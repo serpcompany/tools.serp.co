@@ -20,7 +20,7 @@ type ToolCategory = {
 const processedTools = buildToolDirectoryEntries(toolsData as Tool[]);
 const directoryCategories = getToolDirectoryCategories(processedTools);
 const categories: ToolCategory[] = [
-  { id: "all", name: "All Tools", count: processedTools.length },
+  { id: "all", name: "Filter", count: processedTools.length },
   ...directoryCategories.map((category) => ({
     id: category.id,
     name: category.name,
