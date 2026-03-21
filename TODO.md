@@ -34,6 +34,7 @@
 - [x] add a live 60-second cooldown countdown inside the downloader CTA modal
 - [x] show the same downloader cooldown countdown on the hero under the progress area
 - [x] add browser image compression worker using jsquash codecs (png/jpeg/webp)
+- [x] fix Next.js build for @jsquash/webp by skipping SWC transpilation
 - [x] add server-side PDF compression API using ghostscript-node
 - [x] add client media compression pipeline with FFmpeg and no-grow guardrails
 - [x] add compressor tool pages for supported formats (pdf/image/audio/video)
