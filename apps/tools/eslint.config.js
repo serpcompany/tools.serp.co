@@ -7,11 +7,47 @@ const turboEnvAllowList = [
   "^GH_TOKEN$",
   "^ADSENSE_PUBLISHER_ID$",
   "^SERVER_ACTION_RATE_LIMIT_SECRET$",
+  "^PORT$",
 ];
 
 /** @type {import("eslint").Linter.Config} */
 export default [
+  {
+    ignores: [
+      ".next/**",
+      "out/**",
+      "public/vendor/**",
+      "node_modules/**",
+      "benchmarks/fixtures/**",
+    ],
+  },
   ...nextJsConfig,
+  {
+    files: ["scripts/**/*.{js,mjs,cjs}", "next.config.mjs"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+      },
+    },
+  },
+  {
+    files: ["**/*.d.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  {
+    files: ["next-env.d.ts"],
+    rules: {
+      "@typescript-eslint/triple-slash-reference": "off",
+    },
+  },
+  {
+    files: ["workers/**/*.{js,mjs,cjs}"],
+    rules: {
+      "@next/next/no-assign-module-variable": "off",
+    },
+  },
   {
     rules: {
       "turbo/no-undeclared-env-vars": ["warn", { allowList: turboEnvAllowList }],

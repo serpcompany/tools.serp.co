@@ -7,7 +7,7 @@
     "dev": "node scripts/dev.mjs next dev",
     "build": "next build && node scripts/copy-ffmpeg.mjs && node scripts/copy-magick-wasm.mjs",
     "start": "next start",
-    "lint": "next lint --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -56,6 +56,7 @@
     "@types/papaparse": "^5.5.2",
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.8",
+    "eslint": "^9.38.0",
     "typescript": "^5.9.2"
   }
 }

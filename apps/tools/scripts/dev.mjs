@@ -17,7 +17,6 @@ function isAvailable(port) {
 
 let port = preferred;
 while (port <= maxPort) {
-  // eslint-disable-next-line no-await-in-loop
   if (await isAvailable(port)) break;
   port += 1;
 }
