@@ -1,0 +1,90 @@
+# Preview deployment workflow
+#
+# Deploys a Vercel preview on every push to a non-main branch and posts
+# the URL as a PR comment so it can be reviewed before merging.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   VERCEL_TOKEN      — Personal access token from https://vercel.com/account/tokens
+#   VERCEL_ORG_ID     — Team/org ID shown in Vercel project settings
+#   VERCEL_PROJECT_ID — Project ID shown in Vercel project settings
+
+name: Preview Deployment
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  deploy-preview:
+    name: Deploy to Vercel (preview)
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write  # needed to post the preview URL comment
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install Vercel CLI
+        run: pnpm add -g vercel@latest
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build project
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "preview_url=$url" >> "$GITHUB_OUTPUT"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Find existing PR comment
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: github-actions[bot]
+          body-includes: "<!-- vercel-preview -->"
+        continue-on-error: true
+
+      - name: Post / update preview URL comment
+        uses: peter-evans/create-or-update-comment@v4
+        if: github.event.pull_request.number != ''
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- vercel-preview -->
+            ## 🚀 Preview deployment ready
+
+            | | |
+            |---|---|
+            | **URL** | ${{ steps.deploy.outputs.preview_url }} |
+            | **Branch** | `${{ github.ref_name }}` |
+            | **Commit** | `${{ github.sha }}` |
+
+            > Updated on every push to this branch.
