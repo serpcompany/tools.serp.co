@@ -125,6 +125,7 @@ const nextConfig = {
   transpilePackages: [
     "@jsquash/jpeg",
     "@jsquash/oxipng",
+    "@kreuzberg/html-to-markdown-wasm",
     "@serp-tools/ui",
     "@serp-tools/tool-telemetry",
   ],
