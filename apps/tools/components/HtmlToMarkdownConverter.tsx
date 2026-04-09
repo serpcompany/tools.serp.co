@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import { Card } from "@serp-tools/ui/components/card";
+import { Badge } from "@serp-tools/ui/components/badge";
 import { beginToolRun } from "@/lib/telemetry";
 
 const TOOL_ID = "html-to-markdown";
@@ -117,33 +118,48 @@ export default function HtmlToMarkdownConverter() {
     }
   }
 
+  const htmlLines = html ? html.split("\n").length : 0;
+  const htmlChars = html.length;
+  const mdLines = markdown ? markdown.split("\n").length : 0;
+  const mdChars = markdown.length;
+
   return (
-    <section className="w-full bg-gradient-to-b from-gray-50 to-white py-16">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="text-center mb-10">
+    <section className="w-full bg-gradient-to-b from-gray-50 to-white py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        {/* Header */}
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold tracking-tight mb-3">HTML to Markdown Converter</h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Paste HTML on the left and get clean Markdown on the right — instantly, in your browser.
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 text-center">
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 text-center">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Editor panels */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* HTML Input */}
-          <Card className="flex flex-col p-0 overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2 border-b bg-gray-50">
-              <span className="text-sm font-semibold text-gray-700">HTML Input</span>
-              <div className="flex gap-2">
+          <Card className="flex flex-col p-0 overflow-hidden shadow-sm">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/80">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-gray-800 text-sm">HTML Input</span>
+                {htmlChars > 0 && (
+                  <Badge variant="secondary" className="font-mono text-xs">
+                    {htmlLines} lines · {htmlChars.toLocaleString()} chars
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
                 <Button
                   size="sm"
-                  variant="ghost"
+                  variant="outline"
                   onClick={handlePaste}
-                  className="h-7 px-2 text-xs"
+                  className="h-8 px-3 text-xs font-medium"
                 >
                   Paste
                 </Button>
@@ -151,62 +167,78 @@ export default function HtmlToMarkdownConverter() {
                   size="sm"
                   variant="ghost"
                   onClick={handleClear}
-                  className="h-7 px-2 text-xs"
+                  className="h-8 px-3 text-xs font-medium text-gray-500 hover:text-gray-800"
                 >
                   Clear
                 </Button>
               </div>
             </div>
+            {/* Textarea */}
             <textarea
               value={html}
               onChange={(e) => setHtml(e.target.value)}
               placeholder="Paste your HTML here…"
-              className="flex-1 w-full h-96 p-4 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="flex-1 w-full min-h-[480px] lg:min-h-[600px] p-5 font-mono text-sm leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 bg-white text-gray-900 placeholder:text-gray-400"
               data-testid="html-input"
               spellCheck={false}
             />
           </Card>
 
           {/* Markdown Output */}
-          <Card className="flex flex-col p-0 overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2 border-b bg-gray-50">
-              <span className="text-sm font-semibold text-gray-700">
-                Markdown Output
-                {!wasmReady && (
-                  <span className="ml-2 text-xs font-normal text-gray-400">(loading…)</span>
-                )}
-              </span>
-              <div className="flex gap-2">
+          <Card className="flex flex-col p-0 overflow-hidden shadow-sm">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/80">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-gray-800 text-sm">
+                  Markdown Output
+                </span>
+                {!wasmReady ? (
+                  <Badge variant="secondary" className="text-xs animate-pulse">
+                    Loading…
+                  </Badge>
+                ) : mdChars > 0 ? (
+                  <Badge variant="secondary" className="font-mono text-xs">
+                    {mdLines} lines · {mdChars.toLocaleString()} chars
+                  </Badge>
+                ) : null}
+              </div>
+              <div className="flex items-center gap-2">
                 <Button
                   size="sm"
-                  variant="ghost"
+                  variant="outline"
                   onClick={handleCopy}
                   disabled={!markdown}
-                  className="h-7 px-2 text-xs"
+                  className="h-8 px-3 text-xs font-medium"
                 >
-                  {copied ? "Copied!" : "Copy"}
+                  {copied ? "✓ Copied" : "Copy"}
                 </Button>
                 <Button
                   size="sm"
-                  variant="ghost"
+                  variant="outline"
                   onClick={handleDownload}
                   disabled={!markdown}
-                  className="h-7 px-2 text-xs"
+                  className="h-8 px-3 text-xs font-medium"
                 >
                   Download .md
                 </Button>
               </div>
             </div>
+            {/* Textarea */}
             <textarea
               value={markdown}
               readOnly
               placeholder={wasmReady ? "Markdown will appear here…" : "Loading converter…"}
-              className="flex-1 w-full h-96 p-4 font-mono text-sm resize-none focus:outline-none bg-white text-gray-800"
+              className="flex-1 w-full min-h-[480px] lg:min-h-[600px] p-5 font-mono text-sm leading-relaxed resize-none focus:outline-none bg-gray-50/50 text-gray-800 placeholder:text-gray-400 cursor-default"
               data-testid="markdown-output"
               spellCheck={false}
             />
           </Card>
         </div>
+
+        {/* Privacy note */}
+        <p className="mt-4 text-center text-xs text-gray-400">
+          🔒 All conversion runs locally in your browser via WebAssembly — your HTML is never uploaded.
+        </p>
       </div>
     </section>
   );
