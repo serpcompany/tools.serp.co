@@ -18,7 +18,6 @@ export const TABLE_CONVERT_PAGES: TableConvertPage[] = [
   { slug: "html-to-html", from: "html", to: "html", title: "Convert HTML Table to HTML Table Online" },
   { slug: "html-to-json", from: "html", to: "json", title: "Convert HTML Table to JSON Array Online" },
   { slug: "html-to-latex", from: "html", to: "latex", title: "Convert HTML Table to LaTeX Table Online" },
-  { slug: "html-to-markdown", from: "html", to: "markdown", title: "Convert HTML Table to Markdown Table Online" },
   { slug: "html-to-xml", from: "html", to: "xml", title: "Convert HTML Table to XML Online" },
   { slug: "json-to-csv", from: "json", to: "csv", title: "Convert JSON Array to CSV Online" },
   { slug: "json-to-html", from: "json", to: "html", title: "Convert JSON Array to HTML Table Online" },
