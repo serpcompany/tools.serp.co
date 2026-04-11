@@ -7,18 +7,20 @@ import { TABLE_CONVERT_PAGES } from "@/lib/table-convert-pages";
 type TableConvertLinksSectionProps = {
   currentSlug?: string;
   title?: string;
+  sectionId?: string;
 };
 
 export function TableConvertLinksSection({
   currentSlug,
   title = "More Table Converters",
+  sectionId = "table-convert-links",
 }: TableConvertLinksSectionProps) {
   const pages = TABLE_CONVERT_PAGES.filter((page) => page.slug !== currentSlug);
 
   if (!pages.length) return null;
 
   return (
-    <section className="py-16 bg-gradient-to-b from-white to-gray-50">
+    <section id={sectionId} className="py-16 bg-gradient-to-b from-white to-gray-50">
       <div className="mx-auto max-w-7xl px-6">
         <h2 className="text-2xl font-bold text-center mb-8 text-gray-900">{title}</h2>
 

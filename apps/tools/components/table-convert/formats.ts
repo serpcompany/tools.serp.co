@@ -16,13 +16,39 @@ export const INPUT_FORMATS: FormatOption[] = [
 
 export const OUTPUT_FORMATS: FormatOption[] = [
   { value: "json", label: "JSON" },
+  { value: "jsonlines", label: "JSONLines" },
   { value: "csv", label: "CSV" },
   { value: "markdown", label: "Markdown" },
+  { value: "html", label: "HTML" },
   { value: "sql", label: "SQL" },
+  { value: "mysql", label: "MySQL" },
   { value: "xml", label: "XML" },
   { value: "yaml", label: "YAML" },
-  { value: "html", label: "HTML" },
   { value: "latex", label: "LaTeX" },
+  { value: "mediawiki", label: "MediaWiki" },
+  { value: "ascii", label: "ASCII" },
+  { value: "asciidoc", label: "AsciiDoc" },
+  { value: "bbcode", label: "BBCode" },
+  { value: "jira", label: "Jira" },
+  { value: "textile", label: "Textile" },
+  { value: "tracwiki", label: "TracWiki" },
+  { value: "restructuredtext", label: "reStructuredText" },
+  { value: "ini", label: "INI" },
+  { value: "toml", label: "TOML" },
+  { value: "php", label: "PHP" },
+  { value: "ruby", label: "Ruby" },
+  { value: "actionscript", label: "ActionScript" },
+  { value: "asp", label: "ASP" },
+  { value: "matlab", label: "MATLAB" },
+  { value: "pandasdataframe", label: "Pandas DataFrame" },
+  { value: "rdataframe", label: "R DataFrame" },
+  { value: "dax", label: "DAX" },
+  { value: "qlik", label: "Qlik" },
+  { value: "firebase", label: "Firebase" },
+  { value: "rdf", label: "RDF" },
+  { value: "avro", label: "Avro" },
+  { value: "protobuf", label: "Protobuf" },
+  { value: "magic", label: "Magic" },
   { value: "excel", label: "Excel" },
   { value: "pdf", label: "PDF" },
   { value: "png", label: "PNG" },
@@ -30,12 +56,8 @@ export const OUTPUT_FORMATS: FormatOption[] = [
 ];
 
 export const SAMPLE_TABLE: TableData = {
-  headers: ["Name", "City", "Plan"],
-  rows: [
-    ["Nova", "Berlin", "Pro"],
-    ["Ari", "Austin", "Team"],
-    ["Kai", "Oslo", "Free"],
-  ],
+  headers: Array.from({ length: 10 }, (_, index) => `Column ${index + 1}`),
+  rows: Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => "")),
 };
 
 export function getLabel(list: FormatOption[], value: string) {

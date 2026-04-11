@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/devin/dev/repos/tools.serp.co/logs/.32d36cf4a788ddbd2bbff07619e950dd3dc877b2-audit.json",
+    "files": [
+        {
+            "date": 1775842255468,
+            "name": "/Users/devin/dev/repos/tools.serp.co/logs/mcp-puppeteer-2026-04-11.log",
+            "hash": "d20d90c61c953d7e24ce439ea01e411ddd92c486b00ecada13191e224efd9a20"
+        }
+    ],
+    "hashType": "sha256"
+}

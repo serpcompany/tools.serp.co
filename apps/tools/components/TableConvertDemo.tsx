@@ -35,6 +35,8 @@ type TableConvertDemoProps = {
   subtitle?: string;
 };
 
+const DEFAULT_TABLE: TableData = SAMPLE_TABLE;
+
 export default function TableConvertDemo({
   initialInputFormat = "csv",
   initialOutputFormat = "json",
@@ -46,18 +48,17 @@ export default function TableConvertDemo({
   const [outputFormat, setOutputFormat] = useState<OutputFormat>(initialOutputFormat);
   const [inputView, setInputView] = useState<ViewMode>("raw");
   const [outputView, setOutputView] = useState<ViewMode>("raw");
-  const [inputText, setInputText] = useState(
-    () => serializeOutput(initialInputFormat, SAMPLE_TABLE).text
-  );
+  const [inputText, setInputText] = useState("");
   const [outputText, setOutputText] = useState(
-    () => serializeOutput(initialOutputFormat, SAMPLE_TABLE).text
+    () => serializeOutput(initialOutputFormat, DEFAULT_TABLE).text
   );
   const [outputNotice, setOutputNotice] = useState<string | null>(null);
-  const [tableData, setTableData] = useState<TableData | null>(SAMPLE_TABLE);
+  const [tableData, setTableData] = useState<TableData | null>(DEFAULT_TABLE);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("Auto-convert is on.");
   const [dragActive, setDragActive] = useState(false);
+  const [hasUserInput, setHasUserInput] = useState(false);
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);
   const outputLabel = getLabel(OUTPUT_FORMATS, outputFormat);
@@ -67,6 +68,11 @@ export default function TableConvertDemo({
     (tableData ? "Rendered output preview will appear here." : "Waiting for valid input.");
 
   useEffect(() => {
+    if (!hasUserInput && !inputText.trim()) {
+      setError(null);
+      setTableData(DEFAULT_TABLE);
+      return;
+    }
     const result = parseInput(inputFormat, inputText);
     if (!result.supported) {
       setError(result.error ?? "Input format not supported.");
@@ -96,7 +102,7 @@ export default function TableConvertDemo({
   function handleInputFormatChange(nextFormat: InputFormat, reserialize = true) {
     if (nextFormat === inputFormat) return;
     setInputFormat(nextFormat);
-    if (!tableData || !reserialize) return;
+    if (!tableData || !reserialize || !hasUserInput) return;
     const serialized = serializeOutput(nextFormat, tableData);
     if (serialized.supported) {
       setInputText(serialized.text);
@@ -116,6 +122,7 @@ export default function TableConvertDemo({
       handleInputFormatChange(detected, false);
     }
     setFileName(file.name);
+    setHasUserInput(true);
     const text = await file.text();
     setInputText(text);
     setStatus(`Loaded ${file.name}.`);
@@ -131,6 +138,7 @@ export default function TableConvertDemo({
       handleInputFormatChange(detected, false);
     }
     setFileName(file.name);
+    setHasUserInput(true);
     const text = await file.text();
     setInputText(text);
     setStatus(`Loaded ${file.name}.`);
@@ -140,6 +148,10 @@ export default function TableConvertDemo({
     setInputText("");
     setFileName(null);
     setError(null);
+    setHasUserInput(false);
+    setTableData(DEFAULT_TABLE);
+    setOutputText(serializeOutput(outputFormat, DEFAULT_TABLE).text);
+    setOutputNotice(null);
     setStatus("Cleared current view.");
   }
 
@@ -161,6 +173,7 @@ export default function TableConvertDemo({
   }
 
   function handleEditorChange(nextTable: TableData) {
+    setHasUserInput(true);
     setTableData(nextTable);
     const serialized = serializeOutput(inputFormat, nextTable);
     if (serialized.supported) {
@@ -231,7 +244,10 @@ export default function TableConvertDemo({
                 {inputView === "raw" ? (
                   <textarea
                     value={inputText}
-                    onChange={(event) => setInputText(event.target.value)}
+                    onChange={(event) => {
+                      setHasUserInput(true);
+                      setInputText(event.target.value);
+                    }}
                     placeholder={getPlaceholder(inputFormat)}
                     className={`min-h-[280px] w-full resize-none rounded-lg border bg-background px-4 py-3 font-mono text-sm shadow-sm focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
                       error ? "border-red-400" : ""
@@ -251,19 +267,6 @@ export default function TableConvertDemo({
                     {error}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-
-            <Card className="min-h-[540px]">
-              <CardHeader className="border-b">
-                <CardTitle>Online table editor</CardTitle>
-                <CardDescription>Work directly in a spreadsheet-style grid.</CardDescription>
-                <CardAction>
-                  <Badge variant="secondary">Editor</Badge>
-                </CardAction>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <DataGridEditor tableData={tableData} onChange={handleEditorChange} />
               </CardContent>
             </Card>
 
@@ -312,6 +315,19 @@ export default function TableConvertDemo({
                     text={outputText}
                   />
                 )}
+              </CardContent>
+            </Card>
+
+            <Card className="min-h-[540px]">
+              <CardHeader className="border-b">
+                <CardTitle>Online table editor</CardTitle>
+                <CardDescription>Work directly in a spreadsheet-style grid.</CardDescription>
+                <CardAction>
+                  <Badge variant="secondary">Editor</Badge>
+                </CardAction>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <DataGridEditor tableData={tableData} onChange={handleEditorChange} />
               </CardContent>
             </Card>
           </div>
