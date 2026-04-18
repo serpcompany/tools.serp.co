@@ -200,6 +200,9 @@ function parseInsertStatement(text: string) {
   }
   const headerPart = match[1];
   const valuesPart = match[2];
+  if (!headerPart || !valuesPart) {
+    return { table: null, error: "SQL INSERT with column list is required." };
+  }
   const headers = headerPart
     .split(",")
     .map((header) => header.trim().replace(/^[`"]|[`"]$/g, ""))
@@ -426,8 +429,9 @@ function parseMediaWiki(text: string) {
   if (currentRow) {
     rows.push(currentRow);
   }
-  if (!headers.length && rows.length) {
-    headers.push(...rows[0].map((_, index) => `column_${index + 1}`));
+  const firstRow = rows[0];
+  if (!headers.length && firstRow) {
+    headers.push(...firstRow.map((_, index) => `column_${index + 1}`));
   }
   if (!headers.length) {
     return { table: null, error: "MediaWiki table needs headers or rows." };
