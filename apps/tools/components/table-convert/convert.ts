@@ -602,7 +602,7 @@ function buildToml(table: TableData) {
     table.headers.forEach((header, headerIndex) => {
       const key = normalizeIdentifier(header, `column_${headerIndex + 1}`);
       const value = escapeDoubleQuotes(row[headerIndex] ?? "");
-      lines.push(`${key} = \"${value}\"`);
+      lines.push(`${key} = "${value}"`);
     });
     lines.push("");
   });
@@ -729,7 +729,7 @@ function buildRdfTriples(table: TableData) {
     table.headers.forEach((header, colIndex) => {
       const predicate = normalizeIdentifier(header, `column_${colIndex + 1}`);
       const value = escapeRdfLiteral(row[colIndex] ?? "");
-      lines.push(`${subject} <urn:table:${predicate}> \"${value}\" .`);
+      lines.push(`${subject} <urn:table:${predicate}> "${value}" .`);
     });
   });
   return lines.join("\n");

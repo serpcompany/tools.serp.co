@@ -85,7 +85,7 @@ export default function TableConvertDemo({
     }
     setError(null);
     setTableData(result.table);
-  }, [inputText, inputFormat]);
+  }, [hasUserInput, inputText, inputFormat]);
 
   useEffect(() => {
     if (!tableData) {
