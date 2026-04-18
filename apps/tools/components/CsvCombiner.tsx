@@ -216,24 +216,40 @@ export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
       sectionClassName="bg-gradient-to-b from-gray-50 to-white"
       containerClassName="max-w-7xl px-6 py-16"
       hero={
-        <div>
-          <div className="text-center mb-12">
+        <div className="mx-auto max-w-4xl">
+          <div className="text-center mb-10">
             <h1 className="text-4xl font-bold tracking-tight mb-4">CSV Combiner</h1>
-            <p className="text-lg text-gray-600">
+            <p className="mx-auto max-w-2xl text-lg text-gray-600">
               Merge multiple CSV files into one clean dataset without uploads.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">CSV Files</h3>
+          <Card className="overflow-hidden border-gray-200 shadow-sm">
+            <div className="border-b border-gray-200 bg-white px-6 py-5 sm:px-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium uppercase tracking-[0.18em] text-gray-500">
+                    Step 1
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold text-gray-900">
+                    Add the CSV files you want to merge
+                  </h2>
+                  <p className="mt-2 text-sm text-gray-600">
+                    We align matching headers automatically and keep every row in one combined
+                    download.
+                  </p>
+                </div>
                 {files.length > 0 && (
-                  <Badge variant="secondary">{files.length} files</Badge>
+                  <Badge variant="secondary" className="self-start sm:self-auto">
+                    {files.length} files selected
+                  </Badge>
                 )}
               </div>
+            </div>
+
+            <div className="space-y-6 bg-white px-6 py-6 sm:px-8">
               <div
-                className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                className="cursor-pointer rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50/70 p-8 text-center transition-colors hover:border-gray-400 hover:bg-white"
                 onClick={onPick}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
@@ -242,8 +258,14 @@ export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
                 }}
                 data-testid="csv-combiner-dropzone"
               >
-                <p className="text-sm text-gray-600">Drop CSV files here or click to select</p>
+                <p className="text-base font-medium text-gray-900">
+                  Drop CSV files here or click to select
+                </p>
+                <p className="mt-2 text-sm text-gray-600">
+                  Add at least two files. We merge rows and align columns by header name.
+                </p>
               </div>
+
               <input
                 ref={inputRef}
                 type="file"
@@ -255,68 +277,110 @@ export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
               />
 
               {files.length > 0 && (
-                <ul className="mt-4 space-y-2 text-sm text-gray-600">
-                  {files.map((file) => (
-                    <li key={file.name} className="flex justify-between">
-                      <span>{file.name}</span>
-                      <span>{Math.round(file.size / 1024)} KB</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="font-semibold text-gray-900">Selected files</h3>
+                    <span className="text-xs uppercase tracking-[0.14em] text-gray-500">
+                      Ready to combine
+                    </span>
+                  </div>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    {files.map((file) => (
+                      <li
+                        key={file.name}
+                        className="flex items-center justify-between rounded-xl bg-gray-50 px-3 py-2"
+                      >
+                        <span className="truncate pr-4 font-medium text-gray-800">{file.name}</span>
+                        <span className="shrink-0 text-gray-500">
+                          {Math.round(file.size / 1024)} KB
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
 
               {error && (
-                <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
                   {error}
                 </div>
               )}
 
-              <div className="mt-6 flex items-center gap-3">
-                <Button onClick={combineCsv} disabled={busy} data-testid="csv-combiner-run">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Button
+                  onClick={combineCsv}
+                  disabled={busy}
+                  className="sm:min-w-48"
+                  data-testid="csv-combiner-run"
+                >
                   {busy ? "Combining..." : "Combine CSV Files"}
                 </Button>
-                <Button variant="outline" onClick={() => {
-                  setFiles([]);
-                  setSelectedFiles([]);
-                  setOutput("");
-                  setStats({ rows: 0, columns: 0 });
-                  setError("");
-                  if (inputRef.current) inputRef.current.value = "";
-                }}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setFiles([]);
+                    setSelectedFiles([]);
+                    setOutput("");
+                    setStats({ rows: 0, columns: 0 });
+                    setError("");
+                    if (inputRef.current) inputRef.current.value = "";
+                  }}
+                >
                   Clear
                 </Button>
+                <p className="text-sm text-gray-500 sm:ml-auto">
+                  No uploads. Everything stays in your browser.
+                </p>
               </div>
-            </Card>
 
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">Combined Output</h3>
-                {stats.rows > 0 && (
-                  <Badge variant="secondary">{stats.rows} rows × {stats.columns} columns</Badge>
-                )}
-              </div>
-              <textarea
-                value={output}
-                readOnly
-                placeholder="Combined CSV output will appear here..."
-                className="w-full h-96 p-4 border rounded-lg resize-none bg-gray-50 font-mono text-sm"
-                data-testid="csv-combiner-output"
-              />
-              <div className="mt-4">
-                <Button
-                  onClick={downloadCsv}
-                  disabled={!output}
-                  variant="secondary"
-                  data-testid="csv-combiner-download"
-                >
-                  Download Combined CSV
-                </Button>
-              </div>
-            </Card>
-          </div>
+              {output && (
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-5">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-700">
+                        Step 2
+                      </p>
+                      <h3 className="mt-2 text-xl font-semibold text-emerald-950">
+                        Combined successfully
+                      </h3>
+                      <p className="mt-2 text-sm text-emerald-900/80">
+                        Your merged file is ready to download.
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="self-start bg-white text-emerald-800">
+                      {stats.rows} rows · {stats.columns} columns
+                    </Badge>
+                  </div>
+
+                  <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <Button
+                      onClick={downloadCsv}
+                      disabled={!output}
+                      variant="secondary"
+                      className="bg-emerald-900 text-white hover:bg-emerald-800"
+                      data-testid="csv-combiner-download"
+                    >
+                      Download Combined CSV
+                    </Button>
+                    <p className="text-sm text-emerald-900/80">
+                      The combined file is generated locally and downloaded as <code>combined.csv</code>.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
 
           {videoEmbedId && (
             <div className="mt-10">
+              <div className="mb-4 text-center">
+                <p className="text-sm font-medium uppercase tracking-[0.18em] text-gray-500">
+                  Walkthrough
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold text-gray-900">
+                  Watch the CSV combiner in action
+                </h2>
+              </div>
               <ToolVideoPanel embedId={videoEmbedId} autoplay={videoPlaying} />
             </div>
           )}
