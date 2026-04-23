@@ -10960,6 +10960,16 @@
     "isActive": true
   },
   {
+    "id": "csv-to-markdown",
+    "name": "CSV to Markdown",
+    "description": "Convert CSV to Markdown online",
+    "operation": "convert",
+    "route": "/csv-to-markdown",
+    "from": "csv",
+    "to": "markdown",
+    "isActive": true
+  },
+  {
     "id": "csv-to-matlab",
     "name": "CSV to MATLAB",
     "description": "Convert CSV to MATLAB online",

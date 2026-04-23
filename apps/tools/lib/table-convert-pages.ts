@@ -24,6 +24,7 @@ export const TABLE_CONVERT_PAGES: TableConvertPage[] = [
   { slug: "csv-to-jsonlines", from: "csv", to: "jsonlines", title: "Convert CSV to JSONLines Format Online" },
   { slug: "csv-to-latex", from: "csv", to: "latex", title: "Convert CSV to LaTeX Table Online" },
   { slug: "csv-to-magic", from: "csv", to: "magic", title: "Convert CSV to Magic Online" },
+  { slug: "csv-to-markdown", from: "csv", to: "markdown", title: "Convert CSV to Markdown Table Online" },
   { slug: "csv-to-matlab", from: "csv", to: "matlab", title: "Convert CSV to MATLAB Online" },
   { slug: "csv-to-mediawiki", from: "csv", to: "mediawiki", title: "Convert CSV to MediaWiki Table Online" },
   { slug: "csv-to-pandasdataframe", from: "csv", to: "pandasdataframe", title: "Convert CSV to Pandas DataFrame Online" },
