@@ -7,6 +7,7 @@
     "dev": "turbo dev",
     "lint": "turbo lint && node scripts/validate-tools.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "sync:network-brands": "node scripts/sync-network-brands.mjs",
     "benchmark:tools": "node scripts/benchmark-tools.mjs",
     "lint:tools": "node scripts/validate-tools.mjs"
   },

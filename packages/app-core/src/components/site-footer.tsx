@@ -6,6 +6,7 @@ type FooterLink = {
 const featuredToolLinks: FooterLink[] = [
   { href: "/", label: "Browse All Tools" },
   { href: "/categories/", label: "Categories" },
+  { href: "/brands/", label: "Brands" },
   { href: "/video-downloader/", label: "Video Downloader" },
   { href: "/download-loom-videos/", label: "Download Loom Videos" },
   { href: "/pdf-viewer/", label: "PDF Viewer" },
@@ -76,6 +77,9 @@ export function SiteFooter() {
             </a>
             <a href="/categories/" className="transition-colors hover:text-white">
               Categories
+            </a>
+            <a href="/brands/" className="transition-colors hover:text-white">
+              Brands
             </a>
             <a href="https://apps.serp.co" className="transition-colors hover:text-white">
               Apps

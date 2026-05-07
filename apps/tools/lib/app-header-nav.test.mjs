@@ -12,5 +12,6 @@ test("header nav includes core SERP links but excludes filetypes", () => {
   assert.match(appHeaderSource, /https:\/\/extensions\.serp\.co/);
   assert.match(appHeaderSource, /https:\/\/tools\.serp\.co/);
   assert.match(appHeaderSource, /https:\/\/apps\.serp\.co/);
+  assert.match(appHeaderSource, /href:\s*"\/brands\/",\s*label:\s*"Brands"/);
   assert.doesNotMatch(appHeaderSource, /https:\/\/filetypes\.serp\.co/);
 });

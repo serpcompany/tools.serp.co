@@ -30,6 +30,7 @@ test("site footer includes core SERP Tools navigation", () => {
   assert.match(siteFooterSource, /video-downloader/);
   assert.match(siteFooterSource, /download-loom-videos/);
   assert.match(siteFooterSource, /\/categories\//);
+  assert.match(siteFooterSource, /\/brands\//);
   assert.match(siteFooterSource, /https:\/\/apps\.serp\.co/);
   assert.match(siteFooterSource, /https:\/\/extensions\.serp\.co/);
 });

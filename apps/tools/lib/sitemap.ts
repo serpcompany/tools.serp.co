@@ -4,7 +4,7 @@ import type { Tool } from "@/types";
 
 export const PAGE_SIZE = 10000;
 
-export const STATIC_PATHS = ["/", "/categories/"];
+export const STATIC_PATHS = ["/", "/categories/", "/brands/"];
 const CATEGORY_PATHS = getCategoryPagePaths(toolsData as Tool[]);
 
 export const escapeXml = (value: string) =>
