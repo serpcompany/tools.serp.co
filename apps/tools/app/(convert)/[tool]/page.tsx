@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import toolsData from "@serp-tools/app-core/data/tools.json";
 import { DownloaderPageRenderer } from "@/components/DownloaderPageRenderer";
@@ -9,6 +9,11 @@ import { buildToolMetadata } from "@/lib/metadata";
 import type { Tool } from "@/types";
 
 const tools = toolsData as Tool[];
+
+const LEGACY_DOWNLOADER_ROUTE_REDIRECTS: Record<string, string> = {
+  "download-kajab-videos": "/download-kajabi-videos",
+  "download-stripcha-videos": "/download-stripchat-videos",
+};
 
 type PageProps = {
   params: Promise<{ tool: string }>;
@@ -21,6 +26,12 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function Page({ params }: PageProps) {
   const { tool: toolId } = await params;
+  const legacyDownloaderRoute = LEGACY_DOWNLOADER_ROUTE_REDIRECTS[toolId];
+
+  if (legacyDownloaderRoute) {
+    redirect(legacyDownloaderRoute);
+  }
+
   const tool = tools.find((item) => item.id === toolId && item.isActive);
 
   if (!tool) {

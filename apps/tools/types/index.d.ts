@@ -102,12 +102,50 @@ export interface BlogPost {
   category?: string;
 }
 
+export interface ProductLinks {
+  appsUrl?: string;
+  serplyUrl?: string;
+  githubRepoUrl?: string;
+}
+
+export interface ProductImage {
+  url: string;
+  alt?: string;
+  caption?: string;
+}
+
+export interface ProductReview {
+  author: string;
+  rating?: number;
+  date?: string;
+  body: string;
+}
+
+export interface SourceLink {
+  label: string;
+  url: string;
+}
+
+export interface PermissionJustification {
+  permission: string;
+  justification: string;
+}
+
 // Tool content structure (landing page data)
 export interface ToolContent {
   tool: ToolInfo;
   videoSection?: VideoSectionData;
   faqs: FAQ[];
   aboutSection: AboutFormatsSection;
+  productLinks?: ProductLinks;
+  features?: string[];
+  screenshots?: ProductImage[];
+  reviews?: ProductReview[];
+  sourceLinks?: SourceLink[];
+  supportedOperatingSystems?: string[];
+  supportedRegions?: string[];
+  permissionJustifications?: PermissionJustification[];
+  keywords?: string[];
   howTo?: HowToSectionData;
   infoArticle?: InfoArticleSectionData;
   changelog?: ChangelogEntry[];
