@@ -43,8 +43,10 @@ test("downloader pages keep ads hidden until the user initiates the action", () 
   assert.match(downloaderPageHeroSource, /\{adsVisible && \(/);
 });
 
-test("shared tool ad rails still use the documented xl breakpoint", () => {
-  assert.match(toolAdsSource, /hidden h-\[600px\] w-full xl:block/);
+test("shared tool ad rails do not reserve rail height while ads are hidden", () => {
+  assert.match(toolAdsSource, /if \(!visible\) \{\s*return \(/);
+  assert.doesNotMatch(toolAdsSource, /railPlaceholderClass/);
+  assert.doesNotMatch(toolAdsSource, /hidden h-\[600px\] w-full xl:block/);
   assert.match(toolAdsSource, /xl:grid-cols-\[160px_minmax\(0,1fr\)_160px\]/);
   assert.match(toolAdsSource, /className="hidden h-\[600px\] w-full xl:flex"/);
 });

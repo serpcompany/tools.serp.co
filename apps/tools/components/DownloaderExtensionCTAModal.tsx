@@ -21,12 +21,14 @@ type DownloaderExtensionCTAModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   cooldownEndsAtMs: number | null;
+  extensionUrl?: string;
 };
 
 export default function DownloaderExtensionCTAModal({
   open,
   onOpenChange,
   cooldownEndsAtMs,
+  extensionUrl = DOWNLOADER_EXTENSION_URL,
 }: DownloaderExtensionCTAModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -46,7 +48,7 @@ export default function DownloaderExtensionCTAModal({
 
         <DialogFooter className="sm:justify-start">
           <Button asChild className="group h-10 rounded-full bg-[#0f62fe] px-6 hover:bg-[#0b4ccc]">
-            <a href={DOWNLOADER_EXTENSION_URL} target="_blank" rel="noreferrer">
+            <a href={extensionUrl} target="_blank" rel="noreferrer">
               {DOWNLOADER_EXTENSION_LABEL}
               <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
             </a>
