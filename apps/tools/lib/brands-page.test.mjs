@@ -3,6 +3,12 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+const networkBrands = JSON.parse(
+  readFileSync(
+    new URL("../../../packages/app-core/src/data/network-brands.json", import.meta.url),
+    "utf8",
+  ),
+);
 const brandsPageUrl = new URL("../app/brands/page.tsx", import.meta.url);
 const brandsPagePath = fileURLToPath(brandsPageUrl);
 const brandsPageSource = existsSync(brandsPagePath)
@@ -13,6 +19,17 @@ const sitemapSource = readFileSync(new URL("./sitemap.ts", import.meta.url), "ut
 test("brands route exists and is backed by network brands data", () => {
   assert.notEqual(brandsPageSource, "");
   assert.match(brandsPageSource, /getNetworkBrands/);
+  assert.equal(Object.keys(networkBrands.brands).length, 46);
+  assert.equal(networkBrands.brandGroups.mainGroup.length, 38);
+  assert.equal(networkBrands.brandGroups.serpxxxGroup.length, 14);
+  assert.equal(
+    networkBrands.brands["thisvidvideodownloader-com"].url,
+    "https://thisvidvideodownloader.com",
+  );
+  assert.equal(
+    networkBrands.brands["redgifsdownloaderapp-com"].url,
+    "https://redgifsdownloaderapp.com",
+  );
 });
 
 test("brands route is static and exports page metadata", () => {
