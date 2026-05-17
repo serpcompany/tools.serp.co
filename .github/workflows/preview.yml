@@ -20,6 +20,7 @@ jobs:
     name: Deploy to Vercel (preview)
     runs-on: ubuntu-latest
     permissions:
+      contents: read       # needed by actions/checkout for private repos
       pull-requests: write  # needed to post the preview URL comment
 
     steps:
