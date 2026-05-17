@@ -408,7 +408,7 @@ export default function VideoDownloaderTool({
               <input
                 type="url"
                 inputMode="url"
-                placeholder="Paste any public video link (YouTube, TikTok, Vimeo, Loom, and more)"
+                placeholder="Paste public video link here"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -431,11 +431,6 @@ export default function VideoDownloaderTool({
                 {busy ? "Working..." : "DOWNLOAD"}
               </Button>
             </div>
-
-            <p className="text-xs text-muted-foreground">
-              Supports many public platforms including YouTube, TikTok, Vimeo, Loom, Wistia,
-              Dailymotion, Reddit, and more.
-            </p>
           </div>
         </div>
       }
