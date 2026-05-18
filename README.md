@@ -1,31 +1,79 @@
-# shadcn/ui monorepo template
+# SERP Tools
 
-This template is for creating a monorepo with shadcn/ui.
+Monorepo for tools.serp.co and shared SERP tool packages.
 
-## Usage
-
-```bash
-pnpm dlx shadcn@latest init
-```
-
-## Adding components
-
-To add components to your app, run the following command at the root of your `web` app:
+## Common commands
 
 ```bash
-pnpm dlx shadcn@latest add button -c apps/web
+pnpm install
+pnpm dev
+pnpm lint
+pnpm lint:tools
+pnpm lint:links
+pnpm -C apps/tools typecheck
 ```
 
-This will place the ui components in the `packages/ui/src/components` directory.
+## Downloader lander outbound links
 
-## Tailwind
+Downloader landing pages must not contain guessed outbound links.
 
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
+The tool registry lives at:
 
-## Using components
-
-To use the components in your app, import them from the `ui` package.
-
-```tsx
-import { Button } from "@serp-tools/ui/components/button";
+```text
+packages/app-core/src/data/tools.json
 ```
+
+Any URL under these fields is treated as a public lander outbound link and must be verified:
+
+```text
+content.productLinks.*
+content.sourceLinks[].url
+```
+
+Before changing downloader page content, run:
+
+```bash
+pnpm lint:links
+```
+
+For a single tool while editing:
+
+```bash
+node scripts/validate-lander-outbound-links.mjs --tool-id=download-tube8-videos
+```
+
+The validator follows redirects and fails on confirmed broken links and source-site Official Links:
+
+```text
+HTTP 404
+HTTP 410
+Official Links that point back to the source platform, e.g. Tube8 -> https://www.tube8.com/
+```
+
+Do not invent links from slugs. In particular, do not add guessed URLs like:
+
+```text
+https://apps.serp.co/<slug>
+https://github.com/serpapps/<slug>
+```
+
+unless the exact URL has been checked and does not return 404/410. Do not add Official Links to the source platform/site itself. Prefer verified `serp.ly` product links when available.
+
+## Git hooks
+
+This repo includes a pre-commit hook under `.githooks/` that runs outbound-link validation when lander data changes.
+
+Enable it once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The hook runs:
+
+```bash
+pnpm lint:links
+node scripts/validate-tools.mjs
+```
+
+for relevant staged changes.

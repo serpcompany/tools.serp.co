@@ -5,11 +5,12 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "turbo lint && node scripts/validate-tools.mjs",
+    "lint": "turbo lint && node scripts/validate-tools.mjs && node scripts/validate-lander-outbound-links.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "sync:network-brands": "node scripts/sync-network-brands.mjs",
     "benchmark:tools": "node scripts/benchmark-tools.mjs",
-    "lint:tools": "node scripts/validate-tools.mjs"
+    "lint:tools": "node scripts/validate-tools.mjs && node scripts/validate-lander-outbound-links.mjs",
+    "lint:links": "node scripts/validate-lander-outbound-links.mjs"
   },
   "devDependencies": {
     "@serp-tools/eslint-config": "workspace:*",

@@ -13,6 +13,10 @@ type DownloaderPageTemplateProps = {
   content: ToolContent;
 };
 
+function hasText(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 function getDownloaderOutboundLinks(content: ToolContent): SourceLink[] {
   const links: SourceLink[] = [];
 
@@ -42,6 +46,9 @@ export default function DownloaderPageTemplate({
   content,
 }: DownloaderPageTemplateProps) {
   const outboundLinks = getDownloaderOutboundLinks(content);
+  const permissionJustifications = content.permissionJustifications?.filter((permission) => (
+    hasText(permission.permission) && hasText(permission.justification)
+  )) ?? [];
 
   return (
     <main className="min-h-screen bg-background">
@@ -188,12 +195,12 @@ export default function DownloaderPageTemplate({
         </section>
       )}
 
-      {content.permissionJustifications && content.permissionJustifications.length > 0 && (
+      {permissionJustifications.length > 0 && (
         <section className="bg-slate-50 py-16">
           <div className="mx-auto max-w-7xl px-6">
             <h2 className="text-3xl font-bold text-slate-950">Permissions</h2>
             <div className="mt-8 grid gap-4 md:grid-cols-2">
-              {content.permissionJustifications.map((permission) => (
+              {permissionJustifications.map((permission) => (
                 <div key={permission.permission} className="rounded-lg border border-slate-200 bg-white p-5">
                   <h3 className="text-base font-semibold text-slate-950">
                     {permission.permission}
