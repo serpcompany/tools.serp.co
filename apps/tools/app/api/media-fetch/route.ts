@@ -419,8 +419,15 @@ async function streamExtractedMedia(format: ExtractedMediaFormat) {
 }
 
 function sanitizeYtDlpFileName(value: string) {
-  const cleaned = value
-    .replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "-")
+  const cleaned = Array.from(value, (char) => {
+    const codePoint = char.codePointAt(0) ?? 0;
+    if (codePoint <= 0x1f || /[\\/:*?"<>|]/.test(char)) {
+      return "-";
+    }
+    return char;
+  })
+    .join("")
+    .replace(/-+/g, "-")
     .replace(/\s+/g, " ")
     .trim();
   return cleaned || "download";
