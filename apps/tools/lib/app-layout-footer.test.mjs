@@ -33,4 +33,7 @@ test("site footer includes core SERP Tools navigation", () => {
   assert.match(siteFooterSource, /\/brands\//);
   assert.match(siteFooterSource, /https:\/\/apps\.serp\.co/);
   assert.match(siteFooterSource, /https:\/\/extensions\.serp\.co/);
+  assert.match(siteFooterSource, /https:\/\/dr\.serp\.co\/sites\/tools\.serp\.co/);
+  assert.match(siteFooterSource, /https:\/\/dr\.serp\.co\/badge\/tools\.serp\.co\?style=serp-dr-v3/);
+  assert.match(siteFooterSource, /Verified DR 78 for tools\.serp\.co/);
 });
