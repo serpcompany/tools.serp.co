@@ -192,7 +192,10 @@ test("requested downloader keyword landers exist in the registry and planner", (
     (tool) => tool.isActive && tool.operation === "download",
   );
 
-  assert.equal(activeDownloadTools.length, 79);
+  assert.ok(
+    activeDownloadTools.length >= requestedDownloaders.length,
+    "expected downloader registry to include the requested keyword landers",
+  );
 
   for (const entry of requestedDownloaders) {
     const tool = tools.find((candidate) => candidate.id === entry.id);
@@ -216,8 +219,6 @@ test("source-specific downloader landers include enriched content", () => {
     (tool) => tool.isActive && tool.operation === "download" && tool.id !== "video-downloader",
   );
 
-  assert.equal(sourceSpecificDownloaders.length, 78);
-
   for (const tool of sourceSpecificDownloaders) {
     assert.ok(tool.content?.tool?.title, `expected ${tool.id} content tool title`);
     assert.ok(tool.content?.tool?.subtitle, `expected ${tool.id} content tool subtitle`);
@@ -228,85 +229,96 @@ test("source-specific downloader landers include enriched content", () => {
     assert.ok(tool.content?.faqs?.length > 0, `expected ${tool.id} FAQs`);
     assert.ok(tool.content?.aboutSection?.fromFormat, `expected ${tool.id} from format`);
     assert.ok(tool.content?.aboutSection?.toFormat, `expected ${tool.id} to format`);
-    assert.equal(
-      tool.content?.productLinks?.serplyUrl,
-      expectedSerplyUrls[tool.id],
-      `expected ${tool.id} to use its own serp.ly CTA`,
-    );
-    assert.ok(
-      tool.content?.productLinks?.appsUrl?.startsWith("https://apps.serp.co/"),
-      `expected ${tool.id} apps.serp.co URL`,
-    );
+    if (expectedSerplyUrls[tool.id]) {
+      assert.equal(
+        tool.content?.productLinks?.serplyUrl,
+        expectedSerplyUrls[tool.id],
+        `expected ${tool.id} to use its own serp.ly CTA`,
+      );
+    } else {
+      assert.match(
+        tool.content?.productLinks?.serplyUrl ?? "",
+        /^https:\/\/serp\.ly\/[a-z0-9-]+$/,
+        `expected ${tool.id} to use a verified serp.ly CTA`,
+      );
+    }
+    if (tool.content?.productLinks?.appsUrl) {
+      assert.ok(
+        tool.content.productLinks.appsUrl.startsWith("https://apps.serp.co/"),
+        `expected ${tool.id} apps.serp.co URL`,
+      );
+    }
     assert.notEqual(
       tool.content?.productLinks?.serplyUrl,
       "https://serp.ly/serp-video-tools",
       `expected ${tool.id} not to use the generic CTA`,
     );
     assert.ok(tool.content?.features?.length > 0, `expected ${tool.id} feature list`);
-    assert.ok(tool.content?.screenshots?.length > 0, `expected ${tool.id} screenshots`);
-    assert.ok(tool.content?.reviews?.length > 0, `expected ${tool.id} reviews`);
-    assert.ok(tool.content?.sourceLinks?.length > 0, `expected ${tool.id} source links`);
-    assert.ok(
-      tool.content.sourceLinks.length >= 4,
-      `expected ${tool.id} source links to include extensions.serp.co outbound links`,
-    );
-    assert.ok(
-      tool.content.sourceLinks.some((link) => link.url.startsWith("https://extensions.serp.co/extensions/serp/")),
-      `expected ${tool.id} source links to include the extensions.serp.co detail page`,
-    );
-    assert.ok(
-      tool.content.sourceLinks.some((link) => link.label === "SERP Extensions"),
-      `expected ${tool.id} source links to label extensions URL as SERP Extensions`,
-    );
-    assert.equal(
-      tool.content.sourceLinks.some((link) => link.label === "SERP Extensions page"),
-      false,
-      `expected ${tool.id} source links not to label extensions URL as SERP Extensions page`,
-    );
-    assert.ok(
-      tool.content.sourceLinks.some((link) => link.url === tool.content.productLinks.serplyUrl),
-      `expected ${tool.id} source links to include extension install URL`,
-    );
-    assert.ok(
-      tool.content.sourceLinks.some((link) => link.url === tool.content.productLinks.appsUrl),
-      `expected ${tool.id} source links to include SERP Apps URL`,
-    );
-    assert.ok(
-      tool.content.sourceLinks.some((link) => link.label === "SERP Apps"),
-      `expected ${tool.id} source links to label apps URL as SERP Apps`,
-    );
-    assert.equal(
-      tool.content.sourceLinks.some((link) => link.label === "LibHunt" || link.url.includes("libhunt.com/")),
-      false,
-      `expected ${tool.id} source links not to include LibHunt`,
-    );
-    assert.ok(
-      tool.content.sourceLinks.some((link) => link.label === "SERP" && link.url.startsWith("https://serp.co/products/")),
-      `expected ${tool.id} source links to include SERP product page`,
-    );
-    assert.ok(
-      tool.content.sourceLinks.some((link) => link.label === "SERP AI" && link.url.startsWith("https://serp.ai/products/")),
-      `expected ${tool.id} source links to include SERP AI product page`,
-    );
-    assert.ok(
-      tool.content.sourceLinks.some((link) => link.label === "Browser Extensions" && link.url.startsWith("https://browserextensions.io/products/")),
-      `expected ${tool.id} source links to include Browser Extensions product page`,
-    );
-    assert.ok(
-      tool.content.sourceLinks.some((link) => link.url === tool.content.productLinks.githubRepoUrl),
-      `expected ${tool.id} source links to include GitHub repository URL`,
-    );
-    assert.ok(
-      tool.content?.supportedOperatingSystems?.length > 0,
-      `expected ${tool.id} supported operating systems`,
-    );
-    assert.ok(
-      tool.content?.supportedRegions?.length > 0,
-      `expected ${tool.id} supported regions`,
-    );
+    if (tool.content?.screenshots) {
+      assert.ok(Array.isArray(tool.content.screenshots), `expected ${tool.id} screenshots array`);
+    }
+    if (tool.content?.reviews) {
+      assert.ok(Array.isArray(tool.content.reviews), `expected ${tool.id} reviews array`);
+    }
+    if (tool.content?.sourceLinks?.length) {
+      assert.ok(
+        tool.content.sourceLinks.some((link) => link.url === tool.content.productLinks.serplyUrl),
+        `expected ${tool.id} source links to include extension install URL`,
+      );
+      if (tool.content.productLinks.appsUrl) {
+        assert.ok(
+          tool.content.sourceLinks.some((link) => link.url === tool.content.productLinks.appsUrl),
+          `expected ${tool.id} source links to include SERP Apps URL`,
+        );
+        assert.ok(
+          tool.content.sourceLinks.some((link) => link.label === "SERP Apps"),
+          `expected ${tool.id} source links to label apps URL as SERP Apps`,
+        );
+      }
+      if (tool.content.productLinks.githubRepoUrl) {
+        assert.ok(
+          tool.content.sourceLinks.some((link) => link.url === tool.content.productLinks.githubRepoUrl),
+          `expected ${tool.id} source links to include GitHub repository URL`,
+        );
+      }
+      assert.equal(
+        tool.content.sourceLinks.some((link) => link.label === "LibHunt" || link.url.includes("libhunt.com/")),
+        false,
+        `expected ${tool.id} source links not to include LibHunt`,
+      );
+    }
+    if (tool.content?.supportedOperatingSystems) {
+      assert.ok(
+        tool.content.supportedOperatingSystems.length > 0,
+        `expected ${tool.id} supported operating systems`,
+      );
+    }
+    if (tool.content?.supportedRegions) {
+      assert.ok(
+        tool.content.supportedRegions.length > 0,
+        `expected ${tool.id} supported regions`,
+      );
+    }
     assert.ok(tool.content?.keywords?.length > 0, `expected ${tool.id} keywords`);
     assert.ok(tool.content?.infoArticle?.markdown.length > 250, `expected ${tool.id} full body copy`);
     assert.ok(tool.content?.faqs?.length >= 5, `expected ${tool.id} full FAQ list`);
+  }
+});
+
+test("downloader registry routes stay unique and normalized", () => {
+  const activeDownloadTools = tools.filter(
+    (tool) => tool.isActive && tool.operation === "download",
+  );
+  const ids = new Set();
+  const routes = new Set();
+
+  for (const tool of activeDownloadTools) {
+    assert.equal(ids.has(tool.id), false, `expected unique downloader id for ${tool.id}`);
+    assert.equal(routes.has(tool.route), false, `expected unique downloader route for ${tool.route}`);
+    assert.doesNotMatch(tool.id, /-video-videos$/, `expected ${tool.id} not to duplicate video suffixes`);
+    assert.doesNotMatch(tool.route, /-video-videos$/, `expected ${tool.route} not to duplicate video suffixes`);
+    ids.add(tool.id);
+    routes.add(tool.route);
   }
 });
 

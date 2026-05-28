@@ -1,14 +1,13 @@
-import { randomUUID } from "node:crypto";
-import { createReadStream, existsSync, promises as fs } from "node:fs";
+import { existsSync, promises as fs } from "node:fs";
 import dns from "node:dns/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
-import { Readable } from "node:stream";
 import ipaddr from "ipaddr.js";
 import { extension as extensionForType, lookup as lookupMime } from "mime-types";
 import { create as createYtDlp } from "youtube-dl-exec";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "../../../lib/capabilities";
 import { DOWNLOADER_CONSUMER } from "../../../lib/downloader-contract.js";
+import { extractWithRegisteredExtractor, type ExtractedMediaFormat } from "../../../lib/extractors";
 import {
   createDownloaderCooldownCookieCodec,
   createDownloaderRateLimiter,
@@ -113,6 +112,32 @@ type UrlPayload = {
   consumer?: string;
   url?: string;
   mode?: "audio" | "video";
+};
+
+type YtDlpInfo = {
+  title?: string;
+  ext?: string;
+  url?: string;
+  filesize?: number;
+  filesize_approx?: number;
+  http_headers?: Record<string, string>;
+  formats?: YtDlpFormat[];
+};
+
+type YtDlpFormat = {
+  url?: string;
+  ext?: string;
+  protocol?: string;
+  format_id?: string;
+  format_note?: string;
+  filesize?: number;
+  filesize_approx?: number;
+  width?: number;
+  height?: number;
+  tbr?: number;
+  vcodec?: string;
+  acodec?: string;
+  http_headers?: Record<string, string>;
 };
 
 const downloaderRateLimiter = createDownloaderRateLimiter();
@@ -284,14 +309,7 @@ function withResponseHeaders(response: Response, extraHeaders: HeadersInit) {
 }
 
 async function tryDirectFetch(targetUrl: URL) {
-  const response = await fetch(targetUrl.toString(), {
-    method: "GET",
-    redirect: "follow",
-    headers: {
-      "user-agent": "Mozilla/5.0 (compatible; SerpToolsBot/1.0)",
-      accept: "*/*",
-    },
-  });
+  const response = await fetchPublicMediaUrl(targetUrl.toString());
 
   const contentType = normalizeContentType(response.headers.get("content-type"));
   const extFromUrl = getExtensionFromPath(targetUrl.pathname);
@@ -340,69 +358,163 @@ async function tryDirectFetch(targetUrl: URL) {
   return new Response(response.body, { status: 200, headers });
 }
 
-async function streamDownloadedFile(
-  filePath: string,
-  fileName: string,
-  onDone: () => void
-) {
-  const stat = await fs.stat(filePath);
-  const extension = getExtensionFromName(fileName);
-  if (!extension || !SUPPORTED_EXTENSIONS.has(extension)) {
-    throw new Error("Downloaded media type is not supported.");
+async function fetchPublicMediaUrl(url: string, referer?: string, redirectCount = 0): Promise<Response> {
+  if (redirectCount > 5) {
+    throw new Error("Too many media redirects.");
   }
 
-  const contentType = lookupMime(fileName) || "application/octet-stream";
+  const mediaUrl = new URL(url);
+  if (mediaUrl.protocol !== "http:" && mediaUrl.protocol !== "https:") {
+    throw new Error("Extracted media URL protocol is not supported.");
+  }
+  await assertPublicUrl(mediaUrl);
+
+  const response = await fetch(mediaUrl.toString(), {
+    method: "GET",
+    redirect: "manual",
+    headers: {
+      "user-agent": "Mozilla/5.0 (compatible; SerpToolsBot/1.0)",
+      accept: "*/*",
+      ...(referer ? { referer } : {}),
+    },
+  });
+
+  if ([301, 302, 303, 307, 308].includes(response.status)) {
+    response.body?.cancel();
+    const location = response.headers.get("location");
+    if (!location) {
+      throw new Error("Extractor media redirect had no location.");
+    }
+    return fetchPublicMediaUrl(new URL(location, mediaUrl).toString(), referer, redirectCount + 1);
+  }
+
+  return response;
+}
+
+async function streamExtractedMedia(format: ExtractedMediaFormat) {
+  const response = await fetchPublicMediaUrl(format.url, format.referer);
+
+  if (!response.ok || !response.body) {
+    response.body?.cancel();
+    throw new Error(`Extractor media fetch failed with HTTP ${response.status}.`);
+  }
+
+  const contentType = normalizeContentType(response.headers.get("content-type")) || format.contentType;
+  const extension = format.extension.toLowerCase();
+  if (!SUPPORTED_EXTENSIONS.has(extension)) {
+    response.body.cancel();
+    throw new Error("Extracted media type is not supported.");
+  }
+
   const headers = buildResponseHeaders({
-    contentType: String(contentType),
-    contentLength: stat.size,
-    fileName,
+    contentType: contentType || "application/octet-stream",
+    contentLength: response.headers.get("content-length")
+      ? Number(response.headers.get("content-length"))
+      : format.contentLength,
+    fileName: format.fileName,
     extension,
   });
 
-  const stream = createReadStream(filePath);
-  stream.on("close", onDone);
-  stream.on("error", onDone);
-  const body = Readable.toWeb(stream) as unknown as BodyInit;
-  return new Response(body, { status: 200, headers });
+  return new Response(response.body, { status: 200, headers });
+}
+
+function sanitizeYtDlpFileName(value: string) {
+  const cleaned = Array.from(value, (char) => {
+    const codePoint = char.codePointAt(0) ?? 0;
+    if (codePoint <= 0x1f || /[\\/:*?"<>|]/.test(char)) {
+      return "-";
+    }
+    return char;
+  })
+    .join("")
+    .replace(/-+/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
+  return cleaned || "download";
+}
+
+function getYtDlpFormatScore(format: YtDlpFormat, mode: "audio" | "video") {
+  const ext = String(format.ext ?? "").toLowerCase();
+  if (!format.url || !SUPPORTED_EXTENSIONS.has(ext)) return -1;
+  if (format.protocol && !/^https?$/.test(format.protocol)) return -1;
+
+  const hasVideo = !!format.vcodec && format.vcodec !== "none";
+  const hasAudio = !!format.acodec && format.acodec !== "none";
+  const height = Number(format.height ?? 0);
+  const bitrate = Number(format.tbr ?? 0);
+  const size = Number(format.filesize ?? format.filesize_approx ?? 0);
+
+  if (mode === "video" && !hasVideo) return -1;
+  if (mode === "audio" && !hasAudio) return -1;
+
+  return (hasVideo ? 1_000_000 : 0) +
+    (hasAudio ? 500_000 : 0) +
+    height * 1_000 +
+    bitrate +
+    Math.min(size / 1_000_000, 10_000);
+}
+
+function selectYtDlpFormat(info: YtDlpInfo, mode: "audio" | "video") {
+  const formats = Array.isArray(info.formats) ? info.formats : [];
+  const selected = formats
+    .map((format) => ({ format, score: getYtDlpFormatScore(format, mode) }))
+    .filter((entry) => entry.score >= 0)
+    .sort((a, b) => b.score - a.score)[0]?.format;
+
+  if (selected?.url) return selected;
+
+  if (info.url) {
+    return {
+      url: info.url,
+      ext: info.ext,
+      filesize: info.filesize,
+      filesize_approx: info.filesize_approx,
+      http_headers: info.http_headers,
+    } satisfies YtDlpFormat;
+  }
+
+  return null;
+}
+
+async function resolveYtDlpMediaFormat(targetUrl: URL, mode: "audio" | "video") {
+  const youtubedl = await getYtDlpInstance();
+  const isVideo = mode === "video";
+  const format = isVideo
+    ? "best[protocol^=http][ext=mp4]/best[protocol^=http]/best"
+    : "bestaudio[protocol^=http]/bestaudio/best";
+
+  const ytdlpOptions = {
+    download: false,
+    dumpSingleJson: true,
+    format,
+    noPlaylist: true,
+    noWarnings: true,
+  } as unknown as Parameters<typeof youtubedl>[1];
+
+  const info = await youtubedl(targetUrl.toString(), ytdlpOptions) as YtDlpInfo;
+
+  const selected = selectYtDlpFormat(info, mode);
+  const extension = String(selected?.ext ?? "").toLowerCase();
+  if (!selected?.url || !extension || !SUPPORTED_EXTENSIONS.has(extension)) {
+    throw new Error("Unable to resolve a direct media URL from that link.");
+  }
+
+  const title = sanitizeYtDlpFileName(info.title ?? "download");
+  const fileName = getExtensionFromName(title) ? title : `${title}.${extension}`;
+  return {
+    url: selected.url,
+    referer: selected.http_headers?.Referer ?? info.http_headers?.Referer,
+    contentLength: selected.filesize ?? selected.filesize_approx ?? info.filesize ?? info.filesize_approx ?? null,
+    contentType: lookupMime(fileName) || "application/octet-stream",
+    extension,
+    fileName,
+    quality: selected.format_note ?? selected.format_id ?? "best",
+  } satisfies ExtractedMediaFormat;
 }
 
 async function fetchViaYtDlp(targetUrl: URL, mode: "audio" | "video") {
-  const runId = randomUUID();
-  const workDir = await fs.mkdtemp(path.join(tmpdir(), `serp-media-${runId}-`));
-  const outputTemplate = path.join(workDir, "download.%(ext)s");
-  const youtubedl = await getYtDlpInstance();
-  const isVideo = mode === "video";
-  const format = isVideo ? "best" : "bestaudio/best";
-
-  try {
-    await youtubedl(targetUrl.toString(), {
-      output: outputTemplate,
-      format,
-      noPlaylist: true,
-      noWarnings: true,
-    });
-
-    const entries = await fs.readdir(workDir);
-    const fileName = entries.find(
-      (entry) => entry.startsWith("download.") && !entry.endsWith(".part")
-    );
-    if (!fileName) {
-      throw new Error("Unable to download media from that link.");
-    }
-
-    const filePath = path.join(workDir, fileName);
-    const cleanup = async () => {
-      try {
-        await fs.rm(workDir, { recursive: true, force: true });
-      } catch {
-        // ignore cleanup failures
-      }
-    };
-    return await streamDownloadedFile(filePath, fileName, cleanup);
-  } catch (err) {
-    await fs.rm(workDir, { recursive: true, force: true });
-    throw err;
-  }
+  const format = await resolveYtDlpMediaFormat(targetUrl, mode);
+  return streamExtractedMedia(format);
 }
 
 export async function POST(request: Request) {
@@ -466,7 +578,10 @@ export async function POST(request: Request) {
   const mode = payload.mode ?? "audio";
 
   try {
-    const directResponse = await tryDirectFetch(targetUrl);
+    const extractedMedia = await extractWithRegisteredExtractor(targetUrl, { mode });
+    const directResponse = extractedMedia
+      ? await streamExtractedMedia(extractedMedia)
+      : await tryDirectFetch(targetUrl);
     let response = directResponse ?? (await fetchViaYtDlp(targetUrl, mode));
 
     if (downloaderIdentity) {
