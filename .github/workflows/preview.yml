@@ -22,49 +22,61 @@ jobs:
     permissions:
       contents: read       # needed by actions/checkout for private repos
       pull-requests: write  # needed to post the preview URL comment
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check Vercel secrets
+        id: vercel-secrets
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "Vercel Actions secrets are not configured; skipping manual preview deploy."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup pnpm
+        if: steps.vercel-secrets.outputs.configured == 'true'
         uses: pnpm/action-setup@v4
         with:
           version: 10.4.1
 
       - name: Setup Node.js
+        if: steps.vercel-secrets.outputs.configured == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
       - name: Install Vercel CLI
+        if: steps.vercel-secrets.outputs.configured == 'true'
         run: pnpm add -g vercel@latest
 
       - name: Pull Vercel environment
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        if: steps.vercel-secrets.outputs.configured == 'true'
+        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
 
       - name: Build project
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        if: steps.vercel-secrets.outputs.configured == 'true'
+        run: vercel build --token="$VERCEL_TOKEN"
 
       - name: Deploy to Vercel
         id: deploy
+        if: steps.vercel-secrets.outputs.configured == 'true'
         run: |
-          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")
           echo "preview_url=$url" >> "$GITHUB_OUTPUT"
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Find existing PR comment
         uses: peter-evans/find-comment@v3
         id: find-comment
+        if: steps.vercel-secrets.outputs.configured == 'true' && github.event_name == 'pull_request'
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: github-actions[bot]
@@ -73,7 +85,7 @@ jobs:
 
       - name: Post / update preview URL comment
         uses: peter-evans/create-or-update-comment@v4
-        if: github.event.pull_request.number != ''
+        if: steps.vercel-secrets.outputs.configured == 'true' && github.event_name == 'pull_request'
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
