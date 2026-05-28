@@ -18,7 +18,7 @@ type Props = {
   from: string;               // "pdf"
   to: string;                 // "jpg"
   accept?: string;            // optional override accept attr
-  videoEmbedId?: string;      // YouTube embed ID for video (optional, defaults to bbkhxMpIH4w)
+  videoEmbedId?: string;      // YouTube embed ID for video
   operation?: OperationType;
 };
 
@@ -29,7 +29,7 @@ export default function LanderHeroTwoColumn({
   from,
   to,
   accept,
-  videoEmbedId = "bbkhxMpIH4w",
+  videoEmbedId,
   operation,
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);

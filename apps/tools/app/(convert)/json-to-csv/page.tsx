@@ -8,7 +8,7 @@ import { TableConvertLinksSection } from "@/components/sections/TableConvertLink
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
 import { buildToolMetadata } from "@/lib/metadata";
 import { toolContent } from '@/lib/tool-content';
-import { requiresCoepForTool } from "@/lib/coep";
+import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
 
 const toolId = "json-to-csv";
 
@@ -20,10 +20,10 @@ export default function Page() {
   if (!content) {
     return <div>Tool not found</div>;
   }
-  const videoEmbedId =
-    content.videoSection && !requiresCoepForTool(content.tool)
-      ? content.videoSection.embedId
-      : undefined;
+  const videoEmbedId = getEnabledVideoEmbedId({
+    tool: content.tool,
+    videoSection: content.videoSection,
+  });
 
   return (
     <main className="min-h-screen bg-background">
