@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import DownloaderCooldownNotice from "@/components/DownloaderCooldownNotice";
 import { saveBlob } from "@/components/saveAs";
+import SerplyCtaButton from "@/components/SerplyCtaButton";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
 import { normalizeBlobPart } from "@/lib/blob-parts";
@@ -27,6 +28,13 @@ type Props = {
   adsVisible?: boolean;
   onAdsVisibleChange?: (visible: boolean) => void;
   cooldownEndsAtMs?: number | null;
+  extensionUrl?: string;
+  extensionProductName?: string;
+};
+
+type ExtensionFailureCta = {
+  extensionUrl: string;
+  productName: string;
 };
 
 const SUPPORTED_EXTENSIONS = new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS]);
@@ -109,6 +117,28 @@ function formatDuration(totalSeconds: number) {
   if (hours > 0) return `${hours}h ${minutes}m`;
   if (minutes > 0) return `${minutes}m ${remaining}s`;
   return `${remaining}s`;
+}
+
+function getExtensionFailureCta(
+  message: string,
+  extensionUrl?: string,
+  extensionProductName?: string
+): ExtensionFailureCta | null {
+  if (!extensionUrl) return null;
+
+  const isExtensionEligibleFailure =
+    /Unsupported URL/i.test(message) ||
+    /Download failed \(500\)/i.test(message) ||
+    /This link returns a media type we do not support yet/i.test(message) ||
+    /That link does not look like a supported media file/i.test(message) ||
+    /Failed to fetch media/i.test(message);
+
+  if (!isExtensionEligibleFailure) return null;
+
+  return {
+    extensionUrl,
+    productName: extensionProductName || "Downloader",
+  };
 }
 
 async function downloadUrlToBlob(
@@ -227,10 +257,14 @@ export default function VideoDownloaderTool({
   adsVisible: controlledAdsVisible,
   onAdsVisibleChange,
   cooldownEndsAtMs = null,
+  extensionUrl,
+  extensionProductName,
 }: Props) {
   const [busy, setBusy] = useState(false);
   const [currentFile, setCurrentFile] = useState<ToolProgressFile | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [extensionFailureCta, setExtensionFailureCta] =
+    useState<ExtensionFailureCta | null>(null);
   const [urlInput, setUrlInput] = useState("");
   const [uncontrolledAdsVisible, setUncontrolledAdsVisible] = useState(false);
   const adsVisible = controlledAdsVisible ?? uncontrolledAdsVisible;
@@ -248,12 +282,14 @@ export default function VideoDownloaderTool({
     if (busy) return;
     const parsedUrl = parseUrlInput(urlInput);
     if (!parsedUrl) {
+      setExtensionFailureCta(null);
       setErrorMessage("Paste a valid public URL first.");
       return;
     }
 
     revealAds();
     setErrorMessage(null);
+    setExtensionFailureCta(null);
     setBusy(true);
 
     const nameHint = getFileNameFromUrl(parsedUrl);
@@ -317,6 +353,25 @@ export default function VideoDownloaderTool({
     } catch (err) {
       const failure = getTelemetryFailure(err, "download_failed");
       const message = failure.message || "Download failed";
+      const extensionCta = getExtensionFailureCta(
+        message,
+        extensionUrl,
+        extensionProductName
+      );
+
+      if (extensionCta) {
+        setExtensionFailureCta(extensionCta);
+        setErrorMessage(null);
+        setCurrentFile({
+          name: nameHint,
+          progress: 0,
+          status: "error",
+          message: "Use the browser extension for this site.",
+        });
+        run.finishFailure({ errorCode: failure.errorCode, metadata: failure.metadata });
+        return;
+      }
+
       setCurrentFile({
         name: nameHint,
         progress: 0,
@@ -331,7 +386,8 @@ export default function VideoDownloaderTool({
 
   const adSlotPrefix = toolId;
   const showCooldownNotice = cooldownEndsAtMs !== null;
-  const hasBelowContent = Boolean(errorMessage) || showCooldownNotice;
+  const hasBelowContent =
+    Boolean(errorMessage) || Boolean(extensionFailureCta) || showCooldownNotice;
 
   return (
     <ToolHeroLayout
@@ -352,7 +408,7 @@ export default function VideoDownloaderTool({
               <input
                 type="url"
                 inputMode="url"
-                placeholder="Paste any public video link (YouTube, TikTok, Vimeo, Loom, and more)"
+                placeholder="Paste public video link here"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -375,11 +431,6 @@ export default function VideoDownloaderTool({
                 {busy ? "Working..." : "DOWNLOAD"}
               </Button>
             </div>
-
-            <p className="text-xs text-muted-foreground">
-              Supports many public platforms including YouTube, TikTok, Vimeo, Loom, Wistia,
-              Dailymotion, Reddit, and more.
-            </p>
           </div>
         </div>
       }
@@ -387,6 +438,23 @@ export default function VideoDownloaderTool({
         hasBelowContent ? (
           <div className="mt-4 space-y-2">
             {errorMessage ? <div className="text-sm text-red-600">{errorMessage}</div> : null}
+            {extensionFailureCta ? (
+              <div className="mx-auto max-w-2xl rounded-lg border border-[#bfd4ff] bg-[#eef4ff] p-4 text-left">
+                <h2 className="text-base font-semibold text-[#12337a]">
+                  Use the {extensionFailureCta.productName} Extension
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-[#12337a]">
+                  This site cannot be downloaded reliably from the web form. The{" "}
+                  {extensionFailureCta.productName} Extension detects the video inside your
+                  browser and saves it directly.
+                </p>
+                <SerplyCtaButton
+                  href={extensionFailureCta.extensionUrl}
+                  label={`Get the ${extensionFailureCta.productName} Extension`}
+                  className="mt-4 h-10 px-5 text-sm"
+                />
+              </div>
+            ) : null}
             {showCooldownNotice ? (
               <DownloaderCooldownNotice
                 cooldownEndsAtMs={cooldownEndsAtMs}

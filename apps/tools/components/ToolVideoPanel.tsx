@@ -1,7 +1,7 @@
 "use client";
 
 type ToolVideoPanelProps = {
-  embedId: string;
+  embedId?: string;
   autoplay?: boolean;
   className?: string;
 };

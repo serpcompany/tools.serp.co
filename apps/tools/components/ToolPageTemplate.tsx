@@ -11,7 +11,7 @@ import { RelatedToolsSection } from "@/components/sections/RelatedToolsSection";
 import { RelatedAppsSection } from "@/components/sections/RelatedAppsSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
-import { requiresCoepForTool } from "@/lib/coep";
+import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
 import type {
   ToolInfo,
   VideoSectionData,
@@ -49,9 +49,8 @@ export default function ToolPageTemplate({
   relatedTools,
   blogPosts,
 }: ToolPageProps) {
-  const requiresCoep = requiresCoepForTool(tool);
-  // If tool requires COEP, avoid templates that embed YouTube.
-  const shouldUseTwoColumn = useTwoColumnLayout && videoSection?.embedId && !requiresCoep;
+  const videoEmbedId = getEnabledVideoEmbedId({ tool, videoSection });
+  const shouldUseTwoColumn = Boolean(useTwoColumnLayout && videoEmbedId);
   const currentRoute =
     tool.route ??
     (tool.from && tool.to ? `/${tool.from.toLowerCase()}-to-${tool.to.toLowerCase()}` : undefined);
@@ -72,7 +71,7 @@ export default function ToolPageTemplate({
             to={tool.to}
             accept={tool.accept}
             operation={tool.operation}
-            videoEmbedId={videoSection.embedId}
+            videoEmbedId={videoEmbedId}
           />
           {/* About the Formats Section - Right after 2-column hero */}
           {aboutSection && (
@@ -102,7 +101,6 @@ export default function ToolPageTemplate({
             />
           )}
           {howTo && <HowToSection title={howTo.title} intro={howTo.intro} steps={howTo.steps} />}
-          {/* No YouTube embed when COEP is required */}
         </>
       )}
 

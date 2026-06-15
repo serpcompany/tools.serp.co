@@ -20,12 +20,14 @@ type DownloaderExtensionCTAModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   cooldownEndsAtMs: number | null;
+  extensionUrl?: string;
 };
 
 export default function DownloaderExtensionCTAModal({
   open,
   onOpenChange,
   cooldownEndsAtMs,
+  extensionUrl = DOWNLOADER_EXTENSION_URL,
 }: DownloaderExtensionCTAModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -45,7 +47,7 @@ export default function DownloaderExtensionCTAModal({
 
         <DialogFooter className="sm:justify-start">
           <SerplyCtaButton
-            href={DOWNLOADER_EXTENSION_URL}
+            href={extensionUrl}
             label={DOWNLOADER_EXTENSION_LABEL}
             className="h-10"
           />

@@ -47,13 +47,12 @@ test("getNetworkBrands returns the main group only", async () => {
   const { getNetworkBrands } = await loadNetworkBrandsModule();
   const brands = getNetworkBrands();
   const mainGroup = networkBrandsData.brandGroups.mainGroup;
-  const excludedGroup = networkBrandsData.brandGroups.serpxxxGroup;
 
   assert.deepEqual(
     brands.map((brand) => brand.slug),
     mainGroup,
   );
-  assert.ok(excludedGroup.every((slug) => !brands.some((brand) => brand.slug === slug)));
+  assert.equal(brands.length, mainGroup.length);
 });
 
 test("network brand group order is preserved", async () => {

@@ -70,7 +70,22 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>Copyright {currentYear} SERP Tools. Built for fast file workflows.</p>
+          <div className="flex flex-col gap-4">
+            <p>Copyright {currentYear} SERP Tools. Built for fast file workflows.</p>
+            <a
+              href="https://dr.serp.co/sites/tools.serp.co"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-fit"
+            >
+              <img
+                src="https://dr.serp.co/badge/tools.serp.co?style=serp-dr-v3"
+                alt="Verified DR 78 for tools.serp.co"
+                width="200"
+                height="50"
+              />
+            </a>
+          </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
             <a href="/" className="transition-colors hover:text-white">
               Home

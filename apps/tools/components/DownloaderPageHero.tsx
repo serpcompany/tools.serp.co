@@ -9,6 +9,8 @@ type DownloaderPageHeroProps = {
   toolId: string;
   title: string;
   subtitle?: string;
+  extensionUrl?: string;
+  extensionProductName?: string;
 };
 
 function getDownloaderBannerSlotId(toolId: string) {
@@ -19,6 +21,8 @@ export default function DownloaderPageHero({
   toolId,
   title,
   subtitle,
+  extensionUrl,
+  extensionProductName,
 }: DownloaderPageHeroProps) {
   const [adsVisible, setAdsVisible] = useState(false);
   const [ctaModalOpen, setCtaModalOpen] = useState(false);
@@ -41,12 +45,15 @@ export default function DownloaderPageHero({
         adsVisible={adsVisible}
         onAdsVisibleChange={handleAdsVisibleChange}
         cooldownEndsAtMs={cooldownEndsAtMs}
+        extensionUrl={extensionUrl}
+        extensionProductName={extensionProductName}
       />
 
       <DownloaderExtensionCTAModal
         open={ctaModalOpen}
         onOpenChange={setCtaModalOpen}
         cooldownEndsAtMs={cooldownEndsAtMs}
+        extensionUrl={extensionUrl}
       />
 
       {adsVisible && (
