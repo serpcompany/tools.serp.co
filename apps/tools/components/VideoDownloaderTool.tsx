@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
 import { Button } from "@serp-tools/ui/components/button";
 import DownloaderCooldownNotice from "@/components/DownloaderCooldownNotice";
 import { saveBlob } from "@/components/saveAs";
+import SerplyCtaButton from "@/components/SerplyCtaButton";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
 import { normalizeBlobPart } from "@/lib/blob-parts";
@@ -448,15 +448,11 @@ export default function VideoDownloaderTool({
                   {extensionFailureCta.productName} Extension detects the video inside your
                   browser and saves it directly.
                 </p>
-                <Button
-                  asChild
-                  className="group mt-4 h-10 rounded-full bg-[#0f62fe] px-5 text-sm font-semibold text-white hover:bg-[#0b4ccc]"
-                >
-                  <a href={extensionFailureCta.extensionUrl} target="_blank" rel="noreferrer">
-                    Get the {extensionFailureCta.productName} Extension
-                    <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-                  </a>
-                </Button>
+                <SerplyCtaButton
+                  href={extensionFailureCta.extensionUrl}
+                  label={`Get the ${extensionFailureCta.productName} Extension`}
+                  className="mt-4 h-10 px-5 text-sm"
+                />
               </div>
             ) : null}
             {showCooldownNotice ? (

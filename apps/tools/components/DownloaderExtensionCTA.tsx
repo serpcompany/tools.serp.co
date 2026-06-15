@@ -1,5 +1,4 @@
-import { ArrowRight } from "lucide-react";
-import { Button } from "@serp-tools/ui/components/button";
+import SerplyCtaButton from "@/components/SerplyCtaButton";
 import {
   DOWNLOADER_EXTENSION_LABEL,
   DOWNLOADER_EXTENSION_TEXT,
@@ -19,16 +18,12 @@ export default function DownloaderExtensionCTA({
         {DOWNLOADER_EXTENSION_TEXT}
       </p>
 
-      <Button
-        asChild
+      <SerplyCtaButton
+        href={extensionUrl}
+        label={DOWNLOADER_EXTENSION_LABEL}
         size="lg"
-        className="group h-10 w-full sm:w-auto rounded-full bg-[#0f62fe] px-6 text-[0.92rem] font-semibold text-white shadow-none ring-0 transition-colors duration-200 hover:bg-[#0b4ccc] focus-visible:ring-2 focus-visible:ring-[#0f62fe]/35"
-      >
-        <a href={extensionUrl} target="_blank" rel="noreferrer">
-          {DOWNLOADER_EXTENSION_LABEL}
-          <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-        </a>
-      </Button>
+        className="h-10 w-full sm:w-auto text-[0.92rem]"
+      />
     </section>
   );
 }

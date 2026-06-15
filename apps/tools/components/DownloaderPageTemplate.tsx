@@ -6,6 +6,7 @@ import { ChangelogSection } from "@/components/sections/ChangelogSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
+import { withSerplyTracking } from "@/lib/downloader-extension-cta";
 import type { SourceLink, ToolContent } from "@/types";
 
 type DownloaderPageTemplateProps = {
@@ -150,7 +151,7 @@ export default function DownloaderPageTemplate({
               {outboundLinks.map((link) => (
                 <a
                   key={link.url}
-                  href={link.url}
+                  href={withSerplyTracking(link.url)}
                   target="_blank"
                   rel="noreferrer"
                   className="group flex min-h-24 flex-col justify-between rounded-lg border border-slate-200 bg-white p-5 transition-colors hover:border-[#0f62fe] hover:bg-[#f7faff]"
