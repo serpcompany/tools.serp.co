@@ -50,6 +50,10 @@ test("tool directory categories and download category tools are derived from the
     .filter((tool) => tool.isActive && tool.operation === "download")
     .map((tool) => tool.id)
     .sort();
+  const activeDownloaderLanderTools = toolsRegistry
+    .filter((tool) => tool.isActive && /^download-.+-videos$/.test(tool.id))
+    .map((tool) => tool.id)
+    .sort();
 
   assert.ok(downloadCategory);
   assert.equal(downloadCategory?.count, activeDownloadTools.length);
@@ -59,6 +63,11 @@ test("tool directory categories and download category tools are derived from the
     .sort();
 
   assert.deepEqual(downloadToolIds, activeDownloadTools);
+  assert.deepEqual(
+    activeDownloaderLanderTools.filter((toolId) => !downloadToolIds.includes(toolId)),
+    [],
+    "expected every download-*-videos lander to appear in /category/download/",
+  );
 });
 
 test("tool directory entries stay plain-data safe for server to client rendering", () => {

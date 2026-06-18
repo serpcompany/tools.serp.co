@@ -14251,290 +14251,6 @@
     ]
   },
   {
-    "id": "download-ashemaletube-bulk-videos",
-    "name": "AShemaleTube Bulk Video Downloader",
-    "description": "Process multiple AShemaleTube video links at once and return structured metadata plus direct downloadable media links when available.",
-    "operation": "download",
-    "route": "/download-ashemaletube-bulk-videos",
-    "from": "AShemaleTube Bulk",
-    "to": "mp4",
-    "isActive": true,
-    "tags": [
-      "ashemaletube",
-      "bulk",
-      "video",
-      "download",
-      "downloader"
-    ],
-    "content": {
-      "tool": {
-        "title": "AShemaleTube Video Downloader",
-        "subtitle": "Process multiple AShemaleTube video links at once and return structured metadata plus direct downloadable media links when available.",
-        "from": "AShemaleTube Bulk links",
-        "to": "Video links and files"
-      },
-      "howTo": {
-        "title": "How to process AShemaleTube Bulk videos",
-        "intro": "Follow these steps to process public AShemaleTube Bulk video links.",
-        "steps": [
-          "Paste public AShemaleTube Bulk video links.",
-          "Wait while we fetch the available media details.",
-          "Download the available video files or use the returned links."
-        ]
-      },
-      "infoArticle": {
-        "title": "About AShemaleTube Bulk Video downloads",
-        "markdown": "AShemaleTube is a niche platform without any built-in download feature, and most generic download tools don't work with it. Finding content worth keeping leaves no reliable way to save it for offline viewing.\n\nAShemaleTube Downloader is a browser extension built specifically for this platform. Play any video on AShemaleTube.com and a download button appears right on the player. Choose the quality you want, click save, and the file drops into a dedicated AShemaleTube folder on your computer. It catches video sources that other downloaders miss because it was designed with this site's stream delivery in mind.\n\nAll processing happens in your browser, and nothing is sent to outside servers. Start with 3 free downloads to test the workflow, then upgrade for unlimited saves."
-      },
-      "faqs": [
-        {
-          "question": "How do I download an AShemaleTube video?",
-          "answer": "Open AShemaleTube.com, press play on the video you want, then click the in-player download button, the extension icon, or the context-menu entry labeled \"Download AShemaleTube Video.\" Pick a quality and the extension will save the MP4 as soon as the stream finishes."
-        },
-        {
-          "question": "What quality options are available?",
-          "answer": "The extension detects every quality advertised by AShemaleTube - flashvars mediaDefinitions, HTML5 sources, and CDN entries - and sorts them by resolution so you can pick the best match. MP4 variants are preferred while HLS renditions are converted automatically."
-        },
-        {
-          "question": "What format are the downloads?",
-          "answer": "Everything saves as a standard MP4 file that plays on desktop and mobile media players. HLS streams are stitched and transmuxed into MP4 within the browser before the download starts."
-        },
-        {
-          "question": "Where are the files saved?",
-          "answer": "Downloads are written straight to a dedicated \"AShemaleTube\" subfolder inside your browser's default Downloads directory so you can organize episodes or clips easily."
-        },
-        {
-          "question": "How many free downloads do I get?",
-          "answer": "You unlock three free trial downloads after signing in with your email and OTP verification. After that, the product uses a paid subscription for unlimited downloads."
-        },
-        {
-          "question": "Does this work on Firefox, Brave, or Edge?",
-          "answer": "Yes. AShemaleTube Downloader runs on Chrome, Edge, Brave, Opera, Firefox, Whale, Yandex, and other Chromium-based browsers that support Manifest V3."
-        },
-        {
-          "question": "Can I download multiple videos at once?",
-          "answer": "This product is optimized for one active AShemaleTube page at a time rather than bulk library exports. For the most reliable results, let the current download finish before starting another large HLS conversion."
-        },
-        {
-          "question": "Why isn't the extension finding my video?",
-          "answer": "Press play on the video first so the stream starts, then open the extension or right-click to download. If it still misses the stream, refresh the page or reopen the player tab. Detection also fails on DRM or unsupported content."
-        },
-        {
-          "question": "Why does the extension need these permissions?",
-          "answer": "Permissions like downloads, activeTab, scripting, tabs, and offscreen let the extension detect the current stream, inject the player button, convert HLS to MP4, keep the download manager in sync, and save the finished file locally."
-        },
-        {
-          "question": "Is my data safe?",
-          "answer": "Yes. Processing happens entirely in your browser and nothing uploads to external servers. Authentication uses secure email OTP and the extension stores only what it needs to run locally."
-        },
-        {
-          "question": "Is this legal?",
-          "answer": "DISCLAIMER: We are not attorneys and do not offer legal advice. Laws vary by country and platform. For any legal question please consult a qualified legal professional.\nWe give you full control over download speeds because we believe users should decide how they use their software.\nThat said, here are a few widely accepted best practices for safe, responsible downloading:\nOnly download content you created, own, or have explicit permission from the rights holder to access.\nProtect your personal data by respecting platform rules and rate limits with reasonable download speeds to avoid automated abuse systems putting your account at risk.\nProtect your privacy by using a reputable VPN for IP protection before initiating downloads \u2014 this is the VPN we recommend & use ."
-        }
-      ],
-      "aboutSection": {
-        "title": "AShemaleTube Bulk video download",
-        "fromFormat": {
-          "name": "AShemaleTube Bulk links",
-          "fullName": "Public AShemaleTube Bulk video link",
-          "description": "A public AShemaleTube Bulk URL that points to a video, page, or stream."
-        },
-        "toFormat": {
-          "name": "Video links and files",
-          "fullName": "Downloadable video links and files",
-          "description": "Structured results that can include direct media links and downloadable files."
-        }
-      },
-      "productLinks": {
-        "appsUrl": "https://apps.serp.co/ashemaletube-downloader",
-        "serplyUrl": "https://serp.ly/ashemaletube-downloader",
-        "githubRepoUrl": "https://github.com/serpapps/ashemaletube-downloader"
-      },
-      "features": [
-        "Detects AShemaleTube playback across flashvars, HTML5 video, CDN entries, embedded scripts, and Performance API resources so fewer streams are missed.",
-        "Places a download button directly inside the AShemaleTube player plus a toolbar icon for quick access when you want to save immediately.",
-        "Converts HLS streams to MP4 entirely inside your browser using the offscreen context and download manager.",
-        "Quality selector shows every available resolution sorted by height with MP4 variants preferred when both MP4 and HLS are available.",
-        "Download manager provides real-time progress, speed, cancel controls, and desktop notifications while the file is being processed.",
-        "Right-click context menu entry labeled \"Download AShemaleTube Video\" gives you a fast shortcut without opening the popup.",
-        "Auto-saves completed MP4s into an organized Downloads/AShemaleTube folder without repeated save-as prompts.",
-        "Dark UI with sky blue accents keeps the tool visually consistent and unobtrusive on AShemaleTube pages.",
-        "Three free trial downloads after email OTP activation let you test the workflow before upgrading to the paid subscription.",
-        "Cross-browser builds are available for Chrome, Edge, Firefox, Brave, Opera, Whale, and Yandex on desktop operating systems.",
-        "Local processing keeps video data on your device instead of routing the media through a third-party server.",
-        "Automatic GitHub release checks help keep the downloader aligned with AShemaleTube site changes."
-      ],
-      "screenshots": [
-        {
-          "url": "https://apps.serp.co/media/optimized-products/ashemaletube-downloader-homescreen-bd65bc401f.webp",
-          "alt": "AShemaleTube Video Downloader",
-          "caption": "Found something worth saving on AShemaleTube? Download it privately in the quality you want, no extra software needed."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/ashemaletube-downloader-homescreen-adult-050b3aad10.webp",
-          "alt": "AShemaleTube Video Downloader",
-          "caption": "Found something worth saving on AShemaleTube? Download it privately in the quality you want, no extra software needed."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/ashemaletube-downloader-fullscreen-01-a732dc4a2d.webp",
-          "alt": "AShemaleTube Video Downloader",
-          "caption": "Found something worth saving on AShemaleTube? Download it privately in the quality you want, no extra software needed."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/ashemaletube-downloader-fullscreen-02-567576960b.webp",
-          "alt": "AShemaleTube Video Downloader",
-          "caption": "Found something worth saving on AShemaleTube? Download it privately in the quality you want, no extra software needed."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/ashemaletube-downloader-fullscreen-03-cf0015a6ed.webp",
-          "alt": "AShemaleTube Video Downloader",
-          "caption": "Found something worth saving on AShemaleTube? Download it privately in the quality you want, no extra software needed."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/ashemaletube-downloader-fullscreen-04-e704d07ad0.webp",
-          "alt": "AShemaleTube Video Downloader",
-          "caption": "Found something worth saving on AShemaleTube? Download it privately in the quality you want, no extra software needed."
-        }
-      ],
-      "reviews": [
-        {
-          "author": "Lena Hart",
-          "rating": 5,
-          "date": "2026-02-11",
-          "body": "The download manager keeps the MP4s organized and the notifications let me keep working while the HLS conversions finish."
-        },
-        {
-          "author": "Kaito Rivers",
-          "rating": 4.9,
-          "date": "2026-01-22",
-          "body": "It finds the CDN streams every time and the quality selector gives me the exact resolution I need for edits."
-        },
-        {
-          "author": "Sasha Navarro",
-          "rating": 4.8,
-          "date": "2025-02-17",
-          "body": "The OTP activation was seamless and the three free downloads gave me enough time to confirm the extension catches every AShemaleTube stream format before I subscribed."
-        }
-      ],
-      "sourceLinks": [
-        {
-          "label": "Install extension",
-          "url": "https://serp.ly/ashemaletube-downloader"
-        },
-        {
-          "label": "SERP Apps",
-          "url": "https://apps.serp.co/ashemaletube-downloader"
-        },
-        {
-          "label": "GitHub repository",
-          "url": "https://github.com/serpapps/ashemaletube-downloader"
-        },
-        {
-          "label": "SERP Extensions",
-          "url": "https://extensions.serp.co/extensions/serp/ashemaletube-downloader/"
-        },
-        {
-          "label": "Apify",
-          "url": "https://apify.com/serpxxx/ashemaletube-video-downloader/"
-        },
-        {
-          "label": "ExtensionHub",
-          "url": "https://www.extensionhub.io/extensions/Ashemaletube-Downloader-1260"
-        },
-        {
-          "label": "SERP",
-          "url": "https://serp.co/products/ashemaletube-downloader/reviews/"
-        },
-        {
-          "label": "SERP AI",
-          "url": "https://serp.ai/products/ashemaletube-downloader/reviews/"
-        },
-        {
-          "label": "Browser Extensions",
-          "url": "https://browserextensions.io/products/ashemaletube-downloader/"
-        }
-      ],
-      "supportedOperatingSystems": [
-        "windows",
-        "mac",
-        "linux",
-        "chrome",
-        "firefox",
-        "edge",
-        "opera",
-        "brave",
-        "whale",
-        "yandex"
-      ],
-      "supportedRegions": [
-        "Worldwide"
-      ],
-      "permissionJustifications": [
-        {
-          "permission": "downloads",
-          "justification": "Saves completed media files directly to your browser downloads folder."
-        },
-        {
-          "permission": "storage",
-          "justification": "Stores license state, download queue data, and local preferences on your device."
-        },
-        {
-          "permission": "activeTab",
-          "justification": "Reads the current tab only after you invoke the extension."
-        },
-        {
-          "permission": "tabs",
-          "justification": "Detects supported pages and coordinates the downloader popup with the active tab."
-        },
-        {
-          "permission": "scripting",
-          "justification": "Injects the downloader controls and detection logic into supported pages."
-        },
-        {
-          "permission": "notifications",
-          "justification": "Required for the notifications browser extension capability."
-        },
-        {
-          "permission": "contextMenus",
-          "justification": "Required for the contextMenus browser extension capability."
-        },
-        {
-          "permission": "offscreen",
-          "justification": "Processes media streams in the background without freezing the page."
-        },
-        {
-          "permission": "host_permissions",
-          "justification": "Limits detection and controls to the supported source pages for this downloader."
-        }
-      ],
-      "keywords": [
-        "ashemaletube downloader",
-        "download ashemaletube",
-        "ashemaletube video download",
-        "save ashemaletube videos",
-        "how to download videos from ashemaletube",
-        "ashemaletube downloader chrome extension",
-        "download ashemaletube to mp4",
-        "save ashemaletube videos browser",
-        "ashemaletube mp4 downloader",
-        "multi-source ashemaletube downloader"
-      ]
-    },
-    "requiresFFmpeg": false,
-    "keywords": [
-      "ashemaletube downloader",
-      "download ashemaletube",
-      "ashemaletube video download",
-      "save ashemaletube videos",
-      "how to download videos from ashemaletube",
-      "ashemaletube downloader chrome extension",
-      "download ashemaletube to mp4",
-      "save ashemaletube videos browser",
-      "ashemaletube mp4 downloader",
-      "multi-source ashemaletube downloader"
-    ]
-  },
-  {
     "id": "download-ashemaletube-videos",
     "name": "AShemaleTube Video Downloader",
     "description": "Download AShemaleTube videos for offline use. Fast, private AShemaleTube downloader.",
@@ -21894,289 +21610,6 @@
     ]
   },
   {
-    "id": "download-kajab-videos",
-    "name": "Kajab Video Downloader",
-    "description": "Download Kajabi videos easily for offline viewing. Fast, reliable Kajabi video downloader with high-quality downloads.",
-    "operation": "download",
-    "route": "/download-kajab-videos",
-    "from": "Kajab",
-    "to": "mp4",
-    "isActive": true,
-    "tags": [
-      "kajab",
-      "video",
-      "download",
-      "downloader"
-    ],
-    "content": {
-      "tool": {
-        "title": "Kajabi Video Downloader",
-        "subtitle": "Download Kajabi videos easily for offline viewing. Fast, reliable Kajabi video downloader with high-quality downloads.",
-        "from": "Kajab link",
-        "to": "Video file"
-      },
-      "howTo": {
-        "title": "How to download a Kajab video",
-        "intro": "Follow these steps to save a public Kajab video link.",
-        "steps": [
-          "Paste a public Kajab video, page, or stream link.",
-          "Wait while we fetch the Kajab video.",
-          "Download the video file to your device."
-        ]
-      },
-      "infoArticle": {
-        "title": "About Kajab Video downloads",
-        "markdown": "Kajabi memberships expire, coaches restructure programs, and entire courses can disappear without warning. Kajabi does not provide a download button, so without a tool like this, streaming is the only option. This extension saves Kajabi lesson videos as standard MP4 files right to your computer. Press play on a lesson, click the extension, choose your quality, and the file downloads.\n\nKajabi creators use a variety of video hosts for their lessons, including Loom, Vimeo, YouTube, and Wistia. This extension handles all of them. It identifies the video host each lesson uses, grabs the best available quality, and saves it as a clean MP4. Download progress is visible right on the page, and you can run a few downloads at the same time.\n\nAll processing happens locally in your browser. No video gets uploaded anywhere, no personal data is collected, and your Kajabi login stays private. Start with 3 free downloads after a quick email sign-in. No credit card needed."
-      },
-      "faqs": [
-        {
-          "question": "How do I download a Kajabi lesson video?",
-          "answer": "Open the Kajabi lesson page, press play so the embedded source loads, then click the extension icon and choose the quality you want. The extension handles the provider-specific download flow and saves the final file as MP4."
-        },
-        {
-          "question": "Which video platforms are supported?",
-          "answer": "The extension is built for the common providers used inside Kajabi lessons, including Loom, Vimeo, YouTube, and Wistia, when those embeds are visible in your current session."
-        },
-        {
-          "question": "Does it work on Kajabi custom domains?",
-          "answer": "Yes, in many cases. It is designed to work across standard Kajabi domains, mykajabi domains, and compatible custom-domain lesson pages that use the same platform structure."
-        },
-        {
-          "question": "What quality options are available?",
-          "answer": "Quality depends on the underlying provider. The extension lists the renditions exposed by the source platform and lets you choose from those available formats."
-        },
-        {
-          "question": "Can I queue a whole course automatically?",
-          "answer": "No. The current extension is designed for lesson-by-lesson downloads with up to a few active jobs visible in the manager. It is not a full-course bulk exporter."
-        },
-        {
-          "question": "Does it download subtitles or transcripts?",
-          "answer": "No. This product is focused on video download. Captions, transcripts, and attachments should be handled separately from within the course platform if you need them."
-        },
-        {
-          "question": "Does it add a context-menu download option?",
-          "answer": "No. The workflow is popup-driven, with progress shown in the download manager. There is no right-click context-menu action in this product."
-        },
-        {
-          "question": "Does it show desktop notifications?",
-          "answer": "No. Progress is shown through the extension popup and in-page download manager rather than system notifications."
-        },
-        {
-          "question": "Which browsers are supported?",
-          "answer": "Desktop builds support Chrome, Edge, Firefox, Brave, Opera, Whale, and Yandex on Windows, macOS, and Linux. Safari and mobile browsers are not supported."
-        },
-        {
-          "question": "How does the free trial work?",
-          "answer": "After secure email OTP sign-in, you get 3 free downloads on the current device. Unlimited downloads require the paid subscription configured for this product."
-        },
-        {
-          "question": "Is my data private?",
-          "answer": "Yes. Detection, stream handling, and MP4 generation happen locally in the browser. Remote requests are limited to activation, update checks, and the original media hosts you are already authorized to access."
-        },
-        {
-          "question": "Is this legal?",
-          "answer": "DISCLAIMER: We are not attorneys and do not offer legal advice. Laws vary by country and platform. For any legal question please consult a qualified legal professional.\nWe give you full control over download speeds because we believe users should decide how they use their software.\nThat said, here are a few widely accepted best practices for safe, responsible downloading:\nOnly download content you created, own, or have explicit permission from the rights holder to access.\nProtect your personal data by respecting platform rules and rate limits with reasonable download speeds to avoid automated abuse systems putting your account at risk.\nProtect your privacy by using a reputable VPN for IP protection before initiating downloads \u2014 this is the VPN we recommend & use ."
-        }
-      ],
-      "aboutSection": {
-        "title": "Kajab video download",
-        "fromFormat": {
-          "name": "Kajab link",
-          "fullName": "Public Kajab video link",
-          "description": "A public Kajab URL that points to a video, page, or stream."
-        },
-        "toFormat": {
-          "name": "Video file",
-          "fullName": "Downloadable video file",
-          "description": "A saved video file you can watch, keep, or share."
-        }
-      },
-      "productLinks": {
-        "appsUrl": "https://apps.serp.co/kajabi-video-downloader",
-        "serplyUrl": "https://serp.ly/kajabi-video-downloader",
-        "githubRepoUrl": "https://github.com/serpapps/kajabi-video-downloader"
-      },
-      "features": [
-        "Detects embedded Loom, Vimeo, YouTube, and Wistia players on Kajabi lesson pages.",
-        "Uses dedicated platform-specific handlers instead of treating every Kajabi lesson like a generic video page.",
-        "Supports HLS-to-MP4 conversion in the browser when the source is not a direct downloadable file.",
-        "Lists available qualities based on the underlying provider so you can choose the best rendition it actually exposes.",
-        "Runs up to 3 active downloads with status tracking in the built-in download manager.",
-        "Works on Kajabi domains, many mykajabi domains, and compatible custom-domain lesson pages.",
-        "Includes a YouTube helper section in the popup for copy-ready yt-dlp commands when a lesson uses YouTube.",
-        "Uses secure email OTP activation with 3 free downloads before the paid subscription is required.",
-        "Keeps processing local in the browser with no video upload to outside servers.",
-        "Supports Chrome, Edge, Firefox, Brave, Opera, Whale, and Yandex on Windows, macOS, and Linux.",
-        "Handles private or unlisted embeds that are visible in your current Kajabi session.",
-        "Keeps the workflow centered on the popup and download manager rather than browser context menus."
-      ],
-      "screenshots": [
-        {
-          "url": "https://apps.serp.co/media/optimized-products/kajabi-video-downloader-kajabi-video-downloader-01856f4103.webp",
-          "alt": "Kajabi Video Downloader",
-          "caption": "Memberships expire, coaches remove content, and there is no download button. Save your Kajabi course videos as MP4s before they are gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/kajabi-video-downloader-kajabi-video-downloader-7670ab909b.webp",
-          "alt": "Kajabi Video Downloader",
-          "caption": "Memberships expire, coaches remove content, and there is no download button. Save your Kajabi course videos as MP4s before they are gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/kajabi-video-downloader-fullscreen-01-03b15b8944.webp",
-          "alt": "Kajabi Video Downloader",
-          "caption": "Memberships expire, coaches remove content, and there is no download button. Save your Kajabi course videos as MP4s before they are gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/kajabi-video-downloader-fullscreen-02-7cdb520c7a.webp",
-          "alt": "Kajabi Video Downloader",
-          "caption": "Memberships expire, coaches remove content, and there is no download button. Save your Kajabi course videos as MP4s before they are gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/kajabi-video-downloader-fullscreen-03-c42c7a7c21.webp",
-          "alt": "Kajabi Video Downloader",
-          "caption": "Memberships expire, coaches remove content, and there is no download button. Save your Kajabi course videos as MP4s before they are gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/kajabi-video-downloader-fullscreen-04-7eb3a0c4ac.webp",
-          "alt": "Kajabi Video Downloader",
-          "caption": "Memberships expire, coaches remove content, and there is no download button. Save your Kajabi course videos as MP4s before they are gone."
-        }
-      ],
-      "reviews": [
-        {
-          "author": "Sienna Crawford",
-          "rating": 5,
-          "date": "2025-02-21",
-          "body": "I use Kajabi for several paid courses and this extension gives me a consistent way to save the lessons even when one creator uses Vimeo and another uses Loom."
-        },
-        {
-          "author": "Malik Thorne",
-          "rating": 4.9,
-          "date": "2025-03-03",
-          "body": "The manager keeps a few downloads moving without getting in the way, and the provider detection is much more accurate than generic tools."
-        },
-        {
-          "author": "Elise Werner",
-          "rating": 4.8,
-          "date": "2025-01-29",
-          "body": "I mainly wanted a practical offline-study workflow for Kajabi and this does that well. Press play, choose quality, save the MP4."
-        }
-      ],
-      "sourceLinks": [
-        {
-          "label": "Install extension",
-          "url": "https://serp.ly/kajabi-video-downloader"
-        },
-        {
-          "label": "SERP Apps",
-          "url": "https://apps.serp.co/kajabi-video-downloader"
-        },
-        {
-          "label": "GitHub repository",
-          "url": "https://github.com/serpapps/kajabi-video-downloader"
-        },
-        {
-          "label": "SERP Extensions",
-          "url": "https://extensions.serp.co/extensions/serp/kajabi-video-downloader/"
-        },
-        {
-          "label": "ExtensionHub",
-          "url": "https://www.extensionhub.io/extensions/Kajabi-Video-Downloader-1210"
-        },
-        {
-          "label": "SERP",
-          "url": "https://serp.co/products/kajabi-video-downloader/reviews/"
-        },
-        {
-          "label": "SERP AI",
-          "url": "https://serp.ai/products/kajabi-video-downloader/reviews/"
-        },
-        {
-          "label": "Browser Extensions",
-          "url": "https://browserextensions.io/products/kajabi-video-downloader/"
-        }
-      ],
-      "supportedOperatingSystems": [
-        "windows",
-        "mac",
-        "linux",
-        "chrome",
-        "firefox",
-        "edge",
-        "brave",
-        "opera",
-        "whale",
-        "yandex"
-      ],
-      "supportedRegions": [
-        "Worldwide"
-      ],
-      "permissionJustifications": [
-        {
-          "permission": "downloads",
-          "justification": "Saves completed media files directly to your browser downloads folder."
-        },
-        {
-          "permission": "storage",
-          "justification": "Stores license state, download queue data, and local preferences on your device."
-        },
-        {
-          "permission": "activeTab",
-          "justification": "Reads the current tab only after you invoke the extension."
-        },
-        {
-          "permission": "tabs",
-          "justification": "Detects supported pages and coordinates the downloader popup with the active tab."
-        },
-        {
-          "permission": "scripting",
-          "justification": "Injects the downloader controls and detection logic into supported pages."
-        },
-        {
-          "permission": "offscreen",
-          "justification": "Processes media streams in the background without freezing the page."
-        },
-        {
-          "permission": "cookies",
-          "justification": "Uses your existing logged-in browser session for content you can already access."
-        },
-        {
-          "permission": "declarativeNetRequestWithHostAccess",
-          "justification": "Observes supported media requests so stream URLs can be detected locally."
-        },
-        {
-          "permission": "host_permissions",
-          "justification": "Limits detection and controls to the supported source pages for this downloader."
-        }
-      ],
-      "keywords": [
-        "kajabi downloader",
-        "kajabi video downloader",
-        "download kajabi videos",
-        "kajabi course downloader",
-        "kajabi lesson downloader",
-        "download vimeo from kajabi",
-        "download loom from kajabi",
-        "download youtube from kajabi",
-        "save kajabi course videos offline",
-        "kajabi mp4 downloader"
-      ]
-    },
-    "requiresFFmpeg": false,
-    "keywords": [
-      "kajabi downloader",
-      "kajabi video downloader",
-      "download kajabi videos",
-      "kajabi course downloader",
-      "kajabi lesson downloader",
-      "download vimeo from kajabi",
-      "download loom from kajabi",
-      "download youtube from kajabi",
-      "save kajabi course videos offline",
-      "kajabi mp4 downloader"
-    ]
-  },
-  {
     "id": "download-kajabi-videos",
     "name": "Kajabi Video Downloader",
     "description": "Download Kajabi videos easily for offline viewing. Fast, reliable Kajabi video downloader with high-quality downloads.",
@@ -28319,293 +27752,6 @@
       "save streamate streams offline",
       "streamate hls capture",
       "streamate vod downloader"
-    ]
-  },
-  {
-    "id": "download-stripcha-videos",
-    "name": "Stripcha Video Downloader",
-    "description": "Download videos, images, and content from stripchat with our reliable downloader tool. Fast, secure, and easy to use.",
-    "operation": "download",
-    "route": "/download-stripcha-videos",
-    "from": "Stripcha",
-    "to": "mp4",
-    "isActive": true,
-    "tags": [
-      "stripcha",
-      "video",
-      "download",
-      "downloader"
-    ],
-    "content": {
-      "tool": {
-        "title": "Stripchat Video Downloader",
-        "subtitle": "Download videos, images, and content from stripchat with our reliable downloader tool. Fast, secure, and easy to use.",
-        "from": "Stripcha link",
-        "to": "Video file"
-      },
-      "howTo": {
-        "title": "How to download a Stripcha video",
-        "intro": "Follow these steps to save a public Stripcha video link.",
-        "steps": [
-          "Paste a public Stripcha video, page, or stream link.",
-          "Wait while we fetch the Stripcha video.",
-          "Download the video file to your device."
-        ]
-      },
-      "infoArticle": {
-        "title": "About Stripcha Video downloads",
-        "markdown": "Stripchat has no download button, and recorded shows disappear without notice. One day the recording is there, the next it's gone. Stripchat Downloader ensures you have a permanent copy on your computer before that happens.\n\nWhether it's a live stream capture or a recorded show, the workflow is the same: open the page, click the download button on the player, pick your quality, and go. Live captures record until you hit stop, and recorded videos download as complete MP4 files. No screen recording software and no extra apps needed.\n\nThe extension is built specifically for Stripchat's architecture, so it handles platform quirks that cause generic tools to fail. A progress tracker, desktop notifications on completion, and automatic file saving keep the process smooth. Everything runs locally on your device for privacy, and 3 free downloads are included to test it out."
-      },
-      "faqs": [
-        {
-          "question": "How do I record a live Stripchat stream?",
-          "answer": "Open a Stripchat model page while the model is live, wait for the player to load, then use the in-player download button, extension popup, or right-click menu. Pick the quality you want and the extension starts capturing the stream while the download manager tracks elapsed time."
-        },
-        {
-          "question": "Can I download recorded videos too?",
-          "answer": "Yes. Visit a Stripchat /videos/ page, let the extension detect the source, choose a format or quality, and save the recording as MP4."
-        },
-        {
-          "question": "What quality options are available?",
-          "answer": "The extension reads the HLS master manifest and lists all detected renditions, including available resolution and frame-rate details. If Stripchat exposes a direct MP4 source, that option can appear as well."
-        },
-        {
-          "question": "What happens if the model is offline?",
-          "answer": "Live capture only works while the model is publicly streaming and the LL-HLS feed is available. If the model is offline, there is no active live stream to record."
-        },
-        {
-          "question": "Does it work in private shows?",
-          "answer": "No. Private or otherwise inaccessible shows are not supported. The extension is designed for content your current session can already access and does not bypass Stripchat access controls."
-        },
-        {
-          "question": "Where are the files saved?",
-          "answer": "Completed MP4 files save to your browser's default Downloads folder. The extension uses auto-save behavior rather than repeatedly prompting with a save dialog."
-        },
-        {
-          "question": "Will downloads resume if my connection drops?",
-          "answer": "The manager tracks segment progress, but live captures still depend on an active connection. If the connection breaks during capture, you may need to start a new recording."
-        },
-        {
-          "question": "Which browsers are supported?",
-          "answer": "Desktop builds work on Chrome, Edge, Firefox, Brave, Opera, Whale, and Yandex on Windows, macOS, and Linux. Safari and mobile browsers are not supported."
-        },
-        {
-          "question": "How does the free trial work?",
-          "answer": "After secure email OTP sign-in, you get 3 free downloads on the current device. Unlimited downloads require the paid subscription configured for this product."
-        },
-        {
-          "question": "Why does the extension need these permissions?",
-          "answer": "Permissions such as downloads, activeTab, scripting, tabs, notifications, contextMenus, and offscreen are used to detect the current stream, inject controls, manage live capture, convert HLS to MP4, and save the finished file locally."
-        },
-        {
-          "question": "Is my data private?",
-          "answer": "Yes. Stream detection, live capture, and MP4 generation all happen locally in the browser. Remote calls are limited to activation, entitlement checks, update checks, and the platform requests needed to fetch the media you can already access."
-        },
-        {
-          "question": "Is this legal?",
-          "answer": "DISCLAIMER: We are not attorneys and do not offer legal advice. Laws vary by country and platform. For any legal question please consult a qualified legal professional.\nWe give you full control over download speeds because we believe users should decide how they use their software.\nThat said, here are a few widely accepted best practices for safe, responsible downloading:\nOnly download content you created, own, or have explicit permission from the rights holder to access.\nProtect your personal data by respecting platform rules and rate limits with reasonable download speeds to avoid automated abuse systems putting your account at risk.\nProtect your privacy by using a reputable VPN for IP protection before initiating downloads \u2014 this is the VPN we recommend & use ."
-        }
-      ],
-      "aboutSection": {
-        "title": "Stripcha video download",
-        "fromFormat": {
-          "name": "Stripcha link",
-          "fullName": "Public Stripcha video link",
-          "description": "A public Stripcha URL that points to a video, page, or stream."
-        },
-        "toFormat": {
-          "name": "Video file",
-          "fullName": "Downloadable video file",
-          "description": "A saved video file you can watch, keep, or share."
-        }
-      },
-      "productLinks": {
-        "appsUrl": "https://apps.serp.co/stripchat-video-downloader",
-        "serplyUrl": "https://serp.ly/stripchat-video-downloader",
-        "githubRepoUrl": "https://github.com/serpapps/stripchat-video-downloader"
-      },
-      "features": [
-        "Records live Stripchat streams through LL-HLS capture with elapsed time tracking, stop controls, and local MP4 assembly.",
-        "Downloads recorded Stripchat videos from /videos/ pages and saves them as standard MP4 files.",
-        "Detects stream variants across Stripchat's multi-CDN delivery stack including doppiocdn, stripcdnm, stripcdnmd, stripcdntmp, and sc-cdn hosts.",
-        "Handles Mouflon-obfuscated HLS manifests so encrypted playlist variants can still be parsed and downloaded correctly.",
-        "Adds an in-player download button with a quality popover that shows resolution, bandwidth, and frame rate when available.",
-        "Provides a right-click option labeled 'Download Stripchat Stream' on supported page and video contexts.",
-        "Shows live progress, segment count, elapsed time, and cancel controls in the built-in download manager.",
-        "Sends desktop notifications for active, completed, and failed jobs so you do not need to keep the popup open.",
-        "Auto-saves finished MP4s into your browser's default Downloads folder for predictable file handling.",
-        "Supports quality selection up to the highest rendition exposed by the Stripchat manifest or direct source.",
-        "Includes 3 free downloads after secure email OTP sign-in before the paid subscription is required.",
-        "Processes video locally in the browser with no media upload to a third-party server."
-      ],
-      "screenshots": [
-        {
-          "url": "https://apps.serp.co/media/optimized-products/stripchat-video-downloader-homescreen-b4ac686ac1.webp",
-          "alt": "Stripchat Video Downloader",
-          "caption": "Stripchat recordings get removed without warning. Save shows to your computer before they're gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/stripchat-video-downloader-homescreen-adult-2864a7ce0f.webp",
-          "alt": "Stripchat Video Downloader",
-          "caption": "Stripchat recordings get removed without warning. Save shows to your computer before they're gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/stripchat-video-downloader-fullscreen-01-3cc6f3a7b5.webp",
-          "alt": "Stripchat Video Downloader",
-          "caption": "Stripchat recordings get removed without warning. Save shows to your computer before they're gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/stripchat-video-downloader-fullscreen-02-132ea8fae8.webp",
-          "alt": "Stripchat Video Downloader",
-          "caption": "Stripchat recordings get removed without warning. Save shows to your computer before they're gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/stripchat-video-downloader-fullscreen-03-e4feaaae4c.webp",
-          "alt": "Stripchat Video Downloader",
-          "caption": "Stripchat recordings get removed without warning. Save shows to your computer before they're gone."
-        },
-        {
-          "url": "https://apps.serp.co/media/optimized-products/stripchat-video-downloader-fullscreen-04-429f09334d.webp",
-          "alt": "Stripchat Video Downloader",
-          "caption": "Stripchat recordings get removed without warning. Save shows to your computer before they're gone."
-        }
-      ],
-      "reviews": [
-        {
-          "author": "Jordan McKenzie",
-          "rating": 5,
-          "date": "2025-02-20",
-          "body": "Stripchat rotates across multiple CDN hosts mid-stream and this extension follows the switches without dropping a single segment. Very impressive."
-        },
-        {
-          "author": "Elena Rinaldi",
-          "rating": 4.9,
-          "date": "2025-03-08",
-          "body": "The in-player button and quality popover make it feel native to the site. I grab recorded videos from /videos/ pages just as easily as live streams."
-        },
-        {
-          "author": "David Okonkwo",
-          "rating": 4.8,
-          "date": "2025-01-15",
-          "body": "Mouflon-obfuscated manifests used to block every other tool I tried. This one resolves them automatically and still lets me pick quality."
-        }
-      ],
-      "sourceLinks": [
-        {
-          "label": "Install extension",
-          "url": "https://serp.ly/stripchat-video-downloader"
-        },
-        {
-          "label": "SERP Apps",
-          "url": "https://apps.serp.co/stripchat-video-downloader"
-        },
-        {
-          "label": "GitHub repository",
-          "url": "https://github.com/serpapps/stripchat-video-downloader"
-        },
-        {
-          "label": "SERP Extensions",
-          "url": "https://extensions.serp.co/extensions/serp/stripchat-video-downloader/"
-        },
-        {
-          "label": "Apify",
-          "url": "https://apify.com/serpxxx/stripchat-video-downloader/"
-        },
-        {
-          "label": "ExtensionHub",
-          "url": "https://www.extensionhub.io/extensions/Stripchat-Video-Downloader-1252"
-        },
-        {
-          "label": "SERP",
-          "url": "https://serp.co/products/stripchat-video-downloader/reviews/"
-        },
-        {
-          "label": "SERP AI",
-          "url": "https://serp.ai/products/stripchat-video-downloader/reviews/"
-        },
-        {
-          "label": "Browser Extensions",
-          "url": "https://browserextensions.io/products/stripchat-video-downloader/"
-        }
-      ],
-      "supportedOperatingSystems": [
-        "windows",
-        "mac",
-        "linux",
-        "chrome",
-        "firefox",
-        "edge",
-        "opera",
-        "brave",
-        "whale",
-        "yandex"
-      ],
-      "supportedRegions": [
-        "Worldwide"
-      ],
-      "permissionJustifications": [
-        {
-          "permission": "downloads",
-          "justification": "Saves completed media files directly to your browser downloads folder."
-        },
-        {
-          "permission": "storage",
-          "justification": "Stores license state, download queue data, and local preferences on your device."
-        },
-        {
-          "permission": "activeTab",
-          "justification": "Reads the current tab only after you invoke the extension."
-        },
-        {
-          "permission": "tabs",
-          "justification": "Detects supported pages and coordinates the downloader popup with the active tab."
-        },
-        {
-          "permission": "scripting",
-          "justification": "Injects the downloader controls and detection logic into supported pages."
-        },
-        {
-          "permission": "notifications",
-          "justification": "Required for the notifications browser extension capability."
-        },
-        {
-          "permission": "contextMenus",
-          "justification": "Required for the contextMenus browser extension capability."
-        },
-        {
-          "permission": "offscreen",
-          "justification": "Processes media streams in the background without freezing the page."
-        },
-        {
-          "permission": "host_permissions",
-          "justification": "Limits detection and controls to the supported source pages for this downloader."
-        }
-      ],
-      "keywords": [
-        "stripchat downloader",
-        "record stripchat stream",
-        "stripchat video downloader",
-        "download stripchat videos",
-        "stripchat live stream recorder",
-        "stripchat mp4 downloader",
-        "stripchat downloader chrome extension",
-        "how to download videos from stripchat",
-        "stripchat hls downloader",
-        "save stripchat recordings"
-      ]
-    },
-    "requiresFFmpeg": false,
-    "keywords": [
-      "stripchat downloader",
-      "record stripchat stream",
-      "stripchat video downloader",
-      "download stripchat videos",
-      "stripchat live stream recorder",
-      "stripchat mp4 downloader",
-      "stripchat downloader chrome extension",
-      "how to download videos from stripchat",
-      "stripchat hls downloader",
-      "save stripchat recordings"
     ]
   },
   {
@@ -99229,6 +98375,1605 @@
       "svg",
       "convert",
       "image"
+    ]
+  },
+  {
+    "id": "download-patreon-videos",
+    "name": "Patreon Video Downloader",
+    "description": "Download Patreon videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-patreon-videos",
+    "from": "Patreon",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "patreon",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Patreon Video Downloader",
+        "subtitle": "Download Patreon videos for offline viewing with a private browser extension workflow.",
+        "from": "Patreon link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Patreon video",
+        "intro": "Follow these steps to save supported Patreon video links.",
+        "steps": [
+          "Install the Patreon Downloader extension from the verified SERP link.",
+          "Open a supported Patreon page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Patreon Video downloads",
+        "markdown": "Patreon Video Downloader is built for people who need a straightforward way to save supported Patreon media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported patreon page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Patreon Video Downloader?",
+          "answer": "Open a supported Patreon page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Patreon Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Patreon video download",
+        "fromFormat": {
+          "name": "Patreon link",
+          "fullName": "Supported Patreon video link",
+          "description": "A supported Patreon page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Patreon media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/patreon-downloader"
+      },
+      "features": [
+        "Source-specific Patreon downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/patreon-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Patreon media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "patreon downloader",
+        "patreon video downloader",
+        "download patreon videos"
+      ]
+    },
+    "keywords": [
+      "patreon downloader",
+      "patreon video downloader",
+      "download patreon videos"
+    ]
+  },
+  {
+    "id": "download-soundgasm-videos",
+    "name": "Soundgasm Downloader",
+    "description": "Download Soundgasm audio for offline listening with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-soundgasm-videos",
+    "from": "Soundgasm",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "soundgasm",
+      "audio",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Soundgasm Downloader",
+        "subtitle": "Download Soundgasm audio for offline listening with a private browser extension workflow.",
+        "from": "Soundgasm link",
+        "to": "Audio file"
+      },
+      "howTo": {
+        "title": "How to download a Soundgasm audio",
+        "intro": "Follow these steps to save supported Soundgasm audio links.",
+        "steps": [
+          "Install the Soundgasm Downloader extension from the verified SERP link.",
+          "Open a supported Soundgasm page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Soundgasm Audio downloads",
+        "markdown": "Soundgasm Downloader is built for people who need a straightforward way to save supported Soundgasm media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported soundgasm page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Soundgasm Downloader?",
+          "answer": "Open a supported Soundgasm page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Soundgasm Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved in the best available browser-supported audio or media format exposed by the source."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Soundgasm audio download",
+        "fromFormat": {
+          "name": "Soundgasm link",
+          "fullName": "Supported Soundgasm audio link",
+          "description": "A supported Soundgasm page URL that exposes downloadable audio media in the current browser session."
+        },
+        "toFormat": {
+          "name": "Audio file",
+          "fullName": "Downloadable audio file",
+          "description": "A local audio file saved from a compatible Soundgasm media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/soundgasm-downloader"
+      },
+      "features": [
+        "Source-specific Soundgasm downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/soundgasm-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Soundgasm media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "soundgasm downloader",
+        "soundgasm audio downloader",
+        "download soundgasm audios"
+      ]
+    },
+    "keywords": [
+      "soundgasm downloader",
+      "soundgasm audio downloader",
+      "download soundgasm audios"
+    ]
+  },
+  {
+    "id": "download-3movs-videos",
+    "name": "3movs Video Downloader",
+    "description": "Download 3movs videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-3movs-videos",
+    "from": "3movs",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "3movs",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "3movs Video Downloader",
+        "subtitle": "Download 3movs videos for offline viewing with a private browser extension workflow.",
+        "from": "3movs link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a 3movs video",
+        "intro": "Follow these steps to save supported 3movs video links.",
+        "steps": [
+          "Install the 3movs Downloader extension from the verified SERP link.",
+          "Open a supported 3movs page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About 3movs Video downloads",
+        "markdown": "3movs Video Downloader is built for people who need a straightforward way to save supported 3movs media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported 3movs page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use 3movs Video Downloader?",
+          "answer": "Open a supported 3movs page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the 3movs Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "3movs video download",
+        "fromFormat": {
+          "name": "3movs link",
+          "fullName": "Supported 3movs video link",
+          "description": "A supported 3movs page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible 3movs media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/3movs-downloader"
+      },
+      "features": [
+        "Source-specific 3movs downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/3movs-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported 3movs media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "3movs downloader",
+        "3movs video downloader",
+        "download 3movs videos"
+      ]
+    },
+    "keywords": [
+      "3movs downloader",
+      "3movs video downloader",
+      "download 3movs videos"
+    ]
+  },
+  {
+    "id": "download-bootyexpo-videos",
+    "name": "Bootyexpo Video Downloader",
+    "description": "Download Bootyexpo videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-bootyexpo-videos",
+    "from": "Bootyexpo",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "bootyexpo",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Bootyexpo Video Downloader",
+        "subtitle": "Download Bootyexpo videos for offline viewing with a private browser extension workflow.",
+        "from": "Bootyexpo link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Bootyexpo video",
+        "intro": "Follow these steps to save supported Bootyexpo video links.",
+        "steps": [
+          "Install the Bootyexpo Downloader extension from the verified SERP link.",
+          "Open a supported Bootyexpo page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Bootyexpo Video downloads",
+        "markdown": "Bootyexpo Video Downloader is built for people who need a straightforward way to save supported Bootyexpo media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported bootyexpo page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Bootyexpo Video Downloader?",
+          "answer": "Open a supported Bootyexpo page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Bootyexpo Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Bootyexpo video download",
+        "fromFormat": {
+          "name": "Bootyexpo link",
+          "fullName": "Supported Bootyexpo video link",
+          "description": "A supported Bootyexpo page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Bootyexpo media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/bootyexpo-downloader"
+      },
+      "features": [
+        "Source-specific Bootyexpo downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/bootyexpo-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Bootyexpo media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "bootyexpo downloader",
+        "bootyexpo video downloader",
+        "download bootyexpo videos"
+      ]
+    },
+    "keywords": [
+      "bootyexpo downloader",
+      "bootyexpo video downloader",
+      "download bootyexpo videos"
+    ]
+  },
+  {
+    "id": "download-bravotube-videos",
+    "name": "Bravotube Video Downloader",
+    "description": "Download Bravotube videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-bravotube-videos",
+    "from": "Bravotube",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "bravotube",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Bravotube Video Downloader",
+        "subtitle": "Download Bravotube videos for offline viewing with a private browser extension workflow.",
+        "from": "Bravotube link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Bravotube video",
+        "intro": "Follow these steps to save supported Bravotube video links.",
+        "steps": [
+          "Install the Bravotube Downloader extension from the verified SERP link.",
+          "Open a supported Bravotube page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Bravotube Video downloads",
+        "markdown": "Bravotube Video Downloader is built for people who need a straightforward way to save supported Bravotube media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported bravotube page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Bravotube Video Downloader?",
+          "answer": "Open a supported Bravotube page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Bravotube Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Bravotube video download",
+        "fromFormat": {
+          "name": "Bravotube link",
+          "fullName": "Supported Bravotube video link",
+          "description": "A supported Bravotube page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Bravotube media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/bravotube-downloader"
+      },
+      "features": [
+        "Source-specific Bravotube downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/bravotube-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Bravotube media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "bravotube downloader",
+        "bravotube video downloader",
+        "download bravotube videos"
+      ]
+    },
+    "keywords": [
+      "bravotube downloader",
+      "bravotube video downloader",
+      "download bravotube videos"
+    ]
+  },
+  {
+    "id": "download-drtuber-videos",
+    "name": "Drtuber Video Downloader",
+    "description": "Download Drtuber videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-drtuber-videos",
+    "from": "Drtuber",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "drtuber",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Drtuber Video Downloader",
+        "subtitle": "Download Drtuber videos for offline viewing with a private browser extension workflow.",
+        "from": "Drtuber link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Drtuber video",
+        "intro": "Follow these steps to save supported Drtuber video links.",
+        "steps": [
+          "Install the Drtuber Downloader extension from the verified SERP link.",
+          "Open a supported Drtuber page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Drtuber Video downloads",
+        "markdown": "Drtuber Video Downloader is built for people who need a straightforward way to save supported Drtuber media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported drtuber page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Drtuber Video Downloader?",
+          "answer": "Open a supported Drtuber page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Drtuber Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Drtuber video download",
+        "fromFormat": {
+          "name": "Drtuber link",
+          "fullName": "Supported Drtuber video link",
+          "description": "A supported Drtuber page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Drtuber media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/drtuber-downloader"
+      },
+      "features": [
+        "Source-specific Drtuber downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/drtuber-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Drtuber media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "drtuber downloader",
+        "drtuber video downloader",
+        "download drtuber videos"
+      ]
+    },
+    "keywords": [
+      "drtuber downloader",
+      "drtuber video downloader",
+      "download drtuber videos"
+    ]
+  },
+  {
+    "id": "download-fapality-videos",
+    "name": "Fapality Video Downloader",
+    "description": "Download Fapality videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-fapality-videos",
+    "from": "Fapality",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "fapality",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Fapality Video Downloader",
+        "subtitle": "Download Fapality videos for offline viewing with a private browser extension workflow.",
+        "from": "Fapality link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Fapality video",
+        "intro": "Follow these steps to save supported Fapality video links.",
+        "steps": [
+          "Install the Fapality Downloader extension from the verified SERP link.",
+          "Open a supported Fapality page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Fapality Video downloads",
+        "markdown": "Fapality Video Downloader is built for people who need a straightforward way to save supported Fapality media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported fapality page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Fapality Video Downloader?",
+          "answer": "Open a supported Fapality page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Fapality Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Fapality video download",
+        "fromFormat": {
+          "name": "Fapality link",
+          "fullName": "Supported Fapality video link",
+          "description": "A supported Fapality page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Fapality media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/fapality-downloader"
+      },
+      "features": [
+        "Source-specific Fapality downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/fapality-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Fapality media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "fapality downloader",
+        "fapality video downloader",
+        "download fapality videos"
+      ]
+    },
+    "keywords": [
+      "fapality downloader",
+      "fapality video downloader",
+      "download fapality videos"
+    ]
+  },
+  {
+    "id": "download-porndig-videos",
+    "name": "Porndig Video Downloader",
+    "description": "Download Porndig videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-porndig-videos",
+    "from": "Porndig",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "porndig",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Porndig Video Downloader",
+        "subtitle": "Download Porndig videos for offline viewing with a private browser extension workflow.",
+        "from": "Porndig link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Porndig video",
+        "intro": "Follow these steps to save supported Porndig video links.",
+        "steps": [
+          "Install the Porndig Downloader extension from the verified SERP link.",
+          "Open a supported Porndig page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Porndig Video downloads",
+        "markdown": "Porndig Video Downloader is built for people who need a straightforward way to save supported Porndig media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported porndig page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Porndig Video Downloader?",
+          "answer": "Open a supported Porndig page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Porndig Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Porndig video download",
+        "fromFormat": {
+          "name": "Porndig link",
+          "fullName": "Supported Porndig video link",
+          "description": "A supported Porndig page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Porndig media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/porndig-downloader"
+      },
+      "features": [
+        "Source-specific Porndig downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/porndig-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Porndig media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "porndig downloader",
+        "porndig video downloader",
+        "download porndig videos"
+      ]
+    },
+    "keywords": [
+      "porndig downloader",
+      "porndig video downloader",
+      "download porndig videos"
+    ]
+  },
+  {
+    "id": "download-porndoe-videos",
+    "name": "Porndoe Video Downloader",
+    "description": "Download Porndoe videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-porndoe-videos",
+    "from": "Porndoe",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "porndoe",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Porndoe Video Downloader",
+        "subtitle": "Download Porndoe videos for offline viewing with a private browser extension workflow.",
+        "from": "Porndoe link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Porndoe video",
+        "intro": "Follow these steps to save supported Porndoe video links.",
+        "steps": [
+          "Install the Porndoe Downloader extension from the verified SERP link.",
+          "Open a supported Porndoe page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Porndoe Video downloads",
+        "markdown": "Porndoe Video Downloader is built for people who need a straightforward way to save supported Porndoe media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported porndoe page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Porndoe Video Downloader?",
+          "answer": "Open a supported Porndoe page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Porndoe Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Porndoe video download",
+        "fromFormat": {
+          "name": "Porndoe link",
+          "fullName": "Supported Porndoe video link",
+          "description": "A supported Porndoe page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Porndoe media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/porndoe-downloader"
+      },
+      "features": [
+        "Source-specific Porndoe downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/porndoe-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Porndoe media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "porndoe downloader",
+        "porndoe video downloader",
+        "download porndoe videos"
+      ]
+    },
+    "keywords": [
+      "porndoe downloader",
+      "porndoe video downloader",
+      "download porndoe videos"
+    ]
+  },
+  {
+    "id": "download-sunporno-videos",
+    "name": "Sunporno Video Downloader",
+    "description": "Download Sunporno videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-sunporno-videos",
+    "from": "Sunporno",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "sunporno",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Sunporno Video Downloader",
+        "subtitle": "Download Sunporno videos for offline viewing with a private browser extension workflow.",
+        "from": "Sunporno link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Sunporno video",
+        "intro": "Follow these steps to save supported Sunporno video links.",
+        "steps": [
+          "Install the Sunporno Downloader extension from the verified SERP link.",
+          "Open a supported Sunporno page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Sunporno Video downloads",
+        "markdown": "Sunporno Video Downloader is built for people who need a straightforward way to save supported Sunporno media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported sunporno page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Sunporno Video Downloader?",
+          "answer": "Open a supported Sunporno page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Sunporno Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Sunporno video download",
+        "fromFormat": {
+          "name": "Sunporno link",
+          "fullName": "Supported Sunporno video link",
+          "description": "A supported Sunporno page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Sunporno media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/sunporno-downloader"
+      },
+      "features": [
+        "Source-specific Sunporno downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/sunporno-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Sunporno media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "sunporno downloader",
+        "sunporno video downloader",
+        "download sunporno videos"
+      ]
+    },
+    "keywords": [
+      "sunporno downloader",
+      "sunporno video downloader",
+      "download sunporno videos"
+    ]
+  },
+  {
+    "id": "download-tube8-videos",
+    "name": "Tube8 Video Downloader",
+    "description": "Download Tube8 videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-tube8-videos",
+    "from": "Tube8",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "tube8",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Tube8 Video Downloader",
+        "subtitle": "Download Tube8 videos for offline viewing with a private browser extension workflow.",
+        "from": "Tube8 link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Tube8 video",
+        "intro": "Follow these steps to save supported Tube8 video links.",
+        "steps": [
+          "Install the Tube8 Downloader extension from the verified SERP link.",
+          "Open a supported Tube8 page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Tube8 Video downloads",
+        "markdown": "Tube8 Video Downloader is built for people who need a straightforward way to save supported Tube8 media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported tube8 page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Tube8 Video Downloader?",
+          "answer": "Open a supported Tube8 page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Tube8 Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Tube8 video download",
+        "fromFormat": {
+          "name": "Tube8 link",
+          "fullName": "Supported Tube8 video link",
+          "description": "A supported Tube8 page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Tube8 media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/tube8-downloader"
+      },
+      "features": [
+        "Source-specific Tube8 downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/tube8-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Tube8 media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "tube8 downloader",
+        "tube8 video downloader",
+        "download tube8 videos"
+      ]
+    },
+    "keywords": [
+      "tube8 downloader",
+      "tube8 video downloader",
+      "download tube8 videos"
+    ]
+  },
+  {
+    "id": "download-veporn-videos",
+    "name": "Veporn Video Downloader",
+    "description": "Download Veporn videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-veporn-videos",
+    "from": "Veporn",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "veporn",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Veporn Video Downloader",
+        "subtitle": "Download Veporn videos for offline viewing with a private browser extension workflow.",
+        "from": "Veporn link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Veporn video",
+        "intro": "Follow these steps to save supported Veporn video links.",
+        "steps": [
+          "Install the Veporn Downloader extension from the verified SERP link.",
+          "Open a supported Veporn page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Veporn Video downloads",
+        "markdown": "Veporn Video Downloader is built for people who need a straightforward way to save supported Veporn media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported veporn page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Veporn Video Downloader?",
+          "answer": "Open a supported Veporn page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Veporn Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Veporn video download",
+        "fromFormat": {
+          "name": "Veporn link",
+          "fullName": "Supported Veporn video link",
+          "description": "A supported Veporn page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Veporn media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/veporn-downloader"
+      },
+      "features": [
+        "Source-specific Veporn downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/veporn-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Veporn media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "veporn downloader",
+        "veporn video downloader",
+        "download veporn videos"
+      ]
+    },
+    "keywords": [
+      "veporn downloader",
+      "veporn video downloader",
+      "download veporn videos"
+    ]
+  },
+  {
+    "id": "download-zbporn-videos",
+    "name": "Zbporn Video Downloader",
+    "description": "Download Zbporn videos for offline viewing with a private browser extension workflow.",
+    "operation": "download",
+    "route": "/download-zbporn-videos",
+    "from": "Zbporn",
+    "to": "mp4",
+    "isActive": true,
+    "tags": [
+      "zbporn",
+      "video",
+      "download",
+      "downloader"
+    ],
+    "content": {
+      "tool": {
+        "title": "Zbporn Video Downloader",
+        "subtitle": "Download Zbporn videos for offline viewing with a private browser extension workflow.",
+        "from": "Zbporn link",
+        "to": "Video file"
+      },
+      "howTo": {
+        "title": "How to download a Zbporn video",
+        "intro": "Follow these steps to save supported Zbporn video links.",
+        "steps": [
+          "Install the Zbporn Downloader extension from the verified SERP link.",
+          "Open a supported Zbporn page in your browser.",
+          "Start playback so the extension can detect the active media source.",
+          "Open the extension popup or use the on-page download control.",
+          "Choose the available quality option and save the file locally."
+        ]
+      },
+      "infoArticle": {
+        "title": "About Zbporn Video downloads",
+        "markdown": "Zbporn Video Downloader is built for people who need a straightforward way to save supported Zbporn media for offline access. Standard browser save actions often miss streamed media, embedded players, or dynamically loaded sources, so a normal right-click workflow can fail even when the media plays correctly in the page.\n\nThe downloader works through a browser extension flow. Open a supported zbporn page, start playback, and let the extension inspect the media sources that are available in the current tab. When a compatible source is found, it offers a simple download action and saves the result to your device in a standard format.\n\nThis page is intended for lawful personal downloads only. It does not bypass DRM, paid access controls, private accounts, or content you do not have permission to save. If a page requires access you do not have, or if the media provider blocks downloading, the downloader may not return a file."
+      },
+      "faqs": [
+        {
+          "question": "How do I use Zbporn Video Downloader?",
+          "answer": "Open a supported Zbporn page, start playback, then use the extension popup or on-page control to detect available media and start the download."
+        },
+        {
+          "question": "Do I need to install anything?",
+          "answer": "Yes. This source-specific workflow uses the Zbporn Downloader browser extension linked from this page."
+        },
+        {
+          "question": "What format are downloads saved in?",
+          "answer": "Downloads are saved as MP4 when a compatible video source is available."
+        },
+        {
+          "question": "Why is no media detected?",
+          "answer": "Start playback first, refresh the page if needed, and confirm the content is public or otherwise available in your current browser session."
+        },
+        {
+          "question": "Can it download private or restricted content?",
+          "answer": "No. Only download content you own or have permission to save. The tool does not bypass DRM, paywalls, login restrictions, or access controls."
+        }
+      ],
+      "aboutSection": {
+        "title": "Zbporn video download",
+        "fromFormat": {
+          "name": "Zbporn link",
+          "fullName": "Supported Zbporn video link",
+          "description": "A supported Zbporn page URL that exposes downloadable video media in the current browser session."
+        },
+        "toFormat": {
+          "name": "MP4",
+          "fullName": "MPEG-4 Video",
+          "description": "A local mp4 saved from a compatible Zbporn media source."
+        }
+      },
+      "productLinks": {
+        "serplyUrl": "https://serp.ly/zbporn-downloader"
+      },
+      "features": [
+        "Source-specific Zbporn downloader workflow",
+        "Browser extension detection for active media pages",
+        "Local save flow for offline access",
+        "Simple popup and page-level controls",
+        "Responsible-use guardrails for permitted downloads"
+      ],
+      "sourceLinks": [
+        {
+          "label": "Install extension",
+          "url": "https://serp.ly/zbporn-downloader"
+        }
+      ],
+      "supportedOperatingSystems": [
+        "Chrome",
+        "Edge",
+        "Brave",
+        "Opera"
+      ],
+      "supportedRegions": [
+        "Global"
+      ],
+      "permissionJustifications": [
+        {
+          "permission": "downloads",
+          "justification": "Used to save detected media files to your device when you start a download."
+        },
+        {
+          "permission": "activeTab",
+          "justification": "Used to detect supported Zbporn media sources in the current tab after playback starts."
+        },
+        {
+          "permission": "Responsible downloading",
+          "justification": "Only download content you own or have explicit permission to save."
+        }
+      ],
+      "keywords": [
+        "zbporn downloader",
+        "zbporn video downloader",
+        "download zbporn videos"
+      ]
+    },
+    "keywords": [
+      "zbporn downloader",
+      "zbporn video downloader",
+      "download zbporn videos"
     ]
   },
   {
