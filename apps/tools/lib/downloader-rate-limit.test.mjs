@@ -7,11 +7,11 @@ const rateLimitModule = existsSync(moduleUrl)
   ? await import(moduleUrl)
   : null;
 
-test("downloader rate limiter blocks repeated requests for 60 seconds, even after an IP change", () => {
+test("downloader rate limiter blocks repeated requests for 180 seconds, even after an IP change", () => {
   assert.ok(rateLimitModule, "expected shared downloader rate limit module to exist");
 
   const limiter = rateLimitModule.createDownloaderRateLimiter({
-    windowMs: 60_000,
+    windowMs: 180_000,
   });
 
   const first = limiter.check(
@@ -36,7 +36,7 @@ test("downloader rate limiter blocks repeated requests for 60 seconds, even afte
   );
   assert.equal(second.allowed, false);
   assert.equal(second.blockedBy, "client");
-  assert.equal(second.retryAfterMs, 56_000);
+  assert.equal(second.retryAfterMs, 176_000);
 
   const third = limiter.check(
     {
@@ -45,7 +45,7 @@ test("downloader rate limiter blocks repeated requests for 60 seconds, even afte
       userAgent: "Mozilla/5.0",
       acceptLanguage: "en-US,en;q=0.9",
     },
-    { now: 61_001 },
+    { now: 181_001 },
   );
   assert.equal(third.allowed, true);
 });
@@ -73,7 +73,7 @@ test("downloader cooldown cookie blocks a repeat request from the same browser i
 
   const cookieCodec = rateLimitModule.createDownloaderCooldownCookieCodec({
     secret: "test-downloader-secret",
-    windowMs: 60_000,
+    windowMs: 180_000,
   });
   const identity = {
     ip: "198.51.100.10",
@@ -95,5 +95,5 @@ test("downloader cooldown cookie blocks a repeat request from the same browser i
 
   assert.equal(block?.allowed, false);
   assert.equal(block?.blockedBy, "cookie");
-  assert.equal(block?.retryAfterMs, 56_000);
+  assert.equal(block?.retryAfterMs, 176_000);
 });

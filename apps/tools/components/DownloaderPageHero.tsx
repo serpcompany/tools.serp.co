@@ -4,6 +4,7 @@ import { useState } from "react";
 import DownloaderExtensionCTAModal from "@/components/DownloaderExtensionCTAModal";
 import { ToolAdInline } from "@/components/ToolAds";
 import VideoDownloaderTool from "@/components/VideoDownloaderTool";
+import { DOWNLOADER_RATE_LIMIT_WINDOW_MS } from "@/lib/downloader-contract.js";
 
 type DownloaderPageHeroProps = {
   toolId: string;
@@ -31,7 +32,7 @@ export default function DownloaderPageHero({
   function handleAdsVisibleChange(visible: boolean) {
     setAdsVisible(visible);
     if (visible) {
-      setCooldownEndsAtMs(Date.now() + 60_000);
+      setCooldownEndsAtMs(Date.now() + DOWNLOADER_RATE_LIMIT_WINDOW_MS);
       setCtaModalOpen(true);
     }
   }

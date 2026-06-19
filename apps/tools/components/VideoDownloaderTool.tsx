@@ -5,11 +5,18 @@ import { Button } from "@serp-tools/ui/components/button";
 import DownloaderCooldownNotice from "@/components/DownloaderCooldownNotice";
 import { saveBlob } from "@/components/saveAs";
 import SerplyCtaButton from "@/components/SerplyCtaButton";
+import { ToolAdSlot } from "@/components/ToolAds";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
+import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetizationPanel";
 import { normalizeBlobPart } from "@/lib/blob-parts";
 import { createDownloaderRequestHeaders } from "@/lib/downloader-client";
 import { DOWNLOADER_CONSUMER } from "@/lib/downloader-contract.js";
+import {
+  DOWNLOADER_EXTENSION_LABEL,
+  DOWNLOADER_EXTENSION_TEXT,
+  DOWNLOADER_EXTENSION_URL,
+} from "@/lib/downloader-extension-cta";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
 
@@ -38,6 +45,15 @@ type ExtensionFailureCta = {
 };
 
 const SUPPORTED_EXTENSIONS = new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS]);
+const LOCAL_USAGE_STORAGE_KEY = "serp-tools:downloader-usage:v1";
+const LOCAL_USAGE_PRESSURE_THRESHOLD = 3;
+const HIGH_RISK_DOWNLOADER_TOOL_IDS = new Set([
+  "download-ashemaletube-videos",
+  "download-beeg-videos",
+  "download-boyfriendtv-videos",
+  "download-eporner-videos",
+  "download-xhamster-videos",
+]);
 
 const MIME_EXTENSION_MAP: Record<string, string> = {
   "audio/mpeg": "mp3",
@@ -124,8 +140,6 @@ function getExtensionFailureCta(
   extensionUrl?: string,
   extensionProductName?: string
 ): ExtensionFailureCta | null {
-  if (!extensionUrl) return null;
-
   const isExtensionEligibleFailure =
     /Unsupported URL/i.test(message) ||
     /Download failed \(500\)/i.test(message) ||
@@ -136,9 +150,80 @@ function getExtensionFailureCta(
   if (!isExtensionEligibleFailure) return null;
 
   return {
-    extensionUrl,
+    extensionUrl: extensionUrl ?? DOWNLOADER_EXTENSION_URL,
     productName: extensionProductName || "Downloader",
   };
+}
+
+function getHighRiskDownloaderCta(
+  toolId: string,
+  extensionUrl?: string,
+  extensionProductName?: string
+): ExtensionFailureCta | null {
+  if (!HIGH_RISK_DOWNLOADER_TOOL_IDS.has(toolId)) return null;
+
+  return {
+    extensionUrl: extensionUrl ?? DOWNLOADER_EXTENSION_URL,
+    productName: extensionProductName || "Downloader",
+  };
+}
+
+function getLocalUsageDayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function incrementLocalUsageCount() {
+  if (typeof window === "undefined") return 0;
+
+  const today = getLocalUsageDayKey();
+  try {
+    const stored = window.localStorage.getItem(LOCAL_USAGE_STORAGE_KEY);
+    const parsed = stored ? JSON.parse(stored) as { day?: string; count?: number } : null;
+    const currentCount =
+      parsed?.day === today && Number.isFinite(parsed.count) ? Number(parsed.count) : 0;
+    const nextCount = currentCount + 1;
+    window.localStorage.setItem(
+      LOCAL_USAGE_STORAGE_KEY,
+      JSON.stringify({ day: today, count: nextCount }),
+    );
+    return nextCount;
+  } catch {
+    return 0;
+  }
+}
+
+function DownloaderCooldownMonetizationPanel({
+  cooldownEndsAtMs,
+  extensionUrl,
+  toolId,
+}: {
+  cooldownEndsAtMs: number | null;
+  extensionUrl?: string;
+  toolId: string;
+}) {
+  return (
+    <div className="mx-auto mt-4 grid max-w-5xl gap-4 text-left lg:grid-cols-[minmax(0,1fr)_336px] lg:items-stretch">
+      <div className="flex flex-col justify-center rounded-lg border border-[#bfd4ff] bg-[#eef4ff] p-4 text-[#12337a]">
+        <DownloaderCooldownNotice
+          cooldownEndsAtMs={cooldownEndsAtMs}
+          dataTestId="downloader-hero-cooldown"
+          className="text-sm font-semibold text-[#0f62fe]"
+        />
+        <p className="mt-2 text-sm leading-6">{DOWNLOADER_EXTENSION_TEXT}</p>
+        <SerplyCtaButton
+          href={extensionUrl ?? DOWNLOADER_EXTENSION_URL}
+          label={DOWNLOADER_EXTENSION_LABEL}
+          className="mt-4 h-10 w-full px-5 text-sm sm:w-fit"
+        />
+      </div>
+
+      <ToolAdSlot
+        slotId={`${toolId}-cooldown-inline`}
+        size="336x280"
+        className="mx-auto h-[280px] w-full max-w-[336px]"
+      />
+    </div>
+  );
 }
 
 async function downloadUrlToBlob(
@@ -265,6 +350,7 @@ export default function VideoDownloaderTool({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [extensionFailureCta, setExtensionFailureCta] =
     useState<ExtensionFailureCta | null>(null);
+  const [localUsageCount, setLocalUsageCount] = useState(0);
   const [urlInput, setUrlInput] = useState("");
   const [uncontrolledAdsVisible, setUncontrolledAdsVisible] = useState(false);
   const adsVisible = controlledAdsVisible ?? uncontrolledAdsVisible;
@@ -288,11 +374,45 @@ export default function VideoDownloaderTool({
     }
 
     revealAds();
+    const nextUsageCount = incrementLocalUsageCount();
+    setLocalUsageCount(nextUsageCount);
     setErrorMessage(null);
     setExtensionFailureCta(null);
-    setBusy(true);
 
     const nameHint = getFileNameFromUrl(parsedUrl);
+    const highRiskCta = getHighRiskDownloaderCta(
+      toolId,
+      extensionUrl,
+      extensionProductName
+    );
+
+    if (highRiskCta) {
+      setExtensionFailureCta(highRiskCta);
+      setCurrentFile({
+        name: nameHint,
+        progress: 0,
+        status: "error",
+        message: "Use the browser extension for this site.",
+      });
+      const run = beginToolRun({
+        toolId,
+        from: "url",
+        to: mode === "video" ? "mp4" : "audio",
+        metadata: {
+          source: "url",
+          mode,
+          urlHost: parsedUrl.host,
+          failFast: true,
+        },
+      });
+      run.finishFailure({
+        errorCode: "known_unreliable_web_downloader",
+        metadata: { source: "url", mode, urlHost: parsedUrl.host, failFast: true },
+      });
+      return;
+    }
+
+    setBusy(true);
     setCurrentFile({
       name: nameHint,
       progress: 0,
@@ -386,8 +506,10 @@ export default function VideoDownloaderTool({
 
   const adSlotPrefix = toolId;
   const showCooldownNotice = cooldownEndsAtMs !== null;
+  const showUsagePressure =
+    localUsageCount >= LOCAL_USAGE_PRESSURE_THRESHOLD && !extensionFailureCta;
   const hasBelowContent =
-    Boolean(errorMessage) || Boolean(extensionFailureCta) || showCooldownNotice;
+    Boolean(errorMessage) || Boolean(extensionFailureCta) || showCooldownNotice || showUsagePressure;
 
   return (
     <ToolHeroLayout
@@ -398,6 +520,16 @@ export default function VideoDownloaderTool({
       showInlineAd={false}
       contentClassName="text-center"
       containerClassName="max-w-6xl px-6 py-10"
+      resultPanel={
+        showCooldownNotice ? undefined : (
+          <ToolResultMonetizationPanel
+            slotPrefix={toolId}
+            variant="downloader"
+            extensionUrl={extensionUrl}
+            extensionProductName={extensionProductName}
+          />
+        )
+      }
       hero={
         <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 p-8 shadow-sm">
           <div className="mx-auto max-w-2xl space-y-4">
@@ -438,6 +570,22 @@ export default function VideoDownloaderTool({
         hasBelowContent ? (
           <div className="mt-4 space-y-2">
             {errorMessage ? <div className="text-sm text-red-600">{errorMessage}</div> : null}
+            {showUsagePressure ? (
+              <div className="mx-auto max-w-2xl rounded-lg border border-[#bfd4ff] bg-[#eef4ff] p-4 text-left text-[#12337a]">
+                <p className="text-sm font-semibold">
+                  You have tried {localUsageCount} downloads today.
+                </p>
+                <p className="mt-2 text-sm leading-6">
+                  Install the browser extension for unlimited downloads and fewer web-form
+                  limits.
+                </p>
+                <SerplyCtaButton
+                  href={extensionUrl ?? DOWNLOADER_EXTENSION_URL}
+                  label={DOWNLOADER_EXTENSION_LABEL}
+                  className="mt-4 h-10 px-5 text-sm"
+                />
+              </div>
+            ) : null}
             {extensionFailureCta ? (
               <div className="mx-auto max-w-2xl rounded-lg border border-[#bfd4ff] bg-[#eef4ff] p-4 text-left">
                 <h2 className="text-base font-semibold text-[#12337a]">
@@ -456,10 +604,10 @@ export default function VideoDownloaderTool({
               </div>
             ) : null}
             {showCooldownNotice ? (
-              <DownloaderCooldownNotice
+              <DownloaderCooldownMonetizationPanel
                 cooldownEndsAtMs={cooldownEndsAtMs}
-                dataTestId="downloader-hero-cooldown"
-                className="mx-auto max-w-2xl rounded-md bg-[#eef4ff] px-3 py-2 text-sm font-medium text-[#0f62fe]"
+                extensionUrl={extensionUrl}
+                toolId={toolId}
               />
             ) : null}
           </div>

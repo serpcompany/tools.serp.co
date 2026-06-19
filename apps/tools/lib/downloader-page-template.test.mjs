@@ -65,7 +65,7 @@ test("downloader page template includes the shared browser extension CTA", () =>
   assert.match(templateSource, /GitHub repository/);
   assert.match(templateSource, /content\.sourceLinks/);
   assert.match(templateSource, /outboundLinks\.map/);
-  assert.match(templateSource, /href={link\.url}/);
+  assert.match(templateSource, /href={withSerplyTracking\(link\.url\)}/);
   assert.doesNotMatch(templateSource, /link\.url\.replace/);
   assert.doesNotMatch(templateSource, /break-all/);
   assert.match(downloaderHeroSource, /<VideoDownloaderTool[\s\S]*extensionUrl={extensionUrl}/);
@@ -97,7 +97,7 @@ test("downloader page template includes the shared browser extension CTA", () =>
   assert.match(downloaderCtaSource, /lg:justify-between/);
   assert.match(downloaderCtaSource, /lg:text-left/);
   assert.match(downloaderCtaSource, /w-full sm:w-auto/);
-  assert.match(downloaderCtaSource, /bg-\[#0f62fe\]/);
+  assert.match(downloaderCtaSource, /SerplyCtaButton/);
   assert.match(downloaderCtaSource, /sticky top-16 z-40/);
   assert.match(downloaderCtaConfigSource, /https:\/\/serp\.ly\/serp-video-tools/);
   assert.doesNotMatch(loomDownloaderPageSource, /serp-video-tools/);
@@ -116,11 +116,12 @@ test("source-specific downloader failures promote the extension instead of raw b
   assert.match(videoDownloaderToolSource, /extensionProductName\?: string/);
   assert.match(videoDownloaderToolSource, /getExtensionFailureCta/);
   assert.match(videoDownloaderToolSource, /Use the \{extensionFailureCta\.productName\} Extension/);
-  assert.match(videoDownloaderToolSource, /Get the \{extensionFailureCta\.productName\} Extension/);
+  assert.match(videoDownloaderToolSource, /Get the \$\{extensionFailureCta\.productName\} Extension/);
   assert.match(videoDownloaderToolSource, /href={extensionFailureCta\.extensionUrl}/);
   assert.match(videoDownloaderToolSource, /This site cannot be downloaded reliably from the web form/);
   assert.match(videoDownloaderToolSource, /Unsupported URL/);
   assert.match(videoDownloaderToolSource, /Download failed \\\(500\\\)/);
+  assert.match(videoDownloaderToolSource, /extensionUrl: extensionUrl \?\? DOWNLOADER_EXTENSION_URL/);
   assert.match(videoDownloaderToolSource, /setExtensionFailureCta/);
   assert.match(videoDownloaderToolSource, /setErrorMessage\("Paste a valid public URL first\."\)/);
   assert.doesNotMatch(
@@ -148,11 +149,39 @@ test("legacy typo downloader routes redirect to canonical downloader routes", ()
   );
 });
 
+test("known unreliable downloader pages fail fast into extension monetization", () => {
+  assert.match(videoDownloaderToolSource, /HIGH_RISK_DOWNLOADER_TOOL_IDS/);
+  assert.match(videoDownloaderToolSource, /download-beeg-videos/);
+  assert.match(videoDownloaderToolSource, /download-eporner-videos/);
+  assert.match(videoDownloaderToolSource, /download-ashemaletube-videos/);
+  assert.match(videoDownloaderToolSource, /download-xhamster-videos/);
+  assert.match(videoDownloaderToolSource, /download-boyfriendtv-videos/);
+  assert.match(videoDownloaderToolSource, /getHighRiskDownloaderCta/);
+  assert.match(videoDownloaderToolSource, /known_unreliable_web_downloader/);
+  assert.match(videoDownloaderToolSource, /failFast: true/);
+  assert.match(videoDownloaderToolSource, /Use the browser extension for this site\./);
+});
+
+test("downloader usage pressure is tracked locally without requiring login", () => {
+  assert.match(videoDownloaderToolSource, /LOCAL_USAGE_STORAGE_KEY/);
+  assert.match(videoDownloaderToolSource, /serp-tools:downloader-usage:v1/);
+  assert.match(videoDownloaderToolSource, /LOCAL_USAGE_PRESSURE_THRESHOLD = 3/);
+  assert.match(videoDownloaderToolSource, /incrementLocalUsageCount/);
+  assert.match(videoDownloaderToolSource, /window\.localStorage\.setItem/);
+  assert.match(videoDownloaderToolSource, /You have tried \{localUsageCount\} downloads today\./);
+  assert.match(videoDownloaderToolSource, /Install the browser extension for unlimited downloads/);
+});
+
 test("shared downloader hero does not render the old public-links helper copy", () => {
   assert.doesNotMatch(
     videoDownloaderToolSource,
     /Public links only\. Private or logged-in content is not supported yet\./,
   );
   assert.match(videoDownloaderToolSource, /DownloaderCooldownNotice/);
+  assert.match(videoDownloaderToolSource, /DownloaderCooldownMonetizationPanel/);
+  assert.match(videoDownloaderToolSource, /ToolAdSlot/);
+  assert.match(videoDownloaderToolSource, /cooldown-inline/);
+  assert.match(videoDownloaderToolSource, /size="336x280"/);
+  assert.match(videoDownloaderToolSource, /DOWNLOADER_EXTENSION_TEXT/);
   assert.match(videoDownloaderToolSource, /downloader-hero-cooldown/);
 });

@@ -5,6 +5,7 @@ import { Button } from "@serp-tools/ui/components/button";
 import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
+import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetizationPanel";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { compressFile, convertWithWorker, getOutputMimeType } from "@/lib/convert/workerClient";
 import { resolveCompressionTarget } from "@/lib/compression-utils";
@@ -266,6 +267,7 @@ export default function HeroConverter({
       adSlotPrefix={adSlotPrefix}
       currentFile={currentFile}
       contentClassName="text-center"
+      resultPanel={<ToolResultMonetizationPanel slotPrefix={adSlotPrefix} />}
       hero={
         <div
           ref={dropRef}

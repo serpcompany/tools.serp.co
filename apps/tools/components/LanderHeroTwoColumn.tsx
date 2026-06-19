@@ -5,6 +5,7 @@ import { Button } from "@serp-tools/ui/components/button";
 import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
+import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetizationPanel";
 import { detectCapabilities, type Capabilities } from "@/lib/capabilities";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { compressFile, convertWithWorker, getOutputMimeType } from "@/lib/convert/workerClient";
@@ -264,6 +265,7 @@ export default function LanderHeroTwoColumn({
       currentFile={currentFile}
       progressClassName="mt-8 max-w-3xl mx-auto"
       containerClassName="max-w-[1400px] px-6 py-12"
+      resultPanel={<ToolResultMonetizationPanel slotPrefix={adSlotPrefix} />}
       hero={
         <>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-center">{title}</h1>

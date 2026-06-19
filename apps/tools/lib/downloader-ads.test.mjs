@@ -14,6 +14,22 @@ const toolAdsSource = readFileSync(
   new URL("../components/ToolAds.tsx", import.meta.url),
   "utf8",
 );
+const toolHeroLayoutSource = readFileSync(
+  new URL("../components/ToolHeroLayout.tsx", import.meta.url),
+  "utf8",
+);
+const toolResultMonetizationSource = readFileSync(
+  new URL("../components/ToolResultMonetizationPanel.tsx", import.meta.url),
+  "utf8",
+);
+const heroConverterSource = readFileSync(
+  new URL("../components/HeroConverter.tsx", import.meta.url),
+  "utf8",
+);
+const landerHeroTwoColumnSource = readFileSync(
+  new URL("../components/LanderHeroTwoColumn.tsx", import.meta.url),
+  "utf8",
+);
 
 test("downloader pages keep ads hidden until the user initiates the action", () => {
   assert.equal(
@@ -34,7 +50,7 @@ test("downloader pages keep ads hidden until the user initiates the action", () 
   );
   assert.match(
     downloaderPageHeroSource,
-    /if \(visible\) \{\s*setCooldownEndsAtMs\(Date\.now\(\) \+ 60_000\);\s*setCtaModalOpen\(true\);/,
+    /if \(visible\) \{\s*setCooldownEndsAtMs\(Date\.now\(\) \+ DOWNLOADER_RATE_LIMIT_WINDOW_MS\);\s*setCtaModalOpen\(true\);/,
   );
   assert.match(
     downloaderPageHeroSource,
@@ -49,4 +65,27 @@ test("shared tool ad rails do not reserve rail height while ads are hidden", () 
   assert.doesNotMatch(toolAdsSource, /hidden h-\[600px\] w-full xl:block/);
   assert.match(toolAdsSource, /xl:grid-cols-\[160px_minmax\(0,1fr\)_160px\]/);
   assert.match(toolAdsSource, /className="hidden h-\[600px\] w-full xl:flex"/);
+});
+
+test("unfilled ad slots render house ads instead of inert placeholders", () => {
+  assert.match(toolAdsSource, /HouseAdFallback/);
+  assert.match(toolAdsSource, /data-house-ad="quiet"/);
+  assert.match(toolAdsSource, /DOWNLOADER_EXTENSION_TEXT/);
+  assert.match(toolAdsSource, /Browser extension available/);
+  assert.match(toolAdsSource, /SERP Tools/);
+  assert.doesNotMatch(toolAdsSource, /SerplyCtaButton/);
+  assert.doesNotMatch(toolAdsSource, /ctaLabel/);
+  assert.doesNotMatch(toolAdsSource, /border-dashed border-gray-200 bg-gray-50\/80/);
+});
+
+test("completed or failed tool runs show a post-result monetization panel", () => {
+  assert.match(toolHeroLayoutSource, /resultPanel\?: React\.ReactNode/);
+  assert.match(toolHeroLayoutSource, /currentFile\?\.status === "completed"/);
+  assert.match(toolHeroLayoutSource, /currentFile\?\.status === "error"/);
+  assert.match(toolHeroLayoutSource, /showResultPanel \? resultPanel : null/);
+  assert.match(toolResultMonetizationSource, /tool-result-monetization/);
+  assert.match(toolResultMonetizationSource, /result-inline/);
+  assert.match(toolResultMonetizationSource, /size="336x280"/);
+  assert.match(heroConverterSource, /ToolResultMonetizationPanel/);
+  assert.match(landerHeroTwoColumnSource, /ToolResultMonetizationPanel/);
 });

@@ -6,7 +6,10 @@ import ipaddr from "ipaddr.js";
 import { extension as extensionForType, lookup as lookupMime } from "mime-types";
 import { create as createYtDlp } from "youtube-dl-exec";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "../../../lib/capabilities";
-import { DOWNLOADER_CONSUMER } from "../../../lib/downloader-contract.js";
+import {
+  DOWNLOADER_CONSUMER,
+  DOWNLOADER_RATE_LIMIT_WINDOW_MS,
+} from "../../../lib/downloader-contract.js";
 import { extractWithRegisteredExtractor, type ExtractedMediaFormat } from "../../../lib/extractors";
 import {
   createDownloaderCooldownCookieCodec,
@@ -17,6 +20,9 @@ import {
 export const runtime = "nodejs";
 
 const SUPPORTED_EXTENSIONS = new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS]);
+const DOWNLOADER_RATE_LIMIT_WINDOW_SECONDS = Math.ceil(
+  DOWNLOADER_RATE_LIMIT_WINDOW_MS / 1000,
+);
 function resolvePlatformBinaryName() {
   if (process.platform === "win32") {
     if (process.arch === "arm64") return "yt-dlp_arm64.exe";
@@ -261,7 +267,7 @@ function shouldRateLimitDownloader(payload: UrlPayload | null) {
 
 function getRateLimitMessage(retryAfterMs: number) {
   const retryAfterSeconds = Math.max(1, Math.ceil(retryAfterMs / 1000));
-  return `You can only download 1 video every 60 seconds. Try again in ${retryAfterSeconds}s.`;
+  return `You can only download 1 video every ${DOWNLOADER_RATE_LIMIT_WINDOW_SECONDS} seconds. Try again in ${retryAfterSeconds}s.`;
 }
 
 function buildDownloaderRateLimitResponse(args: {

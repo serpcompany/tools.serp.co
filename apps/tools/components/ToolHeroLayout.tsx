@@ -16,6 +16,7 @@ type ToolHeroLayoutProps = {
   currentFile?: ToolProgressFile | null;
   progressClassName?: string;
   progressCompletedLabel?: string;
+  resultPanel?: React.ReactNode;
   sectionClassName?: string;
   containerClassName?: string;
   contentClassName?: string;
@@ -33,6 +34,7 @@ export function ToolHeroLayout({
   currentFile = null,
   progressClassName,
   progressCompletedLabel,
+  resultPanel,
   sectionClassName,
   containerClassName,
   contentClassName,
@@ -47,6 +49,9 @@ export function ToolHeroLayout({
     .join(" ");
   const inlineAdClasses = ["mt-6", inlineAdClassName].filter(Boolean).join(" ");
   const progressClasses = progressClassName ?? "mt-6 max-w-2xl mx-auto";
+  const showResultPanel =
+    Boolean(resultPanel) &&
+    (currentFile?.status === "completed" || currentFile?.status === "error");
   const content = (
     <div className={contentClassName}>
       {hero}
@@ -56,6 +61,7 @@ export function ToolHeroLayout({
         completedLabel={progressCompletedLabel}
       />
       {below}
+      {showResultPanel ? resultPanel : null}
     </div>
   );
 

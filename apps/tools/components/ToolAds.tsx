@@ -9,6 +9,7 @@ import {
   TOOL_AD_SLOTS,
 } from "@/lib/adsense";
 import { isAdSenseSlotEnabled } from "@/lib/adsense-runtime";
+import { DOWNLOADER_EXTENSION_TEXT } from "@/lib/downloader-extension-cta";
 
 declare global {
   interface Window {
@@ -35,8 +36,11 @@ const ADSENSE_SLOTS = {
   inline: process.env.NEXT_PUBLIC_ADSENSE_SLOT_INLINE ?? DEFAULT_AD_SLOTS.inline ?? "",
 };
 
-function parseAdSize(size: string) {
-  const [width, height] = size.split("x").map((value) => Number.parseInt(value, 10));
+function parseAdSize(size: string): { width: number; height: number } | null {
+  const dimensions = size.split("x").map((value) => Number.parseInt(value, 10));
+  const width = dimensions[0];
+  const height = dimensions[1];
+  if (width === undefined || height === undefined) return null;
   if (!Number.isFinite(width) || !Number.isFinite(height)) return null;
   return { width, height };
 }
@@ -51,6 +55,61 @@ function resolveAdSlot(slotId: string) {
   const toolKey = slotId.replace(/-(left|right|inline)$/, "");
   const toolSlots = TOOL_AD_SLOTS[toolKey];
   return toolSlots?.[suffix] ?? ADSENSE_SLOTS[suffix] ?? "";
+}
+
+function isDownloaderSlot(slotId: string) {
+  return slotId.startsWith("download-") || slotId.includes("downloader");
+}
+
+function getHouseAdCopy(slotId: string) {
+  if (isDownloaderSlot(slotId)) {
+    return {
+      eyebrow: "House ad",
+      title: "Browser extension available",
+      body: DOWNLOADER_EXTENSION_TEXT,
+    };
+  }
+
+  return {
+    eyebrow: "House ad",
+    title: "SERP Tools",
+    body: "Browse SERP tools for downloaders, converters, compressors, and document utilities.",
+  };
+}
+
+function HouseAdFallback({
+  slotId,
+  size,
+  className,
+  label,
+}: Required<Pick<ToolAdSlotProps, "slotId" | "size" | "label">> &
+  Pick<ToolAdSlotProps, "className">) {
+  const parsedSize = parseAdSize(size);
+  const compact = parsedSize ? parsedSize.height <= 100 : false;
+  const copy = getHouseAdCopy(slotId);
+
+  return (
+    <div
+      className={`relative flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50/80 p-3 text-slate-500 ${className ?? ""}`}
+      data-ad-slot={slotId}
+      data-ad-size={size}
+      data-house-ad="quiet"
+      aria-label={label}
+      role="complementary"
+    >
+      <div className={compact ? "flex w-full items-center justify-between gap-3" : "w-full text-center"}>
+        <div className={compact ? "min-w-0 text-left" : ""}>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+            {copy.eyebrow}
+          </p>
+          <p className="mt-1 text-sm font-semibold leading-5 text-slate-600">{copy.title}</p>
+          {!compact && (
+            <p className="mt-2 text-xs leading-5 text-slate-500">{copy.body}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 type ToolAdSlotProps = {
@@ -117,20 +176,7 @@ export function ToolAdSlot({
     );
   }
 
-  return (
-    <div
-      className={`relative flex items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50/80 text-gray-400 ${className ?? ""}`}
-      data-ad-slot={slotId}
-      data-ad-size={size}
-      aria-label={label}
-      role="complementary"
-    >
-      <div className="text-center text-[10px] uppercase tracking-wide">
-        <div>{label}</div>
-        <div>{size}</div>
-      </div>
-    </div>
-  );
+  return <HouseAdFallback slotId={slotId} size={size} className={className} label={label} />;
 }
 
 type ToolAdRailProps = {
