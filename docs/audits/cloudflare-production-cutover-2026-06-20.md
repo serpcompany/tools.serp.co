@@ -174,3 +174,28 @@ Automation note: the current Wrangler OAuth token can read the Worker tag
 `4e38de528c2f4e2e8abfb7f4468e180e`, but Cloudflare's Workers Builds triggers
 API returned `403 Authentication error`, so the dashboard build trigger settings
 were not machine-verifiable from this session.
+
+## Git Integration Follow-Up
+
+Commit `2ced676c533e335ddcf6bccf30891259c6b60ba0` was pushed to `main`.
+
+GitHub confirmed the Cloudflare GitHub App created a Workers Builds check:
+
+- Check: `Workers Builds: tools-serp-co`
+- Build ID: `358b2ec6-04d0-4c2d-803b-346f4ddd3dac`
+- Result: failure
+- Build details URL: `https://dash.cloudflare.com/cec5f04e1d18bcc65f2be0aefb04f059/workers/services/view/tools-serp-co/production/builds/358b2ec6-04d0-4c2d-803b-346f4ddd3dac`
+
+GitHub exposed no annotations or error details for the failed Cloudflare build.
+The Cloudflare Builds logs endpoint also returned `403 Authentication error` with
+the current Wrangler OAuth token, and the dashboard page required Cloudflare
+security verification in the automation browser. Inspect the build details URL
+in an authenticated browser to fix the dashboard build settings.
+
+The failed GitHub-triggered build did not publish a new Worker version. The live
+production Worker remains the manually deployed version
+`14ab28f7-6ea0-4a4f-ac27-fee0415f44d2`.
+
+The same push also triggered a Vercel production deployment status, confirming
+Vercel Git integration is still active. Keep it available during the observation
+window, then disable it during Vercel retirement.
