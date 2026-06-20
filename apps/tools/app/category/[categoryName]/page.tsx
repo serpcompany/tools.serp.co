@@ -20,8 +20,6 @@ type PageProps = {
   params: Promise<{ categoryName: string }>;
 };
 
-export const dynamicParams = false;
-
 export function generateStaticParams() {
   return availableOperations.map((categoryName) => ({ categoryName }));
 }

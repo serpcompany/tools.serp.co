@@ -140,6 +140,7 @@ const nextConfig = {
   outputFileTracingIncludes,
   webpack(config) {
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
+    config.output = { ...config.output, hashFunction: "sha256" };
     return config;
   },
   async headers() {

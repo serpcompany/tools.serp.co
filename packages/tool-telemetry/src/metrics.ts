@@ -1,4 +1,4 @@
-import type { ToolRunRecord } from "./types";
+import type { ToolRunRecord } from "./types.ts";
 
 export type ToolUsageSummary = {
   totalRuns: number;

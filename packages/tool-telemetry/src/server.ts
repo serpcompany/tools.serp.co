@@ -1,8 +1,6 @@
-import { and, desc, eq, gte } from "drizzle-orm";
-import { getDb } from "@serp-tools/app-core/db";
-import { toolRuns, toolStatus } from "@serp-tools/app-core/db/schema";
-import type { ToolRunEvent, ToolRunStatus, ToolRunRecord } from "./types";
-import { median, summarizeToolRuns } from "./metrics";
+import { recordToolRunInD1, type D1DatabaseLike } from "./d1.ts";
+import type { ToolRunEvent, ToolRunStatus, ToolRunRecord } from "./types.ts";
+import { median, summarizeToolRuns } from "./metrics.ts";
 
 type RecordToolRunResult = {
   status: number;
@@ -14,7 +12,33 @@ type RecordToolRunResult = {
   };
 };
 
+type RecordToolRunOptions = {
+  d1?: D1DatabaseLike | null;
+  now?: Date;
+};
+
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+async function loadLegacyTelemetryDeps() {
+  const [drizzleOrm, dbModule, schemaModule] = await Promise.all([
+    import("drizzle-orm"),
+    import("@serp-tools/app-core/db"),
+    import("@serp-tools/app-core/db/schema"),
+  ]);
+
+  return {
+    and: drizzleOrm.and,
+    desc: drizzleOrm.desc,
+    eq: drizzleOrm.eq,
+    gte: drizzleOrm.gte,
+    getDb: dbModule.getDb,
+    toolRuns: schemaModule.toolRuns,
+    toolStatus: schemaModule.toolStatus,
+  };
+}
+
+type LegacyTelemetryDeps = Awaited<ReturnType<typeof loadLegacyTelemetryDeps>>;
+type LegacyDb = NonNullable<ReturnType<LegacyTelemetryDeps["getDb"]>>;
 
 function isToolRunEvent(payload: unknown): payload is ToolRunEvent {
   if (!payload || typeof payload !== "object") return false;
@@ -48,7 +72,12 @@ function toMetadata(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
-async function updateToolStatus(db: NonNullable<ReturnType<typeof getDb>>, toolId: string) {
+async function updateToolStatus(
+  db: LegacyDb,
+  deps: LegacyTelemetryDeps,
+  toolId: string
+) {
+  const { and, desc, eq, gte, toolRuns, toolStatus } = deps;
   const since = new Date(Date.now() - ONE_DAY_MS);
 
   const runs = await db
@@ -121,7 +150,10 @@ async function updateToolStatus(db: NonNullable<ReturnType<typeof getDb>>, toolI
     });
 }
 
-export async function recordToolRun(payload: unknown): Promise<RecordToolRunResult> {
+export async function recordToolRun(
+  payload: unknown,
+  options: RecordToolRunOptions = {}
+): Promise<RecordToolRunResult> {
   if (!isToolRunEvent(payload)) {
     return { status: 400, body: { ok: false, error: "Missing fields" } };
   }
@@ -131,9 +163,28 @@ export async function recordToolRun(payload: unknown): Promise<RecordToolRunResu
     return { status: 400, body: { ok: false, error: "Invalid startedAt" } };
   }
 
-  let db;
+  if (options.d1) {
+    try {
+      await recordToolRunInD1(options.d1, payload, { now: options.now });
+      return { status: 200, body: { ok: true } };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "D1 telemetry write failed";
+      return { status: 500, body: { ok: false, error: message } };
+    }
+  }
+
+  if (!process.env.DATABASE_URL) {
+    return {
+      status: 200,
+      body: { ok: true, skipped: true, reason: "DATABASE_URL not set" },
+    };
+  }
+
+  let deps: LegacyTelemetryDeps;
+  let db: LegacyDb | null;
   try {
-    db = getDb();
+    deps = await loadLegacyTelemetryDeps();
+    db = deps.getDb();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Database unavailable";
     return { status: 500, body: { ok: false, error: message } };
@@ -147,7 +198,7 @@ export async function recordToolRun(payload: unknown): Promise<RecordToolRunResu
   }
 
   const status = toStatus(payload);
-  const insert = db.insert(toolRuns).values({
+  const insert = db.insert(deps.toolRuns).values({
     id: payload.runId,
     toolId: payload.toolId,
     status,
@@ -160,10 +211,10 @@ export async function recordToolRun(payload: unknown): Promise<RecordToolRunResu
   });
 
   if (status === "started") {
-    await insert.onConflictDoNothing({ target: toolRuns.id });
+    await insert.onConflictDoNothing({ target: deps.toolRuns.id });
   } else {
     await insert.onConflictDoUpdate({
-      target: toolRuns.id,
+      target: deps.toolRuns.id,
       set: {
         status,
         durationMs: payload.durationMs ?? null,
@@ -175,7 +226,7 @@ export async function recordToolRun(payload: unknown): Promise<RecordToolRunResu
     });
   }
 
-  await updateToolStatus(db, payload.toolId);
+  await updateToolStatus(db, deps, payload.toolId);
 
   return { status: 200, body: { ok: true } };
 }

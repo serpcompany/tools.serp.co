@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { recordToolRun } from "@serp-tools/tool-telemetry/server";
+import { getSerpToolsD1Binding } from "@/lib/cloudflare-d1";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
   }
 
   const enrichedPayload = attachRequestMetadata(payload, request);
-  const result = await recordToolRun(enrichedPayload);
+  const d1 = await getSerpToolsD1Binding();
+  const result = await recordToolRun(enrichedPayload, { d1 });
   return NextResponse.json(result.body, { status: result.status });
 }

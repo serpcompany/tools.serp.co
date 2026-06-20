@@ -149,6 +149,14 @@ type YtDlpFormat = {
 const downloaderRateLimiter = createDownloaderRateLimiter();
 const downloaderCooldownCookieCodec = createDownloaderCooldownCookieCodec();
 
+function getServerEnv(name: string) {
+  return process.env[name] ?? "";
+}
+
+const FEATURE_FLAG_DOWNLOADER_EXTENSION_ONLY_ENABLED = /^(1|true|yes|on)$/i.test(
+  getServerEnv("FEATURE_FLAG_DOWNLOADER_EXTENSION_ONLY"),
+);
+
 function normalizeContentType(value: string | null) {
   if (!value) return "";
   return value.split(";")[0]?.trim().toLowerCase() ?? "";
@@ -263,6 +271,16 @@ function buildJsonErrorResponse(
 
 function shouldRateLimitDownloader(payload: UrlPayload | null) {
   return payload?.consumer === DOWNLOADER_CONSUMER;
+}
+
+function buildDownloaderExtensionOnlyResponse() {
+  return buildJsonErrorResponse(
+    {
+      error: "This website requires a browser extension to download from.",
+      extensionRequired: true,
+    },
+    403,
+  );
 }
 
 function getRateLimitMessage(retryAfterMs: number) {
@@ -537,6 +555,10 @@ export async function POST(request: Request) {
 
   if (payload.mode && payload.mode !== "audio" && payload.mode !== "video") {
     return buildJsonErrorResponse({ error: "Invalid mode." }, 400);
+  }
+
+  if (shouldRateLimitDownloader(payload) && FEATURE_FLAG_DOWNLOADER_EXTENSION_ONLY_ENABLED) {
+    return buildDownloaderExtensionOnlyResponse();
   }
 
   const downloaderIdentity = shouldRateLimitDownloader(payload)

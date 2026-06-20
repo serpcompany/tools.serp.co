@@ -115,7 +115,7 @@ test("source-specific downloader failures promote the extension instead of raw b
   assert.match(videoDownloaderToolSource, /extensionUrl\?: string/);
   assert.match(videoDownloaderToolSource, /extensionProductName\?: string/);
   assert.match(videoDownloaderToolSource, /getExtensionFailureCta/);
-  assert.match(videoDownloaderToolSource, /Use the \{extensionFailureCta\.productName\} Extension/);
+  assert.match(videoDownloaderToolSource, /Use the \$\{extensionFailureCta\.productName\} Extension/);
   assert.match(videoDownloaderToolSource, /Get the \$\{extensionFailureCta\.productName\} Extension/);
   assert.match(videoDownloaderToolSource, /href={extensionFailureCta\.extensionUrl}/);
   assert.match(videoDownloaderToolSource, /This site cannot be downloaded reliably from the web form/);
@@ -156,10 +156,23 @@ test("known unreliable downloader pages fail fast into extension monetization", 
   assert.match(videoDownloaderToolSource, /download-ashemaletube-videos/);
   assert.match(videoDownloaderToolSource, /download-xhamster-videos/);
   assert.match(videoDownloaderToolSource, /download-boyfriendtv-videos/);
-  assert.match(videoDownloaderToolSource, /getHighRiskDownloaderCta/);
+  assert.match(videoDownloaderToolSource, /getFailFastDownloaderCta/);
   assert.match(videoDownloaderToolSource, /known_unreliable_web_downloader/);
   assert.match(videoDownloaderToolSource, /failFast: true/);
   assert.match(videoDownloaderToolSource, /Use the browser extension for this site\./);
+});
+
+test("downloaders map extension-only API responses into extension monetization", () => {
+  assert.match(videoDownloaderToolSource, /Download failed/);
+  assert.match(videoDownloaderToolSource, /403/);
+  assert.match(videoDownloaderToolSource, /requires a browser extension/);
+  assert.match(videoDownloaderToolSource, /extension_only/);
+  assert.match(videoDownloaderToolSource, /Browser Extension Required/);
+  assert.match(
+    videoDownloaderToolSource,
+    /This website requires a browser extension to download from\./,
+  );
+  assert.doesNotMatch(videoDownloaderToolSource, /NEXT_PUBLIC_FEATURE_FLAG_DOWNLOADER_EXTENSION_ONLY/);
 });
 
 test("downloader usage pressure is tracked locally without requiring login", () => {

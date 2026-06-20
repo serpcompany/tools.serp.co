@@ -17,6 +17,7 @@ import {
   DOWNLOADER_EXTENSION_TEXT,
   DOWNLOADER_EXTENSION_URL,
 } from "@/lib/downloader-extension-cta";
+import { getDownloaderMediaFetchEndpoint } from "@/lib/media-fetch-endpoint";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
 
@@ -42,6 +43,7 @@ type Props = {
 type ExtensionFailureCta = {
   extensionUrl: string;
   productName: string;
+  reason: "download_failure" | "extension_only" | "site_unreliable";
 };
 
 const SUPPORTED_EXTENSIONS = new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS]);
@@ -142,7 +144,9 @@ function getExtensionFailureCta(
 ): ExtensionFailureCta | null {
   const isExtensionEligibleFailure =
     /Unsupported URL/i.test(message) ||
+    /requires a browser extension/i.test(message) ||
     /Download failed \(500\)/i.test(message) ||
+    /Download failed \(403\)/i.test(message) ||
     /This link returns a media type we do not support yet/i.test(message) ||
     /That link does not look like a supported media file/i.test(message) ||
     /Failed to fetch media/i.test(message);
@@ -152,10 +156,13 @@ function getExtensionFailureCta(
   return {
     extensionUrl: extensionUrl ?? DOWNLOADER_EXTENSION_URL,
     productName: extensionProductName || "Downloader",
+    reason: /requires a browser extension/i.test(message)
+      ? "extension_only"
+      : "download_failure",
   };
 }
 
-function getHighRiskDownloaderCta(
+function getFailFastDownloaderCta(
   toolId: string,
   extensionUrl?: string,
   extensionProductName?: string
@@ -165,6 +172,7 @@ function getHighRiskDownloaderCta(
   return {
     extensionUrl: extensionUrl ?? DOWNLOADER_EXTENSION_URL,
     productName: extensionProductName || "Downloader",
+    reason: "site_unreliable",
   };
 }
 
@@ -231,7 +239,7 @@ async function downloadUrlToBlob(
   mode: "audio" | "video",
   onProgress?: (update: ProgressUpdate) => void
 ) {
-  const response = await fetch("/api/media-fetch", {
+  const response = await fetch(getDownloaderMediaFetchEndpoint(), {
     method: "POST",
     headers: createDownloaderRequestHeaders(),
     body: JSON.stringify({
@@ -380,19 +388,22 @@ export default function VideoDownloaderTool({
     setExtensionFailureCta(null);
 
     const nameHint = getFileNameFromUrl(parsedUrl);
-    const highRiskCta = getHighRiskDownloaderCta(
+    const failFastCta = getFailFastDownloaderCta(
       toolId,
       extensionUrl,
       extensionProductName
     );
 
-    if (highRiskCta) {
-      setExtensionFailureCta(highRiskCta);
+    if (failFastCta) {
+      const isExtensionOnly = failFastCta.reason === "extension_only";
+      setExtensionFailureCta(failFastCta);
       setCurrentFile({
         name: nameHint,
         progress: 0,
         status: "error",
-        message: "Use the browser extension for this site.",
+        message: isExtensionOnly
+          ? "This website requires the browser extension."
+          : "Use the browser extension for this site.",
       });
       const run = beginToolRun({
         toolId,
@@ -403,11 +414,20 @@ export default function VideoDownloaderTool({
           mode,
           urlHost: parsedUrl.host,
           failFast: true,
+          failFastReason: failFastCta.reason,
         },
       });
       run.finishFailure({
-        errorCode: "known_unreliable_web_downloader",
-        metadata: { source: "url", mode, urlHost: parsedUrl.host, failFast: true },
+        errorCode: isExtensionOnly
+          ? "downloader_extension_only"
+          : "known_unreliable_web_downloader",
+        metadata: {
+          source: "url",
+          mode,
+          urlHost: parsedUrl.host,
+          failFast: true,
+          failFastReason: failFastCta.reason,
+        },
       });
       return;
     }
@@ -589,12 +609,14 @@ export default function VideoDownloaderTool({
             {extensionFailureCta ? (
               <div className="mx-auto max-w-2xl rounded-lg border border-[#bfd4ff] bg-[#eef4ff] p-4 text-left">
                 <h2 className="text-base font-semibold text-[#12337a]">
-                  Use the {extensionFailureCta.productName} Extension
+                  {extensionFailureCta.reason === "extension_only"
+                    ? "Browser Extension Required"
+                    : `Use the ${extensionFailureCta.productName} Extension`}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#12337a]">
-                  This site cannot be downloaded reliably from the web form. The{" "}
-                  {extensionFailureCta.productName} Extension detects the video inside your
-                  browser and saves it directly.
+                  {extensionFailureCta.reason === "extension_only"
+                    ? "This website requires a browser extension to download from."
+                    : `This site cannot be downloaded reliably from the web form. The ${extensionFailureCta.productName} Extension detects the video inside your browser and saves it directly.`}
                 </p>
                 <SerplyCtaButton
                   href={extensionFailureCta.extensionUrl}

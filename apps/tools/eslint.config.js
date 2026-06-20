@@ -6,7 +6,15 @@ const turboEnvAllowList = [
   "^GITHUB_TOKEN$",
   "^GH_TOKEN$",
   "^ADSENSE_PUBLISHER_ID$",
+  "^CLOUDFLARE_BASE_URL$",
+  "^FEATURE_FLAG_DOWNLOADER_EXTENSION_ONLY$",
+  "^MEDIA_FETCH_SMOKE_URL$",
+  "^NEXT_PUBLIC_ASSETS_BASE_URL$",
+  "^NEXT_PUBLIC_DOWNLOADER_MEDIA_FETCH_ENDPOINT$",
+  "^NEXT_PUBLIC_MEDIA_FETCH_ENDPOINT$",
+  "^R2_ASSETS_BUCKET$",
   "^SERVER_ACTION_RATE_LIMIT_SECRET$",
+  "^VERCEL_BASE_URL$",
   "^PORT$",
 ];
 
@@ -15,6 +23,7 @@ export default [
   {
     ignores: [
       ".next/**",
+      ".open-next/**",
       "out/**",
       "public/vendor/**",
       "node_modules/**",

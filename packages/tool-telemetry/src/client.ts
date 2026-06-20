@@ -1,4 +1,4 @@
-import type { ToolRunEvent } from "./types";
+import type { ToolRunEvent } from "./types.ts";
 
 type ToolRunHandle = {
   runId: string;

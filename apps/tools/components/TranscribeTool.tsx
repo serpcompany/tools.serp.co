@@ -9,6 +9,7 @@ import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { extractAudioForTranscription } from "@/lib/convert/video";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
+import { getMediaFetchEndpoint } from "@/lib/media-fetch-endpoint";
 
 type ProgressUpdate = {
   progress?: number;
@@ -225,7 +226,7 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       etaSeconds?: number;
     }) => void
   ) {
-    const response = await fetch("/api/media-fetch", {
+    const response = await fetch(getMediaFetchEndpoint(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: url.toString(), mode: "audio" }),

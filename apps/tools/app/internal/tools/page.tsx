@@ -1,7 +1,6 @@
 import toolsData from "@serp-tools/app-core/data/tools.json";
-import { getDb } from "@serp-tools/app-core/db";
-import { toolRuns, toolStatus } from "@serp-tools/app-core/db/schema";
-import { and, desc, eq, gte, sql } from "drizzle-orm";
+import { getD1ToolsDashboardData } from "@serp-tools/tool-telemetry/d1";
+import { getSerpToolsD1Binding } from "@/lib/cloudflare-d1";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -11,8 +10,18 @@ type FailureSummary = {
   toolId: string;
   errorCode: string | null;
   count: number;
-  lastSeen: Date | null;
+  lastSeen: Date | string | null;
   sampleMetadata: Record<string, unknown> | null;
+};
+
+type StatusRow = {
+  toolId: string;
+  status: string;
+  lastRunAt: Date | string | null;
+  failureRate24h: number | null;
+  medianDurationMs: number | null;
+  medianReductionPct: number | null;
+  updatedAt: Date | string;
 };
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -24,6 +33,25 @@ const toolMap = new Map(
     tool,
   ])
 );
+
+async function loadLegacyDashboardDeps() {
+  const [drizzleOrm, dbModule, schemaModule] = await Promise.all([
+    import("drizzle-orm"),
+    import("@serp-tools/app-core/db"),
+    import("@serp-tools/app-core/db/schema"),
+  ]);
+
+  return {
+    and: drizzleOrm.and,
+    desc: drizzleOrm.desc,
+    eq: drizzleOrm.eq,
+    gte: drizzleOrm.gte,
+    sql: drizzleOrm.sql,
+    getDb: dbModule.getDb,
+    toolRuns: schemaModule.toolRuns,
+    toolStatus: schemaModule.toolStatus,
+  };
+}
 
 export default async function ToolsDashboard({ searchParams }: PageProps) {
   const token = process.env.INTERNAL_DASHBOARD_TOKEN;
@@ -42,64 +70,82 @@ export default async function ToolsDashboard({ searchParams }: PageProps) {
     );
   }
 
-  let rows: Array<typeof toolStatus.$inferSelect> = [];
+  let rows: StatusRow[] = [];
   let failureRows: FailureSummary[] = [];
   let errorMessage: string | null = null;
 
   try {
-    const db = getDb();
-    if (!db) {
-      throw new Error("Telemetry database not configured (DATABASE_URL not set).");
-    }
-    rows = await db.select().from(toolStatus).orderBy(desc(toolStatus.updatedAt));
+    const d1 = await getSerpToolsD1Binding();
 
-    const since = new Date(Date.now() - ONE_DAY_MS);
-    const failureCountExpr = sql<number>`count(*)`.mapWith(Number);
-    const lastSeenExpr = sql<Date>`max(${toolRuns.startedAt})`;
-
-    const failureCounts = await db
-      .select({
-        toolId: toolRuns.toolId,
-        errorCode: toolRuns.errorCode,
-        count: failureCountExpr,
-        lastSeen: lastSeenExpr,
-      })
-      .from(toolRuns)
-      .where(and(eq(toolRuns.status, "failed"), gte(toolRuns.startedAt, since)))
-      .groupBy(toolRuns.toolId, toolRuns.errorCode)
-      .orderBy(desc(failureCountExpr));
-
-    const recentFailures = await db
-      .select({
-        toolId: toolRuns.toolId,
-        errorCode: toolRuns.errorCode,
-        metadata: toolRuns.metadata,
-        startedAt: toolRuns.startedAt,
-      })
-      .from(toolRuns)
-      .where(and(eq(toolRuns.status, "failed"), gte(toolRuns.startedAt, since)))
-      .orderBy(desc(toolRuns.startedAt))
-      .limit(200);
-
-    const sampleMetadataByKey = new Map<string, Record<string, unknown>>();
-    for (const run of recentFailures) {
-      if (!run.metadata) continue;
-      const key = `${run.toolId}::${run.errorCode ?? "unknown"}`;
-      if (!sampleMetadataByKey.has(key)) {
-        sampleMetadataByKey.set(key, run.metadata as Record<string, unknown>);
+    if (d1) {
+      const dashboardData = await getD1ToolsDashboardData(d1);
+      rows = dashboardData.statusRows;
+      failureRows = dashboardData.failureRows;
+    } else {
+      const {
+        and,
+        desc,
+        eq,
+        gte,
+        sql,
+        getDb,
+        toolRuns,
+        toolStatus,
+      } = await loadLegacyDashboardDeps();
+      const db = getDb();
+      if (!db) {
+        throw new Error("Telemetry database not configured (DATABASE_URL not set).");
       }
-    }
+      rows = await db.select().from(toolStatus).orderBy(desc(toolStatus.updatedAt));
 
-    failureRows = failureCounts.map((row) => {
-      const key = `${row.toolId}::${row.errorCode ?? "unknown"}`;
-      return {
-        toolId: row.toolId,
-        errorCode: row.errorCode ?? null,
-        count: row.count ?? 0,
-        lastSeen: row.lastSeen ?? null,
-        sampleMetadata: sampleMetadataByKey.get(key) ?? null,
-      };
-    });
+      const since = new Date(Date.now() - ONE_DAY_MS);
+      const failureCountExpr = sql<number>`count(*)`.mapWith(Number);
+      const lastSeenExpr = sql<Date>`max(${toolRuns.startedAt})`;
+
+      const failureCounts = await db
+        .select({
+          toolId: toolRuns.toolId,
+          errorCode: toolRuns.errorCode,
+          count: failureCountExpr,
+          lastSeen: lastSeenExpr,
+        })
+        .from(toolRuns)
+        .where(and(eq(toolRuns.status, "failed"), gte(toolRuns.startedAt, since)))
+        .groupBy(toolRuns.toolId, toolRuns.errorCode)
+        .orderBy(desc(failureCountExpr));
+
+      const recentFailures = await db
+        .select({
+          toolId: toolRuns.toolId,
+          errorCode: toolRuns.errorCode,
+          metadata: toolRuns.metadata,
+          startedAt: toolRuns.startedAt,
+        })
+        .from(toolRuns)
+        .where(and(eq(toolRuns.status, "failed"), gte(toolRuns.startedAt, since)))
+        .orderBy(desc(toolRuns.startedAt))
+        .limit(200);
+
+      const sampleMetadataByKey = new Map<string, Record<string, unknown>>();
+      for (const run of recentFailures) {
+        if (!run.metadata) continue;
+        const key = `${run.toolId}::${run.errorCode ?? "unknown"}`;
+        if (!sampleMetadataByKey.has(key)) {
+          sampleMetadataByKey.set(key, run.metadata as Record<string, unknown>);
+        }
+      }
+
+      failureRows = failureCounts.map((row) => {
+        const key = `${row.toolId}::${row.errorCode ?? "unknown"}`;
+        return {
+          toolId: row.toolId,
+          errorCode: row.errorCode ?? null,
+          count: row.count ?? 0,
+          lastSeen: row.lastSeen ?? null,
+          sampleMetadata: sampleMetadataByKey.get(key) ?? null,
+        };
+      });
+    }
   } catch (err: unknown) {
     errorMessage = err instanceof Error ? err.message : "Failed to load tool status.";
   }

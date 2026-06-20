@@ -223,6 +223,8 @@ Data:
 - Databases:
   - `serp-tools-prod`
   - `serp-tools-preview`
+- Current D1 IDs, telemetry schema, access commands, dashboard path, and cache
+  bindings are documented in `docs/knowledge/cloudflare-operations.md`.
 
 Secrets:
 

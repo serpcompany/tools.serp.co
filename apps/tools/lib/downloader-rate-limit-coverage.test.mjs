@@ -20,6 +20,14 @@ const videoDownloaderToolSource = readFileSync(
   new URL("../components/VideoDownloaderTool.tsx", import.meta.url),
   "utf8",
 );
+const transcribeToolSource = readFileSync(
+  new URL("../components/TranscribeTool.tsx", import.meta.url),
+  "utf8",
+);
+const mediaFetchEndpointSource = readFileSync(
+  new URL("../lib/media-fetch-endpoint.ts", import.meta.url),
+  "utf8",
+);
 const sharedToolRouteSource = readFileSync(
   new URL("../app/(convert)/[tool]/page.tsx", import.meta.url),
   "utf8",
@@ -45,6 +53,8 @@ test("all active download tools use the shared rate-limited downloader path", ()
     videoDownloaderToolSource,
     /createDownloaderRequestHeaders|DOWNLOADER_CLIENT_ID_HEADER|x-serp-downloader-client-id/,
   );
+  assert.match(videoDownloaderToolSource, /getDownloaderMediaFetchEndpoint\(\)/);
+  assert.doesNotMatch(videoDownloaderToolSource, /fetch\("\/api\/media-fetch"/);
   assert.match(
     mediaFetchRouteSource,
     /payload\.consumer === DOWNLOADER_CONSUMER|consumer === DOWNLOADER_CONSUMER/,
@@ -61,4 +71,29 @@ test("all active download tools use the shared rate-limited downloader path", ()
       `expected downloader route naming convention for ${tool.id}`,
     );
   }
+});
+
+test("media fetch calls can be moved off Vercel with a public endpoint override", () => {
+  assert.match(mediaFetchEndpointSource, /NEXT_PUBLIC_MEDIA_FETCH_ENDPOINT/);
+  assert.match(mediaFetchEndpointSource, /NEXT_PUBLIC_DOWNLOADER_MEDIA_FETCH_ENDPOINT/);
+  assert.match(mediaFetchEndpointSource, /DEFAULT_MEDIA_FETCH_ENDPOINT = "\/api\/media-fetch"/);
+  assert.match(videoDownloaderToolSource, /getDownloaderMediaFetchEndpoint/);
+  assert.match(transcribeToolSource, /getMediaFetchEndpoint/);
+  assert.doesNotMatch(transcribeToolSource, /fetch\("\/api\/media-fetch"/);
+});
+
+test("downloader media fetches can be disabled before expensive server work", () => {
+  assert.match(mediaFetchRouteSource, /FEATURE_FLAG_DOWNLOADER_EXTENSION_ONLY_ENABLED/);
+  assert.match(mediaFetchRouteSource, /FEATURE_FLAG_DOWNLOADER_EXTENSION_ONLY/);
+  assert.doesNotMatch(mediaFetchRouteSource, /NEXT_PUBLIC_FEATURE_FLAG_DOWNLOADER_EXTENSION_ONLY/);
+  assert.match(mediaFetchRouteSource, /buildDownloaderExtensionOnlyResponse/);
+  assert.match(mediaFetchRouteSource, /extensionRequired: true/);
+  assert.match(
+    mediaFetchRouteSource,
+    /shouldRateLimitDownloader\(payload\) && FEATURE_FLAG_DOWNLOADER_EXTENSION_ONLY_ENABLED/,
+  );
+  assert.match(
+    mediaFetchRouteSource,
+    /This website requires a browser extension to download from\./,
+  );
 });

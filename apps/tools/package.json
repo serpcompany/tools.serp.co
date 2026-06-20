@@ -6,6 +6,22 @@
   "scripts": {
     "dev": "node scripts/dev.mjs next dev",
     "build": "next build && node scripts/copy-ffmpeg.mjs && node scripts/copy-magick-wasm.mjs",
+    "cf:build": "node scripts/build-cloudflare.mjs",
+    "cf:preview": "pnpm cf:build && wrangler dev",
+    "cf:deploy": "pnpm cf:build && wrangler deploy",
+    "cf:typegen": "wrangler types",
+    "audit:cf:readiness": "node scripts/audit-cloudflare-readiness.mjs",
+    "audit:cf:parity": "node scripts/audit-cloudflare-parity.mjs",
+    "audit:cf:api-smoke": "node scripts/smoke-cloudflare-api.mjs",
+    "d1:create:prod": "wrangler d1 create serp-tools-prod --binding SERP_TOOLS_DB",
+    "d1:create:preview": "wrangler d1 create serp-tools-preview --binding SERP_TOOLS_DB",
+    "d1:migrate:local": "wrangler d1 migrations apply SERP_TOOLS_DB --local",
+    "d1:migrate:preview": "wrangler d1 migrations apply SERP_TOOLS_DB --remote --preview",
+    "d1:migrate:prod": "wrangler d1 migrations apply SERP_TOOLS_DB --remote",
+    "d1:import:local": "node scripts/import-tool-runs-to-d1.mjs --local",
+    "d1:import:preview": "node scripts/import-tool-runs-to-d1.mjs --preview",
+    "d1:import:prod": "node scripts/import-tool-runs-to-d1.mjs --remote",
+    "r2:upload-ffmpeg-assets": "node scripts/upload-r2-ffmpeg-assets.mjs",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit"
@@ -33,7 +49,7 @@
     "lucide-react": "^0.541.0",
     "markdown-table": "^3.0.4",
     "mime-types": "^3.0.2",
-    "next": "15.5.12",
+    "next": "15.5.18",
     "next-themes": "^0.4.6",
     "papaparse": "^5.5.3",
     "pdf-lib": "^1.17.1",
@@ -49,6 +65,7 @@
     "youtube-dl-exec": "^3.0.28"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.19.11",
     "@serp-tools/eslint-config": "workspace:^",
     "@serp-tools/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.12",
@@ -58,6 +75,7 @@
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.8",
     "eslint": "^9.38.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "wrangler": "^4.103.0"
   }
 }

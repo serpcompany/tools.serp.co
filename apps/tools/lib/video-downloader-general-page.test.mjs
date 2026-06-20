@@ -24,9 +24,7 @@ test("generic video downloader is configured as the broad download route", () =>
   assert.match(tool.content.faqs[0].answer, /many supported platforms/i);
 });
 
-test("generic video downloader hero copy advertises broad public host support", () => {
-  assert.match(
-    downloaderToolSource,
-    /Supports many public platforms including[\s\S]*YouTube, TikTok, Vimeo, Loom, Wistia,[\s\S]*Dailymotion, Reddit, and more\./,
-  );
+test("generic video downloader renders configured broad public host support copy", () => {
+  assert.match(downloaderToolSource, /subtitle &&/);
+  assert.match(downloaderToolSource, /{subtitle}/);
 });
