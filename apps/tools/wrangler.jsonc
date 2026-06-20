@@ -7,6 +7,12 @@
 		"nodejs_compat",
 		"global_fetch_strictly_public"
 	],
+	"routes": [
+		{
+			"pattern": "tools.serp.co",
+			"custom_domain": true
+		}
+	],
 	"vars": {
 		"NEXT_PUBLIC_ASSETS_BASE_URL": "https://assets.tools.serp.co",
 		"NEXT_PUBLIC_SITE_URL": "https://tools.serp.co"
