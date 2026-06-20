@@ -123,6 +123,12 @@ test("source-specific downloader failures promote the extension instead of raw b
   assert.match(videoDownloaderToolSource, /Download failed \\\(500\\\)/);
   assert.match(videoDownloaderToolSource, /extensionUrl: extensionUrl \?\? DOWNLOADER_EXTENSION_URL/);
   assert.match(videoDownloaderToolSource, /setExtensionFailureCta/);
+  assert.match(videoDownloaderToolSource, /showExtensionCta\?: boolean/);
+  assert.match(videoDownloaderToolSource, /showExtensionCta=\{!extensionFailureCta\}/);
+  assert.match(
+    videoDownloaderToolSource,
+    /showExtensionCta \? \([\s\S]*DOWNLOADER_EXTENSION_TEXT[\s\S]*SerplyCtaButton/,
+  );
   assert.match(videoDownloaderToolSource, /setErrorMessage\("Paste a valid public URL first\."\)/);
   assert.doesNotMatch(
     videoDownloaderToolSource,

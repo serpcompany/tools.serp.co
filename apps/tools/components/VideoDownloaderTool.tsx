@@ -203,10 +203,12 @@ function incrementLocalUsageCount() {
 function DownloaderCooldownMonetizationPanel({
   cooldownEndsAtMs,
   extensionUrl,
+  showExtensionCta = true,
   toolId,
 }: {
   cooldownEndsAtMs: number | null;
   extensionUrl?: string;
+  showExtensionCta?: boolean;
   toolId: string;
 }) {
   return (
@@ -217,12 +219,16 @@ function DownloaderCooldownMonetizationPanel({
           dataTestId="downloader-hero-cooldown"
           className="text-sm font-semibold text-[#0f62fe]"
         />
-        <p className="mt-2 text-sm leading-6">{DOWNLOADER_EXTENSION_TEXT}</p>
-        <SerplyCtaButton
-          href={extensionUrl ?? DOWNLOADER_EXTENSION_URL}
-          label={DOWNLOADER_EXTENSION_LABEL}
-          className="mt-4 h-10 w-full px-5 text-sm sm:w-fit"
-        />
+        {showExtensionCta ? (
+          <>
+            <p className="mt-2 text-sm leading-6">{DOWNLOADER_EXTENSION_TEXT}</p>
+            <SerplyCtaButton
+              href={extensionUrl ?? DOWNLOADER_EXTENSION_URL}
+              label={DOWNLOADER_EXTENSION_LABEL}
+              className="mt-4 h-10 w-full px-5 text-sm sm:w-fit"
+            />
+          </>
+        ) : null}
       </div>
 
       <ToolAdSlot
@@ -629,6 +635,7 @@ export default function VideoDownloaderTool({
               <DownloaderCooldownMonetizationPanel
                 cooldownEndsAtMs={cooldownEndsAtMs}
                 extensionUrl={extensionUrl}
+                showExtensionCta={!extensionFailureCta}
                 toolId={toolId}
               />
             ) : null}
