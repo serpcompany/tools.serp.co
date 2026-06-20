@@ -159,16 +159,11 @@ This session could not remove or replace the current Vercel DNS record at the ti
 
 ## Required Next Action
 
-1. Verify Cloudflare dashboard builds for Worker `tools-serp-co` in the dashboard:
-   - Repository: `serpcompany/tools.serp.co`
-   - Production branch: `main`
-   - Install command: `pnpm install --frozen-lockfile`
-   - Build command: `pnpm -C apps/tools cf:build`
-   - Deploy command: `pnpm -C apps/tools exec wrangler deploy`
-   - Builds for non-production branches: disabled unless a separate preview Worker strategy is added.
-2. Commit and push the Cloudflare route config and audit notes.
-3. Observe production for 72 hours before retiring Vercel.
-4. Roll back by restoring Vercel DNS/routing if production shows route failures, broken native API flows, telemetry failures, or missing critical assets.
+1. Confirm the next Cloudflare Workers Builds check for `tools-serp-co` passes
+   after the repository-root Wrangler config is pushed.
+2. Observe production for 72 hours before retiring Vercel.
+3. Roll back by restoring Vercel DNS/routing if production shows route failures,
+   broken native API flows, telemetry failures, or missing critical assets.
 
 Automation note: the current Wrangler OAuth token can read the Worker tag
 `4e38de528c2f4e2e8abfb7f4468e180e`, but Cloudflare's Workers Builds triggers
@@ -186,11 +181,10 @@ GitHub confirmed the Cloudflare GitHub App created a Workers Builds check:
 - Result: failure
 - Build details URL: `https://dash.cloudflare.com/cec5f04e1d18bcc65f2be0aefb04f059/workers/services/view/tools-serp-co/production/builds/358b2ec6-04d0-4c2d-803b-346f4ddd3dac`
 
-GitHub exposed no annotations or error details for the failed Cloudflare build.
-The Cloudflare Builds logs endpoint also returned `403 Authentication error` with
-the current Wrangler OAuth token, and the dashboard page required Cloudflare
-security verification in the automation browser. Inspect the build details URL
-in an authenticated browser to fix the dashboard build settings.
+GitHub exposed no annotations or error details for the failed Cloudflare build,
+and the Cloudflare Builds logs endpoint returned `403 Authentication error` with
+the current Wrangler OAuth token. The failing deploy log was supplied from
+Cloudflare and is recorded below.
 
 The failed GitHub-triggered build did not publish a new Worker version. The live
 production Worker remains the manually deployed version
@@ -199,3 +193,36 @@ production Worker remains the manually deployed version
 The same push also triggered a Vercel production deployment status, confirming
 Vercel Git integration is still active. Keep it available during the observation
 window, then disable it during Vercel retirement.
+
+Cloudflare's connected-repository build log showed the dashboard was running
+these commands from the repository root:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm run build
+npx wrangler deploy
+```
+
+The root build succeeded, but root `npx wrangler deploy` failed because the
+Worker config lived only at `apps/tools/wrangler.jsonc`:
+
+```text
+The Cloudflare application detection logic has been run in the root of a
+workspace instead of targeting a specific project.
+```
+
+To make the current Cloudflare dashboard commands deployable without browser
+settings changes, a root `wrangler.jsonc` now mirrors the production Worker
+configuration with root-relative paths and runs `pnpm -C apps/tools cf:build`
+through Wrangler's `build.command` before deployment.
+
+Local verification of the root deploy path passed:
+
+```bash
+npx --yes wrangler@4.103.0 deploy --dry-run
+```
+
+The dry run found the root config, ran the app Cloudflare build, read 1,172
+asset files from `apps/tools/.open-next/assets`, printed the expected D1, R2,
+self-reference, assets, and public environment bindings, then exited at
+`--dry-run` without publishing.
