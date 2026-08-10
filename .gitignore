@@ -21,7 +21,7 @@ coverage
 # Turbo
 .turbo
 
-# Vercel
+# Legacy provider metadata pending owner-controlled cleanup
 .vercel
 
 # Build Outputs
@@ -42,5 +42,4 @@ npm-debug.log*
 
 next-env.d.ts
 
-tmp/
 .env*.local

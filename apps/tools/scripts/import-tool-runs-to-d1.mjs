@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Papa from "papaparse";
@@ -7,8 +7,6 @@ import Papa from "papaparse";
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repoRoot = path.resolve(appRoot, "../..");
 const localWranglerBin = path.join(appRoot, "node_modules", ".bin", "wrangler");
-const defaultJsonPath = path.join(repoRoot, "tmp", "tool_runs.json");
-const defaultCsvPath = path.join(repoRoot, "tmp", "tool_runs.csv");
 const defaultDatabase = "SERP_TOOLS_DB";
 const oneDayMs = 24 * 60 * 60 * 1000;
 
@@ -18,9 +16,7 @@ function usage() {
     "",
     "Options:",
     "  --database <name-or-binding>  D1 database name or binding. Defaults to SERP_TOOLS_DB.",
-    "  --source <path>               Explicit JSON or CSV source path.",
-    "  --json <path>                 JSON source path. Defaults to repo tmp/tool_runs.json.",
-    "  --csv <path>                  CSV fallback path. Defaults to repo tmp/tool_runs.csv.",
+    "  --source <absolute-path>      Required protected JSON or CSV source outside the repository.",
     "  --chunk-size <number>         Rows per D1 execute statement. Defaults to 25.",
   ].join("\n");
 }
@@ -30,8 +26,6 @@ export function parseArgs(argv) {
     mode: "local",
     database: defaultDatabase,
     sourcePath: null,
-    jsonPath: defaultJsonPath,
-    csvPath: defaultCsvPath,
     chunkSize: 25,
   };
 
@@ -51,16 +45,6 @@ export function parseArgs(argv) {
       index += 1;
       continue;
     }
-    if (arg === "--json") {
-      args.jsonPath = argv[index + 1] ?? "";
-      index += 1;
-      continue;
-    }
-    if (arg === "--csv") {
-      args.csvPath = argv[index + 1] ?? "";
-      index += 1;
-      continue;
-    }
     if (arg === "--chunk-size") {
       args.chunkSize = Number(argv[index + 1]);
       index += 1;
@@ -76,6 +60,15 @@ export function parseArgs(argv) {
   if (!args.database) {
     throw new Error("--database must not be empty");
   }
+  if (!args.sourcePath) {
+    throw new Error("--source is required");
+  }
+  if (!path.isAbsolute(args.sourcePath) || isInsideRepository(args.sourcePath)) {
+    throw new Error("--source must be an absolute path outside the repository");
+  }
+  if (!/\.(json|csv)$/i.test(args.sourcePath)) {
+    throw new Error("--source must name a JSON or CSV file");
+  }
   if (!Number.isInteger(args.chunkSize) || args.chunkSize < 1) {
     throw new Error("--chunk-size must be a positive integer");
   }
@@ -83,8 +76,22 @@ export function parseArgs(argv) {
   return args;
 }
 
+function isInsideRepository(sourcePath) {
+  const relativePath = path.relative(repoRoot, sourcePath);
+  return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
+}
+
 function resolveSourcePath(sourcePath) {
-  return path.isAbsolute(sourcePath) ? sourcePath : path.resolve(repoRoot, sourcePath);
+  let resolvedPath;
+  try {
+    resolvedPath = realpathSync(sourcePath);
+  } catch {
+    throw new Error("The explicit protected source is unavailable");
+  }
+  if (isInsideRepository(resolvedPath)) {
+    throw new Error("--source must resolve outside the repository");
+  }
+  return resolvedPath;
 }
 
 export function parseJsonRows(source) {
@@ -110,36 +117,21 @@ export function parseCsvRows(source) {
   return parsed.data;
 }
 
-export function loadToolRunExport({
-  sourcePath = null,
-  jsonPath = defaultJsonPath,
-  csvPath = defaultCsvPath,
-} = {}) {
-  if (sourcePath) {
-    const resolvedPath = resolveSourcePath(sourcePath);
-    const source = readFileSync(resolvedPath, "utf8");
-    const rawRows = resolvedPath.endsWith(".csv") ? parseCsvRows(source) : parseJsonRows(source);
-    return {
-      path: resolvedPath,
-      rows: normalizeRows(rawRows),
-    };
+export function loadToolRunExport({ sourcePath } = {}) {
+  if (!sourcePath) {
+    throw new Error("--source is required");
   }
-
-  if (existsSync(jsonPath)) {
-    return {
-      path: jsonPath,
-      rows: normalizeRows(parseJsonRows(readFileSync(jsonPath, "utf8"))),
-    };
+  const resolvedPath = resolveSourcePath(sourcePath);
+  let source;
+  try {
+    source = readFileSync(resolvedPath, "utf8");
+  } catch {
+    throw new Error("The explicit protected source could not be read");
   }
-
-  if (existsSync(csvPath)) {
-    return {
-      path: csvPath,
-      rows: normalizeRows(parseCsvRows(readFileSync(csvPath, "utf8"))),
-    };
-  }
-
-  throw new Error(`No tool run export found at ${jsonPath} or ${csvPath}`);
+  const rawRows = resolvedPath.toLowerCase().endsWith(".csv")
+    ? parseCsvRows(source)
+    : parseJsonRows(source);
+  return normalizeRows(rawRows);
 }
 
 function readString(row, snakeKey, camelKey = snakeKey) {
@@ -418,9 +410,9 @@ export function extractCountFromD1Json(stdout) {
 
 export async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
-  const { path: sourcePath, rows } = loadToolRunExport(args);
+  const rows = loadToolRunExport(args);
 
-  console.log(`Loaded ${rows.length} tool run rows from ${path.relative(repoRoot, sourcePath)}`);
+  console.log(`Loaded ${rows.length} tool run rows from the explicit protected source.`);
 
   const runChunks = chunkRows(rows, args.chunkSize);
   runChunks.forEach((chunk, index) => {

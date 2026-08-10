@@ -26,6 +26,7 @@ function writeFixtureFile(root, relativePath, contents) {
 function createDocumentationFixture(testContext) {
   const root = mkdtempSync(path.join(tmpdir(), 'tools-serp-documentation-'));
   const documents = {
+    '.gitignore': '.artifacts/\n',
     'AGENTS.md': '# Agent routes\n',
     'ARCHITECTURE.md':
       '# Architecture\n\nSee the [work-state definition](./CONTEXT.md#work-state).\n',
@@ -55,11 +56,25 @@ function createDocumentationFixture(testContext) {
     ].join('\n'),
   );
 
+  const initResult = spawnSync('git', ['init', '--quiet'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  assert.equal(initResult.status, 0, initResult.stderr);
+
   testContext.after(() => rmSync(root, { recursive: true, force: true }));
   return root;
 }
 
 function runVerifier(root) {
+  if (root !== repositoryRoot) {
+    const addResult = spawnSync('git', ['add', '--all'], {
+      cwd: root,
+      encoding: 'utf8',
+    });
+    assert.equal(addResult.status, 0, addResult.stderr);
+  }
+
   return spawnSync(process.execPath, [verifierPath, '--root', root], {
     encoding: 'utf8',
   });

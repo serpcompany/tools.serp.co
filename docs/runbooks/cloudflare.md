@@ -121,8 +121,8 @@ Supported project commands:
 ```bash
 pnpm -C apps/tools migrate:d1:preview:remote
 pnpm -C apps/tools migrate:d1:production:remote
-pnpm -C apps/tools import:d1:preview:remote
-pnpm -C apps/tools import:d1:production:remote
+pnpm -C apps/tools import:d1:preview:remote -- --source <absolute-protected-path>
+pnpm -C apps/tools import:d1:production:remote -- --source <absolute-protected-path>
 ```
 
 Migration status through Wrangler:
@@ -132,11 +132,12 @@ pnpm -C apps/tools exec wrangler d1 migrations list SERP_TOOLS_DB --remote --pre
 pnpm -C apps/tools exec wrangler d1 migrations list SERP_TOOLS_DB --remote
 ```
 
-The legacy reconciliation importer accepts an explicit source with
-`--source <protected-path>`. Its repository `tmp/` defaults are temporary
-compatibility behavior tracked for retirement by GitHub issues #34 and #61;
-do not treat that directory as durable artifact storage. Production exports
-must remain outside the repository and under human control.
+The bounded reconciliation importer requires
+`--source <absolute-protected-path>`. The path must resolve outside the
+repository and name JSON or CSV. The importer never prints or retains the
+source filename. Production exports remain outside the repository and under
+human control. Retire the importer after the snapshot and D1 reconciliation in
+issue #34 are accepted.
 
 Per repo policy, do not run ad-hoc SQL or database shell commands against local,
 preview, staging, or production databases unless the user explicitly approves

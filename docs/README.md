@@ -55,6 +55,7 @@ reusable claim against current code, current runbooks, and linked GitHub work.
 - [Downloader domain-gap audit](./audits/tools-serp-downloader-domain-gap-audit.md)
 - [Downloader Lander content-upgrade retrospective](./audits/downloader-lander-content-upgrade-retrospective.md)
 - [FFmpeg Tool benchmark — 2026-01-20](./audits/ffmpeg-tools-benchmark-2026-01-20.md)
+- [Ignored local workflow inventory — 2026-08-11](./audits/ignored-local-inventory-2026-08-11.md)
 - [Vercel-retirement and Cloudflare-readiness audit](./audits/vercel-retirement-cloudflare-readiness.md)
 
 ## Advisory evidence

@@ -1,21 +1,10 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 const DOCUMENTATION_INDEX = 'docs/README.md';
-const SKIPPED_DIRECTORIES = new Set([
-  '.artifacts',
-  '.git',
-  '.next',
-  '.open-next',
-  '.turbo',
-  'coverage',
-  'dist',
-  'node_modules',
-  'out',
-  'tmp',
-]);
 const RETIRED_CATEGORIES = ['docs/knowledge/', 'docs/planner/', 'docs/plans/'];
 
 function parseRoot(args) {
@@ -37,23 +26,19 @@ function toPosixPath(value) {
   return value.split(path.sep).join('/');
 }
 
-function findMarkdownFiles(root, directory = root) {
-  const documents = [];
-
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
-    if (entry.isDirectory() && SKIPPED_DIRECTORIES.has(entry.name)) {
-      continue;
-    }
-
-    const absolutePath = path.join(directory, entry.name);
-    if (entry.isDirectory()) {
-      documents.push(...findMarkdownFiles(root, absolutePath));
-    } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.md')) {
-      documents.push(toPosixPath(path.relative(root, absolutePath)));
-    }
+function trackedMarkdownFiles(root) {
+  const result = spawnSync('git', ['ls-files', '-z'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  if (result.status !== 0) {
+    throw new Error(`git ls-files failed: ${result.stderr.trim()}`);
   }
 
-  return documents.sort();
+  return result.stdout
+    .split('\0')
+    .filter((filePath) => filePath.toLowerCase().endsWith('.md'))
+    .sort();
 }
 
 function markdownLinks(contents) {
@@ -196,7 +181,7 @@ function report(diagnostic) {
 }
 
 const root = parseRoot(process.argv.slice(2));
-const documents = findMarkdownFiles(root);
+const documents = trackedMarkdownFiles(root);
 const indexPath = path.join(root, DOCUMENTATION_INDEX);
 const indexedDocuments = new Set();
 const anchorCache = new Map();

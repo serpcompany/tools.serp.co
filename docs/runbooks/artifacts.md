@@ -17,8 +17,11 @@ interchangeable.
 | ADRs                | Tracked decisions under `docs/adr`                                                                   | Follow the ADR policy; supersede rather than delete accepted history.                                                                                                         |
 | Restricted exports  | A human-owner-controlled location outside the repository with restrictive permissions                | Never place credentials, environment exports, production rows, personal data, or captured authorization material in scratch, `.artifacts`, CI artifacts, fixtures, or audits. |
 
-Repository `tmp/` is not an artifact home. Remaining migration compatibility
-uses are retirement work under GitHub issues #34 and #61.
+The repository has no `tmp/` workflow contract or catch-all ignore. The dated
+[ignored local inventory](../audits/ignored-local-inventory-2026-08-11.md)
+records aggregate classes observed before that convention was removed. Its
+contents remain under owner-controlled disposition; implementation must not
+blanket-delete or inspect restricted local material.
 
 ## Run identity and manifest
 
