@@ -1,9 +1,9 @@
-import { Card } from "@serp-tools/ui/components/card";
+import { Card } from '@serp-tools/ui/components/card';
 
 type HowToSectionProps = {
   title: string;
   intro?: string;
-  steps: string[];
+  steps: readonly string[];
 };
 
 export function HowToSection({ title, intro, steps }: HowToSectionProps) {

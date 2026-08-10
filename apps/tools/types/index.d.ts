@@ -1,23 +1,18 @@
 // Tool operation types - what the tool does
 export type OperationType =
-  | 'bulk'       // Batch processing
-  | 'combine'    // Merge multiple files
-  | 'compress'   // Reduce file size
-  | 'convert'    // Transform from one format to another
-  | 'download'   // Download from external sources
-  | 'edit'       // Edit existing files
+  | 'bulk' // Batch processing
+  | 'combine' // Merge multiple files
+  | 'compress' // Reduce file size
+  | 'convert' // Transform from one format to another
+  | 'download' // Download from external sources
+  | 'edit' // Edit existing files
   | 'video-editor' // Edit video files
   | 'image-editor' // Edit image files
   | 'audio-editor' // Edit audio files
-  | 'view';      // View/read files in browser
+  | 'view'; // View/read files in browser
 
 // Media types - what kind of content the tool works with
-export type MediaType =
-  | 'image'
-  | 'video'
-  | 'audio'
-  | 'document'
-  | 'text';
+export type MediaType = 'image' | 'video' | 'audio' | 'document' | 'text';
 
 // FAQ item structure
 export interface FAQ {
@@ -30,7 +25,7 @@ export interface RelatedTool {
   toolId?: string;
   href?: string;
   title: string;
-  description: string;
+  description?: string;
 }
 
 // About section structure
@@ -64,7 +59,7 @@ export interface FormatInfo {
   name: string;
   fullName: string;
   description: string;
-  details?: string[];
+  details?: readonly string[];
 }
 
 // About formats section
@@ -78,7 +73,7 @@ export interface AboutFormatsSection {
 export interface HowToSectionData {
   title: string;
   intro?: string;
-  steps: string[];
+  steps: readonly string[];
 }
 
 // Info article section
@@ -90,7 +85,7 @@ export interface InfoArticleSectionData {
 // Changelog entry
 export interface ChangelogEntry {
   date: string;
-  changes: string[];
+  changes: readonly string[];
 }
 
 // Blog post
@@ -135,22 +130,22 @@ export interface PermissionJustification {
 export interface ToolContent {
   tool: ToolInfo;
   videoSection?: VideoSectionData;
-  faqs: FAQ[];
+  faqs: readonly FAQ[];
   aboutSection: AboutFormatsSection;
   productLinks?: ProductLinks;
-  features?: string[];
-  screenshots?: ProductImage[];
-  reviews?: ProductReview[];
-  sourceLinks?: SourceLink[];
-  supportedOperatingSystems?: string[];
-  supportedRegions?: string[];
-  permissionJustifications?: PermissionJustification[];
-  keywords?: string[];
+  features?: readonly string[];
+  screenshots?: readonly ProductImage[];
+  reviews?: readonly ProductReview[];
+  sourceLinks?: readonly SourceLink[];
+  supportedOperatingSystems?: readonly string[];
+  supportedRegions?: readonly string[];
+  permissionJustifications?: readonly PermissionJustification[];
+  keywords?: readonly string[];
   howTo?: HowToSectionData;
   infoArticle?: InfoArticleSectionData;
-  changelog?: ChangelogEntry[];
-  relatedTools?: RelatedTool[];
-  blogPosts?: BlogPost[];
+  changelog?: readonly ChangelogEntry[];
+  relatedTools?: readonly RelatedTool[];
+  blogPosts?: readonly BlogPost[];
 }
 
 // Main tool interface
@@ -158,14 +153,14 @@ export interface Tool {
   id: string;
   name: string;
   description: string;
-  
+
   // Taxonomy
   operation: OperationType;
-  
+
   // File formats
   from?: string;
   to?: string;
-  
+
   // Metadata
   route: string;
   isActive: boolean;
@@ -176,7 +171,7 @@ export interface Tool {
   isNew?: boolean;
   isPopular?: boolean;
   requiresFFmpeg?: boolean;
-  
+
   // Landing page content
   content?: ToolContent;
 }

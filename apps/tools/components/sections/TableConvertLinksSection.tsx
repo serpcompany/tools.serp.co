@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Card } from "@serp-tools/ui/components/card";
 
 import { formatTableLabel } from "@/lib/table-convert";
-import { TABLE_CONVERT_PAGES } from "@/lib/table-convert-pages";
+import { getTableConvertPages } from "@/lib/table-convert-pages";
 
 type TableConvertLinksSectionProps = {
   currentSlug?: string;
@@ -15,7 +15,7 @@ export function TableConvertLinksSection({
   title = "More Table Converters",
   sectionId = "table-convert-links",
 }: TableConvertLinksSectionProps) {
-  const pages = TABLE_CONVERT_PAGES.filter((page) => page.slug !== currentSlug);
+  const pages = getTableConvertPages().filter((page) => page.slug !== currentSlug);
 
   if (!pages.length) return null;
 

@@ -1,4 +1,5 @@
 import registryData from '../data/tools.json' with { type: 'json' };
+import { buildPageContent } from './tool-page-content.ts';
 
 export const TOOL_OPERATION_ORDER = [
   'convert',
@@ -14,6 +15,15 @@ export const TOOL_OPERATION_ORDER = [
 ] as const;
 
 export type ToolOperation = (typeof TOOL_OPERATION_ORDER)[number];
+
+export const CATALOG_PAGE_CONTENT_PROFILES = [
+  'legacy-conversion-v1',
+  'legacy-pdf-v1',
+  'legacy-sections-v1',
+] as const;
+
+export type CatalogPageContentProfile =
+  (typeof CATALOG_PAGE_CONTENT_PROFILES)[number];
 
 export type DeepReadonly<T> = T extends (
   ...args: infer Arguments
@@ -115,6 +125,8 @@ export type CatalogToolContent = DeepReadonly<{
     to: string;
     accept?: string;
     requiresFFmpeg?: boolean;
+    renderer?: 'table';
+    showInTableLinks?: boolean;
   };
   videoSection?: { embedId?: string };
   faqs?: readonly { question: string; answer: string }[];
@@ -166,6 +178,43 @@ export type CatalogToolContent = DeepReadonly<{
   }[];
 }>;
 
+export type CatalogPageContent = DeepReadonly<
+  Omit<CatalogToolContent, 'tool'> & {
+    tool: Omit<CatalogToolContent['tool'], 'id' | 'route' | 'operation'> & {
+      id: string;
+      route: string;
+      operation: ToolOperation;
+    };
+  }
+>;
+
+export type CatalogRelatedTool = DeepReadonly<{
+  kind: 'tool';
+  id: string;
+  name: string;
+  description: string;
+  route: string;
+}>;
+
+export type CatalogRelatedExternalLink = DeepReadonly<{
+  kind: 'external';
+  name: string;
+  description: string;
+  route: string;
+}>;
+
+export type CatalogRelatedItem =
+  | CatalogRelatedTool
+  | CatalogRelatedExternalLink;
+
+export type CatalogRelatedToolsQuery = DeepReadonly<{
+  currentFrom?: string;
+  currentTo?: string;
+  currentRoute?: string;
+  currentToolId?: string;
+  relatedTools?: NonNullable<CatalogToolContent['relatedTools']>;
+}>;
+
 const REGISTRY_FIELDS = new Set([
   'id',
   'name',
@@ -182,6 +231,7 @@ const REGISTRY_FIELDS = new Set([
   'isNew',
   'isPopular',
   'requiresFFmpeg',
+  'pageContentProfile',
   'content',
   'video',
 ]);
@@ -204,6 +254,7 @@ export type CatalogTool = DeepReadonly<{
   isNew: boolean;
   isPopular: boolean;
   video: string | null;
+  pageContentProfile: CatalogPageContentProfile | null;
   content: CatalogToolContent | null;
   display: {
     title: string;
@@ -243,6 +294,10 @@ export type ToolCatalog = DeepReadonly<{
   getByRoute(route: string): CatalogTool | undefined;
   getToolsByOperation(operation: ToolOperation): readonly CatalogTool[];
   getDirectoryTools(operation: ToolOperation): readonly ToolDirectoryEntry[];
+  getPageContent(id: string): CatalogPageContent | undefined;
+  getRelatedItems(
+    query: CatalogRelatedToolsQuery,
+  ): readonly CatalogRelatedItem[];
 }>;
 
 function isRecord(value: unknown): value is RegistryRecord {
@@ -450,6 +505,25 @@ export function isToolOperation(value: unknown): value is ToolOperation {
   );
 }
 
+function optionalPageContentProfile(
+  record: RegistryRecord,
+  location: string,
+): CatalogPageContentProfile | null {
+  const value = record.pageContentProfile;
+  if (value === undefined) return null;
+  if (
+    typeof value !== 'string' ||
+    !CATALOG_PAGE_CONTENT_PROFILES.includes(
+      value as CatalogPageContentProfile,
+    )
+  ) {
+    throw new TypeError(
+      `${location}.pageContentProfile must be a supported Catalog content profile`,
+    );
+  }
+  return value as CatalogPageContentProfile;
+}
+
 function validateFormatInfo(record: RegistryRecord, location: string): void {
   assertAllowedFields(
     record,
@@ -501,16 +575,22 @@ function validateToolContent(content: RegistryRecord, location: string): void {
       'to',
       'accept',
       'requiresFFmpeg',
+      'renderer',
+      'showInTableLinks',
     ],
     `${location}.tool`,
   );
   for (const field of ['title', 'subtitle', 'from', 'to']) {
     requiredString(tool, field, `${location}.tool`);
   }
-  for (const field of ['id', 'route', 'operation', 'accept']) {
+  for (const field of ['id', 'route', 'operation', 'accept', 'renderer']) {
     optionalString(tool, field, `${location}.tool`);
   }
   optionalBoolean(tool, 'requiresFFmpeg', `${location}.tool`);
+  optionalBoolean(tool, 'showInTableLinks', `${location}.tool`);
+  if (tool.renderer !== undefined && tool.renderer !== 'table') {
+    throw new TypeError(`${location}.tool.renderer must be table when provided`);
+  }
   if (tool.operation !== undefined && !isToolOperation(tool.operation)) {
     throw new TypeError(
       `${location}.tool.operation must be a supported Tool operation`,
@@ -697,6 +777,30 @@ function normalizeTool(value: unknown, index: number): CatalogTool {
   const tags = optionalStringArray(value, 'tags', location);
   const keywords = optionalStringArray(value, 'keywords', location);
   const content = contentRecord(value, location);
+  const pageContentProfile = optionalPageContentProfile(value, location);
+  if (
+    pageContentProfile === 'legacy-conversion-v1' &&
+    (content !== null ||
+      (value.operation !== 'convert' && value.operation !== 'compress'))
+  ) {
+    throw new TypeError(
+      `${location}.pageContentProfile legacy-conversion-v1 requires a content-free convert or compress Tool`,
+    );
+  }
+  if (
+    pageContentProfile === 'legacy-pdf-v1' &&
+    (content !== null ||
+      (value.operation !== 'edit' && value.operation !== 'view'))
+  ) {
+    throw new TypeError(
+      `${location}.pageContentProfile legacy-pdf-v1 requires a content-free edit or view Tool`,
+    );
+  }
+  if (pageContentProfile === 'legacy-sections-v1' && content === null) {
+    throw new TypeError(
+      `${location}.pageContentProfile legacy-sections-v1 requires explicit Tool content`,
+    );
+  }
 
   return Object.freeze({
     id,
@@ -716,6 +820,7 @@ function normalizeTool(value: unknown, index: number): CatalogTool {
     isNew: optionalBoolean(value, 'isNew', location),
     isPopular: optionalBoolean(value, 'isPopular', location),
     video: optionalString(value, 'video', location),
+    pageContentProfile,
     content,
     display: Object.freeze({
       title: contentString(content, 'title') ?? name,
@@ -772,6 +877,12 @@ export function createToolCatalog(registry: unknown): ToolCatalog {
   }
 
   const activeTools = Object.freeze(tools.filter((tool) => tool.isActive));
+  const pageContentById = new Map(
+    activeTools.map((tool) => [
+      tool.id,
+      deepFreezeClone(buildPageContent(tool)),
+    ]),
+  );
   const directoryEntries = Object.freeze(activeTools.map(directoryEntry));
   const availableOperations = Object.freeze(
     TOOL_OPERATION_ORDER.filter((operation) =>
@@ -793,6 +904,84 @@ export function createToolCatalog(registry: unknown): ToolCatalog {
     }),
   );
 
+  const sameRoute = (left: string, right: string): boolean =>
+    left.startsWith('/') && right.startsWith('/')
+      ? normalizeRoute(left) === normalizeRoute(right)
+      : left === right;
+
+  const getRelatedItems = (
+    query: CatalogRelatedToolsQuery,
+  ): readonly CatalogRelatedItem[] => {
+    const curated = (query.relatedTools ?? [])
+      .map((entry): CatalogRelatedItem | null => {
+        let resolved: CatalogTool | undefined;
+        if (entry.toolId) {
+          resolved = byId.get(entry.toolId);
+        } else if (entry.href?.startsWith('/')) {
+          resolved = byRoute.get(normalizeRoute(entry.href));
+        }
+
+        if (resolved) {
+          if (!resolved.isActive) return null;
+          return {
+            kind: 'tool',
+            id: resolved.id,
+            name: entry.title || resolved.name,
+            description: entry.description ?? resolved.description,
+            route: resolved.route,
+          };
+        }
+
+        if (entry.href && !entry.href.startsWith('/')) {
+          return {
+            kind: 'external',
+            name: entry.title,
+            description: entry.description ?? '',
+            route: entry.href,
+          };
+        }
+        return null;
+      })
+      .filter((tool): tool is CatalogRelatedItem => tool !== null)
+      .filter(
+        (tool) =>
+          (!query.currentToolId ||
+            tool.kind === 'external' ||
+            tool.id !== query.currentToolId) &&
+          (!query.currentRoute || !sameRoute(tool.route, query.currentRoute)),
+      );
+
+    const fallback =
+      query.currentFrom && query.currentTo
+        ? activeTools
+            .filter(
+              (tool) =>
+                tool.from === query.currentFrom ||
+                tool.to === query.currentFrom ||
+                tool.from === query.currentTo ||
+                tool.to === query.currentTo,
+            )
+            .filter(
+              (tool) =>
+                (!query.currentToolId || tool.id !== query.currentToolId) &&
+                (!query.currentRoute ||
+                  !sameRoute(tool.route, query.currentRoute)),
+            )
+            .map((tool) => ({
+              kind: 'tool' as const,
+              id: tool.id,
+              name: tool.name,
+              description: tool.description,
+              route: tool.route,
+            }))
+        : [];
+
+    const selected = curated.length > 0 ? curated : fallback;
+    return deepFreezeClone(
+      Array.from(new Map(selected.map((tool) => [tool.route, tool])).values()),
+    );
+  };
+
   return Object.freeze({
     tools,
     activeTools,
@@ -807,6 +996,8 @@ export function createToolCatalog(registry: unknown): ToolCatalog {
       Object.freeze(
         directoryEntries.filter((tool) => tool.category === operation),
       ),
+    getPageContent: (id: string) => pageContentById.get(id),
+    getRelatedItems,
   });
 }
 

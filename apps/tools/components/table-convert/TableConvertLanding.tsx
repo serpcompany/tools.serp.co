@@ -13,8 +13,9 @@ import { TableConvertWorkflowSection } from "@/components/sections/TableConvertW
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
 import { INPUT_FORMATS, OUTPUT_FORMATS } from "@/components/table-convert/formats";
 import { formatTableLabel } from "@/lib/table-convert";
-import type { FAQ } from "@/types";
 import type { InputFormat, OutputFormat } from "@/components/table-convert/types";
+import { toolCatalog } from "@serp-tools/app-core/lib/tool-catalog";
+import { notFound } from "next/navigation";
 import {
   ClipboardCopy,
   Code2,
@@ -27,45 +28,6 @@ import {
   UploadCloud,
   Users,
 } from "lucide-react";
-
-const buildSubtitle = (fromLabel: string, toLabel: string) =>
-  `Paste or upload ${fromLabel} data, preview the table, and export ${toLabel} instantly.`;
-
-const buildAboutSection = (fromLabel: string, toLabel: string) => ({
-  title: `${fromLabel} to ${toLabel} table conversion`,
-  fromFormat: {
-    name: fromLabel,
-    fullName: `${fromLabel} table data`,
-    description: `Use ${fromLabel} as your input format and we will parse it into a clean table.`,
-  },
-  toFormat: {
-    name: toLabel,
-    fullName: `${toLabel} table output`,
-    description: `Export the table to ${toLabel} format for your workflow or app.`,
-  },
-});
-
-const buildHowToSection = (fromLabel: string, toLabel: string) => ({
-  title: `How to convert ${fromLabel} to ${toLabel}`,
-  intro: `Follow these steps to convert ${fromLabel} to ${toLabel} online.`,
-  steps: [
-    `Paste or upload your ${fromLabel} data.`,
-    "Review the table preview and make edits if needed.",
-    `Copy or download the ${toLabel} output when it is ready.`,
-  ],
-});
-
-const buildInfoArticleSection = (fromLabel: string, toLabel: string) => ({
-  title: `About ${fromLabel} to ${toLabel} conversions`,
-  markdown: [
-    `This converter turns ${fromLabel} table data into ${toLabel} format directly in your browser.`,
-    `Use it when you need to move tabular data between tools, systems, or documentation formats.`,
-    `**Why use this converter**`,
-    `- Live table preview while you edit.`,
-    `- Local processing in your browser.`,
-    `- Easy copy or download of the result.`,
-  ].join("\n\n"),
-});
 
 const buildWorkflowSection = (fromLabel: string, toLabel: string) => ({
   title: "How the converter works",
@@ -190,55 +152,53 @@ const buildStatsSection = () => ({
   ],
 });
 
-const buildFaqs = (fromLabel: string, toLabel: string): FAQ[] => [
-  {
-    question: `How do I convert ${fromLabel} to ${toLabel}?`,
-    answer: `Paste or upload ${fromLabel} data, then copy or download the ${toLabel} output from the right panel.`,
-  },
-  {
-    question: "Can I edit the table before exporting?",
-    answer: "Yes. Use the online table editor in the middle to make quick edits before exporting.",
-  },
-  {
-    question: "Does this run in the browser?",
-    answer: "Yes. Everything runs locally in your browser, so your data stays on your device.",
-  },
-];
-
 type TableConvertLandingProps = {
-  from: InputFormat;
-  to: OutputFormat;
-  title: string;
-  subtitle?: string;
+  toolId: string;
 };
 
-export default function TableConvertLanding({
-  from,
-  to,
-  title,
-  subtitle,
-}: TableConvertLandingProps) {
+const inputFormatIds = new Set(INPUT_FORMATS.map((format) => format.value));
+const outputFormatIds = new Set(OUTPUT_FORMATS.map((format) => format.value));
+
+function isInputFormat(value: string): value is InputFormat {
+  return inputFormatIds.has(value);
+}
+
+function isOutputFormat(value: string): value is OutputFormat {
+  return outputFormatIds.has(value);
+}
+
+export default function TableConvertLanding({ toolId }: TableConvertLandingProps) {
+  const tool = toolCatalog.getById(toolId);
+  const content = toolCatalog.getPageContent(toolId);
+  if (
+    !tool?.isActive ||
+    !tool.from ||
+    !tool.to ||
+    !content ||
+    !isInputFormat(tool.from) ||
+    !isOutputFormat(tool.to)
+  ) {
+    return notFound();
+  }
+
+  const from = tool.from;
+  const to = tool.to;
   const fromLabel = formatTableLabel(from);
   const toLabel = formatTableLabel(to);
-  const resolvedSubtitle = subtitle ?? buildSubtitle(fromLabel, toLabel);
-  const aboutSection = buildAboutSection(fromLabel, toLabel);
-  const howTo = buildHowToSection(fromLabel, toLabel);
-  const infoArticle = buildInfoArticleSection(fromLabel, toLabel);
   const workflow = buildWorkflowSection(fromLabel, toLabel);
   const outputDetails = buildOutputDetailsSection(fromLabel, toLabel);
   const quickActions = buildQuickActionsSection(fromLabel, toLabel);
   const socialProof = buildSocialProofSection(fromLabel, toLabel);
   const stats = buildStatsSection();
-  const faqs = buildFaqs(fromLabel, toLabel);
-  const currentSlug = `${from}-to-${to}`;
+  const currentSlug = tool.id;
 
   return (
     <main className="theme-light min-h-screen bg-background">
       <TableConvertDemo
         initialInputFormat={from}
         initialOutputFormat={to}
-        title={title}
-        subtitle={resolvedSubtitle}
+        title={content.tool.title}
+        subtitle={content.tool.subtitle}
       />
 
       <TableConvertWorkflowSection
@@ -255,13 +215,21 @@ export default function TableConvertLanding({
 
       <TableConvertLinksSection currentSlug={currentSlug} />
 
-      <AboutFormatsSection
-        title={aboutSection.title}
-        fromFormat={aboutSection.fromFormat}
-        toFormat={aboutSection.toFormat}
-      />
+      {content.aboutSection && (
+        <AboutFormatsSection
+          title={content.aboutSection.title}
+          fromFormat={content.aboutSection.fromFormat}
+          toFormat={content.aboutSection.toFormat}
+        />
+      )}
 
-      <HowToSection title={howTo.title} intro={howTo.intro} steps={howTo.steps} />
+      {content.howTo && (
+        <HowToSection
+          title={content.howTo.title}
+          intro={content.howTo.intro}
+          steps={content.howTo.steps}
+        />
+      )}
 
       <TableConvertExtensionSection
         title={quickActions.title}
@@ -280,9 +248,14 @@ export default function TableConvertLanding({
 
       <RelatedAppsSection currentFrom={from} currentTo={to} />
 
-      <InfoArticleSection title={infoArticle.title} markdown={infoArticle.markdown} />
+      {content.infoArticle && (
+        <InfoArticleSection
+          title={content.infoArticle.title}
+          markdown={content.infoArticle.markdown}
+        />
+      )}
 
-      <FAQSection faqs={faqs} />
+      {content.faqs && <FAQSection faqs={content.faqs} />}
 
       <ToolsLinkHub />
     </main>

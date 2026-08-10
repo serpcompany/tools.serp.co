@@ -1,19 +1,19 @@
-import TranscribeTool from "@/components/TranscribeTool";
-import { FAQSection } from "@/components/sections/FAQSection";
-import { BlogSection } from "@/components/sections/BlogSection";
-import { ChangelogSection } from "@/components/sections/ChangelogSection";
-import { HowToSection } from "@/components/sections/HowToSection";
-import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
-import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { buildToolMetadata } from "@/lib/metadata";
-import { toolContent } from "@/lib/tool-content";
+import TranscribeTool from '@/components/TranscribeTool';
+import { FAQSection } from '@/components/sections/FAQSection';
+import { BlogSection } from '@/components/sections/BlogSection';
+import { ChangelogSection } from '@/components/sections/ChangelogSection';
+import { HowToSection } from '@/components/sections/HowToSection';
+import { InfoArticleSection } from '@/components/sections/InfoArticleSection';
+import { ToolsLinkHub } from '@/components/sections/ToolsLinkHub';
+import { buildToolMetadata } from '@/lib/metadata';
+import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
 
-const toolId = "video-to-transcript";
+const toolId = 'video-to-transcript';
 
 export const generateMetadata = () => buildToolMetadata(toolId);
 
 export default function Page() {
-  const content = toolContent[toolId];
+  const content = toolCatalog.getPageContent(toolId);
 
   if (!content) {
     return <div>Tool not found</div>;
@@ -28,7 +28,11 @@ export default function Page() {
       />
 
       {content.howTo && (
-        <HowToSection title={content.howTo.title} intro={content.howTo.intro} steps={content.howTo.steps} />
+        <HowToSection
+          title={content.howTo.title}
+          intro={content.howTo.intro}
+          steps={content.howTo.steps}
+        />
       )}
 
       {content.infoArticle && (

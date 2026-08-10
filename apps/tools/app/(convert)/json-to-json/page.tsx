@@ -1,14 +1,10 @@
-import TableConvertLanding from "@/components/table-convert/TableConvertLanding";
-import { buildTableConvertMetadata } from "@/lib/table-convert";
+import TableConvertLanding from '@/components/table-convert/TableConvertLanding';
+import { buildToolMetadata } from '@/lib/metadata';
 
-const fromFormat = "json" as const;
-const toFormat = "json" as const;
-const title = "Convert JSON Array to JSON Array Online";
-const slug = "json-to-json";
+const toolId = 'json-to-json';
 
-export const generateMetadata = () =>
-  buildTableConvertMetadata({ from: fromFormat, to: toFormat, title, slug });
+export const generateMetadata = () => buildToolMetadata(toolId);
 
 export default function Page() {
-  return <TableConvertLanding from={fromFormat} to={toFormat} title={title} />;
+  return <TableConvertLanding toolId={toolId} />;
 }

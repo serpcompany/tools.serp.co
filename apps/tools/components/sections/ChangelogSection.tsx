@@ -1,5 +1,5 @@
-import { Badge } from "@serp-tools/ui/components/badge";
-import { Card } from "@serp-tools/ui/components/card";
+import { Badge } from '@serp-tools/ui/components/badge';
+import { Card } from '@serp-tools/ui/components/card';
 import {
   Sparkles,
   Zap,
@@ -8,20 +8,28 @@ import {
   CheckCircle,
   Info,
   GitCommit,
-  Calendar
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+  Calendar,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-type ChangeType = 'feature' | 'improvement' | 'fix' | 'breaking' | 'deprecation' | 'performance' | 'security' | 'other';
+type ChangeType =
+  | 'feature'
+  | 'improvement'
+  | 'fix'
+  | 'breaking'
+  | 'deprecation'
+  | 'performance'
+  | 'security'
+  | 'other';
 
 type ChangelogEntry = {
   date: string;
   version?: string;
-  changes: string[] | Array<{ text: string; type?: ChangeType }>;
+  changes: readonly string[] | readonly { text: string; type?: ChangeType }[];
 };
 
 type ChangelogSectionProps = {
-  changelog: ChangelogEntry[];
+  changelog: readonly ChangelogEntry[];
 };
 
 // Icon and color mapping for change types
@@ -33,62 +41,84 @@ const changeTypeConfig: Record<
     icon: Sparkles,
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
-    label: 'New'
+    label: 'New',
   },
   improvement: {
     icon: Zap,
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
-    label: 'Improved'
+    label: 'Improved',
   },
   fix: {
     icon: Bug,
     color: 'text-green-600',
     bgColor: 'bg-green-50',
-    label: 'Fixed'
+    label: 'Fixed',
   },
   breaking: {
     icon: AlertCircle,
     color: 'text-red-600',
     bgColor: 'bg-red-50',
-    label: 'Breaking'
+    label: 'Breaking',
   },
   deprecation: {
     icon: Info,
     color: 'text-orange-600',
     bgColor: 'bg-orange-50',
-    label: 'Deprecated'
+    label: 'Deprecated',
   },
   performance: {
     icon: Zap,
     color: 'text-indigo-600',
     bgColor: 'bg-indigo-50',
-    label: 'Performance'
+    label: 'Performance',
   },
   security: {
     icon: CheckCircle,
     color: 'text-emerald-600',
     bgColor: 'bg-emerald-50',
-    label: 'Security'
+    label: 'Security',
   },
   other: {
     icon: GitCommit,
     color: 'text-gray-600',
     bgColor: 'bg-gray-50',
-    label: 'Update'
-  }
+    label: 'Update',
+  },
 };
 
 // Function to detect change type from text
 function detectChangeType(text: string): ChangeType {
   const lowerText = text.toLowerCase();
-  if (lowerText.includes('add') || lowerText.includes('new') || lowerText.includes('launch')) return 'feature';
-  if (lowerText.includes('fix') || lowerText.includes('resolve') || lowerText.includes('correct')) return 'fix';
-  if (lowerText.includes('improve') || lowerText.includes('enhance') || lowerText.includes('optimize')) return 'improvement';
-  if (lowerText.includes('breaking') || lowerText.includes('remove')) return 'breaking';
+  if (
+    lowerText.includes('add') ||
+    lowerText.includes('new') ||
+    lowerText.includes('launch')
+  )
+    return 'feature';
+  if (
+    lowerText.includes('fix') ||
+    lowerText.includes('resolve') ||
+    lowerText.includes('correct')
+  )
+    return 'fix';
+  if (
+    lowerText.includes('improve') ||
+    lowerText.includes('enhance') ||
+    lowerText.includes('optimize')
+  )
+    return 'improvement';
+  if (lowerText.includes('breaking') || lowerText.includes('remove'))
+    return 'breaking';
   if (lowerText.includes('deprecat')) return 'deprecation';
-  if (lowerText.includes('performance') || lowerText.includes('speed') || lowerText.includes('faster')) return 'performance';
-  if (lowerText.includes('security') || lowerText.includes('vulnerab')) return 'security';
+  if (
+    lowerText.includes('performance') ||
+    lowerText.includes('speed') ||
+    lowerText.includes('faster')
+  )
+    return 'performance';
+  if (lowerText.includes('security') || lowerText.includes('vulnerab'))
+    return 'security';
   return 'other';
 }
 
@@ -104,9 +134,7 @@ export function ChangelogSection({ changelog }: ChangelogSectionProps) {
             <Calendar className="mr-1 h-3 w-3" />
             Updates
           </Badge>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Changelog
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Changelog</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Track the latest updates, improvements, and fixes to our tools
           </p>
@@ -122,7 +150,9 @@ export function ChangelogSection({ changelog }: ChangelogSectionProps) {
             {changelog.map((entry, idx) => {
               // Parse date to get month and year
               const date = new Date(entry.date);
-              const month = date.toLocaleDateString('en-US', { month: 'short' });
+              const month = date.toLocaleDateString('en-US', {
+                month: 'short',
+              });
               const year = date.getFullYear();
               const day = date.getDate();
 
@@ -149,10 +179,12 @@ export function ChangelogSection({ changelog }: ChangelogSectionProps) {
                     <Card className="p-6 hover:shadow-lg transition-shadow duration-200">
                       <div className="space-y-3">
                         {entry.changes.map((change, changeIdx) => {
-                          const changeText = typeof change === 'string' ? change : change.text;
-                          const changeType = typeof change === 'string'
-                            ? detectChangeType(change)
-                            : (change.type || detectChangeType(change.text));
+                          const changeText =
+                            typeof change === 'string' ? change : change.text;
+                          const changeType =
+                            typeof change === 'string'
+                              ? detectChangeType(change)
+                              : change.type || detectChangeType(change.text);
 
                           const config = changeTypeConfig[changeType];
                           const Icon = config.icon;
@@ -163,7 +195,9 @@ export function ChangelogSection({ changelog }: ChangelogSectionProps) {
                               className="flex items-start gap-3 group"
                             >
                               {/* Icon with background */}
-                              <div className={`flex-shrink-0 w-8 h-8 rounded-lg ${config.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                              <div
+                                className={`flex-shrink-0 w-8 h-8 rounded-lg ${config.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}
+                              >
                                 <Icon className={`w-4 h-4 ${config.color}`} />
                               </div>
 

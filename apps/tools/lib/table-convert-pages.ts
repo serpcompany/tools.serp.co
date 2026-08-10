@@ -1,3 +1,5 @@
+import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
+
 export type TableConvertPage = {
   slug: string;
   from: string;
@@ -5,97 +7,37 @@ export type TableConvertPage = {
   title: string;
 };
 
-export const TABLE_CONVERT_PAGES: TableConvertPage[] = [
-  { slug: "csv-to-actionscript", from: "csv", to: "actionscript", title: "Convert CSV to ActionScript Online" },
-  { slug: "csv-to-ascii", from: "csv", to: "ascii", title: "Convert CSV to ASCII Text Table Online" },
-  { slug: "csv-to-asciidoc", from: "csv", to: "asciidoc", title: "Convert CSV to AsciiDoc Online" },
-  { slug: "csv-to-asp", from: "csv", to: "asp", title: "Convert CSV to ASP Online" },
-  { slug: "csv-to-avro", from: "csv", to: "avro", title: "Convert CSV to Avro Schema Online" },
-  { slug: "csv-to-bbcode", from: "csv", to: "bbcode", title: "Convert CSV to BBCode Online" },
-  { slug: "csv-to-csv", from: "csv", to: "csv", title: "Convert CSV to CSV Online" },
-  { slug: "csv-to-dax", from: "csv", to: "dax", title: "Convert CSV to DAX Online" },
-  { slug: "csv-to-excel", from: "csv", to: "excel", title: "Convert CSV to Excel Online" },
-  { slug: "csv-to-firebase", from: "csv", to: "firebase", title: "Convert CSV to Firebase Online" },
-  { slug: "csv-to-html", from: "csv", to: "html", title: "Convert CSV to HTML Table Online" },
-  { slug: "csv-to-ini", from: "csv", to: "ini", title: "Convert CSV to INI Online" },
-  { slug: "csv-to-jira", from: "csv", to: "jira", title: "Convert CSV to Jira Online" },
-  { slug: "csv-to-jpeg", from: "csv", to: "jpeg", title: "Convert CSV to JPEG Image Online" },
-  { slug: "csv-to-json", from: "csv", to: "json", title: "Convert CSV to JSON Array Online" },
-  { slug: "csv-to-jsonlines", from: "csv", to: "jsonlines", title: "Convert CSV to JSONLines Format Online" },
-  { slug: "csv-to-latex", from: "csv", to: "latex", title: "Convert CSV to LaTeX Table Online" },
-  { slug: "csv-to-magic", from: "csv", to: "magic", title: "Convert CSV to Magic Online" },
-  { slug: "csv-to-markdown", from: "csv", to: "markdown", title: "Convert CSV to Markdown Table Online" },
-  { slug: "csv-to-matlab", from: "csv", to: "matlab", title: "Convert CSV to MATLAB Online" },
-  { slug: "csv-to-mediawiki", from: "csv", to: "mediawiki", title: "Convert CSV to MediaWiki Table Online" },
-  { slug: "csv-to-pandasdataframe", from: "csv", to: "pandasdataframe", title: "Convert CSV to Pandas DataFrame Online" },
-  { slug: "csv-to-pdf", from: "csv", to: "pdf", title: "Convert CSV to PDF Table Online" },
-  { slug: "csv-to-php", from: "csv", to: "php", title: "Convert CSV to PHP Array Online" },
-  { slug: "csv-to-png", from: "csv", to: "png", title: "Convert CSV to PNG Image Online" },
-  { slug: "csv-to-protobuf", from: "csv", to: "protobuf", title: "Convert CSV to Protobuf Online" },
-  { slug: "csv-to-qlik", from: "csv", to: "qlik", title: "Convert CSV to Qlik Online" },
-  { slug: "csv-to-rdataframe", from: "csv", to: "rdataframe", title: "Convert CSV to R DataFrame Online" },
-  { slug: "csv-to-rdf", from: "csv", to: "rdf", title: "Convert CSV to RDF Online" },
-  { slug: "csv-to-restructuredtext", from: "csv", to: "restructuredtext", title: "Convert CSV to reStructuredText Online" },
-  { slug: "csv-to-ruby", from: "csv", to: "ruby", title: "Convert CSV to Ruby Online" },
-  { slug: "csv-to-sql", from: "csv", to: "sql", title: "Convert CSV to Insert SQL Online" },
-  { slug: "csv-to-textile", from: "csv", to: "textile", title: "Convert CSV to Textile Online" },
-  { slug: "csv-to-toml", from: "csv", to: "toml", title: "Convert CSV to TOML Online" },
-  { slug: "csv-to-tracwiki", from: "csv", to: "tracwiki", title: "Convert CSV to TracWiki Online" },
-  { slug: "csv-to-xml", from: "csv", to: "xml", title: "Convert CSV to XML Online" },
-  { slug: "csv-to-yaml", from: "csv", to: "yaml", title: "Convert CSV to YAML Configuration Online" },
-  { slug: "excel-to-csv", from: "excel", to: "csv", title: "Convert Excel to CSV Online" },
-  { slug: "excel-to-markdown", from: "excel", to: "markdown", title: "Convert Excel to Markdown Table Online" },
-  { slug: "html-to-csv", from: "html", to: "csv", title: "Convert HTML Table to CSV Online" },
-  { slug: "html-to-markdown", from: "html", to: "markdown", title: "Convert HTML to Markdown Online" },
-  { slug: "json-to-csv", from: "json", to: "csv", title: "Convert JSON Array to CSV Online" },
-  { slug: "json-to-markdown", from: "json", to: "markdown", title: "Convert JSON Array to Markdown Table Online" },
-  { slug: "latex-to-csv", from: "latex", to: "csv", title: "Convert LaTeX Table to CSV Online" },
-  { slug: "latex-to-markdown", from: "latex", to: "markdown", title: "Convert LaTeX Table to Markdown Table Online" },
-  { slug: "markdown-to-actionscript", from: "markdown", to: "actionscript", title: "Convert Markdown to ActionScript Online" },
-  { slug: "markdown-to-ascii", from: "markdown", to: "ascii", title: "Convert Markdown to ASCII Online" },
-  { slug: "markdown-to-asciidoc", from: "markdown", to: "asciidoc", title: "Convert Markdown to AsciiDoc Online" },
-  { slug: "markdown-to-asp", from: "markdown", to: "asp", title: "Convert Markdown to ASP Online" },
-  { slug: "markdown-to-avro", from: "markdown", to: "avro", title: "Convert Markdown to Avro Online" },
-  { slug: "markdown-to-bbcode", from: "markdown", to: "bbcode", title: "Convert Markdown to BBCode Online" },
-  { slug: "markdown-to-csv", from: "markdown", to: "csv", title: "Convert Markdown Table to CSV Online" },
-  { slug: "markdown-to-dax", from: "markdown", to: "dax", title: "Convert Markdown to DAX Online" },
-  { slug: "markdown-to-excel", from: "markdown", to: "excel", title: "Convert Markdown Table to Excel Online" },
-  { slug: "markdown-to-firebase", from: "markdown", to: "firebase", title: "Convert Markdown to Firebase Online" },
-  { slug: "markdown-to-html", from: "markdown", to: "html", title: "Convert Markdown Table to HTML Table Online" },
-  { slug: "markdown-to-ini", from: "markdown", to: "ini", title: "Convert Markdown to INI Online" },
-  { slug: "markdown-to-jira", from: "markdown", to: "jira", title: "Convert Markdown Table to Jira Table Online" },
-  { slug: "markdown-to-jpeg", from: "markdown", to: "jpeg", title: "Convert Markdown Table to JPEG Image Online" },
-  { slug: "markdown-to-json", from: "markdown", to: "json", title: "Convert Markdown Table to JSON Array Online" },
-  { slug: "markdown-to-jsonlines", from: "markdown", to: "jsonlines", title: "Convert Markdown to JSONLines Online" },
-  { slug: "markdown-to-latex", from: "markdown", to: "latex", title: "Convert Markdown Table to LaTeX Table Online" },
-  { slug: "markdown-to-magic", from: "markdown", to: "magic", title: "Convert Markdown to Magic Online" },
-  { slug: "markdown-to-markdown", from: "markdown", to: "markdown", title: "Convert Markdown Table to Markdown Table Online" },
-  { slug: "markdown-to-matlab", from: "markdown", to: "matlab", title: "Convert Markdown to MATLAB Online" },
-  { slug: "markdown-to-mediawiki", from: "markdown", to: "mediawiki", title: "Convert Markdown to MediaWiki Online" },
-  { slug: "markdown-to-pandasdataframe", from: "markdown", to: "pandasdataframe", title: "Convert Markdown Table to Pandas DataFrame Online" },
-  { slug: "markdown-to-pdf", from: "markdown", to: "pdf", title: "Convert Markdown Table to PDF Table Online" },
-  { slug: "markdown-to-php", from: "markdown", to: "php", title: "Convert Markdown to PHP Online" },
-  { slug: "markdown-to-png", from: "markdown", to: "png", title: "Convert Markdown to PNG Online" },
-  { slug: "markdown-to-protobuf", from: "markdown", to: "protobuf", title: "Convert Markdown to Protobuf Online" },
-  { slug: "markdown-to-qlik", from: "markdown", to: "qlik", title: "Convert Markdown to Qlik Online" },
-  { slug: "markdown-to-rdataframe", from: "markdown", to: "rdataframe", title: "Convert Markdown to R DataFrame Online" },
-  { slug: "markdown-to-rdf", from: "markdown", to: "rdf", title: "Convert Markdown to RDF Online" },
-  { slug: "markdown-to-restructuredtext", from: "markdown", to: "restructuredtext", title: "Convert Markdown Table to reStructuredText Table Online" },
-  { slug: "markdown-to-ruby", from: "markdown", to: "ruby", title: "Convert Markdown to Ruby Online" },
-  { slug: "markdown-to-sql", from: "markdown", to: "sql", title: "Convert Markdown to SQL Online" },
-  { slug: "markdown-to-textile", from: "markdown", to: "textile", title: "Convert Markdown to Textile Online" },
-  { slug: "markdown-to-toml", from: "markdown", to: "toml", title: "Convert Markdown to TOML Online" },
-  { slug: "markdown-to-tracwiki", from: "markdown", to: "tracwiki", title: "Convert Markdown to TracWiki Online" },
-  { slug: "markdown-to-xml", from: "markdown", to: "xml", title: "Convert Markdown Table to XML Online" },
-  { slug: "markdown-to-yaml", from: "markdown", to: "yaml", title: "Convert Markdown to YAML Online" },
-  { slug: "mediawiki-to-csv", from: "mediawiki", to: "csv", title: "Convert MediaWiki Table to CSV Online" },
-  { slug: "mediawiki-to-markdown", from: "mediawiki", to: "markdown", title: "Convert MediaWiki to Markdown Online" },
-  { slug: "mysql-to-csv", from: "mysql", to: "csv", title: "Convert MySQL Query Results to CSV Online" },
-  { slug: "mysql-to-markdown", from: "mysql", to: "markdown", title: "Convert MySQL to Markdown Online" },
-  { slug: "sql-to-csv", from: "sql", to: "csv", title: "Convert Insert SQL to CSV Online" },
-  { slug: "sql-to-markdown", from: "sql", to: "markdown", title: "Convert SQL to Markdown Online" },
-  { slug: "xml-to-csv", from: "xml", to: "csv", title: "Convert XML to CSV Online" },
-  { slug: "xml-to-markdown", from: "xml", to: "markdown", title: "Convert XML to Markdown Table Online" },
-];
+export function getTableRendererToolIds(): readonly string[] {
+  return toolCatalog.activeTools
+    .filter((tool) => tool.content?.tool.renderer === 'table')
+    .map((tool) => tool.id);
+}
 
-export const TABLE_CONVERT_UNSUPPORTED: TableConvertPage[] = [];
+export function isTableRendererTool(toolId: string): boolean {
+  return toolCatalog.getById(toolId)?.content?.tool.renderer === 'table';
+}
+
+export function getTableConvertPages(): readonly TableConvertPage[] {
+  return Object.freeze(
+    toolCatalog.activeTools.flatMap((tool) => {
+      const content = toolCatalog.getPageContent(tool.id);
+      if (
+        tool.content?.tool.renderer !== 'table' ||
+        !tool.content.tool.showInTableLinks ||
+        !tool.from ||
+        !tool.to ||
+        !content
+      ) {
+        return [];
+      }
+      return [
+        Object.freeze({
+          slug: tool.id,
+          from: tool.from,
+          to: tool.to,
+          title: content.tool.title,
+        }),
+      ];
+    }),
+  );
+}

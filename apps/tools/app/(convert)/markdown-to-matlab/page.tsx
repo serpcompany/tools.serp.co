@@ -1,14 +1,10 @@
-import TableConvertLanding from "@/components/table-convert/TableConvertLanding";
-import { buildTableConvertMetadata } from "@/lib/table-convert";
+import TableConvertLanding from '@/components/table-convert/TableConvertLanding';
+import { buildToolMetadata } from '@/lib/metadata';
 
-const fromFormat = "markdown" as const;
-const toFormat = "matlab" as const;
-const title = "Convert Markdown to MATLAB Online";
-const slug = "markdown-to-matlab";
+const toolId = 'markdown-to-matlab';
 
-export const generateMetadata = () =>
-  buildTableConvertMetadata({ from: fromFormat, to: toFormat, title, slug });
+export const generateMetadata = () => buildToolMetadata(toolId);
 
 export default function Page() {
-  return <TableConvertLanding from={fromFormat} to={toFormat} title={title} />;
+  return <TableConvertLanding toolId={toolId} />;
 }

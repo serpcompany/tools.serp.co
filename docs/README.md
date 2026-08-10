@@ -20,6 +20,7 @@ dated observations belong in `docs/audits`; advisory inputs belong in
 - [Domain glossary](../CONTEXT.md)
 - [Repository overview and commands](../README.md)
 - [ADR policy and index](./adr/README.md)
+- [ADR 0001: Catalog compatibility copy is presentation intent](./adr/0001-catalog-compatibility-copy-is-intent.md)
 
 ### Agent and workflow policy
 

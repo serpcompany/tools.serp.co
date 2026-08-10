@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 type BlogPost = {
   title: string;
@@ -10,7 +10,7 @@ type BlogPost = {
 };
 
 type BlogSectionProps = {
-  blogPosts: BlogPost[];
+  blogPosts: readonly BlogPost[];
 };
 
 export function BlogSection({ blogPosts }: BlogSectionProps) {
@@ -18,7 +18,7 @@ export function BlogSection({ blogPosts }: BlogSectionProps) {
     blogPosts?.filter((post) => {
       const href = post.href?.trim();
       if (!href) return false;
-      if (href === "#" || href.startsWith("#")) return false;
+      if (href === '#' || href.startsWith('#')) return false;
       return true;
     }) ?? [];
 
@@ -27,9 +27,9 @@ export function BlogSection({ blogPosts }: BlogSectionProps) {
   const renderLink = (
     href: string,
     className: string,
-    children: React.ReactNode
+    children: React.ReactNode,
   ) => {
-    if (href.startsWith("/")) {
+    if (href.startsWith('/')) {
       return (
         <Link href={href} className={className}>
           {children}
@@ -59,69 +59,69 @@ export function BlogSection({ blogPosts }: BlogSectionProps) {
             <div key={idx}>
               {renderLink(
                 post.href,
-                "group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1",
+                'group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1',
                 <>
-              {post.image ? (
-                <div className="aspect-[16/10] bg-gray-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="aspect-[16/10] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-                  <div className="text-white/80">
-                    <svg
-                      className="w-20 h-20 text-white/40"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  {post.image ? (
+                    <div className="aspect-[16/10] bg-gray-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
                       />
-                    </svg>
+                    </div>
+                  ) : (
+                    <div className="aspect-[16/10] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+                      <div className="text-white/80">
+                        <svg
+                          className="w-20 h-20 text-white/40"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                  <div className="p-6">
+                    {post.category && (
+                      <div className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-3">
+                        {post.category}
+                      </div>
+                    )}
+                    <h3 className="font-bold text-lg mb-2 text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-sm font-medium text-gray-700 mb-3">
+                      {post.subtitle}
+                    </p>
+                    <p className="text-sm text-gray-500 line-clamp-3">
+                      {post.description}
+                    </p>
+                    <div className="mt-4 flex items-center text-blue-600 text-sm font-semibold">
+                      Read more
+                      <svg
+                        className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
                   </div>
-                </div>
-              )}
-              <div className="p-6">
-                {post.category && (
-                  <div className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-3">
-                    {post.category}
-                  </div>
-                )}
-                <h3 className="font-bold text-lg mb-2 text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                  {post.title}
-                </h3>
-                <p className="text-sm font-medium text-gray-700 mb-3">
-                  {post.subtitle}
-                </p>
-                <p className="text-sm text-gray-500 line-clamp-3">
-                  {post.description}
-                </p>
-                <div className="mt-4 flex items-center text-blue-600 text-sm font-semibold">
-                  Read more
-                  <svg
-                    className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-              </div>
-                </>
+                </>,
               )}
             </div>
           ))}

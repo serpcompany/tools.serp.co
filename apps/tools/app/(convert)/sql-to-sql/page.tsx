@@ -1,14 +1,10 @@
-import TableConvertLanding from "@/components/table-convert/TableConvertLanding";
-import { buildTableConvertMetadata } from "@/lib/table-convert";
+import TableConvertLanding from '@/components/table-convert/TableConvertLanding';
+import { buildToolMetadata } from '@/lib/metadata';
 
-const fromFormat = "sql" as const;
-const toFormat = "sql" as const;
-const title = "Convert Insert SQL to Insert SQL Online";
-const slug = "sql-to-sql";
+const toolId = 'sql-to-sql';
 
-export const generateMetadata = () =>
-  buildTableConvertMetadata({ from: fromFormat, to: toFormat, title, slug });
+export const generateMetadata = () => buildToolMetadata(toolId);
 
 export default function Page() {
-  return <TableConvertLanding from={fromFormat} to={toFormat} title={title} />;
+  return <TableConvertLanding toolId={toolId} />;
 }

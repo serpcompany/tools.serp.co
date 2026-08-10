@@ -47,8 +47,10 @@ Tool's operation.
 
 Never collapse these dimensions into a single Tool `status`:
 
-- **Catalog intent** — identity, route, operation, formats, content, and
-  active/inactive publication intent from the registry.
+- **Catalog intent** — identity, route, operation, formats, presentation
+  content, and active/inactive publication intent from the registry. Content
+  copy does not prove its runtime-sounding statements; versioned compatibility
+  copy follows [ADR 0001](./docs/adr/0001-catalog-compatibility-copy-is-intent.md).
 - **Implementation provenance** — processing location, capability or engine,
   owning code/package, and whether that mapping is explicit or unknown.
 - **Fixture availability** — whether a named reproducible input exists. A

@@ -1,10 +1,10 @@
-import { Card } from "@serp-tools/ui/components/card";
+import { Card } from '@serp-tools/ui/components/card';
 
 type FormatInfo = {
   name: string;
   fullName: string;
   description: string;
-  details?: string[];
+  details?: readonly string[];
 };
 
 type AboutFormatsSectionProps = {

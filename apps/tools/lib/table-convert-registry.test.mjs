@@ -1,60 +1,105 @@
-import test from "node:test";
-import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
-import { TABLE_CONVERT_PAGES } from "./table-convert-pages.ts";
-import { buildToolDirectoryEntries } from "./tool-directory.ts";
+import { toolCatalog } from '../../../packages/app-core/src/lib/tool-catalog.ts';
+import {
+  getTableConvertPages,
+  getTableRendererToolIds,
+} from './table-convert-pages.ts';
+import { selectToolRenderer } from './tool-renderer.ts';
 
-const toolsRegistry = JSON.parse(
-  readFileSync(new URL("../../../packages/app-core/src/data/tools.json", import.meta.url), "utf8"),
-);
-const csvToMarkdownPageSource = readFileSync(
-  new URL("../app/(convert)/csv-to-markdown/page.tsx", import.meta.url),
-  "utf8",
-);
-
-function normalizeRoute(route) {
-  if (!route) {
-    return null;
-  }
-
-  const normalized = String(route).replace(/\/$/, "");
-  return normalized === "" ? "/" : `${normalized}/`;
-}
-
-test("csv-to-markdown is discoverable through page, directory, and sitemap data", () => {
-  const tableConvertEntry = TABLE_CONVERT_PAGES.find((entry) => entry.slug === "csv-to-markdown");
-  const tool = toolsRegistry.find((entry) => entry.id === "csv-to-markdown");
-  const directoryEntries = buildToolDirectoryEntries(toolsRegistry);
-  const directoryEntry = directoryEntries.find((entry) => entry.id === "csv-to-markdown");
-  const sitemapRoutes = new Set(
-    toolsRegistry
-      .filter((entry) => entry.isActive)
-      .map((entry) => normalizeRoute(entry.route))
-      .filter(Boolean),
+test('csv-to-markdown is catalog-backed and uses the table renderer', () => {
+  const tool = toolCatalog.getById('csv-to-markdown');
+  const content = toolCatalog.getPageContent('csv-to-markdown');
+  const tableConvertEntry = getTableConvertPages().find(
+    (entry) => entry.slug === 'csv-to-markdown',
+  );
+  const directoryEntry = toolCatalog.directoryEntries.find(
+    (entry) => entry.id === 'csv-to-markdown',
   );
 
-  assert.match(csvToMarkdownPageSource, /const slug = "csv-to-markdown"/);
-  assert.match(csvToMarkdownPageSource, /const fromFormat = "csv"/);
-  assert.match(csvToMarkdownPageSource, /const toFormat = "markdown"/);
-
+  assert.ok(tool);
+  assert.ok(content);
   assert.deepEqual(tableConvertEntry, {
-    slug: "csv-to-markdown",
-    from: "csv",
-    to: "markdown",
-    title: "Convert CSV to Markdown Table Online",
+    slug: tool.id,
+    from: tool.from,
+    to: tool.to,
+    title: content.tool.title,
   });
-
-  assert.ok(tool, "expected csv-to-markdown in tools.json");
-  assert.equal(tool.operation, "convert");
-  assert.equal(tool.route, "/csv-to-markdown");
-  assert.equal(tool.from, "csv");
-  assert.equal(tool.to, "markdown");
+  assert.equal(tool.operation, 'convert');
+  assert.equal(tool.route, '/csv-to-markdown');
   assert.equal(tool.isActive, true);
+  assert.equal(selectToolRenderer(tool), 'table');
 
-  assert.ok(directoryEntry, "expected csv-to-markdown in homepage directory entries");
-  assert.deepEqual(directoryEntry?.tags, ["csv", "markdown"]);
-  assert.equal(directoryEntry?.href, "/csv-to-markdown");
+  assert.ok(directoryEntry);
+  assert.equal(directoryEntry.href, tool.route);
+  assert.equal(toolCatalog.getByRoute(tool.route)?.id, tool.id);
+});
 
-  assert.ok(sitemapRoutes.has("/csv-to-markdown/"), "expected csv-to-markdown in sitemap routes");
+test('every table renderer route resolves active Catalog identity and formats', () => {
+  const toolIds = getTableRendererToolIds();
+  assert.ok(toolIds.length > 100);
+
+  for (const toolId of toolIds) {
+    const tool = toolCatalog.getById(toolId);
+    assert.ok(tool?.isActive, toolId);
+    assert.ok(tool.from, toolId);
+    assert.ok(tool.to, toolId);
+    assert.ok(toolCatalog.getPageContent(toolId), toolId);
+    assert.equal(selectToolRenderer(tool), 'table', toolId);
+    const routeSource = readFileSync(
+      new URL(`../app/(convert)/${toolId}/page.tsx`, import.meta.url),
+      'utf8',
+    );
+    assert.match(routeSource, new RegExp(`const toolId = '${toolId}'`));
+    assert.match(routeSource, /TableConvertLanding toolId=\{toolId\}/);
+  }
+});
+
+test('table Catalog content preserves the prior renderer-visible copy', () => {
+  const content = toolCatalog.getPageContent('csv-to-sql');
+  assert.ok(content);
+
+  assert.equal(content.tool.title, 'Convert CSV to Insert SQL Online');
+  assert.equal(
+    content.tool.subtitle,
+    'Paste or upload CSV data, preview the table, and export SQL instantly.',
+  );
+  assert.deepEqual(content.howTo, {
+    title: 'How to convert CSV to SQL',
+    intro: 'Follow these steps to convert CSV to SQL online.',
+    steps: [
+      'Paste or upload your CSV data.',
+      'Review the table preview and make edits if needed.',
+      'Copy or download the SQL output when it is ready.',
+    ],
+  });
+  assert.equal(content.aboutSection?.title, 'CSV to SQL table conversion');
+  assert.match(content.infoArticle?.markdown ?? '', /Local processing in your browser/);
+  assert.deepEqual(
+    content.faqs?.map((faq) => faq.question),
+    [
+      'How do I convert CSV to SQL?',
+      'Can I edit the table before exporting?',
+      'Does this run in the browser?',
+    ],
+  );
+});
+
+test('HTML to Markdown retains its dedicated sections without adding new ones', () => {
+  const content = toolCatalog.getPageContent('html-to-markdown');
+  const pageSource = readFileSync(
+    new URL('../app/(convert)/html-to-markdown/page.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.ok(content);
+  assert.equal(content.howTo?.title, 'How to convert HTML to Markdown');
+  assert.match(content.infoArticle?.markdown ?? '', /html-to-markdown.*WebAssembly/);
+  assert.equal(content.faqs?.length, 5);
+  assert.equal(
+    content.faqs?.[4]?.question,
+    'What is the difference between this and the HTML Table to Markdown converter?',
+  );
+  assert.doesNotMatch(pageSource, /AboutFormatsSection|ChangelogSection/);
 });

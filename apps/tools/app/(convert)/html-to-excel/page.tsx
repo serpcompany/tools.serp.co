@@ -1,14 +1,10 @@
-import TableConvertLanding from "@/components/table-convert/TableConvertLanding";
-import { buildTableConvertMetadata } from "@/lib/table-convert";
+import TableConvertLanding from '@/components/table-convert/TableConvertLanding';
+import { buildToolMetadata } from '@/lib/metadata';
 
-const fromFormat = "html" as const;
-const toFormat = "excel" as const;
-const title = "Convert HTML Table to Excel Online";
-const slug = "html-to-excel";
+const toolId = 'html-to-excel';
 
-export const generateMetadata = () =>
-  buildTableConvertMetadata({ from: fromFormat, to: toFormat, title, slug });
+export const generateMetadata = () => buildToolMetadata(toolId);
 
 export default function Page() {
-  return <TableConvertLanding from={fromFormat} to={toFormat} title={title} />;
+  return <TableConvertLanding toolId={toolId} />;
 }

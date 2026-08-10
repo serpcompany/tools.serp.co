@@ -1,14 +1,10 @@
-import TableConvertLanding from "@/components/table-convert/TableConvertLanding";
-import { buildTableConvertMetadata } from "@/lib/table-convert";
+import TableConvertLanding from '@/components/table-convert/TableConvertLanding';
+import { buildToolMetadata } from '@/lib/metadata';
 
-const fromFormat = "sql" as const;
-const toFormat = "csv" as const;
-const title = "Convert Insert SQL to CSV Online";
-const slug = "sql-to-csv";
+const toolId = 'sql-to-csv';
 
-export const generateMetadata = () =>
-  buildTableConvertMetadata({ from: fromFormat, to: toFormat, title, slug });
+export const generateMetadata = () => buildToolMetadata(toolId);
 
 export default function Page() {
-  return <TableConvertLanding from={fromFormat} to={toFormat} title={title} />;
+  return <TableConvertLanding toolId={toolId} />;
 }

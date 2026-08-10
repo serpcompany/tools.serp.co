@@ -3,7 +3,7 @@ import { getToolLinkCategories } from '@/lib/tool-link-categories';
 import type { RelatedTool } from '@/types';
 
 type ToolsLinkHubProps = {
-  relatedTools?: RelatedTool[];
+  relatedTools?: readonly RelatedTool[];
 };
 
 const toolCategories = getToolLinkCategories();

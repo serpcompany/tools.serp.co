@@ -55,7 +55,11 @@ real reusable contract justifies moving it into a package.
 Consumers migrate through
 `packages/app-core/src/lib/tool-catalog.ts`. That read-only boundary validates
 and projects registry identity, routes, taxonomy, publication intent, and
-content without adding verification or runtime claims.
+content. Explicit versioned compatibility profiles may preserve prior
+presentation copy as catalog intent under
+[ADR 0001](./docs/adr/0001-catalog-compatibility-copy-is-intent.md); that copy
+must not be used as implementation provenance, verification evidence, or a
+runtime observation.
 
 Registry Tool id is the join key across catalog intent, fixtures, verification,
 runtime observations, planning evidence, and GitHub work. Names, routes, and

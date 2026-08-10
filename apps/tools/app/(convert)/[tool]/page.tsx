@@ -1,18 +1,16 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound, redirect } from 'next/navigation';
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
-import { DownloaderPageRenderer } from "@/components/DownloaderPageRenderer";
-import PdfToolPage from "@/components/PdfToolPage";
-import ToolPlaceholder from "@/components/ToolPlaceholder";
-import { ToolPageRenderer } from "@/components/ToolPageRenderer";
-import { buildToolMetadata } from "@/lib/metadata";
-import type { Tool } from "@/types";
-
-const tools = toolsData as Tool[];
+import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
+import { DownloaderPageRenderer } from '@/components/DownloaderPageRenderer';
+import PdfToolPage from '@/components/PdfToolPage';
+import ToolPlaceholder from '@/components/ToolPlaceholder';
+import { ToolPageRenderer } from '@/components/ToolPageRenderer';
+import { buildToolMetadata } from '@/lib/metadata';
+import { selectToolRenderer } from '@/lib/tool-renderer';
 
 const LEGACY_DOWNLOADER_ROUTE_REDIRECTS: Record<string, string> = {
-  "download-kajab-videos": "/download-kajabi-videos",
-  "download-stripcha-videos": "/download-stripchat-videos",
+  'download-kajab-videos': '/download-kajabi-videos',
+  'download-stripcha-videos': '/download-stripchat-videos',
 };
 
 type PageProps = {
@@ -28,39 +26,18 @@ export default async function Page({ params }: PageProps) {
   const { tool: toolId } = await params;
   const legacyDownloaderRoute = LEGACY_DOWNLOADER_ROUTE_REDIRECTS[toolId];
 
-  if (legacyDownloaderRoute) {
-    redirect(legacyDownloaderRoute);
-  }
+  if (legacyDownloaderRoute) redirect(legacyDownloaderRoute);
 
-  const tool = tools.find((item) => item.id === toolId && item.isActive);
+  const tool = toolCatalog.getById(toolId);
+  const renderer = selectToolRenderer(tool);
 
-  if (!tool) {
-    return notFound();
-  }
-
-  if (
-    (tool.operation === "convert" || tool.operation === "compress") &&
-    tool.from &&
-    tool.to
-  ) {
-    return <ToolPageRenderer toolId={toolId} />;
-  }
-
-  if (tool.operation === "download") {
+  if (renderer === 'generic') return <ToolPageRenderer toolId={toolId} />;
+  if (renderer === 'downloader') {
     return <DownloaderPageRenderer toolId={toolId} />;
   }
-
-  if (
-    tool.operation === "video-editor" ||
-    tool.operation === "image-editor" ||
-    tool.operation === "audio-editor"
-  ) {
+  if (renderer === 'pdf') return <PdfToolPage toolId={toolId} />;
+  if (renderer === 'placeholder' && tool) {
     return <ToolPlaceholder title={tool.name} />;
   }
-
-  if (tool.operation === "view" || tool.operation === "edit") {
-    return <PdfToolPage toolId={toolId} />;
-  }
-
   return notFound();
 }

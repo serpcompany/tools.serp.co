@@ -1,40 +1,33 @@
-"use client";
+'use client';
 
-import HeroConverter from "@/components/HeroConverter";
-import LanderHeroTwoColumn from "@/components/LanderHeroTwoColumn";
-import { AboutFormatsSection } from "@/components/sections/AboutFormatsSection";
-import { FAQSection } from "@/components/sections/FAQSection";
-import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { BlogSection } from "@/components/sections/BlogSection";
-import { ChangelogSection } from "@/components/sections/ChangelogSection";
-import { RelatedToolsSection } from "@/components/sections/RelatedToolsSection";
-import { RelatedAppsSection } from "@/components/sections/RelatedAppsSection";
-import { HowToSection } from "@/components/sections/HowToSection";
-import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
-import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
+import HeroConverter from '@/components/HeroConverter';
+import LanderHeroTwoColumn from '@/components/LanderHeroTwoColumn';
+import { AboutFormatsSection } from '@/components/sections/AboutFormatsSection';
+import { FAQSection } from '@/components/sections/FAQSection';
+import { ToolsLinkHub } from '@/components/sections/ToolsLinkHub';
+import { BlogSection } from '@/components/sections/BlogSection';
+import { ChangelogSection } from '@/components/sections/ChangelogSection';
+import { RelatedItemsSection } from '@/components/sections/RelatedItemsSection';
+import { RelatedAppsSection } from '@/components/sections/RelatedAppsSection';
+import { HowToSection } from '@/components/sections/HowToSection';
+import { InfoArticleSection } from '@/components/sections/InfoArticleSection';
+import { getEnabledVideoEmbedId } from '@/lib/video-embeds';
 import type {
-  ToolInfo,
-  VideoSectionData,
-  FAQ,
-  AboutFormatsSection as AboutFormatsSectionData,
-  ChangelogEntry,
-  RelatedTool,
-  BlogPost,
-  HowToSectionData,
-  InfoArticleSectionData
-} from "@/types";
+  CatalogPageContent,
+  CatalogRelatedItem,
+} from '@serp-tools/app-core/lib/tool-catalog';
 
 type ToolPageProps = {
-  tool: ToolInfo;
-  videoSection?: VideoSectionData;
+  tool: CatalogPageContent['tool'];
+  videoSection?: CatalogPageContent['videoSection'];
   useTwoColumnLayout?: boolean;
-  faqs?: FAQ[];
-  aboutSection?: AboutFormatsSectionData;
-  howTo?: HowToSectionData;
-  infoArticle?: InfoArticleSectionData;
-  changelog?: ChangelogEntry[];
-  relatedTools?: RelatedTool[];
-  blogPosts?: BlogPost[];
+  faqs?: CatalogPageContent['faqs'];
+  aboutSection?: CatalogPageContent['aboutSection'];
+  howTo?: CatalogPageContent['howTo'];
+  infoArticle?: CatalogPageContent['infoArticle'];
+  changelog?: CatalogPageContent['changelog'];
+  resolvedRelatedItems?: readonly CatalogRelatedItem[];
+  blogPosts?: CatalogPageContent['blogPosts'];
 };
 
 export default function ToolPageTemplate({
@@ -46,17 +39,12 @@ export default function ToolPageTemplate({
   howTo,
   infoArticle,
   changelog,
-  relatedTools,
+  resolvedRelatedItems = [],
   blogPosts,
 }: ToolPageProps) {
   const videoEmbedId = getEnabledVideoEmbedId({ tool, videoSection });
   const shouldUseTwoColumn = Boolean(useTwoColumnLayout && videoEmbedId);
-  const currentRoute =
-    tool.route ??
-    (tool.from && tool.to ? `/${tool.from.toLowerCase()}-to-${tool.to.toLowerCase()}` : undefined);
-  const showRelatedTools = Boolean(
-    (relatedTools && relatedTools.length > 0) || (tool.from && tool.to)
-  );
+  const showRelatedItems = Boolean(resolvedRelatedItems.length > 0);
 
   return (
     <main className="min-h-screen bg-background">
@@ -80,7 +68,13 @@ export default function ToolPageTemplate({
               toFormat={aboutSection.toFormat}
             />
           )}
-          {howTo && <HowToSection title={howTo.title} intro={howTo.intro} steps={howTo.steps} />}
+          {howTo && (
+            <HowToSection
+              title={howTo.title}
+              intro={howTo.intro}
+              steps={howTo.steps}
+            />
+          )}
         </>
       ) : (
         <>
@@ -100,27 +94,22 @@ export default function ToolPageTemplate({
               toFormat={aboutSection.toFormat}
             />
           )}
-          {howTo && <HowToSection title={howTo.title} intro={howTo.intro} steps={howTo.steps} />}
+          {howTo && (
+            <HowToSection
+              title={howTo.title}
+              intro={howTo.intro}
+              steps={howTo.steps}
+            />
+          )}
         </>
       )}
 
       {/* Related Tools Section - right after format cards */}
-      {showRelatedTools && (
-        <RelatedToolsSection
-          currentFrom={tool.from}
-          currentTo={tool.to}
-          currentRoute={currentRoute}
-          currentToolId={tool.id}
-          relatedTools={relatedTools}
-        />
-      )}
+      {showRelatedItems && <RelatedItemsSection items={resolvedRelatedItems} />}
 
       {/* Related Apps Section */}
       {tool.from && tool.to && (
-        <RelatedAppsSection
-          currentFrom={tool.from}
-          currentTo={tool.to}
-        />
+        <RelatedAppsSection currentFrom={tool.from} currentTo={tool.to} />
       )}
 
       {infoArticle && (
