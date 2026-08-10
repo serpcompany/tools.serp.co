@@ -1,13 +1,10 @@
 import { recordToolRunInD1, type D1DatabaseLike } from "./d1.ts";
-import type { ToolRunEvent, ToolRunStatus, ToolRunRecord } from "./types.ts";
-import { median, summarizeToolRuns } from "./metrics.ts";
+import type { ToolRunEvent } from "./types.ts";
 
 type RecordToolRunResult = {
   status: number;
   body: {
     ok: boolean;
-    skipped?: boolean;
-    reason?: string;
     error?: string;
   };
 };
@@ -16,29 +13,6 @@ type RecordToolRunOptions = {
   d1?: D1DatabaseLike | null;
   now?: Date;
 };
-
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-
-async function loadLegacyTelemetryDeps() {
-  const [drizzleOrm, dbModule, schemaModule] = await Promise.all([
-    import("drizzle-orm"),
-    import("@serp-tools/app-core/db"),
-    import("@serp-tools/app-core/db/schema"),
-  ]);
-
-  return {
-    and: drizzleOrm.and,
-    desc: drizzleOrm.desc,
-    eq: drizzleOrm.eq,
-    gte: drizzleOrm.gte,
-    getDb: dbModule.getDb,
-    toolRuns: schemaModule.toolRuns,
-    toolStatus: schemaModule.toolStatus,
-  };
-}
-
-type LegacyTelemetryDeps = Awaited<ReturnType<typeof loadLegacyTelemetryDeps>>;
-type LegacyDb = NonNullable<ReturnType<LegacyTelemetryDeps["getDb"]>>;
 
 function isToolRunEvent(payload: unknown): payload is ToolRunEvent {
   if (!payload || typeof payload !== "object") return false;
@@ -51,103 +25,10 @@ function isToolRunEvent(payload: unknown): payload is ToolRunEvent {
   );
 }
 
-function toStatus(event: ToolRunEvent): ToolRunStatus {
-  if (event.event === "tool_run_started") return "started";
-  if (event.event === "tool_run_succeeded") return "succeeded";
-  return "failed";
-}
-
 function toDate(value: string) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return null;
   return parsed;
-}
-
-function toNumber(value?: number | null) {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
-
-function toMetadata(value: unknown): Record<string, unknown> | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  return value as Record<string, unknown>;
-}
-
-async function updateToolStatus(
-  db: LegacyDb,
-  deps: LegacyTelemetryDeps,
-  toolId: string
-) {
-  const { and, desc, eq, gte, toolRuns, toolStatus } = deps;
-  const since = new Date(Date.now() - ONE_DAY_MS);
-
-  const runs = await db
-    .select()
-    .from(toolRuns)
-    .where(and(eq(toolRuns.toolId, toolId), gte(toolRuns.startedAt, since)))
-    .orderBy(desc(toolRuns.startedAt));
-
-  const normalizedRuns: ToolRunRecord[] = runs.map((run) => ({
-    toolId: run.toolId,
-    status: run.status as ToolRunStatus,
-    startedAt: run.startedAt,
-    durationMs: run.durationMs ?? null,
-    inputBytes: run.inputBytes ?? null,
-    outputBytes: run.outputBytes ?? null,
-    errorCode: run.errorCode ?? null,
-    metadata: toMetadata(run.metadata),
-  }));
-
-  const summary = summarizeToolRuns(normalizedRuns);
-  const completed = normalizedRuns.filter(
-    (run) => run.status === "succeeded" || run.status === "failed"
-  );
-
-  const reductionSamples = completed
-    .filter((run) => run.status === "succeeded")
-    .map((run) => {
-      const input = toNumber(run.inputBytes);
-      const output = toNumber(run.outputBytes);
-      if (!input || !output) return null;
-      return Math.round((1 - output / input) * 100);
-    })
-    .filter((value): value is number => value !== null);
-
-  const medianReductionPct = median(reductionSamples);
-
-  let status = "unknown";
-  if (completed.length) {
-    status = "live";
-    if (summary.failureRate !== null && summary.failureRate >= 0.5) {
-      status = "broken";
-    } else if (summary.failureRate !== null && summary.failureRate >= 0.2) {
-      status = "degraded";
-    }
-  }
-
-  const lastRunAt = runs[0]?.startedAt ?? null;
-
-  await db
-    .insert(toolStatus)
-    .values({
-      toolId,
-      status,
-      lastRunAt,
-      failureRate24h: summary.failureRate,
-      medianDurationMs: summary.medianDurationMs,
-      medianReductionPct,
-      updatedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: toolStatus.toolId,
-      set: {
-        status,
-        lastRunAt,
-        failureRate24h: summary.failureRate,
-        medianDurationMs: summary.medianDurationMs,
-        medianReductionPct,
-        updatedAt: new Date(),
-      },
-    });
 }
 
 export async function recordToolRun(
@@ -163,70 +44,18 @@ export async function recordToolRun(
     return { status: 400, body: { ok: false, error: "Invalid startedAt" } };
   }
 
-  if (options.d1) {
-    try {
-      await recordToolRunInD1(options.d1, payload, { now: options.now });
-      return { status: 200, body: { ok: true } };
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "D1 telemetry write failed";
-      return { status: 500, body: { ok: false, error: message } };
-    }
-  }
-
-  if (!process.env.DATABASE_URL) {
+  if (!options.d1) {
     return {
-      status: 200,
-      body: { ok: true, skipped: true, reason: "DATABASE_URL not set" },
+      status: 503,
+      body: { ok: false, error: "D1 telemetry binding unavailable" },
     };
   }
 
-  let deps: LegacyTelemetryDeps;
-  let db: LegacyDb | null;
   try {
-    deps = await loadLegacyTelemetryDeps();
-    db = deps.getDb();
+    await recordToolRunInD1(options.d1, payload, { now: options.now });
+    return { status: 200, body: { ok: true } };
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Database unavailable";
+    const message = err instanceof Error ? err.message : "D1 telemetry write failed";
     return { status: 500, body: { ok: false, error: message } };
   }
-
-  if (!db) {
-    return {
-      status: 200,
-      body: { ok: true, skipped: true, reason: "DATABASE_URL not set" },
-    };
-  }
-
-  const status = toStatus(payload);
-  const insert = db.insert(deps.toolRuns).values({
-    id: payload.runId,
-    toolId: payload.toolId,
-    status,
-    startedAt,
-    durationMs: payload.durationMs ?? null,
-    inputBytes: payload.inputBytes ?? null,
-    outputBytes: payload.outputBytes ?? null,
-    errorCode: payload.errorCode ?? null,
-    metadata: payload.metadata ?? null,
-  });
-
-  if (status === "started") {
-    await insert.onConflictDoNothing({ target: deps.toolRuns.id });
-  } else {
-    await insert.onConflictDoUpdate({
-      target: deps.toolRuns.id,
-      set: {
-        status,
-        durationMs: payload.durationMs ?? null,
-        inputBytes: payload.inputBytes ?? null,
-        outputBytes: payload.outputBytes ?? null,
-        errorCode: payload.errorCode ?? null,
-        metadata: payload.metadata ?? null,
-      },
-    });
-  }
-
-  await updateToolStatus(db, deps, payload.toolId);
-
-  return { status: 200, body: { ok: true } };
 }

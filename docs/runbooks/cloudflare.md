@@ -12,9 +12,9 @@ database, and cache bindings.
 - Production host after cutover: `https://tools.serp.co`
 - Runtime config source of truth: `apps/tools/wrangler.jsonc`
 
-Do not commit Cloudflare API tokens, dashboard tokens, Vercel env dumps, or raw
-database credentials. Secrets belong in Cloudflare Worker secrets or the
-deployment system.
+Do not commit Cloudflare API tokens, dashboard tokens, legacy platform env
+dumps, or raw database credentials. Secrets belong in Cloudflare Worker secrets
+or the deployment system.
 
 ## D1 Telemetry Database
 
@@ -111,9 +111,8 @@ user agent when available, then calls `recordToolRun`.
 Cloudflare context. `packages/tool-telemetry/src/d1.ts` owns D1 inserts,
 upserts, dashboard summaries, and status recomputation.
 
-If the D1 binding is unavailable, telemetry falls back to the legacy
-`DATABASE_URL` path. If neither D1 nor `DATABASE_URL` is configured, the
-endpoint returns success with `skipped: true` so local/dev requests do not fail.
+Telemetry is D1 only. If the binding is unavailable, the endpoint returns HTTP
+503 instead of discarding the event or writing to a compatibility database.
 
 ## Access Paths
 
@@ -148,7 +147,8 @@ Dashboard access:
 - Route: `/internal/tools`
 - Auth: query `token` must match the Worker secret
   `INTERNAL_DASHBOARD_TOKEN` when that secret is set.
-- Data source order: D1 binding first, then legacy Postgres fallback.
+- Data source: the `SERP_TOOLS_DB` D1 binding only. A missing binding is shown as
+  an error instead of falling back to another database.
 
 ## Cache And Optimization Bindings
 
@@ -185,11 +185,40 @@ Production was cut over to Cloudflare on 2026-06-20. The dated cutover and
 route-parity evidence is indexed under `docs/audits`; it is not a current
 deployment procedure.
 
-Vercel and Neon compatibility remains retirement work in GitHub issue #34.
-Do not extend the dormant full-application Vercel fallback. Native-binary APIs
-using FFmpeg, ImageMagick, Ghostscript, `yt-dlp`, Sharp, or child processes are
-a separate architecture decision; local Node.js success is not proof of
-Cloudflare Worker compatibility.
+Repository runtime and CI paths are Cloudflare-only. The legacy Postgres client,
+Drizzle schema/configuration, Vercel preview workflow, and Vercel comparison
+runners have been removed. External account retirement remains owner-controlled
+under GitHub issue #34; repository cleanup is not evidence that remote projects,
+domains, integrations, credentials, or databases have been deleted.
+
+Native-binary APIs using FFmpeg, ImageMagick, Ghostscript, `yt-dlp`, Sharp, or
+child processes remain a separate architecture concern. GitHub issue #67 owns
+explicit execution-profile and engine provenance; any replacement runtime also
+requires its own issue or accepted decision. Local Node.js success is not proof
+of Cloudflare Worker compatibility.
+
+### Owner-controlled legacy platform sequence
+
+The human owner must complete these operations with authorized provider access.
+Do not store production rows, credentials, or exports in the repository or in
+structured run artifacts.
+
+1. Create a protected export or snapshot of the legacy telemetry database in an
+   owner-controlled location outside the repository. Record only sanitized
+   provenance such as provider snapshot id, UTC time, cutoff, row count, and a
+   checksum in a dated audit.
+2. Perform a read-only reconciliation against production D1. Compare the
+   coverage window, counts, stable run ids at the cutoff, and documented
+   acceptable discrepancies. A repository test cannot substitute for this
+   production-data verification.
+3. After reconciliation is accepted, retire the bounded importer together with
+   its migration-source convention under issue #61.
+4. Disable the legacy Git integration, detach obsolete domains/rollback paths,
+   and remove the legacy project and database only after recovery and rollback
+   needs are signed off.
+5. Remove or rotate legacy provider credentials. Inspect ignored `.env*` files
+   for the retired database variable and remove the ignored `.vercel/` metadata
+   directory manually. Never commit, print, or blanket-delete those files.
 
 Before a human-controlled Cloudflare deployment, run the deterministic local
 checks and the production-faithful build. Deployed API canaries are separate

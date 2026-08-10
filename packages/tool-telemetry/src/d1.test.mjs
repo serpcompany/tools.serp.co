@@ -1,5 +1,3 @@
-/* global process */
-
 import test from "node:test";
 import assert from "node:assert/strict";
 import { getD1ToolsDashboardData } from "./d1.ts";
@@ -280,23 +278,11 @@ test("tool_status recalculates failure rate, medians, reduction, and last run", 
   assert.deepEqual(dashboard.failureRows[0].sampleMetadata, { urlHost: "videos.example" });
 });
 
-test("missing D1 binding still skips when Postgres is not configured", async () => {
-  const previousDatabaseUrl = process.env.DATABASE_URL;
-  delete process.env.DATABASE_URL;
-
-  try {
-    const result = await recordToolRun(event({}));
-    assert.equal(result.status, 200);
-    assert.deepEqual(result.body, {
-      ok: true,
-      skipped: true,
-      reason: "DATABASE_URL not set",
-    });
-  } finally {
-    if (previousDatabaseUrl === undefined) {
-      delete process.env.DATABASE_URL;
-    } else {
-      process.env.DATABASE_URL = previousDatabaseUrl;
-    }
-  }
+test("missing D1 binding fails instead of discarding telemetry", async () => {
+  const result = await recordToolRun(event({}));
+  assert.equal(result.status, 503);
+  assert.deepEqual(result.body, {
+    ok: false,
+    error: "D1 telemetry binding unavailable",
+  });
 });
