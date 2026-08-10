@@ -21,7 +21,7 @@ Before adding or changing any URL in the Tool registry under
 Run these commands before reporting any downloader lander or content change:
 
 ```bash
-pnpm lint:links
+pnpm check:links
 node scripts/validate-tools.mjs
 pnpm -C apps/tools typecheck
 ```

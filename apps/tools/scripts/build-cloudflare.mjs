@@ -4,6 +4,7 @@ const defaultAssetsBaseUrl = "https://assets.tools.serp.co";
 const defaultSiteUrl = "https://tools.serp.co";
 const env = {
   ...process.env,
+  NEXT_TELEMETRY_DISABLED: "1",
   NEXT_PUBLIC_ASSETS_BASE_URL:
     process.env.NEXT_PUBLIC_ASSETS_BASE_URL || defaultAssetsBaseUrl,
   NEXT_PUBLIC_SITE_URL:

@@ -8,15 +8,23 @@ Start with the [architecture map](./ARCHITECTURE.md),
 ## Common commands
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
+pnpm check
+pnpm build
 pnpm dev
 pnpm test
 pnpm lint
-pnpm lint:tools
-pnpm lint:links
+pnpm typecheck
+pnpm verify:catalog
 pnpm verify:docs
-pnpm -C apps/tools typecheck
+pnpm check:links
 ```
+
+`pnpm check` is the highest local verification seam. It composes deterministic
+lint, typechecking, the complete automated-test suite, agent/documentation/Tool
+catalog structural verification, and the production-faithful Cloudflare build.
+It does not exercise deployed systems or run link checks, canaries, benchmarks,
+syncs, uploads, deploys, or remote migrations.
 
 ## Test suite
 
@@ -24,7 +32,7 @@ Use Node.js `>=20 <23` and pnpm `10.4.1`. From a fresh clone:
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm test
+pnpm check
 ```
 
 The root test command discovers committed `node:test` entrypoints, rejects
@@ -49,10 +57,10 @@ content.productLinks.*
 content.sourceLinks[].url
 ```
 
-Before changing downloader page content, run:
+Before changing downloader page content, run the separate network-backed check:
 
 ```bash
-pnpm lint:links
+pnpm check:links
 ```
 
 For a single tool while editing:
@@ -91,7 +99,7 @@ git config core.hooksPath .githooks
 The hook runs:
 
 ```bash
-pnpm lint:links
+pnpm check:links
 node scripts/validate-tools.mjs
 ```
 
