@@ -290,6 +290,9 @@ importers:
       '@types/node':
         specifier: ^20.19.9
         version: 20.19.23
+      eslint:
+        specifier: ^9.34.0
+        version: 9.38.0(jiti@2.6.1)
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
