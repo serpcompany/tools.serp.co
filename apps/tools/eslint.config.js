@@ -14,7 +14,6 @@ const turboEnvAllowList = [
   "^NEXT_PUBLIC_MEDIA_FETCH_ENDPOINT$",
   "^R2_ASSETS_BUCKET$",
   "^SERVER_ACTION_RATE_LIMIT_SECRET$",
-  "^VERCEL_BASE_URL$",
   "^PORT$",
 ];
 

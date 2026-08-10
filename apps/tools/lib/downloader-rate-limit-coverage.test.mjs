@@ -73,7 +73,7 @@ test("all active download tools use the shared rate-limited downloader path", ()
   }
 });
 
-test("media fetch calls can be moved off Vercel with a public endpoint override", () => {
+test("media fetch calls support a public endpoint override", () => {
   assert.match(mediaFetchEndpointSource, /NEXT_PUBLIC_MEDIA_FETCH_ENDPOINT/);
   assert.match(mediaFetchEndpointSource, /NEXT_PUBLIC_DOWNLOADER_MEDIA_FETCH_ENDPOINT/);
   assert.match(mediaFetchEndpointSource, /DEFAULT_MEDIA_FETCH_ENDPOINT = "\/api\/media-fetch"/);

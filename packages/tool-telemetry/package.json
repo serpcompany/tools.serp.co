@@ -6,10 +6,6 @@
   "scripts": {
     "lint": "eslint . --max-warnings 0"
   },
-  "dependencies": {
-    "@serp-tools/app-core": "workspace:*",
-    "drizzle-orm": "^0.45.1"
-  },
   "devDependencies": {
     "@serp-tools/eslint-config": "workspace:^",
     "@serp-tools/typescript-config": "workspace:*",

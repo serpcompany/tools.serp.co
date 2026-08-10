@@ -7,16 +7,16 @@ evidence.
 
 ## Ownership map
 
-| Area                     | Owner                                  | Contract                                                                                                                                             |
-| ------------------------ | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Product application      | `apps/tools`                           | Next.js routes, application components, Tool execution, API handlers, metadata, sitemaps, and Cloudflare assembly for `tools.serp.co`.               |
-| Shared application core  | `packages/app-core`                    | Shared shell components, the versioned Tool registry and related catalog data, plus the legacy Postgres schema while its retirement remains tracked. |
-| Tool telemetry           | `packages/tool-telemetry`              | Browser/server event contracts, D1 persistence and summaries, and the temporary legacy Postgres telemetry path.                                      |
-| UI primitives            | `packages/ui`                          | Reusable presentation primitives, styles, and small UI utilities; no Tool or application policy.                                                     |
-| Lint configuration       | `packages/eslint-config`               | Shared ESLint configuration only.                                                                                                                    |
-| TypeScript configuration | `packages/typescript-config`           | Shared TypeScript configuration only.                                                                                                                |
-| Repository harness       | root `scripts` and root `package.json` | Repository-wide validation, generation, audit, and orchestration commands. Command roles are made explicit as the harness modernization proceeds.    |
-| Durable documentation    | root maps and `docs`                   | Current guidance, accepted decisions, and historical evidence as classified by the documentation index.                                              |
+| Area                     | Owner                                  | Contract                                                                                                                                          |
+| ------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Product application      | `apps/tools`                           | Next.js routes, application components, Tool execution, API handlers, metadata, sitemaps, and Cloudflare assembly for `tools.serp.co`.            |
+| Shared application core  | `packages/app-core`                    | Shared shell components, the versioned Tool registry, and related catalog data.                                                                   |
+| Tool telemetry           | `packages/tool-telemetry`              | Browser/server event contracts plus D1 persistence and summaries.                                                                                 |
+| UI primitives            | `packages/ui`                          | Reusable presentation primitives, styles, and small UI utilities; no Tool or application policy.                                                  |
+| Lint configuration       | `packages/eslint-config`               | Shared ESLint configuration only.                                                                                                                 |
+| TypeScript configuration | `packages/typescript-config`           | Shared TypeScript configuration only.                                                                                                             |
+| Repository harness       | root `scripts` and root `package.json` | Repository-wide validation, generation, audit, and orchestration commands. Command roles are made explicit as the harness modernization proceeds. |
+| Durable documentation    | root maps and `docs`                   | Current guidance, accepted decisions, and historical evidence as classified by the documentation index.                                           |
 
 `apps/tools` is the only deployable application. A package owns reusable code
 and data; it does not own application routes or deployment configuration.
@@ -27,8 +27,8 @@ Runtime dependencies point from the application toward packages and from
 higher-level shared packages toward lower-level primitives:
 
 ```text
-apps/tools ───────┬──> packages/tool-telemetry ──> packages/app-core ──> packages/ui
-                  ├──> packages/app-core ─────────────────────────────> packages/ui
+apps/tools ───────┬──> packages/tool-telemetry
+                  ├──> packages/app-core ──> packages/ui
                   └──> packages/ui
 ```
 
@@ -36,10 +36,6 @@ Build and lint configuration may be consumed by every workspace. Packages must
 not import from `apps/tools`, and dependency cycles between workspace packages
 are not permitted. Application-specific behavior stays in `apps/tools` until a
 real reusable contract justifies moving it into a package.
-
-The telemetry-to-app-core edge exists because the legacy server path consumes
-the shared Postgres schema. It is not permission to make telemetry depend on UI
-or application code, and it should disappear with the legacy database path.
 
 ## Canonical sources of truth
 
@@ -77,12 +73,9 @@ to the `tools-serp-co` Cloudflare Worker and routed to `tools.serp.co`.
   `https://assets.tools.serp.co`; this host is configuration, not a second
   application runtime.
 
-The current code still contains legacy Postgres fallback and native-binary
-compatibility paths. They are retirement scope tracked in GitHub, not an
-alternative production architecture to extend. Native FFmpeg, ImageMagick,
-Ghostscript, or `yt-dlp` execution requires an explicitly chosen compatible
-runtime; Cloudflare Workers support must not be inferred from local Node.js
-behavior.
+Native FFmpeg, ImageMagick, Ghostscript, or `yt-dlp` execution requires an
+explicitly chosen compatible runtime; Cloudflare Workers support must not be
+inferred from local Node.js behavior.
 
 Production deploys, remote migrations, provisioning, uploads, secrets, and
 destructive resource retirement remain human-controlled. See the current

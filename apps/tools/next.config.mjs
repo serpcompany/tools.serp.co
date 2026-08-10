@@ -121,7 +121,7 @@ if (ytDlpTrace) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use Vercel's Next.js runtime (no static export)
+  // Use the Next.js server runtime compiled by OpenNext (no static export)
   transpilePackages: [
     "@jsquash/jpeg",
     "@jsquash/oxipng",

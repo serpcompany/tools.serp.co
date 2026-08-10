@@ -39,15 +39,6 @@ export function readJsonFile(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
-export function tryReadJsonFile(filePath) {
-  try {
-    if (!fs.existsSync(filePath)) return null;
-    return readJsonFile(filePath);
-  } catch {
-    return null;
-  }
-}
-
 export function normalizePathname(value) {
   if (!value) return "/";
   const rawPath = value.startsWith("/") ? value : `/${value}`;
@@ -285,22 +276,6 @@ export function getPackageScripts() {
     appDevDependencies: appPackage.devDependencies ?? {},
     rootPackageManager: rootPackage.packageManager ?? null,
     rootEngines: rootPackage.engines ?? {},
-  };
-}
-
-export function getVercelProjectMetadata() {
-  const metadata = tryReadJsonFile(path.join(repoRoot, ".vercel/project.json"));
-  if (!metadata) return null;
-  return {
-    projectName: metadata.projectName ?? null,
-    projectId: metadata.projectId ?? null,
-    orgId: metadata.orgId ?? null,
-    framework: metadata.settings?.framework ?? null,
-    rootDirectory: metadata.settings?.rootDirectory ?? null,
-    nodeVersion: metadata.settings?.nodeVersion ?? null,
-    buildCommand: metadata.settings?.buildCommand ?? null,
-    installCommand: metadata.settings?.installCommand ?? null,
-    outputDirectory: metadata.settings?.outputDirectory ?? null,
   };
 }
 
