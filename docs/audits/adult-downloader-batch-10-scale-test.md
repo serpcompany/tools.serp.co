@@ -1,5 +1,13 @@
 # Adult downloader batch 10 scale test
 
+Historical evidence only.
+
+- Observed: 2026-05-18 at revision
+  `373c3fbf50a623c74f866fde31999d2260ce9432`
+- Scope: rows 11–20 of the then-local missing-adult-downloader input
+- Limitation: referenced `tmp/` inputs and outputs were not retained, so this
+  record is not reproducible and does not establish current capability
+
 Batch: rows 11-20 from `tmp/missing-adult-downloader-routes.csv`.
 
 Domains:

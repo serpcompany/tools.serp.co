@@ -16,36 +16,6 @@ const SKIPPED_DIRECTORIES = new Set([
   'tmp',
 ]);
 const RETIRED_CATEGORIES = ['docs/knowledge/', 'docs/planner/', 'docs/plans/'];
-const RETIRED_CATEGORY_BASELINE = new Set([
-  'docs/knowledge/adsense.md',
-  'docs/knowledge/amr-audio-conversion.md',
-  'docs/knowledge/apng-image-convert.md',
-  'docs/knowledge/benchmark-transcribe-tools.md',
-  'docs/knowledge/category-pages.md',
-  'docs/knowledge/cloudflare-operations.md',
-  'docs/knowledge/compression-pipeline.md',
-  'docs/knowledge/dev-server-ports.md',
-  'docs/knowledge/dev-server-postcss.md',
-  'docs/knowledge/download-loom-videos.md',
-  'docs/knowledge/downloader-ads.md',
-  'docs/knowledge/downloader-page-requirements.md',
-  'docs/knowledge/downloader-rate-limit.md',
-  'docs/knowledge/ffmpeg-benchmark-2026-01-20.md',
-  'docs/knowledge/fixtures-office.md',
-  'docs/knowledge/image-canvas-grouping.md',
-  'docs/knowledge/jsquash-webp-next-build.md',
-  'docs/knowledge/lint-next-lint-deprecation.md',
-  'docs/knowledge/pdf-viewer-editor.md',
-  'docs/knowledge/server-action-rate-limit.md',
-  'docs/knowledge/shared-site-footer.md',
-  'docs/knowledge/tool-operation-taxonomy.md',
-  'docs/knowledge/tools-link-hub.md',
-  'docs/planner/README.md',
-  'docs/planner/pdf-tools.md',
-  'docs/plans/2026-05-17-adult-downloader-capability-testing-plan.md',
-  'docs/plans/2026-05-17-adult-downloader-competitor-first-scale-plan.md',
-  'docs/plans/2026-05-17-adult-downloader-scale-plan.md',
-]);
 
 function parseRoot(args) {
   const rootIndex = args.indexOf('--root');
@@ -257,10 +227,7 @@ if (!existsSync(indexPath)) {
 }
 
 for (const document of documents) {
-  if (
-    RETIRED_CATEGORIES.some((category) => document.startsWith(category)) &&
-    !RETIRED_CATEGORY_BASELINE.has(document)
-  ) {
+  if (RETIRED_CATEGORIES.some((category) => document.startsWith(category))) {
     report(
       `retired-document-category: ${document} (move current guidance to an owned runbook or package README; move dated evidence to docs/audits)`,
     );

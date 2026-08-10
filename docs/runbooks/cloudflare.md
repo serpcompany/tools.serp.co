@@ -48,17 +48,17 @@ internal tools dashboard.
 
 `tool_runs`
 
-| Column | Type | Null | Notes |
-| --- | --- | --- | --- |
-| `id` | `TEXT` | no | Primary key. This is the telemetry `runId`. |
-| `tool_id` | `TEXT` | no | Tool registry id. |
-| `status` | `TEXT` | no | One of `started`, `succeeded`, or `failed`. |
-| `started_at` | `TEXT` | no | ISO timestamp text. |
-| `duration_ms` | `INTEGER` | yes | Completed run duration. |
-| `input_bytes` | `INTEGER` | yes | Input payload size when known. |
-| `output_bytes` | `INTEGER` | yes | Output payload size when known. |
-| `error_code` | `TEXT` | yes | Failure classifier. |
-| `metadata` | `TEXT` | yes | JSON text; validated with `json_valid(metadata)`. |
+| Column         | Type      | Null | Notes                                             |
+| -------------- | --------- | ---- | ------------------------------------------------- |
+| `id`           | `TEXT`    | no   | Primary key. This is the telemetry `runId`.       |
+| `tool_id`      | `TEXT`    | no   | Tool registry id.                                 |
+| `status`       | `TEXT`    | no   | One of `started`, `succeeded`, or `failed`.       |
+| `started_at`   | `TEXT`    | no   | ISO timestamp text.                               |
+| `duration_ms`  | `INTEGER` | yes  | Completed run duration.                           |
+| `input_bytes`  | `INTEGER` | yes  | Input payload size when known.                    |
+| `output_bytes` | `INTEGER` | yes  | Output payload size when known.                   |
+| `error_code`   | `TEXT`    | yes  | Failure classifier.                               |
+| `metadata`     | `TEXT`    | yes  | JSON text; validated with `json_valid(metadata)`. |
 
 Indexes:
 
@@ -67,15 +67,15 @@ Indexes:
 
 `tool_status`
 
-| Column | Type | Null | Notes |
-| --- | --- | --- | --- |
-| `tool_id` | `TEXT` | no | Primary key. |
-| `status` | `TEXT` | no | `unknown`, `live`, `degraded`, or `broken`. |
-| `last_run_at` | `TEXT` | yes | Latest run timestamp. |
-| `failure_rate_24h` | `REAL` | yes | Failed completed runs divided by completed runs. |
-| `median_duration_ms` | `INTEGER` | yes | Median duration over the last 24 hours. |
-| `median_reduction_pct` | `REAL` | yes | Median compression/reduction percentage. |
-| `updated_at` | `TEXT` | no | ISO timestamp text. |
+| Column                 | Type      | Null | Notes                                            |
+| ---------------------- | --------- | ---- | ------------------------------------------------ |
+| `tool_id`              | `TEXT`    | no   | Primary key.                                     |
+| `status`               | `TEXT`    | no   | `unknown`, `live`, `degraded`, or `broken`.      |
+| `last_run_at`          | `TEXT`    | yes  | Latest run timestamp.                            |
+| `failure_rate_24h`     | `REAL`    | yes  | Failed completed runs divided by completed runs. |
+| `median_duration_ms`   | `INTEGER` | yes  | Median duration over the last 24 hours.          |
+| `median_reduction_pct` | `REAL`    | yes  | Median compression/reduction percentage.         |
+| `updated_at`           | `TEXT`    | no   | ISO timestamp text.                              |
 
 The migration that creates these tables is
 `apps/tools/migrations/0001_tool_telemetry.sql`.
@@ -133,9 +133,11 @@ pnpm -C apps/tools exec wrangler d1 migrations list SERP_TOOLS_DB --remote --pre
 pnpm -C apps/tools exec wrangler d1 migrations list SERP_TOOLS_DB --remote
 ```
 
-The import script reads `tmp/tool_runs.json` by default, or `tmp/tool_runs.csv`
-as a fallback. Keep import files under the repo `tmp/` directory and remove
-them after the import is verified.
+The legacy reconciliation importer accepts an explicit source with
+`--source <protected-path>`. Its repository `tmp/` defaults are temporary
+compatibility behavior tracked for retirement by GitHub issues #34 and #61;
+do not treat that directory as durable artifact storage. Production exports
+must remain outside the repository and under human control.
 
 Per repo policy, do not run ad-hoc SQL or database shell commands against local,
 preview, staging, or production databases unless the user explicitly approves
@@ -177,25 +179,25 @@ The external FFmpeg/WASM asset host remains
 `https://assets.tools.serp.co`, configured through
 `NEXT_PUBLIC_ASSETS_BASE_URL`.
 
-## Cutover Notes
+## Production and retirement boundary
 
-Do not retire Vercel until native-binary API routes are either proven on
-Cloudflare or moved to a compatible runtime. Known risky routes include
-server-side conversion, compression, and media-fetch endpoints that use
-`ffmpeg`, `magick`, `exiftool`, `ghostscript`, `yt-dlp`, `sharp`, or
-`child_process`.
+Production was cut over to Cloudflare on 2026-06-20. The dated cutover and
+route-parity evidence is indexed under `docs/audits`; it is not a current
+deployment procedure.
 
-Before DNS cutover, run:
+Vercel and Neon compatibility remains retirement work in GitHub issue #34.
+Do not extend the dormant full-application Vercel fallback. Native-binary APIs
+using FFmpeg, ImageMagick, Ghostscript, `yt-dlp`, Sharp, or child processes are
+a separate architecture decision; local Node.js success is not proof of
+Cloudflare Worker compatibility.
+
+Before a human-controlled Cloudflare deployment, run the deterministic local
+checks and the production-faithful build. Deployed API canaries are separate
+live-system operations and must name their target:
 
 ```bash
 pnpm -C apps/tools lint
 pnpm -C apps/tools typecheck
 pnpm -C apps/tools cf:build
-pnpm -C apps/tools audit:cf:api-smoke -- --base-url https://tools-serp-co.serpcompany.workers.dev --no-fail
-```
-
-For route parity, run:
-
-```bash
-pnpm -C apps/tools audit:cf:parity -- --vercel-url https://tools.serp.co --cloudflare-url https://tools-serp-co.serpcompany.workers.dev --include-noslash --concurrency 6 --timeout-ms 20000 --report docs/audits/cloudflare-worker-full-route-crawl.md --json tmp/cloudflare-worker-full-route-crawl.json --no-fail
+pnpm -C apps/tools audit:cf:api-smoke -- --base-url <deployed-preview-url> --no-fail
 ```

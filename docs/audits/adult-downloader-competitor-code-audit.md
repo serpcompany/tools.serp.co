@@ -1,5 +1,13 @@
 # Adult downloader competitor public-code audit
 
+Historical evidence only.
+
+- Observed: 2026-05-18 at revision
+  `373c3fbf50a623c74f866fde31999d2260ce9432`
+- Scope: public competitor HTML, JavaScript, and repositories named below
+- Limitation: local raw reports were not retained; availability, licensing,
+  and behavior must be revalidated before any reuse
+
 Generated from public HTML/JS only. No credentials, bypass, or private server code access.
 
 Primary raw report:

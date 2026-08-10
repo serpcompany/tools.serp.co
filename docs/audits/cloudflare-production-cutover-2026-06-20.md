@@ -1,5 +1,13 @@
 # Cloudflare Production Cutover - 2026-06-20
 
+Historical evidence only.
+
+- Observed: 2026-06-20; retained at revision
+  `4526054ddad8a82ab42382114f32ab50c9b41186`
+- Scope: the production cutover gates and observations recorded below
+- Limitation: rollback advice and platform observations reflect the cutover
+  window, not current operating procedure; use the Cloudflare runbook instead
+
 ## Status
 
 Cutover completed after the existing Vercel DNS record was removed or replaced and `pnpm -C apps/tools cf:deploy` was rerun.
