@@ -1,30 +1,19 @@
 # Agent instructions for tools.serp.co
 
-## Downloader lander outbound-link policy
+Use this file as a routing map. Keep detailed project knowledge beside its owner
+and use installed skills for generic TDD, review, GitHub, and safety procedures.
 
-Do not add guessed outbound links to downloader landers.
+## Repository knowledge
 
-Before adding or changing any URL in `packages/app-core/src/data/tools.json` under `content.productLinks` or `content.sourceLinks`:
+- Work state and tracker conventions: `docs/agents/issue-tracker.md`
+- Triage vocabulary: `docs/agents/triage-labels.md`
+- Domain documentation and ADR convention: `docs/agents/domain.md`
+- Current repository overview: `README.md`
+- Current Cloudflare runtime and data operations: `docs/knowledge/cloudflare-operations.md`
 
-1. Verify the exact URL with HTTP.
-2. Do not invent GitHub repo URLs, app URLs, support URLs, source URLs, or product URLs from a slug.
-3. If a URL returns `404` or `410`, remove it or leave the field blank.
-4. If the source site blocks HEAD/GET with anti-bot status but does not return `404`/`410`, document it as reachable-but-blocked only when necessary; do not replace it with an unverified alternate URL.
-5. Never add Official Links that point users back to the source platform/site itself, e.g. `Tube8` -> `https://www.tube8.com/`. Those links do not help SERP and should be omitted.
-6. Prefer the verified `serp.ly` product/extension URL over guessed `apps.serp.co` or `github.com/serpapps/...` URLs.
+Treat dated audits as evidence at their recorded date, not as current operating
+truth. Prefer the nearest scoped `AGENTS.md` when one exists.
 
-Run this before reporting any downloader lander/content change:
+## Scoped policies
 
-```bash
-pnpm lint:links
-node scripts/validate-tools.mjs
-pnpm -C apps/tools typecheck
-```
-
-For a single page while editing:
-
-```bash
-node scripts/validate-lander-outbound-links.mjs --tool-id=<tool-id>
-```
-
-The outbound-link check is intentionally wired into repo lint hooks so fake lander links fail locally instead of shipping.
+- Downloader lander outbound links: `docs/agents/downloader-lander-links.md`
