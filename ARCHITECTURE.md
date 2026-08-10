@@ -10,7 +10,7 @@ evidence.
 | Area                     | Owner                                  | Contract                                                                                                                                          |
 | ------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Product application      | `apps/tools`                           | Next.js routes, application components, Tool execution, API handlers, metadata, sitemaps, and Cloudflare assembly for `tools.serp.co`.            |
-| Shared application core  | `packages/app-core`                    | Shared shell components, the versioned Tool registry, and related catalog data.                                                                   |
+| Shared application core  | `packages/app-core`                    | Shared shell components, the versioned Tool registry, its read-only Tool Catalog interface, and related catalog data.                             |
 | Tool telemetry           | `packages/tool-telemetry`              | Browser/server event contracts plus D1 persistence and summaries.                                                                                 |
 | UI primitives            | `packages/ui`                          | Reusable presentation primitives, styles, and small UI utilities; no Tool or application policy.                                                  |
 | Lint configuration       | `packages/eslint-config`               | Shared ESLint configuration only.                                                                                                                 |
@@ -41,7 +41,7 @@ real reusable contract justifies moving it into a package.
 
 | Concern                                        | Canonical source                                                               | Boundary                                                                                                                                  |
 | ---------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Shipped Tool catalog intent                    | `packages/app-core/src/data/tools.json`                                        | Owns registry id, route, operation, active/inactive intent, formats, and catalog content. It does not prove correctness or health.        |
+| Shipped Tool catalog intent                    | `packages/app-core/src/data/tools.json`                                        | Sole versioned authority for shipped catalog intent. It does not prove correctness or health.                                             |
 | Executable Tool behavior                       | Dispatch, workers, components, and API routes under `apps/tools`               | Code owns what executes. Registry flags and dependency names are not sufficient provenance by themselves.                                 |
 | Related applications and network brands        | JSON data under `packages/app-core/src/data`                                   | These are separate catalogs and must not be inferred from Tool names or routes.                                                           |
 | Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                        | Imports show actual consumption; planner fields do not override manifests or code.                                                        |
@@ -51,6 +51,11 @@ real reusable contract justifies moving it into a package.
 | Runtime observations                           | D1 `tool_runs` and derived `tool_status`                                       | Time-bound evidence for instrumented Tool ids, not catalog or work state.                                                                 |
 | Active work                                    | GitHub Issues for this repository                                              | Issues, dependencies, labels, and assignees own readiness, blockers, and ownership. Repository plans are not a parallel tracker.          |
 | Current documentation classification           | `docs/README.md`                                                               | Every durable Markdown document must be indexed as current guidance, historical/advisory evidence, or legacy material awaiting migration. |
+
+Consumers migrate through
+`packages/app-core/src/lib/tool-catalog.ts`. That read-only boundary validates
+and projects registry identity, routes, taxonomy, publication intent, and
+content without adding verification or runtime claims.
 
 Registry Tool id is the join key across catalog intent, fixtures, verification,
 runtime observations, planning evidence, and GitHub work. Names, routes, and

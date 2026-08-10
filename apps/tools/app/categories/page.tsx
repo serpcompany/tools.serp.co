@@ -1,17 +1,14 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
-import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { buildCategoriesIndexMetadata } from "@/lib/metadata";
-import {
-  buildToolDirectoryEntries,
-  getToolDirectoryCategories,
-} from "@/lib/tool-directory";
-import type { Tool } from "@/types";
+import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
+import { ToolsLinkHub } from '@/components/sections/ToolsLinkHub';
+import { buildCategoriesIndexMetadata } from '@/lib/metadata';
 
-const tools = buildToolDirectoryEntries(toolsData as Tool[]);
-const categories = getToolDirectoryCategories(tools);
-const activeToolCount = categories.reduce((sum, category) => sum + category.count, 0);
+const categories = toolCatalog.directoryCategories;
+const activeToolCount = categories.reduce(
+  (sum, category) => sum + category.count,
+  0,
+);
 
 export const metadata = buildCategoriesIndexMetadata();
 
@@ -28,8 +25,8 @@ export default function Page() {
               Browse Tool Categories
             </h1>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-600">
-              Jump into every active SERP Tools category and browse the tools available in each
-              one.
+              Jump into every active SERP Tools category and browse the tools
+              available in each one.
             </p>
           </div>
 
