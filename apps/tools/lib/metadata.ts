@@ -1,52 +1,29 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
-import {
-  getCategoryPageContent,
-  getCategoryPagePath,
-} from "@/lib/tool-directory";
-import {
-  buildOperationFallbackDescription,
-  isToolOperation,
-} from "@/lib/tool-operations";
-import { toolContent } from "@/lib/tool-content";
-import { normalizePath } from "@/lib/sitemap";
-import type { Tool } from "@/types";
-
-const tools = toolsData as Tool[];
-
-const buildFallbackDescription = (tool: Tool) => {
-  return buildOperationFallbackDescription({
-    operation: tool.operation,
-    from: tool.from,
-    to: tool.to,
-    description: tool.description,
-  });
-};
+import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
 
 export function buildToolMetadata(toolId: string): Metadata {
-  const tool = tools.find((item) => item.id === toolId && item.isActive);
-  if (!tool) {
+  const tool = toolCatalog.getById(toolId);
+  if (!tool?.isActive) {
     return {};
   }
 
-  const content = toolContent[toolId];
-  const title = content?.tool.title ?? tool.name;
-  const description = content?.tool.subtitle ?? tool.description ?? buildFallbackDescription(tool);
-  const canonical = tool.route ? normalizePath(tool.route) : undefined;
+  const title = tool.display.title;
+  const description = tool.display.description;
+  const canonical = tool.canonicalRoute;
 
   return {
     title: `${title} | SERP Tools`,
     description,
-    alternates: canonical ? { canonical } : undefined,
+    alternates: { canonical },
     openGraph: {
       title,
       description,
-      type: "website",
+      type: 'website',
       url: canonical,
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description,
     },
@@ -54,35 +31,38 @@ export function buildToolMetadata(toolId: string): Metadata {
 }
 
 export function buildCategoryMetadata(categoryName: string): Metadata {
-  if (!isToolOperation(categoryName)) {
+  const category = toolCatalog.directoryCategories.find(
+    (candidate) => candidate.id === categoryName,
+  );
+  if (!category) {
     return {};
   }
 
-  const content = getCategoryPageContent(categoryName);
-  const canonical = normalizePath(getCategoryPagePath(categoryName));
+  const canonical = category.href;
 
   return {
-    title: `${content.title} | SERP Tools`,
-    description: content.description,
+    title: `${category.title} | SERP Tools`,
+    description: category.description,
     alternates: { canonical },
     openGraph: {
-      title: content.title,
-      description: content.description,
-      type: "website",
+      title: category.title,
+      description: category.description,
+      type: 'website',
       url: canonical,
     },
     twitter: {
-      card: "summary_large_image",
-      title: content.title,
-      description: content.description,
+      card: 'summary_large_image',
+      title: category.title,
+      description: category.description,
     },
   };
 }
 
 export function buildCategoriesIndexMetadata(): Metadata {
-  const title = "Categories";
-  const description = "Browse every SERP Tools category and jump into the tools available in each one.";
-  const canonical = normalizePath("/categories/");
+  const title = 'Categories';
+  const description =
+    'Browse every SERP Tools category and jump into the tools available in each one.';
+  const canonical = '/categories/';
 
   return {
     title: `${title} | SERP Tools`,
@@ -91,11 +71,11 @@ export function buildCategoriesIndexMetadata(): Metadata {
     openGraph: {
       title,
       description,
-      type: "website",
+      type: 'website',
       url: canonical,
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description,
     },

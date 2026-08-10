@@ -1,20 +1,17 @@
-import toolsData from "@serp-tools/app-core/data/tools.json";
-import { getCategoryPagePaths } from "@/lib/tool-directory";
-import type { Tool } from "@/types";
+import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
 
 export const PAGE_SIZE = 10000;
 
-export const STATIC_PATHS = ["/", "/categories/", "/brands/"];
-const CATEGORY_PATHS = getCategoryPagePaths(toolsData as Tool[]);
+export const STATIC_PATHS = ['/', '/categories/', '/brands/'];
 
 export const escapeXml = (value: string) =>
-  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-export const normalizeBase = (site: string) => site.replace(/\/$/, "");
+export const normalizeBase = (site: string) => site.replace(/\/$/, '');
 
 export const buildUrl = (base: string, path: string) => `${base}${path}`;
 
-const dedupePaths = (paths: string[]) => {
+const dedupePaths = (paths: readonly string[]) => {
   const seen = new Set<string>();
   return paths.map(normalizePath).filter((path) => {
     if (seen.has(path)) return false;
@@ -24,16 +21,18 @@ const dedupePaths = (paths: string[]) => {
 };
 
 export function normalizePath(path: string) {
-  if (!path) return "/";
-  const withSlash = path.startsWith("/") ? path : `/${path}`;
-  if (withSlash === "/") return "/";
-  return withSlash.endsWith("/") ? withSlash : `${withSlash}/`;
+  if (!path) return '/';
+  const withSlash = path.startsWith('/') ? path : `/${path}`;
+  if (withSlash === '/') return '/';
+  return withSlash.endsWith('/') ? withSlash : `${withSlash}/`;
 }
 
 export function resolveSiteBase(request: Request) {
   const envBase = process.env.NEXT_PUBLIC_SITE_URL;
   if (envBase) {
-    const withProtocol = envBase.startsWith("http") ? envBase : `https://${envBase}`;
+    const withProtocol = envBase.startsWith('http')
+      ? envBase
+      : `https://${envBase}`;
     return normalizeBase(withProtocol);
   }
   return normalizeBase(new URL(request.url).origin);
@@ -44,15 +43,14 @@ export function getPagePaths() {
 }
 
 export function getToolPaths() {
-  const toolPaths = toolsData
-    .filter((tool) => tool.isActive)
-    .map((tool) => tool.route)
-    .filter((path): path is string => Boolean(path));
+  const toolPaths = toolCatalog.activeTools.map((tool) => tool.canonicalRoute);
   return dedupePaths(toolPaths);
 }
 
 export function getCategoryPaths() {
-  return dedupePaths(CATEGORY_PATHS);
+  return dedupePaths(
+    toolCatalog.directoryCategories.map((category) => category.href),
+  );
 }
 
 export function getSitemapPaths() {

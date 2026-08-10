@@ -9,6 +9,7 @@ import {
   buildToolDirectoryEntries,
   getToolDirectoryCategories,
 } from './tool-directory.ts';
+import { getPagePaths } from './sitemap.ts';
 
 const categoriesPageUrl = new URL(
   '../app/categories/page.tsx',
@@ -18,10 +19,6 @@ const categoriesPagePath = fileURLToPath(categoriesPageUrl);
 const categoriesPageSource = existsSync(categoriesPagePath)
   ? readFileSync(categoriesPageUrl, 'utf8')
   : '';
-const sitemapSource = readFileSync(
-  new URL('./sitemap.ts', import.meta.url),
-  'utf8',
-);
 
 test('categories hub route consumes the Tool Catalog end to end', () => {
   assert.notEqual(categoriesPageSource, '');
@@ -34,7 +31,7 @@ test('categories hub route consumes the Tool Catalog end to end', () => {
 });
 
 test('static sitemap paths include the categories hub page', () => {
-  assert.match(sitemapSource, /"\/categories\/"/);
+  assert.ok(getPagePaths().includes('/categories/'));
 });
 
 test('catalog migration preserves category names, counts, routes, and ordering', () => {

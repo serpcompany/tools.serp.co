@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+import { getPagePaths } from "./sitemap.ts";
+
 const networkBrands = JSON.parse(
   readFileSync(
     new URL("../../../packages/app-core/src/data/network-brands.json", import.meta.url),
@@ -14,7 +16,6 @@ const brandsPagePath = fileURLToPath(brandsPageUrl);
 const brandsPageSource = existsSync(brandsPagePath)
   ? readFileSync(brandsPageUrl, "utf8")
   : "";
-const sitemapSource = readFileSync(new URL("./sitemap.ts", import.meta.url), "utf8");
 
 test("brands route exists and is backed by network brands data", () => {
   assert.notEqual(brandsPageSource, "");
@@ -53,5 +54,5 @@ test("brands page renders compact directory brand cards", () => {
 });
 
 test("static sitemap paths include the brands page", () => {
-  assert.match(sitemapSource, /"\/brands\/"/);
+  assert.ok(getPagePaths().includes("/brands/"));
 });
