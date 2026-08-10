@@ -2,29 +2,44 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseCatalogSyncMode } from "./lib/catalog-sync-mode.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const DATA_PATH = path.resolve(__dirname, "../packages/app-core/src/data/extensions.json");
+const DATA_PATH = path.resolve(
+  __dirname,
+  "../packages/app-core/src/data/extensions.json",
+);
+const inputAuthority = "exact Chrome Web Store URLs in extensions.json";
+const ownedOutput = "packages/app-core/src/data/extensions.json";
 
-const CHROME_HOSTS = new Set(["chromewebstore.google.com", "chrome.google.com"]);
+const CHROME_HOSTS = new Set([
+  "chromewebstore.google.com",
+  "chrome.google.com",
+]);
 
 function decodeEscapedUrl(value) {
   return value
     .replace(/\\u002F/g, "/")
     .replace(/\\u003d/gi, "=")
     .replace(/\\\//g, "/")
-    .replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) =>
+      String.fromCharCode(parseInt(hex, 16)),
+    )
     .replace(/&amp;/g, "&");
 }
 
 function extractIcon(html) {
-  const srcsetMatch = html.match(/srcset=["'](https:\/\/lh3\.googleusercontent\.com\/[^"'\s]*=s120[^"'\s]*)/i);
+  const srcsetMatch = html.match(
+    /srcset=["'](https:\/\/lh3\.googleusercontent\.com\/[^"'\s]*=s120[^"'\s]*)/i,
+  );
   if (srcsetMatch) {
     return decodeEscapedUrl(srcsetMatch[1]);
   }
 
-  const directMatch = html.match(/https:\/\/lh3\.googleusercontent\.com\/[^"']*s120[^"']*/i);
+  const directMatch = html.match(
+    /https:\/\/lh3\.googleusercontent\.com\/[^"']*s120[^"']*/i,
+  );
   if (directMatch) {
     return decodeEscapedUrl(directMatch[0]);
   }
@@ -44,7 +59,8 @@ function extractScreenshots(html) {
   }
 
   if (results.size === 0) {
-    const dataAttrRegex = /data-media-url=["'](https:\/\/lh3\.googleusercontent\.com[^"']+)["']/g;
+    const dataAttrRegex =
+      /data-media-url=["'](https:\/\/lh3\.googleusercontent\.com[^"']+)["']/g;
     let attrMatch;
     while ((attrMatch = dataAttrRegex.exec(html)) !== null) {
       const decoded = decodeEscapedUrl(attrMatch[1]);
@@ -62,13 +78,17 @@ function extractScreenshots(html) {
 async function fetchHtml(url) {
   const response = await fetch(url, {
     headers: {
-      "User-Agent": "SerpTemplates/1.0 (+https://serptemplates.com)"
+      "User-Agent": "SerpTemplates/1.0 (+https://serptemplates.com)",
     },
-    redirect: "follow"
+    redirect: "follow",
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+    const error = new Error(
+      `Failed to fetch Chrome Web Store entry: ${response.status} ${response.statusText}`,
+    );
+    error.status = response.status;
+    throw error;
   }
 
   return response.text();
@@ -84,44 +104,100 @@ function shouldUpdateExtension(extension) {
   }
 }
 
-async function updateExtensions() {
-  const original = await readFile(DATA_PATH, "utf8");
+export async function updateExtensions({
+  dataPath = DATA_PATH,
+  write = false,
+  fetchStoreHtml = fetchHtml,
+} = {}) {
+  const original = await readFile(dataPath, "utf8");
   const extensions = JSON.parse(original);
 
   let updated = false;
+  let unreachable = 0;
+  let confirmedRemovals = 0;
+  const proposedChanges = [];
   for (const extension of extensions) {
     if (!shouldUpdateExtension(extension)) continue;
 
     try {
-      const html = await fetchHtml(extension.chromeStoreUrl);
+      const html = await fetchStoreHtml(extension.chromeStoreUrl);
       const icon = extractIcon(html);
       const screenshots = extractScreenshots(html);
+      if (!icon && screenshots.length === 0) {
+        throw new Error("Chrome Web Store response was not recognizable");
+      }
 
       if (icon && extension.icon !== icon) {
         extension.icon = icon;
         updated = true;
+        proposedChanges.push(`${extension.slug}: icon`);
       }
 
       if (screenshots.length > 0) {
-        if (JSON.stringify(extension.screenshots ?? []) !== JSON.stringify(screenshots)) {
+        if (
+          JSON.stringify(extension.screenshots ?? []) !==
+          JSON.stringify(screenshots)
+        ) {
           extension.screenshots = screenshots;
           updated = true;
+          proposedChanges.push(`${extension.slug}: screenshots`);
         }
       }
     } catch (error) {
-      console.error(`Failed to update ${extension.slug}:`, error.message);
+      if (new Set([404, 410]).has(error?.status)) {
+        confirmedRemovals += 1;
+        console.error(
+          `Confirmed store removal for ${extension.slug}; retained existing catalog data for human review.`,
+        );
+      } else {
+        unreachable += 1;
+        console.error(
+          `Transient external unreachability for ${extension.slug}; retained existing catalog data:`,
+          error.message,
+        );
+      }
     }
   }
 
-  if (updated) {
-    await writeFile(DATA_PATH, `${JSON.stringify(extensions, null, 2)}\n`, "utf8");
-    console.log("✅ Updated extensions.json with Chrome Web Store assets.");
+  console.log(`Input authority: ${inputAuthority}`);
+  console.log(`Owned output: ${ownedOutput}`);
+  console.log(
+    `Proposed diff: ${proposedChanges.length ? proposedChanges.join(", ") : "no changes"}`,
+  );
+  console.log(
+    `External unreachable: ${unreachable}; confirmed removals: ${confirmedRemovals}`,
+  );
+  if (write && updated) {
+    await writeFile(
+      dataPath,
+      `${JSON.stringify(extensions, null, 2)}\n`,
+      "utf8",
+    );
+    console.log(
+      "Updated extensions.json with reviewed Chrome Web Store assets.",
+    );
   } else {
-    console.log("ℹ️ No changes needed.");
+    console.log(
+      write ? "No changes needed." : "Check mode: repository unchanged.",
+    );
   }
+  return { changed: updated, proposedChanges, unreachable, confirmedRemovals };
 }
 
-updateExtensions().catch((error) => {
-  console.error("Unexpected error:", error);
-  process.exitCode = 1;
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  let options;
+  try {
+    options = parseCatalogSyncMode(process.argv.slice(2));
+  } catch (error) {
+    console.error(
+      error instanceof Error
+        ? error.message
+        : "Extension sync arguments are invalid",
+    );
+    process.exit(1);
+  }
+  updateExtensions(options).catch((error) => {
+    console.error("Unexpected error:", error);
+    process.exitCode = 1;
+  });
+}

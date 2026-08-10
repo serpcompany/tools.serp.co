@@ -39,6 +39,7 @@ dated observations belong in `docs/audits`; advisory inputs belong in
 - [Artifact lifecycle and safe cleanup](./runbooks/artifacts.md)
 - [Cloudflare operations](./runbooks/cloudflare.md)
 - [Command roles and authority](./runbooks/commands.md)
+- [Catalog synchronization](./runbooks/catalog-syncs.md)
 
 ## Historical evidence
 
