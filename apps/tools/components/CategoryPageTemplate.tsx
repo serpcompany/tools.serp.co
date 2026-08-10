@@ -1,13 +1,16 @@
-import Link from "next/link";
+import Link from 'next/link';
+import type {
+  ToolDirectoryCategory,
+  ToolDirectoryEntry,
+} from '@serp-tools/app-core/lib/tool-catalog';
 
-import { ToolCard } from "@/components/ToolCard";
-import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import type { ToolDirectoryCategory, ToolDirectoryEntry } from "@/lib/tool-directory";
+import { ToolCard } from '@/components/ToolCard';
+import { ToolsLinkHub } from '@/components/sections/ToolsLinkHub';
 
 type CategoryPageTemplateProps = {
   activeCategory: ToolDirectoryCategory;
-  categories: ToolDirectoryCategory[];
-  tools: ToolDirectoryEntry[];
+  categories: readonly ToolDirectoryCategory[];
+  tools: readonly ToolDirectoryEntry[];
 };
 
 export default function CategoryPageTemplate({
@@ -15,7 +18,7 @@ export default function CategoryPageTemplate({
   categories,
   tools,
 }: CategoryPageTemplateProps) {
-  const toolCountLabel = `${tools.length} ${tools.length === 1 ? "tool" : "tools"}`;
+  const toolCountLabel = `${tools.length} ${tools.length === 1 ? 'tool' : 'tools'}`;
 
   return (
     <main className="min-h-screen bg-background">
@@ -56,8 +59,8 @@ export default function CategoryPageTemplate({
                   href={category.href}
                   className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                     isActive
-                      ? "border-slate-900 bg-slate-900 text-white"
-                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-slate-950"
+                      ? 'border-slate-900 bg-slate-900 text-white'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-slate-950'
                   }`}
                 >
                   {category.name} ({category.count})
@@ -74,8 +77,8 @@ export default function CategoryPageTemplate({
             Browse {toolCountLabel} in {activeCategory.name}
           </h2>
           <p className="mt-3 text-base leading-7 text-slate-600">
-            Every active {activeCategory.name.toLowerCase()} tool currently available on SERP
-            Tools is listed below.
+            Every active {activeCategory.name.toLowerCase()} tool currently
+            available on SERP Tools is listed below.
           </p>
         </div>
 

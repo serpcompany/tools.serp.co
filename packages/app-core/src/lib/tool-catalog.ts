@@ -106,11 +106,15 @@ type CatalogFormatInfo = {
 
 export type CatalogToolContent = DeepReadonly<{
   tool: {
+    id?: string;
+    route?: string;
+    operation?: ToolOperation;
     title: string;
     subtitle: string;
     from: string;
     to: string;
     accept?: string;
+    requiresFFmpeg?: boolean;
   };
   videoSection?: { embedId?: string };
   faqs?: readonly { question: string; answer: string }[];
@@ -484,12 +488,37 @@ function validateToolContent(content: RegistryRecord, location: string): void {
     location,
   );
 
-  validateStringObject(
-    requiredRecord(content, 'tool', location),
-    ['title', 'subtitle', 'from', 'to'],
-    ['accept'],
+  const tool = requiredRecord(content, 'tool', location);
+  assertAllowedFields(
+    tool,
+    [
+      'id',
+      'route',
+      'operation',
+      'title',
+      'subtitle',
+      'from',
+      'to',
+      'accept',
+      'requiresFFmpeg',
+    ],
     `${location}.tool`,
   );
+  for (const field of ['title', 'subtitle', 'from', 'to']) {
+    requiredString(tool, field, `${location}.tool`);
+  }
+  for (const field of ['id', 'route', 'operation', 'accept']) {
+    optionalString(tool, field, `${location}.tool`);
+  }
+  optionalBoolean(tool, 'requiresFFmpeg', `${location}.tool`);
+  if (tool.operation !== undefined && !isToolOperation(tool.operation)) {
+    throw new TypeError(
+      `${location}.tool.operation must be a supported Tool operation`,
+    );
+  }
+  if (typeof tool.route === 'string') {
+    validateRoute(tool.route, `${location}.tool`);
+  }
 
   const videoSection = optionalRecord(content, 'videoSection', location);
   if (videoSection) {

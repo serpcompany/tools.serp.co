@@ -158,10 +158,14 @@ test('catalog exposes explicit missing facts and registry-backed display fallbac
       route: '/content-tool',
       content: {
         tool: {
+          id: 'content-tool',
+          route: '/content-tool',
+          operation: 'convert',
           title: 'Content title',
           subtitle: 'Content subtitle',
           from: 'source',
           to: 'target',
+          requiresFFmpeg: true,
         },
       },
     }),
@@ -188,6 +192,11 @@ test('catalog exposes explicit missing facts and registry-backed display fallbac
     from: 'alpha',
     to: 'beta',
   });
+  assert.equal(catalog.getById('content-tool')?.content?.tool.id, 'content-tool');
+  assert.equal(
+    catalog.getById('content-tool')?.content?.tool.requiresFFmpeg,
+    true,
+  );
   assert.equal('status' in fallback, false);
   assert.equal('verified' in fallback, false);
 });

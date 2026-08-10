@@ -21,10 +21,15 @@ test('category sitemap paths are not left empty', () => {
   assert.match(sitemapSource, /getCategoryPaths/);
 });
 
-test('category route preserves Cloudflare-compatible registry-backed pages', () => {
+test('category route preserves Cloudflare-compatible catalog-backed pages', () => {
   assert.match(categoryPageSource, /generateStaticParams/);
   assert.doesNotMatch(categoryPageSource, /dynamicParams = false/);
   assert.match(categoryPageSource, /isToolOperation/);
+  assert.match(categoryPageSource, /toolCatalog/);
+  assert.match(categoryPageSource, /directoryCategories/);
+  assert.match(categoryPageSource, /getDirectoryTools/);
+  assert.doesNotMatch(categoryPageSource, /data\/tools\.json/);
+  assert.doesNotMatch(categoryPageSource, /tool-directory/);
   assert.match(categoryPageSource, /return notFound\(\)/);
   assert.match(categoryPageSource, /buildCategoryMetadata/);
 });

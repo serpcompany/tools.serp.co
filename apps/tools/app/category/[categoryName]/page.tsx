@@ -1,20 +1,14 @@
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
-import CategoryPageTemplate from "@/components/CategoryPageTemplate";
-import { buildCategoryMetadata } from "@/lib/metadata";
 import {
-  buildToolDirectoryEntries,
-  getAvailableToolOperations,
-  getToolDirectoryCategories,
-  getToolsForDirectoryCategory,
-} from "@/lib/tool-directory";
-import { isToolOperation } from "@/lib/tool-operations";
-import type { Tool } from "@/types";
+  isToolOperation,
+  toolCatalog,
+} from '@serp-tools/app-core/lib/tool-catalog';
+import CategoryPageTemplate from '@/components/CategoryPageTemplate';
+import { buildCategoryMetadata } from '@/lib/metadata';
 
-const tools = buildToolDirectoryEntries(toolsData as Tool[]);
-const categories = getToolDirectoryCategories(tools);
-const availableOperations = getAvailableToolOperations(toolsData as Tool[]);
+const categories = toolCatalog.directoryCategories;
+const availableOperations = toolCatalog.availableOperations;
 
 type PageProps = {
   params: Promise<{ categoryName: string }>;
@@ -35,12 +29,14 @@ export default async function Page({ params }: PageProps) {
     return notFound();
   }
 
-  const activeCategory = categories.find((category) => category.id === categoryName);
+  const activeCategory = categories.find(
+    (category) => category.id === categoryName,
+  );
   if (!activeCategory) {
     return notFound();
   }
 
-  const categoryTools = getToolsForDirectoryCategory(tools, categoryName);
+  const categoryTools = toolCatalog.getDirectoryTools(categoryName);
   if (categoryTools.length === 0) {
     return notFound();
   }

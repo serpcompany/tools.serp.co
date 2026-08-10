@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { Search, ChevronDown, X } from "lucide-react";
+import { useState, useRef, useEffect } from 'react';
+import { Search, ChevronDown, X } from 'lucide-react';
 
 type Category = {
   id: string;
@@ -12,7 +12,7 @@ type Category = {
 type ToolsSearchBarProps = {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  categories: Category[];
+  categories: readonly Category[];
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
 };
@@ -30,7 +30,10 @@ export function ToolsSearchBar({
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     }
@@ -38,7 +41,8 @@ export function ToolsSearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const selectedCategoryName = categories.find(c => c.id === selectedCategory)?.name || "All Tools";
+  const selectedCategoryName =
+    categories.find((c) => c.id === selectedCategory)?.name || 'All Tools';
 
   return (
     <div className="mb-8">
@@ -62,11 +66,18 @@ export function ToolsSearchBar({
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="w-full h-[48px] px-4 py-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-gray-300 transition-colors flex items-center justify-between"
           >
-            <span className={selectedCategory === 'all' ? 'text-gray-500' : 'text-gray-900'}>
+            <span
+              className={
+                selectedCategory === 'all' ? 'text-gray-500' : 'text-gray-900'
+              }
+            >
               {selectedCategoryName}
             </span>
-            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''
-              }`} />
+            <ChevronDown
+              className={`h-4 w-4 text-gray-400 transition-transform ${
+                dropdownOpen ? 'rotate-180' : ''
+              }`}
+            />
           </div>
 
           {dropdownOpen && (
@@ -78,11 +89,16 @@ export function ToolsSearchBar({
                     setSelectedCategory(category.id);
                     setDropdownOpen(false);
                   }}
-                  className={`w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors flex items-center justify-between ${selectedCategory === category.id ? 'bg-blue-50 text-blue-600' : ''
-                    }`}
+                  className={`w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors flex items-center justify-between ${
+                    selectedCategory === category.id
+                      ? 'bg-blue-50 text-blue-600'
+                      : ''
+                  }`}
                 >
                   <span>{category.name}</span>
-                  <span className="text-sm text-gray-500">({category.count})</span>
+                  <span className="text-sm text-gray-500">
+                    ({category.count})
+                  </span>
                 </button>
               ))}
             </div>
@@ -107,9 +123,14 @@ export function ToolsSearchBar({
       {/* Results count */}
       {(searchQuery || selectedCategory !== 'all') && (
         <div className="mt-4 text-sm text-gray-600">
-          Showing results for: {searchQuery && <span className="font-medium">&ldquo;{searchQuery}&rdquo;</span>}
+          Showing results for:{' '}
+          {searchQuery && (
+            <span className="font-medium">&ldquo;{searchQuery}&rdquo;</span>
+          )}
           {searchQuery && selectedCategory !== 'all' && ' in '}
-          {selectedCategory !== 'all' && <span className="font-medium">{selectedCategoryName}</span>}
+          {selectedCategory !== 'all' && (
+            <span className="font-medium">{selectedCategoryName}</span>
+          )}
         </div>
       )}
     </div>
