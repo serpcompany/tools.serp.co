@@ -82,7 +82,7 @@ function assertSafeSlug(value, optionName) {
 
 function redactReport(report) {
   const safeLine =
-    /^(?:status=(?:success|failure|cancelled)|(?:checks-passed|checks-failed|items|bytes|duration-ms)=\d+)$/;
+    /^(?:status=(?:success|failure|cancelled)|(?:checks-passed|checks-failed|items|bytes|duration-ms|samples|min-ms|p50-ms|p95-ms|max-ms)=\d+)$/;
 
   return `${report
     .split(/\r?\n/)

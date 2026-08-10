@@ -41,8 +41,8 @@ test("Cloudflare builds externalize oversized ffmpeg assets to the public asset 
 
 test("Workers static asset bundle excludes ffmpeg files that exceed Cloudflare limits", () => {
   assert.match(packageJson.scripts["cf:build"], /build-cloudflare\.mjs/);
-  assert.match(packageJson.scripts["cf:preview"], /wrangler dev/);
-  assert.match(packageJson.scripts["cf:deploy"], /wrangler deploy/);
+  assert.match(packageJson.scripts["preview:cloudflare:local"], /wrangler dev --local/);
+  assert.match(packageJson.scripts["deploy:cloudflare:production"], /wrangler deploy/);
   assert.match(buildCloudflareSource, /opennextjs-cloudflare/);
   assert.match(buildCloudflareSource, /prepare-workers-assets\.mjs/);
   assert.match(buildCloudflareSource, /NEXT_PUBLIC_ASSETS_BASE_URL/);
@@ -53,7 +53,7 @@ test("Workers static asset bundle excludes ffmpeg files that exceed Cloudflare l
 });
 
 test("ffmpeg R2 upload helper publishes the same public paths used by the app", () => {
-  assert.match(packageJson.scripts["r2:upload-ffmpeg-assets"], /upload-r2-ffmpeg-assets\.mjs/);
+  assert.match(packageJson.scripts["upload:r2:ffmpeg:production"], /upload-r2-ffmpeg-assets\.mjs/);
   assert.match(uploadR2AssetsSource, /tools-serp-co-assets/);
   assert.match(uploadR2AssetsSource, /"--remote"/);
   assert.match(uploadR2AssetsSource, /public[\s\S]*vendor[\s\S]*ffmpeg/);

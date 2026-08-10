@@ -91,6 +91,18 @@ Application-only checks are `pnpm -C apps/tools lint` and
 network-backed checks are separate operations and must not be described as
 part of the deterministic test result.
 
+Run browser correctness and performance separately from the repository root:
+
+```bash
+pnpm smoke:tools:browser -- --environment local --revision <40-character-commit>
+pnpm benchmark:tools:browser -- --environment local --revision <40-character-commit>
+```
+
+Both write sanitized structured evidence under `.artifacts/runs`; neither
+writes a raw result file into `scripts`. Command targets, side effects, and
+human-control boundaries are documented in
+[`docs/runbooks/commands.md`](../../docs/runbooks/commands.md).
+
 ## Adding a Tool
 
 1. Add or update the registry entry with a stable Tool id, route, operation,

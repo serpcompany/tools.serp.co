@@ -11,7 +11,8 @@ Start with the [architecture map](./ARCHITECTURE.md),
 pnpm install --frozen-lockfile
 pnpm check
 pnpm build
-pnpm dev
+pnpm dev:local
+pnpm preview:cloudflare:local
 pnpm test
 pnpm lint
 pnpm typecheck
@@ -26,6 +27,10 @@ lint, typechecking, the complete automated-test suite, agent/documentation/Tool
 catalog structural verification, and the production-faithful Cloudflare build.
 It does not exercise deployed systems or run link checks, canaries, benchmarks,
 syncs, uploads, deploys, or remote migrations.
+
+Live, mutating, development, preview, smoke, and benchmark operations are
+listed with their side effects and authority boundaries in the
+[command roles runbook](./docs/runbooks/commands.md).
 
 Nontrivial local and CI evidence uses the structured run manifest described in
 the [artifact lifecycle runbook](./docs/runbooks/artifacts.md). Local evidence

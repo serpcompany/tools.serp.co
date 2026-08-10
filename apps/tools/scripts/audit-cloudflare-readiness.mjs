@@ -340,9 +340,9 @@ function renderMarkdown(audit) {
     ["typecheck", audit.packageInfo.app.typecheck ?? ""],
     ["lint", audit.packageInfo.app.lint ?? ""],
     ["cf:build", audit.packageInfo.app["cf:build"] ?? ""],
-    ["d1:migrate:preview", audit.packageInfo.app["d1:migrate:preview"] ?? ""],
-    ["d1:migrate:prod", audit.packageInfo.app["d1:migrate:prod"] ?? ""],
-    ["r2:upload-ffmpeg-assets", audit.packageInfo.app["r2:upload-ffmpeg-assets"] ?? ""],
+    ["migrate:d1:preview:remote", audit.packageInfo.app["migrate:d1:preview:remote"] ?? ""],
+    ["migrate:d1:production:remote", audit.packageInfo.app["migrate:d1:production:remote"] ?? ""],
+    ["upload:r2:ffmpeg:production", audit.packageInfo.app["upload:r2:ffmpeg:production"] ?? ""],
   ];
 
   return [

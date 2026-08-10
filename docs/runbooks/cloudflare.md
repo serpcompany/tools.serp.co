@@ -120,10 +120,10 @@ endpoint returns success with `skipped: true` so local/dev requests do not fail.
 Supported project commands:
 
 ```bash
-pnpm -C apps/tools d1:migrate:preview
-pnpm -C apps/tools d1:migrate:prod
-pnpm -C apps/tools d1:import:preview
-pnpm -C apps/tools d1:import:prod
+pnpm -C apps/tools migrate:d1:preview:remote
+pnpm -C apps/tools migrate:d1:production:remote
+pnpm -C apps/tools import:d1:preview:remote
+pnpm -C apps/tools import:d1:production:remote
 ```
 
 Migration status through Wrangler:
@@ -199,5 +199,12 @@ live-system operations and must name their target:
 pnpm -C apps/tools lint
 pnpm -C apps/tools typecheck
 pnpm -C apps/tools cf:build
-pnpm -C apps/tools audit:cf:api-smoke -- --base-url <deployed-preview-url> --no-fail
+pnpm canary:cloudflare:deployed -- \
+  --environment preview \
+  --base-url <deployed-preview-origin> \
+  --revision <40-character-deployed-commit>
 ```
+
+The canary performs safe reads by default. Telemetry writes and native API
+checks require `--allow-telemetry-write` and `--include-native`, respectively.
+Every run records sanitized structured evidence under `.artifacts/runs`.

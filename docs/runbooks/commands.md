@@ -1,0 +1,60 @@
+# Command roles and authority
+
+Command names describe the target and effect. Do not replace an explicit role
+with a shorter alias. `pnpm check` remains the deterministic, read-only local
+gate; none of the live, mutating, or performance roles below belongs in it.
+
+## Local development and preview
+
+| Command                                         | Network access                                                                   | Repository writes                                                    | External writes                                  | Authority and evidence                                                                                                                    |
+| ----------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev:local -- [supported Next.js options]` | Serves locally; application behavior may call configured services                | Reproducible `.next` cache only                                      | None by the wrapper                              | Agent-safe. Supported arguments are forwarded explicitly; Turbopack and remote trace upload are refused. No retained evidence by default. |
+| `pnpm preview:cloudflare:local`                 | Local Wrangler preview; application requests may call configured public services | Ignored Cloudflare build caches, `.open-next`, and `.wrangler/state` | None; `wrangler dev --local` is not a deployment | Agent-safe. This is distinct from any remote preview and from production deploy. No retained evidence by default.                         |
+
+Use `pnpm dev:local -- --port 3100 --hostname 127.0.0.1` to request an
+exact port and hostname. The wrapper also supports the local HTTPS and
+source-map flags listed by `pnpm dev:local -- --help`. It rejects unknown
+arguments instead of silently ignoring them.
+
+## Smoke, benchmark, and deployed canary
+
+These commands have network access to their named target and write a structured
+artifact under ignored `.artifacts/runs`. They do not write raw JSON, Markdown,
+responses, URLs, filenames, or credentials. See the
+[artifact lifecycle runbook](./artifacts.md).
+
+| Command                                                                                                                | Purpose                                                 | Target and side effects                                                                                                                                                                                                                                                        | Authority and evidence                                                                                                                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm smoke:tools:browser -- --environment <local\|preview\|production> --revision <commit> [--base-url <origin>]`     | Browser correctness assertions with registered fixtures | Reads the target and performs the Tool interactions under test. It does not collect performance as a result dimension.                                                                                                                                                         | Local is agent-safe. A deployed target requires explicit target authorization. Records command, revision, environment class, all/subset scope, selected-Tool hash, result counts, runtime, and expiry.                              |
+| `pnpm benchmark:tools:browser -- --environment <local\|preview\|production> --revision <commit> [--base-url <origin>]` | Browser navigation performance measurement              | Reads the target. It does not execute Tool correctness/fixture assertions.                                                                                                                                                                                                     | Local is agent-safe. A deployed target requires explicit target authorization. Records all/subset scope, selected-Tool hash, and sanitized sample count/min/p50/p95/max navigation timings.                                         |
+| `pnpm canary:cloudflare:deployed -- --environment <preview\|production> --base-url <origin> --revision <commit>`       | Deployed Cloudflare route/API canary                    | Has network access and performs safe reads by default. `--allow-telemetry-write` explicitly adds one synthetic telemetry write. `--include-native` explicitly exercises native-processing POSTs. `MEDIA_FETCH_CANARY_URL` adds its named native check through the environment. | Requires explicit authorization for the target. Production secrets stay in environment variables and never appear in arguments or artifacts. Always records a structured artifact; failures cannot be masked with a no-fail option. |
+
+The revision is the full 40-character commit actually running at the target.
+`preview` evidence maps to the pull-request retention class; `production`
+evidence maps to `main`. Browser local runs may add `--dirty` when uncommitted
+inputs contributed.
+
+## Data, upload, generation, and deploy roles
+
+These operations are excluded from `pnpm check`. Remote external writes are
+human-controlled. An implementation agent may inspect commands and use an
+available dry-run, but must not provision, remotely migrate/import, upload, or
+deploy without explicit human direction.
+
+| App command (`pnpm -C apps/tools …`)       | Target and writes                                                    | Authority                                                                                                      |
+| ------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `generate:cloudflare:types`                | Reads Wrangler configuration and modifies generated repository types | Generator contract; check/write behavior is owned by issue #59. Review the repository diff.                    |
+| `migrate:d1:local`                         | Writes only local Wrangler D1 state                                  | Agent-safe when required by an implementation issue.                                                           |
+| `import:d1:local`                          | Reads an explicitly selected source and writes local D1 state        | Agent-safe only with non-sensitive fixture data. Legacy reconciliation rules remain in the Cloudflare runbook. |
+| `provision:d1:preview`                     | Creates a remote preview D1 database; external write                 | Human-controlled.                                                                                              |
+| `provision:d1:production`                  | Creates a remote production D1 database; external write              | Human-controlled.                                                                                              |
+| `migrate:d1:preview:remote`                | Applies migrations to remote preview D1; external write              | Human-controlled.                                                                                              |
+| `migrate:d1:production:remote`             | Applies migrations to production D1; external write                  | Human-controlled.                                                                                              |
+| `import:d1:preview:remote`                 | Imports reconciled rows into remote preview D1; external write       | Human-controlled.                                                                                              |
+| `import:d1:production:remote`              | Imports reconciled rows into production D1; external write           | Human-controlled.                                                                                              |
+| `upload:r2:ffmpeg:production -- --dry-run` | Prints the proposed production R2 object uploads; no external write  | Agent-safe inspection after the Cloudflare build creates the source assets.                                    |
+| `upload:r2:ffmpeg:production`              | Uploads public FFmpeg assets to production R2; external write        | Human-controlled.                                                                                              |
+| `deploy:cloudflare:production`             | Builds and deploys the production Worker; external write             | Human-controlled. Merge, secrets, routes, and deployment approval remain with the human owner.                 |
+
+There is no remote-preview deployment alias. A future remote preview topology
+must receive its own target-specific command and reviewed authority contract.

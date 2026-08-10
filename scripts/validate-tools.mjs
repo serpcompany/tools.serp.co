@@ -79,12 +79,12 @@ if (await pathExists(componentsDir)) {
 const toolsPackagePath = path.join(root, "apps/tools/package.json");
 if (await pathExists(toolsPackagePath)) {
   const toolsPackage = JSON.parse(await fs.readFile(toolsPackagePath, "utf8"));
-  const devScript = toolsPackage.scripts?.dev ?? "";
-  if (!devScript.includes("next dev")) {
-    fail("apps/tools/package.json dev script must run next dev.");
+  const devScript = toolsPackage.scripts?.["dev:local"] ?? "";
+  if (!devScript.includes("node scripts/dev.mjs")) {
+    fail("apps/tools/package.json dev:local script must use the local development wrapper.");
   }
   if (devScript.includes("--turbopack")) {
-    fail("apps/tools/package.json dev script must not use --turbopack (module workers break).");
+    fail("apps/tools/package.json dev:local script must not use --turbopack (module workers break).");
   }
   const deps = { ...(toolsPackage.dependencies ?? {}), ...(toolsPackage.devDependencies ?? {}) };
   if (!deps["ffmpeg-static"]) {

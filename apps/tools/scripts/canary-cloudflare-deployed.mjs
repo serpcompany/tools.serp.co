@@ -7,6 +7,7 @@ import {
   getWranglerConfig,
   repoRoot,
 } from "./lib/cloudflare-audit.mjs";
+import { recordRunEvidence } from "../../../scripts/lib/run-evidence.mjs";
 
 const DEFAULT_TIMEOUT_MS = 30000;
 
@@ -17,50 +18,39 @@ function parseArgs(argv) {
 
   const wrangler = getWranglerConfig();
   const args = {
+    environment: "",
+    revision: "",
     baseUrl: process.env.CLOUDFLARE_BASE_URL || "",
     internalToken: process.env.INTERNAL_DASHBOARD_TOKEN || "",
     assetBaseUrl:
       process.env.NEXT_PUBLIC_ASSETS_BASE_URL ||
       wrangler?.vars?.NEXT_PUBLIC_ASSETS_BASE_URL ||
       "https://assets.tools.serp.co",
-    mediaUrl: process.env.MEDIA_FETCH_SMOKE_URL || "",
-    reportPath: "",
-    jsonPath: "",
+    mediaUrl: process.env.MEDIA_FETCH_CANARY_URL || "",
     timeoutMs: DEFAULT_TIMEOUT_MS,
     allowTelemetryWrite: false,
     includeNative: false,
-    noFail: false,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
+    if (arg === "--environment") {
+      args.environment = argv[index + 1] ?? "";
+      index += 1;
+      continue;
+    }
+    if (arg === "--revision") {
+      args.revision = argv[index + 1] ?? "";
+      index += 1;
+      continue;
+    }
     if (arg === "--base-url") {
       args.baseUrl = argv[index + 1] ?? "";
       index += 1;
       continue;
     }
-    if (arg === "--internal-token") {
-      args.internalToken = argv[index + 1] ?? "";
-      index += 1;
-      continue;
-    }
     if (arg === "--asset-base-url") {
       args.assetBaseUrl = argv[index + 1] ?? "";
-      index += 1;
-      continue;
-    }
-    if (arg === "--media-url") {
-      args.mediaUrl = argv[index + 1] ?? "";
-      index += 1;
-      continue;
-    }
-    if (arg === "--report") {
-      args.reportPath = path.resolve(repoRoot, argv[index + 1] ?? "");
-      index += 1;
-      continue;
-    }
-    if (arg === "--json") {
-      args.jsonPath = path.resolve(repoRoot, argv[index + 1] ?? "");
       index += 1;
       continue;
     }
@@ -77,34 +67,66 @@ function parseArgs(argv) {
       args.includeNative = true;
       continue;
     }
-    if (arg === "--no-fail") {
-      args.noFail = true;
-      continue;
-    }
     if (arg === "-h" || arg === "--help") {
       console.log(
         [
-          "Usage: node scripts/smoke-cloudflare-api.mjs --base-url <url> [options]",
+          "Usage: node scripts/canary-cloudflare-deployed.mjs --environment <preview|production> --base-url <url> --revision <40-character-commit> [options]",
+          "",
+          "Runs safe reads by default and writes a structured artifact.",
           "",
           "Options:",
+          "  --environment <preview|production>  Target environment. Required.",
+          "  --base-url <url>                     Deployed HTTPS origin. Required.",
+          "  --revision <40-character-commit>     Exact deployed revision. Required.",
           "  --asset-base-url <url>       Asset host for FFmpeg static assets.",
-          "  --internal-token <token>     Token for /internal/tools dashboard readback.",
           "  --allow-telemetry-write      POST a synthetic telemetry event.",
           "  --include-native             Exercise native processor APIs.",
-          "  --media-url <url>            Public media URL for /api/media-fetch.",
           "  --timeout-ms <n>             Per-request timeout. Default 30000.",
-          "  --report <path>              Write a Markdown report.",
-          "  --json <path>                Write raw JSON results.",
-          "  --no-fail                    Exit 0 even when checks fail.",
+          "",
+          "Secrets and MEDIA_FETCH_CANARY_URL are accepted only through the environment.",
         ].join("\n"),
       );
       process.exit(0);
     }
-    throw new Error(`Unknown argument: ${arg}`);
+    throw new Error("Unknown deployed canary argument");
   }
 
+  if (!args.environment) {
+    throw new Error("--environment is required");
+  }
+  if (!new Set(["preview", "production"]).has(args.environment)) {
+    throw new Error("--environment must be preview or production");
+  }
   if (!args.baseUrl) {
     throw new Error("--base-url is required");
+  }
+  if (!/^[a-f0-9]{40}$/.test(args.revision)) {
+    throw new Error(
+      "--revision requires the full 40-character deployed commit",
+    );
+  }
+  for (const [name, value] of [
+    ["--base-url", args.baseUrl],
+    ["--asset-base-url", args.assetBaseUrl],
+  ]) {
+    let url;
+    try {
+      url = new URL(value);
+    } catch {
+      throw new Error(`${name} must be a sanitized HTTPS origin`);
+    }
+    if (
+      url.protocol !== "https:" ||
+      url.username ||
+      url.password ||
+      url.pathname !== "/" ||
+      url.search ||
+      url.hash
+    ) {
+      throw new Error(
+        `${name} must be a sanitized HTTPS origin without a query`,
+      );
+    }
   }
   if (!Number.isInteger(args.timeoutMs) || args.timeoutMs < 1000) {
     throw new Error("--timeout-ms must be an integer >= 1000");
@@ -189,7 +211,8 @@ function assetChecks(args) {
     name: `asset ${assetPath}`,
     url: buildUrl(args.assetBaseUrl, assetPath),
     headers: { range: "bytes=0-0" },
-    expect: (response, bytes) => [200, 206].includes(response.status) && bytes.length > 0,
+    expect: (response, bytes) =>
+      [200, 206].includes(response.status) && bytes.length > 0,
     details: (response, bytes) => ({
       contentType: response.headers.get("content-type"),
       contentRange: response.headers.get("content-range"),
@@ -227,7 +250,8 @@ function safeGetChecks(args) {
       name: "GET /internal/tools/ with token",
       url: url.toString(),
       expect: (response, bytes) =>
-        response.status === 200 && bytes.includes(Buffer.from("Tools Dashboard")),
+        response.status === 200 &&
+        bytes.includes(Buffer.from("Tools Dashboard")),
       details: (response, bytes) => ({
         contentType: response.headers.get("content-type"),
         bytes: bytes.length,
@@ -239,7 +263,7 @@ function safeGetChecks(args) {
 }
 
 function telemetryCheck(args) {
-  const runId = `cf-audit-${crypto.randomUUID()}`;
+  const runId = `cf-canary-${crypto.randomUUID()}`;
   return {
     name: "POST /api/telemetry synthetic started event",
     url: buildUrl(args.baseUrl, "/api/telemetry"),
@@ -247,11 +271,11 @@ function telemetryCheck(args) {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       runId,
-      toolId: "cloudflare-audit",
+      toolId: "cloudflare-canary",
       event: "tool_run_started",
       startedAt: new Date().toISOString(),
       metadata: {
-        audit: "vercel-retirement-cloudflare",
+        canary: "cloudflare-deployed",
       },
     }),
     expect: (response, bytes) => {
@@ -265,13 +289,18 @@ function telemetryCheck(args) {
     },
     details: (response, bytes) => ({
       contentType: response.headers.get("content-type"),
-      body: bytes.toString("utf8").slice(0, 300),
-      runId,
+      bytes: bytes.length,
     }),
   };
 }
 
 function nativeChecks(args) {
+  if (
+    process.env.NODE_ENV === "test" &&
+    process.env.TOOLS_SERP_TEST_CANARY_FAILURE === "native-fixtures"
+  ) {
+    throw new Error("Injected native fixture failure");
+  }
   const checks = [
     {
       name: "POST /api/image-compress?format=svg",
@@ -281,7 +310,8 @@ function nativeChecks(args) {
       body: readFixture("sample.svg"),
       expect: (response, bytes) =>
         response.status === 200 &&
-        contentTypeEssence(response.headers.get("content-type")) === "image/svg+xml" &&
+        contentTypeEssence(response.headers.get("content-type")) ===
+          "image/svg+xml" &&
         bytes.length > 0,
     },
     {
@@ -292,7 +322,8 @@ function nativeChecks(args) {
       body: readFixture("sample.png"),
       expect: (response, bytes) =>
         response.status === 200 &&
-        contentTypeEssence(response.headers.get("content-type")) === "image/jpeg" &&
+        contentTypeEssence(response.headers.get("content-type")) ===
+          "image/jpeg" &&
         bytes.length > 0,
     },
     {
@@ -313,7 +344,8 @@ function nativeChecks(args) {
       timeoutMs: Math.max(args.timeoutMs, 60000),
       expect: (response, bytes) =>
         response.status === 200 &&
-        contentTypeEssence(response.headers.get("content-type")) === "application/pdf" &&
+        contentTypeEssence(response.headers.get("content-type")) ===
+          "application/pdf" &&
         bytes.length > 0,
     },
   ];
@@ -337,8 +369,6 @@ function nativeChecks(args) {
       contentLength: response.headers.get("content-length"),
       setCookie: Boolean(response.headers.get("set-cookie")),
       bytes: bytes.length,
-      errorBody:
-        response.status >= 400 ? bytes.toString("utf8").slice(0, 500) : undefined,
     }),
   }));
 }
@@ -360,16 +390,22 @@ function skipped(name, reason) {
 
 function renderReport(payload) {
   const rows = payload.results.map((result) => {
-    const status = result.skipped ? "skipped" : result.passed ? "passed" : "failed";
+    const status = result.skipped
+      ? "skipped"
+      : result.passed
+        ? "passed"
+        : "failed";
     const detail = result.error || JSON.stringify(result.details ?? {});
     return `| ${result.name} | ${status} | ${result.status ?? "-"} | ${result.durationMs} | ${detail.replaceAll("|", "\\|")} |`;
   });
 
   return [
-    "# Cloudflare API Smoke Report",
+    "# Deployed Cloudflare Canary Report",
     "",
     `Generated: ${payload.generatedAt}`,
     "",
+    `- Target environment: ${payload.environment}`,
+    `- Deployed revision: ${payload.revision}`,
     `- Base URL: ${payload.baseUrl}`,
     `- Asset base URL: ${payload.assetBaseUrl}`,
     `- Passed: ${payload.summary.passed}`,
@@ -383,61 +419,139 @@ function renderReport(payload) {
   ].join("\n");
 }
 
-const args = parseArgs(process.argv.slice(2));
-const checks = [...assetChecks(args), ...safeGetChecks(args)];
-
-if (args.allowTelemetryWrite) {
-  checks.push(telemetryCheck(args));
-} else {
-  checks.push(skipped("POST /api/telemetry synthetic started event", "requires --allow-telemetry-write"));
-}
-
-if (args.includeNative) {
-  checks.push(...nativeChecks(args));
-} else {
-  checks.push(skipped("native processor API checks", "requires --include-native"));
-}
-
-if (!args.mediaUrl) {
-  checks.push(skipped("POST /api/media-fetch public media URL", "requires --media-url"));
-}
-
-const results = [];
-for (const check of checks) {
-  if (check.skipped) {
-    results.push(check);
-    continue;
-  }
-  results.push(await requestCheck(check, args));
-}
-
-const payload = {
-  generatedAt: new Date().toISOString(),
-  baseUrl: args.baseUrl,
-  assetBaseUrl: args.assetBaseUrl,
-  summary: {
-    passed: results.filter((result) => result.passed && !result.skipped).length,
-    failed: results.filter((result) => !result.passed).length,
-    skipped: results.filter((result) => result.skipped).length,
-  },
-  results,
-};
-
-if (args.jsonPath) {
-  fs.mkdirSync(path.dirname(args.jsonPath), { recursive: true });
-  fs.writeFileSync(args.jsonPath, JSON.stringify(payload, null, 2));
-  console.log(`Wrote ${path.relative(repoRoot, args.jsonPath)}`);
-}
-
-const markdown = renderReport(payload);
-if (args.reportPath) {
-  fs.mkdirSync(path.dirname(args.reportPath), { recursive: true });
-  fs.writeFileSync(args.reportPath, markdown);
-  console.log(`Wrote ${path.relative(repoRoot, args.reportPath)}`);
-} else {
-  console.log(markdown);
-}
-
-if (!args.noFail && payload.summary.failed > 0) {
+let args;
+try {
+  args = parseArgs(process.argv.slice(2));
+} catch (error) {
+  console.error(
+    error instanceof Error
+      ? error.message
+      : "Deployed canary arguments are invalid",
+  );
   process.exit(1);
+}
+const startedAt = new Date();
+const evidenceRepositoryRoot =
+  process.env.NODE_ENV === "test" && process.env.TOOLS_SERP_TEST_REPOSITORY_ROOT
+    ? path.resolve(process.env.TOOLS_SERP_TEST_REPOSITORY_ROOT)
+    : repoRoot;
+
+function recordCanaryEvidence(status, summary, completedAt = new Date()) {
+  return recordRunEvidence({
+    repositoryRoot: evidenceRepositoryRoot,
+    command: "canary:cloudflare:deployed",
+    commandVersion: "1",
+    revision: args.revision,
+    environment: args.environment === "production" ? "main" : "pull-request",
+    scope: `cloudflare-${args.environment}`,
+    status,
+    startedAt: startedAt.toISOString(),
+    completedAt: completedAt.toISOString(),
+    linkedWork: ["#58"],
+    summary: {
+      status,
+      ...summary,
+      durationMs: completedAt.valueOf() - startedAt.valueOf(),
+    },
+  });
+}
+
+try {
+  const checks = [...assetChecks(args), ...safeGetChecks(args)];
+
+  if (args.allowTelemetryWrite) {
+    checks.push(telemetryCheck(args));
+  } else {
+    checks.push(
+      skipped(
+        "POST /api/telemetry synthetic started event",
+        "requires --allow-telemetry-write",
+      ),
+    );
+  }
+
+  if (args.includeNative) {
+    checks.push(...nativeChecks(args));
+  } else {
+    checks.push(
+      skipped("native processor API checks", "requires --include-native"),
+    );
+  }
+
+  if (!args.mediaUrl) {
+    checks.push(
+      skipped(
+        "POST /api/media-fetch public media URL",
+        "requires MEDIA_FETCH_CANARY_URL",
+      ),
+    );
+  }
+
+  const results = [];
+  for (const check of checks) {
+    if (check.skipped) {
+      results.push(check);
+      continue;
+    }
+    results.push(await requestCheck(check, args));
+  }
+
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    environment: args.environment,
+    revision: args.revision,
+    baseUrl: args.baseUrl,
+    assetBaseUrl: args.assetBaseUrl,
+    summary: {
+      passed: results.filter((result) => result.passed && !result.skipped)
+        .length,
+      failed: results.filter((result) => !result.passed).length,
+      skipped: results.filter((result) => result.skipped).length,
+    },
+    results,
+  };
+
+  const markdown = renderReport(payload);
+  console.log(markdown);
+
+  const completedAt = new Date();
+  const evidenceStatus = payload.summary.failed > 0 ? "failure" : "success";
+  try {
+    const evidence = recordCanaryEvidence(
+      evidenceStatus,
+      {
+        checksPassed: payload.summary.passed,
+        checksFailed: payload.summary.failed,
+        items: results.length,
+      },
+      completedAt,
+    );
+    console.log(`Structured artifact: ${evidence.runId}`);
+  } catch (error) {
+    console.error(
+      error instanceof Error
+        ? error.message
+        : "Structured run artifact could not be recorded",
+    );
+    process.exitCode = 1;
+  }
+
+  if (payload.summary.failed > 0) {
+    process.exitCode = 1;
+  }
+} catch (error) {
+  try {
+    const evidence = recordCanaryEvidence("failure", {
+      checksPassed: 0,
+      checksFailed: 1,
+      items: 0,
+    });
+    console.error(`Structured failure artifact: ${evidence.runId}`);
+  } catch {
+    console.error("Structured canary failure artifact could not be recorded");
+  }
+  console.error(
+    error instanceof Error ? error.message : "Deployed canary failed",
+  );
+  process.exitCode = 1;
 }
