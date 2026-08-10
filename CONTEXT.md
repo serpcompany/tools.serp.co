@@ -1,0 +1,77 @@
+# Domain glossary
+
+This is the repository's shared domain vocabulary. Add terms only after a real
+ambiguity or durable distinction has been resolved.
+
+## Core terms
+
+**Tool** — A user-facing capability in the `tools.serp.co` catalog, identified
+by its registry `id`. A Tool can have a dedicated or shared implementation. Its
+publication intent, implementation, verification, and runtime health are
+separate facts.
+
+**Product** — A separately distributed SERP offering that a Tool or Lander may
+promote, such as an application or browser extension. A Product has its own
+destination and lifecycle; it is not the source website named by a downloader,
+and it is not made canonical by appearing in Lander content.
+
+**Lander** — A public page that presents a Tool or Product to a particular user
+intent. Multiple Landers may share one renderer or execution engine. A
+keyword- or source-specific downloader Lander is still represented by its own
+registry Tool id when it is shipped.
+
+**Registry Entry** — One versioned object in
+`packages/app-core/src/data/tools.json`. It records shipped catalog intent such
+as Tool identity, route, operation, publication state, formats, and content.
+`isActive` means intended for publication; it does not mean working, verified,
+healthy, or planned.
+
+## Execution profiles
+
+These are the only accepted execution profiles. They describe where the Tool's
+core transformation or operation runs.
+
+- **client-only** — The core operation runs in the user's browser. Static asset
+  delivery, telemetry, authentication, or unrelated network requests do not
+  change this profile.
+- **server-assisted** — The browser performs the core operation, but a server
+  provides a necessary supporting step such as safe remote-media retrieval.
+- **server-executed** — The server performs the core transformation or
+  operation.
+
+Calling a third-party source alone does not make a Tool server-assisted. The
+profile changes only when repository-owned server behavior is necessary to the
+Tool's operation.
+
+## Evidence dimensions
+
+Never collapse these dimensions into a single Tool `status`:
+
+- **Catalog intent** — identity, route, operation, formats, content, and
+  active/inactive publication intent from the registry.
+- **Implementation provenance** — processing location, capability or engine,
+  owning code/package, and whether that mapping is explicit or unknown.
+- **Fixture availability** — whether a named reproducible input exists. A
+  fixture does not prove the Tool works.
+- **Verification evidence** — the exact invariant or behavior checked at a
+  named revision, environment, scope, and time.
+- **Runtime observation** — instrumented runs and derived metrics observed in a
+  named environment and time window. No observation is not success or failure.
+- **Planning evidence** — candidate, prioritization, or research material. It
+  does not establish publication, correctness, or health.
+- **Work state** — requested work, readiness, blockers, and ownership in GitHub
+  Issues. Pull requests and commits are implementation and review evidence, not
+  work-state authorities.
+
+Unknown evidence remains `unknown` with the reason and the source needed to
+resolve it; absence must not be converted into a positive or negative claim.
+
+## Work state
+
+GitHub Issues is the sole authority for active work. Native issue dependencies
+express blockers; labels express the agreed triage state; assignees express
+ownership; commits and pull requests are implementation evidence. None of
+those facts alone proves that a Tool is published or healthy.
+
+The repository's accepted triage vocabulary is defined in
+[the triage label map](./docs/agents/triage-labels.md).

@@ -2,6 +2,9 @@
 
 Monorepo for tools.serp.co and shared SERP tool packages.
 
+Start with the [architecture map](./ARCHITECTURE.md),
+[domain glossary](./CONTEXT.md), and [documentation index](./docs/README.md).
+
 ## Common commands
 
 ```bash
@@ -10,6 +13,7 @@ pnpm dev
 pnpm lint
 pnpm lint:tools
 pnpm lint:links
+pnpm verify:docs
 pnpm -C apps/tools typecheck
 ```
 
