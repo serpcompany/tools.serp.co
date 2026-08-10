@@ -86,5 +86,5 @@ behavior.
 
 Production deploys, remote migrations, provisioning, uploads, secrets, and
 destructive resource retirement remain human-controlled. See the current
-[Cloudflare operations runbook](./docs/knowledge/cloudflare-operations.md) for
+[Cloudflare operations runbook](./docs/runbooks/cloudflare.md) for
 binding details and safe access paths.

@@ -1,5 +1,13 @@
 # Adult downloader 10 URL API smoke after yt-dlp direct streaming
 
+Historical evidence only.
+
+- Observed: 2026-05-18 at revision
+  `373c3fbf50a623c74f866fde31999d2260ce9432`
+- Scope: ten public downloader URLs exercised against the API behavior below
+- Limitation: source availability and extractor behavior are live,
+  time-dependent observations and do not establish current Tool health
+
 Change tested:
 
 - `apps/tools/app/api/media-fetch/route.ts`

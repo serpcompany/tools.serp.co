@@ -1,5 +1,13 @@
 # Adult Downloader Wave 0 Capability Report
 
+Historical evidence only.
+
+- Observed: 2026-05-18 at revision
+  `373c3fbf50a623c74f866fde31999d2260ce9432`
+- Scope: the ten Wave 0 rows listed below
+- Limitation: only one row had a verified sample and was actually probed;
+  `manual_review` is missing evidence, not a failure or current health state
+
 Rows classified: 10
 Rows with verified sample URL actually probed: 1
 Rows awaiting sample URL discovery: 9

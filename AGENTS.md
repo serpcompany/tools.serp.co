@@ -13,7 +13,7 @@ and use installed skills for generic TDD, review, GitHub, and safety procedures.
 - Domain documentation and ADR convention: `docs/agents/domain.md`
 - ADR creation and supersession guidance: `docs/adr/README.md`
 - Repository overview and commands: `README.md`
-- Current Cloudflare runtime and data operations: `docs/knowledge/cloudflare-operations.md`
+- Current Cloudflare runtime and data operations: `docs/runbooks/cloudflare.md`
 
 Treat dated audits as evidence at their recorded date, not as current operating
 truth. Prefer the nearest scoped `AGENTS.md` when one exists.

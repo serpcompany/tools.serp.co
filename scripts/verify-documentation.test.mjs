@@ -167,6 +167,28 @@ for (const retiredCategory of ['knowledge', 'plans', 'planner']) {
   });
 }
 
+test('documentation verifier rejects pre-migration catch-all documents', (t) => {
+  const root = createDocumentationFixture(t);
+  writeFixtureFile(
+    root,
+    'docs/knowledge/category-pages.md',
+    '# Category pages\n',
+  );
+  writeFixtureFile(
+    root,
+    'docs/README.md',
+    `${readFileSync(path.join(root, 'docs/README.md'), 'utf8')}- [Category pages](./knowledge/category-pages.md)\n`,
+  );
+
+  const result = runVerifier(root);
+
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /retired-document-category: docs\/knowledge\/category-pages\.md/,
+  );
+});
+
 test('repository documentation satisfies the structural contract', () => {
   const result = runVerifier(repositoryRoot);
 

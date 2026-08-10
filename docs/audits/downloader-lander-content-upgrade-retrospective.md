@@ -1,5 +1,15 @@
 # Downloader Lander Content Upgrade Retrospective
 
+Historical evidence only.
+
+- Completed revision: `62480f6` in PR #9
+- Retrospective recorded: 2026-05-16 at repository revision
+  `b38e2682dc114a1fb35bdd0a1bb00ee7d7965898`
+- Scope: the downloader Lander content upgrade described below
+- Limitation: route counts, source availability, and Product details are a
+  snapshot of that work and must be revalidated against the current registry
+  and source sites
+
 ## Executive Summary
 
 The downloader landing-page project upgraded shallow source-specific downloader landers into richer, app-grade pages that can explain the product, route users to the right extension, and give search engines a fuller page to evaluate.

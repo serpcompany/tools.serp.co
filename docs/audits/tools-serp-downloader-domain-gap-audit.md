@@ -1,5 +1,14 @@
 # tools.serp.co Downloader Page Gap Audit
 
+Historical advisory evidence only.
+
+- Recorded: 2026-05-18 at revision
+  `373c3fbf50a623c74f866fde31999d2260ce9432`
+- Scope: the registry and competitor-domain inputs summarized below
+- Limitation: several source inputs came from an undeclared personal sibling
+  checkout and are not portable; routes, availability, and recommendations
+  require revalidation and do not represent active work
+
 Generated from verified competitor sitemap/domain research. This is an audit only; it did not add tools or publish pages.
 
 ## Inputs
@@ -196,7 +205,7 @@ These pages already exist, but competitor pages provide extra content angles/sam
 
 1. Start with `docs/audits/tools-serp-missing-adult-downloader-pages.csv` if the goal is adult downloader SEO expansion.
 2. Add new registry-backed downloader landers in `packages/app-core/src/data/tools.json`; use `operation: "download"`, `handler: "custom"` or the existing downloader shared renderer pattern, and `route: /download-{base}-videos`.
-3. Update `docs/planner/tools_planner.csv` in the same batch.
+3. Update `docs/evidence/tool-planning/tools_planner.csv` in the same batch.
 4. Reuse `DownloaderPageTemplate` and the existing browser extension CTA/cooldown path.
 5. For existing pages, use `tools-serp-existing-downloader-competitor-content-gaps.csv` to enrich `content.infoArticle`, FAQs, keyword lists, supported examples, and related tools.
 6. Run `pnpm -C apps/tools typecheck`, `pnpm lint`, and route smoke checks before publishing.
