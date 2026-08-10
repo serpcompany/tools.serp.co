@@ -10,12 +10,27 @@ Start with the [architecture map](./ARCHITECTURE.md),
 ```bash
 pnpm install
 pnpm dev
+pnpm test
 pnpm lint
 pnpm lint:tools
 pnpm lint:links
 pnpm verify:docs
 pnpm -C apps/tools typecheck
 ```
+
+## Test suite
+
+Use Node.js `>=20 <23` and pnpm `10.4.1`. From a fresh clone:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm test
+```
+
+The root test command discovers committed `node:test` entrypoints, rejects
+misnamed or non-test files, and runs them in app, package, and repository-owned
+groups. It is deterministic and requires no network access, production
+credentials, ignored local inputs, or repository writes.
 
 ## Downloader lander outbound links
 

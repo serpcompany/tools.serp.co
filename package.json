@@ -5,6 +5,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "test": "node scripts/run-tests.mjs",
     "lint": "turbo lint && node scripts/validate-tools.mjs && node scripts/validate-lander-outbound-links.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "sync:network-brands": "node scripts/sync-network-brands.mjs",
