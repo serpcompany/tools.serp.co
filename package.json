@@ -9,6 +9,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "sync:network-brands": "node scripts/sync-network-brands.mjs",
     "benchmark:tools": "node scripts/benchmark-tools.mjs",
+    "verify:agent-workflow": "node scripts/verify-agent-workflow.mjs",
     "lint:tools": "node scripts/validate-tools.mjs && node scripts/validate-lander-outbound-links.mjs",
     "lint:links": "node scripts/validate-lander-outbound-links.mjs"
   },
