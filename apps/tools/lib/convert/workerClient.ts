@@ -1,10 +1,15 @@
-import { detectCapabilities, requiresVideoConversion } from "../capabilities.ts";
-import { resolveCompressionTarget } from "../compression-utils.ts";
+import { detectCapabilities } from "../capabilities.ts";
+import { resolveCompressionDispatch } from "../compression-utils.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
+import {
+  resolveConversionDispatch,
+  type ConversionOp,
+} from "./conversion-dispatch.ts";
 
-export type ConversionOp = "raster" | "pdf-pages" | "video";
+export { resolveConversionOp } from "./conversion-dispatch.ts";
+export type { ConversionOp } from "./conversion-dispatch.ts";
 
 export type ConversionResult =
   | { kind: "single"; buffer: ArrayBuffer }
@@ -15,36 +20,6 @@ export type ProgressUpdate = {
   progress?: number;
   time?: number;
 };
-
-const SERVER_IMAGE_INPUTS = new Set([
-  "tiff",
-  "tif",
-  "cr2",
-  "cr3",
-  "dng",
-  "arw",
-  "psd",
-  "tga",
-  "dds",
-  "xcf",
-  "ai",
-  "apng",
-]);
-const SERVER_IMAGE_OUTPUTS = new Set([
-  "jpg",
-  "jpeg",
-  "png",
-  "webp",
-  "gif",
-  "bmp",
-  "tiff",
-  "tif",
-  "svg",
-  "ico",
-  "cur",
-  "tga",
-  "dds",
-]);
 
 const MIME_MAP: Record<string, string> = {
   png: "image/png",
@@ -116,14 +91,6 @@ export function getOutputMimeType(format: string) {
   return MIME_MAP[format.toLowerCase()] ?? "application/octet-stream";
 }
 
-export function resolveConversionOp(from: string, to: string): ConversionOp {
-  if (from === "pdf") return "pdf-pages";
-  if (requiresVideoConversion(from, to)) {
-    return "video";
-  }
-  return "raster";
-}
-
 type WorkerMessage = {
   type?: "progress";
   status?: string;
@@ -167,55 +134,68 @@ export async function convertWithWorker(args: {
 }): Promise<ConversionResult> {
   const fromExt = args.from.toLowerCase();
   const toExt = args.to.toLowerCase();
-  if (fromExt === "ai") {
-    const { renderPdfPages } = await import("./pdf");
-    const rasterFormat = toExt === "jpg" || toExt === "jpeg" ? "jpg" : "png";
-    const buffers = await renderPdfPages(args.buf, undefined, rasterFormat);
-    if (toExt === "svg") {
-      const svgBuffers = [];
-      for (const buffer of buffers) {
-        const rgba = await decodeToRGBA("png", buffer);
-        const blob = await encodeFromRGBA("svg", rgba, args.quality ?? 0.85);
-        svgBuffers.push(await blob.arrayBuffer());
+  const dispatch = resolveConversionDispatch(fromExt, toExt);
+  switch (dispatch.kind) {
+    case "browser-pdf-pages": {
+      const { renderPdfPages } = await import("./pdf");
+      const rasterFormat =
+        fromExt === "ai"
+          ? toExt === "jpg" || toExt === "jpeg"
+            ? "jpg"
+            : "png"
+          : args.to;
+      const buffers = await renderPdfPages(args.buf, undefined, rasterFormat);
+      if (fromExt === "ai" && toExt === "svg") {
+        const svgBuffers = [];
+        for (const buffer of buffers) {
+          const rgba = await decodeToRGBA("png", buffer);
+          const blob = await encodeFromRGBA(
+            "svg",
+            rgba,
+            args.quality ?? 0.85,
+          );
+          svgBuffers.push(await blob.arrayBuffer());
+        }
+        return { kind: "multiple", buffers: svgBuffers };
       }
-      return { kind: "multiple", buffers: svgBuffers };
+      return { kind: "multiple", buffers };
     }
-    return { kind: "multiple", buffers };
-  }
-  if (shouldUseServerImageConversion(fromExt)) {
-    if (SERVER_IMAGE_OUTPUTS.has(toExt)) {
+    case "server-image":
       return convertImageViaApi(args);
+    case "server-assisted-image": {
+      const serverResult = await convertImageViaApi({ ...args, to: "png" });
+      if (serverResult.kind !== "single") {
+        throw new Error(
+          "Server image conversion returned multiple buffers unexpectedly.",
+        );
+      }
+      args.onProgress?.({ status: "processing", progress: 90 });
+      return convertRasterOnMainThread({
+        from: "png",
+        to: args.to,
+        buf: serverResult.buffer,
+        quality: args.quality,
+      });
     }
-    const serverResult = await convertImageViaApi({ ...args, to: "png" });
-    if (serverResult.kind !== "single") {
-      throw new Error("Server image conversion returned multiple buffers unexpectedly.");
-    }
-    args.onProgress?.({ status: "processing", progress: 90 });
-    return convertRasterOnMainThread({
-      from: "png",
-      to: args.to,
-      buf: serverResult.buffer,
-      quality: args.quality,
-    });
+    case "adaptive-video":
+      return convertVideoOnMainThread(args);
+    case "browser-raster":
+      break;
   }
+
   if (fromExt === "heic" || fromExt === "heif") {
     return convertRasterOnMainThread(args);
   }
-  if (fromExt === "pdf") {
-    const { renderPdfPages } = await import("./pdf");
-    const buffers = await renderPdfPages(args.buf, undefined, args.to);
-    return { kind: "multiple", buffers };
-  }
-  const op = resolveConversionOp(args.from, args.to);
-  if (op === "video") {
-    return convertVideoOnMainThread(args);
-  }
-  const workerBuf = op === "raster" ? args.buf.slice(0) : args.buf;
+  const workerBuf = args.buf.slice(0);
 
   try {
-    return await convertWithWorkerInner({ ...args, op, buf: workerBuf });
+    return await convertWithWorkerInner({
+      ...args,
+      op: "raster",
+      buf: workerBuf,
+    });
   } catch (error) {
-    if (op === "raster" && (isDecodeError(error) || isWorkerError(error))) {
+    if (isDecodeError(error) || isWorkerError(error)) {
       return convertRasterOnMainThread(args);
     }
     throw error;
@@ -428,10 +408,6 @@ function isDecodeError(error: unknown) {
 function isWorkerError(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
   return message.toLowerCase().includes("worker error");
-}
-
-function shouldUseServerImageConversion(fromExt: string) {
-  return SERVER_IMAGE_INPUTS.has(fromExt.toLowerCase());
 }
 
 async function convertImageViaApi(args: {
@@ -735,7 +711,7 @@ export async function compressFile(args: {
   onProgress?: (update: ProgressUpdate) => void;
   quality?: number;
 }): Promise<ArrayBuffer> {
-  const target = resolveCompressionTarget(args.format);
+  const { target } = resolveCompressionDispatch(args.format);
   if (target === "image-worker") {
     if (!args.worker) {
       throw new Error("Compression worker is required for image formats.");

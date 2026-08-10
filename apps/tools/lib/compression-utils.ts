@@ -8,6 +8,11 @@ export type CompressionTarget =
   | "unsupported"
   | "video";
 
+export type CompressionDispatch = Readonly<{
+  target: CompressionTarget;
+  engineIds: readonly string[];
+}>;
+
 const IMAGE_WORKER_FORMATS = new Set(["png", "jpg", "jpeg", "webp"]);
 const IMAGE_SERVER_FORMATS = new Set([
   "gif",
@@ -37,6 +42,37 @@ export function resolveCompressionTarget(format: string): CompressionTarget {
   if (AUDIO_FORMAT_SET.has(normalized)) return "audio";
   if (VIDEO_FORMAT_SET.has(normalized)) return "video";
   return "unsupported";
+}
+
+const compressionDispatchByTarget = Object.freeze({
+  audio: Object.freeze({
+    target: "audio",
+    engineIds: Object.freeze(["browser-ffmpeg-compression"]),
+  }),
+  "image-server": Object.freeze({
+    target: "image-server",
+    engineIds: Object.freeze(["server-image-compression"]),
+  }),
+  "image-worker": Object.freeze({
+    target: "image-worker",
+    engineIds: Object.freeze(["browser-image-compression-worker"]),
+  }),
+  pdf: Object.freeze({
+    target: "pdf",
+    engineIds: Object.freeze(["server-pdf-compression"]),
+  }),
+  unsupported: Object.freeze({
+    target: "unsupported",
+    engineIds: Object.freeze([]),
+  }),
+  video: Object.freeze({
+    target: "video",
+    engineIds: Object.freeze(["browser-ffmpeg-compression"]),
+  }),
+} satisfies Record<CompressionTarget, CompressionDispatch>);
+
+export function resolveCompressionDispatch(format: string): CompressionDispatch {
+  return compressionDispatchByTarget[resolveCompressionTarget(format)];
 }
 
 export function mapQualityToPngLevel(quality?: number): number {

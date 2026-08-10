@@ -43,6 +43,7 @@ real reusable contract justifies moving it into a package.
 | ---------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | Shipped Tool catalog intent                    | `packages/app-core/src/data/tools.json`                                        | Sole versioned authority for shipped catalog intent. It does not prove correctness or health.                                             |
 | Executable Tool behavior                       | Dispatch, workers, components, and API routes under `apps/tools`               | Code owns what executes. Registry flags and dependency names are not sufficient provenance by themselves.                                 |
+| Tool implementation provenance                 | `apps/tools/lib/tool-execution-provenance.ts` and its imported dispatch selectors | Read-only Tool-id joins expose explicit engine ownership and accepted execution profiles; unknown mappings remain unknown, never health.   |
 | Related applications and network brands        | JSON data under `packages/app-core/src/data`                                   | These are separate catalogs and must not be inferred from Tool names or routes.                                                           |
 | Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                        | Imports show actual consumption; planner fields do not override manifests or code.                                                        |
 | Production Worker configuration                | `apps/tools/wrangler.jsonc`                                                    | Owns Worker name, route, bindings, compatibility settings, and production/preview resource ids.                                           |
@@ -70,6 +71,13 @@ the registry or recreate publication and taxonomy rules.
 Registry Tool id is the join key across catalog intent, fixtures, verification,
 runtime observations, planning evidence, and GitHub work. Names, routes, and
 planner rows are not substitute join keys.
+
+The application-owned execution-provenance boundary maps canonical Tool ids to
+engine records that name the owning dispatch module and processing location.
+It reuses pure selectors imported by runtime dispatch, so package manifests and
+real imports remain the evidence for engine ownership. It does not add
+dependency guesses to catalog records or infer capability, correctness, or
+health when no maintained mapping exists.
 
 ## Cloudflare runtime and data boundaries
 
