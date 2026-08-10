@@ -3,12 +3,6 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import toolsData from '../../../packages/app-core/src/data/tools.json' with { type: 'json' };
-import { toolCatalog } from '../../../packages/app-core/src/lib/tool-catalog.ts';
-import {
-  buildToolDirectoryEntries,
-  getToolDirectoryCategories,
-} from './tool-directory.ts';
 import { getPagePaths } from './sitemap.ts';
 
 const categoriesPageUrl = new URL(
@@ -32,13 +26,4 @@ test('categories hub route consumes the Tool Catalog end to end', () => {
 
 test('static sitemap paths include the categories hub page', () => {
   assert.ok(getPagePaths().includes('/categories/'));
-});
-
-test('catalog migration preserves category names, counts, routes, and ordering', () => {
-  const previousProjection = getToolDirectoryCategories(
-    buildToolDirectoryEntries(toolsData),
-  );
-
-  assert.deepEqual(toolCatalog.directoryCategories, previousProjection);
-  assert.doesNotThrow(() => JSON.stringify(toolCatalog.directoryCategories));
 });

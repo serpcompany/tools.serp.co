@@ -1,13 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { toolCatalog } from "../../../packages/app-core/src/lib/tool-catalog.ts";
 
-const tools = JSON.parse(
-  readFileSync(
-    new URL("../../../packages/app-core/src/data/tools.json", import.meta.url),
-    "utf8",
-  ),
-);
+const tools = toolCatalog.tools;
 const plannerSource = readFileSync(
   new URL(
     "../../../docs/evidence/tool-planning/tools_planner.csv",
@@ -211,8 +207,8 @@ const expectedThisVidOutboundUrls = [
 ];
 
 test("requested downloader keyword landers exist in the registry and planner", () => {
-  const activeDownloadTools = tools.filter(
-    (tool) => tool.isActive && tool.operation === "download",
+  const activeDownloadTools = toolCatalog.activeTools.filter(
+    (tool) => tool.operation === "download",
   );
 
   assert.ok(
@@ -238,8 +234,8 @@ test("requested downloader keyword landers exist in the registry and planner", (
 });
 
 test("source-specific downloader landers include enriched content", () => {
-  const sourceSpecificDownloaders = tools.filter(
-    (tool) => tool.isActive && tool.operation === "download" && tool.id !== "video-downloader",
+  const sourceSpecificDownloaders = toolCatalog.activeTools.filter(
+    (tool) => tool.operation === "download" && tool.id !== "video-downloader",
   );
 
   for (const tool of sourceSpecificDownloaders) {
@@ -329,8 +325,8 @@ test("source-specific downloader landers include enriched content", () => {
 });
 
 test("downloader registry routes stay unique and normalized", () => {
-  const activeDownloadTools = tools.filter(
-    (tool) => tool.isActive && tool.operation === "download",
+  const activeDownloadTools = toolCatalog.activeTools.filter(
+    (tool) => tool.operation === "download",
   );
   const ids = new Set();
   const routes = new Set();

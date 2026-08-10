@@ -1,13 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { toolCatalog } from "../../../packages/app-core/src/lib/tool-catalog.ts";
 
-const tools = JSON.parse(
-  readFileSync(
-    new URL("../../../packages/app-core/src/data/tools.json", import.meta.url),
-    "utf8",
-  ),
-);
+const tools = toolCatalog.tools;
 const plannerSource = readFileSync(
   new URL(
     "../../../docs/evidence/tool-planning/tools_planner.csv",

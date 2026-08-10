@@ -3,28 +3,26 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import ffmpegPath from "ffmpeg-static";
+import { operationalToolCatalog } from "@serp-tools/app-core/lib/tool-catalog-adapter";
 
 const require = createRequire(import.meta.url);
 const appRoot = path.dirname(fileURLToPath(import.meta.url));
 const tracingRoot = path.resolve(appRoot, "../..");
-const toolsPath = path.resolve(tracingRoot, "packages/app-core/src/data/tools.json");
 const appDir = path.resolve(appRoot, "app");
 let ffmpegRoutes = [];
 const transcribeRoutes = new Set();
 const singleThreadEnv = process.env.NEXT_PUBLIC_FFMPEG_SINGLE_THREAD ?? "true";
 const useSingleThread = singleThreadEnv === "true";
 
-function normalizeRoute(route) {
-  if (!route) return null;
-  const normalized = String(route).replace(/\/$/, "");
-  return normalized.length ? normalized : "/";
-}
-
 function routeFromFilePath(filePath) {
   const relative = path.relative(appDir, path.dirname(filePath));
   if (!relative || relative === ".") return "/";
   const parts = relative.split(path.sep).filter((part) => part && !/^\(.*\)$/.test(part));
-  return normalizeRoute(`/${parts.join("/")}`);
+  return `/${parts.join("/")}`;
+}
+
+function nestedRoutePattern(route) {
+  return `${route.replace(/\/$/, "")}/:path*`;
 }
 
 function collectTranscribeRoutes() {
@@ -54,27 +52,28 @@ function collectTranscribeRoutes() {
 }
 
 try {
-  const toolsJson = JSON.parse(fs.readFileSync(toolsPath, "utf8"));
   collectTranscribeRoutes();
   const seenRoutes = new Set();
   const transcribeRouteSet = new Set(
     Array.from(transcribeRoutes)
       .map((entry) => {
         if (!entry.toolId) return entry.fallbackRoute;
-        const tool = toolsJson.find((candidate) => candidate?.id === entry.toolId);
-        return normalizeRoute(tool?.route) ?? entry.fallbackRoute;
+        const tool = operationalToolCatalog.tools.find(
+          (candidate) => candidate.id === entry.toolId,
+        );
+        return tool?.canonicalRoute ?? entry.fallbackRoute;
       })
       .filter(Boolean)
   );
   const includeFfmpegRoutes = !useSingleThread;
-  ffmpegRoutes = toolsJson
+  ffmpegRoutes = operationalToolCatalog.activeTools
     .filter((tool) => {
-      if (!tool?.isActive || !tool?.route) return false;
-      const normalizedRoute = normalizeRoute(tool.route);
-      if (!normalizedRoute) return false;
-      return transcribeRouteSet.has(normalizedRoute) || (includeFfmpegRoutes && tool?.requiresFFmpeg);
+      return (
+        transcribeRouteSet.has(tool.canonicalRoute) ||
+        (includeFfmpegRoutes && tool.requiresFFmpeg)
+      );
     })
-    .map((tool) => normalizeRoute(tool.route))
+    .map((tool) => tool.canonicalRoute)
     .filter((route) => {
       if (!route || seenRoutes.has(route)) return false;
       seenRoutes.add(route);
@@ -150,7 +149,7 @@ const nextConfig = {
     ];
 
     return ffmpegRoutes.map((route) => ({
-      source: `${route}/:path*`,
+      source: nestedRoutePattern(route),
       headers: isolationHeaders,
     }));
   },

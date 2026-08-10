@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@serp-tools/ui/components/card";
 import Link from "next/link";
 
-import { getToolDirectoryIcon } from "@/lib/tool-directory";
+import { getToolIcon } from "@/lib/tool-icons";
 
 interface ToolCardProps {
   tool: {
@@ -33,7 +33,7 @@ const colors = [
 export function ToolCard({ tool }: ToolCardProps) {
   const [borderColor, setBorderColor] = useState<string>("");
   const colorIndexRef = useRef(0);
-  const Icon = getToolDirectoryIcon(tool.id);
+  const Icon = getToolIcon(tool.id);
 
   const handleMouseEnter = () => {
     // Cycle through colors sequentially instead of random
