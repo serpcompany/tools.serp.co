@@ -1,6 +1,10 @@
-import { getD1ToolsDashboardData } from "@serp-tools/tool-telemetry/d1";
-import { getSerpToolsD1Binding } from "@/lib/cloudflare-d1";
-import { joinToolEvidence } from "@/lib/internal-tools-dashboard";
+import { getD1ToolsDashboardData } from '@serp-tools/tool-telemetry/d1';
+import { getSerpToolsD1Binding } from '@/lib/cloudflare-d1';
+import {
+  describeDashboardLoadError,
+  joinToolEvidence,
+  type DashboardLoadError,
+} from '@/lib/internal-tools-dashboard';
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -45,19 +49,19 @@ export default async function ToolsDashboard({ searchParams }: PageProps) {
 
   let rows: StatusRow[] = [];
   let failureRows: FailureSummary[] = [];
-  let errorMessage: string | null = null;
+  let loadError: DashboardLoadError | null = null;
 
   try {
     const d1 = await getSerpToolsD1Binding();
 
     if (!d1) {
-      throw new Error("D1 telemetry binding unavailable.");
+      throw new Error('D1 telemetry binding unavailable.');
     }
     const dashboardData = await getD1ToolsDashboardData(d1);
     rows = dashboardData.statusRows;
     failureRows = dashboardData.failureRows;
   } catch (err: unknown) {
-    errorMessage = err instanceof Error ? err.message : "Failed to load tool status.";
+    loadError = describeDashboardLoadError(err);
   }
 
   return (
@@ -68,9 +72,10 @@ export default async function ToolsDashboard({ searchParams }: PageProps) {
           Status and telemetry summary for tool runs (last 24h).
         </p>
 
-        {errorMessage ? (
-          <div className="border rounded-lg p-4 text-sm text-red-600">
-            {errorMessage}
+        {loadError ? (
+          <div className="border rounded-lg p-4" role="alert">
+            <h2 className="font-medium mb-1">{loadError.title}</h2>
+            <p className="text-sm text-muted-foreground">{loadError.message}</p>
           </div>
         ) : (
           <>
@@ -91,8 +96,12 @@ export default async function ToolsDashboard({ searchParams }: PageProps) {
                     return (
                       <tr key={row.toolId} className="border-t">
                         <td className="p-3">
-                          <div className="font-medium">{tool?.name ?? row.toolId}</div>
-                          <div className="text-xs text-muted-foreground">{tool?.route ?? "-"}</div>
+                          <div className="font-medium">
+                            {tool?.name ?? row.toolId}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {tool?.route ?? '-'}
+                          </div>
                         </td>
                         <td className="p-3">
                           <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border">
@@ -100,20 +109,26 @@ export default async function ToolsDashboard({ searchParams }: PageProps) {
                           </span>
                         </td>
                         <td className="p-3">
-                          {row.lastRunAt ? new Date(row.lastRunAt).toLocaleString() : "-"}
+                          {row.lastRunAt
+                            ? new Date(row.lastRunAt).toLocaleString()
+                            : '-'}
                         </td>
                         <td className="p-3 text-right">
-                          {row.failureRate24h !== null && row.failureRate24h !== undefined
+                          {row.failureRate24h !== null &&
+                          row.failureRate24h !== undefined
                             ? `${Math.round(row.failureRate24h * 100)}%`
-                            : "-"}
+                            : '-'}
                         </td>
                         <td className="p-3 text-right">
-                          {row.medianDurationMs ? `${row.medianDurationMs} ms` : "-"}
+                          {row.medianDurationMs
+                            ? `${row.medianDurationMs} ms`
+                            : '-'}
                         </td>
                         <td className="p-3 text-right">
-                          {row.medianReductionPct !== null && row.medianReductionPct !== undefined
+                          {row.medianReductionPct !== null &&
+                          row.medianReductionPct !== undefined
                             ? `${row.medianReductionPct}%`
-                            : "-"}
+                            : '-'}
                         </td>
                       </tr>
                     );
@@ -123,9 +138,12 @@ export default async function ToolsDashboard({ searchParams }: PageProps) {
             </div>
 
             <div className="mt-10">
-              <h2 className="text-xl font-semibold mb-2">Top Failures (last 24h)</h2>
+              <h2 className="text-xl font-semibold mb-2">
+                Top Failures (last 24h)
+              </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                Aggregated by tool + error code. Sample metadata shows the latest failure payload.
+                Aggregated by tool + error code. Sample metadata shows the
+                latest failure payload.
               </p>
               {failureRows.length === 0 ? (
                 <div className="border rounded-lg p-4 text-sm text-muted-foreground">
@@ -144,36 +162,47 @@ export default async function ToolsDashboard({ searchParams }: PageProps) {
                       </tr>
                     </thead>
                     <tbody>
-                      {joinToolEvidence(failureRows).map(({ tool, evidence: row }) => {
-                        const metadataText = row.sampleMetadata
-                          ? JSON.stringify(row.sampleMetadata)
-                          : "-";
-                        const metadataPreview =
-                          metadataText.length > MAX_METADATA_LENGTH
-                            ? `${metadataText.slice(0, MAX_METADATA_LENGTH)}...`
-                            : metadataText;
+                      {joinToolEvidence(failureRows).map(
+                        ({ tool, evidence: row }) => {
+                          const metadataText = row.sampleMetadata
+                            ? JSON.stringify(row.sampleMetadata)
+                            : '-';
+                          const metadataPreview =
+                            metadataText.length > MAX_METADATA_LENGTH
+                              ? `${metadataText.slice(0, MAX_METADATA_LENGTH)}...`
+                              : metadataText;
 
-                        return (
-                          <tr key={`${row.toolId}-${row.errorCode ?? "unknown"}`} className="border-t">
-                            <td className="p-3">
-                              <div className="font-medium">{tool?.name ?? row.toolId}</div>
-                              <div className="text-xs text-muted-foreground">{tool?.route ?? "-"}</div>
-                            </td>
-                            <td className="p-3">
-                              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border">
-                                {row.errorCode ?? "unknown"}
-                              </span>
-                            </td>
-                            <td className="p-3 text-right">{row.count}</td>
-                            <td className="p-3">
-                              {row.lastSeen ? new Date(row.lastSeen).toLocaleString() : "-"}
-                            </td>
-                            <td className="p-3 text-xs text-muted-foreground whitespace-pre-wrap break-words">
-                              {metadataPreview}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                          return (
+                            <tr
+                              key={`${row.toolId}-${row.errorCode ?? 'unknown'}`}
+                              className="border-t"
+                            >
+                              <td className="p-3">
+                                <div className="font-medium">
+                                  {tool?.name ?? row.toolId}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {tool?.route ?? '-'}
+                                </div>
+                              </td>
+                              <td className="p-3">
+                                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border">
+                                  {row.errorCode ?? 'unknown'}
+                                </span>
+                              </td>
+                              <td className="p-3 text-right">{row.count}</td>
+                              <td className="p-3">
+                                {row.lastSeen
+                                  ? new Date(row.lastSeen).toLocaleString()
+                                  : '-'}
+                              </td>
+                              <td className="p-3 text-xs text-muted-foreground whitespace-pre-wrap break-words">
+                                {metadataPreview}
+                              </td>
+                            </tr>
+                          );
+                        },
+                      )}
                     </tbody>
                   </table>
                 </div>
