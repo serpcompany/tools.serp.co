@@ -1,6 +1,6 @@
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import { getD1ToolsDashboardData } from "@serp-tools/tool-telemetry/d1";
 import { getSerpToolsD1Binding } from "@/lib/cloudflare-d1";
+import { joinToolEvidence } from "@/lib/internal-tools-dashboard";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -25,13 +25,6 @@ type StatusRow = {
 };
 
 const MAX_METADATA_LENGTH = 240;
-
-const toolMap = new Map(
-  (toolsData as Array<{ id: string; name: string; route: string }>).map((tool) => [
-    tool.id,
-    tool,
-  ])
-);
 
 export default async function ToolsDashboard({ searchParams }: PageProps) {
   const token = process.env.INTERNAL_DASHBOARD_TOKEN;
@@ -94,8 +87,7 @@ export default async function ToolsDashboard({ searchParams }: PageProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((row) => {
-                    const tool = toolMap.get(row.toolId);
+                  {joinToolEvidence(rows).map(({ tool, evidence: row }) => {
                     return (
                       <tr key={row.toolId} className="border-t">
                         <td className="p-3">
@@ -152,8 +144,7 @@ export default async function ToolsDashboard({ searchParams }: PageProps) {
                       </tr>
                     </thead>
                     <tbody>
-                      {failureRows.map((row) => {
-                        const tool = toolMap.get(row.toolId);
+                      {joinToolEvidence(failureRows).map(({ tool, evidence: row }) => {
                         const metadataText = row.sampleMetadata
                           ? JSON.stringify(row.sampleMetadata)
                           : "-";

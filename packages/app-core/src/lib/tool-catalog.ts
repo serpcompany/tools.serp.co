@@ -1,20 +1,14 @@
 import registryData from '../data/tools.json' with { type: 'json' };
+import {
+  TOOL_OPERATION_ORDER as operationOrder,
+  TOOL_OPERATION_TAXONOMY as operationTaxonomy,
+} from './tool-catalog-constants.mjs';
 import { buildPageContent } from './tool-page-content.ts';
 
-export const TOOL_OPERATION_ORDER = [
-  'convert',
-  'download',
-  'compress',
-  'combine',
-  'bulk',
-  'edit',
-  'video-editor',
-  'image-editor',
-  'audio-editor',
-  'view',
-] as const;
+export type ToolOperation = keyof typeof operationTaxonomy;
 
-export type ToolOperation = (typeof TOOL_OPERATION_ORDER)[number];
+export const TOOL_OPERATION_ORDER =
+  operationOrder as readonly ToolOperation[];
 
 export const CATALOG_PAGE_CONTENT_PROFILES = [
   'legacy-conversion-v1',
@@ -41,69 +35,8 @@ type OperationTaxonomy = {
   description: string;
 };
 
-export const TOOL_OPERATION_TAXONOMY: DeepReadonly<
-  Record<ToolOperation, OperationTaxonomy>
-> = deepFreezeClone({
-  bulk: {
-    name: 'Bulk Operations',
-    title: 'Bulk Operations',
-    description:
-      'Run batch file workflows and multi-file operations in a single pass.',
-  },
-  combine: {
-    name: 'Combine',
-    title: 'Combine Tools',
-    description:
-      'Merge multiple files into one output without installing extra software.',
-  },
-  compress: {
-    name: 'Compress',
-    title: 'Compress Tools',
-    description:
-      'Reduce file size online while keeping the output usable and shareable.',
-  },
-  convert: {
-    name: 'Convert',
-    title: 'Convert Tools',
-    description:
-      'Convert image, audio, video, document, and data files directly in your browser.',
-  },
-  download: {
-    name: 'Downloaders',
-    title: 'Downloaders',
-    description:
-      'Download supported public videos and media links straight to your device.',
-  },
-  edit: {
-    name: 'Edit',
-    title: 'Edit Tools',
-    description:
-      'Open and edit supported files online without installing desktop software.',
-  },
-  'video-editor': {
-    name: 'Video Editor',
-    title: 'Video Editor Tools',
-    description:
-      'Trim, crop, and enhance videos online without installing desktop software.',
-  },
-  'image-editor': {
-    name: 'Image Editor',
-    title: 'Image Editor Tools',
-    description:
-      'Edit and enhance images online with quick adjustments and exports.',
-  },
-  'audio-editor': {
-    name: 'Audio Editor',
-    title: 'Audio Editor Tools',
-    description:
-      'Trim, merge, and refine audio tracks online with fast exports.',
-  },
-  view: {
-    name: 'PDF',
-    title: 'PDF',
-    description: 'Open, read, and edit PDF files instantly in your browser.',
-  },
-});
+export const TOOL_OPERATION_TAXONOMY =
+  operationTaxonomy as DeepReadonly<Record<ToolOperation, OperationTaxonomy>>;
 
 type RegistryRecord = Record<string, unknown>;
 

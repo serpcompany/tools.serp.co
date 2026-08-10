@@ -26,6 +26,7 @@
   },
   "exports": {
     "./components/*": "./src/components/*.tsx",
+    "./lib/tool-catalog-adapter": "./src/lib/tool-catalog-adapter.mjs",
     "./lib/*": "./src/lib/*.ts",
     "./data/*": "./src/data/*"
   }

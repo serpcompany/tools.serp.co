@@ -1,3 +1,5 @@
+import { createOperationalToolCatalog } from '../../packages/app-core/src/lib/tool-catalog-adapter.mjs';
+
 const defaultOperatingSystems = [
   "windows",
   "mac",
@@ -302,10 +304,8 @@ function buildExistingTokens(tools) {
       tool.route,
       tool.name,
       tool.from,
-      tool.content?.tool?.title,
-      tool.content?.productLinks?.serplyUrl,
-      tool.content?.productLinks?.appsUrl,
-      tool.content?.productLinks?.githubRepoUrl,
+      tool.presentationTitle,
+      ...tool.outboundLinks.map((link) => link.url),
     ];
 
     for (const candidate of candidates.filter(Boolean)) {
@@ -569,8 +569,9 @@ export async function planDownloaderRegistrySync({
   if (!Array.isArray(tools)) {
     throw new Error("Owned Tool catalog must be an array");
   }
-  const existingTokens = buildExistingTokens(tools);
-  const existingIds = new Set(tools.map((tool) => tool.id));
+  const sourceCatalog = createOperationalToolCatalog(tools);
+  const existingTokens = buildExistingTokens(sourceCatalog.tools);
+  const existingIds = new Set(sourceCatalog.tools.map((tool) => tool.id));
   const newTools = [];
 
   for (const [key, entry] of Object.entries(registry.overrides ?? {})) {
@@ -608,6 +609,7 @@ export async function planDownloaderRegistrySync({
   }
 
   const nextTools = insertTools(tools, newTools);
+  createOperationalToolCatalog(nextTools);
 
   const plannerIds = new Set(
     plannerSource

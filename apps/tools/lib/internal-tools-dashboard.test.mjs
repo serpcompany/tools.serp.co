@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import test from 'node:test';
+
+import { createToolCatalog } from '../../../packages/app-core/src/lib/tool-catalog.ts';
+import { joinToolEvidence } from './internal-tools-dashboard.ts';
+
+const catalog = createToolCatalog([
+  {
+    id: 'alpha',
+    name: 'Alpha Tool',
+    description: 'Alpha description',
+    operation: 'convert',
+    route: '/alpha',
+    isActive: true,
+  },
+]);
+
+test('internal evidence joins preserve Catalog intent separately from observations', () => {
+  const knownEvidence = { toolId: 'alpha', status: 'failed', count: 2 };
+  const unknownEvidence = { toolId: 'missing', status: 'unknown', count: 1 };
+  const joined = joinToolEvidence(
+    [knownEvidence, unknownEvidence],
+    catalog,
+  );
+
+  assert.deepEqual(joined[0], {
+    tool: {
+      id: 'alpha',
+      name: 'Alpha Tool',
+      route: '/alpha',
+      isActive: true,
+    },
+    evidence: knownEvidence,
+  });
+  assert.deepEqual(joined[1], {
+    tool: null,
+    evidence: unknownEvidence,
+  });
+  assert.equal(joined[0].evidence, knownEvidence);
+});
+
+test('internal Tool page consumes the Catalog join instead of raw registry data', () => {
+  const source = readFileSync('apps/tools/app/internal/tools/page.tsx', 'utf8');
+  assert.match(source, /joinToolEvidence/);
+  assert.doesNotMatch(source, /data\/tools\.json|toolsData|toolMap/);
+});

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { operationalToolCatalog } from "../packages/app-core/src/lib/tool-catalog-adapter.mjs";
 import { recordRunEvidence } from "./lib/run-evidence.mjs";
 import {
   buildBrowserScope,
@@ -151,15 +152,10 @@ function recordBrowserEvidence(status, summary, completedAt = new Date()) {
 
 try {
   const baseUrl = options.baseUrl.replace(/\/$/, "");
-  const toolsPath = path.join(
-    repositoryRoot,
-    "packages/app-core/src/data/tools.json",
-  );
   const fixturesDir = path.join(repositoryRoot, "apps/tools/benchmarks");
   const fixtureMatrixPath = path.join(fixturesDir, "fixture-matrix.json");
 
-  const toolsRaw = await fs.readFile(toolsPath, "utf8");
-  let tools = JSON.parse(toolsRaw).filter((tool) => tool.isActive);
+  let tools = [...operationalToolCatalog.activeTools];
   const toolFilter = process.env.TOOLS_ONLY
     ? process.env.TOOLS_ONLY.split(",")
         .map((id) => id.trim())

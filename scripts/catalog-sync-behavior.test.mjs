@@ -11,7 +11,10 @@ import http from 'node:http';
 import path from 'node:path';
 import test from 'node:test';
 import { updateExtensions } from './fetch-store-assets.mjs';
-import { firstVerifiedUrl } from './lib/downloader-registry-sync.mjs';
+import {
+  firstVerifiedUrl,
+  planDownloaderRegistrySync,
+} from './lib/downloader-registry-sync.mjs';
 import { synchronizeDownloaderRegistry } from './sync-downloader-landers-from-registry.mjs';
 
 function temporaryFile(t, name, contents) {
@@ -185,4 +188,41 @@ test('downloader links come from exact candidates that respond successfully', as
     `${origin}/verified`,
   );
   assert.equal(await firstVerifiedUrl([`${origin}/transient-failure`]), '');
+});
+
+test('downloader deduplication retains bounded title and product URL aliases', async () => {
+  const existingTool = {
+    id: 'download-existing-videos',
+    name: 'Existing Downloader',
+    description: 'Existing downloader fixture',
+    operation: 'download',
+    route: '/download-existing-videos',
+    from: 'Existing',
+    to: 'mp4',
+    isActive: true,
+    content: {
+      tool: { title: 'Presentation Alias' },
+      productLinks: { serplyUrl: 'https://serp.ly/existing-alias' },
+    },
+  };
+  const result = await planDownloaderRegistrySync({
+    toolsSource: JSON.stringify([existingTool]),
+    plannerSource: 'keyword,operation,tool_id\n',
+    registry: {
+      overrides: {
+        'serpapps/title-alias-downloader': {
+          app_name: 'Presentation Alias',
+          short_description: 'Download a title alias',
+        },
+        'serpapps/url-alias-downloader': {
+          app_name: 'Different Downloader',
+          short_description: 'Download a URL alias',
+          serply_link: 'https://serp.ly/existing-alias',
+        },
+      },
+    },
+    verifyUrl: async () => false,
+  });
+
+  assert.deepEqual(result.newTools, []);
 });

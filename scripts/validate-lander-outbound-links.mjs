@@ -1,66 +1,12 @@
 #!/usr/bin/env node
-import fs from "node:fs/promises";
-import path from "node:path";
+import { operationalToolCatalog } from "../packages/app-core/src/lib/tool-catalog-adapter.mjs";
+import { collectCatalogLanderLinks } from "./lib/lander-link-catalog.mjs";
 
-const root = process.cwd();
 const args = process.argv.slice(2);
 const toolIdFilter = args.find((arg) => arg.startsWith("--tool-id="))?.slice("--tool-id=".length);
 const failOnUnreachable = args.includes("--fail-on-unreachable");
 const timeoutMs = Number(args.find((arg) => arg.startsWith("--timeout-ms="))?.slice("--timeout-ms=".length) ?? 10000);
 const concurrency = Number(args.find((arg) => arg.startsWith("--concurrency="))?.slice("--concurrency=".length) ?? 12);
-
-const toolsPath = path.join(root, "packages/app-core/src/data/tools.json");
-const tools = JSON.parse(await fs.readFile(toolsPath, "utf8"));
-
-function normalizeText(value) {
-  return String(value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
-}
-
-function hostnameWithoutWww(url) {
-  try {
-    return new URL(url).hostname.toLowerCase().replace(/^www\./, "");
-  } catch {
-    return "";
-  }
-}
-
-function isSourceSiteLink(tool, link) {
-  if (tool.operation !== "download") return false;
-  const from = normalizeText(tool.from);
-  if (!from) return false;
-  const label = normalizeText(link.label);
-  const host = normalizeText(hostnameWithoutWww(link.url).split(".")[0]);
-  return label === from || host === from;
-}
-
-function collectToolLinks(tool) {
-  const links = [];
-  const content = tool.content ?? {};
-  const productLinks = content.productLinks ?? {};
-
-  for (const [field, url] of Object.entries(productLinks)) {
-    if (typeof url === "string" && /^https?:\/\//i.test(url)) {
-      links.push({ toolId: tool.id, route: tool.route, field: `content.productLinks.${field}`, label: field, url, kind: "product" });
-    }
-  }
-
-  for (const [index, link] of (content.sourceLinks ?? []).entries()) {
-    if (typeof link?.url === "string" && /^https?:\/\//i.test(link.url)) {
-      const collectedLink = {
-        toolId: tool.id,
-        route: tool.route,
-        field: `content.sourceLinks[${index}].url`,
-        label: link.label ?? `sourceLinks[${index}]`,
-        url: link.url,
-        kind: "source",
-        sourceSiteViolation: isSourceSiteLink(tool, link),
-      };
-      links.push(collectedLink);
-    }
-  }
-
-  return links;
-}
 
 function statusIsBroken(status) {
   return status === 404 || status === 410;
@@ -147,9 +93,9 @@ async function checkUrl(url, redirectCount = 0) {
   return { ok: true, kind: "ok", status: response.status, finalUrl: response.url || url, message: "" };
 }
 
-const allLinks = tools
-  .filter((tool) => !toolIdFilter || tool.id === toolIdFilter)
-  .flatMap(collectToolLinks);
+const allLinks = collectCatalogLanderLinks(operationalToolCatalog.tools).filter(
+  (link) => !toolIdFilter || link.toolId === toolIdFilter,
+);
 
 const sourceSiteViolations = allLinks.filter((link) => link.sourceSiteViolation);
 

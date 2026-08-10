@@ -61,6 +61,12 @@ presentation copy as catalog intent under
 must not be used as implementation provenance, verification evidence, or a
 runtime observation.
 
+Maintained Node.js harness consumers that cannot load the TypeScript facade use
+the package-owned `tool-catalog-adapter.mjs`. It is the only approved
+JavaScript registry reader, exposes bounded operational projections, and is
+parity-tested against the full Tool Catalog. Individual scripts must not parse
+the registry or recreate publication and taxonomy rules.
+
 Registry Tool id is the join key across catalog intent, fixtures, verification,
 runtime observations, planning evidence, and GitHub work. Names, routes, and
 planner rows are not substitute join keys.

@@ -2,25 +2,13 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { operationalToolCatalog } from "@serp-tools/app-core/lib/tool-catalog-adapter";
 
 export const scriptsRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const appRoot = path.resolve(scriptsRoot, "..");
 export const repoRoot = path.resolve(appRoot, "../..");
 
 export const PAGE_SIZE = 10000;
-
-export const OPERATION_ORDER = [
-  "convert",
-  "download",
-  "compress",
-  "combine",
-  "bulk",
-  "edit",
-  "video-editor",
-  "image-editor",
-  "audio-editor",
-  "view",
-];
 
 const TEXT_FILE_EXTENSIONS = new Set([".txt", ".xml"]);
 const DEFAULT_STATIC_PATHS = ["/", "/categories/", "/brands/"];
@@ -86,33 +74,16 @@ export function routeFromAppFile(filePath) {
   return normalizePathname(`/${parts.join("/")}`);
 }
 
-export function getToolsData() {
-  return readJsonFile(path.join(repoRoot, "packages/app-core/src/data/tools.json"));
-}
-
-export function getActiveTools(tools = getToolsData()) {
-  return tools.filter((tool) => tool?.isActive && tool?.route);
-}
-
-export function getOperationCounts(tools = getActiveTools()) {
-  const counts = {};
-  for (const tool of tools) {
-    const operation = tool.operation || "unknown";
-    counts[operation] = (counts[operation] ?? 0) + 1;
-  }
-  return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a.localeCompare(b)));
-}
-
-export function getCategoryPaths(tools = getActiveTools()) {
-  const operations = new Set();
-  for (const tool of tools) {
-    if (OPERATION_ORDER.includes(tool.operation)) {
-      operations.add(tool.operation);
-    }
-  }
-  return OPERATION_ORDER.filter((operation) => operations.has(operation)).map(
-    (operation) => `/category/${operation}/`,
+export function getOperationCounts() {
+  return Object.fromEntries(
+    Object.entries(operationalToolCatalog.operationCounts).sort(([a], [b]) =>
+      a.localeCompare(b),
+    ),
   );
+}
+
+export function getCategoryPaths() {
+  return operationalToolCatalog.categoryPaths;
 }
 
 function addRoute(routes, pathValue, source, metadata = {}) {
@@ -133,15 +104,14 @@ function addRoute(routes, pathValue, source, metadata = {}) {
 export function buildRouteManifest(options = {}) {
   const includeInternal = Boolean(options.includeInternal);
   const includeNoSlash = Boolean(options.includeNoSlash);
-  const tools = getToolsData();
-  const activeTools = getActiveTools(tools);
+  const activeTools = operationalToolCatalog.activeTools;
   const routes = new Map();
 
   for (const pathname of DEFAULT_STATIC_PATHS) {
     addRoute(routes, pathname, "static-page");
   }
 
-  for (const pathname of getCategoryPaths(activeTools)) {
+  for (const pathname of getCategoryPaths()) {
     addRoute(routes, pathname, "category-page");
   }
 
@@ -168,7 +138,7 @@ export function buildRouteManifest(options = {}) {
 
   const pageSitemapPages = Math.max(1, Math.ceil(DEFAULT_STATIC_PATHS.length / PAGE_SIZE));
   const toolSitemapPages = Math.max(1, Math.ceil(activeTools.length / PAGE_SIZE));
-  const categorySitemapPages = Math.max(1, Math.ceil(getCategoryPaths(activeTools).length / PAGE_SIZE));
+  const categorySitemapPages = Math.max(1, Math.ceil(getCategoryPaths().length / PAGE_SIZE));
 
   const sitemapPaths = [
     "/robots.txt",
