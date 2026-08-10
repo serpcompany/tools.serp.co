@@ -18,6 +18,7 @@ pnpm typecheck
 pnpm verify:catalog
 pnpm verify:docs
 pnpm check:links
+pnpm artifacts:cleanup
 ```
 
 `pnpm check` is the highest local verification seam. It composes deterministic
@@ -25,6 +26,11 @@ lint, typechecking, the complete automated-test suite, agent/documentation/Tool
 catalog structural verification, and the production-faithful Cloudflare build.
 It does not exercise deployed systems or run link checks, canaries, benchmarks,
 syncs, uploads, deploys, or remote migrations.
+
+Nontrivial local and CI evidence uses the structured run manifest described in
+the [artifact lifecycle runbook](./docs/runbooks/artifacts.md). Local evidence
+is ignored under `.artifacts/runs`; cleanup is dry-run by default and never
+cleans build caches.
 
 ## Test suite
 

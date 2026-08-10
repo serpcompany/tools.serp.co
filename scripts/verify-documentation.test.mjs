@@ -73,6 +73,19 @@ test('documentation verifier accepts an indexed tree with resolvable links', (t)
   assert.equal(result.stdout, '');
 });
 
+test('documentation verifier ignores local run artifacts', (t) => {
+  const root = createDocumentationFixture(t);
+  writeFixtureFile(
+    root,
+    '.artifacts/runs/example/report.md',
+    '# Local run report\n',
+  );
+
+  const result = runVerifier(root);
+
+  assert.equal(result.status, 0, result.stderr);
+});
+
 test('documentation verifier reports durable Markdown missing from the index', (t) => {
   const root = createDocumentationFixture(t);
   writeFixtureFile(root, 'docs/runbooks/orphan.md', '# Orphan runbook\n');

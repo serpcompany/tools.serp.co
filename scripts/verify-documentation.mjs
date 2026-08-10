@@ -5,6 +5,7 @@ import path from 'node:path';
 
 const DOCUMENTATION_INDEX = 'docs/README.md';
 const SKIPPED_DIRECTORIES = new Set([
+  '.artifacts',
   '.git',
   '.next',
   '.open-next',
