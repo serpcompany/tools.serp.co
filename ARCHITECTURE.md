@@ -39,19 +39,20 @@ real reusable contract justifies moving it into a package.
 
 ## Canonical sources of truth
 
-| Concern                                        | Canonical source                                                               | Boundary                                                                                                                                  |
-| ---------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Shipped Tool catalog intent                    | `packages/app-core/src/data/tools.json`                                        | Sole versioned authority for shipped catalog intent. It does not prove correctness or health.                                             |
-| Executable Tool behavior                       | Dispatch, workers, components, and API routes under `apps/tools`               | Code owns what executes. Registry flags and dependency names are not sufficient provenance by themselves.                                 |
-| Tool implementation provenance                 | `apps/tools/lib/tool-execution-provenance.ts` and its imported dispatch selectors | Read-only Tool-id joins expose explicit engine ownership and accepted execution profiles; unknown mappings remain unknown, never health.   |
-| Related applications and network brands        | JSON data under `packages/app-core/src/data`                                   | These are separate catalogs and must not be inferred from Tool names or routes.                                                           |
-| Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                        | Imports show actual consumption; planner fields do not override manifests or code.                                                        |
-| Production Worker configuration                | `apps/tools/wrangler.jsonc`                                                    | Owns Worker name, route, bindings, compatibility settings, and production/preview resource ids.                                           |
-| Cloudflare build behavior                      | `apps/tools/open-next.config.ts` and `apps/tools/scripts/build-cloudflare.mjs` | Owns the OpenNext artifact and incremental-cache integration.                                                                             |
-| D1 schema                                      | Ordered SQL in `apps/tools/migrations`                                         | Migrations own persisted production telemetry shape. TypeScript types and runbooks describe, but do not replace, the schema.              |
-| Runtime observations                           | D1 `tool_runs` and derived `tool_status`                                       | Time-bound evidence for instrumented Tool ids, not catalog or work state.                                                                 |
-| Active work                                    | GitHub Issues for this repository                                              | Issues, dependencies, labels, and assignees own readiness, blockers, and ownership. Repository plans are not a parallel tracker.          |
-| Current documentation classification           | `docs/README.md`                                                               | Every durable Markdown document must be indexed as current guidance, historical/advisory evidence, or legacy material awaiting migration. |
+| Concern                                        | Canonical source                                                                  | Boundary                                                                                                                                                           |
+| ---------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Shipped Tool catalog intent                    | `packages/app-core/src/data/tools.json`                                           | Sole versioned authority for shipped catalog intent. It does not prove correctness or health.                                                                      |
+| Executable Tool behavior                       | Dispatch, workers, components, and API routes under `apps/tools`                  | Code owns what executes. Registry flags and dependency names are not sufficient provenance by themselves.                                                          |
+| Tool implementation provenance                 | `apps/tools/lib/tool-execution-provenance.ts` and its imported dispatch selectors | Read-only Tool-id joins expose explicit engine ownership, implementation identity, and accepted execution profiles; unknown mappings remain unknown, never health. |
+| Shared-workflow processor availability         | `apps/tools/lib/tool-processor-registry.ts`                                       | Read-only Tool-id joins distinguish registered adapters, explicitly unwired Tools, and unknown provenance. Known engines do not imply shared-workflow wiring.      |
+| Related applications and network brands        | JSON data under `packages/app-core/src/data`                                      | These are separate catalogs and must not be inferred from Tool names or routes.                                                                                    |
+| Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                           | Imports show actual consumption; planner fields do not override manifests or code.                                                                                 |
+| Production Worker configuration                | `apps/tools/wrangler.jsonc`                                                       | Owns Worker name, route, bindings, compatibility settings, and production/preview resource ids.                                                                    |
+| Cloudflare build behavior                      | `apps/tools/open-next.config.ts` and `apps/tools/scripts/build-cloudflare.mjs`    | Owns the OpenNext artifact and incremental-cache integration.                                                                                                      |
+| D1 schema                                      | Ordered SQL in `apps/tools/migrations`                                            | Migrations own persisted production telemetry shape. TypeScript types and runbooks describe, but do not replace, the schema.                                       |
+| Runtime observations                           | D1 `tool_runs` and derived `tool_status`                                          | Time-bound evidence for instrumented Tool ids, not catalog or work state.                                                                                          |
+| Active work                                    | GitHub Issues for this repository                                                 | Issues, dependencies, labels, and assignees own readiness, blockers, and ownership. Repository plans are not a parallel tracker.                                   |
+| Current documentation classification           | `docs/README.md`                                                                  | Every durable Markdown document must be indexed as current guidance, historical/advisory evidence, or legacy material awaiting migration.                          |
 
 Consumers migrate through
 `packages/app-core/src/lib/tool-catalog.ts`. That read-only boundary validates
@@ -85,6 +86,22 @@ It reuses pure selectors imported by runtime dispatch, so package manifests and
 real imports remain the evidence for engine ownership. It does not add
 dependency guesses to catalog records or infer capability, correctness, or
 health when no maintained mapping exists.
+
+Processor contracts remain behind the shared workflow's single `run` seam.
+Canonical Tool-id intent supplies the requested operation and output contract;
+processor support separately declares accepted detected inputs, outputs,
+resource limits, cardinality, parsed options, and semantic-validator policy.
+Both contracts are validated and deeply frozen before acquisition. Declared
+budgets are cooperative limits available to acquisition and processing code,
+with workflow byte-limit postconditions as a second defense; they are not a
+JavaScript sandbox. The workflow always enforces non-empty bytes and exact
+format/MIME agreement with intent, then the processor-owned validator proves
+format or domain semantics. Application semantic verifiers provide trusted
+defaults without making their current format registry the extensibility
+boundary. Processor availability is a separate Tool-id projection: inferred
+provenance remains explicitly unwired until a production family migration
+registers an adapter, and neither support nor validator results become Catalog
+intent or runtime telemetry.
 
 ## Cloudflare runtime and data boundaries
 

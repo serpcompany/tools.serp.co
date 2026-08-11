@@ -9,6 +9,7 @@ import {
   executionProvenance,
   getToolExecutionProvenance,
 } from './tool-execution-provenance.ts';
+import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 
 function mapped(toolId) {
   const provenance = getToolExecutionProvenance(toolId);
@@ -18,14 +19,9 @@ function mapped(toolId) {
 
 test('conversion and compression provenance follows actual dispatch selectors', () => {
   assert.equal(resolveConversionDispatch('cr2', 'jpg').kind, 'server-image');
-  assert.deepEqual(mapped('cr2-to-jpg').executionProfiles, [
-    'server-executed',
-  ]);
+  assert.deepEqual(mapped('cr2-to-jpg').executionProfiles, ['server-executed']);
 
-  assert.equal(
-    resolveConversionDispatch('3g2', 'mp4').kind,
-    'adaptive-video',
-  );
+  assert.equal(resolveConversionDispatch('3g2', 'mp4').kind, 'adaptive-video');
   assert.deepEqual(mapped('3g2-to-mp4').executionProfiles, [
     'client-only',
     'server-executed',
@@ -34,6 +30,12 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   assert.deepEqual(mapped('compress-jpg').executionProfiles, ['client-only']);
   assert.deepEqual(mapped('compress-pdf').executionProfiles, [
     'server-executed',
+  ]);
+  assert.deepEqual(resolveConversionDispatch('heic', 'pdf').engineIds, [
+    'browser-raster-worker',
+  ]);
+  assert.deepEqual(resolveConversionDispatch('cr2', 'pdf').engineIds, [
+    'browser-raster-with-server-image-decode',
   ]);
   assert.deepEqual(
     [
@@ -68,6 +70,83 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   );
   assert.match(workerClientSource, /resolveConversionDispatch/);
   assert.match(workerClientSource, /resolveCompressionDispatch/);
+
+  const convertWorkerSource = readFileSync(
+    new URL('../workers/convert.worker.js', import.meta.url),
+    'utf8',
+  );
+  const decodeSource = readFileSync(
+    new URL('./convert/decode.ts', import.meta.url),
+    'utf8',
+  );
+  const encodeSource = readFileSync(
+    new URL('./convert/encode.ts', import.meta.url),
+    'utf8',
+  );
+  const heifSource = readFileSync(
+    new URL('./convert/heif.ts', import.meta.url),
+    'utf8',
+  );
+  const compressionWorkerSource = readFileSync(
+    new URL('../workers/compress.worker.js', import.meta.url),
+    'utf8',
+  );
+  const imageConvertRouteSource = readFileSync(
+    new URL('../app/api/image-convert/route.ts', import.meta.url),
+    'utf8',
+  );
+  assert.match(convertWorkerSource, /decodeToRGBA/);
+  assert.match(convertWorkerSource, /encodeFromRGBA/);
+  assert.match(decodeSource, /ImageDecoder/);
+  assert.match(decodeSource, /createImageBitmap/);
+  assert.match(decodeSource, /decodeHeifToRGBA/);
+  assert.match(heifSource, /libheif/);
+  assert.match(encodeSource, /OffscreenCanvas/);
+  assert.match(encodeSource, /convertToBlob/);
+  assert.match(encodeSource, /import\("pdf-lib"\)/);
+  assert.match(
+    workerClientSource,
+    /convertImageViaApi\(\{ \.\.\.args, to: "png" \}\)/,
+  );
+  assert.match(workerClientSource, /convertRasterOnMainThread\(\{/);
+  assert.match(workerClientSource, /from: "png"/);
+  assert.match(workerClientSource, /import\("upng-js"\)/);
+  assert.match(compressionWorkerSource, /@jsquash\/oxipng/);
+  assert.match(compressionWorkerSource, /@jsquash\/jpeg/);
+  assert.match(imageConvertRouteSource, /convertWithMagickWasm/);
+  assert.deepEqual(
+    executionProvenance.getEngine('browser-raster-worker')?.implementation,
+    {
+      class: 'hybrid',
+      identity:
+        'libheif, WebCodecs ImageDecoder, createImageBitmap, Canvas 2D, and pdf-lib',
+      rationale:
+        'Repository dispatch uses libheif for HEIC/HEIF inputs, browser image primitives for other raster inputs, Canvas for raster encoding, and pdf-lib for PDF outputs.',
+    },
+  );
+  assert.deepEqual(
+    executionProvenance.getEngine(
+      'browser-raster-with-server-image-decode',
+    )?.implementation,
+    {
+      class: 'hybrid',
+      identity:
+        'repository server image decoder, WebCodecs ImageDecoder, createImageBitmap, Canvas 2D, and pdf-lib',
+      rationale:
+        'The repository server emits PNG; browser image and Canvas primitives produce raster outputs, while pdf-lib packages PDF outputs.',
+    },
+  );
+  assert.deepEqual(
+    executionProvenance.getEngine('browser-image-compression-worker')
+      ?.implementation,
+    {
+      class: 'hybrid',
+      identity:
+        '@jsquash image codecs with UPNG.js and browser Canvas fallbacks',
+      rationale:
+        'The compression worker uses JSquash; repository fallbacks use UPNG.js for PNG and platform image/Canvas primitives for other browser images.',
+    },
+  );
 });
 
 test('downloader and browser-with-fetch support keep distinct profiles', () => {
@@ -100,9 +179,7 @@ test('downloader and browser-with-fetch support keep distinct profiles', () => {
 });
 
 test('specialized and table Tools expose explicit browser-owned engines', () => {
-  assert.deepEqual(mapped('csv-to-sql').engineIds, [
-    'browser-table-converter',
-  ]);
+  assert.deepEqual(mapped('csv-to-sql').engineIds, ['browser-table-converter']);
   assert.deepEqual(mapped('character-counter').engineIds, [
     'browser-character-counter',
   ]);
@@ -144,6 +221,13 @@ test('read-only provenance is joinable by every canonical Tool id', () => {
     owner: 'apps/tools/lib/convert/workerClient.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'hybrid',
+      identity:
+        'libheif, WebCodecs ImageDecoder, createImageBitmap, Canvas 2D, and pdf-lib',
+      rationale:
+        'Repository dispatch uses libheif for HEIC/HEIF inputs, browser image primitives for other raster inputs, Canvas for raster encoding, and pdf-lib for PDF outputs.',
+    },
   });
   assert.equal(executionProvenance.getEngine('toString'), undefined);
   assert.equal(executionProvenance.getEngine('__proto__'), undefined);
@@ -156,5 +240,36 @@ test('read-only provenance is joinable by every canonical Tool id', () => {
 
   for (const engine of executionProvenance.engines) {
     assert.equal(existsSync(engine.owner), true, engine.owner);
+    assert.notEqual(engine.implementation.identity.trim(), '', engine.id);
+    if (
+      engine.implementation.class === 'hybrid' ||
+      engine.implementation.class === 'repository-authored'
+    ) {
+      assert.notEqual(engine.implementation.rationale.trim(), '', engine.id);
+    }
   }
+});
+
+test('processor availability stays distinct from inferred provenance and joins by Tool id', () => {
+  for (const tool of toolCatalog.tools) {
+    assert.equal(getToolProcessorAvailability(tool.id).toolId, tool.id);
+  }
+
+  assert.deepEqual(getToolProcessorAvailability('png-to-jpg'), {
+    kind: 'unwired',
+    toolId: 'png-to-jpg',
+    reason:
+      'Execution provenance is known, but no processor adapter is registered for the shared workflow.',
+    sourceNeeded:
+      'Register a processor adapter only when this Tool family migrates to the shared workflow.',
+  });
+  assert.deepEqual(getToolProcessorAvailability('video-editor'), {
+    kind: 'unknown',
+    toolId: 'video-editor',
+    reason: 'No maintained execution mapping exists for this Tool renderer.',
+    sourceNeeded:
+      'Trace the active renderer to the function that performs its core operation.',
+  });
+  assert.equal('isActive' in getToolProcessorAvailability('png-to-jpg'), false);
+  assert.equal('status' in getToolProcessorAvailability('png-to-jpg'), false);
 });
