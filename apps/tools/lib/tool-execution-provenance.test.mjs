@@ -256,8 +256,13 @@ test('processor availability stays distinct from inferred provenance and joins b
   }
 
   assert.deepEqual(getToolProcessorAvailability('png-to-jpg'), {
-    kind: 'unwired',
+    kind: 'wired',
     toolId: 'png-to-jpg',
+    adapterId: 'generic-conversion',
+  });
+  assert.deepEqual(getToolProcessorAvailability('markdown-to-rdataframe'), {
+    kind: 'unwired',
+    toolId: 'markdown-to-rdataframe',
     reason:
       'Execution provenance is known, but no processor adapter is registered for the shared workflow.',
     sourceNeeded:

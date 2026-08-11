@@ -2,14 +2,11 @@
 
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@serp-tools/ui/components/button";
-import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
-import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
 import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetizationPanel";
 import { detectCapabilities, type Capabilities } from "@/lib/capabilities";
-import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
-import { compressFile, convertWithWorker, getOutputMimeType } from "@/lib/convert/workerClient";
-import { resolveCompressionTarget } from "@/lib/compression-utils";
+import { getGenericAccept } from "@/lib/generic-tool-workflow";
+import { useGenericToolWorkflow } from "@/lib/useGenericToolWorkflow";
 import type { OperationType } from "@/types";
 
 type Props = {
@@ -35,14 +32,14 @@ export default function LanderHeroTwoColumn({
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dropRef = useRef<HTMLDivElement | null>(null);
-  const workerRef = useRef<Worker | null>(null);
-  const [busy, setBusy] = useState(false);
   const [hint, setHint] = useState("or drop files here");
   const [dropEffect, setDropEffect] = useState<string>("");
   const [capabilities, setCapabilities] = useState<Capabilities | null>(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
-  const [adsVisible, setAdsVisible] = useState(false);
-  const [currentFile, setCurrentFile] = useState<ToolProgressFile | null>(null);
+  const { adsVisible, busy, currentFile, runFiles } = useGenericToolWorkflow({
+    toolId: toolId ?? `${from}-to-${to}`,
+    onStart: () => setVideoPlaying(true),
+  });
   // Generate stable color based on tool properties
   const colors = [
     "#ef4444", // red-500
@@ -67,23 +64,6 @@ export default function LanderHeroTwoColumn({
   const normalizedFrom = from.toLowerCase();
   const normalizedTo = to.toLowerCase();
   const isCompression = operation === "compress" && normalizedFrom === normalizedTo;
-  const compressionTarget = isCompression ? resolveCompressionTarget(normalizedFrom) : null;
-  const shouldUseCompressionWorker = compressionTarget === "image-worker";
-
-  function ensureWorker() {
-    if (!workerRef.current) {
-      const workerUrl = shouldUseCompressionWorker
-        ? new URL("../workers/compress.worker.js", import.meta.url)
-        : new URL("../workers/convert.worker.js", import.meta.url);
-      workerRef.current = new Worker(workerUrl, { type: "module" });
-
-      // Add error handler for worker
-      workerRef.current.onerror = (error) => {
-        console.error('Worker error:', error);
-      };
-    }
-    return workerRef.current;
-  }
 
   // Detect capabilities on mount
   useEffect(() => {
@@ -92,119 +72,6 @@ export default function LanderHeroTwoColumn({
 
   function onPick() {
     inputRef.current?.click();
-  }
-
-  async function handleFiles(files: FileList | null) {
-    if (!files || !files.length) return;
-    if (!adsVisible) setAdsVisible(true);
-
-    // Start playing video when file is dropped
-    setVideoPlaying(true);
-
-    const w = shouldUseCompressionWorker || !isCompression ? ensureWorker() : null;
-    setBusy(true);
-    for (const file of Array.from(files)) {
-      const run = beginToolRun({
-        toolId: toolId ?? `${from}-to-${to}`,
-        from,
-        to,
-        inputBytes: file.size,
-        metadata: { fileName: file.name },
-      });
-      setCurrentFile({
-        name: file.name,
-        progress: 0,
-        status: "processing",
-        message: undefined,
-      });
-      try {
-        const buf = await file.arrayBuffer();
-        if (isCompression) {
-          const compressedBuffer = await compressFile({
-            worker: w ?? undefined,
-            format: normalizedFrom,
-            buf,
-            quality: 0.82,
-            onProgress: (update) => {
-              setCurrentFile({
-                name: file.name,
-                progress: update.progress || 0,
-                status: "processing",
-                message: undefined,
-              });
-            },
-          });
-          const blob = new Blob([compressedBuffer], { type: getOutputMimeType(normalizedFrom) });
-          const name = file.name.replace(/\.[^.]+$/, "") + `_compressed.${normalizedFrom}`;
-          saveBlob(blob, name);
-          run.finishSuccess({ outputBytes: blob.size });
-          setCurrentFile({
-            name: file.name,
-            progress: 100,
-            status: "completed",
-            message: "Compression complete!",
-          });
-          continue;
-        }
-        const worker = w ?? ensureWorker();
-        const result = await convertWithWorker({
-          worker,
-          from,
-          to,
-          buf,
-          onProgress: (update) => {
-            setCurrentFile({
-              name: file.name,
-              progress: update.progress ?? 0,
-              status: update.status === "loading" ? "loading" : "processing",
-              message: update.status === "loading" ? "Loading converter…" : undefined,
-            });
-          },
-        });
-
-        if (result.kind === "multiple") {
-          const mimeType = getOutputMimeType(to);
-          result.buffers.forEach((buffer, i) => {
-            const blob = new Blob([buffer], { type: mimeType });
-            const name = file.name.replace(/\.[^.]+$/, "") + `_page${i + 1}.${to}`;
-            saveBlob(blob, name);
-          });
-          run.finishSuccess({
-            outputBytes: result.buffers.reduce((sum, buffer) => sum + buffer.byteLength, 0),
-          });
-          setCurrentFile({
-            name: file.name,
-            progress: 100,
-            status: "completed",
-            message: "Conversion complete!",
-          });
-        } else {
-          const mimeType = getOutputMimeType(to);
-          const blob = new Blob([result.buffer], { type: mimeType });
-          const name = file.name.replace(/\.[^.]+$/, "") + "." + to;
-          saveBlob(blob, name);
-          run.finishSuccess({ outputBytes: result.buffer.byteLength });
-          setCurrentFile({
-            name: file.name,
-            progress: 100,
-            status: "completed",
-            message: "Conversion complete!",
-          });
-        }
-      } catch (err: unknown) {
-        const failure = getTelemetryFailure(err, "convert_failed");
-        const message = failure.message || "Convert failed";
-        run.finishFailure({ errorCode: failure.errorCode, metadata: failure.metadata });
-        console.error(`Conversion failed for ${file.name}:`, err);
-        setCurrentFile({
-          name: file.name,
-          progress: 0,
-          status: "error",
-          message,
-        });
-      }
-    }
-    setBusy(false);
   }
 
   // simple drag/drop
@@ -239,7 +106,7 @@ export default function LanderHeroTwoColumn({
     setTimeout(() => setDropEffect(""), 1000);
 
     setHint(isCompression ? "Compressing…" : "Converting…");
-    handleFiles(e.dataTransfer.files).finally(() => setHint("or drop files here"));
+    runFiles(e.dataTransfer.files).finally(() => setHint("or drop files here"));
   }
 
   // Clear drop effect when component unmounts or effect changes
@@ -250,12 +117,7 @@ export default function LanderHeroTwoColumn({
     }
   }, [dropEffect]);
 
-  const acceptAttr =
-    accept ??
-    (from === "pdf" ? ".pdf"
-      : from === "jpg" ? ".jpg,.jpeg"
-        : from === "jpeg" ? ".jpeg,.jpg"
-          : `.${from}`);
+  const acceptAttr = accept ?? getGenericAccept(from);
   const adSlotPrefix = toolId ?? `${from}-to-${to}`;
 
   return (
@@ -392,7 +254,7 @@ export default function LanderHeroTwoColumn({
                   accept={acceptAttr}
                   className="hidden"
                   data-testid="tool-file-input"
-                  onChange={(e) => handleFiles(e.target.files)}
+                  onChange={(e) => runFiles(e.target.files)}
                 />
               </div>
             </div>
