@@ -20,6 +20,7 @@ export function useSpecializedToolWorkflow() {
   const [snapshot, setSnapshot] = useState<WorkflowSnapshot>();
   const [controller] = useState(() => createSpecializedRunController(workflow, {
     observe: setSnapshot,
+    onOutcome: setOutcome,
   }));
 
   useEffect(() => () => {
@@ -27,35 +28,28 @@ export function useSpecializedToolWorkflow() {
     deliveries.clear();
   }, [controller, deliveries]);
 
-  const accept = useCallback((next: WorkflowOutcome | undefined) => {
-    if (next) setOutcome(next);
-    return next;
-  }, []);
-
   const runInteraction = useCallback(async (request: SpecializedInteractionRequest) => {
     deliveries.clear();
-    const next = await controller.runInteraction(request);
-    return accept(next);
-  }, [accept, controller, deliveries]);
+    return controller.runInteraction(request);
+  }, [controller, deliveries]);
 
   const scheduleInteraction = useCallback((
     request: SpecializedInteractionRequest,
     delay = 800,
   ) => {
+    deliveries.clear();
     controller.scheduleInteraction(request, delay);
-  }, [controller]);
+  }, [controller, deliveries]);
 
   const runFile = useCallback(async (toolId: string, file: BrowserFile) => {
     deliveries.clear();
-    const next = await controller.runFile(toolId, file);
-    return accept(next);
-  }, [accept, controller, deliveries]);
+    return controller.runFile(toolId, file);
+  }, [controller, deliveries]);
 
   const runFiles = useCallback(async (toolId: string, files: readonly BrowserFile[]) => {
     deliveries.clear();
-    const next = await controller.runFiles(toolId, files);
-    return accept(next);
-  }, [accept, controller, deliveries]);
+    return controller.runFiles(toolId, files);
+  }, [controller, deliveries]);
 
   const clear = useCallback(() => {
     controller.clear();

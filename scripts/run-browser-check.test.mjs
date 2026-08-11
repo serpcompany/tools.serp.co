@@ -143,6 +143,16 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   );
 });
 
+test('specialized smoke coverage exercises rendered lifecycle and delivery behavior', () => {
+  assert.match(runnerSource, /tool\.id === "html-to-markdown"/);
+  assert.match(runnerSource, /html clear allowed a scheduled result to reappear/i);
+  assert.match(runnerSource, /character debounce published stale statistics/i);
+  assert.match(runnerSource, /csv-combiner-download/);
+  assert.match(runnerSource, /pdf-tool-input/);
+  assert.match(runnerSource, /pdf-tool-viewer/);
+  assert.match(runnerSource, /file=blob%3A/);
+});
+
 test('local evidence accepts only loopback targets', () => {
   const result = spawnSync(
     process.execPath,

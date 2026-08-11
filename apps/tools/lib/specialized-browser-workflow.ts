@@ -150,7 +150,10 @@ function mediaMimeType(file: BrowserFile, format: string): string {
 
 export function createSpecializedRunController(
   workflow: ToolWorkflow,
-  options: Readonly<{ observe?(snapshot: WorkflowSnapshot): void }> = {},
+  options: Readonly<{
+    observe?(snapshot: WorkflowSnapshot): void;
+    onOutcome?(outcome: WorkflowOutcome): void;
+  }> = {},
 ): Readonly<{
   runInteraction(request: SpecializedInteractionRequest): Promise<WorkflowOutcome | undefined>;
   runFile(toolId: string, file: BrowserFile): Promise<WorkflowOutcome | undefined>;
@@ -195,7 +198,9 @@ export function createSpecializedRunController(
           },
         },
       }, { signal: run.controller.signal, observe: options.observe });
-      return current(run.revision) ? outcome : undefined;
+      if (!current(run.revision)) return undefined;
+      options.onOutcome?.(outcome);
+      return outcome;
     },
     async runFile(toolId, file) {
       const run = begin();
@@ -209,7 +214,9 @@ export function createSpecializedRunController(
           media: { name: file.name, format, mimeType: mediaMimeType(file, format), bytes },
         },
       }, { signal: run.controller.signal, observe: options.observe });
-      return current(run.revision) ? outcome : undefined;
+      if (!current(run.revision)) return undefined;
+      options.onOutcome?.(outcome);
+      return outcome;
     },
     async runFiles(toolId, files) {
       const run = begin();
@@ -230,7 +237,9 @@ export function createSpecializedRunController(
           }),
         },
       }, { signal: run.controller.signal, observe: options.observe });
-      return current(run.revision) ? outcome : undefined;
+      if (!current(run.revision)) return undefined;
+      options.onOutcome?.(outcome);
+      return outcome;
     },
     scheduleInteraction(request, delay = 800) {
       if (timer) clearTimeout(timer);

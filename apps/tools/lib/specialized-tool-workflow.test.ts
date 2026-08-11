@@ -355,6 +355,33 @@ test("clearing the shared controller cancels a pending interaction", async () =>
   assert.deepEqual(requests, []);
 });
 
+test("scheduled interaction publishes its terminal outcome to the presentation", async () => {
+  const outcomes: string[] = [];
+  const controller = createSpecializedRunController({
+    async run(request) {
+      return {
+        status: "cancelled",
+        runId: request.toolId,
+        telemetry: { start: "not-attempted", terminal: "not-attempted" },
+      };
+    },
+  }, {
+    onOutcome(outcome) {
+      outcomes.push(outcome.status);
+    },
+  });
+
+  controller.scheduleInteraction({
+    toolId: "character-counter",
+    format: "text",
+    mimeType: "text/plain",
+    value: "one two",
+  }, 0);
+  await new Promise((resolve) => setTimeout(resolve, 10));
+
+  assert.deepEqual(outcomes, ["cancelled"]);
+});
+
 test("shared controller projects workflow phases and numeric progress", async () => {
   const snapshots: Array<{ phase: string; progress?: number }> = [];
   const { workflow } = createBrowserSpecializedWorkflow();
