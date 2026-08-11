@@ -24,8 +24,7 @@ const ARCHIVE_NAME = 'compressed_pngs.zip';
 export const BATCH_PNG_LIMITS = Object.freeze({
   maxItems: 100,
   maxItemBytes: 16 * 1_024 * 1_024,
-  maxInputBytes: 64 * 1_024 * 1_024,
-  maxRetainedBytes: 48 * 1_024 * 1_024,
+  maxInputBytes: 48 * 1_024 * 1_024,
   maxArchiveBytes: 80 * 1_024 * 1_024,
 });
 
@@ -325,7 +324,7 @@ function processor(
           },
         });
         context.signal.throwIfAborted();
-        const verification = await verifyMediaSemantics(
+        const candidateVerification = await verifyMediaSemantics(
           {
             name: names[index]!,
             format: 'png',
@@ -333,16 +332,31 @@ function processor(
             bytes,
           },
           undefined,
-          { maxBytes: BATCH_PNG_LIMITS.maxItemBytes, signal: context.signal },
+          { signal: context.signal },
         );
-        if (verification.status !== 'verified')
-          throw new Error(verification.message);
+        if (candidateVerification.status !== 'verified')
+          throw new Error(candidateVerification.message);
         const retained =
           bytes.byteLength < media.bytes.byteLength ? bytes : media.bytes;
         retainedBytes += retained.byteLength;
-        if (retainedBytes > BATCH_PNG_LIMITS.maxRetainedBytes) {
+        if (
+          retained.byteLength > BATCH_PNG_LIMITS.maxItemBytes ||
+          retainedBytes > BATCH_PNG_LIMITS.maxInputBytes
+        ) {
           throw new Error('Compressed batch exceeds the retained-byte limit');
         }
+        const retainedVerification = await verifyMediaSemantics(
+          {
+            name: names[index]!,
+            format: 'png',
+            mimeType: 'image/png',
+            bytes: retained,
+          },
+          undefined,
+          { maxBytes: BATCH_PNG_LIMITS.maxItemBytes, signal: context.signal },
+        );
+        if (retainedVerification.status !== 'verified')
+          throw new Error(retainedVerification.message);
         compressed.push(retained);
       }
 

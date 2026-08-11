@@ -277,6 +277,19 @@ test('a compressor returning spoofed PNG bytes cannot reach archive delivery', a
   assert.deepEqual(telemetry, ['start', 'terminal:failed']);
 });
 
+test('a larger malformed compressor candidate cannot be hidden by retaining the original', async () => {
+  const malformed = new Uint8Array(sample.byteLength + 1_024);
+  const { workflow, deliveries, telemetry } = recorder(async () => malformed);
+  const outcome = await workflow.run({
+    toolId: 'batch-compress-png',
+    input: batch([png('one.png')]),
+    options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
+  });
+  assert.equal(outcome.status, 'failed');
+  assert.deepEqual(deliveries, []);
+  assert.deepEqual(telemetry, ['start', 'terminal:failed']);
+});
+
 test('workflow keeps original PNG bytes when compression would be larger', async () => {
   const larger = pngWithTextPayload(sample, 1_024);
   const { workflow, deliveries } = recorder(async () => larger);
@@ -290,7 +303,20 @@ test('workflow keeps original PNG bytes when compression would be larger', async
   assert.deepEqual(entries[0]!.bytes, sample);
 });
 
-test('retained compressed-byte budget fails before archive build or delivery and still cleans up', async () => {
+test('workflow keeps a valid original when a structurally valid compressor candidate expands beyond the per-item limit', async () => {
+  const expanded = pngWithTextPayload(sample, 17 * 1_024 * 1_024);
+  const { workflow, deliveries } = recorder(async () => expanded);
+  const outcome = await workflow.run({
+    toolId: 'batch-compress-png',
+    input: batch([png('one.png')]),
+    options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
+  });
+  assert.equal(outcome.status, 'succeeded');
+  const entries = await archiveEntries(deliveries[0]!.bytes);
+  assert.deepEqual(entries[0]!.bytes, sample);
+});
+
+test('declared aggregate budget rejects before compression, archive build, telemetry, or delivery', async () => {
   const largePng = pngWithTextPayload(sample, 13 * 1_024 * 1_024);
   let cleanups = 0;
   let calls = 0;
@@ -311,10 +337,10 @@ test('retained compressed-byte budget fails before archive build or delivery and
     options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
   });
   assert.equal(outcome.status, 'failed');
-  assert.equal(calls, 4);
-  assert.equal(cleanups, 4);
+  assert.equal(calls, 0);
+  assert.equal(cleanups, 0);
   assert.deepEqual(deliveries, []);
-  assert.deepEqual(telemetry, ['start', 'terminal:failed']);
+  assert.deepEqual(telemetry, []);
 });
 
 test('fail-fast partial-success policy never converts a non-empty prefix into success', async () => {
@@ -340,6 +366,10 @@ test('cancellation stops the active and pending items, cleans up once, and ignor
   let calls = 0;
   let cleanups = 0;
   let lateProgress: (() => void) | undefined;
+  let signalCompressorEntered: (() => void) | undefined;
+  const compressorEntered = new Promise<void>((resolve) => {
+    signalCompressorEntered = resolve;
+  });
   const { workflow, deliveries, telemetry } = recorder(
     async ({ signal, registerCleanup, reportProgress }) => {
       calls += 1;
@@ -347,6 +377,7 @@ test('cancellation stops the active and pending items, cleans up once, and ignor
         cleanups += 1;
       });
       lateProgress = () => reportProgress(1);
+      signalCompressorEntered?.();
       return await new Promise<Uint8Array>((_resolve, reject) => {
         signal.addEventListener('abort', () => reject(signal.reason), {
           once: true,
@@ -366,7 +397,7 @@ test('cancellation stops the active and pending items, cleans up once, and ignor
       observe: (snapshot) => snapshots.push(snapshot),
     },
   );
-  await new Promise((resolve) => setTimeout(resolve, 0));
+  await compressorEntered;
   controller.abort(new DOMException('cancelled', 'AbortError'));
   const outcome = await pending;
   const beforeLate = snapshots.length;
