@@ -50,6 +50,8 @@ test('representative Tool pages consume catalog-resolved content', () => {
 
 test('renderer selection preserves specialized Tool roles', () => {
   assert.equal(selectToolRenderer(toolCatalog.getById('csv-to-sql')), 'table');
+  assert.equal(selectToolRenderer(toolCatalog.getById('json-to-csv')), 'specialized');
+  assert.equal(selectToolRenderer(toolCatalog.getById('html-to-markdown')), 'specialized');
   assert.equal(selectToolRenderer(toolCatalog.getById('3g2-to-mp4')), 'generic');
   assert.equal(selectToolRenderer(toolCatalog.getById('video-downloader')), 'downloader');
   assert.equal(selectToolRenderer(toolCatalog.getById('pdf-reader')), 'pdf');
