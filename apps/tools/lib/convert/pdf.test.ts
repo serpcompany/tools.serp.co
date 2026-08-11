@@ -12,6 +12,7 @@ test("PDF rendering cancellation stops the active render and destroys the docume
         GlobalWorkerOptions: { workerSrc: "" },
         getDocument() {
           return {
+            async destroy() {},
             promise: Promise.resolve({
               numPages: 1,
               async getPage() {
@@ -72,6 +73,7 @@ test("PDF rendering destroys the document when page acquisition fails", async ()
         GlobalWorkerOptions: { workerSrc: "" },
         getDocument() {
           return {
+            async destroy() {},
             promise: Promise.resolve({
               numPages: 1,
               async getPage() {
@@ -92,4 +94,60 @@ test("PDF rendering destroys the document when page acquisition fails", async ()
 
   await assert.rejects(renderPages(new ArrayBuffer(8)), /page failed/);
   assert.equal(destroyed, 1);
+});
+
+test("PDF cancellation destroys a stalled loading task before a document exists", async () => {
+  let taskDestroyed = 0;
+  const renderPages = createPdfPageRenderer({
+    async loadPdfjs() {
+      return {
+        GlobalWorkerOptions: { workerSrc: "" },
+        getDocument() {
+          return {
+            promise: new Promise<never>(() => {}),
+            async destroy() {
+              taskDestroyed += 1;
+            },
+          };
+        },
+      };
+    },
+    createCanvas() {
+      throw new Error("canvas should not be created");
+    },
+  });
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 10);
+
+  await assert.rejects(
+    renderPages(new ArrayBuffer(8), undefined, "png", controller.signal),
+    (error: unknown) =>
+      error instanceof DOMException && error.name === "AbortError",
+  );
+  assert.equal(taskDestroyed, 1);
+});
+
+test("PDF loading failure destroys its loading task", async () => {
+  let taskDestroyed = 0;
+  const renderPages = createPdfPageRenderer({
+    async loadPdfjs() {
+      return {
+        GlobalWorkerOptions: { workerSrc: "" },
+        getDocument() {
+          return {
+            promise: Promise.reject(new Error("load failed")),
+            async destroy() {
+              taskDestroyed += 1;
+            },
+          };
+        },
+      };
+    },
+    createCanvas() {
+      throw new Error("canvas should not be created");
+    },
+  });
+
+  await assert.rejects(renderPages(new ArrayBuffer(8)), /load failed/);
+  assert.equal(taskDestroyed, 1);
 });

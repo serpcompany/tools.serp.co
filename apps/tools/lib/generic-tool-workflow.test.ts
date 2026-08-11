@@ -589,6 +589,8 @@ test("main-thread HEIC conversion propagates cancellation to libheif", async () 
     globalThis.ImageData = originalImageData;
   }
   assert.ok(performance.now() - started < 150);
+  assert.equal(freed, 0);
+  await new Promise((resolve) => setTimeout(resolve, 75));
   assert.equal(freed, 3);
 });
 

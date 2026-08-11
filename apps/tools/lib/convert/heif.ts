@@ -42,6 +42,10 @@ type HeifGlobal = typeof globalThis & {
 
 // Where you put the bundle file (see step below)
 const BUNDLE_URL = "/vendor/libheif/libheif-bundle.js";
+// The bundled callback API schedules display work for the next task and offers
+// no cancellation primitive. On abort, retain native ownership for a grace
+// task so its callback can settle before falling back to bounded cleanup.
+const CALLBACK_CLEANUP_GRACE_MS = 50;
 
 let inited = false;
 let g: HeifGlobal | null = null; // global
@@ -137,44 +141,107 @@ async function awaitWithSignal<T>(
   }
 }
 
-async function displayImage(
+type DisplayOperation = Readonly<{
+  outcome: Promise<void>;
+  callbackSettled(): boolean;
+  waitUntilSafeToRelease(): Promise<void>;
+}>;
+
+function displayImage(
   img: HeifImage,
   rgba: Uint8ClampedArray,
   width: number,
   height: number,
   signal?: AbortSignal,
-): Promise<void> {
+): DisplayOperation {
   signal?.throwIfAborted();
   if (img.display.length >= 4) {
     img.display(rgba, width, height, { colorSpace: "rgb", bitDepth: 8 });
     signal?.throwIfAborted();
-    return;
+    return {
+      outcome: Promise.resolve(),
+      callbackSettled: () => true,
+      waitUntilSafeToRelease: async () => {},
+    };
   }
-  await awaitWithSignal(
-    new Promise<void>((resolve, reject) => {
-      try {
-        const imageData = new ImageData(
-          Uint8ClampedArray.from(rgba),
-          width,
-          height,
-        );
-        img.display(imageData, (result: unknown) => {
-          if (result === null || result instanceof Error) {
-            reject(
-              result instanceof Error
-                ? result
-                : new Error("HEIF display callback failed"),
-            );
-          } else {
-            resolve();
-          }
-        });
-      } catch (error) {
-        reject(error);
+  let settled = false;
+  const callback = new Promise<void>((resolve, reject) => {
+    try {
+      // libheif writes into ImageData.data. It must share the exact returned
+      // RGBA allocation; copying here silently produces an all-zero result.
+      if (!(rgba.buffer instanceof ArrayBuffer)) {
+        throw new Error("HEIF RGBA allocation must use an ArrayBuffer");
       }
-    }),
-    signal,
+      const sharedRgba = new Uint8ClampedArray(
+        rgba.buffer,
+        rgba.byteOffset,
+        rgba.byteLength,
+      );
+      const imageData = new ImageData(sharedRgba, width, height);
+      img.display(imageData, (result: unknown) => {
+        settled = true;
+        if (result === null || result instanceof Error) {
+          reject(
+            result instanceof Error
+              ? result
+              : new Error("HEIF display callback failed"),
+          );
+        } else {
+          resolve();
+        }
+      });
+    } catch (error) {
+      settled = true;
+      reject(error);
+    }
+  });
+  const callbackCompletion = callback.then(
+    () => undefined,
+    () => undefined,
   );
+  return {
+    outcome: awaitWithSignal(callback, signal),
+    callbackSettled: () => settled,
+    async waitUntilSafeToRelease() {
+      if (settled) return;
+      await Promise.race([
+        callbackCompletion,
+        new Promise<void>((resolve) =>
+          setTimeout(resolve, CALLBACK_CLEANUP_GRACE_MS),
+        ),
+      ]);
+    },
+  };
+}
+
+function once(cleanup: () => void): () => void {
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    cleanup();
+  };
+}
+
+function releaseAll(cleanups: readonly (() => void)[]): void {
+  for (const cleanup of cleanups) {
+    try {
+      cleanup();
+    } catch {
+      // Every independently acquired native handle still gets its release.
+    }
+  }
+}
+
+async function releaseAfterDisplay(
+  display: DisplayOperation | undefined,
+  signal: AbortSignal | undefined,
+  release: () => void,
+): Promise<void> {
+  if (signal?.aborted && display && !display.callbackSettled()) {
+    await display.waitUntilSafeToRelease();
+  }
+  release();
 }
 
 /** Unified decode: prefers HeifContext if present; otherwise uses HeifDecoder */
@@ -195,6 +262,14 @@ export async function decodeHeifToRGBA(
     const ctx = new g.HeifContext();
     let handle: ReturnType<HeifContext["getPrimaryImageHandle"]> | undefined;
     let img: HeifImage | undefined;
+    let display: DisplayOperation | undefined;
+    const release = once(() => {
+      releaseAll([
+        () => img?.free?.(),
+        () => handle?.free?.(),
+        () => ctx.free?.(),
+      ]);
+    });
     try {
       ctx.read(bytes);
       signal?.throwIfAborted();
@@ -203,12 +278,15 @@ export async function decodeHeifToRGBA(
       const width = img.get_width();
       const height = img.get_height();
       const rgba = new Uint8ClampedArray(checkedRgbaLength(width, height));
-      await displayImage(img, rgba, width, height, signal);
+      display = displayImage(img, rgba, width, height, signal);
+      await display.outcome;
       return { data: rgba, width, height };
     } finally {
-      img?.free?.();
-      handle?.free?.();
-      ctx.free?.();
+      if (signal?.aborted && display && !display.callbackSettled()) {
+        void releaseAfterDisplay(display, signal, release);
+      } else {
+        release();
+      }
     }
   }
 
@@ -217,15 +295,24 @@ export async function decodeHeifToRGBA(
     const dec = new g.HeifDecoder();
     const images = dec.decode(bytes);
     const [img] = images ?? [];
+    let display: DisplayOperation | undefined;
+    const release = once(() => {
+      releaseAll((images ?? []).map((image) => () => image.free?.()));
+    });
     try {
       if (!img) throw new Error("No images in HEIF");
       const width = img.get_width();
       const height = img.get_height();
       const rgba = new Uint8ClampedArray(checkedRgbaLength(width, height));
-      await displayImage(img, rgba, width, height, signal);
+      display = displayImage(img, rgba, width, height, signal);
+      await display.outcome;
       return { data: rgba, width, height };
     } finally {
-      for (const image of images ?? []) image.free?.();
+      if (signal?.aborted && display && !display.callbackSettled()) {
+        void releaseAfterDisplay(display, signal, release);
+      } else {
+        release();
+      }
     }
   }
 

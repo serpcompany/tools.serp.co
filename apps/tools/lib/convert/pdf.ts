@@ -18,9 +18,14 @@ type PdfjsDocument = {
   destroy: () => void | Promise<void>;
 };
 
+type PdfjsLoadingTask = {
+  promise: Promise<PdfjsDocument>;
+  destroy: () => void | Promise<void>;
+};
+
 type PdfjsModule = {
   GlobalWorkerOptions: { workerSrc: string };
-  getDocument: (options: { data: ArrayBuffer }) => { promise: Promise<PdfjsDocument> };
+  getDocument: (options: { data: ArrayBuffer }) => PdfjsLoadingTask;
 };
 
 let pdfjsPromise: Promise<PdfjsModule> | null = null;
@@ -88,9 +93,11 @@ export function createPdfPageRenderer(
     signal?.throwIfAborted();
     const pdfjsLib = await awaitWithSignal(ports.loadPdfjs(), signal);
     pdfjsLib.GlobalWorkerOptions.workerSrc = workerPublicUrl;
+    let loadingTask: PdfjsLoadingTask | undefined;
     let doc: PdfjsDocument | undefined;
     try {
-      const documentPromise = pdfjsLib.getDocument({ data: buf }).promise;
+      loadingTask = pdfjsLib.getDocument({ data: buf });
+      const documentPromise = loadingTask.promise;
       const loadedDocument = await awaitWithSignal(
         documentPromise.then(async (loaded) => {
           if (signal?.aborted) {
@@ -154,7 +161,11 @@ export function createPdfPageRenderer(
       }
       return out;
     } finally {
-      await doc?.destroy();
+      if (doc) {
+        await doc.destroy();
+      } else {
+        await loadingTask?.destroy();
+      }
     }
   };
 }
