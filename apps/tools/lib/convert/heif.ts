@@ -14,7 +14,12 @@ type HeifImage = {
 
 type HeifContext = {
   read: (bytes: Uint8Array) => void;
-  getPrimaryImageHandle: () => { decode: () => HeifImage; free?: () => void };
+  getPrimaryImageHandle: () => {
+    decode: () => HeifImage;
+    get_width?: () => number;
+    get_height?: () => number;
+    free?: () => void;
+  };
   free?: () => void;
 };
 
@@ -110,6 +115,28 @@ function checkedRgbaLength(width: number, height: number): number {
   return width * height * 4;
 }
 
+async function awaitWithSignal<T>(
+  promise: Promise<T>,
+  signal?: AbortSignal,
+): Promise<T> {
+  signal?.throwIfAborted();
+  if (!signal) return promise;
+  let rejectAbort: ((reason: unknown) => void) | undefined;
+  const aborted = new Promise<never>((_resolve, reject) => {
+    rejectAbort = reject;
+  });
+  const onAbort = () =>
+    rejectAbort?.(
+      signal.reason ?? new DOMException("The operation was aborted", "AbortError"),
+    );
+  signal.addEventListener("abort", onAbort, { once: true });
+  try {
+    return await Promise.race([promise, aborted]);
+  } finally {
+    signal.removeEventListener("abort", onAbort);
+  }
+}
+
 async function displayImage(
   img: HeifImage,
   rgba: Uint8ClampedArray,
@@ -123,33 +150,31 @@ async function displayImage(
     signal?.throwIfAborted();
     return;
   }
-  await new Promise<void>((resolve, reject) => {
-    try {
-      const imageData = new ImageData(
-        Uint8ClampedArray.from(rgba),
-        width,
-        height,
-      );
-      img.display(imageData, (result: unknown) => {
-        if (result === null || result instanceof Error) {
-          reject(
-            result instanceof Error
-              ? result
-              : new Error("HEIF display callback failed"),
-          );
-        } else {
-          try {
-            signal?.throwIfAborted();
+  await awaitWithSignal(
+    new Promise<void>((resolve, reject) => {
+      try {
+        const imageData = new ImageData(
+          Uint8ClampedArray.from(rgba),
+          width,
+          height,
+        );
+        img.display(imageData, (result: unknown) => {
+          if (result === null || result instanceof Error) {
+            reject(
+              result instanceof Error
+                ? result
+                : new Error("HEIF display callback failed"),
+            );
+          } else {
             resolve();
-          } catch (error) {
-            reject(error);
           }
-        }
-      });
-    } catch (error) {
-      reject(error);
-    }
-  });
+        });
+      } catch (error) {
+        reject(error);
+      }
+    }),
+    signal,
+  );
 }
 
 /** Unified decode: prefers HeifContext if present; otherwise uses HeifDecoder */
@@ -205,4 +230,56 @@ export async function decodeHeifToRGBA(
   }
 
   throw new Error("No compatible libheif API found");
+}
+
+export async function verifyHeifIdentity(
+  buf: ArrayBuffer,
+  signal?: AbortSignal,
+): Promise<boolean> {
+  signal?.throwIfAborted();
+  try {
+    await ensureHeif();
+    if (!g) return false;
+    const bytes = new Uint8Array(buf);
+    if (typeof g.HeifContext === "function") {
+      const context = new g.HeifContext();
+      let handle: ReturnType<HeifContext["getPrimaryImageHandle"]> | undefined;
+      let image: HeifImage | undefined;
+      try {
+        context.read(bytes);
+        signal?.throwIfAborted();
+        handle = context.getPrimaryImageHandle();
+        const width = handle.get_width?.();
+        const height = handle.get_height?.();
+        if (width !== undefined && height !== undefined) {
+          checkedRgbaLength(width, height);
+          return true;
+        }
+        image = handle.decode();
+        checkedRgbaLength(image.get_width(), image.get_height());
+        signal?.throwIfAborted();
+        return true;
+      } finally {
+        image?.free?.();
+        handle?.free?.();
+        context.free?.();
+      }
+    }
+    if (typeof g.HeifDecoder === "function") {
+      const images = new g.HeifDecoder().decode(bytes);
+      try {
+        const image = images[0];
+        if (!image) return false;
+        checkedRgbaLength(image.get_width(), image.get_height());
+        signal?.throwIfAborted();
+        return true;
+      } finally {
+        for (const image of images) image.free?.();
+      }
+    }
+    return false;
+  } catch {
+    signal?.throwIfAborted();
+    return false;
+  }
 }

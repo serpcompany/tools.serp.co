@@ -10,6 +10,7 @@ import { toolCatalog } from "@serp-tools/app-core/lib/tool-catalog";
 import {
   createGenericToolWorkflow,
   decideGenericBrowserSupport,
+  detectGenericMediaMimeType,
   deliverBrowserMedia,
   getGenericAccept,
   genericCompressionNeedsWorker,
@@ -25,6 +26,7 @@ import { resolveCompressionDispatch } from "./compression-utils.ts";
 import { createGenericToolRunController } from "./generic-tool-run-controller.ts";
 import { runFfmpegLifecycle } from "./convert/ffmpeg-lifecycle.ts";
 import { decodeToRGBA } from "./convert/decode.ts";
+import { convertWithWorker } from "./convert/workerClient.ts";
 
 const fixture = (name: string) =>
   new Uint8Array(
@@ -117,11 +119,21 @@ test("known production dispatches retain exact generic workflow contracts", () =
     "png-to-webp",
     "webp-to-jpg",
     "heic-to-jpg",
-    "mp4-to-mp3",
   ]) {
     assert.equal(getGenericToolContract(toolId).state, "supported", toolId);
   }
-  for (const toolId of ["cr2-to-jpg", "m4a-to-mp4", "mp3-to-mp4"]) {
+  for (const toolId of [
+    "cr2-to-jpg",
+    "m4a-to-mp4",
+    "mp3-to-mp4",
+    "compress-m4a",
+    "compress-mp3",
+    "compress-mp4",
+    "m4a-to-mp3",
+    "mp3-to-m4a",
+    "mp4-to-m4a",
+    "mp4-to-mp3",
+  ]) {
     assert.equal(getGenericToolContract(toolId).state, "unsupported", toolId);
   }
 });
@@ -169,6 +181,12 @@ test("contract inventory independently audits real dispatches with semantic cove
     "png",
     "webp",
   ]);
+  const cloudflareInoperableMediaRoutes = new Set([
+    "m4a-to-mp3",
+    "mp3-to-m4a",
+    "mp4-to-m4a",
+    "mp4-to-mp3",
+  ]);
   for (const tool of toolCatalog.activeTools.filter(
     (item) =>
       selectToolRenderer(item) === "generic" && item.operation === "convert",
@@ -178,7 +196,8 @@ test("contract inventory independently audits real dispatches with semantic cove
     const expectedSupported =
       capability.supported &&
       verifiedInputs.has(tool.from) &&
-      verifiedOutputs.has(tool.to);
+      verifiedOutputs.has(tool.to) &&
+      !cloudflareInoperableMediaRoutes.has(tool.id);
     assert.equal(
       getGenericToolContract(tool.id).state === "supported",
       expectedSupported,
@@ -196,7 +215,8 @@ test("contract inventory independently audits real dispatches with semantic cove
       dispatch.target !== "unsupported" &&
       dispatch.target !== "pdf" &&
       verifiedInputs.has(tool.from) &&
-      verifiedOutputs.has(tool.to);
+      verifiedOutputs.has(tool.to) &&
+      !["m4a", "mp3", "mp4"].includes(tool.from);
     assert.equal(
       getGenericToolContract(tool.id).state === "supported",
       expectedSupported,
@@ -318,17 +338,30 @@ test("runtime capability rejection fails closed before a registered engine runs"
   assert.deepEqual(baseBoundary.delivered, []);
 });
 
-test("production support retains adaptive server conversion but rejects unavailable browser compression", () => {
+test("production support rejects media work when no deployable browser runtime exists", () => {
   assert.deepEqual(
     decideGenericBrowserSupport(
       { operation: "convert", inputFormat: "mp4", outputFormat: "m4a" },
       false,
     ),
-    { supported: true },
+    {
+      supported: false,
+      message: "Media processing is not available in this browser.",
+    },
   );
   assert.deepEqual(
     decideGenericBrowserSupport(
       { operation: "compress", inputFormat: "mp4", outputFormat: "mp4" },
+      false,
+    ),
+    {
+      supported: false,
+      message: "Media processing is not available in this browser.",
+    },
+  );
+  assert.deepEqual(
+    decideGenericBrowserSupport(
+      { operation: "compress", inputFormat: "mp3", outputFormat: "mp3" },
       false,
     ),
     {
@@ -420,7 +453,54 @@ test("generic file acquisition canonicalizes safe MIME aliases and derives octet
   const outcome = await runGenericToolFile("mp4-to-mp3", renamed);
   assert.equal(outcome.status, "failed");
   if (outcome.status === "failed")
-    assert.equal(outcome.error.code, "unsupported-request");
+    assert.equal(outcome.error.code, "unsupported-tool");
+});
+
+test("trusted byte identity distinguishes HEIC, M4A, and MP4 families", async () => {
+  const heifGlobal = globalThis as typeof globalThis & {
+    HeifContext?: new () => unknown;
+  };
+  heifGlobal.HeifContext = class {
+    read() {}
+    getPrimaryImageHandle() {
+      return {
+        decode() {
+          throw new Error("identity detection must not decode pixels");
+        },
+        get_width: () => 1,
+        get_height: () => 1,
+        free() {},
+      };
+    }
+    free() {}
+  } as never;
+
+  assert.equal(
+    await detectGenericMediaMimeType(fixture("sample.heic")),
+    "image/heic",
+  );
+  assert.equal(
+    await detectGenericMediaMimeType(fixture("sample.m4a")),
+    "audio/mp4",
+  );
+  assert.equal(
+    await detectGenericMediaMimeType(fixture("sample.mp4")),
+    "video/mp4",
+  );
+  assert.equal(await detectGenericMediaMimeType(fixture("sample.avif")), undefined);
+});
+
+test("empty and octet-stream MIME use trusted HEIC identity before workflow support", async () => {
+  for (const type of ["", "application/octet-stream"]) {
+    const outcome = await runGenericToolFile(
+      "heic-to-jpg",
+      new File([fixture("sample.heic")], "sample.heic", { type }),
+    );
+    assert.equal(outcome.status, "failed");
+    if (outcome.status === "failed") {
+      assert.notEqual(outcome.error.code, "unsupported-request", type);
+    }
+  }
 });
 
 test("browser image decoder cancellation rejects promptly and closes the decoder", async () => {
@@ -457,33 +537,86 @@ test("browser image decoder cancellation rejects promptly and closes the decoder
   assert.equal(closed, true);
 });
 
-test("trusted audio decoder cancellation becomes a cancelled workflow and closes its context", async () => {
+test("main-thread HEIC conversion propagates cancellation to libheif", async () => {
+  const originalImageData = globalThis.ImageData;
+  const heifGlobal = globalThis as typeof globalThis & {
+    HeifContext?: new () => unknown;
+  };
+  let freed = 0;
+  globalThis.ImageData = class {
+    constructor() {}
+  } as never;
+  heifGlobal.HeifContext = class {
+    read() {}
+    getPrimaryImageHandle() {
+      return {
+        decode() {
+          return {
+            get_width: () => 1,
+            get_height: () => 1,
+            display() {},
+            free() {
+              freed += 1;
+            },
+          };
+        },
+        free() {
+          freed += 1;
+        },
+      };
+    }
+    free() {
+      freed += 1;
+    }
+  } as never;
+  const controller = new AbortController();
+  const worker = { terminate() {}, postMessage() {} } as unknown as Worker;
+  setTimeout(() => controller.abort(), 10);
+  const started = performance.now();
+  try {
+    await assert.rejects(
+      convertWithWorker({
+        worker,
+        from: "heic",
+        to: "jpg",
+        buf: fixture("sample.heic").slice().buffer,
+        signal: controller.signal,
+      }),
+      (error: unknown) =>
+        error instanceof DOMException && error.name === "AbortError",
+    );
+  } finally {
+    globalThis.ImageData = originalImageData;
+  }
+  assert.ok(performance.now() - started < 150);
+  assert.equal(freed, 3);
+});
+
+test("unsupported media compression fails before constructing an audio decoder", async () => {
   const originalAudioContext = globalThis.AudioContext;
-  let closed = 0;
+  let constructed = 0;
   class StalledAudioContext {
+    constructor() {
+      constructed += 1;
+    }
     decodeAudioData() {
       return new Promise<never>(() => {});
     }
-    async close() {
-      closed += 1;
-    }
+    async close() {}
   }
   globalThis.AudioContext = StalledAudioContext as never;
-  const controller = new AbortController();
-  setTimeout(() => controller.abort(), 10);
-  const started = performance.now();
   try {
     const outcome = await runGenericToolFile(
       "compress-mp3",
       new File([fixture("sample.mp3")], "sample.mp3", { type: "audio/mp3" }),
-      { signal: controller.signal },
     );
-    assert.equal(outcome.status, "cancelled");
+    assert.equal(outcome.status, "failed");
+    if (outcome.status === "failed")
+      assert.equal(outcome.error.code, "unsupported-tool");
   } finally {
     globalThis.AudioContext = originalAudioContext;
   }
-  assert.ok(performance.now() - started < 150);
-  assert.ok(closed >= 1);
+  assert.equal(constructed, 0);
 });
 
 test("native JPEG fallback reapplies dimension and aggregate RGBA limits", async () => {
@@ -712,18 +845,12 @@ test("trusted media parsers reject truncated and fabricated BMFF audio", async (
   }
 });
 
-test("BMFF contracts reject a valid container from the wrong media family without delivery", async () => {
+test("Cloudflare-inoperable BMFF contracts fail before processing or delivery", async () => {
   const cases = [
     {
       toolId: "mp4-to-m4a",
       input: "sample.mp4",
       output: "sample.mp4",
-      expectedProcessed: true,
-    },
-    {
-      toolId: "mp4-to-m4a",
-      input: "sample.m4a",
-      output: "sample.m4a",
       expectedProcessed: false,
     },
     {
@@ -736,7 +863,7 @@ test("BMFF contracts reject a valid container from the wrong media family withou
       toolId: "compress-m4a",
       input: "sample.m4a",
       output: "sample.mp4",
-      expectedProcessed: true,
+      expectedProcessed: false,
     },
   ] as const;
 
@@ -744,16 +871,15 @@ test("BMFF contracts reject a valid container from the wrong media family withou
     const boundary = adapters(fixture(testCase.output));
     const workflow = createGenericToolWorkflow(boundary);
     const contract = getGenericToolContract(testCase.toolId);
-    assert.equal(contract.state, "supported");
-    if (contract.state !== "supported") continue;
+    assert.equal(contract.state, "unsupported");
     const outcome = await workflow.run({
       toolId: testCase.toolId,
       input: {
         kind: "file",
         media: {
           name: testCase.input,
-          format: contract.input.format,
-          mimeType: contract.input.mimeType,
+          format: testCase.input.split(".").at(-1) ?? "unknown",
+          mimeType: testCase.input.endsWith(".m4a") ? "audio/mp4" : "video/mp4",
           bytes: fixture(testCase.input),
         },
       },

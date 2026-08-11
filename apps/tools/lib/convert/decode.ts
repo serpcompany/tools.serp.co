@@ -34,7 +34,11 @@ function getCanvasDimensions(source: CanvasSource) {
 }
 
 /** Draws an ImageBitmap/VideoFrame into a canvas and returns RGBA data */
-async function bitmapToRGBA(source: CanvasSource): Promise<RGBA> {
+async function bitmapToRGBA(
+  source: CanvasSource,
+  signal?: AbortSignal,
+): Promise<RGBA> {
+  signal?.throwIfAborted();
   const { width, height } = getCanvasDimensions(source);
   const useOffscreen = typeof OffscreenCanvas !== "undefined";
   const canvas: CanvasLike = useOffscreen
@@ -51,13 +55,14 @@ async function bitmapToRGBA(source: CanvasSource): Promise<RGBA> {
   try {
     ctx2d.drawImage(source, 0, 0, width, height);
     const img = ctx2d.getImageData(0, 0, width, height);
+    signal?.throwIfAborted();
     return { data: img.data, width: img.width, height: img.height };
   } finally {
     source.close?.();
   }
 }
 
-async function decodeViaImage(blob: Blob): Promise<RGBA> {
+async function decodeViaImage(blob: Blob, signal?: AbortSignal): Promise<RGBA> {
   if (typeof document === "undefined") {
     throw new Error("Image decoding requires a document.");
   }
@@ -66,6 +71,7 @@ async function decodeViaImage(blob: Blob): Promise<RGBA> {
   try {
     const img = new Image();
     img.decoding = "async";
+    const cancelImage = () => img.removeAttribute("src");
 
     const loaded = new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
@@ -76,12 +82,17 @@ async function decodeViaImage(blob: Blob): Promise<RGBA> {
 
     if ("decode" in img) {
       try {
-        await (img as HTMLImageElement).decode();
+        await awaitWithSignal(
+          (img as HTMLImageElement).decode(),
+          signal,
+          cancelImage,
+        );
       } catch {
-        await loaded;
+        signal?.throwIfAborted();
+        await awaitWithSignal(loaded, signal, cancelImage);
       }
     } else {
-      await loaded;
+      await awaitWithSignal(loaded, signal, cancelImage);
     }
 
     const width = img.naturalWidth || img.width;
@@ -115,7 +126,7 @@ async function decodeWithImageDecoder(
   const onAbort = () => decoder.close?.();
   try {
     const result = await awaitWithSignal(decoder.decode(), signal, onAbort);
-    return bitmapToRGBA(result.image as CanvasSource);
+    return bitmapToRGBA(result.image as CanvasSource, signal);
   } catch {
     signal?.throwIfAborted();
     return null;
@@ -188,11 +199,12 @@ export async function decodeToRGBA(
     if (typeof createImageBitmap !== "function") {
       throw new Error("createImageBitmap unavailable.");
     }
-    const bitmap = await createImageBitmap(blob);
-    return bitmapToRGBA(bitmap as CanvasSource);
+    const bitmap = await awaitWithSignal(createImageBitmap(blob), signal);
+    return bitmapToRGBA(bitmap as CanvasSource, signal);
   } catch {
+    signal?.throwIfAborted();
     if (typeof document !== "undefined") {
-      return decodeViaImage(blob);
+      return decodeViaImage(blob, signal);
     }
     throw new Error("This format isn’t natively supported by your browser.");
   }

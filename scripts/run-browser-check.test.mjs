@@ -100,11 +100,26 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   assert.doesNotMatch(runnerSource, /data-generic-contract/);
   assert.match(runnerSource, /getGenericSmokeExpectation/);
   assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v2');
-  for (const id of ['png-to-webp', 'webp-to-jpg', 'heic-to-jpg', 'mp4-to-mp3']) {
+  for (const id of ['png-to-webp', 'webp-to-jpg', 'heic-to-jpg']) {
     const [from, to] = id.split('-to-');
     assert.equal(
       getGenericSmokeExpectation({ id, from, to, operation: 'convert' }),
       'supported',
+      id,
+    );
+  }
+  for (const [id, from, to, operation] of [
+    ['compress-m4a', 'm4a', 'm4a', 'compress'],
+    ['compress-mp3', 'mp3', 'mp3', 'compress'],
+    ['compress-mp4', 'mp4', 'mp4', 'compress'],
+    ['m4a-to-mp3', 'm4a', 'mp3', 'convert'],
+    ['mp3-to-m4a', 'mp3', 'm4a', 'convert'],
+    ['mp4-to-m4a', 'mp4', 'm4a', 'convert'],
+    ['mp4-to-mp3', 'mp4', 'mp3', 'convert'],
+  ]) {
+    assert.equal(
+      getGenericSmokeExpectation({ id, from, to, operation }),
+      'unsupported',
       id,
     );
   }

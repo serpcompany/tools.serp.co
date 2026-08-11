@@ -2,9 +2,7 @@ export const GENERIC_SMOKE_CAPABILITY_VERSION = "generic-adapters-v2";
 
 const imageInputs = new Set(["heic", "jpeg", "jpg", "png", "webp"]);
 const imageOutputs = new Set(["jpeg", "jpg", "pdf", "png", "webp"]);
-const mediaFormats = new Set(["m4a", "mp3", "mp4"]);
-const audioFormats = new Set(["m4a", "mp3"]);
-const compressionFormats = new Set(["jpeg", "jpg", "m4a", "mp3", "mp4", "png", "webp"]);
+const compressionFormats = new Set(["jpeg", "jpg", "png", "webp"]);
 const semanticallyVerifiedInputs = new Set([
   "heic", "jpeg", "jpg", "m4a", "mp3", "mp4", "pdf", "png", "webp",
 ]);
@@ -27,8 +25,6 @@ export function getGenericSmokeExpectation(tool) {
   if (tool.operation !== "convert") return "unsupported";
   const adapterSupported =
     (from === "pdf" && ["jpeg", "jpg", "png", "webp"].includes(to)) ||
-    (imageInputs.has(from) && imageOutputs.has(to)) ||
-    (mediaFormats.has(from) && mediaFormats.has(to) &&
-      (from === "mp4" || audioFormats.has(to)));
+    (imageInputs.has(from) && imageOutputs.has(to));
   return adapterSupported ? "supported" : "unsupported";
 }

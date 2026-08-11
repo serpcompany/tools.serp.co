@@ -26,6 +26,7 @@ import {
   verifyMediaSemantics,
 } from "./tool-workflow/semantic-validators.ts";
 import { decodeToRGBA } from "./convert/decode.ts";
+import { verifyHeifIdentity } from "./convert/heif.ts";
 import { createServerActionRequestHeaders } from "./server-action-client.ts";
 import { executionProvenance } from "./tool-execution-provenance.ts";
 import { selectToolRenderer } from "./tool-renderer.ts";
@@ -64,7 +65,15 @@ const SEMANTIC_OUTPUT_FORMATS = new Set([
   "png",
   "webp",
 ]);
+const CLOUDFLARE_UNSUPPORTED_CONVERSIONS = new Set([
+  "m4a->mp3",
+  "mp3->m4a",
+  "mp4->m4a",
+  "mp4->mp3",
+]);
+const CLOUDFLARE_UNSUPPORTED_COMPRESSIONS = new Set(["m4a", "mp3", "mp4"]);
 const MAX_INPUT_BYTES = 256 * 1_024 * 1_024;
+const MAX_IDENTITY_PARSE_BYTES = 64 * 1_024 * 1_024;
 const MAX_OUTPUT_BYTES = 512 * 1_024 * 1_024;
 const MAX_TOTAL_OUTPUT_BYTES = 1_024 * 1_024 * 1_024;
 
@@ -154,7 +163,8 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
   const exactConversion =
     resolveConversionCapability(from, to).supported &&
     SEMANTIC_INPUT_FORMATS.has(from) &&
-    SEMANTIC_OUTPUT_FORMATS.has(to);
+    SEMANTIC_OUTPUT_FORMATS.has(to) &&
+    !CLOUDFLARE_UNSUPPORTED_CONVERSIONS.has(`${from}->${to}`);
   const compression = resolveCompressionDispatch(from);
   const exactCompression =
     tool.operation === "compress" &&
@@ -162,7 +172,8 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
     compression.target !== "unsupported" &&
     compression.target !== "pdf" &&
     SEMANTIC_INPUT_FORMATS.has(from) &&
-    SEMANTIC_OUTPUT_FORMATS.has(to);
+    SEMANTIC_OUTPUT_FORMATS.has(to) &&
+    !CLOUDFLARE_UNSUPPORTED_COMPRESSIONS.has(from);
   if (tool.operation === "convert" ? !exactConversion : !exactCompression) {
     return undefined;
   }
@@ -848,14 +859,11 @@ export function decideGenericBrowserSupport(
   }>,
   supportsBrowserMedia: boolean,
 ) {
+  const mediaFormats = ["m4a", "mp3", "mp4"];
   const needsMediaRuntime =
-    ["m4a", "mp4"].includes(request.inputFormat) ||
-    ["m4a", "mp4"].includes(request.outputFormat);
-  if (
-    needsMediaRuntime &&
-    request.operation === "compress" &&
-    !supportsBrowserMedia
-  ) {
+    mediaFormats.includes(request.inputFormat) ||
+    mediaFormats.includes(request.outputFormat);
+  if (needsMediaRuntime && !supportsBrowserMedia) {
     return {
       supported: false as const,
       message: "Media processing is not available in this browser.",
@@ -941,7 +949,21 @@ const SAFE_MIME_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   "image/x-png": "image/png",
 });
 
-async function sniffMimeType(
+function bmffBrands(bytes: Uint8Array): readonly string[] | undefined {
+  if (bytes.byteLength < 16 || ascii(bytes, 4, 4) !== "ftyp") return undefined;
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const boxSize = view.getUint32(0, false);
+  if (boxSize < 16 || boxSize > bytes.byteLength || boxSize > 4_096) {
+    return undefined;
+  }
+  const brands = [ascii(bytes, 8, 4)];
+  for (let offset = 16; offset + 4 <= boxSize; offset += 4) {
+    brands.push(ascii(bytes, offset, 4));
+  }
+  return brands;
+}
+
+export async function detectGenericMediaMimeType(
   bytes: Uint8Array,
   signal?: AbortSignal,
 ): Promise<string | undefined> {
@@ -964,6 +986,48 @@ async function sniffMimeType(
     (await verifyMp3Identity(bytes, signal)).status === "verified"
   )
     return "audio/mpeg";
+  const brands = bmffBrands(bytes);
+  const heicBrands = new Set([
+    "heic",
+    "heix",
+    "hevc",
+    "hevx",
+    "heim",
+    "heis",
+    "hevm",
+    "hevs",
+  ]);
+  if (
+    bytes.byteLength <= MAX_IDENTITY_PARSE_BYTES &&
+    brands?.some((brand) => heicBrands.has(brand)) &&
+    (await verifyHeifIdentity(
+      bytes.byteOffset === 0 &&
+        bytes.byteLength === bytes.buffer.byteLength &&
+        bytes.buffer instanceof ArrayBuffer
+        ? bytes.buffer
+        : bytes.slice().buffer,
+      signal,
+    ))
+  ) {
+    return "image/heic";
+  }
+  if (brands && bytes.byteLength <= MAX_IDENTITY_PARSE_BYTES) {
+    const verification = await verifyMediaSemantics(
+      {
+        name: "detected.mp4",
+        format: "mp4",
+        mimeType: "video/mp4",
+        bytes,
+      },
+      undefined,
+      { maxBytes: MAX_IDENTITY_PARSE_BYTES, signal },
+    );
+    if (verification.status === "verified") {
+      const tracks = inspectBmffTrackFamilies(bytes);
+      if (tracks.video > 0) return "video/mp4";
+      if (tracks.audio > 0) return "audio/mp4";
+    }
+  }
   return undefined;
 }
 
@@ -975,7 +1039,10 @@ async function resolveFileMimeType(
   const normalized =
     SAFE_MIME_ALIASES[declared.toLowerCase()] ?? declared.toLowerCase();
   if (!normalized || normalized === "application/octet-stream") {
-    return (await sniffMimeType(bytes, signal)) ?? "application/octet-stream";
+    return (
+      (await detectGenericMediaMimeType(bytes, signal)) ??
+      "application/octet-stream"
+    );
   }
   return normalized;
 }

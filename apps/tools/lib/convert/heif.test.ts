@@ -88,6 +88,58 @@ test("libheif callback failure rejects and still frees context resources", async
   assert.deepEqual(freed, ["image", "handle", "context"]);
 });
 
+test("libheif callback decoding aborts promptly and frees context resources", async () => {
+  const originalImageData = globalThis.ImageData;
+  const freed: string[] = [];
+  globalThis.ImageData = class {
+    data: Uint8ClampedArray;
+    width: number;
+    height: number;
+    constructor(data: Uint8ClampedArray, width: number, height: number) {
+      this.data = data;
+      this.width = width;
+      this.height = height;
+    }
+  } as never;
+  globalHeif.HeifContext = class {
+    read() {}
+    getPrimaryImageHandle() {
+      return {
+        decode() {
+          return {
+            get_width: () => 1,
+            get_height: () => 1,
+            display() {},
+            free() {
+              freed.push("image");
+            },
+          };
+        },
+        free() {
+          freed.push("handle");
+        },
+      };
+    }
+    free() {
+      freed.push("context");
+    }
+  } as never;
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 10);
+  const started = performance.now();
+  try {
+    await assert.rejects(
+      decodeHeifToRGBA(new ArrayBuffer(8), controller.signal),
+      (error: unknown) =>
+        error instanceof DOMException && error.name === "AbortError",
+    );
+  } finally {
+    globalThis.ImageData = originalImageData;
+  }
+  assert.ok(performance.now() - started < 150);
+  assert.deepEqual(freed, ["image", "handle", "context"]);
+});
+
 test("libheif decoder decoding frees every returned image on failure", async () => {
   const freed: string[] = [];
   globalHeif.HeifContext = undefined;

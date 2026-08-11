@@ -145,7 +145,12 @@ export async function convertWithWorker(args: {
             ? "jpg"
             : "png"
           : args.to;
-      const buffers = await renderPdfPages(args.buf, undefined, rasterFormat);
+      const buffers = await renderPdfPages(
+        args.buf,
+        undefined,
+        rasterFormat,
+        args.signal,
+      );
       if (fromExt === "ai" && toExt === "svg") {
         const svgBuffers = [];
         for (const buffer of buffers) {
@@ -176,6 +181,7 @@ export async function convertWithWorker(args: {
         to: args.to,
         buf: serverResult.buffer,
         quality: args.quality,
+        signal: args.signal,
       });
     }
     case "adaptive-video":
@@ -625,10 +631,18 @@ async function convertRasterOnMainThread(args: {
   to: string;
   buf: ArrayBuffer;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ConversionResult> {
-  const rgba = await decodeToRGBA(args.from, args.buf);
-  const blob = await encodeFromRGBA(args.to, rgba, args.quality ?? 0.85);
+  const rgba = await decodeToRGBA(args.from, args.buf, args.signal);
+  const blob = await encodeFromRGBA(
+    args.to,
+    rgba,
+    args.quality ?? 0.85,
+    args.signal,
+  );
+  args.signal?.throwIfAborted();
   const buffer = await blob.arrayBuffer();
+  args.signal?.throwIfAborted();
   return { kind: "single", buffer };
 }
 
