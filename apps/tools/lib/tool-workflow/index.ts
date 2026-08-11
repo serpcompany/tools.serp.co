@@ -1,4 +1,4 @@
-import type { ExecutionEngine } from "../tool-execution-provenance.ts";
+import type { ExecutionEngine } from '../tool-execution-provenance.ts';
 
 export type WorkflowMedia = {
   name: string;
@@ -8,8 +8,8 @@ export type WorkflowMedia = {
 };
 
 export type WorkflowInput =
-  | { kind: "file"; media: WorkflowMedia }
-  | { kind: "url"; url: string };
+  | { kind: 'file'; media: WorkflowMedia }
+  | { kind: 'url'; url: string };
 
 export type WorkflowRequest = {
   toolId: string;
@@ -18,13 +18,13 @@ export type WorkflowRequest = {
 };
 
 export type WorkflowPhase =
-  | "acquiring"
-  | "processing"
-  | "validating"
-  | "delivering"
-  | "succeeded"
-  | "failed"
-  | "cancelled";
+  | 'acquiring'
+  | 'processing'
+  | 'validating'
+  | 'delivering'
+  | 'succeeded'
+  | 'failed'
+  | 'cancelled';
 
 export type WorkflowSnapshot = {
   phase: WorkflowPhase;
@@ -40,42 +40,42 @@ export type WorkflowDelivery = {
 };
 
 export type TelemetryEvidence = {
-  start: "not-attempted" | "submitted" | "failed";
-  terminal: "not-attempted" | "submitted" | "failed";
+  start: 'not-attempted' | 'submitted' | 'failed';
+  terminal: 'not-attempted' | 'submitted' | 'failed';
 };
 
 export type WorkflowRecovery = Readonly<{
-  kind: "browser-extension-required";
+  kind: 'browser-extension-required';
 }>;
 
 export type WorkflowFailure = {
   code:
-    | "unsupported-tool"
-    | "unsupported-request"
-    | "invalid-request"
-    | "acquisition-failed"
-    | "processor-failed"
-    | "invalid-result"
-    | "delivery-failed";
+    | 'unsupported-tool'
+    | 'unsupported-request'
+    | 'invalid-request'
+    | 'acquisition-failed'
+    | 'processor-failed'
+    | 'invalid-result'
+    | 'delivery-failed';
   message: string;
   recovery?: WorkflowRecovery;
 };
 
 export type WorkflowOutcome =
   | {
-      status: "succeeded";
+      status: 'succeeded';
       runId: string;
       results: WorkflowDelivery[];
       telemetry: TelemetryEvidence;
     }
   | {
-      status: "failed";
+      status: 'failed';
       runId: string;
       error: WorkflowFailure;
       telemetry: TelemetryEvidence;
     }
   | {
-      status: "cancelled";
+      status: 'cancelled';
       runId: string;
       telemetry: TelemetryEvidence;
     };
@@ -93,7 +93,7 @@ export type ToolWorkflow = {
 };
 
 export type ToolSupport = Readonly<{
-  acquisition: WorkflowInput["kind"];
+  acquisition: WorkflowInput['kind'];
   inputs: ReadonlyArray<
     Readonly<{ format: string; mimeTypes: readonly string[] }>
   >;
@@ -131,35 +131,35 @@ export function defineToolSupport(definition: ToolSupport): ToolSupport {
     min < 1 ||
     min > max
   ) {
-    throw new TypeError("Invalid output cardinality contract");
+    throw new TypeError('Invalid output cardinality contract');
   }
   const limits = definition.resourceLimits;
-  assertSafeNonNegativeInteger(limits.maxInputBytes, "maxInputBytes");
-  assertSafeNonNegativeInteger(limits.maxOutputBytes, "maxOutputBytes");
+  assertSafeNonNegativeInteger(limits.maxInputBytes, 'maxInputBytes');
+  assertSafeNonNegativeInteger(limits.maxOutputBytes, 'maxOutputBytes');
   assertSafeNonNegativeInteger(
     limits.maxTotalOutputBytes,
-    "maxTotalOutputBytes",
+    'maxTotalOutputBytes',
   );
   if (limits.maxOutputBytes > limits.maxTotalOutputBytes) {
-    throw new TypeError(
-      "maxOutputBytes cannot exceed maxTotalOutputBytes",
-    );
+    throw new TypeError('maxOutputBytes cannot exceed maxTotalOutputBytes');
   }
   if (definition.inputs.length === 0 || definition.outputs.length === 0) {
-    throw new TypeError("Processor support requires input and output contracts");
+    throw new TypeError(
+      'Processor support requires input and output contracts',
+    );
   }
   for (const input of definition.inputs) {
-    assertNonEmptyString(input.format, "input format");
+    assertNonEmptyString(input.format, 'input format');
     if (input.mimeTypes.length === 0) {
-      throw new TypeError("Processor input requires at least one MIME type");
+      throw new TypeError('Processor input requires at least one MIME type');
     }
     for (const mimeType of input.mimeTypes) {
-      assertNonEmptyString(mimeType, "input MIME type");
+      assertNonEmptyString(mimeType, 'input MIME type');
     }
   }
   for (const output of definition.outputs) {
-    assertNonEmptyString(output.format, "output format");
-    assertNonEmptyString(output.mimeType, "output MIME type");
+    assertNonEmptyString(output.format, 'output format');
+    assertNonEmptyString(output.mimeType, 'output MIME type');
   }
   return Object.freeze({
     acquisition: definition.acquisition,
@@ -182,13 +182,15 @@ export function defineToolSupport(definition: ToolSupport): ToolSupport {
 export function defineToolExecutionIntent(
   definition: ToolExecutionIntent,
 ): ToolExecutionIntent {
-  assertNonEmptyString(definition.requestedOperation, "requested operation");
+  assertNonEmptyString(definition.requestedOperation, 'requested operation');
   if (definition.outputs.length === 0) {
-    throw new TypeError("Tool execution intent requires an operation and output");
+    throw new TypeError(
+      'Tool execution intent requires an operation and output',
+    );
   }
   for (const output of definition.outputs) {
-    assertNonEmptyString(output.format, "intent output format");
-    assertNonEmptyString(output.mimeType, "intent output MIME type");
+    assertNonEmptyString(output.format, 'intent output format');
+    assertNonEmptyString(output.mimeType, 'intent output MIME type');
   }
   return Object.freeze({
     requestedOperation: definition.requestedOperation,
@@ -200,14 +202,14 @@ export function defineToolExecutionIntent(
 
 export type ProcessorSupportRequest<Options> = Readonly<{
   detectedInput: Readonly<{
-    acquisition: WorkflowInput["kind"];
+    acquisition: WorkflowInput['kind'];
     format: string;
     mimeType: string;
     bytes: number;
   }>;
   requestedOperation: string;
   options: Options;
-  outputs: ToolExecutionIntent["outputs"];
+  outputs: ToolExecutionIntent['outputs'];
 }>;
 
 export type ProcessorSupportDecision =
@@ -215,8 +217,8 @@ export type ProcessorSupportDecision =
   | { supported: false; message: string };
 
 export type SemanticVerification =
-  | { status: "verified" }
-  | { status: "rejected" | "unavailable"; message: string };
+  | { status: 'verified' }
+  | { status: 'rejected' | 'unavailable'; message: string };
 
 export type ProcessorOptions<Options> =
   | { ok: true; value: Options }
@@ -224,7 +226,7 @@ export type ProcessorOptions<Options> =
 
 function freezeProcessorOptions<Options>(options: Options): Options {
   return options !== null &&
-    (typeof options === "object" || typeof options === "function")
+    (typeof options === 'object' || typeof options === 'function')
     ? Object.freeze(options)
     : options;
 }
@@ -254,16 +256,16 @@ export type ToolProcessor<Options = unknown> = {
 };
 
 export type RuntimeResourceKind =
-  | "reader"
-  | "worker"
-  | "blob"
-  | "object-url"
-  | "subscription";
+  | 'reader'
+  | 'worker'
+  | 'blob'
+  | 'object-url'
+  | 'subscription';
 
 type WorkflowStageContext = {
   signal: AbortSignal;
   /** Cooperative limits exposed before work; workflow also enforces byte postconditions. */
-  budgets: ToolSupport["resourceLimits"];
+  budgets: ToolSupport['resourceLimits'];
   openResource(kind: RuntimeResourceKind): Promise<void>;
   registerCleanup(cleanup: () => Promise<void>): Promise<void>;
   reportProgress(progress: number): void;
@@ -273,13 +275,13 @@ type WorkflowPorts = {
   acquisition: {
     file: {
       acquire(
-        input: Extract<WorkflowInput, { kind: "file" }>,
+        input: Extract<WorkflowInput, { kind: 'file' }>,
         context: WorkflowStageContext,
       ): Promise<WorkflowMedia>;
     };
     url: {
       acquire(
-        input: Extract<WorkflowInput, { kind: "url" }>,
+        input: Extract<WorkflowInput, { kind: 'url' }>,
         context: WorkflowStageContext,
       ): Promise<WorkflowMedia>;
     };
@@ -300,22 +302,22 @@ type WorkflowPorts = {
     start(runId: string, request: WorkflowRequest, at: number): Promise<void>;
     terminal(
       runId: string,
-      status: WorkflowOutcome["status"] | "cancelled",
+      status: WorkflowOutcome['status'] | 'cancelled',
       at: number,
     ): Promise<void>;
   };
   clock: { now(): number };
-  nextId(kind: "run" | "delivery"): string;
+  nextId(kind: 'run' | 'delivery'): string;
 };
 
 export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
   return {
     async run(request, options = {}) {
       const signal = options.signal ?? new AbortController().signal;
-      const runId = ports.nextId("run");
+      const runId = ports.nextId('run');
       let telemetry: TelemetryEvidence = {
-        start: "not-attempted",
-        terminal: "not-attempted",
+        start: 'not-attempted',
+        terminal: 'not-attempted',
       };
       const emitSnapshot = (snapshot: WorkflowSnapshot) => {
         try {
@@ -337,31 +339,31 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         }
       };
       const commitTerminal = async (
-        status: WorkflowOutcome["status"],
+        status: WorkflowOutcome['status'],
       ): Promise<TelemetryEvidence> => {
         if (terminalOutcomeCommitted) {
           return telemetry;
         }
         terminalOutcomeCommitted = true;
         if (telemetryEligible) {
-          telemetry = { ...telemetry, terminal: "submitted" };
+          telemetry = { ...telemetry, terminal: 'submitted' };
           try {
             await ports.telemetry.terminal(runId, status, ports.clock.now());
           } catch {
-            telemetry = { ...telemetry, terminal: "failed" };
+            telemetry = { ...telemetry, terminal: 'failed' };
           }
         }
         emitSnapshot({ phase: status });
         return telemetry;
       };
       const fail = async (
-        code: WorkflowFailure["code"],
+        code: WorkflowFailure['code'],
         message: string,
         recovery?: WorkflowRecovery,
-      ): Promise<Extract<WorkflowOutcome, { status: "failed" }>> => {
-        await commitTerminal("failed");
+      ): Promise<Extract<WorkflowOutcome, { status: 'failed' }>> => {
+        await commitTerminal('failed');
         return {
-          status: "failed",
+          status: 'failed',
           runId,
           error: recovery ? { code, message, recovery } : { code, message },
           telemetry,
@@ -371,7 +373,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
       const processor = ports.resolveProcessor(request.toolId);
       const resolvedIntent = ports.resolveIntent(request.toolId);
       if (!processor || !resolvedIntent) {
-        return fail("unsupported-tool", `Unsupported Tool: ${request.toolId}`);
+        return fail('unsupported-tool', `Unsupported Tool: ${request.toolId}`);
       }
       let support: ToolSupport;
       let intent: ToolExecutionIntent;
@@ -380,7 +382,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         intent = defineToolExecutionIntent(resolvedIntent);
       } catch (error) {
         return fail(
-          "unsupported-tool",
+          'unsupported-tool',
           error instanceof Error ? error.message : String(error),
         );
       }
@@ -394,24 +396,24 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
       );
       if (unsupportedIntentOutput) {
         return fail(
-          "unsupported-request",
+          'unsupported-request',
           `Unsupported requested output: ${unsupportedIntentOutput.format} (${unsupportedIntentOutput.mimeType})`,
         );
       }
       if (support.acquisition !== request.input.kind) {
         return fail(
-          "unsupported-request",
+          'unsupported-request',
           `Unsupported acquisition: ${request.input.kind}`,
         );
       }
       const parsedOptions = processor.parseOptions(request.options);
       if (!parsedOptions.ok) {
-        return fail("invalid-request", parsedOptions.message);
+        return fail('invalid-request', parsedOptions.message);
       }
       const processorOptions = freezeProcessorOptions(parsedOptions.value);
 
-      let stage: "acquiring" | "processing" | "validating" | "delivering" =
-        "acquiring";
+      let stage: 'acquiring' | 'processing' | 'validating' | 'delivering' =
+        'acquiring';
       let activePhase: WorkflowPhase | undefined;
       let lastProgress = 0;
       const reportProgress = (
@@ -460,20 +462,30 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         },
       });
 
-      telemetryEligible = true;
-      telemetry = { ...telemetry, start: "submitted" };
-      try {
-        await ports.telemetry.start(runId, request, ports.clock.now());
-      } catch {
-        telemetry = { ...telemetry, start: "failed" };
+      const startTelemetry = async () => {
+        if (telemetryEligible) return;
+        telemetryEligible = true;
+        telemetry = { ...telemetry, start: 'submitted' };
+        try {
+          await ports.telemetry.start(runId, request, ports.clock.now());
+        } catch {
+          telemetry = { ...telemetry, start: 'failed' };
+        }
+      };
+
+      // URL acquisition is an eligible execution attempt: source failures and
+      // cancellation must terminate the run exactly once. Local file input is
+      // not eligible until its domain semantics have been verified.
+      if (request.input.kind === 'url') {
+        await startTelemetry();
       }
 
       try {
-        activePhase = "acquiring";
-        emitSnapshot({ phase: "acquiring" });
-        const acquisitionContext = context("acquiring", 0, 0.25);
+        activePhase = 'acquiring';
+        emitSnapshot({ phase: 'acquiring' });
+        const acquisitionContext = context('acquiring', 0, 0.25);
         const input =
-          request.input.kind === "file"
+          request.input.kind === 'file'
             ? await ports.acquisition.file.acquire(
                 request.input,
                 acquisitionContext,
@@ -489,16 +501,13 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         );
         if (!inputSupport) {
           return fail(
-            "unsupported-request",
+            'unsupported-request',
             `Unsupported input format: ${input.format}`,
           );
         }
-        if (
-          input.bytes.byteLength >
-          support.resourceLimits.maxInputBytes
-        ) {
+        if (input.bytes.byteLength > support.resourceLimits.maxInputBytes) {
           return fail(
-            "unsupported-request",
+            'unsupported-request',
             `Input exceeds ${support.resourceLimits.maxInputBytes} bytes`,
           );
         }
@@ -514,37 +523,38 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           outputs: intent.outputs,
         });
         if (!supportDecision.supported) {
-          return fail("unsupported-request", supportDecision.message);
+          return fail('unsupported-request', supportDecision.message);
         }
         if (input.bytes.byteLength === 0) {
-          return fail("invalid-request", `${input.format} input is empty`);
+          return fail('invalid-request', `${input.format} input is empty`);
         }
         const inputVerification = await processor.verifyInput(
           input,
           acquisitionContext,
           processorOptions,
         );
-        if (inputVerification.status !== "verified") {
-          return fail("invalid-request", inputVerification.message);
+        if (inputVerification.status !== 'verified') {
+          return fail('invalid-request', inputVerification.message);
         }
         signal.throwIfAborted();
 
+        await startTelemetry();
         signal.throwIfAborted();
 
-        stage = "processing";
-        activePhase = "processing";
-        emitSnapshot({ phase: "processing" });
+        stage = 'processing';
+        activePhase = 'processing';
+        emitSnapshot({ phase: 'processing' });
         const results = await processor.process(
           input,
           processorOptions,
-          context("processing", 0.25, 0.45),
+          context('processing', 0.25, 0.45),
         );
         signal.throwIfAborted();
-        stage = "validating";
-        activePhase = "validating";
-        emitSnapshot({ phase: "validating" });
+        stage = 'validating';
+        activePhase = 'validating';
+        emitSnapshot({ phase: 'validating' });
         if (results.length === 0) {
-          throw new Error("Processor returned no results");
+          throw new Error('Processor returned no results');
         }
         const { min, max } = support.outputCardinality;
         if (results.length < min || results.length > max) {
@@ -556,19 +566,13 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           (total, result) => total + result.bytes.byteLength,
           0,
         );
-        if (
-          totalOutputBytes >
-          support.resourceLimits.maxTotalOutputBytes
-        ) {
+        if (totalOutputBytes > support.resourceLimits.maxTotalOutputBytes) {
           throw new Error(
             `Total output exceeds ${support.resourceLimits.maxTotalOutputBytes} bytes`,
           );
         }
         for (const result of results) {
-          if (
-            result.bytes.byteLength >
-            support.resourceLimits.maxOutputBytes
-          ) {
+          if (result.bytes.byteLength > support.resourceLimits.maxOutputBytes) {
             throw new Error(
               `Output exceeds ${support.resourceLimits.maxOutputBytes} bytes`,
             );
@@ -587,17 +591,17 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           }
           const verification = await processor.verifyResult(
             result,
-            context("validating", 0.7, 0.15),
+            context('validating', 0.7, 0.15),
             processorOptions,
           );
-          if (verification.status !== "verified") {
+          if (verification.status !== 'verified') {
             throw new Error(verification.message);
           }
           signal.throwIfAborted();
         }
-        stage = "delivering";
-        activePhase = "delivering";
-        emitSnapshot({ phase: "delivering" });
+        stage = 'delivering';
+        activePhase = 'delivering';
+        emitSnapshot({ phase: 'delivering' });
         signal.throwIfAborted();
         const deliveries: WorkflowDelivery[] = [];
         for (const result of results) {
@@ -608,16 +612,16 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
             size: result.bytes.byteLength,
             deliveryId: await ports.deliver(
               result,
-              context("delivering", 0.85, 0.15),
+              context('delivering', 0.85, 0.15),
             ),
           });
           signal.throwIfAborted();
         }
         activePhase = undefined;
-        await commitTerminal("succeeded");
+        await commitTerminal('succeeded');
 
         return {
-          status: "succeeded",
+          status: 'succeeded',
           runId,
           results: deliveries,
           telemetry,
@@ -626,28 +630,28 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         activePhase = undefined;
         if (
           signal.aborted ||
-          (error instanceof Error && error.name === "AbortError")
+          (error instanceof Error && error.name === 'AbortError')
         ) {
-          await commitTerminal("cancelled");
-          return { status: "cancelled", runId, telemetry };
+          await commitTerminal('cancelled');
+          return { status: 'cancelled', runId, telemetry };
         }
         const code =
-          stage === "acquiring"
-            ? "acquisition-failed"
-            : stage === "processing"
-              ? "processor-failed"
-              : stage === "validating"
-                ? "invalid-result"
-                : "delivery-failed";
+          stage === 'acquiring'
+            ? 'acquisition-failed'
+            : stage === 'processing'
+              ? 'processor-failed'
+              : stage === 'validating'
+                ? 'invalid-result'
+                : 'delivery-failed';
         return fail(
           code,
           error instanceof Error ? error.message : String(error),
-          typeof error === "object" &&
+          typeof error === 'object' &&
             error !== null &&
-            "recovery" in error &&
+            'recovery' in error &&
             (error as { recovery?: { kind?: unknown } }).recovery?.kind ===
-              "browser-extension-required"
-            ? { kind: "browser-extension-required" }
+              'browser-extension-required'
+            ? { kind: 'browser-extension-required' }
             : undefined,
         );
       } finally {

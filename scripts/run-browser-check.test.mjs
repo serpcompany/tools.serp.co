@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { createHash } from 'node:crypto';
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -202,10 +201,10 @@ test('local downloader smoke crosses the URL endpoint with checked-in media', ()
     url: 'https://fixture.example/watch/deterministic-video',
     responseFixture: 'fixtures/sample.mp4',
   });
-  assert.match(runnerSource, /tool\.id === "video-downloader"/);
-  assert.match(runnerSource, /page\.route\("\*\*\/api\/media-fetch\*"/);
-  assert.match(runnerSource, /data-status="completed"/);
-  assert.match(runnerSource, /data-status="error"/);
+  assert.match(runnerSource, /tool\.id === ['"]video-downloader['"]/);
+  assert.match(runnerSource, /page\.route\(['"]\*\*\/api\/media-fetch\*['"]/);
+  assert.match(runnerSource, /data-status=['"]completed['"]/);
+  assert.match(runnerSource, /data-status=['"]error['"]/);
 });
 
 test('local evidence accepts only loopback targets', () => {
