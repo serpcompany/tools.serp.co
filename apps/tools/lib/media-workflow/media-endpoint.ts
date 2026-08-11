@@ -216,18 +216,6 @@ export function createStreamedMediaAcquisition(options: {
     ): Promise<WorkflowMedia> {
       context.signal.throwIfAborted();
       const response = await options.endpoint.open(request, context.signal);
-      context.signal.throwIfAborted();
-      const identity = resolveMediaIdentity(response, request);
-      if (
-        response.contentLength !== undefined &&
-        response.contentLength > context.budgets.maxInputBytes
-      ) {
-        await response.body.cancel("Input byte budget exceeded");
-        throw new Error(
-          `Input exceeds ${context.budgets.maxInputBytes} bytes`,
-        );
-      }
-
       const reader = response.body.getReader();
       let complete = false;
       const cancelReader = () => {
@@ -240,6 +228,17 @@ export function createStreamedMediaAcquisition(options: {
         if (!complete) await reader.cancel().catch(() => {});
         reader.releaseLock();
       });
+      context.signal.throwIfAborted();
+      const identity = resolveMediaIdentity(response, request);
+      if (
+        response.contentLength !== undefined &&
+        response.contentLength > context.budgets.maxInputBytes
+      ) {
+        await reader.cancel("Input byte budget exceeded");
+        throw new Error(
+          `Input exceeds ${context.budgets.maxInputBytes} bytes`,
+        );
+      }
 
       const chunks: Uint8Array[] = [];
       let receivedBytes = 0;

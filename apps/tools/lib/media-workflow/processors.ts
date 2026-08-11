@@ -80,10 +80,7 @@ function verifyMediaIdentity(media: WorkflowMedia): Promise<SemanticVerification
       message: "Media format does not match its content type",
     });
   }
-  if (media.format === "mp4" && media.mimeType === "video/mp4") {
-    return verifyMediaSemantics(media);
-  }
-  return Promise.resolve({ status: "verified" });
+  return verifyMediaSemantics(media);
 }
 
 export type TranscriptionPort = Readonly<{

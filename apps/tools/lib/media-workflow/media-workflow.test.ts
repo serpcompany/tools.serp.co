@@ -137,6 +137,43 @@ test("downloader URL streams cross workflow.run and preserve verified media", as
   ]);
 });
 
+test("cancelling from the delivering snapshot prevents every delivery side effect", async () => {
+  const harness = createMediaWorkflowTestHarness({
+    media: {
+      "https://media.example/cancel-before-delivery": {
+        name: "cancel-before-delivery.mp4",
+        extension: "mp4",
+        mimeType: "video/mp4",
+        chunks: [SAMPLE_MP4_BYTES],
+      },
+    },
+  });
+  const controller = new AbortController();
+
+  const outcome = await harness.workflow.run(
+    {
+      toolId: "video-downloader",
+      input: {
+        kind: "url",
+        url: "https://media.example/cancel-before-delivery",
+      },
+    },
+    {
+      signal: controller.signal,
+      observe({ phase }) {
+        if (phase === "delivering") controller.abort("cancel before delivery");
+      },
+    },
+  );
+
+  assert.equal(outcome.status, "cancelled");
+  assert.deepEqual(harness.deliveries, []);
+  assert.deepEqual(harness.telemetry, [
+    { kind: "start" },
+    { kind: "terminal", status: "cancelled" },
+  ]);
+});
+
 test("URL and file transcription use workflow.run and enforce transcript semantics", async () => {
   const url = "https://media.example/talk";
   const harness = createMediaWorkflowTestHarness({
@@ -195,7 +232,7 @@ test("URL and file transcription use workflow.run and enforce transcript semanti
   );
 });
 
-test("legacy media MIME variants keep their accepted public extensions", async () => {
+test("recognized MIME metadata still fails closed without a semantic verifier", async () => {
   const harness = createMediaWorkflowTestHarness({
     media: {
       "https://media.example/mobile": {
@@ -220,15 +257,100 @@ test("legacy media MIME variants keep their accepted public extensions", async (
     input: { kind: "url", url: "https://media.example/archive" },
   });
 
-  assert.equal(transcript.status, "succeeded");
-  assert.equal(download.status, "succeeded");
-  assert.deepEqual(
-    harness.deliveries.map(({ name, format }) => ({ name, format })),
-    [
-      { name: "mobile.txt", format: "txt" },
-      { name: "archive.asf", format: "asf" },
-    ],
-  );
+  assert.equal(transcript.status, "failed");
+  assert.equal(transcript.error.code, "invalid-request");
+  assert.equal(download.status, "failed");
+  assert.equal(download.error.code, "invalid-request");
+  assert.deepEqual(harness.deliveries, []);
+});
+
+test("opaque MP4 and fake MP3 bytes fail closed without delivery or success telemetry", async () => {
+  const harness = createMediaWorkflowTestHarness({
+    media: {
+      "https://media.example/opaque-mp4": {
+        name: "opaque.mp4",
+        extension: "mp4",
+        mimeType: "application/octet-stream",
+        chunks: [new TextEncoder().encode("not an MP4")],
+      },
+      "https://media.example/fake-mp3": {
+        name: "fake.mp3",
+        extension: "mp3",
+        mimeType: "audio/mpeg",
+        chunks: [new Uint8Array([0x49, 0x44, 0x33, 0x04, 0, 0, 0, 0])],
+      },
+    },
+  });
+
+  const opaqueMp4 = await harness.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://media.example/opaque-mp4" },
+  });
+  const fakeMp3 = await harness.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://media.example/fake-mp3" },
+    options: { mode: "audio" },
+  });
+
+  assert.equal(opaqueMp4.status, "failed");
+  assert.equal(opaqueMp4.error.code, "invalid-request");
+  assert.equal(fakeMp3.status, "failed");
+  assert.equal(fakeMp3.error.code, "invalid-request");
+  assert.deepEqual(harness.deliveries, []);
+  assert.deepEqual(harness.telemetry, [
+    { kind: "start" },
+    { kind: "terminal", status: "failed" },
+    { kind: "start" },
+    { kind: "terminal", status: "failed" },
+  ]);
+});
+
+test("endpoint identity rejection cancels and releases the unread response body", async (t) => {
+  const cases = [
+    {
+      name: "unsupported metadata",
+      url: "https://media.example/unsupported-metadata",
+      fixture: {
+        name: "media",
+        mimeType: "application/json",
+        chunks: [new TextEncoder().encode("not media")],
+      },
+    },
+    {
+      name: "conflicting MIME and extension",
+      url: "https://media.example/conflicting-metadata",
+      fixture: {
+        name: "video.mp4",
+        extension: "mp3",
+        mimeType: "video/mp4",
+        chunks: [SAMPLE_MP4_BYTES],
+      },
+    },
+  ];
+
+  for (const fixture of cases) {
+    await t.test(fixture.name, async () => {
+      const harness = createMediaWorkflowTestHarness({
+        media: { [fixture.url]: fixture.fixture },
+      });
+
+      const outcome = await harness.workflow.run({
+        toolId: "video-downloader",
+        input: { kind: "url", url: fixture.url },
+      });
+
+      assert.equal(outcome.status, "failed");
+      assert.equal(outcome.error.code, "acquisition-failed");
+      assert.deepEqual(harness.deliveries, []);
+      assert.deepEqual(harness.endpoint.streams, [
+        { chunksRead: 1, cancelled: true, readerLockReleased: true },
+      ]);
+      assert.deepEqual(harness.telemetry, [
+        { kind: "start" },
+        { kind: "terminal", status: "failed" },
+      ]);
+    });
+  }
 });
 
 test("empty transcript and mismatched downloader media fail before delivery", async () => {
@@ -236,14 +358,14 @@ test("empty transcript and mismatched downloader media fail before delivery", as
     transcript: "   ",
   });
   const transcriptOutcome = await emptyTranscript.workflow.run({
-    toolId: "audio-to-transcript",
+    toolId: "mp4-to-transcript",
     input: {
       kind: "file",
       media: {
-        name: "voice.mp3",
-        format: "mp3",
-        mimeType: "audio/mpeg",
-        bytes: new Uint8Array([0x49, 0x44, 0x33, 4]),
+        name: "voice.mp4",
+        format: "mp4",
+        mimeType: "video/mp4",
+        bytes: SAMPLE_MP4_BYTES,
       },
     },
   });

@@ -580,6 +580,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         stage = "delivering";
         activePhase = "delivering";
         emitSnapshot({ phase: "delivering" });
+        signal.throwIfAborted();
         const deliveries: WorkflowDelivery[] = [];
         for (const result of results) {
           deliveries.push({
