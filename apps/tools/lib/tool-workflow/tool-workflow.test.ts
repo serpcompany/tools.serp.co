@@ -6,8 +6,23 @@ import {
   defineScriptedProcessor,
 } from "./testing.ts";
 
-const PNG_BYTES = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
-const JPEG_BYTES = new Uint8Array([255, 216, 255, 217]);
+function bytes(hex: string) {
+  return Uint8Array.from(hex.match(/.{2}/g) ?? [], (byte) =>
+    Number.parseInt(byte, 16),
+  );
+}
+
+function base64Bytes(value: string) {
+  return Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
+}
+
+// Independently generated, parseable 1×1 PNG and JPEG fixtures.
+const PNG_BYTES = bytes(
+  "89504e470d0a1a0a0000000d4948445200000001000000010804000000b51c0c020000000b4944415478da6364f80f00010501012718e3660000000049454e44ae426082",
+);
+const JPEG_BYTES = base64Bytes(
+  "/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAABgj/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABykX//Z",
+);
 const MP4_FTYP_BYTES = new Uint8Array([
   0, 0, 0, 20, 102, 116, 121, 112, 105, 115, 111, 109, 0, 0, 2, 0, 105, 115,
   111, 109,
@@ -64,7 +79,7 @@ test("a file Tool run crosses one workflow seam from acquisition through deliver
         name: "photo.jpg",
         format: "jpg",
         mimeType: "image/jpeg",
-        size: 4,
+        size: 270,
         deliveryId: "delivery-1",
       },
     ],
@@ -77,10 +92,10 @@ test("a URL stream uses the same workflow seam and preserves multiple result ord
     media: {
       urls: {
         "https://media.example/video": {
-          name: "video.source",
-          format: "remote-video",
-          mimeType: "application/octet-stream",
-          chunks: [new Uint8Array([1, 2]), new Uint8Array([3, 4])],
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          chunks: [MP4_FTYP_BYTES.subarray(0, 8), MP4_FTYP_BYTES.subarray(8)],
         },
       },
     },
@@ -88,7 +103,7 @@ test("a URL stream uses the same workflow seam and preserves multiple result ord
       "video-downloader": {
         support: {
           acquisition: "url",
-          inputFormats: ["remote-video"],
+          inputFormats: ["mp4"],
           outputFormats: ["mp4", "jpg"],
         },
         result: [
@@ -119,7 +134,7 @@ test("a URL stream uses the same workflow seam and preserves multiple result ord
     outcome.results.map(({ name, format, size }) => ({ name, format, size })),
     [
       { name: "video.mp4", format: "mp4", size: 20 },
-      { name: "poster.jpg", format: "jpg", size: 4 },
+      { name: "poster.jpg", format: "jpg", size: 270 },
     ],
   );
 });
@@ -378,6 +393,7 @@ test("processor failure and late callbacks produce one failed terminal outcome",
         error: new Error("codec crashed"),
         lateProgress: [0.5, 1],
         lateResources: ["object-url"],
+        lateCleanups: ["subscription"],
         result: {
           name: "must-not-deliver.jpg",
           format: "jpg",
@@ -417,6 +433,8 @@ test("processor failure and late callbacks produce one failed terminal outcome",
   ]);
   assert.deepEqual(harness.activeResources, []);
   assert.deepEqual(harness.openedResources, []);
+  assert.deepEqual(harness.lateCleanupActive, []);
+  assert.deepEqual(harness.lateCleanupReleased, ["subscription"]);
 });
 
 test("telemetry transport failure remains evidence without redefining success", async () => {
@@ -572,15 +590,15 @@ test("mid-stream URL cancellation closes the reader before processing or deliver
     media: {
       urls: {
         "https://media.example/large-video": {
-          name: "video.source",
-          format: "remote-video",
-          mimeType: "application/octet-stream",
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
           chunks: [
-            new Uint8Array([1, 2]),
-            new Uint8Array([3, 4]),
-            new Uint8Array([5, 6]),
+            MP4_FTYP_BYTES.subarray(0, 8),
+            MP4_FTYP_BYTES.subarray(8, 14),
+            MP4_FTYP_BYTES.subarray(14),
           ],
-          totalBytes: 6,
+          totalBytes: MP4_FTYP_BYTES.byteLength,
         },
       },
     },
@@ -588,7 +606,7 @@ test("mid-stream URL cancellation closes the reader before processing or deliver
       "video-downloader": {
         support: {
           acquisition: "url",
-          inputFormats: ["remote-video"],
+          inputFormats: ["mp4"],
           outputFormats: ["mp4"],
         },
         result: {
@@ -633,6 +651,7 @@ test("semantic verification fails closed for malformed MP4 and unknown formats",
   const harness = createToolWorkflowTestHarness({
     processors: {
       "bad-mp4": {
+        engineId: "browser-raster-worker",
         support: {
           acquisition: "file",
           inputFormats: ["png"],
@@ -649,6 +668,7 @@ test("semantic verification fails closed for malformed MP4 and unknown formats",
         },
       },
       "unknown-output": {
+        engineId: "browser-raster-worker",
         support: {
           acquisition: "file",
           inputFormats: ["png"],
@@ -691,11 +711,7 @@ test("semantic verification fails closed for malformed MP4 and unknown formats",
 
 test("typed options and engine support policy stay behind the run seam", async () => {
   const processor = defineScriptedProcessor<{ quality: number }>({
-    engine: {
-      id: "libjpeg-wasm",
-      version: "1.0.0-test",
-      execution: "client-only",
-    },
+    engineId: "browser-raster-worker",
     support: {
       acquisition: "file",
       inputFormats: ["png"],
@@ -746,9 +762,11 @@ test("typed options and engine support policy stay behind the run seam", async (
     {
       toolId: "png-to-jpg",
       engine: {
-        id: "libjpeg-wasm",
-        version: "1.0.0-test",
-        execution: "client-only",
+        id: "browser-raster-worker",
+        capability: "raster-conversion",
+        owner: "apps/tools/lib/convert/workerClient.ts",
+        processingLocation: "browser",
+        executionProfile: "client-only",
       },
       support: {
         acquisition: "file",
@@ -758,4 +776,225 @@ test("typed options and engine support policy stay behind the run seam", async (
       options: { quality: 82 },
     },
   ]);
+});
+
+test("scripted processors use canonical execution provenance records", async () => {
+  const harness = createToolWorkflowTestHarness({
+    media: {
+      urls: {
+        "https://media.example/video.mp4": {
+          name: "source.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          chunks: [MP4_FTYP_BYTES],
+        },
+      },
+    },
+    processors: {
+      "png-to-jpg": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+        },
+        result: {
+          name: "photo.jpg",
+          format: "jpg",
+          mimeType: "image/jpeg",
+          bytes: JPEG_BYTES,
+        },
+      },
+      "video-downloader": {
+        support: {
+          acquisition: "url",
+          inputFormats: ["mp4"],
+          outputFormats: ["mp4"],
+        },
+        result: {
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: MP4_FTYP_BYTES,
+        },
+      },
+    },
+  });
+
+  await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+  await harness.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://media.example/video.mp4" },
+  });
+
+  assert.deepEqual(
+    harness.processorRecords.map(({ engine }) => engine),
+    [
+      {
+        id: "browser-raster-worker",
+        capability: "raster-conversion",
+        owner: "apps/tools/lib/convert/workerClient.ts",
+        processingLocation: "browser",
+        executionProfile: "client-only",
+      },
+      {
+        id: "server-media-fetch",
+        capability: "public-media-download",
+        owner: "apps/tools/app/api/media-fetch/route.ts",
+        processingLocation: "repository-server",
+        executionProfile: "server-executed",
+      },
+    ],
+  );
+});
+
+test("truncated PNG input and JPEG output fail structural verification", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "truncated-png": {
+        engineId: "browser-raster-worker",
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+        },
+        result: {
+          name: "photo.jpg",
+          format: "jpg",
+          mimeType: "image/jpeg",
+          bytes: JPEG_BYTES,
+        },
+      },
+      "truncated-jpeg": {
+        engineId: "browser-raster-worker",
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+        },
+        result: {
+          name: "photo.jpg",
+          format: "jpg",
+          mimeType: "image/jpeg",
+          bytes: JPEG_BYTES.subarray(0, JPEG_BYTES.byteLength - 1),
+        },
+      },
+    },
+  });
+
+  const truncatedInput = await harness.workflow.run({
+    toolId: "truncated-png",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES.subarray(0, PNG_BYTES.byteLength - 4),
+      },
+    },
+  });
+  const truncatedOutput = await harness.workflow.run({
+    toolId: "truncated-jpeg",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(truncatedInput.status, "failed");
+  assert.equal(truncatedInput.error.code, "invalid-request");
+  assert.equal(truncatedOutput.status, "failed");
+  assert.equal(truncatedOutput.error.code, "invalid-result");
+  assert.equal(
+    harness.events.filter((event) => event === "delivery").length,
+    0,
+  );
+});
+
+test("aborting a stalled URL stream immediately unblocks and releases its reader", async () => {
+  const harness = createToolWorkflowTestHarness({
+    media: {
+      urls: {
+        "https://media.example/stalled.mp4": {
+          name: "stalled.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          chunks: [],
+          totalBytes: MP4_FTYP_BYTES.byteLength,
+          stallAfterChunks: 0,
+        },
+      },
+    },
+    processors: {
+      "video-downloader": {
+        support: {
+          acquisition: "url",
+          inputFormats: ["mp4"],
+          outputFormats: ["mp4"],
+        },
+        result: {
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: MP4_FTYP_BYTES,
+        },
+      },
+    },
+  });
+  const controller = new AbortController();
+  const run = harness.workflow.run(
+    {
+      toolId: "video-downloader",
+      input: { kind: "url", url: "https://media.example/stalled.mp4" },
+    },
+    {
+      signal: controller.signal,
+      observe(snapshot) {
+        if (snapshot.phase === "acquiring") {
+          setTimeout(() => controller.abort("cancel stalled reader"), 0);
+        }
+      },
+    },
+  );
+  const timeout = Symbol("timeout");
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const settled = await Promise.race([
+    run,
+    new Promise<typeof timeout>(
+      (resolve) => (timeoutId = setTimeout(() => resolve(timeout), 250)),
+    ),
+  ]);
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+
+  if (settled === timeout) {
+    assert.fail("stalled reader did not unblock on abort");
+  }
+  assert.equal(settled.status, "cancelled");
+  assert.deepEqual(harness.streamRecords, [
+    {
+      url: "https://media.example/stalled.mp4",
+      chunksRead: 0,
+      cancelled: true,
+      readerLockReleased: true,
+    },
+  ]);
+  assert.deepEqual(harness.events, []);
 });

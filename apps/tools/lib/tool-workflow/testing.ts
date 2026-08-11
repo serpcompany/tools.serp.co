@@ -6,11 +6,15 @@ import {
   type RuntimeResourceKind,
   type WorkflowMedia,
 } from "./index.ts";
+import {
+  executionProvenance,
+  getToolExecutionProvenance,
+} from "../tool-execution-provenance.ts";
 
 type ProcessorEngine = ToolProcessor["engine"];
 
 type ProcessorScript = {
-  engine?: ProcessorEngine;
+  engineId?: string;
   support: {
     acquisition: "file" | "url";
     inputFormats: string[];
@@ -19,6 +23,7 @@ type ProcessorScript = {
   progress?: number[];
   lateProgress?: number[];
   lateResources?: RuntimeResourceKind[];
+  lateCleanups?: RuntimeResourceKind[];
   error?: Error;
   parseOptions?(value: unknown): ProcessorOptions<unknown>;
   result: WorkflowMedia | WorkflowMedia[];
@@ -37,6 +42,7 @@ export function defineScriptedProcessor<Options>(
 type UrlFixture = Omit<WorkflowMedia, "bytes"> & {
   chunks: Uint8Array[];
   totalBytes?: number | null;
+  stallAfterChunks?: number;
 };
 
 type StreamRecord = {
@@ -46,30 +52,121 @@ type StreamRecord = {
   readerLockReleased: boolean;
 };
 
-const signatures: Record<string, readonly number[]> = {
-  jpg: [255, 216, 255],
-  png: [137, 80, 78, 71, 13, 10, 26, 10],
-};
-
 const mimeTypes: Record<string, string> = {
   jpg: "image/jpeg",
   mp4: "video/mp4",
   png: "image/png",
-  "remote-video": "application/octet-stream",
 };
 
-function verifyMedia(
-  media: WorkflowMedia,
-  role: "input" | "result",
-): SemanticVerification {
-  if (
-    role === "input" &&
-    media.format === "remote-video" &&
-    media.mimeType === "application/octet-stream" &&
-    media.bytes.byteLength > 0
-  ) {
-    return { status: "verified" };
+function pngStructureError(bytes: Uint8Array): string | undefined {
+  const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+  if (!signature.every((byte, index) => bytes[index] === byte)) {
+    return "Invalid PNG signature";
   }
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let offset = signature.length;
+  let chunkCount = 0;
+  let sawImageData = false;
+  while (offset < bytes.byteLength) {
+    if (bytes.byteLength - offset < 12) {
+      return "PNG chunk is truncated";
+    }
+    const length = view.getUint32(offset, false);
+    const type = new TextDecoder().decode(
+      bytes.subarray(offset + 4, offset + 8),
+    );
+    if (length > bytes.byteLength - offset - 12) {
+      return `PNG ${type} chunk exceeds the input`;
+    }
+    if (chunkCount === 0 && (type !== "IHDR" || length !== 13)) {
+      return "PNG must begin with a 13-byte IHDR chunk";
+    }
+    if (type === "IDAT") {
+      sawImageData = true;
+    }
+    const nextOffset = offset + 12 + length;
+    if (type === "IEND") {
+      return length === 0 && sawImageData && nextOffset === bytes.byteLength
+        ? undefined
+        : "PNG IEND chunk is invalid or not terminal";
+    }
+    offset = nextOffset;
+    chunkCount += 1;
+  }
+  return "PNG is missing its IEND chunk";
+}
+
+function jpegStructureError(bytes: Uint8Array): string | undefined {
+  if (bytes[0] !== 0xff || bytes[1] !== 0xd8) {
+    return "JPEG is missing its SOI marker";
+  }
+  let offset = 2;
+  let sawFrame = false;
+  while (offset < bytes.byteLength) {
+    if (bytes[offset] !== 0xff) {
+      return "JPEG segment does not begin with a marker";
+    }
+    while (bytes[offset] === 0xff) {
+      offset += 1;
+    }
+    const marker = bytes[offset];
+    offset += 1;
+    if (marker === undefined) {
+      return "JPEG marker is truncated";
+    }
+    if (marker === 0xd9) {
+      return sawFrame && offset === bytes.byteLength
+        ? undefined
+        : "JPEG EOI marker is invalid or not terminal";
+    }
+    if (offset + 2 > bytes.byteLength) {
+      return "JPEG segment length is truncated";
+    }
+    const length = (bytes[offset]! << 8) | bytes[offset + 1]!;
+    if (length < 2 || length > bytes.byteLength - offset) {
+      return "JPEG segment exceeds the input";
+    }
+    if (
+      (marker >= 0xc0 && marker <= 0xc3) ||
+      (marker >= 0xc5 && marker <= 0xc7) ||
+      (marker >= 0xc9 && marker <= 0xcb) ||
+      (marker >= 0xcd && marker <= 0xcf)
+    ) {
+      sawFrame = true;
+    }
+    offset += length;
+    if (marker !== 0xda) {
+      continue;
+    }
+    if (!sawFrame) {
+      return "JPEG scan appears before a frame header";
+    }
+    while (offset < bytes.byteLength) {
+      if (bytes[offset] !== 0xff) {
+        offset += 1;
+        continue;
+      }
+      const next = bytes[offset + 1];
+      if (
+        next === 0x00 ||
+        (next !== undefined && next >= 0xd0 && next <= 0xd7)
+      ) {
+        offset += 2;
+        continue;
+      }
+      if (next === 0xd9) {
+        return offset + 2 === bytes.byteLength
+          ? undefined
+          : "JPEG EOI marker is not terminal";
+      }
+      return "JPEG scan contains an invalid marker";
+    }
+    return "JPEG scan is missing its EOI marker";
+  }
+  return "JPEG is missing its EOI marker";
+}
+
+function verifyMedia(media: WorkflowMedia): SemanticVerification {
   const mimeType = mimeTypes[media.format];
   if (!mimeType) {
     return {
@@ -82,6 +179,18 @@ function verifyMedia(
       status: "rejected",
       message: `Expected MIME ${mimeType}, received ${media.mimeType}`,
     };
+  }
+  if (media.format === "png") {
+    const error = pngStructureError(media.bytes);
+    return error
+      ? { status: "rejected", message: error }
+      : { status: "verified" };
+  }
+  if (media.format === "jpg") {
+    const error = jpegStructureError(media.bytes);
+    return error
+      ? { status: "rejected", message: error }
+      : { status: "verified" };
   }
   if (media.format === "mp4") {
     if (media.bytes.byteLength < 12) {
@@ -103,20 +212,10 @@ function verifyMedia(
     }
     return { status: "verified" };
   }
-  const signature = signatures[media.format];
-  if (!signature) {
-    return {
-      status: "unavailable",
-      message: `No semantic verifier for ${media.format}`,
-    };
-  }
-  if (!signature.every((byte, index) => media.bytes[index] === byte)) {
-    return {
-      status: "rejected",
-      message: `Bytes do not match ${media.format}`,
-    };
-  }
-  return { status: "verified" };
+  return {
+    status: "unavailable",
+    message: `No semantic verifier for ${media.format}`,
+  };
 }
 
 export function createToolWorkflowTestHarness(options: {
@@ -149,6 +248,8 @@ export function createToolWorkflowTestHarness(options: {
   const runIds = [...(options.ids?.run ?? [])];
   const deliveryIds = [...(options.ids?.delivery ?? [])];
   const streamRecords: StreamRecord[] = [];
+  const lateCleanupActive: RuntimeResourceKind[] = [];
+  const lateCleanupReleased: RuntimeResourceKind[] = [];
   const processorRecords: Array<{
     toolId: string;
     engine: ProcessorEngine;
@@ -176,11 +277,16 @@ export function createToolWorkflowTestHarness(options: {
             "application/octet-stream",
         })),
       } as const;
-      const engine: ProcessorEngine = script.engine ?? {
-        id: `scripted:${toolId}`,
-        version: "test",
-        execution: "client-only",
-      };
+      const provenance = getToolExecutionProvenance(toolId);
+      const engineId =
+        script.engineId ??
+        (provenance.kind === "mapped" ? provenance.engineIds[0] : undefined);
+      const engine = engineId
+        ? executionProvenance.getEngine(engineId)
+        : undefined;
+      if (!engine) {
+        throw new TypeError(`No canonical execution engine for ${toolId}`);
+      }
       return [
         toolId,
         {
@@ -190,7 +296,7 @@ export function createToolWorkflowTestHarness(options: {
             return script.parseOptions?.(value) ?? { ok: true, value: {} };
           },
           async verifyInput(input): Promise<SemanticVerification> {
-            return verifyMedia(input, "input");
+            return verifyMedia(input);
           },
           async process(_input, processorOptions, context) {
             processorRecords.push({
@@ -207,13 +313,27 @@ export function createToolWorkflowTestHarness(options: {
             for (const progress of script.progress ?? []) {
               context.reportProgress(progress);
             }
-            if (script.lateProgress || script.lateResources) {
+            if (
+              script.lateProgress ||
+              script.lateResources ||
+              script.lateCleanups
+            ) {
               setTimeout(async () => {
                 for (const progress of script.lateProgress ?? []) {
                   context.reportProgress(progress);
                 }
                 for (const resource of script.lateResources ?? []) {
                   await context.openResource(resource);
+                }
+                for (const resource of script.lateCleanups ?? []) {
+                  lateCleanupActive.push(resource);
+                  await context.registerCleanup(async () => {
+                    const index = lateCleanupActive.lastIndexOf(resource);
+                    if (index !== -1) {
+                      lateCleanupActive.splice(index, 1);
+                    }
+                    lateCleanupReleased.push(resource);
+                  });
                 }
               }, 0);
             }
@@ -227,7 +347,7 @@ export function createToolWorkflowTestHarness(options: {
               await context.openResource(resource);
             }
             context.signal.throwIfAborted();
-            return verifyMedia(result, "result");
+            return verifyMedia(result);
           },
         },
       ];
@@ -266,6 +386,9 @@ export function createToolWorkflowTestHarness(options: {
             let chunkIndex = 0;
             const stream = new ReadableStream<Uint8Array>({
               pull(controller) {
+                if (chunkIndex === fixture.stallAfterChunks) {
+                  return;
+                }
                 const chunk = fixture.chunks[chunkIndex];
                 chunkIndex += 1;
                 if (chunk) {
@@ -280,7 +403,18 @@ export function createToolWorkflowTestHarness(options: {
             });
             const reader = stream.getReader();
             let complete = false;
-            context.registerCleanup(async () => {
+            const cancelReader = () => {
+              void reader.cancel(context.signal.reason).catch(() => {});
+            };
+            if (context.signal.aborted) {
+              cancelReader();
+            } else {
+              context.signal.addEventListener("abort", cancelReader, {
+                once: true,
+              });
+            }
+            await context.registerCleanup(async () => {
+              context.signal.removeEventListener("abort", cancelReader);
               if (!complete) {
                 await reader.cancel();
               }
@@ -386,5 +520,7 @@ export function createToolWorkflowTestHarness(options: {
     telemetryRecords,
     streamRecords,
     processorRecords,
+    lateCleanupActive,
+    lateCleanupReleased,
   };
 }

@@ -1,3 +1,5 @@
+import type { ExecutionEngine } from "../tool-execution-provenance.ts";
+
 export type WorkflowMedia = {
   name: string;
   format: string;
@@ -100,11 +102,7 @@ export type ProcessorOptions<Options> =
   | { ok: false; message: string };
 
 export type ToolProcessor<Options = unknown> = {
-  engine: {
-    id: string;
-    version: string;
-    execution: "client-only" | "server-assisted" | "server-executed";
-  };
+  engine: ExecutionEngine;
   support: ToolSupport;
   parseOptions(options: unknown): ProcessorOptions<Options>;
   verifyInput(
@@ -132,7 +130,7 @@ export type RuntimeResourceKind =
 type WorkflowStageContext = {
   signal: AbortSignal;
   openResource(kind: RuntimeResourceKind): Promise<void>;
-  registerCleanup(cleanup: () => Promise<void>): void;
+  registerCleanup(cleanup: () => Promise<void>): Promise<void>;
   reportProgress(progress: number): void;
 };
 
@@ -288,10 +286,12 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           }
           cleanups.push(() => resource.release());
         },
-        registerCleanup(cleanup) {
+        async registerCleanup(cleanup) {
           if (activePhase === phase && !terminalOutcomeCommitted) {
             cleanups.push(cleanup);
+            return;
           }
+          await cleanup();
         },
       });
 
