@@ -9,7 +9,22 @@ export type WorkflowMedia = {
 
 export type WorkflowInput =
   | { kind: "file"; media: WorkflowMedia }
-  | { kind: "url"; url: string };
+  | { kind: "url"; url: string }
+  | { kind: "files"; media: readonly WorkflowMedia[] }
+  | {
+      kind: "interaction";
+      interaction: Readonly<{
+        format: string;
+        mimeType: string;
+        value: unknown;
+        bytes: number;
+      }>;
+    };
+
+export type WorkflowAcquiredInput =
+  | WorkflowMedia
+  | readonly WorkflowMedia[]
+  | Extract<WorkflowInput, { kind: "interaction" }>["interaction"];
 
 export type WorkflowRequest = {
   toolId: string;
@@ -217,7 +232,10 @@ export type ProcessorOptions<Options> =
   | { ok: true; value: Options }
   | { ok: false; message: string };
 
-export type ToolProcessor<Options = unknown> = {
+export type ToolProcessor<
+  Options = unknown,
+  Input extends WorkflowAcquiredInput = WorkflowMedia,
+> = {
   engine: ExecutionEngine;
   support: ToolSupport;
   parseOptions(options: unknown): ProcessorOptions<Options>;
@@ -225,11 +243,11 @@ export type ToolProcessor<Options = unknown> = {
     request: ProcessorSupportRequest<Options>,
   ): ProcessorSupportDecision;
   verifyInput(
-    input: WorkflowMedia,
+    input: Input,
     context: WorkflowStageContext,
   ): Promise<SemanticVerification>;
   process(
-    input: WorkflowMedia,
+    input: Input,
     options: Options,
     context: WorkflowStageContext,
   ): Promise<WorkflowMedia[]>;
@@ -268,6 +286,18 @@ type WorkflowPorts = {
         input: Extract<WorkflowInput, { kind: "url" }>,
         context: WorkflowStageContext,
       ): Promise<WorkflowMedia>;
+    };
+    files?: {
+      acquire(
+        input: Extract<WorkflowInput, { kind: "files" }>,
+        context: WorkflowStageContext,
+      ): Promise<readonly WorkflowMedia[]>;
+    };
+    interaction?: {
+      acquire(
+        input: Extract<WorkflowInput, { kind: "interaction" }>,
+        context: WorkflowStageContext,
+      ): Promise<Extract<WorkflowInput, { kind: "interaction" }>["interaction"]>;
     };
   };
   resolveIntent(toolId: string): ToolExecutionIntent | undefined;
@@ -448,31 +478,48 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         activePhase = "acquiring";
         emitSnapshot({ phase: "acquiring" });
         const acquisitionContext = context("acquiring", 0, 0.25);
-        const input =
+        const input: WorkflowAcquiredInput =
           request.input.kind === "file"
-            ? await ports.acquisition.file.acquire(
-                request.input,
-                acquisitionContext,
-              )
-            : await ports.acquisition.url.acquire(
-                request.input,
-                acquisitionContext,
-              );
+            ? await ports.acquisition.file.acquire(request.input, acquisitionContext)
+            : request.input.kind === "url"
+              ? await ports.acquisition.url.acquire(request.input, acquisitionContext)
+              : request.input.kind === "files"
+                ? ports.acquisition.files
+                  ? await ports.acquisition.files.acquire(request.input, acquisitionContext)
+                  : request.input.media
+                : ports.acquisition.interaction
+                  ? await ports.acquisition.interaction.acquire(request.input, acquisitionContext)
+                  : request.input.interaction;
         signal.throwIfAborted();
-        const inputSupport = support.inputs.find(
-          ({ format, mimeTypes }) =>
-            format === input.format && mimeTypes.includes(input.mimeType),
-        );
-        if (!inputSupport) {
-          return fail(
-            "unsupported-request",
-            `Unsupported input format: ${input.format}`,
-          );
+        const acquiredInputs = Array.isArray(input) ? input : [input];
+        if (acquiredInputs.length === 0) {
+          return fail("invalid-request", "Input collection is empty");
         }
-        if (
-          input.bytes.byteLength >
-          support.resourceLimits.maxInputBytes
-        ) {
+        for (const acquired of acquiredInputs) {
+          const inputSupport = support.inputs.find(
+            ({ format, mimeTypes }) =>
+              format === acquired.format && mimeTypes.includes(acquired.mimeType),
+          );
+          if (!inputSupport) {
+            return fail(
+              "unsupported-request",
+              `Unsupported input format: ${acquired.format}`,
+            );
+          }
+          const byteLength = "bytes" in acquired && acquired.bytes instanceof Uint8Array
+            ? acquired.bytes.byteLength
+            : acquired.bytes;
+          if (byteLength === 0) {
+            return fail("invalid-request", `${acquired.format} input is empty`);
+          }
+        }
+        const totalInputBytes = acquiredInputs.reduce((total, acquired) => {
+          const bytes = "bytes" in acquired && acquired.bytes instanceof Uint8Array
+            ? acquired.bytes.byteLength
+            : acquired.bytes;
+          return total + bytes;
+        }, 0);
+        if (totalInputBytes > support.resourceLimits.maxInputBytes) {
           return fail(
             "unsupported-request",
             `Input exceeds ${support.resourceLimits.maxInputBytes} bytes`,
@@ -481,9 +528,9 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         const supportDecision = processor.decideSupport({
           detectedInput: {
             acquisition: request.input.kind,
-            format: input.format,
-            mimeType: input.mimeType,
-            bytes: input.bytes.byteLength,
+            format: acquiredInputs[0]!.format,
+            mimeType: acquiredInputs[0]!.mimeType,
+            bytes: totalInputBytes,
           },
           requestedOperation: intent.requestedOperation,
           options: parsedOptions.value,
@@ -492,11 +539,8 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         if (!supportDecision.supported) {
           return fail("unsupported-request", supportDecision.message);
         }
-        if (input.bytes.byteLength === 0) {
-          return fail("invalid-request", `${input.format} input is empty`);
-        }
         const inputVerification = await processor.verifyInput(
-          input,
+          input as never,
           acquisitionContext,
         );
         if (inputVerification.status !== "verified") {
@@ -517,7 +561,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         activePhase = "processing";
         emitSnapshot({ phase: "processing" });
         const results = await processor.process(
-          input,
+          input as never,
           parsedOptions.value,
           context("processing", 0.25, 0.45),
         );
