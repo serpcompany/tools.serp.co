@@ -10,6 +10,7 @@ import { ToolVideoPanel } from '@/components/ToolVideoPanel';
 import {
   createBatchRunController,
   createBrowserBatchWorkflow,
+  retainBatchAggregateProgress,
 } from '@/lib/batch-browser-workflow';
 import type { WorkflowDelivery, WorkflowSnapshot } from '@/lib/tool-workflow';
 
@@ -46,8 +47,10 @@ export default function BatchHeroConverter({
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [{ workflow, deliveries }] = useState(createBrowserBatchWorkflow);
   const [controller] = useState(() =>
-    createBatchRunController(workflow, {
-      observe: setSnapshot,
+    createBatchRunController(workflow, deliveries, {
+      observe(next) {
+        setSnapshot((previous) => retainBatchAggregateProgress(previous, next));
+      },
       onOutcome(outcome) {
         setBusy(false);
         if (outcome.status === 'succeeded') {

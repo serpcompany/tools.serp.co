@@ -22,6 +22,15 @@ export type BrowserBatchDeliveries = Readonly<{
   clear(): void;
 }>;
 
+export function retainBatchAggregateProgress(
+  previous: WorkflowSnapshot | undefined,
+  next: WorkflowSnapshot,
+): WorkflowSnapshot {
+  return next.progress === undefined && previous?.progress !== undefined
+    ? { ...next, progress: previous.progress }
+    : next;
+}
+
 export function createBrowserBatchWorkflow(): Readonly<{
   workflow: ToolWorkflow;
   deliveries: BrowserBatchDeliveries;
@@ -29,37 +38,34 @@ export function createBrowserBatchWorkflow(): Readonly<{
   const mediaById = new Map<string, WorkflowMedia>();
   const objectUrlById = new Map<string, string>();
   const telemetryByRunId = new Map<string, TelemetryHandle>();
-  let worker: Worker | undefined;
-  let workerCleanupRegistered = false;
   let sequence = 0;
 
   const compress: BatchCompressionPort = async (request) => {
-    if (!worker) {
-      worker = new Worker(
-        new URL('../workers/compress.worker.js', import.meta.url),
-        {
-          type: 'module',
-        },
-      );
-    }
-    if (!workerCleanupRegistered) {
-      workerCleanupRegistered = true;
-      await request.registerCleanup(async () => {
-        worker?.terminate();
-        worker = undefined;
-        workerCleanupRegistered = false;
+    const worker = new Worker(
+      new URL('../workers/compress.worker.js', import.meta.url),
+      { type: 'module' },
+    );
+    let released = false;
+    const release = async () => {
+      if (released) return;
+      released = true;
+      worker.terminate();
+    };
+    await request.registerCleanup(release);
+    try {
+      request.signal.throwIfAborted();
+      request.reportProgress(0);
+      const output = await compressPngWithWorker({
+        worker,
+        buf: Uint8Array.from(request.bytes).buffer,
+        quality: request.quality,
+        signal: request.signal,
       });
+      request.reportProgress(1);
+      return new Uint8Array(output);
+    } finally {
+      await release();
     }
-    request.signal.throwIfAborted();
-    request.reportProgress(0);
-    const output = await compressPngWithWorker({
-      worker,
-      buf: Uint8Array.from(request.bytes).buffer,
-      quality: request.quality,
-      signal: request.signal,
-    });
-    request.reportProgress(1);
-    return new Uint8Array(output);
   };
 
   const release = (deliveryId: string) => {
@@ -83,18 +89,15 @@ export function createBrowserBatchWorkflow(): Readonly<{
     },
     telemetry: {
       async start(runId, request) {
-        const media = request.input.kind === 'files' ? request.input.media : [];
+        const items = request.input.kind === 'batch' ? request.input.items : [];
         telemetryByRunId.set(
           runId,
           beginToolRun({
             toolId: request.toolId,
             from: 'png',
             to: 'zip',
-            inputBytes: media.reduce(
-              (total, item) => total + item.bytes.byteLength,
-              0,
-            ),
-            metadata: { fileCount: media.length, partialSuccess: 'fail-fast' },
+            inputBytes: items.reduce((total, item) => total + item.size, 0),
+            metadata: { fileCount: items.length, partialSuccess: 'fail-fast' },
           }),
         );
       },
@@ -140,11 +143,13 @@ export function createBrowserBatchWorkflow(): Readonly<{
 export type BrowserBatchFile = Readonly<{
   name: string;
   type: string;
-  arrayBuffer(): Promise<ArrayBuffer>;
+  size: number;
+  stream(): ReadableStream<Uint8Array>;
 }>;
 
 export function createBatchRunController(
   workflow: ToolWorkflow,
+  deliveryLifecycle: Pick<BrowserBatchDeliveries, 'clear'>,
   options: Readonly<{
     observe?(snapshot: WorkflowSnapshot): void;
     onOutcome?(outcome: WorkflowOutcome): void;
@@ -163,6 +168,7 @@ export function createBatchRunController(
     revision += 1;
     active?.abort(new DOMException('Batch cancelled', 'AbortError'));
     active = undefined;
+    deliveryLifecycle.clear();
   };
   return Object.freeze({
     async runFiles(files, compressionLevel) {
@@ -170,20 +176,17 @@ export function createBatchRunController(
       const runRevision = revision;
       active = new AbortController();
       const controller = active;
-      const media = await Promise.all(
-        files.map(async (file) => ({
-          name: file.name,
-          format: 'png',
-          mimeType: file.type || 'image/png',
-          bytes: new Uint8Array(await file.arrayBuffer()),
-        })),
-      );
-      if (runRevision !== revision || controller.signal.aborted)
-        return undefined;
+      const items = files.map((file) => ({
+        name: file.name,
+        format: 'png',
+        mimeType: file.type || 'image/png',
+        size: file.size,
+        stream: () => file.stream(),
+      }));
       const outcome = await workflow.run(
         {
           toolId: 'batch-compress-png',
-          input: { kind: 'files', media },
+          input: { kind: 'batch', items },
           options: { compressionLevel, partialSuccess: 'fail-fast' },
         },
         {

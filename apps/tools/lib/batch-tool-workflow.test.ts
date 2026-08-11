@@ -10,7 +10,14 @@ import {
   getBatchToolContract,
   type BatchCompressionPort,
 } from './batch-tool-workflow.ts';
-import type { WorkflowMedia } from './tool-workflow/index.ts';
+import {
+  createBatchRunController,
+  retainBatchAggregateProgress,
+} from './batch-browser-workflow.ts';
+import type {
+  WorkflowMedia,
+  WorkflowSnapshot,
+} from './tool-workflow/index.ts';
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 
 const sample = new Uint8Array(
@@ -22,6 +29,19 @@ const sample2 = new Uint8Array(
 
 function png(name: string, bytes = sample): WorkflowMedia {
   return { name, format: 'png', mimeType: 'image/png', bytes };
+}
+
+function batch(media: readonly WorkflowMedia[]) {
+  return {
+    kind: 'batch' as const,
+    items: media.map((item) => ({
+      name: item.name,
+      format: item.format,
+      mimeType: item.mimeType,
+      size: item.bytes.byteLength,
+      stream: () => new Blob([Uint8Array.from(item.bytes)]).stream(),
+    })),
+  };
 }
 
 function recorder(
@@ -107,6 +127,18 @@ test('batch presentation delegates processing, telemetry, delivery resources, an
   );
 });
 
+test('phase-only presentation snapshots preserve monotonic aggregate progress', () => {
+  const processing = { phase: 'processing' as const, progress: 0.7 };
+  const validating = retainBatchAggregateProgress(processing, {
+    phase: 'validating',
+  });
+  const delivering = retainBatchAggregateProgress(validating, {
+    phase: 'delivering',
+  });
+  assert.equal(validating.progress, 0.7);
+  assert.equal(delivering.progress, 0.7);
+});
+
 test('workflow.run emits one telemetry run and delivers an ordered, named, semantically valid archive', async () => {
   const calls: string[] = [];
   const { workflow, deliveries, telemetry } = recorder(
@@ -117,18 +149,12 @@ test('workflow.run emits one telemetry run and delivers an ordered, named, seman
       return Uint8Array.from(bytes);
     },
   );
-  const snapshots: Array<{
-    progress?: number;
-    item?: { index: number; total: number; name: string; progress?: number };
-  }> = [];
+  const snapshots: WorkflowSnapshot[] = [];
 
   const outcome = await workflow.run(
     {
       toolId: 'batch-compress-png',
-      input: {
-        kind: 'files',
-        media: [png('zeta.png'), png('alpha.PNG', sample2)],
-      },
+      input: batch([png('zeta.png'), png('alpha.PNG', sample2)]),
       options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
     },
     { observe: (snapshot) => snapshots.push(snapshot) },
@@ -163,7 +189,9 @@ test('workflow.run emits one telemetry run and delivers an ordered, named, seman
     entries.map(({ bytes }) => bytes.byteLength),
     [sample.byteLength, sample2.byteLength],
   );
-  const itemSnapshots = snapshots.filter(({ item }) => item);
+  const itemSnapshots = snapshots.filter(
+    ({ phase, item }) => phase === 'processing' && item,
+  );
   assert.equal(
     itemSnapshots[0]!.item!.progress,
     undefined,
@@ -193,7 +221,7 @@ test('batch inputs fail closed on cardinality, order-name collisions, format spo
     const { workflow, telemetry, deliveries } = recorder();
     const outcome = await workflow.run({
       toolId: 'batch-compress-png',
-      input: { kind: 'files', media },
+      input: batch(media),
       options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
     });
     assert.equal(outcome.status, 'failed');
@@ -208,7 +236,7 @@ test('a compressor returning spoofed PNG bytes cannot reach archive delivery', a
   );
   const outcome = await workflow.run({
     toolId: 'batch-compress-png',
-    input: { kind: 'files', media: [png('one.png')] },
+    input: batch([png('one.png')]),
     options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
   });
   assert.equal(outcome.status, 'failed');
@@ -225,10 +253,7 @@ test('fail-fast partial-success policy never converts a non-empty prefix into su
   });
   const outcome = await workflow.run({
     toolId: 'batch-compress-png',
-    input: {
-      kind: 'files',
-      media: [png('one.png'), png('two.png'), png('three.png')],
-    },
+    input: batch([png('one.png'), png('two.png'), png('three.png')]),
     options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
   });
   assert.equal(outcome.status, 'failed');
@@ -260,7 +285,7 @@ test('cancellation stops the active and pending items, cleans up once, and ignor
   const pending = workflow.run(
     {
       toolId: 'batch-compress-png',
-      input: { kind: 'files', media: [png('one.png'), png('two.png')] },
+      input: batch([png('one.png'), png('two.png')]),
       options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
     },
     {
@@ -281,4 +306,79 @@ test('cancellation stops the active and pending items, cleans up once, and ignor
   assert.deepEqual(deliveries, []);
   assert.deepEqual(telemetry, ['start', 'terminal:cancelled']);
   assert.equal(snapshots.length, beforeLate);
+});
+
+test('cancellation closes the active acquisition stream and never opens pending items', async () => {
+  let streamsOpened = 0;
+  let activeCancelled = false;
+  const stalled = {
+    name: 'one.png',
+    format: 'png',
+    mimeType: 'image/png',
+    size: sample.byteLength,
+    stream() {
+      streamsOpened += 1;
+      return new ReadableStream<Uint8Array>({
+        pull() {},
+        cancel() {
+          activeCancelled = true;
+        },
+      });
+    },
+  };
+  const pending = { ...stalled, name: 'two.png' };
+  const { workflow, telemetry, deliveries } = recorder();
+  const controller = new AbortController();
+  const outcomePromise = workflow.run(
+    {
+      toolId: 'batch-compress-png',
+      input: { kind: 'batch', items: [stalled, pending] },
+      options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
+    },
+    { signal: controller.signal },
+  );
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  controller.abort(new DOMException('cancelled', 'AbortError'));
+  const outcome = await outcomePromise;
+  assert.equal(outcome.status, 'cancelled');
+  assert.equal(streamsOpened, 1);
+  assert.equal(activeCancelled, true);
+  assert.deepEqual(telemetry, []);
+  assert.deepEqual(deliveries, []);
+});
+
+test('browser controller clears prior delivery resources on replacement and cancellation', async () => {
+  let clears = 0;
+  const workflow = {
+    async run() {
+      return {
+        status: 'failed' as const,
+        runId: 'run-1',
+        error: { code: 'processor-failed' as const, message: 'failed' },
+        telemetry: {
+          start: 'submitted' as const,
+          terminal: 'submitted' as const,
+        },
+      };
+    },
+  };
+  const controller = createBatchRunController(workflow, {
+    clear() {
+      clears += 1;
+    },
+  });
+  await controller.runFiles(
+    [
+      {
+        name: 'one.png',
+        type: 'image/png',
+        size: sample.byteLength,
+        stream: () => new Blob([sample]).stream(),
+      },
+    ],
+    'high',
+  );
+  assert.equal(clears, 1);
+  controller.cancel();
+  assert.equal(clears, 2);
 });

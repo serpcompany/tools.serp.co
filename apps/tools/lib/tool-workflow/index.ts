@@ -7,10 +7,19 @@ export type WorkflowMedia = {
   bytes: Uint8Array;
 };
 
+export type WorkflowBatchItem = Readonly<{
+  name: string;
+  format: string;
+  mimeType: string;
+  size: number;
+  stream(): ReadableStream<Uint8Array>;
+}>;
+
 export type WorkflowInput =
   | { kind: 'file'; media: WorkflowMedia }
   | { kind: 'url'; url: string }
   | { kind: 'files'; media: readonly WorkflowMedia[] }
+  | { kind: 'batch'; items: readonly WorkflowBatchItem[] }
   | {
       kind: 'interaction';
       interaction: Readonly<{
@@ -316,6 +325,12 @@ type WorkflowPorts = {
         context: WorkflowStageContext,
       ): Promise<readonly WorkflowMedia[]>;
     };
+    batch?: {
+      acquire(
+        input: Extract<WorkflowInput, { kind: 'batch' }>,
+        context: WorkflowStageContext,
+      ): Promise<readonly WorkflowMedia[]>;
+    };
     interaction?: {
       acquire(
         input: Extract<WorkflowInput, { kind: 'interaction' }>,
@@ -574,12 +589,19 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
                       acquisitionContext,
                     )
                   : request.input.media
-                : ports.acquisition.interaction
-                  ? await ports.acquisition.interaction.acquire(
-                      request.input,
-                      acquisitionContext,
-                    )
-                  : request.input.interaction;
+                : request.input.kind === 'batch'
+                  ? ports.acquisition.batch
+                    ? await ports.acquisition.batch.acquire(
+                        request.input,
+                        acquisitionContext,
+                      )
+                    : []
+                  : ports.acquisition.interaction
+                    ? await ports.acquisition.interaction.acquire(
+                        request.input,
+                        acquisitionContext,
+                      )
+                    : request.input.interaction;
         signal.throwIfAborted();
         const acquiredInputs = Array.isArray(input) ? input : [input];
         if (acquiredInputs.length === 0) {

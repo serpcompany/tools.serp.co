@@ -236,7 +236,7 @@ function processor(
   return {
     engine,
     support: defineToolSupport({
-      acquisition: 'files',
+      acquisition: 'batch',
       inputs: [{ format: 'png', mimeTypes: ['image/png'] }],
       outputs: [{ format: 'zip', mimeType: 'application/zip' }],
       resourceLimits: {
@@ -248,7 +248,7 @@ function processor(
     }),
     parseOptions,
     decideSupport(request) {
-      return request.detectedInput.acquisition === 'files' &&
+      return request.detectedInput.acquisition === 'batch' &&
         request.requestedOperation === 'bulk' &&
         request.outputs.length === 1 &&
         request.outputs[0]?.format === 'zip'
@@ -402,10 +402,99 @@ export function createBatchToolWorkflow(
           throw new TypeError('Batch Tools do not accept URLs');
         },
       },
-      files: {
+      batch: {
         async acquire(input, context) {
-          context.signal.throwIfAborted();
-          return input.media;
+          if (
+            input.items.length < 1 ||
+            input.items.length > BATCH_PNG_LIMITS.maxItems
+          ) {
+            throw new TypeError(
+              `Batch requires 1..${BATCH_PNG_LIMITS.maxItems} files`,
+            );
+          }
+          const declaredBytes = input.items.reduce((total, item) => {
+            if (
+              !Number.isSafeInteger(item.size) ||
+              item.size < 1 ||
+              item.size > BATCH_PNG_LIMITS.maxItemBytes ||
+              item.format !== 'png' ||
+              item.mimeType !== 'image/png'
+            ) {
+              throw new TypeError(`Unsupported batch item: ${item.name}`);
+            }
+            outputName(item.name);
+            return total + item.size;
+          }, 0);
+          if (declaredBytes > BATCH_PNG_LIMITS.maxInputBytes) {
+            throw new TypeError('Batch exceeds the aggregate input byte limit');
+          }
+
+          const media: WorkflowMedia[] = [];
+          let actualTotalBytes = 0;
+          for (let index = 0; index < input.items.length; index += 1) {
+            context.signal.throwIfAborted();
+            const item = input.items[index]!;
+            const reader = item.stream().getReader();
+            const chunks: Uint8Array[] = [];
+            let itemBytes = 0;
+            let complete = false;
+            const cancelReader = () => {
+              void reader.cancel(context.signal.reason).catch(() => {});
+            };
+            context.signal.addEventListener('abort', cancelReader, {
+              once: true,
+            });
+            try {
+              while (true) {
+                const next = await reader.read();
+                if (next.done) {
+                  complete = true;
+                  break;
+                }
+                itemBytes += next.value.byteLength;
+                actualTotalBytes += next.value.byteLength;
+                if (
+                  itemBytes > BATCH_PNG_LIMITS.maxItemBytes ||
+                  actualTotalBytes > BATCH_PNG_LIMITS.maxInputBytes
+                ) {
+                  throw new TypeError('Batch stream exceeds its byte contract');
+                }
+                chunks.push(next.value);
+                context.reportProgress(
+                  (index + itemBytes / item.size) / input.items.length,
+                  {
+                    index,
+                    total: input.items.length,
+                    name: item.name,
+                    progress: Math.min(1, itemBytes / item.size),
+                  },
+                );
+                context.signal.throwIfAborted();
+              }
+            } finally {
+              context.signal.removeEventListener('abort', cancelReader);
+              if (!complete) await reader.cancel().catch(() => {});
+              reader.releaseLock();
+            }
+            if (itemBytes !== item.size) {
+              throw new TypeError(
+                `${item.name} size changed during acquisition`,
+              );
+            }
+            const bytes = new Uint8Array(itemBytes);
+            let offset = 0;
+            for (const chunk of chunks) {
+              bytes.set(chunk, offset);
+              offset += chunk.byteLength;
+            }
+            media.push({
+              name: item.name,
+              format: item.format,
+              mimeType: item.mimeType,
+              bytes,
+            });
+          }
+          return media;
         },
       },
     },
