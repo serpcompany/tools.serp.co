@@ -19,7 +19,7 @@ function emitProgress(progress, message, status = "processing") {
 
 async function loadTransformers() {
   if (!transformersPromise) {
-    transformersPromise = import(TRANSFORMERS_URL);
+    transformersPromise = import(/* webpackIgnore: true */ TRANSFORMERS_URL);
   }
   const module = await transformersPromise;
   if (!envConfigured) {

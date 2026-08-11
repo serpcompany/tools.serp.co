@@ -50,10 +50,23 @@ test('representative Tool pages consume catalog-resolved content', () => {
 
 test('renderer selection preserves specialized Tool roles', () => {
   assert.equal(selectToolRenderer(toolCatalog.getById('csv-to-sql')), 'table');
-  assert.equal(selectToolRenderer(toolCatalog.getById('3g2-to-mp4')), 'generic');
-  assert.equal(selectToolRenderer(toolCatalog.getById('video-downloader')), 'downloader');
+  assert.equal(
+    selectToolRenderer(toolCatalog.getById('audio-to-text')),
+    'transcription',
+  );
+  assert.equal(
+    selectToolRenderer(toolCatalog.getById('3g2-to-mp4')),
+    'generic',
+  );
+  assert.equal(
+    selectToolRenderer(toolCatalog.getById('video-downloader')),
+    'downloader',
+  );
   assert.equal(selectToolRenderer(toolCatalog.getById('pdf-reader')), 'pdf');
-  assert.equal(selectToolRenderer(toolCatalog.getById('video-editor')), 'placeholder');
+  assert.equal(
+    selectToolRenderer(toolCatalog.getById('video-editor')),
+    'placeholder',
+  );
   assert.equal(selectToolRenderer(undefined), 'not-found');
 
   assert.match(sharedRouteSource, /selectToolRenderer/);
@@ -79,7 +92,8 @@ test('generic Tool rendering obtains related Tools from the catalog', () => {
   assert.ok(
     related.every(
       (tool) =>
-        tool.kind === 'external' || toolCatalog.getByRoute(tool.route)?.isActive,
+        tool.kind === 'external' ||
+        toolCatalog.getByRoute(tool.route)?.isActive,
     ),
   );
   assert.match(genericRendererSource, /toolCatalog\.getRelatedItems/);

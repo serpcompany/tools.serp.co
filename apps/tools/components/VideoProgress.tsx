@@ -6,8 +6,8 @@ import { Loader2, CheckCircle, XCircle } from "lucide-react";
 
 interface VideoProgressProps {
   fileName: string;
-  progress: number;
-  status: 'loading' | 'processing' | 'completed' | 'error';
+  progress?: number;
+  status: "loading" | "processing" | "completed" | "error";
   message?: string;
   completedLabel?: string;
 }
@@ -21,37 +21,54 @@ export function VideoProgress({
 }: VideoProgressProps) {
   const getStatusIcon = () => {
     switch (status) {
-      case 'loading':
+      case "loading":
         return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
-      case 'processing':
+      case "processing":
         return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
-      case 'completed':
+      case "completed":
         return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'error':
+      case "error":
         return <XCircle className="h-4 w-4 text-red-500" />;
     }
   };
 
   const getStatusText = () => {
     switch (status) {
-      case 'loading':
-        return message || `Processing ${Math.round(progress)}%`;
-      case 'processing':
-        return message || `Processing ${Math.round(progress)}%`;
-      case 'completed':
-        return completedLabel || 'Conversion complete!';
-      case 'error':
-        return message || 'Conversion failed';
+      case "loading":
+        return (
+          message ||
+          (progress === undefined
+            ? "Processing..."
+            : `Processing ${Math.round(progress)}%`)
+        );
+      case "processing":
+        return (
+          message ||
+          (progress === undefined
+            ? "Processing..."
+            : `Processing ${Math.round(progress)}%`)
+        );
+      case "completed":
+        return completedLabel || "Conversion complete!";
+      case "error":
+        return message || "Conversion failed";
     }
   };
 
   return (
-    <Card className="p-4 mb-3" data-testid="video-progress">
+    <Card
+      className="p-4 mb-3"
+      data-testid="video-progress"
+      data-status={status}
+    >
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {getStatusIcon()}
-            <span className="text-sm font-medium truncate max-w-[200px]" title={fileName}>
+            <span
+              className="text-sm font-medium truncate max-w-[200px]"
+              title={fileName}
+            >
               {fileName}
             </span>
           </div>
@@ -63,13 +80,17 @@ export function VideoProgress({
         <Progress
           value={progress}
           className="h-2"
-        // indicatorClassName={getProgressColor()}
+          // indicatorClassName={getProgressColor()}
         />
 
-        {status === 'processing' && (
+        {status === "processing" && (
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Processing file...</span>
-            <span>{Math.round(progress)}%</span>
+            <span>
+              {progress === undefined
+                ? "In progress"
+                : `${Math.round(progress)}%`}
+            </span>
           </div>
         )}
       </div>
@@ -82,7 +103,7 @@ interface MultiFileProgressProps {
     id: string;
     name: string;
     progress: number;
-    status: 'loading' | 'processing' | 'completed' | 'error';
+    status: "loading" | "processing" | "completed" | "error";
     message?: string;
   }>;
 }
@@ -90,10 +111,13 @@ interface MultiFileProgressProps {
 export function MultiFileProgress({ files }: MultiFileProgressProps) {
   if (files.length === 0) return null;
 
-  const totalProgress = files.reduce((acc, file) => acc + file.progress, 0) / files.length;
-  const completedCount = files.filter(f => f.status === 'completed').length;
-  const errorCount = files.filter(f => f.status === 'error').length;
-  const processingCount = files.filter(f => f.status === 'processing' || f.status === 'loading').length;
+  const totalProgress =
+    files.reduce((acc, file) => acc + file.progress, 0) / files.length;
+  const completedCount = files.filter((f) => f.status === "completed").length;
+  const errorCount = files.filter((f) => f.status === "error").length;
+  const processingCount = files.filter(
+    (f) => f.status === "processing" || f.status === "loading",
+  ).length;
 
   return (
     <div className="space-y-4">
@@ -104,10 +128,14 @@ export function MultiFileProgress({ files }: MultiFileProgressProps) {
             <h3 className="text-sm font-semibold">Overall Progress</h3>
             <div className="flex gap-4 text-xs">
               {completedCount > 0 && (
-                <span className="text-green-600">✓ {completedCount} completed</span>
+                <span className="text-green-600">
+                  ✓ {completedCount} completed
+                </span>
               )}
               {processingCount > 0 && (
-                <span className="text-blue-600">⟳ {processingCount} processing</span>
+                <span className="text-blue-600">
+                  ⟳ {processingCount} processing
+                </span>
               )}
               {errorCount > 0 && (
                 <span className="text-red-600">✗ {errorCount} failed</span>

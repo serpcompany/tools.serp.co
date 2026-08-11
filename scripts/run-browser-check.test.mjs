@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -125,22 +127,85 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   }
   assert.equal(
     getGenericSmokeExpectation({
-      id: 'cr2-to-jpg', from: 'cr2', to: 'jpg', operation: 'convert',
+      id: 'cr2-to-jpg',
+      from: 'cr2',
+      to: 'jpg',
+      operation: 'convert',
     }),
     'unsupported',
   );
   assert.equal(
     getGenericSmokeExpectation({
-      id: '3g2-to-mp4', from: '3g2', to: 'mp4', operation: 'convert',
+      id: '3g2-to-mp4',
+      from: '3g2',
+      to: 'mp4',
+      operation: 'convert',
     }),
     'unsupported',
   );
   assert.equal(
     getGenericSmokeExpectation({
-      id: 'mp3-to-mp4', from: 'mp3', to: 'mp4', operation: 'convert',
+      id: 'mp3-to-mp4',
+      from: 'mp3',
+      to: 'mp4',
+      operation: 'convert',
     }),
     'unsupported',
   );
+});
+
+test('transcription smoke uses owned speech and a bounded success-or-error terminal', () => {
+  const matrix = JSON.parse(
+    readFileSync(
+      new URL('../apps/tools/benchmarks/fixture-matrix.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  const provenance = JSON.parse(
+    readFileSync(
+      new URL(
+        '../apps/tools/benchmarks/fixture-provenance.json',
+        import.meta.url,
+      ),
+      'utf8',
+    ),
+  );
+  const relativeFixture = matrix.toolFixtures['audio-to-text']?.fixture;
+  const fixture = readFileSync(
+    new URL(`../apps/tools/benchmarks/${relativeFixture}`, import.meta.url),
+  );
+
+  assert.equal(relativeFixture, 'fixtures/transcription-speech.mp3');
+  assert.equal(
+    createHash('sha256').update(fixture).digest('hex'),
+    provenance[relativeFixture].sha256,
+  );
+  assert.match(provenance[relativeFixture].command, /say -v Daniel/);
+  assert.match(provenance[relativeFixture].command, /ffmpeg/);
+  assert.match(provenance[relativeFixture].text, /shared workflow test/);
+  assert.match(runnerSource, /toolFixtures\[tool\.id\]\?\.fixture/);
+  assert.match(runnerSource, /readTranscriptionTerminalState/);
+  assert.match(runnerSource, /timeout: 60_000/);
+  assert.doesNotMatch(runnerSource, /timeout: 600000/);
+});
+
+test('local downloader smoke crosses the URL endpoint with checked-in media', () => {
+  const matrix = JSON.parse(
+    readFileSync(
+      new URL('../apps/tools/benchmarks/fixture-matrix.json', import.meta.url),
+      'utf8',
+    ),
+  );
+
+  assert.deepEqual(matrix.toolFixtures['video-downloader'], {
+    input: 'url',
+    url: 'https://fixture.example/watch/deterministic-video',
+    responseFixture: 'fixtures/sample.mp4',
+  });
+  assert.match(runnerSource, /tool\.id === "video-downloader"/);
+  assert.match(runnerSource, /page\.route\("\*\*\/api\/media-fetch\*"/);
+  assert.match(runnerSource, /data-status="completed"/);
+  assert.match(runnerSource, /data-status="error"/);
 });
 
 test('local evidence accepts only loopback targets', () => {

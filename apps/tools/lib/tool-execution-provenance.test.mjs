@@ -10,6 +10,8 @@ import {
   getToolExecutionProvenance,
 } from './tool-execution-provenance.ts';
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
+import { getMediaWorkflowAdapterRegistration } from './media-workflow/adapter-registration.ts';
+import { selectToolRenderer } from './tool-renderer.ts';
 
 function mapped(toolId) {
   const provenance = getToolExecutionProvenance(toolId);
@@ -176,10 +178,19 @@ test('downloader and browser-with-fetch support keep distinct profiles', () => {
     new URL('../components/TranscribeTool.tsx', import.meta.url),
     'utf8',
   );
-  assert.match(downloaderSource, /getDownloaderMediaFetchEndpoint/);
-  assert.match(transcriptionSource, /getMediaFetchEndpoint/);
+  const browserMediaWorkflowSource = readFileSync(
+    new URL('../lib/media-workflow/transcription-browser.ts', import.meta.url),
+    'utf8',
+  );
+  const mediaEndpointSource = readFileSync(
+    new URL('../lib/media-workflow/media-endpoint.ts', import.meta.url),
+    'utf8',
+  );
+  assert.match(downloaderSource, /createBrowserMediaWorkflow/);
+  assert.match(mediaEndpointSource, /getDownloaderMediaFetchEndpoint/);
+  assert.match(mediaEndpointSource, /getMediaFetchEndpoint/);
   assert.match(transcriptionSource, /handleFiles/);
-  assert.match(transcriptionSource, /transcribe\.worker/);
+  assert.match(browserMediaWorkflowSource, /transcribe\.worker/);
 });
 
 test('specialized and table Tools expose explicit browser-owned engines', () => {
@@ -281,4 +292,24 @@ test('processor availability stays distinct from inferred provenance and joins b
   });
   assert.equal('isActive' in getToolProcessorAvailability('png-to-jpg'), false);
   assert.equal('status' in getToolProcessorAvailability('png-to-jpg'), false);
+});
+
+test('every active shared-renderer downloader is explicitly wired to the streamed workflow', () => {
+  const eligibleDownloaders = toolCatalog.activeTools.filter(
+    (tool) => selectToolRenderer(tool) === 'downloader',
+  );
+
+  assert.equal(eligibleDownloaders.length, 292);
+  for (const tool of eligibleDownloaders) {
+    assert.deepEqual(getMediaWorkflowAdapterRegistration(tool.id), {
+      toolId: tool.id,
+      family: 'downloader',
+      adapterId: 'streamed-media-workflow',
+    });
+    assert.deepEqual(getToolProcessorAvailability(tool.id), {
+      kind: 'wired',
+      toolId: tool.id,
+      adapterId: 'streamed-media-workflow',
+    });
+  }
 });

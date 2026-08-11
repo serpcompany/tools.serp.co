@@ -639,7 +639,10 @@ test("invalid and unsupported requests fail closed before processor execution", 
   assert.equal(unsupportedRequest.error.code, "unsupported-request");
   assert.equal(unsupported.status, "failed");
   assert.equal(unsupported.error.code, "unsupported-tool");
-  assert.deepEqual(harness.events, []);
+  assert.deepEqual(harness.events, [
+    "telemetry:start",
+    "telemetry:terminal",
+  ]);
 });
 
 test("exact processor support rejects an unsupported operation before fallback execution", async () => {
@@ -712,7 +715,10 @@ test("exact processor support rejects an unsupported operation before fallback e
     outcome.error.message,
     "browser raster engine has no verified AVIF encoder",
   );
-  assert.deepEqual(harness.events, []);
+  assert.deepEqual(harness.events, [
+    "telemetry:start",
+    "telemetry:terminal",
+  ]);
 });
 
 test("declared input resource limits reject work before processor execution", async () => {
@@ -754,7 +760,10 @@ test("declared input resource limits reject work before processor execution", as
 
   assert.equal(outcome.status, "failed");
   assert.equal(outcome.error.code, "unsupported-request");
-  assert.equal(harness.events.length, 0);
+  assert.deepEqual(harness.events, [
+    "telemetry:start",
+    "telemetry:terminal",
+  ]);
 });
 
 test("malformed resource-limit contracts fail before acquisition", async (t) => {
@@ -1873,7 +1882,10 @@ test("mid-stream URL cancellation closes the reader before processing or deliver
       readerLockReleased: true,
     },
   ]);
-  assert.deepEqual(harness.events, []);
+  assert.deepEqual(harness.events, [
+    "telemetry:start",
+    "telemetry:terminal",
+  ]);
 });
 
 test("a URL stream stops reading as soon as its declared input budget is exceeded", async () => {
@@ -1930,7 +1942,10 @@ test("a URL stream stops reading as soon as its declared input budget is exceede
       readerLockReleased: true,
     },
   ]);
-  assert.deepEqual(harness.events, []);
+  assert.deepEqual(harness.events, [
+    "telemetry:start",
+    "telemetry:terminal",
+  ]);
 });
 
 test("semantic verification fails closed for malformed MP4 and unknown formats", async () => {
@@ -2366,6 +2381,91 @@ test("typed options and engine support policy stay behind the run seam", async (
   ]);
 });
 
+test("one immutable parsed-options value reaches both validators for each run", async () => {
+  const observed: Array<{
+    stage: "input" | "result";
+    options: { quality: number };
+  }> = [];
+  const processor = defineScriptedProcessor<{ quality: number }>({
+    engineId: "browser-raster-worker",
+    support: {
+      acquisition: "file",
+      inputFormats: ["png"],
+      outputFormats: ["jpg"],
+    },
+    parseOptions(value) {
+      return {
+        ok: true,
+        value: { quality: (value as { quality: number }).quality },
+      };
+    },
+    validators: {
+      input(_media, options) {
+        observed.push({
+          stage: "input",
+          options: options as { quality: number },
+        });
+        return { status: "verified" };
+      },
+      output(_media, options) {
+        observed.push({
+          stage: "result",
+          options: options as { quality: number },
+        });
+        return { status: "verified" };
+      },
+    },
+    result: {
+      name: "photo.jpg",
+      format: "jpg",
+      mimeType: "image/jpeg",
+      bytes: JPEG_BYTES,
+    },
+  });
+  const harness = createToolWorkflowTestHarness({
+    processors: { "png-to-jpg": processor },
+  });
+  const input = {
+    kind: "file" as const,
+    media: {
+      name: "photo.png",
+      format: "png",
+      mimeType: "image/png",
+      bytes: PNG_BYTES,
+    },
+  };
+
+  const first = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input,
+    options: { quality: 27 },
+  });
+  const second = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input,
+    options: { quality: 82 },
+  });
+
+  assert.equal(first.status, "succeeded");
+  assert.equal(second.status, "succeeded");
+  assert.deepEqual(
+    observed.map(({ stage, options }) => ({
+      stage,
+      quality: options.quality,
+      frozen: Object.isFrozen(options),
+    })),
+    [
+      { stage: "input", quality: 27, frozen: true },
+      { stage: "result", quality: 27, frozen: true },
+      { stage: "input", quality: 82, frozen: true },
+      { stage: "result", quality: 82, frozen: true },
+    ],
+  );
+  assert.equal(observed[0]?.options, observed[1]?.options);
+  assert.notEqual(observed[0]?.options, observed[2]?.options);
+  assert.equal(observed[2]?.options, observed[3]?.options);
+});
+
 test("scripted processors use canonical execution provenance records", async () => {
   const harness = createToolWorkflowTestHarness({
     media: {
@@ -2598,5 +2698,80 @@ test("aborting a stalled URL stream immediately unblocks and releases its reader
       readerLockReleased: true,
     },
   ]);
-  assert.deepEqual(harness.events, []);
+  assert.deepEqual(harness.events, [
+    "telemetry:start",
+    "telemetry:terminal",
+  ]);
+});
+
+test("URL acquisition failure records exactly one failed terminal outcome", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "video-downloader": {
+        support: {
+          acquisition: "url",
+          inputFormats: ["mp4"],
+          outputFormats: ["mp4"],
+        },
+        result: {
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: SAMPLE_MP4_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://media.example/unavailable.mp4" },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "acquisition-failed");
+  assert.deepEqual(harness.telemetryRecords.map(({ kind }) => kind), [
+    "start",
+    "terminal",
+  ]);
+  assert.deepEqual(harness.telemetryRecords.at(-1), {
+    kind: "terminal",
+    runId: "run-1",
+    status: "failed",
+    at: 0,
+  });
+});
+
+test("malformed processor options remain outside telemetry eligibility", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "video-downloader": {
+        support: {
+          acquisition: "url",
+          inputFormats: ["mp4"],
+          outputFormats: ["mp4"],
+        },
+        parseOptions() {
+          return { ok: false, message: "Downloader mode is malformed" };
+        },
+        result: {
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: SAMPLE_MP4_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://media.example/not-requested.mp4" },
+    options: { mode: "invalid" },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-request");
+  assert.deepEqual(harness.streamRecords, []);
+  assert.deepEqual(harness.telemetryRecords, []);
 });

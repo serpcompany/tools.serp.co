@@ -24,6 +24,14 @@ const mediaFetchEndpointSource = readFileSync(
   new URL('../lib/media-fetch-endpoint.ts', import.meta.url),
   'utf8',
 );
+const browserMediaWorkflowSource = readFileSync(
+  new URL('../lib/media-workflow/browser.ts', import.meta.url),
+  'utf8',
+);
+const mediaEndpointAdapterSource = readFileSync(
+  new URL('../lib/media-workflow/media-endpoint.ts', import.meta.url),
+  'utf8',
+);
 const sharedToolRouteSource = readFileSync(
   new URL('../app/(convert)/[tool]/page.tsx', import.meta.url),
   'utf8',
@@ -47,18 +55,19 @@ test('all active download tools use the shared rate-limited downloader path', ()
   assert.match(downloaderHeroSource, /VideoDownloaderTool/);
   assert.match(sharedToolRouteSource, /DownloaderPageRenderer/);
   assert.match(
-    videoDownloaderToolSource,
+    mediaEndpointAdapterSource,
     /consumer:\s*DOWNLOADER_CONSUMER|consumer:\s*"downloader"/,
   );
   assert.match(
-    videoDownloaderToolSource,
+    mediaEndpointAdapterSource,
     /createDownloaderRequestHeaders|DOWNLOADER_CLIENT_ID_HEADER|x-serp-downloader-client-id/,
   );
   assert.match(
-    videoDownloaderToolSource,
+    mediaEndpointAdapterSource,
     /getDownloaderMediaFetchEndpoint\(\)/,
   );
-  assert.doesNotMatch(videoDownloaderToolSource, /fetch\("\/api\/media-fetch"/);
+  assert.doesNotMatch(mediaEndpointAdapterSource, /fetch\("\/api\/media-fetch"/);
+  assert.match(videoDownloaderToolSource, /createBrowserMediaWorkflow/);
   assert.match(
     mediaFetchRouteSource,
     /payload\.consumer === DOWNLOADER_CONSUMER|consumer === DOWNLOADER_CONSUMER/,
@@ -88,8 +97,10 @@ test('media fetch calls support a public endpoint override', () => {
     mediaFetchEndpointSource,
     /DEFAULT_MEDIA_FETCH_ENDPOINT = "\/api\/media-fetch"/,
   );
-  assert.match(videoDownloaderToolSource, /getDownloaderMediaFetchEndpoint/);
-  assert.match(transcribeToolSource, /getMediaFetchEndpoint/);
+  assert.match(mediaEndpointAdapterSource, /getDownloaderMediaFetchEndpoint/);
+  assert.match(mediaEndpointAdapterSource, /getMediaFetchEndpoint/);
+  assert.match(browserMediaWorkflowSource, /createProductionMediaEndpoint/);
+  assert.match(transcribeToolSource, /createBrowserTranscriptionWorkflow/);
   assert.doesNotMatch(transcribeToolSource, /fetch\("\/api\/media-fetch"/);
 });
 

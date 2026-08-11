@@ -4,7 +4,7 @@ import { VideoProgress } from "@/components/VideoProgress";
 
 export type ToolProgressFile = {
   name: string;
-  progress: number;
+  progress?: number;
   status: "loading" | "processing" | "completed" | "error";
   message?: string;
 };

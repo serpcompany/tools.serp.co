@@ -659,6 +659,19 @@
     }
   ],
   "toolFixtures": {
+    "audio-to-text": {
+      "input": "file",
+      "fixture": "fixtures/transcription-speech.mp3"
+    },
+    "audio-to-transcript": {
+      "input": "file",
+      "fixture": "fixtures/transcription-speech.mp3"
+    },
+    "video-downloader": {
+      "input": "url",
+      "url": "https://fixture.example/watch/deterministic-video",
+      "responseFixture": "fixtures/sample.mp4"
+    },
     "batch-compress-png": {
       "input": "file",
       "fixtures": [

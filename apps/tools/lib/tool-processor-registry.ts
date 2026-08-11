@@ -6,6 +6,7 @@ import {
 } from './table-operation-policy.ts';
 import { getToolExecutionProvenance } from './tool-execution-provenance.ts';
 import { getGenericToolContract } from './generic-tool-workflow.ts';
+import { getMediaWorkflowAdapterRegistration } from './media-workflow/adapter-registration.ts';
 
 export type WiredToolProcessorAvailability = Readonly<{
   kind: 'wired';
@@ -43,9 +44,22 @@ const registeredAdapterIdByToolId: Readonly<Record<string, string>> =
   );
 
 function availabilityForToolId(toolId: string): ToolProcessorAvailability {
-  const adapterId = registeredAdapterIdByToolId[toolId];
-  if (adapterId) {
-    return Object.freeze({ kind: 'wired', toolId, adapterId });
+  const tableAdapterId = registeredAdapterIdByToolId[toolId];
+  if (tableAdapterId) {
+    return Object.freeze({
+      kind: 'wired',
+      toolId,
+      adapterId: tableAdapterId,
+    });
+  }
+
+  const mediaRegistration = getMediaWorkflowAdapterRegistration(toolId);
+  if (mediaRegistration) {
+    return Object.freeze({
+      kind: 'wired',
+      toolId,
+      adapterId: mediaRegistration.adapterId,
+    });
   }
   const genericContract = getGenericToolContract(toolId);
   if (genericContract.state === 'supported') {

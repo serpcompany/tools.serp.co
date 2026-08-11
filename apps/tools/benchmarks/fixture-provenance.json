@@ -1,0 +1,16 @@
+{
+  "fixtures/sample-video-only.webm": {
+    "source": "repository-generated",
+    "command": "ffmpeg -f lavfi -i color=c=black:s=320x240:r=25:d=1 -an -c:v libvpx -deadline best -cpu-used 0 -map_metadata -1 sample-video-only.webm",
+    "reproducibility": "recipe-only; WebM muxing may vary; sha256 identifies the checked-in artifact",
+    "sha256": "a8baba8e56e31fd86e6581468f59c8f8b5451f30b2ab4d58cfd3d8ee120e37b4"
+  },
+  "fixtures/transcription-speech.mp3": {
+    "source": "repository-generated",
+    "text": "The shared workflow test confirms that browser transcription returns clear and useful text.",
+    "command": "/usr/bin/say -v Daniel -r 180 -o speech.aiff 'The shared workflow test confirms that browser transcription returns clear and useful text.' && ffmpeg -hide_banner -loglevel error -y -i speech.aiff -map_metadata -1 -ac 1 -ar 16000 -c:a libmp3lame -b:a 64k transcription-speech.mp3",
+    "toolVersions": "macOS 26.5.2 build 25F84 Daniel voice; ffmpeg 8.0.1",
+    "reproducibility": "recipe and exact spoken text recorded; platform voice and MP3 muxing may vary; sha256 identifies the checked-in artifact",
+    "sha256": "91c7d12b2d16cf5a79aabaa2ece02db3ee22aa805b81296da0e5fc71f188743e"
+  }
+}
