@@ -166,6 +166,71 @@ function jpegStructureError(bytes: Uint8Array): string | undefined {
   return "JPEG is missing its EOI marker";
 }
 
+function bmffStructureError(bytes: Uint8Array): string | undefined {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const requiredPayloadSizes = new Map([
+    ["ftyp", 8],
+    ["mdat", 1],
+    ["moov", 1],
+  ]);
+  const found = new Set<string>();
+  let offset = 0;
+
+  while (offset < bytes.byteLength) {
+    const remaining = bytes.byteLength - offset;
+    if (remaining < 8) {
+      return "MP4 top-level box header is truncated";
+    }
+
+    const size32 = view.getUint32(offset, false);
+    const type = new TextDecoder().decode(
+      bytes.subarray(offset + 4, offset + 8),
+    );
+    let headerSize = 8;
+    let boxSize: number;
+
+    if (size32 === 1) {
+      if (remaining < 16) {
+        return `MP4 ${type} extended-size header is truncated`;
+      }
+      const extendedSize = view.getBigUint64(offset + 8, false);
+      if (extendedSize > BigInt(Number.MAX_SAFE_INTEGER)) {
+        return `MP4 ${type} box size is not safely representable`;
+      }
+      headerSize = 16;
+      boxSize = Number(extendedSize);
+    } else if (size32 === 0) {
+      boxSize = remaining;
+    } else {
+      boxSize = size32;
+    }
+
+    if (boxSize < headerSize) {
+      return `MP4 ${type} box is smaller than its header`;
+    }
+    if (boxSize > remaining) {
+      return `MP4 ${type} box exceeds the input`;
+    }
+
+    const requiredPayloadSize = requiredPayloadSizes.get(type);
+    if (requiredPayloadSize !== undefined) {
+      if (boxSize - headerSize < requiredPayloadSize) {
+        return `MP4 ${type} box has no valid payload`;
+      }
+      found.add(type);
+    }
+
+    offset += boxSize;
+  }
+
+  for (const type of requiredPayloadSizes.keys()) {
+    if (!found.has(type)) {
+      return `MP4 is missing its ${type} box`;
+    }
+  }
+  return undefined;
+}
+
 function verifyMedia(media: WorkflowMedia): SemanticVerification {
   const mimeType = mimeTypes[media.format];
   if (!mimeType) {
@@ -193,24 +258,10 @@ function verifyMedia(media: WorkflowMedia): SemanticVerification {
       : { status: "verified" };
   }
   if (media.format === "mp4") {
-    if (media.bytes.byteLength < 12) {
-      return { status: "rejected", message: "MP4 ftyp box is truncated" };
-    }
-    const view = new DataView(
-      media.bytes.buffer,
-      media.bytes.byteOffset,
-      media.bytes.byteLength,
-    );
-    const boxSize = view.getUint32(0, false);
-    const boxType = new TextDecoder().decode(media.bytes.subarray(4, 8));
-    if (
-      boxType !== "ftyp" ||
-      boxSize < 12 ||
-      boxSize > media.bytes.byteLength
-    ) {
-      return { status: "rejected", message: "Invalid MP4 ftyp box" };
-    }
-    return { status: "verified" };
+    const error = bmffStructureError(media.bytes);
+    return error
+      ? { status: "rejected", message: error }
+      : { status: "verified" };
   }
   return {
     status: "unavailable",

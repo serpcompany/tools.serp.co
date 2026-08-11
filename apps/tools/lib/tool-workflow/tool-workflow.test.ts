@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -27,6 +28,11 @@ const MP4_FTYP_BYTES = new Uint8Array([
   0, 0, 0, 20, 102, 116, 121, 112, 105, 115, 111, 109, 0, 0, 2, 0, 105, 115,
   111, 109,
 ]);
+const SAMPLE_MP4_BYTES = new Uint8Array(
+  readFileSync(
+    new URL("../../benchmarks/fixtures/sample.mp4", import.meta.url),
+  ),
+);
 
 test("a file Tool run crosses one workflow seam from acquisition through delivery", async () => {
   const harness = createToolWorkflowTestHarness({
@@ -95,7 +101,10 @@ test("a URL stream uses the same workflow seam and preserves multiple result ord
           name: "video.mp4",
           format: "mp4",
           mimeType: "video/mp4",
-          chunks: [MP4_FTYP_BYTES.subarray(0, 8), MP4_FTYP_BYTES.subarray(8)],
+          chunks: [
+            SAMPLE_MP4_BYTES.subarray(0, 4096),
+            SAMPLE_MP4_BYTES.subarray(4096),
+          ],
         },
       },
     },
@@ -111,7 +120,7 @@ test("a URL stream uses the same workflow seam and preserves multiple result ord
             name: "video.mp4",
             format: "mp4",
             mimeType: "video/mp4",
-            bytes: MP4_FTYP_BYTES,
+            bytes: SAMPLE_MP4_BYTES,
           },
           {
             name: "poster.jpg",
@@ -133,7 +142,7 @@ test("a URL stream uses the same workflow seam and preserves multiple result ord
   assert.deepEqual(
     outcome.results.map(({ name, format, size }) => ({ name, format, size })),
     [
-      { name: "video.mp4", format: "mp4", size: 20 },
+      { name: "video.mp4", format: "mp4", size: 12429 },
       { name: "poster.jpg", format: "jpg", size: 270 },
     ],
   );
@@ -594,11 +603,11 @@ test("mid-stream URL cancellation closes the reader before processing or deliver
           format: "mp4",
           mimeType: "video/mp4",
           chunks: [
-            MP4_FTYP_BYTES.subarray(0, 8),
-            MP4_FTYP_BYTES.subarray(8, 14),
-            MP4_FTYP_BYTES.subarray(14),
+            SAMPLE_MP4_BYTES.subarray(0, 4096),
+            SAMPLE_MP4_BYTES.subarray(4096, 8192),
+            SAMPLE_MP4_BYTES.subarray(8192),
           ],
-          totalBytes: MP4_FTYP_BYTES.byteLength,
+          totalBytes: SAMPLE_MP4_BYTES.byteLength,
         },
       },
     },
@@ -613,7 +622,7 @@ test("mid-stream URL cancellation closes the reader before processing or deliver
           name: "video.mp4",
           format: "mp4",
           mimeType: "video/mp4",
-          bytes: MP4_FTYP_BYTES,
+          bytes: SAMPLE_MP4_BYTES,
         },
       },
     },
@@ -709,6 +718,47 @@ test("semantic verification fails closed for malformed MP4 and unknown formats",
   );
 });
 
+test("an ftyp-only MP4 artifact is rejected before delivery", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "ftyp-only": {
+        engineId: "browser-raster-worker",
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["mp4"],
+        },
+        result: {
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: MP4_FTYP_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "ftyp-only",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.equal(
+    harness.events.filter((event) => event === "delivery").length,
+    0,
+  );
+});
+
 test("typed options and engine support policy stay behind the run seam", async () => {
   const processor = defineScriptedProcessor<{ quality: number }>({
     engineId: "browser-raster-worker",
@@ -786,7 +836,7 @@ test("scripted processors use canonical execution provenance records", async () 
           name: "source.mp4",
           format: "mp4",
           mimeType: "video/mp4",
-          chunks: [MP4_FTYP_BYTES],
+          chunks: [SAMPLE_MP4_BYTES],
         },
       },
     },
@@ -814,7 +864,7 @@ test("scripted processors use canonical execution provenance records", async () 
           name: "video.mp4",
           format: "mp4",
           mimeType: "video/mp4",
-          bytes: MP4_FTYP_BYTES,
+          bytes: SAMPLE_MP4_BYTES,
         },
       },
     },
@@ -936,7 +986,7 @@ test("aborting a stalled URL stream immediately unblocks and releases its reader
           format: "mp4",
           mimeType: "video/mp4",
           chunks: [],
-          totalBytes: MP4_FTYP_BYTES.byteLength,
+          totalBytes: SAMPLE_MP4_BYTES.byteLength,
           stallAfterChunks: 0,
         },
       },
@@ -952,7 +1002,7 @@ test("aborting a stalled URL stream immediately unblocks and releases its reader
           name: "video.mp4",
           format: "mp4",
           mimeType: "video/mp4",
-          bytes: MP4_FTYP_BYTES,
+          bytes: SAMPLE_MP4_BYTES,
         },
       },
     },
