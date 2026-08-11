@@ -30,8 +30,8 @@ const videoDownloaderToolSource = readFileSync(
   new URL("../components/VideoDownloaderTool.tsx", import.meta.url),
   "utf8",
 );
-const downloaderAttemptPolicySource = readFileSync(
-  new URL("./media-workflow/attempt-policy.ts", import.meta.url),
+const downloaderFailurePresentationSource = readFileSync(
+  new URL("./media-workflow/downloader-failure-presentation.ts", import.meta.url),
   "utf8",
 );
 const videoDownloaderPageSource = readFileSync(
@@ -115,17 +115,18 @@ test("downloader page template includes the shared browser extension CTA", () =>
   );
 });
 
-test("source-specific downloader failures promote the extension instead of raw backend errors", () => {
+test("only structured downloader recovery promotes the extension", () => {
   assert.match(videoDownloaderToolSource, /extensionUrl\?: string/);
   assert.match(videoDownloaderToolSource, /extensionProductName\?: string/);
-  assert.match(videoDownloaderToolSource, /getExtensionFailureCta/);
-  assert.match(videoDownloaderToolSource, /Use the \$\{extensionFailureCta\.productName\} Extension/);
+  assert.match(videoDownloaderToolSource, /getDownloaderExtensionCta/);
   assert.match(videoDownloaderToolSource, /Get the \$\{extensionFailureCta\.productName\} Extension/);
   assert.match(videoDownloaderToolSource, /href={extensionFailureCta\.extensionUrl}/);
-  assert.match(videoDownloaderToolSource, /This site cannot be downloaded reliably from the web form/);
-  assert.match(videoDownloaderToolSource, /Unsupported URL/);
-  assert.match(videoDownloaderToolSource, /Download failed \\\(500\\\)/);
-  assert.match(videoDownloaderToolSource, /extensionUrl: extensionUrl \?\? DOWNLOADER_EXTENSION_URL/);
+  assert.match(
+    downloaderFailurePresentationSource,
+    /failure\.recovery\?\.kind !== "browser-extension-required"/,
+  );
+  assert.doesNotMatch(videoDownloaderToolSource, /Unsupported URL/);
+  assert.doesNotMatch(videoDownloaderToolSource, /Download failed \\\(500\\\)/);
   assert.match(videoDownloaderToolSource, /setExtensionFailureCta/);
   assert.match(videoDownloaderToolSource, /showExtensionCta\?: boolean/);
   assert.match(videoDownloaderToolSource, /showExtensionCta=\{!extensionFailureCta\}/);
@@ -159,27 +160,15 @@ test("legacy typo downloader routes redirect to canonical downloader routes", ()
   );
 });
 
-test("known unreliable downloader pages fail fast into extension monetization", () => {
-  assert.match(videoDownloaderToolSource, /getDownloaderAttemptPolicy/);
-  assert.match(downloaderAttemptPolicySource, /download-beeg-videos/);
-  assert.match(downloaderAttemptPolicySource, /download-eporner-videos/);
-  assert.match(downloaderAttemptPolicySource, /download-ashemaletube-videos/);
-  assert.match(downloaderAttemptPolicySource, /download-xhamster-videos/);
-  assert.match(downloaderAttemptPolicySource, /download-boyfriendtv-videos/);
-  assert.match(videoDownloaderToolSource, /getFailFastDownloaderCta/);
-  assert.match(
-    videoDownloaderToolSource,
-    /createBrowserMediaWorkflow\(\{[\s\S]*\}\)\.run\([\s\S]*if \(failFastCta\)/,
-  );
+test("downloader pages do not encode Tool-specific endpoint health claims", () => {
+  assert.doesNotMatch(videoDownloaderToolSource, /getDownloaderAttemptPolicy/);
+  assert.doesNotMatch(videoDownloaderToolSource, /getFailFastDownloaderCta/);
+  assert.doesNotMatch(videoDownloaderToolSource, /site_unreliable/);
   assert.doesNotMatch(videoDownloaderToolSource, /beginToolRun|finishFailure/);
-  assert.match(videoDownloaderToolSource, /Use the browser extension for this site\./);
 });
 
 test("downloaders map extension-only API responses into extension monetization", () => {
-  assert.match(videoDownloaderToolSource, /Download failed/);
-  assert.match(videoDownloaderToolSource, /403/);
-  assert.match(videoDownloaderToolSource, /requires a browser extension/);
-  assert.match(videoDownloaderToolSource, /extension_only/);
+  assert.match(videoDownloaderToolSource, /getDownloaderExtensionCta\(outcome\.error/);
   assert.match(videoDownloaderToolSource, /Browser Extension Required/);
   assert.match(
     videoDownloaderToolSource,

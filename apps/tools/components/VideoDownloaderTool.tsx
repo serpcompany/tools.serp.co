@@ -15,7 +15,10 @@ import {
 } from "@/lib/downloader-extension-cta";
 import { createBrowserMediaWorkflow } from "@/lib/media-workflow/browser";
 import { createBrowserRunOwnership } from "@/lib/media-workflow/browser-run-ownership";
-import { getDownloaderAttemptPolicy } from "@/lib/media-workflow/attempt-policy";
+import {
+  getDownloaderExtensionCta,
+  type DownloaderExtensionCta,
+} from "@/lib/media-workflow/downloader-failure-presentation";
 import { createMonotonicProgress } from "@/lib/media-workflow/monotonic-progress";
 import { projectMediaTransfer } from "@/lib/media-workflow/transfer-presentation";
 
@@ -31,12 +34,6 @@ type Props = {
   extensionProductName?: string;
 };
 
-type ExtensionFailureCta = {
-  extensionUrl: string;
-  productName: string;
-  reason: "download_failure" | "extension_only" | "site_unreliable";
-};
-
 const LOCAL_USAGE_STORAGE_KEY = "serp-tools:downloader-usage:v1";
 const LOCAL_USAGE_PRESSURE_THRESHOLD = 3;
 function parseUrlInput(value: string) {
@@ -50,45 +47,6 @@ function parseUrlInput(value: string) {
   } catch {
     return null;
   }
-}
-
-function getExtensionFailureCta(
-  message: string,
-  extensionUrl?: string,
-  extensionProductName?: string,
-): ExtensionFailureCta | null {
-  const isExtensionEligibleFailure =
-    /Unsupported URL/i.test(message) ||
-    /requires a browser extension/i.test(message) ||
-    /Download failed \(500\)/i.test(message) ||
-    /Download failed \(403\)/i.test(message) ||
-    /This link returns a media type we do not support yet/i.test(message) ||
-    /That link does not look like a supported media file/i.test(message) ||
-    /Failed to fetch media/i.test(message);
-
-  if (!isExtensionEligibleFailure) return null;
-
-  return {
-    extensionUrl: extensionUrl ?? DOWNLOADER_EXTENSION_URL,
-    productName: extensionProductName || "Downloader",
-    reason: /requires a browser extension/i.test(message)
-      ? "extension_only"
-      : "download_failure",
-  };
-}
-
-function getFailFastDownloaderCta(
-  toolId: string,
-  extensionUrl?: string,
-  extensionProductName?: string,
-): ExtensionFailureCta | null {
-  if (getDownloaderAttemptPolicy(toolId).kind !== "reject") return null;
-
-  return {
-    extensionUrl: extensionUrl ?? DOWNLOADER_EXTENSION_URL,
-    productName: extensionProductName || "Downloader",
-    reason: "site_unreliable",
-  };
 }
 
 function getLocalUsageDayKey() {
@@ -177,7 +135,7 @@ export default function VideoDownloaderTool({
   const [currentFile, setCurrentFile] = useState<ToolProgressFile | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [extensionFailureCta, setExtensionFailureCta] =
-    useState<ExtensionFailureCta | null>(null);
+    useState<DownloaderExtensionCta | null>(null);
   const [localUsageCount, setLocalUsageCount] = useState(0);
   const [urlInput, setUrlInput] = useState("");
   const [uncontrolledAdsVisible, setUncontrolledAdsVisible] = useState(false);
@@ -213,12 +171,6 @@ export default function VideoDownloaderTool({
     setExtensionFailureCta(null);
 
     const nameHint = "Media download";
-    const failFastCta = getFailFastDownloaderCta(
-      toolId,
-      extensionUrl,
-      extensionProductName,
-    );
-
     const lease = runOwnership.begin();
     setBusy(true);
     setCurrentFile({
@@ -278,7 +230,23 @@ export default function VideoDownloaderTool({
         },
       );
       if (!lease.isCurrent()) return;
-      if (outcome.status === "failed") throw new Error(outcome.error.message);
+      if (outcome.status === "failed") {
+        const extensionCta = getDownloaderExtensionCta(outcome.error, {
+          extensionUrl,
+          productName: extensionProductName,
+        });
+        if (extensionCta) {
+          setExtensionFailureCta(extensionCta);
+          setCurrentFile({
+            name: nameHint,
+            progress: 0,
+            status: "error",
+            message: "Use the browser extension for this site.",
+          });
+          return;
+        }
+        throw new Error(outcome.error.message);
+      }
       if (outcome.status === "cancelled") return;
       const result = outcome.results[0];
       if (!result) throw new Error("Download produced no result");
@@ -291,34 +259,6 @@ export default function VideoDownloaderTool({
     } catch (err) {
       if (!lease.isCurrent()) return;
       const message = err instanceof Error ? err.message : "Download failed";
-      if (failFastCta) {
-        setExtensionFailureCta(failFastCta);
-        setCurrentFile({
-          name: nameHint,
-          progress: 0,
-          status: "error",
-          message: "Use the browser extension for this site.",
-        });
-        return;
-      }
-      const extensionCta = getExtensionFailureCta(
-        message,
-        extensionUrl,
-        extensionProductName,
-      );
-
-      if (extensionCta) {
-        setExtensionFailureCta(extensionCta);
-        setErrorMessage(null);
-        setCurrentFile({
-          name: nameHint,
-          progress: 0,
-          status: "error",
-          message: "Use the browser extension for this site.",
-        });
-        return;
-      }
-
       setCurrentFile({
         name: nameHint,
         progress: 0,
@@ -424,14 +364,10 @@ export default function VideoDownloaderTool({
             {extensionFailureCta ? (
               <div className="mx-auto max-w-2xl rounded-lg border border-[#bfd4ff] bg-[#eef4ff] p-4 text-left">
                 <h2 className="text-base font-semibold text-[#12337a]">
-                  {extensionFailureCta.reason === "extension_only"
-                    ? "Browser Extension Required"
-                    : `Use the ${extensionFailureCta.productName} Extension`}
+                  Browser Extension Required
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#12337a]">
-                  {extensionFailureCta.reason === "extension_only"
-                    ? "This website requires a browser extension to download from."
-                    : `This site cannot be downloaded reliably from the web form. The ${extensionFailureCta.productName} Extension detects the video inside your browser and saves it directly.`}
+                  This website requires a browser extension to download from.
                 </p>
                 <SerplyCtaButton
                   href={extensionFailureCta.extensionUrl}

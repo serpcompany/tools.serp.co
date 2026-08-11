@@ -14,6 +14,7 @@ import { deliverMediaInBrowser } from "./browser.ts";
 import {
   BROWSER_MEDIA_MEMORY_BUDGET,
   createStreamedMediaAcquisition,
+  MediaEndpointError,
   type MediaEndpointResponse,
 } from "./media-endpoint.ts";
 import { createMediaWorkflowTestHarness } from "./testing.ts";
@@ -551,7 +552,7 @@ test("scoped downloader and transcription Tool ids register the media workflow a
   assert.equal(getMediaWorkflowAdapterRegistration("png-to-jpg"), undefined);
 });
 
-test("known-unreliable downloader attempts fail inside workflow accounting without endpoint access", async (t) => {
+test("every downloader Tool id attempts its endpoint once and records the actual failure once", async (t) => {
   for (const toolId of [
     "download-ashemaletube-videos",
     "download-beeg-videos",
@@ -568,7 +569,13 @@ test("known-unreliable downloader attempts fail inside workflow accounting witho
 
       assert.equal(outcome.status, "failed");
       assert.equal(outcome.error.code, "acquisition-failed");
-      assert.deepEqual(harness.endpoint.requests, []);
+      assert.deepEqual(harness.endpoint.requests, [
+        {
+          consumer: "downloader",
+          mode: "video",
+          url: "https://source.invalid/video",
+        },
+      ]);
       assert.deepEqual(harness.deliveries, []);
       assert.deepEqual(harness.telemetry, [
         { kind: "start" },
@@ -576,6 +583,51 @@ test("known-unreliable downloader attempts fail inside workflow accounting witho
       ]);
     });
   }
+});
+
+test("workflow failure preserves explicit endpoint recovery without inventing it for ordinary failures", async () => {
+  const extensionRequired = createMediaWorkflowTestHarness({
+    media: {
+      "https://source.example/extension": {
+        error: new MediaEndpointError("Browser integration required", {
+          kind: "browser-extension-required",
+        }),
+        chunks: [],
+      },
+    },
+  });
+  const ordinary = createMediaWorkflowTestHarness({
+    media: {
+      "https://source.example/unavailable": {
+        error: new Error("Source unavailable"),
+        chunks: [],
+      },
+    },
+  });
+
+  const extensionOutcome = await extensionRequired.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://source.example/extension" },
+  });
+  const ordinaryOutcome = await ordinary.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://source.example/unavailable" },
+  });
+
+  assert.equal(extensionOutcome.status, "failed");
+  assert.deepEqual(
+    (extensionOutcome.error as typeof extensionOutcome.error & {
+      recovery?: unknown;
+    }).recovery,
+    { kind: "browser-extension-required" },
+  );
+  assert.equal(ordinaryOutcome.status, "failed");
+  assert.equal(
+    (ordinaryOutcome.error as typeof ordinaryOutcome.error & {
+      recovery?: unknown;
+    }).recovery,
+    undefined,
+  );
 });
 
 test("downloader URL streams cross workflow.run and preserve verified media", async () => {

@@ -12,7 +12,6 @@ import {
   type MediaEndpointRequest,
   type MediaTransferProgress,
 } from "./media-endpoint.ts";
-import { getDownloaderAttemptPolicy } from "./attempt-policy.ts";
 import { getMediaWorkflowAdapterRegistration } from "./adapter-registration.ts";
 import {
   createDownloaderProcessor,
@@ -92,10 +91,6 @@ export function createMediaWorkflow(ports: MediaWorkflowPorts): ToolWorkflow {
           },
           url: {
             acquire(_input, context) {
-              const attemptPolicy = getDownloaderAttemptPolicy(request.toolId);
-              if (downloader && attemptPolicy.kind === "reject") {
-                throw new Error(attemptPolicy.message);
-              }
               return streamedAcquisition.acquire(endpointRequest(request), context);
             },
           },

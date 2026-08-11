@@ -44,6 +44,10 @@ export type TelemetryEvidence = {
   terminal: "not-attempted" | "submitted" | "failed";
 };
 
+export type WorkflowRecovery = Readonly<{
+  kind: "browser-extension-required";
+}>;
+
 export type WorkflowFailure = {
   code:
     | "unsupported-tool"
@@ -54,6 +58,7 @@ export type WorkflowFailure = {
     | "invalid-result"
     | "delivery-failed";
   message: string;
+  recovery?: WorkflowRecovery;
 };
 
 export type WorkflowOutcome =
@@ -352,12 +357,13 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
       const fail = async (
         code: WorkflowFailure["code"],
         message: string,
+        recovery?: WorkflowRecovery,
       ): Promise<Extract<WorkflowOutcome, { status: "failed" }>> => {
         await commitTerminal("failed");
         return {
           status: "failed",
           runId,
-          error: { code, message },
+          error: recovery ? { code, message, recovery } : { code, message },
           telemetry,
         };
       };
@@ -636,6 +642,13 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         return fail(
           code,
           error instanceof Error ? error.message : String(error),
+          typeof error === "object" &&
+            error !== null &&
+            "recovery" in error &&
+            (error as { recovery?: { kind?: unknown } }).recovery?.kind ===
+              "browser-extension-required"
+            ? { kind: "browser-extension-required" }
+            : undefined,
         );
       } finally {
         await releaseResources();

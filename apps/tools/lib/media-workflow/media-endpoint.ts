@@ -4,7 +4,10 @@ import {
   getDownloaderMediaFetchEndpoint,
   getMediaFetchEndpoint,
 } from "../media-fetch-endpoint.ts";
-import type { WorkflowMedia } from "../tool-workflow/index.ts";
+import type {
+  WorkflowMedia,
+  WorkflowRecovery,
+} from "../tool-workflow/index.ts";
 import { VERIFIED_MEDIA_FORMATS } from "./verified-formats.ts";
 
 export type MediaEndpointRequest = Readonly<{
@@ -27,6 +30,16 @@ export type MediaEndpointPort = Readonly<{
     signal: AbortSignal,
   ): Promise<MediaEndpointResponse>;
 }>;
+
+export class MediaEndpointError extends Error {
+  readonly recovery?: WorkflowRecovery;
+
+  constructor(message: string, recovery?: WorkflowRecovery) {
+    super(message);
+    this.name = "MediaEndpointError";
+    if (recovery) this.recovery = recovery;
+  }
+}
 
 export function createProductionMediaEndpoint(
   options: {
@@ -56,14 +69,22 @@ export function createProductionMediaEndpoint(
       );
       if (!response.ok) {
         let detail = "";
+        let extensionRequired = false;
         try {
-          const payload = (await response.json()) as { error?: unknown };
+          const payload = (await response.json()) as {
+            error?: unknown;
+            extensionRequired?: unknown;
+          };
           detail = typeof payload.error === "string" ? payload.error : "";
+          extensionRequired = payload.extensionRequired === true;
         } catch {
           // The repository endpoint is allowed to return an empty error body.
         }
-        throw new Error(
+        throw new MediaEndpointError(
           `Download failed (${response.status})${detail ? `: ${detail}` : ""}`,
+          extensionRequired
+            ? { kind: "browser-extension-required" }
+            : undefined,
         );
       }
       const body =
