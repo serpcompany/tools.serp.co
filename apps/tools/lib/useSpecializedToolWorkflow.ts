@@ -15,9 +15,11 @@ function failureMessage(outcome: WorkflowOutcome | undefined): string | undefine
 
 export function useSpecializedToolWorkflow() {
   const [{ workflow, deliveries }] = useState(createBrowserSpecializedWorkflow);
-  const [controller] = useState(() => createSpecializedRunController(workflow));
   const [outcome, setOutcome] = useState<WorkflowOutcome>();
   const [snapshot, setSnapshot] = useState<WorkflowSnapshot>();
+  const [controller] = useState(() => createSpecializedRunController(workflow, {
+    observe: setSnapshot,
+  }));
 
   useEffect(() => () => {
     controller.dispose();
@@ -36,9 +38,7 @@ export function useSpecializedToolWorkflow() {
     value: string,
   ) => {
     deliveries.clear();
-    setSnapshot({ phase: "acquiring" });
     const next = await controller.runInteraction(toolId, format, mimeType, value);
-    if (next) setSnapshot({ phase: next.status });
     return accept(next);
   }, [accept, controller, deliveries]);
 
@@ -54,17 +54,13 @@ export function useSpecializedToolWorkflow() {
 
   const runFile = useCallback(async (toolId: string, file: BrowserFile) => {
     deliveries.clear();
-    setSnapshot({ phase: "acquiring" });
     const next = await controller.runFile(toolId, file);
-    if (next) setSnapshot({ phase: next.status });
     return accept(next);
   }, [accept, controller, deliveries]);
 
   const runFiles = useCallback(async (toolId: string, files: readonly BrowserFile[]) => {
     deliveries.clear();
-    setSnapshot({ phase: "acquiring" });
     const next = await controller.runFiles(toolId, files);
-    if (next) setSnapshot({ phase: next.status });
     return accept(next);
   }, [accept, controller, deliveries]);
 

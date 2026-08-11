@@ -333,3 +333,34 @@ test("clearing the shared controller cancels a pending interaction", async () =>
 
   assert.deepEqual(requests, []);
 });
+
+test("shared controller projects workflow phases and numeric progress", async () => {
+  const snapshots: Array<{ phase: string; progress?: number }> = [];
+  const { workflow } = createBrowserSpecializedWorkflow();
+  const controller = createSpecializedRunController(workflow, {
+    observe(snapshot) {
+      snapshots.push(snapshot);
+    },
+  });
+
+  const outcome = await controller.runInteraction(
+    "character-counter",
+    "text",
+    "text/plain",
+    "one two",
+  );
+
+  assert.equal(outcome?.status, "succeeded");
+  assert.deepEqual(
+    [...new Set(snapshots.map(({ phase }) => phase))],
+    ["acquiring", "processing", "validating", "delivering", "succeeded"],
+  );
+  for (const phase of ["acquiring", "processing", "validating", "delivering"]) {
+    assert.ok(
+      snapshots.some(
+        (snapshot) => snapshot.phase === phase && typeof snapshot.progress === "number",
+      ),
+      `${phase} must expose numeric progress`,
+    );
+  }
+});

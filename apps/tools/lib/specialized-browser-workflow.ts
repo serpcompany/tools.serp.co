@@ -10,6 +10,7 @@ import type {
   WorkflowDelivery,
   WorkflowMedia,
   WorkflowOutcome,
+  WorkflowSnapshot,
 } from "./tool-workflow/index.ts";
 
 type TelemetryHandle = ReturnType<typeof beginToolRun>;
@@ -140,7 +141,10 @@ function mediaFormat(file: BrowserFile): string {
   return "unknown";
 }
 
-export function createSpecializedRunController(workflow: ToolWorkflow): Readonly<{
+export function createSpecializedRunController(
+  workflow: ToolWorkflow,
+  options: Readonly<{ observe?(snapshot: WorkflowSnapshot): void }> = {},
+): Readonly<{
   runInteraction(
     toolId: string,
     format: string,
@@ -188,7 +192,7 @@ export function createSpecializedRunController(workflow: ToolWorkflow): Readonly
             bytes: new TextEncoder().encode(value).byteLength,
           },
         },
-      }, { signal: run.controller.signal });
+      }, { signal: run.controller.signal, observe: options.observe });
       return current(run.revision) ? outcome : undefined;
     },
     async runFile(toolId, file) {
@@ -201,7 +205,7 @@ export function createSpecializedRunController(workflow: ToolWorkflow): Readonly
           kind: "file",
           media: { name: file.name, format: mediaFormat(file), mimeType: file.type, bytes },
         },
-      }, { signal: run.controller.signal });
+      }, { signal: run.controller.signal, observe: options.observe });
       return current(run.revision) ? outcome : undefined;
     },
     async runFiles(toolId, files) {
@@ -219,7 +223,7 @@ export function createSpecializedRunController(workflow: ToolWorkflow): Readonly
             bytes: new Uint8Array(bytes[index]!),
           })),
         },
-      }, { signal: run.controller.signal });
+      }, { signal: run.controller.signal, observe: options.observe });
       return current(run.revision) ? outcome : undefined;
     },
     scheduleInteraction(request, delay = 800) {

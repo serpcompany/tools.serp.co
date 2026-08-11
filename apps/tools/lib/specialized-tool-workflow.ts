@@ -217,6 +217,7 @@ function interactionProcessor(args: {
       const value = interactionText(input, args.input.format, args.input.mimeType);
       const converted = await args.convert(value, context.signal);
       context.signal.throwIfAborted();
+      context.reportProgress(1);
       return [{
         name: args.output.name,
         format: args.output.format,
@@ -224,9 +225,10 @@ function interactionProcessor(args: {
         bytes: encoder.encode(converted),
       }];
     },
-    async verifyResult(result) {
+    async verifyResult(result, context) {
       try {
         args.verifyOutput(decoder.decode(result.bytes));
+        context.reportProgress(1);
         return verified();
       } catch (error) {
         return rejected(error);
@@ -385,6 +387,7 @@ const csvProcessor: ToolProcessor<Readonly<object>, readonly WorkflowMedia[]> = 
     const rows = parsed.flatMap(({ rows }) =>
       rows.map((row) => Object.fromEntries(headers.map((header) => [header, row[header] ?? ""]))),
     );
+    context.reportProgress(1);
     return [{
       name: "combined.csv",
       format: "csv",
@@ -392,9 +395,10 @@ const csvProcessor: ToolProcessor<Readonly<object>, readonly WorkflowMedia[]> = 
       bytes: encoder.encode(Papa.unparse(rows, { columns: headers, newline: "\n" })),
     }];
   },
-  async verifyResult(result) {
+  async verifyResult(result, context) {
     try {
       parseCsv(decoder.decode(result.bytes));
+      context.reportProgress(1);
       return verified();
     } catch (error) {
       return rejected(error);
@@ -441,10 +445,13 @@ const pdfProcessor: ToolProcessor<Readonly<object>> = {
   },
   async process(input, _options, context) {
     context.signal.throwIfAborted();
+    context.reportProgress(1);
     return [{ ...input, bytes: Uint8Array.from(input.bytes) }];
   },
   async verifyResult(result, context) {
-    return verifyPdf(result.bytes, context.signal);
+    const verification = await verifyPdf(result.bytes, context.signal);
+    if (verification.status === "verified") context.reportProgress(1);
+    return verification;
   },
 };
 
@@ -477,10 +484,10 @@ export type SpecializedWorkflowPorts = Readonly<{
 export function createSpecializedToolWorkflow(ports: SpecializedWorkflowPorts): ToolWorkflow {
   return createToolWorkflow({
     acquisition: {
-      file: { async acquire(input) { return input.media; } },
+      file: { async acquire(input, context) { context.reportProgress(1); return input.media; } },
       url: { async acquire() { throw new TypeError("Specialized Tools do not accept URLs"); } },
-      files: { async acquire(input) { return input.media; } },
-      interaction: { async acquire(input) { return input.interaction; } },
+      files: { async acquire(input, context) { context.reportProgress(1); return input.media; } },
+      interaction: { async acquire(input, context) { context.reportProgress(1); return input.interaction; } },
     },
     resolveIntent(toolId) {
       const processor = resolveProcessor(toolId);
@@ -492,7 +499,11 @@ export function createSpecializedToolWorkflow(ports: SpecializedWorkflowPorts): 
       return defineToolExecutionIntent({ requestedOperation: operation, outputs: [output] });
     },
     resolveProcessor,
-    deliver: ports.deliver,
+    async deliver(result, context) {
+      const deliveryId = await ports.deliver(result);
+      context.reportProgress(1);
+      return deliveryId;
+    },
     runtime: { async open() { return { release: async () => {} }; } },
     telemetry: ports.telemetry,
     clock: ports.clock ?? { now: () => Date.now() },
