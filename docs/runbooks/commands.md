@@ -16,6 +16,16 @@ exact port and hostname. The wrapper also supports the local HTTPS and
 source-map flags listed by `pnpm dev:local -- --help`. It rejects unknown
 arguments instead of silently ignoring them.
 
+## Read-only portfolio audit
+
+| Command                                                                    | Network access | Repository writes | Authority and evidence                                                                                                                                                         |
+| -------------------------------------------------------------------------- | -------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm --silent audit:tool-coverage -- --source-revision <full-commit-sha>` | None           | None; JSON stdout | Agent-safe. Requires Node 22 and refuses to run unless all Catalog, renderer, provenance, fixture, telemetry, and tracked-test inputs match the named source revision exactly. |
+
+This command reports mechanically derived coverage and gap memberships. It
+does not run Tool behavior, query an environment, or turn missing evidence into
+a pass or failure.
+
 ## Smoke, benchmark, and deployed canary
 
 These commands have network access to their named target and write a structured
