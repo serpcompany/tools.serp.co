@@ -314,12 +314,13 @@ export async function compressPngWithWorker(args: {
   buf: ArrayBuffer;
   quality?: number;
   signal?: AbortSignal;
+  fallback?: "main-thread" | "fail-closed";
 }): Promise<ArrayBuffer> {
   const workerBuf = args.buf.slice(0);
   try {
     return await compressPngWithWorkerInner({ ...args, buf: workerBuf });
   } catch (error) {
-    if (args.signal?.aborted) throw error;
+    if (args.signal?.aborted || args.fallback === "fail-closed") throw error;
     return await compressPngOnMainThread(args);
   }
 }

@@ -306,7 +306,7 @@ const engineById = defineEngines({
     executionProfile: 'client-only',
     implementation: {
       class: 'library',
-      identity: '@jsquash/oxipng',
+      identity: '@jsquash/oxipng and @zip.js/zip.js',
     },
   },
 } satisfies Record<string, ExecutionEngineDefinition>);

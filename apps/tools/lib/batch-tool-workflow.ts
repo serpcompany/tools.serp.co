@@ -25,6 +25,7 @@ export const BATCH_PNG_LIMITS = Object.freeze({
   maxItems: 100,
   maxItemBytes: 16 * 1_024 * 1_024,
   maxInputBytes: 64 * 1_024 * 1_024,
+  maxRetainedBytes: 48 * 1_024 * 1_024,
   maxArchiveBytes: 80 * 1_024 * 1_024,
 });
 
@@ -298,6 +299,7 @@ function processor(
     async process(input, options, context) {
       const names = input.map(({ name }) => outputName(name));
       const compressed: Uint8Array[] = [];
+      let retainedBytes = 0;
       for (let index = 0; index < input.length; index += 1) {
         context.signal.throwIfAborted();
         const media = input[index]!;
@@ -335,7 +337,13 @@ function processor(
         );
         if (verification.status !== 'verified')
           throw new Error(verification.message);
-        compressed.push(bytes);
+        const retained =
+          bytes.byteLength < media.bytes.byteLength ? bytes : media.bytes;
+        retainedBytes += retained.byteLength;
+        if (retainedBytes > BATCH_PNG_LIMITS.maxRetainedBytes) {
+          throw new Error('Compressed batch exceeds the retained-byte limit');
+        }
+        compressed.push(retained);
       }
 
       const writer = new Uint8ArrayWriter();

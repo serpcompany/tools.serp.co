@@ -72,7 +72,7 @@ export default function BatchHeroConverter({
     [controller, deliveries],
   );
 
-  async function handleFiles(fileList: FileList | null) {
+  function handleFiles(fileList: FileList | null) {
     if (!fileList?.length) return;
     const selected = Array.from(fileList);
     setFiles(selected);
@@ -82,8 +82,7 @@ export default function BatchHeroConverter({
     setBusy(true);
     setAdsVisible(true);
     setVideoPlaying(true);
-    const outcome = await controller.runFiles(selected, compressionLevel);
-    if (!outcome) setBusy(false);
+    void controller.runFiles(selected, compressionLevel);
   }
 
   function cancel() {

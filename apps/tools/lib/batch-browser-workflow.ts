@@ -35,8 +35,10 @@ export function createBrowserBatchWorkflow(): Readonly<{
   workflow: ToolWorkflow;
   deliveries: BrowserBatchDeliveries;
 }> {
-  const mediaById = new Map<string, WorkflowMedia>();
-  const objectUrlById = new Map<string, string>();
+  const deliveryById = new Map<
+    string,
+    { media: WorkflowMedia; objectUrl?: string }
+  >();
   const telemetryByRunId = new Map<string, TelemetryHandle>();
   let sequence = 0;
 
@@ -60,6 +62,7 @@ export function createBrowserBatchWorkflow(): Readonly<{
         buf: Uint8Array.from(request.bytes).buffer,
         quality: request.quality,
         signal: request.signal,
+        fallback: 'fail-closed',
       });
       request.reportProgress(1);
       return new Uint8Array(output);
@@ -69,13 +72,12 @@ export function createBrowserBatchWorkflow(): Readonly<{
   };
 
   const release = (deliveryId: string) => {
-    const objectUrl = objectUrlById.get(deliveryId);
-    if (objectUrl) URL.revokeObjectURL(objectUrl);
-    objectUrlById.delete(deliveryId);
-    mediaById.delete(deliveryId);
+    const record = deliveryById.get(deliveryId);
+    if (record?.objectUrl) URL.revokeObjectURL(record.objectUrl);
+    deliveryById.delete(deliveryId);
   };
   const clear = () => {
-    for (const deliveryId of [...mediaById.keys()]) release(deliveryId);
+    for (const deliveryId of [...deliveryById.keys()]) release(deliveryId);
   };
 
   const workflow = createBatchToolWorkflow({
@@ -84,7 +86,7 @@ export function createBrowserBatchWorkflow(): Readonly<{
       clear();
       sequence += 1;
       const deliveryId = `batch-delivery-${crypto.randomUUID()}-${sequence}`;
-      mediaById.set(deliveryId, media);
+      deliveryById.set(deliveryId, { media });
       return deliveryId;
     },
     telemetry: {
@@ -119,15 +121,17 @@ export function createBrowserBatchWorkflow(): Readonly<{
     workflow,
     deliveries: Object.freeze({
       download(delivery: WorkflowDelivery) {
-        const media = mediaById.get(delivery.deliveryId);
-        if (!media)
+        const record = deliveryById.get(delivery.deliveryId);
+        if (!record)
           throw new TypeError('Batch delivery is no longer available');
-        let objectUrl = objectUrlById.get(delivery.deliveryId);
+        let objectUrl = record.objectUrl;
         if (!objectUrl) {
           objectUrl = URL.createObjectURL(
-            new Blob([Uint8Array.from(media.bytes)], { type: media.mimeType }),
+            new Blob([Uint8Array.from(record.media.bytes)], {
+              type: record.media.mimeType,
+            }),
           );
-          objectUrlById.set(delivery.deliveryId, objectUrl);
+          record.objectUrl = objectUrl;
         }
         const anchor = document.createElement('a');
         anchor.href = objectUrl;

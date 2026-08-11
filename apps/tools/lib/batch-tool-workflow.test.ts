@@ -14,7 +14,11 @@ import {
   createBatchRunController,
   retainBatchAggregateProgress,
 } from './batch-browser-workflow.ts';
-import type { WorkflowMedia, WorkflowSnapshot } from './tool-workflow/index.ts';
+import type {
+  ToolWorkflow,
+  WorkflowMedia,
+  WorkflowSnapshot,
+} from './tool-workflow/index.ts';
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 
 const sample = new Uint8Array(
@@ -23,6 +27,36 @@ const sample = new Uint8Array(
 const sample2 = new Uint8Array(
   readFileSync(new URL('../benchmarks/fixtures/sample-2.png', import.meta.url)),
 );
+
+function crc32(bytes: Uint8Array): number {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function pngWithTextPayload(source: Uint8Array, payloadBytes: number) {
+  const iendOffset = source.byteLength - 12;
+  const chunk = new Uint8Array(12 + payloadBytes);
+  const view = new DataView(chunk.buffer);
+  view.setUint32(0, payloadBytes, false);
+  chunk.set(new TextEncoder().encode('tEXt'), 4);
+  chunk.fill(97, 8, 8 + payloadBytes);
+  view.setUint32(
+    8 + payloadBytes,
+    crc32(chunk.subarray(4, 8 + payloadBytes)),
+    false,
+  );
+  const result = new Uint8Array(source.byteLength + chunk.byteLength);
+  result.set(source.subarray(0, iendOffset));
+  result.set(chunk, iendOffset);
+  result.set(source.subarray(iendOffset), iendOffset + chunk.byteLength);
+  return result;
+}
 
 function png(name: string, bytes = sample): WorkflowMedia {
   return { name, format: 'png', mimeType: 'image/png', bytes };
@@ -122,6 +156,8 @@ test('batch presentation delegates processing, telemetry, delivery resources, an
     source,
     /new Worker|compressPngWithWorker|beginToolRun|finishSuccess|finishFailure|saveBlob|createObjectURL|revokeObjectURL|terminate\(/,
   );
+  assert.match(source, /void controller\.runFiles\(/);
+  assert.doesNotMatch(source, /if\s*\(!outcome\)\s*setBusy\(false\)/);
 });
 
 test('phase-only presentation snapshots preserve monotonic aggregate progress', () => {
@@ -237,6 +273,46 @@ test('a compressor returning spoofed PNG bytes cannot reach archive delivery', a
     options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
   });
   assert.equal(outcome.status, 'failed');
+  assert.deepEqual(deliveries, []);
+  assert.deepEqual(telemetry, ['start', 'terminal:failed']);
+});
+
+test('workflow keeps original PNG bytes when compression would be larger', async () => {
+  const larger = pngWithTextPayload(sample, 1_024);
+  const { workflow, deliveries } = recorder(async () => larger);
+  const outcome = await workflow.run({
+    toolId: 'batch-compress-png',
+    input: batch([png('one.png')]),
+    options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
+  });
+  assert.equal(outcome.status, 'succeeded');
+  const entries = await archiveEntries(deliveries[0]!.bytes);
+  assert.deepEqual(entries[0]!.bytes, sample);
+});
+
+test('retained compressed-byte budget fails before archive build or delivery and still cleans up', async () => {
+  const largePng = pngWithTextPayload(sample, 13 * 1_024 * 1_024);
+  let cleanups = 0;
+  let calls = 0;
+  const { workflow, deliveries, telemetry } = recorder(
+    async ({ bytes, registerCleanup }) => {
+      calls += 1;
+      await registerCleanup(async () => {
+        cleanups += 1;
+      });
+      return bytes;
+    },
+  );
+  const outcome = await workflow.run({
+    toolId: 'batch-compress-png',
+    input: batch(
+      Array.from({ length: 4 }, (_, index) => png(`${index}.png`, largePng)),
+    ),
+    options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
+  });
+  assert.equal(outcome.status, 'failed');
+  assert.equal(calls, 4);
+  assert.equal(cleanups, 4);
   assert.deepEqual(deliveries, []);
   assert.deepEqual(telemetry, ['start', 'terminal:failed']);
 });
@@ -411,4 +487,56 @@ test('browser controller clears prior delivery resources on replacement and canc
   assert.equal(clears, 1);
   controller.cancel();
   assert.equal(clears, 2);
+});
+
+test('browser controller lease suppresses stale replacement progress and outcomes', async () => {
+  const runs: Array<{
+    resolve(outcome: Awaited<ReturnType<ToolWorkflow['run']>>): void;
+    observe?: (snapshot: WorkflowSnapshot) => void;
+  }> = [];
+  const workflow: ToolWorkflow = {
+    run(_request, options) {
+      return new Promise((resolve) =>
+        runs.push({ resolve, observe: options?.observe }),
+      );
+    },
+  };
+  const snapshots: string[] = [];
+  const outcomes: string[] = [];
+  const controller = createBatchRunController(
+    workflow,
+    { clear() {} },
+    {
+      observe(snapshot) {
+        snapshots.push(snapshot.phase);
+      },
+      onOutcome(outcome) {
+        outcomes.push(outcome.runId);
+      },
+    },
+  );
+  const file = {
+    name: 'one.png',
+    type: 'image/png',
+    size: sample.byteLength,
+    stream: () => new Blob([sample]).stream(),
+  };
+  const first = controller.runFiles([file], 'high');
+  const second = controller.runFiles([file], 'high');
+  runs[0]!.observe?.({ phase: 'processing', progress: 0.5 });
+  runs[1]!.observe?.({ phase: 'processing', progress: 0.25 });
+  runs[0]!.resolve({
+    status: 'cancelled',
+    runId: 'stale',
+    telemetry: { start: 'submitted', terminal: 'submitted' },
+  });
+  runs[1]!.resolve({
+    status: 'cancelled',
+    runId: 'current',
+    telemetry: { start: 'submitted', terminal: 'submitted' },
+  });
+  assert.equal(await first, undefined);
+  assert.equal((await second)?.runId, 'current');
+  assert.deepEqual(snapshots, ['processing']);
+  assert.deepEqual(outcomes, ['current']);
 });
