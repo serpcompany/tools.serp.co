@@ -578,6 +578,11 @@ try {
       await hookBlobCapture(page);
       const input = page.locator('[data-testid="html-input"]');
       const output = page.locator('[data-testid="markdown-output"]');
+      await page.waitForFunction(
+        () => Boolean(document.querySelector('[data-testid="markdown-output"]')?.value),
+        null,
+        { timeout: 10000 },
+      );
       await input.fill("<h1>stale</h1>");
       await page.getByRole("button", { name: "Clear" }).click();
       await page.waitForTimeout(400);
