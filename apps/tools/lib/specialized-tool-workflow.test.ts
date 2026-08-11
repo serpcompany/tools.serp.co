@@ -13,6 +13,7 @@ import {
   createBrowserSpecializedWorkflow,
   createSpecializedRunController,
 } from "./specialized-browser-workflow.ts";
+import { getToolProcessorAvailability } from "./tool-processor-registry.ts";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -59,6 +60,11 @@ test("specialized contracts enumerate the exact migrated Tool ids and ownership"
     assert.match(contract.primaryOperation.class, /^(library|hybrid|repository-authored)$/);
     assert.ok(contract.primaryOperation.identity);
     assert.ok(contract.primaryOperation.rationale.length > 40);
+    assert.deepEqual(getToolProcessorAvailability(id), {
+      kind: "wired",
+      toolId: id,
+      adapterId: "browser-specialized-workflow",
+    });
   }
   assert.equal(getSpecializedToolContract("not-a-tool").state, "unsupported");
 });
@@ -72,7 +78,7 @@ test("workflow.run converts JSON interaction to parser-valid CSV", async () => {
       interaction: {
         format: "json",
         mimeType: "application/json",
-        value: '[{"name":"Ada","note":"comma, quote \\\" and newline\\nkept"}]',
+        value: String.raw`[{"name":"Ada","note":"comma, quote \" and newline\nkept"}]`,
         bytes: 59,
       },
     },

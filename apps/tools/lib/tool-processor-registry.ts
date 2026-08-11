@@ -6,6 +6,7 @@ import {
 } from './table-operation-policy.ts';
 import { getToolExecutionProvenance } from './tool-execution-provenance.ts';
 import { getGenericToolContract } from './generic-tool-workflow.ts';
+import { SPECIALIZED_TOOL_IDS } from './specialized-tool-workflow.ts';
 
 export type WiredToolProcessorAvailability = Readonly<{
   kind: 'wired';
@@ -38,7 +39,12 @@ const registeredAdapterIdByToolId: Readonly<Record<string, string>> =
       getEligibleTableToolIds().map((toolId) => [
         toolId,
         TABLE_PROCESSOR_ADAPTER_ID,
-      ]),
+      ]).concat(
+        SPECIALIZED_TOOL_IDS.map((toolId) => [
+          toolId,
+          'browser-specialized-workflow',
+        ]),
+      ),
     ),
   );
 

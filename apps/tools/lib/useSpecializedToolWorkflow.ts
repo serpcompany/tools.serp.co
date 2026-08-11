@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   createBrowserSpecializedWorkflow,
@@ -26,12 +26,61 @@ export function useSpecializedToolWorkflow() {
     deliveries.clear();
   }, [controller, deliveries]);
 
-  const accept = (next: WorkflowOutcome | undefined) => {
+  const accept = useCallback((next: WorkflowOutcome | undefined) => {
     if (next) setOutcome(next);
     return next;
-  };
+  }, []);
 
-  return Object.freeze({
+  const runInteraction = useCallback(async (
+    toolId: string,
+    format: string,
+    mimeType: string,
+    value: string,
+  ) => {
+    deliveries.clear();
+    setSnapshot({ phase: "acquiring" });
+    const next = await controller.runInteraction(toolId, format, mimeType, value);
+    if (next) setSnapshot({ phase: next.status });
+    return accept(next);
+  }, [accept, controller, deliveries]);
+
+  const scheduleInteraction = useCallback((
+    toolId: string,
+    format: string,
+    mimeType: string,
+    value: string,
+    delay = 800,
+  ) => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      void runInteraction(toolId, format, mimeType, value);
+    }, delay);
+  }, [runInteraction]);
+
+  const runFile = useCallback(async (toolId: string, file: BrowserFile) => {
+    deliveries.clear();
+    setSnapshot({ phase: "acquiring" });
+    const next = await controller.runFile(toolId, file);
+    if (next) setSnapshot({ phase: next.status });
+    return accept(next);
+  }, [accept, controller, deliveries]);
+
+  const runFiles = useCallback(async (toolId: string, files: readonly BrowserFile[]) => {
+    deliveries.clear();
+    setSnapshot({ phase: "acquiring" });
+    const next = await controller.runFiles(toolId, files);
+    if (next) setSnapshot({ phase: next.status });
+    return accept(next);
+  }, [accept, controller, deliveries]);
+
+  const clear = useCallback(() => {
+    controller.dispose();
+    deliveries.clear();
+    setOutcome(undefined);
+    setSnapshot(undefined);
+  }, [controller, deliveries]);
+
+  return useMemo(() => Object.freeze({
     outcome,
     snapshot,
     error: failureMessage(outcome),
@@ -46,41 +95,10 @@ export function useSpecializedToolWorkflow() {
     download(delivery: WorkflowDelivery | undefined) {
       if (delivery) deliveries.download(delivery);
     },
-    async runInteraction(toolId: string, format: string, mimeType: string, value: string) {
-      setSnapshot({ phase: "acquiring" });
-      const next = await controller.runInteraction(toolId, format, mimeType, value);
-      if (next) setSnapshot({ phase: next.status });
-      return accept(next);
-    },
-    scheduleInteraction(
-      toolId: string,
-      format: string,
-      mimeType: string,
-      value: string,
-      delay = 800,
-    ) {
-      if (timer.current) clearTimeout(timer.current);
-      timer.current = setTimeout(() => {
-        void this.runInteraction(toolId, format, mimeType, value);
-      }, delay);
-    },
-    async runFile(toolId: string, file: BrowserFile) {
-      setSnapshot({ phase: "acquiring" });
-      const next = await controller.runFile(toolId, file);
-      if (next) setSnapshot({ phase: next.status });
-      return accept(next);
-    },
-    async runFiles(toolId: string, files: readonly BrowserFile[]) {
-      setSnapshot({ phase: "acquiring" });
-      const next = await controller.runFiles(toolId, files);
-      if (next) setSnapshot({ phase: next.status });
-      return accept(next);
-    },
-    clear() {
-      controller.dispose();
-      deliveries.clear();
-      setOutcome(undefined);
-      setSnapshot(undefined);
-    },
-  });
+    runInteraction,
+    scheduleInteraction,
+    runFile,
+    runFiles,
+    clear,
+  }), [clear, deliveries, outcome, runFile, runFiles, runInteraction, scheduleInteraction, snapshot]);
 }

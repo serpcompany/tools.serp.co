@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Papa from "papaparse";
 import { Card } from "@serp-tools/ui/components/card";
 import { Button } from "@serp-tools/ui/components/button";
 import { Badge } from "@serp-tools/ui/components/badge";
-import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import { ToolVideoPanel } from "@/components/ToolVideoPanel";
-import { beginToolRun } from "@/lib/telemetry";
+import { useSpecializedToolWorkflow } from "@/lib/useSpecializedToolWorkflow";
 
 type Props = {
   toolId?: string;
@@ -19,111 +19,6 @@ type FileEntry = {
   size: number;
 };
 
-type ParsedCsv = {
-  headers: string[];
-  rows: string[][];
-};
-
-const DELIMITERS = [",", ";", "\t", "|"];
-
-function detectDelimiter(line: string) {
-  const scores = DELIMITERS.map((delimiter) => ({
-    delimiter,
-    count: line.split(delimiter).length - 1,
-  }));
-  scores.sort((a, b) => b.count - a.count);
-  return scores[0]?.count ? scores[0].delimiter : ",";
-}
-
-function parseCsvLine(line: string, delimiter: string) {
-  const values: string[] = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i += 1) {
-    const char = line[i];
-    if (char === '"') {
-      const nextChar = line[i + 1];
-      if (inQuotes && nextChar === '"') {
-        current += '"';
-        i += 1;
-        continue;
-      }
-      inQuotes = !inQuotes;
-      continue;
-    }
-
-    if (char === delimiter && !inQuotes) {
-      values.push(current);
-      current = "";
-      continue;
-    }
-
-    current += char;
-  }
-
-  values.push(current);
-  return values;
-}
-
-function parseCsv(text: string): ParsedCsv {
-  const cleaned = text.replace(/^\uFEFF/, "").trim();
-  if (!cleaned) {
-    return { headers: [], rows: [] };
-  }
-
-  const lines = cleaned.split(/\r?\n/).filter((line) => line.trim().length > 0);
-  const delimiter = detectDelimiter(lines[0] ?? "");
-  const headers = parseCsvLine(lines[0] ?? "", delimiter).map((h) => h.trim());
-  const rows = lines.slice(1).map((line) => parseCsvLine(line, delimiter));
-
-  return { headers, rows };
-}
-
-function escapeCsv(value: string) {
-  if (value.includes(",") || value.includes("\n") || value.includes('"')) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
-}
-
-function mergeCsvFiles(parsedFiles: ParsedCsv[]) {
-  const headerIndex = new Map<string, number>();
-  const combinedHeaders: string[] = [];
-  const combinedRows: string[][] = [];
-
-  parsedFiles.forEach(({ headers, rows }) => {
-    headers.forEach((header) => {
-      if (!headerIndex.has(header)) {
-        headerIndex.set(header, combinedHeaders.length);
-        combinedHeaders.push(header);
-        combinedRows.forEach((row) => row.push(""));
-      }
-    });
-
-    rows.forEach((row) => {
-      const output = new Array(combinedHeaders.length).fill("");
-      headers.forEach((header, index) => {
-        const targetIndex = headerIndex.get(header);
-        if (targetIndex === undefined) return;
-        output[targetIndex] = row[index] ?? "";
-      });
-      combinedRows.push(output);
-    });
-  });
-
-  const csvLines = [
-    combinedHeaders.map(escapeCsv).join(","),
-    ...combinedRows.map((row) => row.map((value) => escapeCsv(value ?? "")).join(",")),
-  ];
-
-  return {
-    csv: csvLines.join("\n"),
-    rows: combinedRows.length,
-    columns: combinedHeaders.length,
-  };
-}
-
 export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [files, setFiles] = useState<FileEntry[]>([]);
@@ -134,6 +29,7 @@ export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
   const [busy, setBusy] = useState(false);
   const [adsVisible, setAdsVisible] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const workflow = useSpecializedToolWorkflow();
 
   function onPick() {
     inputRef.current?.click();
@@ -166,36 +62,17 @@ export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
     setBusy(true);
     setError("");
 
-    const run = beginToolRun({
-      toolId: toolId ?? "csv-combiner",
-      from: "csv",
-      to: "csv",
-      inputBytes: selectedFiles.reduce((sum, file) => sum + file.size, 0),
-      metadata: { fileCount: selectedFiles.length },
-    });
-
     try {
-      const parsedFiles = await Promise.all(
-        selectedFiles.map(async (file) => {
-          const text = await file.text();
-          return parseCsv(text);
-        })
-      );
-
-      if (parsedFiles.some((parsed) => parsed.headers.length === 0)) {
-        throw new Error("One or more files are empty or invalid.");
+      const outcome = await workflow.runFiles(toolId ?? "csv-combiner", selectedFiles);
+      if (outcome?.status !== "succeeded") {
+        throw new Error(outcome?.status === "failed" ? outcome.error.message : "Combination cancelled");
       }
-
-      const merged = mergeCsvFiles(parsedFiles);
-      setOutput(merged.csv);
-      setStats({ rows: merged.rows, columns: merged.columns });
-      run.finishSuccess({
-        outputBytes: new Blob([merged.csv]).size,
-        metadata: { rows: merged.rows, columns: merged.columns },
-      });
+      const combined = workflow.text(outcome.results[0]) ?? "";
+      const parsed = Papa.parse(combined, { header: true, skipEmptyLines: true });
+      setOutput(combined);
+      setStats({ rows: parsed.data.length, columns: parsed.meta.fields?.length ?? 0 });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to combine CSV files.");
-      run.finishFailure({ errorCode: "combine_failed" });
     } finally {
       setBusy(false);
     }
@@ -203,8 +80,7 @@ export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
 
   function downloadCsv() {
     if (!output) return;
-    const blob = new Blob([output], { type: "text/csv" });
-    saveBlob(blob, "combined.csv");
+    workflow.download(workflow.delivery);
   }
 
   const adSlotPrefix = toolId ?? "csv-combiner";
@@ -323,6 +199,7 @@ export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
                     setOutput("");
                     setStats({ rows: 0, columns: 0 });
                     setError("");
+                    workflow.clear();
                     if (inputRef.current) inputRef.current.value = "";
                   }}
                 >

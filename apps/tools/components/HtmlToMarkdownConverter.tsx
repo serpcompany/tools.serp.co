@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import { Card } from "@serp-tools/ui/components/card";
 import { Badge } from "@serp-tools/ui/components/badge";
-import { beginToolRun } from "@/lib/telemetry";
+import { useSpecializedToolWorkflow } from "@/lib/useSpecializedToolWorkflow";
 
 const TOOL_ID = "html-to-markdown";
 
@@ -18,74 +18,27 @@ const SAMPLE_HTML = `<h1>Welcome to HTML to Markdown</h1>
 </ul>
 <blockquote><p>Paste any HTML on the left and get clean Markdown on the right.</p></blockquote>`;
 
-type ConvertFn = (html: string, options: null) => { content: string | null };
-
 export default function HtmlToMarkdownConverter() {
   const [html, setHtml] = useState(SAMPLE_HTML);
   const [markdown, setMarkdown] = useState("");
-  const [wasmReady, setWasmReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const convertRef = useRef<ConvertFn | null>(null);
-  const telemetryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastTelemetryAt = useRef(0);
+  const workflow = useSpecializedToolWorkflow();
+  const { clear, delivery, download, error, outcome, scheduleInteraction, text } = workflow;
 
-  // Load the WASM module once on mount
   useEffect(() => {
-    let cancelled = false;
-    async function loadWasm() {
-      try {
-        const mod = await import("@kreuzberg/html-to-markdown-wasm/dist-web");
-        await mod.default();
-        if (!cancelled) {
-          convertRef.current = mod.convert as ConvertFn;
-          setWasmReady(true);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError("Failed to load converter. Please refresh and try again.");
-          console.error("WASM load error:", err);
-        }
-      }
-    }
-    loadWasm();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Re-convert whenever html changes and WASM is ready
-  useEffect(() => {
-    if (!wasmReady || !convertRef.current) return;
-    try {
-      const result = convertRef.current(html, null);
-      setMarkdown(result.content ?? "");
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Conversion failed");
+    if (!html.trim()) {
       setMarkdown("");
+      clear();
+      return;
     }
-  }, [html, wasmReady]);
+    scheduleInteraction(TOOL_ID, "html", "text/html", html, 250);
+  }, [clear, html, scheduleInteraction]);
 
-  // Debounced telemetry
   useEffect(() => {
-    if (!html.trim() || !markdown) return;
-    if (telemetryTimer.current) clearTimeout(telemetryTimer.current);
-    telemetryTimer.current = setTimeout(() => {
-      const now = Date.now();
-      if (now - lastTelemetryAt.current < 10_000) return;
-      const run = beginToolRun({
-        toolId: TOOL_ID,
-        inputBytes: new Blob([html]).size,
-        metadata: { htmlLength: html.length },
-      });
-      run.finishSuccess({ outputBytes: new Blob([markdown]).size });
-      lastTelemetryAt.current = now;
-    }, 800);
-    return () => {
-      if (telemetryTimer.current) clearTimeout(telemetryTimer.current);
-    };
-  }, [html, markdown]);
+    setMarkdown(text(delivery) ?? "");
+  }, [delivery, text]);
+
+  const wasmReady = outcome?.status === "succeeded";
 
   function handleCopy() {
     navigator.clipboard.writeText(markdown).then(() => {
@@ -95,18 +48,13 @@ export default function HtmlToMarkdownConverter() {
   }
 
   function handleDownload() {
-    const blob = new Blob([markdown], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "converted.md";
-    a.click();
-    URL.revokeObjectURL(url);
+    download(delivery);
   }
 
   function handleClear() {
     setHtml("");
     setMarkdown("");
+    clear();
   }
 
   async function handlePaste() {

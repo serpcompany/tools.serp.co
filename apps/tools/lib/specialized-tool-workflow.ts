@@ -288,12 +288,12 @@ type HtmlModule = Readonly<{
 
 async function convertHtml(html: string, signal: AbortSignal): Promise<string> {
   signal.throwIfAborted();
-  const module = (typeof window === "undefined"
+  const converter = (typeof window === "undefined"
     ? await import("@kreuzberg/html-to-markdown-wasm/dist-node")
     : await import("@kreuzberg/html-to-markdown-wasm/dist-web")) as HtmlModule;
-  if (typeof window !== "undefined" && module.default) await module.default();
+  if (typeof window !== "undefined" && converter.default) await converter.default();
   signal.throwIfAborted();
-  const content = module.convert(html, null).content;
+  const content = converter.convert(html, null).content;
   if (!content?.trim()) throw new TypeError("HTML conversion produced no Markdown");
   return content;
 }
@@ -412,13 +412,13 @@ async function verifyPdf(bytes: Uint8Array, signal: AbortSignal): Promise<Semant
   let task: ReturnType<PdfModule["getDocument"]> | undefined;
   try {
     signal.throwIfAborted();
-    const module = (typeof window === "undefined"
+    const pdfjs = (typeof window === "undefined"
       ? await import("pdfjs-dist/legacy/build/pdf.mjs")
       : await import(/* webpackIgnore: true */ "/vendor/pdfjs/pdf.min.mjs")) as unknown as PdfModule;
-    if (typeof window !== "undefined" && module.GlobalWorkerOptions) {
-      module.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+    if (typeof window !== "undefined" && pdfjs.GlobalWorkerOptions) {
+      pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
     }
-    task = module.getDocument({ data: Uint8Array.from(bytes), isEvalSupported: false, useWorkerFetch: false });
+    task = pdfjs.getDocument({ data: Uint8Array.from(bytes), isEvalSupported: false, useWorkerFetch: false });
     const document = await task.promise;
     signal.throwIfAborted();
     return document.numPages > 0 ? verified() : rejected("PDF has no pages");

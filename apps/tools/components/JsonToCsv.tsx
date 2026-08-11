@@ -4,10 +4,9 @@ import { useState } from "react";
 import { Card } from "@serp-tools/ui/components/card";
 import { Button } from "@serp-tools/ui/components/button";
 import { Badge } from "@serp-tools/ui/components/badge";
-import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import { ToolVideoPanel } from "@/components/ToolVideoPanel";
-import { beginToolRun } from "@/lib/telemetry";
+import { useSpecializedToolWorkflow } from "@/lib/useSpecializedToolWorkflow";
 
 type Props = {
   toolId?: string;
@@ -21,8 +20,9 @@ export default function JsonToCsv({ toolId, videoEmbedId }: Props) {
   const [stats, setStats] = useState({ rows: 0, columns: 0 });
   const [adsVisible, setAdsVisible] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const workflow = useSpecializedToolWorkflow();
 
-  const convertJsonToCsv = () => {
+  const convertJsonToCsv = async () => {
     setError("");
     setCsvOutput("");
 
@@ -33,76 +33,30 @@ export default function JsonToCsv({ toolId, videoEmbedId }: Props) {
 
     if (!adsVisible) setAdsVisible(true);
     if (!videoPlaying) setVideoPlaying(true);
-    const inputBytes = new Blob([jsonInput]).size;
-    const run = beginToolRun({
-      toolId: toolId ?? "json-to-csv",
-      from: "json",
-      to: "csv",
-      inputBytes,
-    });
-
     try {
-      const data = JSON.parse(jsonInput);
-
-      if (!Array.isArray(data)) {
-        setError("JSON must be an array of objects");
-        run.finishFailure({ errorCode: "invalid_format" });
+      const outcome = await workflow.runInteraction(
+        toolId ?? "json-to-csv",
+        "json",
+        "application/json",
+        jsonInput,
+      );
+      if (outcome?.status !== "succeeded") {
+        setError(outcome?.status === "failed" ? outcome.error.message : "Conversion cancelled");
         return;
       }
-
-      if (data.length === 0) {
-        setError("JSON array is empty");
-        run.finishFailure({ errorCode: "empty_array" });
-        return;
-      }
-
-      // Get all unique keys from all objects
-      const allKeys = new Set<string>();
-      data.forEach(obj => {
-        Object.keys(obj).forEach(key => allKeys.add(key));
-      });
-      const headers = Array.from(allKeys);
-
-      // Build CSV
-      const csvRows = [];
-
-      // Add headers
-      csvRows.push(headers.map(h => escapeCSV(h)).join(','));
-
-      // Add data rows
-      data.forEach(obj => {
-        const row = headers.map(header => {
-          const value = obj[header];
-          if (value === undefined || value === null) return '';
-          return escapeCSV(String(value));
-        });
-        csvRows.push(row.join(','));
-      });
-
-      const csv = csvRows.join('\n');
+      const csv = workflow.text(outcome.results[0]) ?? "";
+      const data = JSON.parse(jsonInput) as Record<string, unknown>[];
+      const headers = [...new Set(data.flatMap((row) => Object.keys(row)))];
       setCsvOutput(csv);
       setStats({ rows: data.length, columns: headers.length });
-      run.finishSuccess({
-        outputBytes: new Blob([csv]).size,
-        metadata: { rows: data.length, columns: headers.length },
-      });
     } catch (e) {
-      setError("Invalid JSON: " + (e as Error).message);
-      run.finishFailure({ errorCode: "invalid_json" });
+      setError(e instanceof Error ? e.message : "Conversion failed");
     }
-  };
-
-  const escapeCSV = (value: string): string => {
-    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
-      return '"' + value.replace(/"/g, '""') + '"';
-    }
-    return value;
   };
 
   const downloadCSV = () => {
     if (!csvOutput) return;
-    const blob = new Blob([csvOutput], { type: 'text/csv' });
-    saveBlob(blob, 'data.csv');
+    workflow.download(workflow.delivery);
   };
 
   const loadSampleData = () => {
@@ -147,7 +101,7 @@ export default function JsonToCsv({ toolId, videoEmbedId }: Props) {
                       Load Sample
                     </button>
                     <button
-                      onClick={() => setJsonInput("")}
+                      onClick={() => { setJsonInput(""); workflow.clear(); }}
                       className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                     >
                       Clear
@@ -211,7 +165,8 @@ export default function JsonToCsv({ toolId, videoEmbedId }: Props) {
           {/* Convert Button */}
           <div className="mt-8 text-center">
             <Button
-              onClick={convertJsonToCsv}
+              onClick={() => void convertJsonToCsv()}
+              disabled={workflow.busy}
               size="lg"
               className="px-8"
               data-testid="json-convert"

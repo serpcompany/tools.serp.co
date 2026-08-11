@@ -1,43 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@serp-tools/ui/components/card";
 import { Badge } from "@serp-tools/ui/components/badge";
 import { ToolVideoPanel } from "@/components/ToolVideoPanel";
-import { beginToolRun } from "@/lib/telemetry";
+import { useSpecializedToolWorkflow } from "@/lib/useSpecializedToolWorkflow";
+import type { CharacterStatistics } from "@/lib/specialized-tool-workflow";
 
-type Stats = {
-  characters: number;
-  charactersNoSpaces: number;
-  words: number;
-  sentences: number;
-  paragraphs: number;
-  lines: number;
-  readingTime: number;
-  speakingTime: number;
-};
-
-function computeStats(text: string): Stats {
-  const characters = text.length;
-  const charactersNoSpaces = text.replace(/\s/g, "").length;
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 0).length;
-  const paragraphs = text.split(/\n\n+/).filter((p) => p.trim().length > 0).length;
-  const lines = text.split(/\n/).length;
-  const readingTime = Math.ceil(words / 200);
-  const speakingTime = Math.ceil(words / 150);
-
-  return {
-    characters,
-    charactersNoSpaces,
-    words,
-    sentences,
-    paragraphs,
-    lines,
-    readingTime,
-    speakingTime,
-  };
-}
+const EMPTY_STATS: CharacterStatistics = Object.freeze({
+  characters: 0,
+  charactersNoSpaces: 0,
+  words: 0,
+  sentences: 0,
+  paragraphs: 0,
+  lines: 1,
+  readingTime: 0,
+  speakingTime: 0,
+});
 
 type Props = {
   videoEmbedId?: string;
@@ -45,62 +24,24 @@ type Props = {
 
 export default function CharacterCounter({ videoEmbedId }: Props) {
   const [text, setText] = useState("");
-  const [stats, setStats] = useState<Stats>(() => computeStats(""));
-  const lastTelemetryAt = useRef(0);
-  const telemetryTimer = useRef<number | null>(null);
+  const [stats, setStats] = useState<CharacterStatistics>(EMPTY_STATS);
   const [videoPlaying, setVideoPlaying] = useState(false);
-
-  useEffect(() => {
-    setStats(computeStats(text));
-  }, [text]);
+  const workflow = useSpecializedToolWorkflow();
+  const { clear, delivery, runInteraction, text: deliveryText } = workflow;
 
   useEffect(() => {
     if (!text.trim()) {
-      if (telemetryTimer.current) {
-        window.clearTimeout(telemetryTimer.current);
-        telemetryTimer.current = null;
-      }
+      clear();
+      setStats(EMPTY_STATS);
       return;
     }
+    void runInteraction("character-counter", "text", "text/plain", text);
+  }, [clear, runInteraction, text]);
 
-    if (telemetryTimer.current) {
-      window.clearTimeout(telemetryTimer.current);
-    }
-
-    telemetryTimer.current = window.setTimeout(() => {
-      const now = Date.now();
-      if (now - lastTelemetryAt.current < 10000) return;
-
-      const snapshot = computeStats(text);
-      const inputBytes = new Blob([text]).size;
-      const run = beginToolRun({
-        toolId: "character-counter",
-        inputBytes,
-        metadata: {
-          characters: snapshot.characters,
-          words: snapshot.words,
-          sentences: snapshot.sentences,
-          paragraphs: snapshot.paragraphs,
-          lines: snapshot.lines,
-        },
-      });
-      run.finishSuccess({
-        outputBytes: inputBytes,
-        metadata: {
-          readingTime: snapshot.readingTime,
-          speakingTime: snapshot.speakingTime,
-        },
-      });
-      lastTelemetryAt.current = now;
-    }, 800);
-
-    return () => {
-      if (telemetryTimer.current) {
-        window.clearTimeout(telemetryTimer.current);
-        telemetryTimer.current = null;
-      }
-    };
-  }, [text]);
+  useEffect(() => {
+    const result = deliveryText(delivery);
+    if (result) setStats(JSON.parse(result) as CharacterStatistics);
+  }, [delivery, deliveryText]);
 
   return (
     <section className="w-full bg-gradient-to-b from-gray-50 to-white py-16">
@@ -131,7 +72,7 @@ export default function CharacterCounter({ videoEmbedId }: Props) {
               />
               <div className="mt-4 flex gap-2">
                 <button
-                  onClick={() => setText("")}
+                  onClick={() => { setText(""); workflow.clear(); }}
                   className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
                   Clear
