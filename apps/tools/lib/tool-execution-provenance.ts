@@ -220,14 +220,15 @@ const engineById = defineEngines({
   },
   'browser-table-converter': {
     capability: 'structured-data-conversion',
-    owner: 'apps/tools/components/table-convert/convert.ts',
+    owner: 'apps/tools/lib/table-tool-processors.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
       class: 'hybrid',
-      identity: 'Papa Parse, yaml, DOMParser, and repository serializers',
+      identity:
+        'Papa Parse, @office-kit/xlsx, parse5, fast-xml-parser, yaml, markdown-table, pdf-lib, Canvas 2D, and bounded repository codecs',
       rationale:
-        'Trusted parsers handle structured inputs while narrow repository serializers emit declared table formats.',
+        'Maintained parsers and serializers own standard formats; bounded repository codecs cover narrow SQL, LaTeX, Markdown-input, and MediaWiki contracts with semantic round-trip fixtures.',
     },
   },
   'browser-html-to-markdown': {

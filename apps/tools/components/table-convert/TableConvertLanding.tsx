@@ -195,6 +195,7 @@ export default function TableConvertLanding({ toolId }: TableConvertLandingProps
   return (
     <main className="theme-light min-h-screen bg-background">
       <TableConvertDemo
+        toolId={toolId}
         initialInputFormat={from}
         initialOutputFormat={to}
         title={content.tool.title}

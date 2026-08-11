@@ -125,9 +125,8 @@ test('conversion and compression provenance follows actual dispatch selectors', 
     },
   );
   assert.deepEqual(
-    executionProvenance.getEngine(
-      'browser-raster-with-server-image-decode',
-    )?.implementation,
+    executionProvenance.getEngine('browser-raster-with-server-image-decode')
+      ?.implementation,
     {
       class: 'hybrid',
       identity:
@@ -188,11 +187,11 @@ test('specialized and table Tools expose explicit browser-owned engines', () => 
   ]);
 
   const tableSource = readFileSync(
-    new URL('../components/table-convert/convert.ts', import.meta.url),
+    new URL('./table-tool-processors.ts', import.meta.url),
     'utf8',
   );
-  assert.match(tableSource, /export function parseInput/);
-  assert.match(tableSource, /export function serializeOutput/);
+  assert.match(tableSource, /function parseInputTable/);
+  assert.match(tableSource, /function serializeTable/);
 });
 
 test('unknown provenance remains first-class and separate from health', () => {
