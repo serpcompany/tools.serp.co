@@ -5,7 +5,10 @@ import { Button } from "@serp-tools/ui/components/button";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetizationPanel";
 import { detectCapabilities, type Capabilities } from "@/lib/capabilities";
-import { getGenericAccept } from "@/lib/generic-tool-workflow";
+import {
+  getGenericAccept,
+  getGenericToolContract,
+} from "@/lib/generic-tool-workflow";
 import { useGenericToolWorkflow } from "@/lib/useGenericToolWorkflow";
 import type { OperationType } from "@/types";
 
@@ -118,6 +121,9 @@ export default function LanderHeroTwoColumn({
   }, [dropEffect]);
 
   const acceptAttr = accept ?? getGenericAccept(from);
+  const contractState = getGenericToolContract(
+    toolId ?? `${from}-to-${to}`,
+  ).state;
   const adSlotPrefix = toolId ?? `${from}-to-${to}`;
 
   return (
@@ -181,6 +187,7 @@ export default function LanderHeroTwoColumn({
                 onDragLeave={onDrag}
                 onDrop={onDrop}
                 data-testid="tool-dropzone"
+                data-generic-contract={contractState}
                 className={`border-2 border-dashed rounded-xl p-12 hover:border-opacity-80 transition-colors cursor-pointer w-full flex items-center justify-center ${dropEffect ? `animate-${dropEffect}` : ""
                   }`}
                 style={{

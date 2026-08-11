@@ -1,4 +1,5 @@
 import { PDFDocument } from "pdf-lib";
+import { createFile, type MP4BoxBuffer, type Movie } from "mp4box";
 
 import { toolCatalog, type CatalogTool } from "@serp-tools/app-core/lib/tool-catalog";
 
@@ -166,11 +167,19 @@ export async function verifyGenericMediaSemantics(media: WorkflowMedia) {
     };
   }
   if (media.format === "m4a") {
-    return verifyMediaSemantics({
+    const verification = await verifyMediaSemantics({
       ...media,
       format: "mp4",
       mimeType: "video/mp4",
     });
+    if (verification.status !== "verified") return verification;
+    const tracks = inspectBmffTrackFamilies(media.bytes);
+    return tracks.audio > 0 && tracks.video === 0
+      ? verification
+      : {
+          status: "rejected" as const,
+          message: "M4A requires complete audio tracks and no video tracks",
+        };
   }
   if (media.format === "pdf") {
     try {
@@ -188,10 +197,22 @@ export async function verifyGenericMediaSemantics(media: WorkflowMedia) {
   const verification = await verifyMediaSemantics(
     media.format === "jpeg" ? { ...media, format: "jpg" } : media,
   );
+  if (media.format === "mp4" && verification.status === "verified") {
+    const tracks = inspectBmffTrackFamilies(media.bytes);
+    if (tracks.video === 0) {
+      return {
+        status: "rejected" as const,
+        message: "MP4 video requires at least one complete video track",
+      };
+    }
+  }
   if (
     verification.status === "rejected" &&
     (verification.message === "PNG decoder rejected the image data" ||
-      verification.message === "JPEG decoder rejected the image data") &&
+      verification.message === "PNG decoder produced inconsistent image data" ||
+      verification.message === "JPEG decoder rejected the image data" ||
+      verification.message === "JPEG decoder produced inconsistent image data") &&
+    (media.format === "png" || hasJpegEnvelope(media)) &&
     typeof createImageBitmap === "function"
   ) {
     try {
@@ -208,6 +229,40 @@ export async function verifyGenericMediaSemantics(media: WorkflowMedia) {
     }
   }
   return verification;
+}
+
+function hasJpegEnvelope(media: WorkflowMedia): boolean {
+  return (
+    (media.format === "jpg" || media.format === "jpeg") &&
+    media.bytes.byteLength >= 4 &&
+    media.bytes[0] === 0xff &&
+    media.bytes[1] === 0xd8 &&
+    media.bytes[media.bytes.byteLength - 2] === 0xff &&
+    media.bytes[media.bytes.byteLength - 1] === 0xd9
+  );
+}
+
+function inspectBmffTrackFamilies(bytes: Uint8Array): {
+  audio: number;
+  video: number;
+} {
+  const file = createFile();
+  let info: Movie | undefined;
+  file.onReady = (movie) => {
+    info = movie;
+  };
+  const buffer = (bytes.byteOffset === 0 &&
+  bytes.byteLength === bytes.buffer.byteLength &&
+  bytes.buffer instanceof ArrayBuffer
+    ? bytes.buffer
+    : bytes.slice().buffer) as MP4BoxBuffer;
+  buffer.fileStart = 0;
+  file.appendBuffer(buffer, true);
+  file.flush();
+  return {
+    audio: info?.audioTracks.length ?? 0,
+    video: info?.videoTracks.length ?? 0,
+  };
 }
 
 type GenericOptions = Readonly<{ quality: number }>;
@@ -316,6 +371,16 @@ function processorFor(
               quality: options.quality,
               context: engineContext,
             });
+      if (
+        contract.operation === "compress" &&
+        contract.input.format === "mp4" &&
+        inspectBmffTrackFamilies(input.bytes).audio > 0 &&
+        outputBytes.some(
+          (bytes) => inspectBmffTrackFamilies(bytes).audio === 0,
+        )
+      ) {
+        throw new Error("MP4 compression discarded the input audio track");
+      }
       const stem = baseName(input.name);
       return outputBytes.map((bytes, index) => ({
         name:
@@ -405,16 +470,10 @@ const browserTelemetryHandles = new Map<string, ToolRunHandle>();
 
 const browserAdapters: GenericWorkflowAdapters = {
   decideSupport(request) {
-    const needsMediaRuntime =
-      (["m4a", "mp4"].includes(request.inputFormat) ||
-        ["m4a", "mp4"].includes(request.outputFormat));
-    if (needsMediaRuntime && !detectCapabilities().supportsVideoConversion) {
-      return {
-        supported: false,
-        message: "Media processing is not available in this browser.",
-      };
-    }
-    return { supported: true };
+    return decideGenericBrowserSupport(
+      request,
+      detectCapabilities().supportsVideoConversion,
+    );
   },
   async convert({ from, to, bytes, quality, context }) {
     context.signal.throwIfAborted();
@@ -430,6 +489,7 @@ const browserAdapters: GenericWorkflowAdapters = {
       buf: Uint8Array.from(bytes).buffer,
       quality,
       onProgress: ({ progress }) => context.reportProgress((progress ?? 0) / 100),
+      signal: context.signal,
     });
     return (result.kind === "multiple" ? result.buffers : [result.buffer]).map(
       (buffer) => new Uint8Array(buffer),
@@ -451,6 +511,7 @@ const browserAdapters: GenericWorkflowAdapters = {
       buf: Uint8Array.from(bytes).buffer,
       quality,
       onProgress: ({ progress }) => context.reportProgress((progress ?? 0) / 100),
+      signal: context.signal,
     });
     return new Uint8Array(result);
   },
@@ -494,6 +555,30 @@ const browserAdapters: GenericWorkflowAdapters = {
   },
 };
 
+export function decideGenericBrowserSupport(
+  request: Readonly<{
+    operation: "convert" | "compress";
+    inputFormat: string;
+    outputFormat: string;
+  }>,
+  supportsBrowserMedia: boolean,
+) {
+  const needsMediaRuntime =
+    ["m4a", "mp4"].includes(request.inputFormat) ||
+    ["m4a", "mp4"].includes(request.outputFormat);
+  if (
+    needsMediaRuntime &&
+    request.operation === "compress" &&
+    !supportsBrowserMedia
+  ) {
+    return {
+      supported: false as const,
+      message: "Media processing is not available in this browser.",
+    };
+  }
+  return { supported: true as const };
+}
+
 export const genericToolWorkflow = createGenericToolWorkflow(browserAdapters);
 
 export async function runGenericToolFile(
@@ -519,7 +604,22 @@ export async function runGenericToolFile(
       options,
     );
   }
-  const bytes = new Uint8Array(await file.arrayBuffer());
+  if (options?.signal?.aborted) return cancelledFileOutcome();
+  if (file.size > MAX_INPUT_BYTES) {
+    return failedFileOutcome(
+      "invalid-request",
+      `Input exceeds ${MAX_INPUT_BYTES} bytes`,
+    );
+  }
+  let bytes: Uint8Array;
+  try {
+    bytes = await readFileWithSignal(file, options?.signal);
+  } catch (error) {
+    if (options?.signal?.aborted || isAbortError(error)) {
+      return cancelledFileOutcome();
+    }
+    return failedFileOutcome("acquisition-failed", "File acquisition failed");
+  }
   return genericToolWorkflow.run(
     {
       toolId,
@@ -539,5 +639,80 @@ export async function runGenericToolFile(
 
 export function getGenericAccept(from: string): string {
   if (from === "jpg" || from === "jpeg") return ".jpg,.jpeg";
+  if (from === "tif" || from === "tiff") return ".tif,.tiff";
   return `.${from}`;
+}
+
+let fileBoundarySequence = 0;
+
+function fileBoundaryRunId(): string {
+  fileBoundarySequence += 1;
+  return `generic-file-${fileBoundarySequence}`;
+}
+
+function cancelledFileOutcome(): WorkflowOutcome {
+  return {
+    status: "cancelled",
+    runId: fileBoundaryRunId(),
+    telemetry: { start: "not-attempted", terminal: "not-attempted" },
+  };
+}
+
+function failedFileOutcome(
+  code: "invalid-request" | "acquisition-failed",
+  message: string,
+): WorkflowOutcome {
+  return {
+    status: "failed",
+    runId: fileBoundaryRunId(),
+    error: { code, message },
+    telemetry: { start: "not-attempted", terminal: "not-attempted" },
+  };
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
+}
+
+async function readFileWithSignal(
+  file: File,
+  signal?: AbortSignal,
+): Promise<Uint8Array> {
+  signal?.throwIfAborted();
+  const reader = file.stream().getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  let rejectAbort: ((reason: unknown) => void) | undefined;
+  const aborted = new Promise<never>((_resolve, reject) => {
+    rejectAbort = reject;
+  });
+  const onAbort = () => {
+    void reader.cancel(signal?.reason).catch(() => {});
+    rejectAbort?.(
+      signal?.reason ?? new DOMException("The operation was aborted", "AbortError"),
+    );
+  };
+  signal?.addEventListener("abort", onAbort, { once: true });
+  try {
+    while (true) {
+      const part = await Promise.race([reader.read(), aborted]);
+      if (part.done) break;
+      signal?.throwIfAborted();
+      total += part.value.byteLength;
+      if (total > MAX_INPUT_BYTES || total > file.size) {
+        throw new Error("File stream exceeded its declared size");
+      }
+      chunks.push(part.value);
+    }
+  } finally {
+    signal?.removeEventListener("abort", onAbort);
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
 }

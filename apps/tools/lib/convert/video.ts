@@ -68,7 +68,8 @@ export function shouldUseServerConversion(fromFormat: string, toFormat: string) 
 export async function convertVideoViaApi(
   inputBuffer: ArrayBuffer,
   fromFormat: string,
-  toFormat: string
+  toFormat: string,
+  signal?: AbortSignal,
 ): Promise<ArrayBuffer> {
   const route = "/api/video-convert";
   const baseMetadata = {
@@ -85,6 +86,7 @@ export async function convertVideoViaApi(
         "Content-Type": "application/octet-stream",
       }),
       body: inputBuffer,
+      signal,
     });
   } catch (error) {
     throw createTelemetryError(
@@ -114,7 +116,8 @@ export async function convertVideoViaApi(
   return await response.arrayBuffer();
 }
 
-async function loadFFmpeg(): Promise<FFmpeg> {
+async function loadFFmpeg(signal?: AbortSignal): Promise<FFmpeg> {
+  signal?.throwIfAborted();
   if (ffmpeg && loaded) return ffmpeg;
 
   // Check capabilities before loading FFmpeg
@@ -148,7 +151,18 @@ async function loadFFmpeg(): Promise<FFmpeg> {
       loadConfig.workerURL = `${baseURL}/ffmpeg-core.worker.js`;
     }
 
-    await ffmpeg.load(loadConfig);
+    const onAbort = () => {
+      ffmpeg?.terminate();
+      ffmpeg = null;
+      loaded = false;
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+    try {
+      await ffmpeg.load(loadConfig);
+      signal?.throwIfAborted();
+    } finally {
+      signal?.removeEventListener("abort", onAbort);
+    }
 
     loaded = true;
   }
@@ -163,10 +177,12 @@ export async function convertVideo(
   options: {
     quality?: number;
     audioOnly?: boolean;
+    signal?: AbortSignal;
     onProgress?: (progress: { ratio: number; time: number }) => void;
   } = {}
 ): Promise<ArrayBuffer> {
-  const ff = await loadFFmpeg();
+  const ff = await loadFFmpeg(options.signal);
+  const removeAbort = terminateFfmpegOnAbort(ff, options.signal);
 
   // Remove any existing listeners - ff.off requires a handler function
   // We'll just use removeAllListeners or skip this for now
@@ -425,6 +441,7 @@ export async function convertVideo(
     // Read output file
     data = await ff.readFile(outputName);
   } finally {
+    removeAbort();
     if (progressHandler) {
       ff.off('progress', progressHandler);
     }
@@ -553,6 +570,7 @@ export async function compressMedia(
   format: string,
   options: {
     quality?: number;
+    signal?: AbortSignal;
     onProgress?: (progress: { ratio: number; time: number }) => void;
   } = {}
 ): Promise<ArrayBuffer> {
@@ -561,7 +579,8 @@ export async function compressMedia(
     throw new Error(`Compression not supported for ${format}`);
   }
 
-  const ff = await loadFFmpeg();
+  const ff = await loadFFmpeg(options.signal);
+  const removeAbort = terminateFfmpegOnAbort(ff, options.signal);
   const progressHandler = options.onProgress
     ? ({ progress, time }: { progress: number; time: number }) => {
         options.onProgress?.({
@@ -600,6 +619,7 @@ export async function compressMedia(
     }
     data = await ff.readFile(outputName);
   } finally {
+    removeAbort();
     if (progressHandler) {
       ff.off("progress", progressHandler);
     }
@@ -628,6 +648,25 @@ export async function compressMedia(
     return ab;
   }
   return buffer;
+}
+
+function terminateFfmpegOnAbort(
+  instance: FFmpeg,
+  signal?: AbortSignal,
+): () => void {
+  const onAbort = () => {
+    instance.terminate();
+    if (ffmpeg === instance) {
+      ffmpeg = null;
+      loaded = false;
+    }
+  };
+  if (signal?.aborted) {
+    onAbort();
+    signal.throwIfAborted();
+  }
+  signal?.addEventListener("abort", onAbort, { once: true });
+  return () => signal?.removeEventListener("abort", onAbort);
 }
 
 export async function extractAudioForTranscription(

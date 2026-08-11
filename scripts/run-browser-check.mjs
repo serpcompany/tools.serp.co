@@ -724,16 +724,41 @@ try {
       const initialProgress = await page.textContent(
         '[data-testid="video-progress"]',
       );
-      if (!initialProgress?.toLowerCase().includes("complete")) {
+      const safeFailureMessage = "This conversion is not currently supported";
+      if (
+        !initialProgress?.toLowerCase().includes("complete") &&
+        !initialProgress?.includes(safeFailureMessage)
+      ) {
         await page.waitForFunction(
-          () => {
+          (expectedSafeFailure) => {
             const el = document.querySelector('[data-testid="video-progress"]');
-            const text = el?.textContent?.toLowerCase() ?? "";
-            return text.includes("complete");
+            const text = el?.textContent ?? "";
+            return (
+              text.toLowerCase().includes("complete") ||
+              text.includes(expectedSafeFailure)
+            );
           },
-          null,
+          safeFailureMessage,
           { timeout: tool.requiresFFmpeg ? 60000 : 20000 },
         );
+      }
+      const terminalProgress = await page.textContent(
+        '[data-testid="video-progress"]',
+      );
+      if (terminalProgress?.includes(safeFailureMessage)) {
+        const contractState = await page.getAttribute(
+          '[data-testid="tool-dropzone"]',
+          "data-generic-contract",
+        );
+        if (contractState !== "unsupported") {
+          throw new Error(
+            "A supported generic contract reported an unsupported outcome.",
+          );
+        }
+        return {
+          detail: "safe failure: published route is truthfully unsupported",
+          metrics: { outputBytes: 0, outputType: null },
+        };
       }
       const blob = await waitForBlob(
         page,

@@ -78,6 +78,18 @@ function defineEngines<
 }
 
 const engineById = defineEngines({
+  'adaptive-media-conversion': {
+    capability: 'adaptive-media-conversion',
+    owner: 'apps/tools/lib/convert/workerClient.ts',
+    processingLocation: 'browser-with-repository-server-support',
+    executionProfile: 'server-assisted',
+    implementation: {
+      class: 'hybrid',
+      identity: '@ffmpeg/ffmpeg with repository FFmpeg server fallback',
+      rationale:
+        'Runtime dispatch selects browser or server execution and retains the other available target as a fallback.',
+    },
+  },
   'browser-raster-worker': {
     capability: 'raster-conversion',
     owner: 'apps/tools/lib/convert/workerClient.ts',

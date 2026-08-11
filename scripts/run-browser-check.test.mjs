@@ -90,6 +90,12 @@ test('browser modes keep correctness and performance execution separate', () => 
   assert.doesNotMatch(runnerSource, /benchmark-results\.json/);
 });
 
+test('smoke treats the truthful generic unsupported outcome as safe failure', () => {
+  assert.match(runnerSource, /This conversion is not currently supported/);
+  assert.match(runnerSource, /safe failure/i);
+  assert.match(runnerSource, /data-generic-contract/);
+});
+
 test('local evidence accepts only loopback targets', () => {
   const result = spawnSync(
     process.execPath,

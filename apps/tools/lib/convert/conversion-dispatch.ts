@@ -57,6 +57,7 @@ const dispatchByKind = Object.freeze({
   'adaptive-video': Object.freeze({
     kind: 'adaptive-video',
     engineIds: Object.freeze([
+      'adaptive-media-conversion',
       'browser-ffmpeg-wasm',
       'server-video-convert',
     ]),

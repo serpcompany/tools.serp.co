@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { compressFile } from "./workerClient.ts";
+import { compressFile, convertWithWorker } from "./workerClient.ts";
+import { resolveAdaptiveVideoExecution } from "./workerClient.ts";
 
 function makeBuffer(size) {
   return new Uint8Array(size).buffer;
@@ -54,4 +55,70 @@ test("compressFile returns original buffer when server result is larger", async 
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test("server processing receives the caller signal and aborts the request", async () => {
+  const originalFetch = globalThis.fetch;
+  const controller = new AbortController();
+  let receivedSignal;
+  globalThis.fetch = async (_input, init) => {
+    receivedSignal = init?.signal;
+    return await new Promise((_resolve, reject) => {
+      init?.signal?.addEventListener("abort", () => reject(init.signal.reason), {
+        once: true,
+      });
+    });
+  };
+  try {
+    const pending = compressFile({
+      format: "gif",
+      buf: makeBuffer(10),
+      quality: 0.8,
+      signal: controller.signal,
+    });
+    controller.abort();
+    await assert.rejects(pending);
+    assert.equal(receivedSignal, controller.signal);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("worker processing terminates promptly when the caller aborts", async () => {
+  const controller = new AbortController();
+  let terminated = false;
+  const worker = {
+    onmessage: null,
+    onerror: null,
+    postMessage() {},
+    terminate() {
+      terminated = true;
+    },
+  };
+  const pending = convertWithWorker({
+    worker,
+    from: "png",
+    to: "jpg",
+    buf: makeBuffer(10),
+    signal: controller.signal,
+  });
+  controller.abort();
+
+  await assert.rejects(pending, /abort/i);
+  assert.equal(terminated, true);
+});
+
+test("adaptive media execution truthfully retains both fallback directions", () => {
+  assert.deepEqual(
+    resolveAdaptiveVideoExecution({ preferServer: true, canUseClient: true }),
+    ["server", "browser"],
+  );
+  assert.deepEqual(
+    resolveAdaptiveVideoExecution({ preferServer: false, canUseClient: true }),
+    ["browser", "server"],
+  );
+  assert.deepEqual(
+    resolveAdaptiveVideoExecution({ preferServer: false, canUseClient: false }),
+    ["server"],
+  );
 });
