@@ -141,6 +141,13 @@ function mediaFormat(file: BrowserFile): string {
   return "unknown";
 }
 
+function mediaMimeType(file: BrowserFile, format: string): string {
+  if (file.type) return file.type;
+  if (format === "csv") return "text/csv";
+  if (format === "pdf") return "application/pdf";
+  return "application/octet-stream";
+}
+
 export function createSpecializedRunController(
   workflow: ToolWorkflow,
   options: Readonly<{ observe?(snapshot: WorkflowSnapshot): void }> = {},
@@ -199,11 +206,12 @@ export function createSpecializedRunController(
       const run = begin();
       const bytes = new Uint8Array(await file.arrayBuffer());
       if (!current(run.revision)) return undefined;
+      const format = mediaFormat(file);
       const outcome = await workflow.run({
         toolId,
         input: {
           kind: "file",
-          media: { name: file.name, format: mediaFormat(file), mimeType: file.type, bytes },
+          media: { name: file.name, format, mimeType: mediaMimeType(file, format), bytes },
         },
       }, { signal: run.controller.signal, observe: options.observe });
       return current(run.revision) ? outcome : undefined;
@@ -216,12 +224,15 @@ export function createSpecializedRunController(
         toolId,
         input: {
           kind: "files",
-          media: files.map((file, index) => ({
-            name: file.name,
-            format: mediaFormat(file),
-            mimeType: file.type,
-            bytes: new Uint8Array(bytes[index]!),
-          })),
+          media: files.map((file, index) => {
+            const format = mediaFormat(file);
+            return {
+              name: file.name,
+              format,
+              mimeType: mediaMimeType(file, format),
+              bytes: new Uint8Array(bytes[index]!),
+            };
+          }),
         },
       }, { signal: run.controller.signal, observe: options.observe });
       return current(run.revision) ? outcome : undefined;

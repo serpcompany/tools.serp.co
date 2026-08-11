@@ -364,3 +364,31 @@ test("shared controller projects workflow phases and numeric progress", async ()
     );
   }
 });
+
+test("browser controller canonicalizes empty CSV and PDF file MIME types", async () => {
+  const { workflow } = createBrowserSpecializedWorkflow();
+  const controller = createSpecializedRunController(workflow);
+  const csvFile = (name: string, value: string) => ({
+    name,
+    type: "",
+    size: encoder.encode(value).byteLength,
+    arrayBuffer: async () => encoder.encode(value).buffer,
+  });
+
+  const combined = await controller.runFiles("csv-combiner", [
+    csvFile("one.csv", "name\nAda\n"),
+    csvFile("two.csv", "name\nGrace\n"),
+  ]);
+  assert.equal(combined?.status, "succeeded");
+
+  const pdfBytes = new Uint8Array(
+    readFileSync(new URL("../benchmarks/fixtures/sample.pdf", import.meta.url)),
+  );
+  const viewed = await controller.runFile("pdf-viewer", {
+    name: "sample.pdf",
+    type: "",
+    size: pdfBytes.byteLength,
+    arrayBuffer: async () => Uint8Array.from(pdfBytes).buffer,
+  });
+  assert.equal(viewed?.status, "succeeded");
+});
