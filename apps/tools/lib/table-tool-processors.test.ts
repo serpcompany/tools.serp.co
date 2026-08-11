@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { degrees, PDFDocument, StandardFonts } from "pdf-lib";
 
 import { toolCatalog } from "../../../packages/app-core/src/lib/tool-catalog.ts";
 import {
@@ -525,6 +525,105 @@ test("workflow.run emits quoted SQL identifiers and escaped string literals", as
   assert.match(decoder.decode(deliveries[0]?.bytes), /'O''Reilly'/);
 });
 
+test("SQL output preserves doubled-quote identifiers through independent parsing", async () => {
+  const { deliveries, workflow } = createRecordingWorkflow();
+  const outcome = await workflow.run({
+    toolId: "csv-to-sql",
+    input: {
+      kind: "file",
+      media: {
+        name: "quoted-header.csv",
+        format: "csv",
+        mimeType: "text/csv",
+        bytes: encoder.encode('"a""b"\r\nvalue\r\n'),
+      },
+    },
+  });
+
+  assert.equal(
+    outcome.status,
+    "succeeded",
+    outcome.status === "failed" ? outcome.error.message : outcome.status,
+  );
+  assert.equal(deliveries.length, 1);
+  assert.deepEqual(
+    await parseTableInput("sql", deliveries[0]?.bytes ?? new Uint8Array()),
+    {
+      headers: ['a"b'],
+      rows: [["value"]],
+    },
+  );
+});
+
+test("SQL and MySQL accept safe quoted and unquoted identifiers", async () => {
+  assert.deepEqual(
+    await parseTableInput(
+      "sql",
+      encoder.encode(
+        'INSERT INTO analytics.people (name, "a""b", "comma,name") VALUES (\'Ada\', \'quote\', \'comma\');',
+      ),
+    ),
+    {
+      headers: ["name", 'a"b', "comma,name"],
+      rows: [["Ada", "quote", "comma"]],
+    },
+  );
+  assert.deepEqual(
+    await parseTableInput(
+      "mysql",
+      encoder.encode(
+        "INSERT INTO `analytics`.`people` (`name`, `a``b`) VALUES ('Ada', 'tick');",
+      ),
+    ),
+    {
+      headers: ["name", "a`b"],
+      rows: [["Ada", "tick"]],
+    },
+  );
+});
+
+test("SQL and MySQL reject comment and operator tokens in identifiers before telemetry", async () => {
+  const invalidStatements = [
+    'INSERT INTO "" (value) VALUES (1);',
+    "INSERT INTO `` (value) VALUES (1);",
+    "INSERT INTO people--comment (value) VALUES (1);",
+    "INSERT INTO people /* comment */ (value) VALUES (1);",
+    "INSERT INTO people+audit (value) VALUES (1);",
+    "INSERT INTO people (value /* comment */) VALUES (1);",
+    "INSERT INTO people (value--comment) VALUES (1);",
+    "INSERT INTO people (value+other) VALUES (1);",
+  ];
+
+  for (const toolId of ["sql-to-json", "mysql-to-json"]) {
+    const format = toolId.startsWith("mysql") ? "mysql" : "sql";
+    for (const statement of invalidStatements) {
+      const { deliveries, workflow } = createRecordingWorkflow();
+      const outcome = await workflow.run({
+        toolId,
+        input: {
+          kind: "file",
+          media: {
+            name: `invalid.${format}`,
+            format,
+            mimeType: "application/sql",
+            bytes: encoder.encode(statement),
+          },
+        },
+      });
+
+      assert.equal(outcome.status, "failed", `${toolId}: ${statement}`);
+      if (outcome.status === "failed") {
+        assert.equal(outcome.error.code, "invalid-request", statement);
+        assert.deepEqual(outcome.telemetry, {
+          start: "not-attempted",
+          terminal: "not-attempted",
+        });
+      }
+      assert.equal(deliveries.length, 0, `${toolId}: ${statement}`);
+    }
+  }
+});
+
 test("SQL and MySQL reject tokens before or after the single INSERT statement", async () => {
   const adversarial = [
     "DROP TABLE audit; INSERT INTO people (name) VALUES ('Ada');",
@@ -769,6 +868,42 @@ test("PDF verification rejects semantically complete text drawn outside actual p
 
   await assert.rejects(
     verifyTablePdfOutput(await document.save(), {
+      headers: ["name"],
+      rows: [["Ada"]],
+    }),
+    /page bounds/i,
+  );
+});
+
+test("PDF verification rejects text extending above or below actual page bounds", async () => {
+  const above = await PDFDocument.create();
+  const aboveFont = await above.embedFont(StandardFonts.Helvetica);
+  const abovePage = above.addPage([100, 100]);
+  abovePage.drawText("name", { x: 10, y: 95, font: aboveFont, size: 9 });
+  abovePage.drawText("Ada", { x: 10, y: 80, font: aboveFont, size: 9 });
+
+  await assert.rejects(
+    verifyTablePdfOutput(await above.save(), {
+      headers: ["name"],
+      rows: [["Ada"]],
+    }),
+    /page bounds/i,
+  );
+
+  const below = await PDFDocument.create();
+  const belowFont = await below.embedFont(StandardFonts.Helvetica);
+  const belowPage = below.addPage([100, 100]);
+  belowPage.drawText("name", {
+    x: 50,
+    y: 5,
+    font: belowFont,
+    size: 9,
+    rotate: degrees(180),
+  });
+  belowPage.drawText("Ada", { x: 10, y: 20, font: belowFont, size: 9 });
+
+  await assert.rejects(
+    verifyTablePdfOutput(await below.save(), {
       headers: ["name"],
       rows: [["Ada"]],
     }),

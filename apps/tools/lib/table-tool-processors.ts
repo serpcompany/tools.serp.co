@@ -67,6 +67,13 @@ type PdfTextItem = Readonly<{
   transform: readonly number[];
 }>;
 
+type PdfTextBounds = Readonly<{
+  left: number;
+  right: number;
+  bottom: number;
+  top: number;
+}>;
+
 type PdfTextPage = Readonly<{
   view: readonly number[];
   getTextContent(options: {
@@ -105,6 +112,48 @@ async function loadPdfTextModule(): Promise<PdfTextModule> {
   return (await import(
     "pdfjs-dist/legacy/build/pdf.mjs"
   )) as unknown as PdfTextModule;
+}
+
+function pdfTextBounds(item: PdfTextItem): PdfTextBounds | undefined {
+  const a = item.transform[0];
+  const b = item.transform[1];
+  const c = item.transform[2];
+  const d = item.transform[3];
+  const x = item.transform[4];
+  const y = item.transform[5];
+  if (
+    a === undefined ||
+    b === undefined ||
+    c === undefined ||
+    d === undefined ||
+    x === undefined ||
+    y === undefined ||
+    ![a, b, c, d, x, y, item.width, item.height].every(Number.isFinite)
+  ) {
+    return undefined;
+  }
+  const horizontalScale = Math.hypot(a, b);
+  const verticalScale = Math.hypot(c, d);
+  if (horizontalScale === 0 || verticalScale === 0) return undefined;
+
+  const widthX = (a / horizontalScale) * item.width;
+  const widthY = (b / horizontalScale) * item.width;
+  const heightX = (c / verticalScale) * item.height;
+  const heightY = (d / verticalScale) * item.height;
+  const corners: readonly (readonly [number, number])[] = [
+    [x, y],
+    [x + widthX, y + widthY],
+    [x + heightX, y + heightY],
+    [x + widthX + heightX, y + widthY + heightY],
+  ];
+  const xs = corners.map(([cornerX]) => cornerX);
+  const ys = corners.map(([, cornerY]) => cornerY);
+  return {
+    left: Math.min(...xs),
+    right: Math.max(...xs),
+    bottom: Math.min(...ys),
+    top: Math.max(...ys),
+  };
 }
 
 const tableEngine = executionProvenance.getEngine("browser-table-converter");
@@ -281,20 +330,54 @@ function assertTable(
   });
 }
 
+const SQL_IDENTIFIER_SOURCE =
+  '(?:[A-Za-z_][A-Za-z0-9_$]*|"(?:[^"]|"")+"|`(?:[^`]|``)+`)';
+const SQL_QUALIFIED_IDENTIFIER_SOURCE = `${SQL_IDENTIFIER_SOURCE}(?:\\s*\\.\\s*${SQL_IDENTIFIER_SOURCE})*`;
+const SQL_COLUMN_LIST_SOURCE = `${SQL_IDENTIFIER_SOURCE}(?:\\s*,\\s*${SQL_IDENTIFIER_SOURCE})*`;
+const SQL_INSERT_PATTERN = new RegExp(
+  `^\\s*insert\\s+into\\s+(${SQL_QUALIFIED_IDENTIFIER_SOURCE})\\s*\\((${SQL_COLUMN_LIST_SOURCE})\\)\\s*values\\s*([\\s\\S]+?)\\s*;?\\s*$`,
+  "i",
+);
+
+function decodeSqlIdentifier(identifier: string): string {
+  const value = identifier.trim();
+  const delimiter = value[0];
+  return delimiter === '"' || delimiter === "`"
+    ? value.slice(1, -1).replaceAll(delimiter + delimiter, delimiter)
+    : value;
+}
+
+function parseSqlColumnList(columnList: string): string[] {
+  const identifiers: string[] = [];
+  let start = 0;
+  let delimiter: '"' | "`" | undefined;
+  for (let index = 0; index < columnList.length; index += 1) {
+    const character = columnList[index];
+    if (delimiter) {
+      if (character === delimiter && columnList[index + 1] === delimiter) {
+        index += 1;
+      } else if (character === delimiter) {
+        delimiter = undefined;
+      }
+    } else if (character === '"' || character === "`") {
+      delimiter = character;
+    } else if (character === ",") {
+      identifiers.push(decodeSqlIdentifier(columnList.slice(start, index)));
+      start = index + 1;
+    }
+  }
+  identifiers.push(decodeSqlIdentifier(columnList.slice(start)));
+  return identifiers;
+}
+
 function parseSql(bytes: Uint8Array): TableData {
-  const match = decoder
-    .decode(bytes)
-    .match(
-      /^\s*insert\s+into\s+[`"\w.-]+\s*\(([^)]+)\)\s*values\s*([\s\S]+?)\s*;?\s*$/i,
-    );
-  if (!match?.[1] || !match[2]) {
+  const match = decoder.decode(bytes).match(SQL_INSERT_PATTERN);
+  if (!match?.[1] || !match[2] || !match[3]) {
     throw new TypeError("SQL input requires one INSERT with a column list");
   }
-  const headers = match[1]
-    .split(",")
-    .map((header) => header.trim().replace(/^[`"]|[`"]$/g, ""));
+  const headers = parseSqlColumnList(match[2]);
   const rows: string[][] = [];
-  const values = match[2];
+  const values = match[3];
   let tuple: string[] | undefined;
   let cell = "";
   let quoted = false;
@@ -858,8 +941,15 @@ export async function verifyTablePdfOutput(
     for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
       const page = await document.getPage(pageNumber);
       const pageLeft = page.view[0];
+      const pageBottom = page.view[1];
       const pageRight = page.view[2];
-      if (pageLeft === undefined || pageRight === undefined) {
+      const pageTop = page.view[3];
+      if (
+        pageLeft === undefined ||
+        pageBottom === undefined ||
+        pageRight === undefined ||
+        pageTop === undefined
+      ) {
         throw new TypeError("PDF page bounds are unavailable");
       }
       const text = await page.getTextContent({ disableNormalization: true });
@@ -868,9 +958,13 @@ export async function verifyTablePdfOutput(
       );
       if (
         items.some((item) => {
-          const x = item.transform[4] ?? Number.NaN;
+          const bounds = pdfTextBounds(item);
           return (
-            !Number.isFinite(x) || x < pageLeft || x + item.width > pageRight
+            !bounds ||
+            bounds.left < Math.min(pageLeft, pageRight) ||
+            bounds.right > Math.max(pageLeft, pageRight) ||
+            bounds.bottom < Math.min(pageBottom, pageTop) ||
+            bounds.top > Math.max(pageBottom, pageTop)
           );
         })
       ) {
