@@ -27,7 +27,7 @@ export default function CharacterCounter({ videoEmbedId }: Props) {
   const [stats, setStats] = useState<CharacterStatistics>(EMPTY_STATS);
   const [videoPlaying, setVideoPlaying] = useState(false);
   const workflow = useSpecializedToolWorkflow();
-  const { clear, delivery, runInteraction, text: deliveryText } = workflow;
+  const { clear, delivery, scheduleInteraction, text: deliveryText } = workflow;
 
   useEffect(() => {
     if (!text.trim()) {
@@ -35,8 +35,8 @@ export default function CharacterCounter({ videoEmbedId }: Props) {
       setStats(EMPTY_STATS);
       return;
     }
-    void runInteraction("character-counter", "text", "text/plain", text);
-  }, [clear, runInteraction, text]);
+    scheduleInteraction("character-counter", "text", "text/plain", text, 250);
+  }, [clear, scheduleInteraction, text]);
 
   useEffect(() => {
     const result = deliveryText(delivery);
