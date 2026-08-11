@@ -4,6 +4,13 @@ import Papa from "papaparse";
 import UPNGModule from "upng-js";
 
 import type { SemanticVerification, WorkflowMedia } from "./index.ts";
+import { decodedAllocationExceeds } from "./image-allocation-limits.ts";
+
+export {
+  decodedAllocationExceeds,
+  MAX_DECODED_RGBA_BYTES,
+  MAX_IMAGE_DIMENSION,
+} from "./image-allocation-limits.ts";
 
 const expectedMimeTypes: Readonly<Record<string, string>> = Object.freeze({
   csv: "text/csv",
@@ -18,8 +25,6 @@ const UPNG = UPNGModule as {
   toRGBA8(image: { width: number; height: number }): ArrayBuffer[];
 };
 
-export const MAX_DECODED_RGBA_BYTES = 64 * 1_024 * 1_024;
-export const MAX_IMAGE_DIMENSION = 16_384;
 const MAX_MP4_PARSE_BYTES = 64 * 1_024 * 1_024;
 
 type DecodedImage = Readonly<{
@@ -56,24 +61,6 @@ function crc32(bytes: Uint8Array): number {
     }
   }
   return (crc ^ 0xffffffff) >>> 0;
-}
-
-export function decodedAllocationExceeds(
-  width: number,
-  height: number,
-  frames = 1,
-): boolean {
-  return (
-    !Number.isSafeInteger(width) ||
-    !Number.isSafeInteger(height) ||
-    !Number.isSafeInteger(frames) ||
-    width < 1 ||
-    height < 1 ||
-    frames < 1 ||
-    width > MAX_IMAGE_DIMENSION ||
-    height > MAX_IMAGE_DIMENSION ||
-    width > Math.floor(MAX_DECODED_RGBA_BYTES / 4 / height / frames)
-  );
 }
 
 function pngStructureError(bytes: Uint8Array): string | undefined {
@@ -216,7 +203,8 @@ async function jpegSemanticError(
       decoded.width < 1 ||
       decoded.height < 1 ||
       decoded.format !== "jpeg" ||
-      decoded.width > Math.floor(Number.MAX_SAFE_INTEGER / 4 / decoded.height) ||
+      decoded.width >
+        Math.floor(Number.MAX_SAFE_INTEGER / 4 / decoded.height) ||
       decoded.data.byteLength !== decoded.width * decoded.height * 4
     ) {
       return "JPEG decoder produced inconsistent image data";
@@ -255,11 +243,13 @@ function bmffSemanticError(
     // MP4Box is synchronous. The signal is checked on both sides of its call,
     // but JavaScript cannot interrupt it mid-parse. A full-buffer view is reused
     // to avoid the former unconditional 256 MiB-sized copy.
-    const buffer = (bytes.byteOffset === 0 &&
-    bytes.byteLength === bytes.buffer.byteLength &&
-    bytes.buffer instanceof ArrayBuffer
-      ? bytes.buffer
-      : bytes.slice().buffer) as MP4BoxBuffer;
+    const buffer = (
+      bytes.byteOffset === 0 &&
+      bytes.byteLength === bytes.buffer.byteLength &&
+      bytes.buffer instanceof ArrayBuffer
+        ? bytes.buffer
+        : bytes.slice().buffer
+    ) as MP4BoxBuffer;
     buffer.fileStart = 0;
     file.appendBuffer(buffer, true);
     file.flush();

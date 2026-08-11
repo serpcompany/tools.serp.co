@@ -24,6 +24,7 @@ import { resolveConversionCapability } from "./convert/conversion-dispatch.ts";
 import { resolveCompressionDispatch } from "./compression-utils.ts";
 import { createGenericToolRunController } from "./generic-tool-run-controller.ts";
 import { runFfmpegLifecycle } from "./convert/ffmpeg-lifecycle.ts";
+import { decodeToRGBA } from "./convert/decode.ts";
 
 const fixture = (name: string) =>
   new Uint8Array(
@@ -33,8 +34,8 @@ const fixture = (name: string) =>
 function mp4WithoutRecognizedAudioTrack(): Uint8Array {
   const bytes = Uint8Array.from(fixture("sample.mp4"));
   const marker = new TextEncoder().encode("mp4a");
-  const offset = bytes.findIndex(
-    (_byte, index) => marker.every((value, part) => bytes[index + part] === value),
+  const offset = bytes.findIndex((_byte, index) =>
+    marker.every((value, part) => bytes[index + part] === value),
   );
   assert.ok(offset >= 0, "fixture must contain an audio sample entry");
   bytes.set(new TextEncoder().encode("xxxx"), offset);
@@ -116,13 +117,25 @@ test("known production dispatches retain exact generic workflow contracts", () =
     "png-to-webp",
     "webp-to-jpg",
     "heic-to-jpg",
-    "cr2-to-jpg",
     "mp4-to-mp3",
   ]) {
     assert.equal(getGenericToolContract(toolId).state, "supported", toolId);
   }
-  for (const toolId of ["m4a-to-mp4", "mp3-to-mp4"]) {
+  for (const toolId of ["cr2-to-jpg", "m4a-to-mp4", "mp3-to-mp4"]) {
     assert.equal(getGenericToolContract(toolId).state, "unsupported", toolId);
+  }
+});
+
+test("Cloudflare-incompatible CR2 dispatches remain truthfully unsupported", () => {
+  for (const toolId of [
+    "cr2-to-jpeg",
+    "cr2-to-jpg",
+    "cr2-to-pdf",
+    "cr2-to-png",
+    "cr2-to-webp",
+  ]) {
+    assert.equal(getGenericToolContract(toolId).state, "unsupported", toolId);
+    assert.notEqual(getToolProcessorAvailability(toolId).kind, "wired", toolId);
   }
 });
 
@@ -136,7 +149,6 @@ test("generic compression allocates workers from the production dispatch table",
 
 test("contract inventory independently audits real dispatches with semantic coverage", () => {
   const verifiedInputs = new Set([
-    "cr2",
     "heic",
     "jpeg",
     "jpg",
@@ -158,7 +170,8 @@ test("contract inventory independently audits real dispatches with semantic cove
     "webp",
   ]);
   for (const tool of toolCatalog.activeTools.filter(
-    (item) => selectToolRenderer(item) === "generic" && item.operation === "convert",
+    (item) =>
+      selectToolRenderer(item) === "generic" && item.operation === "convert",
   )) {
     if (!tool.from || !tool.to) continue;
     const capability = resolveConversionCapability(tool.from, tool.to);
@@ -173,7 +186,8 @@ test("contract inventory independently audits real dispatches with semantic cove
     );
   }
   for (const tool of toolCatalog.activeTools.filter(
-    (item) => selectToolRenderer(item) === "generic" && item.operation === "compress",
+    (item) =>
+      selectToolRenderer(item) === "generic" && item.operation === "compress",
   )) {
     if (!tool.from || !tool.to) continue;
     const dispatch = resolveCompressionDispatch(tool.from);
@@ -208,9 +222,7 @@ test("every supported generic contract resolves a processor through workflow.run
   const boundary: GenericWorkflowAdapters = {
     ...baseBoundary,
     async convert(request) {
-      return [
-        fixture(outputFixture[request.to as keyof typeof outputFixture]),
-      ];
+      return [fixture(outputFixture[request.to as keyof typeof outputFixture])];
     },
     async compress(request) {
       return fixture(
@@ -343,7 +355,8 @@ test("a PNG fallback cannot succeed for a requested non-PNG output", async () =>
   });
 
   assert.equal(outcome.status, "failed");
-  if (outcome.status === "failed") assert.equal(outcome.error.code, "invalid-result");
+  if (outcome.status === "failed")
+    assert.equal(outcome.error.code, "invalid-result");
   assert.deepEqual(boundary.delivered, []);
 });
 
@@ -364,6 +377,115 @@ test("browser image decoding cannot legitimize wrong-format bytes", async () => 
   }
 });
 
+test("exact WebP identity rejects PNG bytes before browser decoding", async () => {
+  const verification = await verifyGenericMediaSemantics({
+    name: "renamed.webp",
+    format: "webp",
+    mimeType: "image/webp",
+    bytes: fixture("sample.png"),
+  });
+  assert.equal(verification.status, "rejected");
+});
+
+test("exact MP3 identity rejects WAV bytes before AudioContext decoding", async () => {
+  for (const bytes of [
+    fixture("sample.wav"),
+    new Uint8Array([
+      0x49, 0x44, 0x33, 4, 0, 0, 0, 0, 0, 0, 0xff, 0xfb, 0x10, 0xc4, 0xff, 0xfb,
+      0x10, 0xc4,
+    ]),
+  ]) {
+    const verification = await verifyGenericMediaSemantics({
+      name: "renamed.mp3",
+      format: "mp3",
+      mimeType: "audio/mpeg",
+      bytes,
+    });
+    assert.equal(verification.status, "rejected");
+  }
+});
+
+test("generic file acquisition canonicalizes safe MIME aliases and derives octet-stream identity from bytes", async () => {
+  for (const type of ["image/x-png", "application/octet-stream"]) {
+    const file = new File([fixture("sample.png")], "sample.png", { type });
+    const outcome = await runGenericToolFile("png-to-jpg", file);
+    assert.equal(outcome.status, "failed", type);
+    if (outcome.status === "failed") {
+      assert.notEqual(outcome.error.code, "unsupported-input", type);
+    }
+  }
+  const renamed = new File([fixture("sample.wav")], "renamed.mp4", {
+    type: "application/octet-stream",
+  });
+  const outcome = await runGenericToolFile("mp4-to-mp3", renamed);
+  assert.equal(outcome.status, "failed");
+  if (outcome.status === "failed")
+    assert.equal(outcome.error.code, "unsupported-request");
+});
+
+test("browser image decoder cancellation rejects promptly and closes the decoder", async () => {
+  const originalImageDecoder = (globalThis as { ImageDecoder?: unknown })
+    .ImageDecoder;
+  let closed = false;
+  class StalledImageDecoder {
+    decode() {
+      return new Promise<never>(() => {});
+    }
+    close() {
+      closed = true;
+    }
+  }
+  (globalThis as { ImageDecoder?: unknown }).ImageDecoder = StalledImageDecoder;
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 10);
+  const started = performance.now();
+  try {
+    await assert.rejects(
+      decodeToRGBA(
+        "webp",
+        fixture("sample.webp").slice().buffer,
+        controller.signal,
+      ),
+      (error: unknown) =>
+        error instanceof DOMException && error.name === "AbortError",
+    );
+  } finally {
+    (globalThis as { ImageDecoder?: unknown }).ImageDecoder =
+      originalImageDecoder;
+  }
+  assert.ok(performance.now() - started < 150);
+  assert.equal(closed, true);
+});
+
+test("trusted audio decoder cancellation becomes a cancelled workflow and closes its context", async () => {
+  const originalAudioContext = globalThis.AudioContext;
+  let closed = 0;
+  class StalledAudioContext {
+    decodeAudioData() {
+      return new Promise<never>(() => {});
+    }
+    async close() {
+      closed += 1;
+    }
+  }
+  globalThis.AudioContext = StalledAudioContext as never;
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 10);
+  const started = performance.now();
+  try {
+    const outcome = await runGenericToolFile(
+      "compress-mp3",
+      new File([fixture("sample.mp3")], "sample.mp3", { type: "audio/mp3" }),
+      { signal: controller.signal },
+    );
+    assert.equal(outcome.status, "cancelled");
+  } finally {
+    globalThis.AudioContext = originalAudioContext;
+  }
+  assert.ok(performance.now() - started < 150);
+  assert.ok(closed >= 1);
+});
+
 test("native JPEG fallback reapplies dimension and aggregate RGBA limits", async () => {
   const originalCreateImageBitmap = globalThis.createImageBitmap;
   const jpegEnvelope = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
@@ -374,7 +496,13 @@ test("native JPEG fallback reapplies dimension and aggregate RGBA limits", async
     ]) {
       let closed = false;
       globalThis.createImageBitmap = async () =>
-        ({ width, height, close() { closed = true; } }) as ImageBitmap;
+        ({
+          width,
+          height,
+          close() {
+            closed = true;
+          },
+        }) as ImageBitmap;
       const verification = await verifyGenericMediaSemantics({
         name: "bomb.jpg",
         format: "jpg",
@@ -421,7 +549,9 @@ test("browser delivery delays Blob URL revocation until the download has started
 });
 
 test("a superseded run cannot clear or overwrite its active replacement", async () => {
-  type Resolve = (outcome: Awaited<ReturnType<typeof runGenericToolFile>>) => void;
+  type Resolve = (
+    outcome: Awaited<ReturnType<typeof runGenericToolFile>>,
+  ) => void;
   const pending = new Map<string, Resolve>();
   const states: Array<Record<string, unknown>> = [];
   let state: Record<string, unknown> = {};
@@ -476,10 +606,18 @@ test("FFmpeg production lifecycle releases listeners and files after every failu
       async writeFile() {
         if (stage === "write") throw new Error("write failed");
       },
-      async deleteFile(name: string) { deleted.push(name); },
-      on() { attached += 1; },
-      off() { detached += 1; },
-      terminate() { terminated += 1; },
+      async deleteFile(name: string) {
+        deleted.push(name);
+      },
+      on() {
+        attached += 1;
+      },
+      off() {
+        detached += 1;
+      },
+      terminate() {
+        terminated += 1;
+      },
     };
     await assert.rejects(
       runFfmpegLifecycle(
@@ -499,7 +637,11 @@ test("FFmpeg production lifecycle releases listeners and files after every failu
     );
     assert.equal(attached, 1, stage);
     assert.equal(detached, 1, stage);
-    assert.deepEqual(deleted, ["input.mp4", "output.mp3", "palette.png"], stage);
+    assert.deepEqual(
+      deleted,
+      ["input.mp4", "output.mp3", "palette.png"],
+      stage,
+    );
     controller.abort();
     assert.equal(terminated, 0, `${stage} retained abort listener`);
   }
@@ -522,7 +664,8 @@ test("an unsupported generic route fails closed before its legacy raster fallbac
   });
 
   assert.equal(outcome.status, "failed");
-  if (outcome.status === "failed") assert.equal(outcome.error.code, "unsupported-tool");
+  if (outcome.status === "failed")
+    assert.equal(outcome.error.code, "unsupported-tool");
   assert.deepEqual(boundary.processed, []);
   assert.deepEqual(boundary.delivered, []);
 });
@@ -555,8 +698,8 @@ test("trusted media parsers reject truncated and fabricated BMFF audio", async (
   for (const bytes of [
     source.subarray(0, Math.min(32, source.byteLength)),
     new Uint8Array([
-      0, 0, 0, 16, 102, 116, 121, 112, 77, 52, 65, 32, 0, 0, 0, 0,
-      0, 0, 0, 8, 109, 111, 111, 118,
+      0, 0, 0, 16, 102, 116, 121, 112, 77, 52, 65, 32, 0, 0, 0, 0, 0, 0, 0, 8,
+      109, 111, 111, 118,
     ]),
   ]) {
     const result = await verifyGenericMediaSemantics({
@@ -656,7 +799,8 @@ test("file preflight rejects oversized input without reading it", async () => {
 
   const outcome = await runGenericToolFile("png-to-jpg", file);
   assert.equal(outcome.status, "failed");
-  if (outcome.status === "failed") assert.equal(outcome.error.code, "invalid-request");
+  if (outcome.status === "failed")
+    assert.equal(outcome.error.code, "invalid-request");
   assert.equal(reads, 0);
 });
 
@@ -688,7 +832,10 @@ test("file acquisition cancellation returns promptly and cancels its reader", as
   });
 
   assert.equal(outcome.status, "cancelled");
-  assert.ok(performance.now() - started < 150, "cancellation waited for the delayed read");
+  assert.ok(
+    performance.now() - started < 150,
+    "cancellation waited for the delayed read",
+  );
   assert.equal(cancelled, true);
 });
 

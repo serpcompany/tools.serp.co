@@ -1,14 +1,15 @@
 import { PDFDocument } from "pdf-lib";
 import { createFile, type MP4BoxBuffer, type Movie } from "mp4box";
+import { parseBuffer as parseMediaBuffer } from "music-metadata";
 
-import { toolCatalog, type CatalogTool } from "@serp-tools/app-core/lib/tool-catalog";
+import {
+  toolCatalog,
+  type CatalogTool,
+} from "@serp-tools/app-core/lib/tool-catalog";
 
 import { beginToolRun } from "./telemetry.ts";
 import { detectCapabilities } from "./capabilities.ts";
-import {
-  compressFile,
-  convertWithWorker,
-} from "./convert/workerClient.ts";
+import { compressFile, convertWithWorker } from "./convert/workerClient.ts";
 import { resolveCompressionDispatch } from "./compression-utils.ts";
 import { resolveConversionCapability } from "./convert/conversion-dispatch.ts";
 import {
@@ -43,7 +44,6 @@ const FORMAT_MIME_TYPES = Object.freeze({
 } satisfies Readonly<Record<string, string>>);
 
 const SEMANTIC_INPUT_FORMATS = new Set([
-  "cr2",
   "heic",
   "jpeg",
   "jpg",
@@ -90,24 +90,30 @@ type GenericEngineContext = Readonly<{
 }>;
 
 export type GenericWorkflowAdapters = Readonly<{
-  decideSupport(request: Readonly<{
-    operation: "convert" | "compress";
-    inputFormat: string;
-    outputFormat: string;
-  }>): Readonly<{ supported: true } | { supported: false; message: string }>;
-  convert(request: Readonly<{
-    from: string;
-    to: string;
-    bytes: Uint8Array;
-    quality: number;
-    context: GenericEngineContext;
-  }>): Promise<readonly Uint8Array[]>;
-  compress(request: Readonly<{
-    format: string;
-    bytes: Uint8Array;
-    quality: number;
-    context: GenericEngineContext;
-  }>): Promise<Uint8Array>;
+  decideSupport(
+    request: Readonly<{
+      operation: "convert" | "compress";
+      inputFormat: string;
+      outputFormat: string;
+    }>,
+  ): Readonly<{ supported: true } | { supported: false; message: string }>;
+  convert(
+    request: Readonly<{
+      from: string;
+      to: string;
+      bytes: Uint8Array;
+      quality: number;
+      context: GenericEngineContext;
+    }>,
+  ): Promise<readonly Uint8Array[]>;
+  compress(
+    request: Readonly<{
+      format: string;
+      bytes: Uint8Array;
+      quality: number;
+      context: GenericEngineContext;
+    }>,
+  ): Promise<Uint8Array>;
   verify(
     media: WorkflowMedia,
     context: Readonly<{ signal: AbortSignal }>,
@@ -186,14 +192,21 @@ function unsupportedContract(toolId: string): GenericToolContract {
 const contractByToolId = new Map<string, GenericToolContract>(
   toolCatalog.activeTools
     .filter((tool) => selectToolRenderer(tool) === "generic")
-    .map((tool) => [tool.id, supportedContract(tool) ?? unsupportedContract(tool.id)]),
+    .map((tool) => [
+      tool.id,
+      supportedContract(tool) ?? unsupportedContract(tool.id),
+    ]),
 );
 
 export function getGenericToolContract(toolId: string): GenericToolContract {
   return contractByToolId.get(toolId) ?? unsupportedContract(toolId);
 }
 
-export async function verifyGenericMediaSemantics(media: WorkflowMedia) {
+export async function verifyGenericMediaSemantics(
+  media: WorkflowMedia,
+  context: Readonly<{ signal?: AbortSignal }> = {},
+) {
+  context.signal?.throwIfAborted();
   const expectedMimeType = mimeTypeFor(media.format);
   if (!expectedMimeType || media.mimeType !== expectedMimeType) {
     return {
@@ -226,8 +239,24 @@ export async function verifyGenericMediaSemantics(media: WorkflowMedia) {
       });
       return { status: "verified" as const };
     } catch {
-      return { status: "rejected" as const, message: "PDF parser rejected the file" };
+      return {
+        status: "rejected" as const,
+        message: "PDF parser rejected the file",
+      };
     }
+  }
+  if (media.format === "webp" && !hasWebpIdentity(media.bytes)) {
+    return {
+      status: "rejected" as const,
+      message: "WebP container identity is invalid",
+    };
+  }
+  if (media.format === "mp3") {
+    const mp3Verification = await verifyMp3Identity(
+      media.bytes,
+      context.signal,
+    );
+    if (mp3Verification.status !== "verified") return mp3Verification;
   }
   const verification = await verifyMediaSemantics(
     media.format === "jpeg" ? { ...media, format: "jpg" } : media,
@@ -246,7 +275,8 @@ export async function verifyGenericMediaSemantics(media: WorkflowMedia) {
     (verification.message === "PNG decoder rejected the image data" ||
       verification.message === "PNG decoder produced inconsistent image data" ||
       verification.message === "JPEG decoder rejected the image data" ||
-      verification.message === "JPEG decoder produced inconsistent image data") &&
+      verification.message ===
+        "JPEG decoder produced inconsistent image data") &&
     (media.format === "png" || hasJpegEnvelope(media)) &&
     typeof createImageBitmap === "function"
   ) {
@@ -256,14 +286,79 @@ export async function verifyGenericMediaSemantics(media: WorkflowMedia) {
       );
       const valid = !decodedAllocationExceeds(bitmap.width, bitmap.height);
       bitmap.close();
-      return valid
-        ? { status: "verified" as const }
-        : verification;
+      return valid ? { status: "verified" as const } : verification;
     } catch {
       return verification;
     }
   }
   return verification;
+}
+
+function ascii(bytes: Uint8Array, offset: number, length: number): string {
+  return String.fromCharCode(...bytes.subarray(offset, offset + length));
+}
+
+function hasWebpIdentity(bytes: Uint8Array): boolean {
+  if (
+    bytes.byteLength < 20 ||
+    ascii(bytes, 0, 4) !== "RIFF" ||
+    ascii(bytes, 8, 4) !== "WEBP"
+  )
+    return false;
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const riffSize = view.getUint32(4, true);
+  if (riffSize !== bytes.byteLength - 8) return false;
+  let offset = 12;
+  let imageChunks = 0;
+  while (offset < bytes.byteLength) {
+    if (bytes.byteLength - offset < 8) return false;
+    const type = ascii(bytes, offset, 4);
+    const size = view.getUint32(offset + 4, true);
+    const paddedSize = size + (size & 1);
+    if (
+      size > bytes.byteLength - offset - 8 ||
+      paddedSize > bytes.byteLength - offset - 8
+    ) {
+      return false;
+    }
+    if (type === "VP8 " || type === "VP8L" || type === "VP8X") imageChunks += 1;
+    offset += 8 + paddedSize;
+  }
+  return offset === bytes.byteLength && imageChunks > 0;
+}
+
+async function verifyMp3Identity(
+  bytes: Uint8Array,
+  signal?: AbortSignal,
+): Promise<SemanticVerification> {
+  signal?.throwIfAborted();
+  try {
+    const { format } = await parseMediaBuffer(
+      bytes,
+      { size: bytes.byteLength },
+      { duration: true, skipCovers: true },
+    );
+    signal?.throwIfAborted();
+    return format.container === "MPEG" &&
+      /(?:^|\s)Layer 3$/i.test(format.codec ?? "") &&
+      format.hasAudio === true &&
+      format.hasVideo !== true &&
+      typeof format.duration === "number" &&
+      Number.isFinite(format.duration) &&
+      format.duration > 0 &&
+      typeof format.sampleRate === "number" &&
+      format.sampleRate > 0 &&
+      typeof format.numberOfChannels === "number" &&
+      format.numberOfChannels > 0
+      ? { status: "verified" }
+      : { status: "rejected", message: "Trusted parser found non-MP3 media" };
+  } catch {
+    signal?.throwIfAborted();
+    return {
+      status: "rejected",
+      message: "Trusted MP3 parser rejected the file",
+    };
+  }
 }
 
 function hasJpegEnvelope(media: WorkflowMedia): boolean {
@@ -286,11 +381,13 @@ function inspectBmffTrackFamilies(bytes: Uint8Array): {
   file.onReady = (movie) => {
     info = movie;
   };
-  const buffer = (bytes.byteOffset === 0 &&
-  bytes.byteLength === bytes.buffer.byteLength &&
-  bytes.buffer instanceof ArrayBuffer
-    ? bytes.buffer
-    : bytes.slice().buffer) as MP4BoxBuffer;
+  const buffer = (
+    bytes.byteOffset === 0 &&
+    bytes.byteLength === bytes.buffer.byteLength &&
+    bytes.buffer instanceof ArrayBuffer
+      ? bytes.buffer
+      : bytes.slice().buffer
+  ) as MP4BoxBuffer;
   buffer.fileStart = 0;
   file.appendBuffer(buffer, true);
   file.flush();
@@ -303,7 +400,8 @@ function inspectBmffTrackFamilies(bytes: Uint8Array): {
 type GenericOptions = Readonly<{ quality: number }>;
 
 function parseOptions(options: unknown) {
-  if (options === undefined) return { ok: true as const, value: { quality: 0.82 } };
+  if (options === undefined)
+    return { ok: true as const, value: { quality: 0.82 } };
   if (!options || typeof options !== "object" || Array.isArray(options)) {
     return { ok: false as const, message: "Options must be an object" };
   }
@@ -316,7 +414,10 @@ function parseOptions(options: unknown) {
     quality < 0.1 ||
     quality > 0.95
   ) {
-    return { ok: false as const, message: "quality must be between 0.1 and 0.95" };
+    return {
+      ok: false as const,
+      message: "quality must be between 0.1 and 0.95",
+    };
   }
   return { ok: true as const, value: { quality } };
 }
@@ -359,7 +460,8 @@ function processorFor(
     },
     parseOptions,
     decideSupport(request) {
-      const exactContract = request.detectedInput.format === contract.input.format &&
+      const exactContract =
+        request.detectedInput.format === contract.input.format &&
         request.detectedInput.mimeType === contract.input.mimeType &&
         request.requestedOperation === contract.operation &&
         request.outputs.length === 1 &&
@@ -378,7 +480,9 @@ function processorFor(
       });
     },
     async verifyInput(input, context) {
-      const verification = await verifyGenericMediaSemantics(input);
+      const verification = await verifyGenericMediaSemantics(input, {
+        signal: context.signal,
+      });
       return verification.status === "unavailable"
         ? adapters.verify(input, { signal: context.signal })
         : verification;
@@ -413,9 +517,7 @@ function processorFor(
         contract.operation === "compress" &&
         contract.input.format === "mp4" &&
         inspectBmffTrackFamilies(input.bytes).audio > 0 &&
-        outputBytes.some(
-          (bytes) => inspectBmffTrackFamilies(bytes).audio === 0,
-        )
+        outputBytes.some((bytes) => inspectBmffTrackFamilies(bytes).audio === 0)
       ) {
         throw new Error("MP4 compression discarded the input audio track");
       }
@@ -433,7 +535,9 @@ function processorFor(
       }));
     },
     async verifyResult(result, context) {
-      const verification = await verifyGenericMediaSemantics(result);
+      const verification = await verifyGenericMediaSemantics(result, {
+        signal: context.signal,
+      });
       return verification.status === "unavailable"
         ? adapters.verify(result, { signal: context.signal })
         : verification;
@@ -488,7 +592,9 @@ export function createGenericToolWorkflow(
     telemetry: {
       async start(runId, request) {
         const bytes =
-          request.input.kind === "file" ? request.input.media.bytes.byteLength : 0;
+          request.input.kind === "file"
+            ? request.input.media.bytes.byteLength
+            : 0;
         await adapters.telemetry.start(runId, {
           toolId: request.toolId,
           inputBytes: bytes,
@@ -569,7 +675,8 @@ const browserAdapters: GenericWorkflowAdapters = {
       to,
       buf: Uint8Array.from(bytes).buffer,
       quality,
-      onProgress: ({ progress }) => context.reportProgress((progress ?? 0) / 100),
+      onProgress: ({ progress }) =>
+        context.reportProgress((progress ?? 0) / 100),
       signal: context.signal,
     });
     return (result.kind === "multiple" ? result.buffers : [result.buffer]).map(
@@ -591,7 +698,8 @@ const browserAdapters: GenericWorkflowAdapters = {
       format,
       buf: Uint8Array.from(bytes).buffer,
       quality,
-      onProgress: ({ progress }) => context.reportProgress((progress ?? 0) / 100),
+      onProgress: ({ progress }) =>
+        context.reportProgress((progress ?? 0) / 100),
       signal: context.signal,
     });
     return new Uint8Array(result);
@@ -623,41 +731,85 @@ const browserAdapters: GenericWorkflowAdapters = {
         const decoded = await decodeToRGBA(
           media.format,
           Uint8Array.from(media.bytes).buffer,
+          signal,
         );
         signal.throwIfAborted();
         const expectedBytes = decoded.width * decoded.height * 4;
         return decodedAllocationExceeds(decoded.width, decoded.height) ||
           decoded.data.byteLength !== expectedBytes
-          ? { status: "rejected", message: "Decoded image is inconsistent or exceeds safety limits" }
+          ? {
+              status: "rejected",
+              message: "Decoded image is inconsistent or exceeds safety limits",
+            }
           : { status: "verified" };
       } catch {
-        return { status: "rejected", message: "Image decoder rejected the file" };
+        signal.throwIfAborted();
+        return {
+          status: "rejected",
+          message: "Image decoder rejected the file",
+        };
       }
     }
     if (media.format === "mp3") {
       const AudioContextConstructor = globalThis.AudioContext;
       if (!AudioContextConstructor) {
-        return { status: "unavailable", message: "Audio decoder is unavailable" };
+        return {
+          status: "unavailable",
+          message: "Audio decoder is unavailable",
+        };
       }
       const context = new AudioContextConstructor();
+      let closePromise: Promise<void> | undefined;
+      const closeContext = () => (closePromise ??= context.close());
+      const onAbort = () => {
+        void closeContext();
+      };
+      signal.addEventListener("abort", onAbort, { once: true });
       try {
-        const decoded = await context.decodeAudioData(
-          Uint8Array.from(media.bytes).buffer,
-        );
+        let rejectAbort: ((reason: unknown) => void) | undefined;
+        const aborted = new Promise<never>((_resolve, reject) => {
+          rejectAbort = reject;
+        });
+        const rejectOnAbort = () =>
+          rejectAbort?.(
+            signal.reason ??
+              new DOMException("The operation was aborted", "AbortError"),
+          );
+        signal.addEventListener("abort", rejectOnAbort, { once: true });
+        let decoded;
+        try {
+          decoded = await Promise.race([
+            context.decodeAudioData(Uint8Array.from(media.bytes).buffer),
+            aborted,
+          ]);
+        } finally {
+          signal.removeEventListener("abort", rejectOnAbort);
+        }
         signal.throwIfAborted();
         const samples = decoded.length * decoded.numberOfChannels;
         return decoded.duration > 0 &&
           Number.isSafeInteger(samples) &&
-          samples <= 64 * 1_024 * 1_024 / 4
+          samples <= (64 * 1_024 * 1_024) / 4
           ? { status: "verified" }
-          : { status: "rejected", message: "Decoded audio exceeds safety limits" };
+          : {
+              status: "rejected",
+              message: "Decoded audio exceeds safety limits",
+            };
       } catch {
-        return { status: "rejected", message: "Audio decoder rejected the file" };
+        signal.throwIfAborted();
+        return {
+          status: "rejected",
+          message: "Audio decoder rejected the file",
+        };
       } finally {
-        await context.close();
+        signal.removeEventListener("abort", onAbort);
+        await closeContext();
       }
     }
-    return { status: "unavailable", message: `No semantic verifier for ${media.format}` };
+    return {
+      status: "unavailable",
+      message: `No semantic verifier for ${media.format}`,
+    };
   },
   deliver: deliverBrowserMedia,
   telemetry: {
@@ -668,8 +820,10 @@ const browserAdapters: GenericWorkflowAdapters = {
         beginToolRun({
           toolId: request.toolId,
           inputBytes: request.inputBytes,
-          from: contract.state === "supported" ? contract.input.format : undefined,
-          to: contract.state === "supported" ? contract.output.format : undefined,
+          from:
+            contract.state === "supported" ? contract.input.format : undefined,
+          to:
+            contract.state === "supported" ? contract.output.format : undefined,
         }),
       );
     },
@@ -751,6 +905,18 @@ export async function runGenericToolFile(
     }
     return failedFileOutcome("acquisition-failed", "File acquisition failed");
   }
+  let mimeType: string;
+  try {
+    mimeType = await resolveFileMimeType(file.type, bytes, options?.signal);
+  } catch (error) {
+    if (options?.signal?.aborted || isAbortError(error)) {
+      return cancelledFileOutcome();
+    }
+    return failedFileOutcome(
+      "acquisition-failed",
+      "File identity detection failed",
+    );
+  }
   return genericToolWorkflow.run(
     {
       toolId,
@@ -759,13 +925,59 @@ export async function runGenericToolFile(
         media: {
           name: file.name,
           format: contract.input.format,
-          mimeType: file.type || contract.input.mimeType,
+          mimeType,
           bytes,
         },
       },
     },
     options,
   );
+}
+
+const SAFE_MIME_ALIASES: Readonly<Record<string, string>> = Object.freeze({
+  "audio/mp3": "audio/mpeg",
+  "image/jpg": "image/jpeg",
+  "image/pjpeg": "image/jpeg",
+  "image/x-png": "image/png",
+});
+
+async function sniffMimeType(
+  bytes: Uint8Array,
+  signal?: AbortSignal,
+): Promise<string | undefined> {
+  if (ascii(bytes, 0, 8) === "\u0089PNG\r\n\u001a\n") return "image/png";
+  if (bytes[0] === 0xff && bytes[1] === 0xd8) return "image/jpeg";
+  if (hasWebpIdentity(bytes)) return "image/webp";
+  if (ascii(bytes, 0, 4) === "%PDF") return "application/pdf";
+  if (ascii(bytes, 0, 4) === "RIFF" && ascii(bytes, 8, 4) === "WAVE")
+    return "audio/wav";
+  const looksLikeMp3 =
+    ascii(bytes, 0, 3) === "ID3" ||
+    bytes
+      .subarray(0, 4_096)
+      .some(
+        (byte, index, prefix) =>
+          byte === 0xff && (prefix[index + 1] ?? 0) >> 5 === 0x7,
+      );
+  if (
+    looksLikeMp3 &&
+    (await verifyMp3Identity(bytes, signal)).status === "verified"
+  )
+    return "audio/mpeg";
+  return undefined;
+}
+
+async function resolveFileMimeType(
+  declared: string,
+  bytes: Uint8Array,
+  signal?: AbortSignal,
+): Promise<string> {
+  const normalized =
+    SAFE_MIME_ALIASES[declared.toLowerCase()] ?? declared.toLowerCase();
+  if (!normalized || normalized === "application/octet-stream") {
+    return (await sniffMimeType(bytes, signal)) ?? "application/octet-stream";
+  }
+  return normalized;
 }
 
 export function getGenericAccept(from: string): string {
@@ -820,7 +1032,8 @@ async function readFileWithSignal(
   const onAbort = () => {
     void reader.cancel(signal?.reason).catch(() => {});
     rejectAbort?.(
-      signal?.reason ?? new DOMException("The operation was aborted", "AbortError"),
+      signal?.reason ??
+        new DOMException("The operation was aborted", "AbortError"),
     );
   };
   signal?.addEventListener("abort", onAbort, { once: true });

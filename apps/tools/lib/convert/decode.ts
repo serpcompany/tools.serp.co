@@ -13,7 +13,10 @@ type ImageDecoderLike = {
   close?: () => void;
 };
 
-type ImageDecoderCtor = new (init: { data: BufferSource; type?: string }) => ImageDecoderLike;
+type ImageDecoderCtor = new (init: {
+  data: BufferSource;
+  type?: string;
+}) => ImageDecoderLike;
 
 type CanvasLike = HTMLCanvasElement | OffscreenCanvas;
 
@@ -42,11 +45,16 @@ async function bitmapToRGBA(source: CanvasSource): Promise<RGBA> {
   if (!ctx) {
     throw new Error("Failed to create 2D canvas context.");
   }
-  const ctx2d = ctx as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
-  ctx2d.drawImage(source, 0, 0, width, height);
-  const img = ctx2d.getImageData(0, 0, width, height);
-  source.close?.();
-  return { data: img.data, width: img.width, height: img.height };
+  const ctx2d = ctx as
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D;
+  try {
+    ctx2d.drawImage(source, 0, 0, width, height);
+    const img = ctx2d.getImageData(0, 0, width, height);
+    return { data: img.data, width: img.width, height: img.height };
+  } finally {
+    source.close?.();
+  }
 }
 
 async function decodeViaImage(blob: Blob): Promise<RGBA> {
@@ -84,31 +92,74 @@ async function decodeViaImage(blob: Blob): Promise<RGBA> {
     const ctx = canvas.getContext("2d")!;
     ctx.drawImage(img, 0, 0);
     const imageData = ctx.getImageData(0, 0, width, height);
-    return { data: imageData.data, width: imageData.width, height: imageData.height };
+    return {
+      data: imageData.data,
+      width: imageData.width,
+      height: imageData.height,
+    };
   } finally {
     URL.revokeObjectURL(url);
   }
 }
 
-async function decodeWithImageDecoder(mime: string | undefined, buf: ArrayBuffer): Promise<RGBA | null> {
-  const ImageDecoderCtor = (globalThis as { ImageDecoder?: ImageDecoderCtor }).ImageDecoder;
+async function decodeWithImageDecoder(
+  mime: string | undefined,
+  buf: ArrayBuffer,
+  signal?: AbortSignal,
+): Promise<RGBA | null> {
+  const ImageDecoderCtor = (globalThis as { ImageDecoder?: ImageDecoderCtor })
+    .ImageDecoder;
   if (!ImageDecoderCtor || !mime) return null;
 
+  const decoder = new ImageDecoderCtor({ data: buf, type: mime });
+  const onAbort = () => decoder.close?.();
   try {
-    const decoder = new ImageDecoderCtor({ data: buf, type: mime });
-    const result = await decoder.decode();
-    decoder.close?.();
+    const result = await awaitWithSignal(decoder.decode(), signal, onAbort);
     return bitmapToRGBA(result.image as CanvasSource);
   } catch {
+    signal?.throwIfAborted();
     return null;
+  } finally {
+    decoder.close?.();
   }
 }
 
-export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA> {
+async function awaitWithSignal<T>(
+  promise: Promise<T>,
+  signal?: AbortSignal,
+  onAbort?: () => void,
+): Promise<T> {
+  signal?.throwIfAborted();
+  if (!signal) return promise;
+  let rejectAbort: ((reason: unknown) => void) | undefined;
+  const aborted = new Promise<never>((_resolve, reject) => {
+    rejectAbort = reject;
+  });
+  const abort = () => {
+    onAbort?.();
+    rejectAbort?.(
+      signal.reason ??
+        new DOMException("The operation was aborted", "AbortError"),
+    );
+  };
+  signal.addEventListener("abort", abort, { once: true });
+  try {
+    return await Promise.race([promise, aborted]);
+  } finally {
+    signal.removeEventListener("abort", abort);
+  }
+}
+
+export async function decodeToRGBA(
+  ext: string,
+  buf: ArrayBuffer,
+  signal?: AbortSignal,
+): Promise<RGBA> {
   const e = (ext || "").toLowerCase();
+  signal?.throwIfAborted();
 
   if (e === "heic" || e === "heif") {
-    return decodeHeifToRGBA(buf);
+    return decodeHeifToRGBA(buf, signal);
   }
 
   const mimeMap: Record<string, string> = {
@@ -127,7 +178,7 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
   const mime = mimeMap[e];
 
   // Prefer ImageDecoder when available (works in workers too).
-  const decoded = await decodeWithImageDecoder(mime, buf);
+  const decoded = await decodeWithImageDecoder(mime, buf, signal);
   if (decoded) return decoded;
 
   // Browser-native decoders handle: jpg/jpeg/png/webp/gif/bmp/avif/ico (varies by engine)
