@@ -44,11 +44,11 @@ test("specialized presentations use the shared React adapter without manual tele
 });
 
 test("presentations cross the explicit acquisition seams", () => {
-  assert.match(presentations.json, /runInteraction\([\s\S]*"json"/);
-  assert.match(presentations.html, /scheduleInteraction\(TOOL_ID, "html"/);
+  assert.match(presentations.json, /runInteraction\(\{[\s\S]*format: "json"/);
+  assert.match(presentations.html, /scheduleInteraction\(\{[\s\S]*format: "html"/);
   assert.match(
     presentations.character,
-    /scheduleInteraction\("character-counter", "text", "text\/plain", text, 250\)/,
+    /scheduleInteraction\(\{[\s\S]*toolId: "character-counter"[\s\S]*value: text[\s\S]*\}, 250\)/,
   );
   assert.match(presentations.csv, /runFiles\(toolId \?\? "csv-combiner"/);
   assert.match(presentations.pdf, /runFile\(toolId, file\)/);

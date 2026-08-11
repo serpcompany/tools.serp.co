@@ -6,6 +6,7 @@ import {
   createBrowserSpecializedWorkflow,
   createSpecializedRunController,
   type BrowserFile,
+  type SpecializedInteractionRequest,
 } from "./specialized-browser-workflow.ts";
 import type { WorkflowDelivery, WorkflowOutcome, WorkflowSnapshot } from "./tool-workflow/index.ts";
 
@@ -31,25 +32,17 @@ export function useSpecializedToolWorkflow() {
     return next;
   }, []);
 
-  const runInteraction = useCallback(async (
-    toolId: string,
-    format: string,
-    mimeType: string,
-    value: string,
-  ) => {
+  const runInteraction = useCallback(async (request: SpecializedInteractionRequest) => {
     deliveries.clear();
-    const next = await controller.runInteraction(toolId, format, mimeType, value);
+    const next = await controller.runInteraction(request);
     return accept(next);
   }, [accept, controller, deliveries]);
 
   const scheduleInteraction = useCallback((
-    toolId: string,
-    format: string,
-    mimeType: string,
-    value: string,
+    request: SpecializedInteractionRequest,
     delay = 800,
   ) => {
-    controller.scheduleInteraction({ toolId, format, mimeType, value }, delay);
+    controller.scheduleInteraction(request, delay);
   }, [controller]);
 
   const runFile = useCallback(async (toolId: string, file: BrowserFile) => {

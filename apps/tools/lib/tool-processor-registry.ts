@@ -6,7 +6,7 @@ import {
 } from './table-operation-policy.ts';
 import { getToolExecutionProvenance } from './tool-execution-provenance.ts';
 import { getGenericToolContract } from './generic-tool-workflow.ts';
-import { SPECIALIZED_TOOL_IDS } from './specialized-tool-workflow.ts';
+import { SPECIALIZED_TOOL_IDS } from './specialized-tool-policy.ts';
 
 export type WiredToolProcessorAvailability = Readonly<{
   kind: 'wired';

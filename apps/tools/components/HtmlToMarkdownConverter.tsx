@@ -31,7 +31,12 @@ export default function HtmlToMarkdownConverter() {
       clear();
       return;
     }
-    scheduleInteraction(TOOL_ID, "html", "text/html", html, 250);
+    scheduleInteraction({
+      toolId: TOOL_ID,
+      format: "html",
+      mimeType: "text/html",
+      value: html,
+    }, 250);
   }, [clear, html, scheduleInteraction]);
 
   useEffect(() => {

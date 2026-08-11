@@ -6,6 +6,7 @@ import Papa from "papaparse";
 
 import {
   createSpecializedToolWorkflow,
+  getSpecializedToolIntent,
   getSpecializedToolContract,
   type SpecializedWorkflowDeliveryPort,
 } from "./specialized-tool-workflow.ts";
@@ -67,6 +68,22 @@ test("specialized contracts enumerate the exact migrated Tool ids and ownership"
     });
   }
   assert.equal(getSpecializedToolContract("not-a-tool").state, "unsupported");
+});
+
+test("specialized execution intent preserves the canonical Catalog operation and output", () => {
+  assert.deepEqual(getSpecializedToolIntent("pdf-editor"), {
+    requestedOperation: "edit",
+    outputs: [{ format: "pdf", mimeType: "application/pdf" }],
+  });
+  assert.deepEqual(getSpecializedToolIntent("pdf-reader"), {
+    requestedOperation: "view",
+    outputs: [{ format: "pdf", mimeType: "application/pdf" }],
+  });
+  assert.deepEqual(getSpecializedToolIntent("character-counter"), {
+    requestedOperation: "convert",
+    outputs: [{ format: "stats", mimeType: "application/json" }],
+  });
+  assert.equal(getSpecializedToolIntent("not-a-tool"), undefined);
 });
 
 test("workflow.run converts JSON interaction to parser-valid CSV", async () => {
@@ -301,9 +318,13 @@ test("shared run controller suppresses stale file reads and cancels replacement/
   await Promise.all([old, latest]);
   assert.deepEqual(requests, ["csv-combiner"]);
 
-  await controller.runInteraction("character-counter", "text", "text/plain", "one");
+  await controller.runInteraction({
+    toolId: "character-counter", format: "text", mimeType: "text/plain", value: "one",
+  });
   const activeSignal = signals.at(-1)!;
-  await controller.runInteraction("character-counter", "text", "text/plain", "two");
+  await controller.runInteraction({
+    toolId: "character-counter", format: "text", mimeType: "text/plain", value: "two",
+  });
   assert.equal(activeSignal.aborted, true);
   controller.dispose();
   assert.equal(signals.at(-1)!.aborted, true);
@@ -343,12 +364,12 @@ test("shared controller projects workflow phases and numeric progress", async ()
     },
   });
 
-  const outcome = await controller.runInteraction(
-    "character-counter",
-    "text",
-    "text/plain",
-    "one two",
-  );
+  const outcome = await controller.runInteraction({
+    toolId: "character-counter",
+    format: "text",
+    mimeType: "text/plain",
+    value: "one two",
+  });
 
   assert.equal(outcome?.status, "succeeded");
   assert.deepEqual(

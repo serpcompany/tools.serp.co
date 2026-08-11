@@ -35,7 +35,12 @@ export default function CharacterCounter({ videoEmbedId }: Props) {
       setStats(EMPTY_STATS);
       return;
     }
-    scheduleInteraction("character-counter", "text", "text/plain", text, 250);
+    scheduleInteraction({
+      toolId: "character-counter",
+      format: "text",
+      mimeType: "text/plain",
+      value: text,
+    }, 250);
   }, [clear, scheduleInteraction, text]);
 
   useEffect(() => {

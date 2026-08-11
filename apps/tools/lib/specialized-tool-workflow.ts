@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import { toolCatalog } from "@serp-tools/app-core/lib/tool-catalog";
 
 import { executionProvenance, type ExecutionEngine } from "./tool-execution-provenance.ts";
 import {
@@ -15,6 +16,11 @@ import {
   type WorkflowOutcome,
   type WorkflowRequest,
 } from "./tool-workflow/index.ts";
+import {
+  getSpecializedToolDefinition,
+  SPECIALIZED_TOOL_IDS,
+  type SpecializedToolFamily,
+} from "./specialized-tool-policy.ts";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8", { fatal: true });
@@ -22,29 +28,7 @@ const MAX_INPUT_BYTES = 32 * 1_024 * 1_024;
 const MAX_OUTPUT_BYTES = 64 * 1_024 * 1_024;
 const PDFJS_WORKER_URL = "/vendor/pdfjs/pdf.worker.min.js";
 
-const PDF_TOOL_IDS = Object.freeze([
-  "pdf-editor",
-  "pdf-editor-extension",
-  "pdf-editor-mac",
-  "pdf-editor-windows",
-  "pdf-reader",
-  "pdf-reader-extension",
-  "pdf-reader-mac",
-  "pdf-reader-windows",
-  "pdf-viewer",
-  "pdf-viewer-extension",
-  "pdf-viewer-windows",
-] as const);
-
-export const SPECIALIZED_TOOL_IDS = Object.freeze([
-  "json-to-csv",
-  "csv-combiner",
-  "html-to-markdown",
-  "character-counter",
-  ...PDF_TOOL_IDS,
-] as const);
-
-type SpecializedToolId = (typeof SPECIALIZED_TOOL_IDS)[number];
+export { SPECIALIZED_TOOL_IDS } from "./specialized-tool-policy.ts";
 type PrimaryOperation = Readonly<{
   class: "library" | "hybrid" | "repository-authored";
   identity: string;
@@ -54,7 +38,7 @@ type PrimaryOperation = Readonly<{
 export type SpecializedToolContract =
   | Readonly<{
       state: "supported";
-      toolId: SpecializedToolId;
+      toolId: string;
       adapterId: "browser-specialized-workflow";
       primaryOperation: PrimaryOperation;
     }>
@@ -104,9 +88,7 @@ const contracts = new Map<string, SpecializedToolContract>(
       state: "supported" as const,
       toolId,
       adapterId: "browser-specialized-workflow" as const,
-      primaryOperation: PDF_TOOL_IDS.includes(toolId as (typeof PDF_TOOL_IDS)[number])
-        ? operations.pdf
-        : operations[toolId as keyof Omit<typeof operations, "pdf">],
+      primaryOperation: operations[getSpecializedToolDefinition(toolId)!.family],
     }),
   ]),
 );
@@ -339,7 +321,7 @@ const characterProcessor = interactionProcessor({
   engineId: "browser-character-counter",
   input: { format: "text", mimeType: "text/plain" },
   output: {
-    format: "character-statistics",
+    format: "stats",
     mimeType: "application/json",
     name: "character-statistics.json",
   },
@@ -455,19 +437,47 @@ const pdfProcessor: ToolProcessor<Readonly<object>> = {
   },
 };
 
-function resolveProcessor(toolId: string): ToolProcessor<unknown, WorkflowAcquiredInput> | undefined {
-  const processor = toolId === "json-to-csv"
+function processorForFamily(
+  family: SpecializedToolFamily | undefined,
+): ToolProcessor<unknown, WorkflowAcquiredInput> | undefined {
+  const processor = family === "json-to-csv"
     ? jsonProcessor
-    : toolId === "csv-combiner"
+    : family === "csv-combiner"
       ? csvProcessor
-      : toolId === "html-to-markdown"
+      : family === "html-to-markdown"
         ? htmlProcessor
-        : toolId === "character-counter"
+        : family === "character-counter"
           ? characterProcessor
-          : PDF_TOOL_IDS.includes(toolId as (typeof PDF_TOOL_IDS)[number])
+          : family === "pdf"
             ? pdfProcessor
             : undefined;
   return processor as unknown as ToolProcessor<unknown, WorkflowAcquiredInput> | undefined;
+}
+
+function resolveProcessor(toolId: string): ToolProcessor<unknown, WorkflowAcquiredInput> | undefined {
+  return processorForFamily(getSpecializedToolDefinition(toolId)?.family);
+}
+
+const canonicalOutputMimeType = Object.freeze({
+  csv: "text/csv",
+  markdown: "text/markdown",
+  pdf: "application/pdf",
+  stats: "application/json",
+} satisfies Record<string, string>);
+
+export function getSpecializedToolIntent(toolId: string) {
+  if (!getSpecializedToolDefinition(toolId)) return undefined;
+  const tool = toolCatalog.getById(toolId);
+  const format = tool?.to ?? tool?.content?.tool.to;
+  const mimeType = format
+    ? canonicalOutputMimeType[format as keyof typeof canonicalOutputMimeType]
+    : undefined;
+  return tool && format && mimeType
+    ? defineToolExecutionIntent({
+        requestedOperation: tool.operation,
+        outputs: [{ format, mimeType }],
+      })
+    : undefined;
 }
 
 export type SpecializedWorkflowDeliveryPort = (media: WorkflowMedia) => Promise<string>;
@@ -490,13 +500,7 @@ export function createSpecializedToolWorkflow(ports: SpecializedWorkflowPorts): 
       interaction: { async acquire(input, context) { context.reportProgress(1); return input.interaction; } },
     },
     resolveIntent(toolId) {
-      const processor = resolveProcessor(toolId);
-      const output = processor?.support.outputs[0];
-      if (!output) return undefined;
-      const operation = PDF_TOOL_IDS.includes(toolId as (typeof PDF_TOOL_IDS)[number])
-        ? toolId.startsWith("pdf-editor") ? "pdf-edit" : "pdf-view"
-        : toolId;
-      return defineToolExecutionIntent({ requestedOperation: operation, outputs: [output] });
+      return getSpecializedToolIntent(toolId);
     },
     resolveProcessor,
     async deliver(result, context) {

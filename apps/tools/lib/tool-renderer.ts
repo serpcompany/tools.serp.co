@@ -1,6 +1,7 @@
 import type { CatalogTool } from '@serp-tools/app-core/lib/tool-catalog';
 
 import { isTableRendererTool } from './table-convert-pages.ts';
+import { getSpecializedPresentationRenderer } from './specialized-tool-policy.ts';
 
 export type ToolRenderer =
   | 'table'
@@ -14,13 +15,8 @@ export type ToolRenderer =
 export function selectToolRenderer(tool: CatalogTool | undefined): ToolRenderer {
   if (!tool?.isActive) return 'not-found';
   if (isTableRendererTool(tool.id)) return 'table';
-  if (
-    ['json-to-csv', 'csv-combiner', 'html-to-markdown', 'character-counter'].includes(
-      tool.id,
-    )
-  ) {
-    return 'specialized';
-  }
+  const specializedRenderer = getSpecializedPresentationRenderer(tool);
+  if (specializedRenderer) return specializedRenderer;
   if (
     (tool.operation === 'convert' || tool.operation === 'compress') &&
     tool.from &&

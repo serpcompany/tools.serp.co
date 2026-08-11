@@ -34,12 +34,12 @@ export default function JsonToCsv({ toolId, videoEmbedId }: Props) {
     if (!adsVisible) setAdsVisible(true);
     if (!videoPlaying) setVideoPlaying(true);
     try {
-      const outcome = await workflow.runInteraction(
-        toolId ?? "json-to-csv",
-        "json",
-        "application/json",
-        jsonInput,
-      );
+      const outcome = await workflow.runInteraction({
+        toolId: toolId ?? "json-to-csv",
+        format: "json",
+        mimeType: "application/json",
+        value: jsonInput,
+      });
       if (outcome?.status !== "succeeded") {
         setError(outcome?.status === "failed" ? outcome.error.message : "Conversion cancelled");
         return;

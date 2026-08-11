@@ -152,12 +152,7 @@ export function createSpecializedRunController(
   workflow: ToolWorkflow,
   options: Readonly<{ observe?(snapshot: WorkflowSnapshot): void }> = {},
 ): Readonly<{
-  runInteraction(
-    toolId: string,
-    format: string,
-    mimeType: string,
-    value: string,
-  ): Promise<WorkflowOutcome | undefined>;
+  runInteraction(request: SpecializedInteractionRequest): Promise<WorkflowOutcome | undefined>;
   runFile(toolId: string, file: BrowserFile): Promise<WorkflowOutcome | undefined>;
   runFiles(toolId: string, files: readonly BrowserFile[]): Promise<WorkflowOutcome | undefined>;
   scheduleInteraction(request: SpecializedInteractionRequest, delay?: number): void;
@@ -184,19 +179,19 @@ export function createSpecializedRunController(
   };
 
   return Object.freeze({
-    async runInteraction(toolId, format, mimeType, value) {
+    async runInteraction(request) {
       if (timer) clearTimeout(timer);
       timer = undefined;
       const run = begin();
       const outcome = await workflow.run({
-        toolId,
+        toolId: request.toolId,
         input: {
           kind: "interaction",
           interaction: {
-            format,
-            mimeType,
-            value,
-            bytes: new TextEncoder().encode(value).byteLength,
+            format: request.format,
+            mimeType: request.mimeType,
+            value: request.value,
+            bytes: new TextEncoder().encode(request.value).byteLength,
           },
         },
       }, { signal: run.controller.signal, observe: options.observe });
@@ -241,12 +236,7 @@ export function createSpecializedRunController(
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         timer = undefined;
-        void this.runInteraction(
-          request.toolId,
-          request.format,
-          request.mimeType,
-          request.value,
-        );
+        void this.runInteraction(request);
       }, delay);
     },
     clear,
