@@ -1,3 +1,5 @@
+import sharp from "sharp";
+
 import {
   createToolWorkflow,
   type ProcessorOptions,
@@ -14,6 +16,21 @@ import {
   getToolExecutionProvenance,
 } from "../tool-execution-provenance.ts";
 import { verifyMediaSemantics as verifyMedia } from "./semantic-validators.ts";
+
+const testSemanticDecoderAdapters = Object.freeze({
+  async decodeJpeg(bytes: Uint8Array) {
+    const image = sharp(bytes);
+    const metadata = await image.metadata();
+    if (metadata.format !== "jpeg") {
+      throw new Error("Sharp did not identify a JPEG image");
+    }
+    const { data, info } = await image
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    return { data, format: "jpeg" as const, width: info.width, height: info.height };
+  },
+});
 
 type ProcessorEngine = ToolProcessor["engine"];
 
@@ -178,7 +195,8 @@ export function createToolWorkflowTestHarness(options: {
           },
           async verifyInput(input): Promise<SemanticVerification> {
             return (
-              (await script.validators?.input?.(input)) ?? verifyMedia(input)
+              (await script.validators?.input?.(input)) ??
+              verifyMedia(input, testSemanticDecoderAdapters)
             );
           },
           async process(_input, processorOptions, context) {
@@ -234,7 +252,8 @@ export function createToolWorkflowTestHarness(options: {
             }
             context.signal.throwIfAborted();
             return (
-              (await script.validators?.output?.(result)) ?? verifyMedia(result)
+              (await script.validators?.output?.(result)) ??
+              verifyMedia(result, testSemanticDecoderAdapters)
             );
           },
         } satisfies ToolProcessor,

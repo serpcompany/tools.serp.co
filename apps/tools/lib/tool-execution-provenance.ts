@@ -84,8 +84,11 @@ const engineById = defineEngines({
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
-      class: 'platform-primitive',
-      identity: 'WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
+      class: 'hybrid',
+      identity:
+        'libheif, WebCodecs ImageDecoder, createImageBitmap, Canvas 2D, and pdf-lib',
+      rationale:
+        'Repository dispatch uses libheif for HEIC/HEIF inputs, browser image primitives for other raster inputs, Canvas for raster encoding, and pdf-lib for PDF outputs.',
     },
   },
   'browser-pdf-pages': {
@@ -115,9 +118,9 @@ const engineById = defineEngines({
     implementation: {
       class: 'hybrid',
       identity:
-        'repository server image decoder plus WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
+        'repository server image decoder, WebCodecs ImageDecoder, createImageBitmap, Canvas 2D, and pdf-lib',
       rationale:
-        'The repository server emits PNG, then the browser decodes and encodes the requested format through platform image and Canvas primitives.',
+        'The repository server emits PNG; browser image and Canvas primitives produce raster outputs, while pdf-lib packages PDF outputs.',
     },
   },
   'browser-ffmpeg-wasm': {

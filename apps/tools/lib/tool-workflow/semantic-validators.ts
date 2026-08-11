@@ -1,3 +1,5 @@
+import decodeJpeg from "@jsquash/jpeg/decode.js";
+import { createFile, type MP4BoxBuffer, type Movie } from "mp4box";
 import Papa from "papaparse";
 import UPNGModule from "upng-js";
 
@@ -15,6 +17,30 @@ const UPNG = UPNGModule as {
   decode(bytes: ArrayBuffer): { width: number; height: number };
   toRGBA8(image: { width: number; height: number }): ArrayBuffer[];
 };
+
+const MAX_DECODED_RGBA_BYTES = 64 * 1_024 * 1_024;
+const MAX_IMAGE_DIMENSION = 16_384;
+const MAX_MP4_PARSE_BYTES = 256 * 1_024 * 1_024;
+
+type DecodedImage = Readonly<{
+  data: Uint8Array | Uint8ClampedArray;
+  format: "jpeg";
+  width: number;
+  height: number;
+}>;
+
+export type SemanticDecoderAdapters = Readonly<{
+  decodeJpeg(bytes: Uint8Array): Promise<DecodedImage>;
+}>;
+
+const defaultDecoderAdapters: SemanticDecoderAdapters = Object.freeze({
+  async decodeJpeg(bytes) {
+    return {
+      ...(await decodeJpeg(Uint8Array.from(bytes).buffer)),
+      format: "jpeg",
+    };
+  },
+});
 
 function crc32(bytes: Uint8Array): number {
   let crc = 0xffffffff;
@@ -63,6 +89,13 @@ function pngStructureError(bytes: Uint8Array): string | undefined {
       if (width === 0 || height === 0) {
         return "PNG dimensions must be non-zero";
       }
+      if (
+        width > MAX_IMAGE_DIMENSION ||
+        height > MAX_IMAGE_DIMENSION ||
+        width > Math.floor(MAX_DECODED_RGBA_BYTES / 4 / height)
+      ) {
+        return "PNG decoded RGBA size exceeds the semantic verification limit";
+      }
     }
     if (type === "IDAT") {
       sawImageData = true;
@@ -95,217 +128,68 @@ function pngStructureError(bytes: Uint8Array): string | undefined {
   return "PNG is missing its IEND chunk";
 }
 
-function jpegStructureError(bytes: Uint8Array): string | undefined {
-  if (bytes[0] !== 0xff || bytes[1] !== 0xd8) {
-    return "JPEG is missing its SOI marker";
-  }
-  let offset = 2;
-  let sawFrame = false;
-  while (offset < bytes.byteLength) {
-    if (bytes[offset] !== 0xff) {
-      return "JPEG segment does not begin with a marker";
-    }
-    while (bytes[offset] === 0xff) {
-      offset += 1;
-    }
-    const marker = bytes[offset];
-    offset += 1;
-    if (marker === undefined) {
-      return "JPEG marker is truncated";
-    }
-    if (marker === 0xd9) {
-      return sawFrame && offset === bytes.byteLength
-        ? undefined
-        : "JPEG EOI marker is invalid or not terminal";
-    }
-    if (offset + 2 > bytes.byteLength) {
-      return "JPEG segment length is truncated";
-    }
-    const length = (bytes[offset]! << 8) | bytes[offset + 1]!;
-    if (length < 2 || length > bytes.byteLength - offset) {
-      return "JPEG segment exceeds the input";
-    }
-    if (
-      (marker >= 0xc0 && marker <= 0xc3) ||
-      (marker >= 0xc5 && marker <= 0xc7) ||
-      (marker >= 0xc9 && marker <= 0xcb) ||
-      (marker >= 0xcd && marker <= 0xcf)
-    ) {
-      const componentCount = bytes[offset + 7];
-      const height = (bytes[offset + 3]! << 8) | bytes[offset + 4]!;
-      const width = (bytes[offset + 5]! << 8) | bytes[offset + 6]!;
-      if (
-        componentCount === undefined ||
-        componentCount === 0 ||
-        length !== 8 + 3 * componentCount ||
-        width === 0 ||
-        height === 0
-      ) {
-        return "JPEG frame header is invalid";
-      }
-      sawFrame = true;
-    }
-    offset += length;
-    if (marker !== 0xda) {
-      continue;
-    }
-    if (!sawFrame) {
-      return "JPEG scan appears before a frame header";
-    }
-    const scanComponentCount = bytes[offset - length + 2];
-    if (
-      scanComponentCount === undefined ||
-      scanComponentCount === 0 ||
-      length !== 6 + 2 * scanComponentCount
-    ) {
-      return "JPEG scan header is invalid";
-    }
-    let sawEntropyData = false;
-    while (offset < bytes.byteLength) {
-      if (bytes[offset] !== 0xff) {
-        sawEntropyData = true;
-        offset += 1;
-        continue;
-      }
-      const next = bytes[offset + 1];
-      if (
-        next === 0x00 ||
-        (next !== undefined && next >= 0xd0 && next <= 0xd7)
-      ) {
-        offset += 2;
-        continue;
-      }
-      if (next === 0xd9) {
-        return sawEntropyData && offset + 2 === bytes.byteLength
-          ? undefined
-          : "JPEG scan is empty or its EOI marker is not terminal";
-      }
-      return "JPEG scan contains an invalid marker";
-    }
-    return "JPEG scan is missing its EOI marker";
-  }
-  return "JPEG is missing its EOI marker";
-}
-
-type BmffBox = { type: string; payloadStart: number; end: number };
-
-function parseBmffChildren(
+async function jpegSemanticError(
   bytes: Uint8Array,
-  start: number,
-  end: number,
-): BmffBox[] | undefined {
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  const boxes: BmffBox[] = [];
-  let offset = start;
-  while (offset < end) {
-    if (end - offset < 8) return undefined;
-    const size = view.getUint32(offset, false);
-    if (size < 8 || size > end - offset) return undefined;
-    boxes.push({
-      type: new TextDecoder().decode(bytes.subarray(offset + 4, offset + 8)),
-      payloadStart: offset + 8,
-      end: offset + size,
-    });
-    offset += size;
-  }
-  return offset === end ? boxes : undefined;
-}
-
-function moovStructureError(
-  bytes: Uint8Array,
-  payloadStart: number,
-  end: number,
-): string | undefined {
-  const children = parseBmffChildren(bytes, payloadStart, end);
-  if (!children) return "MP4 moov child boxes are malformed";
-  if (!children.some(({ type }) => type === "mvhd")) {
-    return "MP4 moov is missing its mvhd box";
-  }
-  const tracks = children.filter(({ type }) => type === "trak");
-  if (tracks.length === 0) return "MP4 moov is missing a trak box";
-  for (const track of tracks) {
-    const trackChildren = parseBmffChildren(
-      bytes,
-      track.payloadStart,
-      track.end,
-    );
+  decoder: SemanticDecoderAdapters["decodeJpeg"],
+): Promise<string | undefined> {
+  try {
+    const decoded = await decoder(bytes);
     if (
-      !trackChildren ||
-      !trackChildren.some(({ type }) => type === "tkhd") ||
-      !trackChildren.some(({ type }) => type === "mdia")
+      !Number.isSafeInteger(decoded.width) ||
+      !Number.isSafeInteger(decoded.height) ||
+      decoded.width < 1 ||
+      decoded.height < 1 ||
+      decoded.format !== "jpeg" ||
+      decoded.width > Math.floor(Number.MAX_SAFE_INTEGER / 4 / decoded.height) ||
+      decoded.data.byteLength !== decoded.width * decoded.height * 4
     ) {
-      return "MP4 trak structure is incomplete";
+      return "JPEG decoder produced inconsistent image data";
     }
+    return undefined;
+  } catch {
+    return "JPEG decoder rejected the image data";
   }
-  return undefined;
 }
 
-function bmffStructureError(bytes: Uint8Array): string | undefined {
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  const requiredPayloadSizes = new Map([
-    ["ftyp", 8],
-    ["mdat", 1],
-    ["moov", 1],
-  ]);
-  const found = new Set<string>();
-  let moovPayload: { start: number; end: number } | undefined;
-  let offset = 0;
-
-  while (offset < bytes.byteLength) {
-    const remaining = bytes.byteLength - offset;
-    if (remaining < 8) {
-      return "MP4 top-level box header is truncated";
-    }
-    const size32 = view.getUint32(offset, false);
-    const type = new TextDecoder().decode(
-      bytes.subarray(offset + 4, offset + 8),
-    );
-    let headerSize = 8;
-    let boxSize: number;
-    if (size32 === 1) {
-      if (remaining < 16) {
-        return `MP4 ${type} extended-size header is truncated`;
-      }
-      const extendedSize = view.getBigUint64(offset + 8, false);
-      if (extendedSize > BigInt(Number.MAX_SAFE_INTEGER)) {
-        return `MP4 ${type} box size is not safely representable`;
-      }
-      headerSize = 16;
-      boxSize = Number(extendedSize);
-    } else {
-      boxSize = size32 === 0 ? remaining : size32;
-    }
-    if (boxSize < headerSize) {
-      return `MP4 ${type} box is smaller than its header`;
-    }
-    if (boxSize > remaining) {
-      return `MP4 ${type} box exceeds the input`;
-    }
-    const requiredPayloadSize = requiredPayloadSizes.get(type);
-    if (requiredPayloadSize !== undefined) {
-      if (boxSize - headerSize < requiredPayloadSize) {
-        return `MP4 ${type} box has no valid payload`;
-      }
-      found.add(type);
-    }
-    if (type === "moov") {
-      moovPayload = { start: offset + headerSize, end: offset + boxSize };
-    }
-    offset += boxSize;
+function bmffSemanticError(bytes: Uint8Array): string | undefined {
+  if (bytes.byteLength > MAX_MP4_PARSE_BYTES) {
+    return "MP4 exceeds the semantic parser input limit";
   }
-  for (const type of requiredPayloadSizes.keys()) {
-    if (!found.has(type)) {
-      return `MP4 is missing its ${type} box`;
+  try {
+    const file = createFile();
+    let info: Movie | undefined;
+    let parserError: string | undefined;
+    file.onReady = (movie) => {
+      info = movie;
+    };
+    file.onError = (_module, message) => {
+      parserError = message;
+    };
+    const buffer = Uint8Array.from(bytes).buffer as MP4BoxBuffer;
+    buffer.fileStart = 0;
+    file.appendBuffer(buffer, true);
+    file.flush();
+    if (parserError) return `MP4 parser rejected the file: ${parserError}`;
+    if (
+      !info?.hasMoov ||
+      info.duration <= 0 ||
+      info.timescale <= 0 ||
+      info.tracks.length === 0 ||
+      info.audioTracks.length + info.videoTracks.length === 0 ||
+      !info.tracks.every(
+        (track) =>
+          track.duration > 0 &&
+          track.timescale > 0 &&
+          track.nb_samples > 0 &&
+          Boolean(track.codec),
+      )
+    ) {
+      return "MP4 parser found no complete timed media tracks";
     }
+    return undefined;
+  } catch {
+    return "MP4 parser rejected the file";
   }
-  if (!moovPayload) return "MP4 is missing its moov box";
-  const moovError = moovStructureError(
-    bytes,
-    moovPayload.start,
-    moovPayload.end,
-  );
-  if (moovError) return moovError;
-  return undefined;
 }
 
 function decodeUtf8(bytes: Uint8Array): string | undefined {
@@ -347,9 +231,10 @@ function csvStructureError(bytes: Uint8Array): string | undefined {
   return undefined;
 }
 
-export function verifyMediaSemantics(
+export async function verifyMediaSemantics(
   media: WorkflowMedia,
-): SemanticVerification {
+  adapters: SemanticDecoderAdapters = defaultDecoderAdapters,
+): Promise<SemanticVerification> {
   if (media.bytes.byteLength === 0) {
     return { status: "rejected", message: `${media.format} result is empty` };
   }
@@ -370,9 +255,9 @@ export function verifyMediaSemantics(
     media.format === "png"
       ? pngStructureError(media.bytes)
       : media.format === "jpg"
-        ? jpegStructureError(media.bytes)
+        ? await jpegSemanticError(media.bytes, adapters.decodeJpeg)
         : media.format === "mp4"
-          ? bmffStructureError(media.bytes)
+          ? bmffSemanticError(media.bytes)
           : media.format === "csv"
             ? csvStructureError(media.bytes)
             : textStructureError(media.bytes);

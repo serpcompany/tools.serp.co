@@ -31,6 +31,12 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   assert.deepEqual(mapped('compress-pdf').executionProfiles, [
     'server-executed',
   ]);
+  assert.deepEqual(resolveConversionDispatch('heic', 'pdf').engineIds, [
+    'browser-raster-worker',
+  ]);
+  assert.deepEqual(resolveConversionDispatch('cr2', 'pdf').engineIds, [
+    'browser-raster-with-server-image-decode',
+  ]);
   assert.deepEqual(
     [
       ['ai', 'svg'],
@@ -77,6 +83,10 @@ test('conversion and compression provenance follows actual dispatch selectors', 
     new URL('./convert/encode.ts', import.meta.url),
     'utf8',
   );
+  const heifSource = readFileSync(
+    new URL('./convert/heif.ts', import.meta.url),
+    'utf8',
+  );
   const compressionWorkerSource = readFileSync(
     new URL('../workers/compress.worker.js', import.meta.url),
     'utf8',
@@ -89,8 +99,11 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   assert.match(convertWorkerSource, /encodeFromRGBA/);
   assert.match(decodeSource, /ImageDecoder/);
   assert.match(decodeSource, /createImageBitmap/);
+  assert.match(decodeSource, /decodeHeifToRGBA/);
+  assert.match(heifSource, /libheif/);
   assert.match(encodeSource, /OffscreenCanvas/);
   assert.match(encodeSource, /convertToBlob/);
+  assert.match(encodeSource, /import\("pdf-lib"\)/);
   assert.match(
     workerClientSource,
     /convertImageViaApi\(\{ \.\.\.args, to: "png" \}\)/,
@@ -104,8 +117,11 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   assert.deepEqual(
     executionProvenance.getEngine('browser-raster-worker')?.implementation,
     {
-      class: 'platform-primitive',
-      identity: 'WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
+      class: 'hybrid',
+      identity:
+        'libheif, WebCodecs ImageDecoder, createImageBitmap, Canvas 2D, and pdf-lib',
+      rationale:
+        'Repository dispatch uses libheif for HEIC/HEIF inputs, browser image primitives for other raster inputs, Canvas for raster encoding, and pdf-lib for PDF outputs.',
     },
   );
   assert.deepEqual(
@@ -115,9 +131,9 @@ test('conversion and compression provenance follows actual dispatch selectors', 
     {
       class: 'hybrid',
       identity:
-        'repository server image decoder plus WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
+        'repository server image decoder, WebCodecs ImageDecoder, createImageBitmap, Canvas 2D, and pdf-lib',
       rationale:
-        'The repository server emits PNG, then the browser decodes and encodes the requested format through platform image and Canvas primitives.',
+        'The repository server emits PNG; browser image and Canvas primitives produce raster outputs, while pdf-lib packages PDF outputs.',
     },
   );
   assert.deepEqual(
@@ -206,8 +222,11 @@ test('read-only provenance is joinable by every canonical Tool id', () => {
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
-      class: 'platform-primitive',
-      identity: 'WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
+      class: 'hybrid',
+      identity:
+        'libheif, WebCodecs ImageDecoder, createImageBitmap, Canvas 2D, and pdf-lib',
+      rationale:
+        'Repository dispatch uses libheif for HEIC/HEIF inputs, browser image primitives for other raster inputs, Canvas for raster encoding, and pdf-lib for PDF outputs.',
     },
   });
   assert.equal(executionProvenance.getEngine('toString'), undefined);
