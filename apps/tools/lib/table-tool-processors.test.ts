@@ -2,8 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { PDFDocument } from "pdf-lib";
-import sharp from "sharp";
+import { PDFDocument, StandardFonts } from "pdf-lib";
 
 import { toolCatalog } from "../../../packages/app-core/src/lib/tool-catalog.ts";
 import {
@@ -11,7 +10,10 @@ import {
   getPlaceholder,
 } from "../components/table-convert/formats.ts";
 import { getTableRendererToolIds } from "./table-convert-pages.ts";
-import { createBrowserTableWorkflow } from "./table-browser-workflow.ts";
+import {
+  createBrowserTableWorkflow,
+  createLatestFileReader,
+} from "./table-browser-workflow.ts";
 import {
   tableInputContracts,
   tableOutputContracts,
@@ -22,7 +24,9 @@ import {
   createTableOperationStateResolver,
   createTableToolWorkflow,
   getTableOperationState,
-  type TableRasterizer,
+  parseTableInput,
+  serializeTableInputText,
+  verifyTablePdfOutput,
   type TableWorkflowDeliveryPort,
 } from "./table-tool-processors.ts";
 
@@ -63,7 +67,7 @@ Ada & analytical engine \\
   yaml: encoder.encode("- name: Ada\n  note: analytical engine\n"),
 };
 
-function createRecordingWorkflow(rasterize?: TableRasterizer) {
+function createRecordingWorkflow() {
   const deliveries: Parameters<TableWorkflowDeliveryPort>[0][] = [];
   const workflow = createTableToolWorkflow({
     deliver: async (media) => {
@@ -78,39 +82,9 @@ function createRecordingWorkflow(rasterize?: TableRasterizer) {
       let id = 0;
       return (kind) => `${kind}-${++id}`;
     })(),
-    rasterize,
-    verifyRaster: rasterize
-      ? async (bytes, format) => {
-          const metadata = await sharp(bytes).metadata();
-          if (
-            metadata.format !== format ||
-            !metadata.width ||
-            !metadata.height
-          ) {
-            throw new TypeError(`${format} fixture did not decode`);
-          }
-        }
-      : undefined,
   });
   return { deliveries, workflow };
 }
-
-const sharpRasterizer: TableRasterizer = async (table, format) => {
-  const text = [table.headers, ...table.rows]
-    .map(
-      (row, index) =>
-        `<text x="8" y="${24 + index * 24}" font-size="14">${row.join(" | ")}</text>`,
-    )
-    .join("");
-  const image = sharp(
-    Buffer.from(
-      `<svg width="640" height="${(table.rows.length + 2) * 24}">${text}</svg>`,
-    ),
-  );
-  return new Uint8Array(
-    await (format === "png" ? image.png() : image.jpeg()).toBuffer(),
-  );
-};
 
 test("every active table Tool id has one explicit processor state", () => {
   const toolIds = getTableRendererToolIds();
@@ -125,7 +99,7 @@ test("every active table Tool id has one explicit processor state", () => {
         states.filter((entry) => entry.kind === kind).length,
       ]),
     ),
-    { supported: 93, unsupported: 46, unknown: 0 },
+    { supported: 80, unsupported: 59, unknown: 0 },
   );
 
   assert.deepEqual(getTableOperationState("csv-to-json"), {
@@ -164,10 +138,10 @@ test("every supported table Tool id resolves and succeeds through workflow.run",
   const states = getTableRendererToolIds()
     .map(getTableOperationState)
     .filter((state) => state.kind === "supported");
-  assert.equal(states.length, 93);
+  assert.equal(states.length, 80);
 
   for (const state of states) {
-    const { deliveries, workflow } = createRecordingWorkflow(sharpRasterizer);
+    const { deliveries, workflow } = createRecordingWorkflow();
     const inputContract = tableInputContracts[state.from];
     const outcome = await workflow.run({
       toolId: state.toolId,
@@ -361,6 +335,13 @@ test("workflow.run serializes YAML rows as parseable delimiter-safe CSV", async 
 
 test("Markdown preserves ordinary and trailing backslashes while unescaping pipes", async () => {
   const { deliveries, workflow } = createRecordingWorkflow();
+  const markdownBytes = encoder.encode(
+    String.raw`| path | trailing | delimiter |
+| --- | --- | --- |
+| C:\temp\file | slash\\ | pipe\|kept |
+| D:\docs | end\\ | pipe\|
+`,
+  );
   const outcome = await workflow.run({
     toolId: "markdown-to-json",
     input: {
@@ -369,12 +350,7 @@ test("Markdown preserves ordinary and trailing backslashes while unescaping pipe
         name: "paths.md",
         format: "markdown",
         mimeType: "text/markdown",
-        bytes: encoder.encode(
-          String.raw`| path | trailing | delimiter |
-| --- | --- | --- |
-| C:\temp\file | slash\\ | pipe\|kept |
-`,
-        ),
+        bytes: markdownBytes,
       },
     },
   });
@@ -386,7 +362,30 @@ test("Markdown preserves ordinary and trailing backslashes while unescaping pipe
       trailing: "slash\\",
       delimiter: "pipe|kept",
     },
+    {
+      path: String.raw`D:\docs`,
+      trailing: "end\\",
+      delimiter: "pipe|",
+    },
   ]);
+  assert.deepEqual(await parseTableInput("markdown", markdownBytes), {
+    headers: ["path", "trailing", "delimiter"],
+    rows: [
+      [String.raw`C:\temp\file`, "slash\\", "pipe|kept"],
+      [String.raw`D:\docs`, "end\\", "pipe|"],
+    ],
+  });
+  const serialized = await serializeTableInputText("markdown", {
+    headers: ["path", "trailing", "delimiter"],
+    rows: [[String.raw`C:\temp\file`, "slash\\", "pipe|"]],
+  });
+  assert.deepEqual(
+    await parseTableInput("markdown", encoder.encode(serialized)),
+    {
+      headers: ["path", "trailing", "delimiter"],
+      rows: [[String.raw`C:\temp\file`, "slash\\", "pipe|"]],
+    },
+  );
 });
 
 test("workflow.run parses an HTML table and preserves its row schema", async () => {
@@ -557,6 +556,30 @@ test("workflow.run emits a parseable XLSX workbook with preserved cells", async 
   ]);
 });
 
+test("XLSX output rejects all-empty data rows before processing", async () => {
+  const { deliveries, workflow } = createRecordingWorkflow();
+  const outcome = await workflow.run({
+    toolId: "json-to-excel",
+    input: {
+      kind: "file",
+      media: {
+        name: "empty-row.json",
+        format: "json",
+        mimeType: "application/json",
+        bytes: encoder.encode('[{"name":"","note":""}]'),
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  if (outcome.status === "failed") {
+    assert.equal(outcome.error.code, "invalid-request");
+    assert.equal(outcome.telemetry.start, "not-attempted");
+    assert.match(outcome.error.message, /empty XLSX row/i);
+  }
+  assert.equal(deliveries.length, 0);
+});
+
 test("workflow.run emits a loadable PDF document with at least one page", async () => {
   const { deliveries, workflow } = createRecordingWorkflow();
   const outcome = await workflow.run({
@@ -577,85 +600,154 @@ test("workflow.run emits a loadable PDF document with at least one page", async 
     deliveries[0]?.bytes ?? new Uint8Array(),
   );
   assert.equal(document.getPageCount(), 1);
+  await verifyTablePdfOutput(deliveries[0]?.bytes ?? new Uint8Array(), {
+    headers: ["name", "note"],
+    rows: [["Ada", "analytical engine"]],
+  });
+
+  const blank = await PDFDocument.create();
+  blank.addPage();
+  await assert.rejects(
+    verifyTablePdfOutput(await blank.save(), {
+      headers: ["name"],
+      rows: [["Ada"]],
+    }),
+    /schema|content/i,
+  );
 });
 
-test("workflow.run emits decodable PNG and JPEG table images", async () => {
-  const png = createRecordingWorkflow(sharpRasterizer);
-  const pngOutcome = await png.workflow.run({
-    toolId: "csv-to-png",
+test("PDF verification rejects semantically complete text drawn outside actual page bounds", async () => {
+  const document = await PDFDocument.create();
+  const font = await document.embedFont(StandardFonts.Helvetica);
+  const page = document.addPage([80, 120]);
+  page.drawText("name", { x: 70, y: 90, font, size: 9 });
+  page.drawText("Ada", { x: 70, y: 70, font, size: 9 });
+
+  await assert.rejects(
+    verifyTablePdfOutput(await document.save(), {
+      headers: ["name"],
+      rows: [["Ada"]],
+    }),
+    /page bounds/i,
+  );
+});
+
+test("PDF verification preserves every row across actual page breaks", async () => {
+  const rows = Array.from({ length: 60 }, (_, index) => [
+    `person-${index + 1}`,
+    `note-${index + 1}`,
+  ]);
+  const { deliveries, workflow } = createRecordingWorkflow();
+  const outcome = await workflow.run({
+    toolId: "csv-to-pdf",
     input: {
       kind: "file",
       media: {
         name: "people.csv",
         format: "csv",
         mimeType: "text/csv",
-        bytes: encoder.encode("name,note\r\nAda,analytical engine\r\n"),
-      },
-    },
-  });
-  assert.equal(pngOutcome.status, "succeeded");
-  assert.deepEqual(
-    await sharp(png.deliveries[0]?.bytes)
-      .metadata()
-      .then(({ format, width, height }) => ({
-        format,
-        width,
-        height,
-      })),
-    { format: "png", width: 640, height: 72 },
-  );
-
-  const jpeg = createRecordingWorkflow(sharpRasterizer);
-  const jpegOutcome = await jpeg.workflow.run({
-    toolId: "markdown-to-jpeg",
-    input: {
-      kind: "file",
-      media: {
-        name: "people.md",
-        format: "markdown",
-        mimeType: "text/markdown",
         bytes: encoder.encode(
-          "| name | note |\n| --- | --- |\n| Ada | analytical engine |\n",
+          ["name,note", ...rows.map((row) => row.join(","))].join("\r\n"),
         ),
       },
     },
   });
-  assert.equal(jpegOutcome.status, "succeeded");
-  assert.equal(
-    (await sharp(jpeg.deliveries[0]?.bytes).metadata()).format,
-    "jpeg",
-  );
+
+  assert.equal(outcome.status, "succeeded");
+  const bytes = deliveries[0]?.bytes ?? new Uint8Array();
+  assert.ok((await PDFDocument.load(bytes)).getPageCount() > 1);
+  await verifyTablePdfOutput(bytes, { headers: ["name", "note"], rows });
 });
 
-test("PDF, PNG, and JPEG fail closed before lossy long-cell rendering", async () => {
+test("raster table operations are explicitly unsupported without semantic visual proof", async () => {
+  const twentyThreeColumns = Array.from(
+    { length: 23 },
+    (_, index) => `c${index + 1}`,
+  );
+  const oneHundredTwentyEightRows = Array.from(
+    { length: 128 },
+    (_, index) => `row-${index + 1}`,
+  );
   const cases = [
-    { toolId: "csv-to-pdf", value: "p".repeat(81) },
-    { toolId: "csv-to-png", value: "p".repeat(29) },
-    { toolId: "csv-to-jpeg", value: "p".repeat(29) },
+    {
+      toolId: "csv-to-png",
+      format: "csv" as const,
+      bytes: encoder.encode(
+        `${twentyThreeColumns.join(",")}\r\n${twentyThreeColumns.map(() => "x").join(",")}\r\n`,
+      ),
+    },
+    {
+      toolId: "csv-to-jpeg",
+      format: "csv" as const,
+      bytes: encoder.encode(
+        `name\r\n${oneHundredTwentyEightRows.join("\r\n")}\r\n`,
+      ),
+    },
+    {
+      toolId: "markdown-to-jpeg",
+      format: "markdown" as const,
+      bytes: encoder.encode("| name |\n| --- |\n| Ada |\n"),
+    },
+  ];
+  for (const { toolId, format, bytes } of cases) {
+    assert.equal(getTableOperationState(toolId).kind, "unsupported");
+    const { deliveries, workflow } = createRecordingWorkflow();
+    const outcome = await workflow.run({
+      toolId,
+      input: {
+        kind: "file",
+        media: {
+          name: `people.${format}`,
+          format,
+          mimeType: tableInputContracts[format].mimeTypes[0]!,
+          bytes,
+        },
+      },
+    });
+    assert.equal(outcome.status, "failed");
+    if (outcome.status === "failed") {
+      assert.equal(outcome.error.code, "unsupported-tool");
+      assert.equal(outcome.telemetry.start, "not-attempted");
+    }
+    assert.equal(deliveries.length, 0);
+  }
+});
+
+test("PDF rejects infeasible measured text widths and column layouts before telemetry", async () => {
+  const hundredHeaders = Array.from(
+    { length: 100 },
+    (_, index) => `c${index + 1}`,
+  );
+  const cases = [
+    encoder.encode(`name,note\r\nAda,${"W".repeat(80)}\r\n`),
+    encoder.encode(
+      `${hundredHeaders.join(",")}\r\n${hundredHeaders.map(() => "x").join(",")}\r\n`,
+    ),
+    encoder.encode("name,note\r\nAda,\r\n"),
   ];
 
-  for (const fixture of cases) {
-    const { deliveries, workflow } = createRecordingWorkflow(sharpRasterizer);
+  for (const bytes of cases) {
+    const { deliveries, workflow } = createRecordingWorkflow();
     const outcome = await workflow.run({
-      toolId: fixture.toolId,
+      toolId: "csv-to-pdf",
       input: {
         kind: "file",
         media: {
           name: "long-cell.csv",
           format: "csv",
           mimeType: "text/csv",
-          bytes: encoder.encode(`name,note\r\nAda,${fixture.value}\r\n`),
+          bytes,
         },
       },
     });
 
-    assert.equal(outcome.status, "failed", fixture.toolId);
+    assert.equal(outcome.status, "failed");
     if (outcome.status === "failed") {
-      assert.equal(outcome.error.code, "invalid-request", fixture.toolId);
-      assert.equal(outcome.telemetry.start, "not-attempted", fixture.toolId);
-      assert.match(outcome.error.message, /lossless/i, fixture.toolId);
+      assert.equal(outcome.error.code, "invalid-request");
+      assert.equal(outcome.telemetry.start, "not-attempted");
+      assert.match(outcome.error.message, /lossless/i);
     }
-    assert.equal(deliveries.length, 0, fixture.toolId);
+    assert.equal(deliveries.length, 0);
   }
 });
 
@@ -759,7 +851,13 @@ test("table presentation delegates execution, terminal telemetry, and delivery p
   assert.match(presentation, /workflow\.run\(/);
   assert.match(presentation, /deliveries\.download\(/);
   assert.match(presentation, /deliveries\.release\(/);
+  assert.match(presentation, /deliveries\.clear\(\)/);
+  assert.match(presentation, /fileReader\.invalidate\(\)/);
+  assert.match(presentation, /createLatestFileReader/);
+  assert.match(presentation, /AbortController/);
+  assert.match(presentation, /runAbortRef\.current\?\.abort\(\)/);
   assert.match(presentation, /disabled=\{!delivery\}/);
+  assert.doesNotMatch(presentation, /table-convert\/convert/);
   assert.doesNotMatch(
     presentation,
     /beginToolRun|saveBlob|finishSuccess|finishFailure/,
@@ -819,4 +917,28 @@ test("browser delivery ownership retains only the latest result and supports exp
     binary.status === "succeeded" ? binary.results[0] : undefined;
   assert.ok(binaryDelivery);
   assert.equal(deliveries.text(binaryDelivery.deliveryId), undefined);
+});
+
+test("latest file reader discards superseded and invalidated asynchronous reads", async () => {
+  const reader = createLatestFileReader();
+  let releaseOld: ((value: ArrayBuffer) => void) | undefined;
+  const oldFile = {
+    arrayBuffer: () =>
+      new Promise<ArrayBuffer>((resolve) => {
+        releaseOld = resolve;
+      }),
+  };
+  const newFile = {
+    arrayBuffer: async () => Uint8Array.from([2]).buffer,
+  };
+
+  const oldRead = reader.read(oldFile);
+  const newRead = reader.read(newFile);
+  assert.deepEqual(await newRead, Uint8Array.from([2]));
+  releaseOld?.(Uint8Array.from([1]).buffer);
+  assert.equal(await oldRead, undefined);
+
+  const invalidatedRead = reader.read(newFile);
+  reader.invalidate();
+  assert.equal(await invalidatedRead, undefined);
 });

@@ -50,22 +50,62 @@ export type TableWorkflowPorts = Readonly<{
   telemetry: TableWorkflowTelemetryPort;
   nextId(kind: "run" | "delivery"): string;
   clock?: Readonly<{ now(): number }>;
-  rasterize?: TableRasterizer;
-  verifyRaster?: TableRasterVerifier;
 }>;
-
-export type TableRasterizer = (
-  table: TableData,
-  format: "png" | "jpeg",
-) => Promise<Uint8Array>;
-
-export type TableRasterVerifier = (
-  bytes: Uint8Array,
-  format: "png" | "jpeg",
-) => Promise<void>;
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8", { fatal: true });
+const PDF_PAGE_WIDTH = 612;
+const PDF_MARGIN = 36;
+const PDF_FONT_SIZE = 9;
+const PDF_CELL_PADDING = 6;
+const PDFJS_WORKER_URL = "/vendor/pdfjs/pdf.worker.min.js";
+
+type PdfTextItem = Readonly<{
+  str: string;
+  height: number;
+  width: number;
+  transform: readonly number[];
+}>;
+
+type PdfTextPage = Readonly<{
+  view: readonly number[];
+  getTextContent(options: {
+    disableNormalization: boolean;
+  }): Promise<Readonly<{ items: readonly (PdfTextItem | object)[] }>>;
+}>;
+
+type PdfTextModule = Readonly<{
+  GlobalWorkerOptions?: { workerSrc: string };
+  getDocument(options: {
+    data: Uint8Array;
+    isEvalSupported: boolean;
+    useSystemFonts: boolean;
+    useWorkerFetch: boolean;
+  }): Readonly<{
+    promise: Promise<
+      Readonly<{
+        numPages: number;
+        getPage(pageNumber: number): Promise<PdfTextPage>;
+      }>
+    >;
+    destroy(): Promise<void>;
+  }>;
+}>;
+
+async function loadPdfTextModule(): Promise<PdfTextModule> {
+  if (typeof window !== "undefined") {
+    const pdfjs = (await import(
+      /* webpackIgnore: true */ "/vendor/pdfjs/pdf.min.mjs"
+    )) as unknown as PdfTextModule;
+    if (pdfjs.GlobalWorkerOptions) {
+      pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+    }
+    return pdfjs;
+  }
+  return (await import(
+    "pdfjs-dist/legacy/build/pdf.mjs"
+  )) as unknown as PdfTextModule;
+}
 
 const tableEngine = executionProvenance.getEngine("browser-table-converter");
 if (!tableEngine) {
@@ -342,8 +382,17 @@ function parseMarkdown(bytes: Uint8Array): TableData {
   if (lines.length < 3) {
     throw new TypeError("Markdown table requires a header, divider, and row");
   }
-  const parseRow = (line: string) =>
-    splitDelimitedRow(line.replace(/^\|/, "").replace(/\|$/, ""), "|");
+  const parseRow = (line: string) => {
+    let row = line.startsWith("|") ? line.slice(1) : line;
+    if (row.endsWith("|")) {
+      let backslashes = 0;
+      for (let index = row.length - 2; row[index] === "\\"; index -= 1) {
+        backslashes += 1;
+      }
+      if (backslashes % 2 === 0) row = row.slice(0, -1);
+    }
+    return splitDelimitedRow(row, "|");
+  };
   const [headerLine, dividerLine, ...rowLines] = lines;
   if (!headerLine || !dividerLine)
     throw new TypeError("Markdown table is incomplete");
@@ -479,7 +528,7 @@ function parseMediaWiki(bytes: Uint8Array): TableData {
   return assertTable(headers, rows, "MediaWiki");
 }
 
-async function parseInputTable(
+export async function parseTableInput(
   format: TableInputFormat,
   bytes: Uint8Array,
 ): Promise<TableData> {
@@ -523,6 +572,10 @@ function escapeLatex(value: string): string {
     .replace(/([&%$#_{}])/g, "\\$1");
 }
 
+function escapeMarkdown(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
+}
+
 function escapeSql(value: string): string {
   return `'${value.replace(/'/g, "''")}'`;
 }
@@ -548,10 +601,10 @@ async function serializeExcel(table: TableData): Promise<Uint8Array> {
 async function serializePdf(table: TableData): Promise<Uint8Array> {
   const document = await PDFDocument.create();
   const font = await document.embedFont(StandardFonts.Helvetica);
-  const fontSize = 9;
+  const fontSize = PDF_FONT_SIZE;
   const lineHeight = 16;
-  const margin = 36;
-  let page = document.addPage([612, 792]);
+  const margin = PDF_MARGIN;
+  let page = document.addPage([PDF_PAGE_WIDTH, 792]);
   let y = page.getHeight() - margin;
   const drawRow = (row: readonly string[], header = false) => {
     const available = page.getWidth() - margin * 2;
@@ -579,7 +632,7 @@ async function serializePdf(table: TableData): Promise<Uint8Array> {
   drawRow(table.headers, true);
   for (const row of table.rows) {
     if (y < margin + lineHeight) {
-      page = document.addPage([612, 792]);
+      page = document.addPage([PDF_PAGE_WIDTH, 792]);
       y = page.getHeight() - margin;
       drawRow(table.headers, true);
     }
@@ -588,92 +641,9 @@ async function serializePdf(table: TableData): Promise<Uint8Array> {
   return document.save();
 }
 
-export async function browserTableRasterizer(
-  table: TableData,
-  format: "png" | "jpeg",
-): Promise<Uint8Array> {
-  if (typeof document === "undefined") {
-    throw new TypeError("Browser Canvas is unavailable for table image output");
-  }
-  const cellHeight = 32;
-  const measurementCanvas = document.createElement("canvas");
-  const measurementContext = measurementCanvas.getContext("2d");
-  if (!measurementContext) {
-    throw new TypeError("Canvas 2D context is unavailable");
-  }
-  measurementContext.font = "14px sans-serif";
-  const widestCell = Math.max(
-    ...[table.headers, ...table.rows]
-      .flat()
-      .map((cell) => measurementContext.measureText(cell).width),
-  );
-  const cellWidth = Math.max(180, Math.ceil(widestCell) + 16);
-  if (
-    table.headers.length * cellWidth > 4096 ||
-    (table.rows.length + 1) * cellHeight > 4096
-  ) {
-    throw new TypeError("Table exceeds the verified Canvas output dimensions");
-  }
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, table.headers.length) * cellWidth;
-  canvas.height = (table.rows.length + 1) * cellHeight;
-  const context = canvas.getContext("2d");
-  if (!context) throw new TypeError("Canvas 2D context is unavailable");
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  context.font = "14px sans-serif";
-  [table.headers, ...table.rows].forEach((row, rowIndex) => {
-    row.forEach((cell, columnIndex) => {
-      const x = columnIndex * cellWidth;
-      const y = rowIndex * cellHeight;
-      context.fillStyle = rowIndex === 0 ? "#eef2f7" : "#ffffff";
-      context.fillRect(x, y, cellWidth, cellHeight);
-      context.strokeStyle = "#94a3b8";
-      context.strokeRect(x, y, cellWidth, cellHeight);
-      context.fillStyle = "#111827";
-      context.fillText(cell, x + 8, y + 21);
-    });
-  });
-  const blob = await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob(
-      (value) =>
-        value
-          ? resolve(value)
-          : reject(new TypeError("Canvas encoding failed")),
-      format === "png" ? "image/png" : "image/jpeg",
-      0.9,
-    ),
-  );
-  return new Uint8Array(await blob.arrayBuffer());
-}
-
-export async function browserTableRasterVerifier(
-  bytes: Uint8Array,
-  format: "png" | "jpeg",
-): Promise<void> {
-  if (typeof createImageBitmap !== "function") {
-    throw new TypeError("Browser image decoding is unavailable");
-  }
-  const image = await createImageBitmap(
-    new Blob([Uint8Array.from(bytes)], {
-      type: format === "png" ? "image/png" : "image/jpeg",
-    }),
-  );
-  try {
-    if (image.width < 1 || image.height < 1) {
-      throw new TypeError(
-        `${format.toUpperCase()} output has invalid dimensions`,
-      );
-    }
-  } finally {
-    image.close();
-  }
-}
-
 async function serializeTable(
   format: TableOutputFormat,
   table: TableData,
-  rasterize: TableRasterizer,
 ): Promise<Uint8Array> {
   switch (format) {
     case "csv":
@@ -691,9 +661,6 @@ async function serializeTable(
       );
       return encoder.encode(serialize(fragment));
     }
-    case "jpeg":
-    case "png":
-      return rasterize(table, format);
     case "json":
       return encoder.encode(JSON.stringify(tableToObjects(table), null, 2));
     case "jsonlines":
@@ -717,8 +684,8 @@ async function serializeTable(
     case "markdown":
       return encoder.encode(
         markdownTable([
-          [...table.headers],
-          ...table.rows.map((row) => [...row]),
+          table.headers.map(escapeMarkdown),
+          ...table.rows.map((row) => row.map(escapeMarkdown)),
         ]),
       );
     case "mediawiki":
@@ -770,6 +737,16 @@ async function serializeTable(
   }
 }
 
+export async function serializeTableInputText(
+  format: TableInputFormat,
+  table: TableData,
+): Promise<string> {
+  if (format === "excel") {
+    throw new TypeError("XLSX input requires a binary workbook upload");
+  }
+  return decoder.decode(await serializeTable(format, table));
+}
+
 function tableEquals(left: TableData, right: TableData): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
 }
@@ -783,41 +760,104 @@ function isWinAnsiText(value: string): boolean {
   });
 }
 
-function assertLosslessVisualInput(
-  table: TableData,
-  format: TableOutputFormat,
-): void {
-  const maximum =
-    format === "pdf"
-      ? 80
-      : format === "png" || format === "jpeg"
-        ? 28
-        : undefined;
+async function assertLosslessPdfLayout(table: TableData): Promise<void> {
   if (
-    maximum !== undefined &&
-    [...table.headers, ...table.rows.flat()].some(
-      (cell) => [...cell].length > maximum,
-    )
+    [...table.headers, ...table.rows.flat()].some((cell) => cell.trim() === "")
   ) {
     throw new TypeError(
-      `${format.toUpperCase()} output requires every cell to be ${maximum} characters or fewer for lossless rendering`,
+      "PDF lossless layout cannot independently preserve empty cells",
     );
+  }
+  const availableWidth = PDF_PAGE_WIDTH - PDF_MARGIN * 2;
+  const cellWidth = availableWidth / table.headers.length;
+  const textWidth = cellWidth - PDF_CELL_PADDING;
+  if (textWidth <= 0) {
+    throw new TypeError("PDF lossless layout has no drawable column width");
+  }
+  const document = await PDFDocument.create();
+  const font = await document.embedFont(StandardFonts.Helvetica);
+  const overflowingCell = [...table.headers, ...table.rows.flat()].find(
+    (cell) => font.widthOfTextAtSize(cell, PDF_FONT_SIZE) > textWidth,
+  );
+  if (overflowingCell !== undefined) {
+    throw new TypeError(
+      "PDF lossless layout cannot fit every cell within the page bounds",
+    );
+  }
+}
+
+export async function verifyTablePdfOutput(
+  bytes: Uint8Array,
+  expected: TableData,
+): Promise<void> {
+  const { getDocument } = await loadPdfTextModule();
+  const loadingTask = getDocument({
+    data: Uint8Array.from(bytes),
+    isEvalSupported: false,
+    useSystemFonts: true,
+    useWorkerFetch: false,
+  });
+  const document = await loadingTask.promise;
+  const observedRows: string[][] = [];
+  try {
+    for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+      const page = await document.getPage(pageNumber);
+      const pageLeft = page.view[0];
+      const pageRight = page.view[2];
+      if (pageLeft === undefined || pageRight === undefined) {
+        throw new TypeError("PDF page bounds are unavailable");
+      }
+      const text = await page.getTextContent({ disableNormalization: true });
+      const items = text.items.filter(
+        (item): item is PdfTextItem => "str" in item && item.height > 0,
+      );
+      if (
+        items.some((item) => {
+          const x = item.transform[4] ?? Number.NaN;
+          return (
+            !Number.isFinite(x) || x < pageLeft || x + item.width > pageRight
+          );
+        })
+      ) {
+        throw new TypeError("PDF text extends outside the actual page bounds");
+      }
+      const values = items.map((item) => item.str);
+      const observedHeaders = values.slice(0, expected.headers.length);
+      if (
+        JSON.stringify(observedHeaders) !== JSON.stringify(expected.headers)
+      ) {
+        throw new TypeError("PDF content does not preserve the table schema");
+      }
+      const body = values.slice(expected.headers.length);
+      if (body.length % expected.headers.length !== 0) {
+        throw new TypeError("PDF content has an incomplete table row");
+      }
+      for (
+        let index = 0;
+        index < body.length;
+        index += expected.headers.length
+      ) {
+        observedRows.push(body.slice(index, index + expected.headers.length));
+      }
+    }
+  } finally {
+    await loadingTask.destroy();
+  }
+  if (JSON.stringify(observedRows) !== JSON.stringify(expected.rows)) {
+    throw new TypeError("PDF content does not preserve every table row");
   }
 }
 
 async function verifyOutput(
   format: TableOutputFormat,
   bytes: Uint8Array,
-  verifyRaster: TableRasterVerifier,
+  expectedTable?: TableData,
 ): Promise<TableData | undefined> {
   if (format === "pdf") {
     const document = await PDFDocument.load(bytes);
     if (document.getPageCount() < 1)
       throw new TypeError("PDF output requires a page");
-    return undefined;
-  }
-  if (format === "png" || format === "jpeg") {
-    await verifyRaster(bytes, format);
+    if (expectedTable) await verifyTablePdfOutput(bytes, expectedTable);
     return undefined;
   }
   if (format === "jsonlines") {
@@ -829,14 +869,12 @@ async function verifyOutput(
     return recordsToTable(records, "JSONLines");
   }
   if (format === "excel") return parseExcel(bytes);
-  return parseInputTable(format, bytes);
+  return parseTableInput(format, bytes);
 }
 
 function createTableProcessor(
   from: TableInputFormat,
   to: TableOutputFormat,
-  rasterize: TableRasterizer,
-  verifyRaster: TableRasterVerifier,
 ): ToolProcessor<undefined> {
   const input = tableInputContracts[from];
   const output = tableOutputContracts[to];
@@ -865,8 +903,16 @@ function createTableProcessor(
     },
     async verifyInput(media) {
       try {
-        const table = await parseInputTable(from, media.bytes);
-        assertLosslessVisualInput(table, to);
+        const table = await parseTableInput(from, media.bytes);
+        if (to === "pdf") await assertLosslessPdfLayout(table);
+        if (
+          to === "excel" &&
+          table.rows.some((row) => row.every((cell) => cell === ""))
+        ) {
+          throw new TypeError(
+            "An empty XLSX row cannot be preserved by the workbook reader",
+          );
+        }
         if (
           to === "pdf" &&
           [...table.headers, ...table.rows.flat()].some(
@@ -886,9 +932,9 @@ function createTableProcessor(
       }
     },
     async process(media) {
-      const table = await parseInputTable(from, media.bytes);
-      const bytes = await serializeTable(to, table, rasterize);
-      const verifiedTable = await verifyOutput(to, bytes, verifyRaster);
+      const table = await parseTableInput(from, media.bytes);
+      const bytes = await serializeTable(to, table);
+      const verifiedTable = await verifyOutput(to, bytes, table);
       if (verifiedTable && !tableEquals(table, verifiedTable)) {
         throw new TypeError(`${to} output changed the table schema or rows`);
       }
@@ -903,7 +949,7 @@ function createTableProcessor(
     },
     async verifyResult(result) {
       try {
-        await verifyOutput(to, result.bytes, verifyRaster);
+        await verifyOutput(to, result.bytes);
         return { status: "verified" };
       } catch (error) {
         return {
@@ -915,14 +961,10 @@ function createTableProcessor(
   };
 }
 
-function resolveTableProcessor(
-  toolId: string,
-  rasterize: TableRasterizer = browserTableRasterizer,
-  verifyRaster: TableRasterVerifier = browserTableRasterVerifier,
-): ToolProcessor | undefined {
+function resolveTableProcessor(toolId: string): ToolProcessor | undefined {
   const policy = getTableOperationPolicy(toolId);
   return policy.kind === "eligible"
-    ? createTableProcessor(policy.from, policy.to, rasterize, verifyRaster)
+    ? createTableProcessor(policy.from, policy.to)
     : undefined;
 }
 
@@ -978,8 +1020,7 @@ export const getTableOperationState = createTableOperationStateResolver(
 export function createTableToolWorkflow(
   ports: TableWorkflowPorts,
 ): ToolWorkflow {
-  const resolveProcessor = (toolId: string) =>
-    resolveTableProcessor(toolId, ports.rasterize, ports.verifyRaster);
+  const resolveProcessor = (toolId: string) => resolveTableProcessor(toolId);
   return createToolWorkflow({
     acquisition: {
       file: {

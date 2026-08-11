@@ -2,14 +2,28 @@
 
 import { beginToolRun } from "./telemetry.ts";
 
-import {
-  browserTableRasterizer,
-  browserTableRasterVerifier,
-  createTableToolWorkflow,
-} from "./table-tool-processors.ts";
+import { createTableToolWorkflow } from "./table-tool-processors.ts";
 import type { WorkflowDelivery, WorkflowMedia } from "./tool-workflow/index.ts";
 
 type TelemetryHandle = ReturnType<typeof beginToolRun>;
+
+export function createLatestFileReader(): Readonly<{
+  read(file: Pick<File, "arrayBuffer">): Promise<Uint8Array | undefined>;
+  invalidate(): void;
+}> {
+  let revision = 0;
+  return Object.freeze({
+    async read(file) {
+      revision += 1;
+      const readRevision = revision;
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      return readRevision === revision ? bytes : undefined;
+    },
+    invalidate() {
+      revision += 1;
+    },
+  });
+}
 
 export type BrowserTableDeliveries = Readonly<{
   get(deliveryId: string): WorkflowMedia | undefined;
@@ -42,8 +56,6 @@ export function createBrowserTableWorkflow(): Readonly<{
 
   let sequence = 0;
   const workflow = createTableToolWorkflow({
-    rasterize: browserTableRasterizer,
-    verifyRaster: browserTableRasterVerifier,
     nextId(kind) {
       sequence += 1;
       return `${kind}-${crypto.randomUUID()}-${sequence}`;

@@ -100,11 +100,6 @@ export const tableOutputContracts = Object.freeze({
     extension: "html",
     serializer: library("parse5 8"),
   }),
-  jpeg: Object.freeze({
-    mimeType: "image/jpeg",
-    extension: "jpg",
-    serializer: platform("Canvas 2D"),
-  }),
   json: Object.freeze({
     mimeType: "application/json",
     extension: "json",
@@ -149,11 +144,6 @@ export const tableOutputContracts = Object.freeze({
     extension: "pdf",
     serializer: library("pdf-lib 1"),
   }),
-  png: Object.freeze({
-    mimeType: "image/png",
-    extension: "png",
-    serializer: platform("Canvas 2D"),
-  }),
   sql: Object.freeze({
     mimeType: "application/sql",
     extension: "sql",
@@ -188,11 +178,13 @@ const unsupportedOutputs = Object.freeze([
   "firebase",
   "ini",
   "jira",
+  "jpeg",
   "magic",
   "matlab",
   "pandasdataframe",
   "php",
   "protobuf",
+  "png",
   "qlik",
   "rdataframe",
   "rdf",
@@ -241,6 +233,14 @@ export function getTableOperationPolicy(toolId: string): TableOperationPolicy {
   }
   if (unsupportedOutputSet.has(tool.to)) {
     const label = tool.to.toUpperCase();
+    if (tool.to === "png" || tool.to === "jpeg") {
+      return Object.freeze({
+        kind: "unsupported",
+        toolId,
+        reason: `${label} table output cannot independently prove that the visible raster preserves every schema and row value.`,
+        sourceNeeded: `Adopt an independent visible-content validator before enabling ${label} table output.`,
+      });
+    }
     return Object.freeze({
       kind: "unsupported",
       toolId,

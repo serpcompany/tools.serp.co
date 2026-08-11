@@ -190,7 +190,7 @@ test('specialized and table Tools expose explicit browser-owned engines', () => 
     new URL('./table-tool-processors.ts', import.meta.url),
     'utf8',
   );
-  assert.match(tableSource, /function parseInputTable/);
+  assert.match(tableSource, /function parseTableInput/);
   assert.match(tableSource, /function serializeTable/);
 });
 
