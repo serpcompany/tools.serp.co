@@ -1,4 +1,3 @@
-import { AUDIO_FORMATS, VIDEO_FORMATS } from "../capabilities.ts";
 import { executionProvenance } from "../tool-execution-provenance.ts";
 import type {
   SemanticVerification,
@@ -9,6 +8,7 @@ import type {
 } from "../tool-workflow/index.ts";
 import { verifyMediaSemantics } from "../tool-workflow/semantic-validators.ts";
 import { getExtensionFromName } from "./media-endpoint.ts";
+import { VERIFIED_MEDIA_FORMATS } from "./verified-formats.ts";
 
 export const TRANSCRIPTION_TOOL_IDS = Object.freeze([
   "audio-to-text",
@@ -21,38 +21,21 @@ export const TRANSCRIPTION_TOOL_IDS = Object.freeze([
   "youtube-to-transcript-generator",
 ]);
 
-const formats = Object.freeze([...new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS])]);
+const formats = VERIFIED_MEDIA_FORMATS;
 const mimeTypesByFormat: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  "3g2": ["audio/3gpp2", "video/3gpp2", "application/octet-stream"],
   "3gp": ["audio/3gpp", "video/3gpp", "application/octet-stream"],
-  aac: ["audio/aac", "application/octet-stream"],
-  aif: ["audio/aiff", "audio/x-aiff", "application/octet-stream"],
-  aiff: ["audio/aiff", "audio/x-aiff", "application/octet-stream"],
-  avi: ["video/x-msvideo", "application/octet-stream"],
-  asf: ["video/x-ms-asf", "application/octet-stream"],
-  flac: ["audio/flac", "audio/x-flac", "application/octet-stream"],
-  flv: ["video/x-flv", "application/octet-stream"],
   m4a: ["audio/mp4", "application/octet-stream"],
-  mkv: ["video/x-matroska", "application/octet-stream"],
+  m4v: ["video/mp4", "video/x-m4v", "application/octet-stream"],
   mov: ["video/quicktime", "application/octet-stream"],
   mp3: ["audio/mpeg", "application/octet-stream"],
   mp4: ["video/mp4", "application/octet-stream"],
-  ogg: ["audio/ogg", "application/ogg", "application/octet-stream"],
-  ogv: ["video/ogg", "application/ogg", "application/octet-stream"],
-  opus: ["audio/opus", "audio/ogg", "application/octet-stream"],
-  wav: ["audio/wav", "audio/wave", "audio/x-wav", "application/octet-stream"],
   webm: ["audio/webm", "video/webm", "application/octet-stream"],
-  wmv: ["video/x-ms-wmv", "application/octet-stream"],
 });
 
 function inputContracts() {
   return formats.map((format) => ({
     format,
-    mimeTypes: mimeTypesByFormat[format] ?? [
-      `audio/${format}`,
-      `video/${format}`,
-      "application/octet-stream",
-    ],
+    mimeTypes: mimeTypesByFormat[format] ?? [],
   }));
 }
 

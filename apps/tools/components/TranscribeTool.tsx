@@ -5,12 +5,12 @@ import { Button } from "@serp-tools/ui/components/button";
 import { Card } from "@serp-tools/ui/components/card";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
-import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
 import {
   deliverMediaInBrowser,
   workflowMediaFromFile,
 } from "@/lib/media-workflow/browser";
 import { createBrowserTranscriptionWorkflow } from "@/lib/media-workflow/transcription-browser";
+import { VERIFIED_MEDIA_FORMATS } from "@/lib/media-workflow/verified-formats";
 import type { WorkflowMedia } from "@/lib/tool-workflow";
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
   subtitle?: string;
 };
 
-const SUPPORTED_EXTENSIONS = Array.from(new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS]));
+const SUPPORTED_EXTENSIONS: readonly string[] = VERIFIED_MEDIA_FORMATS;
 const ACCEPT_ATTR = SUPPORTED_EXTENSIONS.map((ext) => `.${ext}`).join(",");
 
 function parseUrlInput(value: string) {

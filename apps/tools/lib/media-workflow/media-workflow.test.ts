@@ -4,9 +4,22 @@ import test from "node:test";
 
 import { getToolProcessorAvailability } from "../tool-processor-registry.ts";
 import { createMediaWorkflowTestHarness } from "./testing.ts";
+import { VERIFIED_MEDIA_FORMATS } from "./verified-formats.ts";
 
 const SAMPLE_MP4_BYTES = new Uint8Array(
-  readFileSync(new URL("../../benchmarks/fixtures/sample.mp4", import.meta.url)),
+  readFileSync(
+    new URL("../../benchmarks/fixtures/sample.mp4", import.meta.url),
+  ),
+);
+const SAMPLE_MP3_BYTES = new Uint8Array(
+  readFileSync(
+    new URL("../../benchmarks/fixtures/sample.mp3", import.meta.url),
+  ),
+);
+const SAMPLE_WEBM_BYTES = new Uint8Array(
+  readFileSync(
+    new URL("../../benchmarks/fixtures/sample.webm", import.meta.url),
+  ),
 );
 
 test("presentation callers delegate stream lifecycle and terminal ownership", () => {
@@ -21,6 +34,10 @@ test("presentation callers delegate stream lifecycle and terminal ownership", ()
       source,
       /getReader\(|beginToolRun|finishSuccess|finishFailure|transcribe\.worker|new Worker|formatBytes|etaSeconds|saveBlob/,
     );
+    if (relativePath.endsWith("TranscribeTool.tsx")) {
+      assert.match(source, /VERIFIED_MEDIA_FORMATS/);
+      assert.doesNotMatch(source, /AUDIO_FORMATS|VIDEO_FORMATS/);
+    }
   }
 });
 
@@ -232,7 +249,7 @@ test("URL and file transcription use workflow.run and enforce transcript semanti
   );
 });
 
-test("recognized MIME metadata still fails closed without a semantic verifier", async () => {
+test("malformed verified media and unadvertised media both fail closed", async () => {
   const harness = createMediaWorkflowTestHarness({
     media: {
       "https://media.example/mobile": {
@@ -260,7 +277,7 @@ test("recognized MIME metadata still fails closed without a semantic verifier", 
   assert.equal(transcript.status, "failed");
   assert.equal(transcript.error.code, "invalid-request");
   assert.equal(download.status, "failed");
-  assert.equal(download.error.code, "invalid-request");
+  assert.equal(download.error.code, "acquisition-failed");
   assert.deepEqual(harness.deliveries, []);
 });
 
@@ -303,6 +320,230 @@ test("opaque MP4 and fake MP3 bytes fail closed without delivery or success tele
     { kind: "start" },
     { kind: "terminal", status: "failed" },
   ]);
+});
+
+test("a real MP3 reaches scoped transcription while an ID3-only lookalike fails closed", async () => {
+  for (const [index, mimeType] of [
+    "audio/mpeg",
+    "application/octet-stream",
+  ].entries()) {
+    const url = `https://media.example/verified-${index}.mp3`;
+    const valid = createMediaWorkflowTestHarness({
+      media: {
+        [url]: {
+          name: "verified.mp3",
+          extension: "mp3",
+          mimeType,
+          chunks: [SAMPLE_MP3_BYTES],
+        },
+      },
+      transcript: "Verified MP3 transcript.",
+    });
+    const validOutcome = await valid.workflow.run({
+      toolId: "mp3-to-transcript",
+      input: { kind: "url", url },
+    });
+
+    assert.equal(validOutcome.status, "succeeded", mimeType);
+    assert.equal(
+      new TextDecoder().decode(valid.deliveries[0]?.bytes),
+      "Verified MP3 transcript.",
+      mimeType,
+    );
+  }
+
+  const invalid = createMediaWorkflowTestHarness({
+    media: {
+      "https://media.example/lookalike.mp3": {
+        name: "lookalike.mp3",
+        extension: "mp3",
+        mimeType: "audio/mpeg",
+        chunks: [new Uint8Array([0x49, 0x44, 0x33, 0x04, 0, 0, 0, 0, 0, 0])],
+      },
+    },
+  });
+  const invalidOutcome = await invalid.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://media.example/lookalike.mp3" },
+    options: { mode: "audio" },
+  });
+
+  assert.equal(invalidOutcome.status, "failed");
+  assert.deepEqual(invalid.deliveries, []);
+  assert.deepEqual(invalid.telemetry, [
+    { kind: "start" },
+    { kind: "terminal", status: "failed" },
+  ]);
+});
+
+test("a real WebM reaches scoped transcription while a truncated EBML lookalike fails closed", async () => {
+  for (const [index, mimeType] of [
+    "audio/webm",
+    "video/webm",
+    "application/octet-stream",
+  ].entries()) {
+    const url = `https://media.example/verified-${index}.webm`;
+    const valid = createMediaWorkflowTestHarness({
+      media: {
+        [url]: {
+          name: "verified.webm",
+          extension: "webm",
+          mimeType,
+          chunks: [SAMPLE_WEBM_BYTES],
+        },
+      },
+      transcript: "Verified WebM transcript.",
+    });
+    const validOutcome = await valid.workflow.run({
+      toolId: "video-to-transcript",
+      input: { kind: "url", url },
+    });
+
+    assert.equal(validOutcome.status, "succeeded", mimeType);
+    assert.equal(
+      new TextDecoder().decode(valid.deliveries[0]?.bytes),
+      "Verified WebM transcript.",
+      mimeType,
+    );
+  }
+
+  const invalid = createMediaWorkflowTestHarness({
+    media: {
+      "https://media.example/lookalike.webm": {
+        name: "lookalike.webm",
+        extension: "webm",
+        mimeType: "video/webm",
+        chunks: [SAMPLE_WEBM_BYTES.subarray(0, 48)],
+      },
+    },
+  });
+  const invalidOutcome = await invalid.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://media.example/lookalike.webm" },
+  });
+
+  assert.equal(invalidOutcome.status, "failed");
+  assert.deepEqual(invalid.deliveries, []);
+  assert.deepEqual(invalid.telemetry, [
+    { kind: "start" },
+    { kind: "terminal", status: "failed" },
+  ]);
+});
+
+test("real ISO media variants pass bounded parsing while ftyp-only lookalikes fail", async (t) => {
+  const formats = [
+    { format: "mp4", mimeTypes: ["video/mp4", "application/octet-stream"] },
+    { format: "mov", mimeTypes: ["video/quicktime", "application/octet-stream"] },
+    { format: "m4a", mimeTypes: ["audio/mp4", "application/octet-stream"] },
+    {
+      format: "m4v",
+      mimeTypes: ["video/mp4", "video/x-m4v", "application/octet-stream"],
+    },
+    {
+      format: "3gp",
+      mimeTypes: ["audio/3gpp", "video/3gpp", "application/octet-stream"],
+    },
+  ];
+  assert.deepEqual(
+    [...VERIFIED_MEDIA_FORMATS].sort(),
+    [...formats.map(({ format }) => format), "mp3", "webm"].sort(),
+  );
+  const ftypOnly = SAMPLE_MP4_BYTES.subarray(0, 32);
+  const wrongFixtureByFormat: Readonly<Record<string, string>> = {
+    "3gp": "mp4",
+    m4a: "mp4",
+    m4v: "m4a",
+    mov: "mp4",
+    mp4: "mov",
+  };
+
+  for (const media of formats) {
+    await t.test(media.format, async () => {
+      const realBytes = new Uint8Array(
+        readFileSync(
+          new URL(
+            `../../benchmarks/fixtures/sample.${media.format}`,
+            import.meta.url,
+          ),
+        ),
+      );
+      for (const [mimeIndex, mimeType] of media.mimeTypes.entries()) {
+        const validUrl = `https://media.example/verified-${mimeIndex}.${media.format}`;
+        const valid = createMediaWorkflowTestHarness({
+          media: {
+            [validUrl]: {
+              name: `verified.${media.format}`,
+              extension: media.format,
+              mimeType,
+              chunks: [realBytes],
+            },
+          },
+        });
+        const validOutcome = await valid.workflow.run({
+          toolId: "video-downloader",
+          input: { kind: "url", url: validUrl },
+        });
+
+        assert.equal(validOutcome.status, "succeeded", mimeType);
+        assert.equal(valid.deliveries[0]?.format, media.format, mimeType);
+      }
+
+      const invalidUrl = `https://media.example/lookalike.${media.format}`;
+      const invalid = createMediaWorkflowTestHarness({
+        media: {
+          [invalidUrl]: {
+            name: `lookalike.${media.format}`,
+            extension: media.format,
+            mimeType: media.mimeTypes[0],
+            chunks: [ftypOnly],
+          },
+        },
+      });
+      const invalidOutcome = await invalid.workflow.run({
+        toolId: "video-downloader",
+        input: { kind: "url", url: invalidUrl },
+      });
+
+      assert.equal(invalidOutcome.status, "failed");
+      assert.deepEqual(invalid.deliveries, []);
+      assert.deepEqual(invalid.telemetry, [
+        { kind: "start" },
+        { kind: "terminal", status: "failed" },
+      ]);
+
+      const wrongContainerUrl = `https://media.example/wrong-container.${media.format}`;
+      const wrongContainer = createMediaWorkflowTestHarness({
+        media: {
+          [wrongContainerUrl]: {
+            name: `wrong-container.${media.format}`,
+            extension: media.format,
+            mimeType: media.mimeTypes[0],
+            chunks: [
+              new Uint8Array(
+                readFileSync(
+                  new URL(
+                    `../../benchmarks/fixtures/sample.${wrongFixtureByFormat[media.format]}`,
+                    import.meta.url,
+                  ),
+                ),
+              ),
+            ],
+          },
+        },
+      });
+      const wrongContainerOutcome = await wrongContainer.workflow.run({
+        toolId: "video-downloader",
+        input: { kind: "url", url: wrongContainerUrl },
+      });
+
+      assert.equal(wrongContainerOutcome.status, "failed");
+      assert.deepEqual(wrongContainer.deliveries, []);
+      assert.deepEqual(wrongContainer.telemetry, [
+        { kind: "start" },
+        { kind: "terminal", status: "failed" },
+      ]);
+    });
+  }
 });
 
 test("endpoint identity rejection cancels and releases the unread response body", async (t) => {

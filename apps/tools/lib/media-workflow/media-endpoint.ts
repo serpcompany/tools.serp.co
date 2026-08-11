@@ -1,4 +1,3 @@
-import { AUDIO_FORMATS, VIDEO_FORMATS } from "../capabilities.ts";
 import { createDownloaderRequestHeaders } from "../downloader-client.ts";
 import { DOWNLOADER_CONSUMER } from "../downloader-contract.js";
 import {
@@ -6,6 +5,7 @@ import {
   getMediaFetchEndpoint,
 } from "../media-fetch-endpoint.ts";
 import type { WorkflowMedia } from "../tool-workflow/index.ts";
+import { VERIFIED_MEDIA_FORMATS } from "./verified-formats.ts";
 
 export type MediaEndpointRequest = Readonly<{
   consumer?: "downloader";
@@ -102,7 +102,7 @@ type AcquisitionContext = {
   reportProgress(progress: number): void;
 };
 
-const supportedExtensions = new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS]);
+const supportedExtensions = new Set<string>(VERIFIED_MEDIA_FORMATS);
 
 const extensionByMimeType: Readonly<Record<string, string>> = Object.freeze({
   "audio/aac": "aac",
@@ -127,6 +127,7 @@ const extensionByMimeType: Readonly<Record<string, string>> = Object.freeze({
   "video/ogg": "ogv",
   "video/quicktime": "mov",
   "video/webm": "webm",
+  "video/x-m4v": "m4v",
   "video/x-flv": "flv",
   "video/x-matroska": "mkv",
   "video/x-ms-asf": "asf",
@@ -177,7 +178,12 @@ function resolveMediaIdentity(
   const mimeExtension = extensionByMimeType[mimeType];
   const headerExtension = response.extension?.trim().toLowerCase() ?? "";
   const nameExtension = getExtensionFromName(response.fileName ?? "");
-  const extension = mimeExtension || headerExtension || nameExtension;
+  const declaredExtension = headerExtension || nameExtension;
+  const compatibleM4vAlias =
+    mimeExtension === "mp4" && declaredExtension === "m4v";
+  const extension = compatibleM4vAlias
+    ? declaredExtension
+    : mimeExtension || declaredExtension;
 
   if (!extension || !supportedExtensions.has(extension)) {
     throw new Error(
@@ -191,7 +197,8 @@ function resolveMediaIdentity(
   if (
     mimeExtension &&
     headerExtension &&
-    mimeExtension !== headerExtension
+    mimeExtension !== headerExtension &&
+    !compatibleM4vAlias
   ) {
     throw new Error("Media response format does not match its content type.");
   }

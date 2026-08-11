@@ -1,17 +1,25 @@
 import decodeJpeg from "@jsquash/jpeg/decode.js";
 import { createFile, type MP4BoxBuffer, type Movie } from "mp4box";
+import { parseBuffer } from "music-metadata";
 import Papa from "papaparse";
 import UPNGModule from "upng-js";
 
 import type { SemanticVerification, WorkflowMedia } from "./index.ts";
 
-const expectedMimeTypes: Readonly<Record<string, string>> = Object.freeze({
-  csv: "text/csv",
-  jpg: "image/jpeg",
-  mp4: "video/mp4",
-  png: "image/png",
-  txt: "text/plain",
-});
+const expectedMimeTypes: Readonly<Record<string, readonly string[]>> =
+  Object.freeze({
+    "3gp": ["audio/3gpp", "video/3gpp", "application/octet-stream"],
+    csv: ["text/csv"],
+    jpg: ["image/jpeg"],
+    m4a: ["audio/mp4", "application/octet-stream"],
+    m4v: ["video/mp4", "video/x-m4v", "application/octet-stream"],
+    mov: ["video/quicktime", "application/octet-stream"],
+    mp3: ["audio/mpeg", "application/octet-stream"],
+    mp4: ["video/mp4", "application/octet-stream"],
+    png: ["image/png"],
+    txt: ["text/plain"],
+    webm: ["audio/webm", "video/webm", "application/octet-stream"],
+  });
 
 const UPNG = UPNGModule as {
   decode(bytes: ArrayBuffer): { width: number; height: number };
@@ -21,6 +29,7 @@ const UPNG = UPNGModule as {
 const MAX_DECODED_RGBA_BYTES = 64 * 1_024 * 1_024;
 const MAX_IMAGE_DIMENSION = 16_384;
 const MAX_MP4_PARSE_BYTES = 64 * 1_024 * 1_024;
+const MAX_AUDIO_PARSE_BYTES = 64 * 1_024 * 1_024;
 
 type DecodedImage = Readonly<{
   data: Uint8Array | Uint8ClampedArray;
@@ -227,17 +236,66 @@ async function jpegSemanticError(
   }
 }
 
-function bmffSemanticError(
-  bytes: Uint8Array,
+function boundedParseLimit(
   context: SemanticVerificationContext,
-): string | undefined {
+  maximum: number,
+): number {
   const declaredLimit =
     context.maxBytes === undefined
-      ? MAX_MP4_PARSE_BYTES
+      ? maximum
       : Number.isSafeInteger(context.maxBytes) && context.maxBytes >= 0
         ? context.maxBytes
         : 0;
-  const parseLimit = Math.min(MAX_MP4_PARSE_BYTES, declaredLimit);
+  return Math.min(maximum, declaredLimit);
+}
+
+async function audioSemanticError(
+  bytes: Uint8Array,
+  format: "mp3" | "webm",
+  context: SemanticVerificationContext,
+): Promise<string | undefined> {
+  if (bytes.byteLength > boundedParseLimit(context, MAX_AUDIO_PARSE_BYTES)) {
+    return `${format.toUpperCase()} exceeds the semantic parser input limit`;
+  }
+  context.signal?.throwIfAborted();
+  try {
+    // music-metadata's browser entry parses the bounded in-memory bytes and
+    // determines the container from their structure, independent of endpoint
+    // filename and MIME metadata.
+    const metadata = await parseBuffer(bytes, undefined, {
+      duration: true,
+      skipCovers: true,
+    });
+    context.signal?.throwIfAborted();
+    const { container, codec, duration, numberOfChannels, sampleRate } =
+      metadata.format;
+    const hasTimedAudio =
+      Boolean(codec) &&
+      Number.isFinite(duration) &&
+      (duration ?? 0) > 0 &&
+      Number.isSafeInteger(numberOfChannels) &&
+      (numberOfChannels ?? 0) > 0 &&
+      Number.isSafeInteger(sampleRate) &&
+      (sampleRate ?? 0) > 0;
+    const matchesContainer =
+      format === "mp3"
+        ? container?.startsWith("MPEG") && /Layer 3/i.test(codec ?? "")
+        : container === "EBML/webm";
+    return matchesContainer && hasTimedAudio
+      ? undefined
+      : `${format.toUpperCase()} parser found no complete timed audio track`;
+  } catch {
+    context.signal?.throwIfAborted();
+    return `${format.toUpperCase()} parser rejected the file`;
+  }
+}
+
+function bmffSemanticError(
+  bytes: Uint8Array,
+  format: string,
+  context: SemanticVerificationContext,
+): string | undefined {
+  const parseLimit = boundedParseLimit(context, MAX_MP4_PARSE_BYTES);
   if (bytes.byteLength > parseLimit) {
     return "MP4 exceeds the semantic parser input limit";
   }
@@ -267,6 +325,24 @@ function bmffSemanticError(
     if (parserError) return `MP4 parser rejected the file: ${parserError}`;
     if (!info?.hasMoov || info.tracks.length === 0) {
       return "MP4 parser found no complete timed media tracks";
+    }
+    const majorBrand = info.brands[0]?.trim().toLowerCase() ?? "";
+    const reservedMajorBrand =
+      majorBrand === "qt" ||
+      majorBrand === "m4a" ||
+      majorBrand.startsWith("3gp");
+    const formatMatchesContainer =
+      format === "mov"
+        ? majorBrand === "qt"
+        : format === "3gp"
+          ? majorBrand.startsWith("3gp")
+          : format === "m4a"
+            ? majorBrand === "m4a" && info.videoTracks.length === 0
+            : format === "m4v"
+              ? !reservedMajorBrand && info.videoTracks.length > 0
+              : format === "mp4" && !reservedMajorBrand;
+    if (!formatMatchesContainer) {
+      return `MP4 parser found bytes for a different ISO media format than ${format}`;
     }
     const timedTrackIds = new Set(
       [...info.audioTracks, ...info.videoTracks].map((track) => track.id),
@@ -381,10 +457,10 @@ export async function verifyMediaSemantics(
       message: `No semantic verifier for ${media.format}`,
     };
   }
-  if (media.mimeType !== expectedMimeType) {
+  if (!expectedMimeType.includes(media.mimeType)) {
     return {
       status: "rejected",
-      message: `Expected MIME ${expectedMimeType}, received ${media.mimeType}`,
+      message: `Expected MIME ${expectedMimeType.join(" or ")}, received ${media.mimeType}`,
     };
   }
   const error =
@@ -392,11 +468,13 @@ export async function verifyMediaSemantics(
       ? pngStructureError(media.bytes)
       : media.format === "jpg"
         ? await jpegSemanticError(media.bytes, adapters.decodeJpeg)
-        : media.format === "mp4"
-          ? bmffSemanticError(media.bytes, context)
-          : media.format === "csv"
-            ? csvStructureError(media.bytes)
-            : textStructureError(media.bytes);
+        : media.format === "mp3" || media.format === "webm"
+          ? await audioSemanticError(media.bytes, media.format, context)
+          : ["3gp", "m4a", "m4v", "mov", "mp4"].includes(media.format)
+            ? bmffSemanticError(media.bytes, media.format, context)
+            : media.format === "csv"
+              ? csvStructureError(media.bytes)
+              : textStructureError(media.bytes);
   return error
     ? { status: "rejected", message: error }
     : { status: "verified" };
