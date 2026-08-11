@@ -460,13 +460,14 @@ export function createBatchToolWorkflow(
                   throw new TypeError('Batch stream exceeds its byte contract');
                 }
                 chunks.push(next.value);
+                const itemProgress = Math.min(1, itemBytes / item.size);
                 context.reportProgress(
-                  (index + itemBytes / item.size) / input.items.length,
+                  (index + itemProgress) / input.items.length,
                   {
                     index,
                     total: input.items.length,
                     name: item.name,
-                    progress: Math.min(1, itemBytes / item.size),
+                    progress: itemProgress,
                   },
                 );
                 context.signal.throwIfAborted();

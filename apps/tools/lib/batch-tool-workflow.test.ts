@@ -14,10 +14,7 @@ import {
   createBatchRunController,
   retainBatchAggregateProgress,
 } from './batch-browser-workflow.ts';
-import type {
-  WorkflowMedia,
-  WorkflowSnapshot,
-} from './tool-workflow/index.ts';
+import type { WorkflowMedia, WorkflowSnapshot } from './tool-workflow/index.ts';
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 
 const sample = new Uint8Array(
@@ -345,6 +342,39 @@ test('cancellation closes the active acquisition stream and never opens pending 
   assert.equal(activeCancelled, true);
   assert.deepEqual(telemetry, []);
   assert.deepEqual(deliveries, []);
+});
+
+test('a size-mismatched stream fails without overstating acquisition progress', async () => {
+  const { workflow } = recorder();
+  const snapshots: WorkflowSnapshot[] = [];
+  const outcome = await workflow.run(
+    {
+      toolId: 'batch-compress-png',
+      input: {
+        kind: 'batch',
+        items: [
+          {
+            name: 'changed.png',
+            format: 'png',
+            mimeType: 'image/png',
+            size: Math.floor(sample.byteLength / 2),
+            stream: () => new Blob([sample]).stream(),
+          },
+        ],
+      },
+      options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
+    },
+    { observe: (snapshot) => snapshots.push(snapshot) },
+  );
+  assert.equal(outcome.status, 'failed');
+  assert.ok(
+    snapshots
+      .filter(
+        ({ phase, progress }) =>
+          phase === 'acquiring' && progress !== undefined,
+      )
+      .every(({ progress }) => progress! <= 0.25),
+  );
 });
 
 test('browser controller clears prior delivery resources on replacement and cancellation', async () => {
