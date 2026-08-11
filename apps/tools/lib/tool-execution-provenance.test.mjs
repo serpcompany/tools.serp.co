@@ -64,6 +64,73 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   );
   assert.match(workerClientSource, /resolveConversionDispatch/);
   assert.match(workerClientSource, /resolveCompressionDispatch/);
+
+  const convertWorkerSource = readFileSync(
+    new URL('../workers/convert.worker.js', import.meta.url),
+    'utf8',
+  );
+  const decodeSource = readFileSync(
+    new URL('./convert/decode.ts', import.meta.url),
+    'utf8',
+  );
+  const encodeSource = readFileSync(
+    new URL('./convert/encode.ts', import.meta.url),
+    'utf8',
+  );
+  const compressionWorkerSource = readFileSync(
+    new URL('../workers/compress.worker.js', import.meta.url),
+    'utf8',
+  );
+  const imageConvertRouteSource = readFileSync(
+    new URL('../app/api/image-convert/route.ts', import.meta.url),
+    'utf8',
+  );
+  assert.match(convertWorkerSource, /decodeToRGBA/);
+  assert.match(convertWorkerSource, /encodeFromRGBA/);
+  assert.match(decodeSource, /ImageDecoder/);
+  assert.match(decodeSource, /createImageBitmap/);
+  assert.match(encodeSource, /OffscreenCanvas/);
+  assert.match(encodeSource, /convertToBlob/);
+  assert.match(
+    workerClientSource,
+    /convertImageViaApi\(\{ \.\.\.args, to: "png" \}\)/,
+  );
+  assert.match(workerClientSource, /convertRasterOnMainThread\(\{/);
+  assert.match(workerClientSource, /from: "png"/);
+  assert.match(workerClientSource, /import\("upng-js"\)/);
+  assert.match(compressionWorkerSource, /@jsquash\/oxipng/);
+  assert.match(compressionWorkerSource, /@jsquash\/jpeg/);
+  assert.match(imageConvertRouteSource, /convertWithMagickWasm/);
+  assert.deepEqual(
+    executionProvenance.getEngine('browser-raster-worker')?.implementation,
+    {
+      class: 'platform-primitive',
+      identity: 'WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
+    },
+  );
+  assert.deepEqual(
+    executionProvenance.getEngine(
+      'browser-raster-with-server-image-decode',
+    )?.implementation,
+    {
+      class: 'hybrid',
+      identity:
+        'repository server image decoder plus WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
+      rationale:
+        'The repository server emits PNG, then the browser decodes and encodes the requested format through platform image and Canvas primitives.',
+    },
+  );
+  assert.deepEqual(
+    executionProvenance.getEngine('browser-image-compression-worker')
+      ?.implementation,
+    {
+      class: 'hybrid',
+      identity:
+        '@jsquash image codecs with UPNG.js and browser Canvas fallbacks',
+      rationale:
+        'The compression worker uses JSquash; repository fallbacks use UPNG.js for PNG and platform image/Canvas primitives for other browser images.',
+    },
+  );
 });
 
 test('downloader and browser-with-fetch support keep distinct profiles', () => {
@@ -139,10 +206,8 @@ test('read-only provenance is joinable by every canonical Tool id', () => {
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
-      class: 'hybrid',
-      identity: '@jsquash codecs, UPNG.js, and @imagemagick/magick-wasm',
-      rationale:
-        'Repository dispatch selects trusted codecs without implementing image codecs.',
+      class: 'platform-primitive',
+      identity: 'WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
     },
   });
   assert.equal(executionProvenance.getEngine('toString'), undefined);

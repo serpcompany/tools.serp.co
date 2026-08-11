@@ -87,18 +87,111 @@ export type ToolWorkflow = {
   ): Promise<WorkflowOutcome>;
 };
 
-export type ToolSupport = {
+export type ToolSupport = Readonly<{
   acquisition: WorkflowInput["kind"];
-  inputs: ReadonlyArray<{ format: string; mimeTypes: readonly string[] }>;
-  outputs: ReadonlyArray<{ format: string; mimeType: string }>;
-  requestedOperation: string;
+  inputs: ReadonlyArray<
+    Readonly<{ format: string; mimeTypes: readonly string[] }>
+  >;
+  outputs: ReadonlyArray<Readonly<{ format: string; mimeType: string }>>;
   resourceLimits: Readonly<{
     maxInputBytes: number;
     maxOutputBytes: number;
     maxTotalOutputBytes: number;
   }>;
   outputCardinality: Readonly<{ min: number; max: number }>;
-};
+}>;
+
+export type ToolExecutionIntent = Readonly<{
+  requestedOperation: string;
+  outputs: ReadonlyArray<Readonly<{ format: string; mimeType: string }>>;
+}>;
+
+function assertSafeNonNegativeInteger(value: number, name: string): void {
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new TypeError(`${name} must be a non-negative safe integer`);
+  }
+}
+
+function assertNonEmptyString(value: string, name: string): void {
+  if (!value.trim()) {
+    throw new TypeError(`${name} must be a non-empty string`);
+  }
+}
+
+export function defineToolSupport(definition: ToolSupport): ToolSupport {
+  const { min, max } = definition.outputCardinality;
+  if (
+    !Number.isSafeInteger(min) ||
+    !Number.isSafeInteger(max) ||
+    min < 1 ||
+    min > max
+  ) {
+    throw new TypeError("Invalid output cardinality contract");
+  }
+  const limits = definition.resourceLimits;
+  assertSafeNonNegativeInteger(limits.maxInputBytes, "maxInputBytes");
+  assertSafeNonNegativeInteger(limits.maxOutputBytes, "maxOutputBytes");
+  assertSafeNonNegativeInteger(
+    limits.maxTotalOutputBytes,
+    "maxTotalOutputBytes",
+  );
+  if (limits.maxOutputBytes > limits.maxTotalOutputBytes) {
+    throw new TypeError(
+      "maxOutputBytes cannot exceed maxTotalOutputBytes",
+    );
+  }
+  if (definition.inputs.length === 0 || definition.outputs.length === 0) {
+    throw new TypeError("Processor support requires input and output contracts");
+  }
+  for (const input of definition.inputs) {
+    assertNonEmptyString(input.format, "input format");
+    if (input.mimeTypes.length === 0) {
+      throw new TypeError("Processor input requires at least one MIME type");
+    }
+    for (const mimeType of input.mimeTypes) {
+      assertNonEmptyString(mimeType, "input MIME type");
+    }
+  }
+  for (const output of definition.outputs) {
+    assertNonEmptyString(output.format, "output format");
+    assertNonEmptyString(output.mimeType, "output MIME type");
+  }
+  return Object.freeze({
+    acquisition: definition.acquisition,
+    inputs: Object.freeze(
+      definition.inputs.map((input) =>
+        Object.freeze({
+          format: input.format,
+          mimeTypes: Object.freeze([...input.mimeTypes]),
+        }),
+      ),
+    ),
+    outputs: Object.freeze(
+      definition.outputs.map((output) => Object.freeze({ ...output })),
+    ),
+    resourceLimits: Object.freeze({ ...limits }),
+    outputCardinality: Object.freeze({ min, max }),
+  });
+}
+
+export function defineToolExecutionIntent(
+  definition: ToolExecutionIntent,
+): ToolExecutionIntent {
+  assertNonEmptyString(definition.requestedOperation, "requested operation");
+  if (definition.outputs.length === 0) {
+    throw new TypeError("Tool execution intent requires an operation and output");
+  }
+  for (const output of definition.outputs) {
+    assertNonEmptyString(output.format, "intent output format");
+    assertNonEmptyString(output.mimeType, "intent output MIME type");
+  }
+  return Object.freeze({
+    requestedOperation: definition.requestedOperation,
+    outputs: Object.freeze(
+      definition.outputs.map((output) => Object.freeze({ ...output })),
+    ),
+  });
+}
 
 export type ProcessorSupportRequest<Options> = Readonly<{
   detectedInput: Readonly<{
@@ -109,7 +202,7 @@ export type ProcessorSupportRequest<Options> = Readonly<{
   }>;
   requestedOperation: string;
   options: Options;
-  outputs: ToolSupport["outputs"];
+  outputs: ToolExecutionIntent["outputs"];
 }>;
 
 export type ProcessorSupportDecision =
@@ -155,6 +248,8 @@ export type RuntimeResourceKind =
 
 type WorkflowStageContext = {
   signal: AbortSignal;
+  /** Cooperative limits exposed before work; workflow also enforces byte postconditions. */
+  budgets: ToolSupport["resourceLimits"];
   openResource(kind: RuntimeResourceKind): Promise<void>;
   registerCleanup(cleanup: () => Promise<void>): Promise<void>;
   reportProgress(progress: number): void;
@@ -175,6 +270,7 @@ type WorkflowPorts = {
       ): Promise<WorkflowMedia>;
     };
   };
+  resolveIntent(toolId: string): ToolExecutionIntent | undefined;
   resolveProcessor(toolId: string): ToolProcessor | undefined;
   deliver(
     result: WorkflowMedia,
@@ -258,10 +354,36 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
       };
 
       const processor = ports.resolveProcessor(request.toolId);
-      if (!processor) {
+      const resolvedIntent = ports.resolveIntent(request.toolId);
+      if (!processor || !resolvedIntent) {
         return fail("unsupported-tool", `Unsupported Tool: ${request.toolId}`);
       }
-      if (processor.support.acquisition !== request.input.kind) {
+      let support: ToolSupport;
+      let intent: ToolExecutionIntent;
+      try {
+        support = defineToolSupport(processor.support);
+        intent = defineToolExecutionIntent(resolvedIntent);
+      } catch (error) {
+        return fail(
+          "unsupported-tool",
+          error instanceof Error ? error.message : String(error),
+        );
+      }
+      const unsupportedIntentOutput = intent.outputs.find(
+        (requested) =>
+          !support.outputs.some(
+            (supported) =>
+              supported.format === requested.format &&
+              supported.mimeType === requested.mimeType,
+          ),
+      );
+      if (unsupportedIntentOutput) {
+        return fail(
+          "unsupported-request",
+          `Unsupported requested output: ${unsupportedIntentOutput.format} (${unsupportedIntentOutput.mimeType})`,
+        );
+      }
+      if (support.acquisition !== request.input.kind) {
         return fail(
           "unsupported-request",
           `Unsupported acquisition: ${request.input.kind}`,
@@ -299,6 +421,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         span: number,
       ): WorkflowStageContext => ({
         signal,
+        budgets: support.resourceLimits,
         reportProgress: (progress) =>
           reportProgress(phase, start, span, progress),
         async openResource(kind) {
@@ -336,7 +459,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
                 acquisitionContext,
               );
         signal.throwIfAborted();
-        const inputSupport = processor.support.inputs.find(
+        const inputSupport = support.inputs.find(
           ({ format, mimeTypes }) =>
             format === input.format && mimeTypes.includes(input.mimeType),
         );
@@ -348,11 +471,11 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         }
         if (
           input.bytes.byteLength >
-          processor.support.resourceLimits.maxInputBytes
+          support.resourceLimits.maxInputBytes
         ) {
           return fail(
             "unsupported-request",
-            `Input exceeds ${processor.support.resourceLimits.maxInputBytes} bytes`,
+            `Input exceeds ${support.resourceLimits.maxInputBytes} bytes`,
           );
         }
         const supportDecision = processor.decideSupport({
@@ -362,12 +485,15 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
             mimeType: input.mimeType,
             bytes: input.bytes.byteLength,
           },
-          requestedOperation: processor.support.requestedOperation,
+          requestedOperation: intent.requestedOperation,
           options: parsedOptions.value,
-          outputs: processor.support.outputs,
+          outputs: intent.outputs,
         });
         if (!supportDecision.supported) {
           return fail("unsupported-request", supportDecision.message);
+        }
+        if (input.bytes.byteLength === 0) {
+          return fail("invalid-request", `${input.format} input is empty`);
         }
         const inputVerification = await processor.verifyInput(
           input,
@@ -399,7 +525,10 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         stage = "validating";
         activePhase = "validating";
         emitSnapshot({ phase: "validating" });
-        const { min, max } = processor.support.outputCardinality;
+        if (results.length === 0) {
+          throw new Error("Processor returned no results");
+        }
+        const { min, max } = support.outputCardinality;
         if (results.length < min || results.length > max) {
           throw new Error(
             `Expected ${min}..${max} results, received ${results.length}`,
@@ -411,22 +540,22 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         );
         if (
           totalOutputBytes >
-          processor.support.resourceLimits.maxTotalOutputBytes
+          support.resourceLimits.maxTotalOutputBytes
         ) {
           throw new Error(
-            `Total output exceeds ${processor.support.resourceLimits.maxTotalOutputBytes} bytes`,
+            `Total output exceeds ${support.resourceLimits.maxTotalOutputBytes} bytes`,
           );
         }
         for (const result of results) {
           if (
             result.bytes.byteLength >
-            processor.support.resourceLimits.maxOutputBytes
+            support.resourceLimits.maxOutputBytes
           ) {
             throw new Error(
-              `Output exceeds ${processor.support.resourceLimits.maxOutputBytes} bytes`,
+              `Output exceeds ${support.resourceLimits.maxOutputBytes} bytes`,
             );
           }
-          const outputSupport = processor.support.outputs.find(
+          const outputSupport = intent.outputs.find(
             ({ format, mimeType }) =>
               format === result.format && mimeType === result.mimeType,
           );
@@ -434,6 +563,9 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
             throw new Error(
               `Unsupported output: ${result.format} (${result.mimeType})`,
             );
+          }
+          if (result.bytes.byteLength === 0) {
+            throw new Error(`${result.format} result is empty`);
           }
           const verification = await processor.verifyResult(
             result,

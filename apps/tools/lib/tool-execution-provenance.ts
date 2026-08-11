@@ -84,10 +84,8 @@ const engineById = defineEngines({
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
-      class: 'hybrid',
-      identity: '@jsquash codecs, UPNG.js, and @imagemagick/magick-wasm',
-      rationale:
-        'Repository dispatch selects trusted codecs without implementing image codecs.',
+      class: 'platform-primitive',
+      identity: 'WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
     },
   },
   'browser-pdf-pages': {
@@ -116,9 +114,10 @@ const engineById = defineEngines({
     executionProfile: 'server-assisted',
     implementation: {
       class: 'hybrid',
-      identity: 'server image decoder plus @jsquash codecs',
+      identity:
+        'repository server image decoder plus WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D',
       rationale:
-        'The repository server decodes unsupported inputs before trusted browser codecs encode the requested output.',
+        'The repository server emits PNG, then the browser decodes and encodes the requested format through platform image and Canvas primitives.',
     },
   },
   'browser-ffmpeg-wasm': {
@@ -145,9 +144,10 @@ const engineById = defineEngines({
     executionProfile: 'client-only',
     implementation: {
       class: 'hybrid',
-      identity: '@jsquash/oxipng and @jsquash image codecs',
+      identity:
+        '@jsquash image codecs with UPNG.js and browser Canvas fallbacks',
       rationale:
-        'Repository dispatch selects the maintained compressor for the detected image format.',
+        'The compression worker uses JSquash; repository fallbacks use UPNG.js for PNG and platform image/Canvas primitives for other browser images.',
     },
   },
   'browser-ffmpeg-compression': {

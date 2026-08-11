@@ -7,6 +7,7 @@ import {
   type ToolProcessor,
   type RuntimeResourceKind,
   type WorkflowMedia,
+  type ToolExecutionIntent,
 } from "./index.ts";
 import {
   executionProvenance,
@@ -18,11 +19,11 @@ type ProcessorEngine = ToolProcessor["engine"];
 
 type ProcessorScript = {
   engineId?: string;
+  intent?: ToolExecutionIntent;
   support: {
     acquisition: "file" | "url";
     inputFormats: string[];
     outputFormats: string[];
-    requestedOperation?: string;
     resourceLimits?: {
       maxInputBytes: number;
       maxOutputBytes: number;
@@ -39,6 +40,7 @@ type ProcessorScript = {
   decideSupport?(
     request: ProcessorSupportRequest<unknown>,
   ): ProcessorSupportDecision;
+  process?: ToolProcessor["process"];
   validators?: {
     input?(
       media: WorkflowMedia,
@@ -121,8 +123,8 @@ export function createToolWorkflowTestHarness(options: {
   }> = [];
   let runId = 0;
   let deliveryId = 0;
-  const processors = new Map<string, ToolProcessor>(
-    Object.entries(options.processors).map(([toolId, script]) => {
+  const processorDefinitions = Object.entries(options.processors).map(
+    ([toolId, script]) => {
       const results = Array.isArray(script.result)
         ? script.result
         : [script.result];
@@ -139,7 +141,6 @@ export function createToolWorkflowTestHarness(options: {
             results.find((result) => result.format === format)?.mimeType ??
             "application/octet-stream",
         })),
-        requestedOperation: script.support.requestedOperation ?? "process",
         resourceLimits: script.support.resourceLimits ?? {
           maxInputBytes: Number.MAX_SAFE_INTEGER,
           maxOutputBytes: Number.MAX_SAFE_INTEGER,
@@ -150,6 +151,10 @@ export function createToolWorkflowTestHarness(options: {
           max: results.length,
         },
       } as const;
+      const intent = script.intent ?? {
+        requestedOperation: "process",
+        outputs: support.outputs,
+      };
       const provenance = getToolExecutionProvenance(toolId);
       const engineId =
         script.engineId ??
@@ -160,9 +165,9 @@ export function createToolWorkflowTestHarness(options: {
       if (!engine) {
         throw new TypeError(`No canonical execution engine for ${toolId}`);
       }
-      return [
+      return {
         toolId,
-        {
+        processor: {
           engine,
           support,
           parseOptions(value): ProcessorOptions<unknown> {
@@ -218,6 +223,9 @@ export function createToolWorkflowTestHarness(options: {
             if (script.error) {
               throw script.error;
             }
+            if (script.process) {
+              return script.process(_input, processorOptions, context);
+            }
             return results;
           },
           async verifyResult(result, context): Promise<SemanticVerification> {
@@ -229,9 +237,16 @@ export function createToolWorkflowTestHarness(options: {
               (await script.validators?.output?.(result)) ?? verifyMedia(result)
             );
           },
-        },
-      ];
-    }),
+        } satisfies ToolProcessor,
+        intent,
+      };
+    },
+  );
+  const processors = new Map<string, ToolProcessor>(
+    processorDefinitions.map(({ toolId, processor }) => [toolId, processor]),
+  );
+  const intents = new Map<string, ToolExecutionIntent>(
+    processorDefinitions.map(({ toolId, intent }) => [toolId, intent]),
   );
 
   return {
@@ -310,6 +325,15 @@ export function createToolWorkflowTestHarness(options: {
                 complete = true;
                 break;
               }
+              if (
+                bytesRead + next.value.byteLength >
+                context.budgets.maxInputBytes
+              ) {
+                await reader.cancel("Input byte budget exceeded");
+                throw new Error(
+                  `Input exceeds ${context.budgets.maxInputBytes} bytes`,
+                );
+              }
               chunks.push(next.value);
               record.chunksRead += 1;
               bytesRead += next.value.byteLength;
@@ -333,6 +357,9 @@ export function createToolWorkflowTestHarness(options: {
             };
           },
         },
+      },
+      resolveIntent(toolId) {
+        return intents.get(toolId);
       },
       resolveProcessor(toolId) {
         return processors.get(toolId);

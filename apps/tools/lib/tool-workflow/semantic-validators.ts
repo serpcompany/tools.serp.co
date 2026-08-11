@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import UPNGModule from "upng-js";
 
 import type { SemanticVerification, WorkflowMedia } from "./index.ts";
 
@@ -10,6 +11,22 @@ const expectedMimeTypes: Readonly<Record<string, string>> = Object.freeze({
   txt: "text/plain",
 });
 
+const UPNG = UPNGModule as {
+  decode(bytes: ArrayBuffer): { width: number; height: number };
+  toRGBA8(image: { width: number; height: number }): ArrayBuffer[];
+};
+
+function crc32(bytes: Uint8Array): number {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
 function pngStructureError(bytes: Uint8Array): string | undefined {
   const signature = [137, 80, 78, 71, 13, 10, 26, 10];
   if (!signature.every((byte, index) => bytes[index] === byte)) {
@@ -19,6 +36,8 @@ function pngStructureError(bytes: Uint8Array): string | undefined {
   let offset = signature.length;
   let chunkCount = 0;
   let sawImageData = false;
+  let width = 0;
+  let height = 0;
   while (offset < bytes.byteLength) {
     if (bytes.byteLength - offset < 12) {
       return "PNG chunk is truncated";
@@ -33,14 +52,42 @@ function pngStructureError(bytes: Uint8Array): string | undefined {
     if (chunkCount === 0 && (type !== "IHDR" || length !== 13)) {
       return "PNG must begin with a 13-byte IHDR chunk";
     }
+    const storedCrc = view.getUint32(offset + 8 + length, false);
+    const computedCrc = crc32(bytes.subarray(offset + 4, offset + 8 + length));
+    if (storedCrc !== computedCrc) {
+      return `PNG ${type} chunk has an invalid CRC`;
+    }
+    if (type === "IHDR") {
+      width = view.getUint32(offset + 8, false);
+      height = view.getUint32(offset + 12, false);
+      if (width === 0 || height === 0) {
+        return "PNG dimensions must be non-zero";
+      }
+    }
     if (type === "IDAT") {
       sawImageData = true;
     }
     const nextOffset = offset + 12 + length;
     if (type === "IEND") {
-      return length === 0 && sawImageData && nextOffset === bytes.byteLength
-        ? undefined
-        : "PNG IEND chunk is invalid or not terminal";
+      if (length !== 0 || !sawImageData || nextOffset !== bytes.byteLength) {
+        return "PNG IEND chunk is invalid or not terminal";
+      }
+      try {
+        const source = Uint8Array.from(bytes).buffer;
+        const decoded = UPNG.decode(source);
+        const frames = UPNG.toRGBA8(decoded);
+        if (
+          decoded.width !== width ||
+          decoded.height !== height ||
+          frames.length === 0 ||
+          frames.some((frame) => frame.byteLength !== width * height * 4)
+        ) {
+          return "PNG decoder produced inconsistent image data";
+        }
+        return undefined;
+      } catch {
+        return "PNG decoder rejected the image data";
+      }
     }
     offset = nextOffset;
     chunkCount += 1;
@@ -84,6 +131,18 @@ function jpegStructureError(bytes: Uint8Array): string | undefined {
       (marker >= 0xc9 && marker <= 0xcb) ||
       (marker >= 0xcd && marker <= 0xcf)
     ) {
+      const componentCount = bytes[offset + 7];
+      const height = (bytes[offset + 3]! << 8) | bytes[offset + 4]!;
+      const width = (bytes[offset + 5]! << 8) | bytes[offset + 6]!;
+      if (
+        componentCount === undefined ||
+        componentCount === 0 ||
+        length !== 8 + 3 * componentCount ||
+        width === 0 ||
+        height === 0
+      ) {
+        return "JPEG frame header is invalid";
+      }
       sawFrame = true;
     }
     offset += length;
@@ -93,8 +152,18 @@ function jpegStructureError(bytes: Uint8Array): string | undefined {
     if (!sawFrame) {
       return "JPEG scan appears before a frame header";
     }
+    const scanComponentCount = bytes[offset - length + 2];
+    if (
+      scanComponentCount === undefined ||
+      scanComponentCount === 0 ||
+      length !== 6 + 2 * scanComponentCount
+    ) {
+      return "JPEG scan header is invalid";
+    }
+    let sawEntropyData = false;
     while (offset < bytes.byteLength) {
       if (bytes[offset] !== 0xff) {
+        sawEntropyData = true;
         offset += 1;
         continue;
       }
@@ -107,15 +176,68 @@ function jpegStructureError(bytes: Uint8Array): string | undefined {
         continue;
       }
       if (next === 0xd9) {
-        return offset + 2 === bytes.byteLength
+        return sawEntropyData && offset + 2 === bytes.byteLength
           ? undefined
-          : "JPEG EOI marker is not terminal";
+          : "JPEG scan is empty or its EOI marker is not terminal";
       }
       return "JPEG scan contains an invalid marker";
     }
     return "JPEG scan is missing its EOI marker";
   }
   return "JPEG is missing its EOI marker";
+}
+
+type BmffBox = { type: string; payloadStart: number; end: number };
+
+function parseBmffChildren(
+  bytes: Uint8Array,
+  start: number,
+  end: number,
+): BmffBox[] | undefined {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const boxes: BmffBox[] = [];
+  let offset = start;
+  while (offset < end) {
+    if (end - offset < 8) return undefined;
+    const size = view.getUint32(offset, false);
+    if (size < 8 || size > end - offset) return undefined;
+    boxes.push({
+      type: new TextDecoder().decode(bytes.subarray(offset + 4, offset + 8)),
+      payloadStart: offset + 8,
+      end: offset + size,
+    });
+    offset += size;
+  }
+  return offset === end ? boxes : undefined;
+}
+
+function moovStructureError(
+  bytes: Uint8Array,
+  payloadStart: number,
+  end: number,
+): string | undefined {
+  const children = parseBmffChildren(bytes, payloadStart, end);
+  if (!children) return "MP4 moov child boxes are malformed";
+  if (!children.some(({ type }) => type === "mvhd")) {
+    return "MP4 moov is missing its mvhd box";
+  }
+  const tracks = children.filter(({ type }) => type === "trak");
+  if (tracks.length === 0) return "MP4 moov is missing a trak box";
+  for (const track of tracks) {
+    const trackChildren = parseBmffChildren(
+      bytes,
+      track.payloadStart,
+      track.end,
+    );
+    if (
+      !trackChildren ||
+      !trackChildren.some(({ type }) => type === "tkhd") ||
+      !trackChildren.some(({ type }) => type === "mdia")
+    ) {
+      return "MP4 trak structure is incomplete";
+    }
+  }
+  return undefined;
 }
 
 function bmffStructureError(bytes: Uint8Array): string | undefined {
@@ -126,6 +248,7 @@ function bmffStructureError(bytes: Uint8Array): string | undefined {
     ["moov", 1],
   ]);
   const found = new Set<string>();
+  let moovPayload: { start: number; end: number } | undefined;
   let offset = 0;
 
   while (offset < bytes.byteLength) {
@@ -165,6 +288,9 @@ function bmffStructureError(bytes: Uint8Array): string | undefined {
       }
       found.add(type);
     }
+    if (type === "moov") {
+      moovPayload = { start: offset + headerSize, end: offset + boxSize };
+    }
     offset += boxSize;
   }
   for (const type of requiredPayloadSizes.keys()) {
@@ -172,6 +298,13 @@ function bmffStructureError(bytes: Uint8Array): string | undefined {
       return `MP4 is missing its ${type} box`;
     }
   }
+  if (!moovPayload) return "MP4 is missing its moov box";
+  const moovError = moovStructureError(
+    bytes,
+    moovPayload.start,
+    moovPayload.end,
+  );
+  if (moovError) return moovError;
   return undefined;
 }
 
@@ -194,8 +327,11 @@ function csvStructureError(bytes: Uint8Array): string | undefined {
   if (textError) return textError;
   const text = decodeUtf8(bytes)!;
   const parsed = Papa.parse<string[]>(text, { skipEmptyLines: true });
-  if (parsed.errors.length) {
-    return parsed.errors[0]?.message ?? "CSV parser rejected the result";
+  const fatalError = parsed.errors.find(
+    ({ code }) => code !== "UndetectableDelimiter",
+  );
+  if (fatalError) {
+    return fatalError.message || "CSV parser rejected the result";
   }
   if (parsed.data.length < 2) return "CSV needs a header and a data row";
   const headers = parsed.data[0] ?? [];

@@ -88,12 +88,20 @@ dependency guesses to catalog records or infer capability, correctness, or
 health when no maintained mapping exists.
 
 Processor contracts remain behind the shared workflow's single `run` seam.
-They own exact detected-input, requested-operation, parsed-options, output,
-resource-limit, cardinality, and semantic-validator policy. Processor
-availability is a separate Tool-id projection: inferred provenance remains
-explicitly unwired until a production family migration registers an adapter,
-and neither support nor validator results become Catalog intent or runtime
-telemetry.
+Canonical Tool-id intent supplies the requested operation and output contract;
+processor support separately declares accepted detected inputs, outputs,
+resource limits, cardinality, parsed options, and semantic-validator policy.
+Both contracts are validated and deeply frozen before acquisition. Declared
+budgets are cooperative limits available to acquisition and processing code,
+with workflow byte-limit postconditions as a second defense; they are not a
+JavaScript sandbox. The workflow always enforces non-empty bytes and exact
+format/MIME agreement with intent, then the processor-owned validator proves
+format or domain semantics. Application semantic verifiers provide trusted
+defaults without making their current format registry the extensibility
+boundary. Processor availability is a separate Tool-id projection: inferred
+provenance remains explicitly unwired until a production family migration
+registers an adapter, and neither support nor validator results become Catalog
+intent or runtime telemetry.
 
 ## Cloudflare runtime and data boundaries
 

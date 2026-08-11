@@ -6,6 +6,7 @@ import {
   createToolWorkflowTestHarness,
   defineScriptedProcessor,
 } from "./testing.ts";
+import { defineToolSupport } from "./index.ts";
 
 function bytes(hex: string) {
   return Uint8Array.from(hex.match(/.{2}/g) ?? [], (byte) =>
@@ -24,9 +25,25 @@ const PNG_BYTES = bytes(
 const JPEG_BYTES = base64Bytes(
   "/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAABgj/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABykX//Z",
 );
+const EMPTY_SOF_JPEG_BYTES = bytes("ffd8ffc00002ffd9");
+const ZERO_DIMENSION_BAD_CRC_PNG_BYTES = new Uint8Array([
+  137, 80, 78, 71, 13, 10, 26, 10,
+  0, 0, 0, 13, 73, 72, 68, 82,
+  0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 0, 0,
+  0, 0, 0, 0,
+  0, 0, 0, 1, 73, 68, 65, 84, 0,
+  0, 0, 0, 0,
+  0, 0, 0, 0, 73, 69, 78, 68,
+  0, 0, 0, 0,
+]);
 const MP4_FTYP_BYTES = new Uint8Array([
   0, 0, 0, 20, 102, 116, 121, 112, 105, 115, 111, 109, 0, 0, 2, 0, 105, 115,
   111, 109,
+]);
+const ARBITRARY_MP4_BOX_BYTES = new Uint8Array([
+  0, 0, 0, 16, 102, 116, 121, 112, 105, 115, 111, 109, 0, 0, 2, 0,
+  0, 0, 0, 9, 109, 111, 111, 118, 0,
+  0, 0, 0, 9, 109, 100, 97, 116, 0,
 ]);
 const SAMPLE_MP4_BYTES = new Uint8Array(
   readFileSync(
@@ -39,6 +56,49 @@ const JSON_TABLE_BYTES = new TextEncoder().encode(
 const CSV_TABLE_BYTES = new TextEncoder().encode(
   "name,language\r\nAda,Analytical Engine\r\n",
 );
+
+test("Tool support construction rejects malformed limits and deeply freezes policy", () => {
+  const definition = {
+    acquisition: "file" as const,
+    inputs: [{ format: "png", mimeTypes: ["image/png"] }],
+    outputs: [{ format: "jpg", mimeType: "image/jpeg" }],
+    resourceLimits: {
+      maxInputBytes: 1_024,
+      maxOutputBytes: 1_024,
+      maxTotalOutputBytes: 1_024,
+    },
+    outputCardinality: { min: 1, max: 1 },
+  };
+  const support = defineToolSupport(definition);
+
+  assert.equal(Object.isFrozen(support), true);
+  assert.equal(Object.isFrozen(support.inputs), true);
+  assert.equal(Object.isFrozen(support.inputs[0]), true);
+  assert.equal(Object.isFrozen(support.inputs[0]?.mimeTypes), true);
+  assert.equal(Object.isFrozen(support.outputs), true);
+  assert.equal(Object.isFrozen(support.outputs[0]), true);
+  assert.equal(Object.isFrozen(support.resourceLimits), true);
+  assert.equal(Object.isFrozen(support.outputCardinality), true);
+
+  for (const [name, value] of [
+    ["negative", -1],
+    ["non-finite", Number.POSITIVE_INFINITY],
+    ["unsafe", Number.MAX_SAFE_INTEGER + 1],
+  ] as const) {
+    assert.throws(
+      () =>
+        defineToolSupport({
+          ...definition,
+          resourceLimits: {
+            ...definition.resourceLimits,
+            maxInputBytes: value,
+          },
+        }),
+      { name: "TypeError" },
+      `${name} resource limit should be rejected`,
+    );
+  }
+});
 
 test("a file Tool run crosses one workflow seam from acquisition through delivery", async () => {
   const harness = createToolWorkflowTestHarness({
@@ -158,11 +218,14 @@ test("a text/table processor succeeds only with a structurally valid table resul
   const harness = createToolWorkflowTestHarness({
     processors: {
       "json-to-csv": {
+        intent: {
+          requestedOperation: "table-convert",
+          outputs: [{ format: "csv", mimeType: "text/csv" }],
+        },
         support: {
           acquisition: "file",
           inputFormats: ["txt"],
           outputFormats: ["csv"],
-          requestedOperation: "table-convert",
           outputCardinality: { min: 1, max: 1 },
         },
         result: {
@@ -197,6 +260,43 @@ test("a text/table processor succeeds only with a structurally valid table resul
     })),
     [{ format: "csv", mimeType: "text/csv", size: 38 }],
   );
+});
+
+test("a valid single-column CSV satisfies table semantics", async () => {
+  const singleColumnCsv = new TextEncoder().encode("name\nAda\n");
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "json-to-csv": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["txt"],
+          outputFormats: ["csv"],
+        },
+        result: {
+          name: "people.csv",
+          format: "csv",
+          mimeType: "text/csv",
+          bytes: singleColumnCsv,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "json-to-csv",
+    input: {
+      kind: "file",
+      media: {
+        name: "people.json",
+        format: "txt",
+        mimeType: "text/plain",
+        bytes: JSON_TABLE_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "succeeded");
+  assert.deepEqual(outcome.results.map(({ size }) => size), [9]);
 });
 
 test("an empty text/table result is rejected before delivery", async () => {
@@ -325,6 +425,113 @@ test("processor-owned semantic validators can enforce transcript invariants", as
   assert.equal(harness.events.includes("delivery"), false);
 });
 
+test("processor validators cannot bypass universal result contracts", async (t) => {
+  const fixtures = [
+    {
+      name: "empty bytes",
+      mimeType: "text/plain",
+      bytes: new Uint8Array(),
+      message: "txt result is empty",
+    },
+    {
+      name: "wrong MIME",
+      mimeType: "application/octet-stream",
+      bytes: new TextEncoder().encode("processor says success"),
+      message: "Unsupported output: txt (application/octet-stream)",
+    },
+  ];
+
+  for (const fixture of fixtures) {
+    await t.test(fixture.name, async () => {
+      const harness = createToolWorkflowTestHarness({
+        processors: {
+          "audio-to-text": {
+            support: {
+              acquisition: "file",
+              inputFormats: ["mp4"],
+              outputFormats: ["txt"],
+            },
+            validators: {
+              output() {
+                return { status: "verified" };
+              },
+            },
+            result: {
+              name: "transcript.txt",
+              format: "txt",
+              mimeType: fixture.mimeType,
+              bytes: fixture.bytes,
+            },
+          },
+        },
+      });
+      const outcome = await harness.workflow.run({
+        toolId: "audio-to-text",
+        input: {
+          kind: "file",
+          media: {
+            name: "speech.mp4",
+            format: "mp4",
+            mimeType: "video/mp4",
+            bytes: SAMPLE_MP4_BYTES,
+          },
+        },
+      });
+
+      assert.equal(outcome.status, "failed");
+      assert.equal(outcome.error.code, "invalid-result");
+      assert.equal(outcome.error.message, fixture.message);
+      assert.equal(harness.events.includes("delivery"), false);
+    });
+  }
+});
+
+test("processor semantic validators can prove formats outside the default registry", async () => {
+  const wavBytes = new TextEncoder().encode("RIFF\u0004\u0000\u0000\u0000WAVE");
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "custom-wav": {
+        engineId: "browser-raster-worker",
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["wav"],
+        },
+        validators: {
+          output(result) {
+            const text = new TextDecoder().decode(result.bytes);
+            return text.startsWith("RIFF") && text.endsWith("WAVE")
+              ? { status: "verified" }
+              : { status: "rejected", message: "Invalid WAV container" };
+          },
+        },
+        result: {
+          name: "audio.wav",
+          format: "wav",
+          mimeType: "audio/wav",
+          bytes: wavBytes,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "custom-wav",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "succeeded");
+  assert.equal(harness.events.includes("delivery"), true);
+});
+
 test("invalid and unsupported requests fail closed before processor execution", async () => {
   const harness = createToolWorkflowTestHarness({
     processors: {
@@ -387,11 +594,14 @@ test("exact processor support rejects an unsupported operation before fallback e
     processors: {
       "png-to-avif": {
         engineId: "browser-raster-worker",
+        intent: {
+          requestedOperation: "convert",
+          outputs: [{ format: "avif", mimeType: "image/avif" }],
+        },
         support: {
           acquisition: "file",
           inputFormats: ["png"],
           outputFormats: ["avif"],
-          requestedOperation: "convert",
           resourceLimits: {
             maxInputBytes: 1_024,
             maxOutputBytes: 1_024,
@@ -494,6 +704,141 @@ test("declared input resource limits reject work before processor execution", as
   assert.equal(harness.events.length, 0);
 });
 
+test("malformed resource-limit contracts fail before acquisition", async (t) => {
+  const cases = [
+    {
+      name: "non-finite input",
+      limits: {
+        maxInputBytes: Number.POSITIVE_INFINITY,
+        maxOutputBytes: 1_024,
+        maxTotalOutputBytes: 1_024,
+      },
+    },
+    {
+      name: "per-output maximum exceeds total maximum",
+      limits: {
+        maxInputBytes: 1_024,
+        maxOutputBytes: 1_024,
+        maxTotalOutputBytes: 512,
+      },
+    },
+  ];
+
+  for (const fixture of cases) {
+    await t.test(fixture.name, async () => {
+      const harness = createToolWorkflowTestHarness({
+        resources: { acquiring: ["reader"] },
+        processors: {
+          "png-to-jpg": {
+            support: {
+              acquisition: "file",
+              inputFormats: ["png"],
+              outputFormats: ["jpg"],
+              resourceLimits: fixture.limits,
+            },
+            result: {
+              name: "photo.jpg",
+              format: "jpg",
+              mimeType: "image/jpeg",
+              bytes: JPEG_BYTES,
+            },
+          },
+        },
+      });
+      const outcome = await harness.workflow.run({
+        toolId: "png-to-jpg",
+        input: {
+          kind: "file",
+          media: {
+            name: "photo.png",
+            format: "png",
+            mimeType: "image/png",
+            bytes: PNG_BYTES,
+          },
+        },
+      });
+
+      assert.equal(outcome.status, "failed");
+      assert.equal(outcome.error.code, "unsupported-tool");
+      assert.deepEqual(harness.openedResources, []);
+      assert.deepEqual(harness.events, []);
+    });
+  }
+});
+
+test("processors receive immutable cooperative budgets and immutable intent before work", async () => {
+  let processHookCalled = false;
+  const limits = {
+    maxInputBytes: 1_024,
+    maxOutputBytes: 2_048,
+    maxTotalOutputBytes: 4_096,
+  };
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "png-to-jpg": {
+        intent: {
+          requestedOperation: "convert",
+          outputs: [{ format: "jpg", mimeType: "image/jpeg" }],
+        },
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+          resourceLimits: limits,
+        },
+        decideSupport(request) {
+          assert.equal(Object.isFrozen(request.outputs), true);
+          assert.equal(Object.isFrozen(request.outputs[0]), true);
+          assert.throws(() => {
+            (request.outputs as Array<{ format: string; mimeType: string }>).push(
+              { format: "png", mimeType: "image/png" },
+            );
+          }, TypeError);
+          return { supported: true };
+        },
+        async process(_input, _options, context) {
+          processHookCalled = true;
+          assert.deepEqual(context.budgets, limits);
+          assert.equal(Object.isFrozen(context.budgets), true);
+          assert.throws(() => {
+            (context.budgets as { maxOutputBytes: number }).maxOutputBytes = 0;
+          }, TypeError);
+          return [
+            {
+              name: "photo.jpg",
+              format: "jpg",
+              mimeType: "image/jpeg",
+              bytes: JPEG_BYTES,
+            },
+          ];
+        },
+        result: {
+          name: "ignored.jpg",
+          format: "jpg",
+          mimeType: "image/jpeg",
+          bytes: JPEG_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "succeeded");
+  assert.equal(processHookCalled, true);
+});
+
 test("semantic validation rejects wrong-format bytes before delivery", async () => {
   const harness = createToolWorkflowTestHarness({
     processors: {
@@ -540,6 +885,81 @@ test("semantic validation rejects wrong-format bytes before delivery", async () 
   ]);
 });
 
+test("zero-dimension PNG bytes with bad CRC and arbitrary image data are rejected", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "png-to-png": {
+        engineId: "browser-raster-worker",
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["png"],
+        },
+        result: {
+          name: "invalid.png",
+          format: "png",
+          mimeType: "image/png",
+          bytes: ZERO_DIMENSION_BAD_CRC_PNG_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "png-to-png",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.equal(harness.events.includes("delivery"), false);
+});
+
+test("a JPEG with an empty frame header and no scan is rejected", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "png-to-jpg": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+        },
+        result: {
+          name: "invalid.jpg",
+          format: "jpg",
+          mimeType: "image/jpeg",
+          bytes: EMPTY_SOF_JPEG_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.equal(harness.events.includes("delivery"), false);
+});
+
 test("workflow rejects processor output with the wrong declared cardinality", async () => {
   const harness = createToolWorkflowTestHarness({
     processors: {
@@ -584,6 +1004,119 @@ test("workflow rejects processor output with the wrong declared cardinality", as
   assert.equal(outcome.status, "failed");
   assert.equal(outcome.error.code, "invalid-result");
   assert.match(outcome.error.message, /Expected 1\.\.1 results, received 2/);
+  assert.equal(harness.events.includes("delivery"), false);
+});
+
+test("invalid cardinality policy fails closed before acquisition", async (t) => {
+  const cases = [
+    { name: "zero-output contract", cardinality: { min: 0, max: 0 }, result: [] },
+    {
+      name: "minimum below one",
+      cardinality: { min: 0, max: 1 },
+      result: {
+        name: "photo.jpg",
+        format: "jpg",
+        mimeType: "image/jpeg",
+        bytes: JPEG_BYTES,
+      },
+    },
+    {
+      name: "maximum below minimum",
+      cardinality: { min: 2, max: 1 },
+      result: {
+        name: "photo.jpg",
+        format: "jpg",
+        mimeType: "image/jpeg",
+        bytes: JPEG_BYTES,
+      },
+    },
+    {
+      name: "non-finite maximum",
+      cardinality: { min: 1, max: Number.POSITIVE_INFINITY },
+      result: {
+        name: "photo.jpg",
+        format: "jpg",
+        mimeType: "image/jpeg",
+        bytes: JPEG_BYTES,
+      },
+    },
+  ];
+
+  for (const fixture of cases) {
+    await t.test(fixture.name, async () => {
+      const harness = createToolWorkflowTestHarness({
+        resources: { acquiring: ["reader"] },
+        processors: {
+          "png-to-jpg": {
+            support: {
+              acquisition: "file",
+              inputFormats: ["png"],
+              outputFormats: ["jpg"],
+              outputCardinality: fixture.cardinality,
+            },
+            result: fixture.result,
+          },
+        },
+      });
+      const phases: string[] = [];
+      const outcome = await harness.workflow.run(
+        {
+          toolId: "png-to-jpg",
+          input: {
+            kind: "file",
+            media: {
+              name: "photo.png",
+              format: "png",
+              mimeType: "image/png",
+              bytes: PNG_BYTES,
+            },
+          },
+        },
+        { observe: ({ phase }) => phases.push(phase) },
+      );
+
+      assert.equal(outcome.status, "failed");
+      assert.equal(outcome.error.code, "unsupported-tool");
+      assert.equal(outcome.error.message, "Invalid output cardinality contract");
+      assert.equal(phases.includes("succeeded"), false);
+      assert.deepEqual(harness.openedResources, []);
+      assert.deepEqual(harness.events, []);
+      assert.deepEqual(harness.telemetryRecords, []);
+    });
+  }
+});
+
+test("workflow cannot succeed with no verified outputs under a valid contract", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "png-to-jpg": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+          outputCardinality: { min: 1, max: 1 },
+        },
+        result: [],
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.equal(outcome.error.message, "Processor returned no results");
   assert.equal(harness.events.includes("delivery"), false);
 });
 
@@ -1034,6 +1567,63 @@ test("mid-stream URL cancellation closes the reader before processing or deliver
   assert.deepEqual(harness.events, []);
 });
 
+test("a URL stream stops reading as soon as its declared input budget is exceeded", async () => {
+  const harness = createToolWorkflowTestHarness({
+    media: {
+      urls: {
+        "https://media.example/oversized.mp4": {
+          name: "oversized.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          chunks: [
+            SAMPLE_MP4_BYTES.subarray(0, 4_096),
+            SAMPLE_MP4_BYTES.subarray(4_096, 8_192),
+            SAMPLE_MP4_BYTES.subarray(8_192),
+          ],
+          totalBytes: SAMPLE_MP4_BYTES.byteLength,
+        },
+      },
+    },
+    processors: {
+      "video-downloader": {
+        support: {
+          acquisition: "url",
+          inputFormats: ["mp4"],
+          outputFormats: ["mp4"],
+          resourceLimits: {
+            maxInputBytes: 4_096,
+            maxOutputBytes: 20_000,
+            maxTotalOutputBytes: 20_000,
+          },
+        },
+        result: {
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: SAMPLE_MP4_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url: "https://media.example/oversized.mp4" },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "acquisition-failed");
+  assert.deepEqual(harness.streamRecords, [
+    {
+      url: "https://media.example/oversized.mp4",
+      chunksRead: 1,
+      cancelled: true,
+      readerLockReleased: true,
+    },
+  ]);
+  assert.deepEqual(harness.events, []);
+});
+
 test("semantic verification fails closed for malformed MP4 and unknown formats", async () => {
   const harness = createToolWorkflowTestHarness({
     processors: {
@@ -1137,6 +1727,44 @@ test("an ftyp-only MP4 artifact is rejected before delivery", async () => {
   );
 });
 
+test("an MP4 with arbitrary one-byte moov and mdat payloads is rejected", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "invalid-mp4": {
+        engineId: "browser-raster-worker",
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["mp4"],
+        },
+        result: {
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: ARBITRARY_MP4_BOX_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "invalid-mp4",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.equal(harness.events.includes("delivery"), false);
+});
+
 test("typed options and engine support policy stay behind the run seam", async () => {
   const processor = defineScriptedProcessor<{ quality: number }>({
     engineId: "browser-raster-worker",
@@ -1196,17 +1824,14 @@ test("typed options and engine support policy stay behind the run seam", async (
         processingLocation: "browser",
         executionProfile: "client-only",
         implementation: {
-          class: "hybrid",
-          identity: "@jsquash codecs, UPNG.js, and @imagemagick/magick-wasm",
-          rationale:
-            "Repository dispatch selects trusted codecs without implementing image codecs.",
+          class: "platform-primitive",
+          identity: "WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D",
         },
       },
       support: {
         acquisition: "file",
         inputs: [{ format: "png", mimeTypes: ["image/png"] }],
         outputs: [{ format: "jpg", mimeType: "image/jpeg" }],
-        requestedOperation: "process",
         resourceLimits: {
           maxInputBytes: Number.MAX_SAFE_INTEGER,
           maxOutputBytes: Number.MAX_SAFE_INTEGER,
@@ -1288,10 +1913,8 @@ test("scripted processors use canonical execution provenance records", async () 
         processingLocation: "browser",
         executionProfile: "client-only",
         implementation: {
-          class: "hybrid",
-          identity: "@jsquash codecs, UPNG.js, and @imagemagick/magick-wasm",
-          rationale:
-            "Repository dispatch selects trusted codecs without implementing image codecs.",
+          class: "platform-primitive",
+          identity: "WebCodecs ImageDecoder, createImageBitmap, and Canvas 2D",
         },
       },
       {
