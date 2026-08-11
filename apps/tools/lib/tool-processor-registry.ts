@@ -28,7 +28,18 @@ export type ToolProcessorAvailability =
   | UnknownToolProcessorAvailability;
 
 const registeredAdapterIdByToolId: Readonly<Record<string, string>> =
-  Object.freeze({});
+  Object.freeze({
+    'audio-to-text': 'streamed-media-workflow',
+    'audio-to-transcript': 'streamed-media-workflow',
+    'download-loom-videos': 'streamed-media-workflow',
+    'mp3-to-transcript': 'streamed-media-workflow',
+    'mp4-to-transcript': 'streamed-media-workflow',
+    'tiktok-to-transcript': 'streamed-media-workflow',
+    'video-downloader': 'streamed-media-workflow',
+    'video-to-transcript': 'streamed-media-workflow',
+    'youtube-to-transcript': 'streamed-media-workflow',
+    'youtube-to-transcript-generator': 'streamed-media-workflow',
+  });
 
 function availabilityForToolId(toolId: string): ToolProcessorAvailability {
   const adapterId = registeredAdapterIdByToolId[toolId];

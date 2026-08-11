@@ -172,10 +172,19 @@ test('downloader and browser-with-fetch support keep distinct profiles', () => {
     new URL('../components/TranscribeTool.tsx', import.meta.url),
     'utf8',
   );
-  assert.match(downloaderSource, /getDownloaderMediaFetchEndpoint/);
-  assert.match(transcriptionSource, /getMediaFetchEndpoint/);
+  const browserMediaWorkflowSource = readFileSync(
+    new URL('../lib/media-workflow/transcription-browser.ts', import.meta.url),
+    'utf8',
+  );
+  const mediaEndpointSource = readFileSync(
+    new URL('../lib/media-workflow/media-endpoint.ts', import.meta.url),
+    'utf8',
+  );
+  assert.match(downloaderSource, /createBrowserMediaWorkflow/);
+  assert.match(mediaEndpointSource, /getDownloaderMediaFetchEndpoint/);
+  assert.match(mediaEndpointSource, /getMediaFetchEndpoint/);
   assert.match(transcriptionSource, /handleFiles/);
-  assert.match(transcriptionSource, /transcribe\.worker/);
+  assert.match(browserMediaWorkflowSource, /transcribe\.worker/);
 });
 
 test('specialized and table Tools expose explicit browser-owned engines', () => {

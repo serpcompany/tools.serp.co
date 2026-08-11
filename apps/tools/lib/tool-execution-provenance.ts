@@ -197,7 +197,7 @@ const engineById = defineEngines({
   },
   'browser-transformers-transcription': {
     capability: 'media-transcription',
-    owner: 'apps/tools/components/TranscribeTool.tsx',
+    owner: 'apps/tools/lib/media-workflow/transcription-browser.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {

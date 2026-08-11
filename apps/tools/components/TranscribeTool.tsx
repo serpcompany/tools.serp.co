@@ -3,18 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import { Card } from "@serp-tools/ui/components/card";
-import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
-import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
-import { extractAudioForTranscription } from "@/lib/convert/video";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
-import { getMediaFetchEndpoint } from "@/lib/media-fetch-endpoint";
-
-type ProgressUpdate = {
-  progress?: number;
-  message?: string;
-};
+import {
+  deliverMediaInBrowser,
+  workflowMediaFromFile,
+} from "@/lib/media-workflow/browser";
+import { createBrowserTranscriptionWorkflow } from "@/lib/media-workflow/transcription-browser";
+import type { WorkflowMedia } from "@/lib/tool-workflow";
 
 type Props = {
   toolId: string;
@@ -24,66 +21,6 @@ type Props = {
 
 const SUPPORTED_EXTENSIONS = Array.from(new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS]));
 const ACCEPT_ATTR = SUPPORTED_EXTENSIONS.map((ext) => `.${ext}`).join(",");
-
-const MIME_EXTENSION_MAP: Record<string, string> = {
-  "audio/mpeg": "mp3",
-  "audio/wav": "wav",
-  "audio/x-wav": "wav",
-  "audio/wave": "wav",
-  "audio/aiff": "aiff",
-  "audio/x-aiff": "aiff",
-  "audio/flac": "flac",
-  "audio/x-flac": "flac",
-  "audio/mp4": "m4a",
-  "audio/x-m4a": "m4a",
-  "audio/aac": "aac",
-  "audio/ogg": "ogg",
-  "audio/opus": "opus",
-  "audio/webm": "webm",
-  "audio/3gpp": "3gp",
-  "audio/3gpp2": "3g2",
-  "video/mp4": "mp4",
-  "video/webm": "webm",
-  "video/quicktime": "mov",
-  "video/ogg": "ogv",
-  "video/x-matroska": "mkv",
-  "video/x-msvideo": "avi",
-  "video/x-flv": "flv",
-  "video/x-ms-asf": "asf",
-  "video/x-ms-wmv": "wmv",
-  "video/3gpp": "3gp",
-  "video/3gpp2": "3g2",
-};
-
-const DOWNLOAD_PROGRESS_MAX = 20;
-const EXTRACTION_PROGRESS_END = 55;
-const AUDIO_SAMPLE_RATE = 16000;
-const AUDIO_BYTES_PER_SAMPLE = 4;
-
-function getExtensionFromName(name: string): string {
-  return name.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1] ?? "";
-}
-
-function getExtension(file: File) {
-  const fromName = getExtensionFromName(file.name);
-  if (fromName) return fromName;
-  const mapped = MIME_EXTENSION_MAP[file.type?.toLowerCase() ?? ""];
-  return mapped ?? "";
-}
-
-function buildOutputName(fileName: string) {
-  const base = fileName.replace(/\.[^.]+$/, "");
-  return `${base || fileName}.txt`;
-}
-
-function getFileNameFromUrl(url: URL) {
-  const raw = url.pathname.split("/").filter(Boolean).pop() || "remote-file";
-  try {
-    return decodeURIComponent(raw);
-  } catch {
-    return raw;
-  }
-}
 
 function parseUrlInput(value: string) {
   if (!value?.trim()) return null;
@@ -98,41 +35,18 @@ function parseUrlInput(value: string) {
   }
 }
 
-function formatBytes(bytes: number) {
-  if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
-  const units = ["B", "KB", "MB", "GB"];
-  let value = bytes;
-  let unitIndex = 0;
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024;
-    unitIndex += 1;
-  }
-  const precision = value < 10 && unitIndex > 0 ? 1 : 0;
-  return `${value.toFixed(precision)} ${units[unitIndex]}`;
-}
-
-function formatDuration(totalSeconds: number) {
-  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return "";
-  const seconds = Math.max(0, Math.round(totalSeconds));
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remaining = seconds % 60;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  if (minutes > 0) return `${minutes}m ${remaining}s`;
-  return `${remaining}s`;
-}
 
 export default function TranscribeTool({ toolId, title, subtitle }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dropRef = useRef<HTMLDivElement | null>(null);
-  const workerRef = useRef<Worker | null>(null);
+  const activeRun = useRef<AbortController | null>(null);
 
   const [busy, setBusy] = useState(false);
   const [hint, setHint] = useState("or drop files here");
   const [dropEffect, setDropEffect] = useState<string>("");
   const [currentFile, setCurrentFile] = useState<ToolProgressFile | null>(null);
   const [transcript, setTranscript] = useState("");
-  const [transcriptName, setTranscriptName] = useState("transcript.txt");
+  const [transcriptMedia, setTranscriptMedia] = useState<WorkflowMedia | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [urlInput, setUrlInput] = useState("");
   const [adsVisible, setAdsVisible] = useState(false);
@@ -157,285 +71,72 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
   }, 0);
   const randomColor = colors[Math.abs(hashCode) % colors.length];
 
-  function ensureWorker() {
-    if (!workerRef.current) {
-      const workerUrl = new URL("../workers/transcribe.worker.js", import.meta.url);
-      workerRef.current = new Worker(workerUrl, { type: "module" });
-    }
-    return workerRef.current;
-  }
-
   function onPick() {
     inputRef.current?.click();
   }
 
-  async function transcribeWithWorker(args: {
-    worker: Worker;
-    audioBuffer: ArrayBuffer;
-    onProgress?: (update: ProgressUpdate) => void;
-  }): Promise<string> {
-    return await new Promise((resolve, reject) => {
-      args.worker.onmessage = (ev) => {
-        if (!ev.data) {
-          reject(new Error("Malformed worker response"));
-          return;
-        }
-
-        if (ev.data.type === "progress") {
-          args.onProgress?.({
-            progress: ev.data.progress,
-            message: ev.data.message,
-          });
-          return;
-        }
-
-        if (ev.data.type === "result") {
-          resolve(ev.data.text ?? "");
-          return;
-        }
-
-        if (ev.data.type === "error") {
-          reject(new Error(ev.data.error || "Transcription failed"));
-          return;
-        }
-
-        reject(new Error("Unknown worker response"));
-      };
-
-      args.worker.onerror = (error) => {
-        const detailParts = [
-          error?.message,
-          error?.filename,
-          error?.lineno,
-          error?.colno,
-        ].filter(Boolean);
-        const detail = detailParts.length ? detailParts.join(" | ") : String(error);
-        reject(new Error(`Worker error: ${detail}`));
-      };
-
-      args.worker.postMessage({ audioBuffer: args.audioBuffer }, [args.audioBuffer]);
-    });
+  function observeRun(name: string) {
+    return (snapshot: { phase: string; progress?: number }) => {
+      if (["succeeded", "failed", "cancelled"].includes(snapshot.phase)) return;
+      setCurrentFile({
+        name,
+        progress: Math.round((snapshot.progress ?? 0) * 100),
+        status: snapshot.phase === "acquiring" ? "loading" : "processing",
+        message:
+          snapshot.phase === "acquiring"
+            ? "Downloading..."
+            : snapshot.phase === "delivering"
+              ? "Preparing transcript..."
+              : "Transcribing...",
+      });
+    };
   }
 
-  async function downloadUrlToFile(
-    url: URL,
-    onProgress?: (update: {
-      receivedBytes: number;
-      totalBytes?: number;
-      ratio?: number;
-      etaSeconds?: number;
-    }) => void
+  async function runTranscription(
+    input: { kind: "url"; url: string } | { kind: "file"; media: WorkflowMedia },
+    name: string,
   ) {
-    const response = await fetch(getMediaFetchEndpoint(), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: url.toString(), mode: "audio" }),
-    });
-
-    if (!response.ok) {
-      let detail = "";
-      try {
-        const data = await response.json();
-        if (data?.error) {
-          detail = data.error;
-        }
-      } catch {
-        detail = "";
-      }
-      const suffix = detail ? `: ${detail}` : "";
-      throw new Error(`Download failed (${response.status})${suffix}`);
-    }
-
-    const contentTypeRaw = response.headers.get("content-type") || "";
-    const contentType = contentTypeRaw.split(";")[0]?.trim().toLowerCase() || "";
-    const fileNameFromHeader =
-      response.headers.get("x-media-filename")?.trim() || "";
-    const fileNameFromUrl = getFileNameFromUrl(url);
-    const fileNameCandidate = fileNameFromHeader || fileNameFromUrl;
-    const extensionFromHeader =
-      response.headers.get("x-media-extension")?.trim().toLowerCase() || "";
-    const extensionFromName = getExtensionFromName(fileNameCandidate);
-    const extensionFromType = MIME_EXTENSION_MAP[contentType] || "";
-    const extension = SUPPORTED_EXTENSIONS.includes(extensionFromName)
-      ? extensionFromName
-      : extensionFromHeader && SUPPORTED_EXTENSIONS.includes(extensionFromHeader)
-        ? extensionFromHeader
-        : extensionFromType;
-    const looksLikeMedia =
-      contentType.startsWith("audio/") || contentType.startsWith("video/");
-
-    if (!extension || !SUPPORTED_EXTENSIONS.includes(extension)) {
-      if (looksLikeMedia) {
-        throw new Error(
-          "This link returns a media type we do not support yet. Try downloading the file and uploading it."
-        );
-      }
-      throw new Error(
-        "That link does not look like a supported audio/video file. Try another link or upload the file."
-      );
-    }
-
-    let fileName = fileNameCandidate || "remote-file";
-    if (!getExtensionFromName(fileName)) {
-      fileName = `${fileName}.${extension}`;
-    }
-
-    const totalBytesHeader = response.headers.get("content-length");
-    const totalBytes = totalBytesHeader ? Number(totalBytesHeader) : 0;
-    const hasTotalBytes = Number.isFinite(totalBytes) && totalBytes > 0;
-
-    if (!response.body) {
-      const buffer = await response.arrayBuffer();
-      return new File([buffer], fileName, {
-        type: contentType || "application/octet-stream",
-      });
-    }
-
-    const reader = response.body.getReader();
-    const chunks: Uint8Array[] = [];
-    let receivedBytes = 0;
-    const startedAt = performance.now();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (!value) continue;
-      chunks.push(value);
-      receivedBytes += value.byteLength;
-
-      const elapsed = (performance.now() - startedAt) / 1000;
-      const speed = elapsed > 0 ? receivedBytes / elapsed : 0;
-      const ratio = hasTotalBytes ? Math.min(1, receivedBytes / totalBytes) : undefined;
-      const etaSeconds =
-        hasTotalBytes && speed > 0 ? Math.max(0, (totalBytes - receivedBytes) / speed) : undefined;
-
-      onProgress?.({
-        receivedBytes,
-        totalBytes: hasTotalBytes ? totalBytes : undefined,
-        ratio,
-        etaSeconds,
-      });
-    }
-
-    const blobParts = chunks.map((chunk) => {
-      const slice = chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength);
-      if (slice instanceof SharedArrayBuffer) {
-        const copy = new ArrayBuffer(slice.byteLength);
-        new Uint8Array(copy).set(new Uint8Array(slice));
-        return copy;
-      }
-      return slice;
-    });
-    const blob = new Blob(blobParts, { type: contentType || "application/octet-stream" });
-    return new File([blob], fileName, {
-      type: contentType || "application/octet-stream",
-    });
-  }
-
-  async function processFile(args: {
-    file: File;
-    worker: Worker;
-    progressOffset?: number;
-    source?: "upload" | "url";
-  }) {
-    const { file, worker, source = "upload" } = args;
-    const ext = getExtension(file);
-    if (!ext || !SUPPORTED_EXTENSIONS.includes(ext)) {
-      setErrorMessage("Unsupported file type. Please upload an audio or video file.");
-      return;
-    }
-
     setErrorMessage(null);
     setTranscript("");
-
-    const run = beginToolRun({
-      toolId,
-      from: ext,
-      to: "txt",
-      inputBytes: file.size,
-      metadata: { fileName: file.name, source },
-    });
-
-    const extractionStart = args.progressOffset ?? 0;
-    const extractionRange = Math.max(0, EXTRACTION_PROGRESS_END - extractionStart);
-
+    setTranscriptMedia(null);
     setCurrentFile({
-      name: file.name,
-      progress: extractionStart,
+      name,
+      progress: 0,
       status: "processing",
       message: "Preparing transcript...",
     });
-
     try {
-      const buf = await file.arrayBuffer();
-      const audioBuffer = await extractAudioForTranscription(buf, ext, {
-        onProgress: (progress) => {
-          const ratio = Math.max(0, Math.min(1, progress.ratio || 0));
-          const extractionProgress = Math.round(extractionStart + ratio * extractionRange);
-          setCurrentFile({
-            name: file.name,
-            progress: extractionProgress,
-            status: "processing",
-            message: "Extracting audio...",
-          });
+      const controller = new AbortController();
+      activeRun.current?.abort("Replaced by a new transcription run");
+      activeRun.current = controller;
+      const workflow = createBrowserTranscriptionWorkflow({
+        onDelivered(media) {
+          setTranscriptMedia(media);
+          setTranscript(new TextDecoder().decode(media.bytes));
         },
       });
-
-      const audioSeconds =
-        audioBuffer.byteLength / (AUDIO_SAMPLE_RATE * AUDIO_BYTES_PER_SAMPLE);
-      const audioDurationLabel = formatDuration(audioSeconds);
-      const audioLengthNote = audioDurationLabel ? `audio length ${audioDurationLabel}` : "";
-
-      const text = await transcribeWithWorker({
-        worker,
-        audioBuffer,
-        onProgress: (update) => {
-          const baseMessage = update.message || "Transcribing...";
-          const includeLength =
-            audioLengthNote && baseMessage.toLowerCase().includes("transcrib");
-          const message = includeLength ? `${baseMessage} (${audioLengthNote})` : baseMessage;
-          setCurrentFile({
-            name: file.name,
-            progress: update.progress || EXTRACTION_PROGRESS_END,
-            status: "processing",
-            message,
-          });
-        },
-      });
-
-      if (!text) {
-        throw new Error("Transcription produced empty output.");
-      }
-
-      setTranscript(text);
-      const blob = new Blob([text], { type: "text/plain" });
-      const outputName = buildOutputName(file.name);
-      setTranscriptName(outputName);
-      saveBlob(blob, outputName);
-
-      run.finishSuccess({
-        outputBytes: blob.size,
-        metadata: {
-          audioSeconds: Math.round(audioSeconds),
-          source,
-        },
-      });
+      const outcome = await workflow.run(
+        { toolId, input },
+        { signal: controller.signal, observe: observeRun(name) },
+      );
+      if (outcome.status === "failed") throw new Error(outcome.error.message);
+      if (outcome.status === "cancelled") return;
       setCurrentFile({
-        name: file.name,
+        name: outcome.results[0]?.name ?? name,
         progress: 100,
         status: "completed",
         message: "Transcription complete!",
       });
     } catch (err) {
-      const failure = getTelemetryFailure(err, "transcribe_failed");
-      const message = failure.message || "Transcription failed";
+      const message = err instanceof Error ? err.message : "Transcription failed";
       setCurrentFile({
-        name: file.name,
+        name,
         progress: 0,
         status: "error",
         message,
       });
-      run.finishFailure({ errorCode: failure.errorCode, metadata: failure.metadata });
+    } finally {
+      activeRun.current = null;
     }
   }
 
@@ -451,8 +152,7 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
     setErrorMessage(null);
     setTranscript("");
 
-    const worker = ensureWorker();
-    const nameHint = getFileNameFromUrl(parsedUrl);
+    const nameHint = "Remote media";
 
     setBusy(true);
     setCurrentFile({
@@ -462,65 +162,28 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       message: "Downloading...",
     });
 
-    try {
-      const file = await downloadUrlToFile(parsedUrl, (update) => {
-        const hasRatio = typeof update.ratio === "number";
-        const ratio = update.ratio ?? 0;
-        const progress = hasRatio ? Math.round(ratio * DOWNLOAD_PROGRESS_MAX) : 0;
-        const percent = hasRatio ? Math.round(ratio * 100) : null;
-        const eta = update.etaSeconds ? formatDuration(update.etaSeconds) : "";
-        const received = formatBytes(update.receivedBytes);
-        const total = update.totalBytes ? formatBytes(update.totalBytes) : "";
-
-        let message = "Downloading...";
-        if (percent !== null) {
-          message = `Downloading... ${percent}%`;
-        }
-        if (total) {
-          message += ` (${received} / ${total}`;
-          if (eta) {
-            message += `, ~${eta} left`;
-          }
-          message += ")";
-        } else {
-          message += ` (${received})`;
-        }
-
-        setCurrentFile({
-          name: nameHint,
-          progress,
-          status: "loading",
-          message,
-        });
-      });
-
-      await processFile({
-        file,
-        worker,
-        progressOffset: DOWNLOAD_PROGRESS_MAX,
-        source: "url",
-      });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Download failed";
-      setCurrentFile({
-        name: nameHint,
-        progress: 0,
-        status: "error",
-        message,
-      });
-    } finally {
-      setBusy(false);
-    }
+    await runTranscription(
+      { kind: "url", url: parsedUrl.toString() },
+      nameHint,
+    );
+    setBusy(false);
   }
 
   async function handleFiles(files: FileList | null) {
     if (!files || !files.length) return;
     if (!adsVisible) setAdsVisible(true);
-    const worker = ensureWorker();
     setBusy(true);
 
     for (const file of Array.from(files)) {
-      await processFile({ file, worker, source: "upload" });
+      try {
+        const media = await workflowMediaFromFile(file);
+        if (!SUPPORTED_EXTENSIONS.includes(media.format)) {
+          throw new Error("Unsupported file type. Please upload an audio or video file.");
+        }
+        await runTranscription({ kind: "file", media }, file.name);
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : "Unsupported file");
+      }
     }
 
     setBusy(false);
@@ -564,6 +227,11 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       return () => clearTimeout(timer);
     }
   }, [dropEffect]);
+
+  useEffect(
+    () => () => activeRun.current?.abort("Transcription view unmounted"),
+    [],
+  );
 
   const adSlotPrefix = toolId;
 
@@ -703,9 +371,8 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
                       Copy
                     </Button>
                     <Button
-                      onClick={() =>
-                        saveBlob(new Blob([transcript], { type: "text/plain" }), transcriptName)
-                      }
+                      onClick={() => transcriptMedia && deliverMediaInBrowser(transcriptMedia)}
+                      disabled={!transcriptMedia}
                     >
                       Download
                     </Button>

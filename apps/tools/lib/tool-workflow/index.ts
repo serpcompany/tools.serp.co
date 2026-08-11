@@ -444,6 +444,14 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         },
       });
 
+      telemetryEligible = true;
+      telemetry = { ...telemetry, start: "submitted" };
+      try {
+        await ports.telemetry.start(runId, request, ports.clock.now());
+      } catch {
+        telemetry = { ...telemetry, start: "failed" };
+      }
+
       try {
         activePhase = "acquiring";
         emitSnapshot({ phase: "acquiring" });
@@ -504,13 +512,6 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         }
         signal.throwIfAborted();
 
-        telemetryEligible = true;
-        telemetry = { ...telemetry, start: "submitted" };
-        try {
-          await ports.telemetry.start(runId, request, ports.clock.now());
-        } catch {
-          telemetry = { ...telemetry, start: "failed" };
-        }
         signal.throwIfAborted();
 
         stage = "processing";

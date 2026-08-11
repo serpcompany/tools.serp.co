@@ -163,8 +163,7 @@ test("known unreliable downloader pages fail fast into extension monetization", 
   assert.match(videoDownloaderToolSource, /download-xhamster-videos/);
   assert.match(videoDownloaderToolSource, /download-boyfriendtv-videos/);
   assert.match(videoDownloaderToolSource, /getFailFastDownloaderCta/);
-  assert.match(videoDownloaderToolSource, /known_unreliable_web_downloader/);
-  assert.match(videoDownloaderToolSource, /failFast: true/);
+  assert.doesNotMatch(videoDownloaderToolSource, /beginToolRun|finishFailure/);
   assert.match(videoDownloaderToolSource, /Use the browser extension for this site\./);
 });
 
