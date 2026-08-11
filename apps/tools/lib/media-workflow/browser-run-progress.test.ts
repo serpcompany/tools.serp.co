@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { createBrowserRunOwnership } from "./browser-run-ownership.ts";
@@ -63,4 +64,16 @@ test("browser run progress owns lease guards and monotonic transfer/snapshot pro
     undefined,
   );
   assert.equal(progress.fromError("late failure"), undefined);
+});
+
+test("progress presentation exposes its terminal status to browser verification", () => {
+  const source = readFileSync(
+    new URL("../../components/VideoProgress.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    source,
+    /data-testid="video-progress"[\s\S]*data-status={status}/,
+  );
 });

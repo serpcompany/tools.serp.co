@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -88,6 +89,38 @@ test('browser modes keep correctness and performance execution separate', () => 
   assert.match(runnerSource, /evidenceInputHashes/);
   assert.match(runnerSource, /buildBrowserScope/);
   assert.doesNotMatch(runnerSource, /benchmark-results\.json/);
+});
+
+test('transcription smoke uses owned speech and a bounded success-or-error terminal', () => {
+  const matrix = JSON.parse(
+    readFileSync(
+      new URL('../apps/tools/benchmarks/fixture-matrix.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  const provenance = JSON.parse(
+    readFileSync(
+      new URL('../apps/tools/benchmarks/fixture-provenance.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  const relativeFixture = matrix.toolFixtures['audio-to-text']?.fixture;
+  const fixture = readFileSync(
+    new URL(`../apps/tools/benchmarks/${relativeFixture}`, import.meta.url),
+  );
+
+  assert.equal(relativeFixture, 'fixtures/transcription-speech.mp3');
+  assert.equal(
+    createHash('sha256').update(fixture).digest('hex'),
+    provenance[relativeFixture].sha256,
+  );
+  assert.match(provenance[relativeFixture].command, /say -v Daniel/);
+  assert.match(provenance[relativeFixture].command, /ffmpeg/);
+  assert.match(provenance[relativeFixture].text, /shared workflow test/);
+  assert.match(runnerSource, /toolFixtures\[tool\.id\]\?\.fixture/);
+  assert.match(runnerSource, /readTranscriptionTerminalState/);
+  assert.match(runnerSource, /timeout: 60_000/);
+  assert.doesNotMatch(runnerSource, /timeout: 600000/);
 });
 
 test('local evidence accepts only loopback targets', () => {

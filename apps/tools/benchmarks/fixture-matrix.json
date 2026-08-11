@@ -659,6 +659,14 @@
     }
   ],
   "toolFixtures": {
+    "audio-to-text": {
+      "input": "file",
+      "fixture": "fixtures/transcription-speech.mp3"
+    },
+    "audio-to-transcript": {
+      "input": "file",
+      "fixture": "fixtures/transcription-speech.mp3"
+    },
     "batch-compress-png": {
       "input": "file",
       "fixtures": [

@@ -56,7 +56,11 @@ export function VideoProgress({
   };
 
   return (
-    <Card className="p-4 mb-3" data-testid="video-progress">
+    <Card
+      className="p-4 mb-3"
+      data-testid="video-progress"
+      data-status={status}
+    >
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
