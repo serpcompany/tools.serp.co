@@ -308,3 +308,28 @@ test("shared run controller suppresses stale file reads and cancels replacement/
   controller.dispose();
   assert.equal(signals.at(-1)!.aborted, true);
 });
+
+test("clearing the shared controller cancels a pending interaction", async () => {
+  const requests: string[] = [];
+  const controller = createSpecializedRunController({
+    async run(request) {
+      requests.push(request.toolId);
+      return {
+        status: "cancelled",
+        runId: request.toolId,
+        telemetry: { start: "not-attempted", terminal: "not-attempted" },
+      };
+    },
+  });
+
+  controller.scheduleInteraction({
+    toolId: "html-to-markdown",
+    format: "html",
+    mimeType: "text/html",
+    value: "<p>stale</p>",
+  }, 5);
+  controller.clear();
+  await new Promise((resolve) => setTimeout(resolve, 20));
+
+  assert.deepEqual(requests, []);
+});

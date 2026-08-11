@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   createBrowserSpecializedWorkflow,
@@ -18,10 +18,8 @@ export function useSpecializedToolWorkflow() {
   const [controller] = useState(() => createSpecializedRunController(workflow));
   const [outcome, setOutcome] = useState<WorkflowOutcome>();
   const [snapshot, setSnapshot] = useState<WorkflowSnapshot>();
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => () => {
-    if (timer.current) clearTimeout(timer.current);
     controller.dispose();
     deliveries.clear();
   }, [controller, deliveries]);
@@ -51,11 +49,8 @@ export function useSpecializedToolWorkflow() {
     value: string,
     delay = 800,
   ) => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => {
-      void runInteraction(toolId, format, mimeType, value);
-    }, delay);
-  }, [runInteraction]);
+    controller.scheduleInteraction({ toolId, format, mimeType, value }, delay);
+  }, [controller]);
 
   const runFile = useCallback(async (toolId: string, file: BrowserFile) => {
     deliveries.clear();
@@ -74,7 +69,7 @@ export function useSpecializedToolWorkflow() {
   }, [accept, controller, deliveries]);
 
   const clear = useCallback(() => {
-    controller.dispose();
+    controller.clear();
     deliveries.clear();
     setOutcome(undefined);
     setSnapshot(undefined);

@@ -125,6 +125,13 @@ export type BrowserFile = Readonly<{
   arrayBuffer(): Promise<ArrayBuffer>;
 }>;
 
+export type SpecializedInteractionRequest = Readonly<{
+  toolId: string;
+  format: string;
+  mimeType: string;
+  value: string;
+}>;
+
 function mediaFormat(file: BrowserFile): string {
   const extension = file.name.split(".").pop()?.toLowerCase();
   if (extension) return extension === "md" ? "markdown" : extension;
@@ -142,10 +149,13 @@ export function createSpecializedRunController(workflow: ToolWorkflow): Readonly
   ): Promise<WorkflowOutcome | undefined>;
   runFile(toolId: string, file: BrowserFile): Promise<WorkflowOutcome | undefined>;
   runFiles(toolId: string, files: readonly BrowserFile[]): Promise<WorkflowOutcome | undefined>;
+  scheduleInteraction(request: SpecializedInteractionRequest, delay?: number): void;
+  clear(): void;
   dispose(): void;
 }> {
   let revision = 0;
   let active: AbortController | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
   const begin = () => {
     revision += 1;
@@ -154,9 +164,18 @@ export function createSpecializedRunController(workflow: ToolWorkflow): Readonly
     return { revision, controller: active };
   };
   const current = (runRevision: number) => runRevision === revision;
+  const clear = () => {
+    revision += 1;
+    if (timer) clearTimeout(timer);
+    timer = undefined;
+    active?.abort();
+    active = undefined;
+  };
 
   return Object.freeze({
     async runInteraction(toolId, format, mimeType, value) {
+      if (timer) clearTimeout(timer);
+      timer = undefined;
       const run = begin();
       const outcome = await workflow.run({
         toolId,
@@ -203,10 +222,19 @@ export function createSpecializedRunController(workflow: ToolWorkflow): Readonly
       }, { signal: run.controller.signal });
       return current(run.revision) ? outcome : undefined;
     },
-    dispose() {
-      revision += 1;
-      active?.abort();
-      active = undefined;
+    scheduleInteraction(request, delay = 800) {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = undefined;
+        void this.runInteraction(
+          request.toolId,
+          request.format,
+          request.mimeType,
+          request.value,
+        );
+      }, delay);
     },
+    clear,
+    dispose: clear,
   });
 }
