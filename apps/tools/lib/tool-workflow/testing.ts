@@ -101,6 +101,7 @@ const mimeTypes: Record<string, string> = {
   txt: "text/plain",
 };
 export function createToolWorkflowTestHarness(options: {
+  semanticDecoders?: "production" | "sharp";
   media?: { urls?: Record<string, UrlFixture> };
   resources?: Partial<
     Record<
@@ -193,10 +194,19 @@ export function createToolWorkflowTestHarness(options: {
           decideSupport(request): ProcessorSupportDecision {
             return script.decideSupport?.(request) ?? { supported: true };
           },
-          async verifyInput(input): Promise<SemanticVerification> {
+          async verifyInput(input, context): Promise<SemanticVerification> {
             return (
               (await script.validators?.input?.(input)) ??
-              verifyMedia(input, testSemanticDecoderAdapters)
+              verifyMedia(
+                input,
+                options.semanticDecoders === "production"
+                  ? undefined
+                  : testSemanticDecoderAdapters,
+                {
+                  maxBytes: context.budgets.maxInputBytes,
+                  signal: context.signal,
+                },
+              )
             );
           },
           async process(_input, processorOptions, context) {
@@ -253,7 +263,19 @@ export function createToolWorkflowTestHarness(options: {
             context.signal.throwIfAborted();
             return (
               (await script.validators?.output?.(result)) ??
-              verifyMedia(result, testSemanticDecoderAdapters)
+              verifyMedia(
+                result,
+                options.semanticDecoders === "production"
+                  ? undefined
+                  : testSemanticDecoderAdapters,
+                {
+                  maxBytes: Math.min(
+                    context.budgets.maxOutputBytes,
+                    context.budgets.maxTotalOutputBytes,
+                  ),
+                  signal: context.signal,
+                },
+              )
             );
           },
         } satisfies ToolProcessor,
