@@ -91,7 +91,30 @@ export type ToolSupport = {
   acquisition: WorkflowInput["kind"];
   inputs: ReadonlyArray<{ format: string; mimeTypes: readonly string[] }>;
   outputs: ReadonlyArray<{ format: string; mimeType: string }>;
+  requestedOperation: string;
+  resourceLimits: Readonly<{
+    maxInputBytes: number;
+    maxOutputBytes: number;
+    maxTotalOutputBytes: number;
+  }>;
+  outputCardinality: Readonly<{ min: number; max: number }>;
 };
+
+export type ProcessorSupportRequest<Options> = Readonly<{
+  detectedInput: Readonly<{
+    acquisition: WorkflowInput["kind"];
+    format: string;
+    mimeType: string;
+    bytes: number;
+  }>;
+  requestedOperation: string;
+  options: Options;
+  outputs: ToolSupport["outputs"];
+}>;
+
+export type ProcessorSupportDecision =
+  | { supported: true }
+  | { supported: false; message: string };
 
 export type SemanticVerification =
   | { status: "verified" }
@@ -105,6 +128,9 @@ export type ToolProcessor<Options = unknown> = {
   engine: ExecutionEngine;
   support: ToolSupport;
   parseOptions(options: unknown): ProcessorOptions<Options>;
+  decideSupport(
+    request: ProcessorSupportRequest<Options>,
+  ): ProcessorSupportDecision;
   verifyInput(
     input: WorkflowMedia,
     context: WorkflowStageContext,
@@ -320,6 +346,29 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
             `Unsupported input format: ${input.format}`,
           );
         }
+        if (
+          input.bytes.byteLength >
+          processor.support.resourceLimits.maxInputBytes
+        ) {
+          return fail(
+            "unsupported-request",
+            `Input exceeds ${processor.support.resourceLimits.maxInputBytes} bytes`,
+          );
+        }
+        const supportDecision = processor.decideSupport({
+          detectedInput: {
+            acquisition: request.input.kind,
+            format: input.format,
+            mimeType: input.mimeType,
+            bytes: input.bytes.byteLength,
+          },
+          requestedOperation: processor.support.requestedOperation,
+          options: parsedOptions.value,
+          outputs: processor.support.outputs,
+        });
+        if (!supportDecision.supported) {
+          return fail("unsupported-request", supportDecision.message);
+        }
         const inputVerification = await processor.verifyInput(
           input,
           acquisitionContext,
@@ -347,13 +396,36 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           context("processing", 0.25, 0.45),
         );
         signal.throwIfAborted();
-        if (results.length === 0) {
-          throw new Error("Processor returned no results");
-        }
         stage = "validating";
         activePhase = "validating";
         emitSnapshot({ phase: "validating" });
+        const { min, max } = processor.support.outputCardinality;
+        if (results.length < min || results.length > max) {
+          throw new Error(
+            `Expected ${min}..${max} results, received ${results.length}`,
+          );
+        }
+        const totalOutputBytes = results.reduce(
+          (total, result) => total + result.bytes.byteLength,
+          0,
+        );
+        if (
+          totalOutputBytes >
+          processor.support.resourceLimits.maxTotalOutputBytes
+        ) {
+          throw new Error(
+            `Total output exceeds ${processor.support.resourceLimits.maxTotalOutputBytes} bytes`,
+          );
+        }
         for (const result of results) {
+          if (
+            result.bytes.byteLength >
+            processor.support.resourceLimits.maxOutputBytes
+          ) {
+            throw new Error(
+              `Output exceeds ${processor.support.resourceLimits.maxOutputBytes} bytes`,
+            );
+          }
           const outputSupport = processor.support.outputs.find(
             ({ format, mimeType }) =>
               format === result.format && mimeType === result.mimeType,

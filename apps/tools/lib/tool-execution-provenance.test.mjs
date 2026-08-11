@@ -9,6 +9,7 @@ import {
   executionProvenance,
   getToolExecutionProvenance,
 } from './tool-execution-provenance.ts';
+import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 
 function mapped(toolId) {
   const provenance = getToolExecutionProvenance(toolId);
@@ -18,14 +19,9 @@ function mapped(toolId) {
 
 test('conversion and compression provenance follows actual dispatch selectors', () => {
   assert.equal(resolveConversionDispatch('cr2', 'jpg').kind, 'server-image');
-  assert.deepEqual(mapped('cr2-to-jpg').executionProfiles, [
-    'server-executed',
-  ]);
+  assert.deepEqual(mapped('cr2-to-jpg').executionProfiles, ['server-executed']);
 
-  assert.equal(
-    resolveConversionDispatch('3g2', 'mp4').kind,
-    'adaptive-video',
-  );
+  assert.equal(resolveConversionDispatch('3g2', 'mp4').kind, 'adaptive-video');
   assert.deepEqual(mapped('3g2-to-mp4').executionProfiles, [
     'client-only',
     'server-executed',
@@ -100,9 +96,7 @@ test('downloader and browser-with-fetch support keep distinct profiles', () => {
 });
 
 test('specialized and table Tools expose explicit browser-owned engines', () => {
-  assert.deepEqual(mapped('csv-to-sql').engineIds, [
-    'browser-table-converter',
-  ]);
+  assert.deepEqual(mapped('csv-to-sql').engineIds, ['browser-table-converter']);
   assert.deepEqual(mapped('character-counter').engineIds, [
     'browser-character-counter',
   ]);
@@ -144,6 +138,12 @@ test('read-only provenance is joinable by every canonical Tool id', () => {
     owner: 'apps/tools/lib/convert/workerClient.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'hybrid',
+      identity: '@jsquash codecs, UPNG.js, and @imagemagick/magick-wasm',
+      rationale:
+        'Repository dispatch selects trusted codecs without implementing image codecs.',
+    },
   });
   assert.equal(executionProvenance.getEngine('toString'), undefined);
   assert.equal(executionProvenance.getEngine('__proto__'), undefined);
@@ -156,5 +156,36 @@ test('read-only provenance is joinable by every canonical Tool id', () => {
 
   for (const engine of executionProvenance.engines) {
     assert.equal(existsSync(engine.owner), true, engine.owner);
+    assert.notEqual(engine.implementation.identity.trim(), '', engine.id);
+    if (
+      engine.implementation.class === 'hybrid' ||
+      engine.implementation.class === 'repository-authored'
+    ) {
+      assert.notEqual(engine.implementation.rationale.trim(), '', engine.id);
+    }
   }
+});
+
+test('processor availability stays distinct from inferred provenance and joins by Tool id', () => {
+  for (const tool of toolCatalog.tools) {
+    assert.equal(getToolProcessorAvailability(tool.id).toolId, tool.id);
+  }
+
+  assert.deepEqual(getToolProcessorAvailability('png-to-jpg'), {
+    kind: 'unwired',
+    toolId: 'png-to-jpg',
+    reason:
+      'Execution provenance is known, but no processor adapter is registered for the shared workflow.',
+    sourceNeeded:
+      'Register a processor adapter only when this Tool family migrates to the shared workflow.',
+  });
+  assert.deepEqual(getToolProcessorAvailability('video-editor'), {
+    kind: 'unknown',
+    toolId: 'video-editor',
+    reason: 'No maintained execution mapping exists for this Tool renderer.',
+    sourceNeeded:
+      'Trace the active renderer to the function that performs its core operation.',
+  });
+  assert.equal('isActive' in getToolProcessorAvailability('png-to-jpg'), false);
+  assert.equal('status' in getToolProcessorAvailability('png-to-jpg'), false);
 });

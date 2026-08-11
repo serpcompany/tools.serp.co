@@ -33,6 +33,12 @@ const SAMPLE_MP4_BYTES = new Uint8Array(
     new URL("../../benchmarks/fixtures/sample.mp4", import.meta.url),
   ),
 );
+const JSON_TABLE_BYTES = new TextEncoder().encode(
+  '[{"name":"Ada","language":"Analytical Engine"}]',
+);
+const CSV_TABLE_BYTES = new TextEncoder().encode(
+  "name,language\r\nAda,Analytical Engine\r\n",
+);
 
 test("a file Tool run crosses one workflow seam from acquisition through delivery", async () => {
   const harness = createToolWorkflowTestHarness({
@@ -148,6 +154,177 @@ test("a URL stream uses the same workflow seam and preserves multiple result ord
   );
 });
 
+test("a text/table processor succeeds only with a structurally valid table result", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "json-to-csv": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["txt"],
+          outputFormats: ["csv"],
+          requestedOperation: "table-convert",
+          outputCardinality: { min: 1, max: 1 },
+        },
+        result: {
+          name: "people.csv",
+          format: "csv",
+          mimeType: "text/csv",
+          bytes: CSV_TABLE_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "json-to-csv",
+    input: {
+      kind: "file",
+      media: {
+        name: "people.json",
+        format: "txt",
+        mimeType: "text/plain",
+        bytes: JSON_TABLE_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "succeeded");
+  assert.deepEqual(
+    outcome.results.map(({ format, mimeType, size }) => ({
+      format,
+      mimeType,
+      size,
+    })),
+    [{ format: "csv", mimeType: "text/csv", size: 38 }],
+  );
+});
+
+test("an empty text/table result is rejected before delivery", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "json-to-csv": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["txt"],
+          outputFormats: ["csv"],
+        },
+        result: {
+          name: "people.csv",
+          format: "csv",
+          mimeType: "text/csv",
+          bytes: new Uint8Array(),
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "json-to-csv",
+    input: {
+      kind: "file",
+      media: {
+        name: "people.json",
+        format: "txt",
+        mimeType: "text/plain",
+        bytes: JSON_TABLE_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.equal(harness.events.includes("delivery"), false);
+});
+
+test("a malformed table with inconsistent row cardinality is rejected before delivery", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "json-to-csv": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["txt"],
+          outputFormats: ["csv"],
+        },
+        result: {
+          name: "people.csv",
+          format: "csv",
+          mimeType: "text/csv",
+          bytes: new TextEncoder().encode("name,language\r\nAda\r\n"),
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "json-to-csv",
+    input: {
+      kind: "file",
+      media: {
+        name: "people.json",
+        format: "txt",
+        mimeType: "text/plain",
+        bytes: JSON_TABLE_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.equal(harness.events.includes("delivery"), false);
+});
+
+test("processor-owned semantic validators can enforce transcript invariants", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "audio-to-text": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["mp4"],
+          outputFormats: ["txt"],
+        },
+        validators: {
+          output(result) {
+            const transcript = new TextDecoder().decode(result.bytes);
+            return transcript.includes("[00:00]")
+              ? { status: "verified" }
+              : {
+                  status: "rejected",
+                  message: "Transcript is missing timestamped speech",
+                };
+          },
+        },
+        result: {
+          name: "transcript.txt",
+          format: "txt",
+          mimeType: "text/plain",
+          bytes: new TextEncoder().encode("processor says success"),
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "audio-to-text",
+    input: {
+      kind: "file",
+      media: {
+        name: "speech.mp4",
+        format: "mp4",
+        mimeType: "video/mp4",
+        bytes: SAMPLE_MP4_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.equal(
+    outcome.error.message,
+    "Transcript is missing timestamped speech",
+  );
+  assert.equal(harness.events.includes("delivery"), false);
+});
+
 test("invalid and unsupported requests fail closed before processor execution", async () => {
   const harness = createToolWorkflowTestHarness({
     processors: {
@@ -205,6 +382,118 @@ test("invalid and unsupported requests fail closed before processor execution", 
   assert.deepEqual(harness.events, []);
 });
 
+test("exact processor support rejects an unsupported operation before fallback execution", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "png-to-avif": {
+        engineId: "browser-raster-worker",
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["avif"],
+          requestedOperation: "convert",
+          resourceLimits: {
+            maxInputBytes: 1_024,
+            maxOutputBytes: 1_024,
+            maxTotalOutputBytes: 1_024,
+          },
+          outputCardinality: { min: 1, max: 1 },
+        },
+        decideSupport(request) {
+          assert.deepEqual(request, {
+            detectedInput: {
+              acquisition: "file",
+              format: "png",
+              mimeType: "image/png",
+              bytes: PNG_BYTES.byteLength,
+            },
+            requestedOperation: "convert",
+            options: { quality: 82 },
+            outputs: [{ format: "avif", mimeType: "image/avif" }],
+          });
+          return {
+            supported: false,
+            message: "browser raster engine has no verified AVIF encoder",
+          };
+        },
+        parseOptions(value) {
+          return { ok: true, value };
+        },
+        result: {
+          name: "generic-fallback.png",
+          format: "png",
+          mimeType: "image/png",
+          bytes: PNG_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "png-to-avif",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+    options: { quality: 82 },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "unsupported-request");
+  assert.equal(
+    outcome.error.message,
+    "browser raster engine has no verified AVIF encoder",
+  );
+  assert.deepEqual(harness.events, []);
+});
+
+test("declared input resource limits reject work before processor execution", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "png-to-jpg": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+          resourceLimits: {
+            maxInputBytes: PNG_BYTES.byteLength - 1,
+            maxOutputBytes: 1_024,
+            maxTotalOutputBytes: 1_024,
+          },
+        },
+        result: {
+          name: "photo.jpg",
+          format: "jpg",
+          mimeType: "image/jpeg",
+          bytes: JPEG_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "unsupported-request");
+  assert.equal(harness.events.length, 0);
+});
+
 test("semantic validation rejects wrong-format bytes before delivery", async () => {
   const harness = createToolWorkflowTestHarness({
     processors: {
@@ -249,6 +538,95 @@ test("semantic validation rejects wrong-format bytes before delivery", async () 
     "processor:png-to-jpg",
     "telemetry:terminal",
   ]);
+});
+
+test("workflow rejects processor output with the wrong declared cardinality", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "png-to-jpg": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+          outputCardinality: { min: 1, max: 1 },
+        },
+        result: [
+          {
+            name: "photo.jpg",
+            format: "jpg",
+            mimeType: "image/jpeg",
+            bytes: JPEG_BYTES,
+          },
+          {
+            name: "processor-success.jpg",
+            format: "jpg",
+            mimeType: "image/jpeg",
+            bytes: JPEG_BYTES,
+          },
+        ],
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.match(outcome.error.message, /Expected 1\.\.1 results, received 2/);
+  assert.equal(harness.events.includes("delivery"), false);
+});
+
+test("declared output resource limits reject results before delivery", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "png-to-jpg": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+          resourceLimits: {
+            maxInputBytes: 1_024,
+            maxOutputBytes: JPEG_BYTES.byteLength - 1,
+            maxTotalOutputBytes: JPEG_BYTES.byteLength - 1,
+          },
+        },
+        result: {
+          name: "photo.jpg",
+          format: "jpg",
+          mimeType: "image/jpeg",
+          bytes: JPEG_BYTES,
+        },
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input: {
+      kind: "file",
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-result");
+  assert.equal(harness.events.includes("delivery"), false);
 });
 
 test("progress is normalized and monotonic while indeterminate phases stay unquantified", async () => {
@@ -817,11 +1195,24 @@ test("typed options and engine support policy stay behind the run seam", async (
         owner: "apps/tools/lib/convert/workerClient.ts",
         processingLocation: "browser",
         executionProfile: "client-only",
+        implementation: {
+          class: "hybrid",
+          identity: "@jsquash codecs, UPNG.js, and @imagemagick/magick-wasm",
+          rationale:
+            "Repository dispatch selects trusted codecs without implementing image codecs.",
+        },
       },
       support: {
         acquisition: "file",
         inputs: [{ format: "png", mimeTypes: ["image/png"] }],
         outputs: [{ format: "jpg", mimeType: "image/jpeg" }],
+        requestedOperation: "process",
+        resourceLimits: {
+          maxInputBytes: Number.MAX_SAFE_INTEGER,
+          maxOutputBytes: Number.MAX_SAFE_INTEGER,
+          maxTotalOutputBytes: Number.MAX_SAFE_INTEGER,
+        },
+        outputCardinality: { min: 1, max: 1 },
       },
       options: { quality: 82 },
     },
@@ -896,6 +1287,12 @@ test("scripted processors use canonical execution provenance records", async () 
         owner: "apps/tools/lib/convert/workerClient.ts",
         processingLocation: "browser",
         executionProfile: "client-only",
+        implementation: {
+          class: "hybrid",
+          identity: "@jsquash codecs, UPNG.js, and @imagemagick/magick-wasm",
+          rationale:
+            "Repository dispatch selects trusted codecs without implementing image codecs.",
+        },
       },
       {
         id: "server-media-fetch",
@@ -903,6 +1300,13 @@ test("scripted processors use canonical execution provenance records", async () 
         owner: "apps/tools/app/api/media-fetch/route.ts",
         processingLocation: "repository-server",
         executionProfile: "server-executed",
+        implementation: {
+          class: "hybrid",
+          identity:
+            "youtube-dl-exec, repository extractors, Fetch API, and ReadableStream",
+          rationale:
+            "Repository dispatch validates public sources, selects extraction or direct streaming, and preserves backpressure through platform streams.",
+        },
       },
     ],
   );

@@ -15,12 +15,25 @@ export type ProcessingLocation =
   | 'browser-with-repository-server-support'
   | 'repository-server';
 
+export type EngineImplementation = Readonly<
+  | {
+      class: 'library' | 'platform-primitive';
+      identity: string;
+    }
+  | {
+      class: 'hybrid' | 'repository-authored';
+      identity: string;
+      rationale: string;
+    }
+>;
+
 export type ExecutionEngine = Readonly<{
   id: string;
   capability: string;
   owner: `apps/tools/${string}`;
   processingLocation: ProcessingLocation;
   executionProfile: ExecutionProfile;
+  implementation: EngineImplementation;
 }>;
 
 export type MappedToolExecutionProvenance = Readonly<{
@@ -52,13 +65,15 @@ function defineEngines<
     Object.fromEntries(
       Object.entries(definitions).map(([id, definition]) => [
         id,
-        Object.freeze({ id, ...definition }),
+        Object.freeze({
+          id,
+          ...definition,
+          implementation: Object.freeze({ ...definition.implementation }),
+        }),
       ]),
     ),
   ) as {
-    readonly [Id in keyof Definitions]: Readonly<
-      Definitions[Id] & { id: Id }
-    >;
+    readonly [Id in keyof Definitions]: Readonly<Definitions[Id] & { id: Id }>;
   };
 }
 
@@ -68,120 +83,212 @@ const engineById = defineEngines({
     owner: 'apps/tools/lib/convert/workerClient.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'hybrid',
+      identity: '@jsquash codecs, UPNG.js, and @imagemagick/magick-wasm',
+      rationale:
+        'Repository dispatch selects trusted codecs without implementing image codecs.',
+    },
   },
   'browser-pdf-pages': {
     capability: 'pdf-page-rasterization',
     owner: 'apps/tools/lib/convert/pdf.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: { class: 'library', identity: 'pdfjs-dist' },
   },
   'server-image-convert': {
     capability: 'image-conversion',
     owner: 'apps/tools/app/api/image-convert/route.ts',
     processingLocation: 'repository-server',
     executionProfile: 'server-executed',
+    implementation: {
+      class: 'hybrid',
+      identity: 'ImageMagick, FFmpeg, ExifTool, and @imagemagick/magick-wasm',
+      rationale:
+        'Repository dispatch selects a trusted decoder and encoder for each declared image format.',
+    },
   },
   'browser-raster-with-server-image-decode': {
     capability: 'server-decoded-raster-conversion',
     owner: 'apps/tools/lib/convert/workerClient.ts',
     processingLocation: 'browser-with-repository-server-support',
     executionProfile: 'server-assisted',
+    implementation: {
+      class: 'hybrid',
+      identity: 'server image decoder plus @jsquash codecs',
+      rationale:
+        'The repository server decodes unsupported inputs before trusted browser codecs encode the requested output.',
+    },
   },
   'browser-ffmpeg-wasm': {
     capability: 'media-conversion',
     owner: 'apps/tools/lib/convert/video.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'library',
+      identity: '@ffmpeg/ffmpeg and @ffmpeg/core',
+    },
   },
   'server-video-convert': {
     capability: 'media-conversion',
     owner: 'apps/tools/app/api/video-convert/route.ts',
     processingLocation: 'repository-server',
     executionProfile: 'server-executed',
+    implementation: { class: 'library', identity: 'FFmpeg executable' },
   },
   'browser-image-compression-worker': {
     capability: 'image-compression',
     owner: 'apps/tools/lib/convert/workerClient.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'hybrid',
+      identity: '@jsquash/oxipng and @jsquash image codecs',
+      rationale:
+        'Repository dispatch selects the maintained compressor for the detected image format.',
+    },
   },
   'browser-ffmpeg-compression': {
     capability: 'media-compression',
     owner: 'apps/tools/lib/convert/video.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'library',
+      identity: '@ffmpeg/ffmpeg and @ffmpeg/core',
+    },
   },
   'server-image-compression': {
     capability: 'image-compression',
     owner: 'apps/tools/app/api/image-compress/route.ts',
     processingLocation: 'repository-server',
     executionProfile: 'server-executed',
+    implementation: {
+      class: 'hybrid',
+      identity: 'sharp, imagemin-gifsicle, and svgo',
+      rationale:
+        'Repository dispatch selects a maintained compressor for each declared image format.',
+    },
   },
   'server-pdf-compression': {
     capability: 'pdf-compression',
     owner: 'apps/tools/app/api/pdf-compress/route.ts',
     processingLocation: 'repository-server',
     executionProfile: 'server-executed',
+    implementation: { class: 'library', identity: 'ghostscript-node' },
   },
   'server-media-fetch': {
     capability: 'public-media-download',
     owner: 'apps/tools/app/api/media-fetch/route.ts',
     processingLocation: 'repository-server',
     executionProfile: 'server-executed',
+    implementation: {
+      class: 'hybrid',
+      identity:
+        'youtube-dl-exec, repository extractors, Fetch API, and ReadableStream',
+      rationale:
+        'Repository dispatch validates public sources, selects extraction or direct streaming, and preserves backpressure through platform streams.',
+    },
   },
   'browser-transformers-transcription': {
     capability: 'media-transcription',
     owner: 'apps/tools/components/TranscribeTool.tsx',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'library',
+      identity: '@xenova/transformers',
+    },
   },
   'server-media-fetch-for-browser-transcription': {
     capability: 'remote-media-retrieval-for-browser-transcription',
     owner: 'apps/tools/app/api/media-fetch/route.ts',
     processingLocation: 'browser-with-repository-server-support',
     executionProfile: 'server-assisted',
+    implementation: {
+      class: 'hybrid',
+      identity:
+        'youtube-dl-exec, repository extractors, Fetch API, and ReadableStream',
+      rationale:
+        'Repository dispatch validates public sources and streams supported media to the browser-owned transcription engine.',
+    },
   },
   'browser-table-converter': {
     capability: 'structured-data-conversion',
     owner: 'apps/tools/components/table-convert/convert.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'hybrid',
+      identity: 'Papa Parse, yaml, DOMParser, and repository serializers',
+      rationale:
+        'Trusted parsers handle structured inputs while narrow repository serializers emit declared table formats.',
+    },
   },
   'browser-html-to-markdown': {
     capability: 'html-to-markdown-conversion',
     owner: 'apps/tools/components/HtmlToMarkdownConverter.tsx',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'library',
+      identity: '@kreuzberg/html-to-markdown-wasm',
+    },
   },
   'browser-json-to-csv': {
     capability: 'json-to-csv-conversion',
     owner: 'apps/tools/components/JsonToCsv.tsx',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'repository-authored',
+      identity: 'apps/tools/components/JsonToCsv.tsx',
+      rationale:
+        'The transformation only projects parsed JSON object fields into RFC-style escaped CSV cells.',
+    },
   },
   'browser-csv-combiner': {
     capability: 'csv-combination',
     owner: 'apps/tools/components/CsvCombiner.tsx',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'repository-authored',
+      identity: 'apps/tools/components/CsvCombiner.tsx',
+      rationale:
+        'The transformation is a narrow header-union and row-alignment algorithm; semantic CSV validation is required.',
+    },
   },
   'browser-character-counter': {
     capability: 'text-statistics',
     owner: 'apps/tools/components/CharacterCounter.tsx',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'repository-authored',
+      identity: 'apps/tools/components/CharacterCounter.tsx',
+      rationale:
+        'The operation computes transparent text statistics without a codec or external protocol.',
+    },
   },
   'browser-pdf-viewer': {
     capability: 'pdf-viewing-and-annotation',
     owner: 'apps/tools/components/PdfTool.tsx',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: { class: 'library', identity: 'pdfjs-dist' },
   },
   'browser-batch-png-compression': {
     capability: 'batch-png-compression',
     owner: 'apps/tools/components/BatchHeroConverter.tsx',
     processingLocation: 'browser',
     executionProfile: 'client-only',
+    implementation: {
+      class: 'library',
+      identity: '@jsquash/oxipng',
+    },
   },
 } satisfies Record<string, ExecutionEngineDefinition>);
 
