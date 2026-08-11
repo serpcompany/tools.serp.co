@@ -13,7 +13,10 @@ type ImageDecoderLike = {
   close?: () => void;
 };
 
-type ImageDecoderCtor = new (init: { data: BufferSource; type?: string }) => ImageDecoderLike;
+type ImageDecoderCtor = new (init: {
+  data: BufferSource;
+  type?: string;
+}) => ImageDecoderLike;
 
 type CanvasLike = HTMLCanvasElement | OffscreenCanvas;
 
@@ -31,7 +34,11 @@ function getCanvasDimensions(source: CanvasSource) {
 }
 
 /** Draws an ImageBitmap/VideoFrame into a canvas and returns RGBA data */
-async function bitmapToRGBA(source: CanvasSource): Promise<RGBA> {
+async function bitmapToRGBA(
+  source: CanvasSource,
+  signal?: AbortSignal,
+): Promise<RGBA> {
+  signal?.throwIfAborted();
   const { width, height } = getCanvasDimensions(source);
   const useOffscreen = typeof OffscreenCanvas !== "undefined";
   const canvas: CanvasLike = useOffscreen
@@ -42,14 +49,20 @@ async function bitmapToRGBA(source: CanvasSource): Promise<RGBA> {
   if (!ctx) {
     throw new Error("Failed to create 2D canvas context.");
   }
-  const ctx2d = ctx as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
-  ctx2d.drawImage(source, 0, 0, width, height);
-  const img = ctx2d.getImageData(0, 0, width, height);
-  source.close?.();
-  return { data: img.data, width: img.width, height: img.height };
+  const ctx2d = ctx as
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D;
+  try {
+    ctx2d.drawImage(source, 0, 0, width, height);
+    const img = ctx2d.getImageData(0, 0, width, height);
+    signal?.throwIfAborted();
+    return { data: img.data, width: img.width, height: img.height };
+  } finally {
+    source.close?.();
+  }
 }
 
-async function decodeViaImage(blob: Blob): Promise<RGBA> {
+async function decodeViaImage(blob: Blob, signal?: AbortSignal): Promise<RGBA> {
   if (typeof document === "undefined") {
     throw new Error("Image decoding requires a document.");
   }
@@ -58,6 +71,7 @@ async function decodeViaImage(blob: Blob): Promise<RGBA> {
   try {
     const img = new Image();
     img.decoding = "async";
+    const cancelImage = () => img.removeAttribute("src");
 
     const loaded = new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
@@ -68,12 +82,17 @@ async function decodeViaImage(blob: Blob): Promise<RGBA> {
 
     if ("decode" in img) {
       try {
-        await (img as HTMLImageElement).decode();
+        await awaitWithSignal(
+          (img as HTMLImageElement).decode(),
+          signal,
+          cancelImage,
+        );
       } catch {
-        await loaded;
+        signal?.throwIfAborted();
+        await awaitWithSignal(loaded, signal, cancelImage);
       }
     } else {
-      await loaded;
+      await awaitWithSignal(loaded, signal, cancelImage);
     }
 
     const width = img.naturalWidth || img.width;
@@ -84,31 +103,74 @@ async function decodeViaImage(blob: Blob): Promise<RGBA> {
     const ctx = canvas.getContext("2d")!;
     ctx.drawImage(img, 0, 0);
     const imageData = ctx.getImageData(0, 0, width, height);
-    return { data: imageData.data, width: imageData.width, height: imageData.height };
+    return {
+      data: imageData.data,
+      width: imageData.width,
+      height: imageData.height,
+    };
   } finally {
     URL.revokeObjectURL(url);
   }
 }
 
-async function decodeWithImageDecoder(mime: string | undefined, buf: ArrayBuffer): Promise<RGBA | null> {
-  const ImageDecoderCtor = (globalThis as { ImageDecoder?: ImageDecoderCtor }).ImageDecoder;
+async function decodeWithImageDecoder(
+  mime: string | undefined,
+  buf: ArrayBuffer,
+  signal?: AbortSignal,
+): Promise<RGBA | null> {
+  const ImageDecoderCtor = (globalThis as { ImageDecoder?: ImageDecoderCtor })
+    .ImageDecoder;
   if (!ImageDecoderCtor || !mime) return null;
 
+  const decoder = new ImageDecoderCtor({ data: buf, type: mime });
+  const onAbort = () => decoder.close?.();
   try {
-    const decoder = new ImageDecoderCtor({ data: buf, type: mime });
-    const result = await decoder.decode();
-    decoder.close?.();
-    return bitmapToRGBA(result.image as CanvasSource);
+    const result = await awaitWithSignal(decoder.decode(), signal, onAbort);
+    return bitmapToRGBA(result.image as CanvasSource, signal);
   } catch {
+    signal?.throwIfAborted();
     return null;
+  } finally {
+    decoder.close?.();
   }
 }
 
-export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA> {
+async function awaitWithSignal<T>(
+  promise: Promise<T>,
+  signal?: AbortSignal,
+  onAbort?: () => void,
+): Promise<T> {
+  signal?.throwIfAborted();
+  if (!signal) return promise;
+  let rejectAbort: ((reason: unknown) => void) | undefined;
+  const aborted = new Promise<never>((_resolve, reject) => {
+    rejectAbort = reject;
+  });
+  const abort = () => {
+    onAbort?.();
+    rejectAbort?.(
+      signal.reason ??
+        new DOMException("The operation was aborted", "AbortError"),
+    );
+  };
+  signal.addEventListener("abort", abort, { once: true });
+  try {
+    return await Promise.race([promise, aborted]);
+  } finally {
+    signal.removeEventListener("abort", abort);
+  }
+}
+
+export async function decodeToRGBA(
+  ext: string,
+  buf: ArrayBuffer,
+  signal?: AbortSignal,
+): Promise<RGBA> {
   const e = (ext || "").toLowerCase();
+  signal?.throwIfAborted();
 
   if (e === "heic" || e === "heif") {
-    return decodeHeifToRGBA(buf);
+    return decodeHeifToRGBA(buf, signal);
   }
 
   const mimeMap: Record<string, string> = {
@@ -127,7 +189,7 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
   const mime = mimeMap[e];
 
   // Prefer ImageDecoder when available (works in workers too).
-  const decoded = await decodeWithImageDecoder(mime, buf);
+  const decoded = await decodeWithImageDecoder(mime, buf, signal);
   if (decoded) return decoded;
 
   // Browser-native decoders handle: jpg/jpeg/png/webp/gif/bmp/avif/ico (varies by engine)
@@ -137,11 +199,12 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
     if (typeof createImageBitmap !== "function") {
       throw new Error("createImageBitmap unavailable.");
     }
-    const bitmap = await createImageBitmap(blob);
-    return bitmapToRGBA(bitmap as CanvasSource);
+    const bitmap = await awaitWithSignal(createImageBitmap(blob), signal);
+    return bitmapToRGBA(bitmap as CanvasSource, signal);
   } catch {
+    signal?.throwIfAborted();
     if (typeof document !== "undefined") {
-      return decodeViaImage(blob);
+      return decodeViaImage(blob, signal);
     }
     throw new Error("This format isn’t natively supported by your browser.");
   }

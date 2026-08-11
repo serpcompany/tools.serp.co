@@ -131,6 +131,7 @@ export async function convertWithWorker(args: {
   buf: ArrayBuffer;
   onProgress?: (update: ProgressUpdate) => void;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ConversionResult> {
   const fromExt = args.from.toLowerCase();
   const toExt = args.to.toLowerCase();
@@ -144,7 +145,12 @@ export async function convertWithWorker(args: {
             ? "jpg"
             : "png"
           : args.to;
-      const buffers = await renderPdfPages(args.buf, undefined, rasterFormat);
+      const buffers = await renderPdfPages(
+        args.buf,
+        undefined,
+        rasterFormat,
+        args.signal,
+      );
       if (fromExt === "ai" && toExt === "svg") {
         const svgBuffers = [];
         for (const buffer of buffers) {
@@ -175,6 +181,7 @@ export async function convertWithWorker(args: {
         to: args.to,
         buf: serverResult.buffer,
         quality: args.quality,
+        signal: args.signal,
       });
     }
     case "adaptive-video":
@@ -209,12 +216,26 @@ async function convertWithWorkerInner(args: {
   buf: ArrayBuffer;
   onProgress?: (update: ProgressUpdate) => void;
   quality?: number;
+  signal?: AbortSignal;
   op: ConversionOp;
 }): Promise<ConversionResult> {
   return await new Promise<ConversionResult>((resolve, reject) => {
+    const settle = <Value>(callback: (value: Value) => void, value: Value) => {
+      args.signal?.removeEventListener("abort", onAbort);
+      callback(value);
+    };
+    const onAbort = () => {
+      args.worker.terminate();
+      settle(reject, args.signal?.reason ?? new DOMException("The operation was aborted", "AbortError"));
+    };
+    if (args.signal?.aborted) {
+      onAbort();
+      return;
+    }
+    args.signal?.addEventListener("abort", onAbort, { once: true });
     args.worker.onmessage = (ev: MessageEvent<WorkerMessage>) => {
       if (!ev.data) {
-        return reject(new Error("Malformed worker response"));
+        return settle(reject, new Error("Malformed worker response"));
       }
 
       if (ev.data?.type === "progress") {
@@ -227,24 +248,25 @@ async function convertWithWorkerInner(args: {
       }
 
       if (!ev.data?.ok) {
-        return reject(
+        return settle(
+          reject,
           createTelemetryError(
             "worker_convert_failed",
             ev.data?.error || "Convert failed",
             { op: args.op, from: args.from, to: args.to, engine: "worker" }
-          )
+          ),
         );
       }
 
       if (ev.data.blobs) {
-        return resolve({ kind: "multiple", buffers: ev.data.blobs });
+        return settle(resolve, { kind: "multiple", buffers: ev.data.blobs });
       }
 
       if (ev.data.blob) {
-        return resolve({ kind: "single", buffer: ev.data.blob });
+        return settle(resolve, { kind: "single", buffer: ev.data.blob });
       }
 
-      return reject(new Error("Unknown worker response"));
+      return settle(reject, new Error("Unknown worker response"));
     };
 
     args.worker.onerror = (error) => {
@@ -256,7 +278,8 @@ async function convertWithWorkerInner(args: {
         (error as ErrorEvent).error instanceof Error ? (error as ErrorEvent).error.message : null,
       ].filter(Boolean);
       const detail = detailParts.length ? detailParts.join(" | ") : String(error);
-      reject(
+      settle(
+        reject,
         createTelemetryError(
           "worker_error",
           `Worker error: ${detail}`,
@@ -267,7 +290,7 @@ async function convertWithWorkerInner(args: {
             engine: "worker",
             detail,
           }
-        )
+        ),
       );
     };
 
@@ -290,11 +313,13 @@ export async function compressPngWithWorker(args: {
   worker: Worker;
   buf: ArrayBuffer;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ArrayBuffer> {
   const workerBuf = args.buf.slice(0);
   try {
     return await compressPngWithWorkerInner({ ...args, buf: workerBuf });
-  } catch {
+  } catch (error) {
+    if (args.signal?.aborted) throw error;
     return await compressPngOnMainThread(args);
   }
 }
@@ -304,11 +329,13 @@ export async function compressImageWithWorker(args: {
   format: string;
   buf: ArrayBuffer;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ArrayBuffer> {
   const workerBuf = args.buf.slice(0);
   try {
     return await compressImageWithWorkerInner({ ...args, buf: workerBuf });
-  } catch {
+  } catch (error) {
+    if (args.signal?.aborted) throw error;
     return await compressImageOnMainThread(args);
   }
 }
@@ -317,9 +344,19 @@ async function compressPngWithWorkerInner(args: {
   worker: Worker;
   buf: ArrayBuffer;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ArrayBuffer> {
   return await new Promise<ArrayBuffer>((resolve, reject) => {
+    const cleanup = () => args.signal?.removeEventListener("abort", onAbort);
+    const onAbort = () => {
+      args.worker.terminate();
+      cleanup();
+      reject(args.signal?.reason ?? new DOMException("The operation was aborted", "AbortError"));
+    };
+    if (args.signal?.aborted) return onAbort();
+    args.signal?.addEventListener("abort", onAbort, { once: true });
     args.worker.onmessage = (ev: MessageEvent<WorkerMessage>) => {
+      cleanup();
       if (!ev.data) {
         return reject(new Error("Malformed worker response"));
       }
@@ -336,6 +373,7 @@ async function compressPngWithWorkerInner(args: {
     };
 
     args.worker.onerror = (error) => {
+      cleanup();
       const detailParts = [
         (error as ErrorEvent).message,
         (error as ErrorEvent).filename,
@@ -356,9 +394,19 @@ async function compressImageWithWorkerInner(args: {
   format: string;
   buf: ArrayBuffer;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ArrayBuffer> {
   return await new Promise<ArrayBuffer>((resolve, reject) => {
+    const cleanup = () => args.signal?.removeEventListener("abort", onAbort);
+    const onAbort = () => {
+      args.worker.terminate();
+      cleanup();
+      reject(args.signal?.reason ?? new DOMException("The operation was aborted", "AbortError"));
+    };
+    if (args.signal?.aborted) return onAbort();
+    args.signal?.addEventListener("abort", onAbort, { once: true });
     args.worker.onmessage = (ev: MessageEvent<WorkerMessage>) => {
+      cleanup();
       if (!ev.data) {
         return reject(new Error("Malformed worker response"));
       }
@@ -375,6 +423,7 @@ async function compressImageWithWorkerInner(args: {
     };
 
     args.worker.onerror = (error) => {
+      cleanup();
       const detailParts = [
         (error as ErrorEvent).message,
         (error as ErrorEvent).filename,
@@ -415,6 +464,7 @@ async function convertImageViaApi(args: {
   to: string;
   buf: ArrayBuffer;
   onProgress?: (update: ProgressUpdate) => void;
+  signal?: AbortSignal;
 }): Promise<ConversionResult> {
   const route = "/api/image-convert";
   const baseMetadata = {
@@ -432,6 +482,7 @@ async function convertImageViaApi(args: {
         "Content-Type": "application/octet-stream",
       }),
       body: args.buf,
+      signal: args.signal,
     });
   } catch (error) {
     throw createTelemetryError(
@@ -466,6 +517,7 @@ async function convertImageViaApi(args: {
 export async function compressPdfViaApi(args: {
   buf: ArrayBuffer;
   onProgress?: (update: ProgressUpdate) => void;
+  signal?: AbortSignal;
 }): Promise<ArrayBuffer> {
   const route = "/api/pdf-compress";
   const baseMetadata = {
@@ -482,6 +534,7 @@ export async function compressPdfViaApi(args: {
         "Content-Type": "application/pdf",
       }),
       body: args.buf,
+      signal: args.signal,
     });
   } catch (error) {
     throw createTelemetryError(
@@ -520,6 +573,7 @@ async function compressImageViaApi(args: {
   buf: ArrayBuffer;
   format: string;
   onProgress?: (update: ProgressUpdate) => void;
+  signal?: AbortSignal;
 }): Promise<ArrayBuffer> {
   const format = args.format.toLowerCase();
   const route = "/api/image-compress";
@@ -537,6 +591,7 @@ async function compressImageViaApi(args: {
         "Content-Type": "application/octet-stream",
       }),
       body: args.buf,
+      signal: args.signal,
     });
   } catch (error) {
     throw createTelemetryError(
@@ -576,10 +631,18 @@ async function convertRasterOnMainThread(args: {
   to: string;
   buf: ArrayBuffer;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ConversionResult> {
-  const rgba = await decodeToRGBA(args.from, args.buf);
-  const blob = await encodeFromRGBA(args.to, rgba, args.quality ?? 0.85);
+  const rgba = await decodeToRGBA(args.from, args.buf, args.signal);
+  const blob = await encodeFromRGBA(
+    args.to,
+    rgba,
+    args.quality ?? 0.85,
+    args.signal,
+  );
+  args.signal?.throwIfAborted();
   const buffer = await blob.arrayBuffer();
+  args.signal?.throwIfAborted();
   return { kind: "single", buffer };
 }
 
@@ -589,55 +652,47 @@ async function convertVideoOnMainThread(args: {
   buf: ArrayBuffer;
   onProgress?: (update: ProgressUpdate) => void;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ConversionResult> {
   const { convertVideo, convertVideoViaApi, shouldUseServerConversion } = await import("./video");
-  let buffer: ArrayBuffer;
-
   const preferServer = shouldUseServerConversion(args.from, args.to);
   const canUseClient = detectCapabilities().supportsVideoConversion;
-
-  if (preferServer) {
-    args.onProgress?.({ status: "processing", progress: 5 });
+  const plan = resolveAdaptiveVideoExecution({ preferServer, canUseClient });
+  let lastError: unknown;
+  for (const target of plan) {
+    args.signal?.throwIfAborted();
     try {
-      buffer = await convertVideoViaApi(args.buf, args.from, args.to);
+      const buffer =
+        target === "server"
+          ? await convertVideoViaApi(args.buf, args.from, args.to, args.signal)
+          : await convertVideo(args.buf, args.from, args.to, {
+              quality: args.quality,
+              signal: args.signal,
+              onProgress: (progress) => {
+                args.onProgress?.({
+                  status: "processing",
+                  progress: progress.ratio * 100,
+                  time: progress.time,
+                });
+              },
+            });
       args.onProgress?.({ status: "processing", progress: 100 });
+      return { kind: "single", buffer };
     } catch (error) {
-      if (!canUseClient) {
-        throw error;
-      }
-      console.warn("Server conversion failed, falling back to client conversion.", error);
-      buffer = await convertVideo(args.buf, args.from, args.to, {
-        quality: args.quality,
-        onProgress: (progress) => {
-          args.onProgress?.({
-            status: "processing",
-            progress: progress.ratio * 100,
-            time: progress.time,
-          });
-        },
-      });
-    }
-  } else {
-    try {
-      buffer = await convertVideo(args.buf, args.from, args.to, {
-        quality: args.quality,
-        onProgress: (progress) => {
-          args.onProgress?.({
-            status: "processing",
-            progress: progress.ratio * 100,
-            time: progress.time,
-          });
-        },
-      });
-    } catch (error) {
-      console.warn("Client conversion failed, falling back to server conversion.", error);
-      args.onProgress?.({ status: "processing", progress: 5 });
-      buffer = await convertVideoViaApi(args.buf, args.from, args.to);
-      args.onProgress?.({ status: "processing", progress: 100 });
+      if (args.signal?.aborted) throw error;
+      lastError = error;
+      console.warn(`${target} conversion failed; trying adaptive fallback.`, error);
     }
   }
+  throw lastError ?? new Error("No adaptive media execution target is available");
+}
 
-  return { kind: "single", buffer };
+export function resolveAdaptiveVideoExecution(args: {
+  preferServer: boolean;
+  canUseClient: boolean;
+}): readonly ("browser" | "server")[] {
+  if (!args.canUseClient) return ["server"];
+  return args.preferServer ? ["server", "browser"] : ["browser", "server"];
 }
 
 export async function compressMediaOnMainThread(args: {
@@ -645,10 +700,12 @@ export async function compressMediaOnMainThread(args: {
   buf: ArrayBuffer;
   onProgress?: (update: ProgressUpdate) => void;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ArrayBuffer> {
   const { compressMedia } = await import("./video");
   const buffer = await compressMedia(args.buf, args.format, {
     quality: args.quality,
+    signal: args.signal,
     onProgress: (progress) => {
       args.onProgress?.({
         status: "processing",
@@ -710,6 +767,7 @@ export async function compressFile(args: {
   buf: ArrayBuffer;
   onProgress?: (update: ProgressUpdate) => void;
   quality?: number;
+  signal?: AbortSignal;
 }): Promise<ArrayBuffer> {
   const { target } = resolveCompressionDispatch(args.format);
   if (target === "image-worker") {
@@ -721,6 +779,7 @@ export async function compressFile(args: {
         worker: args.worker,
         buf: args.buf,
         quality: args.quality,
+        signal: args.signal,
       });
     }
     return compressImageWithWorker({
@@ -728,6 +787,7 @@ export async function compressFile(args: {
       format: args.format,
       buf: args.buf,
       quality: args.quality,
+      signal: args.signal,
     });
   }
   if (target === "image-server") {
@@ -735,10 +795,15 @@ export async function compressFile(args: {
       buf: args.buf,
       format: args.format,
       onProgress: args.onProgress,
+      signal: args.signal,
     });
   }
   if (target === "pdf") {
-    return compressPdfViaApi({ buf: args.buf, onProgress: args.onProgress });
+    return compressPdfViaApi({
+      buf: args.buf,
+      onProgress: args.onProgress,
+      signal: args.signal,
+    });
   }
   if (target === "audio" || target === "video") {
     return compressMediaOnMainThread({
@@ -746,6 +811,7 @@ export async function compressFile(args: {
       buf: args.buf,
       onProgress: args.onProgress,
       quality: args.quality,
+      signal: args.signal,
     });
   }
   throw new Error(`Compression not supported for ${args.format}`);

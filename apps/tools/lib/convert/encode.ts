@@ -1,10 +1,34 @@
 import type { RGBA } from "./heif.ts";
 
+async function awaitWithSignal<T>(
+  promise: Promise<T>,
+  signal?: AbortSignal,
+): Promise<T> {
+  signal?.throwIfAborted();
+  if (!signal) return promise;
+  let rejectAbort: ((reason: unknown) => void) | undefined;
+  const aborted = new Promise<never>((_resolve, reject) => {
+    rejectAbort = reject;
+  });
+  const onAbort = () =>
+    rejectAbort?.(
+      signal.reason ?? new DOMException("The operation was aborted", "AbortError"),
+    );
+  signal.addEventListener("abort", onAbort, { once: true });
+  try {
+    return await Promise.race([promise, aborted]);
+  } finally {
+    signal.removeEventListener("abort", onAbort);
+  }
+}
+
 export async function encodeFromRGBA(
   toExt: string,
   rgba: RGBA,
-  quality = 0.85
+  quality = 0.85,
+  signal?: AbortSignal,
 ): Promise<Blob> {
+  signal?.throwIfAborted();
   const useOffscreen = typeof OffscreenCanvas !== "undefined";
   const canvas: HTMLCanvasElement | OffscreenCanvas = useOffscreen
     ? new OffscreenCanvas(rgba.width, rgba.height)
@@ -18,24 +42,35 @@ export async function encodeFromRGBA(
   ctx2d.putImageData(new ImageData(new Uint8ClampedArray(rgba.data), rgba.width, rgba.height), 0, 0);
 
   const canvasToBlob = async (type: string, q?: number) => {
+    signal?.throwIfAborted();
     if ("convertToBlob" in canvas) {
-      return (canvas as OffscreenCanvas).convertToBlob({
-        type,
-        quality: type === "image/png" ? undefined : q,
-      });
-    }
-    return new Promise<Blob>((resolve, reject) => {
-      (canvas as HTMLCanvasElement).toBlob(
-        (b) => (b ? resolve(b) : reject(new Error("toBlob failed"))),
-        type,
-        type === "image/png" ? undefined : q
+      const blob = await awaitWithSignal(
+        (canvas as OffscreenCanvas).convertToBlob({
+          type,
+          quality: type === "image/png" ? undefined : q,
+        }),
+        signal,
       );
-    });
+      signal?.throwIfAborted();
+      return blob;
+    }
+    const blob = await awaitWithSignal(
+      new Promise<Blob>((resolve, reject) => {
+        (canvas as HTMLCanvasElement).toBlob(
+          (b) => (b ? resolve(b) : reject(new Error("toBlob failed"))),
+          type,
+          type === "image/png" ? undefined : q,
+        );
+      }),
+      signal,
+    );
+    signal?.throwIfAborted();
+    return blob;
   };
 
   if (toExt === "svg") {
     const pngBlob = await canvasToBlob("image/png");
-    const buffer = await pngBlob.arrayBuffer();
+    const buffer = await awaitWithSignal(pngBlob.arrayBuffer(), signal);
     const bytes = new Uint8Array(buffer);
     let binary = "";
     const chunkSize = 0x8000;
@@ -56,10 +91,13 @@ export async function encodeFromRGBA(
 
   if (toExt === "pdf") {
     const pngBlob = await canvasToBlob("image/png");
-    const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
+    const pngBytes = new Uint8Array(
+      await awaitWithSignal(pngBlob.arrayBuffer(), signal),
+    );
     const { PDFDocument } = await import("pdf-lib");
     const pdfDoc = await PDFDocument.create();
-    const pngImage = await pdfDoc.embedPng(pngBytes);
+    signal?.throwIfAborted();
+    const pngImage = await awaitWithSignal(pdfDoc.embedPng(pngBytes), signal);
     const page = pdfDoc.addPage([rgba.width, rgba.height]);
     page.drawImage(pngImage, {
       x: 0,
@@ -67,7 +105,8 @@ export async function encodeFromRGBA(
       width: rgba.width,
       height: rgba.height,
     });
-    const pdfBytes = await pdfDoc.save();
+    const pdfBytes = await awaitWithSignal(pdfDoc.save(), signal);
+    signal?.throwIfAborted();
     const pdfBuffer = pdfBytes.buffer.slice(
       pdfBytes.byteOffset,
       pdfBytes.byteOffset + pdfBytes.byteLength

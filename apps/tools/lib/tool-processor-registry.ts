@@ -5,6 +5,7 @@ import {
   TABLE_PROCESSOR_ADAPTER_ID,
 } from './table-operation-policy.ts';
 import { getToolExecutionProvenance } from './tool-execution-provenance.ts';
+import { getGenericToolContract } from './generic-tool-workflow.ts';
 
 export type WiredToolProcessorAvailability = Readonly<{
   kind: 'wired';
@@ -45,6 +46,14 @@ function availabilityForToolId(toolId: string): ToolProcessorAvailability {
   const adapterId = registeredAdapterIdByToolId[toolId];
   if (adapterId) {
     return Object.freeze({ kind: 'wired', toolId, adapterId });
+  }
+  const genericContract = getGenericToolContract(toolId);
+  if (genericContract.state === 'supported') {
+    return Object.freeze({
+      kind: 'wired',
+      toolId,
+      adapterId: genericContract.adapterId,
+    });
   }
 
   const provenance = getToolExecutionProvenance(toolId);

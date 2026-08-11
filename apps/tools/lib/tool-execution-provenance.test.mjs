@@ -22,8 +22,13 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   assert.deepEqual(mapped('cr2-to-jpg').executionProfiles, ['server-executed']);
 
   assert.equal(resolveConversionDispatch('3g2', 'mp4').kind, 'adaptive-video');
+  assert.equal(
+    resolveConversionDispatch('mp4', 'm4a').engineIds[0],
+    'adaptive-media-conversion',
+  );
   assert.deepEqual(mapped('3g2-to-mp4').executionProfiles, [
     'client-only',
+    'server-assisted',
     'server-executed',
   ]);
 
@@ -255,8 +260,13 @@ test('processor availability stays distinct from inferred provenance and joins b
   }
 
   assert.deepEqual(getToolProcessorAvailability('png-to-jpg'), {
-    kind: 'unwired',
+    kind: 'wired',
     toolId: 'png-to-jpg',
+    adapterId: 'generic-conversion',
+  });
+  assert.deepEqual(getToolProcessorAvailability('markdown-to-rdataframe'), {
+    kind: 'unwired',
+    toolId: 'markdown-to-rdataframe',
     reason:
       'Execution provenance is known, but no processor adapter is registered for the shared workflow.',
     sourceNeeded:

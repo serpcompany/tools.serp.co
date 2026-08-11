@@ -5,6 +5,10 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import {
+  GENERIC_SMOKE_CAPABILITY_VERSION,
+  getGenericSmokeExpectation,
+} from './lib/generic-smoke-capabilities.mjs';
 
 const runnerPath = fileURLToPath(
   new URL('./run-browser-check.mjs', import.meta.url),
@@ -88,6 +92,55 @@ test('browser modes keep correctness and performance execution separate', () => 
   assert.match(runnerSource, /evidenceInputHashes/);
   assert.match(runnerSource, /buildBrowserScope/);
   assert.doesNotMatch(runnerSource, /benchmark-results\.json/);
+});
+
+test('smoke treats the truthful generic unsupported outcome as safe failure', () => {
+  assert.match(runnerSource, /This conversion is not currently supported/);
+  assert.match(runnerSource, /safe failure/i);
+  assert.doesNotMatch(runnerSource, /data-generic-contract/);
+  assert.match(runnerSource, /getGenericSmokeExpectation/);
+  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v2');
+  for (const id of ['png-to-webp', 'webp-to-jpg', 'heic-to-jpg']) {
+    const [from, to] = id.split('-to-');
+    assert.equal(
+      getGenericSmokeExpectation({ id, from, to, operation: 'convert' }),
+      'supported',
+      id,
+    );
+  }
+  for (const [id, from, to, operation] of [
+    ['compress-m4a', 'm4a', 'm4a', 'compress'],
+    ['compress-mp3', 'mp3', 'mp3', 'compress'],
+    ['compress-mp4', 'mp4', 'mp4', 'compress'],
+    ['m4a-to-mp3', 'm4a', 'mp3', 'convert'],
+    ['mp3-to-m4a', 'mp3', 'm4a', 'convert'],
+    ['mp4-to-m4a', 'mp4', 'm4a', 'convert'],
+    ['mp4-to-mp3', 'mp4', 'mp3', 'convert'],
+  ]) {
+    assert.equal(
+      getGenericSmokeExpectation({ id, from, to, operation }),
+      'unsupported',
+      id,
+    );
+  }
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: 'cr2-to-jpg', from: 'cr2', to: 'jpg', operation: 'convert',
+    }),
+    'unsupported',
+  );
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: '3g2-to-mp4', from: '3g2', to: 'mp4', operation: 'convert',
+    }),
+    'unsupported',
+  );
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: 'mp3-to-mp4', from: 'mp3', to: 'mp4', operation: 'convert',
+    }),
+    'unsupported',
+  );
 });
 
 test('local evidence accepts only loopback targets', () => {

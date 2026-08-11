@@ -1,4 +1,8 @@
-import { requiresVideoConversion } from '../capabilities.ts';
+import {
+  AUDIO_FORMATS,
+  VIDEO_FORMATS,
+  requiresVideoConversion,
+} from '../capabilities.ts';
 
 export type ConversionOp = 'raster' | 'pdf-pages' | 'video';
 
@@ -43,6 +47,64 @@ const SERVER_IMAGE_OUTPUTS = new Set([
   'tga',
   'dds',
 ]);
+const BROWSER_RASTER_INPUTS = new Set([
+  'avif',
+  'bmp',
+  'gif',
+  'heic',
+  'heif',
+  'ico',
+  'jpeg',
+  'jpg',
+  'png',
+  'svg',
+  'tif',
+  'tiff',
+  'webp',
+]);
+const BROWSER_RASTER_OUTPUTS = new Set([
+  'avif',
+  'jpeg',
+  'jpg',
+  'pdf',
+  'png',
+  'svg',
+  'webp',
+]);
+const PDF_OUTPUTS = new Set(['jpeg', 'jpg', 'png', 'webp']);
+const ADAPTIVE_INPUTS = new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS, 'gif']);
+const ADAPTIVE_OUTPUTS = new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS, 'gif']);
+const AUDIO_INPUTS = new Set(AUDIO_FORMATS);
+const VIDEO_INPUTS = new Set([...VIDEO_FORMATS, 'gif']);
+
+export type ConversionCapability = Readonly<
+  | { supported: true; dispatch: ConversionDispatch }
+  | { supported: false; reason: string }
+>;
+
+export function resolveConversionCapability(
+  from: string,
+  to: string,
+): ConversionCapability {
+  const input = from.toLowerCase();
+  const output = to.toLowerCase();
+  const dispatch = resolveConversionDispatch(input, output);
+  const supported =
+    input === 'pdf'
+      ? PDF_OUTPUTS.has(output)
+      : SERVER_IMAGE_INPUTS.has(input)
+        ? SERVER_IMAGE_OUTPUTS.has(output) || BROWSER_RASTER_OUTPUTS.has(output)
+        : ADAPTIVE_INPUTS.has(input) || ADAPTIVE_OUTPUTS.has(output)
+          ? (VIDEO_INPUTS.has(input) && ADAPTIVE_OUTPUTS.has(output)) ||
+            (AUDIO_INPUTS.has(input) && AUDIO_INPUTS.has(output))
+          : BROWSER_RASTER_INPUTS.has(input) && BROWSER_RASTER_OUTPUTS.has(output);
+  return supported
+    ? { supported: true, dispatch }
+    : {
+        supported: false,
+        reason: `No exact production adapter for ${input}->${output}`,
+      };
+}
 
 export function resolveConversionOp(from: string, to: string): ConversionOp {
   const dispatch = resolveConversionDispatch(from, to);
@@ -57,6 +119,7 @@ const dispatchByKind = Object.freeze({
   'adaptive-video': Object.freeze({
     kind: 'adaptive-video',
     engineIds: Object.freeze([
+      'adaptive-media-conversion',
       'browser-ffmpeg-wasm',
       'server-video-convert',
     ]),

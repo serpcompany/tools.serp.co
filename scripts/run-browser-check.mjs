@@ -7,6 +7,10 @@ import {
   buildBrowserScope,
   summarizeNavigationTimings,
 } from "./lib/browser-evidence.mjs";
+import {
+  GENERIC_SMOKE_CAPABILITY_VERSION,
+  getGenericSmokeExpectation,
+} from "./lib/generic-smoke-capabilities.mjs";
 
 function parseArguments(arguments_) {
   const tokens = arguments_.filter((argument) => argument !== "--");
@@ -724,16 +728,37 @@ try {
       const initialProgress = await page.textContent(
         '[data-testid="video-progress"]',
       );
-      if (!initialProgress?.toLowerCase().includes("complete")) {
+      const safeFailureMessage = "This conversion is not currently supported";
+      if (
+        !initialProgress?.toLowerCase().includes("complete") &&
+        !initialProgress?.includes(safeFailureMessage)
+      ) {
         await page.waitForFunction(
-          () => {
+          (expectedSafeFailure) => {
             const el = document.querySelector('[data-testid="video-progress"]');
-            const text = el?.textContent?.toLowerCase() ?? "";
-            return text.includes("complete");
+            const text = el?.textContent ?? "";
+            return (
+              text.toLowerCase().includes("complete") ||
+              text.includes(expectedSafeFailure)
+            );
           },
-          null,
+          safeFailureMessage,
           { timeout: tool.requiresFFmpeg ? 60000 : 20000 },
         );
+      }
+      const terminalProgress = await page.textContent(
+        '[data-testid="video-progress"]',
+      );
+      if (terminalProgress?.includes(safeFailureMessage)) {
+        if (getGenericSmokeExpectation(tool) !== "unsupported") {
+          throw new Error(
+            `A known supported adapter route reported unsupported (${GENERIC_SMOKE_CAPABILITY_VERSION}).`,
+          );
+        }
+        return {
+          detail: "safe failure: published route is truthfully unsupported",
+          metrics: { outputBytes: 0, outputType: null },
+        };
       }
       const blob = await waitForBlob(
         page,
