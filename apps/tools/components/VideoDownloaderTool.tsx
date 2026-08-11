@@ -15,6 +15,7 @@ import {
 } from "@/lib/downloader-extension-cta";
 import { createBrowserMediaWorkflow } from "@/lib/media-workflow/browser";
 import { getDownloaderAttemptPolicy } from "@/lib/media-workflow/attempt-policy";
+import { projectMediaTransfer } from "@/lib/media-workflow/transfer-presentation";
 
 type Props = {
   toolId: string;
@@ -52,7 +53,7 @@ function parseUrlInput(value: string) {
 function getExtensionFailureCta(
   message: string,
   extensionUrl?: string,
-  extensionProductName?: string
+  extensionProductName?: string,
 ): ExtensionFailureCta | null {
   const isExtensionEligibleFailure =
     /Unsupported URL/i.test(message) ||
@@ -77,7 +78,7 @@ function getExtensionFailureCta(
 function getFailFastDownloaderCta(
   toolId: string,
   extensionUrl?: string,
-  extensionProductName?: string
+  extensionProductName?: string,
 ): ExtensionFailureCta | null {
   if (getDownloaderAttemptPolicy(toolId).kind !== "reject") return null;
 
@@ -98,9 +99,13 @@ function incrementLocalUsageCount() {
   const today = getLocalUsageDayKey();
   try {
     const stored = window.localStorage.getItem(LOCAL_USAGE_STORAGE_KEY);
-    const parsed = stored ? JSON.parse(stored) as { day?: string; count?: number } : null;
+    const parsed = stored
+      ? (JSON.parse(stored) as { day?: string; count?: number })
+      : null;
     const currentCount =
-      parsed?.day === today && Number.isFinite(parsed.count) ? Number(parsed.count) : 0;
+      parsed?.day === today && Number.isFinite(parsed.count)
+        ? Number(parsed.count)
+        : 0;
     const nextCount = currentCount + 1;
     window.localStorage.setItem(
       LOCAL_USAGE_STORAGE_KEY,
@@ -133,7 +138,9 @@ function DownloaderCooldownMonetizationPanel({
         />
         {showExtensionCta ? (
           <>
-            <p className="mt-2 text-sm leading-6">{DOWNLOADER_EXTENSION_TEXT}</p>
+            <p className="mt-2 text-sm leading-6">
+              {DOWNLOADER_EXTENSION_TEXT}
+            </p>
             <SerplyCtaButton
               href={extensionUrl ?? DOWNLOADER_EXTENSION_URL}
               label={DOWNLOADER_EXTENSION_LABEL}
@@ -174,10 +181,7 @@ export default function VideoDownloaderTool({
   const [uncontrolledAdsVisible, setUncontrolledAdsVisible] = useState(false);
   const adsVisible = controlledAdsVisible ?? uncontrolledAdsVisible;
 
-  useEffect(
-    () => () => activeRun.current?.abort("Downloader unmounted"),
-    [],
-  );
+  useEffect(() => () => activeRun.current?.abort("Downloader unmounted"), []);
 
   function revealAds() {
     if (adsVisible) return;
@@ -207,7 +211,7 @@ export default function VideoDownloaderTool({
     const failFastCta = getFailFastDownloaderCta(
       toolId,
       extensionUrl,
-      extensionProductName
+      extensionProductName,
     );
 
     setBusy(true);
@@ -222,7 +226,18 @@ export default function VideoDownloaderTool({
       const controller = new AbortController();
       activeRun.current?.abort("Replaced by a new downloader run");
       activeRun.current = controller;
-      const outcome = await createBrowserMediaWorkflow().run(
+      const outcome = await createBrowserMediaWorkflow({
+        releaseDeliveredBytes: true,
+        onTransfer(transfer) {
+          const presentation = projectMediaTransfer(transfer);
+          setCurrentFile({
+            name: nameHint,
+            progress: presentation.progress,
+            status: "loading",
+            message: presentation.message,
+          });
+        },
+      }).run(
         {
           toolId,
           input: { kind: "url", url: parsedUrl.toString() },
@@ -231,7 +246,11 @@ export default function VideoDownloaderTool({
         {
           signal: controller.signal,
           observe(snapshot) {
-            if (snapshot.phase === "succeeded" || snapshot.phase === "failed" || snapshot.phase === "cancelled") {
+            if (
+              snapshot.phase === "succeeded" ||
+              snapshot.phase === "failed" ||
+              snapshot.phase === "cancelled"
+            ) {
               return;
             }
             setCurrentFile({
@@ -273,7 +292,7 @@ export default function VideoDownloaderTool({
       const extensionCta = getExtensionFailureCta(
         message,
         extensionUrl,
-        extensionProductName
+        extensionProductName,
       );
 
       if (extensionCta) {
@@ -305,7 +324,10 @@ export default function VideoDownloaderTool({
   const showUsagePressure =
     localUsageCount >= LOCAL_USAGE_PRESSURE_THRESHOLD && !extensionFailureCta;
   const hasBelowContent =
-    Boolean(errorMessage) || Boolean(extensionFailureCta) || showCooldownNotice || showUsagePressure;
+    Boolean(errorMessage) ||
+    Boolean(extensionFailureCta) ||
+    showCooldownNotice ||
+    showUsagePressure;
 
   return (
     <ToolHeroLayout
@@ -329,8 +351,12 @@ export default function VideoDownloaderTool({
       hero={
         <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 p-8 shadow-sm">
           <div className="mx-auto max-w-2xl space-y-4">
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{title}</h1>
-            {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+              {title}
+            </h1>
+            {subtitle && (
+              <p className="text-sm text-muted-foreground">{subtitle}</p>
+            )}
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
@@ -365,15 +391,17 @@ export default function VideoDownloaderTool({
       below={
         hasBelowContent ? (
           <div className="mt-4 space-y-2">
-            {errorMessage ? <div className="text-sm text-red-600">{errorMessage}</div> : null}
+            {errorMessage ? (
+              <div className="text-sm text-red-600">{errorMessage}</div>
+            ) : null}
             {showUsagePressure ? (
               <div className="mx-auto max-w-2xl rounded-lg border border-[#bfd4ff] bg-[#eef4ff] p-4 text-left text-[#12337a]">
                 <p className="text-sm font-semibold">
                   You have tried {localUsageCount} downloads today.
                 </p>
                 <p className="mt-2 text-sm leading-6">
-                  Install the browser extension for unlimited downloads and fewer web-form
-                  limits.
+                  Install the browser extension for unlimited downloads and
+                  fewer web-form limits.
                 </p>
                 <SerplyCtaButton
                   href={extensionUrl ?? DOWNLOADER_EXTENSION_URL}

@@ -1,9 +1,16 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { getToolProcessorAvailability } from "../tool-processor-registry.ts";
+import { deliverMediaInBrowser } from "./browser.ts";
+import {
+  createStreamedMediaAcquisition,
+  type MediaEndpointResponse,
+} from "./media-endpoint.ts";
 import { createMediaWorkflowTestHarness } from "./testing.ts";
+import { projectMediaTransfer } from "./transfer-presentation.ts";
 import { VERIFIED_MEDIA_FORMATS } from "./verified-formats.ts";
 
 const SAMPLE_MP4_BYTES = new Uint8Array(
@@ -30,6 +37,325 @@ const SAMPLE_VIDEO_ONLY_WEBM_BYTES = new Uint8Array(
   ),
 );
 
+test("acquisition avoids two full owned buffers at the 64 MiB cap", async (t) => {
+  const cap = 64 * 1_024 * 1_024;
+
+  for (const contentLength of [cap, undefined]) {
+    await t.test(
+      contentLength ? "declared length" : "indeterminate length",
+      async () => {
+        const transportChunk = new Uint8Array(cap / 2);
+        const body = new ReadableStream<Uint8Array>({
+          start(controller) {
+            controller.enqueue(transportChunk);
+            controller.enqueue(transportChunk);
+            controller.close();
+          },
+        });
+        let cancelled = false;
+        let released = false;
+        const originalGetReader = body.getReader.bind(body);
+        body.getReader = (() => {
+          const reader = originalGetReader();
+          const originalCancel = reader.cancel.bind(reader);
+          const originalRelease = reader.releaseLock.bind(reader);
+          reader.cancel = async (reason?: unknown) => {
+            cancelled = true;
+            return originalCancel(reason);
+          };
+          reader.releaseLock = () => {
+            released = true;
+            originalRelease();
+          };
+          return reader;
+        }) as typeof body.getReader;
+        const allocations: Uint8Array[] = [];
+        const cleanups: Array<() => Promise<void>> = [];
+        const acquisition = createStreamedMediaAcquisition({
+          endpoint: {
+            async open(): Promise<MediaEndpointResponse> {
+              return {
+                body,
+                contentLength,
+                extension: "mp4",
+                fileName: "at-cap.mp4",
+                mimeType: "video/mp4",
+              };
+            },
+          },
+          allocateBuffer(bytes) {
+            const allocation = new Uint8Array(bytes);
+            allocations.push(allocation);
+            return allocation;
+          },
+        });
+
+        const media = await acquisition.acquire(
+          {
+            consumer: "downloader",
+            mode: "video",
+            url: "https://media.example/at-cap",
+          },
+          {
+            signal: new AbortController().signal,
+            budgets: { maxInputBytes: cap },
+            async registerCleanup(cleanup) {
+              cleanups.push(cleanup);
+            },
+            reportProgress() {},
+          },
+        );
+
+        const allocationSizes = allocations.map(({ byteLength }) => byteLength);
+        if (contentLength) {
+          assert.deepEqual(allocationSizes, [cap]);
+        } else {
+          assert.deepEqual(allocationSizes, [cap / 2, cap]);
+          assert.equal(
+            Math.max(
+              ...allocationSizes
+                .slice(1)
+                .map((size, index) => size + allocationSizes[index]!),
+            ),
+            cap * 1.5,
+          );
+        }
+        assert.equal(media.bytes.buffer, allocations.at(-1)?.buffer);
+        assert.equal(media.bytes.byteLength, cap);
+        await Promise.all(cleanups.map((cleanup) => cleanup()));
+        assert.equal(cancelled, false);
+        assert.equal(released, true);
+      },
+    );
+  }
+});
+
+test("a tiny indeterminate stream keeps its owned allocation small and reuses it at EOF", async () => {
+  const chunk = new Uint8Array([1, 2, 3]);
+  const allocations: Uint8Array[] = [];
+  const acquisition = createStreamedMediaAcquisition({
+    endpoint: {
+      async open() {
+        return {
+          body: new ReadableStream<Uint8Array>({
+            start(controller) {
+              controller.enqueue(chunk);
+              controller.close();
+            },
+          }),
+          extension: "mp4",
+          fileName: "tiny.mp4",
+          mimeType: "video/mp4",
+        };
+      },
+    },
+    allocateBuffer(bytes) {
+      const allocation = new Uint8Array(bytes);
+      allocations.push(allocation);
+      return allocation;
+    },
+  });
+
+  const media = await acquisition.acquire(
+    {
+      consumer: "downloader",
+      mode: "video",
+      url: "https://media.example/tiny",
+    },
+    {
+      signal: new AbortController().signal,
+      budgets: { maxInputBytes: 64 * 1_024 * 1_024 },
+      async registerCleanup() {},
+      reportProgress() {},
+    },
+  );
+
+  assert.deepEqual(
+    allocations.map(({ byteLength }) => byteLength),
+    [64 * 1_024],
+  );
+  assert.equal(media.bytes.buffer, allocations[0]?.buffer);
+  assert.deepEqual(Array.from(media.bytes), [1, 2, 3]);
+});
+
+test("cancelling a cap-sized indeterminate acquisition releases its reader and sole owned buffer", async () => {
+  const cap = 64 * 1_024 * 1_024;
+  const controller = new AbortController();
+  let streamCancelled = false;
+  let readerReleased = false;
+  let allocated: Uint8Array | undefined;
+  const cleanups: Array<() => Promise<void>> = [];
+  const transportChunk = new Uint8Array(cap / 2);
+  let chunkIndex = 0;
+  const body = new ReadableStream<Uint8Array>(
+    {
+      pull(stream) {
+        if (chunkIndex < 2) {
+          chunkIndex += 1;
+          stream.enqueue(transportChunk);
+        }
+      },
+      cancel() {
+        streamCancelled = true;
+      },
+    },
+    { highWaterMark: 0 },
+  );
+  const originalGetReader = body.getReader.bind(body);
+  body.getReader = (() => {
+    const reader = originalGetReader();
+    const originalRelease = reader.releaseLock.bind(reader);
+    reader.releaseLock = () => {
+      readerReleased = true;
+      originalRelease();
+    };
+    return reader;
+  }) as typeof body.getReader;
+  const acquisition = createStreamedMediaAcquisition({
+    endpoint: {
+      async open() {
+        return {
+          body,
+          extension: "mp4",
+          fileName: "cancelled.mp4",
+          mimeType: "video/mp4",
+        };
+      },
+    },
+    allocateBuffer(bytes) {
+      allocated = new Uint8Array(bytes);
+      return allocated;
+    },
+    onTransfer(transfer) {
+      if (transfer.receivedBytes === cap) {
+        controller.abort("cancel cap transfer");
+      }
+    },
+  });
+
+  await assert.rejects(
+    acquisition.acquire(
+      {
+        consumer: "downloader",
+        mode: "video",
+        url: "https://media.example/cancelled",
+      },
+      {
+        signal: controller.signal,
+        budgets: { maxInputBytes: cap },
+        async registerCleanup(cleanup) {
+          cleanups.push(cleanup);
+        },
+        reportProgress() {},
+      },
+    ),
+    (error) => error === "cancel cap transfer",
+  );
+  assert.equal(allocated?.byteLength, cap);
+  assert.equal(streamCancelled, true);
+  await Promise.all(cleanups.map((cleanup) => cleanup()));
+  assert.equal(readerReleased, true);
+});
+
+test("video-only WebM fixture has deterministic generation provenance", () => {
+  const provenance = JSON.parse(
+    readFileSync(
+      new URL("../../benchmarks/fixture-provenance.json", import.meta.url),
+      "utf8",
+    ),
+  ) as Record<string, { command: string; sha256: string; source: string }>;
+  const record = provenance["fixtures/sample-video-only.webm"];
+
+  assert.equal(record?.source, "repository-generated");
+  assert.match(record?.command ?? "", /ffmpeg[\s\S]*-an[\s\S]*libvpx/);
+  assert.equal(
+    createHash("sha256").update(SAMPLE_VIDEO_ONLY_WEBM_BYTES).digest("hex"),
+    record?.sha256,
+  );
+});
+
+test("browser delivery hands off the owned view without cloning and releases downloader ownership", () => {
+  const bytes = new Uint8Array([1, 2, 3, 4]);
+  const media = {
+    name: "clip.mp4",
+    format: "mp4",
+    mimeType: "video/mp4",
+    bytes,
+  };
+  const blobParts: BlobPart[][] = [];
+  const revoked: string[] = [];
+  const scheduled: Array<() => void> = [];
+  let clicked = false;
+
+  deliverMediaInBrowser(media, {
+    releaseOwnership: true,
+    createBlob(parts, options) {
+      blobParts.push(parts);
+      return new Blob(parts, options);
+    },
+    createObjectURL() {
+      return "blob:owned-media";
+    },
+    revokeObjectURL(url) {
+      revoked.push(url);
+    },
+    createAnchor() {
+      return {
+        href: "",
+        download: "",
+        click() {
+          clicked = true;
+        },
+      };
+    },
+    schedule(cleanup) {
+      scheduled.push(cleanup);
+    },
+  });
+
+  assert.equal(blobParts.length, 1);
+  assert.equal(blobParts[0]?.length, 1);
+  assert.equal(blobParts[0]?.[0], bytes);
+  assert.equal(media.bytes.byteLength, 0);
+  assert.equal(clicked, true);
+  assert.deepEqual(revoked, []);
+  scheduled[0]?.();
+  assert.deepEqual(revoked, ["blob:owned-media"]);
+});
+
+test("transfer presentation projects determinate stats and a meaningful indeterminate state", () => {
+  assert.deepEqual(
+    projectMediaTransfer({
+      receivedBytes: 32 * 1_024 * 1_024,
+      totalBytes: 64 * 1_024 * 1_024,
+      ratio: 0.5,
+      bytesPerSecond: 8 * 1_024 * 1_024,
+      etaSeconds: 4,
+    }),
+    {
+      progress: 50,
+      message: "32 MB of 64 MB • 8 MB/s • 4s remaining",
+    },
+  );
+  assert.deepEqual(
+    projectMediaTransfer({
+      receivedBytes: 3 * 1_024 * 1_024,
+      bytesPerSecond: 1.5 * 1_024 * 1_024,
+    }),
+    {
+      progress: undefined,
+      message: "3 MB downloaded • 1.5 MB/s • total size unknown",
+    },
+  );
+  assert.deepEqual(
+    projectMediaTransfer({ receivedBytes: 1, bytesPerSecond: 0 }),
+    {
+      progress: undefined,
+      message: "1 B downloaded • calculating speed • total size unknown",
+    },
+  );
+});
+
 test("presentation callers delegate stream lifecycle and terminal ownership", () => {
   for (const relativePath of [
     "../../components/VideoDownloaderTool.tsx",
@@ -47,6 +373,25 @@ test("presentation callers delegate stream lifecycle and terminal ownership", ()
       assert.doesNotMatch(source, /AUDIO_FORMATS|VIDEO_FORMATS/);
     }
   }
+});
+
+test("downloader UI consumes the browser transfer projection without deriving transport statistics", () => {
+  const source = readFileSync(
+    new URL("../../components/VideoDownloaderTool.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(
+    source,
+    /createBrowserMediaWorkflow\(\{[\s\S]*onTransfer\(transfer\)/,
+  );
+  assert.match(source, /projectMediaTransfer\(transfer\)/);
+  assert.match(source, /progress: presentation\.progress/);
+  assert.match(source, /message: presentation\.message/);
+  assert.match(source, /releaseDeliveredBytes: true/);
+  assert.doesNotMatch(
+    source,
+    /transfer\.(?:receivedBytes|totalBytes|ratio|bytesPerSecond|etaSeconds)/,
+  );
 });
 
 test("scoped downloader and transcription Tool ids register the media workflow adapter", () => {
@@ -213,7 +558,12 @@ test("declared media length must match stream EOF before processing or delivery"
             extension: media.format,
             mimeType: media.mimeType,
             totalBytes: media.bytes.byteLength,
-            chunks: [media.bytes.subarray(0, Math.floor(media.bytes.byteLength * 0.75))],
+            chunks: [
+              media.bytes.subarray(
+                0,
+                Math.floor(media.bytes.byteLength * 0.75),
+              ),
+            ],
           },
         },
       });
@@ -244,7 +594,10 @@ test("declared media length must match stream EOF before processing or delivery"
           name: "chunked.mp3",
           extension: "mp3",
           mimeType: "audio/mpeg",
-          chunks: [SAMPLE_MP3_BYTES.subarray(0, 2_000), SAMPLE_MP3_BYTES.subarray(2_000)],
+          chunks: [
+            SAMPLE_MP3_BYTES.subarray(0, 2_000),
+            SAMPLE_MP3_BYTES.subarray(2_000),
+          ],
         },
       },
     });
@@ -654,7 +1007,10 @@ test("video-only WebM downloads but cannot enter transcription processing", asyn
 test("real ISO media variants pass bounded parsing while ftyp-only lookalikes fail", async (t) => {
   const formats = [
     { format: "mp4", mimeTypes: ["video/mp4", "application/octet-stream"] },
-    { format: "mov", mimeTypes: ["video/quicktime", "application/octet-stream"] },
+    {
+      format: "mov",
+      mimeTypes: ["video/quicktime", "application/octet-stream"],
+    },
     { format: "m4a", mimeTypes: ["audio/mp4", "application/octet-stream"] },
     {
       format: "m4v",

@@ -169,7 +169,7 @@ test("known unreliable downloader pages fail fast into extension monetization", 
   assert.match(videoDownloaderToolSource, /getFailFastDownloaderCta/);
   assert.match(
     videoDownloaderToolSource,
-    /createBrowserMediaWorkflow\(\)\.run\([\s\S]*if \(failFastCta\)/,
+    /createBrowserMediaWorkflow\(\{[\s\S]*\}\)\.run\([\s\S]*if \(failFastCta\)/,
   );
   assert.doesNotMatch(videoDownloaderToolSource, /beginToolRun|finishFailure/);
   assert.match(videoDownloaderToolSource, /Use the browser extension for this site\./);

@@ -28,9 +28,11 @@ export type MediaEndpointPort = Readonly<{
   ): Promise<MediaEndpointResponse>;
 }>;
 
-export function createProductionMediaEndpoint(options: {
-  fetch?: typeof fetch;
-} = {}): MediaEndpointPort {
+export function createProductionMediaEndpoint(
+  options: {
+    fetch?: typeof fetch;
+  } = {},
+): MediaEndpointPort {
   const fetchMedia = options.fetch ?? fetch;
   return {
     async open(request, signal) {
@@ -214,8 +216,11 @@ export function createStreamedMediaAcquisition(options: {
   endpoint: MediaEndpointPort;
   clock?: { now(): number };
   onTransfer?: (progress: MediaTransferProgress) => void;
+  allocateBuffer?: (bytes: number) => Uint8Array;
 }) {
   const clock = options.clock ?? { now: () => performance.now() };
+  const allocateBuffer =
+    options.allocateBuffer ?? ((bytes: number) => new Uint8Array(bytes));
   return {
     async acquire(
       request: MediaEndpointRequest,
@@ -229,7 +234,8 @@ export function createStreamedMediaAcquisition(options: {
         void reader.cancel(context.signal.reason).catch(() => {});
       };
       if (context.signal.aborted) cancelReader();
-      else context.signal.addEventListener("abort", cancelReader, { once: true });
+      else
+        context.signal.addEventListener("abort", cancelReader, { once: true });
       await context.registerCleanup(async () => {
         context.signal.removeEventListener("abort", cancelReader);
         if (!complete) await reader.cancel().catch(() => {});
@@ -242,12 +248,22 @@ export function createStreamedMediaAcquisition(options: {
         response.contentLength > context.budgets.maxInputBytes
       ) {
         await reader.cancel("Input byte budget exceeded");
-        throw new Error(
-          `Input exceeds ${context.budgets.maxInputBytes} bytes`,
-        );
+        throw new Error(`Input exceeds ${context.budgets.maxInputBytes} bytes`);
       }
 
-      const chunks: Uint8Array[] = [];
+      const declaredLength = response.contentLength;
+      let ownedBuffer =
+        declaredLength === undefined
+          ? undefined
+          : allocateBuffer(declaredLength);
+      if (
+        declaredLength !== undefined &&
+        ownedBuffer?.byteLength !== declaredLength
+      ) {
+        throw new Error(
+          `Media buffer allocator returned ${ownedBuffer?.byteLength ?? 0} bytes; expected ${declaredLength}`,
+        );
+      }
       let receivedBytes = 0;
       const startedAt = clock.now();
       while (true) {
@@ -263,12 +279,35 @@ export function createStreamedMediaAcquisition(options: {
             `Input exceeds ${context.budgets.maxInputBytes} bytes`,
           );
         }
-        chunks.push(chunk);
+        const requiredBytes = receivedBytes + chunk.byteLength;
+        if (!ownedBuffer || requiredBytes > ownedBuffer.byteLength) {
+          // Unknown-length bodies grow geometrically from a small allocation.
+          // Only the current owned prefix and its replacement coexist during
+          // growth; no chunk list or EOF coalescing allocation is retained.
+          let capacity = Math.min(64 * 1_024, context.budgets.maxInputBytes);
+          while (capacity < requiredBytes) {
+            capacity = Math.min(context.budgets.maxInputBytes, capacity * 2);
+          }
+          const replacement = allocateBuffer(capacity);
+          if (replacement.byteLength !== capacity) {
+            throw new Error(
+              `Media buffer allocator returned ${replacement.byteLength} bytes; expected ${capacity}`,
+            );
+          }
+          if (ownedBuffer) {
+            replacement.set(ownedBuffer.subarray(0, receivedBytes));
+          }
+          ownedBuffer = replacement;
+        }
+        ownedBuffer.set(chunk, receivedBytes);
         receivedBytes += chunk.byteLength;
         const elapsedSeconds = Math.max((clock.now() - startedAt) / 1_000, 0);
-        const bytesPerSecond = elapsedSeconds > 0 ? receivedBytes / elapsedSeconds : 0;
+        const bytesPerSecond =
+          elapsedSeconds > 0 ? receivedBytes / elapsedSeconds : 0;
         const totalBytes = response.contentLength;
-        const ratio = totalBytes ? Math.min(1, receivedBytes / totalBytes) : undefined;
+        const ratio = totalBytes
+          ? Math.min(1, receivedBytes / totalBytes)
+          : undefined;
         const etaSeconds =
           totalBytes && bytesPerSecond > 0
             ? Math.max(0, (totalBytes - receivedBytes) / bytesPerSecond)
@@ -293,13 +332,14 @@ export function createStreamedMediaAcquisition(options: {
         );
       }
 
-      const bytes = new Uint8Array(receivedBytes);
-      let offset = 0;
-      for (const chunk of chunks) {
-        bytes.set(chunk, offset);
-        offset += chunk.byteLength;
-      }
-      return { ...identity, bytes };
+      return {
+        ...identity,
+        bytes: !ownedBuffer
+          ? new Uint8Array(0)
+          : receivedBytes === ownedBuffer.byteLength
+            ? ownedBuffer
+            : ownedBuffer.subarray(0, receivedBytes),
+      };
     },
   };
 }

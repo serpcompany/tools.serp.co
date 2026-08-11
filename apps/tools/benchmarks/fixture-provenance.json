@@ -1,0 +1,7 @@
+{
+  "fixtures/sample-video-only.webm": {
+    "source": "repository-generated",
+    "command": "ffmpeg -f lavfi -i color=c=black:s=320x240:r=25:d=1 -an -c:v libvpx -deadline best -cpu-used 0 -map_metadata -1 sample-video-only.webm",
+    "sha256": "a8baba8e56e31fd86e6581468f59c8f8b5451f30b2ab4d58cfd3d8ee120e37b4"
+  }
+}
