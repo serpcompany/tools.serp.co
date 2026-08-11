@@ -15,6 +15,22 @@ const presentations = {
   ),
   pdf: readFileSync(new URL("../components/PdfTool.tsx", import.meta.url), "utf8"),
 };
+const pdfViewer = readFileSync(
+  new URL("../public/vendor/pdfjs-annotation-extension/web/viewer.mjs", import.meta.url),
+  "utf8",
+);
+const pdfProvider = readFileSync(
+  new URL("../public/vendor/pdfjs-annotation-extension/pdf.mjs", import.meta.url),
+  "utf8",
+);
+const pdfWorker = readFileSync(
+  new URL("../public/vendor/pdfjs-annotation-extension/pdf.worker.mjs", import.meta.url),
+  "utf8",
+);
+const pdfViewerHtml = readFileSync(
+  new URL("../public/vendor/pdfjs-annotation-extension/web/viewer.html", import.meta.url),
+  "utf8",
+);
 
 test("specialized presentations use the shared React adapter without manual telemetry", () => {
   for (const [name, source] of Object.entries(presentations)) {
@@ -34,4 +50,20 @@ test("presentations cross the explicit acquisition seams", () => {
   assert.match(presentations.csv, /runFiles\(toolId \?\? "csv-combiner"/);
   assert.match(presentations.pdf, /runFile\(toolId, file\)/);
   assert.match(presentations.pdf, /data-testid="pdf-tool-viewer"/);
+});
+
+test("vendored PDF viewer loads a complete version-matched PDF.js runtime", () => {
+  assert.match(pdfViewer, /const pdfjsVersion = "4\.3\.136"/);
+  assert.match(pdfProvider, /pdfjsVersion\s*=\s*["']4\.3\.136["']/);
+  assert.match(pdfProvider, /globalThis\.pdfjsLib\s*=\s*\{\}/);
+  assert.match(pdfWorker, /pdfjsVersion\s*=\s*["']4\.3\.136["']/);
+  assert.match(
+    pdfViewerHtml,
+    /src="\/vendor\/pdfjs-annotation-extension\/pdf\.mjs" type="module"/,
+  );
+  assert.match(
+    pdfViewer,
+    /value: "\/vendor\/pdfjs-annotation-extension\/pdf\.worker\.mjs"/,
+  );
+  assert.doesNotMatch(pdfViewerHtml, /\.\.\/build\/pdf\.mjs/);
 });
