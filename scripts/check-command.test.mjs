@@ -14,6 +14,10 @@ const preCommitHook = readFileSync(
   new URL('../.githooks/pre-commit', import.meta.url),
   'utf8',
 );
+const prePushHook = readFileSync(
+  new URL('../.githooks/pre-push', import.meta.url),
+  'utf8',
+);
 const cloudflareBuild = readFileSync(
   new URL('../apps/tools/scripts/build-cloudflare.mjs', import.meta.url),
   'utf8',
@@ -78,4 +82,9 @@ test('production build avoids implicit build-time network activity', () => {
   assert.doesNotMatch(layout, /next\/font\/google/);
   assert.match(layout, /bg-background font-sans antialiased/);
   assert.match(cloudflareBuild, /NEXT_TELEMETRY_DISABLED:\s*["']1["']/);
+});
+
+test('pre-push uses the canonical deterministic check', () => {
+  assert.match(prePushHook, /pnpm check/);
+  assert.doesNotMatch(prePushHook, /lint:tools|lint:links/);
 });
