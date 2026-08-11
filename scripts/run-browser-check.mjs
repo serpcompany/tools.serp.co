@@ -422,6 +422,52 @@ try {
   }
 
   async function runFunctionalTest(page, tool) {
+    if (tool.id === "video-downloader") {
+      const fixture = toolFixtures[tool.id];
+      const fixturePath = resolveFixturePath(fixture?.responseFixture);
+      if (options.environment !== "local" || !fixturePath || !fixture?.url) {
+        return { skipped: true, reason: "missing local downloader fixture" };
+      }
+      const media = await fs.readFile(fixturePath);
+      await page.route("**/api/media-fetch*", async (route) => {
+        await route.fulfill({
+          status: 200,
+          headers: {
+            "content-length": String(media.byteLength),
+            "content-type": "video/mp4",
+            "x-media-extension": "mp4",
+            "x-media-filename": "deterministic-video.mp4",
+          },
+          body: media,
+        });
+      });
+      await hookBlobCapture(page);
+      await page.fill('[data-testid="tool-url-input"]', fixture.url);
+      await page.click('[data-testid="tool-url-submit"]');
+      await page.waitForFunction(
+        () =>
+          document.querySelector(
+            '[data-testid="video-progress"][data-status="completed"], [data-testid="video-progress"][data-status="error"]',
+          ) !== null,
+        null,
+        { timeout: 20_000 },
+      );
+      const terminal = await page.$('[data-testid="video-progress"]');
+      if ((await terminal?.getAttribute("data-status")) === "error") {
+        throw new Error(
+          `Downloader failed: ${(await terminal?.textContent())?.trim() || "unknown error"}`,
+        );
+      }
+      const blob = await waitForBlob(page, 1, 20_000);
+      if (!blob?.size || blob.type !== "video/mp4") {
+        throw new Error("Downloader URL flow did not deliver verified MP4 media");
+      }
+      return {
+        detail: `download ${blob.size} bytes`,
+        metrics: { outputBytes: blob.size, outputType: blob.type },
+      };
+    }
+
     if (tool.id === "png-to-png" || tool.route === "/compress-png") {
       const fixtureEntry = getFormatFixture("png");
       if (!fixtureEntry) {

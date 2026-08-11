@@ -123,6 +123,25 @@ test('transcription smoke uses owned speech and a bounded success-or-error termi
   assert.doesNotMatch(runnerSource, /timeout: 600000/);
 });
 
+test('local downloader smoke crosses the URL endpoint with checked-in media', () => {
+  const matrix = JSON.parse(
+    readFileSync(
+      new URL('../apps/tools/benchmarks/fixture-matrix.json', import.meta.url),
+      'utf8',
+    ),
+  );
+
+  assert.deepEqual(matrix.toolFixtures['video-downloader'], {
+    input: 'url',
+    url: 'https://fixture.example/watch/deterministic-video',
+    responseFixture: 'fixtures/sample.mp4',
+  });
+  assert.match(runnerSource, /tool\.id === "video-downloader"/);
+  assert.match(runnerSource, /page\.route\("\*\*\/api\/media-fetch\*"/);
+  assert.match(runnerSource, /data-status="completed"/);
+  assert.match(runnerSource, /data-status="error"/);
+});
+
 test('local evidence accepts only loopback targets', () => {
   const result = spawnSync(
     process.execPath,
