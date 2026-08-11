@@ -1,27 +1,53 @@
 import {
   createToolWorkflow,
+  type ProcessorOptions,
+  type SemanticVerification,
   type ToolProcessor,
-  type ToolSupport,
   type RuntimeResourceKind,
   type WorkflowMedia,
 } from "./index.ts";
 
+type ProcessorEngine = ToolProcessor["engine"];
+
 type ProcessorScript = {
-  support: ToolSupport;
+  engine?: ProcessorEngine;
+  support: {
+    acquisition: "file" | "url";
+    inputFormats: string[];
+    outputFormats: string[];
+  };
   progress?: number[];
   lateProgress?: number[];
   lateResources?: RuntimeResourceKind[];
   error?: Error;
+  parseOptions?(value: unknown): ProcessorOptions<unknown>;
   result: WorkflowMedia | WorkflowMedia[];
 };
 
+type TypedProcessorScript<Options> = Omit<ProcessorScript, "parseOptions"> & {
+  parseOptions(value: unknown): ProcessorOptions<Options>;
+};
+
+export function defineScriptedProcessor<Options>(
+  script: TypedProcessorScript<Options>,
+): ProcessorScript {
+  return script as unknown as ProcessorScript;
+}
+
 type UrlFixture = Omit<WorkflowMedia, "bytes"> & {
   chunks: Uint8Array[];
+  totalBytes?: number | null;
+};
+
+type StreamRecord = {
+  url: string;
+  chunksRead: number;
+  cancelled: boolean;
+  readerLockReleased: boolean;
 };
 
 const signatures: Record<string, readonly number[]> = {
   jpg: [255, 216, 255],
-  mp4: [0, 0, 0],
   png: [137, 80, 78, 71, 13, 10, 26, 10],
 };
 
@@ -29,14 +55,68 @@ const mimeTypes: Record<string, string> = {
   jpg: "image/jpeg",
   mp4: "video/mp4",
   png: "image/png",
+  "remote-video": "application/octet-stream",
 };
 
-function hasFormatSignature(media: WorkflowMedia) {
+function verifyMedia(
+  media: WorkflowMedia,
+  role: "input" | "result",
+): SemanticVerification {
+  if (
+    role === "input" &&
+    media.format === "remote-video" &&
+    media.mimeType === "application/octet-stream" &&
+    media.bytes.byteLength > 0
+  ) {
+    return { status: "verified" };
+  }
+  const mimeType = mimeTypes[media.format];
+  if (!mimeType) {
+    return {
+      status: "unavailable",
+      message: `No semantic verifier for ${media.format}`,
+    };
+  }
+  if (media.mimeType !== mimeType) {
+    return {
+      status: "rejected",
+      message: `Expected MIME ${mimeType}, received ${media.mimeType}`,
+    };
+  }
+  if (media.format === "mp4") {
+    if (media.bytes.byteLength < 12) {
+      return { status: "rejected", message: "MP4 ftyp box is truncated" };
+    }
+    const view = new DataView(
+      media.bytes.buffer,
+      media.bytes.byteOffset,
+      media.bytes.byteLength,
+    );
+    const boxSize = view.getUint32(0, false);
+    const boxType = new TextDecoder().decode(media.bytes.subarray(4, 8));
+    if (
+      boxType !== "ftyp" ||
+      boxSize < 12 ||
+      boxSize > media.bytes.byteLength
+    ) {
+      return { status: "rejected", message: "Invalid MP4 ftyp box" };
+    }
+    return { status: "verified" };
+  }
   const signature = signatures[media.format];
-  return (
-    !signature ||
-    signature.every((byte, index) => media.bytes[index] === byte)
-  );
+  if (!signature) {
+    return {
+      status: "unavailable",
+      message: `No semantic verifier for ${media.format}`,
+    };
+  }
+  if (!signature.every((byte, index) => media.bytes[index] === byte)) {
+    return {
+      status: "rejected",
+      message: `Bytes do not match ${media.format}`,
+    };
+  }
+  return { status: "verified" };
 }
 
 export function createToolWorkflowTestHarness(options: {
@@ -68,39 +148,90 @@ export function createToolWorkflowTestHarness(options: {
   const times = [...(options.clock?.times ?? [])];
   const runIds = [...(options.ids?.run ?? [])];
   const deliveryIds = [...(options.ids?.delivery ?? [])];
+  const streamRecords: StreamRecord[] = [];
+  const processorRecords: Array<{
+    toolId: string;
+    engine: ProcessorEngine;
+    support: ToolProcessor["support"];
+    options: unknown;
+  }> = [];
   let runId = 0;
   let deliveryId = 0;
   const processors = new Map<string, ToolProcessor>(
-    Object.entries(options.processors).map(([toolId, script]) => [
-      toolId,
-      {
-        support: script.support,
-        async process(_input, context) {
-          events.push(`processor:${toolId}`);
-          for (const resource of options.resources?.processing ?? []) {
-            await context.openResource(resource);
-          }
-          context.signal.throwIfAborted();
-          for (const progress of script.progress ?? []) {
-            context.reportProgress(progress);
-          }
-          if (script.lateProgress || script.lateResources) {
-            setTimeout(async () => {
-              for (const progress of script.lateProgress ?? []) {
-                context.reportProgress(progress);
-              }
-              for (const resource of script.lateResources ?? []) {
-                await context.openResource(resource);
-              }
-            }, 0);
-          }
-          if (script.error) {
-            throw script.error;
-          }
-          return Array.isArray(script.result) ? script.result : [script.result];
+    Object.entries(options.processors).map(([toolId, script]) => {
+      const results = Array.isArray(script.result)
+        ? script.result
+        : [script.result];
+      const support = {
+        acquisition: script.support.acquisition,
+        inputs: script.support.inputFormats.map((format) => ({
+          format,
+          mimeTypes: mimeTypes[format] ? [mimeTypes[format]] : [],
+        })),
+        outputs: script.support.outputFormats.map((format) => ({
+          format,
+          mimeType:
+            mimeTypes[format] ??
+            results.find((result) => result.format === format)?.mimeType ??
+            "application/octet-stream",
+        })),
+      } as const;
+      const engine: ProcessorEngine = script.engine ?? {
+        id: `scripted:${toolId}`,
+        version: "test",
+        execution: "client-only",
+      };
+      return [
+        toolId,
+        {
+          engine,
+          support,
+          parseOptions(value): ProcessorOptions<unknown> {
+            return script.parseOptions?.(value) ?? { ok: true, value: {} };
+          },
+          async verifyInput(input): Promise<SemanticVerification> {
+            return verifyMedia(input, "input");
+          },
+          async process(_input, processorOptions, context) {
+            processorRecords.push({
+              toolId,
+              engine,
+              support,
+              options: processorOptions,
+            });
+            events.push(`processor:${toolId}`);
+            for (const resource of options.resources?.processing ?? []) {
+              await context.openResource(resource);
+            }
+            context.signal.throwIfAborted();
+            for (const progress of script.progress ?? []) {
+              context.reportProgress(progress);
+            }
+            if (script.lateProgress || script.lateResources) {
+              setTimeout(async () => {
+                for (const progress of script.lateProgress ?? []) {
+                  context.reportProgress(progress);
+                }
+                for (const resource of script.lateResources ?? []) {
+                  await context.openResource(resource);
+                }
+              }, 0);
+            }
+            if (script.error) {
+              throw script.error;
+            }
+            return results;
+          },
+          async verifyResult(result, context): Promise<SemanticVerification> {
+            for (const resource of options.resources?.validating ?? []) {
+              await context.openResource(resource);
+            }
+            context.signal.throwIfAborted();
+            return verifyMedia(result, "result");
+          },
         },
-      },
-    ]),
+      ];
+    }),
   );
 
   return {
@@ -125,13 +256,58 @@ export function createToolWorkflowTestHarness(options: {
             if (!fixture) {
               throw new Error(`No URL fixture configured: ${input.url}`);
             }
-            const size = fixture.chunks.reduce(
-              (total, chunk) => total + chunk.byteLength,
-              0,
-            );
-            const bytes = new Uint8Array(size);
+            const record: StreamRecord = {
+              url: input.url,
+              chunksRead: 0,
+              cancelled: false,
+              readerLockReleased: false,
+            };
+            streamRecords.push(record);
+            let chunkIndex = 0;
+            const stream = new ReadableStream<Uint8Array>({
+              pull(controller) {
+                const chunk = fixture.chunks[chunkIndex];
+                chunkIndex += 1;
+                if (chunk) {
+                  controller.enqueue(chunk);
+                } else {
+                  controller.close();
+                }
+              },
+              cancel() {
+                record.cancelled = true;
+              },
+            });
+            const reader = stream.getReader();
+            let complete = false;
+            context.registerCleanup(async () => {
+              if (!complete) {
+                await reader.cancel();
+              }
+              reader.releaseLock();
+              record.readerLockReleased = true;
+            });
+
+            const chunks: Uint8Array[] = [];
+            let bytesRead = 0;
+            while (true) {
+              const next = await reader.read();
+              if (next.done) {
+                complete = true;
+                break;
+              }
+              chunks.push(next.value);
+              record.chunksRead += 1;
+              bytesRead += next.value.byteLength;
+              if (fixture.totalBytes != null) {
+                context.reportProgress(bytesRead / fixture.totalBytes);
+              }
+              context.signal.throwIfAborted();
+            }
+
+            const bytes = new Uint8Array(bytesRead);
             let offset = 0;
-            for (const chunk of fixture.chunks) {
+            for (const chunk of chunks) {
               bytes.set(chunk, offset);
               offset += chunk.byteLength;
             }
@@ -146,25 +322,6 @@ export function createToolWorkflowTestHarness(options: {
       },
       resolveProcessor(toolId) {
         return processors.get(toolId);
-      },
-      async acceptsInput(input) {
-        return hasFormatSignature(input);
-      },
-      async validate(result, support, context) {
-        for (const resource of options.resources?.validating ?? []) {
-          await context.openResource(resource);
-        }
-        context.signal.throwIfAborted();
-        if (!support.outputFormats.includes(result.format)) {
-          throw new Error(`Unexpected output format: ${result.format}`);
-        }
-        if (!hasFormatSignature(result)) {
-          throw new Error(`Output bytes are not ${result.format}`);
-        }
-        const mimeType = mimeTypes[result.format];
-        if (mimeType && result.mimeType !== mimeType) {
-          throw new Error(`Output MIME is not ${mimeType}`);
-        }
       },
       async deliver(_result, context) {
         for (const resource of options.resources?.delivering ?? []) {
@@ -227,5 +384,7 @@ export function createToolWorkflowTestHarness(options: {
     openedResources,
     releasedResources,
     telemetryRecords,
+    streamRecords,
+    processorRecords,
   };
 }

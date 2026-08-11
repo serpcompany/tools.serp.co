@@ -1,10 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createToolWorkflowTestHarness } from "./testing.ts";
+import {
+  createToolWorkflowTestHarness,
+  defineScriptedProcessor,
+} from "./testing.ts";
 
 const PNG_BYTES = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 const JPEG_BYTES = new Uint8Array([255, 216, 255, 217]);
+const MP4_FTYP_BYTES = new Uint8Array([
+  0, 0, 0, 20, 102, 116, 121, 112, 105, 115, 111, 109, 0, 0, 2, 0, 105, 115,
+  111, 109,
+]);
 
 test("a file Tool run crosses one workflow seam from acquisition through delivery", async () => {
   const harness = createToolWorkflowTestHarness({
@@ -89,7 +96,7 @@ test("a URL stream uses the same workflow seam and preserves multiple result ord
             name: "video.mp4",
             format: "mp4",
             mimeType: "video/mp4",
-            bytes: new Uint8Array([0, 0, 0, 20, 102, 116, 121, 112]),
+            bytes: MP4_FTYP_BYTES,
           },
           {
             name: "poster.jpg",
@@ -111,7 +118,7 @@ test("a URL stream uses the same workflow seam and preserves multiple result ord
   assert.deepEqual(
     outcome.results.map(({ name, format, size }) => ({ name, format, size })),
     [
-      { name: "video.mp4", format: "mp4", size: 8 },
+      { name: "video.mp4", format: "mp4", size: 20 },
       { name: "poster.jpg", format: "jpg", size: 4 },
     ],
   );
@@ -497,5 +504,258 @@ test("in-memory clock and id adapters make telemetry identity and ordering deter
   assert.deepEqual(harness.telemetryRecords, [
     { kind: "start", runId: "proof-run", at: 1_000 },
     { kind: "terminal", runId: "proof-run", status: "succeeded", at: 1_250 },
+  ]);
+});
+
+test("an observer throwing at terminal success cannot create a conflicting outcome", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "png-to-jpg": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["jpg"],
+        },
+        result: {
+          name: "photo.jpg",
+          format: "jpg",
+          mimeType: "image/jpeg",
+          bytes: JPEG_BYTES,
+        },
+      },
+    },
+  });
+  const observedTerminals: string[] = [];
+
+  const outcome = await harness.workflow.run(
+    {
+      toolId: "png-to-jpg",
+      input: {
+        kind: "file",
+        media: {
+          name: "photo.png",
+          format: "png",
+          mimeType: "image/png",
+          bytes: PNG_BYTES,
+        },
+      },
+    },
+    {
+      observe(snapshot) {
+        if (["succeeded", "failed", "cancelled"].includes(snapshot.phase)) {
+          observedTerminals.push(snapshot.phase);
+        }
+        if (snapshot.phase === "succeeded") {
+          throw new Error("presentation listener crashed");
+        }
+      },
+    },
+  );
+
+  assert.equal(outcome.status, "succeeded");
+  assert.deepEqual(observedTerminals, ["succeeded"]);
+  assert.deepEqual(
+    harness.telemetryRecords.filter(({ kind }) => kind === "terminal"),
+    [
+      {
+        kind: "terminal",
+        runId: "run-1",
+        status: "succeeded",
+        at: 0,
+      },
+    ],
+  );
+});
+
+test("mid-stream URL cancellation closes the reader before processing or delivery", async () => {
+  const harness = createToolWorkflowTestHarness({
+    media: {
+      urls: {
+        "https://media.example/large-video": {
+          name: "video.source",
+          format: "remote-video",
+          mimeType: "application/octet-stream",
+          chunks: [
+            new Uint8Array([1, 2]),
+            new Uint8Array([3, 4]),
+            new Uint8Array([5, 6]),
+          ],
+          totalBytes: 6,
+        },
+      },
+    },
+    processors: {
+      "video-downloader": {
+        support: {
+          acquisition: "url",
+          inputFormats: ["remote-video"],
+          outputFormats: ["mp4"],
+        },
+        result: {
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: MP4_FTYP_BYTES,
+        },
+      },
+    },
+  });
+  const controller = new AbortController();
+
+  const outcome = await harness.workflow.run(
+    {
+      toolId: "video-downloader",
+      input: { kind: "url", url: "https://media.example/large-video" },
+    },
+    {
+      signal: controller.signal,
+      observe(snapshot) {
+        if (snapshot.phase === "acquiring" && snapshot.progress !== undefined) {
+          controller.abort("stop streaming");
+        }
+      },
+    },
+  );
+
+  assert.equal(outcome.status, "cancelled");
+  assert.deepEqual(harness.streamRecords, [
+    {
+      url: "https://media.example/large-video",
+      chunksRead: 1,
+      cancelled: true,
+      readerLockReleased: true,
+    },
+  ]);
+  assert.deepEqual(harness.events, []);
+});
+
+test("semantic verification fails closed for malformed MP4 and unknown formats", async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      "bad-mp4": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["mp4"],
+        },
+        result: {
+          name: "video.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: new Uint8Array([
+            0, 0, 0, 20, 110, 111, 112, 101, 105, 115, 111, 109, 0, 0, 2, 0,
+            105, 115, 111, 109,
+          ]),
+        },
+      },
+      "unknown-output": {
+        support: {
+          acquisition: "file",
+          inputFormats: ["png"],
+          outputFormats: ["mystery"],
+        },
+        result: {
+          name: "result.mystery",
+          format: "mystery",
+          mimeType: "application/x-mystery",
+          bytes: new Uint8Array([1, 2, 3]),
+        },
+      },
+    },
+  });
+  const input = {
+    kind: "file" as const,
+    media: {
+      name: "photo.png",
+      format: "png",
+      mimeType: "image/png",
+      bytes: PNG_BYTES,
+    },
+  };
+
+  const malformed = await harness.workflow.run({ toolId: "bad-mp4", input });
+  const unknown = await harness.workflow.run({
+    toolId: "unknown-output",
+    input,
+  });
+
+  assert.equal(malformed.status, "failed");
+  assert.equal(malformed.error.code, "invalid-result");
+  assert.equal(unknown.status, "failed");
+  assert.equal(unknown.error.code, "invalid-result");
+  assert.equal(
+    harness.events.filter((event) => event === "delivery").length,
+    0,
+  );
+});
+
+test("typed options and engine support policy stay behind the run seam", async () => {
+  const processor = defineScriptedProcessor<{ quality: number }>({
+    engine: {
+      id: "libjpeg-wasm",
+      version: "1.0.0-test",
+      execution: "client-only",
+    },
+    support: {
+      acquisition: "file",
+      inputFormats: ["png"],
+      outputFormats: ["jpg"],
+    },
+    parseOptions(value) {
+      const quality = (value as { quality?: unknown } | undefined)?.quality;
+      return typeof quality === "number" && quality >= 1 && quality <= 100
+        ? { ok: true, value: { quality } }
+        : { ok: false, message: "quality must be between 1 and 100" };
+    },
+    result: {
+      name: "photo.jpg",
+      format: "jpg",
+      mimeType: "image/jpeg",
+      bytes: JPEG_BYTES,
+    },
+  });
+  const harness = createToolWorkflowTestHarness({
+    processors: { "png-to-jpg": processor },
+  });
+  const request = {
+    toolId: "png-to-jpg",
+    input: {
+      kind: "file" as const,
+      media: {
+        name: "photo.png",
+        format: "png",
+        mimeType: "image/png",
+        bytes: PNG_BYTES,
+      },
+    },
+  };
+
+  const succeeded = await harness.workflow.run({
+    ...request,
+    options: { quality: 82 },
+  });
+  const invalid = await harness.workflow.run({
+    ...request,
+    options: { quality: "maximum" },
+  });
+
+  assert.equal(succeeded.status, "succeeded");
+  assert.equal(invalid.status, "failed");
+  assert.equal(invalid.error.code, "invalid-request");
+  assert.deepEqual(harness.processorRecords, [
+    {
+      toolId: "png-to-jpg",
+      engine: {
+        id: "libjpeg-wasm",
+        version: "1.0.0-test",
+        execution: "client-only",
+      },
+      support: {
+        acquisition: "file",
+        inputs: [{ format: "png", mimeTypes: ["image/png"] }],
+        outputs: [{ format: "jpg", mimeType: "image/jpeg" }],
+      },
+      options: { quality: 82 },
+    },
   ]);
 });

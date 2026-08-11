@@ -12,6 +12,7 @@ export type WorkflowInput =
 export type WorkflowRequest = {
   toolId: string;
   input: WorkflowInput;
+  options?: unknown;
 };
 
 export type WorkflowPhase =
@@ -86,20 +87,39 @@ export type ToolWorkflow = {
 
 export type ToolSupport = {
   acquisition: WorkflowInput["kind"];
-  inputFormats: readonly string[];
-  outputFormats: readonly string[];
+  inputs: ReadonlyArray<{ format: string; mimeTypes: readonly string[] }>;
+  outputs: ReadonlyArray<{ format: string; mimeType: string }>;
 };
 
-export type ToolProcessor = {
+export type SemanticVerification =
+  | { status: "verified" }
+  | { status: "rejected" | "unavailable"; message: string };
+
+export type ProcessorOptions<Options> =
+  | { ok: true; value: Options }
+  | { ok: false; message: string };
+
+export type ToolProcessor<Options = unknown> = {
+  engine: {
+    id: string;
+    version: string;
+    execution: "client-only" | "server-assisted" | "server-executed";
+  };
   support: ToolSupport;
+  parseOptions(options: unknown): ProcessorOptions<Options>;
+  verifyInput(
+    input: WorkflowMedia,
+    context: WorkflowStageContext,
+  ): Promise<SemanticVerification>;
   process(
     input: WorkflowMedia,
-    context: {
-      signal: AbortSignal;
-      reportProgress(progress: number): void;
-      openResource(kind: RuntimeResourceKind): Promise<void>;
-    },
+    options: Options,
+    context: WorkflowStageContext,
   ): Promise<WorkflowMedia[]>;
+  verifyResult(
+    result: WorkflowMedia,
+    context: WorkflowStageContext,
+  ): Promise<SemanticVerification>;
 };
 
 export type RuntimeResourceKind =
@@ -112,6 +132,7 @@ export type RuntimeResourceKind =
 type WorkflowStageContext = {
   signal: AbortSignal;
   openResource(kind: RuntimeResourceKind): Promise<void>;
+  registerCleanup(cleanup: () => Promise<void>): void;
   reportProgress(progress: number): void;
 };
 
@@ -131,12 +152,6 @@ type WorkflowPorts = {
     };
   };
   resolveProcessor(toolId: string): ToolProcessor | undefined;
-  acceptsInput(input: WorkflowMedia, support: ToolSupport): Promise<boolean>;
-  validate(
-    result: WorkflowMedia,
-    support: ToolSupport,
-    context: WorkflowStageContext,
-  ): Promise<void>;
   deliver(
     result: WorkflowMedia,
     context: WorkflowStageContext,
@@ -168,8 +183,15 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         start: "not-attempted",
         terminal: "not-attempted",
       };
-      let accepted = false;
-      let terminal = false;
+      const emitSnapshot = (snapshot: WorkflowSnapshot) => {
+        try {
+          options.observe?.(snapshot);
+        } catch {
+          // Presentation observers cannot redefine Tool execution correctness.
+        }
+      };
+      let telemetryEligible = false;
+      let terminalOutcomeCommitted = false;
       const cleanups: Array<() => Promise<void>> = [];
       const releaseResources = async () => {
         for (const cleanup of [...cleanups].reverse()) {
@@ -180,14 +202,14 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           }
         }
       };
-      const finish = async (
+      const commitTerminal = async (
         status: WorkflowOutcome["status"],
       ): Promise<TelemetryEvidence> => {
-        if (terminal) {
+        if (terminalOutcomeCommitted) {
           return telemetry;
         }
-        terminal = true;
-        if (accepted) {
+        terminalOutcomeCommitted = true;
+        if (telemetryEligible) {
           telemetry = { ...telemetry, terminal: "submitted" };
           try {
             await ports.telemetry.terminal(runId, status, ports.clock.now());
@@ -195,34 +217,35 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
             telemetry = { ...telemetry, terminal: "failed" };
           }
         }
-        options.observe?.({ phase: status });
+        emitSnapshot({ phase: status });
         return telemetry;
+      };
+      const fail = async (
+        code: WorkflowFailure["code"],
+        message: string,
+      ): Promise<Extract<WorkflowOutcome, { status: "failed" }>> => {
+        await commitTerminal("failed");
+        return {
+          status: "failed",
+          runId,
+          error: { code, message },
+          telemetry,
+        };
       };
 
       const processor = ports.resolveProcessor(request.toolId);
       if (!processor) {
-        await finish("failed");
-        return {
-          status: "failed",
-          runId,
-          error: {
-            code: "unsupported-tool",
-            message: `Unsupported Tool: ${request.toolId}`,
-          },
-          telemetry,
-        };
+        return fail("unsupported-tool", `Unsupported Tool: ${request.toolId}`);
       }
       if (processor.support.acquisition !== request.input.kind) {
-        await finish("failed");
-        return {
-          status: "failed",
-          runId,
-          error: {
-            code: "unsupported-request",
-            message: `Unsupported acquisition: ${request.input.kind}`,
-          },
-          telemetry,
-        };
+        return fail(
+          "unsupported-request",
+          `Unsupported acquisition: ${request.input.kind}`,
+        );
+      }
+      const parsedOptions = processor.parseOptions(request.options);
+      if (!parsedOptions.ok) {
+        return fail("invalid-request", parsedOptions.message);
       }
 
       let stage: "acquiring" | "processing" | "validating" | "delivering" =
@@ -244,7 +267,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           return;
         }
         lastProgress = overall;
-        options.observe?.({ phase, progress: overall });
+        emitSnapshot({ phase, progress: overall });
       };
       const context = (
         phase: typeof stage,
@@ -255,21 +278,26 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         reportProgress: (progress) =>
           reportProgress(phase, start, span, progress),
         async openResource(kind) {
-          if (activePhase !== phase || terminal) {
+          if (activePhase !== phase || terminalOutcomeCommitted) {
             return;
           }
           const resource = await ports.runtime.open(kind, signal);
-          if (activePhase !== phase || terminal) {
+          if (activePhase !== phase || terminalOutcomeCommitted) {
             await resource.release();
             return;
           }
           cleanups.push(() => resource.release());
         },
+        registerCleanup(cleanup) {
+          if (activePhase === phase && !terminalOutcomeCommitted) {
+            cleanups.push(cleanup);
+          }
+        },
       });
 
       try {
         activePhase = "acquiring";
-        options.observe?.({ phase: "acquiring" });
+        emitSnapshot({ phase: "acquiring" });
         const acquisitionContext = context("acquiring", 0, 0.25);
         const input =
           request.input.kind === "file"
@@ -282,33 +310,26 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
                 acquisitionContext,
               );
         signal.throwIfAborted();
-        if (!processor.support.inputFormats.includes(input.format)) {
-          await finish("failed");
-          return {
-            status: "failed",
-            runId,
-            error: {
-              code: "unsupported-request",
-              message: `Unsupported input format: ${input.format}`,
-            },
-            telemetry,
-          };
+        const inputSupport = processor.support.inputs.find(
+          ({ format, mimeTypes }) =>
+            format === input.format && mimeTypes.includes(input.mimeType),
+        );
+        if (!inputSupport) {
+          return fail(
+            "unsupported-request",
+            `Unsupported input format: ${input.format}`,
+          );
         }
-        if (!(await ports.acceptsInput(input, processor.support))) {
-          await finish("failed");
-          return {
-            status: "failed",
-            runId,
-            error: {
-              code: "invalid-request",
-              message: `Input bytes do not match ${input.format}`,
-            },
-            telemetry,
-          };
+        const inputVerification = await processor.verifyInput(
+          input,
+          acquisitionContext,
+        );
+        if (inputVerification.status !== "verified") {
+          return fail("invalid-request", inputVerification.message);
         }
         signal.throwIfAborted();
 
-        accepted = true;
+        telemetryEligible = true;
         telemetry = { ...telemetry, start: "submitted" };
         try {
           await ports.telemetry.start(runId, request, ports.clock.now());
@@ -319,28 +340,41 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
 
         stage = "processing";
         activePhase = "processing";
-        options.observe?.({ phase: "processing" });
-        const results = await processor.process(input, {
-          ...context("processing", 0.25, 0.45),
-        });
+        emitSnapshot({ phase: "processing" });
+        const results = await processor.process(
+          input,
+          parsedOptions.value,
+          context("processing", 0.25, 0.45),
+        );
         signal.throwIfAborted();
         if (results.length === 0) {
           throw new Error("Processor returned no results");
         }
         stage = "validating";
         activePhase = "validating";
-        options.observe?.({ phase: "validating" });
+        emitSnapshot({ phase: "validating" });
         for (const result of results) {
-          await ports.validate(
+          const outputSupport = processor.support.outputs.find(
+            ({ format, mimeType }) =>
+              format === result.format && mimeType === result.mimeType,
+          );
+          if (!outputSupport) {
+            throw new Error(
+              `Unsupported output: ${result.format} (${result.mimeType})`,
+            );
+          }
+          const verification = await processor.verifyResult(
             result,
-            processor.support,
             context("validating", 0.7, 0.15),
           );
+          if (verification.status !== "verified") {
+            throw new Error(verification.message);
+          }
           signal.throwIfAborted();
         }
         stage = "delivering";
         activePhase = "delivering";
-        options.observe?.({ phase: "delivering" });
+        emitSnapshot({ phase: "delivering" });
         const deliveries: WorkflowDelivery[] = [];
         for (const result of results) {
           deliveries.push({
@@ -356,7 +390,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           signal.throwIfAborted();
         }
         activePhase = undefined;
-        await finish("succeeded");
+        await commitTerminal("succeeded");
 
         return {
           status: "succeeded",
@@ -370,7 +404,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           signal.aborted ||
           (error instanceof Error && error.name === "AbortError")
         ) {
-          await finish("cancelled");
+          await commitTerminal("cancelled");
           return { status: "cancelled", runId, telemetry };
         }
         const code =
@@ -381,16 +415,10 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
               : stage === "validating"
                 ? "invalid-result"
                 : "delivery-failed";
-        await finish("failed");
-        return {
-          status: "failed",
-          runId,
-          error: {
-            code,
-            message: error instanceof Error ? error.message : String(error),
-          },
-          telemetry,
-        };
+        return fail(
+          code,
+          error instanceof Error ? error.message : String(error),
+        );
       } finally {
         await releaseResources();
       }
