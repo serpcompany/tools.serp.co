@@ -1,6 +1,7 @@
 "use client";
 
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
+import { useSpecializedToolWorkflow } from "@/lib/useSpecializedToolWorkflow";
 
 type PdfMode = "edit" | "view";
 
@@ -13,18 +14,21 @@ type PdfToolProps = {
 
 const viewerBasePath = "/vendor/pdfjs-annotation-extension/web/viewer.html";
 
-function buildViewerUrl(mode: PdfMode): string {
+function buildViewerUrl(mode: PdfMode, fileUrl?: string): string {
   const hashParams = new URLSearchParams();
   hashParams.set("ae_username", "SERP Tools");
   hashParams.set("ae_get_url", "");
   hashParams.set("ae_post_url", "");
   hashParams.set("ae_default_editor_active", mode === "edit" ? "true" : "false");
   hashParams.set("ae_default_sidebar_open", mode === "edit" ? "true" : "false");
-  return `${viewerBasePath}#${hashParams.toString()}`;
+  const query = fileUrl ? `?file=${encodeURIComponent(fileUrl)}` : "";
+  return `${viewerBasePath}${query}#${hashParams.toString()}`;
 }
 
 export default function PdfTool({ toolId, title, subtitle, mode }: PdfToolProps) {
-  const viewerUrl = buildViewerUrl(mode);
+  const workflow = useSpecializedToolWorkflow();
+  const fileUrl = workflow.objectUrl(workflow.delivery);
+  const viewerUrl = buildViewerUrl(mode, fileUrl);
 
   const heroContent = (
     <div className="text-center space-y-3">
@@ -33,8 +37,23 @@ export default function PdfTool({ toolId, title, subtitle, mode }: PdfToolProps)
         {subtitle ?? "Open and annotate PDF documents directly in your browser."}
       </p>
       <p className="text-sm text-gray-500">
-        Use the built-in toolbar to open files, annotate, and download updates.
+        Choose a PDF below, then use the built-in toolbar to view, annotate, and export it.
       </p>
+      <label className="mx-auto mt-5 block max-w-md text-left text-sm font-medium text-gray-700">
+        PDF document
+        <input
+          type="file"
+          accept=".pdf,application/pdf"
+          data-testid="pdf-tool-input"
+          className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) void workflow.runFile(toolId, file);
+          }}
+        />
+      </label>
+      {workflow.busy && <p className="text-sm text-gray-500">Validating PDF…</p>}
+      {workflow.error && <p className="text-sm text-red-600">{workflow.error}</p>}
     </div>
   );
 
@@ -43,6 +62,7 @@ export default function PdfTool({ toolId, title, subtitle, mode }: PdfToolProps)
       <iframe
         title={`${title} viewer`}
         src={viewerUrl}
+        data-testid="pdf-tool-viewer"
         className="h-[80vh] w-full bg-white"
         allowFullScreen
       />

@@ -209,7 +209,17 @@ try {
   );
   const toolFixtures = fixtureMatrix.toolFixtures ?? {};
 
-  const textOnlyTools = new Set(['json-to-csv', 'character-counter']);
+  const textOnlyTools = new Set([
+    'json-to-csv',
+    'html-to-markdown',
+    'character-counter',
+  ]);
+  const specializedSmokeTools = new Set([
+    'json-to-csv',
+    'csv-combiner',
+    'html-to-markdown',
+    'character-counter',
+  ]);
 
   const { chromium } = await import('playwright');
 
@@ -285,6 +295,7 @@ try {
     m4p: 'audio/mp4',
     mpv: 'video/mp4',
     txt: 'text/plain',
+    csv: 'text/csv',
   };
 
   function getExpectedMimeType(format) {
@@ -618,6 +629,41 @@ try {
       };
     }
 
+    if (tool.id === 'html-to-markdown') {
+      await hookBlobCapture(page);
+      const input = page.locator('[data-testid="html-input"]');
+      const output = page.locator('[data-testid="markdown-output"]');
+      await page.waitForFunction(
+        () => Boolean(document.querySelector('[data-testid="markdown-output"]')?.value),
+        null,
+        { timeout: 10000 },
+      );
+      await input.fill('<h1>stale</h1>');
+      await page.getByRole('button', { name: 'Clear' }).click();
+      await page.waitForTimeout(400);
+      if ((await input.inputValue()) || (await output.inputValue())) {
+        throw new Error('HTML clear allowed a scheduled result to reappear.');
+      }
+
+      await input.fill('<h1>Smoke</h1><p>Hello <strong>world</strong>.</p>');
+      await page.waitForFunction(
+        () => document.querySelector('[data-testid="markdown-output"]')?.value.includes("# Smoke"),
+        null,
+        { timeout: 10000 },
+      );
+      const markdown = await output.inputValue();
+      if (!markdown.includes('**world**')) {
+        throw new Error('HTML conversion omitted expected Markdown semantics.');
+      }
+      const beforeCount = await page.evaluate(() => window.__blobEvents?.length ?? 0);
+      await page.getByRole('button', { name: 'Download .md' }).click();
+      const blob = await waitForBlob(page, beforeCount + 1, 10000);
+      return {
+        detail: `markdown ${markdown.length} chars`,
+        metrics: { outputBytes: blob?.size ?? null, outputType: blob?.type ?? null },
+      };
+    }
+
     if (tool.id === 'csv-combiner') {
       const csvFixtures = toolFixtures['csv-combiner']?.fixtures ?? [];
       const csvPaths = csvFixtures.map(resolveFixturePath).filter(Boolean);
@@ -638,12 +684,7 @@ try {
       );
       await page.click('[data-testid="csv-combiner-run"]');
       await page.waitForFunction(
-        () => {
-          const el = document.querySelector(
-            '[data-testid="csv-combiner-output"]',
-          );
-          return el && el.value && el.value.length > 0;
-        },
+        () => document.body.textContent?.includes('4 rows · 4 columns'),
         null,
         { timeout: 10000 },
       );
@@ -665,25 +706,11 @@ try {
           `CSV combiner output missing headers: ${missing.join(', ')}`,
         );
       }
-      const downloadButton = await page.$(
-        'button:has-text("Download Combined CSV")',
+      const beforeCount = await page.evaluate(
+        () => window.__blobEvents?.length ?? 0,
       );
-      if (downloadButton) {
-        const beforeCount = await page.evaluate(
-          () => window.__blobEvents?.length ?? 0,
-        );
-        await downloadButton.click();
-        await page.waitForFunction(
-          (count) =>
-            Array.isArray(window.__blobEvents) &&
-            window.__blobEvents.length > count,
-          beforeCount,
-          { timeout: 10000 },
-        );
-      }
-      const blob = await page.evaluate(
-        () => window.__blobEvents?.[window.__blobEvents.length - 1],
-      );
+      await page.click('[data-testid="csv-combiner-download"]');
+      const blob = await waitForBlob(page, beforeCount + 1, 10000);
       return {
         detail: `output ${output.split('\n').length} lines`,
         metrics: {
@@ -697,7 +724,20 @@ try {
       const sampleText =
         toolFixtures['character-counter']?.fixtureText ??
         'Hello world.\n\nSecond line!';
+      await page.fill('[data-testid="character-counter-input"]', 'stale value');
+      await page.waitForTimeout(100);
       await page.fill('[data-testid="character-counter-input"]', sampleText);
+      await page.waitForTimeout(100);
+      const earlyWords = await page.textContent('[data-testid="stat-words"]');
+      if (Number(earlyWords?.replace(/[^0-9]/g, '') || 0) !== 0) {
+        throw new Error('Character debounce published stale statistics.');
+      }
+      await page.waitForFunction(
+        (expected) =>
+          Number(document.querySelector('[data-testid="stat-characters"]')?.textContent?.replace(/[^0-9]/g, "") || 0) === expected,
+        sampleText.length,
+        { timeout: 10000 },
+      );
       const grab = async (testId) => {
         const text = await page.textContent(`[data-testid=\"${testId}\"]`);
         return Number(text?.replace(/[^0-9]/g, '') || 0);
@@ -733,6 +773,46 @@ try {
       return {
         detail: `chars ${stats.characters}, words ${stats.words}`,
         metrics: stats,
+      };
+    }
+
+    if (
+      (tool.operation === 'view' || tool.operation === 'edit') &&
+      tool.from === 'pdf' &&
+      tool.to === 'pdf'
+    ) {
+      const fixtureEntry = getFormatFixture('pdf');
+      if (!fixtureEntry) {
+        return { skipped: true, reason: 'missing pdf fixture' };
+      }
+      await hookBlobCapture(page);
+      await page
+        .locator('[data-testid="pdf-tool-input"]')
+        .setInputFiles(fixtureEntry.path);
+      await page.waitForFunction(
+        () =>
+          document
+            .querySelector('[data-testid="pdf-tool-viewer"]')
+            ?.getAttribute('src')
+            ?.includes('file=blob%3A'),
+        null,
+        { timeout: 15000 },
+      );
+      const viewerUrl = await page
+        .locator('[data-testid="pdf-tool-viewer"]')
+        .getAttribute('src');
+      const blob = await waitForBlob(page, 1, 10000);
+      if (
+        !viewerUrl?.includes('file=blob%3A') ||
+        blob?.type !== 'application/pdf'
+      ) {
+        throw new Error(
+          'PDF file did not reach the vendored viewer as a PDF blob.',
+        );
+      }
+      return {
+        detail: 'verified PDF blob delivered to viewer',
+        metrics: { outputBytes: blob.size ?? null, outputType: blob.type ?? null },
       };
     }
 
@@ -873,6 +953,16 @@ try {
         result.errors.push('missing dropzone');
       }
     }
+    const isSpecializedPdf =
+      (tool.operation === "view" || tool.operation === "edit") &&
+      tool.from === "pdf" &&
+      tool.to === "pdf";
+    if (
+      (specializedSmokeTools.has(tool.id) || isSpecializedPdf) &&
+      result.pageErrors.length > 0
+    ) {
+      throw new Error(`Rendered Tool raised ${result.pageErrors.length} pageerror event(s).`);
+    }
   }
 
   async function runBenchmark(page, _tool, result) {
@@ -903,9 +993,11 @@ try {
       metrics: null,
       fixture: null,
       errors: [],
+      pageErrors: [],
     };
 
     const page = await browser.newPage();
+    page.on("pageerror", (error) => result.pageErrors.push(error));
 
     const fixtureEntry = tool.from ? formatFixtures.get(tool.from) : null;
     result.fixture = fixtureEntry

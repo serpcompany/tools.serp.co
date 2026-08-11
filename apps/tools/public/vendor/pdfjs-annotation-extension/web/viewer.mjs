@@ -775,7 +775,7 @@ const defaultOptions = {
     kind: OptionKind.WORKER
   },
   workerSrc: {
-    value: "../build/pdf.worker.mjs",
+    value: "/vendor/pdfjs-annotation-extension/pdf.worker.mjs",
     kind: OptionKind.WORKER
   }
 };

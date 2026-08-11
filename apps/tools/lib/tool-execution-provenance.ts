@@ -245,7 +245,7 @@ const engineById = defineEngines({
   },
   'browser-html-to-markdown': {
     capability: 'html-to-markdown-conversion',
-    owner: 'apps/tools/components/HtmlToMarkdownConverter.tsx',
+    owner: 'apps/tools/lib/specialized-tool-workflow.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
@@ -255,46 +255,49 @@ const engineById = defineEngines({
   },
   'browser-json-to-csv': {
     capability: 'json-to-csv-conversion',
-    owner: 'apps/tools/components/JsonToCsv.tsx',
+    owner: 'apps/tools/lib/specialized-tool-workflow.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
-      class: 'repository-authored',
-      identity: 'apps/tools/components/JsonToCsv.tsx',
-      rationale:
-        'The transformation only projects parsed JSON object fields into RFC-style escaped CSV cells.',
+      class: 'library',
+      identity: 'Papa Parse 5',
     },
   },
   'browser-csv-combiner': {
     capability: 'csv-combination',
-    owner: 'apps/tools/components/CsvCombiner.tsx',
+    owner: 'apps/tools/lib/specialized-tool-workflow.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
-      class: 'repository-authored',
-      identity: 'apps/tools/components/CsvCombiner.tsx',
+      class: 'hybrid',
+      identity: 'Papa Parse 5 with bounded schema-union policy',
       rationale:
-        'The transformation is a narrow header-union and row-alignment algorithm; semantic CSV validation is required.',
+        'Papa Parse owns CSV grammar including multiline cells; bounded repository policy unions headers and aligns rows.',
     },
   },
   'browser-character-counter': {
     capability: 'text-statistics',
-    owner: 'apps/tools/components/CharacterCounter.tsx',
+    owner: 'apps/tools/lib/specialized-tool-workflow.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
       class: 'repository-authored',
-      identity: 'apps/tools/components/CharacterCounter.tsx',
+      identity: 'bounded character-statistics policy',
       rationale:
         'The operation computes transparent text statistics without a codec or external protocol.',
     },
   },
   'browser-pdf-viewer': {
     capability: 'pdf-viewing-and-annotation',
-    owner: 'apps/tools/components/PdfTool.tsx',
+    owner: 'apps/tools/lib/specialized-tool-workflow.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
-    implementation: { class: 'library', identity: 'pdfjs-dist' },
+    implementation: {
+      class: 'hybrid',
+      identity: 'pdfjs-dist parser plus vendored PDF.js annotation viewer',
+      rationale:
+        'The processor requires PDF.js to parse the document before delivery; the vendored viewer owns rendering, annotations, and export.',
+    },
   },
   'browser-batch-png-compression': {
     capability: 'batch-png-compression',

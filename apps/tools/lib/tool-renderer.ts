@@ -2,10 +2,12 @@ import type { CatalogTool } from '@serp-tools/app-core/lib/tool-catalog';
 
 import { isTranscriptionToolId } from './media-workflow/tool-family.ts';
 import { isTableRendererTool } from './table-convert-pages.ts';
+import { getSpecializedPresentationRenderer } from './specialized-tool-policy.ts';
 
 export type ToolRenderer =
   | 'table'
   | 'transcription'
+  | 'specialized'
   | 'generic'
   | 'downloader'
   | 'pdf'
@@ -18,6 +20,8 @@ export function selectToolRenderer(
   if (!tool?.isActive) return 'not-found';
   if (isTableRendererTool(tool.id)) return 'table';
   if (isTranscriptionToolId(tool.id)) return 'transcription';
+  const specializedRenderer = getSpecializedPresentationRenderer(tool);
+  if (specializedRenderer) return specializedRenderer;
   if (
     (tool.operation === 'convert' || tool.operation === 'compress') &&
     tool.from &&

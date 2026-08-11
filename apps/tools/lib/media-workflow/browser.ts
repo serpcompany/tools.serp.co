@@ -90,7 +90,11 @@ export function createBrowserMediaWorkflow(
           request.toolId,
         );
         const from =
-          request.input.kind === "url" ? "url" : request.input.media.format;
+          request.input.kind === "url"
+            ? "url"
+            : request.input.kind === "file"
+              ? request.input.media.format
+              : request.input.kind;
         const to =
           registration?.family === "transcription"
             ? TRANSCRIPT_OUTPUT.format
