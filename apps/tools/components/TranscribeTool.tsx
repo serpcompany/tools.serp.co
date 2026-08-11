@@ -9,7 +9,13 @@ import {
   deliverMediaInBrowser,
   workflowMediaFromFile,
 } from "@/lib/media-workflow/browser";
+import {
+  createBrowserRunOwnership,
+  type BrowserRunLease,
+} from "@/lib/media-workflow/browser-run-ownership";
+import { createMonotonicProgress } from "@/lib/media-workflow/monotonic-progress";
 import { createBrowserTranscriptionWorkflow } from "@/lib/media-workflow/transcription-browser";
+import { projectMediaTransfer } from "@/lib/media-workflow/transfer-presentation";
 import { VERIFIED_MEDIA_FORMATS } from "@/lib/media-workflow/verified-formats";
 import type { WorkflowMedia } from "@/lib/tool-workflow";
 
@@ -35,18 +41,19 @@ function parseUrlInput(value: string) {
   }
 }
 
-
 export default function TranscribeTool({ toolId, title, subtitle }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dropRef = useRef<HTMLDivElement | null>(null);
-  const activeRun = useRef<AbortController | null>(null);
+  const [runOwnership] = useState(createBrowserRunOwnership);
 
   const [busy, setBusy] = useState(false);
   const [hint, setHint] = useState("or drop files here");
   const [dropEffect, setDropEffect] = useState<string>("");
   const [currentFile, setCurrentFile] = useState<ToolProgressFile | null>(null);
   const [transcript, setTranscript] = useState("");
-  const [transcriptMedia, setTranscriptMedia] = useState<WorkflowMedia | null>(null);
+  const [transcriptMedia, setTranscriptMedia] = useState<WorkflowMedia | null>(
+    null,
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [urlInput, setUrlInput] = useState("");
   const [adsVisible, setAdsVisible] = useState(false);
@@ -75,12 +82,19 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
     inputRef.current?.click();
   }
 
-  function observeRun(name: string) {
+  function observeRun(
+    name: string,
+    lease: BrowserRunLease,
+    progress: ReturnType<typeof createMonotonicProgress>,
+  ) {
     return (snapshot: { phase: string; progress?: number }) => {
+      if (!lease.isCurrent()) return;
       if (["succeeded", "failed", "cancelled"].includes(snapshot.phase)) return;
       setCurrentFile({
         name,
-        progress: Math.round((snapshot.progress ?? 0) * 100),
+        progress: progress.project(
+          snapshot.progress === undefined ? undefined : snapshot.progress * 100,
+        ),
         status: snapshot.phase === "acquiring" ? "loading" : "processing",
         message:
           snapshot.phase === "acquiring"
@@ -93,9 +107,13 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
   }
 
   async function runTranscription(
-    input: { kind: "url"; url: string } | { kind: "file"; media: WorkflowMedia },
+    input:
+      | { kind: "url"; url: string }
+      | { kind: "file"; media: WorkflowMedia },
     name: string,
-  ) {
+    lease: BrowserRunLease,
+  ): Promise<"completed" | "cancelled" | "failed"> {
+    const progress = createMonotonicProgress();
     setErrorMessage(null);
     setTranscript("");
     setTranscriptMedia(null);
@@ -106,42 +124,55 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       message: "Preparing transcript...",
     });
     try {
-      const controller = new AbortController();
-      activeRun.current?.abort("Replaced by a new transcription run");
-      activeRun.current = controller;
       const workflow = createBrowserTranscriptionWorkflow({
+        onTransfer(transfer) {
+          if (!lease.isCurrent()) return;
+          const presentation = projectMediaTransfer(transfer);
+          setCurrentFile({
+            name,
+            progress: progress.project(presentation.progress),
+            status: "loading",
+            message: presentation.message,
+          });
+        },
         onDelivered(media) {
+          if (!lease.isCurrent()) return;
           setTranscriptMedia(media);
           setTranscript(new TextDecoder().decode(media.bytes));
         },
       });
       const outcome = await workflow.run(
         { toolId, input },
-        { signal: controller.signal, observe: observeRun(name) },
+        { signal: lease.signal, observe: observeRun(name, lease, progress) },
       );
       if (outcome.status === "failed") throw new Error(outcome.error.message);
-      if (outcome.status === "cancelled") return;
+      if (outcome.status === "cancelled" || !lease.isCurrent()) {
+        return "cancelled";
+      }
       setCurrentFile({
         name: outcome.results[0]?.name ?? name,
         progress: 100,
         status: "completed",
         message: "Transcription complete!",
       });
+      return "completed";
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Transcription failed";
-      setCurrentFile({
-        name,
-        progress: 0,
-        status: "error",
-        message,
-      });
-    } finally {
-      activeRun.current = null;
+      const message =
+        err instanceof Error ? err.message : "Transcription failed";
+      if (lease.isCurrent()) {
+        setCurrentFile({
+          name,
+          progress: progress.project(undefined),
+          status: "error",
+          message,
+        });
+      }
+      return "failed";
     }
   }
 
   async function handleUrlSubmit() {
-    if (busy) return;
+    if (busy || runOwnership.isBusy()) return;
     const parsedUrl = parseUrlInput(urlInput);
     if (!parsedUrl) {
       setErrorMessage("Paste a valid public URL first.");
@@ -154,6 +185,7 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
 
     const nameHint = "Remote media";
 
+    const lease = runOwnership.begin();
     setBusy(true);
     setCurrentFile({
       name: nameHint,
@@ -162,41 +194,64 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       message: "Downloading...",
     });
 
-    await runTranscription(
-      { kind: "url", url: parsedUrl.toString() },
-      nameHint,
-    );
-    setBusy(false);
+    try {
+      await runTranscription(
+        { kind: "url", url: parsedUrl.toString() },
+        nameHint,
+        lease,
+      );
+    } finally {
+      if (lease.finish()) setBusy(false);
+    }
   }
 
   async function handleFiles(files: FileList | null) {
     if (!files || !files.length) return;
+    if (busy || runOwnership.isBusy()) return;
+    const lease = runOwnership.begin();
     if (!adsVisible) setAdsVisible(true);
     setBusy(true);
 
-    for (const file of Array.from(files)) {
-      try {
-        const media = await workflowMediaFromFile(file);
-        if (!SUPPORTED_EXTENSIONS.includes(media.format)) {
-          throw new Error("Unsupported file type. Please upload an audio or video file.");
+    try {
+      for (const file of Array.from(files)) {
+        if (!lease.isCurrent()) break;
+        try {
+          const media = await workflowMediaFromFile(file);
+          if (!lease.isCurrent()) break;
+          if (!SUPPORTED_EXTENSIONS.includes(media.format)) {
+            throw new Error(
+              "Unsupported file type. Please upload an audio or video file.",
+            );
+          }
+          const result = await runTranscription(
+            { kind: "file", media },
+            file.name,
+            lease,
+          );
+          if (result === "cancelled") break;
+        } catch (error) {
+          if (lease.isCurrent()) {
+            setErrorMessage(
+              error instanceof Error ? error.message : "Unsupported file",
+            );
+          }
         }
-        await runTranscription({ kind: "file", media }, file.name);
-      } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : "Unsupported file");
       }
+    } finally {
+      if (lease.finish()) setBusy(false);
     }
-
-    setBusy(false);
   }
 
   function onDrag(e: React.DragEvent) {
     e.preventDefault();
-    if (e.type === "dragenter" || e.type === "dragover") setHint("Drop to transcribe");
+    if (e.type === "dragenter" || e.type === "dragover")
+      setHint("Drop to transcribe");
     if (e.type === "dragleave") setHint("or drop files here");
   }
 
   function onDrop(e: React.DragEvent) {
     e.preventDefault();
+    if (busy || runOwnership.isBusy()) return;
 
     const effects = [
       "splash",
@@ -218,7 +273,9 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
     setTimeout(() => setDropEffect(""), 1000);
 
     setHint("Transcribing...");
-    handleFiles(e.dataTransfer.files).finally(() => setHint("or drop files here"));
+    handleFiles(e.dataTransfer.files).finally(() =>
+      setHint("or drop files here"),
+    );
   }
 
   useEffect(() => {
@@ -229,8 +286,8 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
   }, [dropEffect]);
 
   useEffect(
-    () => () => activeRun.current?.abort("Transcription view unmounted"),
-    [],
+    () => () => runOwnership.abort("Transcription view unmounted"),
+    [runOwnership],
   );
 
   const adSlotPrefix = toolId;
@@ -259,7 +316,9 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
           onClick={onPick}
         >
           <div className="flex flex-col items-center space-y-6">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">{title}</h1>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              {title}
+            </h1>
             <p className="text-sm text-muted-foreground">{subtitle}</p>
 
             <svg
@@ -336,7 +395,8 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
                 </Button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Supports public links. Private or logged-in content is not supported yet.
+                Supports public links. Private or logged-in content is not
+                supported yet.
               </p>
             </div>
           </div>
@@ -362,16 +422,25 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
             <div className="mt-8 max-w-4xl mx-auto text-left">
               <Card className="p-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">Transcript</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Transcript
+                  </h3>
                   <div className="flex gap-2">
                     <Button
                       variant="secondary"
-                      onClick={() => navigator.clipboard?.writeText(transcript).catch(() => {})}
+                      onClick={() =>
+                        navigator.clipboard
+                          ?.writeText(transcript)
+                          .catch(() => {})
+                      }
                     >
                       Copy
                     </Button>
                     <Button
-                      onClick={() => transcriptMedia && deliverMediaInBrowser(transcriptMedia)}
+                      onClick={() =>
+                        transcriptMedia &&
+                        deliverMediaInBrowser(transcriptMedia)
+                      }
                       disabled={!transcriptMedia}
                     >
                       Download

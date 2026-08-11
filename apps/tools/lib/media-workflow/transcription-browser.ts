@@ -1,6 +1,10 @@
-import { cleanupFFmpeg, extractAudioForTranscription } from "../convert/video.ts";
+import {
+  cleanupFFmpeg,
+  extractAudioForTranscription,
+} from "../convert/video.ts";
 import type { ToolWorkflow, WorkflowMedia } from "../tool-workflow/index.ts";
 import { createBrowserMediaWorkflow } from "./browser.ts";
+import type { MediaTransferProgress } from "./media-endpoint.ts";
 import type { TranscriptionPort } from "./processors.ts";
 
 type WorkerMessage =
@@ -14,16 +18,21 @@ function arrayBufferOf(bytes: Uint8Array): ArrayBuffer {
   return copy.buffer;
 }
 
-export function createBrowserTranscriptionPort(options: {
-  createWorker?: () => Worker;
-  extractAudio?: typeof extractAudioForTranscription;
-} = {}): TranscriptionPort {
+export function createBrowserTranscriptionPort(
+  options: {
+    createWorker?: () => Worker;
+    extractAudio?: typeof extractAudioForTranscription;
+  } = {},
+): TranscriptionPort {
   const createWorker =
     options.createWorker ??
     (() =>
-      new Worker(new URL("../../workers/transcribe.worker.js", import.meta.url), {
-        type: "module",
-      }));
+      new Worker(
+        new URL("../../workers/transcribe.worker.js", import.meta.url),
+        {
+          type: "module",
+        },
+      ));
   const extractAudio = options.extractAudio ?? extractAudioForTranscription;
   return {
     async transcribe(media, context) {
@@ -91,9 +100,12 @@ export function createBrowserTranscriptionPort(options: {
   };
 }
 
-export function createBrowserTranscriptionWorkflow(options: {
-  onDelivered?(media: WorkflowMedia): void;
-} = {}): ToolWorkflow {
+export function createBrowserTranscriptionWorkflow(
+  options: {
+    onDelivered?(media: WorkflowMedia): void;
+    onTransfer?(progress: MediaTransferProgress): void;
+  } = {},
+): ToolWorkflow {
   return createBrowserMediaWorkflow({
     ...options,
     transcription: createBrowserTranscriptionPort(),

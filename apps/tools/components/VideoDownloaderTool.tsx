@@ -15,6 +15,7 @@ import {
 } from "@/lib/downloader-extension-cta";
 import { createBrowserMediaWorkflow } from "@/lib/media-workflow/browser";
 import { getDownloaderAttemptPolicy } from "@/lib/media-workflow/attempt-policy";
+import { createMonotonicProgress } from "@/lib/media-workflow/monotonic-progress";
 import { projectMediaTransfer } from "@/lib/media-workflow/transfer-presentation";
 
 type Props = {
@@ -222,6 +223,7 @@ export default function VideoDownloaderTool({
       message: "Starting download...",
     });
 
+    const progress = createMonotonicProgress();
     try {
       const controller = new AbortController();
       activeRun.current?.abort("Replaced by a new downloader run");
@@ -232,7 +234,7 @@ export default function VideoDownloaderTool({
           const presentation = projectMediaTransfer(transfer);
           setCurrentFile({
             name: nameHint,
-            progress: presentation.progress,
+            progress: progress.project(presentation.progress),
             status: "loading",
             message: presentation.message,
           });
@@ -255,7 +257,11 @@ export default function VideoDownloaderTool({
             }
             setCurrentFile({
               name: nameHint,
-              progress: Math.round((snapshot.progress ?? 0) * 100),
+              progress: progress.project(
+                snapshot.progress === undefined
+                  ? undefined
+                  : snapshot.progress * 100,
+              ),
               status: snapshot.phase === "acquiring" ? "loading" : "processing",
               message:
                 snapshot.phase === "acquiring"

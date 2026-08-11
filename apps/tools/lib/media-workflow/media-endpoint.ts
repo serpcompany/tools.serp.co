@@ -97,6 +97,19 @@ export type MediaTransferProgress = Readonly<{
   etaSeconds?: number;
 }>;
 
+/**
+ * Browser downloads must materialize verified bytes before delivery, and Blob
+ * construction snapshots those bytes. Capping the transfer at 32 MiB keeps
+ * both the final acquisition-buffer + Blob handoff (32 + 32 MiB) and the
+ * largest indeterminate growth transition (16 + 32 MiB) within 64 MiB.
+ */
+export const BROWSER_MEDIA_MEMORY_BUDGET = Object.freeze({
+  blobSnapshotBytes: 32 * 1_024 * 1_024,
+  maxTransferBytes: 32 * 1_024 * 1_024,
+  peakBytes: 64 * 1_024 * 1_024,
+  unknownGrowthTransitionBytes: 48 * 1_024 * 1_024,
+});
+
 type AcquisitionContext = {
   signal: AbortSignal;
   budgets: { maxInputBytes: number };
@@ -243,12 +256,16 @@ export function createStreamedMediaAcquisition(options: {
       });
       context.signal.throwIfAborted();
       const identity = resolveMediaIdentity(response, request);
+      const maxTransferBytes = Math.min(
+        context.budgets.maxInputBytes,
+        BROWSER_MEDIA_MEMORY_BUDGET.maxTransferBytes,
+      );
       if (
         response.contentLength !== undefined &&
-        response.contentLength > context.budgets.maxInputBytes
+        response.contentLength > maxTransferBytes
       ) {
         await reader.cancel("Input byte budget exceeded");
-        throw new Error(`Input exceeds ${context.budgets.maxInputBytes} bytes`);
+        throw new Error(`Input exceeds ${maxTransferBytes} bytes`);
       }
 
       const declaredLength = response.contentLength;
@@ -273,20 +290,18 @@ export function createStreamedMediaAcquisition(options: {
           break;
         }
         const chunk = next.value;
-        if (receivedBytes + chunk.byteLength > context.budgets.maxInputBytes) {
+        if (receivedBytes + chunk.byteLength > maxTransferBytes) {
           await reader.cancel("Input byte budget exceeded");
-          throw new Error(
-            `Input exceeds ${context.budgets.maxInputBytes} bytes`,
-          );
+          throw new Error(`Input exceeds ${maxTransferBytes} bytes`);
         }
         const requiredBytes = receivedBytes + chunk.byteLength;
         if (!ownedBuffer || requiredBytes > ownedBuffer.byteLength) {
           // Unknown-length bodies grow geometrically from a small allocation.
           // Only the current owned prefix and its replacement coexist during
           // growth; no chunk list or EOF coalescing allocation is retained.
-          let capacity = Math.min(64 * 1_024, context.budgets.maxInputBytes);
+          let capacity = Math.min(64 * 1_024, maxTransferBytes);
           while (capacity < requiredBytes) {
-            capacity = Math.min(context.budgets.maxInputBytes, capacity * 2);
+            capacity = Math.min(maxTransferBytes, capacity * 2);
           }
           const replacement = allocateBuffer(capacity);
           if (replacement.byteLength !== capacity) {

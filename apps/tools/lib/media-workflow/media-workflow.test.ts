@@ -4,8 +4,11 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { getToolProcessorAvailability } from "../tool-processor-registry.ts";
+import { createBrowserRunOwnership } from "./browser-run-ownership.ts";
+import { createMonotonicProgress } from "./monotonic-progress.ts";
 import { deliverMediaInBrowser } from "./browser.ts";
 import {
+  BROWSER_MEDIA_MEMORY_BUDGET,
   createStreamedMediaAcquisition,
   type MediaEndpointResponse,
 } from "./media-endpoint.ts";
@@ -37,8 +40,40 @@ const SAMPLE_VIDEO_ONLY_WEBM_BYTES = new Uint8Array(
   ),
 );
 
-test("acquisition avoids two full owned buffers at the 64 MiB cap", async (t) => {
-  const cap = 64 * 1_024 * 1_024;
+test("a finished old browser run cannot clear newer ownership", () => {
+  const ownership = createBrowserRunOwnership();
+  const first = ownership.begin();
+  ownership.abort("first run cancelled");
+  const second = ownership.begin();
+
+  assert.equal(first.signal.aborted, true);
+  assert.equal(first.isCurrent(), false);
+  assert.equal(second.isCurrent(), true);
+  first.finish();
+  assert.equal(second.isCurrent(), true);
+  ownership.abort("view unmounted");
+  assert.equal(second.signal.aborted, true);
+  assert.equal(ownership.isBusy(), false);
+});
+
+test("presentation progress never moves backward when a phase omits or lowers progress", () => {
+  const progress = createMonotonicProgress();
+
+  assert.equal(progress.project(50), 50);
+  assert.equal(progress.project(100), 100);
+  assert.equal(progress.project(undefined), 100);
+  assert.equal(progress.project(25), 100);
+});
+
+test("browser acquisition and Blob snapshot stay within the explicit 64 MiB peak budget", async (t) => {
+  const cap = BROWSER_MEDIA_MEMORY_BUDGET.maxTransferBytes;
+
+  assert.deepEqual(BROWSER_MEDIA_MEMORY_BUDGET, {
+    blobSnapshotBytes: 32 * 1_024 * 1_024,
+    maxTransferBytes: 32 * 1_024 * 1_024,
+    peakBytes: 64 * 1_024 * 1_024,
+    unknownGrowthTransitionBytes: 48 * 1_024 * 1_024,
+  });
 
   for (const contentLength of [cap, undefined]) {
     await t.test(
@@ -120,6 +155,9 @@ test("acquisition avoids two full owned buffers at the 64 MiB cap", async (t) =>
             cap * 1.5,
           );
         }
+        assert.ok(
+          Math.max(cap * 2, cap * 1.5) <= BROWSER_MEDIA_MEMORY_BUDGET.peakBytes,
+        );
         assert.equal(media.bytes.buffer, allocations.at(-1)?.buffer);
         assert.equal(media.bytes.byteLength, cap);
         await Promise.all(cleanups.map((cleanup) => cleanup()));
@@ -179,7 +217,7 @@ test("a tiny indeterminate stream keeps its owned allocation small and reuses it
 });
 
 test("cancelling a cap-sized indeterminate acquisition releases its reader and sole owned buffer", async () => {
-  const cap = 64 * 1_024 * 1_024;
+  const cap = BROWSER_MEDIA_MEMORY_BUDGET.maxTransferBytes;
   const controller = new AbortController();
   let streamCancelled = false;
   let readerReleased = false;
@@ -257,24 +295,36 @@ test("cancelling a cap-sized indeterminate acquisition releases its reader and s
   assert.equal(readerReleased, true);
 });
 
-test("video-only WebM fixture has deterministic generation provenance", () => {
+test("video-only WebM provenance records a reproducible recipe and checked-in artifact hash", () => {
   const provenance = JSON.parse(
     readFileSync(
       new URL("../../benchmarks/fixture-provenance.json", import.meta.url),
       "utf8",
     ),
-  ) as Record<string, { command: string; sha256: string; source: string }>;
+  ) as Record<
+    string,
+    {
+      command: string;
+      reproducibility: string;
+      sha256: string;
+      source: string;
+    }
+  >;
   const record = provenance["fixtures/sample-video-only.webm"];
 
   assert.equal(record?.source, "repository-generated");
   assert.match(record?.command ?? "", /ffmpeg[\s\S]*-an[\s\S]*libvpx/);
+  assert.equal(
+    record?.reproducibility,
+    "recipe-only; WebM muxing may vary; sha256 identifies the checked-in artifact",
+  );
   assert.equal(
     createHash("sha256").update(SAMPLE_VIDEO_ONLY_WEBM_BYTES).digest("hex"),
     record?.sha256,
   );
 });
 
-test("browser delivery hands off the owned view without cloning and releases downloader ownership", () => {
+test("browser delivery snapshots bytes into Blob ownership and immediately releases downloader ownership", async () => {
   const bytes = new Uint8Array([1, 2, 3, 4]);
   const media = {
     name: "clip.mp4",
@@ -285,13 +335,15 @@ test("browser delivery hands off the owned view without cloning and releases dow
   const blobParts: BlobPart[][] = [];
   const revoked: string[] = [];
   const scheduled: Array<() => void> = [];
+  let createdBlob: Blob | undefined;
   let clicked = false;
 
   deliverMediaInBrowser(media, {
     releaseOwnership: true,
     createBlob(parts, options) {
       blobParts.push(parts);
-      return new Blob(parts, options);
+      createdBlob = new Blob(parts, options);
+      return createdBlob;
     },
     createObjectURL() {
       return "blob:owned-media";
@@ -317,6 +369,12 @@ test("browser delivery hands off the owned view without cloning and releases dow
   assert.equal(blobParts[0]?.length, 1);
   assert.equal(blobParts[0]?.[0], bytes);
   assert.equal(media.bytes.byteLength, 0);
+  assert.ok(createdBlob);
+  bytes[0] = 9;
+  assert.deepEqual(
+    Array.from(new Uint8Array(await createdBlob.arrayBuffer())),
+    [1, 2, 3, 4],
+  );
   assert.equal(clicked, true);
   assert.deepEqual(revoked, []);
   scheduled[0]?.();
@@ -385,13 +443,43 @@ test("downloader UI consumes the browser transfer projection without deriving tr
     /createBrowserMediaWorkflow\(\{[\s\S]*onTransfer\(transfer\)/,
   );
   assert.match(source, /projectMediaTransfer\(transfer\)/);
-  assert.match(source, /progress: presentation\.progress/);
+  assert.match(source, /progress: progress\.project\(presentation\.progress\)/);
   assert.match(source, /message: presentation\.message/);
   assert.match(source, /releaseDeliveredBytes: true/);
   assert.doesNotMatch(
     source,
     /transfer\.(?:receivedBytes|totalBytes|ratio|bytesPerSecond|etaSeconds)/,
   );
+});
+
+test("transcription UI owns one guarded batch run through unmount", () => {
+  const source = readFileSync(
+    new URL("../../components/TranscribeTool.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(source, /createBrowserRunOwnership/);
+  assert.match(source, /if \(busy \|\| runOwnership\.isBusy\(\)\) return/);
+  assert.match(source, /if \(!lease\.isCurrent\(\)\) break/);
+  assert.match(source, /lease\.finish\(\)/);
+  assert.match(source, /runOwnership\.abort\("Transcription view unmounted"\)/);
+  assert.doesNotMatch(source, /activeRun\.current\s*=\s*null/);
+});
+
+test("downloader and URL transcription project transfer stats without backward progress", () => {
+  for (const relativePath of [
+    "../../components/VideoDownloaderTool.tsx",
+    "../../components/TranscribeTool.tsx",
+  ]) {
+    const source = readFileSync(new URL(relativePath, import.meta.url), "utf8");
+    assert.match(source, /createMonotonicProgress/);
+    assert.match(source, /onTransfer\(transfer\)/);
+    assert.match(source, /projectMediaTransfer\(transfer\)/);
+    assert.match(source, /progress\.project\(presentation\.progress\)/);
+    assert.doesNotMatch(
+      source,
+      /Math\.round\(\(snapshot\.progress \?\? 0\) \* 100\)/,
+    );
+  }
 });
 
 test("scoped downloader and transcription Tool ids register the media workflow adapter", () => {
@@ -612,8 +700,8 @@ test("declared media length must match stream EOF before processing or delivery"
   });
 });
 
-test("trusted media parser budget rejects declared and streamed excess during acquisition", async (t) => {
-  const parserLimit = 64 * 1_024 * 1_024;
+test("browser transfer cap rejects declared and streamed excess during acquisition", async (t) => {
+  const parserLimit = BROWSER_MEDIA_MEMORY_BUDGET.maxTransferBytes;
 
   await t.test("declared excess", async () => {
     const url = "https://media.example/declared-too-large.mp4";

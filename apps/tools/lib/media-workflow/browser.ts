@@ -38,6 +38,9 @@ export function deliverMediaInBrowser(
     ownedBytes.buffer instanceof ArrayBuffer
       ? (ownedBytes as Uint8Array<ArrayBuffer>)
       : new Uint8Array(ownedBytes);
+  // Blob snapshots typed-array bytes into platform-owned immutable storage.
+  // Release the acquisition view immediately after that handoff when the
+  // caller does not need to retain it.
   const blob = (
     ports.createBlob ?? ((parts, options) => new Blob(parts, options))
   )([blobPart], { type: media.mimeType });
