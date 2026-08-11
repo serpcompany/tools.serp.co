@@ -9,39 +9,60 @@ import {
   compressFile,
   convertWithWorker,
 } from "./convert/workerClient.ts";
+import { resolveCompressionDispatch } from "./compression-utils.ts";
+import { resolveConversionCapability } from "./convert/conversion-dispatch.ts";
 import {
   createToolWorkflow,
+  type SemanticVerification,
   type ToolProcessor,
   type ToolWorkflow,
   type WorkflowMedia,
   type WorkflowOutcome,
   type WorkflowRunOptions,
 } from "./tool-workflow/index.ts";
-import { verifyMediaSemantics } from "./tool-workflow/semantic-validators.ts";
+import {
+  decodedAllocationExceeds,
+  verifyMediaSemantics,
+} from "./tool-workflow/semantic-validators.ts";
+import { decodeToRGBA } from "./convert/decode.ts";
+import { createServerActionRequestHeaders } from "./server-action-client.ts";
 import { executionProvenance } from "./tool-execution-provenance.ts";
 import { selectToolRenderer } from "./tool-renderer.ts";
 
 const FORMAT_MIME_TYPES = Object.freeze({
+  cr2: "image/x-canon-cr2",
+  heic: "image/heic",
   jpeg: "image/jpeg",
   jpg: "image/jpeg",
   m4a: "audio/mp4",
+  mp3: "audio/mpeg",
   mp4: "video/mp4",
   pdf: "application/pdf",
   png: "image/png",
+  webp: "image/webp",
 } satisfies Readonly<Record<string, string>>);
 
-const IMAGE_INPUTS = new Set(["jpeg", "jpg", "png"]);
-const IMAGE_OUTPUTS = new Set(["jpeg", "jpg", "pdf", "png"]);
-const PDF_OUTPUTS = new Set(["jpeg", "jpg", "png"]);
-const MEDIA_CONVERSIONS = new Set([
-  "mp4->m4a",
-]);
-const COMPRESSION_FORMATS = new Set([
+const SEMANTIC_INPUT_FORMATS = new Set([
+  "cr2",
+  "heic",
   "jpeg",
   "jpg",
   "m4a",
+  "mp3",
   "mp4",
+  "pdf",
   "png",
+  "webp",
+]);
+const SEMANTIC_OUTPUT_FORMATS = new Set([
+  "jpeg",
+  "jpg",
+  "m4a",
+  "mp3",
+  "mp4",
+  "pdf",
+  "png",
+  "webp",
 ]);
 const MAX_INPUT_BYTES = 256 * 1_024 * 1_024;
 const MAX_OUTPUT_BYTES = 512 * 1_024 * 1_024;
@@ -87,6 +108,10 @@ export type GenericWorkflowAdapters = Readonly<{
     quality: number;
     context: GenericEngineContext;
   }>): Promise<Uint8Array>;
+  verify(
+    media: WorkflowMedia,
+    context: Readonly<{ signal: AbortSignal }>,
+  ): Promise<SemanticVerification>;
   deliver(result: WorkflowMedia): Promise<string>;
   telemetry: Readonly<{
     start(
@@ -99,6 +124,10 @@ export type GenericWorkflowAdapters = Readonly<{
 
 function mimeTypeFor(format: string): string | undefined {
   return FORMAT_MIME_TYPES[format as keyof typeof FORMAT_MIME_TYPES];
+}
+
+export function genericCompressionNeedsWorker(format: string): boolean {
+  return resolveCompressionDispatch(format).target === "image-worker";
 }
 
 function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
@@ -117,11 +146,17 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
   if (!inputMimeType || !outputMimeType) return undefined;
 
   const exactConversion =
-    (IMAGE_INPUTS.has(from) && IMAGE_OUTPUTS.has(to)) ||
-    (from === "pdf" && PDF_OUTPUTS.has(to)) ||
-    MEDIA_CONVERSIONS.has(`${from}->${to}`);
+    resolveConversionCapability(from, to).supported &&
+    SEMANTIC_INPUT_FORMATS.has(from) &&
+    SEMANTIC_OUTPUT_FORMATS.has(to);
+  const compression = resolveCompressionDispatch(from);
   const exactCompression =
-    tool.operation === "compress" && from === to && COMPRESSION_FORMATS.has(from);
+    tool.operation === "compress" &&
+    from === to &&
+    compression.target !== "unsupported" &&
+    compression.target !== "pdf" &&
+    SEMANTIC_INPUT_FORMATS.has(from) &&
+    SEMANTIC_OUTPUT_FORMATS.has(to);
   if (tool.operation === "convert" ? !exactConversion : !exactCompression) {
     return undefined;
   }
@@ -219,7 +254,7 @@ export async function verifyGenericMediaSemantics(media: WorkflowMedia) {
       const bitmap = await createImageBitmap(
         new Blob([Uint8Array.from(media.bytes)], { type: media.mimeType }),
       );
-      const valid = bitmap.width > 0 && bitmap.height > 0;
+      const valid = !decodedAllocationExceeds(bitmap.width, bitmap.height);
       bitmap.close();
       return valid
         ? { status: "verified" as const }
@@ -342,8 +377,11 @@ function processorFor(
         outputFormat: contract.output.format,
       });
     },
-    async verifyInput(input) {
-      return verifyGenericMediaSemantics(input);
+    async verifyInput(input, context) {
+      const verification = await verifyGenericMediaSemantics(input);
+      return verification.status === "unavailable"
+        ? adapters.verify(input, { signal: context.signal })
+        : verification;
     },
     async process(input, options, context) {
       const engineContext: GenericEngineContext = {
@@ -394,8 +432,11 @@ function processorFor(
         bytes,
       }));
     },
-    async verifyResult(result) {
-      return verifyGenericMediaSemantics(result);
+    async verifyResult(result, context) {
+      const verification = await verifyGenericMediaSemantics(result);
+      return verification.status === "unavailable"
+        ? adapters.verify(result, { signal: context.signal })
+        : verification;
     },
   };
 }
@@ -468,6 +509,46 @@ export function createGenericToolWorkflow(
 type ToolRunHandle = ReturnType<typeof beginToolRun>;
 const browserTelemetryHandles = new Map<string, ToolRunHandle>();
 
+export type BrowserDeliveryPorts = Readonly<{
+  createObjectUrl(blob: Blob): string;
+  revokeObjectUrl(url: string): void;
+  clickDownload(url: string, name: string): void;
+  scheduleCleanup(callback: () => void, delayMs: number): void;
+  nextId(): string;
+}>;
+
+const defaultBrowserDeliveryPorts: BrowserDeliveryPorts = {
+  createObjectUrl: (blob) => URL.createObjectURL(blob),
+  revokeObjectUrl: (url) => URL.revokeObjectURL(url),
+  clickDownload(url, name) {
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = name;
+    anchor.click();
+  },
+  scheduleCleanup(callback, delayMs) {
+    setTimeout(callback, delayMs);
+  },
+  nextId: () => crypto.randomUUID(),
+};
+
+export async function deliverBrowserMedia(
+  result: WorkflowMedia,
+  ports: BrowserDeliveryPorts = defaultBrowserDeliveryPorts,
+): Promise<string> {
+  const objectUrl = ports.createObjectUrl(
+    new Blob([Uint8Array.from(result.bytes)], { type: result.mimeType }),
+  );
+  try {
+    ports.clickDownload(objectUrl, result.name);
+    ports.scheduleCleanup(() => ports.revokeObjectUrl(objectUrl), 1_000);
+  } catch (error) {
+    ports.revokeObjectUrl(objectUrl);
+    throw error;
+  }
+  return ports.nextId();
+}
+
 const browserAdapters: GenericWorkflowAdapters = {
   decideSupport(request) {
     return decideGenericBrowserSupport(
@@ -498,7 +579,7 @@ const browserAdapters: GenericWorkflowAdapters = {
   async compress({ format, bytes, quality, context }) {
     context.signal.throwIfAborted();
     let worker: Worker | undefined;
-    if (["jpeg", "jpg", "png"].includes(format)) {
+    if (genericCompressionNeedsWorker(format)) {
       worker = new Worker(
         new URL("../workers/compress.worker.js", import.meta.url),
         { type: "module" },
@@ -515,20 +596,70 @@ const browserAdapters: GenericWorkflowAdapters = {
     });
     return new Uint8Array(result);
   },
-  async deliver(result) {
-    const objectUrl = URL.createObjectURL(
-      new Blob([Uint8Array.from(result.bytes)], { type: result.mimeType }),
-    );
-    try {
-      const anchor = document.createElement("a");
-      anchor.href = objectUrl;
-      anchor.download = result.name;
-      anchor.click();
-    } finally {
-      URL.revokeObjectURL(objectUrl);
+  async verify(media, { signal }) {
+    signal.throwIfAborted();
+    if (media.format === "cr2") {
+      const response = await fetch("/api/image-convert?from=cr2&to=png", {
+        method: "POST",
+        headers: createServerActionRequestHeaders({
+          "Content-Type": "application/octet-stream",
+        }),
+        body: Uint8Array.from(media.bytes),
+        signal,
+      });
+      if (!response.ok) {
+        return { status: "rejected", message: "CR2 decoder rejected the file" };
+      }
+      const decoded = new Uint8Array(await response.arrayBuffer());
+      return verifyMediaSemantics({
+        name: `${media.name}.png`,
+        format: "png",
+        mimeType: "image/png",
+        bytes: decoded,
+      });
     }
-    return crypto.randomUUID();
+    if (["heic", "webp"].includes(media.format)) {
+      try {
+        const decoded = await decodeToRGBA(
+          media.format,
+          Uint8Array.from(media.bytes).buffer,
+        );
+        signal.throwIfAborted();
+        const expectedBytes = decoded.width * decoded.height * 4;
+        return decodedAllocationExceeds(decoded.width, decoded.height) ||
+          decoded.data.byteLength !== expectedBytes
+          ? { status: "rejected", message: "Decoded image is inconsistent or exceeds safety limits" }
+          : { status: "verified" };
+      } catch {
+        return { status: "rejected", message: "Image decoder rejected the file" };
+      }
+    }
+    if (media.format === "mp3") {
+      const AudioContextConstructor = globalThis.AudioContext;
+      if (!AudioContextConstructor) {
+        return { status: "unavailable", message: "Audio decoder is unavailable" };
+      }
+      const context = new AudioContextConstructor();
+      try {
+        const decoded = await context.decodeAudioData(
+          Uint8Array.from(media.bytes).buffer,
+        );
+        signal.throwIfAborted();
+        const samples = decoded.length * decoded.numberOfChannels;
+        return decoded.duration > 0 &&
+          Number.isSafeInteger(samples) &&
+          samples <= 64 * 1_024 * 1_024 / 4
+          ? { status: "verified" }
+          : { status: "rejected", message: "Decoded audio exceeds safety limits" };
+      } catch {
+        return { status: "rejected", message: "Audio decoder rejected the file" };
+      } finally {
+        await context.close();
+      }
+    }
+    return { status: "unavailable", message: `No semantic verifier for ${media.format}` };
   },
+  deliver: deliverBrowserMedia,
   telemetry: {
     async start(runId, request) {
       const contract = getGenericToolContract(request.toolId);

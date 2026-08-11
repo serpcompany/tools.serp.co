@@ -1,0 +1,35 @@
+export const GENERIC_SMOKE_CAPABILITY_VERSION = "generic-adapters-v1";
+
+const imageInputs = new Set(["heic", "jpeg", "jpg", "png", "webp"]);
+const imageOutputs = new Set(["jpeg", "jpg", "pdf", "png", "webp"]);
+const mediaFormats = new Set(["m4a", "mp3", "mp4"]);
+const audioFormats = new Set(["m4a", "mp3"]);
+const compressionFormats = new Set(["jpeg", "jpg", "m4a", "mp3", "mp4", "png", "webp"]);
+const semanticallyVerifiedInputs = new Set([
+  "cr2", "heic", "jpeg", "jpg", "m4a", "mp3", "mp4", "pdf", "png", "webp",
+]);
+const semanticallyVerifiedOutputs = new Set([
+  "jpeg", "jpg", "m4a", "mp3", "mp4", "pdf", "png", "webp",
+]);
+
+// This evidence projection deliberately does not import the UI contract registry.
+// It is versioned and derived from the actual server-image, raster-worker, adaptive
+// media, and semantic-decoder boundaries exercised by browser smoke.
+export function getGenericSmokeExpectation(tool) {
+  const from = tool.from?.toLowerCase();
+  const to = tool.to?.toLowerCase();
+  if (!from || !to || !semanticallyVerifiedInputs.has(from) || !semanticallyVerifiedOutputs.has(to)) {
+    return "unsupported";
+  }
+  if (tool.operation === "compress") {
+    return from === to && compressionFormats.has(from) ? "supported" : "unsupported";
+  }
+  if (tool.operation !== "convert") return "unsupported";
+  const adapterSupported =
+    (from === "pdf" && ["jpeg", "jpg", "png", "webp"].includes(to)) ||
+    (from === "cr2" && ["jpeg", "jpg", "pdf", "png", "webp"].includes(to)) ||
+    (imageInputs.has(from) && imageOutputs.has(to)) ||
+    (mediaFormats.has(from) && mediaFormats.has(to) &&
+      (from === "mp4" || audioFormats.has(to)));
+  return adapterSupported ? "supported" : "unsupported";
+}

@@ -7,6 +7,10 @@ import {
   buildBrowserScope,
   summarizeNavigationTimings,
 } from "./lib/browser-evidence.mjs";
+import {
+  GENERIC_SMOKE_CAPABILITY_VERSION,
+  getGenericSmokeExpectation,
+} from "./lib/generic-smoke-capabilities.mjs";
 
 function parseArguments(arguments_) {
   const tokens = arguments_.filter((argument) => argument !== "--");
@@ -746,13 +750,9 @@ try {
         '[data-testid="video-progress"]',
       );
       if (terminalProgress?.includes(safeFailureMessage)) {
-        const contractState = await page.getAttribute(
-          '[data-testid="tool-dropzone"]',
-          "data-generic-contract",
-        );
-        if (contractState !== "unsupported") {
+        if (getGenericSmokeExpectation(tool) !== "unsupported") {
           throw new Error(
-            "A supported generic contract reported an unsupported outcome.",
+            `A known supported adapter route reported unsupported (${GENERIC_SMOKE_CAPABILITY_VERSION}).`,
           );
         }
         return {

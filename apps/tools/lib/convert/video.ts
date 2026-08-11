@@ -3,6 +3,7 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { AUDIO_FORMATS, VIDEO_FORMATS, detectCapabilities } from '../capabilities';
 import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils";
 import { createServerActionRequestHeaders } from "../server-action-client";
+import { runFfmpegLifecycle } from "./ffmpeg-lifecycle";
 
 let ffmpeg: FFmpeg | null = null;
 let loaded = false;
@@ -182,7 +183,6 @@ export async function convertVideo(
   } = {}
 ): Promise<ArrayBuffer> {
   const ff = await loadFFmpeg(options.signal);
-  const removeAbort = terminateFfmpegOnAbort(ff, options.signal);
 
   // Remove any existing listeners - ff.off requires a handler function
   // We'll just use removeAllListeners or skip this for now
@@ -200,15 +200,8 @@ export async function convertVideo(
       }
     : null;
 
-  if (progressHandler) {
-    ff.on('progress', progressHandler);
-  }
-
   const inputName = `input.${fromFormat}`;
   let outputName = `output.${toFormat}`;
-
-  // Write input file
-  await ff.writeFile(inputName, new Uint8Array(inputBuffer));
 
   // Build FFmpeg command based on output format
   const baseArgs = ['-y', '-nostdin'];
@@ -402,12 +395,6 @@ export async function convertVideo(
   } else if (toFormat === 'gif') {
     // Generate palette for better quality
     const paletteName = 'palette.png';
-    await ff.exec([
-      '-i', inputName,
-      '-vf', `${FAST_GIF_FILTER},palettegen`,
-      paletteName
-    ]);
-
     // Use palette to create GIF
     args = [
       ...baseArgs,
@@ -423,29 +410,33 @@ export async function convertVideo(
   // Log the command for debugging
   console.log('[FFmpeg Command]', args.join(' '));
 
-  let data: Uint8Array | string;
-
-  try {
-    try {
-      await ff.deleteFile(outputName);
-    } catch {
-      // Ignore missing output file
-    }
-
-    // Execute conversion
-    const exitCode = await ff.exec(args);
-    if (exitCode !== 0) {
-      throw new Error(`FFmpeg failed with exit code ${exitCode}`);
-    }
-
-    // Read output file
-    data = await ff.readFile(outputName);
-  } finally {
-    removeAbort();
-    if (progressHandler) {
-      ff.off('progress', progressHandler);
-    }
-  }
+  const data = await runFfmpegLifecycle(
+    ff,
+    {
+      inputs: [{ name: inputName, data: new Uint8Array(inputBuffer) }],
+      cleanupFiles: [outputName, ...(toFormat === "gif" ? ["palette.png"] : [])],
+      signal: options.signal,
+      progress: progressHandler ?? undefined,
+      onAbort: () => resetTerminatedFfmpeg(ff),
+    },
+    async () => {
+      if (toFormat === "gif") {
+        await ff.exec([
+          "-i", inputName,
+          "-vf", `${FAST_GIF_FILTER},palettegen`,
+          "palette.png",
+        ]);
+      }
+      try {
+        await ff.deleteFile(outputName);
+      } catch {
+        // Ignore missing output file.
+      }
+      const exitCode = await ff.exec(args);
+      if (exitCode !== 0) throw new Error(`FFmpeg failed with exit code ${exitCode}`);
+      return ff.readFile(outputName);
+    },
+  );
 
   // Ensure we have a Uint8Array
   if (!(data instanceof Uint8Array)) {
@@ -453,17 +444,6 @@ export async function convertVideo(
   }
 
   console.log(`Output file size: ${data.length} bytes`);
-
-  // Cleanup
-  try {
-    await ff.deleteFile(inputName);
-    await ff.deleteFile(outputName);
-    if (toFormat === 'gif') {
-      await ff.deleteFile('palette.png');
-    }
-  } catch (cleanupErr) {
-    console.warn('Cleanup error:', cleanupErr);
-  }
 
   // Return the ArrayBuffer (handle both ArrayBuffer and SharedArrayBuffer)
   const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
@@ -580,7 +560,6 @@ export async function compressMedia(
   }
 
   const ff = await loadFFmpeg(options.signal);
-  const removeAbort = terminateFfmpegOnAbort(ff, options.signal);
   const progressHandler = options.onProgress
     ? ({ progress, time }: { progress: number; time: number }) => {
         options.onProgress?.({
@@ -590,13 +569,8 @@ export async function compressMedia(
       }
     : null;
 
-  if (progressHandler) {
-    ff.on("progress", progressHandler);
-  }
-
   const inputName = `input.${normalized}`;
   const outputName = `output.${normalized}`;
-  await ff.writeFile(inputName, new Uint8Array(inputBuffer));
 
   const baseArgs = ["-y", "-nostdin", "-i", inputName];
   const audioBitrate = mapQualityToAudioBitrate(options.quality);
@@ -606,34 +580,29 @@ export async function compressMedia(
     : buildVideoCompressionArgs(normalized, crf, audioBitrate);
   const args = [...baseArgs, ...specificArgs, outputName];
 
-  let data: Uint8Array | string;
-  try {
-    try {
-      await ff.deleteFile(outputName);
-    } catch {
-      // Ignore missing output file
-    }
-    const exitCode = await ff.exec(args);
-    if (exitCode !== 0) {
-      throw new Error(`FFmpeg failed with exit code ${exitCode}`);
-    }
-    data = await ff.readFile(outputName);
-  } finally {
-    removeAbort();
-    if (progressHandler) {
-      ff.off("progress", progressHandler);
-    }
-  }
+  const data = await runFfmpegLifecycle(
+    ff,
+    {
+      inputs: [{ name: inputName, data: new Uint8Array(inputBuffer) }],
+      cleanupFiles: [outputName],
+      signal: options.signal,
+      progress: progressHandler ?? undefined,
+      onAbort: () => resetTerminatedFfmpeg(ff),
+    },
+    async () => {
+      try {
+        await ff.deleteFile(outputName);
+      } catch {
+        // Ignore missing output file.
+      }
+      const exitCode = await ff.exec(args);
+      if (exitCode !== 0) throw new Error(`FFmpeg failed with exit code ${exitCode}`);
+      return ff.readFile(outputName);
+    },
+  );
 
   if (!(data instanceof Uint8Array)) {
     throw new Error("Unexpected output format from FFmpeg");
-  }
-
-  try {
-    await ff.deleteFile(inputName);
-    await ff.deleteFile(outputName);
-  } catch (cleanupErr) {
-    console.warn("Cleanup error:", cleanupErr);
   }
 
   if (data.byteLength >= inputBuffer.byteLength) {
@@ -650,23 +619,12 @@ export async function compressMedia(
   return buffer;
 }
 
-function terminateFfmpegOnAbort(
-  instance: FFmpeg,
-  signal?: AbortSignal,
-): () => void {
-  const onAbort = () => {
-    instance.terminate();
-    if (ffmpeg === instance) {
-      ffmpeg = null;
-      loaded = false;
-    }
-  };
-  if (signal?.aborted) {
-    onAbort();
-    signal.throwIfAborted();
+function resetTerminatedFfmpeg(instance: FFmpeg): void {
+  instance.terminate();
+  if (ffmpeg === instance) {
+    ffmpeg = null;
+    loaded = false;
   }
-  signal?.addEventListener("abort", onAbort, { once: true });
-  return () => signal?.removeEventListener("abort", onAbort);
 }
 
 export async function extractAudioForTranscription(

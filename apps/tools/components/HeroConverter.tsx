@@ -6,7 +6,6 @@ import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetizationPanel";
 import {
   getGenericAccept,
-  getGenericToolContract,
 } from "@/lib/generic-tool-workflow";
 import { useGenericToolWorkflow } from "@/lib/useGenericToolWorkflow";
 import type { OperationType } from "@/types";
@@ -105,10 +104,6 @@ export default function HeroConverter({
   }, [dropEffect]);
 
   const acceptAttr = accept ?? getGenericAccept(from);
-  const contractState = getGenericToolContract(
-    toolId ?? `${from}-to-${to}`,
-  ).state;
-
   const adSlotPrefix = toolId ?? `${from}-to-${to}`;
 
   return (
@@ -126,7 +121,6 @@ export default function HeroConverter({
           onDragLeave={onDrag}
           onDrop={onDrop}
           data-testid="tool-dropzone"
-          data-generic-contract={contractState}
           className={`mt-8 mx-auto max-w-6xl border-2 border-dashed rounded-2xl p-12 hover:border-opacity-80 transition-colors cursor-pointer ${dropEffect ? `animate-${dropEffect}` : ""
             }`}
           style={{

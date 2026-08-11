@@ -5,6 +5,10 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import {
+  GENERIC_SMOKE_CAPABILITY_VERSION,
+  getGenericSmokeExpectation,
+} from './lib/generic-smoke-capabilities.mjs';
 
 const runnerPath = fileURLToPath(
   new URL('./run-browser-check.mjs', import.meta.url),
@@ -93,7 +97,29 @@ test('browser modes keep correctness and performance execution separate', () => 
 test('smoke treats the truthful generic unsupported outcome as safe failure', () => {
   assert.match(runnerSource, /This conversion is not currently supported/);
   assert.match(runnerSource, /safe failure/i);
-  assert.match(runnerSource, /data-generic-contract/);
+  assert.doesNotMatch(runnerSource, /data-generic-contract/);
+  assert.match(runnerSource, /getGenericSmokeExpectation/);
+  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v1');
+  for (const id of ['png-to-webp', 'webp-to-jpg', 'heic-to-jpg', 'cr2-to-jpg', 'mp4-to-mp3']) {
+    const [from, to] = id.split('-to-');
+    assert.equal(
+      getGenericSmokeExpectation({ id, from, to, operation: 'convert' }),
+      'supported',
+      id,
+    );
+  }
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: '3g2-to-mp4', from: '3g2', to: 'mp4', operation: 'convert',
+    }),
+    'unsupported',
+  );
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: 'mp3-to-mp4', from: 'mp3', to: 'mp4', operation: 'convert',
+    }),
+    'unsupported',
+  );
 });
 
 test('local evidence accepts only loopback targets', () => {

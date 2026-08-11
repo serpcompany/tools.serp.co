@@ -18,8 +18,8 @@ const UPNG = UPNGModule as {
   toRGBA8(image: { width: number; height: number }): ArrayBuffer[];
 };
 
-const MAX_DECODED_RGBA_BYTES = 64 * 1_024 * 1_024;
-const MAX_IMAGE_DIMENSION = 16_384;
+export const MAX_DECODED_RGBA_BYTES = 64 * 1_024 * 1_024;
+export const MAX_IMAGE_DIMENSION = 16_384;
 const MAX_MP4_PARSE_BYTES = 64 * 1_024 * 1_024;
 
 type DecodedImage = Readonly<{
@@ -58,7 +58,7 @@ function crc32(bytes: Uint8Array): number {
   return (crc ^ 0xffffffff) >>> 0;
 }
 
-function decodedAllocationExceeds(
+export function decodedAllocationExceeds(
   width: number,
   height: number,
   frames = 1,

@@ -10,7 +10,9 @@ import { toolCatalog } from "@serp-tools/app-core/lib/tool-catalog";
 import {
   createGenericToolWorkflow,
   decideGenericBrowserSupport,
+  deliverBrowserMedia,
   getGenericAccept,
+  genericCompressionNeedsWorker,
   getGenericToolContract,
   runGenericToolFile,
   verifyGenericMediaSemantics,
@@ -18,6 +20,10 @@ import {
 } from "./generic-tool-workflow.ts";
 import { getToolProcessorAvailability } from "./tool-processor-registry.ts";
 import { selectToolRenderer } from "./tool-renderer.ts";
+import { resolveConversionCapability } from "./convert/conversion-dispatch.ts";
+import { resolveCompressionDispatch } from "./compression-utils.ts";
+import { createGenericToolRunController } from "./generic-tool-run-controller.ts";
+import { runFfmpegLifecycle } from "./convert/ffmpeg-lifecycle.ts";
 
 const fixture = (name: string) =>
   new Uint8Array(
@@ -69,6 +75,9 @@ function adapters(output: Uint8Array): GenericWorkflowAdapters & {
       processed.push(`compress:${request.format}`);
       return output;
     },
+    async verify() {
+      return { status: "verified" };
+    },
     async deliver(result) {
       delivered.push(result.name);
       return `delivery-${delivered.length}`;
@@ -102,14 +111,98 @@ test("every active generic renderer Tool has an explicit processor contract stat
   }
 });
 
+test("known production dispatches retain exact generic workflow contracts", () => {
+  for (const toolId of [
+    "png-to-webp",
+    "webp-to-jpg",
+    "heic-to-jpg",
+    "cr2-to-jpg",
+    "mp4-to-mp3",
+  ]) {
+    assert.equal(getGenericToolContract(toolId).state, "supported", toolId);
+  }
+  for (const toolId of ["m4a-to-mp4", "mp3-to-mp4"]) {
+    assert.equal(getGenericToolContract(toolId).state, "unsupported", toolId);
+  }
+});
+
+test("generic compression allocates workers from the production dispatch table", () => {
+  assert.equal(genericCompressionNeedsWorker("webp"), true);
+  assert.equal(genericCompressionNeedsWorker("jpg"), true);
+  assert.equal(genericCompressionNeedsWorker("png"), true);
+  assert.equal(genericCompressionNeedsWorker("heic"), false);
+  assert.equal(genericCompressionNeedsWorker("mp4"), false);
+});
+
+test("contract inventory independently audits real dispatches with semantic coverage", () => {
+  const verifiedInputs = new Set([
+    "cr2",
+    "heic",
+    "jpeg",
+    "jpg",
+    "m4a",
+    "mp3",
+    "mp4",
+    "pdf",
+    "png",
+    "webp",
+  ]);
+  const verifiedOutputs = new Set([
+    "jpeg",
+    "jpg",
+    "m4a",
+    "mp3",
+    "mp4",
+    "pdf",
+    "png",
+    "webp",
+  ]);
+  for (const tool of toolCatalog.activeTools.filter(
+    (item) => selectToolRenderer(item) === "generic" && item.operation === "convert",
+  )) {
+    if (!tool.from || !tool.to) continue;
+    const capability = resolveConversionCapability(tool.from, tool.to);
+    const expectedSupported =
+      capability.supported &&
+      verifiedInputs.has(tool.from) &&
+      verifiedOutputs.has(tool.to);
+    assert.equal(
+      getGenericToolContract(tool.id).state === "supported",
+      expectedSupported,
+      `${tool.id}: ${capability.supported ? capability.dispatch.kind : capability.reason}`,
+    );
+  }
+  for (const tool of toolCatalog.activeTools.filter(
+    (item) => selectToolRenderer(item) === "generic" && item.operation === "compress",
+  )) {
+    if (!tool.from || !tool.to) continue;
+    const dispatch = resolveCompressionDispatch(tool.from);
+    const expectedSupported =
+      tool.from === tool.to &&
+      dispatch.target !== "unsupported" &&
+      dispatch.target !== "pdf" &&
+      verifiedInputs.has(tool.from) &&
+      verifiedOutputs.has(tool.to);
+    assert.equal(
+      getGenericToolContract(tool.id).state === "supported",
+      expectedSupported,
+      `${tool.id}: ${dispatch.target}`,
+    );
+  }
+});
+
 test("every supported generic contract resolves a processor through workflow.run", async () => {
   const outputFixture = {
+    cr2: "sample.cr2",
+    heic: "sample.heic",
     jpeg: "sample.jpg",
     jpg: "sample.jpg",
     m4a: "sample.m4a",
+    mp3: "sample.mp3",
     mp4: "sample.mp4",
     pdf: "sample.pdf",
     png: "sample.png",
+    webp: "sample.webp",
   } as const;
   const baseBoundary = adapters(fixture("sample.png"));
   const boundary: GenericWorkflowAdapters = {
@@ -127,12 +220,16 @@ test("every supported generic contract resolves a processor through workflow.run
   };
   const workflow = createGenericToolWorkflow(boundary);
   const inputFixture = {
+    cr2: "sample.cr2",
+    heic: "sample.heic",
     jpeg: "sample.jpg",
     jpg: "sample.jpg",
     m4a: "sample.m4a",
+    mp3: "sample.mp3",
     mp4: "sample.mp4",
     pdf: "sample.pdf",
     png: "sample.png",
+    webp: "sample.webp",
   } as const;
   const supported = toolCatalog.activeTools
     .filter((tool) => selectToolRenderer(tool) === "generic")
@@ -264,6 +361,147 @@ test("browser image decoding cannot legitimize wrong-format bytes", async () => 
     assert.equal(verification.status, "rejected");
   } finally {
     globalThis.createImageBitmap = originalCreateImageBitmap;
+  }
+});
+
+test("native JPEG fallback reapplies dimension and aggregate RGBA limits", async () => {
+  const originalCreateImageBitmap = globalThis.createImageBitmap;
+  const jpegEnvelope = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
+  try {
+    for (const [width, height] of [
+      [100_000, 100_000],
+      [8_192, 2_049],
+    ]) {
+      let closed = false;
+      globalThis.createImageBitmap = async () =>
+        ({ width, height, close() { closed = true; } }) as ImageBitmap;
+      const verification = await verifyGenericMediaSemantics({
+        name: "bomb.jpg",
+        format: "jpg",
+        mimeType: "image/jpeg",
+        bytes: jpegEnvelope,
+      });
+      assert.equal(verification.status, "rejected", `${width}x${height}`);
+      assert.equal(closed, true, `${width}x${height} bitmap was not closed`);
+    }
+  } finally {
+    globalThis.createImageBitmap = originalCreateImageBitmap;
+  }
+});
+
+test("browser delivery delays Blob URL revocation until the download has started", async () => {
+  const revoked: string[] = [];
+  const clicks: string[] = [];
+  let cleanup: (() => void) | undefined;
+  let delay = 0;
+  const deliveryId = await deliverBrowserMedia(
+    {
+      name: "result.png",
+      format: "png",
+      mimeType: "image/png",
+      bytes: fixture("sample.png"),
+    },
+    {
+      createObjectUrl: () => "blob:result",
+      revokeObjectUrl: (url) => revoked.push(url),
+      clickDownload: (url, name) => clicks.push(`${url}:${name}`),
+      scheduleCleanup(callback, delayMs) {
+        cleanup = callback;
+        delay = delayMs;
+      },
+      nextId: () => "delivery-1",
+    },
+  );
+  assert.equal(deliveryId, "delivery-1");
+  assert.deepEqual(clicks, ["blob:result:result.png"]);
+  assert.deepEqual(revoked, []);
+  assert.equal(delay, 1_000);
+  cleanup?.();
+  assert.deepEqual(revoked, ["blob:result"]);
+});
+
+test("a superseded run cannot clear or overwrite its active replacement", async () => {
+  type Resolve = (outcome: Awaited<ReturnType<typeof runGenericToolFile>>) => void;
+  const pending = new Map<string, Resolve>();
+  const states: Array<Record<string, unknown>> = [];
+  let state: Record<string, unknown> = {};
+  const controller = createGenericToolRunController({
+    runFile(_toolId, file) {
+      return new Promise((resolve) => pending.set(file.name, resolve));
+    },
+    publish(patch) {
+      state = { ...state, ...patch };
+      states.push(state);
+    },
+    failureMessage: () => "failed",
+    completionMessage: () => "complete",
+  });
+  const first = controller.run({
+    toolId: "png-to-jpg",
+    files: [{ name: "slow.png" } as File],
+  });
+  const second = controller.run({
+    toolId: "png-to-jpg",
+    files: [{ name: "active.png" } as File],
+  });
+  pending.get("active.png")?.({
+    status: "succeeded",
+    runId: "active",
+    results: [],
+    telemetry: { start: "submitted", terminal: "submitted" },
+  });
+  await second;
+  const settledReplacement = { ...state };
+  pending.get("slow.png")?.({
+    status: "cancelled",
+    runId: "slow",
+    telemetry: { start: "submitted", terminal: "submitted" },
+  });
+  await first;
+  assert.deepEqual(state, settledReplacement);
+  assert.equal(state.busy, false);
+  assert.equal((state.currentFile as { name: string }).name, "active.png");
+  assert.equal(states.at(-1)?.busy, false);
+});
+
+test("FFmpeg production lifecycle releases listeners and files after every failure stage", async () => {
+  for (const stage of ["write", "exec", "read"] as const) {
+    const deleted: string[] = [];
+    let attached = 0;
+    let detached = 0;
+    let terminated = 0;
+    const controller = new AbortController();
+    const progress = () => {};
+    const adapter = {
+      async writeFile() {
+        if (stage === "write") throw new Error("write failed");
+      },
+      async deleteFile(name: string) { deleted.push(name); },
+      on() { attached += 1; },
+      off() { detached += 1; },
+      terminate() { terminated += 1; },
+    };
+    await assert.rejects(
+      runFfmpegLifecycle(
+        adapter,
+        {
+          inputs: [{ name: "input.mp4", data: new Uint8Array([1]) }],
+          cleanupFiles: ["output.mp3", "palette.png"],
+          signal: controller.signal,
+          progress,
+        },
+        async () => {
+          if (stage === "exec") throw new Error("exec failed");
+          throw new Error("read failed");
+        },
+      ),
+      new RegExp(`${stage} failed`),
+    );
+    assert.equal(attached, 1, stage);
+    assert.equal(detached, 1, stage);
+    assert.deepEqual(deleted, ["input.mp4", "output.mp3", "palette.png"], stage);
+    controller.abort();
+    assert.equal(terminated, 0, `${stage} retained abort listener`);
   }
 });
 
