@@ -209,6 +209,94 @@ test('a file Tool run crosses one workflow seam from acquisition through deliver
   });
 });
 
+test('workflow.run preserves truthful per-item batch progress at the public observer seam', async () => {
+  const harness = createToolWorkflowTestHarness({
+    processors: {
+      'png-to-jpg': {
+        support: {
+          acquisition: 'file',
+          inputFormats: ['png'],
+          outputFormats: ['jpg'],
+        },
+        async process(_input, _options, context) {
+          context.reportProgress(0, {
+            index: 0,
+            total: 2,
+            name: 'first.png',
+          });
+          context.reportProgress(0.5, {
+            index: 0,
+            total: 2,
+            name: 'first.png',
+            progress: 1,
+          });
+          context.reportProgress(0.5, {
+            index: 1,
+            total: 2,
+            name: 'second.png',
+          });
+          return [
+            {
+              name: 'photo.jpg',
+              format: 'jpg',
+              mimeType: 'image/jpeg',
+              bytes: JPEG_BYTES,
+            },
+          ];
+        },
+        result: {
+          name: 'photo.jpg',
+          format: 'jpg',
+          mimeType: 'image/jpeg',
+          bytes: JPEG_BYTES,
+        },
+      },
+    },
+  });
+  const snapshots: unknown[] = [];
+
+  const outcome = await harness.workflow.run(
+    {
+      toolId: 'png-to-jpg',
+      input: {
+        kind: 'file',
+        media: {
+          name: 'photo.png',
+          format: 'png',
+          mimeType: 'image/png',
+          bytes: PNG_BYTES,
+        },
+      },
+    },
+    { observe: (snapshot) => snapshots.push(snapshot) },
+  );
+
+  assert.equal(outcome.status, 'succeeded');
+  assert.deepEqual(
+    snapshots.filter(
+      (snapshot) =>
+        typeof snapshot === 'object' && snapshot !== null && 'item' in snapshot,
+    ),
+    [
+      {
+        phase: 'processing',
+        progress: 0.25,
+        item: { index: 0, total: 2, name: 'first.png' },
+      },
+      {
+        phase: 'processing',
+        progress: 0.475,
+        item: { index: 0, total: 2, name: 'first.png', progress: 1 },
+      },
+      {
+        phase: 'processing',
+        progress: 0.475,
+        item: { index: 1, total: 2, name: 'second.png' },
+      },
+    ],
+  );
+});
+
 test('a URL stream uses the same workflow seam and preserves multiple result order', async () => {
   const harness = createToolWorkflowTestHarness({
     media: {
