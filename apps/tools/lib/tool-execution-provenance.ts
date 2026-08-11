@@ -226,7 +226,7 @@ const engineById = defineEngines({
     implementation: {
       class: 'hybrid',
       identity:
-        'Papa Parse, @office-kit/xlsx, parse5, fast-xml-parser, yaml, markdown-table, pdf-lib, Canvas 2D, and bounded repository codecs',
+        'Papa Parse, read-excel-file, write-excel-file, parse5, fast-xml-parser, yaml, markdown-table, pdf-lib, Canvas 2D, and bounded repository codecs',
       rationale:
         'Maintained parsers and serializers own standard formats; bounded repository codecs cover narrow SQL, LaTeX, Markdown-input, and MediaWiki contracts with semantic round-trip fixtures.',
     },

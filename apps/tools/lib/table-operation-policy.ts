@@ -28,7 +28,7 @@ export const tableInputContracts = Object.freeze({
     mimeTypes: Object.freeze([
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ]),
-    parser: library("@office-kit/xlsx 0.9"),
+    parser: library("read-excel-file 9"),
   }),
   html: Object.freeze({
     mimeTypes: Object.freeze(["text/html"]),
@@ -93,7 +93,7 @@ export const tableOutputContracts = Object.freeze({
     mimeType:
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     extension: "xlsx",
-    serializer: library("@office-kit/xlsx 0.9"),
+    serializer: library("write-excel-file 4"),
   }),
   html: Object.freeze({
     mimeType: "text/html",

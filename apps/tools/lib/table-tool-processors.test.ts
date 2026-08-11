@@ -6,7 +6,12 @@ import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 
 import { toolCatalog } from "../../../packages/app-core/src/lib/tool-catalog.ts";
+import {
+  detectFormatFromFile,
+  getPlaceholder,
+} from "../components/table-convert/formats.ts";
 import { getTableRendererToolIds } from "./table-convert-pages.ts";
+import { createBrowserTableWorkflow } from "./table-browser-workflow.ts";
 import {
   tableInputContracts,
   tableOutputContracts,
@@ -253,6 +258,82 @@ test("workflow.run parses quoted CSV and delivers schema-preserving JSON", async
   ]);
 });
 
+test("single-column CSV and singleton XML cells round-trip without widening schema", async () => {
+  const csv = createRecordingWorkflow();
+  const csvOutcome = await csv.workflow.run({
+    toolId: "csv-to-json",
+    input: {
+      kind: "file",
+      media: {
+        name: "names.csv",
+        format: "csv",
+        mimeType: "text/csv",
+        bytes: encoder.encode("name\nAda\n"),
+      },
+    },
+  });
+  assert.equal(csvOutcome.status, "succeeded");
+  assert.deepEqual(JSON.parse(decoder.decode(csv.deliveries[0]?.bytes)), [
+    { name: "Ada" },
+  ]);
+
+  const xml = createRecordingWorkflow();
+  const xmlOutcome = await xml.workflow.run({
+    toolId: "json-to-xml",
+    input: {
+      kind: "file",
+      media: {
+        name: "names.json",
+        format: "json",
+        mimeType: "application/json",
+        bytes: encoder.encode('[{"name":"Ada"}]'),
+      },
+    },
+  });
+  assert.equal(xmlOutcome.status, "succeeded");
+  assert.equal(xml.deliveries.length, 1);
+
+  const reparsed = createRecordingWorkflow();
+  const reparseOutcome = await reparsed.workflow.run({
+    toolId: "xml-to-csv",
+    input: {
+      kind: "file",
+      media: {
+        name: "names.xml",
+        format: "xml",
+        mimeType: "application/xml",
+        bytes: xml.deliveries[0]?.bytes ?? new Uint8Array(),
+      },
+    },
+  });
+  assert.equal(
+    reparseOutcome.status,
+    "succeeded",
+    reparseOutcome.status === "failed"
+      ? `${reparseOutcome.error.code}: ${reparseOutcome.error.message}`
+      : reparseOutcome.status,
+  );
+  assert.equal(decoder.decode(reparsed.deliveries[0]?.bytes), "name\r\nAda");
+});
+
+test("Excel upload claims only the OOXML workbook format the processor accepts", () => {
+  assert.equal(
+    detectFormatFromFile({
+      name: "legacy.xls",
+      type: "application/vnd.ms-excel",
+    } as File),
+    null,
+  );
+  assert.equal(
+    detectFormatFromFile({
+      name: "workbook.xlsx",
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    } as File),
+    "excel",
+  );
+  assert.equal(getPlaceholder("excel"), "Upload an Excel file (.xlsx)");
+});
+
 test("workflow.run serializes YAML rows as parseable delimiter-safe CSV", async () => {
   const { deliveries, workflow } = createRecordingWorkflow();
 
@@ -276,6 +357,36 @@ test("workflow.run serializes YAML rows as parseable delimiter-safe CSV", async 
     decoder.decode(deliveries[0]?.bytes),
     'name,note\r\nAda,"comma, preserved"\r\nGrace,"quote "" preserved"',
   );
+});
+
+test("Markdown preserves ordinary and trailing backslashes while unescaping pipes", async () => {
+  const { deliveries, workflow } = createRecordingWorkflow();
+  const outcome = await workflow.run({
+    toolId: "markdown-to-json",
+    input: {
+      kind: "file",
+      media: {
+        name: "paths.md",
+        format: "markdown",
+        mimeType: "text/markdown",
+        bytes: encoder.encode(
+          String.raw`| path | trailing | delimiter |
+| --- | --- | --- |
+| C:\temp\file | slash\\ | pipe\|kept |
+`,
+        ),
+      },
+    },
+  });
+
+  assert.equal(outcome.status, "succeeded");
+  assert.deepEqual(JSON.parse(decoder.decode(deliveries[0]?.bytes)), [
+    {
+      path: String.raw`C:\temp\file`,
+      trailing: "slash\\",
+      delimiter: "pipe|kept",
+    },
+  ]);
 });
 
 test("workflow.run parses an HTML table and preserves its row schema", async () => {
@@ -351,6 +462,39 @@ test("workflow.run emits quoted SQL identifiers and escaped string literals", as
     /\("first name", "note"\)/,
   );
   assert.match(decoder.decode(deliveries[0]?.bytes), /'O''Reilly'/);
+});
+
+test("SQL and MySQL reject tokens before or after the single INSERT statement", async () => {
+  const adversarial = [
+    "DROP TABLE audit; INSERT INTO people (name) VALUES ('Ada');",
+    "INSERT INTO people (name) VALUES ('Ada'); DROP TABLE audit;",
+  ];
+
+  for (const toolId of ["sql-to-json", "mysql-to-json"]) {
+    for (const statement of adversarial) {
+      const { deliveries, workflow } = createRecordingWorkflow();
+      const format = toolId.startsWith("mysql") ? "mysql" : "sql";
+      const outcome = await workflow.run({
+        toolId,
+        input: {
+          kind: "file",
+          media: {
+            name: `people.${format}`,
+            format,
+            mimeType: "application/sql",
+            bytes: encoder.encode(statement),
+          },
+        },
+      });
+
+      assert.equal(outcome.status, "failed", `${toolId}: ${statement}`);
+      if (outcome.status === "failed") {
+        assert.equal(outcome.error.code, "invalid-request");
+        assert.equal(outcome.telemetry.start, "not-attempted");
+      }
+      assert.equal(deliveries.length, 0);
+    }
+  }
 });
 
 test("workflow.run parses an independently generated XLSX workbook", async () => {
@@ -483,6 +627,38 @@ test("workflow.run emits decodable PNG and JPEG table images", async () => {
   );
 });
 
+test("PDF, PNG, and JPEG fail closed before lossy long-cell rendering", async () => {
+  const cases = [
+    { toolId: "csv-to-pdf", value: "p".repeat(81) },
+    { toolId: "csv-to-png", value: "p".repeat(29) },
+    { toolId: "csv-to-jpeg", value: "p".repeat(29) },
+  ];
+
+  for (const fixture of cases) {
+    const { deliveries, workflow } = createRecordingWorkflow(sharpRasterizer);
+    const outcome = await workflow.run({
+      toolId: fixture.toolId,
+      input: {
+        kind: "file",
+        media: {
+          name: "long-cell.csv",
+          format: "csv",
+          mimeType: "text/csv",
+          bytes: encoder.encode(`name,note\r\nAda,${fixture.value}\r\n`),
+        },
+      },
+    });
+
+    assert.equal(outcome.status, "failed", fixture.toolId);
+    if (outcome.status === "failed") {
+      assert.equal(outcome.error.code, "invalid-request", fixture.toolId);
+      assert.equal(outcome.telemetry.start, "not-attempted", fixture.toolId);
+      assert.match(outcome.error.message, /lossless/i, fixture.toolId);
+    }
+    assert.equal(deliveries.length, 0, fixture.toolId);
+  }
+});
+
 test("unsupported and unknown table operations fail closed before telemetry or delivery", async () => {
   for (const toolId of ["csv-to-avro", "csv-to-not-a-format"]) {
     const { deliveries, workflow } = createRecordingWorkflow();
@@ -582,6 +758,8 @@ test("table presentation delegates execution, terminal telemetry, and delivery p
 
   assert.match(presentation, /workflow\.run\(/);
   assert.match(presentation, /deliveries\.download\(/);
+  assert.match(presentation, /deliveries\.release\(/);
+  assert.match(presentation, /disabled=\{!delivery\}/);
   assert.doesNotMatch(
     presentation,
     /beginToolRun|saveBlob|finishSuccess|finishFailure/,
@@ -590,4 +768,55 @@ test("table presentation delegates execution, terminal telemetry, and delivery p
   assert.match(browserAdapter, /finishSuccess/);
   assert.match(browserAdapter, /finishFailure/);
   assert.match(browserAdapter, /URL\.createObjectURL/);
+});
+
+test("browser delivery ownership retains only the latest result and supports explicit release", async () => {
+  const { workflow, deliveries } = createBrowserTableWorkflow();
+  const run = (name: string) =>
+    workflow.run({
+      toolId: "csv-to-json",
+      input: {
+        kind: "file",
+        media: {
+          name,
+          format: "csv",
+          mimeType: "text/csv",
+          bytes: encoder.encode("name\nAda\n"),
+        },
+      },
+    });
+
+  const first = await run("first.csv");
+  const firstDelivery =
+    first.status === "succeeded" ? first.results[0] : undefined;
+  assert.ok(firstDelivery);
+  assert.ok(deliveries.get(firstDelivery.deliveryId));
+  assert.match(deliveries.text(firstDelivery.deliveryId) ?? "", /"Ada"/);
+
+  const second = await run("second.csv");
+  const secondDelivery =
+    second.status === "succeeded" ? second.results[0] : undefined;
+  assert.ok(secondDelivery);
+  assert.equal(deliveries.get(firstDelivery.deliveryId), undefined);
+  assert.ok(deliveries.get(secondDelivery.deliveryId));
+
+  deliveries.release(secondDelivery.deliveryId);
+  assert.equal(deliveries.get(secondDelivery.deliveryId), undefined);
+
+  const binary = await workflow.run({
+    toolId: "csv-to-excel",
+    input: {
+      kind: "file",
+      media: {
+        name: "workbook.csv",
+        format: "csv",
+        mimeType: "text/csv",
+        bytes: encoder.encode("name\nAda\n"),
+      },
+    },
+  });
+  const binaryDelivery =
+    binary.status === "succeeded" ? binary.results[0] : undefined;
+  assert.ok(binaryDelivery);
+  assert.equal(deliveries.text(binaryDelivery.deliveryId), undefined);
 });

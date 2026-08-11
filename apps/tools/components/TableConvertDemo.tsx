@@ -48,6 +48,7 @@ export default function TableConvertDemo({
   subtitle = "Paste or upload on the left, convert to a target format, and preview on the right.",
 }: TableConvertDemoProps) {
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const outputRevisionRef = useRef(0);
   const [{ workflow, deliveries }] = useState(createBrowserTableWorkflow);
   const [inputFormat, setInputFormat] = useState<InputFormat>(initialInputFormat);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>(initialOutputFormat);
@@ -98,8 +99,24 @@ export default function TableConvertDemo({
     setTableData(result.table);
   }, [hasUserInput, inputText, inputFormat, inputBytes]);
 
+  useEffect(
+    () => () => {
+      if (delivery) deliveries.release(delivery.deliveryId);
+    },
+    [deliveries, delivery],
+  );
+
+  function clearOutputResult() {
+    outputRevisionRef.current += 1;
+    if (delivery) deliveries.release(delivery.deliveryId);
+    setDelivery(null);
+    setOutputText("");
+    setOutputNotice(null);
+  }
+
   function handleInputFormatChange(nextFormat: InputFormat, reserialize = true) {
     if (nextFormat === inputFormat) return;
+    clearOutputResult();
     setInputFormat(nextFormat);
     setInputBytes(null);
     if (!tableData || !reserialize || !hasUserInput) return;
@@ -117,6 +134,7 @@ export default function TableConvertDemo({
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
+    clearOutputResult();
     const detected = detectFormatFromFile(file);
     if (detected && detected !== inputFormat) {
       handleInputFormatChange(detected, false);
@@ -134,6 +152,7 @@ export default function TableConvertDemo({
     setDragActive(false);
     const file = event.dataTransfer.files?.[0];
     if (!file) return;
+    clearOutputResult();
     const detected = detectFormatFromFile(file);
     if (detected && detected !== inputFormat) {
       handleInputFormatChange(detected, false);
@@ -150,12 +169,10 @@ export default function TableConvertDemo({
     setInputText("");
     setFileName(null);
     setInputBytes(null);
-    setDelivery(null);
+    clearOutputResult();
     setError(null);
     setHasUserInput(false);
     setTableData(DEFAULT_TABLE);
-    setOutputText("");
-    setOutputNotice(null);
     setStatus("Cleared current view.");
   }
 
@@ -179,8 +196,8 @@ export default function TableConvertDemo({
     if ((!inputText.trim() && !inputBytes) || isConverting) return;
     setIsConverting(true);
     setError(null);
-    setOutputNotice(null);
-    setDelivery(null);
+    clearOutputResult();
+    const outputRevision = outputRevisionRef.current;
     const selectedToolId =
       inputFormat === initialInputFormat && outputFormat === initialOutputFormat && toolId
         ? toolId
@@ -205,6 +222,14 @@ export default function TableConvertDemo({
           observe: ({ phase }) => setStatus(`${phase[0]?.toUpperCase()}${phase.slice(1)}…`),
         },
       );
+      if (outputRevision !== outputRevisionRef.current) {
+        if (outcome.status === "succeeded") {
+          for (const staleDelivery of outcome.results) {
+            deliveries.release(staleDelivery.deliveryId);
+          }
+        }
+        return;
+      }
       if (outcome.status !== "succeeded") {
         const message =
           outcome.status === "failed" ? outcome.error.message : "Conversion was cancelled.";
@@ -219,14 +244,9 @@ export default function TableConvertDemo({
         throw new TypeError("Workflow delivery is unavailable");
       }
       setDelivery(nextDelivery);
-      if (
-        media.mimeType.startsWith("text/") ||
-        media.mimeType.includes("json") ||
-        media.mimeType.includes("yaml") ||
-        media.mimeType.includes("sql") ||
-        media.mimeType.includes("xml")
-      ) {
-        setOutputText(new TextDecoder().decode(media.bytes));
+      const deliveredText = deliveries.text(nextDelivery.deliveryId);
+      if (deliveredText !== undefined) {
+        setOutputText(deliveredText);
       } else {
         setOutputText("");
         setOutputNotice(`${outputLabel} binary output is verified and ready to download.`);
@@ -243,6 +263,7 @@ export default function TableConvertDemo({
   }
 
   function handleEditorChange(nextTable: TableData) {
+    clearOutputResult();
     setHasUserInput(true);
     setInputBytes(null);
     setTableData(nextTable);
@@ -318,6 +339,7 @@ export default function TableConvertDemo({
                   <textarea
                     value={inputText}
                     onChange={(event) => {
+                      clearOutputResult();
                       setHasUserInput(true);
                       setInputBytes(null);
                       setInputText(event.target.value);
@@ -360,9 +382,7 @@ export default function TableConvertDemo({
                   value={outputFormat}
                   onChange={(value) => {
                     setOutputFormat(value as OutputFormat);
-                    setDelivery(null);
-                    setOutputText("");
-                    setOutputNotice(null);
+                    clearOutputResult();
                   }}
                 />
 

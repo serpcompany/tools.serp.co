@@ -1,4 +1,4 @@
-import { FormatOption, InputFormat, TableData } from "./types";
+import type { FormatOption, InputFormat, TableData } from "./types.ts";
 
 export const INPUT_FORMATS: FormatOption[] = [
   { value: "csv", label: "CSV" },
@@ -83,7 +83,7 @@ export function getPlaceholder(format: InputFormat) {
     case "latex":
       return "Paste LaTeX tabular";
     case "excel":
-      return "Upload an Excel file (.xlsx, .xls)";
+      return "Upload an Excel file (.xlsx)";
     case "mysql":
       return "Paste MySQL output";
     case "mediawiki":
@@ -101,6 +101,11 @@ export function detectFormatFromFile(file: File): InputFormat | null {
   if (mime === "text/html") return "html";
   if (mime === "application/xml" || mime === "text/xml") return "xml";
   if (mime === "application/x-yaml" || mime === "text/yaml") return "yaml";
+  if (
+    mime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  ) {
+    return "excel";
+  }
   const ext = file.name.split(".").pop()?.toLowerCase();
   if (!ext) return null;
   if (["csv", "tsv"].includes(ext)) return "csv";
@@ -111,7 +116,7 @@ export function detectFormatFromFile(file: File): InputFormat | null {
   if (["yaml", "yml"].includes(ext)) return "yaml";
   if (["sql"].includes(ext)) return "sql";
   if (["tex"].includes(ext)) return "latex";
-  if (["xls", "xlsx"].includes(ext)) return "excel";
+  if (ext === "xlsx") return "excel";
   if (["wiki", "mediawiki"].includes(ext)) return "mediawiki";
   return null;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { beginToolRun } from "@/lib/telemetry";
+import { beginToolRun } from "./telemetry.ts";
 
 import {
   browserTableRasterizer,
@@ -13,7 +13,10 @@ type TelemetryHandle = ReturnType<typeof beginToolRun>;
 
 export type BrowserTableDeliveries = Readonly<{
   get(deliveryId: string): WorkflowMedia | undefined;
+  text(deliveryId: string): string | undefined;
   download(delivery: WorkflowDelivery): void;
+  release(deliveryId: string): void;
+  clear(): void;
 }>;
 
 export function createBrowserTableWorkflow(): Readonly<{
@@ -21,7 +24,21 @@ export function createBrowserTableWorkflow(): Readonly<{
   deliveries: BrowserTableDeliveries;
 }> {
   const mediaByDeliveryId = new Map<string, WorkflowMedia>();
+  const objectUrlsByDeliveryId = new Map<string, Set<string>>();
   const telemetryByRunId = new Map<string, TelemetryHandle>();
+
+  const release = (deliveryId: string) => {
+    for (const objectUrl of objectUrlsByDeliveryId.get(deliveryId) ?? []) {
+      URL.revokeObjectURL(objectUrl);
+    }
+    objectUrlsByDeliveryId.delete(deliveryId);
+    mediaByDeliveryId.delete(deliveryId);
+  };
+  const clear = () => {
+    for (const deliveryId of [...mediaByDeliveryId.keys()]) {
+      release(deliveryId);
+    }
+  };
 
   let sequence = 0;
   const workflow = createTableToolWorkflow({
@@ -32,6 +49,7 @@ export function createBrowserTableWorkflow(): Readonly<{
       return `${kind}-${crypto.randomUUID()}-${sequence}`;
     },
     async deliver(media) {
+      clear();
       const deliveryId = `table-delivery-${crypto.randomUUID()}`;
       mediaByDeliveryId.set(deliveryId, media);
       return deliveryId;
@@ -68,18 +86,47 @@ export function createBrowserTableWorkflow(): Readonly<{
       get(deliveryId: string) {
         return mediaByDeliveryId.get(deliveryId);
       },
+      text(deliveryId: string) {
+        const media = mediaByDeliveryId.get(deliveryId);
+        if (
+          !media ||
+          (!media.mimeType.startsWith("text/") &&
+            ![
+              "application/json",
+              "application/sql",
+              "application/x-ndjson",
+              "application/xml",
+              "application/yaml",
+            ].includes(media.mimeType))
+        ) {
+          return undefined;
+        }
+        return new TextDecoder().decode(media.bytes);
+      },
       download(delivery: WorkflowDelivery) {
         const media = mediaByDeliveryId.get(delivery.deliveryId);
         if (!media)
           throw new TypeError("Table delivery is no longer available");
         const anchor = document.createElement("a");
-        anchor.href = URL.createObjectURL(
+        const objectUrl = URL.createObjectURL(
           new Blob([Uint8Array.from(media.bytes)], { type: media.mimeType }),
         );
+        anchor.href = objectUrl;
         anchor.download = media.name;
         anchor.click();
-        window.setTimeout(() => URL.revokeObjectURL(anchor.href), 1_000);
+        const objectUrls =
+          objectUrlsByDeliveryId.get(delivery.deliveryId) ?? new Set<string>();
+        objectUrls.add(objectUrl);
+        objectUrlsByDeliveryId.set(delivery.deliveryId, objectUrls);
+        window.setTimeout(() => {
+          URL.revokeObjectURL(objectUrl);
+          objectUrls.delete(objectUrl);
+          if (objectUrls.size === 0)
+            objectUrlsByDeliveryId.delete(delivery.deliveryId);
+        }, 1_000);
       },
+      release,
+      clear,
     }),
   });
 }

@@ -1,22 +1,11 @@
 import { toolCatalog } from "@serp-tools/app-core/lib/tool-catalog";
-import { cellValueAsString } from "@office-kit/xlsx/cell";
-import {
-  fromArrayBuffer,
-  loadWorkbook,
-  workbookToBytes,
-} from "@office-kit/xlsx/io";
-import { addWorksheet, createWorkbook } from "@office-kit/xlsx/workbook";
-import {
-  getCell,
-  getMaxCol,
-  getMaxRow,
-  setCell,
-} from "@office-kit/xlsx/worksheet";
 import { XMLBuilder, XMLParser, XMLValidator } from "fast-xml-parser";
 import { markdownTable } from "markdown-table";
 import Papa from "papaparse";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { parseFragment, serialize, type DefaultTreeAdapterMap } from "parse5";
+import { readSheet } from "read-excel-file/universal";
+import writeXlsxFile from "write-excel-file/universal";
 import YAML from "yaml";
 
 import { executionProvenance } from "./tool-execution-provenance.ts";
@@ -89,8 +78,11 @@ function parseCsv(bytes: Uint8Array): TableData {
   const parsed = Papa.parse<string[]>(text, {
     skipEmptyLines: true,
   });
-  if (parsed.errors.length > 0) {
-    throw new TypeError(parsed.errors[0]?.message ?? "CSV parse failed");
+  const fatalErrors = parsed.errors.filter(
+    (error) => error.code !== "UndetectableDelimiter",
+  );
+  if (fatalErrors.length > 0) {
+    throw new TypeError(fatalErrors[0]?.message ?? "CSV parse failed");
   }
   const [rawHeaders, ...rawRows] = parsed.data;
   if (!rawHeaders || rawHeaders.length === 0) {
@@ -242,7 +234,7 @@ function parseSql(bytes: Uint8Array): TableData {
   const match = decoder
     .decode(bytes)
     .match(
-      /insert\s+into\s+[`"\w.-]+\s*\(([^)]+)\)\s*values\s*([\s\S]+?);?\s*$/i,
+      /^\s*insert\s+into\s+[`"\w.-]+\s*\(([^)]+)\)\s*values\s*([\s\S]+?)\s*;?\s*$/i,
     );
   if (!match?.[1] || !match[2]) {
     throw new TypeError("SQL input requires one INSERT with a column list");
@@ -255,6 +247,7 @@ function parseSql(bytes: Uint8Array): TableData {
   let tuple: string[] | undefined;
   let cell = "";
   let quoted = false;
+  let expectsTuple = true;
   for (let index = 0; index < values.length; index += 1) {
     const character = values[index];
     if (quoted) {
@@ -268,12 +261,12 @@ function parseSql(bytes: Uint8Array): TableData {
       }
       continue;
     }
-    if (character === "'") {
+    if (character === "'" && tuple) {
       quoted = true;
-    } else if (character === "(") {
-      if (tuple) throw new TypeError("Nested SQL tuples are unsupported");
+    } else if (character === "(" && expectsTuple) {
       tuple = [];
       cell = "";
+      expectsTuple = false;
     } else if (character === "," && tuple) {
       tuple.push(cell.trim().toLowerCase() === "null" ? "" : cell.trim());
       cell = "";
@@ -282,31 +275,38 @@ function parseSql(bytes: Uint8Array): TableData {
       rows.push(tuple);
       tuple = undefined;
       cell = "";
+    } else if (!tuple && character === "," && !expectsTuple) {
+      expectsTuple = true;
+    } else if (!tuple && character === ";" && !expectsTuple) {
+      if (values.slice(index + 1).trim()) {
+        throw new TypeError("SQL input contains tokens after the INSERT");
+      }
+      break;
+    } else if (!tuple && /^\s$/.test(character ?? "")) {
+      continue;
     } else if (tuple) {
       cell += character;
+    } else {
+      throw new TypeError("SQL input requires exactly one INSERT statement");
     }
   }
-  if (quoted || tuple) throw new TypeError("SQL VALUES tuple is unterminated");
+  if (quoted || tuple || expectsTuple) {
+    throw new TypeError("SQL VALUES tuple is unterminated");
+  }
   return assertTable(headers, rows, "SQL");
 }
 
 async function parseExcel(bytes: Uint8Array): Promise<TableData> {
-  const workbook = await loadWorkbook(fromArrayBuffer(bytes));
-  const sheetRef = workbook.sheets.find((sheet) => sheet.kind === "worksheet");
-  if (!sheetRef || sheetRef.kind !== "worksheet") {
-    throw new TypeError("XLSX input requires a worksheet");
-  }
-  const maxRow = getMaxRow(sheetRef.sheet);
-  const maxCol = getMaxCol(sheetRef.sheet);
-  if (maxRow < 2 || maxCol < 1) {
+  const arrayBuffer = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
+  const sheet = await readSheet(arrayBuffer);
+  if (sheet.length < 2 || (sheet[0]?.length ?? 0) < 1) {
     throw new TypeError("XLSX worksheet requires headers and at least one row");
   }
-  const values = Array.from({ length: maxRow }, (_, index) =>
-    Array.from({ length: maxCol }, (_, columnIndex) =>
-      cellValueAsString(
-        getCell(sheetRef.sheet, index + 1, columnIndex + 1)?.value ?? null,
-      ),
-    ),
+  const values = sheet.map((row) =>
+    row.map((cell) => (cell === null ? "" : String(cell))),
   );
   const [headers, ...rows] = values;
   if (!headers) throw new TypeError("XLSX worksheet requires headers");
@@ -316,13 +316,12 @@ async function parseExcel(bytes: Uint8Array): Promise<TableData> {
 function splitDelimitedRow(line: string, delimiter: string): string[] {
   const cells: string[] = [];
   let cell = "";
-  let escaped = false;
-  for (const character of line) {
-    if (escaped) {
-      cell += character;
-      escaped = false;
-    } else if (character === "\\") {
-      escaped = true;
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index];
+    const next = line[index + 1];
+    if (character === "\\" && (next === delimiter || next === "\\")) {
+      cell += next;
+      index += 1;
     } else if (character === delimiter) {
       cells.push(cell.trim());
       cell = "";
@@ -376,14 +375,19 @@ function parseXml(bytes: Uint8Array): TableData {
   if (rawRows.length === 0)
     throw new TypeError("XML input requires row elements");
   const first = rawRows[0] as Record<string, unknown>;
-  if (Array.isArray(first.cell)) {
-    const headers = (first.cell as Record<string, unknown>[]).map((cell) =>
-      String(cell["@column"] ?? ""),
-    );
+  const cellsForRow = (row: Record<string, unknown>) =>
+    Array.isArray(row.cell)
+      ? (row.cell as Record<string, unknown>[])
+      : row.cell !== null && typeof row.cell === "object"
+        ? [row.cell as Record<string, unknown>]
+        : undefined;
+  const firstCells = cellsForRow(first);
+  if (firstCells) {
+    const headers = firstCells.map((cell) => String(cell["@column"] ?? ""));
     const rows = rawRows.map((rawRow, rowIndex) => {
-      const cells = (rawRow as Record<string, unknown>).cell;
-      if (!Array.isArray(cells)) return [];
-      const entries = (cells as Record<string, unknown>[]).map(
+      const cells = cellsForRow(rawRow as Record<string, unknown>);
+      if (!cells) return [];
+      const entries = cells.map(
         (cell) =>
           [String(cell["@column"] ?? ""), String(cell["#text"] ?? "")] as const,
       );
@@ -534,14 +538,11 @@ function sqlIdentifier(value: string, dialect: "mysql" | "sql"): string {
 }
 
 async function serializeExcel(table: TableData): Promise<Uint8Array> {
-  const workbook = createWorkbook();
-  const worksheet = addWorksheet(workbook, "Table");
-  [table.headers, ...table.rows].forEach((row, rowIndex) => {
-    row.forEach((cell, columnIndex) => {
-      setCell(worksheet, rowIndex + 1, columnIndex + 1, cell);
-    });
-  });
-  return workbookToBytes(workbook);
+  const blob = await writeXlsxFile(
+    [table.headers, ...table.rows].map((row) => [...row]),
+    { sheet: "Table" },
+  ).toBlob();
+  return new Uint8Array(await blob.arrayBuffer());
 }
 
 async function serializePdf(table: TableData): Promise<Uint8Array> {
@@ -565,7 +566,7 @@ async function serializePdf(table: TableData): Promise<Uint8Array> {
         borderColor: rgb(0.6, 0.6, 0.6),
         color: header ? rgb(0.93, 0.95, 0.98) : undefined,
       });
-      page.drawText(cell.slice(0, 80), {
+      page.drawText(cell, {
         x: margin + index * width + 3,
         y: y - fontSize,
         size: fontSize,
@@ -594,8 +595,19 @@ export async function browserTableRasterizer(
   if (typeof document === "undefined") {
     throw new TypeError("Browser Canvas is unavailable for table image output");
   }
-  const cellWidth = 180;
   const cellHeight = 32;
+  const measurementCanvas = document.createElement("canvas");
+  const measurementContext = measurementCanvas.getContext("2d");
+  if (!measurementContext) {
+    throw new TypeError("Canvas 2D context is unavailable");
+  }
+  measurementContext.font = "14px sans-serif";
+  const widestCell = Math.max(
+    ...[table.headers, ...table.rows]
+      .flat()
+      .map((cell) => measurementContext.measureText(cell).width),
+  );
+  const cellWidth = Math.max(180, Math.ceil(widestCell) + 16);
   if (
     table.headers.length * cellWidth > 4096 ||
     (table.rows.length + 1) * cellHeight > 4096
@@ -619,7 +631,7 @@ export async function browserTableRasterizer(
       context.strokeStyle = "#94a3b8";
       context.strokeRect(x, y, cellWidth, cellHeight);
       context.fillStyle = "#111827";
-      context.fillText(cell.slice(0, 28), x + 8, y + 21, cellWidth - 16);
+      context.fillText(cell, x + 8, y + 21);
     });
   });
   const blob = await new Promise<Blob>((resolve, reject) =>
@@ -771,6 +783,28 @@ function isWinAnsiText(value: string): boolean {
   });
 }
 
+function assertLosslessVisualInput(
+  table: TableData,
+  format: TableOutputFormat,
+): void {
+  const maximum =
+    format === "pdf"
+      ? 80
+      : format === "png" || format === "jpeg"
+        ? 28
+        : undefined;
+  if (
+    maximum !== undefined &&
+    [...table.headers, ...table.rows.flat()].some(
+      (cell) => [...cell].length > maximum,
+    )
+  ) {
+    throw new TypeError(
+      `${format.toUpperCase()} output requires every cell to be ${maximum} characters or fewer for lossless rendering`,
+    );
+  }
+}
+
 async function verifyOutput(
   format: TableOutputFormat,
   bytes: Uint8Array,
@@ -832,6 +866,7 @@ function createTableProcessor(
     async verifyInput(media) {
       try {
         const table = await parseInputTable(from, media.bytes);
+        assertLosslessVisualInput(table, to);
         if (
           to === "pdf" &&
           [...table.headers, ...table.rows.flat()].some(
