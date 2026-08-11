@@ -19,7 +19,6 @@ test("only structured extension recovery creates a downloader CTA", () => {
     {
       extensionUrl: "https://extension.example/install",
       productName: "Video Helper",
-      reason: "extension_only",
     },
   );
 

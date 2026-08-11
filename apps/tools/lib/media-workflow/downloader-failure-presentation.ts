@@ -4,7 +4,6 @@ import type { WorkflowFailure } from "../tool-workflow/index.ts";
 export type DownloaderExtensionCta = Readonly<{
   extensionUrl: string;
   productName: string;
-  reason: "extension_only";
 }>;
 
 export function getDownloaderExtensionCta(
@@ -19,6 +18,5 @@ export function getDownloaderExtensionCta(
   return {
     extensionUrl: options.extensionUrl ?? DOWNLOADER_EXTENSION_URL,
     productName: options.productName || "Downloader",
-    reason: "extension_only",
   };
 }
