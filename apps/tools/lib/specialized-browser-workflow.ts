@@ -179,12 +179,15 @@ export function createSpecializedRunController(
       if (current(run.revision)) options.observe?.(snapshot);
     },
   });
-  const clear = () => {
+  const invalidateActive = () => {
     revision += 1;
-    if (timer) clearTimeout(timer);
-    timer = undefined;
     active?.abort();
     active = undefined;
+  };
+  const clear = () => {
+    invalidateActive();
+    if (timer) clearTimeout(timer);
+    timer = undefined;
   };
 
   return Object.freeze({
@@ -248,6 +251,7 @@ export function createSpecializedRunController(
       return outcome;
     },
     scheduleInteraction(request, delay = 800) {
+      invalidateActive();
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         timer = undefined;

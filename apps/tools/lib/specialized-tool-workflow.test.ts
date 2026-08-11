@@ -382,6 +382,47 @@ test("scheduled interaction publishes its terminal outcome to the presentation",
   assert.deepEqual(outcomes, ["cancelled"]);
 });
 
+test("scheduling replacement input immediately aborts and suppresses the active interaction", async () => {
+  const outcomes: string[] = [];
+  const signals: AbortSignal[] = [];
+  let finishActive!: () => void;
+  const controller = createSpecializedRunController({
+    async run(request, options) {
+      signals.push(options?.signal ?? new AbortController().signal);
+      await new Promise<void>((resolve) => { finishActive = resolve; });
+      return {
+        status: "succeeded",
+        runId: request.toolId,
+        results: [],
+        telemetry: { start: "not-attempted", terminal: "not-attempted" },
+      };
+    },
+  }, {
+    onOutcome(outcome) {
+      outcomes.push(outcome.status);
+    },
+  });
+
+  const active = controller.runInteraction({
+    toolId: "html-to-markdown",
+    format: "html",
+    mimeType: "text/html",
+    value: "<p>old</p>",
+  });
+  controller.scheduleInteraction({
+    toolId: "html-to-markdown",
+    format: "html",
+    mimeType: "text/html",
+    value: "<p>new</p>",
+  }, 1_000);
+
+  assert.equal(signals[0]!.aborted, true);
+  finishActive();
+  await active;
+  assert.deepEqual(outcomes, []);
+  controller.clear();
+});
+
 test("shared controller projects workflow phases and numeric progress", async () => {
   const snapshots: Array<{ phase: string; progress?: number }> = [];
   const { workflow } = createBrowserSpecializedWorkflow();
