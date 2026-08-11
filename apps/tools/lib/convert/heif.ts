@@ -347,9 +347,11 @@ export async function verifyHeifIdentity(
         signal?.throwIfAborted();
         return true;
       } finally {
-        image?.free?.();
-        handle?.free?.();
-        context.free?.();
+        releaseAll([
+          () => image?.free?.(),
+          () => handle?.free?.(),
+          () => context.free?.(),
+        ]);
       }
     }
     if (typeof g.HeifDecoder === "function") {
@@ -361,7 +363,7 @@ export async function verifyHeifIdentity(
         signal?.throwIfAborted();
         return true;
       } finally {
-        for (const image of images) image.free?.();
+        releaseAll(images.map((image) => () => image.free?.()));
       }
     }
     return false;

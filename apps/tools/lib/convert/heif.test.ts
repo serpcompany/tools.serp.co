@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 import test from "node:test";
 import { runInNewContext } from "node:vm";
 
-import { decodeHeifToRGBA } from "./heif.ts";
+import { decodeHeifToRGBA, verifyHeifIdentity } from "./heif.ts";
 
 const globalHeif = globalThis as typeof globalThis & {
   libheif?: () => unknown;
@@ -303,5 +303,67 @@ test("libheif decoder decoding releases every returned image when display and cl
   } as never;
 
   await assert.rejects(decodeHeifToRGBA(new ArrayBuffer(8)), /display failed/);
+  assert.deepEqual(freed, ["primary", "secondary"]);
+});
+
+test("libheif context identity rejection attempts every release when image cleanup throws", async () => {
+  const freed: string[] = [];
+  globalHeif.HeifContext = class {
+    read() {}
+    getPrimaryImageHandle() {
+      return {
+        decode() {
+          return {
+            get_width: () => 100_000,
+            get_height: () => 100_000,
+            display() {},
+            free() {
+              freed.push("image");
+              throw new Error("image cleanup failed");
+            },
+          };
+        },
+        free() {
+          freed.push("handle");
+        },
+      };
+    }
+    free() {
+      freed.push("context");
+    }
+  } as never;
+
+  assert.equal(await verifyHeifIdentity(new ArrayBuffer(8)), false);
+  assert.deepEqual(freed, ["image", "handle", "context"]);
+});
+
+test("libheif decoder identity rejection attempts every image release when cleanup throws", async () => {
+  const freed: string[] = [];
+  globalHeif.HeifContext = undefined;
+  globalHeif.HeifDecoder = class {
+    decode() {
+      return [
+        {
+          get_width: () => 100_000,
+          get_height: () => 100_000,
+          display() {},
+          free() {
+            freed.push("primary");
+            throw new Error("primary cleanup failed");
+          },
+        },
+        {
+          get_width: () => 1,
+          get_height: () => 1,
+          display() {},
+          free() {
+            freed.push("secondary");
+          },
+        },
+      ];
+    }
+  } as never;
+
+  assert.equal(await verifyHeifIdentity(new ArrayBuffer(8)), false);
   assert.deepEqual(freed, ["primary", "secondary"]);
 });
