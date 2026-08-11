@@ -115,16 +115,27 @@ const verifiedTableEngine = tableEngine;
 
 function parseCsv(bytes: Uint8Array): TableData {
   const text = decoder.decode(bytes);
-  const parsed = Papa.parse<string[]>(text, {
-    skipEmptyLines: true,
+  const data: string[][] = [];
+  const errors: Array<{ code: string; message: string }> = [];
+  let recordStart = 0;
+  Papa.parse<string[]>(text, {
+    skipEmptyLines: false,
+    step(result) {
+      const rawRecord = text.slice(recordStart, result.meta.cursor);
+      recordStart = result.meta.cursor;
+      errors.push(...result.errors);
+      if (rawRecord.replace(/(?:\r\n|\r|\n)$/, "").trim()) {
+        data.push(result.data);
+      }
+    },
   });
-  const fatalErrors = parsed.errors.filter(
+  const fatalErrors = errors.filter(
     (error) => error.code !== "UndetectableDelimiter",
   );
   if (fatalErrors.length > 0) {
     throw new TypeError(fatalErrors[0]?.message ?? "CSV parse failed");
   }
-  const [rawHeaders, ...rawRows] = parsed.data;
+  const [rawHeaders, ...rawRows] = data;
   if (!rawHeaders || rawHeaders.length === 0) {
     throw new TypeError("CSV requires a header row");
   }
@@ -287,7 +298,36 @@ function parseSql(bytes: Uint8Array): TableData {
   let tuple: string[] | undefined;
   let cell = "";
   let quoted = false;
+  let quotedCell = false;
+  let quoteClosed = false;
   let expectsTuple = true;
+  const finishCell = () => {
+    if (!tuple) throw new TypeError("SQL VALUES cell is outside a tuple");
+    if (quotedCell) {
+      if (!quoteClosed) {
+        throw new TypeError("SQL quoted literal has invalid trailing tokens");
+      }
+      tuple.push(cell);
+    } else {
+      const literal = cell.trim();
+      if (/^null$/i.test(literal)) {
+        tuple.push("");
+      } else if (/^(?:true|false)$/i.test(literal)) {
+        tuple.push(literal.toLowerCase());
+      } else if (
+        /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(literal)
+      ) {
+        tuple.push(literal);
+      } else {
+        throw new TypeError(
+          "SQL VALUES cells must be quoted strings, NULL, booleans, or decimal numbers",
+        );
+      }
+    }
+    cell = "";
+    quotedCell = false;
+    quoteClosed = false;
+  };
   for (let index = 0; index < values.length; index += 1) {
     const character = values[index];
     if (quoted) {
@@ -296,22 +336,29 @@ function parseSql(bytes: Uint8Array): TableData {
         index += 1;
       } else if (character === "'") {
         quoted = false;
+        quoteClosed = true;
       } else {
         cell += character;
       }
       continue;
     }
     if (character === "'" && tuple) {
+      if (cell.trim() || quotedCell || quoteClosed) {
+        throw new TypeError(
+          "SQL quoted literal must start at the cell boundary",
+        );
+      }
+      cell = "";
+      quotedCell = true;
       quoted = true;
     } else if (character === "(" && expectsTuple) {
       tuple = [];
       cell = "";
       expectsTuple = false;
     } else if (character === "," && tuple) {
-      tuple.push(cell.trim().toLowerCase() === "null" ? "" : cell.trim());
-      cell = "";
+      finishCell();
     } else if (character === ")" && tuple) {
-      tuple.push(cell.trim().toLowerCase() === "null" ? "" : cell.trim());
+      finishCell();
       rows.push(tuple);
       tuple = undefined;
       cell = "";
@@ -325,7 +372,10 @@ function parseSql(bytes: Uint8Array): TableData {
     } else if (!tuple && /^\s$/.test(character ?? "")) {
       continue;
     } else if (tuple) {
-      cell += character;
+      if (quoteClosed && !/^\s$/.test(character ?? "")) {
+        throw new TypeError("SQL quoted literal has invalid trailing tokens");
+      }
+      if (!quoteClosed) cell += character;
     } else {
       throw new TypeError("SQL input requires exactly one INSERT statement");
     }
@@ -648,10 +698,15 @@ async function serializeTable(
   switch (format) {
     case "csv":
       return encoder.encode(
-        Papa.unparse({
-          fields: [...table.headers],
-          data: table.rows.map((row) => [...row]),
-        }),
+        Papa.unparse(
+          {
+            fields: [...table.headers],
+            data: table.rows.map((row) => [...row]),
+          },
+          {
+            quotes: (value) => table.headers.length === 1 && value === "",
+          },
+        ),
       );
     case "excel":
       return serializeExcel(table);

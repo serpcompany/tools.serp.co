@@ -290,6 +290,68 @@ test("single-column CSV and singleton XML cells round-trip without widening sche
   assert.equal(decoder.decode(reparsed.deliveries[0]?.bytes), "name\r\nAda");
 });
 
+test("CSV preserves explicit empty records while ignoring blank physical lines", async () => {
+  const singleColumn = createRecordingWorkflow();
+  const singleOutcome = await singleColumn.workflow.run({
+    toolId: "csv-to-json",
+    input: {
+      kind: "file",
+      media: {
+        name: "names.csv",
+        format: "csv",
+        mimeType: "text/csv",
+        bytes: encoder.encode('name\r\nAda\r\n\r\n""\r\nGrace\r\n'),
+      },
+    },
+  });
+  assert.equal(singleOutcome.status, "succeeded");
+  assert.deepEqual(
+    JSON.parse(decoder.decode(singleColumn.deliveries[0]?.bytes)),
+    [{ name: "Ada" }, { name: "" }, { name: "Grace" }],
+  );
+
+  const multiColumn = createRecordingWorkflow();
+  const multiOutcome = await multiColumn.workflow.run({
+    toolId: "csv-to-json",
+    input: {
+      kind: "file",
+      media: {
+        name: "people.csv",
+        format: "csv",
+        mimeType: "text/csv",
+        bytes: encoder.encode("name,note\nAda,engine\n\n,\nGrace,compiler\n"),
+      },
+    },
+  });
+  assert.equal(multiOutcome.status, "succeeded");
+  const records = JSON.parse(decoder.decode(multiColumn.deliveries[0]?.bytes));
+  assert.equal(records.length, 3);
+  assert.deepEqual(records[1], { name: "", note: "" });
+
+  const serialized = await serializeTableInputText("csv", {
+    headers: ["name"],
+    rows: [["Ada"], [""], ["Grace"]],
+  });
+  assert.deepEqual(await parseTableInput("csv", encoder.encode(serialized)), {
+    headers: ["name"],
+    rows: [["Ada"], [""], ["Grace"]],
+  });
+  assert.deepEqual(
+    await parseTableInput("csv", encoder.encode('name\rAda\r\r""\rGrace\r')),
+    {
+      headers: ["name"],
+      rows: [["Ada"], [""], ["Grace"]],
+    },
+  );
+  assert.deepEqual(
+    await parseTableInput("csv", encoder.encode('name\nfoo"bar\n\nbaz\n')),
+    {
+      headers: ["name"],
+      rows: [['foo"bar'], ["baz"]],
+    },
+  );
+});
+
 test("Excel upload claims only the OOXML workbook format the processor accepts", () => {
   assert.equal(
     detectFormatFromFile({
@@ -492,6 +554,88 @@ test("SQL and MySQL reject tokens before or after the single INSERT statement", 
         assert.equal(outcome.telemetry.start, "not-attempted");
       }
       assert.equal(deliveries.length, 0);
+    }
+  }
+});
+
+test("SQL and MySQL accept only bounded literal VALUES without changing their table meaning", async () => {
+  const validStatement =
+    "INSERT INTO people (text, empty, truthy, falsy, integer, decimal, exponent) " +
+    "VALUES ('O''Reilly', NULL, TRUE, false, -42, +3.50, 6.02e23);";
+
+  for (const toolId of ["sql-to-json", "mysql-to-json"]) {
+    const format = toolId.startsWith("mysql") ? "mysql" : "sql";
+    const { deliveries, workflow } = createRecordingWorkflow();
+    const outcome = await workflow.run({
+      toolId,
+      input: {
+        kind: "file",
+        media: {
+          name: `literals.${format}`,
+          format,
+          mimeType: "application/sql",
+          bytes: encoder.encode(validStatement),
+        },
+      },
+    });
+
+    assert.equal(outcome.status, "succeeded", toolId);
+    assert.deepEqual(JSON.parse(decoder.decode(deliveries[0]?.bytes)), [
+      {
+        text: "O'Reilly",
+        empty: "",
+        truthy: "true",
+        falsy: "false",
+        integer: "-42",
+        decimal: "+3.50",
+        exponent: "6.02e23",
+      },
+    ]);
+  }
+});
+
+test("SQL and MySQL reject non-literal VALUES before telemetry or delivery", async () => {
+  const invalidValues = [
+    "1 + 2",
+    "DEFAULT",
+    "CURRENT_TIMESTAMP",
+    "-- comment\n7",
+    "/* comment */ 7",
+    "1e",
+    "+",
+    ".",
+    "0x10",
+    "'closed' suffix",
+  ];
+
+  for (const toolId of ["sql-to-json", "mysql-to-json"]) {
+    const format = toolId.startsWith("mysql") ? "mysql" : "sql";
+    for (const value of invalidValues) {
+      const { deliveries, workflow } = createRecordingWorkflow();
+      const outcome = await workflow.run({
+        toolId,
+        input: {
+          kind: "file",
+          media: {
+            name: `invalid.${format}`,
+            format,
+            mimeType: "application/sql",
+            bytes: encoder.encode(
+              `INSERT INTO people (value) VALUES (${value});`,
+            ),
+          },
+        },
+      });
+
+      assert.equal(outcome.status, "failed", `${toolId}: ${value}`);
+      if (outcome.status === "failed") {
+        assert.equal(outcome.error.code, "invalid-request", value);
+        assert.deepEqual(outcome.telemetry, {
+          start: "not-attempted",
+          terminal: "not-attempted",
+        });
+      }
+      assert.equal(deliveries.length, 0, `${toolId}: ${value}`);
     }
   }
 });
@@ -866,6 +1010,20 @@ test("table presentation delegates execution, terminal telemetry, and delivery p
   assert.match(browserAdapter, /finishSuccess/);
   assert.match(browserAdapter, /finishFailure/);
   assert.match(browserAdapter, /URL\.createObjectURL/);
+});
+
+test("table landing copy describes the explicit verified Convert action", () => {
+  const landing = readFileSync(
+    new URL(
+      "../components/table-convert/TableConvertLanding.tsx",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+
+  assert.doesNotMatch(landing, /auto-convert/i);
+  assert.match(landing, /Select Convert after each edit/);
+  assert.match(landing, /Select Convert whenever you edit the table/);
 });
 
 test("browser delivery ownership retains only the latest result and supports explicit release", async () => {

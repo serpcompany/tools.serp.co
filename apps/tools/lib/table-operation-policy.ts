@@ -63,14 +63,14 @@ export const tableInputContracts = Object.freeze({
     mimeTypes: Object.freeze(["application/sql"]),
     parser: repository(
       "bounded INSERT parser",
-      "Executing arbitrary SQL in-browser is unsafe; the contract accepts one INSERT column list plus literal VALUES tuples and rejects every other statement shape.",
+      "Executing arbitrary SQL in-browser is unsafe; the contract accepts one INSERT column list whose VALUES cells are doubled-quote string literals, NULL, booleans, or signed decimal numbers, and rejects every other statement shape.",
     ),
   }),
   sql: Object.freeze({
     mimeTypes: Object.freeze(["application/sql"]),
     parser: repository(
       "bounded INSERT parser",
-      "Executing arbitrary SQL in-browser is unsafe; the contract accepts one INSERT column list plus literal VALUES tuples and rejects every other statement shape.",
+      "Executing arbitrary SQL in-browser is unsafe; the contract accepts one INSERT column list whose VALUES cells are doubled-quote string literals, NULL, booleans, or signed decimal numbers, and rejects every other statement shape.",
     ),
   }),
   xml: Object.freeze({
