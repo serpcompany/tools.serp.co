@@ -217,6 +217,13 @@ export type ProcessorOptions<Options> =
   | { ok: true; value: Options }
   | { ok: false; message: string };
 
+function freezeProcessorOptions<Options>(options: Options): Options {
+  return options !== null &&
+    (typeof options === "object" || typeof options === "function")
+    ? Object.freeze(options)
+    : options;
+}
+
 export type ToolProcessor<Options = unknown> = {
   engine: ExecutionEngine;
   support: ToolSupport;
@@ -227,6 +234,7 @@ export type ToolProcessor<Options = unknown> = {
   verifyInput(
     input: WorkflowMedia,
     context: WorkflowStageContext,
+    options: Options,
   ): Promise<SemanticVerification>;
   process(
     input: WorkflowMedia,
@@ -236,6 +244,7 @@ export type ToolProcessor<Options = unknown> = {
   verifyResult(
     result: WorkflowMedia,
     context: WorkflowStageContext,
+    options: Options,
   ): Promise<SemanticVerification>;
 };
 
@@ -393,6 +402,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
       if (!parsedOptions.ok) {
         return fail("invalid-request", parsedOptions.message);
       }
+      const processorOptions = freezeProcessorOptions(parsedOptions.value);
 
       let stage: "acquiring" | "processing" | "validating" | "delivering" =
         "acquiring";
@@ -494,7 +504,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
             bytes: input.bytes.byteLength,
           },
           requestedOperation: intent.requestedOperation,
-          options: parsedOptions.value,
+          options: processorOptions,
           outputs: intent.outputs,
         });
         if (!supportDecision.supported) {
@@ -506,6 +516,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         const inputVerification = await processor.verifyInput(
           input,
           acquisitionContext,
+          processorOptions,
         );
         if (inputVerification.status !== "verified") {
           return fail("invalid-request", inputVerification.message);
@@ -519,7 +530,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         emitSnapshot({ phase: "processing" });
         const results = await processor.process(
           input,
-          parsedOptions.value,
+          processorOptions,
           context("processing", 0.25, 0.45),
         );
         signal.throwIfAborted();
@@ -571,6 +582,7 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
           const verification = await processor.verifyResult(
             result,
             context("validating", 0.7, 0.15),
+            processorOptions,
           );
           if (verification.status !== "verified") {
             throw new Error(verification.message);

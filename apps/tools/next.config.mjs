@@ -148,10 +148,19 @@ const nextConfig = {
       { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
     ];
 
-    return ffmpegRoutes.map((route) => ({
-      source: nestedRoutePattern(route),
-      headers: isolationHeaders,
-    }));
+    return [
+      ...ffmpegRoutes.map((route) => ({
+        source: nestedRoutePattern(route),
+        headers: isolationHeaders,
+      })),
+      {
+        source: "/_next/static/chunks/:path*",
+        headers: [
+          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+        ],
+      },
+    ];
   },
   async rewrites() {
     return [

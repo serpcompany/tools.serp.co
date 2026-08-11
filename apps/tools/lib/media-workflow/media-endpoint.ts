@@ -99,15 +99,21 @@ export type MediaTransferProgress = Readonly<{
 
 /**
  * Browser downloads must materialize verified bytes before delivery, and Blob
- * construction snapshots those bytes. Capping the transfer at 32 MiB keeps
- * both the final acquisition-buffer + Blob handoff (32 + 32 MiB) and the
- * largest indeterminate growth transition (16 + 32 MiB) within 64 MiB.
+ * construction snapshots those bytes. The 32 MiB transfer cap yields a 64 MiB
+ * delivery handoff (owned bytes + Blob snapshot). During unknown-length
+ * acquisition, a conservative bound also includes the previous 16 MiB growth
+ * owner, its 32 MiB replacement, and the still-live incoming chunk (up to
+ * 32 MiB), for an 80 MiB lifecycle peak. Declared streams cannot grow beyond
+ * their advertised length.
  */
 export const BROWSER_MEDIA_MEMORY_BUDGET = Object.freeze({
-  blobSnapshotBytes: 32 * 1_024 * 1_024,
+  maxBlobSnapshotBytes: 32 * 1_024 * 1_024,
+  maxDeliveryPeakBytes: 64 * 1_024 * 1_024,
+  maxGrowthOwnerBytes: 16 * 1_024 * 1_024,
+  maxIncomingChunkBytes: 32 * 1_024 * 1_024,
+  maxLifecyclePeakBytes: 80 * 1_024 * 1_024,
+  maxReplacementBytes: 32 * 1_024 * 1_024,
   maxTransferBytes: 32 * 1_024 * 1_024,
-  peakBytes: 64 * 1_024 * 1_024,
-  unknownGrowthTransitionBytes: 48 * 1_024 * 1_024,
 });
 
 type AcquisitionContext = {
@@ -295,6 +301,12 @@ export function createStreamedMediaAcquisition(options: {
           throw new Error(`Input exceeds ${maxTransferBytes} bytes`);
         }
         const requiredBytes = receivedBytes + chunk.byteLength;
+        if (declaredLength !== undefined && requiredBytes > declaredLength) {
+          await reader.cancel("Media stream exceeded declared length");
+          throw new Error(
+            `Media stream exceeded its declared ${declaredLength} bytes`,
+          );
+        }
         if (!ownedBuffer || requiredBytes > ownedBuffer.byteLength) {
           // Unknown-length bodies grow geometrically from a small allocation.
           // Only the current owned prefix and its replacement coexist during

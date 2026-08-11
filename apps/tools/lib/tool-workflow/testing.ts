@@ -61,9 +61,11 @@ type ProcessorScript = {
   validators?: {
     input?(
       media: WorkflowMedia,
+      options: unknown,
     ): SemanticVerification | Promise<SemanticVerification>;
     output?(
       media: WorkflowMedia,
+      options: unknown,
     ): SemanticVerification | Promise<SemanticVerification>;
   };
   result: WorkflowMedia | WorkflowMedia[];
@@ -194,9 +196,13 @@ export function createToolWorkflowTestHarness(options: {
           decideSupport(request): ProcessorSupportDecision {
             return script.decideSupport?.(request) ?? { supported: true };
           },
-          async verifyInput(input, context): Promise<SemanticVerification> {
+          async verifyInput(
+            input,
+            context,
+            processorOptions,
+          ): Promise<SemanticVerification> {
             return (
-              (await script.validators?.input?.(input)) ??
+              (await script.validators?.input?.(input, processorOptions)) ??
               verifyMedia(
                 input,
                 options.semanticDecoders === "production"
@@ -256,13 +262,17 @@ export function createToolWorkflowTestHarness(options: {
             }
             return results;
           },
-          async verifyResult(result, context): Promise<SemanticVerification> {
+          async verifyResult(
+            result,
+            context,
+            processorOptions,
+          ): Promise<SemanticVerification> {
             for (const resource of options.resources?.validating ?? []) {
               await context.openResource(resource);
             }
             context.signal.throwIfAborted();
             return (
-              (await script.validators?.output?.(result)) ??
+              (await script.validators?.output?.(result, processorOptions)) ??
               verifyMedia(
                 result,
                 options.semanticDecoders === "production"

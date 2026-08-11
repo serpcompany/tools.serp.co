@@ -2381,6 +2381,91 @@ test("typed options and engine support policy stay behind the run seam", async (
   ]);
 });
 
+test("one immutable parsed-options value reaches both validators for each run", async () => {
+  const observed: Array<{
+    stage: "input" | "result";
+    options: { quality: number };
+  }> = [];
+  const processor = defineScriptedProcessor<{ quality: number }>({
+    engineId: "browser-raster-worker",
+    support: {
+      acquisition: "file",
+      inputFormats: ["png"],
+      outputFormats: ["jpg"],
+    },
+    parseOptions(value) {
+      return {
+        ok: true,
+        value: { quality: (value as { quality: number }).quality },
+      };
+    },
+    validators: {
+      input(_media, options) {
+        observed.push({
+          stage: "input",
+          options: options as { quality: number },
+        });
+        return { status: "verified" };
+      },
+      output(_media, options) {
+        observed.push({
+          stage: "result",
+          options: options as { quality: number },
+        });
+        return { status: "verified" };
+      },
+    },
+    result: {
+      name: "photo.jpg",
+      format: "jpg",
+      mimeType: "image/jpeg",
+      bytes: JPEG_BYTES,
+    },
+  });
+  const harness = createToolWorkflowTestHarness({
+    processors: { "png-to-jpg": processor },
+  });
+  const input = {
+    kind: "file" as const,
+    media: {
+      name: "photo.png",
+      format: "png",
+      mimeType: "image/png",
+      bytes: PNG_BYTES,
+    },
+  };
+
+  const first = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input,
+    options: { quality: 27 },
+  });
+  const second = await harness.workflow.run({
+    toolId: "png-to-jpg",
+    input,
+    options: { quality: 82 },
+  });
+
+  assert.equal(first.status, "succeeded");
+  assert.equal(second.status, "succeeded");
+  assert.deepEqual(
+    observed.map(({ stage, options }) => ({
+      stage,
+      quality: options.quality,
+      frozen: Object.isFrozen(options),
+    })),
+    [
+      { stage: "input", quality: 27, frozen: true },
+      { stage: "result", quality: 27, frozen: true },
+      { stage: "input", quality: 82, frozen: true },
+      { stage: "result", quality: 82, frozen: true },
+    ],
+  );
+  assert.equal(observed[0]?.options, observed[1]?.options);
+  assert.notEqual(observed[0]?.options, observed[2]?.options);
+  assert.equal(observed[2]?.options, observed[3]?.options);
+});
+
 test("scripted processors use canonical execution provenance records", async () => {
   const harness = createToolWorkflowTestHarness({
     media: {

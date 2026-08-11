@@ -120,16 +120,22 @@ export function createDownloaderProcessor(
       decideSupport() {
         return { supported: true };
       },
-      verifyInput(media) {
-        return verifyMediaIdentity(media, "any");
+      verifyInput(media, _context, options) {
+        return verifyMediaIdentity(
+          media,
+          options.mode === "audio" ? "audio" : "any",
+        );
       },
       async process(input, _options, context) {
         context.signal.throwIfAborted();
         context.reportProgress(1);
         return [input];
       },
-      verifyResult(media) {
-        return verifyMediaIdentity(media, "any");
+      verifyResult(media, _context, options) {
+        return verifyMediaIdentity(
+          media,
+          options.mode === "audio" ? "audio" : "any",
+        );
       },
     },
   };

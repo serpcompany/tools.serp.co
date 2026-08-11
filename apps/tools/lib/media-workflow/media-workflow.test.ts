@@ -65,14 +65,17 @@ test("presentation progress never moves backward when a phase omits or lowers pr
   assert.equal(progress.project(25), 100);
 });
 
-test("browser acquisition and Blob snapshot stay within the explicit 64 MiB peak budget", async (t) => {
+test("browser acquisition accounts for the live stream chunk in its 80 MiB lifecycle peak", async (t) => {
   const cap = BROWSER_MEDIA_MEMORY_BUDGET.maxTransferBytes;
 
   assert.deepEqual(BROWSER_MEDIA_MEMORY_BUDGET, {
-    blobSnapshotBytes: 32 * 1_024 * 1_024,
+    maxBlobSnapshotBytes: 32 * 1_024 * 1_024,
+    maxDeliveryPeakBytes: 64 * 1_024 * 1_024,
+    maxGrowthOwnerBytes: 16 * 1_024 * 1_024,
+    maxIncomingChunkBytes: 32 * 1_024 * 1_024,
+    maxLifecyclePeakBytes: 80 * 1_024 * 1_024,
+    maxReplacementBytes: 32 * 1_024 * 1_024,
     maxTransferBytes: 32 * 1_024 * 1_024,
-    peakBytes: 64 * 1_024 * 1_024,
-    unknownGrowthTransitionBytes: 48 * 1_024 * 1_024,
   });
 
   for (const contentLength of [cap, undefined]) {
@@ -155,8 +158,9 @@ test("browser acquisition and Blob snapshot stay within the explicit 64 MiB peak
             cap * 1.5,
           );
         }
-        assert.ok(
-          Math.max(cap * 2, cap * 1.5) <= BROWSER_MEDIA_MEMORY_BUDGET.peakBytes,
+        assert.equal(
+          16 * 1_024 * 1_024 + 32 * 1_024 * 1_024 + 32 * 1_024 * 1_024,
+          BROWSER_MEDIA_MEMORY_BUDGET.maxLifecyclePeakBytes,
         );
         assert.equal(media.bytes.buffer, allocations.at(-1)?.buffer);
         assert.equal(media.bytes.byteLength, cap);
@@ -698,6 +702,34 @@ test("declared media length must match stream EOF before processing or delivery"
     assert.equal(outcome.status, "succeeded");
     assert.equal(harness.deliveries[0]?.format, "txt");
   });
+
+  await t.test("stream exceeds declared length", async () => {
+    const url = "https://media.example/underdeclared.webm";
+    const harness = createMediaWorkflowTestHarness({
+      media: {
+        [url]: {
+          name: "underdeclared.webm",
+          extension: "webm",
+          mimeType: "video/webm",
+          totalBytes: SAMPLE_WEBM_BYTES.byteLength - 1,
+          chunks: [SAMPLE_WEBM_BYTES],
+        },
+      },
+    });
+
+    const outcome = await harness.workflow.run({
+      toolId: "video-downloader",
+      input: { kind: "url", url },
+    });
+
+    assert.equal(outcome.status, "failed");
+    assert.equal(outcome.error.code, "acquisition-failed");
+    assert.deepEqual(harness.transfers, []);
+    assert.deepEqual(harness.endpoint.streams, [
+      { chunksRead: 1, cancelled: true, readerLockReleased: true },
+    ]);
+    assert.deepEqual(harness.deliveries, []);
+  });
 });
 
 test("browser transfer cap rejects declared and streamed excess during acquisition", async (t) => {
@@ -1087,6 +1119,34 @@ test("video-only WebM downloads but cannot enter transcription processing", asyn
   assert.equal(transcription.transcriptionRecords.cleanupReleased, false);
   assert.deepEqual(transcription.deliveries, []);
   assert.deepEqual(transcription.telemetry, [
+    { kind: "start" },
+    { kind: "terminal", status: "failed" },
+  ]);
+});
+
+test("an audio-mode downloader rejects video-only media before delivery", async () => {
+  const url = "https://media.example/video-only-audio-download.webm";
+  const harness = createMediaWorkflowTestHarness({
+    media: {
+      [url]: {
+        name: "video-only.webm",
+        extension: "webm",
+        mimeType: "video/webm",
+        chunks: [SAMPLE_VIDEO_ONLY_WEBM_BYTES],
+      },
+    },
+  });
+
+  const outcome = await harness.workflow.run({
+    toolId: "video-downloader",
+    input: { kind: "url", url },
+    options: { mode: "audio" },
+  });
+
+  assert.equal(outcome.status, "failed");
+  assert.equal(outcome.error.code, "invalid-request");
+  assert.deepEqual(harness.deliveries, []);
+  assert.deepEqual(harness.telemetry, [
     { kind: "start" },
     { kind: "terminal", status: "failed" },
   ]);
