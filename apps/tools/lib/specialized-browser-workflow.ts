@@ -173,6 +173,12 @@ export function createSpecializedRunController(
     return { revision, controller: active };
   };
   const current = (runRevision: number) => runRevision === revision;
+  const workflowOptions = (run: ReturnType<typeof begin>) => ({
+    signal: run.controller.signal,
+    observe(snapshot: WorkflowSnapshot) {
+      if (current(run.revision)) options.observe?.(snapshot);
+    },
+  });
   const clear = () => {
     revision += 1;
     if (timer) clearTimeout(timer);
@@ -197,7 +203,7 @@ export function createSpecializedRunController(
             bytes: new TextEncoder().encode(request.value).byteLength,
           },
         },
-      }, { signal: run.controller.signal, observe: options.observe });
+      }, workflowOptions(run));
       if (!current(run.revision)) return undefined;
       options.onOutcome?.(outcome);
       return outcome;
@@ -213,7 +219,7 @@ export function createSpecializedRunController(
           kind: "file",
           media: { name: file.name, format, mimeType: mediaMimeType(file, format), bytes },
         },
-      }, { signal: run.controller.signal, observe: options.observe });
+      }, workflowOptions(run));
       if (!current(run.revision)) return undefined;
       options.onOutcome?.(outcome);
       return outcome;
@@ -236,7 +242,7 @@ export function createSpecializedRunController(
             };
           }),
         },
-      }, { signal: run.controller.signal, observe: options.observe });
+      }, workflowOptions(run));
       if (!current(run.revision)) return undefined;
       options.onOutcome?.(outcome);
       return outcome;

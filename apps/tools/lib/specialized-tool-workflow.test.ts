@@ -413,6 +413,39 @@ test("shared controller projects workflow phases and numeric progress", async ()
   }
 });
 
+test("cleared controller suppresses stale workflow observations", async () => {
+  const snapshots: string[] = [];
+  let resolveRun!: () => void;
+  const controller = createSpecializedRunController({
+    async run(request, options) {
+      options?.observe?.({ phase: "acquiring" });
+      await new Promise<void>((resolve) => { resolveRun = resolve; });
+      options?.observe?.({ phase: "cancelled" });
+      return {
+        status: "cancelled",
+        runId: request.toolId,
+        telemetry: { start: "not-attempted", terminal: "not-attempted" },
+      };
+    },
+  }, {
+    observe(snapshot) {
+      snapshots.push(snapshot.phase);
+    },
+  });
+
+  const pending = controller.runInteraction({
+    toolId: "character-counter",
+    format: "text",
+    mimeType: "text/plain",
+    value: "stale",
+  });
+  controller.clear();
+  resolveRun();
+  await pending;
+
+  assert.deepEqual(snapshots, ["acquiring"]);
+});
+
 test("browser controller canonicalizes empty CSV and PDF file MIME types", async () => {
   const { workflow } = createBrowserSpecializedWorkflow();
   const controller = createSpecializedRunController(workflow);
