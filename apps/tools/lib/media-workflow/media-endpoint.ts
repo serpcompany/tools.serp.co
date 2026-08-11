@@ -284,6 +284,15 @@ export function createStreamedMediaAcquisition(options: {
         context.signal.throwIfAborted();
       }
 
+      if (
+        response.contentLength !== undefined &&
+        receivedBytes !== response.contentLength
+      ) {
+        throw new Error(
+          `Media stream ended at ${receivedBytes} bytes; expected ${response.contentLength}`,
+        );
+      }
+
       const bytes = new Uint8Array(receivedBytes);
       let offset = 0;
       for (const chunk of chunks) {

@@ -282,3 +282,23 @@ test('processor availability stays distinct from inferred provenance and joins b
   assert.equal('isActive' in getToolProcessorAvailability('png-to-jpg'), false);
   assert.equal('status' in getToolProcessorAvailability('png-to-jpg'), false);
 });
+
+test('every active server-media-fetch downloader is wired to the streamed workflow', () => {
+  const eligibleDownloaders = toolCatalog.activeTools.filter((tool) => {
+    const provenance = getToolExecutionProvenance(tool.id);
+    return (
+      provenance.kind === 'mapped' &&
+      provenance.engineIds.length === 1 &&
+      provenance.engineIds[0] === 'server-media-fetch'
+    );
+  });
+
+  assert.equal(eligibleDownloaders.length, 292);
+  for (const tool of eligibleDownloaders) {
+    assert.deepEqual(getToolProcessorAvailability(tool.id), {
+      kind: 'wired',
+      toolId: tool.id,
+      adapterId: 'streamed-media-workflow',
+    });
+  }
+});

@@ -21,6 +21,14 @@ const SAMPLE_WEBM_BYTES = new Uint8Array(
     new URL("../../benchmarks/fixtures/sample.webm", import.meta.url),
   ),
 );
+const SAMPLE_VIDEO_ONLY_WEBM_BYTES = new Uint8Array(
+  readFileSync(
+    new URL(
+      "../../benchmarks/fixtures/sample-video-only.webm",
+      import.meta.url,
+    ),
+  ),
+);
 
 test("presentation callers delegate stream lifecycle and terminal ownership", () => {
   for (const relativePath of [
@@ -57,6 +65,33 @@ test("scoped downloader and transcription Tool ids register the media workflow a
       kind: "wired",
       toolId,
       adapterId: "streamed-media-workflow",
+    });
+  }
+});
+
+test("known-unreliable downloader attempts fail inside workflow accounting without endpoint access", async (t) => {
+  for (const toolId of [
+    "download-ashemaletube-videos",
+    "download-beeg-videos",
+    "download-boyfriendtv-videos",
+    "download-eporner-videos",
+    "download-xhamster-videos",
+  ]) {
+    await t.test(toolId, async () => {
+      const harness = createMediaWorkflowTestHarness({});
+      const outcome = await harness.workflow.run({
+        toolId,
+        input: { kind: "url", url: "https://source.invalid/video" },
+      });
+
+      assert.equal(outcome.status, "failed");
+      assert.equal(outcome.error.code, "acquisition-failed");
+      assert.deepEqual(harness.endpoint.requests, []);
+      assert.deepEqual(harness.deliveries, []);
+      assert.deepEqual(harness.telemetry, [
+        { kind: "start" },
+        { kind: "terminal", status: "failed" },
+      ]);
     });
   }
 });
@@ -152,6 +187,141 @@ test("downloader URL streams cross workflow.run and preserve verified media", as
       etaSeconds: 0,
     },
   ]);
+});
+
+test("declared media length must match stream EOF before processing or delivery", async (t) => {
+  for (const media of [
+    {
+      bytes: SAMPLE_MP3_BYTES,
+      format: "mp3",
+      mimeType: "audio/mpeg",
+      toolId: "mp3-to-transcript",
+    },
+    {
+      bytes: SAMPLE_WEBM_BYTES,
+      format: "webm",
+      mimeType: "video/webm",
+      toolId: "video-downloader",
+    },
+  ]) {
+    await t.test(media.format, async () => {
+      const url = `https://media.example/truncated.${media.format}`;
+      const harness = createMediaWorkflowTestHarness({
+        media: {
+          [url]: {
+            name: `truncated.${media.format}`,
+            extension: media.format,
+            mimeType: media.mimeType,
+            totalBytes: media.bytes.byteLength,
+            chunks: [media.bytes.subarray(0, Math.floor(media.bytes.byteLength * 0.75))],
+          },
+        },
+      });
+
+      const outcome = await harness.workflow.run({
+        toolId: media.toolId,
+        input: { kind: "url", url },
+      });
+
+      assert.equal(outcome.status, "failed");
+      assert.equal(outcome.error.code, "acquisition-failed");
+      assert.deepEqual(harness.deliveries, []);
+      assert.deepEqual(harness.endpoint.streams, [
+        { chunksRead: 1, cancelled: false, readerLockReleased: true },
+      ]);
+      assert.deepEqual(harness.telemetry, [
+        { kind: "start" },
+        { kind: "terminal", status: "failed" },
+      ]);
+    });
+  }
+
+  await t.test("omitted length", async () => {
+    const url = "https://media.example/chunked.mp3";
+    const harness = createMediaWorkflowTestHarness({
+      media: {
+        [url]: {
+          name: "chunked.mp3",
+          extension: "mp3",
+          mimeType: "audio/mpeg",
+          chunks: [SAMPLE_MP3_BYTES.subarray(0, 2_000), SAMPLE_MP3_BYTES.subarray(2_000)],
+        },
+      },
+    });
+
+    const outcome = await harness.workflow.run({
+      toolId: "mp3-to-transcript",
+      input: { kind: "url", url },
+    });
+
+    assert.equal(outcome.status, "succeeded");
+    assert.equal(harness.deliveries[0]?.format, "txt");
+  });
+});
+
+test("trusted media parser budget rejects declared and streamed excess during acquisition", async (t) => {
+  const parserLimit = 64 * 1_024 * 1_024;
+
+  await t.test("declared excess", async () => {
+    const url = "https://media.example/declared-too-large.mp4";
+    const harness = createMediaWorkflowTestHarness({
+      media: {
+        [url]: {
+          name: "declared-too-large.mp4",
+          extension: "mp4",
+          mimeType: "video/mp4",
+          totalBytes: parserLimit + 1,
+          chunks: [new Uint8Array([0])],
+        },
+      },
+    });
+
+    const outcome = await harness.workflow.run({
+      toolId: "video-downloader",
+      input: { kind: "url", url },
+    });
+
+    assert.equal(outcome.status, "failed");
+    assert.equal(outcome.error.code, "acquisition-failed");
+    assert.deepEqual(harness.transfers, []);
+    assert.deepEqual(harness.deliveries, []);
+    assert.deepEqual(harness.endpoint.streams, [
+      { chunksRead: 0, cancelled: true, readerLockReleased: true },
+    ]);
+  });
+
+  await t.test("streamed excess", async () => {
+    const url = "https://media.example/streamed-too-large.mp4";
+    const halfLimit = new Uint8Array(parserLimit / 2);
+    const harness = createMediaWorkflowTestHarness({
+      media: {
+        [url]: {
+          name: "streamed-too-large.mp4",
+          extension: "mp4",
+          mimeType: "video/mp4",
+          chunks: [
+            halfLimit,
+            halfLimit,
+            new Uint8Array([1]),
+            new Uint8Array([2]),
+          ],
+        },
+      },
+    });
+
+    const outcome = await harness.workflow.run({
+      toolId: "video-downloader",
+      input: { kind: "url", url },
+    });
+
+    assert.equal(outcome.status, "failed");
+    assert.equal(outcome.error.code, "acquisition-failed");
+    assert.equal(harness.transfers.length, 2);
+    assert.deepEqual(harness.deliveries, []);
+    assert.deepEqual(harness.endpoint.streams, [
+      { chunksRead: 3, cancelled: true, readerLockReleased: true },
+    ]);
+  });
 });
 
 test("cancelling from the delivering snapshot prevents every delivery side effect", async () => {
@@ -430,6 +600,57 @@ test("a real WebM reaches scoped transcription while a truncated EBML lookalike 
   ]);
 });
 
+test("video-only WebM downloads but cannot enter transcription processing", async () => {
+  for (const [index, mimeType] of [
+    "video/webm",
+    "application/octet-stream",
+  ].entries()) {
+    const downloadUrl = `https://media.example/video-only-${index}.webm`;
+    const downloader = createMediaWorkflowTestHarness({
+      media: {
+        [downloadUrl]: {
+          name: "video-only.webm",
+          extension: "webm",
+          mimeType,
+          chunks: [SAMPLE_VIDEO_ONLY_WEBM_BYTES],
+        },
+      },
+    });
+    const download = await downloader.workflow.run({
+      toolId: "video-downloader",
+      input: { kind: "url", url: downloadUrl },
+    });
+
+    assert.equal(download.status, "succeeded", mimeType);
+    assert.equal(downloader.deliveries[0]?.format, "webm", mimeType);
+  }
+
+  const transcriptUrl = "https://media.example/video-only-transcript.webm";
+  const transcription = createMediaWorkflowTestHarness({
+    media: {
+      [transcriptUrl]: {
+        name: "video-only-transcript.webm",
+        extension: "webm",
+        mimeType: "video/webm",
+        chunks: [SAMPLE_VIDEO_ONLY_WEBM_BYTES],
+      },
+    },
+  });
+  const transcript = await transcription.workflow.run({
+    toolId: "video-to-transcript",
+    input: { kind: "url", url: transcriptUrl },
+  });
+
+  assert.equal(transcript.status, "failed");
+  assert.equal(transcript.error.code, "invalid-request");
+  assert.equal(transcription.transcriptionRecords.cleanupReleased, false);
+  assert.deepEqual(transcription.deliveries, []);
+  assert.deepEqual(transcription.telemetry, [
+    { kind: "start" },
+    { kind: "terminal", status: "failed" },
+  ]);
+});
+
 test("real ISO media variants pass bounded parsing while ftyp-only lookalikes fail", async (t) => {
   const formats = [
     { format: "mp4", mimeTypes: ["video/mp4", "application/octet-stream"] },
@@ -584,7 +805,7 @@ test("endpoint identity rejection cancels and releases the unread response body"
       assert.equal(outcome.error.code, "acquisition-failed");
       assert.deepEqual(harness.deliveries, []);
       assert.deepEqual(harness.endpoint.streams, [
-        { chunksRead: 1, cancelled: true, readerLockReleased: true },
+        { chunksRead: 0, cancelled: true, readerLockReleased: true },
       ]);
       assert.deepEqual(harness.telemetry, [
         { kind: "start" },

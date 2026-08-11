@@ -1,6 +1,7 @@
 import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
 
 import { getToolExecutionProvenance } from './tool-execution-provenance.ts';
+import { isStreamedMediaDownloaderTool } from './media-workflow/eligibility.ts';
 
 export type WiredToolProcessorAvailability = Readonly<{
   kind: 'wired';
@@ -31,11 +32,9 @@ const registeredAdapterIdByToolId: Readonly<Record<string, string>> =
   Object.freeze({
     'audio-to-text': 'streamed-media-workflow',
     'audio-to-transcript': 'streamed-media-workflow',
-    'download-loom-videos': 'streamed-media-workflow',
     'mp3-to-transcript': 'streamed-media-workflow',
     'mp4-to-transcript': 'streamed-media-workflow',
     'tiktok-to-transcript': 'streamed-media-workflow',
-    'video-downloader': 'streamed-media-workflow',
     'video-to-transcript': 'streamed-media-workflow',
     'youtube-to-transcript': 'streamed-media-workflow',
     'youtube-to-transcript-generator': 'streamed-media-workflow',
@@ -45,6 +44,13 @@ function availabilityForToolId(toolId: string): ToolProcessorAvailability {
   const adapterId = registeredAdapterIdByToolId[toolId];
   if (adapterId) {
     return Object.freeze({ kind: 'wired', toolId, adapterId });
+  }
+  if (isStreamedMediaDownloaderTool(toolId)) {
+    return Object.freeze({
+      kind: 'wired',
+      toolId,
+      adapterId: 'streamed-media-workflow',
+    });
   }
 
   const provenance = getToolExecutionProvenance(toolId);

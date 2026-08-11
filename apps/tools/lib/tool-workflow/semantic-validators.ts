@@ -28,8 +28,7 @@ const UPNG = UPNGModule as {
 
 const MAX_DECODED_RGBA_BYTES = 64 * 1_024 * 1_024;
 const MAX_IMAGE_DIMENSION = 16_384;
-const MAX_MP4_PARSE_BYTES = 64 * 1_024 * 1_024;
-const MAX_AUDIO_PARSE_BYTES = 64 * 1_024 * 1_024;
+export const MAX_SEMANTIC_MEDIA_BYTES = 64 * 1_024 * 1_024;
 
 type DecodedImage = Readonly<{
   data: Uint8Array | Uint8ClampedArray;
@@ -44,6 +43,7 @@ export type SemanticDecoderAdapters = Readonly<{
 
 export type SemanticVerificationContext = Readonly<{
   maxBytes?: number;
+  requiredMediaTrack?: "any" | "audio";
   signal?: AbortSignal;
 }>;
 
@@ -249,12 +249,12 @@ function boundedParseLimit(
   return Math.min(maximum, declaredLimit);
 }
 
-async function audioSemanticError(
+async function musicMetadataSemanticError(
   bytes: Uint8Array,
   format: "mp3" | "webm",
   context: SemanticVerificationContext,
 ): Promise<string | undefined> {
-  if (bytes.byteLength > boundedParseLimit(context, MAX_AUDIO_PARSE_BYTES)) {
+  if (bytes.byteLength > boundedParseLimit(context, MAX_SEMANTIC_MEDIA_BYTES)) {
     return `${format.toUpperCase()} exceeds the semantic parser input limit`;
   }
   context.signal?.throwIfAborted();
@@ -267,23 +267,29 @@ async function audioSemanticError(
       skipCovers: true,
     });
     context.signal?.throwIfAborted();
-    const { container, codec, duration, numberOfChannels, sampleRate } =
+    const { container, codec, duration, hasAudio, hasVideo, trackInfo } =
       metadata.format;
-    const hasTimedAudio =
-      Boolean(codec) &&
-      Number.isFinite(duration) &&
-      (duration ?? 0) > 0 &&
-      Number.isSafeInteger(numberOfChannels) &&
-      (numberOfChannels ?? 0) > 0 &&
-      Number.isSafeInteger(sampleRate) &&
-      (sampleRate ?? 0) > 0;
+    const hasDuration = Number.isFinite(duration) && (duration ?? 0) > 0;
+    const hasUsableWebmAudio = trackInfo.some(
+      (track) =>
+        track.type === 2 &&
+        Boolean(track.codecName) &&
+        (track.audio?.channels ?? 0) > 0 &&
+        (track.audio?.samplingFrequency ?? 0) > 0,
+    );
     const matchesContainer =
       format === "mp3"
         ? container?.startsWith("MPEG") && /Layer 3/i.test(codec ?? "")
         : container === "EBML/webm";
-    return matchesContainer && hasTimedAudio
+    const meetsTrackRequirement =
+      format === "mp3"
+        ? hasAudio === true
+        : context.requiredMediaTrack === "audio"
+          ? hasAudio === true && hasUsableWebmAudio
+          : hasAudio === true || hasVideo === true;
+    return matchesContainer && hasDuration && meetsTrackRequirement
       ? undefined
-      : `${format.toUpperCase()} parser found no complete timed audio track`;
+      : `${format.toUpperCase()} parser found no usable timed ${context.requiredMediaTrack === "audio" ? "audio" : "media"} track`;
   } catch {
     context.signal?.throwIfAborted();
     return `${format.toUpperCase()} parser rejected the file`;
@@ -295,7 +301,7 @@ function bmffSemanticError(
   format: string,
   context: SemanticVerificationContext,
 ): string | undefined {
-  const parseLimit = boundedParseLimit(context, MAX_MP4_PARSE_BYTES);
+  const parseLimit = boundedParseLimit(context, MAX_SEMANTIC_MEDIA_BYTES);
   if (bytes.byteLength > parseLimit) {
     return "MP4 exceeds the semantic parser input limit";
   }
@@ -345,7 +351,10 @@ function bmffSemanticError(
       return `MP4 parser found bytes for a different ISO media format than ${format}`;
     }
     const timedTrackIds = new Set(
-      [...info.audioTracks, ...info.videoTracks].map((track) => track.id),
+      (context.requiredMediaTrack === "audio"
+        ? info.audioTracks
+        : [...info.audioTracks, ...info.videoTracks]
+      ).map((track) => track.id),
     );
     if (timedTrackIds.size === 0) {
       return "MP4 parser found no complete timed media tracks";
@@ -469,7 +478,7 @@ export async function verifyMediaSemantics(
       : media.format === "jpg"
         ? await jpegSemanticError(media.bytes, adapters.decodeJpeg)
         : media.format === "mp3" || media.format === "webm"
-          ? await audioSemanticError(media.bytes, media.format, context)
+          ? await musicMetadataSemanticError(media.bytes, media.format, context)
           : ["3gp", "m4a", "m4v", "mov", "mp4"].includes(media.format)
             ? bmffSemanticError(media.bytes, media.format, context)
             : media.format === "csv"

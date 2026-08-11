@@ -6,7 +6,10 @@ import type {
   WorkflowInput,
   WorkflowMedia,
 } from "../tool-workflow/index.ts";
-import { verifyMediaSemantics } from "../tool-workflow/semantic-validators.ts";
+import {
+  MAX_SEMANTIC_MEDIA_BYTES,
+  verifyMediaSemantics,
+} from "../tool-workflow/semantic-validators.ts";
 import { getExtensionFromName } from "./media-endpoint.ts";
 import { VERIFIED_MEDIA_FORMATS } from "./verified-formats.ts";
 
@@ -43,7 +46,10 @@ const outputContracts = inputContracts().flatMap(({ format, mimeTypes }) =>
   mimeTypes.map((mimeType) => ({ format, mimeType })),
 );
 
-function verifyMediaIdentity(media: WorkflowMedia): Promise<SemanticVerification> {
+function verifyMediaIdentity(
+  media: WorkflowMedia,
+  requiredMediaTrack: "any" | "audio",
+): Promise<SemanticVerification> {
   if (!media.bytes.byteLength) {
     return Promise.resolve({ status: "rejected", message: "Media is empty" });
   }
@@ -63,7 +69,7 @@ function verifyMediaIdentity(media: WorkflowMedia): Promise<SemanticVerification
       message: "Media format does not match its content type",
     });
   }
-  return verifyMediaSemantics(media);
+  return verifyMediaSemantics(media, undefined, { requiredMediaTrack });
 }
 
 export type TranscriptionPort = Readonly<{
@@ -96,9 +102,9 @@ export function createDownloaderProcessor(
         inputs: inputContracts(),
         outputs: outputContracts,
         resourceLimits: {
-          maxInputBytes: 1_000_000_000,
-          maxOutputBytes: 1_000_000_000,
-          maxTotalOutputBytes: 1_000_000_000,
+          maxInputBytes: MAX_SEMANTIC_MEDIA_BYTES,
+          maxOutputBytes: MAX_SEMANTIC_MEDIA_BYTES,
+          maxTotalOutputBytes: MAX_SEMANTIC_MEDIA_BYTES,
         },
         outputCardinality: { min: 1, max: 1 },
       },
@@ -114,13 +120,17 @@ export function createDownloaderProcessor(
       decideSupport() {
         return { supported: true };
       },
-      verifyInput: verifyMediaIdentity,
+      verifyInput(media) {
+        return verifyMediaIdentity(media, "any");
+      },
       async process(input, _options, context) {
         context.signal.throwIfAborted();
         context.reportProgress(1);
         return [input];
       },
-      verifyResult: verifyMediaIdentity,
+      verifyResult(media) {
+        return verifyMediaIdentity(media, "any");
+      },
     },
   };
 }
@@ -141,7 +151,7 @@ export function createTranscriptionProcessor(
         inputs: inputContracts(),
         outputs: [{ format: "txt", mimeType: "text/plain" }],
         resourceLimits: {
-          maxInputBytes: 1_000_000_000,
+          maxInputBytes: MAX_SEMANTIC_MEDIA_BYTES,
           maxOutputBytes: 20_000_000,
           maxTotalOutputBytes: 20_000_000,
         },
@@ -153,7 +163,9 @@ export function createTranscriptionProcessor(
       decideSupport() {
         return { supported: true };
       },
-      verifyInput: verifyMediaIdentity,
+      verifyInput(media) {
+        return verifyMediaIdentity(media, "audio");
+      },
       async process(input, _options, context) {
         const transcript = await transcription.transcribe(input, context);
         const baseName = input.name.replace(/\.[^.]+$/, "") || "transcript";

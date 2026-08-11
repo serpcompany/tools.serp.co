@@ -30,6 +30,10 @@ const videoDownloaderToolSource = readFileSync(
   new URL("../components/VideoDownloaderTool.tsx", import.meta.url),
   "utf8",
 );
+const downloaderAttemptPolicySource = readFileSync(
+  new URL("./media-workflow/attempt-policy.ts", import.meta.url),
+  "utf8",
+);
 const videoDownloaderPageSource = readFileSync(
   new URL("../app/video-downloader/page.tsx", import.meta.url),
   "utf8",
@@ -156,13 +160,17 @@ test("legacy typo downloader routes redirect to canonical downloader routes", ()
 });
 
 test("known unreliable downloader pages fail fast into extension monetization", () => {
-  assert.match(videoDownloaderToolSource, /HIGH_RISK_DOWNLOADER_TOOL_IDS/);
-  assert.match(videoDownloaderToolSource, /download-beeg-videos/);
-  assert.match(videoDownloaderToolSource, /download-eporner-videos/);
-  assert.match(videoDownloaderToolSource, /download-ashemaletube-videos/);
-  assert.match(videoDownloaderToolSource, /download-xhamster-videos/);
-  assert.match(videoDownloaderToolSource, /download-boyfriendtv-videos/);
+  assert.match(videoDownloaderToolSource, /getDownloaderAttemptPolicy/);
+  assert.match(downloaderAttemptPolicySource, /download-beeg-videos/);
+  assert.match(downloaderAttemptPolicySource, /download-eporner-videos/);
+  assert.match(downloaderAttemptPolicySource, /download-ashemaletube-videos/);
+  assert.match(downloaderAttemptPolicySource, /download-xhamster-videos/);
+  assert.match(downloaderAttemptPolicySource, /download-boyfriendtv-videos/);
   assert.match(videoDownloaderToolSource, /getFailFastDownloaderCta/);
+  assert.match(
+    videoDownloaderToolSource,
+    /createBrowserMediaWorkflow\(\)\.run\([\s\S]*if \(failFastCta\)/,
+  );
   assert.doesNotMatch(videoDownloaderToolSource, /beginToolRun|finishFailure/);
   assert.match(videoDownloaderToolSource, /Use the browser extension for this site\./);
 });

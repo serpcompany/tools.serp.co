@@ -14,6 +14,7 @@ import {
   DOWNLOADER_EXTENSION_URL,
 } from "@/lib/downloader-extension-cta";
 import { createBrowserMediaWorkflow } from "@/lib/media-workflow/browser";
+import { getDownloaderAttemptPolicy } from "@/lib/media-workflow/attempt-policy";
 
 type Props = {
   toolId: string;
@@ -35,14 +36,6 @@ type ExtensionFailureCta = {
 
 const LOCAL_USAGE_STORAGE_KEY = "serp-tools:downloader-usage:v1";
 const LOCAL_USAGE_PRESSURE_THRESHOLD = 3;
-const HIGH_RISK_DOWNLOADER_TOOL_IDS = new Set([
-  "download-ashemaletube-videos",
-  "download-beeg-videos",
-  "download-boyfriendtv-videos",
-  "download-eporner-videos",
-  "download-xhamster-videos",
-]);
-
 function parseUrlInput(value: string) {
   if (!value?.trim()) return null;
   try {
@@ -86,7 +79,7 @@ function getFailFastDownloaderCta(
   extensionUrl?: string,
   extensionProductName?: string
 ): ExtensionFailureCta | null {
-  if (!HIGH_RISK_DOWNLOADER_TOOL_IDS.has(toolId)) return null;
+  if (getDownloaderAttemptPolicy(toolId).kind !== "reject") return null;
 
   return {
     extensionUrl: extensionUrl ?? DOWNLOADER_EXTENSION_URL,
@@ -217,20 +210,6 @@ export default function VideoDownloaderTool({
       extensionProductName
     );
 
-    if (failFastCta) {
-      const isExtensionOnly = failFastCta.reason === "extension_only";
-      setExtensionFailureCta(failFastCta);
-      setCurrentFile({
-        name: nameHint,
-        progress: 0,
-        status: "error",
-        message: isExtensionOnly
-          ? "This website requires the browser extension."
-          : "Use the browser extension for this site.",
-      });
-      return;
-    }
-
     setBusy(true);
     setCurrentFile({
       name: nameHint,
@@ -281,6 +260,16 @@ export default function VideoDownloaderTool({
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Download failed";
+      if (failFastCta) {
+        setExtensionFailureCta(failFastCta);
+        setCurrentFile({
+          name: nameHint,
+          progress: 0,
+          status: "error",
+          message: "Use the browser extension for this site.",
+        });
+        return;
+      }
       const extensionCta = getExtensionFailureCta(
         message,
         extensionUrl,

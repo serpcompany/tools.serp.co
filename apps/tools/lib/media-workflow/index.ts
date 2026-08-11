@@ -1,4 +1,3 @@
-import { getToolExecutionProvenance } from "../tool-execution-provenance.ts";
 import {
   createToolWorkflow,
   type RuntimeResourceKind,
@@ -13,6 +12,8 @@ import {
   type MediaEndpointRequest,
   type MediaTransferProgress,
 } from "./media-endpoint.ts";
+import { getDownloaderAttemptPolicy } from "./attempt-policy.ts";
+import { isStreamedMediaDownloaderTool } from "./eligibility.ts";
 import {
   createDownloaderProcessor,
   createTranscriptionProcessor,
@@ -49,15 +50,6 @@ function isTranscriptionTool(toolId: string): boolean {
   return TRANSCRIPTION_TOOL_IDS.includes(toolId);
 }
 
-function isDownloaderTool(toolId: string): boolean {
-  const provenance = getToolExecutionProvenance(toolId);
-  return (
-    provenance.kind === "mapped" &&
-    provenance.engineIds.length === 1 &&
-    provenance.engineIds[0] === "server-media-fetch"
-  );
-}
-
 function endpointRequest(request: WorkflowRequest): MediaEndpointRequest {
   if (request.input.kind !== "url") {
     throw new TypeError("URL media acquisition requires a URL input");
@@ -79,7 +71,7 @@ export function createMediaWorkflow(ports: MediaWorkflowPorts): ToolWorkflow {
   return {
     run(request, options) {
       const transcription = isTranscriptionTool(request.toolId);
-      const downloader = isDownloaderTool(request.toolId);
+      const downloader = isStreamedMediaDownloaderTool(request.toolId);
       if (transcription && !ports.transcription) {
         throw new Error("The transcription workflow adapter is unavailable");
       }
@@ -101,6 +93,10 @@ export function createMediaWorkflow(ports: MediaWorkflowPorts): ToolWorkflow {
           },
           url: {
             acquire(_input, context) {
+              const attemptPolicy = getDownloaderAttemptPolicy(request.toolId);
+              if (downloader && attemptPolicy.kind === "reject") {
+                throw new Error(attemptPolicy.message);
+              }
               return streamedAcquisition.acquire(endpointRequest(request), context);
             },
           },

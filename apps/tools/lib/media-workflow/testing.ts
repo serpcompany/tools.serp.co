@@ -40,19 +40,22 @@ export function createInMemoryMediaEndpoint(
       };
       streams.push(record);
       let index = 0;
-      const body = new ReadableStream<Uint8Array>({
-        pull(controller) {
-          if (index === fixture.stallAfterChunks) return;
-          const chunk = fixture.chunks[index++];
-          if (chunk) {
-            record.chunksRead += 1;
-            controller.enqueue(chunk);
-          } else controller.close();
+      const body = new ReadableStream<Uint8Array>(
+        {
+          pull(controller) {
+            if (index === fixture.stallAfterChunks) return;
+            const chunk = fixture.chunks[index++];
+            if (chunk) {
+              record.chunksRead += 1;
+              controller.enqueue(chunk);
+            } else controller.close();
+          },
+          cancel() {
+            record.cancelled = true;
+          },
         },
-        cancel() {
-          record.cancelled = true;
-        },
-      });
+        { highWaterMark: 0 },
+      );
       const originalGetReader = body.getReader.bind(body);
       body.getReader = ((...args: []) => {
         const reader = originalGetReader(...args);
