@@ -15,12 +15,11 @@ import {
 } from "@/lib/downloader-extension-cta";
 import { createBrowserMediaWorkflow } from "@/lib/media-workflow/browser";
 import { createBrowserRunOwnership } from "@/lib/media-workflow/browser-run-ownership";
+import { createBrowserRunProgress } from "@/lib/media-workflow/browser-run-progress";
 import {
   getDownloaderExtensionCta,
   type DownloaderExtensionCta,
 } from "@/lib/media-workflow/downloader-failure-presentation";
-import { createMonotonicProgress } from "@/lib/media-workflow/monotonic-progress";
-import { projectMediaTransfer } from "@/lib/media-workflow/transfer-presentation";
 
 type Props = {
   toolId: string;
@@ -180,19 +179,22 @@ export default function VideoDownloaderTool({
       message: "Starting download...",
     });
 
-    const progress = createMonotonicProgress();
+    const runProgress = createBrowserRunProgress({
+      lease,
+      name: nameHint,
+      messages: {
+        acquiring: "Downloading...",
+        processing: "Checking download...",
+        validating: "Checking download...",
+        delivering: "Preparing download...",
+      },
+    });
     try {
       const outcome = await createBrowserMediaWorkflow({
         releaseDeliveredBytes: true,
         onTransfer(transfer) {
-          if (!lease.isCurrent()) return;
-          const presentation = projectMediaTransfer(transfer);
-          setCurrentFile({
-            name: nameHint,
-            progress: progress.project(presentation.progress),
-            status: "loading",
-            message: presentation.message,
-          });
+          const file = runProgress.fromTransfer(transfer);
+          if (file) setCurrentFile(file);
         },
       }).run(
         {
@@ -203,29 +205,8 @@ export default function VideoDownloaderTool({
         {
           signal: lease.signal,
           observe(snapshot) {
-            if (!lease.isCurrent()) return;
-            if (
-              snapshot.phase === "succeeded" ||
-              snapshot.phase === "failed" ||
-              snapshot.phase === "cancelled"
-            ) {
-              return;
-            }
-            setCurrentFile({
-              name: nameHint,
-              progress: progress.project(
-                snapshot.progress === undefined
-                  ? undefined
-                  : snapshot.progress * 100,
-              ),
-              status: snapshot.phase === "acquiring" ? "loading" : "processing",
-              message:
-                snapshot.phase === "acquiring"
-                  ? "Downloading..."
-                  : snapshot.phase === "delivering"
-                    ? "Preparing download..."
-                    : "Checking download...",
-            });
+            const file = runProgress.fromSnapshot(snapshot);
+            if (file) setCurrentFile(file);
           },
         },
       );

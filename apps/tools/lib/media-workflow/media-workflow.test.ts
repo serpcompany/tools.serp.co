@@ -468,7 +468,7 @@ test("presentation callers delegate stream lifecycle and terminal ownership", ()
   }
 });
 
-test("downloader UI consumes the browser transfer projection without deriving transport statistics", () => {
+test("downloader UI consumes shared browser run progress without deriving transport statistics", () => {
   const source = readFileSync(
     new URL("../../components/VideoDownloaderTool.tsx", import.meta.url),
     "utf8",
@@ -477,9 +477,9 @@ test("downloader UI consumes the browser transfer projection without deriving tr
     source,
     /createBrowserMediaWorkflow\(\{[\s\S]*onTransfer\(transfer\)/,
   );
-  assert.match(source, /projectMediaTransfer\(transfer\)/);
-  assert.match(source, /progress: progress\.project\(presentation\.progress\)/);
-  assert.match(source, /message: presentation\.message/);
+  assert.match(source, /createBrowserRunProgress/);
+  assert.match(source, /runProgress\.fromTransfer\(transfer\)/);
+  assert.match(source, /runProgress\.fromSnapshot\(snapshot\)/);
   assert.match(source, /releaseDeliveredBytes: true/);
   assert.doesNotMatch(
     source,
@@ -519,10 +519,11 @@ test("downloader and URL transcription project transfer stats without backward p
     "../../components/TranscribeTool.tsx",
   ]) {
     const source = readFileSync(new URL(relativePath, import.meta.url), "utf8");
-    assert.match(source, /createMonotonicProgress/);
+    assert.match(source, /createBrowserRunProgress/);
     assert.match(source, /onTransfer\(transfer\)/);
-    assert.match(source, /projectMediaTransfer\(transfer\)/);
-    assert.match(source, /progress\.project\(presentation\.progress\)/);
+    assert.match(source, /runProgress\.fromTransfer\(transfer\)/);
+    assert.match(source, /runProgress\.fromSnapshot\(snapshot\)/);
+    assert.doesNotMatch(source, /createMonotonicProgress|projectMediaTransfer/);
     assert.doesNotMatch(
       source,
       /Math\.round\(\(snapshot\.progress \?\? 0\) \* 100\)/,

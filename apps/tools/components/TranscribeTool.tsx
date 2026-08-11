@@ -13,9 +13,8 @@ import {
   createBrowserRunOwnership,
   type BrowserRunLease,
 } from "@/lib/media-workflow/browser-run-ownership";
-import { createMonotonicProgress } from "@/lib/media-workflow/monotonic-progress";
+import { createBrowserRunProgress } from "@/lib/media-workflow/browser-run-progress";
 import { createBrowserTranscriptionWorkflow } from "@/lib/media-workflow/transcription-browser";
-import { projectMediaTransfer } from "@/lib/media-workflow/transfer-presentation";
 import { VERIFIED_MEDIA_FORMATS } from "@/lib/media-workflow/verified-formats";
 import type { WorkflowMedia } from "@/lib/tool-workflow";
 
@@ -82,30 +81,6 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
     inputRef.current?.click();
   }
 
-  function observeRun(
-    name: string,
-    lease: BrowserRunLease,
-    progress: ReturnType<typeof createMonotonicProgress>,
-  ) {
-    return (snapshot: { phase: string; progress?: number }) => {
-      if (!lease.isCurrent()) return;
-      if (["succeeded", "failed", "cancelled"].includes(snapshot.phase)) return;
-      setCurrentFile({
-        name,
-        progress: progress.project(
-          snapshot.progress === undefined ? undefined : snapshot.progress * 100,
-        ),
-        status: snapshot.phase === "acquiring" ? "loading" : "processing",
-        message:
-          snapshot.phase === "acquiring"
-            ? "Downloading..."
-            : snapshot.phase === "delivering"
-              ? "Preparing transcript..."
-              : "Transcribing...",
-      });
-    };
-  }
-
   async function runTranscription(
     input:
       | { kind: "url"; url: string }
@@ -113,7 +88,16 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
     name: string,
     lease: BrowserRunLease,
   ): Promise<"completed" | "cancelled" | "failed"> {
-    const progress = createMonotonicProgress();
+    const runProgress = createBrowserRunProgress({
+      lease,
+      name,
+      messages: {
+        acquiring: "Downloading...",
+        processing: "Transcribing...",
+        validating: "Transcribing...",
+        delivering: "Preparing transcript...",
+      },
+    });
     setErrorMessage(null);
     setTranscript("");
     setTranscriptMedia(null);
@@ -126,14 +110,8 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
     try {
       const workflow = createBrowserTranscriptionWorkflow({
         onTransfer(transfer) {
-          if (!lease.isCurrent()) return;
-          const presentation = projectMediaTransfer(transfer);
-          setCurrentFile({
-            name,
-            progress: progress.project(presentation.progress),
-            status: "loading",
-            message: presentation.message,
-          });
+          const file = runProgress.fromTransfer(transfer);
+          if (file) setCurrentFile(file);
         },
         onDelivered(media) {
           if (!lease.isCurrent()) return;
@@ -143,7 +121,13 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       });
       const outcome = await workflow.run(
         { toolId, input },
-        { signal: lease.signal, observe: observeRun(name, lease, progress) },
+        {
+          signal: lease.signal,
+          observe(snapshot) {
+            const file = runProgress.fromSnapshot(snapshot);
+            if (file) setCurrentFile(file);
+          },
+        },
       );
       if (outcome.status === "failed") throw new Error(outcome.error.message);
       if (outcome.status === "cancelled" || !lease.isCurrent()) {
@@ -159,14 +143,8 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Transcription failed";
-      if (lease.isCurrent()) {
-        setCurrentFile({
-          name,
-          progress: progress.project(undefined),
-          status: "error",
-          message,
-        });
-      }
+      const file = runProgress.fromError(message);
+      if (file) setCurrentFile(file);
       return "failed";
     }
   }
