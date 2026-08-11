@@ -151,6 +151,7 @@ test('specialized smoke coverage exercises rendered lifecycle and delivery behav
   assert.match(runnerSource, /pdf-tool-input/);
   assert.match(runnerSource, /pdf-tool-viewer/);
   assert.match(runnerSource, /file=blob%3A/);
+  assert.match(runnerSource, /pageerror/);
 });
 
 test('local evidence accepts only loopback targets', () => {

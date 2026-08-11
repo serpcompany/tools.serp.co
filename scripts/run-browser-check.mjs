@@ -213,6 +213,12 @@ try {
     "html-to-markdown",
     "character-counter",
   ]);
+  const specializedSmokeTools = new Set([
+    "json-to-csv",
+    "csv-combiner",
+    "html-to-markdown",
+    "character-counter",
+  ]);
 
   const { chromium } = await import("playwright");
 
@@ -866,6 +872,16 @@ try {
         result.errors.push("missing dropzone");
       }
     }
+    const isSpecializedPdf =
+      (tool.operation === "view" || tool.operation === "edit") &&
+      tool.from === "pdf" &&
+      tool.to === "pdf";
+    if (
+      (specializedSmokeTools.has(tool.id) || isSpecializedPdf) &&
+      result.pageErrors.length > 0
+    ) {
+      throw new Error(`Rendered Tool raised ${result.pageErrors.length} pageerror event(s).`);
+    }
   }
 
   async function runBenchmark(page, _tool, result) {
@@ -896,9 +912,11 @@ try {
       metrics: null,
       fixture: null,
       errors: [],
+      pageErrors: [],
     };
 
     const page = await browser.newPage();
+    page.on("pageerror", (error) => result.pageErrors.push(error));
 
     const fixtureEntry = tool.from ? formatFixtures.get(tool.from) : null;
     result.fixture = fixtureEntry
