@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@serp-tools/ui/components/card";
 import { Badge } from "@serp-tools/ui/components/badge";
-import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import DataGridEditor from "@/components/table-convert/DataGridEditor";
 import FormatTabs from "@/components/table-convert/FormatTabs";
@@ -25,10 +24,28 @@ import {
   getLabel,
   getPlaceholder,
 } from "@/components/table-convert/formats";
-import { parseInput, serializeOutput } from "@/components/table-convert/convert";
-import { InputFormat, OutputFormat, TableData, ViewMode } from "@/components/table-convert/types";
+import {
+  InputFormat,
+  OutputFormat,
+  TableData,
+  ViewMode,
+} from "@/components/table-convert/types";
+import {
+  createBrowserTableWorkflow,
+  createLatestFileReader,
+} from "@/lib/table-browser-workflow";
+import {
+  getTableOperationPolicy,
+  tableInputContracts,
+} from "@/lib/table-operation-policy";
+import {
+  parseTableInput,
+  serializeTableInputText,
+} from "@/lib/table-tool-processors";
+import type { WorkflowDelivery } from "@/lib/tool-workflow";
 
 type TableConvertDemoProps = {
+  toolId?: string;
   initialInputFormat?: InputFormat;
   initialOutputFormat?: OutputFormat;
   title?: string;
@@ -38,34 +55,55 @@ type TableConvertDemoProps = {
 const DEFAULT_TABLE: TableData = SAMPLE_TABLE;
 
 export default function TableConvertDemo({
+  toolId,
   initialInputFormat = "csv",
   initialOutputFormat = "json",
   title = "Dual Viewer Converter Demo",
   subtitle = "Paste or upload on the left, convert to a target format, and preview on the right.",
 }: TableConvertDemoProps) {
   const fileRef = useRef<HTMLInputElement | null>(null);
-  const [inputFormat, setInputFormat] = useState<InputFormat>(initialInputFormat);
-  const [outputFormat, setOutputFormat] = useState<OutputFormat>(initialOutputFormat);
+  const outputRevisionRef = useRef(0);
+  const sourceRevisionRef = useRef(0);
+  const runAbortRef = useRef<AbortController | null>(null);
+  const [{ workflow, deliveries }] = useState(createBrowserTableWorkflow);
+  const [fileReader] = useState(createLatestFileReader);
+  const [inputFormat, setInputFormat] =
+    useState<InputFormat>(initialInputFormat);
+  const [outputFormat, setOutputFormat] =
+    useState<OutputFormat>(initialOutputFormat);
   const [inputView, setInputView] = useState<ViewMode>("raw");
   const [outputView, setOutputView] = useState<ViewMode>("raw");
   const [inputText, setInputText] = useState("");
-  const [outputText, setOutputText] = useState(
-    () => serializeOutput(initialOutputFormat, DEFAULT_TABLE).text
-  );
+  const [outputText, setOutputText] = useState("");
   const [outputNotice, setOutputNotice] = useState<string | null>(null);
   const [tableData, setTableData] = useState<TableData | null>(DEFAULT_TABLE);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [status, setStatus] = useState<string>("Auto-convert is on.");
+  const [inputBytes, setInputBytes] = useState<Uint8Array | null>(null);
+  const [delivery, setDelivery] = useState<WorkflowDelivery | null>(null);
+  const [status, setStatus] = useState<string>("Ready to convert.");
+  const [isConverting, setIsConverting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [hasUserInput, setHasUserInput] = useState(false);
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);
   const outputLabel = getLabel(OUTPUT_FORMATS, outputFormat);
-  const inputPreviewMessage = error ?? "Rendered input preview will appear here.";
+  const selectedToolId =
+    inputFormat === initialInputFormat &&
+    outputFormat === initialOutputFormat &&
+    toolId
+      ? toolId
+      : `${inputFormat}-to-${outputFormat}`;
+  const operationPolicy = getTableOperationPolicy(selectedToolId);
+  const operationUnavailable =
+    operationPolicy.kind === "eligible" ? null : operationPolicy.reason;
+  const inputPreviewMessage =
+    error ?? "Rendered input preview will appear here.";
   const outputPreviewMessage =
     outputNotice ??
-    (tableData ? "Rendered output preview will appear here." : "Waiting for valid input.");
+    (tableData
+      ? "Rendered output preview will appear here."
+      : "Waiting for valid input.");
 
   useEffect(() => {
     if (!hasUserInput && !inputText.trim()) {
@@ -73,41 +111,81 @@ export default function TableConvertDemo({
       setTableData(DEFAULT_TABLE);
       return;
     }
-    const result = parseInput(inputFormat, inputText);
-    if (!result.supported) {
-      setError(result.error ?? "Input format not supported.");
-      return;
-    }
-    if (!result.table) {
+    const bytes =
+      inputFormat === "excel"
+        ? inputBytes
+        : new TextEncoder().encode(inputText);
+    if (!bytes) {
       setTableData(null);
-      setError(result.error ?? null);
+      setError("Upload an XLSX workbook to begin.");
       return;
     }
-    setError(null);
-    setTableData(result.table);
-  }, [hasUserInput, inputText, inputFormat]);
+    let current = true;
+    void parseTableInput(inputFormat, bytes).then(
+      (result) => {
+        if (!current) return;
+        setError(null);
+        setTableData({
+          headers: [...result.headers],
+          rows: result.rows.map((row) => [...row]),
+        });
+      },
+      (parseError: unknown) => {
+        if (!current) return;
+        setTableData(null);
+        setError(
+          parseError instanceof Error ? parseError.message : String(parseError),
+        );
+      },
+    );
+    return () => {
+      current = false;
+    };
+  }, [hasUserInput, inputText, inputFormat, inputBytes]);
 
-  useEffect(() => {
-    if (!tableData) {
-      setOutputText("");
-      setOutputNotice("Waiting for valid input.");
-      return;
-    }
-    const serialized = serializeOutput(outputFormat, tableData);
-    setOutputText(serialized.text);
-    setOutputNotice(serialized.supported ? null : serialized.notice ?? null);
-    setStatus(`Auto-converting ${inputLabel} to ${outputLabel}.`);
-  }, [tableData, outputFormat, inputLabel, outputLabel]);
+  useEffect(
+    () => () => {
+      outputRevisionRef.current += 1;
+      sourceRevisionRef.current += 1;
+      runAbortRef.current?.abort();
+      fileReader.invalidate();
+      deliveries.clear();
+    },
+    [deliveries, fileReader],
+  );
 
-  function handleInputFormatChange(nextFormat: InputFormat, reserialize = true) {
+  function clearOutputResult() {
+    outputRevisionRef.current += 1;
+    runAbortRef.current?.abort();
+    runAbortRef.current = null;
+    if (delivery) deliveries.release(delivery.deliveryId);
+    setDelivery(null);
+    setOutputText("");
+    setOutputNotice(null);
+    setIsConverting(false);
+  }
+
+  async function handleInputFormatChange(
+    nextFormat: InputFormat,
+    reserialize = true,
+  ) {
     if (nextFormat === inputFormat) return;
+    clearOutputResult();
+    fileReader.invalidate();
+    sourceRevisionRef.current += 1;
+    const sourceRevision = sourceRevisionRef.current;
     setInputFormat(nextFormat);
+    setInputBytes(null);
     if (!tableData || !reserialize || !hasUserInput) return;
-    const serialized = serializeOutput(nextFormat, tableData);
-    if (serialized.supported) {
-      setInputText(serialized.text);
-      setError(null);
+    if (nextFormat === "excel") {
+      setInputText("");
+      setError("Upload an XLSX workbook to use Excel as input.");
+      return;
     }
+    const serialized = await serializeTableInputText(nextFormat, tableData);
+    if (sourceRevision !== sourceRevisionRef.current) return;
+    setInputText(serialized);
+    setError(null);
   }
 
   function handleUploadClick() {
@@ -117,14 +195,25 @@ export default function TableConvertDemo({
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
-    const detected = detectFormatFromFile(file);
-    if (detected && detected !== inputFormat) {
-      handleInputFormatChange(detected, false);
-    }
+    await loadFile(file);
+  }
+
+  async function loadFile(file: File) {
+    clearOutputResult();
+    sourceRevisionRef.current += 1;
+    const sourceRevision = sourceRevisionRef.current;
+    const bytes = await fileReader.read(file);
+    if (!bytes || sourceRevision !== sourceRevisionRef.current) return;
+    const detected = detectFormatFromFile(file) ?? inputFormat;
+    setInputFormat(detected);
     setFileName(file.name);
     setHasUserInput(true);
-    const text = await file.text();
-    setInputText(text);
+    setInputBytes(bytes);
+    setInputText(
+      detected === "excel"
+        ? "XLSX workbook loaded."
+        : new TextDecoder().decode(bytes),
+    );
     setStatus(`Loaded ${file.name}.`);
   }
 
@@ -133,25 +222,19 @@ export default function TableConvertDemo({
     setDragActive(false);
     const file = event.dataTransfer.files?.[0];
     if (!file) return;
-    const detected = detectFormatFromFile(file);
-    if (detected && detected !== inputFormat) {
-      handleInputFormatChange(detected, false);
-    }
-    setFileName(file.name);
-    setHasUserInput(true);
-    const text = await file.text();
-    setInputText(text);
-    setStatus(`Loaded ${file.name}.`);
+    await loadFile(file);
   }
 
   function handleClear() {
+    fileReader.invalidate();
+    sourceRevisionRef.current += 1;
     setInputText("");
     setFileName(null);
+    setInputBytes(null);
+    clearOutputResult();
     setError(null);
     setHasUserInput(false);
     setTableData(DEFAULT_TABLE);
-    setOutputText(serializeOutput(outputFormat, DEFAULT_TABLE).text);
-    setOutputNotice(null);
     setStatus("Cleared current view.");
   }
 
@@ -166,20 +249,116 @@ export default function TableConvertDemo({
   }
 
   function handleDownload() {
-    if (!outputText) return;
-    const blob = new Blob([outputText], { type: "text/plain" });
-    saveBlob(blob, `tableconvert-demo.${outputFormat}.txt`);
+    if (!delivery) return;
+    deliveries.download(delivery);
     setStatus(`Downloaded ${outputLabel} output.`);
   }
 
-  function handleEditorChange(nextTable: TableData) {
-    setHasUserInput(true);
-    setTableData(nextTable);
-    const serialized = serializeOutput(inputFormat, nextTable);
-    if (serialized.supported) {
-      setInputText(serialized.text);
-      setError(null);
+  async function handleConvert() {
+    if (
+      (!inputText.trim() && !inputBytes) ||
+      isConverting ||
+      operationUnavailable
+    )
+      return;
+    clearOutputResult();
+    setIsConverting(true);
+    setError(null);
+    const outputRevision = outputRevisionRef.current;
+    const runAbort = new AbortController();
+    runAbortRef.current = runAbort;
+    const bytes = inputBytes ?? new TextEncoder().encode(inputText);
+    const mimeType = tableInputContracts[inputFormat].mimeTypes[0]!;
+    try {
+      const outcome = await workflow.run(
+        {
+          toolId: selectedToolId,
+          input: {
+            kind: "file",
+            media: {
+              name: fileName ?? `table.${inputFormat}`,
+              format: inputFormat,
+              mimeType,
+              bytes,
+            },
+          },
+        },
+        {
+          signal: runAbort.signal,
+          observe: ({ phase }) => {
+            if (outputRevision === outputRevisionRef.current) {
+              setStatus(`${phase[0]?.toUpperCase()}${phase.slice(1)}…`);
+            }
+          },
+        },
+      );
+      if (outputRevision !== outputRevisionRef.current) {
+        if (outcome.status === "succeeded") {
+          for (const staleDelivery of outcome.results) {
+            deliveries.release(staleDelivery.deliveryId);
+          }
+        }
+        return;
+      }
+      if (outcome.status !== "succeeded") {
+        const message =
+          outcome.status === "failed"
+            ? outcome.error.message
+            : "Conversion was cancelled.";
+        setError(message);
+        setOutputText("");
+        setStatus(message);
+        return;
+      }
+      const nextDelivery = outcome.results[0];
+      const media = nextDelivery
+        ? deliveries.get(nextDelivery.deliveryId)
+        : undefined;
+      if (!nextDelivery || !media) {
+        throw new TypeError("Workflow delivery is unavailable");
+      }
+      setDelivery(nextDelivery);
+      const deliveredText = deliveries.text(nextDelivery.deliveryId);
+      if (deliveredText !== undefined) {
+        setOutputText(deliveredText);
+      } else {
+        setOutputText("");
+        setOutputNotice(
+          `${outputLabel} binary output is verified and ready to download.`,
+        );
+      }
+      setStatus(`Converted ${inputLabel} to ${outputLabel}.`);
+    } catch (conversionError) {
+      if (outputRevision !== outputRevisionRef.current) return;
+      const message =
+        conversionError instanceof Error
+          ? conversionError.message
+          : String(conversionError);
+      setError(message);
+      setStatus(message);
+    } finally {
+      if (runAbortRef.current === runAbort) runAbortRef.current = null;
+      if (outputRevision === outputRevisionRef.current) setIsConverting(false);
     }
+  }
+
+  async function handleEditorChange(nextTable: TableData) {
+    clearOutputResult();
+    fileReader.invalidate();
+    sourceRevisionRef.current += 1;
+    const sourceRevision = sourceRevisionRef.current;
+    setHasUserInput(true);
+    setInputBytes(null);
+    setTableData(nextTable);
+    if (inputFormat === "excel") {
+      setInputText("");
+      setError("Edited grid data cannot replace a binary XLSX source.");
+      return;
+    }
+    const serialized = await serializeTableInputText(inputFormat, nextTable);
+    if (sourceRevision !== sourceRevisionRef.current) return;
+    setInputText(serialized);
+    setError(null);
   }
 
   return (
@@ -209,7 +388,9 @@ export default function TableConvertDemo({
             >
               <CardHeader className="border-b">
                 <CardTitle>Source</CardTitle>
-                <CardDescription>Paste or upload, then switch the input format tab.</CardDescription>
+                <CardDescription>
+                  Paste or upload, then switch the input format tab.
+                </CardDescription>
                 <CardAction>
                   <Badge variant="secondary">Input</Badge>
                 </CardAction>
@@ -220,19 +401,32 @@ export default function TableConvertDemo({
                   badgeLabel={inputLabel}
                   options={INPUT_FORMATS}
                   value={inputFormat}
-                  onChange={(value) => handleInputFormatChange(value as InputFormat)}
+                  onChange={(value) =>
+                    handleInputFormatChange(value as InputFormat)
+                  }
                 />
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Button size="sm" variant="outline" onClick={handleUploadClick}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleUploadClick}
+                  >
                     Upload file
                   </Button>
                   <Button size="sm" variant="ghost" onClick={handleClear}>
                     Clear view
                   </Button>
-                  <input ref={fileRef} type="file" onChange={handleFileChange} className="hidden" />
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
                   {fileName && (
-                    <span className="text-xs text-muted-foreground">Selected: {fileName}</span>
+                    <span className="text-xs text-muted-foreground">
+                      Selected: {fileName}
+                    </span>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -245,7 +439,11 @@ export default function TableConvertDemo({
                   <textarea
                     value={inputText}
                     onChange={(event) => {
+                      clearOutputResult();
+                      fileReader.invalidate();
+                      sourceRevisionRef.current += 1;
                       setHasUserInput(true);
+                      setInputBytes(null);
                       setInputText(event.target.value);
                     }}
                     placeholder={getPlaceholder(inputFormat)}
@@ -273,7 +471,9 @@ export default function TableConvertDemo({
             <Card className="min-h-[540px]">
               <CardHeader className="border-b">
                 <CardTitle>Output</CardTitle>
-                <CardDescription>Auto-converts as you type or drop a file.</CardDescription>
+                <CardDescription>
+                  Runs through the verified shared workflow.
+                </CardDescription>
                 <CardAction>
                   <Badge variant="secondary">Output</Badge>
                 </CardAction>
@@ -284,18 +484,47 @@ export default function TableConvertDemo({
                   badgeLabel={outputLabel}
                   options={OUTPUT_FORMATS}
                   value={outputFormat}
-                  onChange={(value) => setOutputFormat(value as OutputFormat)}
+                  onChange={(value) => {
+                    setOutputFormat(value as OutputFormat);
+                    clearOutputResult();
+                  }}
                 />
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Button size="sm" variant="outline" onClick={handleCopyOutput}>
+                  <Button
+                    size="sm"
+                    onClick={handleConvert}
+                    disabled={isConverting || Boolean(operationUnavailable)}
+                  >
+                    {isConverting ? "Converting…" : "Convert"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCopyOutput}
+                    disabled={!outputText}
+                  >
                     Copy
                   </Button>
-                  <Button size="sm" variant="outline" onClick={handleDownload}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleDownload}
+                    disabled={!delivery}
+                  >
                     Download
                   </Button>
                 </div>
-                {outputNotice && <p className="text-xs text-muted-foreground">{outputNotice}</p>}
+                {operationUnavailable && (
+                  <p className="text-xs text-amber-700">
+                    {operationUnavailable}
+                  </p>
+                )}
+                {outputNotice && (
+                  <p className="text-xs text-muted-foreground">
+                    {outputNotice}
+                  </p>
+                )}
                 <div className="text-xs text-muted-foreground">{status}</div>
 
                 <ViewToggle value={outputView} onChange={setOutputView} />
@@ -321,13 +550,18 @@ export default function TableConvertDemo({
             <Card className="min-h-[540px]">
               <CardHeader className="border-b">
                 <CardTitle>Online table editor</CardTitle>
-                <CardDescription>Work directly in a spreadsheet-style grid.</CardDescription>
+                <CardDescription>
+                  Work directly in a spreadsheet-style grid.
+                </CardDescription>
                 <CardAction>
                   <Badge variant="secondary">Editor</Badge>
                 </CardAction>
               </CardHeader>
               <CardContent className="space-y-4">
-                <DataGridEditor tableData={tableData} onChange={handleEditorChange} />
+                <DataGridEditor
+                  tableData={tableData}
+                  onChange={handleEditorChange}
+                />
               </CardContent>
             </Card>
           </div>

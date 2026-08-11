@@ -57,7 +57,7 @@ const buildWorkflowSection = (fromLabel: string, toLabel: string) => ({
       title: "Table Generator",
       description: `Export to ${toLabel} as soon as you're ready.`,
       bullets: [
-        "Auto-convert on every edit.",
+        "Select Convert after each edit.",
         "Copy output or download a file in one click.",
         "Preview results before you ship.",
       ],
@@ -71,7 +71,7 @@ const buildOutputDetailsSection = (fromLabel: string, toLabel: string) => ({
   subtitle: `Everything the converter includes when moving from ${fromLabel} to ${toLabel}.`,
   items: [
     "Preserves the header row and keeps columns aligned.",
-    "Auto-converts whenever you edit the table.",
+    "Select Convert whenever you edit the table.",
     "Escapes special characters when the target format requires it.",
     "Copy output or download it instantly.",
     "Preview data as a table or raw text.",
@@ -195,6 +195,7 @@ export default function TableConvertLanding({ toolId }: TableConvertLandingProps
   return (
     <main className="theme-light min-h-screen bg-background">
       <TableConvertDemo
+        toolId={toolId}
         initialInputFormat={from}
         initialOutputFormat={to}
         title={content.tool.title}

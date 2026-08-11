@@ -1,5 +1,9 @@
 import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
 
+import {
+  getEligibleTableToolIds,
+  TABLE_PROCESSOR_ADAPTER_ID,
+} from './table-operation-policy.ts';
 import { getToolExecutionProvenance } from './tool-execution-provenance.ts';
 
 export type WiredToolProcessorAvailability = Readonly<{
@@ -28,7 +32,14 @@ export type ToolProcessorAvailability =
   | UnknownToolProcessorAvailability;
 
 const registeredAdapterIdByToolId: Readonly<Record<string, string>> =
-  Object.freeze({});
+  Object.freeze(
+    Object.fromEntries(
+      getEligibleTableToolIds().map((toolId) => [
+        toolId,
+        TABLE_PROCESSOR_ADAPTER_ID,
+      ]),
+    ),
+  );
 
 function availabilityForToolId(toolId: string): ToolProcessorAvailability {
   const adapterId = registeredAdapterIdByToolId[toolId];

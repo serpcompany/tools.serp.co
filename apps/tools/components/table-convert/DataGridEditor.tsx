@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { objectsToTableData, tableDataToObjects } from "./convert";
+import { objectsToTableData, tableDataToObjects } from "./table-data";
 import { SAMPLE_TABLE } from "./formats";
 import { TableData } from "./types";
 
