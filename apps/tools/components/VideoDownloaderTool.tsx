@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import DownloaderCooldownNotice from "@/components/DownloaderCooldownNotice";
 import SerplyCtaButton from "@/components/SerplyCtaButton";
@@ -14,6 +14,7 @@ import {
   DOWNLOADER_EXTENSION_URL,
 } from "@/lib/downloader-extension-cta";
 import { createBrowserMediaWorkflow } from "@/lib/media-workflow/browser";
+import { createBrowserRunOwnership } from "@/lib/media-workflow/browser-run-ownership";
 import { getDownloaderAttemptPolicy } from "@/lib/media-workflow/attempt-policy";
 import { createMonotonicProgress } from "@/lib/media-workflow/monotonic-progress";
 import { projectMediaTransfer } from "@/lib/media-workflow/transfer-presentation";
@@ -171,7 +172,7 @@ export default function VideoDownloaderTool({
   extensionUrl,
   extensionProductName,
 }: Props) {
-  const activeRun = useRef<AbortController | null>(null);
+  const [runOwnership] = useState(createBrowserRunOwnership);
   const [busy, setBusy] = useState(false);
   const [currentFile, setCurrentFile] = useState<ToolProgressFile | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -182,7 +183,10 @@ export default function VideoDownloaderTool({
   const [uncontrolledAdsVisible, setUncontrolledAdsVisible] = useState(false);
   const adsVisible = controlledAdsVisible ?? uncontrolledAdsVisible;
 
-  useEffect(() => () => activeRun.current?.abort("Downloader unmounted"), []);
+  useEffect(
+    () => () => runOwnership.abort("Downloader unmounted"),
+    [runOwnership],
+  );
 
   function revealAds() {
     if (adsVisible) return;
@@ -194,7 +198,7 @@ export default function VideoDownloaderTool({
   }
 
   async function handleUrlSubmit() {
-    if (busy) return;
+    if (busy || runOwnership.isBusy()) return;
     const parsedUrl = parseUrlInput(urlInput);
     if (!parsedUrl) {
       setExtensionFailureCta(null);
@@ -215,6 +219,7 @@ export default function VideoDownloaderTool({
       extensionProductName,
     );
 
+    const lease = runOwnership.begin();
     setBusy(true);
     setCurrentFile({
       name: nameHint,
@@ -225,12 +230,10 @@ export default function VideoDownloaderTool({
 
     const progress = createMonotonicProgress();
     try {
-      const controller = new AbortController();
-      activeRun.current?.abort("Replaced by a new downloader run");
-      activeRun.current = controller;
       const outcome = await createBrowserMediaWorkflow({
         releaseDeliveredBytes: true,
         onTransfer(transfer) {
+          if (!lease.isCurrent()) return;
           const presentation = projectMediaTransfer(transfer);
           setCurrentFile({
             name: nameHint,
@@ -246,8 +249,9 @@ export default function VideoDownloaderTool({
           options: { mode },
         },
         {
-          signal: controller.signal,
+          signal: lease.signal,
           observe(snapshot) {
+            if (!lease.isCurrent()) return;
             if (
               snapshot.phase === "succeeded" ||
               snapshot.phase === "failed" ||
@@ -273,6 +277,7 @@ export default function VideoDownloaderTool({
           },
         },
       );
+      if (!lease.isCurrent()) return;
       if (outcome.status === "failed") throw new Error(outcome.error.message);
       if (outcome.status === "cancelled") return;
       const result = outcome.results[0];
@@ -284,6 +289,7 @@ export default function VideoDownloaderTool({
         message: "Download ready!",
       });
     } catch (err) {
+      if (!lease.isCurrent()) return;
       const message = err instanceof Error ? err.message : "Download failed";
       if (failFastCta) {
         setExtensionFailureCta(failFastCta);
@@ -320,8 +326,7 @@ export default function VideoDownloaderTool({
         message,
       });
     } finally {
-      activeRun.current = null;
-      setBusy(false);
+      if (lease.finish()) setBusy(false);
     }
   }
 

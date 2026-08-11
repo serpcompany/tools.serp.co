@@ -1,10 +1,12 @@
 import { beginToolRun } from "../telemetry.ts";
 import type { ToolWorkflow, WorkflowMedia } from "../tool-workflow/index.ts";
+import { getMediaWorkflowAdapterRegistration } from "./adapter-registration.ts";
 import { createMediaWorkflow } from "./index.ts";
 import { createProductionMediaEndpoint } from "./media-endpoint.ts";
 import { getExtensionFromName, safeMediaName } from "./media-endpoint.ts";
 import type { MediaTransferProgress } from "./media-endpoint.ts";
 import type { TranscriptionPort } from "./processors.ts";
+import { TRANSCRIPT_OUTPUT } from "./verified-formats.ts";
 
 export async function workflowMediaFromFile(
   file: File,
@@ -84,12 +86,14 @@ export function createBrowserMediaWorkflow(
     },
     telemetry: {
       async start(runId, request) {
+        const registration = getMediaWorkflowAdapterRegistration(
+          request.toolId,
+        );
         const from =
           request.input.kind === "url" ? "url" : request.input.media.format;
         const to =
-          request.toolId.includes("transcript") ||
-          request.toolId === "audio-to-text"
-            ? "txt"
+          registration?.family === "transcription"
+            ? TRANSCRIPT_OUTPUT.format
             : request.options &&
                 typeof request.options === "object" &&
                 "mode" in request.options &&

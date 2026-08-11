@@ -11,34 +11,18 @@ import {
   verifyMediaSemantics,
 } from "../tool-workflow/semantic-validators.ts";
 import { getExtensionFromName } from "./media-endpoint.ts";
-import { VERIFIED_MEDIA_FORMATS } from "./verified-formats.ts";
-
-export const TRANSCRIPTION_TOOL_IDS = Object.freeze([
-  "audio-to-text",
-  "audio-to-transcript",
-  "mp3-to-transcript",
-  "mp4-to-transcript",
-  "tiktok-to-transcript",
-  "video-to-transcript",
-  "youtube-to-transcript",
-  "youtube-to-transcript-generator",
-]);
+import {
+  TRANSCRIPT_OUTPUT,
+  VERIFIED_MEDIA_FORMATS,
+  VERIFIED_MEDIA_MIME_TYPES,
+} from "./verified-formats.ts";
 
 const formats = VERIFIED_MEDIA_FORMATS;
-const mimeTypesByFormat: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  "3gp": ["audio/3gpp", "video/3gpp", "application/octet-stream"],
-  m4a: ["audio/mp4", "application/octet-stream"],
-  m4v: ["video/mp4", "video/x-m4v", "application/octet-stream"],
-  mov: ["video/quicktime", "application/octet-stream"],
-  mp3: ["audio/mpeg", "application/octet-stream"],
-  mp4: ["video/mp4", "application/octet-stream"],
-  webm: ["audio/webm", "video/webm", "application/octet-stream"],
-});
 
 function inputContracts() {
   return formats.map((format) => ({
     format,
-    mimeTypes: mimeTypesByFormat[format] ?? [],
+    mimeTypes: VERIFIED_MEDIA_MIME_TYPES[format],
   }));
 }
 
@@ -59,7 +43,10 @@ function verifyMediaIdentity(
       message: "Media filename does not match its declared format",
     });
   }
-  const acceptedMimeTypes = mimeTypesByFormat[media.format];
+  const acceptedMimeTypes =
+    VERIFIED_MEDIA_MIME_TYPES[
+      media.format as keyof typeof VERIFIED_MEDIA_MIME_TYPES
+    ];
   if (
     acceptedMimeTypes &&
     !acceptedMimeTypes.includes(media.mimeType)
@@ -148,14 +135,14 @@ export function createTranscriptionProcessor(
   return {
     intent: {
       requestedOperation: "transcribe",
-      outputs: [{ format: "txt", mimeType: "text/plain" }],
+      outputs: [TRANSCRIPT_OUTPUT],
     },
     processor: {
       engine: engine("browser-transformers-transcription"),
       support: {
         acquisition,
         inputs: inputContracts(),
-        outputs: [{ format: "txt", mimeType: "text/plain" }],
+        outputs: [TRANSCRIPT_OUTPUT],
         resourceLimits: {
           maxInputBytes: MAX_SEMANTIC_MEDIA_BYTES,
           maxOutputBytes: 20_000_000,
@@ -178,8 +165,7 @@ export function createTranscriptionProcessor(
         return [
           {
             name: `${baseName}.txt`,
-            format: "txt",
-            mimeType: "text/plain",
+            ...TRANSCRIPT_OUTPUT,
             bytes: new TextEncoder().encode(transcript),
           },
         ];

@@ -10,6 +10,8 @@ import {
   getToolExecutionProvenance,
 } from './tool-execution-provenance.ts';
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
+import { getMediaWorkflowAdapterRegistration } from './media-workflow/adapter-registration.ts';
+import { selectToolRenderer } from './tool-renderer.ts';
 
 function mapped(toolId) {
   const provenance = getToolExecutionProvenance(toolId);
@@ -283,18 +285,18 @@ test('processor availability stays distinct from inferred provenance and joins b
   assert.equal('status' in getToolProcessorAvailability('png-to-jpg'), false);
 });
 
-test('every active server-media-fetch downloader is wired to the streamed workflow', () => {
-  const eligibleDownloaders = toolCatalog.activeTools.filter((tool) => {
-    const provenance = getToolExecutionProvenance(tool.id);
-    return (
-      provenance.kind === 'mapped' &&
-      provenance.engineIds.length === 1 &&
-      provenance.engineIds[0] === 'server-media-fetch'
-    );
-  });
+test('every active shared-renderer downloader is explicitly wired to the streamed workflow', () => {
+  const eligibleDownloaders = toolCatalog.activeTools.filter(
+    (tool) => selectToolRenderer(tool) === 'downloader',
+  );
 
   assert.equal(eligibleDownloaders.length, 292);
   for (const tool of eligibleDownloaders) {
+    assert.deepEqual(getMediaWorkflowAdapterRegistration(tool.id), {
+      toolId: tool.id,
+      family: 'downloader',
+      adapterId: 'streamed-media-workflow',
+    });
     assert.deepEqual(getToolProcessorAvailability(tool.id), {
       kind: 'wired',
       toolId: tool.id,

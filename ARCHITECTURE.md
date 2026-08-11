@@ -103,6 +103,13 @@ provenance remains explicitly unwired until a production family migration
 registers an adapter, and neither support nor validator results become Catalog
 intent or runtime telemetry.
 
+The streamed-media adapter registration in
+`apps/tools/lib/media-workflow/adapter-registration.ts` projects executable
+families explicitly. Its downloader family is the active Tool-id set owned by
+the shared downloader renderer, while transcription remains an explicit
+Tool-id family. Execution provenance describes those Tools but does not
+register or dispatch their adapters.
+
 ## Cloudflare runtime and data boundaries
 
 The production application path is a Next.js application compiled by OpenNext

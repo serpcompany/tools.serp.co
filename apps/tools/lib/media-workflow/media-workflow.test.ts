@@ -4,6 +4,10 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { getToolProcessorAvailability } from "../tool-processor-registry.ts";
+import {
+  getMediaWorkflowAdapterRegistration,
+  mediaWorkflowAdapterRegistrations,
+} from "./adapter-registration.ts";
 import { createBrowserRunOwnership } from "./browser-run-ownership.ts";
 import { createMonotonicProgress } from "./monotonic-progress.ts";
 import { deliverMediaInBrowser } from "./browser.ts";
@@ -52,6 +56,32 @@ test("a finished old browser run cannot clear newer ownership", () => {
   first.finish();
   assert.equal(second.isCurrent(), true);
   ownership.abort("view unmounted");
+  assert.equal(second.signal.aborted, true);
+  assert.equal(ownership.isBusy(), false);
+});
+
+test("downloader run callbacks cannot outlive replacement or unmount", () => {
+  const ownership = createBrowserRunOwnership();
+  const writes: string[] = [];
+  const first = ownership.begin();
+  const firstCallback = () => {
+    if (first.isCurrent()) writes.push("first");
+  };
+
+  ownership.abort("first downloader run replaced");
+  const second = ownership.begin();
+  const secondCallback = () => {
+    if (second.isCurrent()) writes.push("second");
+  };
+  firstCallback();
+  assert.equal(first.finish(), false);
+  secondCallback();
+
+  ownership.abort("Downloader unmounted");
+  secondCallback();
+
+  assert.deepEqual(writes, ["second"]);
+  assert.equal(first.signal.aborted, true);
   assert.equal(second.signal.aborted, true);
   assert.equal(ownership.isBusy(), false);
 });
@@ -469,6 +499,19 @@ test("transcription UI owns one guarded batch run through unmount", () => {
   assert.doesNotMatch(source, /activeRun\.current\s*=\s*null/);
 });
 
+test("downloader UI guards every run callback and terminal release with one lease", () => {
+  const source = readFileSync(
+    new URL("../../components/VideoDownloaderTool.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(source, /createBrowserRunOwnership/);
+  assert.match(source, /if \(busy \|\| runOwnership\.isBusy\(\)\) return/);
+  assert.match(source, /if \(!lease\.isCurrent\(\)\) return/);
+  assert.match(source, /if \(lease\.finish\(\)\) setBusy\(false\)/);
+  assert.match(source, /runOwnership\.abort\("Downloader unmounted"\)/);
+  assert.doesNotMatch(source, /activeRun\.current/);
+});
+
 test("downloader and URL transcription project transfer stats without backward progress", () => {
   for (const relativePath of [
     "../../components/VideoDownloaderTool.tsx",
@@ -487,23 +530,25 @@ test("downloader and URL transcription project transfer stats without backward p
 });
 
 test("scoped downloader and transcription Tool ids register the media workflow adapter", () => {
-  for (const toolId of [
-    "video-downloader",
-    "download-loom-videos",
-    "audio-to-transcript",
-    "mp3-to-transcript",
-    "mp4-to-transcript",
-    "video-to-transcript",
-    "youtube-to-transcript",
-    "youtube-to-transcript-generator",
-    "tiktok-to-transcript",
-  ]) {
+  assert.equal(mediaWorkflowAdapterRegistrations.length, 300);
+  for (const [toolId, family] of [
+    ["video-downloader", "downloader"],
+    ["download-loom-videos", "downloader"],
+    ["audio-to-transcript", "transcription"],
+    ["youtube-to-transcript-generator", "transcription"],
+  ] as const) {
+    assert.deepEqual(getMediaWorkflowAdapterRegistration(toolId), {
+      toolId,
+      family,
+      adapterId: "streamed-media-workflow",
+    });
     assert.deepEqual(getToolProcessorAvailability(toolId), {
       kind: "wired",
       toolId,
       adapterId: "streamed-media-workflow",
     });
   }
+  assert.equal(getMediaWorkflowAdapterRegistration("png-to-jpg"), undefined);
 });
 
 test("known-unreliable downloader attempts fail inside workflow accounting without endpoint access", async (t) => {

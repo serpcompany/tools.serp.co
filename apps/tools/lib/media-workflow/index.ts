@@ -13,11 +13,10 @@ import {
   type MediaTransferProgress,
 } from "./media-endpoint.ts";
 import { getDownloaderAttemptPolicy } from "./attempt-policy.ts";
-import { isStreamedMediaDownloaderTool } from "./eligibility.ts";
+import { getMediaWorkflowAdapterRegistration } from "./adapter-registration.ts";
 import {
   createDownloaderProcessor,
   createTranscriptionProcessor,
-  TRANSCRIPTION_TOOL_IDS,
   type TranscriptionPort,
 } from "./processors.ts";
 
@@ -46,15 +45,14 @@ export type MediaWorkflowPorts = {
   onTransfer?: (progress: MediaTransferProgress) => void;
 };
 
-function isTranscriptionTool(toolId: string): boolean {
-  return TRANSCRIPTION_TOOL_IDS.includes(toolId);
-}
-
 function endpointRequest(request: WorkflowRequest): MediaEndpointRequest {
   if (request.input.kind !== "url") {
     throw new TypeError("URL media acquisition requires a URL input");
   }
-  if (isTranscriptionTool(request.toolId)) {
+  if (
+    getMediaWorkflowAdapterRegistration(request.toolId)?.family ===
+    "transcription"
+  ) {
     return { mode: "audio", url: request.input.url };
   }
   const mode =
@@ -70,8 +68,9 @@ function endpointRequest(request: WorkflowRequest): MediaEndpointRequest {
 export function createMediaWorkflow(ports: MediaWorkflowPorts): ToolWorkflow {
   return {
     run(request, options) {
-      const transcription = isTranscriptionTool(request.toolId);
-      const downloader = isStreamedMediaDownloaderTool(request.toolId);
+      const registration = getMediaWorkflowAdapterRegistration(request.toolId);
+      const transcription = registration?.family === "transcription";
+      const downloader = registration?.family === "downloader";
       if (transcription && !ports.transcription) {
         throw new Error("The transcription workflow adapter is unavailable");
       }
