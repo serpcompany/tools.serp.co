@@ -153,21 +153,13 @@ async function waitForServer(origin, child, logs) {
 
 async function stopServer(child) {
   if (child.exitCode !== null) return;
-  try {
-    process.kill(-child.pid, 'SIGTERM');
-  } catch {
-    child.kill('SIGTERM');
-  }
+  child.kill('SIGTERM');
   await Promise.race([
     once(child, 'exit'),
     new Promise((resolve) => setTimeout(resolve, 5_000)),
   ]);
   if (child.exitCode === null) {
-    try {
-      process.kill(-child.pid, 'SIGKILL');
-    } catch {
-      child.kill('SIGKILL');
-    }
+    child.kill('SIGKILL');
     await once(child, 'exit').catch(() => {});
   }
 }
@@ -191,18 +183,18 @@ async function withRevisionServer(repositoryRoot, revision, label, action) {
     const port = await reservePort();
     const origin = `http://127.0.0.1:${port}`;
     child = spawn(
-      'pnpm',
+      process.execPath,
       [
-        'dev:local',
-        '--',
+        path.join(worktree, 'node_modules/next/dist/bin/next'),
+        'dev',
         '--hostname',
         '127.0.0.1',
         '--port',
         String(port),
       ],
       {
-        cwd: worktree,
-        detached: true,
+        cwd: path.join(worktree, 'apps/tools'),
+        detached: false,
         env: {
           ...process.env,
           NEXT_TELEMETRY_DISABLED: '1',
