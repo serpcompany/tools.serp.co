@@ -170,6 +170,13 @@ Dashboard access:
   `TOOLS_SERP_CLOUDFLARE_ACCESS_AUD`, and
   `TOOLS_SERP_TOOL_FACTORY_ALLOWED_EMAIL` outside the repository. Do not put
   the approved email or Access credentials in source, logs, or artifacts.
+- Access setup (human-authorized mutation): create one Cloudflare Access
+  self-hosted application for the Wayfinder workers.dev hostname with path
+  `/internal/tools*`; add one Allow policy containing the exact approved owner
+  email and no broad Everyone rule. Copy the application AUD and team domain.
+  Store all three runtime bindings with `wrangler secret put <NAME> --env
+  wayfinder-preview`, entering each value through stdin. The deploy wrapper
+  checks that all names exist and refuses deployment when any are absent.
 - Display: the page visibly identifies `DEV/STAGING` and the full deployed
   revision. Treat that pair as the boundary for any screenshot or browser
   evidence.
@@ -177,6 +184,23 @@ Dashboard access:
   controlled-verification, and revision-local coverage facts. Runtime
   observations remain a separate evidence dimension and are not inferred from
   support registration.
+
+Hosted table verification uses an authenticated Access session cookie supplied
+only through the environment:
+
+```bash
+TOOL_FACTORY_CF_AUTHORIZATION='<temporary Access cookie>' \
+  pnpm -C apps/tools check:tool-factory -- \
+  --base-url https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev \
+  --environment DEV/STAGING \
+  --revision <full-deployed-commit> \
+  --screenshot <ignored-artifact-path.png>
+```
+
+Never put the cookie in an argument, source file, screenshot, or retained
+artifact. The check exercises search, support filtering, column visibility,
+pagination, and a Tool detail drawer while asserting the displayed environment
+and revision.
 
 ## Cache And Optimization Bindings
 

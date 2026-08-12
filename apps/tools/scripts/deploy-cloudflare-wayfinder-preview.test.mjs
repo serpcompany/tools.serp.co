@@ -144,3 +144,55 @@ test('preview wrapper reads deployment topology from Wrangler config', () => {
     /const previewOrigin =\s*'https:\/\/tools-serp-co-wayfinder-preview/,
   );
 });
+
+test('preview deployment refuses to run when private Tool Factory bindings are missing', (t) => {
+  const fixtureRoot = mkdtempSync(
+    path.join(tmpdir(), 'tools-serp-wayfinder-access-'),
+  );
+  t.after(() => rmSync(fixtureRoot, { recursive: true, force: true }));
+  const revision = 'a'.repeat(40);
+
+  writeExecutable(
+    path.join(fixtureRoot, 'git'),
+    `
+if (process.argv[2] === 'rev-parse') process.stdout.write(process.env.TEST_REVISION);
+else if (process.argv[2] === 'status') process.stdout.write('');
+else process.exit(2);
+`,
+  );
+  writeExecutable(
+    path.join(fixtureRoot, 'pnpm'),
+    `
+if (process.argv.includes('secret') && process.argv.includes('list')) process.stdout.write('[]');
+`,
+  );
+
+  const result = spawnSync(
+    process.execPath,
+    [deployScript, '--deploy', '--revision', revision],
+    {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        // eslint-disable-next-line turbo/no-undeclared-env-vars
+        PATH: `${fixtureRoot}${path.delimiter}${process.env.PATH}`,
+        TEST_REVISION: revision,
+      },
+    },
+  );
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Tool Factory access secrets are incomplete/);
+  assert.doesNotMatch(result.stderr, /ACCESS_AUD|ALLOWED_EMAIL|TEAM_DOMAIN/);
+});
+
+test('preview deployment names all required private access bindings without embedding values', () => {
+  for (const name of [
+    'TOOLS_SERP_CLOUDFLARE_ACCESS_TEAM_DOMAIN',
+    'TOOLS_SERP_CLOUDFLARE_ACCESS_AUD',
+    'TOOLS_SERP_TOOL_FACTORY_ALLOWED_EMAIL',
+  ]) {
+    assert.match(deploySource, new RegExp(`['"]${name}['"]`));
+  }
+  assert.doesNotMatch(deploySource, /@(?:gmail|serpcompany)\./i);
+});
