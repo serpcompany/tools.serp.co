@@ -48,6 +48,7 @@ const DEFAULT_VISIBLE_COLUMNS: readonly ToolFactoryColumnId[] = Object.freeze([
 ]);
 
 export type ToolFactoryViewState = Readonly<{
+  expansionGroup: string;
   search: string;
   filters: Readonly<{
     support: string;
@@ -62,6 +63,7 @@ export type ToolFactoryViewState = Readonly<{
 }>;
 
 export const DEFAULT_TOOL_FACTORY_VIEW: ToolFactoryViewState = Object.freeze({
+  expansionGroup: '',
   search: '',
   filters: Object.freeze({
     support: '',
@@ -144,12 +146,17 @@ export function parseToolFactoryView(
   options: Readonly<{
     families: readonly string[];
     profiles: readonly string[];
+    expansionGroups: readonly string[];
   }>,
 ): ToolFactoryViewState {
   const parameters = new URLSearchParams(search);
   const page = Number(parameters.get('page'));
   const rows = Number(parameters.get('rows'));
   return Object.freeze({
+    expansionGroup: allowed(
+      parameters.get('expansion'),
+      new Set(options.expansionGroups),
+    ),
     search: boundedText(parameters.get('q'), 200),
     filters: Object.freeze({
       support: allowed(parameters.get('support'), supportValues),
@@ -173,6 +180,9 @@ function sameValues(left: readonly string[], right: readonly string[]) {
 
 export function serializeToolFactoryView(view: ToolFactoryViewState) {
   const parameters = new URLSearchParams();
+  if (view.expansionGroup) {
+    parameters.set('expansion', view.expansionGroup);
+  }
   if (view.search) parameters.set('q', view.search);
   if (view.filters.support) parameters.set('support', view.filters.support);
   if (view.filters.family) parameters.set('family', view.filters.family);

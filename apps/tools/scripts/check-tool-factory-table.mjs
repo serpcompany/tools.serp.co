@@ -151,6 +151,84 @@ try {
     .waitFor();
   await waitForHydration(page);
 
+  const planner = page.getByRole('region', { name: 'OSS expansion planner' });
+  await planner
+    .getByRole('heading', { name: 'OSS expansion planner' })
+    .waitFor();
+  await planner
+    .getByText(
+      'Candidate library, engine mapping, or installed-package presence is planning evidence only and never verified support.',
+      { exact: true },
+    )
+    .waitFor();
+  const adaptiveGroup = planner.getByRole('article', {
+    name: 'Rank 1 generic-convert:adaptive-video',
+  });
+  await adaptiveGroup.getByText('1,505 exact Tools', { exact: true }).waitFor();
+  await adaptiveGroup
+    .getByText('@ffmpeg/ffmpeg and @ffmpeg/core', { exact: false })
+    .first()
+    .waitFor();
+  await adaptiveGroup.getByText('adapter · missing', { exact: true }).waitFor();
+  await adaptiveGroup
+    .getByText('browser/runtime fit · needs review', { exact: true })
+    .waitFor();
+  await adaptiveGroup
+    .getByRole('button', { name: 'Show 1,505 exact Tools' })
+    .click();
+  await page.getByText('1,505 matching Tools').waitFor();
+  await page
+    .getByText('Filtering to rank 1 · generic-convert:adaptive-video', {
+      exact: true,
+    })
+    .waitFor();
+  if (args.screenshot) await planner.screenshot({ path: args.screenshot });
+  await page.getByLabel('Search all Tools').fill('3g2-to-mp4');
+  await page.getByText('1 matching Tools').waitFor();
+  await page.getByLabel('Search all Tools').fill('ai-to-png');
+  await page.getByText('0 matching Tools').waitFor();
+  await page.getByLabel('Search all Tools').fill('');
+  const expansionUrl = new URL(page.url());
+  assert.equal(
+    expansionUrl.searchParams.get('expansion'),
+    'family:generic-convert:adaptive-video',
+  );
+
+  await page.reload({ waitUntil: 'networkidle' });
+  await waitForHydration(page);
+  await page.getByText('1,505 matching Tools').waitFor();
+  await page
+    .getByText('Filtering to rank 1 · generic-convert:adaptive-video', {
+      exact: true,
+    })
+    .waitFor();
+
+  const copiedExpansionPage = await context.newPage();
+  const copiedExpansionErrors = [];
+  copiedExpansionPage.on('pageerror', (error) =>
+    copiedExpansionErrors.push(error.message),
+  );
+  await copiedExpansionPage.goto(expansionUrl.href, {
+    waitUntil: 'networkidle',
+  });
+  await waitForHydration(copiedExpansionPage);
+  await copiedExpansionPage.getByText('1,505 matching Tools').waitFor();
+  await copiedExpansionPage
+    .getByText('Filtering to rank 1 · generic-convert:adaptive-video', {
+      exact: true,
+    })
+    .waitFor();
+  assert.deepEqual(copiedExpansionErrors, []);
+  await copiedExpansionPage.close();
+
+  await page.getByRole('button', { name: 'Reset' }).click();
+  assert.equal(new URL(page.url()).search, '');
+  await page.getByText('2,807 matching Tools').waitFor();
+  await page.goBack({ waitUntil: 'networkidle' });
+  await page.getByText('1,505 matching Tools').waitFor();
+  await page.goForward({ waitUntil: 'networkidle' });
+  await page.getByText('2,807 matching Tools').waitFor();
+
   await page.getByLabel('Search all Tools').fill('png-to-webp');
   await page.getByText('1 matching Tools').waitFor();
   await page.getByRole('row', { name: /PNG to WebP/ }).click();
@@ -175,7 +253,6 @@ try {
       exact: true,
     })
     .waitFor();
-  if (args.screenshot) await dialog.screenshot({ path: args.screenshot });
   await page.keyboard.press('Escape');
 
   await page.getByLabel('Search all Tools').fill('bmp-to-png');
@@ -331,7 +408,7 @@ try {
 
   await page.goto(
     new URL(
-      '/internal/tools?support=retired&sort=missing%3Asideways&columns=missing&page=999999&rows=999',
+      '/internal/tools?expansion=family%3Ainvented&support=retired&sort=missing%3Asideways&columns=missing&page=999999&rows=999',
       args.baseUrl,
     ).href,
     { waitUntil: 'networkidle' },
@@ -361,10 +438,10 @@ try {
     status,
     startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
-    linkedWork: ['#50', '#105', '#106', '#107'],
+    linkedWork: ['#50', '#102', '#105', '#106', '#107'],
     summary: {
       status,
-      checksPassed: status === 'success' ? 14 : 0,
+      checksPassed: status === 'success' ? 18 : 0,
       checksFailed: status === 'success' ? 0 : 1,
       items: 1,
       durationMs: completedAt.valueOf() - startedAt.valueOf(),

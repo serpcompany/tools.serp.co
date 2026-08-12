@@ -99,16 +99,21 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /page\.goForward/);
   assert.match(source, /new URL\(page\.url\(\)\)\.search/);
   assert.match(source, /getByRole\(['"]dialog['"]\)/);
+  assert.match(source, /OSS expansion planner/);
+  assert.match(source, /Show 1,505 exact Tools/);
+  assert.match(source, /installed-package presence/);
+  assert.match(source, /searchParams\.get\(['"]expansion['"]\)/);
+  assert.match(source, /copiedExpansionPage\.goto\(expansionUrl\.href/);
   assert.match(source, /Latest exact Tool test/);
   assert.match(source, /Converted a real PNG and produced a WebP file/);
   assert.match(source, /Not tested here/);
   assert.match(source, /Family verification policy \(not an exact Tool test\)/);
-  assert.match(source, /dialog\.screenshot/);
+  assert.match(source, /planner\.screenshot/);
   assert.match(source, /recordRunEvidence/);
   assert.match(source, /command:\s*['"]check:tool-factory['"]/);
   assert.match(
     source,
-    /linkedWork:\s*\[['"]#50['"], ['"]#105['"], ['"]#106['"], ['"]#107['"]\]/,
+    /linkedWork:\s*\[['"]#50['"], ['"]#102['"], ['"]#105['"], ['"]#106['"], ['"]#107['"]\]/,
   );
   assert.doesNotMatch(source, /console\.log\(.*accessCookie/);
 });

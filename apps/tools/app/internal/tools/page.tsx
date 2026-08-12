@@ -7,6 +7,7 @@ import {
   getToolFactoryAccessConfig,
   getToolFactoryDeployment,
 } from '../../../lib/tool-factory-access.ts';
+import { buildToolExpansionPlan } from '../../../lib/tool-expansion-planner.ts';
 import { buildToolFactoryReadModel } from '../../../lib/tool-factory-read-model.ts';
 import { ToolFactoryTable } from './tool-factory-table.tsx';
 
@@ -35,10 +36,12 @@ export default async function ToolFactoryPage() {
   }
 
   const model = buildToolFactoryReadModel();
+  const expansionPlan = buildToolExpansionPlan(model.rows);
   return (
     <ToolFactoryTable
       deployment={deployment}
       model={{ rows: model.rows, counts: model.counts }}
+      expansionPlan={expansionPlan}
     />
   );
 }
