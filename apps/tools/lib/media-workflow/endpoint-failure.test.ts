@@ -103,3 +103,65 @@ test("downloader and transcription clients prefer the encoded Unicode filename",
     });
   }
 });
+
+test("transcription endpoint hides unexpected server implementation details", async () => {
+  const endpoint = createProductionMediaEndpoint({
+    fetch: async () =>
+      new Response(
+        JSON.stringify({
+          error: `Unexpected token 'R', "Request fo"... is not valid JSON`,
+        }),
+        {
+          status: 500,
+          headers: { "content-type": "application/json" },
+        },
+      ),
+  });
+
+  await assert.rejects(
+    endpoint.open(
+      {
+        mode: "audio",
+        url: "https://www.youtube.com/watch?v=3Is2P90qVa0",
+      },
+      new AbortController().signal,
+    ),
+    (error: unknown) => {
+      assert.ok(error instanceof Error);
+      assert.equal(
+        error.message,
+        "This public media link could not be opened. Try a direct audio or video file URL instead.",
+      );
+      assert.doesNotMatch(error.message, /Unexpected token|not valid JSON/);
+      return true;
+    },
+  );
+});
+
+test("transcription endpoint presents the explicit YouTube unsupported response", async () => {
+  const endpoint = createProductionMediaEndpoint({
+    fetch: async () =>
+      new Response(
+        JSON.stringify({
+          code: "youtube-unsupported",
+          error:
+            "YouTube links are not supported right now. Upload the file or use a direct public audio or video file URL.",
+        }),
+        {
+          status: 422,
+          headers: { "content-type": "application/json" },
+        },
+      ),
+  });
+
+  await assert.rejects(
+    endpoint.open(
+      {
+        mode: "audio",
+        url: "https://www.youtube.com/watch?v=3Is2P90qVa0",
+      },
+      new AbortController().signal,
+    ),
+    /YouTube links are not supported right now.*direct public audio or video file URL/,
+  );
+});

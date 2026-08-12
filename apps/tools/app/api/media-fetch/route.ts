@@ -182,6 +182,27 @@ function getExtensionFromName(name: string) {
   return match ? match[1] : "";
 }
 
+function isYouTubeUrl(url: URL) {
+  const hostname = url.hostname.toLowerCase();
+  return (
+    hostname === "youtube.com" ||
+    hostname === "www.youtube.com" ||
+    hostname === "m.youtube.com" ||
+    hostname === "youtu.be"
+  );
+}
+
+function buildYouTubeUnsupportedResponse() {
+  return buildJsonErrorResponse(
+    {
+      code: "youtube-unsupported",
+      error:
+        "YouTube links are not supported right now. Upload the file or use a direct public audio or video file URL.",
+    },
+    422,
+  );
+}
+
 function parseContentDispositionFilename(header: string | null) {
   if (!header) return "";
   const utfMatch = header.match(/filename\\*=UTF-8''([^;]+)/i);
@@ -383,7 +404,11 @@ async function tryDirectFetch(targetUrl: URL) {
   return new Response(response.body, { status: 200, headers });
 }
 
-async function fetchPublicMediaUrl(url: string, referer?: string, redirectCount = 0): Promise<Response> {
+async function fetchPublicMediaUrl(
+  url: string,
+  referer?: string,
+  redirectCount = 0,
+): Promise<Response> {
   if (redirectCount > 5) {
     throw new Error("Too many media redirects.");
   }
@@ -597,6 +622,10 @@ export async function POST(request: Request) {
     );
   }
 
+  if (isYouTubeUrl(targetUrl)) {
+    return buildYouTubeUnsupportedResponse();
+  }
+
   try {
     await assertPublicUrl(targetUrl);
   } catch (err) {
@@ -632,7 +661,17 @@ export async function POST(request: Request) {
         ? String((err as { stderr?: unknown }).stderr ?? "")
         : "";
     const trimmedStderr = stderr.trim().split("\n")[0] || "";
-    const message = errMessage || trimmedStderr || "Failed to fetch media.";
-    return buildJsonErrorResponse({ error: message }, 500);
+    const internalMessage = errMessage || trimmedStderr;
+    console.error("Media fetch failed", {
+      message: internalMessage || "unknown media fetch error",
+      sourceHost: targetUrl.hostname,
+    });
+    return buildJsonErrorResponse(
+      {
+        error:
+          "This public media link could not be opened. Try a direct audio or video file URL instead.",
+      },
+      422,
+    );
   }
 }

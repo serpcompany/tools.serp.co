@@ -342,7 +342,7 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
                 <input
                   type="url"
                   inputMode="url"
-                  placeholder="Paste a public link (YouTube, SoundCloud, or direct file)"
+                  placeholder="Paste a direct public audio or video file URL"
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -373,8 +373,8 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
                 </Button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Supports public links. Private or logged-in content is not
-                supported yet.
+                Direct public audio/video file URLs only. YouTube, private, and
+                logged-in links are not supported yet.
               </p>
             </div>
           </div>

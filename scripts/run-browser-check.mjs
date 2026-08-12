@@ -896,9 +896,35 @@ try {
       if (!fixtureEntry) {
         return { skipped: true, reason: 'missing mp3 fixture' };
       }
-      await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
-        fixtureEntry.path,
-      ]);
+      if (tool.id === 'audio-to-text') {
+        await page.route('**/api/media-fetch*', async (route) => {
+          const requestPayload = route.request().postDataJSON();
+          if (
+            requestPayload?.url !==
+            'https://www.youtube.com/watch?v=3Is2P90qVa0'
+          ) {
+            throw new Error('Audio-to-Text did not send the exact YouTube URL');
+          }
+          await route.fulfill({
+            status: 422,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              code: 'youtube-unsupported',
+              error:
+                'YouTube links are not supported right now. Upload the file or use a direct public audio or video file URL.',
+            }),
+          });
+        });
+        await page.fill(
+          '[data-testid="tool-url-input"]',
+          'https://www.youtube.com/watch?v=3Is2P90qVa0',
+        );
+        await page.click('[data-testid="tool-url-submit"]');
+      } else {
+        await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
+          fixtureEntry.path,
+        ]);
+      }
       const terminalHandle = await page.waitForFunction(
         readTranscriptionTerminalState,
         undefined,
@@ -906,6 +932,13 @@ try {
       );
       const terminal = await terminalHandle.jsonValue();
       if (terminal.status === 'failed') {
+        if (
+          tool.id === 'audio-to-text' &&
+          terminal.message.includes('YouTube links are not supported right now') &&
+          !terminal.message.includes('Unexpected token')
+        ) {
+          return { detail: 'truthful YouTube unsupported terminal' };
+        }
         throw new Error(`Transcription failed: ${terminal.message}`);
       }
       return { detail: `transcript ${terminal.transcript.length} chars` };

@@ -422,6 +422,30 @@ function nativeChecks(args) {
   }
   const checks = [
     {
+      name: "POST /api/media-fetch exact Audio-to-Text YouTube URL",
+      url: buildUrl(args.baseUrl, "/api/media-fetch"),
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        url: "https://www.youtube.com/watch?v=3Is2P90qVa0",
+        mode: "audio",
+      }),
+      timeoutMs: Math.max(args.timeoutMs, 60000),
+      expect: (response, bytes) => {
+        if (response.status !== 422) return false;
+        try {
+          const payload = JSON.parse(bytes.toString("utf8"));
+          return (
+            payload.code === "youtube-unsupported" &&
+            typeof payload.error === "string" &&
+            !payload.error.includes("Unexpected token")
+          );
+        } catch {
+          return false;
+        }
+      },
+    },
+    {
       name: "POST /api/image-compress?format=svg",
       url: buildUrl(args.baseUrl, "/api/image-compress?format=svg"),
       method: "POST",

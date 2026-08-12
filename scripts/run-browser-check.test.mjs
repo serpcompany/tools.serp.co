@@ -216,6 +216,12 @@ test('transcription smoke uses owned speech and a bounded success-or-error termi
   assert.match(runnerSource, /readTranscriptionTerminalState/);
   assert.match(runnerSource, /timeout: 60_000/);
   assert.doesNotMatch(runnerSource, /timeout: 600000/);
+  assert.match(
+    runnerSource,
+    /https:\/\/www\.youtube\.com\/watch\?v=3Is2P90qVa0/,
+  );
+  assert.match(runnerSource, /page\.fill\(['"]\[data-testid=[^\n]+tool-url-input/);
+  assert.match(runnerSource, /page\.route\(['"]\*\*\/api\/media-fetch\*['"]/);
 });
 
 test('local downloader smoke crosses the URL endpoint with checked-in media', () => {

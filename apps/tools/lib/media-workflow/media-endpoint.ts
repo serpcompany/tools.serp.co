@@ -81,8 +81,12 @@ export function createProductionMediaEndpoint(
         } catch {
           // The repository endpoint is allowed to return an empty error body.
         }
+        const publicMessage =
+          !downloader && response.status >= 500
+            ? "This public media link could not be opened. Try a direct audio or video file URL instead."
+            : `Download failed (${response.status})${detail ? `: ${detail}` : ""}`;
         throw new MediaEndpointError(
-          `Download failed (${response.status})${detail ? `: ${detail}` : ""}`,
+          publicMessage,
           extensionRequired
             ? { kind: "browser-extension-required" }
             : undefined,

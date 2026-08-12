@@ -96,6 +96,14 @@ test('native canaries require pure SVG success and structured unavailable contra
   }
   assert.match(canarySource, /payload\.code === "server-native-unavailable"/);
   assert.match(canarySource, /payload\.capability\?\.available === false/);
+  assert.match(
+    canarySource,
+    /https:\/\/www\.youtube\.com\/watch\?v=3Is2P90qVa0/,
+  );
+  assert.match(
+    canarySource,
+    /POST \/api\/media-fetch exact Audio-to-Text YouTube URL/,
+  );
 });
 
 test('deployed Cloudflare canary verifies the emitted transcription chunk and FFmpeg resource contracts', () => {
