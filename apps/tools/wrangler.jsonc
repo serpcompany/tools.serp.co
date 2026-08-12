@@ -50,5 +50,40 @@
 			"service": "tools-serp-co"
 		}
 	],
-	"workers_dev": true
+	"workers_dev": true,
+	"env": {
+		"wayfinder-preview": {
+			"name": "tools-serp-co-wayfinder-preview",
+			"workers_dev": true,
+			"routes": [],
+			"vars": {
+				"NEXT_PUBLIC_ASSETS_BASE_URL": "https://assets.tools.serp.co",
+				"NEXT_PUBLIC_SITE_URL": "https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev"
+			},
+			"assets": {
+				"directory": ".open-next/assets",
+				"binding": "ASSETS"
+			},
+			"r2_buckets": [
+				{
+					"binding": "NEXT_INC_CACHE_R2_BUCKET",
+					"bucket_name": "tools-serp-co-inc-cache-preview"
+				}
+			],
+			"d1_databases": [
+				{
+					"binding": "SERP_TOOLS_DB",
+					"database_name": "serp-tools-preview",
+					"database_id": "69ab9290-579f-4537-96a0-7d0dc3bede2f",
+					"migrations_dir": "migrations"
+				}
+			],
+			"services": [
+				{
+					"binding": "WORKER_SELF_REFERENCE",
+					"service": "tools-serp-co-wayfinder-preview"
+				}
+			]
+		}
+	}
 }

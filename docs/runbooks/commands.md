@@ -16,6 +16,29 @@ exact port and hostname. The wrapper also supports the local HTTPS and
 source-map flags listed by `pnpm dev:local -- --help`. It rejects unknown
 arguments instead of silently ignoring them.
 
+## Dedicated Wayfinder preview
+
+The named Wrangler environment `wayfinder-preview` resolves only to the
+`tools-serp-co-wayfinder-preview` Worker at
+`https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev`. It is
+workers.dev only: its explicit empty route list prevents the production custom
+domain from being inherited. Its non-inheritable bindings explicitly name the
+preview D1 database, preview R2 cache bucket, and preview self-reference.
+
+| Command                                                                     | Network access | Repository writes                                                                  | External writes                                       | Authority and evidence                                                                                                                                                                     |
+| --------------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm prepare:cloudflare:wayfinder-preview -- --revision <full-commit-sha>` | None required  | Ignored `.next` and `.open-next` build output plus ignored structured run evidence | None; Wrangler receives `--dry-run`                   | Agent-safe after the branch is committed and clean. Requires the exact 40-character commit at `HEAD`, prints Wrangler's resolved binding summary, and records a local structured artifact. |
+| `pnpm deploy:cloudflare:wayfinder-preview -- --revision <full-commit-sha>`  | Cloudflare API | Ignored `.next` and `.open-next` build output plus ignored structured run evidence | Uploads a new version of the dedicated preview Worker | Human-controlled. Requires explicit preview authorization, an exact clean revision, and authenticated Cloudflare access.                                                                   |
+
+Both commands rebuild with the dedicated workers.dev origin and pass
+`TOOLS_SERP_DEPLOYED_REVISION` as a runtime variable. The wrapper refuses a
+dirty worktree or a revision different from `HEAD`. Neither command provisions
+resources, applies migrations, changes routes, or targets the production
+Worker. Their target topology is read from the canonical Wrangler configuration
+rather than duplicated in the executable wrapper. A successful build plus
+Wrangler validation/deployment records revision-scoped structured evidence
+linked to issue #77.
+
 ## Read-only portfolio audit
 
 | Command                                                                    | Network access | Repository writes | Authority and evidence                                                                                                                                                         |
@@ -64,7 +87,5 @@ deploy without explicit human direction.
 | `import:d1:production:remote`              | Imports reconciled rows into production D1; external write           | Human-controlled.                                                                                              |
 | `upload:r2:ffmpeg:production -- --dry-run` | Prints the proposed production R2 object uploads; no external write  | Agent-safe inspection after the Cloudflare build creates the source assets.                                    |
 | `upload:r2:ffmpeg:production`              | Uploads public FFmpeg assets to production R2; external write        | Human-controlled.                                                                                              |
+| `deploy:cloudflare:wayfinder-preview`      | Builds and uploads the dedicated workers.dev-only preview Worker     | Human-controlled. Exact revision and explicit preview authorization are required.                              |
 | `deploy:cloudflare:production`             | Builds and deploys the production Worker; external write             | Human-controlled. Merge, secrets, routes, and deployment approval remain with the human owner.                 |
-
-There is no remote-preview deployment alias. A future remote preview topology
-must receive its own target-specific command and reviewed authority contract.

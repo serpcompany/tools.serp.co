@@ -19,6 +19,8 @@
     "sync:downloader-registry:check": "node scripts/sync-downloader-landers-from-registry.mjs --check",
     "sync:downloader-registry:write": "node scripts/sync-downloader-landers-from-registry.mjs --write",
     "preview:cloudflare:local": "pnpm -C apps/tools preview:cloudflare:local",
+    "prepare:cloudflare:wayfinder-preview": "pnpm -C apps/tools prepare:cloudflare:wayfinder-preview",
+    "deploy:cloudflare:wayfinder-preview": "pnpm -C apps/tools deploy:cloudflare:wayfinder-preview",
     "canary:cloudflare:deployed": "pnpm -C apps/tools canary:cloudflare:deployed",
     "smoke:tools:browser": "node scripts/run-browser-check.mjs --mode smoke",
     "benchmark:tools:browser": "node scripts/run-browser-check.mjs --mode benchmark",
