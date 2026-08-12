@@ -144,8 +144,7 @@ test("transcription endpoint presents the explicit YouTube unsupported response"
       new Response(
         JSON.stringify({
           code: "youtube-unsupported",
-          error:
-            "YouTube links are not supported right now. Upload the file or use a direct public audio or video file URL.",
+          error: "server copy must not override the application-owned message",
         }),
         {
           status: 422,

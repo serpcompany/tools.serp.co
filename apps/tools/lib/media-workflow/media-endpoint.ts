@@ -9,6 +9,7 @@ import type {
   WorkflowRecovery,
 } from "../tool-workflow/index.ts";
 import { readMediaFilename } from "../media-filename-transport.ts";
+import { YOUTUBE_UNSUPPORTED_ERROR } from "./media-link-support.ts";
 import { VERIFIED_MEDIA_FORMATS } from "./verified-formats.ts";
 
 export type MediaEndpointRequest = Readonly<{
@@ -85,8 +86,8 @@ export function createProductionMediaEndpoint(
           // The repository endpoint is allowed to return an empty error body.
         }
         const publicMessage =
-          !downloader && errorCode === "youtube-unsupported" && detail
-            ? detail
+          !downloader && errorCode === YOUTUBE_UNSUPPORTED_ERROR.code
+            ? YOUTUBE_UNSUPPORTED_ERROR.message
             : !downloader && response.status >= 500
             ? "This public media link could not be opened. Try a direct audio or video file URL instead."
             : `Download failed (${response.status})${detail ? `: ${detail}` : ""}`;

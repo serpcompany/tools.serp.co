@@ -13,6 +13,7 @@ import {
   getDownloaderRateLimitIdentity,
 } from "../../../lib/downloader-rate-limit.ts";
 import { setMediaFilenameHeaders } from "../../../lib/media-filename-transport";
+import { getUnsupportedTranscriptionLink } from "../../../lib/media-workflow/media-link-support.ts";
 import { loadServerNativeEngine } from "../../../lib/server-native-capability.ts";
 
 export const runtime = "nodejs";
@@ -62,23 +63,13 @@ function getExtensionFromName(name: string) {
   return match ? match[1] : "";
 }
 
-function isYouTubeUrl(url: URL) {
-  const hostname = url.hostname.toLowerCase();
-  return (
-    hostname === "youtu.be" ||
-    hostname === "youtube.com" ||
-    hostname.endsWith(".youtube.com") ||
-    hostname === "youtube-nocookie.com" ||
-    hostname.endsWith(".youtube-nocookie.com")
-  );
-}
-
-function buildYouTubeUnsupportedResponse() {
+function buildUnsupportedLinkResponse(
+  error: Readonly<{ code: string; message: string }>,
+) {
   return buildJsonErrorResponse(
     {
-      code: "youtube-unsupported",
-      error:
-        "YouTube links are not supported right now. Upload the file or use a direct public audio or video file URL.",
+      code: error.code,
+      error: error.message,
     },
     422,
   );
@@ -413,8 +404,12 @@ export async function POST(request: Request) {
     );
   }
 
-  if (isYouTubeUrl(targetUrl)) {
-    return buildYouTubeUnsupportedResponse();
+  const unsupportedLink = getUnsupportedTranscriptionLink(
+    targetUrl,
+    payload.consumer,
+  );
+  if (unsupportedLink) {
+    return buildUnsupportedLinkResponse(unsupportedLink);
   }
 
   try {

@@ -22,7 +22,7 @@ test('Tool metadata uses active catalog identity, content, and canonical routes'
   assert.equal(specialized.title, 'Audio to Text | SERP Tools');
   assert.equal(
     specialized.description,
-    'Transcribe audio or video files to text from uploads or public links.',
+    'Transcribe an upload or direct public media file URL. YouTube links are not supported right now.',
   );
   assert.deepEqual(specialized.alternates, { canonical: '/audio-to-text/' });
 
