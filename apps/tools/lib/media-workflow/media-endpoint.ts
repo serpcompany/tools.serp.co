@@ -8,6 +8,7 @@ import type {
   WorkflowMedia,
   WorkflowRecovery,
 } from "../tool-workflow/index.ts";
+import { readMediaFilename } from "../media-filename-transport.ts";
 import { VERIFIED_MEDIA_FORMATS } from "./verified-formats.ts";
 
 export type MediaEndpointRequest = Readonly<{
@@ -103,7 +104,7 @@ export function createProductionMediaEndpoint(
             ? contentLengthValue
             : undefined,
         extension: response.headers.get("x-media-extension") ?? undefined,
-        fileName: response.headers.get("x-media-filename") ?? undefined,
+        fileName: readMediaFilename(response.headers),
         mimeType: response.headers.get("content-type") ?? undefined,
       };
     },
@@ -206,10 +207,14 @@ export function safeMediaName(
       return code > 31 && code !== 127;
     })
     .join("")
-    .trim()
-    .slice(0, 180);
+    .trim();
   const withoutExtension = decoded.replace(/\.[^.]+$/, "").replace(/^\.+/, "");
-  return `${withoutExtension || "media"}.${extension}`;
+  const suffix = `.${extension}`;
+  const maxStemCodePoints = Math.max(1, 180 - Array.from(suffix).length);
+  const boundedStem = Array.from(withoutExtension || "media")
+    .slice(0, maxStemCodePoints)
+    .join("");
+  return `${boundedStem}.${extension}`;
 }
 
 function resolveMediaIdentity(
