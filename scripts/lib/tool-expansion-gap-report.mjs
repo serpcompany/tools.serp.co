@@ -19,12 +19,12 @@ function groupTable(groups, pointer) {
   return lines.join('\n');
 }
 
-function recommendationSection(recommendation) {
+function recommendationSection(recommendation, supportedCount) {
   return `### ${recommendation.title}
 
 - Candidate id: \`${recommendation.id}\`
 - Exact membership: ${number(recommendation.count)} Tool ids (\`${recommendation.membershipSha256}\`)
-- Expected controlled coverage delta: +${number(recommendation.expectedCoverageDelta)}; 426 → ${number(recommendation.expectedSupportedCount)} if and only if every member passes the family acceptance gate
+- Expected controlled coverage delta: +${number(recommendation.expectedCoverageDelta)}; ${number(supportedCount)} → ${number(recommendation.expectedSupportedCount)} if and only if every member passes the family acceptance gate
 - Dependencies: ${recommendation.dependencies.join('; ')}
 - Risks: ${recommendation.risks.join('; ')}
 - Semantic-test strategy: ${recommendation.semanticTestStrategy}
@@ -106,7 +106,9 @@ ${feasibilityCounts.map(([key, count]) => `| ${escapeTable(key)} | ${number(coun
 
 ## Three bounded candidate waves
 
-${projection.recommendations.map(recommendationSection).join('\n')}
+${projection.recommendations
+  .map((recommendation) => recommendationSection(recommendation, counts.supported))
+  .join('\n')}
 ## Reproduction
 
 From a fresh clone at a revision whose consumed product inputs match the

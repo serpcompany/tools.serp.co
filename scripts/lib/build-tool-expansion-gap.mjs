@@ -33,6 +33,7 @@ const SOURCES = Object.freeze({
   tablePolicy: 'apps/tools/lib/table-operation-policy.ts',
   planning: 'scripts/lib/build-tool-expansion-gap.mjs#planning-policy-v1',
 });
+const CURRENT_SUPPORTED_COUNT = 431;
 
 const audioFormats = new Set(AUDIO_FORMATS);
 const videoFormats = new Set(VIDEO_FORMATS);
@@ -434,7 +435,7 @@ function recommendation(id, title, rows, details) {
     title,
     ...membership,
     expectedCoverageDelta: membership.count,
-    expectedSupportedCount: 426 + membership.count,
+    expectedSupportedCount: CURRENT_SUPPORTED_COUNT + membership.count,
     ...details,
     planningSource: SOURCES.planning,
   };
@@ -526,8 +527,8 @@ export function buildToolExpansionGapReadModel({
     reproducerSourceRevision,
     rows,
     expectedCounts: {
-      supported: 426,
-      unsupported: 2_378,
+      supported: CURRENT_SUPPORTED_COUNT,
+      unsupported: 2_373,
       unwired: 0,
       unknown: 3,
     },

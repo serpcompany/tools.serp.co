@@ -1,13 +1,36 @@
-export const GENERIC_SMOKE_CAPABILITY_VERSION = "generic-adapters-v2";
+export const GENERIC_SMOKE_CAPABILITY_VERSION = "generic-adapters-v3-bmp";
 
-const imageInputs = new Set(["heic", "jpeg", "jpg", "png", "webp"]);
+const imageInputs = new Set(["bmp", "heic", "jpeg", "jpg", "png", "webp"]);
 const imageOutputs = new Set(["jpeg", "jpg", "pdf", "png", "webp"]);
 const compressionFormats = new Set(["jpeg", "jpg", "png", "webp"]);
 const semanticallyVerifiedInputs = new Set([
-  "heic", "jpeg", "jpg", "m4a", "mp3", "mp4", "pdf", "png", "webp",
+  "bmp",
+  "heic",
+  "jpeg",
+  "jpg",
+  "m4a",
+  "mp3",
+  "mp4",
+  "pdf",
+  "png",
+  "webp",
 ]);
 const semanticallyVerifiedOutputs = new Set([
-  "jpeg", "jpg", "m4a", "mp3", "mp4", "pdf", "png", "webp",
+  "jpeg",
+  "jpg",
+  "m4a",
+  "mp3",
+  "mp4",
+  "pdf",
+  "png",
+  "webp",
+]);
+const approvedBmpToolIds = new Set([
+  "bmp-to-jpeg",
+  "bmp-to-jpg",
+  "bmp-to-pdf",
+  "bmp-to-png",
+  "bmp-to-webp",
 ]);
 
 // This evidence projection deliberately does not import the UI contract registry.
@@ -16,13 +39,23 @@ const semanticallyVerifiedOutputs = new Set([
 export function getGenericSmokeExpectation(tool) {
   const from = tool.from?.toLowerCase();
   const to = tool.to?.toLowerCase();
-  if (!from || !to || !semanticallyVerifiedInputs.has(from) || !semanticallyVerifiedOutputs.has(to)) {
+  if (
+    !from ||
+    !to ||
+    !semanticallyVerifiedInputs.has(from) ||
+    !semanticallyVerifiedOutputs.has(to)
+  ) {
     return "unsupported";
   }
   if (tool.operation === "compress") {
-    return from === to && compressionFormats.has(from) ? "supported" : "unsupported";
+    return from === to && compressionFormats.has(from)
+      ? "supported"
+      : "unsupported";
   }
   if (tool.operation !== "convert") return "unsupported";
+  if (from === "bmp" && !approvedBmpToolIds.has(tool.id)) {
+    return "unsupported";
+  }
   const adapterSupported =
     (from === "pdf" && ["jpeg", "jpg", "png", "webp"].includes(to)) ||
     (imageInputs.has(from) && imageOutputs.has(to));

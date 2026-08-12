@@ -4,6 +4,8 @@ import { createRequire } from "node:module";
 import test, { before } from "node:test";
 
 import { init as initializeJpegDecoder } from "@jsquash/jpeg/decode.js";
+import { PDFDocument } from "pdf-lib";
+import UPNGModule from "upng-js";
 
 import { toolCatalog } from "@serp-tools/app-core/lib/tool-catalog";
 
@@ -27,6 +29,7 @@ import { createGenericToolRunController } from "./generic-tool-run-controller.ts
 import { runFfmpegLifecycle } from "./convert/ffmpeg-lifecycle.ts";
 import { decodeToRGBA } from "./convert/decode.ts";
 import { convertWithWorker } from "./convert/workerClient.ts";
+import { inspectBmp } from "./convert/bmp.ts";
 
 const fixture = (name: string) =>
   new Uint8Array(
@@ -115,11 +118,7 @@ test("every active generic renderer Tool has an explicit processor contract stat
 });
 
 test("known production dispatches retain exact generic workflow contracts", () => {
-  for (const toolId of [
-    "png-to-webp",
-    "webp-to-jpg",
-    "heic-to-jpg",
-  ]) {
+  for (const toolId of ["png-to-webp", "webp-to-jpg", "heic-to-jpg"]) {
     assert.equal(getGenericToolContract(toolId).state, "supported", toolId);
   }
   for (const toolId of [
@@ -161,6 +160,7 @@ test("generic compression allocates workers from the production dispatch table",
 
 test("contract inventory independently audits real dispatches with semantic coverage", () => {
   const verifiedInputs = new Set([
+    "bmp",
     "heic",
     "jpeg",
     "jpg",
@@ -197,7 +197,15 @@ test("contract inventory independently audits real dispatches with semantic cove
       capability.supported &&
       verifiedInputs.has(tool.from) &&
       verifiedOutputs.has(tool.to) &&
-      !cloudflareInoperableMediaRoutes.has(tool.id);
+      !cloudflareInoperableMediaRoutes.has(tool.id) &&
+      (tool.from !== "bmp" ||
+        [
+          "bmp-to-jpeg",
+          "bmp-to-jpg",
+          "bmp-to-pdf",
+          "bmp-to-png",
+          "bmp-to-webp",
+        ].includes(tool.id));
     assert.equal(
       getGenericToolContract(tool.id).state === "supported",
       expectedSupported,
@@ -238,11 +246,45 @@ test("every supported generic contract resolves a processor through workflow.run
     png: "sample.png",
     webp: "sample.webp",
   } as const;
+  const bmpInspection = inspectBmp(fixture("sample.bmp"));
+  assert.equal(bmpInspection.status, "verified");
+  if (bmpInspection.status !== "verified") return;
+  const UPNG = UPNGModule as {
+    encode(
+      buffers: ArrayBuffer[],
+      width: number,
+      height: number,
+      colors: number,
+    ): ArrayBuffer;
+  };
+  const bmpPdf = await PDFDocument.create();
+  const bmpPng = await bmpPdf.embedPng(
+    new Uint8Array(
+      UPNG.encode(
+        [bmpInspection.rgba.slice().buffer],
+        bmpInspection.width,
+        bmpInspection.height,
+        0,
+      ),
+    ),
+  );
+  const bmpPage = bmpPdf.addPage([bmpInspection.width, bmpInspection.height]);
+  bmpPage.drawImage(bmpPng, {
+    x: 0,
+    y: 0,
+    width: bmpInspection.width,
+    height: bmpInspection.height,
+  });
+  const bmpPdfBytes = await bmpPdf.save();
   const baseBoundary = adapters(fixture("sample.png"));
   const boundary: GenericWorkflowAdapters = {
     ...baseBoundary,
     async convert(request) {
-      return [fixture(outputFixture[request.to as keyof typeof outputFixture])];
+      return [
+        request.from === "bmp" && request.to === "pdf"
+          ? bmpPdfBytes
+          : fixture(outputFixture[request.to as keyof typeof outputFixture]),
+      ];
     },
     async compress(request) {
       return fixture(
@@ -250,8 +292,8 @@ test("every supported generic contract resolves a processor through workflow.run
       );
     },
   };
-  const workflow = createGenericToolWorkflow(boundary);
   const inputFixture = {
+    bmp: "sample.bmp",
     cr2: "sample.cr2",
     heic: "sample.heic",
     jpeg: "sample.jpg",
@@ -263,13 +305,24 @@ test("every supported generic contract resolves a processor through workflow.run
     png: "sample.png",
     webp: "sample.webp",
   } as const;
+  const workflowBoundary: GenericWorkflowAdapters = {
+    ...boundary,
+    async decodeRaster() {
+      return {
+        width: bmpInspection.width,
+        height: bmpInspection.height,
+        rgba: bmpInspection.rgba,
+      };
+    },
+  };
+  const workflowWithBmpEvidence = createGenericToolWorkflow(workflowBoundary);
   const supported = toolCatalog.activeTools
     .filter((tool) => selectToolRenderer(tool) === "generic")
     .map((tool) => getGenericToolContract(tool.id))
     .filter((contract) => contract.state === "supported");
 
   for (const contract of supported) {
-    const outcome = await workflow.run({
+    const outcome = await workflowWithBmpEvidence.run({
       toolId: contract.toolId,
       input: {
         kind: "file",
@@ -487,7 +540,10 @@ test("trusted byte identity distinguishes HEIC, M4A, and MP4 families", async ()
     await detectGenericMediaMimeType(fixture("sample.mp4")),
     "video/mp4",
   );
-  assert.equal(await detectGenericMediaMimeType(fixture("sample.avif")), undefined);
+  assert.equal(
+    await detectGenericMediaMimeType(fixture("sample.avif")),
+    undefined,
+  );
 });
 
 test("empty and octet-stream MIME use trusted HEIC identity before workflow support", async () => {

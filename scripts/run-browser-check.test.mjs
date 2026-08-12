@@ -100,12 +100,42 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   assert.match(runnerSource, /safe failure/i);
   assert.doesNotMatch(runnerSource, /data-generic-contract/);
   assert.match(runnerSource, /getGenericSmokeExpectation/);
-  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v2');
+  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v3-bmp');
   for (const id of ['png-to-webp', 'webp-to-jpg', 'heic-to-jpg']) {
     const [from, to] = id.split('-to-');
     assert.equal(
       getGenericSmokeExpectation({ id, from, to, operation: 'convert' }),
       'supported',
+      id,
+    );
+  }
+  for (const id of [
+    'bmp-to-jpeg',
+    'bmp-to-jpg',
+    'bmp-to-pdf',
+    'bmp-to-png',
+    'bmp-to-webp',
+  ]) {
+    assert.equal(
+      getGenericSmokeExpectation({
+        id,
+        from: 'bmp',
+        to: id.slice('bmp-to-'.length),
+        operation: 'convert',
+      }),
+      'supported',
+      id,
+    );
+  }
+  for (const id of ['bmp-to-svg', 'bmp-to-tiff', 'bmp-to-ktx2']) {
+    assert.equal(
+      getGenericSmokeExpectation({
+        id,
+        from: 'bmp',
+        to: id.slice('bmp-to-'.length),
+        operation: 'convert',
+      }),
+      'unsupported',
       id,
     );
   }

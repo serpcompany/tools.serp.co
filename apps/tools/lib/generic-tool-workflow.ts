@@ -30,12 +30,18 @@ import {
   verifyMediaSemantics,
 } from './tool-workflow/semantic-validators.ts';
 import { decodeToRGBA } from './convert/decode.ts';
+import {
+  BMP_CONVERSION_TOOL_IDS,
+  inspectBmp,
+  verifyBmpConversionSemantics,
+} from './convert/bmp.ts';
 import { verifyHeifIdentity } from './convert/heif.ts';
 import { createServerActionRequestHeaders } from './server-action-client.ts';
 import { executionProvenance } from './tool-execution-provenance.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
 
 const FORMAT_MIME_TYPES = Object.freeze({
+  bmp: 'image/bmp',
   cr2: 'image/x-canon-cr2',
   heic: 'image/heic',
   jpeg: 'image/jpeg',
@@ -49,6 +55,7 @@ const FORMAT_MIME_TYPES = Object.freeze({
 } satisfies Readonly<Record<string, string>>);
 
 const SEMANTIC_INPUT_FORMATS = new Set([
+  'bmp',
   'heic',
   'jpeg',
   'jpg',
@@ -69,6 +76,7 @@ const SEMANTIC_OUTPUT_FORMATS = new Set([
   'png',
   'webp',
 ]);
+const BMP_CONVERSION_TOOL_ID_SET = new Set<string>(BMP_CONVERSION_TOOL_IDS);
 const CLOUDFLARE_UNSUPPORTED_CONVERSIONS = new Set([
   'm4a->mp3',
   'mp3->m4a',
@@ -131,6 +139,16 @@ export type GenericWorkflowAdapters = Readonly<{
     media: WorkflowMedia,
     context: Readonly<{ signal: AbortSignal }>,
   ): Promise<SemanticVerification>;
+  decodeRaster?(
+    media: WorkflowMedia,
+    context: Readonly<{ signal: AbortSignal }>,
+  ): Promise<
+    Readonly<{
+      width: number;
+      height: number;
+      rgba: Uint8Array | Uint8ClampedArray;
+    }>
+  >;
   deliver(result: WorkflowMedia): Promise<string>;
   telemetry: Readonly<{
     start(
@@ -160,6 +178,9 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
   }
   const from = tool.from.toLowerCase();
   const to = tool.to.toLowerCase();
+  if (from === 'bmp' && !BMP_CONVERSION_TOOL_ID_SET.has(tool.id)) {
+    return undefined;
+  }
   const inputMimeType = mimeTypeFor(from);
   const outputMimeType = mimeTypeFor(to);
   if (!inputMimeType || !outputMimeType) return undefined;
@@ -228,6 +249,16 @@ export async function verifyGenericMediaSemantics(
       status: 'rejected' as const,
       message: `Expected ${expectedMimeType ?? 'a supported MIME'}, received ${media.mimeType}`,
     };
+  }
+  if (media.format === 'bmp') {
+    const inspection = inspectBmp(media.bytes);
+    return inspection.status === 'verified'
+      ? {
+          status: 'unavailable' as const,
+          message:
+            'BMP structure is valid; a browser pixel decoder is required',
+        }
+      : inspection;
   }
   if (media.format === 'm4a') {
     const verification = await verifyMediaSemantics(media);
@@ -450,6 +481,7 @@ function processorFor(
   if (!engine) return undefined;
   const multiplePages =
     contract.operation === 'convert' && contract.input.format === 'pdf';
+  const bmpSourceByResult = new WeakMap<Uint8Array, Uint8Array>();
 
   return {
     engine,
@@ -533,7 +565,7 @@ function processorFor(
         throw new Error('MP4 compression discarded the input audio track');
       }
       const stem = baseName(input.name);
-      return outputBytes.map((bytes, index) => ({
+      const results = outputBytes.map((bytes, index) => ({
         name:
           contract.operation === 'compress'
             ? `${stem}_compressed.${contract.output.format}`
@@ -544,14 +576,36 @@ function processorFor(
         mimeType: contract.output.mimeType,
         bytes,
       }));
+      if (contract.input.format === 'bmp') {
+        for (const result of results)
+          bmpSourceByResult.set(result.bytes, input.bytes);
+      }
+      return results;
     },
     async verifyResult(result, context) {
       const verification = await verifyGenericMediaSemantics(result, {
         signal: context.signal,
       });
-      return verification.status === 'unavailable'
-        ? adapters.verify(result, { signal: context.signal })
-        : verification;
+      const formatVerification =
+        verification.status === 'unavailable'
+          ? await adapters.verify(result, { signal: context.signal })
+          : verification;
+      if (formatVerification.status !== 'verified') return formatVerification;
+      const bmpSource = bmpSourceByResult.get(result.bytes);
+      if (!bmpSource) return formatVerification;
+      return verifyBmpConversionSemantics({
+        input: bmpSource,
+        output: { format: result.format, bytes: result.bytes },
+        signal: context.signal,
+        decode: adapters.decodeRaster
+          ? async (_bytes, signal) => {
+              const decoded = await adapters.decodeRaster!(result, {
+                signal: signal ?? context.signal,
+              });
+              return decoded;
+            }
+          : undefined,
+      });
     },
   };
 }
@@ -631,6 +685,7 @@ const browserAdapters: GenericWorkflowAdapters = {
     return decideGenericBrowserSupport(
       request,
       detectCapabilities().supportsVideoConversion,
+      supportsBmpRasterRuntime(),
     );
   },
   async convert({ from, to, bytes, quality, context }) {
@@ -697,7 +752,7 @@ const browserAdapters: GenericWorkflowAdapters = {
         bytes: decoded,
       });
     }
-    if (['heic', 'webp'].includes(media.format)) {
+    if (['bmp', 'heic', 'webp'].includes(media.format)) {
       try {
         const decoded = await decodeToRGBA(
           media.format,
@@ -782,6 +837,14 @@ const browserAdapters: GenericWorkflowAdapters = {
       message: `No semantic verifier for ${media.format}`,
     };
   },
+  async decodeRaster(media, { signal }) {
+    const decoded = await decodeToRGBA(
+      media.format,
+      Uint8Array.from(media.bytes).buffer,
+      signal,
+    );
+    return { width: decoded.width, height: decoded.height, rgba: decoded.data };
+  },
   deliver: deliverBrowserMedia,
   telemetry: createBrowserWorkflowTelemetry(
     (request) => {
@@ -805,7 +868,14 @@ export function decideGenericBrowserSupport(
     outputFormat: string;
   }>,
   supportsBrowserMedia: boolean,
+  supportsBmpRaster = true,
 ) {
+  if (request.inputFormat === 'bmp' && !supportsBmpRaster) {
+    return {
+      supported: false as const,
+      message: 'BMP conversion is not available in this browser.',
+    };
+  }
   const mediaFormats = ['m4a', 'mp3', 'mp4'];
   const needsMediaRuntime =
     mediaFormats.includes(request.inputFormat) ||
@@ -817,6 +887,17 @@ export function decideGenericBrowserSupport(
     };
   }
   return { supported: true as const };
+}
+
+function supportsBmpRasterRuntime(): boolean {
+  const hasDecoder =
+    typeof (globalThis as { ImageDecoder?: unknown }).ImageDecoder ===
+      'function' ||
+    typeof createImageBitmap === 'function' ||
+    typeof document !== 'undefined';
+  const hasCanvas =
+    typeof OffscreenCanvas !== 'undefined' || typeof document !== 'undefined';
+  return hasDecoder && hasCanvas;
 }
 
 export const genericToolWorkflow = createGenericToolWorkflow(browserAdapters);
@@ -914,6 +995,7 @@ export async function detectGenericMediaMimeType(
   bytes: Uint8Array,
   signal?: AbortSignal,
 ): Promise<string | undefined> {
+  if (inspectBmp(bytes).status === 'verified') return 'image/bmp';
   if (ascii(bytes, 0, 8) === '\u0089PNG\r\n\u001a\n') return 'image/png';
   if (bytes[0] === 0xff && bytes[1] === 0xd8) return 'image/jpeg';
   if (hasWebpIdentity(bytes)) return 'image/webp';
