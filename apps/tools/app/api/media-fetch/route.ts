@@ -12,7 +12,7 @@ import {
   createDownloaderRateLimiter,
   getDownloaderRateLimitIdentity,
 } from "../../../lib/downloader-rate-limit.ts";
-import { setMediaFilenameHeaders } from "../../../lib/media-filename-transport";
+import { setMediaFilenameHeaders } from "../../../lib/media-filename-transport.ts";
 import { getUnsupportedTranscriptionLink } from "../../../lib/media-workflow/media-link-support.ts";
 import { loadServerNativeEngine } from "../../../lib/server-native-capability.ts";
 
