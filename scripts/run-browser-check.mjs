@@ -629,12 +629,55 @@ try {
       };
     }
 
+    if (tool.id === 'csv-to-json') {
+      const input = 'name,count\nAda,1\nGrace,2\n';
+      await hookBlobCapture(page);
+      await page.fill('[data-testid="table-source-input"]', input);
+      await page.click('[data-testid="table-convert-run"]');
+      await page.waitForFunction(
+        () =>
+          Boolean(
+            document.querySelector('[data-testid="table-output"]')?.value,
+          ),
+        null,
+        { timeout: 10_000 },
+      );
+      const output = await page
+        .locator('[data-testid="table-output"]')
+        .inputValue();
+      const records = JSON.parse(output);
+      if (
+        !Array.isArray(records) ||
+        records.length !== 2 ||
+        records[0]?.name !== 'Ada' ||
+        records[0]?.count !== 1 ||
+        records[1]?.name !== 'Grace' ||
+        records[1]?.count !== 2
+      ) {
+        throw new Error(
+          'CSV to JSON output did not preserve rows, headers, and numeric cells.',
+        );
+      }
+      await page.getByRole('button', { name: 'Download' }).click();
+      const blob = await waitForBlob(page, 1, 10_000);
+      if (!blob?.size || blob.type !== 'application/json') {
+        throw new Error('CSV to JSON download did not deliver verified JSON.');
+      }
+      return {
+        detail: 'verified 2 JSON records with preserved numeric cells',
+        metrics: { outputBytes: blob.size, outputType: blob.type },
+      };
+    }
+
     if (tool.id === 'html-to-markdown') {
       await hookBlobCapture(page);
       const input = page.locator('[data-testid="html-input"]');
       const output = page.locator('[data-testid="markdown-output"]');
       await page.waitForFunction(
-        () => Boolean(document.querySelector('[data-testid="markdown-output"]')?.value),
+        () =>
+          Boolean(
+            document.querySelector('[data-testid="markdown-output"]')?.value,
+          ),
         null,
         { timeout: 10000 },
       );
@@ -647,7 +690,10 @@ try {
 
       await input.fill('<h1>Smoke</h1><p>Hello <strong>world</strong>.</p>');
       await page.waitForFunction(
-        () => document.querySelector('[data-testid="markdown-output"]')?.value.includes("# Smoke"),
+        () =>
+          document
+            .querySelector('[data-testid="markdown-output"]')
+            ?.value.includes('# Smoke'),
         null,
         { timeout: 10000 },
       );
@@ -655,12 +701,17 @@ try {
       if (!markdown.includes('**world**')) {
         throw new Error('HTML conversion omitted expected Markdown semantics.');
       }
-      const beforeCount = await page.evaluate(() => window.__blobEvents?.length ?? 0);
+      const beforeCount = await page.evaluate(
+        () => window.__blobEvents?.length ?? 0,
+      );
       await page.getByRole('button', { name: 'Download .md' }).click();
       const blob = await waitForBlob(page, beforeCount + 1, 10000);
       return {
         detail: `markdown ${markdown.length} chars`,
-        metrics: { outputBytes: blob?.size ?? null, outputType: blob?.type ?? null },
+        metrics: {
+          outputBytes: blob?.size ?? null,
+          outputType: blob?.type ?? null,
+        },
       };
     }
 
@@ -734,7 +785,11 @@ try {
       }
       await page.waitForFunction(
         (expected) =>
-          Number(document.querySelector('[data-testid="stat-characters"]')?.textContent?.replace(/[^0-9]/g, "") || 0) === expected,
+          Number(
+            document
+              .querySelector('[data-testid="stat-characters"]')
+              ?.textContent?.replace(/[^0-9]/g, '') || 0,
+          ) === expected,
         sampleText.length,
         { timeout: 10000 },
       );
@@ -812,7 +867,10 @@ try {
       }
       return {
         detail: 'verified PDF blob delivered to viewer',
-        metrics: { outputBytes: blob.size ?? null, outputType: blob.type ?? null },
+        metrics: {
+          outputBytes: blob.size ?? null,
+          outputType: blob.type ?? null,
+        },
       };
     }
 
@@ -943,7 +1001,8 @@ try {
 
     if (
       ['convert', 'compress', 'bulk', 'combine'].includes(tool.operation) &&
-      !textOnlyTools.has(tool.id)
+      !textOnlyTools.has(tool.id) &&
+      tool.id !== 'csv-to-json'
     ) {
       const dropzone = await page.$(
         '[data-testid="tool-dropzone"], [data-testid="batch-compress-dropzone"], [data-testid="csv-combiner-dropzone"]',
@@ -954,14 +1013,16 @@ try {
       }
     }
     const isSpecializedPdf =
-      (tool.operation === "view" || tool.operation === "edit") &&
-      tool.from === "pdf" &&
-      tool.to === "pdf";
+      (tool.operation === 'view' || tool.operation === 'edit') &&
+      tool.from === 'pdf' &&
+      tool.to === 'pdf';
     if (
       (specializedSmokeTools.has(tool.id) || isSpecializedPdf) &&
       result.pageErrors.length > 0
     ) {
-      throw new Error(`Rendered Tool raised ${result.pageErrors.length} pageerror event(s).`);
+      throw new Error(
+        `Rendered Tool raised ${result.pageErrors.length} pageerror event(s).`,
+      );
     }
   }
 
@@ -997,7 +1058,7 @@ try {
     };
 
     const page = await browser.newPage();
-    page.on("pageerror", (error) => result.pageErrors.push(error));
+    page.on('pageerror', (error) => result.pageErrors.push(error));
 
     const fixtureEntry = tool.from ? formatFixtures.get(tool.from) : null;
     result.fixture = fixtureEntry

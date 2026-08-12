@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { Button } from "@serp-tools/ui/components/button";
+import { useEffect, useRef, useState } from 'react';
+import { Button } from '@serp-tools/ui/components/button';
 import {
   Card,
   CardAction,
@@ -9,13 +9,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@serp-tools/ui/components/card";
-import { Badge } from "@serp-tools/ui/components/badge";
-import { ToolHeroLayout } from "@/components/ToolHeroLayout";
-import DataGridEditor from "@/components/table-convert/DataGridEditor";
-import FormatTabs from "@/components/table-convert/FormatTabs";
-import TablePreview from "@/components/table-convert/TablePreview";
-import ViewToggle from "@/components/table-convert/ViewToggle";
+} from '@serp-tools/ui/components/card';
+import { Badge } from '@serp-tools/ui/components/badge';
+import { ToolHeroLayout } from '@/components/ToolHeroLayout';
+import DataGridEditor from '@/components/table-convert/DataGridEditor';
+import FormatTabs from '@/components/table-convert/FormatTabs';
+import TablePreview from '@/components/table-convert/TablePreview';
+import ViewToggle from '@/components/table-convert/ViewToggle';
 import {
   INPUT_FORMATS,
   OUTPUT_FORMATS,
@@ -23,26 +23,26 @@ import {
   detectFormatFromFile,
   getLabel,
   getPlaceholder,
-} from "@/components/table-convert/formats";
+} from '@/components/table-convert/formats';
 import {
   InputFormat,
   OutputFormat,
   TableData,
   ViewMode,
-} from "@/components/table-convert/types";
+} from '@/components/table-convert/types';
 import {
   createBrowserTableWorkflow,
   createLatestFileReader,
-} from "@/lib/table-browser-workflow";
+} from '@/lib/table-browser-workflow';
 import {
   getTableOperationPolicy,
   tableInputContracts,
-} from "@/lib/table-operation-policy";
+} from '@/lib/table-operation-policy';
 import {
   parseTableInput,
   serializeTableInputText,
-} from "@/lib/table-tool-processors";
-import type { WorkflowDelivery } from "@/lib/tool-workflow";
+} from '@/lib/table-tool-processors';
+import type { WorkflowDelivery } from '@/lib/tool-workflow';
 
 type TableConvertDemoProps = {
   toolId?: string;
@@ -56,10 +56,10 @@ const DEFAULT_TABLE: TableData = SAMPLE_TABLE;
 
 export default function TableConvertDemo({
   toolId,
-  initialInputFormat = "csv",
-  initialOutputFormat = "json",
-  title = "Dual Viewer Converter Demo",
-  subtitle = "Paste or upload on the left, convert to a target format, and preview on the right.",
+  initialInputFormat = 'csv',
+  initialOutputFormat = 'json',
+  title = 'Dual Viewer Converter Demo',
+  subtitle = 'Paste or upload on the left, convert to a target format, and preview on the right.',
 }: TableConvertDemoProps) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const outputRevisionRef = useRef(0);
@@ -71,17 +71,17 @@ export default function TableConvertDemo({
     useState<InputFormat>(initialInputFormat);
   const [outputFormat, setOutputFormat] =
     useState<OutputFormat>(initialOutputFormat);
-  const [inputView, setInputView] = useState<ViewMode>("raw");
-  const [outputView, setOutputView] = useState<ViewMode>("raw");
-  const [inputText, setInputText] = useState("");
-  const [outputText, setOutputText] = useState("");
+  const [inputView, setInputView] = useState<ViewMode>('raw');
+  const [outputView, setOutputView] = useState<ViewMode>('raw');
+  const [inputText, setInputText] = useState('');
+  const [outputText, setOutputText] = useState('');
   const [outputNotice, setOutputNotice] = useState<string | null>(null);
   const [tableData, setTableData] = useState<TableData | null>(DEFAULT_TABLE);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [inputBytes, setInputBytes] = useState<Uint8Array | null>(null);
   const [delivery, setDelivery] = useState<WorkflowDelivery | null>(null);
-  const [status, setStatus] = useState<string>("Ready to convert.");
+  const [status, setStatus] = useState<string>('Ready to convert.');
   const [isConverting, setIsConverting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [hasUserInput, setHasUserInput] = useState(false);
@@ -96,14 +96,14 @@ export default function TableConvertDemo({
       : `${inputFormat}-to-${outputFormat}`;
   const operationPolicy = getTableOperationPolicy(selectedToolId);
   const operationUnavailable =
-    operationPolicy.kind === "eligible" ? null : operationPolicy.reason;
+    operationPolicy.kind === 'eligible' ? null : operationPolicy.reason;
   const inputPreviewMessage =
-    error ?? "Rendered input preview will appear here.";
+    error ?? 'Rendered input preview will appear here.';
   const outputPreviewMessage =
     outputNotice ??
     (tableData
-      ? "Rendered output preview will appear here."
-      : "Waiting for valid input.");
+      ? 'Rendered output preview will appear here.'
+      : 'Waiting for valid input.');
 
   useEffect(() => {
     if (!hasUserInput && !inputText.trim()) {
@@ -112,12 +112,12 @@ export default function TableConvertDemo({
       return;
     }
     const bytes =
-      inputFormat === "excel"
+      inputFormat === 'excel'
         ? inputBytes
         : new TextEncoder().encode(inputText);
     if (!bytes) {
       setTableData(null);
-      setError("Upload an XLSX workbook to begin.");
+      setError('Upload an XLSX workbook to begin.');
       return;
     }
     let current = true;
@@ -160,7 +160,7 @@ export default function TableConvertDemo({
     runAbortRef.current = null;
     if (delivery) deliveries.release(delivery.deliveryId);
     setDelivery(null);
-    setOutputText("");
+    setOutputText('');
     setOutputNotice(null);
     setIsConverting(false);
   }
@@ -177,9 +177,9 @@ export default function TableConvertDemo({
     setInputFormat(nextFormat);
     setInputBytes(null);
     if (!tableData || !reserialize || !hasUserInput) return;
-    if (nextFormat === "excel") {
-      setInputText("");
-      setError("Upload an XLSX workbook to use Excel as input.");
+    if (nextFormat === 'excel') {
+      setInputText('');
+      setError('Upload an XLSX workbook to use Excel as input.');
       return;
     }
     const serialized = await serializeTableInputText(nextFormat, tableData);
@@ -210,8 +210,8 @@ export default function TableConvertDemo({
     setHasUserInput(true);
     setInputBytes(bytes);
     setInputText(
-      detected === "excel"
-        ? "XLSX workbook loaded."
+      detected === 'excel'
+        ? 'XLSX workbook loaded.'
         : new TextDecoder().decode(bytes),
     );
     setStatus(`Loaded ${file.name}.`);
@@ -228,14 +228,14 @@ export default function TableConvertDemo({
   function handleClear() {
     fileReader.invalidate();
     sourceRevisionRef.current += 1;
-    setInputText("");
+    setInputText('');
     setFileName(null);
     setInputBytes(null);
     clearOutputResult();
     setError(null);
     setHasUserInput(false);
     setTableData(DEFAULT_TABLE);
-    setStatus("Cleared current view.");
+    setStatus('Cleared current view.');
   }
 
   async function handleCopyOutput() {
@@ -244,7 +244,7 @@ export default function TableConvertDemo({
       await navigator.clipboard.writeText(outputText);
       setStatus(`Copied ${outputLabel} output.`);
     } catch {
-      setStatus("Copy failed.");
+      setStatus('Copy failed.');
     }
   }
 
@@ -274,7 +274,7 @@ export default function TableConvertDemo({
         {
           toolId: selectedToolId,
           input: {
-            kind: "file",
+            kind: 'file',
             media: {
               name: fileName ?? `table.${inputFormat}`,
               format: inputFormat,
@@ -293,20 +293,20 @@ export default function TableConvertDemo({
         },
       );
       if (outputRevision !== outputRevisionRef.current) {
-        if (outcome.status === "succeeded") {
+        if (outcome.status === 'succeeded') {
           for (const staleDelivery of outcome.results) {
             deliveries.release(staleDelivery.deliveryId);
           }
         }
         return;
       }
-      if (outcome.status !== "succeeded") {
+      if (outcome.status !== 'succeeded') {
         const message =
-          outcome.status === "failed"
+          outcome.status === 'failed'
             ? outcome.error.message
-            : "Conversion was cancelled.";
+            : 'Conversion was cancelled.';
         setError(message);
-        setOutputText("");
+        setOutputText('');
         setStatus(message);
         return;
       }
@@ -315,14 +315,14 @@ export default function TableConvertDemo({
         ? deliveries.get(nextDelivery.deliveryId)
         : undefined;
       if (!nextDelivery || !media) {
-        throw new TypeError("Workflow delivery is unavailable");
+        throw new TypeError('Workflow delivery is unavailable');
       }
       setDelivery(nextDelivery);
       const deliveredText = deliveries.text(nextDelivery.deliveryId);
       if (deliveredText !== undefined) {
         setOutputText(deliveredText);
       } else {
-        setOutputText("");
+        setOutputText('');
         setOutputNotice(
           `${outputLabel} binary output is verified and ready to download.`,
         );
@@ -350,9 +350,9 @@ export default function TableConvertDemo({
     setHasUserInput(true);
     setInputBytes(null);
     setTableData(nextTable);
-    if (inputFormat === "excel") {
-      setInputText("");
-      setError("Edited grid data cannot replace a binary XLSX source.");
+    if (inputFormat === 'excel') {
+      setInputText('');
+      setError('Edited grid data cannot replace a binary XLSX source.');
       return;
     }
     const serialized = await serializeTableInputText(inputFormat, nextTable);
@@ -378,7 +378,7 @@ export default function TableConvertDemo({
 
           <div className="grid grid-cols-1 gap-6 items-start">
             <Card
-              className={`min-h-[540px] ${dragActive ? "border-blue-500 ring-2 ring-blue-200" : ""}`}
+              className={`min-h-[540px] ${dragActive ? 'border-blue-500 ring-2 ring-blue-200' : ''}`}
               onDragOver={(event) => {
                 event.preventDefault();
                 setDragActive(true);
@@ -435,8 +435,9 @@ export default function TableConvertDemo({
 
                 <ViewToggle value={inputView} onChange={setInputView} />
 
-                {inputView === "raw" ? (
+                {inputView === 'raw' ? (
                   <textarea
+                    data-testid="table-source-input"
                     value={inputText}
                     onChange={(event) => {
                       clearOutputResult();
@@ -448,7 +449,7 @@ export default function TableConvertDemo({
                     }}
                     placeholder={getPlaceholder(inputFormat)}
                     className={`min-h-[280px] w-full resize-none rounded-lg border bg-background px-4 py-3 font-mono text-sm shadow-sm focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
-                      error ? "border-red-400" : ""
+                      error ? 'border-red-400' : ''
                     }`}
                     spellCheck={false}
                   />
@@ -495,8 +496,9 @@ export default function TableConvertDemo({
                     size="sm"
                     onClick={handleConvert}
                     disabled={isConverting || Boolean(operationUnavailable)}
+                    data-testid="table-convert-run"
                   >
-                    {isConverting ? "Converting…" : "Convert"}
+                    {isConverting ? 'Converting…' : 'Convert'}
                   </Button>
                   <Button
                     size="sm"
@@ -529,8 +531,9 @@ export default function TableConvertDemo({
 
                 <ViewToggle value={outputView} onChange={setOutputView} />
 
-                {outputView === "raw" ? (
+                {outputView === 'raw' ? (
                   <textarea
+                    data-testid="table-output"
                     readOnly
                     value={outputText}
                     className="min-h-[280px] w-full resize-none rounded-lg border bg-muted/20 px-4 py-3 font-mono text-sm shadow-sm"
