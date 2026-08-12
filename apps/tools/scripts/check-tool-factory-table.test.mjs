@@ -109,11 +109,22 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /Not tested here/);
   assert.match(source, /Family verification policy \(not an exact Tool test\)/);
   assert.match(source, /planner\.screenshot/);
+  assert.match(source, /getByText\(['"]GitHub work['"]/);
+  assert.match(source, /getByText\(['"]No tracked work['"]/);
+  assert.match(source, /Work tracking not loaded/);
+  assert.match(source, /point-in-time snapshot/);
+  assert.match(source, /Open pull request/);
+  assert.match(source, /Closed issue/);
+  assert.match(source, /renderer:transcription/);
+  assert.match(
+    source,
+    /githubWorkHeading\.locator\(['"]\.\.['"]\)\.screenshot/,
+  );
   assert.match(source, /recordRunEvidence/);
   assert.match(source, /command:\s*['"]check:tool-factory['"]/);
   assert.match(
     source,
-    /linkedWork:\s*\[['"]#50['"], ['"]#102['"], ['"]#105['"], ['"]#106['"], ['"]#107['"]\]/,
+    /linkedWork:\s*\[['"]#50['"], ['"]#102['"], ['"]#104['"], ['"]#105['"], ['"]#106['"], ['"]#107['"]\]/,
   );
   assert.doesNotMatch(source, /console\.log\(.*accessCookie/);
 });

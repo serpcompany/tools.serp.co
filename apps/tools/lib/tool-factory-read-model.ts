@@ -12,6 +12,11 @@ import {
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
 import {
+  buildToolGithubWorkIndex,
+  retainedToolGithubWorkSnapshot,
+  type ToolGithubWorkView,
+} from './tool-github-work-links.ts';
+import {
   buildToolVerificationEvidenceIndex,
   retainedToolVerificationEvidence,
   type ToolVerificationEvidenceView,
@@ -68,6 +73,7 @@ export type ToolFactoryRow = Readonly<{
     reason: string;
   }>;
   verificationEvidence: ToolVerificationEvidenceView;
+  githubWork: ToolGithubWorkView;
   runtimeRequirement: Readonly<{
     classification:
       | 'declared-client-only'
@@ -184,7 +190,7 @@ function attentionCodes({
 
 function buildRow(
   tool: (typeof toolCatalog.activeTools)[number],
-): Omit<ToolFactoryRow, 'verificationEvidence'> {
+): Omit<ToolFactoryRow, 'verificationEvidence' | 'githubWork'> {
   const renderer = selectToolRenderer(tool);
   const availability = getToolProcessorAvailability(tool.id);
   const provenance = getToolExecutionProvenance(tool.id);
@@ -312,10 +318,15 @@ export function buildToolFactoryReadModel(): ToolFactoryReadModel {
     retainedToolVerificationEvidence,
     sourceRows.map((row) => ({ toolId: row.toolId, family: row.family })),
   );
+  const githubWorkIndex = buildToolGithubWorkIndex(
+    retainedToolGithubWorkSnapshot,
+    sourceRows.map((row) => ({ toolId: row.toolId, family: row.family })),
+  );
   const rows = sourceRows.map((row) =>
     deepFreeze({
       ...row,
       verificationEvidence: evidenceIndex.getForTool(row.toolId, row.family),
+      githubWork: githubWorkIndex.getForTool(row.toolId, row.family),
     }),
   );
   const byId = new Map(rows.map((row) => [row.toolId, row]));

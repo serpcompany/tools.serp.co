@@ -37,6 +37,7 @@ import type {
   ToolExpansionGroup,
   ToolExpansionPlan,
 } from '../../../lib/tool-expansion-planner.ts';
+import type { ToolGithubWorkScopeView } from '../../../lib/tool-github-work-links.ts';
 import type { ToolFactoryDeployment } from '../../../lib/tool-factory-access.ts';
 import {
   DEFAULT_TOOL_FACTORY_VIEW,
@@ -678,6 +679,93 @@ function FamilyVerificationPolicy({ row }: { row: ToolFactoryRow }) {
   );
 }
 
+function GithubWorkList({ scope }: { scope: ToolGithubWorkScopeView }) {
+  if (!scope.links.length) {
+    return (
+      <p className="mt-2 text-sm text-slate-600">
+        {scope.coverage === 'complete'
+          ? 'No tracked work'
+          : 'Work tracking not loaded'}
+      </p>
+    );
+  }
+  return (
+    <>
+      <ul className="mt-2 space-y-2">
+        {scope.links.map((link) => {
+          const current = link.state === 'open';
+          return (
+            <li
+              key={`${link.kind}:${link.number}`}
+              className="rounded-md border p-3"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                    current
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-slate-100 text-slate-700'
+                  }`}
+                >
+                  {link.stateLabel}
+                </span>
+                <span className="font-mono text-xs text-slate-500">
+                  #{link.number}
+                </span>
+              </div>
+              <a
+                className="mt-2 block text-sm font-medium text-blue-700 underline underline-offset-4 hover:text-blue-900"
+                href={link.url}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {link.title}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+      {scope.coverage === 'partial' && (
+        <p className="mt-2 text-xs text-amber-800">
+          Additional tracked work may not be loaded.
+        </p>
+      )}
+    </>
+  );
+}
+
+function GithubWork({ row }: { row: ToolFactoryRow }) {
+  return (
+    <section className="rounded-lg border p-4">
+      <h3 className="text-sm font-semibold text-slate-950">GitHub work</h3>
+      <p className="mt-1 text-sm text-slate-600">
+        Read-only links from explicit Tool IDs and exact family membership.
+      </p>
+      <p className="mt-1 text-xs text-slate-500">
+        Source: {row.githubWork.source.authority} ·{' '}
+        {row.githubWork.source.repository} · observed{' '}
+        {new Date(row.githubWork.source.observedAt).toLocaleString('en-US', {
+          timeZone: 'UTC',
+          timeZoneName: 'short',
+        })}{' '}
+        · revision {row.githubWork.source.revision.slice(0, 8)}.{' '}
+        {row.githubWork.source.freshness}.
+      </p>
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <div className="rounded-lg bg-slate-50 p-3">
+          <h4 className="text-sm font-semibold text-slate-900">This Tool</h4>
+          <GithubWorkList scope={row.githubWork.tool} />
+        </div>
+        <div className="rounded-lg bg-slate-50 p-3">
+          <h4 className="text-sm font-semibold text-slate-900">
+            Family · {row.family}
+          </h4>
+          <GithubWorkList scope={row.githubWork.family} />
+        </div>
+      </div>
+    </section>
+  );
+}
 function ToolDetail({
   row,
   onClose,
@@ -715,6 +803,7 @@ function ToolDetail({
           <ExactToolEvidence row={row} />
           <FamilyTestEvidence row={row} />
           <FamilyVerificationPolicy row={row} />
+          <GithubWork row={row} />
           <Fact label="Catalog description" value={row.description} />
           <Fact label="Support reason" value={row.support.reason ?? '—'} />
           <Fact label="Attention" value={row.attention.summary} />

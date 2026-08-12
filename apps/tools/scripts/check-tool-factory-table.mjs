@@ -253,6 +253,13 @@ try {
       exact: true,
     })
     .waitFor();
+  await dialog.getByText('GitHub work', { exact: true }).waitFor();
+  assert.equal(
+    await dialog.getByText('No tracked work', { exact: true }).count(),
+    1,
+  );
+  await dialog.getByText('Work tracking not loaded', { exact: true }).waitFor();
+  await dialog.getByText(/point-in-time snapshot/).waitFor();
   await page.keyboard.press('Escape');
 
   await page.getByLabel('Search all Tools').fill('bmp-to-png');
@@ -288,6 +295,34 @@ try {
       { exact: true },
     )
     .waitFor();
+  const githubWorkHeading = familyDialog.getByText('GitHub work', {
+    exact: true,
+  });
+  await githubWorkHeading.waitFor();
+  await familyDialog
+    .getByRole('heading', { name: 'Family · renderer:transcription' })
+    .waitFor();
+  assert.equal(
+    await familyDialog.getByText('Open pull request', { exact: true }).count(),
+    2,
+  );
+  assert.equal(
+    await familyDialog.getByText('Closed issue', { exact: true }).count(),
+    1,
+  );
+  await familyDialog
+    .getByRole('link', {
+      name: 'Fix Audio-to-Text for real YouTube links on Cloudflare',
+    })
+    .waitFor();
+  await familyDialog
+    .getByRole('link', {
+      name: 'Draft foundation — do not merge to main: Tool workflow architecture',
+    })
+    .waitFor();
+  if (args.screenshot) {
+    await githubWorkHeading.locator('..').screenshot({ path: args.screenshot });
+  }
   await page.keyboard.press('Escape');
 
   await page.getByRole('button', { name: 'Reset' }).click();
@@ -438,10 +473,10 @@ try {
     status,
     startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
-    linkedWork: ['#50', '#102', '#105', '#106', '#107'],
+    linkedWork: ['#50', '#102', '#104', '#105', '#106', '#107'],
     summary: {
       status,
-      checksPassed: status === 'success' ? 18 : 0,
+      checksPassed: status === 'success' ? 21 : 0,
       checksFailed: status === 'success' ? 0 : 1,
       items: 1,
       durationMs: completedAt.valueOf() - startedAt.valueOf(),
