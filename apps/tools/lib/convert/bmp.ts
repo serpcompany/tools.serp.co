@@ -150,6 +150,68 @@ function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
   );
 }
 
+type PdfMatrix = readonly [number, number, number, number, number, number];
+
+function multiplyPdfMatrices(left: PdfMatrix, right: PdfMatrix): PdfMatrix {
+  const [a, b, c, d, e, f] = left;
+  const [g, h, i, j, k, l] = right;
+  return [
+    a * g + c * h,
+    b * g + d * h,
+    a * i + c * j,
+    b * i + d * j,
+    a * k + c * l + e,
+    b * k + d * l + f,
+  ];
+}
+
+function hasExactImagePlacement(
+  operators: string,
+  imageName: string,
+  width: number,
+  height: number,
+): boolean {
+  const identity: PdfMatrix = [1, 0, 0, 1, 0, 0];
+  let matrix = identity;
+  const stack: PdfMatrix[] = [];
+  let matchingDraws = 0;
+  for (const line of operators.split(/\r?\n/).map((value) => value.trim())) {
+    if (!line) continue;
+    if (line === 'q') {
+      stack.push(matrix);
+      continue;
+    }
+    if (line === 'Q') {
+      const restored = stack.pop();
+      if (!restored) return false;
+      matrix = restored;
+      continue;
+    }
+    const transform = line.match(
+      /^(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) cm$/,
+    );
+    if (transform) {
+      const values = transform.slice(1).map(Number) as unknown as PdfMatrix;
+      matrix = multiplyPdfMatrices(matrix, values);
+      continue;
+    }
+    const draw = line.match(/^\/(\S+) Do$/);
+    if (draw) {
+      if (draw[1] !== imageName) return false;
+      const expected: PdfMatrix = [width, 0, 0, height, 0, 0];
+      if (!matrix.every((value, index) => Math.abs(value - expected[index]!) < 0.01)) {
+        return false;
+      }
+      matchingDraws += 1;
+      continue;
+    }
+    // A dedicated BMP PDF is exactly one un-clipped image. Reject additional
+    // painting or clipping operators whose visible bounds are not proven here.
+    return false;
+  }
+  return stack.length === 0 && matchingDraws === 1;
+}
+
 async function verifyPdfOutput(
   bytes: Uint8Array,
   source: Extract<BmpInspection, { status: 'verified' }>,
@@ -214,7 +276,12 @@ async function verifyPdfOutput(
         subtype.asString() === '/Image' &&
         pdfNumber(object.dict, 'Width') === source.width &&
         pdfNumber(object.dict, 'Height') === source.height &&
-        pageOperators.includes(`/${key.decodeText()} Do`) &&
+        hasExactImagePlacement(
+          pageOperators,
+          key.decodeText(),
+          source.width,
+          source.height,
+        ) &&
         bytesEqual(
           decodedPixels,
           source.rgba.filter((_value, index) => index % 4 !== 3),
@@ -273,7 +340,13 @@ export async function verifyBmpConversionSemantics({
     let absoluteError = 0;
     let comparedChannels = 0;
     for (let index = 0; index < source.rgba.byteLength; index += 4) {
-      for (let channel = 0; channel < 4; channel += 1) {
+      if (source.rgba[index + 3] !== decoded.rgba[index + 3]) {
+        return {
+          status: 'rejected',
+          message: 'BMP output opacity does not match the source',
+        };
+      }
+      for (let channel = 0; channel < 3; channel += 1) {
         absoluteError += Math.abs(
           source.rgba[index + channel]! - decoded.rgba[index + channel]!,
         );

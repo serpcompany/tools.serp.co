@@ -951,6 +951,23 @@ export async function runGenericToolFile(
       'File identity detection failed',
     );
   }
+  if (contract.input.format === 'bmp' && mimeType === 'image/bmp') {
+    try {
+      await decodeToRGBA(
+        'bmp',
+        Uint8Array.from(bytes).buffer,
+        options?.signal,
+      );
+    } catch (error) {
+      if (options?.signal?.aborted || isAbortError(error)) {
+        return cancelledFileOutcome();
+      }
+      return failedFileOutcome(
+        'unsupported-request',
+        'BMP conversion is not available in this browser.',
+      );
+    }
+  }
   return genericToolWorkflow.run(
     {
       toolId,
@@ -1103,7 +1120,7 @@ function cancelledFileOutcome(): WorkflowOutcome {
 }
 
 function failedFileOutcome(
-  code: 'invalid-request' | 'acquisition-failed',
+  code: 'invalid-request' | 'acquisition-failed' | 'unsupported-request',
   message: string,
 ): WorkflowOutcome {
   return {

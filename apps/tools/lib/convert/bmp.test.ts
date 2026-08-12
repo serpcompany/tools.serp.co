@@ -249,14 +249,19 @@ test('BMP conversion evidence checks decoded dimensions and content with lossy t
   assert.equal(inputPixels.status, 'verified');
   if (inputPixels.status !== 'verified') return;
   const exact = Uint8Array.from(inputPixels.rgba);
-  const slightlyLossy = Uint8Array.from(exact, (value) =>
-    Math.max(0, Math.min(255, value + (value === 255 ? -4 : 4))),
+  const slightlyLossy = Uint8Array.from(exact, (value, index) =>
+    index % 4 === 3
+      ? value
+      : Math.max(0, Math.min(255, value + (value === 255 ? -4 : 4))),
   );
   const wrong = Uint8Array.from(exact, (value, index) =>
     index % 4 === 3 ? value : 255 - value,
   );
   const transparent = Uint8Array.from(exact, (value, index) =>
     index % 4 === 3 ? 0 : value,
+  );
+  const translucent = Uint8Array.from(exact, (value, index) =>
+    index % 4 === 3 ? 128 : value,
   );
   const decode = async (bytes: Uint8Array) => ({
     width: 8,
@@ -284,6 +289,16 @@ test('BMP conversion evidence checks decoded dimensions and content with lossy t
       await verifyBmpConversionSemantics({
         input: source,
         output: { format: 'webp', bytes: wrong },
+        decode,
+      })
+    ).status,
+    'rejected',
+  );
+  assert.equal(
+    (
+      await verifyBmpConversionSemantics({
+        input: source,
+        output: { format: 'webp', bytes: translucent },
         decode,
       })
     ).status,
@@ -341,6 +356,25 @@ test('BMP-to-PDF evidence requires one bounded page and real image content', asy
   await orphan.embedPng(encodedPng(sourceInspection.rgba));
   orphan.addPage([8, 8]);
   const orphanBytes = await orphan.save();
+  const zeroSized = await PDFDocument.create();
+  const zeroImage = await zeroSized.embedPng(encodedPng(sourceInspection.rgba));
+  const zeroPage = zeroSized.addPage([8, 8]);
+  zeroPage.drawImage(zeroImage, { x: 0, y: 0, width: 0, height: 0 });
+  const zeroSizedBytes = await zeroSized.save();
+  const thumbnail = await PDFDocument.create();
+  const thumbnailImage = await thumbnail.embedPng(
+    encodedPng(sourceInspection.rgba),
+  );
+  const thumbnailPage = thumbnail.addPage([8, 8]);
+  thumbnailPage.drawImage(thumbnailImage, { x: 0, y: 0, width: 1, height: 1 });
+  const thumbnailBytes = await thumbnail.save();
+  const offPage = await PDFDocument.create();
+  const offPageImage = await offPage.embedPng(
+    encodedPng(sourceInspection.rgba),
+  );
+  const displacedPage = offPage.addPage([8, 8]);
+  displacedPage.drawImage(offPageImage, { x: 8, y: 8, width: 8, height: 8 });
+  const offPageBytes = await offPage.save();
 
   assert.deepEqual(
     await verifyBmpConversionSemantics({
@@ -354,6 +388,9 @@ test('BMP-to-PDF evidence requires one bounded page and real image content', asy
     wrongSizeBytes,
     wrongContentBytes,
     orphanBytes,
+    zeroSizedBytes,
+    thumbnailBytes,
+    offPageBytes,
   ]) {
     assert.equal(
       (

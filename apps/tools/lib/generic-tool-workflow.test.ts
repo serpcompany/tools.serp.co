@@ -463,6 +463,42 @@ test("browser image decoding cannot legitimize wrong-format bytes", async () => 
   }
 });
 
+test("a browser with image interfaces but no BMP codec returns the exact safe unsupported outcome", async () => {
+  const originalImageDecoder = (globalThis as { ImageDecoder?: unknown })
+    .ImageDecoder;
+  const originalCreateImageBitmap = globalThis.createImageBitmap;
+  class UnsupportedBmpDecoder {
+    decode() {
+      return Promise.reject(new DOMException("unsupported", "NotSupportedError"));
+    }
+    close() {}
+  }
+  (globalThis as { ImageDecoder?: unknown }).ImageDecoder =
+    UnsupportedBmpDecoder;
+  globalThis.createImageBitmap = async () => {
+    throw new DOMException("unsupported", "NotSupportedError");
+  };
+  try {
+    const outcome = await runGenericToolFile(
+      "bmp-to-png",
+      new File([fixture("sample.bmp")], "sample.bmp", { type: "image/bmp" }),
+    );
+    assert.equal(outcome.status, "failed");
+    if (outcome.status === "failed") {
+      assert.equal(outcome.error.code, "unsupported-request");
+      assert.equal(
+        outcome.error.message,
+        "BMP conversion is not available in this browser.",
+      );
+      assert.equal(outcome.telemetry.start, "not-attempted");
+    }
+  } finally {
+    (globalThis as { ImageDecoder?: unknown }).ImageDecoder =
+      originalImageDecoder;
+    globalThis.createImageBitmap = originalCreateImageBitmap;
+  }
+});
+
 test("exact WebP identity rejects PNG bytes before browser decoding", async () => {
   const verification = await verifyGenericMediaSemantics({
     name: "renamed.webp",
