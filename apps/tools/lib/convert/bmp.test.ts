@@ -4,6 +4,7 @@ import test from 'node:test';
 
 import { PDFDocument } from 'pdf-lib';
 import UPNGModule from 'upng-js';
+import { readFileSync } from 'node:fs';
 
 import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
 
@@ -184,9 +185,31 @@ test('BMP identity is byte-derived, bounded, and rejects malformed or polyglot i
   new DataView(oversized.buffer).setInt32(18, 16_385, true);
   const pngSpoof = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
   const jpegSpoof = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
+  const validRenamedPng = new Uint8Array(
+    readFileSync(
+      new URL('../../benchmarks/fixtures/sample.png', import.meta.url),
+    ),
+  );
+  const validRenamedJpeg = new Uint8Array(
+    readFileSync(
+      new URL('../../benchmarks/fixtures/sample.jpg', import.meta.url),
+    ),
+  );
   const polyglot = new Uint8Array(positive.byteLength + pngSpoof.byteLength);
   polyglot.set(positive);
   polyglot.set(pngSpoof, positive.byteLength);
+  const invalidReserved = Uint8Array.from(positive);
+  new DataView(invalidReserved.buffer).setUint32(6, 1, true);
+  const invalidPixelOffset = Uint8Array.from(positive);
+  new DataView(invalidPixelOffset.buffer).setUint32(10, 55, true);
+  const invalidPlanes = Uint8Array.from(positive);
+  new DataView(invalidPlanes.buffer).setUint16(26, 2, true);
+  const invalidBits = Uint8Array.from(positive);
+  new DataView(invalidBits.buffer).setUint16(28, 32, true);
+  const compressed = Uint8Array.from(positive);
+  new DataView(compressed.buffer).setUint32(30, 1, true);
+  const invalidImageSize = Uint8Array.from(positive);
+  new DataView(invalidImageSize.buffer).setUint32(34, 1, true);
 
   for (const bytes of [
     new Uint8Array(),
@@ -196,7 +219,15 @@ test('BMP identity is byte-derived, bounded, and rejects malformed or polyglot i
     oversized,
     pngSpoof,
     jpegSpoof,
+    validRenamedPng,
+    validRenamedJpeg,
     polyglot,
+    invalidReserved,
+    invalidPixelOffset,
+    invalidPlanes,
+    invalidBits,
+    compressed,
+    invalidImageSize,
   ]) {
     assert.equal(inspectBmp(bytes).status, 'rejected');
     assert.notEqual(await detectGenericMediaMimeType(bytes), 'image/bmp');
@@ -223,6 +254,9 @@ test('BMP conversion evidence checks decoded dimensions and content with lossy t
   );
   const wrong = Uint8Array.from(exact, (value, index) =>
     index % 4 === 3 ? value : 255 - value,
+  );
+  const transparent = Uint8Array.from(exact, (value, index) =>
+    index % 4 === 3 ? 0 : value,
   );
   const decode = async (bytes: Uint8Array) => ({
     width: 8,
@@ -259,6 +293,16 @@ test('BMP conversion evidence checks decoded dimensions and content with lossy t
     (
       await verifyBmpConversionSemantics({
         input: source,
+        output: { format: 'webp', bytes: transparent },
+        decode,
+      })
+    ).status,
+    'rejected',
+  );
+  assert.equal(
+    (
+      await verifyBmpConversionSemantics({
+        input: source,
         output: { format: 'png', bytes: exact },
         decode: async (bytes) => ({ width: 7, height: 8, rgba: bytes }),
       })
@@ -284,6 +328,19 @@ test('BMP-to-PDF evidence requires one bounded page and real image content', asy
   const wrongSize = await PDFDocument.create();
   wrongSize.addPage([9, 8]);
   const wrongSizeBytes = await wrongSize.save();
+  const wrongContent = await PDFDocument.create();
+  const red = new Uint8Array(8 * 8 * 4);
+  for (let index = 0; index < red.byteLength; index += 4) {
+    red.set([255, 0, 0, 255], index);
+  }
+  const redImage = await wrongContent.embedPng(encodedPng(red));
+  const redPage = wrongContent.addPage([8, 8]);
+  redPage.drawImage(redImage, { x: 0, y: 0, width: 8, height: 8 });
+  const wrongContentBytes = await wrongContent.save();
+  const orphan = await PDFDocument.create();
+  await orphan.embedPng(encodedPng(sourceInspection.rgba));
+  orphan.addPage([8, 8]);
+  const orphanBytes = await orphan.save();
 
   assert.deepEqual(
     await verifyBmpConversionSemantics({
@@ -292,7 +349,12 @@ test('BMP-to-PDF evidence requires one bounded page and real image content', asy
     }),
     { status: 'verified' },
   );
-  for (const bytes of [blankBytes, wrongSizeBytes]) {
+  for (const bytes of [
+    blankBytes,
+    wrongSizeBytes,
+    wrongContentBytes,
+    orphanBytes,
+  ]) {
     assert.equal(
       (
         await verifyBmpConversionSemantics({

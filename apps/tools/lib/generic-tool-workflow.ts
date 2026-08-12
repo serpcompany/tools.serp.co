@@ -892,9 +892,7 @@ export function decideGenericBrowserSupport(
 function supportsBmpRasterRuntime(): boolean {
   const hasDecoder =
     typeof (globalThis as { ImageDecoder?: unknown }).ImageDecoder ===
-      'function' ||
-    typeof createImageBitmap === 'function' ||
-    typeof document !== 'undefined';
+      'function' || typeof createImageBitmap === 'function';
   const hasCanvas =
     typeof OffscreenCanvas !== 'undefined' || typeof document !== 'undefined';
   return hasDecoder && hasCanvas;

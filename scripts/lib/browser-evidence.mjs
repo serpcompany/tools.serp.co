@@ -2,6 +2,11 @@ import crypto from 'node:crypto';
 
 const invariantByToolId = Object.freeze({
   'png-to-webp': 'generic-file-exact-output',
+  'bmp-to-jpeg': 'bmp-decoded-content-semantics',
+  'bmp-to-jpg': 'bmp-decoded-content-semantics',
+  'bmp-to-pdf': 'bmp-pdf-page-image-semantics',
+  'bmp-to-png': 'bmp-decoded-content-semantics',
+  'bmp-to-webp': 'bmp-decoded-content-semantics',
   'video-downloader': 'url-stream-exact-output',
   'batch-compress-png': 'batch-archive-semantics',
   'csv-to-json': 'table-row-header-value-semantics',

@@ -1,4 +1,13 @@
-import { PDFDict, PDFDocument, PDFName, PDFNumber } from 'pdf-lib';
+import {
+  decodePDFRawStream,
+  PDFDict,
+  PDFDocument,
+  PDFName,
+  PDFNumber,
+  PDFArray,
+  PDFRef,
+  PDFRawStream,
+} from 'pdf-lib';
 
 import { decodedAllocationExceeds } from '../tool-workflow/image-allocation-limits.ts';
 import type { SemanticVerification } from '../tool-workflow/index.ts';
@@ -134,6 +143,13 @@ function pdfNumber(dict: PDFDict, key: string): number | undefined {
   return value instanceof PDFNumber ? value.asNumber() : undefined;
 }
 
+function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
+  return (
+    left.byteLength === right.byteLength &&
+    left.every((value, index) => value === right[index])
+  );
+}
+
 async function verifyPdfOutput(
   bytes: Uint8Array,
   source: Extract<BmpInspection, { status: 'verified' }>,
@@ -165,18 +181,44 @@ async function verifyPdfOutput(
     }
     const resources = page.node.Resources();
     const xObjects = resources?.lookup(PDFName.of('XObject'), PDFDict);
+    const pageContents = page.node.Contents();
+    const pageContentReferences =
+      pageContents instanceof PDFArray
+        ? pageContents.asArray()
+        : pageContents
+          ? [pageContents]
+          : [];
+    const pageOperators = pageContentReferences
+      .map((reference) =>
+        reference instanceof PDFRef
+          ? document.context.lookup(reference)
+          : reference,
+      )
+      .filter(
+        (stream): stream is PDFRawStream => stream instanceof PDFRawStream,
+      )
+      .map((stream) =>
+        new TextDecoder().decode(decodePDFRawStream(stream).decode()),
+      )
+      .join('\n');
     let matchingImage = false;
     for (const key of xObjects?.keys() ?? []) {
       const object = xObjects?.lookup(key);
-      if (!object || !('dict' in object) || !(object.dict instanceof PDFDict)) {
+      if (!(object instanceof PDFRawStream)) {
         continue;
       }
       const subtype = object.dict.get(PDFName.of('Subtype'));
+      const decodedPixels = decodePDFRawStream(object).decode();
       if (
         subtype instanceof PDFName &&
         subtype.asString() === '/Image' &&
         pdfNumber(object.dict, 'Width') === source.width &&
-        pdfNumber(object.dict, 'Height') === source.height
+        pdfNumber(object.dict, 'Height') === source.height &&
+        pageOperators.includes(`/${key.decodeText()} Do`) &&
+        bytesEqual(
+          decodedPixels,
+          source.rgba.filter((_value, index) => index % 4 !== 3),
+        )
       ) {
         matchingImage = true;
       }
@@ -231,7 +273,7 @@ export async function verifyBmpConversionSemantics({
     let absoluteError = 0;
     let comparedChannels = 0;
     for (let index = 0; index < source.rgba.byteLength; index += 4) {
-      for (let channel = 0; channel < 3; channel += 1) {
+      for (let channel = 0; channel < 4; channel += 1) {
         absoluteError += Math.abs(
           source.rgba[index + channel]! - decoded.rgba[index + channel]!,
         );

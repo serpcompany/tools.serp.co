@@ -30,6 +30,30 @@ test('smoke scope retains semantic invariants associated with each Tool id', () 
   ]);
 });
 
+test('BMP smoke scope names decoded raster and PDF content invariants', () => {
+  assert.deepEqual(
+    buildBrowserScope({
+      mode: 'smoke',
+      environment: 'local',
+      toolIds: [
+        'bmp-to-jpeg',
+        'bmp-to-jpg',
+        'bmp-to-pdf',
+        'bmp-to-png',
+        'bmp-to-webp',
+      ],
+      filtered: true,
+    }).tools,
+    [
+      { toolId: 'bmp-to-jpeg', invariants: ['bmp-decoded-content-semantics'] },
+      { toolId: 'bmp-to-jpg', invariants: ['bmp-decoded-content-semantics'] },
+      { toolId: 'bmp-to-pdf', invariants: ['bmp-pdf-page-image-semantics'] },
+      { toolId: 'bmp-to-png', invariants: ['bmp-decoded-content-semantics'] },
+      { toolId: 'bmp-to-webp', invariants: ['bmp-decoded-content-semantics'] },
+    ],
+  );
+});
+
 test('benchmark scope identifies Tools without claiming semantic correctness', () => {
   const evidence = buildBrowserScope({
     mode: 'benchmark',
