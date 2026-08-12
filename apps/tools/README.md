@@ -57,6 +57,14 @@ request. Downloader requests use their separate shared contract in
 cross-instance cookie verification; missing secrets must not be represented as
 equivalent production enforcement.
 
+Browser transcription uses the `Xenova/whisper-tiny` Transformers.js model at
+the exact revision and file inventory declared in
+`lib/transcription-model-assets.js`. That manifest also records the source,
+upstream OpenAI model, and the source repository's Apache-2.0 declaration at
+the pinned revision. This is reproducible attribution, not a legal conclusion:
+changing the model, revision, files, or declared license requires an explicit
+provenance and distribution review before release.
+
 ## Downloader Landers
 
 All active `download` Tools use the shared downloader template and request

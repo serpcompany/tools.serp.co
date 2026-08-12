@@ -2,6 +2,14 @@ export const TRANSCRIPTION_MODEL_ID = "Xenova/whisper-tiny";
 export const TRANSCRIPTION_MODEL_REVISION =
   "5332fcc35e32a33b86612b9a57a89be7906102b1";
 export const TRANSCRIPTION_MODEL_ROUTE = "/vendor/models/whisper-tiny";
+export const TRANSCRIPTION_MODEL_PROVENANCE = Object.freeze({
+  source: "https://huggingface.co/Xenova/whisper-tiny",
+  sourceRevision: TRANSCRIPTION_MODEL_REVISION,
+  upstreamModel: "https://huggingface.co/openai/whisper-tiny",
+  declaredLicense: "Apache-2.0",
+  licenseDeclaration:
+    `https://huggingface.co/Xenova/whisper-tiny/blob/${TRANSCRIPTION_MODEL_REVISION}/README.md`,
+});
 export const TRANSCRIPTION_MODEL_FILES = Object.freeze([
   "config.json",
   "tokenizer.json",

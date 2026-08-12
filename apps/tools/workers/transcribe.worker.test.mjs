@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
   TRANSCRIPTION_MODEL_FILES,
+  TRANSCRIPTION_MODEL_PROVENANCE,
   TRANSCRIPTION_MODEL_REVISION,
 } from '../lib/transcription-model-assets.js';
 
@@ -23,6 +24,14 @@ test('the production transcription worker preserves its external module import',
     TRANSCRIPTION_MODEL_REVISION,
     '5332fcc35e32a33b86612b9a57a89be7906102b1',
   );
+  assert.deepEqual(TRANSCRIPTION_MODEL_PROVENANCE, {
+    source: 'https://huggingface.co/Xenova/whisper-tiny',
+    sourceRevision: TRANSCRIPTION_MODEL_REVISION,
+    upstreamModel: 'https://huggingface.co/openai/whisper-tiny',
+    declaredLicense: 'Apache-2.0',
+    licenseDeclaration:
+      `https://huggingface.co/Xenova/whisper-tiny/blob/${TRANSCRIPTION_MODEL_REVISION}/README.md`,
+  });
   assert.deepEqual(TRANSCRIPTION_MODEL_FILES, [
     'config.json',
     'tokenizer.json',
