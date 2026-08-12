@@ -306,6 +306,18 @@ async function observeScenario(browser, origin, scenario, fixtures) {
     });
     const input = page.locator('[data-testid="tool-file-input"]');
     await input.waitFor({ state: 'attached', timeout: 45_000 });
+    await page.waitForFunction(
+      () => {
+        const input = document.querySelector('[data-testid="tool-file-input"]');
+        if (!input) return false;
+        return Object.keys(input).some(
+          (key) =>
+            key.startsWith('__reactFiber') || key.startsWith('__reactProps'),
+        );
+      },
+      undefined,
+      { timeout: 45_000 },
+    );
     await input.setInputFiles(definition.file);
     await page.waitForFunction(
       () => {
