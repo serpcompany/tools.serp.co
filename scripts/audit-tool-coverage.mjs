@@ -53,7 +53,38 @@ if (JSON.stringify(currentTestFiles) !== JSON.stringify(sourceTestFiles)) {
   );
 }
 
+function collectLocalModuleInputs(entryPath) {
+  const inputs = new Set();
+  const pending = [entryPath];
+  const importPattern = /(?:from\s*|import\s*\()\s*['"](\.{1,2}\/[^'"]+)['"]/g;
+  while (pending.length > 0) {
+    const relativePath = pending.pop();
+    if (!relativePath || inputs.has(relativePath)) continue;
+    inputs.add(relativePath);
+    const source = fs.readFileSync(
+      path.join(repositoryRoot, relativePath),
+      'utf8',
+    );
+    for (const match of source.matchAll(importPattern)) {
+      const importedPath = path.posix.normalize(
+        path.posix.join(path.posix.dirname(relativePath), match[1]),
+      );
+      if (fs.existsSync(path.join(repositoryRoot, importedPath))) {
+        pending.push(importedPath);
+      }
+    }
+  }
+  return Object.freeze([...inputs].sort());
+}
+
+// Pin the executable reproducer's complete local module graph as well as the
+// product inputs. Otherwise a working-tree-only helper change could produce a
+// payload that falsely names `sourceRevision` as its complete source.
+const auditReproducerInputs = collectLocalModuleInputs(
+  'scripts/audit-tool-coverage.mjs',
+);
 const auditedInputPaths = [
+  ...auditReproducerInputs,
   'apps/tools',
   'packages/app-core',
   'packages/tool-telemetry',
