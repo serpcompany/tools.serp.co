@@ -130,7 +130,7 @@ test('dynamic imports keep presentation lifecycle ownership reachable', () => {
     new Map([
       [
         'apps/tools/app/tool/page.tsx',
-        "export async function load() { return import('../../components/ToolView'); }",
+        'export async function load() { return import(`../../components/ToolView`); }',
       ],
       [
         'apps/tools/components/ToolView.tsx',
@@ -143,6 +143,60 @@ test('dynamic imports keep presentation lifecycle ownership reachable', () => {
     result.violations.map(({ concept }) => concept),
     ['worker-lifecycle'],
   );
+});
+
+test('reachable colocated route presentation cannot own lifecycle primitives', () => {
+  const result = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import View from './View'; export default View;",
+      ],
+      [
+        'apps/tools/app/tool/View.tsx',
+        'export default function View() { const url = URL.createObjectURL(new Blob()); return <div>{url}</div>; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(
+    result.violations.map(({ concept }) => concept),
+    ['object-url-delivery'],
+  );
+});
+
+test('default telemetry facade wrappers retain raw terminal ownership', () => {
+  const result = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import start from '../../lib/run-facade'; export default function Page() { start({}); return <div />; }",
+      ],
+      [
+        'apps/tools/lib/run-facade.ts',
+        "import { beginToolRun as rawStart } from './telemetry'; export default function start(options) { return rawStart(options); }",
+      ],
+      [
+        'apps/tools/lib/telemetry.ts',
+        "export { beginToolRun } from '@serp-tools/tool-telemetry/client';",
+      ],
+    ]),
+  );
+  assert.deepEqual(
+    result.violations.map(({ concept }) => concept),
+    ['terminal-telemetry'],
+  );
+});
+
+test('ordinary presentation state progress is not lifecycle policy ownership', () => {
+  const result = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        'export default function Page() { const setProgress = () => {}; setProgress(50); return <div />; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(result.violations, []);
 });
 
 test('local telemetry facades and computed URL helpers cannot hide presentation ownership', () => {
@@ -201,8 +255,7 @@ test('processor modules may use lifecycle-shaped primitives for tool-specific wo
     [],
   );
   assert.deepEqual(
-    result.lifecycleInventory['worker-lifecycle']
-      .allowedProcessorOrSupportModules,
+    result.lifecycleInventory['worker-lifecycle'].toolSpecificOrSupportModules,
     ['apps/tools/lib/convert/processor.ts'],
   );
 });
@@ -244,4 +297,40 @@ test('reachable family adapters must cross the accepted workflow.run seam', () =
       'apps/tools/app/tool/page.tsx',
     ],
   });
+
+  const unrelated = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import { createBrowserTableWorkflow } from '../../lib/table-browser-workflow'; const unrelatedWorkflow = { run() {} }; export default function Page() { createBrowserTableWorkflow(); unrelatedWorkflow.run(); return <div />; }",
+      ],
+      [
+        'apps/tools/lib/table-browser-workflow.ts',
+        'export function createBrowserTableWorkflow() { return { workflow: { run() {} } }; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(
+    unrelated.violations.map(({ concept }) => concept),
+    ['missing-workflow-run'],
+  );
+});
+
+test('new reachable browser workflow adapters enter seam and ownership enforcement automatically', () => {
+  const result = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import { createBrowserNovelWorkflow } from '../../lib/novel-browser-workflow'; export default function Page() { createBrowserNovelWorkflow(); return <div />; }",
+      ],
+      [
+        'apps/tools/lib/novel-browser-workflow.ts',
+        'export function createBrowserNovelWorkflow() { const url = URL.createObjectURL(new Blob()); return { url }; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(
+    result.violations.map(({ concept }) => concept),
+    ['object-url-delivery', 'missing-workflow-run'],
+  );
 });

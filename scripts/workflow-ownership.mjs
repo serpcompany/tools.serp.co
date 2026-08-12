@@ -11,13 +11,6 @@ const SOURCE_FILE = /\.(?:[cm]?[jt]s|[jt]sx)$/u;
 const TEST_FILE = /\.test\.(?:[cm]?[jt]s|[jt]sx)$/u;
 const ROUTE_PRESENTATION_FILE =
   /\/(?:page|layout|template|error|loading|not-found)\.[jt]sx?$/u;
-const FAMILY_ADAPTER_FILES = new Set([
-  'apps/tools/lib/batch-browser-workflow.ts',
-  'apps/tools/lib/generic-tool-workflow.ts',
-  'apps/tools/lib/media-workflow/browser.ts',
-  'apps/tools/lib/specialized-browser-workflow.ts',
-  'apps/tools/lib/table-browser-workflow.ts',
-]);
 const LIFECYCLE_CONCEPTS = Object.freeze([
   'terminal-telemetry',
   'object-url-delivery',
@@ -80,7 +73,7 @@ function importedSpecifiers(sourceFile) {
       ts.isCallExpression(node) &&
       node.expression.kind === ts.SyntaxKind.ImportKeyword &&
       node.arguments.length === 1 &&
-      ts.isStringLiteral(node.arguments[0])
+      ts.isStringLiteralLike(node.arguments[0])
     ) {
       specifiers.push(node.arguments[0].text);
     }
@@ -103,7 +96,7 @@ function resolveImport(from, specifier, files) {
   }
   for (const candidate of [
     base,
-    ...['.ts', '.tsx', '.js', '.jsx', '.mjs'].map(
+    ...['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs'].map(
       (extension) => `${base}${extension}`,
     ),
     ...['index.ts', 'index.tsx', 'index.js', 'index.mjs'].map((name) =>
@@ -186,7 +179,7 @@ function conceptsFor(sourceFile) {
       }
       if (method === 'getReader') add('streamed-reader');
       if (method === 'arrayBuffer') add('upload-read-ownership');
-      if (method === 'reportProgress' || method === 'setProgress') {
+      if (method === 'reportProgress') {
         add('progress-policy');
       }
     }
@@ -207,7 +200,7 @@ function conceptsFor(sourceFile) {
         objectUrlSites += 1;
       }
       if (ts.isIdentifier(node.expression)) {
-        if (/^(?:report|set|update)Progress$/u.test(node.expression.text)) {
+        if (node.expression.text === 'reportProgress') {
           add('progress-policy');
         }
       }
@@ -235,7 +228,8 @@ function isPresentationModule(relativePath, reachable) {
     reachable.has(relativePath) &&
     (relativePath.startsWith(`${APP_ROOT}components/`) ||
       (relativePath.startsWith(`${APP_ROOT}app/`) &&
-        ROUTE_PRESENTATION_FILE.test(relativePath)))
+        (relativePath.endsWith('.tsx') ||
+          ROUTE_PRESENTATION_FILE.test(relativePath))))
   );
 }
 
@@ -262,6 +256,40 @@ function reverseImportGraph(graph) {
   return reverse;
 }
 
+function registeredFamilyAdapters(parsed) {
+  const adapters = new Map();
+  for (const [relativePath, sourceFile] of parsed) {
+    if (!relativePath.startsWith(`${APP_ROOT}lib/`)) continue;
+    const exports = new Set();
+    for (const statement of sourceFile.statements) {
+      const exported = statement.modifiers?.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
+      );
+      if (
+        exported &&
+        ts.isFunctionDeclaration(statement) &&
+        statement.name &&
+        /^createBrowser.+Workflow$/u.test(statement.name.text)
+      ) {
+        exports.add(statement.name.text);
+      }
+      if (exported && ts.isVariableStatement(statement)) {
+        for (const declaration of statement.declarationList.declarations) {
+          if (
+            ts.isIdentifier(declaration.name) &&
+            (declaration.name.text === 'genericToolWorkflow' ||
+              /^browser.+Workflow$/u.test(declaration.name.text))
+          ) {
+            exports.add(declaration.name.text);
+          }
+        }
+      }
+    }
+    if (exports.size > 0) adapters.set(relativePath, exports);
+  }
+  return adapters;
+}
+
 function telemetryOwners(files, parsed) {
   const exportedSymbols = new Map();
   const ownerPaths = new Set();
@@ -269,6 +297,10 @@ function telemetryOwners(files, parsed) {
   while (changed) {
     changed = false;
     for (const [relativePath, sourceFile] of parsed) {
+      const stopsRawTelemetryPropagation =
+        relativePath === CANONICAL_LIFECYCLE ||
+        relativePath.startsWith(`${APP_ROOT}components/`) ||
+        relativePath.startsWith(`${APP_ROOT}app/`);
       const symbols = exportedSymbols.get(relativePath) ?? new Set();
       const localTelemetryBindings = new Set();
       const telemetryNamespaces = new Set();
@@ -302,7 +334,12 @@ function telemetryOwners(files, parsed) {
           Boolean(providerSymbols?.has(name));
 
         if (ts.isImportDeclaration(statement)) {
-          const bindings = statement.importClause?.namedBindings;
+          const importClause = statement.importClause;
+          if (importClause?.name && providerSymbols?.has('default')) {
+            ownerPaths.add(relativePath);
+            localTelemetryBindings.add(importClause.name.text);
+          }
+          const bindings = importClause?.namedBindings;
           if (!bindings) continue;
           if (ts.isNamespaceImport(bindings)) {
             if (telemetryBoundary || (providerSymbols?.size ?? 0) > 0) {
@@ -350,7 +387,7 @@ function telemetryOwners(files, parsed) {
         visit(root);
         return found;
       };
-      for (const statement of relativePath === CANONICAL_LIFECYCLE
+      for (const statement of stopsRawTelemetryPropagation
         ? []
         : sourceFile.statements) {
         if (
@@ -372,13 +409,16 @@ function telemetryOwners(files, parsed) {
         const exported = statement.modifiers?.some(
           (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
         );
+        const defaultExport = statement.modifiers?.some(
+          (modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword,
+        );
         if (!exported) continue;
         if (
           ts.isFunctionDeclaration(statement) &&
           statement.name &&
           containsTelemetryReference(statement)
         ) {
-          addSymbol(statement.name.text);
+          addSymbol(defaultExport ? 'default' : statement.name.text);
         }
         if (ts.isVariableStatement(statement)) {
           for (const declaration of statement.declarationList.declarations) {
@@ -392,13 +432,65 @@ function telemetryOwners(files, parsed) {
           }
         }
       }
+      if (!stopsRawTelemetryPropagation) {
+        for (const statement of sourceFile.statements) {
+          if (
+            ts.isExportAssignment(statement) &&
+            !statement.isExportEquals &&
+            containsTelemetryReference(statement.expression)
+          ) {
+            addSymbol('default');
+          }
+        }
+      }
       exportedSymbols.set(relativePath, symbols);
     }
   }
   return ownerPaths;
 }
 
-function callsAcceptedWorkflowRun(sourceFile) {
+function bindingNames(name, names = new Set()) {
+  if (ts.isIdentifier(name)) names.add(name.text);
+  else ts.forEachChild(name, (child) => bindingNames(child, names));
+  return names;
+}
+
+function containsAnyIdentifier(root, identifiers) {
+  let found = false;
+  function visit(node) {
+    if (ts.isIdentifier(node) && identifiers.has(node.text)) found = true;
+    if (!found) ts.forEachChild(node, visit);
+  }
+  visit(root);
+  return found;
+}
+
+function callsAcceptedWorkflowRun(
+  sourceFile,
+  adapterPath,
+  sourcePath,
+  factorySymbols,
+) {
+  const adapterBindings = new Set(factorySymbols);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    function collect(node) {
+      if (
+        ts.isVariableDeclaration(node) &&
+        node.initializer &&
+        containsAnyIdentifier(node.initializer, adapterBindings)
+      ) {
+        for (const name of bindingNames(node.name)) {
+          if (adapterBindings.has(name)) continue;
+          adapterBindings.add(name);
+          changed = true;
+        }
+      }
+      ts.forEachChild(node, collect);
+    }
+    collect(sourceFile);
+  }
   let accepted = false;
   function visit(node) {
     if (ts.isCallExpression(node)) {
@@ -409,8 +501,13 @@ function callsAcceptedWorkflowRun(sourceFile) {
         (ts.isElementAccessExpression(expression) &&
           ts.isStringLiteral(expression.argumentExpression) &&
           expression.argumentExpression.text === 'run');
-      if (isRun && /workflow/iu.test(expression.expression.getText(sourceFile)))
-        accepted = true;
+      if (isRun) {
+        const receiver = expression.expression;
+        accepted =
+          sourcePath === adapterPath ||
+          (ts.isIdentifier(receiver) && adapterBindings.has(receiver.text)) ||
+          containsAnyIdentifier(receiver, new Set(factorySymbols));
+      }
     }
     if (!accepted) ts.forEachChild(node, visit);
   }
@@ -432,9 +529,9 @@ function reachableDependents(relativePath, reverseGraph, reachable) {
   return dependents;
 }
 
-function moduleRole(relativePath, reachable) {
+function moduleRole(relativePath, reachable, familyAdapters) {
   if (relativePath === CANONICAL_LIFECYCLE) return 'canonical-owner';
-  if (FAMILY_ADAPTER_FILES.has(relativePath)) return 'family-adapter';
+  if (familyAdapters.has(relativePath)) return 'family-adapter';
   if (isPresentationModule(relativePath, reachable)) return 'presentation';
   return 'processor-or-support';
 }
@@ -455,6 +552,7 @@ export function analyzeWorkflowOwnership(inputFiles) {
   const reachable = reachableFiles(files, parsed);
   const reverseGraph = reverseImportGraph(importGraph(files, parsed));
   const telemetry = telemetryOwners(files, parsed);
+  const familyAdapters = registeredFamilyAdapters(parsed);
   const ownership = new Map();
   const violations = [];
 
@@ -466,7 +564,7 @@ export function analyzeWorkflowOwnership(inputFiles) {
     }
     for (const [concept, sites] of concepts) {
       const paths = ownership.get(concept) ?? [];
-      const role = moduleRole(relativePath, reachable);
+      const role = moduleRole(relativePath, reachable, familyAdapters);
       paths.push({ path: relativePath, role, sites });
       ownership.set(concept, paths);
 
@@ -486,13 +584,18 @@ export function analyzeWorkflowOwnership(inputFiles) {
   }
 
   const familySeamEvidence = {};
-  for (const familyAdapter of [...FAMILY_ADAPTER_FILES].sort()) {
+  for (const familyAdapter of [...familyAdapters.keys()].sort()) {
     if (!files.has(familyAdapter) || !reachable.has(familyAdapter)) continue;
     const evidence = [
       ...reachableDependents(familyAdapter, reverseGraph, reachable),
     ]
       .filter((relativePath) =>
-        callsAcceptedWorkflowRun(parsed.get(relativePath)),
+        callsAcceptedWorkflowRun(
+          parsed.get(relativePath),
+          familyAdapter,
+          relativePath,
+          familyAdapters.get(familyAdapter),
+        ),
       )
       .sort();
     familySeamEvidence[familyAdapter] = evidence;
@@ -537,10 +640,10 @@ export function analyzeWorkflowOwnership(inputFiles) {
             (total, owner) => total + owner.sites,
             0,
           ),
-          allowedProcessorOrSupportModules: otherOwners
+          toolSpecificOrSupportModules: otherOwners
             .map(({ path: ownerPath }) => ownerPath)
             .sort(),
-          allowedProcessorOrSupportSites: otherOwners.reduce(
+          toolSpecificOrSupportSites: otherOwners.reduce(
             (total, owner) => total + owner.sites,
             0,
           ),
@@ -566,9 +669,9 @@ export function analyzeWorkflowOwnership(inputFiles) {
     canonicalLifecycleOwner: CANONICAL_LIFECYCLE,
     countDefinitions: {
       implementation:
-        'One reachable module/concept pair in a restricted presentation, registered family-adapter, or canonical shared-owner role.',
+        'One reachable shared-owner module/concept pair: presentation and canonical lifecycle sites, plus terminal telemetry or object-URL delivery in a family adapter.',
       duplicate:
-        'A shared-owner module/concept pair beyond an actually present canonical owner; processor-or-support sites are reported but excluded.',
+        'A shared-owner module/concept pair beyond an actually present canonical owner; Tool-specific family-adapter, processor, and support sites are reported but excluded.',
       acceptedOwnerBudget,
     },
     reachableImplementationCount: reachableSharedOwners.length,

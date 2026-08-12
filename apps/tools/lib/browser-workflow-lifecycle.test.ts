@@ -78,7 +78,13 @@ test('delivery store releases a result when starting its download throws', async
   URL.revokeObjectURL = (url) => revoked.push(url);
   globalThis.document = {
     createElement() {
-      throw new Error('anchor unavailable');
+      return {
+        href: '',
+        download: '',
+        click() {
+          throw new Error('anchor click failed');
+        },
+      };
     },
   } as unknown as Document;
 
@@ -94,7 +100,7 @@ test('delivery store releases a result when starting its download throws', async
           mimeType: 'text/plain',
           size: 10,
         }),
-      /anchor unavailable/,
+      /anchor click failed/,
     );
     assert.equal(store.get(deliveryId), undefined);
     assert.deepEqual(revoked, ['blob:failed-store']);
