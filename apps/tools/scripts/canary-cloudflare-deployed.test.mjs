@@ -5,6 +5,11 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import {
+  TRANSCRIPTION_MODEL_BYTES,
+  TRANSCRIPTION_MODEL_FILES,
+  TRANSCRIPTION_MODEL_REVISION,
+} from '../lib/transcription-model-assets.js';
 
 const canaryScript = fileURLToPath(
   new URL('./canary-cloudflare-deployed.mjs', import.meta.url),
@@ -108,6 +113,31 @@ test('deployed Cloudflare canary verifies the emitted transcription chunk and FF
   assert.match(canarySource, /application\/wasm/);
   assert.match(canarySource, /text\/javascript/);
   assert.match(canarySource, /immutable/);
+  assert.deepEqual(TRANSCRIPTION_MODEL_FILES, [
+    'config.json',
+    'tokenizer.json',
+    'tokenizer_config.json',
+    'preprocessor_config.json',
+    'generation_config.json',
+    'onnx/encoder_model_quantized.onnx',
+    'onnx/decoder_model_merged_quantized.onnx',
+  ]);
+  assert.equal(
+    TRANSCRIPTION_MODEL_REVISION,
+    '5332fcc35e32a33b86612b9a57a89be7906102b1',
+  );
+  assert.deepEqual(TRANSCRIPTION_MODEL_BYTES, {
+    'config.json': 2248,
+    'tokenizer.json': 2480466,
+    'tokenizer_config.json': 282683,
+    'preprocessor_config.json': 339,
+    'generation_config.json': 3716,
+    'onnx/encoder_model_quantized.onnx': 10124910,
+    'onnx/decoder_model_merged_quantized.onnx': 30727765,
+  });
+  assert.match(canarySource, /transcriptionModelChecks/);
+  assert.match(canarySource, /TRANSCRIPTION_MODEL_FILES/);
+  assert.match(canarySource, /TRANSCRIPTION_MODEL_BYTES/);
 });
 
 test('native canary setup failure records structured evidence', (t) => {

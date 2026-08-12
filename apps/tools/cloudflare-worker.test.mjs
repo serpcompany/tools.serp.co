@@ -36,6 +36,7 @@ test("Cloudflare routes generated worker chunks through the header-owning Worker
   );
   assert.match(wranglerSource, /"\/vendor\/ffmpeg\/\*"/);
   assert.match(wranglerSource, /"\/vendor\/ffmpeg-st\/\*"/);
+  assert.match(wranglerSource, /"\/vendor\/models\/whisper-tiny\//);
 });
 
 test("OpenNext post-build adapter owns generated worker chunk headers", () => {
@@ -163,6 +164,113 @@ test(
       appCookies.filter((cookie) => cookie.name === "upstream-session"),
       [],
     );
+  },
+);
+
+test(
+  "an isolated browser can fetch only pinned Whisper resources without crossing private headers",
+  { timeout: 15_000 },
+  async (t) => {
+    const revision = "5332fcc35e32a33b86612b9a57a89be7906102b1";
+    const assetPath = `/vendor/models/whisper-tiny/${revision}/config.json`;
+    const originalFetch = globalThis.fetch;
+    const upstreamRequests = [];
+    globalThis.fetch = async (input, init) => {
+      const request = new Request(input, init);
+      upstreamRequests.push({
+        authorization: request.headers.get("authorization"),
+        cookie: request.headers.get("cookie"),
+        internal: request.headers.get("x-internal-secret"),
+        range: request.headers.get("range"),
+        url: request.url,
+      });
+      return new Response('{"model_type":"whisper"}', {
+        headers: {
+          "content-type": "text/plain",
+          etag: '"pinned-model-fixture"',
+          "set-cookie": "model-session=owned; Path=/; HttpOnly",
+          "x-upstream-secret": "must-not-cross-app-origin",
+        },
+      });
+    };
+    t.after(() => {
+      globalThis.fetch = originalFetch;
+    });
+
+    const generated = `export default {\n    async fetch(request, env, ctx) {\n        return new Response("<!doctype html><title>isolated</title>", { headers: { "content-type": "text/html", "cross-origin-embedder-policy": "credentialless", "cross-origin-opener-policy": "same-origin" } });\n    },\n};\n`;
+    const worker = (
+      await import(`data:text/javascript;base64,${Buffer.from(addIsolatedAssetAdapter(generated)).toString("base64")}`)
+    ).default;
+    const app = http.createServer(async (request, response) => {
+      const address = app.address();
+      assert.ok(address && typeof address !== "string");
+      const workerResponse = await worker.fetch(
+        new Request(`http://127.0.0.1:${address.port}${request.url}`, {
+          headers: {
+            authorization: "Bearer private-app-token",
+            cookie: "session=private-app-session",
+            range: "bytes=0-63",
+            "x-internal-secret": "private-app-header",
+          },
+          method: request.method,
+        }),
+        {},
+        {},
+      );
+      response.writeHead(workerResponse.status, Object.fromEntries(workerResponse.headers));
+      response.end(Buffer.from(await workerResponse.arrayBuffer()));
+    });
+    app.listen(0, "127.0.0.1");
+    await once(app, "listening");
+    t.after(() => app.close());
+    const address = app.address();
+    assert.ok(address && typeof address !== "string");
+
+    const browser = await chromium.launch({ headless: true });
+    t.after(() => browser.close());
+    const page = await browser.newPage();
+    const failures = [];
+    page.on("requestfailed", (request) => failures.push(request.failure()?.errorText));
+    await page.goto(`http://127.0.0.1:${address.port}/`);
+    const result = await page.evaluate(async (path) => {
+      const response = await fetch(path);
+      return {
+        body: await response.json(),
+        cacheControl: response.headers.get("cache-control"),
+        contentType: response.headers.get("content-type"),
+        cors: response.headers.get("access-control-allow-origin"),
+        corp: response.headers.get("cross-origin-resource-policy"),
+        upstreamSecret: response.headers.get("x-upstream-secret"),
+      };
+    }, assetPath);
+    const deniedResponse = await page.evaluate(async (path) => {
+      const response = await fetch(path.replace("config.json", "README.md"));
+      return {
+        contentType: response.headers.get("content-type"),
+        text: await response.text(),
+      };
+    }, assetPath);
+    const cookies = await page.context().cookies(`http://127.0.0.1:${address.port}`);
+
+    assert.deepEqual(result, {
+      body: { model_type: "whisper" },
+      cacheControl: "public,max-age=31536000,immutable",
+      contentType: "application/json",
+      cors: "*",
+      corp: "same-origin",
+      upstreamSecret: null,
+    });
+    assert.deepEqual(upstreamRequests, [{
+      authorization: null,
+      cookie: null,
+      internal: null,
+      range: "bytes=0-63",
+      url: `https://huggingface.co/Xenova/whisper-tiny/resolve/${revision}/config.json`,
+    }]);
+    assert.match(deniedResponse.contentType ?? "", /^text\/html/);
+    assert.match(deniedResponse.text, /<title>isolated<\/title>/);
+    assert.deepEqual(cookies.filter((cookie) => cookie.name === "model-session"), []);
+    assert.deepEqual(failures, []);
   },
 );
 

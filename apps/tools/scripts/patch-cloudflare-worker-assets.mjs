@@ -1,29 +1,43 @@
 import fs from "node:fs";
 import path from "node:path";
+import {
+  TRANSCRIPTION_MODEL_FILES,
+  transcriptionModelAssetPath,
+  transcriptionModelUpstreamUrl,
+} from "../lib/transcription-model-assets.js";
 
 const FETCH_ENTRY = "    async fetch(request, env, ctx) {\n";
+const modelProxyEntries = TRANSCRIPTION_MODEL_FILES.map(
+  (file) =>
+    `            [${JSON.stringify(transcriptionModelAssetPath(file))}, ${JSON.stringify(transcriptionModelUpstreamUrl(file))}],`,
+).join("\n");
+
 const ASSET_ADAPTER = `        const assetUrl = new URL(request.url);
-        const ffmpegAssetPaths = new Set([
-            "/vendor/ffmpeg/ffmpeg-core.js",
-            "/vendor/ffmpeg/ffmpeg-core.wasm",
-            "/vendor/ffmpeg/ffmpeg-core.worker.js",
-            "/vendor/ffmpeg-st/ffmpeg-core.js",
-            "/vendor/ffmpeg-st/ffmpeg-core.wasm",
+        const proxiedAssetTargets = new Map([
+            ["/vendor/ffmpeg/ffmpeg-core.js", "/vendor/ffmpeg/ffmpeg-core.js"],
+            ["/vendor/ffmpeg/ffmpeg-core.wasm", "/vendor/ffmpeg/ffmpeg-core.wasm"],
+            ["/vendor/ffmpeg/ffmpeg-core.worker.js", "/vendor/ffmpeg/ffmpeg-core.worker.js"],
+            ["/vendor/ffmpeg-st/ffmpeg-core.js", "/vendor/ffmpeg-st/ffmpeg-core.js"],
+            ["/vendor/ffmpeg-st/ffmpeg-core.wasm", "/vendor/ffmpeg-st/ffmpeg-core.wasm"],
+${modelProxyEntries}
         ]);
-        if (ffmpegAssetPaths.has(assetUrl.pathname)) {
+        const mappedAssetTarget = proxiedAssetTargets.get(assetUrl.pathname);
+        if (mappedAssetTarget) {
             if (request.method !== "GET" && request.method !== "HEAD") {
                 return new Response("Method Not Allowed", {
                     status: 405,
                     headers: { Allow: "GET, HEAD" },
                 });
             }
-            const upstreamUrl = new URL(assetUrl.pathname, env.NEXT_PUBLIC_ASSETS_BASE_URL);
             const upstreamRequestHeaders = new Headers();
             for (const headerName of ["Range", "If-Range", "If-None-Match", "If-Modified-Since"]) {
                 const headerValue = request.headers.get(headerName);
                 if (headerValue !== null) upstreamRequestHeaders.set(headerName, headerValue);
             }
-            const upstreamResponse = await fetch(upstreamUrl, {
+            const proxiedAssetTarget = mappedAssetTarget.startsWith("https://")
+                ? mappedAssetTarget
+                : new URL(mappedAssetTarget, env.NEXT_PUBLIC_ASSETS_BASE_URL).toString();
+            const upstreamResponse = await fetch(proxiedAssetTarget, {
                 method: request.method,
                 headers: upstreamRequestHeaders,
             });
@@ -34,6 +48,10 @@ const ASSET_ADAPTER = `        const assetUrl = new URL(request.url);
             }
             upstreamHeaders.set("Access-Control-Allow-Origin", "*");
             upstreamHeaders.set("Cross-Origin-Resource-Policy", "same-origin");
+            if (assetUrl.pathname.startsWith("/vendor/models/whisper-tiny/")) {
+                upstreamHeaders.set("Cache-Control", "public,max-age=31536000,immutable");
+                upstreamHeaders.set("Content-Type", assetUrl.pathname.endsWith(".json") ? "application/json" : "application/octet-stream");
+            }
             return new Response(upstreamResponse.body, {
                 status: upstreamResponse.status,
                 statusText: upstreamResponse.statusText,
@@ -71,8 +89,8 @@ function javascriptFiles(directory) {
 
 export function verifyCloudflareIsolationBuild({ workerSource, assetsDirectory }) {
   for (const expected of [
-    'ffmpegAssetPaths.has(assetUrl.pathname)',
-    'new URL(assetUrl.pathname, env.NEXT_PUBLIC_ASSETS_BASE_URL)',
+    'proxiedAssetTargets.get(assetUrl.pathname)',
+    'https://huggingface.co/Xenova/whisper-tiny/resolve/',
     'const upstreamRequestHeaders = new Headers()',
     'const upstreamHeaders = new Headers()',
     'upstreamHeaders.set("Access-Control-Allow-Origin", "*")',

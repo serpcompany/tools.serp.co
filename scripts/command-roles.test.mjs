@@ -34,6 +34,7 @@ test('Wayfinder preview is an isolated workers.dev environment', () => {
       '/_next/static/chunks/*',
       '/vendor/ffmpeg/*',
       '/vendor/ffmpeg-st/*',
+      '/vendor/models/whisper-tiny/*',
     ],
   });
   assert.deepEqual(preview?.r2_buckets, [
