@@ -11,6 +11,21 @@ const SOURCE_FILE = /\.(?:[cm]?[jt]s|[jt]sx)$/u;
 const TEST_FILE = /\.test\.(?:[cm]?[jt]s|[jt]sx)$/u;
 const ROUTE_PRESENTATION_FILE =
   /\/(?:page|layout|template|error|loading|not-found)\.[jt]sx?$/u;
+const FAMILY_ADAPTER_FILES = new Set([
+  'apps/tools/lib/batch-browser-workflow.ts',
+  'apps/tools/lib/generic-tool-workflow.ts',
+  'apps/tools/lib/media-workflow/browser.ts',
+  'apps/tools/lib/specialized-browser-workflow.ts',
+  'apps/tools/lib/table-browser-workflow.ts',
+]);
+const LIFECYCLE_CONCEPTS = Object.freeze([
+  'terminal-telemetry',
+  'object-url-delivery',
+  'worker-lifecycle',
+  'streamed-reader',
+  'upload-read-ownership',
+  'progress-policy',
+]);
 
 const REMEDIATION = Object.freeze({
   'terminal-telemetry':
@@ -21,6 +36,12 @@ const REMEDIATION = Object.freeze({
     'Move Worker creation, cancellation, and cleanup behind the workflow.run processor adapter; presentation modules only render snapshots and outcomes.',
   'streamed-reader':
     'Move stream acquisition and cancellation behind workflow.run; presentation modules must not own ReadableStream readers.',
+  'upload-read-ownership':
+    'Pass selected inputs to the family workflow; byte acquisition belongs behind ToolWorkflow.run.',
+  'progress-policy':
+    'Render shared workflow snapshots instead of deriving lifecycle progress in presentation code.',
+  'missing-workflow-run':
+    'Connect this reachable family adapter to the accepted ToolWorkflow.run(request, options) seam.',
 });
 
 function scriptKind(relativePath) {
@@ -54,6 +75,18 @@ function importedSpecifiers(sourceFile) {
       specifiers.push(statement.moduleSpecifier.text);
     }
   }
+  function visit(node) {
+    if (
+      ts.isCallExpression(node) &&
+      node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+      node.arguments.length === 1 &&
+      ts.isStringLiteral(node.arguments[0])
+    ) {
+      specifiers.push(node.arguments[0].text);
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(sourceFile);
   return specifiers;
 }
 
@@ -106,41 +139,22 @@ function reachableFiles(files, parsed) {
   return reachable;
 }
 
-function conceptsFor(relativePath, sourceFile) {
+function conceptsFor(sourceFile) {
   const concepts = new Map();
   const add = (concept, count = 1) =>
     concepts.set(concept, (concepts.get(concept) ?? 0) + count);
-  const telemetryNamespaces = new Set();
   const objectUrlBindings = new Set();
-  for (const statement of sourceFile.statements) {
-    if (
-      ts.isImportDeclaration(statement) &&
-      statement.importClause?.namedBindings &&
-      ts.isStringLiteral(statement.moduleSpecifier) &&
-      (/(?:^|\/)telemetry(?:\.ts)?$/u.test(statement.moduleSpecifier.text) ||
-        statement.moduleSpecifier.text === '@serp-tools/tool-telemetry/client')
-    ) {
-      const bindings = statement.importClause.namedBindings;
-      if (ts.isNamespaceImport(bindings)) {
-        telemetryNamespaces.add(bindings.name.text);
-      } else if (
-        bindings.elements.some(
-          (element) =>
-            (element.propertyName ?? element.name).text === 'beginToolRun',
-        )
-      ) {
-        add('terminal-telemetry');
-      }
-    }
-  }
-  let hasDeliveryName = false;
-  let hasDownloadClick = false;
   let objectUrlSites = 0;
   function visit(node) {
     if (
       ts.isNewExpression(node) &&
-      ts.isIdentifier(node.expression) &&
-      node.expression.text === 'Worker'
+      ((ts.isIdentifier(node.expression) &&
+        node.expression.text === 'Worker') ||
+        (ts.isPropertyAccessExpression(node.expression) &&
+          node.expression.name.text === 'Worker' &&
+          ['window', 'globalThis'].includes(
+            node.expression.expression.getText(sourceFile),
+          )))
     ) {
       add('worker-lifecycle');
     }
@@ -170,15 +184,20 @@ function conceptsFor(relativePath, sourceFile) {
       ) {
         objectUrlSites += 1;
       }
-      if (method === 'download') hasDeliveryName = true;
       if (method === 'getReader') add('streamed-reader');
+      if (method === 'arrayBuffer') add('upload-read-ownership');
+      if (method === 'reportProgress' || method === 'setProgress') {
+        add('progress-policy');
+      }
     }
     if (
-      ts.isJsxAttribute(node) &&
-      node.name.getText(sourceFile) === 'download'
+      ts.isNewExpression(node) &&
+      ((ts.isIdentifier(node.expression) &&
+        node.expression.text === 'FileReader') ||
+        (ts.isPropertyAccessExpression(node.expression) &&
+          node.expression.name.text === 'FileReader'))
     ) {
-      hasDeliveryName = true;
-      hasDownloadClick = true;
+      add('upload-read-ownership');
     }
     if (ts.isCallExpression(node)) {
       if (
@@ -187,31 +206,27 @@ function conceptsFor(relativePath, sourceFile) {
       ) {
         objectUrlSites += 1;
       }
-      if (
-        ts.isPropertyAccessExpression(node.expression) &&
-        node.expression.name.text === 'click'
-      ) {
-        hasDownloadClick = true;
+      if (ts.isIdentifier(node.expression)) {
+        if (/^(?:report|set|update)Progress$/u.test(node.expression.text)) {
+          add('progress-policy');
+        }
       }
+    }
+    if (ts.isElementAccessExpression(node)) {
+      const owner = node.expression.getText(sourceFile);
+      const member = node.argumentExpression;
       if (
-        ts.isPropertyAccessExpression(node.expression) &&
-        ts.isIdentifier(node.expression.expression) &&
-        telemetryNamespaces.has(node.expression.expression.text) &&
-        node.expression.name.text === 'beginToolRun'
+        ['URL', 'globalThis.URL', 'window.URL'].includes(owner) &&
+        ts.isStringLiteral(member) &&
+        (member.text === 'createObjectURL' || member.text === 'revokeObjectURL')
       ) {
-        add('terminal-telemetry');
+        objectUrlSites += 1;
       }
     }
     ts.forEachChild(node, visit);
   }
   visit(sourceFile);
-  if (
-    objectUrlSites > 0 &&
-    (relativePath === CANONICAL_LIFECYCLE ||
-      (hasDeliveryName && hasDownloadClick))
-  ) {
-    add('object-url-delivery');
-  }
+  if (objectUrlSites > 0) add('object-url-delivery', objectUrlSites);
   return concepts;
 }
 
@@ -222,6 +237,141 @@ function isPresentationModule(relativePath, reachable) {
       (relativePath.startsWith(`${APP_ROOT}app/`) &&
         ROUTE_PRESENTATION_FILE.test(relativePath)))
   );
+}
+
+function importGraph(files, parsed) {
+  return new Map(
+    [...parsed].map(([relativePath, sourceFile]) => [
+      relativePath,
+      importedSpecifiers(sourceFile)
+        .map((specifier) => resolveImport(relativePath, specifier, files))
+        .filter(Boolean),
+    ]),
+  );
+}
+
+function reverseImportGraph(graph) {
+  const reverse = new Map();
+  for (const [importer, imports] of graph) {
+    for (const imported of imports) {
+      const importers = reverse.get(imported) ?? [];
+      importers.push(importer);
+      reverse.set(imported, importers);
+    }
+  }
+  return reverse;
+}
+
+function telemetryOwners(files, parsed) {
+  const exportedSymbols = new Map();
+  const ownerPaths = new Set();
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const [relativePath, sourceFile] of parsed) {
+      const symbols = exportedSymbols.get(relativePath) ?? new Set();
+      const addSymbol = (name) => {
+        if (symbols.has(name)) return;
+        symbols.add(name);
+        changed = true;
+      };
+      for (const statement of sourceFile.statements) {
+        if (
+          !(
+            ts.isImportDeclaration(statement) ||
+            ts.isExportDeclaration(statement)
+          ) ||
+          !statement.moduleSpecifier ||
+          !ts.isStringLiteral(statement.moduleSpecifier)
+        )
+          continue;
+        const specifier = statement.moduleSpecifier.text;
+        const directTelemetry =
+          specifier === '@serp-tools/tool-telemetry/client';
+        const telemetryBoundary =
+          directTelemetry ||
+          /(?:^|\/)telemetry(?:\.[cm]?[jt]s)?$/u.test(specifier);
+        const providerPath = resolveImport(relativePath, specifier, files);
+        const providerSymbols = providerPath
+          ? exportedSymbols.get(providerPath)
+          : undefined;
+        const provides = (name) =>
+          (telemetryBoundary && name === 'beginToolRun') ||
+          Boolean(providerSymbols?.has(name));
+
+        if (ts.isImportDeclaration(statement)) {
+          const bindings = statement.importClause?.namedBindings;
+          if (!bindings) continue;
+          if (ts.isNamespaceImport(bindings)) {
+            if (telemetryBoundary || (providerSymbols?.size ?? 0) > 0)
+              ownerPaths.add(relativePath);
+            continue;
+          }
+          for (const element of bindings.elements) {
+            if (provides((element.propertyName ?? element.name).text))
+              ownerPaths.add(relativePath);
+          }
+          continue;
+        }
+
+        const clause = statement.exportClause;
+        if (!clause) {
+          for (const name of providerSymbols ?? []) addSymbol(name);
+          if (telemetryBoundary) addSymbol('beginToolRun');
+        } else if (ts.isNamedExports(clause)) {
+          for (const element of clause.elements) {
+            if (!provides((element.propertyName ?? element.name).text))
+              continue;
+            addSymbol(element.name.text);
+            ownerPaths.add(relativePath);
+          }
+        }
+      }
+      exportedSymbols.set(relativePath, symbols);
+    }
+  }
+  return ownerPaths;
+}
+
+function callsAcceptedWorkflowRun(sourceFile) {
+  let accepted = false;
+  function visit(node) {
+    if (ts.isCallExpression(node)) {
+      const expression = node.expression;
+      const isRun =
+        (ts.isPropertyAccessExpression(expression) &&
+          expression.name.text === 'run') ||
+        (ts.isElementAccessExpression(expression) &&
+          ts.isStringLiteral(expression.argumentExpression) &&
+          expression.argumentExpression.text === 'run');
+      if (isRun && /workflow/iu.test(expression.expression.getText(sourceFile)))
+        accepted = true;
+    }
+    if (!accepted) ts.forEachChild(node, visit);
+  }
+  visit(sourceFile);
+  return accepted;
+}
+
+function reachableDependents(relativePath, reverseGraph, reachable) {
+  const dependents = new Set([relativePath]);
+  const pending = [relativePath];
+  while (pending.length > 0) {
+    const current = pending.pop();
+    for (const importer of reverseGraph.get(current) ?? []) {
+      if (!reachable.has(importer) || dependents.has(importer)) continue;
+      dependents.add(importer);
+      pending.push(importer);
+    }
+  }
+  return dependents;
+}
+
+function moduleRole(relativePath, reachable) {
+  if (relativePath === CANONICAL_LIFECYCLE) return 'canonical-owner';
+  if (FAMILY_ADAPTER_FILES.has(relativePath)) return 'family-adapter';
+  if (isPresentationModule(relativePath, reachable)) return 'presentation';
+  return 'processor-or-support';
 }
 
 export function analyzeWorkflowOwnership(inputFiles) {
@@ -238,33 +388,55 @@ export function analyzeWorkflowOwnership(inputFiles) {
     ]),
   );
   const reachable = reachableFiles(files, parsed);
+  const reverseGraph = reverseImportGraph(importGraph(files, parsed));
+  const telemetry = telemetryOwners(files, parsed);
   const ownership = new Map();
   const violations = [];
 
   for (const [relativePath, sourceFile] of parsed) {
-    const concepts = conceptsFor(relativePath, sourceFile);
+    const concepts = new Map();
+    if (telemetry.has(relativePath)) concepts.set('terminal-telemetry', 1);
+    for (const [concept, sites] of conceptsFor(sourceFile)) {
+      concepts.set(concept, sites);
+    }
     for (const [concept, sites] of concepts) {
       const paths = ownership.get(concept) ?? [];
-      paths.push({ path: relativePath, sites });
+      const role = moduleRole(relativePath, reachable);
+      paths.push({ path: relativePath, role, sites });
       ownership.set(concept, paths);
 
-      const presentation = isPresentationModule(relativePath, reachable);
-      const sharedOwnerViolation =
-        concept === 'terminal-telemetry' &&
-        relativePath !== CANONICAL_LIFECYCLE;
-      const objectUrlViolation =
-        concept === 'object-url-delivery' &&
-        relativePath !== CANONICAL_LIFECYCLE;
-      const presentationViolation =
-        presentation &&
-        (concept === 'worker-lifecycle' || concept === 'streamed-reader');
-      if (sharedOwnerViolation || objectUrlViolation || presentationViolation) {
+      const forbiddenInPresentation =
+        role === 'presentation' && LIFECYCLE_CONCEPTS.includes(concept);
+      const forbiddenInFamilyAdapter =
+        role === 'family-adapter' &&
+        (concept === 'terminal-telemetry' || concept === 'object-url-delivery');
+      if (forbiddenInPresentation || forbiddenInFamilyAdapter) {
         violations.push({
           path: relativePath,
           concept,
           remediation: REMEDIATION[concept],
         });
       }
+    }
+  }
+
+  const familySeamEvidence = {};
+  for (const familyAdapter of [...FAMILY_ADAPTER_FILES].sort()) {
+    if (!files.has(familyAdapter) || !reachable.has(familyAdapter)) continue;
+    const evidence = [
+      ...reachableDependents(familyAdapter, reverseGraph, reachable),
+    ]
+      .filter((relativePath) =>
+        callsAcceptedWorkflowRun(parsed.get(relativePath)),
+      )
+      .sort();
+    familySeamEvidence[familyAdapter] = evidence;
+    if (evidence.length === 0) {
+      violations.push({
+        path: familyAdapter,
+        concept: 'missing-workflow-run',
+        remediation: REMEDIATION['missing-workflow-run'],
+      });
     }
   }
 
@@ -276,35 +448,84 @@ export function analyzeWorkflowOwnership(inputFiles) {
         owners.map(({ path: ownerPath }) => ownerPath).sort(),
       ]),
   );
-  const sharedLifecycleConcepts = new Set([
-    'object-url-delivery',
-    'terminal-telemetry',
-  ]);
+  const isSharedOwner = (owner) =>
+    owner.role === 'canonical-owner' ||
+    owner.role === 'presentation' ||
+    (owner.role === 'family-adapter' &&
+      (owner.concept === 'terminal-telemetry' ||
+        owner.concept === 'object-url-delivery'));
+  const lifecycleInventory = Object.fromEntries(
+    LIFECYCLE_CONCEPTS.map((concept) => {
+      const owners = (ownership.get(concept) ?? []).map((owner) => ({
+        ...owner,
+        concept,
+      }));
+      const sharedOwners = owners.filter(isSharedOwner);
+      const otherOwners = owners.filter((owner) => !isSharedOwner(owner));
+      return [
+        concept,
+        {
+          sharedOwnerModules: sharedOwners
+            .map(({ path: ownerPath }) => ownerPath)
+            .sort(),
+          sharedOwnerSites: sharedOwners.reduce(
+            (total, owner) => total + owner.sites,
+            0,
+          ),
+          allowedProcessorOrSupportModules: otherOwners
+            .map(({ path: ownerPath }) => ownerPath)
+            .sort(),
+          allowedProcessorOrSupportSites: otherOwners.reduce(
+            (total, owner) => total + owner.sites,
+            0,
+          ),
+        },
+      ];
+    }),
+  );
+  const reachableSharedOwners = LIFECYCLE_CONCEPTS.flatMap((concept) =>
+    (ownership.get(concept) ?? [])
+      .map((owner) => ({ ...owner, concept }))
+      .filter((owner) => isSharedOwner(owner) && reachable.has(owner.path)),
+  );
+  const acceptedOwnerBudget = {
+    'terminal-telemetry': 1,
+    'object-url-delivery': 1,
+    'worker-lifecycle': 0,
+    'streamed-reader': 0,
+    'upload-read-ownership': 0,
+    'progress-policy': 0,
+  };
   return {
     acceptedInterface: 'ToolWorkflow.run(request, options)',
     canonicalLifecycleOwner: CANONICAL_LIFECYCLE,
-    reachableImplementationCount: [...ownership].reduce(
-      (total, [concept, owners]) =>
-        total +
-        (sharedLifecycleConcepts.has(concept)
-          ? owners
-              .filter(({ path: ownerPath }) => reachable.has(ownerPath))
-              .reduce((sites, owner) => sites + owner.sites, 0)
-          : 0),
-      0,
-    ),
-    duplicateImplementationCount: [...ownership].reduce(
-      (total, [concept, owners]) =>
-        total +
-        (sharedLifecycleConcepts.has(concept)
-          ? Math.max(
-              0,
-              owners.reduce((sites, owner) => sites + owner.sites, 0) - 1,
-            )
-          : 0),
+    countDefinitions: {
+      implementation:
+        'One reachable module/concept pair in a restricted presentation, registered family-adapter, or canonical shared-owner role.',
+      duplicate:
+        'A shared-owner module/concept pair beyond an actually present canonical owner; processor-or-support sites are reported but excluded.',
+      acceptedOwnerBudget,
+    },
+    reachableImplementationCount: reachableSharedOwners.length,
+    duplicateImplementationCount: LIFECYCLE_CONCEPTS.reduce(
+      (total, concept) => {
+        const owners = (ownership.get(concept) ?? []).map((owner) => ({
+          ...owner,
+          concept,
+        }));
+        const sharedOwnerCount = owners.filter(isSharedOwner).length;
+        const presentCanonicalBudget = owners.some(
+          (owner) => owner.role === 'canonical-owner',
+        )
+          ? acceptedOwnerBudget[concept]
+          : 0;
+        return total + Math.max(0, sharedOwnerCount - presentCanonicalBudget);
+      },
       0,
     ),
     inventory,
+    lifecycleInventory,
+    familySeamEvidence,
     reachablePresentationModules: [...reachable]
       .filter((relativePath) => isPresentationModule(relativePath, reachable))
       .sort(),

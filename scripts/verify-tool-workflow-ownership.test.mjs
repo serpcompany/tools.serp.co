@@ -124,3 +124,124 @@ test('package telemetry, window URL, and declarative downloads cannot bypass own
     ['terminal-telemetry', 'object-url-delivery'],
   );
 });
+
+test('dynamic imports keep presentation lifecycle ownership reachable', () => {
+  const result = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "export async function load() { return import('../../components/ToolView'); }",
+      ],
+      [
+        'apps/tools/components/ToolView.tsx',
+        "export default function ToolView() { const worker = new window.Worker('worker.js'); return <button onClick={() => worker.terminate()}>Run</button>; }",
+      ],
+    ]),
+  );
+
+  assert.deepEqual(
+    result.violations.map(({ concept }) => concept),
+    ['worker-lifecycle'],
+  );
+});
+
+test('local telemetry facades and computed URL helpers cannot hide presentation ownership', () => {
+  const result = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import ToolView from '../../components/ToolView'; export default ToolView;",
+      ],
+      [
+        'apps/tools/components/ToolView.tsx',
+        "import { startRun } from '../lib/run-facade'; import { clickDownload } from '../lib/click-download'; export default function ToolView() { startRun({}); const url = URL['createObjectURL'](new Blob()); clickDownload(url); return <div>{url}</div>; }",
+      ],
+      [
+        'apps/tools/lib/run-facade.ts',
+        "export { beginToolRun as startRun } from './telemetry';",
+      ],
+      [
+        'apps/tools/lib/telemetry.ts',
+        "export { beginToolRun } from '@serp-tools/tool-telemetry/client';",
+      ],
+      [
+        'apps/tools/lib/click-download.ts',
+        "export function clickDownload(url) { const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'result.bin'; anchor.click(); }",
+      ],
+    ]),
+  );
+
+  assert.deepEqual(
+    result.violations.map(({ concept }) => concept),
+    ['terminal-telemetry', 'object-url-delivery'],
+  );
+});
+
+test('processor modules may use lifecycle-shaped primitives for tool-specific work', () => {
+  const result = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/lib/convert/processor.ts',
+        "export function process(blob, menu) { const url = URL.createObjectURL(blob); const worker = new window.Worker('decoder.js'); const reader = blob.stream().getReader(); menu.download = false; menu.click(); return { url, worker, reader }; }",
+      ],
+    ]),
+  );
+
+  assert.deepEqual(result.violations, []);
+  assert.deepEqual(Object.keys(result.lifecycleInventory), [
+    'terminal-telemetry',
+    'object-url-delivery',
+    'worker-lifecycle',
+    'streamed-reader',
+    'upload-read-ownership',
+    'progress-policy',
+  ]);
+  assert.deepEqual(
+    result.lifecycleInventory['worker-lifecycle'].sharedOwnerModules,
+    [],
+  );
+  assert.deepEqual(
+    result.lifecycleInventory['worker-lifecycle']
+      .allowedProcessorOrSupportModules,
+    ['apps/tools/lib/convert/processor.ts'],
+  );
+});
+
+test('reachable family adapters must cross the accepted workflow.run seam', () => {
+  const noOp = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import { createBrowserTableWorkflow } from '../../lib/table-browser-workflow'; export default function Page() { createBrowserTableWorkflow(); return <div />; }",
+      ],
+      [
+        'apps/tools/lib/table-browser-workflow.ts',
+        'export function createBrowserTableWorkflow() { return { workflow: { run() {} } }; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(
+    noOp.violations.map(({ concept }) => concept),
+    ['missing-workflow-run'],
+  );
+  assert.match(noOp.violations[0].remediation, /ToolWorkflow\.run/);
+
+  const delegated = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import { createBrowserTableWorkflow } from '../../lib/table-browser-workflow'; export default function Page() { const { workflow } = createBrowserTableWorkflow(); void workflow.run({}); return <div />; }",
+      ],
+      [
+        'apps/tools/lib/table-browser-workflow.ts',
+        'export function createBrowserTableWorkflow() { return { workflow: { run() {} } }; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(delegated.violations, []);
+  assert.deepEqual(delegated.familySeamEvidence, {
+    'apps/tools/lib/table-browser-workflow.ts': [
+      'apps/tools/app/tool/page.tsx',
+    ],
+  });
+});

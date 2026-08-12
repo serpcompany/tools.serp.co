@@ -144,7 +144,12 @@ export function createBrowserDeliveryStore(
       objectUrl(delivery.deliveryId);
       const resource = resourceById.get(delivery.deliveryId);
       if (!resource) throw new TypeError('Delivery is no longer available');
-      resource.click(delivery.name);
+      try {
+        resource.click(delivery.name);
+      } catch (error) {
+        release(delivery.deliveryId);
+        throw error;
+      }
     },
     release,
     clear,

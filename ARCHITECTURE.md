@@ -111,8 +111,17 @@ Tool-specific controls, copy, and snapshot rendering; processors may own
 Tool-specific Worker and stream implementations. Neither presentation nor
 family adapters may recreate the shared browser lifecycle. The tracked-source
 verifier in `scripts/verify-tool-workflow-ownership.mjs` follows application
-imports, reports the accepted interface with an actionable migration, and is
-part of the canonical `pnpm check` gate.
+imports (including dynamic imports), reports the accepted interface with an
+actionable migration, and is part of the canonical `pnpm check` gate. It
+requires every reachable registered family adapter to have a reachable caller
+of the `workflow.run` seam. Its inventory covers terminal telemetry,
+delivery/object URLs, Workers, streamed readers, upload reads, and progress
+policy. A reachable implementation is one module/concept pair in a
+presentation, registered family-adapter, or canonical shared-owner role;
+duplicates are shared-owner pairs beyond an actually present canonical owner.
+AST site totals are reported separately. Processor-or-support modules are
+inventoried but excluded from those shared-owner counts so legitimate
+Tool-specific processing primitives are visible without being banned.
 
 The streamed-media adapter registration in
 `apps/tools/lib/media-workflow/adapter-registration.ts` projects executable
