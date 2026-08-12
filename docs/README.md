@@ -59,6 +59,7 @@ reusable claim against current code, current runbooks, and linked GitHub work.
 - [Ignored local workflow inventory — 2026-08-11](./audits/ignored-local-inventory-2026-08-11.md)
 - [Tool verification and runtime-observation coverage — 2026-08-11](./audits/tool-verification-runtime-coverage-2026-08-11.md)
 - [Vercel-retirement and Cloudflare-readiness audit](./audits/vercel-retirement-cloudflare-readiness.md)
+- [Workflow preview human review packet — 2026-08-12](./audits/workflow-preview-human-review-2026-08-12.md)
 
 ## Advisory evidence
 
