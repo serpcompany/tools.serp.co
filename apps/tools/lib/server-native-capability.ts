@@ -6,6 +6,7 @@ export const SERVER_NATIVE_OPERATIONS = [
 ] as const;
 
 export type ServerNativeOperation = (typeof SERVER_NATIVE_OPERATIONS)[number];
+export type ServerNativeAvailability = "available" | "unavailable";
 
 export type ServerNativeCapability = Readonly<
   | { available: true }
@@ -17,11 +18,19 @@ const CONFIGURED_UNAVAILABLE_REASON =
 const LOAD_FAILURE_REASON =
   "Server-native processing could not start in this runtime.";
 
+export function parseServerNativeAvailability(
+  value: unknown,
+): ServerNativeAvailability {
+  return value === "available" ? "available" : "unavailable";
+}
+
 export function projectServerNativeCapabilities(
-  configuredAvailability = process.env.TOOLS_SERP_SERVER_NATIVE_PROCESSORS,
+  configuredAvailability: unknown =
+    process.env.TOOLS_SERP_SERVER_NATIVE_PROCESSORS,
 ): Readonly<Record<ServerNativeOperation, ServerNativeCapability>> {
+  const availability = parseServerNativeAvailability(configuredAvailability);
   const capability: ServerNativeCapability =
-    configuredAvailability === "unavailable"
+    availability === "unavailable"
       ? Object.freeze({
           available: false,
           reason: CONFIGURED_UNAVAILABLE_REASON,

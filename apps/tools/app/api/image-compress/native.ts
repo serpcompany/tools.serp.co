@@ -4,8 +4,16 @@ import sharp from "sharp";
 
 import { mapQualityToImageQuality } from "@/lib/compression-utils";
 
+export type ServerNativeImageCompressFormat =
+  | "avif"
+  | "gif"
+  | "heic"
+  | "heif"
+  | "tif"
+  | "tiff";
+
 export async function compressServerNativeImage(
-  format: string,
+  format: ServerNativeImageCompressFormat,
   buffer: Buffer,
 ): Promise<Buffer> {
   if (format === "gif") {

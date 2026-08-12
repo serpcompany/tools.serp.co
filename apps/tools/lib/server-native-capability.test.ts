@@ -4,6 +4,7 @@ import test from "node:test";
 
 import {
   dispatchServerNativeRequest,
+  parseServerNativeAvailability,
   projectServerNativeCapabilities,
 } from "./server-native-capability.ts";
 
@@ -87,6 +88,18 @@ test("the Cloudflare projection marks every server-native route unavailable", ()
   );
 });
 
+test("server-native availability is a closed explicit opt-in and invalid configuration fails closed", () => {
+  assert.equal(parseServerNativeAvailability("available"), "available");
+  assert.equal(parseServerNativeAvailability("unavailable"), "unavailable");
+  for (const invalid of [undefined, "", "AVAILABLE", "enabled", true, 1]) {
+    assert.equal(parseServerNativeAvailability(invalid), "unavailable");
+    assert.equal(
+      projectServerNativeCapabilities(invalid)["video-convert"].available,
+      false,
+    );
+  }
+});
+
 test("route entrypoints defer unavailable native dependencies and keep pure image compression isolated", () => {
   const route = (name: string) =>
     readFileSync(
@@ -99,6 +112,16 @@ test("route entrypoints defer unavailable native dependencies and keep pure imag
   assert.doesNotMatch(route("pdf-compress"), /from "ghostscript-node"/);
   assert.doesNotMatch(route("image-compress"), /from "sharp"/);
   assert.match(route("image-compress"), /from "svgo\/browser"/);
+  const nativeImage = readFileSync(
+    new URL("../app/api/image-compress/native.ts", import.meta.url),
+    "utf8",
+  );
+  assert.match(nativeImage, /type ServerNativeImageCompressFormat/);
+  assert.match(
+    nativeImage,
+    /format: ServerNativeImageCompressFormat/,
+  );
+  assert.doesNotMatch(nativeImage, /format: string/);
   assert.match(route("image-compress"), /case "svg"/);
 });
 

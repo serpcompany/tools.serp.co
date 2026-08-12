@@ -1,4 +1,5 @@
 import { optimize } from "svgo/browser";
+import type { ServerNativeImageCompressFormat } from "./native";
 import { loadServerNativeEngine } from "../../../lib/server-native-capability.ts";
 import {
   buildServerActionRateLimitResponse,
@@ -12,14 +13,9 @@ import {
 export const runtime = "nodejs";
 
 type ImageCompressFormat =
-  | "avif"
   | "bmp"
-  | "gif"
-  | "heic"
-  | "heif"
   | "svg"
-  | "tif"
-  | "tiff";
+  | ServerNativeImageCompressFormat;
 
 const IMAGE_COMPRESS_FORMATS = new Set<ImageCompressFormat>([
   "avif",
