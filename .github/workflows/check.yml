@@ -30,5 +30,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install pinned browser runtime
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Run deterministic production check
         run: pnpm check
