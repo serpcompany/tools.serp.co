@@ -51,21 +51,26 @@ test('legacy Vercel and Postgres repository paths are retired', () => {
   assert.equal(appPackage.scripts['audit:cf:parity'], undefined);
 });
 
-test('telemetry writes and dashboard reads require D1', () => {
+test('telemetry writes require D1 while source inspection does not invent runtime observations', () => {
   const server = readFileSync('packages/tool-telemetry/src/server.ts', 'utf8');
-  const dashboard = readFileSync(
+  const inspectionPage = readFileSync(
     'apps/tools/app/internal/tools/page.tsx',
     'utf8',
   );
+  const inspectionModel = readFileSync(
+    'apps/tools/lib/tool-factory-read-model.ts',
+    'utf8',
+  );
 
-  for (const source of [server, dashboard]) {
+  for (const source of [server, inspectionPage, inspectionModel]) {
     assert.doesNotMatch(source, /DATABASE_URL/);
     assert.doesNotMatch(source, /drizzle-orm/);
     assert.doesNotMatch(source, /@serp-tools\/app-core\/db/);
   }
   assert.match(server, /D1 telemetry binding unavailable/);
-  assert.match(dashboard, /D1 telemetry binding unavailable/);
-  assert.doesNotMatch(dashboard, /LegacyDashboard/);
+  assert.match(inspectionModel, /classification: 'not-loaded'/);
+  assert.match(inspectionModel, /No runtime observation source is loaded/);
+  assert.doesNotMatch(inspectionPage, /LegacyDashboard/);
 });
 
 test('repository CI performs the production-faithful check without deployment credentials', () => {

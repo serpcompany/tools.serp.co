@@ -48,8 +48,15 @@ test('maintained Tool consumers use the Catalog or its approved adapter', () => 
   for (const file of catalogConsumers) {
     const source = readFileSync(file, 'utf8');
     assert.doesNotMatch(source, /packages\/app-core\/src\/data\/tools\.json|@serp-tools\/app-core\/data\/tools\.json/);
-    assert.match(source, /toolCatalog|operationalToolCatalog|joinToolEvidence/);
+    assert.match(
+      source,
+      /toolCatalog|operationalToolCatalog|joinToolEvidence|buildToolFactoryReadModel/,
+    );
   }
+  assert.match(
+    readFileSync('apps/tools/lib/tool-factory-read-model.ts', 'utf8'),
+    /toolCatalog/,
+  );
   assert.match(
     readFileSync('scripts/lib/downloader-registry-sync.mjs', 'utf8'),
     /createOperationalToolCatalog/,
