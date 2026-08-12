@@ -1,6 +1,18 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright';
+import { recordRunEvidence } from '../../../scripts/lib/run-evidence.mjs';
+
+const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const repositoryRoot = path.resolve(appRoot, '..', '..');
+const wrangler = JSON.parse(
+  readFileSync(path.join(appRoot, 'wrangler.jsonc'), 'utf8'),
+);
+const canonicalPreviewOrigin =
+  wrangler.env?.['wayfinder-preview']?.vars?.NEXT_PUBLIC_SITE_URL;
 
 function parseArgs(argv) {
   const result = {
@@ -24,19 +36,28 @@ function parseArgs(argv) {
   if (!['http:', 'https:'].includes(url.protocol)) {
     throw new Error('--base-url must use HTTP or HTTPS');
   }
+  if (!new Set(['LOCAL', 'DEV/STAGING']).has(result.environment)) {
+    throw new Error('--environment must be LOCAL or DEV/STAGING');
+  }
+  if (!/^[a-f0-9]{40}$/.test(result.revision)) {
+    throw new Error('Tool Factory checks require the full deployed revision');
+  }
   if (
     result.environment === 'DEV/STAGING' &&
-    !/^[a-f0-9]{40}$/.test(result.revision)
+    (url.protocol !== 'https:' || url.origin !== canonicalPreviewOrigin)
   ) {
-    throw new Error('Hosted checks require the full deployed revision');
+    throw new Error('DEV/STAGING checks require the canonical Wayfinder origin');
   }
   return result;
 }
 
 const args = parseArgs(process.argv.slice(2));
-const browser = await chromium.launch({ headless: true });
+const startedAt = new Date();
+let browser;
+let status = 'failure';
 
 try {
+  browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 1600, height: 1000 },
   });
@@ -95,9 +116,31 @@ try {
   if (args.screenshot) await page.screenshot({ path: args.screenshot });
 
   assert.deepEqual(pageErrors, []);
+  status = 'success';
   process.stdout.write(
     `Tool Factory table browser check passed for ${args.environment} at ${args.revision}\n`,
   );
 } finally {
-  await browser.close();
+  await browser?.close();
+  const completedAt = new Date();
+  const evidence = recordRunEvidence({
+    repositoryRoot,
+    command: 'check:tool-factory',
+    commandVersion: '1',
+    revision: args.revision,
+    environment: args.environment === 'DEV/STAGING' ? 'pull-request' : 'local',
+    scope: 'tool-factory-table',
+    status,
+    startedAt: startedAt.toISOString(),
+    completedAt: completedAt.toISOString(),
+    linkedWork: ['#50', '#107'],
+    summary: {
+      status,
+      checksPassed: status === 'success' ? 6 : 0,
+      checksFailed: status === 'success' ? 0 : 1,
+      items: 1,
+      durationMs: completedAt.valueOf() - startedAt.valueOf(),
+    },
+  });
+  process.stdout.write(`Structured artifact: ${evidence.runId}\n`);
 }
