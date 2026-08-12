@@ -45,9 +45,24 @@ linked to issue #77.
 | -------------------------------------------------------------------------- | -------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `pnpm --silent audit:tool-coverage -- --source-revision <full-commit-sha>` | None           | None; JSON stdout | Agent-safe. Requires Node 22 and refuses to run unless all Catalog, renderer, provenance, fixture, telemetry, and tracked-test inputs match the named source revision exactly. |
 
-This command reports mechanically derived coverage and gap memberships. It
-does not run Tool behavior, query an environment, or turn missing evidence into
-a pass or failure.
+This audit command reports mechanically derived coverage and gap memberships.
+It does not run Tool behavior, query an environment, or turn missing evidence
+into a pass or failure.
+
+## Local before/after workflow proof
+
+| Command | Network access | Repository writes | Authority and evidence |
+| --- | --- | --- | --- |
+| `pnpm proof:tool-workflow -- --baseline <full-commit-sha> --current <full-commit-sha>` | None after dependencies are available in the local pnpm store | Ignored disposable build state and `.artifacts/runs/<run-id>` retained-debug evidence | Agent-safe. Requires Node 22, an ancestor baseline, an explicit full SHA for each revision, and a clean current `HEAD`. The same evaluator replays semantic browser checks against disposable checkouts of both revisions, probes the current `ToolWorkflow.run` seam, and runs the ownership analyzer symmetrically against both raw refs. |
+
+The documented historical comparison point is
+`d4499e333450f5bc501e3842d37deb029717aef4`, but the command does not silently
+choose it. The retained `comparison.json` is validated before it is written;
+`report.html` is derived from that data and includes the exact reproduction
+command. The report deliberately says **15.18% supported** (426 of 2,807 active
+Tool IDs) and **deployed behavior remains unproven**. A local PASS therefore
+means the tested workflow is safer and more centralized, not that every Tool
+works or that a deployed environment has been validated.
 
 ## Smoke, benchmark, and deployed canary
 
