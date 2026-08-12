@@ -98,16 +98,35 @@ function parseToolEvidence(values) {
       Array.isArray(tool) ||
       Object.keys(tool).some(
         (key) =>
-          key !== 'toolId' && key !== 'invariants' && key !== 'warnings',
+          key !== 'toolId' &&
+          key !== 'journeyIds' &&
+          key !== 'invariants' &&
+          key !== 'warnings',
       ) ||
+      (tool.journeyIds !== undefined && !Array.isArray(tool.journeyIds)) ||
       !Array.isArray(tool.invariants) ||
       (tool.warnings !== undefined && !Array.isArray(tool.warnings))
     ) {
       throw new Error(
-        '--tool-evidence must contain only toolId, invariants, and optional warnings arrays',
+        '--tool-evidence must contain only toolId, optional journeyIds, invariants, and optional warnings arrays',
       );
     }
     assertSafeSlug(tool.toolId, 'tool-evidence toolId');
+    const journeyIds = tool.journeyIds ?? [];
+    for (const journeyId of journeyIds) {
+      if (
+        typeof journeyId !== 'string' ||
+        !journeyId.startsWith(`${tool.toolId}:`) ||
+        !/^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$/.test(journeyId)
+      ) {
+        throw new Error(
+          '--tool-evidence journeyIds must be safe and belong to the Tool id',
+        );
+      }
+    }
+    if (new Set(journeyIds).size !== journeyIds.length) {
+      throw new Error('--tool-evidence journeyIds must be unique');
+    }
     for (const invariant of tool.invariants) {
       assertSafeSlug(invariant, 'tool-evidence invariant');
     }
@@ -123,6 +142,7 @@ function parseToolEvidence(values) {
     }
     return {
       toolId: tool.toolId,
+      ...(tool.journeyIds !== undefined ? { journeyIds } : {}),
       invariants: tool.invariants,
       ...(tool.warnings !== undefined ? { warnings } : {}),
     };

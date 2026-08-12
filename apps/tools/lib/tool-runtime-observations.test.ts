@@ -8,27 +8,37 @@ import {
 import { classifyMediaRuntimePath } from './media-runtime-path.ts';
 
 test('media telemetry classifies upload, direct-link, and extractor attempts before execution', () => {
-  assert.equal(classifyMediaRuntimePath({ kind: 'file' }), 'upload');
   assert.equal(
-    classifyMediaRuntimePath({
+    classifyMediaRuntimePath('audio-to-text', { kind: 'file' }),
+    'upload',
+  );
+  assert.equal(
+    classifyMediaRuntimePath('audio-to-text', {
       kind: 'url',
       url: 'https://cdn.example.test/media/sample.mp3',
     }),
     'direct-url',
   );
   assert.equal(
-    classifyMediaRuntimePath({
+    classifyMediaRuntimePath('audio-to-text', {
       kind: 'url',
       url: 'https://www.youtube.com/watch?v=3Is2P90qVa0',
     }),
     'youtube-extractor',
   );
   assert.equal(
-    classifyMediaRuntimePath({
+    classifyMediaRuntimePath('audio-to-text', {
       kind: 'url',
       url: 'https://www.tube8.com/example/video/123/',
     }),
     'youtube-extractor',
+  );
+  assert.equal(
+    classifyMediaRuntimePath('png-to-webp', {
+      kind: 'url',
+      url: 'https://cdn.example.test/image.png',
+    }),
+    'other',
   );
 });
 

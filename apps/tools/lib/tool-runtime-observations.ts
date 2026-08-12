@@ -1,3 +1,5 @@
+import type { ToolJourneyRuntimePath } from './tool-journeys.ts';
+
 type D1Value = string | number | null;
 
 export type ToolRuntimeObservationStatement = Readonly<{
@@ -9,12 +11,7 @@ export type ToolRuntimeObservationDatabase = Readonly<{
   prepare(query: string): ToolRuntimeObservationStatement;
 }>;
 
-export type ToolRuntimePath =
-  | 'upload'
-  | 'direct-url'
-  | 'youtube-extractor'
-  | 'other'
-  | 'unclassified-url';
+export type ToolRuntimePath = ToolJourneyRuntimePath | 'unclassified-url';
 
 export type ToolRuntimeFailureClassifier =
   | 'processing-failed'

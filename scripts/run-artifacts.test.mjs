@@ -323,11 +323,13 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
       tools: [
         {
           toolId: 'png-to-webp',
+          journeyIds: ['png-to-webp:upload'],
           invariants: ['generic-file-exact-output'],
           warnings: ['adsense-script-attribute'],
         },
         {
           toolId: 'video-downloader',
+          journeyIds: ['video-downloader:direct-url'],
           invariants: ['url-stream-exact-output'],
         },
       ],
@@ -359,11 +361,13 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
       tools: [
         {
           toolId: 'png-to-webp',
+          journeyIds: ['png-to-webp:upload'],
           invariants: ['generic-file-exact-output'],
           warnings: ['adsense-script-attribute'],
         },
         {
           toolId: 'video-downloader',
+          journeyIds: ['video-downloader:direct-url'],
           invariants: ['url-stream-exact-output'],
         },
       ],

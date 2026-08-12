@@ -14,6 +14,10 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
     unwired: 0,
     unknown: 3,
   });
+  assert.equal(
+    model.rows.reduce((total, row) => total + row.journeys.length, 0),
+    3_115,
+  );
 });
 
 test('supported Tool keeps implementation, verification, and runtime facts separate', () => {
@@ -121,6 +125,18 @@ test('Tool and exact family GitHub work remain a separate read-model dimension',
   );
   assert.equal(row.support.disposition, 'supported');
   assert.equal(row.runtimeObservation.classification, 'not-loaded');
+  assert.deepEqual(
+    row.journeys.map((journey) => [
+      journey.id,
+      journey.input.kind,
+      journey.requiredEnvironment,
+    ]),
+    [
+      ['audio-to-text:upload', 'file', 'browser'],
+      ['audio-to-text:direct-url', 'direct-url', 'preview'],
+      ['audio-to-text:extractor-url', 'extractor-url', 'preview'],
+    ],
+  );
 });
 
 test('missing exact Tool and family work stays empty instead of being guessed from titles', () => {
