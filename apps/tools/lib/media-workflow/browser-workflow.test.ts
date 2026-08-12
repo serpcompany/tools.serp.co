@@ -392,6 +392,30 @@ test("browser delivery snapshots bytes into Blob ownership and immediately relea
   assert.deepEqual(revoked, ["blob:owned-media"]);
 });
 
+test("browser delivery revokes object URL when starting the download throws", () => {
+  const revoked: string[] = [];
+  assert.throws(
+    () =>
+      deliverMediaInBrowser(
+        {
+          name: "clip.mp4",
+          format: "mp4",
+          mimeType: "video/mp4",
+          bytes: new Uint8Array([1, 2, 3, 4]),
+        },
+        {
+          createObjectURL: () => "blob:failed-download",
+          revokeObjectURL: (url) => revoked.push(url),
+          createAnchor() {
+            throw new Error("anchor unavailable");
+          },
+        },
+      ),
+    /anchor unavailable/,
+  );
+  assert.deepEqual(revoked, ["blob:failed-download"]);
+});
+
 test("transfer presentation projects determinate stats and a meaningful indeterminate state", () => {
   assert.deepEqual(
     projectMediaTransfer({

@@ -44,10 +44,15 @@ test('root check is the deterministic production-faithful verification seam', ()
       'pnpm typecheck',
       'pnpm test',
       'pnpm verify:agent-workflow',
+      'pnpm verify:workflow-ownership',
       'pnpm verify:docs',
       'pnpm verify:catalog',
       'pnpm build',
     ],
+  );
+  assert.equal(
+    packageJson.scripts['verify:workflow-ownership'],
+    'node scripts/verify-tool-workflow-ownership.mjs',
   );
   assert.doesNotMatch(
     packageJson.scripts.check,

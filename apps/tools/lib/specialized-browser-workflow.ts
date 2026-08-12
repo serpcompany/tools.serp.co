@@ -1,19 +1,20 @@
-"use client";
+'use client';
 
-import { beginToolRun } from "./telemetry.ts";
+import {
+  createBrowserDeliveryStore,
+  createBrowserWorkflowTelemetry,
+} from './browser-workflow-lifecycle.ts';
 import {
   createSpecializedToolWorkflow,
   type SpecializedWorkflowDeliveryPort,
-} from "./specialized-tool-workflow.ts";
+} from './specialized-tool-workflow.ts';
 import type {
   ToolWorkflow,
   WorkflowDelivery,
   WorkflowMedia,
   WorkflowOutcome,
   WorkflowSnapshot,
-} from "./tool-workflow/index.ts";
-
-type TelemetryHandle = ReturnType<typeof beginToolRun>;
+} from './tool-workflow/index.ts';
 
 export type BrowserSpecializedDeliveries = Readonly<{
   get(deliveryId: string): WorkflowMedia | undefined;
@@ -28,27 +29,11 @@ export function createBrowserSpecializedWorkflow(): Readonly<{
   workflow: ToolWorkflow;
   deliveries: BrowserSpecializedDeliveries;
 }> {
-  const mediaById = new Map<string, WorkflowMedia>();
-  const objectUrlById = new Map<string, string>();
-  const telemetryByRunId = new Map<string, TelemetryHandle>();
-
-  const release = (deliveryId: string) => {
-    const objectUrl = objectUrlById.get(deliveryId);
-    if (objectUrl) URL.revokeObjectURL(objectUrl);
-    objectUrlById.delete(deliveryId);
-    mediaById.delete(deliveryId);
-  };
-  const clear = () => {
-    for (const deliveryId of [...mediaById.keys()]) release(deliveryId);
-  };
+  const deliveries = createBrowserDeliveryStore({
+    idPrefix: 'specialized-delivery',
+  });
   let sequence = 0;
-  const deliver: SpecializedWorkflowDeliveryPort = async (media) => {
-    clear();
-    sequence += 1;
-    const deliveryId = `specialized-delivery-${crypto.randomUUID()}-${sequence}`;
-    mediaById.set(deliveryId, media);
-    return deliveryId;
-  };
+  const deliver: SpecializedWorkflowDeliveryPort = deliveries.deliver;
 
   const workflow = createSpecializedToolWorkflow({
     deliver,
@@ -56,66 +41,32 @@ export function createBrowserSpecializedWorkflow(): Readonly<{
       sequence += 1;
       return `${kind}-${crypto.randomUUID()}-${sequence}`;
     },
-    telemetry: {
-      async start(runId, request) {
-        const inputBytes = request.input.kind === "file"
+    telemetry: createBrowserWorkflowTelemetry((request) => {
+      const inputBytes =
+        request.input.kind === 'file'
           ? request.input.media.bytes.byteLength
-          : request.input.kind === "files"
-            ? request.input.media.reduce((total, media) => total + media.bytes.byteLength, 0)
-            : request.input.kind === "interaction"
+          : request.input.kind === 'files'
+            ? request.input.media.reduce(
+                (total, media) => total + media.bytes.byteLength,
+                0,
+              )
+            : request.input.kind === 'interaction'
               ? request.input.interaction.bytes
               : undefined;
-        telemetryByRunId.set(runId, beginToolRun({
-          toolId: request.toolId,
-          inputBytes,
-          metadata: request.input.kind === "files"
+      return {
+        toolId: request.toolId,
+        inputBytes,
+        metadata:
+          request.input.kind === 'files'
             ? { fileCount: request.input.media.length }
             : undefined,
-        }));
-      },
-      async terminal(runId, status) {
-        const telemetry = telemetryByRunId.get(runId);
-        telemetryByRunId.delete(runId);
-        if (!telemetry) return;
-        if (status === "succeeded") telemetry.finishSuccess({});
-        else telemetry.finishFailure({ errorCode: `workflow_${status}` });
-      },
-    },
+      };
+    }),
   });
 
   return Object.freeze({
     workflow,
-    deliveries: Object.freeze({
-      get(deliveryId: string) {
-        return mediaById.get(deliveryId);
-      },
-      text(deliveryId: string) {
-        const media = mediaById.get(deliveryId);
-        if (!media) return undefined;
-        return new TextDecoder().decode(media.bytes);
-      },
-      objectUrl(deliveryId: string) {
-        const existing = objectUrlById.get(deliveryId);
-        if (existing) return existing;
-        const media = mediaById.get(deliveryId);
-        if (!media) return undefined;
-        const objectUrl = URL.createObjectURL(
-          new Blob([Uint8Array.from(media.bytes)], { type: media.mimeType }),
-        );
-        objectUrlById.set(deliveryId, objectUrl);
-        return objectUrl;
-      },
-      download(delivery: WorkflowDelivery) {
-        const objectUrl = this.objectUrl(delivery.deliveryId);
-        if (!objectUrl) throw new TypeError("Delivery is no longer available");
-        const anchor = document.createElement("a");
-        anchor.href = objectUrl;
-        anchor.download = delivery.name;
-        anchor.click();
-      },
-      release,
-      clear,
-    }),
+    deliveries,
   });
 }
 
@@ -134,18 +85,18 @@ export type SpecializedInteractionRequest = Readonly<{
 }>;
 
 function mediaFormat(file: BrowserFile): string {
-  const extension = file.name.split(".").pop()?.toLowerCase();
-  if (extension) return extension === "md" ? "markdown" : extension;
-  if (file.type === "application/pdf") return "pdf";
-  if (file.type === "text/csv") return "csv";
-  return "unknown";
+  const extension = file.name.split('.').pop()?.toLowerCase();
+  if (extension) return extension === 'md' ? 'markdown' : extension;
+  if (file.type === 'application/pdf') return 'pdf';
+  if (file.type === 'text/csv') return 'csv';
+  return 'unknown';
 }
 
 function mediaMimeType(file: BrowserFile, format: string): string {
   if (file.type) return file.type;
-  if (format === "csv") return "text/csv";
-  if (format === "pdf") return "application/pdf";
-  return "application/octet-stream";
+  if (format === 'csv') return 'text/csv';
+  if (format === 'pdf') return 'application/pdf';
+  return 'application/octet-stream';
 }
 
 export function createSpecializedRunController(
@@ -155,10 +106,21 @@ export function createSpecializedRunController(
     onOutcome?(outcome: WorkflowOutcome): void;
   }> = {},
 ): Readonly<{
-  runInteraction(request: SpecializedInteractionRequest): Promise<WorkflowOutcome | undefined>;
-  runFile(toolId: string, file: BrowserFile): Promise<WorkflowOutcome | undefined>;
-  runFiles(toolId: string, files: readonly BrowserFile[]): Promise<WorkflowOutcome | undefined>;
-  scheduleInteraction(request: SpecializedInteractionRequest, delay?: number): void;
+  runInteraction(
+    request: SpecializedInteractionRequest,
+  ): Promise<WorkflowOutcome | undefined>;
+  runFile(
+    toolId: string,
+    file: BrowserFile,
+  ): Promise<WorkflowOutcome | undefined>;
+  runFiles(
+    toolId: string,
+    files: readonly BrowserFile[],
+  ): Promise<WorkflowOutcome | undefined>;
+  scheduleInteraction(
+    request: SpecializedInteractionRequest,
+    delay?: number,
+  ): void;
   clear(): void;
   dispose(): void;
 }> {
@@ -195,18 +157,21 @@ export function createSpecializedRunController(
       if (timer) clearTimeout(timer);
       timer = undefined;
       const run = begin();
-      const outcome = await workflow.run({
-        toolId: request.toolId,
-        input: {
-          kind: "interaction",
-          interaction: {
-            format: request.format,
-            mimeType: request.mimeType,
-            value: request.value,
-            bytes: new TextEncoder().encode(request.value).byteLength,
+      const outcome = await workflow.run(
+        {
+          toolId: request.toolId,
+          input: {
+            kind: 'interaction',
+            interaction: {
+              format: request.format,
+              mimeType: request.mimeType,
+              value: request.value,
+              bytes: new TextEncoder().encode(request.value).byteLength,
+            },
           },
         },
-      }, workflowOptions(run));
+        workflowOptions(run),
+      );
       if (!current(run.revision)) return undefined;
       options.onOutcome?.(outcome);
       return outcome;
@@ -216,13 +181,21 @@ export function createSpecializedRunController(
       const bytes = new Uint8Array(await file.arrayBuffer());
       if (!current(run.revision)) return undefined;
       const format = mediaFormat(file);
-      const outcome = await workflow.run({
-        toolId,
-        input: {
-          kind: "file",
-          media: { name: file.name, format, mimeType: mediaMimeType(file, format), bytes },
+      const outcome = await workflow.run(
+        {
+          toolId,
+          input: {
+            kind: 'file',
+            media: {
+              name: file.name,
+              format,
+              mimeType: mediaMimeType(file, format),
+              bytes,
+            },
+          },
         },
-      }, workflowOptions(run));
+        workflowOptions(run),
+      );
       if (!current(run.revision)) return undefined;
       options.onOutcome?.(outcome);
       return outcome;
@@ -231,21 +204,24 @@ export function createSpecializedRunController(
       const run = begin();
       const bytes = await Promise.all(files.map((file) => file.arrayBuffer()));
       if (!current(run.revision)) return undefined;
-      const outcome = await workflow.run({
-        toolId,
-        input: {
-          kind: "files",
-          media: files.map((file, index) => {
-            const format = mediaFormat(file);
-            return {
-              name: file.name,
-              format,
-              mimeType: mediaMimeType(file, format),
-              bytes: new Uint8Array(bytes[index]!),
-            };
-          }),
+      const outcome = await workflow.run(
+        {
+          toolId,
+          input: {
+            kind: 'files',
+            media: files.map((file, index) => {
+              const format = mediaFormat(file);
+              return {
+                name: file.name,
+                format,
+                mimeType: mediaMimeType(file, format),
+                bytes: new Uint8Array(bytes[index]!),
+              };
+            }),
+          },
         },
-      }, workflowOptions(run));
+        workflowOptions(run),
+      );
       if (!current(run.revision)) return undefined;
       options.onOutcome?.(outcome);
       return outcome;
