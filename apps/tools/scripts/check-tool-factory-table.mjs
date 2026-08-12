@@ -7,7 +7,10 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { recordRunEvidence } from '../../../scripts/lib/run-evidence.mjs';
 
-const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const appRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+);
 const repositoryRoot = path.resolve(appRoot, '..', '..');
 const wrangler = JSON.parse(
   readFileSync(path.join(appRoot, 'wrangler.jsonc'), 'utf8'),
@@ -72,7 +75,9 @@ if (
   args.environment === 'LOCAL' &&
   !new Set(['working-copy', source.revision]).has(args.revision)
 ) {
-  throw new Error('LOCAL revision must be working-copy or the checked-out HEAD');
+  throw new Error(
+    'LOCAL revision must be working-copy or the checked-out HEAD',
+  );
 }
 if (
   args.environment === 'DEV/STAGING' &&
@@ -119,21 +124,89 @@ try {
   });
   await page.getByRole('heading', { name: 'All Tools' }).waitFor();
   await page.getByText(args.environment, { exact: true }).waitFor();
-  await page
-    .getByText(`Revision ${args.revision}`, { exact: true })
-    .waitFor();
+  await page.getByText(`Revision ${args.revision}`, { exact: true }).waitFor();
   await page
     .getByText(
       '2,807 active Tools · 431 supported · 2,373 explicitly unsupported · 3 unknown',
     )
     .waitFor();
+  await page.waitForFunction(
+    () => {
+      const input = globalThis.document.querySelector(
+        'input[aria-label="Search all Tools"]',
+      );
+      return (
+        input &&
+        Object.keys(input).some(
+          (key) =>
+            key.startsWith('__reactFiber') || key.startsWith('__reactProps'),
+        )
+      );
+    },
+    undefined,
+    { timeout: 30_000 },
+  );
+
+  await page.getByLabel('Search all Tools').fill('png-to-webp');
+  await page.getByText('1 matching Tools').waitFor();
+  await page.getByRole('row', { name: /PNG to WebP/ }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByText('Latest exact Tool test', { exact: true }).waitFor();
+  await dialog.getByText('Passed', { exact: true }).waitFor();
+  await dialog
+    .getByText('Converted a real PNG and produced a WebP file.', {
+      exact: true,
+    })
+    .waitFor();
+  await dialog.getByText('DEV/STAGING preview', { exact: true }).waitFor();
+  await dialog.getByRole('link', { name: 'View screenshot' }).waitFor();
+  await dialog
+    .getByText(
+      '20260812T083305Z_03dc90f_pull-request_browser-smoke-preview-subset',
+      { exact: true },
+    )
+    .waitFor();
+  await dialog
+    .getByText('Family verification policy (not an exact Tool test)', {
+      exact: true,
+    })
+    .waitFor();
+  if (args.screenshot) await dialog.screenshot({ path: args.screenshot });
+  await page.keyboard.press('Escape');
+
+  await page.getByLabel('Search all Tools').fill('bmp-to-png');
+  await page.getByRole('row', { name: /BMP to PNG/ }).click();
+  const untestedDialog = page.getByRole('dialog');
+  await untestedDialog.getByText('Not tested here', { exact: true }).waitFor();
+  assert.equal(
+    await untestedDialog.getByRole('link', { name: 'View screenshot' }).count(),
+    0,
+  );
+  await untestedDialog
+    .getByText('Family verification policy (not an exact Tool test)', {
+      exact: true,
+    })
+    .waitFor();
+  await page.keyboard.press('Escape');
 
   await page.getByLabel('Search all Tools').fill('audio-to-text');
-  await page.getByText('1 matching Tools').waitFor();
   await page.getByRole('row', { name: /Audio to Text/ }).click();
-  const dialog = page.getByRole('dialog');
-  await dialog.getByText('@xenova/transformers', { exact: true }).waitFor();
-  await dialog.getByText('Runtime observation', { exact: true }).waitFor();
+  const familyDialog = page.getByRole('dialog');
+  await familyDialog
+    .getByText('Family test evidence — not an exact Tool test', { exact: true })
+    .waitFor();
+  await familyDialog
+    .getByText(
+      'The representative family browser run included real speech transcription for this Tool.',
+      { exact: true },
+    )
+    .waitFor();
+  await familyDialog
+    .getByText(
+      'Family tested revision 03dc90f5213560ff61493dd058b877f9666b8338',
+      { exact: true },
+    )
+    .waitFor();
   await page.keyboard.press('Escape');
 
   await page.getByRole('button', { name: 'Reset' }).click();
@@ -146,8 +219,6 @@ try {
 
   await page.getByRole('button', { name: 'Next', exact: true }).click();
   await page.getByText('page 2 of 48').waitFor();
-
-  if (args.screenshot) await page.screenshot({ path: args.screenshot });
 
   assert.deepEqual(pageErrors, []);
   status = 'success';
@@ -168,10 +239,10 @@ try {
     status,
     startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
-    linkedWork: ['#50', '#107'],
+    linkedWork: ['#50', '#105', '#107'],
     summary: {
       status,
-      checksPassed: status === 'success' ? 6 : 0,
+      checksPassed: status === 'success' ? 8 : 0,
       checksFailed: status === 'success' ? 0 : 1,
       items: 1,
       durationMs: completedAt.valueOf() - startedAt.valueOf(),

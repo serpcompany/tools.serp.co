@@ -55,6 +55,21 @@ function profiles(row: ToolFactoryRow) {
   return joined(row.runtimeRequirement.executionProfiles);
 }
 
+const verifiedDateFormatter = new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'medium',
+  timeZone: 'UTC',
+});
+
+function formatVerifiedDate(verifiedAt: string) {
+  return verifiedDateFormatter.format(new Date(verifiedAt));
+}
+
+function exactTestLabel(row: ToolFactoryRow) {
+  const evidence = row.verificationEvidence.exact;
+  if (!evidence) return 'Not tested here';
+  return `${evidence.result === 'passed' ? 'Passed' : 'Failed'} · ${formatVerifiedDate(evidence.verifiedAt)}`;
+}
+
 function SupportBadge({
   disposition,
 }: {
@@ -157,8 +172,18 @@ const columns: ColumnDef<ToolFactoryRow>[] = [
   {
     id: 'verification',
     accessorFn: (row) => row.controlledVerification.classification,
-    header: ({ column }) => <SortButton column={column} label="Verification" />,
+    header: ({ column }) => (
+      <SortButton column={column} label="Family policy" />
+    ),
     size: 220,
+  },
+  {
+    id: 'exactTest',
+    accessorFn: exactTestLabel,
+    header: ({ column }) => (
+      <SortButton column={column} label="Latest exact test" />
+    ),
+    size: 190,
   },
   {
     id: 'runtimeRequirement',
@@ -338,6 +363,153 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
+function familyPolicyExplanation(row: ToolFactoryRow) {
+  if (
+    row.controlledVerification.classification ===
+    'registered-with-semantic-policy'
+  ) {
+    return 'This Tool belongs to a family with a registered processor and semantic checks. That does not prove this exact Tool was run.';
+  }
+  if (
+    row.controlledVerification.classification ===
+    'explicit-fail-closed-contract'
+  ) {
+    return 'This family is configured to refuse this operation rather than return an unverified result.';
+  }
+  return 'No registered family verification policy exists for this Tool.';
+}
+
+type DisplayEvidence =
+  | NonNullable<ToolFactoryRow['verificationEvidence']['exact']>
+  | ToolFactoryRow['verificationEvidence']['family'][number];
+
+function EvidenceResult({
+  evidence,
+  family,
+}: {
+  evidence: DisplayEvidence;
+  family: boolean;
+}) {
+  const resultLabel = `${evidence.result === 'passed' ? 'Passed' : 'Failed'}${family ? ' family run' : ''}`;
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+            evidence.result === 'passed'
+              ? 'bg-emerald-100 text-emerald-800'
+              : 'bg-red-100 text-red-800'
+          }`}
+        >
+          {resultLabel}
+        </span>
+        <span className="text-sm text-slate-700">{evidence.environment}</span>
+        <time className="text-sm text-slate-500" dateTime={evidence.verifiedAt}>
+          {formatVerifiedDate(evidence.verifiedAt)}
+        </time>
+      </div>
+      <ul className="list-disc space-y-1 pl-5 text-sm text-slate-800">
+        {evidence.checkedBehaviors.map((behavior) => (
+          <li key={behavior}>{behavior}</li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        <a
+          className="font-medium text-blue-700 underline underline-offset-4 hover:text-blue-900"
+          href={evidence.screenshotUrl}
+          rel="noreferrer"
+          target="_blank"
+        >
+          {family ? 'View family screenshot' : 'View screenshot'}
+        </a>
+        <span className="font-mono text-xs text-slate-500">
+          {evidence.artifact.runId}
+        </span>
+      </div>
+      <details className="text-xs text-slate-600" open={family}>
+        <summary className="cursor-pointer font-medium">
+          Technical evidence identity
+        </summary>
+        <div className="mt-2 break-all font-mono">
+          {family ? 'Family tested revision' : 'Tested revision'}{' '}
+          {evidence.verifiedRevision}
+        </div>
+      </details>
+    </div>
+  );
+}
+
+function ExactToolEvidence({ row }: { row: ToolFactoryRow }) {
+  const evidence = row.verificationEvidence.exact;
+  return (
+    <section className="rounded-lg border p-4">
+      <h3 className="text-sm font-semibold text-slate-950">
+        Latest exact Tool test
+      </h3>
+      {evidence ? (
+        <div className="mt-3">
+          <EvidenceResult evidence={evidence} family={false} />
+        </div>
+      ) : (
+        <div className="mt-3 rounded-md bg-amber-50 p-3">
+          <div className="font-semibold text-amber-950">Not tested here</div>
+          <p className="mt-1 text-sm text-amber-900">
+            There is no retained test result for this exact Tool. A family
+            policy or installed library is not counted as a pass.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function FamilyTestEvidence({ row }: { row: ToolFactoryRow }) {
+  if (!row.verificationEvidence.family.length) return null;
+  return (
+    <section className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+      <h3 className="text-sm font-semibold text-blue-950">
+        Family test evidence — not an exact Tool test
+      </h3>
+      <p className="mt-1 text-sm text-blue-900">
+        These runs covered this Tool as a named member of a broader family run.
+        They do not replace the exact Tool test above.
+      </p>
+      <div className="mt-3 space-y-3">
+        {row.verificationEvidence.family.map((evidence) => (
+          <article
+            key={evidence.evidenceId}
+            className="rounded-md border border-blue-200 bg-white p-3"
+          >
+            <EvidenceResult evidence={evidence} family />
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FamilyVerificationPolicy({ row }: { row: ToolFactoryRow }) {
+  return (
+    <section className="rounded-lg border bg-slate-50 p-4">
+      <h3 className="text-sm font-semibold text-slate-950">
+        Family verification policy (not an exact Tool test)
+      </h3>
+      <p className="mt-2 text-sm text-slate-800">
+        {familyPolicyExplanation(row)}
+      </p>
+      <details className="mt-2 text-xs text-slate-600">
+        <summary className="cursor-pointer font-medium">
+          Technical policy detail
+        </summary>
+        <p className="mt-2">
+          {row.controlledVerification.classification} —{' '}
+          {row.controlledVerification.reason}
+        </p>
+      </details>
+    </section>
+  );
+}
+
 function ToolDetail({
   row,
   onClose,
@@ -363,10 +535,6 @@ function ToolDetail({
             <Fact label="Library / engine" value={engineNames(row)} />
             <Fact label="Execution profile" value={profiles(row)} />
             <Fact
-              label="Controlled verification"
-              value={`${row.controlledVerification.classification} — ${row.controlledVerification.reason}`}
-            />
-            <Fact
               label="Runtime requirement"
               value={`${row.runtimeRequirement.classification} — ${row.runtimeRequirement.reason}`}
             />
@@ -376,6 +544,9 @@ function ToolDetail({
             />
             <Fact label="Route" value={row.route} />
           </dl>
+          <ExactToolEvidence row={row} />
+          <FamilyTestEvidence row={row} />
+          <FamilyVerificationPolicy row={row} />
           <Fact label="Catalog description" value={row.description} />
           <Fact label="Support reason" value={row.support.reason ?? '—'} />
           <Fact label="Attention" value={row.attention.summary} />
@@ -483,7 +654,9 @@ export function ToolFactoryTable({
             <span className="rounded-full bg-blue-100 px-2.5 py-1 text-blue-800">
               {deployment.environment}
             </span>
-            <span className="text-slate-600">Read only · source-owned facts</span>
+            <span className="text-slate-600">
+              Read only · source-owned facts
+            </span>
           </div>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">
             All Tools

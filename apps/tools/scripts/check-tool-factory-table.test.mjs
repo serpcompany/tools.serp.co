@@ -70,23 +70,40 @@ test('local Tool Factory check refuses Access credentials before opening a brows
 });
 
 test('local Tool Factory evidence derives revision and dirty state from Git', () => {
-  assert.match(source, /execFileSync\(['"]git['"], \[['"]rev-parse['"], ['"]HEAD['"]\]/);
-  assert.match(source, /status['"], ['"]--short['"], ['"]--untracked-files=all['"]/);
+  assert.match(
+    source,
+    /execFileSync\(['"]git['"], \[['"]rev-parse['"], ['"]HEAD['"]\]/,
+  );
+  assert.match(
+    source,
+    /status['"], ['"]--short['"], ['"]--untracked-files=all['"]/,
+  );
   assert.match(source, /revision:\s*source\.revision/);
-  assert.match(source, /dirty:\s*args\.environment === ['"]LOCAL['"] \? source\.dirty/);
+  assert.match(
+    source,
+    /dirty:\s*args\.environment === ['"]LOCAL['"] \? source\.dirty/,
+  );
 });
 
 test('hosted Tool Factory check owns authenticated browser interactions and screenshot evidence', () => {
   assert.match(source, /process\.env\.TOOL_FACTORY_CF_AUTHORIZATION/);
   assert.match(source, /name:\s*['"]CF_Authorization['"]/);
   assert.match(source, /getByLabel\(['"]Search all Tools['"]\)/);
+  assert.match(source, /__reactFiber/);
   assert.match(source, /Filter by support/);
   assert.match(source, /getByLabel\(['"]Description['"]\)\.check/);
   assert.match(source, /name:\s*['"]Next['"]/);
   assert.match(source, /getByRole\(['"]dialog['"]\)/);
-  assert.match(source, /page\.screenshot/);
+  assert.match(source, /Latest exact Tool test/);
+  assert.match(source, /Converted a real PNG and produced a WebP file/);
+  assert.match(source, /Not tested here/);
+  assert.match(source, /Family verification policy \(not an exact Tool test\)/);
+  assert.match(source, /dialog\.screenshot/);
   assert.match(source, /recordRunEvidence/);
   assert.match(source, /command:\s*['"]check:tool-factory['"]/);
-  assert.match(source, /linkedWork:\s*\[['"]#50['"], ['"]#107['"]\]/);
+  assert.match(
+    source,
+    /linkedWork:\s*\[['"]#50['"], ['"]#105['"], ['"]#107['"]\]/,
+  );
   assert.doesNotMatch(source, /console\.log\(.*accessCookie/);
 });
