@@ -68,6 +68,31 @@ Never collapse these dimensions into a single Tool `status`:
 Unknown evidence remains `unknown` with the reason and the source needed to
 resolve it; absence must not be converted into a positive or negative claim.
 
+## Verification language
+
+**Tool Journey** — One user-visible path through a Tool to a promised outcome.
+Journeys are distinct when their input source or required runtime path differs,
+such as file upload, direct URL, or extractor-backed URL.
+
+**Processor Support** — An exact Tool operation has a registered processor
+contract that fails closed and semantically validates its result. Processor
+Support is capability, not evidence that any Tool Journey has executed.
+
+**Verified Journey** — A Tool Journey has current controlled evidence for its
+exact contract, fixture, semantic invariant, revision, and required execution
+environment. Family evidence applies only through mechanically exact contract
+membership.
+
+**Fully Verified Tool** — Every primary Tool Journey promised by the Registry
+Entry is a Verified Journey. An explicitly unsupported promised journey makes
+the Tool partially verified rather than fully verified.
+
+**Partially Verified Tool** — At least one, but not every, primary Tool Journey
+is verified. The verified, unsupported, and unknown journeys remain visible
+separately.
+
+_Avoid_: `working`, `healthy`, or `tested` without an exact evidence scope.
+
 ## Work state
 
 GitHub Issues is the sole authority for active work. Native issue dependencies
