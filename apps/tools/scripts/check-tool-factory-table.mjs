@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,6 +14,19 @@ const wrangler = JSON.parse(
 );
 const canonicalPreviewOrigin =
   wrangler.env?.['wayfinder-preview']?.vars?.NEXT_PUBLIC_SITE_URL;
+
+function repositoryState() {
+  const revision = execFileSync('git', ['rev-parse', 'HEAD'], {
+    cwd: repositoryRoot,
+    encoding: 'utf8',
+  }).trim();
+  const dirty =
+    execFileSync('git', ['status', '--short', '--untracked-files=all'], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+    }).trim() !== '';
+  return { revision, dirty };
+}
 
 function parseArgs(argv) {
   const result = {
@@ -39,30 +53,50 @@ function parseArgs(argv) {
   if (!new Set(['LOCAL', 'DEV/STAGING']).has(result.environment)) {
     throw new Error('--environment must be LOCAL or DEV/STAGING');
   }
-  if (!/^[a-f0-9]{40}$/.test(result.revision)) {
-    throw new Error('Tool Factory checks require the full deployed revision');
-  }
   if (
     result.environment === 'DEV/STAGING' &&
-    (url.protocol !== 'https:' || url.origin !== canonicalPreviewOrigin)
+    (!/^[a-f0-9]{40}$/.test(result.revision) ||
+      url.protocol !== 'https:' ||
+      url.origin !== canonicalPreviewOrigin)
   ) {
-    throw new Error('DEV/STAGING checks require the canonical Wayfinder origin');
+    throw new Error(
+      'DEV/STAGING checks require the full revision and canonical Wayfinder origin',
+    );
   }
   return result;
 }
 
 const args = parseArgs(process.argv.slice(2));
+const source = repositoryState();
+if (
+  args.environment === 'LOCAL' &&
+  !new Set(['working-copy', source.revision]).has(args.revision)
+) {
+  throw new Error('LOCAL revision must be working-copy or the checked-out HEAD');
+}
+if (
+  args.environment === 'DEV/STAGING' &&
+  (source.dirty || source.revision !== args.revision)
+) {
+  throw new Error('DEV/STAGING checks require a clean matching checkout');
+}
 const startedAt = new Date();
 let browser;
 let status = 'failure';
+const accessCookie = process.env.TOOL_FACTORY_CF_AUTHORIZATION ?? '';
+if (args.environment === 'LOCAL' && accessCookie) {
+  throw new Error('LOCAL checks refuse Cloudflare Access credentials');
+}
+if (args.environment === 'DEV/STAGING' && !accessCookie) {
+  throw new Error('DEV/STAGING checks require Cloudflare Access');
+}
 
 try {
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 1600, height: 1000 },
   });
-  const accessCookie = process.env.TOOL_FACTORY_CF_AUTHORIZATION;
-  if (accessCookie) {
+  if (args.environment === 'DEV/STAGING') {
     const origin = new URL(args.baseUrl);
     await context.addCookies([
       {
@@ -127,7 +161,8 @@ try {
     repositoryRoot,
     command: 'check:tool-factory',
     commandVersion: '1',
-    revision: args.revision,
+    revision: source.revision,
+    dirty: args.environment === 'LOCAL' ? source.dirty : false,
     environment: args.environment === 'DEV/STAGING' ? 'pull-request' : 'local',
     scope: 'tool-factory-table',
     status,

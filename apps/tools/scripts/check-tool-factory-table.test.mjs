@@ -24,7 +24,7 @@ test('hosted Tool Factory check requires an exact deployed revision before openi
     { encoding: 'utf8' },
   );
   assert.equal(result.status, 1);
-  assert.match(result.stderr, /full deployed revision/);
+  assert.match(result.stderr, /full revision/);
 });
 
 test('hosted Tool Factory check refuses to send Access credentials to any noncanonical origin', () => {
@@ -47,6 +47,33 @@ test('hosted Tool Factory check refuses to send Access credentials to any noncan
   assert.equal(result.status, 1);
   assert.match(result.stderr, /canonical Wayfinder origin/);
   assert.doesNotMatch(`${result.stdout}${result.stderr}`, /restricted/);
+});
+
+test('local Tool Factory check refuses Access credentials before opening a browser', () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      script,
+      '--environment',
+      'LOCAL',
+      '--base-url',
+      'https://hostile.example.test',
+    ],
+    {
+      encoding: 'utf8',
+      env: { ...process.env, TOOL_FACTORY_CF_AUTHORIZATION: 'restricted' },
+    },
+  );
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /refuse Cloudflare Access credentials/);
+  assert.doesNotMatch(`${result.stdout}${result.stderr}`, /restricted/);
+});
+
+test('local Tool Factory evidence derives revision and dirty state from Git', () => {
+  assert.match(source, /execFileSync\(['"]git['"], \[['"]rev-parse['"], ['"]HEAD['"]\]/);
+  assert.match(source, /status['"], ['"]--short['"], ['"]--untracked-files=all['"]/);
+  assert.match(source, /revision:\s*source\.revision/);
+  assert.match(source, /dirty:\s*args\.environment === ['"]LOCAL['"] \? source\.dirty/);
 });
 
 test('hosted Tool Factory check owns authenticated browser interactions and screenshot evidence', () => {
