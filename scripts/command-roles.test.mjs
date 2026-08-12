@@ -30,7 +30,11 @@ test('Wayfinder preview is an isolated workers.dev environment', () => {
   assert.deepEqual(preview?.assets, {
     directory: '.open-next/assets',
     binding: 'ASSETS',
-    run_worker_first: ['/_next/static/chunks/*'],
+    run_worker_first: [
+      '/_next/static/chunks/*',
+      '/vendor/ffmpeg/*',
+      '/vendor/ffmpeg-st/*',
+    ],
   });
   assert.deepEqual(preview?.r2_buckets, [
     {

@@ -3,6 +3,31 @@ import path from "node:path";
 
 const FETCH_ENTRY = "    async fetch(request, env, ctx) {\n";
 const ASSET_ADAPTER = `        const assetUrl = new URL(request.url);
+        const ffmpegAssetPaths = new Set([
+            "/vendor/ffmpeg/ffmpeg-core.js",
+            "/vendor/ffmpeg/ffmpeg-core.wasm",
+            "/vendor/ffmpeg/ffmpeg-core.worker.js",
+            "/vendor/ffmpeg-st/ffmpeg-core.js",
+            "/vendor/ffmpeg-st/ffmpeg-core.wasm",
+        ]);
+        if (ffmpegAssetPaths.has(assetUrl.pathname)) {
+            if (request.method !== "GET" && request.method !== "HEAD") {
+                return new Response("Method Not Allowed", {
+                    status: 405,
+                    headers: { Allow: "GET, HEAD" },
+                });
+            }
+            const upstreamUrl = new URL(assetUrl.pathname, env.NEXT_PUBLIC_ASSETS_BASE_URL);
+            const upstreamResponse = await fetch(new Request(upstreamUrl, request));
+            const upstreamHeaders = new Headers(upstreamResponse.headers);
+            upstreamHeaders.set("Access-Control-Allow-Origin", "*");
+            upstreamHeaders.set("Cross-Origin-Resource-Policy", "same-origin");
+            return new Response(upstreamResponse.body, {
+                status: upstreamResponse.status,
+                statusText: upstreamResponse.statusText,
+                headers: upstreamHeaders,
+            });
+        }
         if (assetUrl.pathname.startsWith("/_next/static/chunks/") && assetUrl.pathname.endsWith(".js")) {
             const assetResponse = await env.ASSETS.fetch(request);
             const assetHeaders = new Headers(assetResponse.headers);
@@ -34,6 +59,10 @@ function javascriptFiles(directory) {
 
 export function verifyCloudflareIsolationBuild({ workerSource, assetsDirectory }) {
   for (const expected of [
+    'ffmpegAssetPaths.has(assetUrl.pathname)',
+    'new URL(assetUrl.pathname, env.NEXT_PUBLIC_ASSETS_BASE_URL)',
+    'upstreamHeaders.set("Access-Control-Allow-Origin", "*")',
+    'upstreamHeaders.set("Cross-Origin-Resource-Policy", "same-origin")',
     'assetUrl.pathname.startsWith("/_next/static/chunks/")',
     'assetUrl.pathname.endsWith(".js")',
     'assetHeaders.set("Cross-Origin-Embedder-Policy", "credentialless")',
@@ -57,14 +86,14 @@ export function verifyCloudflareIsolationBuild({ workerSource, assetsDirectory }
   const ffmpegBundle = chunks.find((file) => {
     const source = fs.readFileSync(file, "utf8");
     return (
-      source.includes("https://assets.tools.serp.co") &&
+      source.includes("/vendor/ffmpeg") &&
       source.includes("ffmpeg-core.js") &&
       source.includes("ffmpeg-core.wasm")
     );
   });
   if (!ffmpegBundle) {
     throw new Error(
-      "Generated assets do not externalize the required FFmpeg core and WASM resources",
+      "Generated assets do not reference the app-owned FFmpeg core and WASM paths",
     );
   }
 }

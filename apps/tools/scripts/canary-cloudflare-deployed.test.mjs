@@ -103,6 +103,8 @@ test('deployed Cloudflare canary verifies the emitted transcription chunk and FF
   assert.match(canarySource, /credentialless/);
   assert.match(canarySource, /cross-origin-resource-policy/);
   assert.match(canarySource, /same-origin/);
+  assert.match(canarySource, /access-control-allow-origin/);
+  assert.match(canarySource, /url:\s*buildUrl\(args\.baseUrl, assetPath\)/);
   assert.match(canarySource, /application\/wasm/);
   assert.match(canarySource, /text\/javascript/);
   assert.match(canarySource, /immutable/);

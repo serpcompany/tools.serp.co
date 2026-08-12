@@ -229,7 +229,7 @@ function assetChecks(args) {
   ];
   return assetPaths.map((assetPath) => ({
     name: `asset ${assetPath}`,
-    url: buildUrl(args.assetBaseUrl, assetPath),
+    url: buildUrl(args.baseUrl, assetPath),
     headers: { range: "bytes=0-0" },
     expect: (response, bytes) => {
       const contentType = contentTypeEssence(
@@ -242,6 +242,8 @@ function assetChecks(args) {
         [200, 206].includes(response.status) &&
         bytes.length > 0 &&
         contentType === expectedType &&
+        response.headers.get("access-control-allow-origin") === "*" &&
+        response.headers.get("cross-origin-resource-policy") === "same-origin" &&
         /(?:^|,)\s*immutable(?:,|$)/i.test(
           response.headers.get("cache-control") ?? "",
         )
@@ -251,6 +253,12 @@ function assetChecks(args) {
       contentType: response.headers.get("content-type"),
       contentRange: response.headers.get("content-range"),
       cacheControl: response.headers.get("cache-control"),
+      accessControlAllowOrigin: response.headers.get(
+        "access-control-allow-origin",
+      ),
+      crossOriginResourcePolicy: response.headers.get(
+        "cross-origin-resource-policy",
+      ),
       bytes: bytes.length,
     }),
   }));

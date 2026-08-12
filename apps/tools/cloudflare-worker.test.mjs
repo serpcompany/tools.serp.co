@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
+import { once } from "node:events";
 import {
   mkdtempSync,
   mkdirSync,
@@ -6,9 +8,11 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
+import http from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { chromium } from "playwright";
 
 import {
   addIsolatedAssetAdapter,
@@ -28,8 +32,10 @@ test("Cloudflare routes generated worker chunks through the header-owning Worker
   assert.match(wranglerSource, /"main":\s*"\.open-next\/worker\.js"/);
   assert.match(
     wranglerSource,
-    /"run_worker_first":\s*\[\s*"\/_next\/static\/chunks\/\*"\s*\]/,
+    /"run_worker_first":\s*\[\s*"\/_next\/static\/chunks\/\*"/,
   );
+  assert.match(wranglerSource, /"\/vendor\/ffmpeg\/\*"/);
+  assert.match(wranglerSource, /"\/vendor\/ffmpeg-st\/\*"/);
 });
 
 test("OpenNext post-build adapter owns generated worker chunk headers", () => {
@@ -42,6 +48,87 @@ test("OpenNext post-build adapter owns generated worker chunk headers", () => {
   assert.equal(addIsolatedAssetAdapter(patched), patched);
 });
 
+test(
+  "an isolated browser can fetch FFmpeg WASM through the same-origin Worker proxy",
+  { timeout: 15_000 },
+  async (t) => {
+    const wasm = Buffer.from([0, 97, 115, 109]);
+    const upstreamRequests = [];
+    const upstream = http.createServer((request, response) => {
+      upstreamRequests.push(request.url);
+      response.writeHead(200, {
+        "cache-control": "public,max-age=31536000,immutable",
+        "content-type": "application/wasm",
+      });
+      response.end(wasm);
+    });
+    upstream.listen(0, "127.0.0.1");
+    await once(upstream, "listening");
+    t.after(() => upstream.close());
+    const upstreamAddress = upstream.address();
+    assert.ok(upstreamAddress && typeof upstreamAddress !== "string");
+
+    const generated = `export default {\n    async fetch(request, env, ctx) {\n        return new Response("<!doctype html><title>isolated</title>", { headers: { "content-type": "text/html", "cross-origin-embedder-policy": "credentialless", "cross-origin-opener-policy": "same-origin" } });\n    },\n};\n`;
+    const patched = addIsolatedAssetAdapter(generated);
+    const worker = (
+      await import(`data:text/javascript;base64,${Buffer.from(patched).toString("base64")}`)
+    ).default;
+    const app = http.createServer(async (request, response) => {
+      const address = app.address();
+      assert.ok(address && typeof address !== "string");
+      const workerResponse = await worker.fetch(
+        new Request(`http://127.0.0.1:${address.port}${request.url}`, {
+          headers: request.headers,
+          method: request.method,
+        }),
+        {
+          NEXT_PUBLIC_ASSETS_BASE_URL: `http://127.0.0.1:${upstreamAddress.port}`,
+        },
+        {},
+      );
+      response.writeHead(
+        workerResponse.status,
+        Object.fromEntries(workerResponse.headers),
+      );
+      response.end(Buffer.from(await workerResponse.arrayBuffer()));
+    });
+    app.listen(0, "127.0.0.1");
+    await once(app, "listening");
+    t.after(() => app.close());
+    const appAddress = app.address();
+    assert.ok(appAddress && typeof appAddress !== "string");
+
+    const browser = await chromium.launch({ headless: true });
+    t.after(() => browser.close());
+    const page = await browser.newPage();
+    const failures = [];
+    page.on("requestfailed", (request) => failures.push(request.failure()?.errorText));
+    await page.goto(`http://127.0.0.1:${appAddress.port}/`);
+    const result = await page.evaluate(async () => {
+      const response = await fetch("/vendor/ffmpeg-st/ffmpeg-core.wasm");
+      return {
+        bytes: [...new Uint8Array(await response.arrayBuffer())],
+        contentType: response.headers.get("content-type"),
+        cors: response.headers.get("access-control-allow-origin"),
+        corp: response.headers.get("cross-origin-resource-policy"),
+        status: response.status,
+      };
+    });
+
+    assert.deepEqual(result, {
+      bytes: [...wasm],
+      contentType: "application/wasm",
+      cors: "*",
+      corp: "same-origin",
+      status: 200,
+    });
+    assert.deepEqual(upstreamRequests, [
+      "/vendor/ffmpeg-st/ffmpeg-core.wasm",
+    ]);
+    assert.deepEqual(failures, []);
+  },
+);
+
 test("Cloudflare build verification covers emitted transcription and FFmpeg resources", (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "tools-isolation-build-"));
   t.after(() => rmSync(root, { recursive: true }));
@@ -50,7 +137,7 @@ test("Cloudflare build verification covers emitted transcription and FFmpeg reso
   writeFileSync(path.join(chunks, "transcribe.js"), '"Xenova/whisper-tiny"');
   writeFileSync(
     path.join(chunks, "ffmpeg.js"),
-    '"https://assets.tools.serp.co";"ffmpeg-core.js";"ffmpeg-core.wasm"',
+    '"/vendor/ffmpeg";"ffmpeg-core.js";"ffmpeg-core.wasm"',
   );
   const workerSource = addIsolatedAssetAdapter(
     `export default {\n    async fetch(request, env, ctx) {\n        return handle(request, env, ctx);\n    },\n};\n`,

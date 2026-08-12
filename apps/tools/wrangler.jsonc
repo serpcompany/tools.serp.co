@@ -28,7 +28,11 @@
 	"assets": {
 		"directory": ".open-next/assets",
 		"binding": "ASSETS",
-		"run_worker_first": ["/_next/static/chunks/*"]
+		"run_worker_first": [
+			"/_next/static/chunks/*",
+			"/vendor/ffmpeg/*",
+			"/vendor/ffmpeg-st/*"
+		]
 	},
 	"r2_buckets": [
 		{
@@ -66,7 +70,11 @@
 			"assets": {
 				"directory": ".open-next/assets",
 				"binding": "ASSETS",
-				"run_worker_first": ["/_next/static/chunks/*"]
+				"run_worker_first": [
+					"/_next/static/chunks/*",
+					"/vendor/ffmpeg/*",
+					"/vendor/ffmpeg-st/*"
+				]
 			},
 			"r2_buckets": [
 				{

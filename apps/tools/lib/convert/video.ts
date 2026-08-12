@@ -8,11 +8,6 @@ import { runFfmpegLifecycle } from "./ffmpeg-lifecycle.ts";
 let ffmpeg: FFmpeg | null = null;
 let loaded = false;
 
-const publicAssetBaseUrl = process.env.NEXT_PUBLIC_ASSETS_BASE_URL?.replace(/\/+$/, "") || "";
-
-function resolvePublicAssetPath(path: `/${string}`) {
-  return publicAssetBaseUrl ? `${publicAssetBaseUrl}${path}` : path;
-}
 const FAST_VIDEO_FILTER = "fps=12,scale=320:-2:flags=fast_bilinear";
 const FAST_GIF_FILTER = "fps=10,scale=320:-1:flags=fast_bilinear";
 const AUDIO_FORMAT_SET = new Set(AUDIO_FORMATS);
@@ -131,9 +126,7 @@ async function loadFFmpeg(signal?: AbortSignal): Promise<FFmpeg> {
     ffmpeg = new FFmpeg();
 
     const useSingleThread = process.env.NEXT_PUBLIC_FFMPEG_SINGLE_THREAD === "true";
-    const baseURL = resolvePublicAssetPath(
-      useSingleThread ? "/vendor/ffmpeg-st" : "/vendor/ffmpeg"
-    );
+    const baseURL = useSingleThread ? "/vendor/ffmpeg-st" : "/vendor/ffmpeg";
 
     ffmpeg.on('log', ({ message }) => {
       console.log('[FFmpeg]', message);

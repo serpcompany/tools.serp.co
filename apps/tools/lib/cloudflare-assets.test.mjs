@@ -26,13 +26,9 @@ const uploadR2AssetsSource = readFileSync(
   "utf8",
 );
 
-test("Cloudflare builds externalize oversized ffmpeg assets to the public asset host", () => {
-  assert.match(videoConvertSource, /NEXT_PUBLIC_ASSETS_BASE_URL/);
-  assert.ok(
-    videoConvertSource.includes('replace(/\\/+$/, "")'),
-    "asset base URL should strip trailing slashes",
-  );
-  assert.match(videoConvertSource, /resolvePublicAssetPath/);
+test("browser FFmpeg loads use app-owned same-origin paths", () => {
+  assert.doesNotMatch(videoConvertSource, /NEXT_PUBLIC_ASSETS_BASE_URL/);
+  assert.doesNotMatch(videoConvertSource, /resolvePublicAssetPath/);
   assert.match(videoConvertSource, /\/vendor\/ffmpeg-st/);
   assert.match(videoConvertSource, /\/vendor\/ffmpeg/);
   assert.match(wranglerConfigSource, /NEXT_PUBLIC_ASSETS_BASE_URL/);
