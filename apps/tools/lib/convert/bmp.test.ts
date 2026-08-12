@@ -123,7 +123,7 @@ test('the approved BMP wave is exactly five IDs with a stable membership hash', 
   }
 });
 
-test('the accepted processor projection moves only from 426 to 431 supported', () => {
+test('the accepted processor projection includes BMP and the exact WebM wave', () => {
   const summary = summarizeToolAcceptance(
     toolCatalog.activeTools.map((tool) => ({
       id: tool.id,
@@ -134,8 +134,8 @@ test('the accepted processor projection moves only from 426 to 431 supported', (
     })),
   );
   assert.deepEqual(summary.counts, {
-    supported: 431,
-    unsupported: 2_373,
+    supported: 435,
+    unsupported: 2_369,
     unwired: 0,
     unknown: 3,
   });

@@ -1,36 +1,43 @@
-export const GENERIC_SMOKE_CAPABILITY_VERSION = "generic-adapters-v3-bmp";
+export const GENERIC_SMOKE_CAPABILITY_VERSION = 'generic-adapters-v4-webm';
 
-const imageInputs = new Set(["bmp", "heic", "jpeg", "jpg", "png", "webp"]);
-const imageOutputs = new Set(["jpeg", "jpg", "pdf", "png", "webp"]);
-const compressionFormats = new Set(["jpeg", "jpg", "png", "webp"]);
+const browserWebmToolIds = new Set([
+  'compress-webm',
+  'webm-to-m4a',
+  'webm-to-mp3',
+  'webm-to-mp4',
+]);
+
+const imageInputs = new Set(['bmp', 'heic', 'jpeg', 'jpg', 'png', 'webp']);
+const imageOutputs = new Set(['jpeg', 'jpg', 'pdf', 'png', 'webp']);
+const compressionFormats = new Set(['jpeg', 'jpg', 'png', 'webp']);
 const semanticallyVerifiedInputs = new Set([
-  "bmp",
-  "heic",
-  "jpeg",
-  "jpg",
-  "m4a",
-  "mp3",
-  "mp4",
-  "pdf",
-  "png",
-  "webp",
+  'bmp',
+  'heic',
+  'jpeg',
+  'jpg',
+  'm4a',
+  'mp3',
+  'mp4',
+  'pdf',
+  'png',
+  'webp',
 ]);
 const semanticallyVerifiedOutputs = new Set([
-  "jpeg",
-  "jpg",
-  "m4a",
-  "mp3",
-  "mp4",
-  "pdf",
-  "png",
-  "webp",
+  'jpeg',
+  'jpg',
+  'm4a',
+  'mp3',
+  'mp4',
+  'pdf',
+  'png',
+  'webp',
 ]);
 const approvedBmpToolIds = new Set([
-  "bmp-to-jpeg",
-  "bmp-to-jpg",
-  "bmp-to-pdf",
-  "bmp-to-png",
-  "bmp-to-webp",
+  'bmp-to-jpeg',
+  'bmp-to-jpg',
+  'bmp-to-pdf',
+  'bmp-to-png',
+  'bmp-to-webp',
 ]);
 
 // This evidence projection deliberately does not import the UI contract registry.
@@ -39,25 +46,26 @@ const approvedBmpToolIds = new Set([
 export function getGenericSmokeExpectation(tool) {
   const from = tool.from?.toLowerCase();
   const to = tool.to?.toLowerCase();
+  if (browserWebmToolIds.has(tool.id)) return 'supported';
   if (
     !from ||
     !to ||
     !semanticallyVerifiedInputs.has(from) ||
     !semanticallyVerifiedOutputs.has(to)
   ) {
-    return "unsupported";
+    return 'unsupported';
   }
-  if (tool.operation === "compress") {
+  if (tool.operation === 'compress') {
     return from === to && compressionFormats.has(from)
-      ? "supported"
-      : "unsupported";
+      ? 'supported'
+      : 'unsupported';
   }
-  if (tool.operation !== "convert") return "unsupported";
-  if (from === "bmp" && !approvedBmpToolIds.has(tool.id)) {
-    return "unsupported";
+  if (tool.operation !== 'convert') return 'unsupported';
+  if (from === 'bmp' && !approvedBmpToolIds.has(tool.id)) {
+    return 'unsupported';
   }
   const adapterSupported =
-    (from === "pdf" && ["jpeg", "jpg", "png", "webp"].includes(to)) ||
+    (from === 'pdf' && ['jpeg', 'jpg', 'png', 'webp'].includes(to)) ||
     (imageInputs.has(from) && imageOutputs.has(to));
-  return adapterSupported ? "supported" : "unsupported";
+  return adapterSupported ? 'supported' : 'unsupported';
 }

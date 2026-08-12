@@ -95,6 +95,27 @@ function requireCleanWorktree() {
 }
 requireCleanWorktree();
 
+if (args.mode === '--deploy') {
+  const configuredSecrets = JSON.parse(
+    run(
+      'pnpm',
+      ['exec', 'wrangler', 'secret', 'list', '--env', previewEnvironment],
+      { cwd: appRoot, capture: true },
+    ),
+  );
+  const secretNames = new Set(
+    configuredSecrets.map((secret) => secret.name).filter(Boolean),
+  );
+  const requiredSecrets = [
+    'TOOLS_SERP_CLOUDFLARE_ACCESS_TEAM_DOMAIN',
+    'TOOLS_SERP_CLOUDFLARE_ACCESS_AUD',
+    'TOOLS_SERP_TOOL_FACTORY_ALLOWED_EMAIL',
+  ];
+  if (requiredSecrets.some((name) => !secretNames.has(name))) {
+    fail('Wayfinder preview Tool Factory access secrets are incomplete');
+  }
+}
+
 const previewEnv = {
   ...process.env,
   NEXT_TELEMETRY_DISABLED: '1',
@@ -138,7 +159,7 @@ const evidence = recordRunEvidence({
   status: 'success',
   startedAt: startedAt.toISOString(),
   completedAt: completedAt.toISOString(),
-  linkedWork: ['#77'],
+  linkedWork: ['#77', '#107'],
   summary: {
     status: 'success',
     checksPassed: 2,

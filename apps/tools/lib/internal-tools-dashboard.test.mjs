@@ -50,6 +50,8 @@ test('internal Tool page consumes its Catalog-backed read model instead of raw r
     'utf8',
   );
   assert.match(pageSource, /buildToolFactoryReadModel/);
+  assert.match(pageSource, /authorizeToolFactoryRequest/);
+  assert.match(pageSource, /cf-access-jwt-assertion/);
   assert.match(modelSource, /toolCatalog/);
   assert.doesNotMatch(
     `${pageSource}\n${modelSource}`,

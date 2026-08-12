@@ -1,15 +1,22 @@
 // Load FFmpeg.wasm for video conversion
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { AUDIO_FORMATS, VIDEO_FORMATS, detectCapabilities } from '../capabilities.ts';
-import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils.ts";
-import { createServerActionRequestHeaders } from "../server-action-client.ts";
-import { runFfmpegLifecycle } from "./ffmpeg-lifecycle.ts";
+import {
+  AUDIO_FORMATS,
+  VIDEO_FORMATS,
+  detectCapabilities,
+} from '../capabilities.ts';
+import {
+  mapQualityToAudioBitrate,
+  mapQualityToVideoCrf,
+} from '../compression-utils.ts';
+import { createServerActionRequestHeaders } from '../server-action-client.ts';
+import { runFfmpegLifecycle } from './ffmpeg-lifecycle.ts';
 
 let ffmpeg: FFmpeg | null = null;
 let loaded = false;
 
-const FAST_VIDEO_FILTER = "fps=12,scale=320:-2:flags=fast_bilinear";
-const FAST_GIF_FILTER = "fps=10,scale=320:-1:flags=fast_bilinear";
+const FAST_VIDEO_FILTER = 'fps=12,scale=320:-2:flags=fast_bilinear';
+const FAST_GIF_FILTER = 'fps=10,scale=320:-1:flags=fast_bilinear';
 const AUDIO_FORMAT_SET = new Set(AUDIO_FORMATS);
 const VIDEO_FORMAT_SET = new Set(VIDEO_FORMATS);
 
@@ -21,7 +28,7 @@ type TelemetryError = Error & {
 function createTelemetryError(
   code: string,
   message: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): TelemetryError {
   const error = new Error(message) as TelemetryError;
   error.telemetryCode = code;
@@ -39,23 +46,27 @@ function canRemux(fromFormat: string, toFormat: string) {
   const from = fromFormat.toLowerCase();
   const to = toFormat.toLowerCase();
   return (
-    (from === "mkv" && ["mov", "mp4", "m4v"].includes(to)) ||
-    (from === "mp4" && ["mkv", "mov", "m4v", "ts", "mts", "m2ts"].includes(to))
+    (from === 'mkv' && ['mov', 'mp4', 'm4v'].includes(to)) ||
+    (from === 'mp4' && ['mkv', 'mov', 'm4v', 'ts', 'mts', 'm2ts'].includes(to))
   );
 }
 
-export function shouldUseServerConversion(fromFormat: string, toFormat: string) {
-  const preferServer = process.env.NEXT_PUBLIC_VIDEO_CONVERSION_PREFER_SERVER === "true";
+export function shouldUseServerConversion(
+  fromFormat: string,
+  toFormat: string,
+) {
+  const preferServer =
+    process.env.NEXT_PUBLIC_VIDEO_CONVERSION_PREFER_SERVER === 'true';
   if (preferServer) {
     return true;
   }
-  const serverOnly = new Set(["mxf", "rm", "rmvb"]);
+  const serverOnly = new Set(['mxf', 'rm', 'rmvb']);
   if (serverOnly.has(toFormat.toLowerCase())) {
     return true;
   }
   const from = fromFormat.toLowerCase();
   const to = toFormat.toLowerCase();
-  if (from === "amr" && ["mp2", "oga", "ogg"].includes(to)) {
+  if (from === 'amr' && ['mp2', 'oga', 'ogg'].includes(to)) {
     return true;
   }
   return !detectCapabilities().supportsVideoConversion;
@@ -67,45 +78,45 @@ export async function convertVideoViaApi(
   toFormat: string,
   signal?: AbortSignal,
 ): Promise<ArrayBuffer> {
-  const route = "/api/video-convert";
+  const route = '/api/video-convert';
   const baseMetadata = {
     route,
     from: fromFormat,
     to: toFormat,
-    engine: "server-video",
+    engine: 'server-video',
   };
   let response: Response;
   try {
     response = await fetch(`${route}?from=${fromFormat}&to=${toFormat}`, {
-      method: "POST",
+      method: 'POST',
       headers: createServerActionRequestHeaders({
-        "Content-Type": "application/octet-stream",
+        'Content-Type': 'application/octet-stream',
       }),
       body: inputBuffer,
       signal,
     });
   } catch (error) {
     throw createTelemetryError(
-      "network_error",
-      "Server conversion request failed",
-      { ...baseMetadata, detail: toErrorMessage(error) }
+      'network_error',
+      'Server conversion request failed',
+      { ...baseMetadata, detail: toErrorMessage(error) },
     );
   }
 
   if (!response.ok) {
-    let detail = "";
+    let detail = '';
     let serverError: string | null = null;
     try {
       const data = await response.json();
       serverError = data?.error ? String(data.error) : null;
-      detail = serverError ? `: ${serverError}` : "";
+      detail = serverError ? `: ${serverError}` : '';
     } catch {
-      detail = "";
+      detail = '';
     }
     throw createTelemetryError(
-      "server_convert_failed",
+      'server_convert_failed',
       `Server conversion failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status, detail: serverError }
+      { ...baseMetadata, status: response.status, detail: serverError },
     );
   }
 
@@ -125,8 +136,9 @@ async function loadFFmpeg(signal?: AbortSignal): Promise<FFmpeg> {
   if (!ffmpeg) {
     ffmpeg = new FFmpeg();
 
-    const useSingleThread = process.env.NEXT_PUBLIC_FFMPEG_SINGLE_THREAD === "true";
-    const baseURL = useSingleThread ? "/vendor/ffmpeg-st" : "/vendor/ffmpeg";
+    const useSingleThread =
+      process.env.NEXT_PUBLIC_FFMPEG_SINGLE_THREAD === 'true';
+    const baseURL = useSingleThread ? '/vendor/ffmpeg-st' : '/vendor/ffmpeg';
 
     ffmpeg.on('log', ({ message }) => {
       console.log('[FFmpeg]', message);
@@ -150,12 +162,12 @@ async function loadFFmpeg(signal?: AbortSignal): Promise<FFmpeg> {
       ffmpeg = null;
       loaded = false;
     };
-    signal?.addEventListener("abort", onAbort, { once: true });
+    signal?.addEventListener('abort', onAbort, { once: true });
     try {
       await ffmpeg.load(loadConfig);
       signal?.throwIfAborted();
     } finally {
-      signal?.removeEventListener("abort", onAbort);
+      signal?.removeEventListener('abort', onAbort);
     }
 
     loaded = true;
@@ -173,7 +185,7 @@ export async function convertVideo(
     audioOnly?: boolean;
     signal?: AbortSignal;
     onProgress?: (progress: { ratio: number; time: number }) => void;
-  } = {}
+  } = {},
 ): Promise<ArrayBuffer> {
   const ff = await loadFFmpeg(options.signal);
 
@@ -211,12 +223,30 @@ export async function convertVideo(
     }
   }
   // Audio extraction from MP4
-  else if ([
-    'mp3', 'wav', 'ogg', 'oga', 'aac', 'm4a', 'm4r', 'opus', 'flac', 'wma', 'aiff', 'mp2',
-    'alac', 'amr', 'au', 'caf', 'cdda'
-  ].includes(toFormat)) {
-    const needsAmrResample = fromFormat.toLowerCase() === "amr"
-      && ["mp2", "ogg", "oga"].includes(toFormat);
+  else if (
+    [
+      'mp3',
+      'wav',
+      'ogg',
+      'oga',
+      'aac',
+      'm4a',
+      'm4r',
+      'opus',
+      'flac',
+      'wma',
+      'aiff',
+      'mp2',
+      'alac',
+      'amr',
+      'au',
+      'caf',
+      'cdda',
+    ].includes(toFormat)
+  ) {
+    const needsAmrResample =
+      fromFormat.toLowerCase() === 'amr' &&
+      ['mp2', 'ogg', 'oga'].includes(toFormat);
     if (toFormat === 'mp3') {
       args.push('-acodec', 'libmp3lame', '-b:a', '192k');
     } else if (toFormat === 'wav') {
@@ -244,13 +274,42 @@ export async function convertVideo(
     } else if (toFormat === 'alac') {
       args.push('-acodec', 'alac', '-f', 'ipod');
     } else if (toFormat === 'amr') {
-      args.push('-acodec', 'libopencore_amrnb', '-ar', '8000', '-ac', '1', '-b:a', '12.2k', '-f', 'amr');
+      args.push(
+        '-acodec',
+        'libopencore_amrnb',
+        '-ar',
+        '8000',
+        '-ac',
+        '1',
+        '-b:a',
+        '12.2k',
+        '-f',
+        'amr',
+      );
     } else if (toFormat === 'au') {
       args.push('-acodec', 'pcm_s16be', '-ar', '44100', '-ac', '2', '-f', 'au');
     } else if (toFormat === 'caf') {
-      args.push('-acodec', 'pcm_s16le', '-ar', '44100', '-ac', '2', '-f', 'caf');
+      args.push(
+        '-acodec',
+        'pcm_s16le',
+        '-ar',
+        '44100',
+        '-ac',
+        '2',
+        '-f',
+        'caf',
+      );
     } else if (toFormat === 'cdda') {
-      args.push('-acodec', 'pcm_s16le', '-ar', '44100', '-ac', '2', '-f', 's16le');
+      args.push(
+        '-acodec',
+        'pcm_s16le',
+        '-ar',
+        '44100',
+        '-ac',
+        '2',
+        '-f',
+        's16le',
+      );
     }
     if (needsAmrResample) {
       args.push('-ar', '44100', '-ac', '2');
@@ -260,13 +319,31 @@ export async function convertVideo(
   // Video conversions - optimized for speed
   else if (toFormat === 'mp4') {
     // Use ultrafast preset for speed, higher CRF for smaller file
-    args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '32', '-tune', 'zerolatency');
+    args.push(
+      '-c:v',
+      'libx264',
+      '-preset',
+      'ultrafast',
+      '-crf',
+      '32',
+      '-tune',
+      'zerolatency',
+    );
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-movflags', '+faststart');
     args.push('-vf', FAST_VIDEO_FILTER);
   } else if (toFormat === 'mkv') {
     // MKV container - can hold almost any codec
-    args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '32', '-tune', 'zerolatency');
+    args.push(
+      '-c:v',
+      'libx264',
+      '-preset',
+      'ultrafast',
+      '-crf',
+      '32',
+      '-tune',
+      'zerolatency',
+    );
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-vf', FAST_VIDEO_FILTER);
   } else if (toFormat === 'webm') {
@@ -285,7 +362,7 @@ export async function convertVideo(
       '-auto-alt-ref',
       '0',
       '-pix_fmt',
-      'yuv420p'
+      'yuv420p',
     );
     if (fromFormat === 'gif') {
       args.push('-an');
@@ -298,24 +375,60 @@ export async function convertVideo(
     args.push('-c:a', 'libmp3lame', '-b:a', '96k');
     args.push('-vf', FAST_VIDEO_FILTER);
   } else if (toFormat === 'mov') {
-    args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '32', '-tune', 'zerolatency');
+    args.push(
+      '-c:v',
+      'libx264',
+      '-preset',
+      'ultrafast',
+      '-crf',
+      '32',
+      '-tune',
+      'zerolatency',
+    );
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-movflags', '+faststart');
     args.push('-vf', FAST_VIDEO_FILTER);
   } else if (toFormat === 'flv') {
-    args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '32', '-tune', 'zerolatency');
+    args.push(
+      '-c:v',
+      'libx264',
+      '-preset',
+      'ultrafast',
+      '-crf',
+      '32',
+      '-tune',
+      'zerolatency',
+    );
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-vf', FAST_VIDEO_FILTER);
     args.push('-f', 'flv');
   } else if (toFormat === 'ts' || toFormat === 'mts' || toFormat === 'm2ts') {
     // MPEG Transport Stream
-    args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '30', '-tune', 'zerolatency');
+    args.push(
+      '-c:v',
+      'libx264',
+      '-preset',
+      'ultrafast',
+      '-crf',
+      '30',
+      '-tune',
+      'zerolatency',
+    );
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-vf', FAST_VIDEO_FILTER);
     args.push('-f', 'mpegts');
   } else if (toFormat === 'm4v') {
     // M4V is basically MP4 with iTunes compatibility
-    args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '30', '-tune', 'zerolatency');
+    args.push(
+      '-c:v',
+      'libx264',
+      '-preset',
+      'ultrafast',
+      '-crf',
+      '30',
+      '-tune',
+      'zerolatency',
+    );
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-movflags', '+faststart');
     args.push('-vf', FAST_VIDEO_FILTER);
@@ -336,7 +449,16 @@ export async function convertVideo(
     args.push('-c:a', 'aac', '-b:a', '24k', '-ar', '8000', '-ac', '1');
   } else if (toFormat === 'f4v') {
     // Flash Video (F4V)
-    args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '32', '-tune', 'zerolatency');
+    args.push(
+      '-c:v',
+      'libx264',
+      '-preset',
+      'ultrafast',
+      '-crf',
+      '32',
+      '-tune',
+      'zerolatency',
+    );
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-vf', FAST_VIDEO_FILTER);
     args.push('-f', 'f4v');
@@ -355,7 +477,16 @@ export async function convertVideo(
     outputName = outputName.replace('.divx', '.avi'); // Use AVI container
   } else if (toFormat === 'av1') {
     // AV1 codec in MP4 container
-    args.push('-c:v', 'libaom-av1', '-crf', '35', '-b:v', '0', '-cpu-used', '8');
+    args.push(
+      '-c:v',
+      'libaom-av1',
+      '-crf',
+      '35',
+      '-b:v',
+      '0',
+      '-cpu-used',
+      '8',
+    );
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-tag:v', 'av01');
     args.push('-movflags', '+faststart');
@@ -363,7 +494,16 @@ export async function convertVideo(
     outputName = outputName.replace('.av1', '.mp4'); // Use MP4 container
   } else if (toFormat === 'avchd') {
     // AVCHD-style transport stream
-    args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '30', '-tune', 'zerolatency');
+    args.push(
+      '-c:v',
+      'libx264',
+      '-preset',
+      'ultrafast',
+      '-crf',
+      '30',
+      '-tune',
+      'zerolatency',
+    );
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-vf', FAST_VIDEO_FILTER);
     args.push('-f', 'mpegts');
@@ -391,10 +531,14 @@ export async function convertVideo(
     // Use palette to create GIF
     args = [
       ...baseArgs,
-      '-i', inputName,
-      '-i', paletteName,
-      '-lavfi', `${FAST_GIF_FILTER}[x];[x][1:v]paletteuse`,
-      '-loop', '0',
+      '-i',
+      inputName,
+      '-i',
+      paletteName,
+      '-lavfi',
+      `${FAST_GIF_FILTER}[x];[x][1:v]paletteuse`,
+      '-loop',
+      '0',
     ];
   }
 
@@ -407,17 +551,22 @@ export async function convertVideo(
     ff,
     {
       inputs: [{ name: inputName, data: new Uint8Array(inputBuffer) }],
-      cleanupFiles: [outputName, ...(toFormat === "gif" ? ["palette.png"] : [])],
+      cleanupFiles: [
+        outputName,
+        ...(toFormat === 'gif' ? ['palette.png'] : []),
+      ],
       signal: options.signal,
       progress: progressHandler ?? undefined,
       onAbort: () => resetTerminatedFfmpeg(ff),
     },
     async () => {
-      if (toFormat === "gif") {
+      if (toFormat === 'gif') {
         await ff.exec([
-          "-i", inputName,
-          "-vf", `${FAST_GIF_FILTER},palettegen`,
-          "palette.png",
+          '-i',
+          inputName,
+          '-vf',
+          `${FAST_GIF_FILTER},palettegen`,
+          'palette.png',
         ]);
       }
       try {
@@ -426,7 +575,8 @@ export async function convertVideo(
         // Ignore missing output file.
       }
       const exitCode = await ff.exec(args);
-      if (exitCode !== 0) throw new Error(`FFmpeg failed with exit code ${exitCode}`);
+      if (exitCode !== 0)
+        throw new Error(`FFmpeg failed with exit code ${exitCode}`);
       return ff.readFile(outputName);
     },
   );
@@ -438,101 +588,136 @@ export async function convertVideo(
 
   console.log(`Output file size: ${data.length} bytes`);
 
-  // Return the ArrayBuffer (handle both ArrayBuffer and SharedArrayBuffer)
-  const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-
-  // Ensure we return an ArrayBuffer, not SharedArrayBuffer
-  if (buffer instanceof SharedArrayBuffer) {
-    const ab = new ArrayBuffer(buffer.byteLength);
-    const view = new Uint8Array(ab);
-    view.set(new Uint8Array(buffer));
-    return ab;
-  }
-
-  return buffer;
+  return Uint8Array.from(data).buffer;
 }
 
 function buildAudioCompressionArgs(format: string, bitrate: string): string[] {
   switch (format) {
-    case "mp3":
-      return ["-vn", "-acodec", "libmp3lame", "-b:a", bitrate];
-    case "aac":
-      return ["-vn", "-acodec", "aac", "-b:a", bitrate];
-    case "m4a":
-      return ["-vn", "-acodec", "aac", "-b:a", bitrate];
-    case "m4r":
-      return ["-vn", "-acodec", "aac", "-b:a", bitrate, "-f", "ipod"];
-    case "ogg":
-      return ["-vn", "-acodec", "libvorbis", "-q:a", "4"];
-    case "oga":
-      return ["-vn", "-acodec", "libvorbis", "-q:a", "4", "-f", "ogg"];
-    case "opus":
-      return ["-vn", "-acodec", "libopus", "-b:a", bitrate];
-    case "wma":
-      return ["-vn", "-acodec", "wmav2", "-b:a", bitrate];
-    case "mp2":
-      return ["-vn", "-acodec", "mp2", "-b:a", bitrate];
-    case "amr":
-      return ["-vn", "-acodec", "libopencore_amrnb", "-ar", "8000", "-ac", "1", "-b:a", "12.2k", "-f", "amr"];
-    case "flac":
-      return ["-vn", "-acodec", "flac", "-compression_level", "8"];
-    case "alac":
-      return ["-vn", "-acodec", "alac", "-f", "ipod"];
-    case "wav":
-      return ["-vn", "-acodec", "pcm_s16le"];
-    case "aiff":
-      return ["-vn", "-acodec", "pcm_s16be"];
-    case "au":
-      return ["-vn", "-acodec", "pcm_s16be", "-ar", "44100", "-ac", "2", "-f", "au"];
-    case "caf":
-      return ["-vn", "-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2", "-f", "caf"];
-    case "cdda":
-      return ["-vn", "-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2", "-f", "s16le"];
+    case 'mp3':
+      return ['-vn', '-acodec', 'libmp3lame', '-b:a', bitrate];
+    case 'aac':
+      return ['-vn', '-acodec', 'aac', '-b:a', bitrate];
+    case 'm4a':
+      return ['-vn', '-acodec', 'aac', '-b:a', bitrate];
+    case 'm4r':
+      return ['-vn', '-acodec', 'aac', '-b:a', bitrate, '-f', 'ipod'];
+    case 'ogg':
+      return ['-vn', '-acodec', 'libvorbis', '-q:a', '4'];
+    case 'oga':
+      return ['-vn', '-acodec', 'libvorbis', '-q:a', '4', '-f', 'ogg'];
+    case 'opus':
+      return ['-vn', '-acodec', 'libopus', '-b:a', bitrate];
+    case 'wma':
+      return ['-vn', '-acodec', 'wmav2', '-b:a', bitrate];
+    case 'mp2':
+      return ['-vn', '-acodec', 'mp2', '-b:a', bitrate];
+    case 'amr':
+      return [
+        '-vn',
+        '-acodec',
+        'libopencore_amrnb',
+        '-ar',
+        '8000',
+        '-ac',
+        '1',
+        '-b:a',
+        '12.2k',
+        '-f',
+        'amr',
+      ];
+    case 'flac':
+      return ['-vn', '-acodec', 'flac', '-compression_level', '8'];
+    case 'alac':
+      return ['-vn', '-acodec', 'alac', '-f', 'ipod'];
+    case 'wav':
+      return ['-vn', '-acodec', 'pcm_s16le'];
+    case 'aiff':
+      return ['-vn', '-acodec', 'pcm_s16be'];
+    case 'au':
+      return [
+        '-vn',
+        '-acodec',
+        'pcm_s16be',
+        '-ar',
+        '44100',
+        '-ac',
+        '2',
+        '-f',
+        'au',
+      ];
+    case 'caf':
+      return [
+        '-vn',
+        '-acodec',
+        'pcm_s16le',
+        '-ar',
+        '44100',
+        '-ac',
+        '2',
+        '-f',
+        'caf',
+      ];
+    case 'cdda':
+      return [
+        '-vn',
+        '-acodec',
+        'pcm_s16le',
+        '-ar',
+        '44100',
+        '-ac',
+        '2',
+        '-f',
+        's16le',
+      ];
     default:
-      return ["-vn", "-b:a", bitrate];
+      return ['-vn', '-b:a', bitrate];
   }
 }
 
-function buildVideoCompressionArgs(format: string, crf: number, audioBitrate: string): string[] {
-  if (format === "webm") {
+function buildVideoCompressionArgs(
+  format: string,
+  crf: number,
+  audioBitrate: string,
+): string[] {
+  if (format === 'webm') {
     const webmCrf = Math.min(63, Math.max(24, Math.round(crf * 1.6)));
     return [
-      "-c:v",
-      "libvpx",
-      "-crf",
+      '-c:v',
+      'libvpx',
+      '-crf',
       String(webmCrf),
-      "-b:v",
-      "0",
-      "-deadline",
-      "good",
-      "-cpu-used",
-      "4",
-      "-auto-alt-ref",
-      "0",
-      "-pix_fmt",
-      "yuv420p",
-      "-c:a",
-      "libvorbis",
-      "-b:a",
+      '-b:v',
+      '0',
+      '-deadline',
+      'good',
+      '-cpu-used',
+      '4',
+      '-auto-alt-ref',
+      '0',
+      '-pix_fmt',
+      'yuv420p',
+      '-c:a',
+      'libvorbis',
+      '-b:a',
       audioBitrate,
     ];
   }
 
   const args = [
-    "-c:v",
-    "libx264",
-    "-preset",
-    "medium",
-    "-crf",
+    '-c:v',
+    'libx264',
+    '-preset',
+    'medium',
+    '-crf',
     String(crf),
-    "-c:a",
-    "aac",
-    "-b:a",
+    '-c:a',
+    'aac',
+    '-b:a',
     audioBitrate,
   ];
 
-  if (["mp4", "mov", "m4v"].includes(format)) {
-    args.push("-movflags", "+faststart");
+  if (['mp4', 'mov', 'm4v'].includes(format)) {
+    args.push('-movflags', '+faststart');
   }
 
   return args;
@@ -545,8 +730,9 @@ export async function compressMedia(
     quality?: number;
     signal?: AbortSignal;
     onProgress?: (progress: { ratio: number; time: number }) => void;
-  } = {}
+  } = {},
 ): Promise<ArrayBuffer> {
+  const originalInput = inputBuffer.slice(0);
   const normalized = format.toLowerCase();
   if (!AUDIO_FORMAT_SET.has(normalized) && !VIDEO_FORMAT_SET.has(normalized)) {
     throw new Error(`Compression not supported for ${format}`);
@@ -565,7 +751,7 @@ export async function compressMedia(
   const inputName = `input.${normalized}`;
   const outputName = `output.${normalized}`;
 
-  const baseArgs = ["-y", "-nostdin", "-i", inputName];
+  const baseArgs = ['-y', '-nostdin', '-i', inputName];
   const audioBitrate = mapQualityToAudioBitrate(options.quality);
   const crf = mapQualityToVideoCrf(options.quality);
   const specificArgs = AUDIO_FORMAT_SET.has(normalized)
@@ -589,27 +775,21 @@ export async function compressMedia(
         // Ignore missing output file.
       }
       const exitCode = await ff.exec(args);
-      if (exitCode !== 0) throw new Error(`FFmpeg failed with exit code ${exitCode}`);
+      if (exitCode !== 0)
+        throw new Error(`FFmpeg failed with exit code ${exitCode}`);
       return ff.readFile(outputName);
     },
   );
 
   if (!(data instanceof Uint8Array)) {
-    throw new Error("Unexpected output format from FFmpeg");
+    throw new Error('Unexpected output format from FFmpeg');
   }
 
-  if (data.byteLength >= inputBuffer.byteLength) {
-    return inputBuffer;
+  if (data.byteLength >= originalInput.byteLength) {
+    return originalInput;
   }
 
-  const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-  if (buffer instanceof SharedArrayBuffer) {
-    const ab = new ArrayBuffer(buffer.byteLength);
-    const view = new Uint8Array(ab);
-    view.set(new Uint8Array(buffer));
-    return ab;
-  }
-  return buffer;
+  return Uint8Array.from(data).buffer;
 }
 
 function resetTerminatedFfmpeg(instance: FFmpeg): void {
@@ -625,7 +805,7 @@ export async function extractAudioForTranscription(
   fromFormat: string,
   options: {
     onProgress?: (progress: { ratio: number; time: number }) => void;
-  } = {}
+  } = {},
 ): Promise<ArrayBuffer> {
   const ff = await loadFFmpeg();
 
@@ -643,21 +823,21 @@ export async function extractAudioForTranscription(
   }
 
   const inputName = `input.${fromFormat}`;
-  const outputName = "output.f32";
+  const outputName = 'output.f32';
 
   await ff.writeFile(inputName, new Uint8Array(inputBuffer));
 
   const args = [
-    "-y",
-    "-nostdin",
-    "-i",
+    '-y',
+    '-nostdin',
+    '-i',
     inputName,
-    "-ac",
-    "1",
-    "-ar",
-    "16000",
-    "-f",
-    "f32le",
+    '-ac',
+    '1',
+    '-ar',
+    '16000',
+    '-f',
+    'f32le',
     outputName,
   ];
 
@@ -672,7 +852,9 @@ export async function extractAudioForTranscription(
 
     const exitCode = await ff.exec(args);
     if (exitCode !== 0) {
-      throw new Error(`FFmpeg audio extraction failed with exit code ${exitCode}`);
+      throw new Error(
+        `FFmpeg audio extraction failed with exit code ${exitCode}`,
+      );
     }
 
     data = await ff.readFile(outputName);
@@ -683,26 +865,17 @@ export async function extractAudioForTranscription(
   }
 
   if (!(data instanceof Uint8Array)) {
-    throw new Error("Unexpected output format from FFmpeg audio extraction");
+    throw new Error('Unexpected output format from FFmpeg audio extraction');
   }
 
   try {
     await ff.deleteFile(inputName);
     await ff.deleteFile(outputName);
   } catch (cleanupErr) {
-    console.warn("Cleanup error:", cleanupErr);
+    console.warn('Cleanup error:', cleanupErr);
   }
 
-  const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-
-  if (buffer instanceof SharedArrayBuffer) {
-    const ab = new ArrayBuffer(buffer.byteLength);
-    const view = new Uint8Array(ab);
-    view.set(new Uint8Array(buffer));
-    return ab;
-  }
-
-  return buffer;
+  return Uint8Array.from(data).buffer;
 }
 
 export async function cleanupFFmpeg() {

@@ -9,8 +9,8 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
   assert.equal(model.rows.length, 2_807);
   assert.equal(new Set(model.rows.map((row) => row.toolId)).size, 2_807);
   assert.deepEqual(model.counts, {
-    supported: 431,
-    unsupported: 2_373,
+    supported: 435,
+    unsupported: 2_369,
     unwired: 0,
     unknown: 3,
   });
@@ -40,6 +40,14 @@ test('supported Tool keeps implementation, verification, and runtime facts separ
   assert.equal(row.controlledVerification.retainedExecutionResult, false);
   assert.equal(row.runtimeRequirement.classification, 'declared-client-only');
   assert.equal(row.runtimeObservation.classification, 'not-loaded');
+  assert.ok(row.verificationEvidence.exact);
+  assert.equal(row.verificationEvidence.exact.result, 'passed');
+  assert.equal(row.verificationEvidence.exact.scope, 'exact-tool');
+  assert.match(
+    row.verificationEvidence.exact.screenshotUrl,
+    /workflow-preview-png-to-webp/,
+  );
+  assert.deepEqual(row.verificationEvidence.family, []);
   assert.deepEqual(row.attention.codes, []);
 });
 
@@ -64,6 +72,20 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
     'runtime-proof-needed',
   ]);
   assert.equal(row.runtimeObservation.classification, 'not-loaded');
+  assert.equal(row.verificationEvidence.exact, null);
+  assert.deepEqual(row.verificationEvidence.family, []);
+});
+
+test('registered family policy does not become exact Tool evidence', () => {
+  const row = buildToolFactoryReadModel().getByToolId('bmp-to-png');
+
+  assert.ok(row);
+  assert.equal(
+    row.controlledVerification.classification,
+    'registered-with-semantic-policy',
+  );
+  assert.equal(row.verificationEvidence.exact, null);
+  assert.deepEqual(row.verificationEvidence.family, []);
 });
 
 test('unknown Tool remains unknown and names the evidence needed to resolve it', () => {
@@ -79,5 +101,37 @@ test('unknown Tool remains unknown and names the evidence needed to resolve it',
   assert.deepEqual(row.attention.codes, ['implementation-unknown']);
   assert.throws(() => {
     (row.implementation.engines as unknown[]).push({});
+  }, TypeError);
+});
+
+test('Tool and exact family GitHub work remain a separate read-model dimension', () => {
+  const row = buildToolFactoryReadModel().getByToolId('audio-to-text');
+
+  assert.ok(row);
+  assert.deepEqual(
+    row.githubWork.tool.links.map((link) => [link.number, link.stateLabel]),
+    [
+      [96, 'Open pull request'],
+      [97, 'Closed issue'],
+    ],
+  );
+  assert.deepEqual(
+    row.githubWork.family.links.map((link) => [link.number, link.stateLabel]),
+    [[85, 'Open pull request']],
+  );
+  assert.equal(row.support.disposition, 'supported');
+  assert.equal(row.runtimeObservation.classification, 'not-loaded');
+});
+
+test('missing exact Tool and family work stays empty instead of being guessed from titles', () => {
+  const row = buildToolFactoryReadModel().getByToolId('png-to-webp');
+
+  assert.ok(row);
+  assert.equal(row.githubWork.tool.coverage, 'complete');
+  assert.deepEqual(row.githubWork.tool.links, []);
+  assert.equal(row.githubWork.family.coverage, 'not-ingested');
+  assert.deepEqual(row.githubWork.family.links, []);
+  assert.throws(() => {
+    (row.githubWork.tool.links as unknown[]).push({});
   }, TypeError);
 });

@@ -100,7 +100,7 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   assert.match(runnerSource, /safe failure/i);
   assert.doesNotMatch(runnerSource, /data-generic-contract/);
   assert.match(runnerSource, /getGenericSmokeExpectation/);
-  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v3-bmp');
+  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v4-webm');
   for (const id of ['png-to-webp', 'webp-to-jpg', 'heic-to-jpg']) {
     const [from, to] = id.split('-to-');
     assert.equal(
@@ -139,6 +139,27 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
       id,
     );
   }
+  for (const [id, to, operation] of [
+    ['compress-webm', 'webm', 'compress'],
+    ['webm-to-m4a', 'm4a', 'convert'],
+    ['webm-to-mp3', 'mp3', 'convert'],
+    ['webm-to-mp4', 'mp4', 'convert'],
+  ]) {
+    assert.equal(
+      getGenericSmokeExpectation({ id, from: 'webm', to, operation }),
+      'supported',
+      id,
+    );
+  }
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: 'webm-to-mov',
+      from: 'webm',
+      to: 'mov',
+      operation: 'convert',
+    }),
+    'unsupported',
+  );
   for (const [id, from, to, operation] of [
     ['compress-m4a', 'm4a', 'm4a', 'compress'],
     ['compress-mp3', 'mp3', 'mp3', 'compress'],
@@ -220,7 +241,10 @@ test('transcription smoke uses owned speech and a bounded success-or-error termi
     runnerSource,
     /https:\/\/www\.youtube\.com\/watch\?v=3Is2P90qVa0/,
   );
-  assert.match(runnerSource, /page\.fill\(['"]\[data-testid=[^\n]+tool-url-input/);
+  assert.match(
+    runnerSource,
+    /page\.fill\(['"]\[data-testid=[^\n]+tool-url-input/,
+  );
   assert.match(runnerSource, /page\.route\(['"]\*\*\/api\/media-fetch\*['"]/);
   assert.match(runnerSource, /Download failed\|422\|Unexpected token/);
   assert.match(runnerSource, /dropFilesOnDropzone[\s\S]*fixtureEntry\.path/);

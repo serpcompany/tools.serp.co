@@ -161,10 +161,54 @@ that operation. Prefer the project migration and import scripts above.
 Dashboard access:
 
 - Route: `/internal/tools`
-- Auth: query `token` must match the Worker secret
-  `INTERNAL_DASHBOARD_TOKEN` when that secret is set.
-- Data source: the `SERP_TOOLS_DB` D1 binding only. A missing binding is shown as
-  an error instead of falling back to another database.
+- Environment: the source-backed Tool Factory table is enabled only in the
+  named `wayfinder-preview` environment. Production remains disabled.
+- Auth: Cloudflare Access protects `/internal/tools*` for an explicitly
+  approved owner email. The application also verifies the signed Access JWT,
+  its team issuer, application audience, and exact email claim before rendering.
+- Runtime bindings: configure `TOOLS_SERP_CLOUDFLARE_ACCESS_TEAM_DOMAIN`,
+  `TOOLS_SERP_CLOUDFLARE_ACCESS_AUD`, and
+  `TOOLS_SERP_TOOL_FACTORY_ALLOWED_EMAIL` outside the repository. Do not put
+  the approved email or Access credentials in source, logs, or artifacts.
+- Access setup (human-authorized mutation): create one Cloudflare Access
+  self-hosted application for the Wayfinder workers.dev hostname with path
+  `/internal/tools*`; add one Allow policy containing the exact approved owner
+  email and no broad Everyone rule. Copy the application AUD and team domain.
+  Store all three runtime bindings with `wrangler secret put <NAME> --env
+wayfinder-preview`, entering each value through stdin. The deploy wrapper
+  checks that all names exist and refuses deployment when any are absent.
+- Display: the page visibly identifies `DEV/STAGING` and the full deployed
+  revision. Treat that pair as the boundary for any screenshot or browser
+  evidence.
+- Data source: the current table joins Catalog, processor, provenance,
+  controlled-verification, and revision-local coverage facts. In the exact
+  `wayfinder-preview` environment only, Tool details also issue one read-only
+  D1 query over completed `tool_runs`: a 24-hour window capped at the latest
+  500 portfolio rows. Local and production origins do not query D1. The view
+  keeps upload, direct-media-link, YouTube/extractor, other, and older
+  unclassified-link attempts separate; it discards raw metadata and displays
+  only Tool id, path, result, time, and a bounded error classifier. Missing or
+  truncated samples never mean zero usage. Runtime observations remain a
+  separate evidence dimension and never rewrite Catalog intent, processor
+  support, or verification evidence.
+
+Hosted table verification uses an authenticated Access session cookie supplied
+only through the environment:
+
+```bash
+TOOL_FACTORY_CF_AUTHORIZATION='<temporary Access cookie>' \
+  pnpm -C apps/tools check:tool-factory -- \
+  --base-url https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev \
+  --environment DEV/STAGING \
+  --revision <full-deployed-commit> \
+  --screenshot <ignored-artifact-path.png>
+```
+
+Never put the cookie in an argument, source file, screenshot, or retained
+artifact. The check exercises search, support filtering, sorting, column
+visibility, pagination, copied-view restoration, browser Back/Forward, Reset,
+invalid-link recovery, and a Tool detail drawer while asserting the displayed
+environment and revision.
 
 ## Cache And Optimization Bindings
 

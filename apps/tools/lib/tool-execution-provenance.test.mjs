@@ -113,11 +113,11 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   assert.match(encodeSource, /import\("pdf-lib"\)/);
   assert.match(
     workerClientSource,
-    /convertImageViaApi\(\{ \.\.\.args, to: "png" \}\)/,
+    /convertImageViaApi\(\{ \.\.\.args, to: ['"]png['"] \}\)/,
   );
   assert.match(workerClientSource, /convertRasterOnMainThread\(\{/);
-  assert.match(workerClientSource, /from: "png"/);
-  assert.match(workerClientSource, /import\("upng-js"\)/);
+  assert.match(workerClientSource, /from: ['"]png['"]/);
+  assert.match(workerClientSource, /import\(['"]upng-js['"]\)/);
   assert.match(compressionWorkerSource, /@jsquash\/oxipng/);
   assert.match(compressionWorkerSource, /@jsquash\/jpeg/);
   assert.match(imageConvertNativeSource, /convertWithMagickWasm/);
@@ -153,6 +153,24 @@ test('conversion and compression provenance follows actual dispatch selectors', 
         'The compression worker uses JSquash; repository fallbacks use UPNG.js for PNG and platform image/Canvas primitives for other browser images.',
     },
   );
+});
+
+test('the exact WebM browser family exposes client-only FFmpeg provenance', () => {
+  for (const toolId of [
+    'compress-webm',
+    'webm-to-m4a',
+    'webm-to-mp3',
+    'webm-to-mp4',
+  ]) {
+    assert.deepEqual(mapped(toolId).executionProfiles, ['client-only'], toolId);
+  }
+  for (const output of ['m4a', 'mp3', 'mp4']) {
+    assert.deepEqual(resolveConversionDispatch('webm', output), {
+      kind: 'browser-webm-ffmpeg',
+      engineIds: ['browser-ffmpeg-wasm'],
+    });
+  }
+  assert.equal(resolveConversionDispatch('webm', 'mov').kind, 'adaptive-video');
 });
 
 test('downloader and browser-with-fetch support keep distinct profiles', () => {

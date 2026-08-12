@@ -48,7 +48,7 @@ export type SemanticDecoderAdapters = Readonly<{
 
 export type SemanticVerificationContext = Readonly<{
   maxBytes?: number;
-  requiredMediaTrack?: 'any' | 'audio';
+  requiredMediaTrack?: 'any' | 'audio' | 'video';
   signal?: AbortSignal;
 }>;
 
@@ -274,7 +274,9 @@ async function musicMetadataSemanticError(
         ? hasAudio === true
         : context.requiredMediaTrack === 'audio'
           ? hasAudio === true && hasUsableWebmAudio
-          : hasAudio === true || hasVideo === true;
+          : context.requiredMediaTrack === 'video'
+            ? hasVideo === true
+            : hasAudio === true || hasVideo === true;
     return matchesContainer && hasDuration && meetsTrackRequirement
       ? undefined
       : `${format.toUpperCase()} parser found no usable timed ${context.requiredMediaTrack === 'audio' ? 'audio' : 'media'} track`;

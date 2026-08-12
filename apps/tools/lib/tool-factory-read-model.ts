@@ -11,6 +11,16 @@ import {
 } from './tool-execution-provenance.ts';
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
+import {
+  buildToolGithubWorkIndex,
+  retainedToolGithubWorkSnapshot,
+  type ToolGithubWorkView,
+} from './tool-github-work-links.ts';
+import {
+  buildToolVerificationEvidenceIndex,
+  retainedToolVerificationEvidence,
+  type ToolVerificationEvidenceView,
+} from './tool-verification-evidence.ts';
 
 export type ToolSupportDisposition =
   | 'supported'
@@ -62,6 +72,8 @@ export type ToolFactoryRow = Readonly<{
     retainedExecutionResult: false;
     reason: string;
   }>;
+  verificationEvidence: ToolVerificationEvidenceView;
+  githubWork: ToolGithubWorkView;
   runtimeRequirement: Readonly<{
     classification:
       | 'declared-client-only'
@@ -178,7 +190,7 @@ function attentionCodes({
 
 function buildRow(
   tool: (typeof toolCatalog.activeTools)[number],
-): ToolFactoryRow {
+): Omit<ToolFactoryRow, 'verificationEvidence' | 'githubWork'> {
   const renderer = selectToolRenderer(tool);
   const availability = getToolProcessorAvailability(tool.id);
   const provenance = getToolExecutionProvenance(tool.id);
@@ -301,7 +313,22 @@ let cachedModel: ToolFactoryReadModel | undefined;
 
 export function buildToolFactoryReadModel(): ToolFactoryReadModel {
   if (cachedModel) return cachedModel;
-  const rows = toolCatalog.activeTools.map(buildRow);
+  const sourceRows = toolCatalog.activeTools.map(buildRow);
+  const evidenceIndex = buildToolVerificationEvidenceIndex(
+    retainedToolVerificationEvidence,
+    sourceRows.map((row) => ({ toolId: row.toolId, family: row.family })),
+  );
+  const githubWorkIndex = buildToolGithubWorkIndex(
+    retainedToolGithubWorkSnapshot,
+    sourceRows.map((row) => ({ toolId: row.toolId, family: row.family })),
+  );
+  const rows = sourceRows.map((row) =>
+    deepFreeze({
+      ...row,
+      verificationEvidence: evidenceIndex.getForTool(row.toolId, row.family),
+      githubWork: githubWorkIndex.getForTool(row.toolId, row.family),
+    }),
+  );
   const byId = new Map(rows.map((row) => [row.toolId, row]));
   if (byId.size !== rows.length) {
     throw new TypeError('Tool Factory rows contain duplicate Tool ids.');

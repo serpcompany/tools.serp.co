@@ -28,7 +28,6 @@ function parseArgs(argv) {
     environment: "",
     revision: "",
     baseUrl: process.env.CLOUDFLARE_BASE_URL || "",
-    internalToken: process.env.INTERNAL_DASHBOARD_TOKEN || "",
     assetBaseUrl:
       process.env.NEXT_PUBLIC_ASSETS_BASE_URL ||
       wrangler?.vars?.NEXT_PUBLIC_ASSETS_BASE_URL ||
@@ -361,22 +360,6 @@ function safeGetChecks(args) {
       bytes: bytes.length,
     }),
   }));
-
-  if (args.internalToken) {
-    const url = new URL(buildUrl(args.baseUrl, "/internal/tools/"));
-    url.searchParams.set("token", args.internalToken);
-    checks.push({
-      name: "GET /internal/tools/ with token",
-      url: url.toString(),
-      expect: (response, bytes) =>
-        response.status === 200 &&
-        bytes.includes(Buffer.from("Tools Dashboard")),
-      details: (response, bytes) => ({
-        contentType: response.headers.get("content-type"),
-        bytes: bytes.length,
-      }),
-    });
-  }
 
   return checks;
 }

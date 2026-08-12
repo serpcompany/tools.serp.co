@@ -8,6 +8,7 @@ export type ConversionOp = 'raster' | 'pdf-pages' | 'video';
 
 export type ConversionDispatchKind =
   | 'adaptive-video'
+  | 'browser-webm-ffmpeg'
   | 'browser-pdf-pages'
   | 'browser-raster'
   | 'server-assisted-image'
@@ -97,7 +98,8 @@ export function resolveConversionCapability(
         : ADAPTIVE_INPUTS.has(input) || ADAPTIVE_OUTPUTS.has(output)
           ? (VIDEO_INPUTS.has(input) && ADAPTIVE_OUTPUTS.has(output)) ||
             (AUDIO_INPUTS.has(input) && AUDIO_INPUTS.has(output))
-          : BROWSER_RASTER_INPUTS.has(input) && BROWSER_RASTER_OUTPUTS.has(output);
+          : BROWSER_RASTER_INPUTS.has(input) &&
+            BROWSER_RASTER_OUTPUTS.has(output);
   return supported
     ? { supported: true, dispatch }
     : {
@@ -109,7 +111,10 @@ export function resolveConversionCapability(
 export function resolveConversionOp(from: string, to: string): ConversionOp {
   const dispatch = resolveConversionDispatch(from, to);
   if (dispatch.kind === 'browser-pdf-pages') return 'pdf-pages';
-  if (dispatch.kind === 'adaptive-video') {
+  if (
+    dispatch.kind === 'adaptive-video' ||
+    dispatch.kind === 'browser-webm-ffmpeg'
+  ) {
     return 'video';
   }
   return 'raster';
@@ -128,15 +133,17 @@ const dispatchByKind = Object.freeze({
     kind: 'browser-pdf-pages',
     engineIds: Object.freeze(['browser-pdf-pages']),
   }),
+  'browser-webm-ffmpeg': Object.freeze({
+    kind: 'browser-webm-ffmpeg',
+    engineIds: Object.freeze(['browser-ffmpeg-wasm']),
+  }),
   'browser-raster': Object.freeze({
     kind: 'browser-raster',
     engineIds: Object.freeze(['browser-raster-worker']),
   }),
   'server-assisted-image': Object.freeze({
     kind: 'server-assisted-image',
-    engineIds: Object.freeze([
-      'browser-raster-with-server-image-decode',
-    ]),
+    engineIds: Object.freeze(['browser-raster-with-server-image-decode']),
   }),
   'server-image': Object.freeze({
     kind: 'server-image',
@@ -157,6 +164,9 @@ export function resolveConversionDispatch(
     return SERVER_IMAGE_OUTPUTS.has(toExt)
       ? dispatchByKind['server-image']
       : dispatchByKind['server-assisted-image'];
+  }
+  if (fromExt === 'webm' && ['m4a', 'mp3', 'mp4'].includes(toExt)) {
+    return dispatchByKind['browser-webm-ffmpeg'];
   }
   if (requiresVideoConversion(fromExt, toExt)) {
     return dispatchByKind['adaptive-video'];

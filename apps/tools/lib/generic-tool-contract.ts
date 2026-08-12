@@ -20,7 +20,16 @@ const FORMAT_MIME_TYPES = Object.freeze({
   pdf: 'application/pdf',
   png: 'image/png',
   webp: 'image/webp',
+  webm: 'video/webm',
 } satisfies Readonly<Record<string, string>>);
+
+export const BROWSER_WEBM_TOOL_IDS = Object.freeze([
+  'compress-webm',
+  'webm-to-m4a',
+  'webm-to-mp3',
+  'webm-to-mp4',
+] as const);
+const BROWSER_WEBM_TOOL_ID_SET = new Set<string>(BROWSER_WEBM_TOOL_IDS);
 
 const SEMANTIC_INPUT_FORMATS = new Set([
   'bmp',
@@ -33,6 +42,7 @@ const SEMANTIC_INPUT_FORMATS = new Set([
   'pdf',
   'png',
   'webp',
+  'webm',
 ]);
 const SEMANTIC_OUTPUT_FORMATS = new Set([
   'jpeg',
@@ -43,6 +53,7 @@ const SEMANTIC_OUTPUT_FORMATS = new Set([
   'pdf',
   'png',
   'webp',
+  'webm',
 ]);
 const BMP_CONVERSION_TOOL_ID_SET = new Set<string>(BMP_CONVERSION_TOOL_IDS);
 const CLOUDFLARE_UNSUPPORTED_CONVERSIONS = new Set([
@@ -98,6 +109,8 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
     resolveConversionCapability(from, to).supported &&
     SEMANTIC_INPUT_FORMATS.has(from) &&
     SEMANTIC_OUTPUT_FORMATS.has(to) &&
+    ((from !== 'webm' && to !== 'webm') ||
+      BROWSER_WEBM_TOOL_ID_SET.has(tool.id)) &&
     !CLOUDFLARE_UNSUPPORTED_CONVERSIONS.has(`${from}->${to}`);
   const compression = resolveCompressionDispatch(from);
   const exactCompression =
@@ -107,6 +120,7 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
     compression.target !== 'pdf' &&
     SEMANTIC_INPUT_FORMATS.has(from) &&
     SEMANTIC_OUTPUT_FORMATS.has(to) &&
+    (from !== 'webm' || BROWSER_WEBM_TOOL_ID_SET.has(tool.id)) &&
     !CLOUDFLARE_UNSUPPORTED_COMPRESSIONS.has(from);
   if (tool.operation === 'convert' ? !exactConversion : !exactCompression) {
     return undefined;

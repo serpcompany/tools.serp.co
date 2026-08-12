@@ -66,7 +66,9 @@
 			"vars": {
 				"NEXT_PUBLIC_ASSETS_BASE_URL": "https://assets.tools.serp.co",
 				"NEXT_PUBLIC_SITE_URL": "https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev",
-				"TOOLS_SERP_SERVER_NATIVE_PROCESSORS": "unavailable"
+				"TOOLS_SERP_SERVER_NATIVE_PROCESSORS": "unavailable",
+				"TOOLS_SERP_TOOL_FACTORY_ACCESS": "cloudflare-access",
+				"TOOLS_SERP_TOOL_FACTORY_ENVIRONMENT": "DEV/STAGING"
 			},
 			"assets": {
 				"directory": ".open-next/assets",

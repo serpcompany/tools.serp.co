@@ -68,5 +68,6 @@ Advisory exports can seed new research. They do not establish publication,
 capability, correctness, health, or work state.
 
 - [Evidence classification](./evidence/README.md)
+- [OSS library and tool research backlog](./evidence/oss-library-research/README.md)
 - [Tool-planning exports](./evidence/tool-planning/README.md)
 - [SEO research exports](./evidence/seo-research/README.md)

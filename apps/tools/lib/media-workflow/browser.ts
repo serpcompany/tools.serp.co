@@ -10,6 +10,7 @@ import { getExtensionFromName, safeMediaName } from './media-endpoint.ts';
 import type { MediaTransferProgress } from './media-endpoint.ts';
 import type { TranscriptionPort } from './processors.ts';
 import { TRANSCRIPT_OUTPUT } from './verified-formats.ts';
+import { classifyMediaRuntimePath } from '../media-runtime-path.ts';
 
 export async function workflowMediaFromFile(
   file: File,
@@ -75,7 +76,10 @@ export function createBrowserMediaWorkflow(
             request.input.kind === 'file'
               ? request.input.media.bytes.byteLength
               : undefined,
-          metadata: { source: request.input.kind },
+          metadata: {
+            source: request.input.kind,
+            runtimePath: classifyMediaRuntimePath(request.input),
+          },
         };
       },
       (status) => (status === 'cancelled' ? 'cancelled' : 'workflow_failed'),
