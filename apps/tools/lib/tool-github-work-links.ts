@@ -28,14 +28,37 @@ export type ToolGithubWorkRecord = Readonly<{
 }>;
 
 export type ToolGithubWorkView = Readonly<{
-  tool: readonly ToolGithubWorkLink[];
-  family: readonly ToolGithubWorkLink[];
+  source: ToolGithubWorkSource;
+  tool: ToolGithubWorkScopeView;
+  family: ToolGithubWorkScopeView;
+}>;
+
+export type ToolGithubWorkSource = Readonly<{
+  authority: string;
+  repository: string;
+  observedAt: string;
+  revision: string;
+  freshness: string;
+}>;
+
+export type ToolGithubWorkScopeView = Readonly<{
+  coverage: 'complete' | 'partial' | 'not-ingested';
+  links: readonly ToolGithubWorkLink[];
+}>;
+
+type CompleteScope =
+  | Readonly<{ kind: 'tools'; toolIds: readonly string[] }>
+  | Readonly<{ kind: 'family'; family: string; toolIds: readonly string[] }>;
+
+export type ToolGithubWorkSnapshot = Readonly<{
+  source: ToolGithubWorkSource;
+  records: readonly ToolGithubWorkRecord[];
+  completeScopes: readonly CompleteScope[];
 }>;
 
 const REPOSITORY_URL = 'https://github.com/serpcompany/tools.serp.co';
 
 const transcriptionToolIds = Object.freeze([
-  'audio-to-text',
   'audio-to-transcript',
   'mp3-to-transcript',
   'mp4-to-transcript',
@@ -43,6 +66,11 @@ const transcriptionToolIds = Object.freeze([
   'video-to-transcript',
   'youtube-to-transcript',
   'youtube-to-transcript-generator',
+]);
+
+const currentTranscriptionToolIds = Object.freeze([
+  'audio-to-text',
+  ...transcriptionToolIds,
 ]);
 
 const bmpToolIds = Object.freeze([
@@ -55,69 +83,78 @@ const bmpToolIds = Object.freeze([
 
 // Associations are intentionally explicit. Titles are display copy only and
 // never participate in Tool or family matching.
-export const retainedToolGithubWorkLinks: readonly ToolGithubWorkRecord[] =
-  Object.freeze([
-    Object.freeze({
-      kind: 'issue',
-      number: 97,
-      title: 'Fix Audio-to-Text for real YouTube links on Cloudflare',
-      state: 'closed',
-      url: `${REPOSITORY_URL}/issues/97`,
-      scope: Object.freeze({
-        kind: 'tools',
-        toolIds: Object.freeze(['audio-to-text']),
+export const retainedToolGithubWorkSnapshot: ToolGithubWorkSnapshot =
+  deepFreeze({
+    source: {
+      authority: 'GitHub issues and pull requests',
+      repository: 'serpcompany/tools.serp.co',
+      observedAt: '2026-08-12T15:11:00.000Z',
+      revision: 'dcd835c726c848488bdae038448adb893a4d188c',
+      freshness: 'point-in-time snapshot; current GitHub state may differ',
+    },
+    records: [
+      Object.freeze({
+        kind: 'issue',
+        number: 97,
+        title: 'Fix Audio-to-Text for real YouTube links on Cloudflare',
+        state: 'closed',
+        url: `${REPOSITORY_URL}/issues/97`,
+        scope: Object.freeze({
+          kind: 'tools',
+          toolIds: Object.freeze(['audio-to-text']),
+        }),
       }),
-    }),
-    Object.freeze({
-      kind: 'pull-request',
-      number: 96,
-      title:
-        'DEV/STAGING — Tool refactor, verified families, and factory inputs',
-      state: 'open',
-      url: `${REPOSITORY_URL}/pull/96`,
-      scope: Object.freeze({
-        kind: 'tools',
-        toolIds: Object.freeze(['audio-to-text', ...bmpToolIds]),
+      Object.freeze({
+        kind: 'pull-request',
+        number: 96,
+        title:
+          'DEV/STAGING — Tool refactor, verified families, and factory inputs',
+        state: 'open',
+        url: `${REPOSITORY_URL}/pull/96`,
+        scope: Object.freeze({
+          kind: 'tools',
+          toolIds: Object.freeze(['audio-to-text', ...bmpToolIds]),
+        }),
       }),
-    }),
-    Object.freeze({
-      kind: 'issue',
-      number: 95,
-      title:
-        'Enable and semantically verify the BMP input conversion family (5 IDs)',
-      state: 'closed',
-      url: `${REPOSITORY_URL}/issues/95`,
-      scope: Object.freeze({
-        kind: 'tools',
-        toolIds: bmpToolIds,
+      Object.freeze({
+        kind: 'issue',
+        number: 95,
+        title:
+          'Enable and semantically verify the BMP input conversion family (5 IDs)',
+        state: 'closed',
+        url: `${REPOSITORY_URL}/issues/95`,
+        scope: Object.freeze({
+          kind: 'tools',
+          toolIds: bmpToolIds,
+        }),
       }),
-    }),
-    Object.freeze({
-      kind: 'issue',
-      number: 82,
-      title: 'Consolidate downloader and transcription stream execution',
-      state: 'closed',
-      url: `${REPOSITORY_URL}/issues/82`,
-      scope: Object.freeze({
-        kind: 'family',
-        family: 'renderer:transcription',
-        toolIds: transcriptionToolIds,
+      Object.freeze({
+        kind: 'issue',
+        number: 82,
+        title: 'Consolidate downloader and transcription stream execution',
+        state: 'closed',
+        url: `${REPOSITORY_URL}/issues/82`,
+        scope: Object.freeze({
+          kind: 'tools',
+          toolIds: transcriptionToolIds,
+        }),
       }),
-    }),
-    Object.freeze({
-      kind: 'pull-request',
-      number: 85,
-      title:
-        'Draft foundation — do not merge to main: Tool workflow architecture',
-      state: 'open',
-      url: `${REPOSITORY_URL}/pull/85`,
-      scope: Object.freeze({
-        kind: 'family',
-        family: 'renderer:transcription',
-        toolIds: transcriptionToolIds,
+      Object.freeze({
+        kind: 'pull-request',
+        number: 85,
+        title:
+          'Draft foundation — do not merge to main: Tool workflow architecture',
+        state: 'open',
+        url: `${REPOSITORY_URL}/pull/85`,
+        scope: Object.freeze({
+          kind: 'family',
+          family: 'renderer:transcription',
+          toolIds: currentTranscriptionToolIds,
+        }),
       }),
-    }),
-  ]);
+    ],
+    completeScopes: [{ kind: 'tools', toolIds: ['png-to-webp'] }],
+  });
 
 function deepFreeze<Value>(value: Value): Value {
   if (value && typeof value === 'object' && !Object.isFrozen(value)) {
@@ -191,7 +228,7 @@ function sortLinks(links: ToolGithubWorkLink[]) {
 }
 
 export function buildToolGithubWorkIndex(
-  records: readonly ToolGithubWorkRecord[],
+  snapshot: ToolGithubWorkSnapshot,
   memberships: readonly Readonly<{ toolId: string; family: string }>[],
 ) {
   const familyMembers = new Map<string, string[]>();
@@ -209,7 +246,7 @@ export function buildToolGithubWorkIndex(
   const recordsByToolId = new Map<string, ToolGithubWorkLink[]>();
   const recordsByFamily = new Map<string, ToolGithubWorkLink[]>();
   const identities = new Set<string>();
-  for (const record of records) {
+  for (const record of snapshot.records) {
     validateRecord(record);
     const identity = `${record.kind}:${record.number}`;
     if (identities.has(identity)) {
@@ -246,6 +283,41 @@ export function buildToolGithubWorkIndex(
   for (const links of recordsByToolId.values()) deepFreeze(sortLinks(links));
   for (const links of recordsByFamily.values()) deepFreeze(sortLinks(links));
 
+  const completeTools = new Set<string>();
+  const completeFamilies = new Set<string>();
+  for (const scope of snapshot.completeScopes) {
+    for (const toolId of scope.toolIds) {
+      if (!familyByToolId.has(toolId))
+        throw new TypeError(
+          `Complete scope references unknown Tool: ${toolId}`,
+        );
+    }
+    if (scope.kind === 'family') {
+      const actualMembers = familyMembers.get(scope.family);
+      if (!actualMembers || !sameMembers(scope.toolIds, actualMembers)) {
+        throw new TypeError(
+          `Complete scope membership does not match ${scope.family}.`,
+        );
+      }
+      completeFamilies.add(scope.family);
+    } else {
+      for (const toolId of scope.toolIds) completeTools.add(toolId);
+    }
+  }
+
+  const scopeView = (
+    links: readonly ToolGithubWorkLink[],
+    complete: boolean,
+  ): ToolGithubWorkScopeView =>
+    deepFreeze({
+      coverage: complete
+        ? 'complete'
+        : links.length
+          ? 'partial'
+          : 'not-ingested',
+      links,
+    });
+
   return deepFreeze({
     getForTool(toolId: string, family: string): ToolGithubWorkView {
       if (familyByToolId.get(toolId) !== family) {
@@ -254,8 +326,15 @@ export function buildToolGithubWorkIndex(
         );
       }
       return deepFreeze({
-        tool: recordsByToolId.get(toolId) ?? [],
-        family: recordsByFamily.get(family) ?? [],
+        source: snapshot.source,
+        tool: scopeView(
+          recordsByToolId.get(toolId) ?? [],
+          completeTools.has(toolId),
+        ),
+        family: scopeView(
+          recordsByFamily.get(family) ?? [],
+          completeFamilies.has(family),
+        ),
       });
     },
   });

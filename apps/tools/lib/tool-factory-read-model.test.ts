@@ -109,18 +109,15 @@ test('Tool and exact family GitHub work remain a separate read-model dimension',
 
   assert.ok(row);
   assert.deepEqual(
-    row.githubWork.tool.map((link) => [link.number, link.stateLabel]),
+    row.githubWork.tool.links.map((link) => [link.number, link.stateLabel]),
     [
       [96, 'Open pull request'],
       [97, 'Closed issue'],
     ],
   );
   assert.deepEqual(
-    row.githubWork.family.map((link) => [link.number, link.stateLabel]),
-    [
-      [85, 'Open pull request'],
-      [82, 'Closed issue'],
-    ],
+    row.githubWork.family.links.map((link) => [link.number, link.stateLabel]),
+    [[85, 'Open pull request']],
   );
   assert.equal(row.support.disposition, 'supported');
   assert.equal(row.runtimeObservation.classification, 'not-loaded');
@@ -130,8 +127,11 @@ test('missing exact Tool and family work stays empty instead of being guessed fr
   const row = buildToolFactoryReadModel().getByToolId('png-to-webp');
 
   assert.ok(row);
-  assert.deepEqual(row.githubWork, { tool: [], family: [] });
+  assert.equal(row.githubWork.tool.coverage, 'complete');
+  assert.deepEqual(row.githubWork.tool.links, []);
+  assert.equal(row.githubWork.family.coverage, 'not-ingested');
+  assert.deepEqual(row.githubWork.family.links, []);
   assert.throws(() => {
-    (row.githubWork.tool as unknown[]).push({});
+    (row.githubWork.tool.links as unknown[]).push({});
   }, TypeError);
 });

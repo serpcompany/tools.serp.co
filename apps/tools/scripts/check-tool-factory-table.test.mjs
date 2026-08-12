@@ -105,6 +105,8 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /Family verification policy \(not an exact Tool test\)/);
   assert.match(source, /getByText\(['"]GitHub work['"]/);
   assert.match(source, /getByText\(['"]No tracked work['"]/);
+  assert.match(source, /Work tracking not loaded/);
+  assert.match(source, /point-in-time snapshot/);
   assert.match(source, /Open pull request/);
   assert.match(source, /Closed issue/);
   assert.match(source, /renderer:transcription/);

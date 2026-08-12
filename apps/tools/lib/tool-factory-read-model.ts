@@ -13,7 +13,7 @@ import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
 import {
   buildToolGithubWorkIndex,
-  retainedToolGithubWorkLinks,
+  retainedToolGithubWorkSnapshot,
   type ToolGithubWorkView,
 } from './tool-github-work-links.ts';
 import {
@@ -319,7 +319,7 @@ export function buildToolFactoryReadModel(): ToolFactoryReadModel {
     sourceRows.map((row) => ({ toolId: row.toolId, family: row.family })),
   );
   const githubWorkIndex = buildToolGithubWorkIndex(
-    retainedToolGithubWorkLinks,
+    retainedToolGithubWorkSnapshot,
     sourceRows.map((row) => ({ toolId: row.toolId, family: row.family })),
   );
   const rows = sourceRows.map((row) =>

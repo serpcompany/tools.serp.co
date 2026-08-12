@@ -178,8 +178,10 @@ try {
   await dialog.getByText('GitHub work', { exact: true }).waitFor();
   assert.equal(
     await dialog.getByText('No tracked work', { exact: true }).count(),
-    2,
+    1,
   );
+  await dialog.getByText('Work tracking not loaded', { exact: true }).waitFor();
+  await dialog.getByText(/point-in-time snapshot/).waitFor();
   await page.keyboard.press('Escape');
 
   await page.getByLabel('Search all Tools').fill('bmp-to-png');
@@ -228,7 +230,7 @@ try {
   );
   assert.equal(
     await familyDialog.getByText('Closed issue', { exact: true }).count(),
-    2,
+    1,
   );
   await familyDialog
     .getByRole('link', {
