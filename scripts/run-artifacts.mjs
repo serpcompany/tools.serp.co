@@ -16,7 +16,12 @@ import process from 'node:process';
 function parseArguments(arguments_) {
   const [operation, ...tokens] = arguments_;
   const options = {};
-  const repeatableOptions = new Set(['input-hash', 'linked-work']);
+  const repeatableOptions = new Set([
+    'input-hash',
+    'linked-work',
+    'tool-id',
+    'invariant',
+  ]);
 
   for (let index = 0; index < tokens.length; index += 1) {
     const token = tokens[index];
@@ -326,6 +331,10 @@ function create(options) {
       );
     }
   }
+  const toolIds = options['tool-id'] ?? [];
+  for (const toolId of toolIds) assertSafeSlug(toolId, 'tool-id');
+  const invariants = options.invariant ?? [];
+  for (const invariant of invariants) assertSafeSlug(invariant, 'invariant');
 
   const compactTimestamp = startedAt
     .toISOString()
@@ -353,7 +362,12 @@ function create(options) {
       completedAt: completedAt.toISOString(),
     },
     environment,
-    scope: { label: scope, inputHashes },
+    scope: {
+      label: scope,
+      inputHashes,
+      ...(toolIds.length > 0 ? { toolIds } : {}),
+      ...(invariants.length > 0 ? { invariants } : {}),
+    },
     result: { status },
     runtime: {
       node: process.versions.node,

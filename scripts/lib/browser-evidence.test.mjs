@@ -5,19 +5,25 @@ import {
   summarizeNavigationTimings,
 } from './browser-evidence.mjs';
 
-test('browser scope identifies filtered Tools without retaining their ids', () => {
+test('browser scope retains exact Tool ids and representative semantic invariants', () => {
   const evidence = buildBrowserScope({
     mode: 'smoke',
     environment: 'preview',
-    toolIds: ['character-counter'],
+    toolIds: ['png-to-webp', 'video-downloader', 'csv-to-json'],
     filtered: true,
   });
 
   assert.equal(evidence.label, 'browser-smoke-preview-subset');
-  assert.deepEqual(evidence.inputHashes, [
-    'sha256:9f7829390d0da74b08dc6ba1a660827059eabeb356d32c038a429dc6902048e5',
+  assert.deepEqual(evidence.toolIds, [
+    'png-to-webp',
+    'video-downloader',
+    'csv-to-json',
   ]);
-  assert.doesNotMatch(JSON.stringify(evidence), /character-counter/);
+  assert.deepEqual(evidence.invariants, [
+    'generic-file-exact-output',
+    'table-row-header-value-semantics',
+    'url-stream-exact-output',
+  ]);
 });
 
 test('benchmark evidence retains sanitized navigation aggregates', () => {

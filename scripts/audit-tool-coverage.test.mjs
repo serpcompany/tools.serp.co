@@ -23,3 +23,14 @@ test('revision validation pins the reproducer and its local classification depen
     /git[\s\S]*diff[\s\S]*sourceRevision[\s\S]*\.\.\.auditedInputPaths/,
   );
 });
+
+test('audit payload identifies the exact runtime command, timestamp, and environment', () => {
+  assert.doesNotMatch(source, /auditDate:\s*['"]2026-08-11['"]/);
+  assert.match(source, /generatedAt:\s*new Date\(\)\.toISOString\(\)/);
+  assert.match(source, /command:\s*Object\.freeze/);
+  assert.match(source, /node:\s*process\.versions\.node/);
+  assert.match(
+    source,
+    /platform:\s*`\$\{process\.platform\}-\$\{process\.arch\}`/,
+  );
+});

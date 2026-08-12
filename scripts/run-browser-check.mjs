@@ -129,6 +129,8 @@ const evidenceEnvironments = Object.freeze({
 const selectedMode = modeConfiguration[options.mode];
 let evidenceScope = `browser-${options.mode}-${options.environment}-initialization`;
 let evidenceInputHashes = [];
+let evidenceToolIds = [];
+let evidenceInvariants = [];
 let selectedItemCount = 0;
 let browser;
 const results = [];
@@ -146,6 +148,8 @@ function recordBrowserEvidence(status, summary, completedAt = new Date()) {
     completedAt: completedAt.toISOString(),
     dirty: options.dirty,
     inputHashes: evidenceInputHashes,
+    toolIds: evidenceToolIds,
+    invariants: evidenceInvariants,
     linkedWork: ['#58'],
     summary: {
       status,
@@ -192,6 +196,8 @@ try {
   });
   evidenceScope = browserScope.label;
   evidenceInputHashes = browserScope.inputHashes;
+  evidenceToolIds = browserScope.toolIds;
+  evidenceInvariants = browserScope.invariants;
   if (tools.length === 0) {
     throw new Error('Browser check selected no active Tools');
   }
@@ -439,6 +445,21 @@ try {
   }
 
   async function runFunctionalTest(page, tool) {
+    function assertCsvToJsonRecords(records) {
+      if (
+        !Array.isArray(records) ||
+        records.length !== 2 ||
+        records[0]?.name !== 'Ada' ||
+        records[0]?.count !== '1' ||
+        records[1]?.name !== 'Grace' ||
+        records[1]?.count !== '2'
+      ) {
+        throw new Error(
+          'CSV to JSON output did not preserve rows, headers, and cell values.',
+        );
+      }
+    }
+
     if (tool.id === 'video-downloader') {
       const fixture = toolFixtures[tool.id];
       const fixturePath = resolveFixturePath(fixture?.responseFixture);
@@ -648,23 +669,16 @@ try {
         .locator('[data-testid="table-output"]')
         .inputValue();
       const records = JSON.parse(output);
-      if (
-        !Array.isArray(records) ||
-        records.length !== 2 ||
-        records[0]?.name !== 'Ada' ||
-        records[0]?.count !== '1' ||
-        records[1]?.name !== 'Grace' ||
-        records[1]?.count !== '2'
-      ) {
-        throw new Error(
-          'CSV to JSON output did not preserve rows, headers, and numeric cells.',
-        );
-      }
+      assertCsvToJsonRecords(records);
       await page.getByRole('button', { name: 'Download' }).click();
       const blob = await waitForBlob(page, 1, 10_000);
       if (!blob?.size || blob.type !== 'application/json') {
         throw new Error('CSV to JSON download did not deliver verified JSON.');
       }
+      const downloadedOutput = await page.evaluate(() =>
+        window.__lastBlob?.text(),
+      );
+      assertCsvToJsonRecords(JSON.parse(downloadedOutput));
       return {
         detail: 'verified 2 JSON records with preserved numeric cells',
         metrics: { outputBytes: blob.size, outputType: blob.type },

@@ -230,6 +230,9 @@ test('table smoke uses the table workflow seam and verifies CSV to JSON semantic
   assert.match(runnerSource, /table-output/);
   assert.match(runnerSource, /Ada/);
   assert.match(runnerSource, /Grace/);
+  assert.match(runnerSource, /__lastBlob\?\.text\(\)/);
+  assert.match(runnerSource, /JSON\.parse\(downloadedOutput\)/);
+  assert.match(runnerSource, /assertCsvToJsonRecords/);
 });
 
 test('local evidence accepts only loopback targets', () => {

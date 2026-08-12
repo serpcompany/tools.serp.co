@@ -239,8 +239,17 @@ const allActiveGap = {
 
 const payload = {
   schemaVersion: 3,
-  auditDate: '2026-08-11',
+  generatedAt: new Date().toISOString(),
   auditedSourceRevision: sourceRevision,
+  command: Object.freeze({
+    name: 'audit:tool-coverage',
+    version: '4',
+    arguments: Object.freeze(['--source-revision', sourceRevision]),
+  }),
+  environment: Object.freeze({
+    node: process.versions.node,
+    platform: `${process.platform}-${process.arch}`,
+  }),
   sources: {
     catalog: 'packages/app-core/src/lib/tool-catalog-adapter.mjs',
     renderer: 'apps/tools/lib/tool-renderer.ts',
