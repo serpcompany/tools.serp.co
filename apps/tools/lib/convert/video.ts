@@ -1,9 +1,9 @@
 // Load FFmpeg.wasm for video conversion
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { AUDIO_FORMATS, VIDEO_FORMATS, detectCapabilities } from '../capabilities';
-import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils";
-import { createServerActionRequestHeaders } from "../server-action-client";
-import { runFfmpegLifecycle } from "./ffmpeg-lifecycle";
+import { AUDIO_FORMATS, VIDEO_FORMATS, detectCapabilities } from '../capabilities.ts';
+import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils.ts";
+import { createServerActionRequestHeaders } from "../server-action-client.ts";
+import { runFfmpegLifecycle } from "./ffmpeg-lifecycle.ts";
 
 let ffmpeg: FFmpeg | null = null;
 let loaded = false;

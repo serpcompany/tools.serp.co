@@ -3,6 +3,7 @@ export async function withSilenceWatchdog<T>(options: {
   signal: AbortSignal;
   timeoutMs: number;
   timeoutMessage: string;
+  onTimeout?(): void | Promise<void>;
 }): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   let rejectTimeout: ((reason: Error) => void) | undefined;
@@ -13,10 +14,18 @@ export async function withSilenceWatchdog<T>(options: {
   const pulse = () => {
     if (!active) return;
     if (timer) clearTimeout(timer);
-    timer = setTimeout(
-      () => rejectTimeout?.(new Error(options.timeoutMessage)),
-      options.timeoutMs,
-    );
+    timer = setTimeout(() => {
+      if (!active) return;
+      void (async () => {
+        try {
+          await options.onTimeout?.();
+        } catch {
+          // Timeout cleanup cannot replace the bounded-operation outcome.
+        } finally {
+          rejectTimeout?.(new Error(options.timeoutMessage));
+        }
+      })();
+    }, options.timeoutMs);
   };
   const onAbort = () => {
     rejectTimeout?.(new DOMException("Transcription cancelled", "AbortError"));

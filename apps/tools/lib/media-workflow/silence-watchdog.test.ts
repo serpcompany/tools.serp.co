@@ -62,3 +62,20 @@ test("late progress after timeout cannot arm another timer", async () => {
   latePulse?.();
   await new Promise((resolve) => setTimeout(resolve, 10));
 });
+
+test("timeout invokes its bounded-operation cleanup exactly once", async () => {
+  let timeoutCleanups = 0;
+  await assert.rejects(
+    withSilenceWatchdog({
+      run: async () => await new Promise<never>(() => {}),
+      signal: new AbortController().signal,
+      timeoutMs: 5,
+      timeoutMessage: "timed out",
+      onTimeout() {
+        timeoutCleanups += 1;
+      },
+    }),
+    /timed out/,
+  );
+  assert.equal(timeoutCleanups, 1);
+});

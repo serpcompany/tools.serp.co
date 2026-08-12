@@ -23,6 +23,7 @@ export function createBrowserTranscriptionPort(
   options: {
     createWorker?: () => Worker;
     extractAudio?: typeof extractAudioForTranscription;
+    cleanupExtraction?: typeof cleanupFFmpeg;
     silenceTimeoutMs?: number;
   } = {},
 ): TranscriptionPort {
@@ -36,11 +37,12 @@ export function createBrowserTranscriptionPort(
         },
       ));
   const extractAudio = options.extractAudio ?? extractAudioForTranscription;
+  const cleanupExtraction = options.cleanupExtraction ?? cleanupFFmpeg;
   const silenceTimeoutMs = options.silenceTimeoutMs ?? 30_000;
   return {
     async transcribe(media, context) {
       const abortExtraction = () => {
-        void cleanupFFmpeg();
+        void cleanupExtraction();
       };
       context.signal.addEventListener("abort", abortExtraction, { once: true });
       await context.registerCleanup(async () => {
@@ -50,6 +52,7 @@ export function createBrowserTranscriptionPort(
         signal: context.signal,
         timeoutMs: silenceTimeoutMs,
         timeoutMessage: "Transcription extraction stopped responding",
+        onTimeout: cleanupExtraction,
         run: (pulse) =>
           extractAudio(arrayBufferOf(media.bytes), media.format, {
             onProgress({ ratio }) {
@@ -63,61 +66,62 @@ export function createBrowserTranscriptionPort(
       context.signal.throwIfAborted();
 
       const worker = createWorker();
+      let workerTerminated = false;
+      const terminateWorker = () => {
+        if (workerTerminated) return;
+        workerTerminated = true;
+        worker.terminate();
+      };
       await context.openResource("worker");
-      await context.registerCleanup(async () => worker.terminate());
-      return await new Promise<string>((resolve, reject) => {
-        let settled = false;
-        let silenceTimer: ReturnType<typeof setTimeout> | undefined;
-        const pulse = () => {
-          if (silenceTimer) clearTimeout(silenceTimer);
-          silenceTimer = setTimeout(
-            () =>
+      await context.registerCleanup(async () => terminateWorker());
+      let removeWorkerListeners = () => {};
+      try {
+        return await withSilenceWatchdog({
+          signal: context.signal,
+          timeoutMs: silenceTimeoutMs,
+          timeoutMessage: "Transcription worker stopped responding",
+          onTimeout: terminateWorker,
+          run: (pulse) => new Promise<string>((resolve, reject) => {
+            let settled = false;
+            const finish = (callback: () => void) => {
+              if (settled) return;
+              settled = true;
+              worker.removeEventListener("message", onMessage);
+              worker.removeEventListener("error", onError);
+              callback();
+            };
+            const onError = (event: ErrorEvent) =>
               finish(() =>
-                reject(new Error("Transcription worker stopped responding")),
-              ),
-            silenceTimeoutMs,
-          );
-        };
-        const finish = (callback: () => void) => {
-          if (settled) return;
-          settled = true;
-          if (silenceTimer) clearTimeout(silenceTimer);
-          context.signal.removeEventListener("abort", onAbort);
-          worker.removeEventListener("message", onMessage);
-          worker.removeEventListener("error", onError);
-          callback();
-        };
-        const onAbort = () =>
-          finish(() =>
-            reject(new DOMException("Transcription cancelled", "AbortError")),
-          );
-        const onError = (event: ErrorEvent) =>
-          finish(() =>
-            reject(new Error(event.message || "Transcription worker failed")),
-          );
-        const onMessage = (event: MessageEvent<WorkerMessage>) => {
-          const message = event.data;
-          if (message.type === "progress") {
+                reject(new Error(event.message || "Transcription worker failed")),
+              );
+            const onMessage = (event: MessageEvent<WorkerMessage>) => {
+              const message = event.data;
+              if (message.type === "progress") {
+                pulse();
+                const normalized = Math.min(
+                  1,
+                  Math.max(0, (message.progress ?? 0) / 100),
+                );
+                context.reportProgress(0.45 + normalized * 0.55);
+              } else if (message.type === "result") {
+                finish(() => resolve(message.text ?? ""));
+              } else if (message.type === "error") {
+                finish(() =>
+                  reject(new Error(message.error || "Transcription failed")),
+                );
+              }
+            };
+            worker.addEventListener("message", onMessage);
+            worker.addEventListener("error", onError);
+            removeWorkerListeners = () => finish(() => {});
             pulse();
-            const normalized = Math.min(
-              1,
-              Math.max(0, (message.progress ?? 0) / 100),
-            );
-            context.reportProgress(0.45 + normalized * 0.55);
-          } else if (message.type === "result") {
-            finish(() => resolve(message.text ?? ""));
-          } else if (message.type === "error") {
-            finish(() =>
-              reject(new Error(message.error || "Transcription failed")),
-            );
-          }
-        };
-        context.signal.addEventListener("abort", onAbort, { once: true });
-        worker.addEventListener("message", onMessage);
-        worker.addEventListener("error", onError);
-        pulse();
-        worker.postMessage({ audioBuffer }, [audioBuffer]);
-      });
+            worker.postMessage({ audioBuffer }, [audioBuffer]);
+          }),
+        });
+      } finally {
+        removeWorkerListeners();
+        terminateWorker();
+      }
     },
   };
 }
