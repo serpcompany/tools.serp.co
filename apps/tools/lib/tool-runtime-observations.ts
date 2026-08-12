@@ -16,12 +16,17 @@ export type ToolRuntimePath =
   | 'other'
   | 'unclassified-url';
 
+export type ToolRuntimeFailureClassifier =
+  | 'processing-failed'
+  | 'cancelled'
+  | 'unclassified-failure';
+
 export type ToolRuntimeObservationRecord = Readonly<{
   toolId: string;
   path: ToolRuntimePath;
   result: 'succeeded' | 'failed';
   observedAt: string;
-  errorCode: string | null;
+  errorClassifier: ToolRuntimeFailureClassifier | null;
 }>;
 
 type ObservationWindow = Readonly<{
@@ -39,7 +44,7 @@ export type ToolRuntimePathObservation =
         sampleSize: number;
         lastObservedAt: string;
         lastResult: 'succeeded' | 'failed';
-        lastErrorCode: string | null;
+        lastErrorClassifier: ToolRuntimeFailureClassifier | null;
         freshness: 'fresh' | 'stale';
         ageMinutes: number;
       }
@@ -106,6 +111,20 @@ const runtimePaths = Object.freeze([
   'unclassified-url',
 ] as const);
 
+const repositoryOwnedFailureClassifiers: Readonly<
+  Record<string, ToolRuntimeFailureClassifier>
+> = Object.freeze({
+  failed: 'processing-failed',
+  workflow_failed: 'processing-failed',
+  cancelled: 'cancelled',
+  workflow_cancelled: 'cancelled',
+});
+
+function classifyFailure(value: unknown): ToolRuntimeFailureClassifier | null {
+  if (typeof value !== 'string' || !value) return null;
+  return repositoryOwnedFailureClassifiers[value] ?? 'unclassified-failure';
+}
+
 function deepFreeze<Value>(value: Value): Value {
   if (value && typeof value === 'object' && !Object.isFrozen(value)) {
     Object.freeze(value);
@@ -168,12 +187,7 @@ function normalizeRecord(
     path: classifyPath(parseMetadata(row.metadata)),
     result: row.status,
     observedAt: observedAt.toISOString(),
-    errorCode:
-      typeof row.errorCode === 'string' && row.errorCode
-        ? /^[a-z0-9][a-z0-9._-]{0,63}$/.test(row.errorCode)
-          ? row.errorCode
-          : 'unclassified-failure'
-        : null,
+    errorClassifier: classifyFailure(row.errorCode),
   });
 }
 
@@ -221,7 +235,7 @@ export function buildToolRuntimeObservationView(
       sampleSize: matching.length,
       lastObservedAt: latest.observedAt,
       lastResult: latest.result,
-      lastErrorCode: latest.errorCode,
+      lastErrorClassifier: latest.errorClassifier,
       freshness:
         ageMinutes <= FRESHNESS_THRESHOLD_MINUTES
           ? ('fresh' as const)

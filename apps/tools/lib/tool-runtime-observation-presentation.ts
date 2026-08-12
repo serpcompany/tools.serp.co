@@ -1,4 +1,14 @@
-import type { ToolRuntimeObservationPortfolio } from './tool-runtime-observations.ts';
+import type {
+  ToolRuntimeFailureClassifier,
+  ToolRuntimeObservationPortfolio,
+} from './tool-runtime-observations.ts';
+
+const failureLabels: Readonly<Record<ToolRuntimeFailureClassifier, string>> =
+  Object.freeze({
+    'processing-failed': 'Processing failed',
+    cancelled: 'Cancelled',
+    'unclassified-failure': 'Unclassified failure',
+  });
 
 function relativeAge(minutes: number) {
   if (minutes < 60) return `${minutes} min ago`;
@@ -43,7 +53,7 @@ export function presentToolRuntimeObservations(
               state: 'observed' as const,
               environment: path.environment,
               attempts: path.sampleSize,
-              latestResult: `${path.lastResult === 'succeeded' ? 'Succeeded' : 'Failed'}${path.lastErrorCode ? ` · ${path.lastErrorCode}` : ''}`,
+              latestResult: `${path.lastResult === 'succeeded' ? 'Succeeded' : 'Failed'}${path.lastErrorClassifier ? ` · ${failureLabels[path.lastErrorClassifier]}` : ''}`,
               lastSeenAt: path.lastObservedAt,
               freshness: `${path.freshness === 'fresh' ? 'Fresh' : 'Stale'} · ${relativeAge(path.ageMinutes)}`,
             })

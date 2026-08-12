@@ -93,7 +93,7 @@ test('DEV/STAGING reads one bounded completed-run window and keeps materially di
                 toolId: 'audio-to-text',
                 status: 'failed',
                 startedAt: '2026-08-12T23:30:00.000Z',
-                errorCode: 'workflow-failed',
+                errorCode: 'secret-token-123',
                 metadata: JSON.stringify({ source: 'url' }),
               },
               {
@@ -160,12 +160,14 @@ test('DEV/STAGING reads one bounded completed-run window and keeps materially di
     sampleSize: 1,
     lastObservedAt: '2026-08-12T23:50:00.000Z',
     lastResult: 'succeeded',
-    lastErrorCode: null,
+    lastErrorClassifier: null,
     freshness: 'fresh',
     ageMinutes: 10,
   });
   assert.equal(
-    tool?.paths[1]?.state === 'observed' ? tool.paths[1].lastErrorCode : null,
+    tool?.paths[1]?.state === 'observed'
+      ? tool.paths[1].lastErrorClassifier
+      : null,
     'unclassified-failure',
   );
   assert.deepEqual(tool?.paths[2], {
@@ -189,7 +191,7 @@ test('DEV/STAGING reads one bounded completed-run window and keeps materially di
     sampleSize: 1,
     lastObservedAt: '2026-08-12T23:30:00.000Z',
     lastResult: 'failed',
-    lastErrorCode: 'workflow-failed',
+    lastErrorClassifier: 'unclassified-failure',
     freshness: 'fresh',
     ageMinutes: 30,
   });
@@ -282,7 +284,7 @@ test('bounded empty data says no observations while stale results remain time-bo
                 toolId: 'audio-to-text',
                 status: 'failed',
                 startedAt: '2026-08-12T01:00:00.000Z',
-                errorCode: 'upload-failed',
+                errorCode: 'workflow_failed',
                 metadata: JSON.stringify({ runtimePath: 'upload' }),
               },
             ],
@@ -308,6 +310,7 @@ test('bounded empty data says no observations while stale results remain time-bo
     assert.equal(upload.freshness, 'stale');
     assert.equal(upload.ageMinutes, 1_380);
     assert.equal(upload.lastResult, 'failed');
+    assert.equal(upload.lastErrorClassifier, 'processing-failed');
   }
   assert.equal(
     result.tools.some((tool) => tool.toolId === 'png-to-webp'),
