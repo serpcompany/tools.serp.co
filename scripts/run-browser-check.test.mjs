@@ -215,6 +215,8 @@ test('specialized smoke coverage exercises rendered lifecycle and delivery behav
   );
   assert.match(runnerSource, /character debounce published stale statistics/i);
   assert.match(runnerSource, /csv-combiner-download/);
+  assert.match(runnerSource, /__lastBlob/);
+  assert.match(runnerSource, /__lastBlob\?\.text\(\)/);
   assert.match(runnerSource, /pdf-tool-input/);
   assert.match(runnerSource, /pdf-tool-viewer/);
   assert.match(runnerSource, /file=blob%3A/);

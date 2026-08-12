@@ -415,11 +415,13 @@ try {
         });
         window.__lastBlobSize = blob?.size ?? null;
         window.__lastBlobType = blob?.type ?? null;
+        window.__lastBlob = blob;
         return window.__origCreateObjectURL(blob);
       };
       window.__blobEvents = [];
       window.__lastBlobSize = null;
       window.__lastBlobType = null;
+      window.__lastBlob = null;
     });
   }
 
@@ -650,9 +652,9 @@ try {
         !Array.isArray(records) ||
         records.length !== 2 ||
         records[0]?.name !== 'Ada' ||
-        records[0]?.count !== 1 ||
+        records[0]?.count !== '1' ||
         records[1]?.name !== 'Grace' ||
-        records[1]?.count !== 2
+        records[1]?.count !== '2'
       ) {
         throw new Error(
           'CSV to JSON output did not preserve rows, headers, and numeric cells.',
@@ -739,31 +741,23 @@ try {
         null,
         { timeout: 10000 },
       );
-      const output = await page.evaluate(() => {
-        const el = document.querySelector(
-          '[data-testid="csv-combiner-output"]',
-        );
-        return el?.value ?? '';
-      });
-      const header =
-        output
-          .split('\n')[0]
-          ?.split(',')
-          .map((value) => value.trim()) ?? [];
-      const required = ['name', 'count', 'score', 'extra'];
-      const missing = required.filter((item) => !header.includes(item));
-      if (missing.length) {
-        throw new Error(
-          `CSV combiner output missing headers: ${missing.join(', ')}`,
-        );
-      }
       const beforeCount = await page.evaluate(
         () => window.__blobEvents?.length ?? 0,
       );
       await page.click('[data-testid="csv-combiner-download"]');
       const blob = await waitForBlob(page, beforeCount + 1, 10000);
+      const output = await page.evaluate(() => window.__lastBlob?.text());
+      const lines = output?.trim().split('\n') ?? [];
+      const header = lines[0]?.split(',').map((value) => value.trim()) ?? [];
+      const required = ['name', 'count', 'score', 'extra'];
+      const missing = required.filter((item) => !header.includes(item));
+      if (missing.length || lines.length !== 5) {
+        throw new Error(
+          `CSV combiner output did not preserve 4 rows and headers: ${missing.join(', ')}`,
+        );
+      }
       return {
-        detail: `output ${output.split('\n').length} lines`,
+        detail: `output ${lines.length} lines`,
         metrics: {
           outputBytes: blob?.size ?? null,
           outputType: blob?.type ?? null,
