@@ -1,0 +1,9 @@
+{
+  "baselineRevision": "d3e6c4c44af0d0a6a8e243f4a4e61963bb838e87",
+  "route": "/pdf-reader/",
+  "sourceUrl": "https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev/pdf-reader/",
+  "retrievedAt": "2026-08-12T07:14:00Z",
+  "htmlSha256": "319e9f6e3325c9e5fc9d2459343e9ffa4ccf3176cb5434e7c02cbd06d3bcbb3e",
+  "scriptSha256": "f2f3497c7fae571b5d7702e4f6b428c5edf7b5eb0fe1f04366a62a847b905931",
+  "script": "((a2, b2, c2, d2, e2, f2, g2, h2) => {\n          let i2 = document.documentElement, j2 = [\"light\", \"dark\"];\n          function k2(b3) {\n            var c3;\n            (Array.isArray(a2) ? a2 : [a2]).forEach((a3) => {\n              let c4 = a3 === \"class\", d3 = c4 && f2 ? e2.map((a4) => f2[a4] || a4) : e2;\n              c4 ? (i2.classList.remove(...d3), i2.classList.add(f2 && f2[b3] ? f2[b3] : b3)) : i2.setAttribute(a3, b3);\n            }), c3 = b3, h2 && j2.includes(c3) && (i2.style.colorScheme = c3);\n          }\n          __name(k2, \"k2\");\n          if (d2) k2(d2);\n          else try {\n            let a3 = localStorage.getItem(b2) || c2, d3 = g2 && a3 === \"system\" ? window.matchMedia(\"(prefers-color-scheme: dark)\").matches ? \"dark\" : \"light\" : a3;\n            k2(d3);\n          } catch {\n          }\n        })(\"class\",\"theme\",\"light\",\"light\",[\"light\",\"dark\"],null,false,true)"
+}
