@@ -31,12 +31,6 @@ test('CLI emits a report when its complete source graph is committed at the name
     { encoding: 'utf8' },
   );
   assert.equal(copy.status, 0, copy.stderr);
-  const branch = spawnSync(
-    'git',
-    ['checkout', '--quiet', 'agent/issue-87-expansion-gap'],
-    { cwd: fixtureRoot, encoding: 'utf8' },
-  );
-  assert.equal(branch.status, 0, branch.stderr);
   fs.symlinkSync(
     path.join(repositoryRoot, 'node_modules'),
     path.join(fixtureRoot, 'node_modules'),
@@ -61,24 +55,31 @@ test('CLI emits a report when its complete source graph is committed at the name
     encoding: 'utf8',
   });
   assert.equal(staged.status, 0, staged.stderr);
-  const committed = spawnSync(
-    'git',
-    [
-      '-c',
-      'user.name=Fixture',
-      '-c',
-      'user.email=fixture@example.invalid',
-      'commit',
-      '--quiet',
-      '-m',
-      'fixture',
-    ],
-    {
-      cwd: fixtureRoot,
-      encoding: 'utf8',
-    },
-  );
-  assert.equal(committed.status, 0, committed.stderr);
+  const stagedDiff = spawnSync('git', ['diff', '--cached', '--quiet'], {
+    cwd: fixtureRoot,
+  });
+  if (stagedDiff.status === 1) {
+    const committed = spawnSync(
+      'git',
+      [
+        '-c',
+        'user.name=Fixture',
+        '-c',
+        'user.email=fixture@example.invalid',
+        'commit',
+        '--quiet',
+        '-m',
+        'fixture',
+      ],
+      {
+        cwd: fixtureRoot,
+        encoding: 'utf8',
+      },
+    );
+    assert.equal(committed.status, 0, committed.stderr);
+  } else {
+    assert.equal(stagedDiff.status, 0, stagedDiff.stderr);
+  }
   const commit = spawnSync('git', ['rev-parse', 'HEAD'], {
     cwd: fixtureRoot,
     encoding: 'utf8',

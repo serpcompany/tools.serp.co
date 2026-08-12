@@ -44,10 +44,18 @@ linked to issue #77.
 | Command                                                                    | Network access | Repository writes | Authority and evidence                                                                                                                                                         |
 | -------------------------------------------------------------------------- | -------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `pnpm --silent audit:tool-coverage -- --source-revision <full-commit-sha>` | None           | None; JSON stdout | Agent-safe. Requires Node 22 and refuses to run unless all Catalog, renderer, provenance, fixture, telemetry, and tracked-test inputs match the named source revision exactly. |
+| `pnpm --silent audit:tool-expansion-gap -- --source-revision <full-commit-sha> --format <json\|report>` | None | None; stdout only | Agent-safe. Requires Node 22 and pins the complete local reproducer module graph plus Catalog/Tool execution inputs. JSON is the all-Tool read model; report is its concise human index. |
 
 This audit command reports mechanically derived coverage and gap memberships.
 It does not run Tool behavior, query an environment, or turn missing evidence
 into a pass or failure.
+
+The expansion-gap projection further joins exact dispatch, processor contract,
+implementation provenance, runtime declarations, blockers, and explicitly
+labeled planning assumptions by canonical Tool id. Its family recommendations
+are planning inputs, not support registrations or runtime evidence. The accepted
+issue #87 baseline and indexed output are retained in the
+[Tool processor expansion-gap evidence](../audits/tool-processor-expansion-gap-2026-08-12.md).
 
 
 ## Local before/after workflow proof
