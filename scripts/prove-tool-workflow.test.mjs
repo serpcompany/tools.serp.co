@@ -44,7 +44,7 @@ test('pnpm argument separator reaches the CLI without changing the public seam',
   assert.equal(result.status, 1);
   assert.match(
     result.stderr,
-    /full 40-character Git commit|consumed current proof inputs must be clean/i,
+    /supported Node 22 runtime|full 40-character Git commit|consumed current proof inputs must be clean/i,
   );
   assert.doesNotMatch(result.stderr, /^Usage:/);
 });
