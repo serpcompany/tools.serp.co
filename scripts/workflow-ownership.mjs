@@ -94,13 +94,21 @@ function resolveImport(from, specifier, files) {
   } else {
     return undefined;
   }
+  const extensions = [
+    '.ts',
+    '.tsx',
+    '.mts',
+    '.cts',
+    '.js',
+    '.jsx',
+    '.mjs',
+    '.cjs',
+  ];
   for (const candidate of [
     base,
-    ...['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs'].map(
-      (extension) => `${base}${extension}`,
-    ),
-    ...['index.ts', 'index.tsx', 'index.js', 'index.mjs'].map((name) =>
-      path.posix.join(base, name),
+    ...extensions.map((extension) => `${base}${extension}`),
+    ...extensions.map((extension) =>
+      path.posix.join(base, `index${extension}`),
     ),
   ]) {
     if (files.has(candidate)) return candidate;
@@ -228,7 +236,7 @@ function isPresentationModule(relativePath, reachable) {
     reachable.has(relativePath) &&
     (relativePath.startsWith(`${APP_ROOT}components/`) ||
       (relativePath.startsWith(`${APP_ROOT}app/`) &&
-        (relativePath.endsWith('.tsx') ||
+        (/[jt]sx$/u.test(relativePath) ||
           ROUTE_PRESENTATION_FILE.test(relativePath))))
   );
 }
@@ -278,6 +286,7 @@ function registeredFamilyAdapters(parsed) {
           if (
             ts.isIdentifier(declaration.name) &&
             (declaration.name.text === 'genericToolWorkflow' ||
+              /^createBrowser.+Workflow$/u.test(declaration.name.text) ||
               /^browser.+Workflow$/u.test(declaration.name.text))
           ) {
             exports.add(declaration.name.text);
@@ -415,7 +424,7 @@ function telemetryOwners(files, parsed) {
         if (!exported) continue;
         if (
           ts.isFunctionDeclaration(statement) &&
-          statement.name &&
+          (statement.name || defaultExport) &&
           containsTelemetryReference(statement)
         ) {
           addSymbol(defaultExport ? 'default' : statement.name.text);
@@ -465,13 +474,91 @@ function containsAnyIdentifier(root, identifiers) {
   return found;
 }
 
+function containsWorkflowFactoryCall(root, factorySymbols) {
+  let found = false;
+  function visit(node) {
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
+      const callee = node.expression.text;
+      if (
+        factorySymbols.has(callee) ||
+        (/^useState$/u.test(callee) &&
+          node.arguments.some((argument) =>
+            containsAnyIdentifier(argument, factorySymbols),
+          ))
+      ) {
+        found = true;
+      }
+    }
+    if (!found) ts.forEachChild(node, visit);
+  }
+  visit(root);
+  return found;
+}
+
+function containsInternalWorkflowFactoryCall(root) {
+  let found = false;
+  function visit(node) {
+    if (
+      ts.isCallExpression(node) &&
+      ts.isIdentifier(node.expression) &&
+      /^create.+Workflow$/u.test(node.expression.text)
+    ) {
+      found = true;
+    }
+    if (!found) ts.forEachChild(node, visit);
+  }
+  visit(root);
+  return found;
+}
+
+function localFactorySymbols(
+  sourcePath,
+  sourceFile,
+  adapterPath,
+  exportedSymbols,
+  files,
+) {
+  const localSymbols = { callable: new Set(), values: new Set() };
+  if (sourcePath === adapterPath) return localSymbols;
+  for (const statement of sourceFile.statements) {
+    if (
+      !ts.isImportDeclaration(statement) ||
+      !ts.isStringLiteral(statement.moduleSpecifier) ||
+      resolveImport(sourcePath, statement.moduleSpecifier.text, files) !==
+        adapterPath
+    )
+      continue;
+    const bindings = statement.importClause?.namedBindings;
+    if (!bindings || ts.isNamespaceImport(bindings)) continue;
+    for (const element of bindings.elements) {
+      if (exportedSymbols.has((element.propertyName ?? element.name).text)) {
+        const exportedName = (element.propertyName ?? element.name).text;
+        const target = exportedName.startsWith('create')
+          ? localSymbols.callable
+          : localSymbols.values;
+        target.add(element.name.text);
+      }
+    }
+  }
+  return localSymbols;
+}
+
 function callsAcceptedWorkflowRun(
   sourceFile,
   adapterPath,
   sourcePath,
   factorySymbols,
+  files,
 ) {
-  const adapterBindings = new Set(factorySymbols);
+  const localSymbols = localFactorySymbols(
+    sourcePath,
+    sourceFile,
+    adapterPath,
+    factorySymbols,
+    files,
+  );
+  const callableFactories = localSymbols.callable;
+  const adapterBindings = localSymbols.values;
   let changed = true;
   while (changed) {
     changed = false;
@@ -479,7 +566,10 @@ function callsAcceptedWorkflowRun(
       if (
         ts.isVariableDeclaration(node) &&
         node.initializer &&
-        containsAnyIdentifier(node.initializer, adapterBindings)
+        (containsAnyIdentifier(node.initializer, adapterBindings) ||
+          containsWorkflowFactoryCall(node.initializer, callableFactories) ||
+          (sourcePath === adapterPath &&
+            containsInternalWorkflowFactoryCall(node.initializer)))
       ) {
         for (const name of bindingNames(node.name)) {
           if (adapterBindings.has(name)) continue;
@@ -504,9 +594,8 @@ function callsAcceptedWorkflowRun(
       if (isRun) {
         const receiver = expression.expression;
         accepted =
-          sourcePath === adapterPath ||
           (ts.isIdentifier(receiver) && adapterBindings.has(receiver.text)) ||
-          containsAnyIdentifier(receiver, new Set(factorySymbols));
+          containsWorkflowFactoryCall(receiver, callableFactories);
       }
     }
     if (!accepted) ts.forEachChild(node, visit);
@@ -595,6 +684,7 @@ export function analyzeWorkflowOwnership(inputFiles) {
           familyAdapter,
           relativePath,
           familyAdapters.get(familyAdapter),
+          files,
         ),
       )
       .sort();

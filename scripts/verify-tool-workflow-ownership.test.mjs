@@ -133,8 +133,8 @@ test('dynamic imports keep presentation lifecycle ownership reachable', () => {
         'export async function load() { return import(`../../components/ToolView`); }',
       ],
       [
-        'apps/tools/components/ToolView.tsx',
-        "export default function ToolView() { const worker = new window.Worker('worker.js'); return <button onClick={() => worker.terminate()}>Run</button>; }",
+        'apps/tools/components/ToolView/index.mts',
+        "export default function ToolView() { return new window.Worker('worker.js'); }",
       ],
     ]),
   );
@@ -153,7 +153,7 @@ test('reachable colocated route presentation cannot own lifecycle primitives', (
         "import View from './View'; export default View;",
       ],
       [
-        'apps/tools/app/tool/View.tsx',
+        'apps/tools/app/tool/View.jsx',
         'export default function View() { const url = URL.createObjectURL(new Blob()); return <div>{url}</div>; }',
       ],
     ]),
@@ -173,7 +173,7 @@ test('default telemetry facade wrappers retain raw terminal ownership', () => {
       ],
       [
         'apps/tools/lib/run-facade.ts',
-        "import { beginToolRun as rawStart } from './telemetry'; export default function start(options) { return rawStart(options); }",
+        "import { beginToolRun as rawStart } from './telemetry'; export default function (options) { return rawStart(options); }",
       ],
       [
         'apps/tools/lib/telemetry.ts',
@@ -283,7 +283,7 @@ test('reachable family adapters must cross the accepted workflow.run seam', () =
     new Map([
       [
         'apps/tools/app/tool/page.tsx',
-        "import { createBrowserTableWorkflow } from '../../lib/table-browser-workflow'; export default function Page() { const { workflow } = createBrowserTableWorkflow(); void workflow.run({}); return <div />; }",
+        "import { createBrowserTableWorkflow as create } from '../../lib/table-browser-workflow'; export default function Page() { const { workflow } = create(); void workflow.run({}); return <div />; }",
       ],
       [
         'apps/tools/lib/table-browser-workflow.ts',
@@ -314,6 +314,40 @@ test('reachable family adapters must cross the accepted workflow.run seam', () =
     unrelated.violations.map(({ concept }) => concept),
     ['missing-workflow-run'],
   );
+
+  const referenceOnly = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import { createBrowserTableWorkflow } from '../../lib/table-browser-workflow'; const unrelatedWorkflow = { factory: createBrowserTableWorkflow, run() {} }; export default function Page() { unrelatedWorkflow.run(); return <div />; }",
+      ],
+      [
+        'apps/tools/lib/table-browser-workflow.ts',
+        'export function createBrowserTableWorkflow() { return {}; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(
+    referenceOnly.violations.map(({ concept }) => concept),
+    ['missing-workflow-run'],
+  );
+
+  const adapterLocalUnrelated = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import { createBrowserTableWorkflow } from '../../lib/table-browser-workflow'; export default function Page() { createBrowserTableWorkflow(); return <div />; }",
+      ],
+      [
+        'apps/tools/lib/table-browser-workflow.ts',
+        'export function createBrowserTableWorkflow() { const unrelated = { run() {} }; unrelated.run(); return {}; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(
+    adapterLocalUnrelated.violations.map(({ concept }) => concept),
+    ['missing-workflow-run'],
+  );
 });
 
 test('new reachable browser workflow adapters enter seam and ownership enforcement automatically', () => {
@@ -325,7 +359,7 @@ test('new reachable browser workflow adapters enter seam and ownership enforceme
       ],
       [
         'apps/tools/lib/novel-browser-workflow.ts',
-        'export function createBrowserNovelWorkflow() { const url = URL.createObjectURL(new Blob()); return { url }; }',
+        'export const createBrowserNovelWorkflow = () => { const url = URL.createObjectURL(new Blob()); return { url }; };',
       ],
     ]),
   );
