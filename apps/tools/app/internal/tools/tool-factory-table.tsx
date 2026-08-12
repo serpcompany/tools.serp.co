@@ -32,6 +32,7 @@ import type {
   ToolFactoryRow,
   ToolSupportDisposition,
 } from '../../../lib/tool-factory-read-model.ts';
+import type { ToolFactoryDeployment } from '../../../lib/tool-factory-access.ts';
 
 type ToolFactoryTableModel = Pick<ToolFactoryReadModel, 'rows' | 'counts'>;
 
@@ -408,7 +409,13 @@ function ToolDetail({
   );
 }
 
-export function ToolFactoryTable({ model }: { model: ToolFactoryTableModel }) {
+export function ToolFactoryTable({
+  deployment,
+  model,
+}: {
+  deployment: ToolFactoryDeployment;
+  model: ToolFactoryTableModel;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
@@ -472,8 +479,11 @@ export function ToolFactoryTable({ model }: { model: ToolFactoryTableModel }) {
     <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-950 lg:px-8">
       <div className="mx-auto max-w-[1800px] space-y-4">
         <header>
-          <div className="text-xs font-medium uppercase tracking-widest text-blue-700">
-            Development · read only · source-owned facts
+          <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-widest">
+            <span className="rounded-full bg-blue-100 px-2.5 py-1 text-blue-800">
+              {deployment.environment}
+            </span>
+            <span className="text-slate-600">Read only · source-owned facts</span>
           </div>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">
             All Tools
@@ -483,6 +493,9 @@ export function ToolFactoryTable({ model }: { model: ToolFactoryTableModel }) {
             {model.counts.supported.toLocaleString()} supported ·{' '}
             {model.counts.unsupported.toLocaleString()} explicitly unsupported ·{' '}
             {model.counts.unknown.toLocaleString()} unknown
+          </p>
+          <p className="mt-1 font-mono text-xs text-slate-500">
+            Revision {deployment.revision}
           </p>
         </header>
 

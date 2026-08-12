@@ -26,6 +26,8 @@ test('Wayfinder preview is an isolated workers.dev environment', () => {
     NEXT_PUBLIC_SITE_URL:
       'https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev',
     TOOLS_SERP_SERVER_NATIVE_PROCESSORS: 'unavailable',
+    TOOLS_SERP_TOOL_FACTORY_ACCESS: 'cloudflare-access',
+    TOOLS_SERP_TOOL_FACTORY_ENVIRONMENT: 'DEV/STAGING',
   });
   assert.deepEqual(preview?.assets, {
     directory: '.open-next/assets',

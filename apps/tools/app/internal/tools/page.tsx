@@ -1,15 +1,44 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
+import {
+  authorizeToolFactoryRequest,
+  getToolFactoryAccessConfig,
+  getToolFactoryDeployment,
+} from '../../../lib/tool-factory-access.ts';
 import { buildToolFactoryReadModel } from '../../../lib/tool-factory-read-model.ts';
 import { ToolFactoryTable } from './tool-factory-table.tsx';
 
 export const dynamic = 'force-dynamic';
 
-export default function ToolFactoryPage() {
-  if (process.env.NODE_ENV === 'production') notFound();
+async function runtimeEnvironment() {
+  try {
+    const { env } = await getCloudflareContext({ async: true });
+    return { ...process.env, ...(env as Record<string, string | undefined>) };
+  } catch {
+    return process.env;
+  }
+}
+
+export default async function ToolFactoryPage() {
+  const environment = await runtimeEnvironment();
+  const deployment = getToolFactoryDeployment(environment);
+  if (!deployment) notFound();
+
+  if (deployment.requiresAccess) {
+    const access = getToolFactoryAccessConfig(environment);
+    const token = (await headers()).get('cf-access-jwt-assertion') ?? '';
+    if (!access || !(await authorizeToolFactoryRequest(token, access))) {
+      notFound();
+    }
+  }
 
   const model = buildToolFactoryReadModel();
   return (
-    <ToolFactoryTable model={{ rows: model.rows, counts: model.counts }} />
+    <ToolFactoryTable
+      deployment={deployment}
+      model={{ rows: model.rows, counts: model.counts }}
+    />
   );
 }

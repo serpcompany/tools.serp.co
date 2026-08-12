@@ -16,6 +16,8 @@ try {
     waitUntil: 'networkidle',
   });
   await page.getByRole('heading', { name: 'All Tools' }).waitFor();
+  await page.getByText('LOCAL', { exact: true }).waitFor();
+  await page.getByText('Revision working-copy', { exact: true }).waitFor();
   await page
     .getByText(
       '2,807 active Tools · 431 supported · 2,373 explicitly unsupported · 3 unknown',

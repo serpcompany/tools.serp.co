@@ -138,7 +138,7 @@ const evidence = recordRunEvidence({
   status: 'success',
   startedAt: startedAt.toISOString(),
   completedAt: completedAt.toISOString(),
-  linkedWork: ['#77'],
+  linkedWork: ['#77', '#107'],
   summary: {
     status: 'success',
     checksPassed: 2,

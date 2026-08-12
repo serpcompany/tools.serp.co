@@ -161,10 +161,22 @@ that operation. Prefer the project migration and import scripts above.
 Dashboard access:
 
 - Route: `/internal/tools`
-- Auth: query `token` must match the Worker secret
-  `INTERNAL_DASHBOARD_TOKEN` when that secret is set.
-- Data source: the `SERP_TOOLS_DB` D1 binding only. A missing binding is shown as
-  an error instead of falling back to another database.
+- Environment: the source-backed Tool Factory table is enabled only in the
+  named `wayfinder-preview` environment. Production remains disabled.
+- Auth: Cloudflare Access protects `/internal/tools*` for an explicitly
+  approved owner email. The application also verifies the signed Access JWT,
+  its team issuer, application audience, and exact email claim before rendering.
+- Runtime bindings: configure `TOOLS_SERP_CLOUDFLARE_ACCESS_TEAM_DOMAIN`,
+  `TOOLS_SERP_CLOUDFLARE_ACCESS_AUD`, and
+  `TOOLS_SERP_TOOL_FACTORY_ALLOWED_EMAIL` outside the repository. Do not put
+  the approved email or Access credentials in source, logs, or artifacts.
+- Display: the page visibly identifies `DEV/STAGING` and the full deployed
+  revision. Treat that pair as the boundary for any screenshot or browser
+  evidence.
+- Data source: the current table joins Catalog, processor, provenance,
+  controlled-verification, and revision-local coverage facts. Runtime
+  observations remain a separate evidence dimension and are not inferred from
+  support registration.
 
 ## Cache And Optimization Bindings
 
