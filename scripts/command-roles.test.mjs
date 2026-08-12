@@ -8,6 +8,63 @@ const rootPackage = JSON.parse(
 const toolsPackage = JSON.parse(
   readFileSync(new URL('../apps/tools/package.json', import.meta.url), 'utf8'),
 );
+const wranglerConfig = JSON.parse(
+  readFileSync(
+    new URL('../apps/tools/wrangler.jsonc', import.meta.url),
+    'utf8',
+  ),
+);
+
+test('Wayfinder preview is an isolated workers.dev environment', () => {
+  const preview = wranglerConfig.env?.['wayfinder-preview'];
+
+  assert.equal(preview?.name, 'tools-serp-co-wayfinder-preview');
+  assert.equal(preview?.workers_dev, true);
+  assert.deepEqual(preview?.routes, []);
+  assert.deepEqual(preview?.vars, {
+    NEXT_PUBLIC_ASSETS_BASE_URL: 'https://assets.tools.serp.co',
+    NEXT_PUBLIC_SITE_URL:
+      'https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev',
+  });
+  assert.deepEqual(preview?.assets, {
+    directory: '.open-next/assets',
+    binding: 'ASSETS',
+  });
+  assert.deepEqual(preview?.r2_buckets, [
+    {
+      binding: 'NEXT_INC_CACHE_R2_BUCKET',
+      bucket_name: 'tools-serp-co-inc-cache-preview',
+    },
+  ]);
+  assert.deepEqual(preview?.d1_databases, [
+    {
+      binding: 'SERP_TOOLS_DB',
+      database_name: 'serp-tools-preview',
+      database_id: '69ab9290-579f-4537-96a0-7d0dc3bede2f',
+      migrations_dir: 'migrations',
+    },
+  ]);
+  assert.deepEqual(preview?.services, [
+    {
+      binding: 'WORKER_SELF_REFERENCE',
+      service: 'tools-serp-co-wayfinder-preview',
+    },
+  ]);
+
+  assert.equal(wranglerConfig.name, 'tools-serp-co');
+  assert.deepEqual(wranglerConfig.routes, [
+    { pattern: 'tools.serp.co', custom_domain: true },
+  ]);
+  assert.equal(
+    wranglerConfig.d1_databases[0].database_id,
+    'da3d6222-cf0f-41fd-a8fb-4dc3e7d890db',
+  );
+  assert.equal(
+    wranglerConfig.r2_buckets[0].bucket_name,
+    'tools-serp-co-inc-cache',
+  );
+  assert.equal(wranglerConfig.services[0].service, 'tools-serp-co');
+});
 
 test('development, preview, canary, browser, and production commands name their roles', () => {
   assert.equal(
@@ -21,6 +78,14 @@ test('development, preview, canary, browser, and production commands name their 
   assert.equal(
     rootPackage.scripts['canary:cloudflare:deployed'],
     'pnpm -C apps/tools canary:cloudflare:deployed',
+  );
+  assert.equal(
+    rootPackage.scripts['prepare:cloudflare:wayfinder-preview'],
+    'pnpm -C apps/tools prepare:cloudflare:wayfinder-preview',
+  );
+  assert.equal(
+    rootPackage.scripts['deploy:cloudflare:wayfinder-preview'],
+    'pnpm -C apps/tools deploy:cloudflare:wayfinder-preview',
   );
   assert.equal(
     rootPackage.scripts['smoke:tools:browser'],
@@ -41,6 +106,14 @@ test('development, preview, canary, browser, and production commands name their 
   assert.equal(
     toolsPackage.scripts['canary:cloudflare:deployed'],
     'node scripts/canary-cloudflare-deployed.mjs',
+  );
+  assert.equal(
+    toolsPackage.scripts['prepare:cloudflare:wayfinder-preview'],
+    'node scripts/deploy-cloudflare-wayfinder-preview.mjs --dry-run',
+  );
+  assert.equal(
+    toolsPackage.scripts['deploy:cloudflare:wayfinder-preview'],
+    'node scripts/deploy-cloudflare-wayfinder-preview.mjs --deploy',
   );
   assert.equal(
     toolsPackage.scripts['deploy:cloudflare:production'],
@@ -126,6 +199,8 @@ test('command runbook documents side effects, authority, targets, and evidence',
   for (const command of [
     'pnpm dev:local',
     'pnpm preview:cloudflare:local',
+    'pnpm prepare:cloudflare:wayfinder-preview',
+    'deploy:cloudflare:wayfinder-preview',
     'pnpm canary:cloudflare:deployed',
     'pnpm smoke:tools:browser',
     'pnpm benchmark:tools:browser',
@@ -144,4 +219,11 @@ test('command runbook documents side effects, authority, targets, and evidence',
   assert.match(runbook, /human-controlled/i);
   assert.match(runbook, /structured artifact/i);
   assert.match(runbook, /safe reads by default/i);
+  assert.match(runbook, /tools-serp-co-wayfinder-preview/);
+  assert.match(runbook, /workers\.dev only/i);
+  assert.match(runbook, /exact 40-character commit/i);
+  assert.match(
+    runbook,
+    /deploy:cloudflare:wayfinder-preview[^\n]*ignored structured run evidence/,
+  );
 });

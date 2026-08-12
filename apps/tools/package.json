@@ -8,6 +8,8 @@
     "build": "next build && node scripts/copy-ffmpeg.mjs && node scripts/copy-magick-wasm.mjs",
     "cf:build": "node scripts/build-cloudflare.mjs",
     "preview:cloudflare:local": "pnpm cf:build && wrangler dev --local",
+    "prepare:cloudflare:wayfinder-preview": "node scripts/deploy-cloudflare-wayfinder-preview.mjs --dry-run",
+    "deploy:cloudflare:wayfinder-preview": "node scripts/deploy-cloudflare-wayfinder-preview.mjs --deploy",
     "deploy:cloudflare:production": "pnpm cf:build && wrangler deploy",
     "generate:cloudflare:types": "wrangler types",
     "canary:cloudflare:deployed": "node scripts/canary-cloudflare-deployed.mjs",

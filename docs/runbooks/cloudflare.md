@@ -12,6 +12,21 @@ database, and cache bindings.
 - Production host after cutover: `https://tools.serp.co`
 - Runtime config source of truth: `apps/tools/wrangler.jsonc`
 
+Wayfinder acceptance uses the isolated named environment
+`wayfinder-preview`:
+
+- Worker name: `tools-serp-co-wayfinder-preview`
+- Origin: `https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev`
+- Routes: none; workers.dev only
+- D1 database ID: `69ab9290-579f-4537-96a0-7d0dc3bede2f`
+- R2 cache bucket: `tools-serp-co-inc-cache-preview`
+- Self-reference service: `tools-serp-co-wayfinder-preview`
+
+Wrangler environment variables and bindings are non-inheritable, while routes
+are inheritable. The named environment therefore restates all bindings and
+uses an explicit empty route list so it cannot receive the production custom
+domain.
+
 Do not commit Cloudflare API tokens, dashboard tokens, legacy platform env
 dumps, or raw database credentials. Secrets belong in Cloudflare Worker secrets
 or the deployment system.
@@ -229,6 +244,7 @@ live-system operations and must name their target:
 pnpm -C apps/tools lint
 pnpm -C apps/tools typecheck
 pnpm -C apps/tools cf:build
+pnpm prepare:cloudflare:wayfinder-preview -- --revision <40-character-commit>
 pnpm canary:cloudflare:deployed -- \
   --environment preview \
   --base-url <deployed-preview-origin> \
