@@ -33,6 +33,10 @@ import type {
   ToolFactoryRow,
   ToolSupportDisposition,
 } from '../../../lib/tool-factory-read-model.ts';
+import type {
+  ToolExpansionGroup,
+  ToolExpansionPlan,
+} from '../../../lib/tool-expansion-planner.ts';
 import type { ToolFactoryDeployment } from '../../../lib/tool-factory-access.ts';
 import {
   DEFAULT_TOOL_FACTORY_VIEW,
@@ -351,6 +355,182 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
+const blockerLabels = {
+  adapter: 'adapter',
+  'browser-runtime-fit': 'browser/runtime fit',
+  fixture: 'fixture',
+  'semantic-validator': 'semantic validator',
+  limits: 'limits',
+  licensing: 'licensing',
+  'maintenance-review': 'maintenance review',
+} as const;
+
+function ExpansionGroupCard({
+  group,
+  active,
+  onSelect,
+}: {
+  group: ToolExpansionGroup;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <article
+      aria-label={`Rank ${group.rank} ${group.operationFamily}`}
+      className={`rounded-lg border p-4 ${active ? 'border-blue-500 bg-blue-50' : 'bg-white'}`}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Rank {group.rank}
+          </div>
+          <h3 className="font-mono text-sm font-semibold text-slate-950">
+            {group.operationFamily}
+          </h3>
+          <p className="mt-1 text-sm font-medium text-blue-800">
+            {group.unlockCount.toLocaleString()} exact Tools
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant={active ? 'default' : 'outline'}
+          onClick={onSelect}
+        >
+          Show {group.unlockCount.toLocaleString()} exact Tools
+        </Button>
+      </div>
+      <dl className="mt-3 grid gap-2 text-sm md:grid-cols-2">
+        <div>
+          <dt className="font-medium text-slate-600">Input formats</dt>
+          <dd className="break-words text-slate-900">
+            {joined(group.inputFormats)}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-slate-600">Output formats</dt>
+          <dd className="break-words text-slate-900">
+            {joined(group.outputFormats)}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-slate-600">
+            Candidate libraries / engines
+          </dt>
+          <dd className="space-y-1 text-slate-900">
+            {group.candidateEngines.map((engine) => (
+              <div key={engine.id}>
+                {engine.identity}
+                <span className="ml-1 text-xs text-slate-500">
+                  (candidate only)
+                </span>
+              </div>
+            ))}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-slate-600">Execution locations</dt>
+          <dd className="text-slate-900">{joined(group.executionLocations)}</dd>
+        </div>
+      </dl>
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {group.blockers.map((blocker) => (
+          <span
+            key={blocker.kind}
+            title={blocker.explanation}
+            className="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-xs text-amber-900"
+          >
+            {blockerLabels[blocker.kind]} · {blocker.status.replace('-', ' ')}
+          </span>
+        ))}
+      </div>
+      <details className="mt-3 text-sm text-slate-700">
+        <summary className="cursor-pointer font-medium">
+          Facts, assumptions, and exact Tool IDs
+        </summary>
+        <div className="mt-2 grid gap-3 md:grid-cols-2">
+          <div>
+            <h4 className="font-medium text-slate-900">Facts</h4>
+            <ul className="mt-1 list-disc space-y-1 pl-5">
+              {group.facts.map((fact) => (
+                <li key={fact.statement}>
+                  {fact.statement}{' '}
+                  <span className="text-xs text-slate-500">
+                    Source: {fact.source}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-medium text-slate-900">Assumptions</h4>
+            <ul className="mt-1 list-disc space-y-1 pl-5">
+              {group.assumptions.map((assumption) => (
+                <li key={assumption}>{assumption}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p className="mt-3 break-words font-mono text-xs text-slate-600">
+          {group.toolIds.join(', ')}
+        </p>
+      </details>
+    </article>
+  );
+}
+
+function ToolExpansionPlanner({
+  plan,
+  activeGroupId,
+  onSelect,
+}: {
+  plan: ToolExpansionPlan;
+  activeGroupId: string | null;
+  onSelect: (group: ToolExpansionGroup) => void;
+}) {
+  return (
+    <section
+      aria-label="OSS expansion planner"
+      className="rounded-xl border bg-white p-4 shadow-sm"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold">OSS expansion planner</h2>
+          <p className="mt-1 max-w-4xl text-sm text-slate-600">
+            {plan.groups.length.toLocaleString()} review groups account for all{' '}
+            {plan.unsupportedToolCount.toLocaleString()} explicitly unsupported
+            Tools. Ranking method: {plan.ranking.method}
+          </p>
+        </div>
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+          Read-only planning
+        </span>
+      </div>
+      <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-950">
+        {plan.supportNotice}
+      </p>
+      <div className="mt-3 rounded-md bg-slate-50 p-3 text-sm text-slate-700">
+        <strong>Ranking assumptions:</strong>{' '}
+        {plan.ranking.assumptions.join(' ')}
+      </div>
+      <details className="mt-3" open>
+        <summary className="cursor-pointer text-sm font-medium text-slate-900">
+          Review all {plan.groups.length.toLocaleString()} groups
+        </summary>
+        <div className="mt-3 max-h-[42rem] space-y-3 overflow-y-auto pr-1">
+          {plan.groups.map((group) => (
+            <ExpansionGroupCard
+              key={group.id}
+              group={group}
+              active={activeGroupId === group.id}
+              onSelect={() => onSelect(group)}
+            />
+          ))}
+        </div>
+      </details>
+    </section>
+  );
+}
+
 function familyPolicyExplanation(row: ToolFactoryRow) {
   if (
     row.controlledVerification.classification ===
@@ -571,9 +751,11 @@ function ToolDetail({
 export function ToolFactoryTable({
   deployment,
   model,
+  expansionPlan,
 }: {
   deployment: ToolFactoryDeployment;
   model: ToolFactoryTableModel;
+  expansionPlan: ToolExpansionPlan;
 }) {
   const [view, setView] = useState<ToolFactoryViewState>(
     DEFAULT_TOOL_FACTORY_VIEW,
@@ -597,7 +779,17 @@ export function ToolFactoryTable({
       unique(model.rows, (row) => row.controlledVerification.classification),
     [model.rows],
   );
-  const rows = useMemo(() => [...model.rows], [model.rows]);
+  const activeExpansionGroup = useMemo(
+    () =>
+      expansionPlan.groups.find((group) => group.id === view.expansionGroup) ??
+      null,
+    [expansionPlan.groups, view.expansionGroup],
+  );
+  const rows = useMemo(() => {
+    if (!activeExpansionGroup) return [...model.rows];
+    const memberIds = new Set(activeExpansionGroup.toolIds);
+    return model.rows.filter((row) => memberIds.has(row.toolId));
+  }, [activeExpansionGroup, model.rows]);
 
   useEffect(() => {
     function restoreFromUrl() {
@@ -605,6 +797,7 @@ export function ToolFactoryTable({
         parseToolFactoryView(globalThis.location.search, {
           families: familyValues,
           profiles: profileValues,
+          expansionGroups: expansionPlan.groups.map((group) => group.id),
         }),
       );
     }
@@ -612,7 +805,7 @@ export function ToolFactoryTable({
     restoreFromUrl();
     globalThis.addEventListener('popstate', restoreFromUrl);
     return () => globalThis.removeEventListener('popstate', restoreFromUrl);
-  }, [familyValues, profileValues]);
+  }, [expansionPlan.groups, familyValues, profileValues]);
 
   const commitView = useCallback(
     (next: ToolFactoryViewState, historyMode: 'push' | 'replace' = 'push') => {
@@ -753,6 +946,36 @@ export function ToolFactoryTable({
             Revision {deployment.revision}
           </p>
         </header>
+
+        <ToolExpansionPlanner
+          plan={expansionPlan}
+          activeGroupId={view.expansionGroup || null}
+          onSelect={(group) => {
+            setSelected(null);
+            commitView({
+              ...DEFAULT_TOOL_FACTORY_VIEW,
+              expansionGroup: group.id,
+            });
+          }}
+        />
+
+        {activeExpansionGroup && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950">
+            <strong>
+              Filtering to rank {activeExpansionGroup.rank} ·{' '}
+              {activeExpansionGroup.operationFamily}
+            </strong>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                commitView(DEFAULT_TOOL_FACTORY_VIEW);
+              }}
+            >
+              Clear expansion filter
+            </Button>
+          </div>
+        )}
 
         <section className="rounded-xl border bg-white shadow-sm">
           <div className="flex flex-wrap items-center gap-2 border-b p-3">

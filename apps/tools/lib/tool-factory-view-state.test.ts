@@ -11,6 +11,10 @@ import {
 const options = {
   families: ['renderer:transcription', 'generic-convert:browser-raster'],
   profiles: ['client-only', 'server-assisted'],
+  expansionGroups: [
+    'family:generic-convert:adaptive-video',
+    'family:generic-convert:browser-raster',
+  ],
 };
 
 test('shareable Tool view round-trips search, filters, sorting, columns, page, and rows', () => {
@@ -20,6 +24,7 @@ test('shareable Tool view round-trips search, filters, sorting, columns, page, a
   );
 
   assert.deepEqual(view, {
+    expansionGroup: '',
     search: 'audio',
     filters: {
       support: 'supported',
@@ -64,4 +69,28 @@ test('stale page numbers clamp to the last page that contains Tools', () => {
   assert.equal(clampToolFactoryPageIndex(999_998, 2_807, 50), 56);
   assert.equal(clampToolFactoryPageIndex(9, 0, 50), 0);
   assert.equal(clampToolFactoryPageIndex(1, 26, 25), 1);
+});
+
+test('shareable Tool view round-trips one validated expansion group', () => {
+  const view = parseToolFactoryView(
+    '?expansion=family%3Ageneric-convert%3Aadaptive-video',
+    options,
+  );
+
+  assert.equal(view.expansionGroup, 'family:generic-convert:adaptive-video');
+  assert.equal(
+    serializeToolFactoryView(view),
+    '?expansion=family%3Ageneric-convert%3Aadaptive-video',
+  );
+});
+
+test('unknown expansion group cannot enter canonical Tool view state', () => {
+  const view = parseToolFactoryView(
+    '?expansion=family%3Ainvented&support=unsupported',
+    options,
+  );
+
+  assert.equal(view.expansionGroup, '');
+  assert.equal(serializeToolFactoryView(view), '?support=unsupported');
+  assert.equal(DEFAULT_TOOL_FACTORY_VIEW.expansionGroup, '');
 });
