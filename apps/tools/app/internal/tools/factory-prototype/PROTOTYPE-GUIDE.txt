@@ -1,0 +1,33 @@
+TOOL FACTORY TABLE — FIVE-MINUTE REVIEW
+
+Start it
+  pnpm dev:local
+
+Open it
+  http://localhost:3000/internal/tools/factory-prototype
+
+This route is throwaway, local-only, and read-only. It is deliberately unavailable in production.
+
+Minute 1 — Scan
+  Scan the default Tool, status, operation, family, library, runtime, verification, and attention columns. Ask: can you understand the portfolio without opening anything?
+
+Minute 2 — Find
+  Search for a Tool, library, format, or blocker. Filter by status, family, runtime, and verification.
+
+Minute 3 — Configure
+  Open Columns. Show or hide anything. Sort headers, resize columns, and change rows per page.
+
+Minute 4 — Inspect
+  Click a Tool row. Check whether the full detail is understandable and whether an important fact is absent.
+
+Minute 5 — Decide
+  Name the columns you want visible by default, columns you never need, and any status/filter wording that is confusing.
+
+Tell us only:
+  1. Which columns should be visible by default?
+  2. What was confusing?
+  3. What information or filters were missing?
+
+Evidence notes
+  Portfolio projection: local versioned sources at b6390254430d6baf49fa79df16b04eed64230d7b.
+  No production telemetry is queried or implied.
