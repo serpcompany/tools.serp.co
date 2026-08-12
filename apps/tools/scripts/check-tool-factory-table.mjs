@@ -344,6 +344,21 @@ try {
   await page.getByLabel('Search all Tools').fill('audio-to-text');
   await page.getByRole('row', { name: /Audio to Text/ }).click();
   const familyDialog = page.getByRole('dialog');
+  await familyDialog.getByText('User journeys', { exact: true }).waitFor();
+  await familyDialog.getByText('File upload', { exact: true }).waitFor();
+  await familyDialog.getByText('Direct media URL', { exact: true }).waitFor();
+  await familyDialog
+    .getByText('YouTube or extractor URL', { exact: true })
+    .waitFor();
+  await familyDialog
+    .getByText('audio-to-text:upload', { exact: true })
+    .waitFor();
+  await familyDialog
+    .getByText('audio-to-text:direct-url', { exact: true })
+    .waitFor();
+  await familyDialog
+    .getByText('audio-to-text:extractor-url', { exact: true })
+    .waitFor();
   await familyDialog
     .getByText('Family test evidence — not an exact Tool test', { exact: true })
     .waitFor();

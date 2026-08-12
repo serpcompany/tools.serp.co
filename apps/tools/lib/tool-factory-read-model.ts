@@ -11,6 +11,7 @@ import {
 } from './tool-execution-provenance.ts';
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
+import { toolJourneys, type ToolJourney } from './tool-journeys.ts';
 import {
   buildToolGithubWorkIndex,
   retainedToolGithubWorkSnapshot,
@@ -46,6 +47,7 @@ export type ToolFactoryRow = Readonly<{
     requiresFFmpeg: boolean;
   }>;
   family: string;
+  journeys: readonly ToolJourney[];
   support: Readonly<{
     disposition: ToolSupportDisposition;
     adapterId: string | null;
@@ -281,6 +283,7 @@ function buildRow(
       requiresFFmpeg: tool.requiresFFmpeg,
     },
     family: processorFamily(tool.operation, renderer, tool.from, tool.to),
+    journeys: toolJourneys.getByToolId(tool.id),
     support: {
       disposition,
       adapterId: availability.kind === 'wired' ? availability.adapterId : null,

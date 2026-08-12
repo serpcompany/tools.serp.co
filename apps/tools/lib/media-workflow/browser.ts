@@ -78,7 +78,10 @@ export function createBrowserMediaWorkflow(
               : undefined,
           metadata: {
             source: request.input.kind,
-            runtimePath: classifyMediaRuntimePath(request.input),
+            runtimePath: classifyMediaRuntimePath(
+              request.toolId,
+              request.input,
+            ),
           },
         };
       },

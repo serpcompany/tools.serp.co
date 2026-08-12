@@ -1,22 +1,5 @@
 import crypto from 'node:crypto';
-
-const invariantByToolId = Object.freeze({
-  'png-to-webp': 'generic-file-exact-output',
-  'bmp-to-jpeg': 'bmp-decoded-content-semantics',
-  'bmp-to-jpg': 'bmp-decoded-content-semantics',
-  'bmp-to-pdf': 'bmp-pdf-page-image-semantics',
-  'bmp-to-png': 'bmp-decoded-content-semantics',
-  'bmp-to-webp': 'bmp-decoded-content-semantics',
-  'video-downloader': 'url-stream-exact-output',
-  'batch-compress-png': 'batch-archive-semantics',
-  'csv-to-json': 'table-row-header-value-semantics',
-  'json-to-csv': 'specialized-output-semantics',
-  'html-to-markdown': 'specialized-output-semantics',
-  'character-counter': 'specialized-output-semantics',
-  'csv-combiner': 'specialized-output-semantics',
-  'pdf-reader': 'specialized-output-semantics',
-  'audio-to-text': 'transcription-terminal',
-});
+import { toolJourneys } from '../../apps/tools/lib/tool-journeys.ts';
 
 export function buildBrowserScope({ mode, environment, toolIds, filtered }) {
   const selection = filtered ? 'subset' : 'all';
@@ -29,14 +12,21 @@ export function buildBrowserScope({ mode, environment, toolIds, filtered }) {
     inputHashes: [`sha256:${digest}`],
     tools: Object.freeze(
       toolIds.map((toolId) =>
-        Object.freeze({
-          toolId,
-          invariants: Object.freeze(
-            mode === 'smoke' && invariantByToolId[toolId]
-              ? [invariantByToolId[toolId]]
-              : [],
-          ),
-        }),
+        (() => {
+          const journeys =
+            mode === 'smoke' ? toolJourneys.getBrowserTargets(toolId) : [];
+          return Object.freeze({
+            toolId,
+            journeyIds: Object.freeze(journeys.map((journey) => journey.id)),
+            invariants: Object.freeze([
+              ...new Set(
+                journeys
+                  .map((journey) => journey.semanticInvariant.id)
+                  .filter(Boolean),
+              ),
+            ]),
+          });
+        })(),
       ),
     ),
   };

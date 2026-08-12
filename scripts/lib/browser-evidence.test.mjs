@@ -19,14 +19,17 @@ test('smoke scope retains semantic invariants associated with each Tool id', () 
   assert.deepEqual(evidence.tools, [
     {
       toolId: 'png-to-webp',
+      journeyIds: ['png-to-webp:upload'],
       invariants: ['generic-file-exact-output'],
     },
     {
       toolId: 'video-downloader',
+      journeyIds: ['video-downloader:direct-url'],
       invariants: ['url-stream-exact-output'],
     },
     {
       toolId: 'csv-to-json',
+      journeyIds: ['csv-to-json:upload'],
       invariants: ['table-row-header-value-semantics'],
     },
   ]);
@@ -47,11 +50,31 @@ test('BMP smoke scope names decoded raster and PDF content invariants', () => {
       filtered: true,
     }).tools,
     [
-      { toolId: 'bmp-to-jpeg', invariants: ['bmp-decoded-content-semantics'] },
-      { toolId: 'bmp-to-jpg', invariants: ['bmp-decoded-content-semantics'] },
-      { toolId: 'bmp-to-pdf', invariants: ['bmp-pdf-page-image-semantics'] },
-      { toolId: 'bmp-to-png', invariants: ['bmp-decoded-content-semantics'] },
-      { toolId: 'bmp-to-webp', invariants: ['bmp-decoded-content-semantics'] },
+      {
+        toolId: 'bmp-to-jpeg',
+        journeyIds: ['bmp-to-jpeg:upload'],
+        invariants: ['bmp-decoded-content-semantics'],
+      },
+      {
+        toolId: 'bmp-to-jpg',
+        journeyIds: ['bmp-to-jpg:upload'],
+        invariants: ['bmp-decoded-content-semantics'],
+      },
+      {
+        toolId: 'bmp-to-pdf',
+        journeyIds: ['bmp-to-pdf:upload'],
+        invariants: ['bmp-pdf-page-image-semantics'],
+      },
+      {
+        toolId: 'bmp-to-png',
+        journeyIds: ['bmp-to-png:upload'],
+        invariants: ['bmp-decoded-content-semantics'],
+      },
+      {
+        toolId: 'bmp-to-webp',
+        journeyIds: ['bmp-to-webp:upload'],
+        invariants: ['bmp-decoded-content-semantics'],
+      },
     ],
   );
 });
@@ -65,8 +88,8 @@ test('benchmark scope identifies Tools without claiming semantic correctness', (
   });
 
   assert.deepEqual(evidence.tools, [
-    { toolId: 'png-to-webp', invariants: [] },
-    { toolId: 'video-downloader', invariants: [] },
+    { toolId: 'png-to-webp', journeyIds: [], invariants: [] },
+    { toolId: 'video-downloader', journeyIds: [], invariants: [] },
   ]);
 });
 

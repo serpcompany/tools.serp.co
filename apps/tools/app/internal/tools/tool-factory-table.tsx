@@ -788,6 +788,62 @@ function FamilyVerificationPolicy({ row }: { row: ToolFactoryRow }) {
   );
 }
 
+function journeyInputLabel(
+  kind: ToolFactoryRow['journeys'][number]['input']['kind'],
+) {
+  return {
+    file: 'File upload',
+    'multiple-files': 'Multiple file upload',
+    text: 'Entered text',
+    'direct-url': 'Direct media URL',
+    'extractor-url': 'YouTube or extractor URL',
+    'local-editor': 'Local editor interaction',
+    unknown: 'Unknown input path',
+  }[kind];
+}
+
+function ToolJourneys({ row }: { row: ToolFactoryRow }) {
+  return (
+    <section className="rounded-lg border p-4">
+      <h3 className="text-sm font-semibold text-slate-950">User journeys</h3>
+      <p className="mt-1 text-sm text-slate-600">
+        Each path is verified separately. Listing a journey here is not a test
+        result.
+      </p>
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
+        {row.journeys.map((journey) => (
+          <article key={journey.id} className="rounded-md bg-slate-50 p-3">
+            <h4 className="text-sm font-semibold text-slate-900">
+              {journeyInputLabel(journey.input.kind)}
+            </h4>
+            <dl className="mt-2 space-y-1 text-sm">
+              <div>
+                <dt className="inline text-slate-500">Needs: </dt>
+                <dd className="inline font-medium">
+                  {journey.requiredEnvironment === 'browser'
+                    ? 'Browser'
+                    : journey.requiredEnvironment === 'preview'
+                      ? 'DEV/STAGING preview'
+                      : 'Unknown environment'}
+                </dd>
+              </div>
+              <div>
+                <dt className="inline text-slate-500">Must prove: </dt>
+                <dd className="inline font-medium">
+                  {journey.semanticInvariant.id ?? 'Not defined yet'}
+                </dd>
+              </div>
+            </dl>
+            <p className="mt-2 font-mono text-xs text-slate-500">
+              {journey.id}
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function GithubWorkList({ scope }: { scope: ToolGithubWorkScopeView }) {
   if (!scope.links.length) {
     return (
@@ -1014,6 +1070,7 @@ function ToolDetail({
             />
             <Fact label="Route" value={row.route} />
           </dl>
+          <ToolJourneys row={row} />
           <RecentStagingActivity
             portfolio={runtimeObservations}
             toolId={row.toolId}
