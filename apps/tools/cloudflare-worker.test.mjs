@@ -55,10 +55,20 @@ test(
     const wasm = Buffer.from([0, 97, 115, 109]);
     const upstreamRequests = [];
     const upstream = http.createServer((request, response) => {
-      upstreamRequests.push(request.url);
+      upstreamRequests.push({
+        authorization: request.headers.authorization,
+        cookie: request.headers.cookie,
+        internal: request.headers["x-internal-secret"],
+        ifNoneMatch: request.headers["if-none-match"],
+        range: request.headers.range,
+        url: request.url,
+      });
       response.writeHead(200, {
         "cache-control": "public,max-age=31536000,immutable",
         "content-type": "application/wasm",
+        etag: '"ffmpeg-fixture"',
+        "set-cookie": "upstream-session=owned; Path=/; HttpOnly",
+        "x-upstream-secret": "must-not-cross-app-origin",
       });
       response.end(wasm);
     });
@@ -78,7 +88,14 @@ test(
       assert.ok(address && typeof address !== "string");
       const workerResponse = await worker.fetch(
         new Request(`http://127.0.0.1:${address.port}${request.url}`, {
-          headers: request.headers,
+          headers: {
+            ...request.headers,
+            authorization: "Bearer private-app-token",
+            cookie: "session=private-app-session",
+            "if-none-match": '"browser-cache"',
+            range: "bytes=0-3",
+            "x-internal-secret": "private-app-header",
+          },
           method: request.method,
         }),
         {
@@ -111,21 +128,41 @@ test(
         contentType: response.headers.get("content-type"),
         cors: response.headers.get("access-control-allow-origin"),
         corp: response.headers.get("cross-origin-resource-policy"),
+        etag: response.headers.get("etag"),
+        setCookie: response.headers.get("set-cookie"),
         status: response.status,
+        upstreamSecret: response.headers.get("x-upstream-secret"),
       };
     });
+    const appCookies = await page.context().cookies(
+      `http://127.0.0.1:${appAddress.port}`,
+    );
 
     assert.deepEqual(result, {
       bytes: [...wasm],
       contentType: "application/wasm",
       cors: "*",
       corp: "same-origin",
+      etag: '"ffmpeg-fixture"',
+      setCookie: null,
       status: 200,
+      upstreamSecret: null,
     });
     assert.deepEqual(upstreamRequests, [
-      "/vendor/ffmpeg-st/ffmpeg-core.wasm",
+      {
+        authorization: undefined,
+        cookie: undefined,
+        internal: undefined,
+        ifNoneMatch: '"browser-cache"',
+        range: "bytes=0-3",
+        url: "/vendor/ffmpeg-st/ffmpeg-core.wasm",
+      },
     ]);
     assert.deepEqual(failures, []);
+    assert.deepEqual(
+      appCookies.filter((cookie) => cookie.name === "upstream-session"),
+      [],
+    );
   },
 );
 

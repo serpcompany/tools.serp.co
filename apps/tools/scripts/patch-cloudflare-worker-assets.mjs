@@ -18,8 +18,20 @@ const ASSET_ADAPTER = `        const assetUrl = new URL(request.url);
                 });
             }
             const upstreamUrl = new URL(assetUrl.pathname, env.NEXT_PUBLIC_ASSETS_BASE_URL);
-            const upstreamResponse = await fetch(new Request(upstreamUrl, request));
-            const upstreamHeaders = new Headers(upstreamResponse.headers);
+            const upstreamRequestHeaders = new Headers();
+            for (const headerName of ["Range", "If-Range", "If-None-Match", "If-Modified-Since"]) {
+                const headerValue = request.headers.get(headerName);
+                if (headerValue !== null) upstreamRequestHeaders.set(headerName, headerValue);
+            }
+            const upstreamResponse = await fetch(upstreamUrl, {
+                method: request.method,
+                headers: upstreamRequestHeaders,
+            });
+            const upstreamHeaders = new Headers();
+            for (const headerName of ["Content-Type", "Content-Length", "Content-Range", "Accept-Ranges", "Cache-Control", "ETag", "Last-Modified"]) {
+                const headerValue = upstreamResponse.headers.get(headerName);
+                if (headerValue !== null) upstreamHeaders.set(headerName, headerValue);
+            }
             upstreamHeaders.set("Access-Control-Allow-Origin", "*");
             upstreamHeaders.set("Cross-Origin-Resource-Policy", "same-origin");
             return new Response(upstreamResponse.body, {
@@ -61,6 +73,8 @@ export function verifyCloudflareIsolationBuild({ workerSource, assetsDirectory }
   for (const expected of [
     'ffmpegAssetPaths.has(assetUrl.pathname)',
     'new URL(assetUrl.pathname, env.NEXT_PUBLIC_ASSETS_BASE_URL)',
+    'const upstreamRequestHeaders = new Headers()',
+    'const upstreamHeaders = new Headers()',
     'upstreamHeaders.set("Access-Control-Allow-Origin", "*")',
     'upstreamHeaders.set("Cross-Origin-Resource-Policy", "same-origin")',
     'assetUrl.pathname.startsWith("/_next/static/chunks/")',
