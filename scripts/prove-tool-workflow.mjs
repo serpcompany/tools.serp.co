@@ -185,7 +185,7 @@ async function withRevisionServer(repositoryRoot, revision, label, action) {
     child = spawn(
       process.execPath,
       [
-        path.join(worktree, 'node_modules/next/dist/bin/next'),
+        path.join(worktree, 'apps/tools/node_modules/next/dist/bin/next'),
         'dev',
         '--hostname',
         '127.0.0.1',
