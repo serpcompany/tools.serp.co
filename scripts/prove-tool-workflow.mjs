@@ -41,6 +41,7 @@ writes ignored retained-debug evidence. It does not deploy anything.
 `;
 
 function parseArguments(arguments_) {
+  if (arguments_[0] === '--') arguments_ = arguments_.slice(1);
   if (arguments_.includes('--help') || arguments_.includes('-h')) {
     return { help: true };
   }

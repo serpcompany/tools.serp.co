@@ -34,3 +34,17 @@ test('CLI help exposes the fixed historical default without silently applying it
   );
   assert.match(result.stdout, /both arguments are required/i);
 });
+
+test('pnpm argument separator reaches the CLI without changing the public seam', () => {
+  const result = spawnSync(
+    process.execPath,
+    ['scripts/prove-tool-workflow.mjs', '--', '--baseline', 'bad', '--current', 'bad'],
+    { encoding: 'utf8' },
+  );
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /full 40-character Git commit|consumed current proof inputs must be clean/i,
+  );
+  assert.doesNotMatch(result.stderr, /^Usage:/);
+});
