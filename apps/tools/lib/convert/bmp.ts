@@ -12,16 +12,10 @@ import {
 import { decodedAllocationExceeds } from '../tool-workflow/image-allocation-limits.ts';
 import type { SemanticVerification } from '../tool-workflow/index.ts';
 
-export const BMP_CONVERSION_TOOL_IDS = Object.freeze([
-  'bmp-to-jpeg',
-  'bmp-to-jpg',
-  'bmp-to-pdf',
-  'bmp-to-png',
-  'bmp-to-webp',
-] as const);
-
-export const BMP_CONVERSION_TOOL_IDS_SHA256 =
-  'sha256:e079eafef5b2221a25a123f5bb65d20f9cf95c81ed01b24426b328b345a2f99d';
+export {
+  BMP_CONVERSION_TOOL_IDS,
+  BMP_CONVERSION_TOOL_IDS_SHA256,
+} from './bmp-contract.ts';
 
 export const BMP_ENGINE_CONTRACT = Object.freeze({
   decode: 'browser-platform-image-codec',
@@ -199,7 +193,11 @@ function hasExactImagePlacement(
     if (draw) {
       if (draw[1] !== imageName) return false;
       const expected: PdfMatrix = [width, 0, 0, height, 0, 0];
-      if (!matrix.every((value, index) => Math.abs(value - expected[index]!) < 0.01)) {
+      if (
+        !matrix.every(
+          (value, index) => Math.abs(value - expected[index]!) < 0.01,
+        )
+      ) {
         return false;
       }
       matchingDraws += 1;

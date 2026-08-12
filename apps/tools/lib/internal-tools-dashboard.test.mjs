@@ -40,10 +40,21 @@ test('internal evidence joins preserve Catalog intent separately from observatio
   assert.equal(joined[0].evidence, knownEvidence);
 });
 
-test('internal Tool page consumes the Catalog join instead of raw registry data', () => {
-  const source = readFileSync('apps/tools/app/internal/tools/page.tsx', 'utf8');
-  assert.match(source, /joinToolEvidence/);
-  assert.doesNotMatch(source, /data\/tools\.json|toolsData|toolMap/);
+test('internal Tool page consumes its Catalog-backed read model instead of raw registry data', () => {
+  const pageSource = readFileSync(
+    'apps/tools/app/internal/tools/page.tsx',
+    'utf8',
+  );
+  const modelSource = readFileSync(
+    'apps/tools/lib/tool-factory-read-model.ts',
+    'utf8',
+  );
+  assert.match(pageSource, /buildToolFactoryReadModel/);
+  assert.match(modelSource, /toolCatalog/);
+  assert.doesNotMatch(
+    `${pageSource}\n${modelSource}`,
+    /data\/tools\.json|toolsData|toolMap/,
+  );
 });
 
 test('internal Tool dashboard controls uninitialized D1 errors without exposing database details', () => {
