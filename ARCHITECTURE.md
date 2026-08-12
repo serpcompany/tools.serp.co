@@ -103,6 +103,17 @@ provenance remains explicitly unwired until a production family migration
 registers an adapter, and neither support nor validator results become Catalog
 intent or runtime telemetry.
 
+Browser lifecycle policy is owned by
+`apps/tools/lib/browser-workflow-lifecycle.ts`. Its small interface supplies
+terminal telemetry, delivery/object-URL ownership, and latest-result reading to
+family adapters behind `ToolWorkflow.run`. Tool presentation modules may own
+Tool-specific controls, copy, and snapshot rendering; processors may own
+Tool-specific Worker and stream implementations. Neither presentation nor
+family adapters may recreate the shared browser lifecycle. The tracked-source
+verifier in `scripts/verify-tool-workflow-ownership.mjs` follows application
+imports, reports the accepted interface with an actionable migration, and is
+part of the canonical `pnpm check` gate.
+
 The streamed-media adapter registration in
 `apps/tools/lib/media-workflow/adapter-registration.ts` projects executable
 families explicitly. Its downloader family is the active Tool-id set owned by

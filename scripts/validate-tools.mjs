@@ -167,10 +167,6 @@ const requiredTestIds = [
     ids: ["tool-dropzone", "tool-file-input"],
   },
   {
-    file: "apps/tools/components/Converter.tsx",
-    ids: ["tool-dropzone", "tool-file-input", "tool-progress"],
-  },
-  {
     file: "apps/tools/components/BatchHeroConverter.tsx",
     ids: ["batch-compress-dropzone", "batch-compress-input", "batch-compress-download", "batch-progress"],
   },

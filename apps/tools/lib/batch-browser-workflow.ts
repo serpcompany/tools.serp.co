@@ -1,6 +1,9 @@
 'use client';
 
-import { beginToolRun } from './telemetry.ts';
+import {
+  createBrowserDeliveryStore,
+  createBrowserWorkflowTelemetry,
+} from './browser-workflow-lifecycle.ts';
 import { compressPngWithWorker } from './convert/workerClient.ts';
 import {
   createBatchToolWorkflow,
@@ -9,12 +12,9 @@ import {
 import type {
   ToolWorkflow,
   WorkflowDelivery,
-  WorkflowMedia,
   WorkflowOutcome,
   WorkflowSnapshot,
 } from './tool-workflow/index.ts';
-
-type TelemetryHandle = ReturnType<typeof beginToolRun>;
 
 export type BrowserBatchDeliveries = Readonly<{
   download(delivery: WorkflowDelivery): void;
@@ -35,11 +35,7 @@ export function createBrowserBatchWorkflow(): Readonly<{
   workflow: ToolWorkflow;
   deliveries: BrowserBatchDeliveries;
 }> {
-  const deliveryById = new Map<
-    string,
-    { media: WorkflowMedia; objectUrl?: string }
-  >();
-  const telemetryByRunId = new Map<string, TelemetryHandle>();
+  const deliveries = createBrowserDeliveryStore({ idPrefix: 'batch-delivery' });
   let sequence = 0;
 
   const compress: BatchCompressionPort = async (request) => {
@@ -71,46 +67,19 @@ export function createBrowserBatchWorkflow(): Readonly<{
     }
   };
 
-  const release = (deliveryId: string) => {
-    const record = deliveryById.get(deliveryId);
-    if (record?.objectUrl) URL.revokeObjectURL(record.objectUrl);
-    deliveryById.delete(deliveryId);
-  };
-  const clear = () => {
-    for (const deliveryId of [...deliveryById.keys()]) release(deliveryId);
-  };
-
   const workflow = createBatchToolWorkflow({
     compress,
-    async deliver(media) {
-      clear();
-      sequence += 1;
-      const deliveryId = `batch-delivery-${crypto.randomUUID()}-${sequence}`;
-      deliveryById.set(deliveryId, { media });
-      return deliveryId;
-    },
-    telemetry: {
-      async start(runId, request) {
-        const items = request.input.kind === 'batch' ? request.input.items : [];
-        telemetryByRunId.set(
-          runId,
-          beginToolRun({
-            toolId: request.toolId,
-            from: 'png',
-            to: 'zip',
-            inputBytes: items.reduce((total, item) => total + item.size, 0),
-            metadata: { fileCount: items.length, partialSuccess: 'fail-fast' },
-          }),
-        );
-      },
-      async terminal(runId, status) {
-        const telemetry = telemetryByRunId.get(runId);
-        telemetryByRunId.delete(runId);
-        if (!telemetry) return;
-        if (status === 'succeeded') telemetry.finishSuccess({});
-        else telemetry.finishFailure({ errorCode: `workflow_${status}` });
-      },
-    },
+    deliver: deliveries.deliver,
+    telemetry: createBrowserWorkflowTelemetry((request) => {
+      const items = request.input.kind === 'batch' ? request.input.items : [];
+      return {
+        toolId: request.toolId,
+        from: 'png',
+        to: 'zip',
+        inputBytes: items.reduce((total, item) => total + item.size, 0),
+        metadata: { fileCount: items.length, partialSuccess: 'fail-fast' },
+      };
+    }),
     nextId(kind) {
       sequence += 1;
       return `${kind}-${crypto.randomUUID()}-${sequence}`;
@@ -119,28 +88,7 @@ export function createBrowserBatchWorkflow(): Readonly<{
 
   return Object.freeze({
     workflow,
-    deliveries: Object.freeze({
-      download(delivery: WorkflowDelivery) {
-        const record = deliveryById.get(delivery.deliveryId);
-        if (!record)
-          throw new TypeError('Batch delivery is no longer available');
-        let objectUrl = record.objectUrl;
-        if (!objectUrl) {
-          objectUrl = URL.createObjectURL(
-            new Blob([Uint8Array.from(record.media.bytes)], {
-              type: record.media.mimeType,
-            }),
-          );
-          record.objectUrl = objectUrl;
-        }
-        const anchor = document.createElement('a');
-        anchor.href = objectUrl;
-        anchor.download = delivery.name;
-        anchor.click();
-      },
-      release,
-      clear,
-    }),
+    deliveries,
   });
 }
 

@@ -1141,10 +1141,12 @@ test("table presentation delegates execution, terminal telemetry, and delivery p
     presentation,
     /beginToolRun|saveBlob|finishSuccess|finishFailure/,
   );
-  assert.match(browserAdapter, /beginToolRun/);
-  assert.match(browserAdapter, /finishSuccess/);
-  assert.match(browserAdapter, /finishFailure/);
-  assert.match(browserAdapter, /URL\.createObjectURL/);
+  assert.match(browserAdapter, /createBrowserWorkflowTelemetry/);
+  assert.match(browserAdapter, /createBrowserDeliveryStore/);
+  assert.doesNotMatch(
+    browserAdapter,
+    /beginToolRun|finishSuccess|finishFailure|URL\.createObjectURL/,
+  );
 });
 
 test("table landing copy describes the explicit verified Convert action", () => {

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "pnpm -C apps/tools cf:build",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm verify:agent-workflow && pnpm verify:docs && pnpm verify:catalog && pnpm build",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm verify:agent-workflow && pnpm verify:workflow-ownership && pnpm verify:docs && pnpm verify:catalog && pnpm build",
     "dev:local": "pnpm -C apps/tools dev:local",
     "test": "node scripts/run-tests.mjs",
     "lint": "TURBO_TELEMETRY_DISABLED=1 turbo lint --cache=local:rw --no-daemon",
@@ -23,6 +23,7 @@
     "smoke:tools:browser": "node scripts/run-browser-check.mjs --mode smoke",
     "benchmark:tools:browser": "node scripts/run-browser-check.mjs --mode benchmark",
     "verify:agent-workflow": "node scripts/verify-agent-workflow.mjs",
+    "verify:workflow-ownership": "node scripts/verify-tool-workflow-ownership.mjs",
     "verify:docs": "node scripts/verify-documentation.mjs",
     "verify:catalog": "node scripts/validate-tools.mjs",
     "check:links": "node scripts/validate-lander-outbound-links.mjs"

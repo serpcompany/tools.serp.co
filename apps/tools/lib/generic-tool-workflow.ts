@@ -7,7 +7,11 @@ import {
   type CatalogTool,
 } from '@serp-tools/app-core/lib/tool-catalog';
 
-import { beginToolRun } from './telemetry.ts';
+import {
+  createBrowserWorkflowTelemetry,
+  deliverBrowserMedia,
+  type BrowserDownloadPorts,
+} from './browser-workflow-lifecycle.ts';
 import { detectCapabilities } from './capabilities.ts';
 import { compressFile, convertWithWorker } from './convert/workerClient.ts';
 import { resolveCompressionDispatch } from './compression-utils.ts';
@@ -619,48 +623,8 @@ export function createGenericToolWorkflow(
   });
 }
 
-type ToolRunHandle = ReturnType<typeof beginToolRun>;
-const browserTelemetryHandles = new Map<string, ToolRunHandle>();
-
-export type BrowserDeliveryPorts = Readonly<{
-  createObjectUrl(blob: Blob): string;
-  revokeObjectUrl(url: string): void;
-  clickDownload(url: string, name: string): void;
-  scheduleCleanup(callback: () => void, delayMs: number): void;
-  nextId(): string;
-}>;
-
-const defaultBrowserDeliveryPorts: BrowserDeliveryPorts = {
-  createObjectUrl: (blob) => URL.createObjectURL(blob),
-  revokeObjectUrl: (url) => URL.revokeObjectURL(url),
-  clickDownload(url, name) {
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = name;
-    anchor.click();
-  },
-  scheduleCleanup(callback, delayMs) {
-    setTimeout(callback, delayMs);
-  },
-  nextId: () => crypto.randomUUID(),
-};
-
-export async function deliverBrowserMedia(
-  result: WorkflowMedia,
-  ports: BrowserDeliveryPorts = defaultBrowserDeliveryPorts,
-): Promise<string> {
-  const objectUrl = ports.createObjectUrl(
-    new Blob([Uint8Array.from(result.bytes)], { type: result.mimeType }),
-  );
-  try {
-    ports.clickDownload(objectUrl, result.name);
-    ports.scheduleCleanup(() => ports.revokeObjectUrl(objectUrl), 1_000);
-  } catch (error) {
-    ports.revokeObjectUrl(objectUrl);
-    throw error;
-  }
-  return ports.nextId();
-}
+export { deliverBrowserMedia };
+export type BrowserDeliveryPorts = BrowserDownloadPorts;
 
 const browserAdapters: GenericWorkflowAdapters = {
   decideSupport(request) {
@@ -819,32 +783,19 @@ const browserAdapters: GenericWorkflowAdapters = {
     };
   },
   deliver: deliverBrowserMedia,
-  telemetry: {
-    async start(runId, request) {
+  telemetry: createBrowserWorkflowTelemetry(
+    (request) => {
       const contract = getGenericToolContract(request.toolId);
-      browserTelemetryHandles.set(
-        runId,
-        beginToolRun({
-          toolId: request.toolId,
-          inputBytes: request.inputBytes,
-          from:
-            contract.state === 'supported' ? contract.input.format : undefined,
-          to:
-            contract.state === 'supported' ? contract.output.format : undefined,
-        }),
-      );
+      return {
+        toolId: request.toolId,
+        inputBytes: request.inputBytes,
+        from:
+          contract.state === 'supported' ? contract.input.format : undefined,
+        to: contract.state === 'supported' ? contract.output.format : undefined,
+      };
     },
-    async terminal(runId, status) {
-      const handle = browserTelemetryHandles.get(runId);
-      browserTelemetryHandles.delete(runId);
-      if (!handle) return;
-      if (status === 'succeeded') {
-        handle.finishSuccess({});
-      } else {
-        handle.finishFailure({ errorCode: status });
-      }
-    },
-  },
+    (status) => status,
+  ),
 };
 
 export function decideGenericBrowserSupport(
