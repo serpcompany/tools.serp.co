@@ -28,6 +28,15 @@ export const BATCH_PNG_LIMITS = Object.freeze({
   maxArchiveBytes: 80 * 1_024 * 1_024,
 });
 
+/**
+ * Bounds bytes returned by the compression port before semantic parsing. This
+ * is an internal transient-allocation limit, not accepted input or delivered
+ * output support; those public contracts remain BATCH_PNG_LIMITS.
+ */
+export const BATCH_PNG_IMPLEMENTATION_LIMITS = Object.freeze({
+  maxCompressionCandidateBytes: 32 * 1_024 * 1_024,
+});
+
 type BatchOptions = Readonly<{
   compressionLevel: 'low' | 'medium' | 'high' | 'extreme';
   /** A failed item fails the run; completed prefixes are never delivered. */
@@ -324,6 +333,14 @@ function processor(
           },
         });
         context.signal.throwIfAborted();
+        if (
+          bytes.byteLength >
+          BATCH_PNG_IMPLEMENTATION_LIMITS.maxCompressionCandidateBytes
+        ) {
+          throw new Error(
+            'Intermediate compressor candidate exceeds the implementation byte limit',
+          );
+        }
         const candidateVerification = await verifyMediaSemantics(
           {
             name: names[index]!,

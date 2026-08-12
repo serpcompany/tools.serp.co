@@ -5,6 +5,7 @@ import test from 'node:test';
 import { Uint8ArrayReader, Uint8ArrayWriter, ZipReader } from '@zip.js/zip.js';
 
 import {
+  BATCH_PNG_IMPLEMENTATION_LIMITS,
   BATCH_PNG_LIMITS,
   createBatchToolWorkflow,
   getBatchToolContract,
@@ -286,6 +287,32 @@ test('a larger malformed compressor candidate cannot be hidden by retaining the 
     options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
   });
   assert.equal(outcome.status, 'failed');
+  assert.deepEqual(deliveries, []);
+  assert.deepEqual(telemetry, ['start', 'terminal:failed']);
+});
+
+test('oversized intermediate compressor candidate is rejected before semantic parsing, archive, or delivery and cleans up', async () => {
+  let cleanups = 0;
+  const { workflow, deliveries, telemetry } = recorder(
+    async ({ registerCleanup }) => {
+      await registerCleanup(async () => {
+        cleanups += 1;
+      });
+      return new Uint8Array(
+        BATCH_PNG_IMPLEMENTATION_LIMITS.maxCompressionCandidateBytes + 1,
+      );
+    },
+  );
+  const outcome = await workflow.run({
+    toolId: 'batch-compress-png',
+    input: batch([png('one.png')]),
+    options: { compressionLevel: 'high', partialSuccess: 'fail-fast' },
+  });
+  assert.equal(outcome.status, 'failed');
+  if (outcome.status === 'failed') {
+    assert.match(outcome.error.message, /intermediate compressor candidate/i);
+  }
+  assert.equal(cleanups, 1);
   assert.deepEqual(deliveries, []);
   assert.deepEqual(telemetry, ['start', 'terminal:failed']);
 });
