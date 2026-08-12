@@ -79,3 +79,18 @@ test("timeout invokes its bounded-operation cleanup exactly once", async () => {
   );
   assert.equal(timeoutCleanups, 1);
 });
+
+test("a hanging timeout cleanup cannot delay the bounded failure", async () => {
+  const startedAt = performance.now();
+  await assert.rejects(
+    withSilenceWatchdog({
+      run: async () => await new Promise<never>(() => {}),
+      signal: new AbortController().signal,
+      timeoutMs: 5,
+      timeoutMessage: "deadline reached",
+      onTimeout: async () => await new Promise<never>(() => {}),
+    }),
+    /deadline reached/,
+  );
+  assert.ok(performance.now() - startedAt < 100);
+});

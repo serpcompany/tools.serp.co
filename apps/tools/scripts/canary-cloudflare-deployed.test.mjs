@@ -93,6 +93,17 @@ test('native canaries require pure SVG success and structured unavailable contra
   assert.match(canarySource, /payload\.capability\?\.available === false/);
 });
 
+test('deployed Cloudflare canary verifies the emitted transcription chunk and FFmpeg resource contracts', () => {
+  assert.match(canarySource, /Xenova\/whisper-tiny/);
+  assert.match(canarySource, /cross-origin-embedder-policy/);
+  assert.match(canarySource, /credentialless/);
+  assert.match(canarySource, /cross-origin-resource-policy/);
+  assert.match(canarySource, /same-origin/);
+  assert.match(canarySource, /application\/wasm/);
+  assert.match(canarySource, /text\/javascript/);
+  assert.match(canarySource, /immutable/);
+});
+
 test('native canary setup failure records structured evidence', (t) => {
   const artifactRoot = mkdtempSync(
     path.join(tmpdir(), 'tools-serp-canary-failure-'),

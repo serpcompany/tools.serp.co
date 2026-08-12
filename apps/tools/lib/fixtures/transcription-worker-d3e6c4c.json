@@ -1,0 +1,27 @@
+{
+  "baselineRevision": "d3e6c4c44af0d0a6a8e243f4a4e61963bb838e87",
+  "route": "/audio-to-text/",
+  "sourceOrigin": "https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev",
+  "workerChunkPath": "/_next/static/chunks/2339.e05538d5582918bc.js",
+  "retrievedAt": "2026-08-12T07:19:28Z",
+  "chunkSha256": "e05538d5582918bc8e107f538966f59ea79b120c492a469e095f051325b8e721",
+  "chunkBytes": 2902,
+  "pageHeaders": {
+    "crossOriginEmbedderPolicy": "require-corp",
+    "crossOriginOpenerPolicy": "same-origin"
+  },
+  "chunkResponse": {
+    "status": 200,
+    "contentType": "text/javascript",
+    "cacheControl": "public,max-age=31536000,immutable",
+    "crossOriginEmbedderPolicy": null,
+    "crossOriginResourcePolicy": null
+  },
+  "browserObservation": {
+    "workerRequestStatus": 0,
+    "networkError": "ERR_BLOCKED_BY_RESPONSE",
+    "ordinaryFetchStatus": 200,
+    "ordinaryFetchBytes": 2902
+  },
+  "provenance": "Direct Chromium diagnosis for GitHub issue #94; response headers and bytes re-fetched from the isolated Wayfinder preview origin."
+}

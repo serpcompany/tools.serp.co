@@ -155,6 +155,29 @@ function contentTypeEssence(value) {
   return (value ?? "").split(";")[0].trim().toLowerCase();
 }
 
+function generatedTranscriptionWorkerChunkPath() {
+  const assetsRoot = path.join(appRoot, ".open-next", "assets");
+  const chunksRoot = path.join(assetsRoot, "_next", "static", "chunks");
+  if (!fs.existsSync(chunksRoot)) {
+    throw new Error(
+      "Missing generated Cloudflare chunks; run the exact OpenNext build first",
+    );
+  }
+  for (const entry of fs.readdirSync(chunksRoot, {
+    recursive: true,
+    withFileTypes: true,
+  })) {
+    if (!entry.isFile() || !entry.name.endsWith(".js")) continue;
+    const filePath = path.join(entry.parentPath, entry.name);
+    if (fs.readFileSync(filePath, "utf8").includes("Xenova/whisper-tiny")) {
+      return `/${path.relative(assetsRoot, filePath).split(path.sep).join("/")}`;
+    }
+  }
+  throw new Error(
+    "Exact OpenNext build is missing the transcription Worker chunk",
+  );
+}
+
 async function requestCheck(check, args) {
   const startedAt = Date.now();
   try {
@@ -211,8 +234,22 @@ function assetChecks(args) {
     name: `asset ${assetPath}`,
     url: buildUrl(args.assetBaseUrl, assetPath),
     headers: { range: "bytes=0-0" },
-    expect: (response, bytes) =>
-      [200, 206].includes(response.status) && bytes.length > 0,
+    expect: (response, bytes) => {
+      const contentType = contentTypeEssence(
+        response.headers.get("content-type"),
+      );
+      const expectedType = assetPath.endsWith(".wasm")
+        ? "application/wasm"
+        : "text/javascript";
+      return (
+        [200, 206].includes(response.status) &&
+        bytes.length > 0 &&
+        contentType === expectedType &&
+        /(?:^|,)\s*immutable(?:,|$)/i.test(
+          response.headers.get("cache-control") ?? "",
+        )
+      );
+    },
     details: (response, bytes) => ({
       contentType: response.headers.get("content-type"),
       contentRange: response.headers.get("content-range"),
@@ -220,6 +257,35 @@ function assetChecks(args) {
       bytes: bytes.length,
     }),
   }));
+}
+
+function isolationHeaderChecks(args) {
+  const workerChunkPath = generatedTranscriptionWorkerChunkPath();
+  return [
+    {
+      name: `transcription Worker headers ${workerChunkPath}`,
+      url: buildUrl(args.baseUrl, workerChunkPath),
+      expect: (response, bytes) =>
+        response.status === 200 &&
+        bytes.length > 0 &&
+        contentTypeEssence(response.headers.get("content-type")) ===
+          "text/javascript" &&
+        response.headers.get("cross-origin-embedder-policy") ===
+          "credentialless" &&
+        response.headers.get("cross-origin-resource-policy") === "same-origin",
+      details: (response, bytes) => ({
+        contentType: response.headers.get("content-type"),
+        crossOriginEmbedderPolicy: response.headers.get(
+          "cross-origin-embedder-policy",
+        ),
+        crossOriginResourcePolicy: response.headers.get(
+          "cross-origin-resource-policy",
+        ),
+        cacheControl: response.headers.get("cache-control"),
+        bytes: bytes.length,
+      }),
+    },
+  ];
 }
 
 function safeGetChecks(args) {
@@ -473,7 +539,11 @@ function recordCanaryEvidence(status, summary, completedAt = new Date()) {
 }
 
 try {
-  const checks = [...assetChecks(args), ...safeGetChecks(args)];
+  const checks = [
+    ...assetChecks(args),
+    ...isolationHeaderChecks(args),
+    ...safeGetChecks(args),
+  ];
 
   if (args.allowTelemetryWrite) {
     checks.push(telemetryCheck(args));

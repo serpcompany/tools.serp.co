@@ -16,15 +16,11 @@ export async function withSilenceWatchdog<T>(options: {
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {
       if (!active) return;
-      void (async () => {
-        try {
-          await options.onTimeout?.();
-        } catch {
-          // Timeout cleanup cannot replace the bounded-operation outcome.
-        } finally {
-          rejectTimeout?.(new Error(options.timeoutMessage));
-        }
-      })();
+      try {
+        void Promise.resolve(options.onTimeout?.()).catch(() => {});
+      } finally {
+        rejectTimeout?.(new Error(options.timeoutMessage));
+      }
     }, options.timeoutMs);
   };
   const onAbort = () => {
