@@ -201,6 +201,14 @@ test('specialized and table Tools expose explicit browser-owned engines', () => 
   assert.deepEqual(mapped('html-to-markdown').executionProfiles, [
     'client-only',
   ]);
+  const batchEngineId = mapped('batch-compress-png').engineIds[0];
+  assert.deepEqual(
+    executionProvenance.getEngine(batchEngineId)?.implementation,
+    {
+      class: 'library',
+      identity: '@jsquash/oxipng and @zip.js/zip.js',
+    },
+  );
 
   const tableSource = readFileSync(
     new URL('./table-tool-processors.ts', import.meta.url),

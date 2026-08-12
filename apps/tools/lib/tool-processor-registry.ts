@@ -8,6 +8,7 @@ import { getToolExecutionProvenance } from './tool-execution-provenance.ts';
 import { getGenericToolContract } from './generic-tool-workflow.ts';
 import { getMediaWorkflowAdapterRegistration } from './media-workflow/adapter-registration.ts';
 import { SPECIALIZED_TOOL_IDS } from './specialized-tool-policy.ts';
+import { getBatchToolContract } from './batch-tool-workflow.ts';
 
 export type WiredToolProcessorAvailability = Readonly<{
   kind: 'wired';
@@ -37,19 +38,26 @@ export type ToolProcessorAvailability =
 const registeredAdapterIdByToolId: Readonly<Record<string, string>> =
   Object.freeze(
     Object.fromEntries(
-      getEligibleTableToolIds().map((toolId) => [
-        toolId,
-        TABLE_PROCESSOR_ADAPTER_ID,
-      ]).concat(
-        SPECIALIZED_TOOL_IDS.map((toolId) => [
-          toolId,
-          'browser-specialized-workflow',
-        ]),
-      ),
+      getEligibleTableToolIds()
+        .map((toolId) => [toolId, TABLE_PROCESSOR_ADAPTER_ID])
+        .concat(
+          SPECIALIZED_TOOL_IDS.map((toolId) => [
+            toolId,
+            'browser-specialized-workflow',
+          ]),
+        ),
     ),
   );
 
 function availabilityForToolId(toolId: string): ToolProcessorAvailability {
+  const batchContract = getBatchToolContract(toolId);
+  if (batchContract.state === 'supported') {
+    return Object.freeze({
+      kind: 'wired',
+      toolId,
+      adapterId: batchContract.adapterId,
+    });
+  }
   const tableAdapterId = registeredAdapterIdByToolId[toolId];
   if (tableAdapterId) {
     return Object.freeze({

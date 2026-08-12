@@ -1,7 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { compressFile, convertWithWorker } from "./workerClient.ts";
+import {
+  compressFile,
+  compressPngWithWorker,
+  convertWithWorker,
+} from "./workerClient.ts";
 import { resolveAdaptiveVideoExecution } from "./workerClient.ts";
 
 function makeBuffer(size) {
@@ -101,6 +105,48 @@ test("worker processing terminates promptly when the caller aborts", async () =>
     to: "jpg",
     buf: makeBuffer(10),
     signal: controller.signal,
+  });
+  controller.abort();
+
+  await assert.rejects(pending, /abort/i);
+  assert.equal(terminated, true);
+});
+
+test("batch PNG worker failure fails closed instead of entering a synchronous fallback", async () => {
+  const worker = {
+    onmessage: null,
+    onerror: null,
+    postMessage() {
+      queueMicrotask(() => this.onerror?.({ message: "worker unavailable" }));
+    },
+    terminate() {},
+  };
+  await assert.rejects(
+    compressPngWithWorker({
+      worker,
+      buf: makeBuffer(10),
+      fallback: "fail-closed",
+    }),
+    /worker unavailable/,
+  );
+});
+
+test("batch PNG fail-closed worker cancellation terminates promptly", async () => {
+  const controller = new AbortController();
+  let terminated = false;
+  const worker = {
+    onmessage: null,
+    onerror: null,
+    postMessage() {},
+    terminate() {
+      terminated = true;
+    },
+  };
+  const pending = compressPngWithWorker({
+    worker,
+    buf: makeBuffer(10),
+    signal: controller.signal,
+    fallback: "fail-closed",
   });
   controller.abort();
 

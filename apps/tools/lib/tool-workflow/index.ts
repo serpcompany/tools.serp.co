@@ -7,10 +7,19 @@ export type WorkflowMedia = {
   bytes: Uint8Array;
 };
 
+export type WorkflowBatchItem = Readonly<{
+  name: string;
+  format: string;
+  mimeType: string;
+  size: number;
+  stream(): ReadableStream<Uint8Array>;
+}>;
+
 export type WorkflowInput =
   | { kind: 'file'; media: WorkflowMedia }
   | { kind: 'url'; url: string }
   | { kind: 'files'; media: readonly WorkflowMedia[] }
+  | { kind: 'batch'; items: readonly WorkflowBatchItem[] }
   | {
       kind: 'interaction';
       interaction: Readonly<{
@@ -44,6 +53,13 @@ export type WorkflowPhase =
 export type WorkflowSnapshot = {
   phase: WorkflowPhase;
   progress?: number;
+  item?: Readonly<{
+    index: number;
+    total: number;
+    name: string;
+    /** Omitted while the active item's operation is indeterminate. */
+    progress?: number;
+  }>;
 };
 
 export type WorkflowDelivery = {
@@ -286,7 +302,7 @@ type WorkflowStageContext = {
   budgets: ToolSupport['resourceLimits'];
   openResource(kind: RuntimeResourceKind): Promise<void>;
   registerCleanup(cleanup: () => Promise<void>): Promise<void>;
-  reportProgress(progress: number): void;
+  reportProgress(progress: number, item?: WorkflowSnapshot['item']): void;
 };
 
 type WorkflowPorts = {
@@ -309,11 +325,19 @@ type WorkflowPorts = {
         context: WorkflowStageContext,
       ): Promise<readonly WorkflowMedia[]>;
     };
+    batch?: {
+      acquire(
+        input: Extract<WorkflowInput, { kind: 'batch' }>,
+        context: WorkflowStageContext,
+      ): Promise<readonly WorkflowMedia[]>;
+    };
     interaction?: {
       acquire(
         input: Extract<WorkflowInput, { kind: 'interaction' }>,
         context: WorkflowStageContext,
-      ): Promise<Extract<WorkflowInput, { kind: 'interaction' }>['interaction']>;
+      ): Promise<
+        Extract<WorkflowInput, { kind: 'interaction' }>['interaction']
+      >;
     };
   };
   resolveIntent(toolId: string): ToolExecutionIntent | undefined;
@@ -446,22 +470,55 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         'acquiring';
       let activePhase: WorkflowPhase | undefined;
       let lastProgress = 0;
+      let lastProgressItem: WorkflowSnapshot['item'];
       const reportProgress = (
         phase: WorkflowPhase,
         start: number,
         span: number,
         progress: number,
+        item?: WorkflowSnapshot['item'],
       ) => {
         if (activePhase !== phase || !Number.isFinite(progress)) {
           return;
         }
         const normalized = Math.min(1, Math.max(0, progress));
         const overall = Number((start + span * normalized).toFixed(6));
-        if (overall <= lastProgress) {
+        const validItem =
+          item &&
+          Number.isSafeInteger(item.index) &&
+          item.index >= 0 &&
+          Number.isSafeInteger(item.total) &&
+          item.total > item.index &&
+          item.name.trim() &&
+          (item.progress === undefined || Number.isFinite(item.progress))
+            ? Object.freeze({
+                index: item.index,
+                total: item.total,
+                name: item.name,
+                ...(item.progress === undefined
+                  ? {}
+                  : { progress: Math.min(1, Math.max(0, item.progress)) }),
+              })
+            : undefined;
+        const itemChanged =
+          validItem !== undefined &&
+          (lastProgressItem?.index !== validItem.index ||
+            lastProgressItem.total !== validItem.total ||
+            lastProgressItem.name !== validItem.name ||
+            lastProgressItem.progress !== validItem.progress);
+        if (
+          overall < lastProgress ||
+          (overall === lastProgress && !itemChanged)
+        ) {
           return;
         }
         lastProgress = overall;
-        emitSnapshot({ phase, progress: overall });
+        lastProgressItem = validItem;
+        emitSnapshot(
+          validItem
+            ? { phase, progress: overall, item: validItem }
+            : { phase, progress: overall },
+        );
       };
       const context = (
         phase: typeof stage,
@@ -470,8 +527,8 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
       ): WorkflowStageContext => ({
         signal,
         budgets: support.resourceLimits,
-        reportProgress: (progress) =>
-          reportProgress(phase, start, span, progress),
+        reportProgress: (progress, item) =>
+          reportProgress(phase, start, span, progress, item),
         async openResource(kind) {
           if (activePhase !== phase || terminalOutcomeCommitted) {
             return;
@@ -532,12 +589,19 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
                       acquisitionContext,
                     )
                   : request.input.media
-                : ports.acquisition.interaction
-                  ? await ports.acquisition.interaction.acquire(
-                      request.input,
-                      acquisitionContext,
-                    )
-                  : request.input.interaction;
+                : request.input.kind === 'batch'
+                  ? ports.acquisition.batch
+                    ? await ports.acquisition.batch.acquire(
+                        request.input,
+                        acquisitionContext,
+                      )
+                    : []
+                  : ports.acquisition.interaction
+                    ? await ports.acquisition.interaction.acquire(
+                        request.input,
+                        acquisitionContext,
+                      )
+                    : request.input.interaction;
         signal.throwIfAborted();
         const acquiredInputs = Array.isArray(input) ? input : [input];
         if (acquiredInputs.length === 0) {
@@ -546,7 +610,8 @@ export function createToolWorkflow(ports: WorkflowPorts): ToolWorkflow {
         for (const acquired of acquiredInputs) {
           const inputSupport = support.inputs.find(
             ({ format, mimeTypes }) =>
-              format === acquired.format && mimeTypes.includes(acquired.mimeType),
+              format === acquired.format &&
+              mimeTypes.includes(acquired.mimeType),
           );
           if (!inputSupport) {
             return fail(

@@ -301,12 +301,12 @@ const engineById = defineEngines({
   },
   'browser-batch-png-compression': {
     capability: 'batch-png-compression',
-    owner: 'apps/tools/components/BatchHeroConverter.tsx',
+    owner: 'apps/tools/lib/batch-tool-workflow.ts',
     processingLocation: 'browser',
     executionProfile: 'client-only',
     implementation: {
       class: 'library',
-      identity: '@jsquash/oxipng',
+      identity: '@jsquash/oxipng and @zip.js/zip.js',
     },
   },
 } satisfies Record<string, ExecutionEngineDefinition>);
