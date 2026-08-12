@@ -94,3 +94,25 @@ test("a hanging timeout cleanup cannot delay the bounded failure", async () => {
   );
   assert.ok(performance.now() - startedAt < 100);
 });
+
+test("a throwing timeout cleanup cannot escape the bounded failure", async (t) => {
+  const uncaught: unknown[] = [];
+  const onUncaught = (error: unknown) => uncaught.push(error);
+  process.on("uncaughtException", onUncaught);
+  t.after(() => process.removeListener("uncaughtException", onUncaught));
+
+  await assert.rejects(
+    withSilenceWatchdog({
+      run: async () => await new Promise<never>(() => {}),
+      signal: new AbortController().signal,
+      timeoutMs: 5,
+      timeoutMessage: "deadline reached",
+      onTimeout() {
+        throw new Error("cleanup failed");
+      },
+    }),
+    /deadline reached/,
+  );
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  assert.deepEqual(uncaught, []);
+});

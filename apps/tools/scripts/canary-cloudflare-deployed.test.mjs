@@ -67,13 +67,13 @@ test('deployed Cloudflare canary rejects unsafe base URLs before requests', () =
 
 test('deployed Cloudflare canary records structured target evidence', () => {
   assert.match(canarySource, /recordRunEvidence/);
-  assert.match(canarySource, /command:\s*"canary:cloudflare:deployed"/);
+  assert.match(canarySource, /command:\s*['"]canary:cloudflare:deployed['"]/);
   assert.match(
     canarySource,
-    /args\.environment === "production"\s*\?\s*"main"\s*:\s*"pull-request"/,
+    /args\.environment === ['"]production['"]\s*\?\s*['"]main['"]\s*:\s*['"]pull-request['"]/,
   );
   assert.match(canarySource, /scope:\s*`cloudflare-\$\{args\.environment\}`/);
-  assert.match(canarySource, /linkedWork:\s*\["#58"\]/);
+  assert.match(canarySource, /linkedWork:\s*\[['"]#58['"]\]/);
 });
 
 test('native canaries require pure SVG success and structured unavailable contracts for native engines', () => {
@@ -94,7 +94,11 @@ test('native canaries require pure SVG success and structured unavailable contra
 });
 
 test('deployed Cloudflare canary verifies the emitted transcription chunk and FFmpeg resource contracts', () => {
-  assert.match(canarySource, /Xenova\/whisper-tiny/);
+  assert.match(canarySource, /validateCloudflareBuildProvenance/);
+  assert.match(canarySource, /ffmpegWorkerChunkPath/);
+  assert.match(canarySource, /transcriptionWorkerChunkPath/);
+  assert.match(canarySource, /rev-parse/);
+  assert.match(canarySource, /status.*--short/s);
   assert.match(canarySource, /cross-origin-embedder-policy/);
   assert.match(canarySource, /credentialless/);
   assert.match(canarySource, /cross-origin-resource-policy/);

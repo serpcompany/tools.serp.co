@@ -15,11 +15,21 @@ import {
   verifyCloudflareIsolationBuild,
 } from "./scripts/patch-cloudflare-worker-assets.mjs";
 
-const wranglerSource = readFileSync(new URL("./wrangler.jsonc", import.meta.url), "utf8");
+const wranglerSource = readFileSync(
+  new URL("./wrangler.jsonc", import.meta.url),
+  "utf8",
+);
+const buildSource = readFileSync(
+  new URL("./scripts/build-cloudflare.mjs", import.meta.url),
+  "utf8",
+);
 
 test("Cloudflare routes generated worker chunks through the header-owning Worker adapter", () => {
   assert.match(wranglerSource, /"main":\s*"\.open-next\/worker\.js"/);
-  assert.match(wranglerSource, /"run_worker_first":\s*\[\s*"\/_next\/static\/chunks\/\*"\s*\]/);
+  assert.match(
+    wranglerSource,
+    /"run_worker_first":\s*\[\s*"\/_next\/static\/chunks\/\*"\s*\]/,
+  );
 });
 
 test("OpenNext post-build adapter owns generated worker chunk headers", () => {
@@ -52,4 +62,10 @@ test("Cloudflare build verification covers emitted transcription and FFmpeg reso
       assetsDirectory: root,
     }),
   );
+});
+
+test("canonical Cloudflare build records revision-bound artifact provenance", () => {
+  assert.match(buildSource, /writeCloudflareBuildProvenance/);
+  assert.match(buildSource, /rev-parse/);
+  assert.match(buildSource, /status.*--short/s);
 });

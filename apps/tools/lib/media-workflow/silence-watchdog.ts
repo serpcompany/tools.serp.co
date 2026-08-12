@@ -17,7 +17,9 @@ export async function withSilenceWatchdog<T>(options: {
     timer = setTimeout(() => {
       if (!active) return;
       try {
-        void Promise.resolve(options.onTimeout?.()).catch(() => {});
+        void Promise.resolve()
+          .then(() => options.onTimeout?.())
+          .catch(() => {});
       } finally {
         rejectTimeout?.(new Error(options.timeoutMessage));
       }

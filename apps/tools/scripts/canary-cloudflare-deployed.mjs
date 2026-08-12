@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer";
+import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -8,6 +9,7 @@ import {
   repoRoot,
 } from "./lib/cloudflare-audit.mjs";
 import { recordRunEvidence } from "../../../scripts/lib/run-evidence.mjs";
+import { validateCloudflareBuildProvenance } from "./lib/cloudflare-build-provenance.mjs";
 
 const DEFAULT_TIMEOUT_MS = 30000;
 
@@ -155,27 +157,22 @@ function contentTypeEssence(value) {
   return (value ?? "").split(";")[0].trim().toLowerCase();
 }
 
-function generatedTranscriptionWorkerChunkPath() {
-  const assetsRoot = path.join(appRoot, ".open-next", "assets");
-  const chunksRoot = path.join(assetsRoot, "_next", "static", "chunks");
-  if (!fs.existsSync(chunksRoot)) {
-    throw new Error(
-      "Missing generated Cloudflare chunks; run the exact OpenNext build first",
-    );
-  }
-  for (const entry of fs.readdirSync(chunksRoot, {
-    recursive: true,
-    withFileTypes: true,
-  })) {
-    if (!entry.isFile() || !entry.name.endsWith(".js")) continue;
-    const filePath = path.join(entry.parentPath, entry.name);
-    if (fs.readFileSync(filePath, "utf8").includes("Xenova/whisper-tiny")) {
-      return `/${path.relative(assetsRoot, filePath).split(path.sep).join("/")}`;
-    }
-  }
-  throw new Error(
-    "Exact OpenNext build is missing the transcription Worker chunk",
-  );
+function generatedWorkerChunkPaths(revision) {
+  const headRevision = execFileSync("git", ["rev-parse", "HEAD"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  }).trim();
+  const clean =
+    execFileSync("git", ["status", "--short", "--untracked-files=all"], {
+      cwd: repoRoot,
+      encoding: "utf8",
+    }).trim() === "";
+  return validateCloudflareBuildProvenance({
+    appRoot,
+    revision,
+    headRevision,
+    clean,
+  });
 }
 
 async function requestCheck(check, args) {
@@ -260,32 +257,34 @@ function assetChecks(args) {
 }
 
 function isolationHeaderChecks(args) {
-  const workerChunkPath = generatedTranscriptionWorkerChunkPath();
+  const { ffmpegWorkerChunkPath, transcriptionWorkerChunkPath } =
+    generatedWorkerChunkPaths(args.revision);
   return [
-    {
-      name: `transcription Worker headers ${workerChunkPath}`,
-      url: buildUrl(args.baseUrl, workerChunkPath),
-      expect: (response, bytes) =>
-        response.status === 200 &&
-        bytes.length > 0 &&
-        contentTypeEssence(response.headers.get("content-type")) ===
-          "text/javascript" &&
-        response.headers.get("cross-origin-embedder-policy") ===
-          "credentialless" &&
-        response.headers.get("cross-origin-resource-policy") === "same-origin",
-      details: (response, bytes) => ({
-        contentType: response.headers.get("content-type"),
-        crossOriginEmbedderPolicy: response.headers.get(
-          "cross-origin-embedder-policy",
-        ),
-        crossOriginResourcePolicy: response.headers.get(
-          "cross-origin-resource-policy",
-        ),
-        cacheControl: response.headers.get("cache-control"),
-        bytes: bytes.length,
-      }),
-    },
-  ];
+    ["FFmpeg Worker", ffmpegWorkerChunkPath],
+    ["transcription Worker", transcriptionWorkerChunkPath],
+  ].map(([label, workerChunkPath]) => ({
+    name: `${label} headers ${workerChunkPath}`,
+    url: buildUrl(args.baseUrl, workerChunkPath),
+    expect: (response, bytes) =>
+      response.status === 200 &&
+      bytes.length > 0 &&
+      contentTypeEssence(response.headers.get("content-type")) ===
+        "text/javascript" &&
+      response.headers.get("cross-origin-embedder-policy") ===
+        "credentialless" &&
+      response.headers.get("cross-origin-resource-policy") === "same-origin",
+    details: (response, bytes) => ({
+      contentType: response.headers.get("content-type"),
+      crossOriginEmbedderPolicy: response.headers.get(
+        "cross-origin-embedder-policy",
+      ),
+      crossOriginResourcePolicy: response.headers.get(
+        "cross-origin-resource-policy",
+      ),
+      cacheControl: response.headers.get("cache-control"),
+      bytes: bytes.length,
+    }),
+  }));
 }
 
 function safeGetChecks(args) {
