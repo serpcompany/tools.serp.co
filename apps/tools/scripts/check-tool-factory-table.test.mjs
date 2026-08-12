@@ -93,6 +93,11 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /Filter by support/);
   assert.match(source, /getByLabel\(['"]Description['"]\)\.check/);
   assert.match(source, /name:\s*['"]Next['"]/);
+  assert.match(source, /sharedUrl\.searchParams\.get\(['"]support['"]\)/);
+  assert.match(source, /copiedPage\.goto\(sharedUrl\.href/);
+  assert.match(source, /page\.goBack/);
+  assert.match(source, /page\.goForward/);
+  assert.match(source, /new URL\(page\.url\(\)\)\.search/);
   assert.match(source, /getByRole\(['"]dialog['"]\)/);
   assert.match(source, /Latest exact Tool test/);
   assert.match(source, /Converted a real PNG and produced a WebP file/);
@@ -103,7 +108,7 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /command:\s*['"]check:tool-factory['"]/);
   assert.match(
     source,
-    /linkedWork:\s*\[['"]#50['"], ['"]#105['"], ['"]#107['"]\]/,
+    /linkedWork:\s*\[['"]#50['"], ['"]#105['"], ['"]#106['"], ['"]#107['"]\]/,
   );
   assert.doesNotMatch(source, /console\.log\(.*accessCookie/);
 });

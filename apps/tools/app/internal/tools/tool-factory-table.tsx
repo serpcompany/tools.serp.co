@@ -6,6 +6,7 @@ import {
   type ColumnFiltersState,
   type PaginationState,
   type SortingState,
+  type Updater,
   type VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -15,7 +16,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@serp-tools/ui/components/button';
 import {
@@ -33,6 +34,15 @@ import type {
   ToolSupportDisposition,
 } from '../../../lib/tool-factory-read-model.ts';
 import type { ToolFactoryDeployment } from '../../../lib/tool-factory-access.ts';
+import {
+  DEFAULT_TOOL_FACTORY_VIEW,
+  clampToolFactoryPageIndex,
+  parseToolFactoryView,
+  serializeToolFactoryView,
+  TOOL_FACTORY_COLUMN_IDS,
+  type ToolFactoryColumnId,
+  type ToolFactoryViewState,
+} from '../../../lib/tool-factory-view-state.ts';
 
 type ToolFactoryTableModel = Pick<ToolFactoryReadModel, 'rows' | 'counts'>;
 
@@ -321,28 +331,6 @@ const columns: ColumnDef<ToolFactoryRow>[] = [
   },
 ];
 
-const defaultVisibility: VisibilityState = {
-  toolId: false,
-  description: false,
-  route: false,
-  operation: false,
-  inputFormat: false,
-  outputFormat: false,
-  renderer: false,
-  tags: false,
-  catalogPriority: false,
-  catalogFlags: false,
-  adapter: false,
-  supportReason: false,
-  engineIds: false,
-  processingLocations: false,
-  implementationOwners: false,
-  verificationReason: false,
-  runtimeReason: false,
-  observationReason: false,
-  attentionSummary: false,
-};
-
 function unique(
   rows: readonly ToolFactoryRow[],
   value: (row: ToolFactoryRow) => string,
@@ -587,15 +575,9 @@ export function ToolFactoryTable({
   deployment: ToolFactoryDeployment;
   model: ToolFactoryTableModel;
 }) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>(defaultVisibility);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 50,
-  });
+  const [view, setView] = useState<ToolFactoryViewState>(
+    DEFAULT_TOOL_FACTORY_VIEW,
+  );
   const [selected, setSelected] = useState<ToolFactoryRow | null>(null);
 
   const supportValues = useMemo(
@@ -617,6 +599,65 @@ export function ToolFactoryTable({
   );
   const rows = useMemo(() => [...model.rows], [model.rows]);
 
+  useEffect(() => {
+    function restoreFromUrl() {
+      setView(
+        parseToolFactoryView(globalThis.location.search, {
+          families: familyValues,
+          profiles: profileValues,
+        }),
+      );
+    }
+
+    restoreFromUrl();
+    globalThis.addEventListener('popstate', restoreFromUrl);
+    return () => globalThis.removeEventListener('popstate', restoreFromUrl);
+  }, [familyValues, profileValues]);
+
+  const commitView = useCallback(
+    (next: ToolFactoryViewState, historyMode: 'push' | 'replace' = 'push') => {
+      setView(next);
+      const href = `${globalThis.location.pathname}${serializeToolFactoryView(next)}${globalThis.location.hash}`;
+      if (historyMode === 'replace') {
+        globalThis.history.replaceState(null, '', href);
+      } else {
+        globalThis.history.pushState(null, '', href);
+      }
+    },
+    [],
+  );
+
+  const sorting = view.sorting as SortingState;
+  const columnFilters: ColumnFiltersState = [];
+  if (view.filters.support) {
+    columnFilters.push({ id: 'support', value: view.filters.support });
+  }
+  if (view.filters.family) {
+    columnFilters.push({ id: 'family', value: view.filters.family });
+  }
+  if (view.filters.profile) {
+    columnFilters.push({ id: 'profiles', value: view.filters.profile });
+  }
+  if (view.filters.verification) {
+    columnFilters.push({
+      id: 'verification',
+      value: view.filters.verification,
+    });
+  }
+  const columnVisibility: VisibilityState = Object.fromEntries(
+    TOOL_FACTORY_COLUMN_IDS.map((id) => [id, view.visibleColumns.includes(id)]),
+  );
+  const pagination: PaginationState = {
+    pageIndex: view.pageIndex,
+    pageSize: view.pageSize,
+  };
+
+  function resolveUpdate<T>(updater: Updater<T>, previous: T) {
+    return typeof updater === 'function'
+      ? (updater as (value: T) => T)(previous)
+      : updater;
+  }
+
   const table = useReactTable({
     data: rows,
     columns,
@@ -624,14 +665,37 @@ export function ToolFactoryTable({
       sorting,
       columnFilters,
       columnVisibility,
-      globalFilter,
+      globalFilter: view.search,
       pagination,
     },
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
+    onSortingChange: (updater) => {
+      const next = resolveUpdate(updater, sorting)
+        .filter((entry) =>
+          TOOL_FACTORY_COLUMN_IDS.includes(entry.id as ToolFactoryColumnId),
+        )
+        .slice(0, 1) as ToolFactoryViewState['sorting'];
+      commitView({ ...view, sorting: next, pageIndex: 0 });
+    },
+    onColumnVisibilityChange: (updater) => {
+      const next = resolveUpdate(updater, columnVisibility);
+      const visibleColumns = TOOL_FACTORY_COLUMN_IDS.filter(
+        (id) => next[id] !== false,
+      );
+      commitView({
+        ...view,
+        visibleColumns: visibleColumns.length
+          ? visibleColumns
+          : view.visibleColumns,
+      });
+    },
+    onPaginationChange: (updater) => {
+      const next = resolveUpdate(updater, pagination);
+      commitView({
+        ...view,
+        pageIndex: Math.max(0, next.pageIndex),
+        pageSize: next.pageSize as 25 | 50 | 100,
+      });
+    },
     globalFilterFn: (row, _columnId, value: string) =>
       JSON.stringify(row.original).toLowerCase().includes(value.toLowerCase()),
     getCoreRowModel: getCoreRowModel(),
@@ -639,11 +703,29 @@ export function ToolFactoryTable({
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     columnResizeMode: 'onChange',
+    autoResetPageIndex: false,
   });
 
-  function setFilter(columnId: string, value: string) {
-    table.getColumn(columnId)?.setFilterValue(value || undefined);
-    table.setPageIndex(0);
+  const filteredRowCount = table.getFilteredRowModel().rows.length;
+  useEffect(() => {
+    const pageIndex = clampToolFactoryPageIndex(
+      view.pageIndex,
+      filteredRowCount,
+      view.pageSize,
+    );
+    if (pageIndex === view.pageIndex) return;
+    commitView({ ...view, pageIndex }, 'replace');
+  }, [commitView, filteredRowCount, view]);
+
+  function setFilter(
+    filter: keyof ToolFactoryViewState['filters'],
+    value: string,
+  ) {
+    commitView({
+      ...view,
+      filters: { ...view.filters, [filter]: value },
+      pageIndex: 0,
+    });
   }
 
   return (
@@ -678,15 +760,18 @@ export function ToolFactoryTable({
               aria-label="Search all Tools"
               className="min-w-64 flex-1 lg:max-w-md"
               placeholder="Search every Tool and detail…"
-              value={globalFilter}
+              value={view.search}
               onChange={(event) => {
-                setGlobalFilter(event.target.value);
-                table.setPageIndex(0);
+                commitView(
+                  { ...view, search: event.target.value, pageIndex: 0 },
+                  'replace',
+                );
               }}
             />
             <select
               aria-label="Filter by support"
               className="h-9 rounded-md border bg-white px-3 text-sm"
+              value={view.filters.support}
               onChange={(event) => setFilter('support', event.target.value)}
             >
               <option value="">All support</option>
@@ -697,6 +782,7 @@ export function ToolFactoryTable({
             <select
               aria-label="Filter by family"
               className="h-9 max-w-56 rounded-md border bg-white px-3 text-sm"
+              value={view.filters.family}
               onChange={(event) => setFilter('family', event.target.value)}
             >
               <option value="">All families</option>
@@ -707,7 +793,8 @@ export function ToolFactoryTable({
             <select
               aria-label="Filter by execution profile"
               className="h-9 max-w-56 rounded-md border bg-white px-3 text-sm"
-              onChange={(event) => setFilter('profiles', event.target.value)}
+              value={view.filters.profile}
+              onChange={(event) => setFilter('profile', event.target.value)}
             >
               <option value="">All execution profiles</option>
               {profileValues.map((value) => (
@@ -717,6 +804,7 @@ export function ToolFactoryTable({
             <select
               aria-label="Filter by verification"
               className="h-9 max-w-56 rounded-md border bg-white px-3 text-sm"
+              value={view.filters.verification}
               onChange={(event) =>
                 setFilter('verification', event.target.value)
               }
@@ -760,10 +848,7 @@ export function ToolFactoryTable({
             <Button
               variant="outline"
               onClick={() => {
-                setGlobalFilter('');
-                setColumnFilters([]);
-                setSorting([]);
-                setColumnVisibility(defaultVisibility);
+                commitView(DEFAULT_TOOL_FACTORY_VIEW);
               }}
             >
               Reset

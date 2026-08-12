@@ -96,6 +96,25 @@ if (args.environment === 'DEV/STAGING' && !accessCookie) {
   throw new Error('DEV/STAGING checks require Cloudflare Access');
 }
 
+async function waitForHydration(page) {
+  await page.waitForFunction(
+    () => {
+      const input = globalThis.document.querySelector(
+        'input[aria-label="Search all Tools"]',
+      );
+      return (
+        input &&
+        Object.keys(input).some(
+          (key) =>
+            key.startsWith('__reactFiber') || key.startsWith('__reactProps'),
+        )
+      );
+    },
+    undefined,
+    { timeout: 30_000 },
+  );
+}
+
 try {
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -130,22 +149,7 @@ try {
       '2,807 active Tools · 431 supported · 2,373 explicitly unsupported · 3 unknown',
     )
     .waitFor();
-  await page.waitForFunction(
-    () => {
-      const input = globalThis.document.querySelector(
-        'input[aria-label="Search all Tools"]',
-      );
-      return (
-        input &&
-        Object.keys(input).some(
-          (key) =>
-            key.startsWith('__reactFiber') || key.startsWith('__reactProps'),
-        )
-      );
-    },
-    undefined,
-    { timeout: 30_000 },
-  );
+  await waitForHydration(page);
 
   await page.getByLabel('Search all Tools').fill('png-to-webp');
   await page.getByText('1 matching Tools').waitFor();
@@ -210,15 +214,133 @@ try {
   await page.keyboard.press('Escape');
 
   await page.getByRole('button', { name: 'Reset' }).click();
+  await page.getByLabel('Search all Tools').fill('to');
   await page.getByLabel('Filter by support').selectOption('unsupported');
-  await page.getByText('2,373 matching Tools').waitFor();
+  await page
+    .getByLabel('Filter by family')
+    .selectOption('generic-convert:adaptive-video');
+  await page
+    .getByLabel('Filter by execution profile')
+    .selectOption('client-only, server-assisted, server-executed');
+  await page
+    .getByLabel('Filter by verification')
+    .selectOption('explicit-fail-closed-contract');
+  const matchingLabel = page.getByText(/^\d[\d,]* matching Tools/);
+  const matchingText = await matchingLabel.textContent();
+  const matchingCount = Number(
+    matchingText?.match(/[\d,]+/)?.[0].replace(',', ''),
+  );
+  assert.ok(matchingCount > 25);
 
   await page.getByText('Columns', { exact: true }).click();
   await page.getByLabel('Description').check();
   await page.getByRole('columnheader', { name: /Description/ }).waitFor();
 
+  await page.getByLabel('Rows per page').selectOption('25');
+  const sharedPageCount = Math.ceil(matchingCount / 25);
+  await page.getByText(`page 1 of ${sharedPageCount}`).waitFor();
+  await page.getByRole('button', { name: 'Tool', exact: true }).click();
   await page.getByRole('button', { name: 'Next', exact: true }).click();
-  await page.getByText('page 2 of 48').waitFor();
+  await page.getByText(`page 2 of ${sharedPageCount}`).waitFor();
+  const expectedFirstRow = await page.locator('tbody tr').first().innerText();
+
+  const sharedUrl = new URL(page.url());
+  assert.equal(sharedUrl.searchParams.get('q'), 'to');
+  assert.equal(sharedUrl.searchParams.get('support'), 'unsupported');
+  assert.equal(
+    sharedUrl.searchParams.get('family'),
+    'generic-convert:adaptive-video',
+  );
+  assert.equal(
+    sharedUrl.searchParams.get('profile'),
+    'client-only, server-assisted, server-executed',
+  );
+  assert.equal(
+    sharedUrl.searchParams.get('verification'),
+    'explicit-fail-closed-contract',
+  );
+  assert.equal(sharedUrl.searchParams.get('rows'), '25');
+  assert.equal(sharedUrl.searchParams.get('page'), '2');
+  assert.equal(sharedUrl.searchParams.get('sort'), 'tool:asc');
+  assert.match(sharedUrl.searchParams.get('columns') ?? '', /description/);
+
+  await page.reload({ waitUntil: 'networkidle' });
+  await waitForHydration(page);
+  await page
+    .getByText(`${matchingCount.toLocaleString()} matching Tools`)
+    .waitFor();
+  await page.getByText(`page 2 of ${sharedPageCount}`).waitFor();
+  assert.equal(await page.getByLabel('Search all Tools').inputValue(), 'to');
+  assert.equal(
+    await page.getByLabel('Filter by support').inputValue(),
+    'unsupported',
+  );
+  assert.equal(
+    await page.getByLabel('Filter by family').inputValue(),
+    'generic-convert:adaptive-video',
+  );
+  assert.equal(
+    await page.getByLabel('Filter by execution profile').inputValue(),
+    'client-only, server-assisted, server-executed',
+  );
+  assert.equal(
+    await page.getByLabel('Filter by verification').inputValue(),
+    'explicit-fail-closed-contract',
+  );
+  assert.equal(await page.getByLabel('Rows per page').inputValue(), '25');
+  await page.getByRole('columnheader', { name: /Description/ }).waitFor();
+  assert.equal(
+    await page.locator('tbody tr').first().innerText(),
+    expectedFirstRow,
+  );
+
+  const copiedPage = await context.newPage();
+  const copiedErrors = [];
+  copiedPage.on('pageerror', (error) => copiedErrors.push(error.message));
+  await copiedPage.goto(sharedUrl.href, { waitUntil: 'networkidle' });
+  await waitForHydration(copiedPage);
+  await copiedPage
+    .getByText(`${matchingCount.toLocaleString()} matching Tools`)
+    .waitFor();
+  await copiedPage.getByText(`page 2 of ${sharedPageCount}`).waitFor();
+  await copiedPage.getByRole('columnheader', { name: /Description/ }).waitFor();
+  assert.equal(
+    await copiedPage.locator('tbody tr').first().innerText(),
+    expectedFirstRow,
+  );
+  assert.deepEqual(copiedErrors, []);
+  await copiedPage.close();
+
+  await page.goBack({ waitUntil: 'networkidle' });
+  await page.getByText(`page 1 of ${sharedPageCount}`).waitFor();
+  await page.goForward({ waitUntil: 'networkidle' });
+  await page.getByText(`page 2 of ${sharedPageCount}`).waitFor();
+  assert.equal(
+    await page.locator('tbody tr').first().innerText(),
+    expectedFirstRow,
+  );
+
+  await page.getByRole('button', { name: 'Reset' }).click();
+  assert.equal(new URL(page.url()).search, '');
+  await page.getByText('2,807 matching Tools').waitFor();
+  assert.equal(await page.getByLabel('Rows per page').inputValue(), '50');
+  assert.equal(
+    await page.getByRole('columnheader', { name: /Description/ }).count(),
+    0,
+  );
+
+  await page.goto(
+    new URL(
+      '/internal/tools?support=retired&sort=missing%3Asideways&columns=missing&page=999999&rows=999',
+      args.baseUrl,
+    ).href,
+    { waitUntil: 'networkidle' },
+  );
+  await waitForHydration(page);
+  await page.getByText('2,807 matching Tools').waitFor();
+  await page.getByText('page 57 of 57').waitFor();
+  assert.equal(new URL(page.url()).search, '?page=57');
+  assert.equal(await page.getByLabel('Rows per page').inputValue(), '50');
 
   assert.deepEqual(pageErrors, []);
   status = 'success';
@@ -239,10 +361,10 @@ try {
     status,
     startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
-    linkedWork: ['#50', '#105', '#107'],
+    linkedWork: ['#50', '#105', '#106', '#107'],
     summary: {
       status,
-      checksPassed: status === 'success' ? 8 : 0,
+      checksPassed: status === 'success' ? 14 : 0,
       checksFailed: status === 'success' ? 0 : 1,
       items: 1,
       durationMs: completedAt.valueOf() - startedAt.valueOf(),

@@ -175,7 +175,7 @@ Dashboard access:
   `/internal/tools*`; add one Allow policy containing the exact approved owner
   email and no broad Everyone rule. Copy the application AUD and team domain.
   Store all three runtime bindings with `wrangler secret put <NAME> --env
-  wayfinder-preview`, entering each value through stdin. The deploy wrapper
+wayfinder-preview`, entering each value through stdin. The deploy wrapper
   checks that all names exist and refuses deployment when any are absent.
 - Display: the page visibly identifies `DEV/STAGING` and the full deployed
   revision. Treat that pair as the boundary for any screenshot or browser
@@ -198,9 +198,10 @@ TOOL_FACTORY_CF_AUTHORIZATION='<temporary Access cookie>' \
 ```
 
 Never put the cookie in an argument, source file, screenshot, or retained
-artifact. The check exercises search, support filtering, column visibility,
-pagination, and a Tool detail drawer while asserting the displayed environment
-and revision.
+artifact. The check exercises search, support filtering, sorting, column
+visibility, pagination, copied-view restoration, browser Back/Forward, Reset,
+invalid-link recovery, and a Tool detail drawer while asserting the displayed
+environment and revision.
 
 ## Cache And Optimization Bindings
 
