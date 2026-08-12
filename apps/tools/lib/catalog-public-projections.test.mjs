@@ -18,7 +18,7 @@ const acceptedProjectionSnapshots = {
     expectedItemCount: 2807,
     observedItemCount: toolCatalog.directoryEntries.length,
     projection: toolCatalog.directoryEntries,
-    sha256: '8cacf223b853270997d71967801b1368e4dfa68b12c120e4b2211866bdf7b5ef',
+    sha256: '9f0c02e83a5776018991c965ee9a652e03653c27e0962260cab49407449287e4',
   },
   toolsLinkHub: {
     expectedItemCount: 2807,
@@ -27,7 +27,7 @@ const acceptedProjectionSnapshots = {
       0,
     ),
     projection: toolsLinkHubProjection,
-    sha256: '7f6e1bf6524cdb6484f8be5d470dec80d4b8568cc0bbfe9a45998e2635254962',
+    sha256: 'af4fa6caa30dd88c40081e4057056862e17c567c07cc458d3150ec891124be5f',
   },
 };
 

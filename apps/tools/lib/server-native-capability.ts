@@ -3,6 +3,7 @@ export const SERVER_NATIVE_OPERATIONS = [
   "image-convert",
   "video-convert",
   "pdf-compress",
+  "media-extract",
 ] as const;
 
 export type ServerNativeOperation = (typeof SERVER_NATIVE_OPERATIONS)[number];

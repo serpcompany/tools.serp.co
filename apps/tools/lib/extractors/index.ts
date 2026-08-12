@@ -1,7 +1,7 @@
-import { tube8Extractor } from "./tube8";
-import type { ExtractedMediaFormat, ExtractorContext, MediaExtractor } from "./types";
+import { tube8Extractor } from "./tube8.ts";
+import type { ExtractedMediaFormat, ExtractorContext, MediaExtractor } from "./types.ts";
 
-export type { ExtractedMediaFormat, ExtractorContext, MediaExtractor } from "./types";
+export type { ExtractedMediaFormat, ExtractorContext, MediaExtractor } from "./types.ts";
 
 export const extractors: MediaExtractor[] = [tube8Extractor];
 

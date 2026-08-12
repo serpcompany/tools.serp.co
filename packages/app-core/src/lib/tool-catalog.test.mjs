@@ -325,6 +325,22 @@ test('catalog resolves specialized and fallback Tool page content', () => {
   );
   assert.ok(specialized.howTo);
   assert.ok(specialized.infoArticle);
+  assert.doesNotMatch(JSON.stringify(specialized), /Yes for public links/);
+
+  for (const toolId of [
+    'youtube-to-transcript',
+    'youtube-to-transcript-generator',
+  ]) {
+    const youtubePage = toolCatalog.getPageContent(toolId);
+    assert.ok(youtubePage);
+    assert.match(toolCatalog.getById(toolId).name, /YouTube Links Unsupported/);
+    const renderedCopy = JSON.stringify(youtubePage);
+    assert.match(renderedCopy, /YouTube links are not supported right now/);
+    assert.doesNotMatch(
+      renderedCopy,
+      /Transcribe YouTube videos|from YouTube videos|Yes for public links/,
+    );
+  }
 
   const generic = toolCatalog.getPageContent('3g2-to-mp4');
   assert.ok(generic);

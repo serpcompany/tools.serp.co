@@ -1,4 +1,4 @@
-import type { ExtractedMediaFormat, MediaExtractor } from "./types";
+import type { ExtractedMediaFormat, MediaExtractor } from "./types.ts";
 
 const BROWSER_USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/124 Safari/537.36";

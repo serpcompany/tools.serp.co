@@ -76,6 +76,7 @@ test("the Cloudflare projection marks every server-native route unavailable", ()
     "image-convert": unavailable,
     "video-convert": unavailable,
     "pdf-compress": unavailable,
+    "media-extract": unavailable,
   });
 
   const wrangler = readFileSync(
@@ -111,6 +112,8 @@ test("route entrypoints defer unavailable native dependencies and keep pure imag
   assert.doesNotMatch(route("video-convert"), /from "node:|from "ffmpeg-static"/);
   assert.doesNotMatch(route("pdf-compress"), /from "ghostscript-node"/);
   assert.doesNotMatch(route("image-compress"), /from "sharp"/);
+  assert.doesNotMatch(route("media-fetch"), /from "youtube-dl-exec"/);
+  assert.doesNotMatch(route("media-fetch"), /from "node:(?:fs|os|path)"/);
   assert.match(route("image-compress"), /from "svgo\/browser"/);
   const nativeImage = readFileSync(
     new URL("../app/api/image-compress/native.ts", import.meta.url),

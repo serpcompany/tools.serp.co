@@ -222,6 +222,10 @@ test('transcription smoke uses owned speech and a bounded success-or-error termi
   );
   assert.match(runnerSource, /page\.fill\(['"]\[data-testid=[^\n]+tool-url-input/);
   assert.match(runnerSource, /page\.route\(['"]\*\*\/api\/media-fetch\*['"]/);
+  assert.match(runnerSource, /Download failed\|422\|Unexpected token/);
+  assert.match(runnerSource, /dropFilesOnDropzone[\s\S]*fixtureEntry\.path/);
+  assert.match(runnerSource, /https:\/\/media\.example\/direct-speech\.mp3/);
+  assert.match(runnerSource, /direct-media transcript/);
 });
 
 test('local downloader smoke crosses the URL endpoint with checked-in media', () => {

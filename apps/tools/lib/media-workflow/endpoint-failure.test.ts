@@ -162,6 +162,14 @@ test("transcription endpoint presents the explicit YouTube unsupported response"
       },
       new AbortController().signal,
     ),
-    /YouTube links are not supported right now.*direct public audio or video file URL/,
+    (error: unknown) => {
+      assert.ok(error instanceof Error);
+      assert.equal(
+        error.message,
+        "YouTube links are not supported right now. Upload the file or use a direct public audio or video file URL.",
+      );
+      assert.doesNotMatch(error.message, /Download failed|422/);
+      return true;
+    },
   );
 });

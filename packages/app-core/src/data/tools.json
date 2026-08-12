@@ -4235,7 +4235,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "YouTube links are not supported right now. Use an upload or a direct public audio or video file URL. Other webpage links may also be unavailable."
         },
         {
           "question": "Why is the first run slower?",
@@ -110268,8 +110268,8 @@
   },
   {
     "id": "youtube-to-transcript",
-    "name": "YouTube to Transcript",
-    "description": "Transcribe YouTube videos to a text transcript",
+    "name": "Video Transcript (YouTube Links Unsupported)",
+    "description": "Transcribe an uploaded copy of a video; YouTube links are not supported",
     "operation": "convert",
     "route": "/youtube-to-transcript",
     "from": "mp4",
@@ -110286,29 +110286,29 @@
     ],
     "content": {
       "tool": {
-        "title": "YouTube to Transcript",
-        "subtitle": "Transcribe YouTube videos to a text transcript from public links or uploads.",
-        "from": "YouTube",
+        "title": "Video Transcript (Uploads Only)",
+        "subtitle": "Upload an audio or video file to transcribe it. YouTube links are not supported right now.",
+        "from": "audio/video upload",
         "to": "transcript",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
       },
       "howTo": {
-        "title": "How to transcribe YouTube videos to a transcript",
-        "intro": "Follow these steps to turn a YouTube video into a readable transcript.",
+        "title": "How to transcribe an uploaded video",
+        "intro": "YouTube links are not supported right now. If you already have a media file you are allowed to use, follow these steps.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
-        "title": "About YouTube transcription",
-        "markdown": "YouTube to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "title": "About upload-based transcription",
+        "markdown": "This page transcribes speech from audio or video files you upload. YouTube links are not supported right now. Uploaded files are processed in your browser, and the speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**What works here**\n\n- Uploading supported audio or video files.\n- Creating a plain text transcript you can edit or share.\n- Common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -110316,7 +110316,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "YouTube links are not supported right now. Upload a media file you are allowed to use instead."
         },
         {
           "question": "Why is the first run slower?",
@@ -110345,8 +110345,8 @@
   },
   {
     "id": "youtube-to-transcript-generator",
-    "name": "YouTube Transcript Generator",
-    "description": "Generate transcripts from YouTube videos",
+    "name": "Video Transcript Generator (YouTube Links Unsupported)",
+    "description": "Generate a transcript from an uploaded video; YouTube links are not supported",
     "operation": "convert",
     "route": "/youtube-to-transcript-generator",
     "from": "mp4",
@@ -110364,29 +110364,29 @@
     ],
     "content": {
       "tool": {
-        "title": "YouTube Transcript Generator",
-        "subtitle": "Generate a text transcript from YouTube videos using public links or uploads.",
-        "from": "YouTube",
+        "title": "Video Transcript Generator (Uploads Only)",
+        "subtitle": "Upload an audio or video file to generate a transcript. YouTube links are not supported right now.",
+        "from": "audio/video upload",
         "to": "transcript",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
       },
       "howTo": {
-        "title": "How to generate a YouTube transcript",
-        "intro": "Follow these steps to generate a readable transcript from a YouTube video.",
+        "title": "How to generate a transcript from an upload",
+        "intro": "YouTube links are not supported right now. If you already have a media file you are allowed to use, follow these steps.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
-        "title": "About YouTube transcript generation",
-        "markdown": "YouTube Transcript Generator transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "title": "About upload-based transcript generation",
+        "markdown": "This page transcribes speech from audio or video files you upload. YouTube links are not supported right now. Uploaded files are processed in your browser, and the speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**What works here**\n\n- Uploading supported audio or video files.\n- Creating a plain text transcript you can edit or share.\n- Common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -110394,7 +110394,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "YouTube links are not supported right now. Upload a media file you are allowed to use instead."
         },
         {
           "question": "Why is the first run slower?",

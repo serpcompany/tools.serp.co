@@ -71,18 +71,23 @@ export function createProductionMediaEndpoint(
       if (!response.ok) {
         let detail = "";
         let extensionRequired = false;
+        let errorCode = "";
         try {
           const payload = (await response.json()) as {
             error?: unknown;
             extensionRequired?: unknown;
+            code?: unknown;
           };
           detail = typeof payload.error === "string" ? payload.error : "";
           extensionRequired = payload.extensionRequired === true;
+          errorCode = typeof payload.code === "string" ? payload.code : "";
         } catch {
           // The repository endpoint is allowed to return an empty error body.
         }
         const publicMessage =
-          !downloader && response.status >= 500
+          !downloader && errorCode === "youtube-unsupported" && detail
+            ? detail
+            : !downloader && response.status >= 500
             ? "This public media link could not be opened. Try a direct audio or video file URL instead."
             : `Download failed (${response.status})${detail ? `: ${detail}` : ""}`;
         throw new MediaEndpointError(

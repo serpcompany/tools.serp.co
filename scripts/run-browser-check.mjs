@@ -920,10 +920,51 @@ try {
           'https://www.youtube.com/watch?v=3Is2P90qVa0',
         );
         await page.click('[data-testid="tool-url-submit"]');
-      } else {
+        const youtubeTerminalHandle = await page.waitForFunction(
+          readTranscriptionTerminalState,
+          undefined,
+          { timeout: 20_000 },
+        );
+        const youtubeTerminal = await youtubeTerminalHandle.jsonValue();
+        if (
+          youtubeTerminal.status !== 'failed' ||
+          !youtubeTerminal.message.includes(
+            'YouTube links are not supported right now',
+          ) ||
+          /Download failed|422|Unexpected token/.test(youtubeTerminal.message)
+        ) {
+          throw new Error(
+            `Audio-to-Text YouTube failure was not plain and truthful: ${youtubeTerminal.message}`,
+          );
+        }
         await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
           fixtureEntry.path,
         ]);
+        await page.waitForFunction(
+          () =>
+            document
+              .querySelector('[data-testid="video-progress"]')
+              ?.getAttribute('data-status') !== 'error',
+        );
+      } else {
+        const media = await fs.readFile(fixtureEntry.path);
+        await page.route('**/api/media-fetch*', async (route) => {
+          await route.fulfill({
+            status: 200,
+            headers: {
+              'content-length': String(media.byteLength),
+              'content-type': 'audio/mpeg',
+              'x-media-extension': 'mp3',
+              'x-media-filename': 'direct-speech.mp3',
+            },
+            body: media,
+          });
+        });
+        await page.fill(
+          '[data-testid="tool-url-input"]',
+          'https://media.example/direct-speech.mp3',
+        );
+        await page.click('[data-testid="tool-url-submit"]');
       }
       const terminalHandle = await page.waitForFunction(
         readTranscriptionTerminalState,
@@ -932,16 +973,14 @@ try {
       );
       const terminal = await terminalHandle.jsonValue();
       if (terminal.status === 'failed') {
-        if (
-          tool.id === 'audio-to-text' &&
-          terminal.message.includes('YouTube links are not supported right now') &&
-          !terminal.message.includes('Unexpected token')
-        ) {
-          return { detail: 'truthful YouTube unsupported terminal' };
-        }
         throw new Error(`Transcription failed: ${terminal.message}`);
       }
-      return { detail: `transcript ${terminal.transcript.length} chars` };
+      return {
+        detail:
+          tool.id === 'audio-to-text'
+            ? `truthful YouTube failure; upload transcript ${terminal.transcript.length} chars`
+            : `direct-media transcript ${terminal.transcript.length} chars`,
+      };
     }
 
     if (tool.from) {
