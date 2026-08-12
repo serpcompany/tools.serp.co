@@ -437,6 +437,7 @@ export default function TableConvertDemo({
 
                 {inputView === "raw" ? (
                   <textarea
+                    data-testid="table-source-input"
                     value={inputText}
                     onChange={(event) => {
                       clearOutputResult();
@@ -495,6 +496,7 @@ export default function TableConvertDemo({
                     size="sm"
                     onClick={handleConvert}
                     disabled={isConverting || Boolean(operationUnavailable)}
+                    data-testid="table-convert-run"
                   >
                     {isConverting ? "Converting…" : "Convert"}
                   </Button>
@@ -531,6 +533,7 @@ export default function TableConvertDemo({
 
                 {outputView === "raw" ? (
                   <textarea
+                    data-testid="table-output"
                     readOnly
                     value={outputText}
                     className="min-h-[280px] w-full resize-none rounded-lg border bg-muted/20 px-4 py-3 font-mono text-sm shadow-sm"

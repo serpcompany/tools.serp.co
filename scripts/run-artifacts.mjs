@@ -16,7 +16,11 @@ import process from 'node:process';
 function parseArguments(arguments_) {
   const [operation, ...tokens] = arguments_;
   const options = {};
-  const repeatableOptions = new Set(['input-hash', 'linked-work']);
+  const repeatableOptions = new Set([
+    'input-hash',
+    'linked-work',
+    'tool-evidence',
+  ]);
 
   for (let index = 0; index < tokens.length; index += 1) {
     const token = tokens[index];
@@ -78,6 +82,42 @@ function assertSafeSlug(value, optionName) {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(value)) {
     throw new Error(`--${optionName} must be a lowercase slug`);
   }
+}
+
+function parseToolEvidence(values) {
+  const tools = values.map((value) => {
+    let tool;
+    try {
+      tool = JSON.parse(value);
+    } catch {
+      throw new Error('--tool-evidence must be valid JSON');
+    }
+    if (
+      tool === null ||
+      typeof tool !== 'object' ||
+      Array.isArray(tool) ||
+      Object.keys(tool).some(
+        (key) => key !== 'toolId' && key !== 'invariants',
+      ) ||
+      !Array.isArray(tool.invariants)
+    ) {
+      throw new Error(
+        '--tool-evidence must contain only toolId and an invariants array',
+      );
+    }
+    assertSafeSlug(tool.toolId, 'tool-evidence toolId');
+    for (const invariant of tool.invariants) {
+      assertSafeSlug(invariant, 'tool-evidence invariant');
+    }
+    if (new Set(tool.invariants).size !== tool.invariants.length) {
+      throw new Error('--tool-evidence invariants must be unique');
+    }
+    return { toolId: tool.toolId, invariants: tool.invariants };
+  });
+  if (new Set(tools.map((tool) => tool.toolId)).size !== tools.length) {
+    throw new Error('--tool-evidence Tool ids must be unique');
+  }
+  return tools;
 }
 
 function redactReport(report) {
@@ -326,6 +366,7 @@ function create(options) {
       );
     }
   }
+  const tools = parseToolEvidence(options['tool-evidence'] ?? []);
 
   const compactTimestamp = startedAt
     .toISOString()
@@ -353,7 +394,11 @@ function create(options) {
       completedAt: completedAt.toISOString(),
     },
     environment,
-    scope: { label: scope, inputHashes },
+    scope: {
+      label: scope,
+      inputHashes,
+      ...(tools.length > 0 ? { tools } : {}),
+    },
     result: { status },
     runtime: {
       node: process.versions.node,

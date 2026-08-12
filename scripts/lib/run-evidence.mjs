@@ -76,6 +76,9 @@ export function recordRunEvidence(options) {
   for (const linkedWork of options.linkedWork ?? []) {
     arguments_.push('--linked-work', linkedWork);
   }
+  for (const tool of options.tools ?? []) {
+    arguments_.push('--tool-evidence', JSON.stringify(tool));
+  }
 
   const result = spawnSync(process.execPath, arguments_, {
     encoding: 'utf8',

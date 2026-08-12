@@ -209,13 +209,30 @@ test('local downloader smoke crosses the URL endpoint with checked-in media', ()
 
 test('specialized smoke coverage exercises rendered lifecycle and delivery behavior', () => {
   assert.match(runnerSource, /tool\.id === ['"]html-to-markdown['"]/);
-  assert.match(runnerSource, /html clear allowed a scheduled result to reappear/i);
+  assert.match(
+    runnerSource,
+    /html clear allowed a scheduled result to reappear/i,
+  );
   assert.match(runnerSource, /character debounce published stale statistics/i);
   assert.match(runnerSource, /csv-combiner-download/);
+  assert.match(runnerSource, /__lastBlob/);
+  assert.match(runnerSource, /__lastBlob\?\.text\(\)/);
   assert.match(runnerSource, /pdf-tool-input/);
   assert.match(runnerSource, /pdf-tool-viewer/);
   assert.match(runnerSource, /file=blob%3A/);
   assert.match(runnerSource, /pageerror/);
+});
+
+test('table smoke uses the table workflow seam and verifies CSV to JSON semantics', () => {
+  assert.match(runnerSource, /tool\.id === ['"]csv-to-json['"]/);
+  assert.match(runnerSource, /table-source-input/);
+  assert.match(runnerSource, /table-convert-run/);
+  assert.match(runnerSource, /table-output/);
+  assert.match(runnerSource, /Ada/);
+  assert.match(runnerSource, /Grace/);
+  assert.match(runnerSource, /__lastBlob\?\.text\(\)/);
+  assert.match(runnerSource, /JSON\.parse\(downloadedOutput\)/);
+  assert.match(runnerSource, /assertCsvToJsonRecords/);
 });
 
 test('local evidence accepts only loopback targets', () => {

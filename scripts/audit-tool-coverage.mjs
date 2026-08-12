@@ -6,6 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { format } from 'prettier';
+import { summarizeToolAcceptance } from './lib/tool-acceptance-classification.mjs';
 
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url));
 const supportedNodeMajor = 22;
@@ -52,7 +53,38 @@ if (JSON.stringify(currentTestFiles) !== JSON.stringify(sourceTestFiles)) {
   );
 }
 
+function collectLocalModuleInputs(entryPath) {
+  const inputs = new Set();
+  const pending = [entryPath];
+  const importPattern = /(?:from\s*|import\s*\()\s*['"](\.{1,2}\/[^'"]+)['"]/g;
+  while (pending.length > 0) {
+    const relativePath = pending.pop();
+    if (!relativePath || inputs.has(relativePath)) continue;
+    inputs.add(relativePath);
+    const source = fs.readFileSync(
+      path.join(repositoryRoot, relativePath),
+      'utf8',
+    );
+    for (const match of source.matchAll(importPattern)) {
+      const importedPath = path.posix.normalize(
+        path.posix.join(path.posix.dirname(relativePath), match[1]),
+      );
+      if (fs.existsSync(path.join(repositoryRoot, importedPath))) {
+        pending.push(importedPath);
+      }
+    }
+  }
+  return Object.freeze([...inputs].sort());
+}
+
+// Pin the executable reproducer's complete local module graph as well as the
+// product inputs. Otherwise a working-tree-only helper change could produce a
+// payload that falsely names `sourceRevision` as its complete source.
+const auditReproducerInputs = collectLocalModuleInputs(
+  'scripts/audit-tool-coverage.mjs',
+);
 const auditedInputPaths = [
+  ...auditReproducerInputs,
   'apps/tools',
   'packages/app-core',
   'packages/tool-telemetry',
@@ -78,10 +110,16 @@ const [
   { operationalToolCatalog: catalog },
   { executionProvenance },
   { selectToolRenderer },
+  { getToolProcessorAvailability },
+  { getGenericToolContract },
+  { getTableOperationPolicy },
 ] = await Promise.all([
   import('../packages/app-core/src/lib/tool-catalog-adapter.mjs'),
   import('../apps/tools/lib/tool-execution-provenance.ts'),
   import('../apps/tools/lib/tool-renderer.ts'),
+  import('../apps/tools/lib/tool-processor-registry.ts'),
+  import('../apps/tools/lib/generic-tool-workflow.ts'),
+  import('../apps/tools/lib/table-operation-policy.ts'),
 ]);
 
 const fixtureRoot = path.join(repositoryRoot, 'apps/tools/benchmarks');
@@ -146,6 +184,7 @@ const tools = [...catalog.activeTools]
   .map((tool) => {
     const renderer = selectToolRenderer(tool);
     const provenance = executionProvenance.getByToolId(tool.id);
+    const processorAvailability = getToolProcessorAvailability(tool.id);
     const fixtureEntry = tool.from ? formatFixtures.get(tool.from) : null;
     const formatFixtureAvailable = Boolean(
       fixtureEntry?.status === 'ready' &&
@@ -174,6 +213,9 @@ const tools = [...catalog.activeTools]
       id: tool.id,
       operation: tool.operation,
       renderer,
+      availabilityKind: processorAvailability.kind,
+      genericContractState: getGenericToolContract(tool.id).state,
+      tablePolicyKind: getTableOperationPolicy(tool.id).kind,
       executionProfiles:
         provenance.kind === 'mapped'
           ? [...provenance.executionProfiles]
@@ -186,6 +228,8 @@ const tools = [...catalog.activeTools]
     };
   });
 
+const acceptanceClassification = summarizeToolAcceptance(tools);
+
 const activeToolIds = tools.map((tool) => tool.id);
 const allActiveGap = {
   covered: 0,
@@ -195,8 +239,17 @@ const allActiveGap = {
 
 const payload = {
   schemaVersion: 3,
-  auditDate: '2026-08-11',
+  generatedAt: new Date().toISOString(),
   auditedSourceRevision: sourceRevision,
+  command: Object.freeze({
+    name: 'audit:tool-coverage',
+    version: '4',
+    arguments: Object.freeze(['--source-revision', sourceRevision]),
+  }),
+  environment: Object.freeze({
+    node: process.versions.node,
+    platform: `${process.platform}-${process.arch}`,
+  }),
   sources: {
     catalog: 'packages/app-core/src/lib/tool-catalog-adapter.mjs',
     renderer: 'apps/tools/lib/tool-renderer.ts',
@@ -240,6 +293,12 @@ const payload = {
         tool.executionProfiles.join('+'),
       ),
     },
+  },
+  acceptanceClassification: {
+    definition:
+      'Every active Tool id appears exactly once: supported has a registered shared-workflow adapter; unsupported has an explicit generic or table fail-closed policy; unwired has known provenance without either; unknown lacks maintained provenance.',
+    counts: acceptanceClassification.counts,
+    toolIds: acceptanceClassification.toolIds,
   },
   coverage: {
     explicitExecutionProvenance: coverage(

@@ -89,6 +89,7 @@ function createArguments(overrides = {}) {
     completedAt: '2026-01-01T00:05:00.000Z',
     inputHashes: [],
     linkedWork: [],
+    tools: [],
     ...overrides,
   };
   const arguments_ = [
@@ -116,6 +117,9 @@ function createArguments(overrides = {}) {
   }
   for (const linkedWork of values.linkedWork) {
     arguments_.push('--linked-work', linkedWork);
+  }
+  for (const tool of values.tools) {
+    arguments_.push('--tool-evidence', JSON.stringify(tool));
   }
   if (values.retentionClass !== undefined) {
     arguments_.push('--retention-class', values.retentionClass);
@@ -313,7 +317,20 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
 
   const result = createRun(
     root,
-    createArguments({ inputHashes: [inputHash], linkedWork: ['#57'] }),
+    createArguments({
+      inputHashes: [inputHash],
+      linkedWork: ['#57'],
+      tools: [
+        {
+          toolId: 'png-to-webp',
+          invariants: ['generic-file-exact-output'],
+        },
+        {
+          toolId: 'video-downloader',
+          invariants: ['url-stream-exact-output'],
+        },
+      ],
+    }),
   );
 
   const runId = '20260101T000000Z_abcdef1_local_all-tools';
@@ -335,7 +352,20 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
       completedAt: '2026-01-01T00:05:00.000Z',
     },
     environment: 'local',
-    scope: { label: 'all-tools', inputHashes: [inputHash] },
+    scope: {
+      label: 'all-tools',
+      inputHashes: [inputHash],
+      tools: [
+        {
+          toolId: 'png-to-webp',
+          invariants: ['generic-file-exact-output'],
+        },
+        {
+          toolId: 'video-downloader',
+          invariants: ['url-stream-exact-output'],
+        },
+      ],
+    },
     result: { status: 'success' },
     runtime: {
       node: process.versions.node,

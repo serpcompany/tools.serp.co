@@ -1,5 +1,18 @@
 import crypto from 'node:crypto';
 
+const invariantByToolId = Object.freeze({
+  'png-to-webp': 'generic-file-exact-output',
+  'video-downloader': 'url-stream-exact-output',
+  'batch-compress-png': 'batch-archive-semantics',
+  'csv-to-json': 'table-row-header-value-semantics',
+  'json-to-csv': 'specialized-output-semantics',
+  'html-to-markdown': 'specialized-output-semantics',
+  'character-counter': 'specialized-output-semantics',
+  'csv-combiner': 'specialized-output-semantics',
+  'pdf-reader': 'specialized-output-semantics',
+  'audio-to-text': 'transcription-terminal',
+});
+
 export function buildBrowserScope({ mode, environment, toolIds, filtered }) {
   const selection = filtered ? 'subset' : 'all';
   const digest = crypto
@@ -9,6 +22,18 @@ export function buildBrowserScope({ mode, environment, toolIds, filtered }) {
   return {
     label: `browser-${mode}-${environment}-${selection}`,
     inputHashes: [`sha256:${digest}`],
+    tools: Object.freeze(
+      toolIds.map((toolId) =>
+        Object.freeze({
+          toolId,
+          invariants: Object.freeze(
+            mode === 'smoke' && invariantByToolId[toolId]
+              ? [invariantByToolId[toolId]]
+              : [],
+          ),
+        }),
+      ),
+    ),
   };
 }
 

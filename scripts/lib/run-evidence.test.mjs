@@ -22,6 +22,16 @@ test('evidence adapter writes the structured artifact contract', (t) => {
     startedAt: '2026-01-01T00:00:00.000Z',
     completedAt: '2026-01-01T00:01:00.000Z',
     linkedWork: ['#58'],
+    tools: [
+      {
+        toolId: 'png-to-webp',
+        invariants: ['generic-file-exact-output'],
+      },
+      {
+        toolId: 'video-downloader',
+        invariants: ['url-stream-exact-output'],
+      },
+    ],
     summary: {
       status: 'failure',
       checksPassed: 7,
@@ -48,6 +58,16 @@ test('evidence adapter writes the structured artifact contract', (t) => {
   assert.equal(manifest.revision.commit, 'a'.repeat(40));
   assert.equal(manifest.environment, 'main');
   assert.equal(manifest.scope.label, 'cloudflare-production');
+  assert.deepEqual(manifest.scope.tools, [
+    {
+      toolId: 'png-to-webp',
+      invariants: ['generic-file-exact-output'],
+    },
+    {
+      toolId: 'video-downloader',
+      invariants: ['url-stream-exact-output'],
+    },
+  ]);
   assert.equal(manifest.result.status, 'failure');
   assert.equal(
     readFileSync(path.join(runRoot, 'summary.txt'), 'utf8'),
