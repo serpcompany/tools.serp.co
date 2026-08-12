@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -69,7 +69,20 @@ function parseArgs(argv) {
   return result;
 }
 
+function deriveScreenshotPath(screenshot, label) {
+  if (!screenshot) return '';
+  const parsed = path.parse(screenshot);
+  return path.join(
+    parsed.dir,
+    `${parsed.name}-${label}${parsed.ext || '.png'}`,
+  );
+}
+
 const args = parseArgs(process.argv.slice(2));
+const screenshotPaths = {
+  planner: args.screenshot,
+  githubWork: deriveScreenshotPath(args.screenshot, 'github-work'),
+};
 const source = repositoryState();
 if (
   args.environment === 'LOCAL' &&
@@ -182,7 +195,9 @@ try {
       exact: true,
     })
     .waitFor();
-  if (args.screenshot) await planner.screenshot({ path: args.screenshot });
+  if (screenshotPaths.planner) {
+    await planner.screenshot({ path: screenshotPaths.planner });
+  }
   await page.getByLabel('Search all Tools').fill('3g2-to-mp4');
   await page.getByText('1 matching Tools').waitFor();
   await page.getByLabel('Search all Tools').fill('ai-to-png');
@@ -320,8 +335,13 @@ try {
       name: 'Draft foundation — do not merge to main: Tool workflow architecture',
     })
     .waitFor();
-  if (args.screenshot) {
-    await githubWorkHeading.locator('..').screenshot({ path: args.screenshot });
+  if (screenshotPaths.githubWork) {
+    await githubWorkHeading
+      .locator('..')
+      .screenshot({ path: screenshotPaths.githubWork });
+    assert.notEqual(screenshotPaths.planner, screenshotPaths.githubWork);
+    assert.ok(statSync(screenshotPaths.planner).size > 0);
+    assert.ok(statSync(screenshotPaths.githubWork).size > 0);
   }
   await page.keyboard.press('Escape');
 

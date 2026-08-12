@@ -109,6 +109,16 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /Not tested here/);
   assert.match(source, /Family verification policy \(not an exact Tool test\)/);
   assert.match(source, /planner\.screenshot/);
+  assert.match(
+    source,
+    /deriveScreenshotPath\(args\.screenshot, ['"]github-work['"]\)/,
+  );
+  assert.match(
+    source,
+    /assert\.notEqual\(screenshotPaths\.planner, screenshotPaths\.githubWork\)/,
+  );
+  assert.match(source, /statSync\(screenshotPaths\.planner\)\.size > 0/);
+  assert.match(source, /statSync\(screenshotPaths\.githubWork\)\.size > 0/);
   assert.match(source, /getByText\(['"]GitHub work['"]/);
   assert.match(source, /getByText\(['"]No tracked work['"]/);
   assert.match(source, /Work tracking not loaded/);
@@ -116,10 +126,7 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /Open pull request/);
   assert.match(source, /Closed issue/);
   assert.match(source, /renderer:transcription/);
-  assert.match(
-    source,
-    /githubWorkHeading\.locator\(['"]\.\.['"]\)\.screenshot/,
-  );
+  assert.match(source, /screenshot\(\{ path: screenshotPaths\.githubWork \}\)/);
   assert.match(source, /recordRunEvidence/);
   assert.match(source, /command:\s*['"]check:tool-factory['"]/);
   assert.match(
