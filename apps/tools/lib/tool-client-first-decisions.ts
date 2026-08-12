@@ -16,11 +16,11 @@ export type ClientFirstDecision = Readonly<{
   facts: readonly Readonly<{ statement: string; source: string }>[];
 }>;
 
-const webmToolIds = new Set([
-  'compress-webm',
-  'webm-to-m4a',
-  'webm-to-mp3',
-  'webm-to-mp4',
+const heifToolIds = new Set([
+  'heif-to-jpg',
+  'heif-to-pdf',
+  'heif-to-png',
+  'heif-to-webp',
 ]);
 
 export function getClientFirstDecision(
@@ -35,22 +35,19 @@ export function getClientFirstDecision(
       facts: Object.freeze([]),
     });
   }
-  if (webmToolIds.has(row.toolId)) {
+  if (heifToolIds.has(row.toolId)) {
     return Object.freeze({
-      groupId: 'wave:webm-browser-ffmpeg',
+      groupId: 'wave:heif-browser-libheif',
       reviewCategory: 'existing-browser-code-to-verify',
-      testReadiness: 'fixture-and-verifiers',
+      testReadiness: 'unresolved',
       decisionCost: 'bounded',
-      allowedCandidateIds: new Set([
-        'browser-ffmpeg-compression',
-        'browser-ffmpeg-wasm',
-      ]),
+      allowedCandidateIds: new Set(['browser-raster-worker']),
       facts: Object.freeze([
         Object.freeze({
           statement:
-            'A distinct WebM fixture and semantic parsers for the exact input/output formats are maintained in the repository.',
+            'The browser raster processor already contains a libheif decode path, but the retained HEIF fixture still needs independent identity review.',
           source:
-            'apps/tools/benchmarks/fixtures/sample.webm and workflow semantic validators',
+            'apps/tools/lib/convert/workerClient.ts and retained HEIF fixtures',
         }),
       ]),
     });

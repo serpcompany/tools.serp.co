@@ -40,6 +40,7 @@ const MAX_OUTPUT_BYTES = 512 * 1_024 * 1_024;
 const MAX_TOTAL_OUTPUT_BYTES = 1_024 * 1_024 * 1_024;
 
 export {
+  BROWSER_WEBM_TOOL_IDS,
   genericCompressionNeedsWorker,
   getGenericToolContract,
   type GenericToolContract,
@@ -102,7 +103,10 @@ export type GenericWorkflowAdapters = Readonly<{
 
 export async function verifyGenericMediaSemantics(
   media: WorkflowMedia,
-  context: Readonly<{ signal?: AbortSignal }> = {},
+  context: Readonly<{
+    signal?: AbortSignal;
+    requiredMediaTrack?: 'any' | 'audio' | 'video';
+  }> = {},
 ) {
   context.signal?.throwIfAborted();
   const expectedMimeType = mimeTypeForGenericFormat(media.format);
@@ -164,6 +168,8 @@ export async function verifyGenericMediaSemantics(
   }
   const verification = await verifyMediaSemantics(
     media.format === 'jpeg' ? { ...media, format: 'jpg' } : media,
+    undefined,
+    context,
   );
   if (media.format === 'mp4' && verification.status === 'verified') {
     const tracks = inspectBmffTrackFamilies(media.bytes);
@@ -387,6 +393,13 @@ function processorFor(
     async verifyInput(input, context) {
       const verification = await verifyGenericMediaSemantics(input, {
         signal: context.signal,
+        requiredMediaTrack:
+          contract.input.format === 'webm'
+            ? contract.output.format === 'm4a' ||
+              contract.output.format === 'mp3'
+              ? 'audio'
+              : 'video'
+            : undefined,
       });
       return verification.status === 'unavailable'
         ? adapters.verify(input, { signal: context.signal })
@@ -447,6 +460,10 @@ function processorFor(
     async verifyResult(result, context) {
       const verification = await verifyGenericMediaSemantics(result, {
         signal: context.signal,
+        requiredMediaTrack:
+          contract.operation === 'compress' && contract.output.format === 'webm'
+            ? 'video'
+            : undefined,
       });
       const formatVerification =
         verification.status === 'unavailable'

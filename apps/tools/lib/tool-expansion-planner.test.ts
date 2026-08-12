@@ -12,7 +12,7 @@ test('expansion plan groups every explicitly unsupported Tool exactly once from 
     .map((row) => row.toolId)
     .sort();
 
-  assert.equal(plan.unsupportedToolCount, 2_373);
+  assert.equal(plan.unsupportedToolCount, 2_369);
   assert.deepEqual(
     plan.groups.flatMap((group) => group.toolIds).sort(),
     unsupportedToolIds,
@@ -25,18 +25,18 @@ test('expansion plan groups every explicitly unsupported Tool exactly once from 
   const first = plan.groups[0];
   assert.ok(first);
   assert.equal(first.rank, 1);
-  assert.equal(first.operationFamily, 'wave:webm-browser-ffmpeg');
+  assert.equal(first.operationFamily, 'wave:heif-browser-libheif');
   assert.equal(first.browserFeasibility, 'existing-browser-code');
   assert.equal(first.unlockCount, 4);
   assert.deepEqual(first.toolIds, [
-    'compress-webm',
-    'webm-to-m4a',
-    'webm-to-mp3',
-    'webm-to-mp4',
+    'heif-to-jpg',
+    'heif-to-pdf',
+    'heif-to-png',
+    'heif-to-webp',
   ]);
   assert.deepEqual(
     first.candidateEngines.map((engine) => engine.id),
-    ['browser-ffmpeg-compression', 'browser-ffmpeg-wasm'],
+    ['browser-raster-worker'],
   );
   assert.deepEqual(first.executionLocations, ['browser']);
   assert.equal(first.supportMeaning, 'planning-candidates-only');
@@ -66,7 +66,7 @@ test('candidate ranking exposes facts, assumptions, and every required review in
       ['adapter', 'missing'],
       ['browser-runtime-fit', 'needs-review'],
       ['fixture', 'needs-review'],
-      ['semantic-validator', 'needs-review'],
+      ['semantic-validator', 'missing'],
       ['limits', 'needs-review'],
       ['licensing', 'needs-review'],
       ['maintenance-review', 'needs-review'],
@@ -111,7 +111,7 @@ test('portfolio groups expose client-first decision categories without treating 
 
   assert.equal(
     plan.groups.reduce((sum, group) => sum + group.unlockCount, 0),
-    2_373,
+    2_369,
   );
 });
 

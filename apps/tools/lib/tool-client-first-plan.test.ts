@@ -97,14 +97,14 @@ test('unsupported portfolio receives conservative browser decision categories', 
 
   assert.deepEqual(
     {
-      webm: plan.getByToolId('webm-to-mp3')?.browserFeasibility,
+      heif: plan.getByToolId('heif-to-png')?.browserFeasibility,
       raster: plan.getByToolId('avif-to-png')?.browserFeasibility,
       same: plan.getByToolId('avif-to-avif')?.browserFeasibility,
       server: plan.getByToolId('cr3-to-png')?.browserFeasibility,
       adaptive: plan.getByToolId('3g2-to-mp4')?.browserFeasibility,
     },
     {
-      webm: 'existing-browser-path',
+      heif: 'existing-browser-path',
       raster: 'new-browser-library',
       same: 'catalog-review',
       server: 'unresolved',
@@ -112,8 +112,13 @@ test('unsupported portfolio receives conservative browser decision categories', 
     },
   );
   assert.equal(
-    plan.getByToolId('webm-to-mp3')?.preferredTarget,
+    plan.getByToolId('heif-to-png')?.preferredTarget,
     'browser-first',
   );
-  assert.equal(plan.getByToolId('webm-to-mp3')?.serverDependency, 'unknown');
+  assert.equal(plan.getByToolId('heif-to-png')?.serverDependency, 'unknown');
+
+  const verifiedWebm = plan.getByToolId('webm-to-mp3');
+  assert.equal(verifiedWebm?.currentExecution.state, 'browser');
+  assert.equal(verifiedWebm?.serverDependency, 'none');
+  assert.deepEqual(verifiedWebm?.candidateEngines, []);
 });

@@ -9,8 +9,8 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
   assert.equal(model.rows.length, 2_807);
   assert.equal(new Set(model.rows.map((row) => row.toolId)).size, 2_807);
   assert.deepEqual(model.counts, {
-    supported: 431,
-    unsupported: 2_373,
+    supported: 435,
+    unsupported: 2_369,
     unwired: 0,
     unknown: 3,
   });

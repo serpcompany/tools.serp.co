@@ -160,7 +160,7 @@ try {
   await page.getByText(`Revision ${args.revision}`, { exact: true }).waitFor();
   await page
     .getByText(
-      '2,807 active Tools · 431 supported · 2,373 explicitly unsupported · 3 unknown',
+      '2,807 active Tools · 435 supported · 2,369 explicitly unsupported · 3 unknown',
     )
     .waitFor();
   await waitForHydration(page);
@@ -182,13 +182,10 @@ try {
     )
     .waitFor();
   const adaptiveGroup = planner.getByRole('article', {
-    name: 'Rank 1 wave:webm-browser-ffmpeg',
+    name: 'Rank 1 wave:heif-browser-libheif',
   });
   await adaptiveGroup.getByText('4 exact Tools', { exact: true }).waitFor();
-  await adaptiveGroup
-    .getByText('@ffmpeg/ffmpeg and @ffmpeg/core', { exact: false })
-    .first()
-    .waitFor();
+  await adaptiveGroup.getByText('libheif', { exact: false }).first().waitFor();
   await adaptiveGroup.getByText('adapter · missing', { exact: true }).waitFor();
   await adaptiveGroup
     .getByText('browser/runtime fit · needs review', { exact: true })
@@ -198,14 +195,14 @@ try {
     .click();
   await page.getByText('4 matching Tools').waitFor();
   await page
-    .getByText('Filtering to rank 1 · wave:webm-browser-ffmpeg', {
+    .getByText('Filtering to rank 1 · wave:heif-browser-libheif', {
       exact: true,
     })
     .waitFor();
   if (screenshotPaths.planner) {
     await planner.screenshot({ path: screenshotPaths.planner });
   }
-  await page.getByLabel('Search all Tools').fill('webm-to-mp3');
+  await page.getByLabel('Search all Tools').fill('heif-to-png');
   await page.getByText('1 matching Tools').waitFor();
   await page.getByLabel('Search all Tools').fill('ai-to-png');
   await page.getByText('0 matching Tools').waitFor();
@@ -213,14 +210,14 @@ try {
   const expansionUrl = new URL(page.url());
   assert.equal(
     expansionUrl.searchParams.get('expansion'),
-    'family:wave:webm-browser-ffmpeg',
+    'family:wave:heif-browser-libheif',
   );
 
   await page.reload({ waitUntil: 'networkidle' });
   await waitForHydration(page);
   await page.getByText('4 matching Tools').waitFor();
   await page
-    .getByText('Filtering to rank 1 · wave:webm-browser-ffmpeg', {
+    .getByText('Filtering to rank 1 · wave:heif-browser-libheif', {
       exact: true,
     })
     .waitFor();
@@ -236,7 +233,7 @@ try {
   await waitForHydration(copiedExpansionPage);
   await copiedExpansionPage.getByText('4 matching Tools').waitFor();
   await copiedExpansionPage
-    .getByText('Filtering to rank 1 · wave:webm-browser-ffmpeg', {
+    .getByText('Filtering to rank 1 · wave:heif-browser-libheif', {
       exact: true,
     })
     .waitFor();
@@ -268,10 +265,10 @@ try {
   const unsupportedDialog = page.getByRole('dialog');
   await unsupportedDialog.getByText('Runs today', { exact: true }).waitFor();
   await unsupportedDialog.getByText('Unsupported', { exact: true }).waitFor();
-  await unsupportedDialog
+  const currentEngineFact = unsupportedDialog
     .getByText('Current engine', { exact: true })
-    .waitFor();
-  await unsupportedDialog.getByText('None', { exact: true }).waitFor();
+    .locator('..');
+  await currentEngineFact.getByText('—', { exact: true }).waitFor();
   await unsupportedDialog
     .getByText('Candidate approaches · not verified support', { exact: true })
     .waitFor();
