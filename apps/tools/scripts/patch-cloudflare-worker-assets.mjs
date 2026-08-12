@@ -23,6 +23,16 @@ ${modelProxyEntries}
         ]);
         const mappedAssetTarget = proxiedAssetTargets.get(assetUrl.pathname);
         if (mappedAssetTarget) {
+            const isTranscriptionModelAsset = assetUrl.pathname.startsWith("/vendor/models/whisper-tiny/");
+            const modelFailureResponse = (status = 502) => new Response("Model asset upstream request failed", {
+                status: status >= 400 && status <= 599 ? status : 502,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Cache-Control": "no-store",
+                    "Content-Type": "text/plain;charset=UTF-8",
+                    "Cross-Origin-Resource-Policy": "same-origin",
+                },
+            });
             if (request.method !== "GET" && request.method !== "HEAD") {
                 return new Response("Method Not Allowed", {
                     status: 405,
@@ -37,10 +47,20 @@ ${modelProxyEntries}
             const proxiedAssetTarget = mappedAssetTarget.startsWith("https://")
                 ? mappedAssetTarget
                 : new URL(mappedAssetTarget, env.NEXT_PUBLIC_ASSETS_BASE_URL).toString();
-            const upstreamResponse = await fetch(proxiedAssetTarget, {
-                method: request.method,
-                headers: upstreamRequestHeaders,
-            });
+            let upstreamResponse;
+            try {
+                upstreamResponse = await fetch(proxiedAssetTarget, {
+                    method: request.method,
+                    headers: upstreamRequestHeaders,
+                    redirect: "follow",
+                });
+            } catch (error) {
+                if (isTranscriptionModelAsset) return modelFailureResponse();
+                throw error;
+            }
+            if (isTranscriptionModelAsset && ![200, 206, 304].includes(upstreamResponse.status)) {
+                return modelFailureResponse(upstreamResponse.status);
+            }
             const upstreamHeaders = new Headers();
             for (const headerName of ["Content-Type", "Content-Length", "Content-Range", "Accept-Ranges", "Cache-Control", "ETag", "Last-Modified"]) {
                 const headerValue = upstreamResponse.headers.get(headerName);
@@ -48,9 +68,14 @@ ${modelProxyEntries}
             }
             upstreamHeaders.set("Access-Control-Allow-Origin", "*");
             upstreamHeaders.set("Cross-Origin-Resource-Policy", "same-origin");
-            if (assetUrl.pathname.startsWith("/vendor/models/whisper-tiny/")) {
+            if (isTranscriptionModelAsset && upstreamResponse.status !== 304) {
                 upstreamHeaders.set("Cache-Control", "public,max-age=31536000,immutable");
                 upstreamHeaders.set("Content-Type", assetUrl.pathname.endsWith(".json") ? "application/json" : "application/octet-stream");
+            }
+            if (isTranscriptionModelAsset && upstreamResponse.status === 304) {
+                upstreamHeaders.delete("Content-Type");
+                upstreamHeaders.delete("Content-Length");
+                upstreamHeaders.delete("Content-Range");
             }
             return new Response(upstreamResponse.body, {
                 status: upstreamResponse.status,

@@ -274,6 +274,106 @@ test(
   },
 );
 
+for (const upstreamStatus of [404, 429, 500]) {
+  test(`Whisper proxy converts upstream ${upstreamStatus} into a non-cacheable bounded error`, async (t) => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () =>
+      new Response("upstream body must not cross the app origin", {
+        status: upstreamStatus,
+        headers: {
+          "cache-control": "public,max-age=31536000,immutable",
+          "content-type": "application/octet-stream",
+          "set-cookie": "model-error=owned; Path=/; HttpOnly",
+          "x-upstream-secret": "must-not-cross-app-origin",
+        },
+      });
+    t.after(() => {
+      globalThis.fetch = originalFetch;
+    });
+
+    const generated = `export default {\n    async fetch(request, env, ctx) {\n        return new Response("fallback");\n    },\n};\n`;
+    const worker = (
+      await import(`data:text/javascript;base64,${Buffer.from(addIsolatedAssetAdapter(generated)).toString("base64")}`)
+    ).default;
+    const response = await worker.fetch(
+      new Request(
+        "https://tools.serp.co/vendor/models/whisper-tiny/5332fcc35e32a33b86612b9a57a89be7906102b1/config.json",
+      ),
+      {},
+      {},
+    );
+
+    assert.equal(response.status, upstreamStatus);
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.equal(response.headers.get("content-type"), "text/plain;charset=UTF-8");
+    assert.equal(response.headers.get("set-cookie"), null);
+    assert.equal(response.headers.get("x-upstream-secret"), null);
+    assert.equal(await response.text(), "Model asset upstream request failed");
+  });
+}
+
+test("Whisper proxy preserves a bodyless 304 validator response without model MIME", async (t) => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(null, {
+      status: 304,
+      headers: {
+        "cache-control": "max-age=0,must-revalidate",
+        "content-type": "application/json",
+        etag: '"pinned-validator"',
+        "set-cookie": "model-validator=owned; Path=/; HttpOnly",
+      },
+    });
+  t.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+  const generated = `export default {\n    async fetch(request, env, ctx) {\n        return new Response("fallback");\n    },\n};\n`;
+  const worker = (
+    await import(`data:text/javascript;base64,${Buffer.from(addIsolatedAssetAdapter(generated)).toString("base64")}`)
+  ).default;
+  const response = await worker.fetch(
+    new Request(
+      "https://tools.serp.co/vendor/models/whisper-tiny/5332fcc35e32a33b86612b9a57a89be7906102b1/config.json",
+      { headers: { "if-none-match": '"pinned-validator"' } },
+    ),
+    {},
+    {},
+  );
+
+  assert.equal(response.status, 304);
+  assert.equal(response.headers.get("cache-control"), "max-age=0,must-revalidate");
+  assert.equal(response.headers.get("content-type"), null);
+  assert.equal(response.headers.get("etag"), '"pinned-validator"');
+  assert.equal(response.headers.get("set-cookie"), null);
+  assert.equal(await response.text(), "");
+});
+
+test("Whisper proxy converts an upstream fetch failure into a bounded no-store 502", async (t) => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    throw new Error("redirect chain leaked internal detail");
+  };
+  t.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+  const generated = `export default {\n    async fetch(request, env, ctx) {\n        return new Response("fallback");\n    },\n};\n`;
+  const worker = (
+    await import(`data:text/javascript;base64,${Buffer.from(addIsolatedAssetAdapter(generated)).toString("base64")}`)
+  ).default;
+  const response = await worker.fetch(
+    new Request(
+      "https://tools.serp.co/vendor/models/whisper-tiny/5332fcc35e32a33b86612b9a57a89be7906102b1/config.json",
+    ),
+    {},
+    {},
+  );
+
+  assert.equal(response.status, 502);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal(response.headers.get("content-type"), "text/plain;charset=UTF-8");
+  assert.equal(await response.text(), "Model asset upstream request failed");
+});
+
 test("Cloudflare build verification covers emitted transcription and FFmpeg resources", (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "tools-isolation-build-"));
   t.after(() => rmSync(root, { recursive: true }));
