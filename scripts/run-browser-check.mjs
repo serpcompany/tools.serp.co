@@ -129,8 +129,7 @@ const evidenceEnvironments = Object.freeze({
 const selectedMode = modeConfiguration[options.mode];
 let evidenceScope = `browser-${options.mode}-${options.environment}-initialization`;
 let evidenceInputHashes = [];
-let evidenceToolIds = [];
-let evidenceInvariants = [];
+let evidenceTools = [];
 let selectedItemCount = 0;
 let browser;
 const results = [];
@@ -148,8 +147,7 @@ function recordBrowserEvidence(status, summary, completedAt = new Date()) {
     completedAt: completedAt.toISOString(),
     dirty: options.dirty,
     inputHashes: evidenceInputHashes,
-    toolIds: evidenceToolIds,
-    invariants: evidenceInvariants,
+    tools: evidenceTools,
     linkedWork: ['#58'],
     summary: {
       status,
@@ -196,8 +194,7 @@ try {
   });
   evidenceScope = browserScope.label;
   evidenceInputHashes = browserScope.inputHashes;
-  evidenceToolIds = browserScope.toolIds;
-  evidenceInvariants = browserScope.invariants;
+  evidenceTools = browserScope.tools;
   if (tools.length === 0) {
     throw new Error('Browser check selected no active Tools');
   }

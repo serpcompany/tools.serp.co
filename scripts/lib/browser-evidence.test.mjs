@@ -5,7 +5,7 @@ import {
   summarizeNavigationTimings,
 } from './browser-evidence.mjs';
 
-test('browser scope retains exact Tool ids and representative semantic invariants', () => {
+test('smoke scope retains semantic invariants associated with each Tool id', () => {
   const evidence = buildBrowserScope({
     mode: 'smoke',
     environment: 'preview',
@@ -14,15 +14,33 @@ test('browser scope retains exact Tool ids and representative semantic invariant
   });
 
   assert.equal(evidence.label, 'browser-smoke-preview-subset');
-  assert.deepEqual(evidence.toolIds, [
-    'png-to-webp',
-    'video-downloader',
-    'csv-to-json',
+  assert.deepEqual(evidence.tools, [
+    {
+      toolId: 'png-to-webp',
+      invariants: ['generic-file-exact-output'],
+    },
+    {
+      toolId: 'video-downloader',
+      invariants: ['url-stream-exact-output'],
+    },
+    {
+      toolId: 'csv-to-json',
+      invariants: ['table-row-header-value-semantics'],
+    },
   ]);
-  assert.deepEqual(evidence.invariants, [
-    'generic-file-exact-output',
-    'table-row-header-value-semantics',
-    'url-stream-exact-output',
+});
+
+test('benchmark scope identifies Tools without claiming semantic correctness', () => {
+  const evidence = buildBrowserScope({
+    mode: 'benchmark',
+    environment: 'preview',
+    toolIds: ['png-to-webp', 'video-downloader'],
+    filtered: true,
+  });
+
+  assert.deepEqual(evidence.tools, [
+    { toolId: 'png-to-webp', invariants: [] },
+    { toolId: 'video-downloader', invariants: [] },
   ]);
 });
 

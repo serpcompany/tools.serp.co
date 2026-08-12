@@ -89,8 +89,7 @@ function createArguments(overrides = {}) {
     completedAt: '2026-01-01T00:05:00.000Z',
     inputHashes: [],
     linkedWork: [],
-    toolIds: [],
-    invariants: [],
+    tools: [],
     ...overrides,
   };
   const arguments_ = [
@@ -119,11 +118,8 @@ function createArguments(overrides = {}) {
   for (const linkedWork of values.linkedWork) {
     arguments_.push('--linked-work', linkedWork);
   }
-  for (const toolId of values.toolIds) {
-    arguments_.push('--tool-id', toolId);
-  }
-  for (const invariant of values.invariants) {
-    arguments_.push('--invariant', invariant);
+  for (const tool of values.tools) {
+    arguments_.push('--tool-evidence', JSON.stringify(tool));
   }
   if (values.retentionClass !== undefined) {
     arguments_.push('--retention-class', values.retentionClass);
@@ -324,8 +320,16 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
     createArguments({
       inputHashes: [inputHash],
       linkedWork: ['#57'],
-      toolIds: ['png-to-webp', 'video-downloader'],
-      invariants: ['generic-file-exact-output', 'url-stream-exact-output'],
+      tools: [
+        {
+          toolId: 'png-to-webp',
+          invariants: ['generic-file-exact-output'],
+        },
+        {
+          toolId: 'video-downloader',
+          invariants: ['url-stream-exact-output'],
+        },
+      ],
     }),
   );
 
@@ -351,8 +355,16 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
     scope: {
       label: 'all-tools',
       inputHashes: [inputHash],
-      toolIds: ['png-to-webp', 'video-downloader'],
-      invariants: ['generic-file-exact-output', 'url-stream-exact-output'],
+      tools: [
+        {
+          toolId: 'png-to-webp',
+          invariants: ['generic-file-exact-output'],
+        },
+        {
+          toolId: 'video-downloader',
+          invariants: ['url-stream-exact-output'],
+        },
+      ],
     },
     result: { status: 'success' },
     runtime: {

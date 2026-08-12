@@ -76,11 +76,8 @@ export function recordRunEvidence(options) {
   for (const linkedWork of options.linkedWork ?? []) {
     arguments_.push('--linked-work', linkedWork);
   }
-  for (const toolId of options.toolIds ?? []) {
-    arguments_.push('--tool-id', toolId);
-  }
-  for (const invariant of options.invariants ?? []) {
-    arguments_.push('--invariant', invariant);
+  for (const tool of options.tools ?? []) {
+    arguments_.push('--tool-evidence', JSON.stringify(tool));
   }
 
   const result = spawnSync(process.execPath, arguments_, {

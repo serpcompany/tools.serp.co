@@ -22,13 +22,17 @@ export function buildBrowserScope({ mode, environment, toolIds, filtered }) {
   return {
     label: `browser-${mode}-${environment}-${selection}`,
     inputHashes: [`sha256:${digest}`],
-    toolIds: Object.freeze([...toolIds]),
-    invariants: Object.freeze(
-      [
-        ...new Set(
-          toolIds.map((toolId) => invariantByToolId[toolId]).filter(Boolean),
-        ),
-      ].sort(),
+    tools: Object.freeze(
+      toolIds.map((toolId) =>
+        Object.freeze({
+          toolId,
+          invariants: Object.freeze(
+            mode === 'smoke' && invariantByToolId[toolId]
+              ? [invariantByToolId[toolId]]
+              : [],
+          ),
+        }),
+      ),
     ),
   };
 }
