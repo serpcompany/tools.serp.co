@@ -324,6 +324,7 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
         {
           toolId: 'png-to-webp',
           invariants: ['generic-file-exact-output'],
+          warnings: ['adsense-script-attribute'],
         },
         {
           toolId: 'video-downloader',
@@ -359,6 +360,7 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
         {
           toolId: 'png-to-webp',
           invariants: ['generic-file-exact-output'],
+          warnings: ['adsense-script-attribute'],
         },
         {
           toolId: 'video-downloader',

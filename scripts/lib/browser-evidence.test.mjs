@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  attachConsoleWarningEvidence,
   buildBrowserScope,
+  classifyConsoleWarning,
   summarizeNavigationTimings,
 } from './browser-evidence.mjs';
 
@@ -53,4 +55,40 @@ test('benchmark evidence retains sanitized navigation aggregates', () => {
     maxMs: 100,
   });
   assert.deepEqual(summarizeNavigationTimings([]), {});
+});
+
+test('console warning evidence is classified, deduplicated, and attached per Tool without raw text', () => {
+  assert.equal(
+    classifyConsoleWarning(
+      'AdSense head tag does not support data-nscript attribute for https://secret.example/path?token=nope',
+    ),
+    'adsense-script-attribute',
+  );
+  assert.equal(
+    classifyConsoleWarning('unexpected warning containing private@example.com'),
+    'other-console-warning',
+  );
+
+  assert.deepEqual(
+    attachConsoleWarningEvidence(
+      [{ toolId: 'pdf-reader', invariants: ['specialized-output-semantics'] }],
+      [
+        {
+          id: 'pdf-reader',
+          consoleWarnings: [
+            'other-console-warning',
+            'adsense-script-attribute',
+            'other-console-warning',
+          ],
+        },
+      ],
+    ),
+    [
+      {
+        toolId: 'pdf-reader',
+        invariants: ['specialized-output-semantics'],
+        warnings: ['adsense-script-attribute', 'other-console-warning'],
+      },
+    ],
+  );
 });

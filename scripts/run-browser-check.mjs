@@ -4,7 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { operationalToolCatalog } from '../packages/app-core/src/lib/tool-catalog-adapter.mjs';
 import { recordRunEvidence } from './lib/run-evidence.mjs';
 import {
+  attachConsoleWarningEvidence,
   buildBrowserScope,
+  classifyConsoleWarning,
   summarizeNavigationTimings,
 } from './lib/browser-evidence.mjs';
 import {
@@ -1074,7 +1076,7 @@ try {
     page.on('pageerror', (error) => result.pageErrors.push(error));
     page.on('console', (message) => {
       if (message.type() === 'warning') {
-        result.consoleWarnings.push(message.text());
+        result.consoleWarnings.push(classifyConsoleWarning(message.text()));
       }
     });
 
@@ -1138,6 +1140,7 @@ try {
 
   const completedAt = new Date();
   const evidenceStatus = summary.fail > 0 ? 'failure' : 'success';
+  evidenceTools = attachConsoleWarningEvidence(evidenceTools, results);
   const evidenceSummary = {
     checksPassed: summary.pass,
     checksFailed: summary.fail,
