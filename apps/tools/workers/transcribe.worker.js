@@ -1,4 +1,9 @@
-const MODEL_ID = "Xenova/whisper-tiny";
+import {
+  TRANSCRIPTION_MODEL_ID,
+  TRANSCRIPTION_MODEL_REVISION,
+  TRANSCRIPTION_MODEL_ROUTE,
+} from "../lib/transcription-model-assets.js";
+
 const TRANSFORMERS_URL =
   "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js";
 const TRANSFORMERS_WASM_BASE =
@@ -24,6 +29,8 @@ async function loadTransformers() {
   const module = await transformersPromise;
   if (!envConfigured) {
     module.env.allowLocalModels = false;
+    module.env.remoteHost = self.location.origin;
+    module.env.remotePathTemplate = `${TRANSCRIPTION_MODEL_ROUTE}/{revision}/`;
     module.env.backends.onnx.wasm.wasmPaths = TRANSFORMERS_WASM_BASE;
     envConfigured = true;
   }
@@ -33,9 +40,14 @@ async function loadTransformers() {
 async function getTranscriber(progressCallback) {
   if (!transcriberPromise) {
     const { pipeline } = await loadTransformers();
-    transcriberPromise = pipeline("automatic-speech-recognition", MODEL_ID, {
-      progress_callback: progressCallback,
-    });
+    transcriberPromise = pipeline(
+      "automatic-speech-recognition",
+      TRANSCRIPTION_MODEL_ID,
+      {
+        progress_callback: progressCallback,
+        revision: TRANSCRIPTION_MODEL_REVISION,
+      },
+    );
   }
   return transcriberPromise;
 }

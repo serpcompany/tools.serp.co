@@ -97,12 +97,14 @@ function parseToolEvidence(values) {
       typeof tool !== 'object' ||
       Array.isArray(tool) ||
       Object.keys(tool).some(
-        (key) => key !== 'toolId' && key !== 'invariants',
+        (key) =>
+          key !== 'toolId' && key !== 'invariants' && key !== 'warnings',
       ) ||
-      !Array.isArray(tool.invariants)
+      !Array.isArray(tool.invariants) ||
+      (tool.warnings !== undefined && !Array.isArray(tool.warnings))
     ) {
       throw new Error(
-        '--tool-evidence must contain only toolId and an invariants array',
+        '--tool-evidence must contain only toolId, invariants, and optional warnings arrays',
       );
     }
     assertSafeSlug(tool.toolId, 'tool-evidence toolId');
@@ -112,7 +114,18 @@ function parseToolEvidence(values) {
     if (new Set(tool.invariants).size !== tool.invariants.length) {
       throw new Error('--tool-evidence invariants must be unique');
     }
-    return { toolId: tool.toolId, invariants: tool.invariants };
+    const warnings = tool.warnings ?? [];
+    for (const warning of warnings) {
+      assertSafeSlug(warning, 'tool-evidence warning');
+    }
+    if (new Set(warnings).size !== warnings.length) {
+      throw new Error('--tool-evidence warnings must be unique');
+    }
+    return {
+      toolId: tool.toolId,
+      invariants: tool.invariants,
+      ...(tool.warnings !== undefined ? { warnings } : {}),
+    };
   });
   if (new Set(tools.map((tool) => tool.toolId)).size !== tools.length) {
     throw new Error('--tool-evidence Tool ids must be unique');

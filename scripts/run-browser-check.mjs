@@ -4,7 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { operationalToolCatalog } from '../packages/app-core/src/lib/tool-catalog-adapter.mjs';
 import { recordRunEvidence } from './lib/run-evidence.mjs';
 import {
+  attachConsoleWarningEvidence,
   buildBrowserScope,
+  classifyConsoleWarning,
   summarizeNavigationTimings,
 } from './lib/browser-evidence.mjs';
 import {
@@ -870,11 +872,18 @@ try {
           'PDF file did not reach the vendored viewer as a PDF blob.',
         );
       }
+
+      const firstPageCanvas = page
+        .frameLocator('[data-testid="pdf-tool-viewer"]')
+        .locator('.page[data-page-number="1"] > .canvasWrapper > canvas');
+      await firstPageCanvas.waitFor({ state: 'visible', timeout: 15000 });
+
       return {
-        detail: 'verified PDF blob delivered to viewer',
+        detail: 'verified PDF blob and rendered viewer page 1',
         metrics: {
           outputBytes: blob.size ?? null,
           outputType: blob.type ?? null,
+          renderedPage: 1,
         },
       };
     }
@@ -1060,10 +1069,16 @@ try {
       fixture: null,
       errors: [],
       pageErrors: [],
+      consoleWarnings: [],
     };
 
     const page = await browser.newPage();
     page.on('pageerror', (error) => result.pageErrors.push(error));
+    page.on('console', (message) => {
+      if (message.type() === 'warning') {
+        result.consoleWarnings.push(classifyConsoleWarning(message.text()));
+      }
+    });
 
     const fixtureEntry = tool.from ? formatFixtures.get(tool.from) : null;
     result.fixture = fixtureEntry
@@ -1125,6 +1140,7 @@ try {
 
   const completedAt = new Date();
   const evidenceStatus = summary.fail > 0 ? 'failure' : 'success';
+  evidenceTools = attachConsoleWarningEvidence(evidenceTools, results);
   const evidenceSummary = {
     checksPassed: summary.pass,
     checksFailed: summary.fail,

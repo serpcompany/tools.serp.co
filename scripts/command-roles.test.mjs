@@ -25,10 +25,17 @@ test('Wayfinder preview is an isolated workers.dev environment', () => {
     NEXT_PUBLIC_ASSETS_BASE_URL: 'https://assets.tools.serp.co',
     NEXT_PUBLIC_SITE_URL:
       'https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev',
+    TOOLS_SERP_SERVER_NATIVE_PROCESSORS: 'unavailable',
   });
   assert.deepEqual(preview?.assets, {
     directory: '.open-next/assets',
     binding: 'ASSETS',
+    run_worker_first: [
+      '/_next/static/chunks/*',
+      '/vendor/ffmpeg/*',
+      '/vendor/ffmpeg-st/*',
+      '/vendor/models/whisper-tiny/*',
+    ],
   });
   assert.deepEqual(preview?.r2_buckets, [
     {
@@ -64,6 +71,10 @@ test('Wayfinder preview is an isolated workers.dev environment', () => {
     'tools-serp-co-inc-cache',
   );
   assert.equal(wranglerConfig.services[0].service, 'tools-serp-co');
+  assert.equal(
+    wranglerConfig.vars.TOOLS_SERP_SERVER_NATIVE_PROCESSORS,
+    'unavailable',
+  );
 });
 
 test('development, preview, canary, browser, and production commands name their roles', () => {

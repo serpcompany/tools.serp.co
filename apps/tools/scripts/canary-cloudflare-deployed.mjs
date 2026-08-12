@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer";
+import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -8,6 +9,12 @@ import {
   repoRoot,
 } from "./lib/cloudflare-audit.mjs";
 import { recordRunEvidence } from "../../../scripts/lib/run-evidence.mjs";
+import { validateCloudflareBuildProvenance } from "./lib/cloudflare-build-provenance.mjs";
+import {
+  TRANSCRIPTION_MODEL_BYTES,
+  TRANSCRIPTION_MODEL_FILES,
+  transcriptionModelAssetPath,
+} from "../lib/transcription-model-assets.js";
 
 const DEFAULT_TIMEOUT_MS = 30000;
 
@@ -155,6 +162,24 @@ function contentTypeEssence(value) {
   return (value ?? "").split(";")[0].trim().toLowerCase();
 }
 
+function generatedWorkerChunkPaths(revision) {
+  const headRevision = execFileSync("git", ["rev-parse", "HEAD"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  }).trim();
+  const clean =
+    execFileSync("git", ["status", "--short", "--untracked-files=all"], {
+      cwd: repoRoot,
+      encoding: "utf8",
+    }).trim() === "";
+  return validateCloudflareBuildProvenance({
+    appRoot,
+    revision,
+    headRevision,
+    clean,
+  });
+}
+
 async function requestCheck(check, args) {
   const startedAt = Date.now();
   try {
@@ -209,13 +234,107 @@ function assetChecks(args) {
   ];
   return assetPaths.map((assetPath) => ({
     name: `asset ${assetPath}`,
-    url: buildUrl(args.assetBaseUrl, assetPath),
+    url: buildUrl(args.baseUrl, assetPath),
     headers: { range: "bytes=0-0" },
-    expect: (response, bytes) =>
-      [200, 206].includes(response.status) && bytes.length > 0,
+    expect: (response, bytes) => {
+      const contentType = contentTypeEssence(
+        response.headers.get("content-type"),
+      );
+      const expectedType = assetPath.endsWith(".wasm")
+        ? "application/wasm"
+        : "text/javascript";
+      return (
+        [200, 206].includes(response.status) &&
+        bytes.length > 0 &&
+        contentType === expectedType &&
+        response.headers.get("access-control-allow-origin") === "*" &&
+        response.headers.get("cross-origin-resource-policy") === "same-origin" &&
+        /(?:^|,)\s*immutable(?:,|$)/i.test(
+          response.headers.get("cache-control") ?? "",
+        )
+      );
+    },
     details: (response, bytes) => ({
       contentType: response.headers.get("content-type"),
       contentRange: response.headers.get("content-range"),
+      cacheControl: response.headers.get("cache-control"),
+      accessControlAllowOrigin: response.headers.get(
+        "access-control-allow-origin",
+      ),
+      crossOriginResourcePolicy: response.headers.get(
+        "cross-origin-resource-policy",
+      ),
+      bytes: bytes.length,
+    }),
+  }));
+}
+
+function transcriptionModelChecks(args) {
+  return TRANSCRIPTION_MODEL_FILES.map((file) => {
+    const assetPath = transcriptionModelAssetPath(file);
+    const expectedType = file.endsWith(".json")
+      ? "application/json"
+      : "application/octet-stream";
+    return {
+      name: `transcription model ${assetPath}`,
+      url: buildUrl(args.baseUrl, assetPath),
+      headers: { range: "bytes=0-0" },
+      expect: (response, bytes) =>
+        [200, 206].includes(response.status) &&
+        bytes.length > 0 &&
+        (response.status === 206
+          ? response.headers.get("content-range") ===
+            `bytes 0-0/${TRANSCRIPTION_MODEL_BYTES[file]}`
+          : bytes.length === TRANSCRIPTION_MODEL_BYTES[file]) &&
+        contentTypeEssence(response.headers.get("content-type")) ===
+          expectedType &&
+        response.headers.get("access-control-allow-origin") === "*" &&
+        response.headers.get("cross-origin-resource-policy") === "same-origin" &&
+        /(?:^|,)\s*immutable(?:,|$)/i.test(
+          response.headers.get("cache-control") ?? "",
+        ),
+      details: (response, bytes) => ({
+        contentType: response.headers.get("content-type"),
+        contentRange: response.headers.get("content-range"),
+        cacheControl: response.headers.get("cache-control"),
+        accessControlAllowOrigin: response.headers.get(
+          "access-control-allow-origin",
+        ),
+        crossOriginResourcePolicy: response.headers.get(
+          "cross-origin-resource-policy",
+        ),
+        bytes: bytes.length,
+        expectedBytes: TRANSCRIPTION_MODEL_BYTES[file],
+      }),
+    };
+  });
+}
+
+function isolationHeaderChecks(args) {
+  const { ffmpegWorkerChunkPath, transcriptionWorkerChunkPath } =
+    generatedWorkerChunkPaths(args.revision);
+  return [
+    ["FFmpeg Worker", ffmpegWorkerChunkPath],
+    ["transcription Worker", transcriptionWorkerChunkPath],
+  ].map(([label, workerChunkPath]) => ({
+    name: `${label} headers ${workerChunkPath}`,
+    url: buildUrl(args.baseUrl, workerChunkPath),
+    expect: (response, bytes) =>
+      response.status === 200 &&
+      bytes.length > 0 &&
+      contentTypeEssence(response.headers.get("content-type")) ===
+        "text/javascript" &&
+      response.headers.get("cross-origin-embedder-policy") ===
+        "credentialless" &&
+      response.headers.get("cross-origin-resource-policy") === "same-origin",
+    details: (response, bytes) => ({
+      contentType: response.headers.get("content-type"),
+      crossOriginEmbedderPolicy: response.headers.get(
+        "cross-origin-embedder-policy",
+      ),
+      crossOriginResourcePolicy: response.headers.get(
+        "cross-origin-resource-policy",
+      ),
       cacheControl: response.headers.get("cache-control"),
       bytes: bytes.length,
     }),
@@ -321,10 +440,7 @@ function nativeChecks(args) {
       headers: { "content-type": "image/png" },
       body: readFixture("sample.png"),
       expect: (response, bytes) =>
-        response.status === 200 &&
-        contentTypeEssence(response.headers.get("content-type")) ===
-          "image/jpeg" &&
-        bytes.length > 0,
+        isServerNativeUnavailable(response, bytes, "image-convert"),
     },
     {
       name: "POST /api/video-convert?from=mp4&to=mp3",
@@ -333,7 +449,8 @@ function nativeChecks(args) {
       headers: { "content-type": "video/mp4" },
       body: readFixture("sample.mp4"),
       timeoutMs: Math.max(args.timeoutMs, 60000),
-      expect: (response, bytes) => response.status === 200 && bytes.length > 0,
+      expect: (response, bytes) =>
+        isServerNativeUnavailable(response, bytes, "video-convert"),
     },
     {
       name: "POST /api/pdf-compress",
@@ -343,10 +460,7 @@ function nativeChecks(args) {
       body: readFixture("sample.pdf"),
       timeoutMs: Math.max(args.timeoutMs, 60000),
       expect: (response, bytes) =>
-        response.status === 200 &&
-        contentTypeEssence(response.headers.get("content-type")) ===
-          "application/pdf" &&
-        bytes.length > 0,
+        isServerNativeUnavailable(response, bytes, "pdf-compress"),
     },
   ];
 
@@ -371,6 +485,27 @@ function nativeChecks(args) {
       bytes: bytes.length,
     }),
   }));
+}
+
+function isServerNativeUnavailable(response, bytes, operation) {
+  if (
+    response.status !== 503 ||
+    contentTypeEssence(response.headers.get("content-type")) !==
+      "application/json"
+  ) {
+    return false;
+  }
+  try {
+    const payload = JSON.parse(bytes.toString("utf8"));
+    return (
+      payload.code === "server-native-unavailable" &&
+      typeof payload.error === "string" &&
+      payload.capability?.operation === operation &&
+      payload.capability?.available === false
+    );
+  } catch {
+    return false;
+  }
 }
 
 function skipped(name, reason) {
@@ -457,7 +592,12 @@ function recordCanaryEvidence(status, summary, completedAt = new Date()) {
 }
 
 try {
-  const checks = [...assetChecks(args), ...safeGetChecks(args)];
+  const checks = [
+    ...assetChecks(args),
+    ...transcriptionModelChecks(args),
+    ...isolationHeaderChecks(args),
+    ...safeGetChecks(args),
+  ];
 
   if (args.allowTelemetryWrite) {
     checks.push(telemetryCheck(args));

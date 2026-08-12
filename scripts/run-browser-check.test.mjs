@@ -250,7 +250,10 @@ test('specialized smoke coverage exercises rendered lifecycle and delivery behav
   assert.match(runnerSource, /pdf-tool-input/);
   assert.match(runnerSource, /pdf-tool-viewer/);
   assert.match(runnerSource, /file=blob%3A/);
+  assert.match(runnerSource, /data-page-number=[\\'"]1[\\'"]/);
   assert.match(runnerSource, /pageerror/);
+  assert.match(runnerSource, /consoleWarnings/);
+  assert.match(runnerSource, /message\.type\(\) === ['"]warning['"]/);
 });
 
 test('table smoke uses the table workflow seam and verifies CSV to JSON semantics', () => {

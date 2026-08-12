@@ -59,3 +59,32 @@ export function summarizeNavigationTimings(values) {
     maxMs: timings.at(-1),
   };
 }
+
+export function classifyConsoleWarning(message) {
+  if (/adsense.*data-nscript/i.test(message)) {
+    return 'adsense-script-attribute';
+  }
+  if (/ignoring event:\s*localhost/i.test(message)) {
+    return 'localhost-event-ignored';
+  }
+  if (/webgl.*(?:driver message|gpu stall)/i.test(message)) {
+    return 'webgl-driver-performance';
+  }
+  if (/ae_default_editor_active is undefined/i.test(message)) {
+    return 'pdf-editor-default-undefined';
+  }
+  return 'other-console-warning';
+}
+
+export function attachConsoleWarningEvidence(tools, results) {
+  const warningsByToolId = new Map(
+    results.map((result) => [
+      result.id,
+      [...new Set(result.consoleWarnings ?? [])].sort(),
+    ]),
+  );
+  return tools.map((tool) => ({
+    ...tool,
+    warnings: warningsByToolId.get(tool.toolId) ?? [],
+  }));
+}

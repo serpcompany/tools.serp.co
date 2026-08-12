@@ -98,8 +98,8 @@ test('conversion and compression provenance follows actual dispatch selectors', 
     new URL('../workers/compress.worker.js', import.meta.url),
     'utf8',
   );
-  const imageConvertRouteSource = readFileSync(
-    new URL('../app/api/image-convert/route.ts', import.meta.url),
+  const imageConvertNativeSource = readFileSync(
+    new URL('../app/api/image-convert/native.ts', import.meta.url),
     'utf8',
   );
   assert.match(convertWorkerSource, /decodeToRGBA/);
@@ -120,7 +120,7 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   assert.match(workerClientSource, /import\("upng-js"\)/);
   assert.match(compressionWorkerSource, /@jsquash\/oxipng/);
   assert.match(compressionWorkerSource, /@jsquash\/jpeg/);
-  assert.match(imageConvertRouteSource, /convertWithMagickWasm/);
+  assert.match(imageConvertNativeSource, /convertWithMagickWasm/);
   assert.deepEqual(
     executionProvenance.getEngine('browser-raster-worker')?.implementation,
     {

@@ -5,6 +5,11 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import {
+  TRANSCRIPTION_MODEL_BYTES,
+  TRANSCRIPTION_MODEL_FILES,
+  TRANSCRIPTION_MODEL_REVISION,
+} from '../lib/transcription-model-assets.js';
 
 const canaryScript = fileURLToPath(
   new URL('./canary-cloudflare-deployed.mjs', import.meta.url),
@@ -67,13 +72,72 @@ test('deployed Cloudflare canary rejects unsafe base URLs before requests', () =
 
 test('deployed Cloudflare canary records structured target evidence', () => {
   assert.match(canarySource, /recordRunEvidence/);
-  assert.match(canarySource, /command:\s*"canary:cloudflare:deployed"/);
+  assert.match(canarySource, /command:\s*['"]canary:cloudflare:deployed['"]/);
   assert.match(
     canarySource,
-    /args\.environment === "production"\s*\?\s*"main"\s*:\s*"pull-request"/,
+    /args\.environment === ['"]production['"]\s*\?\s*['"]main['"]\s*:\s*['"]pull-request['"]/,
   );
   assert.match(canarySource, /scope:\s*`cloudflare-\$\{args\.environment\}`/);
-  assert.match(canarySource, /linkedWork:\s*\["#58"\]/);
+  assert.match(canarySource, /linkedWork:\s*\[['"]#58['"]\]/);
+});
+
+test('native canaries require pure SVG success and structured unavailable contracts for native engines', () => {
+  assert.match(
+    canarySource,
+    /POST \/api\/image-compress\?format=svg[\s\S]*response\.status === 200/,
+  );
+  for (const operation of ['image-convert', 'video-convert', 'pdf-compress']) {
+    assert.match(
+      canarySource,
+      new RegExp(
+        `isServerNativeUnavailable\\(response, bytes, "${operation}"\\)`,
+      ),
+    );
+  }
+  assert.match(canarySource, /payload\.code === "server-native-unavailable"/);
+  assert.match(canarySource, /payload\.capability\?\.available === false/);
+});
+
+test('deployed Cloudflare canary verifies the emitted transcription chunk and FFmpeg resource contracts', () => {
+  assert.match(canarySource, /validateCloudflareBuildProvenance/);
+  assert.match(canarySource, /ffmpegWorkerChunkPath/);
+  assert.match(canarySource, /transcriptionWorkerChunkPath/);
+  assert.match(canarySource, /rev-parse/);
+  assert.match(canarySource, /status.*--short/s);
+  assert.match(canarySource, /cross-origin-embedder-policy/);
+  assert.match(canarySource, /credentialless/);
+  assert.match(canarySource, /cross-origin-resource-policy/);
+  assert.match(canarySource, /same-origin/);
+  assert.match(canarySource, /access-control-allow-origin/);
+  assert.match(canarySource, /url:\s*buildUrl\(args\.baseUrl, assetPath\)/);
+  assert.match(canarySource, /application\/wasm/);
+  assert.match(canarySource, /text\/javascript/);
+  assert.match(canarySource, /immutable/);
+  assert.deepEqual(TRANSCRIPTION_MODEL_FILES, [
+    'config.json',
+    'tokenizer.json',
+    'tokenizer_config.json',
+    'preprocessor_config.json',
+    'generation_config.json',
+    'onnx/encoder_model_quantized.onnx',
+    'onnx/decoder_model_merged_quantized.onnx',
+  ]);
+  assert.equal(
+    TRANSCRIPTION_MODEL_REVISION,
+    '5332fcc35e32a33b86612b9a57a89be7906102b1',
+  );
+  assert.deepEqual(TRANSCRIPTION_MODEL_BYTES, {
+    'config.json': 2248,
+    'tokenizer.json': 2480466,
+    'tokenizer_config.json': 282683,
+    'preprocessor_config.json': 339,
+    'generation_config.json': 3716,
+    'onnx/encoder_model_quantized.onnx': 10124910,
+    'onnx/decoder_model_merged_quantized.onnx': 30727765,
+  });
+  assert.match(canarySource, /transcriptionModelChecks/);
+  assert.match(canarySource, /TRANSCRIPTION_MODEL_FILES/);
+  assert.match(canarySource, /TRANSCRIPTION_MODEL_BYTES/);
 });
 
 test('native canary setup failure records structured evidence', (t) => {

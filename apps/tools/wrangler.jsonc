@@ -15,7 +15,8 @@
 	],
 	"vars": {
 		"NEXT_PUBLIC_ASSETS_BASE_URL": "https://assets.tools.serp.co",
-		"NEXT_PUBLIC_SITE_URL": "https://tools.serp.co"
+		"NEXT_PUBLIC_SITE_URL": "https://tools.serp.co",
+		"TOOLS_SERP_SERVER_NATIVE_PROCESSORS": "unavailable"
 	},
 	"observability": {
 		"enabled": true,
@@ -26,7 +27,13 @@
 	},
 	"assets": {
 		"directory": ".open-next/assets",
-		"binding": "ASSETS"
+		"binding": "ASSETS",
+		"run_worker_first": [
+			"/_next/static/chunks/*",
+			"/vendor/ffmpeg/*",
+			"/vendor/ffmpeg-st/*",
+			"/vendor/models/whisper-tiny/*"
+		]
 	},
 	"r2_buckets": [
 		{
@@ -58,11 +65,18 @@
 			"routes": [],
 			"vars": {
 				"NEXT_PUBLIC_ASSETS_BASE_URL": "https://assets.tools.serp.co",
-				"NEXT_PUBLIC_SITE_URL": "https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev"
+				"NEXT_PUBLIC_SITE_URL": "https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev",
+				"TOOLS_SERP_SERVER_NATIVE_PROCESSORS": "unavailable"
 			},
 			"assets": {
 				"directory": ".open-next/assets",
-				"binding": "ASSETS"
+				"binding": "ASSETS",
+				"run_worker_first": [
+					"/_next/static/chunks/*",
+					"/vendor/ffmpeg/*",
+					"/vendor/ffmpeg-st/*",
+					"/vendor/models/whisper-tiny/*"
+				]
 			},
 			"r2_buckets": [
 				{

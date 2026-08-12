@@ -1,8 +1,6 @@
-import imagemin from "imagemin";
-import imageminGifsicle from "imagemin-gifsicle";
-import sharp from "sharp";
-import { optimize } from "svgo";
-import { mapQualityToImageQuality } from "@/lib/compression-utils";
+import { optimize } from "svgo/browser";
+import type { ServerNativeImageCompressFormat } from "./native";
+import { loadServerNativeEngine } from "../../../lib/server-native-capability.ts";
 import {
   buildServerActionRateLimitResponse,
   createServerActionCooldownCookieCodec,
@@ -10,19 +8,14 @@ import {
   getServerActionRateLimitIdentity,
   isSecureRequest,
   type ServerActionRateLimitIdentity,
-} from "@/lib/server-action-rate-limit";
+} from "../../../lib/server-action-rate-limit.ts";
 
 export const runtime = "nodejs";
 
 type ImageCompressFormat =
-  | "avif"
   | "bmp"
-  | "gif"
-  | "heic"
-  | "heif"
   | "svg"
-  | "tif"
-  | "tiff";
+  | ServerNativeImageCompressFormat;
 
 const IMAGE_COMPRESS_FORMATS = new Set<ImageCompressFormat>([
   "avif",
@@ -76,46 +69,35 @@ async function compressSvg(buffer: Buffer): Promise<Buffer> {
   return Buffer.from(result.data);
 }
 
-async function compressGif(buffer: Buffer): Promise<Buffer> {
-  return imagemin.buffer(buffer, {
-    plugins: [
-      imageminGifsicle({
-        optimizationLevel: 2,
-      }),
-    ],
-  });
-}
-
-async function compressWithSharp(format: ImageCompressFormat, buffer: Buffer): Promise<Buffer> {
-  const quality = mapQualityToImageQuality(0.82);
-  switch (format) {
-    case "avif":
-      return sharp(buffer).avif({ quality }).toBuffer();
-    case "heic":
-    case "heif":
-      return sharp(buffer).heif({ quality }).toBuffer();
-    case "tif":
-    case "tiff":
-      return sharp(buffer).tiff({ compression: "lzw", quality }).toBuffer();
-    default:
-      throw new Error(`Unsupported sharp compression format: ${format}`);
-  }
-}
-
-async function compressImageByFormat(
+async function compressWorkerCompatibleImage(
   format: ImageCompressFormat,
   buffer: Buffer,
 ): Promise<Buffer> {
   switch (format) {
     case "svg":
       return compressSvg(buffer);
-    case "gif":
-      return compressGif(buffer);
     case "bmp":
       return buffer;
     default:
-      return compressWithSharp(format, buffer);
+      throw new Error(`Unsupported Worker-compatible image format: ${format}`);
   }
+}
+
+async function compressImageByFormat(
+  format: ImageCompressFormat,
+  buffer: Buffer,
+): Promise<Buffer | Response> {
+  if (format === "svg" || format === "bmp") {
+    return compressWorkerCompatibleImage(format, buffer);
+  }
+
+  const loaded = await loadServerNativeEngine({
+    operation: "image-compress",
+    loadEngine: async () =>
+      (await import("./native")).compressServerNativeImage,
+  });
+  if (!loaded.available) return loaded.response;
+  return loaded.engine(format, buffer);
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -158,6 +140,7 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const result = await compressImageByFormat(format, buffer);
+    if (result instanceof Response) return result;
     return buildSuccessResponse({
       buffer: result,
       contentType: OUTPUT_MIME_MAP[format],

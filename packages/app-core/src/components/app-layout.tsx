@@ -1,7 +1,6 @@
 import Script from "next/script";
 
 import { AppHeader } from "./app-header";
-import { Providers } from "./providers";
 import { GTagManager } from "./gtag-manager";
 import { SiteFooter } from "./site-footer";
 
@@ -16,7 +15,7 @@ export function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body className="bg-background font-sans antialiased">
         {adsenseClient && (process.env.NODE_ENV !== "development" || adsenseTestMode) ? (
           <Script
@@ -28,13 +27,11 @@ export function AppLayout({
           />
         ) : null}
         <GTagManager />
-        <Providers>
-          <div className="flex min-h-screen flex-col">
-            <AppHeader />
-            <div className="flex-1">{children}</div>
-            <SiteFooter />
-          </div>
-        </Providers>
+        <div className="flex min-h-screen flex-col">
+          <AppHeader />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
+        </div>
       </body>
     </html>
   );
