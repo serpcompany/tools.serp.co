@@ -76,6 +76,23 @@ test('deployed Cloudflare canary records structured target evidence', () => {
   assert.match(canarySource, /linkedWork:\s*\["#58"\]/);
 });
 
+test('native canaries require pure SVG success and structured unavailable contracts for native engines', () => {
+  assert.match(
+    canarySource,
+    /POST \/api\/image-compress\?format=svg[\s\S]*response\.status === 200/,
+  );
+  for (const operation of ['image-convert', 'video-convert', 'pdf-compress']) {
+    assert.match(
+      canarySource,
+      new RegExp(
+        `isServerNativeUnavailable\\(response, bytes, "${operation}"\\)`,
+      ),
+    );
+  }
+  assert.match(canarySource, /payload\.code === "server-native-unavailable"/);
+  assert.match(canarySource, /payload\.capability\?\.available === false/);
+});
+
 test('native canary setup failure records structured evidence', (t) => {
   const artifactRoot = mkdtempSync(
     path.join(tmpdir(), 'tools-serp-canary-failure-'),

@@ -321,10 +321,7 @@ function nativeChecks(args) {
       headers: { "content-type": "image/png" },
       body: readFixture("sample.png"),
       expect: (response, bytes) =>
-        response.status === 200 &&
-        contentTypeEssence(response.headers.get("content-type")) ===
-          "image/jpeg" &&
-        bytes.length > 0,
+        isServerNativeUnavailable(response, bytes, "image-convert"),
     },
     {
       name: "POST /api/video-convert?from=mp4&to=mp3",
@@ -333,7 +330,8 @@ function nativeChecks(args) {
       headers: { "content-type": "video/mp4" },
       body: readFixture("sample.mp4"),
       timeoutMs: Math.max(args.timeoutMs, 60000),
-      expect: (response, bytes) => response.status === 200 && bytes.length > 0,
+      expect: (response, bytes) =>
+        isServerNativeUnavailable(response, bytes, "video-convert"),
     },
     {
       name: "POST /api/pdf-compress",
@@ -343,10 +341,7 @@ function nativeChecks(args) {
       body: readFixture("sample.pdf"),
       timeoutMs: Math.max(args.timeoutMs, 60000),
       expect: (response, bytes) =>
-        response.status === 200 &&
-        contentTypeEssence(response.headers.get("content-type")) ===
-          "application/pdf" &&
-        bytes.length > 0,
+        isServerNativeUnavailable(response, bytes, "pdf-compress"),
     },
   ];
 
@@ -371,6 +366,27 @@ function nativeChecks(args) {
       bytes: bytes.length,
     }),
   }));
+}
+
+function isServerNativeUnavailable(response, bytes, operation) {
+  if (
+    response.status !== 503 ||
+    contentTypeEssence(response.headers.get("content-type")) !==
+      "application/json"
+  ) {
+    return false;
+  }
+  try {
+    const payload = JSON.parse(bytes.toString("utf8"));
+    return (
+      payload.code === "server-native-unavailable" &&
+      typeof payload.error === "string" &&
+      payload.capability?.operation === operation &&
+      payload.capability?.available === false
+    );
+  } catch {
+    return false;
+  }
 }
 
 function skipped(name, reason) {
