@@ -870,11 +870,18 @@ try {
           'PDF file did not reach the vendored viewer as a PDF blob.',
         );
       }
+
+      const firstPageCanvas = page
+        .frameLocator('[data-testid="pdf-tool-viewer"]')
+        .locator('.page[data-page-number="1"] > .canvasWrapper > canvas');
+      await firstPageCanvas.waitFor({ state: 'visible', timeout: 15000 });
+
       return {
-        detail: 'verified PDF blob delivered to viewer',
+        detail: 'verified PDF blob and rendered viewer page 1',
         metrics: {
           outputBytes: blob.size ?? null,
           outputType: blob.type ?? null,
+          renderedPage: 1,
         },
       };
     }
@@ -1060,10 +1067,16 @@ try {
       fixture: null,
       errors: [],
       pageErrors: [],
+      consoleWarnings: [],
     };
 
     const page = await browser.newPage();
     page.on('pageerror', (error) => result.pageErrors.push(error));
+    page.on('console', (message) => {
+      if (message.type() === 'warning') {
+        result.consoleWarnings.push(message.text());
+      }
+    });
 
     const fixtureEntry = tool.from ? formatFixtures.get(tool.from) : null;
     result.fixture = fixtureEntry
