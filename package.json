@@ -13,6 +13,7 @@
     "artifacts:create": "node scripts/run-artifacts.mjs create --repository-root .",
     "artifacts:cleanup": "node scripts/run-artifacts.mjs cleanup --repository-root .",
     "audit:tool-coverage": "node scripts/audit-tool-coverage.mjs",
+    "audit:tool-expansion-gap": "node scripts/audit-tool-expansion-gap.mjs",
     "scratch:run": "node scripts/run-with-scratch.mjs",
     "sync:extensions:check": "node scripts/fetch-store-assets.mjs --check",
     "sync:extensions:write": "node scripts/fetch-store-assets.mjs --write",
