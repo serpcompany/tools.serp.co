@@ -49,6 +49,7 @@ This audit command reports mechanically derived coverage and gap memberships.
 It does not run Tool behavior, query an environment, or turn missing evidence
 into a pass or failure.
 
+
 ## Local before/after workflow proof
 
 | Command | Network access | Repository writes | Authority and evidence |
