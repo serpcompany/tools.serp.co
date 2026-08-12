@@ -49,8 +49,17 @@ test('supported Tool keeps implementation, verification, and runtime facts separ
       evidence.journeyId,
       evidence.state,
     ]),
-    [['png-to-webp:upload', 'no-evidence']],
+    [['png-to-webp:upload', 'incomplete']],
   );
+  const uploadEvidence = row.verificationEvidence[0];
+  assert.ok(uploadEvidence);
+  assert.deepEqual(uploadEvidence.missingChecks, [
+    'malformed-input',
+    'spoofed-input',
+    'wrong-format-output',
+    'no-delivery-on-failure',
+    'cancellation-lifecycle',
+  ]);
   assert.deepEqual(row.attention.codes, []);
 });
 

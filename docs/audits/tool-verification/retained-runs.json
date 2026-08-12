@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "schemaVersion": 2,
+    "runId": "20260812T235556Z_4f5fd0d_local_browser-smoke-local-subset",
+    "command": {
+      "name": "smoke:tools:browser",
+      "version": "1"
+    },
+    "revision": {
+      "commit": "4f5fd0de8adf9de478c889e5579dcf4da962ecf1",
+      "dirty": false
+    },
+    "timestamps": {
+      "startedAt": "2026-08-12T23:55:56.756Z",
+      "completedAt": "2026-08-12T23:56:05.199Z"
+    },
+    "environment": "local",
+    "scope": {
+      "label": "browser-smoke-local-subset",
+      "inputHashes": [
+        "sha256:57e65212651db0838d51c25475c83ffe9fcfe523b8fa53a01adce58a960f3779"
+      ],
+      "tools": [
+        {
+          "toolId": "png-to-webp",
+          "journeys": [
+            {
+              "journeyId": "png-to-webp:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/png",
+                "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
+              },
+              "invariantId": "generic-file-exact-output",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
+                "journey-contract": "sha256:123b486a465b48f1753968ce396bd3aaf5b67d3bb9382bccdb83039fad40ab4b",
+                "semantic-invariant": "sha256:4f9341350a479a7eebd610688604dd484827e0e04dc219fa314e3a4840b471a3",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89"
+              }
+            }
+          ],
+          "warnings": ["other-console-warning"]
+        }
+      ]
+    },
+    "result": {
+      "status": "success"
+    }
+  }
+]

@@ -279,11 +279,30 @@ try {
   await page.getByText('1 matching Tools').waitFor();
   await page.getByRole('row', { name: /PNG to WebP/ }).click();
   const dialog = page.getByRole('dialog');
-  await dialog
+  const verificationSection = dialog
     .getByText('Journey verification evidence', { exact: true })
+    .locator('..');
+  await verificationSection.waitFor();
+  await verificationSection
+    .getByText('png-to-webp:upload', { exact: true })
     .waitFor();
-  await dialog.getByText('png-to-webp:upload', { exact: true }).waitFor();
-  await dialog.getByText('No retained evidence', { exact: true }).waitFor();
+  await verificationSection
+    .getByText('Passed checks · evidence incomplete', { exact: true })
+    .waitFor();
+  await verificationSection
+    .getByText(
+      'Still needed: malformed-input, spoofed-input, wrong-format-output, no-delivery-on-failure, cancellation-lifecycle',
+      { exact: true },
+    )
+    .waitFor();
+  await verificationSection
+    .getByText('Exact evidence identity', { exact: true })
+    .click();
+  await verificationSection
+    .getByText('20260812T235556Z_4f5fd0d_local_browser-smoke-local-subset', {
+      exact: true,
+    })
+    .waitFor();
   await dialog
     .getByText('Family verification policy (not an exact Tool test)', {
       exact: true,
@@ -338,17 +357,20 @@ try {
   await familyDialog
     .getByText('YouTube or extractor URL', { exact: true })
     .waitFor();
-  await familyDialog
+  const familyVerificationSection = familyDialog
+    .getByText('Journey verification evidence', { exact: true })
+    .locator('..');
+  await familyVerificationSection
     .getByText('audio-to-text:upload', { exact: true })
     .waitFor();
-  await familyDialog
+  await familyVerificationSection
     .getByText('audio-to-text:direct-url', { exact: true })
     .waitFor();
-  await familyDialog
+  await familyVerificationSection
     .getByText('audio-to-text:extractor-url', { exact: true })
     .waitFor();
   assert.equal(
-    await familyDialog
+    await familyVerificationSection
       .getByText('No retained evidence', { exact: true })
       .count(),
     3,
