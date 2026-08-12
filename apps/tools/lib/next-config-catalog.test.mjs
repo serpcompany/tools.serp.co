@@ -77,7 +77,7 @@ test('same-origin Next worker chunks opt into isolated transcription pages', asy
     assert.deepEqual(workerChunks, {
       source: '/_next/static/chunks/:path*',
       headers: [
-        { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+        { key: 'Cross-Origin-Embedder-Policy', value: 'credentialless' },
         { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
       ],
     });

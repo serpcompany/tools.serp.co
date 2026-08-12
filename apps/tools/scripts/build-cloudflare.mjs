@@ -36,4 +36,14 @@ const prepareAssetsResult = spawnSync(
   },
 );
 
-process.exit(prepareAssetsResult.status ?? 1);
+if (prepareAssetsResult.status !== 0) {
+  process.exit(prepareAssetsResult.status ?? 1);
+}
+
+const patchWorkerResult = spawnSync(
+  process.execPath,
+  ["scripts/patch-cloudflare-worker-assets.mjs"],
+  { env, stdio: "inherit" },
+);
+
+process.exit(patchWorkerResult.status ?? 1);

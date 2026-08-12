@@ -6,6 +6,7 @@ import type { ToolWorkflow, WorkflowMedia } from "../tool-workflow/index.ts";
 import { createBrowserMediaWorkflow } from "./browser.ts";
 import type { MediaTransferProgress } from "./media-endpoint.ts";
 import type { TranscriptionPort } from "./processors.ts";
+import { withSilenceWatchdog } from "./silence-watchdog.ts";
 
 type WorkerMessage =
   | { type: "progress"; progress?: number }
@@ -22,6 +23,7 @@ export function createBrowserTranscriptionPort(
   options: {
     createWorker?: () => Worker;
     extractAudio?: typeof extractAudioForTranscription;
+    silenceTimeoutMs?: number;
   } = {},
 ): TranscriptionPort {
   const createWorker =
@@ -34,6 +36,7 @@ export function createBrowserTranscriptionPort(
         },
       ));
   const extractAudio = options.extractAudio ?? extractAudioForTranscription;
+  const silenceTimeoutMs = options.silenceTimeoutMs ?? 30_000;
   return {
     async transcribe(media, context) {
       const abortExtraction = () => {
@@ -43,15 +46,20 @@ export function createBrowserTranscriptionPort(
       await context.registerCleanup(async () => {
         context.signal.removeEventListener("abort", abortExtraction);
       });
-      const audioBuffer = await extractAudio(
-        arrayBufferOf(media.bytes),
-        media.format,
-        {
-          onProgress({ ratio }) {
-            context.reportProgress(Math.min(0.45, Math.max(0, ratio) * 0.45));
-          },
-        },
-      );
+      const audioBuffer = await withSilenceWatchdog({
+        signal: context.signal,
+        timeoutMs: silenceTimeoutMs,
+        timeoutMessage: "Transcription extraction stopped responding",
+        run: (pulse) =>
+          extractAudio(arrayBufferOf(media.bytes), media.format, {
+            onProgress({ ratio }) {
+              pulse();
+              context.reportProgress(
+                Math.min(0.45, Math.max(0, ratio) * 0.45),
+              );
+            },
+          }),
+      });
       context.signal.throwIfAborted();
 
       const worker = createWorker();
@@ -59,9 +67,21 @@ export function createBrowserTranscriptionPort(
       await context.registerCleanup(async () => worker.terminate());
       return await new Promise<string>((resolve, reject) => {
         let settled = false;
+        let silenceTimer: ReturnType<typeof setTimeout> | undefined;
+        const pulse = () => {
+          if (silenceTimer) clearTimeout(silenceTimer);
+          silenceTimer = setTimeout(
+            () =>
+              finish(() =>
+                reject(new Error("Transcription worker stopped responding")),
+              ),
+            silenceTimeoutMs,
+          );
+        };
         const finish = (callback: () => void) => {
           if (settled) return;
           settled = true;
+          if (silenceTimer) clearTimeout(silenceTimer);
           context.signal.removeEventListener("abort", onAbort);
           worker.removeEventListener("message", onMessage);
           worker.removeEventListener("error", onError);
@@ -78,6 +98,7 @@ export function createBrowserTranscriptionPort(
         const onMessage = (event: MessageEvent<WorkerMessage>) => {
           const message = event.data;
           if (message.type === "progress") {
+            pulse();
             const normalized = Math.min(
               1,
               Math.max(0, (message.progress ?? 0) / 100),
@@ -94,6 +115,7 @@ export function createBrowserTranscriptionPort(
         context.signal.addEventListener("abort", onAbort, { once: true });
         worker.addEventListener("message", onMessage);
         worker.addEventListener("error", onError);
+        pulse();
         worker.postMessage({ audioBuffer }, [audioBuffer]);
       });
     },

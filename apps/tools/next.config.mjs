@@ -145,7 +145,7 @@ const nextConfig = {
   async headers() {
     const isolationHeaders = [
       { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-      { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+      { key: "Cross-Origin-Embedder-Policy", value: "credentialless" },
     ];
 
     return [
@@ -156,7 +156,7 @@ const nextConfig = {
       {
         source: "/_next/static/chunks/:path*",
         headers: [
-          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+          { key: "Cross-Origin-Embedder-Policy", value: "credentialless" },
           { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
         ],
       },
