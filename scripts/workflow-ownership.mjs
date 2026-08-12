@@ -19,6 +19,13 @@ const LIFECYCLE_CONCEPTS = Object.freeze([
   'upload-read-ownership',
   'progress-policy',
 ]);
+const ACCEPTED_WORKFLOW_FACTORY_NAMES = new Set([
+  'createBatchToolWorkflow',
+  'createMediaWorkflow',
+  'createSpecializedToolWorkflow',
+  'createTableToolWorkflow',
+  'createToolWorkflow',
+]);
 
 const REMEDIATION = Object.freeze({
   'terminal-telemetry':
@@ -460,7 +467,10 @@ function telemetryOwners(files, parsed) {
 
 function bindingNames(name, names = new Set()) {
   if (ts.isIdentifier(name)) names.add(name.text);
-  else ts.forEachChild(name, (child) => bindingNames(child, names));
+  else if (ts.isBindingElement(name)) bindingNames(name.name, names);
+  else if (ts.isArrayBindingPattern(name) || ts.isObjectBindingPattern(name)) {
+    for (const element of name.elements) bindingNames(element, names);
+  }
   return names;
 }
 
@@ -501,7 +511,7 @@ function containsInternalWorkflowFactoryCall(root) {
     if (
       ts.isCallExpression(node) &&
       ts.isIdentifier(node.expression) &&
-      /^create.+Workflow$/u.test(node.expression.text)
+      ACCEPTED_WORKFLOW_FACTORY_NAMES.has(node.expression.text)
     ) {
       found = true;
     }
@@ -519,7 +529,14 @@ function localFactorySymbols(
   files,
 ) {
   const localSymbols = { callable: new Set(), values: new Set() };
-  if (sourcePath === adapterPath) return localSymbols;
+  if (sourcePath === adapterPath) {
+    for (const exportedName of exportedSymbols) {
+      if (!exportedName.startsWith('create')) {
+        localSymbols.values.add(exportedName);
+      }
+    }
+    return localSymbols;
+  }
   for (const statement of sourceFile.statements) {
     if (
       !ts.isImportDeclaration(statement) ||

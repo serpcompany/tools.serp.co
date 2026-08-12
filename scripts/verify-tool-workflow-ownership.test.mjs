@@ -348,6 +348,40 @@ test('reachable family adapters must cross the accepted workflow.run seam', () =
     adapterLocalUnrelated.violations.map(({ concept }) => concept),
     ['missing-workflow-run'],
   );
+
+  const propertyNameContamination = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import { createBrowserTableWorkflow } from '../../lib/table-browser-workflow'; const unrelated = { run() {} }; export default function Page() { const { workflow: ignored } = createBrowserTableWorkflow(); const workflow = unrelated; workflow.run(); return <div>{ignored}</div>; }",
+      ],
+      [
+        'apps/tools/lib/table-browser-workflow.ts',
+        'export function createBrowserTableWorkflow() { return { workflow: {} }; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(
+    propertyNameContamination.violations.map(({ concept }) => concept),
+    ['missing-workflow-run'],
+  );
+
+  const unrelatedInternalFactory = analyzeWorkflowOwnership(
+    new Map([
+      [
+        'apps/tools/app/tool/page.tsx',
+        "import { createBrowserTableWorkflow } from '../../lib/table-browser-workflow'; export default function Page() { createBrowserTableWorkflow(); return <div />; }",
+      ],
+      [
+        'apps/tools/lib/table-browser-workflow.ts',
+        'function createLoggingWorkflow() { return { run() {} }; } export function createBrowserTableWorkflow() { const logging = createLoggingWorkflow(); logging.run(); return {}; }',
+      ],
+    ]),
+  );
+  assert.deepEqual(
+    unrelatedInternalFactory.violations.map(({ concept }) => concept),
+    ['missing-workflow-run'],
+  );
 });
 
 test('new reachable browser workflow adapters enter seam and ownership enforcement automatically', () => {
