@@ -25,6 +25,12 @@ test("shared app shell renders the global site footer", () => {
   assert.match(appLayoutSource, /<SiteFooter\s*\/>/);
 });
 
+test("shared app shell owns static light appearance without an inline theme bootstrap", () => {
+  assert.match(appLayoutSource, /<html[^>]*className="light"/);
+  assert.match(appLayoutSource, /colorScheme:\s*"light"/);
+  assert.doesNotMatch(appLayoutSource, /Providers|next-themes|ThemeProvider/);
+});
+
 test("site footer includes core SERP Tools navigation", () => {
   assert.match(siteFooterSource, /SERP Tools/);
   assert.match(siteFooterSource, /video-downloader/);
