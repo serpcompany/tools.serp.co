@@ -10,7 +10,7 @@ import {
 
 const options = {
   families: ['renderer:transcription', 'generic-convert:browser-raster'],
-  profiles: ['client-only', 'server-assisted'],
+  profiles: ['Browser', 'Hybrid', 'Server', 'Unsupported', 'Unknown'],
   expansionGroups: [
     'family:generic-convert:adaptive-video',
     'family:generic-convert:browser-raster',
@@ -19,7 +19,7 @@ const options = {
 
 test('shareable Tool view round-trips search, filters, sorting, columns, page, and rows', () => {
   const view = parseToolFactoryView(
-    '?q=audio&support=supported&family=renderer%3Atranscription&profile=server-assisted&verification=registered-with-semantic-policy&sort=tool%3Adesc&columns=tool%2Csupport%2CexactTest&page=3&rows=100',
+    '?q=audio&support=supported&family=renderer%3Atranscription&runs=Hybrid&target=browser-first&server=optional-fallback&browser=existing-browser-path&verification=registered-with-semantic-policy&sort=tool%3Adesc&columns=tool%2Csupport%2CexactTest&page=3&rows=100',
     options,
   );
 
@@ -29,7 +29,10 @@ test('shareable Tool view round-trips search, filters, sorting, columns, page, a
     filters: {
       support: 'supported',
       family: 'renderer:transcription',
-      profile: 'server-assisted',
+      currentExecution: 'Hybrid',
+      preferredTarget: 'browser-first',
+      serverDependency: 'optional-fallback',
+      browserFeasibility: 'existing-browser-path',
       verification: 'registered-with-semantic-policy',
     },
     sorting: [{ id: 'tool', desc: true }],
@@ -39,7 +42,7 @@ test('shareable Tool view round-trips search, filters, sorting, columns, page, a
   });
   assert.equal(
     serializeToolFactoryView(view),
-    '?q=audio&support=supported&family=renderer%3Atranscription&profile=server-assisted&verification=registered-with-semantic-policy&sort=tool%3Adesc&columns=tool%2Csupport%2CexactTest&page=3&rows=100',
+    '?q=audio&support=supported&family=renderer%3Atranscription&runs=Hybrid&target=browser-first&server=optional-fallback&browser=existing-browser-path&verification=registered-with-semantic-policy&sort=tool%3Adesc&columns=tool%2Csupport%2CexactTest&page=3&rows=100',
   );
 });
 
@@ -52,6 +55,12 @@ test('invalid and obsolete URL values safely become the default view', () => {
     DEFAULT_TOOL_FACTORY_VIEW,
   );
   assert.equal(serializeToolFactoryView(DEFAULT_TOOL_FACTORY_VIEW), '');
+});
+
+test('every displayed browser-opportunity value survives URL sharing', () => {
+  const view = parseToolFactoryView('?browser=server-required', options);
+  assert.equal(view.filters.browserFeasibility, 'server-required');
+  assert.equal(serializeToolFactoryView(view), '?browser=server-required');
 });
 
 test('empty or duplicate column values cannot hide every column or create unstable state', () => {

@@ -25,21 +25,20 @@ test('expansion plan groups every explicitly unsupported Tool exactly once from 
   const first = plan.groups[0];
   assert.ok(first);
   assert.equal(first.rank, 1);
-  assert.equal(first.operationFamily, 'generic-convert:adaptive-video');
-  assert.equal(first.unlockCount, 1_505);
+  assert.equal(first.operationFamily, 'wave:webm-browser-ffmpeg');
+  assert.equal(first.browserFeasibility, 'existing-browser-code');
+  assert.equal(first.unlockCount, 4);
+  assert.deepEqual(first.toolIds, [
+    'compress-webm',
+    'webm-to-m4a',
+    'webm-to-mp3',
+    'webm-to-mp4',
+  ]);
   assert.deepEqual(
     first.candidateEngines.map((engine) => engine.id),
-    [
-      'adaptive-media-conversion',
-      'browser-ffmpeg-wasm',
-      'server-video-convert',
-    ],
+    ['browser-ffmpeg-compression', 'browser-ffmpeg-wasm'],
   );
-  assert.deepEqual(first.executionLocations, [
-    'browser',
-    'browser-with-repository-server-support',
-    'repository-server',
-  ]);
+  assert.deepEqual(first.executionLocations, ['browser']);
   assert.equal(first.supportMeaning, 'planning-candidates-only');
 });
 
@@ -50,11 +49,11 @@ test('candidate ranking exposes facts, assumptions, and every required review in
 
   assert.equal(
     plan.ranking.method,
-    'Exact unsupported Tool count descending, then operation family name.',
+    'Browser feasibility, test readiness, decision cost, exact Tool count, then stable family ID.',
   );
   assert.deepEqual(plan.ranking.assumptions, [
-    'A reviewed family adapter may reduce repeated work across its exact member Tools.',
-    'Larger exact groups are evaluated first; this ordering does not establish feasibility or support.',
+    'Existing browser code with distinct fixtures and semantic validators is reviewed before speculative bulk mappings.',
+    'Candidate categories and ranking do not establish feasibility or support.',
   ]);
   assert.equal(
     plan.supportNotice,
@@ -67,13 +66,13 @@ test('candidate ranking exposes facts, assumptions, and every required review in
       ['adapter', 'missing'],
       ['browser-runtime-fit', 'needs-review'],
       ['fixture', 'needs-review'],
-      ['semantic-validator', 'missing'],
+      ['semantic-validator', 'needs-review'],
       ['limits', 'needs-review'],
       ['licensing', 'needs-review'],
       ['maintenance-review', 'needs-review'],
     ],
   );
-  assert.match(first.facts[0]?.statement ?? '', /1,505 exact Tool IDs/);
+  assert.match(first.facts[0]?.statement ?? '', /4 exact Tool IDs/);
   assert.equal(first.facts[0]?.source, 'Tool Factory support read model');
   assert.ok(first.assumptions.every((assumption) => assumption.length > 0));
   assert.ok(
@@ -82,6 +81,37 @@ test('candidate ranking exposes facts, assumptions, and every required review in
         engine.source === 'maintained execution provenance' &&
         engine.verifiedSupport === false,
     ),
+  );
+});
+
+test('portfolio groups expose client-first decision categories without treating broad adaptive mappings as proof', () => {
+  const plan = buildToolExpansionPlan(buildToolFactoryReadModel().rows);
+  const classifications = new Set(
+    plan.groups.map((group) => group.browserFeasibility),
+  );
+  assert.deepEqual([...classifications].sort(), [
+    'catalog-review',
+    'existing-browser-code',
+    'new-browser-wasm-library',
+    'server-alternative-research',
+    'unresolved',
+  ]);
+
+  const adaptive = plan.groups.find(
+    (group) => group.operationFamily === 'generic-convert:adaptive-video',
+  );
+  assert.ok(adaptive);
+  assert.equal(adaptive.browserFeasibility, 'unresolved');
+  assert.equal(adaptive.unlockCount, 1_502);
+  assert.ok(
+    !adaptive.toolIds.some((toolId) =>
+      ['webm-to-m4a', 'webm-to-mp3', 'webm-to-mp4'].includes(toolId),
+    ),
+  );
+
+  assert.equal(
+    plan.groups.reduce((sum, group) => sum + group.unlockCount, 0),
+    2_373,
   );
 });
 

@@ -164,6 +164,12 @@ try {
     )
     .waitFor();
   await waitForHydration(page);
+  assert.equal(
+    await page
+      .getByRole('columnheader', { name: 'Runtime requirement' })
+      .count(),
+    0,
+  );
 
   const planner = page.getByRole('region', { name: 'OSS expansion planner' });
   await planner
@@ -176,9 +182,9 @@ try {
     )
     .waitFor();
   const adaptiveGroup = planner.getByRole('article', {
-    name: 'Rank 1 generic-convert:adaptive-video',
+    name: 'Rank 1 wave:webm-browser-ffmpeg',
   });
-  await adaptiveGroup.getByText('1,505 exact Tools', { exact: true }).waitFor();
+  await adaptiveGroup.getByText('4 exact Tools', { exact: true }).waitFor();
   await adaptiveGroup
     .getByText('@ffmpeg/ffmpeg and @ffmpeg/core', { exact: false })
     .first()
@@ -188,18 +194,18 @@ try {
     .getByText('browser/runtime fit · needs review', { exact: true })
     .waitFor();
   await adaptiveGroup
-    .getByRole('button', { name: 'Show 1,505 exact Tools' })
+    .getByRole('button', { name: 'Show 4 exact Tools' })
     .click();
-  await page.getByText('1,505 matching Tools').waitFor();
+  await page.getByText('4 matching Tools').waitFor();
   await page
-    .getByText('Filtering to rank 1 · generic-convert:adaptive-video', {
+    .getByText('Filtering to rank 1 · wave:webm-browser-ffmpeg', {
       exact: true,
     })
     .waitFor();
   if (screenshotPaths.planner) {
     await planner.screenshot({ path: screenshotPaths.planner });
   }
-  await page.getByLabel('Search all Tools').fill('3g2-to-mp4');
+  await page.getByLabel('Search all Tools').fill('webm-to-mp3');
   await page.getByText('1 matching Tools').waitFor();
   await page.getByLabel('Search all Tools').fill('ai-to-png');
   await page.getByText('0 matching Tools').waitFor();
@@ -207,14 +213,14 @@ try {
   const expansionUrl = new URL(page.url());
   assert.equal(
     expansionUrl.searchParams.get('expansion'),
-    'family:generic-convert:adaptive-video',
+    'family:wave:webm-browser-ffmpeg',
   );
 
   await page.reload({ waitUntil: 'networkidle' });
   await waitForHydration(page);
-  await page.getByText('1,505 matching Tools').waitFor();
+  await page.getByText('4 matching Tools').waitFor();
   await page
-    .getByText('Filtering to rank 1 · generic-convert:adaptive-video', {
+    .getByText('Filtering to rank 1 · wave:webm-browser-ffmpeg', {
       exact: true,
     })
     .waitFor();
@@ -228,9 +234,9 @@ try {
     waitUntil: 'networkidle',
   });
   await waitForHydration(copiedExpansionPage);
-  await copiedExpansionPage.getByText('1,505 matching Tools').waitFor();
+  await copiedExpansionPage.getByText('4 matching Tools').waitFor();
   await copiedExpansionPage
-    .getByText('Filtering to rank 1 · generic-convert:adaptive-video', {
+    .getByText('Filtering to rank 1 · wave:webm-browser-ffmpeg', {
       exact: true,
     })
     .waitFor();
@@ -241,9 +247,36 @@ try {
   assert.equal(new URL(page.url()).search, '');
   await page.getByText('2,807 matching Tools').waitFor();
   await page.goBack({ waitUntil: 'networkidle' });
-  await page.getByText('1,505 matching Tools').waitFor();
+  await page.getByText('4 matching Tools').waitFor();
   await page.goForward({ waitUntil: 'networkidle' });
   await page.getByText('2,807 matching Tools').waitFor();
+
+  await page.getByLabel('Search all Tools').fill('3g2-to-mp4');
+  await page.getByText('1 matching Tools').waitFor();
+  const misleadingRow = page.getByRole('row', { name: /3G2 to MP4/ });
+  await misleadingRow
+    .getByRole('cell', { name: 'Unsupported', exact: true })
+    .waitFor();
+  await misleadingRow
+    .getByRole('cell', { name: 'Undecided', exact: true })
+    .waitFor();
+  await misleadingRow
+    .getByRole('cell', { name: 'Unknown', exact: true })
+    .waitFor();
+  await misleadingRow.getByRole('cell', { name: '—', exact: true }).waitFor();
+  await misleadingRow.click();
+  const unsupportedDialog = page.getByRole('dialog');
+  await unsupportedDialog.getByText('Runs today', { exact: true }).waitFor();
+  await unsupportedDialog.getByText('Unsupported', { exact: true }).waitFor();
+  await unsupportedDialog
+    .getByText('Current engine', { exact: true })
+    .waitFor();
+  await unsupportedDialog.getByText('None', { exact: true }).waitFor();
+  await unsupportedDialog
+    .getByText('Candidate approaches · not verified support', { exact: true })
+    .waitFor();
+  await page.keyboard.press('Escape');
+  await page.getByLabel('Search all Tools').fill('');
 
   await page.getByLabel('Search all Tools').fill('png-to-webp');
   await page.getByText('1 matching Tools').waitFor();
@@ -376,8 +409,13 @@ try {
     .getByLabel('Filter by family')
     .selectOption('generic-convert:adaptive-video');
   await page
-    .getByLabel('Filter by execution profile')
-    .selectOption('client-only, server-assisted, server-executed');
+    .getByLabel('Filter by current execution')
+    .selectOption('Unsupported');
+  await page.getByLabel('Filter by preferred target').selectOption('undecided');
+  await page.getByLabel('Filter by server dependency').selectOption('unknown');
+  await page
+    .getByLabel('Filter by browser opportunity')
+    .selectOption('unresolved');
   await page
     .getByLabel('Filter by verification')
     .selectOption('explicit-fail-closed-contract');
@@ -407,10 +445,10 @@ try {
     sharedUrl.searchParams.get('family'),
     'generic-convert:adaptive-video',
   );
-  assert.equal(
-    sharedUrl.searchParams.get('profile'),
-    'client-only, server-assisted, server-executed',
-  );
+  assert.equal(sharedUrl.searchParams.get('runs'), 'Unsupported');
+  assert.equal(sharedUrl.searchParams.get('target'), 'undecided');
+  assert.equal(sharedUrl.searchParams.get('server'), 'unknown');
+  assert.equal(sharedUrl.searchParams.get('browser'), 'unresolved');
   assert.equal(
     sharedUrl.searchParams.get('verification'),
     'explicit-fail-closed-contract',
@@ -436,8 +474,20 @@ try {
     'generic-convert:adaptive-video',
   );
   assert.equal(
-    await page.getByLabel('Filter by execution profile').inputValue(),
-    'client-only, server-assisted, server-executed',
+    await page.getByLabel('Filter by current execution').inputValue(),
+    'Unsupported',
+  );
+  assert.equal(
+    await page.getByLabel('Filter by preferred target').inputValue(),
+    'undecided',
+  );
+  assert.equal(
+    await page.getByLabel('Filter by server dependency').inputValue(),
+    'unknown',
+  );
+  assert.equal(
+    await page.getByLabel('Filter by browser opportunity').inputValue(),
+    'unresolved',
   );
   assert.equal(
     await page.getByLabel('Filter by verification').inputValue(),
@@ -517,7 +567,7 @@ try {
     status,
     startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
-    linkedWork: ['#50', '#102', '#103', '#104', '#105', '#106', '#107'],
+    linkedWork: ['#50', '#102', '#103', '#104', '#105', '#106', '#107', '#114'],
     summary: {
       status,
       checksPassed: status === 'success' ? 24 : 0,

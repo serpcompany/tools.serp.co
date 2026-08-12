@@ -3,11 +3,16 @@ export const TOOL_FACTORY_COLUMN_IDS = Object.freeze([
   'support',
   'operationDisplay',
   'family',
+  'currentExecution',
+  'preferredTarget',
+  'serverDependency',
+  'browserFeasibility',
+  'currentEngines',
+  'candidateEngines',
   'engines',
   'profiles',
   'verification',
   'exactTest',
-  'runtimeRequirement',
   'observation',
   'attention',
   'toolId',
@@ -38,11 +43,13 @@ const DEFAULT_VISIBLE_COLUMNS: readonly ToolFactoryColumnId[] = Object.freeze([
   'support',
   'operationDisplay',
   'family',
-  'engines',
-  'profiles',
+  'currentExecution',
+  'preferredTarget',
+  'serverDependency',
+  'currentEngines',
+  'candidateEngines',
   'verification',
   'exactTest',
-  'runtimeRequirement',
   'observation',
   'attention',
 ]);
@@ -53,7 +60,10 @@ export type ToolFactoryViewState = Readonly<{
   filters: Readonly<{
     support: string;
     family: string;
-    profile: string;
+    currentExecution: string;
+    preferredTarget: string;
+    serverDependency: string;
+    browserFeasibility: string;
     verification: string;
   }>;
   sorting: readonly Readonly<{ id: ToolFactoryColumnId; desc: boolean }>[];
@@ -68,7 +78,10 @@ export const DEFAULT_TOOL_FACTORY_VIEW: ToolFactoryViewState = Object.freeze({
   filters: Object.freeze({
     support: '',
     family: '',
-    profile: '',
+    currentExecution: '',
+    preferredTarget: '',
+    serverDependency: '',
+    browserFeasibility: '',
     verification: '',
   }),
   sorting: Object.freeze([]),
@@ -96,6 +109,24 @@ const verificationValues = new Set([
   'registered-with-semantic-policy',
   'explicit-fail-closed-contract',
   'not-verified',
+]);
+const preferredTargetValues = new Set([
+  'browser-first',
+  'server-required',
+  'undecided',
+]);
+const serverDependencyValues = new Set([
+  'none',
+  'optional-fallback',
+  'required',
+  'unknown',
+]);
+const browserFeasibilityValues = new Set([
+  'existing-browser-path',
+  'new-browser-library',
+  'server-required',
+  'catalog-review',
+  'unresolved',
 ]);
 const columnIds = new Set<string>(TOOL_FACTORY_COLUMN_IDS);
 
@@ -161,7 +192,19 @@ export function parseToolFactoryView(
     filters: Object.freeze({
       support: allowed(parameters.get('support'), supportValues),
       family: allowed(parameters.get('family'), new Set(options.families)),
-      profile: allowed(parameters.get('profile'), new Set(options.profiles)),
+      currentExecution: allowed(
+        parameters.get('runs') ?? parameters.get('profile'),
+        new Set(options.profiles),
+      ),
+      preferredTarget: allowed(parameters.get('target'), preferredTargetValues),
+      serverDependency: allowed(
+        parameters.get('server'),
+        serverDependencyValues,
+      ),
+      browserFeasibility: allowed(
+        parameters.get('browser'),
+        browserFeasibilityValues,
+      ),
       verification: allowed(parameters.get('verification'), verificationValues),
     }),
     sorting: sorting(parameters.get('sort')),
@@ -186,7 +229,18 @@ export function serializeToolFactoryView(view: ToolFactoryViewState) {
   if (view.search) parameters.set('q', view.search);
   if (view.filters.support) parameters.set('support', view.filters.support);
   if (view.filters.family) parameters.set('family', view.filters.family);
-  if (view.filters.profile) parameters.set('profile', view.filters.profile);
+  if (view.filters.currentExecution) {
+    parameters.set('runs', view.filters.currentExecution);
+  }
+  if (view.filters.preferredTarget) {
+    parameters.set('target', view.filters.preferredTarget);
+  }
+  if (view.filters.serverDependency) {
+    parameters.set('server', view.filters.serverDependency);
+  }
+  if (view.filters.browserFeasibility) {
+    parameters.set('browser', view.filters.browserFeasibility);
+  }
   if (view.filters.verification) {
     parameters.set('verification', view.filters.verification);
   }

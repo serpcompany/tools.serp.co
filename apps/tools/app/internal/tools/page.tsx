@@ -8,6 +8,7 @@ import {
   getToolFactoryDeployment,
 } from '../../../lib/tool-factory-access.ts';
 import { buildToolExpansionPlan } from '../../../lib/tool-expansion-planner.ts';
+import { buildToolClientFirstPlan } from '../../../lib/tool-client-first-plan.ts';
 import { buildToolFactoryReadModel } from '../../../lib/tool-factory-read-model.ts';
 import { getSerpToolsD1Binding } from '../../../lib/cloudflare-d1.ts';
 import { loadToolRuntimeObservations } from '../../../lib/tool-runtime-observations.ts';
@@ -38,6 +39,7 @@ export default async function ToolFactoryPage() {
   }
 
   const model = buildToolFactoryReadModel();
+  const clientFirstPlan = buildToolClientFirstPlan(model.rows);
   const expansionPlan = buildToolExpansionPlan(model.rows);
   const runtimeObservations = await loadToolRuntimeObservations(
     deployment.environment === 'DEV/STAGING'
@@ -54,6 +56,7 @@ export default async function ToolFactoryPage() {
     <ToolFactoryTable
       deployment={deployment}
       model={{ rows: model.rows, counts: model.counts }}
+      clientFirstPlan={{ rows: clientFirstPlan.rows }}
       expansionPlan={expansionPlan}
       runtimeObservations={runtimeObservations}
     />

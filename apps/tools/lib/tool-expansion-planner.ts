@@ -1,4 +1,8 @@
 import type { ToolFactoryRow } from './tool-factory-read-model.ts';
+import {
+  getClientFirstDecision,
+  type ClientFirstReviewCategory,
+} from './tool-client-first-decisions.ts';
 
 export type ToolExpansionCandidateEngine = Readonly<{
   id: string;
@@ -31,10 +35,20 @@ export type ToolExpansionFact = Readonly<{
   source: string;
 }>;
 
+export type ToolExpansionBrowserFeasibility =
+  | 'existing-browser-code'
+  | 'new-browser-wasm-library'
+  | 'server-alternative-research'
+  | 'catalog-review'
+  | 'unresolved';
+
 export type ToolExpansionGroup = Readonly<{
   id: string;
   rank: number;
   operationFamily: string;
+  browserFeasibility: ToolExpansionBrowserFeasibility;
+  testReadiness: 'fixture-and-verifiers' | 'unresolved';
+  decisionCost: 'bounded' | 'multiple-open-decisions';
   operations: readonly string[];
   inputFormats: readonly string[];
   outputFormats: readonly string[];
@@ -69,10 +83,16 @@ function values<Value>(items: readonly Value[]) {
 function buildUnrankedGroup(
   operationFamily: string,
   rows: readonly ToolFactoryRow[],
+  browserFeasibility: ToolExpansionBrowserFeasibility,
+  testReadiness: 'fixture-and-verifiers' | 'unresolved',
+  decisionCost: 'bounded' | 'multiple-open-decisions',
+  decisionFacts: readonly ToolExpansionFact[],
+  allowedCandidateIds?: ReadonlySet<string>,
 ) {
   const candidateById = new Map<string, ToolExpansionCandidateEngine>();
   for (const row of rows) {
     for (const engine of row.implementation.engines) {
+      if (allowedCandidateIds && !allowedCandidateIds.has(engine.id)) continue;
       const candidate = {
         id: engine.id,
         identity: engine.identity,
@@ -111,6 +131,9 @@ function buildUnrankedGroup(
   return {
     id: `family:${operationFamily}`,
     operationFamily,
+    browserFeasibility,
+    testReadiness,
+    decisionCost,
     operations: values(rows.map((row) => row.catalogIntent.operation)),
     inputFormats,
     outputFormats,
@@ -126,6 +149,7 @@ function buildUnrankedGroup(
         statement: `${toolIds.length.toLocaleString('en-US')} exact Tool IDs are explicitly unsupported.`,
         source: 'Tool Factory support read model',
       }),
+      ...decisionFacts,
       Object.freeze({
         statement: `${inputFormats.length.toLocaleString('en-US')} catalog input formats and ${outputFormats.length.toLocaleString('en-US')} catalog output formats are represented.`,
         source: 'Tool Catalog intent',
@@ -154,15 +178,25 @@ function buildUnrankedGroup(
       }),
       Object.freeze({
         kind: 'fixture' as const,
-        status: 'needs-review' as const,
+        status:
+          testReadiness === 'fixture-and-verifiers'
+            ? ('needs-review' as const)
+            : ('needs-review' as const),
         explanation:
-          'This planner does not load a retained fixture inventory for every exact Tool ID.',
+          testReadiness === 'fixture-and-verifiers'
+            ? 'A distinct retained fixture exists; exact browser execution still must pass.'
+            : 'This planner does not load a retained fixture inventory for every exact Tool ID.',
       }),
       Object.freeze({
         kind: 'semantic-validator' as const,
-        status: 'missing' as const,
+        status:
+          testReadiness === 'fixture-and-verifiers'
+            ? ('needs-review' as const)
+            : ('missing' as const),
         explanation:
-          'The explicit unsupported contract has no exact semantic verifier policy.',
+          testReadiness === 'fixture-and-verifiers'
+            ? 'Independent format validators exist; the exact family policy still must pass review.'
+            : 'The explicit unsupported contract has no exact semantic verifier policy.',
       }),
       Object.freeze({
         kind: 'limits' as const,
@@ -198,17 +232,70 @@ export function buildToolExpansionPlan(
       'Expansion planner input contains duplicate unsupported Tool IDs.',
     );
   }
-  const rowsByFamily = new Map<string, ToolFactoryRow[]>();
+  const rowsByFamily = new Map<
+    string,
+    {
+      rows: ToolFactoryRow[];
+      browserFeasibility: ToolExpansionBrowserFeasibility;
+      testReadiness: 'fixture-and-verifiers' | 'unresolved';
+      decisionCost: 'bounded' | 'multiple-open-decisions';
+      facts: readonly ToolExpansionFact[];
+      allowedCandidateIds?: ReadonlySet<string>;
+    }
+  >();
+  const feasibilityByCategory: Record<
+    ClientFirstReviewCategory,
+    ToolExpansionBrowserFeasibility
+  > = {
+    'existing-browser-code-to-verify': 'existing-browser-code',
+    'browser-library-research': 'new-browser-wasm-library',
+    'server-alternative-research': 'server-alternative-research',
+    'catalog-review': 'catalog-review',
+    unresolved: 'unresolved',
+  };
   for (const row of unsupportedRows) {
-    const members = rowsByFamily.get(row.family) ?? [];
-    members.push(row);
-    rowsByFamily.set(row.family, members);
+    const decision = getClientFirstDecision(row);
+    const group = rowsByFamily.get(decision.groupId) ?? {
+      rows: [],
+      browserFeasibility: feasibilityByCategory[decision.reviewCategory],
+      testReadiness: decision.testReadiness,
+      decisionCost: decision.decisionCost,
+      facts: decision.facts,
+      allowedCandidateIds: decision.allowedCandidateIds,
+    };
+    group.rows.push(row);
+    rowsByFamily.set(decision.groupId, group);
   }
-  const unranked = [...rowsByFamily].map(([family, members]) =>
-    buildUnrankedGroup(family, members),
+  const unranked = [...rowsByFamily].map(([family, group]) =>
+    buildUnrankedGroup(
+      family,
+      group.rows,
+      group.browserFeasibility,
+      group.testReadiness,
+      group.decisionCost,
+      group.facts,
+      group.allowedCandidateIds,
+    ),
   );
+  const feasibilityRank: Record<ToolExpansionBrowserFeasibility, number> = {
+    'existing-browser-code': 0,
+    'new-browser-wasm-library': 1,
+    'catalog-review': 2,
+    'server-alternative-research': 3,
+    unresolved: 4,
+  };
+  const readinessRank = { 'fixture-and-verifiers': 0, unresolved: 1 } as const;
+  const decisionCostRank = {
+    bounded: 0,
+    'multiple-open-decisions': 1,
+  } as const;
   unranked.sort(
     (left, right) =>
+      feasibilityRank[left.browserFeasibility] -
+        feasibilityRank[right.browserFeasibility] ||
+      readinessRank[left.testReadiness] - readinessRank[right.testReadiness] ||
+      decisionCostRank[left.decisionCost] -
+        decisionCostRank[right.decisionCost] ||
       right.unlockCount - left.unlockCount ||
       left.operationFamily.localeCompare(right.operationFamily),
   );
@@ -229,10 +316,10 @@ export function buildToolExpansionPlan(
     groups: Object.freeze(groups),
     ranking: Object.freeze({
       method:
-        'Exact unsupported Tool count descending, then operation family name.',
+        'Browser feasibility, test readiness, decision cost, exact Tool count, then stable family ID.',
       assumptions: Object.freeze([
-        'A reviewed family adapter may reduce repeated work across its exact member Tools.',
-        'Larger exact groups are evaluated first; this ordering does not establish feasibility or support.',
+        'Existing browser code with distinct fixtures and semantic validators is reviewed before speculative bulk mappings.',
+        'Candidate categories and ranking do not establish feasibility or support.',
       ]),
     }),
     supportNotice:

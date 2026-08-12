@@ -33,6 +33,7 @@ import type {
   ToolFactoryRow,
   ToolSupportDisposition,
 } from '../../../lib/tool-factory-read-model.ts';
+import type { ToolClientFirstRow } from '../../../lib/tool-client-first-plan.ts';
 import type {
   ToolExpansionGroup,
   ToolExpansionPlan,
@@ -68,8 +69,51 @@ function engineNames(row: ToolFactoryRow) {
   return joined(row.implementation.engines.map((engine) => engine.identity));
 }
 
-function profiles(row: ToolFactoryRow) {
+function candidateProfiles(row: ToolFactoryRow) {
   return joined(row.runtimeRequirement.executionProfiles);
+}
+
+function executionLabel(
+  state: ToolClientFirstRow['currentExecution']['state'],
+) {
+  return {
+    browser: 'Browser',
+    hybrid: 'Hybrid',
+    server: 'Server',
+    unsupported: 'Unsupported',
+    unknown: 'Unknown',
+  }[state];
+}
+
+function targetLabel(target: ToolClientFirstRow['preferredTarget']) {
+  return {
+    'browser-first': 'Browser-first',
+    'server-required': 'Server required',
+    undecided: 'Undecided',
+  }[target];
+}
+
+function serverDependencyLabel(
+  dependency: ToolClientFirstRow['serverDependency'],
+) {
+  return {
+    none: 'None',
+    'optional-fallback': 'Optional / conditional',
+    required: 'Required',
+    unknown: 'Unknown',
+  }[dependency];
+}
+
+function browserOpportunityLabel(
+  value: ToolClientFirstRow['browserFeasibility'],
+) {
+  return {
+    'existing-browser-path': 'Existing browser code to verify',
+    'new-browser-library': 'Research a browser library',
+    'server-required': 'Server required',
+    'catalog-review': 'Review the Tool idea',
+    unresolved: 'Unresolved',
+  }[value];
 }
 
 const verifiedDateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -153,208 +197,253 @@ function SortButton({
   );
 }
 
-const columns: ColumnDef<ToolFactoryRow>[] = [
-  {
-    id: 'tool',
-    accessorFn: (row) => `${row.name} ${row.toolId}`,
-    header: ({ column }) => <SortButton column={column} label="Tool" />,
-    cell: ({ row }) => (
-      <div className="min-w-52">
-        <div className="font-medium text-slate-950">{row.original.name}</div>
-        <div className="font-mono text-xs text-slate-500">
-          {row.original.toolId}
+function buildColumns(
+  clientFirstByToolId: ReadonlyMap<string, ToolClientFirstRow>,
+): ColumnDef<ToolFactoryRow>[] {
+  const planning = (row: ToolFactoryRow) => {
+    const result = clientFirstByToolId.get(row.toolId);
+    if (!result)
+      throw new TypeError(`Missing client-first plan for ${row.toolId}`);
+    return result;
+  };
+  return [
+    {
+      id: 'tool',
+      accessorFn: (row) => `${row.name} ${row.toolId}`,
+      header: ({ column }) => <SortButton column={column} label="Tool" />,
+      cell: ({ row }) => (
+        <div className="min-w-52">
+          <div className="font-medium text-slate-950">{row.original.name}</div>
+          <div className="font-mono text-xs text-slate-500">
+            {row.original.toolId}
+          </div>
         </div>
-      </div>
-    ),
-    size: 270,
-  },
-  {
-    id: 'support',
-    accessorFn: (row) => row.support.disposition,
-    header: ({ column }) => <SortButton column={column} label="Support" />,
-    cell: ({ row }) => (
-      <SupportBadge disposition={row.original.support.disposition} />
-    ),
-    size: 140,
-  },
-  {
-    id: 'operationDisplay',
-    accessorFn: operationLabel,
-    header: ({ column }) => <SortButton column={column} label="Operation" />,
-    size: 150,
-  },
-  {
-    accessorKey: 'family',
-    header: ({ column }) => <SortButton column={column} label="Family" />,
-    size: 220,
-  },
-  {
-    id: 'engines',
-    accessorFn: engineNames,
-    header: ({ column }) => (
-      <SortButton column={column} label="Library / engine" />
-    ),
-    size: 300,
-  },
-  {
-    id: 'profiles',
-    accessorFn: profiles,
-    header: ({ column }) => (
-      <SortButton column={column} label="Execution profile" />
-    ),
-    size: 220,
-  },
-  {
-    id: 'verification',
-    accessorFn: (row) => row.controlledVerification.classification,
-    header: ({ column }) => (
-      <SortButton column={column} label="Family policy" />
-    ),
-    size: 220,
-  },
-  {
-    id: 'exactTest',
-    accessorFn: exactTestLabel,
-    header: ({ column }) => (
-      <SortButton column={column} label="Latest exact test" />
-    ),
-    size: 190,
-  },
-  {
-    id: 'runtimeRequirement',
-    accessorFn: (row) => row.runtimeRequirement.classification,
-    header: ({ column }) => (
-      <SortButton column={column} label="Runtime requirement" />
-    ),
-    size: 260,
-  },
-  {
-    id: 'observation',
-    accessorFn: (row) => row.runtimeObservation.classification,
-    header: ({ column }) => (
-      <SortButton column={column} label="Recent staging" />
-    ),
-    size: 190,
-  },
-  {
-    id: 'attention',
-    accessorFn: (row) => joined(row.attention.codes),
-    header: ({ column }) => <SortButton column={column} label="Attention" />,
-    size: 260,
-  },
-  { accessorKey: 'toolId', header: 'Tool ID', size: 220 },
-  { accessorKey: 'description', header: 'Description', size: 380 },
-  { accessorKey: 'route', header: 'Route', size: 230 },
-  {
-    id: 'operation',
-    accessorFn: (row) => row.catalogIntent.operation,
-    header: 'Operation type',
-    size: 160,
-  },
-  {
-    id: 'inputFormat',
-    accessorFn: (row) => row.catalogIntent.inputFormat ?? '—',
-    header: 'Input format',
-    size: 130,
-  },
-  {
-    id: 'outputFormat',
-    accessorFn: (row) => row.catalogIntent.outputFormat ?? '—',
-    header: 'Output format',
-    size: 130,
-  },
-  {
-    id: 'renderer',
-    accessorFn: (row) => row.catalogIntent.renderer,
-    header: 'Renderer',
-    size: 170,
-  },
-  {
-    id: 'tags',
-    accessorFn: (row) => joined(row.catalogIntent.tags),
-    header: 'Tags',
-    size: 250,
-  },
-  {
-    id: 'catalogPriority',
-    accessorFn: (row) => row.catalogIntent.priority ?? '—',
-    header: 'Catalog priority',
-    size: 140,
-  },
-  {
-    id: 'catalogFlags',
-    accessorFn: (row) =>
-      joined(
-        [
-          row.catalogIntent.isBeta && 'beta',
-          row.catalogIntent.isNew && 'new',
-          row.catalogIntent.isPopular && 'popular',
-          row.catalogIntent.requiresFFmpeg && 'requires FFmpeg',
-        ].filter((flag): flag is string => Boolean(flag)),
       ),
-    header: 'Catalog flags',
-    size: 190,
-  },
-  {
-    id: 'adapter',
-    accessorFn: (row) => row.support.adapterId ?? '—',
-    header: 'Adapter',
-    size: 220,
-  },
-  {
-    id: 'supportReason',
-    accessorFn: (row) => row.support.reason ?? '—',
-    header: 'Support reason',
-    size: 420,
-  },
-  {
-    id: 'engineIds',
-    accessorFn: (row) =>
-      joined(row.implementation.engines.map((engine) => engine.id)),
-    header: 'Engine IDs',
-    size: 280,
-  },
-  {
-    id: 'processingLocations',
-    accessorFn: (row) =>
-      joined(
-        row.implementation.engines.map((engine) => engine.processingLocation),
+      size: 270,
+    },
+    {
+      id: 'support',
+      accessorFn: (row) => row.support.disposition,
+      header: ({ column }) => <SortButton column={column} label="Support" />,
+      cell: ({ row }) => (
+        <SupportBadge disposition={row.original.support.disposition} />
       ),
-    header: 'Processing locations',
-    size: 240,
-  },
-  {
-    id: 'implementationOwners',
-    accessorFn: (row) =>
-      joined(row.implementation.engines.map((engine) => engine.owner)),
-    header: 'Implementation owners',
-    size: 360,
-  },
-  {
-    id: 'verificationReason',
-    accessorFn: (row) => row.controlledVerification.reason,
-    header: 'Verification reason',
-    size: 420,
-  },
-  {
-    id: 'runtimeReason',
-    accessorFn: (row) => row.runtimeRequirement.reason,
-    header: 'Runtime reason',
-    size: 420,
-  },
-  {
-    id: 'observationReason',
-    accessorFn: (row) => row.runtimeObservation.reason,
-    header: 'Observation reason',
-    size: 400,
-  },
-  {
-    id: 'attentionSummary',
-    accessorFn: (row) => row.attention.summary,
-    header: 'Attention summary',
-    size: 380,
-  },
-];
+      size: 140,
+    },
+    {
+      id: 'operationDisplay',
+      accessorFn: operationLabel,
+      header: ({ column }) => <SortButton column={column} label="Operation" />,
+      size: 150,
+    },
+    {
+      accessorKey: 'family',
+      header: ({ column }) => <SortButton column={column} label="Family" />,
+      size: 220,
+    },
+    {
+      id: 'currentExecution',
+      accessorFn: (row) => executionLabel(planning(row).currentExecution.state),
+      header: ({ column }) => <SortButton column={column} label="Runs today" />,
+      size: 150,
+    },
+    {
+      id: 'preferredTarget',
+      accessorFn: (row) => targetLabel(planning(row).preferredTarget),
+      header: ({ column }) => (
+        <SortButton column={column} label="Preferred target" />
+      ),
+      size: 170,
+    },
+    {
+      id: 'serverDependency',
+      accessorFn: (row) =>
+        serverDependencyLabel(planning(row).serverDependency),
+      header: ({ column }) => (
+        <SortButton column={column} label="Server dependency" />
+      ),
+      size: 190,
+    },
+    {
+      id: 'browserFeasibility',
+      accessorFn: (row) =>
+        browserOpportunityLabel(planning(row).browserFeasibility),
+      header: 'Browser opportunity',
+      size: 210,
+    },
+    {
+      id: 'currentEngines',
+      accessorFn: (row) => joined(planning(row).currentExecution.engineIds),
+      header: 'Current engine',
+      size: 250,
+    },
+    {
+      id: 'candidateEngines',
+      accessorFn: (row) =>
+        joined(planning(row).candidateEngines.map((engine) => engine.identity)),
+      header: 'Candidate approach · not verified',
+      size: 340,
+    },
+    {
+      id: 'engines',
+      accessorFn: engineNames,
+      header: ({ column }) => (
+        <SortButton column={column} label="Library / engine" />
+      ),
+      size: 300,
+    },
+    {
+      id: 'profiles',
+      accessorFn: candidateProfiles,
+      header: ({ column }) => (
+        <SortButton column={column} label="Mapped candidate profiles" />
+      ),
+      size: 220,
+    },
+    {
+      id: 'verification',
+      accessorFn: (row) => row.controlledVerification.classification,
+      header: ({ column }) => (
+        <SortButton column={column} label="Family policy" />
+      ),
+      size: 220,
+    },
+    {
+      id: 'exactTest',
+      accessorFn: exactTestLabel,
+      header: ({ column }) => (
+        <SortButton column={column} label="Latest exact test" />
+      ),
+      size: 190,
+    },
+    {
+      id: 'observation',
+      accessorFn: (row) => row.runtimeObservation.classification,
+      header: ({ column }) => (
+        <SortButton column={column} label="Recent staging" />
+      ),
+      size: 190,
+    },
+    {
+      id: 'attention',
+      accessorFn: (row) => joined(row.attention.codes),
+      header: ({ column }) => <SortButton column={column} label="Attention" />,
+      size: 260,
+    },
+    { accessorKey: 'toolId', header: 'Tool ID', size: 220 },
+    { accessorKey: 'description', header: 'Description', size: 380 },
+    { accessorKey: 'route', header: 'Route', size: 230 },
+    {
+      id: 'operation',
+      accessorFn: (row) => row.catalogIntent.operation,
+      header: 'Operation type',
+      size: 160,
+    },
+    {
+      id: 'inputFormat',
+      accessorFn: (row) => row.catalogIntent.inputFormat ?? '—',
+      header: 'Input format',
+      size: 130,
+    },
+    {
+      id: 'outputFormat',
+      accessorFn: (row) => row.catalogIntent.outputFormat ?? '—',
+      header: 'Output format',
+      size: 130,
+    },
+    {
+      id: 'renderer',
+      accessorFn: (row) => row.catalogIntent.renderer,
+      header: 'Renderer',
+      size: 170,
+    },
+    {
+      id: 'tags',
+      accessorFn: (row) => joined(row.catalogIntent.tags),
+      header: 'Tags',
+      size: 250,
+    },
+    {
+      id: 'catalogPriority',
+      accessorFn: (row) => row.catalogIntent.priority ?? '—',
+      header: 'Catalog priority',
+      size: 140,
+    },
+    {
+      id: 'catalogFlags',
+      accessorFn: (row) =>
+        joined(
+          [
+            row.catalogIntent.isBeta && 'beta',
+            row.catalogIntent.isNew && 'new',
+            row.catalogIntent.isPopular && 'popular',
+            row.catalogIntent.requiresFFmpeg && 'requires FFmpeg',
+          ].filter((flag): flag is string => Boolean(flag)),
+        ),
+      header: 'Catalog flags',
+      size: 190,
+    },
+    {
+      id: 'adapter',
+      accessorFn: (row) => row.support.adapterId ?? '—',
+      header: 'Adapter',
+      size: 220,
+    },
+    {
+      id: 'supportReason',
+      accessorFn: (row) => row.support.reason ?? '—',
+      header: 'Support reason',
+      size: 420,
+    },
+    {
+      id: 'engineIds',
+      accessorFn: (row) =>
+        joined(row.implementation.engines.map((engine) => engine.id)),
+      header: 'Engine IDs',
+      size: 280,
+    },
+    {
+      id: 'processingLocations',
+      accessorFn: (row) =>
+        joined(
+          row.implementation.engines.map((engine) => engine.processingLocation),
+        ),
+      header: 'Processing locations',
+      size: 240,
+    },
+    {
+      id: 'implementationOwners',
+      accessorFn: (row) =>
+        joined(row.implementation.engines.map((engine) => engine.owner)),
+      header: 'Implementation owners',
+      size: 360,
+    },
+    {
+      id: 'verificationReason',
+      accessorFn: (row) => row.controlledVerification.reason,
+      header: 'Verification reason',
+      size: 420,
+    },
+    {
+      id: 'runtimeReason',
+      accessorFn: (row) => row.runtimeRequirement.reason,
+      header: 'Runtime reason',
+      size: 420,
+    },
+    {
+      id: 'observationReason',
+      accessorFn: (row) => row.runtimeObservation.reason,
+      header: 'Observation reason',
+      size: 400,
+    },
+    {
+      id: 'attentionSummary',
+      accessorFn: (row) => row.attention.summary,
+      header: 'Attention summary',
+      size: 380,
+    },
+  ];
+}
 
 function unique(
   rows: readonly ToolFactoryRow[],
@@ -875,16 +964,18 @@ function RecentStagingActivity({
 }
 function ToolDetail({
   row,
+  clientFirst,
   runtimeObservations,
   onClose,
 }: {
   row: ToolFactoryRow | null;
+  clientFirst: ToolClientFirstRow | null;
   runtimeObservations: ToolRuntimeObservationPortfolio;
   onClose: () => void;
 }) {
   return (
     <Dialog open={row !== null} onOpenChange={(open) => !open && onClose()}>
-      {row && (
+      {row && clientFirst && (
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-5xl">
           <DialogHeader>
             <DialogTitle>{row.name}</DialogTitle>
@@ -897,11 +988,29 @@ function ToolDetail({
             <Fact label="Operation" value={operationLabel(row)} />
             <Fact label="Family" value={row.family} />
             <Fact label="Adapter" value={row.support.adapterId ?? '—'} />
-            <Fact label="Library / engine" value={engineNames(row)} />
-            <Fact label="Execution profile" value={profiles(row)} />
             <Fact
-              label="Runtime requirement"
-              value={`${row.runtimeRequirement.classification} — ${row.runtimeRequirement.reason}`}
+              label="Runs today"
+              value={executionLabel(clientFirst.currentExecution.state)}
+            />
+            <Fact
+              label="Preferred target"
+              value={targetLabel(clientFirst.preferredTarget)}
+            />
+            <Fact
+              label="Server dependency"
+              value={serverDependencyLabel(clientFirst.serverDependency)}
+            />
+            <Fact
+              label="Current engine"
+              value={joined(clientFirst.currentExecution.engineIds)}
+            />
+            <Fact
+              label="Current execution meaning"
+              value={clientFirst.currentExecution.explanation}
+            />
+            <Fact
+              label="Browser opportunity"
+              value={browserOpportunityLabel(clientFirst.browserFeasibility)}
             />
             <Fact label="Route" value={row.route} />
           </dl>
@@ -918,25 +1027,19 @@ function ToolDetail({
           <Fact label="Attention" value={row.attention.summary} />
           <div className="rounded-lg border p-3">
             <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Implementation ownership
+              Candidate approaches · not verified support
             </div>
-            {row.implementation.engines.length ? (
+            {clientFirst.candidateEngines.length ? (
               <ul className="mt-2 space-y-2 text-sm">
-                {row.implementation.engines.map((engine) => (
+                {clientFirst.candidateEngines.map((engine) => (
                   <li key={engine.id} className="rounded-md bg-slate-50 p-2">
                     <strong>{engine.identity}</strong>
-                    <div className="mt-1 font-mono text-xs text-slate-600">
-                      {engine.owner}
-                    </div>
                   </li>
                 ))}
               </ul>
             ) : (
               <p className="mt-1 text-sm text-slate-700">
-                {row.implementation.reason ?? 'No mapped engine.'}
-                {row.implementation.sourceNeeded
-                  ? ` Needed: ${row.implementation.sourceNeeded}`
-                  : ''}
+                No unverified candidate approach is recorded.
               </p>
             )}
           </div>
@@ -949,11 +1052,13 @@ function ToolDetail({
 export function ToolFactoryTable({
   deployment,
   model,
+  clientFirstPlan,
   expansionPlan,
   runtimeObservations,
 }: {
   deployment: ToolFactoryDeployment;
   model: ToolFactoryTableModel;
+  clientFirstPlan: Readonly<{ rows: readonly ToolClientFirstRow[] }>;
   expansionPlan: ToolExpansionPlan;
   runtimeObservations: ToolRuntimeObservationPortfolio;
 }) {
@@ -961,6 +1066,10 @@ export function ToolFactoryTable({
     DEFAULT_TOOL_FACTORY_VIEW,
   );
   const [selected, setSelected] = useState<ToolFactoryRow | null>(null);
+  const clientFirstByToolId = useMemo(
+    () => new Map(clientFirstPlan.rows.map((row) => [row.toolId, row])),
+    [clientFirstPlan.rows],
+  );
 
   const supportValues = useMemo(
     () => unique(model.rows, (row) => row.support.disposition),
@@ -971,8 +1080,36 @@ export function ToolFactoryTable({
     [model.rows],
   );
   const profileValues = useMemo(
-    () => unique(model.rows, profiles),
-    [model.rows],
+    () =>
+      [
+        ...new Set(
+          clientFirstPlan.rows.map((row) =>
+            executionLabel(row.currentExecution.state),
+          ),
+        ),
+      ].sort(),
+    [clientFirstPlan.rows],
+  );
+  const targetValues = useMemo(
+    () =>
+      [
+        ...new Set(clientFirstPlan.rows.map((row) => row.preferredTarget)),
+      ].sort(),
+    [clientFirstPlan.rows],
+  );
+  const serverDependencyValues = useMemo(
+    () =>
+      [
+        ...new Set(clientFirstPlan.rows.map((row) => row.serverDependency)),
+      ].sort(),
+    [clientFirstPlan.rows],
+  );
+  const browserFeasibilityValues = useMemo(
+    () =>
+      [
+        ...new Set(clientFirstPlan.rows.map((row) => row.browserFeasibility)),
+      ].sort(),
+    [clientFirstPlan.rows],
   );
   const verificationValues = useMemo(
     () =>
@@ -1028,8 +1165,29 @@ export function ToolFactoryTable({
   if (view.filters.family) {
     columnFilters.push({ id: 'family', value: view.filters.family });
   }
-  if (view.filters.profile) {
-    columnFilters.push({ id: 'profiles', value: view.filters.profile });
+  if (view.filters.currentExecution) {
+    columnFilters.push({
+      id: 'currentExecution',
+      value: view.filters.currentExecution,
+    });
+  }
+  if (view.filters.preferredTarget) {
+    columnFilters.push({
+      id: 'preferredTarget',
+      value: view.filters.preferredTarget,
+    });
+  }
+  if (view.filters.serverDependency) {
+    columnFilters.push({
+      id: 'serverDependency',
+      value: view.filters.serverDependency,
+    });
+  }
+  if (view.filters.browserFeasibility) {
+    columnFilters.push({
+      id: 'browserFeasibility',
+      value: view.filters.browserFeasibility,
+    });
   }
   if (view.filters.verification) {
     columnFilters.push({
@@ -1046,7 +1204,7 @@ export function ToolFactoryTable({
   };
   const tableColumns = useMemo(
     () =>
-      columns.map((column) =>
+      buildColumns(clientFirstByToolId).map((column) =>
         column.id === 'observation'
           ? {
               ...column,
@@ -1055,7 +1213,7 @@ export function ToolFactoryTable({
             }
           : column,
       ),
-    [runtimeObservations],
+    [clientFirstByToolId, runtimeObservations],
   );
 
   function resolveUpdate<T>(updater: Updater<T>, previous: T) {
@@ -1227,14 +1385,57 @@ export function ToolFactoryTable({
               ))}
             </select>
             <select
-              aria-label="Filter by execution profile"
+              aria-label="Filter by current execution"
               className="h-9 max-w-56 rounded-md border bg-white px-3 text-sm"
-              value={view.filters.profile}
-              onChange={(event) => setFilter('profile', event.target.value)}
+              value={view.filters.currentExecution}
+              onChange={(event) =>
+                setFilter('currentExecution', event.target.value)
+              }
             >
-              <option value="">All execution profiles</option>
+              <option value="">All current execution</option>
               {profileValues.map((value) => (
                 <option key={value}>{value}</option>
+              ))}
+            </select>
+            <select
+              aria-label="Filter by preferred target"
+              className="h-9 max-w-56 rounded-md border bg-white px-3 text-sm"
+              value={view.filters.preferredTarget}
+              onChange={(event) =>
+                setFilter('preferredTarget', event.target.value)
+              }
+            >
+              <option value="">All preferred targets</option>
+              {targetValues.map((value) => (
+                <option key={value}>{value}</option>
+              ))}
+            </select>
+            <select
+              aria-label="Filter by server dependency"
+              className="h-9 max-w-56 rounded-md border bg-white px-3 text-sm"
+              value={view.filters.serverDependency}
+              onChange={(event) =>
+                setFilter('serverDependency', event.target.value)
+              }
+            >
+              <option value="">All server dependencies</option>
+              {serverDependencyValues.map((value) => (
+                <option key={value}>{value}</option>
+              ))}
+            </select>
+            <select
+              aria-label="Filter by browser opportunity"
+              className="h-9 max-w-56 rounded-md border bg-white px-3 text-sm"
+              value={view.filters.browserFeasibility}
+              onChange={(event) =>
+                setFilter('browserFeasibility', event.target.value)
+              }
+            >
+              <option value="">All browser opportunities</option>
+              {browserFeasibilityValues.map((value) => (
+                <option key={value} value={value}>
+                  {browserOpportunityLabel(value)}
+                </option>
               ))}
             </select>
             <select
@@ -1407,6 +1608,9 @@ export function ToolFactoryTable({
       </div>
       <ToolDetail
         row={selected}
+        clientFirst={
+          selected ? (clientFirstByToolId.get(selected.toolId) ?? null) : null
+        }
         runtimeObservations={runtimeObservations}
         onClose={() => setSelected(null)}
       />
