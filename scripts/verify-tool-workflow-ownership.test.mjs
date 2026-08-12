@@ -158,7 +158,7 @@ test('local telemetry facades and computed URL helpers cannot hide presentation 
       ],
       [
         'apps/tools/lib/run-facade.ts',
-        "export { beginToolRun as startRun } from './telemetry';",
+        "import { beginToolRun as rawStart } from './telemetry'; export function startRun(options) { return rawStart(options); }",
       ],
       [
         'apps/tools/lib/telemetry.ts',

@@ -270,6 +270,8 @@ function telemetryOwners(files, parsed) {
     changed = false;
     for (const [relativePath, sourceFile] of parsed) {
       const symbols = exportedSymbols.get(relativePath) ?? new Set();
+      const localTelemetryBindings = new Set();
+      const telemetryNamespaces = new Set();
       const addSymbol = (name) => {
         if (symbols.has(name)) return;
         symbols.add(name);
@@ -303,13 +305,17 @@ function telemetryOwners(files, parsed) {
           const bindings = statement.importClause?.namedBindings;
           if (!bindings) continue;
           if (ts.isNamespaceImport(bindings)) {
-            if (telemetryBoundary || (providerSymbols?.size ?? 0) > 0)
+            if (telemetryBoundary || (providerSymbols?.size ?? 0) > 0) {
               ownerPaths.add(relativePath);
+              telemetryNamespaces.add(bindings.name.text);
+            }
             continue;
           }
           for (const element of bindings.elements) {
-            if (provides((element.propertyName ?? element.name).text))
+            if (provides((element.propertyName ?? element.name).text)) {
               ownerPaths.add(relativePath);
+              localTelemetryBindings.add(element.name.text);
+            }
           }
           continue;
         }
@@ -324,6 +330,65 @@ function telemetryOwners(files, parsed) {
               continue;
             addSymbol(element.name.text);
             ownerPaths.add(relativePath);
+          }
+        }
+      }
+      const containsTelemetryReference = (root) => {
+        let found = false;
+        function visit(node) {
+          if (
+            (ts.isIdentifier(node) && localTelemetryBindings.has(node.text)) ||
+            (ts.isPropertyAccessExpression(node) &&
+              ts.isIdentifier(node.expression) &&
+              telemetryNamespaces.has(node.expression.text) &&
+              node.name.text === 'beginToolRun')
+          ) {
+            found = true;
+          }
+          if (!found) ts.forEachChild(node, visit);
+        }
+        visit(root);
+        return found;
+      };
+      for (const statement of relativePath === CANONICAL_LIFECYCLE
+        ? []
+        : sourceFile.statements) {
+        if (
+          ts.isExportDeclaration(statement) &&
+          !statement.moduleSpecifier &&
+          statement.exportClause &&
+          ts.isNamedExports(statement.exportClause)
+        ) {
+          for (const element of statement.exportClause.elements) {
+            if (
+              localTelemetryBindings.has(
+                (element.propertyName ?? element.name).text,
+              )
+            ) {
+              addSymbol(element.name.text);
+            }
+          }
+        }
+        const exported = statement.modifiers?.some(
+          (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
+        );
+        if (!exported) continue;
+        if (
+          ts.isFunctionDeclaration(statement) &&
+          statement.name &&
+          containsTelemetryReference(statement)
+        ) {
+          addSymbol(statement.name.text);
+        }
+        if (ts.isVariableStatement(statement)) {
+          for (const declaration of statement.declarationList.declarations) {
+            if (
+              ts.isIdentifier(declaration.name) &&
+              declaration.initializer &&
+              containsTelemetryReference(declaration.initializer)
+            ) {
+              addSymbol(declaration.name.text);
+            }
           }
         }
       }
