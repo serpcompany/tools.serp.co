@@ -103,3 +103,35 @@ test('unknown Tool remains unknown and names the evidence needed to resolve it',
     (row.implementation.engines as unknown[]).push({});
   }, TypeError);
 });
+
+test('Tool and exact family GitHub work remain a separate read-model dimension', () => {
+  const row = buildToolFactoryReadModel().getByToolId('audio-to-text');
+
+  assert.ok(row);
+  assert.deepEqual(
+    row.githubWork.tool.map((link) => [link.number, link.stateLabel]),
+    [
+      [96, 'Open pull request'],
+      [97, 'Closed issue'],
+    ],
+  );
+  assert.deepEqual(
+    row.githubWork.family.map((link) => [link.number, link.stateLabel]),
+    [
+      [85, 'Open pull request'],
+      [82, 'Closed issue'],
+    ],
+  );
+  assert.equal(row.support.disposition, 'supported');
+  assert.equal(row.runtimeObservation.classification, 'not-loaded');
+});
+
+test('missing exact Tool and family work stays empty instead of being guessed from titles', () => {
+  const row = buildToolFactoryReadModel().getByToolId('png-to-webp');
+
+  assert.ok(row);
+  assert.deepEqual(row.githubWork, { tool: [], family: [] });
+  assert.throws(() => {
+    (row.githubWork.tool as unknown[]).push({});
+  }, TypeError);
+});

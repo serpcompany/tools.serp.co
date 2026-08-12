@@ -175,7 +175,11 @@ try {
       exact: true,
     })
     .waitFor();
-  if (args.screenshot) await dialog.screenshot({ path: args.screenshot });
+  await dialog.getByText('GitHub work', { exact: true }).waitFor();
+  assert.equal(
+    await dialog.getByText('No tracked work', { exact: true }).count(),
+    2,
+  );
   await page.keyboard.press('Escape');
 
   await page.getByLabel('Search all Tools').fill('bmp-to-png');
@@ -211,6 +215,34 @@ try {
       { exact: true },
     )
     .waitFor();
+  const githubWorkHeading = familyDialog.getByText('GitHub work', {
+    exact: true,
+  });
+  await githubWorkHeading.waitFor();
+  await familyDialog
+    .getByRole('heading', { name: 'Family · renderer:transcription' })
+    .waitFor();
+  assert.equal(
+    await familyDialog.getByText('Open pull request', { exact: true }).count(),
+    2,
+  );
+  assert.equal(
+    await familyDialog.getByText('Closed issue', { exact: true }).count(),
+    2,
+  );
+  await familyDialog
+    .getByRole('link', {
+      name: 'Fix Audio-to-Text for real YouTube links on Cloudflare',
+    })
+    .waitFor();
+  await familyDialog
+    .getByRole('link', {
+      name: 'Draft foundation — do not merge to main: Tool workflow architecture',
+    })
+    .waitFor();
+  if (args.screenshot) {
+    await githubWorkHeading.locator('..').screenshot({ path: args.screenshot });
+  }
   await page.keyboard.press('Escape');
 
   await page.getByRole('button', { name: 'Reset' }).click();
@@ -361,10 +393,10 @@ try {
     status,
     startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
-    linkedWork: ['#50', '#105', '#106', '#107'],
+    linkedWork: ['#50', '#104', '#105', '#106', '#107'],
     summary: {
       status,
-      checksPassed: status === 'success' ? 14 : 0,
+      checksPassed: status === 'success' ? 17 : 0,
       checksFailed: status === 'success' ? 0 : 1,
       items: 1,
       durationMs: completedAt.valueOf() - startedAt.valueOf(),
