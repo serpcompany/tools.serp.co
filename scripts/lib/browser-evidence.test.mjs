@@ -1,13 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+
 import {
   attachConsoleWarningEvidence,
+  attachJourneyResultEvidence,
   buildBrowserScope,
   classifyConsoleWarning,
   summarizeNavigationTimings,
 } from './browser-evidence.mjs';
 
-test('smoke scope retains semantic invariants associated with each Tool id', () => {
+test('smoke scope derives exact journey requirements from the Tool Journey module', () => {
   const evidence = buildBrowserScope({
     mode: 'smoke',
     environment: 'preview',
@@ -16,81 +18,173 @@ test('smoke scope retains semantic invariants associated with each Tool id', () 
   });
 
   assert.equal(evidence.label, 'browser-smoke-preview-subset');
-  assert.deepEqual(evidence.tools, [
-    {
-      toolId: 'png-to-webp',
-      journeyIds: ['png-to-webp:upload'],
-      invariants: ['generic-file-exact-output'],
-    },
-    {
-      toolId: 'video-downloader',
-      journeyIds: ['video-downloader:direct-url'],
-      invariants: ['url-stream-exact-output'],
-    },
-    {
-      toolId: 'csv-to-json',
-      journeyIds: ['csv-to-json:upload'],
-      invariants: ['table-row-header-value-semantics'],
-    },
-  ]);
-});
-
-test('BMP smoke scope names decoded raster and PDF content invariants', () => {
   assert.deepEqual(
-    buildBrowserScope({
-      mode: 'smoke',
-      environment: 'local',
-      toolIds: [
-        'bmp-to-jpeg',
-        'bmp-to-jpg',
-        'bmp-to-pdf',
-        'bmp-to-png',
-        'bmp-to-webp',
-      ],
-      filtered: true,
-    }).tools,
+    evidence.tools.map((tool) => ({
+      toolId: tool.toolId,
+      journeys: tool.journeys.map((journey) => ({
+        journeyId: journey.journeyId,
+        fixtureKind: journey.fixtureKind,
+        fixtureReference: journey.fixtureReference,
+        invariantId: journey.invariantId,
+        revisionKeys: Object.keys(journey.inputRevisions),
+      })),
+    })),
     [
       {
-        toolId: 'bmp-to-jpeg',
-        journeyIds: ['bmp-to-jpeg:upload'],
-        invariants: ['bmp-decoded-content-semantics'],
+        toolId: 'png-to-webp',
+        journeys: [
+          {
+            journeyId: 'png-to-webp:upload',
+            fixtureKind: 'format-fixture',
+            fixtureReference: 'formats/png',
+            invariantId: 'generic-file-exact-output',
+            revisionKeys: [
+              'fixture-contract',
+              'journey-contract',
+              'semantic-invariant',
+              'verification-policy',
+            ],
+          },
+        ],
       },
       {
-        toolId: 'bmp-to-jpg',
-        journeyIds: ['bmp-to-jpg:upload'],
-        invariants: ['bmp-decoded-content-semantics'],
+        toolId: 'video-downloader',
+        journeys: [
+          {
+            journeyId: 'video-downloader:direct-url',
+            fixtureKind: 'direct-url-fixture',
+            fixtureReference: 'tools/video-downloader',
+            invariantId: 'url-stream-exact-output',
+            revisionKeys: [
+              'fixture-contract',
+              'journey-contract',
+              'semantic-invariant',
+              'verification-policy',
+            ],
+          },
+        ],
       },
       {
-        toolId: 'bmp-to-pdf',
-        journeyIds: ['bmp-to-pdf:upload'],
-        invariants: ['bmp-pdf-page-image-semantics'],
-      },
-      {
-        toolId: 'bmp-to-png',
-        journeyIds: ['bmp-to-png:upload'],
-        invariants: ['bmp-decoded-content-semantics'],
-      },
-      {
-        toolId: 'bmp-to-webp',
-        journeyIds: ['bmp-to-webp:upload'],
-        invariants: ['bmp-decoded-content-semantics'],
+        toolId: 'csv-to-json',
+        journeys: [
+          {
+            journeyId: 'csv-to-json:upload',
+            fixtureKind: 'format-fixture',
+            fixtureReference: 'formats/csv',
+            invariantId: 'table-row-header-value-semantics',
+            revisionKeys: [
+              'fixture-contract',
+              'journey-contract',
+              'semantic-invariant',
+              'verification-policy',
+            ],
+          },
+        ],
       },
     ],
   );
 });
 
-test('benchmark scope identifies Tools without claiming semantic correctness', () => {
-  const evidence = buildBrowserScope({
-    mode: 'benchmark',
-    environment: 'preview',
-    toolIds: ['png-to-webp', 'video-downloader'],
+test('BMP scope keeps each exact decoded-content or PDF invariant', () => {
+  const tools = buildBrowserScope({
+    mode: 'smoke',
+    environment: 'local',
+    toolIds: [
+      'bmp-to-jpeg',
+      'bmp-to-jpg',
+      'bmp-to-pdf',
+      'bmp-to-png',
+      'bmp-to-webp',
+    ],
     filtered: true,
-  });
+  }).tools;
 
-  assert.deepEqual(evidence.tools, [
-    { toolId: 'png-to-webp', journeyIds: [], invariants: [] },
-    { toolId: 'video-downloader', journeyIds: [], invariants: [] },
+  assert.deepEqual(
+    tools.map((tool) => [
+      tool.toolId,
+      tool.journeys[0]?.journeyId,
+      tool.journeys[0]?.invariantId,
+    ]),
+    [
+      ['bmp-to-jpeg', 'bmp-to-jpeg:upload', 'bmp-decoded-content-semantics'],
+      ['bmp-to-jpg', 'bmp-to-jpg:upload', 'bmp-decoded-content-semantics'],
+      ['bmp-to-pdf', 'bmp-to-pdf:upload', 'bmp-pdf-page-image-semantics'],
+      ['bmp-to-png', 'bmp-to-png:upload', 'bmp-decoded-content-semantics'],
+      ['bmp-to-webp', 'bmp-to-webp:upload', 'bmp-decoded-content-semantics'],
+    ],
+  );
+});
+
+test('benchmark scope identifies Tools without claiming journey correctness', () => {
+  assert.deepEqual(
+    buildBrowserScope({
+      mode: 'benchmark',
+      environment: 'preview',
+      toolIds: ['png-to-webp', 'video-downloader'],
+      filtered: true,
+    }).tools,
+    [
+      { toolId: 'png-to-webp', journeys: [] },
+      { toolId: 'video-downloader', journeys: [] },
+    ],
+  );
+});
+
+test('browser result evidence records each journey outcome instead of promoting aggregate success', () => {
+  const tools = buildBrowserScope({
+    mode: 'smoke',
+    environment: 'local',
+    toolIds: ['audio-to-text'],
+    filtered: true,
+  }).tools;
+
+  const evidence = attachJourneyResultEvidence(tools, [
+    {
+      id: 'audio-to-text',
+      status: 'warn',
+      journeyResults: [
+        {
+          journeyId: 'audio-to-text:upload',
+          outcome: 'passed',
+          reasonCode: null,
+          fixtureSha256: 'a'.repeat(64),
+        },
+        {
+          journeyId: 'audio-to-text:extractor-url',
+          outcome: 'skipped',
+          reasonCode: 'preview-required',
+          fixtureSha256: 'b'.repeat(64),
+        },
+      ],
+    },
   ]);
+
+  assert.deepEqual(
+    evidence[0].journeys.map((journey) => ({
+      journeyId: journey.journeyId,
+      outcome: journey.outcome,
+      reasonCode: journey.reasonCode,
+      checks: journey.checks,
+    })),
+    [
+      {
+        journeyId: 'audio-to-text:upload',
+        outcome: 'passed',
+        reasonCode: null,
+        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+      },
+      {
+        journeyId: 'audio-to-text:extractor-url',
+        outcome: 'skipped',
+        reasonCode: 'preview-required',
+        checks: [],
+      },
+    ],
+  );
+  const extractor = evidence[0].journeys.find(
+    (journey) => journey.journeyId === 'audio-to-text:extractor-url',
+  );
+  assert.equal(extractor.fixture.kind, 'literal');
 });
 
 test('benchmark evidence retains sanitized navigation aggregates', () => {
@@ -104,7 +198,7 @@ test('benchmark evidence retains sanitized navigation aggregates', () => {
   assert.deepEqual(summarizeNavigationTimings([]), {});
 });
 
-test('console warning evidence is classified, deduplicated, and attached per Tool without raw text', () => {
+test('console warning evidence is classified, deduplicated, and attached without raw text', () => {
   assert.equal(
     classifyConsoleWarning(
       'AdSense head tag does not support data-nscript attribute for https://secret.example/path?token=nope',
@@ -118,7 +212,7 @@ test('console warning evidence is classified, deduplicated, and attached per Too
 
   assert.deepEqual(
     attachConsoleWarningEvidence(
-      [{ toolId: 'pdf-reader', invariants: ['specialized-output-semantics'] }],
+      [{ toolId: 'pdf-reader', journeys: [] }],
       [
         {
           id: 'pdf-reader',
@@ -133,7 +227,7 @@ test('console warning evidence is classified, deduplicated, and attached per Too
     [
       {
         toolId: 'pdf-reader',
-        invariants: ['specialized-output-semantics'],
+        journeys: [],
         warnings: ['adsense-script-attribute', 'other-console-warning'],
       },
     ],

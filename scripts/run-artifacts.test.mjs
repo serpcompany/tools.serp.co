@@ -35,7 +35,7 @@ function writeRun(root, runId, overrides = {}) {
   const runRoot = path.join(root, '.artifacts', 'runs', runId);
   mkdirSync(runRoot, { recursive: true });
   const manifest = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     runId,
     command: { name: 'smoke:tools', version: '1' },
     revision: { commit: 'abcdef1', dirty: false },
@@ -323,14 +323,32 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
       tools: [
         {
           toolId: 'png-to-webp',
-          journeyIds: ['png-to-webp:upload'],
-          invariants: ['generic-file-exact-output'],
+          journeys: [
+            {
+              journeyId: 'png-to-webp:upload',
+              outcome: 'passed',
+              reasonCode: null,
+              fixture: {
+                kind: 'content',
+                reference: 'formats/png',
+                sha256: 'b'.repeat(64),
+              },
+              invariantId: 'generic-file-exact-output',
+              checks: [
+                'valid-fixture',
+                'semantic-output',
+                'required-environment',
+              ],
+              inputRevisions: {
+                'journey-contract': `sha256:${'c'.repeat(64)}`,
+              },
+            },
+          ],
           warnings: ['adsense-script-attribute'],
         },
         {
           toolId: 'video-downloader',
-          journeyIds: ['video-downloader:direct-url'],
-          invariants: ['url-stream-exact-output'],
+          journeys: [],
         },
       ],
     }),
@@ -346,7 +364,7 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
     ),
   );
   assert.deepEqual(manifest, {
-    schemaVersion: 1,
+    schemaVersion: 2,
     runId,
     command: { name: 'smoke:tools', version: '1' },
     revision: { commit: fullRevision, dirty: false },
@@ -361,14 +379,32 @@ test('artifact creation writes the accepted run identity and manifest', (t) => {
       tools: [
         {
           toolId: 'png-to-webp',
-          journeyIds: ['png-to-webp:upload'],
-          invariants: ['generic-file-exact-output'],
+          journeys: [
+            {
+              journeyId: 'png-to-webp:upload',
+              outcome: 'passed',
+              reasonCode: null,
+              fixture: {
+                kind: 'content',
+                reference: 'formats/png',
+                sha256: 'b'.repeat(64),
+              },
+              invariantId: 'generic-file-exact-output',
+              checks: [
+                'valid-fixture',
+                'semantic-output',
+                'required-environment',
+              ],
+              inputRevisions: {
+                'journey-contract': `sha256:${'c'.repeat(64)}`,
+              },
+            },
+          ],
           warnings: ['adsense-script-attribute'],
         },
         {
           toolId: 'video-downloader',
-          journeyIds: ['video-downloader:direct-url'],
-          invariants: ['url-stream-exact-output'],
+          journeys: [],
         },
       ],
     },

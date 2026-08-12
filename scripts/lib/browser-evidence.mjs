@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { toolJourneys } from '../../apps/tools/lib/tool-journeys.ts';
+import { getToolVerificationInputRevisions } from '../../apps/tools/lib/tool-verification-evidence.ts';
 
 export function buildBrowserScope({ mode, environment, toolIds, filtered }) {
   const selection = filtered ? 'subset' : 'all';
@@ -17,19 +18,66 @@ export function buildBrowserScope({ mode, environment, toolIds, filtered }) {
             mode === 'smoke' ? toolJourneys.getBrowserTargets(toolId) : [];
           return Object.freeze({
             toolId,
-            journeyIds: Object.freeze(journeys.map((journey) => journey.id)),
-            invariants: Object.freeze([
-              ...new Set(
-                journeys
-                  .map((journey) => journey.semanticInvariant.id)
-                  .filter(Boolean),
+            journeys: Object.freeze(
+              journeys.map((journey) =>
+                Object.freeze({
+                  journeyId: journey.id,
+                  fixtureKind: journey.fixture.kind,
+                  fixtureReference: journey.fixture.reference,
+                  invariantId: journey.semanticInvariant.id,
+                  inputRevisions: getToolVerificationInputRevisions(journey),
+                }),
               ),
-            ]),
+            ),
           });
         })(),
       ),
     ),
   };
+}
+
+export function attachJourneyResultEvidence(tools, results) {
+  const resultByToolId = new Map(results.map((result) => [result.id, result]));
+  return tools.map((tool) => {
+    const result = resultByToolId.get(tool.toolId);
+    const journeyResultById = new Map(
+      (result?.journeyResults ?? []).map((item) => [item.journeyId, item]),
+    );
+    return {
+      ...tool,
+      journeys: tool.journeys.map((journey) => {
+        const journeyResult = journeyResultById.get(journey.journeyId) ?? {
+          journeyId: journey.journeyId,
+          outcome: 'skipped',
+          reasonCode: 'journey-result-missing',
+          fixtureSha256: null,
+        };
+        return {
+          journeyId: journey.journeyId,
+          outcome: journeyResult.outcome,
+          reasonCode: journeyResult.reasonCode,
+          fixture:
+            journey.fixtureReference && journeyResult.fixtureSha256
+              ? {
+                  kind:
+                    journey.fixtureKind === 'literal' ||
+                    journey.fixtureKind === 'maintainer-url'
+                      ? 'literal'
+                      : 'content',
+                  reference: journey.fixtureReference,
+                  sha256: journeyResult.fixtureSha256,
+                }
+              : null,
+          invariantId: journey.invariantId,
+          checks:
+            journeyResult.outcome === 'passed'
+              ? ['valid-fixture', 'semantic-output', 'required-environment']
+              : [],
+          inputRevisions: journey.inputRevisions,
+        };
+      }),
+    };
+  });
 }
 
 export function summarizeNavigationTimings(values) {

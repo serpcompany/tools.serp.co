@@ -113,6 +113,7 @@ const [
   { getToolProcessorAvailability },
   { getGenericToolContract },
   { getTableOperationPolicy },
+  { retainedToolVerificationEvidence },
 ] = await Promise.all([
   import('../packages/app-core/src/lib/tool-catalog-adapter.mjs'),
   import('../apps/tools/lib/tool-execution-provenance.ts'),
@@ -120,6 +121,7 @@ const [
   import('../apps/tools/lib/tool-processor-registry.ts'),
   import('../apps/tools/lib/generic-tool-workflow.ts'),
   import('../apps/tools/lib/table-operation-policy.ts'),
+  import('../apps/tools/lib/tool-verification-evidence.ts'),
 ]);
 
 const fixtureRoot = path.join(repositoryRoot, 'apps/tools/benchmarks');
@@ -236,14 +238,19 @@ const allActiveGap = {
   gap: activeToolIds.length,
   gapToolIds: activeToolIds,
 };
+const retainedEvidenceCoverage = coverage(tools, (tool) =>
+  retainedToolVerificationEvidence
+    .getForTool(tool.id)
+    .some((evidence) => evidence.latest !== null),
+);
 
 const payload = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   generatedAt: new Date().toISOString(),
   auditedSourceRevision: sourceRevision,
   command: Object.freeze({
     name: 'audit:tool-coverage',
-    version: '4',
+    version: '5',
     arguments: Object.freeze(['--source-revision', sourceRevision]),
   }),
   environment: Object.freeze({
@@ -319,7 +326,7 @@ const payload = {
       tools,
       (tool) => tool.deterministicTestLiteralFiles.length > 0,
     ),
-    portableRetainedPerToolVerificationEvidence: allActiveGap,
+    portableRetainedPerToolVerificationEvidence: retainedEvidenceCoverage,
     authorizedRuntimeObservationCoverage: {
       ...allActiveGap,
       classification: 'unknown',
@@ -339,9 +346,16 @@ const payload = {
     deterministicTestLiteralReference:
       'At least one committed test source contains the exact Tool id as a quoted literal. This is an inventory aid, not proof of functional behavior or a retained result.',
     portableRetainedPerToolVerificationEvidence:
-      'A fresh clone contains no per-Tool result joined to an invariant, revision, environment, scope, and time.',
+      'A fresh clone contains at least one source-derived exact Tool Journey result. Coverage does not mean the journey is verified; warning, skip, failure, stale, invalid, and incomplete states remain distinct.',
     authorizedRuntimeObservationCoverage:
       'Unknown for every Tool because no runtime environment query was authorized. Gap means evidence unavailable for console ingestion, not success or failure.',
+  },
+  verificationEvidence: {
+    grain: 'Tool Journey',
+    journeyCount: 3_115,
+    states: retainedToolVerificationEvidence.summary,
+    warning:
+      'Only the verified state is a current Verified Journey. Processor Support and runtime observations remain separate.',
   },
 };
 

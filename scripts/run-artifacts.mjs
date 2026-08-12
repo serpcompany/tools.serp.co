@@ -12,6 +12,7 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { requiredVerificationChecks } from '../apps/tools/lib/tool-verification-evidence.ts';
 
 function parseArguments(arguments_) {
   const [operation, ...tokens] = arguments_;
@@ -97,41 +98,116 @@ function parseToolEvidence(values) {
       typeof tool !== 'object' ||
       Array.isArray(tool) ||
       Object.keys(tool).some(
-        (key) =>
-          key !== 'toolId' &&
-          key !== 'journeyIds' &&
-          key !== 'invariants' &&
-          key !== 'warnings',
+        (key) => key !== 'toolId' && key !== 'journeys' && key !== 'warnings',
       ) ||
-      (tool.journeyIds !== undefined && !Array.isArray(tool.journeyIds)) ||
-      !Array.isArray(tool.invariants) ||
+      !Array.isArray(tool.journeys) ||
       (tool.warnings !== undefined && !Array.isArray(tool.warnings))
     ) {
       throw new Error(
-        '--tool-evidence must contain only toolId, optional journeyIds, invariants, and optional warnings arrays',
+        '--tool-evidence must contain only toolId, journeys, and optional warnings arrays',
       );
     }
     assertSafeSlug(tool.toolId, 'tool-evidence toolId');
-    const journeyIds = tool.journeyIds ?? [];
-    for (const journeyId of journeyIds) {
+    const journeys = tool.journeys.map((journey) => {
       if (
-        typeof journeyId !== 'string' ||
-        !journeyId.startsWith(`${tool.toolId}:`) ||
-        !/^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$/.test(journeyId)
+        journey === null ||
+        typeof journey !== 'object' ||
+        Array.isArray(journey) ||
+        Object.keys(journey).some(
+          (key) =>
+            !new Set([
+              'journeyId',
+              'outcome',
+              'reasonCode',
+              'fixture',
+              'invariantId',
+              'checks',
+              'inputRevisions',
+            ]).has(key),
+        ) ||
+        typeof journey.journeyId !== 'string' ||
+        !journey.journeyId.startsWith(`${tool.toolId}:`) ||
+        !/^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$/.test(journey.journeyId) ||
+        !new Set(['passed', 'failed', 'warned', 'skipped']).has(
+          journey.outcome,
+        ) ||
+        !Array.isArray(journey.checks) ||
+        journey.inputRevisions === null ||
+        typeof journey.inputRevisions !== 'object' ||
+        Array.isArray(journey.inputRevisions)
       ) {
         throw new Error(
-          '--tool-evidence journeyIds must be safe and belong to the Tool id',
+          '--tool-evidence journeys must use the exact journey result contract',
         );
       }
-    }
-    if (new Set(journeyIds).size !== journeyIds.length) {
-      throw new Error('--tool-evidence journeyIds must be unique');
-    }
-    for (const invariant of tool.invariants) {
-      assertSafeSlug(invariant, 'tool-evidence invariant');
-    }
-    if (new Set(tool.invariants).size !== tool.invariants.length) {
-      throw new Error('--tool-evidence invariants must be unique');
+      if (
+        (journey.outcome === 'passed' && journey.reasonCode !== null) ||
+        (journey.outcome !== 'passed' &&
+          (typeof journey.reasonCode !== 'string' ||
+            !/^[a-z0-9][a-z0-9-]*$/.test(journey.reasonCode)))
+      ) {
+        throw new Error(
+          '--tool-evidence non-pass journeys require a safe reason and passed journeys require null',
+        );
+      }
+      if (
+        journey.invariantId !== null &&
+        (typeof journey.invariantId !== 'string' ||
+          !/^[a-z0-9][a-z0-9-]*$/.test(journey.invariantId))
+      ) {
+        throw new Error(
+          '--tool-evidence invariant must be a safe slug or null',
+        );
+      }
+      for (const check of journey.checks) {
+        if (!requiredVerificationChecks.includes(check)) {
+          throw new Error('--tool-evidence check is not recognized');
+        }
+      }
+      if (new Set(journey.checks).size !== journey.checks.length) {
+        throw new Error('--tool-evidence journey checks must be unique');
+      }
+      for (const [inputId, revision] of Object.entries(
+        journey.inputRevisions,
+      )) {
+        assertSafeSlug(inputId, 'tool-evidence input revision id');
+        if (!/^sha256:[a-f0-9]{64}$/.test(revision)) {
+          throw new Error(
+            '--tool-evidence input revisions must be SHA-256 values',
+          );
+        }
+      }
+      if (journey.fixture !== null) {
+        if (
+          journey.fixture === undefined ||
+          typeof journey.fixture !== 'object' ||
+          Array.isArray(journey.fixture) ||
+          Object.keys(journey.fixture).sort().join(',') !==
+            'kind,reference,sha256' ||
+          !new Set(['content', 'literal']).has(journey.fixture.kind) ||
+          typeof journey.fixture.reference !== 'string' ||
+          !journey.fixture.reference ||
+          typeof journey.fixture.sha256 !== 'string' ||
+          !/^[a-f0-9]{64}$/.test(journey.fixture.sha256)
+        ) {
+          throw new Error('--tool-evidence fixture identity is invalid');
+        }
+      }
+      return {
+        journeyId: journey.journeyId,
+        outcome: journey.outcome,
+        reasonCode: journey.reasonCode,
+        fixture: journey.fixture,
+        invariantId: journey.invariantId,
+        checks: journey.checks,
+        inputRevisions: journey.inputRevisions,
+      };
+    });
+    if (
+      new Set(journeys.map((journey) => journey.journeyId)).size !==
+      journeys.length
+    ) {
+      throw new Error('--tool-evidence journey ids must be unique');
     }
     const warnings = tool.warnings ?? [];
     for (const warning of warnings) {
@@ -142,8 +218,7 @@ function parseToolEvidence(values) {
     }
     return {
       toolId: tool.toolId,
-      ...(tool.journeyIds !== undefined ? { journeyIds } : {}),
-      invariants: tool.invariants,
+      journeys,
       ...(tool.warnings !== undefined ? { warnings } : {}),
     };
   });
@@ -418,7 +493,7 @@ function create(options) {
       RETENTION_DAYS[retentionClass] * 24 * 60 * 60 * 1000,
   );
   const manifest = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     runId,
     command: { name: commandName, version: commandVersion },
     revision: { commit: revision, dirty: options.dirty === true },
