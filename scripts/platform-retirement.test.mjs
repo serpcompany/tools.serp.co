@@ -72,6 +72,12 @@ test('repository CI performs the production-faithful check without deployment cr
   const workflowPath = '.github/workflows/check.yml';
   assert.equal(existsSync(workflowPath), true);
   const workflow = readFileSync(workflowPath, 'utf8');
+  assert.match(workflow, /pnpm exec playwright install --with-deps chromium/);
+  assert.ok(
+    workflow.indexOf('pnpm exec playwright install --with-deps chromium') <
+      workflow.indexOf('pnpm check'),
+    'CI must install the pinned browser before the production-faithful check',
+  );
   assert.match(workflow, /pnpm check/);
   assert.doesNotMatch(workflow, /vercel/i);
   assert.doesNotMatch(workflow, /secrets\./);
