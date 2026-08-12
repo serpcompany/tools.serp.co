@@ -5,10 +5,10 @@ import {
   TABLE_PROCESSOR_ADAPTER_ID,
 } from './table-operation-policy.ts';
 import { getToolExecutionProvenance } from './tool-execution-provenance.ts';
-import { getGenericToolContract } from './generic-tool-workflow.ts';
+import { getGenericToolContract } from './generic-tool-contract.ts';
 import { getMediaWorkflowAdapterRegistration } from './media-workflow/adapter-registration.ts';
 import { SPECIALIZED_TOOL_IDS } from './specialized-tool-policy.ts';
-import { getBatchToolContract } from './batch-tool-workflow.ts';
+import { getBatchToolContract } from './batch-tool-contract.ts';
 
 export type WiredToolProcessorAvailability = Readonly<{
   kind: 'wired';
