@@ -6,8 +6,10 @@ import test from "node:test";
 import { createBrowserRunOwnership } from "./browser-run-ownership.ts";
 import { createMonotonicProgress } from "./monotonic-progress.ts";
 import { deliverMediaInBrowser } from "./browser.ts";
+import { setMediaFilenameHeaders } from "../media-filename-transport.ts";
 import {
   BROWSER_MEDIA_MEMORY_BUDGET,
+  createProductionMediaEndpoint,
   createStreamedMediaAcquisition,
   type MediaEndpointResponse,
 } from "./media-endpoint.ts";
@@ -225,6 +227,45 @@ test("a tiny indeterminate stream keeps its owned allocation small and reuses it
   );
   assert.equal(media.bytes.buffer, allocations[0]?.buffer);
   assert.deepEqual(Array.from(media.bytes), [1, 2, 3]);
+});
+
+test("endpoint acquisition preserves a long astral Unicode filename without lone surrogates", async () => {
+  const fileName = `a${"🎵".repeat(100)}.mp3`;
+  const headers = new Headers({
+    "content-type": "audio/mpeg",
+    "x-media-extension": "mp3",
+  });
+  setMediaFilenameHeaders(headers, fileName);
+  const endpoint = createProductionMediaEndpoint({
+    fetch: async () =>
+      new Response(new Uint8Array([1, 2, 3]), {
+        headers,
+      }),
+  });
+  const acquisition = createStreamedMediaAcquisition({ endpoint });
+
+  const media = await acquisition.acquire(
+    {
+      consumer: "downloader",
+      mode: "audio",
+      url: "https://media.example/long-name",
+    },
+    {
+      signal: new AbortController().signal,
+      budgets: { maxInputBytes: 1_024 },
+      async registerCleanup() {},
+      reportProgress() {},
+    },
+  );
+
+  assert.equal(media.name, fileName);
+  assert.equal(
+    Array.from(media.name).some((character) => {
+      const codePoint = character.codePointAt(0) ?? 0;
+      return codePoint >= 0xd800 && codePoint <= 0xdfff;
+    }),
+    false,
+  );
 });
 
 test("cancelling a cap-sized indeterminate acquisition releases its reader and sole owned buffer", async () => {
