@@ -82,6 +82,7 @@ const args = parseArgs(process.argv.slice(2));
 const screenshotPaths = {
   planner: args.screenshot,
   githubWork: deriveScreenshotPath(args.screenshot, 'github-work'),
+  runtimeActivity: deriveScreenshotPath(args.screenshot, 'runtime-activity'),
 };
 const source = repositoryState();
 if (
@@ -275,6 +276,24 @@ try {
   );
   await dialog.getByText('Work tracking not loaded', { exact: true }).waitFor();
   await dialog.getByText(/point-in-time snapshot/).waitFor();
+  const activityHeading = dialog.getByText('Recent staging activity', {
+    exact: true,
+  });
+  await activityHeading.waitFor();
+  if (args.environment === 'LOCAL') {
+    await dialog.getByText('No recent staging data', { exact: true }).waitFor();
+    await dialog
+      .getByText(
+        'Runtime observations are queried only from the private DEV/STAGING D1 binding.',
+        { exact: true },
+      )
+      .waitFor();
+  }
+  if (screenshotPaths.runtimeActivity) {
+    await activityHeading
+      .locator('..')
+      .screenshot({ path: screenshotPaths.runtimeActivity });
+  }
   await page.keyboard.press('Escape');
 
   await page.getByLabel('Search all Tools').fill('bmp-to-png');
@@ -340,8 +359,13 @@ try {
       .locator('..')
       .screenshot({ path: screenshotPaths.githubWork });
     assert.notEqual(screenshotPaths.planner, screenshotPaths.githubWork);
+    assert.notEqual(
+      screenshotPaths.runtimeActivity,
+      screenshotPaths.githubWork,
+    );
     assert.ok(statSync(screenshotPaths.planner).size > 0);
     assert.ok(statSync(screenshotPaths.githubWork).size > 0);
+    assert.ok(statSync(screenshotPaths.runtimeActivity).size > 0);
   }
   await page.keyboard.press('Escape');
 
@@ -493,10 +517,10 @@ try {
     status,
     startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
-    linkedWork: ['#50', '#102', '#104', '#105', '#106', '#107'],
+    linkedWork: ['#50', '#102', '#103', '#104', '#105', '#106', '#107'],
     summary: {
       status,
-      checksPassed: status === 'success' ? 21 : 0,
+      checksPassed: status === 'success' ? 24 : 0,
       checksFailed: status === 'success' ? 0 : 1,
       items: 1,
       durationMs: completedAt.valueOf() - startedAt.valueOf(),

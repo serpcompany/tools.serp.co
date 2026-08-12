@@ -115,10 +115,21 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   );
   assert.match(
     source,
+    /deriveScreenshotPath\(args\.screenshot, ['"]runtime-activity['"]\)/,
+  );
+  assert.match(
+    source,
     /assert\.notEqual\(screenshotPaths\.planner, screenshotPaths\.githubWork\)/,
   );
   assert.match(source, /statSync\(screenshotPaths\.planner\)\.size > 0/);
   assert.match(source, /statSync\(screenshotPaths\.githubWork\)\.size > 0/);
+  assert.match(
+    source,
+    /statSync\(screenshotPaths\.runtimeActivity\)\.size > 0/,
+  );
+  assert.match(source, /Recent staging activity/);
+  assert.match(source, /No recent staging data/);
+  assert.match(source, /private DEV\/STAGING D1 binding/);
   assert.match(source, /getByText\(['"]GitHub work['"]/);
   assert.match(source, /getByText\(['"]No tracked work['"]/);
   assert.match(source, /Work tracking not loaded/);
@@ -131,7 +142,7 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /command:\s*['"]check:tool-factory['"]/);
   assert.match(
     source,
-    /linkedWork:\s*\[['"]#50['"], ['"]#102['"], ['"]#104['"], ['"]#105['"], ['"]#106['"], ['"]#107['"]\]/,
+    /linkedWork:\s*\[['"]#50['"], ['"]#102['"], ['"]#103['"], ['"]#104['"], ['"]#105['"], ['"]#106['"], ['"]#107['"]\]/,
   );
   assert.doesNotMatch(source, /console\.log\(.*accessCookie/);
 });

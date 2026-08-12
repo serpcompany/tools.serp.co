@@ -9,6 +9,8 @@ import {
 } from '../../../lib/tool-factory-access.ts';
 import { buildToolExpansionPlan } from '../../../lib/tool-expansion-planner.ts';
 import { buildToolFactoryReadModel } from '../../../lib/tool-factory-read-model.ts';
+import { getSerpToolsD1Binding } from '../../../lib/cloudflare-d1.ts';
+import { loadToolRuntimeObservations } from '../../../lib/tool-runtime-observations.ts';
 import { ToolFactoryTable } from './tool-factory-table.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -37,11 +39,23 @@ export default async function ToolFactoryPage() {
 
   const model = buildToolFactoryReadModel();
   const expansionPlan = buildToolExpansionPlan(model.rows);
+  const runtimeObservations = await loadToolRuntimeObservations(
+    deployment.environment === 'DEV/STAGING'
+      ? await getSerpToolsD1Binding()
+      : null,
+    {
+      environment: deployment.environment,
+      sourceOrigin: environment.NEXT_PUBLIC_SITE_URL ?? '',
+      toolIds: model.rows.map((row) => row.toolId),
+      now: new Date(),
+    },
+  );
   return (
     <ToolFactoryTable
       deployment={deployment}
       model={{ rows: model.rows, counts: model.counts }}
       expansionPlan={expansionPlan}
+      runtimeObservations={runtimeObservations}
     />
   );
 }

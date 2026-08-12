@@ -39,6 +39,8 @@ import type {
 } from '../../../lib/tool-expansion-planner.ts';
 import type { ToolGithubWorkScopeView } from '../../../lib/tool-github-work-links.ts';
 import type { ToolFactoryDeployment } from '../../../lib/tool-factory-access.ts';
+import type { ToolRuntimeObservationPortfolio } from '../../../lib/tool-runtime-observations.ts';
+import { presentToolRuntimeObservations } from '../../../lib/tool-runtime-observation-presentation.ts';
 import {
   DEFAULT_TOOL_FACTORY_VIEW,
   clampToolFactoryPageIndex,
@@ -83,6 +85,24 @@ function exactTestLabel(row: ToolFactoryRow) {
   const evidence = row.verificationEvidence.exact;
   if (!evidence) return 'Not tested here';
   return `${evidence.result === 'passed' ? 'Passed' : 'Failed'} · ${formatVerifiedDate(evidence.verifiedAt)}`;
+}
+
+function runtimeObservationLabel(
+  portfolio: ToolRuntimeObservationPortfolio,
+  toolId: string,
+) {
+  if (portfolio.state === 'unavailable') return 'Not available';
+  const tool = portfolio.tools.find((candidate) => candidate.toolId === toolId);
+  if (!tool) return 'No recent staging data';
+  const latest = tool.paths
+    .filter((path) => path.state === 'observed')
+    .sort((left, right) =>
+      right.state === 'observed' && left.state === 'observed'
+        ? right.lastObservedAt.localeCompare(left.lastObservedAt)
+        : 0,
+    )[0];
+  if (!latest || latest.state !== 'observed') return 'No recent staging data';
+  return `${latest.lastResult === 'succeeded' ? 'Succeeded' : 'Failed'} · ${latest.label} · ${latest.freshness}`;
 }
 
 function SupportBadge({
@@ -212,7 +232,7 @@ const columns: ColumnDef<ToolFactoryRow>[] = [
     id: 'observation',
     accessorFn: (row) => row.runtimeObservation.classification,
     header: ({ column }) => (
-      <SortButton column={column} label="Runtime observation" />
+      <SortButton column={column} label="Recent staging" />
     ),
     size: 190,
   },
@@ -766,11 +786,100 @@ function GithubWork({ row }: { row: ToolFactoryRow }) {
     </section>
   );
 }
+
+function RecentStagingActivity({
+  portfolio,
+  toolId,
+}: {
+  portfolio: ToolRuntimeObservationPortfolio;
+  toolId: string;
+}) {
+  const presentation = presentToolRuntimeObservations(portfolio, toolId);
+  return (
+    <section className="rounded-lg border p-4">
+      <h3 className="text-sm font-semibold text-slate-950">
+        {presentation.heading}
+      </h3>
+      {presentation.state === 'unavailable' ? (
+        <div className="mt-3 rounded-md bg-amber-50 p-3">
+          <div className="font-semibold text-amber-950">
+            {presentation.title}
+          </div>
+          <p className="mt-1 text-sm text-amber-900">
+            {presentation.explanation}
+          </p>
+        </div>
+      ) : presentation.state === 'empty' ? (
+        <div className="mt-3 rounded-md bg-slate-50 p-3">
+          <div className="font-semibold text-slate-900">
+            {presentation.title}
+          </div>
+          <p className="mt-1 text-sm text-slate-700">
+            {presentation.explanation}
+          </p>
+        </div>
+      ) : (
+        <>
+          <p className="mt-1 text-sm text-slate-600">
+            {presentation.sampleSummary}
+          </p>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {presentation.paths.map((path) => (
+              <article key={path.label} className="rounded-lg bg-slate-50 p-3">
+                <h4 className="text-sm font-semibold text-slate-900">
+                  {path.label}
+                </h4>
+                {path.state === 'observed' ? (
+                  <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <dt className="text-slate-500">Environment</dt>
+                      <dd className="font-medium">{path.environment}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Attempts</dt>
+                      <dd className="font-medium">
+                        {path.attempts.toLocaleString()}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Latest result</dt>
+                      <dd className="font-medium">{path.latestResult}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Freshness</dt>
+                      <dd className="font-medium">{path.freshness}</dd>
+                    </div>
+                    <div className="col-span-2">
+                      <dt className="text-slate-500">Last seen</dt>
+                      <dd className="font-medium">
+                        {new Date(path.lastSeenAt).toLocaleString('en-US', {
+                          timeZone: 'UTC',
+                          timeZoneName: 'short',
+                        })}
+                      </dd>
+                    </div>
+                  </dl>
+                ) : (
+                  <p className="mt-2 text-sm text-slate-600">
+                    {path.explanation}
+                  </p>
+                )}
+              </article>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-slate-500">{presentation.notice}</p>
+        </>
+      )}
+    </section>
+  );
+}
 function ToolDetail({
   row,
+  runtimeObservations,
   onClose,
 }: {
   row: ToolFactoryRow | null;
+  runtimeObservations: ToolRuntimeObservationPortfolio;
   onClose: () => void;
 }) {
   return (
@@ -794,12 +903,12 @@ function ToolDetail({
               label="Runtime requirement"
               value={`${row.runtimeRequirement.classification} — ${row.runtimeRequirement.reason}`}
             />
-            <Fact
-              label="Runtime observation"
-              value={`${row.runtimeObservation.classification} — ${row.runtimeObservation.reason}`}
-            />
             <Fact label="Route" value={row.route} />
           </dl>
+          <RecentStagingActivity
+            portfolio={runtimeObservations}
+            toolId={row.toolId}
+          />
           <ExactToolEvidence row={row} />
           <FamilyTestEvidence row={row} />
           <FamilyVerificationPolicy row={row} />
@@ -841,10 +950,12 @@ export function ToolFactoryTable({
   deployment,
   model,
   expansionPlan,
+  runtimeObservations,
 }: {
   deployment: ToolFactoryDeployment;
   model: ToolFactoryTableModel;
   expansionPlan: ToolExpansionPlan;
+  runtimeObservations: ToolRuntimeObservationPortfolio;
 }) {
   const [view, setView] = useState<ToolFactoryViewState>(
     DEFAULT_TOOL_FACTORY_VIEW,
@@ -933,6 +1044,19 @@ export function ToolFactoryTable({
     pageIndex: view.pageIndex,
     pageSize: view.pageSize,
   };
+  const tableColumns = useMemo(
+    () =>
+      columns.map((column) =>
+        column.id === 'observation'
+          ? {
+              ...column,
+              accessorFn: (row: ToolFactoryRow) =>
+                runtimeObservationLabel(runtimeObservations, row.toolId),
+            }
+          : column,
+      ),
+    [runtimeObservations],
+  );
 
   function resolveUpdate<T>(updater: Updater<T>, previous: T) {
     return typeof updater === 'function'
@@ -942,7 +1066,7 @@ export function ToolFactoryTable({
 
   const table = useReactTable({
     data: rows,
-    columns,
+    columns: tableColumns,
     state: {
       sorting,
       columnFilters,
@@ -1281,7 +1405,11 @@ export function ToolFactoryTable({
           </div>
         </section>
       </div>
-      <ToolDetail row={selected} onClose={() => setSelected(null)} />
+      <ToolDetail
+        row={selected}
+        runtimeObservations={runtimeObservations}
+        onClose={() => setSelected(null)}
+      />
     </main>
   );
 }

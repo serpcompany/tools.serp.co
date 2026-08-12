@@ -181,9 +181,16 @@ wayfinder-preview`, entering each value through stdin. The deploy wrapper
   revision. Treat that pair as the boundary for any screenshot or browser
   evidence.
 - Data source: the current table joins Catalog, processor, provenance,
-  controlled-verification, and revision-local coverage facts. Runtime
-  observations remain a separate evidence dimension and are not inferred from
-  support registration.
+  controlled-verification, and revision-local coverage facts. In the exact
+  `wayfinder-preview` environment only, Tool details also issue one read-only
+  D1 query over completed `tool_runs`: a 24-hour window capped at the latest
+  500 portfolio rows. Local and production origins do not query D1. The view
+  keeps upload, direct-media-link, YouTube/extractor, other, and older
+  unclassified-link attempts separate; it discards raw metadata and displays
+  only Tool id, path, result, time, and a bounded error classifier. Missing or
+  truncated samples never mean zero usage. Runtime observations remain a
+  separate evidence dimension and never rewrite Catalog intent, processor
+  support, or verification evidence.
 
 Hosted table verification uses an authenticated Access session cookie supplied
 only through the environment:
