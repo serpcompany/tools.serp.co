@@ -21,7 +21,11 @@ import {
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url));
 
 function git(cwd, ...args) {
-  return execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  return execFileSync('git', args, {
+    cwd,
+    encoding: 'utf8',
+    env: scrubGitEnvironment(process.env),
+  }).trim();
 }
 
 test('Git environment scrubbing removes every inherited repository override', () => {
@@ -54,14 +58,18 @@ test('preview currentness uses a disposable branch, real generated mutation, act
   const source = path.join(scratch, 'source');
   let disposableClone = '';
   try {
-    execFileSync('git', [
-      'clone',
-      '--quiet',
-      '--no-local',
-      '--no-checkout',
-      repositoryRoot,
-      source,
-    ]);
+    execFileSync(
+      'git',
+      [
+        'clone',
+        '--quiet',
+        '--no-local',
+        '--no-checkout',
+        repositoryRoot,
+        source,
+      ],
+      { env: scrubGitEnvironment(process.env) },
+    );
     const revision = git(repositoryRoot, 'rev-parse', 'HEAD');
     git(source, 'switch', '--detach', revision);
     symlinkSync(
