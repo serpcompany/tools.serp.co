@@ -1643,7 +1643,8 @@ try {
     page.on('pageerror', (error) => result.pageErrors.push(error));
     page.on('console', (message) => {
       if (message.type() === 'warning') {
-        result.consoleWarnings.push(classifyConsoleWarning(message.text()));
+        const warningCode = classifyConsoleWarning(message.text());
+        if (warningCode) result.consoleWarnings.push(warningCode);
       }
     });
 

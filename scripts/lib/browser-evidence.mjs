@@ -145,17 +145,20 @@ export function summarizeNavigationTimings(values) {
 }
 
 export function classifyConsoleWarning(message) {
+  if (
+    /target origin provided \('https:\/\/ep2\.adtrafficquality\.google'\).*origin \('null'\)/i.test(
+      message,
+    ) ||
+    /webgl.*(?:driver message|gpu stall)/i.test(message) ||
+    /ae_default_editor_active is undefined/i.test(message)
+  ) {
+    return null;
+  }
   if (/adsense.*data-nscript/i.test(message)) {
     return 'adsense-script-attribute';
   }
   if (/ignoring event:\s*localhost/i.test(message)) {
     return 'localhost-event-ignored';
-  }
-  if (/webgl.*(?:driver message|gpu stall)/i.test(message)) {
-    return 'webgl-driver-performance';
-  }
-  if (/ae_default_editor_active is undefined/i.test(message)) {
-    return 'pdf-editor-default-undefined';
   }
   return 'other-console-warning';
 }

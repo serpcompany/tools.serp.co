@@ -311,6 +311,13 @@ test('console warning evidence is classified, deduplicated, and attached without
     classifyConsoleWarning('unexpected warning containing private@example.com'),
     'other-console-warning',
   );
+  for (const diagnostic of [
+    "Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://ep2.adtrafficquality.google') does not match the recipient window's origin ('null').",
+    '[.WebGL-0x123]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels',
+    'ae_default_editor_active is undefined',
+  ]) {
+    assert.equal(classifyConsoleWarning(diagnostic), null, diagnostic);
+  }
 
   assert.deepEqual(
     attachConsoleWarningEvidence(
