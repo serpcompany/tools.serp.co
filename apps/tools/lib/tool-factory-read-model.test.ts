@@ -49,8 +49,16 @@ test('supported Tool keeps implementation, verification, and runtime facts separ
       evidence.journeyId,
       evidence.state,
     ]),
-    [['png-to-webp:upload', 'no-evidence']],
+    [['png-to-webp:upload', 'warned']],
   );
+  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, [
+    'semantic-output',
+    'malformed-input',
+    'spoofed-input',
+    'wrong-format-output',
+    'no-delivery-on-failure',
+    'cancellation-lifecycle',
+  ]);
   assert.deepEqual(row.attention.codes, []);
 });
 

@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "schemaVersion": 2,
+    "runId": "20260813T002309Z_33f6970_local_browser-smoke-local-subset",
+    "command": {
+      "name": "smoke:tools:browser",
+      "version": "1"
+    },
+    "revision": {
+      "commit": "33f69703bc00ebf297d976fd5dc3a42b717648a2",
+      "dirty": false
+    },
+    "timestamps": {
+      "startedAt": "2026-08-13T00:23:09.299Z",
+      "completedAt": "2026-08-13T00:23:15.391Z"
+    },
+    "environment": "local",
+    "scope": {
+      "label": "browser-smoke-local-subset",
+      "inputHashes": [
+        "sha256:57e65212651db0838d51c25475c83ffe9fcfe523b8fa53a01adce58a960f3779"
+      ],
+      "tools": [
+        {
+          "toolId": "png-to-webp",
+          "journeys": [
+            {
+              "journeyId": "png-to-webp:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/png",
+                "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
+              },
+              "invariantId": "generic-file-exact-output",
+              "checks": ["valid-fixture", "required-environment"],
+              "inputRevisions": {
+                "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
+                "fixture-content": "sha256:e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7",
+                "journey-contract": "sha256:123b486a465b48f1753968ce396bd3aaf5b67d3bb9382bccdb83039fad40ab4b",
+                "semantic-invariant": "sha256:4f9341350a479a7eebd610688604dd484827e0e04dc219fa314e3a4840b471a3",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:45b449b3fb99cb7c44a56d9b5a76148de3cdb09640a31fa08ef6a1d1b2e8153f",
+                "dependency-lock": "sha256:dc5f0768b88b98356b9c642f21f4bdddeedf709a61e0fc97f653bf5e11db35c2",
+                "runner-sources": "sha256:6ccaa35c9210a2718af68535a8ec085cf8446565c026dbc87556007769938cb0"
+              }
+            }
+          ],
+          "warnings": ["other-console-warning"]
+        }
+      ]
+    },
+    "result": {
+      "status": "success"
+    }
+  }
+]
