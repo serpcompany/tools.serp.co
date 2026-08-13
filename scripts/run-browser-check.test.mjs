@@ -211,6 +211,16 @@ test('same-family MP4 to WebM browser proof independently decodes exact output',
   assert.match(runnerSource, /semantic-output/);
 });
 
+test('HEIF family browser proof validates every exact output and negative path', () => {
+  assert.match(
+    runnerSource,
+    /\['heif-to-jpg', 'heif-to-pdf', 'heif-to-png', 'heif-to-webp'\]/,
+  );
+  assert.match(runnerSource, /assertHeifPdfBytes\(outputBytes\)/);
+  assert.match(runnerSource, /runHeifNegativePathProbe\(\)/);
+  assert.match(runnerSource, /rgba: \[253, 165, 0, 255\]/);
+});
+
 test('Golden downloader and PNG to WebP checks retain exact or decoded fixture semantics', () => {
   assert.match(runnerSource, /assertExactFixtureBytes/);
   assert.match(runnerSource, /fixtureBytes/);

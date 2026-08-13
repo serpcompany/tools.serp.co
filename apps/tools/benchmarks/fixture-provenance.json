@@ -1,4 +1,14 @@
 {
+  "fixtures/sample.heif": {
+    "source": "repository-generated",
+    "sourceFixture": "fixtures/sample-2.png",
+    "sourceFixtureSha256": "7121c88e12c0381ba2bfd80713d4965c0362fe439b779bd38fc94cfc0391c999",
+    "command": "heif-enc fixtures/sample-2.png -q 90 -o fixtures/sample.heif",
+    "toolVersions": "heif-enc 1.20.2; libheif 1.20.2",
+    "identity": "128x80 HEVC-coded HEIF image; major brand heic; compatible brands mif1, heic, miaf",
+    "reproducibility": "recipe and source fixture recorded; encoder output may vary by libheif/x265 version; sha256 identifies the checked-in artifact",
+    "sha256": "62952c9045e9abc24f1710c8bf516f8cccf7c19fcfdb09c6f0e3c601b808a183"
+  },
   "fixtures/sample-video-only.webm": {
     "source": "repository-generated",
     "command": "ffmpeg -f lavfi -i color=c=black:s=320x240:r=25:d=1 -an -c:v libvpx -deadline best -cpu-used 0 -map_metadata -1 sample-video-only.webm",

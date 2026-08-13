@@ -31,6 +31,11 @@ import { runFfmpegLifecycle } from './convert/ffmpeg-lifecycle.ts';
 import { decodeToRGBA } from './convert/decode.ts';
 import { convertWithWorker } from './convert/workerClient.ts';
 import { inspectBmp } from './convert/bmp.ts';
+import {
+  HEIF_CONVERSION_TOOL_IDS,
+  HEIF_CONVERSION_TOOL_IDS_SHA256,
+  HEIF_ENGINE_CONTRACT,
+} from './convert/heif-contract.ts';
 
 const fixture = (name: string) =>
   new Uint8Array(
@@ -167,6 +172,40 @@ test('the browser WebM family adds MP4 to WebM through the existing exact contra
   }
 });
 
+test('the approved HEIF wave is exactly four browser-only conversions', async () => {
+  const { createHash } = await import('node:crypto');
+  assert.deepEqual(HEIF_CONVERSION_TOOL_IDS, [
+    'heif-to-jpg',
+    'heif-to-pdf',
+    'heif-to-png',
+    'heif-to-webp',
+  ]);
+  assert.equal(
+    HEIF_CONVERSION_TOOL_IDS_SHA256,
+    `sha256:${createHash('sha256')
+      .update(HEIF_CONVERSION_TOOL_IDS.join('\n'))
+      .digest('hex')}`,
+  );
+  assert.deepEqual(HEIF_ENGINE_CONTRACT, {
+    decode: 'libheif-js@1.19.8',
+    encode: 'browser-canvas-codec',
+    pdf: 'pdf-lib',
+    execution: 'browser-only',
+    fallback: 'fail-closed',
+  });
+  for (const toolId of HEIF_CONVERSION_TOOL_IDS) {
+    assert.equal(getGenericToolContract(toolId).state, 'supported', toolId);
+    assert.deepEqual(getToolProcessorAvailability(toolId), {
+      kind: 'wired',
+      toolId,
+      adapterId: 'generic-conversion',
+    });
+  }
+  for (const toolId of ['heif-to-gif', 'heif-to-svg', 'heif-to-tiff']) {
+    assert.equal(getGenericToolContract(toolId).state, 'unsupported', toolId);
+  }
+});
+
 test('Cloudflare-incompatible CR2 dispatches remain truthfully unsupported', () => {
   for (const toolId of [
     'cr2-to-jpeg',
@@ -192,6 +231,7 @@ test('contract inventory independently audits real dispatches with semantic cove
   const verifiedInputs = new Set([
     'bmp',
     'heic',
+    'heif',
     'jpeg',
     'jpg',
     'm4a',
@@ -241,7 +281,9 @@ test('contract inventory independently audits real dispatches with semantic cove
           'bmp-to-pdf',
           'bmp-to-png',
           'bmp-to-webp',
-        ].includes(tool.id));
+        ].includes(tool.id)) &&
+      (tool.from !== 'heif' ||
+        HEIF_CONVERSION_TOOL_IDS.includes(tool.id as never));
     assert.equal(
       getGenericToolContract(tool.id).state === 'supported',
       expectedSupported,
@@ -321,7 +363,7 @@ test('every supported generic contract resolves a processor through workflow.run
     ...baseBoundary,
     async convert(request) {
       return [
-        request.from === 'bmp' && request.to === 'pdf'
+        ['bmp', 'heif'].includes(request.from) && request.to === 'pdf'
           ? bmpPdfBytes
           : fixture(outputFixture[request.to as keyof typeof outputFixture]),
       ];
@@ -336,6 +378,7 @@ test('every supported generic contract resolves a processor through workflow.run
     bmp: 'sample.bmp',
     cr2: 'sample.cr2',
     heic: 'sample.heic',
+    heif: 'sample.heif',
     jpeg: 'sample.jpg',
     jpg: 'sample.jpg',
     m4a: 'sample.m4a',

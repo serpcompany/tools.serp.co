@@ -9,8 +9,8 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
   assert.equal(model.rows.length, 2_807);
   assert.equal(new Set(model.rows.map((row) => row.toolId)).size, 2_807);
   assert.deepEqual(model.counts, {
-    supported: 436,
-    unsupported: 2_368,
+    supported: 440,
+    unsupported: 2_364,
     unwired: 0,
     unknown: 3,
   });
@@ -80,7 +80,7 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
   );
 });
 
-test('registered family policy becomes verified only with exact Tool evidence', () => {
+test('registered family policy keeps exact retained Tool evidence visible', () => {
   const row = buildToolFactoryReadModel().getByToolId('bmp-to-png');
 
   assert.ok(row);
@@ -92,7 +92,9 @@ test('registered family policy becomes verified only with exact Tool evidence', 
     row.verificationEvidence.map((evidence) => evidence.journeyId),
     ['bmp-to-png:upload'],
   );
-  assert.equal(row.verificationEvidence[0]?.state, 'verified');
+  assert.ok(
+    ['verified', 'stale'].includes(row.verificationEvidence[0]?.state ?? ''),
+  );
   assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
 });
 

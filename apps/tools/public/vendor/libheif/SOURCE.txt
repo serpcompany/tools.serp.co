@@ -1,0 +1,16 @@
+libheif browser bundle provenance
+
+The files libheif-bundle.js and libheif.wasm are the unmodified browser
+artifacts from npm package libheif-js@1.19.8, distributed under LGPL-3.0.
+The accompanying LICENSE is copied from that exact package.
+
+Package: https://www.npmjs.com/package/libheif-js/v/1.19.8
+Source wrapper: https://github.com/catdad-experiments/libheif-js/tree/v1.19.8
+Upstream library: https://github.com/strukturag/libheif
+npm tarball SHA-1: fcbf3571ef28b6199dd052bc4d2cb7cce56ddf06
+libheif-bundle.js SHA-256: 793b36c913689784b2bfba60456fd87c14ed49e2d13f3b4d2611baaf05148f81
+libheif.wasm SHA-256: 615bfe847f823d008d4a5bdb3e8286029f72a0f581e120115c2d6478e3c37fb3
+
+To reproduce the distributed files, fetch the pinned npm tarball and compare
+package/libheif-wasm/libheif-bundle.js and package/libheif-wasm/libheif.wasm
+against the hashes above. Do not replace these files from an unpinned CDN URL.

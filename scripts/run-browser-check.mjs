@@ -22,6 +22,7 @@ import { readTranscriptionTerminalState } from './lib/transcription-browser-stat
 import { assertTranscriptMatchesFixture } from './lib/transcription-semantics.mjs';
 import {
   assertExactFixtureBytes,
+  assertHeifPdfBytes,
   assertLossyUniformImageSummary,
   assertPdfCanvasSummary,
   assertUniformImageSummary,
@@ -710,6 +711,34 @@ try {
       throw new Error(
         `Golden ${toolId} negative-path probe did not prove its exact checks.`,
       );
+    }
+    return checks;
+  }
+
+  function runHeifNegativePathProbe() {
+    const output = execFileSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        path.join(repositoryRoot, 'apps/tools/lib/heif-negative-path-probe.ts'),
+      ],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    const result = JSON.parse(output);
+    const checks = [
+      'malformed-input',
+      'spoofed-input',
+      'wrong-format-output',
+      'no-delivery-on-failure',
+      'cancellation-lifecycle',
+    ];
+    if (
+      result?.journeyId !== 'heif-to-png:upload' ||
+      JSON.stringify(result?.checks) !== JSON.stringify(checks) ||
+      result?.observed?.deliveries !== 0 ||
+      result?.observed?.cleanupCalls !== 1
+    ) {
+      throw new Error('HEIF negative-path probe did not prove exact checks.');
     }
     return checks;
   }
@@ -1559,6 +1588,41 @@ try {
             'valid-fixture',
             'semantic-output',
             ...runGoldenNegativePathProbe(tool.id),
+            'required-environment',
+          ],
+        };
+      }
+      if (
+        ['heif-to-jpg', 'heif-to-pdf', 'heif-to-png', 'heif-to-webp'].includes(
+          tool.id,
+        )
+      ) {
+        const outputBytes = await lastBlobBytes(page);
+        let semantic;
+        if (tool.to === 'pdf') {
+          semantic = await assertHeifPdfBytes(outputBytes);
+        } else {
+          semantic = await decodeImageSummary(page, outputBytes, expectedType);
+          assertLossyUniformImageSummary(semantic, {
+            width: 128,
+            height: 80,
+            rgba: [253, 165, 0, 255],
+            tolerance: tool.to === 'png' ? 12 : 24,
+            label: `${tool.id} output`,
+          });
+        }
+        return {
+          detail: `verified ${tool.to.toUpperCase()} 128×80 source semantics, ${blob.size} bytes`,
+          metrics: {
+            outputBytes: blob.size,
+            outputType: blob.type,
+            width: semantic.width,
+            height: semantic.height,
+          },
+          checks: [
+            'valid-fixture',
+            'semantic-output',
+            ...runHeifNegativePathProbe(),
             'required-environment',
           ],
         };

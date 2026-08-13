@@ -25,6 +25,10 @@ import {
 import { decodeToRGBA } from './convert/decode.ts';
 import { inspectBmp, verifyBmpConversionSemantics } from './convert/bmp.ts';
 import {
+  inspectHeifContainer,
+  verifyHeifConversionSemantics,
+} from './convert/heif-semantics.ts';
+import {
   genericCompressionNeedsWorker,
   getGenericToolContract,
   mimeTypeForGenericFormat,
@@ -35,6 +39,7 @@ import { createServerActionRequestHeaders } from './server-action-client.ts';
 import { executionProvenance } from './tool-execution-provenance.ts';
 
 const MAX_INPUT_BYTES = 256 * 1_024 * 1_024;
+const MAX_HEIF_INPUT_BYTES = 32 * 1_024 * 1_024;
 const MAX_IDENTITY_PARSE_BYTES = 64 * 1_024 * 1_024;
 const MAX_OUTPUT_BYTES = 512 * 1_024 * 1_024;
 const MAX_TOTAL_OUTPUT_BYTES = 1_024 * 1_024 * 1_024;
@@ -350,6 +355,7 @@ function processorFor(
   const multiplePages =
     contract.operation === 'convert' && contract.input.format === 'pdf';
   const bmpSourceByResult = new WeakMap<Uint8Array, Uint8Array>();
+  const heifSourceByResult = new WeakMap<Uint8Array, Uint8Array>();
 
   return {
     engine,
@@ -363,7 +369,10 @@ function processorFor(
       ],
       outputs: [contract.output],
       resourceLimits: {
-        maxInputBytes: MAX_INPUT_BYTES,
+        maxInputBytes:
+          contract.input.format === 'heif'
+            ? MAX_HEIF_INPUT_BYTES
+            : MAX_INPUT_BYTES,
         maxOutputBytes: MAX_OUTPUT_BYTES,
         maxTotalOutputBytes: MAX_TOTAL_OUTPUT_BYTES,
       },
@@ -458,6 +467,10 @@ function processorFor(
         for (const result of results)
           bmpSourceByResult.set(result.bytes, input.bytes);
       }
+      if (contract.input.format === 'heif') {
+        for (const result of results)
+          heifSourceByResult.set(result.bytes, input.bytes);
+      }
       return results;
     },
     async verifyResult(result, context) {
@@ -472,18 +485,44 @@ function processorFor(
           : verification;
       if (formatVerification.status !== 'verified') return formatVerification;
       const bmpSource = bmpSourceByResult.get(result.bytes);
-      if (!bmpSource) return formatVerification;
-      return verifyBmpConversionSemantics({
-        input: bmpSource,
+      if (bmpSource) {
+        return verifyBmpConversionSemantics({
+          input: bmpSource,
+          output: { format: result.format, bytes: result.bytes },
+          signal: context.signal,
+          decode: adapters.decodeRaster
+            ? async (_bytes, signal) => {
+                const decoded = await adapters.decodeRaster!(result, {
+                  signal: signal ?? context.signal,
+                });
+                return decoded;
+              }
+            : undefined,
+        });
+      }
+      const heifSource = heifSourceByResult.get(result.bytes);
+      if (!heifSource) return formatVerification;
+      return verifyHeifConversionSemantics({
+        input: heifSource,
         output: { format: result.format, bytes: result.bytes },
         signal: context.signal,
-        decode: adapters.decodeRaster
-          ? async (_bytes, signal) => {
-              const decoded = await adapters.decodeRaster!(result, {
+        decodeInput: async (bytes, signal) => {
+          if (!adapters.decodeRaster) throw new Error('Decoder unavailable');
+          return adapters.decodeRaster(
+            {
+              name: 'source.heif',
+              format: 'heif',
+              mimeType: 'image/heif',
+              bytes,
+            },
+            { signal: signal ?? context.signal },
+          );
+        },
+        decodeOutput: adapters.decodeRaster
+          ? async (_bytes, signal) =>
+              adapters.decodeRaster!(result, {
                 signal: signal ?? context.signal,
-              });
-              return decoded;
-            }
+              })
           : undefined,
       });
     },
@@ -632,7 +671,7 @@ const browserAdapters: GenericWorkflowAdapters = {
         bytes: decoded,
       });
     }
-    if (['bmp', 'heic', 'webp'].includes(media.format)) {
+    if (['bmp', 'heic', 'heif', 'webp'].includes(media.format)) {
       try {
         const decoded = await decodeToRGBA(
           media.format,
@@ -804,10 +843,12 @@ export async function runGenericToolFile(
     );
   }
   if (options?.signal?.aborted) return cancelledFileOutcome();
-  if (file.size > MAX_INPUT_BYTES) {
+  const maxInputBytes =
+    contract.input.format === 'heif' ? MAX_HEIF_INPUT_BYTES : MAX_INPUT_BYTES;
+  if (file.size > maxInputBytes) {
     return failedFileOutcome(
       'invalid-request',
-      `Input exceeds ${MAX_INPUT_BYTES} bytes`,
+      `Input exceeds ${maxInputBytes} bytes`,
     );
   }
   let bytes: Uint8Array;
@@ -841,6 +882,28 @@ export async function runGenericToolFile(
       return failedFileOutcome(
         'unsupported-request',
         'BMP conversion is not available in this browser.',
+      );
+    }
+  }
+  if (contract.input.format === 'heif') {
+    const identity = inspectHeifContainer(bytes);
+    if (identity.status !== 'verified') {
+      return failedFileOutcome('invalid-request', identity.message);
+    }
+    try {
+      await decodeToRGBA(
+        'heif',
+        Uint8Array.from(bytes).buffer,
+        options?.signal,
+      );
+      mimeType = 'image/heif';
+    } catch (error) {
+      if (options?.signal?.aborted || isAbortError(error)) {
+        return cancelledFileOutcome();
+      }
+      return failedFileOutcome(
+        'unsupported-request',
+        'HEIF conversion is not available in this browser.',
       );
     }
   }

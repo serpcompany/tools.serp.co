@@ -115,7 +115,12 @@ test('unsupported portfolio receives conservative browser decision categories', 
     plan.getByToolId('heif-to-png')?.preferredTarget,
     'browser-first',
   );
-  assert.equal(plan.getByToolId('heif-to-png')?.serverDependency, 'unknown');
+  assert.equal(plan.getByToolId('heif-to-png')?.serverDependency, 'none');
+  assert.equal(
+    plan.getByToolId('heif-to-png')?.currentExecution.state,
+    'browser',
+  );
+  assert.deepEqual(plan.getByToolId('heif-to-png')?.candidateEngines, []);
 
   const verifiedWebm = plan.getByToolId('webm-to-mp3');
   assert.equal(verifiedWebm?.currentExecution.state, 'browser');

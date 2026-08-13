@@ -160,9 +160,7 @@
       "input": "file",
       "fixture": "fixtures/sample.csv",
       "notes": "CSV combiner uses both files.",
-      "alternates": [
-        "fixtures/sample-2.csv"
-      ]
+      "alternates": ["fixtures/sample-2.csv"]
     },
     {
       "format": "cur",
@@ -281,7 +279,7 @@
       "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.heif",
-      "notes": "Add a real fixture for this format."
+      "notes": "Repository-generated 128x80 HEVC-coded HEIF-family fixture with recorded provenance; intentionally distinct from sample.heic."
     },
     {
       "format": "hevc",
@@ -506,9 +504,7 @@
       "input": "file",
       "fixture": "fixtures/sample.png",
       "notes": "Primary image fixture.",
-      "alternates": [
-        "fixtures/sample-2.png"
-      ]
+      "alternates": ["fixtures/sample-2.png"]
     },
     {
       "format": "ppt",
@@ -674,17 +670,11 @@
     },
     "batch-compress-png": {
       "input": "file",
-      "fixtures": [
-        "fixtures/sample.png",
-        "fixtures/sample-2.png"
-      ]
+      "fixtures": ["fixtures/sample.png", "fixtures/sample-2.png"]
     },
     "csv-combiner": {
       "input": "file",
-      "fixtures": [
-        "fixtures/sample.csv",
-        "fixtures/sample-2.csv"
-      ]
+      "fixtures": ["fixtures/sample.csv", "fixtures/sample-2.csv"]
     },
     "json-to-csv": {
       "input": "text",

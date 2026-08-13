@@ -6,12 +6,14 @@ import {
 import { resolveCompressionDispatch } from './compression-utils.ts';
 import { BMP_CONVERSION_TOOL_IDS } from './convert/bmp-contract.ts';
 import { resolveConversionCapability } from './convert/conversion-dispatch.ts';
+import { HEIF_CONVERSION_TOOL_IDS } from './convert/heif-contract.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
 
 const FORMAT_MIME_TYPES = Object.freeze({
   bmp: 'image/bmp',
   cr2: 'image/x-canon-cr2',
   heic: 'image/heic',
+  heif: 'image/heif',
   jpeg: 'image/jpeg',
   jpg: 'image/jpeg',
   m4a: 'audio/mp4',
@@ -35,6 +37,7 @@ const BROWSER_WEBM_TOOL_ID_SET = new Set<string>(BROWSER_WEBM_TOOL_IDS);
 const SEMANTIC_INPUT_FORMATS = new Set([
   'bmp',
   'heic',
+  'heif',
   'jpeg',
   'jpg',
   'm4a',
@@ -57,6 +60,7 @@ const SEMANTIC_OUTPUT_FORMATS = new Set([
   'webm',
 ]);
 const BMP_CONVERSION_TOOL_ID_SET = new Set<string>(BMP_CONVERSION_TOOL_IDS);
+const HEIF_CONVERSION_TOOL_ID_SET = new Set<string>(HEIF_CONVERSION_TOOL_IDS);
 const CLOUDFLARE_UNSUPPORTED_CONVERSIONS = new Set([
   'm4a->mp3',
   'mp3->m4a',
@@ -100,6 +104,9 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
   const from = tool.from.toLowerCase();
   const to = tool.to.toLowerCase();
   if (from === 'bmp' && !BMP_CONVERSION_TOOL_ID_SET.has(tool.id)) {
+    return undefined;
+  }
+  if (from === 'heif' && !HEIF_CONVERSION_TOOL_ID_SET.has(tool.id)) {
     return undefined;
   }
   const inputMimeType = mimeTypeForGenericFormat(from);

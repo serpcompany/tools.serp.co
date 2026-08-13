@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
 import test from 'node:test';
 
 import {
@@ -6,9 +7,15 @@ import {
   TextReader,
   ZipWriter,
 } from '../../apps/tools/node_modules/@zip.js/zip.js/index.js';
+const requireFromTools = createRequire(
+  new URL('../../apps/tools/package.json', import.meta.url),
+);
+const { PDFDocument } = requireFromTools('pdf-lib');
+const UPNG = requireFromTools('upng-js');
 
 import {
   assertExactFixtureBytes,
+  assertHeifPdfBytes,
   assertLossyUniformImageSummary,
   assertPdfCanvasSummary,
   assertUniformImageSummary,
@@ -198,4 +205,24 @@ test('PDF canvas verification rejects blank, wrong-color, and multi-page renders
       bluePixels: 9_000,
     }),
   );
+});
+
+test('HEIF PDF verification inspects exact page bounds and embedded pixels', async () => {
+  const rgba = new Uint8Array(128 * 80 * 4);
+  for (let index = 0; index < rgba.byteLength; index += 4) {
+    rgba.set([253, 165, 0, 255], index);
+  }
+  const png = new Uint8Array(UPNG.encode([rgba.buffer], 128, 80, 0));
+  const document = await PDFDocument.create();
+  const image = await document.embedPng(png);
+  const page = document.addPage([128, 80]);
+  page.drawImage(image, { x: 0, y: 0, width: 128, height: 80 });
+  const summary = await assertHeifPdfBytes(await document.save());
+  assert.equal(summary.pageCount, 1);
+  assert.deepEqual(summary.minimum, [253, 165, 0]);
+
+  const blank = await PDFDocument.create();
+  blank.addPage([128, 80]);
+  const blankBytes = await blank.save();
+  await assert.rejects(() => assertHeifPdfBytes(blankBytes), /one source/);
 });
