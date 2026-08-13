@@ -80,6 +80,7 @@ function deriveScreenshotPath(screenshot, label) {
 
 const args = parseArgs(process.argv.slice(2));
 const screenshotPaths = {
+  goldenPilot: deriveScreenshotPath(args.screenshot, 'golden-pilot'),
   planner: args.screenshot,
   githubWork: deriveScreenshotPath(args.screenshot, 'github-work'),
   runtimeActivity: deriveScreenshotPath(args.screenshot, 'runtime-activity'),
@@ -160,9 +161,43 @@ try {
   await page.getByText(`Revision ${args.revision}`, { exact: true }).waitFor();
   await page
     .getByText(
-      '2,807 active Tools · 435 supported · 2,369 explicitly unsupported · 3 unknown',
+      '2,807 active Tools · 436 supported · 2,368 explicitly unsupported · 3 unknown',
     )
     .waitFor();
+  await waitForHydration(page);
+  await page.getByRole('link', { name: 'Open Golden Journey pilot' }).click();
+  await page
+    .getByRole('heading', { name: 'Golden Journey pilot' })
+    .first()
+    .waitFor();
+  assert.equal(new URL(page.url()).searchParams.get('pilot'), 'golden');
+  const goldenPilot = page.getByRole('region', {
+    name: 'Golden Journey pilot',
+  });
+  await goldenPilot
+    .getByText(
+      'Fixed membership sha256:cf077705f900e695b0310fbd090dbd366fa3c01219f93b2076f849b3396ba6ba',
+      { exact: true },
+    )
+    .waitFor();
+  assert.equal(await goldenPilot.getByRole('row').count(), 11);
+  assert.equal(
+    await goldenPilot.getByRole('link', { name: 'Open Tool' }).count(),
+    10,
+  );
+  await goldenPilot
+    .getByText('audio-to-text:extractor-url', { exact: true })
+    .waitFor();
+  await goldenPilot.getByText('compress-pdf:upload', { exact: true }).waitFor();
+  await goldenPilot.getByText('Unavailable', { exact: true }).waitFor();
+  await goldenPilot
+    .getByText('Warning · not verified', { exact: true })
+    .waitFor();
+  if (screenshotPaths.goldenPilot) {
+    await goldenPilot.screenshot({ path: screenshotPaths.goldenPilot });
+  }
+  await goldenPilot.getByRole('link', { name: 'Return to all Tools' }).click();
+  await page.getByRole('heading', { name: 'All Tools' }).waitFor();
   await waitForHydration(page);
   assert.equal(
     await page
@@ -410,11 +445,13 @@ try {
       .locator('..')
       .screenshot({ path: screenshotPaths.githubWork });
     assert.notEqual(screenshotPaths.planner, screenshotPaths.githubWork);
+    assert.notEqual(screenshotPaths.goldenPilot, screenshotPaths.planner);
     assert.notEqual(
       screenshotPaths.runtimeActivity,
       screenshotPaths.githubWork,
     );
     assert.ok(statSync(screenshotPaths.planner).size > 0);
+    assert.ok(statSync(screenshotPaths.goldenPilot).size > 0);
     assert.ok(statSync(screenshotPaths.githubWork).size > 0);
     assert.ok(statSync(screenshotPaths.runtimeActivity).size > 0);
   }
@@ -585,7 +622,17 @@ try {
     status,
     startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
-    linkedWork: ['#50', '#102', '#103', '#104', '#105', '#106', '#107', '#114'],
+    linkedWork: [
+      '#50',
+      '#102',
+      '#103',
+      '#104',
+      '#105',
+      '#106',
+      '#107',
+      '#114',
+      '#124',
+    ],
     summary: {
       status,
       checksPassed: status === 'success' ? 24 : 0,

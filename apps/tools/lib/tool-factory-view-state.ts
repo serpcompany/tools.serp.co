@@ -55,6 +55,7 @@ const DEFAULT_VISIBLE_COLUMNS: readonly ToolFactoryColumnId[] = Object.freeze([
 ]);
 
 export type ToolFactoryViewState = Readonly<{
+  pilot: '' | 'golden';
   expansionGroup: string;
   search: string;
   filters: Readonly<{
@@ -73,6 +74,7 @@ export type ToolFactoryViewState = Readonly<{
 }>;
 
 export const DEFAULT_TOOL_FACTORY_VIEW: ToolFactoryViewState = Object.freeze({
+  pilot: '',
   expansionGroup: '',
   search: '',
   filters: Object.freeze({
@@ -184,6 +186,7 @@ export function parseToolFactoryView(
   const page = Number(parameters.get('page'));
   const rows = Number(parameters.get('rows'));
   return Object.freeze({
+    pilot: parameters.get('pilot') === 'golden' ? 'golden' : '',
     expansionGroup: allowed(
       parameters.get('expansion'),
       new Set(options.expansionGroups),
@@ -223,6 +226,7 @@ function sameValues(left: readonly string[], right: readonly string[]) {
 
 export function serializeToolFactoryView(view: ToolFactoryViewState) {
   const parameters = new URLSearchParams();
+  if (view.pilot === 'golden') parameters.set('pilot', 'golden');
   if (view.expansionGroup) {
     parameters.set('expansion', view.expansionGroup);
   }

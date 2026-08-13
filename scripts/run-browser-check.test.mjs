@@ -100,7 +100,7 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   assert.match(runnerSource, /safe failure/i);
   assert.doesNotMatch(runnerSource, /data-generic-contract/);
   assert.match(runnerSource, /getGenericSmokeExpectation/);
-  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v4-webm');
+  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v5-webm');
   for (const id of ['png-to-webp', 'webp-to-jpg', 'heic-to-jpg']) {
     const [from, to] = id.split('-to-');
     assert.equal(
@@ -202,6 +202,13 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
     }),
     'unsupported',
   );
+});
+
+test('same-family MP4 to WebM browser proof independently decodes exact output', () => {
+  assert.match(runnerSource, /tool\.id === 'mp4-to-webm'/);
+  assert.match(runnerSource, /\[26, 69, 223, 163\]/);
+  assert.match(runnerSource, /video\.videoWidth/);
+  assert.match(runnerSource, /semantic-output/);
 });
 
 test('transcription smoke uses owned speech and a bounded success-or-error terminal', () => {

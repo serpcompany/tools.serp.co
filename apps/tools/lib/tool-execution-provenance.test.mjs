@@ -158,6 +158,7 @@ test('conversion and compression provenance follows actual dispatch selectors', 
 test('the exact WebM browser family exposes client-only FFmpeg provenance', () => {
   for (const toolId of [
     'compress-webm',
+    'mp4-to-webm',
     'webm-to-m4a',
     'webm-to-mp3',
     'webm-to-mp4',
@@ -170,6 +171,10 @@ test('the exact WebM browser family exposes client-only FFmpeg provenance', () =
       engineIds: ['browser-ffmpeg-wasm'],
     });
   }
+  assert.deepEqual(resolveConversionDispatch('mp4', 'webm'), {
+    kind: 'browser-webm-ffmpeg',
+    engineIds: ['browser-ffmpeg-wasm'],
+  });
   assert.equal(resolveConversionDispatch('webm', 'mov').kind, 'adaptive-video');
 });
 

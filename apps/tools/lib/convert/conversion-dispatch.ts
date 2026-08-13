@@ -165,7 +165,10 @@ export function resolveConversionDispatch(
       ? dispatchByKind['server-image']
       : dispatchByKind['server-assisted-image'];
   }
-  if (fromExt === 'webm' && ['m4a', 'mp3', 'mp4'].includes(toExt)) {
+  if (
+    (fromExt === 'webm' && ['m4a', 'mp3', 'mp4'].includes(toExt)) ||
+    (fromExt === 'mp4' && toExt === 'webm')
+  ) {
     return dispatchByKind['browser-webm-ffmpeg'];
   }
   if (requiresVideoConversion(fromExt, toExt)) {

@@ -25,6 +25,7 @@ const FORMAT_MIME_TYPES = Object.freeze({
 
 export const BROWSER_WEBM_TOOL_IDS = Object.freeze([
   'compress-webm',
+  'mp4-to-webm',
   'webm-to-m4a',
   'webm-to-mp3',
   'webm-to-mp4',

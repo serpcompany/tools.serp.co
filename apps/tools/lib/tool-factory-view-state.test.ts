@@ -24,6 +24,7 @@ test('shareable Tool view round-trips search, filters, sorting, columns, page, a
   );
 
   assert.deepEqual(view, {
+    pilot: '',
     expansionGroup: '',
     search: 'audio',
     filters: {
@@ -102,4 +103,13 @@ test('unknown expansion group cannot enter canonical Tool view state', () => {
   assert.equal(view.expansionGroup, '');
   assert.equal(serializeToolFactoryView(view), '?support=unsupported');
   assert.equal(DEFAULT_TOOL_FACTORY_VIEW.expansionGroup, '');
+});
+
+test('Golden Pilot is a canonical shareable Tool Factory view', () => {
+  const view = parseToolFactoryView('?pilot=golden', options);
+
+  assert.equal(view.pilot, 'golden');
+  assert.equal(serializeToolFactoryView(view), '?pilot=golden');
+  assert.equal(DEFAULT_TOOL_FACTORY_VIEW.pilot, '');
+  assert.equal(parseToolFactoryView('?pilot=invented', options).pilot, '');
 });

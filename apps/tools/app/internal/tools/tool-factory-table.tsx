@@ -16,6 +16,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@serp-tools/ui/components/button';
@@ -41,6 +42,7 @@ import type {
 import type { ToolGithubWorkScopeView } from '../../../lib/tool-github-work-links.ts';
 import type { ToolFactoryDeployment } from '../../../lib/tool-factory-access.ts';
 import type { ToolRuntimeObservationPortfolio } from '../../../lib/tool-runtime-observations.ts';
+import type { GoldenToolJourneyPilotView } from '../../../lib/golden-tool-journey-pilot.ts';
 import { presentToolRuntimeObservations } from '../../../lib/tool-runtime-observation-presentation.ts';
 import {
   DEFAULT_TOOL_FACTORY_VIEW,
@@ -53,6 +55,79 @@ import {
 } from '../../../lib/tool-factory-view-state.ts';
 
 type ToolFactoryTableModel = Pick<ToolFactoryReadModel, 'rows' | 'counts'>;
+
+function GoldenPilotPanel({ pilot }: { pilot: GoldenToolJourneyPilotView }) {
+  return (
+    <section
+      aria-labelledby="golden-pilot-heading"
+      className="rounded-xl border border-amber-300 bg-amber-50 p-4 shadow-sm"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 id="golden-pilot-heading" className="text-lg font-semibold">
+            Golden Journey pilot
+          </h2>
+          <p className="mt-1 max-w-4xl text-sm text-slate-700">
+            Ten fixed user journeys connect real Tool behavior to retained
+            evidence. This is a bounded decision sample, not a claim about all
+            Tools.
+          </p>
+        </div>
+        <Link
+          className="rounded-md border bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50"
+          href="/internal/tools/"
+        >
+          Return to all Tools
+        </Link>
+      </div>
+      <p className="mt-2 font-mono text-xs text-slate-600">
+        Fixed membership {pilot.membershipHash}
+      </p>
+      <div className="mt-4 overflow-x-auto rounded-lg border bg-white">
+        <table className="min-w-[1100px] w-full border-collapse text-sm">
+          <thead className="bg-slate-100 text-left text-xs uppercase tracking-wide text-slate-600">
+            <tr>
+              <th className="p-3">Journey</th>
+              <th className="p-3">Current result</th>
+              <th className="p-3">Where it runs</th>
+              <th className="p-3">What was checked</th>
+              <th className="p-3">Freshness</th>
+              <th className="p-3">Remaining gap</th>
+              <th className="p-3">Try it</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pilot.rows.map((row) => (
+              <tr key={row.journeyId} className="border-t align-top">
+                <td className="p-3">
+                  <strong>{row.toolName}</strong>
+                  <div className="font-mono text-xs text-slate-500">
+                    {row.journeyId}
+                  </div>
+                </td>
+                <td className="p-3 font-medium">{row.resultLabel}</td>
+                <td className="p-3">{row.whereItRuns}</td>
+                <td className="p-3">{row.checkedBehavior}</td>
+                <td className="p-3">{row.freshness}</td>
+                <td className="max-w-md p-3 text-slate-700">
+                  {row.remainingGap}
+                </td>
+                <td className="p-3">
+                  <a
+                    className="font-medium text-blue-700 underline underline-offset-2"
+                    href={row.tryHref}
+                  >
+                    Open Tool
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
 
 function joined(values: readonly string[]) {
   return values.length ? values.join(', ') : '—';
@@ -1083,12 +1158,14 @@ export function ToolFactoryTable({
   deployment,
   model,
   clientFirstPlan,
+  goldenPilot,
   expansionPlan,
   runtimeObservations,
 }: {
   deployment: ToolFactoryDeployment;
   model: ToolFactoryTableModel;
   clientFirstPlan: Readonly<{ rows: readonly ToolClientFirstRow[] }>;
+  goldenPilot: GoldenToolJourneyPilotView;
   expansionPlan: ToolExpansionPlan;
   runtimeObservations: ToolRuntimeObservationPortfolio;
 }) {
@@ -1153,10 +1230,14 @@ export function ToolFactoryTable({
     [expansionPlan.groups, view.expansionGroup],
   );
   const rows = useMemo(() => {
+    if (view.pilot === 'golden') {
+      const memberIds = new Set(goldenPilot.rows.map((row) => row.toolId));
+      return model.rows.filter((row) => memberIds.has(row.toolId));
+    }
     if (!activeExpansionGroup) return [...model.rows];
     const memberIds = new Set(activeExpansionGroup.toolIds);
     return model.rows.filter((row) => memberIds.has(row.toolId));
-  }, [activeExpansionGroup, model.rows]);
+  }, [activeExpansionGroup, goldenPilot.rows, model.rows, view.pilot]);
 
   useEffect(() => {
     function restoreFromUrl() {
@@ -1335,7 +1416,7 @@ export function ToolFactoryTable({
             </span>
           </div>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-            All Tools
+            {view.pilot === 'golden' ? 'Golden Journey pilot' : 'All Tools'}
           </h1>
           <p className="mt-1 text-sm text-slate-600">
             {model.rows.length.toLocaleString()} active Tools ·{' '}
@@ -1346,19 +1427,31 @@ export function ToolFactoryTable({
           <p className="mt-1 font-mono text-xs text-slate-500">
             Revision {deployment.revision}
           </p>
+          {view.pilot !== 'golden' && (
+            <Link
+              className="mt-3 inline-flex rounded-md border bg-white px-3 py-2 text-sm font-medium shadow-xs hover:bg-slate-50"
+              href="/internal/tools/?pilot=golden"
+            >
+              Open Golden Journey pilot
+            </Link>
+          )}
         </header>
 
-        <ToolExpansionPlanner
-          plan={expansionPlan}
-          activeGroupId={view.expansionGroup || null}
-          onSelect={(group) => {
-            setSelected(null);
-            commitView({
-              ...DEFAULT_TOOL_FACTORY_VIEW,
-              expansionGroup: group.id,
-            });
-          }}
-        />
+        {view.pilot === 'golden' ? (
+          <GoldenPilotPanel pilot={goldenPilot} />
+        ) : (
+          <ToolExpansionPlanner
+            plan={expansionPlan}
+            activeGroupId={view.expansionGroup || null}
+            onSelect={(group) => {
+              setSelected(null);
+              commitView({
+                ...DEFAULT_TOOL_FACTORY_VIEW,
+                expansionGroup: group.id,
+              });
+            }}
+          />
+        )}
 
         {activeExpansionGroup && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950">

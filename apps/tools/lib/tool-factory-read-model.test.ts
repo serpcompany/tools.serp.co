@@ -9,8 +9,8 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
   assert.equal(model.rows.length, 2_807);
   assert.equal(new Set(model.rows.map((row) => row.toolId)).size, 2_807);
   assert.deepEqual(model.counts, {
-    supported: 435,
-    unsupported: 2_369,
+    supported: 436,
+    unsupported: 2_368,
     unwired: 0,
     unknown: 3,
   });
@@ -49,7 +49,7 @@ test('supported Tool keeps implementation, verification, and runtime facts separ
       evidence.journeyId,
       evidence.state,
     ]),
-    [['png-to-webp:upload', 'warned']],
+    [['png-to-webp:upload', 'stale']],
   );
   assert.deepEqual(row.verificationEvidence[0]?.missingChecks, [
     'semantic-output',

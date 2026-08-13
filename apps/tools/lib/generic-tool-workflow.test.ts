@@ -138,17 +138,18 @@ test('known production dispatches retain exact generic workflow contracts', () =
   }
 });
 
-test('the browser WebM family is an exact four-Tool contract', async () => {
+test('the browser WebM family adds MP4 to WebM through the existing exact contract', async () => {
   const { createHash } = await import('node:crypto');
   assert.deepEqual(BROWSER_WEBM_TOOL_IDS, [
     'compress-webm',
+    'mp4-to-webm',
     'webm-to-m4a',
     'webm-to-mp3',
     'webm-to-mp4',
   ]);
   assert.equal(
     createHash('sha256').update(BROWSER_WEBM_TOOL_IDS.join('\n')).digest('hex'),
-    'b70c579fedc4a30f62eceef454e27541c4ef9461e12f58e6768b7df7e0626b2b',
+    'b4aeb75e43e750e8c2ea36b5bf90e0d920f0617c53f4b07be7a88730a3d2053b',
   );
   for (const toolId of BROWSER_WEBM_TOOL_IDS) {
     assert.equal(getGenericToolContract(toolId).state, 'supported', toolId);
@@ -230,7 +231,9 @@ test('contract inventory independently audits real dispatches with semantic cove
       verifiedOutputs.has(tool.to) &&
       !cloudflareInoperableMediaRoutes.has(tool.id) &&
       ((tool.from !== 'webm' && tool.to !== 'webm') ||
-        ['webm-to-m4a', 'webm-to-mp3', 'webm-to-mp4'].includes(tool.id)) &&
+        ['mp4-to-webm', 'webm-to-m4a', 'webm-to-mp3', 'webm-to-mp4'].includes(
+          tool.id,
+        )) &&
       (tool.from !== 'bmp' ||
         [
           'bmp-to-jpeg',
@@ -420,24 +423,26 @@ test('WebM audio extraction rejects malformed, spoofed, and video-only inputs be
   assert.deepEqual(boundary.delivered, []);
 });
 
-test('the four WebM Tools validate independent real output semantics before delivery', async () => {
+test('the five WebM Tools validate independent real output semantics before delivery', async () => {
   const outputs = {
     'compress-webm': 'sample.webm',
+    'mp4-to-webm': 'sample.webm',
     'webm-to-m4a': 'sample.m4a',
     'webm-to-mp3': 'sample.mp3',
     'webm-to-mp4': 'sample.mp4',
   } as const;
   for (const [toolId, outputName] of Object.entries(outputs)) {
     const boundary = adapters(fixture(outputName));
+    const inputFormat = toolId === 'mp4-to-webm' ? 'mp4' : 'webm';
     const outcome = await createGenericToolWorkflow(boundary).run({
       toolId,
       input: {
         kind: 'file',
         media: {
-          name: 'sample.webm',
-          format: 'webm',
-          mimeType: 'video/webm',
-          bytes: fixture('sample.webm'),
+          name: `sample.${inputFormat}`,
+          format: inputFormat,
+          mimeType: inputFormat === 'mp4' ? 'video/mp4' : 'video/webm',
+          bytes: fixture(`sample.${inputFormat}`),
         },
       },
     });
@@ -446,18 +451,42 @@ test('the four WebM Tools validate independent real output semantics before deli
   }
 });
 
-test('the four WebM Tools never deliver malformed or wrong-format output', async () => {
+test('MP4 to WebM rejects spoofed input and wrong-format output without delivery', async () => {
+  for (const [input, output] of [
+    ['sample.png', 'sample.webm'],
+    ['sample.mp4', 'sample.png'],
+  ] as const) {
+    const boundary = adapters(fixture(output));
+    const outcome = await createGenericToolWorkflow(boundary).run({
+      toolId: 'mp4-to-webm',
+      input: {
+        kind: 'file',
+        media: {
+          name: 'sample.mp4',
+          format: 'mp4',
+          mimeType: 'video/mp4',
+          bytes: fixture(input),
+        },
+      },
+    });
+    assert.equal(outcome.status, 'failed', `${input} -> ${output}`);
+    assert.deepEqual(boundary.delivered, [], `${input} -> ${output}`);
+  }
+});
+
+test('the five WebM Tools never deliver malformed or wrong-format output', async () => {
   for (const toolId of BROWSER_WEBM_TOOL_IDS) {
     const boundary = adapters(fixture('sample.png'));
+    const inputFormat = toolId === 'mp4-to-webm' ? 'mp4' : 'webm';
     const outcome = await createGenericToolWorkflow(boundary).run({
       toolId,
       input: {
         kind: 'file',
         media: {
-          name: 'sample.webm',
-          format: 'webm',
-          mimeType: 'video/webm',
-          bytes: fixture('sample.webm'),
+          name: `sample.${inputFormat}`,
+          format: inputFormat,
+          mimeType: inputFormat === 'mp4' ? 'video/mp4' : 'video/webm',
+          bytes: fixture(`sample.${inputFormat}`),
         },
       },
     });
