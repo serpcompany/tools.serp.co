@@ -287,7 +287,26 @@ try {
     .getByText('png-to-webp:upload', { exact: true })
     .waitFor();
   await verificationSection
-    .getByText('No retained evidence', { exact: true })
+    .getByText('Warning · not verified', { exact: true })
+    .waitFor();
+  await verificationSection
+    .getByText('The run emitted warnings (other-console-warning).', {
+      exact: true,
+    })
+    .waitFor();
+  await verificationSection
+    .getByText(
+      'Still needed: malformed-input, spoofed-input, wrong-format-output, no-delivery-on-failure, cancellation-lifecycle',
+      { exact: true },
+    )
+    .waitFor();
+  await verificationSection
+    .getByText('Exact evidence identity', { exact: true })
+    .click();
+  await verificationSection
+    .getByText('20260813T001428Z_9d1f7bb_local_browser-smoke-local-subset', {
+      exact: true,
+    })
     .waitFor();
   await dialog
     .getByText('Family verification policy (not an exact Tool test)', {
