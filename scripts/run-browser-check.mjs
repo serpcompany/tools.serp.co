@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,7 +10,9 @@ import {
   attachJourneyResultEvidence,
   buildBrowserScope,
   classifyConsoleWarning,
+  finalizeJourneyResults,
   summarizeNavigationTimings,
+  validateBrowserEvidenceRevision,
 } from './lib/browser-evidence.mjs';
 import {
   GENERIC_SMOKE_CAPABILITY_VERSION,
@@ -137,6 +140,22 @@ let evidenceTools = [];
 let selectedItemCount = 0;
 let browser;
 const results = [];
+
+if (process.env.NODE_ENV !== 'test') {
+  const actualRevision = execFileSync('git', ['rev-parse', 'HEAD'], {
+    cwd: repositoryRoot,
+    encoding: 'utf8',
+  }).trim();
+  const actualDirty =
+    execFileSync('git', ['status', '--porcelain', '--untracked-files=all'], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+    }).trim() !== '';
+  validateBrowserEvidenceRevision(
+    { revision: options.revision, dirty: options.dirty },
+    { revision: actualRevision, dirty: actualDirty },
+  );
+}
 
 function recordBrowserEvidence(status, summary, completedAt = new Date()) {
   return recordRunEvidence({
@@ -979,6 +998,10 @@ try {
           );
         }
         result.completedJourneyIds.push('audio-to-text:extractor-url');
+        result.journeyOutcomes.set('audio-to-text:extractor-url', {
+          outcome: 'passed',
+          reasonCode: null,
+        });
         result.activeJourneyId = 'audio-to-text:upload';
         await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
           fixtureEntry.path,
@@ -1020,6 +1043,10 @@ try {
         throw new Error(`Transcription failed: ${terminal.message}`);
       }
       result.completedJourneyIds.push(result.activeJourneyId);
+      result.journeyOutcomes.set(result.activeJourneyId, {
+        outcome: 'passed',
+        reasonCode: null,
+      });
       result.activeJourneyId = null;
       return {
         detail:
@@ -1122,6 +1149,12 @@ try {
     if (functional?.skipped) {
       result.status = 'warn';
       result.errors.push(functional.reason);
+      if (result.activeJourneyId) {
+        result.journeyOutcomes.set(result.activeJourneyId, {
+          outcome: 'skipped',
+          reasonCode: 'browser-check-skipped',
+        });
+      }
       result.activeJourneyId = null;
     } else {
       result.detail = functional?.detail ?? null;
@@ -1131,15 +1164,30 @@ try {
           result.status = 'warn';
         }
         result.errors.push(functional.warning);
-        result.completedJourneyIds.push(
-          ...result.plannedJourneys.map((journey) => journey.journeyId),
-        );
+        for (const journey of result.plannedJourneys) {
+          if (!result.journeyOutcomes.has(journey.journeyId)) {
+            result.journeyOutcomes.set(journey.journeyId, {
+              outcome: 'warned',
+              reasonCode: 'browser-check-warning',
+            });
+          }
+        }
         result.activeJourneyId = null;
       }
       if (!result.completedJourneyIds.length && !functional?.warning) {
         result.completedJourneyIds.push(
           ...result.plannedJourneys.map((journey) => journey.journeyId),
         );
+      }
+      if (!functional?.warning) {
+        for (const journey of result.plannedJourneys) {
+          if (!result.journeyOutcomes.has(journey.journeyId)) {
+            result.journeyOutcomes.set(journey.journeyId, {
+              outcome: 'passed',
+              reasonCode: null,
+            });
+          }
+        }
       }
       result.activeJourneyId = null;
     }
@@ -1212,6 +1260,7 @@ try {
       completedJourneyIds: [],
       activeJourneyId: null,
       journeyResults: [],
+      journeyOutcomes: new Map(),
     };
 
     const page = await browser.newPage();
@@ -1255,34 +1304,11 @@ try {
         result.errors.push(message);
       }
     } finally {
-      const completed = new Set(result.completedJourneyIds);
-      result.journeyResults = result.plannedJourneys.map((journey) => {
-        if (completed.has(journey.journeyId)) {
-          return {
-            journeyId: journey.journeyId,
-            outcome: result.status === 'warn' ? 'warned' : 'passed',
-            reasonCode:
-              result.status === 'warn' ? 'browser-check-warning' : null,
-            fixtureSha256: journey.fixtureSha256,
-          };
-        }
-        if (result.activeJourneyId === journey.journeyId) {
-          return {
-            journeyId: journey.journeyId,
-            outcome: 'failed',
-            reasonCode: 'browser-check-failed',
-            fixtureSha256: journey.fixtureSha256,
-          };
-        }
-        return {
-          journeyId: journey.journeyId,
-          outcome: 'skipped',
-          reasonCode:
-            result.status === 'warn'
-              ? 'browser-check-skipped'
-              : 'not-executed-after-failure',
-          fixtureSha256: journey.fixtureSha256,
-        };
+      result.journeyResults = finalizeJourneyResults({
+        plannedJourneys: result.plannedJourneys,
+        outcomes: [...result.journeyOutcomes],
+        activeJourneyId: result.activeJourneyId,
+        status: result.status,
       });
       await page.close();
     }

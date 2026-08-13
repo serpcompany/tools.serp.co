@@ -287,21 +287,7 @@ try {
     .getByText('png-to-webp:upload', { exact: true })
     .waitFor();
   await verificationSection
-    .getByText('Passed checks · evidence incomplete', { exact: true })
-    .waitFor();
-  await verificationSection
-    .getByText(
-      'Still needed: malformed-input, spoofed-input, wrong-format-output, no-delivery-on-failure, cancellation-lifecycle',
-      { exact: true },
-    )
-    .waitFor();
-  await verificationSection
-    .getByText('Exact evidence identity', { exact: true })
-    .click();
-  await verificationSection
-    .getByText('20260812T235556Z_4f5fd0d_local_browser-smoke-local-subset', {
-      exact: true,
-    })
+    .getByText('No retained evidence', { exact: true })
     .waitFor();
   await dialog
     .getByText('Family verification policy (not an exact Tool test)', {

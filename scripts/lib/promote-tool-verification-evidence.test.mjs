@@ -36,7 +36,7 @@ function fixture(t, overrides = {}) {
         environment: 'local',
         scope: {
           label: 'browser-smoke-local-subset',
-          inputHashes: [],
+          inputHashes: [`sha256:${'d'.repeat(64)}`],
           tools: [
             {
               toolId: 'png-to-webp',
@@ -65,19 +65,28 @@ function fixture(t, overrides = {}) {
           ],
         },
         result: { status: 'success' },
+        privateToken: 'must-not-be-retained',
         ...overrides,
       },
       null,
       2,
     )}\n`,
   );
-  return { root, runId };
+  return {
+    root,
+    runId,
+    gitState: { revision: 'a'.repeat(40), dirty: false },
+  };
 }
 
 test('promotion retains the validated source manifest instead of display claims', (t) => {
-  const { root, runId } = fixture(t);
+  const { root, runId, gitState } = fixture(t);
 
-  const result = promoteToolVerificationRun({ repositoryRoot: root, runId });
+  const result = promoteToolVerificationRun({
+    repositoryRoot: root,
+    runId,
+    gitState,
+  });
   const retained = JSON.parse(
     readFileSync(
       path.join(
@@ -95,6 +104,7 @@ test('promotion retains the validated source manifest instead of display claims'
   assert.equal(retained.length, 1);
   assert.equal(retained[0].scope.tools[0].journeys[0].outcome, 'passed');
   assert.equal('runtime' in retained[0], false);
+  assert.equal('privateToken' in retained[0], false);
 });
 
 test('promotion rejects dirty, duplicate, or non-browser evidence', (t) => {
@@ -106,20 +116,34 @@ test('promotion rejects dirty, duplicate, or non-browser evidence', (t) => {
       promoteToolVerificationRun({
         repositoryRoot: dirty.root,
         runId: dirty.runId,
+        gitState: dirty.gitState,
       }),
     /dirty/i,
+  );
+
+  const mismatched = fixture(t);
+  assert.throws(
+    () =>
+      promoteToolVerificationRun({
+        repositoryRoot: mismatched.root,
+        runId: mismatched.runId,
+        gitState: { revision: 'b'.repeat(40), dirty: false },
+      }),
+    /exact evidence revision/i,
   );
 
   const clean = fixture(t);
   promoteToolVerificationRun({
     repositoryRoot: clean.root,
     runId: clean.runId,
+    gitState: clean.gitState,
   });
   assert.throws(
     () =>
       promoteToolVerificationRun({
         repositoryRoot: clean.root,
         runId: clean.runId,
+        gitState: clean.gitState,
       }),
     /already retained/i,
   );

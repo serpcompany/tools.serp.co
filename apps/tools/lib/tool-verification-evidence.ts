@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 
 import retainedRuns from '../../../docs/audits/tool-verification/retained-runs.json' with { type: 'json' };
+import generatedInputs from './tool-verification-inputs.generated.json' with { type: 'json' };
 import { toolJourneys, type ToolJourney } from './tool-journeys.ts';
 
 export const requiredVerificationChecks = Object.freeze([
@@ -46,6 +47,7 @@ export type ToolJourneyEvidenceRecord = Readonly<{
   inputRevisions: Readonly<Record<string, string>>;
   artifactUrl: string | null;
   screenshotUrl: string | null;
+  warningCodes?: readonly string[];
 }>;
 
 export type ToolJourneyEvidenceState =
@@ -83,6 +85,7 @@ export type ToolVerificationRunManifest = Readonly<{
     inputHashes: readonly string[];
     tools?: readonly Readonly<{
       toolId: string;
+      warnings?: readonly string[];
       journeys: readonly Readonly<{
         journeyId: string;
         outcome: ToolJourneyEvidenceOutcome;
@@ -125,11 +128,21 @@ function revision(value: unknown) {
 export function getToolVerificationInputRevisions(
   journey: ToolJourney,
 ): Readonly<Record<string, string>> {
+  const fixtureSha256 =
+    generatedInputs.fixtureSha256ByJourney[
+      journey.id as keyof typeof generatedInputs.fixtureSha256ByJourney
+    ];
   return deepFreeze({
     'fixture-contract': revision(journey.fixture),
+    'fixture-content': fixtureSha256
+      ? `sha256:${fixtureSha256}`
+      : revision(null),
     'journey-contract': revision(journey),
     'semantic-invariant': revision(journey.semanticInvariant),
     'verification-policy': revision(requiredVerificationChecks),
+    'executable-sources': generatedInputs.executableSources,
+    'dependency-lock': generatedInputs.dependencyLock,
+    'runner-sources': generatedInputs.runnerSources,
   });
 }
 
@@ -167,6 +180,7 @@ export function ingestToolVerificationRun(
       inputRevisions: journey.inputRevisions,
       artifactUrl: null,
       screenshotUrl: null,
+      warningCodes: [...(tool.warnings ?? [])],
     })),
   );
   return deepFreeze(records);
@@ -239,6 +253,22 @@ function validateRecordIdentity(
       `Evidence ${record.evidenceId} must explain a non-pass outcome.`,
     );
   }
+  if (record.outcome === 'passed' && record.reasonCode !== null) {
+    throw new TypeError(
+      `Evidence ${record.evidenceId} cannot attach a reason to a pass.`,
+    );
+  }
+  const warningCodes = record.warningCodes ?? [];
+  if (new Set(warningCodes).size !== warningCodes.length) {
+    throw new TypeError(`Evidence ${record.evidenceId} repeats a warning.`);
+  }
+  for (const warning of warningCodes) {
+    if (!safeIdentity(warning)) {
+      throw new TypeError(
+        `Evidence ${record.evidenceId} has an unsafe warning.`,
+      );
+    }
+  }
   if (new Set(record.checks).size !== record.checks.length) {
     throw new TypeError(`Evidence ${record.evidenceId} repeats a check.`);
   }
@@ -309,15 +339,13 @@ function project(
       reason: 'Relevant journey, fixture, invariant, or policy inputs changed.',
     });
   }
-  const invalid =
+  const baseInvalid =
     latest.revision.dirty ||
     inputs === 'missing' ||
-    latest.fixture === null ||
-    latest.fixture.reference !== journey.fixture.reference ||
     latest.invariantId === null ||
     latest.invariantId !== journey.semanticInvariant.id ||
     !environmentSatisfies(journey, latest.environment);
-  if (invalid) {
+  if (baseInvalid) {
     return deepFreeze({
       journeyId: journey.id,
       state: 'invalid' as const,
@@ -352,6 +380,28 @@ function project(
       latest,
       missingChecks,
       reason: `The latest controlled run skipped this journey (${latest.reasonCode}).`,
+    });
+  }
+  if (latest.warningCodes?.length) {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'warned' as const,
+      latest,
+      missingChecks,
+      reason: `The run emitted warnings (${latest.warningCodes.join(', ')}).`,
+    });
+  }
+  if (
+    latest.fixture === null ||
+    latest.fixture.reference !== journey.fixture.reference ||
+    `sha256:${latest.fixture.sha256}` !== currentInputs['fixture-content']
+  ) {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'invalid' as const,
+      latest,
+      missingChecks,
+      reason: 'The record does not match the exact journey fixture.',
     });
   }
   if (missingChecks.length) {

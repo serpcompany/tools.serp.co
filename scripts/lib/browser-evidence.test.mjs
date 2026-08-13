@@ -6,7 +6,9 @@ import {
   attachJourneyResultEvidence,
   buildBrowserScope,
   classifyConsoleWarning,
+  finalizeJourneyResults,
   summarizeNavigationTimings,
+  validateBrowserEvidenceRevision,
 } from './browser-evidence.mjs';
 
 test('smoke scope derives exact journey requirements from the Tool Journey module', () => {
@@ -40,9 +42,13 @@ test('smoke scope derives exact journey requirements from the Tool Journey modul
             invariantId: 'generic-file-exact-output',
             revisionKeys: [
               'fixture-contract',
+              'fixture-content',
               'journey-contract',
               'semantic-invariant',
               'verification-policy',
+              'executable-sources',
+              'dependency-lock',
+              'runner-sources',
             ],
           },
         ],
@@ -57,9 +63,13 @@ test('smoke scope derives exact journey requirements from the Tool Journey modul
             invariantId: 'url-stream-exact-output',
             revisionKeys: [
               'fixture-contract',
+              'fixture-content',
               'journey-contract',
               'semantic-invariant',
               'verification-policy',
+              'executable-sources',
+              'dependency-lock',
+              'runner-sources',
             ],
           },
         ],
@@ -74,9 +84,13 @@ test('smoke scope derives exact journey requirements from the Tool Journey modul
             invariantId: 'table-row-header-value-semantics',
             revisionKeys: [
               'fixture-contract',
+              'fixture-content',
               'journey-contract',
               'semantic-invariant',
               'verification-policy',
+              'executable-sources',
+              'dependency-lock',
+              'runner-sources',
             ],
           },
         ],
@@ -185,6 +199,57 @@ test('browser result evidence records each journey outcome instead of promoting 
     (journey) => journey.journeyId === 'audio-to-text:extractor-url',
   );
   assert.equal(extractor.fixture.kind, 'literal');
+});
+
+test('a later Tool warning cannot rewrite an already passed journey', () => {
+  assert.deepEqual(
+    finalizeJourneyResults({
+      plannedJourneys: [
+        { journeyId: 'one', fixtureSha256: 'a'.repeat(64) },
+        { journeyId: 'two', fixtureSha256: 'b'.repeat(64) },
+      ],
+      outcomes: [['one', { outcome: 'passed', reasonCode: null }]],
+      activeJourneyId: null,
+      status: 'warn',
+    }).map(({ journeyId, outcome, reasonCode }) => ({
+      journeyId,
+      outcome,
+      reasonCode,
+    })),
+    [
+      { journeyId: 'one', outcome: 'passed', reasonCode: null },
+      {
+        journeyId: 'two',
+        outcome: 'skipped',
+        reasonCode: 'browser-check-skipped',
+      },
+    ],
+  );
+});
+
+test('browser evidence revision must match the actual clean checkout', () => {
+  assert.doesNotThrow(() =>
+    validateBrowserEvidenceRevision(
+      { revision: 'a'.repeat(40), dirty: false },
+      { revision: 'a'.repeat(40), dirty: false },
+    ),
+  );
+  assert.throws(
+    () =>
+      validateBrowserEvidenceRevision(
+        { revision: 'a'.repeat(40), dirty: false },
+        { revision: 'b'.repeat(40), dirty: false },
+      ),
+    /checked-out Git HEAD/,
+  );
+  assert.throws(
+    () =>
+      validateBrowserEvidenceRevision(
+        { revision: 'a'.repeat(40), dirty: false },
+        { revision: 'a'.repeat(40), dirty: true },
+      ),
+    /checkout is dirty/,
+  );
 });
 
 test('benchmark evidence retains sanitized navigation aggregates', () => {

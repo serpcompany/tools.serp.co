@@ -114,6 +114,7 @@ const [
   { getGenericToolContract },
   { getTableOperationPolicy },
   { retainedToolVerificationEvidence },
+  { toolJourneys },
 ] = await Promise.all([
   import('../packages/app-core/src/lib/tool-catalog-adapter.mjs'),
   import('../apps/tools/lib/tool-execution-provenance.ts'),
@@ -122,6 +123,7 @@ const [
   import('../apps/tools/lib/generic-tool-workflow.ts'),
   import('../apps/tools/lib/table-operation-policy.ts'),
   import('../apps/tools/lib/tool-verification-evidence.ts'),
+  import('../apps/tools/lib/tool-journeys.ts'),
 ]);
 
 const fixtureRoot = path.join(repositoryRoot, 'apps/tools/benchmarks');
@@ -352,7 +354,7 @@ const payload = {
   },
   verificationEvidence: {
     grain: 'Tool Journey',
-    journeyCount: 3_115,
+    journeyCount: toolJourneys.all.length,
     states: retainedToolVerificationEvidence.summary,
     warning:
       'Only the verified state is a current Verified Journey. Processor Support and runtime observations remain separate.',

@@ -17,7 +17,11 @@ const currentInputRevisions = Object.freeze({
   'journey-contract': `sha256:${'1'.repeat(64)}`,
   'semantic-invariant': `sha256:${'2'.repeat(64)}`,
   'fixture-contract': `sha256:${'3'.repeat(64)}`,
+  'fixture-content': `sha256:${'b'.repeat(64)}`,
   'verification-policy': `sha256:${'4'.repeat(64)}`,
+  'executable-sources': `sha256:${'5'.repeat(64)}`,
+  'dependency-lock': `sha256:${'6'.repeat(64)}`,
+  'runner-sources': `sha256:${'7'.repeat(64)}`,
 });
 
 function record(
@@ -104,6 +108,13 @@ test('warning, skip, semantic failure, and incomplete checks never become verifi
       }),
       state: 'incomplete',
     },
+    {
+      value: record({
+        evidenceId: 'warning-on-pass',
+        warningCodes: ['other-console-warning'],
+      }),
+      state: 'warned',
+    },
   ] as const;
 
   for (const item of cases) {
@@ -142,6 +153,16 @@ test('dirty, stale, mismatched, duplicate, or missing proof fails closed', () =>
     'invalid',
   );
   assert.equal(
+    build([
+      record({
+        outcome: 'skipped',
+        reasonCode: 'fixture-missing',
+        fixture: null,
+      }),
+    ]).getForJourney(journey.id).state,
+    'skipped',
+  );
+  assert.equal(
     build([record({ invariantId: null })]).getForJourney(journey.id).state,
     'invalid',
   );
@@ -167,9 +188,13 @@ test('currentness revisions are source-derived from the exact journey and verifi
 
   assert.deepEqual(Object.keys(inputs), [
     'fixture-contract',
+    'fixture-content',
     'journey-contract',
     'semantic-invariant',
     'verification-policy',
+    'executable-sources',
+    'dependency-lock',
+    'runner-sources',
   ]);
   assert.ok(
     Object.values(inputs).every((value) => /^sha256:[a-f0-9]{64}$/.test(value)),
@@ -236,5 +261,6 @@ test('a structured browser manifest expands into exact source-derived journey re
     ...record(),
     evidenceId: records[0]?.evidenceId,
     checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+    warningCodes: [],
   });
 });

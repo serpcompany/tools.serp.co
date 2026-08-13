@@ -80,6 +80,55 @@ export function attachJourneyResultEvidence(tools, results) {
   });
 }
 
+export function finalizeJourneyResults({
+  plannedJourneys,
+  outcomes,
+  activeJourneyId,
+  status,
+}) {
+  const outcomeById = new Map(outcomes);
+  return plannedJourneys.map((journey) => {
+    const exact = outcomeById.get(journey.journeyId);
+    if (exact) {
+      return {
+        journeyId: journey.journeyId,
+        ...exact,
+        fixtureSha256: journey.fixtureSha256,
+      };
+    }
+    if (activeJourneyId === journey.journeyId) {
+      return {
+        journeyId: journey.journeyId,
+        outcome: 'failed',
+        reasonCode: 'browser-check-failed',
+        fixtureSha256: journey.fixtureSha256,
+      };
+    }
+    return {
+      journeyId: journey.journeyId,
+      outcome: 'skipped',
+      reasonCode:
+        status === 'warn'
+          ? 'browser-check-skipped'
+          : 'not-executed-after-failure',
+      fixtureSha256: journey.fixtureSha256,
+    };
+  });
+}
+
+export function validateBrowserEvidenceRevision(requested, actual) {
+  if (requested.revision !== actual.revision) {
+    throw new Error('--revision must equal the checked-out Git HEAD');
+  }
+  if (requested.dirty !== actual.dirty) {
+    throw new Error(
+      actual.dirty
+        ? 'The checkout is dirty; pass --dirty only for local non-promotable evidence'
+        : '--dirty cannot describe a clean checkout',
+    );
+  }
+}
+
 export function summarizeNavigationTimings(values) {
   const timings = values
     .filter((value) => Number.isSafeInteger(value) && value >= 0)

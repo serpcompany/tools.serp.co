@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 
 import { toolJourneys } from '../../apps/tools/lib/tool-journeys.ts';
@@ -8,7 +9,25 @@ import {
   ingestToolVerificationRun,
 } from '../../apps/tools/lib/tool-verification-evidence.ts';
 
-export function promoteToolVerificationRun({ repositoryRoot, runId }) {
+function repositoryGitState(repositoryRoot) {
+  return {
+    revision: execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+    }).trim(),
+    dirty:
+      execFileSync('git', ['status', '--porcelain', '--untracked-files=all'], {
+        cwd: repositoryRoot,
+        encoding: 'utf8',
+      }).trim() !== '',
+  };
+}
+
+export function promoteToolVerificationRun({
+  repositoryRoot,
+  runId,
+  gitState = repositoryGitState(repositoryRoot),
+}) {
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(runId)) {
     throw new TypeError('Run id is invalid.');
   }
@@ -33,8 +52,25 @@ export function promoteToolVerificationRun({ repositoryRoot, runId }) {
   if (manifest.command?.name !== 'smoke:tools:browser') {
     throw new TypeError('Only Tool browser smoke evidence can be promoted.');
   }
+  if (
+    !/^[A-Za-z0-9._-]+$/.test(String(manifest.command.version)) ||
+    !/^[a-z0-9][a-z0-9._-]*$/.test(manifest.scope?.label ?? '') ||
+    !(manifest.scope?.inputHashes ?? []).every((value) =>
+      /^sha256:[a-f0-9]{64}$/.test(value),
+    ) ||
+    !new Set(['success', 'failure']).has(manifest.result?.status) ||
+    !Number.isFinite(Date.parse(manifest.timestamps?.startedAt)) ||
+    !Number.isFinite(Date.parse(manifest.timestamps?.completedAt))
+  ) {
+    throw new TypeError('Browser evidence contains invalid retained metadata.');
+  }
   if (manifest.revision?.dirty !== false) {
     throw new TypeError('Dirty browser evidence cannot be promoted.');
+  }
+  if (gitState.dirty || gitState.revision !== manifest.revision.commit) {
+    throw new TypeError(
+      'Promotion requires a clean checkout at the exact evidence revision.',
+    );
   }
   const records = ingestToolVerificationRun(manifest);
   buildToolVerificationEvidenceIndex({
@@ -50,18 +86,47 @@ export function promoteToolVerificationRun({ repositoryRoot, runId }) {
     throw new TypeError(`Run ${runId} is already retained.`);
   }
   const sanitized = {
-    schemaVersion: manifest.schemaVersion,
+    schemaVersion: 2,
     runId: manifest.runId,
-    command: manifest.command,
-    revision: manifest.revision,
-    timestamps: manifest.timestamps,
+    command: {
+      name: 'smoke:tools:browser',
+      version: String(manifest.command.version),
+    },
+    revision: { commit: manifest.revision.commit, dirty: false },
+    timestamps: {
+      startedAt: manifest.timestamps.startedAt,
+      completedAt: manifest.timestamps.completedAt,
+    },
     environment: manifest.environment,
     scope: {
       label: manifest.scope.label,
-      inputHashes: manifest.scope.inputHashes ?? [],
-      tools: manifest.scope.tools ?? [],
+      inputHashes: (manifest.scope.inputHashes ?? []).map(String),
+      tools: (manifest.scope.tools ?? []).map((tool) => ({
+        toolId: tool.toolId,
+        journeys: tool.journeys.map((journey) => ({
+          journeyId: journey.journeyId,
+          outcome: journey.outcome,
+          reasonCode: journey.reasonCode,
+          fixture: journey.fixture
+            ? {
+                kind: journey.fixture.kind,
+                reference: journey.fixture.reference,
+                sha256: journey.fixture.sha256,
+              }
+            : null,
+          invariantId: journey.invariantId,
+          checks: [...journey.checks],
+          inputRevisions: Object.fromEntries(
+            Object.entries(journey.inputRevisions).map(([key, value]) => [
+              key,
+              value,
+            ]),
+          ),
+        })),
+        ...(tool.warnings?.length ? { warnings: [...tool.warnings] } : {}),
+      })),
     },
-    result: manifest.result,
+    result: { status: manifest.result.status },
   };
   const updated = [...retained, sanitized].sort((left, right) =>
     left.timestamps.completedAt.localeCompare(right.timestamps.completedAt),
