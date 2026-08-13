@@ -91,5 +91,7 @@ test('production build avoids implicit build-time network activity', () => {
 
 test('pre-push uses the canonical deterministic check', () => {
   assert.match(prePushHook, /pnpm check/);
+  assert.match(prePushHook, /git rev-parse --local-env-vars/);
+  assert.match(prePushHook, /unset "\$git_variable"/);
   assert.doesNotMatch(prePushHook, /lint:tools|lint:links/);
 });

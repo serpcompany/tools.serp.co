@@ -1,5 +1,9 @@
 #!/bin/sh
 set -e
 
+for git_variable in $(git rev-parse --local-env-vars); do
+  unset "$git_variable"
+done
+
 echo "Running canonical repository check..."
 pnpm check
