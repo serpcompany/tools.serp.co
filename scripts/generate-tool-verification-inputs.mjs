@@ -76,16 +76,22 @@ function fixtureDigest(journey) {
 
 export function buildToolVerificationInputs() {
   const executableFiles = trackedFiles([
+    'apps/tools/app',
     'apps/tools/lib',
     'apps/tools/components',
     'apps/tools/workers',
+    'apps/tools/public',
     'packages/app-core/src',
+    'packages/tool-telemetry/src',
+    'packages/ui/src',
   ]);
   const runnerFiles = trackedFiles([
     'scripts/run-browser-check.mjs',
     'scripts/run-artifacts.mjs',
     'scripts/lib/browser-evidence.mjs',
+    'scripts/lib/generic-smoke-capabilities.mjs',
     'scripts/lib/run-evidence.mjs',
+    'scripts/lib/transcription-browser-state.mjs',
   ]);
   return {
     schemaVersion: 1,

@@ -1001,6 +1001,7 @@ try {
         result.journeyOutcomes.set('audio-to-text:extractor-url', {
           outcome: 'passed',
           reasonCode: null,
+          checks: ['valid-fixture', 'semantic-output', 'required-environment'],
         });
         result.activeJourneyId = 'audio-to-text:upload';
         await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
@@ -1046,6 +1047,7 @@ try {
       result.journeyOutcomes.set(result.activeJourneyId, {
         outcome: 'passed',
         reasonCode: null,
+        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
       });
       result.activeJourneyId = null;
       return {
@@ -1169,6 +1171,7 @@ try {
             result.journeyOutcomes.set(journey.journeyId, {
               outcome: 'warned',
               reasonCode: 'browser-check-warning',
+              checks: [],
             });
           }
         }
@@ -1185,6 +1188,7 @@ try {
             result.journeyOutcomes.set(journey.journeyId, {
               outcome: 'passed',
               reasonCode: null,
+              checks: ['valid-fixture', 'required-environment'],
             });
           }
         }

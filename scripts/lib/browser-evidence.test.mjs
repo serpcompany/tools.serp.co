@@ -162,6 +162,7 @@ test('browser result evidence records each journey outcome instead of promoting 
           outcome: 'passed',
           reasonCode: null,
           fixtureSha256: 'a'.repeat(64),
+          checks: ['valid-fixture', 'required-environment'],
         },
         {
           journeyId: 'audio-to-text:extractor-url',
@@ -185,7 +186,7 @@ test('browser result evidence records each journey outcome instead of promoting 
         journeyId: 'audio-to-text:upload',
         outcome: 'passed',
         reasonCode: null,
-        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+        checks: ['valid-fixture', 'required-environment'],
       },
       {
         journeyId: 'audio-to-text:extractor-url',
@@ -208,7 +209,16 @@ test('a later Tool warning cannot rewrite an already passed journey', () => {
         { journeyId: 'one', fixtureSha256: 'a'.repeat(64) },
         { journeyId: 'two', fixtureSha256: 'b'.repeat(64) },
       ],
-      outcomes: [['one', { outcome: 'passed', reasonCode: null }]],
+      outcomes: [
+        [
+          'one',
+          {
+            outcome: 'passed',
+            reasonCode: null,
+            checks: ['valid-fixture'],
+          },
+        ],
+      ],
       activeJourneyId: null,
       status: 'warn',
     }).map(({ journeyId, outcome, reasonCode }) => ({

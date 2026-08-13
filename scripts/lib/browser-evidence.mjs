@@ -71,7 +71,7 @@ export function attachJourneyResultEvidence(tools, results) {
           invariantId: journey.invariantId,
           checks:
             journeyResult.outcome === 'passed'
-              ? ['valid-fixture', 'semantic-output', 'required-environment']
+              ? [...(journeyResult.checks ?? [])]
               : [],
           inputRevisions: journey.inputRevisions,
         };
