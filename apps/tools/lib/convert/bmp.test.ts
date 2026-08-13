@@ -123,7 +123,7 @@ test('the approved BMP wave is exactly five IDs with a stable membership hash', 
   }
 });
 
-test('the accepted processor projection includes BMP, WebM, and HEIF waves', () => {
+test('the accepted processor projection excludes the security-blocked HEIF wave', () => {
   const summary = summarizeToolAcceptance(
     toolCatalog.activeTools.map((tool) => ({
       id: tool.id,
@@ -134,8 +134,8 @@ test('the accepted processor projection includes BMP, WebM, and HEIF waves', () 
     })),
   );
   assert.deepEqual(summary.counts, {
-    supported: 440,
-    unsupported: 2_364,
+    supported: 436,
+    unsupported: 2_368,
     unwired: 0,
     unknown: 3,
   });

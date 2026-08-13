@@ -35,7 +35,9 @@ import {
   HEIF_CONVERSION_TOOL_IDS,
   HEIF_CONVERSION_TOOL_IDS_SHA256,
   HEIF_ENGINE_CONTRACT,
+  HEIF_INPUT_REGISTRATION,
 } from './convert/heif-contract.ts';
+import { createToolWorkflowTestHarness } from './tool-workflow/testing.ts';
 
 const fixture = (name: string) =>
   new Uint8Array(
@@ -172,7 +174,7 @@ test('the browser WebM family adds MP4 to WebM through the existing exact contra
   }
 });
 
-test('the approved HEIF wave is exactly four browser-only conversions', async () => {
+test('the reviewed HEIF wave remains exact and security-blocked', async () => {
   const { createHash } = await import('node:crypto');
   assert.deepEqual(HEIF_CONVERSION_TOOL_IDS, [
     'heif-to-jpg',
@@ -193,13 +195,10 @@ test('the approved HEIF wave is exactly four browser-only conversions', async ()
     execution: 'browser-only',
     fallback: 'fail-closed',
   });
+  assert.equal(HEIF_INPUT_REGISTRATION.state, 'blocked');
+  assert.match(HEIF_INPUT_REGISTRATION.reason, /memory-safety advisories/);
   for (const toolId of HEIF_CONVERSION_TOOL_IDS) {
-    assert.equal(getGenericToolContract(toolId).state, 'supported', toolId);
-    assert.deepEqual(getToolProcessorAvailability(toolId), {
-      kind: 'wired',
-      toolId,
-      adapterId: 'generic-conversion',
-    });
+    assert.equal(getGenericToolContract(toolId).state, 'unsupported', toolId);
   }
   for (const toolId of ['heif-to-gif', 'heif-to-svg', 'heif-to-tiff']) {
     assert.equal(getGenericToolContract(toolId).state, 'unsupported', toolId);
@@ -282,8 +281,7 @@ test('contract inventory independently audits real dispatches with semantic cove
           'bmp-to-png',
           'bmp-to-webp',
         ].includes(tool.id)) &&
-      (tool.from !== 'heif' ||
-        HEIF_CONVERSION_TOOL_IDS.includes(tool.id as never));
+      tool.from !== 'heif';
     assert.equal(
       getGenericToolContract(tool.id).state === 'supported',
       expectedSupported,
@@ -883,7 +881,7 @@ test('browser image decoder cancellation rejects promptly and closes the decoder
   assert.equal(closed, true);
 });
 
-test('main-thread HEIC conversion propagates cancellation to libheif', async () => {
+test('main-thread HEIF conversion propagates cancellation to libheif and frees native handles', async () => {
   const originalImageData = globalThis.ImageData;
   const heifGlobal = globalThis as typeof globalThis & {
     HeifContext?: new () => unknown;
@@ -923,9 +921,9 @@ test('main-thread HEIC conversion propagates cancellation to libheif', async () 
     await assert.rejects(
       convertWithWorker({
         worker,
-        from: 'heic',
+        from: 'heif',
         to: 'jpg',
-        buf: fixture('sample.heic').slice().buffer,
+        buf: fixture('sample.heif').slice().buffer,
         signal: controller.signal,
       }),
       (error: unknown) =>
@@ -1278,7 +1276,7 @@ test('file preflight rejects oversized input without reading it', async () => {
   assert.equal(reads, 0);
 });
 
-test('file acquisition cancellation returns promptly and cancels its reader', async () => {
+test('file acquisition cancellation stays cancelled after its reader closes', async () => {
   const controller = new AbortController();
   let cancelled = false;
   const file = {
@@ -1305,12 +1303,84 @@ test('file acquisition cancellation returns promptly and cancels its reader', as
     signal: controller.signal,
   });
 
-  assert.equal(outcome.status, 'cancelled');
+  assert.equal(outcome.status, 'cancelled', JSON.stringify(outcome));
   assert.ok(
     performance.now() - started < 150,
     'cancellation waited for the delayed read',
   );
   assert.equal(cancelled, true);
+});
+
+test('HEIF workflow cancellation releases phase resources and suppresses late delivery', async () => {
+  for (const cancelledPhase of [
+    'acquiring',
+    'processing',
+    'validating',
+    'delivering',
+  ] as const) {
+    const harness = createToolWorkflowTestHarness({
+      resources: {
+        acquiring: ['reader'],
+        processing: ['worker'],
+        validating: ['subscription'],
+        delivering: ['object-url'],
+      },
+      processors: {
+        'heif-to-png': {
+          support: {
+            acquisition: 'file',
+            inputFormats: ['heif'],
+            outputFormats: ['png'],
+          },
+          validators: {
+            input: () => ({ status: 'verified' }),
+            output: () => ({ status: 'verified' }),
+          },
+          result: {
+            name: 'sample.png',
+            format: 'png',
+            mimeType: 'image/png',
+            bytes: fixture('sample.png'),
+          },
+        },
+      },
+    });
+    const controller = new AbortController();
+    const outcome = await harness.workflow.run(
+      {
+        toolId: 'heif-to-png',
+        input: {
+          kind: 'file',
+          media: {
+            name: 'sample.heif',
+            format: 'heif',
+            mimeType: 'image/heif',
+            bytes: fixture('sample.heif'),
+          },
+        },
+      },
+      {
+        signal: controller.signal,
+        observe(snapshot) {
+          if (snapshot.phase === cancelledPhase) {
+            controller.abort(`cancel HEIF ${cancelledPhase}`);
+          }
+        },
+      },
+    );
+    assert.equal(
+      outcome.status,
+      'cancelled',
+      `${cancelledPhase}: ${JSON.stringify(outcome)}`,
+    );
+    assert.deepEqual(harness.activeResources, [], cancelledPhase);
+    assert.deepEqual(
+      harness.openedResources,
+      [...harness.releasedResources].reverse(),
+      cancelledPhase,
+    );
+    assert.equal(harness.events.includes('delivery'), false, cancelledPhase);
+  }
 });
 
 test('TIFF picker accepts both conventional extensions', () => {

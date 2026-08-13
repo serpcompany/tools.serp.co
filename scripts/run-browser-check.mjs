@@ -715,16 +715,25 @@ try {
     return checks;
   }
 
-  function runHeifNegativePathProbe() {
-    const output = execFileSync(
-      process.execPath,
-      [
-        '--experimental-strip-types',
-        path.join(repositoryRoot, 'apps/tools/lib/heif-negative-path-probe.ts'),
-      ],
-      { cwd: repositoryRoot, encoding: 'utf8' },
+  let heifNegativePathProof;
+  function runHeifNegativePathProbe(toolId) {
+    if (!heifNegativePathProof) {
+      const output = execFileSync(
+        process.execPath,
+        [
+          '--experimental-strip-types',
+          path.join(
+            repositoryRoot,
+            'apps/tools/lib/heif-negative-path-probe.ts',
+          ),
+        ],
+        { cwd: repositoryRoot, encoding: 'utf8' },
+      );
+      heifNegativePathProof = JSON.parse(output);
+    }
+    const result = heifNegativePathProof.journeys?.find(
+      (journey) => journey.journeyId === `${toolId}:upload`,
     );
-    const result = JSON.parse(output);
     const checks = [
       'malformed-input',
       'spoofed-input',
@@ -733,12 +742,14 @@ try {
       'cancellation-lifecycle',
     ];
     if (
-      result?.journeyId !== 'heif-to-png:upload' ||
       JSON.stringify(result?.checks) !== JSON.stringify(checks) ||
       result?.observed?.deliveries !== 0 ||
-      result?.observed?.cleanupCalls !== 1
+      result?.observed?.cleanupCalls !== 1 ||
+      result?.observed?.cancelledRuns !== 1
     ) {
-      throw new Error('HEIF negative-path probe did not prove exact checks.');
+      throw new Error(
+        `HEIF ${toolId} negative-path probe did not prove exact checks.`,
+      );
     }
     return checks;
   }
@@ -1622,7 +1633,7 @@ try {
           checks: [
             'valid-fixture',
             'semantic-output',
-            ...runHeifNegativePathProbe(),
+            ...runHeifNegativePathProbe(tool.id),
             'required-environment',
           ],
         };

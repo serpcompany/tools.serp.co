@@ -12,7 +12,7 @@ test('expansion plan groups every explicitly unsupported Tool exactly once from 
     .map((row) => row.toolId)
     .sort();
 
-  assert.equal(plan.unsupportedToolCount, 2_364);
+  assert.equal(plan.unsupportedToolCount, 2_368);
   assert.deepEqual(
     plan.groups.flatMap((group) => group.toolIds).sort(),
     unsupportedToolIds,
@@ -25,17 +25,15 @@ test('expansion plan groups every explicitly unsupported Tool exactly once from 
   const first = plan.groups[0];
   assert.ok(first);
   assert.equal(first.rank, 1);
-  assert.equal(first.operationFamily, 'generic-convert:browser-raster');
-  assert.equal(first.browserFeasibility, 'new-browser-wasm-library');
-  assert.equal(first.unlockCount, 568);
-  assert.ok(first.toolIds.includes('avif-to-png'));
-  assert.ok(
-    !first.toolIds.some((toolId) =>
-      ['heif-to-jpg', 'heif-to-pdf', 'heif-to-png', 'heif-to-webp'].includes(
-        toolId,
-      ),
-    ),
-  );
+  assert.equal(first.operationFamily, 'wave:heif-browser-libheif');
+  assert.equal(first.browserFeasibility, 'existing-browser-code');
+  assert.equal(first.unlockCount, 4);
+  assert.deepEqual(first.toolIds, [
+    'heif-to-jpg',
+    'heif-to-pdf',
+    'heif-to-png',
+    'heif-to-webp',
+  ]);
   assert.deepEqual(
     first.candidateEngines.map((engine) => engine.id),
     ['browser-raster-worker'],
@@ -74,7 +72,7 @@ test('candidate ranking exposes facts, assumptions, and every required review in
       ['maintenance-review', 'needs-review'],
     ],
   );
-  assert.match(first.facts[0]?.statement ?? '', /568 exact Tool IDs/);
+  assert.match(first.facts[0]?.statement ?? '', /4 exact Tool IDs/);
   assert.equal(first.facts[0]?.source, 'Tool Factory support read model');
   assert.ok(first.assumptions.every((assumption) => assumption.length > 0));
   assert.ok(
@@ -93,6 +91,7 @@ test('portfolio groups expose client-first decision categories without treating 
   );
   assert.deepEqual([...classifications].sort(), [
     'catalog-review',
+    'existing-browser-code',
     'new-browser-wasm-library',
     'server-alternative-research',
     'unresolved',
@@ -112,7 +111,7 @@ test('portfolio groups expose client-first decision categories without treating 
 
   assert.equal(
     plan.groups.reduce((sum, group) => sum + group.unlockCount, 0),
-    2_364,
+    2_368,
   );
 });
 

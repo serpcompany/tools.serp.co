@@ -18,9 +18,9 @@ test('report is deterministic, indexed, and keeps evidence scope and planning ca
   assert.match(first, /2,807 active Tool ids/);
   assert.match(
     first,
-    /440 supported \| 2,364 unsupported \| 0 unwired \| 3 unknown/,
+    /436 supported \| 2,368 unsupported \| 0 unwired \| 3 unknown/,
   );
-  assert.match(first, /Conversion gaps \| 2,345/);
+  assert.match(first, /Conversion gaps \| 2,349/);
   assert.match(first, /Compression gaps \| 19/);
   assert.match(first, /JSON pointer/);
   assert.match(first, /browser-raster-exact-capability.*29/s);

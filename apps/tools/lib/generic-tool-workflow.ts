@@ -531,6 +531,9 @@ function processorFor(
 
 export function createGenericToolWorkflow(
   adapters: GenericWorkflowAdapters,
+  resolveContract: (
+    toolId: string,
+  ) => GenericToolContract = getGenericToolContract,
 ): ToolWorkflow {
   let nextSequence = 0;
   return createToolWorkflow({
@@ -549,7 +552,7 @@ export function createGenericToolWorkflow(
       },
     },
     resolveIntent(toolId) {
-      const contract = getGenericToolContract(toolId);
+      const contract = resolveContract(toolId);
       return contract.state === 'supported'
         ? {
             requestedOperation: contract.operation,
@@ -558,7 +561,7 @@ export function createGenericToolWorkflow(
         : undefined;
     },
     resolveProcessor(toolId) {
-      const contract = getGenericToolContract(toolId);
+      const contract = resolveContract(toolId);
       return contract.state === 'supported'
         ? processorFor(contract, adapters)
         : undefined;
@@ -854,6 +857,7 @@ export async function runGenericToolFile(
   let bytes: Uint8Array;
   try {
     bytes = await readFileWithSignal(file, options?.signal);
+    options?.signal?.throwIfAborted();
   } catch (error) {
     if (options?.signal?.aborted || isAbortError(error)) {
       return cancelledFileOutcome();

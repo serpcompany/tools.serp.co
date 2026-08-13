@@ -1,4 +1,4 @@
-import sharp from "sharp";
+import sharp from 'sharp';
 
 import {
   createToolWorkflow,
@@ -10,35 +10,40 @@ import {
   type RuntimeResourceKind,
   type WorkflowMedia,
   type ToolExecutionIntent,
-} from "./index.ts";
+} from './index.ts';
 import {
   executionProvenance,
   getToolExecutionProvenance,
-} from "../tool-execution-provenance.ts";
-import { verifyMediaSemantics as verifyMedia } from "./semantic-validators.ts";
+} from '../tool-execution-provenance.ts';
+import { verifyMediaSemantics as verifyMedia } from './semantic-validators.ts';
 
 const testSemanticDecoderAdapters = Object.freeze({
   async decodeJpeg(bytes: Uint8Array) {
     const image = sharp(bytes);
     const metadata = await image.metadata();
-    if (metadata.format !== "jpeg") {
-      throw new Error("Sharp did not identify a JPEG image");
+    if (metadata.format !== 'jpeg') {
+      throw new Error('Sharp did not identify a JPEG image');
     }
     const { data, info } = await image
       .ensureAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
-    return { data, format: "jpeg" as const, width: info.width, height: info.height };
+    return {
+      data,
+      format: 'jpeg' as const,
+      width: info.width,
+      height: info.height,
+    };
   },
 });
 
-type ProcessorEngine = ToolProcessor["engine"];
+type ProcessorEngine = ToolProcessor['engine'];
 
 type ProcessorScript = {
   engineId?: string;
   intent?: ToolExecutionIntent;
   support: {
-    acquisition: "file" | "url";
+    acquisition: 'file' | 'url';
     inputFormats: string[];
     outputFormats: string[];
     resourceLimits?: {
@@ -57,7 +62,7 @@ type ProcessorScript = {
   decideSupport?(
     request: ProcessorSupportRequest<unknown>,
   ): ProcessorSupportDecision;
-  process?: ToolProcessor["process"];
+  process?: ToolProcessor['process'];
   validators?: {
     input?(
       media: WorkflowMedia,
@@ -71,7 +76,7 @@ type ProcessorScript = {
   result: WorkflowMedia | WorkflowMedia[];
 };
 
-type TypedProcessorScript<Options> = Omit<ProcessorScript, "parseOptions"> & {
+type TypedProcessorScript<Options> = Omit<ProcessorScript, 'parseOptions'> & {
   parseOptions(value: unknown): ProcessorOptions<Options>;
 };
 
@@ -81,7 +86,7 @@ export function defineScriptedProcessor<Options>(
   return script as unknown as ProcessorScript;
 }
 
-type UrlFixture = Omit<WorkflowMedia, "bytes"> & {
+type UrlFixture = Omit<WorkflowMedia, 'bytes'> & {
   chunks: Uint8Array[];
   totalBytes?: number | null;
   stallAfterChunks?: number;
@@ -95,19 +100,20 @@ type StreamRecord = {
 };
 
 const mimeTypes: Record<string, string> = {
-  avif: "image/avif",
-  csv: "text/csv",
-  jpg: "image/jpeg",
-  mp4: "video/mp4",
-  png: "image/png",
-  txt: "text/plain",
+  avif: 'image/avif',
+  csv: 'text/csv',
+  heif: 'image/heif',
+  jpg: 'image/jpeg',
+  mp4: 'video/mp4',
+  png: 'image/png',
+  txt: 'text/plain',
 };
 export function createToolWorkflowTestHarness(options: {
-  semanticDecoders?: "production" | "sharp";
+  semanticDecoders?: 'production' | 'sharp';
   media?: { urls?: Record<string, UrlFixture> };
   resources?: Partial<
     Record<
-      "acquiring" | "processing" | "validating" | "delivering",
+      'acquiring' | 'processing' | 'validating' | 'delivering',
       RuntimeResourceKind[]
     >
   >;
@@ -121,11 +127,11 @@ export function createToolWorkflowTestHarness(options: {
   const openedResources: RuntimeResourceKind[] = [];
   const releasedResources: RuntimeResourceKind[] = [];
   const telemetryRecords: Array<
-    | { kind: "start"; runId: string; at: number }
+    | { kind: 'start'; runId: string; at: number }
     | {
-        kind: "terminal";
+        kind: 'terminal';
         runId: string;
-        status: "succeeded" | "failed" | "cancelled";
+        status: 'succeeded' | 'failed' | 'cancelled';
         at: number;
       }
   > = [];
@@ -138,7 +144,7 @@ export function createToolWorkflowTestHarness(options: {
   const processorRecords: Array<{
     toolId: string;
     engine: ProcessorEngine;
-    support: ToolProcessor["support"];
+    support: ToolProcessor['support'];
     options: unknown;
   }> = [];
   let runId = 0;
@@ -159,7 +165,7 @@ export function createToolWorkflowTestHarness(options: {
           mimeType:
             mimeTypes[format] ??
             results.find((result) => result.format === format)?.mimeType ??
-            "application/octet-stream",
+            'application/octet-stream',
         })),
         resourceLimits: script.support.resourceLimits ?? {
           maxInputBytes: Number.MAX_SAFE_INTEGER,
@@ -172,13 +178,13 @@ export function createToolWorkflowTestHarness(options: {
         },
       } as const;
       const intent = script.intent ?? {
-        requestedOperation: "process",
+        requestedOperation: 'process',
         outputs: support.outputs,
       };
       const provenance = getToolExecutionProvenance(toolId);
       const engineId =
         script.engineId ??
-        (provenance.kind === "mapped" ? provenance.engineIds[0] : undefined);
+        (provenance.kind === 'mapped' ? provenance.engineIds[0] : undefined);
       const engine = engineId
         ? executionProvenance.getEngine(engineId)
         : undefined;
@@ -205,7 +211,7 @@ export function createToolWorkflowTestHarness(options: {
               (await script.validators?.input?.(input, processorOptions)) ??
               verifyMedia(
                 input,
-                options.semanticDecoders === "production"
+                options.semanticDecoders === 'production'
                   ? undefined
                   : testSemanticDecoderAdapters,
                 {
@@ -275,7 +281,7 @@ export function createToolWorkflowTestHarness(options: {
               (await script.validators?.output?.(result, processorOptions)) ??
               verifyMedia(
                 result,
-                options.semanticDecoders === "production"
+                options.semanticDecoders === 'production'
                   ? undefined
                   : testSemanticDecoderAdapters,
                 {
@@ -355,12 +361,12 @@ export function createToolWorkflowTestHarness(options: {
             if (context.signal.aborted) {
               cancelReader();
             } else {
-              context.signal.addEventListener("abort", cancelReader, {
+              context.signal.addEventListener('abort', cancelReader, {
                 once: true,
               });
             }
             await context.registerCleanup(async () => {
-              context.signal.removeEventListener("abort", cancelReader);
+              context.signal.removeEventListener('abort', cancelReader);
               if (!complete) {
                 await reader.cancel();
               }
@@ -380,7 +386,7 @@ export function createToolWorkflowTestHarness(options: {
                 bytesRead + next.value.byteLength >
                 context.budgets.maxInputBytes
               ) {
-                await reader.cancel("Input byte budget exceeded");
+                await reader.cancel('Input byte budget exceeded');
                 throw new Error(
                   `Input exceeds ${context.budgets.maxInputBytes} bytes`,
                 );
@@ -420,27 +426,27 @@ export function createToolWorkflowTestHarness(options: {
           await context.openResource(resource);
         }
         context.signal.throwIfAborted();
-        events.push("delivery");
+        events.push('delivery');
         return deliveryIds.shift() ?? `delivery-${++deliveryId}`;
       },
       telemetry: {
         async start(recordRunId, _request, at) {
-          events.push("telemetry:start");
-          telemetryRecords.push({ kind: "start", runId: recordRunId, at });
+          events.push('telemetry:start');
+          telemetryRecords.push({ kind: 'start', runId: recordRunId, at });
           if (options.telemetry?.failStart) {
-            throw new Error("telemetry start unavailable");
+            throw new Error('telemetry start unavailable');
           }
         },
         async terminal(recordRunId, status, at) {
-          events.push("telemetry:terminal");
+          events.push('telemetry:terminal');
           telemetryRecords.push({
-            kind: "terminal",
+            kind: 'terminal',
             runId: recordRunId,
             status,
             at,
           });
           if (options.telemetry?.failTerminal) {
-            throw new Error("telemetry terminal unavailable");
+            throw new Error('telemetry terminal unavailable');
           }
         },
       },
@@ -465,7 +471,7 @@ export function createToolWorkflowTestHarness(options: {
         },
       },
       nextId(kind) {
-        if (kind === "run") {
+        if (kind === 'run') {
           return runIds.shift() ?? `run-${++runId}`;
         }
         return deliveryIds.shift() ?? `delivery-${++deliveryId}`;

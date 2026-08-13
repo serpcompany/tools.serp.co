@@ -58,6 +58,7 @@ reusable claim against current code, current runbooks, and linked GitHub work.
 - [Downloader Lander content-upgrade retrospective](./audits/downloader-lander-content-upgrade-retrospective.md)
 - [FFmpeg Tool benchmark — 2026-01-20](./audits/ffmpeg-tools-benchmark-2026-01-20.md)
 - [Ignored local workflow inventory — 2026-08-11](./audits/ignored-local-inventory-2026-08-11.md)
+- [HEIF browser decoder security review — 2026-08-13](./audits/heif-browser-decoder-security-review-2026-08-13.md)
 - [Tool verification and runtime-observation coverage — 2026-08-11](./audits/tool-verification-runtime-coverage-2026-08-11.md)
 - [Tool processor expansion-gap evidence — 2026-08-12](./audits/tool-processor-expansion-gap-2026-08-12.md)
 - [Retained Tool Journey verification runs](./audits/tool-verification/README.md)

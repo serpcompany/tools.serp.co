@@ -14,3 +14,7 @@ libheif.wasm SHA-256: 615bfe847f823d008d4a5bdb3e8286029f72a0f581e120115c2d6478e3
 To reproduce the distributed files, fetch the pinned npm tarball and compare
 package/libheif-wasm/libheif-bundle.js and package/libheif-wasm/libheif.wasm
 against the hashes above. Do not replace these files from an unpinned CDN URL.
+
+Security decision: the 2026-08-13 decoder review keeps HEIF input routes
+fail-closed because current upstream memory-safety advisories overlap this
+version. See docs/audits/heif-browser-decoder-security-review-2026-08-13.md.

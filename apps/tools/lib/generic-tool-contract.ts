@@ -6,7 +6,10 @@ import {
 import { resolveCompressionDispatch } from './compression-utils.ts';
 import { BMP_CONVERSION_TOOL_IDS } from './convert/bmp-contract.ts';
 import { resolveConversionCapability } from './convert/conversion-dispatch.ts';
-import { HEIF_CONVERSION_TOOL_IDS } from './convert/heif-contract.ts';
+import {
+  HEIF_CONVERSION_TOOL_IDS,
+  HEIF_INPUT_REGISTRATION,
+} from './convert/heif-contract.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
 
 const FORMAT_MIME_TYPES = Object.freeze({
@@ -103,6 +106,9 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
   }
   const from = tool.from.toLowerCase();
   const to = tool.to.toLowerCase();
+  if (from === 'heif' && HEIF_INPUT_REGISTRATION.state !== 'accepted') {
+    return undefined;
+  }
   if (from === 'bmp' && !BMP_CONVERSION_TOOL_ID_SET.has(tool.id)) {
     return undefined;
   }
