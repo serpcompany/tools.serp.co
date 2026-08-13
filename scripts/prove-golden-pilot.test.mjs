@@ -8,20 +8,9 @@ const source = readFileSync(
   'utf8',
 );
 
-test('Golden pilot command owns the fixed journey portfolio and human report', () => {
-  for (const toolId of [
-    'audio-to-text',
-    'audio-to-transcript',
-    'batch-compress-png',
-    'bmp-to-png',
-    'compress-pdf',
-    'csv-to-json',
-    'pdf-reader',
-    'png-to-webp',
-    'video-downloader',
-  ]) {
-    assert.match(source, new RegExp(`['"]${toolId}['"]`));
-  }
+test('Golden pilot command consumes the canonical portfolio and renders the human report', () => {
+  assert.match(source, /goldenToolJourneyPilot\.toolIds/);
+  assert.match(source, /goldenToolJourneyPilot\.membershipHash/);
   assert.match(source, /mp4-to-webm/);
   assert.match(source, /Golden Journey pilot/);
   assert.match(source, /continue \/ repair \/ reconsider/i);
@@ -29,6 +18,8 @@ test('Golden pilot command owns the fixed journey portfolio and human report', (
   assert.match(source, /options\.environment === 'preview'/);
   assert.match(source, /golden-pilot-currentness-proof\.ts/);
   assert.match(source, /recordRunEvidence/);
+  assert.match(source, /<h2>Before and after<\/h2>/);
+  assert.match(source, /beforeAfter:/);
 });
 
 test('Golden pilot command documents one clean-checkout invocation', () => {

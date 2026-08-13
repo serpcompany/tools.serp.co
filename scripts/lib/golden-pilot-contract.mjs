@@ -1,15 +1,8 @@
-const EXPECTED_JOURNEYS = Object.freeze([
-  'audio-to-text:extractor-url',
-  'audio-to-text:upload',
-  'audio-to-transcript:direct-url',
-  'batch-compress-png:multiple-file-upload',
-  'bmp-to-png:upload',
-  'compress-pdf:upload',
-  'csv-to-json:upload',
-  'pdf-reader:upload',
-  'png-to-webp:upload',
-  'video-downloader:direct-url',
-]);
+import { goldenToolJourneyPilot } from '../../apps/tools/lib/golden-tool-journey-pilot.ts';
+
+const EXPECTED_JOURNEYS = goldenToolJourneyPilot.journeys.map(
+  (journey) => journey.id,
+);
 
 export function assertGoldenBrowserManifest(manifest) {
   const journeys = manifest.scope.tools.flatMap((tool) => tool.journeys);

@@ -11,25 +11,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { recordRunEvidence } from './lib/run-evidence.mjs';
+import { goldenToolJourneyPilot } from '../apps/tools/lib/golden-tool-journey-pilot.ts';
 import {
   assertGoldenBrowserManifest,
   summarizeGoldenPilotProjection,
 } from './lib/golden-pilot-contract.mjs';
 
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url));
-const FIXED_TOOL_IDS = Object.freeze([
-  'audio-to-text',
-  'audio-to-transcript',
-  'batch-compress-png',
-  'bmp-to-png',
-  'compress-pdf',
-  'csv-to-json',
-  'pdf-reader',
-  'png-to-webp',
-  'video-downloader',
-]);
-const FIXED_MEMBERSHIP_HASH =
-  'sha256:cf077705f900e695b0310fbd090dbd366fa3c01219f93b2076f849b3396ba6ba';
+const FIXED_TOOL_IDS = goldenToolJourneyPilot.toolIds;
 const ADDITION_IMPLEMENTATION_STARTED_AT = '2026-08-13T01:10:26.000Z';
 const HELP = `Usage: pnpm proof:golden-pilot -- --environment <local|preview> --base-url <origin> --revision <full-sha>\n\nRuns the fixed Golden Journey portfolio, the MP4 to WebM same-family addition, the Tool Factory decision view, and the currentness proof from one clean checkout.\n`;
 
@@ -99,7 +88,7 @@ function renderReport(report) {
         `<tr><td>${escapeHtml(journey.journeyId)}</td><td>${escapeHtml(journey.observedResult)}</td><td>${escapeHtml(journey.evidenceResult)}</td><td>${escapeHtml(journey.whereItRuns)}</td><td>${escapeHtml(journey.checks.join(', ') || 'No checks retained')}</td><td>${escapeHtml(journey.freshness)}</td><td>${escapeHtml(journey.remainingGap)}</td><td><a href="${escapeHtml(journey.tryUrl)}">Try it</a></td></tr>`,
     )
     .join('');
-  return `<!doctype html><html><head><meta charset="utf-8"><title>Golden Journey pilot</title><style>body{font:16px system-ui;max-width:1500px;margin:40px auto;padding:0 20px;color:#172033}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccd3dd;padding:10px;text-align:left;vertical-align:top}.callout{padding:16px;border:1px solid #e0a800;background:#fff8db;border-radius:8px}code{font-size:12px}</style></head><body><h1>Golden Journey pilot</h1><p class="callout"><strong>Execution ${escapeHtml(report.package.executionStatus)}.</strong> Evidence decision: <strong>${escapeHtml(report.package.verificationDecision)}</strong> (${escapeHtml(report.package.acceptanceStatus)}). A completed proof command means the package was generated; it does not by itself mean the pilot was accepted. The maintainer records <strong>continue / repair / reconsider</strong>.</p><p>This is a fixed 10-journey decision sample. It does not claim all Tools work. The observed browser outcome and retained evidence state are separate below.</p><p>Revision <code>${escapeHtml(report.revision)}</code><br>Membership <code>${escapeHtml(report.membershipHash)}</code></p><h2>Observed journeys</h2><table><thead><tr><th>Journey</th><th>Observed result</th><th>Evidence state</th><th>Where it runs</th><th>Checks retained</th><th>Freshness</th><th>Remaining gap</th><th>Open Tool</th></tr></thead><tbody>${rows}</tbody></table><h2>Evidence currentness</h2><pre>${escapeHtml(JSON.stringify(report.currentness, null, 2))}</pre><h2>Same-family scaling check</h2><p><strong>mp4-to-webm</strong> reused the WebM processor contract, fixture, semantic validator, delivery, cancellation, and telemetry lifecycle. No lifecycle implementation was added.</p><p>Measured elapsed implementation and verification window: ${escapeHtml(report.sameFamilyAddition.elapsedMinutes)} minutes.</p><h2>Evidence files</h2><ul><li><a href="screenshots/tool-factory-golden-pilot.png">Tool Factory Golden Pilot screenshot</a></li><li><a href="screenshots/png-to-webp-success.png">Successful conversion screenshot</a></li><li><a href="screenshots/audio-to-text-youtube-unsupported.png">Honest unsupported screenshot</a></li><li><a href="screenshots/compress-pdf-unavailable.png">Server-unavailable screenshot</a></li><li><a href="outputs/png-to-webp.webp" download>PNG to WebP sample output</a></li><li><a href="outputs/mp4-to-webm.webm" download>MP4 to WebM sample output</a></li></ul></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><title>Golden Journey pilot</title><style>body{font:16px system-ui;max-width:1500px;margin:40px auto;padding:0 20px;color:#172033}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccd3dd;padding:10px;text-align:left;vertical-align:top}.callout{padding:16px;border:1px solid #e0a800;background:#fff8db;border-radius:8px}code{font-size:12px}</style></head><body><h1>Golden Journey pilot</h1><p class="callout"><strong>Execution ${escapeHtml(report.package.executionStatus)}.</strong> Evidence decision: <strong>${escapeHtml(report.package.verificationDecision)}</strong> (${escapeHtml(report.package.acceptanceStatus)}). A completed proof command means the package was generated; it does not by itself mean the pilot was accepted. The maintainer records <strong>continue / repair / reconsider</strong>.</p><p>This is a fixed 10-journey decision sample. It does not claim all Tools work. The observed browser outcome and retained evidence state are separate below.</p><p>Revision <code>${escapeHtml(report.revision)}</code><br>Membership <code>${escapeHtml(report.membershipHash)}</code></p><h2>Before and after</h2><p><strong>Before:</strong> ${escapeHtml(report.beforeAfter.before)}</p><p><strong>After:</strong> ${escapeHtml(report.beforeAfter.after)}</p><h2>Observed journeys</h2><table><thead><tr><th>Journey</th><th>Observed result</th><th>Evidence state</th><th>Where it runs</th><th>Checks retained</th><th>Freshness</th><th>Remaining gap</th><th>Open Tool</th></tr></thead><tbody>${rows}</tbody></table><h2>Evidence currentness</h2><pre>${escapeHtml(JSON.stringify(report.currentness, null, 2))}</pre><h2>Same-family scaling check</h2><p><strong>mp4-to-webm</strong> reused the WebM processor contract, fixture, semantic validator, delivery, cancellation, and telemetry lifecycle. No lifecycle implementation was added.</p><p>Measured elapsed implementation and verification window: ${escapeHtml(report.sameFamilyAddition.elapsedMinutes)} minutes.</p><h2>Evidence files</h2><ul><li><a href="screenshots/tool-factory-golden-pilot.png">Tool Factory Golden Pilot screenshot</a></li><li><a href="screenshots/png-to-webp-success.png">Successful conversion screenshot</a></li><li><a href="screenshots/audio-to-text-youtube-unsupported.png">Honest unsupported screenshot</a></li><li><a href="screenshots/compress-pdf-unavailable.png">Server-unavailable screenshot</a></li><li><a href="outputs/png-to-webp.webp" download>PNG to WebP sample output</a></li><li><a href="outputs/mp4-to-webm.webm" download>MP4 to WebM sample output</a></li></ul></body></html>`;
 }
 
 const options = parseArguments(process.argv.slice(2));
@@ -288,8 +277,14 @@ const report = {
   title: 'Golden Journey pilot',
   revision: options.revision,
   environment: options.environment,
-  membershipHash: FIXED_MEMBERSHIP_HASH,
+  membershipHash: goldenToolJourneyPilot.membershipHash,
   package: packageSummary,
+  beforeAfter: {
+    before:
+      'The Golden dashboard had nine journeys with no retained evidence and one stale journey, while behavioral browser results lived only in transient artifacts.',
+    after:
+      'Nine supported journeys have current, source-derived verified evidence; the unavailable PDF compressor remains an honest warning with no bogus delivery.',
+  },
   componentArtifacts,
   journeys,
   currentness,
