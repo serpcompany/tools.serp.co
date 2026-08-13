@@ -80,7 +80,7 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
   );
 });
 
-test('registered family policy does not become exact Tool evidence', () => {
+test('registered family policy becomes verified only with exact Tool evidence', () => {
   const row = buildToolFactoryReadModel().getByToolId('bmp-to-png');
 
   assert.ok(row);
@@ -92,14 +92,8 @@ test('registered family policy does not become exact Tool evidence', () => {
     row.verificationEvidence.map((evidence) => evidence.journeyId),
     ['bmp-to-png:upload'],
   );
-  assert.notEqual(row.verificationEvidence[0]?.state, 'verified');
-  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, [
-    'malformed-input',
-    'spoofed-input',
-    'wrong-format-output',
-    'no-delivery-on-failure',
-    'cancellation-lifecycle',
-  ]);
+  assert.equal(row.verificationEvidence[0]?.state, 'verified');
+  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
 });
 
 test('unknown Tool remains unknown and names the evidence needed to resolve it', () => {
