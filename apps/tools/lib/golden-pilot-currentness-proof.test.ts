@@ -4,7 +4,23 @@ import test from 'node:test';
 import { proveGoldenPilotEvidenceCurrentness } from './golden-pilot-currentness-proof.ts';
 
 test('Golden pilot mechanically proves current to stale to current evidence and fail-closed outcomes', () => {
-  const proof = proveGoldenPilotEvidenceCurrentness();
+  const gitDirectoryVariable = ['GIT', 'DIR'].join('_');
+  const gitWorkTreeVariable = ['GIT', 'WORK', 'TREE'].join('_');
+  const originalGitDirectory = process.env[gitDirectoryVariable];
+  const originalGitWorkTree = process.env[gitWorkTreeVariable];
+  process.env[gitDirectoryVariable] = '/invalid/hook-repository';
+  process.env[gitWorkTreeVariable] = '/invalid/hook-worktree';
+  let proof: ReturnType<typeof proveGoldenPilotEvidenceCurrentness>;
+  try {
+    proof = proveGoldenPilotEvidenceCurrentness();
+  } finally {
+    if (originalGitDirectory === undefined)
+      delete process.env[gitDirectoryVariable];
+    else process.env[gitDirectoryVariable] = originalGitDirectory;
+    if (originalGitWorkTree === undefined)
+      delete process.env[gitWorkTreeVariable];
+    else process.env[gitWorkTreeVariable] = originalGitWorkTree;
+  }
 
   assert.equal(proof.journeyId, 'png-to-webp:upload');
   assert.equal(proof.changedInput, 'fixture-content');

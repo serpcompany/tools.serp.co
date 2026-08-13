@@ -46,6 +46,16 @@ function fixtureRevisionFromGeneratedFile(file: string, journeyId: string) {
   return `sha256:${fixtureSha256}`;
 }
 
+function isolatedGitEnvironment(
+  environment: Readonly<Record<string, string>> = {},
+): NodeJS.ProcessEnv {
+  const sanitizedEnvironment: NodeJS.ProcessEnv = { ...process.env };
+  for (const name of Object.keys(sanitizedEnvironment)) {
+    if (name.startsWith('GIT_')) delete sanitizedEnvironment[name];
+  }
+  return { ...sanitizedEnvironment, ...environment };
+}
+
 function git(
   workingDirectory: string,
   arguments_: readonly string[],
@@ -54,7 +64,7 @@ function git(
   return execFileSync('git', [...arguments_], {
     cwd: workingDirectory,
     encoding: 'utf8',
-    env: { ...process.env, ...environment },
+    env: isolatedGitEnvironment(environment),
     stdio: ['ignore', 'pipe', 'pipe'],
   }).trim();
 }
@@ -151,6 +161,7 @@ export function proveGoldenPilotEvidenceCurrentness() {
     const revision = execFileSync('git', ['rev-parse', 'HEAD'], {
       cwd: repositoryRoot,
       encoding: 'utf8',
+      env: isolatedGitEnvironment(),
     }).trim();
     if (!/^[a-f0-9]{40}$/.test(revision)) {
       throw new TypeError('Golden currentness proof requires a Git revision.');
