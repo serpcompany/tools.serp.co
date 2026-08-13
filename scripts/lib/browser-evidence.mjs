@@ -146,7 +146,7 @@ export function summarizeNavigationTimings(values) {
 
 export function classifyConsoleWarning(message) {
   if (
-    /target origin provided \('https:\/\/ep2\.adtrafficquality\.google'\).*origin \('null'\)/i.test(
+    /ep2\.adtrafficquality\.google.*does not match.*recipient window.*origin/i.test(
       message,
     ) ||
     /webgl.*(?:driver message|gpu stall)/i.test(message) ||
