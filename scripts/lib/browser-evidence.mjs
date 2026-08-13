@@ -150,7 +150,13 @@ export function classifyConsoleWarning(message) {
       message,
     ) ||
     /webgl.*(?:driver message|gpu stall)/i.test(message) ||
-    /ae_default_editor_active is undefined/i.test(message)
+    /ae_default_editor_active is undefined/i.test(message) ||
+    /unable to determine content-length from response headers\. will expand buffer when needed\./i.test(
+      message,
+    ) ||
+    /onnxruntime.*CleanUnusedInitializersAndNodeArgs.*Removing initializer/i.test(
+      message,
+    )
   ) {
     return null;
   }

@@ -223,6 +223,8 @@ test('Golden downloader and PNG to WebP checks retain exact or decoded fixture s
 test('Golden output journeys retain exact negative-path probe checks', () => {
   assert.match(runnerSource, /function runGoldenNegativePathProbe/);
   for (const toolId of [
+    'audio-to-text',
+    'audio-to-transcript',
     'batch-compress-png',
     'bmp-to-png',
     'csv-to-json',

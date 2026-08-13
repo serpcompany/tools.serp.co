@@ -321,12 +321,119 @@ export async function runGoldenVideoDownloaderNegativeProbe() {
   });
 }
 
+async function runGoldenTranscriptionNegativeProbe(
+  journeyId: 'audio-to-text:upload' | 'audio-to-transcript:direct-url',
+) {
+  let mode: 'empty' | 'stall' = 'empty';
+  const urls = {
+    malformed: 'https://fixture.invalid/malformed.mp3',
+    spoofed: 'https://fixture.invalid/spoofed.mp3',
+    valid: 'https://fixture.invalid/speech.mp3',
+  } as const;
+  const run = recorder((ports) =>
+    createMediaWorkflow({
+      ...ports,
+      clock: { now: () => 0 },
+      endpoint: mediaEndpoint({
+        [urls.malformed]: {
+          name: 'malformed.mp3',
+          format: 'mp3',
+          mimeType: 'audio/mpeg',
+          bytes: new Uint8Array([0, 1, 2, 3]),
+        },
+        [urls.spoofed]: {
+          name: 'spoofed.mp3',
+          format: 'mp3',
+          mimeType: 'audio/mpeg',
+          bytes: fixture('sample.mp4'),
+        },
+        [urls.valid]: {
+          name: 'speech.mp3',
+          format: 'mp3',
+          mimeType: 'audio/mpeg',
+          bytes: fixture('transcription-speech.mp3'),
+        },
+      }),
+      transcription: {
+        async transcribe(_media, context) {
+          if (mode === 'empty') return '';
+          context.signal.throwIfAborted();
+          return new Promise<string>((_resolve, reject) => {
+            context.signal.addEventListener(
+              'abort',
+              () => reject(context.signal.reason),
+              { once: true },
+            );
+          });
+        },
+      },
+    }),
+  );
+  const upload = journeyId === 'audio-to-text:upload';
+  const request = (kind: keyof typeof urls) =>
+    upload
+      ? fileRequest(
+          'audio-to-text',
+          `${kind}.mp3`,
+          'mp3',
+          'audio/mpeg',
+          kind === 'malformed'
+            ? new Uint8Array([0, 1, 2, 3])
+            : kind === 'spoofed'
+              ? fixture('sample.mp4')
+              : fixture('transcription-speech.mp3'),
+        )
+      : {
+          toolId: 'audio-to-transcript',
+          input: { kind: 'url' as const, url: urls[kind] },
+        };
+  const malformed = await run.workflow.run(request('malformed'));
+  const spoofed = await run.workflow.run(request('spoofed'));
+  const wrongOutput = await run.workflow.run(request('valid'));
+  mode = 'stall';
+  const cancelled = await cancellation(run.workflow, request('valid'));
+  if (
+    malformed.status !== 'failed' ||
+    spoofed.status !== 'failed' ||
+    wrongOutput.status !== 'failed' ||
+    cancelled.status !== 'cancelled' ||
+    run.deliveries.length !== 0
+  ) {
+    throw new Error(`${journeyId} transcription probe did not fail closed.`);
+  }
+  return Object.freeze({
+    journeyId,
+    checks: Object.freeze([
+      'malformed-input',
+      'spoofed-input',
+      'wrong-format-output',
+      'no-delivery-on-failure',
+      'cancellation-lifecycle',
+    ] as const),
+    observed: Object.freeze({
+      failedRuns: 3,
+      cancelledRuns: 1,
+      deliveries: run.deliveries.length,
+    }),
+  });
+}
+
+export function runGoldenTranscriptionUploadNegativeProbe() {
+  return runGoldenTranscriptionNegativeProbe('audio-to-text:upload');
+}
+
+export function runGoldenTranscriptionDirectUrlNegativeProbe() {
+  return runGoldenTranscriptionNegativeProbe('audio-to-transcript:direct-url');
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   process.stdout.write(
     `${JSON.stringify({
       csv: await runGoldenCsvNegativeProbe(),
       pdf: await runGoldenPdfReaderNegativeProbe(),
       video: await runGoldenVideoDownloaderNegativeProbe(),
+      audioUpload: await runGoldenTranscriptionUploadNegativeProbe(),
+      audioDirect: await runGoldenTranscriptionDirectUrlNegativeProbe(),
     })}\n`,
   );
 }

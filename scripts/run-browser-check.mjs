@@ -644,6 +644,16 @@ try {
 
   function runGoldenNegativePathProbe(toolId) {
     const configurations = {
+      'audio-to-text': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'audioUpload',
+        journeyId: 'audio-to-text:upload',
+      },
+      'audio-to-transcript': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'audioDirect',
+        journeyId: 'audio-to-transcript:direct-url',
+      },
       'batch-compress-png': {
         file: 'apps/tools/lib/golden-negative-path-probes.ts',
         key: 'batch',
@@ -1397,11 +1407,15 @@ try {
             ? [
                 'valid-fixture',
                 'semantic-output',
-                'no-delivery-on-failure',
-                'cancellation-lifecycle',
+                ...runGoldenNegativePathProbe(tool.id),
                 'required-environment',
               ]
-            : ['valid-fixture', 'semantic-output', 'required-environment'],
+            : [
+                'valid-fixture',
+                'semantic-output',
+                ...runGoldenNegativePathProbe(tool.id),
+                'required-environment',
+              ],
       });
       result.activeJourneyId = null;
       return {

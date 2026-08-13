@@ -315,6 +315,8 @@ test('console warning evidence is classified, deduplicated, and attached without
     "Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://ep2.adtrafficquality.google') does not match the recipient window's origin ('null').",
     '[.WebGL-0x123]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels',
     'ae_default_editor_active is undefined',
+    'Unable to determine content-length from response headers. Will expand buffer when needed.',
+    "2026-08-13 19:43:53.219340 [W:onnxruntime:, graph.cc:3490 CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_16_output_0'. It is not used by any node and should be removed from the model.",
   ]) {
     assert.equal(classifyConsoleWarning(diagnostic), null, diagnostic);
   }
