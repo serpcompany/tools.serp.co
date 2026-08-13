@@ -126,9 +126,16 @@ function formatVerifiedDate(verifiedAt: string) {
 }
 
 function exactTestLabel(row: ToolFactoryRow) {
-  const evidence = row.verificationEvidence.exact;
-  if (!evidence) return 'Not tested here';
-  return `${evidence.result === 'passed' ? 'Passed' : 'Failed'} · ${formatVerifiedDate(evidence.verifiedAt)}`;
+  const withEvidence = row.verificationEvidence.filter(
+    (evidence) => evidence.latest !== null,
+  );
+  if (!withEvidence.length) return 'No journey evidence';
+  const verified = withEvidence.filter(
+    (evidence) => evidence.state === 'verified',
+  ).length;
+  return verified
+    ? `${verified} of ${row.journeys.length} journeys verified`
+    : `${withEvidence.length} journey result${withEvidence.length === 1 ? '' : 's'} · none verified`;
 }
 
 function runtimeObservationLabel(
@@ -657,110 +664,77 @@ function familyPolicyExplanation(row: ToolFactoryRow) {
   return 'No registered family verification policy exists for this Tool.';
 }
 
-type DisplayEvidence =
-  | NonNullable<ToolFactoryRow['verificationEvidence']['exact']>
-  | ToolFactoryRow['verificationEvidence']['family'][number];
-
-function EvidenceResult({
-  evidence,
-  family,
-}: {
-  evidence: DisplayEvidence;
-  family: boolean;
-}) {
-  const resultLabel = `${evidence.result === 'passed' ? 'Passed' : 'Failed'}${family ? ' family run' : ''}`;
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span
-          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-            evidence.result === 'passed'
-              ? 'bg-emerald-100 text-emerald-800'
-              : 'bg-red-100 text-red-800'
-          }`}
-        >
-          {resultLabel}
-        </span>
-        <span className="text-sm text-slate-700">{evidence.environment}</span>
-        <time className="text-sm text-slate-500" dateTime={evidence.verifiedAt}>
-          {formatVerifiedDate(evidence.verifiedAt)}
-        </time>
-      </div>
-      <ul className="list-disc space-y-1 pl-5 text-sm text-slate-800">
-        {evidence.checkedBehaviors.map((behavior) => (
-          <li key={behavior}>{behavior}</li>
-        ))}
-      </ul>
-      <div className="flex flex-wrap items-center gap-3 text-sm">
-        <a
-          className="font-medium text-blue-700 underline underline-offset-4 hover:text-blue-900"
-          href={evidence.screenshotUrl}
-          rel="noreferrer"
-          target="_blank"
-        >
-          {family ? 'View family screenshot' : 'View screenshot'}
-        </a>
-        <span className="font-mono text-xs text-slate-500">
-          {evidence.artifact.runId}
-        </span>
-      </div>
-      <details className="text-xs text-slate-600" open={family}>
-        <summary className="cursor-pointer font-medium">
-          Technical evidence identity
-        </summary>
-        <div className="mt-2 break-all font-mono">
-          {family ? 'Family tested revision' : 'Tested revision'}{' '}
-          {evidence.verifiedRevision}
-        </div>
-      </details>
-    </div>
-  );
+function journeyEvidenceLabel(
+  state: ToolFactoryRow['verificationEvidence'][number]['state'],
+) {
+  return {
+    verified: 'Verified journey',
+    incomplete: 'Passed checks · evidence incomplete',
+    failed: 'Failed controlled run',
+    warned: 'Warning · not verified',
+    skipped: 'Skipped · not verified',
+    stale: 'Stale evidence',
+    invalid: 'Invalid evidence',
+    'no-evidence': 'No retained evidence',
+  }[state];
 }
 
-function ExactToolEvidence({ row }: { row: ToolFactoryRow }) {
-  const evidence = row.verificationEvidence.exact;
+function JourneyVerificationEvidence({ row }: { row: ToolFactoryRow }) {
   return (
     <section className="rounded-lg border p-4">
       <h3 className="text-sm font-semibold text-slate-950">
-        Latest exact Tool test
+        Journey verification evidence
       </h3>
-      {evidence ? (
-        <div className="mt-3">
-          <EvidenceResult evidence={evidence} family={false} />
-        </div>
-      ) : (
-        <div className="mt-3 rounded-md bg-amber-50 p-3">
-          <div className="font-semibold text-amber-950">Not tested here</div>
-          <p className="mt-1 text-sm text-amber-900">
-            There is no retained test result for this exact Tool. A family
-            policy or installed library is not counted as a pass.
-          </p>
-        </div>
-      )}
-    </section>
-  );
-}
-
-function FamilyTestEvidence({ row }: { row: ToolFactoryRow }) {
-  if (!row.verificationEvidence.family.length) return null;
-  return (
-    <section className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-      <h3 className="text-sm font-semibold text-blue-950">
-        Family test evidence — not an exact Tool test
-      </h3>
-      <p className="mt-1 text-sm text-blue-900">
-        These runs covered this Tool as a named member of a broader family run.
-        They do not replace the exact Tool test above.
+      <p className="mt-1 text-sm text-slate-700">
+        Each card is one exact way a person can use this Tool. A package, family
+        policy, warning, skip, or partial browser check is never counted as a
+        verified journey.
       </p>
       <div className="mt-3 space-y-3">
-        {row.verificationEvidence.family.map((evidence) => (
-          <article
-            key={evidence.evidenceId}
-            className="rounded-md border border-blue-200 bg-white p-3"
-          >
-            <EvidenceResult evidence={evidence} family />
-          </article>
-        ))}
+        {row.verificationEvidence.map((evidence) => {
+          const journey = row.journeys.find(
+            (candidate) => candidate.id === evidence.journeyId,
+          );
+          return (
+            <article
+              key={evidence.journeyId}
+              className="rounded-md border bg-slate-50 p-3"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div className="font-medium text-slate-950">
+                    {journey?.input.kind ?? evidence.journeyId}
+                  </div>
+                  <div className="font-mono text-xs text-slate-500">
+                    {evidence.journeyId}
+                  </div>
+                </div>
+                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-slate-800">
+                  {journeyEvidenceLabel(evidence.state)}
+                </span>
+              </div>
+              <p className="mt-2 text-sm text-slate-700">{evidence.reason}</p>
+              {evidence.missingChecks.length ? (
+                <p className="mt-2 text-xs text-amber-800">
+                  Still needed: {evidence.missingChecks.join(', ')}
+                </p>
+              ) : null}
+              {evidence.latest ? (
+                <details className="mt-2 text-xs text-slate-600">
+                  <summary className="cursor-pointer font-medium">
+                    Exact evidence identity
+                  </summary>
+                  <div className="mt-2 space-y-1 break-all font-mono">
+                    <div>{evidence.latest.runId}</div>
+                    <div>{evidence.latest.environment}</div>
+                    <div>{formatVerifiedDate(evidence.latest.observedAt)}</div>
+                    <div>{evidence.latest.revision.commit}</div>
+                  </div>
+                </details>
+              ) : null}
+            </article>
+          );
+        })}
       </div>
     </section>
   );
@@ -1075,8 +1049,7 @@ function ToolDetail({
             portfolio={runtimeObservations}
             toolId={row.toolId}
           />
-          <ExactToolEvidence row={row} />
-          <FamilyTestEvidence row={row} />
+          <JourneyVerificationEvidence row={row} />
           <FamilyVerificationPolicy row={row} />
           <GithubWork row={row} />
           <Fact label="Catalog description" value={row.description} />

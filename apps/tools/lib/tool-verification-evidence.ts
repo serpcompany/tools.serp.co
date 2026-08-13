@@ -1,233 +1,521 @@
-export type ToolVerificationResult = 'passed' | 'failed';
+import { createHash } from 'node:crypto';
 
-type RetainedArtifact = Readonly<{
-  runId: string;
-  revision: string;
-}>;
+import retainedRuns from '../../../docs/audits/tool-verification/retained-runs.json' with { type: 'json' };
+import generatedInputs from './tool-verification-inputs.generated.json' with { type: 'json' };
+import { toolJourneys, type ToolJourney } from './tool-journeys.ts';
 
-type EvidenceBase = Readonly<{
+export const requiredVerificationChecks = Object.freeze([
+  'valid-fixture',
+  'semantic-output',
+  'malformed-input',
+  'spoofed-input',
+  'wrong-format-output',
+  'no-delivery-on-failure',
+  'cancellation-lifecycle',
+  'required-environment',
+] as const);
+
+export type ToolVerificationCheck = (typeof requiredVerificationChecks)[number];
+export type ToolJourneyEvidenceOutcome =
+  | 'passed'
+  | 'failed'
+  | 'warned'
+  | 'skipped';
+export type ToolJourneyEvidenceEnvironment =
+  | 'local-browser'
+  | 'preview-browser'
+  | 'production-browser'
+  | 'node-test';
+
+export type ToolJourneyEvidenceRecord = Readonly<{
   evidenceId: string;
-  verifiedAt: string;
-  verifiedRevision: string;
-  environment: string;
-  result: ToolVerificationResult;
-  checkedBehaviors: readonly string[];
-  artifact: RetainedArtifact;
-  screenshotUrl: string;
+  runId: string;
+  toolId: string;
+  journeyId: string;
+  observedAt: string;
+  revision: Readonly<{ commit: string; dirty: boolean }>;
+  environment: ToolJourneyEvidenceEnvironment;
+  outcome: ToolJourneyEvidenceOutcome;
+  reasonCode: string | null;
+  fixture: Readonly<{
+    kind: 'content' | 'literal';
+    reference: string;
+    sha256: string;
+  }> | null;
+  invariantId: string | null;
+  checks: readonly ToolVerificationCheck[];
+  inputRevisions: Readonly<Record<string, string>>;
+  artifactUrl: string | null;
+  screenshotUrl: string | null;
+  warningCodes?: readonly string[];
 }>;
 
-export type ExactToolVerificationEvidence = EvidenceBase &
-  Readonly<{
-    scope: 'exact-tool';
-    toolId: string;
-  }>;
+export type ToolJourneyEvidenceState =
+  | 'verified'
+  | 'incomplete'
+  | 'failed'
+  | 'warned'
+  | 'skipped'
+  | 'stale'
+  | 'invalid'
+  | 'no-evidence';
 
-export type FamilyVerificationEvidence = EvidenceBase &
-  Readonly<{
-    scope: 'family';
-    family: string;
-    toolIds: readonly string[];
-  }>;
-
-export type ToolVerificationEvidence =
-  | ExactToolVerificationEvidence
-  | FamilyVerificationEvidence;
-
-export type ToolVerificationEvidenceView = Readonly<{
-  exact: ExactToolVerificationEvidence | null;
-  family: readonly FamilyVerificationEvidence[];
+export type ToolJourneyEvidenceView = Readonly<{
+  journeyId: string;
+  state: ToolJourneyEvidenceState;
+  latest: ToolJourneyEvidenceRecord | null;
+  missingChecks: readonly ToolVerificationCheck[];
+  reason: string;
 }>;
 
-type KnownTool = Readonly<{ toolId: string; family: string }>;
+type BuildOptions = Readonly<{
+  journeys: readonly ToolJourney[];
+  records: readonly ToolJourneyEvidenceRecord[];
+  currentInputRevisions(journey: ToolJourney): Readonly<Record<string, string>>;
+}>;
 
-const verifiedRevision = '03dc90f5213560ff61493dd058b877f9666b8338';
-const screenshotRevision = 'be36a19617b779bccdfabb820a9a60e4250e1cdf';
-const artifact = Object.freeze({
-  runId: '20260812T083305Z_03dc90f_pull-request_browser-smoke-preview-subset',
-  revision: verifiedRevision,
-});
+export type ToolVerificationRunManifest = Readonly<{
+  schemaVersion: number;
+  runId: string;
+  revision: Readonly<{ commit: string; dirty: boolean }>;
+  timestamps: Readonly<{ startedAt: string; completedAt: string }>;
+  environment: 'local' | 'pull-request' | 'main';
+  scope: Readonly<{
+    label: string;
+    inputHashes: readonly string[];
+    tools?: readonly Readonly<{
+      toolId: string;
+      warnings?: readonly string[];
+      journeys: readonly Readonly<{
+        journeyId: string;
+        outcome: ToolJourneyEvidenceOutcome;
+        reasonCode: string | null;
+        fixture: ToolJourneyEvidenceRecord['fixture'];
+        invariantId: string | null;
+        checks: readonly ToolVerificationCheck[];
+        inputRevisions: Readonly<Record<string, string>>;
+      }>[];
+    }>[];
+  }>;
+  result: Readonly<{ status: string }>;
+}>;
 
-function screenshot(fileName: string) {
-  return `https://github.com/serpcompany/tools.serp.co/blob/${screenshotRevision}/docs/audits/${fileName}`;
-}
-
-export const retainedToolVerificationEvidence: readonly ToolVerificationEvidence[] =
-  Object.freeze([
-    Object.freeze({
-      evidenceId: 'preview-png-to-webp-2026-08-12',
-      scope: 'exact-tool' as const,
-      toolId: 'png-to-webp',
-      verifiedAt: '2026-08-12T08:33:05.000Z',
-      verifiedRevision,
-      environment: 'DEV/STAGING preview',
-      result: 'passed' as const,
-      checkedBehaviors: Object.freeze([
-        'Converted a real PNG and produced a WebP file.',
-      ]),
-      artifact,
-      screenshotUrl: screenshot('workflow-preview-png-to-webp-2026-08-12.png'),
-    }),
-    Object.freeze({
-      evidenceId: 'preview-audio-to-text-2026-08-12',
-      scope: 'exact-tool' as const,
-      toolId: 'audio-to-text',
-      verifiedAt: '2026-08-12T08:33:05.000Z',
-      verifiedRevision,
-      environment: 'DEV/STAGING preview',
-      result: 'passed' as const,
-      checkedBehaviors: Object.freeze([
-        'Transcribed a real speech MP3 into non-empty text.',
-      ]),
-      artifact,
-      screenshotUrl: screenshot(
-        'workflow-preview-audio-to-text-2026-08-12.png',
-      ),
-    }),
-    Object.freeze({
-      evidenceId: 'preview-transcription-family-2026-08-12',
-      scope: 'family' as const,
-      family: 'renderer:transcription',
-      toolIds: Object.freeze(['audio-to-text']),
-      verifiedAt: '2026-08-12T08:33:05.000Z',
-      verifiedRevision,
-      environment: 'DEV/STAGING preview',
-      result: 'passed' as const,
-      checkedBehaviors: Object.freeze([
-        'The representative family browser run included real speech transcription for this Tool.',
-      ]),
-      artifact,
-      screenshotUrl: screenshot(
-        'workflow-preview-audio-to-text-2026-08-12.png',
-      ),
-    }),
-    Object.freeze({
-      evidenceId: 'preview-pdf-reader-2026-08-12',
-      scope: 'exact-tool' as const,
-      toolId: 'pdf-reader',
-      verifiedAt: '2026-08-12T08:33:05.000Z',
-      verifiedRevision,
-      environment: 'DEV/STAGING preview',
-      result: 'passed' as const,
-      checkedBehaviors: Object.freeze([
-        'Opened a real PDF and rendered page 1 in the maintained viewer.',
-      ]),
-      artifact,
-      screenshotUrl: screenshot('workflow-preview-pdf-reader-2026-08-12.png'),
-    }),
-  ]);
-
-function validateRevision(value: string, field: string) {
-  if (!/^[a-f0-9]{40}$/.test(value)) {
-    throw new TypeError(`${field} must be a full Git revision.`);
+function deepFreeze<Value>(value: Value): Value {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    for (const child of Object.values(value)) deepFreeze(child);
   }
+  return value;
 }
 
-function validateEvidence(
-  evidence: ToolVerificationEvidence,
-  knownById: ReadonlyMap<string, KnownTool>,
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map(canonicalJson).join(',')}]`;
+  }
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, child]) => `${JSON.stringify(key)}:${canonicalJson(child)}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function revision(value: unknown) {
+  return `sha256:${createHash('sha256').update(canonicalJson(value)).digest('hex')}`;
+}
+
+export function getToolVerificationInputRevisions(
+  journey: ToolJourney,
+): Readonly<Record<string, string>> {
+  const fixtureSha256 =
+    generatedInputs.fixtureSha256ByJourney[
+      journey.id as keyof typeof generatedInputs.fixtureSha256ByJourney
+    ];
+  return deepFreeze({
+    'fixture-contract': revision(journey.fixture),
+    'fixture-content': fixtureSha256
+      ? `sha256:${fixtureSha256}`
+      : revision(null),
+    'journey-contract': revision(journey),
+    'semantic-invariant': revision(journey.semanticInvariant),
+    'verification-policy': revision(requiredVerificationChecks),
+    'executable-sources': generatedInputs.executableSources,
+    'dependency-lock': generatedInputs.dependencyLock,
+    'runner-sources': generatedInputs.runnerSources,
+  });
+}
+
+export function ingestToolVerificationRun(
+  manifest: ToolVerificationRunManifest,
+): readonly ToolJourneyEvidenceRecord[] {
+  if (manifest.schemaVersion !== 2) {
+    throw new TypeError('Journey evidence requires artifact schema version 2.');
+  }
+  const environmentByRun = {
+    local: 'local-browser',
+    'pull-request': 'preview-browser',
+    main: 'production-browser',
+  } as const;
+  const environment = environmentByRun[manifest.environment];
+  if (!environment) {
+    throw new TypeError('Journey evidence uses an unsupported environment.');
+  }
+  const records = (manifest.scope.tools ?? []).flatMap((tool) =>
+    tool.journeys.map((journey) => ({
+      evidenceId: `evidence-${createHash('sha256')
+        .update(`${manifest.runId}\0${journey.journeyId}`)
+        .digest('hex')}`,
+      runId: manifest.runId,
+      toolId: tool.toolId,
+      journeyId: journey.journeyId,
+      observedAt: manifest.timestamps.completedAt,
+      revision: manifest.revision,
+      environment,
+      outcome: journey.outcome,
+      reasonCode: journey.reasonCode,
+      fixture: journey.fixture,
+      invariantId: journey.invariantId,
+      checks: journey.checks,
+      inputRevisions: journey.inputRevisions,
+      artifactUrl: null,
+      screenshotUrl: null,
+      warningCodes: [...(tool.warnings ?? [])],
+    })),
+  );
+  return deepFreeze(records);
+}
+
+function fullRevision(value: string) {
+  return /^[a-f0-9]{40}$/.test(value);
+}
+
+function sha256(value: string) {
+  return /^[a-f0-9]{64}$/.test(value);
+}
+
+function safeIdentity(value: string) {
+  return /^[a-z0-9][a-z0-9:._-]*$/.test(value);
+}
+
+function safeRunIdentity(value: string) {
+  return /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(value);
+}
+
+function environmentSatisfies(
+  journey: ToolJourney,
+  environment: ToolJourneyEvidenceEnvironment,
 ) {
-  validateRevision(evidence.verifiedRevision, 'Evidence revision');
-  validateRevision(evidence.artifact.revision, 'Artifact revision');
-  if (evidence.artifact.revision !== evidence.verifiedRevision) {
+  if (journey.requiredEnvironment === 'browser') {
+    return new Set([
+      'local-browser',
+      'preview-browser',
+      'production-browser',
+    ]).has(environment);
+  }
+  if (journey.requiredEnvironment === 'preview') {
+    return environment === 'preview-browser';
+  }
+  return false;
+}
+
+function validateRecordIdentity(
+  record: ToolJourneyEvidenceRecord,
+  journeyById: ReadonlyMap<string, ToolJourney>,
+) {
+  if (!safeIdentity(record.evidenceId) || !safeRunIdentity(record.runId)) {
+    throw new TypeError('Evidence and run identities must be safe slugs.');
+  }
+  if (!fullRevision(record.revision.commit)) {
     throw new TypeError(
-      `Evidence ${evidence.evidenceId} artifact revision does not match its verified revision.`,
+      `Evidence ${record.evidenceId} must name a full Git revision.`,
     );
   }
-  if (!Number.isFinite(Date.parse(evidence.verifiedAt))) {
-    throw new TypeError(`Evidence ${evidence.evidenceId} has an invalid date.`);
+  if (!Number.isFinite(Date.parse(record.observedAt))) {
+    throw new TypeError(`Evidence ${record.evidenceId} has an invalid date.`);
   }
-  if (!evidence.checkedBehaviors.length) {
+  const journey = journeyById.get(record.journeyId);
+  if (!journey) {
     throw new TypeError(
-      `Evidence ${evidence.evidenceId} must name checked behavior.`,
+      `Evidence ${record.evidenceId} names unknown journey ${record.journeyId}.`,
     );
+  }
+  if (journey.toolId !== record.toolId) {
+    throw new TypeError(
+      `Journey ${record.journeyId} does not belong to Tool ${record.toolId}.`,
+    );
+  }
+  if (record.reasonCode !== null && !safeIdentity(record.reasonCode)) {
+    throw new TypeError(`Evidence ${record.evidenceId} has an unsafe reason.`);
+  }
+  if (record.outcome !== 'passed' && record.reasonCode === null) {
+    throw new TypeError(
+      `Evidence ${record.evidenceId} must explain a non-pass outcome.`,
+    );
+  }
+  if (record.outcome === 'passed' && record.reasonCode !== null) {
+    throw new TypeError(
+      `Evidence ${record.evidenceId} cannot attach a reason to a pass.`,
+    );
+  }
+  const warningCodes = record.warningCodes ?? [];
+  if (new Set(warningCodes).size !== warningCodes.length) {
+    throw new TypeError(`Evidence ${record.evidenceId} repeats a warning.`);
+  }
+  for (const warning of warningCodes) {
+    if (!safeIdentity(warning)) {
+      throw new TypeError(
+        `Evidence ${record.evidenceId} has an unsafe warning.`,
+      );
+    }
+  }
+  if (new Set(record.checks).size !== record.checks.length) {
+    throw new TypeError(`Evidence ${record.evidenceId} repeats a check.`);
+  }
+  for (const check of record.checks) {
+    if (!(requiredVerificationChecks as readonly string[]).includes(check)) {
+      throw new TypeError(
+        `Evidence ${record.evidenceId} has an unknown check.`,
+      );
+    }
+  }
+  for (const [inputId, revision] of Object.entries(record.inputRevisions)) {
+    if (!safeIdentity(inputId) || !/^sha256:[a-f0-9]{64}$/.test(revision)) {
+      throw new TypeError(
+        `Evidence ${record.evidenceId} has an invalid input revision.`,
+      );
+    }
+  }
+  if (record.fixture !== null) {
+    if (!record.fixture.reference || !sha256(record.fixture.sha256)) {
+      throw new TypeError(
+        `Evidence ${record.evidenceId} has an invalid fixture identity.`,
+      );
+    }
+  }
+}
+
+function compareInputs(
+  recorded: Readonly<Record<string, string>>,
+  current: Readonly<Record<string, string>>,
+) {
+  const recordedKeys = Object.keys(recorded).sort();
+  const currentKeys = Object.keys(current).sort();
+  if (
+    !recordedKeys.length ||
+    recordedKeys.join('\0') !== currentKeys.join('\0')
+  ) {
+    return 'missing' as const;
+  }
+  return recordedKeys.every((key) => recorded[key] === current[key])
+    ? ('current' as const)
+    : ('stale' as const);
+}
+
+function project(
+  journey: ToolJourney,
+  latest: ToolJourneyEvidenceRecord | null,
+  currentInputs: Readonly<Record<string, string>>,
+): ToolJourneyEvidenceView {
+  if (!latest) {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'no-evidence' as const,
+      latest: null,
+      missingChecks: [...requiredVerificationChecks],
+      reason: 'No retained controlled evidence exists for this journey.',
+    });
+  }
+  const missingChecks = requiredVerificationChecks.filter(
+    (check) => !latest.checks.includes(check),
+  );
+  const inputs = compareInputs(latest.inputRevisions, currentInputs);
+  if (inputs === 'stale') {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'stale' as const,
+      latest,
+      missingChecks,
+      reason: 'Relevant journey, fixture, invariant, or policy inputs changed.',
+    });
+  }
+  const baseInvalid =
+    latest.revision.dirty ||
+    inputs === 'missing' ||
+    latest.invariantId === null ||
+    latest.invariantId !== journey.semanticInvariant.id ||
+    !environmentSatisfies(journey, latest.environment);
+  if (baseInvalid) {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'invalid' as const,
+      latest,
+      missingChecks,
+      reason:
+        'The record does not match the journey fixture, invariant, environment, clean revision, or declared evidence inputs.',
+    });
+  }
+  if (latest.outcome === 'failed') {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'failed' as const,
+      latest,
+      missingChecks,
+      reason: `The latest controlled run failed (${latest.reasonCode}).`,
+    });
+  }
+  if (latest.outcome === 'warned') {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'warned' as const,
+      latest,
+      missingChecks,
+      reason: `The latest controlled run produced a warning (${latest.reasonCode}).`,
+    });
+  }
+  if (latest.outcome === 'skipped') {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'skipped' as const,
+      latest,
+      missingChecks,
+      reason: `The latest controlled run skipped this journey (${latest.reasonCode}).`,
+    });
+  }
+  if (latest.warningCodes?.length) {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'warned' as const,
+      latest,
+      missingChecks,
+      reason: `The run emitted warnings (${latest.warningCodes.join(', ')}).`,
+    });
   }
   if (
-    !/^https:\/\/github\.com\/serpcompany\/tools\.serp\.co\/blob\/[a-f0-9]{40}\//.test(
-      evidence.screenshotUrl,
-    )
+    latest.fixture === null ||
+    latest.fixture.reference !== journey.fixture.reference ||
+    `sha256:${latest.fixture.sha256}` !== currentInputs['fixture-content']
   ) {
-    throw new TypeError(
-      `Evidence ${evidence.evidenceId} must link to a revision-pinned screenshot.`,
-    );
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'invalid' as const,
+      latest,
+      missingChecks,
+      reason: 'The record does not match the exact journey fixture.',
+    });
   }
-
-  if (evidence.scope === 'exact-tool') {
-    if (!knownById.has(evidence.toolId)) {
-      throw new TypeError(
-        `Evidence ${evidence.evidenceId} names unknown Tool ${evidence.toolId}.`,
-      );
-    }
-    return;
+  if (missingChecks.length) {
+    return deepFreeze({
+      journeyId: journey.id,
+      state: 'incomplete' as const,
+      latest,
+      missingChecks,
+      reason:
+        'The run passed, but it did not cover every required verification check.',
+    });
   }
-
-  if (!evidence.toolIds.length) {
-    throw new TypeError(
-      `Family evidence ${evidence.evidenceId} has no Tool membership.`,
-    );
-  }
-  for (const toolId of evidence.toolIds) {
-    const tool = knownById.get(toolId);
-    if (!tool) {
-      throw new TypeError(
-        `Evidence ${evidence.evidenceId} names unknown Tool ${toolId}.`,
-      );
-    }
-    if (tool.family !== evidence.family) {
-      throw new TypeError(
-        `Evidence ${evidence.evidenceId} family does not match Tool ${toolId}.`,
-      );
-    }
-  }
+  return deepFreeze({
+    journeyId: journey.id,
+    state: 'verified' as const,
+    latest,
+    missingChecks: [],
+    reason: 'Current controlled evidence satisfies every required check.',
+  });
 }
 
-function newest<
-  Evidence extends ExactToolVerificationEvidence | FamilyVerificationEvidence,
->(records: readonly Evidence[]): Evidence | null {
-  return (
-    [...records].sort(
-      (left, right) =>
-        Date.parse(right.verifiedAt) - Date.parse(left.verifiedAt),
-    )[0] ?? null
+export function buildToolVerificationEvidenceIndex(options: BuildOptions) {
+  const journeyById = new Map(
+    options.journeys.map((journey) => [journey.id, journey]),
   );
-}
-
-export function buildToolVerificationEvidenceIndex(
-  records: readonly ToolVerificationEvidence[],
-  knownTools: readonly KnownTool[],
-) {
-  const knownById = new Map(knownTools.map((tool) => [tool.toolId, tool]));
-  if (knownById.size !== knownTools.length) {
-    throw new TypeError('Known Tool evidence identities contain duplicates.');
+  if (journeyById.size !== options.journeys.length) {
+    throw new TypeError('Tool Journey evidence identities contain duplicates.');
   }
   const evidenceIds = new Set<string>();
-  for (const evidence of records) {
-    if (evidenceIds.has(evidence.evidenceId)) {
-      throw new TypeError(`Duplicate evidence id: ${evidence.evidenceId}.`);
+  const runJourneys = new Set<string>();
+  const records = options.records.map((record) =>
+    deepFreeze(structuredClone(record)),
+  );
+  for (const record of records) {
+    if (evidenceIds.has(record.evidenceId)) {
+      throw new TypeError(`Duplicate evidence id: ${record.evidenceId}.`);
     }
-    evidenceIds.add(evidence.evidenceId);
-    validateEvidence(evidence, knownById);
+    evidenceIds.add(record.evidenceId);
+    const runJourney = `${record.runId}\0${record.journeyId}`;
+    if (runJourneys.has(runJourney)) {
+      throw new TypeError(
+        `Duplicate evidence for journey ${record.journeyId} in run ${record.runId}.`,
+      );
+    }
+    runJourneys.add(runJourney);
+    validateRecordIdentity(record, journeyById);
   }
 
-  return Object.freeze({
-    getForTool(toolId: string, family: string): ToolVerificationEvidenceView {
-      const exact = newest(
-        records.filter(
-          (record): record is ExactToolVerificationEvidence =>
-            record.scope === 'exact-tool' && record.toolId === toolId,
-        ),
-      );
-      const familyEvidence = records
-        .filter(
-          (record): record is FamilyVerificationEvidence =>
-            record.scope === 'family' &&
-            record.family === family &&
-            record.toolIds.includes(toolId),
-        )
+  const views = options.journeys.map((journey) => {
+    const latest =
+      records
+        .filter((record) => record.journeyId === journey.id)
         .sort(
           (left, right) =>
-            Date.parse(right.verifiedAt) - Date.parse(left.verifiedAt),
-        );
-      return Object.freeze({ exact, family: Object.freeze(familyEvidence) });
+            Date.parse(right.observedAt) - Date.parse(left.observedAt),
+        )[0] ?? null;
+    return project(journey, latest, options.currentInputRevisions(journey));
+  });
+  const byJourney = new Map(views.map((view) => [view.journeyId, view]));
+  const byTool = new Map<string, ToolJourneyEvidenceView[]>();
+  for (const journey of options.journeys) {
+    const view = byJourney.get(journey.id);
+    if (!view) continue;
+    byTool.set(journey.toolId, [...(byTool.get(journey.toolId) ?? []), view]);
+  }
+  const states: ToolJourneyEvidenceState[] = [
+    'verified',
+    'incomplete',
+    'failed',
+    'warned',
+    'skipped',
+    'stale',
+    'invalid',
+    'no-evidence',
+  ];
+  const summary = deepFreeze(
+    Object.fromEntries(
+      states.map((state) => [
+        state === 'no-evidence' ? 'noEvidence' : state,
+        views.filter((view) => view.state === state).length,
+      ]),
+    ) as Record<
+      Exclude<ToolJourneyEvidenceState, 'no-evidence'> | 'noEvidence',
+      number
+    >,
+  );
+
+  return Object.freeze({
+    summary,
+    getForJourney(journeyId: string): ToolJourneyEvidenceView {
+      return (
+        byJourney.get(journeyId) ??
+        deepFreeze({
+          journeyId,
+          state: 'no-evidence' as const,
+          latest: null,
+          missingChecks: [...requiredVerificationChecks],
+          reason: 'Unknown Tool Journey.',
+        })
+      );
+    },
+    getForTool(toolId: string): readonly ToolJourneyEvidenceView[] {
+      return deepFreeze([...(byTool.get(toolId) ?? [])]);
     },
   });
 }
+
+const retainedRecords = retainedRuns.flatMap((manifest) =>
+  ingestToolVerificationRun(manifest as unknown as ToolVerificationRunManifest),
+);
+
+export const retainedToolVerificationEvidence =
+  buildToolVerificationEvidenceIndex({
+    journeys: toolJourneys.all,
+    records: retainedRecords,
+    currentInputRevisions: getToolVerificationInputRevisions,
+  });

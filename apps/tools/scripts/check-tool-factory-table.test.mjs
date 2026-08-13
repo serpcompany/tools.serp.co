@@ -108,11 +108,10 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /installed-package presence/);
   assert.match(source, /searchParams\.get\(['"]expansion['"]\)/);
   assert.match(source, /copiedExpansionPage\.goto\(expansionUrl\.href/);
-  assert.match(source, /Latest exact Tool test/);
+  assert.match(source, /Journey verification evidence/);
   assert.match(source, /3g2-to-mp4/);
   assert.match(source, /Candidate approaches · not verified support/);
-  assert.match(source, /Converted a real PNG and produced a WebP file/);
-  assert.match(source, /Not tested here/);
+  assert.match(source, /No retained evidence/);
   assert.match(source, /Family verification policy \(not an exact Tool test\)/);
   assert.match(source, /planner\.screenshot/);
   assert.match(

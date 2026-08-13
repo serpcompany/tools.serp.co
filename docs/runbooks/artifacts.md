@@ -80,6 +80,19 @@ Allowed environment classes are `local`, `pull-request`, `scheduled`, `main`,
 and `migration`. A local run may opt into `--retention-class retained-debug`.
 Credential-bearing and restricted classifications are refused.
 
+Tool browser smoke artifacts use schema version 2 and record one outcome for
+each exact Tool Journey. A successful aggregate run does not make warned,
+skipped, stale, or incomplete journeys pass. After reviewing a clean
+exact-revision run, promote its sanitized manifest into clone-portable evidence:
+
+```bash
+pnpm evidence:promote:tool-journeys -- --run <run-id>
+```
+
+The promotion command validates the shared verification-evidence interface and
+writes only to `docs/audits/tool-verification/retained-runs.json`. It does not
+change Processor Support or deploy anything.
+
 ## Retention defaults
 
 | Class                                       |                                                               Default maximum |

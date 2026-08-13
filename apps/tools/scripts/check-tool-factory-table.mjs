@@ -279,20 +279,34 @@ try {
   await page.getByText('1 matching Tools').waitFor();
   await page.getByRole('row', { name: /PNG to WebP/ }).click();
   const dialog = page.getByRole('dialog');
-  await dialog.getByText('Latest exact Tool test', { exact: true }).waitFor();
-  await dialog.getByText('Passed', { exact: true }).waitFor();
-  await dialog
-    .getByText('Converted a real PNG and produced a WebP file.', {
+  const verificationSection = dialog
+    .getByText('Journey verification evidence', { exact: true })
+    .locator('..');
+  await verificationSection.waitFor();
+  await verificationSection
+    .getByText('png-to-webp:upload', { exact: true })
+    .waitFor();
+  await verificationSection
+    .getByText('Warning · not verified', { exact: true })
+    .waitFor();
+  await verificationSection
+    .getByText('The run emitted warnings (other-console-warning).', {
       exact: true,
     })
     .waitFor();
-  await dialog.getByText('DEV/STAGING preview', { exact: true }).waitFor();
-  await dialog.getByRole('link', { name: 'View screenshot' }).waitFor();
-  await dialog
+  await verificationSection
     .getByText(
-      '20260812T083305Z_03dc90f_pull-request_browser-smoke-preview-subset',
+      'Still needed: semantic-output, malformed-input, spoofed-input, wrong-format-output, no-delivery-on-failure, cancellation-lifecycle',
       { exact: true },
     )
+    .waitFor();
+  await verificationSection
+    .getByText('Exact evidence identity', { exact: true })
+    .click();
+  await verificationSection
+    .getByText('20260813T002824Z_05f9398_local_browser-smoke-local-subset', {
+      exact: true,
+    })
     .waitFor();
   await dialog
     .getByText('Family verification policy (not an exact Tool test)', {
@@ -329,11 +343,9 @@ try {
   await page.getByLabel('Search all Tools').fill('bmp-to-png');
   await page.getByRole('row', { name: /BMP to PNG/ }).click();
   const untestedDialog = page.getByRole('dialog');
-  await untestedDialog.getByText('Not tested here', { exact: true }).waitFor();
-  assert.equal(
-    await untestedDialog.getByRole('link', { name: 'View screenshot' }).count(),
-    0,
-  );
+  await untestedDialog
+    .getByText('No retained evidence', { exact: true })
+    .waitFor();
   await untestedDialog
     .getByText('Family verification policy (not an exact Tool test)', {
       exact: true,
@@ -350,30 +362,24 @@ try {
   await familyDialog
     .getByText('YouTube or extractor URL', { exact: true })
     .waitFor();
-  await familyDialog
+  const familyVerificationSection = familyDialog
+    .getByText('Journey verification evidence', { exact: true })
+    .locator('..');
+  await familyVerificationSection
     .getByText('audio-to-text:upload', { exact: true })
     .waitFor();
-  await familyDialog
+  await familyVerificationSection
     .getByText('audio-to-text:direct-url', { exact: true })
     .waitFor();
-  await familyDialog
+  await familyVerificationSection
     .getByText('audio-to-text:extractor-url', { exact: true })
     .waitFor();
-  await familyDialog
-    .getByText('Family test evidence — not an exact Tool test', { exact: true })
-    .waitFor();
-  await familyDialog
-    .getByText(
-      'The representative family browser run included real speech transcription for this Tool.',
-      { exact: true },
-    )
-    .waitFor();
-  await familyDialog
-    .getByText(
-      'Family tested revision 03dc90f5213560ff61493dd058b877f9666b8338',
-      { exact: true },
-    )
-    .waitFor();
+  assert.equal(
+    await familyVerificationSection
+      .getByText('No retained evidence', { exact: true })
+      .count(),
+    3,
+  );
   const githubWorkHeading = familyDialog.getByText('GitHub work', {
     exact: true,
   });

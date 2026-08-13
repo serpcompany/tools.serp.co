@@ -25,6 +25,8 @@
     "canary:cloudflare:deployed": "pnpm -C apps/tools canary:cloudflare:deployed",
     "smoke:tools:browser": "node scripts/run-browser-check.mjs --mode smoke",
     "benchmark:tools:browser": "node scripts/run-browser-check.mjs --mode benchmark",
+    "evidence:promote:tool-journeys": "node scripts/promote-tool-verification-evidence.mjs",
+    "generate:tool-verification-inputs": "node scripts/generate-tool-verification-inputs.mjs",
     "proof:tool-workflow": "node scripts/prove-tool-workflow.mjs",
     "verify:agent-workflow": "node scripts/verify-agent-workflow.mjs",
     "verify:workflow-ownership": "node scripts/verify-tool-workflow-ownership.mjs",

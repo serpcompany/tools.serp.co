@@ -44,14 +44,21 @@ test('supported Tool keeps implementation, verification, and runtime facts separ
   assert.equal(row.controlledVerification.retainedExecutionResult, false);
   assert.equal(row.runtimeRequirement.classification, 'declared-client-only');
   assert.equal(row.runtimeObservation.classification, 'not-loaded');
-  assert.ok(row.verificationEvidence.exact);
-  assert.equal(row.verificationEvidence.exact.result, 'passed');
-  assert.equal(row.verificationEvidence.exact.scope, 'exact-tool');
-  assert.match(
-    row.verificationEvidence.exact.screenshotUrl,
-    /workflow-preview-png-to-webp/,
+  assert.deepEqual(
+    row.verificationEvidence.map((evidence) => [
+      evidence.journeyId,
+      evidence.state,
+    ]),
+    [['png-to-webp:upload', 'warned']],
   );
-  assert.deepEqual(row.verificationEvidence.family, []);
+  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, [
+    'semantic-output',
+    'malformed-input',
+    'spoofed-input',
+    'wrong-format-output',
+    'no-delivery-on-failure',
+    'cancellation-lifecycle',
+  ]);
   assert.deepEqual(row.attention.codes, []);
 });
 
@@ -76,8 +83,10 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
     'runtime-proof-needed',
   ]);
   assert.equal(row.runtimeObservation.classification, 'not-loaded');
-  assert.equal(row.verificationEvidence.exact, null);
-  assert.deepEqual(row.verificationEvidence.family, []);
+  assert.deepEqual(
+    row.verificationEvidence.map((evidence) => evidence.state),
+    ['no-evidence'],
+  );
 });
 
 test('registered family policy does not become exact Tool evidence', () => {
@@ -88,8 +97,10 @@ test('registered family policy does not become exact Tool evidence', () => {
     row.controlledVerification.classification,
     'registered-with-semantic-policy',
   );
-  assert.equal(row.verificationEvidence.exact, null);
-  assert.deepEqual(row.verificationEvidence.family, []);
+  assert.deepEqual(
+    row.verificationEvidence.map((evidence) => evidence.state),
+    ['no-evidence'],
+  );
 });
 
 test('unknown Tool remains unknown and names the evidence needed to resolve it', () => {

@@ -1,3 +1,5 @@
+import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -5,9 +7,12 @@ import { operationalToolCatalog } from '../packages/app-core/src/lib/tool-catalo
 import { recordRunEvidence } from './lib/run-evidence.mjs';
 import {
   attachConsoleWarningEvidence,
+  attachJourneyResultEvidence,
   buildBrowserScope,
   classifyConsoleWarning,
+  finalizeJourneyResults,
   summarizeNavigationTimings,
+  validateBrowserEvidenceRevision,
 } from './lib/browser-evidence.mjs';
 import {
   GENERIC_SMOKE_CAPABILITY_VERSION,
@@ -135,6 +140,22 @@ let evidenceTools = [];
 let selectedItemCount = 0;
 let browser;
 const results = [];
+
+if (process.env.NODE_ENV !== 'test') {
+  const actualRevision = execFileSync('git', ['rev-parse', 'HEAD'], {
+    cwd: repositoryRoot,
+    encoding: 'utf8',
+  }).trim();
+  const actualDirty =
+    execFileSync('git', ['status', '--porcelain', '--untracked-files=all'], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+    }).trim() !== '';
+  validateBrowserEvidenceRevision(
+    { revision: options.revision, dirty: options.dirty },
+    { revision: actualRevision, dirty: actualDirty },
+  );
+}
 
 function recordBrowserEvidence(status, summary, completedAt = new Date()) {
   return recordRunEvidence({
@@ -310,6 +331,10 @@ try {
 
   const fixtureCache = new Map();
 
+  function sha256(value) {
+    return crypto.createHash('sha256').update(value).digest('hex');
+  }
+
   function resolveFixturePath(relativePath) {
     if (!relativePath) return null;
     return path.join(fixturesDir, relativePath);
@@ -352,6 +377,40 @@ try {
     };
     fixtureCache.set(filePath, file);
     return file;
+  }
+
+  async function getJourneyFixtureSha256(toolId, journey) {
+    const reference = journey.fixtureReference;
+    if (!reference) return null;
+    if (
+      journey.fixtureKind === 'maintainer-url' ||
+      journey.fixtureKind === 'literal'
+    ) {
+      return sha256(reference);
+    }
+    if (reference.startsWith('formats/')) {
+      const fixture = getFormatFixture(reference.slice('formats/'.length));
+      return fixture ? sha256(await fs.readFile(fixture.path)) : null;
+    }
+    if (reference.startsWith('fixtures/')) {
+      const fixturePath = resolveFixturePath(reference);
+      return fixturePath ? sha256(await fs.readFile(fixturePath)) : null;
+    }
+    if (reference.startsWith('tools/')) {
+      const toolFixture = toolFixtures[toolId] ?? {};
+      const fileReference = toolFixture.fixture ?? toolFixture.responseFixture;
+      if (fileReference) {
+        const fixturePath = resolveFixturePath(fileReference);
+        return fixturePath ? sha256(await fs.readFile(fixturePath)) : null;
+      }
+      if (typeof toolFixture.fixtureText === 'string') {
+        return sha256(toolFixture.fixtureText);
+      }
+      return Object.keys(toolFixture).length
+        ? sha256(JSON.stringify(toolFixture))
+        : null;
+    }
+    return sha256(reference);
   }
 
   async function dropFilesOnDropzone(page, selector, filePaths) {
@@ -897,6 +956,7 @@ try {
         return { skipped: true, reason: 'missing mp3 fixture' };
       }
       if (tool.id === 'audio-to-text') {
+        result.activeJourneyId = 'audio-to-text:extractor-url';
         await page.route('**/api/media-fetch*', async (route) => {
           const requestPayload = route.request().postDataJSON();
           if (
@@ -937,6 +997,13 @@ try {
             `Audio-to-Text YouTube failure was not plain and truthful: ${youtubeTerminal.message}`,
           );
         }
+        result.completedJourneyIds.push('audio-to-text:extractor-url');
+        result.journeyOutcomes.set('audio-to-text:extractor-url', {
+          outcome: 'passed',
+          reasonCode: null,
+          checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+        });
+        result.activeJourneyId = 'audio-to-text:upload';
         await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
           fixtureEntry.path,
         ]);
@@ -947,6 +1014,7 @@ try {
               ?.getAttribute('data-status') !== 'error',
         );
       } else {
+        result.activeJourneyId = 'audio-to-transcript:direct-url';
         const media = await fs.readFile(fixtureEntry.path);
         await page.route('**/api/media-fetch*', async (route) => {
           await route.fulfill({
@@ -975,6 +1043,13 @@ try {
       if (terminal.status === 'failed') {
         throw new Error(`Transcription failed: ${terminal.message}`);
       }
+      result.completedJourneyIds.push(result.activeJourneyId);
+      result.journeyOutcomes.set(result.activeJourneyId, {
+        outcome: 'passed',
+        reasonCode: null,
+        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+      });
+      result.activeJourneyId = null;
       return {
         detail:
           tool.id === 'audio-to-text'
@@ -1028,6 +1103,7 @@ try {
         return {
           detail: 'safe failure: published route is truthfully unsupported',
           metrics: { outputBytes: 0, outputType: null },
+          warning: 'truthfully unsupported operation produced no output',
         };
       }
       const blob = await waitForBlob(
@@ -1070,10 +1146,18 @@ try {
     await waitForHydration(page);
     await page.waitForTimeout(250);
 
-    const functional = await runFunctionalTest(page, tool);
+    result.activeJourneyId ??= result.plannedJourneys[0]?.journeyId ?? null;
+    const functional = await runFunctionalTest(page, tool, result);
     if (functional?.skipped) {
       result.status = 'warn';
       result.errors.push(functional.reason);
+      if (result.activeJourneyId) {
+        result.journeyOutcomes.set(result.activeJourneyId, {
+          outcome: 'skipped',
+          reasonCode: 'browser-check-skipped',
+        });
+      }
+      result.activeJourneyId = null;
     } else {
       result.detail = functional?.detail ?? null;
       result.metrics = functional?.metrics ?? null;
@@ -1082,7 +1166,34 @@ try {
           result.status = 'warn';
         }
         result.errors.push(functional.warning);
+        for (const journey of result.plannedJourneys) {
+          if (!result.journeyOutcomes.has(journey.journeyId)) {
+            result.journeyOutcomes.set(journey.journeyId, {
+              outcome: 'warned',
+              reasonCode: 'browser-check-warning',
+              checks: [],
+            });
+          }
+        }
+        result.activeJourneyId = null;
       }
+      if (!result.completedJourneyIds.length && !functional?.warning) {
+        result.completedJourneyIds.push(
+          ...result.plannedJourneys.map((journey) => journey.journeyId),
+        );
+      }
+      if (!functional?.warning) {
+        for (const journey of result.plannedJourneys) {
+          if (!result.journeyOutcomes.has(journey.journeyId)) {
+            result.journeyOutcomes.set(journey.journeyId, {
+              outcome: 'passed',
+              reasonCode: null,
+              checks: ['valid-fixture', 'required-environment'],
+            });
+          }
+        }
+      }
+      result.activeJourneyId = null;
     }
 
     if (
@@ -1131,6 +1242,8 @@ try {
   });
 
   for (const tool of tools) {
+    const plannedJourneys =
+      evidenceTools.find((entry) => entry.toolId === tool.id)?.journeys ?? [];
     const result = {
       id: tool.id,
       route: tool.route,
@@ -1142,6 +1255,16 @@ try {
       errors: [],
       pageErrors: [],
       consoleWarnings: [],
+      plannedJourneys: await Promise.all(
+        plannedJourneys.map(async (journey) => ({
+          ...journey,
+          fixtureSha256: await getJourneyFixtureSha256(tool.id, journey),
+        })),
+      ),
+      completedJourneyIds: [],
+      activeJourneyId: null,
+      journeyResults: [],
+      journeyOutcomes: new Map(),
     };
 
     const page = await browser.newPage();
@@ -1185,6 +1308,12 @@ try {
         result.errors.push(message);
       }
     } finally {
+      result.journeyResults = finalizeJourneyResults({
+        plannedJourneys: result.plannedJourneys,
+        outcomes: [...result.journeyOutcomes],
+        activeJourneyId: result.activeJourneyId,
+        status: result.status,
+      });
       await page.close();
     }
 
@@ -1212,6 +1341,7 @@ try {
 
   const completedAt = new Date();
   const evidenceStatus = summary.fail > 0 ? 'failure' : 'success';
+  evidenceTools = attachJourneyResultEvidence(evidenceTools, results);
   evidenceTools = attachConsoleWarningEvidence(evidenceTools, results);
   const evidenceSummary = {
     checksPassed: summary.pass,
@@ -1239,6 +1369,8 @@ try {
     await browser.close().catch(() => {});
   }
   try {
+    evidenceTools = attachJourneyResultEvidence(evidenceTools, results);
+    evidenceTools = attachConsoleWarningEvidence(evidenceTools, results);
     const evidence = recordBrowserEvidence('failure', {
       checksPassed: results.filter((result) => result.status === 'pass').length,
       checksFailed: Math.max(

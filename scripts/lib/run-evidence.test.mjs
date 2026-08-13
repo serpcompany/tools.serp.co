@@ -25,11 +25,11 @@ test('evidence adapter writes the structured artifact contract', (t) => {
     tools: [
       {
         toolId: 'png-to-webp',
-        invariants: ['generic-file-exact-output'],
+        journeys: [],
       },
       {
         toolId: 'video-downloader',
-        invariants: ['url-stream-exact-output'],
+        journeys: [],
       },
     ],
     summary: {
@@ -61,11 +61,11 @@ test('evidence adapter writes the structured artifact contract', (t) => {
   assert.deepEqual(manifest.scope.tools, [
     {
       toolId: 'png-to-webp',
-      invariants: ['generic-file-exact-output'],
+      journeys: [],
     },
     {
       toolId: 'video-downloader',
-      invariants: ['url-stream-exact-output'],
+      journeys: [],
     },
   ]);
   assert.equal(manifest.result.status, 'failure');
