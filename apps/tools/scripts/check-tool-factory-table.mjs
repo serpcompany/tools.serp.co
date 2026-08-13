@@ -304,7 +304,7 @@ try {
     .getByText('Exact evidence identity', { exact: true })
     .click();
   await verificationSection
-    .getByText('20260813T002309Z_33f6970_local_browser-smoke-local-subset', {
+    .getByText('20260813T002824Z_05f9398_local_browser-smoke-local-subset', {
       exact: true,
     })
     .waitFor();
