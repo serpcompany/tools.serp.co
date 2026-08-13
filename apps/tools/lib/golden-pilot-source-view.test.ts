@@ -30,4 +30,13 @@ test('Golden source view projects portfolio and planner expectations from curren
     view.firstExpansionGroup.operationFamily,
     'wave:heif-browser-libheif',
   );
+  const pngCard = view.evidenceCards.find(
+    (card) => card.journeyId === 'png-to-webp:upload',
+  );
+  assert.ok(pngCard);
+  assert.equal(pngCard.label, 'Verified journey');
+  assert.equal(
+    pngCard.reason,
+    'Current controlled evidence satisfies every required check.',
+  );
 });

@@ -120,12 +120,15 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /expectedGoldenPilot\.portfolioCounts/);
   assert.match(source, /expectedGoldenPilot\.portfolioTotal/);
   assert.match(source, /expectedGoldenPilot\.firstExpansionGroup/);
+  assert.match(source, /expectedGoldenPilot\.evidenceCards/);
   assert.doesNotMatch(source, /436 supported/);
   assert.doesNotMatch(source, /wave:heif-browser-libheif/);
   assert.match(source, /expected\.resultLabel/);
   assert.match(source, /expected\.remainingGap/);
-  assert.match(source, /expectedBmp\.resultLabel/);
-  assert.match(source, /expectedBmp\.remainingGap/);
+  assert.match(source, /expectedPngCard\.label/);
+  assert.match(source, /expectedPngCard\.reason/);
+  assert.match(source, /expectedBmpCard\.label/);
+  assert.match(source, /expectedBmpCard\.reason/);
   assert.match(source, /expectedAudioNoEvidence/);
   assert.match(
     source,

@@ -44,6 +44,7 @@ import type { ToolFactoryDeployment } from '../../../lib/tool-factory-access.ts'
 import type { ToolRuntimeObservationPortfolio } from '../../../lib/tool-runtime-observations.ts';
 import type { GoldenToolJourneyPilotView } from '../../../lib/golden-tool-journey-pilot.ts';
 import { presentToolRuntimeObservations } from '../../../lib/tool-runtime-observation-presentation.ts';
+import { journeyEvidenceLabel } from '../../../lib/tool-verification-presentation.ts';
 import {
   DEFAULT_TOOL_FACTORY_VIEW,
   clampToolFactoryPageIndex,
@@ -737,21 +738,6 @@ function familyPolicyExplanation(row: ToolFactoryRow) {
     return 'This family is configured to refuse this operation rather than return an unverified result.';
   }
   return 'No registered family verification policy exists for this Tool.';
-}
-
-function journeyEvidenceLabel(
-  state: ToolFactoryRow['verificationEvidence'][number]['state'],
-) {
-  return {
-    verified: 'Verified journey',
-    incomplete: 'Passed checks · evidence incomplete',
-    failed: 'Failed controlled run',
-    warned: 'Warning · not verified',
-    skipped: 'Skipped · not verified',
-    stale: 'Stale evidence',
-    invalid: 'Invalid evidence',
-    'no-evidence': 'No retained evidence',
-  }[state];
 }
 
 function JourneyVerificationEvidence({ row }: { row: ToolFactoryRow }) {

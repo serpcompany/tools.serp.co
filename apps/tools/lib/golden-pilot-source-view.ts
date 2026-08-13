@@ -4,6 +4,7 @@ import { buildGoldenToolJourneyPilotView } from './golden-tool-journey-pilot.ts'
 import { buildToolClientFirstPlan } from './tool-client-first-plan.ts';
 import { buildToolExpansionPlan } from './tool-expansion-planner.ts';
 import { buildToolFactoryReadModel } from './tool-factory-read-model.ts';
+import { journeyEvidenceLabel } from './tool-verification-presentation.ts';
 
 export function buildGoldenPilotSourceView() {
   const tools = buildToolFactoryReadModel();
@@ -38,6 +39,18 @@ export function buildGoldenPilotSourceView() {
       includedToolId: firstExpansionGroup.toolIds[0],
       excludedToolId: excludedExpansionTool.toolId,
     }),
+    evidenceCards: Object.freeze(
+      tools.rows.flatMap((row) =>
+        row.verificationEvidence.map((evidence) =>
+          Object.freeze({
+            journeyId: evidence.journeyId,
+            state: evidence.state,
+            label: journeyEvidenceLabel(evidence.state),
+            reason: evidence.reason,
+          }),
+        ),
+      ),
+    ),
   });
 }
 

@@ -358,14 +358,16 @@ try {
   const expectedPng = expectedGoldenPilot.rows.find(
     (row) => row.journeyId === 'png-to-webp:upload',
   );
+  const expectedPngCard = expectedGoldenPilot.evidenceCards.find(
+    (card) => card.journeyId === 'png-to-webp:upload',
+  );
   assert.ok(expectedPng);
+  assert.ok(expectedPngCard);
   await verificationSection
-    .getByText(expectedPng.resultLabel, { exact: false })
-    .first()
+    .getByText(expectedPngCard.label, { exact: true })
     .waitFor();
   await verificationSection
-    .getByText(expectedPng.remainingGap, { exact: false })
-    .first()
+    .getByText(expectedPngCard.reason, { exact: true })
     .waitFor();
   await verificationSection
     .getByText('Exact evidence identity', { exact: true })
@@ -420,12 +422,16 @@ try {
   const expectedBmp = expectedGoldenPilot.rows.find(
     (row) => row.journeyId === 'bmp-to-png:upload',
   );
+  const expectedBmpCard = expectedGoldenPilot.evidenceCards.find(
+    (card) => card.journeyId === 'bmp-to-png:upload',
+  );
   assert.ok(expectedBmp);
+  assert.ok(expectedBmpCard);
   await bmpVerificationSection
-    .getByText(expectedBmp.resultLabel, { exact: false })
+    .getByText(expectedBmpCard.label, { exact: true })
     .waitFor();
   await bmpVerificationSection
-    .getByText(expectedBmp.remainingGap, { exact: false })
+    .getByText(expectedBmpCard.reason, { exact: true })
     .waitFor();
   await bmpDialog
     .getByText('Family verification policy (not an exact Tool test)', {
