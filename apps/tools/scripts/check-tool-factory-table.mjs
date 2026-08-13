@@ -111,6 +111,12 @@ const expectedGoldenPilot = JSON.parse(
     { cwd: repositoryRoot, encoding: 'utf8' },
   ),
 );
+const expectedPortfolioSummary = [
+  '2,807 active Tools',
+  `${expectedGoldenPilot.portfolioCounts.supported.toLocaleString('en-US')} supported`,
+  `${expectedGoldenPilot.portfolioCounts.unsupported.toLocaleString('en-US')} explicitly unsupported`,
+  `${expectedGoldenPilot.portfolioCounts.unknown.toLocaleString('en-US')} unknown`,
+].join(' · ');
 let browser;
 let status = 'failure';
 const accessCookie = process.env.TOOL_FACTORY_CF_AUTHORIZATION ?? '';
@@ -169,11 +175,7 @@ try {
   await page.getByRole('heading', { name: 'All Tools' }).waitFor();
   await page.getByText(args.environment, { exact: true }).waitFor();
   await page.getByText(`Revision ${args.revision}`, { exact: true }).waitFor();
-  await page
-    .getByText(
-      '2,807 active Tools · 436 supported · 2,368 explicitly unsupported · 3 unknown',
-    )
-    .waitFor();
+  await page.getByText(expectedPortfolioSummary, { exact: true }).waitFor();
   await waitForHydration(page);
   await page.getByRole('link', { name: 'Open Golden Journey pilot' }).click();
   await page

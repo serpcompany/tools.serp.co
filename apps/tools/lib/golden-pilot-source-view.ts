@@ -7,7 +7,10 @@ import { buildToolFactoryReadModel } from './tool-factory-read-model.ts';
 export function buildGoldenPilotSourceView() {
   const tools = buildToolFactoryReadModel();
   const clientFirst = buildToolClientFirstPlan(tools.rows);
-  return buildGoldenToolJourneyPilotView(tools.rows, clientFirst.rows);
+  return Object.freeze({
+    ...buildGoldenToolJourneyPilotView(tools.rows, clientFirst.rows),
+    portfolioCounts: tools.counts,
+  });
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

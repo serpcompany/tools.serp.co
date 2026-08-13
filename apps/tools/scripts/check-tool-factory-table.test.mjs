@@ -113,6 +113,8 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /Fixed membership sha256:cf077705/);
   assert.match(source, /golden-pilot-source-view\.ts/);
   assert.match(source, /expectedGoldenPilot\.rows/);
+  assert.match(source, /expectedGoldenPilot\.portfolioCounts/);
+  assert.doesNotMatch(source, /436 supported/);
   assert.match(source, /expected\.resultLabel/);
   assert.match(source, /expected\.remainingGap/);
   assert.match(source, /expectedBmp\.resultLabel/);
