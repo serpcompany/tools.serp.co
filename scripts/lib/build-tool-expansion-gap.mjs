@@ -33,7 +33,7 @@ const SOURCES = Object.freeze({
   tablePolicy: 'apps/tools/lib/table-operation-policy.ts',
   planning: 'scripts/lib/build-tool-expansion-gap.mjs#planning-policy-v1',
 });
-const CURRENT_SUPPORTED_COUNT = 435;
+const CURRENT_SUPPORTED_COUNT = 436;
 
 const audioFormats = new Set(AUDIO_FORMATS);
 const videoFormats = new Set(VIDEO_FORMATS);
@@ -528,7 +528,7 @@ export function buildToolExpansionGapReadModel({
     rows,
     expectedCounts: {
       supported: CURRENT_SUPPORTED_COUNT,
-      unsupported: 2_369,
+      unsupported: 2_368,
       unwired: 0,
       unknown: 3,
     },

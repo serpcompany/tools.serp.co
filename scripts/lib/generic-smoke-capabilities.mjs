@@ -1,7 +1,8 @@
-export const GENERIC_SMOKE_CAPABILITY_VERSION = 'generic-adapters-v4-webm';
+export const GENERIC_SMOKE_CAPABILITY_VERSION = 'generic-adapters-v5-webm';
 
 const browserWebmToolIds = new Set([
   'compress-webm',
+  'mp4-to-webm',
   'webm-to-m4a',
   'webm-to-mp3',
   'webm-to-mp4',

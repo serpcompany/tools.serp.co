@@ -109,6 +109,20 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /searchParams\.get\(['"]expansion['"]\)/);
   assert.match(source, /copiedExpansionPage\.goto\(expansionUrl\.href/);
   assert.match(source, /Journey verification evidence/);
+  assert.match(source, /Open Golden Journey pilot/);
+  assert.match(source, /Fixed membership sha256:cf077705/);
+  assert.match(source, /golden-pilot-source-view\.ts/);
+  assert.match(source, /expectedGoldenPilot\.rows/);
+  assert.match(source, /expected\.resultLabel/);
+  assert.match(source, /expected\.remainingGap/);
+  assert.match(source, /expectedBmp\.resultLabel/);
+  assert.match(source, /expectedBmp\.remainingGap/);
+  assert.match(source, /expectedAudioNoEvidence/);
+  assert.match(
+    source,
+    /deriveScreenshotPath\(args\.screenshot, ['"]golden-pilot['"]\)/,
+  );
+  assert.match(source, /statSync\(screenshotPaths\.goldenPilot\)\.size > 0/);
   assert.match(source, /3g2-to-mp4/);
   assert.match(source, /Candidate approaches · not verified support/);
   assert.match(source, /No retained evidence/);
@@ -145,9 +159,6 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /screenshot\(\{ path: screenshotPaths\.githubWork \}\)/);
   assert.match(source, /recordRunEvidence/);
   assert.match(source, /command:\s*['"]check:tool-factory['"]/);
-  assert.match(
-    source,
-    /linkedWork:\s*\[['"]#50['"], ['"]#102['"], ['"]#103['"], ['"]#104['"], ['"]#105['"], ['"]#106['"], ['"]#107['"], ['"]#114['"]\]/,
-  );
+  assert.match(source, /linkedWork:\s*\[[\s\S]*['"]#124['"][\s\S]*\]/);
   assert.doesNotMatch(source, /console\.log\(.*accessCookie/);
 });

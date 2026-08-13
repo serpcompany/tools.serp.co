@@ -4,6 +4,7 @@ import test from 'node:test';
 import { toolJourneys } from './tool-journeys.ts';
 import {
   buildToolVerificationEvidenceIndex,
+  getRequiredVerificationChecks,
   getToolVerificationInputRevisions,
   ingestToolVerificationRun,
   requiredVerificationChecks,
@@ -12,6 +13,10 @@ import {
 
 const journey = toolJourneys.getByToolId('png-to-webp')[0];
 assert.ok(journey);
+const unsupportedExtractorJourney = toolJourneys
+  .getByToolId('audio-to-text')
+  .find((candidate) => candidate.input.kind === 'extractor-url');
+assert.ok(unsupportedExtractorJourney);
 
 const currentInputRevisions = Object.freeze({
   'journey-contract': `sha256:${'1'.repeat(64)}`,
@@ -60,6 +65,25 @@ function build(records: readonly ToolJourneyEvidenceRecord[]) {
     },
   });
 }
+
+test('required checks follow the promised journey outcome instead of one global conversion checklist', () => {
+  assert.deepEqual(getRequiredVerificationChecks(journey), [
+    'valid-fixture',
+    'semantic-output',
+    'malformed-input',
+    'spoofed-input',
+    'wrong-format-output',
+    'no-delivery-on-failure',
+    'cancellation-lifecycle',
+    'required-environment',
+  ]);
+  assert.deepEqual(getRequiredVerificationChecks(unsupportedExtractorJourney), [
+    'valid-fixture',
+    'semantic-output',
+    'no-delivery-on-failure',
+    'required-environment',
+  ]);
+});
 
 test('an exact current journey result becomes verified only with every required check', () => {
   const index = build([record()]);

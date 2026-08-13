@@ -399,7 +399,10 @@ function processorFor(
               contract.output.format === 'mp3'
               ? 'audio'
               : 'video'
-            : undefined,
+            : contract.input.format === 'mp4' &&
+                contract.output.format === 'webm'
+              ? 'video'
+              : undefined,
       });
       return verification.status === 'unavailable'
         ? adapters.verify(input, { signal: context.signal })
@@ -461,9 +464,7 @@ function processorFor(
       const verification = await verifyGenericMediaSemantics(result, {
         signal: context.signal,
         requiredMediaTrack:
-          contract.operation === 'compress' && contract.output.format === 'webm'
-            ? 'video'
-            : undefined,
+          contract.output.format === 'webm' ? 'video' : undefined,
       });
       const formatVerification =
         verification.status === 'unavailable'

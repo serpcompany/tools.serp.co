@@ -100,7 +100,7 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   assert.match(runnerSource, /safe failure/i);
   assert.doesNotMatch(runnerSource, /data-generic-contract/);
   assert.match(runnerSource, /getGenericSmokeExpectation/);
-  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v4-webm');
+  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v5-webm');
   for (const id of ['png-to-webp', 'webp-to-jpg', 'heic-to-jpg']) {
     const [from, to] = id.split('-to-');
     assert.equal(
@@ -204,6 +204,63 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   );
 });
 
+test('same-family MP4 to WebM browser proof independently decodes exact output', () => {
+  assert.match(runnerSource, /tool\.id === 'mp4-to-webm'/);
+  assert.match(runnerSource, /\[26, 69, 223, 163\]/);
+  assert.match(runnerSource, /video\.videoWidth/);
+  assert.match(runnerSource, /semantic-output/);
+});
+
+test('Golden downloader and PNG to WebP checks retain exact or decoded fixture semantics', () => {
+  assert.match(runnerSource, /assertExactFixtureBytes/);
+  assert.match(runnerSource, /fixtureBytes/);
+  assert.match(runnerSource, /outputSha256/);
+  assert.match(runnerSource, /assertLossyUniformImageSummary/);
+  assert.match(runnerSource, /tolerance: 8/);
+  assert.match(runnerSource, /'image\/webp'/);
+});
+
+test('Golden output journeys retain exact negative-path probe checks', () => {
+  assert.match(runnerSource, /function runGoldenNegativePathProbe/);
+  for (const toolId of [
+    'audio-to-text',
+    'audio-to-transcript',
+    'batch-compress-png',
+    'bmp-to-png',
+    'csv-to-json',
+    'pdf-reader',
+    'video-downloader',
+  ]) {
+    assert.match(runnerSource, new RegExp(`'${toolId}'`));
+  }
+  for (const check of [
+    'malformed-input',
+    'spoofed-input',
+    'wrong-format-output',
+    'no-delivery-on-failure',
+    'cancellation-lifecycle',
+  ]) {
+    assert.match(runnerSource, new RegExp(`'${check}'`));
+  }
+  assert.match(runnerSource, /runGoldenNegativePathProbe\(tool\.id\)/);
+});
+
+test('truthfully unavailable compression retains no-delivery without claiming output semantics', () => {
+  const unsupportedBranch = runnerSource.slice(
+    runnerSource.indexOf(
+      "detail: 'safe failure: published route is truthfully unsupported'",
+    ),
+    runnerSource.indexOf(
+      'const blob = await waitForBlob',
+      runnerSource.indexOf(
+        "detail: 'safe failure: published route is truthfully unsupported'",
+      ),
+    ),
+  );
+  assert.match(unsupportedBranch, /no-delivery-on-failure/);
+  assert.doesNotMatch(unsupportedBranch, /semantic-output/);
+});
+
 test('transcription smoke uses owned speech and a bounded success-or-error terminal', () => {
   const matrix = JSON.parse(
     readFileSync(
@@ -233,6 +290,8 @@ test('transcription smoke uses owned speech and a bounded success-or-error termi
   assert.match(provenance[relativeFixture].command, /say -v Daniel/);
   assert.match(provenance[relativeFixture].command, /ffmpeg/);
   assert.match(provenance[relativeFixture].text, /shared workflow test/);
+  assert.match(runnerSource, /fixture-provenance\.json/);
+  assert.match(runnerSource, /assertTranscriptMatchesFixture/);
   assert.match(runnerSource, /toolFixtures\[tool\.id\]\?\.fixture/);
   assert.match(runnerSource, /readTranscriptionTerminalState/);
   assert.match(runnerSource, /timeout: 60_000/);
@@ -248,8 +307,17 @@ test('transcription smoke uses owned speech and a bounded success-or-error termi
   assert.match(runnerSource, /page\.route\(['"]\*\*\/api\/media-fetch\*['"]/);
   assert.match(runnerSource, /Download failed\|422\|Unexpected token/);
   assert.match(runnerSource, /dropFilesOnDropzone[\s\S]*fixtureEntry\.path/);
+  assert.match(runnerSource, /getByTestId\(['"]tool-cancel['"]\)\.click\(\)/);
+  assert.match(runnerSource, /No transcript was delivered\./);
+  assert.match(runnerSource, /deliveriesBeforeCancellation/);
+  assert.match(runnerSource, /'cancellation-lifecycle'/);
   assert.match(runnerSource, /https:\/\/media\.example\/direct-speech\.mp3/);
   assert.match(runnerSource, /direct-media transcript/);
+  assert.match(
+    runnerSource,
+    /async function runFunctionalTest\(page, tool, result\)/,
+  );
+  assert.match(runnerSource, /runFunctionalTest\(page, tool, result\)/);
 });
 
 test('local downloader smoke crosses the URL endpoint with checked-in media', () => {

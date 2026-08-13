@@ -528,7 +528,7 @@ test("downloader UI consumes shared browser run progress without deriving transp
   );
 });
 
-test("transcription UI owns one guarded batch run through unmount", () => {
+test("transcription UI owns one guarded batch run through cancellation and unmount", () => {
   const source = readFileSync(
     new URL("../../components/TranscribeTool.tsx", import.meta.url),
     "utf8",
@@ -537,7 +537,16 @@ test("transcription UI owns one guarded batch run through unmount", () => {
   assert.match(source, /if \(busy \|\| runOwnership\.isBusy\(\)\) return/);
   assert.match(source, /if \(!lease\.isCurrent\(\)\) break/);
   assert.match(source, /lease\.finish\(\)/);
-  assert.match(source, /runOwnership\.abort\("Transcription view unmounted"\)/);
+  assert.match(
+    source,
+    /runOwnership\.abort\(["']Transcription cancelled by the user["']\)/,
+  );
+  assert.match(source, /data-testid="tool-cancel"/);
+  assert.match(source, /No transcript was delivered/);
+  assert.match(
+    source,
+    /runOwnership\.abort\(["']Transcription view unmounted["']\)/,
+  );
   assert.doesNotMatch(source, /activeRun\.current\s*=\s*null/);
 });
 

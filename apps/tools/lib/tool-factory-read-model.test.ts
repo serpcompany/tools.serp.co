@@ -9,8 +9,8 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
   assert.equal(model.rows.length, 2_807);
   assert.equal(new Set(model.rows.map((row) => row.toolId)).size, 2_807);
   assert.deepEqual(model.counts, {
-    supported: 435,
-    unsupported: 2_369,
+    supported: 436,
+    unsupported: 2_368,
     unwired: 0,
     unknown: 3,
   });
@@ -45,20 +45,11 @@ test('supported Tool keeps implementation, verification, and runtime facts separ
   assert.equal(row.runtimeRequirement.classification, 'declared-client-only');
   assert.equal(row.runtimeObservation.classification, 'not-loaded');
   assert.deepEqual(
-    row.verificationEvidence.map((evidence) => [
-      evidence.journeyId,
-      evidence.state,
-    ]),
-    [['png-to-webp:upload', 'warned']],
+    row.verificationEvidence.map((evidence) => evidence.journeyId),
+    ['png-to-webp:upload'],
   );
-  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, [
-    'semantic-output',
-    'malformed-input',
-    'spoofed-input',
-    'wrong-format-output',
-    'no-delivery-on-failure',
-    'cancellation-lifecycle',
-  ]);
+  assert.ok(row.verificationEvidence[0]);
+  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
   assert.deepEqual(row.attention.codes, []);
 });
 
@@ -89,7 +80,7 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
   );
 });
 
-test('registered family policy does not become exact Tool evidence', () => {
+test('registered family policy becomes verified only with exact Tool evidence', () => {
   const row = buildToolFactoryReadModel().getByToolId('bmp-to-png');
 
   assert.ok(row);
@@ -98,9 +89,11 @@ test('registered family policy does not become exact Tool evidence', () => {
     'registered-with-semantic-policy',
   );
   assert.deepEqual(
-    row.verificationEvidence.map((evidence) => evidence.state),
-    ['no-evidence'],
+    row.verificationEvidence.map((evidence) => evidence.journeyId),
+    ['bmp-to-png:upload'],
   );
+  assert.equal(row.verificationEvidence[0]?.state, 'verified');
+  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
 });
 
 test('unknown Tool remains unknown and names the evidence needed to resolve it', () => {

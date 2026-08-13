@@ -415,6 +415,13 @@ async function verifyPdf(bytes: Uint8Array, signal: AbortSignal): Promise<Semant
   }
 }
 
+export function verifyPdfToolOutput(
+  bytes: Uint8Array,
+  signal: AbortSignal = new AbortController().signal,
+): Promise<SemanticVerification> {
+  return verifyPdf(bytes, signal);
+}
+
 const pdfProcessor: ToolProcessor<Readonly<object>> = {
   engine: engine("browser-pdf-viewer"),
   support: support("file", [{ format: "pdf", mimeTypes: ["application/pdf"] }], {

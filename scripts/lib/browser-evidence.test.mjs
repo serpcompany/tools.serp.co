@@ -237,6 +237,33 @@ test('a later Tool warning cannot rewrite an already passed journey', () => {
   );
 });
 
+test('warned journey evidence retains the checks that proved its bounded outcome', () => {
+  const tools = buildBrowserScope({
+    mode: 'smoke',
+    environment: 'preview',
+    toolIds: ['compress-pdf'],
+    filtered: true,
+  }).tools;
+  const [tool] = attachJourneyResultEvidence(tools, [
+    {
+      id: 'compress-pdf',
+      journeyResults: [
+        {
+          journeyId: 'compress-pdf:upload',
+          outcome: 'warned',
+          reasonCode: 'browser-check-warning',
+          fixtureSha256: 'a'.repeat(64),
+          checks: ['valid-fixture', 'no-delivery-on-failure'],
+        },
+      ],
+    },
+  ]);
+  assert.deepEqual(tool.journeys[0].checks, [
+    'valid-fixture',
+    'no-delivery-on-failure',
+  ]);
+});
+
 test('browser evidence revision must match the actual clean checkout', () => {
   assert.doesNotThrow(() =>
     validateBrowserEvidenceRevision(
@@ -284,6 +311,15 @@ test('console warning evidence is classified, deduplicated, and attached without
     classifyConsoleWarning('unexpected warning containing private@example.com'),
     'other-console-warning',
   );
+  for (const diagnostic of [
+    "Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://ep2.adtrafficquality.google') does not match the recipient window's origin ('null').",
+    '[.WebGL-0x123]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels',
+    'ae_default_editor_active is undefined',
+    'Unable to determine content-length from response headers. Will expand buffer when needed.',
+    "2026-08-13 19:43:53.219340 [W:onnxruntime:, graph.cc:3490 CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_16_output_0'. It is not used by any node and should be removed from the model.",
+  ]) {
+    assert.equal(classifyConsoleWarning(diagnostic), null, diagnostic);
+  }
 
   assert.deepEqual(
     attachConsoleWarningEvidence(

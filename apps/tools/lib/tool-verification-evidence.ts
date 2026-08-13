@@ -16,6 +16,21 @@ export const requiredVerificationChecks = Object.freeze([
 ] as const);
 
 export type ToolVerificationCheck = (typeof requiredVerificationChecks)[number];
+
+const truthfulUnsupportedVerificationChecks = Object.freeze([
+  'valid-fixture',
+  'semantic-output',
+  'no-delivery-on-failure',
+  'required-environment',
+] as const satisfies readonly ToolVerificationCheck[]);
+
+export function getRequiredVerificationChecks(
+  journey: ToolJourney,
+): readonly ToolVerificationCheck[] {
+  return journey.semanticInvariant.id === 'truthful-unsupported-terminal'
+    ? truthfulUnsupportedVerificationChecks
+    : requiredVerificationChecks;
+}
 export type ToolJourneyEvidenceOutcome =
   | 'passed'
   | 'failed'
@@ -139,7 +154,7 @@ export function getToolVerificationInputRevisions(
       : revision(null),
     'journey-contract': revision(journey),
     'semantic-invariant': revision(journey.semanticInvariant),
-    'verification-policy': revision(requiredVerificationChecks),
+    'verification-policy': revision(getRequiredVerificationChecks(journey)),
     'executable-sources': generatedInputs.executableSources,
     'dependency-lock': generatedInputs.dependencyLock,
     'runner-sources': generatedInputs.runnerSources,
@@ -317,16 +332,17 @@ function project(
   latest: ToolJourneyEvidenceRecord | null,
   currentInputs: Readonly<Record<string, string>>,
 ): ToolJourneyEvidenceView {
+  const journeyRequiredChecks = getRequiredVerificationChecks(journey);
   if (!latest) {
     return deepFreeze({
       journeyId: journey.id,
       state: 'no-evidence' as const,
       latest: null,
-      missingChecks: [...requiredVerificationChecks],
+      missingChecks: [...journeyRequiredChecks],
       reason: 'No retained controlled evidence exists for this journey.',
     });
   }
-  const missingChecks = requiredVerificationChecks.filter(
+  const missingChecks = journeyRequiredChecks.filter(
     (check) => !latest.checks.includes(check),
   );
   const inputs = compareInputs(latest.inputRevisions, currentInputs);

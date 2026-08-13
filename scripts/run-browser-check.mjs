@@ -19,6 +19,14 @@ import {
   getGenericSmokeExpectation,
 } from './lib/generic-smoke-capabilities.mjs';
 import { readTranscriptionTerminalState } from './lib/transcription-browser-state.mjs';
+import { assertTranscriptMatchesFixture } from './lib/transcription-semantics.mjs';
+import {
+  assertExactFixtureBytes,
+  assertLossyUniformImageSummary,
+  assertPdfCanvasSummary,
+  assertUniformImageSummary,
+  extractExactZipEntries,
+} from './lib/golden-output-semantics.mjs';
 
 function parseArguments(arguments_) {
   const tokens = arguments_.filter((argument) => argument !== '--');
@@ -230,6 +238,12 @@ try {
   const fixtureMatrix = JSON.parse(
     await fs.readFile(fixtureMatrixPath, 'utf8'),
   );
+  const fixtureProvenance = JSON.parse(
+    await fs.readFile(
+      path.join(fixturesDir, 'fixture-provenance.json'),
+      'utf8',
+    ),
+  );
   const formatFixtures = new Map(
     (fixtureMatrix.formats ?? []).map((entry) => [entry.format, entry]),
   );
@@ -348,6 +362,26 @@ try {
   }
 
   browser = await chromium.launch();
+  const browserContext = await browser.newContext();
+  const accessCookie = process.env.TOOL_FACTORY_CF_AUTHORIZATION ?? '';
+  if (options.environment === 'local' && accessCookie) {
+    throw new Error(
+      'Local browser evidence refuses Cloudflare Access credentials.',
+    );
+  }
+  if (options.environment === 'preview' && accessCookie) {
+    await browserContext.addCookies([
+      {
+        name: 'CF_Authorization',
+        value: accessCookie,
+        domain: new URL(baseUrl).hostname,
+        path: '/',
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Lax',
+      },
+    ]);
+  }
 
   async function waitForHydration(page) {
     await page.waitForFunction(
@@ -502,7 +536,185 @@ try {
     );
   }
 
-  async function runFunctionalTest(page, tool) {
+  async function saveGoldenOutput(page, fileName) {
+    const outputDirectory = process.env.GOLDEN_OUTPUT_DIR;
+    if (!outputDirectory) return;
+    const bytes = await page.evaluate(async () => [
+      ...new Uint8Array(await window.__lastBlob.arrayBuffer()),
+    ]);
+    await fs.mkdir(outputDirectory, { recursive: true });
+    await fs.writeFile(
+      path.join(outputDirectory, fileName),
+      Buffer.from(bytes),
+    );
+  }
+
+  async function lastBlobBytes(page) {
+    return page.evaluate(async () => [
+      ...new Uint8Array(await window.__lastBlob.arrayBuffer()),
+    ]);
+  }
+
+  async function decodeImageSummary(page, bytes, type = 'image/png') {
+    return page.evaluate(
+      async ({ bytes: input, type: mimeType }) => {
+        const image = await createImageBitmap(
+          new Blob([Uint8Array.from(input)], { type: mimeType }),
+        );
+        const canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        context.drawImage(image, 0, 0);
+        image.close();
+        const pixels = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        ).data;
+        const minimum = [255, 255, 255, 255];
+        const maximum = [0, 0, 0, 0];
+        for (let index = 0; index < pixels.length; index += 4) {
+          for (let channel = 0; channel < 4; channel += 1) {
+            minimum[channel] = Math.min(
+              minimum[channel],
+              pixels[index + channel],
+            );
+            maximum[channel] = Math.max(
+              maximum[channel],
+              pixels[index + channel],
+            );
+          }
+        }
+        return {
+          width: canvas.width,
+          height: canvas.height,
+          pixelCount: pixels.length / 4,
+          minimum,
+          maximum,
+        };
+      },
+      { bytes, type },
+    );
+  }
+
+  async function saveGoldenScreenshot(page, fileName) {
+    const screenshotDirectory = process.env.GOLDEN_SCREENSHOT_DIR;
+    if (!screenshotDirectory) return;
+    await fs.mkdir(screenshotDirectory, { recursive: true });
+    await page.screenshot({
+      path: path.join(screenshotDirectory, fileName),
+      fullPage: true,
+    });
+  }
+
+  function runGoldenPngWorkflowProbe() {
+    const output = execFileSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        path.join(
+          repositoryRoot,
+          'apps/tools/lib/golden-pilot-workflow-probe.ts',
+        ),
+      ],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    const result = JSON.parse(output);
+    const checks = [
+      'malformed-input',
+      'spoofed-input',
+      'wrong-format-output',
+      'no-delivery-on-failure',
+      'cancellation-lifecycle',
+    ];
+    if (
+      result.journeyId !== 'png-to-webp:upload' ||
+      JSON.stringify(result.checks) !== JSON.stringify(checks) ||
+      result.observed?.deliveries !== 0 ||
+      result.observed?.terminatedWorkers !== 1
+    ) {
+      throw new Error(
+        'Golden PNG workflow probe did not prove its exact checks.',
+      );
+    }
+    return checks;
+  }
+
+  function runGoldenNegativePathProbe(toolId) {
+    const configurations = {
+      'audio-to-text': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'audioUpload',
+        journeyId: 'audio-to-text:upload',
+      },
+      'audio-to-transcript': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'audioDirect',
+        journeyId: 'audio-to-transcript:direct-url',
+      },
+      'batch-compress-png': {
+        file: 'apps/tools/lib/golden-negative-path-probes.ts',
+        key: 'batch',
+        journeyId: 'batch-compress-png:multiple-file-upload',
+      },
+      'bmp-to-png': {
+        file: 'apps/tools/lib/golden-negative-path-probes.ts',
+        key: 'bmp',
+        journeyId: 'bmp-to-png:upload',
+      },
+      'csv-to-json': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'csv',
+        journeyId: 'csv-to-json:upload',
+      },
+      'pdf-reader': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'pdf',
+        journeyId: 'pdf-reader:upload',
+      },
+      'video-downloader': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'video',
+        journeyId: 'video-downloader:direct-url',
+      },
+    };
+    const configuration = configurations[toolId];
+    if (!configuration) {
+      throw new Error(`No Golden negative-path probe for ${toolId}.`);
+    }
+    const output = execFileSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        path.join(repositoryRoot, configuration.file),
+      ],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    const result = JSON.parse(output)[configuration.key];
+    const checks = [
+      'malformed-input',
+      'spoofed-input',
+      'wrong-format-output',
+      'no-delivery-on-failure',
+      'cancellation-lifecycle',
+    ];
+    const deliveries =
+      result?.observed?.deliveries ?? result?.observed?.totalDeliveries;
+    if (
+      result?.journeyId !== configuration.journeyId ||
+      JSON.stringify(result?.checks) !== JSON.stringify(checks) ||
+      deliveries !== 0
+    ) {
+      throw new Error(
+        `Golden ${toolId} negative-path probe did not prove its exact checks.`,
+      );
+    }
+    return checks;
+  }
+
+  async function runFunctionalTest(page, tool, result) {
     function assertCsvToJsonRecords(records) {
       if (
         !Array.isArray(records) ||
@@ -521,24 +733,30 @@ try {
     if (tool.id === 'video-downloader') {
       const fixture = toolFixtures[tool.id];
       const fixturePath = resolveFixturePath(fixture?.responseFixture);
-      if (options.environment !== 'local' || !fixturePath || !fixture?.url) {
-        return { skipped: true, reason: 'missing local downloader fixture' };
+      if (!fixturePath || !fixture?.url) {
+        return { skipped: true, reason: 'missing downloader fixture' };
       }
-      const media = await fs.readFile(fixturePath);
-      await page.route('**/api/media-fetch*', async (route) => {
-        await route.fulfill({
-          status: 200,
-          headers: {
-            'content-length': String(media.byteLength),
-            'content-type': 'video/mp4',
-            'x-media-extension': 'mp4',
-            'x-media-filename': 'deterministic-video.mp4',
-          },
-          body: media,
+      const requestedUrl =
+        options.environment === 'local'
+          ? fixture.url
+          : `${baseUrl}/fixtures/sample.mp4`;
+      if (options.environment === 'local') {
+        const media = await fs.readFile(fixturePath);
+        await page.route('**/api/media-fetch*', async (route) => {
+          await route.fulfill({
+            status: 200,
+            headers: {
+              'content-length': String(media.byteLength),
+              'content-type': 'video/mp4',
+              'x-media-extension': 'mp4',
+              'x-media-filename': 'deterministic-video.mp4',
+            },
+            body: media,
+          });
         });
-      });
+      }
       await hookBlobCapture(page);
-      await page.fill('[data-testid="tool-url-input"]', fixture.url);
+      await page.fill('[data-testid="tool-url-input"]', requestedUrl);
       await page.click('[data-testid="tool-url-submit"]');
       await page.waitForFunction(
         () =>
@@ -560,9 +778,25 @@ try {
           'Downloader URL flow did not deliver verified MP4 media',
         );
       }
+      const fixtureBytes = await fs.readFile(fixturePath);
+      const deliveredSha256 = assertExactFixtureBytes(
+        await lastBlobBytes(page),
+        fixtureBytes,
+        'Downloader MP4 output',
+      );
       return {
-        detail: `download ${blob.size} bytes`,
-        metrics: { outputBytes: blob.size, outputType: blob.type },
+        detail: `verified exact owned MP4 fixture (${blob.size} bytes)`,
+        metrics: {
+          outputBytes: blob.size,
+          outputType: blob.type,
+          outputSha256: deliveredSha256,
+        },
+        checks: [
+          'valid-fixture',
+          'semantic-output',
+          ...runGoldenNegativePathProbe(tool.id),
+          'required-environment',
+        ],
       };
     }
 
@@ -645,12 +879,32 @@ try {
       if (!blob?.size) {
         throw new Error('Batch compression did not produce output blob.');
       }
+      const entries = await extractExactZipEntries(await lastBlobBytes(page), [
+        'sample_compressed.png',
+        'sample-2_compressed.png',
+      ]);
+      const expectedImages = [
+        { width: 96, height: 96, rgba: [0, 0, 253, 255] },
+        { width: 128, height: 80, rgba: [253, 165, 0, 255] },
+      ];
+      for (const [index, entry] of entries.entries()) {
+        assertUniformImageSummary(await decodeImageSummary(page, entry.bytes), {
+          ...expectedImages[index],
+          label: `ZIP entry ${entry.name}`,
+        });
+      }
       return {
-        detail: `zip size ${blob?.size ?? '?'}`,
+        detail: `verified ${entries.length} decoded PNG entries in ${blob.size} byte ZIP`,
         metrics: {
           outputBytes: blob?.size ?? null,
           outputType: blob?.type ?? null,
         },
+        checks: [
+          'valid-fixture',
+          'semantic-output',
+          ...runGoldenNegativePathProbe(tool.id),
+          'required-environment',
+        ],
       };
     }
 
@@ -740,6 +994,12 @@ try {
       return {
         detail: 'verified 2 JSON records with preserved numeric cells',
         metrics: { outputBytes: blob.size, outputType: blob.type },
+        checks: [
+          'valid-fixture',
+          'semantic-output',
+          ...runGoldenNegativePathProbe(tool.id),
+          'required-environment',
+        ],
       };
     }
 
@@ -937,13 +1197,50 @@ try {
         .locator('.page[data-page-number="1"] > .canvasWrapper > canvas');
       await firstPageCanvas.waitFor({ state: 'visible', timeout: 15000 });
 
+      const pdfSummary = await firstPageCanvas.evaluate((canvas) => {
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        const pixels = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        ).data;
+        let nonWhitePixels = 0;
+        let bluePixels = 0;
+        for (let index = 0; index < pixels.length; index += 4) {
+          const [red, green, blue, alpha] = pixels.slice(index, index + 4);
+          if (alpha > 0 && (red < 245 || green < 245 || blue < 245))
+            nonWhitePixels += 1;
+          if (alpha > 0 && blue > red + 80 && blue > green + 80)
+            bluePixels += 1;
+        }
+        return {
+          width: canvas.width,
+          height: canvas.height,
+          nonWhitePixels,
+          bluePixels,
+        };
+      });
+      const pageCount = await page
+        .frameLocator('[data-testid="pdf-tool-viewer"]')
+        .locator('.page[data-page-number]')
+        .count();
+      assertPdfCanvasSummary({ ...pdfSummary, pageCount });
+
       return {
-        detail: 'verified PDF blob and rendered viewer page 1',
+        detail: 'verified one-page PDF with decoded blue fixture content',
         metrics: {
           outputBytes: blob.size ?? null,
           outputType: blob.type ?? null,
           renderedPage: 1,
+          bluePixels: pdfSummary.bluePixels,
         },
+        checks: [
+          'valid-fixture',
+          'semantic-output',
+          ...runGoldenNegativePathProbe(tool.id),
+          'required-environment',
+        ],
       };
     }
 
@@ -957,24 +1254,29 @@ try {
       }
       if (tool.id === 'audio-to-text') {
         result.activeJourneyId = 'audio-to-text:extractor-url';
-        await page.route('**/api/media-fetch*', async (route) => {
-          const requestPayload = route.request().postDataJSON();
-          if (
-            requestPayload?.url !==
-            'https://www.youtube.com/watch?v=3Is2P90qVa0'
-          ) {
-            throw new Error('Audio-to-Text did not send the exact YouTube URL');
-          }
-          await route.fulfill({
-            status: 422,
-            contentType: 'application/json',
-            body: JSON.stringify({
-              code: 'youtube-unsupported',
-              error:
-                'YouTube links are not supported right now. Upload the file or use a direct public audio or video file URL.',
-            }),
+        await hookBlobCapture(page);
+        if (options.environment === 'local') {
+          await page.route('**/api/media-fetch*', async (route) => {
+            const requestPayload = route.request().postDataJSON();
+            if (
+              requestPayload?.url !==
+              'https://www.youtube.com/watch?v=3Is2P90qVa0'
+            ) {
+              throw new Error(
+                'Audio-to-Text did not send the exact YouTube URL',
+              );
+            }
+            await route.fulfill({
+              status: 422,
+              contentType: 'application/json',
+              body: JSON.stringify({
+                code: 'youtube-unsupported',
+                error:
+                  'YouTube links are not supported right now. Upload the file or use a direct public audio or video file URL.',
+              }),
+            });
           });
-        });
+        }
         await page.fill(
           '[data-testid="tool-url-input"]',
           'https://www.youtube.com/watch?v=3Is2P90qVa0',
@@ -997,13 +1299,58 @@ try {
             `Audio-to-Text YouTube failure was not plain and truthful: ${youtubeTerminal.message}`,
           );
         }
+        const youtubeDeliveries = await page.evaluate(
+          () => window.__blobEvents?.length ?? 0,
+        );
+        if (youtubeDeliveries !== 0) {
+          throw new Error(
+            `Audio-to-Text delivered ${youtubeDeliveries} blobs after rejecting YouTube.`,
+          );
+        }
+        await saveGoldenScreenshot(
+          page,
+          'audio-to-text-youtube-unsupported.png',
+        );
         result.completedJourneyIds.push('audio-to-text:extractor-url');
         result.journeyOutcomes.set('audio-to-text:extractor-url', {
           outcome: 'passed',
           reasonCode: null,
-          checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+          checks: [
+            'valid-fixture',
+            'semantic-output',
+            'no-delivery-on-failure',
+            'required-environment',
+          ],
         });
         result.activeJourneyId = 'audio-to-text:upload';
+        const deliveriesBeforeCancellation = await page.evaluate(
+          () => window.__blobEvents?.length ?? 0,
+        );
+        await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
+          fixtureEntry.path,
+        ]);
+        await page.getByTestId('tool-cancel').click();
+        await page.waitForFunction(
+          () =>
+            document
+              .querySelector('[data-testid="video-progress"]')
+              ?.textContent?.includes('No transcript was delivered.'),
+          null,
+          { timeout: 10_000 },
+        );
+        await page.waitForTimeout(250);
+        const cancellationState = await page.evaluate(() => ({
+          deliveries: window.__blobEvents?.length ?? 0,
+          transcript: document.querySelector('textarea')?.value ?? '',
+        }));
+        if (
+          cancellationState.deliveries !== deliveriesBeforeCancellation ||
+          cancellationState.transcript.trim()
+        ) {
+          throw new Error(
+            'Audio-to-Text cancellation delivered a transcript or download.',
+          );
+        }
         await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
           fixtureEntry.path,
         ]);
@@ -1015,23 +1362,26 @@ try {
         );
       } else {
         result.activeJourneyId = 'audio-to-transcript:direct-url';
-        const media = await fs.readFile(fixtureEntry.path);
-        await page.route('**/api/media-fetch*', async (route) => {
-          await route.fulfill({
-            status: 200,
-            headers: {
-              'content-length': String(media.byteLength),
-              'content-type': 'audio/mpeg',
-              'x-media-extension': 'mp3',
-              'x-media-filename': 'direct-speech.mp3',
-            },
-            body: media,
+        const directUrl =
+          options.environment === 'local'
+            ? 'https://media.example/direct-speech.mp3'
+            : `${baseUrl}/fixtures/transcription-speech.mp3`;
+        if (options.environment === 'local') {
+          const media = await fs.readFile(fixtureEntry.path);
+          await page.route('**/api/media-fetch*', async (route) => {
+            await route.fulfill({
+              status: 200,
+              headers: {
+                'content-length': String(media.byteLength),
+                'content-type': 'audio/mpeg',
+                'x-media-extension': 'mp3',
+                'x-media-filename': 'direct-speech.mp3',
+              },
+              body: media,
+            });
           });
-        });
-        await page.fill(
-          '[data-testid="tool-url-input"]',
-          'https://media.example/direct-speech.mp3',
-        );
+        }
+        await page.fill('[data-testid="tool-url-input"]', directUrl);
         await page.click('[data-testid="tool-url-submit"]');
       }
       const terminalHandle = await page.waitForFunction(
@@ -1043,18 +1393,36 @@ try {
       if (terminal.status === 'failed') {
         throw new Error(`Transcription failed: ${terminal.message}`);
       }
+      const expectedTranscript = fixtureProvenance[toolFixture]?.text;
+      const transcriptSemantics = assertTranscriptMatchesFixture(
+        terminal.transcript,
+        expectedTranscript,
+      );
       result.completedJourneyIds.push(result.activeJourneyId);
       result.journeyOutcomes.set(result.activeJourneyId, {
         outcome: 'passed',
         reasonCode: null,
-        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+        checks:
+          tool.id === 'audio-to-text'
+            ? [
+                'valid-fixture',
+                'semantic-output',
+                ...runGoldenNegativePathProbe(tool.id),
+                'required-environment',
+              ]
+            : [
+                'valid-fixture',
+                'semantic-output',
+                ...runGoldenNegativePathProbe(tool.id),
+                'required-environment',
+              ],
       });
       result.activeJourneyId = null;
       return {
         detail:
           tool.id === 'audio-to-text'
-            ? `truthful YouTube failure; upload transcript ${terminal.transcript.length} chars`
-            : `direct-media transcript ${terminal.transcript.length} chars`,
+            ? `truthful YouTube failure; upload transcript matched owned speech (${transcriptSemantics.wordErrorRate.toFixed(3)} word error rate)`
+            : `direct-media transcript matched owned speech (${transcriptSemantics.wordErrorRate.toFixed(3)} word error rate)`,
       };
     }
 
@@ -1100,10 +1468,18 @@ try {
             `A known supported adapter route reported unsupported (${GENERIC_SMOKE_CAPABILITY_VERSION}).`,
           );
         }
+        if (tool.id === 'compress-pdf') {
+          await saveGoldenScreenshot(page, 'compress-pdf-unavailable.png');
+        }
         return {
           detail: 'safe failure: published route is truthfully unsupported',
           metrics: { outputBytes: 0, outputType: null },
           warning: 'truthfully unsupported operation produced no output',
+          checks: [
+            'valid-fixture',
+            'no-delivery-on-failure',
+            'required-environment',
+          ],
         };
       }
       const blob = await waitForBlob(
@@ -1127,6 +1503,112 @@ try {
             outputType: blob?.type ?? null,
           },
           warning: `unexpected output type ${blob?.type ?? '?'} (expected ${expectedType})`,
+        };
+      }
+      if (tool.id === 'png-to-webp') {
+        const semantic = await decodeImageSummary(
+          page,
+          await lastBlobBytes(page),
+          'image/webp',
+        );
+        assertLossyUniformImageSummary(semantic, {
+          width: 96,
+          height: 96,
+          rgba: [0, 0, 253, 255],
+          tolerance: 8,
+          label: 'PNG to WebP output',
+        });
+        await saveGoldenOutput(page, 'png-to-webp.webp');
+        await saveGoldenScreenshot(page, 'png-to-webp-success.png');
+        return {
+          detail: `verified WebP ${semantic.width}×${semantic.height}, ${blob.size} bytes`,
+          metrics: {
+            outputBytes: blob.size,
+            outputType: blob.type,
+            width: semantic.width,
+            height: semantic.height,
+          },
+          checks: [
+            'valid-fixture',
+            'semantic-output',
+            ...runGoldenPngWorkflowProbe(),
+            'required-environment',
+          ],
+        };
+      }
+      if (tool.id === 'bmp-to-png') {
+        const semantic = await decodeImageSummary(
+          page,
+          await lastBlobBytes(page),
+        );
+        assertUniformImageSummary(semantic, {
+          width: 96,
+          height: 96,
+          rgba: [0, 0, 253, 255],
+          label: 'BMP to PNG output',
+        });
+        return {
+          detail: `verified decoded PNG ${semantic.width}x${semantic.height}, ${blob.size} bytes`,
+          metrics: {
+            outputBytes: blob.size,
+            outputType: blob.type,
+            width: semantic.width,
+            height: semantic.height,
+          },
+          checks: [
+            'valid-fixture',
+            'semantic-output',
+            ...runGoldenNegativePathProbe(tool.id),
+            'required-environment',
+          ],
+        };
+      }
+      if (tool.id === 'mp4-to-webm') {
+        const semantic = await page.evaluate(async () => {
+          const blob = window.__lastBlob;
+          if (!blob) return null;
+          const bytes = new Uint8Array(await blob.arrayBuffer());
+          const video = document.createElement('video');
+          const url = URL.createObjectURL(blob);
+          video.preload = 'metadata';
+          video.src = url;
+          await new Promise((resolve, reject) => {
+            video.onloadedmetadata = resolve;
+            video.onerror = () => reject(new Error('WebM metadata failed'));
+          });
+          const result = {
+            ebml: [...bytes.slice(0, 4)],
+            width: video.videoWidth,
+            height: video.videoHeight,
+            duration: video.duration,
+          };
+          URL.revokeObjectURL(url);
+          video.remove();
+          return result;
+        });
+        if (
+          JSON.stringify(semantic?.ebml) !==
+            JSON.stringify([26, 69, 223, 163]) ||
+          !semantic?.width ||
+          !semantic.height ||
+          !Number.isFinite(semantic.duration) ||
+          semantic.duration <= 0
+        ) {
+          throw new Error(
+            'MP4 to WebM output failed independent WebM decoding.',
+          );
+        }
+        await saveGoldenOutput(page, 'mp4-to-webm.webm');
+        await saveGoldenScreenshot(page, 'mp4-to-webm-success.png');
+        return {
+          detail: `verified WebM ${semantic.width}×${semantic.height}, ${blob.size} bytes`,
+          metrics: {
+            outputBytes: blob.size,
+            outputType: blob.type,
+            width: semantic.width,
+            height: semantic.height,
+          },
+          checks: ['valid-fixture', 'semantic-output', 'required-environment'],
         };
       }
       return {
@@ -1171,7 +1653,7 @@ try {
             result.journeyOutcomes.set(journey.journeyId, {
               outcome: 'warned',
               reasonCode: 'browser-check-warning',
-              checks: [],
+              checks: functional?.checks ?? [],
             });
           }
         }
@@ -1188,7 +1670,10 @@ try {
             result.journeyOutcomes.set(journey.journeyId, {
               outcome: 'passed',
               reasonCode: null,
-              checks: ['valid-fixture', 'required-environment'],
+              checks: functional?.checks ?? [
+                'valid-fixture',
+                'required-environment',
+              ],
             });
           }
         }
@@ -1267,11 +1752,12 @@ try {
       journeyOutcomes: new Map(),
     };
 
-    const page = await browser.newPage();
+    const page = await browserContext.newPage();
     page.on('pageerror', (error) => result.pageErrors.push(error));
     page.on('console', (message) => {
       if (message.type() === 'warning') {
-        result.consoleWarnings.push(classifyConsoleWarning(message.text()));
+        const warningCode = classifyConsoleWarning(message.text());
+        if (warningCode) result.consoleWarnings.push(warningCode);
       }
     });
 
@@ -1320,6 +1806,9 @@ try {
     results.push(result);
     const statusLabel = result.status.toUpperCase();
     console.log(`${statusLabel} ${tool.id} (${tool.route})`);
+    if (process.env.DEBUG_BROWSER_ERRORS === '1' && result.errors.length) {
+      console.error(result.errors);
+    }
   }
 
   await browser.close();

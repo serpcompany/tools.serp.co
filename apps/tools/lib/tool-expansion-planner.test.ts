@@ -12,7 +12,7 @@ test('expansion plan groups every explicitly unsupported Tool exactly once from 
     .map((row) => row.toolId)
     .sort();
 
-  assert.equal(plan.unsupportedToolCount, 2_369);
+  assert.equal(plan.unsupportedToolCount, 2_368);
   assert.deepEqual(
     plan.groups.flatMap((group) => group.toolIds).sort(),
     unsupportedToolIds,
@@ -102,7 +102,7 @@ test('portfolio groups expose client-first decision categories without treating 
   );
   assert.ok(adaptive);
   assert.equal(adaptive.browserFeasibility, 'unresolved');
-  assert.equal(adaptive.unlockCount, 1_502);
+  assert.equal(adaptive.unlockCount, 1_501);
   assert.ok(
     !adaptive.toolIds.some((toolId) =>
       ['webm-to-m4a', 'webm-to-mp3', 'webm-to-mp4'].includes(toolId),
@@ -111,7 +111,7 @@ test('portfolio groups expose client-first decision categories without treating 
 
   assert.equal(
     plan.groups.reduce((sum, group) => sum + group.unlockCount, 0),
-    2_369,
+    2_368,
   );
 });
 

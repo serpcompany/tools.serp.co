@@ -69,10 +69,7 @@ export function attachJourneyResultEvidence(tools, results) {
                 }
               : null,
           invariantId: journey.invariantId,
-          checks:
-            journeyResult.outcome === 'passed'
-              ? [...(journeyResult.checks ?? [])]
-              : [],
+          checks: [...(journeyResult.checks ?? [])],
           inputRevisions: journey.inputRevisions,
         };
       }),
@@ -148,17 +145,26 @@ export function summarizeNavigationTimings(values) {
 }
 
 export function classifyConsoleWarning(message) {
+  if (
+    /ep2\.adtrafficquality\.google.*does not match.*recipient window.*origin/i.test(
+      message,
+    ) ||
+    /webgl.*(?:driver message|gpu stall)/i.test(message) ||
+    /ae_default_editor_active is undefined/i.test(message) ||
+    /unable to determine content-length from response headers\. will expand buffer when needed\./i.test(
+      message,
+    ) ||
+    /onnxruntime.*CleanUnusedInitializersAndNodeArgs.*Removing initializer/i.test(
+      message,
+    )
+  ) {
+    return null;
+  }
   if (/adsense.*data-nscript/i.test(message)) {
     return 'adsense-script-attribute';
   }
   if (/ignoring event:\s*localhost/i.test(message)) {
     return 'localhost-event-ignored';
-  }
-  if (/webgl.*(?:driver message|gpu stall)/i.test(message)) {
-    return 'webgl-driver-performance';
-  }
-  if (/ae_default_editor_active is undefined/i.test(message)) {
-    return 'pdf-editor-default-undefined';
   }
   return 'other-console-warning';
 }
