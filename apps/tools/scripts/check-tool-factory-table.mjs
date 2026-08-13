@@ -101,6 +101,16 @@ if (
   throw new Error('DEV/STAGING checks require a clean matching checkout');
 }
 const startedAt = new Date();
+const expectedGoldenPilot = JSON.parse(
+  execFileSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      'apps/tools/lib/golden-pilot-source-view.ts',
+    ],
+    { cwd: repositoryRoot, encoding: 'utf8' },
+  ),
+);
 let browser;
 let status = 'failure';
 const accessCookie = process.env.TOOL_FACTORY_CF_AUTHORIZATION ?? '';
@@ -190,11 +200,16 @@ try {
     .waitFor();
   await goldenPilot.getByText('compress-pdf:upload', { exact: true }).waitFor();
   await goldenPilot.getByText('Unavailable', { exact: true }).waitFor();
-  assert.equal(
-    await goldenPilot.getByText('No retained evidence', { exact: true }).count(),
-    9,
-  );
-  await goldenPilot.getByText('Evidence is stale', { exact: true }).waitFor();
+  for (const expected of expectedGoldenPilot.rows) {
+    const row = goldenPilot
+      .getByRole('row')
+      .filter({ hasText: expected.journeyId });
+    await row.getByText(expected.resultLabel, { exact: true }).waitFor();
+    await row.getByText(expected.whereItRuns, { exact: true }).waitFor();
+    await row.getByText(expected.checkedBehavior, { exact: true }).waitFor();
+    await row.getByText(expected.freshness, { exact: true }).waitFor();
+    await row.getByText(expected.remainingGap, { exact: true }).waitFor();
+  }
   if (screenshotPaths.goldenPilot) {
     await goldenPilot.screenshot({ path: screenshotPaths.goldenPilot });
   }
@@ -323,28 +338,27 @@ try {
   await verificationSection
     .getByText('png-to-webp:upload', { exact: true })
     .waitFor();
+  const expectedPng = expectedGoldenPilot.rows.find(
+    (row) => row.journeyId === 'png-to-webp:upload',
+  );
+  assert.ok(expectedPng);
   await verificationSection
-    .getByText('Stale evidence', { exact: true })
+    .getByText(expectedPng.resultLabel, { exact: false })
+    .first()
     .waitFor();
   await verificationSection
-    .getByText('Relevant journey, fixture, invariant, or policy inputs changed.', {
-      exact: true,
-    })
-    .waitFor();
-  await verificationSection
-    .getByText(
-      'Still needed: semantic-output, malformed-input, spoofed-input, wrong-format-output, no-delivery-on-failure, cancellation-lifecycle',
-      { exact: true },
-    )
+    .getByText(expectedPng.remainingGap, { exact: false })
+    .first()
     .waitFor();
   await verificationSection
     .getByText('Exact evidence identity', { exact: true })
     .click();
-  await verificationSection
-    .getByText('20260813T002824Z_05f9398_local_browser-smoke-local-subset', {
-      exact: true,
-    })
-    .waitFor();
+  if (expectedPng.evidenceState !== 'no-evidence') {
+    await verificationSection
+      .getByText(/browser-smoke-(?:preview|local)-subset/, { exact: false })
+      .first()
+      .waitFor();
+  }
   await dialog
     .getByText('Family verification policy (not an exact Tool test)', {
       exact: true,

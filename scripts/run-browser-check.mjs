@@ -19,6 +19,11 @@ import {
   getGenericSmokeExpectation,
 } from './lib/generic-smoke-capabilities.mjs';
 import { readTranscriptionTerminalState } from './lib/transcription-browser-state.mjs';
+import {
+  assertPdfCanvasSummary,
+  assertUniformImageSummary,
+  extractExactZipEntries,
+} from './lib/golden-output-semantics.mjs';
 
 function parseArguments(arguments_) {
   const tokens = arguments_.filter((argument) => argument !== '--');
@@ -538,6 +543,56 @@ try {
     );
   }
 
+  async function lastBlobBytes(page) {
+    return page.evaluate(async () => [
+      ...new Uint8Array(await window.__lastBlob.arrayBuffer()),
+    ]);
+  }
+
+  async function decodeImageSummary(page, bytes, type = 'image/png') {
+    return page.evaluate(
+      async ({ bytes: input, type: mimeType }) => {
+        const image = await createImageBitmap(
+          new Blob([Uint8Array.from(input)], { type: mimeType }),
+        );
+        const canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        context.drawImage(image, 0, 0);
+        image.close();
+        const pixels = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        ).data;
+        const minimum = [255, 255, 255, 255];
+        const maximum = [0, 0, 0, 0];
+        for (let index = 0; index < pixels.length; index += 4) {
+          for (let channel = 0; channel < 4; channel += 1) {
+            minimum[channel] = Math.min(
+              minimum[channel],
+              pixels[index + channel],
+            );
+            maximum[channel] = Math.max(
+              maximum[channel],
+              pixels[index + channel],
+            );
+          }
+        }
+        return {
+          width: canvas.width,
+          height: canvas.height,
+          pixelCount: pixels.length / 4,
+          minimum,
+          maximum,
+        };
+      },
+      { bytes, type },
+    );
+  }
+
   async function saveGoldenScreenshot(page, fileName) {
     const screenshotDirectory = process.env.GOLDEN_SCREENSHOT_DIR;
     if (!screenshotDirectory) return;
@@ -738,12 +793,27 @@ try {
       if (!blob?.size) {
         throw new Error('Batch compression did not produce output blob.');
       }
+      const entries = await extractExactZipEntries(await lastBlobBytes(page), [
+        'sample_compressed.png',
+        'sample-2_compressed.png',
+      ]);
+      const expectedImages = [
+        { width: 96, height: 96, rgba: [0, 0, 253, 255] },
+        { width: 128, height: 80, rgba: [253, 165, 0, 255] },
+      ];
+      for (const [index, entry] of entries.entries()) {
+        assertUniformImageSummary(await decodeImageSummary(page, entry.bytes), {
+          ...expectedImages[index],
+          label: `ZIP entry ${entry.name}`,
+        });
+      }
       return {
-        detail: `zip size ${blob?.size ?? '?'}`,
+        detail: `verified ${entries.length} decoded PNG entries in ${blob.size} byte ZIP`,
         metrics: {
           outputBytes: blob?.size ?? null,
           outputType: blob?.type ?? null,
         },
+        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
       };
     }
 
@@ -833,6 +903,7 @@ try {
       return {
         detail: 'verified 2 JSON records with preserved numeric cells',
         metrics: { outputBytes: blob.size, outputType: blob.type },
+        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
       };
     }
 
@@ -1030,13 +1101,45 @@ try {
         .locator('.page[data-page-number="1"] > .canvasWrapper > canvas');
       await firstPageCanvas.waitFor({ state: 'visible', timeout: 15000 });
 
+      const pdfSummary = await firstPageCanvas.evaluate((canvas) => {
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        const pixels = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        ).data;
+        let nonWhitePixels = 0;
+        let bluePixels = 0;
+        for (let index = 0; index < pixels.length; index += 4) {
+          const [red, green, blue, alpha] = pixels.slice(index, index + 4);
+          if (alpha > 0 && (red < 245 || green < 245 || blue < 245))
+            nonWhitePixels += 1;
+          if (alpha > 0 && blue > red + 80 && blue > green + 80)
+            bluePixels += 1;
+        }
+        return {
+          width: canvas.width,
+          height: canvas.height,
+          nonWhitePixels,
+          bluePixels,
+        };
+      });
+      const pageCount = await page
+        .frameLocator('[data-testid="pdf-tool-viewer"]')
+        .locator('.page[data-page-number]')
+        .count();
+      assertPdfCanvasSummary({ ...pdfSummary, pageCount });
+
       return {
-        detail: 'verified PDF blob and rendered viewer page 1',
+        detail: 'verified one-page PDF with decoded blue fixture content',
         metrics: {
           outputBytes: blob.size ?? null,
           outputType: blob.type ?? null,
           renderedPage: 1,
+          bluePixels: pdfSummary.bluePixels,
         },
+        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
       };
     }
 
@@ -1225,6 +1328,12 @@ try {
           detail: 'safe failure: published route is truthfully unsupported',
           metrics: { outputBytes: 0, outputType: null },
           warning: 'truthfully unsupported operation produced no output',
+          checks: [
+            'valid-fixture',
+            'semantic-output',
+            'no-delivery-on-failure',
+            'required-environment',
+          ],
         };
       }
       const blob = await waitForBlob(
@@ -1291,6 +1400,28 @@ try {
             ...runGoldenPngWorkflowProbe(),
             'required-environment',
           ],
+        };
+      }
+      if (tool.id === 'bmp-to-png') {
+        const semantic = await decodeImageSummary(
+          page,
+          await lastBlobBytes(page),
+        );
+        assertUniformImageSummary(semantic, {
+          width: 96,
+          height: 96,
+          rgba: [0, 0, 253, 255],
+          label: 'BMP to PNG output',
+        });
+        return {
+          detail: `verified decoded PNG ${semantic.width}x${semantic.height}, ${blob.size} bytes`,
+          metrics: {
+            outputBytes: blob.size,
+            outputType: blob.type,
+            width: semantic.width,
+            height: semantic.height,
+          },
+          checks: ['valid-fixture', 'semantic-output', 'required-environment'],
         };
       }
       if (tool.id === 'mp4-to-webm') {
@@ -1383,7 +1514,7 @@ try {
             result.journeyOutcomes.set(journey.journeyId, {
               outcome: 'warned',
               reasonCode: 'browser-check-warning',
-              checks: [],
+              checks: functional?.checks ?? [],
             });
           }
         }
@@ -1535,6 +1666,9 @@ try {
     results.push(result);
     const statusLabel = result.status.toUpperCase();
     console.log(`${statusLabel} ${tool.id} (${tool.route})`);
+    if (process.env.DEBUG_BROWSER_ERRORS === '1' && result.errors.length) {
+      console.error(result.errors);
+    }
   }
 
   await browser.close();

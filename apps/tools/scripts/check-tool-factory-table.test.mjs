@@ -111,10 +111,10 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /Journey verification evidence/);
   assert.match(source, /Open Golden Journey pilot/);
   assert.match(source, /Fixed membership sha256:cf077705/);
-  assert.match(source, /No retained evidence/);
-  assert.match(source, /Evidence is stale/);
-  assert.match(source, /Stale evidence/);
-  assert.doesNotMatch(source, /Warning · not verified/);
+  assert.match(source, /golden-pilot-source-view\.ts/);
+  assert.match(source, /expectedGoldenPilot\.rows/);
+  assert.match(source, /expected\.resultLabel/);
+  assert.match(source, /expected\.remainingGap/);
   assert.match(
     source,
     /deriveScreenshotPath\(args\.screenshot, ['"]golden-pilot['"]\)/,
@@ -156,9 +156,6 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /screenshot\(\{ path: screenshotPaths\.githubWork \}\)/);
   assert.match(source, /recordRunEvidence/);
   assert.match(source, /command:\s*['"]check:tool-factory['"]/);
-  assert.match(
-    source,
-    /linkedWork:\s*\[[\s\S]*['"]#124['"][\s\S]*\]/,
-  );
+  assert.match(source, /linkedWork:\s*\[[\s\S]*['"]#124['"][\s\S]*\]/);
   assert.doesNotMatch(source, /console\.log\(.*accessCookie/);
 });
