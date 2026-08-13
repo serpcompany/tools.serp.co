@@ -2350,5 +2350,213 @@
     "result": {
       "status": "success"
     }
+  },
+  {
+    "schemaVersion": 2,
+    "runId": "20260813T134243Z_da80c78_pull-request_browser-smoke-preview-subset",
+    "command": {
+      "name": "smoke:tools:browser",
+      "version": "1"
+    },
+    "revision": {
+      "commit": "da80c786a0598d29646d7aa6146e065e508f40f6",
+      "dirty": false
+    },
+    "timestamps": {
+      "startedAt": "2026-08-13T13:42:43.749Z",
+      "completedAt": "2026-08-13T13:42:53.718Z"
+    },
+    "environment": "pull-request",
+    "scope": {
+      "label": "browser-smoke-preview-subset",
+      "inputHashes": [
+        "sha256:4dda64ce01c0bf3501aaa832e43104e877819f4eb4181e3d45e0e3ab111afa49"
+      ],
+      "tools": [
+        {
+          "toolId": "heif-to-jpg",
+          "journeys": [
+            {
+              "journeyId": "heif-to-jpg:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/heif",
+                "sha256": "62952c9045e9abc24f1710c8bf516f8cccf7c19fcfdb09c6f0e3c601b808a183"
+              },
+              "invariantId": "converted-file-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:7da1a9c9c35918c1750547110b819a71b91677913c50732d8b3208cff66dc8c2",
+                "fixture-content": "sha256:62952c9045e9abc24f1710c8bf516f8cccf7c19fcfdb09c6f0e3c601b808a183",
+                "journey-contract": "sha256:e5b4730e9313d93116624ea8af09bee8fcbec55dccd5b07888fe84ed175af656",
+                "semantic-invariant": "sha256:9bddfac2a91fe344acc9986317c4d2709afd09d6e97333f70b3aab7d1442da01",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:377709777cd3247750d4aff6d64fcd5e9a3187bff0ac9839b55afb0085ad8532",
+                "dependency-lock": "sha256:dc5f0768b88b98356b9c642f21f4bdddeedf709a61e0fc97f653bf5e11db35c2",
+                "runner-sources": "sha256:a8fc03e2fc28a78d606edd838e1602a49117b246ba9a91f73eabf34076a20b12"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "heif-to-pdf",
+          "journeys": [
+            {
+              "journeyId": "heif-to-pdf:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/heif",
+                "sha256": "62952c9045e9abc24f1710c8bf516f8cccf7c19fcfdb09c6f0e3c601b808a183"
+              },
+              "invariantId": "converted-file-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:7da1a9c9c35918c1750547110b819a71b91677913c50732d8b3208cff66dc8c2",
+                "fixture-content": "sha256:62952c9045e9abc24f1710c8bf516f8cccf7c19fcfdb09c6f0e3c601b808a183",
+                "journey-contract": "sha256:ec2496f5a55be9330036cbf859b6e051f2bd2a26698ed121603ec1753d698d92",
+                "semantic-invariant": "sha256:9bddfac2a91fe344acc9986317c4d2709afd09d6e97333f70b3aab7d1442da01",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:377709777cd3247750d4aff6d64fcd5e9a3187bff0ac9839b55afb0085ad8532",
+                "dependency-lock": "sha256:dc5f0768b88b98356b9c642f21f4bdddeedf709a61e0fc97f653bf5e11db35c2",
+                "runner-sources": "sha256:a8fc03e2fc28a78d606edd838e1602a49117b246ba9a91f73eabf34076a20b12"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "heif-to-png",
+          "journeys": [
+            {
+              "journeyId": "heif-to-png:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/heif",
+                "sha256": "62952c9045e9abc24f1710c8bf516f8cccf7c19fcfdb09c6f0e3c601b808a183"
+              },
+              "invariantId": "converted-file-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:7da1a9c9c35918c1750547110b819a71b91677913c50732d8b3208cff66dc8c2",
+                "fixture-content": "sha256:62952c9045e9abc24f1710c8bf516f8cccf7c19fcfdb09c6f0e3c601b808a183",
+                "journey-contract": "sha256:bd0c60c4e3eef0d77f929569243ef0f39ac90489ab3ffd4e77429b56742f1303",
+                "semantic-invariant": "sha256:9bddfac2a91fe344acc9986317c4d2709afd09d6e97333f70b3aab7d1442da01",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:377709777cd3247750d4aff6d64fcd5e9a3187bff0ac9839b55afb0085ad8532",
+                "dependency-lock": "sha256:dc5f0768b88b98356b9c642f21f4bdddeedf709a61e0fc97f653bf5e11db35c2",
+                "runner-sources": "sha256:a8fc03e2fc28a78d606edd838e1602a49117b246ba9a91f73eabf34076a20b12"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "heif-to-webp",
+          "journeys": [
+            {
+              "journeyId": "heif-to-webp:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/heif",
+                "sha256": "62952c9045e9abc24f1710c8bf516f8cccf7c19fcfdb09c6f0e3c601b808a183"
+              },
+              "invariantId": "converted-file-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:7da1a9c9c35918c1750547110b819a71b91677913c50732d8b3208cff66dc8c2",
+                "fixture-content": "sha256:62952c9045e9abc24f1710c8bf516f8cccf7c19fcfdb09c6f0e3c601b808a183",
+                "journey-contract": "sha256:89fdba1883fceea03f3c196b95c19ed317ef4c21e0f8fc415342bf98a08010f7",
+                "semantic-invariant": "sha256:9bddfac2a91fe344acc9986317c4d2709afd09d6e97333f70b3aab7d1442da01",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:377709777cd3247750d4aff6d64fcd5e9a3187bff0ac9839b55afb0085ad8532",
+                "dependency-lock": "sha256:dc5f0768b88b98356b9c642f21f4bdddeedf709a61e0fc97f653bf5e11db35c2",
+                "runner-sources": "sha256:a8fc03e2fc28a78d606edd838e1602a49117b246ba9a91f73eabf34076a20b12"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "png-to-webp",
+          "journeys": [
+            {
+              "journeyId": "png-to-webp:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/png",
+                "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
+              },
+              "invariantId": "generic-file-exact-output",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
+                "fixture-content": "sha256:e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7",
+                "journey-contract": "sha256:123b486a465b48f1753968ce396bd3aaf5b67d3bb9382bccdb83039fad40ab4b",
+                "semantic-invariant": "sha256:4f9341350a479a7eebd610688604dd484827e0e04dc219fa314e3a4840b471a3",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:377709777cd3247750d4aff6d64fcd5e9a3187bff0ac9839b55afb0085ad8532",
+                "dependency-lock": "sha256:dc5f0768b88b98356b9c642f21f4bdddeedf709a61e0fc97f653bf5e11db35c2",
+                "runner-sources": "sha256:a8fc03e2fc28a78d606edd838e1602a49117b246ba9a91f73eabf34076a20b12"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "result": {
+      "status": "success"
+    }
   }
 ]
