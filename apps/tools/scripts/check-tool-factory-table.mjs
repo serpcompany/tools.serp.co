@@ -111,8 +111,15 @@ const expectedGoldenPilot = JSON.parse(
     { cwd: repositoryRoot, encoding: 'utf8' },
   ),
 );
+const expectedPortfolioTotal = expectedGoldenPilot.portfolioTotal;
+const expectedFirstExpansionGroup = expectedGoldenPilot.firstExpansionGroup;
+const expectedExpansionCount =
+  expectedFirstExpansionGroup.unlockCount.toLocaleString('en-US');
+const expectedExpansionHeading = `Rank ${expectedFirstExpansionGroup.rank} ${expectedFirstExpansionGroup.operationFamily}`;
+const expectedExpansionFilter = `Filtering to rank ${expectedFirstExpansionGroup.rank} · ${expectedFirstExpansionGroup.operationFamily}`;
+const expectedExpansionMatches = `${expectedExpansionCount} matching Tools`;
 const expectedPortfolioSummary = [
-  '2,807 active Tools',
+  `${expectedPortfolioTotal.toLocaleString('en-US')} active Tools`,
   `${expectedGoldenPilot.portfolioCounts.supported.toLocaleString('en-US')} supported`,
   `${expectedGoldenPilot.portfolioCounts.unsupported.toLocaleString('en-US')} explicitly unsupported`,
   `${expectedGoldenPilot.portfolioCounts.unknown.toLocaleString('en-US')} unknown`,
@@ -236,45 +243,47 @@ try {
     )
     .waitFor();
   const adaptiveGroup = planner.getByRole('article', {
-    name: 'Rank 1 wave:heif-browser-libheif',
+    name: expectedExpansionHeading,
   });
-  await adaptiveGroup.getByText('4 exact Tools', { exact: true }).waitFor();
-  await adaptiveGroup.getByText('libheif', { exact: false }).first().waitFor();
+  await adaptiveGroup
+    .getByText(`${expectedExpansionCount} exact Tools`, { exact: true })
+    .waitFor();
+  for (const identity of expectedFirstExpansionGroup.candidateEngineIdentities) {
+    await adaptiveGroup.getByText(identity, { exact: false }).first().waitFor();
+  }
   await adaptiveGroup.getByText('adapter · missing', { exact: true }).waitFor();
   await adaptiveGroup
     .getByText('browser/runtime fit · needs review', { exact: true })
     .waitFor();
   await adaptiveGroup
-    .getByRole('button', { name: 'Show 4 exact Tools' })
-    .click();
-  await page.getByText('4 matching Tools').waitFor();
-  await page
-    .getByText('Filtering to rank 1 · wave:heif-browser-libheif', {
-      exact: true,
+    .getByRole('button', {
+      name: `Show ${expectedExpansionCount} exact Tools`,
     })
-    .waitFor();
+    .click();
+  await page.getByText(expectedExpansionMatches).waitFor();
+  await page.getByText(expectedExpansionFilter, { exact: true }).waitFor();
   if (screenshotPaths.planner) {
     await planner.screenshot({ path: screenshotPaths.planner });
   }
-  await page.getByLabel('Search all Tools').fill('heif-to-png');
+  await page
+    .getByLabel('Search all Tools')
+    .fill(expectedFirstExpansionGroup.includedToolId);
   await page.getByText('1 matching Tools').waitFor();
-  await page.getByLabel('Search all Tools').fill('ai-to-png');
+  await page
+    .getByLabel('Search all Tools')
+    .fill(expectedFirstExpansionGroup.excludedToolId);
   await page.getByText('0 matching Tools').waitFor();
   await page.getByLabel('Search all Tools').fill('');
   const expansionUrl = new URL(page.url());
   assert.equal(
     expansionUrl.searchParams.get('expansion'),
-    'family:wave:heif-browser-libheif',
+    expectedFirstExpansionGroup.id,
   );
 
   await page.reload({ waitUntil: 'networkidle' });
   await waitForHydration(page);
-  await page.getByText('4 matching Tools').waitFor();
-  await page
-    .getByText('Filtering to rank 1 · wave:heif-browser-libheif', {
-      exact: true,
-    })
-    .waitFor();
+  await page.getByText(expectedExpansionMatches).waitFor();
+  await page.getByText(expectedExpansionFilter, { exact: true }).waitFor();
 
   const copiedExpansionPage = await context.newPage();
   const copiedExpansionErrors = [];
@@ -285,22 +294,28 @@ try {
     waitUntil: 'networkidle',
   });
   await waitForHydration(copiedExpansionPage);
-  await copiedExpansionPage.getByText('4 matching Tools').waitFor();
+  await copiedExpansionPage.getByText(expectedExpansionMatches).waitFor();
   await copiedExpansionPage
-    .getByText('Filtering to rank 1 · wave:heif-browser-libheif', {
-      exact: true,
-    })
+    .getByText(expectedExpansionFilter, { exact: true })
     .waitFor();
   assert.deepEqual(copiedExpansionErrors, []);
   await copiedExpansionPage.close();
 
   await page.getByRole('button', { name: 'Reset' }).click();
   assert.equal(new URL(page.url()).search, '');
-  await page.getByText('2,807 matching Tools').waitFor();
+  await page
+    .getByText(
+      `${expectedPortfolioTotal.toLocaleString('en-US')} matching Tools`,
+    )
+    .waitFor();
   await page.goBack({ waitUntil: 'networkidle' });
-  await page.getByText('4 matching Tools').waitFor();
+  await page.getByText(expectedExpansionMatches).waitFor();
   await page.goForward({ waitUntil: 'networkidle' });
-  await page.getByText('2,807 matching Tools').waitFor();
+  await page
+    .getByText(
+      `${expectedPortfolioTotal.toLocaleString('en-US')} matching Tools`,
+    )
+    .waitFor();
 
   await page.getByLabel('Search all Tools').fill('3g2-to-mp4');
   await page.getByText('1 matching Tools').waitFor();
@@ -621,7 +636,11 @@ try {
 
   await page.getByRole('button', { name: 'Reset' }).click();
   assert.equal(new URL(page.url()).search, '');
-  await page.getByText('2,807 matching Tools').waitFor();
+  await page
+    .getByText(
+      `${expectedPortfolioTotal.toLocaleString('en-US')} matching Tools`,
+    )
+    .waitFor();
   assert.equal(await page.getByLabel('Rows per page').inputValue(), '50');
   assert.equal(
     await page.getByRole('columnheader', { name: /Description/ }).count(),
@@ -636,9 +655,16 @@ try {
     { waitUntil: 'networkidle' },
   );
   await waitForHydration(page);
-  await page.getByText('2,807 matching Tools').waitFor();
-  await page.getByText('page 57 of 57').waitFor();
-  assert.equal(new URL(page.url()).search, '?page=57');
+  await page
+    .getByText(
+      `${expectedPortfolioTotal.toLocaleString('en-US')} matching Tools`,
+    )
+    .waitFor();
+  const expectedLastPage = Math.ceil(expectedPortfolioTotal / 50);
+  await page
+    .getByText(`page ${expectedLastPage} of ${expectedLastPage}`)
+    .waitFor();
+  assert.equal(new URL(page.url()).search, `?page=${expectedLastPage}`);
   assert.equal(await page.getByLabel('Rows per page').inputValue(), '50');
 
   assert.deepEqual(pageErrors, []);

@@ -100,7 +100,11 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /new URL\(page\.url\(\)\)\.search/);
   assert.match(source, /getByRole\(['"]dialog['"]\)/);
   assert.match(source, /OSS expansion planner/);
-  assert.match(source, /Show 4 exact Tools/);
+  assert.match(source, /expectedFirstExpansionGroup/);
+  assert.match(source, /expectedExpansionCount/);
+  assert.match(source, /expectedExpansionHeading/);
+  assert.match(source, /expectedExpansionFilter/);
+  assert.match(source, /expectedExpansionMatches/);
   assert.match(source, /Filter by current execution/);
   assert.match(source, /Filter by preferred target/);
   assert.match(source, /Filter by server dependency/);
@@ -114,7 +118,10 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /golden-pilot-source-view\.ts/);
   assert.match(source, /expectedGoldenPilot\.rows/);
   assert.match(source, /expectedGoldenPilot\.portfolioCounts/);
+  assert.match(source, /expectedGoldenPilot\.portfolioTotal/);
+  assert.match(source, /expectedGoldenPilot\.firstExpansionGroup/);
   assert.doesNotMatch(source, /436 supported/);
+  assert.doesNotMatch(source, /wave:heif-browser-libheif/);
   assert.match(source, /expected\.resultLabel/);
   assert.match(source, /expected\.remainingGap/);
   assert.match(source, /expectedBmp\.resultLabel/);
