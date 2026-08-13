@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { toolJourneys } from './tool-journeys.ts';
+import { toolJourneys } from '../../apps/tools/lib/tool-journeys.ts';
 import {
   buildToolVerificationEvidenceIndex,
   getRequiredVerificationChecks,
@@ -14,11 +14,14 @@ import {
   type ToolJourneyEvidenceOutcome,
   type ToolVerificationCheck,
   type ToolVerificationRunManifest,
-} from './tool-verification-evidence.ts';
+} from '../../apps/tools/lib/tool-verification-evidence.ts';
 
-const repositoryRoot = fileURLToPath(new URL('../../../', import.meta.url));
+const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url));
 const generatedInputsPath = fileURLToPath(
-  new URL('./tool-verification-inputs.generated.json', import.meta.url),
+  new URL(
+    '../../apps/tools/lib/tool-verification-inputs.generated.json',
+    import.meta.url,
+  ),
 );
 
 function freeze<Value>(value: Value): Value {

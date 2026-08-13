@@ -16,7 +16,7 @@ test('Golden pilot command consumes the canonical portfolio and renders the huma
   assert.match(source, /continue \/ repair \/ reconsider/i);
   assert.match(source, /scripts\/prove-golden-currentness\.mjs/);
   assert.match(source, /options\.environment === 'preview'/);
-  assert.match(source, /golden-pilot-currentness-proof\.ts/);
+  assert.match(source, /scripts\/lib\/golden-pilot-currentness-proof\.ts/);
   assert.match(source, /recordRunEvidence/);
   assert.match(source, /<h2>Before and after<\/h2>/);
   assert.match(source, /beforeAfter:/);

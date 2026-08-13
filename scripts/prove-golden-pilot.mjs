@@ -158,7 +158,7 @@ const currentness = JSON.parse(
       ])
     : run(process.execPath, [
         '--experimental-strip-types',
-        'apps/tools/lib/golden-pilot-currentness-proof.ts',
+        'scripts/lib/golden-pilot-currentness-proof.ts',
       ]),
 );
 const componentArtifacts = {
