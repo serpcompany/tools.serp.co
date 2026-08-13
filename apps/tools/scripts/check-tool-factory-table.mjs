@@ -190,9 +190,11 @@ try {
     .waitFor();
   await goldenPilot.getByText('compress-pdf:upload', { exact: true }).waitFor();
   await goldenPilot.getByText('Unavailable', { exact: true }).waitFor();
-  await goldenPilot
-    .getByText('Warning · not verified', { exact: true })
-    .waitFor();
+  assert.equal(
+    await goldenPilot.getByText('No retained evidence', { exact: true }).count(),
+    9,
+  );
+  await goldenPilot.getByText('Evidence is stale', { exact: true }).waitFor();
   if (screenshotPaths.goldenPilot) {
     await goldenPilot.screenshot({ path: screenshotPaths.goldenPilot });
   }
@@ -322,10 +324,10 @@ try {
     .getByText('png-to-webp:upload', { exact: true })
     .waitFor();
   await verificationSection
-    .getByText('Warning · not verified', { exact: true })
+    .getByText('Stale evidence', { exact: true })
     .waitFor();
   await verificationSection
-    .getByText('The run emitted warnings (other-console-warning).', {
+    .getByText('Relevant journey, fixture, invariant, or policy inputs changed.', {
       exact: true,
     })
     .waitFor();

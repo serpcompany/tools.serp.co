@@ -581,7 +581,7 @@ try {
     return checks;
   }
 
-  async function runFunctionalTest(page, tool) {
+  async function runFunctionalTest(page, tool, result) {
     function assertCsvToJsonRecords(records) {
       if (
         !Array.isArray(records) ||

@@ -26,9 +26,13 @@ export async function withSilenceWatchdog<T>(options: {
     }, options.timeoutMs);
   };
   const onAbort = () => {
-    rejectTimeout?.(new DOMException("Transcription cancelled", "AbortError"));
+    rejectTimeout?.(
+      options.signal.reason instanceof Error
+        ? options.signal.reason
+        : new DOMException('Transcription cancelled', 'AbortError'),
+    );
   };
-  options.signal.addEventListener("abort", onAbort, { once: true });
+  options.signal.addEventListener('abort', onAbort, { once: true });
   options.signal.throwIfAborted();
   pulse();
   try {
@@ -36,6 +40,6 @@ export async function withSilenceWatchdog<T>(options: {
   } finally {
     active = false;
     if (timer) clearTimeout(timer);
-    options.signal.removeEventListener("abort", onAbort);
+    options.signal.removeEventListener('abort', onAbort);
   }
 }

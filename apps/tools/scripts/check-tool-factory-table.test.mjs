@@ -111,6 +111,10 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /Journey verification evidence/);
   assert.match(source, /Open Golden Journey pilot/);
   assert.match(source, /Fixed membership sha256:cf077705/);
+  assert.match(source, /No retained evidence/);
+  assert.match(source, /Evidence is stale/);
+  assert.match(source, /Stale evidence/);
+  assert.doesNotMatch(source, /Warning · not verified/);
   assert.match(
     source,
     /deriveScreenshotPath\(args\.screenshot, ['"]golden-pilot['"]\)/,
