@@ -77,6 +77,10 @@ function fixtureDigest(journey) {
 export function buildToolVerificationInputs() {
   const executableFiles = trackedFiles([
     'apps/tools/app',
+    'apps/tools/next.config.mjs',
+    'apps/tools/open-next.config.ts',
+    'apps/tools/package.json',
+    'apps/tools/wrangler.jsonc',
     'apps/tools/lib',
     'apps/tools/components',
     'apps/tools/workers',
@@ -84,6 +88,10 @@ export function buildToolVerificationInputs() {
     'packages/app-core/src',
     'packages/tool-telemetry/src',
     'packages/ui/src',
+    'packages/app-core/package.json',
+    'packages/tool-telemetry/package.json',
+    'packages/ui/package.json',
+    'package.json',
   ]);
   const runnerFiles = trackedFiles([
     'scripts/run-browser-check.mjs',
