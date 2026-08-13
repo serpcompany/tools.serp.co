@@ -3,11 +3,17 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const appLayoutSource = readFileSync(
-  new URL("../../../packages/app-core/src/components/app-layout.tsx", import.meta.url),
+  new URL(
+    "../../../packages/app-core/src/components/app-layout.tsx",
+    import.meta.url,
+  ),
   "utf8",
 );
 const siteFooterSource = readFileSync(
-  new URL("../../../packages/app-core/src/components/site-footer.tsx", import.meta.url),
+  new URL(
+    "../../../packages/app-core/src/components/site-footer.tsx",
+    import.meta.url,
+  ),
   "utf8",
 );
 const rootLayoutSource = readFileSync(
@@ -27,8 +33,16 @@ test("shared app shell renders the global site footer", () => {
 
 test("shared app shell owns static light appearance without an inline theme bootstrap", () => {
   assert.match(appLayoutSource, /<html[^>]*className="light"/);
-  assert.match(appLayoutSource, /colorScheme:\s*"light"/);
+  assert.match(appLayoutSource, /colorScheme:\s*["']light["']/);
   assert.doesNotMatch(appLayoutSource, /Providers|next-themes|ThemeProvider/);
+});
+
+test("shared app shell loads AdSense without framework-only script attributes", () => {
+  assert.match(
+    appLayoutSource,
+    /<script[\s\S]*pagead2\.googlesyndication\.com/,
+  );
+  assert.doesNotMatch(appLayoutSource, /next\/script|strategy=|data-nscript/);
 });
 
 test("site footer includes core SERP Tools navigation", () => {
@@ -39,7 +53,13 @@ test("site footer includes core SERP Tools navigation", () => {
   assert.match(siteFooterSource, /\/brands\//);
   assert.match(siteFooterSource, /https:\/\/apps\.serp\.co/);
   assert.match(siteFooterSource, /https:\/\/extensions\.serp\.co/);
-  assert.match(siteFooterSource, /https:\/\/dr\.serp\.co\/sites\/tools\.serp\.co/);
-  assert.match(siteFooterSource, /https:\/\/dr\.serp\.co\/badge\/tools\.serp\.co\?style=serp-dr-v3/);
+  assert.match(
+    siteFooterSource,
+    /https:\/\/dr\.serp\.co\/sites\/tools\.serp\.co/,
+  );
+  assert.match(
+    siteFooterSource,
+    /https:\/\/dr\.serp\.co\/badge\/tools\.serp\.co\?style=serp-dr-v3/,
+  );
   assert.match(siteFooterSource, /Verified DR 78 for tools\.serp\.co/);
 });

@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { assertGoldenBrowserManifest } from './golden-pilot-contract.mjs';
+import {
+  assertGoldenBrowserManifest,
+  summarizeGoldenPilotProjection,
+} from './golden-pilot-contract.mjs';
 
 const ids = [
   'audio-to-text:extractor-url',
@@ -56,5 +59,37 @@ test('Golden proof accepts only exact semantic output and honest no-delivery evi
         manifest({ 'compress-pdf:upload': { checks: [] } }),
       ),
     /no-delivery/,
+  );
+});
+
+test('Golden package separates completed execution from a repair decision', () => {
+  const rows = ids.map((journeyId) => ({
+    journeyId,
+    evidenceState: 'warned',
+  }));
+
+  assert.deepEqual(summarizeGoldenPilotProjection(rows), {
+    executionStatus: 'completed',
+    verificationDecision: 'repair',
+    acceptanceStatus: 'not-accepted',
+    evidenceCounts: { warned: 10 },
+  });
+});
+
+test('Golden package is ready for a human continue decision only at the declared evidence boundary', () => {
+  const rows = ids.map((journeyId) => ({
+    journeyId,
+    evidenceState: journeyId === 'compress-pdf:upload' ? 'warned' : 'verified',
+  }));
+
+  assert.deepEqual(summarizeGoldenPilotProjection(rows), {
+    executionStatus: 'completed',
+    verificationDecision: 'continue',
+    acceptanceStatus: 'ready-for-maintainer-decision',
+    evidenceCounts: { verified: 9, warned: 1 },
+  });
+  assert.throws(
+    () => summarizeGoldenPilotProjection(rows.slice(1)),
+    /fixed journey membership/,
   );
 });

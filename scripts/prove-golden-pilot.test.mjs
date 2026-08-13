@@ -54,3 +54,13 @@ test('Golden pilot uses preview evidence retention policy outside local runs', (
     /status: 'success',\s*retentionClass: 'retained-debug'/,
   );
 });
+
+test('Golden report separates browser observations from evidence acceptance', () => {
+  assert.match(source, /<th>Observed result<\/th>/);
+  assert.match(source, /<th>Evidence state<\/th>/);
+  assert.match(source, /journey\.observedResult/);
+  assert.match(source, /journey\.evidenceResult/);
+  assert.match(source, /packageSummary\.verificationDecision/);
+  assert.match(source, /does not by itself mean the pilot was accepted/);
+  assert.doesNotMatch(source, /Golden Journey pilot proof passed/);
+});

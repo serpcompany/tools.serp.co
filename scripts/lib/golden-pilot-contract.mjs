@@ -47,3 +47,35 @@ export function assertGoldenBrowserManifest(manifest) {
   }
   return journeys;
 }
+
+export function summarizeGoldenPilotProjection(rows) {
+  const byId = new Map(rows.map((row) => [row.journeyId, row]));
+  if (
+    rows.length !== EXPECTED_JOURNEYS.length ||
+    EXPECTED_JOURNEYS.some((journeyId) => !byId.has(journeyId))
+  ) {
+    throw new Error(
+      'Golden projection did not contain the fixed journey membership.',
+    );
+  }
+  const counts = Object.freeze(
+    rows.reduce((summary, row) => {
+      summary[row.evidenceState] = (summary[row.evidenceState] ?? 0) + 1;
+      return summary;
+    }, {}),
+  );
+  const readyToContinue = EXPECTED_JOURNEYS.every((journeyId) => {
+    const state = byId.get(journeyId)?.evidenceState;
+    return journeyId === 'compress-pdf:upload'
+      ? state === 'warned'
+      : state === 'verified';
+  });
+  return Object.freeze({
+    executionStatus: 'completed',
+    verificationDecision: readyToContinue ? 'continue' : 'repair',
+    acceptanceStatus: readyToContinue
+      ? 'ready-for-maintainer-decision'
+      : 'not-accepted',
+    evidenceCounts: counts,
+  });
+}

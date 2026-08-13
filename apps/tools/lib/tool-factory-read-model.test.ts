@@ -45,20 +45,11 @@ test('supported Tool keeps implementation, verification, and runtime facts separ
   assert.equal(row.runtimeRequirement.classification, 'declared-client-only');
   assert.equal(row.runtimeObservation.classification, 'not-loaded');
   assert.deepEqual(
-    row.verificationEvidence.map((evidence) => [
-      evidence.journeyId,
-      evidence.state,
-    ]),
-    [['png-to-webp:upload', 'stale']],
+    row.verificationEvidence.map((evidence) => evidence.journeyId),
+    ['png-to-webp:upload'],
   );
-  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, [
-    'semantic-output',
-    'malformed-input',
-    'spoofed-input',
-    'wrong-format-output',
-    'no-delivery-on-failure',
-    'cancellation-lifecycle',
-  ]);
+  assert.notEqual(row.verificationEvidence[0]?.state, 'verified');
+  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
   assert.deepEqual(row.attention.codes, []);
 });
 
@@ -98,9 +89,17 @@ test('registered family policy does not become exact Tool evidence', () => {
     'registered-with-semantic-policy',
   );
   assert.deepEqual(
-    row.verificationEvidence.map((evidence) => evidence.state),
-    ['no-evidence'],
+    row.verificationEvidence.map((evidence) => evidence.journeyId),
+    ['bmp-to-png:upload'],
   );
+  assert.notEqual(row.verificationEvidence[0]?.state, 'verified');
+  assert.deepEqual(row.verificationEvidence[0]?.missingChecks, [
+    'malformed-input',
+    'spoofed-input',
+    'wrong-format-output',
+    'no-delivery-on-failure',
+    'cancellation-lifecycle',
+  ]);
 });
 
 test('unknown Tool remains unknown and names the evidence needed to resolve it', () => {

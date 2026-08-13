@@ -1,12 +1,11 @@
-import Script from "next/script";
-
 import { AppHeader } from "./app-header";
 import { GTagManager } from "./gtag-manager";
 import { SiteFooter } from "./site-footer";
 
 import "@serp-tools/ui/globals.css";
 
-const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "ca-pub-2343633734899216";
+const adsenseClient =
+  process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "ca-pub-2343633734899216";
 const adsenseTestMode = process.env.NEXT_PUBLIC_ADSENSE_TEST_MODE === "true";
 
 export function AppLayout({
@@ -17,13 +16,12 @@ export function AppLayout({
   return (
     <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body className="bg-background font-sans antialiased">
-        {adsenseClient && (process.env.NODE_ENV !== "development" || adsenseTestMode) ? (
-          <Script
-            id="adsense-script"
+        {adsenseClient &&
+        (process.env.NODE_ENV !== "development" || adsenseTestMode) ? (
+          <script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
             crossOrigin="anonymous"
-            strategy="afterInteractive"
           />
         ) : null}
         <GTagManager />

@@ -20,6 +20,8 @@ import {
 } from './lib/generic-smoke-capabilities.mjs';
 import { readTranscriptionTerminalState } from './lib/transcription-browser-state.mjs';
 import {
+  assertExactFixtureBytes,
+  assertLossyUniformImageSummary,
   assertPdfCanvasSummary,
   assertUniformImageSummary,
   extractExactZipEntries,
@@ -697,16 +699,19 @@ try {
           'Downloader URL flow did not deliver verified MP4 media',
         );
       }
-      const mp4Identity = await page.evaluate(async () => {
-        const bytes = new Uint8Array(await window.__lastBlob.arrayBuffer());
-        return String.fromCharCode(...bytes.slice(4, 8));
-      });
-      if (mp4Identity !== 'ftyp') {
-        throw new Error('Downloader output did not contain an MP4 ftyp box.');
-      }
+      const fixtureBytes = await fs.readFile(fixturePath);
+      const deliveredSha256 = assertExactFixtureBytes(
+        await lastBlobBytes(page),
+        fixtureBytes,
+        'Downloader MP4 output',
+      );
       return {
-        detail: `download ${blob.size} bytes`,
-        metrics: { outputBytes: blob.size, outputType: blob.type },
+        detail: `verified exact owned MP4 fixture (${blob.size} bytes)`,
+        metrics: {
+          outputBytes: blob.size,
+          outputType: blob.type,
+          outputSha256: deliveredSha256,
+        },
         checks: ['valid-fixture', 'semantic-output', 'required-environment'],
       };
     }
@@ -1219,6 +1224,34 @@ try {
           ],
         });
         result.activeJourneyId = 'audio-to-text:upload';
+        const deliveriesBeforeCancellation = await page.evaluate(
+          () => window.__blobEvents?.length ?? 0,
+        );
+        await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
+          fixtureEntry.path,
+        ]);
+        await page.getByTestId('tool-cancel').click();
+        await page.waitForFunction(
+          () =>
+            document
+              .querySelector('[data-testid="video-progress"]')
+              ?.textContent?.includes('No transcript was delivered.'),
+          null,
+          { timeout: 10_000 },
+        );
+        await page.waitForTimeout(250);
+        const cancellationState = await page.evaluate(() => ({
+          deliveries: window.__blobEvents?.length ?? 0,
+          transcript: document.querySelector('textarea')?.value ?? '',
+        }));
+        if (
+          cancellationState.deliveries !== deliveriesBeforeCancellation ||
+          cancellationState.transcript.trim()
+        ) {
+          throw new Error(
+            'Audio-to-Text cancellation delivered a transcript or download.',
+          );
+        }
         await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
           fixtureEntry.path,
         ]);
@@ -1265,7 +1298,16 @@ try {
       result.journeyOutcomes.set(result.activeJourneyId, {
         outcome: 'passed',
         reasonCode: null,
-        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+        checks:
+          tool.id === 'audio-to-text'
+            ? [
+                'valid-fixture',
+                'semantic-output',
+                'no-delivery-on-failure',
+                'cancellation-lifecycle',
+                'required-environment',
+              ]
+            : ['valid-fixture', 'semantic-output', 'required-environment'],
       });
       result.activeJourneyId = null;
       return {
@@ -1327,7 +1369,6 @@ try {
           warning: 'truthfully unsupported operation produced no output',
           checks: [
             'valid-fixture',
-            'semantic-output',
             'no-delivery-on-failure',
             'required-environment',
           ],
@@ -1357,30 +1398,18 @@ try {
         };
       }
       if (tool.id === 'png-to-webp') {
-        const semantic = await page.evaluate(async () => {
-          const blob = window.__lastBlob;
-          if (!blob) return null;
-          const bytes = new Uint8Array(await blob.arrayBuffer());
-          const image = await createImageBitmap(blob);
-          const result = {
-            riff: new TextDecoder().decode(bytes.slice(0, 4)),
-            webp: new TextDecoder().decode(bytes.slice(8, 12)),
-            width: image.width,
-            height: image.height,
-          };
-          image.close();
-          return result;
+        const semantic = await decodeImageSummary(
+          page,
+          await lastBlobBytes(page),
+          'image/webp',
+        );
+        assertLossyUniformImageSummary(semantic, {
+          width: 96,
+          height: 96,
+          rgba: [0, 0, 253, 255],
+          tolerance: 8,
+          label: 'PNG to WebP output',
         });
-        if (
-          semantic?.riff !== 'RIFF' ||
-          semantic.webp !== 'WEBP' ||
-          !semantic.width ||
-          !semantic.height
-        ) {
-          throw new Error(
-            'PNG to WebP output failed independent WebP decoding.',
-          );
-        }
         await saveGoldenOutput(page, 'png-to-webp.webp');
         await saveGoldenScreenshot(page, 'png-to-webp-success.png');
         return {

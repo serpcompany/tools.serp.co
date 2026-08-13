@@ -81,6 +81,19 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
     inputRef.current?.click();
   }
 
+  function cancelTranscription() {
+    runOwnership.abort("Transcription cancelled by the user");
+    setBusy(false);
+    setTranscript("");
+    setTranscriptMedia(null);
+    setCurrentFile({
+      name: currentFile?.name ?? "Media",
+      progress: currentFile?.progress,
+      status: "error",
+      message: "Transcription cancelled. No transcript was delivered.",
+    });
+  }
+
   async function runTranscription(
     input:
       | { kind: "url"; url: string }
@@ -329,6 +342,20 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
             >
               {busy ? "Working..." : "CHOOSE FILES"}
             </Button>
+
+            {busy && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  cancelTranscription();
+                }}
+                data-testid="tool-cancel"
+              >
+                Cancel transcription
+              </Button>
+            )}
 
             <div className="text-sm" style={{ color: randomColor }}>
               <p className="font-medium">{hint}</p>

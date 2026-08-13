@@ -8,10 +8,34 @@ import {
 } from '../../apps/tools/node_modules/@zip.js/zip.js/index.js';
 
 import {
+  assertExactFixtureBytes,
+  assertLossyUniformImageSummary,
   assertPdfCanvasSummary,
   assertUniformImageSummary,
   extractExactZipEntries,
 } from './golden-output-semantics.mjs';
+
+test('exact fixture verification rejects altered or truncated delivery bytes', () => {
+  const fixture = [0, 0, 0, 24, 102, 116, 121, 112, 1, 2, 3];
+  assert.match(
+    assertExactFixtureBytes(fixture, fixture, 'Downloaded MP4'),
+    /^[a-f0-9]{64}$/,
+  );
+  assert.throws(
+    () =>
+      assertExactFixtureBytes(
+        [0, 0, 0, 24, 102, 116, 121, 112, 1, 2, 4],
+        fixture,
+        'Downloaded MP4',
+      ),
+    /owned fixture/,
+  );
+  assert.throws(
+    () =>
+      assertExactFixtureBytes(fixture.slice(0, -1), fixture, 'Downloaded MP4'),
+    /owned fixture/,
+  );
+});
 
 async function zip(entries) {
   const writer = new ZipWriter(new BlobWriter(), { useWebWorkers: false });
@@ -83,6 +107,56 @@ test('image verification rejects wrong pixels and dimensions', () => {
   assert.throws(
     () =>
       assertUniformImageSummary(
+        {
+          width: 3,
+          height: 1,
+          pixelCount: 3,
+          minimum: expected.rgba,
+          maximum: expected.rgba,
+        },
+        expected,
+      ),
+    /dimensions/,
+  );
+});
+
+test('lossy image verification accepts bounded drift and rejects changed content', () => {
+  const expected = {
+    width: 2,
+    height: 1,
+    rgba: [0, 0, 253, 255],
+    tolerance: 8,
+    label: 'PNG to WebP output',
+  };
+  assert.doesNotThrow(() =>
+    assertLossyUniformImageSummary(
+      {
+        width: 2,
+        height: 1,
+        pixelCount: 2,
+        minimum: [0, 0, 251, 255],
+        maximum: [3, 1, 255, 255],
+      },
+      expected,
+    ),
+  );
+  assert.throws(
+    () =>
+      assertLossyUniformImageSummary(
+        {
+          width: 2,
+          height: 1,
+          pixelCount: 2,
+          minimum: [0, 0, 253, 255],
+          maximum: [40, 0, 253, 255],
+        },
+        expected,
+      ),
+    /lossy tolerance/,
+  );
+  assert.throws(
+    () =>
+      assertLossyUniformImageSummary(
         {
           width: 3,
           height: 1,

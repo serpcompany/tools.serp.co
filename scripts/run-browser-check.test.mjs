@@ -211,6 +211,31 @@ test('same-family MP4 to WebM browser proof independently decodes exact output',
   assert.match(runnerSource, /semantic-output/);
 });
 
+test('Golden downloader and PNG to WebP checks retain exact or decoded fixture semantics', () => {
+  assert.match(runnerSource, /assertExactFixtureBytes/);
+  assert.match(runnerSource, /fixtureBytes/);
+  assert.match(runnerSource, /outputSha256/);
+  assert.match(runnerSource, /assertLossyUniformImageSummary/);
+  assert.match(runnerSource, /tolerance: 8/);
+  assert.match(runnerSource, /'image\/webp'/);
+});
+
+test('truthfully unavailable compression retains no-delivery without claiming output semantics', () => {
+  const unsupportedBranch = runnerSource.slice(
+    runnerSource.indexOf(
+      "detail: 'safe failure: published route is truthfully unsupported'",
+    ),
+    runnerSource.indexOf(
+      'const blob = await waitForBlob',
+      runnerSource.indexOf(
+        "detail: 'safe failure: published route is truthfully unsupported'",
+      ),
+    ),
+  );
+  assert.match(unsupportedBranch, /no-delivery-on-failure/);
+  assert.doesNotMatch(unsupportedBranch, /semantic-output/);
+});
+
 test('transcription smoke uses owned speech and a bounded success-or-error terminal', () => {
   const matrix = JSON.parse(
     readFileSync(
@@ -255,6 +280,10 @@ test('transcription smoke uses owned speech and a bounded success-or-error termi
   assert.match(runnerSource, /page\.route\(['"]\*\*\/api\/media-fetch\*['"]/);
   assert.match(runnerSource, /Download failed\|422\|Unexpected token/);
   assert.match(runnerSource, /dropFilesOnDropzone[\s\S]*fixtureEntry\.path/);
+  assert.match(runnerSource, /getByTestId\(['"]tool-cancel['"]\)\.click\(\)/);
+  assert.match(runnerSource, /No transcript was delivered\./);
+  assert.match(runnerSource, /deliveriesBeforeCancellation/);
+  assert.match(runnerSource, /'cancellation-lifecycle'/);
   assert.match(runnerSource, /https:\/\/media\.example\/direct-speech\.mp3/);
   assert.match(runnerSource, /direct-media transcript/);
   assert.match(
