@@ -69,10 +69,7 @@ export function attachJourneyResultEvidence(tools, results) {
                 }
               : null,
           invariantId: journey.invariantId,
-          checks:
-            journeyResult.outcome === 'passed'
-              ? [...(journeyResult.checks ?? [])]
-              : [],
+          checks: [...(journeyResult.checks ?? [])],
           inputRevisions: journey.inputRevisions,
         };
       }),

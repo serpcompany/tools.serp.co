@@ -237,6 +237,33 @@ test('a later Tool warning cannot rewrite an already passed journey', () => {
   );
 });
 
+test('warned journey evidence retains the checks that proved its bounded outcome', () => {
+  const tools = buildBrowserScope({
+    mode: 'smoke',
+    environment: 'preview',
+    toolIds: ['compress-pdf'],
+    filtered: true,
+  }).tools;
+  const [tool] = attachJourneyResultEvidence(tools, [
+    {
+      id: 'compress-pdf',
+      journeyResults: [
+        {
+          journeyId: 'compress-pdf:upload',
+          outcome: 'warned',
+          reasonCode: 'browser-check-warning',
+          fixtureSha256: 'a'.repeat(64),
+          checks: ['valid-fixture', 'no-delivery-on-failure'],
+        },
+      ],
+    },
+  ]);
+  assert.deepEqual(tool.journeys[0].checks, [
+    'valid-fixture',
+    'no-delivery-on-failure',
+  ]);
+});
+
 test('browser evidence revision must match the actual clean checkout', () => {
   assert.doesNotThrow(() =>
     validateBrowserEvidenceRevision(
