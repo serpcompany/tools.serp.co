@@ -20,6 +20,7 @@ import {
   createToolWorkflow,
   defineToolExecutionIntent,
   defineToolSupport,
+  type SemanticVerification,
   type ToolProcessor,
   type ToolWorkflow,
   type WorkflowMedia,
@@ -1115,6 +1116,25 @@ function resolveTableProcessor(toolId: string): ToolProcessor | undefined {
   return policy.kind === "eligible"
     ? createTableProcessor(policy.from, policy.to)
     : undefined;
+}
+
+export async function verifyTableToolOutput(
+  toolId: string,
+  result: WorkflowMedia,
+): Promise<SemanticVerification> {
+  const policy = getTableOperationPolicy(toolId);
+  if (policy.kind !== "eligible") {
+    return { status: "rejected", message: policy.reason };
+  }
+  try {
+    await verifyOutput(policy.to, result.bytes);
+    return { status: "verified" };
+  } catch (error) {
+    return {
+      status: "rejected",
+      message: error instanceof Error ? error.message : String(error),
+    };
+  }
 }
 
 export type TableOperationState =

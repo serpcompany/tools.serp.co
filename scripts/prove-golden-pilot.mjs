@@ -159,10 +159,18 @@ const factoryOutput = run(process.execPath, [
   screenshotBase,
 ]);
 const currentness = JSON.parse(
-  run(process.execPath, [
-    '--experimental-strip-types',
-    'apps/tools/lib/golden-pilot-currentness-proof.ts',
-  ]),
+  options.environment === 'preview'
+    ? run(process.execPath, [
+        'scripts/prove-golden-currentness.mjs',
+        '--revision',
+        options.revision,
+        '--base-url',
+        options.baseUrl,
+      ])
+    : run(process.execPath, [
+        '--experimental-strip-types',
+        'apps/tools/lib/golden-pilot-currentness-proof.ts',
+      ]),
 );
 const componentArtifacts = {
   journeys: artifactId(fixedOutput),

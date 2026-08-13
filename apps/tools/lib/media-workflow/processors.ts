@@ -59,6 +59,13 @@ function verifyMediaIdentity(
   return verifyMediaSemantics(media, undefined, { requiredMediaTrack });
 }
 
+export function verifyDownloaderMediaOutput(
+  media: WorkflowMedia,
+  mode: "audio" | "video" = "video",
+): Promise<SemanticVerification> {
+  return verifyMediaIdentity(media, mode === "audio" ? "audio" : "any");
+}
+
 export type TranscriptionPort = Readonly<{
   transcribe(
     media: WorkflowMedia,

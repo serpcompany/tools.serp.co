@@ -220,6 +220,29 @@ test('Golden downloader and PNG to WebP checks retain exact or decoded fixture s
   assert.match(runnerSource, /'image\/webp'/);
 });
 
+test('Golden output journeys retain exact negative-path probe checks', () => {
+  assert.match(runnerSource, /function runGoldenNegativePathProbe/);
+  for (const toolId of [
+    'batch-compress-png',
+    'bmp-to-png',
+    'csv-to-json',
+    'pdf-reader',
+    'video-downloader',
+  ]) {
+    assert.match(runnerSource, new RegExp(`'${toolId}'`));
+  }
+  for (const check of [
+    'malformed-input',
+    'spoofed-input',
+    'wrong-format-output',
+    'no-delivery-on-failure',
+    'cancellation-lifecycle',
+  ]) {
+    assert.match(runnerSource, new RegExp(`'${check}'`));
+  }
+  assert.match(runnerSource, /runGoldenNegativePathProbe\(tool\.id\)/);
+});
+
 test('truthfully unavailable compression retains no-delivery without claiming output semantics', () => {
   const unsupportedBranch = runnerSource.slice(
     runnerSource.indexOf(
@@ -265,6 +288,8 @@ test('transcription smoke uses owned speech and a bounded success-or-error termi
   assert.match(provenance[relativeFixture].command, /say -v Daniel/);
   assert.match(provenance[relativeFixture].command, /ffmpeg/);
   assert.match(provenance[relativeFixture].text, /shared workflow test/);
+  assert.match(runnerSource, /fixture-provenance\.json/);
+  assert.match(runnerSource, /assertTranscriptMatchesFixture/);
   assert.match(runnerSource, /toolFixtures\[tool\.id\]\?\.fixture/);
   assert.match(runnerSource, /readTranscriptionTerminalState/);
   assert.match(runnerSource, /timeout: 60_000/);

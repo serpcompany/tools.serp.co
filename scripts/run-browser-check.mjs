@@ -19,6 +19,7 @@ import {
   getGenericSmokeExpectation,
 } from './lib/generic-smoke-capabilities.mjs';
 import { readTranscriptionTerminalState } from './lib/transcription-browser-state.mjs';
+import { assertTranscriptMatchesFixture } from './lib/transcription-semantics.mjs';
 import {
   assertExactFixtureBytes,
   assertLossyUniformImageSummary,
@@ -236,6 +237,12 @@ try {
   }
   const fixtureMatrix = JSON.parse(
     await fs.readFile(fixtureMatrixPath, 'utf8'),
+  );
+  const fixtureProvenance = JSON.parse(
+    await fs.readFile(
+      path.join(fixturesDir, 'fixture-provenance.json'),
+      'utf8',
+    ),
   );
   const formatFixtures = new Map(
     (fixtureMatrix.formats ?? []).map((entry) => [entry.format, entry]),
@@ -635,6 +642,68 @@ try {
     return checks;
   }
 
+  function runGoldenNegativePathProbe(toolId) {
+    const configurations = {
+      'batch-compress-png': {
+        file: 'apps/tools/lib/golden-negative-path-probes.ts',
+        key: 'batch',
+        journeyId: 'batch-compress-png:multiple-file-upload',
+      },
+      'bmp-to-png': {
+        file: 'apps/tools/lib/golden-negative-path-probes.ts',
+        key: 'bmp',
+        journeyId: 'bmp-to-png:upload',
+      },
+      'csv-to-json': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'csv',
+        journeyId: 'csv-to-json:upload',
+      },
+      'pdf-reader': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'pdf',
+        journeyId: 'pdf-reader:upload',
+      },
+      'video-downloader': {
+        file: 'apps/tools/lib/golden-pilot-negative-probes.ts',
+        key: 'video',
+        journeyId: 'video-downloader:direct-url',
+      },
+    };
+    const configuration = configurations[toolId];
+    if (!configuration) {
+      throw new Error(`No Golden negative-path probe for ${toolId}.`);
+    }
+    const output = execFileSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        path.join(repositoryRoot, configuration.file),
+      ],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    const result = JSON.parse(output)[configuration.key];
+    const checks = [
+      'malformed-input',
+      'spoofed-input',
+      'wrong-format-output',
+      'no-delivery-on-failure',
+      'cancellation-lifecycle',
+    ];
+    const deliveries =
+      result?.observed?.deliveries ?? result?.observed?.totalDeliveries;
+    if (
+      result?.journeyId !== configuration.journeyId ||
+      JSON.stringify(result?.checks) !== JSON.stringify(checks) ||
+      deliveries !== 0
+    ) {
+      throw new Error(
+        `Golden ${toolId} negative-path probe did not prove its exact checks.`,
+      );
+    }
+    return checks;
+  }
+
   async function runFunctionalTest(page, tool, result) {
     function assertCsvToJsonRecords(records) {
       if (
@@ -712,7 +781,12 @@ try {
           outputType: blob.type,
           outputSha256: deliveredSha256,
         },
-        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+        checks: [
+          'valid-fixture',
+          'semantic-output',
+          ...runGoldenNegativePathProbe(tool.id),
+          'required-environment',
+        ],
       };
     }
 
@@ -815,7 +889,12 @@ try {
           outputBytes: blob?.size ?? null,
           outputType: blob?.type ?? null,
         },
-        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+        checks: [
+          'valid-fixture',
+          'semantic-output',
+          ...runGoldenNegativePathProbe(tool.id),
+          'required-environment',
+        ],
       };
     }
 
@@ -905,7 +984,12 @@ try {
       return {
         detail: 'verified 2 JSON records with preserved numeric cells',
         metrics: { outputBytes: blob.size, outputType: blob.type },
-        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+        checks: [
+          'valid-fixture',
+          'semantic-output',
+          ...runGoldenNegativePathProbe(tool.id),
+          'required-environment',
+        ],
       };
     }
 
@@ -1141,7 +1225,12 @@ try {
           renderedPage: 1,
           bluePixels: pdfSummary.bluePixels,
         },
-        checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+        checks: [
+          'valid-fixture',
+          'semantic-output',
+          ...runGoldenNegativePathProbe(tool.id),
+          'required-environment',
+        ],
       };
     }
 
@@ -1294,6 +1383,11 @@ try {
       if (terminal.status === 'failed') {
         throw new Error(`Transcription failed: ${terminal.message}`);
       }
+      const expectedTranscript = fixtureProvenance[toolFixture]?.text;
+      const transcriptSemantics = assertTranscriptMatchesFixture(
+        terminal.transcript,
+        expectedTranscript,
+      );
       result.completedJourneyIds.push(result.activeJourneyId);
       result.journeyOutcomes.set(result.activeJourneyId, {
         outcome: 'passed',
@@ -1313,8 +1407,8 @@ try {
       return {
         detail:
           tool.id === 'audio-to-text'
-            ? `truthful YouTube failure; upload transcript ${terminal.transcript.length} chars`
-            : `direct-media transcript ${terminal.transcript.length} chars`,
+            ? `truthful YouTube failure; upload transcript matched owned speech (${transcriptSemantics.wordErrorRate.toFixed(3)} word error rate)`
+            : `direct-media transcript matched owned speech (${transcriptSemantics.wordErrorRate.toFixed(3)} word error rate)`,
       };
     }
 
@@ -1447,7 +1541,12 @@ try {
             width: semantic.width,
             height: semantic.height,
           },
-          checks: ['valid-fixture', 'semantic-output', 'required-environment'],
+          checks: [
+            'valid-fixture',
+            'semantic-output',
+            ...runGoldenNegativePathProbe(tool.id),
+            'required-environment',
+          ],
         };
       }
       if (tool.id === 'mp4-to-webm') {

@@ -25,6 +25,8 @@ test('Golden pilot command owns the fixed journey portfolio and human report', (
   assert.match(source, /mp4-to-webm/);
   assert.match(source, /Golden Journey pilot/);
   assert.match(source, /continue \/ repair \/ reconsider/i);
+  assert.match(source, /scripts\/prove-golden-currentness\.mjs/);
+  assert.match(source, /options\.environment === 'preview'/);
   assert.match(source, /golden-pilot-currentness-proof\.ts/);
   assert.match(source, /recordRunEvidence/);
 });
