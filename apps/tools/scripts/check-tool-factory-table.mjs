@@ -393,11 +393,20 @@ try {
 
   await page.getByLabel('Search all Tools').fill('bmp-to-png');
   await page.getByRole('row', { name: /BMP to PNG/ }).click();
-  const untestedDialog = page.getByRole('dialog');
-  await untestedDialog
-    .getByText('No retained evidence', { exact: true })
+  const bmpDialog = page.getByRole('dialog');
+  const expectedBmp = expectedGoldenPilot.rows.find(
+    (row) => row.journeyId === 'bmp-to-png:upload',
+  );
+  assert.ok(expectedBmp);
+  await bmpDialog
+    .getByText(expectedBmp.resultLabel, { exact: false })
+    .first()
     .waitFor();
-  await untestedDialog
+  await bmpDialog
+    .getByText(expectedBmp.remainingGap, { exact: false })
+    .first()
+    .waitFor();
+  await bmpDialog
     .getByText('Family verification policy (not an exact Tool test)', {
       exact: true,
     })

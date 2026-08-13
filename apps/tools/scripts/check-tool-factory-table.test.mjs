@@ -115,6 +115,8 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /expectedGoldenPilot\.rows/);
   assert.match(source, /expected\.resultLabel/);
   assert.match(source, /expected\.remainingGap/);
+  assert.match(source, /expectedBmp\.resultLabel/);
+  assert.match(source, /expectedBmp\.remainingGap/);
   assert.match(
     source,
     /deriveScreenshotPath\(args\.screenshot, ['"]golden-pilot['"]\)/,
