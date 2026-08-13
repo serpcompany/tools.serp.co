@@ -434,11 +434,22 @@ try {
   await familyVerificationSection
     .getByText('audio-to-text:extractor-url', { exact: true })
     .waitFor();
+  const audioJourneyIds = [
+    'audio-to-text:upload',
+    'audio-to-text:direct-url',
+    'audio-to-text:extractor-url',
+  ];
+  const expectedAudioNoEvidence = audioJourneyIds.filter((journeyId) => {
+    const expected = expectedGoldenPilot.rows.find(
+      (row) => row.journeyId === journeyId,
+    );
+    return !expected || expected.evidenceState === 'no-evidence';
+  }).length;
   assert.equal(
     await familyVerificationSection
       .getByText('No retained evidence', { exact: true })
       .count(),
-    3,
+    expectedAudioNoEvidence,
   );
   const githubWorkHeading = familyDialog.getByText('GitHub work', {
     exact: true,
