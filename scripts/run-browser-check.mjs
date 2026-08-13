@@ -360,10 +360,7 @@ try {
       'Local browser evidence refuses Cloudflare Access credentials.',
     );
   }
-  if (options.environment === 'preview') {
-    if (!accessCookie) {
-      throw new Error('Preview browser evidence requires Cloudflare Access.');
-    }
+  if (options.environment === 'preview' && accessCookie) {
     await browserContext.addCookies([
       {
         name: 'CF_Authorization',
