@@ -48,7 +48,7 @@ test('supported Tool keeps implementation, verification, and runtime facts separ
     row.verificationEvidence.map((evidence) => evidence.journeyId),
     ['png-to-webp:upload'],
   );
-  assert.notEqual(row.verificationEvidence[0]?.state, 'verified');
+  assert.equal(row.verificationEvidence[0]?.state, 'verified');
   assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
   assert.deepEqual(row.attention.codes, []);
 });
