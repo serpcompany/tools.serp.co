@@ -4,6 +4,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
+import {
+  parseCsvSourceClassifications,
+  prohibitedOperationalCsvClassifications,
+} from './lib/csv-source-classification.mjs';
+
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url));
 
 const CATALOG_IMPLEMENTATIONS = new Set([
@@ -24,10 +29,21 @@ const STRUCTURAL_CHECK_SOURCES = new Set([
   'scripts/verify-tool-catalog-boundary.mjs',
 ]);
 
-const maintainedSourcePath = /^(?:apps\/tools|packages|scripts)\/.*\.(?:[cm]?[jt]sx?)$/;
+const maintainedSourcePath =
+  /^(?:apps\/tools|packages|scripts)\/.*\.(?:[cm]?[jt]sx?)$/;
 const rawRegistryPath = /(?:^|\/)tools\.json(?:$|[?#])/;
-const advisoryCsvPath = /(?:^|\/)docs\/evidence\/[^?#]+\.csv(?:$|[?#])/;
-const retiredCompatibilityModule = /(?:tool-directory|tool-operations)(?:\.[^/]*)?$/;
+const retiredCompatibilityModule =
+  /(?:tool-directory|tool-operations)(?:\.[^/]*)?$/;
+
+const prohibitedOperationalCsvPaths = new Set(
+  parseCsvSourceClassifications(
+    readFileSync(path.join(repositoryRoot, 'docs/evidence/README.md'), 'utf8'),
+  )
+    .filter(({ classification }) =>
+      prohibitedOperationalCsvClassifications.has(classification),
+    )
+    .map(({ path }) => path),
+);
 
 function guidance(path, problem) {
   return `${path}: ${problem} Use @serp-tools/app-core/lib/tool-catalog for application code or @serp-tools/app-core/lib/tool-catalog-adapter for maintained Node.js harness code. Catalog mutators must isolate raw reads and writes at their approved owned-output boundary.`;
@@ -47,10 +63,7 @@ export function findToolCatalogBoundaryViolations(sources) {
       true,
       scriptKind(path),
     );
-    if (
-      !allowsRawRegistryPath(path) &&
-      containsRawRegistryPath(sourceFile)
-    ) {
+    if (!allowsRawRegistryPath(path) && containsRawRegistryPath(sourceFile)) {
       violations.push(
         guidance(path, 'direct Tool registry access is not permitted.'),
       );
@@ -114,12 +127,62 @@ function containsRawRegistryPath(sourceFile) {
   );
 }
 
+function staticPathFragments(node) {
+  const current = unwrapExpression(node);
+  if (
+    ts.isStringLiteral(current) ||
+    ts.isNoSubstitutionTemplateLiteral(current)
+  ) {
+    return [current.text];
+  }
+  if (ts.isTemplateExpression(current)) {
+    return [
+      current.head.text,
+      ...current.templateSpans.map(({ literal }) => literal.text),
+    ];
+  }
+  if (
+    ts.isBinaryExpression(current) &&
+    current.operatorToken.kind === ts.SyntaxKind.PlusToken
+  ) {
+    return [
+      ...staticPathFragments(current.left),
+      ...staticPathFragments(current.right),
+    ];
+  }
+  return [];
+}
+
+function staticPathCandidates(node) {
+  const current = unwrapExpression(node);
+  const candidates = [];
+  if (
+    ts.isStringLiteral(current) ||
+    ts.isNoSubstitutionTemplateLiteral(current) ||
+    ts.isTemplateExpression(current) ||
+    ts.isBinaryExpression(current)
+  ) {
+    candidates.push(staticPathFragments(current).join(''));
+  }
+  if (
+    ts.isCallExpression(current) &&
+    ts.isPropertyAccessExpression(current.expression) &&
+    ['join', 'resolve'].includes(current.expression.name.text)
+  ) {
+    candidates.push(
+      current.arguments.flatMap(staticPathFragments).filter(Boolean).join('/'),
+    );
+  }
+  return candidates.map((candidate) => candidate.replaceAll('\\', '/'));
+}
+
 function containsAdvisoryCsvPath(sourceFile) {
-  return visitTree(
-    sourceFile,
-    (node) =>
-      (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) &&
-      advisoryCsvPath.test(node.text.replaceAll('\\', '/')),
+  return visitTree(sourceFile, (node) =>
+    staticPathCandidates(node).some((candidate) =>
+      [...prohibitedOperationalCsvPaths].some((csvPath) =>
+        candidate.includes(csvPath),
+      ),
+    ),
   );
 }
 
@@ -132,7 +195,8 @@ function importsRetiredCompatibilityModule(sourceFile) {
       ts.isCallExpression(node) &&
       node.arguments.length === 1 &&
       (node.expression.kind === ts.SyntaxKind.ImportKeyword ||
-        (ts.isIdentifier(node.expression) && node.expression.text === 'require'))
+        (ts.isIdentifier(node.expression) &&
+          node.expression.text === 'require'))
     ) {
       [specifier] = node.arguments;
     }
@@ -213,7 +277,9 @@ function collectCatalogAliases(sourceFile) {
       } else {
         for (const element of node.importClause.namedBindings.elements) {
           const importedName = element.propertyName?.text ?? element.name.text;
-          if (['toolCatalog', 'operationalToolCatalog'].includes(importedName)) {
+          if (
+            ['toolCatalog', 'operationalToolCatalog'].includes(importedName)
+          ) {
             catalogObjectAliases.add(element.name.text);
           }
         }
@@ -273,7 +339,8 @@ function collectCatalogAliases(sourceFile) {
           const propertyName = element.propertyName?.getText(sourceFile);
           if (
             (propertyName === 'tools' ||
-              (propertyName === undefined && element.name.getText(sourceFile) === 'tools')) &&
+              (propertyName === undefined &&
+                element.name.getText(sourceFile) === 'tools')) &&
             ts.isIdentifier(element.name) &&
             !catalogToolAliases.has(element.name.text)
           ) {
@@ -294,11 +361,8 @@ function collectCatalogAliases(sourceFile) {
 }
 
 function reconstructsCatalogPublicationFilter(sourceFile) {
-  const {
-    catalogNamespaceAliases,
-    catalogObjectAliases,
-    catalogToolAliases,
-  } = collectCatalogAliases(sourceFile);
+  const { catalogNamespaceAliases, catalogObjectAliases, catalogToolAliases } =
+    collectCatalogAliases(sourceFile);
 
   return visitTree(sourceFile, (node) => {
     if (
@@ -318,7 +382,10 @@ function reconstructsCatalogPublicationFilter(sourceFile) {
     return (
       callback !== undefined &&
       (ts.isArrowFunction(callback) || ts.isFunctionExpression(callback)) &&
-      visitTree(callback, (part) => ts.isIdentifier(part) && part.text === 'isActive')
+      visitTree(
+        callback,
+        (part) => ts.isIdentifier(part) && part.text === 'isActive',
+      )
     );
   });
 }

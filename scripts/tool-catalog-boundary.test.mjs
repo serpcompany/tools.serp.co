@@ -19,8 +19,7 @@ test('boundary failure names public interfaces and migration guidance', () => {
     },
     {
       path: 'apps/tools/lib/raw-file-reader.ts',
-      source:
-        "readFileSync('packages/app-core/src/data/tools.json', 'utf8');",
+      source: "readFileSync('packages/app-core/src/data/tools.json', 'utf8');",
     },
     {
       path: 'apps/tools/lib/publication-reader.ts',
@@ -79,8 +78,7 @@ test('boundary failure names public interfaces and migration guidance', () => {
     },
     {
       path: 'scripts/sync-downloader-landers-from-registry.mjs',
-      source:
-        "readFileSync('packages/app-core/src/data/tools.json', 'utf8');",
+      source: "readFileSync('packages/app-core/src/data/tools.json', 'utf8');",
     },
   ]);
 

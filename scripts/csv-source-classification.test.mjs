@@ -3,12 +3,10 @@ import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 
-const allowedClassifications = new Set([
-  'fixture',
-  'generated projection',
-  'dated advisory evidence',
-  'obsolete input',
-]);
+import {
+  allowedCsvSourceClassifications,
+  parseCsvSourceClassifications,
+} from './lib/csv-source-classification.mjs';
 
 function trackedCsvPaths() {
   const result = spawnSync('git', ['ls-files', '*.csv'], {
@@ -20,13 +18,7 @@ function trackedCsvPaths() {
 
 function classifiedCsvPaths() {
   const source = readFileSync('docs/evidence/README.md', 'utf8');
-  const entries = [];
-  const rowPattern = /^\|\s+`([^`]+\.csv)`\s+\|\s+`([^`]+)`\s+\|/gm;
-  let match;
-  while ((match = rowPattern.exec(source)) !== null) {
-    entries.push({ path: match[1], classification: match[2] });
-  }
-  return entries;
+  return parseCsvSourceClassifications(source);
 }
 
 test('every tracked CSV has exactly one explicit source classification', () => {
@@ -36,6 +28,8 @@ test('every tracked CSV has exactly one explicit source classification', () => {
   assert.deepEqual(classifiedPaths, [...new Set(classifiedPaths)]);
   assert.deepEqual(classifiedPaths, trackedCsvPaths());
   assert.ok(
-    entries.every((entry) => allowedClassifications.has(entry.classification)),
+    entries.every((entry) =>
+      allowedCsvSourceClassifications.has(entry.classification),
+    ),
   );
 });
