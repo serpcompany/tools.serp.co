@@ -15,11 +15,6 @@ import {
   validateBrowserEvidenceRevision,
 } from './lib/browser-evidence.mjs';
 import {
-  createBrowserCaptureWorkspace,
-  discardBrowserCaptureWorkspace,
-  retainBrowserCaptureWorkspace,
-} from './lib/browser-evidence-captures.mjs';
-import {
   GENERIC_SMOKE_CAPABILITY_VERSION,
   getGenericSmokeExpectation,
 } from './lib/generic-smoke-capabilities.mjs';
@@ -154,10 +149,6 @@ let evidenceTools = [];
 let selectedItemCount = 0;
 let browser;
 const results = [];
-const captureWorkspace = await createBrowserCaptureWorkspace({
-  outputDirectory: process.env.GOLDEN_OUTPUT_DIR,
-  screenshotDirectory: process.env.GOLDEN_SCREENSHOT_DIR,
-});
 
 if (process.env.NODE_ENV !== 'test') {
   const actualRevision = execFileSync('git', ['rev-parse', 'HEAD'], {
@@ -547,7 +538,8 @@ try {
   }
 
   async function saveGoldenOutput(page, fileName) {
-    const outputDirectory = captureWorkspace.outputDirectory;
+    const outputDirectory = process.env.GOLDEN_OUTPUT_DIR;
+    if (!outputDirectory) return;
     const bytes = await page.evaluate(async () => [
       ...new Uint8Array(await window.__lastBlob.arrayBuffer()),
     ]);
@@ -609,7 +601,8 @@ try {
   }
 
   async function saveGoldenScreenshot(page, fileName) {
-    const screenshotDirectory = captureWorkspace.screenshotDirectory;
+    const screenshotDirectory = process.env.GOLDEN_SCREENSHOT_DIR;
+    if (!screenshotDirectory) return;
     await fs.mkdir(screenshotDirectory, { recursive: true });
     await page.screenshot({
       path: path.join(screenshotDirectory, fileName),
@@ -1914,10 +1907,6 @@ try {
     evidenceSummary,
     completedAt,
   );
-  await retainBrowserCaptureWorkspace(captureWorkspace, {
-    repositoryRoot: evidenceRepositoryRoot,
-    runId: evidence.runId,
-  });
   console.log(`Structured artifact: ${evidence.runId}`);
 
   if (summary.fail > 0) {
@@ -1938,13 +1927,8 @@ try {
       ),
       items: selectedItemCount,
     });
-    await retainBrowserCaptureWorkspace(captureWorkspace, {
-      repositoryRoot: evidenceRepositoryRoot,
-      runId: evidence.runId,
-    });
     console.error(`Structured failure artifact: ${evidence.runId}`);
   } catch {
-    await discardBrowserCaptureWorkspace(captureWorkspace).catch(() => {});
     console.error('Structured browser failure artifact could not be recorded');
   }
   console.error(
