@@ -64,13 +64,18 @@ async function inspectSvgRenderEquivalence(page, inputBytes, outputBytes) {
           }
           for (const attribute of element.attributes) {
             const name = attribute.name.toLowerCase();
+            const localName = attribute.localName.toLowerCase();
+            const namespace = attribute.namespaceURI;
             const value = attribute.value.trim();
             if (name.startsWith('on') || name === 'xml:base') {
               activeFindings.push(name);
             }
             if (
               /(?:javascript\s*:|https?\s*:|\/\/)/i.test(value) &&
-              (name === 'href' || name === 'xlink:href' || name === 'src')
+              (localName === 'href' ||
+                localName === 'src' ||
+                (namespace === 'http://www.w3.org/1999/xlink' &&
+                  localName === 'href'))
             ) {
               activeFindings.push(`${name}=${value}`);
             }
@@ -81,10 +86,7 @@ async function inspectSvgRenderEquivalence(page, inputBytes, outputBytes) {
               if (!ids.has(match[1]))
                 unresolvedFragmentRefs.push(`#${match[1]}`);
             }
-            if (
-              (name === 'href' || name === 'xlink:href') &&
-              value.startsWith('#')
-            ) {
+            if (localName === 'href' && value.startsWith('#')) {
               referenceCount += 1;
               if (!ids.has(value.slice(1))) unresolvedFragmentRefs.push(value);
             }

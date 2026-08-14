@@ -6,6 +6,8 @@ import {
   type GenericWorkflowAdapters,
   verifyGenericMediaSemantics,
 } from './generic-tool-workflow.ts';
+import { deliverBrowserMedia } from './browser-workflow-lifecycle.ts';
+import { compressSvgWithWorker } from './svg-compression.ts';
 
 export const SVG_NEGATIVE_PATH_CHECKS = Object.freeze([
   'malformed-input',
@@ -23,6 +25,10 @@ export type SvgNegativePathProof = Readonly<{
   observed: Readonly<{
     deliveries: number;
     terminatedWorkers: number;
+    workerMessages: number;
+    lateWorkerResults: number;
+    deliveryClicks: number;
+    revokedDeliveryUrls: number;
     terminalStatuses: readonly string[];
   }>;
 }>;
@@ -49,10 +55,18 @@ export async function proveSvgCompressionNegativePaths(fixtures: {
   safeSvg: Uint8Array;
   spoofedNonSvg: Uint8Array;
 }): Promise<SvgNegativePathProof> {
-  let mode: 'active-output' | 'changed-output' | 'larger-output' | 'stall' =
-    'active-output';
+  let mode:
+    | 'active-output'
+    | 'wrong-format-output'
+    | 'changed-output'
+    | 'larger-output'
+    | 'stall' = 'active-output';
   let deliveries = 0;
   let terminatedWorkers = 0;
+  let workerMessages = 0;
+  let lateWorkerResults = 0;
+  let deliveryClicks = 0;
+  let revokedDeliveryUrls = 0;
   let enteredStall: (() => void) | undefined;
   const stalled = new Promise<void>((resolve) => {
     enteredStall = resolve;
@@ -69,6 +83,9 @@ export async function proveSvgCompressionNegativePaths(fixtures: {
           '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>',
         );
       }
+      if (mode === 'wrong-format-output') {
+        return fixtures.spoofedNonSvg;
+      }
       if (mode === 'changed-output') {
         return encoder.encode(
           '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180"><rect width="320" height="180" fill="red"/></svg>',
@@ -79,19 +96,42 @@ export async function proveSvgCompressionNegativePaths(fixtures: {
           `${new TextDecoder().decode(fixtures.safeSvg)}<!--${'x'.repeat(1_024)}-->`,
         );
       }
-      await context.registerWorker({
+      let workerMessage: Worker['onmessage'] = null;
+      const capturedLateMessages: Array<NonNullable<Worker['onmessage']>> = [];
+      const worker = {
+        onerror: null,
+        get onmessage() {
+          return workerMessage;
+        },
+        set onmessage(value) {
+          workerMessage = value;
+        },
+        postMessage() {
+          workerMessages += 1;
+          if (workerMessage) capturedLateMessages.push(workerMessage);
+          enteredStall?.();
+        },
         terminate() {
           terminatedWorkers += 1;
         },
-      } as Worker);
-      enteredStall?.();
-      return new Promise<Uint8Array>((_resolve, reject) => {
-        context.signal.addEventListener(
-          'abort',
-          () => reject(context.signal.reason),
-          { once: true },
-        );
-      });
+      } as unknown as Worker;
+      await context.registerWorker(worker);
+      try {
+        return await compressSvgWithWorker({
+          worker,
+          bytes: fixtures.safeSvg,
+          signal: context.signal,
+        });
+      } finally {
+        const deliveriesBeforeLateResult = deliveries;
+        capturedLateMessages[0]?.call(worker, {
+          data: {
+            ok: true,
+            blob: Uint8Array.from(fixtures.safeSvg).buffer,
+          },
+        } as MessageEvent);
+        lateWorkerResults += deliveries - deliveriesBeforeLateResult;
+      }
     },
     verify: (media, context) =>
       verifyGenericMediaSemantics(media, { signal: context.signal }),
@@ -120,6 +160,8 @@ export async function proveSvgCompressionNegativePaths(fixtures: {
   );
   const spoofed = await workflow.run(request(fixtures.spoofedNonSvg));
   const activeOutput = await workflow.run(request(fixtures.safeSvg));
+  mode = 'wrong-format-output';
+  const wrongFormatOutput = await workflow.run(request(fixtures.safeSvg));
   mode = 'changed-output';
   const changedOutput = await workflow.run(request(fixtures.safeSvg));
   mode = 'larger-output';
@@ -128,6 +170,7 @@ export async function proveSvgCompressionNegativePaths(fixtures: {
     ['malformed', malformed],
     ['spoofed', spoofed],
     ['active output', activeOutput],
+    ['wrong-format output', wrongFormatOutput],
     ['visibly changed output', changedOutput],
     ['larger output', largerOutput],
   ] as const) {
@@ -152,12 +195,55 @@ export async function proveSvgCompressionNegativePaths(fixtures: {
       `SVG proof observed ${deliveries} deliveries and ${terminatedWorkers} Worker terminations.`,
     );
   }
+  const deliveryController = new AbortController();
+  const pendingDelivery = deliverBrowserMedia(
+    {
+      name: 'sample_compressed.svg',
+      format: 'svg',
+      mimeType: 'image/svg+xml',
+      bytes: fixtures.safeSvg,
+    },
+    {
+      createObjectUrl: () => 'blob:svg-cancellation-proof',
+      revokeObjectUrl() {
+        revokedDeliveryUrls += 1;
+      },
+      clickDownload() {
+        deliveryClicks += 1;
+      },
+      scheduleCleanup() {
+        throw new TypeError('Cancelled SVG delivery scheduled late cleanup.');
+      },
+      nextId: () => 'svg-cancellation-delivery',
+    },
+    deliveryController.signal,
+  );
+  deliveryController.abort(
+    new DOMException('Cancelled during delivery proof', 'AbortError'),
+  );
+  try {
+    await pendingDelivery;
+    throw new TypeError('Cancelled SVG delivery unexpectedly completed.');
+  } catch (error) {
+    if (!(error instanceof DOMException) || error.name !== 'AbortError') {
+      throw error;
+    }
+  }
+  if (deliveryClicks !== 0 || revokedDeliveryUrls !== 1) {
+    throw new TypeError(
+      `SVG delivery cancellation observed ${deliveryClicks} clicks and ${revokedDeliveryUrls} URL releases.`,
+    );
+  }
   return Object.freeze({
     journeyId: 'compress-svg:upload',
     checks: SVG_NEGATIVE_PATH_CHECKS,
     observed: Object.freeze({
       deliveries,
       terminatedWorkers,
+      workerMessages,
+      lateWorkerResults,
+      deliveryClicks,
+      revokedDeliveryUrls,
       terminalStatuses: Object.freeze([...terminalStatuses]),
     }),
   });

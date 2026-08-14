@@ -24,7 +24,7 @@ const ACTIVE_ELEMENTS = new Set([
   'style',
   'video',
 ]);
-const URL_ATTRIBUTES = new Set(['href', 'src', 'xlink:href']);
+const URL_ATTRIBUTE_LOCAL_NAMES = new Set(['href', 'src']);
 const decoder = new TextDecoder('utf-8', { fatal: true });
 const parser = new XMLParser({
   allowBooleanAttributes: false,
@@ -60,6 +60,7 @@ function hasUnsafeUrl(value: string): boolean {
 
 function verifyAttribute(name: string, value: unknown): SemanticVerification {
   const normalizedName = name.toLowerCase();
+  const normalizedLocalName = localName(name);
   const text = String(value ?? '').trim();
   if (normalizedName.startsWith('on')) {
     return rejected('SVG event-handler attributes are not allowed');
@@ -72,7 +73,10 @@ function verifyAttribute(name: string, value: unknown): SemanticVerification {
       'SVG JavaScript and external resource URLs are not allowed',
     );
   }
-  if (URL_ATTRIBUTES.has(normalizedName) && !text.startsWith('#')) {
+  if (
+    URL_ATTRIBUTE_LOCAL_NAMES.has(normalizedLocalName) &&
+    !text.startsWith('#')
+  ) {
     return rejected('SVG external resource references are not allowed');
   }
   return { status: 'verified' };
