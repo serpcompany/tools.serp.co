@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "description": "Deterministic generated and injected scenarios used to prove the bounded compress-svg policy and lifecycle. Literal file fixtures are tracked separately in fixture-provenance.json.",
+  "scenarios": {
+    "malformed": {
+      "kind": "utf8",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\"><g></svg>"
+    },
+    "truncated": {
+      "kind": "utf8",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\"><g>"
+    },
+    "doctype-entity": {
+      "kind": "utf8",
+      "source": "<!DOCTYPE svg [<!ENTITY x \"unsafe\">]><svg xmlns=\"http://www.w3.org/2000/svg\">&x;</svg>"
+    },
+    "script": {
+      "kind": "utf8",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\"><script>alert(1)</script></svg>"
+    },
+    "event-handler": {
+      "kind": "utf8",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"alert(1)\"/>"
+    },
+    "javascript-uri": {
+      "kind": "utf8",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\"><a href=\"javascript:alert(1)\"/></svg>"
+    },
+    "external-resource": {
+      "kind": "utf8",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:evil=\"http://www.w3.org/1999/xlink\"><image evil:href=\"https://example.com/external.png\"/></svg>"
+    },
+    "oversized": { "kind": "repeat-byte", "byte": 0, "count": 1048577 },
+    "over-depth": { "kind": "nested-svg-element", "element": "g", "depth": 65 },
+    "over-element": {
+      "kind": "repeated-svg-element",
+      "element": "g",
+      "count": 10000
+    },
+    "over-attribute": {
+      "kind": "root-attributes",
+      "prefix": "a",
+      "count": 50000
+    },
+    "timeout": { "kind": "worker-never-responds", "deadlineMs": 5 },
+    "active-optimization-cancellation": { "kind": "abort-after-worker-post" },
+    "in-flight-delivery-cancellation": {
+      "kind": "abort-before-browser-download-click"
+    },
+    "invalid-output": {
+      "kind": "utf8",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\"><g></svg>"
+    },
+    "active-output": {
+      "kind": "utf8",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\"><script>alert(1)</script></svg>"
+    },
+    "wrong-format-output": {
+      "kind": "fixture-reference",
+      "path": "fixtures/sample.png"
+    },
+    "larger-output": {
+      "kind": "append-comment",
+      "character": "x",
+      "count": 1024
+    },
+    "visibly-changed-output": {
+      "kind": "utf8",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"320\" height=\"180\" viewBox=\"0 0 320 180\"><rect width=\"320\" height=\"180\" fill=\"red\"/></svg>"
+    }
+  }
+}

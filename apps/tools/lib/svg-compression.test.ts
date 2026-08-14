@@ -49,6 +49,50 @@ test('owned SVG fixtures retain their exact provenance digests', () => {
   }
 });
 
+test('generated SVG policy and lifecycle scenarios retain one fixed provenance digest', () => {
+  const provenance = JSON.parse(
+    readFileSync(
+      new URL('../benchmarks/fixture-provenance.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  const bytes = readFileSync(
+    new URL(
+      '../benchmarks/svg-compression-proof-scenarios.json',
+      import.meta.url,
+    ),
+  );
+  const scenarios = JSON.parse(bytes.toString('utf8'));
+  assert.deepEqual(
+    Object.keys(scenarios.scenarios).sort(),
+    [
+      'active-optimization-cancellation',
+      'active-output',
+      'doctype-entity',
+      'event-handler',
+      'external-resource',
+      'in-flight-delivery-cancellation',
+      'invalid-output',
+      'javascript-uri',
+      'larger-output',
+      'malformed',
+      'over-attribute',
+      'over-depth',
+      'over-element',
+      'oversized',
+      'script',
+      'timeout',
+      'truncated',
+      'visibly-changed-output',
+      'wrong-format-output',
+    ].sort(),
+  );
+  assert.equal(
+    crypto.createHash('sha256').update(bytes).digest('hex'),
+    provenance['svg-compression-proof-scenarios.json']?.sha256,
+  );
+});
+
 test('SVG policy rejects an external stylesheet processing instruction', () => {
   const verification = verifySvgBytes(
     svg(
