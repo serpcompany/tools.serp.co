@@ -21,8 +21,7 @@ function trackedCsvPaths() {
 function classifiedCsvPaths() {
   const source = readFileSync('docs/evidence/README.md', 'utf8');
   const entries = [];
-  const rowPattern =
-    /^\|\s+`([^`]+\.csv)`\s+\|\s+`(fixture|generated projection|dated advisory evidence|obsolete input)`\s+\|/gm;
+  const rowPattern = /^\|\s+`([^`]+\.csv)`\s+\|\s+`([^`]+)`\s+\|/gm;
   let match;
   while ((match = rowPattern.exec(source)) !== null) {
     entries.push({ path: match[1], classification: match[2] });

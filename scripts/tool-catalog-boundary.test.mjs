@@ -35,6 +35,15 @@ test('boundary failure names public interfaces and migration guidance', () => {
         "readFileSync('../../../docs/evidence/tool-planning/tools_planner.csv', 'utf8');",
     },
     {
+      path: 'apps/tools/lib/segmented-advisory-planner-reader.test.mjs',
+      source: `
+        readFileSync(
+          path.join(root, 'docs', 'evidence', 'tool-planning', 'tools_planner.csv'),
+          'utf8',
+        );
+      `,
+    },
+    {
       path: 'apps/tools/lib/renamed-catalog-reader.ts',
       source: `
         import { toolCatalog as catalog } from '@serp-tools/app-core/lib/tool-catalog';
@@ -76,7 +85,7 @@ test('boundary failure names public interfaces and migration guidance', () => {
   ]);
 
   const report = violations.join('\n');
-  assert.equal(violations.length, 9);
+  assert.equal(violations.length, 10);
   assert.match(report, /@serp-tools\/app-core\/lib\/tool-catalog/);
   assert.match(report, /tool-catalog-adapter/);
   assert.match(report, /raw-reader\.ts/);
@@ -88,6 +97,7 @@ test('boundary failure names public interfaces and migration guidance', () => {
   assert.match(report, /destructured-tools-reader\.ts/);
   assert.match(report, /namespace-catalog-reader\.ts/);
   assert.match(report, /advisory-planner-reader\.test\.mjs/);
+  assert.match(report, /segmented-advisory-planner-reader\.test\.mjs/);
   assert.match(report, /advisory CSV evidence is not an operational input/);
   assert.doesNotMatch(report, /unrelated-reader\.ts/);
   assert.doesNotMatch(report, /sync-downloader-landers/);
