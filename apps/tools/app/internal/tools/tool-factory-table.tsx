@@ -1149,7 +1149,7 @@ function ToolDetail({
           <Fact label="Attention" value={row.attention.summary} />
           <div className="rounded-lg border p-3">
             <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Candidate approaches · not verified support
+              Candidate approaches · not processor capability evidence
             </div>
             {clientFirst.candidateEngines.length ? (
               <ul className="mt-2 space-y-2 text-sm">

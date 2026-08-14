@@ -79,16 +79,9 @@ const DISPOSITIONS = Object.freeze([
   'unwired',
   'unknown',
 ] as const satisfies readonly ToolAcceptanceDisposition[]);
-const RENDERERS = Object.freeze([
-  'table',
-  'transcription',
-  'specialized',
-  'generic',
-  'downloader',
-  'pdf',
-  'placeholder',
-  'not-found',
-] as const satisfies readonly ToolRenderer[]);
+const ACCEPTANCE_RENDERERS = new Set<ToolRenderer>(
+  toolCatalog.activeTools.map(selectToolRenderer),
+);
 
 function deepFreeze<Value>(value: Value): Value {
   if (value && typeof value === 'object' && !Object.isFrozen(value)) {
@@ -119,7 +112,11 @@ function nonEmpty(value: unknown): value is string {
 }
 
 function validateSourceFact(fact: ToolAcceptanceSourceFact) {
-  if (!fact || !nonEmpty(fact.toolId) || !RENDERERS.includes(fact.renderer)) {
+  if (
+    !fact ||
+    !nonEmpty(fact.toolId) ||
+    !ACCEPTANCE_RENDERERS.has(fact.renderer)
+  ) {
     throw new TypeError('Tool acceptance source facts require an identity.');
   }
   if (!['wired', 'unwired', 'unknown'].includes(fact.availability?.kind)) {
