@@ -88,6 +88,19 @@ test('SVG policy rejects xml:base because it can externalize fragment references
   }
 });
 
+test('SVG policy resolves namespaced href attributes before allowing local references', () => {
+  const verification = verifySvgBytes(
+    svg(
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:evil="http://www.w3.org/1999/xlink"><image evil:href="https://example.com/external.png"/></svg>',
+    ),
+  );
+
+  assert.equal(verification.status, 'rejected');
+  if (verification.status === 'rejected') {
+    assert.match(verification.message, /external resource/i);
+  }
+});
+
 test('SVG policy rejects SMIL elements that can activate attributes after load', () => {
   const verification = verifySvgBytes(
     svg(

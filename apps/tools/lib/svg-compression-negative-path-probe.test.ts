@@ -22,7 +22,12 @@ test('exact SVG workflow proves fail-closed inputs, output, delivery, and cancel
   assert.deepEqual(proof.checks, SVG_NEGATIVE_PATH_CHECKS);
   assert.equal(proof.observed.deliveries, 0);
   assert.equal(proof.observed.terminatedWorkers, 1);
+  assert.equal(proof.observed.workerMessages, 1);
+  assert.equal(proof.observed.lateWorkerResults, 0);
+  assert.equal(proof.observed.deliveryClicks, 0);
+  assert.equal(proof.observed.revokedDeliveryUrls, 1);
   assert.deepEqual(proof.observed.terminalStatuses, [
+    'failed',
     'failed',
     'failed',
     'failed',
