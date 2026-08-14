@@ -15,6 +15,7 @@ const repositoryRoot = path.resolve(
 const membership =
   'sha256:2e8404b30c9b954d51d697be77e5e3bc6faf8c9b3a5e942cfb75e56e86d4986e';
 export const ICO_CANDIDATE_WORKER_MAX_BYTES = 128 * 1_024;
+export const ICO_CANDIDATE_EVIDENCE_ENVIRONMENT = 'pull-request';
 export const ICO_CANDIDATE_TERMINATION_STAGES = Object.freeze([
   'decode',
   'select',
@@ -300,7 +301,7 @@ export async function proveIcoPreviewCandidate(arguments_) {
       command: 'prove:ico-preview-candidate',
       commandVersion: '1',
       revision: options.revision,
-      environment: 'preview',
+      environment: ICO_CANDIDATE_EVIDENCE_ENVIRONMENT,
       scope: 'ico-to-png-unregistered-candidate',
       status: 'success',
       startedAt: startedAt.toISOString(),
@@ -322,27 +323,33 @@ export async function proveIcoPreviewCandidate(arguments_) {
     );
   } catch (error) {
     const completedAt = new Date();
-    recordRunEvidence({
-      repositoryRoot,
-      command: 'prove:ico-preview-candidate',
-      commandVersion: '1',
-      revision: options.revision,
-      environment: 'preview',
-      scope: 'ico-to-png-unregistered-candidate',
-      status: 'failure',
-      startedAt: startedAt.toISOString(),
-      completedAt: completedAt.toISOString(),
-      retentionClass: 'pull-request',
-      inputHashes: [membership],
-      linkedWork: ['#144'],
-      summary: {
+    try {
+      recordRunEvidence({
+        repositoryRoot,
+        command: 'prove:ico-preview-candidate',
+        commandVersion: '1',
+        revision: options.revision,
+        environment: ICO_CANDIDATE_EVIDENCE_ENVIRONMENT,
+        scope: 'ico-to-png-unregistered-candidate',
         status: 'failure',
-        checksPassed: 0,
-        checksFailed: 1,
-        items: 1,
-        durationMs: completedAt.getTime() - startedAt.getTime(),
-      },
-    });
+        startedAt: startedAt.toISOString(),
+        completedAt: completedAt.toISOString(),
+        retentionClass: 'pull-request',
+        inputHashes: [membership],
+        linkedWork: ['#144'],
+        summary: {
+          status: 'failure',
+          checksPassed: 0,
+          checksFailed: 1,
+          items: 1,
+          durationMs: completedAt.getTime() - startedAt.getTime(),
+        },
+      });
+    } catch (artifactError) {
+      console.error(
+        `Candidate proof failed and its failure artifact could not be recorded: ${artifactError instanceof Error ? artifactError.message : 'unknown artifact error'}`,
+      );
+    }
     throw error;
   } finally {
     await browser?.close();
