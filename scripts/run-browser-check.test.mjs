@@ -255,6 +255,10 @@ test('TIFF aliases require dedicated Worker and exact independent RGBA evidence'
   assert.match(runnerSource, /rgbaSha256/);
   assert.match(runnerSource, /runTiffNegativePathProbe\(tool\.id\)/);
   assert.match(runnerSource, /proveActiveTiffWorkerCancellation/);
+  assert.match(
+    runnerSource,
+    /proveActiveTiffWorkerCancellation\(\s*page,\s*tiffWorkerUrl,\s*fixture\.path,?\s*\)/,
+  );
   assert.match(runnerSource, /terminalMessages !== 0/);
 });
 

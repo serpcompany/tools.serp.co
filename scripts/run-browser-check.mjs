@@ -680,7 +680,11 @@ try {
     return result.checks;
   }
 
-  async function proveActiveTiffWorkerCancellation(workerUrl, fixturePath) {
+  async function proveActiveTiffWorkerCancellation(
+    page,
+    workerUrl,
+    fixturePath,
+  ) {
     const bytes = Array.from(await fs.readFile(fixturePath));
     return await page.evaluate(
       async ({ workerUrl: url, fixtureBytes }) => {
@@ -1754,7 +1758,11 @@ try {
           throw new Error(`${tool.id} did not load its dedicated TIFF Worker.`);
         }
         const activeWorkerCancellation =
-          await proveActiveTiffWorkerCancellation(tiffWorkerUrl, fixture.path);
+          await proveActiveTiffWorkerCancellation(
+            page,
+            tiffWorkerUrl,
+            fixture.path,
+          );
         return {
           detail: `verified TIFF pixels in PNG ${semantic.width}x${semantic.height}, ${blob.size} bytes`,
           metrics: {
