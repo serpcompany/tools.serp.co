@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createBrowserDeliveryStore } from './browser-workflow-lifecycle.ts';
+import {
+  createBrowserDeliveryStore,
+  deliverBrowserMedia,
+} from './browser-workflow-lifecycle.ts';
 
 function media(name: string) {
   return {
@@ -109,4 +112,30 @@ test('delivery store releases a result when starting its download throws', async
     URL.createObjectURL = originalCreate;
     URL.revokeObjectURL = originalRevoke;
   }
+});
+
+test('cancelling in-flight browser delivery releases its URL and suppresses the click', async () => {
+  const controller = new AbortController();
+  const clicked: string[] = [];
+  const revoked: string[] = [];
+  let cleanupScheduled = 0;
+  const pending = deliverBrowserMedia(
+    media('result.svg'),
+    {
+      createObjectUrl: () => 'blob:pending-svg',
+      revokeObjectUrl: (url) => revoked.push(url),
+      clickDownload: (url, name) => clicked.push(`${url}:${name}`),
+      scheduleCleanup() {
+        cleanupScheduled += 1;
+      },
+      nextId: () => 'delivery-svg',
+    },
+    controller.signal,
+  );
+  controller.abort();
+
+  await assert.rejects(pending, { name: 'AbortError' });
+  assert.deepEqual(clicked, []);
+  assert.deepEqual(revoked, ['blob:pending-svg']);
+  assert.equal(cleanupScheduled, 0);
 });

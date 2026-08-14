@@ -1,34 +1,37 @@
-import { AUDIO_FORMATS, VIDEO_FORMATS } from "./capabilities.ts";
+import { AUDIO_FORMATS, VIDEO_FORMATS } from './capabilities.ts';
 
 export type CompressionTarget =
-  | "audio"
-  | "image-server"
-  | "image-worker"
-  | "pdf"
-  | "unsupported"
-  | "video";
+  | 'audio'
+  | 'image-server'
+  | 'image-worker'
+  | 'pdf'
+  | 'svg-worker'
+  | 'unsupported'
+  | 'video';
 
 export type CompressionDispatch = Readonly<{
   target: CompressionTarget;
   engineIds: readonly string[];
 }>;
 
-const IMAGE_WORKER_FORMATS = new Set(["png", "jpg", "jpeg", "webp"]);
+const IMAGE_WORKER_FORMATS = new Set(['png', 'jpg', 'jpeg', 'webp']);
 const IMAGE_SERVER_FORMATS = new Set([
-  "gif",
-  "svg",
-  "heic",
-  "heif",
-  "avif",
-  "tiff",
-  "tif",
-  "bmp",
+  'gif',
+  'heic',
+  'heif',
+  'avif',
+  'tiff',
+  'tif',
+  'bmp',
 ]);
 const AUDIO_FORMAT_SET = new Set(AUDIO_FORMATS);
 const VIDEO_FORMAT_SET = new Set(VIDEO_FORMATS);
 
-function normalizeQuality(quality: number | undefined, fallback: number): number {
-  if (typeof quality !== "number" || Number.isNaN(quality)) {
+function normalizeQuality(
+  quality: number | undefined,
+  fallback: number,
+): number {
+  if (typeof quality !== 'number' || Number.isNaN(quality)) {
     return fallback;
   }
   return Math.min(0.95, Math.max(0.1, quality));
@@ -36,42 +39,49 @@ function normalizeQuality(quality: number | undefined, fallback: number): number
 
 export function resolveCompressionTarget(format: string): CompressionTarget {
   const normalized = format.toLowerCase();
-  if (normalized === "pdf") return "pdf";
-  if (IMAGE_WORKER_FORMATS.has(normalized)) return "image-worker";
-  if (IMAGE_SERVER_FORMATS.has(normalized)) return "image-server";
-  if (AUDIO_FORMAT_SET.has(normalized)) return "audio";
-  if (VIDEO_FORMAT_SET.has(normalized)) return "video";
-  return "unsupported";
+  if (normalized === 'pdf') return 'pdf';
+  if (normalized === 'svg') return 'svg-worker';
+  if (IMAGE_WORKER_FORMATS.has(normalized)) return 'image-worker';
+  if (IMAGE_SERVER_FORMATS.has(normalized)) return 'image-server';
+  if (AUDIO_FORMAT_SET.has(normalized)) return 'audio';
+  if (VIDEO_FORMAT_SET.has(normalized)) return 'video';
+  return 'unsupported';
 }
 
 const compressionDispatchByTarget = Object.freeze({
   audio: Object.freeze({
-    target: "audio",
-    engineIds: Object.freeze(["browser-ffmpeg-compression"]),
+    target: 'audio',
+    engineIds: Object.freeze(['browser-ffmpeg-compression']),
   }),
-  "image-server": Object.freeze({
-    target: "image-server",
-    engineIds: Object.freeze(["server-image-compression"]),
+  'image-server': Object.freeze({
+    target: 'image-server',
+    engineIds: Object.freeze(['server-image-compression']),
   }),
-  "image-worker": Object.freeze({
-    target: "image-worker",
-    engineIds: Object.freeze(["browser-image-compression-worker"]),
+  'image-worker': Object.freeze({
+    target: 'image-worker',
+    engineIds: Object.freeze(['browser-image-compression-worker']),
   }),
   pdf: Object.freeze({
-    target: "pdf",
-    engineIds: Object.freeze(["server-pdf-compression"]),
+    target: 'pdf',
+    engineIds: Object.freeze(['server-pdf-compression']),
+  }),
+  'svg-worker': Object.freeze({
+    target: 'svg-worker',
+    engineIds: Object.freeze(['browser-svg-optimization-worker']),
   }),
   unsupported: Object.freeze({
-    target: "unsupported",
+    target: 'unsupported',
     engineIds: Object.freeze([]),
   }),
   video: Object.freeze({
-    target: "video",
-    engineIds: Object.freeze(["browser-ffmpeg-compression"]),
+    target: 'video',
+    engineIds: Object.freeze(['browser-ffmpeg-compression']),
   }),
 } satisfies Record<CompressionTarget, CompressionDispatch>);
 
-export function resolveCompressionDispatch(format: string): CompressionDispatch {
+export function resolveCompressionDispatch(
+  format: string,
+): CompressionDispatch {
   return compressionDispatchByTarget[resolveCompressionTarget(format)];
 }
 
@@ -88,11 +98,11 @@ export function mapQualityToImageQuality(quality?: number): number {
 
 export function mapQualityToAudioBitrate(quality?: number): string {
   const normalized = normalizeQuality(quality, 0.7);
-  if (normalized >= 0.85) return "192k";
-  if (normalized >= 0.7) return "160k";
-  if (normalized >= 0.55) return "128k";
-  if (normalized >= 0.4) return "96k";
-  return "64k";
+  if (normalized >= 0.85) return '192k';
+  if (normalized >= 0.7) return '160k';
+  if (normalized >= 0.55) return '128k';
+  if (normalized >= 0.4) return '96k';
+  return '64k';
 }
 
 export function mapQualityToVideoCrf(quality?: number): number {
@@ -103,5 +113,7 @@ export function mapQualityToVideoCrf(quality?: number): number {
 
 export function isImageCompressionFormat(format: string): boolean {
   const normalized = format.toLowerCase();
-  return IMAGE_WORKER_FORMATS.has(normalized) || IMAGE_SERVER_FORMATS.has(normalized);
+  return (
+    IMAGE_WORKER_FORMATS.has(normalized) || IMAGE_SERVER_FORMATS.has(normalized)
+  );
 }

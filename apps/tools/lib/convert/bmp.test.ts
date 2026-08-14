@@ -134,8 +134,8 @@ test('the accepted processor projection includes BMP and the exact WebM wave', (
     })),
   );
   assert.deepEqual(summary.counts, {
-    supported: 436,
-    unsupported: 2_368,
+    supported: 437,
+    unsupported: 2_367,
     unwired: 0,
     unknown: 3,
   });

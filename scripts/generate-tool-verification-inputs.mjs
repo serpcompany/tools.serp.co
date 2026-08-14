@@ -99,6 +99,8 @@ export function buildToolVerificationInputs() {
     'scripts/lib/browser-evidence.mjs',
     'scripts/lib/generic-smoke-capabilities.mjs',
     'scripts/lib/run-evidence.mjs',
+    'scripts/lib/svg-compression-browser-proof.mjs',
+    'scripts/lib/svg-render-equivalence.mjs',
     'scripts/lib/transcription-browser-state.mjs',
   ]);
   return {

@@ -64,7 +64,7 @@
     "read-excel-file": "9.3.10",
     "remark-gfm": "^4.0.0",
     "sharp": "^0.34.5",
-    "svgo": "^4.0.1",
+    "svgo": "4.0.2",
     "upng-js": "^2.1.0",
     "write-excel-file": "4.1.1",
     "yaml": "^2.8.2",

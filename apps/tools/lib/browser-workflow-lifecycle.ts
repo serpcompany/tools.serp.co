@@ -182,7 +182,9 @@ const browserDownloadPorts: BrowserDownloadPorts = {
 export async function deliverBrowserMedia(
   media: WorkflowMedia,
   ports: BrowserDownloadPorts = browserDownloadPorts,
+  signal?: AbortSignal,
 ): Promise<string> {
+  signal?.throwIfAborted();
   const resource = createBrowserDeliveryResource(media, {
     createBlob: browserDeliveryResourcePorts.createBlob,
     createObjectUrl: ports.createObjectUrl,
@@ -190,6 +192,24 @@ export async function deliverBrowserMedia(
     clickDownload: ports.clickDownload,
   });
   try {
+    if (signal) {
+      await new Promise<void>((resolve, reject) => {
+        const onAbort = () => {
+          clearTimeout(timer);
+          signal.removeEventListener('abort', onAbort);
+          reject(
+            signal.reason ??
+              new DOMException('The operation was aborted', 'AbortError'),
+          );
+        };
+        const timer = setTimeout(() => {
+          signal.removeEventListener('abort', onAbort);
+          resolve();
+        }, 0);
+        signal.addEventListener('abort', onAbort, { once: true });
+      });
+      signal.throwIfAborted();
+    }
     resource.click(media.name);
     ports.scheduleCleanup(resource.release, 1_000);
   } catch (error) {

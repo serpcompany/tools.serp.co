@@ -33,6 +33,12 @@ import {
 import { verifyHeifIdentity } from './convert/heif.ts';
 import { createServerActionRequestHeaders } from './server-action-client.ts';
 import { executionProvenance } from './tool-execution-provenance.ts';
+import {
+  compressSvgWithWorker,
+  SVG_COMPRESSION_LIMITS,
+  verifySvgBytes,
+} from './svg-compression.ts';
+import { verifySvgRenderEquivalence } from './svg-render-verification.ts';
 
 const MAX_INPUT_BYTES = 256 * 1_024 * 1_024;
 const MAX_IDENTITY_PARSE_BYTES = 64 * 1_024 * 1_024;
@@ -81,6 +87,11 @@ export type GenericWorkflowAdapters = Readonly<{
     media: WorkflowMedia,
     context: Readonly<{ signal: AbortSignal }>,
   ): Promise<SemanticVerification>;
+  verifySvgEquivalence?(
+    input: WorkflowMedia,
+    output: WorkflowMedia,
+    context: Readonly<{ signal: AbortSignal }>,
+  ): Promise<SemanticVerification>;
   decodeRaster?(
     media: WorkflowMedia,
     context: Readonly<{ signal: AbortSignal }>,
@@ -91,7 +102,10 @@ export type GenericWorkflowAdapters = Readonly<{
       rgba: Uint8Array | Uint8ClampedArray;
     }>
   >;
-  deliver(result: WorkflowMedia): Promise<string>;
+  deliver(
+    result: WorkflowMedia,
+    context: Readonly<{ signal: AbortSignal }>,
+  ): Promise<string>;
   telemetry: Readonly<{
     start(
       runId: string,
@@ -153,6 +167,7 @@ export async function verifyGenericMediaSemantics(
       };
     }
   }
+  if (media.format === 'svg') return verifySvgBytes(media.bytes);
   if (media.format === 'webp' && !hasWebpIdentity(media.bytes)) {
     return {
       status: 'rejected' as const,
@@ -337,6 +352,13 @@ function baseName(name: string): string {
   return withoutExtension || 'result';
 }
 
+function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
+  return (
+    left.byteLength === right.byteLength &&
+    left.every((value, index) => value === right[index])
+  );
+}
+
 function processorFor(
   contract: Extract<GenericToolContract, { state: 'supported' }>,
   adapters: GenericWorkflowAdapters,
@@ -350,6 +372,7 @@ function processorFor(
   const multiplePages =
     contract.operation === 'convert' && contract.input.format === 'pdf';
   const bmpSourceByResult = new WeakMap<Uint8Array, Uint8Array>();
+  const svgSourceByResult = new WeakMap<Uint8Array, WorkflowMedia>();
 
   return {
     engine,
@@ -363,9 +386,18 @@ function processorFor(
       ],
       outputs: [contract.output],
       resourceLimits: {
-        maxInputBytes: MAX_INPUT_BYTES,
-        maxOutputBytes: MAX_OUTPUT_BYTES,
-        maxTotalOutputBytes: MAX_TOTAL_OUTPUT_BYTES,
+        maxInputBytes:
+          contract.input.format === 'svg'
+            ? SVG_COMPRESSION_LIMITS.maxBytes
+            : MAX_INPUT_BYTES,
+        maxOutputBytes:
+          contract.output.format === 'svg'
+            ? SVG_COMPRESSION_LIMITS.maxBytes
+            : MAX_OUTPUT_BYTES,
+        maxTotalOutputBytes:
+          contract.output.format === 'svg'
+            ? SVG_COMPRESSION_LIMITS.maxBytes
+            : MAX_TOTAL_OUTPUT_BYTES,
       },
       outputCardinality: { min: 1, max: multiplePages ? 100 : 1 },
     },
@@ -446,7 +478,9 @@ function processorFor(
       const results = outputBytes.map((bytes, index) => ({
         name:
           contract.operation === 'compress'
-            ? `${stem}_compressed.${contract.output.format}`
+            ? contract.input.format === 'svg' && bytesEqual(bytes, input.bytes)
+              ? `${stem}_unchanged.${contract.output.format}`
+              : `${stem}_compressed.${contract.output.format}`
             : outputBytes.length > 1
               ? `${stem}_page${index + 1}.${contract.output.format}`
               : `${stem}.${contract.output.format}`,
@@ -457,6 +491,10 @@ function processorFor(
       if (contract.input.format === 'bmp') {
         for (const result of results)
           bmpSourceByResult.set(result.bytes, input.bytes);
+      }
+      if (contract.input.format === 'svg') {
+        for (const result of results)
+          svgSourceByResult.set(result.bytes, input);
       }
       return results;
     },
@@ -471,6 +509,17 @@ function processorFor(
           ? await adapters.verify(result, { signal: context.signal })
           : verification;
       if (formatVerification.status !== 'verified') return formatVerification;
+      const svgSource = svgSourceByResult.get(result.bytes);
+      if (svgSource) {
+        return adapters.verifySvgEquivalence
+          ? adapters.verifySvgEquivalence(svgSource, result, {
+              signal: context.signal,
+            })
+          : {
+              status: 'rejected',
+              message: 'SVG render-equivalence verifier is unavailable',
+            };
+      }
       const bmpSource = bmpSourceByResult.get(result.bytes);
       if (!bmpSource) return formatVerification;
       return verifyBmpConversionSemantics({
@@ -527,7 +576,7 @@ export function createGenericToolWorkflow(
     async deliver(result, context) {
       context.signal.throwIfAborted();
       await context.openResource('blob');
-      return adapters.deliver(result);
+      return adapters.deliver(result, { signal: context.signal });
     },
     runtime: {
       async open() {
@@ -591,6 +640,18 @@ const browserAdapters: GenericWorkflowAdapters = {
   },
   async compress({ format, bytes, quality, context }) {
     context.signal.throwIfAborted();
+    if (format === 'svg') {
+      const worker = new Worker(
+        new URL('../workers/svg-compress.worker.js', import.meta.url),
+        { type: 'module' },
+      );
+      await context.registerWorker(worker);
+      return compressSvgWithWorker({
+        worker,
+        bytes,
+        signal: context.signal,
+      });
+    }
     let worker: Worker | undefined;
     if (genericCompressionNeedsWorker(format)) {
       worker = new Worker(
@@ -717,6 +778,13 @@ const browserAdapters: GenericWorkflowAdapters = {
       message: `No semantic verifier for ${media.format}`,
     };
   },
+  async verifySvgEquivalence(input, output, { signal }) {
+    return verifySvgRenderEquivalence({
+      input: input.bytes,
+      output: output.bytes,
+      signal,
+    });
+  },
   async decodeRaster(media, { signal }) {
     const decoded = await decodeToRGBA(
       media.format,
@@ -725,7 +793,8 @@ const browserAdapters: GenericWorkflowAdapters = {
     );
     return { width: decoded.width, height: decoded.height, rgba: decoded.data };
   },
-  deliver: deliverBrowserMedia,
+  deliver: (result, { signal }) =>
+    deliverBrowserMedia(result, undefined, signal),
   telemetry: createBrowserWorkflowTelemetry(
     (request) => {
       const contract = getGenericToolContract(request.toolId);
@@ -804,15 +873,19 @@ export async function runGenericToolFile(
     );
   }
   if (options?.signal?.aborted) return cancelledFileOutcome();
-  if (file.size > MAX_INPUT_BYTES) {
+  const maxInputBytes =
+    contract.input.format === 'svg'
+      ? SVG_COMPRESSION_LIMITS.maxBytes
+      : MAX_INPUT_BYTES;
+  if (file.size > maxInputBytes) {
     return failedFileOutcome(
       'invalid-request',
-      `Input exceeds ${MAX_INPUT_BYTES} bytes`,
+      `Input exceeds ${maxInputBytes} bytes`,
     );
   }
   let bytes: Uint8Array;
   try {
-    bytes = await readFileWithSignal(file, options?.signal);
+    bytes = await readFileWithSignal(file, options?.signal, maxInputBytes);
   } catch (error) {
     if (options?.signal?.aborted || isAbortError(error)) {
       return cancelledFileOutcome();
@@ -1014,6 +1087,7 @@ function isAbortError(error: unknown): boolean {
 async function readFileWithSignal(
   file: File,
   signal?: AbortSignal,
+  maxBytes = MAX_INPUT_BYTES,
 ): Promise<Uint8Array> {
   signal?.throwIfAborted();
   const reader = file.stream().getReader();
@@ -1037,7 +1111,7 @@ async function readFileWithSignal(
       if (part.done) break;
       signal?.throwIfAborted();
       total += part.value.byteLength;
-      if (total > MAX_INPUT_BYTES || total > file.size) {
+      if (total > maxBytes || total > file.size) {
         throw new Error('File stream exceeded its declared size');
       }
       chunks.push(part.value);

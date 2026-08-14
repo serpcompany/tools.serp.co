@@ -19,6 +19,7 @@ const FORMAT_MIME_TYPES = Object.freeze({
   mp4: 'video/mp4',
   pdf: 'application/pdf',
   png: 'image/png',
+  svg: 'image/svg+xml',
   webp: 'image/webp',
   webm: 'video/webm',
 } satisfies Readonly<Record<string, string>>);
@@ -85,7 +86,9 @@ export function mimeTypeForGenericFormat(format: string): string | undefined {
 }
 
 export function genericCompressionNeedsWorker(format: string): boolean {
-  return resolveCompressionDispatch(format).target === 'image-worker';
+  return ['image-worker', 'svg-worker'].includes(
+    resolveCompressionDispatch(format).target,
+  );
 }
 
 function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
@@ -119,8 +122,8 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
     from === to &&
     compression.target !== 'unsupported' &&
     compression.target !== 'pdf' &&
-    SEMANTIC_INPUT_FORMATS.has(from) &&
-    SEMANTIC_OUTPUT_FORMATS.has(to) &&
+    ((tool.id === 'compress-svg' && from === 'svg') ||
+      (SEMANTIC_INPUT_FORMATS.has(from) && SEMANTIC_OUTPUT_FORMATS.has(to))) &&
     (from !== 'webm' || BROWSER_WEBM_TOOL_ID_SET.has(tool.id)) &&
     !CLOUDFLARE_UNSUPPORTED_COMPRESSIONS.has(from);
   if (tool.operation === 'convert' ? !exactConversion : !exactCompression) {

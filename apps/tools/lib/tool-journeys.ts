@@ -134,6 +134,7 @@ function fileJourney(
   inputKind: 'file' | 'multiple-files' = 'file',
 ): ToolJourney {
   const exactInvariantByToolId: Readonly<Record<string, string>> = {
+    'compress-svg': 'inert-svg-render-equivalence',
     'png-to-webp': 'generic-file-exact-output',
     'bmp-to-jpeg': 'bmp-decoded-content-semantics',
     'bmp-to-jpg': 'bmp-decoded-content-semantics',

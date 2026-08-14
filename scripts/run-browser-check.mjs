@@ -27,6 +27,7 @@ import {
   assertUniformImageSummary,
   extractExactZipEntries,
 } from './lib/golden-output-semantics.mjs';
+import { proveSvgCompressionBrowser } from './lib/svg-compression-browser-proof.mjs';
 
 function parseArguments(arguments_) {
   const tokens = arguments_.filter((argument) => argument !== '--');
@@ -709,6 +710,39 @@ try {
     ) {
       throw new Error(
         `Golden ${toolId} negative-path probe did not prove its exact checks.`,
+      );
+    }
+    return checks;
+  }
+
+  function runSvgCompressionNegativePathProbe() {
+    const output = execFileSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        path.join(
+          repositoryRoot,
+          'apps/tools/lib/svg-compression-negative-path-probe.ts',
+        ),
+      ],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    const result = JSON.parse(output);
+    const checks = [
+      'malformed-input',
+      'spoofed-input',
+      'wrong-format-output',
+      'no-delivery-on-failure',
+      'cancellation-lifecycle',
+    ];
+    if (
+      result.journeyId !== 'compress-svg:upload' ||
+      JSON.stringify(result.checks) !== JSON.stringify(checks) ||
+      result.observed?.deliveries !== 0 ||
+      result.observed?.terminatedWorkers !== 1
+    ) {
+      throw new Error(
+        'SVG compression negative-path probe did not prove its exact checks.',
       );
     }
     return checks;
@@ -1431,6 +1465,9 @@ try {
       if (!fixture) {
         return { skipped: true, reason: `missing fixture for ${tool.from}` };
       }
+      const svgWorkerUrls = [];
+      const onSvgWorker = (worker) => svgWorkerUrls.push(worker.url());
+      if (tool.id === 'compress-svg') page.on('worker', onSvgWorker);
       await hookBlobCapture(page);
       await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
         fixture.path,
@@ -1487,6 +1524,7 @@ try {
         1,
         tool.requiresFFmpeg ? 60000 : 20000,
       );
+      if (tool.id === 'compress-svg') page.off('worker', onSvgWorker);
       if (!blob?.size) {
         throw new Error('Conversion did not produce output blob.');
       }
@@ -1535,6 +1573,27 @@ try {
             'required-environment',
           ],
         };
+      }
+      if (tool.id === 'compress-svg') {
+        return proveSvgCompressionBrowser({
+          page,
+          fixturePath: fixture.path,
+          fixtureDirectory: path.join(
+            repositoryRoot,
+            'apps/tools/benchmarks/fixtures',
+          ),
+          initialWorkerUrls: svgWorkerUrls,
+          blob,
+          capture: {
+            hookBlob: hookBlobCapture,
+            waitForBlob,
+            lastBlobBytes,
+            dropFiles: dropFilesOnDropzone,
+            saveOutput: saveGoldenOutput,
+            saveScreenshot: saveGoldenScreenshot,
+          },
+          runNegativeProbe: runSvgCompressionNegativePathProbe,
+        });
       }
       if (tool.id === 'bmp-to-png') {
         const semantic = await decodeImageSummary(

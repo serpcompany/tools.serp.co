@@ -165,6 +165,18 @@ const engineById = defineEngines({
         'The compression worker uses JSquash; repository fallbacks use UPNG.js for PNG and platform image/Canvas primitives for other browser images.',
     },
   },
+  'browser-svg-optimization-worker': {
+    capability: 'svg-compression',
+    owner: 'apps/tools/lib/svg-compression.ts',
+    processingLocation: 'browser',
+    executionProfile: 'client-only',
+    implementation: {
+      class: 'hybrid',
+      identity: 'SVGO 4.0.2 with bounded inert-SVG policy',
+      rationale:
+        'SVGO performs one optimization pass in a dedicated Worker after repository policy rejects active, external, malformed, and over-budget SVG input.',
+    },
+  },
   'browser-ffmpeg-compression': {
     capability: 'media-compression',
     owner: 'apps/tools/lib/convert/video.ts',

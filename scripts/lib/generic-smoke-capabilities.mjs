@@ -1,4 +1,4 @@
-export const GENERIC_SMOKE_CAPABILITY_VERSION = 'generic-adapters-v5-webm';
+export const GENERIC_SMOKE_CAPABILITY_VERSION = 'generic-adapters-v6-svg';
 
 const browserWebmToolIds = new Set([
   'compress-webm',
@@ -48,6 +48,14 @@ export function getGenericSmokeExpectation(tool) {
   const from = tool.from?.toLowerCase();
   const to = tool.to?.toLowerCase();
   if (browserWebmToolIds.has(tool.id)) return 'supported';
+  if (
+    tool.id === 'compress-svg' &&
+    tool.operation === 'compress' &&
+    from === 'svg' &&
+    to === 'svg'
+  ) {
+    return 'supported';
+  }
   if (
     !from ||
     !to ||

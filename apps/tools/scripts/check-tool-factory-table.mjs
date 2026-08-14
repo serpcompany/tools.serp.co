@@ -171,7 +171,7 @@ try {
   await page.getByText(`Revision ${args.revision}`, { exact: true }).waitFor();
   await page
     .getByText(
-      '2,807 active Tools · 436 supported · 2,368 explicitly unsupported · 3 unknown',
+      '2,807 active Tools · 437 supported · 2,367 explicitly unsupported · 3 unknown',
     )
     .waitFor();
   await waitForHydration(page);

@@ -31,6 +31,7 @@ import { runFfmpegLifecycle } from './convert/ffmpeg-lifecycle.ts';
 import { decodeToRGBA } from './convert/decode.ts';
 import { convertWithWorker } from './convert/workerClient.ts';
 import { inspectBmp } from './convert/bmp.ts';
+import { compressSvgWithWorker } from './svg-compression.ts';
 
 const fixture = (name: string) =>
   new Uint8Array(
@@ -83,6 +84,9 @@ function adapters(output: Uint8Array): GenericWorkflowAdapters & {
       return output;
     },
     async verify() {
+      return { status: 'verified' };
+    },
+    async verifySvgEquivalence() {
       return { status: 'verified' };
     },
     async deliver(result) {
@@ -188,6 +192,229 @@ test('generic compression allocates workers from the production dispatch table',
   assert.equal(genericCompressionNeedsWorker('mp4'), false);
 });
 
+test('SVG compression crosses workflow.run through one exact browser contract', async () => {
+  const contract = getGenericToolContract('compress-svg');
+  assert.deepEqual(contract, {
+    state: 'supported',
+    toolId: 'compress-svg',
+    adapterId: 'generic-compression',
+    operation: 'compress',
+    input: { format: 'svg', mimeType: 'image/svg+xml' },
+    output: { format: 'svg', mimeType: 'image/svg+xml' },
+  });
+  assert.deepEqual(getToolProcessorAvailability('compress-svg'), {
+    kind: 'wired',
+    toolId: 'compress-svg',
+    adapterId: 'generic-compression',
+  });
+
+  const optimized = new TextEncoder().encode(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><rect width="120" height="120" fill="#0ea5e9"/><circle cx="60" cy="60" r="32" fill="#f59e0b"/><text x="60" y="66" font-size="18" text-anchor="middle" fill="#111">SVG</text></svg>',
+  );
+  const boundary = adapters(optimized);
+  const outcome = await createGenericToolWorkflow(boundary).run({
+    toolId: 'compress-svg',
+    input: {
+      kind: 'file',
+      media: {
+        name: 'sample.svg',
+        format: 'svg',
+        mimeType: 'image/svg+xml',
+        bytes: fixture('svg-compression-complex.svg'),
+      },
+    },
+  });
+
+  assert.equal(outcome.status, 'succeeded');
+  assert.deepEqual(boundary.processed, ['compress:svg']);
+  assert.deepEqual(boundary.delivered, ['sample_compressed.svg']);
+});
+
+test('SVG compression names an unchanged original honestly instead of claiming reduction', async () => {
+  const original = fixture('svg-compression-complex.svg');
+  const boundary = adapters(original);
+  const outcome = await createGenericToolWorkflow(boundary).run({
+    toolId: 'compress-svg',
+    input: {
+      kind: 'file',
+      media: {
+        name: 'sample.svg',
+        format: 'svg',
+        mimeType: 'image/svg+xml',
+        bytes: original,
+      },
+    },
+  });
+
+  assert.equal(outcome.status, 'succeeded');
+  assert.deepEqual(boundary.delivered, ['sample_unchanged.svg']);
+});
+
+test('SVG compression rejects malformed, spoofed, and active output without delivery', async () => {
+  const encoder = new TextEncoder();
+  const safeOutput = encoder.encode(
+    '<svg xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1"/></svg>',
+  );
+  for (const [name, input, output] of [
+    [
+      'malformed',
+      encoder.encode('<svg xmlns="http://www.w3.org/2000/svg"><g></svg>'),
+      safeOutput,
+    ],
+    ['spoofed', fixture('sample.png'), safeOutput],
+    [
+      'active output',
+      fixture('svg-compression-complex.svg'),
+      encoder.encode(
+        '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>',
+      ),
+    ],
+  ] as const) {
+    const boundary = adapters(output);
+    const outcome = await createGenericToolWorkflow(boundary).run({
+      toolId: 'compress-svg',
+      input: {
+        kind: 'file',
+        media: {
+          name: 'sample.svg',
+          format: 'svg',
+          mimeType: 'image/svg+xml',
+          bytes: input,
+        },
+      },
+    });
+    assert.equal(outcome.status, 'failed', name);
+    assert.deepEqual(boundary.delivered, [], name);
+    assert.deepEqual(
+      boundary.processed,
+      name === 'active output' ? ['compress:svg'] : [],
+      name,
+    );
+  }
+});
+
+test('SVG compression timeout terminates its registered Worker and never delivers', async () => {
+  let terminated = 0;
+  const baseBoundary = adapters(fixture('svg-compression-complex.svg'));
+  const boundary: GenericWorkflowAdapters = {
+    ...baseBoundary,
+    async compress({ bytes, context }) {
+      const worker = {
+        onerror: null,
+        onmessage: null,
+        postMessage() {},
+        terminate() {
+          terminated += 1;
+        },
+      } as unknown as Worker;
+      await context.registerWorker(worker);
+      return compressSvgWithWorker({
+        worker,
+        bytes,
+        signal: context.signal,
+        timeoutMs: 5,
+      });
+    },
+  };
+  const outcome = await createGenericToolWorkflow(boundary).run({
+    toolId: 'compress-svg',
+    input: {
+      kind: 'file',
+      media: {
+        name: 'sample.svg',
+        format: 'svg',
+        mimeType: 'image/svg+xml',
+        bytes: fixture('svg-compression-complex.svg'),
+      },
+    },
+  });
+
+  assert.equal(outcome.status, 'failed');
+  assert.equal(terminated, 1);
+  assert.deepEqual(baseBoundary.delivered, []);
+});
+
+test('SVG compression cancellation terminates its active Worker once and suppresses late output', async () => {
+  const controller = new AbortController();
+  const terminals: string[] = [];
+  let started = false;
+  let terminated = 0;
+  let workerMessage: Worker['onmessage'] = null;
+  const baseBoundary = adapters(fixture('svg-compression-complex.svg'));
+  const boundary: GenericWorkflowAdapters = {
+    ...baseBoundary,
+    async compress({ bytes, context }) {
+      const worker = {
+        onerror: null,
+        get onmessage() {
+          return workerMessage;
+        },
+        set onmessage(value) {
+          workerMessage = value;
+        },
+        postMessage() {
+          started = true;
+        },
+        terminate() {
+          terminated += 1;
+        },
+      } as unknown as Worker;
+      await context.registerWorker(worker);
+      return compressSvgWithWorker({ worker, bytes, signal: context.signal });
+    },
+    telemetry: {
+      async start() {},
+      async terminal(_runId, status) {
+        terminals.push(status);
+      },
+    },
+  };
+  const pending = createGenericToolWorkflow(boundary).run(
+    {
+      toolId: 'compress-svg',
+      input: {
+        kind: 'file',
+        media: {
+          name: 'sample.svg',
+          format: 'svg',
+          mimeType: 'image/svg+xml',
+          bytes: fixture('svg-compression-complex.svg'),
+        },
+      },
+    },
+    { signal: controller.signal },
+  );
+  while (!started) await new Promise((resolve) => setTimeout(resolve, 0));
+  controller.abort();
+  const outcome = await pending;
+
+  assert.equal(outcome.status, 'cancelled');
+  assert.equal(terminated, 1);
+  assert.equal(workerMessage, null);
+  assert.deepEqual(terminals, ['cancelled']);
+  assert.deepEqual(baseBoundary.delivered, []);
+});
+
+test('SVG file boundary rejects its one-MiB limit before opening the upload stream', async () => {
+  let streamsOpened = 0;
+  const file = {
+    name: 'oversized.svg',
+    size: 1_024 * 1_024 + 1,
+    type: 'image/svg+xml',
+    stream() {
+      streamsOpened += 1;
+      throw new Error('stream must not be opened');
+    },
+  } as unknown as File;
+
+  const outcome = await runGenericToolFile('compress-svg', file);
+  assert.equal(outcome.status, 'failed');
+  if (outcome.status === 'failed') {
+    assert.equal(outcome.error.code, 'invalid-request');
+  }
+  assert.equal(streamsOpened, 0);
+});
+
 test('contract inventory independently audits real dispatches with semantic coverage', () => {
   const verifiedInputs = new Set([
     'bmp',
@@ -262,7 +489,7 @@ test('contract inventory independently audits real dispatches with semantic cove
       verifiedOutputs.has(tool.to) &&
       !['m4a', 'mp3', 'mp4'].includes(tool.from);
     const exactExpectedSupported =
-      expectedSupported &&
+      (tool.id === 'compress-svg' || expectedSupported) &&
       (tool.from !== 'webm' || tool.id === 'compress-webm');
     assert.equal(
       getGenericToolContract(tool.id).state === 'supported',
@@ -283,6 +510,7 @@ test('every supported generic contract resolves a processor through workflow.run
     mp4: 'sample.mp4',
     pdf: 'sample.pdf',
     png: 'sample.png',
+    svg: 'svg-compression-complex.svg',
     webp: 'sample.webp',
     webm: 'sample.webm',
   } as const;
@@ -343,6 +571,7 @@ test('every supported generic contract resolves a processor through workflow.run
     mp4: 'sample.mp4',
     pdf: 'sample.pdf',
     png: 'sample.png',
+    svg: 'svg-compression-complex.svg',
     webp: 'sample.webp',
     webm: 'sample.webm',
   } as const;

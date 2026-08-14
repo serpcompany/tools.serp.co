@@ -160,9 +160,7 @@
       "input": "file",
       "fixture": "fixtures/sample.csv",
       "notes": "CSV combiner uses both files.",
-      "alternates": [
-        "fixtures/sample-2.csv"
-      ]
+      "alternates": ["fixtures/sample-2.csv"]
     },
     {
       "format": "cur",
@@ -506,9 +504,7 @@
       "input": "file",
       "fixture": "fixtures/sample.png",
       "notes": "Primary image fixture.",
-      "alternates": [
-        "fixtures/sample-2.png"
-      ]
+      "alternates": ["fixtures/sample-2.png"]
     },
     {
       "format": "ppt",
@@ -556,8 +552,8 @@
       "format": "svg",
       "status": "ready",
       "input": "file",
-      "fixture": "fixtures/sample.svg",
-      "notes": "Add a real fixture for this format."
+      "fixture": "fixtures/svg-compression-complex.svg",
+      "notes": "Owned complex SVG fixture with gradients, clipping, identifier references, namespaces, and Unicode text."
     },
     {
       "format": "swf",
@@ -659,6 +655,11 @@
     }
   ],
   "toolFixtures": {
+    "compress-svg": {
+      "input": "file",
+      "fixture": "fixtures/svg-compression-complex.svg",
+      "noOpFixture": "fixtures/svg-compression-minimal.svg"
+    },
     "audio-to-text": {
       "input": "file",
       "fixture": "fixtures/transcription-speech.mp3"
@@ -674,17 +675,11 @@
     },
     "batch-compress-png": {
       "input": "file",
-      "fixtures": [
-        "fixtures/sample.png",
-        "fixtures/sample-2.png"
-      ]
+      "fixtures": ["fixtures/sample.png", "fixtures/sample-2.png"]
     },
     "csv-combiner": {
       "input": "file",
-      "fixtures": [
-        "fixtures/sample.csv",
-        "fixtures/sample-2.csv"
-      ]
+      "fixtures": ["fixtures/sample.csv", "fixtures/sample-2.csv"]
     },
     "json-to-csv": {
       "input": "text",

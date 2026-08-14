@@ -1,4 +1,16 @@
 {
+  "fixtures/svg-compression-complex.svg": {
+    "source": "repository-authored",
+    "description": "Bounded safe SVG exercising gradients, clipping, identifier references, namespaces, accessibility text, and Unicode glyphs.",
+    "reproducibility": "exact UTF-8 source is checked in; sha256 identifies the artifact",
+    "sha256": "4034376ea55dfe8d74ba30379b6c04b610f6a044d76f4ae566d00ffc23d7b1d2"
+  },
+  "fixtures/svg-compression-minimal.svg": {
+    "source": "repository-authored",
+    "description": "Bounded inert SVG whose single-pass SVGO serialization is not smaller, proving the honest unchanged path.",
+    "reproducibility": "exact UTF-8 source is checked in; sha256 identifies the artifact",
+    "sha256": "0f2e29f33b5e6c0a11e2cfac55627bf78b7eff4e28f966c484ad02c224129590"
+  },
   "fixtures/sample-video-only.webm": {
     "source": "repository-generated",
     "command": "ffmpeg -f lavfi -i color=c=black:s=320x240:r=25:d=1 -an -c:v libvpx -deadline best -cpu-used 0 -map_metadata -1 sample-video-only.webm",

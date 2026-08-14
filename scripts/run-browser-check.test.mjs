@@ -15,6 +15,10 @@ const runnerPath = fileURLToPath(
   new URL('./run-browser-check.mjs', import.meta.url),
 );
 const runnerSource = readFileSync(runnerPath, 'utf8');
+const svgProofSource = readFileSync(
+  new URL('./lib/svg-compression-browser-proof.mjs', import.meta.url),
+  'utf8',
+);
 
 function runLocalBrowserFixture(t, { mode = 'smoke', envOverrides = {} } = {}) {
   const artifactRoot = mkdtempSync(
@@ -100,7 +104,25 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   assert.match(runnerSource, /safe failure/i);
   assert.doesNotMatch(runnerSource, /data-generic-contract/);
   assert.match(runnerSource, /getGenericSmokeExpectation/);
-  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v5-webm');
+  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v6-svg');
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: 'compress-svg',
+      from: 'svg',
+      to: 'svg',
+      operation: 'compress',
+    }),
+    'supported',
+  );
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: 'svg-to-png',
+      from: 'svg',
+      to: 'png',
+      operation: 'convert',
+    }),
+    'unsupported',
+  );
   for (const id of ['png-to-webp', 'webp-to-jpg', 'heic-to-jpg']) {
     const [from, to] = id.split('-to-');
     assert.equal(
@@ -209,6 +231,21 @@ test('same-family MP4 to WebM browser proof independently decodes exact output',
   assert.match(runnerSource, /\[26, 69, 223, 163\]/);
   assert.match(runnerSource, /video\.videoWidth/);
   assert.match(runnerSource, /semantic-output/);
+});
+
+test('SVG compression proof uses its dedicated Worker and independent DOM plus two-viewport pixels', () => {
+  assert.match(runnerSource, /tool\.id === 'compress-svg'/);
+  assert.match(runnerSource, /proveSvgCompressionBrowser/);
+  assert.match(svgProofSource, /workerUrls\.length !== 1/);
+  assert.match(svgProofSource, /\/_next\/static\/chunks\//);
+  assert.match(svgProofSource, /new DOMParser\(\)/);
+  assert.match(svgProofSource, /createImageBitmap/);
+  assert.match(svgProofSource, /SVG_RENDER_VIEWPORTS/);
+  assert.match(svgProofSource, /runNegativeProbe/);
+  assert.match(svgProofSource, /compress-svg-success\.png/);
+  assert.match(svgProofSource, /svg-compression-minimal\.svg/);
+  assert.match(svgProofSource, /deterministic SVG output/);
+  assert.match(svgProofSource, /SVG no-op output/);
 });
 
 test('Golden downloader and PNG to WebP checks retain exact or decoded fixture semantics', () => {

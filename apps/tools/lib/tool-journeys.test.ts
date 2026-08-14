@@ -71,6 +71,23 @@ test('every active Tool has immutable, unique journey identities', () => {
   assert.equal(generic[0]?.fixture.reference, 'formats/png');
   assert.equal(generic[0]?.semanticInvariant.id, 'generic-file-exact-output');
 
+  const svgCompression = toolJourneys.getByToolId('compress-svg');
+  assert.deepEqual(svgCompression, [
+    {
+      id: 'compress-svg:upload',
+      toolId: 'compress-svg',
+      input: { kind: 'file', runtimePath: 'upload' },
+      promisedOutcome:
+        'Produce semantically valid svg output for the compress operation.',
+      requiredEnvironment: 'browser',
+      fixture: { kind: 'format-fixture', reference: 'formats/svg' },
+      semanticInvariant: {
+        id: 'inert-svg-render-equivalence',
+        sourceNeeded: null,
+      },
+    },
+  ]);
+
   const placeholder = toolJourneys.getByToolId('audio-editor');
   assert.equal(placeholder[0]?.input.kind, 'unknown');
   assert.equal(placeholder[0]?.requiredEnvironment, 'unknown');

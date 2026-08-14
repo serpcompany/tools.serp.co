@@ -50,7 +50,12 @@ test('CLI emits a report when its complete source graph is committed at the name
       path.join(fixtureRoot, relativePath),
     );
   }
-  const staged = spawnSync('git', ['add', 'scripts'], {
+  fs.cpSync(
+    path.join(repositoryRoot, 'apps/tools/lib'),
+    path.join(fixtureRoot, 'apps/tools/lib'),
+    { recursive: true },
+  );
+  const staged = spawnSync('git', ['add', 'scripts', 'apps/tools/lib'], {
     cwd: fixtureRoot,
     encoding: 'utf8',
   });
