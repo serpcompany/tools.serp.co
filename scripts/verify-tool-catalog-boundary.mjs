@@ -26,10 +26,15 @@ const STRUCTURAL_CHECK_SOURCES = new Set([
 
 const maintainedSourcePath = /^(?:apps\/tools|packages|scripts)\/.*\.(?:[cm]?[jt]sx?)$/;
 const rawRegistryPath = /(?:^|\/)tools\.json(?:$|[?#])/;
+const advisoryCsvPath = /(?:^|\/)docs\/evidence\/[^?#]+\.csv(?:$|[?#])/;
 const retiredCompatibilityModule = /(?:tool-directory|tool-operations)(?:\.[^/]*)?$/;
 
 function guidance(path, problem) {
   return `${path}: ${problem} Use @serp-tools/app-core/lib/tool-catalog for application code or @serp-tools/app-core/lib/tool-catalog-adapter for maintained Node.js harness code. Catalog mutators must isolate raw reads and writes at their approved owned-output boundary.`;
+}
+
+function advisoryGuidance(path) {
+  return `${path}: advisory CSV evidence is not an operational input. Consume the Tool Catalog, executable provenance, Tool Journeys, or retained verification evidence through their owned interfaces.`;
 }
 
 export function findToolCatalogBoundaryViolations(sources) {
@@ -49,6 +54,9 @@ export function findToolCatalogBoundaryViolations(sources) {
       violations.push(
         guidance(path, 'direct Tool registry access is not permitted.'),
       );
+    }
+    if (containsAdvisoryCsvPath(sourceFile)) {
+      violations.push(advisoryGuidance(path));
     }
     if (importsRetiredCompatibilityModule(sourceFile)) {
       violations.push(
@@ -103,6 +111,15 @@ function containsRawRegistryPath(sourceFile) {
     (node) =>
       (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) &&
       rawRegistryPath.test(node.text.replaceAll('\\', '/')),
+  );
+}
+
+function containsAdvisoryCsvPath(sourceFile) {
+  return visitTree(
+    sourceFile,
+    (node) =>
+      (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) &&
+      advisoryCsvPath.test(node.text.replaceAll('\\', '/')),
   );
 }
 

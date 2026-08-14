@@ -1,16 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { toolCatalog } from "../../../packages/app-core/src/lib/tool-catalog.ts";
 
 const tools = toolCatalog.tools;
-const plannerSource = readFileSync(
-  new URL(
-    "../../../docs/evidence/tool-planning/tools_planner.csv",
-    import.meta.url,
-  ),
-  "utf8",
-);
 
 const requestedCompressors = [
   { keyword: "png optimizer", id: "png-to-png", format: "png", route: "/compress-png" },
@@ -39,7 +31,7 @@ const requestedCompressors = [
   { keyword: "flac compressor", id: "compress-flac", format: "flac", route: "/compress-flac" },
 ];
 
-test("requested compressor keyword landers exist in the registry and planner", () => {
+test("requested compressor keyword landers are owned by the Tool Catalog", () => {
   for (const entry of requestedCompressors) {
     const tool = tools.find((candidate) => candidate.id === entry.id);
 
@@ -49,10 +41,6 @@ test("requested compressor keyword landers exist in the registry and planner", (
     assert.equal(tool.route, entry.route, `expected ${entry.id} route to match slug`);
     assert.equal(tool.from, entry.format, `expected ${entry.id} from format`);
     assert.equal(tool.to, entry.format, `expected ${entry.id} to format`);
-    assert.match(
-      plannerSource,
-      new RegExp(`^${entry.keyword},compress,`, "mi"),
-      `expected planner row for ${entry.id}`,
-    );
+    assert.equal(tool.name.toLowerCase(), entry.keyword, `expected ${entry.id} keyword title`);
   }
 });

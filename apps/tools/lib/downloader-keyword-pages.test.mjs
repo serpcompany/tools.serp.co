@@ -1,16 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { toolCatalog } from "../../../packages/app-core/src/lib/tool-catalog.ts";
 
 const tools = toolCatalog.tools;
-const plannerSource = readFileSync(
-  new URL(
-    "../../../docs/evidence/tool-planning/tools_planner.csv",
-    import.meta.url,
-  ),
-  "utf8",
-);
 
 const requestedDownloaders = [
   { keyword: "Skool", id: "download-skool-videos" },
@@ -206,7 +198,7 @@ const expectedThisVidOutboundUrls = [
   "https://serp.ai/products/thisvid-downloader/reviews/",
 ];
 
-test("requested downloader keyword landers exist in the registry and planner", () => {
+test("requested downloader keyword landers are owned by the Tool Catalog", () => {
   const activeDownloadTools = toolCatalog.activeTools.filter(
     (tool) => tool.operation === "download",
   );
@@ -218,17 +210,16 @@ test("requested downloader keyword landers exist in the registry and planner", (
 
   for (const entry of requestedDownloaders) {
     const tool = tools.find((candidate) => candidate.id === entry.id);
-    const plannerKeyword = entry.keyword.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
     assert.ok(tool, `expected ${entry.id} to exist in tools.json`);
     assert.equal(tool.operation, "download", `expected ${entry.id} to be a download tool`);
     assert.equal(tool.isActive, true, `expected ${entry.id} to be active`);
     assert.equal(tool.route, `/${entry.id}`, `expected ${entry.id} route to match slug`);
     assert.match(tool.name, /Downloader/, `expected ${entry.id} to use downloader naming`);
-    assert.match(
-      plannerSource,
-      new RegExp(`^${plannerKeyword} video downloader,download,${entry.id},`, "mi"),
-      `expected planner row for ${entry.id}`,
+    assert.equal(
+      tool.from.toLowerCase(),
+      entry.keyword.toLowerCase(),
+      `expected ${entry.id} source keyword`,
     );
   }
 });
