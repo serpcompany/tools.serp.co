@@ -6,4 +6,4 @@ for git_variable in $(git rev-parse --local-env-vars); do
 done
 
 echo "Running canonical repository check..."
-pnpm check
+mise exec node@22.23.1 -- pnpm check

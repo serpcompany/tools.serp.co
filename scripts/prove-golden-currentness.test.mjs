@@ -28,6 +28,25 @@ function git(cwd, ...args) {
   }).trim();
 }
 
+function retainedPngBaseline(repositoryRoot) {
+  const retainedPath = path.join(
+    repositoryRoot,
+    'docs/audits/tool-verification/retained-runs.json',
+  );
+  const retained = JSON.parse(readFileSync(retainedPath, 'utf8'));
+  const run = retained
+    .filter((candidate) =>
+      (candidate.scope.tools ?? []).some((tool) =>
+        (tool.journeys ?? []).some(
+          (journey) => journey.journeyId === 'png-to-webp:upload',
+        ),
+      ),
+    )
+    .at(-1);
+  assert.match(run?.revision?.commit ?? '', /^[a-f0-9]{40}$/);
+  return { commit: run.revision.commit, retainedPath };
+}
+
 test('Git environment scrubbing removes every inherited repository override', () => {
   assert.deepEqual(
     scrubGitEnvironment({
@@ -70,8 +89,28 @@ test('preview currentness uses a disposable branch, real generated mutation, act
       ],
       { env: scrubGitEnvironment(process.env) },
     );
-    const revision = git(repositoryRoot, 'rev-parse', 'HEAD');
-    git(source, 'switch', '--detach', revision);
+    const baseline = retainedPngBaseline(repositoryRoot);
+    git(source, 'switch', '--detach', baseline.commit);
+    const cloneRetainedPath = path.join(
+      source,
+      'docs/audits/tool-verification/retained-runs.json',
+    );
+    writeFileSync(cloneRetainedPath, readFileSync(baseline.retainedPath));
+    git(source, 'add', 'docs/audits/tool-verification/retained-runs.json');
+    git(
+      source,
+      '-c',
+      'core.hooksPath=/dev/null',
+      '-c',
+      'user.name=Golden Currentness Fixture',
+      '-c',
+      'user.email=golden@invalid.example',
+      'commit',
+      '--quiet',
+      '-m',
+      'test: seed retained currentness baseline',
+    );
+    const revision = git(source, 'rev-parse', 'HEAD');
     symlinkSync(
       path.join(repositoryRoot, 'node_modules'),
       path.join(source, 'node_modules'),
