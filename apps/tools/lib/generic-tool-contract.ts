@@ -6,6 +6,7 @@ import {
 import { resolveCompressionDispatch } from './compression-utils.ts';
 import { BMP_CONVERSION_TOOL_IDS } from './convert/bmp-contract.ts';
 import { resolveConversionCapability } from './convert/conversion-dispatch.ts';
+import { ICO_TO_PNG_CANDIDATE_CONTRACT } from './convert/ico.ts';
 import { TIFF_TO_PNG_TOOL_IDS } from './convert/tiff.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
 
@@ -104,6 +105,9 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
     (tool.operation !== 'convert' && tool.operation !== 'compress')
   ) {
     return undefined;
+  }
+  if (tool.id === ICO_TO_PNG_CANDIDATE_CONTRACT.toolId) {
+    return ICO_TO_PNG_CANDIDATE_CONTRACT;
   }
   const from = tool.from.toLowerCase();
   const to = tool.to.toLowerCase();

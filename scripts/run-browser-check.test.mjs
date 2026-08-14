@@ -108,7 +108,7 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   assert.match(runnerSource, /safe failure/i);
   assert.doesNotMatch(runnerSource, /data-generic-contract/);
   assert.match(runnerSource, /getGenericSmokeExpectation/);
-  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v7-tiff');
+  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v8-ico');
   assert.equal(
     getGenericSmokeExpectation({
       id: 'compress-svg',
@@ -264,7 +264,7 @@ test('TIFF aliases require dedicated Worker and exact independent RGBA evidence'
   assert.match(runnerSource, /requestType: 'convert-tiff-to-png'/);
 });
 
-test('ICO to PNG candidate proof stays separate from public smoke support', () => {
+test('ICO to PNG public smoke owns the preview-proved semantics', () => {
   assert.equal(
     getGenericSmokeExpectation({
       id: 'ico-to-png',
@@ -272,7 +272,7 @@ test('ICO to PNG candidate proof stays separate from public smoke support', () =
       to: 'png',
       operation: 'convert',
     }),
-    'unsupported',
+    'supported',
   );
   assert.match(genericWorkflowSource, /ico-to-png\.worker/);
   assert.match(runnerSource, /tool\.id === 'ico-to-png'/);

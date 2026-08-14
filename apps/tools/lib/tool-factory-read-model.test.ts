@@ -11,15 +11,15 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
   assert.equal(model.rows.length, 2_807);
   assert.equal(new Set(model.rows.map((row) => row.toolId)).size, 2_807);
   assert.deepEqual(model.counts, {
-    supported: 439,
-    unsupported: 2_365,
+    supported: 440,
+    unsupported: 2_364,
     unwired: 0,
     unknown: 3,
   });
   assert.deepEqual(model.counts, toolAcceptanceClaims.counts);
   assert.equal(
     formatToolFactorySummary(model),
-    '2,807 active Tools · 439 processor capable · 2,365 explicitly processor-unsupported · 3 unknown',
+    '2,807 active Tools · 440 processor capable · 2,364 explicitly processor-unsupported · 3 unknown',
   );
   assert.equal(model.memberships, toolAcceptanceClaims.memberships);
   assert.equal(
