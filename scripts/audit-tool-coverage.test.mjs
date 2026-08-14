@@ -34,3 +34,9 @@ test('audit payload identifies the exact runtime command, timestamp, and environ
     /platform:\s*`\$\{process\.platform\}-\$\{process\.arch\}`/,
   );
 });
+
+test('audit consumes canonical acceptance claims including reasons and memberships', () => {
+  assert.match(source, /claims:\s*toolAcceptanceClaims\.all/);
+  assert.match(source, /memberships:\s*toolAcceptanceClaims\.memberships/);
+  assert.match(source, /claims:\s*acceptanceClassification\.claims/);
+});

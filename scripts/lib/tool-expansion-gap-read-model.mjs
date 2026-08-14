@@ -116,6 +116,7 @@ export function createToolExpansionGapReadModel({
   baselineRevision,
   rows,
   expectedCounts,
+  expectedMemberships,
   recommendations,
   referenceData = {},
   reproducerSourceRevision = baselineRevision,
@@ -156,6 +157,30 @@ export function createToolExpansionGapReadModel({
       `Disposition counts drifted: expected ${JSON.stringify(expectedCounts)}, received ${JSON.stringify(counts)}`,
     );
   }
+  const computedMemberships = {
+    all: {
+      toolIds: sortedRows.map((row) => row.toolId),
+      sha256: membershipSha256(sortedRows.map((row) => row.toolId)),
+    },
+    byDisposition: Object.fromEntries(
+      dispositions.map((disposition) => [
+        disposition,
+        {
+          toolIds: toolIdsByDisposition[disposition],
+          sha256: membershipSha256(toolIdsByDisposition[disposition]),
+        },
+      ]),
+    ),
+  };
+  if (
+    expectedMemberships &&
+    JSON.stringify(computedMemberships) !== JSON.stringify(expectedMemberships)
+  ) {
+    throw new TypeError(
+      'Disposition memberships drifted from acceptance claims',
+    );
+  }
+  const acceptedMemberships = expectedMemberships ?? computedMemberships;
   const unsupportedRows = sortedRows.filter(
     (row) => row.acceptedDisposition === 'unsupported',
   );
@@ -185,9 +210,10 @@ export function createToolExpansionGapReadModel({
     },
     portfolio: {
       activeToolCount: allToolIds.length,
-      activeToolIdsSha256: membershipSha256(allToolIds),
+      activeToolIdsSha256: acceptedMemberships.all.sha256,
       counts,
       toolIdsByDisposition,
+      memberships: acceptedMemberships,
     },
     rows: sortedRows,
     referenceData,

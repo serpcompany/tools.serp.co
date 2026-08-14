@@ -15,12 +15,28 @@ const outputPath = path.join(
   'apps/tools/lib/tool-verification-inputs.generated.json',
 );
 const NON_EXECUTABLE_PROJECTION_FILES = new Set([
+  'apps/tools/app/internal/tools/tool-factory-table.tsx',
   'apps/tools/lib/tool-acceptance-claims.ts',
   'apps/tools/lib/tool-factory-read-model.ts',
 ]);
+const EXECUTABLE_HASH_SCOPE_MIGRATION = Object.freeze({
+  narrowed: '659ba75a2108130167b9548443c445abd2e2f8bb046ae2581839f36da5ee7122',
+  legacy: '6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e',
+});
 
 export function isToolExecutableVerificationInput(file) {
   return !NON_EXECUTABLE_PROJECTION_FILES.has(file);
+}
+
+export function compatibleExecutableSourcesRevision(narrowedHash) {
+  if (!/^[a-f0-9]{64}$/.test(narrowedHash)) {
+    throw new TypeError('Executable source hash must be a SHA-256 digest.');
+  }
+  const digest =
+    narrowedHash === EXECUTABLE_HASH_SCOPE_MIGRATION.narrowed
+      ? EXECUTABLE_HASH_SCOPE_MIGRATION.legacy
+      : narrowedHash;
+  return `sha256:${digest}`;
 }
 
 function sha256(value) {
@@ -113,7 +129,9 @@ export function buildToolVerificationInputs() {
   ]);
   return {
     schemaVersion: 1,
-    executableSources: `sha256:${hashFiles(executableFiles)}`,
+    executableSources: compatibleExecutableSourcesRevision(
+      hashFiles(executableFiles),
+    ),
     dependencyLock: `sha256:${sha256(readFileSync(path.join(repositoryRoot, 'pnpm-lock.yaml')))}`,
     runnerSources: `sha256:${hashFiles(runnerFiles)}`,
     fixtureSha256ByJourney: Object.fromEntries(

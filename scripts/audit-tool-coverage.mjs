@@ -225,6 +225,7 @@ const tools = [...catalog.activeTools]
 
 const acceptanceClassification = {
   counts: toolAcceptanceClaims.counts,
+  claims: toolAcceptanceClaims.all,
   toolIds: Object.fromEntries(
     Object.entries(toolAcceptanceClaims.memberships.byDisposition).map(
       ([disposition, membership]) => [disposition, membership.toolIds],
@@ -306,6 +307,7 @@ const payload = {
     definition:
       'Every active Tool id appears exactly once: supported has a registered shared-workflow adapter; unsupported has an explicit generic or table fail-closed policy; unwired has known provenance without either; unknown lacks maintained provenance.',
     counts: acceptanceClassification.counts,
+    claims: acceptanceClassification.claims,
     toolIds: acceptanceClassification.toolIds,
     memberships: acceptanceClassification.memberships,
     source: 'apps/tools/lib/tool-acceptance-claims.ts',

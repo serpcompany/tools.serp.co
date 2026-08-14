@@ -45,6 +45,7 @@ test('canonical claims expose capability reasons and source pointers without evi
     disposition: 'supported',
     adapterId: 'generic-conversion',
     reason: null,
+    sourceNeeded: null,
     sourcePointers: {
       catalog: 'packages/app-core/src/lib/tool-catalog.ts',
       processor: 'apps/tools/lib/tool-processor-registry.ts',
@@ -64,6 +65,10 @@ test('canonical claims expose capability reasons and source pointers without evi
   assert.match(
     unknown?.reason ?? '',
     /No maintained execution mapping exists for this Tool renderer/,
+  );
+  assert.match(
+    unknown?.sourceNeeded ?? '',
+    /Trace the active renderer to the function that performs its core operation/,
   );
   assert.equal(Object.hasOwn(supported ?? {}, 'verificationEvidence'), false);
   assert.equal(Object.hasOwn(supported ?? {}, 'runtimeObservation'), false);
@@ -92,5 +97,111 @@ test('acceptance claims fail closed when processor and contract facts contradict
         },
       ]),
     /contradictory processor acceptance facts for contradiction/i,
+  );
+  assert.throws(
+    () =>
+      createToolAcceptanceClaims([
+        {
+          toolId: 'missing-wiring',
+          renderer: 'table',
+          availability: {
+            kind: 'unwired',
+            reason: 'No processor is registered.',
+            sourceNeeded: 'Register the exact processor.',
+          },
+          genericContract: { state: 'not-applicable', reason: null },
+          tablePolicy: { kind: 'eligible', reason: null },
+        },
+      ]),
+    /contradictory processor acceptance facts for missing-wiring/i,
+  );
+});
+
+test('public constructor exposes and deeply freezes every disposition', () => {
+  const claims = createToolAcceptanceClaims([
+    {
+      toolId: 'supported-tool',
+      renderer: 'generic',
+      availability: { kind: 'wired', adapterId: 'generic-conversion' },
+      genericContract: { state: 'supported', reason: null },
+      tablePolicy: { kind: 'not-applicable', reason: null },
+    },
+    {
+      toolId: 'unsupported-tool',
+      renderer: 'generic',
+      availability: {
+        kind: 'unwired',
+        reason: 'No processor is registered.',
+        sourceNeeded: 'Register the exact processor.',
+      },
+      genericContract: {
+        state: 'unsupported',
+        reason: 'The exact contract is unsupported.',
+      },
+      tablePolicy: { kind: 'not-applicable', reason: null },
+    },
+    {
+      toolId: 'unwired-tool',
+      renderer: 'specialized',
+      availability: {
+        kind: 'unwired',
+        reason: 'No processor is registered.',
+        sourceNeeded: 'Register the exact processor.',
+      },
+      genericContract: { state: 'not-applicable', reason: null },
+      tablePolicy: { kind: 'not-applicable', reason: null },
+    },
+    {
+      toolId: 'unknown-tool',
+      renderer: 'unknown',
+      availability: {
+        kind: 'unknown',
+        reason: 'Trace the renderer owner.',
+        sourceNeeded: 'Identify the maintained execution source.',
+      },
+      genericContract: { state: 'not-applicable', reason: null },
+      tablePolicy: { kind: 'not-applicable', reason: null },
+    },
+  ]);
+
+  assert.deepEqual(
+    claims.all.map(({ toolId, disposition }) => ({ toolId, disposition })),
+    [
+      { toolId: 'supported-tool', disposition: 'supported' },
+      { toolId: 'unknown-tool', disposition: 'unknown' },
+      { toolId: 'unsupported-tool', disposition: 'unsupported' },
+      { toolId: 'unwired-tool', disposition: 'unwired' },
+    ],
+  );
+  assert.throws(() => {
+    (claims.counts as { supported: number }).supported = 0;
+  }, TypeError);
+  assert.throws(() => {
+    (claims.memberships.byDisposition.unwired.toolIds as string[]).push(
+      'another-tool',
+    );
+  }, TypeError);
+  assert.throws(() => {
+    (
+      claims.getByToolId('supported-tool')?.sourcePointers as {
+        processor: string;
+      }
+    ).processor = 'different-owner';
+  }, TypeError);
+});
+
+test('public constructor rejects malformed runtime source facts', () => {
+  assert.throws(
+    () =>
+      createToolAcceptanceClaims([
+        {
+          toolId: 'malformed-tool',
+          renderer: 'generic',
+          availability: { kind: 'bogus' },
+          genericContract: { state: 'supported', reason: null },
+          tablePolicy: { kind: 'not-applicable', reason: null },
+        } as never,
+      ]),
+    /invalid processor availability/i,
   );
 });

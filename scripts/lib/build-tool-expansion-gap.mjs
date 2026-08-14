@@ -360,6 +360,7 @@ function buildRow(tool) {
       acceptanceClaim: {
         disposition: acceptance.disposition,
         reason: acceptance.reason,
+        sourceNeeded: acceptance.sourceNeeded,
         sourcePointers: acceptance.sourcePointers,
         source: SOURCES.acceptanceClaims,
       },
@@ -530,6 +531,7 @@ export function buildToolExpansionGapReadModel({
     reproducerSourceRevision,
     rows,
     expectedCounts: toolAcceptanceClaims.counts,
+    expectedMemberships: toolAcceptanceClaims.memberships,
     recommendations: buildRecommendations(rows),
     referenceData: {
       executionEngines: executionProvenance.engines.map((engine) => ({

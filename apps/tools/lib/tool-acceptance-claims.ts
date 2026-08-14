@@ -15,7 +15,11 @@ export type ToolAcceptanceDisposition =
 
 type AcceptanceAvailability = Readonly<
   | { kind: 'wired'; adapterId: string }
-  | { kind: 'unwired' | 'unknown'; reason: string }
+  | {
+      kind: 'unwired' | 'unknown';
+      reason: string;
+      sourceNeeded: string;
+    }
 >;
 
 type AcceptanceContractFact = Readonly<{
@@ -41,6 +45,7 @@ export type ToolAcceptanceClaim = Readonly<{
   disposition: ToolAcceptanceDisposition;
   adapterId: string | null;
   reason: string | null;
+  sourceNeeded: string | null;
   sourcePointers: Readonly<{
     catalog: 'packages/app-core/src/lib/tool-catalog.ts';
     processor: 'apps/tools/lib/tool-processor-registry.ts';
@@ -99,7 +104,52 @@ function contractKind(fact: ToolAcceptanceSourceFact) {
   return 'not-applicable';
 }
 
+function nonEmpty(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function validateSourceFact(fact: ToolAcceptanceSourceFact) {
+  if (!fact || !nonEmpty(fact.toolId) || !nonEmpty(fact.renderer)) {
+    throw new TypeError('Tool acceptance source facts require an identity.');
+  }
+  if (!['wired', 'unwired', 'unknown'].includes(fact.availability?.kind)) {
+    throw new TypeError(`${fact.toolId} has invalid processor availability.`);
+  }
+  if (
+    fact.availability.kind === 'wired'
+      ? !nonEmpty(fact.availability.adapterId)
+      : !nonEmpty(fact.availability.reason) ||
+        !nonEmpty(fact.availability.sourceNeeded)
+  ) {
+    throw new TypeError(
+      `${fact.toolId} has incomplete processor availability.`,
+    );
+  }
+  if (
+    !['supported', 'unsupported', 'not-applicable'].includes(
+      fact.genericContract?.state,
+    ) ||
+    !['eligible', 'unsupported', 'unknown', 'not-applicable'].includes(
+      fact.tablePolicy?.kind,
+    )
+  ) {
+    throw new TypeError(`${fact.toolId} has an invalid acceptance contract.`);
+  }
+  if (
+    (fact.genericContract.state === 'unsupported' &&
+      !nonEmpty(fact.genericContract.reason)) ||
+    (fact.tablePolicy.kind !== 'eligible' &&
+      fact.tablePolicy.kind !== 'not-applicable' &&
+      !nonEmpty(fact.tablePolicy.reason))
+  ) {
+    throw new TypeError(
+      `${fact.toolId} has an incomplete acceptance contract.`,
+    );
+  }
+}
+
 function claimFor(fact: ToolAcceptanceSourceFact): ToolAcceptanceClaim {
+  validateSourceFact(fact);
   const contract = contractKind(fact);
   const contractUnsupported = contract === 'unsupported';
   const contractEligible = contract === 'supported' || contract === 'eligible';
@@ -148,6 +198,10 @@ function claimFor(fact: ToolAcceptanceSourceFact): ToolAcceptanceClaim {
     adapterId:
       fact.availability.kind === 'wired' ? fact.availability.adapterId : null,
     reason,
+    sourceNeeded:
+      fact.availability.kind === 'wired'
+        ? null
+        : fact.availability.sourceNeeded,
     sourcePointers: {
       catalog: 'packages/app-core/src/lib/tool-catalog.ts',
       processor: 'apps/tools/lib/tool-processor-registry.ts',
@@ -215,7 +269,11 @@ function canonicalSourceFact(
     availability:
       availability.kind === 'wired'
         ? { kind: availability.kind, adapterId: availability.adapterId }
-        : { kind: availability.kind, reason: availability.reason },
+        : {
+            kind: availability.kind,
+            reason: availability.reason,
+            sourceNeeded: availability.sourceNeeded,
+          },
     genericContract: {
       state: genericContract.state,
       reason:

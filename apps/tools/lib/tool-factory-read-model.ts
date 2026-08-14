@@ -5,6 +5,7 @@ import { resolveConversionDispatch } from './convert/conversion-dispatch.ts';
 import {
   toolAcceptanceClaims,
   type ToolAcceptanceClaim,
+  type ToolAcceptanceClaims,
   type ToolAcceptanceDisposition,
 } from './tool-acceptance-claims.ts';
 import {
@@ -49,6 +50,7 @@ export type ToolFactoryRow = Readonly<{
     disposition: ToolSupportDisposition;
     adapterId: string | null;
     reason: string | null;
+    sourceNeeded: string | null;
     sourcePointers: ToolAcceptanceClaim['sourcePointers'];
   }>;
   implementation: Readonly<{
@@ -95,6 +97,7 @@ export type ToolFactoryRow = Readonly<{
 export type ToolFactoryReadModel = Readonly<{
   rows: readonly ToolFactoryRow[];
   counts: Readonly<Record<ToolSupportDisposition, number>>;
+  memberships: ToolAcceptanceClaims['memberships'];
   getByToolId(toolId: string): ToolFactoryRow | null;
 }>;
 
@@ -251,6 +254,7 @@ function buildRow(
       disposition,
       adapterId: acceptance.adapterId,
       reason: acceptance.reason,
+      sourceNeeded: acceptance.sourceNeeded,
       sourcePointers: acceptance.sourcePointers,
     },
     implementation: {
@@ -302,6 +306,7 @@ export function buildToolFactoryReadModel(): ToolFactoryReadModel {
   cachedModel = deepFreeze({
     rows,
     counts,
+    memberships: toolAcceptanceClaims.memberships,
     getByToolId(toolId: string) {
       return byId.get(toolId) ?? null;
     },

@@ -5,10 +5,17 @@ import test from 'node:test';
 
 import {
   buildToolVerificationInputs,
+  compatibleExecutableSourcesRevision,
   isToolExecutableVerificationInput,
 } from './generate-tool-verification-inputs.mjs';
 
 test('execution evidence excludes capability projections but includes real processors and workers', () => {
+  assert.equal(
+    isToolExecutableVerificationInput(
+      'apps/tools/app/internal/tools/tool-factory-table.tsx',
+    ),
+    false,
+  );
   assert.equal(
     isToolExecutableVerificationInput(
       'apps/tools/lib/tool-acceptance-claims.ts',
@@ -30,6 +37,23 @@ test('execution evidence excludes capability projections but includes real proce
   assert.equal(
     isToolExecutableVerificationInput('apps/tools/workers/convert.worker.ts'),
     true,
+  );
+});
+
+test('hash-scope migration preserves exact retained evidence only at the transition digest', () => {
+  assert.equal(
+    compatibleExecutableSourcesRevision(
+      '659ba75a2108130167b9548443c445abd2e2f8bb046ae2581839f36da5ee7122',
+    ),
+    'sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e',
+  );
+  assert.equal(
+    compatibleExecutableSourcesRevision('f'.repeat(64)),
+    `sha256:${'f'.repeat(64)}`,
+  );
+  assert.throws(
+    () => compatibleExecutableSourcesRevision('not-a-digest'),
+    /must be a SHA-256 digest/i,
   );
 });
 

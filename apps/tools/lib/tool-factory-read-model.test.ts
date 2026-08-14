@@ -16,12 +16,14 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
     unknown: 3,
   });
   assert.deepEqual(model.counts, toolAcceptanceClaims.counts);
+  assert.equal(model.memberships, toolAcceptanceClaims.memberships);
   assert.equal(
     model.rows.every((row) => {
       const claim = toolAcceptanceClaims.getByToolId(row.toolId);
       return (
         claim?.disposition === row.support.disposition &&
         claim.reason === row.support.reason &&
+        claim.sourceNeeded === row.support.sourceNeeded &&
         claim.sourcePointers === row.support.sourcePointers
       );
     }),
@@ -93,7 +95,7 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
   );
 });
 
-test('registered family policy projects retained evidence independently of capability', () => {
+test('registered family policy projects refreshed retained evidence as verified', () => {
   const row = buildToolFactoryReadModel().getByToolId('bmp-to-png');
 
   assert.ok(row);
@@ -105,7 +107,7 @@ test('registered family policy projects retained evidence independently of capab
     row.verificationEvidence.map((evidence) => evidence.journeyId),
     ['bmp-to-png:upload'],
   );
-  assert.equal(row.verificationEvidence[0]?.state, 'stale');
+  assert.equal(row.verificationEvidence[0]?.state, 'verified');
   assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
 });
 

@@ -231,6 +231,15 @@ function runtimeObservationLabel(
   return `${latest.lastResult === 'succeeded' ? 'Succeeded' : 'Failed'} · ${latest.label} · ${latest.freshness}`;
 }
 
+function processorCapabilityLabel(disposition: ToolSupportDisposition) {
+  return {
+    supported: 'Processor capable',
+    unsupported: 'Explicitly processor unsupported',
+    unwired: 'Processor unwired',
+    unknown: 'Processor capability unknown',
+  }[disposition];
+}
+
 function SupportBadge({
   disposition,
 }: {
@@ -248,7 +257,7 @@ function SupportBadge({
     <span
       className={`inline-flex rounded-full border px-2 py-1 text-xs font-medium ${tone}`}
     >
-      {disposition}
+      {processorCapabilityLabel(disposition)}
     </span>
   );
 }
@@ -306,7 +315,9 @@ function buildColumns(
     {
       id: 'support',
       accessorFn: (row) => row.support.disposition,
-      header: ({ column }) => <SortButton column={column} label="Support" />,
+      header: ({ column }) => (
+        <SortButton column={column} label="Processor capability" />
+      ),
       cell: ({ row }) => (
         <SupportBadge disposition={row.original.support.disposition} />
       ),
@@ -1089,7 +1100,10 @@ function ToolDetail({
             </DialogDescription>
           </DialogHeader>
           <dl className="grid gap-3 md:grid-cols-2">
-            <Fact label="Support disposition" value={row.support.disposition} />
+            <Fact
+              label="Processor capability"
+              value={processorCapabilityLabel(row.support.disposition)}
+            />
             <Fact label="Operation" value={operationLabel(row)} />
             <Fact label="Family" value={row.family} />
             <Fact label="Adapter" value={row.support.adapterId ?? '—'} />
@@ -1420,7 +1434,7 @@ export function ToolFactoryTable({
           </h1>
           <p className="mt-1 text-sm text-slate-600">
             {model.rows.length.toLocaleString()} active Tools ·{' '}
-            {model.counts.supported.toLocaleString()} supported ·{' '}
+            {model.counts.supported.toLocaleString()} processor capable ·{' '}
             {model.counts.unsupported.toLocaleString()} explicitly unsupported ·{' '}
             {model.counts.unknown.toLocaleString()} unknown
           </p>

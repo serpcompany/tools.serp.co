@@ -22,6 +22,10 @@ test('accepted baseline is accounted for once with exact gap partitions and sour
     unwired: 0,
     unknown: 3,
   });
+  assert.equal(
+    projection.portfolio.memberships,
+    toolAcceptanceClaims.memberships,
+  );
   assert.equal(new Set(projection.rows.map((row) => row.toolId)).size, 2_807);
   assert.equal(
     projection.rows.every((row) => {
@@ -30,6 +34,7 @@ test('accepted baseline is accounted for once with exact gap partitions and sour
         row.acceptedDisposition === claim?.disposition &&
         row.evidence.acceptanceClaim.disposition === claim.disposition &&
         row.evidence.acceptanceClaim.reason === claim.reason &&
+        row.evidence.acceptanceClaim.sourceNeeded === claim.sourceNeeded &&
         row.evidence.acceptanceClaim.sourcePointers === claim.sourcePointers
       );
     }),
