@@ -111,24 +111,26 @@ export function hasIcoIdentity(bytes: Uint8Array): boolean {
 function inspectPngPayload(
   bytes: Uint8Array,
   entry: Omit<IcoEntry, 'sourceKind'>,
+  label = 'ICO PNG entry',
 ): void {
   if (entry.payloadBytes < 33 || !isPng(bytes, entry.payloadOffset)) {
-    throw new Error('ICO PNG entry is malformed.');
+    throw new Error(`${label} is malformed.`);
   }
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const payloadEnd = entry.payloadOffset + entry.payloadBytes;
   let offset = entry.payloadOffset + PNG_SIGNATURE.length;
   let chunkCount = 0;
+  let sawHeader = false;
   let sawImageData = false;
   let sawEnd = false;
   while (offset < payloadEnd) {
     if (payloadEnd - offset < 12 || chunkCount >= 4_096) {
-      throw new Error('ICO PNG entry is truncated or too complex.');
+      throw new Error(`${label} is truncated or too complex.`);
     }
     const length = view.getUint32(offset, false);
     const chunkEnd = offset + 12 + length;
     if (!Number.isSafeInteger(chunkEnd) || chunkEnd > payloadEnd) {
-      throw new Error('ICO PNG entry chunk is truncated.');
+      throw new Error(`${label} chunk is truncated.`);
     }
     const type = new TextDecoder().decode(
       bytes.subarray(offset + 4, offset + 8),
@@ -136,7 +138,7 @@ function inspectPngPayload(
     const storedCrc = view.getUint32(offset + 8 + length, false);
     const computedCrc = crc32(bytes.subarray(offset + 4, offset + 8 + length));
     if (storedCrc !== computedCrc) {
-      throw new Error(`ICO PNG ${type} chunk has an invalid CRC.`);
+      throw new Error(`${label} ${type} chunk has an invalid CRC.`);
     }
     if (chunkCount === 0) {
       const width = view.getUint32(offset + 8, false);
@@ -167,13 +169,21 @@ function inspectPngPayload(
         bytes[offset + 19] !== 0 ||
         ![0, 1].includes(bytes[offset + 20]!)
       ) {
-        throw new Error('ICO PNG entry metadata disagrees with its directory.');
+        throw new Error(`${label} metadata disagrees with its directory.`);
       }
+      sawHeader = true;
+    } else if (type === 'IHDR') {
+      throw new Error(`${label} contains a duplicate IHDR chunk.`);
     }
-    if (type === 'IDAT') sawImageData = true;
+    if (type === 'IDAT') {
+      if (!sawHeader || sawEnd) {
+        throw new Error(`${label} has image data outside the PNG image.`);
+      }
+      sawImageData = true;
+    }
     if (type === 'IEND') {
       if (length !== 0 || chunkEnd !== payloadEnd) {
-        throw new Error('ICO PNG IEND chunk must terminate the entry.');
+        throw new Error(`${label} IEND chunk must terminate the image.`);
       }
       sawEnd = true;
     }
@@ -181,7 +191,7 @@ function inspectPngPayload(
     chunkCount += 1;
   }
   if (!sawImageData || !sawEnd) {
-    throw new Error('ICO PNG entry requires image data and a terminal IEND.');
+    throw new Error(`${label} requires image data and a terminal IEND.`);
   }
 }
 
@@ -315,6 +325,18 @@ export async function convertIcoBytesToPng(
     ) {
       throw new Error('ICO decoder returned inconsistent image data.');
     }
+    inspectPngPayload(
+      image.png,
+      {
+        index,
+        width: image.width,
+        height: image.height,
+        directoryBpp: image.bpp,
+        payloadOffset: 0,
+        payloadBytes: image.png.byteLength,
+      },
+      'ICO decoder PNG output',
+    );
   }
   const selected = decoded.reduce(
     (best, candidate, index) => {
@@ -328,15 +350,6 @@ export async function convertIcoBytesToPng(
     { image: decoded[0]!, index: 0 },
   );
   const entry = entries[selected.index]!;
-  const outputDimensions = pngDimensions(selected.image.png);
-  if (
-    outputDimensions.width !== entry.width ||
-    outputDimensions.height !== entry.height
-  ) {
-    throw new Error(
-      'ICO decoder PNG dimensions differ from the selected entry.',
-    );
-  }
   return Object.freeze({
     png: Uint8Array.from(selected.image.png),
     width: entry.width,
@@ -474,19 +487,6 @@ export async function verifyIcoConversionResult(
           ),
         };
   verifyIcoDecodedOutput({ expected, actual });
-}
-
-function pngDimensions(
-  bytes: Uint8Array,
-): Readonly<{ width: number; height: number }> {
-  if (bytes.byteLength < 24 || !isPng(bytes, 0)) {
-    throw new Error('PNG output is malformed.');
-  }
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  return Object.freeze({
-    width: view.getUint32(16, false),
-    height: view.getUint32(20, false),
-  });
 }
 
 type IcoWorkerResponse = Readonly<{
