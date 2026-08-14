@@ -1934,5 +1934,69 @@
     "result": {
       "status": "success"
     }
+  },
+  {
+    "schemaVersion": 2,
+    "runId": "20260814T155137Z_fd7531f_pull-request_browser-smoke-preview-subset",
+    "command": {
+      "name": "smoke:tools:browser",
+      "version": "1"
+    },
+    "revision": {
+      "commit": "fd7531fd08d2bac27b8e5ce32ba88d20aec84581",
+      "dirty": false
+    },
+    "timestamps": {
+      "startedAt": "2026-08-14T15:51:37.061Z",
+      "completedAt": "2026-08-14T15:51:42.135Z"
+    },
+    "environment": "pull-request",
+    "scope": {
+      "label": "browser-smoke-preview-subset",
+      "inputHashes": [
+        "sha256:de4005760206a72b1376ddab4c1021387771ff13063f3ce2027081a548a2c62a"
+      ],
+      "tools": [
+        {
+          "toolId": "compress-svg",
+          "journeys": [
+            {
+              "journeyId": "compress-svg:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/svg",
+                "sha256": "4034376ea55dfe8d74ba30379b6c04b610f6a044d76f4ae566d00ffc23d7b1d2"
+              },
+              "invariantId": "inert-svg-render-equivalence",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:c8503bb773c460d332ebd82a8c82e525c173cae9afeff5df10041d876ef0b1e0",
+                "fixture-content": "sha256:4034376ea55dfe8d74ba30379b6c04b610f6a044d76f4ae566d00ffc23d7b1d2",
+                "journey-contract": "sha256:b864433f2ed682048ab05e521889a97e78b8569ef3c2ad5d5a831d50b9e57292",
+                "semantic-invariant": "sha256:0d3078a851588819b9371b043a222e66ce23341961533a066cf692762e15f23c",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:de2005606c9f53d6dbe1d5ce17775a09abd7eb2f1f328a9b9709b12a50df4e56",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:1ea91685654b8b62d4bf57e87c3c6105d2ebd71e303b12d4c97b1439fe6c559f"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "result": {
+      "status": "success"
+    }
   }
 ]
