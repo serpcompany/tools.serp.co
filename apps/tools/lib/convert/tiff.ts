@@ -1,13 +1,14 @@
-export const TIFF_TO_PNG_TOOL_IDS = Object.freeze([
-  'tif-to-png',
-  'tiff-to-png',
-] as const);
+import { isTiffToPngToolId, TIFF_TO_PNG_TOOL_IDS } from './tiff-family.mjs';
+
+export { isTiffToPngToolId, TIFF_TO_PNG_TOOL_IDS };
+export type TiffToolId = (typeof TIFF_TO_PNG_TOOL_IDS)[number];
 
 export const TIFF_TO_PNG_LIMITS = Object.freeze({
   maxInputBytes: 32 * 1_024 * 1_024,
   maxDimension: 16_384,
   maxDecodedRgbaBytes: 64 * 1_024 * 1_024,
   maxOutputBytes: 64 * 1_024 * 1_024,
+  maxStorageSegments: 65_536,
   executionTimeoutMs: 10_000,
 });
 
@@ -23,6 +24,8 @@ export type TiffImageMetadata = Readonly<{
   sampleFormat: readonly number[];
   samplesPerPixel: number;
   imageCount: number;
+  photometricInterpretation: number;
+  extraSamples: readonly number[];
 }>;
 
 export function validateTiffImageMetadata(metadata: TiffImageMetadata) {
@@ -46,6 +49,15 @@ export function validateTiffImageMetadata(metadata: TiffImageMetadata) {
   ) {
     throw new Error('TIFF decoded pixels exceed the memory limit.');
   }
+  const scanlineBytes = rgbaBytes + metadata.height;
+  const pngUpperBound =
+    scanlineBytes + Math.ceil(scanlineBytes / 65_535) * 5 + 128;
+  if (
+    !Number.isSafeInteger(pngUpperBound) ||
+    pngUpperBound > TIFF_TO_PNG_LIMITS.maxOutputBytes
+  ) {
+    throw new Error('TIFF encoded PNG could exceed the output limit.');
+  }
   if (
     ![1, 3, 4].includes(metadata.samplesPerPixel) ||
     metadata.bitsPerSample.length !== metadata.samplesPerPixel ||
@@ -55,10 +67,33 @@ export function validateTiffImageMetadata(metadata: TiffImageMetadata) {
   ) {
     throw new Error('TIFF sample layout is unsupported.');
   }
+  if (![0, 1, 2, 3].includes(metadata.photometricInterpretation)) {
+    throw new Error('TIFF photometric interpretation is unsupported.');
+  }
+  const samplesMatchPhotometric =
+    ([0, 1, 3].includes(metadata.photometricInterpretation) &&
+      metadata.samplesPerPixel === 1) ||
+    (metadata.photometricInterpretation === 2 &&
+      [3, 4].includes(metadata.samplesPerPixel));
+  if (!samplesMatchPhotometric) {
+    throw new Error('TIFF photometric and sample layouts are inconsistent.');
+  }
+  if (metadata.samplesPerPixel === 4) {
+    if (metadata.extraSamples.length !== 1 || metadata.extraSamples[0] !== 2) {
+      throw new Error(
+        'TIFF associated alpha is unsupported; one unpremultiplied alpha sample is required.',
+      );
+    }
+  } else if (metadata.extraSamples.length !== 0) {
+    throw new Error(
+      'TIFF ExtraSamples are inconsistent with the sample layout.',
+    );
+  }
   return Object.freeze({
     width: metadata.width,
     height: metadata.height,
     rgbaBytes,
+    pngUpperBound,
   });
 }
 
@@ -118,15 +153,6 @@ export async function decodeTiffToRgba(
     'PhotometricInterpretation',
   );
   const extraSamples = fileDirectory.getValue('ExtraSamples');
-  if (![0, 1, 2, 3].includes(Number(photometricInterpretation ?? -1))) {
-    throw new Error('TIFF photometric interpretation is unsupported.');
-  }
-  if (
-    samplesPerPixel === 4 &&
-    ![1, 2].includes(Number(Array.from(extraSamples ?? [])[0]))
-  ) {
-    throw new Error('TIFF alpha sample layout is unsupported.');
-  }
   const metadata = validateTiffImageMetadata({
     width: image.getWidth(),
     height: image.getHeight(),
@@ -142,6 +168,8 @@ export async function decodeTiffToRgba(
     ),
     samplesPerPixel,
     imageCount,
+    photometricInterpretation: Number(photometricInterpretation ?? -1),
+    extraSamples: Array.from(extraSamples ?? [], Number),
   });
   signal?.throwIfAborted();
   const rgb = await image.readRGB({
@@ -258,6 +286,26 @@ type TiffWorkerResponse = Readonly<{
   sourceRgbaSha256?: string;
 }>;
 
+export function ownTiffWorkerTermination(worker: Worker): Worker {
+  let terminated = false;
+  return new Proxy(worker, {
+    get(target, property) {
+      if (property === 'terminate') {
+        return () => {
+          if (terminated) return;
+          terminated = true;
+          target.terminate();
+        };
+      }
+      const value = Reflect.get(target, property, target);
+      return typeof value === 'function' ? value.bind(target) : value;
+    },
+    set(target, property, value) {
+      return Reflect.set(target, property, value, target);
+    },
+  });
+}
+
 export async function convertTiffToPngWithWorker(args: {
   worker: Worker;
   bytes: Uint8Array;
@@ -361,8 +409,78 @@ export function inspectTiffHeader(bytes: Uint8Array): TiffHeader {
     throw new Error('TIFF version marker is invalid.');
   }
   const firstIfdOffset = view.getUint32(4, littleEndian);
-  if (firstIfdOffset < 8 || firstIfdOffset > bytes.byteLength) {
+  if (firstIfdOffset < 8 || firstIfdOffset + 2 > bytes.byteLength) {
     throw new Error('TIFF first IFD offset is outside the input.');
+  }
+  const entryCount = view.getUint16(firstIfdOffset, littleEndian);
+  if (entryCount > 256) {
+    throw new Error('TIFF IFD entry count exceeds the supported limit.');
+  }
+  const tableEnd = firstIfdOffset + 2 + entryCount * 12 + 4;
+  if (!Number.isSafeInteger(tableEnd) || tableEnd > bytes.byteLength) {
+    throw new Error('TIFF IFD table is truncated.');
+  }
+  const typeSizes = Object.freeze([0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8]);
+  let storageOffsets: number[] | undefined;
+  let storageByteCounts: number[] | undefined;
+  for (let index = 0; index < entryCount; index += 1) {
+    const entryOffset = firstIfdOffset + 2 + index * 12;
+    const tag = view.getUint16(entryOffset, littleEndian);
+    const type = view.getUint16(entryOffset + 2, littleEndian);
+    const count = view.getUint32(entryOffset + 4, littleEndian);
+    const typeSize = typeSizes[type];
+    if (!typeSize) {
+      throw new Error('TIFF IFD entry type or count is invalid.');
+    }
+    if (count === 0) continue;
+    const payloadBytes = typeSize * count;
+    if (!Number.isSafeInteger(payloadBytes)) {
+      throw new Error('TIFF IFD payload size is unsafe.');
+    }
+    if (payloadBytes > 4) {
+      const payloadOffset = view.getUint32(entryOffset + 8, littleEndian);
+      const payloadEnd = payloadOffset + payloadBytes;
+      if (
+        !Number.isSafeInteger(payloadEnd) ||
+        payloadOffset < 8 ||
+        payloadEnd > bytes.byteLength
+      ) {
+        throw new Error('TIFF IFD payload is outside the input.');
+      }
+    }
+    if ([273, 279, 324, 325].includes(tag) && [3, 4].includes(type)) {
+      if (count > TIFF_TO_PNG_LIMITS.maxStorageSegments) {
+        throw new Error('TIFF storage segment count exceeds the limit.');
+      }
+      const payloadOffset =
+        payloadBytes <= 4
+          ? entryOffset + 8
+          : view.getUint32(entryOffset + 8, littleEndian);
+      const values = Array.from({ length: count }, (_, valueIndex) =>
+        type === 3
+          ? view.getUint16(payloadOffset + valueIndex * 2, littleEndian)
+          : view.getUint32(payloadOffset + valueIndex * 4, littleEndian),
+      );
+      if (tag === 273 || tag === 324) storageOffsets = values;
+      else storageByteCounts = values;
+    }
+  }
+  if (
+    !storageOffsets ||
+    !storageByteCounts ||
+    storageOffsets.length !== storageByteCounts.length ||
+    storageOffsets.some((offset, index) => {
+      const byteCount = storageByteCounts?.[index] ?? 0;
+      const end = offset + byteCount;
+      return (
+        byteCount < 1 ||
+        offset < 8 ||
+        !Number.isSafeInteger(end) ||
+        end > bytes.byteLength
+      );
+    })
+  ) {
+    throw new Error('TIFF strip or tile storage range is invalid.');
   }
   return Object.freeze({
     byteOrder: littleEndian ? 'little' : 'big',

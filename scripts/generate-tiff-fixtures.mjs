@@ -1,4 +1,10 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -59,6 +65,27 @@ function run(command, args) {
   if (result.status !== 0) {
     throw new Error(result.stderr || `${command} failed`);
   }
+}
+
+function mutateClassicLongTag(bytes, tag, value) {
+  const output = Uint8Array.from(bytes);
+  const view = new DataView(output.buffer);
+  const littleEndian = output[0] === 0x49;
+  const ifdOffset = view.getUint32(4, littleEndian);
+  const entryCount = view.getUint16(ifdOffset, littleEndian);
+  for (let index = 0; index < entryCount; index += 1) {
+    const offset = ifdOffset + 2 + index * 12;
+    if (view.getUint16(offset, littleEndian) !== tag) continue;
+    if (
+      view.getUint16(offset + 2, littleEndian) !== 4 ||
+      view.getUint32(offset + 4, littleEndian) !== 1
+    ) {
+      throw new Error(`Tag ${tag} is not an inline LONG.`);
+    }
+    view.setUint32(offset + 8, value, littleEndian);
+    return output;
+  }
+  throw new Error(`Tag ${tag} was not found.`);
 }
 
 try {
@@ -141,6 +168,97 @@ try {
     path.join(fixtureDirectory, 'negative-truncated-ifd.tiff'),
     truncated,
   );
+  const rgbBytes = new Uint8Array(readFileSync(rgb));
+  writeFileSync(
+    path.join(fixtureDirectory, 'negative-truncated-strip.tiff'),
+    rgbBytes.slice(0, rgbBytes.byteLength - 8),
+  );
+  writeFileSync(
+    path.join(fixtureDirectory, 'negative-strip-offset.tiff'),
+    mutateClassicLongTag(rgbBytes, 273, rgbBytes.byteLength + 4_096),
+  );
+  writeFileSync(
+    path.join(fixtureDirectory, 'negative-strip-byte-count.tiff'),
+    mutateClassicLongTag(rgbBytes, 279, 0xffff_ffff),
+  );
+  writeFileSync(
+    path.join(fixtureDirectory, 'negative-floating-point.tiff'),
+    new Uint8Array(
+      writeArrayBuffer(new Float32Array(16 * 16).fill(0.5), {
+        width: 16,
+        height: 16,
+        SamplesPerPixel: 1,
+        BitsPerSample: [32],
+        SampleFormat: [3],
+        PhotometricInterpretation: 1,
+        PlanarConfiguration: 1,
+      }),
+    ),
+  );
+  writeFileSync(
+    path.join(fixtureDirectory, 'negative-associated-alpha.tiff'),
+    new Uint8Array(
+      writeArrayBuffer(pixels(4), {
+        width: 16,
+        height: 16,
+        SamplesPerPixel: 4,
+        BitsPerSample: [8, 8, 8, 8],
+        SampleFormat: [1, 1, 1, 1],
+        PhotometricInterpretation: 2,
+        ExtraSamples: [1],
+        PlanarConfiguration: 1,
+      }),
+    ),
+  );
+  writeFileSync(
+    path.join(fixtureDirectory, 'negative-unsupported-photometric.tiff'),
+    new Uint8Array(
+      writeArrayBuffer(pixels(3), {
+        width: 16,
+        height: 16,
+        SamplesPerPixel: 3,
+        BitsPerSample: [8, 8, 8],
+        SampleFormat: [1, 1, 1],
+        PhotometricInterpretation: 5,
+        PlanarConfiguration: 1,
+      }),
+    ),
+  );
+  writeFileSync(
+    path.join(fixtureDirectory, 'negative-oversized-dimension.tiff'),
+    new Uint8Array(
+      writeArrayBuffer(new Uint8Array(16_385), {
+        width: 16_385,
+        height: 1,
+        SamplesPerPixel: 1,
+        BitsPerSample: [8],
+        SampleFormat: [1],
+        PhotometricInterpretation: 1,
+        PlanarConfiguration: 1,
+      }),
+    ),
+  );
+  const expansion = path.join(temporaryDirectory, 'expansion.tiff');
+  writeFileSync(
+    expansion,
+    new Uint8Array(
+      writeArrayBuffer(new Uint8Array(4_096 * 4_097), {
+        width: 4_096,
+        height: 4_097,
+        SamplesPerPixel: 1,
+        BitsPerSample: [8],
+        SampleFormat: [1],
+        PhotometricInterpretation: 1,
+        PlanarConfiguration: 1,
+      }),
+    ),
+  );
+  tiffcp(expansion, 'negative-decompression-expansion.tiff', [
+    '-L',
+    '-s',
+    '-c',
+    'zip',
+  ]);
 } finally {
   rmSync(temporaryDirectory, { recursive: true, force: true });
 }

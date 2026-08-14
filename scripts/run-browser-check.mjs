@@ -28,6 +28,7 @@ import {
   extractExactZipEntries,
 } from './lib/golden-output-semantics.mjs';
 import { proveSvgCompressionBrowser } from './lib/svg-compression-browser-proof.mjs';
+import { isTiffToPngToolId } from '../apps/tools/lib/convert/tiff-family.mjs';
 
 function parseArguments(arguments_) {
   const tokens = arguments_.filter((argument) => argument !== '--');
@@ -658,10 +659,77 @@ try {
       { cwd: repositoryRoot, encoding: 'utf8' },
     );
     const result = JSON.parse(output);
-    if (result.journeyId !== `${toolId}:upload`) {
-      throw new Error(`${toolId} negative probe returned the wrong journey.`);
+    const checks = [
+      'malformed-input',
+      'spoofed-input',
+      'wrong-format-output',
+      'no-delivery-on-failure',
+      'cancellation-lifecycle',
+    ];
+    if (
+      result.journeyId !== `${toolId}:upload` ||
+      JSON.stringify(result.checks) !== JSON.stringify(checks) ||
+      result.observed?.failedRuns !== 3 ||
+      result.observed?.cancelledRuns !== 1 ||
+      result.observed?.deliveries !== 0 ||
+      result.observed?.cleanupCalls !== 1 ||
+      !result.observed?.terminalStatuses?.includes('cancelled')
+    ) {
+      throw new Error(`${toolId} negative probe did not prove exact cleanup.`);
     }
     return result.checks;
+  }
+
+  async function proveActiveTiffWorkerCancellation(workerUrl, fixturePath) {
+    const bytes = Array.from(await fs.readFile(fixturePath));
+    return await page.evaluate(
+      async ({ workerUrl: url, fixtureBytes }) => {
+        const observations = [];
+        for (const target of ['decode', 'encode']) {
+          const observation = await new Promise((resolve, reject) => {
+            const worker = new Worker(url, { type: 'module' });
+            const stages = [];
+            let terminalMessages = 0;
+            const timeout = setTimeout(() => {
+              worker.terminate();
+              reject(new Error(`TIFF Worker did not reach ${target}.`));
+            }, 10_000);
+            worker.onerror = () => {
+              clearTimeout(timeout);
+              worker.terminate();
+              reject(new Error(`TIFF Worker failed before ${target}.`));
+            };
+            worker.onmessage = (event) => {
+              if (event.data?.type === 'progress') {
+                stages.push(event.data.stage);
+                if (event.data.stage === target) {
+                  worker.terminate();
+                  setTimeout(() => {
+                    clearTimeout(timeout);
+                    resolve({ target, stages, terminalMessages });
+                  }, 100);
+                }
+                return;
+              }
+              terminalMessages += 1;
+            };
+            const input = Uint8Array.from(fixtureBytes).buffer;
+            worker.postMessage({ type: 'convert-tiff-to-png', input }, [input]);
+          });
+          if (
+            !observation.stages.includes(target) ||
+            observation.terminalMessages !== 0
+          ) {
+            throw new Error(
+              `TIFF Worker ${target} cancellation leaked a terminal response.`,
+            );
+          }
+          observations.push(observation);
+        }
+        return observations;
+      },
+      { workerUrl, fixtureBytes: bytes },
+    );
   }
 
   function runGoldenNegativePathProbe(toolId) {
@@ -1491,7 +1559,7 @@ try {
       if (tool.id === 'compress-svg') page.on('worker', onSvgWorker);
       const tiffWorkerUrls = [];
       const onTiffWorker = (worker) => tiffWorkerUrls.push(worker.url());
-      if (tool.id === 'tif-to-png' || tool.id === 'tiff-to-png') {
+      if (isTiffToPngToolId(tool.id)) {
         page.on('worker', onTiffWorker);
       }
       await hookBlobCapture(page);
@@ -1551,7 +1619,7 @@ try {
         tool.requiresFFmpeg ? 60000 : 20000,
       );
       if (tool.id === 'compress-svg') page.off('worker', onSvgWorker);
-      if (tool.id === 'tif-to-png' || tool.id === 'tiff-to-png') {
+      if (isTiffToPngToolId(tool.id)) {
         page.off('worker', onTiffWorker);
       }
       if (!blob?.size) {
@@ -1651,7 +1719,7 @@ try {
           ],
         };
       }
-      if (tool.id === 'tif-to-png' || tool.id === 'tiff-to-png') {
+      if (isTiffToPngToolId(tool.id)) {
         const semantic = await decodeImageSummary(
           page,
           await lastBlobBytes(page),
@@ -1674,13 +1742,19 @@ try {
             `${tool.id} output failed independent exact RGBA verification.`,
           );
         }
+        const tiffWorkerUrl = tiffWorkerUrls.at(-1);
         if (
-          !tiffWorkerUrls.some((url) =>
-            /tiff-to-png\.worker|tiff-to-png/i.test(url),
+          tiffWorkerUrls.length !== 1 ||
+          !tiffWorkerUrl ||
+          new URL(tiffWorkerUrl).origin !== new URL(page.url()).origin ||
+          !/\/_next\/static\/chunks\/[^/]+\.js$/.test(
+            new URL(tiffWorkerUrl).pathname,
           )
         ) {
           throw new Error(`${tool.id} did not load its dedicated TIFF Worker.`);
         }
+        const activeWorkerCancellation =
+          await proveActiveTiffWorkerCancellation(tiffWorkerUrl, fixture.path);
         return {
           detail: `verified TIFF pixels in PNG ${semantic.width}x${semantic.height}, ${blob.size} bytes`,
           metrics: {
@@ -1690,6 +1764,7 @@ try {
             height: semantic.height,
             rgbaSha256: semantic.rgbaSha256,
             workerUrls: tiffWorkerUrls,
+            activeWorkerCancellation,
           },
           checks: [
             'valid-fixture',

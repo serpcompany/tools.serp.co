@@ -1533,6 +1533,25 @@ test('file preflight rejects oversized input without reading it', async () => {
   assert.equal(reads, 0);
 });
 
+test('TIFF file preflight applies the family limit before reading', async () => {
+  let reads = 0;
+  const file = {
+    name: 'oversized.tiff',
+    type: 'image/tiff',
+    size: 32 * 1_024 * 1_024 + 1,
+    async arrayBuffer() {
+      reads += 1;
+      throw new Error('must not read');
+    },
+  } as unknown as File;
+
+  const outcome = await runGenericToolFile('tiff-to-png', file);
+  assert.equal(outcome.status, 'failed');
+  if (outcome.status === 'failed')
+    assert.equal(outcome.error.code, 'invalid-request');
+  assert.equal(reads, 0);
+});
+
 test('file acquisition cancellation returns promptly and cancels its reader', async () => {
   const controller = new AbortController();
   let cancelled = false;

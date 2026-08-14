@@ -1,11 +1,15 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import {
+  isTiffToPngToolId,
+  TIFF_TO_PNG_TOOL_IDS,
+} from '../apps/tools/lib/convert/tiff-family.mjs';
 
 import { proveTiffNegativePaths } from '../apps/tools/lib/tiff-negative-path-probe.ts';
 
 const toolId = process.argv[2];
-if (toolId !== 'tif-to-png' && toolId !== 'tiff-to-png') {
-  throw new TypeError('Expected tif-to-png or tiff-to-png.');
+if (!isTiffToPngToolId(toolId)) {
+  throw new TypeError(`Expected ${TIFF_TO_PNG_TOOL_IDS.join(' or ')}.`);
 }
 const fixtureDirectory = path.resolve(
   import.meta.dirname,

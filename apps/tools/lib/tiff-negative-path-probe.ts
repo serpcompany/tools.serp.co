@@ -4,6 +4,7 @@ import {
   type GenericWorkflowAdapters,
 } from './generic-tool-workflow.ts';
 import type { WorkflowOutcome } from './tool-workflow/index.ts';
+import type { TiffToolId } from './convert/tiff.ts';
 
 export const TIFF_NEGATIVE_PATH_CHECKS = Object.freeze([
   'malformed-input',
@@ -12,8 +13,6 @@ export const TIFF_NEGATIVE_PATH_CHECKS = Object.freeze([
   'no-delivery-on-failure',
   'cancellation-lifecycle',
 ] as const);
-
-export type TiffToolId = 'tif-to-png' | 'tiff-to-png';
 
 export async function proveTiffNegativePaths(
   toolId: TiffToolId,

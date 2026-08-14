@@ -34,8 +34,14 @@ import { verifyHeifIdentity } from './convert/heif.ts';
 import {
   convertTiffToPngWithWorker,
   inspectTiffHeader,
+  ownTiffWorkerTermination,
+  TIFF_TO_PNG_LIMITS,
   verifyTiffDecodedOutput,
 } from './convert/tiff.ts';
+import {
+  isTiffInputFormat,
+  TIFF_UPLOAD_ACCEPT,
+} from './convert/tiff-family.mjs';
 import { createServerActionRequestHeaders } from './server-action-client.ts';
 import { executionProvenance } from './tool-execution-provenance.ts';
 import {
@@ -177,7 +183,7 @@ export async function verifyGenericMediaSemantics(
     }
   }
   if (media.format === 'svg') return verifySvgBytes(media.bytes);
-  if (media.format === 'tif' || media.format === 'tiff') {
+  if (isTiffInputFormat(media.format)) {
     try {
       inspectTiffHeader(media.bytes);
       return { status: 'verified' as const };
@@ -409,15 +415,21 @@ function processorFor(
         maxInputBytes:
           contract.input.format === 'svg'
             ? SVG_COMPRESSION_LIMITS.maxBytes
-            : MAX_INPUT_BYTES,
+            : isTiffInputFormat(contract.input.format)
+              ? TIFF_TO_PNG_LIMITS.maxInputBytes
+              : MAX_INPUT_BYTES,
         maxOutputBytes:
           contract.output.format === 'svg'
             ? SVG_COMPRESSION_LIMITS.maxBytes
-            : MAX_OUTPUT_BYTES,
+            : isTiffInputFormat(contract.input.format)
+              ? TIFF_TO_PNG_LIMITS.maxOutputBytes
+              : MAX_OUTPUT_BYTES,
         maxTotalOutputBytes:
           contract.output.format === 'svg'
             ? SVG_COMPRESSION_LIMITS.maxBytes
-            : MAX_TOTAL_OUTPUT_BYTES,
+            : isTiffInputFormat(contract.input.format)
+              ? TIFF_TO_PNG_LIMITS.maxOutputBytes
+              : MAX_TOTAL_OUTPUT_BYTES,
       },
       outputCardinality: { min: 1, max: multiplePages ? 100 : 1 },
     },
@@ -540,7 +552,7 @@ function processorFor(
               message: 'SVG render-equivalence verifier is unavailable',
             };
       }
-      if (contract.input.format === 'tif' || contract.input.format === 'tiff') {
+      if (isTiffInputFormat(contract.input.format)) {
         return adapters.verifyTiffEquivalence
           ? adapters.verifyTiffEquivalence(result, { signal: context.signal })
           : {
@@ -652,10 +664,14 @@ const browserAdapters: GenericWorkflowAdapters = {
   },
   async convert({ from, to, bytes, quality, context }) {
     context.signal.throwIfAborted();
-    if ((from === 'tif' || from === 'tiff') && to === 'png') {
-      const worker = new Worker(
-        new URL('../workers/tiff-to-png.worker.js', import.meta.url),
-        { type: 'module' },
+    if (isTiffInputFormat(from) && to === 'png') {
+      const worker = ownTiffWorkerTermination(
+        new Worker(
+          new URL('../workers/tiff-to-png.worker.js', import.meta.url),
+          {
+            type: 'module',
+          },
+        ),
       );
       await context.registerWorker(worker);
       const result = await convertTiffToPngWithWorker({
@@ -959,7 +975,9 @@ export async function runGenericToolFile(
   const maxInputBytes =
     contract.input.format === 'svg'
       ? SVG_COMPRESSION_LIMITS.maxBytes
-      : MAX_INPUT_BYTES;
+      : isTiffInputFormat(contract.input.format)
+        ? TIFF_TO_PNG_LIMITS.maxInputBytes
+        : MAX_INPUT_BYTES;
   if (file.size > maxInputBytes) {
     return failedFileOutcome(
       'invalid-request',
@@ -1132,7 +1150,7 @@ async function resolveFileMimeType(
 
 export function getGenericAccept(from: string): string {
   if (from === 'jpg' || from === 'jpeg') return '.jpg,.jpeg';
-  if (from === 'tif' || from === 'tiff') return '.tif,.tiff';
+  if (isTiffInputFormat(from)) return TIFF_UPLOAD_ACCEPT;
   return `.${from}`;
 }
 

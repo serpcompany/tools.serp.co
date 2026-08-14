@@ -254,6 +254,8 @@ test('TIFF aliases require dedicated Worker and exact independent RGBA evidence'
   assert.match(genericWorkflowSource, /tiff-to-png\.worker/);
   assert.match(runnerSource, /rgbaSha256/);
   assert.match(runnerSource, /runTiffNegativePathProbe\(tool\.id\)/);
+  assert.match(runnerSource, /proveActiveTiffWorkerCancellation/);
+  assert.match(runnerSource, /terminalMessages !== 0/);
 });
 
 test('same-family MP4 to WebM browser proof independently decodes exact output', () => {

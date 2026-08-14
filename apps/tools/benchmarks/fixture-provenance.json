@@ -71,6 +71,70 @@
     "reproducibility": "deterministic pinned-library generator and exact truncation recipe; sha256 identifies the reviewed artifact",
     "sha256": "86d89331d7256aa6b4ea5a66e4297128eeee8e27fe261a9488303a66d7b14ad5"
   },
+  "fixtures/tiff/negative-associated-alpha.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5",
+    "description": "Classic 8-bit RGBA TIFF with associated alpha, rejected because the PNG contract requires unpremultiplied samples.",
+    "reproducibility": "deterministic pinned-library generator; sha256 identifies the reviewed artifact",
+    "sha256": "c4a2df492faec09d75459fff8f96d39340fa86218f36a9263a403ba27ba89f9c"
+  },
+  "fixtures/tiff/negative-decompression-expansion.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5; libtiff tiffcp 4.7.1",
+    "description": "Small Deflate TIFF whose 4096x4097 decoded RGBA allocation exceeds the 64 MiB family limit.",
+    "reproducibility": "deterministic zero raster plus recorded codec version; sha256 identifies the reviewed artifact",
+    "sha256": "51c4aa42a07bd95d9c4bf2a7d4c8dc9a7fe5b169231d8b4b961c229e3a067009"
+  },
+  "fixtures/tiff/negative-floating-point.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5",
+    "description": "Classic 32-bit floating-point grayscale TIFF outside the bounded 8-bit integer contract.",
+    "reproducibility": "deterministic pinned-library generator; sha256 identifies the reviewed artifact",
+    "sha256": "390606f17882c09941a08f74223585c4cec3ee44ba230d224b8588fc13fef348"
+  },
+  "fixtures/tiff/negative-oversized-dimension.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5",
+    "description": "Classic grayscale TIFF with a 16385-pixel dimension beyond the family limit.",
+    "reproducibility": "deterministic pinned-library generator; sha256 identifies the reviewed artifact",
+    "sha256": "b41bb132f47cf274aa4a41a8fe8b04e21b7aff53d58c9c907ab133ff17b665b1"
+  },
+  "fixtures/tiff/negative-strip-byte-count.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5",
+    "description": "Classic TIFF with a strip byte count extending beyond the input.",
+    "reproducibility": "deterministic pinned-library generation plus exact IFD mutation; sha256 identifies the reviewed artifact",
+    "sha256": "955c1846ba189eb3ee45a0da3df5d9de0391410547dc0dbc36c0f6abdefce949"
+  },
+  "fixtures/tiff/negative-strip-offset.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5",
+    "description": "Classic TIFF with a strip offset outside the input.",
+    "reproducibility": "deterministic pinned-library generation plus exact IFD mutation; sha256 identifies the reviewed artifact",
+    "sha256": "af186f8dbf3d02b8af87cea224266c21a34263b5d79fa22b16c2fd69b90414ed"
+  },
+  "fixtures/tiff/negative-truncated-strip.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5",
+    "description": "Classic TIFF truncated inside its final strip payload.",
+    "reproducibility": "deterministic pinned-library generation plus exact truncation; sha256 identifies the reviewed artifact",
+    "sha256": "78b62056b28214a29a665e559d2719598d95d710bec77a45d55ec78f3041aa60"
+  },
+  "fixtures/tiff/negative-unsupported-photometric.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5",
+    "description": "Classic 8-bit TIFF using a separated photometric layout outside the initial RGB, grayscale, and palette contract.",
+    "reproducibility": "deterministic pinned-library generator; sha256 identifies the reviewed artifact",
+    "sha256": "57424759c224ba612ad4293675474867628b8c425770b62d17f105ebc6bbdc9f"
+  },
   "fixtures/svg-compression-complex.svg": {
     "source": "repository-authored",
     "description": "Bounded safe SVG exercising gradients, clipping, identifier references, namespaces, accessibility text, and Unicode glyphs.",

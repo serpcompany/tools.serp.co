@@ -1,4 +1,4 @@
-import { convertTiffBytesToPng } from '../lib/convert/tiff';
+import { convertTiffBytesToPng } from '../lib/convert/tiff.ts';
 
 self.onmessage = async (event) => {
   if (event.data?.type !== 'convert-tiff-to-png') {

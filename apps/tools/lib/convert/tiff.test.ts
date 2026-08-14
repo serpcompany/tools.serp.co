@@ -12,6 +12,7 @@ import {
   decodeTiffToRgba,
   inspectTiffHeader,
   normalizeTiffRgb,
+  ownTiffWorkerTermination,
   verifyTiffDecodedOutput,
   validateTiffImageMetadata,
 } from './tiff.ts';
@@ -20,12 +21,22 @@ function classicTiffHeader(options: {
   byteOrder: 'big' | 'little';
   firstIfdOffset?: number;
 }) {
-  const bytes = new Uint8Array(8);
+  const bytes = new Uint8Array(39);
   const view = new DataView(bytes.buffer);
   const littleEndian = options.byteOrder === 'little';
   bytes.set(littleEndian ? [0x49, 0x49] : [0x4d, 0x4d]);
   view.setUint16(2, 42, littleEndian);
   view.setUint32(4, options.firstIfdOffset ?? 8, littleEndian);
+  view.setUint16(8, 2, littleEndian);
+  view.setUint16(10, 273, littleEndian);
+  view.setUint16(12, 4, littleEndian);
+  view.setUint32(14, 1, littleEndian);
+  view.setUint32(18, 38, littleEndian);
+  view.setUint16(22, 279, littleEndian);
+  view.setUint16(24, 4, littleEndian);
+  view.setUint32(26, 1, littleEndian);
+  view.setUint32(30, 1, littleEndian);
+  view.setUint32(34, 0, littleEndian);
   return bytes;
 }
 
@@ -42,6 +53,7 @@ test('TIFF to PNG keeps one exact alias family and bounded resource policy', () 
     maxDimension: 16_384,
     maxDecodedRgbaBytes: 64 * 1_024 * 1_024,
     maxOutputBytes: 64 * 1_024 * 1_024,
+    maxStorageSegments: 65_536,
     executionTimeoutMs: 10_000,
   });
 });
@@ -81,7 +93,7 @@ test('TIFF output equivalence rejects wrong dimensions and same-size wrong pixel
 
 test('TIFF worker client aborts by termination and suppresses late success', async () => {
   let terminated = 0;
-  const worker = {
+  const rawWorker = {
     onmessage: null as ((event: MessageEvent<unknown>) => void) | null,
     onerror: null as ((event: ErrorEvent) => void) | null,
     postMessage() {},
@@ -89,6 +101,7 @@ test('TIFF worker client aborts by termination and suppresses late success', asy
       terminated += 1;
     },
   } as unknown as Worker;
+  const worker = ownTiffWorkerTermination(rawWorker);
   const controller = new AbortController();
   const pending = convertTiffToPngWithWorker({
     worker,
@@ -111,6 +124,49 @@ test('TIFF worker client aborts by termination and suppresses late success', asy
     }),
   );
   assert.equal(terminated, 1);
+});
+
+test('TIFF worker client enforces the owned ten-second timeout and suppresses late success', async () => {
+  let terminated = 0;
+  let scheduledDelay = 0;
+  const originalSetTimeout = globalThis.setTimeout;
+  globalThis.setTimeout = ((callback: () => void, delay?: number) => {
+    scheduledDelay = Number(delay);
+    queueMicrotask(callback);
+    return 1 as unknown as NodeJS.Timeout;
+  }) as typeof setTimeout;
+  const rawWorker = {
+    onmessage: null as ((event: MessageEvent) => void) | null,
+    onerror: null,
+    postMessage() {},
+    terminate() {
+      terminated += 1;
+    },
+  } as unknown as Worker;
+  const worker = ownTiffWorkerTermination(rawWorker);
+  try {
+    const pending = convertTiffToPngWithWorker({
+      worker,
+      bytes: classicTiffHeader({ byteOrder: 'little' }),
+    });
+    await assert.rejects(pending, /execution timeout/i);
+    assert.equal(scheduledDelay, TIFF_TO_PNG_LIMITS.executionTimeoutMs);
+    assert.equal(terminated, 1);
+    worker.terminate();
+    assert.equal(terminated, 1);
+    worker.onmessage?.({
+      data: {
+        ok: true,
+        png: new ArrayBuffer(8),
+        width: 1,
+        height: 1,
+        sourceRgbaSha256: 'late',
+      },
+    } as MessageEvent);
+    assert.equal(terminated, 1);
+  } finally {
+    globalThis.setTimeout = originalSetTimeout;
+  }
 });
 
 test('TIFF worker termination owns cancellation during decode and encode', async () => {
@@ -215,12 +271,20 @@ test('owned endian, storage, compression, grayscale, RGB, and alpha fixtures dec
   }
 });
 
-test('owned BigTIFF, multipage, higher-depth, and truncated fixtures fail closed', async () => {
+test('owned TIFF identity, layout, offset, sample, and expansion fixtures fail closed', async () => {
   for (const name of [
+    'negative-associated-alpha.tiff',
     'negative-bigtiff.tiff',
+    'negative-decompression-expansion.tiff',
+    'negative-floating-point.tiff',
     'negative-higher-depth.tiff',
     'negative-multipage.tiff',
+    'negative-oversized-dimension.tiff',
+    'negative-strip-byte-count.tiff',
+    'negative-strip-offset.tiff',
     'negative-truncated-ifd.tiff',
+    'negative-truncated-strip.tiff',
+    'negative-unsupported-photometric.tiff',
   ]) {
     const bytes = new Uint8Array(
       readFileSync(
@@ -240,13 +304,16 @@ test('TIFF metadata fails closed before decoded raster allocation', () => {
       sampleFormat: [1, 1, 1],
       samplesPerPixel: 3,
       imageCount: 1,
+      photometricInterpretation: 2,
+      extraSamples: [],
     }),
-    { width: 2, height: 1, rgbaBytes: 8 },
+    { width: 2, height: 1, rgbaBytes: 8, pngUpperBound: 142 },
   );
 
   for (const metadata of [
     { width: 16_385, height: 1, bitsPerSample: [8], sampleFormat: [1] },
     { width: 4_096, height: 4_097, bitsPerSample: [8], sampleFormat: [1] },
+    { width: 4_096, height: 4_096, bitsPerSample: [8], sampleFormat: [1] },
     { width: 1, height: 1, bitsPerSample: [16], sampleFormat: [1] },
     { width: 1, height: 1, bitsPerSample: [8], sampleFormat: [3] },
     {
@@ -262,9 +329,63 @@ test('TIFF metadata fails closed before decoded raster allocation', () => {
         validateTiffImageMetadata({
           samplesPerPixel: 1,
           imageCount: 1,
+          photometricInterpretation: 1,
+          extraSamples: [],
           ...metadata,
         }),
       /unsupported|limit|single image/i,
+    );
+  }
+
+  assert.throws(
+    () =>
+      validateTiffImageMetadata({
+        width: 1,
+        height: 1,
+        bitsPerSample: [8, 8, 8, 8],
+        sampleFormat: [1, 1, 1, 1],
+        samplesPerPixel: 4,
+        imageCount: 1,
+        photometricInterpretation: 2,
+        extraSamples: [1],
+      }),
+    /associated alpha/i,
+  );
+  for (const metadata of [
+    { photometricInterpretation: 1, samplesPerPixel: 3 },
+    { photometricInterpretation: 2, samplesPerPixel: 1 },
+    { photometricInterpretation: 3, samplesPerPixel: 3 },
+  ]) {
+    assert.throws(
+      () =>
+        validateTiffImageMetadata({
+          width: 1,
+          height: 1,
+          bitsPerSample: Array(metadata.samplesPerPixel).fill(8),
+          sampleFormat: Array(metadata.samplesPerPixel).fill(1),
+          imageCount: 1,
+          extraSamples: [],
+          ...metadata,
+        }),
+      /photometric.*sample/i,
+    );
+  }
+  for (const metadata of [
+    { samplesPerPixel: 3, extraSamples: [2] },
+    { samplesPerPixel: 4, extraSamples: [2, 2] },
+  ]) {
+    assert.throws(
+      () =>
+        validateTiffImageMetadata({
+          width: 1,
+          height: 1,
+          bitsPerSample: Array(metadata.samplesPerPixel).fill(8),
+          sampleFormat: Array(metadata.samplesPerPixel).fill(1),
+          imageCount: 1,
+          photometricInterpretation: 2,
+          ...metadata,
+        }),
+      /ExtraSamples|alpha sample/i,
     );
   }
 });
@@ -316,4 +437,40 @@ test('TIFF preflight accepts classic endian variants and rejects unsafe identiti
       ),
     { message: /offset/i },
   );
+
+  const unsafeEntryCount = classicTiffHeader({ byteOrder: 'little' });
+  new DataView(unsafeEntryCount.buffer).setUint16(8, 257, true);
+  assert.throws(() => inspectTiffHeader(unsafeEntryCount), {
+    message: /entry count/i,
+  });
+
+  const unsafePayload = new Uint8Array(26);
+  unsafePayload.set(classicTiffHeader({ byteOrder: 'little' }).slice(0, 8));
+  const view = new DataView(unsafePayload.buffer);
+  view.setUint16(8, 1, true);
+  view.setUint16(10, 258, true);
+  view.setUint16(12, 3, true);
+  view.setUint32(14, 3, true);
+  view.setUint32(18, 24, true);
+  view.setUint32(22, 0, true);
+  assert.throws(() => inspectTiffHeader(unsafePayload), {
+    message: /payload/i,
+  });
+
+  const excessiveSegments = new Uint8Array(38 + 65_537 * 4);
+  excessiveSegments.set(classicTiffHeader({ byteOrder: 'little' }).slice(0, 8));
+  const segmentView = new DataView(excessiveSegments.buffer);
+  segmentView.setUint16(8, 2, true);
+  segmentView.setUint16(10, 273, true);
+  segmentView.setUint16(12, 4, true);
+  segmentView.setUint32(14, 65_537, true);
+  segmentView.setUint32(18, 38, true);
+  segmentView.setUint16(22, 279, true);
+  segmentView.setUint16(24, 4, true);
+  segmentView.setUint32(26, 65_537, true);
+  segmentView.setUint32(30, 38, true);
+  segmentView.setUint32(34, 0, true);
+  assert.throws(() => inspectTiffHeader(excessiveSegments), {
+    message: /segment count/i,
+  });
 });
