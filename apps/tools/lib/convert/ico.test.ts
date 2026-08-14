@@ -379,6 +379,44 @@ test('ICO preflight accepts a bounded PNG-backed 256px transparent entry', async
   assert.equal(result.height, 1);
 });
 
+test('ICO aggregate decoded RGBA is bounded by the entry and dimension limits', async () => {
+  const png = new Uint8Array(
+    await sharp({
+      create: {
+        width: ICO_TO_PNG_LIMITS.maxDimension,
+        height: ICO_TO_PNG_LIMITS.maxDimension,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    })
+      .png()
+      .toBuffer(),
+  );
+  const bytesPerEntry =
+    ICO_TO_PNG_LIMITS.maxDimension ** 2 * Uint32Array.BYTES_PER_ELEMENT;
+  assert.equal(
+    bytesPerEntry * ICO_TO_PNG_LIMITS.maxEntries,
+    ICO_TO_PNG_LIMITS.maxDecodedRgbaBytes,
+  );
+  assert.equal(
+    inspectIco(
+      icoWithPngEntries(
+        Array.from({ length: ICO_TO_PNG_LIMITS.maxEntries }, () => png),
+      ),
+    ).length,
+    ICO_TO_PNG_LIMITS.maxEntries,
+  );
+  assert.throws(
+    () =>
+      inspectIco(
+        icoWithPngEntries(
+          Array.from({ length: ICO_TO_PNG_LIMITS.maxEntries + 1 }, () => png),
+        ),
+      ),
+    /entry count/i,
+  );
+});
+
 test('ICO Worker cancellation terminates exactly once and ignores late output', async () => {
   let terminations = 0;
   let posted = false;
