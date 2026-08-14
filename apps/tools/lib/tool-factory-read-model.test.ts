@@ -95,7 +95,7 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
   );
 });
 
-test('executable changes mark prior retained evidence stale until refresh', () => {
+test('refreshed retained evidence projects verified for its exact inputs', () => {
   const row = buildToolFactoryReadModel().getByToolId('bmp-to-png');
 
   assert.ok(row);
@@ -107,7 +107,7 @@ test('executable changes mark prior retained evidence stale until refresh', () =
     row.verificationEvidence.map((evidence) => evidence.journeyId),
     ['bmp-to-png:upload'],
   );
-  assert.equal(row.verificationEvidence[0]?.state, 'stale');
+  assert.equal(row.verificationEvidence[0]?.state, 'verified');
   assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
 });
 
