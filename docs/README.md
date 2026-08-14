@@ -58,6 +58,7 @@ reusable claim against current code, current runbooks, and linked GitHub work.
 - [Downloader Lander content-upgrade retrospective](./audits/downloader-lander-content-upgrade-retrospective.md)
 - [FFmpeg Tool benchmark — 2026-01-20](./audits/ffmpeg-tools-benchmark-2026-01-20.md)
 - [Ignored local workflow inventory — 2026-08-11](./audits/ignored-local-inventory-2026-08-11.md)
+- [AVIF encode family prerequisite — 2026-08-15](./audits/avif-encode-family-prerequisite-2026-08-15.md)
 - [SVG compression family selection — 2026-08-14](./audits/svg-compression-family-selection-2026-08-14.md)
 - [SVG compression preview proof — 2026-08-14](./audits/svg-compression-preview-proof-2026-08-14.md)
 - [TIFF-to-PNG family selection — 2026-08-15](./audits/tiff-to-png-family-selection-2026-08-15.md)
