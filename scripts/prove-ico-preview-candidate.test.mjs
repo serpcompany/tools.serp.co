@@ -13,6 +13,7 @@ const fullRevision = 'a'.repeat(40);
 test('candidate proof accepts only an exact non-production preview target', () => {
   assert.deepEqual(
     parseIcoPreviewCandidateArguments([
+      '--',
       '--base-url',
       'https://tools-serp-co-wayfinder-preview.serpcompany.workers.dev',
       '--revision',

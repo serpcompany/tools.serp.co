@@ -22,14 +22,17 @@ export const ICO_CANDIDATE_TERMINATION_STAGES = Object.freeze([
 ]);
 
 export function parseIcoPreviewCandidateArguments(arguments_) {
+  const normalizedArguments =
+    arguments_[0] === '--' ? arguments_.slice(1) : arguments_;
   const options = { baseUrl: '', revision: '' };
-  for (let index = 0; index < arguments_.length; index += 1) {
+  for (let index = 0; index < normalizedArguments.length; index += 1) {
     const field = new Map([
       ['--base-url', 'baseUrl'],
       ['--revision', 'revision'],
-    ]).get(arguments_[index]);
-    if (!field) throw new Error(`Unknown argument ${arguments_[index]}`);
-    options[field] = arguments_[index + 1] ?? '';
+    ]).get(normalizedArguments[index]);
+    if (!field)
+      throw new Error(`Unknown argument ${normalizedArguments[index]}`);
+    options[field] = normalizedArguments[index + 1] ?? '';
     index += 1;
   }
   if (!/^https:\/\//.test(options.baseUrl)) {
