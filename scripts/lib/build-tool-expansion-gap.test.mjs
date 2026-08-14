@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { buildToolExpansionGapReadModel } from './build-tool-expansion-gap.mjs';
+import { toolAcceptanceClaims } from '../../apps/tools/lib/tool-acceptance-claims.ts';
 
 const baselineRevision = 'd3e6c4c44af0d0a6a8e243f4a4e61963bb838e87';
 
@@ -22,6 +23,18 @@ test('accepted baseline is accounted for once with exact gap partitions and sour
     unknown: 3,
   });
   assert.equal(new Set(projection.rows.map((row) => row.toolId)).size, 2_807);
+  assert.equal(
+    projection.rows.every((row) => {
+      const claim = toolAcceptanceClaims.getByToolId(row.toolId);
+      return (
+        row.acceptedDisposition === claim?.disposition &&
+        row.evidence.acceptanceClaim.disposition === claim.disposition &&
+        row.evidence.acceptanceClaim.reason === claim.reason &&
+        row.evidence.acceptanceClaim.sourcePointers === claim.sourcePointers
+      );
+    }),
+    true,
+  );
   assert.deepEqual(
     Object.fromEntries(
       projection.unsupportedGroups.byRenderer.map(({ key, count }) => [

@@ -48,6 +48,7 @@ real reusable contract justifies moving it into a package.
 | Retained Tool Journey verification evidence    | `apps/tools/lib/tool-verification-evidence.ts` and `docs/audits/tool-verification/retained-runs.json` | Owns per-journey result validation, required checks, applicability, input-based currentness, and immutable projections. Browser artifacts are promoted as sanitized source manifests; aggregate success, warning, skip, dirty, stale, incomplete, and mismatched evidence never become verified journeys. |
 | Server-native runtime availability             | `apps/tools/lib/server-native-capability.ts`                                                          | Cloudflare configuration projects native processors as unavailable; route entrypoints decide capability before dynamically loading an engine and return one structured 503 contract when unavailable.                                                                                                     |
 | Shared-workflow processor availability         | `apps/tools/lib/tool-processor-registry.ts`                                                           | Read-only Tool-id joins distinguish registered adapters, explicitly unwired Tools, and unknown provenance. Known engines do not imply shared-workflow wiring.                                                                                                                                             |
+| Processor acceptance claims                    | `apps/tools/lib/tool-acceptance-claims.ts`                                                            | Immutable exact Tool memberships, dispositions, reasons, source pointers, counts, and hashes derived from Catalog intent, processor availability, and explicit fail-closed contracts. This capability claim never implies verification, runtime health, deployment availability, or desirability.         |
 | Related applications and network brands        | JSON data under `packages/app-core/src/data`                                                          | These are separate catalogs and must not be inferred from Tool names or routes.                                                                                                                                                                                                                           |
 | Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                                               | Imports show actual consumption; planner fields do not override manifests or code.                                                                                                                                                                                                                        |
 | Production Worker configuration                | `apps/tools/wrangler.jsonc`                                                                           | Owns Worker name, route, bindings, compatibility settings, and production/preview resource ids.                                                                                                                                                                                                           |
@@ -121,6 +122,14 @@ boundary. Processor availability is a separate Tool-id projection: inferred
 provenance remains explicitly unwired until a production family migration
 registers an adapter, and neither support nor validator results become Catalog
 intent or runtime telemetry.
+
+The application-owned acceptance-claims module is the sole join that turns
+Catalog membership, processor availability, and explicit generic/table
+fail-closed policy into `supported`, `unsupported`, `unwired`, or `unknown`.
+Tool Factory and repository audit/planning harnesses consume its immutable
+memberships, reasons, source pointers, counts, and hashes rather than
+reconstructing that capability claim. Verification evidence, runtime
+observation, planning priority, and GitHub work remain separate projections.
 
 Browser lifecycle policy is owned by
 `apps/tools/lib/browser-workflow-lifecycle.ts`. Its small interface supplies

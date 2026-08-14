@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { buildToolFactoryReadModel } from './tool-factory-read-model.ts';
+import { toolAcceptanceClaims } from './tool-acceptance-claims.ts';
 
 test('Tool Factory read model accounts for every active Tool exactly once', () => {
   const model = buildToolFactoryReadModel();
@@ -14,6 +15,18 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
     unwired: 0,
     unknown: 3,
   });
+  assert.deepEqual(model.counts, toolAcceptanceClaims.counts);
+  assert.equal(
+    model.rows.every((row) => {
+      const claim = toolAcceptanceClaims.getByToolId(row.toolId);
+      return (
+        claim?.disposition === row.support.disposition &&
+        claim.reason === row.support.reason &&
+        claim.sourcePointers === row.support.sourcePointers
+      );
+    }),
+    true,
+  );
   assert.equal(
     model.rows.reduce((total, row) => total + row.journeys.length, 0),
     3_115,
@@ -80,7 +93,7 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
   );
 });
 
-test('registered family policy projects refreshed retained evidence as verified', () => {
+test('registered family policy projects retained evidence independently of capability', () => {
   const row = buildToolFactoryReadModel().getByToolId('bmp-to-png');
 
   assert.ok(row);
@@ -92,7 +105,7 @@ test('registered family policy projects refreshed retained evidence as verified'
     row.verificationEvidence.map((evidence) => evidence.journeyId),
     ['bmp-to-png:upload'],
   );
-  assert.equal(row.verificationEvidence[0]?.state, 'verified');
+  assert.equal(row.verificationEvidence[0]?.state, 'stale');
   assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
 });
 

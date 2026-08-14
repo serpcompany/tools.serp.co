@@ -14,6 +14,14 @@ const outputPath = path.join(
   repositoryRoot,
   'apps/tools/lib/tool-verification-inputs.generated.json',
 );
+const NON_EXECUTABLE_PROJECTION_FILES = new Set([
+  'apps/tools/lib/tool-acceptance-claims.ts',
+  'apps/tools/lib/tool-factory-read-model.ts',
+]);
+
+export function isToolExecutableVerificationInput(file) {
+  return !NON_EXECUTABLE_PROJECTION_FILES.has(file);
+}
 
 function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
@@ -92,7 +100,7 @@ export function buildToolVerificationInputs() {
     'packages/tool-telemetry/package.json',
     'packages/ui/package.json',
     'package.json',
-  ]);
+  ]).filter(isToolExecutableVerificationInput);
   const runnerFiles = trackedFiles([
     'scripts/run-browser-check.mjs',
     'scripts/run-artifacts.mjs',

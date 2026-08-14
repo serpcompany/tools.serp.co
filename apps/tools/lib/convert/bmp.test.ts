@@ -24,9 +24,7 @@ import {
   type GenericWorkflowAdapters,
 } from '../generic-tool-workflow.ts';
 import { getToolProcessorAvailability } from '../tool-processor-registry.ts';
-import { selectToolRenderer } from '../tool-renderer.ts';
-import { getTableOperationPolicy } from '../table-operation-policy.ts';
-import { summarizeToolAcceptance } from '../../../../scripts/lib/tool-acceptance-classification.mjs';
+import { toolAcceptanceClaims } from '../tool-acceptance-claims.ts';
 
 function generatedBmp(width = 8, height = 8): Uint8Array {
   const rowStride = Math.ceil((width * 3) / 4) * 4;
@@ -124,23 +122,16 @@ test('the approved BMP wave is exactly five IDs with a stable membership hash', 
 });
 
 test('the accepted processor projection includes BMP and the exact WebM wave', () => {
-  const summary = summarizeToolAcceptance(
-    toolCatalog.activeTools.map((tool) => ({
-      id: tool.id,
-      availabilityKind: getToolProcessorAvailability(tool.id).kind,
-      renderer: selectToolRenderer(tool),
-      genericContractState: getGenericToolContract(tool.id).state,
-      tablePolicyKind: getTableOperationPolicy(tool.id).kind,
-    })),
-  );
-  assert.deepEqual(summary.counts, {
+  assert.deepEqual(toolAcceptanceClaims.counts, {
     supported: 437,
     unsupported: 2_367,
     unwired: 0,
     unknown: 3,
   });
   assert.deepEqual(
-    summary.toolIds.supported.filter((id: string) => id.startsWith('bmp-to-')),
+    toolAcceptanceClaims.memberships.byDisposition.supported.toolIds.filter(
+      (id) => id.startsWith('bmp-to-'),
+    ),
     BMP_CONVERSION_TOOL_IDS,
   );
 });

@@ -16,7 +16,7 @@ import {
 } from '../../apps/tools/lib/tool-execution-provenance.ts';
 import { getToolProcessorAvailability } from '../../apps/tools/lib/tool-processor-registry.ts';
 import { selectToolRenderer } from '../../apps/tools/lib/tool-renderer.ts';
-import { classifyToolAcceptance } from './tool-acceptance-classification.mjs';
+import { toolAcceptanceClaims } from '../../apps/tools/lib/tool-acceptance-claims.ts';
 import {
   createMembership,
   createToolExpansionGapReadModel,
@@ -31,9 +31,9 @@ const SOURCES = Object.freeze({
   compressionDispatch: 'apps/tools/lib/compression-utils.ts',
   genericContract: 'apps/tools/lib/generic-tool-workflow.ts',
   tablePolicy: 'apps/tools/lib/table-operation-policy.ts',
+  acceptanceClaims: 'apps/tools/lib/tool-acceptance-claims.ts',
   planning: 'scripts/lib/build-tool-expansion-gap.mjs#planning-policy-v1',
 });
-const CURRENT_SUPPORTED_COUNT = 437;
 
 const audioFormats = new Set(AUDIO_FORMATS);
 const videoFormats = new Set(VIDEO_FORMATS);
@@ -333,14 +333,10 @@ function buildRow(tool) {
   const renderer = selectToolRenderer(tool);
   const availability = getToolProcessorAvailability(tool.id);
   const provenance = getToolExecutionProvenance(tool.id);
-  const genericContractState = getGenericToolContract(tool.id).state;
-  const tablePolicyKind = getTableOperationPolicy(tool.id).kind;
-  const disposition = classifyToolAcceptance({
-    availabilityKind: availability.kind,
-    renderer,
-    genericContractState,
-    tablePolicyKind,
-  });
+  const acceptance = toolAcceptanceClaims.getByToolId(tool.id);
+  if (!acceptance)
+    throw new TypeError(`Missing acceptance claim for ${tool.id}.`);
+  const disposition = acceptance.disposition;
   const exact = exactDispatchCapability(tool, renderer);
   const contract = contractEvidence(tool, renderer);
   const runtime = runtimeCompatibility(provenance);
@@ -361,6 +357,12 @@ function buildRow(tool) {
     toolId: tool.id,
     acceptedDisposition: disposition,
     evidence: {
+      acceptanceClaim: {
+        disposition: acceptance.disposition,
+        reason: acceptance.reason,
+        sourcePointers: acceptance.sourcePointers,
+        source: SOURCES.acceptanceClaims,
+      },
       catalogIntent: {
         operation: tool.operation,
         renderer,
@@ -435,7 +437,8 @@ function recommendation(id, title, rows, details) {
     title,
     ...membership,
     expectedCoverageDelta: membership.count,
-    expectedSupportedCount: CURRENT_SUPPORTED_COUNT + membership.count,
+    expectedSupportedCount:
+      toolAcceptanceClaims.counts.supported + membership.count,
     ...details,
     planningSource: SOURCES.planning,
   };
@@ -526,12 +529,7 @@ export function buildToolExpansionGapReadModel({
     baselineRevision,
     reproducerSourceRevision,
     rows,
-    expectedCounts: {
-      supported: CURRENT_SUPPORTED_COUNT,
-      unsupported: 2_367,
-      unwired: 0,
-      unknown: 3,
-    },
+    expectedCounts: toolAcceptanceClaims.counts,
     recommendations: buildRecommendations(rows),
     referenceData: {
       executionEngines: executionProvenance.engines.map((engine) => ({

@@ -2,14 +2,16 @@ import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
 
 import { resolveCompressionDispatch } from './compression-utils.ts';
 import { resolveConversionDispatch } from './convert/conversion-dispatch.ts';
-import { getGenericToolContract } from './generic-tool-contract.ts';
-import { getTableOperationPolicy } from './table-operation-policy.ts';
+import {
+  toolAcceptanceClaims,
+  type ToolAcceptanceClaim,
+  type ToolAcceptanceDisposition,
+} from './tool-acceptance-claims.ts';
 import {
   executionProvenance,
   getToolExecutionProvenance,
   type ExecutionProfile,
 } from './tool-execution-provenance.ts';
-import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
 import { toolJourneys, type ToolJourney } from './tool-journeys.ts';
 import {
@@ -22,11 +24,7 @@ import {
   type ToolJourneyEvidenceView,
 } from './tool-verification-evidence.ts';
 
-export type ToolSupportDisposition =
-  | 'supported'
-  | 'unsupported'
-  | 'unwired'
-  | 'unknown';
+export type ToolSupportDisposition = ToolAcceptanceDisposition;
 
 export type ToolFactoryRow = Readonly<{
   toolId: string;
@@ -51,6 +49,7 @@ export type ToolFactoryRow = Readonly<{
     disposition: ToolSupportDisposition;
     adapterId: string | null;
     reason: string | null;
+    sourcePointers: ToolAcceptanceClaim['sourcePointers'];
   }>;
   implementation: Readonly<{
     provenance: 'mapped' | 'unknown';
@@ -105,23 +104,6 @@ function deepFreeze<Value>(value: Value): Value {
     for (const child of Object.values(value)) deepFreeze(child);
   }
   return value;
-}
-
-function supportDisposition(
-  renderer: string,
-  availabilityKind: string,
-  genericContractState: string,
-  tablePolicyKind: string,
-): ToolSupportDisposition {
-  if (availabilityKind === 'wired') return 'supported';
-  if (
-    (renderer === 'generic' && genericContractState === 'unsupported') ||
-    (renderer === 'table' && tablePolicyKind === 'unsupported')
-  ) {
-    return 'unsupported';
-  }
-  if (availabilityKind === 'unknown') return 'unknown';
-  return 'unwired';
 }
 
 function processorFamily(
@@ -193,23 +175,17 @@ function buildRow(
   tool: (typeof toolCatalog.activeTools)[number],
 ): Omit<ToolFactoryRow, 'verificationEvidence' | 'githubWork'> {
   const renderer = selectToolRenderer(tool);
-  const availability = getToolProcessorAvailability(tool.id);
+  const acceptance = toolAcceptanceClaims.getByToolId(tool.id);
+  if (!acceptance) {
+    throw new TypeError(`Missing acceptance claim for ${tool.id}.`);
+  }
   const provenance = getToolExecutionProvenance(tool.id);
-  const genericContract = getGenericToolContract(tool.id);
-  const tablePolicy = getTableOperationPolicy(tool.id);
-  const disposition = supportDisposition(
-    renderer,
-    availability.kind,
-    genericContract.state,
-    tablePolicy.kind,
-  );
+  const disposition = acceptance.disposition;
   const runtime = runtimeRequirement(provenance);
-  const contractUnsupported =
-    (renderer === 'generic' && genericContract.state === 'unsupported') ||
-    (renderer === 'table' && tablePolicy.kind === 'unsupported');
+  const contractUnsupported = disposition === 'unsupported';
   const codes = attentionCodes({
     disposition,
-    hasRegisteredProcessor: availability.kind === 'wired',
+    hasRegisteredProcessor: acceptance.adapterId !== null,
     contractUnsupported,
     needsRuntimeProof:
       runtime.classification === 'declared-server-path-needs-environment-proof',
@@ -230,18 +206,6 @@ function buildRow(
           };
         })
       : [];
-  const supportReason =
-    availability.kind === 'wired'
-      ? null
-      : contractUnsupported
-        ? renderer === 'table'
-          ? tablePolicy.kind === 'unsupported'
-            ? tablePolicy.reason
-            : null
-          : genericContract.state === 'unsupported'
-            ? genericContract.reason
-            : null
-        : availability.reason;
   const verification =
     disposition === 'supported'
       ? {
@@ -285,8 +249,9 @@ function buildRow(
     journeys: toolJourneys.getByToolId(tool.id),
     support: {
       disposition,
-      adapterId: availability.kind === 'wired' ? availability.adapterId : null,
-      reason: supportReason,
+      adapterId: acceptance.adapterId,
+      reason: acceptance.reason,
+      sourcePointers: acceptance.sourcePointers,
     },
     implementation: {
       provenance: provenance.kind,
@@ -333,14 +298,7 @@ export function buildToolFactoryReadModel(): ToolFactoryReadModel {
   if (byId.size !== rows.length) {
     throw new TypeError('Tool Factory rows contain duplicate Tool ids.');
   }
-  const counts = {
-    supported: rows.filter((row) => row.support.disposition === 'supported')
-      .length,
-    unsupported: rows.filter((row) => row.support.disposition === 'unsupported')
-      .length,
-    unwired: rows.filter((row) => row.support.disposition === 'unwired').length,
-    unknown: rows.filter((row) => row.support.disposition === 'unknown').length,
-  };
+  const counts = toolAcceptanceClaims.counts;
   cachedModel = deepFreeze({
     rows,
     counts,
