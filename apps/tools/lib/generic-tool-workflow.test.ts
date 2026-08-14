@@ -200,13 +200,15 @@ test('TIFF to PNG aliases alone use the dedicated browser conversion contract', 
   }
 });
 
-test('ICO to PNG candidate stays unregistered until exact preview proof', () => {
+test('ICO to PNG uses the exact preview-proved candidate contract', () => {
   assert.deepEqual(resolveConversionDispatch('ico', 'png'), {
     kind: 'browser-ico-worker',
     engineIds: ['browser-ico-png-worker'],
   });
-  assert.equal(getGenericToolContract('ico-to-png').state, 'unsupported');
-  assert.equal(ICO_TO_PNG_CANDIDATE_CONTRACT.toolId, 'ico-to-png');
+  assert.equal(
+    getGenericToolContract('ico-to-png'),
+    ICO_TO_PNG_CANDIDATE_CONTRACT,
+  );
   for (const toolId of ['ico-to-jpg', 'ico-to-pdf', 'ico-to-webp']) {
     assert.equal(getGenericToolContract(toolId).state, 'unsupported', toolId);
   }
@@ -646,8 +648,10 @@ test('contract inventory independently audits real dispatches with semantic cove
     if (!tool.from || !tool.to) continue;
     const capability = resolveConversionCapability(tool.from, tool.to);
     const exactTiffFamily = ['tif-to-png', 'tiff-to-png'].includes(tool.id);
+    const exactIcoFamily = tool.id === 'ico-to-png';
     const expectedSupported =
       (exactTiffFamily ||
+        exactIcoFamily ||
         (capability.supported &&
           verifiedInputs.has(tool.from) &&
           verifiedOutputs.has(tool.to) &&
@@ -668,7 +672,7 @@ test('contract inventory independently audits real dispatches with semantic cove
               'bmp-to-webp',
             ].includes(tool.id)))) &&
       (!['tif', 'tiff'].includes(tool.from) || exactTiffFamily) &&
-      tool.from !== 'ico';
+      (tool.from !== 'ico' || exactIcoFamily);
     assert.equal(
       getGenericToolContract(tool.id).state === 'supported',
       expectedSupported,
@@ -1805,7 +1809,7 @@ test('TIFF file preflight applies the family limit before reading', async () => 
   assert.equal(reads, 0);
 });
 
-test('unregistered ICO route fails closed before reading candidate bytes', async () => {
+test('registered ICO route rejects oversized input before reading bytes', async () => {
   let reads = 0;
   const file = {
     name: 'oversized.ico',
@@ -1820,7 +1824,7 @@ test('unregistered ICO route fails closed before reading candidate bytes', async
   const outcome = await runGenericToolFile('ico-to-png', file);
   assert.equal(outcome.status, 'failed');
   if (outcome.status === 'failed') {
-    assert.equal(outcome.error.code, 'unsupported-tool');
+    assert.equal(outcome.error.code, 'invalid-request');
   }
   assert.equal(reads, 0);
 });

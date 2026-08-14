@@ -1,6 +1,6 @@
 import { TIFF_TO_PNG_TOOL_IDS } from '../../apps/tools/lib/convert/tiff-family.mjs';
 
-export const GENERIC_SMOKE_CAPABILITY_VERSION = 'generic-adapters-v7-tiff';
+export const GENERIC_SMOKE_CAPABILITY_VERSION = 'generic-adapters-v8-ico';
 
 const browserWebmToolIds = new Set([
   'compress-webm',
@@ -52,6 +52,7 @@ export function getGenericSmokeExpectation(tool) {
   const to = tool.to?.toLowerCase();
   if (browserWebmToolIds.has(tool.id)) return 'supported';
   if (browserTiffToolIds.has(tool.id)) return 'supported';
+  if (tool.id === 'ico-to-png') return 'supported';
   if (
     tool.id === 'compress-svg' &&
     tool.operation === 'compress' &&
