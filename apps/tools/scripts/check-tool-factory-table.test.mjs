@@ -115,7 +115,9 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /expectedGoldenPilot\.rows/);
   assert.match(source, /expected\.resultLabel/);
   assert.match(source, /expected\.remainingGap/);
-  assert.match(source, /expectedBmp\.resultLabel/);
+  assert.match(source, /detailEvidenceLabel\(expectedPng\.evidenceState\)/);
+  assert.match(source, /stale:\s*['"]Stale evidence['"]/);
+  assert.match(source, /detailEvidenceLabel\(expectedBmp\.evidenceState\)/);
   assert.match(source, /expectedBmp\.remainingGap/);
   assert.match(source, /expectedAudioNoEvidence/);
   assert.match(

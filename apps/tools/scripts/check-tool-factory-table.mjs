@@ -78,6 +78,19 @@ function deriveScreenshotPath(screenshot, label) {
   );
 }
 
+function detailEvidenceLabel(state) {
+  return {
+    verified: 'Verified journey',
+    incomplete: 'Passed checks · evidence incomplete',
+    failed: 'Failed controlled run',
+    warned: 'Warning · not verified',
+    skipped: 'Skipped · not verified',
+    stale: 'Stale evidence',
+    invalid: 'Invalid evidence',
+    'no-evidence': 'No retained evidence',
+  }[state];
+}
+
 const args = parseArgs(process.argv.slice(2));
 const screenshotPaths = {
   goldenPilot: deriveScreenshotPath(args.screenshot, 'golden-pilot'),
@@ -343,7 +356,7 @@ try {
   );
   assert.ok(expectedPng);
   await verificationSection
-    .getByText(expectedPng.resultLabel, { exact: false })
+    .getByText(detailEvidenceLabel(expectedPng.evidenceState), { exact: true })
     .first()
     .waitFor();
   await verificationSection
@@ -399,7 +412,7 @@ try {
   );
   assert.ok(expectedBmp);
   await bmpDialog
-    .getByText(expectedBmp.resultLabel, { exact: false })
+    .getByText(detailEvidenceLabel(expectedBmp.evidenceState), { exact: true })
     .first()
     .waitFor();
   await bmpDialog
