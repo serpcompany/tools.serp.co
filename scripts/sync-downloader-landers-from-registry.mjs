@@ -32,28 +32,20 @@ export async function synchronizeDownloaderRegistry({
     root,
     'packages/app-core/src/data/tools.json',
   );
-  const ownedPlannerPath = path.join(
-    root,
-    'docs/evidence/tool-planning/tools_planner.csv',
-  );
-  const [toolsSource, plannerSource] = await Promise.all([
-    fs.readFile(ownedToolsPath, 'utf8'),
-    fs.readFile(ownedPlannerPath, 'utf8'),
-  ]);
+  const toolsSource = await fs.readFile(ownedToolsPath, 'utf8');
   const plan = await planDownloaderRegistrySync({
     toolsSource,
-    plannerSource,
     registry,
     ...(verifyUrl === undefined ? {} : { verifyUrl }),
   });
 
   console.log(`Input authority: ${inputAuthority}`);
   console.log(
-    'Owned outputs: packages/app-core/src/data/tools.json, docs/evidence/tool-planning/tools_planner.csv',
+    'Owned output: packages/app-core/src/data/tools.json',
   );
   console.log(
     plan.newTools.length
-      ? `Proposed diff: add Tool ids ${plan.newTools.map((tool) => tool.id).join(', ')}; add ${plan.plannerRows.length} planner rows`
+      ? `Proposed diff: add Tool ids ${plan.newTools.map((tool) => tool.id).join(', ')}`
       : 'Proposed diff: no changes',
   );
   console.log(
@@ -62,7 +54,6 @@ export async function synchronizeDownloaderRegistry({
 
   if (write && plan.newTools.length) {
     await fs.writeFile(ownedToolsPath, plan.nextToolsSource);
-    await fs.writeFile(ownedPlannerPath, plan.nextPlannerSource);
   }
   console.log(
     write ? 'Write mode complete.' : 'Check mode: repository unchanged.',

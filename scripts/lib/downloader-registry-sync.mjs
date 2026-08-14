@@ -432,42 +432,6 @@ async function buildTool(entry, repoSlug, verifyUrl) {
   };
 }
 
-function csvCell(value) {
-  const stringValue = String(value ?? "");
-  if (!/[",\n\r]/.test(stringValue)) return stringValue;
-  return `"${stringValue.replace(/"/g, '""')}"`;
-}
-
-function parseCsvLine(line) {
-  const cells = [];
-  let cell = "";
-  let quoted = false;
-
-  for (let index = 0; index < line.length; index += 1) {
-    const character = line[index];
-    if (character === '"') {
-      if (quoted && line[index + 1] === '"') {
-        cell += '"';
-        index += 1;
-      } else {
-        quoted = !quoted;
-      }
-      continue;
-    }
-
-    if (character === "," && !quoted) {
-      cells.push(cell);
-      cell = "";
-      continue;
-    }
-
-    cell += character;
-  }
-
-  cells.push(cell);
-  return cells;
-}
-
 function escapeNonAscii(value) {
   return value.replace(/[^\x00-\x7F]/g, (character) => {
     const codePoint = character.codePointAt(0);
@@ -480,28 +444,6 @@ function escapeNonAscii(value) {
     const low = 0xdc00 + (offset & 0x3ff);
     return `\\u${high.toString(16).padStart(4, "0")}\\u${low.toString(16).padStart(4, "0")}`;
   });
-}
-
-function plannerRowForTool(tool) {
-  const sourceName = String(
-    tool.from ?? tool.name.replace(/\s+Video Downloader$/i, ""),
-  )
-    .trim()
-    .toLowerCase();
-  return [
-    `${sourceName} video downloader`,
-    "download",
-    tool.id,
-    "onsite-unverified",
-    "",
-    "",
-    "",
-    "Shared downloader template via registry-backed download route. Keyword-led downloader lander.",
-    "",
-    "",
-  ]
-    .map(csvCell)
-    .join(",");
 }
 
 function insertTools(tools, newTools) {
@@ -560,7 +502,6 @@ function validateRegistryAuthority(registry) {
 
 export async function planDownloaderRegistrySync({
   toolsSource,
-  plannerSource,
   registry,
   verifyUrl = checkUrl,
 }) {
@@ -602,32 +543,15 @@ export async function planDownloaderRegistrySync({
   if (!newTools.length) {
     return {
       newTools: [],
-      plannerRows: [],
       nextToolsSource: toolsSource,
-      nextPlannerSource: plannerSource,
     };
   }
 
   const nextTools = insertTools(tools, newTools);
   createOperationalToolCatalog(nextTools);
 
-  const plannerIds = new Set(
-    plannerSource
-      .split(/\r?\n/)
-      .map((line) => parseCsvLine(line)[2])
-      .filter(Boolean),
-  );
-  const plannerRows = newTools
-    .filter((tool) => !plannerIds.has(tool.id))
-    .map(plannerRowForTool);
-
-  const newline = plannerSource.endsWith("\n") ? "" : "\n";
   return {
     newTools,
-    plannerRows,
     nextToolsSource: `${escapeNonAscii(JSON.stringify(nextTools, null, 2))}\n`,
-    nextPlannerSource: plannerRows.length
-      ? `${plannerSource}${newline}${plannerRows.join("\n")}\n`
-      : plannerSource,
   };
 }
