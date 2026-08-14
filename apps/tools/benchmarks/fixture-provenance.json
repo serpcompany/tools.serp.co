@@ -13,9 +13,9 @@
   },
   "svg-compression-proof-scenarios.json": {
     "source": "repository-authored",
-    "description": "Canonical recipes and literals for malformed, truncated, active-content, resource-limit, processor-lie, timeout, active-optimization cancellation, and in-flight delivery cancellation proof scenarios.",
-    "reproducibility": "exact JSON is checked in; every generated scenario is named and bounded; sha256 identifies the complete scenario contract",
-    "sha256": "a997efb2356d51ed97a9dc3e65fc00825f998389459882eb1fd29cd52d59275a"
+    "description": "Provenance inventory of recipes and literals for malformed, truncated, active-content, resource-limit, processor-lie, timeout, active-optimization cancellation, and in-flight delivery cancellation scenarios; executable tests remain independently authored.",
+    "reproducibility": "exact JSON is checked in; every generated scenario is named and bounded; sha256 identifies the reviewed provenance inventory",
+    "sha256": "fe045ef2f768e46a2c4663b0c01ef8eaeb752aec1ece066724df1bbeeb730c4c"
   },
   "fixtures/sample-video-only.webm": {
     "source": "repository-generated",

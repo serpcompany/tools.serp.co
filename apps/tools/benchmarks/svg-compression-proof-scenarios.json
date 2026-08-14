@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Deterministic generated and injected scenarios used to prove the bounded compress-svg policy and lifecycle. Literal file fixtures are tracked separately in fixture-provenance.json.",
+  "description": "Provenance inventory for deterministic generated and injected scenarios used to prove the bounded compress-svg policy and lifecycle. Executable tests and probes remain independent owners; literal file fixtures are tracked separately in fixture-provenance.json.",
   "scenarios": {
     "malformed": {
       "kind": "utf8",
