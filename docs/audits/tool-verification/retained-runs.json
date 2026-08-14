@@ -34,7 +34,10 @@
                 "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
               },
               "invariantId": "generic-file-exact-output",
-              "checks": ["valid-fixture", "required-environment"],
+              "checks": [
+                "valid-fixture",
+                "required-environment"
+              ],
               "inputRevisions": {
                 "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
                 "fixture-content": "sha256:e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7",
@@ -47,7 +50,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         }
       ]
     },
@@ -90,7 +95,10 @@
                 "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
               },
               "invariantId": "generic-file-exact-output",
-              "checks": ["valid-fixture", "required-environment"],
+              "checks": [
+                "valid-fixture",
+                "required-environment"
+              ],
               "inputRevisions": {
                 "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
                 "fixture-content": "sha256:e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7",
@@ -103,7 +111,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         }
       ]
     },
@@ -190,7 +200,10 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute", "other-console-warning"]
+          "warnings": [
+            "adsense-script-attribute",
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "audio-to-transcript",
@@ -222,7 +235,10 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute", "other-console-warning"]
+          "warnings": [
+            "adsense-script-attribute",
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "batch-compress-png",
@@ -254,7 +270,10 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute", "webgl-driver-performance"]
+          "warnings": [
+            "adsense-script-attribute",
+            "webgl-driver-performance"
+          ]
         },
         {
           "toolId": "bmp-to-png",
@@ -286,7 +305,10 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute", "webgl-driver-performance"]
+          "warnings": [
+            "adsense-script-attribute",
+            "webgl-driver-performance"
+          ]
         },
         {
           "toolId": "compress-pdf",
@@ -319,7 +341,9 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute"]
+          "warnings": [
+            "adsense-script-attribute"
+          ]
         },
         {
           "toolId": "csv-to-json",
@@ -351,7 +375,9 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute"]
+          "warnings": [
+            "adsense-script-attribute"
+          ]
         },
         {
           "toolId": "pdf-reader",
@@ -423,7 +449,9 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute"]
+          "warnings": [
+            "adsense-script-attribute"
+          ]
         },
         {
           "toolId": "video-downloader",
@@ -455,7 +483,9 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute"]
+          "warnings": [
+            "adsense-script-attribute"
+          ]
         }
       ]
     },
@@ -544,7 +574,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "audio-to-transcript",
@@ -576,7 +608,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "batch-compress-png",
@@ -887,7 +921,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "audio-to-transcript",
@@ -919,7 +955,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "batch-compress-png",
@@ -2011,6 +2049,380 @@
                 "fixture-content": "sha256:4034376ea55dfe8d74ba30379b6c04b610f6a044d76f4ae566d00ffc23d7b1d2",
                 "journey-contract": "sha256:b864433f2ed682048ab05e521889a97e78b8569ef3c2ad5d5a831d50b9e57292",
                 "semantic-invariant": "sha256:0d3078a851588819b9371b043a222e66ce23341961533a066cf692762e15f23c",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "result": {
+      "status": "success"
+    }
+  },
+  {
+    "schemaVersion": 2,
+    "runId": "20260814T171957Z_4c684e0_pull-request_browser-smoke-preview-subset",
+    "command": {
+      "name": "smoke:tools:browser",
+      "version": "1"
+    },
+    "revision": {
+      "commit": "4c684e0561f0b967a0ba9124e6d11f955620101e",
+      "dirty": false
+    },
+    "timestamps": {
+      "startedAt": "2026-08-14T17:19:57.759Z",
+      "completedAt": "2026-08-14T17:20:29.180Z"
+    },
+    "environment": "pull-request",
+    "scope": {
+      "label": "browser-smoke-preview-subset",
+      "inputHashes": [
+        "sha256:4c12c9da53b09121e9de07b366e15ff98723000d647e574f5ce22d7c3e6a6451"
+      ],
+      "tools": [
+        {
+          "toolId": "audio-to-text",
+          "journeys": [
+            {
+              "journeyId": "audio-to-text:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "fixtures/transcription-speech.mp3",
+                "sha256": "91c7d12b2d16cf5a79aabaa2ece02db3ee22aa805b81296da0e5fc71f188743e"
+              },
+              "invariantId": "non-empty-transcript",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:4c2b3c0982ac3738b9bc56e626745fc11123af5583e6026a657110ac58e13e4f",
+                "fixture-content": "sha256:91c7d12b2d16cf5a79aabaa2ece02db3ee22aa805b81296da0e5fc71f188743e",
+                "journey-contract": "sha256:6f307b3e28027cb3c60e29cb7cf3eb0ed95091b83dcea69c3269f6c62fcff013",
+                "semantic-invariant": "sha256:e2ee5d9dd2d7476068a691d90a6f7a5dc1c9a9ce6025a4f182e4156cf0831644",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            },
+            {
+              "journeyId": "audio-to-text:extractor-url",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "literal",
+                "reference": "https://www.youtube.com/watch?v=3Is2P90qVa0",
+                "sha256": "cacf567127725adac1e440678ac15e00092203f302fe291b181f3b70493b3cc0"
+              },
+              "invariantId": "truthful-unsupported-terminal",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "no-delivery-on-failure",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:4fef38bf0cf04fd46d79df030af4eca8f9d04ada3a3ca69593174f2b1b241585",
+                "fixture-content": "sha256:cacf567127725adac1e440678ac15e00092203f302fe291b181f3b70493b3cc0",
+                "journey-contract": "sha256:63dcaa9eaa934041fa2320f1702a0bcec33529435b655c5a272f19943d90d32a",
+                "semantic-invariant": "sha256:725c67aba54ab93172430aa6184b8eac0935fa7c2419f3a861fd1cc8e9af4528",
+                "verification-policy": "sha256:f1b9c62cf18e23ccf1f16aa21e096a280b69b3181064a8611d151d1e012efc90",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "audio-to-transcript",
+          "journeys": [
+            {
+              "journeyId": "audio-to-transcript:direct-url",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "fixtures/transcription-speech.mp3",
+                "sha256": "91c7d12b2d16cf5a79aabaa2ece02db3ee22aa805b81296da0e5fc71f188743e"
+              },
+              "invariantId": "non-empty-transcript",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:a79c29f37c0809209e109ddbf358f1c6301d8ec563d61841ce4dfc15c432dc21",
+                "fixture-content": "sha256:91c7d12b2d16cf5a79aabaa2ece02db3ee22aa805b81296da0e5fc71f188743e",
+                "journey-contract": "sha256:66fefb6690536b0aed5a5fe5ae52c90ae275a376c673652029547952c8793ab6",
+                "semantic-invariant": "sha256:e2ee5d9dd2d7476068a691d90a6f7a5dc1c9a9ce6025a4f182e4156cf0831644",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "batch-compress-png",
+          "journeys": [
+            {
+              "journeyId": "batch-compress-png:multiple-file-upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "tools/batch-compress-png",
+                "sha256": "7c696f59964e148e52b1cf05fd64cf3ee4fae446d2f6da16fab70a098b744157"
+              },
+              "invariantId": "batch-archive-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:d84ab8fafcd7a42354b4e1d5bbdf5ae3582b00a49a2964a1ea222c8aea8e8ebb",
+                "fixture-content": "sha256:7c696f59964e148e52b1cf05fd64cf3ee4fae446d2f6da16fab70a098b744157",
+                "journey-contract": "sha256:fb353105f062acab416f1d7a6fb77907a84c5ba62e53319a88c24c72e620c7ae",
+                "semantic-invariant": "sha256:6b755af6fc88615161b19d09befc5febf5c601824715f844a455597c1edb3824",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "bmp-to-png",
+          "journeys": [
+            {
+              "journeyId": "bmp-to-png:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/bmp",
+                "sha256": "db921072e32024051205713c04333356fd72c251a9eec0439aca7a7fb2ac73f7"
+              },
+              "invariantId": "bmp-decoded-content-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:54ff8a171ea664dcfd040b113834b9b6533985254c77a6e724ec3049ba937fed",
+                "fixture-content": "sha256:db921072e32024051205713c04333356fd72c251a9eec0439aca7a7fb2ac73f7",
+                "journey-contract": "sha256:2676b262680d49e4aee3a728f253bd404736670007f80287e5473da6becf0318",
+                "semantic-invariant": "sha256:939954cbddd5095df65b0fa4174e7060254f0ea1991aa624858db74fae28124c",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "compress-pdf",
+          "journeys": [
+            {
+              "journeyId": "compress-pdf:upload",
+              "outcome": "warned",
+              "reasonCode": "browser-check-warning",
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/pdf",
+                "sha256": "31158c227972d9f85fd472be9bbc0a93334a04831e01cbe9ca0e4c250015e1a5"
+              },
+              "invariantId": "compressed-file-semantics",
+              "checks": [
+                "valid-fixture",
+                "no-delivery-on-failure",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:c7fa45b59f2de0201bdd5c4e5aef02eced6905a3b9a609caa794f72ff6515906",
+                "fixture-content": "sha256:31158c227972d9f85fd472be9bbc0a93334a04831e01cbe9ca0e4c250015e1a5",
+                "journey-contract": "sha256:5d54704da4211233e41e404414cd4da6c02919c51c4ddebff017f4819cf55a63",
+                "semantic-invariant": "sha256:b0b3c5cc0e4e09adfe66a56f586bda33817f2e7d7caafd9dd59a097671bca416",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "csv-to-json",
+          "journeys": [
+            {
+              "journeyId": "csv-to-json:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/csv",
+                "sha256": "0d87bbf1f24d5f98fabffecfb6e3fe98d7ed2e01b5c66224fd287bc0b480c0e2"
+              },
+              "invariantId": "table-row-header-value-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:f6e4d09def21266943d0d34cf7930c50638b07e4b7800edd380156a1f221a331",
+                "fixture-content": "sha256:0d87bbf1f24d5f98fabffecfb6e3fe98d7ed2e01b5c66224fd287bc0b480c0e2",
+                "journey-contract": "sha256:64b06b56613b883e35e7fc4eb2bfb3ecadd5dfdff93fb9fa3c8401118e70a255",
+                "semantic-invariant": "sha256:0d5b437dc758e60f76f8520823832d69ab3e98d6bf664a8aabe0ecbfe719de34",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "pdf-reader",
+          "journeys": [
+            {
+              "journeyId": "pdf-reader:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/pdf",
+                "sha256": "31158c227972d9f85fd472be9bbc0a93334a04831e01cbe9ca0e4c250015e1a5"
+              },
+              "invariantId": "specialized-output-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:c7fa45b59f2de0201bdd5c4e5aef02eced6905a3b9a609caa794f72ff6515906",
+                "fixture-content": "sha256:31158c227972d9f85fd472be9bbc0a93334a04831e01cbe9ca0e4c250015e1a5",
+                "journey-contract": "sha256:50df1c0e968bd3a85df30b264b6da6010b66c495ebba4af783bbf0d194ee54a4",
+                "semantic-invariant": "sha256:694a2092bca825a1368abf7751af4cddb3390f377d889bb50a0882ff5717155e",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "png-to-webp",
+          "journeys": [
+            {
+              "journeyId": "png-to-webp:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/png",
+                "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
+              },
+              "invariantId": "generic-file-exact-output",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
+                "fixture-content": "sha256:e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7",
+                "journey-contract": "sha256:123b486a465b48f1753968ce396bd3aaf5b67d3bb9382bccdb83039fad40ab4b",
+                "semantic-invariant": "sha256:4f9341350a479a7eebd610688604dd484827e0e04dc219fa314e3a4840b471a3",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+                "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
+                "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "video-downloader",
+          "journeys": [
+            {
+              "journeyId": "video-downloader:direct-url",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "tools/video-downloader",
+                "sha256": "b92d75ca17d1dfc61a5dc9f49f8afa855a496bb669a0cfbc93b445724b7b9fc3"
+              },
+              "invariantId": "url-stream-exact-output",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:9e08cbf3ce3344ad283e22a38e8823f8c35658d76b95c4a1d6ddb71e32afe387",
+                "fixture-content": "sha256:b92d75ca17d1dfc61a5dc9f49f8afa855a496bb669a0cfbc93b445724b7b9fc3",
+                "journey-contract": "sha256:e76c476aa0f200f7ae1e7edde41ca77e02ae7ad6a930da0218304d2509e6fe64",
+                "semantic-invariant": "sha256:569078faa2af5fd74c6eba8fd0b0ee6b31f27b6f72c763842901c6043c497f28",
                 "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
                 "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
                 "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
