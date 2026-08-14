@@ -249,6 +249,7 @@ test('SVG compression proof uses its dedicated Worker and independent DOM plus t
   assert.match(svgProofSource, /svg-compression-minimal\.svg/);
   assert.match(svgProofSource, /deterministic SVG output/);
   assert.match(svgProofSource, /SVG no-op output/);
+  assert.match(runnerSource, /retainBrowserCaptureWorkspace/);
 });
 
 test('Golden downloader and PNG to WebP checks retain exact or decoded fixture semantics', () => {
