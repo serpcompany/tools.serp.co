@@ -21,6 +21,17 @@ type SvgRenderVerificationPorts = Readonly<{
   ): Promise<Uint8ClampedArray>;
 }>;
 
+type SvgRasterImage = { src: string; decode(): Promise<void> };
+type SvgBrowserRasterPorts = Readonly<{
+  createObjectUrl(blob: Blob): string;
+  revokeObjectUrl(url: string): void;
+  createImage(): SvgRasterImage;
+  readPixels(
+    image: SvgRasterImage,
+    viewport: Readonly<{ width: number; height: number }>,
+  ): Uint8ClampedArray;
+}>;
+
 function inspectBrowserSvg(bytes: Uint8Array): SvgDocumentIdentity {
   const source = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
   const document = new DOMParser().parseFromString(source, 'image/svg+xml');
@@ -67,47 +78,59 @@ function inspectBrowserSvg(bytes: Uint8Array): SvgDocumentIdentity {
   };
 }
 
-async function rasterizeBrowserSvg(
+const defaultBrowserRasterPorts: SvgBrowserRasterPorts = {
+  createObjectUrl: (blob) => URL.createObjectURL(blob),
+  revokeObjectUrl: (url) => URL.revokeObjectURL(url),
+  createImage: () => new Image(),
+  readPixels(image, viewport) {
+    const canvas = new OffscreenCanvas(viewport.width, viewport.height);
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) throw new TypeError('SVG canvas context is unavailable.');
+    context.drawImage(
+      image as CanvasImageSource,
+      0,
+      0,
+      viewport.width,
+      viewport.height,
+    );
+    return context.getImageData(0, 0, viewport.width, viewport.height).data;
+  },
+};
+
+export async function rasterizeBrowserSvg(
   bytes: Uint8Array,
   viewport: Readonly<{ width: number; height: number }>,
   signal: AbortSignal,
+  ports: SvgBrowserRasterPorts = defaultBrowserRasterPorts,
 ): Promise<Uint8ClampedArray> {
   signal.throwIfAborted();
-  const pending = createImageBitmap(
+  const objectUrl = ports.createObjectUrl(
     new Blob([Uint8Array.from(bytes)], { type: 'image/svg+xml' }),
-    {
-      resizeWidth: viewport.width,
-      resizeHeight: viewport.height,
-      resizeQuality: 'high',
-    },
   );
+  const image = ports.createImage();
+  image.src = objectUrl;
+  const pending = image.decode();
+  void pending.catch(() => undefined);
   let rejectAbort: ((reason: unknown) => void) | undefined;
   const aborted = new Promise<never>((_resolve, reject) => {
     rejectAbort = reject;
   });
   const onAbort = () => {
+    image.src = '';
     rejectAbort?.(
       signal.reason ??
         new DOMException('The operation was aborted', 'AbortError'),
     );
-    void pending.then(
-      (lateBitmap) => lateBitmap.close(),
-      () => undefined,
-    );
   };
   signal.addEventListener('abort', onAbort, { once: true });
-  let bitmap: ImageBitmap | undefined;
   try {
-    bitmap = await Promise.race([pending, aborted]);
+    await Promise.race([pending, aborted]);
     signal.throwIfAborted();
-    const canvas = new OffscreenCanvas(viewport.width, viewport.height);
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-    if (!context) throw new TypeError('SVG canvas context is unavailable.');
-    context.drawImage(bitmap, 0, 0, viewport.width, viewport.height);
-    return context.getImageData(0, 0, viewport.width, viewport.height).data;
+    return ports.readPixels(image, viewport);
   } finally {
     signal.removeEventListener('abort', onAbort);
-    bitmap?.close();
+    image.src = '';
+    ports.revokeObjectUrl(objectUrl);
   }
 }
 

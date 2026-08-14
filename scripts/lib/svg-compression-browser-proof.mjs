@@ -120,12 +120,11 @@ async function inspectSvgRenderEquivalence(page, inputBytes, outputBytes) {
       };
       const render = async (source, viewport) => {
         const blob = new Blob([source], { type: 'image/svg+xml' });
-        const image = await createImageBitmap(blob, {
-          resizeWidth: viewport.width,
-          resizeHeight: viewport.height,
-          resizeQuality: 'high',
-        });
+        const url = URL.createObjectURL(blob);
+        const image = new Image();
+        image.src = url;
         try {
+          await image.decode();
           const canvas = new OffscreenCanvas(viewport.width, viewport.height);
           const context = canvas.getContext('2d', {
             willReadFrequently: true,
@@ -135,7 +134,8 @@ async function inspectSvgRenderEquivalence(page, inputBytes, outputBytes) {
           return context.getImageData(0, 0, viewport.width, viewport.height)
             .data;
         } finally {
-          image.close();
+          image.src = '';
+          URL.revokeObjectURL(url);
         }
       };
       const inputSource = decodeText(input);

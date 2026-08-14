@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { verifySvgRenderEquivalence } from './svg-render-verification.ts';
+import {
+  rasterizeBrowserSvg,
+  verifySvgRenderEquivalence,
+} from './svg-render-verification.ts';
 
 const bytes = (length: number) => new Uint8Array(length);
 const identity = {
@@ -109,4 +112,55 @@ test('SVG verification cancellation rejects without accepting late raster output
   while (!entered) await new Promise((resolve) => setTimeout(resolve, 0));
   controller.abort(new DOMException('Cancelled', 'AbortError'));
   await assert.rejects(pending, { name: 'AbortError' });
+});
+
+test('browser SVG rasterization revokes its object URL after decoded canvas pixels', async () => {
+  const image = { src: '', async decode() {} };
+  const revoked: string[] = [];
+  const result = await rasterizeBrowserSvg(
+    bytes(20),
+    { width: 320, height: 180 },
+    new AbortController().signal,
+    {
+      createObjectUrl: () => 'blob:svg-success',
+      revokeObjectUrl: (url) => revoked.push(url),
+      createImage: () => image,
+      readPixels: () => pixels(),
+    },
+  );
+  assert.deepEqual(result, pixels());
+  assert.equal(image.src, '');
+  assert.deepEqual(revoked, ['blob:svg-success']);
+});
+
+test('browser SVG rasterization abort clears its image and suppresses late decode', async () => {
+  const controller = new AbortController();
+  let finishDecode: (() => void) | undefined;
+  const image = {
+    src: '',
+    decode: () =>
+      new Promise<void>((resolve) => {
+        finishDecode = resolve;
+      }),
+  };
+  const revoked: string[] = [];
+  const pending = rasterizeBrowserSvg(
+    bytes(20),
+    { width: 320, height: 180 },
+    controller.signal,
+    {
+      createObjectUrl: () => 'blob:svg-cancelled',
+      revokeObjectUrl: (url) => revoked.push(url),
+      createImage: () => image,
+      readPixels: () => {
+        throw new Error('late delivery reached canvas');
+      },
+    },
+  );
+  controller.abort(new DOMException('Cancelled', 'AbortError'));
+  await assert.rejects(pending, { name: 'AbortError' });
+  finishDecode?.();
+  await Promise.resolve();
+  assert.equal(image.src, '');
+  assert.deepEqual(revoked, ['blob:svg-cancelled']);
 });

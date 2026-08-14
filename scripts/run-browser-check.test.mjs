@@ -239,7 +239,8 @@ test('SVG compression proof uses its dedicated Worker and independent DOM plus t
   assert.match(svgProofSource, /workerUrls\.length !== 1/);
   assert.match(svgProofSource, /\/_next\/static\/chunks\//);
   assert.match(svgProofSource, /new DOMParser\(\)/);
-  assert.match(svgProofSource, /createImageBitmap/);
+  assert.match(svgProofSource, /new Image\(\)/);
+  assert.match(svgProofSource, /URL\.revokeObjectURL/);
   assert.match(svgProofSource, /SVG_RENDER_VIEWPORTS/);
   assert.match(svgProofSource, /runNegativeProbe/);
   assert.match(svgProofSource, /compress-svg-success\.png/);
