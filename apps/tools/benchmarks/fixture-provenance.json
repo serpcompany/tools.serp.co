@@ -11,6 +11,12 @@
     "reproducibility": "exact UTF-8 source is checked in; sha256 identifies the artifact",
     "sha256": "0f2e29f33b5e6c0a11e2cfac55627bf78b7eff4e28f966c484ad02c224129590"
   },
+  "svg-compression-proof-scenarios.json": {
+    "source": "repository-authored",
+    "description": "Canonical recipes and literals for malformed, truncated, active-content, resource-limit, processor-lie, timeout, active-optimization cancellation, and in-flight delivery cancellation proof scenarios.",
+    "reproducibility": "exact JSON is checked in; every generated scenario is named and bounded; sha256 identifies the complete scenario contract",
+    "sha256": "a997efb2356d51ed97a9dc3e65fc00825f998389459882eb1fd29cd52d59275a"
+  },
   "fixtures/sample-video-only.webm": {
     "source": "repository-generated",
     "command": "ffmpeg -f lavfi -i color=c=black:s=320x240:r=25:d=1 -an -c:v libvpx -deadline best -cpu-used 0 -map_metadata -1 sample-video-only.webm",
