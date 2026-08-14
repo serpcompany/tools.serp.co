@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   ICO_CANDIDATE_TERMINATION_STAGES,
   ICO_CANDIDATE_EVIDENCE_ENVIRONMENT,
+  ICO_CANDIDATE_EMITTED_WORKER_TYPE,
   ICO_CANDIDATE_WORKER_MAX_BYTES,
   discoverIcoWorkerChunkId,
   parseIcoPreviewCandidateArguments,
@@ -61,6 +62,7 @@ test('candidate proof discovers the emitted worker chunk from compiled code', ()
 
 test('candidate proof fixes its worker and termination proof budgets', () => {
   assert.equal(ICO_CANDIDATE_EVIDENCE_ENVIRONMENT, 'pull-request');
+  assert.equal(ICO_CANDIDATE_EMITTED_WORKER_TYPE, 'classic');
   assert.equal(ICO_CANDIDATE_WORKER_MAX_BYTES, 128 * 1_024);
   assert.deepEqual(ICO_CANDIDATE_TERMINATION_STAGES, [
     'decode',

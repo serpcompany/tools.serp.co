@@ -16,6 +16,7 @@ const membership =
   'sha256:2e8404b30c9b954d51d697be77e5e3bc6faf8c9b3a5e942cfb75e56e86d4986e';
 export const ICO_CANDIDATE_WORKER_MAX_BYTES = 128 * 1_024;
 export const ICO_CANDIDATE_EVIDENCE_ENVIRONMENT = 'pull-request';
+export const ICO_CANDIDATE_EMITTED_WORKER_TYPE = 'classic';
 export const ICO_CANDIDATE_TERMINATION_STAGES = Object.freeze([
   'decode',
   'select',
@@ -117,7 +118,15 @@ export async function proveIcoPreviewCandidate(arguments_) {
 
     const proof = await page.evaluate(
       async (input) => {
-        const { fixtureBytes, terminationStages, workerMaxBytes } = input;
+        const {
+          emittedWorkerType,
+          fixtureBytes,
+          terminationStages,
+          workerMaxBytes,
+        } = input;
+        if (emittedWorkerType !== 'classic') {
+          throw new Error('ICO proof requires the emitted classic Worker.');
+        }
         const resources = performance
           .getEntriesByType('resource')
           .map((entry) => entry.name)
@@ -163,7 +172,10 @@ export async function proveIcoPreviewCandidate(arguments_) {
 
         const run = async (bytes, terminateStage) =>
           await new Promise((resolve, reject) => {
-            const worker = new Worker(workerUrl, { type: 'module' });
+            // Next emits Worker entrypoints as self-bootstrapping classic
+            // chunks, even when the application source uses a module Worker.
+            // Exercise the deployed asset using the same compiled contract.
+            const worker = new Worker(workerUrl);
             const stages = [];
             let terminalMessages = 0;
             const timeout = setTimeout(() => {
@@ -286,6 +298,7 @@ export async function proveIcoPreviewCandidate(arguments_) {
         };
       },
       {
+        emittedWorkerType: ICO_CANDIDATE_EMITTED_WORKER_TYPE,
         fixtureBytes: [...fixture],
         terminationStages: ICO_CANDIDATE_TERMINATION_STAGES,
         workerMaxBytes: ICO_CANDIDATE_WORKER_MAX_BYTES,
