@@ -80,7 +80,7 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
   );
 });
 
-test('registered family policy fail-closes retained evidence when executable inputs changed', () => {
+test('registered family policy projects refreshed retained evidence as verified', () => {
   const row = buildToolFactoryReadModel().getByToolId('bmp-to-png');
 
   assert.ok(row);
@@ -92,7 +92,7 @@ test('registered family policy fail-closes retained evidence when executable inp
     row.verificationEvidence.map((evidence) => evidence.journeyId),
     ['bmp-to-png:upload'],
   );
-  assert.equal(row.verificationEvidence[0]?.state, 'stale');
+  assert.equal(row.verificationEvidence[0]?.state, 'verified');
   assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
 });
 
