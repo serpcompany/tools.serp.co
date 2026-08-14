@@ -74,3 +74,17 @@ capability, correctness, health, or work state.
 - [OSS library and tool research backlog](./evidence/oss-library-research/README.md)
 - [Tool-planning exports](./evidence/tool-planning/README.md)
 - [SEO research exports](./evidence/seo-research/README.md)
+
+## Authority by concern
+
+| Concern                                    | Canonical owner                                               | Explicitly non-canonical                         |
+| ------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------ |
+| Published Tool identity and product intent | `packages/app-core/src/data/tools.json`                       | Planning and SEO CSV exports                     |
+| Implemented execution path                 | Application processor/Worker modules and execution provenance | Catalog copy or a fixture alone                  |
+| Current verified behavior                  | Retained Tool Journey evidence projected by Tool Factory      | Local artifacts, telemetry, and dated audits     |
+| Active work, blockers, and decisions       | GitHub Issues with native relationships                       | Repository plan documents and CSV status columns |
+| Historical research                        | Dated `docs/audits` and advisory `docs/evidence`              | Current operating guidance                       |
+
+CSV files under `docs/evidence` remain read-only research inputs until an
+explicit sync consumes them. Implementations must join on canonical Tool ids
+and must not write progress or verification state back into those exports.

@@ -49,6 +49,18 @@ image compression uses JSquash codecs; server image compression uses the
 route-specific Sharp, gifsicle, and SVGO paths; media compression uses FFmpeg;
 PDF compression uses Ghostscript and qpdf.
 
+`compress-svg` uses the dedicated module at `lib/svg-compression.ts`, the
+dedicated Worker at `workers/svg-compress.worker.js`, and exactly pinned
+`svgo@4.0.2`. The public workflow accepts at most 1 MiB, 10,000 elements, 64
+levels of nesting, and 50,000 attributes. Before and after optimization it
+rejects declarations, active elements and attributes, scriptable URLs,
+external resources, and unresolved execution surfaces. Aborting or reaching
+the 10-second execution deadline terminates the registered Worker and
+suppresses late delivery. Output is delivered only when independently valid;
+an output that is not smaller is returned and named honestly as unchanged.
+SVGO is an optimizer, not a sanitizer, so the application-owned inert-SVG
+policy remains mandatory even when upstream defaults change.
+
 Server-required conversion APIs share the server-action cooldown contract in
 `apps/tools/lib/server-action-contract.js`. Clients use
 `createServerActionRequestHeaders` so the persistent client id accompanies the

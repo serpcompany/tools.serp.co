@@ -17600,10 +17600,6 @@
           "url": "https://extensions.serp.co/extensions/serp/bongacams-downloader/"
         },
         {
-          "label": "Apify",
-          "url": "https://apify.com/serpxxx/bongacams-downloader/"
-        },
-        {
           "label": "ExtensionHub",
           "url": "https://www.extensionhub.io/extensions/Bongacams-Downloader-1262"
         },
@@ -32028,10 +32024,6 @@
           "url": "https://extensions.serp.co/extensions/serp/tnaflix-video-downloader/"
         },
         {
-          "label": "Apify",
-          "url": "https://apify.com/serpxxx/tnaflix-video-downloader/"
-        },
-        {
           "label": "ExtensionHub",
           "url": "https://www.extensionhub.io/extensions/TNAFlix-Downloader-1302"
         },
@@ -32449,8 +32441,7 @@
       },
       "productLinks": {
         "appsUrl": "https://apps.serp.co/twitch-video-downloader",
-        "serplyUrl": "https://serp.ly/twitch-video-downloader",
-        "githubRepoUrl": "https://github.com/serpapps/twitch-video-downloader"
+        "serplyUrl": "https://serp.ly/twitch-video-downloader"
       },
       "features": [
         "Download Twitch VODs at source quality by capturing HLS stream segments",
@@ -32499,10 +32490,6 @@
         {
           "label": "SERP Apps",
           "url": "https://apps.serp.co/twitch-video-downloader"
-        },
-        {
-          "label": "GitHub repository",
-          "url": "https://github.com/serpapps/twitch-video-downloader"
         },
         {
           "label": "SERP Extensions",
@@ -32660,8 +32647,7 @@
       },
       "productLinks": {
         "appsUrl": "https://apps.serp.co/twitter-video-downloader",
-        "serplyUrl": "https://serp.ly/twitter-downloader",
-        "githubRepoUrl": "https://github.com/serpapps/twitter-video-downloader"
+        "serplyUrl": "https://serp.ly/twitter-downloader"
       },
       "features": [
         "Inline download buttons appear on every video in your Twitter/X timeline automatically.",
@@ -32709,10 +32695,6 @@
         {
           "label": "SERP Apps",
           "url": "https://apps.serp.co/twitter-video-downloader"
-        },
-        {
-          "label": "GitHub repository",
-          "url": "https://github.com/serpapps/twitter-video-downloader"
         },
         {
           "label": "SERP Extensions",
@@ -36076,10 +36058,6 @@
         {
           "label": "SERP Extensions",
           "url": "https://extensions.serp.co/extensions/serp/youjizz-downloader/"
-        },
-        {
-          "label": "Apify",
-          "url": "https://apify.com/serpxxx/youjizz-downloader/"
         },
         {
           "label": "ExtensionHub",
