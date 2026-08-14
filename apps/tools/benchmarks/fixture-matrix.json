@@ -573,15 +573,15 @@
       "format": "tif",
       "status": "ready",
       "input": "file",
-      "fixture": "fixtures/sample.tif",
-      "notes": "Alias of TIFF fixture."
+      "fixture": "fixtures/tiff/rgb-little-stripped-none.tiff",
+      "notes": "Owned reproducible little-endian RGB TIFF with uncompressed strips."
     },
     {
       "format": "tiff",
       "status": "ready",
       "input": "file",
-      "fixture": "fixtures/sample.tiff",
-      "notes": "Add a real fixture for this format."
+      "fixture": "fixtures/tiff/rgb-big-tiled-lzw.tiff",
+      "notes": "Owned reproducible big-endian RGB TIFF with LZW-compressed tiled storage."
     },
     {
       "format": "ts",

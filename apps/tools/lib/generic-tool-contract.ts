@@ -6,6 +6,7 @@ import {
 import { resolveCompressionDispatch } from './compression-utils.ts';
 import { BMP_CONVERSION_TOOL_IDS } from './convert/bmp-contract.ts';
 import { resolveConversionCapability } from './convert/conversion-dispatch.ts';
+import { TIFF_TO_PNG_TOOL_IDS } from './convert/tiff.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
 
 const FORMAT_MIME_TYPES = Object.freeze({
@@ -20,6 +21,8 @@ const FORMAT_MIME_TYPES = Object.freeze({
   pdf: 'application/pdf',
   png: 'image/png',
   svg: 'image/svg+xml',
+  tif: 'image/tiff',
+  tiff: 'image/tiff',
   webp: 'image/webp',
   webm: 'video/webm',
 } satisfies Readonly<Record<string, string>>);
@@ -58,6 +61,7 @@ const SEMANTIC_OUTPUT_FORMATS = new Set([
   'webm',
 ]);
 const BMP_CONVERSION_TOOL_ID_SET = new Set<string>(BMP_CONVERSION_TOOL_IDS);
+const TIFF_TO_PNG_TOOL_ID_SET = new Set<string>(TIFF_TO_PNG_TOOL_IDS);
 const CLOUDFLARE_UNSUPPORTED_CONVERSIONS = new Set([
   'm4a->mp3',
   'mp3->m4a',
@@ -110,12 +114,13 @@ function supportedContract(tool: CatalogTool): GenericToolContract | undefined {
   if (!inputMimeType || !outputMimeType) return undefined;
 
   const exactConversion =
-    resolveConversionCapability(from, to).supported &&
-    SEMANTIC_INPUT_FORMATS.has(from) &&
-    SEMANTIC_OUTPUT_FORMATS.has(to) &&
-    ((from !== 'webm' && to !== 'webm') ||
-      BROWSER_WEBM_TOOL_ID_SET.has(tool.id)) &&
-    !CLOUDFLARE_UNSUPPORTED_CONVERSIONS.has(`${from}->${to}`);
+    (TIFF_TO_PNG_TOOL_ID_SET.has(tool.id) && to === 'png') ||
+    (resolveConversionCapability(from, to).supported &&
+      SEMANTIC_INPUT_FORMATS.has(from) &&
+      SEMANTIC_OUTPUT_FORMATS.has(to) &&
+      ((from !== 'webm' && to !== 'webm') ||
+        BROWSER_WEBM_TOOL_ID_SET.has(tool.id)) &&
+      !CLOUDFLARE_UNSUPPORTED_CONVERSIONS.has(`${from}->${to}`));
   const compression = resolveCompressionDispatch(from);
   const exactCompression =
     tool.operation === 'compress' &&

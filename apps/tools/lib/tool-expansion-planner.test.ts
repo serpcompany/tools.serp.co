@@ -12,7 +12,7 @@ test('expansion plan groups every explicitly unsupported Tool exactly once from 
     .map((row) => row.toolId)
     .sort();
 
-  assert.equal(plan.unsupportedToolCount, 2_367);
+  assert.equal(plan.unsupportedToolCount, 2_365);
   assert.deepEqual(
     plan.groups.flatMap((group) => group.toolIds).sort(),
     unsupportedToolIds,
@@ -111,7 +111,7 @@ test('portfolio groups expose client-first decision categories without treating 
 
   assert.equal(
     plan.groups.reduce((sum, group) => sum + group.unlockCount, 0),
-    2_367,
+    2_365,
   );
 });
 

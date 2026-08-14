@@ -11,6 +11,7 @@ export type ConversionDispatchKind =
   | 'browser-webm-ffmpeg'
   | 'browser-pdf-pages'
   | 'browser-raster'
+  | 'browser-tiff-worker'
   | 'server-assisted-image'
   | 'server-image';
 
@@ -141,6 +142,10 @@ const dispatchByKind = Object.freeze({
     kind: 'browser-raster',
     engineIds: Object.freeze(['browser-raster-worker']),
   }),
+  'browser-tiff-worker': Object.freeze({
+    kind: 'browser-tiff-worker',
+    engineIds: Object.freeze(['browser-tiff-png-worker']),
+  }),
   'server-assisted-image': Object.freeze({
     kind: 'server-assisted-image',
     engineIds: Object.freeze(['browser-raster-with-server-image-decode']),
@@ -159,6 +164,9 @@ export function resolveConversionDispatch(
   const toExt = to.toLowerCase();
   if (fromExt === 'ai' || fromExt === 'pdf') {
     return dispatchByKind['browser-pdf-pages'];
+  }
+  if ((fromExt === 'tif' || fromExt === 'tiff') && toExt === 'png') {
+    return dispatchByKind['browser-tiff-worker'];
   }
   if (SERVER_IMAGE_INPUTS.has(fromExt)) {
     return SERVER_IMAGE_OUTPUTS.has(toExt)

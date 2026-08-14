@@ -43,6 +43,7 @@
     "@zip.js/zip.js": "^2.7.72",
     "fast-xml-parser": "5.10.1",
     "ffmpeg-static": "^5.2.0",
+    "geotiff": "3.0.5",
     "ghostscript-node": "^1.5.0",
     "imagemin": "^9.0.1",
     "imagemin-gifsicle": "^7.0.0",

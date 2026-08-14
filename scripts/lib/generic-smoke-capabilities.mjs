@@ -1,4 +1,4 @@
-export const GENERIC_SMOKE_CAPABILITY_VERSION = 'generic-adapters-v6-svg';
+export const GENERIC_SMOKE_CAPABILITY_VERSION = 'generic-adapters-v7-tiff';
 
 const browserWebmToolIds = new Set([
   'compress-webm',
@@ -7,6 +7,7 @@ const browserWebmToolIds = new Set([
   'webm-to-mp3',
   'webm-to-mp4',
 ]);
+const browserTiffToolIds = new Set(['tif-to-png', 'tiff-to-png']);
 
 const imageInputs = new Set(['bmp', 'heic', 'jpeg', 'jpg', 'png', 'webp']);
 const imageOutputs = new Set(['jpeg', 'jpg', 'pdf', 'png', 'webp']);
@@ -48,6 +49,7 @@ export function getGenericSmokeExpectation(tool) {
   const from = tool.from?.toLowerCase();
   const to = tool.to?.toLowerCase();
   if (browserWebmToolIds.has(tool.id)) return 'supported';
+  if (browserTiffToolIds.has(tool.id)) return 'supported';
   if (
     tool.id === 'compress-svg' &&
     tool.operation === 'compress' &&

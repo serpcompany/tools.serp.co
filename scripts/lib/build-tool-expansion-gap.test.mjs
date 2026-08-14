@@ -17,8 +17,8 @@ test('accepted baseline is accounted for once with exact gap partitions and sour
     'sha256:fadb77ac2e1c68c14863a3ebd4ca43cde6692e9bde72bfacaf1026b8baeda030',
   );
   assert.deepEqual(projection.portfolio.counts, {
-    supported: 437,
-    unsupported: 2_367,
+    supported: 439,
+    unsupported: 2_365,
     unwired: 0,
     unknown: 3,
   });
@@ -47,7 +47,7 @@ test('accepted baseline is accounted for once with exact gap partitions and sour
         count,
       ]),
     ),
-    { generic: 2308, table: 59 },
+    { generic: 2306, table: 59 },
   );
   assert.equal(
     projection.rows.filter(
@@ -55,7 +55,7 @@ test('accepted baseline is accounted for once with exact gap partitions and sour
         row.acceptedDisposition === 'unsupported' &&
         row.evidence.catalogIntent.operation === 'convert',
     ).length,
-    2_349,
+    2_347,
   );
   assert.equal(
     projection.rows.filter(
@@ -119,8 +119,8 @@ test('planning remains visibly separate and recommends three bounded exact-membe
       },
       {
         id: 'server-image-exact-capability',
-        count: 80,
-        expectedCoverageDelta: 80,
+        count: 78,
+        expectedCoverageDelta: 78,
       },
     ],
   );

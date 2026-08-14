@@ -89,6 +89,9 @@ function adapters(output: Uint8Array): GenericWorkflowAdapters & {
     async verifySvgEquivalence() {
       return { status: 'verified' };
     },
+    async verifyTiffEquivalence() {
+      return { status: 'verified' };
+    },
     async deliver(result) {
       delivered.push(result.name);
       return `delivery-${delivered.length}`;
@@ -140,6 +143,60 @@ test('known production dispatches retain exact generic workflow contracts', () =
   ]) {
     assert.equal(getGenericToolContract(toolId).state, 'unsupported', toolId);
   }
+});
+
+test('TIFF to PNG aliases alone use the dedicated browser conversion contract', () => {
+  for (const toolId of ['tif-to-png', 'tiff-to-png']) {
+    assert.deepEqual(getGenericToolContract(toolId), {
+      state: 'supported',
+      toolId,
+      adapterId: 'generic-conversion',
+      operation: 'convert',
+      input: {
+        format: toolId.startsWith('tiff-') ? 'tiff' : 'tif',
+        mimeType: 'image/tiff',
+      },
+      output: { format: 'png', mimeType: 'image/png' },
+    });
+  }
+  for (const toolId of [
+    'tif-to-jpg',
+    'tif-to-webp',
+    'tiff-to-jpg',
+    'tiff-to-pdf',
+    'tiff-to-webp',
+  ]) {
+    assert.equal(getGenericToolContract(toolId).state, 'unsupported', toolId);
+  }
+});
+
+test('TIFF workflow rejects wrong pixels before delivery', async () => {
+  let deliveries = 0;
+  const base = adapters(fixture('sample.png'));
+  const workflow = createGenericToolWorkflow({
+    ...base,
+    async verifyTiffEquivalence() {
+      return { status: 'rejected', message: 'pixels differ' };
+    },
+    async deliver() {
+      deliveries += 1;
+      return 'unexpected';
+    },
+  });
+  const outcome = await workflow.run({
+    toolId: 'tiff-to-png',
+    input: {
+      kind: 'file',
+      media: {
+        name: 'sample.tiff',
+        format: 'tiff',
+        mimeType: 'image/tiff',
+        bytes: fixture('sample.tiff'),
+      },
+    },
+  });
+  assert.equal(outcome.status, 'failed');
+  assert.equal(deliveries, 0);
 });
 
 test('the browser WebM family adds MP4 to WebM through the existing exact contract', async () => {
@@ -426,6 +483,8 @@ test('contract inventory independently audits real dispatches with semantic cove
     'mp4',
     'pdf',
     'png',
+    'tif',
+    'tiff',
     'webp',
     'webm',
   ]);
@@ -452,23 +511,29 @@ test('contract inventory independently audits real dispatches with semantic cove
   )) {
     if (!tool.from || !tool.to) continue;
     const capability = resolveConversionCapability(tool.from, tool.to);
+    const exactTiffFamily = ['tif-to-png', 'tiff-to-png'].includes(tool.id);
     const expectedSupported =
-      capability.supported &&
-      verifiedInputs.has(tool.from) &&
-      verifiedOutputs.has(tool.to) &&
-      !cloudflareInoperableMediaRoutes.has(tool.id) &&
-      ((tool.from !== 'webm' && tool.to !== 'webm') ||
-        ['mp4-to-webm', 'webm-to-m4a', 'webm-to-mp3', 'webm-to-mp4'].includes(
-          tool.id,
-        )) &&
-      (tool.from !== 'bmp' ||
-        [
-          'bmp-to-jpeg',
-          'bmp-to-jpg',
-          'bmp-to-pdf',
-          'bmp-to-png',
-          'bmp-to-webp',
-        ].includes(tool.id));
+      (exactTiffFamily ||
+        (capability.supported &&
+          verifiedInputs.has(tool.from) &&
+          verifiedOutputs.has(tool.to) &&
+          !cloudflareInoperableMediaRoutes.has(tool.id) &&
+          ((tool.from !== 'webm' && tool.to !== 'webm') ||
+            [
+              'mp4-to-webm',
+              'webm-to-m4a',
+              'webm-to-mp3',
+              'webm-to-mp4',
+            ].includes(tool.id)) &&
+          (tool.from !== 'bmp' ||
+            [
+              'bmp-to-jpeg',
+              'bmp-to-jpg',
+              'bmp-to-pdf',
+              'bmp-to-png',
+              'bmp-to-webp',
+            ].includes(tool.id)))) &&
+      (!['tif', 'tiff'].includes(tool.from) || exactTiffFamily);
     assert.equal(
       getGenericToolContract(tool.id).state === 'supported',
       expectedSupported,
@@ -511,6 +576,8 @@ test('every supported generic contract resolves a processor through workflow.run
     pdf: 'sample.pdf',
     png: 'sample.png',
     svg: 'svg-compression-complex.svg',
+    tif: 'sample.tif',
+    tiff: 'sample.tiff',
     webp: 'sample.webp',
     webm: 'sample.webm',
   } as const;
@@ -572,6 +639,8 @@ test('every supported generic contract resolves a processor through workflow.run
     pdf: 'sample.pdf',
     png: 'sample.png',
     svg: 'svg-compression-complex.svg',
+    tif: 'sample.tif',
+    tiff: 'sample.tiff',
     webp: 'sample.webp',
     webm: 'sample.webm',
   } as const;

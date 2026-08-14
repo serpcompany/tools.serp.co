@@ -123,8 +123,8 @@ test('the approved BMP wave is exactly five IDs with a stable membership hash', 
 
 test('the accepted processor projection includes BMP and the exact WebM wave', () => {
   assert.deepEqual(toolAcceptanceClaims.counts, {
-    supported: 437,
-    unsupported: 2_367,
+    supported: 439,
+    unsupported: 2_365,
     unwired: 0,
     unknown: 3,
   });

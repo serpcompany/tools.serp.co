@@ -1,4 +1,76 @@
 {
+  "fixtures/tiff/grayscale-little-stripped-deflate.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5; libtiff tiffcp 4.7.1",
+    "description": "16x16 classic little-endian grayscale TIFF using stripped Deflate storage.",
+    "reproducibility": "deterministic repository generator plus pinned decoder and recorded libtiff version; sha256 identifies the reviewed artifact",
+    "sha256": "fde59f99b4bc199b6b72e098b97fa9cbfc3b3d11a85c08a35a478054e8912f62"
+  },
+  "fixtures/tiff/palette-little-stripped-lzw.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5; libtiff tiffcp 4.7.1; ImageMagick 7.1.2-8",
+    "description": "256x1 classic little-endian 8-bit palette TIFF using LZW-compressed strips.",
+    "reproducibility": "deterministic repository generator plus pinned decoder and recorded codec versions; sha256 identifies the reviewed artifact",
+    "sha256": "575883fac174c682bb434e11df72f426a098a0763f4d86f316a647a4bc57b83b"
+  },
+  "fixtures/tiff/rgb-big-tiled-lzw.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5; libtiff tiffcp 4.7.1",
+    "description": "16x16 classic big-endian RGB TIFF using one LZW-compressed tile.",
+    "reproducibility": "deterministic repository generator plus pinned decoder and recorded libtiff version; sha256 identifies the reviewed artifact",
+    "sha256": "00c6ced34fad8d1ef2f6936a1417df086c48141b8b3de7724c85216c4a578935"
+  },
+  "fixtures/tiff/rgb-little-stripped-none.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5; libtiff tiffcp 4.7.1",
+    "description": "16x16 classic little-endian RGB TIFF using uncompressed strips.",
+    "reproducibility": "deterministic repository generator plus pinned decoder and recorded libtiff version; sha256 identifies the reviewed artifact",
+    "sha256": "189d24c0d539000a09f76266a29dfbf988e4a2187b94840d203a8f32b937fe96"
+  },
+  "fixtures/tiff/rgba-big-stripped-none.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5; libtiff tiffcp 4.7.1",
+    "description": "16x16 classic big-endian RGBA TIFF with unassociated alpha and uncompressed strips.",
+    "reproducibility": "deterministic repository generator plus pinned decoder and recorded libtiff version; sha256 identifies the reviewed artifact",
+    "sha256": "fb4302156738c855fafdfc200c9fa203cdee9368854586ae09bb4c2f9bedabf0"
+  },
+  "fixtures/tiff/negative-bigtiff.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5; libtiff tiffcp 4.7.1",
+    "description": "BigTIFF identity fixture that the bounded classic-TIFF contract rejects.",
+    "reproducibility": "deterministic repository generator and recorded codec version; sha256 identifies the reviewed artifact",
+    "sha256": "0d3aa848a28b2f760342965f3858c4c4065ab7490d5c970929f544f4b0a7e53c"
+  },
+  "fixtures/tiff/negative-higher-depth.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5",
+    "description": "Classic 16-bit integer TIFF that the initial 8-bit contract rejects before raster allocation.",
+    "reproducibility": "deterministic pinned-library generator; sha256 identifies the reviewed artifact",
+    "sha256": "8433e14083fbe1395aa8a627eb12f4122a213f4294a894d934f793c8daeb3925"
+  },
+  "fixtures/tiff/negative-multipage.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5; libtiff tiffcp 4.7.1",
+    "description": "Two-image classic TIFF that the singular PNG Tool rejects instead of discarding a page.",
+    "reproducibility": "deterministic repository generator and recorded codec version; sha256 identifies the reviewed artifact",
+    "sha256": "643fa0c0fbd7d24658cbd4b401fbd1c33b0729fa5a842433f4f1b3c1476274a9"
+  },
+  "fixtures/tiff/negative-truncated-ifd.tiff": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-tiff-fixtures.mjs",
+    "toolVersions": "geotiff 3.0.5",
+    "description": "Classic TIFF truncated inside its first IFD for parser fail-closed coverage.",
+    "reproducibility": "deterministic pinned-library generator and exact truncation recipe; sha256 identifies the reviewed artifact",
+    "sha256": "86d89331d7256aa6b4ea5a66e4297128eeee8e27fe261a9488303a66d7b14ad5"
+  },
   "fixtures/svg-compression-complex.svg": {
     "source": "repository-authored",
     "description": "Bounded safe SVG exercising gradients, clipping, identifier references, namespaces, accessibility text, and Unicode glyphs.",

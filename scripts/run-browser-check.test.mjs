@@ -19,6 +19,10 @@ const svgProofSource = readFileSync(
   new URL('./lib/svg-compression-browser-proof.mjs', import.meta.url),
   'utf8',
 );
+const genericWorkflowSource = readFileSync(
+  new URL('../apps/tools/lib/generic-tool-workflow.ts', import.meta.url),
+  'utf8',
+);
 
 function runLocalBrowserFixture(t, { mode = 'smoke', envOverrides = {} } = {}) {
   const artifactRoot = mkdtempSync(
@@ -104,7 +108,7 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
   assert.match(runnerSource, /safe failure/i);
   assert.doesNotMatch(runnerSource, /data-generic-contract/);
   assert.match(runnerSource, /getGenericSmokeExpectation/);
-  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v6-svg');
+  assert.equal(GENERIC_SMOKE_CAPABILITY_VERSION, 'generic-adapters-v7-tiff');
   assert.equal(
     getGenericSmokeExpectation({
       id: 'compress-svg',
@@ -224,6 +228,32 @@ test('smoke treats the truthful generic unsupported outcome as safe failure', ()
     }),
     'unsupported',
   );
+});
+
+test('TIFF aliases require dedicated Worker and exact independent RGBA evidence', () => {
+  for (const id of ['tif-to-png', 'tiff-to-png']) {
+    assert.equal(
+      getGenericSmokeExpectation({
+        id,
+        from: id.startsWith('tiff-') ? 'tiff' : 'tif',
+        to: 'png',
+        operation: 'convert',
+      }),
+      'supported',
+    );
+  }
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: 'tiff-to-jpg',
+      from: 'tiff',
+      to: 'jpg',
+      operation: 'convert',
+    }),
+    'unsupported',
+  );
+  assert.match(genericWorkflowSource, /tiff-to-png\.worker/);
+  assert.match(runnerSource, /rgbaSha256/);
+  assert.match(runnerSource, /runTiffNegativePathProbe\(tool\.id\)/);
 });
 
 test('same-family MP4 to WebM browser proof independently decodes exact output', () => {

@@ -31,6 +31,11 @@ import {
   type GenericToolContract,
 } from './generic-tool-contract.ts';
 import { verifyHeifIdentity } from './convert/heif.ts';
+import {
+  convertTiffToPngWithWorker,
+  inspectTiffHeader,
+  verifyTiffDecodedOutput,
+} from './convert/tiff.ts';
 import { createServerActionRequestHeaders } from './server-action-client.ts';
 import { executionProvenance } from './tool-execution-provenance.ts';
 import {
@@ -89,6 +94,10 @@ export type GenericWorkflowAdapters = Readonly<{
   ): Promise<SemanticVerification>;
   verifySvgEquivalence?(
     input: WorkflowMedia,
+    output: WorkflowMedia,
+    context: Readonly<{ signal: AbortSignal }>,
+  ): Promise<SemanticVerification>;
+  verifyTiffEquivalence?(
     output: WorkflowMedia,
     context: Readonly<{ signal: AbortSignal }>,
   ): Promise<SemanticVerification>;
@@ -168,6 +177,17 @@ export async function verifyGenericMediaSemantics(
     }
   }
   if (media.format === 'svg') return verifySvgBytes(media.bytes);
+  if (media.format === 'tif' || media.format === 'tiff') {
+    try {
+      inspectTiffHeader(media.bytes);
+      return { status: 'verified' as const };
+    } catch {
+      return {
+        status: 'rejected' as const,
+        message: 'TIFF parser rejected the file identity',
+      };
+    }
+  }
   if (media.format === 'webp' && !hasWebpIdentity(media.bytes)) {
     return {
       status: 'rejected' as const,
@@ -520,6 +540,14 @@ function processorFor(
               message: 'SVG render-equivalence verifier is unavailable',
             };
       }
+      if (contract.input.format === 'tif' || contract.input.format === 'tiff') {
+        return adapters.verifyTiffEquivalence
+          ? adapters.verifyTiffEquivalence(result, { signal: context.signal })
+          : {
+              status: 'rejected',
+              message: 'TIFF pixel-equivalence verifier is unavailable',
+            };
+      }
       const bmpSource = bmpSourceByResult.get(result.bytes);
       if (!bmpSource) return formatVerification;
       return verifyBmpConversionSemantics({
@@ -609,6 +637,11 @@ export function createGenericToolWorkflow(
 export { deliverBrowserMedia };
 export type BrowserDeliveryPorts = BrowserDownloadPorts;
 
+const browserTiffIdentityByOutput = new WeakMap<
+  Uint8Array,
+  Readonly<{ width: number; height: number; sourceRgbaSha256: string }>
+>();
+
 const browserAdapters: GenericWorkflowAdapters = {
   decideSupport(request) {
     return decideGenericBrowserSupport(
@@ -619,6 +652,25 @@ const browserAdapters: GenericWorkflowAdapters = {
   },
   async convert({ from, to, bytes, quality, context }) {
     context.signal.throwIfAborted();
+    if ((from === 'tif' || from === 'tiff') && to === 'png') {
+      const worker = new Worker(
+        new URL('../workers/tiff-to-png.worker.js', import.meta.url),
+        { type: 'module' },
+      );
+      await context.registerWorker(worker);
+      const result = await convertTiffToPngWithWorker({
+        worker,
+        bytes,
+        signal: context.signal,
+      });
+      browserTiffIdentityByOutput.set(result.png, {
+        width: result.width,
+        height: result.height,
+        sourceRgbaSha256: result.sourceRgbaSha256,
+      });
+      context.reportProgress(1);
+      return [result.png];
+    }
     const worker = new Worker(
       new URL('../workers/convert.worker.js', import.meta.url),
       { type: 'module' },
@@ -784,6 +836,37 @@ const browserAdapters: GenericWorkflowAdapters = {
       output: output.bytes,
       signal,
     });
+  },
+  async verifyTiffEquivalence(output, { signal }) {
+    const expected = browserTiffIdentityByOutput.get(output.bytes);
+    if (!expected) {
+      return {
+        status: 'rejected',
+        message: 'TIFF source pixel identity is unavailable',
+      };
+    }
+    try {
+      const decoded = await decodeToRGBA(
+        'png',
+        Uint8Array.from(output.bytes).buffer,
+        signal,
+      );
+      await verifyTiffDecodedOutput({
+        expected,
+        actual: {
+          width: decoded.width,
+          height: decoded.height,
+          rgba: decoded.data,
+        },
+      });
+      return { status: 'verified' };
+    } catch {
+      signal.throwIfAborted();
+      return {
+        status: 'rejected',
+        message: 'Delivered PNG does not preserve the TIFF source pixels',
+      };
+    }
   },
   async decodeRaster(media, { signal }) {
     const decoded = await decodeToRGBA(

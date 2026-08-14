@@ -103,6 +103,18 @@ const engineById = defineEngines({
         'Repository dispatch uses libheif for HEIC/HEIF inputs, browser image primitives for other raster inputs, Canvas for raster encoding, and pdf-lib for PDF outputs.',
     },
   },
+  'browser-tiff-png-worker': {
+    capability: 'tiff-to-png-conversion',
+    owner: 'apps/tools/lib/convert/tiff.ts',
+    processingLocation: 'browser',
+    executionProfile: 'client-only',
+    implementation: {
+      class: 'hybrid',
+      identity: 'geotiff 3.0.5 with UPNG.js and browser PNG decoding',
+      rationale:
+        'A dedicated lazy Worker bounds and decodes one classic TIFF without a nested pool, encodes PNG, and the browser independently decodes and compares delivered RGBA pixels.',
+    },
+  },
   'browser-pdf-pages': {
     capability: 'pdf-page-rasterization',
     owner: 'apps/tools/lib/convert/pdf.ts',

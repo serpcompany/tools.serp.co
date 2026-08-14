@@ -10,8 +10,8 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
   assert.equal(model.rows.length, 2_807);
   assert.equal(new Set(model.rows.map((row) => row.toolId)).size, 2_807);
   assert.deepEqual(model.counts, {
-    supported: 437,
-    unsupported: 2_367,
+    supported: 439,
+    unsupported: 2_365,
     unwired: 0,
     unknown: 3,
   });
@@ -95,7 +95,7 @@ test('unsupported Tool names its contract and runtime proof gaps without becomin
   );
 });
 
-test('registered family policy projects refreshed retained evidence as verified', () => {
+test('executable changes mark prior retained evidence stale until refresh', () => {
   const row = buildToolFactoryReadModel().getByToolId('bmp-to-png');
 
   assert.ok(row);
@@ -107,7 +107,7 @@ test('registered family policy projects refreshed retained evidence as verified'
     row.verificationEvidence.map((evidence) => evidence.journeyId),
     ['bmp-to-png:upload'],
   );
-  assert.equal(row.verificationEvidence[0]?.state, 'verified');
+  assert.equal(row.verificationEvidence[0]?.state, 'stale');
   assert.deepEqual(row.verificationEvidence[0]?.missingChecks, []);
 });
 

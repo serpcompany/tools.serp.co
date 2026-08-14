@@ -44,6 +44,11 @@ test('conversion and compression provenance follows actual dispatch selectors', 
   assert.deepEqual(resolveConversionDispatch('cr2', 'pdf').engineIds, [
     'browser-raster-with-server-image-decode',
   ]);
+  assert.deepEqual(resolveConversionDispatch('tiff', 'png').engineIds, [
+    'browser-tiff-png-worker',
+  ]);
+  assert.deepEqual(mapped('tiff-to-png').executionProfiles, ['client-only']);
+  assert.deepEqual(mapped('tif-to-png').engineIds, ['browser-tiff-png-worker']);
   assert.deepEqual(
     [
       ['ai', 'svg'],

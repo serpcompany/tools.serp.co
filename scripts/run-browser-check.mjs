@@ -594,6 +594,10 @@ try {
           pixelCount: pixels.length / 4,
           minimum,
           maximum,
+          rgbaSha256: Array.from(
+            new Uint8Array(await crypto.subtle.digest('SHA-256', pixels)),
+            (value) => value.toString(16).padStart(2, '0'),
+          ).join(''),
         };
       },
       { bytes, type },
@@ -641,6 +645,23 @@ try {
       );
     }
     return checks;
+  }
+
+  function runTiffNegativePathProbe(toolId) {
+    const output = execFileSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        path.join(repositoryRoot, 'scripts/run-tiff-negative-path-probe.mjs'),
+        toolId,
+      ],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    const result = JSON.parse(output);
+    if (result.journeyId !== `${toolId}:upload`) {
+      throw new Error(`${toolId} negative probe returned the wrong journey.`);
+    }
+    return result.checks;
   }
 
   function runGoldenNegativePathProbe(toolId) {
@@ -1468,6 +1489,11 @@ try {
       const svgWorkerUrls = [];
       const onSvgWorker = (worker) => svgWorkerUrls.push(worker.url());
       if (tool.id === 'compress-svg') page.on('worker', onSvgWorker);
+      const tiffWorkerUrls = [];
+      const onTiffWorker = (worker) => tiffWorkerUrls.push(worker.url());
+      if (tool.id === 'tif-to-png' || tool.id === 'tiff-to-png') {
+        page.on('worker', onTiffWorker);
+      }
       await hookBlobCapture(page);
       await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
         fixture.path,
@@ -1525,6 +1551,9 @@ try {
         tool.requiresFFmpeg ? 60000 : 20000,
       );
       if (tool.id === 'compress-svg') page.off('worker', onSvgWorker);
+      if (tool.id === 'tif-to-png' || tool.id === 'tiff-to-png') {
+        page.off('worker', onTiffWorker);
+      }
       if (!blob?.size) {
         throw new Error('Conversion did not produce output blob.');
       }
@@ -1618,6 +1647,54 @@ try {
             'valid-fixture',
             'semantic-output',
             ...runGoldenNegativePathProbe(tool.id),
+            'required-environment',
+          ],
+        };
+      }
+      if (tool.id === 'tif-to-png' || tool.id === 'tiff-to-png') {
+        const semantic = await decodeImageSummary(
+          page,
+          await lastBlobBytes(page),
+        );
+        const expectedPixels = new Uint8Array(16 * 16 * 4);
+        for (let y = 0; y < 16; y += 1) {
+          for (let x = 0; x < 16; x += 1) {
+            const offset = (y * 16 + x) * 4;
+            expectedPixels.set([x * 16, y * 16, (x + y) * 8, 255], offset);
+          }
+        }
+        const expectedRgbaSha256 = sha256(expectedPixels);
+        if (
+          semantic.width !== 16 ||
+          semantic.height !== 16 ||
+          semantic.pixelCount !== 256 ||
+          semantic.rgbaSha256 !== expectedRgbaSha256
+        ) {
+          throw new Error(
+            `${tool.id} output failed independent exact RGBA verification.`,
+          );
+        }
+        if (
+          !tiffWorkerUrls.some((url) =>
+            /tiff-to-png\.worker|tiff-to-png/i.test(url),
+          )
+        ) {
+          throw new Error(`${tool.id} did not load its dedicated TIFF Worker.`);
+        }
+        return {
+          detail: `verified TIFF pixels in PNG ${semantic.width}x${semantic.height}, ${blob.size} bytes`,
+          metrics: {
+            outputBytes: blob.size,
+            outputType: blob.type,
+            width: semantic.width,
+            height: semantic.height,
+            rgbaSha256: semantic.rgbaSha256,
+            workerUrls: tiffWorkerUrls,
+          },
+          checks: [
+            'valid-fixture',
+            'semantic-output',
+            ...runTiffNegativePathProbe(tool.id),
             'required-environment',
           ],
         };
