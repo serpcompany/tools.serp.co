@@ -244,6 +244,8 @@ export async function proveSvgCompressionBrowser(args) {
       noOpBytes: noOp.output.length,
       noOpWorkerUrl: noOp.workerUrl,
       repeatWorkerUrl: repeated.workerUrl,
+      downloadableOutput: 'captures/compress-svg.svg',
+      screenshot: 'captures/compress-svg-success.png',
     },
     checks: [
       'valid-fixture',
