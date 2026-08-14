@@ -112,19 +112,13 @@ test('unrecognizable extension response is transient and non-destructive', async
   assert.equal(readFileSync(dataPath, 'utf8'), original);
 });
 
-test('downloader check is non-mutating and write owns exact outputs', async (t) => {
+test('downloader check and write depend only on the canonical Tool Catalog output', async (t) => {
   const root = mkdtempSync(path.join(tmpdir(), 'tools-serp-downloader-sync-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const toolsPath = path.join(root, 'packages/app-core/src/data/tools.json');
-  const plannerPath = path.join(
-    root,
-    'docs/evidence/tool-planning/tools_planner.csv',
-  );
   const unrelatedPath = path.join(root, 'unrelated.txt');
   mkdirSync(path.dirname(toolsPath), { recursive: true });
-  mkdirSync(path.dirname(plannerPath), { recursive: true });
   writeFileSync(toolsPath, '[]\n');
-  writeFileSync(plannerPath, 'keyword,operation,tool_id\n');
   writeFileSync(unrelatedPath, 'preserved\n');
   const registry = {
     overrides: {
@@ -142,10 +136,8 @@ test('downloader check is non-mutating and write owns exact outputs', async (t) 
   });
   assert.equal(checked.newTools.length, 1);
   assert.equal(readFileSync(toolsPath, 'utf8'), '[]\n');
-  assert.equal(
-    readFileSync(plannerPath, 'utf8'),
-    'keyword,operation,tool_id\n',
-  );
+  assert.equal('plannerRows' in checked, false);
+  assert.equal('nextPlannerSource' in checked, false);
 
   await synchronizeDownloaderRegistry({
     registry,
@@ -154,7 +146,6 @@ test('downloader check is non-mutating and write owns exact outputs', async (t) 
     verifyUrl: async () => false,
   });
   assert.equal(JSON.parse(readFileSync(toolsPath, 'utf8')).length, 1);
-  assert.match(readFileSync(plannerPath, 'utf8'), /download-example-videos/);
   assert.equal(readFileSync(unrelatedPath, 'utf8'), 'preserved\n');
 
   await assert.rejects(
