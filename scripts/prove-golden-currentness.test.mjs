@@ -124,6 +124,7 @@ test('preview currentness uses a disposable branch, real generated mutation, act
       'user.email=golden@invalid.example',
       'commit',
       '--quiet',
+      '--allow-empty',
       '-m',
       'test: seed retained currentness baseline',
     );
