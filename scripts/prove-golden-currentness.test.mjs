@@ -34,17 +34,14 @@ function retainedPngBaseline(repositoryRoot) {
     'docs/audits/tool-verification/retained-runs.json',
   );
   const retained = JSON.parse(readFileSync(retainedPath, 'utf8'));
-  const run = retained
-    .filter((candidate) =>
-      (candidate.scope.tools ?? []).some((tool) =>
-        (tool.journeys ?? []).some(
-          (journey) => journey.journeyId === 'png-to-webp:upload',
-        ),
-      ),
+  const journey = retained
+    .flatMap((run) =>
+      (run.scope.tools ?? []).flatMap((tool) => tool.journeys ?? []),
     )
+    .filter((candidate) => candidate.journeyId === 'png-to-webp:upload')
     .at(-1);
-  assert.match(run?.revision?.commit ?? '', /^[a-f0-9]{40}$/);
-  return { commit: run.revision.commit, retainedPath };
+  assert.ok(journey?.inputRevisions);
+  return { inputRevisions: journey.inputRevisions, retainedPath };
 }
 
 test('Git environment scrubbing removes every inherited repository override', () => {
@@ -90,13 +87,33 @@ test('preview currentness uses a disposable branch, real generated mutation, act
       { env: scrubGitEnvironment(process.env) },
     );
     const baseline = retainedPngBaseline(repositoryRoot);
-    git(source, 'switch', '--detach', baseline.commit);
+    git(source, 'switch', '--detach', 'HEAD');
     const cloneRetainedPath = path.join(
       source,
       'docs/audits/tool-verification/retained-runs.json',
     );
     writeFileSync(cloneRetainedPath, readFileSync(baseline.retainedPath));
-    git(source, 'add', 'docs/audits/tool-verification/retained-runs.json');
+    const cloneGeneratedPath = path.join(
+      source,
+      'apps/tools/lib/tool-verification-inputs.generated.json',
+    );
+    const generatedInputs = JSON.parse(readFileSync(cloneGeneratedPath));
+    generatedInputs.executableSources =
+      baseline.inputRevisions['executable-sources'];
+    generatedInputs.dependencyLock = baseline.inputRevisions['dependency-lock'];
+    generatedInputs.runnerSources = baseline.inputRevisions['runner-sources'];
+    generatedInputs.fixtureSha256ByJourney['png-to-webp:upload'] =
+      baseline.inputRevisions['fixture-content'].replace(/^sha256:/, '');
+    writeFileSync(
+      cloneGeneratedPath,
+      `${JSON.stringify(generatedInputs, null, 2)}\n`,
+    );
+    git(
+      source,
+      'add',
+      'docs/audits/tool-verification/retained-runs.json',
+      'apps/tools/lib/tool-verification-inputs.generated.json',
+    );
     git(
       source,
       '-c',
