@@ -49,8 +49,8 @@ function guidance(path, problem) {
   return `${path}: ${problem} Use @serp-tools/app-core/lib/tool-catalog for application code or @serp-tools/app-core/lib/tool-catalog-adapter for maintained Node.js harness code. Catalog mutators must isolate raw reads and writes at their approved owned-output boundary.`;
 }
 
-function advisoryGuidance(path) {
-  return `${path}: advisory CSV evidence is not an operational input. Consume the Tool Catalog, executable provenance, Tool Journeys, or retained verification evidence through their owned interfaces.`;
+function prohibitedOperationalCsvGuidance(path) {
+  return `${path}: advisory or obsolete CSV evidence is not an operational input. Consume the Tool Catalog, executable provenance, Tool Journeys, or retained verification evidence through their owned interfaces.`;
 }
 
 export function findToolCatalogBoundaryViolations(sources) {
@@ -68,8 +68,8 @@ export function findToolCatalogBoundaryViolations(sources) {
         guidance(path, 'direct Tool registry access is not permitted.'),
       );
     }
-    if (containsAdvisoryCsvPath(sourceFile)) {
-      violations.push(advisoryGuidance(path));
+    if (containsProhibitedOperationalCsvPath(sourceFile)) {
+      violations.push(prohibitedOperationalCsvGuidance(path));
     }
     if (importsRetiredCompatibilityModule(sourceFile)) {
       violations.push(
@@ -176,7 +176,7 @@ function staticPathCandidates(node) {
   return candidates.map((candidate) => candidate.replaceAll('\\', '/'));
 }
 
-function containsAdvisoryCsvPath(sourceFile) {
+function containsProhibitedOperationalCsvPath(sourceFile) {
   return visitTree(sourceFile, (node) =>
     staticPathCandidates(node).some((candidate) =>
       [...prohibitedOperationalCsvPaths].some((csvPath) =>

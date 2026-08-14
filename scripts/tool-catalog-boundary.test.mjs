@@ -96,7 +96,10 @@ test('boundary failure names public interfaces and migration guidance', () => {
   assert.match(report, /namespace-catalog-reader\.ts/);
   assert.match(report, /advisory-planner-reader\.test\.mjs/);
   assert.match(report, /segmented-advisory-planner-reader\.test\.mjs/);
-  assert.match(report, /advisory CSV evidence is not an operational input/);
+  assert.match(
+    report,
+    /advisory or obsolete CSV evidence is not an operational input/,
+  );
   assert.doesNotMatch(report, /unrelated-reader\.ts/);
   assert.doesNotMatch(report, /sync-downloader-landers/);
 });
