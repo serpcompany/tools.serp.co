@@ -668,9 +668,6 @@ const browserAdapters: GenericWorkflowAdapters = {
       const worker = ownTiffWorkerTermination(
         new Worker(
           new URL('../workers/tiff-to-png.worker.js', import.meta.url),
-          {
-            type: 'module',
-          },
         ),
       );
       await context.registerWorker(worker);

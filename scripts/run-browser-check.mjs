@@ -691,7 +691,7 @@ try {
         const observations = [];
         for (const target of ['decode', 'encode']) {
           const observation = await new Promise((resolve, reject) => {
-            const worker = new Worker(url, { type: 'module' });
+            const worker = new Worker(url);
             const stages = [];
             let terminalMessages = 0;
             const timeout = setTimeout(() => {

@@ -38,6 +38,17 @@ const fixture = (name: string) =>
     readFileSync(new URL(`../benchmarks/fixtures/${name}`, import.meta.url)),
   );
 
+test('TIFF uses the classic Worker mode required by its emitted browser chunk', () => {
+  const source = readFileSync(
+    new URL('./generic-tool-workflow.ts', import.meta.url),
+    'utf8',
+  );
+  assert.match(
+    source,
+    /new Worker\(\s*new URL\('\.\.\/workers\/tiff-to-png\.worker\.js', import\.meta\.url\),\s*\)/,
+  );
+});
+
 function mp4WithoutRecognizedAudioTrack(): Uint8Array {
   const bytes = Uint8Array.from(fixture('sample.mp4'));
   const marker = new TextEncoder().encode('mp4a');
