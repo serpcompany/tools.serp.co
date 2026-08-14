@@ -2974,5 +2974,69 @@
     "result": {
       "status": "success"
     }
+  },
+  {
+    "schemaVersion": 2,
+    "runId": "20260814T224353Z_60f02cd_pull-request_browser-smoke-preview-subset",
+    "command": {
+      "name": "smoke:tools:browser",
+      "version": "1"
+    },
+    "revision": {
+      "commit": "60f02cdc2da8d4dfa70e9db51aae317d128b106c",
+      "dirty": false
+    },
+    "timestamps": {
+      "startedAt": "2026-08-14T22:43:53.909Z",
+      "completedAt": "2026-08-14T22:44:03.368Z"
+    },
+    "environment": "pull-request",
+    "scope": {
+      "label": "browser-smoke-preview-subset",
+      "inputHashes": [
+        "sha256:2e8404b30c9b954d51d697be77e5e3bc6faf8c9b3a5e942cfb75e56e86d4986e"
+      ],
+      "tools": [
+        {
+          "toolId": "ico-to-png",
+          "journeys": [
+            {
+              "journeyId": "ico-to-png:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/ico",
+                "sha256": "25a36366f3be4adade6961d445c58a72322e72cf616b98979a6535fb10433419"
+              },
+              "invariantId": "ico-selected-image-pixel-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:a2c7800ab21b6e616aa17387402597702cf3f7e2ca84f0b63bfc4224434a3273",
+                "fixture-content": "sha256:25a36366f3be4adade6961d445c58a72322e72cf616b98979a6535fb10433419",
+                "journey-contract": "sha256:e3618d9d66c58bdf7c1e03591ce81e6de5367a44ec51cf6a33271ab773d2e69f",
+                "semantic-invariant": "sha256:9ae5992450e0abee58aef96b283fcad0e06bbe48d27034d252d0f22592283a3a",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:f684a319acbf0101da9dc656ed4cf8dcb63d05887dd8f16d0c6673dabb367396",
+                "dependency-lock": "sha256:122672eb655908fc2725879833da56491e10e7aa1c234b8b6b43d9f660276537",
+                "runner-sources": "sha256:709b4bf11cf7b4ded6cfca6667d74b6918633db0c84aaa47297bdb0317b7c6da"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "result": {
+      "status": "success"
+    }
   }
 ]
