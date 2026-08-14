@@ -77,6 +77,17 @@ test('hash-scope migration preserves exact retained evidence only at the transit
   );
 });
 
+test('repository check retains the baseline history required by the scope migration', () => {
+  const workflow = readFileSync(
+    path.resolve('.github/workflows/check.yml'),
+    'utf8',
+  );
+  assert.match(
+    workflow,
+    /uses: actions\/checkout@v4\n\s+with:\n\s+fetch-depth: 0/,
+  );
+});
+
 test('verification input manifest is mechanically generated from source, dependencies, runner, and fixture bytes', () => {
   const retained = JSON.parse(
     readFileSync(
