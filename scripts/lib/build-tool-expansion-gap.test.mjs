@@ -17,8 +17,8 @@ test('accepted baseline is accounted for once with exact gap partitions and sour
     'sha256:fadb77ac2e1c68c14863a3ebd4ca43cde6692e9bde72bfacaf1026b8baeda030',
   );
   assert.deepEqual(projection.portfolio.counts, {
-    supported: 440,
-    unsupported: 2_364,
+    supported: 439,
+    unsupported: 2_365,
     unwired: 0,
     unknown: 3,
   });
@@ -47,7 +47,7 @@ test('accepted baseline is accounted for once with exact gap partitions and sour
         count,
       ]),
     ),
-    { generic: 2305, table: 59 },
+    { generic: 2306, table: 59 },
   );
   assert.equal(
     projection.rows.filter(
@@ -55,7 +55,7 @@ test('accepted baseline is accounted for once with exact gap partitions and sour
         row.acceptedDisposition === 'unsupported' &&
         row.evidence.catalogIntent.operation === 'convert',
     ).length,
-    2_346,
+    2_347,
   );
   assert.equal(
     projection.rows.filter(

@@ -9,8 +9,8 @@ import {
 test('canonical acceptance claims account for every active Tool exactly once', () => {
   assert.equal(toolAcceptanceClaims.all.length, 2_807);
   assert.deepEqual(toolAcceptanceClaims.counts, {
-    supported: 440,
-    unsupported: 2_364,
+    supported: 439,
+    unsupported: 2_365,
     unwired: 0,
     unknown: 3,
   });
