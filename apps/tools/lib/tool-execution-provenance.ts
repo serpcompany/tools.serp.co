@@ -115,6 +115,18 @@ const engineById = defineEngines({
         'A dedicated lazy Worker bounds and decodes one classic TIFF without a nested pool, encodes PNG, and the browser independently decodes and compares delivered RGBA pixels.',
     },
   },
+  'browser-ico-png-worker': {
+    capability: 'ico-to-png-conversion',
+    owner: 'apps/tools/lib/convert/ico.ts',
+    processingLocation: 'browser',
+    executionProfile: 'client-only',
+    implementation: {
+      class: 'hybrid',
+      identity: 'icojs 1.0.0 with an independent bounded DIB pixel oracle',
+      rationale:
+        'A dedicated lazy Worker validates every ICO entry, deterministically selects one rendition, decodes it through icojs, and the application independently compares delivered PNG pixels.',
+    },
+  },
   'browser-pdf-pages': {
     capability: 'pdf-page-rasterization',
     owner: 'apps/tools/lib/convert/pdf.ts',

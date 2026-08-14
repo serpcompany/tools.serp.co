@@ -135,6 +135,22 @@
     "reproducibility": "deterministic pinned-library generator; sha256 identifies the reviewed artifact",
     "sha256": "57424759c224ba612ad4293675474867628b8c425770b62d17f105ebc6bbdc9f"
   },
+  "fixtures/sample.ico": {
+    "source": "pre-existing repository fixture",
+    "command": "original generator not retained",
+    "toolVersions": "test oracle: sharp 0.34.5 plus the repository-owned bounded DIB decoder",
+    "description": "Single-entry 96x96 resource-type-1 ICO containing a 24-bit uncompressed DIB with uniform blue pixels.",
+    "reproducibility": "the original generator is unknown; sha256 identifies the reviewed checked-in artifact, and independent DIB-to-RGBA comparison against sample.png fixes its accepted semantics",
+    "sha256": "769f56dd9dae8a464c3a8bbde014e45267057f57c274c0212d70d4c1d3130639"
+  },
+  "fixtures/ico/selection.ico": {
+    "source": "repository-generated",
+    "command": "mise exec node@22.23.1 -- node scripts/generate-ico-fixtures.mjs",
+    "toolVersions": "repository generator; source pixel oracles: sharp 0.34.5",
+    "description": "Two-entry resource-type-1 ICO containing the reviewed 96x96 24-bit blue DIB from sample.ico followed by the reviewed 128x80 orange sample-2.png payload.",
+    "reproducibility": "deterministic byte assembly from two checked-in source fixtures; the greater-area then bit-depth then directory-order contract selects the 128x80 PNG entry; sha256 identifies the generated artifact",
+    "sha256": "25a36366f3be4adade6961d445c58a72322e72cf616b98979a6535fb10433419"
+  },
   "fixtures/svg-compression-complex.svg": {
     "source": "repository-authored",
     "description": "Bounded safe SVG exercising gradients, clipping, identifier references, namespaces, accessibility text, and Unicode glyphs.",

@@ -260,7 +260,62 @@ test('TIFF aliases require dedicated Worker and exact independent RGBA evidence'
     /proveActiveTiffWorkerCancellation\(\s*page,\s*tiffWorkerUrl,\s*fixture\.path,?\s*\)/,
   );
   assert.match(runnerSource, /terminalMessages !== 0/);
-  assert.match(runnerSource, /const worker = new Worker\(url\);/);
+  assert.match(runnerSource, /proveActiveWorkerCancellation/);
+  assert.match(runnerSource, /requestType: 'convert-tiff-to-png'/);
+});
+
+test('ICO to PNG candidate proof stays separate from public smoke support', () => {
+  assert.equal(
+    getGenericSmokeExpectation({
+      id: 'ico-to-png',
+      from: 'ico',
+      to: 'png',
+      operation: 'convert',
+    }),
+    'unsupported',
+  );
+  assert.match(genericWorkflowSource, /ico-to-png\.worker/);
+  assert.match(runnerSource, /tool\.id === 'ico-to-png'/);
+  assert.match(runnerSource, /runIcoNegativePathProbe/);
+  assert.match(runnerSource, /proveExternalIcoWorkerTermination/);
+  assert.match(runnerSource, /rgbaSha256/);
+  assert.match(runnerSource, /workerAsset\.bytes > 128 \* 1_024/);
+  assert.match(runnerSource, /icoUserByteRequests\.length !== 0/);
+  assert.match(runnerSource, /semantic\.width !== 128/);
+  assert.match(runnerSource, /semantic\.height !== 80/);
+  assert.match(runnerSource, /proveDeployedIcoRejections/);
+  assert.match(runnerSource, /malformed\.ico/);
+  assert.match(runnerSource, /spoofed\.ico/);
+});
+
+test('ICO preview uses the deterministic multi-entry selection fixture', () => {
+  const matrix = JSON.parse(
+    readFileSync(
+      new URL('../apps/tools/benchmarks/fixture-matrix.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  const provenance = JSON.parse(
+    readFileSync(
+      new URL(
+        '../apps/tools/benchmarks/fixture-provenance.json',
+        import.meta.url,
+      ),
+      'utf8',
+    ),
+  );
+  const icoEntry = matrix.formats.find((entry) => entry.format === 'ico');
+  const fixture = readFileSync(
+    new URL(`../apps/tools/benchmarks/${icoEntry.fixture}`, import.meta.url),
+  );
+
+  assert.equal(icoEntry.fixture, 'fixtures/ico/selection.ico');
+  assert.equal(fixture.readUInt16LE(4), 2);
+  assert.equal(
+    createHash('sha256').update(fixture).digest('hex'),
+    provenance[icoEntry.fixture].sha256,
+  );
+  assert.match(provenance[icoEntry.fixture].command, /generate-ico-fixtures/);
 });
 
 test('same-family MP4 to WebM browser proof independently decodes exact output', () => {

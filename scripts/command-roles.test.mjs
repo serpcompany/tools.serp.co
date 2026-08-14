@@ -105,6 +105,10 @@ test('development, preview, canary, browser, and production commands name their 
     'node scripts/run-browser-check.mjs --mode smoke',
   );
   assert.equal(
+    rootPackage.scripts['proof:ico-preview-candidate'],
+    'node scripts/prove-ico-preview-candidate.mjs',
+  );
+  assert.equal(
     rootPackage.scripts['benchmark:tools:browser'],
     'node scripts/run-browser-check.mjs --mode benchmark',
   );
@@ -216,6 +220,7 @@ test('command runbook documents side effects, authority, targets, and evidence',
     'deploy:cloudflare:wayfinder-preview',
     'pnpm canary:cloudflare:deployed',
     'pnpm smoke:tools:browser',
+    'pnpm proof:ico-preview-candidate',
     'pnpm benchmark:tools:browser',
     'deploy:cloudflare:production',
     'provision:d1:preview',

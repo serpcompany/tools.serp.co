@@ -13,6 +13,7 @@ const FORMAT_MIME_TYPES = Object.freeze({
   bmp: 'image/bmp',
   cr2: 'image/x-canon-cr2',
   heic: 'image/heic',
+  ico: 'image/x-icon',
   jpeg: 'image/jpeg',
   jpg: 'image/jpeg',
   m4a: 'audio/mp4',

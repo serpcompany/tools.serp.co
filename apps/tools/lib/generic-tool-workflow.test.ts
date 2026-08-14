@@ -24,13 +24,21 @@ import {
 } from './generic-tool-workflow.ts';
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
 import { selectToolRenderer } from './tool-renderer.ts';
-import { resolveConversionCapability } from './convert/conversion-dispatch.ts';
+import {
+  resolveConversionCapability,
+  resolveConversionDispatch,
+} from './convert/conversion-dispatch.ts';
 import { resolveCompressionDispatch } from './compression-utils.ts';
 import { createGenericToolRunController } from './generic-tool-run-controller.ts';
 import { runFfmpegLifecycle } from './convert/ffmpeg-lifecycle.ts';
 import { decodeToRGBA } from './convert/decode.ts';
 import { convertWithWorker } from './convert/workerClient.ts';
 import { inspectBmp } from './convert/bmp.ts';
+import {
+  convertIcoToPngWithWorker,
+  ICO_TO_PNG_CANDIDATE_CONTRACT,
+} from './convert/ico.ts';
+import { ownWorkerTermination } from './convert/owned-worker.ts';
 import { compressSvgWithWorker } from './svg-compression.ts';
 
 const fixture = (name: string) =>
@@ -46,6 +54,17 @@ test('TIFF uses the classic Worker mode required by its emitted browser chunk', 
   assert.match(
     source,
     /new Worker\(\s*new URL\('\.\.\/workers\/tiff-to-png\.worker\.js', import\.meta\.url\),\s*\)/,
+  );
+});
+
+test('ICO conversion uses its lazy dedicated module Worker', () => {
+  const source = readFileSync(
+    new URL('./generic-tool-workflow.ts', import.meta.url),
+    'utf8',
+  );
+  assert.match(
+    source,
+    /new Worker\(\s*new URL\('\.\.\/workers\/ico-to-png\.worker\.js', import\.meta\.url\),\s*\{ type: 'module' \},\s*\)/,
   );
 });
 
@@ -179,6 +198,109 @@ test('TIFF to PNG aliases alone use the dedicated browser conversion contract', 
   ]) {
     assert.equal(getGenericToolContract(toolId).state, 'unsupported', toolId);
   }
+});
+
+test('ICO to PNG candidate stays unregistered until exact preview proof', () => {
+  assert.deepEqual(resolveConversionDispatch('ico', 'png'), {
+    kind: 'browser-ico-worker',
+    engineIds: ['browser-ico-png-worker'],
+  });
+  assert.equal(getGenericToolContract('ico-to-png').state, 'unsupported');
+  assert.equal(ICO_TO_PNG_CANDIDATE_CONTRACT.toolId, 'ico-to-png');
+  for (const toolId of ['ico-to-jpg', 'ico-to-pdf', 'ico-to-webp']) {
+    assert.equal(getGenericToolContract(toolId).state, 'unsupported', toolId);
+  }
+});
+
+test('ICO workflow rejects changed selected pixels before delivery', async () => {
+  let deliveries = 0;
+  const workflow = createGenericToolWorkflow(
+    {
+      ...adapters(fixture('sample.png')),
+      async verifyIcoEquivalence() {
+        return { status: 'rejected', message: 'selected pixels differ' };
+      },
+      async deliver() {
+        deliveries += 1;
+        return 'unexpected';
+      },
+    },
+    {
+      resolveContract: () => ICO_TO_PNG_CANDIDATE_CONTRACT,
+    },
+  );
+  const outcome = await workflow.run({
+    toolId: 'ico-to-png',
+    input: {
+      kind: 'file',
+      media: {
+        name: 'sample.ico',
+        format: 'ico',
+        mimeType: 'image/x-icon',
+        bytes: fixture('sample.ico'),
+      },
+    },
+  });
+  assert.equal(outcome.status, 'failed');
+  assert.equal(deliveries, 0);
+});
+
+test('ICO cancellation during semantic verification suppresses delivery', async () => {
+  const controller = new AbortController();
+  let verificationStarted!: () => void;
+  const started = new Promise<void>((resolve) => {
+    verificationStarted = resolve;
+  });
+  const boundary = adapters(fixture('sample.png'));
+  const workflow = createGenericToolWorkflow(
+    {
+      ...boundary,
+      async verifyIcoEquivalence(_output, { signal }) {
+        verificationStarted();
+        await new Promise<void>((_resolve, reject) => {
+          signal.addEventListener('abort', () => reject(signal.reason), {
+            once: true,
+          });
+        });
+        return { status: 'verified' };
+      },
+    },
+    {
+      resolveContract: () => ICO_TO_PNG_CANDIDATE_CONTRACT,
+    },
+  );
+  const pending = workflow.run(
+    {
+      toolId: 'ico-to-png',
+      input: {
+        kind: 'file',
+        media: {
+          name: 'sample.ico',
+          format: 'ico',
+          mimeType: 'image/x-icon',
+          bytes: fixture('sample.ico'),
+        },
+      },
+    },
+    { signal: controller.signal },
+  );
+
+  await started;
+  controller.abort(new DOMException('cancelled', 'AbortError'));
+  const outcome = await pending;
+  assert.equal(outcome.status, 'cancelled');
+  assert.deepEqual(boundary.delivered, []);
+});
+
+test('ICO input identity is byte-derived instead of trusting the extension', async () => {
+  assert.equal(
+    await detectGenericMediaMimeType(fixture('sample.ico')),
+    'image/x-icon',
+  );
+  assert.notEqual(
+    await detectGenericMediaMimeType(fixture('sample.png')),
+    'image/x-icon',
+  );
 });
 
 test('TIFF workflow rejects wrong pixels before delivery', async () => {
@@ -487,6 +609,7 @@ test('contract inventory independently audits real dispatches with semantic cove
   const verifiedInputs = new Set([
     'bmp',
     'heic',
+    'ico',
     'jpeg',
     'jpg',
     'm4a',
@@ -544,7 +667,8 @@ test('contract inventory independently audits real dispatches with semantic cove
               'bmp-to-png',
               'bmp-to-webp',
             ].includes(tool.id)))) &&
-      (!['tif', 'tiff'].includes(tool.from) || exactTiffFamily);
+      (!['tif', 'tiff'].includes(tool.from) || exactTiffFamily) &&
+      tool.from !== 'ico';
     assert.equal(
       getGenericToolContract(tool.id).state === 'supported',
       expectedSupported,
@@ -579,6 +703,7 @@ test('every supported generic contract resolves a processor through workflow.run
   const outputFixture = {
     cr2: 'sample.cr2',
     heic: 'sample.heic',
+    ico: 'sample.ico',
     jpeg: 'sample.jpg',
     jpg: 'sample.jpg',
     m4a: 'sample.m4a',
@@ -642,6 +767,7 @@ test('every supported generic contract resolves a processor through workflow.run
     bmp: 'sample.bmp',
     cr2: 'sample.cr2',
     heic: 'sample.heic',
+    ico: 'sample.ico',
     jpeg: 'sample.jpg',
     jpg: 'sample.jpg',
     m4a: 'sample.m4a',
@@ -657,6 +783,9 @@ test('every supported generic contract resolves a processor through workflow.run
   } as const;
   const workflowBoundary: GenericWorkflowAdapters = {
     ...boundary,
+    async verifyIcoEquivalence() {
+      return { status: 'verified' };
+    },
     async decodeRaster() {
       return {
         width: bmpInspection.width,
@@ -1341,6 +1470,119 @@ test('a superseded run cannot clear or overwrite its active replacement', async 
   assert.equal(states.at(-1)?.busy, false);
 });
 
+test('an active ICO Worker is terminated when a replacement run supersedes it', async () => {
+  type RawWorker = {
+    onmessage: Worker['onmessage'];
+    onerror: Worker['onerror'];
+    postMessage(): void;
+    terminate(): void;
+  };
+  const states: Array<Record<string, unknown>> = [];
+  const terminations = [0, 0];
+  const rawWorkers: RawWorker[] = [];
+  const controller = createGenericToolRunController({
+    async runFile(_toolId, file, options) {
+      const index = rawWorkers.length;
+      const rawWorker: RawWorker = {
+        onmessage: null,
+        onerror: null,
+        postMessage() {
+          if (index !== 1) return;
+          queueMicrotask(() =>
+            rawWorker.onmessage?.call(
+              rawWorker as unknown as Worker,
+              {
+                data: {
+                  ok: true,
+                  png: Uint8Array.from(fixture('sample.png')).buffer,
+                  width: 96,
+                  height: 96,
+                  selectedIndex: 0,
+                  sourceKind: 'dib',
+                  pixelVerified: true,
+                },
+              } as MessageEvent,
+            ),
+          );
+        },
+        terminate() {
+          terminations[index] = (terminations[index] ?? 0) + 1;
+        },
+      };
+      rawWorkers.push(rawWorker);
+      try {
+        await convertIcoToPngWithWorker({
+          worker: ownWorkerTermination(rawWorker as unknown as Worker),
+          bytes: fixture('sample.ico'),
+          signal: options.signal,
+        });
+        return {
+          status: 'succeeded' as const,
+          runId: file.name,
+          results: [],
+          telemetry: {
+            start: 'submitted' as const,
+            terminal: 'submitted' as const,
+          },
+        };
+      } catch (error) {
+        if (options.signal.aborted) {
+          return {
+            status: 'cancelled' as const,
+            runId: file.name,
+            telemetry: {
+              start: 'submitted' as const,
+              terminal: 'submitted' as const,
+            },
+          };
+        }
+        throw error;
+      }
+    },
+    publish(patch) {
+      states.push({ ...(states.at(-1) ?? {}), ...patch });
+    },
+    failureMessage: () => 'failed',
+    completionMessage: () => 'complete',
+  });
+
+  const first = controller.run({
+    toolId: 'ico-to-png',
+    files: [{ name: 'slow.ico' } as File],
+  });
+  while (rawWorkers.length < 1)
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  const firstLateMessage = rawWorkers[0]!.onmessage;
+  const second = controller.run({
+    toolId: 'ico-to-png',
+    files: [{ name: 'replacement.ico' } as File],
+  });
+  await Promise.all([first, second]);
+  const settledReplacement = { ...states.at(-1) };
+  firstLateMessage?.call(
+    rawWorkers[0]! as unknown as Worker,
+    {
+      data: {
+        ok: true,
+        png: Uint8Array.from(fixture('sample.png')).buffer,
+        width: 96,
+        height: 96,
+        selectedIndex: 0,
+        sourceKind: 'dib',
+        pixelVerified: true,
+      },
+    } as MessageEvent,
+  );
+
+  assert.deepEqual(terminations, [1, 0]);
+  assert.deepEqual(states.at(-1), settledReplacement);
+  assert.equal(states.at(-1)?.busy, false);
+  assert.equal(
+    (states.at(-1)?.currentFile as { name: string }).name,
+    'replacement.ico',
+  );
+});
+
 test('FFmpeg production lifecycle releases listeners and files after every failure stage', async () => {
   for (const stage of ['write', 'exec', 'read'] as const) {
     const deleted: string[] = [];
@@ -1560,6 +1802,26 @@ test('TIFF file preflight applies the family limit before reading', async () => 
   assert.equal(outcome.status, 'failed');
   if (outcome.status === 'failed')
     assert.equal(outcome.error.code, 'invalid-request');
+  assert.equal(reads, 0);
+});
+
+test('unregistered ICO route fails closed before reading candidate bytes', async () => {
+  let reads = 0;
+  const file = {
+    name: 'oversized.ico',
+    type: 'image/x-icon',
+    size: 16 * 1_024 * 1_024 + 1,
+    async arrayBuffer() {
+      reads += 1;
+      throw new Error('must not read');
+    },
+  } as unknown as File;
+
+  const outcome = await runGenericToolFile('ico-to-png', file);
+  assert.equal(outcome.status, 'failed');
+  if (outcome.status === 'failed') {
+    assert.equal(outcome.error.code, 'unsupported-tool');
+  }
   assert.equal(reads, 0);
 });
 

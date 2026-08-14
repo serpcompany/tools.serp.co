@@ -23,7 +23,7 @@ test('report is deterministic, indexed, and keeps evidence scope and planning ca
   assert.match(first, /Conversion gaps \| 2,347/);
   assert.match(first, /Compression gaps \| 18/);
   assert.match(first, /JSON pointer/);
-  assert.match(first, /browser-raster-exact-capability.*29/s);
+  assert.match(first, /browser-raster-exact-capability.*28/s);
   assert.match(first, /Production was not queried/);
   assert.match(first, /Planning assumptions are not measured evidence/);
   assert.doesNotMatch(first, /generated at/i);

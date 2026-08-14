@@ -29,6 +29,7 @@ import {
 } from './lib/golden-output-semantics.mjs';
 import { proveSvgCompressionBrowser } from './lib/svg-compression-browser-proof.mjs';
 import { isTiffToPngToolId } from '../apps/tools/lib/convert/tiff-family.mjs';
+import { ICO_NEGATIVE_PATH_CHECKS } from '../apps/tools/lib/ico-negative-path-checks.mjs';
 
 function parseArguments(arguments_) {
   const tokens = arguments_.filter((argument) => argument !== '--');
@@ -459,6 +460,14 @@ try {
       throw new Error('No files available for dropzone upload.');
     }
 
+    await dropFixtureFilesOnDropzone(page, selector, files);
+  }
+
+  async function dropFixtureFilesOnDropzone(page, selector, files) {
+    if (!files.length) {
+      throw new Error('No files available for dropzone upload.');
+    }
+
     await page.evaluate(
       ({ selector, files }) => {
         const dropzone = document.querySelector(selector);
@@ -499,6 +508,64 @@ try {
       },
       { selector, files },
     );
+  }
+
+  async function proveDeployedIcoRejections(page, validFixturePath) {
+    const validBytes = await fs.readFile(validFixturePath);
+    const spoofedBytes = await fs.readFile(
+      path.join(fixturesDir, 'fixtures/sample.png'),
+    );
+    const scenarios = [
+      {
+        name: 'malformed.ico',
+        type: 'image/x-icon',
+        bytes: validBytes.subarray(0, 12),
+      },
+      {
+        name: 'spoofed.ico',
+        type: 'image/x-icon',
+        bytes: spoofedBytes,
+      },
+    ];
+    const observations = [];
+    for (const scenario of scenarios) {
+      const negativePage = await page.context().newPage();
+      try {
+        await negativePage.goto(page.url(), { waitUntil: 'domcontentloaded' });
+        await negativePage.waitForSelector('[data-testid="tool-dropzone"]');
+        await negativePage.waitForTimeout(500);
+        await hookBlobCapture(negativePage);
+        await dropFixtureFilesOnDropzone(
+          negativePage,
+          '[data-testid="tool-dropzone"]',
+          [
+            {
+              name: scenario.name,
+              type: scenario.type,
+              base64: Buffer.from(scenario.bytes).toString('base64'),
+            },
+          ],
+        );
+        await negativePage.waitForFunction(
+          () =>
+            document
+              .querySelector('[data-testid="video-progress"]')
+              ?.getAttribute('data-status') === 'error',
+          null,
+          { timeout: 10_000 },
+        );
+        const deliveries = await negativePage.evaluate(
+          () => window.__blobEvents?.length ?? 0,
+        );
+        if (deliveries !== 0) {
+          throw new Error(`${scenario.name} produced ${deliveries} downloads.`);
+        }
+        observations.push({ scenario: scenario.name, deliveries });
+      } finally {
+        await negativePage.close();
+      }
+    }
+    return observations;
   }
 
   async function hookBlobCapture(page) {
@@ -680,28 +747,63 @@ try {
     return result.checks;
   }
 
-  async function proveActiveTiffWorkerCancellation(
+  function runIcoNegativePathProbe() {
+    const output = execFileSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        path.join(repositoryRoot, 'scripts/run-ico-negative-path-probe.mjs'),
+      ],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    const result = JSON.parse(output);
+    if (
+      result.journeyId !== 'ico-to-png:upload' ||
+      JSON.stringify(result.checks) !==
+        JSON.stringify(ICO_NEGATIVE_PATH_CHECKS) ||
+      result.observed?.failedRuns !== 3 ||
+      result.observed?.cancelledRuns !== 1 ||
+      result.observed?.deliveries !== 0 ||
+      result.observed?.cleanupCalls !== 1
+    ) {
+      throw new Error('ICO negative probe did not prove exact cleanup.');
+    }
+    return result.checks;
+  }
+
+  async function proveActiveWorkerCancellation(
     page,
     workerUrl,
     fixturePath,
+    configuration,
   ) {
     const bytes = Array.from(await fs.readFile(fixturePath));
     return await page.evaluate(
-      async ({ workerUrl: url, fixtureBytes }) => {
+      async ({ workerUrl: url, fixtureBytes, configuration }) => {
         const observations = [];
-        for (const target of ['decode', 'encode']) {
+        for (const target of configuration.stages) {
           const observation = await new Promise((resolve, reject) => {
-            const worker = new Worker(url);
+            const worker = configuration.module
+              ? new Worker(url, { type: 'module' })
+              : new Worker(url);
             const stages = [];
             let terminalMessages = 0;
             const timeout = setTimeout(() => {
               worker.terminate();
-              reject(new Error(`TIFF Worker did not reach ${target}.`));
+              reject(
+                new Error(
+                  `${configuration.label} Worker did not reach ${target}.`,
+                ),
+              );
             }, 10_000);
-            worker.onerror = () => {
+            worker.onerror = (event) => {
               clearTimeout(timeout);
               worker.terminate();
-              reject(new Error(`TIFF Worker failed before ${target}.`));
+              reject(
+                new Error(
+                  `${configuration.label} Worker failed before ${target}: ${event.message || 'unknown error'}.`,
+                ),
+              );
             };
             worker.onmessage = (event) => {
               if (event.data?.type === 'progress') {
@@ -718,22 +820,148 @@ try {
               terminalMessages += 1;
             };
             const input = Uint8Array.from(fixtureBytes).buffer;
-            worker.postMessage({ type: 'convert-tiff-to-png', input }, [input]);
+            worker.postMessage({ type: configuration.requestType, input }, [
+              input,
+            ]);
           });
           if (
             !observation.stages.includes(target) ||
             observation.terminalMessages !== 0
           ) {
             throw new Error(
-              `TIFF Worker ${target} cancellation leaked a terminal response.`,
+              `${configuration.label} Worker ${target} cancellation leaked a terminal response.`,
             );
           }
           observations.push(observation);
         }
         return observations;
       },
-      { workerUrl, fixtureBytes: bytes },
+      { workerUrl, fixtureBytes: bytes, configuration },
     );
+  }
+
+  async function proveExternalIcoWorkerTermination(page, fixturePath) {
+    const observations = [];
+    for (const targetStage of ['decode', 'select', 'verify']) {
+      const terminationPage = await page.context().newPage();
+      try {
+        await terminationPage.addInitScript((target) => {
+          const NativeWorker = window.Worker;
+          window.__icoWorkerTermination = {
+            target,
+            stages: [],
+            terminalMessages: 0,
+            terminations: 0,
+            terminated: false,
+            workerUrl: null,
+          };
+          window.Worker = class {
+            constructor(url, options) {
+              const worker = new NativeWorker(url, options);
+              window.__icoWorkerTermination.workerUrl = String(url);
+              return new Proxy(worker, {
+                get(workerTarget, property) {
+                  const value = Reflect.get(
+                    workerTarget,
+                    property,
+                    workerTarget,
+                  );
+                  return typeof value === 'function'
+                    ? value.bind(workerTarget)
+                    : value;
+                },
+                set(workerTarget, property, value) {
+                  if (property !== 'onmessage') {
+                    return Reflect.set(
+                      workerTarget,
+                      property,
+                      value,
+                      workerTarget,
+                    );
+                  }
+                  workerTarget.onmessage = (event) => {
+                    const observation = window.__icoWorkerTermination;
+                    if (event.data?.type === 'progress') {
+                      observation.stages.push(event.data.stage);
+                      if (event.data.stage === observation.target) {
+                        workerTarget.terminate();
+                        observation.terminations += 1;
+                        observation.terminated = true;
+                        return;
+                      }
+                    } else {
+                      observation.terminalMessages += 1;
+                    }
+                    value?.call(workerTarget, event);
+                  };
+                  return true;
+                },
+              });
+            }
+          };
+        }, targetStage);
+        await terminationPage.goto(page.url(), {
+          waitUntil: 'domcontentloaded',
+        });
+        await terminationPage.waitForSelector('[data-testid="tool-dropzone"]');
+        await terminationPage.waitForTimeout(500);
+        await hookBlobCapture(terminationPage);
+        await dropFilesOnDropzone(
+          terminationPage,
+          '[data-testid="tool-dropzone"]',
+          [fixturePath],
+        );
+        try {
+          await terminationPage.waitForFunction(
+            () => window.__icoWorkerTermination?.terminated === true,
+            null,
+            { timeout: 10_000 },
+          );
+        } catch {
+          const state = await terminationPage.evaluate(() => ({
+            termination: window.__icoWorkerTermination,
+            progress:
+              document.querySelector('[data-testid="video-progress"]')
+                ?.textContent ?? null,
+          }));
+          throw new Error(
+            `ICO Worker did not reach external termination stage ${targetStage}: ${JSON.stringify(state)}.`,
+          );
+        }
+        await terminationPage.waitForTimeout(100);
+        const observation = await terminationPage.evaluate(() => ({
+          ...window.__icoWorkerTermination,
+          deliveries: window.__blobEvents?.length ?? 0,
+        }));
+        if (
+          !observation.stages.includes(targetStage) ||
+          observation.terminations !== 1 ||
+          observation.terminalMessages !== 0 ||
+          observation.deliveries !== 0
+        ) {
+          throw new Error(
+            `ICO Worker ${targetStage} external termination leaked a terminal message or blob delivery.`,
+          );
+        }
+        observations.push(observation);
+      } finally {
+        await terminationPage.close();
+      }
+    }
+    return observations;
+  }
+
+  async function proveActiveTiffWorkerCancellation(
+    page,
+    workerUrl,
+    fixturePath,
+  ) {
+    return await proveActiveWorkerCancellation(page, workerUrl, fixturePath, {
+      label: 'TIFF',
+      stages: ['decode', 'encode'],
+      requestType: 'convert-tiff-to-png',
+      module: false,
+    });
   }
 
   function runGoldenNegativePathProbe(toolId) {
@@ -1566,6 +1794,23 @@ try {
       if (isTiffToPngToolId(tool.id)) {
         page.on('worker', onTiffWorker);
       }
+      const icoWorkerUrls = [];
+      const onIcoWorker = (worker) => icoWorkerUrls.push(worker.url());
+      if (tool.id === 'ico-to-png') page.on('worker', onIcoWorker);
+      const fixtureBytesForNetwork =
+        tool.id === 'ico-to-png' ? await fs.readFile(fixture.path) : null;
+      const icoUserByteRequests = [];
+      const onIcoRequest = (request) => {
+        const body = request.postDataBuffer();
+        if (
+          body &&
+          fixtureBytesForNetwork &&
+          body.includes(fixtureBytesForNetwork)
+        ) {
+          icoUserByteRequests.push(request.url());
+        }
+      };
+      if (tool.id === 'ico-to-png') page.on('request', onIcoRequest);
       await hookBlobCapture(page);
       await dropFilesOnDropzone(page, '[data-testid="tool-dropzone"]', [
         fixture.path,
@@ -1626,6 +1871,8 @@ try {
       if (isTiffToPngToolId(tool.id)) {
         page.off('worker', onTiffWorker);
       }
+      if (tool.id === 'ico-to-png') page.off('worker', onIcoWorker);
+      if (tool.id === 'ico-to-png') page.off('request', onIcoRequest);
       if (!blob?.size) {
         throw new Error('Conversion did not produce output blob.');
       }
@@ -1778,6 +2025,91 @@ try {
             'valid-fixture',
             'semantic-output',
             ...runTiffNegativePathProbe(tool.id),
+            'required-environment',
+          ],
+        };
+      }
+      if (tool.id === 'ico-to-png') {
+        const semantic = await decodeImageSummary(
+          page,
+          await lastBlobBytes(page),
+        );
+        const expectedPixels = new Uint8Array(128 * 80 * 4);
+        for (let offset = 0; offset < expectedPixels.length; offset += 4) {
+          expectedPixels.set([253, 165, 0, 255], offset);
+        }
+        const expectedRgbaSha256 = sha256(expectedPixels);
+        if (
+          semantic.width !== 128 ||
+          semantic.height !== 80 ||
+          semantic.pixelCount !== 128 * 80 ||
+          semantic.rgbaSha256 !== expectedRgbaSha256
+        ) {
+          throw new Error(
+            'ico-to-png output failed independent exact RGBA verification.',
+          );
+        }
+        const workerUrl = icoWorkerUrls.at(-1);
+        if (
+          icoWorkerUrls.length !== 1 ||
+          !workerUrl ||
+          new URL(workerUrl).origin !== new URL(page.url()).origin ||
+          !/\/_next\/static\/chunks\/[^/]+\.js$/.test(
+            new URL(workerUrl).pathname,
+          )
+        ) {
+          throw new Error('ico-to-png did not load its dedicated ICO Worker.');
+        }
+        const workerAsset = await page.evaluate(async (url) => {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`ICO Worker asset returned ${response.status}.`);
+          }
+          return {
+            bytes: (await response.arrayBuffer()).byteLength,
+            contentType: response.headers.get('content-type'),
+          };
+        }, workerUrl);
+        if (workerAsset.bytes < 1 || workerAsset.bytes > 128 * 1_024) {
+          throw new Error(
+            `ICO Worker entry chunk is outside its 128 KiB budget (${workerAsset.bytes} bytes).`,
+          );
+        }
+        if (icoUserByteRequests.length !== 0) {
+          throw new Error(
+            `ico-to-png uploaded the owned input bytes to ${icoUserByteRequests.join(', ')}.`,
+          );
+        }
+        const externalWorkerTermination =
+          await proveExternalIcoWorkerTermination(page, fixture.path);
+        const deployedNegativePaths = await proveDeployedIcoRejections(
+          page,
+          fixture.path,
+        );
+        return {
+          detail: `verified selected ICO pixels in PNG ${semantic.width}x${semantic.height}, ${blob.size} bytes`,
+          metrics: {
+            outputBytes: blob.size,
+            outputType: blob.type,
+            width: semantic.width,
+            height: semantic.height,
+            rgbaSha256: semantic.rgbaSha256,
+            workerUrls: icoWorkerUrls,
+            workerAsset,
+            selectedEntry: {
+              index: 1,
+              width: 128,
+              height: 80,
+              sourceKind: 'png',
+            },
+            userByteUploadRequests: icoUserByteRequests,
+            externalWorkerTermination,
+            deployedNegativePaths,
+          },
+          checks: [
+            'valid-fixture',
+            'semantic-output',
+            ...runIcoNegativePathProbe(),
             'required-environment',
           ],
         };

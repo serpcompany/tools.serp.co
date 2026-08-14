@@ -9,6 +9,7 @@ export type ConversionOp = 'raster' | 'pdf-pages' | 'video';
 export type ConversionDispatchKind =
   | 'adaptive-video'
   | 'browser-webm-ffmpeg'
+  | 'browser-ico-worker'
   | 'browser-pdf-pages'
   | 'browser-raster'
   | 'browser-tiff-worker'
@@ -142,6 +143,10 @@ const dispatchByKind = Object.freeze({
     kind: 'browser-raster',
     engineIds: Object.freeze(['browser-raster-worker']),
   }),
+  'browser-ico-worker': Object.freeze({
+    kind: 'browser-ico-worker',
+    engineIds: Object.freeze(['browser-ico-png-worker']),
+  }),
   'browser-tiff-worker': Object.freeze({
     kind: 'browser-tiff-worker',
     engineIds: Object.freeze(['browser-tiff-png-worker']),
@@ -167,6 +172,9 @@ export function resolveConversionDispatch(
   }
   if ((fromExt === 'tif' || fromExt === 'tiff') && toExt === 'png') {
     return dispatchByKind['browser-tiff-worker'];
+  }
+  if (fromExt === 'ico' && toExt === 'png') {
+    return dispatchByKind['browser-ico-worker'];
   }
   if (SERVER_IMAGE_INPUTS.has(fromExt)) {
     return SERVER_IMAGE_OUTPUTS.has(toExt)

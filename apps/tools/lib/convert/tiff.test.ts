@@ -12,10 +12,10 @@ import {
   decodeTiffToRgba,
   inspectTiffHeader,
   normalizeTiffRgb,
-  ownTiffWorkerTermination,
   verifyTiffDecodedOutput,
   validateTiffImageMetadata,
 } from './tiff.ts';
+import { ownWorkerTermination } from './owned-worker.ts';
 
 function classicTiffHeader(options: {
   byteOrder: 'big' | 'little';
@@ -101,7 +101,7 @@ test('TIFF worker client aborts by termination and suppresses late success', asy
       terminated += 1;
     },
   } as unknown as Worker;
-  const worker = ownTiffWorkerTermination(rawWorker);
+  const worker = ownWorkerTermination(rawWorker);
   const controller = new AbortController();
   const pending = convertTiffToPngWithWorker({
     worker,
@@ -143,7 +143,7 @@ test('TIFF worker client enforces the owned ten-second timeout and suppresses la
       terminated += 1;
     },
   } as unknown as Worker;
-  const worker = ownTiffWorkerTermination(rawWorker);
+  const worker = ownWorkerTermination(rawWorker);
   try {
     const pending = convertTiffToPngWithWorker({
       worker,

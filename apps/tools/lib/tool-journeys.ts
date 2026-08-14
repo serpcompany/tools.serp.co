@@ -141,6 +141,7 @@ function fileJourney(
     'bmp-to-pdf': 'bmp-pdf-page-image-semantics',
     'bmp-to-png': 'bmp-decoded-content-semantics',
     'bmp-to-webp': 'bmp-decoded-content-semantics',
+    'ico-to-png': 'ico-selected-image-pixel-semantics',
   };
   return journey(
     tool,

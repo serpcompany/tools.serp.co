@@ -25,6 +25,11 @@ import {
 import { decodeToRGBA } from './convert/decode.ts';
 import { inspectBmp, verifyBmpConversionSemantics } from './convert/bmp.ts';
 import {
+  convertIcoToPngWithWorker,
+  hasIcoIdentity,
+  ICO_TO_PNG_LIMITS,
+} from './convert/ico.ts';
+import {
   genericCompressionNeedsWorker,
   getGenericToolContract,
   mimeTypeForGenericFormat,
@@ -34,10 +39,10 @@ import { verifyHeifIdentity } from './convert/heif.ts';
 import {
   convertTiffToPngWithWorker,
   inspectTiffHeader,
-  ownTiffWorkerTermination,
   TIFF_TO_PNG_LIMITS,
   verifyTiffDecodedOutput,
 } from './convert/tiff.ts';
+import { ownWorkerTermination } from './convert/owned-worker.ts';
 import {
   isTiffInputFormat,
   TIFF_UPLOAD_ACCEPT,
@@ -107,6 +112,10 @@ export type GenericWorkflowAdapters = Readonly<{
     output: WorkflowMedia,
     context: Readonly<{ signal: AbortSignal }>,
   ): Promise<SemanticVerification>;
+  verifyIcoEquivalence?(
+    output: WorkflowMedia,
+    context: Readonly<{ signal: AbortSignal }>,
+  ): Promise<SemanticVerification>;
   decodeRaster?(
     media: WorkflowMedia,
     context: Readonly<{ signal: AbortSignal }>,
@@ -154,6 +163,11 @@ export async function verifyGenericMediaSemantics(
             'BMP structure is valid; a browser pixel decoder is required',
         }
       : inspection;
+  }
+  if (media.format === 'ico') {
+    return hasIcoIdentity(media.bytes)
+      ? { status: 'verified' as const }
+      : { status: 'rejected' as const, message: 'ICO input is malformed' };
   }
   if (media.format === 'm4a') {
     const verification = await verifyMediaSemantics(media);
@@ -415,21 +429,27 @@ function processorFor(
         maxInputBytes:
           contract.input.format === 'svg'
             ? SVG_COMPRESSION_LIMITS.maxBytes
-            : isTiffInputFormat(contract.input.format)
-              ? TIFF_TO_PNG_LIMITS.maxInputBytes
-              : MAX_INPUT_BYTES,
+            : contract.input.format === 'ico'
+              ? ICO_TO_PNG_LIMITS.maxInputBytes
+              : isTiffInputFormat(contract.input.format)
+                ? TIFF_TO_PNG_LIMITS.maxInputBytes
+                : MAX_INPUT_BYTES,
         maxOutputBytes:
           contract.output.format === 'svg'
             ? SVG_COMPRESSION_LIMITS.maxBytes
-            : isTiffInputFormat(contract.input.format)
-              ? TIFF_TO_PNG_LIMITS.maxOutputBytes
-              : MAX_OUTPUT_BYTES,
+            : contract.input.format === 'ico'
+              ? ICO_TO_PNG_LIMITS.maxOutputBytes
+              : isTiffInputFormat(contract.input.format)
+                ? TIFF_TO_PNG_LIMITS.maxOutputBytes
+                : MAX_OUTPUT_BYTES,
         maxTotalOutputBytes:
           contract.output.format === 'svg'
             ? SVG_COMPRESSION_LIMITS.maxBytes
-            : isTiffInputFormat(contract.input.format)
-              ? TIFF_TO_PNG_LIMITS.maxOutputBytes
-              : MAX_TOTAL_OUTPUT_BYTES,
+            : contract.input.format === 'ico'
+              ? ICO_TO_PNG_LIMITS.maxOutputBytes
+              : isTiffInputFormat(contract.input.format)
+                ? TIFF_TO_PNG_LIMITS.maxOutputBytes
+                : MAX_TOTAL_OUTPUT_BYTES,
       },
       outputCardinality: { min: 1, max: multiplePages ? 100 : 1 },
     },
@@ -560,6 +580,14 @@ function processorFor(
               message: 'TIFF pixel-equivalence verifier is unavailable',
             };
       }
+      if (contract.input.format === 'ico') {
+        return adapters.verifyIcoEquivalence
+          ? adapters.verifyIcoEquivalence(result, { signal: context.signal })
+          : {
+              status: 'rejected',
+              message: 'ICO selected-pixel verifier is unavailable',
+            };
+      }
       const bmpSource = bmpSourceByResult.get(result.bytes);
       if (!bmpSource) return formatVerification;
       return verifyBmpConversionSemantics({
@@ -581,8 +609,12 @@ function processorFor(
 
 export function createGenericToolWorkflow(
   adapters: GenericWorkflowAdapters,
+  options: Readonly<{
+    resolveContract?: (toolId: string) => GenericToolContract;
+  }> = {},
 ): ToolWorkflow {
   let nextSequence = 0;
+  const resolveContract = options.resolveContract ?? getGenericToolContract;
   return createToolWorkflow({
     acquisition: {
       file: {
@@ -599,7 +631,7 @@ export function createGenericToolWorkflow(
       },
     },
     resolveIntent(toolId) {
-      const contract = getGenericToolContract(toolId);
+      const contract = resolveContract(toolId);
       return contract.state === 'supported'
         ? {
             requestedOperation: contract.operation,
@@ -608,7 +640,7 @@ export function createGenericToolWorkflow(
         : undefined;
     },
     resolveProcessor(toolId) {
-      const contract = getGenericToolContract(toolId);
+      const contract = resolveContract(toolId);
       return contract.state === 'supported'
         ? processorFor(contract, adapters)
         : undefined;
@@ -654,6 +686,8 @@ const browserTiffIdentityByOutput = new WeakMap<
   Readonly<{ width: number; height: number; sourceRgbaSha256: string }>
 >();
 
+const browserVerifiedIcoOutputs = new WeakSet<Uint8Array>();
+
 const browserAdapters: GenericWorkflowAdapters = {
   decideSupport(request) {
     return decideGenericBrowserSupport(
@@ -664,8 +698,29 @@ const browserAdapters: GenericWorkflowAdapters = {
   },
   async convert({ from, to, bytes, quality, context }) {
     context.signal.throwIfAborted();
+    if (from === 'ico' && to === 'png') {
+      const worker = ownWorkerTermination(
+        new Worker(
+          new URL('../workers/ico-to-png.worker.js', import.meta.url),
+          { type: 'module' },
+        ),
+      );
+      await context.registerWorker(worker);
+      const result = await convertIcoToPngWithWorker({
+        worker,
+        bytes,
+        signal: context.signal,
+        onStage: (stage) =>
+          context.reportProgress(
+            stage === 'decode' ? 0.4 : stage === 'select' ? 0.7 : 0.9,
+          ),
+      });
+      browserVerifiedIcoOutputs.add(result.png);
+      context.reportProgress(1);
+      return [result.png];
+    }
     if (isTiffInputFormat(from) && to === 'png') {
-      const worker = ownTiffWorkerTermination(
+      const worker = ownWorkerTermination(
         new Worker(
           new URL('../workers/tiff-to-png.worker.js', import.meta.url),
         ),
@@ -881,6 +936,15 @@ const browserAdapters: GenericWorkflowAdapters = {
       };
     }
   },
+  async verifyIcoEquivalence(output, { signal }) {
+    signal.throwIfAborted();
+    return browserVerifiedIcoOutputs.has(output.bytes)
+      ? { status: 'verified' }
+      : {
+          status: 'rejected',
+          message: 'ICO Worker pixel verification is unavailable',
+        };
+  },
   async decodeRaster(media, { signal }) {
     const decoded = await decodeToRGBA(
       media.format,
@@ -972,9 +1036,11 @@ export async function runGenericToolFile(
   const maxInputBytes =
     contract.input.format === 'svg'
       ? SVG_COMPRESSION_LIMITS.maxBytes
-      : isTiffInputFormat(contract.input.format)
-        ? TIFF_TO_PNG_LIMITS.maxInputBytes
-        : MAX_INPUT_BYTES;
+      : contract.input.format === 'ico'
+        ? ICO_TO_PNG_LIMITS.maxInputBytes
+        : isTiffInputFormat(contract.input.format)
+          ? TIFF_TO_PNG_LIMITS.maxInputBytes
+          : MAX_INPUT_BYTES;
   if (file.size > maxInputBytes) {
     return failedFileOutcome(
       'invalid-request',
@@ -1037,6 +1103,7 @@ const SAFE_MIME_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   'image/jpg': 'image/jpeg',
   'image/pjpeg': 'image/jpeg',
   'image/x-png': 'image/png',
+  'image/vnd.microsoft.icon': 'image/x-icon',
 });
 
 function bmffBrands(bytes: Uint8Array): readonly string[] | undefined {
@@ -1058,6 +1125,7 @@ export async function detectGenericMediaMimeType(
   signal?: AbortSignal,
 ): Promise<string | undefined> {
   if (inspectBmp(bytes).status === 'verified') return 'image/bmp';
+  if (hasIcoIdentity(bytes)) return 'image/x-icon';
   if (ascii(bytes, 0, 8) === '\u0089PNG\r\n\u001a\n') return 'image/png';
   if (bytes[0] === 0xff && bytes[1] === 0xd8) return 'image/jpeg';
   if (hasWebpIdentity(bytes)) return 'image/webp';

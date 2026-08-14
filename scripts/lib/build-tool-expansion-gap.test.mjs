@@ -109,8 +109,8 @@ test('planning remains visibly separate and recommends three bounded exact-membe
     [
       {
         id: 'browser-raster-exact-capability',
-        count: 29,
-        expectedCoverageDelta: 29,
+        count: 28,
+        expectedCoverageDelta: 28,
       },
       {
         id: 'table-raster-semantic-validator',

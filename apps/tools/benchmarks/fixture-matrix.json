@@ -299,8 +299,8 @@
       "format": "ico",
       "status": "ready",
       "input": "file",
-      "fixture": "fixtures/sample.ico",
-      "notes": "Add a real fixture for this format."
+      "fixture": "fixtures/ico/selection.ico",
+      "notes": "Deterministic two-entry ICO containing a 96x96 blue DIB and a 128x80 orange PNG; the exact selection contract chooses the greater-area PNG entry."
     },
     {
       "format": "jfif",
