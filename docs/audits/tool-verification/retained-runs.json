@@ -34,10 +34,7 @@
                 "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
               },
               "invariantId": "generic-file-exact-output",
-              "checks": [
-                "valid-fixture",
-                "required-environment"
-              ],
+              "checks": ["valid-fixture", "required-environment"],
               "inputRevisions": {
                 "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
                 "fixture-content": "sha256:e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7",
@@ -50,9 +47,7 @@
               }
             }
           ],
-          "warnings": [
-            "other-console-warning"
-          ]
+          "warnings": ["other-console-warning"]
         }
       ]
     },
@@ -95,10 +90,7 @@
                 "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
               },
               "invariantId": "generic-file-exact-output",
-              "checks": [
-                "valid-fixture",
-                "required-environment"
-              ],
+              "checks": ["valid-fixture", "required-environment"],
               "inputRevisions": {
                 "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
                 "fixture-content": "sha256:e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7",
@@ -111,9 +103,7 @@
               }
             }
           ],
-          "warnings": [
-            "other-console-warning"
-          ]
+          "warnings": ["other-console-warning"]
         }
       ]
     },
@@ -200,10 +190,7 @@
               }
             }
           ],
-          "warnings": [
-            "adsense-script-attribute",
-            "other-console-warning"
-          ]
+          "warnings": ["adsense-script-attribute", "other-console-warning"]
         },
         {
           "toolId": "audio-to-transcript",
@@ -235,10 +222,7 @@
               }
             }
           ],
-          "warnings": [
-            "adsense-script-attribute",
-            "other-console-warning"
-          ]
+          "warnings": ["adsense-script-attribute", "other-console-warning"]
         },
         {
           "toolId": "batch-compress-png",
@@ -270,10 +254,7 @@
               }
             }
           ],
-          "warnings": [
-            "adsense-script-attribute",
-            "webgl-driver-performance"
-          ]
+          "warnings": ["adsense-script-attribute", "webgl-driver-performance"]
         },
         {
           "toolId": "bmp-to-png",
@@ -305,10 +286,7 @@
               }
             }
           ],
-          "warnings": [
-            "adsense-script-attribute",
-            "webgl-driver-performance"
-          ]
+          "warnings": ["adsense-script-attribute", "webgl-driver-performance"]
         },
         {
           "toolId": "compress-pdf",
@@ -341,9 +319,7 @@
               }
             }
           ],
-          "warnings": [
-            "adsense-script-attribute"
-          ]
+          "warnings": ["adsense-script-attribute"]
         },
         {
           "toolId": "csv-to-json",
@@ -375,9 +351,7 @@
               }
             }
           ],
-          "warnings": [
-            "adsense-script-attribute"
-          ]
+          "warnings": ["adsense-script-attribute"]
         },
         {
           "toolId": "pdf-reader",
@@ -449,9 +423,7 @@
               }
             }
           ],
-          "warnings": [
-            "adsense-script-attribute"
-          ]
+          "warnings": ["adsense-script-attribute"]
         },
         {
           "toolId": "video-downloader",
@@ -483,9 +455,7 @@
               }
             }
           ],
-          "warnings": [
-            "adsense-script-attribute"
-          ]
+          "warnings": ["adsense-script-attribute"]
         }
       ]
     },
@@ -574,9 +544,7 @@
               }
             }
           ],
-          "warnings": [
-            "other-console-warning"
-          ]
+          "warnings": ["other-console-warning"]
         },
         {
           "toolId": "audio-to-transcript",
@@ -608,9 +576,7 @@
               }
             }
           ],
-          "warnings": [
-            "other-console-warning"
-          ]
+          "warnings": ["other-console-warning"]
         },
         {
           "toolId": "batch-compress-png",
@@ -921,9 +887,7 @@
               }
             }
           ],
-          "warnings": [
-            "other-console-warning"
-          ]
+          "warnings": ["other-console-warning"]
         },
         {
           "toolId": "audio-to-transcript",
@@ -955,9 +919,7 @@
               }
             }
           ],
-          "warnings": [
-            "other-console-warning"
-          ]
+          "warnings": ["other-console-warning"]
         },
         {
           "toolId": "batch-compress-png",
@@ -2427,6 +2389,106 @@
                 "executable-sources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
                 "dependency-lock": "sha256:0d597defd8893e9427a6972e228aabfd31810aed73519766129125b97ebe31b0",
                 "runner-sources": "sha256:a8f7236780d708c80e4a9050a2f6f6d7ef9bcb8670de1956473c417b4765eb98"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "result": {
+      "status": "success"
+    }
+  },
+  {
+    "schemaVersion": 2,
+    "runId": "20260814T192923Z_226aa6f_pull-request_browser-smoke-preview-subset",
+    "command": {
+      "name": "smoke:tools:browser",
+      "version": "1"
+    },
+    "revision": {
+      "commit": "226aa6f097efe044fdf9411bf1e56c6b4ee290f6",
+      "dirty": false
+    },
+    "timestamps": {
+      "startedAt": "2026-08-14T19:29:23.650Z",
+      "completedAt": "2026-08-14T19:29:30.164Z"
+    },
+    "environment": "pull-request",
+    "scope": {
+      "label": "browser-smoke-preview-subset",
+      "inputHashes": [
+        "sha256:7f1420b62963f2627681c66dce42b4e60d4eed43884490a3256655ce74f522f7"
+      ],
+      "tools": [
+        {
+          "toolId": "tif-to-png",
+          "journeys": [
+            {
+              "journeyId": "tif-to-png:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/tif",
+                "sha256": "189d24c0d539000a09f76266a29dfbf988e4a2187b94840d203a8f32b937fe96"
+              },
+              "invariantId": "converted-file-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:bbaddf2733119d267d4e600c3daa50537ae2f982c87e3183cb9629c8149bc06f",
+                "fixture-content": "sha256:189d24c0d539000a09f76266a29dfbf988e4a2187b94840d203a8f32b937fe96",
+                "journey-contract": "sha256:fcf1b863a1be8448bac1454c5a0abcd8a904cc09121ca531e89c4525466b30b8",
+                "semantic-invariant": "sha256:9bddfac2a91fe344acc9986317c4d2709afd09d6e97333f70b3aab7d1442da01",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:b6628405babd0d1861b919516181d9abf18d57555a3513b4908445f9b18d3fdf",
+                "dependency-lock": "sha256:9b34f8084f11b1d767bb112e142e7bd314a76d5505355b7b0873f533134985a8",
+                "runner-sources": "sha256:ce2aada782ea2a7ac3425c4355509b21d2c2deba7345603a71a7aa0ab33dd4e5"
+              }
+            }
+          ]
+        },
+        {
+          "toolId": "tiff-to-png",
+          "journeys": [
+            {
+              "journeyId": "tiff-to-png:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/tiff",
+                "sha256": "00c6ced34fad8d1ef2f6936a1417df086c48141b8b3de7724c85216c4a578935"
+              },
+              "invariantId": "converted-file-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:2a766dd92e97124af5efa2326e84cd6b8eb9ec43ec07a97a91365bae36f8a802",
+                "fixture-content": "sha256:00c6ced34fad8d1ef2f6936a1417df086c48141b8b3de7724c85216c4a578935",
+                "journey-contract": "sha256:04c95f7066fdc4b96da2be3acee7fd3af7c59588277c15aa341cad578a20e9c2",
+                "semantic-invariant": "sha256:9bddfac2a91fe344acc9986317c4d2709afd09d6e97333f70b3aab7d1442da01",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:b6628405babd0d1861b919516181d9abf18d57555a3513b4908445f9b18d3fdf",
+                "dependency-lock": "sha256:9b34f8084f11b1d767bb112e142e7bd314a76d5505355b7b0873f533134985a8",
+                "runner-sources": "sha256:ce2aada782ea2a7ac3425c4355509b21d2c2deba7345603a71a7aa0ab33dd4e5"
               }
             }
           ]
