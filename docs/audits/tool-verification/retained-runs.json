@@ -34,7 +34,10 @@
                 "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
               },
               "invariantId": "generic-file-exact-output",
-              "checks": ["valid-fixture", "required-environment"],
+              "checks": [
+                "valid-fixture",
+                "required-environment"
+              ],
               "inputRevisions": {
                 "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
                 "fixture-content": "sha256:e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7",
@@ -47,7 +50,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         }
       ]
     },
@@ -90,7 +95,10 @@
                 "sha256": "e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7"
               },
               "invariantId": "generic-file-exact-output",
-              "checks": ["valid-fixture", "required-environment"],
+              "checks": [
+                "valid-fixture",
+                "required-environment"
+              ],
               "inputRevisions": {
                 "fixture-contract": "sha256:a97ef6a8469a56e53dc3a1bcc7e3a3441740d4163c315e24102555a734604a07",
                 "fixture-content": "sha256:e106670fbee532a2bffa0e245b0bb987be0178faf6445923f3541547116965d7",
@@ -103,7 +111,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         }
       ]
     },
@@ -190,7 +200,10 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute", "other-console-warning"]
+          "warnings": [
+            "adsense-script-attribute",
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "audio-to-transcript",
@@ -222,7 +235,10 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute", "other-console-warning"]
+          "warnings": [
+            "adsense-script-attribute",
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "batch-compress-png",
@@ -254,7 +270,10 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute", "webgl-driver-performance"]
+          "warnings": [
+            "adsense-script-attribute",
+            "webgl-driver-performance"
+          ]
         },
         {
           "toolId": "bmp-to-png",
@@ -286,7 +305,10 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute", "webgl-driver-performance"]
+          "warnings": [
+            "adsense-script-attribute",
+            "webgl-driver-performance"
+          ]
         },
         {
           "toolId": "compress-pdf",
@@ -319,7 +341,9 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute"]
+          "warnings": [
+            "adsense-script-attribute"
+          ]
         },
         {
           "toolId": "csv-to-json",
@@ -351,7 +375,9 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute"]
+          "warnings": [
+            "adsense-script-attribute"
+          ]
         },
         {
           "toolId": "pdf-reader",
@@ -423,7 +449,9 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute"]
+          "warnings": [
+            "adsense-script-attribute"
+          ]
         },
         {
           "toolId": "video-downloader",
@@ -455,7 +483,9 @@
               }
             }
           ],
-          "warnings": ["adsense-script-attribute"]
+          "warnings": [
+            "adsense-script-attribute"
+          ]
         }
       ]
     },
@@ -544,7 +574,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "audio-to-transcript",
@@ -576,7 +608,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "batch-compress-png",
@@ -887,7 +921,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "audio-to-transcript",
@@ -919,7 +955,9 @@
               }
             }
           ],
-          "warnings": ["other-console-warning"]
+          "warnings": [
+            "other-console-warning"
+          ]
         },
         {
           "toolId": "batch-compress-png",
@@ -2863,6 +2901,70 @@
                 "executable-sources": "sha256:b6628405babd0d1861b919516181d9abf18d57555a3513b4908445f9b18d3fdf",
                 "dependency-lock": "sha256:9b34f8084f11b1d767bb112e142e7bd314a76d5505355b7b0873f533134985a8",
                 "runner-sources": "sha256:ce2aada782ea2a7ac3425c4355509b21d2c2deba7345603a71a7aa0ab33dd4e5"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "result": {
+      "status": "success"
+    }
+  },
+  {
+    "schemaVersion": 2,
+    "runId": "20260814T222056Z_71b6004_pull-request_browser-smoke-preview-subset",
+    "command": {
+      "name": "smoke:tools:browser",
+      "version": "1"
+    },
+    "revision": {
+      "commit": "71b6004d2d92cb6acce3c7b2d70b31f4eb001baa",
+      "dirty": false
+    },
+    "timestamps": {
+      "startedAt": "2026-08-14T22:20:56.586Z",
+      "completedAt": "2026-08-14T22:21:05.330Z"
+    },
+    "environment": "pull-request",
+    "scope": {
+      "label": "browser-smoke-preview-subset",
+      "inputHashes": [
+        "sha256:2e8404b30c9b954d51d697be77e5e3bc6faf8c9b3a5e942cfb75e56e86d4986e"
+      ],
+      "tools": [
+        {
+          "toolId": "ico-to-png",
+          "journeys": [
+            {
+              "journeyId": "ico-to-png:upload",
+              "outcome": "passed",
+              "reasonCode": null,
+              "fixture": {
+                "kind": "content",
+                "reference": "formats/ico",
+                "sha256": "25a36366f3be4adade6961d445c58a72322e72cf616b98979a6535fb10433419"
+              },
+              "invariantId": "ico-selected-image-pixel-semantics",
+              "checks": [
+                "valid-fixture",
+                "semantic-output",
+                "malformed-input",
+                "spoofed-input",
+                "wrong-format-output",
+                "no-delivery-on-failure",
+                "cancellation-lifecycle",
+                "required-environment"
+              ],
+              "inputRevisions": {
+                "fixture-contract": "sha256:a2c7800ab21b6e616aa17387402597702cf3f7e2ca84f0b63bfc4224434a3273",
+                "fixture-content": "sha256:25a36366f3be4adade6961d445c58a72322e72cf616b98979a6535fb10433419",
+                "journey-contract": "sha256:e3618d9d66c58bdf7c1e03591ce81e6de5367a44ec51cf6a33271ab773d2e69f",
+                "semantic-invariant": "sha256:9ae5992450e0abee58aef96b283fcad0e06bbe48d27034d252d0f22592283a3a",
+                "verification-policy": "sha256:6fe3cf1675b509c1c1f39f65efa57e2e75f07564b09ec5eb3dccfda7aaa95f89",
+                "executable-sources": "sha256:61f0312e2102de9eb1143070ea076a03da0c4c2badc8f6541b3a1c3854184e2b",
+                "dependency-lock": "sha256:122672eb655908fc2725879833da56491e10e7aa1c234b8b6b43d9f660276537",
+                "runner-sources": "sha256:709b4bf11cf7b4ded6cfca6667d74b6918633db0c84aaa47297bdb0317b7c6da"
               }
             }
           ]
