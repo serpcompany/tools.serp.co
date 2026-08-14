@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PROTOTYPE — CSV to PNG visible semantics</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        background: #f6f7fb;
+        color: #172033;
+      }
+      body {
+        margin: 0;
+        padding: 40px 20px 64px;
+      }
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      h1,
+      h2 {
+        margin: 0 0 12px;
+      }
+      .lede {
+        max-width: 780px;
+        color: #526079;
+        line-height: 1.55;
+      }
+      .notice {
+        border-left: 4px solid #5b5bd6;
+        background: #efefff;
+        padding: 14px 16px;
+        margin: 24px 0;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+        gap: 20px;
+        align-items: start;
+      }
+      .card {
+        background: white;
+        border: 1px solid #dfe3ec;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 8px 24px rgb(34 45 74 / 6%);
+      }
+      canvas {
+        display: block;
+        max-width: 100%;
+        border: 1px solid #dfe3ec;
+        image-rendering: pixelated;
+      }
+      button {
+        border: 1px solid #c7cddd;
+        border-radius: 9px;
+        padding: 9px 12px;
+        background: white;
+        color: #172033;
+        font-weight: 650;
+        cursor: pointer;
+      }
+      button:hover {
+        border-color: #5b5bd6;
+      }
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+      dl {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 10px 12px;
+        margin: 0;
+      }
+      dt {
+        color: #66718a;
+      }
+      dd {
+        margin: 0;
+        font-weight: 650;
+        overflow-wrap: anywhere;
+      }
+      .pass {
+        color: #08783e;
+      }
+      .fail {
+        color: #b42318;
+      }
+      pre {
+        white-space: pre-wrap;
+        font-size: 12px;
+        line-height: 1.45;
+        background: #f6f7fb;
+        padding: 12px;
+        border-radius: 8px;
+        min-height: 64px;
+      }
+      .walkthroughs {
+        margin-top: 20px;
+      }
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .tabs button[aria-selected="true"] {
+        background: #5b5bd6;
+        border-color: #5b5bd6;
+        color: white;
+      }
+      @media (max-width: 760px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>PROTOTYPE — Can a PNG prove its visible table content?</h1>
+      <p class="lede">
+        This throwaway demo tests one question for <strong>csv-to-png</strong>: can the browser render a
+        readable table and then independently reopen the delivered PNG and recover the exact headers,
+        rows, and cells from pixels alone? It uses a deliberately constrained bitmap font so verification
+        does not need OCR, a server, or trust in the renderer.
+      </p>
+      <div class="notice">
+        Expected table: <strong>NAME / ROLE</strong>, then <strong>ADA / ENGINEER</strong> and
+        <strong>GRACE / SCIENTIST</strong>. A valid result must survive PNG encoding, ImageBitmap decoding,
+        and pixel-level glyph recovery.
+      </div>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Delivered PNG</h2>
+          <canvas id="preview" width="320" height="104"></canvas>
+          <div class="buttons" id="freePlay"></div>
+        </section>
+
+        <section class="card">
+          <h2>Verification state</h2>
+          <dl>
+            <dt>Scenario</dt><dd id="scenario">—</dd>
+            <dt>Result</dt><dd id="result">Not run</dd>
+            <dt>PNG bytes</dt><dd id="bytes">—</dd>
+            <dt>Dimensions</dt><dd id="dimensions">—</dd>
+            <dt>Recovered</dt><dd id="recovered">—</dd>
+          </dl>
+          <h2 style="margin-top: 20px">Why</h2>
+          <pre id="details">Choose a scenario.</pre>
+        </section>
+      </div>
+
+      <section class="card walkthroughs">
+        <h2>Guided walkthroughs</h2>
+        <div class="tabs" id="tabs"></div>
+        <p id="walkthroughDescription" class="lede"></p>
+        <div class="buttons" id="walkthroughSteps"></div>
+      </section>
+    </main>
+
+    <script>
+      // Portable prototype module: deterministic table raster + independent PNG pixel reader.
+      const CsvPngSemantics = (() => {
+        const GLYPHS = Object.freeze({
+          " ": ["00000", "00000", "00000", "00000", "00000", "00000", "00000"],
+          A: ["01110", "10001", "10001", "11111", "10001", "10001", "10001"],
+          B: ["11110", "10001", "10001", "11110", "10001", "10001", "11110"],
+          C: ["01111", "10000", "10000", "10000", "10000", "10000", "01111"],
+          D: ["11110", "10001", "10001", "10001", "10001", "10001", "11110"],
+          E: ["11111", "10000", "10000", "11110", "10000", "10000", "11111"],
+          F: ["11111", "10000", "10000", "11110", "10000", "10000", "10000"],
+          G: ["01111", "10000", "10000", "10111", "10001", "10001", "01111"],
+          H: ["10001", "10001", "10001", "11111", "10001", "10001", "10001"],
+          I: ["11111", "00100", "00100", "00100", "00100", "00100", "11111"],
+          J: ["00111", "00010", "00010", "00010", "10010", "10010", "01100"],
+          K: ["10001", "10010", "10100", "11000", "10100", "10010", "10001"],
+          L: ["10000", "10000", "10000", "10000", "10000", "10000", "11111"],
+          M: ["10001", "11011", "10101", "10101", "10001", "10001", "10001"],
+          N: ["10001", "11001", "10101", "10011", "10001", "10001", "10001"],
+          O: ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+          P: ["11110", "10001", "10001", "11110", "10000", "10000", "10000"],
+          Q: ["01110", "10001", "10001", "10001", "10101", "10010", "01101"],
+          R: ["11110", "10001", "10001", "11110", "10100", "10010", "10001"],
+          S: ["01111", "10000", "10000", "01110", "00001", "00001", "11110"],
+          T: ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
+          U: ["10001", "10001", "10001", "10001", "10001", "10001", "01110"],
+          V: ["10001", "10001", "10001", "10001", "10001", "01010", "00100"],
+          W: ["10001", "10001", "10001", "10101", "10101", "10101", "01010"],
+          X: ["10001", "10001", "01010", "00100", "01010", "10001", "10001"],
+          Y: ["10001", "10001", "01010", "00100", "00100", "00100", "00100"],
+          Z: ["11111", "00001", "00010", "00100", "01000", "10000", "11111"],
+        });
+
+        const EXPECTED = Object.freeze([
+          Object.freeze(["NAME", "ROLE"]),
+          Object.freeze(["ADA", "ENGINEER"]),
+          Object.freeze(["GRACE", "SCIENTIST"]),
+        ]);
+        const SCALE = 2;
+        const GLYPH_WIDTH = 5;
+        const GLYPH_HEIGHT = 7;
+        const CHAR_ADVANCE = 12;
+        const CELL_PADDING = 8;
+        const MAX_CHARS = 12;
+        const CELL_WIDTH = CELL_PADDING * 2 + MAX_CHARS * CHAR_ADVANCE;
+        const ROW_HEIGHT = CELL_PADDING * 2 + GLYPH_HEIGHT * SCALE;
+        const EXPECTED_WIDTH = CELL_WIDTH * 2 + 1;
+        const EXPECTED_HEIGHT = ROW_HEIGHT * 3 + 1;
+
+        function drawGlyph(ctx, glyph, x, y) {
+          const pattern = GLYPHS[glyph] ?? GLYPHS[" "];
+          ctx.fillStyle = "#101828";
+          for (let row = 0; row < GLYPH_HEIGHT; row += 1) {
+            for (let column = 0; column < GLYPH_WIDTH; column += 1) {
+              if (pattern[row][column] === "1") {
+                ctx.fillRect(x + column * SCALE, y + row * SCALE, SCALE, SCALE);
+              }
+            }
+          }
+        }
+
+        function drawCellText(ctx, value, cellX, cellY) {
+          [...value.toUpperCase().slice(0, MAX_CHARS)].forEach((glyph, index) =>
+            drawGlyph(ctx, glyph, cellX + CELL_PADDING + index * CHAR_ADVANCE, cellY + CELL_PADDING),
+          );
+        }
+
+        function render(rows, options = {}) {
+          const width = EXPECTED_WIDTH + (options.wrongDimensions ? 20 : 0);
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = EXPECTED_HEIGHT;
+          const ctx = canvas.getContext("2d", { alpha: false });
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, width, EXPECTED_HEIGHT);
+          if (!options.blank) {
+            rows.forEach((row, rowIndex) => {
+              row.forEach((value, columnIndex) => {
+                const x = columnIndex * CELL_WIDTH;
+                const y = rowIndex * ROW_HEIGHT;
+                ctx.fillStyle = rowIndex === 0 ? "#dfe4ff" : rowIndex % 2 ? "#ffffff" : "#f6f7fb";
+                ctx.fillRect(x + 1, y + 1, CELL_WIDTH - 1, ROW_HEIGHT - 1);
+                drawCellText(ctx, value, x, y);
+              });
+            });
+          }
+          ctx.strokeStyle = "#667085";
+          ctx.lineWidth = 1;
+          for (let row = 0; row <= 3; row += 1) {
+            ctx.beginPath();
+            ctx.moveTo(0.5, row * ROW_HEIGHT + 0.5);
+            ctx.lineTo(EXPECTED_WIDTH - 0.5, row * ROW_HEIGHT + 0.5);
+            ctx.stroke();
+          }
+          for (let column = 0; column <= 2; column += 1) {
+            ctx.beginPath();
+            ctx.moveTo(column * CELL_WIDTH + 0.5, 0.5);
+            ctx.lineTo(column * CELL_WIDTH + 0.5, EXPECTED_HEIGHT - 0.5);
+            ctx.stroke();
+          }
+          return canvas;
+        }
+
+        function canvasToPng(canvas) {
+          return new Promise((resolve, reject) => {
+            canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("PNG encoding failed"))), "image/png");
+          });
+        }
+
+        function pixelIsInk(data, width, x, y) {
+          const offset = (y * width + x) * 4;
+          return data[offset] < 80 && data[offset + 1] < 80 && data[offset + 2] < 100 && data[offset + 3] > 240;
+        }
+
+        function glyphSignature(data, width, cellX, cellY, charIndex) {
+          const rows = [];
+          for (let row = 0; row < GLYPH_HEIGHT; row += 1) {
+            let bits = "";
+            for (let column = 0; column < GLYPH_WIDTH; column += 1) {
+              const x = cellX + CELL_PADDING + charIndex * CHAR_ADVANCE + column * SCALE + 1;
+              const y = cellY + CELL_PADDING + row * SCALE + 1;
+              bits += pixelIsInk(data, width, x, y) ? "1" : "0";
+            }
+            rows.push(bits);
+          }
+          return rows.join("/");
+        }
+
+        const signatureToGlyph = new Map(
+          Object.entries(GLYPHS).map(([glyph, rows]) => [rows.join("/"), glyph]),
+        );
+
+        function recoverCell(data, width, row, column) {
+          let value = "";
+          for (let index = 0; index < MAX_CHARS; index += 1) {
+            const signature = glyphSignature(data, width, column * CELL_WIDTH, row * ROW_HEIGHT, index);
+            const glyph = signatureToGlyph.get(signature);
+            if (glyph === undefined) throw new Error(`Unknown visible glyph at row ${row + 1}, column ${column + 1}`);
+            value += glyph;
+          }
+          return value.trimEnd();
+        }
+
+        async function verifyPng(blob) {
+          if (blob.type !== "image/png") throw new Error(`Expected image/png; received ${blob.type || "unknown"}`);
+          const bitmap = await createImageBitmap(blob);
+          try {
+            if (bitmap.width !== EXPECTED_WIDTH || bitmap.height !== EXPECTED_HEIGHT) {
+              throw new Error(`Expected ${EXPECTED_WIDTH}×${EXPECTED_HEIGHT}; received ${bitmap.width}×${bitmap.height}`);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            const ctx = canvas.getContext("2d", { willReadFrequently: true });
+            ctx.drawImage(bitmap, 0, 0);
+            const image = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+            const recovered = EXPECTED.map((row, rowIndex) =>
+              row.map((_, columnIndex) => recoverCell(image.data, bitmap.width, rowIndex, columnIndex)),
+            );
+            if (JSON.stringify(recovered) !== JSON.stringify(EXPECTED)) {
+              throw new Error(`Visible content mismatch. Recovered ${JSON.stringify(recovered)}`);
+            }
+            return { width: bitmap.width, height: bitmap.height, recovered };
+          } finally {
+            bitmap.close();
+          }
+        }
+
+        return Object.freeze({ EXPECTED, render, canvasToPng, verifyPng });
+      })();
+
+      const scenarios = Object.freeze({
+        correct: { label: "Correct table", rows: CsvPngSemantics.EXPECTED },
+        changed: { label: "Changed cell", rows: [["NAME", "ROLE"], ["ADA", "DESIGNER"], ["GRACE", "SCIENTIST"]] },
+        reordered: { label: "Reordered rows", rows: [["NAME", "ROLE"], ["GRACE", "SCIENTIST"], ["ADA", "ENGINEER"]] },
+        missing: { label: "Missing row", rows: [["NAME", "ROLE"], ["ADA", "ENGINEER"]] },
+        blank: { label: "Blank output", rows: CsvPngSemantics.EXPECTED, blank: true },
+        dimensions: { label: "Wrong dimensions", rows: CsvPngSemantics.EXPECTED, wrongDimensions: true },
+        corrupt: { label: "Corrupt PNG", rows: CsvPngSemantics.EXPECTED, corrupt: true },
+      });
+
+      const preview = document.querySelector("#preview");
+      const previewContext = preview.getContext("2d");
+      const elements = Object.fromEntries(
+        ["scenario", "result", "bytes", "dimensions", "recovered", "details"].map((id) => [id, document.querySelector(`#${id}`)]),
+      );
+
+      async function runScenario(id) {
+        const scenario = scenarios[id];
+        elements.scenario.textContent = scenario.label;
+        elements.result.textContent = "Checking…";
+        elements.result.className = "";
+        elements.details.textContent = "Rendering, encoding, reopening, and reading visible glyph pixels.";
+        const rendered = CsvPngSemantics.render(scenario.rows, scenario);
+        preview.width = rendered.width;
+        preview.height = rendered.height;
+        previewContext.drawImage(rendered, 0, 0);
+        let blob = await CsvPngSemantics.canvasToPng(rendered);
+        if (scenario.corrupt) blob = new Blob(["not a png"], { type: "image/png" });
+        elements.bytes.textContent = String(blob.size);
+        try {
+          const verified = await CsvPngSemantics.verifyPng(blob);
+          elements.result.textContent = "PASS — exact visible semantics";
+          elements.result.className = "pass";
+          elements.dimensions.textContent = `${verified.width}×${verified.height}`;
+          elements.recovered.textContent = verified.recovered.flat().join(" · ");
+          elements.details.textContent = "The delivered PNG independently decoded to the exact expected headers, row order, and cell values.";
+        } catch (error) {
+          elements.result.textContent = "REJECTED — not verified";
+          elements.result.className = "fail";
+          elements.dimensions.textContent = `${rendered.width}×${rendered.height}`;
+          elements.recovered.textContent = "No verified table";
+          elements.details.textContent = error instanceof Error ? error.message : String(error);
+        }
+      }
+
+      const freePlay = document.querySelector("#freePlay");
+      Object.entries(scenarios).forEach(([id, scenario]) => {
+        const button = document.createElement("button");
+        button.textContent = scenario.label;
+        button.addEventListener("click", () => runScenario(id));
+        freePlay.append(button);
+      });
+
+      const walkthroughs = Object.freeze({
+        happy: {
+          label: "Happy path",
+          description: "Start with the owned table. Watch the verifier recover every visible header and cell from the PNG pixels.",
+          steps: ["correct"],
+        },
+        semantic: {
+          label: "Semantic lies",
+          description: "These images are valid PNGs with plausible dimensions, but their visible table meaning is wrong.",
+          steps: ["changed", "reordered", "missing"],
+        },
+        envelope: {
+          label: "Output envelope",
+          description: "These cases prove that blank, malformed, and wrong-size image output cannot pass as meaningful delivery.",
+          steps: ["blank", "dimensions", "corrupt"],
+        },
+      });
+
+      const tabs = document.querySelector("#tabs");
+      const description = document.querySelector("#walkthroughDescription");
+      const steps = document.querySelector("#walkthroughSteps");
+      function selectWalkthrough(id) {
+        [...tabs.children].forEach((button) => button.setAttribute("aria-selected", String(button.dataset.id === id)));
+        const walkthrough = walkthroughs[id];
+        description.textContent = walkthrough.description;
+        steps.replaceChildren();
+        walkthrough.steps.forEach((scenarioId, index) => {
+          const button = document.createElement("button");
+          button.textContent = `${index + 1}. ${scenarios[scenarioId].label}`;
+          button.addEventListener("click", () => runScenario(scenarioId));
+          steps.append(button);
+        });
+      }
+      Object.entries(walkthroughs).forEach(([id, walkthrough]) => {
+        const button = document.createElement("button");
+        button.dataset.id = id;
+        button.textContent = walkthrough.label;
+        button.addEventListener("click", () => selectWalkthrough(id));
+        tabs.append(button);
+      });
+      selectWalkthrough("happy");
+      runScenario("correct");
+    </script>
+  </body>
+</html>
