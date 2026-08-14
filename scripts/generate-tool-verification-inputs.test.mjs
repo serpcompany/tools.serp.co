@@ -31,6 +31,18 @@ test('execution evidence excludes capability projections but includes real proce
   );
   assert.equal(
     isToolExecutableVerificationInput(
+      'apps/tools/lib/tool-factory-source-view.ts',
+    ),
+    false,
+  );
+  assert.equal(
+    isToolExecutableVerificationInput(
+      'apps/tools/lib/tool-factory-summary.ts',
+    ),
+    false,
+  );
+  assert.equal(
+    isToolExecutableVerificationInput(
       'apps/tools/lib/generic-tool-workflow.ts',
     ),
     true,

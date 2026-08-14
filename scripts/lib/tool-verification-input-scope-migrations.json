@@ -7,7 +7,9 @@
       "excludedPaths": [
         "apps/tools/app/internal/tools/tool-factory-table.tsx",
         "apps/tools/lib/tool-acceptance-claims.ts",
-        "apps/tools/lib/tool-factory-read-model.ts"
+        "apps/tools/lib/tool-factory-read-model.ts",
+        "apps/tools/lib/tool-factory-source-view.ts",
+        "apps/tools/lib/tool-factory-summary.ts"
       ],
       "legacyExecutableSources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
       "narrowedExecutableSources": "sha256:659ba75a2108130167b9548443c445abd2e2f8bb046ae2581839f36da5ee7122"

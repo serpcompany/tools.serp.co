@@ -34,6 +34,7 @@ import type {
   ToolFactoryRow,
   ToolSupportDisposition,
 } from '../../../lib/tool-factory-read-model.ts';
+import { formatToolFactorySummary } from '../../../lib/tool-factory-summary.ts';
 import type { ToolClientFirstRow } from '../../../lib/tool-client-first-plan.ts';
 import type {
   ToolExpansionGroup,
@@ -1436,10 +1437,7 @@ export function ToolFactoryTable({
             {view.pilot === 'golden' ? 'Golden Journey pilot' : 'All Tools'}
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            {model.rows.length.toLocaleString()} active Tools ·{' '}
-            {model.counts.supported.toLocaleString()} processor capable ·{' '}
-            {model.counts.unsupported.toLocaleString()} explicitly processor-
-            unsupported · {model.counts.unknown.toLocaleString()} unknown
+            {formatToolFactorySummary(model)}
           </p>
           <p className="mt-1 font-mono text-xs text-slate-500">
             Revision {deployment.revision}

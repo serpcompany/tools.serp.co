@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { buildToolFactoryReadModel } from './tool-factory-read-model.ts';
+import { formatToolFactorySummary } from './tool-factory-summary.ts';
 import { toolAcceptanceClaims } from './tool-acceptance-claims.ts';
 
 test('Tool Factory read model accounts for every active Tool exactly once', () => {
@@ -16,6 +17,10 @@ test('Tool Factory read model accounts for every active Tool exactly once', () =
     unknown: 3,
   });
   assert.deepEqual(model.counts, toolAcceptanceClaims.counts);
+  assert.equal(
+    formatToolFactorySummary(model),
+    '2,807 active Tools · 439 processor capable · 2,365 explicitly processor-unsupported · 3 unknown',
+  );
   assert.equal(model.memberships, toolAcceptanceClaims.memberships);
   assert.equal(
     model.rows.every((row) => {

@@ -90,7 +90,7 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /name:\s*['"]CF_Authorization['"]/);
   assert.match(source, /getByLabel\(['"]Search all Tools['"]\)/);
   assert.match(source, /__reactFiber/);
-  assert.match(source, /Filter by support/);
+  assert.match(source, /Filter by processor capability/);
   assert.match(source, /getByLabel\(['"]Description['"]\)\.check/);
   assert.match(source, /name:\s*['"]Next['"]/);
   assert.match(source, /sharedUrl\.searchParams\.get\(['"]support['"]\)/);
@@ -112,6 +112,8 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   assert.match(source, /Open Golden Journey pilot/);
   assert.match(source, /Fixed membership sha256:cf077705/);
   assert.match(source, /golden-pilot-source-view\.ts/);
+  assert.match(source, /tool-factory-source-view\.ts/);
+  assert.match(source, /expectedFactory\.summaryText/);
   assert.match(source, /expectedGoldenPilot\.rows/);
   assert.match(source, /expected\.resultLabel/);
   assert.match(source, /expected\.remainingGap/);
@@ -126,7 +128,10 @@ test('hosted Tool Factory check owns authenticated browser interactions and scre
   );
   assert.match(source, /statSync\(screenshotPaths\.goldenPilot\)\.size > 0/);
   assert.match(source, /3g2-to-mp4/);
-  assert.match(source, /Candidate approaches · not verified support/);
+  assert.match(
+    source,
+    /Candidate approaches · not processor capability evidence/,
+  );
   assert.match(source, /No retained evidence/);
   assert.match(source, /Family verification policy \(not an exact Tool test\)/);
   assert.match(source, /planner\.screenshot/);

@@ -124,6 +124,16 @@ const expectedGoldenPilot = JSON.parse(
     { cwd: repositoryRoot, encoding: 'utf8' },
   ),
 );
+const expectedFactory = JSON.parse(
+  execFileSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      'apps/tools/lib/tool-factory-source-view.ts',
+    ],
+    { cwd: repositoryRoot, encoding: 'utf8' },
+  ),
+);
 let browser;
 let status = 'failure';
 const accessCookie = process.env.TOOL_FACTORY_CF_AUTHORIZATION ?? '';
@@ -182,11 +192,7 @@ try {
   await page.getByRole('heading', { name: 'All Tools' }).waitFor();
   await page.getByText(args.environment, { exact: true }).waitFor();
   await page.getByText(`Revision ${args.revision}`, { exact: true }).waitFor();
-  await page
-    .getByText(
-      '2,807 active Tools · 437 supported · 2,367 explicitly unsupported · 3 unknown',
-    )
-    .waitFor();
+  await page.getByText(expectedFactory.summaryText, { exact: true }).waitFor();
   await waitForHydration(page);
   await page.getByRole('link', { name: 'Open Golden Journey pilot' }).click();
   await page
@@ -335,7 +341,9 @@ try {
     .locator('..');
   await currentEngineFact.getByText('—', { exact: true }).waitFor();
   await unsupportedDialog
-    .getByText('Candidate approaches · not verified support', { exact: true })
+    .getByText('Candidate approaches · not processor capability evidence', {
+      exact: true,
+    })
     .waitFor();
   await page.keyboard.press('Escape');
   await page.getByLabel('Search all Tools').fill('');
@@ -508,7 +516,9 @@ try {
 
   await page.getByRole('button', { name: 'Reset' }).click();
   await page.getByLabel('Search all Tools').fill('to');
-  await page.getByLabel('Filter by support').selectOption('unsupported');
+  await page
+    .getByLabel('Filter by processor capability')
+    .selectOption('unsupported');
   await page
     .getByLabel('Filter by family')
     .selectOption('generic-convert:adaptive-video');
@@ -570,7 +580,7 @@ try {
   await page.getByText(`page 2 of ${sharedPageCount}`).waitFor();
   assert.equal(await page.getByLabel('Search all Tools').inputValue(), 'to');
   assert.equal(
-    await page.getByLabel('Filter by support').inputValue(),
+    await page.getByLabel('Filter by processor capability').inputValue(),
     'unsupported',
   );
   assert.equal(
