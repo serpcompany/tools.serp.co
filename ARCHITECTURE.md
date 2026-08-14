@@ -74,10 +74,12 @@ the registry or recreate publication and taxonomy rules.
 
 The tracked-source contract in
 `scripts/verify-tool-catalog-boundary.mjs` rejects direct registry readers,
-retired compatibility imports, and reconstructed active-publication filters.
+retired compatibility imports, reconstructed active-publication filters, and
+application/package/script references to advisory CSV evidence.
 Failures name the supported TypeScript Catalog and JavaScript adapter migration
 paths. The downloader registry synchronizer is the sole retained raw
-owned-output mutator; it does not provide a read interface to consumers.
+owned-output mutator; it writes only the Tool Catalog and does not provide a
+read interface to consumers or mutate planning evidence.
 
 Registry Tool id is the join key across catalog intent, fixtures, verification,
 runtime observations, planning evidence, and GitHub work. Names, routes, and

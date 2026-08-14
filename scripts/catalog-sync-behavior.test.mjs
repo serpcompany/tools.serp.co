@@ -198,7 +198,6 @@ test('downloader deduplication retains bounded title and product URL aliases', a
   };
   const result = await planDownloaderRegistrySync({
     toolsSource: JSON.stringify([existingTool]),
-    plannerSource: 'keyword,operation,tool_id\n',
     registry: {
       overrides: {
         'serpapps/title-alias-downloader': {
