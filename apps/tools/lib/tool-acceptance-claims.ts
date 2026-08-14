@@ -5,7 +5,7 @@ import { toolCatalog } from '@serp-tools/app-core/lib/tool-catalog';
 import { getGenericToolContract } from './generic-tool-contract.ts';
 import { getTableOperationPolicy } from './table-operation-policy.ts';
 import { getToolProcessorAvailability } from './tool-processor-registry.ts';
-import { selectToolRenderer } from './tool-renderer.ts';
+import { selectToolRenderer, type ToolRenderer } from './tool-renderer.ts';
 
 export type ToolAcceptanceDisposition =
   | 'supported'
@@ -34,7 +34,7 @@ type AcceptanceTableFact = Readonly<{
 
 export type ToolAcceptanceSourceFact = Readonly<{
   toolId: string;
-  renderer: string;
+  renderer: ToolRenderer;
   availability: AcceptanceAvailability;
   genericContract: AcceptanceContractFact;
   tablePolicy: AcceptanceTableFact;
@@ -79,6 +79,16 @@ const DISPOSITIONS = Object.freeze([
   'unwired',
   'unknown',
 ] as const satisfies readonly ToolAcceptanceDisposition[]);
+const RENDERERS = Object.freeze([
+  'table',
+  'transcription',
+  'specialized',
+  'generic',
+  'downloader',
+  'pdf',
+  'placeholder',
+  'not-found',
+] as const satisfies readonly ToolRenderer[]);
 
 function deepFreeze<Value>(value: Value): Value {
   if (value && typeof value === 'object' && !Object.isFrozen(value)) {
@@ -109,7 +119,7 @@ function nonEmpty(value: unknown): value is string {
 }
 
 function validateSourceFact(fact: ToolAcceptanceSourceFact) {
-  if (!fact || !nonEmpty(fact.toolId) || !nonEmpty(fact.renderer)) {
+  if (!fact || !nonEmpty(fact.toolId) || !RENDERERS.includes(fact.renderer)) {
     throw new TypeError('Tool acceptance source facts require an identity.');
   }
   if (!['wired', 'unwired', 'unknown'].includes(fact.availability?.kind)) {
@@ -146,6 +156,18 @@ function validateSourceFact(fact: ToolAcceptanceSourceFact) {
       `${fact.toolId} has an incomplete acceptance contract.`,
     );
   }
+  const genericApplies = fact.renderer === 'generic';
+  const tableApplies = fact.renderer === 'table';
+  if (
+    (genericApplies && fact.tablePolicy.kind !== 'not-applicable') ||
+    (tableApplies && fact.genericContract.state !== 'not-applicable') ||
+    (!genericApplies &&
+      !tableApplies &&
+      (fact.genericContract.state !== 'not-applicable' ||
+        fact.tablePolicy.kind !== 'not-applicable'))
+  ) {
+    throw new TypeError(`${fact.toolId} has incoherent renderer contracts.`);
+  }
 }
 
 function claimFor(fact: ToolAcceptanceSourceFact): ToolAcceptanceClaim {
@@ -153,9 +175,13 @@ function claimFor(fact: ToolAcceptanceSourceFact): ToolAcceptanceClaim {
   const contract = contractKind(fact);
   const contractUnsupported = contract === 'unsupported';
   const contractEligible = contract === 'supported' || contract === 'eligible';
+  const contractApplies =
+    fact.renderer === 'generic' || fact.renderer === 'table';
 
   if (
-    (fact.availability.kind === 'wired' && contractUnsupported) ||
+    (fact.availability.kind === 'wired' &&
+      contractApplies &&
+      !contractEligible) ||
     (fact.availability.kind !== 'wired' && contractEligible)
   ) {
     throw new TypeError(
@@ -261,11 +287,12 @@ function canonicalSourceFact(
   tool: (typeof toolCatalog.activeTools)[number],
 ): ToolAcceptanceSourceFact {
   const availability = getToolProcessorAvailability(tool.id);
+  const renderer = selectToolRenderer(tool);
   const genericContract = getGenericToolContract(tool.id);
   const tablePolicy = getTableOperationPolicy(tool.id);
   return {
     toolId: tool.id,
-    renderer: selectToolRenderer(tool),
+    renderer,
     availability:
       availability.kind === 'wired'
         ? { kind: availability.kind, adapterId: availability.adapterId }
@@ -275,13 +302,18 @@ function canonicalSourceFact(
             sourceNeeded: availability.sourceNeeded,
           },
     genericContract: {
-      state: genericContract.state,
+      state: renderer === 'generic' ? genericContract.state : 'not-applicable',
       reason:
-        genericContract.state === 'unsupported' ? genericContract.reason : null,
+        renderer === 'generic' && genericContract.state === 'unsupported'
+          ? genericContract.reason
+          : null,
     },
     tablePolicy: {
-      kind: tablePolicy.kind,
-      reason: tablePolicy.kind === 'eligible' ? null : tablePolicy.reason,
+      kind: renderer === 'table' ? tablePolicy.kind : 'not-applicable',
+      reason:
+        renderer === 'table' && tablePolicy.kind !== 'eligible'
+          ? tablePolicy.reason
+          : null,
     },
   };
 }

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "migrations": [
+    {
+      "id": "exclude-capability-projections-v1",
+      "baselineRevision": "714dd1b0d5923ea5f8a88377a4b4036781542a77",
+      "excludedPaths": [
+        "apps/tools/app/internal/tools/tool-factory-table.tsx",
+        "apps/tools/lib/tool-acceptance-claims.ts",
+        "apps/tools/lib/tool-factory-read-model.ts"
+      ],
+      "legacyExecutableSources": "sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e",
+      "narrowedExecutableSources": "sha256:659ba75a2108130167b9548443c445abd2e2f8bb046ae2581839f36da5ee7122"
+    }
+  ]
+}

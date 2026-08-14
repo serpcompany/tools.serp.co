@@ -153,7 +153,7 @@ test('public constructor exposes and deeply freezes every disposition', () => {
     },
     {
       toolId: 'unknown-tool',
-      renderer: 'unknown',
+      renderer: 'placeholder',
       availability: {
         kind: 'unknown',
         reason: 'Trace the renderer owner.',
@@ -203,5 +203,47 @@ test('public constructor rejects malformed runtime source facts', () => {
         } as never,
       ]),
     /invalid processor availability/i,
+  );
+  assert.throws(
+    () =>
+      createToolAcceptanceClaims([
+        {
+          toolId: 'misspelled-renderer',
+          renderer: 'generci',
+          availability: { kind: 'wired', adapterId: 'generic-conversion' },
+          genericContract: { state: 'not-applicable', reason: null },
+          tablePolicy: { kind: 'not-applicable', reason: null },
+        } as never,
+      ]),
+    /require an identity/i,
+  );
+  assert.throws(
+    () =>
+      createToolAcceptanceClaims([
+        {
+          toolId: 'generic-without-contract',
+          renderer: 'generic',
+          availability: { kind: 'wired', adapterId: 'generic-conversion' },
+          genericContract: { state: 'not-applicable', reason: null },
+          tablePolicy: { kind: 'not-applicable', reason: null },
+        },
+      ]),
+    /contradictory processor acceptance facts/i,
+  );
+  assert.throws(
+    () =>
+      createToolAcceptanceClaims([
+        {
+          toolId: 'table-with-unknown-contract',
+          renderer: 'table',
+          availability: { kind: 'wired', adapterId: 'table-conversion' },
+          genericContract: { state: 'not-applicable', reason: null },
+          tablePolicy: {
+            kind: 'unknown',
+            reason: 'No table contract is owned.',
+          },
+        },
+      ]),
+    /contradictory processor acceptance facts/i,
   );
 });

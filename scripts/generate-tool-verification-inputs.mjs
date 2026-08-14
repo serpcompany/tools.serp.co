@@ -14,27 +14,60 @@ const outputPath = path.join(
   repositoryRoot,
   'apps/tools/lib/tool-verification-inputs.generated.json',
 );
-const NON_EXECUTABLE_PROJECTION_FILES = new Set([
-  'apps/tools/app/internal/tools/tool-factory-table.tsx',
-  'apps/tools/lib/tool-acceptance-claims.ts',
-  'apps/tools/lib/tool-factory-read-model.ts',
+const EXECUTABLE_SOURCE_PATTERNS = Object.freeze([
+  'apps/tools/app',
+  'apps/tools/next.config.mjs',
+  'apps/tools/open-next.config.ts',
+  'apps/tools/package.json',
+  'apps/tools/wrangler.jsonc',
+  'apps/tools/lib',
+  'apps/tools/components',
+  'apps/tools/workers',
+  'apps/tools/public',
+  'packages/app-core/src',
+  'packages/tool-telemetry/src',
+  'packages/ui/src',
+  'packages/app-core/package.json',
+  'packages/tool-telemetry/package.json',
+  'packages/ui/package.json',
+  'package.json',
 ]);
-const EXECUTABLE_HASH_SCOPE_MIGRATION = Object.freeze({
-  narrowed: '659ba75a2108130167b9548443c445abd2e2f8bb046ae2581839f36da5ee7122',
-  legacy: '6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e',
-});
+const migrationCatalog = JSON.parse(
+  readFileSync(
+    path.join(
+      repositoryRoot,
+      'scripts/lib/tool-verification-input-scope-migrations.json',
+    ),
+    'utf8',
+  ),
+);
+if (
+  migrationCatalog.schemaVersion !== 1 ||
+  migrationCatalog.migrations.length !== 1
+) {
+  throw new TypeError('Executable input scope migration catalog is invalid.');
+}
+const executableHashScopeMigration = Object.freeze(
+  migrationCatalog.migrations[0],
+);
+const NON_EXECUTABLE_PROJECTION_FILES = new Set(
+  executableHashScopeMigration.excludedPaths,
+);
 
 export function isToolExecutableVerificationInput(file) {
   return !NON_EXECUTABLE_PROJECTION_FILES.has(file);
 }
 
-export function compatibleExecutableSourcesRevision(narrowedHash) {
+export function compatibleExecutableSourcesRevision(
+  narrowedHash,
+  migration = verifyExecutableHashScopeMigration(),
+) {
   if (!/^[a-f0-9]{64}$/.test(narrowedHash)) {
     throw new TypeError('Executable source hash must be a SHA-256 digest.');
   }
   const digest =
-    narrowedHash === EXECUTABLE_HASH_SCOPE_MIGRATION.narrowed
-      ? EXECUTABLE_HASH_SCOPE_MIGRATION.legacy
+    `sha256:${narrowedHash}` === migration.narrowedExecutableSources
+      ? migration.legacyExecutableSources.slice('sha256:'.length)
       : narrowedHash;
   return `sha256:${digest}`;
 }
@@ -43,11 +76,8 @@ function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
 }
 
-function trackedFiles(patterns) {
-  return execFileSync('git', ['ls-files', '--', ...patterns], {
-    cwd: repositoryRoot,
-    encoding: 'utf8',
-  })
+function filteredFiles(output) {
+  return output
     .trim()
     .split('\n')
     .filter(
@@ -60,6 +90,25 @@ function trackedFiles(patterns) {
     .sort();
 }
 
+function trackedFiles(patterns) {
+  return filteredFiles(
+    execFileSync('git', ['ls-files', '--', ...patterns], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+    }),
+  );
+}
+
+function trackedFilesAtRevision(revision, patterns) {
+  return filteredFiles(
+    execFileSync(
+      'git',
+      ['ls-tree', '-r', '--name-only', revision, '--', ...patterns],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    ),
+  );
+}
+
 function hashFiles(files) {
   const hash = crypto.createHash('sha256');
   for (const file of files) {
@@ -69,6 +118,62 @@ function hashFiles(files) {
     hash.update('\0');
   }
   return hash.digest('hex');
+}
+
+function hashFilesAtRevision(files, revision) {
+  const batch = execFileSync('git', ['cat-file', '--batch'], {
+    cwd: repositoryRoot,
+    input: files.map((file) => `${revision}:${file}\n`).join(''),
+    maxBuffer: 256 * 1024 * 1024,
+  });
+  const hash = crypto.createHash('sha256');
+  let offset = 0;
+  for (const file of files) {
+    const headerEnd = batch.indexOf(10, offset);
+    const header = batch.subarray(offset, headerEnd).toString('utf8');
+    const [, type, sizeText] = header.split(' ');
+    const size = Number(sizeText);
+    if (type !== 'blob' || !Number.isSafeInteger(size)) {
+      throw new TypeError(`Cannot read migration input ${file}.`);
+    }
+    const contentStart = headerEnd + 1;
+    const contentEnd = contentStart + size;
+    hash.update(file);
+    hash.update('\0');
+    hash.update(batch.subarray(contentStart, contentEnd));
+    hash.update('\0');
+    offset = contentEnd + 1;
+  }
+  return hash.digest('hex');
+}
+
+export function verifyExecutableHashScopeMigration() {
+  const migration = executableHashScopeMigration;
+  if (
+    !/^[a-f0-9]{40}$/.test(migration.baselineRevision) ||
+    !Array.isArray(migration.excludedPaths)
+  ) {
+    throw new TypeError('Executable input scope migration record is invalid.');
+  }
+  const baselineFiles = trackedFilesAtRevision(
+    migration.baselineRevision,
+    EXECUTABLE_SOURCE_PATTERNS,
+  );
+  const legacy = `sha256:${hashFilesAtRevision(
+    baselineFiles,
+    migration.baselineRevision,
+  )}`;
+  const narrowed = `sha256:${hashFilesAtRevision(
+    baselineFiles.filter(isToolExecutableVerificationInput),
+    migration.baselineRevision,
+  )}`;
+  if (
+    legacy !== migration.legacyExecutableSources ||
+    narrowed !== migration.narrowedExecutableSources
+  ) {
+    throw new TypeError('Executable input scope migration proof drifted.');
+  }
+  return migration;
 }
 
 const fixtureRoot = path.join(repositoryRoot, 'apps/tools/benchmarks');
@@ -99,24 +204,9 @@ function fixtureDigest(journey) {
 }
 
 export function buildToolVerificationInputs() {
-  const executableFiles = trackedFiles([
-    'apps/tools/app',
-    'apps/tools/next.config.mjs',
-    'apps/tools/open-next.config.ts',
-    'apps/tools/package.json',
-    'apps/tools/wrangler.jsonc',
-    'apps/tools/lib',
-    'apps/tools/components',
-    'apps/tools/workers',
-    'apps/tools/public',
-    'packages/app-core/src',
-    'packages/tool-telemetry/src',
-    'packages/ui/src',
-    'packages/app-core/package.json',
-    'packages/tool-telemetry/package.json',
-    'packages/ui/package.json',
-    'package.json',
-  ]).filter(isToolExecutableVerificationInput);
+  const executableFiles = trackedFiles(EXECUTABLE_SOURCE_PATTERNS).filter(
+    isToolExecutableVerificationInput,
+  );
   const runnerFiles = trackedFiles([
     'scripts/run-browser-check.mjs',
     'scripts/run-artifacts.mjs',

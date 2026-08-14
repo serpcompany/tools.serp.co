@@ -7,6 +7,7 @@ import {
   buildToolVerificationInputs,
   compatibleExecutableSourcesRevision,
   isToolExecutableVerificationInput,
+  verifyExecutableHashScopeMigration,
 } from './generate-tool-verification-inputs.mjs';
 
 test('execution evidence excludes capability projections but includes real processors and workers', () => {
@@ -41,18 +42,25 @@ test('execution evidence excludes capability projections but includes real proce
 });
 
 test('hash-scope migration preserves exact retained evidence only at the transition digest', () => {
+  const migration = verifyExecutableHashScopeMigration();
+  assert.equal(migration.id, 'exclude-capability-projections-v1');
+  assert.equal(
+    migration.baselineRevision,
+    '714dd1b0d5923ea5f8a88377a4b4036781542a77',
+  );
   assert.equal(
     compatibleExecutableSourcesRevision(
       '659ba75a2108130167b9548443c445abd2e2f8bb046ae2581839f36da5ee7122',
+      migration,
     ),
     'sha256:6a3479acce25ce3ddb69eb692bcd25dff7ab3a40a62eb93184e3c72dc105aa4e',
   );
   assert.equal(
-    compatibleExecutableSourcesRevision('f'.repeat(64)),
+    compatibleExecutableSourcesRevision('f'.repeat(64), migration),
     `sha256:${'f'.repeat(64)}`,
   );
   assert.throws(
-    () => compatibleExecutableSourcesRevision('not-a-digest'),
+    () => compatibleExecutableSourcesRevision('not-a-digest', migration),
     /must be a SHA-256 digest/i,
   );
 });

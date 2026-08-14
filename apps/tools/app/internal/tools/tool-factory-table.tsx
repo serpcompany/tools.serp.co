@@ -485,7 +485,7 @@ function buildColumns(
     {
       id: 'supportReason',
       accessorFn: (row) => row.support.reason ?? '—',
-      header: 'Support reason',
+      header: 'Processor capability reason',
       size: 420,
     },
     {
@@ -700,8 +700,8 @@ function ToolExpansionPlanner({
           <h2 className="text-lg font-semibold">OSS expansion planner</h2>
           <p className="mt-1 max-w-4xl text-sm text-slate-600">
             {plan.groups.length.toLocaleString()} review groups account for all{' '}
-            {plan.unsupportedToolCount.toLocaleString()} explicitly unsupported
-            Tools. Ranking method: {plan.ranking.method}
+            {plan.unsupportedToolCount.toLocaleString()} explicitly processor-
+            unsupported Tools. Ranking method: {plan.ranking.method}
           </p>
         </div>
         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
@@ -1142,7 +1142,10 @@ function ToolDetail({
           <FamilyVerificationPolicy row={row} />
           <GithubWork row={row} />
           <Fact label="Catalog description" value={row.description} />
-          <Fact label="Support reason" value={row.support.reason ?? '—'} />
+          <Fact
+            label="Processor capability reason"
+            value={row.support.reason ?? '—'}
+          />
           <Fact label="Attention" value={row.attention.summary} />
           <div className="rounded-lg border p-3">
             <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -1435,8 +1438,8 @@ export function ToolFactoryTable({
           <p className="mt-1 text-sm text-slate-600">
             {model.rows.length.toLocaleString()} active Tools ·{' '}
             {model.counts.supported.toLocaleString()} processor capable ·{' '}
-            {model.counts.unsupported.toLocaleString()} explicitly unsupported ·{' '}
-            {model.counts.unknown.toLocaleString()} unknown
+            {model.counts.unsupported.toLocaleString()} explicitly processor-
+            unsupported · {model.counts.unknown.toLocaleString()} unknown
           </p>
           <p className="mt-1 font-mono text-xs text-slate-500">
             Revision {deployment.revision}
@@ -1500,14 +1503,16 @@ export function ToolFactoryTable({
               }}
             />
             <select
-              aria-label="Filter by support"
+              aria-label="Filter by processor capability"
               className="h-9 rounded-md border bg-white px-3 text-sm"
               value={view.filters.support}
               onChange={(event) => setFilter('support', event.target.value)}
             >
-              <option value="">All support</option>
+              <option value="">All processor capabilities</option>
               {supportValues.map((value) => (
-                <option key={value}>{value}</option>
+                <option key={value} value={value}>
+                  {processorCapabilityLabel(value as ToolSupportDisposition)}
+                </option>
               ))}
             </select>
             <select
