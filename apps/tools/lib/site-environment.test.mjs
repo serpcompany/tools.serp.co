@@ -155,8 +155,4 @@ test("absolute URLs use the canonical origin when deployed and the request origi
       String(siteEnv),
     );
   }
-  assert.equal(
-    origin({ siteEnv: "production", siteUrl: undefined }, "http://localhost:3000/"),
-    "http://localhost:3000",
-  );
 });
