@@ -111,6 +111,17 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
     return decodeHeifToRGBA(buf);
   }
 
+  if (e === "ktx" || e === "ktx2") {
+    const { decodeKtx1, decodeKtx2 } = await import("./texture-formats.ts");
+    return e === "ktx" ? decodeKtx1(new Uint8Array(buf)) : decodeKtx2(new Uint8Array(buf));
+  }
+
+  if (e === "icns") {
+    const { largestIcnsPng } = await import("./texture-formats.ts");
+    const png = largestIcnsPng(new Uint8Array(buf));
+    return decodeToRGBA("png", png.slice().buffer);
+  }
+
   const mimeMap: Record<string, string> = {
     jpg: "image/jpeg",
     jpeg: "image/jpeg",

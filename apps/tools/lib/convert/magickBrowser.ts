@@ -42,8 +42,9 @@ export const MAGICK_BROWSER_INPUTS = new Set([
   "dds", "psd", "tga", "tif", "tiff", "xcf",
 ]);
 
-// Formats ImageMagick writes that a canvas can't. Camera RAW, HEIC, ICNS and
-// KTX can't be written by any engine we have.
+// Formats ImageMagick writes that a canvas can't (ICNS and KTX have their own
+// writers in texture-formats.ts). Camera RAW and HEIC can't be written by any
+// engine we have.
 export const MAGICK_BROWSER_OUTPUTS = new Set([
   "bmp", "cur", "dds", "eps", "exr", "gif", "hdr", "ico", "jp2", "jxl", "pam",
   "pbm", "pcx", "pgm", "ppm", "psd", "rgb", "tga", "tif", "tiff", "wbmp",
