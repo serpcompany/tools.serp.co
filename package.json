@@ -36,6 +36,16 @@
     "onlyBuiltDependencies": [
       "gifsicle",
       "sharp"
-    ]
+    ],
+    "overrides": {
+      "brace-expansion@1": "^1.1.21",
+      "minimatch@3": "^3.1.4",
+      "nanoid@3": "^3.3.18",
+      "picomatch@2": "^2.3.2",
+      "postcss": "^8.5.23",
+      "cross-spawn@<6.0.6": "^6.0.6",
+      "semver-regex@<3.1.4": "^3.1.4",
+      "imagemin>file-type": "^21.3.1"
+    }
   }
 }

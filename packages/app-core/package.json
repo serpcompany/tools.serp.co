@@ -7,10 +7,10 @@
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
-    "@next/third-parties": "^15.5.12",
+    "@next/third-parties": "^15.5.27",
     "@serp-tools/ui": "workspace:*",
     "lucide-react": "^0.541.0",
-    "next": "15.5.12",
+    "next": "15.5.27",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
