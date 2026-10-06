@@ -2048,7 +2048,7 @@ avif to pbm,convert,"x to y, convert x to y",onsite-unverified,".avif,.pbm",/avi
 avif to pcx,convert,"x to y, convert x to y",onsite-unverified,".avif,.pcx",/avif-to-pcx,,,canvas-only,none (browser canvas)
 avif to pgm,convert,"x to y, convert x to y",onsite-unverified,".avif,.pgm",/avif-to-pgm,,,canvas-only,none (browser canvas)
 avif to ppm,convert,"x to y, convert x to y",onsite-unverified,".avif,.ppm",/avif-to-ppm,,,canvas-only,none (browser canvas)
-avif to rw2,convert,"x to y, convert x to y",onsite-unverified,".avif,.rw2",/avif-to-rw2,,,canvas-only,none (browser canvas)
+avif to rw2,convert,"x to y, convert x to y",retired,".avif,.rw2",/avif-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 avif to tga,convert,"x to y, convert x to y",onsite-unverified,".avif,.tga",/avif-to-tga,,,canvas-only,none (browser canvas)
 avif to tif,convert,"x to y, convert x to y",onsite-unverified,".avif,.tif",/avif-to-tif,,,canvas-only,none (browser canvas)
 avif to xbm,convert,"x to y, convert x to y",onsite-unverified,".avif,.xbm",/avif-to-xbm,,,canvas-only,none (browser canvas)
@@ -2065,7 +2065,7 @@ bmp to pbm,convert,"x to y, convert x to y",onsite-unverified,".bmp,.pbm",/bmp-t
 bmp to pcx,convert,"x to y, convert x to y",onsite-unverified,".bmp,.pcx",/bmp-to-pcx,,,canvas-only,none (browser canvas)
 bmp to pgm,convert,"x to y, convert x to y",onsite-unverified,".bmp,.pgm",/bmp-to-pgm,,,canvas-only,none (browser canvas)
 bmp to ppm,convert,"x to y, convert x to y",onsite-unverified,".bmp,.ppm",/bmp-to-ppm,,,canvas-only,none (browser canvas)
-bmp to rw2,convert,"x to y, convert x to y",onsite-unverified,".bmp,.rw2",/bmp-to-rw2,,,canvas-only,none (browser canvas)
+bmp to rw2,convert,"x to y, convert x to y",retired,".bmp,.rw2",/bmp-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 crw to jpeg,convert,"x to y, convert x to y",onsite-unverified,".crw,.jpeg",/crw-to-jpeg,,,canvas-only,none (browser canvas)
 cur to heic,convert,"x to y, convert x to y",onsite-unverified,".cur,.heic",/cur-to-heic,,,canvas-only,none (browser canvas)
 cur to heif,convert,"x to y, convert x to y",onsite-unverified,".cur,.heif",/cur-to-heif,,,canvas-only,none (browser canvas)
@@ -2080,7 +2080,7 @@ cur to pbm,convert,"x to y, convert x to y",onsite-unverified,".cur,.pbm",/cur-t
 cur to pcx,convert,"x to y, convert x to y",onsite-unverified,".cur,.pcx",/cur-to-pcx,,,canvas-only,none (browser canvas)
 cur to pgm,convert,"x to y, convert x to y",onsite-unverified,".cur,.pgm",/cur-to-pgm,,,canvas-only,none (browser canvas)
 cur to ppm,convert,"x to y, convert x to y",onsite-unverified,".cur,.ppm",/cur-to-ppm,,,canvas-only,none (browser canvas)
-cur to rw2,convert,"x to y, convert x to y",onsite-unverified,".cur,.rw2",/cur-to-rw2,,,canvas-only,none (browser canvas)
+cur to rw2,convert,"x to y, convert x to y",retired,".cur,.rw2",/cur-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 cur to xbm,convert,"x to y, convert x to y",onsite-unverified,".cur,.xbm",/cur-to-xbm,,,canvas-only,none (browser canvas)
 dds to heic,convert,"x to y, convert x to y",onsite-unverified,".dds,.heic",/dds-to-heic,,,canvas-only,none (browser canvas)
 dds to heif,convert,"x to y, convert x to y",onsite-unverified,".dds,.heif",/dds-to-heif,,,canvas-only,none (browser canvas)
@@ -2095,7 +2095,7 @@ dds to pbm,convert,"x to y, convert x to y",onsite-unverified,".dds,.pbm",/dds-t
 dds to pcx,convert,"x to y, convert x to y",onsite-unverified,".dds,.pcx",/dds-to-pcx,,,canvas-only,none (browser canvas)
 dds to pgm,convert,"x to y, convert x to y",onsite-unverified,".dds,.pgm",/dds-to-pgm,,,canvas-only,none (browser canvas)
 dds to ppm,convert,"x to y, convert x to y",onsite-unverified,".dds,.ppm",/dds-to-ppm,,,canvas-only,none (browser canvas)
-dds to rw2,convert,"x to y, convert x to y",onsite-unverified,".dds,.rw2",/dds-to-rw2,,,canvas-only,none (browser canvas)
+dds to rw2,convert,"x to y, convert x to y",retired,".dds,.rw2",/dds-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 dds to xbm,convert,"x to y, convert x to y",onsite-unverified,".dds,.xbm",/dds-to-xbm,,,canvas-only,none (browser canvas)
 dot to jpg,convert,"x to y, convert x to y",onsite-unverified,".dot,.jpg",/dot-to-jpg,,,canvas-only,none (browser canvas)
 dst to psd,convert,"x to y, convert x to y",onsite-unverified,".dst,.psd",/dst-to-psd,,,canvas-only,none (browser canvas)
@@ -2111,7 +2111,7 @@ gif to pbm,convert,"x to y, convert x to y",onsite-unverified,".gif,.pbm",/gif-t
 gif to pcx,convert,"x to y, convert x to y",onsite-unverified,".gif,.pcx",/gif-to-pcx,,,canvas-only,none (browser canvas)
 gif to pgm,convert,"x to y, convert x to y",onsite-unverified,".gif,.pgm",/gif-to-pgm,,,canvas-only,none (browser canvas)
 gif to ppm,convert,"x to y, convert x to y",onsite-unverified,".gif,.ppm",/gif-to-ppm,,,canvas-only,none (browser canvas)
-gif to rw2,convert,"x to y, convert x to y",onsite-unverified,".gif,.rw2",/gif-to-rw2,,,canvas-only,none (browser canvas)
+gif to rw2,convert,"x to y, convert x to y",retired,".gif,.rw2",/gif-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 gif to xbm,convert,"x to y, convert x to y",onsite-unverified,".gif,.xbm",/gif-to-xbm,,,canvas-only,none (browser canvas)
 heic to heic,convert,"x to y, convert x to y",onsite-unverified,".heic,.heic",/heic-to-heic,,,canvas-only,none (browser canvas)
 heic to heif,convert,"x to y, convert x to y",onsite-unverified,".heic,.heif",/heic-to-heif,,,canvas-only,none (browser canvas)
@@ -2126,7 +2126,7 @@ heic to pbm,convert,"x to y, convert x to y",onsite-unverified,".heic,.pbm",/hei
 heic to pcx,convert,"x to y, convert x to y",onsite-unverified,".heic,.pcx",/heic-to-pcx,,,canvas-only,none (browser canvas)
 heic to pgm,convert,"x to y, convert x to y",onsite-unverified,".heic,.pgm",/heic-to-pgm,,,canvas-only,none (browser canvas)
 heic to ppm,convert,"x to y, convert x to y",onsite-unverified,".heic,.ppm",/heic-to-ppm,,,canvas-only,none (browser canvas)
-heic to rw2,convert,"x to y, convert x to y",onsite-unverified,".heic,.rw2",/heic-to-rw2,,,canvas-only,none (browser canvas)
+heic to rw2,convert,"x to y, convert x to y",retired,".heic,.rw2",/heic-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 heic to tga,convert,"x to y, convert x to y",onsite-unverified,".heic,.tga",/heic-to-tga,,,canvas-only,none (browser canvas)
 heic to xbm,convert,"x to y, convert x to y",onsite-unverified,".heic,.xbm",/heic-to-xbm,,,canvas-only,none (browser canvas)
 heif to heif,convert,"x to y, convert x to y",onsite-unverified,".heif,.heif",/heif-to-heif,,,canvas-only,none (browser canvas)
@@ -2142,7 +2142,7 @@ heif to pbm,convert,"x to y, convert x to y",onsite-unverified,".heif,.pbm",/hei
 heif to pcx,convert,"x to y, convert x to y",onsite-unverified,".heif,.pcx",/heif-to-pcx,,,canvas-only,none (browser canvas)
 heif to pgm,convert,"x to y, convert x to y",onsite-unverified,".heif,.pgm",/heif-to-pgm,,,canvas-only,none (browser canvas)
 heif to ppm,convert,"x to y, convert x to y",onsite-unverified,".heif,.ppm",/heif-to-ppm,,,canvas-only,none (browser canvas)
-heif to rw2,convert,"x to y, convert x to y",onsite-unverified,".heif,.rw2",/heif-to-rw2,,,canvas-only,none (browser canvas)
+heif to rw2,convert,"x to y, convert x to y",retired,".heif,.rw2",/heif-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 heif to tga,convert,"x to y, convert x to y",onsite-unverified,".heif,.tga",/heif-to-tga,,,canvas-only,none (browser canvas)
 heif to tif,convert,"x to y, convert x to y",onsite-unverified,".heif,.tif",/heif-to-tif,,,canvas-only,none (browser canvas)
 heif to xbm,convert,"x to y, convert x to y",onsite-unverified,".heif,.xbm",/heif-to-xbm,,,canvas-only,none (browser canvas)
@@ -2159,7 +2159,7 @@ icns to pbm,convert,"x to y, convert x to y",onsite-unverified,".icns,.pbm",/icn
 icns to pcx,convert,"x to y, convert x to y",onsite-unverified,".icns,.pcx",/icns-to-pcx,,,canvas-only,none (browser canvas)
 icns to pgm,convert,"x to y, convert x to y",onsite-unverified,".icns,.pgm",/icns-to-pgm,,,canvas-only,none (browser canvas)
 icns to ppm,convert,"x to y, convert x to y",onsite-unverified,".icns,.ppm",/icns-to-ppm,,,canvas-only,none (browser canvas)
-icns to rw2,convert,"x to y, convert x to y",onsite-unverified,".icns,.rw2",/icns-to-rw2,,,canvas-only,none (browser canvas)
+icns to rw2,convert,"x to y, convert x to y",retired,".icns,.rw2",/icns-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 icns to tga,convert,"x to y, convert x to y",onsite-unverified,".icns,.tga",/icns-to-tga,,,canvas-only,none (browser canvas)
 icns to tif,convert,"x to y, convert x to y",onsite-unverified,".icns,.tif",/icns-to-tif,,,canvas-only,none (browser canvas)
 icns to tiff,convert,"x to y, convert x to y",onsite-unverified,".icns,.tiff",/icns-to-tiff,,,canvas-only,none (browser canvas)
@@ -2175,7 +2175,7 @@ ico to pbm,convert,"x to y, convert x to y",onsite-unverified,".ico,.pbm",/ico-t
 ico to pcx,convert,"x to y, convert x to y",onsite-unverified,".ico,.pcx",/ico-to-pcx,,,canvas-only,none (browser canvas)
 ico to pgm,convert,"x to y, convert x to y",onsite-unverified,".ico,.pgm",/ico-to-pgm,,,canvas-only,none (browser canvas)
 ico to ppm,convert,"x to y, convert x to y",onsite-unverified,".ico,.ppm",/ico-to-ppm,,,canvas-only,none (browser canvas)
-ico to rw2,convert,"x to y, convert x to y",onsite-unverified,".ico,.rw2",/ico-to-rw2,,,canvas-only,none (browser canvas)
+ico to rw2,convert,"x to y, convert x to y",retired,".ico,.rw2",/ico-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 ico to xbm,convert,"x to y, convert x to y",onsite-unverified,".ico,.xbm",/ico-to-xbm,,,canvas-only,none (browser canvas)
 jfif to pbm,convert,"x to y, convert x to y",onsite-unverified,".jfif,.pbm",/jfif-to-pbm,,,canvas-only,none (browser canvas)
 jfif to pgm,convert,"x to y, convert x to y",onsite-unverified,".jfif,.pgm",/jfif-to-pgm,,,canvas-only,none (browser canvas)
@@ -2196,14 +2196,14 @@ jpeg to pam,convert,"x to y, convert x to y",onsite-unverified,".jpeg,.pam",/jpe
 jpeg to pbm,convert,"x to y, convert x to y",onsite-unverified,".jpeg,.pbm",/jpeg-to-pbm,,,canvas-only,none (browser canvas)
 jpeg to pcx,convert,"x to y, convert x to y",onsite-unverified,".jpeg,.pcx",/jpeg-to-pcx,,,canvas-only,none (browser canvas)
 jpeg to pgm,convert,"x to y, convert x to y",onsite-unverified,".jpeg,.pgm",/jpeg-to-pgm,,,canvas-only,none (browser canvas)
-jpeg to rw2,convert,"x to y, convert x to y",onsite-unverified,".jpeg,.rw2",/jpeg-to-rw2,,,canvas-only,none (browser canvas)
+jpeg to rw2,convert,"x to y, convert x to y",retired,".jpeg,.rw2",/jpeg-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 jpeg to xbm,convert,"x to y, convert x to y",onsite-unverified,".jpeg,.xbm",/jpeg-to-xbm,,,canvas-only,none (browser canvas)
 jpg to dot,convert,"x to y, convert x to y",onsite-unverified,".jpg,.dot",/jpg-to-dot,,,canvas-only,none (browser canvas)
 jpg to ktx,convert,"x to y, convert x to y",onsite-unverified,".jpg,.ktx",/jpg-to-ktx,,,canvas-only,none (browser canvas)
 jpg to ktx2,convert,"x to y, convert x to y",onsite-unverified,".jpg,.ktx2",/jpg-to-ktx2,,,canvas-only,none (browser canvas)
 jpg to pam,convert,"x to y, convert x to y",onsite-unverified,".jpg,.pam",/jpg-to-pam,,,canvas-only,none (browser canvas)
 jpg to pcd,convert,"x to y, convert x to y",onsite-unverified,".jpg,.pcd",/jpg-to-pcd,,,canvas-only,none (browser canvas)
-jpg to rw2,convert,"x to y, convert x to y",onsite-unverified,".jpg,.rw2",/jpg-to-rw2,,,canvas-only,none (browser canvas)
+jpg to rw2,convert,"x to y, convert x to y",retired,".jpg,.rw2",/jpg-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 jpg to sk,convert,"x to y, convert x to y",onsite-unverified,".jpg,.sk",/jpg-to-sk,,,canvas-only,none (browser canvas)
 jpg to wbmp,convert,"x to y, convert x to y",onsite-unverified,".jpg,.wbmp",/jpg-to-wbmp,,,canvas-only,none (browser canvas)
 jpg to xbm,convert,"x to y, convert x to y",onsite-unverified,".jpg,.xbm",/jpg-to-xbm,,,canvas-only,none (browser canvas)
@@ -2243,7 +2243,7 @@ pbm to pbm,convert,"x to y, convert x to y",onsite-unverified,".pbm,.pbm",/pbm-t
 pbm to pcx,convert,"x to y, convert x to y",onsite-unverified,".pbm,.pcx",/pbm-to-pcx,,,canvas-only,none (browser canvas)
 pbm to pgm,convert,"x to y, convert x to y",onsite-unverified,".pbm,.pgm",/pbm-to-pgm,,,canvas-only,none (browser canvas)
 pbm to ppm,convert,"x to y, convert x to y",onsite-unverified,".pbm,.ppm",/pbm-to-ppm,,,canvas-only,none (browser canvas)
-pbm to rw2,convert,"x to y, convert x to y",onsite-unverified,".pbm,.rw2",/pbm-to-rw2,,,canvas-only,none (browser canvas)
+pbm to rw2,convert,"x to y, convert x to y",retired,".pbm,.rw2",/pbm-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 pbm to tga,convert,"x to y, convert x to y",onsite-unverified,".pbm,.tga",/pbm-to-tga,,,canvas-only,none (browser canvas)
 pbm to tif,convert,"x to y, convert x to y",onsite-unverified,".pbm,.tif",/pbm-to-tif,,,canvas-only,none (browser canvas)
 pbm to tiff,convert,"x to y, convert x to y",onsite-unverified,".pbm,.tiff",/pbm-to-tiff,,,canvas-only,none (browser canvas)
@@ -2260,15 +2260,15 @@ pes to psd,convert,"x to y, convert x to y",onsite-unverified,".pes,.psd",/pes-t
 pgm to pgm,convert,"x to y, convert x to y",onsite-unverified,".pgm,.pgm",/pgm-to-pgm,,,canvas-only,none (browser canvas)
 pgm to ppm,convert,"x to y, convert x to y",onsite-unverified,".pgm,.ppm",/pgm-to-ppm,,,canvas-only,none (browser canvas)
 pgm to rgb,convert,"x to y, convert x to y",onsite-unverified,".pgm,.rgb",/pgm-to-rgb,,,canvas-only,none (browser canvas)
-pgm to rw2,convert,"x to y, convert x to y",onsite-unverified,".pgm,.rw2",/pgm-to-rw2,,,canvas-only,none (browser canvas)
+pgm to rw2,convert,"x to y, convert x to y",retired,".pgm,.rw2",/pgm-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 pgm to tga,convert,"x to y, convert x to y",onsite-unverified,".pgm,.tga",/pgm-to-tga,,,canvas-only,none (browser canvas)
 pgm to tif,convert,"x to y, convert x to y",onsite-unverified,".pgm,.tif",/pgm-to-tif,,,canvas-only,none (browser canvas)
 pgm to tiff,convert,"x to y, convert x to y",onsite-unverified,".pgm,.tiff",/pgm-to-tiff,,,canvas-only,none (browser canvas)
 pgm to webp,convert,"x to y, convert x to y",onsite-unverified,".pgm,.webp",/pgm-to-webp,,,canvas-only,none (browser canvas)
 pgm to xbm,convert,"x to y, convert x to y",onsite-unverified,".pgm,.xbm",/pgm-to-xbm,,,canvas-only,none (browser canvas)
 png to dot,convert,"x to y, convert x to y",onsite-unverified,".png,.dot",/png-to-dot,,,canvas-only,none (browser canvas)
-png to rw2,convert,"x to y, convert x to y",onsite-unverified,".png,.rw2",/png-to-rw2,,,canvas-only,none (browser canvas)
-ppm to rw2,convert,"x to y, convert x to y",onsite-unverified,".ppm,.rw2",/ppm-to-rw2,,,canvas-only,none (browser canvas)
+png to rw2,convert,"x to y, convert x to y",retired,".png,.rw2",/png-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
+ppm to rw2,convert,"x to y, convert x to y",retired,".ppm,.rw2",/ppm-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,canvas-only,none (browser canvas)
 ppm to tga,convert,"x to y, convert x to y",onsite-unverified,".ppm,.tga",/ppm-to-tga,,,canvas-only,none (browser canvas)
 ppm to tif,convert,"x to y, convert x to y",onsite-unverified,".ppm,.tif",/ppm-to-tif,,,canvas-only,none (browser canvas)
 ppm to tiff,convert,"x to y, convert x to y",onsite-unverified,".ppm,.tiff",/ppm-to-tiff,,,canvas-only,none (browser canvas)
@@ -2296,35 +2296,35 @@ nef to jpeg,convert,"x to y, convert x to y",onsite-unverified,".nef,.jpeg",/nef
 raf to jpg,convert,"x to y, convert x to y",onsite-unverified,".raf,.jpg",/raf-to-jpg,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to jpg,convert,"x to y, convert x to y",onsite-unverified,".orf,.jpg",/orf-to-jpg,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to tiff,convert,"x to y, convert x to y",onsite-unverified,".nef,.tiff",/nef-to-tiff,,Engine: raw image decode.,image-raw,image-decoder + canvas
-arw to dng,convert,"x to y, convert x to y",onsite-unverified,".arw,.dng",/arw-to-dng,,Engine: raw image decode.,image-raw,image-decoder + canvas
+arw to dng,convert,"x to y, convert x to y",retired,".arw,.dng",/arw-to-dng,,Retired (#147): nothing can write DNG; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 raf to jpeg,convert,"x to y, convert x to y",onsite-unverified,".raf,.jpeg",/raf-to-jpeg,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr2 to dng,convert,"x to y, convert x to y",onsite-unverified,".cr2,.dng",/cr2-to-dng,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr3 to dng,convert,"x to y, convert x to y",onsite-unverified,".cr3,.dng",/cr3-to-dng,,Engine: raw image decode.,image-raw,image-decoder + canvas
+cr2 to dng,convert,"x to y, convert x to y",retired,".cr2,.dng",/cr2-to-dng,,Retired (#147): nothing can write DNG; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cr3 to dng,convert,"x to y, convert x to y",retired,".cr3,.dng",/cr3-to-dng,,Retired (#147): nothing can write DNG; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 orf to jpeg,convert,"x to y, convert x to y",onsite-unverified,".orf,.jpeg",/orf-to-jpeg,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to png,convert,"x to y, convert x to y",onsite-unverified,".orf,.png",/orf-to-png,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ai to arw,convert,"x to y, convert x to y",onsite-unverified,".ai,.arw",/ai-to-arw,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ai to cr2,convert,"x to y, convert x to y",onsite-unverified,".ai,.cr2",/ai-to-cr2,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ai to cr3,convert,"x to y, convert x to y",onsite-unverified,".ai,.cr3",/ai-to-cr3,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ai to dng,convert,"x to y, convert x to y",onsite-unverified,".ai,.dng",/ai-to-dng,,Engine: raw image decode.,image-raw,image-decoder + canvas
-arw to cr2,convert,"x to y, convert x to y",onsite-unverified,".arw,.cr2",/arw-to-cr2,,Engine: raw image decode.,image-raw,image-decoder + canvas
+ai to arw,convert,"x to y, convert x to y",retired,".ai,.arw",/ai-to-arw,,Retired (#147): nothing can write ARW; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ai to cr2,convert,"x to y, convert x to y",retired,".ai,.cr2",/ai-to-cr2,,Retired (#147): nothing can write CR2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ai to cr3,convert,"x to y, convert x to y",retired,".ai,.cr3",/ai-to-cr3,,Retired (#147): nothing can write CR3; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ai to dng,convert,"x to y, convert x to y",retired,".ai,.dng",/ai-to-dng,,Retired (#147): nothing can write DNG; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+arw to cr2,convert,"x to y, convert x to y",retired,".arw,.cr2",/arw-to-cr2,,Retired (#147): nothing can write CR2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 arw to heic,convert,"x to y, convert x to y",onsite-unverified,".arw,.heic",/arw-to-heic,,Engine: raw image decode.,image-raw,image-decoder + canvas
-arw to nef,convert,"x to y, convert x to y",onsite-unverified,".arw,.nef",/arw-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
+arw to nef,convert,"x to y, convert x to y",retired,".arw,.nef",/arw-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 arw to pgm,convert,"x to y, convert x to y",onsite-unverified,".arw,.pgm",/arw-to-pgm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 arw to xbm,convert,"x to y, convert x to y",onsite-unverified,".arw,.xbm",/arw-to-xbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-avif to cr2,convert,"x to y, convert x to y",onsite-unverified,".avif,.cr2",/avif-to-cr2,,Engine: raw image decode.,image-raw,image-decoder + canvas
-avif to cr3,convert,"x to y, convert x to y",onsite-unverified,".avif,.cr3",/avif-to-cr3,,Engine: raw image decode.,image-raw,image-decoder + canvas
-avif to dng,convert,"x to y, convert x to y",onsite-unverified,".avif,.dng",/avif-to-dng,,Engine: raw image decode.,image-raw,image-decoder + canvas
-avif to nef,convert,"x to y, convert x to y",onsite-unverified,".avif,.nef",/avif-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-avif to orf,convert,"x to y, convert x to y",onsite-unverified,".avif,.orf",/avif-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-avif to raf,convert,"x to y, convert x to y",onsite-unverified,".avif,.raf",/avif-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-bmp to cr2,convert,"x to y, convert x to y",onsite-unverified,".bmp,.cr2",/bmp-to-cr2,,Engine: raw image decode.,image-raw,image-decoder + canvas
-bmp to cr3,convert,"x to y, convert x to y",onsite-unverified,".bmp,.cr3",/bmp-to-cr3,,Engine: raw image decode.,image-raw,image-decoder + canvas
-bmp to dng,convert,"x to y, convert x to y",onsite-unverified,".bmp,.dng",/bmp-to-dng,,Engine: raw image decode.,image-raw,image-decoder + canvas
-bmp to nef,convert,"x to y, convert x to y",onsite-unverified,".bmp,.nef",/bmp-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-bmp to orf,convert,"x to y, convert x to y",onsite-unverified,".bmp,.orf",/bmp-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-bmp to raf,convert,"x to y, convert x to y",onsite-unverified,".bmp,.raf",/bmp-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr2 to cr2,convert,"x to y, convert x to y",onsite-unverified,".cr2,.cr2",/cr2-to-cr2,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr2 to cr3,convert,"x to y, convert x to y",onsite-unverified,".cr2,.cr3",/cr2-to-cr3,,Engine: raw image decode.,image-raw,image-decoder + canvas
+avif to cr2,convert,"x to y, convert x to y",retired,".avif,.cr2",/avif-to-cr2,,Retired (#147): nothing can write CR2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+avif to cr3,convert,"x to y, convert x to y",retired,".avif,.cr3",/avif-to-cr3,,Retired (#147): nothing can write CR3; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+avif to dng,convert,"x to y, convert x to y",retired,".avif,.dng",/avif-to-dng,,Retired (#147): nothing can write DNG; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+avif to nef,convert,"x to y, convert x to y",retired,".avif,.nef",/avif-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+avif to orf,convert,"x to y, convert x to y",retired,".avif,.orf",/avif-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+avif to raf,convert,"x to y, convert x to y",retired,".avif,.raf",/avif-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+bmp to cr2,convert,"x to y, convert x to y",retired,".bmp,.cr2",/bmp-to-cr2,,Retired (#147): nothing can write CR2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+bmp to cr3,convert,"x to y, convert x to y",retired,".bmp,.cr3",/bmp-to-cr3,,Retired (#147): nothing can write CR3; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+bmp to dng,convert,"x to y, convert x to y",retired,".bmp,.dng",/bmp-to-dng,,Retired (#147): nothing can write DNG; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+bmp to nef,convert,"x to y, convert x to y",retired,".bmp,.nef",/bmp-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+bmp to orf,convert,"x to y, convert x to y",retired,".bmp,.orf",/bmp-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+bmp to raf,convert,"x to y, convert x to y",retired,".bmp,.raf",/bmp-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cr2 to cr2,convert,"x to y, convert x to y",retired,".cr2,.cr2",/cr2-to-cr2,,Retired (#147): nothing can write CR2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cr2 to cr3,convert,"x to y, convert x to y",retired,".cr2,.cr3",/cr2-to-cr3,,Retired (#147): nothing can write CR3; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 cr2 to cur,convert,"x to y, convert x to y",onsite-unverified,".cr2,.cur",/cr2-to-cur,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr2 to eps,convert,"x to y, convert x to y",onsite-unverified,".cr2,.eps",/cr2-to-eps,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr2 to heic,convert,"x to y, convert x to y",onsite-unverified,".cr2,.heic",/cr2-to-heic,,Engine: raw image decode.,image-raw,image-decoder + canvas
@@ -2336,17 +2336,17 @@ cr2 to jif,convert,"x to y, convert x to y",onsite-unverified,".cr2,.jif",/cr2-t
 cr2 to jxl,convert,"x to y, convert x to y",onsite-unverified,".cr2,.jxl",/cr2-to-jxl,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr2 to ktx,convert,"x to y, convert x to y",onsite-unverified,".cr2,.ktx",/cr2-to-ktx,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr2 to ktx2,convert,"x to y, convert x to y",onsite-unverified,".cr2,.ktx2",/cr2-to-ktx2,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr2 to nef,convert,"x to y, convert x to y",onsite-unverified,".cr2,.nef",/cr2-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr2 to orf,convert,"x to y, convert x to y",onsite-unverified,".cr2,.orf",/cr2-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
+cr2 to nef,convert,"x to y, convert x to y",retired,".cr2,.nef",/cr2-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cr2 to orf,convert,"x to y, convert x to y",retired,".cr2,.orf",/cr2-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 cr2 to pam,convert,"x to y, convert x to y",onsite-unverified,".cr2,.pam",/cr2-to-pam,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr2 to pbm,convert,"x to y, convert x to y",onsite-unverified,".cr2,.pbm",/cr2-to-pbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr2 to pcx,convert,"x to y, convert x to y",onsite-unverified,".cr2,.pcx",/cr2-to-pcx,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr2 to pgm,convert,"x to y, convert x to y",onsite-unverified,".cr2,.pgm",/cr2-to-pgm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr2 to ppm,convert,"x to y, convert x to y",onsite-unverified,".cr2,.ppm",/cr2-to-ppm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr2 to raf,convert,"x to y, convert x to y",onsite-unverified,".cr2,.raf",/cr2-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr2 to rw2,convert,"x to y, convert x to y",onsite-unverified,".cr2,.rw2",/cr2-to-rw2,,Engine: raw image decode.,image-raw,image-decoder + canvas
+cr2 to raf,convert,"x to y, convert x to y",retired,".cr2,.raf",/cr2-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cr2 to rw2,convert,"x to y, convert x to y",retired,".cr2,.rw2",/cr2-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 cr2 to xbm,convert,"x to y, convert x to y",onsite-unverified,".cr2,.xbm",/cr2-to-xbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr3 to cr3,convert,"x to y, convert x to y",onsite-unverified,".cr3,.cr3",/cr3-to-cr3,,Engine: raw image decode.,image-raw,image-decoder + canvas
+cr3 to cr3,convert,"x to y, convert x to y",retired,".cr3,.cr3",/cr3-to-cr3,,Retired (#147): nothing can write CR3; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 cr3 to cur,convert,"x to y, convert x to y",onsite-unverified,".cr3,.cur",/cr3-to-cur,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr3 to eps,convert,"x to y, convert x to y",onsite-unverified,".cr3,.eps",/cr3-to-eps,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr3 to heic,convert,"x to y, convert x to y",onsite-unverified,".cr3,.heic",/cr3-to-heic,,Engine: raw image decode.,image-raw,image-decoder + canvas
@@ -2358,25 +2358,25 @@ cr3 to jif,convert,"x to y, convert x to y",onsite-unverified,".cr3,.jif",/cr3-t
 cr3 to jxl,convert,"x to y, convert x to y",onsite-unverified,".cr3,.jxl",/cr3-to-jxl,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr3 to ktx,convert,"x to y, convert x to y",onsite-unverified,".cr3,.ktx",/cr3-to-ktx,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr3 to ktx2,convert,"x to y, convert x to y",onsite-unverified,".cr3,.ktx2",/cr3-to-ktx2,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr3 to nef,convert,"x to y, convert x to y",onsite-unverified,".cr3,.nef",/cr3-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr3 to orf,convert,"x to y, convert x to y",onsite-unverified,".cr3,.orf",/cr3-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
+cr3 to nef,convert,"x to y, convert x to y",retired,".cr3,.nef",/cr3-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cr3 to orf,convert,"x to y, convert x to y",retired,".cr3,.orf",/cr3-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 cr3 to pam,convert,"x to y, convert x to y",onsite-unverified,".cr3,.pam",/cr3-to-pam,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr3 to pbm,convert,"x to y, convert x to y",onsite-unverified,".cr3,.pbm",/cr3-to-pbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr3 to pcx,convert,"x to y, convert x to y",onsite-unverified,".cr3,.pcx",/cr3-to-pcx,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr3 to pgm,convert,"x to y, convert x to y",onsite-unverified,".cr3,.pgm",/cr3-to-pgm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 cr3 to ppm,convert,"x to y, convert x to y",onsite-unverified,".cr3,.ppm",/cr3-to-ppm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr3 to raf,convert,"x to y, convert x to y",onsite-unverified,".cr3,.raf",/cr3-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cr3 to rw2,convert,"x to y, convert x to y",onsite-unverified,".cr3,.rw2",/cr3-to-rw2,,Engine: raw image decode.,image-raw,image-decoder + canvas
+cr3 to raf,convert,"x to y, convert x to y",retired,".cr3,.raf",/cr3-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cr3 to rw2,convert,"x to y, convert x to y",retired,".cr3,.rw2",/cr3-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 cr3 to xbm,convert,"x to y, convert x to y",onsite-unverified,".cr3,.xbm",/cr3-to-xbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cur to dng,convert,"x to y, convert x to y",onsite-unverified,".cur,.dng",/cur-to-dng,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cur to nef,convert,"x to y, convert x to y",onsite-unverified,".cur,.nef",/cur-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cur to orf,convert,"x to y, convert x to y",onsite-unverified,".cur,.orf",/cur-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-cur to raf,convert,"x to y, convert x to y",onsite-unverified,".cur,.raf",/cur-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-dds to dng,convert,"x to y, convert x to y",onsite-unverified,".dds,.dng",/dds-to-dng,,Engine: raw image decode.,image-raw,image-decoder + canvas
-dds to nef,convert,"x to y, convert x to y",onsite-unverified,".dds,.nef",/dds-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-dds to orf,convert,"x to y, convert x to y",onsite-unverified,".dds,.orf",/dds-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-dds to raf,convert,"x to y, convert x to y",onsite-unverified,".dds,.raf",/dds-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-dng to dng,convert,"x to y, convert x to y",onsite-unverified,".dng,.dng",/dng-to-dng,,Engine: raw image decode.,image-raw,image-decoder + canvas
+cur to dng,convert,"x to y, convert x to y",retired,".cur,.dng",/cur-to-dng,,Retired (#147): nothing can write DNG; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cur to nef,convert,"x to y, convert x to y",retired,".cur,.nef",/cur-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cur to orf,convert,"x to y, convert x to y",retired,".cur,.orf",/cur-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+cur to raf,convert,"x to y, convert x to y",retired,".cur,.raf",/cur-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+dds to dng,convert,"x to y, convert x to y",retired,".dds,.dng",/dds-to-dng,,Retired (#147): nothing can write DNG; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+dds to nef,convert,"x to y, convert x to y",retired,".dds,.nef",/dds-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+dds to orf,convert,"x to y, convert x to y",retired,".dds,.orf",/dds-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+dds to raf,convert,"x to y, convert x to y",retired,".dds,.raf",/dds-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+dng to dng,convert,"x to y, convert x to y",retired,".dng,.dng",/dng-to-dng,,Retired (#147): nothing can write DNG; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 dng to eps,convert,"x to y, convert x to y",onsite-unverified,".dng,.eps",/dng-to-eps,,Engine: raw image decode.,image-raw,image-decoder + canvas
 dng to heif,convert,"x to y, convert x to y",onsite-unverified,".dng,.heif",/dng-to-heif,,Engine: raw image decode.,image-raw,image-decoder + canvas
 dng to icns,convert,"x to y, convert x to y",onsite-unverified,".dng,.icns",/dng-to-icns,,Engine: raw image decode.,image-raw,image-decoder + canvas
@@ -2386,92 +2386,92 @@ dng to jif,convert,"x to y, convert x to y",onsite-unverified,".dng,.jif",/dng-t
 dng to jxl,convert,"x to y, convert x to y",onsite-unverified,".dng,.jxl",/dng-to-jxl,,Engine: raw image decode.,image-raw,image-decoder + canvas
 dng to ktx,convert,"x to y, convert x to y",onsite-unverified,".dng,.ktx",/dng-to-ktx,,Engine: raw image decode.,image-raw,image-decoder + canvas
 dng to ktx2,convert,"x to y, convert x to y",onsite-unverified,".dng,.ktx2",/dng-to-ktx2,,Engine: raw image decode.,image-raw,image-decoder + canvas
-dng to nef,convert,"x to y, convert x to y",onsite-unverified,".dng,.nef",/dng-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-dng to orf,convert,"x to y, convert x to y",onsite-unverified,".dng,.orf",/dng-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
+dng to nef,convert,"x to y, convert x to y",retired,".dng,.nef",/dng-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+dng to orf,convert,"x to y, convert x to y",retired,".dng,.orf",/dng-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 dng to pam,convert,"x to y, convert x to y",onsite-unverified,".dng,.pam",/dng-to-pam,,Engine: raw image decode.,image-raw,image-decoder + canvas
 dng to pbm,convert,"x to y, convert x to y",onsite-unverified,".dng,.pbm",/dng-to-pbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 dng to pcx,convert,"x to y, convert x to y",onsite-unverified,".dng,.pcx",/dng-to-pcx,,Engine: raw image decode.,image-raw,image-decoder + canvas
 dng to pgm,convert,"x to y, convert x to y",onsite-unverified,".dng,.pgm",/dng-to-pgm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 dng to ppm,convert,"x to y, convert x to y",onsite-unverified,".dng,.ppm",/dng-to-ppm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-dng to raf,convert,"x to y, convert x to y",onsite-unverified,".dng,.raf",/dng-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-dng to rw2,convert,"x to y, convert x to y",onsite-unverified,".dng,.rw2",/dng-to-rw2,,Engine: raw image decode.,image-raw,image-decoder + canvas
+dng to raf,convert,"x to y, convert x to y",retired,".dng,.raf",/dng-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+dng to rw2,convert,"x to y, convert x to y",retired,".dng,.rw2",/dng-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 dng to xbm,convert,"x to y, convert x to y",onsite-unverified,".dng,.xbm",/dng-to-xbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 dng to xpm,convert,"x to y, convert x to y",onsite-unverified,".dng,.xpm",/dng-to-xpm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-eps to nef,convert,"x to y, convert x to y",onsite-unverified,".eps,.nef",/eps-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-eps to orf,convert,"x to y, convert x to y",onsite-unverified,".eps,.orf",/eps-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-eps to raf,convert,"x to y, convert x to y",onsite-unverified,".eps,.raf",/eps-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-gif to nef,convert,"x to y, convert x to y",onsite-unverified,".gif,.nef",/gif-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-gif to orf,convert,"x to y, convert x to y",onsite-unverified,".gif,.orf",/gif-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-gif to raf,convert,"x to y, convert x to y",onsite-unverified,".gif,.raf",/gif-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-heic to nef,convert,"x to y, convert x to y",onsite-unverified,".heic,.nef",/heic-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-heic to orf,convert,"x to y, convert x to y",onsite-unverified,".heic,.orf",/heic-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-heic to raf,convert,"x to y, convert x to y",onsite-unverified,".heic,.raf",/heic-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-heif to nef,convert,"x to y, convert x to y",onsite-unverified,".heif,.nef",/heif-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-heif to orf,convert,"x to y, convert x to y",onsite-unverified,".heif,.orf",/heif-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-heif to raf,convert,"x to y, convert x to y",onsite-unverified,".heif,.raf",/heif-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-icns to nef,convert,"x to y, convert x to y",onsite-unverified,".icns,.nef",/icns-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-icns to orf,convert,"x to y, convert x to y",onsite-unverified,".icns,.orf",/icns-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-icns to raf,convert,"x to y, convert x to y",onsite-unverified,".icns,.raf",/icns-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ico to nef,convert,"x to y, convert x to y",onsite-unverified,".ico,.nef",/ico-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ico to orf,convert,"x to y, convert x to y",onsite-unverified,".ico,.orf",/ico-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ico to raf,convert,"x to y, convert x to y",onsite-unverified,".ico,.raf",/ico-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jfif to nef,convert,"x to y, convert x to y",onsite-unverified,".jfif,.nef",/jfif-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jfif to orf,convert,"x to y, convert x to y",onsite-unverified,".jfif,.orf",/jfif-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jfif to raf,convert,"x to y, convert x to y",onsite-unverified,".jfif,.raf",/jfif-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jif to nef,convert,"x to y, convert x to y",onsite-unverified,".jif,.nef",/jif-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jif to orf,convert,"x to y, convert x to y",onsite-unverified,".jif,.orf",/jif-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jif to raf,convert,"x to y, convert x to y",onsite-unverified,".jif,.raf",/jif-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jpeg to nef,convert,"x to y, convert x to y",onsite-unverified,".jpeg,.nef",/jpeg-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jpeg to orf,convert,"x to y, convert x to y",onsite-unverified,".jpeg,.orf",/jpeg-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jpeg to raf,convert,"x to y, convert x to y",onsite-unverified,".jpeg,.raf",/jpeg-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jpg to orf,convert,"x to y, convert x to y",onsite-unverified,".jpg,.orf",/jpg-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jpg to raf,convert,"x to y, convert x to y",onsite-unverified,".jpg,.raf",/jpg-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jxl to nef,convert,"x to y, convert x to y",onsite-unverified,".jxl,.nef",/jxl-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jxl to orf,convert,"x to y, convert x to y",onsite-unverified,".jxl,.orf",/jxl-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-jxl to raf,convert,"x to y, convert x to y",onsite-unverified,".jxl,.raf",/jxl-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ktx to nef,convert,"x to y, convert x to y",onsite-unverified,".ktx,.nef",/ktx-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ktx to orf,convert,"x to y, convert x to y",onsite-unverified,".ktx,.orf",/ktx-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ktx to raf,convert,"x to y, convert x to y",onsite-unverified,".ktx,.raf",/ktx-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ktx2 to nef,convert,"x to y, convert x to y",onsite-unverified,".ktx2,.nef",/ktx2-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ktx2 to orf,convert,"x to y, convert x to y",onsite-unverified,".ktx2,.orf",/ktx2-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ktx2 to raf,convert,"x to y, convert x to y",onsite-unverified,".ktx2,.raf",/ktx2-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-nef to nef,convert,"x to y, convert x to y",onsite-unverified,".nef,.nef",/nef-to-nef,,Engine: raw image decode.,image-raw,image-decoder + canvas
-nef to orf,convert,"x to y, convert x to y",onsite-unverified,".nef,.orf",/nef-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
+eps to nef,convert,"x to y, convert x to y",retired,".eps,.nef",/eps-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+eps to orf,convert,"x to y, convert x to y",retired,".eps,.orf",/eps-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+eps to raf,convert,"x to y, convert x to y",retired,".eps,.raf",/eps-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+gif to nef,convert,"x to y, convert x to y",retired,".gif,.nef",/gif-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+gif to orf,convert,"x to y, convert x to y",retired,".gif,.orf",/gif-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+gif to raf,convert,"x to y, convert x to y",retired,".gif,.raf",/gif-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+heic to nef,convert,"x to y, convert x to y",retired,".heic,.nef",/heic-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+heic to orf,convert,"x to y, convert x to y",retired,".heic,.orf",/heic-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+heic to raf,convert,"x to y, convert x to y",retired,".heic,.raf",/heic-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+heif to nef,convert,"x to y, convert x to y",retired,".heif,.nef",/heif-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+heif to orf,convert,"x to y, convert x to y",retired,".heif,.orf",/heif-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+heif to raf,convert,"x to y, convert x to y",retired,".heif,.raf",/heif-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+icns to nef,convert,"x to y, convert x to y",retired,".icns,.nef",/icns-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+icns to orf,convert,"x to y, convert x to y",retired,".icns,.orf",/icns-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+icns to raf,convert,"x to y, convert x to y",retired,".icns,.raf",/icns-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ico to nef,convert,"x to y, convert x to y",retired,".ico,.nef",/ico-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ico to orf,convert,"x to y, convert x to y",retired,".ico,.orf",/ico-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ico to raf,convert,"x to y, convert x to y",retired,".ico,.raf",/ico-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jfif to nef,convert,"x to y, convert x to y",retired,".jfif,.nef",/jfif-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jfif to orf,convert,"x to y, convert x to y",retired,".jfif,.orf",/jfif-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jfif to raf,convert,"x to y, convert x to y",retired,".jfif,.raf",/jfif-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jif to nef,convert,"x to y, convert x to y",retired,".jif,.nef",/jif-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jif to orf,convert,"x to y, convert x to y",retired,".jif,.orf",/jif-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jif to raf,convert,"x to y, convert x to y",retired,".jif,.raf",/jif-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jpeg to nef,convert,"x to y, convert x to y",retired,".jpeg,.nef",/jpeg-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jpeg to orf,convert,"x to y, convert x to y",retired,".jpeg,.orf",/jpeg-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jpeg to raf,convert,"x to y, convert x to y",retired,".jpeg,.raf",/jpeg-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jpg to orf,convert,"x to y, convert x to y",retired,".jpg,.orf",/jpg-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jpg to raf,convert,"x to y, convert x to y",retired,".jpg,.raf",/jpg-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jxl to nef,convert,"x to y, convert x to y",retired,".jxl,.nef",/jxl-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jxl to orf,convert,"x to y, convert x to y",retired,".jxl,.orf",/jxl-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+jxl to raf,convert,"x to y, convert x to y",retired,".jxl,.raf",/jxl-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ktx to nef,convert,"x to y, convert x to y",retired,".ktx,.nef",/ktx-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ktx to orf,convert,"x to y, convert x to y",retired,".ktx,.orf",/ktx-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ktx to raf,convert,"x to y, convert x to y",retired,".ktx,.raf",/ktx-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ktx2 to nef,convert,"x to y, convert x to y",retired,".ktx2,.nef",/ktx2-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ktx2 to orf,convert,"x to y, convert x to y",retired,".ktx2,.orf",/ktx2-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ktx2 to raf,convert,"x to y, convert x to y",retired,".ktx2,.raf",/ktx2-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+nef to nef,convert,"x to y, convert x to y",retired,".nef,.nef",/nef-to-nef,,Retired (#147): nothing can write NEF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+nef to orf,convert,"x to y, convert x to y",retired,".nef,.orf",/nef-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 nef to pam,convert,"x to y, convert x to y",onsite-unverified,".nef,.pam",/nef-to-pam,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to pbm,convert,"x to y, convert x to y",onsite-unverified,".nef,.pbm",/nef-to-pbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to pcx,convert,"x to y, convert x to y",onsite-unverified,".nef,.pcx",/nef-to-pcx,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to pgm,convert,"x to y, convert x to y",onsite-unverified,".nef,.pgm",/nef-to-pgm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to ppm,convert,"x to y, convert x to y",onsite-unverified,".nef,.ppm",/nef-to-ppm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to psd,convert,"x to y, convert x to y",onsite-unverified,".nef,.psd",/nef-to-psd,,Engine: raw image decode.,image-raw,image-decoder + canvas
-nef to raf,convert,"x to y, convert x to y",onsite-unverified,".nef,.raf",/nef-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-nef to rw2,convert,"x to y, convert x to y",onsite-unverified,".nef,.rw2",/nef-to-rw2,,Engine: raw image decode.,image-raw,image-decoder + canvas
+nef to raf,convert,"x to y, convert x to y",retired,".nef,.raf",/nef-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+nef to rw2,convert,"x to y, convert x to y",retired,".nef,.rw2",/nef-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 nef to svg,convert,"x to y, convert x to y",onsite-unverified,".nef,.svg",/nef-to-svg,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to tga,convert,"x to y, convert x to y",onsite-unverified,".nef,.tga",/nef-to-tga,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to tif,convert,"x to y, convert x to y",onsite-unverified,".nef,.tif",/nef-to-tif,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to webp,convert,"x to y, convert x to y",onsite-unverified,".nef,.webp",/nef-to-webp,,Engine: raw image decode.,image-raw,image-decoder + canvas
 nef to xbm,convert,"x to y, convert x to y",onsite-unverified,".nef,.xbm",/nef-to-xbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-orf to orf,convert,"x to y, convert x to y",onsite-unverified,".orf,.orf",/orf-to-orf,,Engine: raw image decode.,image-raw,image-decoder + canvas
+orf to orf,convert,"x to y, convert x to y",retired,".orf,.orf",/orf-to-orf,,Retired (#147): nothing can write ORF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 orf to pam,convert,"x to y, convert x to y",onsite-unverified,".orf,.pam",/orf-to-pam,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to pbm,convert,"x to y, convert x to y",onsite-unverified,".orf,.pbm",/orf-to-pbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to pcx,convert,"x to y, convert x to y",onsite-unverified,".orf,.pcx",/orf-to-pcx,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to pgm,convert,"x to y, convert x to y",onsite-unverified,".orf,.pgm",/orf-to-pgm,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to ppm,convert,"x to y, convert x to y",onsite-unverified,".orf,.ppm",/orf-to-ppm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-orf to raf,convert,"x to y, convert x to y",onsite-unverified,".orf,.raf",/orf-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-orf to rw2,convert,"x to y, convert x to y",onsite-unverified,".orf,.rw2",/orf-to-rw2,,Engine: raw image decode.,image-raw,image-decoder + canvas
+orf to raf,convert,"x to y, convert x to y",retired,".orf,.raf",/orf-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+orf to rw2,convert,"x to y, convert x to y",retired,".orf,.rw2",/orf-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 orf to svg,convert,"x to y, convert x to y",onsite-unverified,".orf,.svg",/orf-to-svg,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to tga,convert,"x to y, convert x to y",onsite-unverified,".orf,.tga",/orf-to-tga,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to tif,convert,"x to y, convert x to y",onsite-unverified,".orf,.tif",/orf-to-tif,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to tiff,convert,"x to y, convert x to y",onsite-unverified,".orf,.tiff",/orf-to-tiff,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to webp,convert,"x to y, convert x to y",onsite-unverified,".orf,.webp",/orf-to-webp,,Engine: raw image decode.,image-raw,image-decoder + canvas
 orf to xbm,convert,"x to y, convert x to y",onsite-unverified,".orf,.xbm",/orf-to-xbm,,Engine: raw image decode.,image-raw,image-decoder + canvas
-pam to raf,convert,"x to y, convert x to y",onsite-unverified,".pam,.raf",/pam-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-pbm to raf,convert,"x to y, convert x to y",onsite-unverified,".pbm,.raf",/pbm-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-pcx to raf,convert,"x to y, convert x to y",onsite-unverified,".pcx,.raf",/pcx-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-pgm to raf,convert,"x to y, convert x to y",onsite-unverified,".pgm,.raf",/pgm-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-png to raf,convert,"x to y, convert x to y",onsite-unverified,".png,.raf",/png-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-ppm to raf,convert,"x to y, convert x to y",onsite-unverified,".ppm,.raf",/ppm-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-raf to raf,convert,"x to y, convert x to y",onsite-unverified,".raf,.raf",/raf-to-raf,,Engine: raw image decode.,image-raw,image-decoder + canvas
-raf to rw2,convert,"x to y, convert x to y",onsite-unverified,".raf,.rw2",/raf-to-rw2,,Engine: raw image decode.,image-raw,image-decoder + canvas
+pam to raf,convert,"x to y, convert x to y",retired,".pam,.raf",/pam-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+pbm to raf,convert,"x to y, convert x to y",retired,".pbm,.raf",/pbm-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+pcx to raf,convert,"x to y, convert x to y",retired,".pcx,.raf",/pcx-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+pgm to raf,convert,"x to y, convert x to y",retired,".pgm,.raf",/pgm-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+png to raf,convert,"x to y, convert x to y",retired,".png,.raf",/png-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+ppm to raf,convert,"x to y, convert x to y",retired,".ppm,.raf",/ppm-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+raf to raf,convert,"x to y, convert x to y",retired,".raf,.raf",/raf-to-raf,,Retired (#147): nothing can write RAF; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
+raf to rw2,convert,"x to y, convert x to y",retired,".raf,.rw2",/raf-to-rw2,,Retired (#147): nothing can write RW2; camera RAW is sensor data and not an export format.,image-raw,image-decoder + canvas
 raf to svg,convert,"x to y, convert x to y",onsite-unverified,".raf,.svg",/raf-to-svg,,Engine: raw image decode.,image-raw,image-decoder + canvas
 raf to tga,convert,"x to y, convert x to y",onsite-unverified,".raf,.tga",/raf-to-tga,,Engine: raw image decode.,image-raw,image-decoder + canvas
 raf to tif,convert,"x to y, convert x to y",onsite-unverified,".raf,.tif",/raf-to-tif,,Engine: raw image decode.,image-raw,image-decoder + canvas
