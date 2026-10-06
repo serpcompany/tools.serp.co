@@ -134,7 +134,6 @@ const nextConfig = {
     BUILD_MODE: "server",
     SUPPORTS_VIDEO_CONVERSION: "true",
     NEXT_PUBLIC_FFMPEG_SINGLE_THREAD: singleThreadEnv,
-    NEXT_PUBLIC_VIDEO_CONVERSION_PREFER_SERVER: "true",
   },
   outputFileTracingRoot: tracingRoot,
   outputFileTracingIncludes,

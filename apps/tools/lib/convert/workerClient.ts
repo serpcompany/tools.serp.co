@@ -638,23 +638,18 @@ async function convertVideoOnMainThread(args: {
       });
     }
   } else {
-    try {
-      buffer = await convertVideo(args.buf, args.from, args.to, {
-        quality: args.quality,
-        onProgress: (progress) => {
-          args.onProgress?.({
-            status: "processing",
-            progress: progress.ratio * 100,
-            time: progress.time,
-          });
-        },
-      });
-    } catch (error) {
-      console.warn("Client conversion failed, falling back to server conversion.", error);
-      args.onProgress?.({ status: "processing", progress: 5 });
-      buffer = await convertVideoViaApi(args.buf, args.from, args.to);
-      args.onProgress?.({ status: "processing", progress: 100 });
-    }
+    // No server fallback: the Worker can't run native FFmpeg, and the input
+    // buffer has already been handed to the FFmpeg worker.
+    buffer = await convertVideo(args.buf, args.from, args.to, {
+      quality: args.quality,
+      onProgress: (progress) => {
+        args.onProgress?.({
+          status: "processing",
+          progress: progress.ratio * 100,
+          time: progress.time,
+        });
+      },
+    });
   }
 
   return { kind: "single", buffer };

@@ -68,9 +68,21 @@ const baseOrigin = new URL(args.baseUrl).origin;
 const browser = await chromium.launch({ headless: !args.headed });
 const context = await browser.newContext({ acceptDownloads: true });
 
+// The FFmpeg wasm (32 MB) lives on the asset host, which can challenge CI
+// runners; serve the same pinned file from the installed package instead.
+const ffmpegWasmPath = path.resolve(appRoot, "node_modules/@ffmpeg/core/dist/esm/ffmpeg-core.wasm");
+
 await context.route("**/*", (route) => {
   const request = route.request();
-  if (new URL(request.url()).origin !== baseOrigin) return route.abort();
+  const url = new URL(request.url());
+  if (url.pathname === "/vendor/ffmpeg-st/ffmpeg-core.wasm") {
+    return route.fulfill({
+      contentType: "application/wasm",
+      headers: { "access-control-allow-origin": "*" },
+      body: readFileSync(ffmpegWasmPath),
+    });
+  }
+  if (url.origin !== baseOrigin) return route.abort();
   return route.continue({ headers: { ...request.headers(), [SMOKE_TEST_HEADER]: "1" } });
 });
 
@@ -221,6 +233,25 @@ await step("telemetry ignores requests with Global Privacy Control", async () =>
     maxRedirects: 0,
   });
   assert(response.status() === 204, `status ${response.status()}`);
+});
+
+await step("webm-to-mp3 converts with FFmpeg in the browser", async (page, telemetryStatuses) => {
+  await page.goto(`${args.baseUrl}/webm-to-mp3/`);
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page
+      .locator('input[type="file"]')
+      .first()
+      .setInputFiles(path.join(appRoot, "benchmarks/fixtures/sample.webm")),
+  ]);
+  const bytes = readFileSync(await download.path());
+  assert(download.suggestedFilename().endsWith(".mp3"), `filename ${download.suggestedFilename()}`);
+  // MP3 files start with an ID3 tag or an MPEG frame sync (FF Ex/Fx).
+  const isMp3 =
+    bytes.subarray(0, 3).toString("latin1") === "ID3" ||
+    (bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0);
+  assert(isMp3, `not an MP3: starts with ${bytes.subarray(0, 4).toString("hex")}`);
+  await expectCompletedRun(page, telemetryStatuses, "webm-to-mp3");
 });
 
 // Each tool's row in the dashboard's status table must say `live`.
