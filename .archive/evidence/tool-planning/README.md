@@ -2,7 +2,9 @@
 
 These CSV files are advisory inputs inherited from earlier Tool planning:
 
-- `tools_planner.csv` contains candidate and previously observed Tool rows.
+- `tools_planner.csv` contained candidate and previously observed Tool rows.
+  It is still an input to maintained commands and tests, so it moved to
+  `packages/app-core/src/data/tools-planner.csv` (issue #150).
 - `in-progress-missing-audit.csv` records an earlier gap classification.
 - `veed-io.csv` contains third-party page research.
 

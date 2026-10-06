@@ -10,7 +10,7 @@ const tools = JSON.parse(
 );
 const plannerSource = readFileSync(
   new URL(
-    "../../../docs/evidence/tool-planning/tools_planner.csv",
+    "../../../packages/app-core/src/data/tools-planner.csv",
     import.meta.url,
   ),
   "utf8",
