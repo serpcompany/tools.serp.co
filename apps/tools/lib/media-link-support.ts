@@ -31,10 +31,20 @@ export function isYouTubeHost(hostname: string): boolean {
 // The message talks about transcription, so only transcription requests are
 // turned away up front. Downloader requests for YouTube still reach the
 // generic MEDIA_LINK_UNAVAILABLE failure.
+// Platform pages that only yt-dlp could read. Turning them away up front
+// skips a pointless yt-dlp attempt (and its GitHub API call).
+const PLATFORM_PAGE_HOSTS = ["tiktok.com", "soundcloud.com", "vimeo.com", "instagram.com"];
+
+function isPlatformPageHost(hostname: string) {
+  const host = hostname.toLowerCase().replace(/\.$/, "");
+  return PLATFORM_PAGE_HOSTS.some((domain) => host === domain || host.endsWith(`.${domain}`));
+}
+
 export function getUnsupportedTranscriptionLink(
   url: URL,
   consumer: string | undefined,
-): typeof YOUTUBE_LINK_UNSUPPORTED | null {
+): typeof YOUTUBE_LINK_UNSUPPORTED | typeof MEDIA_LINK_UNAVAILABLE | null {
   if (consumer === DOWNLOADER_CONSUMER) return null;
-  return isYouTubeHost(url.hostname) ? YOUTUBE_LINK_UNSUPPORTED : null;
+  if (isYouTubeHost(url.hostname)) return YOUTUBE_LINK_UNSUPPORTED;
+  return isPlatformPageHost(url.hostname) ? MEDIA_LINK_UNAVAILABLE : null;
 }

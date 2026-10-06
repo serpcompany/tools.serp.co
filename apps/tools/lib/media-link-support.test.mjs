@@ -50,6 +50,20 @@ test("transcription requests for YouTube links get a plain explanation", () => {
   );
 });
 
+test("other platform pages are turned away for transcription, not for downloads", () => {
+  for (const link of ["https://www.tiktok.com/@a/video/1", "https://soundcloud.com/a/b", "https://vimeo.com/1"]) {
+    assert.equal(getUnsupportedTranscriptionLink(new URL(link), undefined), MEDIA_LINK_UNAVAILABLE, link);
+    assert.equal(getUnsupportedTranscriptionLink(new URL(link), "downloader"), null, link);
+  }
+});
+
+test("downloader failures keep the 500 that offers the browser extension", () => {
+  const route = read("../app/api/media-fetch/route.ts");
+  assert.match(route, /payload\.consumer === DOWNLOADER_CONSUMER\) \{\s*return buildJsonErrorResponse\(\{ error: "Failed to fetch media\." \}, 500\)/);
+  const cta = read("../components/VideoDownloaderTool.tsx");
+  assert.match(cta, /Failed to fetch media/);
+});
+
 test("user-facing messages carry no internal details", () => {
   for (const { message } of [YOUTUBE_LINK_UNSUPPORTED, MEDIA_LINK_UNAVAILABLE]) {
     assert.doesNotMatch(message, /JSON|token|yt-dlp|stderr|binary|HTTP \d/i);

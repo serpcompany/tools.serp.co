@@ -611,8 +611,15 @@ export async function POST(request: Request) {
   try {
     await assertPublicUrl(targetUrl);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "URL is not allowed.";
-    return buildJsonErrorResponse({ error: message }, 400);
+    // DNS and runtime messages stay in the logs.
+    console.error("media-fetch rejected URL", {
+      host: targetUrl.hostname,
+      message: err instanceof Error ? err.message : "unknown error",
+    });
+    return buildJsonErrorResponse(
+      { error: "That link can't be fetched. Check the address, or upload the file." },
+      400,
+    );
   }
 
   const mode = payload.mode ?? "audio";
@@ -648,6 +655,11 @@ export async function POST(request: Request) {
       host: targetUrl.hostname,
       message: errMessage || trimmedStderr || "unknown error",
     });
+    // Downloader pages offer the browser extension on this 500 (see
+    // getExtensionFailureCta in VideoDownloaderTool.tsx).
+    if (payload.consumer === DOWNLOADER_CONSUMER) {
+      return buildJsonErrorResponse({ error: "Failed to fetch media." }, 500);
+    }
     return buildJsonErrorResponse(
       { code: MEDIA_LINK_UNAVAILABLE.code, error: MEDIA_LINK_UNAVAILABLE.message },
       422,
