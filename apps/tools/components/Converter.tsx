@@ -117,7 +117,6 @@ export default function Converter({
         from,
         to,
         inputBytes: item.file.size,
-        metadata: { fileName: item.file.name },
       });
 
       try {

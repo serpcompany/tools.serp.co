@@ -1,13 +1,21 @@
 import type { ToolRunEvent } from "./types.ts";
+import type { ToolRunMetadata } from "./validate.ts";
 
 type ToolRunHandle = {
   runId: string;
-  finishSuccess: (args: { outputBytes?: number; metadata?: Record<string, unknown> }) => void;
-  finishFailure: (args: { errorCode?: string; metadata?: Record<string, unknown> }) => void;
+  finishSuccess: (args: { outputBytes?: number; metadata?: ToolRunMetadata }) => void;
+  finishFailure: (args: { errorCode?: string; metadata?: ToolRunMetadata }) => void;
 };
 
 const TELEMETRY_ENDPOINT = "/api/telemetry";
 const DEVICE_ID_KEY = "serp_tools_device_id";
+
+// Global Privacy Control (https://globalprivacycontrol.org): a browser that
+// sends it gets no telemetry at all and no device id (docs/telemetry.md).
+export function isTelemetryOptedOut(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
+}
 
 function getDeviceId(): string | null {
   if (typeof window === "undefined") return null;
@@ -57,9 +65,9 @@ export function beginToolRun(args: {
   from?: string;
   to?: string;
   inputBytes?: number;
-  metadata?: Record<string, unknown>;
+  metadata?: ToolRunMetadata;
 }): ToolRunHandle {
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || isTelemetryOptedOut()) {
     return {
       runId: "server",
       finishSuccess: () => {},

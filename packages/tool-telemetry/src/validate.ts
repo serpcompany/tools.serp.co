@@ -12,7 +12,51 @@ export const TOOL_RUN_EVENTS: readonly ToolRunEventType[] = [
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/;
 const ERROR_CODE_PATTERN = /^[A-Za-z0-9_.:-]{1,64}$/;
 const FORMAT_PATTERN = /^[A-Za-z0-9.+_-]{1,32}$/;
-const METADATA_KEY_PATTERN = /^[A-Za-z0-9_.-]{1,40}$/;
+// Every metadata key the app may store, and why (docs/telemetry.md). Anything
+// else is dropped: never file names, file or page contents, free-form error
+// text, or other user input.
+const METADATA_KEY_LIST = [
+  // Added by the server: request origin, reviewed and kept (issue #161).
+  "ip",
+  "userAgent",
+  "release",
+  // Added by the client: a random per-browser id in localStorage.
+  "deviceId",
+  // How a tool ran.
+  "engine",
+  "route",
+  "op",
+  "from",
+  "to",
+  "format",
+  "status",
+  "source",
+  "mode",
+  "urlHost",
+  "failFast",
+  "failFastReason",
+  "compressionLevel",
+  // Sizes and counts of the input or output, never the content itself.
+  "fileCount",
+  "rows",
+  "columns",
+  "htmlLength",
+  "audioSeconds",
+  "characters",
+  "words",
+  "sentences",
+  "paragraphs",
+  "lines",
+  "readingTime",
+  "speakingTime",
+] as const;
+
+export type MetadataKey = (typeof METADATA_KEY_LIST)[number];
+// What a browser may send: every allowlisted key except the ones only the
+// server sets.
+export type ClientMetadataKey = Exclude<MetadataKey, "ip" | "userAgent" | "release">;
+export type ToolRunMetadata = Partial<Record<ClientMetadataKey, unknown>>;
+export const METADATA_KEYS: ReadonlySet<string> = new Set(METADATA_KEY_LIST);
 const MAX_METADATA_KEYS = 20;
 const MAX_METADATA_STRING = 256;
 const MAX_METADATA_JSON_BYTES = 4096;
@@ -53,15 +97,16 @@ function truncate(value: string): string {
   return value.length > MAX_METADATA_STRING ? value.slice(0, MAX_METADATA_STRING) : value;
 }
 
-// Flat, primitive-only metadata: nested values are stringified and truncated,
-// unknown key shapes are dropped, and the whole object is capped in size.
+// Flat, primitive-only metadata: keys outside METADATA_KEYS are dropped,
+// nested values are stringified and truncated, and the whole object is capped
+// in size.
 export function sanitizeMetadata(value: unknown): Record<string, unknown> | undefined {
   if (!isPlainObject(value)) return undefined;
   const result: Record<string, unknown> = {};
   let bytes = 2;
   for (const [key, raw] of Object.entries(value)) {
     if (Object.keys(result).length >= MAX_METADATA_KEYS) break;
-    if (!METADATA_KEY_PATTERN.test(key)) continue;
+    if (!METADATA_KEYS.has(key)) continue;
     let clean: unknown;
     if (raw === null || typeof raw === "boolean") clean = raw;
     else if (typeof raw === "number") clean = Number.isFinite(raw) ? raw : null;

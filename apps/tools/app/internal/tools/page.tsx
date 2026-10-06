@@ -23,6 +23,14 @@ type StatusRow = {
 };
 
 const MAX_METADATA_LENGTH = 240;
+// Identity fields would crowd the diagnostic ones out of the short preview.
+const PREVIEW_OMITTED_KEYS = new Set(["ip", "userAgent", "deviceId"]);
+
+function withoutIdentityFields(metadata: Record<string, unknown>) {
+  return Object.fromEntries(
+    Object.entries(metadata).filter(([key]) => !PREVIEW_OMITTED_KEYS.has(key)),
+  );
+}
 
 const toolMap = new Map(
   (toolsData as Array<{ id: string; name: string; route: string }>).map((tool) => [
@@ -150,8 +158,11 @@ export default async function ToolsDashboard() {
                     <tbody>
                       {failureRows.map((row) => {
                         const tool = toolMap.get(row.toolId);
-                        const metadataText = row.sampleMetadata
-                          ? JSON.stringify(row.sampleMetadata)
+                        const preview = row.sampleMetadata
+                          ? withoutIdentityFields(row.sampleMetadata)
+                          : {};
+                        const metadataText = Object.keys(preview).length
+                          ? JSON.stringify(preview)
                           : "-";
                         const metadataPreview =
                           metadataText.length > MAX_METADATA_LENGTH

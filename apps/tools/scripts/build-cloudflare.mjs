@@ -11,6 +11,13 @@ const env = {
     process.env.NEXT_PUBLIC_ASSETS_BASE_URL || defaultAssetsBaseUrl,
   NEXT_PUBLIC_SITE_URL:
     process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl,
+  // The release id stamped on telemetry: Workers Builds' commit, else the
+  // local checkout's.
+  NEXT_PUBLIC_RELEASE:
+    process.env.NEXT_PUBLIC_RELEASE ||
+    process.env.WORKERS_CI_COMMIT_SHA?.slice(0, 12) ||
+    spawnSync("git", ["rev-parse", "--short=12", "HEAD"], { encoding: "utf8" }).stdout?.trim() ||
+    "unknown",
 };
 
 const buildEnvironmentError = getBuildEnvironmentError(env);

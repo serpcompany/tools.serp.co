@@ -3,6 +3,7 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { AUDIO_FORMATS, VIDEO_FORMATS, detectCapabilities } from '../capabilities';
 import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils";
 import { createServerActionRequestHeaders } from "../server-action-client";
+import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
 let ffmpeg: FFmpeg | null = null;
 let loaded = false;
@@ -19,13 +20,13 @@ const VIDEO_FORMAT_SET = new Set(VIDEO_FORMATS);
 
 type TelemetryError = Error & {
   telemetryCode?: string;
-  telemetryMetadata?: Record<string, unknown>;
+  telemetryMetadata?: ToolRunMetadata;
 };
 
 function createTelemetryError(
   code: string,
   message: string,
-  metadata?: Record<string, unknown>
+  metadata?: ToolRunMetadata
 ): TelemetryError {
   const error = new Error(message) as TelemetryError;
   error.telemetryCode = code;
@@ -33,10 +34,6 @@ function createTelemetryError(
     error.telemetryMetadata = metadata;
   }
   return error;
-}
-
-function toErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : String(error);
 }
 
 function canRemux(fromFormat: string, toFormat: string) {
@@ -71,7 +68,7 @@ export async function convertVideoViaApi(
   toFormat: string
 ): Promise<ArrayBuffer> {
   const route = "/api/video-convert";
-  const baseMetadata = {
+  const baseMetadata: ToolRunMetadata = {
     route,
     from: fromFormat,
     to: toFormat,
@@ -86,11 +83,11 @@ export async function convertVideoViaApi(
       }),
       body: inputBuffer,
     });
-  } catch (error) {
+  } catch {
     throw createTelemetryError(
       "network_error",
       "Server conversion request failed",
-      { ...baseMetadata, detail: toErrorMessage(error) }
+      baseMetadata
     );
   }
 
@@ -107,7 +104,7 @@ export async function convertVideoViaApi(
     throw createTelemetryError(
       "server_convert_failed",
       `Server conversion failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status, detail: serverError }
+      { ...baseMetadata, status: response.status }
     );
   }
 

@@ -3,6 +3,7 @@ import { resolveCompressionTarget } from "../compression-utils.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
+import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
 export type ConversionOp = "raster" | "pdf-pages" | "video";
 
@@ -137,13 +138,13 @@ type WorkerMessage = {
 
 type TelemetryError = Error & {
   telemetryCode?: string;
-  telemetryMetadata?: Record<string, unknown>;
+  telemetryMetadata?: ToolRunMetadata;
 };
 
 function createTelemetryError(
   code: string,
   message: string,
-  metadata?: Record<string, unknown>
+  metadata?: ToolRunMetadata
 ): TelemetryError {
   const error = new Error(message) as TelemetryError;
   error.telemetryCode = code;
@@ -151,10 +152,6 @@ function createTelemetryError(
     error.telemetryMetadata = metadata;
   }
   return error;
-}
-
-function toErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : String(error);
 }
 
 export async function convertWithWorker(args: {
@@ -285,7 +282,6 @@ async function convertWithWorkerInner(args: {
             from: args.from,
             to: args.to,
             engine: "worker",
-            detail,
           }
         )
       );
@@ -441,7 +437,7 @@ async function convertImageViaApi(args: {
   onProgress?: (update: ProgressUpdate) => void;
 }): Promise<ConversionResult> {
   const route = "/api/image-convert";
-  const baseMetadata = {
+  const baseMetadata: ToolRunMetadata = {
     route,
     from: args.from,
     to: args.to,
@@ -457,11 +453,11 @@ async function convertImageViaApi(args: {
       }),
       body: args.buf,
     });
-  } catch (error) {
+  } catch {
     throw createTelemetryError(
       "network_error",
       "Server conversion request failed",
-      { ...baseMetadata, detail: toErrorMessage(error) }
+      baseMetadata
     );
   }
 
@@ -478,7 +474,7 @@ async function convertImageViaApi(args: {
     throw createTelemetryError(
       "server_convert_failed",
       `Server conversion failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status, detail: serverError }
+      { ...baseMetadata, status: response.status }
     );
   }
 
@@ -492,7 +488,7 @@ export async function compressPdfViaApi(args: {
   onProgress?: (update: ProgressUpdate) => void;
 }): Promise<ArrayBuffer> {
   const route = "/api/pdf-compress";
-  const baseMetadata = {
+  const baseMetadata: ToolRunMetadata = {
     route,
     format: "pdf",
     engine: "server-pdf",
@@ -507,11 +503,11 @@ export async function compressPdfViaApi(args: {
       }),
       body: args.buf,
     });
-  } catch (error) {
+  } catch {
     throw createTelemetryError(
       "network_error",
       "Server compression request failed",
-      { ...baseMetadata, detail: toErrorMessage(error) }
+      baseMetadata
     );
   }
 
@@ -528,7 +524,7 @@ export async function compressPdfViaApi(args: {
     throw createTelemetryError(
       "server_compress_failed",
       `Server compression failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status, detail: serverError }
+      { ...baseMetadata, status: response.status }
     );
   }
 
@@ -547,7 +543,7 @@ async function compressImageViaApi(args: {
 }): Promise<ArrayBuffer> {
   const format = args.format.toLowerCase();
   const route = "/api/image-compress";
-  const baseMetadata = {
+  const baseMetadata: ToolRunMetadata = {
     route,
     format,
     engine: "server-image-compress",
@@ -562,11 +558,11 @@ async function compressImageViaApi(args: {
       }),
       body: args.buf,
     });
-  } catch (error) {
+  } catch {
     throw createTelemetryError(
       "network_error",
       "Server image compression request failed",
-      { ...baseMetadata, detail: toErrorMessage(error) }
+      baseMetadata
     );
   }
 
@@ -583,7 +579,7 @@ async function compressImageViaApi(args: {
     throw createTelemetryError(
       "server_compress_failed",
       `Server image compression failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status, detail: serverError }
+      { ...baseMetadata, status: response.status }
     );
   }
 

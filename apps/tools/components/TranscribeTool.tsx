@@ -353,7 +353,7 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       from: ext,
       to: "txt",
       inputBytes: file.size,
-      metadata: { fileName: file.name, source },
+      metadata: { source },
     });
 
     const extractionStart = args.progressOffset ?? 0;

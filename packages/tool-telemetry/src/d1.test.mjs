@@ -7,7 +7,15 @@ import { migrate } from "drizzle-orm/d1/migrator";
 import { getPlatformProxy } from "wrangler";
 
 import { STATUS_SAMPLE_LIMIT, getD1ToolsDashboardData } from "./d1.ts";
+import {
+  TOOL_RUN_RETENTION_DAYS,
+  deviceRunsDeleteSql,
+  expiredCountSql,
+  purgeBatchSql,
+  purgeCutoff,
+} from "./purge.ts";
 import { recordToolRun } from "./server.ts";
+import { METADATA_KEYS } from "./validate.ts";
 
 // Runs against workerd's local D1, with the real migrations applied.
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -106,22 +114,22 @@ async function seedRuns({ idPrefix, toolId, count, status, offsetMs = 60_000 }) 
 }
 
 test("a valid started event inserts a tool_runs row", async () => {
-  const result = await recordToolRun(event({ metadata: { host: "example.com" } }), { d1, now });
+  const result = await recordToolRun(event({ metadata: { urlHost: "example.com" } }), { d1, now });
 
   assert.deepEqual(result, { status: 200, body: { ok: true } });
   const row = await run("run-a");
   assert.equal(row.tool_id, "compress-png");
   assert.equal(row.status, "started");
-  assert.equal(row.metadata, '{"host":"example.com"}');
+  assert.equal(row.metadata, '{"urlHost":"example.com"}');
 });
 
 test("a repeated started event keeps the first row", async () => {
-  await recordToolRun(event({ inputBytes: 1000, metadata: { version: 1 } }), { d1, now });
-  await recordToolRun(event({ inputBytes: 999, metadata: { version: 2 } }), { d1, now });
+  await recordToolRun(event({ inputBytes: 1000, metadata: { rows: 1 } }), { d1, now });
+  await recordToolRun(event({ inputBytes: 999, metadata: { rows: 2 } }), { d1, now });
 
   const row = await run("run-a");
   assert.equal(row.input_bytes, 1000);
-  assert.equal(row.metadata, '{"version":1}');
+  assert.equal(row.metadata, '{"rows":1}');
 });
 
 test("succeeded and failed events update the run", async () => {
@@ -243,26 +251,85 @@ test("an odd from/to label is dropped without losing the event", async () => {
   assert.equal((await run("run-a")).status, "started");
 });
 
-test("metadata is flattened and capped before it is stored", async () => {
+test("only allowlisted metadata keys are stored", async () => {
   await recordToolRun(
     event({
       metadata: {
-        fileName: "a".repeat(1000),
-        nested: { deep: { value: 1 } },
+        engine: "worker",
+        fileName: "passport-scan.pdf",
+        detail: "ENOENT: /Users/someone/file.txt",
         "bad key!": "dropped",
-        ok: true,
-        ...Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`k${i}`, i])),
+        failFast: true,
+      },
+    }),
+    { d1, now },
+  );
+
+  assert.deepEqual(JSON.parse((await run("run-a")).metadata), { engine: "worker", failFast: true });
+});
+
+test("metadata is flattened and capped before it is stored", async () => {
+  const keys = [...METADATA_KEYS];
+  await recordToolRun(
+    event({
+      metadata: {
+        userAgent: "a".repeat(1000),
+        engine: { deep: { value: 1 } },
+        ...Object.fromEntries(keys.slice(5, 35).map((key, i) => [key, i])),
       },
     }),
     { d1, now },
   );
 
   const metadata = JSON.parse((await run("run-a")).metadata);
-  assert.equal(metadata.fileName.length, 256);
-  assert.equal(metadata.nested, '{"deep":{"value":1}}');
-  assert.equal(metadata["bad key!"], undefined);
-  assert.equal(metadata.ok, true);
+  assert.equal(metadata.userAgent.length, 256);
+  assert.equal(metadata.engine, '{"deep":{"value":1}}');
   assert.equal(Object.keys(metadata).length, 20);
+});
+
+test(`a purge batch deletes only runs older than ${TOOL_RUN_RETENTION_DAYS} days, at most batchSize`, async () => {
+  const day = 86_400_000;
+  const expiredOffset = (TOOL_RUN_RETENTION_DAYS + 1) * day;
+  await seedRuns({ idPrefix: "old-ok", toolId: "busy-tool", count: 9, status: "succeeded", offsetMs: expiredOffset });
+  await seedRuns({ idPrefix: "old-bad", toolId: "busy-tool", count: 8, status: "failed", offsetMs: expiredOffset });
+  // Abandoned runs never finish, and still carry ip, userAgent and deviceId.
+  await seedRuns({ idPrefix: "old-open", toolId: "busy-tool", count: 8, status: "started", offsetMs: expiredOffset });
+  await seedRuns({ idPrefix: "recent", toolId: "busy-tool", count: 5, status: "succeeded", offsetMs: (TOOL_RUN_RETENTION_DAYS - 1) * day });
+  const cutoff = purgeCutoff(now);
+
+  const counted = await d1.prepare(expiredCountSql(cutoff)).first();
+  assert.equal(counted.expired, 25);
+
+  const batches = [];
+  for (;;) {
+    const { results } = await d1.prepare(purgeBatchSql(cutoff, 10)).all();
+    batches.push(results.length);
+    if (results.length < 10) break;
+  }
+  assert.deepEqual(batches, [10, 10, 5]);
+  const { results } = await d1.prepare("SELECT id FROM tool_runs ORDER BY id").all();
+  assert.deepEqual(results.map((row) => row.id), ["recent-0", "recent-1", "recent-2", "recent-3", "recent-4"]);
+});
+
+test("a purge batch with nothing expired reads almost nothing, however big the table", async () => {
+  await seedRuns({ idPrefix: "recent", toolId: "busy-tool", count: 3000, status: "succeeded" });
+
+  const { results, meta } = await d1.prepare(purgeBatchSql(purgeCutoff(now))).all();
+
+  assert.equal(results.length, 0);
+  // The (status, started_at) index finds no expired rows without a table scan.
+  assert.ok(meta.rows_read < 10, `read ${meta.rows_read} rows`);
+});
+
+test("the purge SQL only accepts an ISO timestamp cutoff and a positive batch size", () => {
+  assert.equal(purgeCutoff(now), "2026-03-22T12:00:00.000Z");
+  for (const cutoff of ["2026-01-01", "2026-01-01T00:00:00.000Z' OR '1'='1", ""]) {
+    assert.throws(() => purgeBatchSql(cutoff), /Invalid purge cutoff/, cutoff);
+    assert.throws(() => expiredCountSql(cutoff), /Invalid purge cutoff/, cutoff);
+  }
+  assert.throws(() => purgeBatchSql(purgeCutoff(now), 0), /Invalid purge batch size/);
+  assert.throws(() => deviceRunsDeleteSql("x' OR '1'='1"), /Invalid device id/);
+  assert.match(deviceRunsDeleteSql("4132ad8a-b1b5-4af6-b987-d8922405d616"), /= '4132ad8a-b1b5-4af6-b987-d8922405d616' RETURNING id$/);
 });
 
 test("a missing D1 binding returns 503 instead of discarding telemetry", async () => {
