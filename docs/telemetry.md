@@ -121,6 +121,6 @@ the same schedule.
   2026-10-06. It is kept only for the broken-tool investigation (#147) and is
   deleted when that work is done; deletion requests don't reach it until then.
   Never commit it or copy it elsewhere.
-- **D1 Time Travel:** Cloudflare can restore the database to any point in the
-  last 30 days, so deleted runs stay recoverable for up to 30 days after a
-  purge or deletion request.
+- **D1 Time Travel:** Cloudflare can restore the database to an earlier point
+  (30 days back on Workers Paid, 7 on Free), so deleted runs stay recoverable
+  for that long after a purge or deletion request.
