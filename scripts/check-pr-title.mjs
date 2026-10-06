@@ -5,7 +5,8 @@
 // Revert button are allowed too: every merge to main deploys production, so a
 // revert must never wait on a retitle.
 
-import { pathToFileURL } from 'node:url';
+import { realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 export const TITLE_TYPES = [
   'feat',
@@ -28,7 +29,8 @@ export function isValidPrTitle(title) {
   return CONVENTIONAL_TITLE.test(title) || GITHUB_REVERT_TITLE.test(title);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Compare real paths: import.meta.url resolves symlinks and argv[1] doesn't.
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const title = process.env.TITLE ?? '';
   if (isValidPrTitle(title)) {
     console.log(`PR title is a Conventional Commit: ${title}`);

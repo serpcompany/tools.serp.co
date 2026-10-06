@@ -21,8 +21,9 @@ truth. Prefer the nearest scoped `AGENTS.md` when one exists.
 ## Git workflow
 
 Follow the serp [git workflow](https://github.com/serpcompany/serp/blob/main/docs/engineering/standards/git-workflow.md):
-one issue, one branch, one PR, one squash commit on the base branch (currently
-`main`; whether to move to a `staging` base is #152).
+one issue, one branch, one PR, one squash commit on the base branch. That is
+`main` today; the standard's `staging` base for repos with Staging is pending
+an owner decision.
 
 - Branch: `issue-<number>-<short-slug>`, from the base branch.
 - PR title: a Conventional Commit phrased as the outcome a user notices. The
@@ -31,6 +32,9 @@ one issue, one branch, one PR, one squash commit on the base branch (currently
   Revert button; its `Revert "..."` title passes.
 - PR body: fill in `.github/pull_request_template.md`. It starts with
   `Closes #<number>` and reports each evidence level separately.
+- A fresh review agent reviews every PR; resolve each finding, re-review after
+  blocking fixes, and record the outcome in the PR. Agents never merge without
+  the owner's approval.
 - Every merge to `main` deploys production through Workers Builds, which does
   not apply D1 migrations: run `db:migrate:production` before merging code
   that needs them (`docs/runbooks/cloudflare.md`).

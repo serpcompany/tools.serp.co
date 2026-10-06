@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { isValidPrTitle } from './check-pr-title.mjs';
@@ -62,4 +65,19 @@ test('the CLI exits 1 with a workflow error for a bad title', () => {
     encoding: 'utf8',
   });
   assert.equal(good.status, 0, good.stdout);
+});
+
+test('the CLI still checks the title when run through a symlink', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'pr-title-'));
+  const link = path.join(dir, 'check-pr-title.mjs');
+  symlinkSync(scriptPath, link);
+  try {
+    const bad = spawnSync(process.execPath, [link], {
+      env: { ...process.env, TITLE: 'update stuff' },
+      encoding: 'utf8',
+    });
+    assert.equal(bad.status, 1, bad.stdout);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
