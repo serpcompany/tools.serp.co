@@ -2,7 +2,7 @@
 
 // PR titles become the squash commit and the changelog line, so they must be
 // Conventional Commits (serp git-workflow standard). Titles from GitHub's
-// Revert button are allowed too: every merge to main deploys production, so a
+// Revert button are allowed too: every merge deploys an environment, so a
 // revert must never wait on a retitle.
 
 import { realpathSync } from 'node:fs';

@@ -1,8 +1,8 @@
 name: Deploy
 
 # A push to `staging` deploys Staging; a push to `main` (a promotion) deploys
-# Production. Each run applies that environment's D1 migrations, deploys, and
-# smoke-tests the live site (serp git-workflow standard, issue #188).
+# Production. Each run builds, applies that environment's D1 migrations,
+# deploys, and smoke-tests the live site (serp git-workflow standard, #188).
 on:
   push:
     branches:
@@ -13,23 +13,20 @@ on:
 permissions:
   contents: read
 
-# One deploy per branch at a time, and never cancel one halfway.
-concurrency:
-  group: deploy-${{ github.ref_name }}
-  cancel-in-progress: false
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # One deploy per environment at a time, and never cancel one halfway.
+    concurrency:
+      group: deploy-tools-serp-co-${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      cancel-in-progress: false
     env:
       DEPLOY_ENV: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
       # CI tests through the Worker's *.workers.dev host with the smoke-test
       # header, so Bot Fight Mode on the branded domain can't block it.
       PLATFORM_URL: ${{ github.ref_name == 'main' && 'https://tools-serp-co.serpcompany.workers.dev' || 'https://tools-serp-co-staging.serpcompany.workers.dev' }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      # The SERP account (docs/runbooks/cloudflare.md). Not secret; pinned here
-      # so the token is always used against the account it was created in.
+      # The SERP account (docs/runbooks/cloudflare.md). Not secret.
       CLOUDFLARE_ACCOUNT_ID: cec5f04e1d18bcc65f2be0aefb04f059
       WRANGLER_SEND_METRICS: "false"
     steps:
@@ -38,6 +35,15 @@ jobs:
         run: |
           echo "::error::Deploy runs only for the staging and main branches."
           exit 1
+
+      # Re-running an old run would deploy an older commit over a newer one.
+      - name: Only the branch's current commit deploys
+        run: |
+          head="$(git ls-remote "https://github.com/${GITHUB_REPOSITORY}.git" "refs/heads/${GITHUB_REF_NAME}" | cut -f1)"
+          if [ "$head" != "$GITHUB_SHA" ]; then
+            echo "::error::$GITHUB_SHA is no longer the head of ${GITHUB_REF_NAME} ($head). Push or re-run the newest commit instead."
+            exit 1
+          fi
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,11 +62,53 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Before anything touches the environment, so a runtime-download flake
+      # can't fail the run after a deploy.
+      - name: Install pinned browser runtime
+        if: env.DEPLOY_ENV == 'staging'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: apps/tools/.next/cache
+          key: nextjs-deploy-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            nextjs-deploy-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      # Fails fast, with Cloudflare's own answer, when the token is invalid or
+      # can't reach this account's D1. Prints no secret values.
+      - name: Check the Cloudflare token
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          api="https://api.cloudflare.com/client/v4"
+          auth="Authorization: Bearer ${CLOUDFLARE_API_TOKEN}"
+          account="$(curl -sS -H "$auth" "$api/accounts/${CLOUDFLARE_ACCOUNT_ID}/tokens/verify")"
+          user="$(curl -sS -H "$auth" "$api/user/tokens/verify")"
+          d1="$(curl -sS -H "$auth" "$api/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database?per_page=1")"
+          echo "account-owned token: $(jq -c '{success, status: .result.status, errors: [.errors[]?.code]}' <<<"$account")"
+          echo "user token:          $(jq -c '{success, status: .result.status, errors: [.errors[]?.code]}' <<<"$user")"
+          echo "SERP D1 access:      $(jq -c '{success, errors: [.errors[]? | {code, message}]}' <<<"$d1")"
+          if [ "$(jq -r .success <<<"$d1")" != "true" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN can't use D1 in the SERP account. Store an active token with D1 Write and Workers Scripts Write on that account (docs/runbooks/cloudflare.md)."
+            exit 1
+          fi
+
+      # Build first: a failed build must not leave migrations applied.
+      - name: Build
+        run: pnpm -C apps/tools cf:build:${DEPLOY_ENV}
+
+      # Only these two steps can read the token.
       - name: Apply D1 migrations
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: pnpm -C apps/tools db:migrate:${DEPLOY_ENV}
 
-      - name: Build and deploy
-        run: pnpm -C apps/tools deploy:${DEPLOY_ENV}
+      - name: Deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: pnpm -C apps/tools exec wrangler deploy --env ${DEPLOY_ENV}
 
       - name: Check the environment rules
         run: >-
@@ -69,10 +117,10 @@ jobs:
           --expect-env "$DEPLOY_ENV"
           --platform-url "$PLATFORM_URL"
 
-      - name: Install pinned browser runtime
-        run: pnpm exec playwright install --with-deps chromium
-
+      # Staging only: the browser smoke records real tool runs, and production
+      # telemetry must hold only real visitors' runs.
       - name: Run the browser smoke test
+        if: env.DEPLOY_ENV == 'staging'
         run: pnpm -C apps/tools smoke:browser --base-url "$PLATFORM_URL"
 
       - name: Upload smoke failure artifacts

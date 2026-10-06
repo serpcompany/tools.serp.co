@@ -10,8 +10,9 @@ on:
 permissions:
   contents: read
 
-# A new push to a PR cancels that PR's older run. Every main run gets its own
-# group, so each commit is checked (serp verification-cadence standard).
+# A new push to a PR cancels that PR's older run. Every push run (staging or
+# main) gets its own group, so each commit is checked (serp verification-cadence
+# standard).
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
