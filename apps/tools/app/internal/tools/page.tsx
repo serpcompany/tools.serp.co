@@ -3,6 +3,11 @@ import toolsData from "@serp-tools/app-core/data/tools.json";
 import { getD1ToolsDashboardData } from "@serp-tools/tool-telemetry/d1";
 import { getSerpToolsD1Binding } from "@/lib/cloudflare-d1";
 import { isInternalDashboardAuthorized } from "@/lib/internal-dashboard-auth";
+import {
+  dashboardLoadErrorLogDetail,
+  describeDashboardLoadError,
+  type DashboardLoadError,
+} from "@/lib/internal-dashboard-load-error";
 
 type FailureSummary = {
   toolId: string;
@@ -56,7 +61,7 @@ export default async function ToolsDashboard() {
 
   let rows: StatusRow[] = [];
   let failureRows: FailureSummary[] = [];
-  let errorMessage: string | null = null;
+  let loadError: DashboardLoadError | null = null;
 
   try {
     const d1 = await getSerpToolsD1Binding();
@@ -68,7 +73,8 @@ export default async function ToolsDashboard() {
     rows = dashboardData.statusRows;
     failureRows = dashboardData.failureRows;
   } catch (err: unknown) {
-    errorMessage = err instanceof Error ? err.message : "Failed to load tool status.";
+    console.error("internal dashboard: D1 load failed", dashboardLoadErrorLogDetail(err));
+    loadError = describeDashboardLoadError(err);
   }
 
   return (
@@ -79,9 +85,10 @@ export default async function ToolsDashboard() {
           Status and telemetry summary for tool runs (last 24h).
         </p>
 
-        {errorMessage ? (
-          <div className="border rounded-lg p-4 text-sm text-red-600">
-            {errorMessage}
+        {loadError ? (
+          <div className="border rounded-lg p-4" role="alert">
+            <h2 className="font-medium text-red-600 mb-1">{loadError.title}</h2>
+            <p className="text-sm text-muted-foreground">{loadError.message}</p>
           </div>
         ) : (
           <>
