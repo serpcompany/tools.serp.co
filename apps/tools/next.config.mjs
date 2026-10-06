@@ -130,6 +130,8 @@ const nextConfig = {
     "@serp-tools/tool-telemetry",
   ],
   trailingSlash: true,
+  // middleware.ts applies the trailing-slash rules (lib/trailing-slash.ts).
+  skipTrailingSlashRedirect: true,
   env: {
     BUILD_MODE: "server",
     SUPPORTS_VIDEO_CONVERSION: "true",

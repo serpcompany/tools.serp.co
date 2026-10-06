@@ -1,5 +1,7 @@
 import { isProductionSite } from "@serp-tools/app-core/lib/site-env";
 
+import { canonicalPath } from "./trailing-slash.ts";
+
 // Which deployment this build serves. `NEXT_PUBLIC_SITE_ENV` is set per
 // environment in the cf:build:* scripts and in wrangler.jsonc vars. Anything
 // other than "production" is non-production: noindex, crawling disallowed, no
@@ -24,8 +26,9 @@ type CanonicalRedirectArgs = {
 };
 
 // Deployed environments have exactly one canonical host. Returns the URL to
-// 308 to when a request arrives on any other host, otherwise null. Local runs
-// never redirect.
+// 308 to when a request arrives on any other host, otherwise null. The target
+// also has the canonical trailing slash, so a platform-host request takes one
+// hop, not two. Local runs never change host.
 export function getCanonicalRedirectUrl({
   requestUrl,
   siteEnv,
@@ -40,7 +43,7 @@ export function getCanonicalRedirectUrl({
   const url = new URL(requestUrl);
   if (url.host === canonical.host) return null;
 
-  return `${canonical.origin}${url.pathname}${url.search}`;
+  return `${canonical.origin}${canonicalPath(url.pathname)}${url.search}`;
 }
 
 // Checks the decoded path too, so an encoded spelling such as
@@ -67,6 +70,12 @@ export type MiddlewareDecision =
 export function decideMiddleware(args: CanonicalRedirectArgs): MiddlewareDecision {
   const location = getCanonicalRedirectUrl(args);
   if (location) return { type: "redirect", location };
+
+  const url = new URL(args.requestUrl);
+  const path = canonicalPath(url.pathname);
+  if (path !== url.pathname) {
+    return { type: "redirect", location: `${url.origin}${path}${url.search}` };
+  }
 
   return {
     type: "continue",

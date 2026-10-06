@@ -97,7 +97,7 @@ test("middleware decisions across environments, hosts and paths", () => {
     requireDashboardAuth: false,
     noindex: false,
   });
-  for (const pathname of ["/internal", "/internal/", "/internal/tools/", "/%69nternal/tools/"]) {
+  for (const pathname of ["/internal/", "/internal/tools/", "/%69nternal/tools/"]) {
     assert.deepEqual(
       decide(production, `https://tools.serp.co${pathname}`),
       { type: "continue", requireDashboardAuth: true, noindex: false },
@@ -111,6 +111,39 @@ test("middleware decisions across environments, hosts and paths", () => {
       pathname,
     );
   }
+
+  // An unslashed page gets its slash first; the slashed page then needs auth.
+  assert.deepEqual(decide(production, "https://tools.serp.co/internal"), {
+    type: "redirect",
+    location: "https://tools.serp.co/internal/",
+  });
+
+  // Trailing-slash rules apply on every host and environment, in one hop.
+  assert.deepEqual(decide(production, "https://tools.serp.co/png-to-jpg?a=1"), {
+    type: "redirect",
+    location: "https://tools.serp.co/png-to-jpg/?a=1",
+  });
+  assert.deepEqual(decide(production, "https://tools.serp.co/robots.txt/"), {
+    type: "redirect",
+    location: "https://tools.serp.co/robots.txt",
+  });
+  assert.deepEqual(decide(production, "https://tools-serp-co.serpcompany.workers.dev/png-to-jpg"), {
+    type: "redirect",
+    location: "https://tools.serp.co/png-to-jpg/",
+  });
+  assert.deepEqual(decide(local, "http://localhost:8787/png-to-jpg"), {
+    type: "redirect",
+    location: "http://localhost:8787/png-to-jpg/",
+  });
+  // /api is never redirected on the canonical host, with or without a slash.
+  for (const pathname of ["/api", "/api/", "/api/telemetry", "/api/telemetry/"]) {
+    assert.equal(decide(production, `https://tools.serp.co${pathname}`).type, "continue", pathname);
+  }
+  // On a platform host /api still moves to the canonical host, path unchanged.
+  assert.deepEqual(decide(production, "https://tools-serp-co.serpcompany.workers.dev/api/telemetry"), {
+    type: "redirect",
+    location: "https://tools.serp.co/api/telemetry",
+  });
 
   // Staging, local and unset are noindex.
   assert.equal(decide(staging, "https://staging.tools.serp.co/").noindex, true);

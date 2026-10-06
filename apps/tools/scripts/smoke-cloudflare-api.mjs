@@ -338,6 +338,50 @@ function environmentChecks(args) {
     },
   );
 
+  // serp url-trailing-slash standard (issue #165, #167).
+  const locationPath = (response) => {
+    const location = response.headers.get("location");
+    return location ? new URL(location, args.baseUrl).pathname : null;
+  };
+  checks.push(
+    {
+      name: "homepage canonical and og:url are the bare origin",
+      url: buildUrl(args.baseUrl, "/"),
+      expect: (response, bytes) => {
+        const html = bytes.toString("utf8");
+        return (
+          response.status === 200 &&
+          html.includes(`<link rel="canonical" href="${canonical}"/>`) &&
+          html.includes(`<meta property="og:url" content="${canonical}"/>`)
+        );
+      },
+      details: (_response, bytes) => ({
+        canonical: bytes.toString("utf8").match(/<link rel="canonical"[^>]*>/)?.[0] ?? null,
+      }),
+    },
+    {
+      name: "a page without its slash 308s to the slashed page",
+      url: buildUrl(args.baseUrl, "/png-to-jpg"),
+      expect: (response) => response.status === 308 && locationPath(response) === "/png-to-jpg/",
+      details: (response) => ({ location: response.headers.get("location") }),
+    },
+    {
+      name: "a file with a slash 308s to the file",
+      url: buildUrl(args.baseUrl, "/robots.txt/"),
+      expect: (response) => response.status === 308 && locationPath(response) === "/robots.txt",
+      details: (response) => ({ location: response.headers.get("location") }),
+    },
+    ...["/api/telemetry", "/api/telemetry/"].map((path) => ({
+      name: `POST ${path} is never redirected`,
+      url: buildUrl(args.baseUrl, path),
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "not json",
+      expect: (response) => response.status === 400,
+      details: (response) => ({ location: response.headers.get("location") }),
+    })),
+  );
+
   if (args.platformUrl) {
     checks.push({
       name: "platform host 308s to the canonical host",

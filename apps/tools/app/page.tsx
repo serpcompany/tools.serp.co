@@ -17,6 +17,12 @@ type ToolCategory = {
   count: number;
 };
 
+// The homepage canonical and og:url are the bare origin, with no trailing
+// slash (serp url-trailing-slash standard). They're rendered here, not via
+// metadata, because trailingSlash makes Next.js append a slash to both.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tools.serp.co";
+const siteOrigin = (siteUrl.startsWith("http") ? siteUrl : `https://${siteUrl}`).replace(/\/+$/, "");
+
 const processedTools = buildToolDirectoryEntries(toolsData as Tool[]);
 const directoryCategories = getToolDirectoryCategories(processedTools);
 const categories: ToolCategory[] = [
@@ -48,6 +54,8 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
+      <link rel="canonical" href={siteOrigin} />
+      <meta property="og:url" content={siteOrigin} />
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b">
         <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02]" />
