@@ -16,6 +16,7 @@ import {
   createDownloaderRateLimiter,
   getDownloaderRateLimitIdentity,
 } from "../../../lib/downloader-rate-limit";
+import { setMediaFilenameHeaders } from "../../../lib/media-filename-transport";
 import {
   getUnsupportedTranscriptionLink,
   MEDIA_LINK_UNAVAILABLE,
@@ -256,7 +257,7 @@ function buildResponseHeaders(args: {
   if (typeof args.contentLength === "number" && Number.isFinite(args.contentLength)) {
     headers.set("content-length", String(args.contentLength));
   }
-  headers.set("x-media-filename", args.fileName);
+  setMediaFilenameHeaders(headers, args.fileName);
   headers.set("x-media-extension", args.extension);
   headers.set("cache-control", "no-store");
   return headers;
