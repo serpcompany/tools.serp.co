@@ -1,6 +1,8 @@
 import { AppLayout } from "@serp-tools/app-core/components/app-layout";
 import type { Metadata } from "next";
 
+import { SentryInit } from "@/components/SentryInit";
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tools.serp.co";
 const metadataBase = new URL(siteUrl.startsWith("http") ? siteUrl : `https://${siteUrl}`);
 
@@ -15,5 +17,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <AppLayout>{children}</AppLayout>;
+  return (
+    <AppLayout>
+      <SentryInit />
+      {children}
+    </AppLayout>
+  );
 }
