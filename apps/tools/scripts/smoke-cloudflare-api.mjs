@@ -37,6 +37,7 @@ function parseArgs(argv) {
     noFail: false,
     expectEnv: "",
     platformUrl: "",
+    skipAssets: false,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -96,6 +97,10 @@ function parseArgs(argv) {
       index += 1;
       continue;
     }
+    if (arg === "--skip-assets") {
+      args.skipAssets = true;
+      continue;
+    }
     if (arg === "--no-fail") {
       args.noFail = true;
       continue;
@@ -116,6 +121,7 @@ function parseArgs(argv) {
           "  --json <path>                Write raw JSON results.",
           "  --expect-env <env>           Assert production or staging robots and noindex rules.",
           "  --platform-url <url>         Assert this *.workers.dev host 308s to the canonical host.",
+          "  --skip-assets                Skip the asset-host checks (CI runners can be challenged there).",
           "  --no-fail                    Exit 0 even when checks fail.",
         ].join("\n"),
       );
@@ -495,7 +501,14 @@ function renderReport(payload) {
 }
 
 const args = parseArgs(process.argv.slice(2));
-const checks = [...assetChecks(args), ...safeGetChecks(args), ...environmentChecks(args)];
+const checks = [
+  ...(args.skipAssets ? [] : assetChecks(args)),
+  ...safeGetChecks(args),
+  ...environmentChecks(args),
+];
+if (args.skipAssets) {
+  checks.push(skipped("asset host checks", "--skip-assets"));
+}
 
 if (args.allowTelemetryWrite) {
   checks.push(telemetryCheck(args));
