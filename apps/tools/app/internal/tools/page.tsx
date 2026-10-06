@@ -1,10 +1,8 @@
+import { headers } from "next/headers";
 import toolsData from "@serp-tools/app-core/data/tools.json";
 import { getD1ToolsDashboardData } from "@serp-tools/tool-telemetry/d1";
 import { getSerpToolsD1Binding } from "@/lib/cloudflare-d1";
-
-type PageProps = {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-};
+import { isInternalDashboardAuthorized } from "@/lib/internal-dashboard-auth";
 
 type FailureSummary = {
   toolId: string;
@@ -33,13 +31,11 @@ const toolMap = new Map(
   ])
 );
 
-export default async function ToolsDashboard({ searchParams }: PageProps) {
-  const token = process.env.INTERNAL_DASHBOARD_TOKEN;
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const providedToken = Array.isArray(resolvedSearchParams?.token)
-    ? resolvedSearchParams?.token[0]
-    : resolvedSearchParams?.token;
-  if (token && token !== providedToken) {
+export default async function ToolsDashboard() {
+  // middleware.ts challenges the browser; this re-check keeps the page closed if
+  // the middleware matcher ever stops covering this route.
+  const authorization = (await headers()).get("authorization");
+  if (!isInternalDashboardAuthorized(authorization, process.env.INTERNAL_DASHBOARD_TOKEN)) {
     return (
       <main className="min-h-screen p-8">
         <div className="max-w-3xl mx-auto border rounded-lg p-6">
