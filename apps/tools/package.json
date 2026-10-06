@@ -48,6 +48,7 @@
     "imagemin": "^9.0.1",
     "imagemin-gifsicle": "^7.0.0",
     "ipaddr.js": "^2.3.0",
+    "ktx-parse": "2.0.0",
     "lucide-react": "^0.541.0",
     "markdown-table": "^3.0.4",
     "mime-types": "^3.0.2",

@@ -33,6 +33,50 @@ export async function encodeFromRGBA(
     });
   };
 
+  if (toExt === "ktx" || toExt === "ktx2") {
+    const { encodeKtx1, encodeKtx2 } = await import("./texture-formats.ts");
+    const bytes = toExt === "ktx" ? encodeKtx1(rgba) : encodeKtx2(rgba);
+    return new Blob([bytes], { type: toExt === "ktx" ? "image/ktx" : "image/ktx2" });
+  }
+
+  if (toExt === "icns") {
+    // One PNG per icon size, each fitted into a transparent square.
+    const { buildIcns, ICNS_WRITE_TYPES } = await import("./texture-formats.ts");
+    const entries = [];
+    for (const [type, size] of ICNS_WRITE_TYPES) {
+      const icon: HTMLCanvasElement | OffscreenCanvas = useOffscreen
+        ? new OffscreenCanvas(size, size)
+        : Object.assign(document.createElement("canvas"), { width: size, height: size });
+      const iconCtx = icon.getContext("2d") as
+        | CanvasRenderingContext2D
+        | OffscreenCanvasRenderingContext2D
+        | null;
+      if (!iconCtx) throw new Error("Failed to create 2D canvas context.");
+      const scale = Math.min(size / rgba.width, size / rgba.height);
+      const width = Math.max(1, Math.round(rgba.width * scale));
+      const height = Math.max(1, Math.round(rgba.height * scale));
+      iconCtx.imageSmoothingQuality = "high";
+      iconCtx.drawImage(
+        canvas,
+        Math.round((size - width) / 2),
+        Math.round((size - height) / 2),
+        width,
+        height,
+      );
+      const blob =
+        "convertToBlob" in icon
+          ? await (icon as OffscreenCanvas).convertToBlob({ type: "image/png" })
+          : await new Promise<Blob>((resolve, reject) =>
+              (icon as HTMLCanvasElement).toBlob(
+                (b) => (b ? resolve(b) : reject(new Error("toBlob failed"))),
+                "image/png",
+              ),
+            );
+      entries.push({ type, png: new Uint8Array(await blob.arrayBuffer()) });
+    }
+    return new Blob([buildIcns(entries)], { type: "image/icns" });
+  }
+
   if (toExt === "svg") {
     const pngBlob = await canvasToBlob("image/png");
     const buffer = await pngBlob.arrayBuffer();
