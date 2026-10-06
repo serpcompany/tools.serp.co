@@ -3,6 +3,7 @@ import { resolveCompressionTarget } from "../compression-utils.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
+import { checkOutputFormat } from "./output-format.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
@@ -125,14 +126,34 @@ function createTelemetryError(
   return error;
 }
 
-export async function convertWithWorker(args: {
+type ConvertArgs = {
   worker: Worker;
   from: string;
   to: string;
   buf: ArrayBuffer;
   onProgress?: (update: ProgressUpdate) => void;
   quality?: number;
-}): Promise<ConversionResult> {
+};
+
+// Converts, then refuses output that isn't the promised format, so a tool can
+// never download (or report as a success) bytes with the wrong extension.
+export async function convertWithWorker(args: ConvertArgs): Promise<ConversionResult> {
+  const result = await convertUnchecked(args);
+  const buffers = result.kind === "single" ? [result.buffer] : result.buffers;
+  for (const buffer of buffers) {
+    const check = checkOutputFormat(buffer, args.to);
+    if (!check.ok) {
+      throw createTelemetryError(
+        "wrong_output_format",
+        `The converter produced ${check.detected.toUpperCase()} instead of ${check.expected.toUpperCase()}.`,
+        { from: args.from, to: args.to, format: check.detected },
+      );
+    }
+  }
+  return result;
+}
+
+async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
   const fromExt = args.from.toLowerCase();
   const toExt = args.to.toLowerCase();
   if (fromExt === "ai") {
