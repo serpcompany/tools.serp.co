@@ -116,10 +116,16 @@ jobs:
         run: |
           dir=apps/tools/.open-next/assets/_next/static
           release="tools-serp-co@$(git rev-parse --short=12 HEAD)"
-          npx --yes @sentry/cli@3.8.0 sourcemaps inject "$dir"
-          npx --yes @sentry/cli@3.8.0 sourcemaps upload --release "$release" "$dir"
+          # A Sentry outage mustn't block a deploy: warn and ship without maps.
+          if npx --yes @sentry/cli@3.8.0 sourcemaps inject "$dir" &&
+            npx --yes @sentry/cli@3.8.0 sourcemaps upload --release "$release" \
+              --url-prefix '~/_next/static' "$dir"; then
+            echo "Uploaded source maps for $release"
+          else
+            echo "::warning::Sentry source map upload failed; deploying without it."
+          fi
+          # Always, so maps are never deployed publicly.
           find "$dir" -name '*.map' -delete
-          echo "Uploaded source maps for $release"
 
       # Only these two steps can read the Cloudflare token.
       - name: Apply D1 migrations
