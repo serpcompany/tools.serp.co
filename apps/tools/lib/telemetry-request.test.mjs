@@ -21,23 +21,31 @@ test("the server adds ip, user agent and release", () => {
   });
 });
 
-test("a client can't set the release", () => {
-  const payload = attachRequestMetadata(
-    { metadata: { release: "spoofed" } },
-    request(),
+test("a client can't set ip, user agent or release, even without a server value", () => {
+  const spoofed = { ip: "198.51.100.1", userAgent: "fake", release: "spoofed", engine: "worker" };
+  const withRelease = attachRequestMetadata(
+    { metadata: spoofed },
+    request({ "cf-connecting-ip": "203.0.113.7", "user-agent": "UA/1" }),
     "abc123",
   );
-  assert.equal(payload.metadata.release, "abc123");
-  assert.equal(Object.keys(payload.metadata)[0], "release");
+  assert.deepEqual(withRelease.metadata, {
+    release: "abc123",
+    ip: "203.0.113.7",
+    userAgent: "UA/1",
+    engine: "worker",
+  });
+
+  const withoutServerValues = attachRequestMetadata({ metadata: spoofed }, request(), undefined);
+  assert.deepEqual(withoutServerValues.metadata, { engine: "worker" });
 });
 
-test("a client-sent ip or user agent still wins, as before", () => {
+test("cf-connecting-ip wins over a client-controlled x-forwarded-for", () => {
   const payload = attachRequestMetadata(
-    { metadata: { ip: "198.51.100.1" } },
-    request({ "x-forwarded-for": "203.0.113.7, 10.0.0.1" }),
+    { metadata: {} },
+    request({ "x-forwarded-for": "198.51.100.1, 10.0.0.1", "cf-connecting-ip": "203.0.113.7" }),
     undefined,
   );
-  assert.equal(payload.metadata.ip, "198.51.100.1");
+  assert.equal(payload.metadata.ip, "203.0.113.7");
 });
 
 test("non-object payloads pass through for the validator to reject", () => {

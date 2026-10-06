@@ -1,9 +1,10 @@
 import type { ToolRunEvent } from "./types.ts";
+import type { ToolRunMetadata } from "./validate.ts";
 
 type ToolRunHandle = {
   runId: string;
-  finishSuccess: (args: { outputBytes?: number; metadata?: Record<string, unknown> }) => void;
-  finishFailure: (args: { errorCode?: string; metadata?: Record<string, unknown> }) => void;
+  finishSuccess: (args: { outputBytes?: number; metadata?: ToolRunMetadata }) => void;
+  finishFailure: (args: { errorCode?: string; metadata?: ToolRunMetadata }) => void;
 };
 
 const TELEMETRY_ENDPOINT = "/api/telemetry";
@@ -64,7 +65,7 @@ export function beginToolRun(args: {
   from?: string;
   to?: string;
   inputBytes?: number;
-  metadata?: Record<string, unknown>;
+  metadata?: ToolRunMetadata;
 }): ToolRunHandle {
   if (typeof window === "undefined" || isTelemetryOptedOut()) {
     return {

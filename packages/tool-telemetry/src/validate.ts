@@ -15,7 +15,7 @@ const FORMAT_PATTERN = /^[A-Za-z0-9.+_-]{1,32}$/;
 // Every metadata key the app may store, and why (docs/telemetry.md). Anything
 // else is dropped: never file names, file or page contents, free-form error
 // text, or other user input.
-export const METADATA_KEYS: ReadonlySet<string> = new Set([
+const METADATA_KEY_LIST = [
   // Added by the server: request origin, reviewed and kept (issue #161).
   "ip",
   "userAgent",
@@ -49,7 +49,11 @@ export const METADATA_KEYS: ReadonlySet<string> = new Set([
   "lines",
   "readingTime",
   "speakingTime",
-]);
+] as const;
+
+export type MetadataKey = (typeof METADATA_KEY_LIST)[number];
+export type ToolRunMetadata = Partial<Record<MetadataKey, unknown>>;
+export const METADATA_KEYS: ReadonlySet<string> = new Set(METADATA_KEY_LIST);
 const MAX_METADATA_KEYS = 20;
 const MAX_METADATA_STRING = 256;
 const MAX_METADATA_JSON_BYTES = 4096;

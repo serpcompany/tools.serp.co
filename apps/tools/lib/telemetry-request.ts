@@ -5,15 +5,16 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
+// Fields only the server sets. A client-sent value for any of them is dropped.
+const SERVER_KEYS = new Set(["release", "ip", "userAgent"]);
+
+// Cloudflare sets cf-connecting-ip to the real client address; the first
+// x-forwarded-for entry is whatever the client sent, so it comes last.
 function getClientIp(request: Request): string | null {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0]?.trim() || null;
-  }
   return (
-    request.headers.get("x-real-ip") ??
     request.headers.get("cf-connecting-ip") ??
-    null
+    request.headers.get("x-real-ip") ??
+    (request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null)
   );
 }
 
@@ -26,15 +27,17 @@ export function attachRequestMetadata(
 
   const ip = getClientIp(request);
   const userAgent = request.headers.get("user-agent");
-  // Server fields come first so the metadata key cap never drops them; a
-  // client-sent ip or userAgent still takes precedence, as before. The
-  // release always comes from the server.
+  const clientMetadata = Object.fromEntries(
+    Object.entries(isPlainObject(payload.metadata) ? payload.metadata : {}).filter(
+      ([key]) => !SERVER_KEYS.has(key),
+    ),
+  );
+  // Server fields come first so the metadata key cap never drops them.
   const metadata = {
     ...(release ? { release } : {}),
     ...(ip ? { ip } : {}),
     ...(userAgent ? { userAgent } : {}),
-    ...(isPlainObject(payload.metadata) ? payload.metadata : {}),
-    ...(release ? { release } : {}),
+    ...clientMetadata,
   };
 
   if (Object.keys(metadata).length > 0) {

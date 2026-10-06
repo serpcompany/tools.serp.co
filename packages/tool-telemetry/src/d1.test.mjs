@@ -303,6 +303,28 @@ test(`the purge deletes runs older than ${TOOL_RUN_RETENTION_DAYS} days, in batc
   assert.ok(2500 > PURGE_BATCH_SIZE, "the seed spans more than one batch");
 });
 
+test("the purge deletes at most batchSize runs per statement and stops at maxBatches", async () => {
+  const expiredOffset = (TOOL_RUN_RETENTION_DAYS + 1) * 86_400_000;
+  await seedRuns({ idPrefix: "old", toolId: "busy-tool", count: 25, status: "failed", offsetMs: expiredOffset });
+
+  const reads = [];
+  const first = await purgeExpiredToolRuns(countingD1(d1, reads), { now, batchSize: 10, maxBatches: 2 });
+  assert.deepEqual({ deleted: first.deleted, complete: first.complete }, { deleted: 20, complete: false });
+  assert.equal(reads.length, 2, "one delete statement per batch");
+
+  const second = await purgeExpiredToolRuns(d1, { now, batchSize: 10, maxBatches: 2 });
+  assert.deepEqual({ deleted: second.deleted, complete: second.complete }, { deleted: 5, complete: true });
+});
+
+test("a failed purge reports how many runs it had already deleted", async () => {
+  const broken = {
+    prepare() {
+      throw new Error("D1_ERROR: database is locked");
+    },
+  };
+  await assert.rejects(purgeExpiredToolRuns(broken, { now }), /purge stopped after deleting 0 runs: D1_ERROR/);
+});
+
 test("a purge with nothing expired reads almost nothing, however big the table", async () => {
   await seedRuns({ idPrefix: "recent", toolId: "busy-tool", count: 3000, status: "succeeded" });
 

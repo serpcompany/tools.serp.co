@@ -29,7 +29,8 @@ The browser sends a `tool_run_started` event when a tool starts and a
 | `errorCode` | A stable code such as `convert_failed`, on failures only. |
 | `metadata` | Allowlisted keys only; see below. |
 
-`from` and `to` (formats) may be sent but are not stored.
+The event's top-level `from` and `to` (formats) are validated but not stored;
+the same names inside `metadata` (see below) are.
 
 ## Metadata
 
@@ -37,38 +38,46 @@ The server keeps only the keys in `METADATA_KEYS`
 (`packages/tool-telemetry/src/validate.ts`) and drops everything else. In
 groups:
 
-- **Request origin, added by the server:** `ip` (the client IP from the
-  request headers), `userAgent`, and `release` (the commit the Worker was built
-  from). Keeping `ip` and `userAgent` was reviewed and accepted by the owner
-  in #161; they help debug failures that only one browser or network hits.
+- **Request origin, set only by the server:** `ip` (Cloudflare's
+  `cf-connecting-ip`), `userAgent`, and `release` (the commit the Worker was
+  built from). Values a client sends for these keys are dropped. Keeping `ip`
+  and `userAgent` was reviewed and accepted by the owner in #161; they help
+  debug failures that only one browser or network hits.
 - **Device:** `deviceId`, a random id the browser keeps in `localStorage`
   (`serp_tools_device_id`) so repeat failures from one browser can be grouped.
   It is not linked to an account, a name or anything outside this site.
 - **How the tool ran:** `engine`, `route`, `op`, `from`, `to`, `format`,
-  `status`, `source`, `mode`, `urlHost` (the host of a pasted URL, never the
-  full URL), `failFast`, `failFastReason`, `compressionLevel`.
+  `status`, `source`, `mode`, `urlHost` (the host of a URL pasted into a
+  downloader, e.g. `www.youtube.com`, never the full URL), `failFast`,
+  `failFastReason`, `compressionLevel`.
 - **Sizes and counts, never content:** `fileCount`, `rows`, `columns`,
   `htmlLength`, `audioSeconds`, `characters`, `words`, `sentences`,
   `paragraphs`, `lines`, `readingTime`, `speakingTime`.
 
 Never sent or stored: file names, file or page contents, pasted text, full
-URLs, free-form error messages, or anything typed into a tool. Values are
-capped (20 keys, 4 KB, strings cut to 256 characters).
+URLs, free-form error messages, or anything typed into a tool. The client's
+`metadata` type only accepts allowlisted keys, so adding a new key is a
+deliberate change to `METADATA_KEYS` and this doc. Values are capped (20 keys,
+4 KB, strings cut to 256 characters).
 
 ## Retention
 
 Tool runs are kept for **90 days** (`TOOL_RUN_RETENTION_DAYS` in
 `packages/tool-telemetry/src/d1.ts`). A Cron Trigger runs every day at 03:23
 UTC in staging and production (`apps/tools/worker-entry.mjs`) and deletes older
-runs in bounded batches. Its result is logged as `telemetry purge` in Workers
-Logs. `tool_status` holds only per-tool aggregates, no per-visitor data, and is
+runs in batches of 1,000, at most 50 per run; anything left is deleted by the
+next run. Its result is logged as `telemetry purge` in Workers Logs, and a
+failure is logged as `telemetry purge failed` and shows as failed in Cron
+Events. `tool_status` holds only per-tool aggregates, no per-visitor data, and is
 rewritten as runs complete.
 
 ## Opting out
 
 A browser that sends [Global Privacy Control](https://globalprivacycontrol.org)
-(`navigator.globalPrivacyControl === true`) sends no telemetry at all and gets
-no device id. Clearing the site's `localStorage` resets the device id.
+(`navigator.globalPrivacyControl === true`) sends no tool-run telemetry at all
+and gets no device id. Clearing the site's `localStorage` resets the device id.
+GPC doesn't change Google Tag Manager or AdSense, which are configured
+separately.
 
 ## Deletion requests
 

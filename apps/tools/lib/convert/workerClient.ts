@@ -281,7 +281,6 @@ async function convertWithWorkerInner(args: {
             from: args.from,
             to: args.to,
             engine: "worker",
-            detail,
           }
         )
       );
