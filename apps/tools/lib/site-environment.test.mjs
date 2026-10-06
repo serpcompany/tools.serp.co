@@ -141,6 +141,11 @@ test("absolute URLs use the canonical origin when deployed and the request origi
     origin(staging, "https://tools-serp-co-staging.serpcompany.workers.dev/robots.txt"),
     "https://staging.tools.serp.co",
   );
+  // A deployed build without its URL fails instead of using the request host.
+  assert.throws(
+    () => origin({ siteEnv: "production", siteUrl: undefined }, "https://x.workers.dev/"),
+    /NEXT_PUBLIC_SITE_URL is unset/,
+  );
   // A local cf:build inlines the production URL default; local runs still
   // write their own origin.
   for (const siteEnv of [undefined, "", "local"]) {
