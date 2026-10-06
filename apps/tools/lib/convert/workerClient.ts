@@ -153,10 +153,6 @@ function createTelemetryError(
   return error;
 }
 
-function toErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : String(error);
-}
-
 export async function convertWithWorker(args: {
   worker: Worker;
   from: string;
@@ -457,11 +453,11 @@ async function convertImageViaApi(args: {
       }),
       body: args.buf,
     });
-  } catch (error) {
+  } catch {
     throw createTelemetryError(
       "network_error",
       "Server conversion request failed",
-      { ...baseMetadata, detail: toErrorMessage(error) }
+      baseMetadata
     );
   }
 
@@ -478,7 +474,7 @@ async function convertImageViaApi(args: {
     throw createTelemetryError(
       "server_convert_failed",
       `Server conversion failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status, detail: serverError }
+      { ...baseMetadata, status: response.status }
     );
   }
 
@@ -507,11 +503,11 @@ export async function compressPdfViaApi(args: {
       }),
       body: args.buf,
     });
-  } catch (error) {
+  } catch {
     throw createTelemetryError(
       "network_error",
       "Server compression request failed",
-      { ...baseMetadata, detail: toErrorMessage(error) }
+      baseMetadata
     );
   }
 
@@ -528,7 +524,7 @@ export async function compressPdfViaApi(args: {
     throw createTelemetryError(
       "server_compress_failed",
       `Server compression failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status, detail: serverError }
+      { ...baseMetadata, status: response.status }
     );
   }
 
@@ -562,11 +558,11 @@ async function compressImageViaApi(args: {
       }),
       body: args.buf,
     });
-  } catch (error) {
+  } catch {
     throw createTelemetryError(
       "network_error",
       "Server image compression request failed",
-      { ...baseMetadata, detail: toErrorMessage(error) }
+      baseMetadata
     );
   }
 
@@ -583,7 +579,7 @@ async function compressImageViaApi(args: {
     throw createTelemetryError(
       "server_compress_failed",
       `Server image compression failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status, detail: serverError }
+      { ...baseMetadata, status: response.status }
     );
   }
 

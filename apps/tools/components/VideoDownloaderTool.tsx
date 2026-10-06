@@ -488,7 +488,7 @@ export default function VideoDownloaderTool({
       saveBlob(result.blob, result.fileName);
       run.finishSuccess({
         outputBytes: result.blob.size,
-        metadata: { fileName: result.fileName, source: "url", mode },
+        metadata: { source: "url", mode },
       });
       setCurrentFile({
         name: result.fileName,

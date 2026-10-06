@@ -44,6 +44,7 @@ architecture map. Both count as leaves for the size check.
 ### Owned application and package contracts
 
 - [Tools application contract](../apps/tools/README.md)
+- [Telemetry: what is recorded, retention, opt-out and deletion](./telemetry.md)
 - [ESLint configuration package](../packages/eslint-config/README.md)
 - [TypeScript configuration package](../packages/typescript-config/README.md)
 

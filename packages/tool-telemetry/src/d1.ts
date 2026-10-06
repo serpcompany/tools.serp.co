@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, max } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, lt, max } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 
 import { median, summarizeToolRuns } from "./metrics.ts";
@@ -32,6 +32,11 @@ type UpdateToolStatusOptions = {
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 // Upper bound on rows read per status refresh, whatever a tool's traffic.
 export const STATUS_SAMPLE_LIMIT = 500;
+// Tool runs are kept this long, then deleted by the daily purge (docs/telemetry.md).
+export const TOOL_RUN_RETENTION_DAYS = 90;
+export const PURGE_BATCH_SIZE = 1000;
+const MAX_PURGE_BATCHES = 50;
+const RUN_STATUSES = ["started", "succeeded", "failed"] as const;
 const RECENT_FAILURE_SAMPLE_LIMIT = 200;
 
 export function isD1DatabaseLike(value: unknown): value is D1DatabaseLike {
@@ -263,4 +268,35 @@ export async function getD1ToolsDashboardData(
         sampleMetadataByKey.get(`${row.toolId}::${row.errorCode ?? "unknown"}`) ?? null,
     })),
   };
+}
+
+type PurgeOptions = {
+  now?: Date;
+  retentionDays?: number;
+};
+
+// Deletes tool runs older than the retention period, in batches so one call
+// stays bounded. Filtering on every status lets SQLite use the
+// (status, started_at) index instead of scanning the table.
+export async function purgeExpiredToolRuns(
+  binding: D1DatabaseLike,
+  options: PurgeOptions = {}
+): Promise<{ deleted: number; cutoff: string; complete: boolean }> {
+  const now = options.now ?? new Date();
+  const retentionDays = options.retentionDays ?? TOOL_RUN_RETENTION_DAYS;
+  const cutoff = new Date(now.getTime() - retentionDays * ONE_DAY_MS).toISOString();
+
+  let deleted = 0;
+  for (let batch = 0; batch < MAX_PURGE_BATCHES; batch += 1) {
+    const expired = db(binding)
+      .select({ id: toolRuns.id })
+      .from(toolRuns)
+      .where(and(inArray(toolRuns.status, [...RUN_STATUSES]), lt(toolRuns.startedAt, cutoff)))
+      .limit(PURGE_BATCH_SIZE);
+    const result = await db(binding).delete(toolRuns).where(inArray(toolRuns.id, expired));
+    const changes = result.meta.changes ?? 0;
+    deleted += changes;
+    if (changes < PURGE_BATCH_SIZE) return { deleted, cutoff, complete: true };
+  }
+  return { deleted, cutoff, complete: false };
 }

@@ -104,7 +104,7 @@ export default function BatchHeroConverter({
         from,
         to,
         inputBytes: file.size,
-        metadata: { fileName: file.name, compressionLevel },
+        metadata: { compressionLevel },
       });
 
       try {

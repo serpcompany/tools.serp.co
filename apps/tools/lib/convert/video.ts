@@ -35,10 +35,6 @@ function createTelemetryError(
   return error;
 }
 
-function toErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : String(error);
-}
-
 function canRemux(fromFormat: string, toFormat: string) {
   const from = fromFormat.toLowerCase();
   const to = toFormat.toLowerCase();
@@ -86,11 +82,11 @@ export async function convertVideoViaApi(
       }),
       body: inputBuffer,
     });
-  } catch (error) {
+  } catch {
     throw createTelemetryError(
       "network_error",
       "Server conversion request failed",
-      { ...baseMetadata, detail: toErrorMessage(error) }
+      baseMetadata
     );
   }
 
@@ -107,7 +103,7 @@ export async function convertVideoViaApi(
     throw createTelemetryError(
       "server_convert_failed",
       `Server conversion failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status, detail: serverError }
+      { ...baseMetadata, status: response.status }
     );
   }
 

@@ -109,7 +109,6 @@ export default function LanderHeroTwoColumn({
         from,
         to,
         inputBytes: file.size,
-        metadata: { fileName: file.name },
       });
       setCurrentFile({
         name: file.name,
