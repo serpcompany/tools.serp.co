@@ -42,7 +42,8 @@ test("Cloudflare builds externalize oversized ffmpeg assets to the public asset 
 test("Workers static asset bundle excludes ffmpeg files that exceed Cloudflare limits", () => {
   assert.match(packageJson.scripts["cf:build"], /build-cloudflare\.mjs/);
   assert.match(packageJson.scripts["cf:preview"], /wrangler dev/);
-  assert.match(packageJson.scripts["cf:deploy"], /wrangler deploy/);
+  assert.match(packageJson.scripts["deploy:staging"], /wrangler deploy --env staging/);
+  assert.match(packageJson.scripts["deploy:production"], /wrangler deploy --env production/);
   assert.match(buildCloudflareSource, /opennextjs-cloudflare/);
   assert.match(buildCloudflareSource, /prepare-workers-assets\.mjs/);
   assert.match(buildCloudflareSource, /NEXT_PUBLIC_ASSETS_BASE_URL/);
