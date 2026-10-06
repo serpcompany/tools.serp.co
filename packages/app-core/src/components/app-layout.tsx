@@ -17,7 +17,7 @@ export function AppLayout({
   return (
     <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body className="bg-background font-sans antialiased">
-        {adsenseClient && (process.env.NODE_ENV !== "development" || adsenseTestMode) ? (
+        {adsenseClient && (process.env.NEXT_PUBLIC_SITE_ENV === "production" || adsenseTestMode) ? (
           <Script
             id="adsense-script"
             async

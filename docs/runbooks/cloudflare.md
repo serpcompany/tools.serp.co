@@ -23,6 +23,27 @@ Staging reuses the former preview D1 database and R2 bucket. Both deployed
 environments keep their `*.workers.dev` URL (`workers_dev: true`) for CI and
 turn off preview URLs (`preview_urls: false`).
 
+`NEXT_PUBLIC_SITE_ENV` (`local`, `staging` or `production`) is set by each
+`cf:build:*` script and in each environment's `vars`. Next.js inlines it at
+build time, so the build command decides it. Anything other than `production`
+is non-production (`apps/tools/lib/site-environment.ts`):
+
+- Every page sends `X-Robots-Tag: noindex, nofollow`, and `robots.txt`
+  disallows everything and lists no sitemap.
+- Google Tag Manager and AdSense don't load (AdSense test mode still works
+  locally).
+- In staging and production, any host other than the canonical one, such as
+  `*.workers.dev`, gets a 308 to the canonical host. Requests with the
+  `x-tools-serp-smoke-test` header skip the redirect so CI can test through the
+  `*.workers.dev` URL. Local runs never redirect.
+
+After a deploy, check the environment rules (add `--platform-url` with the
+Worker's `*.workers.dev` URL to check the redirect too):
+
+```bash
+pnpm -C apps/tools audit:cf:api-smoke --base-url https://staging.tools.serp.co --expect-env staging
+```
+
 Production deploys come from Cloudflare Workers Builds on every push to `main`
 (only `main` builds). Its settings must be: root directory `/`, build command
 `pnpm -C apps/tools cf:build:production`, deploy command

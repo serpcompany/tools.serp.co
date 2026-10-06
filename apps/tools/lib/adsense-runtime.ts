@@ -2,22 +2,20 @@ type AdSenseSlotRuntimeArgs = {
   adsenseClient?: string;
   resolvedSlot?: string;
   adsenseTestMode?: boolean;
-  nodeEnv?: string;
+  siteEnv?: string;
 };
 
+// Ads serve only on a build explicitly marked production, unless test mode is
+// on for local ad work.
 export function isAdSenseSlotEnabled({
   adsenseClient,
   resolvedSlot,
   adsenseTestMode = false,
-  nodeEnv = process.env.NODE_ENV,
+  siteEnv = process.env.NEXT_PUBLIC_SITE_ENV,
 }: AdSenseSlotRuntimeArgs) {
   if (!adsenseClient || !resolvedSlot) {
     return false;
   }
 
-  if (nodeEnv === "development" && !adsenseTestMode) {
-    return false;
-  }
-
-  return true;
+  return siteEnv === "production" || adsenseTestMode;
 }

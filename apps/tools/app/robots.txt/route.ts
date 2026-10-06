@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 
+import { getRobotsTxt } from "@/lib/site-environment";
 import { resolveSiteBase } from "@/lib/sitemap";
 
 export const dynamic = "force-dynamic";
 
 export function GET(request: Request) {
-  const base = resolveSiteBase(request);
-  const body = [`User-agent: *`, `Allow: /`, `Sitemap: ${base}/sitemap-index.xml`].join("\n");
+  const body = getRobotsTxt(process.env.NEXT_PUBLIC_SITE_ENV, resolveSiteBase(request));
 
   return new NextResponse(body, {
     headers: {

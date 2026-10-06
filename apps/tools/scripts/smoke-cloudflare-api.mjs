@@ -9,6 +9,11 @@ import {
 } from "./lib/cloudflare-audit.mjs";
 
 const DEFAULT_TIMEOUT_MS = 30000;
+// Must match SMOKE_TEST_HEADER in lib/site-environment.ts. It lets the smoke
+// test reach a deployment through its *.workers.dev host without the
+// canonical-host redirect.
+const SMOKE_TEST_HEADER = "x-tools-serp-smoke-test";
+const ENVIRONMENTS = new Set(["production", "staging"]);
 
 function parseArgs(argv) {
   if (argv[0] === "--") {
@@ -30,6 +35,8 @@ function parseArgs(argv) {
     allowTelemetryWrite: false,
     includeNative: false,
     noFail: false,
+    expectEnv: "",
+    platformUrl: "",
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -77,6 +84,16 @@ function parseArgs(argv) {
       args.includeNative = true;
       continue;
     }
+    if (arg === "--expect-env") {
+      args.expectEnv = argv[index + 1] ?? "";
+      index += 1;
+      continue;
+    }
+    if (arg === "--platform-url") {
+      args.platformUrl = argv[index + 1] ?? "";
+      index += 1;
+      continue;
+    }
     if (arg === "--no-fail") {
       args.noFail = true;
       continue;
@@ -95,6 +112,8 @@ function parseArgs(argv) {
           "  --timeout-ms <n>             Per-request timeout. Default 30000.",
           "  --report <path>              Write a Markdown report.",
           "  --json <path>                Write raw JSON results.",
+          "  --expect-env <env>           Assert production or staging robots and noindex rules.",
+          "  --platform-url <url>         Assert this *.workers.dev host 308s to --base-url.",
           "  --no-fail                    Exit 0 even when checks fail.",
         ].join("\n"),
       );
@@ -105,6 +124,9 @@ function parseArgs(argv) {
 
   if (!args.baseUrl) {
     throw new Error("--base-url is required");
+  }
+  if (args.expectEnv && !ENVIRONMENTS.has(args.expectEnv)) {
+    throw new Error("--expect-env must be production or staging");
   }
   if (!Number.isInteger(args.timeoutMs) || args.timeoutMs < 1000) {
     throw new Error("--timeout-ms must be an integer >= 1000");
@@ -141,6 +163,7 @@ async function requestCheck(check, args) {
       body: check.body,
       headers: {
         "user-agent": "tools-serp-cloudflare-api-smoke/1.0",
+        ...(check.skipSmokeTestHeader ? {} : { [SMOKE_TEST_HEADER]: "1" }),
         ...(check.headers ?? {}),
       },
       redirect: check.redirect ?? "manual",
@@ -233,6 +256,51 @@ function safeGetChecks(args) {
         contentType: response.headers.get("content-type"),
         bytes: bytes.length,
       }),
+    });
+  }
+
+  return checks;
+}
+
+function environmentChecks(args) {
+  const checks = [];
+  const production = args.expectEnv === "production";
+
+  if (args.expectEnv) {
+    checks.push(
+      {
+        name: `robots.txt matches ${args.expectEnv}`,
+        url: buildUrl(args.baseUrl, "/robots.txt"),
+        expect: (response, bytes) => {
+          const body = bytes.toString("utf8");
+          return production
+            ? response.status === 200 && body.includes("Allow: /") && body.includes("Sitemap: ")
+            : response.status === 200 && body.includes("Disallow: /") && !body.includes("Sitemap:");
+        },
+        details: (_response, bytes) => ({ body: bytes.toString("utf8").slice(0, 200) }),
+      },
+      {
+        name: `X-Robots-Tag matches ${args.expectEnv}`,
+        url: buildUrl(args.baseUrl, "/"),
+        expect: (response) => {
+          const tag = response.headers.get("x-robots-tag") ?? "";
+          return response.status === 200 && (production ? !tag.includes("noindex") : tag.includes("noindex"));
+        },
+        details: (response) => ({ xRobotsTag: response.headers.get("x-robots-tag") }),
+      },
+    );
+  }
+
+  if (args.platformUrl) {
+    const canonicalOrigin = new URL(args.baseUrl).origin;
+    checks.push({
+      name: "platform host 308s to the canonical host",
+      url: buildUrl(args.platformUrl, "/png-to-jpg/?smoke=1"),
+      skipSmokeTestHeader: true,
+      expect: (response) =>
+        response.status === 308 &&
+        response.headers.get("location") === `${canonicalOrigin}/png-to-jpg/?smoke=1`,
+      details: (response) => ({ location: response.headers.get("location") }),
     });
   }
 
@@ -385,7 +453,7 @@ function renderReport(payload) {
 }
 
 const args = parseArgs(process.argv.slice(2));
-const checks = [...assetChecks(args), ...safeGetChecks(args)];
+const checks = [...assetChecks(args), ...safeGetChecks(args), ...environmentChecks(args)];
 
 if (args.allowTelemetryWrite) {
   checks.push(telemetryCheck(args));

@@ -15,6 +15,8 @@ console.log(
   [
     `Building Cloudflare bundle with NEXT_PUBLIC_ASSETS_BASE_URL=${env.NEXT_PUBLIC_ASSETS_BASE_URL}`,
     `NEXT_PUBLIC_SITE_URL=${env.NEXT_PUBLIC_SITE_URL}`,
+    // Unset means non-production: noindex, no analytics or ads.
+    `NEXT_PUBLIC_SITE_ENV=${env.NEXT_PUBLIC_SITE_ENV ?? "(unset)"}`,
   ].join(" "),
 );
 
