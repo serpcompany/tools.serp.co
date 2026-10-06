@@ -22,8 +22,7 @@ truth. Prefer the nearest scoped `AGENTS.md` when one exists.
 
 Follow the serp [git workflow](https://github.com/serpcompany/serp/blob/main/docs/engineering/standards/git-workflow.md):
 one issue, one branch, one PR, one squash commit on the base branch. That is
-`main` today; the standard's `staging` base for repos with Staging is pending
-an owner decision.
+`main` today; the move to a `staging` base branch is #188.
 
 - Branch: `issue-<number>-<short-slug>`, from the base branch.
 - PR title: a Conventional Commit phrased as the outcome a user notices. The
