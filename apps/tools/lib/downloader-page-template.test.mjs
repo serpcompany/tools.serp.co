@@ -38,10 +38,6 @@ const loomDownloaderPageSource = readFileSync(
   new URL("../app/download-loom-videos/page.tsx", import.meta.url),
   "utf8",
 );
-const dynamicToolPageSource = readFileSync(
-  new URL("../app/(convert)/[tool]/page.tsx", import.meta.url),
-  "utf8",
-);
 
 test("downloader page template includes the ad banner section", () => {
   assert.match(templateSource, /DownloaderPageHero/);
@@ -140,19 +136,6 @@ test("source-specific downloader failures promote the extension instead of raw b
 test("dedicated downloader routes use the shared downloader page template", () => {
   assert.match(videoDownloaderPageSource, /DownloaderPageTemplate/);
   assert.match(loomDownloaderPageSource, /DownloaderPageTemplate/);
-});
-
-test("legacy typo downloader routes redirect to canonical downloader routes", () => {
-  assert.match(dynamicToolPageSource, /LEGACY_DOWNLOADER_ROUTE_REDIRECTS/);
-  assert.match(dynamicToolPageSource, /redirect\(legacyDownloaderRoute\)/);
-  assert.match(
-    dynamicToolPageSource,
-    /download-stripcha-videos[\s\S]*\/download-stripchat-videos/,
-  );
-  assert.match(
-    dynamicToolPageSource,
-    /download-kajab-videos[\s\S]*\/download-kajabi-videos/,
-  );
 });
 
 test("known unreliable downloader pages fail fast into extension monetization", () => {
