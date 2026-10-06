@@ -155,21 +155,13 @@ const nextConfig = {
   },
   async rewrites() {
     return [
+      // Root-level sitemap files: /sitemap.xml, /sitemap-<group>.xml and the
+      // retired /pages-0.xml-style names, which 308 to the flat tree
+      // (lib/sitemap.ts). /sitemap-index.xml has its own route and is
+      // matched before this rewrite.
       {
-        source: "/sitemap-:page.xml",
-        destination: "/sitemap/:page",
-      },
-      {
-        source: "/pages-:page.xml",
-        destination: "/sitemaps/pages/:page",
-      },
-      {
-        source: "/tools-:page.xml",
-        destination: "/sitemaps/tools/:page",
-      },
-      {
-        source: "/categories-:page.xml",
-        destination: "/sitemaps/categories/:page",
+        source: "/:file((?:sitemap|pages|tools|categories)(?:-[a-z0-9-]+)?\\.xml)",
+        destination: "/sitemaps/:file",
       },
     ];
   },

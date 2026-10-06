@@ -257,7 +257,9 @@ export function getToolDirectoryIcon(toolId: string): LucideIcon {
   return iconMap[toolId] ?? Image;
 }
 
-export function getAvailableToolOperations(tools: ToolDirectorySource[]): OperationType[] {
+export function getAvailableToolOperations(
+  tools: Pick<ToolDirectorySource, "isActive" | "operation">[],
+): OperationType[] {
   const operations = new Set<OperationType>();
 
   tools.forEach((tool) => {
@@ -271,7 +273,9 @@ export function getAvailableToolOperations(tools: ToolDirectorySource[]): Operat
   return TOOL_OPERATION_ORDER.filter((operation) => operations.has(operation));
 }
 
-export function getCategoryPagePaths(tools: ToolDirectorySource[]): string[] {
+export function getCategoryPagePaths(
+  tools: Pick<ToolDirectorySource, "isActive" | "operation">[],
+): string[] {
   return getAvailableToolOperations(tools).map((operation) => toCategoryPath(operation));
 }
 

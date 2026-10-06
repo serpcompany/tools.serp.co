@@ -75,6 +75,27 @@ export function decideMiddleware(args: CanonicalRedirectArgs): MiddlewareDecisio
   };
 }
 
+type SiteOriginArgs = {
+  requestUrl: string;
+  siteEnv: string | undefined;
+  siteUrl: string | undefined;
+};
+
+// The origin to write into absolute URLs such as sitemap entries. Staging and
+// production use their canonical origin; any other run (next dev, a local
+// wrangler dev) uses the origin it was requested on, so local output never
+// points at a deployed host. A local cf:build inlines the production
+// NEXT_PUBLIC_SITE_URL default, so the environment decides, not the URL.
+export function getSiteOrigin({ requestUrl, siteEnv, siteUrl }: SiteOriginArgs): string {
+  if (siteEnv && DEPLOYED_ENVIRONMENTS.has(siteEnv)) {
+    // Never fall back to the request host here: a platform-host request
+    // would put *.workers.dev URLs in the sitemap.
+    if (!siteUrl) throw new Error(`NEXT_PUBLIC_SITE_URL is unset for ${siteEnv}`);
+    return new URL(siteUrl.startsWith("http") ? siteUrl : `https://${siteUrl}`).origin;
+  }
+  return new URL(requestUrl).origin;
+}
+
 export function getRobotsTxt(siteEnv: string | undefined, siteBase: string) {
   if (!isProductionSite(siteEnv)) {
     return ["User-agent: *", "Disallow: /"].join("\n");

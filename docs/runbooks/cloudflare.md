@@ -47,7 +47,9 @@ so they get neither the redirect nor the header; `public/_headers` marks
 
 After a deploy, check the environment rules: robots, `X-Robots-Tag`, and GTM
 and AdSense present only in production (the check assumes AdSense test mode is
-off). Add `--platform-url` with the Worker's
+off). It also checks that the sitemap index lists only the canonical
+`/sitemap-<group>.xml` files, that the homepage entry has no slash, and that
+`/sitemap.xml` and retired sitemap names 308 into the tree. Add `--platform-url` with the Worker's
 `*.workers.dev` URL to check the redirect too; it retries for 30 s while the
 new version rolls out.
 
