@@ -107,6 +107,9 @@ jobs:
       - name: Run the browser smoke test
         run: pnpm -C apps/tools smoke:browser --base-url http://localhost:8787 --require-dashboard
 
+      - name: Check internal links
+        run: pnpm -C apps/tools smoke:links --base-url http://localhost:8787
+
       - name: Show the Worker log
         if: failure()
         run: cat wrangler-dev.log || true
