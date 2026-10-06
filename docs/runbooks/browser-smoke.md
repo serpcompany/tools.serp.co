@@ -50,4 +50,6 @@ Every run writes real tool runs into that environment's D1, so use staging:
 pnpm -C apps/tools smoke:browser --base-url https://staging.tools.serp.co
 ```
 
-Reaching a `*.workers.dev` host needs the smoke-test header handling from #164.
+A deployment's `*.workers.dev` host works too. Once #164 lands, those hosts 308
+to the canonical host, and the smoke-test header the script sends skips that
+redirect.

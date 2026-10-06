@@ -141,28 +141,30 @@ async function step(name, run) {
 async function expectCompletedRun(page, telemetryStatuses, toolId) {
   const deadline = Date.now() + TELEMETRY_TIMEOUT_MS;
   let events = [];
-  let run;
+  let started;
+  let succeeded;
   while (Date.now() < deadline) {
     events = await page.evaluate(() => globalThis.__smokeTelemetry ?? []);
-    const started = events.find((e) => e.event === "tool_run_started" && e.toolId === toolId);
-    const succeeded =
+    started = events.find((e) => e.event === "tool_run_started" && e.toolId === toolId);
+    succeeded =
       started && events.find((e) => e.event === "tool_run_succeeded" && e.runId === started.runId);
-    if (succeeded && telemetryStatuses.length >= events.length) {
-      run = started;
-      break;
-    }
+    if (succeeded && telemetryStatuses.length >= events.length) break;
     await sleep(100);
   }
 
   const summary = events.map((e) => `${e.event}:${e.toolId}`).join(", ") || "none";
-  assert(run, `no started + succeeded run for ${toolId} (events: ${summary})`);
+  assert(succeeded, `no started + succeeded run for ${toolId} (events: ${summary})`);
   assert(
     !events.some((e) => e.event === "tool_run_failed"),
     `a tool_run_failed event was sent (events: ${summary})`,
   );
   assert(
-    telemetryStatuses.length > 0 && telemetryStatuses.every((status) => status === 200),
-    `telemetry statuses ${telemetryStatuses.join(",") || "none"}`,
+    telemetryStatuses.length >= events.length,
+    `the Worker answered ${telemetryStatuses.length} of ${events.length} telemetry requests`,
+  );
+  assert(
+    telemetryStatuses.every((status) => status === 200),
+    `telemetry statuses ${telemetryStatuses.join(",")}`,
   );
 }
 
@@ -211,6 +213,16 @@ await step("html-to-markdown converts pasted HTML", async (page, telemetryStatus
   await expectCompletedRun(page, telemetryStatuses, "html-to-markdown");
 });
 
+// Each tool's row in the dashboard's status table must say `live`.
+function assertLiveRows(body) {
+  const rows = body.split("<tr");
+  for (const toolId of ["png-to-jpg", "html-to-markdown"]) {
+    const row = rows.find((chunk) => chunk.includes(`>${toolName(toolId)}</div>`));
+    assert(row, `no status row for ${toolId}`);
+    assert(row.includes(">live</span>"), `${toolId} status is not live`);
+  }
+}
+
 if (args.internalToken) {
   await step("internal dashboard shows both tools as live", async () => {
     // A direct request, not a page: no subresources load, so the password is
@@ -220,12 +232,18 @@ if (args.internalToken) {
       headers: { authorization, [SMOKE_TEST_HEADER]: "1" },
       maxRedirects: 0,
     });
-    assert(response.status() === 200, `status ${response.status()}`);
-    const rows = (await response.text()).split("<tr");
-    for (const toolId of ["png-to-jpg", "html-to-markdown"]) {
-      const row = rows.find((chunk) => chunk.includes(`>${toolName(toolId)}</div>`));
-      assert(row, `no status row for ${toolId}`);
-      assert(row.includes(">live</span>"), `${toolId} status is not live`);
+    const body = await response.text();
+    try {
+      assert(response.status() === 200, `status ${response.status()}`);
+      assertLiveRows(body);
+    } catch (error) {
+      // The page holds no secret; keep it for diagnosis.
+      mkdirSync(args.artifactsDir, { recursive: true });
+      writeFileSync(
+        path.join(args.artifactsDir, "internal-dashboard.html"),
+        `<!-- status ${response.status()} -->\n${body}`,
+      );
+      throw error;
     }
   });
 }
