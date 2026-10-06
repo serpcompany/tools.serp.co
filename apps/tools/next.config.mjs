@@ -11,6 +11,9 @@ const toolsPath = path.resolve(tracingRoot, "packages/app-core/src/data/tools.js
 const appDir = path.resolve(appRoot, "app");
 let ffmpegRoutes = [];
 const transcribeRoutes = new Set();
+// Multi-thread FFmpeg needs cross-origin isolation (COEP), and the worker
+// scripts don't send COEP headers yet: turning this off breaks FFmpeg and
+// transcription pages until they do (PR #213).
 const singleThreadEnv = process.env.NEXT_PUBLIC_FFMPEG_SINGLE_THREAD ?? "true";
 const useSingleThread = singleThreadEnv === "true";
 
