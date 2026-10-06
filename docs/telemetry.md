@@ -83,6 +83,9 @@ query string, the browser or runtime, the environment, and the release
 (`tools-serp-co@<commit>`). `beforeSend` (`apps/tools/lib/sentry-scrub.ts`)
 removes user identity, IP, cookies, headers, query strings, request bodies,
 console breadcrumbs and extra data. Tracing, replay and profiling are off.
+When the `SENTRY_AUTH_TOKEN` secret exists, each deploy uploads the browser
+source maps to Sentry for its release and deletes them before deploying, so
+they are never public.
 Browsers that send Global Privacy Control send no reports.
 
 ## Retention
