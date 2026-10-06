@@ -203,7 +203,7 @@ The external FFmpeg/WASM asset host remains
 ## Production and retirement boundary
 
 Production was cut over to Cloudflare on 2026-06-20. The dated cutover and
-route-parity evidence is indexed under `docs/audits`; it is not a current
+route-parity evidence is archived under `.archive/audits`; it is not a current
 deployment procedure.
 
 Repository runtime and CI paths are Cloudflare-only. The legacy Postgres client,

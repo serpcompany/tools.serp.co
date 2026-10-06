@@ -9,7 +9,7 @@ const registryApiPath =
 const toolsPath = path.join(root, "packages/app-core/src/data/tools.json");
 const plannerPath = path.join(
   root,
-  "docs/evidence/tool-planning/tools_planner.csv",
+  "packages/app-core/src/data/tools-planner.csv",
 );
 
 const defaultOperatingSystems = [
