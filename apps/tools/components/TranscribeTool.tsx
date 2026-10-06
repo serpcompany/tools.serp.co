@@ -10,6 +10,7 @@ import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { extractAudioForTranscription } from "@/lib/convert/video";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
 import { getMediaFetchEndpoint } from "@/lib/media-fetch-endpoint";
+import { getUnsupportedTranscriptionLink } from "@/lib/media-link-support";
 import { normalizeBlobPart } from "@/lib/blob-parts";
 
 type ProgressUpdate = {
@@ -243,8 +244,7 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       } catch {
         detail = "";
       }
-      const suffix = detail ? `: ${detail}` : "";
-      throw new Error(`Download failed (${response.status})${suffix}`);
+      throw new Error(detail || `Download failed (${response.status})`);
     }
 
     const contentTypeRaw = response.headers.get("content-type") || "";
@@ -444,6 +444,12 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       return;
     }
 
+    const unsupportedLink = getUnsupportedTranscriptionLink(parsedUrl, undefined);
+    if (unsupportedLink) {
+      setErrorMessage(unsupportedLink.message);
+      return;
+    }
+
     if (!adsVisible) setAdsVisible(true);
     setErrorMessage(null);
     setTranscript("");
@@ -634,7 +640,7 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
                 <input
                   type="url"
                   inputMode="url"
-                  placeholder="Paste a public link (YouTube, SoundCloud, or direct file)"
+                  placeholder="Paste a direct link to an audio or video file"
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -665,7 +671,8 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
                 </Button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Supports public links. Private or logged-in content is not supported yet.
+                Direct links to public audio or video files only. YouTube, TikTok,
+                SoundCloud, and other webpage links are not supported right now.
               </p>
             </div>
           </div>
