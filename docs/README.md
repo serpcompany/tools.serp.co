@@ -13,6 +13,15 @@ dated audits and advisory research exports belong in `.archive/` at the
 repository root; data an owner still reads lives with that owner; active work
 belongs in GitHub Issues.
 
+Docs follow the serp [docs-are-maps](https://github.com/serpcompany/serp/blob/main/docs/engineering/standards/agent-harness/docs-are-maps.md)
+budgets: maps (`AGENTS.md`, `README.md`) at most 120 lines and every other doc
+at most 300, counted as lines wrapped at 100 characters. When a doc outgrows
+its budget, split it by topic. Name files and folders under `docs/` in
+kebab-case. `node .github/scripts/check-docs.mjs` checks both, and the
+**Docs Links** workflow checks relative links in `AGENTS.md`, `README.md` and
+`docs/`. The root `ARCHITECTURE.md` and `CONTEXT.md` keep their conventional
+uppercase names, which agent tooling looks for (decided in #149).
+
 ## Current guidance
 
 ### Repository maps

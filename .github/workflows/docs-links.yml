@@ -1,0 +1,32 @@
+name: Docs Links
+
+on:
+  # No path filters: these checks take seconds, and a required check must report on every PR.
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # remark resolves plugins from the working directory, so install them there;
+      # `npx --package` puts them where remark can't load them.
+      - name: Install remark
+        run: npm install --no-save --no-package-lock --no-audit --no-fund remark-cli@12 remark-validate-links@13
+
+      - name: Validate internal markdown links
+        run: npx remark AGENTS.md README.md "docs/**/*.md" --frail --quiet --use remark-validate-links
