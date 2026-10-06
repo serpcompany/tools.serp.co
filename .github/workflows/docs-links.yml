@@ -1,0 +1,34 @@
+name: Docs Links
+
+on:
+  # No path filters: these checks take seconds, and a required check must report on every PR.
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # The root package.json has pnpm `workspace:` dependencies that npm can't
+      # install, so install remark outside the repo and pass the plugin by path.
+      - name: Install remark
+        run: npm install --prefix "$RUNNER_TEMP/remark" --no-save --no-package-lock --no-audit --no-fund remark-cli@12 remark-validate-links@13
+
+      - name: Validate internal markdown links
+        run: |
+          "$RUNNER_TEMP/remark/node_modules/.bin/remark" AGENTS.md README.md ARCHITECTURE.md CONTEXT.md "docs/**/*.md" \
+            --frail --quiet --use "$RUNNER_TEMP/remark/node_modules/remark-validate-links/index.js"

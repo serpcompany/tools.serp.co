@@ -13,6 +13,17 @@ dated audits and advisory research exports belong in `.archive/` at the
 repository root; data an owner still reads lives with that owner; active work
 belongs in GitHub Issues.
 
+Docs follow the serp [docs-are-maps](https://github.com/serpcompany/serp/blob/main/docs/engineering/standards/agent-harness/docs-are-maps.md)
+budgets: maps (`AGENTS.md`, `README.md`) at most 120 lines and every other doc
+at most 300, counted as lines wrapped at 100 characters. When a doc outgrows
+its budget, split it by topic. Name files and folders under `docs/` in
+kebab-case. `node .github/scripts/check-docs.mjs` checks both, and the
+**Docs Links** workflow checks relative links in the root docs and `docs/`.
+The root `ARCHITECTURE.md` and `CONTEXT.md` keep their conventional uppercase
+names (decided in #149): `CONTEXT.md` is the file the domain-modeling skill
+reads, and `ARCHITECTURE.md` is the common name for a repository's
+architecture map. Both count as leaves for the size check.
+
 ## Current guidance
 
 ### Repository maps
@@ -38,6 +49,7 @@ belongs in GitHub Issues.
 
 ### Runbooks
 
+- [D1 telemetry schema and write contract](./runbooks/d1-telemetry.md)
 - [Cloudflare operations](./runbooks/cloudflare.md)
 - [Browser smoke test](./runbooks/browser-smoke.md)
 
