@@ -4,7 +4,14 @@ import {
   INTERNAL_DASHBOARD_REALM,
   isInternalDashboardAuthorized,
 } from "./lib/internal-dashboard-auth";
-import { NOINDEX_ROBOTS_TAG, SMOKE_TEST_HEADER, decideMiddleware } from "./lib/site-environment";
+import {
+  NOINDEX_ROBOTS_TAG,
+  RELEASE_HEADER,
+  SMOKE_TEST_HEADER,
+  decideMiddleware,
+} from "./lib/site-environment";
+
+const RELEASE = process.env.NEXT_PUBLIC_RELEASE ?? "unknown";
 
 function internalDashboardResponse(request: NextRequest) {
   const authorized = isInternalDashboardAuthorized(
@@ -29,12 +36,17 @@ export function middleware(request: NextRequest) {
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
     hasSmokeTestHeader: request.headers.has(SMOKE_TEST_HEADER),
   });
-  if (decision.type === "redirect") return NextResponse.redirect(decision.location, 308);
+  if (decision.type === "redirect") {
+    const redirect = NextResponse.redirect(decision.location, 308);
+    redirect.headers.set(RELEASE_HEADER, RELEASE);
+    return redirect;
+  }
 
   const response = decision.requireDashboardAuth
     ? internalDashboardResponse(request)
     : NextResponse.next();
   if (decision.noindex) response.headers.set("X-Robots-Tag", NOINDEX_ROBOTS_TAG);
+  response.headers.set(RELEASE_HEADER, RELEASE);
   return response;
 }
 

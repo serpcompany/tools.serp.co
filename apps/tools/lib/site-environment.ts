@@ -16,6 +16,10 @@ export const SMOKE_TEST_HEADER = "x-tools-serp-smoke-test";
 
 export const NOINDEX_ROBOTS_TAG = "noindex, nofollow";
 
+// Every response names the release (commit) that served it, so the deploy
+// smoke can wait until the new version answers everywhere.
+export const RELEASE_HEADER = "x-tools-release";
+
 const DEPLOYED_ENVIRONMENTS = new Set(["production", "staging"]);
 
 type CanonicalRedirectArgs = {

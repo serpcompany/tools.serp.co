@@ -125,6 +125,7 @@ jobs:
           --base-url "$PLATFORM_URL"
           --expect-env "$DEPLOY_ENV"
           --platform-url "$PLATFORM_URL"
+          --expect-release "$(git rev-parse --short=12 HEAD)"
           --skip-assets
 
       # Staging only: the browser smoke records real tool runs, and production
