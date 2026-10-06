@@ -9,10 +9,10 @@ on:
 permissions:
   contents: read
 
-# A new push to a PR cancels that PR's older run. Every main commit gets its
-# own group, so each one is checked.
+# A new push to a PR cancels that PR's older run. Every main run gets its own
+# group, so each commit is checked (serp verification-cadence standard).
 concurrency:
-  group: check-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.sha }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -37,12 +37,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # The pnpm store is cached by setup-node above. This restores Next.js's
-      # incremental build cache; a source change still rebuilds what changed.
+      # incremental build cache (Next validates it), saves a fresh one every
+      # run, and never reuses one built from a different lockfile.
       - name: Cache Next.js build
         uses: actions/cache@v4
         with:
           path: apps/tools/.next/cache
-          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('apps/tools/**/*.ts', 'apps/tools/**/*.tsx', 'apps/tools/**/*.js', 'apps/tools/**/*.mjs', 'packages/*/src/**', '!**/node_modules/**', '!**/.next/**', '!**/.open-next/**') }}
+          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
           restore-keys: |
             nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
