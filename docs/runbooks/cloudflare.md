@@ -252,10 +252,5 @@ pnpm -C apps/tools cf:build
 pnpm -C apps/tools audit:cf:api-smoke -- --base-url <deployed-preview-url> --no-fail
 ```
 
-The browser smoke test that CI runs against a local Worker can also run against
-a deployed one. It writes real tool runs into that environment's D1, so use
-staging (see the README for local use and the dashboard token):
-
-```bash
-pnpm -C apps/tools smoke:browser --base-url https://staging.tools.serp.co
-```
+The browser smoke test can also run against a deployment; see
+[browser-smoke.md](browser-smoke.md).
