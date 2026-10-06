@@ -107,28 +107,32 @@ will list both names.
 
 ## Telemetry Write Contract
 
-Clients POST JSON to `/api/telemetry`.
+Clients POST JSON to `/api/telemetry`. Bodies over 16k characters get `413`.
+`packages/tool-telemetry/src/validate.ts` checks and caps every field before it
+reaches SQL:
 
-Required fields:
+| Field                                     | Rule                                                                     |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
+| `event`                                   | Required. `tool_run_started`, `tool_run_succeeded` or `tool_run_failed`. |
+| `runId`, `toolId`                         | Required. Letters, digits, `_` and `-`, up to 80 characters.             |
+| `startedAt`                               | Required. A date within 24 hours of the server clock.                    |
+| `durationMs`, `inputBytes`, `outputBytes` | Optional. Non-negative numbers up to 10¹².                               |
+| `errorCode`                               | Optional. Letters, digits and `_.:-`, up to 64 characters.               |
+| `from`, `to`                              | Optional and not stored. Values that don't fit are dropped.              |
+| `metadata`                                | Optional. Flat object, at most 20 keys and 4 KB. See below.              |
 
-- `runId`
-- `toolId`
-- `event`
-- `startedAt`
+Metadata strings are cut to 256 characters, nested values are stored as JSON
+strings, and keys that aren't simple names are dropped.
 
-Optional fields:
+Invalid events get `400` with a stable code in `error` (`invalid_json`,
+`invalid_event`, `invalid_run_id`, and so on). D1 failures return
+`d1_write_failed` and log only the error class, never the D1 message.
 
-- `durationMs`
-- `inputBytes`
-- `outputBytes`
-- `errorCode`
-- `metadata`
-
-Runtime status mapping:
-
-- `tool_run_started` becomes `started`
-- `tool_run_succeeded` becomes `succeeded`
-- any other valid tool-run event becomes `failed`
+`tool_run_started` inserts the row and ignores repeats. A completed event
+upserts the row, then recomputes that tool's `tool_status` from at most its
+latest 500 runs in the last 24 hours, so a busy tool can't make one write read
+an unbounded number of rows. The tests run against workerd's local D1 and
+assert `rows_read`.
 
 `apps/tools/app/api/telemetry/route.ts` enriches metadata with request IP and
 user agent when available, then calls `recordToolRun`.
@@ -137,7 +141,8 @@ Cloudflare context. `packages/tool-telemetry/src/d1.ts` owns D1 inserts,
 upserts, dashboard summaries, and status recomputation.
 
 Telemetry is D1 only. If the binding is unavailable, the endpoint returns HTTP
-503 instead of discarding the event or writing to a compatibility database.
+503 (`d1_unavailable`) instead of discarding the event or writing to a
+compatibility database.
 
 ## Access Paths
 

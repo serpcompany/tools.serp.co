@@ -1,184 +1,41 @@
-import test from "node:test";
+import { after, before, beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
-import { getD1ToolsDashboardData } from "./d1.ts";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { drizzle } from "drizzle-orm/d1";
+import { migrate } from "drizzle-orm/d1/migrator";
+import { getPlatformProxy } from "wrangler";
+
+import { STATUS_SAMPLE_LIMIT, getD1ToolsDashboardData } from "./d1.ts";
 import { recordToolRun } from "./server.ts";
 
-class FakeStatement {
-  constructor(db, query) {
-    this.db = db;
-    this.query = query.replace(/\s+/g, " ").trim();
-    this.values = [];
-  }
-
-  bind(...values) {
-    this.values = values;
-    return this;
-  }
-
-  async run() {
-    if (this.query.includes("INSERT OR IGNORE INTO tool_runs")) {
-      this.db.insertRun(this.values, { ignoreExisting: true });
-      return { success: true };
-    }
-
-    if (this.query.includes("INSERT INTO tool_runs")) {
-      this.db.insertRun(this.values, { ignoreExisting: false });
-      return { success: true };
-    }
-
-    if (this.query.includes("INSERT INTO tool_status")) {
-      this.db.upsertStatus(this.values);
-      return { success: true };
-    }
-
-    throw new Error(`Unhandled run query: ${this.query}`);
-  }
-
-  async all() {
-    if (this.query.includes("SELECT DISTINCT tool_id AS toolId")) {
-      return { results: this.db.distinctToolIds() };
-    }
-
-    if (this.query.includes("FROM tool_status")) {
-      return { results: this.db.statusRows() };
-    }
-
-    if (this.query.includes("GROUP BY tool_id, error_code")) {
-      return { results: this.db.failureCounts(this.values[0]) };
-    }
-
-    if (this.query.includes("LIMIT 200")) {
-      return { results: this.db.recentFailures(this.values[0]) };
-    }
-
-    if (this.query.includes("WHERE tool_id = ? AND started_at >= ?")) {
-      return { results: this.db.runsForTool(this.values[0], this.values[1]) };
-    }
-
-    throw new Error(`Unhandled all query: ${this.query}`);
-  }
-
-  async first() {
-    const results = await this.all();
-    return results.results?.[0] ?? null;
-  }
-}
-
-class FakeD1 {
-  constructor() {
-    this.runs = new Map();
-    this.statuses = new Map();
-  }
-
-  prepare(query) {
-    return new FakeStatement(this, query);
-  }
-
-  insertRun(values, { ignoreExisting }) {
-    const [
-      id,
-      toolId,
-      status,
-      startedAt,
-      durationMs,
-      inputBytes,
-      outputBytes,
-      errorCode,
-      metadata,
-    ] = values;
-
-    if (ignoreExisting && this.runs.has(id)) return;
-
-    this.runs.set(id, {
-      id,
-      tool_id: toolId,
-      status,
-      started_at: startedAt,
-      duration_ms: durationMs,
-      input_bytes: inputBytes,
-      output_bytes: outputBytes,
-      error_code: errorCode,
-      metadata,
-    });
-  }
-
-  upsertStatus(values) {
-    const [
-      toolId,
-      status,
-      lastRunAt,
-      failureRate24h,
-      medianDurationMs,
-      medianReductionPct,
-      updatedAt,
-    ] = values;
-
-    this.statuses.set(toolId, {
-      toolId,
-      status,
-      lastRunAt,
-      failureRate24h,
-      medianDurationMs,
-      medianReductionPct,
-      updatedAt,
-    });
-  }
-
-  distinctToolIds() {
-    return Array.from(new Set(Array.from(this.runs.values()).map((row) => row.tool_id)))
-      .sort()
-      .map((toolId) => ({ toolId }));
-  }
-
-  statusRows() {
-    return Array.from(this.statuses.values()).sort((a, b) =>
-      b.updatedAt.localeCompare(a.updatedAt)
-    );
-  }
-
-  runsForTool(toolId, since) {
-    return Array.from(this.runs.values())
-      .filter((row) => row.tool_id === toolId && row.started_at >= since)
-      .sort((a, b) => b.started_at.localeCompare(a.started_at));
-  }
-
-  failureCounts(since) {
-    const grouped = new Map();
-    for (const row of this.runs.values()) {
-      if (row.status !== "failed" || row.started_at < since) continue;
-      const key = `${row.tool_id}::${row.error_code ?? "unknown"}`;
-      const existing = grouped.get(key) ?? {
-        toolId: row.tool_id,
-        errorCode: row.error_code,
-        count: 0,
-        lastSeen: null,
-      };
-      existing.count += 1;
-      if (!existing.lastSeen || row.started_at > existing.lastSeen) {
-        existing.lastSeen = row.started_at;
-      }
-      grouped.set(key, existing);
-    }
-    return Array.from(grouped.values()).sort((a, b) => b.count - a.count);
-  }
-
-  recentFailures(since) {
-    return Array.from(this.runs.values())
-      .filter((row) => row.status === "failed" && row.started_at >= since)
-      .sort((a, b) => b.started_at.localeCompare(a.started_at))
-      .slice(0, 200)
-      .map((row) => ({
-        toolId: row.tool_id,
-        errorCode: row.error_code,
-        metadata: row.metadata,
-        startedAt: row.started_at,
-      }));
-  }
-}
-
+// Runs against workerd's local D1, with the real migrations applied.
+const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const now = new Date("2026-06-20T12:00:00.000Z");
 
-function event(overrides) {
+let proxy;
+let d1;
+
+before(async () => {
+  proxy = await getPlatformProxy({
+    configPath: path.join(packageRoot, "test/wrangler.jsonc"),
+    persist: false,
+  });
+  d1 = proxy.env.SERP_TOOLS_DB;
+  await migrate(drizzle(d1), {
+    migrationsFolder: path.join(packageRoot, "../../apps/tools/migrations"),
+  });
+});
+
+after(async () => {
+  await proxy?.dispose();
+});
+
+beforeEach(async () => {
+  await d1.batch([d1.prepare("DELETE FROM tool_runs"), d1.prepare("DELETE FROM tool_status")]);
+});
+
+function event(overrides = {}) {
   return {
     event: "tool_run_started",
     runId: "run-a",
@@ -190,40 +47,113 @@ function event(overrides) {
   };
 }
 
-test("valid telemetry event inserts a D1 tool_runs row", async () => {
-  const db = new FakeD1();
-  const result = await recordToolRun(event({ metadata: { host: "example.com" } }), {
-    d1: db,
-    now,
+async function run(id) {
+  return d1.prepare("SELECT * FROM tool_runs WHERE id = ?").bind(id).first();
+}
+
+async function status(toolId) {
+  return d1.prepare("SELECT * FROM tool_status WHERE tool_id = ?").bind(toolId).first();
+}
+
+// Wraps the binding so every statement adds its D1 rows_read to `reads`.
+// Drizzle runs selects through raw(), which has no meta, so raw() and first()
+// run all() first to measure the same statement.
+function countingD1(binding, reads) {
+  const measure = async (statement) => {
+    const { meta } = await statement.all();
+    reads.push(meta.rows_read);
+  };
+  const wrap = (statement) => ({
+    bind: (...params) => wrap(statement.bind(...params)),
+    async all() {
+      const result = await statement.all();
+      reads.push(result.meta.rows_read);
+      return result;
+    },
+    async run() {
+      const result = await statement.run();
+      reads.push(result.meta.rows_read);
+      return result;
+    },
+    async raw(options) {
+      await measure(statement);
+      return statement.raw(options);
+    },
+    async first(column) {
+      await measure(statement);
+      return statement.first(column);
+    },
   });
+  return { prepare: (query) => wrap(binding.prepare(query)) };
+}
 
-  assert.deepEqual(result.body, { ok: true });
-  assert.equal(db.runs.get("run-a").tool_id, "compress-png");
-  assert.equal(db.runs.get("run-a").status, "started");
-  assert.equal(db.runs.get("run-a").metadata, '{"host":"example.com"}');
+// Inserts `count` runs one second apart, the newest `offsetMs` before `now`.
+async function seedRuns({ idPrefix, toolId, count, status, offsetMs = 60_000 }) {
+  const insert = d1.prepare(
+    "INSERT INTO tool_runs (id, tool_id, status, started_at, duration_ms) VALUES (?, ?, ?, ?, 10)",
+  );
+  const rows = Array.from({ length: count }, (_, i) =>
+    insert.bind(
+      `${idPrefix}-${i}`,
+      toolId,
+      status,
+      new Date(now.getTime() - offsetMs - i * 1000).toISOString(),
+    ),
+  );
+  for (let i = 0; i < rows.length; i += 500) {
+    await d1.batch(rows.slice(i, i + 500));
+  }
+}
+
+test("a valid started event inserts a tool_runs row", async () => {
+  const result = await recordToolRun(event({ metadata: { host: "example.com" } }), { d1, now });
+
+  assert.deepEqual(result, { status: 200, body: { ok: true } });
+  const row = await run("run-a");
+  assert.equal(row.tool_id, "compress-png");
+  assert.equal(row.status, "started");
+  assert.equal(row.metadata, '{"host":"example.com"}');
 });
 
-test("started event uses insert-or-ignore", async () => {
-  const db = new FakeD1();
-  await recordToolRun(event({ inputBytes: 1000, metadata: { version: 1 } }), { d1: db, now });
-  await recordToolRun(event({ inputBytes: 999, metadata: { version: 2 } }), { d1: db, now });
+test("a repeated started event keeps the first row", async () => {
+  await recordToolRun(event({ inputBytes: 1000, metadata: { version: 1 } }), { d1, now });
+  await recordToolRun(event({ inputBytes: 999, metadata: { version: 2 } }), { d1, now });
 
-  assert.equal(db.runs.size, 1);
-  assert.equal(db.runs.get("run-a").input_bytes, 1000);
-  assert.equal(db.runs.get("run-a").metadata, '{"version":1}');
+  const row = await run("run-a");
+  assert.equal(row.input_bytes, 1000);
+  assert.equal(row.metadata, '{"version":1}');
 });
 
-test("succeeded and failed events upsert existing D1 runs", async () => {
-  const db = new FakeD1();
-  await recordToolRun(event({ inputBytes: 1000 }), { d1: db, now });
+test("succeeded and failed events update the run", async () => {
+  await recordToolRun(event(), { d1, now });
+  await recordToolRun(
+    event({ event: "tool_run_succeeded", durationMs: 100, outputBytes: 400 }),
+    { d1, now },
+  );
   await recordToolRun(
     event({
-      event: "tool_run_succeeded",
-      durationMs: 100,
-      outputBytes: 400,
-      metadata: { phase: "done" },
+      event: "tool_run_failed",
+      runId: "run-b",
+      startedAt: "2026-06-20T11:00:00.000Z",
+      durationMs: 300,
+      errorCode: "download_failed",
     }),
-    { d1: db, now }
+    { d1, now },
+  );
+
+  const a = await run("run-a");
+  assert.equal(a.status, "succeeded");
+  assert.equal(a.duration_ms, 100);
+  assert.equal(a.output_bytes, 400);
+  const b = await run("run-b");
+  assert.equal(b.status, "failed");
+  assert.equal(b.error_code, "download_failed");
+});
+
+test("completed runs recompute tool_status and feed the dashboard", async () => {
+  await recordToolRun(
+    event({ event: "tool_run_succeeded", durationMs: 100, outputBytes: 400 }),
+    { d1, now },
   );
   await recordToolRun(
     event({
@@ -234,55 +164,118 @@ test("succeeded and failed events upsert existing D1 runs", async () => {
       errorCode: "download_failed",
       metadata: { urlHost: "videos.example" },
     }),
-    { d1: db, now }
+    { d1, now },
   );
 
-  assert.equal(db.runs.get("run-a").status, "succeeded");
-  assert.equal(db.runs.get("run-a").duration_ms, 100);
-  assert.equal(db.runs.get("run-a").output_bytes, 400);
-  assert.equal(db.runs.get("run-b").status, "failed");
-  assert.equal(db.runs.get("run-b").error_code, "download_failed");
-});
+  const row = await status("compress-png");
+  assert.equal(row.status, "broken");
+  assert.equal(row.last_run_at, "2026-06-20T11:00:00.000Z");
+  assert.equal(row.failure_rate_24h, 0.5);
+  assert.equal(row.median_duration_ms, 200);
+  assert.equal(row.median_reduction_pct, 60);
 
-test("tool_status recalculates failure rate, medians, reduction, and last run", async () => {
-  const db = new FakeD1();
-  await recordToolRun(
-    event({
-      event: "tool_run_succeeded",
-      durationMs: 100,
-      outputBytes: 400,
-    }),
-    { d1: db, now }
-  );
-  await recordToolRun(
-    event({
-      event: "tool_run_failed",
-      runId: "run-b",
-      startedAt: "2026-06-20T11:00:00.000Z",
-      durationMs: 300,
-      errorCode: "download_failed",
-      metadata: { urlHost: "videos.example" },
-    }),
-    { d1: db, now }
-  );
-
-  const status = db.statuses.get("compress-png");
-  assert.equal(status.status, "broken");
-  assert.equal(status.lastRunAt, "2026-06-20T11:00:00.000Z");
-  assert.equal(status.failureRate24h, 0.5);
-  assert.equal(status.medianDurationMs, 200);
-  assert.equal(status.medianReductionPct, 60);
-
-  const dashboard = await getD1ToolsDashboardData(db, { now });
+  const dashboard = await getD1ToolsDashboardData(d1, { now });
+  assert.equal(dashboard.statusRows[0].toolId, "compress-png");
   assert.equal(dashboard.failureRows[0].count, 1);
   assert.deepEqual(dashboard.failureRows[0].sampleMetadata, { urlHost: "videos.example" });
 });
 
-test("missing D1 binding fails instead of discarding telemetry", async () => {
-  const result = await recordToolRun(event({}));
-  assert.equal(result.status, 503);
-  assert.deepEqual(result.body, {
-    ok: false,
-    error: "D1 telemetry binding unavailable",
-  });
+test("started events do not trigger a status refresh", async () => {
+  await recordToolRun(event(), { d1, now });
+  assert.equal(await status("compress-png"), null);
+});
+
+test(`a completed event reads at most ${STATUS_SAMPLE_LIMIT} runs, however busy the tool`, async () => {
+  // 499 recent successes, then 1,500 older failures still inside the 24h window.
+  const toolId = "busy-tool";
+  await seedRuns({ idPrefix: "new", toolId, count: STATUS_SAMPLE_LIMIT - 1, status: "succeeded" });
+  await seedRuns({ idPrefix: "old", toolId, count: 1500, status: "failed", offsetMs: 3_600_000 });
+  // Other tools' rows must not be scanned either.
+  await seedRuns({ idPrefix: "other", toolId: "other-tool", count: 2000, status: "succeeded" });
+
+  const reads = [];
+  const result = await recordToolRun(
+    event({
+      event: "tool_run_succeeded",
+      runId: "latest",
+      toolId,
+      startedAt: now.toISOString(),
+      durationMs: 10,
+    }),
+    { d1: countingD1(d1, reads), now },
+  );
+
+  assert.deepEqual(result, { status: 200, body: { ok: true } });
+  const rowsRead = reads.reduce((total, n) => total + n, 0);
+  // One read for the upsert, then the capped status sample.
+  assert.ok(rowsRead <= STATUS_SAMPLE_LIMIT + 1, `read ${rowsRead} rows`);
+
+  // The older failures fall outside the sample, so the tool reads as healthy.
+  const row = await status(toolId);
+  assert.equal(row.failure_rate_24h, 0);
+  assert.equal(row.status, "live");
+});
+
+test("invalid payloads are rejected with stable codes and nothing is written", async () => {
+  const cases = [
+    [null, "invalid_payload"],
+    [event({ event: "tool_run_exploded" }), "invalid_event"],
+    [event({ runId: "x".repeat(81) }), "invalid_run_id"],
+    [event({ toolId: "../etc/passwd" }), "invalid_tool_id"],
+    [event({ startedAt: "not a date" }), "invalid_started_at"],
+    [event({ startedAt: "2030-01-01T00:00:00.000Z" }), "invalid_started_at"],
+    [event({ durationMs: -1 }), "invalid_number"],
+    [event({ inputBytes: "1000" }), "invalid_number"],
+    [event({ errorCode: "<script>" }), "invalid_error_code"],
+  ];
+  for (const [payload, code] of cases) {
+    const result = await recordToolRun(payload, { d1, now });
+    assert.deepEqual(result, { status: 400, body: { ok: false, error: code } }, code);
+  }
+  const { results } = await d1.prepare("SELECT count(*) AS n FROM tool_runs").all();
+  assert.equal(results[0].n, 0);
+});
+
+test("an odd from/to label is dropped without losing the event", async () => {
+  const result = await recordToolRun(event({ from: "Twitter/X", to: "mp4" }), { d1, now });
+
+  assert.deepEqual(result, { status: 200, body: { ok: true } });
+  assert.equal((await run("run-a")).status, "started");
+});
+
+test("metadata is flattened and capped before it is stored", async () => {
+  await recordToolRun(
+    event({
+      metadata: {
+        fileName: "a".repeat(1000),
+        nested: { deep: { value: 1 } },
+        "bad key!": "dropped",
+        ok: true,
+        ...Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`k${i}`, i])),
+      },
+    }),
+    { d1, now },
+  );
+
+  const metadata = JSON.parse((await run("run-a")).metadata);
+  assert.equal(metadata.fileName.length, 256);
+  assert.equal(metadata.nested, '{"deep":{"value":1}}');
+  assert.equal(metadata["bad key!"], undefined);
+  assert.equal(metadata.ok, true);
+  assert.equal(Object.keys(metadata).length, 20);
+});
+
+test("a missing D1 binding returns 503 instead of discarding telemetry", async () => {
+  const result = await recordToolRun(event(), { now });
+  assert.deepEqual(result, { status: 503, body: { ok: false, error: "d1_unavailable" } });
+});
+
+test("D1 failures return a stable code, not the database message", async () => {
+  const broken = {
+    prepare() {
+      throw new Error("D1_ERROR: no such table: tool_runs: SQLITE_ERROR");
+    },
+  };
+  const result = await recordToolRun(event({ event: "tool_run_succeeded" }), { d1: broken, now });
+  assert.deepEqual(result, { status: 500, body: { ok: false, error: "d1_write_failed" } });
 });
