@@ -16,9 +16,17 @@ separate from it.
 
 ## What a tool run sends
 
-The browser sends a `tool_run_started` event when a tool starts and a
-`tool_run_succeeded` or `tool_run_failed` event when it ends
-(`packages/tool-telemetry/src/client.ts`). Each event carries:
+The browser sends a `tool_run_started` event when a tool starts and exactly one
+ending event (`packages/tool-telemetry/src/client.ts`):
+
+- `tool_run_succeeded` or `tool_run_failed`;
+- `tool_run_handed_off` when the tool sends the visitor elsewhere instead of
+  attempting the job, for example a downloader that only shows the browser
+  extension prompt. It isn't a failure;
+- `tool_run_abandoned` when the page closes or navigates away first.
+
+Only succeeded and failed runs count toward a tool's failure rate. Each event
+carries:
 
 | Field | What it is |
 | --- | --- |
@@ -26,7 +34,7 @@ The browser sends a `tool_run_started` event when a tool starts and a
 | `toolId` | The catalog id of the tool, e.g. `png-to-jpg`. |
 | `startedAt` | When the run started. |
 | `durationMs`, `inputBytes`, `outputBytes` | Timing and file sizes. |
-| `errorCode` | A stable code such as `convert_failed`, on failures only. |
+| `errorCode` | A stable code such as `convert_failed` on failures, or the reason for a hand-off. |
 | `metadata` | Allowlisted keys only; see below. |
 
 The event's top-level `from` and `to` (formats) are validated but not stored;

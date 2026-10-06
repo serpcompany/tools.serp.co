@@ -17,11 +17,15 @@ function setGpc(value) {
 beforeEach(() => {
   beacons = [];
   storage = new Map();
+  const pageHideListeners = new Set();
   globalThis.window = {
     localStorage: {
       getItem: (key) => storage.get(key) ?? null,
       setItem: (key, value) => storage.set(key, value),
     },
+    addEventListener: (type, listener) => type === "pagehide" && pageHideListeners.add(listener),
+    removeEventListener: (type, listener) => pageHideListeners.delete(listener),
+    hidePage: () => [...pageHideListeners].forEach((listener) => listener()),
   };
   Object.defineProperty(globalThis.navigator, "sendBeacon", {
     value: (url, data) => {
@@ -50,6 +54,41 @@ test("a run sends started and succeeded events with a device id", async () => {
   );
   assert.equal(typeof events[0].metadata.deviceId, "string");
   assert.equal(storage.size, 1);
+});
+
+async function sentEvents() {
+  return Promise.all(beacons.map(({ data }) => data.text().then(JSON.parse)));
+}
+
+test("an extension prompt is a hand-off, not a failure", async () => {
+  setGpc(false);
+  beginToolRun({ toolId: "download-loom-videos" }).finishHandoff({
+    reason: "downloader_extension_only",
+  });
+
+  const events = await sentEvents();
+  assert.deepEqual(events.map((event) => event.event), ["tool_run_started", "tool_run_handed_off"]);
+  assert.equal(events[1].errorCode, "downloader_extension_only");
+});
+
+test("a run still open when the page goes away is abandoned", async () => {
+  setGpc(false);
+  beginToolRun({ toolId: "webm-to-mp3" });
+  globalThis.window.hidePage();
+
+  const events = await sentEvents();
+  assert.deepEqual(events.map((event) => event.event), ["tool_run_started", "tool_run_abandoned"]);
+});
+
+test("a run ends once: later finishes and page hides send nothing", async () => {
+  setGpc(false);
+  const run = beginToolRun({ toolId: "png-to-jpg" });
+  run.finishSuccess({ outputBytes: 10 });
+  run.finishFailure({ errorCode: "convert_failed" });
+  globalThis.window.hidePage();
+
+  const events = await sentEvents();
+  assert.deepEqual(events.map((event) => event.event), ["tool_run_started", "tool_run_succeeded"]);
 });
 
 test("Global Privacy Control turns telemetry off: no events, no device id", () => {

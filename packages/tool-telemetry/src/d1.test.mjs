@@ -158,6 +158,31 @@ test("succeeded and failed events update the run", async () => {
   assert.equal(b.error_code, "download_failed");
 });
 
+test("a hand-off is stored as handed_off and doesn't count as a failure", async () => {
+  await recordToolRun(event({ toolId: "download-loom-videos" }), { d1, now });
+  await recordToolRun(
+    event({ event: "tool_run_handed_off", toolId: "download-loom-videos", errorCode: "downloader_extension_only" }),
+    { d1, now },
+  );
+
+  const row = await run("run-a");
+  assert.equal(row.status, "handed_off");
+  assert.equal(row.error_code, "downloader_extension_only");
+  const status = await d1.prepare("SELECT failure_rate_24h FROM tool_status WHERE tool_id = 'download-loom-videos'").first();
+  assert.equal(status.failure_rate_24h, null);
+});
+
+test("an abandoned event never overwrites a finished run", async () => {
+  await recordToolRun(event(), { d1, now });
+  await recordToolRun(event({ event: "tool_run_succeeded", durationMs: 100 }), { d1, now });
+  await recordToolRun(event({ event: "tool_run_abandoned", durationMs: 200 }), { d1, now });
+  assert.equal((await run("run-a")).status, "succeeded");
+
+  await recordToolRun(event({ runId: "run-b" }), { d1, now });
+  await recordToolRun(event({ event: "tool_run_abandoned", runId: "run-b", durationMs: 50 }), { d1, now });
+  assert.equal((await run("run-b")).status, "abandoned");
+});
+
 test("completed runs recompute tool_status and feed the dashboard", async () => {
   await recordToolRun(
     event({ event: "tool_run_succeeded", durationMs: 100, outputBytes: 400 }),
@@ -317,8 +342,9 @@ test("a purge batch with nothing expired reads almost nothing, however big the t
   const { results, meta } = await d1.prepare(purgeBatchSql(purgeCutoff(now))).all();
 
   assert.equal(results.length, 0);
-  // The (status, started_at) index finds no expired rows without a table scan.
-  assert.ok(meta.rows_read < 10, `read ${meta.rows_read} rows`);
+  // The (status, started_at) index finds no expired rows without a table
+  // scan: a few reads per status, whatever the table size.
+  assert.ok(meta.rows_read < 20, `read ${meta.rows_read} rows`);
 });
 
 test("the purge SQL only accepts an ISO timestamp cutoff and a positive batch size", () => {

@@ -9,7 +9,9 @@ export const toolRuns = sqliteTable(
   {
     id: text("id").primaryKey().notNull(),
     toolId: text("tool_id").notNull(),
-    status: text("status", { enum: ["started", "succeeded", "failed"] }).notNull(),
+    status: text("status", {
+      enum: ["started", "succeeded", "failed", "handed_off", "abandoned"],
+    }).notNull(),
     startedAt: text("started_at").notNull(),
     durationMs: integer("duration_ms"),
     inputBytes: integer("input_bytes"),
@@ -20,7 +22,10 @@ export const toolRuns = sqliteTable(
   (table) => [
     index("idx_tool_runs_tool_id_started_at").on(table.toolId, table.startedAt),
     index("idx_tool_runs_status_started_at").on(table.status, table.startedAt),
-    check("tool_runs_status_check", sql`${table.status} IN ('started', 'succeeded', 'failed')`),
+    check(
+      "tool_runs_status_check",
+      sql`${table.status} IN ('started', 'succeeded', 'failed', 'handed_off', 'abandoned')`,
+    ),
     check(
       "tool_runs_metadata_check",
       sql`${table.metadata} IS NULL OR json_valid(${table.metadata})`,

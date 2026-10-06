@@ -1,6 +1,14 @@
-export type ToolRunEventType = "tool_run_started" | "tool_run_succeeded" | "tool_run_failed";
+export type ToolRunEventType =
+  | "tool_run_started"
+  | "tool_run_succeeded"
+  | "tool_run_failed"
+  // The tool sent the visitor elsewhere (e.g. the browser extension) instead
+  // of attempting the job. Not a failure.
+  | "tool_run_handed_off"
+  // The page closed or navigated away before the run finished.
+  | "tool_run_abandoned";
 
-export type ToolRunStatus = "started" | "succeeded" | "failed";
+export type ToolRunStatus = "started" | "succeeded" | "failed" | "handed_off" | "abandoned";
 
 export type ToolRunEvent = {
   event: ToolRunEventType;

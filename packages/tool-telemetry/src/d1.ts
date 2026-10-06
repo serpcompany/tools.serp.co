@@ -46,10 +46,16 @@ function db(binding: D1DatabaseLike) {
   return drizzle(binding);
 }
 
+const STATUS_BY_EVENT: Record<ToolRunEvent["event"], ToolRunStatus> = {
+  tool_run_started: "started",
+  tool_run_succeeded: "succeeded",
+  tool_run_failed: "failed",
+  tool_run_handed_off: "handed_off",
+  tool_run_abandoned: "abandoned",
+};
+
 function toStatus(event: ToolRunEvent): ToolRunStatus {
-  if (event.event === "tool_run_started") return "started";
-  if (event.event === "tool_run_succeeded") return "succeeded";
-  return "failed";
+  return STATUS_BY_EVENT[event.event];
 }
 
 function toNumber(value?: number | null) {
@@ -184,6 +190,16 @@ export async function recordToolRunInD1(
 
   if (status === "started") {
     await db(binding).insert(toolRuns).values(row).onConflictDoNothing();
+    return;
+  }
+
+  // A page can close after a run finished; never let that overwrite the
+  // outcome. Abandoned runs don't change a tool's status.
+  if (status === "abandoned") {
+    await db(binding)
+      .insert(toolRuns)
+      .values(row)
+      .onConflictDoUpdate({ target: toolRuns.id, set: fields, setWhere: eq(toolRuns.status, "started") });
     return;
   }
 

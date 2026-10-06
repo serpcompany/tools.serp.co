@@ -28,7 +28,7 @@ internal tools dashboard.
 | -------------- | --------- | ---- | ------------------------------------------------- |
 | `id`           | `TEXT`    | no   | Primary key. This is the telemetry `runId`.       |
 | `tool_id`      | `TEXT`    | no   | Tool registry id.                                 |
-| `status`       | `TEXT`    | no   | One of `started`, `succeeded`, or `failed`.       |
+| `status`       | `TEXT`    | no   | `started`, `succeeded`, `failed`, `handed_off` or `abandoned`. |
 | `started_at`   | `TEXT`    | no   | ISO timestamp text.                               |
 | `duration_ms`  | `INTEGER` | yes  | Completed run duration.                           |
 | `input_bytes`  | `INTEGER` | yes  | Input payload size when known.                    |
@@ -72,7 +72,7 @@ reaches SQL:
 
 | Field                                     | Rule                                                                     |
 | ----------------------------------------- | ------------------------------------------------------------------------ |
-| `event`                                   | Required. `tool_run_started`, `tool_run_succeeded` or `tool_run_failed`. |
+| `event`                                   | Required. `tool_run_started`, `tool_run_succeeded`, `tool_run_failed`, `tool_run_handed_off` or `tool_run_abandoned`. |
 | `runId`, `toolId`                         | Required. Letters, digits, `_` and `-`, up to 80 characters.             |
 | `startedAt`                               | Required. A date within 24 hours of the server clock.                    |
 | `durationMs`, `inputBytes`, `outputBytes` | Optional. Non-negative numbers up to 10¹².                               |
@@ -88,8 +88,9 @@ Invalid events get `400` with a stable code in `error` (`invalid_json`,
 `invalid_event`, `invalid_run_id`, and so on). D1 failures return
 `d1_write_failed` and log only the error class, never the D1 message.
 
-`tool_run_started` inserts the row and ignores repeats. A completed event
-upserts the row, then recomputes that tool's `tool_status` from at most its
+`tool_run_started` inserts the row and ignores repeats. `tool_run_abandoned`
+only updates a row that is still `started`, so a page closing after a run
+finished never overwrites its outcome. Any other ending event upserts the row, then recomputes that tool's `tool_status` from at most its
 latest 500 runs in the last 24 hours, so a busy tool can't make one write read
 an unbounded number of rows. The tests run against workerd's local D1 and
 assert `rows_read`.
