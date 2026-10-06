@@ -11,16 +11,16 @@ jobs:
   conventional-title:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout the title rule
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/check-pr-title.mjs
+          sparse-checkout-cone-mode: false
+
       # The PR title becomes the squash commit and changelog line, so it must
-      # be a Conventional Commit (serp git-workflow standard).
+      # be a Conventional Commit. The rule and its tests live in
+      # scripts/check-pr-title.mjs.
       - name: Check the PR title
         env:
           TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          pattern='^(feat|fix|perf|refactor|docs|test|build|ci|chore)(\([a-z0-9-]+\))?!?: [^ ].*$'
-          if [[ "$TITLE" =~ $pattern ]]; then
-            echo "PR title is a Conventional Commit: $TITLE"
-          else
-            echo "::error::PR title must look like 'fix: what the user notices' (types: feat, fix, perf, refactor, docs, test, build, ci, chore). Got: $TITLE"
-            exit 1
-          fi
+        run: node scripts/check-pr-title.mjs
