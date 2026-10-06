@@ -54,7 +54,7 @@ test("csv-to-markdown is discoverable through page, directory, and sitemap data"
 
   assert.ok(directoryEntry, "expected csv-to-markdown in homepage directory entries");
   assert.deepEqual(directoryEntry?.tags, ["csv", "markdown"]);
-  assert.equal(directoryEntry?.href, "/csv-to-markdown");
+  assert.equal(directoryEntry?.href, "/csv-to-markdown/");
 
   assert.ok(sitemapRoutes.has("/csv-to-markdown/"), "expected csv-to-markdown in sitemap routes");
 });

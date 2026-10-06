@@ -11,6 +11,9 @@ const toolsPath = path.resolve(tracingRoot, "packages/app-core/src/data/tools.js
 const appDir = path.resolve(appRoot, "app");
 let ffmpegRoutes = [];
 const transcribeRoutes = new Set();
+// Multi-thread FFmpeg needs cross-origin isolation (COEP), and the worker
+// scripts don't send COEP headers yet: turning this off breaks FFmpeg and
+// transcription pages until they do (PR #213).
 const singleThreadEnv = process.env.NEXT_PUBLIC_FFMPEG_SINGLE_THREAD ?? "true";
 const useSingleThread = singleThreadEnv === "true";
 
@@ -72,7 +75,7 @@ try {
       if (!tool?.isActive || !tool?.route) return false;
       const normalizedRoute = normalizeRoute(tool.route);
       if (!normalizedRoute) return false;
-      return transcribeRouteSet.has(normalizedRoute) || (includeFfmpegRoutes && tool?.requiresFFmpeg);
+      return includeFfmpegRoutes && (transcribeRouteSet.has(normalizedRoute) || tool?.requiresFFmpeg);
     })
     .map((tool) => normalizeRoute(tool.route))
     .filter((route) => {
@@ -80,7 +83,11 @@ try {
       seenRoutes.add(route);
       return true;
     });
-  for (const route of transcribeRouteSet) {
+  // Like other FFmpeg pages, transcription pages are only isolated for
+  // multi-threaded FFmpeg. Their Worker scripts are served without a COEP
+  // header, so Chrome refuses them on an isolated page and transcription
+  // hangs (issue #171).
+  for (const route of includeFfmpegRoutes ? transcribeRouteSet : []) {
     if (!route || seenRoutes.has(route)) continue;
     seenRoutes.add(route);
     ffmpegRoutes.push(route);
