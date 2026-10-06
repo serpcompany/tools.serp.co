@@ -24,7 +24,12 @@ const tools = JSON.parse(
 // Deployed Workers skip their canonical-host redirect for requests with this
 // header (issue #164), so the smoke test can run through *.workers.dev.
 const SMOKE_TEST_HEADER = "x-tools-serp-smoke-test";
-const STEP_TIMEOUT_MS = 60_000;
+// The FFmpeg and ImageMagick steps load 32 MB and 14 MB of wasm.
+const STEP_TIMEOUT_MS = 90_000;
+// A failed step runs once more on a fresh page, so a slow runner or a
+// deploy that is still rolling out doesn't fail the run. Both attempts are
+// reported.
+const STEP_ATTEMPTS = 2;
 const TELEMETRY_TIMEOUT_MS = 10_000;
 
 function parseArgs(argv) {
@@ -120,7 +125,7 @@ async function saveFailureArtifacts(page, name) {
   }
 }
 
-async function step(name, run) {
+async function attemptStep(name, run) {
   const startedAt = Date.now();
   const page = await context.newPage();
   page.setDefaultTimeout(STEP_TIMEOUT_MS);
@@ -132,15 +137,25 @@ async function step(name, run) {
     }
   });
 
-  let result;
   try {
     await run(page, telemetryStatuses);
-    result = { name, ok: true, ms: Date.now() - startedAt };
+    return { name, ok: true, ms: Date.now() - startedAt };
   } catch (error) {
-    result = { name, ok: false, ms: Date.now() - startedAt, error: error.message };
     await saveFailureArtifacts(page, name);
+    return { name, ok: false, ms: Date.now() - startedAt, error: error.message };
   } finally {
-    await page.close();
+    await page.close().catch(() => {});
+  }
+}
+
+async function step(name, run) {
+  let result;
+  for (let attempt = 1; attempt <= STEP_ATTEMPTS; attempt += 1) {
+    result = await attemptStep(name, run);
+    if (result.ok) break;
+    if (attempt < STEP_ATTEMPTS) {
+      console.log(`retry ${name} (${result.ms} ms)\n      ${result.error}`);
+    }
   }
   results.push(result);
   const mark = result.ok ? "pass" : "FAIL";
