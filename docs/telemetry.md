@@ -4,7 +4,7 @@ What tools.serp.co records when someone runs a tool, why, how long it is kept,
 and how a visitor opts out or gets it deleted. This follows the serp
 [telemetry standard](https://github.com/serpcompany/serp/blob/main/docs/engineering/technology/telemetry.md).
 The database schema and write contract are in the
-[runbooks](runbooks/cloudflare.md#d1-telemetry-database).
+[D1 telemetry runbook](runbooks/d1-telemetry.md).
 
 ## Purpose
 
@@ -55,27 +55,36 @@ groups:
   `paragraphs`, `lines`, `readingTime`, `speakingTime`.
 
 Never sent or stored: file names, file or page contents, pasted text, full
-URLs, free-form error messages, or anything typed into a tool. The client's
-`metadata` type only accepts allowlisted keys, so adding a new key is a
-deliberate change to `METADATA_KEYS` and this doc. Values are capped (20 keys,
+URLs, free-form error messages, or anything typed into a tool. Metadata objects
+written in the app are typed `ToolRunMetadata` (allowlisted keys, minus the
+server-only ones), so typecheck rejects a new key until it is added to
+`METADATA_KEYS` and this doc. Values are capped (20 keys,
 4 KB, strings cut to 256 characters).
 
 ## Retention
 
 Tool runs are kept for **90 days** (`TOOL_RUN_RETENTION_DAYS` in
-`packages/tool-telemetry/src/d1.ts`). A Cron Trigger runs every day at 03:23
-UTC in staging and production (`apps/tools/worker-entry.mjs`) and deletes older
-runs in batches of 1,000, at most 50 per run; anything left is deleted by the
-next run. Its result is logged as `telemetry purge` in Workers Logs, and a
-failure is logged as `telemetry purge failed` and shows as failed in Cron
-Events. `tool_status` holds only per-tool aggregates, no per-visitor data, and is
-rewritten as runs complete.
+`packages/tool-telemetry/src/purge.ts`). The purge isn't scheduled yet (owner
+decision, 2026-10-06), so run it by hand about once a month, checking first
+with `--dry-run`:
+
+```bash
+pnpm -C apps/tools telemetry:purge --env production --dry-run
+pnpm -C apps/tools telemetry:purge --env production
+```
+
+It deletes expired runs through `wrangler d1 execute --remote`, 1,000 per
+statement and at most 200 statements per run; if it stops at that limit, run it
+again. Scheduling it later is a Cron Trigger on the Worker, which runs on
+Cloudflare and uses no GitHub Actions minutes. `tool_status` holds only per-tool
+aggregates, no per-visitor data, and is rewritten as runs complete.
 
 ## Opting out
 
 A browser that sends [Global Privacy Control](https://globalprivacycontrol.org)
 (`navigator.globalPrivacyControl === true`) sends no tool-run telemetry at all
-and gets no device id. Clearing the site's `localStorage` resets the device id.
+and gets no device id. The server also ignores any telemetry request with the
+`Sec-GPC: 1` header, which covers pages cached before the client check. Clearing the site's `localStorage` resets the device id.
 GPC doesn't change Google Tag Manager or AdSense, which are configured
 separately.
 

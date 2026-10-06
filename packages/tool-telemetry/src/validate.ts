@@ -52,7 +52,10 @@ const METADATA_KEY_LIST = [
 ] as const;
 
 export type MetadataKey = (typeof METADATA_KEY_LIST)[number];
-export type ToolRunMetadata = Partial<Record<MetadataKey, unknown>>;
+// What a browser may send: every allowlisted key except the ones only the
+// server sets.
+export type ClientMetadataKey = Exclude<MetadataKey, "ip" | "userAgent" | "release">;
+export type ToolRunMetadata = Partial<Record<ClientMetadataKey, unknown>>;
 export const METADATA_KEYS: ReadonlySet<string> = new Set(METADATA_KEY_LIST);
 const MAX_METADATA_KEYS = 20;
 const MAX_METADATA_STRING = 256;

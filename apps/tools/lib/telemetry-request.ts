@@ -40,9 +40,11 @@ export function attachRequestMetadata(
     ...clientMetadata,
   };
 
-  if (Object.keys(metadata).length > 0) {
-    return { ...payload, metadata };
-  }
+  return { ...payload, metadata };
+}
 
-  return payload;
+// Browsers with Global Privacy Control send `Sec-GPC: 1`. The client already
+// sends nothing in that case; this also covers pages cached before it did.
+export function sentGlobalPrivacyControl(request: Request) {
+  return request.headers.get("sec-gpc") === "1";
 }

@@ -3,6 +3,7 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { AUDIO_FORMATS, VIDEO_FORMATS, detectCapabilities } from '../capabilities';
 import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils";
 import { createServerActionRequestHeaders } from "../server-action-client";
+import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
 let ffmpeg: FFmpeg | null = null;
 let loaded = false;
@@ -19,13 +20,13 @@ const VIDEO_FORMAT_SET = new Set(VIDEO_FORMATS);
 
 type TelemetryError = Error & {
   telemetryCode?: string;
-  telemetryMetadata?: Record<string, unknown>;
+  telemetryMetadata?: ToolRunMetadata;
 };
 
 function createTelemetryError(
   code: string,
   message: string,
-  metadata?: Record<string, unknown>
+  metadata?: ToolRunMetadata
 ): TelemetryError {
   const error = new Error(message) as TelemetryError;
   error.telemetryCode = code;

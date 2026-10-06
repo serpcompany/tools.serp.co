@@ -1,15 +1,16 @@
 export { beginToolRun } from "@serp-tools/tool-telemetry/client";
-export type { ToolRunEvent } from "@serp-tools/tool-telemetry";
+export type { ToolRunEvent, ToolRunMetadata } from "@serp-tools/tool-telemetry";
+import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
 export type TelemetryFailure = {
   errorCode: string;
-  metadata?: Record<string, unknown>;
+  metadata?: ToolRunMetadata;
   message: string;
 };
 
 type TelemetryErrorShape = {
   telemetryCode?: string;
-  telemetryMetadata?: Record<string, unknown>;
+  telemetryMetadata?: ToolRunMetadata;
 };
 
 function isTelemetryError(value: unknown): value is TelemetryErrorShape {

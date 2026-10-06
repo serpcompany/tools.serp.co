@@ -3,6 +3,7 @@ import { resolveCompressionTarget } from "../compression-utils.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
+import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
 export type ConversionOp = "raster" | "pdf-pages" | "video";
 
@@ -137,13 +138,13 @@ type WorkerMessage = {
 
 type TelemetryError = Error & {
   telemetryCode?: string;
-  telemetryMetadata?: Record<string, unknown>;
+  telemetryMetadata?: ToolRunMetadata;
 };
 
 function createTelemetryError(
   code: string,
   message: string,
-  metadata?: Record<string, unknown>
+  metadata?: ToolRunMetadata
 ): TelemetryError {
   const error = new Error(message) as TelemetryError;
   error.telemetryCode = code;

@@ -6,13 +6,13 @@ import { drizzle } from "drizzle-orm/d1";
 import { migrate } from "drizzle-orm/d1/migrator";
 import { getPlatformProxy } from "wrangler";
 
+import { STATUS_SAMPLE_LIMIT, getD1ToolsDashboardData } from "./d1.ts";
 import {
-  PURGE_BATCH_SIZE,
-  STATUS_SAMPLE_LIMIT,
   TOOL_RUN_RETENTION_DAYS,
-  getD1ToolsDashboardData,
-  purgeExpiredToolRuns,
-} from "./d1.ts";
+  expiredCountSql,
+  purgeBatchSql,
+  purgeCutoff,
+} from "./purge.ts";
 import { recordToolRun } from "./server.ts";
 import { METADATA_KEYS } from "./validate.ts";
 
@@ -286,55 +286,45 @@ test("metadata is flattened and capped before it is stored", async () => {
   assert.equal(Object.keys(metadata).length, 20);
 });
 
-test(`the purge deletes runs older than ${TOOL_RUN_RETENTION_DAYS} days, in batches`, async () => {
+test(`a purge batch deletes only runs older than ${TOOL_RUN_RETENTION_DAYS} days, at most batchSize`, async () => {
   const day = 86_400_000;
   const expiredOffset = (TOOL_RUN_RETENTION_DAYS + 1) * day;
-  await seedRuns({ idPrefix: "old-ok", toolId: "busy-tool", count: 1300, status: "succeeded", offsetMs: expiredOffset });
-  await seedRuns({ idPrefix: "old-bad", toolId: "busy-tool", count: 1200, status: "failed", offsetMs: expiredOffset });
-  await seedRuns({ idPrefix: "recent", toolId: "busy-tool", count: 300, status: "succeeded", offsetMs: (TOOL_RUN_RETENTION_DAYS - 1) * day });
+  await seedRuns({ idPrefix: "old-ok", toolId: "busy-tool", count: 13, status: "succeeded", offsetMs: expiredOffset });
+  await seedRuns({ idPrefix: "old-bad", toolId: "busy-tool", count: 12, status: "failed", offsetMs: expiredOffset });
+  await seedRuns({ idPrefix: "recent", toolId: "busy-tool", count: 5, status: "succeeded", offsetMs: (TOOL_RUN_RETENTION_DAYS - 1) * day });
+  const cutoff = purgeCutoff(now);
 
-  const result = await purgeExpiredToolRuns(d1, { now });
+  const counted = await d1.prepare(expiredCountSql(cutoff)).first();
+  assert.equal(counted.expired, 25);
 
-  assert.equal(result.deleted, 2500);
-  assert.equal(result.complete, true);
-  assert.equal(result.cutoff, new Date(now.getTime() - TOOL_RUN_RETENTION_DAYS * day).toISOString());
-  const { results } = await d1.prepare("SELECT count(*) AS n FROM tool_runs").all();
-  assert.equal(results[0].n, 300);
-  assert.ok(2500 > PURGE_BATCH_SIZE, "the seed spans more than one batch");
+  const batches = [];
+  for (;;) {
+    const { results } = await d1.prepare(purgeBatchSql(cutoff, 10)).all();
+    batches.push(results.length);
+    if (results.length < 10) break;
+  }
+  assert.deepEqual(batches, [10, 10, 5]);
+  const { results } = await d1.prepare("SELECT id FROM tool_runs ORDER BY id").all();
+  assert.deepEqual(results.map((row) => row.id), ["recent-0", "recent-1", "recent-2", "recent-3", "recent-4"]);
 });
 
-test("the purge deletes at most batchSize runs per statement and stops at maxBatches", async () => {
-  const expiredOffset = (TOOL_RUN_RETENTION_DAYS + 1) * 86_400_000;
-  await seedRuns({ idPrefix: "old", toolId: "busy-tool", count: 25, status: "failed", offsetMs: expiredOffset });
-
-  const reads = [];
-  const first = await purgeExpiredToolRuns(countingD1(d1, reads), { now, batchSize: 10, maxBatches: 2 });
-  assert.deepEqual({ deleted: first.deleted, complete: first.complete }, { deleted: 20, complete: false });
-  assert.equal(reads.length, 2, "one delete statement per batch");
-
-  const second = await purgeExpiredToolRuns(d1, { now, batchSize: 10, maxBatches: 2 });
-  assert.deepEqual({ deleted: second.deleted, complete: second.complete }, { deleted: 5, complete: true });
-});
-
-test("a failed purge reports how many runs it had already deleted", async () => {
-  const broken = {
-    prepare() {
-      throw new Error("D1_ERROR: database is locked");
-    },
-  };
-  await assert.rejects(purgeExpiredToolRuns(broken, { now }), /purge stopped after deleting 0 runs: D1_ERROR/);
-});
-
-test("a purge with nothing expired reads almost nothing, however big the table", async () => {
+test("a purge batch with nothing expired reads almost nothing, however big the table", async () => {
   await seedRuns({ idPrefix: "recent", toolId: "busy-tool", count: 3000, status: "succeeded" });
 
-  const reads = [];
-  const result = await purgeExpiredToolRuns(countingD1(d1, reads), { now });
+  const { results, meta } = await d1.prepare(purgeBatchSql(purgeCutoff(now))).all();
 
-  assert.deepEqual({ deleted: result.deleted, complete: result.complete }, { deleted: 0, complete: true });
-  const rowsRead = reads.reduce((total, n) => total + n, 0);
+  assert.equal(results.length, 0);
   // The (status, started_at) index finds no expired rows without a table scan.
-  assert.ok(rowsRead < 10, `read ${rowsRead} rows`);
+  assert.ok(meta.rows_read < 10, `read ${meta.rows_read} rows`);
+});
+
+test("the purge SQL only accepts an ISO timestamp cutoff and a positive batch size", () => {
+  assert.equal(purgeCutoff(now), "2026-03-22T12:00:00.000Z");
+  for (const cutoff of ["2026-01-01", "2026-01-01T00:00:00.000Z' OR '1'='1", ""]) {
+    assert.throws(() => purgeBatchSql(cutoff), /Invalid purge cutoff/, cutoff);
+    assert.throws(() => expiredCountSql(cutoff), /Invalid purge cutoff/, cutoff);
+  }
+  assert.throws(() => purgeBatchSql(purgeCutoff(now), 0), /Invalid purge batch size/);
 });
 
 test("a missing D1 binding returns 503 instead of discarding telemetry", async () => {

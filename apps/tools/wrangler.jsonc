@@ -1,7 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "tools-serp-co",
-	"main": "worker-entry.mjs",
+	"main": ".open-next/worker.js",
 	"compatibility_date": "2024-12-30",
 	"compatibility_flags": [
 		"nodejs_compat",
@@ -46,7 +46,6 @@
 	"env": {
 		"staging": {
 			"name": "tools-serp-co-staging",
-			"triggers": { "crons": ["23 3 * * *"] },
 			"routes": [
 				{
 					"pattern": "staging.tools.serp.co",
@@ -83,7 +82,6 @@
 		},
 		"production": {
 			"name": "tools-serp-co",
-			"triggers": { "crons": ["23 3 * * *"] },
 			"routes": [
 				{
 					"pattern": "tools.serp.co",

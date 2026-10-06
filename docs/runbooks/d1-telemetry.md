@@ -80,8 +80,9 @@ reaches SQL:
 | `from`, `to`                              | Optional and not stored. Values that don't fit are dropped.              |
 | `metadata`                                | Optional. Flat object, at most 20 keys and 4 KB. See below.              |
 
-Metadata strings are cut to 256 characters, nested values are stored as JSON
-strings, and keys that aren't simple names are dropped.
+Metadata keys outside the allowlist (`METADATA_KEYS` in `validate.ts`, see
+[telemetry.md](../telemetry.md)) are dropped; strings are cut to 256 characters
+and nested values are stored as JSON strings.
 
 Invalid events get `400` with a stable code in `error` (`invalid_json`,
 `invalid_event`, `invalid_run_id`, and so on). D1 failures return
@@ -93,8 +94,11 @@ latest 500 runs in the last 24 hours, so a busy tool can't make one write read
 an unbounded number of rows. The tests run against workerd's local D1 and
 assert `rows_read`.
 
-`apps/tools/app/api/telemetry/route.ts` enriches metadata with request IP and
-user agent when available, then calls `recordToolRun`.
+`apps/tools/app/api/telemetry/route.ts` ignores requests with `Sec-GPC: 1`,
+adds the server-only `release`, `ip` and `userAgent`
+(`apps/tools/lib/telemetry-request.ts`), then calls `recordToolRun`. Runs older
+than 90 days are deleted with `pnpm -C apps/tools telemetry:purge` (see
+[telemetry.md](../telemetry.md#retention)).
 `apps/tools/lib/cloudflare-d1.ts` reads `SERP_TOOLS_DB` from the OpenNext
 Cloudflare context. `packages/tool-telemetry/src/d1.ts` owns D1 inserts,
 upserts, dashboard summaries, and status recomputation.

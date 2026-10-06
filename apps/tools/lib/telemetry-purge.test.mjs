@@ -1,22 +1,28 @@
-import { after, before, test } from "node:test";
+import { after, before, beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import process from "node:process";
 import { readFileSync, readdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { getPlatformProxy } from "wrangler";
 
-import { runScheduledTelemetryPurge } from "./telemetry-purge.ts";
+import { purgeExpiredToolRuns } from "../scripts/lib/telemetry-purge.mjs";
 
-// Runs the cron's job against workerd's local D1 with the real migrations.
+// Runs the purge command's loop against workerd's local D1 with the real
+// migrations; the command itself only swaps in `wrangler d1 execute --remote`.
 let proxy;
 let d1;
+const now = new Date("2026-10-06T00:00:00.000Z");
+const day = 86_400_000;
 
 before(async () => {
   proxy = await getPlatformProxy({
-    configPath: new URL("../../../packages/tool-telemetry/test/wrangler.jsonc", import.meta.url)
-      .pathname,
+    configPath: fileURLToPath(
+      new URL("../../../packages/tool-telemetry/test/wrangler.jsonc", import.meta.url),
+    ),
     persist: false,
   });
   d1 = proxy.env.SERP_TOOLS_DB;
-  // Apply every migration as written, split on Drizzle's statement breakpoints.
   const migrations = new URL("../migrations/", import.meta.url);
   for (const file of readdirSync(migrations).filter((name) => name.endsWith(".sql")).sort()) {
     const statements = readFileSync(new URL(file, migrations), "utf8")
@@ -31,59 +37,60 @@ after(async () => {
   await proxy?.dispose();
 });
 
-function capturingLog() {
-  const lines = [];
-  return {
-    lines,
-    log: (...args) => lines.push(["log", ...args]),
-    error: (...args) => lines.push(["error", ...args]),
-  };
+beforeEach(async () => {
+  await d1.prepare("DELETE FROM tool_runs").run();
+  const insert = d1.prepare(
+    "INSERT INTO tool_runs (id, tool_id, status, started_at) VALUES (?, 'png-to-jpg', 'failed', ?)",
+  );
+  const expired = new Date(now.getTime() - 91 * day).toISOString();
+  const kept = new Date(now.getTime() - 89 * day).toISOString();
+  await d1.batch([
+    ...Array.from({ length: 25 }, (_, i) => insert.bind(`old-${i}`, expired)),
+    insert.bind("kept", kept),
+  ]);
+});
+
+const execute = (sql) => d1.prepare(sql).all().then((result) => result.results);
+
+async function remainingIds() {
+  const { results } = await d1.prepare("SELECT id FROM tool_runs").all();
+  return results.map((row) => row.id);
 }
 
-test("the scheduled job purges expired runs from SERP_TOOLS_DB and logs the result", async () => {
-  const day = 86_400_000;
-  const insert = d1.prepare(
-    "INSERT INTO tool_runs (id, tool_id, status, started_at) VALUES (?, 'png-to-jpg', 'succeeded', ?)",
-  );
-  await d1.batch([
-    insert.bind("expired", new Date(Date.now() - 91 * day).toISOString()),
-    insert.bind("kept", new Date(Date.now() - 89 * day).toISOString()),
+test("the purge deletes every expired run in batches and keeps the rest", async () => {
+  const lines = [];
+  const result = await purgeExpiredToolRuns({ execute, now, batchSize: 10, log: (line) => lines.push(line) });
+
+  assert.deepEqual({ deleted: result.deleted, complete: result.complete }, { deleted: 25, complete: true });
+  assert.deepEqual(await remainingIds(), ["kept"]);
+  assert.deepEqual(lines, [
+    "batch 1: deleted 10 (total 10)",
+    "batch 2: deleted 10 (total 20)",
+    "batch 3: deleted 5 (total 25)",
   ]);
-
-  const log = capturingLog();
-  const result = await runScheduledTelemetryPurge({ SERP_TOOLS_DB: d1 }, log);
-
-  assert.equal(result.deleted, 1);
-  const { results } = await d1.prepare("SELECT id FROM tool_runs").all();
-  assert.deepEqual(results.map((row) => row.id), ["kept"]);
-  assert.equal(log.lines[0][1], "telemetry purge");
 });
 
-test("the scheduled job rethrows and logs the reason when it fails", async () => {
-  const missing = capturingLog();
-  await assert.rejects(runScheduledTelemetryPurge({}, missing), /SERP_TOOLS_DB binding is missing/);
-  assert.deepEqual(missing.lines, [["error", "telemetry purge failed", "SERP_TOOLS_DB binding is missing"]]);
+test("the purge stops at maxBatches and the next run continues", async () => {
+  const first = await purgeExpiredToolRuns({ execute, now, batchSize: 10, maxBatches: 2 });
+  assert.deepEqual({ deleted: first.deleted, complete: first.complete }, { deleted: 20, complete: false });
 
-  const broken = capturingLog();
-  const binding = { prepare: () => { throw new Error("D1_ERROR: locked"); } };
-  await assert.rejects(runScheduledTelemetryPurge({ SERP_TOOLS_DB: binding }, broken));
-  assert.match(broken.lines[0][2], /purge stopped after deleting 0 runs: D1_ERROR: locked/);
+  const second = await purgeExpiredToolRuns({ execute, now, batchSize: 10, maxBatches: 2 });
+  assert.deepEqual({ deleted: second.deleted, complete: second.complete }, { deleted: 5, complete: true });
 });
 
-test("the Worker entry wires OpenNext's handler and the cron, and wrangler uses it", () => {
-  const entry = readFileSync(new URL("../worker-entry.mjs", import.meta.url), "utf8");
-  assert.match(entry, /import handler from "\.\/\.open-next\/worker\.js";/);
-  assert.match(entry, /fetch: handler\.fetch,/);
-  assert.match(entry, /async scheduled\(_controller, env\) \{\s*await runScheduledTelemetryPurge\(env\);/);
-  assert.match(
-    entry,
-    /export \{ BucketCachePurge, DOQueueHandler, DOShardedTagCache \} from "\.\/\.open-next\/worker\.js";/,
+test("a dry run counts expired runs without deleting anything", async () => {
+  const result = await purgeExpiredToolRuns({ execute, now, dryRun: true });
+
+  assert.equal(result.expired, 25);
+  assert.equal((await remainingIds()).length, 26);
+});
+
+test("the command refuses to run without a deployed environment", () => {
+  const result = spawnSync(
+    process.execPath,
+    [fileURLToPath(new URL("../scripts/purge-telemetry.mjs", import.meta.url)), "--env", "local"],
+    { encoding: "utf8", timeout: 30_000 },
   );
-
-  const wrangler = JSON.parse(readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8"));
-  assert.equal(wrangler.main, "worker-entry.mjs");
-  for (const env of ["staging", "production"]) {
-    assert.deepEqual(wrangler.env[env].triggers, { crons: ["23 3 * * *"] }, env);
-    assert.equal(wrangler.env[env].d1_databases[0].binding, "SERP_TOOLS_DB", env);
-  }
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--env must be staging or production/);
 });

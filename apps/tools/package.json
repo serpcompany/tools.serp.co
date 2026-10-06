@@ -22,6 +22,7 @@
     "deploy:staging": "pnpm cf:build:staging && wrangler deploy --env staging",
     "deploy:production": "pnpm cf:build:production && wrangler deploy --env production",
     "cf:typegen": "wrangler types",
+    "telemetry:purge": "node scripts/purge-telemetry.mjs",
     "audit:cf:api-smoke": "node scripts/smoke-cloudflare-api.mjs",
     "smoke:browser": "node scripts/smoke-browser.mjs",
     "r2:upload-ffmpeg-assets": "node scripts/upload-r2-ffmpeg-assets.mjs",
