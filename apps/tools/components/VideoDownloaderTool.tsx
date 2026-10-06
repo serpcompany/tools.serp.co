@@ -423,8 +423,9 @@ export default function VideoDownloaderTool({
           failFastReason: failFastCta.reason,
         },
       });
-      run.finishFailure({
-        errorCode: isExtensionOnly
+      // Sending the visitor to the extension isn't a failed download.
+      run.finishHandoff({
+        reason: isExtensionOnly
           ? "downloader_extension_only"
           : "known_unreliable_web_downloader",
         metadata: {

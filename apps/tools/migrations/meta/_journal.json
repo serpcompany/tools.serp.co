@@ -8,6 +8,13 @@
       "when": 1791248359644,
       "tag": "0000_tool_telemetry",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791290576304,
+      "tag": "0001_tool_run_outcomes",
+      "breakpoints": true
     }
   ]
 }

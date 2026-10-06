@@ -7,6 +7,8 @@ export const TOOL_RUN_EVENTS: readonly ToolRunEventType[] = [
   "tool_run_started",
   "tool_run_succeeded",
   "tool_run_failed",
+  "tool_run_handed_off",
+  "tool_run_abandoned",
 ];
 
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/;

@@ -5,6 +5,9 @@ type ToolRunHandle = {
   runId: string;
   finishSuccess: (args: { outputBytes?: number; metadata?: ToolRunMetadata }) => void;
   finishFailure: (args: { errorCode?: string; metadata?: ToolRunMetadata }) => void;
+  // The tool sent the visitor elsewhere (the browser extension) instead of
+  // attempting the job.
+  finishHandoff: (args: { reason: string; metadata?: ToolRunMetadata }) => void;
 };
 
 const TELEMETRY_ENDPOINT = "/api/telemetry";
@@ -72,6 +75,7 @@ export function beginToolRun(args: {
       runId: "server",
       finishSuccess: () => {},
       finishFailure: () => {},
+      finishHandoff: () => {},
     };
   }
 
@@ -92,37 +96,39 @@ export function beginToolRun(args: {
     metadata: baseMetadata,
   });
 
+  // Each run ends exactly once: the first finish wins, and a run still open
+  // when the page goes away is recorded as abandoned.
+  let finished = false;
+  const finish = (
+    event: "tool_run_succeeded" | "tool_run_failed" | "tool_run_handed_off" | "tool_run_abandoned",
+    fields: { outputBytes?: number; errorCode?: string; metadata?: ToolRunMetadata } = {},
+  ) => {
+    if (finished) return;
+    finished = true;
+    window.removeEventListener("pagehide", onPageHide);
+    sendTelemetry({
+      event,
+      runId,
+      toolId: args.toolId,
+      from: args.from,
+      to: args.to,
+      startedAt,
+      durationMs: Math.round(performance.now() - startTime),
+      inputBytes: args.inputBytes,
+      outputBytes: fields.outputBytes,
+      errorCode: fields.errorCode,
+      metadata: mergeMetadata(baseMetadata, fields.metadata),
+    });
+  };
+  const onPageHide = () => finish("tool_run_abandoned");
+  window.addEventListener("pagehide", onPageHide);
+
   return {
     runId,
-    finishSuccess: ({ outputBytes, metadata }) => {
-      const durationMs = Math.round(performance.now() - startTime);
-      sendTelemetry({
-        event: "tool_run_succeeded",
-        runId,
-        toolId: args.toolId,
-        from: args.from,
-        to: args.to,
-        startedAt,
-        durationMs,
-        inputBytes: args.inputBytes,
-        outputBytes,
-        metadata: mergeMetadata(baseMetadata, metadata),
-      });
-    },
-    finishFailure: ({ errorCode, metadata }) => {
-      const durationMs = Math.round(performance.now() - startTime);
-      sendTelemetry({
-        event: "tool_run_failed",
-        runId,
-        toolId: args.toolId,
-        from: args.from,
-        to: args.to,
-        startedAt,
-        durationMs,
-        inputBytes: args.inputBytes,
-        errorCode,
-        metadata: mergeMetadata(baseMetadata, metadata),
-      });
-    },
+    finishSuccess: ({ outputBytes, metadata }) =>
+      finish("tool_run_succeeded", { outputBytes, metadata }),
+    finishFailure: ({ errorCode, metadata }) => finish("tool_run_failed", { errorCode, metadata }),
+    finishHandoff: ({ reason, metadata }) =>
+      finish("tool_run_handed_off", { errorCode: reason, metadata }),
   };
 }
