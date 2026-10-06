@@ -23,6 +23,38 @@ Staging reuses the former preview D1 database and R2 bucket. Both deployed
 environments keep their `*.workers.dev` URL (`workers_dev: true`) for CI and
 turn off preview URLs (`preview_urls: false`).
 
+`NEXT_PUBLIC_SITE_ENV` (`local`, `staging` or `production`) is set by each
+`cf:build:*` script and in each environment's `vars`. Next.js inlines it at
+build time when it is set, so the build command decides it; a test keeps the
+build scripts, `vars` and routes in agreement. A Workers Builds build fails
+unless it is `staging` or `production`, and a build of `main` must be
+`production`. Anything other than `production` is non-production
+(`apps/tools/lib/site-environment.ts`):
+
+- Every page sends `X-Robots-Tag: noindex, nofollow`, and `robots.txt`
+  disallows everything and lists no sitemap.
+- Google Tag Manager and AdSense don't load. AdSense test mode
+  (`NEXT_PUBLIC_ADSENSE_TEST_MODE=true`) still enables test ads in any build.
+- In staging and production, any host other than the canonical one, such as
+  `*.workers.dev`, gets a 308 to the canonical host. Requests with the
+  `x-tools-serp-smoke-test` header skip the redirect so CI can test through the
+  `*.workers.dev` URL. Local runs never redirect.
+
+These rules apply to responses the Worker renders. Files in
+`apps/tools/public` are served by Workers Static Assets before the Worker runs,
+so they get neither the redirect nor the header; `public/_headers` marks
+`/vendor/*` (which includes the pdf.js viewer HTML) `noindex` everywhere.
+
+After a deploy, check the environment rules: robots, `X-Robots-Tag`, and GTM
+and AdSense present only in production (the check assumes AdSense test mode is
+off). Add `--platform-url` with the Worker's
+`*.workers.dev` URL to check the redirect too; it retries for 30 s while the
+new version rolls out.
+
+```bash
+pnpm -C apps/tools audit:cf:api-smoke --base-url https://staging.tools.serp.co --expect-env staging
+```
+
 Production deploys come from Cloudflare Workers Builds on every push to `main`
 (only `main` builds). Its settings must be: root directory `/`, build command
 `pnpm -C apps/tools cf:build:production`, deploy command

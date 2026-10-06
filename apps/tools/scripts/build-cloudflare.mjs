@@ -1,5 +1,7 @@
 import { spawnSync } from "node:child_process";
 
+import { getBuildEnvironmentError } from "./lib/build-environment.mjs";
+
 const defaultAssetsBaseUrl = "https://assets.tools.serp.co";
 const defaultSiteUrl = "https://tools.serp.co";
 const env = {
@@ -11,10 +13,18 @@ const env = {
     process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl,
 };
 
+const buildEnvironmentError = getBuildEnvironmentError(env);
+if (buildEnvironmentError) {
+  console.error(buildEnvironmentError);
+  process.exit(1);
+}
+
 console.log(
   [
     `Building Cloudflare bundle with NEXT_PUBLIC_ASSETS_BASE_URL=${env.NEXT_PUBLIC_ASSETS_BASE_URL}`,
     `NEXT_PUBLIC_SITE_URL=${env.NEXT_PUBLIC_SITE_URL}`,
+    // Unset means non-production: noindex, no analytics or ads.
+    `NEXT_PUBLIC_SITE_ENV=${env.NEXT_PUBLIC_SITE_ENV ?? "(unset)"}`,
   ].join(" "),
 );
 

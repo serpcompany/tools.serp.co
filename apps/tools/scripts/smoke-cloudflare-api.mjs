@@ -9,6 +9,11 @@ import {
 } from "./lib/cloudflare-audit.mjs";
 
 const DEFAULT_TIMEOUT_MS = 30000;
+// Must match SMOKE_TEST_HEADER in lib/site-environment.ts. It lets the smoke
+// test reach a deployment through its *.workers.dev host without the
+// canonical-host redirect.
+const SMOKE_TEST_HEADER = "x-tools-serp-smoke-test";
+const ENVIRONMENTS = new Set(["production", "staging"]);
 
 function parseArgs(argv) {
   if (argv[0] === "--") {
@@ -30,6 +35,8 @@ function parseArgs(argv) {
     allowTelemetryWrite: false,
     includeNative: false,
     noFail: false,
+    expectEnv: "",
+    platformUrl: "",
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -77,6 +84,18 @@ function parseArgs(argv) {
       args.includeNative = true;
       continue;
     }
+    if (arg === "--expect-env") {
+      args.expectEnv = argv[index + 1] ?? "";
+      if (!args.expectEnv) throw new Error("--expect-env needs production or staging");
+      index += 1;
+      continue;
+    }
+    if (arg === "--platform-url") {
+      args.platformUrl = argv[index + 1] ?? "";
+      if (!args.platformUrl) throw new Error("--platform-url needs a URL");
+      index += 1;
+      continue;
+    }
     if (arg === "--no-fail") {
       args.noFail = true;
       continue;
@@ -95,6 +114,8 @@ function parseArgs(argv) {
           "  --timeout-ms <n>             Per-request timeout. Default 30000.",
           "  --report <path>              Write a Markdown report.",
           "  --json <path>                Write raw JSON results.",
+          "  --expect-env <env>           Assert production or staging robots and noindex rules.",
+          "  --platform-url <url>         Assert this *.workers.dev host 308s to the canonical host.",
           "  --no-fail                    Exit 0 even when checks fail.",
         ].join("\n"),
       );
@@ -105,6 +126,12 @@ function parseArgs(argv) {
 
   if (!args.baseUrl) {
     throw new Error("--base-url is required");
+  }
+  if (args.expectEnv && !ENVIRONMENTS.has(args.expectEnv)) {
+    throw new Error("--expect-env must be production or staging");
+  }
+  if (args.platformUrl && !args.expectEnv) {
+    throw new Error("--platform-url needs --expect-env to know the canonical host");
   }
   if (!Number.isInteger(args.timeoutMs) || args.timeoutMs < 1000) {
     throw new Error("--timeout-ms must be an integer >= 1000");
@@ -133,6 +160,17 @@ function contentTypeEssence(value) {
   return (value ?? "").split(";")[0].trim().toLowerCase();
 }
 
+// Retries a check that sets `retryForMs` until it passes or time runs out.
+async function requestCheckWithRetry(check, args) {
+  const deadline = Date.now() + (check.retryForMs ?? 0);
+  let result = await requestCheck(check, args);
+  while (!result.passed && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    result = await requestCheck(check, args);
+  }
+  return result;
+}
+
 async function requestCheck(check, args) {
   const startedAt = Date.now();
   try {
@@ -141,6 +179,7 @@ async function requestCheck(check, args) {
       body: check.body,
       headers: {
         "user-agent": "tools-serp-cloudflare-api-smoke/1.0",
+        ...(check.skipSmokeTestHeader ? {} : { [SMOKE_TEST_HEADER]: "1" }),
         ...(check.headers ?? {}),
       },
       redirect: check.redirect ?? "manual",
@@ -233,6 +272,77 @@ function safeGetChecks(args) {
         contentType: response.headers.get("content-type"),
         bytes: bytes.length,
       }),
+    });
+  }
+
+  return checks;
+}
+
+// The canonical origin of an environment, from its wrangler vars, so the
+// checks also work when --base-url is the *.workers.dev host.
+function canonicalOrigin(expectEnv) {
+  const siteUrl = getWranglerConfig()?.env?.[expectEnv]?.vars?.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) throw new Error(`No NEXT_PUBLIC_SITE_URL for env.${expectEnv} in wrangler.jsonc`);
+  return new URL(siteUrl).origin;
+}
+
+// Must match the GTM id in gtag-manager.tsx (pinned by a test).
+const GTM_CONTAINER = "GTM-PP9W77LK";
+const ADSENSE_SCRIPT = "pagead/js/adsbygoogle.js";
+
+function environmentChecks(args) {
+  const checks = [];
+  if (!args.expectEnv) return checks;
+  const production = args.expectEnv === "production";
+  const canonical = canonicalOrigin(args.expectEnv);
+
+  checks.push(
+    {
+      name: `robots.txt matches ${args.expectEnv}`,
+      url: buildUrl(args.baseUrl, "/robots.txt"),
+      expect: (response, bytes) => {
+        const body = bytes.toString("utf8");
+        return production
+          ? response.status === 200 &&
+              body.includes("Allow: /") &&
+              body.includes(`Sitemap: ${canonical}/sitemap-index.xml`)
+          : response.status === 200 && body.includes("Disallow: /") && !body.includes("Sitemap:");
+      },
+      details: (_response, bytes) => ({ body: bytes.toString("utf8").slice(0, 200) }),
+    },
+    {
+      name: `X-Robots-Tag, analytics and ads match ${args.expectEnv}`,
+      url: buildUrl(args.baseUrl, "/"),
+      expect: (response, bytes) => {
+        const tag = response.headers.get("x-robots-tag") ?? "";
+        const hasGtm = bytes.includes(Buffer.from(GTM_CONTAINER));
+        const hasAdSense = bytes.includes(Buffer.from(ADSENSE_SCRIPT));
+        return (
+          response.status === 200 &&
+          (production
+            ? !tag.includes("noindex") && hasGtm && hasAdSense
+            : tag.includes("noindex") && !hasGtm && !hasAdSense)
+        );
+      },
+      details: (response, bytes) => ({
+        xRobotsTag: response.headers.get("x-robots-tag"),
+        gtm: bytes.includes(Buffer.from(GTM_CONTAINER)),
+        adsense: bytes.includes(Buffer.from(ADSENSE_SCRIPT)),
+      }),
+    },
+  );
+
+  if (args.platformUrl) {
+    checks.push({
+      name: "platform host 308s to the canonical host",
+      url: buildUrl(args.platformUrl, "/png-to-jpg/?smoke=1"),
+      skipSmokeTestHeader: true,
+      // A new version takes a few seconds to replace the old one everywhere.
+      retryForMs: 30_000,
+      expect: (response) =>
+        response.status === 308 &&
+        response.headers.get("location") === `${canonical}/png-to-jpg/?smoke=1`,
+      details: (response) => ({ location: response.headers.get("location") }),
     });
   }
 
@@ -385,7 +495,7 @@ function renderReport(payload) {
 }
 
 const args = parseArgs(process.argv.slice(2));
-const checks = [...assetChecks(args), ...safeGetChecks(args)];
+const checks = [...assetChecks(args), ...safeGetChecks(args), ...environmentChecks(args)];
 
 if (args.allowTelemetryWrite) {
   checks.push(telemetryCheck(args));
@@ -409,7 +519,7 @@ for (const check of checks) {
     results.push(check);
     continue;
   }
-  results.push(await requestCheck(check, args));
+  results.push(await requestCheckWithRetry(check, args));
 }
 
 const payload = {

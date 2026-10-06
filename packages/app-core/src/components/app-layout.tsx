@@ -1,6 +1,7 @@
 import Script from "next/script";
 
 import { AppHeader } from "./app-header";
+import { isProductionSite } from "../lib/site-env";
 import { GTagManager } from "./gtag-manager";
 import { SiteFooter } from "./site-footer";
 
@@ -17,7 +18,7 @@ export function AppLayout({
   return (
     <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body className="bg-background font-sans antialiased">
-        {adsenseClient && (process.env.NODE_ENV !== "development" || adsenseTestMode) ? (
+        {adsenseClient && (isProductionSite(process.env.NEXT_PUBLIC_SITE_ENV) || adsenseTestMode) ? (
           <Script
             id="adsense-script"
             async

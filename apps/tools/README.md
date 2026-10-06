@@ -74,9 +74,10 @@ Downloader Lander link changes must follow
 Ad placement is centralized in `apps/tools/components/ToolAds.tsx`; the script
 is mounted by the shared app layout. Tool and downloader ads remain hidden
 until the user initiates the relevant action. Rail ads are hidden below the
-`xl` breakpoint. `NEXT_PUBLIC_ADSENSE_TEST_MODE=true` enables test ads during
-development; other `NEXT_PUBLIC_ADSENSE_*` variables configure client and slot
-overrides.
+`xl` breakpoint. Ads load only in a production build
+(`NEXT_PUBLIC_SITE_ENV=production`, set by `cf:build:production`);
+`NEXT_PUBLIC_ADSENSE_TEST_MODE=true` enables test ads in any other build. Other
+`NEXT_PUBLIC_ADSENSE_*` variables configure client and slot overrides.
 
 ## Fixtures and verification
 

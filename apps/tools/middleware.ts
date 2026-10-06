@@ -4,8 +4,9 @@ import {
   INTERNAL_DASHBOARD_REALM,
   isInternalDashboardAuthorized,
 } from "./lib/internal-dashboard-auth";
+import { NOINDEX_ROBOTS_TAG, SMOKE_TEST_HEADER, decideMiddleware } from "./lib/site-environment";
 
-export function middleware(request: NextRequest) {
+function internalDashboardResponse(request: NextRequest) {
   const authorized = isInternalDashboardAuthorized(
     request.headers.get("authorization"),
     process.env.INTERNAL_DASHBOARD_TOKEN,
@@ -21,6 +22,25 @@ export function middleware(request: NextRequest) {
   });
 }
 
+export function middleware(request: NextRequest) {
+  const decision = decideMiddleware({
+    requestUrl: request.url,
+    siteEnv: process.env.NEXT_PUBLIC_SITE_ENV,
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+    hasSmokeTestHeader: request.headers.has(SMOKE_TEST_HEADER),
+  });
+  if (decision.type === "redirect") return NextResponse.redirect(decision.location, 308);
+
+  const response = decision.requireDashboardAuth
+    ? internalDashboardResponse(request)
+    : NextResponse.next();
+  if (decision.noindex) response.headers.set("X-Robots-Tag", NOINDEX_ROBOTS_TAG);
+  return response;
+}
+
 export const config = {
-  matcher: ["/internal/:path*"],
+  // Static build assets don't need host or robots handling. Files in public/
+  // are served by Workers Static Assets before the Worker runs; see
+  // public/_headers for their robots rule.
+  matcher: ["/((?!_next/static|_next/image).*)"],
 };
