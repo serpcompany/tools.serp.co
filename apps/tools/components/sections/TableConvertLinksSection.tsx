@@ -29,7 +29,7 @@ export function TableConvertLinksSection({
             const fromLabel = formatTableLabel(page.from);
             const toLabel = formatTableLabel(page.to);
             return (
-              <Link key={page.slug} href={`/${page.slug}`}>
+              <Link key={page.slug} href={`/${page.slug}/`}>
                 <Card className="p-3 hover:shadow-md transition-all duration-200 cursor-pointer border-gray-200 hover:border-blue-300 hover:bg-blue-50/50">
                   <h4 className="font-semibold text-sm text-gray-900 mb-0.5 truncate">
                     {fromLabel} to {toLabel}

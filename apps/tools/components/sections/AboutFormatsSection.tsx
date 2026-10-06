@@ -28,7 +28,7 @@ export function AboutFormatsSection({
         )}
         <div className="grid md:grid-cols-2 gap-8">
           {/* From Format */}
-          <a href={`/files/${fromFormat.name.toLowerCase()}`} className="block">
+          <div className="block">
             <Card className="p-8 border-gray-200 hover:shadow-lg transition-shadow duration-300 cursor-pointer">
               <div className="mb-6">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 mb-4">
@@ -69,10 +69,10 @@ export function AboutFormatsSection({
                 </ul>
               )}
             </Card>
-          </a>
+          </div>
 
           {/* To Format */}
-          <a href={`/files/${toFormat.name.toLowerCase()}`} className="block">
+          <div className="block">
             <Card className="p-8 border-gray-200 hover:shadow-lg transition-shadow duration-300 cursor-pointer">
               <div className="mb-6">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 mb-4">
@@ -113,7 +113,7 @@ export function AboutFormatsSection({
                 </ul>
               )}
             </Card>
-          </a>
+          </div>
         </div>
       </div>
     </section>
