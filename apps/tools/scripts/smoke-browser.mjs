@@ -129,7 +129,8 @@ async function attemptStep(name, run) {
   const startedAt = Date.now();
   const page = await context.newPage();
   page.setDefaultTimeout(STEP_TIMEOUT_MS);
-  page.on("pageerror", (error) => pageErrors.push(`${name}: ${error.message}`));
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(`${name}: ${error.message}`));
   const telemetryStatuses = [];
   page.on("response", (response) => {
     if (new URL(response.url()).pathname === "/api/telemetry") {
@@ -139,10 +140,10 @@ async function attemptStep(name, run) {
 
   try {
     await run(page, telemetryStatuses);
-    return { name, ok: true, ms: Date.now() - startedAt };
+    return { name, ok: true, ms: Date.now() - startedAt, errors };
   } catch (error) {
     await saveFailureArtifacts(page, name);
-    return { name, ok: false, ms: Date.now() - startedAt, error: error.message };
+    return { name, ok: false, ms: Date.now() - startedAt, error: error.message, errors };
   } finally {
     await page.close().catch(() => {});
   }
@@ -153,10 +154,14 @@ async function step(name, run) {
   for (let attempt = 1; attempt <= STEP_ATTEMPTS; attempt += 1) {
     result = await attemptStep(name, run);
     if (result.ok) break;
+    // Page errors from a retried attempt (e.g. a chunk that vanished while a
+    // deploy rolled out) are logged but don't fail the run.
     if (attempt < STEP_ATTEMPTS) {
-      console.log(`retry ${name} (${result.ms} ms)\n      ${result.error}`);
+      const details = [result.error, ...result.errors].join("\n      ");
+      console.log(`retry ${name} (${result.ms} ms)\n      ${details}`);
     }
   }
+  pageErrors.push(...result.errors);
   results.push(result);
   const mark = result.ok ? "pass" : "FAIL";
   console.log(`${mark}  ${name} (${result.ms} ms)${result.ok ? "" : `\n      ${result.error}`}`);
