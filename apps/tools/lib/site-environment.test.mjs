@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  decideMiddleware,
   getCanonicalRedirectUrl,
   getRobotsTxt,
   isProductionSite,
@@ -83,4 +84,47 @@ test("robots.txt allows crawling and lists the sitemap only in production", () =
       "User-agent: *\nDisallow: /",
     );
   }
+});
+
+test("middleware decisions across environments, hosts and paths", () => {
+  const decide = (env, requestUrl, hasSmokeTestHeader = false) =>
+    decideMiddleware({ ...env, requestUrl, hasSmokeTestHeader });
+  const local = { siteEnv: "local", siteUrl: "http://localhost:8787" };
+
+  // Production on its canonical host: indexable, auth only under /internal.
+  assert.deepEqual(decide(production, "https://tools.serp.co/png-to-jpg/"), {
+    type: "continue",
+    requireDashboardAuth: false,
+    noindex: false,
+  });
+  for (const pathname of ["/internal", "/internal/", "/internal/tools/"]) {
+    assert.deepEqual(
+      decide(production, `https://tools.serp.co${pathname}`),
+      { type: "continue", requireDashboardAuth: true, noindex: false },
+      pathname,
+    );
+  }
+  for (const pathname of ["/internals/", "/internal-tools/", "/tools/internal/"]) {
+    assert.equal(
+      decide(production, `https://tools.serp.co${pathname}`).requireDashboardAuth,
+      false,
+      pathname,
+    );
+  }
+
+  // Staging, local and unset are noindex.
+  assert.equal(decide(staging, "https://staging.tools.serp.co/").noindex, true);
+  assert.equal(decide(local, "http://localhost:8787/").noindex, true);
+  assert.equal(decide({ siteEnv: undefined, siteUrl: undefined }, "http://localhost:3000/").noindex, true);
+
+  // A platform host redirects before any dashboard auth prompt.
+  assert.deepEqual(decide(production, "https://tools-serp-co.serpcompany.workers.dev/internal/tools/"), {
+    type: "redirect",
+    location: "https://tools.serp.co/internal/tools/",
+  });
+  // With the smoke header the platform host is served, and still needs auth.
+  assert.deepEqual(
+    decide(production, "https://tools-serp-co.serpcompany.workers.dev/internal/tools/", true),
+    { type: "continue", requireDashboardAuth: true, noindex: false },
+  );
 });

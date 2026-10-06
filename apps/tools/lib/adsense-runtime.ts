@@ -1,3 +1,5 @@
+import { isProductionSite } from "@serp-tools/app-core/lib/site-env";
+
 type AdSenseSlotRuntimeArgs = {
   adsenseClient?: string;
   resolvedSlot?: string;
@@ -17,5 +19,5 @@ export function isAdSenseSlotEnabled({
     return false;
   }
 
-  return siteEnv === "production" || adsenseTestMode;
+  return isProductionSite(siteEnv) || adsenseTestMode;
 }

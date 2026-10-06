@@ -86,11 +86,13 @@ function parseArgs(argv) {
     }
     if (arg === "--expect-env") {
       args.expectEnv = argv[index + 1] ?? "";
+      if (!args.expectEnv) throw new Error("--expect-env needs production or staging");
       index += 1;
       continue;
     }
     if (arg === "--platform-url") {
       args.platformUrl = argv[index + 1] ?? "";
+      if (!args.platformUrl) throw new Error("--platform-url needs a URL");
       index += 1;
       continue;
     }
@@ -113,7 +115,7 @@ function parseArgs(argv) {
           "  --report <path>              Write a Markdown report.",
           "  --json <path>                Write raw JSON results.",
           "  --expect-env <env>           Assert production or staging robots and noindex rules.",
-          "  --platform-url <url>         Assert this *.workers.dev host 308s to --base-url.",
+          "  --platform-url <url>         Assert this *.workers.dev host 308s to the canonical host.",
           "  --no-fail                    Exit 0 even when checks fail.",
         ].join("\n"),
       );
@@ -127,6 +129,9 @@ function parseArgs(argv) {
   }
   if (args.expectEnv && !ENVIRONMENTS.has(args.expectEnv)) {
     throw new Error("--expect-env must be production or staging");
+  }
+  if (args.platformUrl && !args.expectEnv) {
+    throw new Error("--platform-url needs --expect-env to know the canonical host");
   }
   if (!Number.isInteger(args.timeoutMs) || args.timeoutMs < 1000) {
     throw new Error("--timeout-ms must be an integer >= 1000");
@@ -153,6 +158,17 @@ function readFixture(name) {
 
 function contentTypeEssence(value) {
   return (value ?? "").split(";")[0].trim().toLowerCase();
+}
+
+// Retries a check that sets `retryForMs` until it passes or time runs out.
+async function requestCheckWithRetry(check, args) {
+  const deadline = Date.now() + (check.retryForMs ?? 0);
+  let result = await requestCheck(check, args);
+  while (!result.passed && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    result = await requestCheck(check, args);
+  }
+  return result;
 }
 
 async function requestCheck(check, args) {
@@ -262,44 +278,64 @@ function safeGetChecks(args) {
   return checks;
 }
 
+// The canonical origin of an environment, from its wrangler vars, so the
+// checks also work when --base-url is the *.workers.dev host.
+function canonicalOrigin(expectEnv) {
+  const siteUrl = getWranglerConfig()?.env?.[expectEnv]?.vars?.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) throw new Error(`No NEXT_PUBLIC_SITE_URL for env.${expectEnv} in wrangler.jsonc`);
+  return new URL(siteUrl).origin;
+}
+
+const GTM_CONTAINER = "GTM-PP9W77LK";
+
 function environmentChecks(args) {
   const checks = [];
+  if (!args.expectEnv) return checks;
   const production = args.expectEnv === "production";
+  const canonical = canonicalOrigin(args.expectEnv);
 
-  if (args.expectEnv) {
-    checks.push(
-      {
-        name: `robots.txt matches ${args.expectEnv}`,
-        url: buildUrl(args.baseUrl, "/robots.txt"),
-        expect: (response, bytes) => {
-          const body = bytes.toString("utf8");
-          return production
-            ? response.status === 200 && body.includes("Allow: /") && body.includes("Sitemap: ")
-            : response.status === 200 && body.includes("Disallow: /") && !body.includes("Sitemap:");
-        },
-        details: (_response, bytes) => ({ body: bytes.toString("utf8").slice(0, 200) }),
+  checks.push(
+    {
+      name: `robots.txt matches ${args.expectEnv}`,
+      url: buildUrl(args.baseUrl, "/robots.txt"),
+      expect: (response, bytes) => {
+        const body = bytes.toString("utf8");
+        return production
+          ? response.status === 200 &&
+              body.includes("Allow: /") &&
+              body.includes(`Sitemap: ${canonical}/sitemap-index.xml`)
+          : response.status === 200 && body.includes("Disallow: /") && !body.includes("Sitemap:");
       },
-      {
-        name: `X-Robots-Tag matches ${args.expectEnv}`,
-        url: buildUrl(args.baseUrl, "/"),
-        expect: (response) => {
-          const tag = response.headers.get("x-robots-tag") ?? "";
-          return response.status === 200 && (production ? !tag.includes("noindex") : tag.includes("noindex"));
-        },
-        details: (response) => ({ xRobotsTag: response.headers.get("x-robots-tag") }),
+      details: (_response, bytes) => ({ body: bytes.toString("utf8").slice(0, 200) }),
+    },
+    {
+      name: `X-Robots-Tag and analytics match ${args.expectEnv}`,
+      url: buildUrl(args.baseUrl, "/"),
+      expect: (response, bytes) => {
+        const tag = response.headers.get("x-robots-tag") ?? "";
+        const hasGtm = bytes.includes(Buffer.from(GTM_CONTAINER));
+        return (
+          response.status === 200 &&
+          (production ? !tag.includes("noindex") && hasGtm : tag.includes("noindex") && !hasGtm)
+        );
       },
-    );
-  }
+      details: (response, bytes) => ({
+        xRobotsTag: response.headers.get("x-robots-tag"),
+        gtm: bytes.includes(Buffer.from(GTM_CONTAINER)),
+      }),
+    },
+  );
 
   if (args.platformUrl) {
-    const canonicalOrigin = new URL(args.baseUrl).origin;
     checks.push({
       name: "platform host 308s to the canonical host",
       url: buildUrl(args.platformUrl, "/png-to-jpg/?smoke=1"),
       skipSmokeTestHeader: true,
+      // A new version takes a few seconds to replace the old one everywhere.
+      retryForMs: 30_000,
       expect: (response) =>
         response.status === 308 &&
-        response.headers.get("location") === `${canonicalOrigin}/png-to-jpg/?smoke=1`,
+        response.headers.get("location") === `${canonical}/png-to-jpg/?smoke=1`,
       details: (response) => ({ location: response.headers.get("location") }),
     });
   }
@@ -477,7 +513,7 @@ for (const check of checks) {
     results.push(check);
     continue;
   }
-  results.push(await requestCheck(check, args));
+  results.push(await requestCheckWithRetry(check, args));
 }
 
 const payload = {

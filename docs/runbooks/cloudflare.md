@@ -25,20 +25,29 @@ turn off preview URLs (`preview_urls: false`).
 
 `NEXT_PUBLIC_SITE_ENV` (`local`, `staging` or `production`) is set by each
 `cf:build:*` script and in each environment's `vars`. Next.js inlines it at
-build time, so the build command decides it. Anything other than `production`
-is non-production (`apps/tools/lib/site-environment.ts`):
+build time when it is set, so the build command decides it; a test keeps the
+build scripts, `vars` and routes in agreement, and a Workers Builds build
+without it fails. Anything other than `production` is non-production
+(`apps/tools/lib/site-environment.ts`):
 
 - Every page sends `X-Robots-Tag: noindex, nofollow`, and `robots.txt`
   disallows everything and lists no sitemap.
-- Google Tag Manager and AdSense don't load (AdSense test mode still works
-  locally).
+- Google Tag Manager and AdSense don't load. AdSense test mode
+  (`NEXT_PUBLIC_ADSENSE_TEST_MODE=true`) still enables test ads in any build.
 - In staging and production, any host other than the canonical one, such as
   `*.workers.dev`, gets a 308 to the canonical host. Requests with the
   `x-tools-serp-smoke-test` header skip the redirect so CI can test through the
   `*.workers.dev` URL. Local runs never redirect.
 
-After a deploy, check the environment rules (add `--platform-url` with the
-Worker's `*.workers.dev` URL to check the redirect too):
+These rules apply to responses the Worker renders. Files in
+`apps/tools/public` are served by Workers Static Assets before the Worker runs,
+so they get neither the redirect nor the header; `public/_headers` marks
+`/vendor/*` (which includes the pdf.js viewer HTML) `noindex` everywhere.
+
+After a deploy, check the environment rules: robots, `X-Robots-Tag`, and GTM
+present only in production. Add `--platform-url` with the Worker's
+`*.workers.dev` URL to check the redirect too; it retries for 30 s while the
+new version rolls out.
 
 ```bash
 pnpm -C apps/tools audit:cf:api-smoke --base-url https://staging.tools.serp.co --expect-env staging

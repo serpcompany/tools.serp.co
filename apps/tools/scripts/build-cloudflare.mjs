@@ -11,6 +11,13 @@ const env = {
     process.env.NEXT_PUBLIC_SITE_URL || defaultSiteUrl,
 };
 
+// Workers Builds must say which environment it builds; an unset value would
+// ship a non-production (noindex, no analytics) build without any error.
+if (process.env.WORKERS_CI && !env.NEXT_PUBLIC_SITE_ENV) {
+  console.error("NEXT_PUBLIC_SITE_ENV is unset. Build with cf:build:production or cf:build:staging.");
+  process.exit(1);
+}
+
 console.log(
   [
     `Building Cloudflare bundle with NEXT_PUBLIC_ASSETS_BASE_URL=${env.NEXT_PUBLIC_ASSETS_BASE_URL}`,

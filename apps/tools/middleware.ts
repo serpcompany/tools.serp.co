@@ -4,16 +4,7 @@ import {
   INTERNAL_DASHBOARD_REALM,
   isInternalDashboardAuthorized,
 } from "./lib/internal-dashboard-auth";
-import {
-  NOINDEX_ROBOTS_TAG,
-  SMOKE_TEST_HEADER,
-  getCanonicalRedirectUrl,
-  isProductionSite,
-} from "./lib/site-environment";
-
-function isInternalPath(pathname: string) {
-  return pathname === "/internal" || pathname.startsWith("/internal/");
-}
+import { NOINDEX_ROBOTS_TAG, SMOKE_TEST_HEADER, decideMiddleware } from "./lib/site-environment";
 
 function internalDashboardResponse(request: NextRequest) {
   const authorized = isInternalDashboardAuthorized(
@@ -32,25 +23,24 @@ function internalDashboardResponse(request: NextRequest) {
 }
 
 export function middleware(request: NextRequest) {
-  const siteEnv = process.env.NEXT_PUBLIC_SITE_ENV;
-  const redirectUrl = getCanonicalRedirectUrl({
+  const decision = decideMiddleware({
     requestUrl: request.url,
-    siteEnv,
+    siteEnv: process.env.NEXT_PUBLIC_SITE_ENV,
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
     hasSmokeTestHeader: request.headers.has(SMOKE_TEST_HEADER),
   });
-  if (redirectUrl) return NextResponse.redirect(redirectUrl, 308);
+  if (decision.type === "redirect") return NextResponse.redirect(decision.location, 308);
 
-  const response = isInternalPath(request.nextUrl.pathname)
+  const response = decision.requireDashboardAuth
     ? internalDashboardResponse(request)
     : NextResponse.next();
-  if (!isProductionSite(siteEnv)) {
-    response.headers.set("X-Robots-Tag", NOINDEX_ROBOTS_TAG);
-  }
+  if (decision.noindex) response.headers.set("X-Robots-Tag", NOINDEX_ROBOTS_TAG);
   return response;
 }
 
 export const config = {
-  // Static build assets don't need host or robots handling.
+  // Static build assets don't need host or robots handling. Files in public/
+  // are served by Workers Static Assets before the Worker runs; see
+  // public/_headers for their robots rule.
   matcher: ["/((?!_next/static|_next/image).*)"],
 };
