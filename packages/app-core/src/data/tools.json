@@ -3984,7 +3984,7 @@
     "content": {
       "tool": {
         "title": "Audio to Text",
-        "subtitle": "Transcribe audio or video files to text from uploads or public links.",
+        "subtitle": "Transcribe audio or video files to text from an upload or a direct file link.",
         "from": "audio/video",
         "to": "text",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
@@ -3993,19 +3993,19 @@
         "title": "How to transcribe audio or video to text",
         "intro": "Follow these steps to turn audio into a readable transcript.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file, or paste a direct link to an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
         "title": "About audio and video transcription",
-        "markdown": "Audio to Text transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "markdown": "Audio to Text transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser for transcription. YouTube, TikTok, SoundCloud, and other webpage links are not supported right now. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or direct links to audio and video files.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -4013,7 +4013,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "Not right now. YouTube, SoundCloud, TikTok, and other webpage links are not supported. Upload the audio or video file, or paste a direct link to one."
         },
         {
           "question": "Why is the first run slower?",
@@ -4059,7 +4059,7 @@
     "content": {
       "tool": {
         "title": "Audio to Transcript",
-        "subtitle": "Transcribe audio or video files to a text transcript from uploads or public links.",
+        "subtitle": "Transcribe audio or video files to a text transcript from an upload or a direct file link.",
         "from": "audio/video",
         "to": "transcript",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
@@ -4068,19 +4068,19 @@
         "title": "How to transcribe audio or video to a transcript",
         "intro": "Follow these steps to turn audio into a readable transcript.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file, or paste a direct link to an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
         "title": "About audio and video transcription",
-        "markdown": "Audio to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "markdown": "Audio to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser for transcription. YouTube, TikTok, SoundCloud, and other webpage links are not supported right now. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or direct links to audio and video files.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -4088,7 +4088,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "Not right now. YouTube, SoundCloud, TikTok, and other webpage links are not supported. Upload the audio or video file, or paste a direct link to one."
         },
         {
           "question": "Why is the first run slower?",
@@ -81478,7 +81478,7 @@
     "content": {
       "tool": {
         "title": "MP3 to Transcript",
-        "subtitle": "Transcribe MP3 audio to a text transcript from uploads or public links.",
+        "subtitle": "Transcribe MP3 audio to a text transcript from an upload or a direct file link.",
         "from": "MP3",
         "to": "transcript",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
@@ -81487,19 +81487,19 @@
         "title": "How to transcribe MP3 to a transcript",
         "intro": "Follow these steps to turn MP3 audio into a readable transcript.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file, or paste a direct link to an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
         "title": "About MP3 transcription",
-        "markdown": "MP3 to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "markdown": "MP3 to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser for transcription. YouTube, TikTok, SoundCloud, and other webpage links are not supported right now. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or direct links to audio and video files.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -81507,7 +81507,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "Not right now. YouTube, SoundCloud, TikTok, and other webpage links are not supported. Upload the audio or video file, or paste a direct link to one."
         },
         {
           "question": "Why is the first run slower?",
@@ -84969,7 +84969,7 @@
     "content": {
       "tool": {
         "title": "MP4 to Transcript",
-        "subtitle": "Transcribe MP4 video to a text transcript from uploads or public links.",
+        "subtitle": "Transcribe MP4 video to a text transcript from an upload or a direct file link.",
         "from": "MP4",
         "to": "transcript",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
@@ -84978,19 +84978,19 @@
         "title": "How to transcribe MP4 to a transcript",
         "intro": "Follow these steps to turn MP4 video into a readable transcript.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file, or paste a direct link to an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
         "title": "About MP4 transcription",
-        "markdown": "MP4 to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "markdown": "MP4 to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser for transcription. YouTube, TikTok, SoundCloud, and other webpage links are not supported right now. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or direct links to audio and video files.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -84998,7 +84998,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "Not right now. YouTube, SoundCloud, TikTok, and other webpage links are not supported. Upload the audio or video file, or paste a direct link to one."
         },
         {
           "question": "Why is the first run slower?",
@@ -97456,7 +97456,7 @@
     "content": {
       "tool": {
         "title": "TikTok to Transcript",
-        "subtitle": "Transcribe TikTok videos to a text transcript from public links or uploads.",
+        "subtitle": "Transcribe a saved TikTok video to a text transcript. TikTok page links are not supported right now.",
         "from": "TikTok",
         "to": "transcript",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
@@ -97465,19 +97465,19 @@
         "title": "How to transcribe TikTok videos to a transcript",
         "intro": "Follow these steps to turn a TikTok video into a readable transcript.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file, or paste a direct link to an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
         "title": "About TikTok transcription",
-        "markdown": "TikTok to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "markdown": "TikTok to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser for transcription. YouTube, TikTok, SoundCloud, and other webpage links are not supported right now. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or direct links to audio and video files.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -97485,7 +97485,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "Not right now. YouTube, SoundCloud, TikTok, and other webpage links are not supported. Upload the audio or video file, or paste a direct link to one."
         },
         {
           "question": "Why is the first run slower?",
@@ -100078,7 +100078,7 @@
     "content": {
       "tool": {
         "title": "Video to Transcript",
-        "subtitle": "Transcribe video files to a text transcript from uploads or public links.",
+        "subtitle": "Transcribe video files to a text transcript from an upload or a direct file link.",
         "from": "video",
         "to": "transcript",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
@@ -100087,19 +100087,19 @@
         "title": "How to transcribe video to a transcript",
         "intro": "Follow these steps to turn video into a readable transcript.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file, or paste a direct link to an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
         "title": "About video transcription",
-        "markdown": "Video to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "markdown": "Video to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser for transcription. YouTube, TikTok, SoundCloud, and other webpage links are not supported right now. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or direct links to audio and video files.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -100107,7 +100107,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "Not right now. YouTube, SoundCloud, TikTok, and other webpage links are not supported. Upload the audio or video file, or paste a direct link to one."
         },
         {
           "question": "Why is the first run slower?",
@@ -103484,7 +103484,7 @@
     "content": {
       "tool": {
         "title": "YouTube to Transcript",
-        "subtitle": "Transcribe YouTube videos to a text transcript from public links or uploads.",
+        "subtitle": "Upload a YouTube video's audio or video file to get a text transcript. YouTube links are not supported right now.",
         "from": "YouTube",
         "to": "transcript",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
@@ -103493,19 +103493,19 @@
         "title": "How to transcribe YouTube videos to a transcript",
         "intro": "Follow these steps to turn a YouTube video into a readable transcript.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file, or paste a direct link to an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
         "title": "About YouTube transcription",
-        "markdown": "YouTube to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "markdown": "YouTube to Transcript transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser for transcription. YouTube, TikTok, SoundCloud, and other webpage links are not supported right now. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or direct links to audio and video files.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -103513,7 +103513,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "Not right now. YouTube, SoundCloud, TikTok, and other webpage links are not supported. Upload the audio or video file, or paste a direct link to one."
         },
         {
           "question": "Why is the first run slower?",
@@ -103562,7 +103562,7 @@
     "content": {
       "tool": {
         "title": "YouTube Transcript Generator",
-        "subtitle": "Generate a text transcript from YouTube videos using public links or uploads.",
+        "subtitle": "Upload a YouTube video's audio or video file to generate a transcript. YouTube links are not supported right now.",
         "from": "YouTube",
         "to": "transcript",
         "accept": ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.m4v"
@@ -103571,19 +103571,19 @@
         "title": "How to generate a YouTube transcript",
         "intro": "Follow these steps to generate a readable transcript from a YouTube video.",
         "steps": [
-          "Upload an audio or video file, or paste a public link.",
+          "Upload an audio or video file, or paste a direct link to an audio or video file.",
           "Wait while we extract the audio and transcribe it.",
           "Download the transcript or copy the text."
         ]
       },
       "infoArticle": {
         "title": "About YouTube transcript generation",
-        "markdown": "YouTube Transcript Generator transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a public link, the server fetches the media and streams it to your browser for transcription. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or public links.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
+        "markdown": "YouTube Transcript Generator transcribes speech from audio or video files. Uploaded files are processed in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser for transcription. YouTube, TikTok, SoundCloud, and other webpage links are not supported right now. The speech model downloads on first use and runs locally.\n\nThis tool is best for interviews, meetings, lectures, and voice notes. Larger files take longer to process and may use more memory.\n\n**Why use this tool**\n\n- Handles uploads or direct links to audio and video files.\n- Creates a plain text transcript you can edit or share.\n- Works with common audio and video formats."
       },
       "faqs": [
         {
           "question": "Do my files get uploaded?",
-          "answer": "Uploads are processed locally in your browser. If you paste a public link, the server fetches the media and streams it to your browser. The model files are downloaded when needed."
+          "answer": "Uploads are processed locally in your browser. If you paste a direct link to an audio or video file, the server fetches the file and streams it to your browser. The model files are downloaded when needed."
         },
         {
           "question": "Which file types are supported?",
@@ -103591,7 +103591,7 @@
         },
         {
           "question": "Can I use YouTube or SoundCloud links?",
-          "answer": "Yes for public links. Private or logged-in content is not supported yet."
+          "answer": "Not right now. YouTube, SoundCloud, TikTok, and other webpage links are not supported. Upload the audio or video file, or paste a direct link to one."
         },
         {
           "question": "Why is the first run slower?",

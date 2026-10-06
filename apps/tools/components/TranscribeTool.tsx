@@ -10,6 +10,9 @@ import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { extractAudioForTranscription } from "@/lib/convert/video";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
 import { getMediaFetchEndpoint } from "@/lib/media-fetch-endpoint";
+import { readMediaFilename } from "@/lib/media-filename-transport";
+import { getUnsupportedTranscriptionLink } from "@/lib/media-link-support";
+import { normalizeBlobPart } from "@/lib/blob-parts";
 
 type ProgressUpdate = {
   progress?: number;
@@ -242,14 +245,12 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       } catch {
         detail = "";
       }
-      const suffix = detail ? `: ${detail}` : "";
-      throw new Error(`Download failed (${response.status})${suffix}`);
+      throw new Error(detail || `Download failed (${response.status})`);
     }
 
     const contentTypeRaw = response.headers.get("content-type") || "";
     const contentType = contentTypeRaw.split(";")[0]?.trim().toLowerCase() || "";
-    const fileNameFromHeader =
-      response.headers.get("x-media-filename")?.trim() || "";
+    const fileNameFromHeader = readMediaFilename(response.headers);
     const fileNameFromUrl = getFileNameFromUrl(url);
     const fileNameCandidate = fileNameFromHeader || fileNameFromUrl;
     const extensionFromHeader =
@@ -317,15 +318,11 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       });
     }
 
-    const blobParts = chunks.map((chunk) => {
-      const slice = chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength);
-      if (slice instanceof SharedArrayBuffer) {
-        const copy = new ArrayBuffer(slice.byteLength);
-        new Uint8Array(copy).set(new Uint8Array(slice));
-        return copy;
-      }
-      return slice;
-    });
+    // normalizeBlobPart never touches the SharedArrayBuffer global, which
+    // doesn't exist on these (not cross-origin isolated) pages.
+    const blobParts = chunks.map((chunk) =>
+      normalizeBlobPart(chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength)),
+    );
     const blob = new Blob(blobParts, { type: contentType || "application/octet-stream" });
     return new File([blob], fileName, {
       type: contentType || "application/octet-stream",
@@ -444,6 +441,12 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
     const parsedUrl = parseUrlInput(urlInput);
     if (!parsedUrl) {
       setErrorMessage("Paste a valid public URL first.");
+      return;
+    }
+
+    const unsupportedLink = getUnsupportedTranscriptionLink(parsedUrl, undefined);
+    if (unsupportedLink) {
+      setErrorMessage(unsupportedLink.message);
       return;
     }
 
@@ -637,7 +640,7 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
                 <input
                   type="url"
                   inputMode="url"
-                  placeholder="Paste a public link (YouTube, SoundCloud, or direct file)"
+                  placeholder="Paste a direct link to an audio or video file"
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -668,7 +671,8 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
                 </Button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Supports public links. Private or logged-in content is not supported yet.
+                Direct links to public audio or video files only. YouTube, TikTok,
+                SoundCloud, and other webpage links are not supported right now.
               </p>
             </div>
           </div>
