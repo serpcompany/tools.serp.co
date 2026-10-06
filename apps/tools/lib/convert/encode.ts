@@ -56,7 +56,13 @@ export async function encodeFromRGBA(
       const width = Math.max(1, Math.round(rgba.width * scale));
       const height = Math.max(1, Math.round(rgba.height * scale));
       iconCtx.imageSmoothingQuality = "high";
-      iconCtx.drawImage(canvas, (size - width) / 2, (size - height) / 2, width, height);
+      iconCtx.drawImage(
+        canvas,
+        Math.round((size - width) / 2),
+        Math.round((size - height) / 2),
+        width,
+        height,
+      );
       const blob =
         "convertToBlob" in icon
           ? await (icon as OffscreenCanvas).convertToBlob({ type: "image/png" })

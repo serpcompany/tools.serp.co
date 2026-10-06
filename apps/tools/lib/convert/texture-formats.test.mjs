@@ -41,7 +41,7 @@ test("ICNS files pass the output check and give back their largest PNG", () => {
 
 test("ICNS files without PNG images fail with a clear message", () => {
   const legacy = buildIcns([{ type: "it32", png: new Uint8Array([1, 2, 3, 4]) }]);
-  assert.throws(() => largestIcnsPng(legacy), /legacy/);
+  assert.throws(() => largestIcnsPng(legacy), /no PNG icon images/);
   assert.throws(() => largestIcnsPng(png), /isn't an ICNS/);
 });
 
@@ -64,9 +64,21 @@ test("KTX 2 round-trips RGBA pixels as sRGB RGBA8 and passes the output check", 
   assert.deepEqual([...back.data], [...image.data]);
 });
 
-test("compressed KTX 2 textures fail with a clear message", () => {
+test("unsupported KTX 2 pixel formats fail with a clear message", () => {
   const ktx2 = encodeKtx2(image);
   // vkFormat lives at byte 12; 145 is BC7_SRGB.
   new DataView(ktx2.buffer).setUint32(12, 145, true);
-  assert.throws(() => decodeKtx2(ktx2), /Compressed KTX2/);
+  assert.throws(() => decodeKtx2(ktx2), /pixel format 145 isn't supported/);
+});
+
+test("truncated KTX files fail with a clear message, not a raw error", () => {
+  assert.throws(() => decodeKtx1(encodeKtx1(image).subarray(0, 40)), /truncated/);
+  assert.throws(() => decodeKtx1(encodeKtx1(image).subarray(0, 70)), /truncated/);
+  assert.throws(() => decodeKtx2(encodeKtx2(image).subarray(0, 30)), /truncated/);
+  assert.throws(() => decodeKtx2(encodeKtx2(image).subarray(0, 120)), /truncated/);
+});
+
+test("KTX 1 output is labelled sRGB, like KTX 2", () => {
+  // glInternalFormat is the 5th header word, at byte 28.
+  assert.equal(new DataView(encodeKtx1(image).buffer).getUint32(28, true), 0x8c43);
 });

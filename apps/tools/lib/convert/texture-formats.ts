@@ -96,7 +96,7 @@ export function largestIcnsPng(bytes: Uint8Array): Uint8Array {
     if (png) return png;
   }
   throw new Error(
-    "This ICNS file only has legacy (pre-PNG) icon images, which aren't supported.",
+    "This ICNS file has no PNG icon images (older JPEG 2000 or bitmap icons aren't supported).",
   );
 }
 
@@ -108,9 +108,10 @@ const KTX1_IDENTIFIER = [
 const GL_UNSIGNED_BYTE = 0x1401;
 const GL_RGB = 0x1907;
 const GL_RGBA = 0x1908;
-const GL_RGBA8 = 0x8058;
+// Canvas pixels are sRGB, so the texture is labelled sRGB (as KTX2 is).
+const GL_SRGB8_ALPHA8 = 0x8c43;
 
-// An uncompressed RGBA8 KTX 1.1 texture with one mip level.
+// An uncompressed sRGB RGBA8 KTX 1.1 texture with one mip level.
 export function encodeKtx1(rgba: RGBA): Uint8Array<ArrayBuffer> {
   const imageSize = rgba.width * rgba.height * 4;
   const out = new Uint8Array(64 + 4 + imageSize);
@@ -121,7 +122,7 @@ export function encodeKtx1(rgba: RGBA): Uint8Array<ArrayBuffer> {
     GL_UNSIGNED_BYTE, // glType
     1, // glTypeSize
     GL_RGBA, // glFormat
-    GL_RGBA8, // glInternalFormat
+    GL_SRGB8_ALPHA8, // glInternalFormat
     GL_RGBA, // glBaseInternalFormat
     rgba.width,
     rgba.height,
@@ -141,6 +142,7 @@ export function decodeKtx1(bytes: Uint8Array): RGBA {
   if (!KTX1_IDENTIFIER.every((byte, i) => bytes[i] === byte)) {
     throw new Error("This isn't a KTX file.");
   }
+  if (bytes.length < 68) throw new Error(TRUNCATED);
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const little = view.getUint32(12, true) === 0x04030201;
   const u32 = (offset: number) => view.getUint32(offset, little);
@@ -155,6 +157,7 @@ export function decodeKtx1(bytes: Uint8Array): RGBA {
     throw new Error("Compressed or non-8-bit KTX textures aren't supported.");
   }
   const dataOffset = 64 + u32(60) + 4;
+  if (dataOffset > bytes.length) throw new Error(TRUNCATED);
   const channels = glFormat === GL_RGBA ? 4 : 3;
   // Rows are padded to 4 bytes.
   const rowBytes = Math.ceil((width * channels) / 4) * 4;
@@ -198,7 +201,13 @@ export function encodeKtx2(rgba: RGBA): Uint8Array<ArrayBuffer> {
 }
 
 export function decodeKtx2(bytes: Uint8Array): RGBA {
-  const container = readKtx2(bytes);
+  let container: ReturnType<typeof readKtx2>;
+  try {
+    // An exact copy: ktx-parse reads through `bytes.buffer` past a subarray.
+    container = readKtx2(bytes.slice());
+  } catch {
+    throw new Error("This isn't a valid KTX2 file, or it is truncated.");
+  }
   const channels =
     container.vkFormat === VK_FORMAT_R8G8B8A8_SRGB ||
     container.vkFormat === VK_FORMAT_R8G8B8A8_UNORM
@@ -207,12 +216,14 @@ export function decodeKtx2(bytes: Uint8Array): RGBA {
           container.vkFormat === VK_FORMAT_R8G8B8_UNORM
         ? 3
         : 0;
-  if (
-    !channels ||
-    container.supercompressionScheme !== KHR_SUPERCOMPRESSION_NONE
-  ) {
+  if (container.supercompressionScheme !== KHR_SUPERCOMPRESSION_NONE) {
     throw new Error(
       "Compressed KTX2 textures (Basis, BCn, ETC, ASTC) aren't supported yet.",
+    );
+  }
+  if (!channels) {
+    throw new Error(
+      `KTX2 pixel format ${container.vkFormat} isn't supported; only 8-bit RGB and RGBA are.`,
     );
   }
   const level = container.levels[0];
@@ -222,15 +233,17 @@ export function decodeKtx2(bytes: Uint8Array): RGBA {
   return toRGBA(level.levelData, width, height, channels, width * channels);
 }
 
+const TRUNCATED = "The texture file is truncated.";
+
 function toRGBA(
   source: Uint8Array,
   width: number,
   height: number,
-  channels: 3 | 4 | number,
+  channels: number,
   rowBytes: number,
 ): RGBA {
   if (!width || source.length < rowBytes * (height - 1) + width * channels) {
-    throw new Error('The texture data is truncated.');
+    throw new Error(TRUNCATED);
   }
   const data = new Uint8ClampedArray(width * height * 4);
   for (let y = 0; y < height; y += 1) {
