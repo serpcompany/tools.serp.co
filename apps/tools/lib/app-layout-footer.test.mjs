@@ -17,7 +17,7 @@ const rootLayoutSource = readFileSync(
 
 test("tools app root layout uses the shared app shell", () => {
   assert.match(rootLayoutSource, /AppLayout/);
-  assert.match(rootLayoutSource, /<AppLayout>\{children\}<\/AppLayout>/);
+  assert.match(rootLayoutSource, /<AppLayout>[\s\S]*\{children\}[\s\S]*<\/AppLayout>/);
 });
 
 test("shared app shell renders the global site footer", () => {

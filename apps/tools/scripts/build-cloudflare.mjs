@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
 
 import { getBuildEnvironmentError } from "./lib/build-environment.mjs";
 
@@ -43,6 +44,12 @@ const buildResult = spawnSync("opennextjs-cloudflare", ["build"], {
 if (buildResult.status !== 0) {
   process.exit(buildResult.status ?? 1);
 }
+
+// The Worker entry (sentry-worker.mjs) tags error reports with this release.
+writeFileSync(
+  ".open-next/release.mjs",
+  `export default ${JSON.stringify(env.NEXT_PUBLIC_RELEASE)};\n`,
+);
 
 const prepareAssetsResult = spawnSync(
   process.execPath,
