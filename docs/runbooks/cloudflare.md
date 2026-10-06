@@ -26,9 +26,9 @@ turn off preview URLs (`preview_urls: false`).
 `NEXT_PUBLIC_SITE_ENV` (`local`, `staging` or `production`) is set by each
 `cf:build:*` script and in each environment's `vars`. Next.js inlines it at
 build time when it is set, so the build command decides it; a test keeps the
-build scripts, `vars` and routes in agreement. A Workers Builds build fails
-unless it is `staging` or `production`, and a build of `main` must be
-`production`. Anything other than `production` is non-production
+build scripts, `vars` and routes in agreement. A Workers Builds build (if one is
+ever reconnected) fails unless it is `staging` or `production`, and a build of
+`main` must be `production`. Anything other than `production` is non-production
 (`apps/tools/lib/site-environment.ts`):
 
 - Every page sends `X-Robots-Tag: noindex, nofollow`, and `robots.txt`
@@ -55,19 +55,22 @@ new version rolls out.
 pnpm -C apps/tools audit:cf:api-smoke --base-url https://staging.tools.serp.co --expect-env staging
 ```
 
-Production deploys come from Cloudflare Workers Builds on every push to `main`
-(only `main` builds). Its settings must be: root directory `/`, build command
-`pnpm -C apps/tools cf:build:production`, deploy command
-`pnpm -C apps/tools exec wrangler deploy --env production`. D1 migrations are
-not applied by the build; run `db:migrate:production` before merging code that
-needs them.
+The **Deploy** workflow (`.github/workflows/deploy.yml`) deploys each
+environment from its branch: a push to `staging` deploys Staging, and a push to
+`main`, which only changes by promotion, deploys Production. Each run applies
+that environment's D1 migrations (`db:migrate:<env>`), runs `deploy:<env>`, then
+the environment smoke check and the browser smoke test through the Worker's
+`*.workers.dev` host. It authenticates with the `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` repository secrets (an account-owned token for Workers,
+D1 and the `serp.co` zone's Workers routes). Cloudflare Workers Builds is
+disconnected, so this workflow is the only deploy path.
 
 ```bash
 pnpm -C apps/tools cf:preview                 # local build + wrangler dev (top-level config)
 pnpm -C apps/tools cf:preview:staging         # production runtime with staging config
 pnpm -C apps/tools cf:preview:production      # production runtime with production config
 pnpm -C apps/tools deploy:staging
-pnpm -C apps/tools deploy:production          # normally run by Workers Builds
+pnpm -C apps/tools deploy:production          # normally run by the Deploy workflow
 ```
 
 Secrets are per Worker: `wrangler secret put <NAME> --env staging` or
