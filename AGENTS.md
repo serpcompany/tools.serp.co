@@ -34,9 +34,10 @@ one issue, one branch, one PR, one squash commit on `staging`, the base branch.
   blocking fixes, and record the outcome in the PR. Agents never merge without
   the owner's approval.
 - A merge to `staging` deploys Staging (migrations, deploy, smoke tests).
-  Production changes only when the owner promotes `staging` to `main` with a
-  fast-forward (`git fetch origin && git push origin origin/staging:main`),
-  which deploys Production the same way (`docs/runbooks/cloudflare.md`).
+  Production changes only when the owner promotes a green `staging` commit to
+  `main` with a fast-forward, which deploys Production the same way. Hotfixes
+  are PRs into `main`, merged back into `staging` right after. Commands and
+  rollback: `docs/runbooks/cloudflare.md`.
 
 ## Scoped policies
 

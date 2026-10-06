@@ -1,11 +1,14 @@
 # Browser smoke test
 
 `apps/tools/scripts/smoke-browser.mjs` drives the critical tools in Chromium
-against a running Worker. CI runs it in the `smoke` job of
-`.github/workflows/check.yml`: it builds the Worker with the local config,
-applies every migration to a fresh local D1 with Wrangler (the same command
-staging and production use), starts `wrangler dev`, and runs the script with
-`--require-dashboard`.
+against a running Worker. CI runs it in two places:
+
+- the `smoke` job of `.github/workflows/check.yml`, on every PR: it builds the
+  Worker with the local config, applies every migration to a fresh local D1
+  with Wrangler, starts `wrangler dev`, and runs the script with
+  `--require-dashboard`;
+- the Deploy workflow, after each Staging deploy, through the staging Worker's
+  `*.workers.dev` host. It never runs against Production.
 
 ## What it checks
 
@@ -44,12 +47,12 @@ rows can satisfy it.
 
 ## Run it against a deployment
 
-Every run writes real tool runs into that environment's D1, so use staging:
+Every run writes real tool runs into that environment's D1, so use staging,
+never production:
 
 ```bash
 pnpm -C apps/tools smoke:browser --base-url https://staging.tools.serp.co
 ```
 
-A deployment's `*.workers.dev` host works too. Once #164 lands, those hosts 308
-to the canonical host, and the smoke-test header the script sends skips that
-redirect.
+A deployment's `*.workers.dev` host works too: it 308s to the canonical host,
+and the smoke-test header the script sends skips that redirect.

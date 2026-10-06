@@ -26,9 +26,9 @@ turn off preview URLs (`preview_urls: false`).
 `NEXT_PUBLIC_SITE_ENV` (`local`, `staging` or `production`) is set by each
 `cf:build:*` script and in each environment's `vars`. Next.js inlines it at
 build time when it is set, so the build command decides it; a test keeps the
-build scripts, `vars` and routes in agreement. A Workers Builds build (if one is
-ever reconnected) fails unless it is `staging` or `production`, and a build of
-`main` must be `production`. Anything other than `production` is non-production
+build scripts, `vars` and routes in agreement. A Workers Builds build fails
+unless it is `staging` or `production`, and a build of `main` must be
+`production`. Anything other than `production` is non-production
 (`apps/tools/lib/site-environment.ts`):
 
 - Every page sends `X-Robots-Tag: noindex, nofollow`, and `robots.txt`
@@ -57,13 +57,35 @@ pnpm -C apps/tools audit:cf:api-smoke --base-url https://staging.tools.serp.co -
 
 The **Deploy** workflow (`.github/workflows/deploy.yml`) deploys each
 environment from its branch: a push to `staging` deploys Staging, and a push to
-`main`, which only changes by promotion, deploys Production. Each run applies
-that environment's D1 migrations (`db:migrate:<env>`), runs `deploy:<env>`, then
-the environment smoke check and the browser smoke test through the Worker's
-`*.workers.dev` host. It authenticates with the `CLOUDFLARE_API_TOKEN`
-repository secret (an account-owned token for Workers, D1 and the `serp.co`
-zone's Workers routes) against the SERP account id above. Cloudflare Workers Builds is
-disconnected, so this workflow is the only deploy path.
+`main`, which only changes by promotion, deploys Production.
+
+- Each run builds (`cf:build:<env>`), applies that environment's D1 migrations
+  (`db:migrate:<env>`), runs `wrangler deploy --env <env>`, then the
+  environment smoke check through the Worker's `*.workers.dev` host.
+- Staging also runs the browser smoke test ([browser-smoke.md](browser-smoke.md)).
+  Production doesn't, because the test records real tool runs.
+- Only the migrate and deploy steps see the `CLOUDFLARE_API_TOKEN` repository
+  secret (an account-owned SERP token for Workers, D1 and the `serp.co` zone's
+  Workers routes).
+- A run for a commit that is no longer its branch's head refuses to deploy.
+
+Until the first promotion has deployed Production through this workflow,
+Cloudflare Workers Builds also deploys every push to `main`. It is disconnected
+after that (#188).
+
+Promote only a commit whose staging Deploy run passed:
+
+```bash
+git fetch origin && gh run list --workflow deploy.yml --branch staging --commit "$(git rev-parse origin/staging)"
+git push origin origin/staging:main
+```
+
+The promotion push needs the owner's bypass on the `main` ruleset (#188). If a
+production deploy turns out bad, roll back with
+`pnpm -C apps/tools exec wrangler rollback --env production`. Rollback doesn't
+undo migrations, so a migration must keep working with the previous version of
+the code. A hotfix is a PR into `main`; merge `main` back into `staging` right
+after.
 
 ```bash
 pnpm -C apps/tools cf:preview                 # local build + wrangler dev (top-level config)
