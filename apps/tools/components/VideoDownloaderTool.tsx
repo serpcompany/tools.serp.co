@@ -18,6 +18,7 @@ import {
   DOWNLOADER_EXTENSION_URL,
 } from "@/lib/downloader-extension-cta";
 import { getDownloaderMediaFetchEndpoint } from "@/lib/media-fetch-endpoint";
+import { readMediaFilename } from "@/lib/media-filename-transport";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
 
@@ -271,7 +272,7 @@ async function downloadUrlToBlob(
 
   const contentTypeRaw = response.headers.get("content-type") || "";
   const contentType = contentTypeRaw.split(";")[0]?.trim().toLowerCase() || "";
-  const fileNameFromHeader = response.headers.get("x-media-filename")?.trim() || "";
+  const fileNameFromHeader = readMediaFilename(response.headers);
   const fileNameFromUrl = getFileNameFromUrl(url);
   const fileNameCandidate = fileNameFromHeader || fileNameFromUrl;
   const extensionFromHeader =

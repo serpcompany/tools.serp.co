@@ -10,6 +10,7 @@ import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { extractAudioForTranscription } from "@/lib/convert/video";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
 import { getMediaFetchEndpoint } from "@/lib/media-fetch-endpoint";
+import { readMediaFilename } from "@/lib/media-filename-transport";
 
 type ProgressUpdate = {
   progress?: number;
@@ -248,8 +249,7 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
 
     const contentTypeRaw = response.headers.get("content-type") || "";
     const contentType = contentTypeRaw.split(";")[0]?.trim().toLowerCase() || "";
-    const fileNameFromHeader =
-      response.headers.get("x-media-filename")?.trim() || "";
+    const fileNameFromHeader = readMediaFilename(response.headers);
     const fileNameFromUrl = getFileNameFromUrl(url);
     const fileNameCandidate = fileNameFromHeader || fileNameFromUrl;
     const extensionFromHeader =
