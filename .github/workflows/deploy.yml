@@ -76,6 +76,25 @@ jobs:
           restore-keys: |
             nextjs-deploy-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
+      # Fails fast, with Cloudflare's own answer, when the token is invalid or
+      # can't reach this account's D1. Prints no secret values.
+      - name: Check the Cloudflare token
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          api="https://api.cloudflare.com/client/v4"
+          auth="Authorization: Bearer ${CLOUDFLARE_API_TOKEN}"
+          account="$(curl -sS -H "$auth" "$api/accounts/${CLOUDFLARE_ACCOUNT_ID}/tokens/verify")"
+          user="$(curl -sS -H "$auth" "$api/user/tokens/verify")"
+          d1="$(curl -sS -H "$auth" "$api/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database?per_page=1")"
+          echo "account-owned token: $(jq -c '{success, status: .result.status, errors: [.errors[]?.code]}' <<<"$account")"
+          echo "user token:          $(jq -c '{success, status: .result.status, errors: [.errors[]?.code]}' <<<"$user")"
+          echo "SERP D1 access:      $(jq -c '{success, errors: [.errors[]? | {code, message}]}' <<<"$d1")"
+          if [ "$(jq -r .success <<<"$d1")" != "true" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN can't use D1 in the SERP account. Store an active token with D1 Write and Workers Scripts Write on that account (docs/runbooks/cloudflare.md)."
+            exit 1
+          fi
+
       # Build first: a failed build must not leave migrations applied.
       - name: Build
         run: pnpm -C apps/tools cf:build:${DEPLOY_ENV}
