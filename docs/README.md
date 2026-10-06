@@ -36,6 +36,7 @@ dated observations belong in `docs/audits`; advisory inputs belong in
 ### Runbooks
 
 - [Cloudflare operations](./runbooks/cloudflare.md)
+- [Browser smoke test](./runbooks/browser-smoke.md)
 
 ## Historical evidence
 

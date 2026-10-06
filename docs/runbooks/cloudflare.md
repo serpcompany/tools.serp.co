@@ -251,3 +251,6 @@ pnpm -C apps/tools typecheck
 pnpm -C apps/tools cf:build
 pnpm -C apps/tools audit:cf:api-smoke -- --base-url <deployed-preview-url> --no-fail
 ```
+
+The browser smoke test can also run against a deployment; see
+[browser-smoke.md](browser-smoke.md).

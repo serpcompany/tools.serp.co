@@ -25,6 +25,10 @@ catalog structural verification, and the production-faithful Cloudflare build.
 It does not exercise deployed systems or run link checks, canaries, benchmarks,
 syncs, uploads, deploys, or remote migrations.
 
+CI also runs a browser smoke test against the real Worker on a freshly
+migrated local D1 (the `smoke` job). What it covers and how to run it locally
+or against staging: [docs/runbooks/browser-smoke.md](docs/runbooks/browser-smoke.md).
+
 ## Test suite
 
 Use Node.js `>=20 <23` and pnpm `10.4.1`. From a fresh clone:

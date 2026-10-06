@@ -45,3 +45,4 @@ tmp/
 .playwright-mcp/
 logs/
 .wrangler/
+smoke-artifacts/
