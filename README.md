@@ -25,6 +25,20 @@ catalog structural verification, and the production-faithful Cloudflare build.
 It does not exercise deployed systems or run link checks, canaries, benchmarks,
 syncs, uploads, deploys, or remote migrations.
 
+CI also runs a browser smoke test (the `smoke` job in
+`.github/workflows/check.yml`). It builds the Worker with the local config,
+applies every migration to a fresh local D1 with Wrangler, starts
+`wrangler dev`, and drives the critical tools in Chromium: it converts a PNG to
+JPEG and checks the output bytes, converts HTML to Markdown, checks that the
+telemetry writes return 200, and reads the runs back from `/internal/tools/`.
+To run it against a local or deployed Worker:
+
+```bash
+pnpm -C apps/tools smoke:browser --base-url http://localhost:8787
+```
+
+Set `INTERNAL_DASHBOARD_TOKEN` to include the dashboard read-back step.
+
 ## Test suite
 
 Use Node.js `>=20 <23` and pnpm `10.4.1`. From a fresh clone:

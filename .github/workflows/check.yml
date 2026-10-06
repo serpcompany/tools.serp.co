@@ -35,3 +35,59 @@ jobs:
 
       - name: Run deterministic production check
         run: pnpm check
+
+  # Builds the real Worker, applies every migration to a fresh local D1 with
+  # Wrangler (as staging and production do), and drives the critical tools in
+  # Chromium, including the telemetry write and dashboard read paths.
+  smoke:
+    runs-on: ubuntu-latest
+    env:
+      WRANGLER_SEND_METRICS: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install pinned browser runtime
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build the Worker with the local config
+        run: pnpm -C apps/tools cf:build
+
+      - name: Apply migrations to a fresh local D1
+        run: pnpm -C apps/tools db:migrate:local
+
+      - name: Start the Worker
+        run: |
+          # A throwaway dashboard token for this run's local Worker only.
+          token="$(openssl rand -hex 16)"
+          echo "::add-mask::$token"
+          echo "INTERNAL_DASHBOARD_TOKEN=$token" >> "$GITHUB_ENV"
+          nohup pnpm -C apps/tools exec wrangler dev --port 8787 \
+            --var "INTERNAL_DASHBOARD_TOKEN:$token" > wrangler-dev.log 2>&1 &
+          for attempt in $(seq 1 90); do
+            curl -sf -o /dev/null http://localhost:8787/robots.txt && exit 0
+            sleep 2
+          done
+          cat wrangler-dev.log
+          exit 1
+
+      - name: Run the browser smoke test
+        run: pnpm -C apps/tools smoke:browser --base-url http://localhost:8787
+
+      - name: Show the Worker log
+        if: failure()
+        run: cat wrangler-dev.log
