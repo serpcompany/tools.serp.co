@@ -69,9 +69,9 @@ environment from its branch: a push to `staging` deploys Staging, and a push to
   Workers routes).
 - A run for a commit that is no longer its branch's head refuses to deploy.
 
-Cloudflare Workers Builds was disconnected from both Workers on 2026-10-06,
-after the first promotion deployed Production through this workflow (#188), so
-this workflow is the only deploy path.
+Cloudflare Workers Builds was disconnected from the production Worker on
+2026-10-06, after the first promotion deployed Production through this workflow
+(#188); the staging Worker never had it. This workflow is the only deploy path.
 
 Promote only a commit whose staging Deploy run passed:
 
