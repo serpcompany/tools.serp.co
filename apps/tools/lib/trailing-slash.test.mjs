@@ -25,6 +25,19 @@ test("a dot only makes a file with a known extension", () => {
   assert.equal(canonicalPath("/v1.2"), "/v1.2/");
 });
 
+test("old routes go to their canonical page in one step", () => {
+  assert.equal(canonicalPath("/download-kajab-videos"), "/download-kajabi-videos/");
+  assert.equal(canonicalPath("/download-kajab-videos/"), "/download-kajabi-videos/");
+  assert.equal(canonicalPath("/png-to-png"), "/compress-png/");
+  assert.equal(canonicalPath("/loom-video-downloader/"), "/download-loom-videos/");
+  assert.equal(canonicalPath("/download-kajabi-videos/"), "/download-kajabi-videos/");
+});
+
+test("vendor file types used by the PDF viewer are files", () => {
+  assert.equal(canonicalPath("/vendor/pdfjs/cmaps/Adobe-GB1-UCS2.bcmap/"), "/vendor/pdfjs/cmaps/Adobe-GB1-UCS2.bcmap");
+  assert.equal(canonicalPath("/vendor/x/viewer.ftl/"), "/vendor/x/viewer.ftl");
+});
+
 test("/api, /.well-known and framework paths are left exactly as requested", () => {
   for (const path of [
     "/api", "/api/", "/API", "/api/telemetry", "/api/telemetry/", "/api/x.json/",

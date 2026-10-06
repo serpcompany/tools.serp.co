@@ -371,6 +371,13 @@ function environmentChecks(args) {
       expect: (response) => response.status === 308 && locationPath(response) === "/robots.txt",
       details: (response) => ({ location: response.headers.get("location") }),
     },
+    {
+      name: "an old route 308s straight to its canonical page",
+      url: buildUrl(args.baseUrl, "/download-kajab-videos"),
+      expect: (response) =>
+        response.status === 308 && locationPath(response) === "/download-kajabi-videos/",
+      details: (response) => ({ location: response.headers.get("location") }),
+    },
     ...["/api/telemetry", "/api/telemetry/"].map((path) => ({
       name: `POST ${path} is never redirected`,
       url: buildUrl(args.baseUrl, path),
@@ -383,6 +390,16 @@ function environmentChecks(args) {
   );
 
   if (args.platformUrl) {
+    checks.push({
+      name: "platform host 308s /api to the canonical host, path unchanged",
+      url: buildUrl(args.platformUrl, "/api/telemetry"),
+      skipSmokeTestHeader: true,
+      retryForMs: 30_000,
+      expect: (response) =>
+        response.status === 308 &&
+        response.headers.get("location") === `${canonical}/api/telemetry`,
+      details: (response) => ({ location: response.headers.get("location") }),
+    });
     checks.push({
       name: "platform host 308s to the canonical host",
       url: buildUrl(args.platformUrl, "/png-to-jpg/?smoke=1"),
