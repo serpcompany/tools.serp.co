@@ -45,7 +45,7 @@ real reusable contract justifies moving it into a package.
 | Executable Tool behavior                       | Dispatch, workers, components, and API routes under `apps/tools`               | Code owns what executes. Registry flags and dependency names are not sufficient provenance by themselves.                                 |
 | Related applications and network brands        | JSON data under `packages/app-core/src/data`                                   | These are separate catalogs and must not be inferred from Tool names or routes.                                                           |
 | Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                        | Imports show actual consumption; planner fields do not override manifests or code.                                                        |
-| Production Worker configuration                | `apps/tools/wrangler.jsonc`                                                    | Owns Worker name, route, bindings, compatibility settings, and production/preview resource ids.                                           |
+| Worker configuration                           | `apps/tools/wrangler.jsonc`                                                    | Only Wrangler config. Top level is local-only; `env.staging` and `env.production` own Worker names, routes, bindings and resource ids.   |
 | Cloudflare build behavior                      | `apps/tools/open-next.config.ts` and `apps/tools/scripts/build-cloudflare.mjs` | Owns the OpenNext artifact and incremental-cache integration.                                                                             |
 | D1 schema                                      | Drizzle schema in `packages/tool-telemetry/src/schema.ts`                      | `db:generate` writes ordered SQL to `apps/tools/migrations`; a test fails when schema and migrations drift.                               |
 | Runtime observations                           | D1 `tool_runs` and derived `tool_status`                                       | Time-bound evidence for instrumented Tool ids, not catalog or work state.                                                                 |
@@ -63,10 +63,10 @@ to the `tools-serp-co` Cloudflare Worker and routed to `tools.serp.co`.
 
 - Workers Static Assets serves the generated application assets through the
   `ASSETS` binding.
-- R2 backs the incremental cache through `NEXT_INC_CACHE_R2_BUCKET`, with
-  separate production and preview buckets.
-- D1 stores telemetry through `SERP_TOOLS_DB`, with separate production and
-  preview database ids and migrations owned by `apps/tools/migrations`.
+- R2 backs the incremental cache through `NEXT_INC_CACHE_R2_BUCKET`, with one
+  bucket per environment (local, staging, production).
+- D1 stores telemetry through `SERP_TOOLS_DB`, with one database per
+  environment and migrations owned by `apps/tools/migrations`.
 - `WORKER_SELF_REFERENCE` is the Worker service binding used by the OpenNext
   runtime.
 - Large FFmpeg/WASM assets are hosted separately at

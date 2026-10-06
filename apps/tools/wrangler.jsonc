@@ -7,16 +7,6 @@
 		"nodejs_compat",
 		"global_fetch_strictly_public"
 	],
-	"routes": [
-		{
-			"pattern": "tools.serp.co",
-			"custom_domain": true
-		}
-	],
-	"vars": {
-		"NEXT_PUBLIC_ASSETS_BASE_URL": "https://assets.tools.serp.co",
-		"NEXT_PUBLIC_SITE_URL": "https://tools.serp.co"
-	},
 	"observability": {
 		"enabled": true,
 		"head_sampling_rate": 1
@@ -28,19 +18,21 @@
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"
 	},
+	"vars": {
+		"NEXT_PUBLIC_ASSETS_BASE_URL": "https://assets.tools.serp.co",
+		"NEXT_PUBLIC_SITE_URL": "http://localhost:8787"
+	},
 	"r2_buckets": [
 		{
 			"binding": "NEXT_INC_CACHE_R2_BUCKET",
-			"bucket_name": "tools-serp-co-inc-cache",
-			"preview_bucket_name": "tools-serp-co-inc-cache-preview"
+			"bucket_name": "tools-serp-co-inc-cache-local"
 		}
 	],
 	"d1_databases": [
 		{
 			"binding": "SERP_TOOLS_DB",
-			"database_name": "serp-tools-prod",
-			"database_id": "da3d6222-cf0f-41fd-a8fb-4dc3e7d890db",
-			"preview_database_id": "69ab9290-579f-4537-96a0-7d0dc3bede2f",
+			"database_name": "serp-tools-local",
+			"database_id": "00000000-0000-0000-0000-000000000000",
 			"migrations_dir": "migrations"
 		}
 	],
@@ -50,5 +42,76 @@
 			"service": "tools-serp-co"
 		}
 	],
-	"workers_dev": true
+	"env": {
+		"staging": {
+			"name": "tools-serp-co-staging",
+			"routes": [
+				{
+					"pattern": "staging.tools.serp.co",
+					"custom_domain": true
+				}
+			],
+			"workers_dev": true,
+			"preview_urls": false,
+			"vars": {
+				"NEXT_PUBLIC_ASSETS_BASE_URL": "https://assets.tools.serp.co",
+				"NEXT_PUBLIC_SITE_URL": "https://staging.tools.serp.co"
+			},
+			"r2_buckets": [
+				{
+					"binding": "NEXT_INC_CACHE_R2_BUCKET",
+					"bucket_name": "tools-serp-co-inc-cache-preview"
+				}
+			],
+			"d1_databases": [
+				{
+					"binding": "SERP_TOOLS_DB",
+					"database_name": "serp-tools-preview",
+					"database_id": "69ab9290-579f-4537-96a0-7d0dc3bede2f",
+					"migrations_dir": "migrations"
+				}
+			],
+			"services": [
+				{
+					"binding": "WORKER_SELF_REFERENCE",
+					"service": "tools-serp-co-staging"
+				}
+			]
+		},
+		"production": {
+			"name": "tools-serp-co",
+			"routes": [
+				{
+					"pattern": "tools.serp.co",
+					"custom_domain": true
+				}
+			],
+			"workers_dev": true,
+			"preview_urls": false,
+			"vars": {
+				"NEXT_PUBLIC_ASSETS_BASE_URL": "https://assets.tools.serp.co",
+				"NEXT_PUBLIC_SITE_URL": "https://tools.serp.co"
+			},
+			"r2_buckets": [
+				{
+					"binding": "NEXT_INC_CACHE_R2_BUCKET",
+					"bucket_name": "tools-serp-co-inc-cache"
+				}
+			],
+			"d1_databases": [
+				{
+					"binding": "SERP_TOOLS_DB",
+					"database_name": "serp-tools-prod",
+					"database_id": "da3d6222-cf0f-41fd-a8fb-4dc3e7d890db",
+					"migrations_dir": "migrations"
+				}
+			],
+			"services": [
+				{
+					"binding": "WORKER_SELF_REFERENCE",
+					"service": "tools-serp-co"
+				}
+			]
+		}
+	}
 }

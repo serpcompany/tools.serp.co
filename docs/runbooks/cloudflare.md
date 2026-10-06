@@ -7,10 +7,35 @@ database, and cache bindings.
 
 - Cloudflare account: `SERP`
 - Account ID: `cec5f04e1d18bcc65f2be0aefb04f059`
-- Worker name: `tools-serp-co`
-- Worker preview URL: `https://tools-serp-co.serpcompany.workers.dev`
-- Production host after cutover: `https://tools.serp.co`
-- Runtime config source of truth: `apps/tools/wrangler.jsonc`
+- Config: `apps/tools/wrangler.jsonc` is the only Wrangler config. Its top level
+  is local-only and never deployed; every deploy and remote command passes
+  `--env staging` or `--env production`.
+
+## Environments
+
+| Environment | Worker                  | Canonical host                  | D1                   | R2 incremental cache              |
+| ----------- | ----------------------- | ------------------------------- | -------------------- | --------------------------------- |
+| Local       | (not deployed)          | `http://localhost:8787`         | `serp-tools-local`   | `tools-serp-co-inc-cache-local`   |
+| Staging     | `tools-serp-co-staging` | `https://staging.tools.serp.co` | `serp-tools-preview` | `tools-serp-co-inc-cache-preview` |
+| Production  | `tools-serp-co`         | `https://tools.serp.co`         | `serp-tools-prod`    | `tools-serp-co-inc-cache`         |
+
+Staging reuses the former preview D1 database and R2 bucket. Both deployed
+environments keep their `*.workers.dev` URL (`workers_dev: true`) for CI and
+turn off preview URLs (`preview_urls: false`).
+
+Production deploys come from Cloudflare Workers Builds on every push to `main`.
+Its deploy command must be `pnpm -C apps/tools deploy:production`.
+
+```bash
+pnpm -C apps/tools cf:preview                 # local build + wrangler dev (top-level config)
+pnpm -C apps/tools cf:preview:staging         # production runtime with staging config
+pnpm -C apps/tools cf:preview:production      # production runtime with production config
+pnpm -C apps/tools deploy:staging
+pnpm -C apps/tools deploy:production          # normally run by Workers Builds
+```
+
+Secrets are per Worker: `wrangler secret put <NAME> --env staging` or
+`--env production`.
 
 Do not commit Cloudflare API tokens, dashboard tokens, legacy platform env
 dumps, or raw database credentials. Secrets belong in Cloudflare Worker secrets
@@ -21,24 +46,12 @@ or the deployment system.
 The app writes tool-run telemetry to Cloudflare D1 through the Worker binding
 `SERP_TOOLS_DB`.
 
-Production binding:
+Every environment uses the same binding name, Drizzle schema, migration
+directory (`apps/tools/migrations`) and `d1_migrations` ledger, with its own
+database (see Environments).
 
-- Binding: `SERP_TOOLS_DB`
-- Database name: `serp-tools-prod`
-- Database ID: `da3d6222-cf0f-41fd-a8fb-4dc3e7d890db`
-- Migration directory: `apps/tools/migrations`
-
-Preview binding:
-
-- Binding: `SERP_TOOLS_DB`
-- Preview database ID: `69ab9290-579f-4537-96a0-7d0dc3bede2f`
-- Migration directory: `apps/tools/migrations`
-
-Deploy-output note: with Wrangler `4.103.0`, the binding summary printed by
-`wrangler deploy` and `wrangler deploy --dry-run` shows `preview_database_id`
-when that field exists. The project config still sets the production deploy
-database through `database_id`; use the explicit migration commands below to
-target preview versus production.
+- Production: `serp-tools-prod` (`da3d6222-cf0f-41fd-a8fb-4dc3e7d890db`)
+- Staging: `serp-tools-preview` (`69ab9290-579f-4537-96a0-7d0dc3bede2f`)
 
 The D1 schema is intentionally narrower than the legacy Postgres schema. D1
 currently stores only telemetry tables needed by `/api/telemetry` and the
@@ -124,31 +137,22 @@ Telemetry is D1 only. If the binding is unavailable, the endpoint returns HTTP
 
 ## Access Paths
 
-Supported project commands:
+Migration commands name their environment. Apply to staging and verify before
+production. Never use `--preview`: it targets a binding's
+`preview_database_id`, not the staging environment.
 
 ```bash
-pnpm -C apps/tools d1:migrate:preview
-pnpm -C apps/tools d1:migrate:prod
-pnpm -C apps/tools d1:import:preview
-pnpm -C apps/tools d1:import:prod
+pnpm -C apps/tools db:migrations:list:local
+pnpm -C apps/tools db:migrate:local
+pnpm -C apps/tools db:migrations:list:staging
+pnpm -C apps/tools db:migrate:staging
+pnpm -C apps/tools db:migrations:list:production
+pnpm -C apps/tools db:migrate:production
 ```
-
-Migration status through Wrangler:
-
-```bash
-pnpm -C apps/tools exec wrangler d1 migrations list SERP_TOOLS_DB --remote --preview
-pnpm -C apps/tools exec wrangler d1 migrations list SERP_TOOLS_DB --remote
-```
-
-The legacy reconciliation importer accepts an explicit source with
-`--source <protected-path>`. Its repository `tmp/` defaults are temporary
-compatibility behavior tracked for retirement by GitHub issues #34 and #61;
-do not treat that directory as durable artifact storage. Production exports
-must remain outside the repository and under human control.
 
 Per repo policy, do not run ad-hoc SQL or database shell commands against local,
 preview, staging, or production databases unless the user explicitly approves
-that operation. Prefer the project migration and import scripts above.
+that operation. Prefer the project migration scripts above.
 
 Dashboard access:
 
@@ -166,9 +170,8 @@ OpenNext uses an R2 incremental cache with Cloudflare regional cache in
 
 R2 buckets:
 
-- Production incremental cache: `tools-serp-co-inc-cache`
-- Preview incremental cache: `tools-serp-co-inc-cache-preview`
-- Worker binding: `NEXT_INC_CACHE_R2_BUCKET`
+- Worker binding: `NEXT_INC_CACHE_R2_BUCKET`, one bucket per environment (see
+  Environments).
 
 Worker-level settings in `apps/tools/wrangler.jsonc`:
 
