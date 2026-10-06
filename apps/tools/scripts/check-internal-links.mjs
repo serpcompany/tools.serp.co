@@ -6,8 +6,7 @@
 //   node scripts/check-internal-links.mjs --base-url http://localhost:8787
 //
 // It visits the seed pages below (one per section layout) plus a spread of the
-// pages the home page links to. Every link found must be slashed; at most
-// MAX_STATUS_CHECKS distinct links (all seed-page links first) are fetched.
+// pages the home page links to, then fetches every distinct link found.
 
 const SMOKE_TEST_HEADER = "x-tools-serp-smoke-test";
 // Pages that render sections the home page doesn't reach.
@@ -21,7 +20,8 @@ const SEED_PATHS = [
   "/categories/",
 ];
 const MAX_DEEP_PAGES = 20;
-const MAX_STATUS_CHECKS = 400;
+const REQUEST_TIMEOUT_MS = 15_000;
+const CONCURRENCY = 16;
 // Last path segment with a file extension: never slashed.
 const FILE_PATTERN = /\/[^/]+\.[a-z0-9]+$/i;
 // Paths that aren't pages.
@@ -45,6 +45,7 @@ async function get(pathname) {
   return fetch(`${origin}${pathname}`, {
     redirect: "manual",
     headers: { [SMOKE_TEST_HEADER]: "1" },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 }
 
@@ -68,7 +69,7 @@ async function visit(pathname) {
   visited.add(pathname);
   const response = await get(pathname);
   if (response.status !== 200) {
-    problems.push(`${pathname}: seed page returned ${response.status}`);
+    problems.push(`${pathname}: page returned ${response.status}`);
     return;
   }
   for (const link of internalLinks(await response.text())) {
@@ -82,29 +83,31 @@ const fromHome = [...pages].filter(([link, from]) => from === "/" && !FILE_PATTE
 const step = Math.max(1, Math.floor(fromHome.length / MAX_DEEP_PAGES));
 for (let i = 0; i < fromHome.length; i += step) await visit(fromHome[i][0]);
 
-const seedLinks = new Set([...pages].filter(([, from]) => SEED_PATHS.includes(from)).map(([link]) => link));
 for (const [link, from] of pages) {
   if (!FILE_PATTERN.test(link) && !link.endsWith("/")) {
     problems.push(`${link} (on ${from}): page link without a trailing slash`);
   }
 }
-// Seed-page links first, then the rest, up to the cap.
-const queue = [...pages]
-  .filter(([link]) => FILE_PATTERN.test(link) || link.endsWith("/"))
-  .sort(([a], [b]) => Number(seedLinks.has(b)) - Number(seedLinks.has(a)))
-  .slice(0, MAX_STATUS_CHECKS);
+// Pages already visited returned 200; fetch everything else.
+const queue = [...pages].filter(
+  ([link]) => (FILE_PATTERN.test(link) || link.endsWith("/")) && !visited.has(link),
+);
 const statusChecked = queue.length;
 async function checkNext() {
   for (let entry = queue.shift(); entry; entry = queue.shift()) {
     const [link, from] = entry;
-    const response = await get(link);
-    await response.body?.cancel();
-    if (response.status !== 200) {
-      problems.push(`${link} (on ${from}): returned ${response.status}`);
+    try {
+      const response = await get(link);
+      await response.body?.cancel();
+      if (response.status !== 200) {
+        problems.push(`${link} (on ${from}): returned ${response.status}`);
+      }
+    } catch (error) {
+      problems.push(`${link} (on ${from}): ${error.name === "TimeoutError" ? "timed out" : error.message}`);
     }
   }
 }
-await Promise.all(Array.from({ length: 8 }, checkNext));
+await Promise.all(Array.from({ length: CONCURRENCY }, checkNext));
 problems.sort();
 
 console.log(
