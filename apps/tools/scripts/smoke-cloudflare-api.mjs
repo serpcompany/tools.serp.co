@@ -286,7 +286,9 @@ function canonicalOrigin(expectEnv) {
   return new URL(siteUrl).origin;
 }
 
+// Must match the GTM id in gtag-manager.tsx (pinned by a test).
 const GTM_CONTAINER = "GTM-PP9W77LK";
+const ADSENSE_SCRIPT = "pagead/js/adsbygoogle.js";
 
 function environmentChecks(args) {
   const checks = [];
@@ -309,19 +311,23 @@ function environmentChecks(args) {
       details: (_response, bytes) => ({ body: bytes.toString("utf8").slice(0, 200) }),
     },
     {
-      name: `X-Robots-Tag and analytics match ${args.expectEnv}`,
+      name: `X-Robots-Tag, analytics and ads match ${args.expectEnv}`,
       url: buildUrl(args.baseUrl, "/"),
       expect: (response, bytes) => {
         const tag = response.headers.get("x-robots-tag") ?? "";
         const hasGtm = bytes.includes(Buffer.from(GTM_CONTAINER));
+        const hasAdSense = bytes.includes(Buffer.from(ADSENSE_SCRIPT));
         return (
           response.status === 200 &&
-          (production ? !tag.includes("noindex") && hasGtm : tag.includes("noindex") && !hasGtm)
+          (production
+            ? !tag.includes("noindex") && hasGtm && hasAdSense
+            : tag.includes("noindex") && !hasGtm && !hasAdSense)
         );
       },
       details: (response, bytes) => ({
         xRobotsTag: response.headers.get("x-robots-tag"),
         gtm: bytes.includes(Buffer.from(GTM_CONTAINER)),
+        adsense: bytes.includes(Buffer.from(ADSENSE_SCRIPT)),
       }),
     },
   );

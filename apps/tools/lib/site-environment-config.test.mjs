@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import process from "node:process";
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
+import { getBuildEnvironmentError } from "../scripts/lib/build-environment.mjs";
 
 // Drift between the build scripts, wrangler vars and routes would noindex
 // production or 308 a whole canonical host away, so pin them together.
@@ -53,4 +58,50 @@ test("middleware applies the pure decision for every non-asset route", () => {
 
 test("vendored static HTML is never indexed", () => {
   assert.match(source("../public/_headers"), /\/vendor\/\*\n\s+X-Robots-Tag: noindex/);
+});
+
+test("Workers Builds builds must name a deployed environment, and main must be production", () => {
+  const cases = [
+    [{}, null],
+    [{ NEXT_PUBLIC_SITE_ENV: "production" }, null],
+    [{ WORKERS_CI: "1", NEXT_PUBLIC_SITE_ENV: "production", WORKERS_CI_BRANCH: "main" }, null],
+    [{ WORKERS_CI: "1", NEXT_PUBLIC_SITE_ENV: "staging", WORKERS_CI_BRANCH: "staging" }, null],
+    [{ WORKERS_CI: "1" }, /NEXT_PUBLIC_SITE_ENV is unset/],
+    [{ WORKERS_CI: "1", NEXT_PUBLIC_SITE_ENV: "local" }, /NEXT_PUBLIC_SITE_ENV is "local"/],
+    [
+      { WORKERS_CI: "1", NEXT_PUBLIC_SITE_ENV: "staging", WORKERS_CI_BRANCH: "main" },
+      /Builds of main deploy production/,
+    ],
+  ];
+  for (const [env, expected] of cases) {
+    const error = getBuildEnvironmentError(env);
+    if (expected === null) assert.equal(error, null, JSON.stringify(env));
+    else assert.match(error ?? "", expected, JSON.stringify(env));
+  }
+});
+
+test("the Cloudflare build script refuses a Workers Builds build without an environment", () => {
+  const result = spawnSync(
+    process.execPath,
+    [fileURLToPath(new URL("../scripts/build-cloudflare.mjs", import.meta.url))],
+    // An empty PATH means a regression fails fast instead of starting a build.
+    { env: { ...process.env, PATH: "", WORKERS_CI: "1", NEXT_PUBLIC_SITE_ENV: "" }, encoding: "utf8" },
+  );
+  assert.equal(result.status, 1);
+  // The message, not just the exit code: a missing build tool also exits 1.
+  assert.match(result.stderr, /NEXT_PUBLIC_SITE_ENV is unset/);
+});
+
+test("constants duplicated in scripts match their sources", () => {
+  const smokeScript = source("../scripts/smoke-cloudflare-api.mjs");
+  const header = source("./site-environment.ts").match(/SMOKE_TEST_HEADER = "([^"]+)"/)[1];
+  assert.match(smokeScript, new RegExp(`const SMOKE_TEST_HEADER = "${header}";`));
+  const gtmId = source("../../../packages/app-core/src/components/gtag-manager.tsx").match(
+    /gtmId = "([^"]+)"/,
+  )[1];
+  assert.match(smokeScript, new RegExp(`const GTM_CONTAINER = "${gtmId}";`));
+});
+
+test("non-canonical hosts get a permanent 308", () => {
+  assert.match(source("../middleware.ts"), /NextResponse\.redirect\(decision\.location, 308\)/);
 });

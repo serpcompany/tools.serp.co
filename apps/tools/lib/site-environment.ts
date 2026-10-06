@@ -43,8 +43,18 @@ export function getCanonicalRedirectUrl({
   return `${canonical.origin}${url.pathname}${url.search}`;
 }
 
+// Checks the decoded path too, so an encoded spelling such as
+// /%69nternal/tools/ never skips dashboard auth.
 export function isInternalPath(pathname: string) {
-  return pathname === "/internal" || pathname.startsWith("/internal/");
+  let decoded = pathname;
+  try {
+    decoded = decodeURIComponent(pathname);
+  } catch {
+    // Malformed escapes: the raw path is all there is to check.
+  }
+  return [pathname, decoded].some(
+    (path) => path === "/internal" || path.startsWith("/internal/"),
+  );
 }
 
 export type MiddlewareDecision =

@@ -97,14 +97,14 @@ test("middleware decisions across environments, hosts and paths", () => {
     requireDashboardAuth: false,
     noindex: false,
   });
-  for (const pathname of ["/internal", "/internal/", "/internal/tools/"]) {
+  for (const pathname of ["/internal", "/internal/", "/internal/tools/", "/%69nternal/tools/"]) {
     assert.deepEqual(
       decide(production, `https://tools.serp.co${pathname}`),
       { type: "continue", requireDashboardAuth: true, noindex: false },
       pathname,
     );
   }
-  for (const pathname of ["/internals/", "/internal-tools/", "/tools/internal/"]) {
+  for (const pathname of ["/internals/", "/internal-tools/", "/tools/internal/", "/%E0%A4%A/"]) {
     assert.equal(
       decide(production, `https://tools.serp.co${pathname}`).requireDashboardAuth,
       false,
