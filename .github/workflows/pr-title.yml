@@ -1,0 +1,26 @@
+name: PR Title
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  conventional-title:
+    runs-on: ubuntu-latest
+    steps:
+      # The PR title becomes the squash commit and changelog line, so it must
+      # be a Conventional Commit (serp git-workflow standard).
+      - name: Check the PR title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|perf|refactor|docs|test|build|ci|chore)(\([a-z0-9-]+\))?!?: [^ ].*$'
+          if [[ "$TITLE" =~ $pattern ]]; then
+            echo "PR title is a Conventional Commit: $TITLE"
+          else
+            echo "::error::PR title must look like 'fix: what the user notices' (types: feat, fix, perf, refactor, docs, test, build, ci, chore). Got: $TITLE"
+            exit 1
+          fi
