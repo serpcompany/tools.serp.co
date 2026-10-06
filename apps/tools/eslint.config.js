@@ -23,6 +23,7 @@ export default [
     ignores: [
       ".next/**",
       ".open-next/**",
+      ".wrangler/**",
       "out/**",
       "public/vendor/**",
       "node_modules/**",

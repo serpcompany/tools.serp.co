@@ -1,5 +1,6 @@
 // Load FFmpeg.wasm for video conversion
 import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { normalizeBlobPart } from "../blob-parts";
 import { AUDIO_FORMATS, VIDEO_FORMATS, detectCapabilities } from '../capabilities';
 import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils";
 import { createServerActionRequestHeaders } from "../server-action-client";
@@ -46,10 +47,6 @@ function canRemux(fromFormat: string, toFormat: string) {
 }
 
 export function shouldUseServerConversion(fromFormat: string, toFormat: string) {
-  const preferServer = process.env.NEXT_PUBLIC_VIDEO_CONVERSION_PREFER_SERVER === "true";
-  if (preferServer) {
-    return true;
-  }
   const serverOnly = new Set(["mxf", "rm", "rmvb"]);
   if (serverOnly.has(toFormat.toLowerCase())) {
     return true;
@@ -127,17 +124,29 @@ async function loadFFmpeg(): Promise<FFmpeg> {
     const baseURL = resolvePublicAssetPath(
       useSingleThread ? "/vendor/ffmpeg-st" : "/vendor/ffmpeg"
     );
+    // @ffmpeg/ffmpeg runs the core in a module worker, which can only import
+    // the ESM build. It is small enough to serve from the app's own origin;
+    // the 32 MB wasm stays on the asset host.
+    const coreURL = useSingleThread
+      ? new URL("/vendor/ffmpeg-esm/ffmpeg-core.js", self.location.href).href
+      : `${baseURL}/ffmpeg-core.js`;
 
     ffmpeg.on('log', ({ message }) => {
       console.log('[FFmpeg]', message);
     });
 
     const loadConfig: {
+      classWorkerURL?: string;
       coreURL: string;
       wasmURL: string;
       workerURL?: string;
     } = {
-      coreURL: `${baseURL}/ffmpeg-core.js`,
+      // Served unbundled: webpack would rewrite the worker's import(coreURL).
+      // Absolute, because the library resolves it against its bundled import.meta.url.
+      classWorkerURL: useSingleThread
+        ? new URL("/vendor/ffmpeg-esm/worker.js", self.location.href).href
+        : undefined,
+      coreURL,
       wasmURL: `${baseURL}/ffmpeg-core.wasm`,
     };
 
@@ -445,18 +454,10 @@ export async function convertVideo(
     console.warn('Cleanup error:', cleanupErr);
   }
 
-  // Return the ArrayBuffer (handle both ArrayBuffer and SharedArrayBuffer)
+  // Copy out of FFmpeg's memory; SharedArrayBuffer only exists on isolated pages.
   const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
 
-  // Ensure we return an ArrayBuffer, not SharedArrayBuffer
-  if (buffer instanceof SharedArrayBuffer) {
-    const ab = new ArrayBuffer(buffer.byteLength);
-    const view = new Uint8Array(ab);
-    view.set(new Uint8Array(buffer));
-    return ab;
-  }
-
-  return buffer;
+  return normalizeBlobPart(buffer);
 }
 
 function buildAudioCompressionArgs(format: string, bitrate: string): string[] {
@@ -618,13 +619,7 @@ export async function compressMedia(
   }
 
   const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-  if (buffer instanceof SharedArrayBuffer) {
-    const ab = new ArrayBuffer(buffer.byteLength);
-    const view = new Uint8Array(ab);
-    view.set(new Uint8Array(buffer));
-    return ab;
-  }
-  return buffer;
+  return normalizeBlobPart(buffer);
 }
 
 export async function extractAudioForTranscription(
@@ -702,14 +697,7 @@ export async function extractAudioForTranscription(
 
   const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
 
-  if (buffer instanceof SharedArrayBuffer) {
-    const ab = new ArrayBuffer(buffer.byteLength);
-    const view = new Uint8Array(ab);
-    view.set(new Uint8Array(buffer));
-    return ab;
-  }
-
-  return buffer;
+  return normalizeBlobPart(buffer);
 }
 
 export async function cleanupFFmpeg() {
