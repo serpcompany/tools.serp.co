@@ -145,8 +145,9 @@ that operation. Prefer the project migration and import scripts above.
 Dashboard access:
 
 - Route: `/internal/tools`
-- Auth: query `token` must match the Worker secret
-  `INTERNAL_DASHBOARD_TOKEN` when that secret is set.
+- Auth: HTTP Basic Auth (`apps/tools/middleware.ts`). Any username; the
+  password must match the Worker secret `INTERNAL_DASHBOARD_TOKEN`. If the
+  secret is unset, every request gets `401`.
 - Data source: the `SERP_TOOLS_DB` D1 binding only. A missing binding is shown as
   an error instead of falling back to another database.
 
