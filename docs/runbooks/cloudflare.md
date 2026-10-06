@@ -60,9 +60,9 @@ environment from its branch: a push to `staging` deploys Staging, and a push to
 `main`, which only changes by promotion, deploys Production. Each run applies
 that environment's D1 migrations (`db:migrate:<env>`), runs `deploy:<env>`, then
 the environment smoke check and the browser smoke test through the Worker's
-`*.workers.dev` host. It authenticates with the `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID` repository secrets (an account-owned token for Workers,
-D1 and the `serp.co` zone's Workers routes). Cloudflare Workers Builds is
+`*.workers.dev` host. It authenticates with the `CLOUDFLARE_API_TOKEN`
+repository secret (an account-owned token for Workers, D1 and the `serp.co`
+zone's Workers routes) against the SERP account id above. Cloudflare Workers Builds is
 disconnected, so this workflow is the only deploy path.
 
 ```bash
