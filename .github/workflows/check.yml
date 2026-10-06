@@ -41,6 +41,7 @@ jobs:
   # Chromium, including the telemetry write and dashboard read paths.
   smoke:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       WRANGLER_SEND_METRICS: "false"
     steps:
@@ -78,16 +79,29 @@ jobs:
           echo "INTERNAL_DASHBOARD_TOKEN=$token" >> "$GITHUB_ENV"
           nohup pnpm -C apps/tools exec wrangler dev --port 8787 \
             --var "INTERNAL_DASHBOARD_TOKEN:$token" > wrangler-dev.log 2>&1 &
+          pid=$!
           for attempt in $(seq 1 90); do
-            curl -sf -o /dev/null http://localhost:8787/robots.txt && exit 0
+            curl -sf --max-time 5 -o /dev/null http://localhost:8787/robots.txt && exit 0
+            kill -0 "$pid" 2>/dev/null || break
             sleep 2
           done
-          cat wrangler-dev.log
+          echo "::error::The Worker did not start"
           exit 1
 
       - name: Run the browser smoke test
-        run: pnpm -C apps/tools smoke:browser --base-url http://localhost:8787
+        run: pnpm -C apps/tools smoke:browser --base-url http://localhost:8787 --require-dashboard
 
       - name: Show the Worker log
         if: failure()
-        run: cat wrangler-dev.log
+        run: cat wrangler-dev.log || true
+
+      - name: Upload smoke failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-failure
+          path: |
+            wrangler-dev.log
+            apps/tools/smoke-artifacts/
+          if-no-files-found: ignore
+          retention-days: 7

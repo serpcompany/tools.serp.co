@@ -28,16 +28,34 @@ syncs, uploads, deploys, or remote migrations.
 CI also runs a browser smoke test (the `smoke` job in
 `.github/workflows/check.yml`). It builds the Worker with the local config,
 applies every migration to a fresh local D1 with Wrangler, starts
-`wrangler dev`, and drives the critical tools in Chromium: it converts a PNG to
-JPEG and checks the output bytes, converts HTML to Markdown, checks that the
-telemetry writes return 200, and reads the runs back from `/internal/tools/`.
-To run it against a local or deployed Worker:
+`wrangler dev`, and drives the critical tools in Chromium:
+
+- It converts a PNG to JPEG and checks the output bytes.
+- It converts HTML to Markdown.
+- It checks that each run sends a started and a succeeded telemetry event, and
+  that the Worker returns 200 for both.
+- It reads `/internal/tools/` and checks that both tools show as `live`.
+
+Requests to other origins (analytics, ads) are blocked. On failure, CI uploads
+screenshots, page text and the Worker log as the `smoke-failure` artifact.
+
+To run it locally, start a Worker with a dashboard token first:
 
 ```bash
-pnpm -C apps/tools smoke:browser --base-url http://localhost:8787
+pnpm -C apps/tools cf:build
+pnpm -C apps/tools db:migrate:local
+pnpm -C apps/tools exec wrangler dev --port 8787 --var INTERNAL_DASHBOARD_TOKEN:local-smoke
 ```
 
-Set `INTERNAL_DASHBOARD_TOKEN` to include the dashboard read-back step.
+```bash
+INTERNAL_DASHBOARD_TOKEN=local-smoke pnpm -C apps/tools smoke:browser --base-url http://localhost:8787
+```
+
+Without `INTERNAL_DASHBOARD_TOKEN` the dashboard step is skipped. The dashboard
+step only proves this run's writes on a fresh D1: on a reused database, older
+rows can satisfy it. Against a deployed Worker, every run writes real tool runs
+into that environment's D1, so prefer staging. Reaching a `*.workers.dev` host
+needs the smoke-test header handling from #164.
 
 ## Test suite
 
