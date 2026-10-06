@@ -1,6 +1,8 @@
 # Documentation index
 
-This is the index of every durable Markdown document in the repository.
+This is the index of every current document in the repository. Everything
+under `.archive/` is historical evidence as a whole and is not indexed file by
+file.
 Current guidance describes the current branch and is the source to follow.
 Historical and advisory material is evidence at its recorded scope and time;
 it must not be treated as current operating truth or active work.

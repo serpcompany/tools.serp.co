@@ -16,7 +16,7 @@ evidence.
 | Lint configuration       | `packages/eslint-config`               | Shared ESLint configuration only.                                                                                                                 |
 | TypeScript configuration | `packages/typescript-config`           | Shared TypeScript configuration only.                                                                                                             |
 | Repository harness       | root `scripts` and root `package.json` | Repository-wide validation, generation, audit, and orchestration commands. Command roles are made explicit as the harness modernization proceeds. |
-| Durable documentation    | root maps and `docs`                   | Current guidance, accepted decisions, and historical evidence as classified by the documentation index.                                           |
+| Durable documentation    | root maps, `docs` and `.archive`       | Current guidance and accepted decisions in `docs`, indexed by `docs/README.md`; historical evidence in `.archive`, classified as a whole.         |
 
 `apps/tools` is the only deployable application. A package owns reusable code
 and data; it does not own application routes or deployment configuration.
@@ -49,8 +49,9 @@ real reusable contract justifies moving it into a package.
 | Cloudflare build behavior                      | `apps/tools/open-next.config.ts` and `apps/tools/scripts/build-cloudflare.mjs` | Owns the OpenNext artifact and incremental-cache integration.                                                                             |
 | D1 schema                                      | Drizzle schema in `packages/tool-telemetry/src/schema.ts`                      | `db:generate` writes ordered SQL to `apps/tools/migrations`; a test fails when schema and migrations drift.                               |
 | Runtime observations                           | D1 `tool_runs` and derived `tool_status`                                       | Time-bound evidence for instrumented Tool ids, not catalog or work state.                                                                 |
+| Planning evidence                              | `packages/app-core/src/data/tools-planner.csv`                                 | Advisory candidate rows read by the downloader lander sync and two lander tests. Not catalog intent, capability, or health; join only by registry Tool id. |
 | Active work                                    | GitHub Issues for this repository                                              | Issues, dependencies, labels, and assignees own readiness, blockers, and ownership. Repository plans are not a parallel tracker.          |
-| Current documentation classification           | `docs/README.md`                                                               | Every durable Markdown document must be indexed as current guidance, historical/advisory evidence, or legacy material awaiting migration. |
+| Current documentation classification           | `docs/README.md`                                                               | Indexes every current doc. Everything under `.archive/` is historical evidence as a whole and is not indexed file by file.                |
 
 Registry Tool id is the join key across catalog intent, fixtures, verification,
 runtime observations, planning evidence, and GitHub work. Names, routes, and
