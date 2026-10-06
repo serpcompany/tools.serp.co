@@ -11,7 +11,7 @@ The app writes tool-run telemetry to Cloudflare D1 through the Worker binding
 
 Every environment uses the same binding name, Drizzle schema, migration
 directory (`apps/tools/migrations`) and `d1_migrations` ledger, with its own
-database (see Environments).
+database (see [Environments](cloudflare.md#environments)).
 
 - Production: `serp-tools-prod` (`da3d6222-cf0f-41fd-a8fb-4dc3e7d890db`)
 - Staging: `serp-tools-preview` (`69ab9290-579f-4537-96a0-7d0dc3bede2f`)
