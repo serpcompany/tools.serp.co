@@ -166,9 +166,15 @@ function contentTypeEssence(value) {
   return (value ?? "").split(";")[0].trim().toLowerCase();
 }
 
-// Retries a check that sets `retryForMs` until it passes or time runs out.
+// A new deployment takes a few seconds to replace the old version
+// everywhere, so right after a deploy (--expect-env) every check retries for
+// a while before it counts as failed (staging run 37476911169).
+const ROLLOUT_RETRY_MS = 30_000;
+
+// Retries a check until it passes or its retry window runs out.
 async function requestCheckWithRetry(check, args) {
-  const deadline = Date.now() + (check.retryForMs ?? 0);
+  const retryForMs = check.retryForMs ?? (args.expectEnv ? ROLLOUT_RETRY_MS : 0);
+  const deadline = Date.now() + retryForMs;
   let result = await requestCheck(check, args);
   while (!result.passed && Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, 3000));
