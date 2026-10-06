@@ -19,6 +19,7 @@ against a running Worker. CI runs it in two places:
 - Each tool run sends a `tool_run_started` and a `tool_run_succeeded` with the
   same `runId`, no `tool_run_failed`, and the Worker returns 200 for every
   telemetry request.
+- A telemetry request with `Sec-GPC: 1` gets a 204 and is not stored.
 - `/internal/tools/` lists both tools as `live`. It is read with a direct
   request, so the dashboard password is only sent to the Worker.
 

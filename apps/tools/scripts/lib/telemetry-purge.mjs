@@ -1,10 +1,33 @@
 import {
   PURGE_BATCH_SIZE,
+  checkDeviceId,
   deviceRunsDeleteSql,
   expiredCountSql,
   purgeBatchSql,
   purgeCutoff,
 } from "@serp-tools/tool-telemetry/purge";
+
+const ENVIRONMENTS = new Set(["staging", "production"]);
+
+// Arguments for scripts/purge-telemetry.mjs. `deviceId` is undefined unless
+// --device-id was given, and then it must be a valid id: an empty value (say,
+// an unset shell variable) must never fall through to the retention purge.
+export function parsePurgeArgs(argv) {
+  const args = { env: "", dryRun: false, deviceId: undefined };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--env") args.env = argv[++index] ?? "";
+    else if (arg === "--dry-run") args.dryRun = true;
+    else if (arg === "--device-id") args.deviceId = argv[++index] ?? "";
+    else if (arg !== "--") throw new Error(`Unknown argument: ${arg}`);
+  }
+  if (!ENVIRONMENTS.has(args.env)) throw new Error("--env must be staging or production");
+  if (args.deviceId !== undefined) {
+    if (args.dryRun) throw new Error("--device-id deletes; it has no --dry-run");
+    checkDeviceId(args.deviceId);
+  }
+  return args;
+}
 
 // Deletes tool runs older than the retention period in bounded batches.
 // `execute(sql)` runs one statement and resolves to its rows.

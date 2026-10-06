@@ -15,32 +15,18 @@ import { fileURLToPath } from "node:url";
 
 import {
   deleteDeviceRuns,
+  parsePurgeArgs,
   parseWranglerExecuteOutput,
   purgeExpiredToolRuns,
   wranglerExecuteArgs,
 } from "./lib/telemetry-purge.mjs";
 
-const ENVIRONMENTS = new Set(["staging", "production"]);
 const wranglerConfig = fileURLToPath(new URL("../wrangler.jsonc", import.meta.url));
 // wrangler doesn't export its bin, so find it from its package.json.
 function resolveWranglerBin() {
   const packageJsonPath = createRequire(import.meta.url).resolve("wrangler/package.json");
   const { bin } = JSON.parse(readFileSync(packageJsonPath, "utf8"));
   return path.join(path.dirname(packageJsonPath), typeof bin === "string" ? bin : bin.wrangler);
-}
-
-function parseArgs(argv) {
-  const args = { env: "", dryRun: false, deviceId: "" };
-  for (let index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-    if (arg === "--env") args.env = argv[++index] ?? "";
-    else if (arg === "--dry-run") args.dryRun = true;
-    else if (arg === "--device-id") args.deviceId = argv[++index] ?? "";
-    else if (arg !== "--") throw new Error(`Unknown argument: ${arg}`);
-  }
-  if (!ENVIRONMENTS.has(args.env)) throw new Error("--env must be staging or production");
-  if (args.deviceId && args.dryRun) throw new Error("--device-id deletes; it has no --dry-run");
-  return args;
 }
 
 function wranglerExecute(env) {
@@ -59,10 +45,10 @@ function wranglerExecute(env) {
   };
 }
 
-const args = parseArgs(process.argv.slice(2));
+const args = parsePurgeArgs(process.argv.slice(2));
 const wranglerBin = resolveWranglerBin();
 
-if (args.deviceId) {
+if (args.deviceId !== undefined) {
   const removed = await deleteDeviceRuns({ execute: wranglerExecute(args.env), deviceId: args.deviceId });
   console.log(`${args.env}: deleted ${removed.deleted} runs for device ${removed.deviceId}.`);
   process.exit(0);

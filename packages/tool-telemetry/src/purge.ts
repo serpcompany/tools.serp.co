@@ -41,10 +41,15 @@ export function expiredCountSql(cutoff: string) {
 
 // Device ids are random UUIDs, or `<base36 time>-<base36 random>` in browsers
 // without crypto.randomUUID (client.ts). Nothing else reaches the SQL.
-const DEVICE_ID = /^[0-9a-z]{6,16}(-[0-9a-z]{2,16}){1,4}$/i;
+// Lowercase only: ids are generated lowercase and the SQL match is exact.
+const DEVICE_ID = /^[0-9a-z]{6,16}(-[0-9a-z]{2,16}){1,4}$/;
+
+export function checkDeviceId(deviceId: string) {
+  if (!DEVICE_ID.test(deviceId)) throw new Error(`Invalid device id: ${JSON.stringify(deviceId)}`);
+}
 
 // Deletes every run carrying one visitor's device id (a deletion request).
 export function deviceRunsDeleteSql(deviceId: string) {
-  if (!DEVICE_ID.test(deviceId)) throw new Error(`Invalid device id: ${deviceId}`);
+  checkDeviceId(deviceId);
   return `DELETE FROM tool_runs WHERE json_extract(metadata, '$.deviceId') = '${deviceId}' RETURNING id`;
 }

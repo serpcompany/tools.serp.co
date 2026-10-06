@@ -1,13 +1,12 @@
 import { after, before, beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
-import process from "node:process";
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { getPlatformProxy } from "wrangler";
 
 import {
   deleteDeviceRuns,
+  parsePurgeArgs,
   parseWranglerExecuteOutput,
   purgeExpiredToolRuns,
   wranglerExecuteArgs,
@@ -92,16 +91,6 @@ test("a dry run counts expired runs without deleting anything", async () => {
   assert.equal((await remainingIds()).length, 26);
 });
 
-test("the command refuses to run without a deployed environment", () => {
-  const result = spawnSync(
-    process.execPath,
-    [fileURLToPath(new URL("../scripts/purge-telemetry.mjs", import.meta.url)), "--env", "local"],
-    { encoding: "utf8", timeout: 30_000 },
-  );
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /--env must be staging or production/);
-});
-
 test("a deletion request removes one device's runs and nothing else", async () => {
   const insert = d1.prepare(
     "INSERT INTO tool_runs (id, tool_id, status, started_at, metadata) VALUES (?, 'png-to-jpg', 'succeeded', ?, ?)",
@@ -118,6 +107,7 @@ test("a deletion request removes one device's runs and nothing else", async () =
   assert.equal(result.deleted, 2);
   const ids = await remainingIds();
   assert.ok(ids.includes("theirs") && !ids.includes("mine-1") && !ids.includes("mine-2"));
+  assert.equal(ids.length, 27, "the 25 expired runs, kept and theirs remain");
   await assert.rejects(deleteDeviceRuns({ execute, deviceId: "x' OR '1'='1" }), /Invalid device id/);
   assert.equal((await remainingIds()).length, ids.length);
 });
@@ -145,20 +135,34 @@ test("wrangler output is parsed strictly", () => {
   }
 });
 
-test("--device-id refuses --dry-run, because it deletes", () => {
-  const result = spawnSync(
-    process.execPath,
-    [
-      fileURLToPath(new URL("../scripts/purge-telemetry.mjs", import.meta.url)),
-      "--env",
-      "staging",
-      "--device-id",
-      "muw5jr43-nlbc7nv3",
-      "--dry-run",
-    ],
-    { encoding: "utf8", timeout: 30_000 },
+test("purge arguments need a deployed environment", () => {
+  assert.deepEqual(parsePurgeArgs(["--env", "production", "--dry-run"]), {
+    env: "production",
+    dryRun: true,
+    deviceId: undefined,
+  });
+  for (const argv of [[], ["--env", "local"], ["--env"], ["--env", "staging", "--force"]]) {
+    assert.throws(() => parsePurgeArgs(argv), Error, JSON.stringify(argv));
+  }
+});
+
+test("--device-id must carry a valid id and never falls through to the retention purge", () => {
+  assert.equal(
+    parsePurgeArgs(["--env", "staging", "--device-id", "muw5jr43-nlbc7nv3"]).deviceId,
+    "muw5jr43-nlbc7nv3",
   );
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /--device-id deletes; it has no --dry-run/);
+  // An unset shell variable drops the value, or passes "".
+  for (const argv of [
+    ["--env", "production", "--device-id"],
+    ["--env", "production", "--device-id", ""],
+    ["--env", "production", "--device-id", "4132AD8A-B1B5-4AF6-B987-D8922405D616"],
+    ["--env", "production", "--device-id", "x' OR '1'='1"],
+  ]) {
+    assert.throws(() => parsePurgeArgs(argv), /Invalid device id/, JSON.stringify(argv));
+  }
+  assert.throws(
+    () => parsePurgeArgs(["--env", "production", "--dry-run", "--device-id", "muw5jr43-nlbc7nv3"]),
+    /--device-id deletes; it has no --dry-run/,
+  );
 });
 

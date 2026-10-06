@@ -40,9 +40,10 @@ groups:
 
 - **Request origin, set only by the server:** `ip` (Cloudflare's
   `cf-connecting-ip`, falling back to `x-real-ip` and then `x-forwarded-for`),
-  `userAgent`, and `release` (the commit the Worker was built from). Values a client sends for these keys are dropped. Keeping `ip`
-  and `userAgent` was reviewed and accepted by the owner in #161; they help
-  debug failures that only one browser or network hits.
+  `userAgent`, and `release` (the commit the Worker was built from). Values a
+  client sends for these keys are dropped. Keeping `ip` and `userAgent` was
+  reviewed and accepted by the owner in #161; they help debug failures that
+  only one browser or network hits.
 - **Device:** `deviceId`, a random id the browser keeps in `localStorage`
   (`serp_tools_device_id`) so repeat failures from one browser can be grouped.
   It is not linked to an account, a name or anything outside this site.
@@ -118,4 +119,8 @@ the same schedule.
 - **One-off D1 backup:** `tmp/d1-production-backup-20261006T0339Z.sql` in the
   owner's local checkout (ignored by git) holds every D1 run as of
   2026-10-06. It is kept only for the broken-tool investigation (#147) and is
-  deleted when that work is done. Never commit it or copy it elsewhere.
+  deleted when that work is done; deletion requests don't reach it until then.
+  Never commit it or copy it elsewhere.
+- **D1 Time Travel:** Cloudflare can restore the database to any point in the
+  last 30 days, so deleted runs stay recoverable for up to 30 days after a
+  purge or deletion request.
