@@ -110,12 +110,15 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: pnpm -C apps/tools exec wrangler deploy --env ${DEPLOY_ENV}
 
+      # The asset host (assets.tools.serp.co, R2) isn't deployed here and sits
+      # behind the branded zone's bot protection, which can challenge runners.
       - name: Check the environment rules
         run: >-
           pnpm -C apps/tools audit:cf:api-smoke
           --base-url "$PLATFORM_URL"
           --expect-env "$DEPLOY_ENV"
           --platform-url "$PLATFORM_URL"
+          --skip-assets
 
       # Staging only: the browser smoke records real tool runs, and production
       # telemetry must hold only real visitors' runs.
