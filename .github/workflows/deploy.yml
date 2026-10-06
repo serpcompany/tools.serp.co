@@ -28,7 +28,9 @@ jobs:
       # header, so Bot Fight Mode on the branded domain can't block it.
       PLATFORM_URL: ${{ github.ref_name == 'main' && 'https://tools-serp-co.serpcompany.workers.dev' || 'https://tools-serp-co-staging.serpcompany.workers.dev' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # The SERP account (docs/runbooks/cloudflare.md). Not secret; pinned here
+      # so the token is always used against the account it was created in.
+      CLOUDFLARE_ACCOUNT_ID: cec5f04e1d18bcc65f2be0aefb04f059
       WRANGLER_SEND_METRICS: "false"
     steps:
       - name: Only staging and main deploy
