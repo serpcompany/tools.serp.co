@@ -254,6 +254,32 @@ await step("webm-to-mp3 converts with FFmpeg in the browser", async (page, telem
   await expectCompletedRun(page, telemetryStatuses, "webm-to-mp3");
 });
 
+// Converts a fixture with a tool and returns the downloaded bytes.
+async function convertFixture(page, toolId, fixture, extension) {
+  await page.goto(`${args.baseUrl}/${toolId}/`);
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.locator('input[type="file"]').first().setInputFiles(path.join(appRoot, "benchmarks/fixtures", fixture)),
+  ]);
+  assert(download.suggestedFilename().endsWith(`.${extension}`), `filename ${download.suggestedFilename()}`);
+  return readFileSync(await download.path());
+}
+
+await step("dng-to-jpg decodes camera RAW with ImageMagick in the browser", async (page, telemetryStatuses) => {
+  const bytes = await convertFixture(page, "dng-to-jpg", "sample.dng", "jpg");
+  assert(
+    bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff,
+    `not a JPEG: starts with ${bytes.subarray(0, 4).toString("hex")}`,
+  );
+  await expectCompletedRun(page, telemetryStatuses, "dng-to-jpg");
+});
+
+await step("png-to-gif writes a real GIF, not a relabelled PNG", async (page, telemetryStatuses) => {
+  const bytes = await convertFixture(page, "png-to-gif", "sample.png", "gif");
+  assert(bytes.subarray(0, 4).toString("latin1") === "GIF8", `not a GIF: starts with ${bytes.subarray(0, 4).toString("hex")}`);
+  await expectCompletedRun(page, telemetryStatuses, "png-to-gif");
+});
+
 // Each tool's row in the dashboard's status table must say `live`.
 function assertLiveRows(body) {
   const rows = body.split("<tr");
