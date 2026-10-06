@@ -1,6 +1,11 @@
 # Vercel vs Cloudflare Route Parity Report
 
-Generated: 2026-06-20T04:50:32.601Z
+- Historical evidence only.
+- Generated: 2026-06-20T04:50:32.601Z at revision
+  `2ced676c533e335ddcf6bccf30891259c6b60ba0`
+- Scope: 5,667 routes on the two named deployed environments
+- Limitation: this is a point-in-time HTTP comparison; it does not establish
+  current route inventory, functional correctness, or runtime health
 
 - Vercel URL: https://tools.serp.co
 - Cloudflare URL: https://tools-serp-co.serpcompany.workers.dev

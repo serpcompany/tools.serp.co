@@ -3,20 +3,22 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "turbo build",
+    "build": "pnpm -C apps/tools cf:build",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm verify:agent-workflow && pnpm verify:catalog && pnpm build",
     "dev": "turbo dev",
-    "lint": "turbo lint && node scripts/validate-tools.mjs && node scripts/validate-lander-outbound-links.mjs",
+    "test": "node scripts/run-tests.mjs",
+    "lint": "TURBO_TELEMETRY_DISABLED=1 turbo lint --cache=local:rw --no-daemon",
+    "typecheck": "TURBO_TELEMETRY_DISABLED=1 turbo typecheck --cache=local:rw --no-daemon",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "sync:network-brands": "node scripts/sync-network-brands.mjs",
     "benchmark:tools": "node scripts/benchmark-tools.mjs",
     "verify:agent-workflow": "node scripts/verify-agent-workflow.mjs",
-    "lint:tools": "node scripts/validate-tools.mjs && node scripts/validate-lander-outbound-links.mjs",
-    "lint:links": "node scripts/validate-lander-outbound-links.mjs"
+    "verify:catalog": "node scripts/validate-tools.mjs",
+    "check:links": "node scripts/validate-lander-outbound-links.mjs"
   },
   "devDependencies": {
     "@serp-tools/eslint-config": "workspace:*",
     "@serp-tools/typescript-config": "workspace:*",
-    "drizzle-kit": "^0.31.8",
     "playwright": "^1.57.0",
     "prettier": "^3.6.2",
     "turbo": "^2.5.6",

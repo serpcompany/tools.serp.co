@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type FooterLink = {
   href: string;
   label: string;
@@ -78,11 +80,12 @@ export function SiteFooter() {
               rel="noopener noreferrer"
               className="inline-flex w-fit"
             >
-              <img
+              <Image
                 src="https://dr.serp.co/badge/tools.serp.co?style=serp-dr-v3"
                 alt="Verified DR 78 for tools.serp.co"
                 width="200"
                 height="50"
+                unoptimized
               />
             </a>
           </div>

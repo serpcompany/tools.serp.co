@@ -6,7 +6,7 @@ changed_files="$(git diff --cached --name-only)"
 case "$changed_files" in
   *packages/app-core/src/data/tools.json*|*scripts/validate-lander-outbound-links.mjs*|*AGENTS.md*|*README.md*)
     echo "Running lander outbound-link validation..."
-    pnpm lint:links
+    pnpm check:links
     ;;
 esac
 

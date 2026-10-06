@@ -1,23 +1,25 @@
-# Adult Downloader Wave 0 Capability Report
+# Adult downloader Wave 0 capability report
 
-Rows classified: 10
-Rows with verified sample URL actually probed: 1
-Rows awaiting sample URL discovery: 9
+Historical evidence only.
 
-## Summary counts
+- Observed: 2026-05-18
+- Revision: `373c3fbf50a623c74f866fde31999d2260ce9432`
+- Source provenance: ten rows selected from local downloader-domain research;
+  only the Tube8 row had a verified public sample at run time, and the raw input
+  and output files were not retained
+- Scope: an initial capability probe for ten candidate source domains
+- Limitations: nine rows were not actually exercised; missing samples meant
+  unknown evidence, not failure, and the sole positive observation is stale and
+  non-reproducible
 
-- manual_review: 9
-- works_with_simple_html_json_extractor: 1
+## Decision-grade finding
 
-## Results
+The Tube8 sample exposed four MP4 variants through a page-specific
+`mediaDefinition` path, and a HEAD request succeeded for the selected media at
+the recorded time. The other nine rows remained untested because no verified
+sample was available.
 
-- `tube8.com` `/download-tube8-videos` — works_with_simple_html_json_extractor (tube8-media-definition; probed): Found 4 mp4 variants; HEAD ok video/mp4
-- `porntube.com` `/download-porntube-videos` — manual_review (no extractor; not probed: missing verified sample URL): No verified sample URL available yet.
-- `hellporno.com` `/download-hellporno-videos` — manual_review (no extractor; not probed: missing verified sample URL): No verified sample URL available yet.
-- `thumbzilla.com` `/download-thumbzilla-videos` — manual_review (no extractor; not probed: missing verified sample URL): No verified sample URL available yet.
-- `xtube.com` `/download-xtube-videos` — manual_review (no extractor; not probed: missing verified sample URL): No verified sample URL available yet.
-- `alphaporno.com` `/download-alphaporno-videos` — manual_review (no extractor; not probed: missing verified sample URL): No verified sample URL available yet.
-- `slutload.com` `/download-slutload-videos` — manual_review (no extractor; not probed: missing verified sample URL): No verified sample URL available yet.
-- `sunporno.com` `/download-sunporno-videos` — manual_review (no extractor; not probed: missing verified sample URL): No verified sample URL available yet.
-- `pornhd.com` `/download-pornhd-videos` — manual_review (no extractor; not probed: missing verified sample URL): No verified sample URL available yet.
-- `porn300.com` `/download-porn300-videos` — manual_review (no extractor; not probed: missing verified sample URL): No verified sample URL available yet.
+The positive Tube8 observation justified an implementation experiment at that
+revision. It does not establish present support. The tracked generated
+capability manifest and its application runner were retired because they
+collapsed a dated observation into apparent catalog truth.

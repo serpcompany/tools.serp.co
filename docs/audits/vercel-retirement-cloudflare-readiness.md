@@ -1,6 +1,13 @@
 # Vercel Retirement / Cloudflare Readiness Audit
 
-Generated: 2026-06-20T03:58:39.005Z
+Historical evidence only.
+
+- Generated: 2026-06-20T03:58:39.005Z at revision
+  `64c81f541d8d72dcbf8813283bf6833d9032d1fc`
+- Scope: the Vercel, Cloudflare, route, dependency, and telemetry observations
+  recorded below
+- Limitation: the worktree was dirty and external state is time-dependent;
+  GitHub issue #34 and the current Cloudflare runbook own retirement work
 
 ## Baseline
 

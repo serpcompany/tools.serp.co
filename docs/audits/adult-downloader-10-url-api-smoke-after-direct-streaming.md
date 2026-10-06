@@ -1,88 +1,25 @@
-# Adult downloader 10 URL API smoke after yt-dlp direct streaming
+# Adult downloader API smoke after direct streaming
 
-Change tested:
+Historical evidence only.
 
-- `apps/tools/app/api/media-fetch/route.ts`
-- Added yt-dlp metadata/direct URL resolution with `download: false` and `dumpSingleJson: true`.
-- The API now streams the direct media URL instead of downloading the whole video to a temp file first.
+- Observed: 2026-05-18
+- Revision: `373c3fbf50a623c74f866fde31999d2260ce9432`
+- Source provenance: a locally assembled set of ten public adult-video page
+  URLs and responses from a local `media-fetch` API instance; raw inputs and
+  response artifacts were not retained
+- Scope: one bounded API smoke after the media-fetch path changed from full
+  temporary downloads to direct media streaming
+- Limitations: source availability, extractor behavior, response content, and
+  the input selection were time-dependent; this is not reproducible evidence
+  and does not establish current Tool health
 
-Test added:
+## Decision-grade finding
 
-- `apps/tools/lib/media-fetch-ytdlp-direct.test.mjs`
+Five of ten requests began returning media bytes within a 25-second cap. The
+other five exposed a mix of unsupported URLs, extraction failures, and an
+anti-bot response. A second seven-URL batch began streaming three responses.
 
-Verification:
-
-```text
-node --test apps/tools/lib/media-fetch-ytdlp-direct.test.mjs
-pnpm -C apps/tools typecheck
-node scripts/validate-tools.mjs
-```
-
-All passed.
-
-## 10 URL smoke
-
-Input:
-
-- `tmp/adult-downloader-sample-urls-offset-0-limit-25.csv`
-- first 10 rows with discovered sample URLs
-
-Runner:
-
-- `scripts/smoke-api-download-10-urls.mjs`
-
-Output:
-
-- `tmp/adult-downloader-10-url-api-download-smoke.csv`
-
-The smoke posts each URL to:
-
-```text
-POST http://localhost:3011/api/media-fetch/
-{"mode":"video","url":"..."}
-```
-
-Each curl is capped at 25 seconds so we do not intentionally download multi-hundred-MB full videos during smoke testing. I counted a video as downloaded/working when the API returned HTTP 200 media headers and wrote non-zero media bytes.
-
-## Result
-
-Downloaded/started media streams: 5/10
-
-| # | Site | Result | Bytes saved | Extension |
-|---|---|---:|---:|---|
-| 1 | tube8.com | failed | 74 | |
-| 2 | porntube.com | downloaded | 572,382 | mp4 |
-| 3 | hellporno.com | downloaded | 4,432,218 | mp4 |
-| 4 | thumbzilla.com | failed | 79 | |
-| 5 | alphaporno.com | failed | 300 | |
-| 6 | slutload.com | failed | 145 | |
-| 7 | sunporno.com | downloaded | 4,458,332 | mp4 |
-| 8 | porn300.com | downloaded | 2,243,778 | mp4 |
-| 9 | thothub.to | downloaded | 25,976,635 | mp4 |
-| 10 | pornone.com | failed | 90 | |
-
-## Failure reasons from response bodies
-
-- `tube8.com`: yt-dlp unsupported for the automatically discovered sample URL `https://www.tube8.com/amateur/648309f/`.
-- `thumbzilla.com`: yt-dlp unsupported for the tested embed URL.
-- `alphaporno.com`: yt-dlp extractor could not extract video URL.
-- `slutload.com`: Cloudflare anti-bot / 403.
-- `pornone.com`: yt-dlp unsupported URL.
-
-## Extra check on previous batch
-
-I also reran the earlier rows 11-20 batch artifact:
-
-- `tmp/adult-downloader-batch-10-api-download-smoke-after-direct.csv`
-
-That batch had only 7 sample URLs discovered. After the direct-streaming fix:
-
-```text
-3/7 sample URLs downloaded/started
-```
-
-Working there:
-
-- `thothub.to`
-- `empflix.com`
-- `analdin.com`
+The result supported keeping direct URL extraction as the preferred server
+path at that revision. It did not justify a durable per-site capability claim.
+Current behavior must be verified through the maintained canary and browser
+commands with an explicitly supplied, authorized input.

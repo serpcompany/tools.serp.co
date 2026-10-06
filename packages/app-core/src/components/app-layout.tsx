@@ -1,22 +1,10 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 
 import { AppHeader } from "./app-header";
-import { Providers } from "./providers";
 import { GTagManager } from "./gtag-manager";
 import { SiteFooter } from "./site-footer";
 
 import "@serp-tools/ui/globals.css";
-
-const fontSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "ca-pub-2343633734899216";
 const adsenseTestMode = process.env.NEXT_PUBLIC_ADSENSE_TEST_MODE === "true";
@@ -27,10 +15,8 @@ export function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${fontSans.variable} ${fontMono.variable} bg-background font-sans antialiased`}
-      >
+    <html lang="en" className="light" style={{ colorScheme: "light" }}>
+      <body className="bg-background font-sans antialiased">
         {adsenseClient && (process.env.NODE_ENV !== "development" || adsenseTestMode) ? (
           <Script
             id="adsense-script"
@@ -41,13 +27,11 @@ export function AppLayout({
           />
         ) : null}
         <GTagManager />
-        <Providers>
-          <div className="flex min-h-screen flex-col">
-            <AppHeader />
-            <div className="flex-1">{children}</div>
-            <SiteFooter />
-          </div>
-        </Providers>
+        <div className="flex min-h-screen flex-col">
+          <AppHeader />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
+        </div>
       </body>
     </html>
   );

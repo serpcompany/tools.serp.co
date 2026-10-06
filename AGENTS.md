@@ -5,11 +5,15 @@ and use installed skills for generic TDD, review, GitHub, and safety procedures.
 
 ## Repository knowledge
 
+- Architecture and ownership boundaries: `ARCHITECTURE.md`
+- Shared domain glossary: `CONTEXT.md`
+- Documentation index and current/evidence classification: `docs/README.md`
 - Work state and tracker conventions: `docs/agents/issue-tracker.md`
 - Triage vocabulary: `docs/agents/triage-labels.md`
 - Domain documentation and ADR convention: `docs/agents/domain.md`
-- Current repository overview: `README.md`
-- Current Cloudflare runtime and data operations: `docs/knowledge/cloudflare-operations.md`
+- ADR creation and supersession guidance: `docs/adr/README.md`
+- Repository overview and commands: `README.md`
+- Current Cloudflare runtime and data operations: `docs/runbooks/cloudflare.md`
 
 Treat dated audits as evidence at their recorded date, not as current operating
 truth. Prefer the nearest scoped `AGENTS.md` when one exists.

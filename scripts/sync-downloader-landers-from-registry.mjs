@@ -7,7 +7,10 @@ const root = process.cwd();
 const registryApiPath =
   "repos/serpcompany/downloader-source-registry/contents/data/source-repo-data-json-config.json";
 const toolsPath = path.join(root, "packages/app-core/src/data/tools.json");
-const plannerPath = path.join(root, "docs/planner/tools_planner.csv");
+const plannerPath = path.join(
+  root,
+  "docs/evidence/tool-planning/tools_planner.csv",
+);
 
 const defaultOperatingSystems = [
   "windows",
