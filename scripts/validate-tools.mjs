@@ -109,14 +109,11 @@ if (await pathExists(nextConfigPath)) {
   if (!nextConfig.includes("BUILD_MODE")) {
     fail("next.config.mjs must set BUILD_MODE env.");
   }
-  if (!nextConfig.includes("/pages-:page.xml")) {
-    fail("next.config.mjs must rewrite /pages-:page.xml to the pages sitemap.");
+  if (!nextConfig.includes('destination: "/sitemaps/:file"')) {
+    fail("next.config.mjs must rewrite root-level sitemap files (/sitemap-<group>.xml, /sitemap.xml) to /sitemaps/:file.");
   }
-  if (!nextConfig.includes("/tools-:page.xml")) {
-    fail("next.config.mjs must rewrite /tools-:page.xml to the tools sitemap.");
-  }
-  if (!nextConfig.includes("/categories-:page.xml")) {
-    fail("next.config.mjs must rewrite /categories-:page.xml to the categories sitemap (even if optional).");
+  if (/sitemaps\/(?:pages|tools|categories)\//.test(nextConfig)) {
+    fail("next.config.mjs must not rewrite to the retired /sitemaps/<group>/:page routes.");
   }
 } else {
   fail("Missing apps/tools/next.config.mjs.");
@@ -202,30 +199,37 @@ for (const entry of requiredTestIds) {
   }
 }
 
+// The flat sitemap tree (serp xml-sitemaps standard): /sitemap-index.xml lists
+// root-level /sitemap-<group>.xml URL sets and never another index.
 const sitemapIndexPath = path.join(root, "apps/tools/app/sitemap-index.xml/route.ts");
-if (await pathExists(sitemapIndexPath)) {
-  const sitemapIndex = await fs.readFile(sitemapIndexPath, "utf8");
-  if (!sitemapIndex.includes("pages-index.xml")) {
-    fail("sitemap-index.xml must include pages-index.xml.");
-  }
-  if (!sitemapIndex.includes("tools-index.xml")) {
-    fail("sitemap-index.xml must include tools-index.xml.");
-  }
-  if (!sitemapIndex.includes("getCategoryPaths")) {
-    fail("sitemap-index.xml must conditionally include categories-index.xml when category routes exist.");
-  }
-} else {
+if (!(await pathExists(sitemapIndexPath))) {
   fail("Missing apps/tools/app/sitemap-index.xml/route.ts.");
 }
 
-const toolsIndexPath = path.join(root, "apps/tools/app/tools-index.xml/route.ts");
-if (!(await pathExists(toolsIndexPath))) {
-  fail("Missing apps/tools/app/tools-index.xml/route.ts.");
+const sitemapFilesPath = path.join(root, "apps/tools/app/sitemaps/[file]/route.ts");
+if (!(await pathExists(sitemapFilesPath))) {
+  fail("Missing apps/tools/app/sitemaps/[file]/route.ts (serves /sitemap-<group>.xml).");
 }
 
-const toolsSitemapPath = path.join(root, "apps/tools/app/sitemaps/tools/[page]/route.ts");
-if (!(await pathExists(toolsSitemapPath))) {
-  fail("Missing apps/tools/app/sitemaps/tools/[page]/route.ts.");
+const sitemapLibPath = path.join(root, "apps/tools/lib/sitemap.ts");
+if (await pathExists(sitemapLibPath)) {
+  const sitemapLib = await fs.readFile(sitemapLibPath, "utf8");
+  if (!sitemapLib.includes("`/sitemap-${group}.xml`")) {
+    fail("lib/sitemap.ts must name child sitemaps /sitemap-<group>.xml.");
+  }
+} else {
+  fail("Missing apps/tools/lib/sitemap.ts.");
+}
+
+for (const retired of [
+  "apps/tools/app/pages-index.xml",
+  "apps/tools/app/tools-index.xml",
+  "apps/tools/app/categories-index.xml",
+  "apps/tools/app/sitemap/[page]",
+]) {
+  if (await pathExists(path.join(root, retired))) {
+    fail(`${retired} is a retired nested sitemap route; retired names 308 via lib/sitemap.ts.`);
+  }
 }
 
 if (warnings.length) {

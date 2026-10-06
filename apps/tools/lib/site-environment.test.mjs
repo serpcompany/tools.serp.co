@@ -5,6 +5,7 @@ import {
   decideMiddleware,
   getCanonicalRedirectUrl,
   getRobotsTxt,
+  getSiteOrigin,
   isProductionSite,
 } from "./site-environment.ts";
 
@@ -126,5 +127,31 @@ test("middleware decisions across environments, hosts and paths", () => {
   assert.deepEqual(
     decide(production, "https://tools-serp-co.serpcompany.workers.dev/internal/tools/", true),
     { type: "continue", requireDashboardAuth: true, noindex: false },
+  );
+});
+
+test("absolute URLs use the canonical origin when deployed and the request origin otherwise", () => {
+  const origin = (env, requestUrl) => getSiteOrigin({ ...env, requestUrl });
+  assert.equal(origin(production, "https://tools.serp.co/sitemap-index.xml"), "https://tools.serp.co");
+  assert.equal(
+    origin(production, "https://tools-serp-co.serpcompany.workers.dev/sitemap-index.xml"),
+    "https://tools.serp.co",
+  );
+  assert.equal(
+    origin(staging, "https://tools-serp-co-staging.serpcompany.workers.dev/robots.txt"),
+    "https://staging.tools.serp.co",
+  );
+  // A local cf:build inlines the production URL default; local runs still
+  // write their own origin.
+  for (const siteEnv of [undefined, "", "local"]) {
+    assert.equal(
+      origin({ siteEnv, siteUrl: "https://tools.serp.co" }, "http://localhost:8790/sitemap-index.xml"),
+      "http://localhost:8790",
+      String(siteEnv),
+    );
+  }
+  assert.equal(
+    origin({ siteEnv: "production", siteUrl: undefined }, "http://localhost:3000/"),
+    "http://localhost:3000",
   );
 });

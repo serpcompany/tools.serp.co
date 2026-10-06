@@ -253,6 +253,8 @@ function safeGetChecks(args) {
     "/pdf-editor/",
     "/robots.txt",
     "/sitemap-index.xml",
+    "/sitemap-pages.xml",
+    "/sitemap-tools.xml",
   ];
   const checks = paths.map((pathname) => ({
     name: `GET ${pathname}`,
@@ -264,6 +266,23 @@ function safeGetChecks(args) {
       bytes: bytes.length,
     }),
   }));
+
+  // /sitemap.xml is an alias, and retired sitemap names move to the flat tree.
+  const sitemapRedirects = {
+    "/sitemap.xml": "/sitemap-index.xml",
+    "/tools-index.xml": "/sitemap-index.xml",
+    "/tools-0.xml": "/sitemap-tools.xml",
+  };
+  for (const [pathname, target] of Object.entries(sitemapRedirects)) {
+    checks.push({
+      name: `GET ${pathname} 308s to ${target}`,
+      url: buildUrl(args.baseUrl, pathname),
+      expect: (response) =>
+        response.status === 308 &&
+        new URL(response.headers.get("location") ?? "", args.baseUrl).pathname === target,
+      details: (response) => ({ location: response.headers.get("location") }),
+    });
+  }
 
   if (args.internalToken) {
     checks.push({
@@ -292,6 +311,14 @@ function canonicalOrigin(expectEnv) {
   return new URL(siteUrl).origin;
 }
 
+function sitemapLocs(bytes) {
+  return [...bytes.toString("utf8").matchAll(/<loc>([^<]*)<\/loc>/g)].map((match) => match[1]);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 // Must match the GTM id in gtag-manager.tsx (pinned by a test).
 const GTM_CONTAINER = "GTM-PP9W77LK";
 const ADSENSE_SCRIPT = "pagead/js/adsbygoogle.js";
@@ -315,6 +342,34 @@ function environmentChecks(args) {
           : response.status === 200 && body.includes("Disallow: /") && !body.includes("Sitemap:");
       },
       details: (_response, bytes) => ({ body: bytes.toString("utf8").slice(0, 200) }),
+    },
+    {
+      name: `sitemap index lists only ${canonical}/sitemap-<group>.xml files`,
+      url: buildUrl(args.baseUrl, "/sitemap-index.xml"),
+      expect: (response, bytes) => {
+        const locs = sitemapLocs(bytes);
+        const child = new RegExp(`^${escapeRegExp(canonical)}/sitemap-[a-z]+(?:-\\d+)?\\.xml$`);
+        return (
+          response.status === 200 &&
+          locs.includes(`${canonical}/sitemap-pages.xml`) &&
+          locs.includes(`${canonical}/sitemap-tools.xml`) &&
+          locs.every((loc) => child.test(loc))
+        );
+      },
+      details: (_response, bytes) => ({ locs: sitemapLocs(bytes) }),
+    },
+    {
+      name: `sitemap homepage is ${canonical} without a slash`,
+      url: buildUrl(args.baseUrl, "/sitemap-pages.xml"),
+      expect: (response, bytes) => {
+        const locs = sitemapLocs(bytes);
+        return (
+          response.status === 200 &&
+          locs.includes(canonical) &&
+          locs.every((loc) => loc === canonical || (loc.startsWith(`${canonical}/`) && loc.endsWith("/")))
+        );
+      },
+      details: (_response, bytes) => ({ locs: sitemapLocs(bytes) }),
     },
     {
       name: `X-Robots-Tag, analytics and ads match ${args.expectEnv}`,
