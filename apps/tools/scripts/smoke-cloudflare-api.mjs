@@ -91,6 +91,12 @@ function parseArgs(argv) {
       index += 1;
       continue;
     }
+    if (arg === "--expect-release") {
+      args.expectRelease = argv[index + 1] ?? "";
+      if (!args.expectRelease) throw new Error("--expect-release needs a release id");
+      index += 1;
+      continue;
+    }
     if (arg === "--platform-url") {
       args.platformUrl = argv[index + 1] ?? "";
       if (!args.platformUrl) throw new Error("--platform-url needs a URL");
@@ -120,6 +126,7 @@ function parseArgs(argv) {
           "  --report <path>              Write a Markdown report.",
           "  --json <path>                Write raw JSON results.",
           "  --expect-env <env>           Assert production or staging robots and noindex rules.",
+          "  --expect-release <id>        Wait until every request is served by this release.",
           "  --platform-url <url>         Assert this *.workers.dev host 308s to the canonical host.",
           "  --skip-assets                Skip the asset-host checks (CI runners can be challenged there).",
           "  --no-fail                    Exit 0 even when checks fail.",
@@ -640,6 +647,44 @@ if (args.includeNative) {
 
 if (!args.mediaUrl) {
   checks.push(skipped("POST /api/media-fetch public media URL", "requires --media-url"));
+}
+
+// A new deployment takes a few seconds to replace the old version
+// everywhere (staging run 37476911169). With --expect-release, wait until
+// that many requests in a row come from the new release, so no check can
+// pass or fail on the old one.
+const RELEASE_HEADER = "x-tools-release";
+const RELEASE_STREAK = 5;
+const RELEASE_WAIT_MS = 120_000;
+
+async function waitForRelease(args) {
+  const deadline = Date.now() + RELEASE_WAIT_MS;
+  let streak = 0;
+  let seen = null;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(buildUrl(args.baseUrl, "/robots.txt"), {
+        headers: { [SMOKE_TEST_HEADER]: "1" },
+        redirect: "manual",
+        signal: AbortSignal.timeout(10_000),
+      });
+      await response.body?.cancel();
+      seen = response.headers.get(RELEASE_HEADER);
+      streak = seen === args.expectRelease ? streak + 1 : 0;
+      if (streak >= RELEASE_STREAK) return;
+    } catch {
+      streak = 0;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  throw new Error(
+    `Release ${args.expectRelease} wasn't serving every request after ${RELEASE_WAIT_MS / 1000}s (last seen: ${seen ?? "none"}).`,
+  );
+}
+
+if (args.expectRelease) {
+  await waitForRelease(args);
+  console.log(`Release ${args.expectRelease} is serving; running checks.`);
 }
 
 const results = [];
