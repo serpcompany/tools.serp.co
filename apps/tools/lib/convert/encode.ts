@@ -75,11 +75,22 @@ export async function encodeFromRGBA(
     return new Blob([pdfBuffer], { type: "application/pdf" });
   }
 
-  const mime =
-    toExt === "jpg" || toExt === "jpeg" ? "image/jpeg" :
+  const canvasMime =
+    toExt === "jpg" || toExt === "jpeg" || toExt === "jfif" || toExt === "jif" ? "image/jpeg" :
     toExt === "webp" ? "image/webp" :
     toExt === "avif" ? "image/avif" :
-    "image/png";
+    toExt === "png" ? "image/png" :
+    null;
 
-  return canvasToBlob(mime, quality);
+  if (canvasMime) {
+    const blob = await canvasToBlob(canvasMime, quality);
+    // Browsers silently return PNG for types they can't encode (e.g. AVIF).
+    if (blob.type === canvasMime) return blob;
+  }
+
+  // Never label a PNG as another format: encode it with ImageMagick, which
+  // throws for formats nothing here can write.
+  const png = await canvasToBlob("image/png");
+  const { encodePngWithMagick } = await import("./magickBrowser.ts");
+  return encodePngWithMagick(await png.arrayBuffer(), toExt);
 }

@@ -2,6 +2,7 @@ import { detectCapabilities, requiresVideoConversion } from "../capabilities.ts"
 import { resolveCompressionTarget } from "../compression-utils.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
+import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
@@ -16,36 +17,6 @@ export type ProgressUpdate = {
   progress?: number;
   time?: number;
 };
-
-const SERVER_IMAGE_INPUTS = new Set([
-  "tiff",
-  "tif",
-  "cr2",
-  "cr3",
-  "dng",
-  "arw",
-  "psd",
-  "tga",
-  "dds",
-  "xcf",
-  "ai",
-  "apng",
-]);
-const SERVER_IMAGE_OUTPUTS = new Set([
-  "jpg",
-  "jpeg",
-  "png",
-  "webp",
-  "gif",
-  "bmp",
-  "tiff",
-  "tif",
-  "svg",
-  "ico",
-  "cur",
-  "tga",
-  "dds",
-]);
 
 const MIME_MAP: Record<string, string> = {
   png: "image/png",
@@ -179,19 +150,28 @@ export async function convertWithWorker(args: {
     }
     return { kind: "multiple", buffers };
   }
-  if (shouldUseServerImageConversion(fromExt)) {
-    if (SERVER_IMAGE_OUTPUTS.has(toExt)) {
-      return convertImageViaApi(args);
+  if (MAGICK_BROWSER_INPUTS.has(fromExt)) {
+    args.onProgress?.({ status: "processing", progress: 5 });
+    const { convertWithMagickInBrowser } = await import("./magickBrowser.ts");
+    let converted: { buffer: ArrayBuffer; format: string };
+    try {
+      converted = await convertWithMagickInBrowser(args.buf, fromExt, toExt);
+    } catch (error) {
+      throw createTelemetryError(
+        "convert_failed",
+        error instanceof Error ? error.message : String(error),
+        { from: args.from, to: args.to, engine: "browser-magick" },
+      );
     }
-    const serverResult = await convertImageViaApi({ ...args, to: "png" });
-    if (serverResult.kind !== "single") {
-      throw new Error("Server image conversion returned multiple buffers unexpectedly.");
+    if (converted.format === toExt) {
+      args.onProgress?.({ status: "processing", progress: 100 });
+      return { kind: "single", buffer: converted.buffer };
     }
     args.onProgress?.({ status: "processing", progress: 90 });
     return convertRasterOnMainThread({
       from: "png",
       to: args.to,
-      buf: serverResult.buffer,
+      buf: converted.buffer,
       quality: args.quality,
     });
   }
@@ -424,63 +404,6 @@ function isDecodeError(error: unknown) {
 function isWorkerError(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
   return message.toLowerCase().includes("worker error");
-}
-
-function shouldUseServerImageConversion(fromExt: string) {
-  return SERVER_IMAGE_INPUTS.has(fromExt.toLowerCase());
-}
-
-async function convertImageViaApi(args: {
-  from: string;
-  to: string;
-  buf: ArrayBuffer;
-  onProgress?: (update: ProgressUpdate) => void;
-}): Promise<ConversionResult> {
-  const route = "/api/image-convert";
-  const baseMetadata: ToolRunMetadata = {
-    route,
-    from: args.from,
-    to: args.to,
-    engine: "server-image",
-  };
-  args.onProgress?.({ status: "processing", progress: 5 });
-  let response: Response;
-  try {
-    response = await fetch(`${route}?from=${args.from}&to=${args.to}`, {
-      method: "POST",
-      headers: createServerActionRequestHeaders({
-        "Content-Type": "application/octet-stream",
-      }),
-      body: args.buf,
-    });
-  } catch {
-    throw createTelemetryError(
-      "network_error",
-      "Server conversion request failed",
-      baseMetadata
-    );
-  }
-
-  if (!response.ok) {
-    let detail = "";
-    let serverError: string | null = null;
-    try {
-      const data = await response.json();
-      serverError = data?.error ? String(data.error) : null;
-      detail = serverError ? `: ${serverError}` : "";
-    } catch {
-      detail = "";
-    }
-    throw createTelemetryError(
-      "server_convert_failed",
-      `Server conversion failed (${response.status})${detail}`,
-      { ...baseMetadata, status: response.status }
-    );
-  }
-
-  const buffer = await response.arrayBuffer();
-  args.onProgress?.({ status: "processing", progress: 100 });
-  return { kind: "single", buffer };
 }
 
 export async function compressPdfViaApi(args: {
