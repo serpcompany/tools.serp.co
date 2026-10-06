@@ -40,6 +40,6 @@ changes. Mark it `Superseded`, add a `Superseded by` link to the replacement,
 and make the replacement link back with `Supersedes`. Both records remain in
 this directory so the decision chain is navigable.
 
-Add every ADR to the [documentation index](../README.md). The structural
-documentation verifier rejects unindexed Markdown and broken replacement
-links.
+Add every ADR to the [documentation index](../README.md). The **Docs Links**
+workflow fails on broken relative links, including replacement links between
+ADRs; nothing checks that an ADR is indexed, so add it by hand.

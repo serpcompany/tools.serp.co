@@ -23,10 +23,12 @@ jobs:
         with:
           node-version: "22"
 
-      # remark resolves plugins from the working directory, so install them there;
-      # `npx --package` puts them where remark can't load them.
+      # The root package.json has pnpm `workspace:` dependencies that npm can't
+      # install, so install remark outside the repo and pass the plugin by path.
       - name: Install remark
-        run: npm install --no-save --no-package-lock --no-audit --no-fund remark-cli@12 remark-validate-links@13
+        run: npm install --prefix "$RUNNER_TEMP/remark" --no-save --no-package-lock --no-audit --no-fund remark-cli@12 remark-validate-links@13
 
       - name: Validate internal markdown links
-        run: npx remark AGENTS.md README.md "docs/**/*.md" --frail --quiet --use remark-validate-links
+        run: |
+          "$RUNNER_TEMP/remark/node_modules/.bin/remark" AGENTS.md README.md ARCHITECTURE.md CONTEXT.md "docs/**/*.md" \
+            --frail --quiet --use "$RUNNER_TEMP/remark/node_modules/remark-validate-links/index.js"
