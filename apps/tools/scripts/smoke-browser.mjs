@@ -213,6 +213,16 @@ await step("html-to-markdown converts pasted HTML", async (page, telemetryStatus
   await expectCompletedRun(page, telemetryStatuses, "html-to-markdown");
 });
 
+await step("telemetry ignores requests with Global Privacy Control", async () => {
+  // A direct request: the browser check in the client already sends nothing.
+  const response = await context.request.post(`${args.baseUrl}/api/telemetry`, {
+    headers: { "sec-gpc": "1", "content-type": "application/json", [SMOKE_TEST_HEADER]: "1" },
+    data: { event: "tool_run_started", runId: "smoke-gpc", toolId: "png-to-jpg", startedAt: new Date().toISOString() },
+    maxRedirects: 0,
+  });
+  assert(response.status() === 204, `status ${response.status()}`);
+});
+
 // Each tool's row in the dashboard's status table must say `live`.
 function assertLiveRows(body) {
   const rows = body.split("<tr");

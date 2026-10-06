@@ -9,6 +9,7 @@ import { getPlatformProxy } from "wrangler";
 import { STATUS_SAMPLE_LIMIT, getD1ToolsDashboardData } from "./d1.ts";
 import {
   TOOL_RUN_RETENTION_DAYS,
+  deviceRunsDeleteSql,
   expiredCountSql,
   purgeBatchSql,
   purgeCutoff,
@@ -289,8 +290,10 @@ test("metadata is flattened and capped before it is stored", async () => {
 test(`a purge batch deletes only runs older than ${TOOL_RUN_RETENTION_DAYS} days, at most batchSize`, async () => {
   const day = 86_400_000;
   const expiredOffset = (TOOL_RUN_RETENTION_DAYS + 1) * day;
-  await seedRuns({ idPrefix: "old-ok", toolId: "busy-tool", count: 13, status: "succeeded", offsetMs: expiredOffset });
-  await seedRuns({ idPrefix: "old-bad", toolId: "busy-tool", count: 12, status: "failed", offsetMs: expiredOffset });
+  await seedRuns({ idPrefix: "old-ok", toolId: "busy-tool", count: 9, status: "succeeded", offsetMs: expiredOffset });
+  await seedRuns({ idPrefix: "old-bad", toolId: "busy-tool", count: 8, status: "failed", offsetMs: expiredOffset });
+  // Abandoned runs never finish, and still carry ip, userAgent and deviceId.
+  await seedRuns({ idPrefix: "old-open", toolId: "busy-tool", count: 8, status: "started", offsetMs: expiredOffset });
   await seedRuns({ idPrefix: "recent", toolId: "busy-tool", count: 5, status: "succeeded", offsetMs: (TOOL_RUN_RETENTION_DAYS - 1) * day });
   const cutoff = purgeCutoff(now);
 
@@ -325,6 +328,8 @@ test("the purge SQL only accepts an ISO timestamp cutoff and a positive batch si
     assert.throws(() => expiredCountSql(cutoff), /Invalid purge cutoff/, cutoff);
   }
   assert.throws(() => purgeBatchSql(purgeCutoff(now), 0), /Invalid purge batch size/);
+  assert.throws(() => deviceRunsDeleteSql("x' OR '1'='1"), /Invalid device id/);
+  assert.match(deviceRunsDeleteSql("4132ad8a-b1b5-4af6-b987-d8922405d616"), /= '4132ad8a-b1b5-4af6-b987-d8922405d616' RETURNING id$/);
 });
 
 test("a missing D1 binding returns 503 instead of discarding telemetry", async () => {

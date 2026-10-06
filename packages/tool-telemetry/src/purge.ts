@@ -38,3 +38,13 @@ export function expiredCountSql(cutoff: string) {
   checkCutoff(cutoff);
   return `SELECT count(*) AS expired FROM tool_runs WHERE ${EXPIRED(cutoff)}`;
 }
+
+// Device ids are random UUIDs, or `<base36 time>-<base36 random>` in browsers
+// without crypto.randomUUID (client.ts). Nothing else reaches the SQL.
+const DEVICE_ID = /^[0-9a-z]{6,16}(-[0-9a-z]{2,16}){1,4}$/i;
+
+// Deletes every run carrying one visitor's device id (a deletion request).
+export function deviceRunsDeleteSql(deviceId: string) {
+  if (!DEVICE_ID.test(deviceId)) throw new Error(`Invalid device id: ${deviceId}`);
+  return `DELETE FROM tool_runs WHERE json_extract(metadata, '$.deviceId') = '${deviceId}' RETURNING id`;
+}

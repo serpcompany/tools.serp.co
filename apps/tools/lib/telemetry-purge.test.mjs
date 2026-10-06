@@ -6,7 +6,12 @@ import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { getPlatformProxy } from "wrangler";
 
-import { purgeExpiredToolRuns } from "../scripts/lib/telemetry-purge.mjs";
+import {
+  deleteDeviceRuns,
+  parseWranglerExecuteOutput,
+  purgeExpiredToolRuns,
+  wranglerExecuteArgs,
+} from "../scripts/lib/telemetry-purge.mjs";
 
 // Runs the purge command's loop against workerd's local D1 with the real
 // migrations; the command itself only swaps in `wrangler d1 execute --remote`.
@@ -40,13 +45,15 @@ after(async () => {
 beforeEach(async () => {
   await d1.prepare("DELETE FROM tool_runs").run();
   const insert = d1.prepare(
-    "INSERT INTO tool_runs (id, tool_id, status, started_at) VALUES (?, 'png-to-jpg', 'failed', ?)",
+    "INSERT INTO tool_runs (id, tool_id, status, started_at) VALUES (?, 'png-to-jpg', ?, ?)",
   );
   const expired = new Date(now.getTime() - 91 * day).toISOString();
   const kept = new Date(now.getTime() - 89 * day).toISOString();
+  const statuses = ["started", "succeeded", "failed"];
   await d1.batch([
-    ...Array.from({ length: 25 }, (_, i) => insert.bind(`old-${i}`, expired)),
-    insert.bind("kept", kept),
+    // Every status, including abandoned `started` runs, must expire.
+    ...Array.from({ length: 25 }, (_, i) => insert.bind(`old-${i}`, statuses[i % 3], expired)),
+    insert.bind("kept", "succeeded", kept),
   ]);
 });
 
@@ -94,3 +101,64 @@ test("the command refuses to run without a deployed environment", () => {
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /--env must be staging or production/);
 });
+
+test("a deletion request removes one device's runs and nothing else", async () => {
+  const insert = d1.prepare(
+    "INSERT INTO tool_runs (id, tool_id, status, started_at, metadata) VALUES (?, 'png-to-jpg', 'succeeded', ?, ?)",
+  );
+  const at = now.toISOString();
+  await d1.batch([
+    insert.bind("mine-1", at, JSON.stringify({ deviceId: "4132ad8a-b1b5-4af6-b987-d8922405d616" })),
+    insert.bind("mine-2", at, JSON.stringify({ deviceId: "4132ad8a-b1b5-4af6-b987-d8922405d616", engine: "worker" })),
+    insert.bind("theirs", at, JSON.stringify({ deviceId: "muw5jr43-nlbc7nv3" })),
+  ]);
+
+  const result = await deleteDeviceRuns({ execute, deviceId: "4132ad8a-b1b5-4af6-b987-d8922405d616" });
+
+  assert.equal(result.deleted, 2);
+  const ids = await remainingIds();
+  assert.ok(ids.includes("theirs") && !ids.includes("mine-1") && !ids.includes("mine-2"));
+  await assert.rejects(deleteDeviceRuns({ execute, deviceId: "x' OR '1'='1" }), /Invalid device id/);
+  assert.equal((await remainingIds()).length, ids.length);
+});
+
+test("the command runs wrangler d1 execute remotely against the named environment", () => {
+  assert.deepEqual(
+    wranglerExecuteArgs({ wranglerBin: "/w.js", config: "/c.jsonc", env: "production", sql: "SELECT 1" }),
+    ["/w.js", "d1", "execute", "SERP_TOOLS_DB", "--remote", "--config", "/c.jsonc", "--env", "production", "--command", "SELECT 1", "--json"],
+  );
+});
+
+test("wrangler output is parsed strictly", () => {
+  assert.deepEqual(
+    parseWranglerExecuteOutput(JSON.stringify([{ results: [{ id: "a" }], success: true, meta: {} }])),
+    [{ id: "a" }],
+  );
+  for (const stdout of [
+    "Proxy environment variables detected.\n[]",
+    JSON.stringify([{ results: [], success: false }]),
+    JSON.stringify([{ success: true }]),
+    JSON.stringify({ results: [] }),
+    "[]",
+  ]) {
+    assert.throws(() => parseWranglerExecuteOutput(stdout), /wrangler d1 execute/, stdout);
+  }
+});
+
+test("--device-id refuses --dry-run, because it deletes", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      fileURLToPath(new URL("../scripts/purge-telemetry.mjs", import.meta.url)),
+      "--env",
+      "staging",
+      "--device-id",
+      "muw5jr43-nlbc7nv3",
+      "--dry-run",
+    ],
+    { encoding: "utf8", timeout: 30_000 },
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--device-id deletes; it has no --dry-run/);
+});
+

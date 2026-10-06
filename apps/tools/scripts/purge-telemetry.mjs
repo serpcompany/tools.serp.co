@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // Deletes tool runs older than the retention period from a deployed D1
 // (docs/telemetry.md). It isn't scheduled yet, so run it by hand about once a
-// month:
+// month. With --device-id it instead deletes one visitor's runs.
 //
 //   pnpm -C apps/tools telemetry:purge --env production --dry-run
 //   pnpm -C apps/tools telemetry:purge --env production
+//   pnpm -C apps/tools telemetry:purge --env production --device-id <id>
 
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -12,7 +13,12 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { purgeExpiredToolRuns } from "./lib/telemetry-purge.mjs";
+import {
+  deleteDeviceRuns,
+  parseWranglerExecuteOutput,
+  purgeExpiredToolRuns,
+  wranglerExecuteArgs,
+} from "./lib/telemetry-purge.mjs";
 
 const ENVIRONMENTS = new Set(["staging", "production"]);
 const wranglerConfig = fileURLToPath(new URL("../wrangler.jsonc", import.meta.url));
@@ -24,14 +30,16 @@ function resolveWranglerBin() {
 }
 
 function parseArgs(argv) {
-  const args = { env: "", dryRun: false };
+  const args = { env: "", dryRun: false, deviceId: "" };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--env") args.env = argv[++index] ?? "";
     else if (arg === "--dry-run") args.dryRun = true;
+    else if (arg === "--device-id") args.deviceId = argv[++index] ?? "";
     else if (arg !== "--") throw new Error(`Unknown argument: ${arg}`);
   }
   if (!ENVIRONMENTS.has(args.env)) throw new Error("--env must be staging or production");
+  if (args.deviceId && args.dryRun) throw new Error("--device-id deletes; it has no --dry-run");
   return args;
 }
 
@@ -39,32 +47,27 @@ function wranglerExecute(env) {
   return async (sql) => {
     const result = spawnSync(
       process.execPath,
-      [
-        wranglerBin,
-        "d1",
-        "execute",
-        "SERP_TOOLS_DB",
-        "--remote",
-        "--config",
-        wranglerConfig,
-        "--env",
-        env,
-        "--command",
-        sql,
-        "--json",
-      ],
+      wranglerExecuteArgs({ wranglerBin, config: wranglerConfig, env, sql }),
       { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
     );
-    if (result.status !== 0) {
-      throw new Error(`wrangler d1 execute failed:\n${result.stderr || result.stdout}`);
+    if (result.error || result.status !== 0) {
+      throw new Error(
+        `wrangler d1 execute failed:\n${[result.error?.message, result.stderr, result.stdout].filter(Boolean).join("\n")}`,
+      );
     }
-    const [statement] = JSON.parse(result.stdout);
-    return statement?.results ?? [];
+    return parseWranglerExecuteOutput(result.stdout);
   };
 }
 
 const args = parseArgs(process.argv.slice(2));
 const wranglerBin = resolveWranglerBin();
+
+if (args.deviceId) {
+  const removed = await deleteDeviceRuns({ execute: wranglerExecute(args.env), deviceId: args.deviceId });
+  console.log(`${args.env}: deleted ${removed.deleted} runs for device ${removed.deviceId}.`);
+  process.exit(0);
+}
+
 const result = await purgeExpiredToolRuns({
   execute: wranglerExecute(args.env),
   dryRun: args.dryRun,

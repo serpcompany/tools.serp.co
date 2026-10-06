@@ -68,7 +68,7 @@ export async function convertVideoViaApi(
   toFormat: string
 ): Promise<ArrayBuffer> {
   const route = "/api/video-convert";
-  const baseMetadata = {
+  const baseMetadata: ToolRunMetadata = {
     route,
     from: fromFormat,
     to: toFormat,

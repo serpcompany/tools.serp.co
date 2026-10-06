@@ -437,7 +437,7 @@ async function convertImageViaApi(args: {
   onProgress?: (update: ProgressUpdate) => void;
 }): Promise<ConversionResult> {
   const route = "/api/image-convert";
-  const baseMetadata = {
+  const baseMetadata: ToolRunMetadata = {
     route,
     from: args.from,
     to: args.to,
@@ -488,7 +488,7 @@ export async function compressPdfViaApi(args: {
   onProgress?: (update: ProgressUpdate) => void;
 }): Promise<ArrayBuffer> {
   const route = "/api/pdf-compress";
-  const baseMetadata = {
+  const baseMetadata: ToolRunMetadata = {
     route,
     format: "pdf",
     engine: "server-pdf",
@@ -543,7 +543,7 @@ async function compressImageViaApi(args: {
 }): Promise<ArrayBuffer> {
   const format = args.format.toLowerCase();
   const route = "/api/image-compress";
-  const baseMetadata = {
+  const baseMetadata: ToolRunMetadata = {
     route,
     format,
     engine: "server-image-compress",

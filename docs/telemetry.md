@@ -39,8 +39,8 @@ The server keeps only the keys in `METADATA_KEYS`
 groups:
 
 - **Request origin, set only by the server:** `ip` (Cloudflare's
-  `cf-connecting-ip`), `userAgent`, and `release` (the commit the Worker was
-  built from). Values a client sends for these keys are dropped. Keeping `ip`
+  `cf-connecting-ip`, falling back to `x-real-ip` and then `x-forwarded-for`),
+  `userAgent`, and `release` (the commit the Worker was built from). Values a client sends for these keys are dropped. Keeping `ip`
   and `userAgent` was reviewed and accepted by the owner in #161; they help
   debug failures that only one browser or network hits.
 - **Device:** `deviceId`, a random id the browser keeps in `localStorage`
@@ -66,7 +66,9 @@ server-only ones), so typecheck rejects a new key until it is added to
 Tool runs are kept for **90 days** (`TOOL_RUN_RETENTION_DAYS` in
 `packages/tool-telemetry/src/purge.ts`). The purge isn't scheduled yet (owner
 decision, 2026-10-06), so run it by hand about once a month, checking first
-with `--dry-run`:
+with `--dry-run`. It uses your `wrangler login` session; with more than one
+Cloudflare account, also set `CLOUDFLARE_ACCOUNT_ID` (the SERP account id is in
+the Cloudflare runbook).
 
 ```bash
 pnpm -C apps/tools telemetry:purge --env production --dry-run
@@ -84,21 +86,36 @@ aggregates, no per-visitor data, and is rewritten as runs complete.
 A browser that sends [Global Privacy Control](https://globalprivacycontrol.org)
 (`navigator.globalPrivacyControl === true`) sends no tool-run telemetry at all
 and gets no device id. The server also ignores any telemetry request with the
-`Sec-GPC: 1` header, which covers pages cached before the client check. Clearing the site's `localStorage` resets the device id.
+`Sec-GPC: 1` header (status 204), which covers pages cached before the
+client check. Clearing the site's `localStorage` resets the device id.
 GPC doesn't change Google Tag Manager or AdSense, which are configured
 separately.
 
 ## Deletion requests
 
-Runs expire after 90 days without any action. To delete one visitor's runs
-sooner, ask them for their device id (`localStorage.serp_tools_device_id` in
-their browser's console). Then, with the owner's approval, run against
-production:
+Runs are deleted at the first manual purge after they turn 90 days old, so
+with a monthly purge they live 90 to about 120 days. To delete one visitor's
+runs sooner, ask them for their device id (`localStorage.serp_tools_device_id`
+in their browser's console). Then, with the owner's approval, run:
 
 ```bash
-pnpm -C apps/tools exec wrangler d1 execute SERP_TOOLS_DB --remote --env production \
-  --command "DELETE FROM tool_runs WHERE json_extract(metadata, '$.deviceId') = '<device id>'"
+pnpm -C apps/tools telemetry:purge --env production --device-id <device id>
 ```
 
-Runs from before #161 may also contain file names in `metadata`; they expire
-on the same 90-day schedule.
+The command accepts only the device id formats the client generates, so a
+pasted value can't change the SQL. Runs without a device id (for example when
+`localStorage` was blocked) can't be matched to a visitor. Runs from before
+#161 may contain file names and error text in `metadata`; they are purged on
+the same schedule.
+
+## Other copies
+
+- **Neon (before 2026-06-20):** about 26,800 runs from before the Cloudflare
+  cutover stay in the retired Neon database or its export, which the owner
+  keeps as the historical record (#34). They include file names and error
+  text. The purge and deletion requests don't reach them; a deletion request
+  for that period is handled by hand in Neon.
+- **One-off D1 backup:** `tmp/d1-production-backup-20261006T0339Z.sql` in the
+  owner's local checkout (ignored by git) holds every D1 run as of
+  2026-10-06. It is kept only for the broken-tool investigation (#147) and is
+  deleted when that work is done. Never commit it or copy it elsewhere.
