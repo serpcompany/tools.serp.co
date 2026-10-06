@@ -85,7 +85,11 @@ test("the Cloudflare build script refuses a Workers Builds build without an envi
     process.execPath,
     [fileURLToPath(new URL("../scripts/build-cloudflare.mjs", import.meta.url))],
     // An empty PATH means a regression fails fast instead of starting a build.
-    { env: { ...process.env, PATH: "", WORKERS_CI: "1", NEXT_PUBLIC_SITE_ENV: "" }, encoding: "utf8" },
+    {
+      env: { ...process.env, PATH: "", WORKERS_CI: "1", NEXT_PUBLIC_SITE_ENV: "" },
+      encoding: "utf8",
+      timeout: 10_000,
+    },
   );
   assert.equal(result.status, 1);
   // The message, not just the exit code: a missing build tool also exits 1.
@@ -95,11 +99,11 @@ test("the Cloudflare build script refuses a Workers Builds build without an envi
 test("constants duplicated in scripts match their sources", () => {
   const smokeScript = source("../scripts/smoke-cloudflare-api.mjs");
   const header = source("./site-environment.ts").match(/SMOKE_TEST_HEADER = "([^"]+)"/)[1];
-  assert.match(smokeScript, new RegExp(`const SMOKE_TEST_HEADER = "${header}";`));
+  assert.ok(smokeScript.includes(`const SMOKE_TEST_HEADER = "${header}";`), header);
   const gtmId = source("../../../packages/app-core/src/components/gtag-manager.tsx").match(
     /gtmId = "([^"]+)"/,
   )[1];
-  assert.match(smokeScript, new RegExp(`const GTM_CONTAINER = "${gtmId}";`));
+  assert.ok(smokeScript.includes(`const GTM_CONTAINER = "${gtmId}";`), gtmId);
 });
 
 test("non-canonical hosts get a permanent 308", () => {

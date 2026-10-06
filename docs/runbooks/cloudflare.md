@@ -26,8 +26,9 @@ turn off preview URLs (`preview_urls: false`).
 `NEXT_PUBLIC_SITE_ENV` (`local`, `staging` or `production`) is set by each
 `cf:build:*` script and in each environment's `vars`. Next.js inlines it at
 build time when it is set, so the build command decides it; a test keeps the
-build scripts, `vars` and routes in agreement, and a Workers Builds build
-without it fails. Anything other than `production` is non-production
+build scripts, `vars` and routes in agreement. A Workers Builds build fails
+unless it is `staging` or `production`, and a build of `main` must be
+`production`. Anything other than `production` is non-production
 (`apps/tools/lib/site-environment.ts`):
 
 - Every page sends `X-Robots-Tag: noindex, nofollow`, and `robots.txt`
@@ -45,7 +46,8 @@ so they get neither the redirect nor the header; `public/_headers` marks
 `/vendor/*` (which includes the pdf.js viewer HTML) `noindex` everywhere.
 
 After a deploy, check the environment rules: robots, `X-Robots-Tag`, and GTM
-present only in production. Add `--platform-url` with the Worker's
+and AdSense present only in production (the check assumes AdSense test mode is
+off). Add `--platform-url` with the Worker's
 `*.workers.dev` URL to check the redirect too; it retries for 30 s while the
 new version rolls out.
 
