@@ -77,8 +77,16 @@ Indexes:
 | `median_reduction_pct` | `REAL`    | yes  | Median compression/reduction percentage.         |
 | `updated_at`           | `TEXT`    | no   | ISO timestamp text.                              |
 
-The migration that creates these tables is
-`apps/tools/migrations/0001_tool_telemetry.sql`.
+The schema is defined in Drizzle at `packages/tool-telemetry/src/schema.ts`.
+To change it, edit the schema, run `pnpm -C apps/tools db:generate`, and commit
+the new file in `apps/tools/migrations` with its `meta/` snapshot. The
+`d1-migrations` test fails if the schema and migrations disagree. Never use
+`drizzle-kit push` against shared databases.
+
+The baseline `0000_tool_telemetry.sql` replaced the hand-written
+`0001_tool_telemetry.sql`. It uses `IF NOT EXISTS`, so applying it to the
+existing production and preview databases is a no-op; their migration ledgers
+will list both names.
 
 ## Telemetry Write Contract
 
@@ -187,7 +195,7 @@ route-parity evidence is indexed under `docs/audits`; it is not a current
 deployment procedure.
 
 Repository runtime and CI paths are Cloudflare-only. The legacy Postgres client,
-Drizzle schema/configuration, Vercel preview workflow, and Vercel comparison
+Postgres Drizzle configuration, Vercel preview workflow, and Vercel comparison
 runners have been removed. External account retirement remains owner-controlled
 under GitHub issue #34; repository cleanup is not evidence that remote projects,
 domains, integrations, credentials, or databases have been deleted.
