@@ -1,11 +1,11 @@
 import { recordToolRunInD1, type D1DatabaseLike } from "./d1.ts";
-import type { ToolRunEvent } from "./types.ts";
+import { parseToolRunEvent, type TelemetryErrorCode } from "./validate.ts";
 
 type RecordToolRunResult = {
   status: number;
   body: {
     ok: boolean;
-    error?: string;
+    error?: TelemetryErrorCode | "d1_unavailable" | "d1_write_failed";
   };
 };
 
@@ -14,48 +14,26 @@ type RecordToolRunOptions = {
   now?: Date;
 };
 
-function isToolRunEvent(payload: unknown): payload is ToolRunEvent {
-  if (!payload || typeof payload !== "object") return false;
-  const data = payload as Record<string, unknown>;
-  return (
-    typeof data.runId === "string" &&
-    typeof data.toolId === "string" &&
-    typeof data.event === "string" &&
-    typeof data.startedAt === "string"
-  );
-}
-
-function toDate(value: string) {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return null;
-  return parsed;
-}
-
 export async function recordToolRun(
   payload: unknown,
   options: RecordToolRunOptions = {}
 ): Promise<RecordToolRunResult> {
-  if (!isToolRunEvent(payload)) {
-    return { status: 400, body: { ok: false, error: "Missing fields" } };
-  }
-
-  const startedAt = toDate(payload.startedAt);
-  if (!startedAt) {
-    return { status: 400, body: { ok: false, error: "Invalid startedAt" } };
+  const now = options.now ?? new Date();
+  const parsed = parseToolRunEvent(payload, now);
+  if (!parsed.ok) {
+    return { status: 400, body: { ok: false, error: parsed.code } };
   }
 
   if (!options.d1) {
-    return {
-      status: 503,
-      body: { ok: false, error: "D1 telemetry binding unavailable" },
-    };
+    return { status: 503, body: { ok: false, error: "d1_unavailable" } };
   }
 
   try {
-    await recordToolRunInD1(options.d1, payload, { now: options.now });
+    await recordToolRunInD1(options.d1, parsed.event, { now });
     return { status: 200, body: { ok: true } };
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "D1 telemetry write failed";
-    return { status: 500, body: { ok: false, error: message } };
+    // Log the code and error class only; D1 messages can echo SQL and values.
+    console.error("telemetry d1_write_failed", err instanceof Error ? err.name : typeof err);
+    return { status: 500, body: { ok: false, error: "d1_write_failed" } };
   }
 }

@@ -1,0 +1,11 @@
+{
+	"name": "tool-telemetry-test",
+	"compatibility_date": "2024-12-30",
+	"d1_databases": [
+		{
+			"binding": "SERP_TOOLS_DB",
+			"database_name": "tool-telemetry-test",
+			"database_id": "00000000-0000-0000-0000-000000000000"
+		}
+	]
+}
