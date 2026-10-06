@@ -23,8 +23,12 @@ Staging reuses the former preview D1 database and R2 bucket. Both deployed
 environments keep their `*.workers.dev` URL (`workers_dev: true`) for CI and
 turn off preview URLs (`preview_urls: false`).
 
-Production deploys come from Cloudflare Workers Builds on every push to `main`.
-Its deploy command must be `pnpm -C apps/tools deploy:production`.
+Production deploys come from Cloudflare Workers Builds on every push to `main`
+(only `main` builds). Its settings must be: root directory `/`, build command
+`pnpm -C apps/tools cf:build:production`, deploy command
+`pnpm -C apps/tools exec wrangler deploy --env production`. D1 migrations are
+not applied by the build; run `db:migrate:production` before merging code that
+needs them.
 
 ```bash
 pnpm -C apps/tools cf:preview                 # local build + wrangler dev (top-level config)
