@@ -21,10 +21,9 @@ truth. Prefer the nearest scoped `AGENTS.md` when one exists.
 ## Git workflow
 
 Follow the serp [git workflow](https://github.com/serpcompany/serp/blob/main/docs/engineering/standards/git-workflow.md):
-one issue, one branch, one PR, one squash commit on the base branch. That is
-`main` today; the move to a `staging` base branch is #188.
+one issue, one branch, one PR, one squash commit on `staging`, the base branch.
 
-- Branch: `issue-<number>-<short-slug>`, from the base branch.
+- Branch: `issue-<number>-<short-slug>`, from `staging`; PRs target `staging`.
 - PR title: a Conventional Commit phrased as the outcome a user notices. The
   `PR Title` check reports the format (`scripts/check-pr-title.mjs`); it
   blocks merging once #154 makes it required. To revert a merge, use GitHub's
@@ -34,9 +33,10 @@ one issue, one branch, one PR, one squash commit on the base branch. That is
 - A fresh review agent reviews every PR; resolve each finding, re-review after
   blocking fixes, and record the outcome in the PR. Agents never merge without
   the owner's approval.
-- Every merge to `main` deploys production through Workers Builds, which does
-  not apply D1 migrations: run `db:migrate:production` before merging code
-  that needs them (`docs/runbooks/cloudflare.md`).
+- A merge to `staging` deploys Staging (migrations, deploy, smoke tests).
+  Production changes only when the owner promotes `staging` to `main` with a
+  fast-forward (`git fetch origin && git push origin origin/staging:main`),
+  which deploys Production the same way (`docs/runbooks/cloudflare.md`).
 
 ## Scoped policies
 
