@@ -221,11 +221,12 @@ function safeGetChecks(args) {
   }));
 
   if (args.internalToken) {
-    const url = new URL(buildUrl(args.baseUrl, "/internal/tools/"));
-    url.searchParams.set("token", args.internalToken);
     checks.push({
       name: "GET /internal/tools/ with token",
-      url: url.toString(),
+      url: buildUrl(args.baseUrl, "/internal/tools/"),
+      headers: {
+        authorization: `Basic ${Buffer.from(`smoke:${args.internalToken}`).toString("base64")}`,
+      },
       expect: (response, bytes) =>
         response.status === 200 && bytes.includes(Buffer.from("Tools Dashboard")),
       details: (response, bytes) => ({

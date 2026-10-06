@@ -44,3 +44,4 @@ tmp/
 *.tsbuildinfo
 .playwright-mcp/
 logs/
+.wrangler/
