@@ -11,6 +11,9 @@ const toolsPath = path.resolve(tracingRoot, "packages/app-core/src/data/tools.js
 const appDir = path.resolve(appRoot, "app");
 let ffmpegRoutes = [];
 const transcribeRoutes = new Set();
+// Multi-thread FFmpeg needs cross-origin isolation (COEP), and the worker
+// scripts don't send COEP headers yet: turning this off breaks FFmpeg and
+// transcription pages until they do (PR #213).
 const singleThreadEnv = process.env.NEXT_PUBLIC_FFMPEG_SINGLE_THREAD ?? "true";
 const useSingleThread = singleThreadEnv === "true";
 
@@ -72,7 +75,7 @@ try {
       if (!tool?.isActive || !tool?.route) return false;
       const normalizedRoute = normalizeRoute(tool.route);
       if (!normalizedRoute) return false;
-      return transcribeRouteSet.has(normalizedRoute) || (includeFfmpegRoutes && tool?.requiresFFmpeg);
+      return includeFfmpegRoutes && (transcribeRouteSet.has(normalizedRoute) || tool?.requiresFFmpeg);
     })
     .map((tool) => normalizeRoute(tool.route))
     .filter((route) => {
@@ -80,7 +83,11 @@ try {
       seenRoutes.add(route);
       return true;
     });
-  for (const route of transcribeRouteSet) {
+  // Like other FFmpeg pages, transcription pages are only isolated for
+  // multi-threaded FFmpeg. Their Worker scripts are served without a COEP
+  // header, so Chrome refuses them on an isolated page and transcription
+  // hangs (issue #171).
+  for (const route of includeFfmpegRoutes ? transcribeRouteSet : []) {
     if (!route || seenRoutes.has(route)) continue;
     seenRoutes.add(route);
     ffmpegRoutes.push(route);
@@ -130,6 +137,8 @@ const nextConfig = {
     "@serp-tools/tool-telemetry",
   ],
   trailingSlash: true,
+  // middleware.ts applies the trailing-slash rules (lib/trailing-slash.ts).
+  skipTrailingSlashRedirect: true,
   env: {
     BUILD_MODE: "server",
     SUPPORTS_VIDEO_CONVERSION: "true",
@@ -155,21 +164,13 @@ const nextConfig = {
   },
   async rewrites() {
     return [
+      // Root-level sitemap files: /sitemap.xml, /sitemap-<group>.xml and the
+      // retired /pages-0.xml-style names, which 308 to the flat tree
+      // (lib/sitemap.ts). /sitemap-index.xml has its own route and is
+      // matched before this rewrite.
       {
-        source: "/sitemap-:page.xml",
-        destination: "/sitemap/:page",
-      },
-      {
-        source: "/pages-:page.xml",
-        destination: "/sitemaps/pages/:page",
-      },
-      {
-        source: "/tools-:page.xml",
-        destination: "/sitemaps/tools/:page",
-      },
-      {
-        source: "/categories-:page.xml",
-        destination: "/sitemaps/categories/:page",
+        source: "/:file((?:sitemap|pages|tools|categories)(?:-[a-z0-9-]+)?\\.xml)",
+        destination: "/sitemaps/:file",
       },
     ];
   },

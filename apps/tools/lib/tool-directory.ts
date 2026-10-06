@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { canonicalPath } from "./trailing-slash.ts";
+
 type OperationType =
   | "bulk"
   | "combine"
@@ -257,7 +259,9 @@ export function getToolDirectoryIcon(toolId: string): LucideIcon {
   return iconMap[toolId] ?? Image;
 }
 
-export function getAvailableToolOperations(tools: ToolDirectorySource[]): OperationType[] {
+export function getAvailableToolOperations(
+  tools: Pick<ToolDirectorySource, "isActive" | "operation">[],
+): OperationType[] {
   const operations = new Set<OperationType>();
 
   tools.forEach((tool) => {
@@ -271,7 +275,9 @@ export function getAvailableToolOperations(tools: ToolDirectorySource[]): Operat
   return TOOL_OPERATION_ORDER.filter((operation) => operations.has(operation));
 }
 
-export function getCategoryPagePaths(tools: ToolDirectorySource[]): string[] {
+export function getCategoryPagePaths(
+  tools: Pick<ToolDirectorySource, "isActive" | "operation">[],
+): string[] {
   return getAvailableToolOperations(tools).map((operation) => toCategoryPath(operation));
 }
 
@@ -286,7 +292,9 @@ export function buildToolDirectoryEntries(tools: ToolDirectorySource[]): ToolDir
         name: tool.name,
         description: tool.description,
         category,
-        href: tool.route ?? "/",
+        // Written canonical (slashed): with skipTrailingSlashRedirect on,
+        // <Link> no longer adds the slash itself.
+        href: canonicalPath(tool.route ?? "/"),
         tags: normalizeTags(tool),
         isNew: Boolean(tool.isNew),
         isPopular: Boolean(tool.isPopular),

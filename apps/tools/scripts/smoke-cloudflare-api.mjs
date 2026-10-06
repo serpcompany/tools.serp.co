@@ -253,6 +253,8 @@ function safeGetChecks(args) {
     "/pdf-editor/",
     "/robots.txt",
     "/sitemap-index.xml",
+    "/sitemap-pages.xml",
+    "/sitemap-tools.xml",
   ];
   const checks = paths.map((pathname) => ({
     name: `GET ${pathname}`,
@@ -264,6 +266,23 @@ function safeGetChecks(args) {
       bytes: bytes.length,
     }),
   }));
+
+  // /sitemap.xml is an alias, and retired sitemap names move to the flat tree.
+  const sitemapRedirects = {
+    "/sitemap.xml": "/sitemap-index.xml",
+    "/tools-index.xml": "/sitemap-index.xml",
+    "/tools-0.xml": "/sitemap-tools.xml",
+  };
+  for (const [pathname, target] of Object.entries(sitemapRedirects)) {
+    checks.push({
+      name: `GET ${pathname} 308s to ${target}`,
+      url: buildUrl(args.baseUrl, pathname),
+      expect: (response) =>
+        response.status === 308 &&
+        new URL(response.headers.get("location") ?? "", args.baseUrl).pathname === target,
+      details: (response) => ({ location: response.headers.get("location") }),
+    });
+  }
 
   if (args.internalToken) {
     checks.push({
@@ -292,6 +311,14 @@ function canonicalOrigin(expectEnv) {
   return new URL(siteUrl).origin;
 }
 
+function sitemapLocs(bytes) {
+  return [...bytes.toString("utf8").matchAll(/<loc>([^<]*)<\/loc>/g)].map((match) => match[1]);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 // Must match the GTM id in gtag-manager.tsx (pinned by a test).
 const GTM_CONTAINER = "GTM-PP9W77LK";
 const ADSENSE_SCRIPT = "pagead/js/adsbygoogle.js";
@@ -317,6 +344,34 @@ function environmentChecks(args) {
       details: (_response, bytes) => ({ body: bytes.toString("utf8").slice(0, 200) }),
     },
     {
+      name: `sitemap index lists only ${canonical}/sitemap-<group>.xml files`,
+      url: buildUrl(args.baseUrl, "/sitemap-index.xml"),
+      expect: (response, bytes) => {
+        const locs = sitemapLocs(bytes);
+        const child = new RegExp(`^${escapeRegExp(canonical)}/sitemap-[a-z]+(?:-\\d+)?\\.xml$`);
+        return (
+          response.status === 200 &&
+          locs.includes(`${canonical}/sitemap-pages.xml`) &&
+          locs.includes(`${canonical}/sitemap-tools.xml`) &&
+          locs.every((loc) => child.test(loc))
+        );
+      },
+      details: (_response, bytes) => ({ locs: sitemapLocs(bytes) }),
+    },
+    {
+      name: `sitemap homepage is ${canonical} without a slash`,
+      url: buildUrl(args.baseUrl, "/sitemap-pages.xml"),
+      expect: (response, bytes) => {
+        const locs = sitemapLocs(bytes);
+        return (
+          response.status === 200 &&
+          locs.includes(canonical) &&
+          locs.every((loc) => loc === canonical || (loc.startsWith(`${canonical}/`) && loc.endsWith("/")))
+        );
+      },
+      details: (_response, bytes) => ({ locs: sitemapLocs(bytes) }),
+    },
+    {
       name: `X-Robots-Tag, analytics and ads match ${args.expectEnv}`,
       url: buildUrl(args.baseUrl, "/"),
       expect: (response, bytes) => {
@@ -338,7 +393,68 @@ function environmentChecks(args) {
     },
   );
 
+  // serp url-trailing-slash standard (issue #165, #167).
+  const locationPath = (response) => {
+    const location = response.headers.get("location");
+    return location ? new URL(location, args.baseUrl).pathname : null;
+  };
+  checks.push(
+    {
+      name: "homepage canonical and og:url are the bare origin",
+      url: buildUrl(args.baseUrl, "/"),
+      expect: (response, bytes) => {
+        const html = bytes.toString("utf8");
+        return (
+          response.status === 200 &&
+          html.includes(`<link rel="canonical" href="${canonical}"/>`) &&
+          html.includes(`<meta property="og:url" content="${canonical}"/>`)
+        );
+      },
+      details: (_response, bytes) => ({
+        canonical: bytes.toString("utf8").match(/<link rel="canonical"[^>]*>/)?.[0] ?? null,
+      }),
+    },
+    {
+      name: "a page without its slash 308s to the slashed page",
+      url: buildUrl(args.baseUrl, "/png-to-jpg"),
+      expect: (response) => response.status === 308 && locationPath(response) === "/png-to-jpg/",
+      details: (response) => ({ location: response.headers.get("location") }),
+    },
+    {
+      name: "a file with a slash 308s to the file",
+      url: buildUrl(args.baseUrl, "/robots.txt/"),
+      expect: (response) => response.status === 308 && locationPath(response) === "/robots.txt",
+      details: (response) => ({ location: response.headers.get("location") }),
+    },
+    {
+      name: "an old route 308s straight to its canonical page",
+      url: buildUrl(args.baseUrl, "/download-kajab-videos"),
+      expect: (response) =>
+        response.status === 308 && locationPath(response) === "/download-kajabi-videos/",
+      details: (response) => ({ location: response.headers.get("location") }),
+    },
+    ...["/api/telemetry", "/api/telemetry/"].map((path) => ({
+      name: `POST ${path} is never redirected`,
+      url: buildUrl(args.baseUrl, path),
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "not json",
+      expect: (response) => response.status === 400,
+      details: (response) => ({ location: response.headers.get("location") }),
+    })),
+  );
+
   if (args.platformUrl) {
+    checks.push({
+      name: "platform host 308s /api to the canonical host, path unchanged",
+      url: buildUrl(args.platformUrl, "/api/telemetry"),
+      skipSmokeTestHeader: true,
+      retryForMs: 30_000,
+      expect: (response) =>
+        response.status === 308 &&
+        response.headers.get("location") === `${canonical}/api/telemetry`,
+      details: (response) => ({ location: response.headers.get("location") }),
+    });
     checks.push({
       name: "platform host 308s to the canonical host",
       url: buildUrl(args.platformUrl, "/png-to-jpg/?smoke=1"),

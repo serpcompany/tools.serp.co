@@ -11,6 +11,7 @@ import { extractAudioForTranscription } from "@/lib/convert/video";
 import { AUDIO_FORMATS, VIDEO_FORMATS } from "@/lib/capabilities";
 import { getMediaFetchEndpoint } from "@/lib/media-fetch-endpoint";
 import { readMediaFilename } from "@/lib/media-filename-transport";
+import { normalizeBlobPart } from "@/lib/blob-parts";
 
 type ProgressUpdate = {
   progress?: number;
@@ -317,15 +318,11 @@ export default function TranscribeTool({ toolId, title, subtitle }: Props) {
       });
     }
 
-    const blobParts = chunks.map((chunk) => {
-      const slice = chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength);
-      if (slice instanceof SharedArrayBuffer) {
-        const copy = new ArrayBuffer(slice.byteLength);
-        new Uint8Array(copy).set(new Uint8Array(slice));
-        return copy;
-      }
-      return slice;
-    });
+    // normalizeBlobPart never touches the SharedArrayBuffer global, which
+    // doesn't exist on these (not cross-origin isolated) pages.
+    const blobParts = chunks.map((chunk) =>
+      normalizeBlobPart(chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength)),
+    );
     const blob = new Blob(blobParts, { type: contentType || "application/octet-stream" });
     return new File([blob], fileName, {
       type: contentType || "application/octet-stream",

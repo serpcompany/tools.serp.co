@@ -70,6 +70,21 @@ server-only ones), so typecheck rejects a new key until it is added to
 `METADATA_KEYS` and this doc. Values are capped (20 keys,
 4 KB, strings cut to 256 characters).
 
+## Error reports (Sentry)
+
+Separate from tool-run telemetry, the browser and the Worker can report
+unexpected errors to Sentry (`apps/tools/lib/sentry-client.ts`,
+`apps/tools/sentry-worker.mjs`). Reporting is off unless the `SENTRY_DSN`
+repository variable is set; the Deploy workflow passes it to the build
+(`NEXT_PUBLIC_SENTRY_DSN`) and to the Worker (`SENTRY_DSN`).
+
+A report carries the error type, message and stack, the page path without its
+query string, the browser or runtime, the environment, and the release
+(`tools-serp-co@<commit>`). `beforeSend` (`apps/tools/lib/sentry-scrub.ts`)
+removes user identity, IP, cookies, headers, query strings, request bodies,
+console breadcrumbs and extra data. Tracing, replay and profiling are off.
+Browsers that send Global Privacy Control send no reports.
+
 ## Retention
 
 Tool runs are kept for **90 days** (`TOOL_RUN_RETENTION_DAYS` in

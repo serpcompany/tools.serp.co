@@ -7,7 +7,8 @@ export const scriptsRoot = path.resolve(path.dirname(fileURLToPath(import.meta.u
 export const appRoot = path.resolve(scriptsRoot, "..");
 export const repoRoot = path.resolve(appRoot, "../..");
 
-export const PAGE_SIZE = 10000;
+// Must match MAX_URLS_PER_SITEMAP in lib/sitemap.ts.
+export const MAX_URLS_PER_SITEMAP = 50000;
 
 export const OPERATION_ORDER = [
   "convert",
@@ -166,30 +167,19 @@ export function buildRouteManifest(options = {}) {
     addRoute(routes, routePath, "app-page");
   }
 
-  const pageSitemapPages = Math.max(1, Math.ceil(DEFAULT_STATIC_PATHS.length / PAGE_SIZE));
-  const toolSitemapPages = Math.max(1, Math.ceil(activeTools.length / PAGE_SIZE));
-  const categorySitemapPages = Math.max(1, Math.ceil(getCategoryPaths(activeTools).length / PAGE_SIZE));
-
-  const sitemapPaths = [
-    "/robots.txt",
-    "/ads.txt",
-    "/sitemap-index.xml",
-    "/pages-index.xml",
-    "/tools-index.xml",
-    "/categories-index.xml",
-  ];
-
-  for (let index = 0; index < pageSitemapPages; index += 1) {
-    sitemapPaths.push(`/pages-${index}.xml`, `/sitemaps/pages/${index}/`);
-  }
-  for (let index = 0; index < toolSitemapPages; index += 1) {
-    sitemapPaths.push(`/tools-${index}.xml`, `/sitemaps/tools/${index}/`);
-  }
-  for (let index = 0; index < categorySitemapPages; index += 1) {
-    sitemapPaths.push(`/categories-${index}.xml`, `/sitemaps/categories/${index}/`);
-  }
-  for (let index = 0; index < Math.max(pageSitemapPages, toolSitemapPages); index += 1) {
-    sitemapPaths.push(`/sitemap-${index}.xml`, `/sitemap/${index}/`);
+  // The flat sitemap tree from lib/sitemap.ts: one root-level URL set per
+  // content group, numbered from -2 when a group passes the URL limit.
+  const sitemapFileCount = (count) => Math.ceil(count / MAX_URLS_PER_SITEMAP);
+  const sitemapGroups = {
+    pages: DEFAULT_STATIC_PATHS.length,
+    tools: activeTools.length,
+    categories: getCategoryPaths(activeTools).length,
+  };
+  const sitemapPaths = ["/robots.txt", "/ads.txt", "/sitemap-index.xml"];
+  for (const [group, count] of Object.entries(sitemapGroups)) {
+    for (let part = 1; part <= sitemapFileCount(count); part += 1) {
+      sitemapPaths.push(part === 1 ? `/sitemap-${group}.xml` : `/sitemap-${group}-${part}.xml`);
+    }
   }
 
   for (const pathname of sitemapPaths) {

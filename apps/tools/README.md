@@ -22,6 +22,16 @@ Active Tools drive public discovery, metadata, and sitemap projections. Keep
 directory payloads plain-data safe when passing from Server Components to
 client components.
 
+## Sitemaps
+
+`lib/sitemap.ts` builds a flat tree per the serp
+[sitemap standard](https://github.com/serpcompany/serp/blob/main/docs/engineering/websites/features/xml-sitemaps.md):
+`/sitemap-index.xml` lists only root-level `/sitemap-{pages,tools,categories}.xml`
+URL sets (`-2`, `-3`... past 50,000 URLs). The homepage entry is the bare origin
+and other entries end in `/`. Deployed environments write their canonical
+origin, local runs the request origin. `/sitemap.xml` and retired names
+(`/sitemap-0.xml`, `/tools-index.xml`, `/tools-0.xml`) 308 into the tree.
+
 ## Rendering and shared page behavior
 
 - Standard Tools use the shared Tool page renderer and template.

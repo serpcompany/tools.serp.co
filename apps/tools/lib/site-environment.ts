@@ -1,5 +1,7 @@
 import { isProductionSite } from "@serp-tools/app-core/lib/site-env";
 
+import { canonicalPath } from "./trailing-slash.ts";
+
 // Which deployment this build serves. `NEXT_PUBLIC_SITE_ENV` is set per
 // environment in the cf:build:* scripts and in wrangler.jsonc vars. Anything
 // other than "production" is non-production: noindex, crawling disallowed, no
@@ -24,8 +26,9 @@ type CanonicalRedirectArgs = {
 };
 
 // Deployed environments have exactly one canonical host. Returns the URL to
-// 308 to when a request arrives on any other host, otherwise null. Local runs
-// never redirect.
+// 308 to when a request arrives on any other host, otherwise null. The target
+// also has the canonical trailing slash, so a platform-host request takes one
+// hop, not two. Local runs never change host.
 export function getCanonicalRedirectUrl({
   requestUrl,
   siteEnv,
@@ -40,7 +43,7 @@ export function getCanonicalRedirectUrl({
   const url = new URL(requestUrl);
   if (url.host === canonical.host) return null;
 
-  return `${canonical.origin}${url.pathname}${url.search}`;
+  return `${canonical.origin}${canonicalPath(url.pathname)}${url.search}`;
 }
 
 // Checks the decoded path too, so an encoded spelling such as
@@ -68,11 +71,38 @@ export function decideMiddleware(args: CanonicalRedirectArgs): MiddlewareDecisio
   const location = getCanonicalRedirectUrl(args);
   if (location) return { type: "redirect", location };
 
+  const url = new URL(args.requestUrl);
+  const path = canonicalPath(url.pathname);
+  if (path !== url.pathname) {
+    return { type: "redirect", location: `${url.origin}${path}${url.search}` };
+  }
+
   return {
     type: "continue",
     requireDashboardAuth: isInternalPath(new URL(args.requestUrl).pathname),
     noindex: !isProductionSite(args.siteEnv),
   };
+}
+
+type SiteOriginArgs = {
+  requestUrl: string;
+  siteEnv: string | undefined;
+  siteUrl: string | undefined;
+};
+
+// The origin to write into absolute URLs such as sitemap entries. Staging and
+// production use their canonical origin; any other run (next dev, a local
+// wrangler dev) uses the origin it was requested on, so local output never
+// points at a deployed host. A local cf:build inlines the production
+// NEXT_PUBLIC_SITE_URL default, so the environment decides, not the URL.
+export function getSiteOrigin({ requestUrl, siteEnv, siteUrl }: SiteOriginArgs): string {
+  if (siteEnv && DEPLOYED_ENVIRONMENTS.has(siteEnv)) {
+    // Never fall back to the request host here: a platform-host request
+    // would put *.workers.dev URLs in the sitemap.
+    if (!siteUrl) throw new Error(`NEXT_PUBLIC_SITE_URL is unset for ${siteEnv}`);
+    return new URL(siteUrl.startsWith("http") ? siteUrl : `https://${siteUrl}`).origin;
+  }
+  return new URL(requestUrl).origin;
 }
 
 export function getRobotsTxt(siteEnv: string | undefined, siteBase: string) {

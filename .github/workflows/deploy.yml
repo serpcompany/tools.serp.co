@@ -96,7 +96,11 @@ jobs:
           fi
 
       # Build first: a failed build must not leave migrations applied.
+      # SENTRY_DSN is a repository variable (not secret: DSNs are public).
+      # Unset, error reporting stays off (docs/telemetry.md).
       - name: Build
+        env:
+          NEXT_PUBLIC_SENTRY_DSN: ${{ vars.SENTRY_DSN }}
         run: pnpm -C apps/tools cf:build:${DEPLOY_ENV}
 
       # Only these two steps can read the token.
@@ -108,7 +112,10 @@ jobs:
       - name: Deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: pnpm -C apps/tools exec wrangler deploy --env ${DEPLOY_ENV}
+          SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+        run: >-
+          pnpm -C apps/tools exec wrangler deploy --env ${DEPLOY_ENV}
+          ${SENTRY_DSN:+--var "SENTRY_DSN:$SENTRY_DSN"}
 
       # The asset host (assets.tools.serp.co, R2) isn't deployed here and sits
       # behind the branded zone's bot protection, which can challenge runners.
