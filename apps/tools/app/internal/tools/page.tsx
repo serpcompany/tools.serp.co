@@ -73,7 +73,7 @@ export default async function ToolsDashboard() {
     rows = dashboardData.statusRows;
     failureRows = dashboardData.failureRows;
   } catch (err: unknown) {
-    console.error("internal dashboard: D1 load failed", dashboardLoadErrorLogDetail(err));
+    console.error("internal dashboard: D1 load failed", dashboardLoadErrorLogDetail(err), err);
     loadError = describeDashboardLoadError(err);
   }
 
