@@ -9,6 +9,12 @@ on:
 permissions:
   contents: read
 
+# A new push to a PR cancels that PR's older run. Every main run gets its own
+# group, so each commit is checked (serp verification-cadence standard).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -30,8 +36,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install pinned browser runtime
-        run: pnpm exec playwright install --with-deps chromium
+      # The pnpm store is cached by setup-node above. This restores Next.js's
+      # incremental build cache (Next validates it), saves a fresh one every
+      # run, and never reuses one built from a different lockfile.
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: apps/tools/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
       - name: Run deterministic production check
         run: pnpm check
