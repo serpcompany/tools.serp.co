@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { canonicalPath } from "./trailing-slash.ts";
+
 type OperationType =
   | "bulk"
   | "combine"
@@ -290,7 +292,9 @@ export function buildToolDirectoryEntries(tools: ToolDirectorySource[]): ToolDir
         name: tool.name,
         description: tool.description,
         category,
-        href: tool.route ?? "/",
+        // Written canonical (slashed): with skipTrailingSlashRedirect on,
+        // <Link> no longer adds the slash itself.
+        href: canonicalPath(tool.route ?? "/"),
         tags: normalizeTags(tool),
         isNew: Boolean(tool.isNew),
         isPopular: Boolean(tool.isPopular),
