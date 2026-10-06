@@ -17,6 +17,10 @@ import {
   getDownloaderRateLimitIdentity,
 } from "../../../lib/downloader-rate-limit";
 import { setMediaFilenameHeaders } from "../../../lib/media-filename-transport";
+import {
+  getUnsupportedTranscriptionLink,
+  MEDIA_LINK_UNAVAILABLE,
+} from "../../../lib/media-link-support";
 
 export const runtime = "nodejs";
 
@@ -597,11 +601,26 @@ export async function POST(request: Request) {
     );
   }
 
+  const unsupportedLink = getUnsupportedTranscriptionLink(targetUrl, payload.consumer);
+  if (unsupportedLink) {
+    return buildJsonErrorResponse(
+      { code: unsupportedLink.code, error: unsupportedLink.message },
+      422,
+    );
+  }
+
   try {
     await assertPublicUrl(targetUrl);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "URL is not allowed.";
-    return buildJsonErrorResponse({ error: message }, 400);
+    // DNS and runtime messages stay in the logs.
+    console.error("media-fetch rejected URL", {
+      host: targetUrl.hostname,
+      message: err instanceof Error ? err.message : "unknown error",
+    });
+    return buildJsonErrorResponse(
+      { error: "That link can't be fetched. Check the address, or upload the file." },
+      400,
+    );
   }
 
   const mode = payload.mode ?? "audio";
@@ -632,7 +651,19 @@ export async function POST(request: Request) {
         ? String((err as { stderr?: unknown }).stderr ?? "")
         : "";
     const trimmedStderr = stderr.trim().split("\n")[0] || "";
-    const message = errMessage || trimmedStderr || "Failed to fetch media.";
-    return buildJsonErrorResponse({ error: message }, 500);
+    // Internal parser and runtime messages stay in the logs, not the UI.
+    console.error("media-fetch failed", {
+      host: targetUrl.hostname,
+      message: errMessage || trimmedStderr || "unknown error",
+    });
+    // Downloader pages offer the browser extension on this 500 (see
+    // getExtensionFailureCta in VideoDownloaderTool.tsx).
+    if (payload.consumer === DOWNLOADER_CONSUMER) {
+      return buildJsonErrorResponse({ error: "Failed to fetch media." }, 500);
+    }
+    return buildJsonErrorResponse(
+      { code: MEDIA_LINK_UNAVAILABLE.code, error: MEDIA_LINK_UNAVAILABLE.message },
+      422,
+    );
   }
 }
