@@ -129,6 +129,9 @@ if (ytDlpTrace) {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Use the Next.js server runtime compiled by OpenNext (no static export)
+  // Deploys with a Sentry auth token build browser source maps, upload them
+  // to Sentry and delete them before deploying (.github/workflows/deploy.yml).
+  productionBrowserSourceMaps: process.env.SENTRY_SOURCEMAPS === "true",
   transpilePackages: [
     "@jsquash/jpeg",
     "@jsquash/oxipng",

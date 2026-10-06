@@ -29,6 +29,8 @@ jobs:
       # The SERP account (docs/runbooks/cloudflare.md). Not secret.
       CLOUDFLARE_ACCOUNT_ID: cec5f04e1d18bcc65f2be0aefb04f059
       WRANGLER_SEND_METRICS: "false"
+      # "true" when the SENTRY_AUTH_TOKEN secret exists (docs/telemetry.md).
+      SENTRY_SOURCEMAPS: ${{ secrets.SENTRY_AUTH_TOKEN != '' }}
     steps:
       - name: Only staging and main deploy
         if: github.ref_name != 'main' && github.ref_name != 'staging'
@@ -103,7 +105,29 @@ jobs:
           NEXT_PUBLIC_SENTRY_DSN: ${{ vars.SENTRY_DSN }}
         run: pnpm -C apps/tools cf:build:${DEPLOY_ENV}
 
-      # Only these two steps can read the token.
+      # Browser stack traces in Sentry: give each chunk a debug id, upload
+      # the maps for this release, then delete them so they aren't public.
+      - name: Upload browser source maps to Sentry
+        if: env.SENTRY_SOURCEMAPS == 'true'
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: serpcompany
+          SENTRY_PROJECT: tools-serp-co
+        run: |
+          dir=apps/tools/.open-next/assets/_next/static
+          release="tools-serp-co@$(git rev-parse --short=12 HEAD)"
+          # A Sentry outage mustn't block a deploy: warn and ship without maps.
+          if npx --yes @sentry/cli@3.8.0 sourcemaps inject "$dir" &&
+            npx --yes @sentry/cli@3.8.0 sourcemaps upload --release "$release" \
+              --url-prefix '~/_next/static' "$dir"; then
+            echo "Uploaded source maps for $release"
+          else
+            echo "::warning::Sentry source map upload failed; deploying without it."
+          fi
+          # Always, so maps are never deployed publicly.
+          find "$dir" -name '*.map' -delete
+
+      # Only these two steps can read the Cloudflare token.
       - name: Apply D1 migrations
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

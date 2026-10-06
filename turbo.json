@@ -3,6 +3,7 @@
   "ui": "tui",
   "globalEnv": [
     "NODE_ENV",
+    "SENTRY_SOURCEMAPS",
     "BUILD_MODE",
     "SUPPORTS_VIDEO_CONVERSION",
     "GITHUB_TOKEN",
