@@ -5,9 +5,8 @@ Current guidance describes the current branch and is the source to follow.
 Historical and advisory material is evidence at its recorded scope and time;
 it must not be treated as current operating truth or active work.
 
-Run `pnpm verify:docs` after adding, moving, or linking documentation. The
-retired catch-all `docs/knowledge`, `docs/plans`, and `docs/planner` categories
-are rejected. Current guidance belongs beside its owner or in `docs/runbooks`;
+The retired catch-all `docs/knowledge`, `docs/plans`, and `docs/planner`
+categories are rejected. Current guidance belongs beside its owner or in `docs/runbooks`;
 dated observations belong in `docs/audits`; advisory inputs belong in
 `docs/evidence`; active work belongs in GitHub Issues.
 
