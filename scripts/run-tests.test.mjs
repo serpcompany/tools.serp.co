@@ -17,6 +17,13 @@ const repositoryPackagePath = fileURLToPath(
   new URL('../package.json', import.meta.url),
 );
 
+// A git hook exports GIT_DIR (and in a linked worktree, more GIT_* variables).
+// Inherited, they point the fixture's git commands at the real repository's
+// index, so fixture processes run without them.
+const fixtureEnv = Object.fromEntries(
+  Object.entries(process.env).filter(([name]) => !name.startsWith('GIT_')),
+);
+
 function writeFixtureFile(root, relativePath, contents) {
   const target = path.join(root, relativePath);
   mkdirSync(path.dirname(target), { recursive: true });
@@ -27,6 +34,7 @@ function stageFixtureChanges(root) {
   const result = spawnSync('git', ['add', '--all'], {
     cwd: root,
     encoding: 'utf8',
+    env: fixtureEnv,
   });
   assert.equal(result.status, 0, result.stderr);
 }
@@ -52,6 +60,7 @@ function createRepositoryFixture(testContext) {
   const initResult = spawnSync('git', ['init', '--quiet'], {
     cwd: root,
     encoding: 'utf8',
+    env: fixtureEnv,
   });
   assert.equal(initResult.status, 0, initResult.stderr);
 
@@ -62,7 +71,7 @@ function createRepositoryFixture(testContext) {
 }
 
 function runTestSuite(root) {
-  const env = { ...process.env };
+  const env = { ...fixtureEnv };
   delete env.NODE_TEST_CONTEXT;
   return spawnSync(process.execPath, [runnerPath, '--root', root], {
     encoding: 'utf8',

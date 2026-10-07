@@ -142,11 +142,12 @@ the same schedule.
   keeps as the historical record (#34). They include file names and error
   text. The purge and deletion requests don't reach them; a deletion request
   for that period is handled by hand in Neon.
-- **One-off D1 backup:** `tmp/d1-production-backup-20261006T0339Z.sql` in the
-  owner's local checkout (ignored by git) holds every D1 run as of
-  2026-10-06. It is kept only for the broken-tool investigation (#147) and is
-  deleted when that work is done; deletion requests don't reach it until then.
-  Never commit it or copy it elsewhere.
+- **One-off D1 exports:** an export of production D1 for an investigation is
+  taken only with the owner's approval and kept outside the repository (the
+  git-ignored `tmp/` is fine). List it here with its path and purpose while it
+  exists, and delete it when the work is done; deletion requests don't reach it
+  until then. Never commit one or copy it elsewhere. None exists as of
+  2026-10-07: the 2026-10-06 backup for #147 has been deleted.
 - **D1 Time Travel:** Cloudflare can restore the database to an earlier point
   (30 days back on Workers Paid, 7 on Free), so deleted runs stay recoverable
   for that long after a purge or deletion request.
