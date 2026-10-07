@@ -4,7 +4,6 @@ import { useState } from "react";
 import DownloaderExtensionCTAModal from "@/components/DownloaderExtensionCTAModal";
 import { ToolAdInline } from "@/components/ToolAds";
 import VideoDownloaderTool from "@/components/VideoDownloaderTool";
-import { DOWNLOADER_RATE_LIMIT_WINDOW_MS } from "@/lib/downloader-contract.js";
 
 type DownloaderPageHeroProps = {
   toolId: string;
@@ -29,10 +28,11 @@ export default function DownloaderPageHero({
   const [ctaModalOpen, setCtaModalOpen] = useState(false);
   const [cooldownEndsAtMs, setCooldownEndsAtMs] = useState<number | null>(null);
 
+  // Ads and the product prompt show at submit, during processing. The tool
+  // sets the cooldown through onCooldownChange once the attempt has ended.
   function handleAdsVisibleChange(visible: boolean) {
     setAdsVisible(visible);
     if (visible) {
-      setCooldownEndsAtMs(Date.now() + DOWNLOADER_RATE_LIMIT_WINDOW_MS);
       setCtaModalOpen(true);
     }
   }
@@ -46,6 +46,7 @@ export default function DownloaderPageHero({
         adsVisible={adsVisible}
         onAdsVisibleChange={handleAdsVisibleChange}
         cooldownEndsAtMs={cooldownEndsAtMs}
+        onCooldownChange={setCooldownEndsAtMs}
         extensionUrl={extensionUrl}
         extensionProductName={extensionProductName}
       />
