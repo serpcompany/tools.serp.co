@@ -102,6 +102,10 @@ Application-only checks are `pnpm -C apps/tools lint` and
 network-backed checks are separate operations and must not be described as
 part of the deterministic test result.
 
+`pnpm -C apps/tools render-snapshot snapshot --base-url <url> --out <dir>`
+records every page, sitemap file and redirect a running Worker serves;
+`render-snapshot diff <base> <head>` exits 1 if a refactor changed any of them.
+
 ## Adding a Tool
 
 1. Add or update the registry entry with a stable Tool id, route, operation,
