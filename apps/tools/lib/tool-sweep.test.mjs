@@ -288,6 +288,20 @@ test("ffmpegError names the encoder that refused, not the exit code", () => {
     ffmpegError(["input.rm: Invalid data found when processing input", "Aborted()"]),
     "input.rm: Invalid data found when processing input",
   );
+  // A video without audio converted to MP3: the stream line mentions "unknown".
+  assert.equal(
+    ffmpegError([
+      "Input #0, mjpeg, from 'input.mjpeg':",
+      "  Duration: N/A, bitrate: N/A",
+      "  Stream #0:0: Video: mjpeg (Baseline), yuvj420p(pc, bt470bg/unknown/unknown), 320x240",
+      "Output #0, mp3, to 'output.mp3':",
+      "  Metadata:",
+      "    encoder         : Lavf59.27.100",
+      "Output file #0 does not contain any stream",
+      "Aborted()",
+    ]),
+    "Output file #0 does not contain any stream",
+  );
   assert.equal(ffmpegError([]), undefined);
 });
 

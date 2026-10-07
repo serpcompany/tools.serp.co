@@ -310,18 +310,19 @@ export function classifyRun(observation, { to, markers = [] }) {
 
 // The line in FFmpeg's log that says why it stopped; the page only shows the
 // exit code. The first message after "Stream mapping:" names the encoder or
-// muxer that refused; without a mapping, the input was the problem.
-const FFMPEG_NOISE = /^(Stream #|Press \[q\]|frame=|size=|Output #|Metadata:|Side data:|cpb:|encoder\s*:)/;
+// muxer that refused; without a mapping, the last message before the end says
+// what was wrong with the input or the output file. Stream, metadata and
+// progress lines describe the files and say nothing about the failure.
+const FFMPEG_CONTEXT =
+  /^(Stream #|Input #|Output #|Duration:|Metadata:|Side data:|Chapters?:|Press \[q\]|frame=|size=|cpb:|\w+\s+:\s)/;
 export function ffmpegError(log) {
   const lines = log.map((line) => line.trim()).filter(Boolean);
   let end = lines.indexOf("Conversion failed!");
   if (end === -1) end = lines.indexOf("Aborted()");
   if (end === -1) end = lines.length;
   const mapping = lines.lastIndexOf("Stream mapping:", end);
-  const reason =
-    mapping === -1
-      ? lines.slice(0, end).findLast((line) => /error|invalid|could not|unknown|not supported|no such/i.test(line))
-      : lines.slice(mapping + 1, end).find((line) => !FFMPEG_NOISE.test(line));
+  const messages = (from) => lines.slice(from, end).filter((line) => !FFMPEG_CONTEXT.test(line));
+  const reason = mapping === -1 ? messages(0).at(-1) : messages(mapping + 1)[0];
   return reason?.replace(/ @ 0x[0-9a-f]+\]/i, "]");
 }
 
