@@ -323,6 +323,7 @@ test("the summary counts statuses, splits passes by check and lists failing ids"
   assert.match(summary, /`0123456`.*concurrency 4, 1 h 30 min/);
   assert.match(summary, /\| pass \| 2 \(bytes checked: 1, text content checked: 0, no check for the output format: 1\) \|/);
   assert.match(summary, /\| \*\*measured \/ active\*\* \| 5 \/ 6 \|/);
+  assert.match(summary, /Non-passing Tools by engine\n\n\| +\| wrong_format/);
   assert.match(summary, /\| ffmpeg-wasm \| 0 \| 1 \| 0 \|/);
   assert.match(summary, /error: FFmpeg failed \[\[h263\] size\] \| 1 \|/);
   assert.match(summary, /no fixture for the input format: icns 1 \| 1 \|/);

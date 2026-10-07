@@ -434,17 +434,21 @@ export function renderSummary({ meta, results }, { activeCount = results.length 
   );
 
   if (failing.length) {
-    const failingTable = (title, key) =>
-      `${title}\n\n${table(
-        ["", ...FAILING],
-        countBy(failing, key).map(([name, row]) => [name, ...FAILING.map((status) => String(row[status]))]),
-      )}`;
-    lines.push("", failingTable("Non-passing Tools by engine:", (row) => row.engine));
-    lines.push("", failingTable("Non-passing Tools by input format:", (row) => row.from));
+    // Long tables are collapsed so the counts above stay readable in a PR.
+    const failingTable = (title, key) => {
+      const rows = countBy(failing, key).map(([name, row]) => [name, ...FAILING.map((status) => String(row[status]))]);
+      const body = table(["", ...FAILING], rows);
+      return rows.length > 15
+        ? `<details><summary>${title} (${rows.length})</summary>\n\n${body}\n\n</details>`
+        : `${title}\n\n${body}`;
+    };
+    lines.push("", failingTable("Non-passing Tools by engine", (row) => row.engine));
+    lines.push("", failingTable("Non-passing Tools by input format", (row) => row.from));
 
+    // Clustered without the saved file's name, which differs per Tool.
     const messages = new Map();
     for (const row of failing) {
-      const message = failureText(row);
+      const message = failureText(row).replace(/ \([^()]+\.[a-z0-9]+\)$/i, "");
       messages.set(message, (messages.get(message) ?? 0) + 1);
     }
     const top = [...messages.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20);
