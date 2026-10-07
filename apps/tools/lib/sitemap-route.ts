@@ -1,8 +1,8 @@
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import { NextResponse } from "next/server";
 
+import { activeTools } from "@/lib/catalog/catalog";
 import { getSiteOrigin } from "@/lib/site-environment";
-import { resolveSitemapRequest, type SitemapTool } from "@/lib/sitemap";
+import { resolveSitemapRequest } from "@/lib/sitemap";
 
 const CACHE_CONTROL = "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400";
 
@@ -18,7 +18,7 @@ export function requestSiteOrigin(request: Request) {
 export function sitemapFileResponse(request: Request, fileName: string) {
   const result = resolveSitemapRequest(fileName, {
     origin: requestSiteOrigin(request),
-    tools: toolsData as SitemapTool[],
+    tools: activeTools(),
   });
 
   if (result.type === "redirect") {

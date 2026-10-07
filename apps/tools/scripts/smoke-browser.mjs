@@ -19,7 +19,7 @@ const { chromium } = await import("playwright");
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const tools = JSON.parse(
-  readFileSync(path.resolve(appRoot, "../../packages/app-core/src/data/tools.json"), "utf8"),
+  readFileSync(path.resolve(appRoot, "lib/catalog/tools.json"), "utf8"),
 );
 // Deployed Workers skip their canonical-host redirect for requests with this
 // header (issue #164), so the smoke test can run through *.workers.dev.

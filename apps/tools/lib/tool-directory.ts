@@ -10,19 +10,14 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { canonicalPath } from "./trailing-slash.ts";
-
-type OperationType =
-  | "bulk"
-  | "combine"
-  | "compress"
-  | "convert"
-  | "download"
-  | "edit"
-  | "video-editor"
-  | "image-editor"
-  | "audio-editor"
-  | "view";
+import { toolHref } from "./catalog/href.ts";
+import {
+  OPERATION_LABELS,
+  OPERATIONS,
+  isToolOperation,
+  operationsUsedBy,
+  type ToolOperation as OperationType,
+} from "./catalog/operations.ts";
 
 type ToolDirectorySource = {
   id: string;
@@ -63,32 +58,6 @@ type CategoryContent = {
   title: string;
   description: string;
 };
-
-const OPERATION_LABELS: Record<OperationType, string> = {
-  bulk: "Bulk Operations",
-  combine: "Combine",
-  compress: "Compress",
-  convert: "Convert",
-  download: "Downloaders",
-  edit: "Edit",
-  "video-editor": "Video Editor",
-  "image-editor": "Image Editor",
-  "audio-editor": "Audio Editor",
-  view: "PDF",
-};
-
-const TOOL_OPERATION_ORDER: OperationType[] = [
-  "convert",
-  "download",
-  "compress",
-  "combine",
-  "bulk",
-  "edit",
-  "video-editor",
-  "image-editor",
-  "audio-editor",
-  "view",
-];
 
 const CATEGORY_CONTENT: Record<OperationType, CategoryContent> = {
   bulk: {
@@ -212,18 +181,6 @@ const iconMap: Record<string, LucideIcon> = {
   "audio-editor": Music,
 };
 
-function getOperationLabel(operation: OperationType): string {
-  return OPERATION_LABELS[operation];
-}
-
-function isToolOperation(operation?: string): operation is OperationType {
-  if (!operation) {
-    return false;
-  }
-
-  return operation in OPERATION_LABELS;
-}
-
 function toCategoryPath(category: OperationType): string {
   return `/category/${category}/`;
 }
@@ -259,29 +216,15 @@ export function getToolDirectoryIcon(toolId: string): LucideIcon {
   return iconMap[toolId] ?? Image;
 }
 
-export function getAvailableToolOperations(
-  tools: Pick<ToolDirectorySource, "isActive" | "operation">[],
-): OperationType[] {
-  const operations = new Set<OperationType>();
-
-  tools.forEach((tool) => {
-    if (!tool.isActive || !isToolOperation(tool.operation)) {
-      return;
-    }
-
-    operations.add(tool.operation);
-  });
-
-  return TOOL_OPERATION_ORDER.filter((operation) => operations.has(operation));
-}
-
 export function getCategoryPagePaths(
-  tools: Pick<ToolDirectorySource, "isActive" | "operation">[],
+  tools: readonly Pick<ToolDirectorySource, "isActive" | "operation">[],
 ): string[] {
-  return getAvailableToolOperations(tools).map((operation) => toCategoryPath(operation));
+  return operationsUsedBy(tools).map((operation) => toCategoryPath(operation));
 }
 
-export function buildToolDirectoryEntries(tools: ToolDirectorySource[]): ToolDirectoryEntry[] {
+export function buildToolDirectoryEntries(
+  tools: readonly ToolDirectorySource[],
+): ToolDirectoryEntry[] {
   return tools
     .filter((tool) => tool.isActive)
     .map((tool) => {
@@ -292,9 +235,7 @@ export function buildToolDirectoryEntries(tools: ToolDirectorySource[]): ToolDir
         name: tool.name,
         description: tool.description,
         category,
-        // Written canonical (slashed): with skipTrailingSlashRedirect on,
-        // <Link> no longer adds the slash itself.
-        href: canonicalPath(tool.route ?? "/"),
+        href: toolHref(tool),
         tags: normalizeTags(tool),
         isNew: Boolean(tool.isNew),
         isPopular: Boolean(tool.isPopular),
@@ -311,7 +252,7 @@ export function getToolDirectoryCategories(
     counts.set(tool.category, (counts.get(tool.category) ?? 0) + 1);
   });
 
-  return TOOL_OPERATION_ORDER
+  return OPERATIONS
     .map((operation) => {
       const count = counts.get(operation);
       if (!count) {
@@ -322,7 +263,7 @@ export function getToolDirectoryCategories(
 
       return {
         id: operation,
-        name: getOperationLabel(operation),
+        name: OPERATION_LABELS[operation],
         title: content.title,
         description: content.description,
         count,

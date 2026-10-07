@@ -7,7 +7,7 @@ import ffmpegPath from "ffmpeg-static";
 const require = createRequire(import.meta.url);
 const appRoot = path.dirname(fileURLToPath(import.meta.url));
 const tracingRoot = path.resolve(appRoot, "../..");
-const toolsPath = path.resolve(tracingRoot, "packages/app-core/src/data/tools.json");
+const toolsPath = path.resolve(appRoot, "lib/catalog/tools.json");
 const appDir = path.resolve(appRoot, "app");
 let ffmpegRoutes = [];
 const transcribeRoutes = new Set();

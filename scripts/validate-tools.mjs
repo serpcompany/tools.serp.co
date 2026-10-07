@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
+import { validateCatalog } from "../apps/tools/lib/catalog/validate.ts";
+
 const root = process.cwd();
 const errors = [];
 const warnings = [];
@@ -34,6 +36,13 @@ async function listFiles(dir) {
     }
   }
   return files;
+}
+
+// The Tool registry matches the type lib/catalog/catalog.ts casts it to. The
+// app never validates it at runtime.
+const registryPath = path.join(root, "apps/tools/lib/catalog/tools.json");
+for (const error of validateCatalog(JSON.parse(await fs.readFile(registryPath, "utf8")))) {
+  fail(`Tool registry: ${error}`);
 }
 
 const workersDir = path.join(root, "apps/tools/workers");

@@ -6,17 +6,21 @@ assembly. Repository-wide orchestration remains owned by the root harness.
 
 ## Catalog and discovery
 
-The versioned Tool registry at
-`packages/app-core/src/data/tools.json` is the canonical source of shipped
-catalog intent. Registry `id` is the stable identity. `isActive` represents
-publication intent; it does not prove implementation, verification, or runtime
-health.
+The versioned Tool registry at `lib/catalog/tools.json` is the canonical
+source of shipped catalog intent. Registry `id` is the stable identity.
+`isActive` represents publication intent; it does not prove implementation,
+verification, or runtime health. Code reads it through `lib/catalog/catalog.ts`;
+`lib/catalog/validate.ts` checks its shape in tests and `pnpm verify:catalog`,
+never at runtime.
 
-The canonical operation values are `bulk`, `combine`, `compress`, `convert`,
-`download`, `edit`, and `view`. Category pages use `/category/{operation}/`,
-and `/categories/` links to the active operation categories. Category routes
-keep dynamic parameters enabled for OpenNext compatibility, validate the
-operation, and return `notFound()` for invalid or empty categories.
+`OPERATIONS` in `lib/catalog/operations.ts` lists the operation values in
+display order: `convert`, `download`, `compress`, `combine`, `bulk`, `edit`,
+`video-editor`, `image-editor`, `audio-editor`, and `view`. Each editor
+operation holds one "coming soon" placeholder Tool. Category pages use
+`/category/{operation}/`, and `/categories/` links to the active operation
+categories. Category routes keep dynamic parameters enabled for OpenNext
+compatibility, validate the operation, and return `notFound()` for invalid or
+empty categories.
 
 Active Tools drive public discovery, metadata, and sitemap projections. Keep
 directory payloads plain-data safe when passing from Server Components to

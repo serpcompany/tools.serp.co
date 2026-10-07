@@ -3,25 +3,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { OPERATIONS } from "../../lib/catalog/operations.ts";
+
 export const scriptsRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const appRoot = path.resolve(scriptsRoot, "..");
 export const repoRoot = path.resolve(appRoot, "../..");
 
 // Must match MAX_URLS_PER_SITEMAP in lib/sitemap.ts.
 export const MAX_URLS_PER_SITEMAP = 50000;
-
-export const OPERATION_ORDER = [
-  "convert",
-  "download",
-  "compress",
-  "combine",
-  "bulk",
-  "edit",
-  "video-editor",
-  "image-editor",
-  "audio-editor",
-  "view",
-];
 
 const TEXT_FILE_EXTENSIONS = new Set([".txt", ".xml"]);
 const DEFAULT_STATIC_PATHS = ["/", "/categories/", "/brands/"];
@@ -88,7 +77,7 @@ export function routeFromAppFile(filePath) {
 }
 
 export function getToolsData() {
-  return readJsonFile(path.join(repoRoot, "packages/app-core/src/data/tools.json"));
+  return readJsonFile(path.join(appRoot, "lib/catalog/tools.json"));
 }
 
 export function getActiveTools(tools = getToolsData()) {
@@ -107,11 +96,11 @@ export function getOperationCounts(tools = getActiveTools()) {
 export function getCategoryPaths(tools = getActiveTools()) {
   const operations = new Set();
   for (const tool of tools) {
-    if (OPERATION_ORDER.includes(tool.operation)) {
+    if (OPERATIONS.includes(tool.operation)) {
       operations.add(tool.operation);
     }
   }
-  return OPERATION_ORDER.filter((operation) => operations.has(operation)).map(
+  return OPERATIONS.filter((operation) => operations.has(operation)).map(
     (operation) => `/category/${operation}/`,
   );
 }

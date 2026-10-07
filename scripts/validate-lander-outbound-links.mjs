@@ -9,7 +9,7 @@ const failOnUnreachable = args.includes("--fail-on-unreachable");
 const timeoutMs = Number(args.find((arg) => arg.startsWith("--timeout-ms="))?.slice("--timeout-ms=".length) ?? 10000);
 const concurrency = Number(args.find((arg) => arg.startsWith("--concurrency="))?.slice("--concurrency=".length) ?? 12);
 
-const toolsPath = path.join(root, "packages/app-core/src/data/tools.json");
+const toolsPath = path.join(root, "apps/tools/lib/catalog/tools.json");
 const tools = JSON.parse(await fs.readFile(toolsPath, "utf8"));
 
 function normalizeText(value) {

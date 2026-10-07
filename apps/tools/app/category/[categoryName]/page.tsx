@@ -1,27 +1,24 @@
 import { notFound } from "next/navigation";
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import CategoryPageTemplate from "@/components/CategoryPageTemplate";
+import { activeTools, availableOperations } from "@/lib/catalog/catalog";
+import { isToolOperation } from "@/lib/catalog/operations";
 import { buildCategoryMetadata } from "@/lib/metadata";
 import {
   buildToolDirectoryEntries,
-  getAvailableToolOperations,
   getToolDirectoryCategories,
   getToolsForDirectoryCategory,
 } from "@/lib/tool-directory";
-import { isToolOperation } from "@/lib/tool-operations";
-import type { Tool } from "@/types";
 
-const tools = buildToolDirectoryEntries(toolsData as Tool[]);
+const tools = buildToolDirectoryEntries(activeTools());
 const categories = getToolDirectoryCategories(tools);
-const availableOperations = getAvailableToolOperations(toolsData as Tool[]);
 
 type PageProps = {
   params: Promise<{ categoryName: string }>;
 };
 
 export function generateStaticParams() {
-  return availableOperations.map((categoryName) => ({ categoryName }));
+  return availableOperations().map((categoryName) => ({ categoryName }));
 }
 
 export async function generateMetadata({ params }: PageProps) {

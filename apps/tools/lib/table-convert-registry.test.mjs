@@ -6,7 +6,7 @@ import { TABLE_CONVERT_PAGES } from "./table-convert-pages.ts";
 import { buildToolDirectoryEntries } from "./tool-directory.ts";
 
 const toolsRegistry = JSON.parse(
-  readFileSync(new URL("../../../packages/app-core/src/data/tools.json", import.meta.url), "utf8"),
+  readFileSync(new URL("./catalog/tools.json", import.meta.url), "utf8"),
 );
 const csvToMarkdownPageSource = readFileSync(
   new URL("../app/(convert)/csv-to-markdown/page.tsx", import.meta.url),

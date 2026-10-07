@@ -9,7 +9,7 @@ import {
 } from "./sitemap.ts";
 
 const tools = JSON.parse(
-  readFileSync(new URL("../../../packages/app-core/src/data/tools.json", import.meta.url), "utf8"),
+  readFileSync(new URL("./catalog/tools.json", import.meta.url), "utf8"),
 );
 const origin = "https://tools.serp.co";
 

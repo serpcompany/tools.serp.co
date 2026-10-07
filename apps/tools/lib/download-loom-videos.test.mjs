@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 
 const tools = JSON.parse(
   readFileSync(
-    new URL("../../../packages/app-core/src/data/tools.json", import.meta.url),
+    new URL("./catalog/tools.json", import.meta.url),
     "utf8",
   ),
 );

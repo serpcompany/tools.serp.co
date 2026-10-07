@@ -1,14 +1,11 @@
 import { notFound } from "next/navigation";
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import { DownloaderPageRenderer } from "@/components/DownloaderPageRenderer";
 import PdfToolPage from "@/components/PdfToolPage";
 import ToolPlaceholder from "@/components/ToolPlaceholder";
 import { ToolPageRenderer } from "@/components/ToolPageRenderer";
+import { getTool } from "@/lib/catalog/catalog";
 import { buildToolMetadata } from "@/lib/metadata";
-import type { Tool } from "@/types";
-
-const tools = toolsData as Tool[];
 
 type PageProps = {
   params: Promise<{ tool: string }>;
@@ -21,7 +18,7 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function Page({ params }: PageProps) {
   const { tool: toolId } = await params;
-  const tool = tools.find((item) => item.id === toolId && item.isActive);
+  const tool = getTool(toolId);
 
   if (!tool) {
     return notFound();

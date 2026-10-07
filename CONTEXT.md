@@ -21,7 +21,7 @@ keyword- or source-specific downloader Lander is still represented by its own
 registry Tool id when it is shipped.
 
 **Registry Entry** — One versioned object in
-`packages/app-core/src/data/tools.json`. It records shipped catalog intent such
+`apps/tools/lib/catalog/tools.json`. It records shipped catalog intent such
 as Tool identity, route, operation, publication state, formats, and content.
 `isActive` means intended for publication; it does not mean working, verified,
 healthy, or planned.
