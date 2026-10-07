@@ -6,6 +6,13 @@ telemetry. This file maps the repository's areas. Start here and open only the
 doc your task needs. Use installed skills for generic TDD, review, GitHub and
 safety procedures, and prefer a nearer `AGENTS.md` when one exists.
 
+Stage: ship
+
+The site has real visitors, search rankings, ad revenue and telemetry, so the
+Ship rules of the serp
+[verification cadence](https://github.com/serpcompany/serp/blob/main/docs/engineering/standards/verification-cadence.md)
+apply. Only the owner changes the `Stage:` line.
+
 ## Areas
 
 **Architecture and boundaries.** [ARCHITECTURE.md](ARCHITECTURE.md) says which
@@ -59,6 +66,35 @@ how to write it, and the size and naming rules the Docs checks enforce.
 exports. They are evidence at their recorded date, not current truth: confirm
 any claim against the code and the docs above.
 
+## Verification
+
+Run each check once, at the cheapest level that can catch the problem.
+
+- **Inner loop**, while editing: `pnpm -C apps/tools typecheck`,
+  `pnpm -C apps/tools lint` (or the lint of the package you touched), and the
+  tests for the code you changed, run from the root with
+  `node --test <path-to-test-file>`.
+- **Push:** the `pre-push` hook runs the app's lint and typecheck, the Tool
+  catalog checks and `pnpm test` in under a minute. Enable it once per clone
+  with `git config core.hooksPath .githooks`.
+- **Finish gate:** `pnpm check`. CI runs it, plus the browser smoke test, on
+  every PR commit and is the record; don't repeat it for a commit CI checked.
+
+What else a change needs, beyond CI:
+
+- **A Tool, page or flow a visitor sees:** one local run of that behavior, with
+  a screenshot or command output. When driving converters in a desktop browser,
+  stub file downloads; the smoke script saves them to a temporary folder.
+- **Redirects, headers, middleware, robots, sitemaps, or environment-specific
+  behavior:** a run on the production-like preview,
+  `pnpm -C apps/tools cf:preview:staging` or `cf:preview:production`.
+- **Deploy or Wrangler configuration, migrations, the Deploy workflow or the
+  smoke test:** after the merge, the staging Deploy run and its smoke checks.
+- **Telemetry queries, D1 writes or migrations:** a check against a fresh export
+  of the production D1 database, kept outside the repository.
+- **URLs, canonicals, sitemaps, redirects or indexability:** a before/after diff
+  of the affected production responses.
+
 ## Git workflow
 
 Follow the serp [git workflow](https://github.com/serpcompany/serp/blob/main/docs/engineering/standards/git-workflow.md):
@@ -71,9 +107,10 @@ one issue, one branch, one PR, one squash commit on `staging`, the base branch.
   passes.
 - PR body: fill in `.github/pull_request_template.md`. It starts with
   `Closes #<number>` and reports each evidence level separately.
-- A fresh review agent reviews every PR; resolve each finding, re-review after
-  blocking fixes, and record the outcome in the PR. Agents never merge without
-  the owner's approval.
+- A fresh review agent reviews every PR once CI is green; resolve each finding,
+  re-review after blocking fixes, and record the outcome in the PR.
+- Agents never merge. The owner merges one PR at a time, each brought up to
+  date with `staging` and re-checked first.
 - A merge to `staging` deploys Staging (migrations, deploy, smoke tests).
   Production changes only when the owner promotes a green `staging` commit to
   `main` with a fast-forward, which deploys Production the same way. Hotfixes
