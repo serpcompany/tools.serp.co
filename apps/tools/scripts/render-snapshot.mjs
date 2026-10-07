@@ -3,15 +3,20 @@
 // then diff the two (issue #148).
 //
 //   node scripts/render-snapshot.mjs snapshot --base-url http://localhost:8787 --out <dir>
-//     [--concurrency 8] [--app-dir app] [--path /extra/path/ ...]
+//     [--concurrency 8] [--app-dir app] [--path /extra/path/ ...] [--paths-from <dir>]
 //   node scripts/render-snapshot.mjs diff <dirA> <dirB> [--max-diffs 5] [--max-lines 60]
 //
 // A snapshot covers every URL in the sitemap tree, every static page route
-// under the app directory that the sitemap leaves out, /robots.txt, the
-// sitemap files themselves and a few redirect and not-found probes. Each URL
-// records its status, the headers in RECORDED_HEADERS and its body with build
-// noise normalized away (lib/render-snapshot.mjs). The sitemap files and
-// robots.txt are also kept byte for byte under raw/.
+// under the app directory that the sitemap leaves out, /robots.txt, /ads.txt,
+// the sitemap files themselves and a few redirect and not-found probes.
+// --paths-from adds every URL another snapshot recorded, so a head snapshot
+// also requests pages that only the base had. Each URL records its status, the
+// headers in RECORDED_HEADERS and its body with build noise normalized away
+// (lib/render-snapshot.mjs). The sitemap files, robots.txt and ads.txt are
+// also kept byte for byte under raw/.
+//
+// Snapshot base and head built the same way. A local `cf:build` serves every
+// page noindex with ads off; `cf:build:production` covers those too.
 //
 // diff exits 1 on any added, removed or changed URL.
 
@@ -49,7 +54,7 @@ const PROBE_PATHS = [
   "/not-a-tool/",
 ];
 const USAGE = `Usage:
-  render-snapshot.mjs snapshot --base-url <url> --out <dir> [--concurrency <n>] [--app-dir <dir>] [--path <path> ...]
+  render-snapshot.mjs snapshot --base-url <url> --out <dir> [--concurrency <n>] [--app-dir <dir>] [--path <path> ...] [--paths-from <dir>]
   render-snapshot.mjs diff <dirA> <dirB> [--max-diffs <n>] [--max-lines <n>]`;
 
 function parsePositiveInteger(value, flag) {
@@ -67,6 +72,7 @@ function parseArgs(argv) {
     appDir: path.join(appRoot, "app"),
     concurrency: 8,
     extraPaths: [],
+    pathsFrom: [],
     dirs: [],
     maxDiffs: 5,
     maxLines: 60,
@@ -83,6 +89,7 @@ function parseArgs(argv) {
     else if (arg === "--app-dir") args.appDir = path.resolve(value());
     else if (arg === "--concurrency") args.concurrency = parsePositiveInteger(value(), arg);
     else if (arg === "--path") args.extraPaths.push(value());
+    else if (arg === "--paths-from") args.pathsFrom.push(path.resolve(value()));
     else if (arg === "--max-diffs") args.maxDiffs = parsePositiveInteger(value(), arg);
     else if (arg === "--max-lines") args.maxLines = parsePositiveInteger(value(), arg);
     else if (arg.startsWith("--")) throw new Error(`Unknown argument: ${arg}`);
@@ -103,7 +110,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // One GET without following redirects. A network error or timeout is retried
 // once; HTTP error statuses are answers and are recorded as they are.
-async function fetchOnce(origin, urlPath) {
+async function fetchWithRetry(origin, urlPath) {
   for (let attempt = 1; ; attempt += 1) {
     try {
       const response = await fetch(`${origin}${urlPath}`, {
@@ -137,7 +144,7 @@ async function snapshot(args) {
     if (urlPath in entries) return null;
     entries[urlPath] = null; // claimed
     try {
-      const response = await fetchOnce(origin, urlPath);
+      const response = await fetchWithRetry(origin, urlPath);
       const { entry, normalizedBody } = describeResponse({ ...response, origin });
       entries[urlPath] = entry;
       writeFileSync(path.join(args.out, "bodies", bodyFileName(urlPath)), normalizedBody);
@@ -168,14 +175,23 @@ async function snapshot(args) {
       sources[pagePath] ??= "sitemap";
     }
   }
-  await capture("/robots.txt", { keepRaw: true });
-  sources["/robots.txt"] = "robots";
+  if (urlSetPaths.length === 0 || pagePaths.size === 0) {
+    errors.push(`${SITEMAP_INDEX_PATH}: no sitemap pages found`);
+  }
+  for (const filePath of ["/robots.txt", "/ads.txt"]) {
+    await capture(filePath, { keepRaw: true });
+    sources[filePath] = "crawler-file";
+  }
 
   const routePaths = staticPageRoutes(args.appDir).filter((route) => !pagePaths.has(route));
   for (const route of routePaths) sources[route] ??= "app-route";
+  const otherPaths = args.pathsFrom.flatMap((dir) => Object.keys(readSnapshot(dir).entries));
   for (const probe of [...PROBE_PATHS, ...args.extraPaths]) sources[probe] ??= "probe";
+  for (const otherPath of otherPaths) sources[otherPath] ??= "other-snapshot";
 
-  const queue = [...pagePaths, ...routePaths, ...PROBE_PATHS, ...args.extraPaths];
+  const queue = [
+    ...new Set([...pagePaths, ...routePaths, ...PROBE_PATHS, ...args.extraPaths, ...otherPaths]),
+  ].filter((urlPath) => !(urlPath in entries));
   let done = 0;
   const total = queue.length;
   async function worker() {
@@ -193,6 +209,8 @@ async function snapshot(args) {
       .map((urlPath) => [urlPath, { source: sources[urlPath], ...entries[urlPath] }]),
   );
   const durationMs = Date.now() - startedAt;
+  const counts = {};
+  for (const { source } of Object.values(sortedEntries)) counts[source] = (counts[source] ?? 0) + 1;
   writeFileSync(
     path.join(args.out, "snapshot.json"),
     `${JSON.stringify(
@@ -201,13 +219,7 @@ async function snapshot(args) {
         origin,
         startedAt: new Date(startedAt).toISOString(),
         durationMs,
-        counts: {
-          total: Object.keys(sortedEntries).length,
-          sitemap: pagePaths.size,
-          appRoutesOutsideSitemap: routePaths.length,
-          sitemapFiles: urlSetPaths.length + 1,
-          probes: PROBE_PATHS.length + args.extraPaths.length,
-        },
+        counts,
         entries: sortedEntries,
       },
       null,
@@ -215,10 +227,10 @@ async function snapshot(args) {
     )}\n`,
   );
 
+  const countList = Object.entries(counts).map(([source, count]) => `${count} ${source}`);
   console.log(
-    `Captured ${Object.keys(sortedEntries).length} URLs from ${origin} in ${(durationMs / 1000).toFixed(1)}s: ` +
-      `${pagePaths.size} sitemap pages, ${routePaths.length} app routes outside the sitemap, ` +
-      `${urlSetPaths.length + 1} sitemap files, robots.txt and ${PROBE_PATHS.length + args.extraPaths.length} probes.`,
+    `Captured ${Object.keys(sortedEntries).length} URLs from ${origin} in ${(durationMs / 1000).toFixed(1)}s ` +
+      `(${countList.join(", ")}).`,
   );
   console.log(`Snapshot: ${args.out}`);
   if (errors.length) {
@@ -245,7 +257,7 @@ function entriesWithoutSource(entries) {
   );
 }
 
-// The sitemap files and robots.txt byte for byte. Their URLs carry the origin,
+// The sitemap files, robots.txt and ads.txt byte for byte. They carry the origin,
 // so this only says something when both snapshots used the same one.
 function compareRaw(dirA, dirB, a, b) {
   if (a.origin !== b.origin) return { compared: false };
@@ -282,13 +294,14 @@ function diff(args) {
   if (raw.compared) {
     console.log(
       raw.different.length
-        ? `Raw sitemap and robots.txt bytes differ: ${raw.different.join(", ")}`
-        : `Raw sitemap and robots.txt bytes: identical (${raw.count} files)`,
+        ? `Raw sitemap, robots.txt and ads.txt bytes differ: ${raw.different.join(", ")}`
+        : `Raw sitemap, robots.txt and ads.txt bytes: identical (${raw.count} files)`,
     );
   } else {
-    console.log("Raw sitemap and robots.txt bytes: not compared (different origins)");
+    console.log("Raw sitemap, robots.txt and ads.txt bytes: not compared (different origins)");
   }
 
+  // A failed request has no body file; its error is already listed.
   const bodyChanges = result.changed.filter(({ changes }) => changes.some((change) => change.startsWith("body")));
   for (const { path: urlPath } of bodyChanges.slice(0, args.maxDiffs)) {
     const name = bodyFileName(urlPath);

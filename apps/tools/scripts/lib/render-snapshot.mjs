@@ -2,15 +2,19 @@
 // route discovery and snapshot comparison. The command does the I/O.
 
 import { Buffer } from "node:buffer";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readdirSync } from "node:fs";
+import { mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 
-// Response headers a crawler or visitor depends on. Everything else (Date,
-// Age, cache status, the release id) changes per build or per request.
+// Response headers a crawler or visitor depends on. cache-control also shows
+// whether a page is prerendered or rendered per request. Everything else
+// (Date, Age, cache hit or miss, the release id) changes per build or request.
 export const RECORDED_HEADERS = [
   "location",
   "content-type",
+  "cache-control",
   "x-robots-tag",
   "cross-origin-opener-policy",
   "cross-origin-embedder-policy",
@@ -107,7 +111,7 @@ export function normalizeBody(text, { origin } = {}) {
     "$1",
   );
   // Skew-protection deployment ids and CSP nonces.
-  normalized = normalized.replace(/([?&])dpl=[\w.-]+/g, "$1dpl=[dpl]");
+  normalized = normalized.replace(/((?:[?&]|&amp;)dpl=)[\w.-]+/g, "$1[dpl]");
   normalized = normalized.replace(/\bnonce="[^"]+"/g, 'nonce="[nonce]"');
   normalized = normalized.replace(
     /(\\?"nonce\\?":\\?")(?!\$undefined)[^"\\]+/g,
@@ -215,8 +219,10 @@ function describeValue(value) {
 // Field-level differences between two recorded entries.
 export function compareEntries(a, b) {
   const changes = [];
-  if (a.error !== b.error) {
-    changes.push(`error ${describeValue(a.error)} -> ${describeValue(b.error)}`);
+  // A failed request recorded nothing else to compare.
+  if (a.error || b.error) {
+    if (a.error !== b.error) changes.push(`error ${describeValue(a.error)} -> ${describeValue(b.error)}`);
+    return changes;
   }
   if (a.status !== b.status) changes.push(`status ${a.status} -> ${b.status}`);
   const headerNames = new Set([...Object.keys(a.headers ?? {}), ...Object.keys(b.headers ?? {})]);
@@ -278,37 +284,53 @@ function clipLine(line, focus = 0) {
   return `${start > 0 ? "..." : ""}${line.slice(start, end)}${end < line.length ? "..." : ""}`;
 }
 
-// A short unified diff: one hunk from the first to the last differing line,
-// with context, cut to maxLines lines of at most MAX_LINE_WIDTH characters.
-export function unifiedDiff(before, after, { labelA = "a", labelB = "b", context = 3, maxLines = 60 } = {}) {
-  const a = toDisplayLines(before);
-  const b = toDisplayLines(after);
-  let start = 0;
-  while (start < a.length && start < b.length && a[start] === b[start]) start += 1;
-  if (start === a.length && start === b.length) return "";
-  let endA = a.length;
-  let endB = b.length;
-  while (endA > start && endB > start && a[endA - 1] === b[endB - 1]) {
-    endA -= 1;
-    endB -= 1;
+// Pairs each removed line with the added line in the same position of the
+// same change block, so a long line is clipped around its first difference.
+function clipHunkLines(lines) {
+  const clipped = [];
+  let index = 0;
+  while (index < lines.length) {
+    if (!lines[index].startsWith("-")) {
+      clipped.push(lines[index][0] === "@" ? lines[index] : `${lines[index][0]}${clipLine(lines[index].slice(1))}`);
+      index += 1;
+      continue;
+    }
+    const removed = [];
+    const added = [];
+    while (index < lines.length && lines[index].startsWith("-")) removed.push(lines[index++].slice(1));
+    while (index < lines.length && lines[index].startsWith("+")) added.push(lines[index++].slice(1));
+    clipped.push(
+      ...removed.map((line, at) => `-${clipLine(line, firstDifference(line, added[at] ?? ""))}`),
+      ...added.map((line, at) => `+${clipLine(line, firstDifference(line, removed[at] ?? ""))}`),
+    );
   }
-  const removed = a.slice(start, endA);
-  const added = b.slice(start, endB);
-  const from = Math.max(0, start - context);
-  const toA = Math.min(a.length, endA + context);
-  const toB = Math.min(b.length, endB + context);
-  const body = [
-    ...a.slice(from, start).map((line) => ` ${clipLine(line)}`),
-    ...removed.map((line, index) => `-${clipLine(line, firstDifference(line, added[index] ?? ""))}`),
-    ...added.map((line, index) => `+${clipLine(line, firstDifference(line, removed[index] ?? ""))}`),
-    ...a.slice(endA, toA).map((line) => ` ${clipLine(line)}`),
-  ];
-  const lines = [
-    `--- ${labelA}`,
-    `+++ ${labelB}`,
-    `@@ -${from + 1},${toA - from} +${from + 1},${toB - from} @@`,
-    ...body.slice(0, maxLines),
-  ];
-  if (body.length > maxLines) lines.push(`... ${body.length - maxLines} more lines`);
-  return lines.join("\n");
+  return clipped;
+}
+
+// A short unified diff of two bodies split into display lines, from
+// `git diff --no-index`, cut to maxLines lines of at most MAX_LINE_WIDTH
+// characters.
+export function unifiedDiff(before, after, { labelA = "a", labelB = "b", context = 3, maxLines = 60 } = {}) {
+  if (before === after) return "";
+  const dir = mkdtempSync(path.join(tmpdir(), "render-snapshot-diff-"));
+  try {
+    writeFileSync(path.join(dir, "a"), `${toDisplayLines(before).join("\n")}\n`);
+    writeFileSync(path.join(dir, "b"), `${toDisplayLines(after).join("\n")}\n`);
+    const result = spawnSync(
+      "git",
+      ["diff", "--no-index", "--no-color", "--no-ext-diff", `-U${context}`, "a", "b"],
+      { cwd: dir, encoding: "utf8", maxBuffer: 256 * 1024 * 1024 },
+    );
+    if (result.status !== 0 && result.status !== 1) {
+      throw new Error(`git diff failed: ${result.error?.message ?? result.stderr}`);
+    }
+    const output = result.stdout.split("\n");
+    const hunks = output.slice(output.findIndex((line) => line.startsWith("@@")));
+    const body = clipHunkLines(hunks.filter((line) => line !== "" && !line.startsWith("\\")));
+    const lines = [`--- ${labelA}`, `+++ ${labelB}`, ...body.slice(0, maxLines)];
+    if (body.length > maxLines) lines.push(`... ${body.length - maxLines} more lines`);
+    return lines.join("\n");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }

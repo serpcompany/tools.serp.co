@@ -99,8 +99,14 @@ test("flight text is compared regardless of where React split it", () => {
 
 test("a change in text, links or metadata survives normalization", () => {
   const before = normalizeBody(renderPage({ build: buildA }), { origin });
-  const after = normalizeBody(renderPage({ build: buildB, title: "PNG to JPEG" }), { origin });
-  assert.notEqual(before, after);
+  const changed = (from, to) =>
+    normalizeBody(renderPage({ build: buildB }).replace(from, to), { origin });
+  assert.notEqual(normalizeBody(renderPage({ build: buildB, title: "PNG to JPEG" }), { origin }), before);
+  assert.notEqual(changed('href="https://tools.serp.co/png-to-jpg/"', 'href="https://tools.serp.co/png-to-jpeg/"'), before);
+  assert.notEqual(changed('<a href="/png-to-jpg/">', '<a href="/png-to-jpeg/">'), before);
+  // A flight text row and a client component's export name.
+  assert.notEqual(changed('\\"p\\":\\"\\"', '\\"p\\":\\"x\\"'), before);
+  assert.notEqual(changed('\\"AppHeader\\"', '\\"AppFooter\\"'), before);
 });
 
 test("normalization leaves text, links, canonicals, meta tags and JSON-LD alone", () => {
@@ -130,6 +136,13 @@ test("the served origin is normalized wherever a page writes it", () => {
   );
   // Another origin, such as the canonical host, is content.
   assert.equal(normalizeBody("https://tools.serp.co/", { origin }), "https://tools.serp.co/");
+});
+
+test("deployment ids are normalized in escaped query strings too", () => {
+  assert.equal(
+    normalizeBody('<img src="/a.png?w=1&amp;dpl=dpl_abc123"/>', { origin }),
+    '<img src="/a.png?w=1&amp;dpl=[dpl]"/>',
+  );
 });
 
 test("an unset nonce stays visible", () => {
@@ -170,6 +183,7 @@ test("a response records status, chosen headers and a normalized body", () => {
   assert.deepEqual(entry.headers, {
     location: "[origin]/sitemap-index.xml",
     "content-type": "application/xml; charset=utf-8",
+    "cache-control": null,
     "x-robots-tag": "noindex, nofollow",
     "cross-origin-opener-policy": null,
     "cross-origin-embedder-policy": null,
@@ -262,30 +276,36 @@ test("a body change says whether the document or only the flight data changed", 
     compareEntries(entry(), entry({ bodySha256: "x", documentSha256: "y" })),
     ["body (document)"],
   );
-  assert.deepEqual(compareEntries({ error: "timed out" }, entry()).slice(0, 2), [
-    'error "timed out" -> (none)',
-    "status undefined -> 200",
-  ]);
+  // A failed request is reported as the error alone.
+  assert.deepEqual(compareEntries({ error: "timed out" }, entry()), ['error "timed out" -> (none)']);
+  assert.deepEqual(compareEntries({ error: "timed out" }, { error: "timed out" }), []);
 });
 
-test("the unified diff shows the changed tags with context", () => {
-  const before = "<html><head><title>PNG to JPG</title></head><body><h1>PNG to JPG</h1><p>a</p><p>b</p></body></html>";
-  const after = before.replace("<h1>PNG to JPG</h1>", "<h1>PNG to JPEG</h1>");
+test("the unified diff shows each changed tag with context", () => {
+  const filler = Array.from({ length: 20 }, (_, index) => `<p>${index}</p>`).join("");
+  const before = `<html><title>PNG to JPG</title>${filler}<h1>PNG to JPG</h1></html>`;
+  const after = before.replaceAll("PNG to JPG", "PNG to JPEG");
+  const diff = unifiedDiff(before, after, { labelA: "a/png-to-jpg/", labelB: "b/png-to-jpg/", context: 1 });
   assert.equal(
-    unifiedDiff(before, after, { labelA: "a/png-to-jpg/", labelB: "b/png-to-jpg/", context: 1 }),
+    diff,
     [
       "--- a/png-to-jpg/",
       "+++ b/png-to-jpg/",
-      "@@ -5,3 +5,3 @@",
-      " <body>",
+      "@@ -1,3 +1,3 @@",
+      " <html>",
+      "-<title>PNG to JPG</title>",
+      "+<title>PNG to JPEG</title>",
+      " <p>0</p>",
+      "@@ -22,3 +22,3 @@",
+      " <p>19</p>",
       "-<h1>PNG to JPG</h1>",
       "+<h1>PNG to JPEG</h1>",
-      " <p>a</p>",
+      " </html>",
     ].join("\n"),
   );
   assert.equal(unifiedDiff(before, before), "");
   const long = unifiedDiff("<a>".repeat(10), "<b>".repeat(10), { maxLines: 4 });
-  assert.match(long, /\.\.\. 16 more lines$/);
+  assert.match(long, /\.\.\. 17 more lines$/);
 });
 
 test("long changed lines are cut around the first difference", () => {
