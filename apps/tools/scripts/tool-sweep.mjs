@@ -325,24 +325,29 @@ async function runTableTool(page, plan) {
   await setup("upload", () =>
     page.getByText(`Selected: ${path.basename(plan.fixtures[0])}`).waitFor({ timeout: plan.timeoutMs }),
   );
-  // Done when the output shows the fixture's data, the input shows a parse
-  // error, or the output format says it isn't wired (that notice is there
-  // before the upload too, and holds whatever the input).
+  // Done when the output shows the fixture's data, or when a parse error or
+  // an output notice ("not wired yet", "Waiting for valid input") holds for
+  // a second with the file's text loaded. The page shows both for a moment
+  // while it reads the file.
   let state;
   try {
     const handle = await page.waitForFunction(
       (markers) => {
         const doc = globalThis.document;
+        const output = [...doc.querySelectorAll("textarea[readonly]")].map((area) => area.value).join("\n");
+        if (markers.every((marker) => output.includes(marker))) return { problem: null };
+        const loaded = [...doc.querySelectorAll("textarea:not([readonly])")].some((area) => area.value.trim());
         const parseError = doc.querySelector("div.bg-red-50")?.textContent?.trim();
         const notice = [...doc.querySelectorAll("p")]
           .map((element) => element.textContent?.trim() ?? "")
           .find((text) => /not wired yet|Waiting for valid input/i.test(text));
-        if (parseError || notice) return { problem: parseError || notice };
-        const output = [...doc.querySelectorAll("textarea[readonly]")].map((area) => area.value).join("\n");
-        return markers.every((marker) => output.includes(marker)) ? { problem: null } : null;
+        const problem = loaded ? parseError || notice || null : null;
+        const sweep = globalThis.__sweep;
+        if (problem !== sweep.problem?.text) sweep.problem = { text: problem, since: Date.now() };
+        return problem && Date.now() - sweep.problem.since >= 1_000 ? { problem } : null;
       },
       plan.markers,
-      { timeout: plan.timeoutMs },
+      { timeout: plan.timeoutMs, polling: 100 },
     );
     state = await handle.jsonValue();
   } catch (error) {
@@ -413,7 +418,8 @@ async function runBatchCompress(page, plan) {
   await setup("file input", () => waitForHydration(page, input));
   await page.locator(input).setInputFiles(plan.fixtures);
   const download = page.locator('[data-testid="batch-compress-download"]');
-  const alert = page.getByRole("alert");
+  // The page's own alert, not Next.js's route announcer (also role=alert).
+  const alert = page.locator('[data-slot="alert"]');
   try {
     await download.or(alert).first().waitFor({ timeout: plan.timeoutMs });
   } catch (error) {
