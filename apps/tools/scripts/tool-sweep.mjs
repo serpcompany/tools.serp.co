@@ -334,20 +334,33 @@ async function runTableTool(page, plan) {
   return { outcome: "completed", outputs: await readOutputs(page, { text: true }) };
 }
 
+// Text converters show their output in a textarea. html-to-markdown converts
+// a built-in sample on load, so wait for the fixture's data, not just text.
 async function runTextTool(page, plan, { input, convert, output, download }) {
   await setup("text input", () => waitForHydration(page, input));
   await page.locator(input).fill(readFileSync(plan.fixtures[0], "utf8"));
   if (convert) await page.locator(convert).click();
   try {
     await page.waitForFunction(
-      (target) => Boolean(globalThis.document.querySelector(target)?.value?.trim()),
-      output,
+      ({ target, markers }) => {
+        const value = globalThis.document.querySelector(target)?.value ?? "";
+        return value.trim() !== "" && markers.every((marker) => value.includes(marker));
+      },
+      { target: output, markers: plan.markers },
       { timeout: plan.timeoutMs },
     );
   } catch (error) {
     if (!isTimeout(error)) throw error;
-    const shown = await page.locator(".text-red-600, .text-red-700, .bg-red-50").first().textContent({ timeout: 500 }).catch(() => null);
-    return shown ? { outcome: "failed", message: shown } : { outcome: "timeout", message: `no output after ${plan.timeoutMs / 1000} s` };
+    const shown = await page
+      .locator(".text-red-600, .text-red-700, .bg-red-50")
+      .first()
+      .textContent({ timeout: 500 })
+      .catch(() => null);
+    if (shown) return { outcome: "failed", message: shown };
+    const value = await page.locator(output).inputValue().catch(() => "");
+    return value.trim()
+      ? { outcome: "failed", message: `the output never showed the input's data (${plan.markers.join(", ")})` }
+      : { outcome: "timeout", message: `no output after ${plan.timeoutMs / 1000} s` };
   }
   await page.locator(download).first().click();
   await setup("download", () => waitForOutputs(page, 1, 5_000));
