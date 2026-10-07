@@ -26,6 +26,7 @@
     "audit:cf:api-smoke": "node scripts/smoke-cloudflare-api.mjs",
     "smoke:links": "node scripts/check-internal-links.mjs",
     "smoke:browser": "node scripts/smoke-browser.mjs",
+    "render-snapshot": "node scripts/render-snapshot.mjs",
     "r2:upload-ffmpeg-assets": "node scripts/upload-r2-ffmpeg-assets.mjs",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
