@@ -62,4 +62,5 @@ git config core.hooksPath .githooks
 - `pre-commit` runs `pnpm check:links` when the Tool registry, the link
   validator, an `AGENTS.md` or a `README.md` changes, and
   `node scripts/validate-tools.mjs` when app or registry code changes.
-- `pre-push` runs the app's lint and typecheck and `pnpm verify:catalog`.
+- `pre-push` runs the app's lint and typecheck, `pnpm verify:catalog` and
+  `pnpm test`, a push-level subset of `pnpm check`. CI runs the full check.

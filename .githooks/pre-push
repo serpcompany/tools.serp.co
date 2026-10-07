@@ -9,3 +9,6 @@ pnpm -C apps/tools typecheck
 
 echo "Running tool catalog checks..."
 pnpm verify:catalog
+
+echo "Running tests..."
+pnpm test
