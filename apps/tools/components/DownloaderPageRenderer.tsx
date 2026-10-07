@@ -1,12 +1,10 @@
 import { notFound } from "next/navigation";
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import DownloaderPageTemplate from "@/components/DownloaderPageTemplate";
 import { buildHowToSection, buildInfoArticleSection } from "@/lib/tool-sections";
+import { getTool } from "@/lib/catalog/catalog";
 import { toolContent } from "@/lib/tool-content";
 import type { Tool, ToolContent } from "@/types";
-
-const tools = toolsData as Tool[];
 
 type DownloaderPageRendererProps = {
   toolId: string;
@@ -83,7 +81,7 @@ function buildDownloaderFallbackContent(tool: Tool): ToolContent {
 export function DownloaderPageRenderer({
   toolId,
 }: DownloaderPageRendererProps) {
-  const tool = tools.find((item) => item.id === toolId && item.isActive);
+  const tool = getTool(toolId);
 
   if (!tool || tool.operation !== "download") {
     return notFound();

@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import { getD1ToolsDashboardData } from "@serp-tools/tool-telemetry/d1";
+import { allTools } from "@/lib/catalog/catalog";
 import { getSerpToolsD1Binding } from "@/lib/cloudflare-d1";
 import { isInternalDashboardAuthorized } from "@/lib/internal-dashboard-auth";
 import {
@@ -37,12 +37,7 @@ function withoutIdentityFields(metadata: Record<string, unknown>) {
   );
 }
 
-const toolMap = new Map(
-  (toolsData as Array<{ id: string; name: string; route: string }>).map((tool) => [
-    tool.id,
-    tool,
-  ])
-);
+const toolMap = new Map(allTools().map((tool) => [tool.id, tool]));
 
 export default async function ToolsDashboard() {
   // middleware.ts challenges the browser; this re-check keeps the page closed if

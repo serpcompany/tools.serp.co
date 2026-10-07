@@ -55,17 +55,17 @@ export function toSitemapUrl(origin: string, path: string) {
   return normalized === "/" ? origin : `${origin}${normalized}`;
 }
 
-export function getToolPaths(tools: SitemapTool[]) {
+export function getToolPaths(tools: readonly SitemapTool[]) {
   return tools
     .filter((tool) => tool.isActive && tool.route)
     .map((tool) => normalizePath(tool.route as string));
 }
 
-export function getCategoryPaths(tools: SitemapTool[]) {
+export function getCategoryPaths(tools: readonly SitemapTool[]) {
   return getCategoryPagePaths(tools).map(normalizePath);
 }
 
-function getGroupPaths(tools: SitemapTool[]): Record<SitemapGroup, string[]> {
+function getGroupPaths(tools: readonly SitemapTool[]): Record<SitemapGroup, string[]> {
   return {
     pages: STATIC_PATHS.map(normalizePath),
     tools: getToolPaths(tools),
@@ -76,7 +76,7 @@ function getGroupPaths(tools: SitemapTool[]): Record<SitemapGroup, string[]> {
 // Every URL-set file, in index order. A path appears once across the whole
 // tree, in the first group that lists it. Empty groups get no file.
 export function getSitemapFiles(
-  tools: SitemapTool[],
+  tools: readonly SitemapTool[],
   maxUrls: number = MAX_URLS_PER_SITEMAP,
 ): SitemapFile[] {
   const groupPaths = getGroupPaths(tools);
@@ -134,7 +134,7 @@ function getLegacyRedirectPath(fileName: string, files: SitemapFile[]) {
 
 type ResolveOptions = {
   origin: string;
-  tools: SitemapTool[];
+  tools: readonly SitemapTool[];
   maxUrls?: number;
 };
 

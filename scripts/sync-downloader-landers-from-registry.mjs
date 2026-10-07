@@ -6,7 +6,7 @@ import path from "node:path";
 const root = process.cwd();
 const registryApiPath =
   "repos/serpcompany/downloader-source-registry/contents/data/source-repo-data-json-config.json";
-const toolsPath = path.join(root, "packages/app-core/src/data/tools.json");
+const toolsPath = path.join(root, "apps/tools/lib/catalog/tools.json");
 const plannerPath = path.join(
   root,
   "packages/app-core/src/data/tools-planner.csv",

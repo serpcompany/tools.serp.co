@@ -4,12 +4,11 @@ import { useMemo, useState } from "react";
 import { ToolCard } from "@/components/ToolCard";
 import { ToolsSearchBar } from "@/components/ToolsSearchBar";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import toolsData from "@serp-tools/app-core/data/tools.json";
+import { activeTools } from "@/lib/catalog/catalog";
 import {
   buildToolDirectoryEntries,
   getToolDirectoryCategories,
 } from "@/lib/tool-directory";
-import type { Tool } from "@/types";
 
 type ToolCategory = {
   id: string;
@@ -23,7 +22,7 @@ type ToolCategory = {
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tools.serp.co";
 const siteOrigin = (siteUrl.startsWith("http") ? siteUrl : `https://${siteUrl}`).replace(/\/+$/, "");
 
-const processedTools = buildToolDirectoryEntries(toolsData as Tool[]);
+const processedTools = buildToolDirectoryEntries(activeTools());
 const directoryCategories = getToolDirectoryCategories(processedTools);
 const categories: ToolCategory[] = [
   { id: "all", name: "Filter", count: processedTools.length },

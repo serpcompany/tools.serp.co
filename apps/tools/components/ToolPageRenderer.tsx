@@ -2,11 +2,9 @@ import { notFound } from "next/navigation";
 
 import ToolPageTemplate from "@/components/ToolPageTemplate";
 import { buildHowToSection, buildInfoArticleSection } from "@/lib/tool-sections";
+import { getTool } from "@/lib/catalog/catalog";
 import { toolContent } from "@/lib/tool-content";
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import type { Tool, ToolContent } from "@/types";
-
-const tools = toolsData as Tool[];
 
 type ToolPageRendererProps = {
   toolId: string;
@@ -73,7 +71,7 @@ const buildFallbackContent = (tool: Tool): ToolContent => {
 };
 
 export function ToolPageRenderer({ toolId }: ToolPageRendererProps) {
-  const tool = tools.find((item) => item.id === toolId && item.isActive);
+  const tool = getTool(toolId);
 
   if (!tool || !tool.from || !tool.to) {
     return notFound();

@@ -1,15 +1,8 @@
-// Tool operation types - what the tool does
-export type OperationType =
-  | 'bulk'       // Batch processing
-  | 'combine'    // Merge multiple files
-  | 'compress'   // Reduce file size
-  | 'convert'    // Transform from one format to another
-  | 'download'   // Download from external sources
-  | 'edit'       // Edit existing files
-  | 'video-editor' // Edit video files
-  | 'image-editor' // Edit image files
-  | 'audio-editor' // Edit audio files
-  | 'view';      // View/read files in browser
+import type { ToolOperation } from '../lib/catalog/operations.ts';
+
+// Tool operation types - what the tool does. OPERATIONS in
+// lib/catalog/operations.ts is the list.
+export type OperationType = ToolOperation;
 
 // Media types - what kind of content the tool works with
 export type MediaType =
@@ -176,6 +169,8 @@ export interface Tool {
   isNew?: boolean;
   isPopular?: boolean;
   requiresFFmpeg?: boolean;
+  // A YouTube video id on a few entries; no renderer reads it.
+  video?: string;
   
   // Landing page content
   content?: ToolContent;

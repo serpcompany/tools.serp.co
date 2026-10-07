@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
+import { getTool } from "@/lib/catalog/catalog";
+import { isToolOperation } from "@/lib/catalog/operations";
 import {
   getCategoryPageContent,
   getCategoryPagePath,
 } from "@/lib/tool-directory";
-import {
-  buildOperationFallbackDescription,
-  isToolOperation,
-} from "@/lib/tool-operations";
+import { buildOperationFallbackDescription } from "@/lib/tool-operations";
 import { toolContent } from "@/lib/tool-content";
 import { normalizePath } from "@/lib/sitemap";
 import type { Tool } from "@/types";
-
-const tools = toolsData as Tool[];
 
 const buildFallbackDescription = (tool: Tool) => {
   return buildOperationFallbackDescription({
@@ -25,7 +21,7 @@ const buildFallbackDescription = (tool: Tool) => {
 };
 
 export function buildToolMetadata(toolId: string): Metadata {
-  const tool = tools.find((item) => item.id === toolId && item.isActive);
+  const tool = getTool(toolId);
   if (!tool) {
     return {};
   }

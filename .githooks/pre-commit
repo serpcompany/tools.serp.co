@@ -4,14 +4,14 @@ set -eu
 changed_files="$(git diff --cached --name-only)"
 
 case "$changed_files" in
-  *packages/app-core/src/data/tools.json*|*scripts/validate-lander-outbound-links.mjs*|*AGENTS.md*|*README.md*)
+  *apps/tools/lib/catalog/tools.json*|*scripts/validate-lander-outbound-links.mjs*|*AGENTS.md*|*README.md*)
     echo "Running lander outbound-link validation..."
     pnpm check:links
     ;;
 esac
 
 case "$changed_files" in
-  *packages/app-core/src/data/tools.json*|*apps/tools/*|*packages/app-core/*)
+  *apps/tools/*|*packages/app-core/*)
     echo "Running tools SOP validation..."
     node scripts/validate-tools.mjs
     ;;

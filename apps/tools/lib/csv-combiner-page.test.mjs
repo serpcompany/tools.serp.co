@@ -7,7 +7,7 @@ const csvCombinerSource = readFileSync(
   "utf8",
 );
 const toolsRegistry = JSON.parse(
-  readFileSync(new URL("../../../packages/app-core/src/data/tools.json", import.meta.url), "utf8"),
+  readFileSync(new URL("./catalog/tools.json", import.meta.url), "utf8"),
 );
 
 test("csv combiner uses the updated video embed", () => {

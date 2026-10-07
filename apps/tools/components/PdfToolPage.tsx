@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import PdfTool from "@/components/PdfTool";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { ChangelogSection } from "@/components/sections/ChangelogSection";
@@ -8,11 +7,10 @@ import { FAQSection } from "@/components/sections/FAQSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
+import { getTool } from "@/lib/catalog/catalog";
 import { toolContent } from "@/lib/tool-content";
 import { buildHowToSection, buildInfoArticleSection } from "@/lib/tool-sections";
 import type { FAQ, Tool, ToolContent } from "@/types";
-
-const tools = toolsData as Tool[];
 
 type PdfToolPageProps = {
   toolId: string;
@@ -88,7 +86,7 @@ const buildFallbackContent = (tool: Tool): ToolContent => {
 };
 
 export default function PdfToolPage({ toolId }: PdfToolPageProps) {
-  const tool = tools.find((item) => item.id === toolId && item.isActive);
+  const tool = getTool(toolId);
 
   if (!tool) {
     return notFound();

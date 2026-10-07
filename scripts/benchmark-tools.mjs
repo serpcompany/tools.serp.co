@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const baseUrl = process.env.TOOLS_BASE_URL ?? "http://localhost:3000";
-const toolsPath = path.join(process.cwd(), "packages/app-core/src/data/tools.json");
+const toolsPath = path.join(process.cwd(), "apps/tools/lib/catalog/tools.json");
 const fixturesDir = path.join(process.cwd(), "apps/tools/benchmarks");
 const fixtureMatrixPath = path.join(fixturesDir, "fixture-matrix.json");
 

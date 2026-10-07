@@ -2,20 +2,20 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
+import { availableOperations } from "./catalog/catalog.ts";
 import {
   buildToolDirectoryEntries,
-  getAvailableToolOperations,
   getCategoryPagePaths,
   getToolDirectoryCategories,
   getToolsForDirectoryCategory,
 } from "./tool-directory.ts";
 
 const toolsRegistry = JSON.parse(
-  readFileSync(new URL("../../../packages/app-core/src/data/tools.json", import.meta.url), "utf8"),
+  readFileSync(new URL("./catalog/tools.json", import.meta.url), "utf8"),
 );
 
 test("tool directory exposes one category path per active operation", () => {
-  assert.deepEqual(getAvailableToolOperations(toolsRegistry), [
+  assert.deepEqual(availableOperations(toolsRegistry), [
     "convert",
     "download",
     "compress",

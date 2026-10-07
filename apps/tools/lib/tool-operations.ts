@@ -1,30 +1,4 @@
-export const OPERATION_LABELS = {
-  bulk: "Bulk Operations",
-  combine: "Combine",
-  compress: "Compress",
-  convert: "Convert",
-  download: "Downloaders",
-  edit: "Edit",
-  "video-editor": "Video Editor",
-  "image-editor": "Image Editor",
-  "audio-editor": "Audio Editor",
-  view: "PDF",
-} as const;
-
-export type ToolOperation = keyof typeof OPERATION_LABELS;
-
-export const TOOL_OPERATION_ORDER: ToolOperation[] = [
-  "convert",
-  "download",
-  "compress",
-  "combine",
-  "bulk",
-  "edit",
-  "video-editor",
-  "image-editor",
-  "audio-editor",
-  "view",
-];
+import { OPERATION_LABELS, type ToolOperation } from "./catalog/operations.ts";
 
 type OperationFallbackDescriptionArgs = {
   operation?: string;
@@ -55,14 +29,6 @@ export function getOperationLabel(operation?: string): string {
   }
 
   return OPERATION_LABELS[operation as ToolOperation] ?? capitalize(operation);
-}
-
-export function isToolOperation(operation?: string): operation is ToolOperation {
-  if (!operation) {
-    return false;
-  }
-
-  return operation in OPERATION_LABELS;
 }
 
 export function buildOperationFallbackDescription({

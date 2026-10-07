@@ -87,7 +87,7 @@ test("the transcription UI does not advertise YouTube links", () => {
 });
 
 test("every transcription page states that webpage links are not supported", () => {
-  const tools = JSON.parse(read("../../../packages/app-core/src/data/tools.json"));
+  const tools = JSON.parse(read("./catalog/tools.json"));
   for (const toolId of TRANSCRIPTION_TOOL_IDS) {
     const tool = tools.find((entry) => entry.id === toolId);
     assert.ok(tool, `${toolId} exists`);

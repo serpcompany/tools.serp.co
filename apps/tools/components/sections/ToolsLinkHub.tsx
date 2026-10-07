@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import { Button } from "@serp-tools/ui/components/button";
 import { Tabs, TabsList, TabsTrigger } from "@serp-tools/ui/components/tabs";
+import { activeTools } from "@/lib/catalog/catalog";
 import {
   buildToolDirectoryEntries,
   getToolDirectoryCategories,
   getToolsForDirectoryCategory,
 } from "@/lib/tool-directory";
-import type { RelatedTool, Tool } from "@/types";
+import type { RelatedTool } from "@/types";
 
 type ToolsLinkHubProps = {
   relatedTools?: RelatedTool[];
@@ -35,7 +35,7 @@ type ToolCategory = {
 const CATEGORY_PREVIEW_LIMIT = 48;
 
 function buildOperationCategories(): ToolCategory[] {
-  const entries = buildToolDirectoryEntries(toolsData as Tool[]);
+  const entries = buildToolDirectoryEntries(activeTools());
   const categories = getToolDirectoryCategories(entries);
 
   return categories.map((category) => {

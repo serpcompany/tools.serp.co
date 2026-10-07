@@ -1,15 +1,14 @@
 import Link from "next/link";
 
-import toolsData from "@serp-tools/app-core/data/tools.json";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
+import { activeTools } from "@/lib/catalog/catalog";
 import { buildCategoriesIndexMetadata } from "@/lib/metadata";
 import {
   buildToolDirectoryEntries,
   getToolDirectoryCategories,
 } from "@/lib/tool-directory";
-import type { Tool } from "@/types";
 
-const tools = buildToolDirectoryEntries(toolsData as Tool[]);
+const tools = buildToolDirectoryEntries(activeTools());
 const categories = getToolDirectoryCategories(tools);
 const activeToolCount = categories.reduce((sum, category) => sum + category.count, 0);
 

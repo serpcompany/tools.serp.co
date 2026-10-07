@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Card } from "@serp-tools/ui/components/card";
-import toolsData from "@serp-tools/app-core/data/tools.json";
+import { activeTools, getTool, getToolByRoute } from "@/lib/catalog/catalog";
 import { canonicalPath } from "@/lib/trailing-slash";
 
 type Tool = {
@@ -35,14 +35,12 @@ export function RelatedToolsSection({
   currentToolId,
   relatedTools,
 }: RelatedToolsSectionProps) {
-  const allTools = (toolsData as Tool[]).filter((tool) => tool.isActive);
-  const toolsById = new Map(allTools.map((tool) => [tool.id, tool as Tool]));
-  const toolsByRoute = new Map(allTools.map((tool) => [tool.route, tool as Tool]));
+  const allTools = activeTools();
 
   const resolvedFromContent = (relatedTools ?? [])
     .map((tool, index) => {
       if (tool.toolId) {
-        const resolved = toolsById.get(tool.toolId);
+        const resolved = getTool(tool.toolId);
         if (!resolved) return null;
         return {
           ...resolved,
@@ -52,7 +50,7 @@ export function RelatedToolsSection({
       }
       if (tool.href) {
         if (tool.href.startsWith("/")) {
-          const resolved = toolsByRoute.get(tool.href);
+          const resolved = getToolByRoute(tool.href);
           if (!resolved) return null;
           return {
             ...resolved,
