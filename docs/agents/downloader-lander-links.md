@@ -5,7 +5,7 @@ Do not add guessed outbound links to downloader landers.
 Before adding or changing any URL in the Tool registry under
 `content.productLinks` or `content.sourceLinks`:
 
-1. Verify the exact URL with HTTP.
+1. Verify the exact URL with HTTP, following redirects to the final page.
 2. Do not invent GitHub repository, app, support, source, or product URLs from a
    slug.
 3. If a URL returns `404` or `410`, remove it or leave the field blank.

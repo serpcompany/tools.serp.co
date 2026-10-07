@@ -13,8 +13,8 @@ guidance.
 | Shared application core  | `packages/app-core`                    | Shared shell components, the versioned Tool registry, and related catalog data.                                                                   |
 | Tool telemetry           | `packages/tool-telemetry`              | Browser/server event contracts plus D1 persistence and summaries.                                                                                 |
 | UI primitives            | `packages/ui`                          | Reusable presentation primitives, styles, and small UI utilities; no Tool or application policy.                                                  |
-| Lint configuration       | `packages/eslint-config`               | Shared ESLint configuration only.                                                                                                                 |
-| TypeScript configuration | `packages/typescript-config`           | Shared TypeScript configuration only.                                                                                                             |
+| Lint configuration       | [`packages/eslint-config`](./packages/eslint-config/README.md)               | Shared ESLint configuration only.                                                                                                                 |
+| TypeScript configuration | [`packages/typescript-config`](./packages/typescript-config/README.md)           | Shared TypeScript configuration only.                                                                                                             |
 | Repository harness       | root `scripts` and root `package.json` | Repository-wide validation, generation, audit, and orchestration commands. Command roles are made explicit as the harness modernization proceeds. |
 | Durable documentation    | root maps, `docs` and `.archive`       | Current guidance and accepted decisions in `docs`, mapped by area from `AGENTS.md`; historical evidence in `.archive`, classified as a whole.         |
 
