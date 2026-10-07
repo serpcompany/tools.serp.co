@@ -466,6 +466,13 @@
       "notes": "Add a real fixture for this format."
     },
     {
+      "format": "nef",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.nef",
+      "notes": "Nikon NEF (TIFF-based, from a Coolscan film scanner)."
+    },
+    {
       "format": "oga",
       "status": "ready",
       "input": "file",
@@ -492,6 +499,13 @@
       "input": "file",
       "fixture": "fixtures/sample.opus",
       "notes": "Auto-generated fixture."
+    },
+    {
+      "format": "orf",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.orf",
+      "notes": "Olympus ORF camera RAW sample."
     },
     {
       "format": "pdf",
@@ -537,6 +551,13 @@
       "input": "file",
       "fixture": "fixtures/sample.ra",
       "notes": "RealAudio sample from FFmpeg samples."
+    },
+    {
+      "format": "raf",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.raf",
+      "notes": "Fujifilm RAF camera RAW sample (X-S1)."
     },
     {
       "format": "rm",
