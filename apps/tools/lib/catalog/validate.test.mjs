@@ -32,10 +32,18 @@ test("a valid entry with content passes", () => {
   assert.deepEqual(validateCatalog([entry({ content: content(), tags: ["png"], requiresFFmpeg: false })]), []);
 });
 
-test("ids and routes are unique", () => {
+test("ids and public paths are unique", () => {
   assert.deepEqual(
     validateCatalog([entry(), entry({ route: "/png-to-jpeg" }), entry({ id: "png-to-jpeg" })]),
-    ["png-to-jpg: duplicate id", "png-to-jpeg: duplicate route /png-to-jpg"],
+    ["png-to-jpg: duplicate id", "png-to-jpeg: duplicate route /png-to-jpg/"],
+  );
+  // /png-to-png/ redirects to /compress-png/, so these two collide.
+  assert.deepEqual(
+    validateCatalog([
+      entry({ id: "png-to-png", route: "/compress-png" }),
+      entry({ id: "png-to-png-2", route: "/png-to-png" }),
+    ]),
+    ["png-to-png-2: duplicate route /compress-png/"],
   );
 });
 
@@ -66,6 +74,15 @@ test("unknown fields are reported, at the top level and in content", () => {
     validateCatalog([entry({ isFeatured: true, content: content({ faq: [] }) })]),
     ["png-to-jpg.isFeatured is not a known field", "png-to-jpg.content.faq is not a known field"],
   );
+  // Object.prototype names are fields like any other.
+  const [parsed] = JSON.parse(
+    JSON.stringify([entry()]).replace('"isActive"', '"constructor":1,"__proto__":{},"toString":"x","isActive"'),
+  );
+  assert.deepEqual(validateCatalog([parsed]), [
+    "png-to-jpg.constructor is not a known field",
+    "png-to-jpg.__proto__ is not a known field",
+    "png-to-jpg.toString is not a known field",
+  ]);
 });
 
 test("content follows ToolContent", () => {

@@ -12,7 +12,6 @@ export const repoRoot = path.resolve(appRoot, "../..");
 // Must match MAX_URLS_PER_SITEMAP in lib/sitemap.ts.
 export const MAX_URLS_PER_SITEMAP = 50000;
 
-export const OPERATION_ORDER = OPERATIONS;
 
 const TEXT_FILE_EXTENSIONS = new Set([".txt", ".xml"]);
 const DEFAULT_STATIC_PATHS = ["/", "/categories/", "/brands/"];
@@ -98,11 +97,11 @@ export function getOperationCounts(tools = getActiveTools()) {
 export function getCategoryPaths(tools = getActiveTools()) {
   const operations = new Set();
   for (const tool of tools) {
-    if (OPERATION_ORDER.includes(tool.operation)) {
+    if (OPERATIONS.includes(tool.operation)) {
       operations.add(tool.operation);
     }
   }
-  return OPERATION_ORDER.filter((operation) => operations.has(operation)).map(
+  return OPERATIONS.filter((operation) => operations.has(operation)).map(
     (operation) => `/category/${operation}/`,
   );
 }

@@ -35,7 +35,7 @@ export function RelatedToolsSection({
   currentToolId,
   relatedTools,
 }: RelatedToolsSectionProps) {
-  const allTools = activeTools();
+  const candidates = activeTools();
 
   const resolvedFromContent = (relatedTools ?? [])
     .map((tool, index) => {
@@ -77,7 +77,7 @@ export function RelatedToolsSection({
 
   // Find all tools that involve either format (combining both)
   const relatedToolsFallback = currentFrom && currentTo
-    ? allTools.filter(tool =>
+    ? candidates.filter(tool =>
         ((tool.from === currentFrom || tool.to === currentFrom ||
           tool.from === currentTo || tool.to === currentTo)) &&
         (currentRoute ? tool.route !== currentRoute : true) &&

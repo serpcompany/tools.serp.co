@@ -10,11 +10,12 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { availableOperations, toolHref } from "./catalog/catalog.ts";
+import { toolHref } from "./catalog/href.ts";
 import {
   OPERATION_LABELS,
   OPERATIONS,
   isToolOperation,
+  operationsUsedBy,
   type ToolOperation as OperationType,
 } from "./catalog/operations.ts";
 
@@ -218,7 +219,7 @@ export function getToolDirectoryIcon(toolId: string): LucideIcon {
 export function getCategoryPagePaths(
   tools: readonly Pick<ToolDirectorySource, "isActive" | "operation">[],
 ): string[] {
-  return availableOperations(tools).map((operation) => toCategoryPath(operation));
+  return operationsUsedBy(tools).map((operation) => toCategoryPath(operation));
 }
 
 export function buildToolDirectoryEntries(

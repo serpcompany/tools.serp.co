@@ -128,8 +128,9 @@ export interface PermissionJustification {
 export interface ToolContent {
   tool: ToolInfo;
   videoSection?: VideoSectionData;
-  faqs: FAQ[];
-  aboutSection: AboutFormatsSection;
+  // 18 converters have content without FAQs or an about section.
+  faqs?: FAQ[];
+  aboutSection?: AboutFormatsSection;
   productLinks?: ProductLinks;
   features?: string[];
   screenshots?: ProductImage[];

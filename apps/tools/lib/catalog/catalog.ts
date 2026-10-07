@@ -1,13 +1,16 @@
 import type { Tool } from "@/types";
 
 import { canonicalPath } from "../trailing-slash.ts";
-import { OPERATIONS, type ToolOperation } from "./operations.ts";
+import { toolHref } from "./href.ts";
+import { operationsUsedBy, type ToolOperation } from "./operations.ts";
 import registryData from "./tools.json" with { type: "json" };
+
+export { toolHref };
 
 // The Tool registry, typed once. Nothing validates, copies or freezes it at
 // runtime: a Worker cold start only parses the JSON. validate.ts checks the
 // shape in tests and `pnpm verify:catalog`. Callers share these objects and
-// must not mutate them.
+// must not mutate them (tool-content.ts still does until #148's PR 3).
 const registry = registryData as Tool[];
 
 let active: readonly Tool[] | undefined;
@@ -37,16 +40,7 @@ export function getToolByRoute(route: string): Tool | undefined {
   return activeByHref.get(canonicalPath(route));
 }
 
-// A Tool's public URL path, with its trailing slash: with
-// skipTrailingSlashRedirect on, <Link> doesn't add it.
-export function toolHref(tool: Pick<Tool, "route">): string {
-  return canonicalPath(tool.route);
-}
-
 // The operations that have at least one active Tool, in OPERATIONS order.
-export function availableOperations(
-  tools: readonly { isActive: boolean; operation: string }[] = registry,
-): ToolOperation[] {
-  const used = new Set(tools.filter((tool) => tool.isActive).map((tool) => tool.operation));
-  return OPERATIONS.filter((operation) => used.has(operation));
+export function availableOperations(): ToolOperation[] {
+  return operationsUsedBy(registry);
 }

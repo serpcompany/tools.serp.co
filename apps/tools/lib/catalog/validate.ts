@@ -1,7 +1,8 @@
 // Checks that the registry matches the Tool type that catalog.ts casts it to:
-// unique ids and routes, a known operation, and the content shape. Run by the
-// catalog tests and `pnpm verify:catalog`, never at runtime.
+// unique ids and public paths, a known operation, and the content shape. Run
+// by the catalog tests and `pnpm verify:catalog`, never at runtime.
 
+import { toolHref } from "./href.ts";
 import { OPERATIONS, isToolOperation } from "./operations.ts";
 
 type Check = (value: unknown, path: string, errors: string[]) => void;
@@ -49,7 +50,7 @@ const object =
       return;
     }
     for (const key of Object.keys(value)) {
-      if (!(key in fields)) errors.push(`${path}.${key} is not a known field`);
+      if (!Object.hasOwn(fields, key)) errors.push(`${path}.${key} is not a known field`);
     }
     for (const [key, check] of Object.entries(fields)) check(value[key], `${path}.${key}`, errors);
   };
@@ -63,9 +64,7 @@ const formatInfo = object({
   details: optional(strings),
 });
 
-// ToolContent in types/index.d.ts. `faqs` and `aboutSection` are optional
-// here because 18 active converters have content without them; their pages
-// render without those sections.
+// ToolContent in types/index.d.ts.
 const content = object({
   tool: object({
     title: string,
@@ -175,9 +174,12 @@ export function validateCatalog(registry: unknown): string[] {
       if (ids.has(entry.id)) errors.push(`${label}: duplicate id`);
       ids.add(entry.id);
     }
+    // Compared as served: slashed, with legacy aliases (/png-to-png/ is
+    // /compress-png/) resolved, the way getToolByRoute looks Tools up.
     if (typeof entry.route === "string") {
-      if (routes.has(entry.route)) errors.push(`${label}: duplicate route ${entry.route}`);
-      routes.add(entry.route);
+      const href = toolHref({ route: entry.route });
+      if (routes.has(href)) errors.push(`${label}: duplicate route ${href}`);
+      routes.add(href);
     }
   });
   return errors;

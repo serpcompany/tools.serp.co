@@ -39,3 +39,12 @@ const OPERATION_SET: ReadonlySet<string> = new Set(OPERATIONS);
 export function isToolOperation(value: unknown): value is ToolOperation {
   return typeof value === "string" && OPERATION_SET.has(value);
 }
+
+// The operations that at least one of these Tools is active in, in OPERATIONS
+// order. catalog.ts applies it to the registry.
+export function operationsUsedBy(
+  tools: readonly { isActive: boolean; operation: string }[],
+): ToolOperation[] {
+  const used = new Set(tools.filter((tool) => tool.isActive).map((tool) => tool.operation));
+  return OPERATIONS.filter((operation) => used.has(operation));
+}

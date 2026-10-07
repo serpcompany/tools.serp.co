@@ -10,7 +10,7 @@ import {
   getToolByRoute,
   toolHref,
 } from "./catalog.ts";
-import { OPERATION_LABELS, OPERATIONS, isToolOperation } from "./operations.ts";
+import { OPERATION_LABELS, OPERATIONS, isToolOperation, operationsUsedBy } from "./operations.ts";
 
 const registry = JSON.parse(readFileSync(new URL("./tools.json", import.meta.url), "utf8"));
 const inactive = registry.find((tool) => !tool.isActive);
@@ -77,10 +77,10 @@ test("toolHref is the slashed public path", () => {
   assert.equal(toolHref(getTool("png-to-png")), "/compress-png/");
 });
 
-test("availableOperations keeps OPERATIONS order and skips inactive and unknown operations", () => {
+test("available operations keep OPERATIONS order and skip inactive and unknown operations", () => {
   assert.deepEqual(availableOperations(), [...OPERATIONS]);
   assert.deepEqual(
-    availableOperations([
+    operationsUsedBy([
       { isActive: true, operation: "view" },
       { isActive: true, operation: "convert" },
       { isActive: false, operation: "bulk" },
