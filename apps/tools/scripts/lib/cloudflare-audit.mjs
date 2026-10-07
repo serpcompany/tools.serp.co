@@ -12,7 +12,6 @@ export const repoRoot = path.resolve(appRoot, "../..");
 // Must match MAX_URLS_PER_SITEMAP in lib/sitemap.ts.
 export const MAX_URLS_PER_SITEMAP = 50000;
 
-
 const TEXT_FILE_EXTENSIONS = new Set([".txt", ".xml"]);
 const DEFAULT_STATIC_PATHS = ["/", "/categories/", "/brands/"];
 const LEGACY_DOWNLOADER_REDIRECTS = [
