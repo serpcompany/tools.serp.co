@@ -1,61 +1,54 @@
-# Documentation index
+# Writing docs
 
-This is the index of every current document in the repository. Everything
-under `.archive/` is historical evidence as a whole and is not indexed file by
-file.
-Current guidance describes the current branch and is the source to follow.
-Historical and advisory material is evidence at its recorded scope and time;
-it must not be treated as current operating truth or active work.
+What belongs in `docs/` and how to write it. For what lives where, see
+[AGENTS.md](../AGENTS.md).
 
-The retired catch-all `docs/knowledge`, `docs/plans`, and `docs/planner`
-categories are rejected. Current guidance belongs beside its owner or in `docs/runbooks`;
-dated audits and advisory research exports belong in `.archive/` at the
-repository root; data an owner still reads lives with that owner; active work
-belongs in GitHub Issues.
+## What belongs here
 
-Docs follow the serp [docs-are-maps](https://github.com/serpcompany/serp/blob/main/docs/engineering/standards/agent-harness/docs-are-maps.md)
+`docs/` holds prose a reader needs that the code can't show: purpose,
+invariants, boundaries, the reasons behind decisions, and how to operate the
+site. Policies agents follow go in `docs/agents/`, operating procedures in
+`docs/runbooks/`, and durable decisions in `docs/adr/`. A topic that fits none
+of these gets its own leaf, such as `docs/telemetry.md`.
+
+Some things belong elsewhere:
+
+- A component's own contract lives beside it, as its `README.md` (for example
+  `apps/tools/README.md`), and data an owner reads lives with that owner.
+- Work, plans, acceptance criteria and status belong in GitHub Issues, not in a
+  doc. The old `docs/knowledge`, `docs/plans` and `docs/planner` folders were
+  retired for that reason; don't recreate them.
+- Dated audits, superseded material and research exports go in `.archive/` at
+  the repository root. They stay useful as evidence, but they never override
+  current docs or running code.
+- Never store live credentials or secret values in a doc.
+
+## Writing guidance
+
+Write for a person who knows the business but not the history of a particular
+decision. Explain purpose, scope, terms and consequences. Update a doc when a
+boundary, an invariant or a term changes; implementation detail belongs in code
+comments, tests or the PR description, where it can't drift from the code.
+
+Avoid file-by-file inventories and link-only tables of contents: they duplicate
+the filesystem and go stale. `AGENTS.md` maps areas, not files. Each entry says
+what the reader will find and when to read it. Link a new leaf from the
+`AGENTS.md` area it belongs to, or from the README of the component it
+documents; an agent won't find a leaf that nothing points to.
+
+## Size and names
+
+Docs follow the serp
+[docs-are-maps](https://github.com/serpcompany/serp/blob/main/docs/engineering/standards/agent-harness/docs-are-maps.md)
 budgets: maps (`AGENTS.md`, `README.md`) at most 120 lines and every other doc
-at most 300, counted as lines wrapped at 100 characters. When a doc outgrows
-its budget, split it by topic. Name files and folders under `docs/` in
-kebab-case. `node .github/scripts/check-docs.mjs` checks both, and the
-**Docs Links** workflow checks relative links in the root docs and `docs/`.
-The root `ARCHITECTURE.md` and `CONTEXT.md` keep their conventional uppercase
-names (decided in #149): `CONTEXT.md` is the file the domain-modeling skill
-reads, and `ARCHITECTURE.md` is the common name for a repository's
-architecture map. Both count as leaves for the size check.
+at most 300, counted as lines wrapped at 100 characters. When a doc outgrows its
+budget, split it by topic instead of squeezing it under the limit.
 
-## Current guidance
+Name files and folders under `docs/` in kebab-case; only `README.md` and
+`AGENTS.md` are uppercase. The root `ARCHITECTURE.md` and `CONTEXT.md` keep
+their conventional names (decided in #149): `CONTEXT.md` is the file the
+domain-modeling skill reads, and `ARCHITECTURE.md` is the common name for a
+repository's architecture map. Both are budgeted as leaves.
 
-### Repository maps
-
-- [Agent instruction router](../AGENTS.md)
-- [Repository architecture](../ARCHITECTURE.md)
-- [Domain glossary](../CONTEXT.md)
-- [Repository overview and commands](../README.md)
-- [ADR policy and index](./adr/README.md)
-
-### Agent and workflow policy
-
-- [Domain documentation convention](./agents/domain.md)
-- [Downloader Lander outbound-link policy](./agents/downloader-lander-links.md)
-- [GitHub issue tracker convention](./agents/issue-tracker.md)
-- [Triage label vocabulary](./agents/triage-labels.md)
-
-### Owned application and package contracts
-
-- [Tools application contract](../apps/tools/README.md)
-- [Telemetry: what is recorded, retention, opt-out and deletion](./telemetry.md)
-- [ESLint configuration package](../packages/eslint-config/README.md)
-- [TypeScript configuration package](../packages/typescript-config/README.md)
-
-### Runbooks
-
-- [D1 telemetry schema and write contract](./runbooks/d1-telemetry.md)
-- [Cloudflare operations](./runbooks/cloudflare.md)
-- [Browser smoke test](./runbooks/browser-smoke.md)
-
-## Archive
-
-Dated audits and retained research exports live in [`.archive/`](../.archive/README.md).
-They are evidence at their recorded scope and time: confirm any reusable claim
-against current code, current runbooks, and linked GitHub work.
+`node .github/scripts/check-docs.mjs` checks sizes and names. The **Docs Links**
+workflow checks relative links in the root docs and `docs/`.

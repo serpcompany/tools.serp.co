@@ -40,6 +40,7 @@ changes. Mark it `Superseded`, add a `Superseded by` link to the replacement,
 and make the replacement link back with `Supersedes`. Both records remain in
 this directory so the decision chain is navigable.
 
-Add every ADR to the [documentation index](../README.md). The **Docs Links**
-workflow fails on broken relative links, including replacement links between
-ADRs; nothing checks that an ADR is indexed, so add it by hand.
+This directory is the ADR index: numbered file names keep it in order. Link a
+new ADR from the doc for the area it decides, such as `ARCHITECTURE.md` or a
+component README, so a reader of that area finds it. The **Docs Links** workflow
+fails on broken relative links, including replacement links between ADRs.
