@@ -1,9 +1,9 @@
 # Repository architecture
 
 This map describes stable ownership and dependency boundaries on the current
-default branch. It is a navigation contract, not a deployment record. Use the
-[documentation index](./docs/README.md) for detailed guidance and dated
-evidence.
+default branch. It is a navigation contract, not a deployment record.
+[AGENTS.md](./AGENTS.md) maps each area to the doc that holds its detailed
+guidance.
 
 ## Ownership map
 
@@ -13,10 +13,10 @@ evidence.
 | Shared application core  | `packages/app-core`                    | Shared shell components, the versioned Tool registry, and related catalog data.                                                                   |
 | Tool telemetry           | `packages/tool-telemetry`              | Browser/server event contracts plus D1 persistence and summaries.                                                                                 |
 | UI primitives            | `packages/ui`                          | Reusable presentation primitives, styles, and small UI utilities; no Tool or application policy.                                                  |
-| Lint configuration       | `packages/eslint-config`               | Shared ESLint configuration only.                                                                                                                 |
-| TypeScript configuration | `packages/typescript-config`           | Shared TypeScript configuration only.                                                                                                             |
+| Lint configuration       | [`packages/eslint-config`](./packages/eslint-config/README.md)               | Shared ESLint configuration only.                                                                                                                 |
+| TypeScript configuration | [`packages/typescript-config`](./packages/typescript-config/README.md)           | Shared TypeScript configuration only.                                                                                                             |
 | Repository harness       | root `scripts` and root `package.json` | Repository-wide validation, generation, audit, and orchestration commands. Command roles are made explicit as the harness modernization proceeds. |
-| Durable documentation    | root maps, `docs` and `.archive`       | Current guidance and accepted decisions in `docs`, indexed by `docs/README.md`; historical evidence in `.archive`, classified as a whole.         |
+| Durable documentation    | root maps, `docs` and `.archive`       | Current guidance and accepted decisions in `docs`, mapped by area from `AGENTS.md`; historical evidence in `.archive`, classified as a whole.         |
 
 `apps/tools` is the only deployable application. A package owns reusable code
 and data; it does not own application routes or deployment configuration.
@@ -51,7 +51,7 @@ real reusable contract justifies moving it into a package.
 | Runtime observations                           | D1 `tool_runs` and derived `tool_status`                                       | Time-bound evidence for instrumented Tool ids, not catalog or work state.                                                                 |
 | Planning evidence                              | `packages/app-core/src/data/tools-planner.csv`                                 | Advisory candidate rows, read and appended to by the downloader lander sync and read by two lander tests. Not catalog intent, capability, or health; join only by registry Tool id. |
 | Active work                                    | GitHub Issues for this repository                                              | Issues, dependencies, labels, and assignees own readiness, blockers, and ownership. Repository plans are not a parallel tracker.          |
-| Current documentation classification           | `docs/README.md`                                                               | Indexes every current doc. Everything under `.archive/` is historical evidence as a whole and is not indexed file by file.                |
+| Documentation map                              | `AGENTS.md`                                                                    | Maps each area to the doc that owns it; `docs/README.md` says what belongs in `docs/`. `.archive/` is historical evidence as a whole.     |
 
 Registry Tool id is the join key across catalog intent, fixtures, verification,
 runtime observations, planning evidence, and GitHub work. Names, routes, and
