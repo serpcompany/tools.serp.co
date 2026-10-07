@@ -174,7 +174,9 @@ const COMPRESSION_ENGINES = {
 // The engine the generic converter page uses for a Tool: the branch order of
 // compressFile and convertUnchecked in lib/convert/workerClient.ts, and the
 // server-only outputs of shouldUseServerConversion in lib/convert/video.ts.
-// A label for grouping results; it decides nothing.
+// Those try /api/video-convert first and fall back to FFmpeg in the browser
+// when it fails, as it does on Workers. A label for grouping results; it
+// decides nothing.
 export function converterEngine({ operation, from, to }) {
   const source = from.toLowerCase();
   const target = to.toLowerCase();
@@ -187,7 +189,7 @@ export function converterEngine({ operation, from, to }) {
   if (requiresVideoConversion(source, target)) {
     const serverOnly =
       ["mxf", "rm", "rmvb"].includes(target) || (source === "amr" && ["mp2", "oga", "ogg"].includes(target));
-    return serverOnly ? "server-video" : "ffmpeg-wasm";
+    return serverOnly ? "server-video, then ffmpeg-wasm" : "ffmpeg-wasm";
   }
   return "browser-raster";
 }
@@ -238,11 +240,21 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
   if (!files) {
     return { ...base, status: "no_fixture", reason: `no ready ${tool.from} fixture in fixture-matrix.json` };
   }
-  const markers = TEXT_DRIVERS.has(driver)
-    ? files.map((file) => TEXT_MARKERS[path.basename(file)]).filter(Boolean)
-    : [];
-  const slow = engine === "ffmpeg-wasm" || engine === "server-video";
-  return { ...base, driver, fixtures: files, markers, timeoutMs: slow ? ffmpegTimeoutMs : timeoutMs };
+  // A text output has no byte signature: without the fixture's data to look
+  // for, a pass would prove nothing.
+  const markers = TEXT_DRIVERS.has(driver) ? files.map((file) => TEXT_MARKERS[path.basename(file)]) : [];
+  if (markers.some((marker) => !marker)) {
+    return { ...base, status: "no_fixture", reason: `no data marker for the ${tool.from} fixture in TEXT_MARKERS` };
+  }
+  const slow = engine.includes("ffmpeg-wasm");
+  return {
+    ...base,
+    driver,
+    fixtures: files,
+    markers,
+    compress: tool.operation === "compress" || tool.operation === "bulk",
+    timeoutMs: slow ? ffmpegTimeoutMs : timeoutMs,
+  };
 }
 
 // checkOutputFormat passes any bytes for a format it has no signature for;
@@ -327,13 +339,19 @@ export function ffmpegError(log) {
 }
 
 // The runnable plans this run measures: all of them, or with --resume only
-// those without a measured row (plus rows whose status --retry names).
+// those without a measured row, rows whose status --retry names, and rows
+// where the harness, not the Tool, failed.
 export function selectRuns(plans, previousRows, { resume, retry = new Set(), limit = null }) {
   const previous = new Map(previousRows.map((row) => [row.id, row]));
   const selected = plans.filter((plan) => {
     if (!resume) return true;
     const row = previous.get(plan.id);
-    return !row || !MEASURED_STATUSES.has(row.status) || retry.has(row.status);
+    return (
+      !row ||
+      !MEASURED_STATUSES.has(row.status) ||
+      retry.has(row.status) ||
+      Boolean(row.error?.startsWith("harness:"))
+    );
   });
   return limit ? selected.slice(0, limit) : selected;
 }
@@ -425,10 +443,10 @@ export function renderSummary({ meta, results }, { activeCount = results.length 
       [
         [
           "pass",
-          `${counts.pass} (bytes checked: ${checks.signature}, text content checked: ${checks.content}, no check for the output format: ${checks.none})`,
+          `${counts.pass} (file signature checked: ${checks.signature}, text content checked: ${checks.content}, no check for the output format: ${checks.none})`,
         ],
         ...STATUSES.slice(1).map((status) => [status, String(counts[status])]),
-        ["**measured / active**", `${results.length} / ${activeCount}`],
+        ["**run / active**", `${results.filter((row) => MEASURED_STATUSES.has(row.status)).length} / ${activeCount}`],
       ],
     ),
   );

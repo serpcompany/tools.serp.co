@@ -126,8 +126,8 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "heic", "png"), "heif-decoder");
   assert.equal(engine("convert", "mp4", "mp3"), "ffmpeg-wasm");
   assert.equal(engine("convert", "gif", "mp4"), "ffmpeg-wasm");
-  assert.equal(engine("convert", "mp4", "mxf"), "server-video");
-  assert.equal(engine("convert", "amr", "ogg"), "server-video");
+  assert.equal(engine("convert", "mp4", "mxf"), "server-video, then ffmpeg-wasm");
+  assert.equal(engine("convert", "amr", "ogg"), "server-video, then ffmpeg-wasm");
   assert.equal(engine("compress", "png", "png"), "jsquash-worker");
   assert.equal(engine("compress", "gif", "gif"), "server-image-compress");
   assert.equal(engine("compress", "pdf", "pdf"), "server-pdf-compress");
@@ -193,8 +193,17 @@ test("planTool picks a driver and fixture, or says why a Tool isn't run", () => 
   );
   const video = plan({ id: "mp4-to-mp3", route: "/mp4-to-mp3", operation: "convert", from: "mp4", to: "mp3" });
   assert.equal(video.timeoutMs, 180);
+  assert.equal(plan({ id: "mp4-to-mxf", route: "/mp4-to-mxf", operation: "convert", from: "mp4", to: "mxf" }).timeoutMs, 180);
   const table = plan({ id: "csv-to-json", route: "/csv-to-json", operation: "convert", from: "csv", to: "json" });
-  assert.deepEqual([table.driver, table.markers], ["table", ["Alpha"]]);
+  assert.deepEqual([table.driver, table.markers, table.compress], ["table", ["Alpha"], false]);
+  const compress = plan({ id: "compress-png", route: "/compress-png", operation: "compress", from: "png", to: "png" });
+  assert.equal(compress.compress, true);
+  // A text converter whose fixture has no known data marker can't be checked.
+  const markerless = planTool(
+    { id: "csv-to-xml", route: "/csv-to-xml", operation: "convert", from: "csv", to: "xml" },
+    { ...options, handlers: new Map([["/csv-to-xml", "TableConvertLanding"]]), fixtures: { ...fixtures, byFormat: new Map([["csv", "/f/other.csv"]]) } },
+  );
+  assert.equal(markerless.status, "no_fixture");
   const batch = plan({ id: "batch-compress-png", route: "/batch-compress-png", operation: "bulk", from: "png", to: "png" });
   assert.equal(batch.status, "skipped", "bulk without its own page has no driver");
 
@@ -241,6 +250,9 @@ test("a resumed run skips measured Tools, re-runs --retry statuses and unmeasure
   assert.deepEqual(ids(selectRuns(plans, previous, { resume: true })), ["d", "e"]);
   assert.deepEqual(ids(selectRuns(plans, previous, { resume: true, retry: new Set(["timeout"]) })), ["c", "d", "e"]);
   assert.deepEqual(ids(selectRuns(plans, previous, { resume: true, limit: 1 })), ["d"]);
+  // A harness failure was never a measurement of the Tool.
+  const harness = [...previous.slice(1), { id: "a", status: "error", error: "harness: file input: Timeout" }];
+  assert.deepEqual(ids(selectRuns(plans, harness, { resume: true })), ["a", "d", "e"]);
 });
 
 test("new rows replace old ones in registry order, and retired Tools drop out", () => {
@@ -321,8 +333,8 @@ test("the summary counts statuses, splits passes by check and lists failing ids"
     { activeCount: 6 },
   );
   assert.match(summary, /`0123456`.*concurrency 4, 1 h 30 min/);
-  assert.match(summary, /\| pass \| 2 \(bytes checked: 1, text content checked: 0, no check for the output format: 1\) \|/);
-  assert.match(summary, /\| \*\*measured \/ active\*\* \| 5 \/ 6 \|/);
+  assert.match(summary, /\| pass \| 2 \(file signature checked: 1, text content checked: 0, no check for the output format: 1\) \|/);
+  assert.match(summary, /\| \*\*run \/ active\*\* \| 3 \/ 6 \|/);
   assert.match(summary, /Non-passing Tools by engine\n\n\| +\| wrong_format/);
   assert.match(summary, /\| ffmpeg-wasm \| 0 \| 1 \| 0 \|/);
   assert.match(summary, /error: FFmpeg failed \[\[h263\] size\] \| 1 \|/);

@@ -20,11 +20,12 @@
 
 import { Buffer } from "node:buffer";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { activeTools, toolHref } from "../lib/catalog/catalog.ts";
+import { SMOKE_TEST_HEADER } from "../lib/site-environment.ts";
 import {
   classifyRun,
   countStatuses,
@@ -40,7 +41,6 @@ import {
 } from "./lib/tool-sweep.mjs";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SMOKE_TEST_HEADER = "x-tools-serp-smoke-test";
 const NAVIGATION_TIMEOUT_MS = 30_000;
 const HYDRATION_TIMEOUT_MS = 20_000;
 
@@ -80,6 +80,11 @@ const previousRows = previous?.results ?? [];
 const runnable = plans.filter((plan) => !plan.status);
 const toRun = selectRuns(runnable, previousRows, args);
 const commit = git("rev-parse", "HEAD");
+// Uncommitted changes outside the results file mean the harness or the app
+// differs from the recorded commit.
+const dirty = spawnSync("git", ["status", "--porcelain"], { cwd: appRoot, encoding: "utf8" })
+  .stdout.split("\n")
+  .some((line) => line.trim() && !outPath.endsWith(line.slice(3).replace(/\.tmp$/, "")));
 if (previous?.meta?.commit && previous.meta.commit !== commit) {
   console.warn(`note: ${path.relative(appRoot, outPath)} was measured at ${previous.meta.commit}; HEAD is ${commit}`);
 }
@@ -89,6 +94,8 @@ const planRows = plans.filter((plan) => plan.status).map((plan) => toRow(plan, {
 const newRows = [...planRows];
 const startedAt = new Date();
 const runEntry = {
+  commit,
+  dirty,
   startedAt: startedAt.toISOString(),
   finishedAt: null,
   wallMs: 0,
@@ -134,7 +141,6 @@ function writeResults() {
     command: "pnpm -C apps/tools tool-sweep",
     baseUrl: args.baseUrl,
     commit,
-    build: "pnpm -C apps/tools cf:build (local config), served by wrangler dev with a fresh local D1",
     activeTools: tools.length,
     counts: countStatuses(results),
     runs: [...(previous?.meta?.runs ?? []), runEntry],
@@ -229,7 +235,7 @@ async function setup(step, run) {
   try {
     return await run();
   } catch (error) {
-    throw new HarnessError(`${step}: ${error.message.split("\n")[0]}`);
+    throw new HarnessError(`harness: ${step}: ${error.message.split("\n")[0]}`);
   }
 }
 
@@ -319,16 +325,31 @@ async function runTableTool(page, plan) {
   await setup("upload", () =>
     page.getByText(`Selected: ${path.basename(plan.fixtures[0])}`).waitFor({ timeout: plan.timeoutMs }),
   );
-  // Parsing and serializing a few rows runs in two React effects.
-  await page.waitForTimeout(500);
-  const problem = await page.evaluate(() => {
-    const parseError = globalThis.document.querySelector("div.bg-red-50")?.textContent?.trim();
-    const notice = [...globalThis.document.querySelectorAll("p")]
-      .map((element) => element.textContent?.trim() ?? "")
-      .find((text) => /not wired yet|Waiting for valid input/i.test(text));
-    return parseError || notice || null;
-  });
-  if (problem) return { outcome: "failed", message: problem };
+  // Done when the output shows the fixture's data, the input shows a parse
+  // error, or the output format says it isn't wired (that notice is there
+  // before the upload too, and holds whatever the input).
+  let state;
+  try {
+    const handle = await page.waitForFunction(
+      (markers) => {
+        const doc = globalThis.document;
+        const parseError = doc.querySelector("div.bg-red-50")?.textContent?.trim();
+        const notice = [...doc.querySelectorAll("p")]
+          .map((element) => element.textContent?.trim() ?? "")
+          .find((text) => /not wired yet|Waiting for valid input/i.test(text));
+        if (parseError || notice) return { problem: parseError || notice };
+        const output = [...doc.querySelectorAll("textarea[readonly]")].map((area) => area.value).join("\n");
+        return markers.every((marker) => output.includes(marker)) ? { problem: null } : null;
+      },
+      plan.markers,
+      { timeout: plan.timeoutMs },
+    );
+    state = await handle.jsonValue();
+  } catch (error) {
+    if (!isTimeout(error)) throw error;
+    return { outcome: "timeout", message: `the output didn't show the input's data after ${plan.timeoutMs / 1000} s` };
+  }
+  if (state.problem) return { outcome: "failed", message: state.problem };
   await page.getByRole("button", { name: "Download", exact: true }).click();
   await setup("download", () => waitForOutputs(page, 1, 5_000));
   return { outcome: "completed", outputs: await readOutputs(page, { text: true }) };
@@ -391,13 +412,16 @@ async function runBatchCompress(page, plan) {
   const input = '[data-testid="batch-compress-input"]';
   await setup("file input", () => waitForHydration(page, input));
   await page.locator(input).setInputFiles(plan.fixtures);
+  const download = page.locator('[data-testid="batch-compress-download"]');
+  const alert = page.getByRole("alert");
   try {
-    await page.locator('[data-testid="batch-compress-download"]').waitFor({ timeout: plan.timeoutMs });
+    await download.or(alert).first().waitFor({ timeout: plan.timeoutMs });
   } catch (error) {
     if (!isTimeout(error)) throw error;
     return { outcome: "timeout", message: `no ZIP offered after ${plan.timeoutMs / 1000} s` };
   }
-  await page.locator('[data-testid="batch-compress-download"]').click();
+  if (await alert.isVisible()) return { outcome: "failed", message: await alert.first().textContent() };
+  await download.click();
   await setup("download", () => waitForOutputs(page, 1, 10_000));
   const [zip] = await readOutputs(page, { base64: true });
   const { BlobReader, Uint8ArrayWriter, ZipReader } = await import("@zip.js/zip.js");
@@ -437,11 +461,21 @@ const DRIVERS = {
 
 class BrowserLost extends Error {}
 
+// Each Tool run is its own visitor to the server-action cooldown (one server
+// action per minute per client and IP): an address from 198.18.0.0/15, the
+// range reserved for benchmarking.
+let visitors = 0;
+function visitorAddress() {
+  const n = visitors++;
+  return `198.${18 + ((n >> 16) & 1)}.${(n >> 8) & 255}.${n & 255}`;
+}
+
 
 async function measure(plan) {
   const started = Date.now();
   const blocked = new Set();
   const browser = await getBrowser();
+  const visitor = visitorAddress();
   const pageErrors = [];
   let crashed = false;
   let context;
@@ -462,7 +496,9 @@ async function measure(plan) {
         blocked.add(url.host);
         handled = route.abort();
       } else {
-        handled = route.continue({ headers: { ...request.headers(), [SMOKE_TEST_HEADER]: "1" } });
+        handled = route.continue({
+          headers: { ...request.headers(), [SMOKE_TEST_HEADER]: "1", "x-forwarded-for": visitor },
+        });
       }
       // The page may close while a request is in flight.
       return handled.catch(() => {});
@@ -494,6 +530,10 @@ async function measure(plan) {
       observation = { outcome: "error", message: `page returned HTTP ${response?.status() ?? "nothing"}` };
     } else {
       observation = await DRIVERS[plan.driver](page, plan);
+      // A script error can leave the progress card at 0% until the timeout.
+      if (observation.outcome === "timeout" && pageErrors[0]) {
+        observation.message = `${observation.message} (page error: ${pageErrors[0]})`;
+      }
     }
   } catch (error) {
     if (!browser.isConnected()) throw new BrowserLost(error.message);
@@ -515,7 +555,13 @@ async function measure(plan) {
     detail: /FFmpeg failed/.test(verdict.error ?? "") ? ffmpegError(ffmpegLog) : undefined,
     durationMs: Date.now() - started,
     output: outputs.length
-      ? { files: outputs.length, bytes: outputs.reduce((sum, item) => sum + item.size, 0), name: outputs[0].name }
+      ? {
+          files: outputs.length,
+          bytes: outputs.reduce((sum, item) => sum + item.size, 0),
+          name: outputs[0].name,
+          // A compressor may hand back the input when it can't make it smaller.
+          ...(plan.compress ? { inputBytes: plan.fixtures.reduce((sum, file) => sum + statSync(file).size, 0) } : {}),
+        }
       : undefined,
     blocked: verdict.status === "pass" ? [] : [...blocked].sort(),
   });

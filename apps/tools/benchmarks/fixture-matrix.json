@@ -37,10 +37,10 @@
     },
     {
       "format": "aifc",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.aifc",
-      "notes": "AIFF-C fixture (copied from sample.aiff)."
+      "notes": "sample.aifc is a copy of sample.aiff (AIFF, not AIFF-C); needs a real AIFF-C."
     },
     {
       "format": "aiff",
@@ -466,13 +466,6 @@
       "notes": "Add a real fixture for this format."
     },
     {
-      "format": "nef",
-      "status": "ready",
-      "input": "file",
-      "fixture": "fixtures/sample.nef",
-      "notes": "Nikon NEF (TIFF-based, from a Coolscan film scanner)."
-    },
-    {
       "format": "oga",
       "status": "ready",
       "input": "file",
@@ -652,17 +645,17 @@
     },
     {
       "format": "wma",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.wma",
-      "notes": "Placeholder fixture (mp3 container) because WMAv2 encoder is unavailable."
+      "notes": "sample.wma is an MP3 stand-in (no WMAv2 encoder was available); needs a real WMA."
     },
     {
       "format": "wmv",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.wmv",
-      "notes": "Placeholder fixture (mp4 container) because WMV encoder is unavailable."
+      "notes": "sample.wmv is an MP4 stand-in (no WMV encoder was available); needs a real WMV."
     },
     {
       "format": "wtv",
