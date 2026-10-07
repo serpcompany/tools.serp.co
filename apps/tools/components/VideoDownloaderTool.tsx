@@ -12,6 +12,7 @@ import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetization
 import { normalizeBlobPart } from "@/lib/blob-parts";
 import { createDownloaderRequestHeaders } from "@/lib/downloader-client";
 import { DOWNLOADER_CONSUMER } from "@/lib/downloader-contract.js";
+import { getDownloaderCooldownEndsAtMs } from "@/lib/downloader-cooldown";
 import {
   DOWNLOADER_EXTENSION_LABEL,
   DOWNLOADER_EXTENSION_TEXT,
@@ -37,9 +38,13 @@ type Props = {
   adsVisible?: boolean;
   onAdsVisibleChange?: (visible: boolean) => void;
   cooldownEndsAtMs?: number | null;
+  onCooldownChange?: (cooldownEndsAtMs: number | null) => void;
   extensionUrl?: string;
   extensionProductName?: string;
 };
+
+// A failed media-fetch answer; a 429 carries the server's remaining wait.
+type DownloadFailure = Error & { retryAfterMs?: number };
 
 type ExtensionFailureCta = {
   extensionUrl: string;
@@ -258,16 +263,24 @@ async function downloadUrlToBlob(
 
   if (!response.ok) {
     let detail = "";
+    let retryAfterMs: number | undefined;
     try {
       const data = await response.json();
       if (data?.error) {
         detail = data.error;
       }
+      if (typeof data?.retryAfterMs === "number") {
+        retryAfterMs = data.retryAfterMs;
+      }
     } catch {
       detail = "";
     }
     const suffix = detail ? `: ${detail}` : "";
-    throw new Error(`Download failed (${response.status})${suffix}`);
+    const failure: DownloadFailure = new Error(
+      `Download failed (${response.status})${suffix}`
+    );
+    failure.retryAfterMs = retryAfterMs;
+    throw failure;
   }
 
   const contentTypeRaw = response.headers.get("content-type") || "";
@@ -357,6 +370,7 @@ export default function VideoDownloaderTool({
   adsVisible: controlledAdsVisible,
   onAdsVisibleChange,
   cooldownEndsAtMs = null,
+  onCooldownChange,
   extensionUrl,
   extensionProductName,
 }: Props) {
@@ -377,6 +391,15 @@ export default function VideoDownloaderTool({
       return;
     }
     setUncontrolledAdsVisible(true);
+  }
+
+  // Ads show at submit. The countdown clears while an attempt runs and starts
+  // once it completes or fails.
+  function showAttempt(file: ToolProgressFile, retryAfterMs?: number) {
+    setCurrentFile(file);
+    onCooldownChange?.(
+      getDownloaderCooldownEndsAtMs(file.status, { now: Date.now(), retryAfterMs })
+    );
   }
 
   async function handleUrlSubmit() {
@@ -404,7 +427,7 @@ export default function VideoDownloaderTool({
     if (failFastCta) {
       const isExtensionOnly = failFastCta.reason === "extension_only";
       setExtensionFailureCta(failFastCta);
-      setCurrentFile({
+      showAttempt({
         name: nameHint,
         progress: 0,
         status: "error",
@@ -441,7 +464,7 @@ export default function VideoDownloaderTool({
     }
 
     setBusy(true);
-    setCurrentFile({
+    showAttempt({
       name: nameHint,
       progress: 0,
       status: "loading",
@@ -492,7 +515,7 @@ export default function VideoDownloaderTool({
         outputBytes: result.blob.size,
         metadata: { source: "url", mode },
       });
-      setCurrentFile({
+      showAttempt({
         name: result.fileName,
         progress: 100,
         status: "completed",
@@ -501,6 +524,8 @@ export default function VideoDownloaderTool({
     } catch (err) {
       const failure = getTelemetryFailure(err, "download_failed");
       const message = failure.message || "Download failed";
+      const retryAfterMs =
+        err instanceof Error ? (err as DownloadFailure).retryAfterMs : undefined;
       const extensionCta = getExtensionFailureCta(
         message,
         extensionUrl,
@@ -510,22 +535,28 @@ export default function VideoDownloaderTool({
       if (extensionCta) {
         setExtensionFailureCta(extensionCta);
         setErrorMessage(null);
-        setCurrentFile({
-          name: nameHint,
-          progress: 0,
-          status: "error",
-          message: "Use the browser extension for this site.",
-        });
+        showAttempt(
+          {
+            name: nameHint,
+            progress: 0,
+            status: "error",
+            message: "Use the browser extension for this site.",
+          },
+          retryAfterMs
+        );
         run.finishFailure({ errorCode: failure.errorCode, metadata: failure.metadata });
         return;
       }
 
-      setCurrentFile({
-        name: nameHint,
-        progress: 0,
-        status: "error",
-        message,
-      });
+      showAttempt(
+        {
+          name: nameHint,
+          progress: 0,
+          status: "error",
+          message,
+        },
+        retryAfterMs
+      );
       run.finishFailure({ errorCode: failure.errorCode, metadata: failure.metadata });
     } finally {
       setBusy(false);
@@ -533,11 +564,13 @@ export default function VideoDownloaderTool({
   }
 
   const adSlotPrefix = toolId;
-  const showCooldownNotice = cooldownEndsAtMs !== null;
+  // The panel's ad and extension prompt show while the attempt runs; its
+  // countdown line appears once the cooldown starts.
+  const showCooldownPanel = busy || cooldownEndsAtMs !== null;
   const showUsagePressure =
     localUsageCount >= LOCAL_USAGE_PRESSURE_THRESHOLD && !extensionFailureCta;
   const hasBelowContent =
-    Boolean(errorMessage) || Boolean(extensionFailureCta) || showCooldownNotice || showUsagePressure;
+    Boolean(errorMessage) || Boolean(extensionFailureCta) || showCooldownPanel || showUsagePressure;
 
   return (
     <ToolHeroLayout
@@ -549,7 +582,7 @@ export default function VideoDownloaderTool({
       contentClassName="text-center"
       containerClassName="max-w-6xl px-6 py-10"
       resultPanel={
-        showCooldownNotice ? undefined : (
+        showCooldownPanel ? undefined : (
           <ToolResultMonetizationPanel
             slotPrefix={toolId}
             variant="downloader"
@@ -633,7 +666,7 @@ export default function VideoDownloaderTool({
                 />
               </div>
             ) : null}
-            {showCooldownNotice ? (
+            {showCooldownPanel ? (
               <DownloaderCooldownMonetizationPanel
                 cooldownEndsAtMs={cooldownEndsAtMs}
                 extensionUrl={extensionUrl}

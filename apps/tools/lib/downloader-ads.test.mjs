@@ -46,12 +46,9 @@ test("downloader pages keep ads hidden until the user initiates the action", () 
   assert.match(downloaderPageHeroSource, /<VideoDownloaderTool[\s\S]*adsVisible={adsVisible}/);
   assert.match(
     downloaderPageHeroSource,
-    /<VideoDownloaderTool[\s\S]*onAdsVisibleChange={handleAdsVisibleChange}[\s\S]*cooldownEndsAtMs={cooldownEndsAtMs}/,
+    /<VideoDownloaderTool[\s\S]*onAdsVisibleChange={handleAdsVisibleChange}[\s\S]*cooldownEndsAtMs={cooldownEndsAtMs}[\s\S]*onCooldownChange={setCooldownEndsAtMs}/,
   );
-  assert.match(
-    downloaderPageHeroSource,
-    /if \(visible\) \{\s*setCooldownEndsAtMs\(Date\.now\(\) \+ DOWNLOADER_RATE_LIMIT_WINDOW_MS\);\s*setCtaModalOpen\(true\);/,
-  );
+  assert.match(downloaderPageHeroSource, /if \(visible\) \{\s*setCtaModalOpen\(true\);\s*\}/);
   assert.match(
     downloaderPageHeroSource,
     /<DownloaderExtensionCTAModal[\s\S]*open={ctaModalOpen}[\s\S]*onOpenChange={setCtaModalOpen}[\s\S]*cooldownEndsAtMs={cooldownEndsAtMs}/,

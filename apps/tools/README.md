@@ -71,9 +71,13 @@ equivalent production enforcement.
 
 All active `download` Tools use the shared downloader template and request
 path. Dedicated Landers normally use `download-*` slugs and inherit the shared
-extension CTA, action-triggered ad gate, modal, cooldown display, and rate
-limit. The generic `/video-downloader/` route remains the broad multi-source
-entry point.
+extension CTA, action-triggered ad gate, modal, and rate limit. The page's
+countdown starts when an attempt ends; the server's limit starts at a successful fetch.
+The generic `/video-downloader/` route remains the broad multi-source entry point.
+
+Downloads deliberately use this site's own `/api/media-fetch`, not the shared
+`https://api.serp.co/download/` that the serp downloader-tools standard names
+(owner decision, 2026-10-07, issue #169).
 
 Outbound Product links are curated data, never derived from Tool ids or slugs.
 Downloader Lander link changes must follow
