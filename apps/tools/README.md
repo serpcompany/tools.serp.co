@@ -105,6 +105,7 @@ part of the deterministic test result.
 `pnpm -C apps/tools render-snapshot snapshot --base-url <url> --out <dir>`
 records every page, sitemap file and redirect a running Worker serves;
 `render-snapshot diff <base> <head>` exits 1 if a refactor changed any of them.
+Build both the same way; only `cf:build:production` covers ads and indexing.
 
 ## Adding a Tool
 

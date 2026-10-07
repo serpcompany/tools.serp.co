@@ -318,14 +318,16 @@ export function unifiedDiff(before, after, { labelA = "a", labelB = "b", context
     writeFileSync(path.join(dir, "b"), `${toDisplayLines(after).join("\n")}\n`);
     const result = spawnSync(
       "git",
-      ["diff", "--no-index", "--no-color", "--no-ext-diff", `-U${context}`, "a", "b"],
+      ["diff", "--no-index", "--no-color", "--no-ext-diff", "--text", `-U${context}`, "a", "b"],
       { cwd: dir, encoding: "utf8", maxBuffer: 256 * 1024 * 1024 },
     );
     if (result.status !== 0 && result.status !== 1) {
       throw new Error(`git diff failed: ${result.error?.message ?? result.stderr}`);
     }
     const output = result.stdout.split("\n");
-    const hunks = output.slice(output.findIndex((line) => line.startsWith("@@")));
+    const firstHunk = output.findIndex((line) => line.startsWith("@@"));
+    if (firstHunk === -1) return `--- ${labelA}\n+++ ${labelB}\n(the bodies differ only in line breaks)`;
+    const hunks = output.slice(firstHunk);
     const body = clipHunkLines(hunks.filter((line) => line !== "" && !line.startsWith("\\")));
     const lines = [`--- ${labelA}`, `+++ ${labelB}`, ...body.slice(0, maxLines)];
     if (body.length > maxLines) lines.push(`... ${body.length - maxLines} more lines`);

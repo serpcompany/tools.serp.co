@@ -130,6 +130,7 @@ async function fetchWithRetry(origin, urlPath) {
 async function snapshot(args) {
   const startedAt = Date.now();
   const origin = new URL(args.baseUrl).origin;
+  const otherPaths = args.pathsFrom.flatMap((dir) => Object.keys(readSnapshot(dir).entries));
   if (existsSync(args.out) && readdirSync(args.out).length) {
     throw new Error(`${args.out} is not empty; snapshot into a new directory`);
   }
@@ -185,7 +186,6 @@ async function snapshot(args) {
 
   const routePaths = staticPageRoutes(args.appDir).filter((route) => !pagePaths.has(route));
   for (const route of routePaths) sources[route] ??= "app-route";
-  const otherPaths = args.pathsFrom.flatMap((dir) => Object.keys(readSnapshot(dir).entries));
   for (const probe of [...PROBE_PATHS, ...args.extraPaths]) sources[probe] ??= "probe";
   for (const otherPath of otherPaths) sources[otherPath] ??= "other-snapshot";
 
@@ -257,8 +257,8 @@ function entriesWithoutSource(entries) {
   );
 }
 
-// The sitemap files, robots.txt and ads.txt byte for byte. They carry the origin,
-// so this only says something when both snapshots used the same one.
+// The sitemap files, robots.txt and ads.txt byte for byte. Sitemaps carry the
+// origin, so this only says something when both snapshots used the same one.
 function compareRaw(dirA, dirB, a, b) {
   if (a.origin !== b.origin) return { compared: false };
   const names = new Set([...readdirSync(path.join(dirA, "raw")), ...readdirSync(path.join(dirB, "raw"))]);

@@ -304,6 +304,7 @@ test("the unified diff shows each changed tag with context", () => {
     ].join("\n"),
   );
   assert.equal(unifiedDiff(before, before), "");
+  assert.match(unifiedDiff("<url><loc>", "<url>\n<loc>"), /differ only in line breaks/);
   const long = unifiedDiff("<a>".repeat(10), "<b>".repeat(10), { maxLines: 4 });
   assert.match(long, /\.\.\. 17 more lines$/);
 });
