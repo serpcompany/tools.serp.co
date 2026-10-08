@@ -187,8 +187,9 @@ export function converterEngine({ operation, from, to }) {
   if (MAGICK_BROWSER_INPUTS.has(source)) return "imagemagick-wasm";
   if (source === "heic" || source === "heif") return "heif-decoder";
   if (requiresVideoConversion(source, target)) {
+    // Mirrors shouldUseServerConversion in lib/convert/video.ts.
     const serverOnly =
-      ["mxf", "rm", "rmvb"].includes(target) || (source === "amr" && ["mp2", "oga", "ogg"].includes(target));
+      ["rm", "rmvb"].includes(target) || (source === "amr" && ["mp2", "oga", "ogg"].includes(target));
     return serverOnly ? "server-video, then ffmpeg-wasm" : "ffmpeg-wasm";
   }
   return "browser-raster";

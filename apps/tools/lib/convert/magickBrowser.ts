@@ -1,6 +1,6 @@
 // ImageMagick (WASM) in the browser, for inputs the browser can't decode:
 // camera RAW, PSD, TGA, DDS, TIFF, XCF. Loads the 14 MB wasm on first use.
-import type { MagickFormat as MagickFormatType } from "@imagemagick/magick-wasm";
+import type { IMagickImage, MagickFormat as MagickFormatType } from "@imagemagick/magick-wasm";
 
 const WASM_URL = "/vendor/imagemagick/magick.wasm";
 
@@ -62,6 +62,18 @@ export function mimeTypeFor(ext: string) {
   return MIME_TYPES[ext] ?? "application/octet-stream";
 }
 
+// ICO and CUR store each side in one byte, so ImageMagick refuses to write
+// an icon over 256 px (WidthOrHeightExceedsLimit). Larger images are fitted
+// inside 256 x 256, keeping their aspect ratio.
+const ICON_MAX_SIZE = 256;
+
+function writeImage(magick: MagickModule, image: IMagickImage, format: string): Uint8Array<ArrayBuffer> {
+  if ((format === "ico" || format === "cur") && (image.width > ICON_MAX_SIZE || image.height > ICON_MAX_SIZE)) {
+    image.resize(ICON_MAX_SIZE, ICON_MAX_SIZE);
+  }
+  return image.write(magickFormat(magick, format)!, (data) => data.slice());
+}
+
 // Converts `from` to `to` when ImageMagick can write `to`; otherwise to PNG,
 // for the caller to re-encode. Returns the bytes and the format written.
 export async function convertWithMagickInBrowser(
@@ -75,9 +87,8 @@ export async function convertWithMagickInBrowser(
     throw new Error(`${from.toUpperCase()} isn't supported by the image converter.`);
   }
   const format = MAGICK_BROWSER_OUTPUTS.has(to) ? to : "png";
-  const target = magickFormat(magick, format)!;
   const bytes = magick.ImageMagick.read(new Uint8Array(buf), source, (image) =>
-    image.write(target, (data) => data.slice()),
+    writeImage(magick, image, format),
   );
   return { buffer: bytes.buffer as ArrayBuffer, format };
 }
@@ -88,9 +99,8 @@ export async function encodePngWithMagick(png: ArrayBuffer, to: string): Promise
     throw new Error(`Converting to ${to.toUpperCase()} isn't supported.`);
   }
   const magick = await loadMagick();
-  const target = magickFormat(magick, to)!;
   const bytes = magick.ImageMagick.read(new Uint8Array(png), magick.MagickFormat.Png, (image) =>
-    image.write(target, (data) => data.slice()),
+    writeImage(magick, image, to),
   );
   return new Blob([bytes], { type: mimeTypeFor(to) });
 }

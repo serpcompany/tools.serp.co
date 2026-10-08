@@ -206,7 +206,8 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "heic", "png"), "heif-decoder");
   assert.equal(engine("convert", "mp4", "mp3"), "ffmpeg-wasm");
   assert.equal(engine("convert", "gif", "mp4"), "ffmpeg-wasm");
-  assert.equal(engine("convert", "mp4", "mxf"), "server-video, then ffmpeg-wasm");
+  assert.equal(engine("convert", "mp4", "mxf"), "ffmpeg-wasm");
+  assert.equal(engine("convert", "mp4", "rm"), "server-video, then ffmpeg-wasm");
   assert.equal(engine("convert", "amr", "ogg"), "server-video, then ffmpeg-wasm");
   assert.equal(engine("compress", "png", "png"), "jsquash-worker");
   assert.equal(engine("compress", "gif", "gif"), "server-image-compress");
