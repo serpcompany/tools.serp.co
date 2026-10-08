@@ -28,10 +28,20 @@ export function imageSize(buf: ArrayBuffer, format: string): { width: number; he
   throw new Error("Couldn't read the image's dimensions.");
 }
 
-// Tesseract's English model, in a worker loaded from jsDelivr on first use.
+// Tesseract's worker, its SIMD LSTM core and the English model (4.0.0
+// best_int) are served from this site, not tesseract.js's default jsDelivr
+// URLs. image-text.test.mjs checks the copies match the installed packages.
+export const TESSERACT_ASSETS = "/vendor/tesseract";
+
 const recognizeWithTesseract: Recognize = async (image) => {
   const { createWorker } = await import("tesseract.js");
-  const worker = await createWorker("eng");
+  const base = new URL(`${TESSERACT_ASSETS}/`, globalThis.location.href).href;
+  const worker = await createWorker("eng", undefined, {
+    workerPath: `${base}worker.min.js`,
+    corePath: `${base}tesseract-core-simd-lstm.wasm.js`,
+    langPath: base.replace(/\/$/, ""),
+    workerBlobURL: false,
+  });
   try {
     const { data } = await worker.recognize(image);
     return data.text;

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 import { unzipSync, strFromU8 } from "fflate";
 
 import { imageSize, imageToDocx, textFromImage } from "./image-text.ts";
@@ -62,4 +63,18 @@ test("OCR text is trimmed, with Unix line endings and no runs of blank lines", a
 
 test("an image with no readable text is an error, not an empty file", async () => {
   await assert.rejects(textFromImage(read("sample-text.png"), "png", async () => " \n "), /No text/);
+});
+
+// The site serves its own copies of tesseract.js's worker and core, so they
+// must be the installed versions'.
+test("the vendored Tesseract worker and core match the installed packages", () => {
+  const require = createRequire(import.meta.url);
+  const tesseract = path.dirname(require.resolve("tesseract.js/package.json"));
+  const core = path.dirname(require.resolve("tesseract.js-core/package.json", { paths: [tesseract] }));
+  const vendor = path.resolve(fixtures, "../../public/vendor/tesseract");
+  const same = (a, b) => assert.ok(readFileSync(a).equals(readFileSync(b)), `${b} differs from ${a}`);
+  same(path.join(tesseract, "dist/worker.min.js"), path.join(vendor, "worker.min.js"));
+  same(path.join(core, "tesseract-core-simd-lstm.wasm.js"), path.join(vendor, "tesseract-core-simd-lstm.wasm.js"));
+  const model = readFileSync(path.join(vendor, "eng.traineddata.gz"));
+  assert.deepEqual([model[0], model[1]], [0x1f, 0x8b]);
 });
