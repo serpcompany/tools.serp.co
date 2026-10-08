@@ -22,11 +22,16 @@ Conversion picks an engine by input format:
   `NEXT_PUBLIC_ASSETS_BASE_URL`.
 - **Camera RAW, PSD, TGA, DDS, TIFF and XCF:** ImageMagick WASM
   (`lib/convert/magickBrowser.ts`) on the main thread. **HEIC and HEIF:**
-  libheif. **PDF and AI:** pdf.js, one file per page.
+  libheif.
+- **PDF and AI:** pdf.js renders each page, one file per page, at twice its
+  size in points but never more than 4096x4096 pixels, Safari's canvas limit.
+  Targets other than PNG and JPEG are encoded from that render. AI to PDF
+  saves the PDF a PDF-compatible AI file already is, vectors included.
 - **Other images:** `workers/convert.worker.js` decodes with the browser and
   encodes with a canvas, retrying on the main thread if the worker fails.
-  ImageMagick writes the formats a canvas can't, and
-  `lib/convert/texture-formats.ts` reads and writes ICNS, KTX and KTX2.
+  ImageMagick writes the formats a canvas can't, fitting ICO and CUR inside
+  256 px, the largest those formats store; `lib/convert/texture-formats.ts`
+  reads and writes ICNS, KTX and KTX2.
 
 Before a converted file is saved, `convertWithWorker` compares its leading bytes
 with the promised format (`lib/convert/output-format.ts`). A mismatch fails the
@@ -35,8 +40,12 @@ signature, such as TGA, aren't checked, and neither is compression output.
 
 Compression keeps the original bytes when the result would be larger. PNG, JPEG
 and WebP use JSquash codecs in `workers/compress.worker.js`; audio and video use
-FFmpeg.wasm. Transcription extracts audio with FFmpeg.wasm and runs Whisper
-(transformers.js, loaded from jsDelivr) in `workers/transcribe.worker.js`.
+FFmpeg.wasm. Giving a buffer to FFmpeg.wasm transfers it to FFmpeg's worker and
+leaves the caller's copy empty, so code that still needs the original reads it
+back from FFmpeg's file system. Until #236, missing that made every audio and
+video compressor save an empty file. Transcription extracts audio with
+FFmpeg.wasm and runs Whisper (transformers.js, loaded from jsDelivr) in
+`workers/transcribe.worker.js`.
 
 ## Server routes
 
@@ -74,7 +83,7 @@ every call to them. What a visitor gets depends on the fallback:
 - Video conversion falls back to FFmpeg.wasm when the route fails, if the
   browser can run it. 27 of the 73 video Tools the sweep sent to the route
   still passed that way; nearly all the rest were MXF or RMVB output, which
-  failed in FFmpeg.wasm too.
+  failed in FFmpeg.wasm too. Since #236, MXF output converts in FFmpeg.wasm.
 
 The sweep didn't measure `/api/image-convert`, because no Tool calls it, but it
 creates its temp directory with `fs.mkdtemp` the same way
