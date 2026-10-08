@@ -69,3 +69,8 @@ test("GIF output builds its palette from the input first", () => {
   assert.equal(prepass.at(-1), "palette.png");
   assert.ok(args.includes("palette.png"));
 });
+
+test("3GP output squares anamorphic pixels before fitting the H.263 frame", () => {
+  const filter = option(buildConvertCommand("vob", "3gp").args, "-vf");
+  assert.match(filter, /^scale=trunc\(iw\*sar\/2\)\*2:ih,setsar=1,scale=352:288:/);
+});

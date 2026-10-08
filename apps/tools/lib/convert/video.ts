@@ -37,7 +37,7 @@ function createTelemetryError(
 }
 
 export function shouldUseServerConversion(fromFormat: string, toFormat: string) {
-  const serverOnly = new Set(["mxf", "rm", "rmvb"]);
+  const serverOnly = new Set(["rm", "rmvb"]);
   if (serverOnly.has(toFormat.toLowerCase())) {
     return true;
   }

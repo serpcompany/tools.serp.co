@@ -6,8 +6,11 @@ import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-u
 const FAST_VIDEO_FILTER = "fps=12,scale=320:-2:flags=fast_bilinear";
 const FAST_GIF_FILTER = "fps=10,scale=320:-1:flags=fast_bilinear";
 // H.263 encodes only its five standard frame sizes. 352x288 (CIF) is the one
-// closest to 320x240: fit the picture inside it and pad the rest.
+// closest to 320x240: fit the picture inside it and pad the rest. Squaring the
+// pixels first keeps an anamorphic source's display shape (a 16:9 DVD at
+// 720x576 would otherwise play as 5:4).
 const H263_CIF_FILTER =
+  "scale=trunc(iw*sar/2)*2:ih,setsar=1," +
   "scale=352:288:force_original_aspect_ratio=decrease:force_divisible_by=2:flags=fast_bilinear," +
   "pad=352:288:(ow-iw)/2:(oh-ih)/2,setsar=1";
 const MXF_VIDEO_FILTER = "scale=320:-2:flags=fast_bilinear";
