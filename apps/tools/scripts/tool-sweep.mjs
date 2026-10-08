@@ -336,7 +336,7 @@ async function runFileTool(page, plan) {
       state.event === "tool_run_handed_off" ? `handed off: ${state.errorCode}` : state.message;
     return { outcome: "failed", message, errorCode: state.errorCode };
   }
-  return { outcome: "completed", outputs: await readOutputs(page) };
+  return { outcome: "completed", outputs: await readOutputs(page, { text: plan.markers.length > 0 }) };
 }
 
 // Table converters (TableConvertLanding): upload the fixture, let the page

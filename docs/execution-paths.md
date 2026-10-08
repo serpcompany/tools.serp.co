@@ -43,6 +43,11 @@ Conversion picks an engine by input format:
   Illustrator file); an image to EPUB is a one-page EPUB 3 built with fflate.
   Raster images to AI are written as a PDF with the image on one page, and
   ImageMagick writes PCD, which is always 768x512.
+- **Image to text** (`lib/convert/image-text.ts`): JPG and PNG to TXT is OCR
+  with tesseract.js; its worker, wasm core and English model load from
+  jsDelivr on first use, and recognition runs in the browser. JPG and PNG to
+  DOCX writes a Word page showing the image at up to the 6.5-inch text width,
+  with the `docx` library.
 - **Other images:** `workers/convert.worker.js` decodes with the browser and
   encodes with a canvas, retrying on the main thread if the worker fails.
   ImageMagick writes the formats a canvas can't, fitting ICO and CUR inside
