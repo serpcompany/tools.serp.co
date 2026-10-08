@@ -18,12 +18,43 @@ const toArrayBuffer = (bytes: Uint8Array) =>
   bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 
 // The <svg> element and what follows it, without the XML declaration,
-// doctype or comments before it, which HTML doesn't allow there.
+// doctype or comments before it, which HTML doesn't allow there. An "<svg"
+// inside a comment doesn't count.
 function svgMarkup(buf: ArrayBuffer): string {
   const source = new TextDecoder().decode(buf);
-  const start = source.search(/<svg[\s>]/i);
+  const blanked = source.replace(/<!--[\s\S]*?-->/g, (comment) => " ".repeat(comment.length));
+  const start = blanked.search(/<svg[\s>/]/i);
   if (start === -1) throw new Error("This file has no SVG drawing in it.");
   return source.slice(start).trim();
+}
+
+// Points per unit. One SVG user unit (or px) is one point, as Illustrator
+// reads and writes SVG. Percentages have no absolute size.
+const POINTS_PER_UNIT: Record<string, number> = {
+  "": 1, px: 1, pt: 1, pc: 12, in: 72, cm: 72 / 2.54, mm: 72 / 25.4,
+};
+
+function points(value: string | null): number | undefined {
+  const match = /^\s*([0-9]*\.?[0-9]+(?:e[+-]?\d+)?)\s*([a-z]*)\s*$/i.exec(value ?? "");
+  const factor = match ? POINTS_PER_UNIT[match[2]!.toLowerCase()] : undefined;
+  const result = factor === undefined ? undefined : Number(match![1]) * factor;
+  return result && result > 0 ? result : undefined;
+}
+
+// The drawing's size in points: width and height when they're absolute, a
+// missing side from the viewBox's aspect ratio, else the viewBox itself.
+export function svgPageSize(attributes: {
+  width: string | null;
+  height: string | null;
+  viewBox: string | null;
+}): { width: number; height: number } {
+  const box = (attributes.viewBox ?? "").trim().split(/[\s,]+/).map(Number);
+  const view = box.length === 4 && box[2]! > 0 && box[3]! > 0 ? { width: box[2]!, height: box[3]! } : undefined;
+  let width = points(attributes.width);
+  let height = points(attributes.height);
+  if (width && !height && view) height = (width * view.height) / view.width;
+  if (height && !width && view) width = (height * view.width) / view.height;
+  return { width: width ?? view?.width ?? 300, height: height ?? view?.height ?? 150 };
 }
 
 export function svgToHtml(buf: ArrayBuffer, fileName: string): ArrayBuffer {
@@ -48,18 +79,19 @@ export function svgToHtml(buf: ArrayBuffer, fileName: string): ArrayBuffer {
 // An AI file is a PDF (Illustrator's "PDF Compatible File"), so SVG to AI
 // draws the SVG as vectors into a PDF page of the drawing's size. Needs a DOM.
 export async function svgToAi(buf: ArrayBuffer): Promise<ArrayBuffer> {
-  const doc = new DOMParser().parseFromString(svgMarkup(buf), "image/svg+xml");
+  // The whole file, doctype included: Illustrator's SVG exports declare
+  // entities there (&ns_ai;) that the drawing uses.
+  svgMarkup(buf);
+  const doc = new DOMParser().parseFromString(new TextDecoder().decode(buf), "image/svg+xml");
   const svg = doc.documentElement;
   if (svg.nodeName.toLowerCase() !== "svg" || doc.querySelector("parsererror")) {
     throw new Error("This SVG file couldn't be read.");
   }
-  const viewBox = (svg.getAttribute("viewBox") ?? "").trim().split(/[\s,]+/).map(Number);
-  const length = (name: string, fallback: number) => {
-    const value = parseFloat(svg.getAttribute(name) ?? "");
-    return Number.isFinite(value) && value > 0 ? value : fallback;
-  };
-  const width = length("width", viewBox.length === 4 && viewBox[2]! > 0 ? viewBox[2]! : 300);
-  const height = length("height", viewBox.length === 4 && viewBox[3]! > 0 ? viewBox[3]! : 150);
+  const { width, height } = svgPageSize({
+    width: svg.getAttribute("width"),
+    height: svg.getAttribute("height"),
+    viewBox: svg.getAttribute("viewBox"),
+  });
 
   const [{ jsPDF }, { svg2pdf }] = await Promise.all([import("jspdf"), import("svg2pdf.js")]);
   const pdf = new jsPDF({

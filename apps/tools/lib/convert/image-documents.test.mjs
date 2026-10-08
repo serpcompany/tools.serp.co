@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { unzipSync, strFromU8 } from "fflate";
 
-import { imageToEpub, isImageDocumentConversion, svgToHtml } from "./image-documents.ts";
+import { imageToEpub, isImageDocumentConversion, svgPageSize, svgToHtml } from "./image-documents.ts";
 import { checkOutputFormat } from "./output-format.ts";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
@@ -24,13 +24,33 @@ test("SVG to HTML embeds the drawing in a standalone UTF-8 page", () => {
   assert.match(html, /<svg xmlns="http:\/\/www.w3.org\/2000\/svg" width="10" height="10"><text>Café<\/text><\/svg>/);
   assert.ok(!html.includes("<?xml"));
   assert.ok(!html.includes("<!DOCTYPE svg"));
-  assert.equal(checkOutputFormat(new TextEncoder().encode(html).buffer, "html").ok, true);
 });
 
 test("SVG to HTML escapes the title and refuses a file with no SVG", () => {
   const svg = new TextEncoder().encode(`<svg xmlns="http://www.w3.org/2000/svg"/>`).buffer;
   assert.match(text(svgToHtml(svg, "<b>&.svg")), /<title>&lt;b&gt;&amp;<\/title>/);
   assert.throws(() => svgToHtml(new TextEncoder().encode("<html></html>").buffer, "x.svg"), /no SVG/);
+});
+
+test("SVG to HTML skips an <svg mention inside a leading comment, and takes <svg/>", () => {
+  const encode = (value) => new TextEncoder().encode(value).buffer;
+  const html = text(svgToHtml(encode(`<!-- made with <svg > tool --><svg xmlns="http://www.w3.org/2000/svg"/>`), "a.svg"));
+  assert.match(html, /<body>\n<svg xmlns="http:\/\/www.w3.org\/2000\/svg"\/>\n<\/body>/);
+  assert.match(text(svgToHtml(encode("<svg/>"), "a.svg")), /<body>\n<svg\/>/);
+});
+
+// One SVG user unit is one point, as Illustrator reads and writes SVG.
+test("the AI page takes the SVG's size in points, from units or the viewBox", () => {
+  const size = (width, height, viewBox) => svgPageSize({ width, height, viewBox });
+  assert.deepEqual(size("200", "100", null), { width: 200, height: 100 });
+  assert.deepEqual(size("200px", "100pt", null), { width: 200, height: 100 });
+  const cm = size("10cm", "5cm", null);
+  assert.ok(Math.abs(cm.width - 283.46) < 0.01 && Math.abs(cm.height - 141.73) < 0.01, JSON.stringify(cm));
+  assert.deepEqual(size("1in", "6pc", null), { width: 72, height: 72 });
+  assert.deepEqual(size("100%", "100%", "0 0 800 400"), { width: 800, height: 400 });
+  assert.deepEqual(size("200", null, "0 0 100 50"), { width: 200, height: 100 });
+  assert.deepEqual(size(null, "25mm", "0,0,2,1").width.toFixed(2), (25 * 72 / 25.4 * 2).toFixed(2));
+  assert.deepEqual(size(null, null, null), { width: 300, height: 150 });
 });
 
 test("an image becomes a one-page EPUB 3 with the mimetype stored first", () => {
@@ -74,5 +94,6 @@ test("AI, PCD, EPUB and HTML outputs have signatures", () => {
   assert.equal(checkOutputFormat(new TextEncoder().encode("%PDF-1.7").buffer, "ai").ok, true);
   assert.equal(checkOutputFormat(read("sample.png"), "ai").ok, false);
   assert.equal(checkOutputFormat(read("sample.png"), "epub").ok, false);
-  assert.equal(checkOutputFormat(read("sample.png"), "html").ok, false);
+  // No HTML signature: table converters save an HTML fragment, not a page.
+  assert.equal(checkOutputFormat(new TextEncoder().encode("<table></table>").buffer, "html").ok, true);
 });

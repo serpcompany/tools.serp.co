@@ -85,7 +85,6 @@ const SIGNATURES: Record<string, Signature> = {
     startsWith(0x50, 0x4b, 0x03, 0x04)(bytes, "") &&
     ascii(bytes, 30, 38) === "mimetype" &&
     ascii(bytes, 38, 58) === "application/epub+zip",
-  html: (_bytes, text) => /^\s*(<!doctype html|<html[\s>])/i.test(text),
   mp3: isMp3,
   wav: riff("WAVE"),
   avi: riff("AVI "),
@@ -126,7 +125,7 @@ export function checkOutputFormat(buffer: ArrayBuffer, to: string): OutputFormat
 
   // 4 KB covers every signature, including PCD's at byte 2048.
   const bytes = new Uint8Array(buffer, 0, Math.min(buffer.byteLength, 4096));
-  const text = expected === "svg" || expected === "html" ? new TextDecoder().decode(bytes) : "";
+  const text = expected === "svg" ? new TextDecoder().decode(bytes) : "";
   if (signature(bytes, text)) return { ok: true };
 
   const detected = DETECTABLE.find((format) => SIGNATURES[format]?.(bytes, "")) ?? "unknown";

@@ -38,7 +38,8 @@ Conversion picks an engine by input format:
   saves the PDF a PDF-compatible AI file already is, vectors included.
 - **Images into documents** (`lib/convert/image-documents.ts`): SVG to HTML
   wraps the drawing in a standalone page; SVG to AI draws it as vectors into a
-  PDF page with jsPDF and svg2pdf.js (an AI file is a PDF-compatible
+  PDF page of the drawing's size, one SVG unit to a point as in Illustrator,
+  with jsPDF and svg2pdf.js (an AI file is a PDF-compatible
   Illustrator file); an image to EPUB is a one-page EPUB 3 built with fflate.
   Raster images to AI are written as a PDF with the image on one page, and
   ImageMagick writes PCD, which is always 768x512.
