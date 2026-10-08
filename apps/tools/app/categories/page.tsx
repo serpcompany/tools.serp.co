@@ -1,20 +1,15 @@
 import Link from "next/link";
 
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { activeTools } from "@/lib/catalog/catalog";
+import { directoryCategories } from "@/lib/catalog/directory";
 import { buildCategoriesIndexMetadata } from "@/lib/metadata";
-import {
-  buildToolDirectoryEntries,
-  getToolDirectoryCategories,
-} from "@/lib/tool-directory";
-
-const tools = buildToolDirectoryEntries(activeTools());
-const categories = getToolDirectoryCategories(tools);
-const activeToolCount = categories.reduce((sum, category) => sum + category.count, 0);
 
 export const metadata = buildCategoriesIndexMetadata();
 
 export default function Page() {
+  const categories = directoryCategories();
+  const activeToolCount = categories.reduce((sum, category) => sum + category.count, 0);
+
   return (
     <main className="min-h-screen bg-background">
       <section className="border-b bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.12),_transparent_55%),linear-gradient(180deg,_rgba(248,250,252,0.98)_0%,_rgba(255,255,255,1)_100%)]">

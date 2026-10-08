@@ -4,15 +4,12 @@ import { useState, useRef } from "react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@serp-tools/ui/components/card";
 import Link from "next/link";
 
-import { getToolDirectoryIcon } from "@/lib/tool-directory";
+import { DEFAULT_TOOL_ICON } from "@/lib/catalog/icons";
+import type { ToolCardEntry } from "@/lib/catalog/directory";
+import { TOOL_ICONS } from "@/lib/tool-icons";
 
 interface ToolCardProps {
-  tool: {
-    id: string;
-    name: string;
-    description: string;
-    href: string;
-  };
+  tool: ToolCardEntry;
 }
 
 const colors = [
@@ -33,7 +30,7 @@ const colors = [
 export function ToolCard({ tool }: ToolCardProps) {
   const [borderColor, setBorderColor] = useState<string>("");
   const colorIndexRef = useRef(0);
-  const Icon = getToolDirectoryIcon(tool.id);
+  const Icon = TOOL_ICONS[tool.icon ?? DEFAULT_TOOL_ICON];
 
   const handleMouseEnter = () => {
     // Cycle through colors sequentially instead of random
@@ -49,7 +46,8 @@ export function ToolCard({ tool }: ToolCardProps) {
   };
 
   return (
-    <Link href={tool.href}>
+    // Cards come in grids of up to every Tool: don't prefetch each one in view.
+    <Link href={tool.href} prefetch={false}>
       <Card
         className="group h-full transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer border-2"
         style={{

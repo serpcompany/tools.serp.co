@@ -103,7 +103,8 @@ export function RelatedToolsSection({
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {uniqueTools.map((tool) => (
-            <Link key={tool.id} href={canonicalPath(tool.route)}>
+            // Often hundreds of links: don't prefetch each one in view.
+            <Link key={tool.id} href={canonicalPath(tool.route)} prefetch={false}>
               <Card className="p-3 hover:shadow-md transition-all duration-200 cursor-pointer border-gray-200 hover:border-blue-300 hover:bg-blue-50/50">
                 <h4 className="font-semibold text-sm text-gray-900 mb-0.5 truncate">
                   {tool.name}

@@ -34,6 +34,51 @@ export const OPERATION_LABELS: Record<ToolOperation, string> = {
   view: "PDF",
 };
 
+// Each operation's category: the heading and description on its
+// /category/{operation}/ page, its /categories/ card and its link hub tab.
+export const CATEGORY_CONTENT: Record<ToolOperation, { title: string; description: string }> = {
+  convert: {
+    title: "Convert Tools",
+    description: "Convert image, audio, video, document, and data files directly in your browser.",
+  },
+  download: {
+    title: "Downloaders",
+    description: "Download supported public videos and media links straight to your device.",
+  },
+  compress: {
+    title: "Compress Tools",
+    description: "Reduce file size online while keeping the output usable and shareable.",
+  },
+  combine: {
+    title: "Combine Tools",
+    description: "Merge multiple files into one output without installing extra software.",
+  },
+  bulk: {
+    title: "Bulk Operations",
+    description: "Run batch file workflows and multi-file operations in a single pass.",
+  },
+  edit: {
+    title: "Edit Tools",
+    description: "Open and edit supported files online without installing desktop software.",
+  },
+  "video-editor": {
+    title: "Video Editor Tools",
+    description: "Trim, crop, and enhance videos online without installing desktop software.",
+  },
+  "image-editor": {
+    title: "Image Editor Tools",
+    description: "Edit and enhance images online with quick adjustments and exports.",
+  },
+  "audio-editor": {
+    title: "Audio Editor Tools",
+    description: "Trim, merge, and refine audio tracks online with fast exports.",
+  },
+  view: {
+    title: "PDF",
+    description: "Open, read, and edit PDF files instantly in your browser.",
+  },
+};
+
 const OPERATION_SET: ReadonlySet<string> = new Set(OPERATIONS);
 
 export function isToolOperation(value: unknown): value is ToolOperation {

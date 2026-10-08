@@ -12,8 +12,7 @@ const sitemapSource = readFileSync(new URL("./sitemap.ts", import.meta.url), "ut
 
 test("categories hub route exists and is backed by shared category data", () => {
   assert.notEqual(categoriesPageSource, "");
-  assert.match(categoriesPageSource, /buildToolDirectoryEntries/);
-  assert.match(categoriesPageSource, /getToolDirectoryCategories/);
+  assert.match(categoriesPageSource, /directoryCategories\(\)/);
   assert.match(categoriesPageSource, /buildCategoriesIndexMetadata/);
   assert.match(categoriesPageSource, /href=\{category\.href\}/);
 });

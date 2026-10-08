@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 
 import { getTool } from "@/lib/catalog/catalog";
-import { isToolOperation } from "@/lib/catalog/operations";
-import {
-  getCategoryPageContent,
-  getCategoryPagePath,
-} from "@/lib/tool-directory";
+import { categoryHref } from "@/lib/catalog/href";
+import { CATEGORY_CONTENT, isToolOperation } from "@/lib/catalog/operations";
 import { buildOperationFallbackDescription } from "@/lib/tool-operations";
 import { toolContent } from "@/lib/tool-content";
 import { normalizePath } from "@/lib/sitemap";
@@ -54,8 +51,8 @@ export function buildCategoryMetadata(categoryName: string): Metadata {
     return {};
   }
 
-  const content = getCategoryPageContent(categoryName);
-  const canonical = normalizePath(getCategoryPagePath(categoryName));
+  const content = CATEGORY_CONTENT[categoryName];
+  const canonical = normalizePath(categoryHref(categoryName));
 
   return {
     title: `${content.title} | SERP Tools`,

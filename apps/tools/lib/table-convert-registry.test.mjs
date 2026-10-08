@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 import { TABLE_CONVERT_PAGES } from "./table-convert-pages.ts";
-import { buildToolDirectoryEntries } from "./tool-directory.ts";
+import { directoryGrid } from "./catalog/directory.ts";
 
 const toolsRegistry = JSON.parse(
   readFileSync(new URL("./catalog/tools.json", import.meta.url), "utf8"),
@@ -25,8 +25,7 @@ function normalizeRoute(route) {
 test("csv-to-markdown is discoverable through page, directory, and sitemap data", () => {
   const tableConvertEntry = TABLE_CONVERT_PAGES.find((entry) => entry.slug === "csv-to-markdown");
   const tool = toolsRegistry.find((entry) => entry.id === "csv-to-markdown");
-  const directoryEntries = buildToolDirectoryEntries(toolsRegistry);
-  const directoryEntry = directoryEntries.find((entry) => entry.id === "csv-to-markdown");
+  const directoryEntry = directoryGrid().find((entry) => entry.href === "/csv-to-markdown/");
   const sitemapRoutes = new Set(
     toolsRegistry
       .filter((entry) => entry.isActive)
@@ -53,8 +52,8 @@ test("csv-to-markdown is discoverable through page, directory, and sitemap data"
   assert.equal(tool.isActive, true);
 
   assert.ok(directoryEntry, "expected csv-to-markdown in homepage directory entries");
-  assert.deepEqual(directoryEntry?.tags, ["csv", "markdown"]);
-  assert.equal(directoryEntry?.href, "/csv-to-markdown/");
+  assert.equal(directoryEntry?.name, tool.name);
+  assert.equal(directoryEntry?.category, "convert");
 
   assert.ok(sitemapRoutes.has("/csv-to-markdown/"), "expected csv-to-markdown in sitemap routes");
 });

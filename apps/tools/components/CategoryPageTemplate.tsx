@@ -2,12 +2,12 @@ import Link from "next/link";
 
 import { ToolCard } from "@/components/ToolCard";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import type { ToolDirectoryCategory, ToolDirectoryEntry } from "@/lib/tool-directory";
+import type { ToolCardEntry, ToolDirectoryCategory } from "@/lib/catalog/directory";
 
 type CategoryPageTemplateProps = {
   activeCategory: ToolDirectoryCategory;
-  categories: ToolDirectoryCategory[];
-  tools: ToolDirectoryEntry[];
+  categories: readonly ToolDirectoryCategory[];
+  tools: readonly ToolCardEntry[];
 };
 
 export default function CategoryPageTemplate({
@@ -81,7 +81,7 @@ export default function CategoryPageTemplate({
 
         <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {tools.map((tool) => (
-            <ToolCard key={tool.id} tool={tool} />
+            <ToolCard key={tool.href} tool={tool} />
           ))}
         </div>
       </section>

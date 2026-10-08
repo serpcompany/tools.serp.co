@@ -1,20 +1,6 @@
-"use client";
-
-import { useMemo, useState } from "react";
-import { ToolCard } from "@/components/ToolCard";
-import { ToolsSearchBar } from "@/components/ToolsSearchBar";
+import { HomeToolDirectory } from "@/components/HomeToolDirectory";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { activeTools } from "@/lib/catalog/catalog";
-import {
-  buildToolDirectoryEntries,
-  getToolDirectoryCategories,
-} from "@/lib/tool-directory";
-
-type ToolCategory = {
-  id: string;
-  name: string;
-  count: number;
-};
+import { directoryCategories, directoryGrid } from "@/lib/catalog/directory";
 
 // The homepage canonical and og:url are the bare origin, with no trailing
 // slash (serp url-trailing-slash standard). They're rendered here, not via
@@ -22,34 +8,18 @@ type ToolCategory = {
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tools.serp.co";
 const siteOrigin = (siteUrl.startsWith("http") ? siteUrl : `https://${siteUrl}`).replace(/\/+$/, "");
 
-const processedTools = buildToolDirectoryEntries(activeTools());
-const directoryCategories = getToolDirectoryCategories(processedTools);
-const categories: ToolCategory[] = [
-  { id: "all", name: "Filter", count: processedTools.length },
-  ...directoryCategories.map((category) => ({
-    id: category.id,
-    name: category.name,
-    count: category.count,
-  })),
-];
-
-
+// A Server Component: it reads the directory from the catalog and hands the
+// search grid plain data, so the registry never ships to the browser.
 export default function HomePage() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const tools = processedTools;
-
-  // Filter tools based on category and search
-  const filteredTools = useMemo(() => {
-    const search = searchQuery.toLowerCase();
-    return tools.filter((tool) => {
-      const matchesCategory = selectedCategory === "all" || tool.category === selectedCategory;
-      const matchesSearch = tool.name.toLowerCase().includes(search) ||
-        tool.description.toLowerCase().includes(search) ||
-        tool.tags.some((tag) => tag.toLowerCase().includes(search));
-      return matchesCategory && matchesSearch;
-    });
-  }, [tools, searchQuery, selectedCategory]);
+  const tools = directoryGrid();
+  const categories = [
+    { id: "all", name: "Filter", count: tools.length },
+    ...directoryCategories().map((category) => ({
+      id: category.id,
+      name: category.name,
+      count: category.count,
+    })),
+  ];
 
   return (
     <main className="min-h-screen">
@@ -67,32 +37,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="container py-12">
-        {/* Search and Filter Bar */}
-        <ToolsSearchBar
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          categories={categories}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-        />
-
-        {/* Tools Grid */}
-        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {filteredTools.map((tool) => (
-            <ToolCard key={tool.id} tool={tool} />
-          ))}
-        </div>
-
-        {filteredTools.length === 0 && (
-          <div className="py-12 text-center">
-            <p className="text-lg text-muted-foreground">
-              No tools found matching your criteria.
-            </p>
-          </div>
-        )}
-      </section>
+      {/* Main Content: search, filter and the Tool grid */}
+      <HomeToolDirectory tools={tools} categories={categories} />
 
       {/* All tools link hub */}
       <ToolsLinkHub />

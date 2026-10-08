@@ -1,5 +1,3 @@
-"use client";
-
 import HeroConverter from "@/components/HeroConverter";
 import LanderHeroTwoColumn from "@/components/LanderHeroTwoColumn";
 import { AboutFormatsSection } from "@/components/sections/AboutFormatsSection";
@@ -37,6 +35,9 @@ type ToolPageProps = {
   blogPosts?: BlogPost[];
 };
 
+// A Server Component: it holds no state, and RelatedToolsSection and
+// ToolsLinkHub read the catalog, which must stay out of the browser bundle.
+// The converter heroes and FAQs are client components of their own.
 export default function ToolPageTemplate({
   tool,
   videoSection,
