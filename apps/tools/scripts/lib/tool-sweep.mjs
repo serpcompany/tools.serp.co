@@ -10,6 +10,7 @@ import { resolveCompressionTarget } from "../../lib/compression-utils.ts";
 import { MAGICK_BROWSER_INPUTS } from "../../lib/convert/magickBrowser.ts";
 import { checkOutputFormat } from "../../lib/convert/output-format.ts";
 import { usesWebCodecs } from "../../lib/convert/webcodecs.ts";
+import { isImageDocumentConversion } from "../../lib/convert/image-document-targets.ts";
 
 export const STATUSES = ["pass", "wrong_format", "error", "timeout", "no_fixture", "skipped"];
 // Statuses that come from running the Tool. A resumed run skips Tools that
@@ -196,6 +197,7 @@ export function converterEngine({ operation, from, to }) {
     return COMPRESSION_ENGINES[compression] ?? "unsupported";
   }
   if (source === "ai" || source === "pdf") return "pdfjs";
+  if (isImageDocumentConversion(source, target)) return "image-documents";
   if (MAGICK_BROWSER_INPUTS.has(source)) return "imagemagick-wasm";
   if (source === "heic" || source === "heif") return "heif-decoder";
   if (usesWebCodecs(source, target)) return "ffmpeg-wasm + webcodecs";
@@ -230,6 +232,7 @@ export const ENGINE_LOCATIONS = {
   "html-to-markdown-wasm": "client-only",
   javascript: "client-only",
   "jsquash-worker": "client-only",
+  "image-documents": "client-only",
   svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",

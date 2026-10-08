@@ -1,5 +1,6 @@
 import { detectCapabilities, requiresVideoConversion } from "../capabilities.ts";
 import { resolveCompressionTarget } from "../compression-utils.ts";
+import { isImageDocumentConversion } from "./image-document-targets.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
@@ -84,6 +85,10 @@ const MIME_MAP: Record<string, string> = {
   av1: "video/x-ivf",
   avchd: "video/mp2t",
   pdf: "application/pdf",
+  ai: "application/pdf",
+  pcd: "image/x-photo-cd",
+  epub: "application/epub+zip",
+  html: "text/html",
   txt: "text/plain",
 };
 
@@ -194,6 +199,9 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
     const buffers = await renderPdfPages(args.buf, undefined, args.to);
     return { kind: "multiple", buffers };
   }
+  if (isImageDocumentConversion(fromExt, toExt)) {
+    return convertImageToDocument(fromExt, toExt, args.buf);
+  }
   const op = resolveConversionOp(args.from, args.to);
   if (op === "video") {
     return convertVideoOnMainThread(args);
@@ -207,6 +215,26 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
       return convertRasterOnMainThread(args);
     }
     throw error;
+  }
+}
+
+// SVG to HTML or vector AI, and an image to EPUB (image-documents.ts).
+async function convertImageToDocument(from: string, to: string, buf: ArrayBuffer): Promise<ConversionResult> {
+  const documents = await import("./image-documents.ts");
+  try {
+    const buffer =
+      to === "html"
+        ? documents.svgToHtml(buf, "image.svg")
+        : to === "ai"
+          ? await documents.svgToAi(buf)
+          : documents.imageToEpub(buf, from, `image.${from}`);
+    return { kind: "single", buffer };
+  } catch (error) {
+    throw createTelemetryError(
+      "convert_failed",
+      error instanceof Error ? error.message : String(error),
+      { from, to, engine: "image-documents" },
+    );
   }
 }
 

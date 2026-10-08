@@ -76,6 +76,16 @@ const SIGNATURES: Record<string, Signature> = {
   pam: isNetpbm("7"),
   svg: (_bytes, text) => /<svg[\s>]/i.test(text),
   pdf: startsWithText("%PDF"),
+  // Illustrator's PDF-compatible AI files are PDFs.
+  ai: startsWithText("%PDF"),
+  // Kodak Photo CD: the image pack header sits after 2048 bytes of padding.
+  pcd: (bytes) => ascii(bytes, 2048, 2055) === "PCD_IPI",
+  // A ZIP whose first entry is the stored "mimetype" file (the OCF rule).
+  epub: (bytes) =>
+    startsWith(0x50, 0x4b, 0x03, 0x04)(bytes, "") &&
+    ascii(bytes, 30, 38) === "mimetype" &&
+    ascii(bytes, 38, 58) === "application/epub+zip",
+  html: (_bytes, text) => /^\s*(<!doctype html|<html[\s>])/i.test(text),
   mp3: isMp3,
   wav: riff("WAVE"),
   avi: riff("AVI "),
@@ -114,8 +124,9 @@ export function checkOutputFormat(buffer: ArrayBuffer, to: string): OutputFormat
   const signature = SIGNATURES[expected];
   if (!signature) return { ok: true };
 
-  const bytes = new Uint8Array(buffer, 0, Math.min(buffer.byteLength, 1024));
-  const text = expected === "svg" ? new TextDecoder().decode(bytes) : "";
+  // 4 KB covers every signature, including PCD's at byte 2048.
+  const bytes = new Uint8Array(buffer, 0, Math.min(buffer.byteLength, 4096));
+  const text = expected === "svg" || expected === "html" ? new TextDecoder().decode(bytes) : "";
   if (signature(bytes, text)) return { ok: true };
 
   const detected = DETECTABLE.find((format) => SIGNATURES[format]?.(bytes, "")) ?? "unknown";

@@ -48,7 +48,7 @@ export const MAGICK_BROWSER_INPUTS = new Set([
 export const MAGICK_BROWSER_OUTPUTS = new Set([
   "bmp", "cur", "dds", "eps", "exr", "gif", "hdr", "ico", "jp2", "jxl", "pam",
   "pbm", "pcx", "pgm", "ppm", "psd", "rgb", "tga", "tif", "tiff", "wbmp",
-  "xbm", "xpm", "avif", "jpeg", "jpg", "png", "webp",
+  "xbm", "xpm", "avif", "jpeg", "jpg", "png", "webp", "pcd",
 ]);
 
 const MIME_TYPES: Record<string, string> = {
@@ -56,6 +56,7 @@ const MIME_TYPES: Record<string, string> = {
   cur: "image/x-icon", jp2: "image/jp2", jpeg: "image/jpeg", jpg: "image/jpeg",
   jxl: "image/jxl", png: "image/png", psd: "image/vnd.adobe.photoshop",
   tif: "image/tiff", tiff: "image/tiff", webp: "image/webp", eps: "application/postscript",
+  pcd: "image/x-photo-cd",
 };
 
 export function mimeTypeFor(ext: string) {
