@@ -90,9 +90,10 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
 
 1. Set `isActive: false` on its registry entry. A page served by the shared
    `[tool]` route then 404s and leaves the sitemap. The entry stays as the
-   record of the retirement. A Tool with its own folder under `app/` (the
-   table converters) keeps serving until that folder is deleted and its entry
-   is removed from lists such as `lib/table-convert-pages.ts`.
+   record of the retirement. A page that renders without checking the catalog
+   (the table converters' `TableConvertLanding`) keeps serving until its folder
+   under `app/` is deleted and its entry is removed from lists such as
+   `lib/table-convert-pages.ts`.
 2. Drop its rows from `benchmarks/tool-sweep-results.json`, as the next sweep
    would: keep only active Tools' rows (`mergeRows` with no new rows) and
    recount `meta.counts`. `pnpm test` fails while a retired Tool keeps a row.
