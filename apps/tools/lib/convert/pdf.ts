@@ -36,6 +36,21 @@ async function getPdfjs() {
   return pdfjsPromise;
 }
 
+// Safari's canvas area limit, the smallest of the browsers': a larger canvas
+// renders blank or fails, and its RGBA copies run to gigabytes.
+export const MAX_RENDER_PIXELS = 4096 * 4096;
+
+// Pages render at twice their size in points, or smaller when that would
+// pass MAX_RENDER_PIXELS (an Illustrator artboard can be 6912 pt square).
+export function pageRenderScale(width: number, height: number) {
+  const pixels = (scale: number) => Math.ceil(width * scale) * Math.ceil(height * scale);
+  let scale = Math.min(2, Math.floor(Math.sqrt(MAX_RENDER_PIXELS / (width * height)) * 1000) / 1000);
+  while (scale > 0.001 && pixels(scale) > MAX_RENDER_PIXELS) {
+    scale = Math.round((scale - 0.001) * 1000) / 1000;
+  }
+  return scale;
+}
+
 export async function renderPdfPages(buf: ArrayBuffer, page?: number, format?: string) {
   const pdfjsLib = await getPdfjs();
   pdfjsLib.GlobalWorkerOptions.workerSrc = workerPublicUrl;
@@ -49,7 +64,8 @@ export async function renderPdfPages(buf: ArrayBuffer, page?: number, format?: s
 
   for (const p of pages) {
     const pg = await doc.getPage(p);
-    const viewport = pg.getViewport({ scale: 2 });
+    const size = pg.getViewport({ scale: 1 });
+    const viewport = pg.getViewport({ scale: pageRenderScale(size.width, size.height) });
     const useOffscreen = typeof OffscreenCanvas !== "undefined";
     const canvas: HTMLCanvasElement | OffscreenCanvas = useOffscreen
       ? new OffscreenCanvas(viewport.width, viewport.height)

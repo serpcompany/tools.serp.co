@@ -557,7 +557,7 @@
       "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.rm",
-      "notes": "Auto-generated fixture."
+      "notes": "Generated with FFmpeg 8.0: 1 s of solid blue 320x240 at 25 fps as RealVideo 2.0 (-c:v rv20 -b:v 200k) with mono AAC. The earlier file's RV20 frames had a zero quantizer, which no FFmpeg decodes."
     },
     {
       "format": "rmvb",

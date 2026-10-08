@@ -157,19 +157,7 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
   const fromExt = args.from.toLowerCase();
   const toExt = args.to.toLowerCase();
   if (fromExt === "ai") {
-    const { renderPdfPages } = await import("./pdf");
-    const rasterFormat = toExt === "jpg" || toExt === "jpeg" ? "jpg" : "png";
-    const buffers = await renderPdfPages(args.buf, undefined, rasterFormat);
-    if (toExt === "svg") {
-      const svgBuffers = [];
-      for (const buffer of buffers) {
-        const rgba = await decodeToRGBA("png", buffer);
-        const blob = await encodeFromRGBA("svg", rgba, args.quality ?? 0.85);
-        svgBuffers.push(await blob.arrayBuffer());
-      }
-      return { kind: "multiple", buffers: svgBuffers };
-    }
-    return { kind: "multiple", buffers };
+    return convertAi(args.buf, toExt, args.quality);
   }
   if (MAGICK_BROWSER_INPUTS.has(fromExt)) {
     args.onProgress?.({ status: "processing", progress: 5 });
@@ -218,6 +206,37 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
     }
     throw error;
   }
+}
+
+// Illustrator writes every AI file as a PDF unless "Create PDF Compatible
+// File" is turned off; older AI files are PostScript, which pdf.js can't read.
+// The PDF is the AI to PDF result as it is, vectors included; other formats
+// are encoded from the pages pdf.js renders.
+async function convertAi(buf: ArrayBuffer, to: string, quality?: number): Promise<ConversionResult> {
+  if (!checkOutputFormat(buf, "pdf").ok) {
+    throw createTelemetryError(
+      "unsupported_input",
+      "This AI file has no PDF inside. In Illustrator, save it again with Create PDF Compatible File turned on.",
+      { from: "ai", to, engine: "pdfjs" },
+    );
+  }
+  if (to === "pdf") {
+    return { kind: "single", buffer: buf };
+  }
+
+  const { renderPdfPages } = await import("./pdf");
+  const rendered = to === "jpg" || to === "jpeg" ? "jpg" : "png";
+  const pages = await renderPdfPages(buf, undefined, rendered);
+  if (to === rendered || to === "jpeg") {
+    return { kind: "multiple", buffers: pages };
+  }
+  const buffers = [];
+  for (const page of pages) {
+    const rgba = await decodeToRGBA("png", page);
+    const blob = await encodeFromRGBA(to, rgba, quality ?? 0.85);
+    buffers.push(await blob.arrayBuffer());
+  }
+  return { kind: "multiple", buffers };
 }
 
 async function convertWithWorkerInner(args: {
