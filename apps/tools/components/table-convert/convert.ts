@@ -952,7 +952,6 @@ export function serializeOutput(format: AnyFormat, table: TableData): SerializeR
       };
     case "avro":
     case "protobuf":
-    case "magic":
     case "excel":
     case "pdf":
     case "png":

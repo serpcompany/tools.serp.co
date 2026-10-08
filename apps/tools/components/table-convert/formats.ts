@@ -48,7 +48,6 @@ export const OUTPUT_FORMATS: FormatOption[] = [
   { value: "rdf", label: "RDF" },
   { value: "avro", label: "Avro" },
   { value: "protobuf", label: "Protobuf" },
-  { value: "magic", label: "Magic" },
   { value: "excel", label: "Excel" },
   { value: "pdf", label: "PDF" },
   { value: "png", label: "PNG" },

@@ -37,7 +37,6 @@ const TABLE_CONVERT_LABELS: Record<string, string> = {
   rdf: "RDF",
   restructuredtext: "reStructuredText",
   ruby: "Ruby",
-  magic: "Magic",
   textile: "Textile",
   toml: "TOML",
   tracwiki: "TracWiki",

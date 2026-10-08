@@ -49,7 +49,6 @@ export type OutputFormat =
   | "rdf"
   | "restructuredtext"
   | "ruby"
-  | "magic"
   | "textile"
   | "toml"
   | "tracwiki"
