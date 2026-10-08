@@ -95,3 +95,39 @@ test("AVIF re-encodes, and no format ever comes back larger than it went in", as
 test("an unreadable file is an error, not an empty download", async () => {
   await assert.rejects(compressImageInBrowser(new Uint8Array([1, 2, 3]).buffer, "tiff", 0.8));
 });
+
+// A GIF with its own palette in every frame (ffmpeg paletteuse new=1). The
+// GIF writer re-quantises some of its frames, which would change pixels.
+test("a GIF whose rewrite would change pixels comes back unchanged", async () => {
+  const input = read("sample-local-palettes.gif");
+  const output = await compressImageInBrowser(input.slice(0), "gif", 0.8);
+  assert.deepEqual(new Uint8Array(output), new Uint8Array(input));
+});
+
+// This ImageMagick build holds 8 bits a channel, so rewriting a 16-bit TIFF
+// would drop the low bits while still calling the file 16-bit.
+test("a TIFF deeper than 8 bits a channel comes back unchanged", async () => {
+  const image = magick.MagickImage.create(new magick.MagickColor("#123456"), 64, 64);
+  image.depth = 16;
+  const tiff = image.write(magick.MagickFormat.Tiff, (data) => data.slice());
+  image.dispose();
+  const output = await compressImageInBrowser(tiff.buffer.slice(0), "tiff", 0.8);
+  assert.deepEqual(new Uint8Array(output), tiff);
+});
+
+test("an SVG that isn't UTF-8 comes back unchanged rather than garbled", async () => {
+  const svg = `<?xml version="1.0" encoding="ISO-8859-1"?>\n<!-- comment -->\n<svg xmlns="http://www.w3.org/2000/svg"><text>Caf\xe9 M\xfcnchen \xa9</text></svg>\n`;
+  const input = Uint8Array.from(svg, (char) => char.charCodeAt(0)).buffer;
+  const output = await compressImageInBrowser(input, "svg", 0.8);
+  assert.deepEqual(new Uint8Array(output), new Uint8Array(input));
+});
+
+// RLE8 has no alpha, and quantising moves semi-transparent pixels.
+test("a BMP with transparency comes back unchanged", async () => {
+  const image = magick.MagickImage.create(new magick.MagickColor("#ff000080"), 32, 32);
+  const bmp = image.write(magick.MagickFormat.Bmp, (data) => data.slice());
+  image.dispose();
+  assert.ok(magick.ImageMagick.read(bmp, magick.MagickFormat.Bmp, (img) => img.hasAlpha));
+  const output = await compressImageInBrowser(bmp.buffer.slice(0), "bmp", 0.8);
+  assert.deepEqual(new Uint8Array(output), bmp);
+});

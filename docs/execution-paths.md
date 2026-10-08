@@ -53,8 +53,10 @@ and WebP use JSquash codecs in `workers/compress.worker.js`. Since #147's Lane
 (`lib/convert/image-compress.ts`): SVG with SVGO, and GIF, TIFF, BMP and AVIF
 with ImageMagick WASM. GIF frames are re-optimised, TIFF pages are rewritten
 with LZW, a BMP with at most 256 colours becomes 8-bit RLE, and AVIF is
-re-encoded at the chosen quality; all but AVIF are lossless. Audio and video
-use FFmpeg.wasm. Giving a buffer to FFmpeg.wasm transfers it to FFmpeg's worker and
+re-encoded at the chosen quality. For all but AVIF, a result that doesn't
+decode to exactly the input's pixels is discarded, and so is any image deeper
+than 8 bits a channel, which this ImageMagick build can't hold. An SVG that
+isn't UTF-8 is left as it is. Audio and video use FFmpeg.wasm. Giving a buffer to FFmpeg.wasm transfers it to FFmpeg's worker and
 leaves the caller's copy empty, so code that still needs the original reads it
 back from FFmpeg's file system. Until #236, missing that made every audio and
 video compressor save an empty file. Transcription extracts audio with

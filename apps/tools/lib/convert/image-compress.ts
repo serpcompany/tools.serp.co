@@ -7,9 +7,18 @@ import { compressImageWithMagick } from "./magickBrowser.ts";
 
 export const BROWSER_IMAGE_COMPRESS_FORMATS = new Set(["avif", "bmp", "gif", "svg", "tif", "tiff"]);
 
+// SVGO drops the XML declaration, so a file in another encoding would be
+// re-read as UTF-8 and garbled. Only UTF-8 files are optimised.
 async function compressSvg(buf: ArrayBuffer): Promise<ArrayBuffer> {
+  let source: string;
+  try {
+    source = new TextDecoder("utf-8", { fatal: true }).decode(buf);
+  } catch {
+    return buf;
+  }
+  if (/^\s*<\?xml[^>]*encoding\s*=\s*["'](?!utf-?8)/i.test(source)) return buf;
   const { optimize } = await import("svgo/browser");
-  const { data } = optimize(new TextDecoder().decode(buf), { multipass: true });
+  const { data } = optimize(source, { multipass: true });
   return new TextEncoder().encode(data).buffer as ArrayBuffer;
 }
 
