@@ -216,6 +216,9 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("compress", "png", "png"), "jsquash-worker");
   assert.equal(engine("compress", "gif", "gif"), "imagemagick-wasm");
   assert.equal(engine("compress", "svg", "svg"), "svgo");
+  assert.equal(engine("convert", "svg", "html"), "image-documents");
+  assert.equal(engine("convert", "png", "epub"), "image-documents");
+  assert.equal(engine("convert", "png", "ai"), "browser-raster");
   assert.equal(engine("compress", "heic", "heic"), "server-image-compress");
   assert.equal(engine("compress", "pdf", "pdf"), "server-pdf-compress");
   assert.equal(engine("compress", "mp4", "mp4"), "ffmpeg-wasm");

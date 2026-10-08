@@ -36,6 +36,13 @@ Conversion picks an engine by input format:
   size in points but never more than 4096x4096 pixels, Safari's canvas limit.
   Targets other than PNG and JPEG are encoded from that render. AI to PDF
   saves the PDF a PDF-compatible AI file already is, vectors included.
+- **Images into documents** (`lib/convert/image-documents.ts`): SVG to HTML
+  wraps the drawing in a standalone page; SVG to AI draws it as vectors into a
+  PDF page of the drawing's size, one SVG unit to a point as in Illustrator,
+  with jsPDF and svg2pdf.js (an AI file is a PDF-compatible
+  Illustrator file); an image to EPUB is a one-page EPUB 3 built with fflate.
+  Raster images to AI are written as a PDF with the image on one page, and
+  ImageMagick writes PCD, which is always 768x512.
 - **Other images:** `workers/convert.worker.js` decodes with the browser and
   encodes with a canvas, retrying on the main thread if the worker fails.
   ImageMagick writes the formats a canvas can't, fitting ICO and CUR inside

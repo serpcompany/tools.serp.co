@@ -254,7 +254,7 @@ async function readOutputs(page, { text = false, base64 = false } = {}) {
     async ({ withText, withBase64 }) =>
       Promise.all(
         globalThis.__sweep.outputs.map(async ({ name, blob }) => {
-          const head = Array.from(new Uint8Array(await blob.slice(0, 1024).arrayBuffer()));
+          const head = Array.from(new Uint8Array(await blob.slice(0, 4096).arrayBuffer()));
           const output = { name, size: blob.size, type: blob.type, head };
           if (withText) output.text = await blob.slice(0, 65_536).text();
           if (withBase64) {
@@ -452,7 +452,7 @@ async function runBatchCompress(page, plan) {
   const outputs = [];
   for (const entry of entries) {
     const bytes = await entry.getData(new Uint8ArrayWriter());
-    outputs.push({ name: entry.filename, size: bytes.length, head: Array.from(bytes.subarray(0, 1024)) });
+    outputs.push({ name: entry.filename, size: bytes.length, head: Array.from(bytes.subarray(0, 4096)) });
   }
   await reader.close();
   if (outputs.length !== plan.fixtures.length) {

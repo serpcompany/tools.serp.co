@@ -98,7 +98,8 @@ export async function encodeFromRGBA(
     return new Blob([svg], { type: "image/svg+xml" });
   }
 
-  if (toExt === "pdf") {
+  // An AI file is a PDF (Illustrator's "PDF Compatible File").
+  if (toExt === "pdf" || toExt === "ai") {
     const pngBlob = await canvasToBlob("image/png");
     const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
     const { PDFDocument } = await import("pdf-lib");
