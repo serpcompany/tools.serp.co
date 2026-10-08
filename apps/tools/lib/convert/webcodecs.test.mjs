@@ -17,7 +17,7 @@ test("AV1 input and AV1 or HEVC output use the browser's codecs; HEVC input stay
   for (const [from, to] of [["av1", "mp4"], ["av1", "gif"], ["mp4", "av1"], ["hevc", "av1"], ["mov", "hevc"], ["AV1", "MKV"]]) {
     assert.equal(usesWebCodecs(from, to), true, `${from} to ${to}`);
   }
-  for (const [from, to] of [["hevc", "mp4"], ["mp4", "webm"], ["mkv", "mp4"], ["png", "jpg"]]) {
+  for (const [from, to] of [["hevc", "mp4"], ["mp4", "webm"], ["mkv", "mp4"], ["png", "jpg"], ["av1", "mp3"], ["AV1", "wav"]]) {
     assert.equal(usesWebCodecs(from, to), false, `${from} to ${to}`);
   }
 });
@@ -78,5 +78,6 @@ test("pages that read or write a raw .av1 or .hevc stream say it has no audio", 
   assert.equal(videoOnlyNote("av1", "mp4"), "Video only: .av1 files are raw video streams with no audio.");
   assert.equal(videoOnlyNote("AV1", "hevc"), "Video only: .av1 and .hevc files are raw video streams with no audio.");
   assert.equal(videoOnlyNote("mp4", "mkv"), undefined);
+  assert.equal(videoOnlyNote("av1", "mp3"), undefined);
   assert.equal(videoOnlyNote(undefined, undefined), undefined);
 });

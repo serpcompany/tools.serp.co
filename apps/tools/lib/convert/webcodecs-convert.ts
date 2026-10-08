@@ -18,7 +18,8 @@ import {
   getFirstEncodableVideoCodec,
 } from "mediabunny";
 
-import { FAST_VIDEO_FPS, FAST_VIDEO_WIDTH, convertVideo, runFFmpeg } from "./video.ts";
+import { FAST_VIDEO_FPS, FAST_VIDEO_WIDTH } from "./ffmpeg-args.ts";
+import { convertVideo, runFFmpeg } from "./video.ts";
 import {
   type BrowserCodec,
   type CodecAction,
@@ -61,7 +62,10 @@ export async function convertWithWebCodecs(
       const conversion = await Conversion.init({
         input,
         output,
-        // No resizing here: FFmpeg scales. A bitrate, not a quantizer:
+        // No resizing here: FFmpeg scales. An AV1 hand-off is therefore
+        // full-resolution VP8, held in memory and then copied into FFmpeg's
+        // file system, so a long 1080p or 4K input can exhaust wasm memory
+        // first. Scaling here instead shifted colours. A bitrate, not a quantizer:
         // Chrome 143 caps the AV1 quantizer at 63 of Mediabunny's 255, which
         // gave every frame its worst quality.
         video:

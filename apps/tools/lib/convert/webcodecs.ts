@@ -19,6 +19,9 @@
 // decision).
 
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
+import { AUDIO_FORMATS } from "../capabilities.ts";
+
+const AUDIO_FORMAT_SET = new Set<string>(AUDIO_FORMATS);
 
 export type BrowserCodec = "av1" | "hevc";
 export type CodecAction = "decode" | "encode";
@@ -30,10 +33,12 @@ export const CODEC_UNSUPPORTED = "codec_unsupported";
 const CODEC_LABELS: Record<BrowserCodec, string> = { av1: "AV1", hevc: "HEVC" };
 
 // Tools whose AV1 or HEVC step runs in the browser. HEVC input stays on
-// FFmpeg, which decodes it in software.
+// FFmpeg, which decodes it in software. So does AV1 to audio: FFmpeg takes
+// the audio and never decodes the video.
 export function usesWebCodecs(from: string, to: string): boolean {
   const target = to.toLowerCase();
-  return from.toLowerCase() === "av1" || target === "av1" || target === "hevc";
+  if (target === "av1" || target === "hevc") return true;
+  return from.toLowerCase() === "av1" && !AUDIO_FORMAT_SET.has(target);
 }
 
 // Worded for every browser: Chrome or Edge can lack the codec too, when the
@@ -45,6 +50,7 @@ export function codecUnsupportedMessage(action: CodecAction, codec: BrowserCodec
 // .av1 and .hevc files are raw video streams with no audio track, so a page
 // that reads or writes one says so (owner decision).
 export function videoOnlyNote(from?: string, to?: string): string | undefined {
+  if (to && AUDIO_FORMAT_SET.has(to.toLowerCase())) return undefined;
   const raw = [...new Set([from, to].map((f) => f?.toLowerCase()))].filter(
     (f): f is BrowserCodec => f === "av1" || f === "hevc",
   );

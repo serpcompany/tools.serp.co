@@ -15,7 +15,6 @@ const publicAssetBaseUrl = process.env.NEXT_PUBLIC_ASSETS_BASE_URL?.replace(/\/+
 function resolvePublicAssetPath(path: `/${string}`) {
   return publicAssetBaseUrl ? `${publicAssetBaseUrl}${path}` : path;
 }
-export { FAST_VIDEO_FPS, FAST_VIDEO_WIDTH } from "./ffmpeg-args";
 const AUDIO_FORMAT_SET = new Set(AUDIO_FORMATS);
 const VIDEO_FORMAT_SET = new Set(VIDEO_FORMATS);
 
