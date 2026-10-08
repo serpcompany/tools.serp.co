@@ -24,8 +24,17 @@ const listFiles = (...pathspecs) =>
     .split("\n")
     .filter((path, index, all) => path && existsSync(path) && all.indexOf(path) === index);
 
-// ARCHITECTURE.md and CONTEXT.md are root reference docs, budgeted as leaves.
-const files = listFiles("AGENTS.md", "README.md", "ARCHITECTURE.md", "CONTEXT.md", "docs/*.md");
+// ARCHITECTURE.md and CONTEXT.md are root reference docs, budgeted as leaves. A workspace's
+// README.md is its component map (docs/README.md), budgeted as a map.
+const files = listFiles(
+  "AGENTS.md",
+  "README.md",
+  "ARCHITECTURE.md",
+  "CONTEXT.md",
+  "docs/*.md",
+  "apps/*/README.md",
+  "packages/*/README.md",
+);
 
 const wrappedLines = (text) =>
   text

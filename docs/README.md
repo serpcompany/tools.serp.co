@@ -14,7 +14,9 @@ of these gets its own leaf, such as `docs/telemetry.md`.
 Some things belong elsewhere:
 
 - A component's own contract lives beside it, as its `README.md` (for example
-  `apps/tools/README.md`), and data an owner reads lives with that owner.
+  `apps/tools/README.md`), and data an owner reads lives with that owner. That
+  README is a map: when its topics outgrow the map budget, each becomes a leaf
+  in `docs/` that the README links, as `apps/tools/README.md` does.
 - Work, plans, acceptance criteria and status belong in GitHub Issues, not in a
   doc. The old `docs/knowledge`, `docs/plans` and `docs/planner` folders were
   retired for that reason; don't recreate them.
@@ -50,5 +52,6 @@ their conventional names (decided in #149): `CONTEXT.md` is the file the
 domain-modeling skill reads, and `ARCHITECTURE.md` is the common name for a
 repository's architecture map. Both are budgeted as leaves.
 
-`node .github/scripts/check-docs.mjs` checks sizes and names. The **Docs Links**
-workflow checks relative links in the root docs and `docs/`.
+`node .github/scripts/check-docs.mjs` checks the sizes of the root docs, `docs/`
+and each workspace `README.md`, and the names under `docs/`. The **Docs Links**
+workflow checks relative links in the same files.

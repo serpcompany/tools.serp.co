@@ -31,5 +31,5 @@ jobs:
 
       - name: Validate internal markdown links
         run: |
-          "$RUNNER_TEMP/remark/node_modules/.bin/remark" AGENTS.md README.md ARCHITECTURE.md CONTEXT.md "docs/**/*.md" \
+          "$RUNNER_TEMP/remark/node_modules/.bin/remark" AGENTS.md README.md ARCHITECTURE.md CONTEXT.md "docs/**/*.md" "apps/*/README.md" "packages/*/README.md" \
             --frail --quiet --use "$RUNNER_TEMP/remark/node_modules/remark-validate-links/index.js"
