@@ -9,7 +9,7 @@ guidance.
 
 | Area                     | Owner                                  | Contract                                                                                                                                          |
 | ------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Product application      | `apps/tools`                           | Next.js routes, components, the Tool registry, Tool execution, API handlers, metadata, sitemaps, and Cloudflare assembly for `tools.serp.co`.     |
+| Product application      | [`apps/tools`](./apps/tools/README.md) | Next.js routes, components, the Tool registry, Tool execution, API handlers, metadata, sitemaps, and Cloudflare assembly for `tools.serp.co`.     |
 | Shared application core  | `packages/app-core`                    | Shared shell components and related catalog data.                                                                                                 |
 | Tool telemetry           | `packages/tool-telemetry`              | Browser/server event contracts plus D1 persistence and summaries.                                                                                 |
 | UI primitives            | `packages/ui`                          | Reusable presentation primitives, styles, and small UI utilities; no Tool or application policy.                                                  |
@@ -77,6 +77,9 @@ to the `tools-serp-co` Cloudflare Worker and routed to `tools.serp.co`.
 Native FFmpeg, ImageMagick, Ghostscript, or `yt-dlp` execution requires an
 explicitly chosen compatible runtime; Cloudflare Workers support must not be
 inferred from local Node.js behavior.
+[Tool execution paths](./docs/execution-paths.md#routes-that-fail-on-workers)
+lists the server routes the #224 sweep saw fail on Workers, and one it didn't
+measure that would fail the same way.
 
 Production deploys, remote migrations, provisioning, uploads, secrets, and
 destructive resource retirement remain human-controlled. See the current
