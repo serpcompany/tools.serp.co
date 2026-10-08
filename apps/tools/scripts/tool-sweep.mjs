@@ -38,6 +38,7 @@ import {
   scanPageHandlers,
   selectRuns,
   serializeResults,
+  sweepRow,
   textOutputTimeout,
   thrownError,
   treeIsDirty,
@@ -115,24 +116,10 @@ const runEntry = {
   ...(args.resume ? { resume: true, retry: [...args.retry] } : {}),
 };
 
+// Every row records the commit and tree state it was measured at, so a later
+// targeted run (--only, --resume) leaves the provenance of other rows intact.
 function toRow(plan, result) {
-  return {
-    id: plan.id,
-    route: plan.route,
-    from: plan.from,
-    to: plan.to,
-    handler: plan.handler,
-    engine: plan.engine,
-    status: result.status,
-    durationMs: result.durationMs,
-    error: result.error ?? undefined,
-    detail: result.detail,
-    formatCheck: result.formatCheck,
-    fixture: plan.fixtures?.map((file) => path.basename(file)).join(","),
-    output: result.output,
-    blocked: result.blocked?.length ? result.blocked : undefined,
-    reason: plan.reason,
-  };
+  return sweepRow(plan, result, { commit, dirty });
 }
 
 function writeResults() {

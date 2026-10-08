@@ -392,6 +392,31 @@ export function selectRuns(plans, previousRows, { resume, retry = new Set(), lim
   return limit ? selected.slice(0, limit) : selected;
 }
 
+// One results row: what the plan says about the Tool, what the run observed,
+// and the commit and tree state (dirty: uncommitted changes outside the
+// results file; null outside a git checkout) it was measured at.
+export function sweepRow(plan, result, { commit, dirty }) {
+  return {
+    id: plan.id,
+    route: plan.route,
+    from: plan.from,
+    to: plan.to,
+    handler: plan.handler,
+    engine: plan.engine,
+    status: result.status,
+    durationMs: result.durationMs,
+    error: result.error ?? undefined,
+    detail: result.detail,
+    formatCheck: result.formatCheck,
+    fixture: plan.fixtures?.map((file) => path.basename(file)).join(","),
+    output: result.output,
+    blocked: result.blocked?.length ? result.blocked : undefined,
+    reason: plan.reason,
+    commit,
+    dirty,
+  };
+}
+
 // Rows from this run replace earlier rows for the same Tool; rows for Tools
 // this run didn't touch are kept. Order follows the registry; rows for Tools
 // that are no longer active are dropped.

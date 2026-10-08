@@ -5,8 +5,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { parseCsv } from "../scripts/lib/csv.mjs";
+import { parseKeywordsCsv } from "../scripts/lib/keywords.mjs";
 import {
   STATUS_COLUMNS,
+  STATUS_INPUTS,
   STATUS_OUTPUTS,
   aliasIds,
   buildStatusRows,
@@ -15,9 +17,11 @@ import {
   joinKeyword,
   keywordId,
   processingLocation,
+  renderStatusCsv,
   sweepCommit,
   sweepNote,
 } from "../scripts/lib/tool-status.mjs";
+import { mergeRows, serializeResults, sweepRow } from "../scripts/lib/tool-sweep.mjs";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -103,12 +107,44 @@ test("the sweep note says why a Tool failed, why it wasn't run, or how a pass wa
   assert.equal(sweepNote({ status: "pass", formatCheck: "signature" }), "format check: signature");
 });
 
-test("a row's commit is the sweep's only when every run used the same one", () => {
-  const sha = "ca5b9a53e93aad8dc434c0955bc8d75f466416b6";
-  assert.equal(sweepCommit({ runs: [{ commit: sha, dirty: false }] }, {}), "ca5b9a53e93a");
-  assert.equal(sweepCommit({ runs: [{ commit: sha, dirty: true }] }, {}), "ca5b9a53e93a-dirty");
-  assert.equal(sweepCommit({ runs: [{ commit: sha }, { commit: "f36d343aaaaa" }] }, {}), "unknown");
-  assert.equal(sweepCommit({ runs: [{ commit: sha }, { commit: "f36d343aaaaa" }] }, { commit: sha }), "ca5b9a53e93a");
+test("a row's commit is its own, shortened, with -dirty for a run with uncommitted changes", () => {
+  const commit = "ca5b9a53e93aad8dc434c0955bc8d75f466416b6";
+  assert.equal(sweepCommit({ commit, dirty: false }), "ca5b9a53e93a");
+  assert.equal(sweepCommit({ commit, dirty: true }), "ca5b9a53e93a-dirty");
+  assert.equal(sweepCommit({ commit, dirty: null }), "ca5b9a53e93a");
+  assert.equal(sweepCommit({}), "unknown");
+});
+
+test("a targeted sweep run changes only the rows it measured, in the results and in the view", () => {
+  const read = (relative) => readFileSync(path.join(appRoot, relative), "utf8");
+  const tools = JSON.parse(read(STATUS_INPUTS.catalog));
+  const sweep = JSON.parse(read(STATUS_INPUTS.sweep));
+  const keywords = parseKeywordsCsv(read(STATUS_INPUTS.keywords));
+  const touched = ["3g2-to-mp4", "webp-to-png"];
+  const newCommit = "f".repeat(40);
+
+  // What `tool-sweep --only 3g2-to-mp4,webp-to-png` at a new commit writes.
+  const newRows = touched.map((id) => {
+    const previous = sweep.results.find((row) => row.id === id);
+    const plan = { ...previous, fixtures: [path.join(appRoot, "benchmarks/fixtures", previous.fixture)] };
+    return sweepRow(plan, { status: "pass", durationMs: 1, formatCheck: "signature" }, { commit: newCommit, dirty: false });
+  });
+  const activeIds = tools.filter((entry) => entry.isActive).map((entry) => entry.id);
+  const after = { meta: sweep.meta, results: mergeRows(activeIds, sweep.results, newRows) };
+
+  const changedLines = (before, next, idOf) => {
+    const a = before.split("\n");
+    const b = next.split("\n");
+    assert.equal(a.length, b.length);
+    return a.flatMap((line, index) => (line === b[index] ? [] : [idOf(b[index])]));
+  };
+  const resultId = (line) => JSON.parse(line.trim().replace(/,$/, "")).id;
+  assert.deepEqual(changedLines(serializeResults(sweep), serializeResults(after), resultId), touched);
+
+  const view = (data) => renderStatusCsv(buildStatusRows({ tools, sweep: data, keywords }));
+  const csvId = (line) => line.split(",")[0];
+  assert.deepEqual(changedLines(view(sweep), view(after), csvId), touched);
+  assert.ok(view(after).includes("webp-to-png,live,convert,webp,png,client-only,browser-raster,pass,format check: signature,ffffffffffff,"));
 });
 
 test("each Tool and each keyword appears exactly once, in id order", () => {
