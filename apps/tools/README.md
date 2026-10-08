@@ -92,7 +92,8 @@ Workers merely because they work in local Node.js.
   files and pages an extractor in `lib/extractors` understands; its `yt-dlp`
   fallback needs a native binary.
 - `/api/video-convert`: native FFmpeg, tried before FFmpeg.wasm for MXF, RM and
-  RMVB output and for AMR to MP2, OGG or OGA (`shouldUseServerConversion`).
+  RMVB output, for AMR to MP2, OGG or OGA, and in browsers that can't run
+  FFmpeg.wasm (`shouldUseServerConversion`).
 - `/api/image-convert`: still exists, but no Tool has called it since #198.
 
 The image, video and PDF routes share the server-action cooldown contract in
