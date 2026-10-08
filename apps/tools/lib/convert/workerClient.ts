@@ -1,6 +1,6 @@
 import { detectCapabilities, requiresVideoConversion } from "../capabilities.ts";
 import { resolveCompressionTarget } from "../compression-utils.ts";
-import { isImageDocumentConversion } from "./image-document-targets.ts";
+import { isImageDocumentConversion, isImageTextConversion } from "./image-document-targets.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
@@ -88,6 +88,7 @@ const MIME_MAP: Record<string, string> = {
   ai: "application/pdf",
   pcd: "image/x-photo-cd",
   epub: "application/epub+zip",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   html: "text/html",
   txt: "text/plain",
 };
@@ -202,6 +203,9 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
   if (isImageDocumentConversion(fromExt, toExt)) {
     return convertImageToDocument(fromExt, toExt, args.buf);
   }
+  if (isImageTextConversion(fromExt, toExt)) {
+    return convertImageToText(fromExt, toExt, args);
+  }
   const op = resolveConversionOp(args.from, args.to);
   if (op === "video") {
     return convertVideoOnMainThread(args);
@@ -234,6 +238,24 @@ async function convertImageToDocument(from: string, to: string, buf: ArrayBuffer
       "convert_failed",
       error instanceof Error ? error.message : String(error),
       { from, to, engine: "image-documents" },
+    );
+  }
+}
+
+// JPG or PNG to TXT by OCR, or to a DOCX showing the image (image-text.ts).
+async function convertImageToText(from: string, to: string, args: ConvertArgs): Promise<ConversionResult> {
+  const engine = to === "txt" ? "tesseract" : "docx";
+  args.onProgress?.({ status: "processing", progress: 10 });
+  try {
+    const { imageToDocx, textFromImage } = await import("./image-text.ts");
+    const buffer = to === "txt" ? await textFromImage(args.buf, from) : await imageToDocx(args.buf, from);
+    args.onProgress?.({ status: "processing", progress: 100 });
+    return { kind: "single", buffer };
+  } catch (error) {
+    throw createTelemetryError(
+      "convert_failed",
+      error instanceof Error ? error.message : String(error),
+      { from, to, engine },
     );
   }
 }

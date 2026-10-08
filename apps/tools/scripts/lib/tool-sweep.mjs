@@ -10,7 +10,7 @@ import { resolveCompressionTarget } from "../../lib/compression-utils.ts";
 import { MAGICK_BROWSER_INPUTS } from "../../lib/convert/magickBrowser.ts";
 import { checkOutputFormat } from "../../lib/convert/output-format.ts";
 import { usesWebCodecs } from "../../lib/convert/webcodecs.ts";
-import { isImageDocumentConversion } from "../../lib/convert/image-document-targets.ts";
+import { isImageDocumentConversion, isImageTextConversion } from "../../lib/convert/image-document-targets.ts";
 
 export const STATUSES = ["pass", "wrong_format", "error", "timeout", "no_fixture", "skipped"];
 // Statuses that come from running the Tool. A resumed run skips Tools that
@@ -198,6 +198,7 @@ export function converterEngine({ operation, from, to }) {
   }
   if (source === "ai" || source === "pdf") return "pdfjs";
   if (isImageDocumentConversion(source, target)) return "image-documents";
+  if (isImageTextConversion(source, target)) return target === "txt" ? "tesseract" : "docx";
   if (MAGICK_BROWSER_INPUTS.has(source)) return "imagemagick-wasm";
   if (source === "heic" || source === "heif") return "heif-decoder";
   if (usesWebCodecs(source, target)) return "ffmpeg-wasm + webcodecs";
@@ -233,6 +234,8 @@ export const ENGINE_LOCATIONS = {
   javascript: "client-only",
   "jsquash-worker": "client-only",
   "image-documents": "client-only",
+  tesseract: "client-only",
+  docx: "client-only",
   svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",
@@ -246,6 +249,8 @@ const TEXT_MARKERS = {
   "sample-2.csv": "Gamma",
   "sample.json": "Alpha",
   "sample.html": "Nova",
+  "sample-text.png": "Tools",
+  "sample-text.jpg": "Tools",
 };
 const TEXT_DRIVERS = new Set(["table", "html-to-markdown", "json-to-csv", "csv-combiner"]);
 
@@ -282,7 +287,8 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
   }
   // A text output has no byte signature: without the fixture's data to look
   // for, a pass would prove nothing.
-  const markers = TEXT_DRIVERS.has(driver) ? files.map((file) => TEXT_MARKERS[path.basename(file)]) : [];
+  const textOutput = TEXT_DRIVERS.has(driver) || tool.to?.toLowerCase() === "txt";
+  const markers = textOutput ? files.map((file) => TEXT_MARKERS[path.basename(file)]) : [];
   if (markers.some((marker) => !marker)) {
     return { ...base, status: "no_fixture", reason: `no data marker for the ${tool.from} fixture in TEXT_MARKERS` };
   }

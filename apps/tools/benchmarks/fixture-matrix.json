@@ -694,6 +694,14 @@
     "character-counter": {
       "input": "text",
       "fixtureText": "Hello world.\n\nSecond line!"
+    },
+    "jpg-to-txt": {
+      "input": "file",
+      "fixture": "fixtures/sample-text.jpg"
+    },
+    "png-to-txt": {
+      "input": "file",
+      "fixture": "fixtures/sample-text.png"
     }
   }
 }

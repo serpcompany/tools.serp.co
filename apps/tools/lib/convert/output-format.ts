@@ -76,6 +76,9 @@ const SIGNATURES: Record<string, Signature> = {
   pam: isNetpbm("7"),
   svg: (_bytes, text) => /<svg[\s>]/i.test(text),
   pdf: startsWithText("%PDF"),
+  // Office Open XML: a ZIP whose entries include [Content_Types].xml.
+  docx: (bytes) =>
+    startsWith(0x50, 0x4b, 0x03, 0x04)(bytes, "") && ascii(bytes, 0, bytes.length).includes("[Content_Types].xml"),
   // Illustrator's PDF-compatible AI files are PDFs.
   ai: startsWithText("%PDF"),
   // Kodak Photo CD: the image pack header sits after 2048 bytes of padding.

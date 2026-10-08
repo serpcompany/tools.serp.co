@@ -44,3 +44,6 @@ tmp/
 logs/
 .wrangler/
 smoke-artifacts/
+
+# Vendored binaries that global *.gz ignores would otherwise drop.
+!apps/tools/public/vendor/**/*.gz
