@@ -362,10 +362,10 @@
     },
     {
       "format": "m4p",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.m4p",
-      "notes": "Sample m4a container with .m4p extension."
+      "notes": "sample.m4p is a copy of sample.m4a (unprotected AAC); a real M4P is FairPlay-protected."
     },
     {
       "format": "m4r",
@@ -432,10 +432,10 @@
     },
     {
       "format": "mpeg2",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.mpeg2",
-      "notes": "Auto-generated fixture."
+      "notes": "sample.mpeg2 is a copy of sample.mpeg (MPEG-2 video in an MPEG-1 system stream); needs a real MPEG-2 program stream."
     },
     {
       "format": "mpg",
@@ -453,10 +453,10 @@
     },
     {
       "format": "mts",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.mts",
-      "notes": "Auto-generated fixture."
+      "notes": "sample.mts is a copy of sample.ts (188-byte packets, not AVCHD's 192); needs a real MTS."
     },
     {
       "format": "mxf",
@@ -561,10 +561,10 @@
     },
     {
       "format": "rmvb",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.rmvb",
-      "notes": "Auto-generated fixture."
+      "notes": "sample.rmvb is a copy of sample.rm (RealVideo 2.0); needs a real RMVB."
     },
     {
       "format": "svg",

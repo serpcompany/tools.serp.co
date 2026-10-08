@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -11,6 +12,7 @@ import {
   countStatuses,
   ffmpegError,
   hasSignature,
+  loadFixtures,
   mergeRows,
   pageComponent,
   parseArgs,
@@ -21,7 +23,8 @@ import {
   serializeResults,
 } from "../scripts/lib/tool-sweep.mjs";
 
-const fixturesDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../benchmarks/fixtures");
+const benchmarksDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../benchmarks");
+const fixturesDir = path.join(benchmarksDir, "fixtures");
 const head = (name) => Array.from(readFileSync(path.join(fixturesDir, name)).subarray(0, 1024));
 const output = (name, extra = {}) => ({ name, size: 100, head: head(name), ...extra });
 
@@ -93,6 +96,31 @@ test("timeouts and harness errors keep their own status", () => {
     error: "no result after 60 s",
   });
   assert.equal(classifyRun({ outcome: "error", message: "harness: x" }, { to: "mp4" }).status, "error");
+});
+
+// Extensions for the same format. Any other two ready formats with the same
+// bytes mean one fixture is a stand-in, and its Tools are fed the wrong input.
+const FIXTURE_ALIASES = [
+  ["jpg", "jpeg", "jfif"],
+  ["tif", "tiff"],
+  ["aif", "aiff"],
+  ["mov", "qt"],
+  ["m4a", "m4b"],
+  ["heic", "heif"],
+  ["mpeg", "mpg"],
+];
+
+test("two ready formats share a fixture's bytes only if they're aliases", () => {
+  const aliasOf = new Map(FIXTURE_ALIASES.flatMap((group) => group.map((format) => [format, group[0]])));
+  const byBytes = new Map();
+  for (const [format, file] of loadFixtures(benchmarksDir).byFormat) {
+    const hash = createHash("sha256").update(readFileSync(file)).digest("hex");
+    byBytes.set(hash, [...(byBytes.get(hash) ?? []), format]);
+  }
+  const shared = [...byBytes.values()].filter(
+    (formats) => new Set(formats.map((format) => aliasOf.get(format) ?? format)).size > 1,
+  );
+  assert.deepEqual(shared, []);
 });
 
 test("an output format without a signature passes unchecked, unless text markers apply", () => {
