@@ -52,7 +52,7 @@ test("Opus output keeps libopus below the complexity that crashes on stereo", ()
 
 test("each command reads its input file first and ends with its output file", () => {
   const firstInput = (args) => args[args.indexOf("-i") + 1];
-  for (const [from, to] of [["mp4", "3gp"], ["mov", "mxf"], ["rm", "gif"], ["wav", "opus"], ["mkv", "hevc"]]) {
+  for (const [from, to] of [["mp4", "3gp"], ["mov", "mxf"], ["rm", "gif"], ["wav", "opus"], ["mkv", "webm"]]) {
     const { args, inputName, outputName } = buildConvertCommand(from, to);
     assert.equal(inputName, `input.${from}`);
     assert.equal(firstInput(args), inputName);

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   CODEC_UNSUPPORTED,
+  codecUnsupportedError,
   codecUnsupportedMessage,
   ffmpegStepArgs,
   planSteps,
@@ -64,5 +65,9 @@ test("the .av1 stream is copied with any audio; outputs are IVF and Annex B with
 test("a browser without the codec is told which one and where to go", () => {
   assert.equal(codecUnsupportedMessage("encode", "hevc"), "This browser can't encode HEVC. Try Chrome or Edge.");
   assert.equal(codecUnsupportedMessage("decode", "av1"), "This browser can't decode AV1. Try Chrome or Edge.");
-  assert.equal(CODEC_UNSUPPORTED, "codec_unsupported");
+  const error = codecUnsupportedError("encode", "av1", "mp4", "av1");
+  assert.equal(error.message, "This browser can't encode AV1. Try Chrome or Edge.");
+  // The converters record this code as a hand-off, not a failure.
+  assert.equal(error.telemetryCode, CODEC_UNSUPPORTED);
+  assert.deepEqual(error.telemetryMetadata, { from: "mp4", to: "av1", engine: "webcodecs", format: "av1" });
 });

@@ -4,7 +4,7 @@ import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
 import { checkOutputFormat } from "./output-format.ts";
-import { convertWithWebCodecs, usesWebCodecs } from "./webcodecs.ts";
+import { usesWebCodecs } from "./webcodecs.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
@@ -576,6 +576,7 @@ async function convertVideoOnMainThread(args: {
   quality?: number;
 }): Promise<ConversionResult> {
   if (usesWebCodecs(args.from, args.to)) {
+    const { convertWithWebCodecs } = await import("./webcodecs-convert.ts");
     const buffer = await convertWithWebCodecs(args.buf, args.from, args.to, (progress) =>
       args.onProgress?.({ status: "processing", progress }),
     );

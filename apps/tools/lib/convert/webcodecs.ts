@@ -13,14 +13,15 @@
 //   (what aomenc writes, and what our fixture is) and Annex B for .hevc.
 //   Neither holds audio.
 //
-// AV1 to HEVC does both. Mediabunny and FFmpeg load only when one of these
-// Tools runs. A browser without the codec gets a message, not a failure
-// (owner decision).
+// AV1 to HEVC does both. This module plans the steps; webcodecs-convert.ts
+// runs them, and it, Mediabunny and FFmpeg load only when one of these Tools
+// runs. A browser without the codec gets a message, not a failure (owner
+// decision).
 
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
-type BrowserCodec = "av1" | "hevc";
-type CodecAction = "decode" | "encode";
+export type BrowserCodec = "av1" | "hevc";
+export type CodecAction = "decode" | "encode";
 
 // The telemetry code for a browser that lacks the codec. The run is handed
 // off (to another browser), not failed.
@@ -41,7 +42,7 @@ export function codecUnsupportedMessage(action: CodecAction, codec: BrowserCodec
 
 type UnsupportedError = Error & { telemetryCode: string; telemetryMetadata: ToolRunMetadata };
 
-function unsupported(action: CodecAction, codec: BrowserCodec, from: string, to: string) {
+export function codecUnsupportedError(action: CodecAction, codec: BrowserCodec, from: string, to: string) {
   const error = new Error(codecUnsupportedMessage(action, codec)) as UnsupportedError;
   error.telemetryCode = CODEC_UNSUPPORTED;
   error.telemetryMetadata = { from, to, engine: "webcodecs", format: codec };
@@ -101,85 +102,4 @@ export function ffmpegStepArgs(
         "-bsf:v", `hevc_mp4toannexb,hevc_metadata=tick_rate=${frameRate}`, "-f", "hevc",
       ];
   }
-}
-
-export async function convertWithWebCodecs(
-  buffer: ArrayBuffer,
-  from: string,
-  to: string,
-  onProgress?: (percent: number) => void,
-): Promise<ArrayBuffer> {
-  const source = from.toLowerCase();
-  const target = to.toLowerCase();
-  const encodes: BrowserCodec | null = target === "av1" || target === "hevc" ? target : null;
-  const mb = await import("mediabunny");
-  const video = await import("./video.ts");
-  const sizes = { width: video.FAST_VIDEO_WIDTH, frameRate: video.FAST_VIDEO_FPS };
-
-  // Asked before FFmpeg loads, so an unsupported browser hears at once. The
-  // real size is checked again when each browser step starts.
-  const probe = { width: video.FAST_VIDEO_WIDTH, height: 240 };
-  if (source === "av1" && !(await mb.canDecodeVideo("av1"))) throw unsupported("decode", "av1", from, to);
-  if (encodes && !(await mb.canEncodeVideo(encodes, probe))) throw unsupported("encode", encodes, from, to);
-  const handOffCodec = source === "av1" ? await mb.getFirstEncodableVideoCodec(["vp8", "vp9"], probe) : null;
-  if (source === "av1" && !handOffCodec) throw unsupported("decode", "av1", from, to);
-
-  // A step the browser can't run names the codec the Tool is about.
-  const browserStep = async (data: ArrayBuffer, job: "hand-off" | "encode", progress: (ratio: number) => void) => {
-    const [action, codec]: [CodecAction, BrowserCodec] = job === "encode" ? ["encode", encodes!] : ["decode", "av1"];
-    const input = new mb.Input({ source: new mb.BufferSource(data), formats: [mb.MATROSKA, mb.WEBM] });
-    const output = new mb.Output({
-      format: job === "encode" ? new mb.MkvOutputFormat() : new mb.WebMOutputFormat(),
-      target: new mb.BufferTarget(),
-    });
-    try {
-      const conversion = await mb.Conversion.init({
-        input,
-        output,
-        // No resizing here: FFmpeg scales. A bitrate, not a quantizer:
-        // Chrome 143 caps the AV1 quantizer at 63 of Mediabunny's 255, which
-        // gave every frame its worst quality.
-        video:
-          job === "encode"
-            ? { codec: encodes!, quality: new mb.Quality({ quality: "high", preferBitrate: true }), forceTranscode: true }
-            : { codec: handOffCodec!, quality: new mb.Quality("very-high"), forceTranscode: true },
-        // Elementary streams hold no audio; a hand-off keeps any audio the
-        // .av1 file had.
-        audio: job === "encode" ? { discard: true } : {},
-        showWarnings: false,
-      });
-      if (!conversion.utilizedTracks.some((track) => track.isVideoTrack())) {
-        const dropped = conversion.discardedTracks.find((entry) => entry.track.isVideoTrack());
-        if (dropped?.reason === "undecodable_source_codec" || dropped?.reason === "no_encodable_target_codec") {
-          throw unsupported(action, codec, from, to);
-        }
-        throw new Error(`No video track to convert${dropped ? ` (${dropped.reason})` : ""}`);
-      }
-      conversion.onProgress = (ratio) => progress(ratio);
-      await conversion.execute();
-    } finally {
-      input.dispose();
-    }
-    if (!output.target.buffer) throw new Error("The browser's encoder wrote nothing");
-    return output.target.buffer;
-  };
-
-  // One progress bar, an equal share per step.
-  const steps = planSteps(from, to);
-  let data = buffer;
-  let name = `input.${source}`;
-  for (const [index, step] of steps.entries()) {
-    const progress = (ratio: number) =>
-      onProgress?.(Math.round(((index + Math.min(1, Math.max(0, ratio))) / steps.length) * 100));
-    if (step.run === "ffmpeg") {
-      data = await video.runFFmpeg({ name, data }, ffmpegStepArgs(step.args, sizes), step.output, progress);
-      name = step.output;
-    } else if (step.run === "browser") {
-      data = await browserStep(data, step.job, progress);
-      name = step.job === "encode" ? "encoded.mkv" : "handoff.webm";
-    } else {
-      data = await video.convertVideo(data, "webm", target, { onProgress: ({ ratio }) => progress(ratio) });
-    }
-  }
-  return data;
 }
