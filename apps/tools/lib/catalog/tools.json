@@ -10957,7 +10957,7 @@
     "route": "/csv-to-magic",
     "from": "csv",
     "to": "magic",
-    "isActive": true
+    "isActive": false
   },
   {
     "id": "csv-to-markdown",
@@ -73539,7 +73539,7 @@
     "route": "/jpg-to-dot",
     "from": "jpg",
     "to": "dot",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "jpg",
       "dot",
@@ -77490,7 +77490,7 @@
     "route": "/markdown-to-magic",
     "from": "markdown",
     "to": "magic",
-    "isActive": true
+    "isActive": false
   },
   {
     "id": "markdown-to-markdown",
@@ -92892,7 +92892,7 @@
     "route": "/png-to-dot",
     "from": "png",
     "to": "dot",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "png",
       "dot",
