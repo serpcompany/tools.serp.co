@@ -39,8 +39,9 @@ each saved file with `lib/convert/output-format.ts` and writes
 instead of Playwright's Chromium, whose codecs can differ (H.264, HEVC and AAC
 are proprietary); each run records its channel and browser version. Each row
 records the commit it was measured at, so `--only <ids>` re-measures some Tools
-without touching the others. That commit can be a PR branch's, absent from `staging` after a squash merge (the #224 rows
-record `ca5b9a5`); find it through the PR.
+without touching the others. That commit can be a PR branch's, absent from
+`staging` after a squash merge (the #224 rows record `ca5b9a5`); find it
+through the PR.
 
 After any sweep, run `pnpm -C apps/tools tool-status` and commit
 `benchmarks/tool-status.csv` and `benchmarks/tool-status-summary.md` with the

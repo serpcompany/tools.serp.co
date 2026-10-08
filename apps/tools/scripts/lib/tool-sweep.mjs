@@ -219,6 +219,7 @@ export function engineFor(tool, handler) {
 // out on purpose: a compressor with no engine should stop the view.
 export const ENGINE_LOCATIONS = {
   "ffmpeg-wasm": "client-only",
+  "ffmpeg-wasm + webcodecs": "client-only",
   "imagemagick-wasm": "client-only",
   "browser-raster": "client-only",
   pdfjs: "client-only",
