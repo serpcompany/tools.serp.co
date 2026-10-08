@@ -9,6 +9,8 @@ const tools = JSON.parse(
   ),
 );
 
+// compress-heic and compress-heif were retired (#147): no browser encoder
+// writes HEIC or HEIF.
 const requestedCompressors = [
   { id: "png-to-png", format: "png", route: "/compress-png" },
   { id: "compress-pdf", format: "pdf", route: "/compress-pdf" },
@@ -17,8 +19,6 @@ const requestedCompressors = [
   { id: "compress-wav", format: "wav", route: "/compress-wav" },
   { id: "compress-gif", format: "gif", route: "/compress-gif" },
   { id: "compress-svg", format: "svg", route: "/compress-svg" },
-  { id: "compress-heic", format: "heic", route: "/compress-heic" },
-  { id: "compress-heif", format: "heif", route: "/compress-heif" },
   { id: "compress-avif", format: "avif", route: "/compress-avif" },
   { id: "compress-tiff", format: "tiff", route: "/compress-tiff" },
   { id: "compress-bmp", format: "bmp", route: "/compress-bmp" },
