@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { unzipSync, strFromU8 } from "fflate";
 
-import { imageSize, imageToDocx, textFromImage } from "./image-text.ts";
+import { imageSize, imageToDocx, startOcrWorker, textFromImage } from "./image-text.ts";
 import { checkOutputFormat } from "./output-format.ts";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
@@ -25,7 +25,7 @@ test("image dimensions come from the PNG or JPEG header", () => {
 
 // A JPEG header with only what imageSize reads: optional fill bytes, an EXIF
 // APP1 segment with an Orientation tag, and a baseline start-of-frame.
-function jpegHeader({ width, height, orientation, fill = 0, littleEndian = false }) {
+function jpegHeader({ width, height, orientation, fill = 0, littleEndian = false, xmp = false, truncateApp1 = false }) {
   const bytes = [0xff, 0xd8];
   for (let i = 0; i < fill; i += 1) bytes.push(0xff);
   if (orientation) {
@@ -36,6 +36,14 @@ function jpegHeader({ width, height, orientation, fill = 0, littleEndian = false
       ...u16(1), ...u16(0x0112), ...u16(3), ...u32(1), ...u16(orientation), 0, 0, ...u32(0),
     ];
     const payload = [0x45, 0x78, 0x69, 0x66, 0, 0, ...tiff];
+    if (truncateApp1) {
+      bytes.push(0xff, 0xe1, 0x40, 0x00, ...payload.slice(0, 12));
+      return new Uint8Array(bytes).buffer;
+    }
+    bytes.push(0xff, 0xe1, (payload.length + 2) >> 8, (payload.length + 2) & 0xff, ...payload);
+  }
+  if (xmp) {
+    const payload = [...new TextEncoder().encode("http://ns.adobe.com/xap/1.0/\0<x:xmpmeta/>")];
     bytes.push(0xff, 0xe1, (payload.length + 2) >> 8, (payload.length + 2) & 0xff, ...payload);
   }
   bytes.push(0xff, 0xc0, 0, 11, 8, height >> 8, height & 0xff, width >> 8, width & 0xff, 1, 1, 0x11, 0);
@@ -54,6 +62,10 @@ test("JPEG sizing skips fill bytes and follows the EXIF orientation", () => {
       assert.deepEqual(imageSize(jpegHeader({ width: 400, height: 300, orientation, littleEndian }), "jpg"), { width: 300, height: 400 });
     }
   }
+  // An XMP APP1 after the EXIF one doesn't reset the orientation.
+  assert.deepEqual(imageSize(jpegHeader({ width: 400, height: 300, orientation: 6, xmp: true }), "jpg"), { width: 300, height: 400 });
+  // A cut-off EXIF segment is an unreadable image, not a RangeError.
+  assert.throws(() => imageSize(jpegHeader({ width: 400, height: 300, orientation: 6, truncateApp1: true }), "jpg"), /dimensions/);
 });
 
 // 1 inch is 914,400 EMU; a Letter page with 1-inch margins is 6.5 inches wide.
@@ -97,6 +109,42 @@ test("a tall image is scaled down to the 9-inch text height, keeping its shape",
   const [, cx, cy] = /<wp:extent cx="(\d+)" cy="(\d+)"/.exec(strFromU8(files["word/document.xml"]));
   assert.ok(Math.abs(Number(cy) - 9 * EMU_PER_INCH) < EMU_PER_INCH / 100, cy);
   assert.ok(Math.abs(Number(cx) / Number(cy) - 0.1) < 0.001, `${cx} x ${cy}`);
+});
+
+// A stand-in for the browser's Worker, recording terminate().
+class FakeWorker {
+  static made = [];
+  constructor() {
+    this.terminated = false;
+    FakeWorker.made.push(this);
+  }
+  terminate() {
+    this.terminated = true;
+  }
+}
+
+test("a Tesseract start that reports an error rejects and stops its worker", async () => {
+  const original = globalThis.Worker;
+  globalThis.Worker = FakeWorker;
+  try {
+    FakeWorker.made = [];
+    // tesseract.js 7 spawns its worker synchronously and, when the model
+    // fails to load, calls errorHandler but never settles createWorker.
+    const create = (options) => {
+      new globalThis.Worker("worker.min.js");
+      setTimeout(() => options.errorHandler(new Error("404 eng.traineddata.gz")), 5);
+      return new Promise(() => {});
+    };
+    await assert.rejects(startOcrWorker(create, {}), /couldn't start/);
+    assert.equal(FakeWorker.made.length, 1);
+    assert.equal(FakeWorker.made[0].terminated, true);
+    assert.equal(globalThis.Worker, FakeWorker, "the Worker constructor is restored");
+
+    const ready = { recognize: async () => ({ data: { text: "ok" } }) };
+    assert.equal(await startOcrWorker(async () => ready, {}), ready);
+  } finally {
+    globalThis.Worker = original;
+  }
 });
 
 test("OCR text is trimmed, with Unix line endings and no runs of blank lines", async () => {
