@@ -199,6 +199,27 @@ export function engineFor(tool, handler) {
   return ENGINES[handler] ?? null;
 }
 
+// Where each engine label above runs a Tool's core operation, inferred from
+// the code the label names (lib/convert/workerClient.ts and the routes it
+// calls), not observed. The Tool status view (scripts/lib/tool-status.mjs)
+// throws on a label that isn't here, so a new engine needs a line. Every
+// label is listed: a "server-" prefix decides nothing. "unsupported" is left
+// out on purpose: a compressor with no engine should stop the view.
+export const ENGINE_LOCATIONS = {
+  "ffmpeg-wasm": "client-only",
+  "imagemagick-wasm": "client-only",
+  "browser-raster": "client-only",
+  pdfjs: "client-only",
+  "heif-decoder": "client-only",
+  "table-convert": "client-only",
+  "html-to-markdown-wasm": "client-only",
+  javascript: "client-only",
+  "jsquash-worker": "client-only",
+  "server-image-compress": "server-executed",
+  "server-pdf-compress": "server-executed",
+  "server-video, then ffmpeg-wasm": "server-first-client-fallback",
+};
+
 // Strings from the text fixtures that a converted copy must still contain,
 // so a text output (no byte signature) proves it holds the input's data.
 const TEXT_MARKERS = {
@@ -390,6 +411,31 @@ export function selectRuns(plans, previousRows, { resume, retry = new Set(), lim
     );
   });
   return limit ? selected.slice(0, limit) : selected;
+}
+
+// One results row: what the plan says about the Tool, what the run observed,
+// and the commit and tree state (dirty: uncommitted changes outside the
+// results file; null outside a git checkout) it was measured at.
+export function sweepRow(plan, result, { commit, dirty }) {
+  return {
+    id: plan.id,
+    route: plan.route,
+    from: plan.from,
+    to: plan.to,
+    handler: plan.handler,
+    engine: plan.engine,
+    status: result.status,
+    durationMs: result.durationMs,
+    error: result.error ?? undefined,
+    detail: result.detail,
+    formatCheck: result.formatCheck,
+    fixture: plan.fixtures?.map((file) => path.basename(file)).join(","),
+    output: result.output,
+    blocked: result.blocked?.length ? result.blocked : undefined,
+    reason: plan.reason,
+    commit,
+    dirty,
+  };
 }
 
 // Rows from this run replace earlier rows for the same Tool; rows for Tools

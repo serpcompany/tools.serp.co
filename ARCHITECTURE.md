@@ -7,16 +7,16 @@ guidance.
 
 ## Ownership map
 
-| Area                     | Owner                                  | Contract                                                                                                                                          |
-| ------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Product application      | [`apps/tools`](./apps/tools/README.md) | Next.js routes, components, the Tool registry, Tool execution, API handlers, metadata, sitemaps, and Cloudflare assembly for `tools.serp.co`.     |
-| Shared application core  | `packages/app-core`                    | Shared shell components and related catalog data.                                                                                                 |
-| Tool telemetry           | `packages/tool-telemetry`              | Browser/server event contracts plus D1 persistence and summaries.                                                                                 |
-| UI primitives            | `packages/ui`                          | Reusable presentation primitives, styles, and small UI utilities; no Tool or application policy.                                                  |
-| Lint configuration       | [`packages/eslint-config`](./packages/eslint-config/README.md)               | Shared ESLint configuration only.                                                                                                                 |
-| TypeScript configuration | [`packages/typescript-config`](./packages/typescript-config/README.md)           | Shared TypeScript configuration only.                                                                                                             |
-| Repository harness       | root `scripts` and root `package.json` | Repository-wide validation, generation, audit, and orchestration commands. Command roles are made explicit as the harness modernization proceeds. |
-| Durable documentation    | root maps, `docs` and `.archive`       | Current guidance and accepted decisions in `docs`, mapped by area from `AGENTS.md`; historical evidence in `.archive`, classified as a whole.         |
+| Area                     | Owner                                                                  | Contract                                                                                                                                          |
+| ------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Product application      | [`apps/tools`](./apps/tools/README.md)                                 | Next.js routes, components, the Tool registry, Tool execution, API handlers, metadata, sitemaps, and Cloudflare assembly for `tools.serp.co`.     |
+| Shared application core  | `packages/app-core`                                                    | Shared shell components and related catalog data.                                                                                                 |
+| Tool telemetry           | `packages/tool-telemetry`                                              | Browser/server event contracts plus D1 persistence and summaries.                                                                                 |
+| UI primitives            | `packages/ui`                                                          | Reusable presentation primitives, styles, and small UI utilities; no Tool or application policy.                                                  |
+| Lint configuration       | [`packages/eslint-config`](./packages/eslint-config/README.md)         | Shared ESLint configuration only.                                                                                                                 |
+| TypeScript configuration | [`packages/typescript-config`](./packages/typescript-config/README.md) | Shared TypeScript configuration only.                                                                                                             |
+| Repository harness       | root `scripts` and root `package.json`                                 | Repository-wide validation, generation, audit, and orchestration commands. Command roles are made explicit as the harness modernization proceeds. |
+| Durable documentation    | root maps, `docs` and `.archive`                                       | Current guidance and accepted decisions in `docs`, mapped by area from `AGENTS.md`; historical evidence in `.archive`, classified as a whole.     |
 
 `apps/tools` is the only deployable application. A package owns reusable code
 and data; it does not own application routes or deployment configuration.
@@ -39,23 +39,32 @@ real reusable contract justifies moving it into a package.
 
 ## Canonical sources of truth
 
-| Concern                                        | Canonical source                                                               | Boundary                                                                                                                                  |
-| ---------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Shipped Tool catalog intent                    | `apps/tools/lib/catalog/tools.json`                                            | Owns registry id, route, operation, active/inactive intent, formats, and catalog content. It does not prove correctness or health.        |
-| Executable Tool behavior                       | Dispatch, workers, components, and API routes under `apps/tools`               | Code owns what executes. Registry flags and dependency names are not sufficient provenance by themselves.                                 |
-| Related applications and network brands        | JSON data under `packages/app-core/src/data`                                   | These are separate catalogs and must not be inferred from Tool names or routes.                                                           |
-| Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                        | Imports show actual consumption; planner fields do not override manifests or code.                                                        |
-| Worker configuration                           | `apps/tools/wrangler.jsonc`                                                    | Only Wrangler config. Top level is local-only; `env.staging` and `env.production` own Worker names, routes, bindings and resource ids.   |
-| Cloudflare build behavior                      | `apps/tools/open-next.config.ts` and `apps/tools/scripts/build-cloudflare.mjs` | Owns the OpenNext artifact and incremental-cache integration.                                                                             |
-| D1 schema                                      | Drizzle schema in `packages/tool-telemetry/src/schema.ts`                      | `db:generate` writes ordered SQL to `apps/tools/migrations`; a test fails when schema and migrations drift.                               |
-| Runtime observations                           | D1 `tool_runs` and derived `tool_status`                                       | Time-bound evidence for instrumented Tool ids, not catalog or work state.                                                                 |
-| Planning evidence                              | `packages/app-core/src/data/tools-planner.csv`                                 | Advisory candidate rows, read and appended to by the downloader lander sync and read by two lander tests. Not catalog intent, capability, or health; join only by registry Tool id. |
-| Active work                                    | GitHub Issues for this repository                                              | Issues, dependencies, labels, and assignees own readiness, blockers, and ownership. Repository plans are not a parallel tracker.          |
-| Documentation map                              | `AGENTS.md`                                                                    | Maps each area to the doc that owns it; `docs/README.md` says what belongs in `docs/`. `.archive/` is historical evidence as a whole.     |
+| Concern                                        | Canonical source                                                               | Boundary                                                                                                                               |
+| ---------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Shipped Tool catalog intent                    | `apps/tools/lib/catalog/tools.json`                                            | Owns registry id, route, operation, active/inactive intent, formats, and catalog content. It does not prove correctness or health.     |
+| Executable Tool behavior                       | Dispatch, workers, components, and API routes under `apps/tools`               | Code owns what executes. Registry flags and dependency names are not sufficient provenance by themselves.                              |
+| Related applications and network brands        | JSON data under `packages/app-core/src/data`                                   | These are separate catalogs and must not be inferred from Tool names or routes.                                                        |
+| Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                        | Imports show actual consumption; planning data does not override manifests or code.                                                    |
+| Worker configuration                           | `apps/tools/wrangler.jsonc`                                                    | Only Wrangler config. Top level is local-only; `env.staging` and `env.production` own Worker names, routes, bindings and resource ids. |
+| Cloudflare build behavior                      | `apps/tools/open-next.config.ts` and `apps/tools/scripts/build-cloudflare.mjs` | Owns the OpenNext artifact and incremental-cache integration.                                                                          |
+| D1 schema                                      | Drizzle schema in `packages/tool-telemetry/src/schema.ts`                      | `db:generate` writes ordered SQL to `apps/tools/migrations`; a test fails when schema and migrations drift.                            |
+| Verification evidence                          | `apps/tools/benchmarks/tool-sweep-results.json` and `fixture-matrix.json`      | Sweep status and measured-at commit per active Tool (`pnpm -C apps/tools tool-sweep`); fixtures per format. A fixture proves nothing.  |
+| Runtime observations                           | D1 `tool_runs` and derived `tool_status`                                       | Time-bound evidence for instrumented Tool ids, not catalog or work state.                                                              |
+| Keyword demand                                 | `apps/tools/data/keywords.csv`                                                 | Search demand per keyword from the dated exports in `apps/tools/data/sources`, plus the old planner's ideas. Planning evidence only.   |
+| Tool status view                               | `apps/tools/benchmarks/tool-status.csv` (generated)                            | Joins the facts above by Tool id; processing location is inferred from the sweep's engine label, not observed. Never hand-edited.      |
+| Active work                                    | GitHub Issues for this repository                                              | Issues, dependencies, labels, and assignees own readiness, blockers, and ownership. Repository plans are not a parallel tracker.       |
+| Documentation map                              | `AGENTS.md`                                                                    | Maps each area to the doc that owns it; `docs/README.md` says what belongs in `docs/`. `.archive/` is historical evidence as a whole.  |
 
 Registry Tool id is the join key across catalog intent, fixtures, verification,
-runtime observations, planning evidence, and GitHub work. Names, routes, and
-planner rows are not substitute join keys.
+runtime observations, keyword demand, and GitHub work. Names and routes are not
+substitute join keys. A keyword joins the Tool whose id is its words joined by
+hyphens; a live Tool whose id differs only by a format alias (`docx-to-jpeg`
+for "word to jpg") counts as alias coverage, never as an exact page.
+
+After a sweep, a catalog change or a keyword import, run
+`pnpm -C apps/tools tool-status` and commit `tool-status.csv` and
+`tool-status-summary.md`; `pnpm test` fails while either is stale. On a merge
+conflict in either file, regenerate it rather than resolving it by hand.
 
 ## Cloudflare runtime and data boundaries
 

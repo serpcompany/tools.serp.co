@@ -79,5 +79,9 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
    introduced.
 4. Verify routes, category membership, metadata, sitemap membership, action
    completion, and output semantics through the highest stable interface.
-5. Run the deterministic repository checks. Run the scoped network link check,
+5. Run `pnpm -C apps/tools tool-status` and commit the regenerated
+   `benchmarks/tool-status.csv` and `tool-status-summary.md`. A new Tool shows
+   `not swept` until the [Tool sweep](runbooks/tool-verification.md#tool-sweep)
+   measures it; the sweep then records its status and processing location.
+6. Run the deterministic repository checks. Run the scoped network link check,
    `pnpm check:links`, as well when downloader outbound links changed.
