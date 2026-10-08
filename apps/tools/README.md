@@ -51,19 +51,51 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
 
 ## Execution paths
 
-Browser conversion and compression use the worker client and workers under
-`apps/tools/workers`. Server-required conversion paths are explicit API routes
-for image conversion, image compression, video conversion, PDF compression,
-and public-media fetching. Native FFmpeg, ImageMagick, Ghostscript, `yt-dlp`,
-and similar binaries are not assumed to work in Cloudflare Workers merely
-because they work in local Node.js.
+A Tool's core operation runs in the visitor's browser unless a server route
+below covers it. `lib/convert/workerClient.ts` dispatches conversion
+(`convertWithWorker`) and compression (`compressFile`). Conversion picks an
+engine by input format:
 
-Compression keeps the original bytes when the result would be larger. Browser
-image compression uses JSquash codecs; server image compression uses the
-route-specific Sharp, gifsicle, and SVGO paths; media compression uses FFmpeg;
-PDF compression uses Ghostscript and qpdf.
+- **Audio and video:** FFmpeg.wasm (`lib/convert/video.ts`) in its own worker.
+  It is single-threaded (`NEXT_PUBLIC_FFMPEG_SINGLE_THREAD`) because the worker
+  scripts don't send the COEP headers the multi-threaded build needs. Its 32 MB
+  wasm is too big for Workers Static Assets, so it loads from
+  `NEXT_PUBLIC_ASSETS_BASE_URL`.
+- **Camera RAW, PSD, TGA, DDS, TIFF and XCF:** ImageMagick WASM
+  (`lib/convert/magickBrowser.ts`) on the main thread. **HEIC and HEIF:**
+  libheif. **PDF and AI:** pdf.js, one file per page.
+- **Other images:** `workers/convert.worker.js` decodes with the browser and
+  encodes with a canvas, retrying on the main thread if the worker fails.
+  ImageMagick writes the formats a canvas can't, and
+  `lib/convert/texture-formats.ts` reads and writes ICNS, KTX and KTX2.
 
-Server-required conversion APIs share the server-action cooldown contract in
+Before a converted file is saved, `convertWithWorker` compares its leading bytes
+with the promised format (`lib/convert/output-format.ts`). A mismatch fails the
+run as `wrong_output_format` and saves nothing. Formats without a reliable
+signature, such as TGA, aren't checked, and neither is compression output.
+
+Compression keeps the original bytes when the result would be larger. PNG, JPEG
+and WebP use JSquash codecs in `workers/compress.worker.js`; audio and video use
+FFmpeg.wasm. Transcription extracts audio with FFmpeg.wasm and runs Whisper
+(transformers.js, loaded from jsDelivr) in `workers/transcribe.worker.js`.
+
+Server routes run on the Node.js runtime. Native FFmpeg, Ghostscript, Sharp,
+gifsicle, `yt-dlp` and similar binaries are not assumed to work in Cloudflare
+Workers merely because they work in local Node.js.
+
+- `/api/image-compress`: GIF (gifsicle), SVG (SVGO), and HEIC, HEIF, AVIF and
+  TIFF (Sharp) compression, which have no browser path yet. BMP comes back
+  unchanged.
+- `/api/pdf-compress`: PDF compression with Ghostscript.
+- `/api/media-fetch`: pasted links for downloaders and transcription, since
+  most media hosts don't allow cross-origin reads from a page. It streams direct
+  files and pages an extractor in `lib/extractors` understands; its `yt-dlp`
+  fallback needs a native binary.
+- `/api/video-convert`: native FFmpeg, tried before FFmpeg.wasm for MXF, RM and
+  RMVB output and for AMR to MP2, OGG or OGA (`shouldUseServerConversion`).
+- `/api/image-convert`: still exists, but no Tool has called it since #198.
+
+The image, video and PDF routes share the server-action cooldown contract in
 `apps/tools/lib/server-action-contract.js`. Clients use
 `createServerActionRequestHeaders` so the persistent client id accompanies the
 request. Downloader requests use their separate shared contract in
