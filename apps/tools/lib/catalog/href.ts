@@ -6,3 +6,8 @@ import { canonicalPath } from "../trailing-slash.ts";
 export function toolHref(tool: { route: string }): string {
   return canonicalPath(tool.route);
 }
+
+// An operation's category page.
+export function categoryHref(operation: string): string {
+  return `/category/${operation}/`;
+}

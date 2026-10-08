@@ -1,4 +1,5 @@
-import { getCategoryPagePaths } from "./tool-directory.ts";
+import { categoryHref } from "./catalog/href.ts";
+import { operationsUsedBy } from "./catalog/operations.ts";
 
 // The sitemap tree follows the serp sitemap standard
 // (serpcompany/serp docs/engineering/websites/features/xml-sitemaps.md):
@@ -62,7 +63,7 @@ export function getToolPaths(tools: readonly SitemapTool[]) {
 }
 
 export function getCategoryPaths(tools: readonly SitemapTool[]) {
-  return getCategoryPagePaths(tools).map(normalizePath);
+  return operationsUsedBy(tools).map(categoryHref).map(normalizePath);
 }
 
 function getGroupPaths(tools: readonly SitemapTool[]): Record<SitemapGroup, string[]> {

@@ -22,9 +22,12 @@ categories. Category routes keep dynamic parameters enabled for OpenNext
 compatibility, validate the operation, and return `notFound()` for invalid or
 empty categories.
 
-Active Tools drive public discovery, metadata, and sitemap projections. Keep
-directory payloads plain-data safe when passing from Server Components to
-client components.
+Active Tools drive public discovery, metadata, and sitemap projections. The
+homepage grid, `/categories/`, the category pages and the link hub read their
+lists from `lib/catalog/directory.ts` in Server Components, which pass client
+components plain data as props. A client module, or anything it imports, must
+not import the catalog: Next.js would ship the 4 MB registry to the browser.
+`lib/catalog/client-boundary.test.mjs` fails if one does.
 
 ## Sitemaps
 

@@ -2,12 +2,12 @@ import Link from "next/link";
 
 import { ToolCard } from "@/components/ToolCard";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import type { ToolDirectoryCategory, ToolDirectoryEntry } from "@/lib/tool-directory";
+import type { ToolDirectoryCategory, ToolDirectoryEntry } from "@/lib/catalog/directory";
 
 type CategoryPageTemplateProps = {
   activeCategory: ToolDirectoryCategory;
-  categories: ToolDirectoryCategory[];
-  tools: ToolDirectoryEntry[];
+  categories: readonly ToolDirectoryCategory[];
+  tools: readonly ToolDirectoryEntry[];
 };
 
 export default function CategoryPageTemplate({

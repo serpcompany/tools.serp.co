@@ -1,17 +1,10 @@
 import { notFound } from "next/navigation";
 
 import CategoryPageTemplate from "@/components/CategoryPageTemplate";
-import { activeTools, availableOperations } from "@/lib/catalog/catalog";
+import { availableOperations } from "@/lib/catalog/catalog";
+import { directoryCategories, directoryEntriesIn } from "@/lib/catalog/directory";
 import { isToolOperation } from "@/lib/catalog/operations";
 import { buildCategoryMetadata } from "@/lib/metadata";
-import {
-  buildToolDirectoryEntries,
-  getToolDirectoryCategories,
-  getToolsForDirectoryCategory,
-} from "@/lib/tool-directory";
-
-const tools = buildToolDirectoryEntries(activeTools());
-const categories = getToolDirectoryCategories(tools);
 
 type PageProps = {
   params: Promise<{ categoryName: string }>;
@@ -32,13 +25,10 @@ export default async function Page({ params }: PageProps) {
     return notFound();
   }
 
+  // Only operations with at least one active Tool have a category.
+  const categories = directoryCategories();
   const activeCategory = categories.find((category) => category.id === categoryName);
   if (!activeCategory) {
-    return notFound();
-  }
-
-  const categoryTools = getToolsForDirectoryCategory(tools, categoryName);
-  if (categoryTools.length === 0) {
     return notFound();
   }
 
@@ -46,7 +36,7 @@ export default async function Page({ params }: PageProps) {
     <CategoryPageTemplate
       activeCategory={activeCategory}
       categories={categories}
-      tools={categoryTools}
+      tools={directoryEntriesIn(categoryName)}
     />
   );
 }
