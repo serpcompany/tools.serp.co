@@ -8,6 +8,7 @@ import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
 import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetizationPanel";
 import { detectCapabilities, type Capabilities } from "@/lib/capabilities";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
+import { CODEC_UNSUPPORTED } from "@/lib/convert/webcodecs";
 import { compressFile, convertWithWorker, getOutputMimeType } from "@/lib/convert/workerClient";
 import { resolveCompressionTarget } from "@/lib/compression-utils";
 import type { OperationType } from "@/types";
@@ -193,12 +194,18 @@ export default function LanderHeroTwoColumn({
       } catch (err: unknown) {
         const failure = getTelemetryFailure(err, "convert_failed");
         const message = failure.message || "Convert failed";
-        run.finishFailure({ errorCode: failure.errorCode, metadata: failure.metadata });
-        console.error(`Conversion failed for ${file.name}:`, err);
+        // A browser without the codec is sent to one that has it, not failed.
+        const unsupported = failure.errorCode === CODEC_UNSUPPORTED;
+        if (unsupported) {
+          run.finishHandoff({ reason: failure.errorCode, metadata: failure.metadata });
+        } else {
+          run.finishFailure({ errorCode: failure.errorCode, metadata: failure.metadata });
+          console.error(`Conversion failed for ${file.name}:`, err);
+        }
         setCurrentFile({
           name: file.name,
           progress: 0,
-          status: "error",
+          status: unsupported ? "unsupported" : "error",
           message,
         });
       }

@@ -1,7 +1,8 @@
 import { DOWNLOADER_RATE_LIMIT_WINDOW_MS } from "./downloader-contract.js";
 
 // The visible state of a downloader attempt (ToolProgressFile["status"]).
-export type DownloaderAttemptStatus = "loading" | "processing" | "completed" | "error";
+// Downloaders never set "unsupported", which starts no countdown.
+export type DownloaderAttemptStatus = "loading" | "processing" | "completed" | "error" | "unsupported";
 
 type DownloaderCooldownOptions = {
   now: number;

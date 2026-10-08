@@ -31,6 +31,13 @@ const isTiff: Signature = (bytes) => ["II*\0", "MM\0*"].includes(ascii(bytes, 0,
 const isMatroska = startsWith(0x1a, 0x45, 0xdf, 0xa3);
 const isOgg = startsWithText("OggS");
 const isIsoMedia = isoBrand();
+// H.265 Annex B: a start code, then a parameter set, delimiter or SEI NAL unit.
+const HEVC_FIRST_NAL_TYPES = new Set([32, 33, 34, 35, 39]); // VPS, SPS, PPS, AUD, prefix SEI
+const isHevcAnnexB: Signature = (bytes) => {
+  const start = startsWith(0, 0, 1)(bytes, "") ? 3 : startsWith(0, 0, 0, 1)(bytes, "") ? 4 : 0;
+  const header = bytes[start] ?? 0x80;
+  return start > 0 && (header & 0x80) === 0 && HEVC_FIRST_NAL_TYPES.has(header >> 1);
+};
 const isNetpbm = (...kinds: string[]): Signature => (bytes) =>
   bytes[0] === 0x50 && kinds.includes(String.fromCharCode(bytes[1] ?? 0));
 
@@ -90,6 +97,9 @@ const SIGNATURES: Record<string, Signature> = {
   "3gp": isIsoMedia,
   "3g2": isIsoMedia,
   flv: startsWithText("FLV"),
+  // AV1 in IVF, the container aomenc writes; .hevc is a raw H.265 stream.
+  av1: (bytes) => ascii(bytes, 0, 4) === "DKIF" && ascii(bytes, 8, 12) === "AV01",
+  hevc: isHevcAnnexB,
 };
 
 // Formats to name in telemetry when the output matches none of the expected one.

@@ -2,12 +2,15 @@
 
 import { Progress } from "@serp-tools/ui/components/progress";
 import { Card } from "@serp-tools/ui/components/card";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, CheckCircle, Info, XCircle } from "lucide-react";
+
+// "unsupported": this browser can't run the Tool; the message says which one can.
+export type ProgressStatus = 'loading' | 'processing' | 'completed' | 'error' | 'unsupported';
 
 interface VideoProgressProps {
   fileName: string;
   progress: number;
-  status: 'loading' | 'processing' | 'completed' | 'error';
+  status: ProgressStatus;
   message?: string;
   completedLabel?: string;
 }
@@ -29,6 +32,8 @@ export function VideoProgress({
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'error':
         return <XCircle className="h-4 w-4 text-red-500" />;
+      case 'unsupported':
+        return <Info className="h-4 w-4 text-amber-500" />;
     }
   };
 
@@ -42,6 +47,8 @@ export function VideoProgress({
         return completedLabel || 'Conversion complete!';
       case 'error':
         return message || 'Conversion failed';
+      case 'unsupported':
+        return message;
     }
   };
 
@@ -82,7 +89,7 @@ interface MultiFileProgressProps {
     id: string;
     name: string;
     progress: number;
-    status: 'loading' | 'processing' | 'completed' | 'error';
+    status: ProgressStatus;
     message?: string;
   }>;
 }

@@ -15,6 +15,7 @@ const publicAssetBaseUrl = process.env.NEXT_PUBLIC_ASSETS_BASE_URL?.replace(/\/+
 function resolvePublicAssetPath(path: `/${string}`) {
   return publicAssetBaseUrl ? `${publicAssetBaseUrl}${path}` : path;
 }
+export { FAST_VIDEO_FPS, FAST_VIDEO_WIDTH } from "./ffmpeg-args";
 const AUDIO_FORMAT_SET = new Set(AUDIO_FORMATS);
 const VIDEO_FORMAT_SET = new Set(VIDEO_FORMATS);
 
@@ -150,6 +151,38 @@ async function loadFFmpeg(): Promise<FFmpeg> {
   }
 
   return ffmpeg;
+}
+
+// Runs one FFmpeg command on one file and returns the file it writes. `args`
+// go between the input and the output name.
+export async function runFFmpeg(
+  input: { name: string; data: ArrayBuffer },
+  args: string[],
+  outputName: string,
+  onProgress?: (ratio: number) => void,
+): Promise<ArrayBuffer> {
+  const ff = await loadFFmpeg();
+  const progressHandler = onProgress
+    ? ({ progress }: { progress: number }) => onProgress(Math.min(1, Math.max(0, progress || 0)))
+    : null;
+  if (progressHandler) ff.on("progress", progressHandler);
+  let data: Uint8Array | string;
+  try {
+    await ff.writeFile(input.name, new Uint8Array(input.data));
+    const exitCode = await ff.exec(["-y", "-nostdin", "-i", input.name, ...args, outputName]);
+    if (exitCode !== 0) {
+      throw new Error(`FFmpeg failed with exit code ${exitCode}`);
+    }
+    data = await ff.readFile(outputName);
+  } finally {
+    if (progressHandler) ff.off("progress", progressHandler);
+    await ff.deleteFile(input.name).catch(() => {});
+    await ff.deleteFile(outputName).catch(() => {});
+  }
+  if (!(data instanceof Uint8Array)) {
+    throw new Error("Unexpected output format from FFmpeg");
+  }
+  return normalizeBlobPart(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
 }
 
 export async function convertVideo(

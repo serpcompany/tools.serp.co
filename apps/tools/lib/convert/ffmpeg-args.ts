@@ -3,7 +3,10 @@
 import { AUDIO_FORMATS } from "../capabilities.ts";
 import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils.ts";
 
-const FAST_VIDEO_FILTER = "fps=12,scale=320:-2:flags=fast_bilinear";
+// Video outputs are 320 px wide at 12 fps, for speed in single-threaded wasm.
+export const FAST_VIDEO_WIDTH = 320;
+export const FAST_VIDEO_FPS = 12;
+const FAST_VIDEO_FILTER = `fps=${FAST_VIDEO_FPS},scale=${FAST_VIDEO_WIDTH}:-2:flags=fast_bilinear`;
 const FAST_GIF_FILTER = "fps=10,scale=320:-1:flags=fast_bilinear";
 // H.263 encodes only its five standard frame sizes. 352x288 (CIF) is the one
 // closest to 320x240: fit the picture inside it and pad the rest. Squaring the

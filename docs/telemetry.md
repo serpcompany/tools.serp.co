@@ -22,7 +22,9 @@ ending event (`packages/tool-telemetry/src/client.ts`):
 - `tool_run_succeeded` or `tool_run_failed`;
 - `tool_run_handed_off` when the tool sends the visitor elsewhere instead of
   attempting the job, for example a downloader that only shows the browser
-  extension prompt. It isn't a failure;
+  extension prompt, or an AV1 or HEVC converter in a browser without that
+  codec, which suggests Chrome or Edge (`codec_unsupported`). It isn't a
+  failure;
 - `tool_run_abandoned` when the page closes or navigates away first.
 
 Only succeeded and failed runs count toward a tool's failure rate. Each event

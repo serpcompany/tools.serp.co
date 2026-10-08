@@ -51,7 +51,9 @@ export function ToolHeroLayout({
   const progressClasses = progressClassName ?? "mt-6 max-w-2xl mx-auto";
   const showResultPanel =
     Boolean(resultPanel) &&
-    (currentFile?.status === "completed" || currentFile?.status === "error");
+    (currentFile?.status === "completed" ||
+      currentFile?.status === "error" ||
+      currentFile?.status === "unsupported");
   const content = (
     <div className={contentClassName}>
       {hero}
