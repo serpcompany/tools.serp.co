@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import CategoryPageTemplate from "@/components/CategoryPageTemplate";
 import { availableOperations } from "@/lib/catalog/catalog";
-import { directoryCategories, directoryEntriesIn } from "@/lib/catalog/directory";
+import { directoryCategories, toolCardsIn } from "@/lib/catalog/directory";
 import { isToolOperation } from "@/lib/catalog/operations";
 import { buildCategoryMetadata } from "@/lib/metadata";
 
@@ -36,7 +36,7 @@ export default async function Page({ params }: PageProps) {
     <CategoryPageTemplate
       activeCategory={activeCategory}
       categories={categories}
-      tools={directoryEntriesIn(categoryName)}
+      tools={toolCardsIn(categoryName)}
     />
   );
 }

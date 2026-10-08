@@ -1,6 +1,6 @@
 import { HomeToolDirectory } from "@/components/HomeToolDirectory";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { directoryCategories, directoryEntries } from "@/lib/catalog/directory";
+import { directoryCategories, directoryGrid } from "@/lib/catalog/directory";
 
 // The homepage canonical and og:url are the bare origin, with no trailing
 // slash (serp url-trailing-slash standard). They're rendered here, not via
@@ -11,7 +11,7 @@ const siteOrigin = (siteUrl.startsWith("http") ? siteUrl : `https://${siteUrl}`)
 // A Server Component: it reads the directory from the catalog and hands the
 // search grid plain data, so the registry never ships to the browser.
 export default function HomePage() {
-  const tools = directoryEntries();
+  const tools = directoryGrid();
   const categories = [
     { id: "all", name: "Filter", count: tools.length },
     ...directoryCategories().map((category) => ({

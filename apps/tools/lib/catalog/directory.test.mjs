@@ -4,46 +4,85 @@ import { readFileSync } from "node:fs";
 
 import {
   directoryCategories,
-  directoryEntries,
-  directoryEntriesIn,
+  directoryGrid,
+  toolCardsIn,
   toolLinkCategories,
 } from "./directory.ts";
-import { categoryHref } from "./href.ts";
+import { categoryHref, toolHref } from "./href.ts";
+import { DEFAULT_TOOL_ICON, TOOL_ICON_NAMES, toolIconName } from "./icons.ts";
 import { CATEGORY_CONTENT, OPERATION_LABELS, OPERATIONS } from "./operations.ts";
 
 const registry = JSON.parse(readFileSync(new URL("./tools.json", import.meta.url), "utf8"));
 const active = registry.filter((tool) => tool.isActive);
+const activeIn = (operation) => active.filter((tool) => tool.operation === operation);
 
-test("the directory lists every active Tool once, in registry order, built once", () => {
-  assert.deepEqual(
-    directoryEntries().map((entry) => entry.id),
-    active.map((tool) => tool.id),
-  );
-  assert.equal(directoryEntries(), directoryEntries());
+// What a ToolCard gets for a Tool: these keys, in this order, and nothing else.
+function expectedCard(tool) {
+  const icon = toolIconName(tool.id);
+  return {
+    href: toolHref(tool),
+    name: tool.name,
+    description: tool.description,
+    ...(icon === DEFAULT_TOOL_ICON ? {} : { icon }),
+  };
+}
+
+// The grid entries are serialized into the homepage, the cards into each
+// category page and the link hub into nearly every page. These tests pin
+// their exact shapes, so a new field has to be added here on purpose.
+test("each homepage grid entry is a card plus its category and leftover search terms, nothing else", () => {
+  const grid = directoryGrid();
+
+  assert.equal(grid.length, active.length);
+  grid.forEach((entry, index) => {
+    const tool = active[index];
+    const { terms, ...rest } = entry;
+    assert.deepEqual(rest, { ...expectedCard(tool), category: tool.operation }, tool.id);
+    assert.deepEqual(
+      Object.keys(entry),
+      [...Object.keys(expectedCard(tool)), "category", ...(terms ? ["terms"] : [])],
+      tool.id,
+    );
+    if (terms) assert.ok(terms.length > 0, `${tool.id}: an empty terms list is left out`);
+  });
+  assert.equal(directoryGrid(), directoryGrid());
 });
 
-test("a directory entry links the Tool's public path and searches its formats, tags and keywords", () => {
-  const byId = new Map(directoryEntries().map((entry) => [entry.id, entry]));
-  const csvToMarkdown = active.find((tool) => tool.id === "csv-to-markdown");
+test("the grid's search finds a Tool by exactly the words the full tags and keywords did", () => {
+  for (const [index, entry] of directoryGrid().entries()) {
+    const tool = active[index];
+    const name = tool.name.toLowerCase();
+    const description = tool.description.toLowerCase();
+    const words = [tool.from, tool.to, ...(tool.tags ?? []), ...(tool.keywords ?? [])]
+      .filter(Boolean)
+      .map((word) => word.toLowerCase());
+    const terms = entry.terms ?? [];
 
-  assert.deepEqual(byId.get("csv-to-markdown"), {
-    id: "csv-to-markdown",
-    name: csvToMarkdown.name,
-    description: csvToMarkdown.description,
-    category: "convert",
-    href: "/csv-to-markdown/",
-    tags: ["csv", "markdown"],
-    isNew: false,
-    isPopular: false,
-  });
-  // png-to-png is served at /compress-png/.
-  assert.equal(byId.get("png-to-png")?.href, "/compress-png/");
+    // Nothing new to match on...
+    for (const term of terms) assert.ok(words.includes(term), `${tool.id}: ${term}`);
+    // ...and every word still matches, through a term or the text itself.
+    for (const word of words) {
+      assert.ok(
+        terms.includes(word) || name.includes(word) || description.includes(word),
+        `${tool.id}: ${word}`,
+      );
+    }
+  }
+});
 
-  for (const tool of active) {
-    const expected = new Set(
-      [tool.from, tool.to, ...(tool.tags ?? []), ...(tool.keywords ?? [])].filter(Boolean),
-    );
-    assert.deepEqual(byId.get(tool.id)?.tags, [...expected], tool.id);
+test("a card links the Tool's public path and names its icon only when it isn't the default", () => {
+  const pngToPng = active.find((tool) => tool.id === "png-to-png");
+  assert.equal(toolCardsIn("compress").find((card) => card.name === pngToPng.name)?.href, "/compress-png/");
+  assert.equal(directoryGrid().find((entry) => entry.href === "/video-downloader/")?.icon, "video");
+  assert.equal(directoryGrid().find((entry) => entry.href === "/png-to-jpg/")?.icon, undefined);
+  for (const entry of directoryGrid()) {
+    if (entry.icon) assert.ok(TOOL_ICON_NAMES.includes(entry.icon), entry.icon);
+  }
+});
+
+test("a category page's cards are its active Tools in registry order, card fields only", () => {
+  for (const operation of OPERATIONS) {
+    assert.deepEqual(toolCardsIn(operation), activeIn(operation).map(expectedCard), operation);
   }
 });
 
@@ -75,7 +114,7 @@ test("each category with an active Tool is listed once, in OPERATIONS order, wit
       name: OPERATION_LABELS[category.id],
       title: CATEGORY_CONTENT[category.id].title,
       description: CATEGORY_CONTENT[category.id].description,
-      count: active.filter((tool) => tool.operation === category.id).length,
+      count: activeIn(category.id).length,
       href: categoryHref(category.id),
     });
   }
@@ -87,51 +126,46 @@ test("each category with an active Tool is listed once, in OPERATIONS order, wit
 });
 
 test("the download category holds every active download Tool, including each download-*-videos Lander", () => {
-  const downloadIds = directoryEntriesIn("download").map((entry) => entry.id);
+  const downloadHrefs = toolCardsIn("download").map((card) => card.href);
 
-  assert.deepEqual(
-    [...downloadIds].sort(),
-    active.filter((tool) => tool.operation === "download").map((tool) => tool.id).sort(),
-  );
+  assert.deepEqual(downloadHrefs, activeIn("download").map(toolHref));
   assert.deepEqual(
     active
       .filter((tool) => /^download-.+-videos$/.test(tool.id))
-      .map((tool) => tool.id)
-      .filter((id) => !downloadIds.includes(id)),
+      .map(toolHref)
+      .filter((href) => !downloadHrefs.includes(href)),
     [],
     "expected every download-*-videos lander to appear in /category/download/",
   );
 });
 
-test("each link hub tab links every Tool in its category: popular, then new, then by name", () => {
+test("each link hub tab is its category without the count, and an href and name per Tool: popular, then new, then by name", () => {
   const tabs = toolLinkCategories();
 
   assert.deepEqual(
-    tabs.map(({ id, name, title, description, href }) => ({ id, name, title, description, href })),
-    directoryCategories().map(({ id, name, title, description, href }) => ({
-      id,
-      name,
-      title,
-      description,
-      href,
-    })),
+    tabs.map(({ tools, ...category }) => {
+      assert.deepEqual(Object.keys(category), ["id", "name", "title", "description", "href"]);
+      return { ...category, tools: tools.length };
+    }),
+    directoryCategories().map(({ count, ...category }) => ({ ...category, tools: count })),
   );
   for (const tab of tabs) {
-    const expected = directoryEntriesIn(tab.id)
+    const expected = activeIn(tab.id)
       .sort(
         (a, b) =>
-          Number(b.isPopular) - Number(a.isPopular) ||
-          Number(b.isNew) - Number(a.isNew) ||
+          Number(Boolean(b.isPopular)) - Number(Boolean(a.isPopular)) ||
+          Number(Boolean(b.isNew)) - Number(Boolean(a.isNew)) ||
           a.name.localeCompare(b.name),
       )
-      .map((entry) => ({ href: entry.href, title: entry.name }));
+      .map((tool) => ({ href: toolHref(tool), name: tool.name }));
     assert.deepEqual(tab.tools, expected, tab.id);
+    for (const link of tab.tools) assert.deepEqual(Object.keys(link), ["href", "name"]);
   }
   assert.equal(toolLinkCategories(), toolLinkCategories());
 });
 
 test("directory lists survive the Server-to-client props boundary unchanged", () => {
-  for (const list of [directoryEntries(), directoryCategories(), toolLinkCategories()]) {
+  for (const list of [directoryGrid(), directoryCategories(), toolLinkCategories(), toolCardsIn("convert")]) {
     assert.deepEqual(JSON.parse(JSON.stringify(list)), list);
   }
 });

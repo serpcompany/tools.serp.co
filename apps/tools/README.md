@@ -25,9 +25,12 @@ empty categories.
 Active Tools drive public discovery, metadata, and sitemap projections. The
 homepage grid, `/categories/`, the category pages and the link hub read their
 lists from `lib/catalog/directory.ts` in Server Components, which pass client
-components plain data as props. A client module, or anything it imports, must
-not import the catalog: Next.js would ship the 4 MB registry to the browser.
-`lib/catalog/client-boundary.test.mjs` fails if one does.
+components plain data as props. Props are serialized into every page that
+renders them, so each entry carries only what the client renders or filters
+on, and `lib/catalog/directory.test.mjs` pins the shapes. A client module, or
+anything it imports, must not import the catalog: Next.js would ship the 4 MB
+registry to the browser. `lib/catalog/client-boundary.test.mjs` fails if one
+does.
 
 ## Sitemaps
 

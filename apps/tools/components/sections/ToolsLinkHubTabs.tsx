@@ -97,7 +97,7 @@ export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
                 href={tool.href}
                 className="rounded-md px-2 py-1.5 text-sm text-slate-700 transition-colors duration-150 hover:bg-blue-50 hover:text-blue-700"
               >
-                {tool.title}
+                {tool.name}
               </Link>
             ))}
           </div>

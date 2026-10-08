@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 import { ToolCard } from "@/components/ToolCard";
 import { ToolsSearchBar } from "@/components/ToolsSearchBar";
-import type { ToolDirectoryEntry } from "@/lib/catalog/directory";
+import type { DirectoryGridEntry } from "@/lib/catalog/directory";
 
 type ToolCategory = {
   id: string;
@@ -13,7 +13,7 @@ type ToolCategory = {
 };
 
 type HomeToolDirectoryProps = {
-  tools: readonly ToolDirectoryEntry[];
+  tools: readonly DirectoryGridEntry[];
   categories: ToolCategory[];
 };
 
@@ -31,7 +31,7 @@ export function HomeToolDirectory({ tools, categories }: HomeToolDirectoryProps)
       const matchesCategory = selectedCategory === "all" || tool.category === selectedCategory;
       const matchesSearch = tool.name.toLowerCase().includes(search) ||
         tool.description.toLowerCase().includes(search) ||
-        tool.tags.some((tag) => tag.toLowerCase().includes(search));
+        (tool.terms?.some((term) => term.includes(search)) ?? false);
       return matchesCategory && matchesSearch;
     });
   }, [tools, searchQuery, selectedCategory]);
@@ -50,7 +50,7 @@ export function HomeToolDirectory({ tools, categories }: HomeToolDirectoryProps)
       {/* Tools Grid */}
       <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {filteredTools.map((tool) => (
-          <ToolCard key={tool.id} tool={tool} />
+          <ToolCard key={tool.href} tool={tool} />
         ))}
       </div>
 
