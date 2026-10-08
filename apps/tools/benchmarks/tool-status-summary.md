@@ -5,32 +5,32 @@ Sweep rows by commit: `ca5b9a53e93a` (2,470), `d0d2843e65ce` (95), `5a318b697fbf
 
 | Catalog state | Tools |
 | ------------- | ----: |
-| live          | 2,643 |
-| retired       |   142 |
+| live          | 2,531 |
+| retired       |   254 |
 | total         | 2,785 |
 
 | Processing location (live Tools) | Tools |
 | -------------------------------- | ----: |
-| client-only                      | 2,265 |
-| server-executed                  |     8 |
-| server-first-client-fallback     |    55 |
+| client-only                      | 2,178 |
+| server-executed                  |     6 |
+| server-first-client-fallback     |    32 |
 | server-assisted-or-extension     |   292 |
 | unknown                          |    23 |
 
 | Sweep status (live Tools) | Tools |
 | ------------------------- | ----: |
 | pass                      | 1,719 |
-| error                     |   186 |
+| error                     |    74 |
 | no_fixture                |   423 |
 | skipped                   |   315 |
 
 | Keyword coverage                    | Keywords | Global searches/mo |
 | ----------------------------------- | -------: | -----------------: |
-| Exact page, live                    |    1,001 |         15,723,440 |
+| Exact page, live                    |      968 |         15,693,470 |
 | Exact page retired, live alias page |        0 |                  0 |
-| Exact page retired, no live alias   |      142 |             74,580 |
-| Alias page only                     |       16 |          1,274,980 |
-| No page                             |      542 |          6,372,400 |
+| Exact page retired, no live alias   |      175 |            104,550 |
+| Alias page only                     |       14 |          1,217,980 |
+| No page                             |      544 |          6,429,400 |
 | total                               |    1,701 |         23,445,400 |
 
 | Keyword source                         | Keywords |
