@@ -9,6 +9,7 @@ import { requiresVideoConversion } from "../../lib/capabilities.ts";
 import { resolveCompressionTarget } from "../../lib/compression-utils.ts";
 import { MAGICK_BROWSER_INPUTS } from "../../lib/convert/magickBrowser.ts";
 import { checkOutputFormat } from "../../lib/convert/output-format.ts";
+import { usesWebCodecs } from "../../lib/convert/webcodecs.ts";
 
 export const STATUSES = ["pass", "wrong_format", "error", "timeout", "no_fixture", "skipped"];
 // Statuses that come from running the Tool. A resumed run skips Tools that
@@ -24,6 +25,9 @@ export const DEFAULTS = {
 };
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+// Playwright's Chromium by default; an installed Chrome or Edge has the
+// proprietary codecs (H.264, HEVC, AAC) that a Chromium build may lack.
+export const CHANNELS = new Set(["chromium", "chrome", "chrome-beta", "msedge", "msedge-beta"]);
 
 export function parseArgs(argv) {
   const args = {
@@ -37,6 +41,7 @@ export function parseArgs(argv) {
     resume: false,
     retry: new Set(),
     headed: false,
+    channel: "chromium",
     summary: false,
   };
   const value = (index, name) => {
@@ -61,6 +66,7 @@ export function parseArgs(argv) {
     else if (arg === "--resume") args.resume = true;
     else if (arg === "--retry") args.retry = new Set(splitList(value(index++, arg)));
     else if (arg === "--headed") args.headed = true;
+    else if (arg === "--channel") args.channel = value(index++, arg);
     else if (arg === "--summary") args.summary = true;
     else if (arg !== "--") throw new Error(`Unknown argument: ${arg}`);
   }
@@ -70,6 +76,9 @@ export function parseArgs(argv) {
     }
   }
   if (args.retry.size && !args.resume) throw new Error("--retry only applies with --resume");
+  if (!CHANNELS.has(args.channel)) {
+    throw new Error(`--channel takes ${[...CHANNELS].join(", ")}, not ${args.channel}`);
+  }
   if (args.summary) return args;
   if (!args.baseUrl) throw new Error("--base-url is required");
   // Every run sends telemetry to the target's D1; thousands of runs belong in
@@ -172,11 +181,12 @@ const COMPRESSION_ENGINES = {
 };
 
 // The engine the generic converter page uses for a Tool: the branch order of
-// compressFile and convertUnchecked in lib/convert/workerClient.ts, and the
-// server-only outputs of shouldUseServerConversion in lib/convert/video.ts.
-// Those try /api/video-convert first and fall back to FFmpeg in the browser
-// when it fails, as it does on Workers. A label for grouping results; it
-// decides nothing.
+// compressFile and convertUnchecked in lib/convert/workerClient.ts, the AV1
+// and HEVC Tools of lib/convert/webcodecs.ts, and the server-only outputs of
+// shouldUseServerConversion in lib/convert/video.ts. Those try
+// /api/video-convert first and fall back to FFmpeg in the browser when it
+// fails, as it does on Workers. A label for grouping results; it decides
+// nothing.
 export function converterEngine({ operation, from, to }) {
   const source = from.toLowerCase();
   const target = to.toLowerCase();
@@ -186,6 +196,7 @@ export function converterEngine({ operation, from, to }) {
   if (source === "ai" || source === "pdf") return "pdfjs";
   if (MAGICK_BROWSER_INPUTS.has(source)) return "imagemagick-wasm";
   if (source === "heic" || source === "heif") return "heif-decoder";
+  if (usesWebCodecs(source, target)) return "ffmpeg-wasm + webcodecs";
   if (requiresVideoConversion(source, target)) {
     // Mirrors shouldUseServerConversion in lib/convert/video.ts.
     const serverOnly =
@@ -208,6 +219,7 @@ export function engineFor(tool, handler) {
 // out on purpose: a compressor with no engine should stop the view.
 export const ENGINE_LOCATIONS = {
   "ffmpeg-wasm": "client-only",
+  "ffmpeg-wasm + webcodecs": "client-only",
   "imagemagick-wasm": "client-only",
   "browser-raster": "client-only",
   pdfjs: "client-only",

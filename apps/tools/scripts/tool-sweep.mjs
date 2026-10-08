@@ -7,7 +7,7 @@
 //   node scripts/tool-sweep.mjs --base-url http://localhost:8787 \
 //     [--out benchmarks/tool-sweep-results.json] [--concurrency 4] \
 //     [--timeout 60000] [--ffmpeg-timeout 180000] [--only id,id] [--limit n] \
-//     [--resume [--retry error,timeout]] [--headed]
+//     [--resume [--retry error,timeout]] [--headed] [--channel chrome]
 //   node scripts/tool-sweep.mjs --summary [--out <file>]
 //
 // Results are written after every Tool, so --resume carries on after a crash
@@ -109,6 +109,7 @@ const runEntry = {
   wallMs: 0,
   measured: 0,
   concurrency: args.concurrency,
+  channel: args.channel,
   timeoutMs: args.timeoutMs,
   ffmpegTimeoutMs: args.ffmpegTimeoutMs,
   ...(args.only ? { only: args.only } : {}),
@@ -148,14 +149,16 @@ const { chromium } = await import("playwright");
 const ffmpegWasm = readFileSync(path.resolve(appRoot, "node_modules/@ffmpeg/core/dist/esm/ffmpeg-core.wasm"));
 const baseOrigin = new URL(args.baseUrl).origin;
 
-// The full Chromium build in new headless mode, the browser visitors run.
-// (The default headless shell was killed about 30 s after launch on the
-// machine that recorded the first results.) A lost browser is relaunched and
-// the Tools that were running on it run again; see measureWithRetry.
+// The full Chromium build in new headless mode, the browser visitors run, or
+// the installed browser --channel names. (The default headless shell was
+// killed about 30 s after launch on the machine that recorded the first
+// results.) A lost browser is relaunched and the Tools that were running on it
+// run again; see measureWithRetry.
 let browserPromise = null;
 function getBrowser() {
   if (!browserPromise) {
-    const launching = chromium.launch({ channel: "chromium", headless: !args.headed }).then((browser) => {
+    const launching = chromium.launch({ channel: args.channel, headless: !args.headed }).then((browser) => {
+      runEntry.browserVersion = browser.version();
       browser.on("disconnected", () => {
         if (browserPromise === launching) browserPromise = null;
       });

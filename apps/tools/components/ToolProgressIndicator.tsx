@@ -1,11 +1,11 @@
 "use client";
 
-import { VideoProgress } from "@/components/VideoProgress";
+import { VideoProgress, type ProgressStatus } from "@/components/VideoProgress";
 
 export type ToolProgressFile = {
   name: string;
   progress: number;
-  status: "loading" | "processing" | "completed" | "error";
+  status: ProgressStatus;
   message?: string;
 };
 

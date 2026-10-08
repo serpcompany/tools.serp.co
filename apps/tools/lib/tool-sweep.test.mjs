@@ -189,7 +189,7 @@ test("an output format without a signature passes unchecked, unless text markers
 });
 
 test("hasSignature asks the app's check which formats it can verify", () => {
-  for (const format of ["png", "jpg", "gif", "pdf", "mp3", "mp4", "svg", "ico", "ktx2"]) {
+  for (const format of ["png", "jpg", "gif", "pdf", "mp3", "mp4", "svg", "ico", "ktx2", "av1", "hevc"]) {
     assert.equal(hasSignature(format), true, format);
   }
   for (const format of ["tga", "aac", "csv", "json", "mxf", "markdown"]) {
@@ -209,6 +209,10 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "mp4", "mxf"), "ffmpeg-wasm");
   assert.equal(engine("convert", "mp4", "rm"), "server-video, then ffmpeg-wasm");
   assert.equal(engine("convert", "amr", "ogg"), "server-video, then ffmpeg-wasm");
+  assert.equal(engine("convert", "av1", "mxf"), "ffmpeg-wasm + webcodecs");
+  assert.equal(engine("convert", "mp4", "av1"), "ffmpeg-wasm + webcodecs");
+  assert.equal(engine("convert", "mov", "hevc"), "ffmpeg-wasm + webcodecs");
+  assert.equal(engine("convert", "hevc", "mp4"), "ffmpeg-wasm");
   assert.equal(engine("compress", "png", "png"), "jsquash-worker");
   assert.equal(engine("compress", "gif", "gif"), "server-image-compress");
   assert.equal(engine("compress", "pdf", "pdf"), "server-pdf-compress");
@@ -316,6 +320,14 @@ test("parseArgs takes defaults, validates numbers and refuses non-local targets"
   assert.throws(() => parseArgs(["--base-url", "http://localhost:1", "--retry", "error"]), /only applies with --resume/);
   assert.throws(() => parseArgs(["--base-url", "http://localhost:1", "--resume", "--retry", "skipped"]), /measured statuses/);
   assert.equal(parseArgs(["--summary"]).summary, true);
+});
+
+test("parseArgs runs Playwright's Chromium unless --channel names an installed browser", () => {
+  assert.equal(parseArgs(["--base-url", "http://localhost:1"]).channel, "chromium");
+  assert.equal(parseArgs(["--base-url", "http://localhost:1", "--channel", "chrome"]).channel, "chrome");
+  assert.equal(parseArgs(["--base-url", "http://localhost:1", "--channel", "msedge"]).channel, "msedge");
+  assert.throws(() => parseArgs(["--base-url", "http://localhost:1", "--channel", "firefox"]), /--channel takes/);
+  assert.throws(() => parseArgs(["--base-url", "http://localhost:1", "--channel"]), /needs a value/);
 });
 
 test("a resumed run skips measured Tools, re-runs --retry statuses and unmeasured rows", () => {

@@ -20,6 +20,15 @@ Conversion picks an engine by input format:
   scripts don't send the COEP headers the multi-threaded build needs. Its 32 MB
   wasm is too big for Workers Static Assets, so it loads from
   `NEXT_PUBLIC_ASSETS_BASE_URL`.
+- **AV1 input, and AV1 or HEVC output:** the browser's own codecs (WebCodecs)
+  through Mediabunny (`lib/convert/webcodecs.ts`), since FFmpeg.wasm has no
+  software AV1 decoder or encoder and its HEVC encoder doesn't finish. FFmpeg
+  still reads and writes the containers and does the scaling around the
+  browser's steps, handing frames over as near-lossless VP8. A `.av1` output is
+  AV1 in IVF and a `.hevc` output a raw Annex B stream, neither with audio, and
+  every page that reads or writes one says "video only". A browser without the
+  codec is told which one and to try a recent Chrome or Edge on a different
+  computer, and the run is recorded as handed off, not failed. HEVC input stays on FFmpeg.
 - **Camera RAW, PSD, TGA, DDS, TIFF and XCF:** ImageMagick WASM
   (`lib/convert/magickBrowser.ts`) on the main thread. **HEIC and HEIF:**
   libheif.

@@ -3,7 +3,10 @@
 import { AUDIO_FORMATS } from "../capabilities.ts";
 import { mapQualityToAudioBitrate, mapQualityToVideoCrf } from "../compression-utils.ts";
 
-const FAST_VIDEO_FILTER = "fps=12,scale=320:-2:flags=fast_bilinear";
+// Video outputs are 320 px wide at 12 fps, for speed in single-threaded wasm.
+export const FAST_VIDEO_WIDTH = 320;
+export const FAST_VIDEO_FPS = 12;
+const FAST_VIDEO_FILTER = `fps=${FAST_VIDEO_FPS},scale=${FAST_VIDEO_WIDTH}:-2:flags=fast_bilinear`;
 const FAST_GIF_FILTER = "fps=10,scale=320:-1:flags=fast_bilinear";
 // H.263 encodes only its five standard frame sizes. 352x288 (CIF) is the one
 // closest to 320x240: fit the picture inside it and pad the rest. Squaring the
@@ -38,6 +41,8 @@ function canRemux(fromFormat: string, toFormat: string) {
   );
 }
 
+// AV1 and HEVC outputs are written by the browser's encoders (webcodecs.ts),
+// not here.
 export function buildConvertCommand(fromFormat: string, toFormat: string): FFmpegCommand {
   const inputName = `input.${fromFormat}`;
   let outputName = `output.${toFormat}`;
@@ -192,27 +197,12 @@ export function buildConvertCommand(fromFormat: string, toFormat: string): FFmpe
     args.push('-c:a', 'aac', '-b:a', '96k');
     args.push('-vf', FAST_VIDEO_FILTER);
     args.push('-f', 'f4v');
-  } else if (toFormat === 'hevc') {
-    // HEVC/H.265 codec in MP4 container
-    args.push('-c:v', 'libx265', '-preset', 'ultrafast', '-crf', '35');
-    args.push('-c:a', 'aac', '-b:a', '96k');
-    args.push('-tag:v', 'hvc1'); // For better compatibility
-    args.push('-vf', FAST_VIDEO_FILTER);
-    outputName = outputName.replace('.hevc', '.mp4'); // Use MP4 container
   } else if (toFormat === 'divx') {
     // DivX (MPEG-4 Part 2) in AVI container
     args.push('-c:v', 'mpeg4', '-vtag', 'DIVX', '-q:v', '10');
     args.push('-c:a', 'mp3', '-b:a', '96k');
     args.push('-vf', FAST_VIDEO_FILTER);
     outputName = outputName.replace('.divx', '.avi'); // Use AVI container
-  } else if (toFormat === 'av1') {
-    // AV1 codec in MP4 container
-    args.push('-c:v', 'libaom-av1', '-crf', '35', '-b:v', '0', '-cpu-used', '8');
-    args.push('-c:a', 'aac', '-b:a', '96k');
-    args.push('-tag:v', 'av01');
-    args.push('-movflags', '+faststart');
-    args.push('-vf', FAST_VIDEO_FILTER);
-    outputName = outputName.replace('.av1', '.mp4'); // Use MP4 container
   } else if (toFormat === 'avchd') {
     // AVCHD-style transport stream
     args.push('-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '30', '-tune', 'zerolatency');

@@ -4,6 +4,7 @@ import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
 import { checkOutputFormat } from "./output-format.ts";
+import { usesWebCodecs } from "./webcodecs.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
@@ -68,7 +69,8 @@ const MIME_MAP: Record<string, string> = {
   f4v: "video/x-f4v",
   vob: "video/dvd",
   "3gp": "video/3gpp",
-  hevc: "video/mp4",
+  // Elementary streams: Annex B H.265, and AV1 in IVF.
+  hevc: "video/h265",
   divx: "video/avi",
   mjpeg: "video/x-motion-jpeg",
   mpeg2: "video/mpeg",
@@ -79,7 +81,7 @@ const MIME_MAP: Record<string, string> = {
   rmvb: "application/vnd.rn-realmedia-vbr",
   swf: "application/x-shockwave-flash",
   mxf: "application/mxf",
-  av1: "video/mp4",
+  av1: "video/x-ivf",
   avchd: "video/mp2t",
   pdf: "application/pdf",
   txt: "text/plain",
@@ -573,6 +575,13 @@ async function convertVideoOnMainThread(args: {
   onProgress?: (update: ProgressUpdate) => void;
   quality?: number;
 }): Promise<ConversionResult> {
+  if (usesWebCodecs(args.from, args.to)) {
+    const { convertWithWebCodecs } = await import("./webcodecs-convert.ts");
+    const buffer = await convertWithWebCodecs(args.buf, args.from, args.to, (progress) =>
+      args.onProgress?.({ status: "processing", progress }),
+    );
+    return { kind: "single", buffer };
+  }
   const { convertVideo, convertVideoViaApi, shouldUseServerConversion } = await import("./video");
   let buffer: ArrayBuffer;
 
