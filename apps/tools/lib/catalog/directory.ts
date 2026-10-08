@@ -7,6 +7,7 @@ import {
   CATEGORY_CONTENT,
   OPERATION_LABELS,
   OPERATIONS,
+  isToolOperation,
   type ToolOperation,
 } from "./operations.ts";
 
@@ -14,8 +15,12 @@ import {
 // and the link hub list. It reads the registry, so only Server Components
 // import it. The lists they pass to client components are serialized into
 // every page that renders them, so each entry carries only what the client
-// renders or filters on (directory.test.mjs pins the shapes). Lists are built
-// on first use and shared by every caller, which must not mutate them.
+// renders or filters on (directory.test.mjs pins the shapes and their sizes).
+// directoryGrid, directoryCategories and toolLinkCategories are built on first
+// use and shared by every caller, which must not mutate them; toolCardsIn
+// builds a new array on each call. A Tool whose operation isn't one of
+// OPERATIONS (validate.ts rejects it) is left out of every list, so the grid
+// and the category counts always agree.
 
 // A ToolCard: the Tool's name and description, linked. `icon` is left out
 // when it's the default.
@@ -87,12 +92,14 @@ function searchTerms(tool: Tool): string[] {
 
 // The homepage grid: every active Tool, in registry order.
 export function directoryGrid(): readonly DirectoryGridEntry[] {
-  grid ??= activeTools().map((tool) => {
-    const entry: DirectoryGridEntry = { ...toolCard(tool), category: tool.operation };
-    const terms = searchTerms(tool);
-    if (terms.length > 0) entry.terms = terms;
-    return entry;
-  });
+  grid ??= activeTools()
+    .filter((tool) => isToolOperation(tool.operation))
+    .map((tool) => {
+      const entry: DirectoryGridEntry = { ...toolCard(tool), category: tool.operation };
+      const terms = searchTerms(tool);
+      if (terms.length > 0) entry.terms = terms;
+      return entry;
+    });
   return grid;
 }
 

@@ -92,9 +92,12 @@ export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
 
           <div className="grid grid-cols-1 gap-x-4 gap-y-1.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {visibleTools.map((tool) => (
+              // Up to every Tool in the category: prefetching each one in view
+              // would download its whole page payload.
               <Link
                 key={tool.href}
                 href={tool.href}
+                prefetch={false}
                 className="rounded-md px-2 py-1.5 text-sm text-slate-700 transition-colors duration-150 hover:bg-blue-50 hover:text-blue-700"
               >
                 {tool.name}

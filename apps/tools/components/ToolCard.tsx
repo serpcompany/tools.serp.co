@@ -46,7 +46,8 @@ export function ToolCard({ tool }: ToolCardProps) {
   };
 
   return (
-    <Link href={tool.href}>
+    // Cards come in grids of up to every Tool: don't prefetch each one in view.
+    <Link href={tool.href} prefetch={false}>
       <Card
         className="group h-full transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer border-2"
         style={{

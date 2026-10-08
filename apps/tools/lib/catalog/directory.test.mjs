@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import { readFileSync } from "node:fs";
 
 import {
@@ -122,6 +123,12 @@ test("each category with an active Tool is listed once, in OPERATIONS order, wit
     categories.reduce((sum, category) => sum + category.count, 0),
     active.length,
   );
+  // The grid and the categories leave out the same Tools, so "Filter (n)" on
+  // the homepage is the sum of the category counts.
+  assert.equal(
+    directoryGrid().length,
+    categories.reduce((sum, category) => sum + category.count, 0),
+  );
   assert.equal(directoryCategories(), directoryCategories());
 });
 
@@ -168,4 +175,24 @@ test("directory lists survive the Server-to-client props boundary unchanged", ()
   for (const list of [directoryGrid(), directoryCategories(), toolLinkCategories(), toolCardsIn("convert")]) {
     assert.deepEqual(JSON.parse(JSON.stringify(list)), list);
   }
+});
+
+// Byte budgets for the two lists sent inline as JSON: the link hub with nearly
+// every page, the grid with the homepage. Each sits about 10% above its size
+// when it was set (link hub 130,654 B, grid 396,800 B, 2,643 active Tools):
+// room for about 260 more Tools, which a field added to every entry would use
+// up quickly. To raise one on purpose, measure the list's UTF-8 JSON bytes,
+// set the budget about 10% above that, and say why in the PR: these bytes
+// ship with every page that renders the list.
+const LINK_HUB_BUDGET_BYTES = 144_000;
+const HOMEPAGE_GRID_BUDGET_BYTES = 437_000;
+
+test("the link hub and the homepage grid stay within their byte budgets", () => {
+  const hubBytes = Buffer.byteLength(JSON.stringify(toolLinkCategories()));
+  const gridBytes = Buffer.byteLength(JSON.stringify(directoryGrid()));
+  assert.ok(hubBytes <= LINK_HUB_BUDGET_BYTES, `link hub is ${hubBytes} B, budget ${LINK_HUB_BUDGET_BYTES} B`);
+  assert.ok(
+    gridBytes <= HOMEPAGE_GRID_BUDGET_BYTES,
+    `homepage grid is ${gridBytes} B, budget ${HOMEPAGE_GRID_BUDGET_BYTES} B`,
+  );
 });

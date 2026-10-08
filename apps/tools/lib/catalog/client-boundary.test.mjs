@@ -1,6 +1,6 @@
-// Next.js bundles every module a "use client" module imports for the browser.
-// The Tool registry is 4 MB, so no client module may reach it: Server
-// Components read the catalog and pass client components plain data.
+// Next.js bundles every module a "use client" module or a web worker imports
+// for the browser. The Tool registry is 4 MB, so none of them may reach it:
+// Server Components read the catalog and pass client components plain data.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
@@ -20,8 +20,24 @@ const SKIPPED_DIRECTORIES = new Set([
   "public",
   "scripts",
 ]);
-const SOURCE_FILE = /\.(?:tsx?|jsx?|mjs)$/;
-const EXTENSIONS = ["", ".ts", ".tsx", ".d.ts", ".js", ".jsx", ".mjs", "/index.ts", "/index.tsx", "/index.d.ts"];
+const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
+const EXTENSIONS = [
+  "",
+  ".ts",
+  ".tsx",
+  ".mts",
+  ".cts",
+  ".d.ts",
+  ".js",
+  ".jsx",
+  ".mjs",
+  ".cjs",
+  "/index.ts",
+  "/index.tsx",
+  "/index.js",
+  "/index.mjs",
+  "/index.d.ts",
+];
 
 function sourceFiles(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -66,10 +82,32 @@ function isClientModule(file) {
   return false;
 }
 
+// The text of a module specifier: a string literal, or an identifier bound to
+// a top-level `const` string in the same file (a CDN URL, say). Null for
+// anything the walk can't follow.
+function specifierText(source, node) {
+  if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) return node.text;
+  if (!ts.isIdentifier(node)) return null;
+  for (const statement of source.statements) {
+    if (!ts.isVariableStatement(statement)) continue;
+    if (!(statement.declarationList.flags & ts.NodeFlags.Const)) continue;
+    for (const declaration of statement.declarationList.declarations) {
+      if (!ts.isIdentifier(declaration.name) || declaration.name.text !== node.text) continue;
+      const value = declaration.initializer;
+      if (value && (ts.isStringLiteral(value) || ts.isNoSubstitutionTemplateLiteral(value))) {
+        return value.text;
+      }
+    }
+  }
+  return null;
+}
+
 const importsCache = new Map();
 
-// The files a module's runtime imports load. Type-only imports are erased
-// before bundling, so they're skipped.
+// The files a module's runtime imports load: static imports and re-exports,
+// import() and require(). Type-only imports are erased before bundling, so
+// they're skipped. An import() or require() whose module the walk can't name
+// fails the test instead of being skipped.
 function importsOf(file) {
   if (!SOURCE_FILE.test(file)) return []; // JSON, CSS and other assets
   if (importsCache.has(file)) return importsCache.get(file);
@@ -90,15 +128,22 @@ function importsOf(file) {
       specifiers.push(node.moduleSpecifier.text);
     } else if (
       ts.isCallExpression(node) &&
-      node.expression.kind === ts.SyntaxKind.ImportKeyword &&
-      node.arguments[0] &&
-      ts.isStringLiteral(node.arguments[0])
+      (node.expression.kind === ts.SyntaxKind.ImportKeyword ||
+        (ts.isIdentifier(node.expression) && node.expression.text === "require"))
     ) {
-      specifiers.push(node.arguments[0].text);
+      const specifier = node.arguments[0] && specifierText(source, node.arguments[0]);
+      if (specifier === null || specifier === undefined) {
+        const { line } = source.getLineAndCharacterOfPosition(node.getStart(source));
+        throw new Error(
+          `${path.relative(appRoot, file)}:${line + 1}: ${node.getText(source)} names no module the walk can follow`,
+        );
+      }
+      specifiers.push(specifier);
     }
     ts.forEachChild(node, visit);
   };
-  visit(sourceOf(file));
+  const source = sourceOf(file);
+  visit(source);
   const imports = specifiers.map((specifier) => resolveImport(file, specifier)).filter(Boolean);
   importsCache.set(file, imports);
   return imports;
@@ -118,11 +163,16 @@ function chainToRegistry(file, seen = new Set()) {
 
 const relative = (file) => path.relative(appRoot, file);
 
-test("no client module imports the Tool registry, directly or through other modules", () => {
+// Web worker entries, which components load with new Worker(new URL(...)).
+const workerEntries = () => sourceFiles(path.join(appRoot, "workers"));
+
+test("no client module or web worker imports the Tool registry, directly or through other modules", () => {
   const clientModules = sourceFiles(appRoot).filter(isClientModule);
   assert.ok(clientModules.length > 20, `found only ${clientModules.length} client modules`);
+  const workers = workerEntries();
+  assert.ok(workers.length >= 3, `found only ${workers.length} worker entries`);
 
-  const leaks = clientModules
+  const leaks = [...clientModules, ...workers]
     .map((file) => chainToRegistry(file))
     .filter(Boolean)
     .map((chain) => chain.map(relative).join(" -> "));

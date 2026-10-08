@@ -27,10 +27,15 @@ homepage grid, `/categories/`, the category pages and the link hub read their
 lists from `lib/catalog/directory.ts` in Server Components, which pass client
 components plain data as props. Props are serialized into every page that
 renders them, so each entry carries only what the client renders or filters
-on, and `lib/catalog/directory.test.mjs` pins the shapes. A client module, or
-anything it imports, must not import the catalog: Next.js would ship the 4 MB
-registry to the browser. `lib/catalog/client-boundary.test.mjs` fails if one
-does.
+on, and `lib/catalog/directory.test.mjs` pins the shapes and byte budgets.
+Nothing a `"use client"` module or a web worker imports may reach
+`lib/catalog/catalog.ts`, `lib/catalog/directory.ts` or `tools.json`, directly
+or through other modules, or Next.js ships the 4 MB registry to the browser.
+The registry-free catalog modules (`icons.ts`, `href.ts`, `operations.ts`)
+are fine to import there. `lib/catalog/client-boundary.test.mjs` fails on a
+leak, and on an `import()` or `require()` it can't follow. Dense link lists
+(the link hub, related Tools, Tool cards) set `prefetch={false}`: each
+prefetch downloads the target page's payload, link hub included.
 
 ## Sitemaps
 
