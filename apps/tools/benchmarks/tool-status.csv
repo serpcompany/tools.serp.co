@@ -1721,7 +1721,7 @@ jpg-to-bmp,live,convert,jpg,bmp,client-only,browser-raster,pass,format check: si
 jpg-to-cur,live,convert,jpg,cur,client-only,browser-raster,pass,format check: signature,ca5b9a53e93a,jpg to cur,exact,,,300,40,0,10,10,ahrefs-2026-01,,
 jpg-to-dds,live,convert,jpg,dds,client-only,browser-raster,pass,format check: signature,ca5b9a53e93a,jpg to dds,exact,,,2300,200,1,700,100,ahrefs-2026-01,,
 jpg-to-doc,retired,convert,jpg,doc,unknown,,not swept,the sweep runs live Tools only,,jpg to doc,exact,,,7900,350,6,32000,900,ahrefs-2026-01,,
-jpg-to-docx,live,convert,jpg,docx,client-only,docx,pass,format check: signature,a0ac2f1bb94c,jpg to docx,exact,,,3700,250,2,2700,150,ahrefs-2026-01,,
+jpg-to-docx,live,convert,jpg,docx,client-only,docx,pass,format check: signature,4e331f5dbb45,jpg to docx,exact,,,3700,250,2,2700,150,ahrefs-2026-01,,
 jpg-to-dot,live,convert,jpg,dot,client-only,browser-raster,error,Converting to DOT isn't supported.,ca5b9a53e93a,jpg to dot,exact,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,jpg,dxf,,,,,,jpg to dxf,none,,,22000,1000,2,40000,2100,ahrefs-2026-01,,
 jpg-to-eps,retired,convert,jpg,eps,unknown,,not swept,the sweep runs live Tools only,,jpg to eps,exact,,,3200,400,3,2600,700,ahrefs-2026-01,,
@@ -1756,7 +1756,7 @@ jpg-to-svg,live,convert,jpg,svg,client-only,browser-raster,pass,format check: si
 ,alias page,convert,jpg,text,,,,,,jpg to text,alias,jpg-to-txt,,82000,1700,67,202000,4000,ahrefs-2026-01,,
 jpg-to-tga,live,convert,jpg,tga,client-only,browser-raster,pass,format check: none,ca5b9a53e93a,jpg to tga,exact,,,900,150,0,250,200,ahrefs-2026-01,,
 jpg-to-tiff,live,convert,jpg,tiff,client-only,browser-raster,pass,format check: signature,ca5b9a53e93a,jpg to tiff,exact,,,6400,600,4,7200,900,ahrefs-2026-01,,
-jpg-to-txt,live,convert,jpg,txt,client-only,tesseract,pass,format check: content,a0ac2f1bb94c,jpg to txt,exact,,,5600,250,12,2400,150,ahrefs-2026-01,jpg to text,82000
+jpg-to-txt,live,convert,jpg,txt,client-only,tesseract,pass,format check: content,4e331f5dbb45,jpg to txt,exact,,,5600,250,12,2400,150,ahrefs-2026-01,jpg to text,82000
 jpg-to-wbmp,live,convert,jpg,wbmp,client-only,browser-raster,pass,format check: none,ca5b9a53e93a,jpg to wbmp,exact,,,,,,,,ahrefs-2026-01,,
 jpg-to-webp,live,convert,jpg,webp,client-only,browser-raster,pass,format check: signature,ca5b9a53e93a,jpg to webp,exact,,,114000,5400,32,60000,2700,ahrefs-2026-01,,
 jpg-to-xbm,live,convert,jpg,xbm,client-only,browser-raster,pass,format check: none,ca5b9a53e93a,jpg to xbm,exact,,,20,,,,,ahrefs-2026-01,,
@@ -2714,7 +2714,7 @@ png-to-bmp,live,convert,png,bmp,client-only,browser-raster,pass,format check: si
 png-to-cur,live,convert,png,cur,client-only,browser-raster,pass,format check: signature,ca5b9a53e93a,png to cur,exact,,,4100,800,0,2100,1300,ahrefs-2026-01,,
 png-to-dds,live,convert,png,dds,client-only,browser-raster,pass,format check: signature,ca5b9a53e93a,png to dds,exact,,,21000,3600,0,11000,2300,ahrefs-2026-01,,
 png-to-doc,retired,convert,png,doc,unknown,,not swept,the sweep runs live Tools only,,png to doc,exact,,,2000,350,1,450,100,ahrefs-2026-01,,
-png-to-docx,live,convert,png,docx,client-only,docx,pass,format check: signature,a0ac2f1bb94c,png to docx,exact,,,1700,350,0,400,100,ahrefs-2026-01,png to word,31000
+png-to-docx,live,convert,png,docx,client-only,docx,pass,format check: signature,4e331f5dbb45,png to docx,exact,,,1700,350,0,400,100,ahrefs-2026-01,png to word,31000
 png-to-dot,live,convert,png,dot,client-only,browser-raster,error,Converting to DOT isn't supported.,ca5b9a53e93a,png to dot,exact,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,png,dxf,,,,,,png to dxf,none,,,17000,1700,0,11000,2100,ahrefs-2026-01,,
 png-to-eps,retired,convert,png,eps,unknown,,not swept,the sweep runs live Tools only,,png to eps,exact,,,6300,1100,0,5800,2100,ahrefs-2026-01,,
@@ -2736,7 +2736,7 @@ png-to-svg,live,convert,png,svg,client-only,browser-raster,pass,format check: si
 ,alias page,convert,png,text,,,,,,png to text,alias,png-to-txt,,19000,1600,60,1440000,123000,ahrefs-2026-01,,
 png-to-tga,live,convert,png,tga,client-only,browser-raster,pass,format check: none,ca5b9a53e93a,png to tga,exact,,,3500,500,0,1200,600,ahrefs-2026-01,,
 png-to-tiff,live,convert,png,tiff,client-only,browser-raster,pass,format check: signature,ca5b9a53e93a,png to tiff,exact,,,4100,700,0,2000,900,ahrefs-2026-01,,
-png-to-txt,live,convert,png,txt,client-only,tesseract,pass,format check: content,a0ac2f1bb94c,png to txt,exact,,,2700,250,2,1200,250,ahrefs-2026-01,png to text,19000
+png-to-txt,live,convert,png,txt,client-only,tesseract,pass,format check: content,4e331f5dbb45,png to txt,exact,,,2700,250,2,1200,250,ahrefs-2026-01,png to text,19000
 png-to-webp,live,convert,png,webp,client-only,browser-raster,pass,format check: signature,ca5b9a53e93a,png to webp,exact,,,175000,6600,25,104000,3800,ahrefs-2026-01,,
 ,alias page,convert,png,word,,,,,,png to word,alias,png-to-docx,,31000,900,2,9900,700,ahrefs-2026-01,,
 png-to-xbm,live,convert,png,xbm,client-only,browser-raster,pass,format check: none,ca5b9a53e93a,png to xbm,exact,,,90,10,,,,ahrefs-2026-01,,
