@@ -38,6 +38,9 @@ import {
   scanPageHandlers,
   selectRuns,
   serializeResults,
+  textOutputTimeout,
+  thrownError,
+  treeIsDirty,
 } from "./lib/tool-sweep.mjs";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -82,9 +85,13 @@ const toRun = selectRuns(runnable, previousRows, args);
 const commit = git("rev-parse", "HEAD");
 // Uncommitted changes outside the results file mean the harness or the app
 // differs from the recorded commit.
-const dirty = spawnSync("git", ["status", "--porcelain"], { cwd: appRoot, encoding: "utf8" })
-  .stdout.split("\n")
-  .some((line) => line.trim() && !outPath.endsWith(line.slice(3).replace(/\.tmp$/, "")));
+const repoRoot = git("rev-parse", "--show-toplevel");
+const dirty = repoRoot
+  ? treeIsDirty(
+      spawnSync("git", ["status", "--porcelain", "-z"], { cwd: appRoot, encoding: "utf8" }).stdout,
+      path.relative(repoRoot, outPath).split(path.sep).join("/"),
+    )
+  : null;
 if (previous?.meta?.commit && previous.meta.commit !== commit) {
   console.warn(`note: ${path.relative(appRoot, outPath)} was measured at ${previous.meta.commit}; HEAD is ${commit}`);
 }
@@ -212,31 +219,44 @@ function installCapture() {
   }
 }
 
-class HarnessError extends Error {}
+// A step the harness needs before the Tool can run. Its failure is recorded
+// with thrownError.
+class HarnessError extends Error {
+  constructor(step, cause, { hydration = false } = {}) {
+    super(cause.message);
+    this.step = step;
+    this.hydration = hydration;
+  }
+}
 
 function isTimeout(error) {
   return error?.name === "TimeoutError";
 }
 
-// Waits for React to attach its handlers to the element, so a file set on
-// it reaches the component's onChange.
-async function waitForHydration(page, selector) {
-  await page.waitForFunction(
-    (target) => {
-      const element = globalThis.document.querySelector(target);
-      return Boolean(element) && Object.keys(element).some((key) => key.startsWith("__reactProps"));
-    },
-    selector,
-    { timeout: HYDRATION_TIMEOUT_MS },
-  );
-}
-
-async function setup(step, run) {
+async function setup(step, run, options) {
   try {
     return await run();
   } catch (error) {
-    throw new HarnessError(`harness: ${step}: ${error.message.split("\n")[0]}`);
+    throw new HarnessError(step, error, options);
   }
+}
+
+// Waits for React to attach its handlers to the element, so a file set on
+// it reaches the component's onChange.
+async function waitForHydration(page, step, selector) {
+  await setup(
+    step,
+    () =>
+      page.waitForFunction(
+        (target) => {
+          const element = globalThis.document.querySelector(target);
+          return Boolean(element) && Object.keys(element).some((key) => key.startsWith("__reactProps"));
+        },
+        selector,
+        { timeout: HYDRATION_TIMEOUT_MS },
+      ),
+    { hydration: true },
+  );
 }
 
 async function readOutputs(page, { text = false, base64 = false } = {}) {
@@ -266,11 +286,24 @@ async function waitForOutputs(page, count, timeout) {
   await page.waitForFunction((n) => globalThis.__sweep.outputs.length >= n, count, { timeout });
 }
 
+// Clicks a download control and waits for the file. A click that saves
+// nothing is the Tool's failure; classifyRun reports it as finishing without
+// saving a file.
+async function download(page, control, { timeout = 5_000, ...read } = {}) {
+  await control.click();
+  try {
+    await waitForOutputs(page, 1, timeout);
+  } catch (error) {
+    if (!isTimeout(error)) throw error;
+  }
+  return { outcome: "completed", outputs: await readOutputs(page, read) };
+}
+
 // The generic converter and compressor (HeroConverter, LanderHeroTwoColumn):
 // choose the fixture, then wait until the progress card shows the result.
 async function runFileTool(page, plan) {
   const selector = '[data-testid="tool-file-input"]';
-  await setup("file input", () => waitForHydration(page, selector));
+  await waitForHydration(page, "file input", selector);
   await page.locator(selector).setInputFiles(plan.fixtures[0]);
   let state;
   try {
@@ -320,7 +353,7 @@ async function runFileTool(page, plan) {
 // parse and serialize it, then press Download.
 async function runTableTool(page, plan) {
   const selector = 'input[type="file"]';
-  await setup("file input", () => waitForHydration(page, selector));
+  await waitForHydration(page, "file input", selector);
   await page.locator(selector).first().setInputFiles(plan.fixtures[0]);
   await setup("upload", () =>
     page.getByText(`Selected: ${path.basename(plan.fixtures[0])}`).waitFor({ timeout: plan.timeoutMs }),
@@ -329,6 +362,7 @@ async function runTableTool(page, plan) {
   // an output notice ("not wired yet", "Waiting for valid input") holds for
   // a second with the file's text loaded. The page shows both for a moment
   // while it reads the file.
+  const output = page.locator("textarea[readonly]");
   let state;
   try {
     const handle = await page.waitForFunction(
@@ -352,18 +386,17 @@ async function runTableTool(page, plan) {
     state = await handle.jsonValue();
   } catch (error) {
     if (!isTimeout(error)) throw error;
-    return { outcome: "timeout", message: `the output didn't show the input's data after ${plan.timeoutMs / 1000} s` };
+    const shown = await output.evaluateAll((areas) => areas.map((area) => area.value).join("\n")).catch(() => "");
+    return textOutputTimeout(shown, plan);
   }
   if (state.problem) return { outcome: "failed", message: state.problem };
-  await page.getByRole("button", { name: "Download", exact: true }).click();
-  await setup("download", () => waitForOutputs(page, 1, 5_000));
-  return { outcome: "completed", outputs: await readOutputs(page, { text: true }) };
+  return download(page, page.getByRole("button", { name: "Download", exact: true }), { text: true });
 }
 
 // Text converters show their output in a textarea. html-to-markdown converts
 // a built-in sample on load, so wait for the fixture's data, not just text.
-async function runTextTool(page, plan, { input, convert, output, download }) {
-  await setup("text input", () => waitForHydration(page, input));
+async function runTextTool(page, plan, { input, convert, output, save }) {
+  await waitForHydration(page, "text input", input);
   await page.locator(input).fill(readFileSync(plan.fixtures[0], "utf8"));
   if (convert) await page.locator(convert).click();
   try {
@@ -383,53 +416,46 @@ async function runTextTool(page, plan, { input, convert, output, download }) {
       .textContent({ timeout: 500 })
       .catch(() => null);
     if (shown) return { outcome: "failed", message: shown };
-    const value = await page.locator(output).inputValue().catch(() => "");
-    return value.trim()
-      ? { outcome: "failed", message: `the output never showed the input's data (${plan.markers.join(", ")})` }
-      : { outcome: "timeout", message: `no output after ${plan.timeoutMs / 1000} s` };
+    return textOutputTimeout(await page.locator(output).inputValue().catch(() => ""), plan);
   }
-  await page.locator(download).first().click();
-  await setup("download", () => waitForOutputs(page, 1, 5_000));
-  return { outcome: "completed", outputs: await readOutputs(page, { text: true }) };
+  return download(page, page.locator(save).first(), { text: true });
 }
 
 async function runCsvCombiner(page, plan) {
   const input = '[data-testid="csv-combiner-input"]';
-  await setup("file input", () => waitForHydration(page, input));
+  await waitForHydration(page, "file input", input);
   await page.locator(input).setInputFiles(plan.fixtures);
   await page.locator('[data-testid="csv-combiner-run"]').click();
-  const download = page.locator('[data-testid="csv-combiner-download"]');
+  const combined = page.locator('[data-testid="csv-combiner-download"]');
   const problem = page.locator("div.bg-red-50");
   try {
-    await download.or(problem).first().waitFor({ timeout: plan.timeoutMs });
+    await combined.or(problem).first().waitFor({ timeout: plan.timeoutMs });
   } catch (error) {
     if (!isTimeout(error)) throw error;
     return { outcome: "timeout", message: `no combined file after ${plan.timeoutMs / 1000} s` };
   }
   if (await problem.isVisible()) return { outcome: "failed", message: await problem.first().textContent() };
-  await download.click();
-  await setup("download", () => waitForOutputs(page, 1, 5_000));
-  return { outcome: "completed", outputs: await readOutputs(page, { text: true }) };
+  return download(page, combined, { text: true });
 }
 
 // Batch PNG compression saves one ZIP; the PNGs inside are what's checked.
 async function runBatchCompress(page, plan) {
   const input = '[data-testid="batch-compress-input"]';
-  await setup("file input", () => waitForHydration(page, input));
+  await waitForHydration(page, "file input", input);
   await page.locator(input).setInputFiles(plan.fixtures);
-  const download = page.locator('[data-testid="batch-compress-download"]');
+  const zipLink = page.locator('[data-testid="batch-compress-download"]');
   // The page's own alert, not Next.js's route announcer (also role=alert).
   const alert = page.locator('[data-slot="alert"]');
   try {
-    await download.or(alert).first().waitFor({ timeout: plan.timeoutMs });
+    await zipLink.or(alert).first().waitFor({ timeout: plan.timeoutMs });
   } catch (error) {
     if (!isTimeout(error)) throw error;
     return { outcome: "timeout", message: `no ZIP offered after ${plan.timeoutMs / 1000} s` };
   }
   if (await alert.isVisible()) return { outcome: "failed", message: await alert.first().textContent() };
-  await download.click();
-  await setup("download", () => waitForOutputs(page, 1, 10_000));
-  const [zip] = await readOutputs(page, { base64: true });
+  const saved = await download(page, zipLink, { timeout: 10_000, base64: true });
+  const [zip] = saved.outputs;
+  if (!zip) return saved;
   const { BlobReader, Uint8ArrayWriter, ZipReader } = await import("@zip.js/zip.js");
   const reader = new ZipReader(new BlobReader(new Blob([Buffer.from(zip.base64, "base64")])));
   const entries = await reader.getEntries();
@@ -452,14 +478,14 @@ const DRIVERS = {
     runTextTool(page, plan, {
       input: '[data-testid="html-input"]',
       output: '[data-testid="markdown-output"]',
-      download: 'button:has-text("Download .md")',
+      save: 'button:has-text("Download .md")',
     }),
   "json-to-csv": (page, plan) =>
     runTextTool(page, plan, {
       input: '[data-testid="json-input"]',
       convert: '[data-testid="json-convert"]',
       output: '[data-testid="csv-output"]',
-      download: '[data-testid="json-to-csv-download"]',
+      save: '[data-testid="json-to-csv-download"]',
     }),
   "csv-combiner": runCsvCombiner,
   "batch-compress": runBatchCompress,
@@ -543,13 +569,17 @@ async function measure(plan) {
     }
   } catch (error) {
     if (!browser.isConnected()) throw new BrowserLost(error.message);
-    // A crashed tab is the Tool's failure: a visitor's tab would crash too.
-    const message = crashed
-      ? "the tab crashed"
-      : error instanceof HarnessError
-        ? error.message
-        : `harness: ${error.message.split("\n")[0]}`;
-    observation = { outcome: "error", message: pageErrors[0] ? `${message} (page error: ${pageErrors[0]})` : message };
+    const setupStep = error instanceof HarnessError ? error : {};
+    observation = {
+      outcome: "error",
+      message: thrownError({
+        message: error.message,
+        step: setupStep.step,
+        hydration: setupStep.hydration,
+        crashed,
+        pageError: pageErrors[0],
+      }),
+    };
   } finally {
     await context.close().catch(() => {});
   }

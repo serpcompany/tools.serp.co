@@ -21,6 +21,9 @@ import {
   scanPageHandlers,
   selectRuns,
   serializeResults,
+  textOutputTimeout,
+  thrownError,
+  treeIsDirty,
 } from "../scripts/lib/tool-sweep.mjs";
 
 const benchmarksDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../benchmarks");
@@ -96,6 +99,55 @@ test("timeouts and harness errors keep their own status", () => {
     error: "no result after 60 s",
   });
   assert.equal(classifyRun({ outcome: "error", message: "harness: x" }, { to: "mp4" }).status, "error");
+});
+
+test("a text output that fills without the fixture's data is a failure, not a timeout", () => {
+  const options = { markers: ["Alpha", "Gamma"], timeoutMs: 60_000 };
+  const stale = textOutputTimeout("id,name\n1,Sample row", options);
+  assert.deepEqual(stale, { outcome: "failed", message: "the output never showed the input's data (Alpha, Gamma)" });
+  assert.equal(classifyRun(stale, { to: "csv", markers: options.markers }).status, "error");
+  assert.deepEqual(textOutputTimeout(" \n", options), { outcome: "timeout", message: "no output after 60 s" });
+});
+
+test("a run that threw is the harness's failure unless the page is to blame", () => {
+  const timeout = "Timeout 20000ms exceeded.\n=========================== logs ===========================";
+  assert.equal(
+    thrownError({ message: timeout, step: "file input", hydration: true }),
+    "harness: file input: Timeout 20000ms exceeded.",
+  );
+  // A page that never hydrated after a script error is stuck for a visitor too.
+  const unhydrated = thrownError({ message: timeout, step: "file input", hydration: true, pageError: "x is not a function" });
+  assert.equal(unhydrated, "the file input never became interactive (page error: x is not a function)");
+  assert.deepEqual(
+    selectRuns([{ id: "a" }], [{ id: "a", status: "error", error: unhydrated }], { resume: true }),
+    [],
+    "--resume keeps it as a measurement",
+  );
+  assert.equal(
+    thrownError({ message: timeout, step: "upload", pageError: "x is not a function" }),
+    "harness: upload: Timeout 20000ms exceeded. (page error: x is not a function)",
+  );
+  assert.equal(
+    thrownError({ message: "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8811/a/\nCall log:" }),
+    "harness: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8811/a/",
+  );
+  assert.equal(
+    thrownError({ message: "Target crashed", step: "file input", hydration: true, crashed: true, pageError: "oom" }),
+    "the tab crashed (page error: oom)",
+  );
+});
+
+test("the tree is dirty when any path but the results file differs", () => {
+  const results = "apps/tools/benchmarks/tool-sweep-results.json";
+  const status = (...entries) => entries.map((entry) => `${entry}\0`).join("");
+  assert.equal(treeIsDirty("", results), false);
+  assert.equal(treeIsDirty(status(` M ${results}`, `?? ${results}.tmp`), results), false);
+  assert.equal(treeIsDirty(status(` M ${results}`, " M apps/tools/scripts/tool-sweep.mjs"), results), true);
+  // Exactly that path: a file whose path ends the same way is another file.
+  assert.equal(treeIsDirty(status("?? results.json"), results), true);
+  assert.equal(treeIsDirty(status(" M benchmarks/tool-sweep-results.json"), results), true);
+  // A rename names the old path in the next entry.
+  assert.equal(treeIsDirty(status(`R  ${results}`, "apps/tools/benchmarks/old.json"), results), true);
 });
 
 // Extensions for the same format. Any other two ready formats with the same

@@ -320,6 +320,42 @@ export function classifyRun(observation, { to, markers = [] }) {
   return { status: "pass", error: null, formatCheck };
 }
 
+// A text driver that waited for the fixture's data and gave up: an output
+// that holds something else is the Tool's failure; no output is a timeout.
+export function textOutputTimeout(output, { markers, timeoutMs }) {
+  return output.trim()
+    ? { outcome: "failed", message: `the output never showed the input's data (${markers.join(", ")})` }
+    : { outcome: "timeout", message: `no output after ${timeoutMs / 1000} s` };
+}
+
+// The error a run records when its driver threw. "harness:" marks the
+// harness's own failure, which --resume runs again. A crashed tab, or a page
+// that never hydrated after a script error, is the Tool's failure: a
+// visitor's page would be stuck too.
+export function thrownError({ message, step = null, hydration = false, crashed = false, pageError = null }) {
+  let error;
+  if (crashed) error = "the tab crashed";
+  else if (hydration && pageError) error = `the ${step} never became interactive`;
+  else error = `harness: ${step ? `${step}: ` : ""}${message.split("\n")[0]}`;
+  return pageError ? `${error} (page error: ${pageError})` : error;
+}
+
+// Whether the working tree differs from HEAD anywhere but the results file
+// (or its temporary copy). Takes `git status --porcelain -z` output, whose
+// paths are relative to the repository root, and the results file's path.
+export function treeIsDirty(porcelain, resultsPath) {
+  const own = new Set([resultsPath, `${resultsPath}.tmp`]);
+  const entries = porcelain.split("\0").filter(Boolean);
+  for (let index = 0; index < entries.length; index += 1) {
+    const status = entries[index].slice(0, 2);
+    const paths = [entries[index].slice(3)];
+    // A rename or copy is followed by the path it came from.
+    if (/[RC]/.test(status)) paths.push(entries[(index += 1)]);
+    if (paths.some((file) => !own.has(file))) return true;
+  }
+  return false;
+}
+
 // The line in FFmpeg's log that says why it stopped; the page only shows the
 // exit code. The first message after "Stream mapping:" names the encoder or
 // muxer that refused; without a mapping, the last message before the end says
