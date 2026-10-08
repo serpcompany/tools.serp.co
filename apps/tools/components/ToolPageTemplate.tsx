@@ -10,6 +10,7 @@ import { RelatedAppsSection } from "@/components/sections/RelatedAppsSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
+import { videoOnlyNote } from "@/lib/convert/webcodecs";
 import type {
   ToolInfo,
   VideoSectionData,
@@ -55,6 +56,7 @@ export default function ToolPageTemplate({
   const currentRoute =
     tool.route ??
     (tool.from && tool.to ? `/${tool.from.toLowerCase()}-to-${tool.to.toLowerCase()}` : undefined);
+  const note = videoOnlyNote(tool.from, tool.to);
   const showRelatedTools = Boolean(
     (relatedTools && relatedTools.length > 0) || (tool.from && tool.to)
   );
@@ -68,6 +70,7 @@ export default function ToolPageTemplate({
             toolId={tool.id}
             title={tool.title}
             subtitle={tool.subtitle}
+            note={note}
             from={tool.from}
             to={tool.to}
             accept={tool.accept}
@@ -89,6 +92,7 @@ export default function ToolPageTemplate({
             toolId={tool.id}
             title={tool.title}
             subtitle={tool.subtitle}
+            note={note}
             from={tool.from}
             to={tool.to}
             accept={tool.accept}

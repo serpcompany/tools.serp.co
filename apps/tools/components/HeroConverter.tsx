@@ -16,6 +16,7 @@ type Props = {
   toolId?: string;
   title: string;              // e.g., "PDF to JPG"
   subtitle?: string;          // e.g., "Convert each PDF page into a JPG…"
+  note?: string;              // a limit worth knowing first, e.g. no audio
   from: string;               // "pdf"
   to: string;                 // "jpg"
   accept?: string;            // optional override accept attr
@@ -26,6 +27,7 @@ export default function HeroConverter({
   toolId,
   title,
   subtitle = "Fast, private, in-browser conversion.",
+  note,
   from,
   to,
   accept,
@@ -290,6 +292,7 @@ export default function HeroConverter({
           <div className="flex flex-col items-center space-y-6">
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">{title}</h1>
             <p className="text-sm text-muted-foreground">{subtitle}</p>
+            {note && <p className="text-xs text-muted-foreground">{note}</p>}
 
             <svg
               className="w-12 h-12"

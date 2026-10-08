@@ -36,8 +36,20 @@ export function usesWebCodecs(from: string, to: string): boolean {
   return from.toLowerCase() === "av1" || target === "av1" || target === "hevc";
 }
 
+// Worded for every browser: Chrome or Edge can lack the codec too, when the
+// device or OS has no encoder for it.
 export function codecUnsupportedMessage(action: CodecAction, codec: BrowserCodec): string {
-  return `This browser can't ${action} ${CODEC_LABELS[codec]}. Try Chrome or Edge.`;
+  return `Your browser can't ${action} ${CODEC_LABELS[codec]} on this device. Try a recent Chrome or Edge on a different computer.`;
+}
+
+// .av1 and .hevc files are raw video streams with no audio track, so a page
+// that reads or writes one says so (owner decision).
+export function videoOnlyNote(from?: string, to?: string): string | undefined {
+  const raw = [...new Set([from, to].map((f) => f?.toLowerCase()))].filter(
+    (f): f is BrowserCodec => f === "av1" || f === "hevc",
+  );
+  if (raw.length === 0) return undefined;
+  return `Video only: ${raw.map((f) => `.${f}`).join(" and ")} files are raw video streams with no audio.`;
 }
 
 type UnsupportedError = Error & { telemetryCode: string; telemetryMetadata: ToolRunMetadata };

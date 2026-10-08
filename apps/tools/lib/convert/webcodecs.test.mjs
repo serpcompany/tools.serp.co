@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   CODEC_UNSUPPORTED,
+  videoOnlyNote,
   codecUnsupportedError,
   codecUnsupportedMessage,
   ffmpegStepArgs,
@@ -63,11 +64,19 @@ test("the .av1 stream is copied with any audio; outputs are IVF and Annex B with
 });
 
 test("a browser without the codec is told which one and where to go", () => {
-  assert.equal(codecUnsupportedMessage("encode", "hevc"), "This browser can't encode HEVC. Try Chrome or Edge.");
-  assert.equal(codecUnsupportedMessage("decode", "av1"), "This browser can't decode AV1. Try Chrome or Edge.");
+  assert.equal(codecUnsupportedMessage("encode", "hevc"), "Your browser can't encode HEVC on this device. Try a recent Chrome or Edge on a different computer.");
+  assert.equal(codecUnsupportedMessage("decode", "av1"), "Your browser can't decode AV1 on this device. Try a recent Chrome or Edge on a different computer.");
   const error = codecUnsupportedError("encode", "av1", "mp4", "av1");
-  assert.equal(error.message, "This browser can't encode AV1. Try Chrome or Edge.");
+  assert.equal(error.message, "Your browser can't encode AV1 on this device. Try a recent Chrome or Edge on a different computer.");
   // The converters record this code as a hand-off, not a failure.
   assert.equal(error.telemetryCode, CODEC_UNSUPPORTED);
   assert.deepEqual(error.telemetryMetadata, { from: "mp4", to: "av1", engine: "webcodecs", format: "av1" });
+});
+
+test("pages that read or write a raw .av1 or .hevc stream say it has no audio", () => {
+  assert.equal(videoOnlyNote("mp4", "hevc"), "Video only: .hevc files are raw video streams with no audio.");
+  assert.equal(videoOnlyNote("av1", "mp4"), "Video only: .av1 files are raw video streams with no audio.");
+  assert.equal(videoOnlyNote("AV1", "hevc"), "Video only: .av1 and .hevc files are raw video streams with no audio.");
+  assert.equal(videoOnlyNote("mp4", "mkv"), undefined);
+  assert.equal(videoOnlyNote(undefined, undefined), undefined);
 });
