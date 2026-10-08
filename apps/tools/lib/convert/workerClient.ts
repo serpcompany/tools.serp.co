@@ -501,6 +501,28 @@ export async function compressPdfViaApi(args: {
   return buffer;
 }
 
+async function compressImageInBrowserWithTelemetry(args: {
+  buf: ArrayBuffer;
+  format: string;
+  quality?: number;
+  onProgress?: (update: ProgressUpdate) => void;
+}): Promise<ArrayBuffer> {
+  const format = args.format.toLowerCase();
+  args.onProgress?.({ status: "processing", progress: 5 });
+  try {
+    const { compressImageInBrowser } = await import("./image-compress");
+    const output = await compressImageInBrowser(args.buf, format, args.quality);
+    args.onProgress?.({ status: "processing", progress: 100 });
+    return output;
+  } catch (error) {
+    throw createTelemetryError(
+      "compress_failed",
+      error instanceof Error ? error.message : "Image compression failed",
+      { format, engine: format === "svg" ? "svgo" : "imagemagick-wasm" },
+    );
+  }
+}
+
 async function compressImageViaApi(args: {
   buf: ArrayBuffer;
   format: string;
@@ -715,6 +737,14 @@ export async function compressFile(args: {
       format: args.format,
       buf: args.buf,
       quality: args.quality,
+    });
+  }
+  if (target === "image-browser") {
+    return compressImageInBrowserWithTelemetry({
+      buf: args.buf,
+      format: args.format,
+      quality: args.quality,
+      onProgress: args.onProgress,
     });
   }
   if (target === "image-server") {

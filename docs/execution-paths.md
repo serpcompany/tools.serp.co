@@ -48,8 +48,13 @@ run as `wrong_output_format` and saves nothing. Formats without a reliable
 signature, such as TGA, aren't checked, and neither is compression output.
 
 Compression keeps the original bytes when the result would be larger. PNG, JPEG
-and WebP use JSquash codecs in `workers/compress.worker.js`; audio and video use
-FFmpeg.wasm. Giving a buffer to FFmpeg.wasm transfers it to FFmpeg's worker and
+and WebP use JSquash codecs in `workers/compress.worker.js`. Since #147's Lane
+4, the other image formats compress on the main thread
+(`lib/convert/image-compress.ts`): SVG with SVGO, and GIF, TIFF, BMP and AVIF
+with ImageMagick WASM. GIF frames are re-optimised, TIFF pages are rewritten
+with LZW, a BMP with at most 256 colours becomes 8-bit RLE, and AVIF is
+re-encoded at the chosen quality; all but AVIF are lossless. Audio and video
+use FFmpeg.wasm. Giving a buffer to FFmpeg.wasm transfers it to FFmpeg's worker and
 leaves the caller's copy empty, so code that still needs the original reads it
 back from FFmpeg's file system. Until #236, missing that made every audio and
 video compressor save an empty file. Transcription extracts audio with
@@ -62,9 +67,9 @@ Server routes run on the Node.js runtime. Native FFmpeg, Ghostscript, Sharp,
 gifsicle, `yt-dlp` and similar binaries are not assumed to work in Cloudflare
 Workers merely because they work in local Node.js.
 
-- `/api/image-compress`: GIF (gifsicle), SVG (SVGO), and HEIC, HEIF, AVIF and
-  TIFF (Sharp) compression, which have no browser path yet. BMP comes back
-  unchanged. [Fails on Workers](#routes-that-fail-on-workers).
+- `/api/image-compress`: HEIC and HEIF compression with Sharp. Both compress
+  Tools are retired, and the other formats compress in the browser, so no live
+  Tool calls it. [Fails on Workers](#routes-that-fail-on-workers).
 - `/api/pdf-compress`: PDF compression with Ghostscript.
   [Fails on Workers](#routes-that-fail-on-workers).
 - `/api/media-fetch`: pasted links for downloaders and transcription, since
@@ -86,9 +91,9 @@ As of the 2026-10-08 sweep, `/api/video-convert`, `/api/image-compress` and
 not-implemented errors (`fs.mkdtemp` in `/api/video-convert`) and a 500 from
 every call to them. What a visitor gets depends on the fallback:
 
-- Image and PDF compression have no browser fallback, so those Tools fail. In
-  the sweep that was all 7 image compressors that use the route, and Compress
-  PDF.
+- PDF compression has no browser fallback, so Compress PDF fails. So did all 7
+  image compressors that used `/api/image-compress` in the sweep; the 5 still
+  live now compress in the browser.
 - Video conversion falls back to FFmpeg.wasm when the route fails, if the
   browser can run it. 27 of the 73 video Tools the sweep sent to the route
   still passed that way; nearly all the rest were MXF or RMVB output, which

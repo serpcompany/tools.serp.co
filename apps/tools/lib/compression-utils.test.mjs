@@ -11,10 +11,12 @@ import {
 test("resolveCompressionTarget maps common formats", () => {
   assert.equal(resolveCompressionTarget("png"), "image-worker");
   assert.equal(resolveCompressionTarget("jpg"), "image-worker");
-  assert.equal(resolveCompressionTarget("gif"), "image-server");
-  assert.equal(resolveCompressionTarget("svg"), "image-server");
+  assert.equal(resolveCompressionTarget("gif"), "image-browser");
+  assert.equal(resolveCompressionTarget("svg"), "image-browser");
+  assert.equal(resolveCompressionTarget("tiff"), "image-browser");
+  assert.equal(resolveCompressionTarget("bmp"), "image-browser");
   assert.equal(resolveCompressionTarget("heic"), "image-server");
-  assert.equal(resolveCompressionTarget("avif"), "image-server");
+  assert.equal(resolveCompressionTarget("avif"), "image-browser");
   assert.equal(resolveCompressionTarget("mp3"), "audio");
   assert.equal(resolveCompressionTarget("mp4"), "video");
   assert.equal(resolveCompressionTarget("pdf"), "pdf");

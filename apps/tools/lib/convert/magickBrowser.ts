@@ -104,3 +104,52 @@ export async function encodePngWithMagick(png: ArrayBuffer, to: string): Promise
   );
   return new Blob([bytes], { type: mimeTypeFor(to) });
 }
+
+// Formats compressImageWithMagick shrinks. All are lossless except AVIF,
+// which is re-encoded at the requested quality.
+export const MAGICK_COMPRESS_FORMATS = new Set(["avif", "bmp", "gif", "tif", "tiff"]);
+
+// Compresses an image without changing its format. Every page of a TIFF and
+// every frame of a GIF is kept. Callers keep the original when the result
+// isn't smaller.
+export async function compressImageWithMagick(
+  buf: ArrayBuffer,
+  format: string,
+  quality: number,
+): Promise<ArrayBuffer> {
+  if (!MAGICK_COMPRESS_FORMATS.has(format)) {
+    throw new Error(`Compressing ${format.toUpperCase()} isn't supported.`);
+  }
+  const magick = await loadMagick();
+  const magickFormatValue = magickFormat(magick, format)!;
+  const { CompressionMethod } = magick;
+  const bytes = magick.ImageMagick.readCollection(new Uint8Array(buf), magickFormatValue, (images) => {
+    if (images.length === 0) throw new Error(`The ${format.toUpperCase()} file has no image.`);
+    if (format === "gif") {
+      // Re-optimise the frames: each stores only what changed from the last.
+      images.coalesce();
+      images.optimizePlus();
+      images.optimizeTransparency();
+    } else if (format === "bmp") {
+      // BMP compresses only 8-bit palette images (RLE8). An image with more
+      // than 256 colours would need lossy quantising, so it's left as is.
+      const image = images[0]!;
+      if (image.totalColors <= 256) {
+        const settings = new magick.QuantizeSettings();
+        settings.colors = 256;
+        settings.ditherMethod = magick.DitherMethod.No;
+        image.quantize(settings);
+        image.settings.compression = CompressionMethod.RLE;
+      }
+    } else if (format === "avif") {
+      for (const image of images) image.quality = Math.round(quality * 100);
+    } else {
+      for (const image of images) image.settings.compression = CompressionMethod.LZW;
+    }
+    return images.write(magickFormatValue, (data) => data.slice());
+  });
+  if (bytes.byteLength === 0) {
+    throw new Error(`Couldn't write the compressed ${format.toUpperCase()} file.`);
+  }
+  return bytes.buffer as ArrayBuffer;
+}

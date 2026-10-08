@@ -2,6 +2,7 @@ import { AUDIO_FORMATS, VIDEO_FORMATS } from "./capabilities.ts";
 
 export type CompressionTarget =
   | "audio"
+  | "image-browser"
   | "image-server"
   | "image-worker"
   | "pdf"
@@ -9,16 +10,11 @@ export type CompressionTarget =
   | "video";
 
 const IMAGE_WORKER_FORMATS = new Set(["png", "jpg", "jpeg", "webp"]);
-const IMAGE_SERVER_FORMATS = new Set([
-  "gif",
-  "svg",
-  "heic",
-  "heif",
-  "avif",
-  "tiff",
-  "tif",
-  "bmp",
-]);
+// Compressed in the browser by lib/convert/image-compress.ts.
+const IMAGE_BROWSER_FORMATS = new Set(["gif", "svg", "avif", "tiff", "tif", "bmp"]);
+// Only /api/image-compress writes HEIC or HEIF, and it fails on Workers. Their
+// compress Tools are retired (#147).
+const IMAGE_SERVER_FORMATS = new Set(["heic", "heif"]);
 const AUDIO_FORMAT_SET = new Set(AUDIO_FORMATS);
 const VIDEO_FORMAT_SET = new Set(VIDEO_FORMATS);
 
@@ -33,6 +29,7 @@ export function resolveCompressionTarget(format: string): CompressionTarget {
   const normalized = format.toLowerCase();
   if (normalized === "pdf") return "pdf";
   if (IMAGE_WORKER_FORMATS.has(normalized)) return "image-worker";
+  if (IMAGE_BROWSER_FORMATS.has(normalized)) return "image-browser";
   if (IMAGE_SERVER_FORMATS.has(normalized)) return "image-server";
   if (AUDIO_FORMAT_SET.has(normalized)) return "audio";
   if (VIDEO_FORMAT_SET.has(normalized)) return "video";
@@ -67,5 +64,9 @@ export function mapQualityToVideoCrf(quality?: number): number {
 
 export function isImageCompressionFormat(format: string): boolean {
   const normalized = format.toLowerCase();
-  return IMAGE_WORKER_FORMATS.has(normalized) || IMAGE_SERVER_FORMATS.has(normalized);
+  return (
+    IMAGE_WORKER_FORMATS.has(normalized) ||
+    IMAGE_BROWSER_FORMATS.has(normalized) ||
+    IMAGE_SERVER_FORMATS.has(normalized)
+  );
 }
