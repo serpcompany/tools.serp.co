@@ -109,7 +109,6 @@ arw to webp,arw,webp,convert,30,,,,,ahrefs-2026-01
 arw to xbm,arw,xbm,convert,,,,,,ahrefs-2026-01
 asf to mp4,asf,mp4,convert,1500,300,3,500,250,ahrefs-2026-01
 au to mp3,au,mp3,convert,80,30,0,450,200,ahrefs-2026-01
-audio compressor,,,compress,,,,,,tools-planner.csv (removed 2026-10-09)
 av1 to mp4,av1,mp4,convert,2200,150,5,38000,7300,ahrefs-2026-01
 avchd to mp4,avchd,mp4,convert,1800,500,3,250,200,ahrefs-2026-01
 avi to flv,avi,flv,convert,70,10,0,20,10,ahrefs-2026-01
@@ -781,7 +780,6 @@ ico to tif,ico,tif,convert,,,,,,ahrefs-2026-01
 ico to tiff,ico,tiff,convert,,,,,,ahrefs-2026-01
 ico to webp,ico,webp,convert,100,10,,,,ahrefs-2026-01
 ico to xbm,ico,xbm,convert,10,,,,,ahrefs-2026-01
-image compressor,,,compress,,,,,,tools-planner.csv (removed 2026-10-09)
 image to pdf,image,pdf,convert,1880000,34000,64,10970000,255000,ahrefs-2026-01
 indd compressor,,,compress,,,,,,tools-planner.csv (removed 2026-10-09)
 ipa compressor,,,compress,,,,,,tools-planner.csv (removed 2026-10-09)
@@ -1570,7 +1568,6 @@ txt to svg,txt,svg,convert,200,30,0,100,60,ahrefs-2026-01
 txt to word,txt,word,convert,4400,150,0,3300,200,ahrefs-2026-01
 txt to xls,txt,xls,convert,200,20,3,150,10,ahrefs-2026-01
 txt to xlsx,txt,xlsx,convert,900,100,2,8800,350,ahrefs-2026-01
-video compressor,,,compress,,,,,,tools-planner.csv (removed 2026-10-09)
 video to gif,video,gif,convert,259000,75000,37,600000,246000,ahrefs-2026-01
 vob to ac3,vob,ac3,convert,,,,,,ahrefs-2026-01
 vob to avi,vob,avi,convert,300,40,1,80,70,ahrefs-2026-01

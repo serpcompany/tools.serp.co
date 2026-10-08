@@ -16,7 +16,8 @@ export const KEYWORD_SOURCES = [
   // 1,634 conversion keywords researched in January 2026 (US database).
   { source: "ahrefs-2026-01", file: "data/sources/ahrefs-2026-01-kwr-tools.csv" },
   // The removed tools-planner.csv's ideas that no catalog Tool covered and
-  // no export had (issue #232): 70 compressor ideas.
+  // no export had (issue #232): 67 compressor ideas. "audio", "image" and
+  // "video compressor" were left out: live per-format compress Tools serve them.
   {
     source: "tools-planner.csv (removed 2026-10-09)",
     file: "data/sources/tools-planner-2026-10-09-candidates.csv",

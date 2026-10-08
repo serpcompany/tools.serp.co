@@ -32,13 +32,13 @@ Sweep rows by commit: `ca5b9a53e93a` (2,643); last run 2026-10-08.
 | Exact page retired, live alias page |        0 |                  0 |
 | Exact page retired, no live alias   |      142 |             74,580 |
 | Alias page only                     |       16 |          1,274,980 |
-| No page                             |      545 |          6,372,400 |
-| total                               |    1,704 |         23,445,400 |
+| No page                             |      542 |          6,372,400 |
+| total                               |    1,701 |         23,445,400 |
 
 | Keyword source                         | Keywords |
 | -------------------------------------- | -------: |
 | ahrefs-2026-01                         |    1,634 |
-| tools-planner.csv (removed 2026-10-09) |       70 |
+| tools-planner.csv (removed 2026-10-09) |       67 |
 
 Same-format keywords (such as "pdf to pdf"): 46.
-Rows: 3,346, one per Tool and one per keyword without a Tool of its own (561).
+Rows: 3,343, one per Tool and one per keyword without a Tool of its own (558).

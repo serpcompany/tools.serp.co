@@ -58,6 +58,13 @@ const byId = (tools) => new Map(tools.map((entry) => [entry.id, entry]));
 
 test("a keyword joins the Tool whose id is its words joined by hyphens", () => {
   assert.equal(keywordId("heic to jpg"), "heic-to-jpg");
+  assert.equal(keywordId("zip compressor"), "compress-zip");
+  assert.deepEqual(joinKeyword("zip compressor", byId([tool("compress-zip")])), {
+    match: "exact",
+    toolId: "compress-zip",
+    aliasToolIds: [],
+  });
+  assert.deepEqual(aliasIds("excel compressor"), ["compress-xlsx"]);
   assert.deepEqual(joinKeyword("heic to jpg", byId([tool("heic-to-jpg"), tool("heic-to-jpeg")])), {
     match: "exact",
     toolId: "heic-to-jpg",
@@ -84,6 +91,16 @@ test("alias ids swap any format word for its alias, alone or together", () => {
   assert.deepEqual(aliasIds("htm to text"), ["htm-to-txt", "html-to-text", "html-to-txt"]);
   assert.deepEqual(aliasIds("excel to powerpoint"), ["excel-to-pptx", "xlsx-to-powerpoint", "xlsx-to-pptx"]);
   assert.deepEqual(aliasIds("mp4 to mp3"), []);
+});
+
+test("a keyword between a format and itself or its alias has no alias Tools", () => {
+  assert.deepEqual(aliasIds("tiff to tif"), []);
+  assert.deepEqual(aliasIds("tiff to tiff"), []);
+  assert.deepEqual(joinKeyword("tiff to tif", byId([tool("tif-to-tiff")])), {
+    match: "none",
+    toolId: "",
+    aliasToolIds: [],
+  });
 });
 
 test("without an exact Tool, a keyword is covered by live alias Tools only", () => {
@@ -214,6 +231,7 @@ test("each Tool and each keyword appears exactly once, in id order", () => {
   assert.deepEqual(
     rows.map((row) => [row.tool_id ?? "", row.keyword ?? "", row.catalog_state, row.keyword_match ?? ""]),
     [
+      ["", "zip compressor", "not built", "none"],
       ["docx-to-jpeg", "", "live", ""],
       ["eps-to-jpg", "eps to jpg", "retired", "exact"],
       ["jpg-to-png", "jpg to png", "live", "exact"],
@@ -221,7 +239,6 @@ test("each Tool and each keyword appears exactly once, in id order", () => {
       ["video-downloader", "", "live", ""],
       ["", "word to jpeg", "alias page", "alias"],
       ["", "word to jpg", "alias page", "alias"],
-      ["", "zip compressor", "not built", "none"],
     ],
   );
   const find = (key, value) => rows.find((row) => row[key] === value);

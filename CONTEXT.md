@@ -52,9 +52,9 @@ where the label settles the profile, and three values where it doesn't:
 `server-assisted-or-extension` (a `download` Tool: its page fetches through
 `/api/media-fetch`, or the visitor uses the promoted extension Product), and
 `unknown`, which covers only a Tool the sweep recorded no engine for
-(transcription, PDF viewers and editors, placeholders) or has no row for
-(retired Tools, and Tools added since the last sweep). A label missing from
-the table stops the view rather than becoming `unknown`.
+(transcription, PDF viewers and editors, placeholders, the character counter)
+or has no row for (retired Tools, and Tools added since the last sweep). A
+label missing from the table stops the view rather than becoming `unknown`.
 
 ## Evidence dimensions
 
@@ -91,10 +91,13 @@ owns no fact and is never edited by hand.
   nothing about whether it works) and `retired` on an inactive one's. A
   keyword row is `alias page` when a page exists but is served by a live Tool
   whose id swaps in a format alias (`docx-to-jpeg` for "word to jpg", named in
-  `alias_tool_id`), and `not built` when no page serves it.
+  `alias_tool_id`), and `not built` when no page serves it. A keyword between
+  a format and itself or its alias ("tiff to tif") has no alias page: the swap
+  would name the reverse conversion.
 - `keyword_match` is `exact` when the row's Tool id is the keyword's words
-  joined by hyphens, `alias` on an alias-page row, `none` on a not-built row,
-  and blank on a Tool row with no keyword. A retired exact Tool's row also
+  joined by hyphens ("`<format>` compressor" joins `compress-<format>`),
+  `alias` on an alias-page row, `none` on a not-built row, and blank on a Tool
+  row with no keyword. A retired exact Tool's row also
   names any live alias Tool in `alias_tool_id`.
 - `alias_keywords` and `alias_global_volume` on a live Tool's row are the
   keywords it serves as their alias page and their known global volume.

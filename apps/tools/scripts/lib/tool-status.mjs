@@ -73,15 +73,22 @@ export const LOCATIONS = [
   "unknown",
 ];
 
-// The Tool id a keyword joins: its words joined by hyphens.
+// The Tool id a keyword joins: its words joined by hyphens, except that
+// "<format> compressor" joins compress-<format>, the catalog's id for it.
 export function keywordId(keyword) {
+  const compressed = /^(\S+) compressor$/.exec(keyword);
+  if (compressed) return `compress-${compressed[1]}`;
   return keyword.split(" ").join("-");
 }
 
 // The keyword's id with one or more format words swapped for their alias,
-// such as docx-to-jpeg for "word to jpg". Excludes the keyword's own id.
+// such as docx-to-jpeg for "word to jpg". Excludes the keyword's own id. A
+// keyword converting a format to itself or to its own alias ("tiff to tif")
+// has none: swapping would name the reverse conversion or a same-format Tool.
 export function aliasIds(keyword) {
-  const words = keyword.split(" ");
+  const [from, joiner, to, ...rest] = keyword.split(" ");
+  if (joiner === "to" && rest.length === 0 && (from === to || ALIAS_OF.get(from) === to)) return [];
+  const words = keywordId(keyword).split("-");
   let variants = [[]];
   for (const word of words) {
     const options = ALIAS_OF.has(word) ? [word, ALIAS_OF.get(word)] : [word];

@@ -3,7 +3,6 @@ keyword,operation
 ai compressor,compress
 apk compressor,compress
 arw compressor,compress
-audio compressor,compress
 azw compressor,compress
 azw3 compressor,compress
 bz2 compressor,compress
@@ -28,7 +27,6 @@ gzip compressor,compress
 html compressor,compress
 icns compressor,compress
 ico compressor,compress
-image compressor,compress
 indd compressor,compress
 ipa compressor,compress
 iso compressor,compress
@@ -60,7 +58,6 @@ stl compressor,compress
 tar compressor,compress
 tgz compressor,compress
 txt compressor,compress
-video compressor,compress
 xlsx compressor,compress
 xml compressor,compress
 xz compressor,compress
