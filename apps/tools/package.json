@@ -28,6 +28,8 @@
     "smoke:browser": "node scripts/smoke-browser.mjs",
     "render-snapshot": "node scripts/render-snapshot.mjs",
     "tool-sweep": "node scripts/tool-sweep.mjs",
+    "tool-status": "node scripts/tool-status.mjs",
+    "keywords": "node scripts/keywords.mjs",
     "r2:upload-ffmpeg-assets": "node scripts/upload-r2-ffmpeg-assets.mjs",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",

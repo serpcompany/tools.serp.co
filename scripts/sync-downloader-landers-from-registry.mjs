@@ -7,10 +7,6 @@ const root = process.cwd();
 const registryApiPath =
   "repos/serpcompany/downloader-source-registry/contents/data/source-repo-data-json-config.json";
 const toolsPath = path.join(root, "apps/tools/lib/catalog/tools.json");
-const plannerPath = path.join(
-  root,
-  "packages/app-core/src/data/tools-planner.csv",
-);
 
 const defaultOperatingSystems = [
   "windows",
@@ -452,42 +448,6 @@ async function buildTool(entry, repoSlug) {
   };
 }
 
-function csvCell(value) {
-  const stringValue = String(value ?? "");
-  if (!/[",\n\r]/.test(stringValue)) return stringValue;
-  return `"${stringValue.replace(/"/g, '""')}"`;
-}
-
-function parseCsvLine(line) {
-  const cells = [];
-  let cell = "";
-  let quoted = false;
-
-  for (let index = 0; index < line.length; index += 1) {
-    const character = line[index];
-    if (character === '"') {
-      if (quoted && line[index + 1] === '"') {
-        cell += '"';
-        index += 1;
-      } else {
-        quoted = !quoted;
-      }
-      continue;
-    }
-
-    if (character === "," && !quoted) {
-      cells.push(cell);
-      cell = "";
-      continue;
-    }
-
-    cell += character;
-  }
-
-  cells.push(cell);
-  return cells;
-}
-
 function escapeNonAscii(value) {
   return value.replace(/[^\x00-\x7F]/g, (character) => {
     const codePoint = character.codePointAt(0);
@@ -500,24 +460,6 @@ function escapeNonAscii(value) {
     const low = 0xdc00 + (offset & 0x3ff);
     return `\\u${high.toString(16).padStart(4, "0")}\\u${low.toString(16).padStart(4, "0")}`;
   });
-}
-
-function plannerRowForTool(tool) {
-  const sourceName = String(tool.from ?? tool.name.replace(/\s+Video Downloader$/i, ""))
-    .trim()
-    .toLowerCase();
-  return [
-    `${sourceName} video downloader`,
-    "download",
-    tool.id,
-    "onsite-unverified",
-    "",
-    "",
-    "",
-    "Shared downloader template via registry-backed download route. Keyword-led downloader lander.",
-    "",
-    "",
-  ].map(csvCell).join(",");
 }
 
 function insertTools(tools, newTools) {
@@ -541,11 +483,7 @@ function insertTools(tools, newTools) {
 }
 
 async function main() {
-  const [toolsSource, plannerSource] = await Promise.all([
-    fs.readFile(toolsPath, "utf8"),
-    fs.readFile(plannerPath, "utf8"),
-  ]);
-  const tools = JSON.parse(toolsSource);
+  const tools = JSON.parse(await fs.readFile(toolsPath, "utf8"));
   const registry = readRegistry();
   const existingTokens = buildExistingTokens(tools);
   const existingIds = new Set(tools.map((tool) => tool.id));
@@ -580,25 +518,9 @@ async function main() {
   const nextTools = insertTools(tools, newTools);
   await fs.writeFile(toolsPath, `${escapeNonAscii(JSON.stringify(nextTools, null, 2))}\n`);
 
-  const plannerIds = new Set(
-    plannerSource
-      .split(/\r?\n/)
-      .map((line) => parseCsvLine(line)[2])
-      .filter(Boolean),
-  );
-  const plannerRows = newTools
-    .filter((tool) => !plannerIds.has(tool.id))
-    .map(plannerRowForTool);
-
-  if (plannerRows.length) {
-    const newline = plannerSource.endsWith("\n") ? "" : "\n";
-    await fs.writeFile(plannerPath, `${plannerSource}${newline}${plannerRows.join("\n")}\n`);
-  }
-
-  console.log(
-    `Downloader registry sync: added ${newTools.length} tools and ${plannerRows.length} planner rows.`,
-  );
+  console.log(`Downloader registry sync: added ${newTools.length} tools.`);
   console.log(newTools.map((tool) => tool.id).join("\n"));
+  console.log("Next: run `pnpm -C apps/tools tool-status` to add them to the status view.");
 }
 
 await main();

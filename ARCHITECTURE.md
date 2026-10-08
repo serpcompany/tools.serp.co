@@ -44,18 +44,27 @@ real reusable contract justifies moving it into a package.
 | Shipped Tool catalog intent                    | `apps/tools/lib/catalog/tools.json`                                            | Owns registry id, route, operation, active/inactive intent, formats, and catalog content. It does not prove correctness or health.        |
 | Executable Tool behavior                       | Dispatch, workers, components, and API routes under `apps/tools`               | Code owns what executes. Registry flags and dependency names are not sufficient provenance by themselves.                                 |
 | Related applications and network brands        | JSON data under `packages/app-core/src/data`                                   | These are separate catalogs and must not be inferred from Tool names or routes.                                                           |
-| Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                        | Imports show actual consumption; planner fields do not override manifests or code.                                                        |
+| Workspace membership and declared dependencies | `pnpm-workspace.yaml` and each workspace `package.json`                        | Imports show actual consumption; planning data does not override manifests or code.                                                       |
 | Worker configuration                           | `apps/tools/wrangler.jsonc`                                                    | Only Wrangler config. Top level is local-only; `env.staging` and `env.production` own Worker names, routes, bindings and resource ids.   |
 | Cloudflare build behavior                      | `apps/tools/open-next.config.ts` and `apps/tools/scripts/build-cloudflare.mjs` | Owns the OpenNext artifact and incremental-cache integration.                                                                             |
 | D1 schema                                      | Drizzle schema in `packages/tool-telemetry/src/schema.ts`                      | `db:generate` writes ordered SQL to `apps/tools/migrations`; a test fails when schema and migrations drift.                               |
+| Verification evidence                          | `apps/tools/benchmarks/tool-sweep-results.json` and `fixture-matrix.json`      | The sweep's status for each active Tool at a recorded commit (`pnpm -C apps/tools tool-sweep`), and the fixture each format uses. A fixture alone proves nothing. |
 | Runtime observations                           | D1 `tool_runs` and derived `tool_status`                                       | Time-bound evidence for instrumented Tool ids, not catalog or work state.                                                                 |
-| Planning evidence                              | `packages/app-core/src/data/tools-planner.csv`                                 | Advisory candidate rows, read and appended to by the downloader lander sync and read by two lander tests. Not catalog intent, capability, or health; join only by registry Tool id. |
+| Keyword demand                                 | `apps/tools/data/keywords.csv`                                                 | Search volume and difficulty per keyword from dated Ahrefs exports, rebuilt by `pnpm -C apps/tools keywords`. Planning evidence only.     |
+| Tool status view                               | `apps/tools/benchmarks/tool-status.csv` (generated)                            | Joins catalog intent, verification, processing location (from the sweep's engine) and keyword demand by Tool id. Owns no fact; never edited by hand. |
 | Active work                                    | GitHub Issues for this repository                                              | Issues, dependencies, labels, and assignees own readiness, blockers, and ownership. Repository plans are not a parallel tracker.          |
 | Documentation map                              | `AGENTS.md`                                                                    | Maps each area to the doc that owns it; `docs/README.md` says what belongs in `docs/`. `.archive/` is historical evidence as a whole.     |
 
 Registry Tool id is the join key across catalog intent, fixtures, verification,
-runtime observations, planning evidence, and GitHub work. Names, routes, and
-planner rows are not substitute join keys.
+runtime observations, keyword demand, and GitHub work. Names and routes are not
+substitute join keys. A keyword joins the Tool whose id is its words joined by
+hyphens; a Tool whose id differs only by a format alias (`docx-to-jpeg` for
+"word to jpg") counts as alias coverage, never as an exact page.
+
+After a sweep, a catalog change or a keyword import, run
+`pnpm -C apps/tools tool-status` and commit `tool-status.csv` and
+`tool-status-summary.md`; `pnpm test` fails while either is stale. On a merge
+conflict in either file, regenerate it rather than resolving it by hand.
 
 ## Cloudflare runtime and data boundaries
 
