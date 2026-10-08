@@ -62,7 +62,7 @@ Workers merely because they work in local Node.js.
   most media hosts don't allow cross-origin reads from a page. It streams direct
   files and pages an extractor in `lib/extractors` understands; its `yt-dlp`
   fallback needs a native binary.
-- `/api/video-convert`: native FFmpeg, tried before FFmpeg.wasm for MXF, RM and
+- `/api/video-convert`: native FFmpeg, tried before FFmpeg.wasm for RM and
   RMVB output, for AMR to MP2, OGG or OGA, and in browsers that can't run
   FFmpeg.wasm (`shouldUseServerConversion`).
   [Fails on Workers](#routes-that-fail-on-workers).
@@ -83,7 +83,8 @@ every call to them. What a visitor gets depends on the fallback:
 - Video conversion falls back to FFmpeg.wasm when the route fails, if the
   browser can run it. 27 of the 73 video Tools the sweep sent to the route
   still passed that way; nearly all the rest were MXF or RMVB output, which
-  failed in FFmpeg.wasm too. Since #236, MXF output converts in FFmpeg.wasm.
+  failed in FFmpeg.wasm too. Since #236, MXF output converts in FFmpeg.wasm without
+  calling the route first.
 
 The sweep didn't measure `/api/image-convert`, because no Tool calls it, but it
 creates its temp directory with `fs.mkdtemp` the same way
