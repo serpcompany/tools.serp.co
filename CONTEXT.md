@@ -43,14 +43,18 @@ Calling a third-party source alone does not make a Tool server-assisted. The
 profile changes only when repository-owned server behavior is necessary to the
 Tool's operation.
 
-The Tool status view records a **processing location** derived from the
-sweep's engine. It uses `client-only` and `server-executed` where the engine
-settles the profile, and three values where it doesn't:
+The Tool status view records a **processing location**, inferred from the
+engine label the sweep records for a Tool rather than observed, through the
+explicit `ENGINE_LOCATIONS` table. It uses `client-only` and `server-executed`
+where the label settles the profile, and three values where it doesn't:
 `server-first-client-fallback` (the page tries a server route, such as
 `/api/video-convert`, and falls back to the browser),
-`server-assisted-or-extension` (a downloader: its page fetches through
+`server-assisted-or-extension` (a `download` Tool: its page fetches through
 `/api/media-fetch`, or the visitor uses the promoted extension Product), and
-`unknown` (the sweep recorded no engine).
+`unknown`, which covers only a Tool the sweep recorded no engine for
+(transcription, PDF viewers and editors, placeholders) or has no row for
+(retired Tools, and Tools added since the last sweep). A label missing from
+the table stops the view rather than becoming `unknown`.
 
 ## Evidence dimensions
 
@@ -68,8 +72,8 @@ Never collapse these dimensions into a single Tool `status`:
   named environment and time window. No observation is not success or failure.
 - **Planning evidence** — candidate, prioritization, or research material, such
   as **keyword demand**: search volume per keyword in
-  `apps/tools/data/keywords.csv`. It does not establish publication,
-  correctness, or health.
+  `apps/tools/data/keywords.csv`, plus candidate keywords with no search data
+  yet. It does not establish publication, correctness, or health.
 - **Work state** — requested work, readiness, blockers, and ownership in GitHub
   Issues. Pull requests and commits are implementation and review evidence, not
   work-state authorities.
@@ -81,12 +85,19 @@ resolve it; absence must not be converted into a positive or negative claim.
 `pnpm -C apps/tools tool-status`. It sets catalog intent, processing location,
 verification evidence and keyword demand side by side, each in its own
 columns: one row per Tool and one per keyword without a Tool of its own id. It
-owns no fact and is never edited by hand. Its `catalog_state` is `live` (an
-active Registry Entry, which says nothing about whether it works), `retired`
-(an inactive one) or `not built` (a keyword only). Its `keyword_match` is
-`exact` (the Tool's id is the keyword's words joined by hyphens), `alias` (only
-a live Tool whose id swaps in a format alias, such as `docx-to-jpeg` for "word
-to jpg") or `none`.
+owns no fact and is never edited by hand.
+
+- `catalog_state` is `live` on an active Registry Entry's row (which says
+  nothing about whether it works) and `retired` on an inactive one's. A
+  keyword row is `alias page` when a page exists but is served by a live Tool
+  whose id swaps in a format alias (`docx-to-jpeg` for "word to jpg", named in
+  `alias_tool_id`), and `not built` when no page serves it.
+- `keyword_match` is `exact` when the row's Tool id is the keyword's words
+  joined by hyphens, `alias` on an alias-page row, `none` on a not-built row,
+  and blank on a Tool row with no keyword. A retired exact Tool's row also
+  names any live alias Tool in `alias_tool_id`.
+- `alias_keywords` and `alias_global_volume` on a live Tool's row are the
+  keywords it serves as their alias page and their known global volume.
 
 ## Work state
 

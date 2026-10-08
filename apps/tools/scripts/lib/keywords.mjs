@@ -1,17 +1,27 @@
 // Pure helpers for scripts/keywords.mjs: turn keyword-research exports into
-// data/keywords.csv, one row per cleaned keyword, sorted by global volume.
+// data/keywords.csv, one row per cleaned keyword, sorted by keyword so a
+// refreshed export diffs row by row.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { parseCsv, toCsv } from "./csv.mjs";
 
-// Exports merged into data/keywords.csv, oldest first, with paths from the
-// repository root. A later export replaces an earlier export's row for the
-// same keyword, so `source` always names the export every metric came from.
+// Sources merged into data/keywords.csv, with paths from apps/tools. Exports
+// are listed oldest first: a later export replaces an earlier export's row
+// for the same keyword, so `source` always names the export every metric
+// came from. A `candidates` source only adds keywords no export has, with
+// blank metrics, and never replaces a row.
 export const KEYWORD_SOURCES = [
   // 1,634 conversion keywords researched in January 2026 (US database).
-  { source: "ahrefs-2026-01", file: ".archive/evidence/seo-research/kwr_tools.csv" },
+  { source: "ahrefs-2026-01", file: "data/sources/ahrefs-2026-01-kwr-tools.csv" },
+  // The removed tools-planner.csv's ideas that no catalog Tool covered and
+  // no export had (issue #232): 70 compressor ideas.
+  {
+    source: "tools-planner.csv (removed 2026-10-09)",
+    file: "data/sources/tools-planner-2026-10-09-candidates.csv",
+    candidates: true,
+  },
 ];
 
 export const KEYWORD_COLUMNS = [
@@ -122,31 +132,27 @@ export function parseExport(text, source) {
   return [...byKeyword.values()];
 }
 
-// Exports oldest first; a later export's row replaces an earlier one's.
-export function mergeExports(exports) {
+// Sources as { rows, candidates }, exports oldest first. A later export's row
+// replaces an earlier one's; a candidate row is added only when no export has
+// the keyword. Sorted by keyword.
+export function mergeExports(sources) {
   const byKeyword = new Map();
-  for (const rows of exports) for (const row of rows) byKeyword.set(row.keyword, row);
-  return sortKeywords([...byKeyword.values()]);
-}
-
-const descending = (a, b) => (b ?? -1) - (a ?? -1);
-
-// Highest global volume first, then US volume; unknown volumes last.
-export function sortKeywords(rows) {
-  return [...rows].sort(
-    (a, b) =>
-      descending(a.global_volume, b.global_volume) ||
-      descending(a.us_volume, b.us_volume) ||
-      (a.keyword < b.keyword ? -1 : a.keyword > b.keyword ? 1 : 0),
-  );
+  for (const { rows } of sources.filter((entry) => !entry.candidates)) {
+    for (const row of rows) byKeyword.set(row.keyword, row);
+  }
+  for (const { rows } of sources.filter((entry) => entry.candidates)) {
+    for (const row of rows) if (!byKeyword.has(row.keyword)) byKeyword.set(row.keyword, row);
+  }
+  return [...byKeyword.values()].sort((a, b) => (a.keyword < b.keyword ? -1 : 1));
 }
 
 // data/keywords.csv as KEYWORD_SOURCES builds it.
-export function buildKeywordsCsv(repoRoot, sources = KEYWORD_SOURCES) {
-  const exports = sources.map(({ source, file }) =>
-    parseExport(decodeExport(readFileSync(path.join(repoRoot, file))), source),
-  );
-  return toCsv(KEYWORD_COLUMNS, mergeExports(exports));
+export function buildKeywordsCsv(appRoot, sources = KEYWORD_SOURCES) {
+  const parsed = sources.map(({ source, file, candidates = false }) => ({
+    rows: parseExport(decodeExport(readFileSync(path.join(appRoot, file))), source),
+    candidates,
+  }));
+  return toCsv(KEYWORD_COLUMNS, mergeExports(parsed));
 }
 
 // data/keywords.csv back into rows, with counts as numbers or null.

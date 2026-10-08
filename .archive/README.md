@@ -7,6 +7,6 @@ and nothing here overrides current docs or running code. Confirm any reused
 claim against the current code and the GitHub issue that authorizes the work.
 
 Archived files keep their original content, except for a short note where a
-file moved out (see `evidence/tool-planning/README.md`) or where a maintained
-command still reads one (see `evidence/seo-research/README.md`). Don't update
-them to match the present; write current guidance beside its owner instead.
+file moved out because something still reads it (see
+`evidence/tool-planning/README.md`). Don't update them to match the present;
+write current guidance beside its owner instead.

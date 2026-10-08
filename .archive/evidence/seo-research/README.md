@@ -11,6 +11,6 @@ work. Revalidate source availability and licensing before reuse, and create or
 update a GitHub issue before turning a row into implementation work.
 
 `kwr_tools.csv`, 1,634 conversion keywords from a January 2026 Ahrefs export,
-is the first source of `apps/tools/data/keywords.csv`, which
-`pnpm -C apps/tools keywords` builds from it (issue #232). Keep it unchanged so
-that file can be rebuilt.
+was here too. `pnpm -C apps/tools keywords` builds `apps/tools/data/keywords.csv`
+from it, so it moved to `apps/tools/data/sources/ahrefs-2026-01-kwr-tools.csv`
+(issue #232).
