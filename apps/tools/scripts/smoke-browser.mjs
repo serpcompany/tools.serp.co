@@ -31,6 +31,9 @@ const STEP_TIMEOUT_MS = 90_000;
 // reported.
 const STEP_ATTEMPTS = 2;
 const TELEMETRY_TIMEOUT_MS = 10_000;
+// A desktop Chrome visitor: not on Next's list of HTML-limited bots.
+const CHROME_USER_AGENT =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 
 function parseArgs(argv) {
   const args = {
@@ -253,6 +256,24 @@ await step("telemetry ignores requests with Global Privacy Control", async () =>
     maxRedirects: 0,
   });
   assert(response.status() === 204, `status ${response.status()}`);
+});
+
+await step("a dynamic tool page serves its title, description and canonical in <head>", async () => {
+  // Next streams metadata into <body> when a dynamic page's RSC payload
+  // outruns it; htmlLimitedBots in next.config.mjs keeps it blocking for every
+  // user agent. /avchd-to-mkv/ is one of the [tool] pages that streamed.
+  const response = await context.request.get(`${args.baseUrl}/avchd-to-mkv/`, {
+    headers: { "user-agent": CHROME_USER_AGENT, [SMOKE_TEST_HEADER]: "1" },
+    maxRedirects: 0,
+  });
+  assert(response.status() === 200, `status ${response.status()}`);
+  const html = await response.text();
+  const headEnd = html.indexOf("</head>");
+  assert(headEnd !== -1, "no </head>");
+  const head = html.slice(0, headEnd);
+  for (const tag of ["<title>", '<meta name="description"', '<link rel="canonical"']) {
+    assert(head.includes(tag), `${tag} is not in <head>`);
+  }
 });
 
 await step("webm-to-mp3 converts with FFmpeg in the browser", async (page, telemetryStatuses) => {

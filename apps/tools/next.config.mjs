@@ -142,6 +142,12 @@ const nextConfig = {
   trailingSlash: true,
   // middleware.ts applies the trailing-slash rules (lib/trailing-slash.ts).
   skipTrailingSlashRedirect: true,
+  // Blocking metadata for every user agent, not only Next's list of
+  // HTML-limited bots: <title>, the description, rel=canonical and og tags
+  // are always in <head>. Streamed, they land in <body> whenever a dynamic
+  // page's RSC payload outruns them: 354 [tool] pages did for browsers and
+  // Googlebot. Requests with no User-Agent still stream.
+  htmlLimitedBots: /.*/,
   env: {
     BUILD_MODE: "server",
     SUPPORTS_VIDEO_CONVERSION: "true",

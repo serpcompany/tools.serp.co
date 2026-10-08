@@ -21,6 +21,9 @@ against a running Worker. CI runs it in two places:
   telemetry request.
 - A telemetry request with `Sec-GPC: 1` gets a 204 (the route returns before
   storing anything).
+- A dynamic Tool page requested with a Chrome user agent has its `<title>`,
+  meta description and `rel=canonical` in `<head>`, not streamed into
+  `<body>`.
 - `/internal/tools/` lists both tools as `live`. It is read with a direct
   request, so the dashboard password is only sent to the Worker.
 
