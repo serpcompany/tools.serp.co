@@ -234,7 +234,6 @@ export const ENGINE_LOCATIONS = {
   javascript: "client-only",
   "jsquash-worker": "client-only",
   "image-documents": "client-only",
-  // The OCR model loads from jsDelivr, but recognition runs in the browser.
   tesseract: "client-only",
   docx: "client-only",
   svgo: "client-only",
