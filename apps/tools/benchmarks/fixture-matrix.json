@@ -37,10 +37,10 @@
     },
     {
       "format": "aifc",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.aifc",
-      "notes": "AIFF-C fixture (copied from sample.aiff)."
+      "notes": "sample.aifc is a copy of sample.aiff (AIFF, not AIFF-C); needs a real AIFF-C."
     },
     {
       "format": "aiff",
@@ -362,10 +362,10 @@
     },
     {
       "format": "m4p",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.m4p",
-      "notes": "Sample m4a container with .m4p extension."
+      "notes": "sample.m4p is a copy of sample.m4a (unprotected AAC); a real M4P is FairPlay-protected."
     },
     {
       "format": "m4r",
@@ -432,10 +432,10 @@
     },
     {
       "format": "mpeg2",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.mpeg2",
-      "notes": "Auto-generated fixture."
+      "notes": "sample.mpeg2 is a copy of sample.mpeg (MPEG-2 video in an MPEG-1 system stream); needs a real MPEG-2 program stream."
     },
     {
       "format": "mpg",
@@ -453,10 +453,10 @@
     },
     {
       "format": "mts",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.mts",
-      "notes": "Auto-generated fixture."
+      "notes": "sample.mts is a copy of sample.ts (188-byte packets, not AVCHD's 192); needs a real MTS."
     },
     {
       "format": "mxf",
@@ -492,6 +492,13 @@
       "input": "file",
       "fixture": "fixtures/sample.opus",
       "notes": "Auto-generated fixture."
+    },
+    {
+      "format": "orf",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.orf",
+      "notes": "Olympus ORF camera RAW sample."
     },
     {
       "format": "pdf",
@@ -539,6 +546,13 @@
       "notes": "RealAudio sample from FFmpeg samples."
     },
     {
+      "format": "raf",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.raf",
+      "notes": "Fujifilm RAF camera RAW sample (X-S1)."
+    },
+    {
       "format": "rm",
       "status": "ready",
       "input": "file",
@@ -547,10 +561,10 @@
     },
     {
       "format": "rmvb",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.rmvb",
-      "notes": "Auto-generated fixture."
+      "notes": "sample.rmvb is a copy of sample.rm (RealVideo 2.0); needs a real RMVB."
     },
     {
       "format": "svg",
@@ -631,17 +645,17 @@
     },
     {
       "format": "wma",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.wma",
-      "notes": "Placeholder fixture (mp3 container) because WMAv2 encoder is unavailable."
+      "notes": "sample.wma is an MP3 stand-in (no WMAv2 encoder was available); needs a real WMA."
     },
     {
       "format": "wmv",
-      "status": "ready",
+      "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.wmv",
-      "notes": "Placeholder fixture (mp4 container) because WMV encoder is unavailable."
+      "notes": "sample.wmv is an MP4 stand-in (no WMV encoder was available); needs a real WMV."
     },
     {
       "format": "wtv",

@@ -115,6 +115,13 @@ records every page, sitemap file and redirect a running Worker serves;
 `render-snapshot diff <base> <head>` exits 1 if a refactor changed any of them.
 Build both the same way; only `cf:build:production` covers ads and indexing.
 
+`pnpm -C apps/tools tool-sweep --base-url http://localhost:8787` runs every
+active converter and compressor Tool once in headless Chromium against a local
+Worker (started as in [the browser smoke runbook](../../docs/runbooks/browser-smoke.md)),
+checks each saved file with `lib/convert/output-format.ts` and writes
+`benchmarks/tool-sweep-results.json`. `--resume` continues an interrupted run;
+`--summary` prints the Markdown table. It measures; it isn't part of `pnpm check`.
+
 ## Adding a Tool
 
 1. Add or update the registry entry with a stable Tool id, route, operation,
