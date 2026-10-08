@@ -85,3 +85,12 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
    measures it; the sweep then records its status and processing location.
 6. Run the deterministic repository checks. Run the scoped network link check,
    `pnpm check:links`, as well when downloader outbound links changed.
+
+## Retiring a Tool
+
+1. Set `isActive: false` on its registry entry. Its page then 404s and leaves
+   the sitemap. The entry stays as the record of the retirement.
+2. Drop its rows from `benchmarks/tool-sweep-results.json`, as the next sweep
+   would: keep only active Tools' rows (`mergeRows` with no new rows) and
+   recount `meta.counts`. `pnpm test` fails while a retired Tool keeps a row.
+3. Run `pnpm -C apps/tools tool-status` and commit the regenerated view.
