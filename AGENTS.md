@@ -30,9 +30,9 @@ supersede it.
 
 **The tools app and its catalog.** [apps/tools/README.md](apps/tools/README.md)
 maps the docs on the Tool registry, routes, sitemaps, rendering, execution paths
-and the server routes that fail on Workers, downloader Landers, ads and verification.
-Read it before adding or changing a Tool, a route or an execution path. A change
-to a downloader Lander's outbound links follows
+(including the server routes that fail on Workers), downloader Landers, ads and
+verification. Read it before adding or changing a Tool, a route or an execution
+path. A change to a downloader Lander's outbound links follows
 [docs/agents/downloader-lander-links.md](docs/agents/downloader-lander-links.md):
 every URL is verified, never guessed from a slug.
 

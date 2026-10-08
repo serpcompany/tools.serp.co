@@ -7,10 +7,9 @@ the Tool sweep, which runs every converter and compressor. Paths are under
 
 ## Fixtures
 
-Benchmark fixtures and their declared coverage live under
-`apps/tools/benchmarks`. In `fixture-matrix.json`, `formats` is keyed by input
-format and records `ready` or `missing`; custom Tool fixtures live under
-`toolFixtures`. Fixtures are reusable inputs, not proof that a Tool works.
+Benchmark fixtures and their declared coverage live under `benchmarks/`. In
+`benchmarks/fixture-matrix.json`, `formats` is keyed by input format and
+records `ready` or `missing`; custom Tool fixtures live under `toolFixtures`. Fixtures are reusable inputs, not proof that a Tool works.
 
 ## Deterministic checks
 

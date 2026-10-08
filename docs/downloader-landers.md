@@ -17,8 +17,9 @@ multi-source entry point.
 
 Downloads deliberately use this site's own `/api/media-fetch`, not the shared
 `https://api.serp.co/download/` that the serp downloader-tools standard names
-(owner decision, 2026-10-07, issue #169). What that route does and its request
-contract are in [execution paths](execution-paths.md#server-routes).
+(owner decision, 2026-10-07, issue #169). What that route does is under
+[server routes](execution-paths.md#server-routes), and its request contract
+under [request contracts](execution-paths.md#request-contracts).
 
 ## Outbound links
 

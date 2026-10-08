@@ -78,7 +78,8 @@ Native FFmpeg, ImageMagick, Ghostscript, or `yt-dlp` execution requires an
 explicitly chosen compatible runtime; Cloudflare Workers support must not be
 inferred from local Node.js behavior.
 [Tool execution paths](./docs/execution-paths.md#routes-that-fail-on-workers)
-lists the server routes that already fail on Workers.
+lists the server routes the #224 sweep saw fail on Workers, and one it didn't
+measure that would fail the same way.
 
 Production deploys, remote migrations, provisioning, uploads, secrets, and
 destructive resource retirement remain human-controlled. See the current

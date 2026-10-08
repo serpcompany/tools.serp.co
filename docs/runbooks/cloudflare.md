@@ -179,10 +179,11 @@ under GitHub issue #34; repository cleanup is not evidence that remote projects,
 domains, integrations, credentials, or databases have been deleted.
 
 Native-binary APIs using FFmpeg, ImageMagick, Ghostscript, `yt-dlp`, Sharp, or
-child processes remain a separate architecture concern. GitHub issue #67 owns
-explicit execution-profile and engine provenance; any replacement runtime also
-requires its own issue or accepted decision. Local Node.js success is not proof
-of Cloudflare Worker compatibility.
+child processes remain a separate architecture concern;
+[Tool execution paths](../execution-paths.md#routes-that-fail-on-workers) lists
+the routes known to fail on Workers. Any replacement runtime requires its own
+issue or accepted decision. Local Node.js success is not proof of Cloudflare
+Worker compatibility.
 
 ### Owner-controlled legacy platform sequence
 

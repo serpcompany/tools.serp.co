@@ -32,8 +32,8 @@ const files = listFiles(
   "ARCHITECTURE.md",
   "CONTEXT.md",
   "docs/*.md",
-  "apps/*/README.md",
-  "packages/*/README.md",
+  ":(glob)apps/*/README.md",
+  ":(glob)packages/*/README.md",
 );
 
 const wrappedLines = (text) =>

@@ -13,10 +13,10 @@ of these gets its own leaf, such as `docs/telemetry.md`.
 
 Some things belong elsewhere:
 
-- A component's own contract lives beside it, as its `README.md` (for example
-  `apps/tools/README.md`), and data an owner reads lives with that owner. That
-  README is a map: when its topics outgrow the map budget, each becomes a leaf
-  in `docs/` that the README links, as `apps/tools/README.md` does.
+- A component's `README.md`, beside it, is the entry point to its contract
+  (for example `apps/tools/README.md`). It is a map: when its topics outgrow
+  the map budget, each becomes a leaf in `docs/` that the README links, as
+  `apps/tools/README.md` does. Data an owner reads lives with that owner.
 - Work, plans, acceptance criteria and status belong in GitHub Issues, not in a
   doc. The old `docs/knowledge`, `docs/plans` and `docs/planner` folders were
   retired for that reason; don't recreate them.

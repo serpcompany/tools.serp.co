@@ -2,7 +2,8 @@
 
 Where a Tool's core operation runs: the browser engine for each kind of input,
 the format check before a file is saved, and the server routes that remain,
-three of which fail on Cloudflare Workers today. [CONTEXT.md](../CONTEXT.md)
+three of which the #224 sweep saw fail on Cloudflare Workers.
+[CONTEXT.md](../CONTEXT.md)
 defines the client-only, server-assisted and server-executed profiles. Paths
 are under `apps/tools/`; [its README](../apps/tools/README.md) maps the app's
 other topics.
@@ -57,13 +58,15 @@ Workers merely because they work in local Node.js.
   FFmpeg.wasm (`shouldUseServerConversion`).
   [Fails on Workers](#routes-that-fail-on-workers).
 - `/api/image-convert`: still exists, but no Tool has called it since #198.
+  [Treat it as failing on Workers](#routes-that-fail-on-workers).
 
 ### Routes that fail on Workers
 
-`/api/video-convert`, `/api/image-compress` and `/api/pdf-compress` fail on
-Cloudflare Workers today. The #224 sweep (2026-10-08, commit `ca5b9a5`, against
-a local `wrangler dev` Worker) logged "`fs.mkdtemp` is not implemented" and got
-a 500 from every call to them. What a visitor gets depends on the fallback:
+As of the 2026-10-08 sweep, `/api/video-convert`, `/api/image-compress` and
+`/api/pdf-compress` fail on Cloudflare Workers. The #224 sweep (commit
+`ca5b9a5`, against a local `wrangler dev` Worker) logged unenv `fs`
+not-implemented errors (`fs.mkdtemp` in `/api/video-convert`) and a 500 from
+every call to them. What a visitor gets depends on the fallback:
 
 - Image and PDF compression have no browser fallback, so those Tools fail. In
   the sweep that was all 7 image compressors that use the route, and Compress
@@ -73,9 +76,14 @@ a 500 from every call to them. What a visitor gets depends on the fallback:
   still passed that way; nearly all the rest were MXF or RMVB output, which
   failed in FFmpeg.wasm too.
 
-Issue #147 is moving this work into the browser and then deleting the routes;
-PDF compression waits on an owner decision about its browser engine. Until then,
-don't count these routes as working server paths.
+The sweep didn't measure `/api/image-convert`, because no Tool calls it, but it
+creates its temp directory with `fs.mkdtemp` the same way
+(`app/api/image-convert/route.ts`), so treat it as failing too.
+
+Issue #147 is moving this work into the browser, or retiring Tools that can't
+run there (such as `compress-heic` and `compress-heif`), and then deleting the
+routes; PDF compression waits on an owner decision about its browser engine.
+Until then, don't count these routes as working server paths.
 
 ## Request contracts
 

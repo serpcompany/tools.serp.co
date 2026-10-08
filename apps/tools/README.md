@@ -17,14 +17,15 @@ category, a sitemap or a shared page section.
 
 **Where a Tool runs.** [docs/execution-paths.md](../../docs/execution-paths.md)
 says which browser engine handles each input, how output is checked before it
-is saved, which server routes remain, which of them fail on Cloudflare Workers
-today, and the request contracts they share. Read it before changing an
+is saved, which server routes remain, which of them fail on Cloudflare
+Workers, and the request contracts they share. Read it before changing an
 engine, a worker or an API route.
 
 **Downloader Landers.** [docs/downloader-landers.md](../../docs/downloader-landers.md)
 covers the shared downloader template and rate limit, why downloads use this
-site's own `/api/media-fetch`, and where outbound links come from. A change to
-outbound links follows
+site's own `/api/media-fetch`, and where outbound links come from. Read it
+before adding or changing a downloader Tool or Lander. A change to outbound
+links follows
 [docs/agents/downloader-lander-links.md](../../docs/agents/downloader-lander-links.md).
 
 **Ads.** [docs/ads.md](../../docs/ads.md) says where ads are placed, when they
