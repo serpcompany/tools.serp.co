@@ -104,3 +104,75 @@ export async function encodePngWithMagick(png: ArrayBuffer, to: string): Promise
   );
   return new Blob([bytes], { type: mimeTypeFor(to) });
 }
+
+// Formats compressImageWithMagick shrinks. All are lossless except AVIF,
+// which is re-encoded at the requested quality.
+export const MAGICK_COMPRESS_FORMATS = new Set(["avif", "bmp", "gif", "tif", "tiff"]);
+const LOSSLESS_FORMATS = new Set(["bmp", "gif", "tif", "tiff"]);
+
+// Whether two files decode to the same pixels, frame by frame (coalesced, so
+// a GIF frame is compared as shown).
+function samePixels(magick: MagickModule, a: Uint8Array, b: Uint8Array, format: MagickFormatType): boolean {
+  return magick.ImageMagick.readCollection(a, format, (first) => {
+    first.coalesce();
+    return magick.ImageMagick.readCollection(b, format, (second) => {
+      second.coalesce();
+      return (
+        first.length === second.length &&
+        first.every((image, index) => image.compare(second[index]!, magick.ErrorMetric.Absolute) === 0)
+      );
+    });
+  });
+}
+
+// Compresses an image without changing its format. Every page of a TIFF and
+// every frame of a GIF is kept. A lossless format comes back unchanged unless
+// the result decodes to exactly the same pixels; so does any image deeper
+// than 8 bits a channel, which this 8-bit ImageMagick build can't hold.
+// Callers keep the original when the result isn't smaller.
+export async function compressImageWithMagick(
+  buf: ArrayBuffer,
+  format: string,
+  quality: number,
+): Promise<ArrayBuffer> {
+  if (!MAGICK_COMPRESS_FORMATS.has(format)) {
+    throw new Error(`Compressing ${format.toUpperCase()} isn't supported.`);
+  }
+  const magick = await loadMagick();
+  const magickFormatValue = magickFormat(magick, format)!;
+  const { CompressionMethod } = magick;
+  const input = new Uint8Array(buf);
+  const bytes = magick.ImageMagick.readCollection(input, magickFormatValue, (images) => {
+    if (images.length === 0) throw new Error(`The ${format.toUpperCase()} file has no image.`);
+    if (images.some((image) => image.depth > 8)) return null;
+    if (format === "gif") {
+      // Re-optimise the frames: each stores only what changed from the last.
+      images.coalesce();
+      images.optimizePlus();
+      images.optimizeTransparency();
+    } else if (format === "bmp") {
+      // BMP compresses only 8-bit palette images (RLE8). An image with more
+      // than 256 colours would need lossy quantising, so it's left as is.
+      // RLE8 has no alpha channel.
+      const image = images[0]!;
+      if (!image.hasAlpha && image.totalColors <= 256) {
+        const settings = new magick.QuantizeSettings();
+        settings.colors = 256;
+        settings.ditherMethod = magick.DitherMethod.No;
+        image.quantize(settings);
+        image.settings.compression = CompressionMethod.RLE;
+      }
+    } else if (format === "avif") {
+      for (const image of images) image.quality = Math.round(quality * 100);
+    } else {
+      for (const image of images) image.settings.compression = CompressionMethod.LZW;
+    }
+    return images.write(magickFormatValue, (data) => data.slice());
+  });
+  if (bytes === null) return buf;
+  if (bytes.byteLength === 0) {
+    throw new Error(`Couldn't write the compressed ${format.toUpperCase()} file.`);
+  }
+  if (LOSSLESS_FORMATS.has(format) && !samePixels(magick, input, bytes, magickFormatValue)) return buf;
+  return bytes.buffer as ArrayBuffer;
+}

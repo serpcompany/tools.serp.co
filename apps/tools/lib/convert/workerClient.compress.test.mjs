@@ -7,7 +7,7 @@ function makeBuffer(size) {
   return new Uint8Array(size).buffer;
 }
 
-test("compressFile uses server image compression for gif", async () => {
+test("compressFile uses server image compression for heic", async () => {
   const originalFetch = globalThis.fetch;
   const calls = [];
 
@@ -19,7 +19,7 @@ test("compressFile uses server image compression for gif", async () => {
 
   try {
     const result = await compressFile({
-      format: "gif",
+      format: "heic",
       buf: makeBuffer(10),
       quality: 0.8,
     });
@@ -28,7 +28,7 @@ test("compressFile uses server image compression for gif", async () => {
     const url =
       typeof calls[0].input === "string" ? calls[0].input : calls[0].input.url;
     assert.ok(url.includes("/api/image-compress"));
-    assert.ok(url.includes("format=gif"));
+    assert.ok(url.includes("format=heic"));
     assert.equal(calls[0].init?.method, "POST");
   } finally {
     globalThis.fetch = originalFetch;
@@ -46,7 +46,7 @@ test("compressFile returns original buffer when server result is larger", async 
   const original = makeBuffer(10);
   try {
     const result = await compressFile({
-      format: "gif",
+      format: "heic",
       buf: original,
       quality: 0.8,
     });

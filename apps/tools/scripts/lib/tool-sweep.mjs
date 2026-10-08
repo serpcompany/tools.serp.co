@@ -191,7 +191,9 @@ export function converterEngine({ operation, from, to }) {
   const source = from.toLowerCase();
   const target = to.toLowerCase();
   if (operation === "compress" && source === target) {
-    return COMPRESSION_ENGINES[resolveCompressionTarget(source)] ?? "unsupported";
+    const compression = resolveCompressionTarget(source);
+    if (compression === "image-browser") return source === "svg" ? "svgo" : "imagemagick-wasm";
+    return COMPRESSION_ENGINES[compression] ?? "unsupported";
   }
   if (source === "ai" || source === "pdf") return "pdfjs";
   if (MAGICK_BROWSER_INPUTS.has(source)) return "imagemagick-wasm";
@@ -228,6 +230,7 @@ export const ENGINE_LOCATIONS = {
   "html-to-markdown-wasm": "client-only",
   javascript: "client-only",
   "jsquash-worker": "client-only",
+  svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",
   "server-video, then ffmpeg-wasm": "server-first-client-fallback",
