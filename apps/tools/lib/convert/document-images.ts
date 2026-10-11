@@ -156,9 +156,10 @@ export function pageScale(width: number, height: number, preferred: number): num
 
 // Where a page that runs past its bottom (`limit`) continues: the index of
 // the first block (paragraph, table or table row) whose bottom is below it,
-// given each block's bottom in order. A page keeps at least its first block,
-// so a block taller than the page is never moved on forever: 0 means only
-// that block's own rows can be split. null when everything fits.
+// given each block's bottom in order; null when everything fits. 0 means
+// the page's first block runs past it, which stays on the page (only a
+// table's rows can split), so a block taller than a page isn't moved on
+// forever.
 export function overflowIndex(bottoms: number[], limit: number): number | null {
   const index = bottoms.findIndex((bottom) => bottom > limit + 0.5);
   return index === -1 ? null : index;
@@ -496,12 +497,13 @@ function continuePage(page: HTMLElement): HTMLElement | null {
     limit,
   );
   if (index === null) return null;
+  // A table that runs past the page continues on the next from its first
+  // row that doesn't fit. Any other block moves whole, unless it's the first
+  // on the page: a block taller than a page stays on its own page.
   let first: Element | undefined = blocks[index];
-  if (index === 0 && first) {
-    // The first block alone runs past the page: a table continues from the
-    // first row that doesn't fit; anything else stays whole on this page.
-    first = (first.localName === "table" ? splitTable(first as HTMLTableElement, limit) : null) ?? blocks[1];
-  }
+  const continued = first?.localName === "table" ? splitTable(first as HTMLTableElement, limit) : null;
+  if (continued) first = continued;
+  else if (index === 0) first = blocks[1];
   if (!first) return null;
 
   const next = page.cloneNode(false) as HTMLElement;
@@ -542,12 +544,26 @@ function splitTable(table: HTMLTableElement, limit: number): HTMLTableElement | 
     limit,
   );
   if (!index) return null;
+  // Both parts keep the columns the whole table was laid out with: a table
+  // sized to its content would size each part to its own rows.
+  const width = table.getBoundingClientRect().width;
+  const columns = (row: HTMLTableRowElement) => Array.from(row.cells, (cell) => cell.getBoundingClientRect().width);
+  const kept = { row: rows[0]!, widths: columns(rows[0]!) };
+  const moved = { row: rows[index]!, widths: columns(rows[index]!) };
   const rest = table.cloneNode(false) as HTMLTableElement;
-  for (const columns of Array.from(table.querySelectorAll(":scope > colgroup"))) rest.append(columns.cloneNode(true));
+  for (const group of Array.from(table.querySelectorAll(":scope > colgroup"))) rest.append(group.cloneNode(true));
   const body = table.ownerDocument.createElement("tbody");
   for (const row of rows.slice(index)) body.append(row);
   rest.append(body);
   table.after(rest);
+  for (const [part, { row, widths }] of [[table, kept], [rest, moved]] as const) {
+    part.style.tableLayout = "fixed";
+    part.style.width = `${width}px`;
+    Array.from(row.cells).forEach((cell, column) => {
+      cell.style.boxSizing = "border-box";
+      cell.style.width = `${widths[column]}px`;
+    });
+  }
   return rest;
 }
 
