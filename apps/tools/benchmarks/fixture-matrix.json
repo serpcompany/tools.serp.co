@@ -295,7 +295,7 @@
       "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.exr",
-      "notes": "OpenEXR with ZIP compression, scene-linear as renderers write EXR, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick sample.ppm -colorspace RGB -compress ZIP. Read back with magick -set colorspace RGB -colorspace sRGB: 85 dB PSNR against sample.ppm."
+      "notes": "OpenEXR with ZIP compression, 96x96 half floats, scene-linear with values above 1.0 as a render holds them: a ramp from black at the left to (4, 2, 1) at the right, so red passes 1.0 at x = 24 and green at x = 48. magick -size 96x96 gradient:black-white -rotate -90 -channel R -evaluate multiply 4 -channel G -evaluate multiply 2 +channel -set colorspace RGB -compress ZIP sample.exr (ImageMagick 7.1.2-8 Q16-HDRI). magick identify -verbose: max red 4, green 2, blue 1."
     },
     {
       "format": "f4v",

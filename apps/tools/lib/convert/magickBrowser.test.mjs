@@ -133,7 +133,7 @@ const NATIVE = {
   pcd: { mean: 152.2, sd: 90.1 },
   mac: { mean: 193.9, sd: 108.8 },
   sfw: { mean: 111.5, sd: 68.0 },
-  exr: { mean: 146.9, sd: 72.9 },
+  exr: { mean: 207.9, sd: 55.8 },
   hdr: { mean: 146.4, sd: 73.2 },
 };
 
@@ -174,6 +174,22 @@ test("HDR and EXR: linear light is encoded to sRGB and values above 1.0 are whit
   );
   // 0.25 linear is 137 in sRGB; 1.0 and 16 are both white.
   assert.deepEqual(greys, [0, 137, 255, 255]);
+  // sample.exr ramps from black at the left to (4, 2, 1) at the right
+  // (fixture-matrix.json): each channel is white where it passes 1.0, and
+  // below white where it's under.
+  const { buffer: exrPng } = await convertWithMagickInBrowser(read("sample.exr"), "exr", "png");
+  const row = magick.ImageMagick.read(new Uint8Array(exrPng), magick.MagickFormat.Png, (image) =>
+    image.getPixels((pixels) => pixels.toByteArray(0, 0, image.width, 1, "RGB")),
+  );
+  assert.equal(row.length, 96 * 3);
+  for (let x = 0; x < 96; x += 1) {
+    [4, 2, 1].forEach((peak, channel) => {
+      const linear = (peak * x) / 95;
+      const value = row[x * 3 + channel];
+      if (linear > 1) assert.equal(value, 255, `x ${x} channel ${channel}: ${linear.toFixed(3)} linear`);
+      if (linear < 0.99) assert.ok(value < 255, `x ${x} channel ${channel}: ${linear.toFixed(3)} linear is white`);
+    });
+  }
   // Tagged as sRGB, not gamma 1.0, which a viewer would show washed out.
   for (const from of ["exr", "hdr"]) {
     const { buffer: png } = await convertWithMagickInBrowser(read(`sample.${from}`), from, "png");
