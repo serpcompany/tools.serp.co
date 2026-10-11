@@ -256,7 +256,7 @@ async function encode(canvas: OffscreenCanvas | HTMLCanvasElement, type: string)
 export async function writeTableImage(
   table: TableData,
   format: "png" | "jpeg",
-): Promise<{ buffer: ArrayBuffer; notice?: string }> {
+): Promise<{ buffer: ArrayBuffer; notice?: string; image: { width: number; height: number } }> {
   const measuring = context2d(makeCanvas(1, 1));
   const widths = new Map<string, number>();
   const measure: MeasureText = (text, bold) => {
@@ -270,13 +270,15 @@ export async function writeTableImage(
     return width;
   };
   const layout = layoutTableImage(table, measure);
-  const canvas = makeCanvas(Math.ceil(layout.width * IMAGE_SCALE), Math.ceil(layout.height * IMAGE_SCALE));
+  const image = { width: Math.ceil(layout.width * IMAGE_SCALE), height: Math.ceil(layout.height * IMAGE_SCALE) };
+  const canvas = makeCanvas(image.width, image.height);
   const context = context2d(canvas);
   context.scale(IMAGE_SCALE, IMAGE_SCALE);
   drawTable(context, layout, measure);
   const blob = await encode(canvas, format === "png" ? "image/png" : "image/jpeg");
   return {
     buffer: await blob.arrayBuffer(),
+    image,
     notice: layout.note ? `${layout.note} The image holds what fits in ${IMAGE_MAX_SIDE} pixels; save as PDF or Excel for the whole table.` : undefined,
   };
 }

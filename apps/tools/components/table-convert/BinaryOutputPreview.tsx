@@ -16,6 +16,7 @@ export type BinaryOutputState =
       notice?: string;
       schema?: string;
       pages?: number;
+      image?: { width: number; height: number };
       previewUrl?: string;
     }
   | { state: "error"; message: string };
@@ -71,6 +72,7 @@ export default function BinaryOutputPreview({
   } else {
     const parts = [fileName, formatBytes(output.buffer.byteLength)];
     if (output.pages) parts.push(plural(output.pages, "page"));
+    if (output.image) parts.push(`${output.image.width.toLocaleString("en-US")} × ${output.image.height.toLocaleString("en-US")} px`);
     if (table) parts.push(`${plural(table.rows.length, "row")}, ${plural(table.headers.length, "column")}`);
     const shown = table && table.rows.length > PREVIEW_ROWS ? { ...table, rows: table.rows.slice(0, PREVIEW_ROWS) } : table;
     body = (
@@ -81,9 +83,16 @@ export default function BinaryOutputPreview({
         {output.notice && <p className="text-xs text-amber-700">{output.notice}</p>}
         {output.previewUrl ? (
           <div className={`${panel} max-h-[360px] overflow-auto bg-white p-2`}>
-            {/* A blob URL of the image just written; next/image can't optimise it. */}
+            {/* A blob URL of the image just written, which next/image can't
+                optimise, drawn at twice its size and shown at its own. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={output.previewUrl} alt={`The table as ${label}`} className="h-auto max-w-full" />
+            <img
+              src={output.previewUrl}
+              alt={`The table as ${label}`}
+              width={output.image ? output.image.width / 2 : undefined}
+              height={output.image ? output.image.height / 2 : undefined}
+              className="h-auto max-w-full"
+            />
           </div>
         ) : format === "protobuf" && output.schema ? (
           <>

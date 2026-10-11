@@ -18,6 +18,8 @@ export type TableOutput = {
   schema?: string;
   // PDF: how many pages it has.
   pages?: number;
+  // PNG and JPEG: the image's size in pixels.
+  image?: { width: number; height: number };
 };
 
 export type TableOutputOptions = {
@@ -275,9 +277,9 @@ async function writePdf(table: TableData, loadFont: () => Promise<ArrayBuffer>):
   let font = "helvetica";
   if (fontBytes) {
     doc.addFileToVFS(`${PDF_FONT}.ttf`, toBase64(fontBytes));
-    // One font file: the header row is shaded, not bold.
+    // One font file, embedded once: the header row is shaded, not bold. (A
+    // second style, even of the same file, would embed it again.)
     doc.addFont(`${PDF_FONT}.ttf`, PDF_FONT, "normal");
-    doc.addFont(`${PDF_FONT}.ttf`, PDF_FONT, "bold");
     doc.setFont(PDF_FONT, "normal");
     const missing = missingGlyphs(doc, cells);
     if (missing.length) {
@@ -290,11 +292,12 @@ async function writePdf(table: TableData, loadFont: () => Promise<ArrayBuffer>):
     drawInDisplayOrder(doc);
   }
 
+  const headerStyle = unicode ? "normal" : "bold";
   doc.setFontSize(PDF_FONT_SIZE);
   const natural = head.map((_, column) => {
     let widest = 0;
     cells.forEach((row, rowIndex) => {
-      doc.setFont(font, rowIndex === 0 ? "bold" : "normal");
+      doc.setFont(font, rowIndex === 0 ? headerStyle : "normal");
       for (const line of (row[column] ?? "").split("\n")) {
         // Text past this length wraps anyway.
         widest = Math.max(widest, doc.getTextWidth(line.slice(0, 120)));
@@ -323,7 +326,7 @@ async function writePdf(table: TableData, loadFont: () => Promise<ArrayBuffer>):
       lineColor: [203, 213, 225],
       lineWidth: 0.5,
     },
-    headStyles: { fillColor: [226, 232, 240], textColor: [15, 23, 42], fontStyle: "bold" },
+    headStyles: { fillColor: [226, 232, 240], textColor: [15, 23, 42], fontStyle: headerStyle },
     columnStyles: Object.fromEntries(
       natural.map((width, column) => [column, { minCellWidth: Math.min(width, PDF_MIN_COLUMN) + 2 * PDF_PADDING }]),
     ),
@@ -422,8 +425,8 @@ export function protoSchema(table: TableData): string {
     return `  string ${name} = ${protoFieldNumber(index)};${note}`;
   });
   return [
-    "// The schema of the .pb file saved with it, a Table message. To read it:",
-    "// protoc --decode=Table table.proto < table.pb",
+    "// The schema of the .pb file saved with it, a Table message. To read it,",
+    "// for example: protoc --decode=Table table.proto < table.pb",
     'syntax = "proto3";',
     "",
     "// One row: each field is one column's text, empty when the cell was.",

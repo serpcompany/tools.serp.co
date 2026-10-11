@@ -199,6 +199,10 @@ test("PDF: Greek, Cyrillic, Polish, Hebrew and Arabic load the Unicode font, and
   };
   const output = await writeTableOutput("pdf", table, { loadFont });
   assert.equal(fontLoads, 1);
+  // The font is embedded once, as a subset (jsPDF keeps every glyph's
+  // metrics and name, about 50 KB compressed), not as the 757 KB file.
+  assert.equal(new TextDecoder("latin1").decode(output.buffer).match(/\/FontFile2/g).length, 1);
+  assert.ok(output.buffer.byteLength < 80_000, `${output.buffer.byteLength} bytes`);
   const items = (await pdfPages(output.buffer))[0].items;
   // pdf.js puts right-to-left text it reads back into typed order: a line
   // drawn backwards would come out reversed.
@@ -257,8 +261,8 @@ test("Protobuf: the .pb decodes back to the rows with the .proto it was written 
   assert.equal(
     output.schema,
     [
-      "// The schema of the .pb file saved with it, a Table message. To read it:",
-      "// protoc --decode=Table table.proto < table.pb",
+      "// The schema of the .pb file saved with it, a Table message. To read it,",
+      "// for example: protoc --decode=Table table.proto < table.pb",
       'syntax = "proto3";',
       "",
       "// One row: each field is one column's text, empty when the cell was.",

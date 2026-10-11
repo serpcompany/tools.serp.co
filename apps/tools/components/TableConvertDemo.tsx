@@ -44,7 +44,7 @@ const DEFAULT_TABLE: TableData = SAMPLE_TABLE;
 // How long edits settle before a binary output is written again.
 const BINARY_DELAY_MS = 300;
 
-// The text output panel shows; binary outputs are written separately.
+// The text the output panel shows; binary outputs are written separately.
 function textOutput(format: OutputFormat, table: TableData) {
   return isBinaryOutput(format) ? "" : serializeOutput(format, table).text;
 }
@@ -119,10 +119,11 @@ export default function TableConvertDemo({
   }, [tableData, outputFormat, inputLabel, outputLabel]);
 
   // A binary output is written once edits settle, with its library loaded
-  // only now, and never for the placeholder table a page opens with.
+  // only now; never for the placeholder table a page opens with, nor while
+  // the input shows an error (the table is then the last one that parsed).
   useEffect(() => {
     if (!isBinaryOutput(outputFormat)) return;
-    if (!tableData || !hasUserInput) {
+    if (!tableData || !hasUserInput || error) {
       setBinaryOutput({ state: "idle" });
       return;
     }
@@ -150,7 +151,7 @@ export default function TableConvertDemo({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [outputFormat, tableData, hasUserInput]);
+  }, [outputFormat, tableData, hasUserInput, error]);
 
   // An image preview's blob URL is released when the image is replaced.
   useEffect(() => {
