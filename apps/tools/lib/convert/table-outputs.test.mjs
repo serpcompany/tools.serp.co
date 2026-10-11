@@ -221,6 +221,27 @@ test("PDF: text the font can't show fails with a clear message instead of a garb
   await assert.rejects(writeTableOutput("pdf", { headers: ["a"], rows: [["ภาษาไทย"]] }, { loadFont }), /can't show “ภ”/);
 });
 
+test("PDF: text outside Windows-1252 fetches the self-hosted font once a page; Latin text fetches nothing", async () => {
+  // The page's own loader, not the test's: the browser smoke test checks the
+  // Worker serves this URL with these bytes (scripts/smoke-browser.mjs).
+  const requests = [];
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    requests.push(String(url));
+    return new Response(fontBytes);
+  };
+  try {
+    await writeTableOutput("pdf", { headers: ["name"], rows: [["café – €5 “x”"]] });
+    assert.deepEqual(requests, []);
+    const greek = await writeTableOutput("pdf", { headers: ["name"], rows: [["Ωmega"]] });
+    await writeTableOutput("pdf", { headers: ["name"], rows: [["Жук"]] });
+    assert.deepEqual(requests, [PDF_FONT_URL]);
+    assert.equal(new TextDecoder("latin1").decode(greek.buffer).match(/\/FontFile2/g)?.length, 1);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
+
 test("PDF text: control and invisible characters go, line breaks stay", () => {
   assert.equal(pdfText("a\r\nb\rc\td\u0000e​f‎g️h­i"), "a\nb\nc    defghi");
   assert.equal(needsUnicodeFont([["café €5 “x”"]]), false);
