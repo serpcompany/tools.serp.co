@@ -37,10 +37,10 @@
     },
     {
       "format": "aifc",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.aifc",
-      "notes": "sample.aifc is a copy of sample.aiff (AIFF, not AIFF-C); needs a real AIFF-C."
+      "notes": "AIFF-C with little-endian PCM ('sowt', as macOS writes it): ffmpeg -i sample.aiff -c:a pcm_s16le -f aiff."
     },
     {
       "format": "aiff",
@@ -120,6 +120,13 @@
       "notes": "Add a real fixture for this format."
     },
     {
+      "format": "bin",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "BIN isn't one image format; the owner decides what BIN to JPG and PNG should read (#248)."
+    },
+    {
       "format": "bmp",
       "status": "ready",
       "input": "file",
@@ -141,6 +148,13 @@
       "notes": "Auto-generated fixture."
     },
     {
+      "format": "cdr",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "CorelDRAW drawing. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
       "format": "cr2",
       "status": "ready",
       "input": "file",
@@ -153,6 +167,13 @@
       "input": "file",
       "fixture": "fixtures/sample.cr3",
       "notes": "CC0 sample from raw.pixls.us."
+    },
+    {
+      "format": "crw",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "Canon camera RAW. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
     },
     {
       "format": "csv",
@@ -170,6 +191,13 @@
       "input": "file",
       "fixture": "fixtures/sample.cur",
       "notes": "Generated with magick-wasm."
+    },
+    {
+      "format": "dcm",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.dcm",
+      "notes": "DICOM Part 10 Secondary Capture, 96x96 16-bit MONOCHROME2 with 12 bits stored, explicit VR little endian; written byte by byte from sample.ppm, read back with ImageMagick."
     },
     {
       "format": "dds",
@@ -207,11 +235,25 @@
       "notes": "Generated via pandoc from markdown."
     },
     {
+      "format": "dot",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.dot",
+      "notes": "Graphviz DOT, a three-node digraph."
+    },
+    {
       "format": "dss",
       "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.dss",
       "notes": "DSS sample from FFmpeg samples."
+    },
+    {
+      "format": "dst",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "Tajima embroidery design. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
     },
     {
       "format": "dv",
@@ -228,6 +270,13 @@
       "notes": "Minimal DXF line entity fixture."
     },
     {
+      "format": "emf",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "Enhanced Metafile; no local tool writes one. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
       "format": "eps",
       "status": "ready",
       "input": "file",
@@ -235,11 +284,32 @@
       "notes": "Generated with magick-wasm."
     },
     {
+      "format": "excel",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.xlsx",
+      "notes": "The table page's Excel input takes .xlsx files: the xlsx fixture."
+    },
+    {
+      "format": "exr",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.exr",
+      "notes": "OpenEXR with ZIP compression, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick -compress ZIP."
+    },
+    {
       "format": "f4v",
       "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.f4v",
       "notes": "Auto-generated fixture."
+    },
+    {
+      "format": "fig",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.fig",
+      "notes": "XFig 3.2 with a circle, a box and a text line, written by hand."
     },
     {
       "format": "flac",
@@ -270,6 +340,13 @@
       "notes": "GSM audio sample from FFmpeg samples."
     },
     {
+      "format": "hdr",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.hdr",
+      "notes": "Radiance RGBE, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick."
+    },
+    {
       "format": "heic",
       "status": "ready",
       "input": "file",
@@ -298,6 +375,13 @@
       "notes": "Simple HTML document fixture."
     },
     {
+      "format": "icns",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.icns",
+      "notes": "iconutil from PNGs of sample.ppm at 16, 32, 64 and 128 px; PNG entries ic11, ic12 and ic07."
+    },
+    {
       "format": "ico",
       "status": "ready",
       "input": "file",
@@ -310,6 +394,20 @@
       "input": "file",
       "fixture": "fixtures/sample.jfif",
       "notes": "Add a real fixture for this format."
+    },
+    {
+      "format": "jif",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.jif",
+      "notes": "JPEG with a .jif extension, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick -quality 85 jpeg:."
+    },
+    {
+      "format": "jp2",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.jp2",
+      "notes": "JPEG 2000 in the JP2 file format, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick."
     },
     {
       "format": "jpeg",
@@ -331,6 +429,34 @@
       "input": "text",
       "fixture": "fixtures/sample.json",
       "notes": "Used by json-to-csv tool."
+    },
+    {
+      "format": "jxl",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.jxl",
+      "notes": "JPEG XL codestream, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick."
+    },
+    {
+      "format": "ktx",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.ktx",
+      "notes": "KTX 1.1, uncompressed RGBA8, one level, KTXorientation S=r,T=d as toktx writes it, from sample.ppm, a 96x96 test image (gradient, circle, two bars); written byte by byte, read back with lib/convert/texture-formats.ts."
+    },
+    {
+      "format": "ktx2",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.ktx2",
+      "notes": "KTX 2.0, VK_FORMAT_R8G8B8A8_SRGB, no supercompression, one level, from sample.ppm, a 96x96 test image (gradient, circle, two bars); written byte by byte, read back with ktx-parse."
+    },
+    {
+      "format": "latex",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.tex",
+      "notes": "A LaTeX document with one tabular: name and count columns, rows Alpha 1 and Beta 2, as in sample.csv."
     },
     {
       "format": "m2ts",
@@ -365,7 +491,7 @@
       "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.m4p",
-      "notes": "sample.m4p is a copy of sample.m4a (unprotected AAC); a real M4P is FairPlay-protected."
+      "notes": "A real M4P is FairPlay-protected, which no browser Tool can convert; sample.m4p is a copy of sample.m4a and isn't used. No sample is proposed (#248)."
     },
     {
       "format": "m4r",
@@ -380,6 +506,27 @@
       "input": "file",
       "fixture": "fixtures/sample.m4v",
       "notes": "Auto-generated fixture."
+    },
+    {
+      "format": "mac",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.mac",
+      "notes": "MacPaint, 576x720 1-bit with PackBits rows, sample.ppm thresholded in the middle; written byte by byte, read back with ImageMagick."
+    },
+    {
+      "format": "markdown",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.md",
+      "notes": "A Markdown table: name and count columns, rows Alpha 1 and Beta 2, as in sample.csv."
+    },
+    {
+      "format": "mediawiki",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.wiki",
+      "notes": "A MediaWiki wikitable: name and count columns, rows Alpha 1 and Beta 2, as in sample.csv."
     },
     {
       "format": "mjpeg",
@@ -432,10 +579,10 @@
     },
     {
       "format": "mpeg2",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.mpeg2",
-      "notes": "sample.mpeg2 is a copy of sample.mpeg (MPEG-2 video in an MPEG-1 system stream); needs a real MPEG-2 program stream."
+      "notes": "MPEG-2 program stream (MPEG-2 video, MP2 audio): ffmpeg -i sample.mp4 -c:v mpeg2video -c:a mp2 -f vob."
     },
     {
       "format": "mpg",
@@ -453,10 +600,10 @@
     },
     {
       "format": "mts",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.mts",
-      "notes": "sample.mts is a copy of sample.ts (188-byte packets, not AVCHD's 192); needs a real MTS."
+      "notes": "AVCHD-style MPEG-TS with 192-byte packets (H.264, AC-3): ffmpeg -i sample.mp4 -c:v libx264 -c:a ac3 -f mpegts -mpegts_m2ts_mode 1."
     },
     {
       "format": "mxf",
@@ -464,6 +611,27 @@
       "input": "file",
       "fixture": "fixtures/sample.mxf",
       "notes": "Add a real fixture for this format."
+    },
+    {
+      "format": "mysql",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample-mysql.txt",
+      "notes": "mysql client table output: name and count columns, rows Alpha 1 and Beta 2, as in sample.csv. A .txt, since a .sql file switches the table page to SQL input."
+    },
+    {
+      "format": "nef",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "Nikon camera RAW. sample.nef is a Nikon COOLSCAN film scan (an RGB TIFF), not a camera RAW, and isn't used. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
+      "format": "odt",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.odt",
+      "notes": "OpenDocument text with a heading and a table (name and count columns, rows Alpha 1 and Beta 2, as in sample.csv): textutil -convert odt."
     },
     {
       "format": "oga",
@@ -501,11 +669,60 @@
       "notes": "Olympus ORF camera RAW sample."
     },
     {
+      "format": "otf",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.otf",
+      "notes": "OpenType (CFF) font with nine blocky glyphs (S E R P T O L, space, .notdef), made with fontTools for these fixtures."
+    },
+    {
+      "format": "pam",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.pam",
+      "notes": "Netpbm PAM, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick."
+    },
+    {
+      "format": "pbm",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.pbm",
+      "notes": "Netpbm PBM (1-bit), from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick."
+    },
+    {
+      "format": "pcd",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.pcd",
+      "notes": "Kodak Photo CD, always 768x512 (788 KB), from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick -resize 768x512!."
+    },
+    {
+      "format": "pcx",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.pcx",
+      "notes": "ZSoft PCX, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick."
+    },
+    {
       "format": "pdf",
       "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.pdf",
       "notes": "Add a real fixture for this format."
+    },
+    {
+      "format": "pes",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "Brother embroidery design. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
+      "format": "pgm",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.pgm",
+      "notes": "Netpbm PGM, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick."
     },
     {
       "format": "png",
@@ -518,11 +735,32 @@
       ]
     },
     {
+      "format": "ppm",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.ppm",
+      "notes": "Netpbm PPM, the 96x96 test image the other new image fixtures are made from: magick -size 96x96 gradient:#1e88e5-#fdd835 with a red circle and two bars."
+    },
+    {
       "format": "ppt",
       "status": "missing",
       "input": "file",
       "fixture": null,
-      "notes": "Needs a real .ppt sample (LibreOffice not available for conversion)."
+      "notes": "PowerPoint 97-2003 binary; no local tool writes one. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
+      "format": "pptx",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.pptx",
+      "notes": "One PowerPoint slide with a title and three lines of text, written part by part (ECMA-376); Quick Look renders it."
+    },
+    {
+      "format": "ps",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.ps",
+      "notes": "PostScript Level 2 with an LZW image, 96x96 pt, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick -density 72 -compress LZW ps2:."
     },
     {
       "format": "psd",
@@ -564,7 +802,35 @@
       "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.rmvb",
-      "notes": "sample.rmvb is a copy of sample.rm (RealVideo 2.0); needs a real RMVB."
+      "notes": "RealVideo 4 (FFmpeg can't encode it); sample.rmvb is a copy of sample.rm (RealVideo 2.0) and isn't used. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
+      "format": "rw2",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "Panasonic camera RAW. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
+      "format": "sfw",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "Seattle FilmWorks image. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
+      "format": "sk",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "SK could be a Skencil drawing or a Sketch file; the owner decides what SK to JPG should read (#248)."
+    },
+    {
+      "format": "sql",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.sql",
+      "notes": "A CREATE TABLE and one INSERT: name and count columns, rows Alpha 1 and Beta 2, as in sample.csv."
     },
     {
       "format": "svg",
@@ -609,6 +875,20 @@
       "notes": "Auto-generated fixture."
     },
     {
+      "format": "ttf",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.ttf",
+      "notes": "TrueType font with nine blocky glyphs (S E R P T O L, space, .notdef), made with fontTools for these fixtures."
+    },
+    {
+      "format": "txt",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.txt",
+      "notes": "Plain text, six lines (SERP Tools, Alpha, Beta, Gamma)."
+    },
+    {
       "format": "vob",
       "status": "ready",
       "input": "file",
@@ -645,17 +925,24 @@
     },
     {
       "format": "wma",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.wma",
-      "notes": "sample.wma is an MP3 stand-in (no WMAv2 encoder was available); needs a real WMA."
+      "notes": "WMA v2 in ASF: ffmpeg -i sample.mp4 -vn -c:a wmav2."
     },
     {
       "format": "wmv",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.wmv",
-      "notes": "sample.wmv is an MP4 stand-in (no WMV encoder was available); needs a real WMV."
+      "notes": "WMV 8 video and WMA v2 audio in ASF: ffmpeg -i sample.mp4 -c:v wmv2 -c:a wmav2."
+    },
+    {
+      "format": "wpg",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.wpg",
+      "notes": "WordPerfect Graphics 1.0, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick."
     },
     {
       "format": "wtv",
@@ -669,7 +956,42 @@
       "status": "missing",
       "input": "file",
       "fixture": null,
-      "notes": "Needs a CC0 sample fixture."
+      "notes": "GIMP image; GIMP isn't installed. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
+      "format": "xls",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "Excel 97-2003 binary; no local tool writes one. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+    },
+    {
+      "format": "xlsx",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.xlsx",
+      "notes": "One sheet: name and count columns, rows Alpha 1 and Beta 2, as in sample.csv. Written with openpyxl."
+    },
+    {
+      "format": "xml",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.xml",
+      "notes": "<row> elements: name and count columns, rows Alpha 1 and Beta 2, as in sample.csv."
+    },
+    {
+      "format": "xpm",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.xpm",
+      "notes": "X pixmap, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick."
+    },
+    {
+      "format": "xps",
+      "status": "missing",
+      "input": "file",
+      "fixture": null,
+      "notes": "XML Paper Specification document; no local tool writes or reads one. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
     }
   ],
   "toolFixtures": {

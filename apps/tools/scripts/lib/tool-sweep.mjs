@@ -251,6 +251,14 @@ const TEXT_MARKERS = {
   "sample.html": "Nova",
   "sample-text.png": "Tools",
   "sample-text.jpg": "Tools",
+  // The table formats hold sample.csv's table.
+  "sample.md": "Alpha",
+  "sample.tex": "Alpha",
+  "sample.wiki": "Alpha",
+  "sample-mysql.txt": "Alpha",
+  "sample.sql": "Alpha",
+  "sample.xml": "Alpha",
+  "sample.xlsx": "Alpha",
 };
 const TEXT_DRIVERS = new Set(["table", "html-to-markdown", "json-to-csv", "csv-combiner"]);
 

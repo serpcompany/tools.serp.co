@@ -1,0 +1,4 @@
+| name | count |
+| --- | --- |
+| Alpha | 1 |
+| Beta | 2 |

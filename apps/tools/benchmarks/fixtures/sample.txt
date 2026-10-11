@@ -1,0 +1,6 @@
+SERP Tools sample text
+
+Alpha, Beta and Gamma are on separate lines:
+Alpha
+Beta
+Gamma

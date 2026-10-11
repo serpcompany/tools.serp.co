@@ -160,6 +160,8 @@ const FIXTURE_ALIASES = [
   ["m4a", "m4b"],
   ["heic", "heif"],
   ["mpeg", "mpg"],
+  // The table page's Excel input reads .xlsx files.
+  ["xlsx", "excel"],
 ];
 
 test("two ready formats share a fixture's bytes only if they're aliases", () => {
