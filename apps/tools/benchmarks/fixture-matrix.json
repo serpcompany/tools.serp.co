@@ -121,10 +121,10 @@
     },
     {
       "format": "bin",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
-      "fixture": null,
-      "notes": "BIN isn't one image format; the owner decides what BIN to JPG and PNG should read (#248)."
+      "fixture": "fixtures/sample.bin",
+      "notes": "A copy of sample.jpg: the owner decided on #261 that BIN to JPG and PNG read a binary file that holds an image. Read back with magick identify (JPEG 96x96)."
     },
     {
       "format": "bmp",
@@ -149,10 +149,10 @@
     },
     {
       "format": "cdr",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
-      "fixture": null,
-      "notes": "CorelDRAW drawing. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "fixture": "fixtures/sample.cdr",
+      "notes": "CorelDRAW X4 or later drawing (a ZIP holding content/riffData.cdr) of eight coloured rectangles. LibreOffice core's test file https://github.com/LibreOffice/core/blob/master/writerperfect/qa/unit/data/draw/libcdr/pass/fdo65220-2.cdr: the repository is MPL-2.0, but the file came from bug report fdo#65220 and has no licence of its own. Read back with file (Zip archive) and unzip -l (content/riffData.cdr and its thumbnails); ImageMagick can't read CDR."
     },
     {
       "format": "cr2",
@@ -170,10 +170,10 @@
     },
     {
       "format": "crw",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
-      "fixture": null,
-      "notes": "Canon camera RAW. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "fixture": "fixtures/sample.crw",
+      "notes": "Canon PowerShot G5 camera RAW (2616x1960), CC0, from raw.pixls.us: https://raw.pixls.us/data/Canon/PowerShot%20G5/105_0506.CRW; its SHA-256 matches the one the site lists for 105_0506.CRW. Read back with file (Canon CIFF raw image data) and magick identify (CRW 2616x1960)."
     },
     {
       "format": "csv",
@@ -250,10 +250,10 @@
     },
     {
       "format": "dst",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
-      "fixture": null,
-      "notes": "Tajima embroidery design. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "fixture": "fixtures/sample.dst",
+      "notes": "Tajima embroidery design, 180 stitches in two colour blocks, 30 x 30 mm, written with pyembroidery 1.5.1 (MIT): jump to 0,0, a running stitch every 2 mm twice round a 30 mm square, COLOR_CHANGE, jump to (15, 5) mm, a running stitch three times round a diamond with corners (15, 5), (25, 15), (15, 25) and (5, 15) mm, END; write_dst. Read back with pyembroidery's reader (180 stitches, 2 colour blocks, 30 x 30 mm); the header starts LA:."
     },
     {
       "format": "dv",
@@ -274,7 +274,7 @@
       "status": "missing",
       "input": "file",
       "fixture": null,
-      "notes": "Enhanced Metafile; no local tool writes one. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "notes": "Enhanced Metafile. The owner approved making one with LibreOffice (soffice --headless --convert-to) from sample.svg (#261), but brew install --cask libreoffice failed here: Homebrew's record of an earlier install points at a missing app. Not made yet."
     },
     {
       "format": "eps",
@@ -488,10 +488,10 @@
     },
     {
       "format": "m4p",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.m4p",
-      "notes": "A real M4P is FairPlay-protected, which no browser Tool can convert; sample.m4p is a copy of sample.m4a and isn't used. No sample is proposed (#248)."
+      "notes": "An unprotected M4P, a copy of sample.m4a (AAC, 1 s, 44.1 kHz mono). A real M4P is FairPlay-protected, which no browser Tool can convert; the owner decided on #261 to measure the Tool with an unprotected file. Read back with ffprobe (aac, mp4a; no drms or sinf box)."
     },
     {
       "format": "m4r",
@@ -621,10 +621,10 @@
     },
     {
       "format": "nef",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
-      "fixture": null,
-      "notes": "Nikon camera RAW. sample.nef is a Nikon COOLSCAN film scan (an RGB TIFF), not a camera RAW, and isn't used. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "fixture": "fixtures/sample.nef",
+      "notes": "Nikon D40 camera RAW (12-bit lossy-compressed NEF, 3039x2014), CC0, from raw.pixls.us: https://raw.pixls.us/data/Nikon/D40/DSC_1842.NEF; its SHA-256 matches the one the site lists for DSC_1842.NEF. Read back with file (TIFF, NIKON D40) and magick identify (NEF 3039x2014). Replaces a Nikon COOLSCAN film scan that wasn't a camera RAW. Known false pass: the app's ImageMagick WASM (0.0.37) decodes this lossy NEF as all white while native ImageMagick reads the photo, so the 15 NEF Tools' sweep `pass` rows only prove a valid file was saved; #269 fixes the decode and adds a blank-image check to the sweep."
     },
     {
       "format": "odt",
@@ -712,10 +712,10 @@
     },
     {
       "format": "pes",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
-      "fixture": null,
-      "notes": "Brother embroidery design. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "fixture": "fixtures/sample.pes",
+      "notes": "Brother embroidery design (#PES0001), the same design as sample.dst with blue and red threads, written with pyembroidery 1.5.1 (MIT): jump to 0,0, a running stitch every 2 mm twice round a 30 mm square, COLOR_CHANGE, jump to (15, 5) mm, a running stitch three times round a diamond with corners (15, 5), (25, 15), (15, 25) and (5, 15) mm, END; write_pes. Read back with pyembroidery's reader (180 stitches, 2 colour blocks, threads #2584bb and #fe370f, 30 x 30 mm)."
     },
     {
       "format": "pgm",
@@ -746,7 +746,7 @@
       "status": "missing",
       "input": "file",
       "fixture": null,
-      "notes": "PowerPoint 97-2003 binary; no local tool writes one. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "notes": "PowerPoint 97-2003 binary. The owner approved making one with LibreOffice (soffice --headless --convert-to) from sample.pptx (#261), but brew install --cask libreoffice failed here: Homebrew's record of an earlier install points at a missing app. Not made yet."
     },
     {
       "format": "pptx",
@@ -802,28 +802,28 @@
       "status": "missing",
       "input": "file",
       "fixture": "fixtures/sample.rmvb",
-      "notes": "RealVideo 4 (FFmpeg can't encode it); sample.rmvb is a copy of sample.rm (RealVideo 2.0) and isn't used. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "notes": "RealVideo 4 (FFmpeg can't encode it); sample.rmvb is a copy of sample.rm (RealVideo 2.0) and isn't used. The owner approved rmvb_window_with_large_black_blank.rmvb from samples.ffmpeg.org if it wasn't film or TV footage (#261); ffprobe and a frame grab showed a commercial disc rip (a publisher's credit with an ISRC code, a copyright warning, then live-action footage, from a 47-minute programme), so no RMVB sample is added."
     },
     {
       "format": "rw2",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
-      "fixture": null,
-      "notes": "Panasonic camera RAW. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "fixture": "fixtures/sample.rw2",
+      "notes": "Panasonic DMC-LX3 camera RAW (2752x2754), CC0, from raw.pixls.us: https://raw.pixls.us/data/Panasonic/DMC-LX3/P1020593.RW2; its SHA-256 matches the one the site lists for P1020593.RW2. Read back with magick identify (RW2 2752x2754); it starts with the RW2 signature IIU."
     },
     {
       "format": "sfw",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
-      "fixture": null,
-      "notes": "Seattle FilmWorks image. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "fixture": "fixtures/sample.sfw",
+      "notes": "Seattle FilmWorks image (SFW94A, 640x480): example.sfw from https://github.com/jasonacox/sfw2jpg (commit 5726ec1). Licence notice: example.sfw is part of sfw2jpg, distributed under the GNU General Public License v3.0 (https://github.com/jasonacox/sfw2jpg/blob/master/LICENSE). It is test data only: no sfw2jpg code is used, and the app's licence is unaffected. Read back with magick identify (SFW 640x480)."
     },
     {
       "format": "sk",
       "status": "missing",
       "input": "file",
       "fixture": null,
-      "notes": "SK could be a Skencil drawing or a Sketch file; the owner decides what SK to JPG should read (#248)."
+      "notes": "SK could be a Skencil drawing or a Sketch file; sk-to-jpg is being retired (#267), so no sample is added."
     },
     {
       "format": "sql",
@@ -953,17 +953,17 @@
     },
     {
       "format": "xcf",
-      "status": "missing",
+      "status": "ready",
       "input": "file",
-      "fixture": null,
-      "notes": "GIMP image; GIMP isn't installed. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "fixture": "fixtures/sample.xcf",
+      "notes": "GIMP image: sample.ppm opened and saved by GIMP 3.2.6 in batch mode (Gimp.file_load, Gimp.file_save). Read back with file (GIMP XCF image data, version 011, 96 x 96) and magick compare against sample.ppm: 0 pixels differ."
     },
     {
       "format": "xls",
       "status": "missing",
       "input": "file",
       "fixture": null,
-      "notes": "Excel 97-2003 binary; no local tool writes one. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "notes": "Excel 97-2003 binary. The owner approved making one with LibreOffice (soffice --headless --convert-to) from sample.xlsx (#261), but brew install --cask libreoffice failed here: Homebrew's record of an earlier install points at a missing app. Not made yet."
     },
     {
       "format": "xlsx",
@@ -991,7 +991,7 @@
       "status": "missing",
       "input": "file",
       "fixture": null,
-      "notes": "XML Paper Specification document; no local tool writes or reads one. Can't be made locally; the sample proposed in #248's PR waits for the owner's approval."
+      "notes": "XML Paper Specification document; no local tool writes or reads one. Waits for a Windows machine to print sample.pdf to XPS (#261)."
     }
   ],
   "toolFixtures": {

@@ -153,11 +153,14 @@ test("the tree is dirty when any path but the results file differs", () => {
 // Extensions for the same format. Any other two ready formats with the same
 // bytes mean one fixture is a stand-in, and its Tools are fed the wrong input.
 const FIXTURE_ALIASES = [
-  ["jpg", "jpeg", "jfif"],
+  // BIN to JPG and PNG read a binary file that holds an image, so the BIN
+  // fixture is a JPEG (#261).
+  ["jpg", "jpeg", "jfif", "bin"],
   ["tif", "tiff"],
   ["aif", "aiff"],
   ["mov", "qt"],
-  ["m4a", "m4b"],
+  // An unprotected M4P is an M4A (#261).
+  ["m4a", "m4b", "m4p"],
   ["heic", "heif"],
   ["mpeg", "mpg"],
   // The table page's Excel input reads .xlsx files.

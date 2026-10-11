@@ -18,7 +18,9 @@ with something other than the app (`ffprobe`, `magick identify`, `file`, or the
 format's spec) and name it in `notes`, so a failure is the Tool's, not the
 fixture's. Don't download one unasked: a format
 that can't be made locally stays `missing`, with the reason in `notes`, until
-the owner approves an outside sample. A Tool whose output is text (a table
+the owner approves an outside sample. Download an approved one into its own
+empty directory, read it back there, and record its source URL and licence in
+`notes`. A Tool whose output is text (a table
 converter, or any Tool to TXT) also needs its fixture's data in `TEXT_MARKERS`
 in `scripts/lib/tool-sweep.mjs`, or the sweep reports it as `no_fixture`. The
 table converter page picks its input format from the file's extension, so a
