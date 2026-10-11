@@ -18,18 +18,17 @@ import {
   getFirstEncodableVideoCodec,
 } from "mediabunny";
 
-import { FAST_VIDEO_FPS, FAST_VIDEO_WIDTH } from "./ffmpeg-args.ts";
+import { MAX_VIDEO_FPS } from "./ffmpeg-args.ts";
 import { convertVideo, runFFmpeg } from "./video.ts";
 import {
   type BrowserCodec,
   type CodecAction,
+  FRAME_AREA_PROBE,
   codecUnsupportedError,
   ffmpegStepArgs,
   planSteps,
+  streamFrameRate,
 } from "./webcodecs.ts";
-
-// The size and frame rate of FFmpeg's other video outputs.
-const SIZES = { width: FAST_VIDEO_WIDTH, frameRate: FAST_VIDEO_FPS };
 
 export async function convertWithWebCodecs(
   buffer: ArrayBuffer,
@@ -42,13 +41,18 @@ export async function convertWithWebCodecs(
   const encodes: BrowserCodec | null = target === "av1" || target === "hevc" ? target : null;
   const unsupported = (action: CodecAction, codec: BrowserCodec) => codecUnsupportedError(action, codec, from, to);
 
-  // Asked before FFmpeg loads, so an unsupported browser hears at once. The
-  // real size is checked again when each browser step starts.
-  const probe = { width: FAST_VIDEO_WIDTH, height: 240 };
+  // Asked before FFmpeg loads, so an unsupported browser hears at once, at a
+  // small size. Mediabunny asks again at the real size when each browser step
+  // starts, and a no there is the same message.
+  const probe = { width: 320, height: 240 };
   if (source === "av1" && !(await canDecodeVideo("av1"))) throw unsupported("decode", "av1");
   if (encodes && !(await canEncodeVideo(encodes, probe))) throw unsupported("encode", encodes);
   const handOffCodec = source === "av1" ? await getFirstEncodableVideoCodec(["vp8", "vp9"], probe) : null;
   if (source === "av1" && !handOffCodec) throw unsupported("decode", "av1");
+
+  // The frame rate FFmpeg gave the hand-off, which a raw HEVC stream records.
+  // Measured when the browser reads the hand-off to encode it.
+  let frameRate = String(MAX_VIDEO_FPS);
 
   // A step the browser can't run names the codec the Tool is about.
   const browserStep = async (data: ArrayBuffer, job: "hand-off" | "encode", progress: (ratio: number) => void) => {
@@ -59,6 +63,11 @@ export async function convertWithWebCodecs(
       target: new BufferTarget(),
     });
     try {
+      if (job === "encode") {
+        const track = await input.getPrimaryVideoTrack();
+        const rate = track ? (await track.computePacketStats()).averagePacketRate : 0;
+        if (Number.isFinite(rate) && rate > 0) frameRate = streamFrameRate(rate);
+      }
       const conversion = await Conversion.init({
         input,
         output,
@@ -101,7 +110,16 @@ export async function convertWithWebCodecs(
     const progress = (ratio: number) =>
       onProgress?.(Math.round(((index + Math.min(1, Math.max(0, ratio))) / steps.length) * 100));
     if (step.run === "ffmpeg") {
-      data = await runFFmpeg({ name, data }, ffmpegStepArgs(step.args, SIZES), step.output, progress);
+      // The hand-off's bitrate limit follows its frame area, which FFmpeg
+      // reads from the same file first.
+      const args =
+        step.args === "to-vp8"
+          ? {
+              probe: FRAME_AREA_PROBE,
+              args: (frame: Uint8Array) => ffmpegStepArgs("to-vp8", { frameRate, frameArea: frame.byteLength }),
+            }
+          : ffmpegStepArgs(step.args, { frameRate });
+      data = await runFFmpeg({ name, data }, args, step.output, progress);
       name = step.output;
     } else if (step.run === "browser") {
       data = await browserStep(data, step.job, progress);

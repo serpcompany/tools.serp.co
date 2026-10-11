@@ -6,12 +6,16 @@ import {
   videoOnlyNote,
   codecUnsupportedError,
   codecUnsupportedMessage,
+  FRAME_AREA_PROBE,
   ffmpegStepArgs,
+  handOffBitrate,
   planSteps,
+  streamFrameRate,
   usesWebCodecs,
 } from "./webcodecs.ts";
+import { VIDEO_FILTER, fitWithin } from "./ffmpeg-args.ts";
 
-const sizes = { width: 320, frameRate: 12 };
+const rate = { frameRate: "30" };
 
 test("AV1 input and AV1 or HEVC output use the browser's codecs; HEVC input stays on FFmpeg", () => {
   for (const [from, to] of [["av1", "mp4"], ["av1", "gif"], ["mp4", "av1"], ["hevc", "av1"], ["mov", "hevc"], ["AV1", "MKV"]]) {
@@ -46,21 +50,62 @@ test("AV1 to HEVC decodes in the browser first, so FFmpeg still does the scaling
   );
 });
 
-test("the hand-off to the browser is scaled like FFmpeg's other outputs and tagged BT.601", () => {
-  const args = ffmpegStepArgs("to-vp8", sizes);
-  assert.equal(args[args.indexOf("-vf") + 1], "fps=12,scale=320:-2:flags=fast_bilinear:out_color_matrix=bt601");
+test("the hand-off to the browser is deinterlaced within FFmpeg's size and rate limits, at a constant rate, tagged BT.601", () => {
+  const args = ffmpegStepArgs("to-vp8", rate);
+  assert.equal(args[args.indexOf("-vf") + 1], `${VIDEO_FILTER}:out_color_matrix=bt601`);
+  assert.ok(VIDEO_FILTER.startsWith("yadif=deint=interlaced,"));
+  assert.equal(args[args.indexOf("-fpsmax") + 1], "30");
+  assert.equal(args[args.indexOf("-fps_mode") + 1], "cfr");
   assert.equal(args[args.indexOf("-colorspace") + 1], "smpte170m");
   assert.equal(args[args.indexOf("-c:v") + 1], "libvpx");
   assert.ok(args.includes("-an"));
 });
 
+test("the hand-off's bitrate limit is 8 Mbit/s at 720p and grows with the frame, up to 40 Mbit/s", () => {
+  assert.equal(handOffBitrate(1280 * 720), "8000k");
+  assert.equal(handOffBitrate(1920 * 1080), "18000k");
+  assert.equal(handOffBitrate(1080 * 1920), "18000k");
+  assert.equal(handOffBitrate(1920 * 1920), "32000k");
+  assert.equal(handOffBitrate(320 * 180), "8000k");
+  assert.equal(handOffBitrate(0), "8000k");
+  assert.equal(handOffBitrate(3840 * 2160), "40000k");
+  const bitrate = (frameArea) => {
+    const args = ffmpegStepArgs("to-vp8", { ...rate, frameArea });
+    return args[args.indexOf("-b:v") + 1];
+  };
+  assert.equal(bitrate(1920 * 1080), "18000k");
+  assert.equal(bitrate(undefined), "8000k");
+});
+
+test("the frame-area probe writes one grey frame at the hand-off's size, a byte a pixel", () => {
+  const { args, output } = FRAME_AREA_PROBE;
+  assert.equal(args[args.indexOf("-frames:v") + 1], "1");
+  assert.equal(args[args.indexOf("-vf") + 1], fitWithin(1920));
+  assert.ok(`${VIDEO_FILTER}:out_color_matrix=bt601`.includes(fitWithin(1920)));
+  assert.equal(args[args.indexOf("-pix_fmt") + 1], "gray");
+  assert.equal(args[args.indexOf("-f") + 1], "rawvideo");
+  assert.equal(output, "frame.gray");
+});
+
 test("the .av1 stream is copied with any audio; outputs are IVF and Annex B with the frame rate", () => {
-  assert.deepEqual(ffmpegStepArgs("copy-av1", sizes), ["-map", "0:v:0", "-map", "0:a:0?", "-c", "copy"]);
-  const ivf = ffmpegStepArgs("write-av1", sizes);
+  assert.deepEqual(ffmpegStepArgs("copy-av1", rate), ["-map", "0:v:0", "-map", "0:a:0?", "-c", "copy"]);
+  const ivf = ffmpegStepArgs("write-av1", rate);
   assert.equal(ivf[ivf.indexOf("-f") + 1], "ivf");
-  const hevc = ffmpegStepArgs("write-hevc", sizes);
+  const hevc = ffmpegStepArgs("write-hevc", { frameRate: "30000/1001" });
   assert.equal(hevc[hevc.indexOf("-f") + 1], "hevc");
-  assert.equal(hevc[hevc.indexOf("-bsf:v") + 1], "hevc_mp4toannexb,hevc_metadata=tick_rate=12");
+  assert.equal(hevc[hevc.indexOf("-bsf:v") + 1], "hevc_mp4toannexb,hevc_metadata=tick_rate=30000/1001");
+});
+
+test("a raw stream records the whole or NTSC rate the hand-off was measured at", () => {
+  // Rates Mediabunny measured on FFmpeg.wasm hand-offs of 4 s clips.
+  assert.equal(streamFrameRate(30.0025), "30");
+  assert.equal(streamFrameRate(29.9673), "30000/1001");
+  assert.equal(streamFrameRate(23.9778), "24000/1001");
+  assert.equal(streamFrameRate(25), "25");
+  assert.equal(streamFrameRate(14.985), "15000/1001");
+  // Neither, so to a thousandth.
+  assert.equal(streamFrameRate(12.5), "12500/1000");
+  assert.equal(streamFrameRate(29.9), "29900/1000");
 });
 
 test("a browser without the codec is told which one and where to go", () => {
