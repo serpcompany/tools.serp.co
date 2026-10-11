@@ -30,7 +30,12 @@ import {
   outputMimeType,
 } from "@/components/table-convert/formats";
 import { parseInput, serializeOutput } from "@/components/table-convert/convert";
-import { canOfferOutput, nextUpload } from "@/components/table-convert/output-state";
+import {
+  NO_UPLOAD,
+  canOfferOutput,
+  nextUpload,
+  rewritesInputOnFormatChange,
+} from "@/components/table-convert/output-state";
 import { InputFormat, OutputFormat, TableData, ViewMode } from "@/components/table-convert/types";
 import type { BinaryTableFormat } from "@/lib/convert/table-outputs";
 
@@ -60,13 +65,12 @@ export default function TableConvertDemo({
   const [binaryOutput, setBinaryOutput] = useState<BinaryOutputState>({ state: "idle" });
   const [tableData, setTableData] = useState<TableData | null>(DEFAULT_TABLE);
   const [error, setError] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("Auto-convert is on.");
   const [dragActive, setDragActive] = useState(false);
   const [hasUserInput, setHasUserInput] = useState(false);
-  // A file being read, and the tickets that let an edit or a newer file win
-  // over it (output-state.ts).
-  const [upload, dispatchUpload] = useReducer(nextUpload, null);
+  // The name downloads take, a file being read, and the tickets that let an
+  // edit or a newer file win over it (output-state.ts).
+  const [{ fileName, upload }, dispatchUpload] = useReducer(nextUpload, NO_UPLOAD);
   const tickets = useRef(0);
   // Counts files loaded, so a file's text is parsed (and its upload ends)
   // even when it matches the text already in the input.
@@ -179,7 +183,8 @@ export default function TableConvertDemo({
   function handleInputFormatChange(nextFormat: InputFormat) {
     if (nextFormat === inputFormat) return;
     setInputFormat(nextFormat);
-    if (!tableData || !hasUserInput) return;
+    // Otherwise the parse effect re-parses the text on screen in the new format.
+    if (!tableData || !rewritesInputOnFormatChange({ table: tableData, hasUserInput, error })) return;
     const reserialized = serializeOutput(nextFormat, tableData);
     if (reserialized.supported) {
       setInputText(reserialized.text);
@@ -200,11 +205,11 @@ export default function TableConvertDemo({
 
   // Until a chosen or dropped file is read and parsed, the output panel says
   // it's being read and offers nothing to download. A file that finishes
-  // reading after a newer file or an edit is dropped.
+  // reading after a newer file or an edit is dropped, and downloads take a
+  // file's name only once its text is in the input.
   async function loadFile(file: File) {
     const ticket = ++tickets.current;
     dispatchUpload({ type: "start", name: file.name, ticket });
-    setFileName(file.name);
     let text: string;
     try {
       text = await file.text();
@@ -226,6 +231,9 @@ export default function TableConvertDemo({
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
+    // Choosing the same file again (after a failed read, say) fires change
+    // again only once the input is emptied.
+    event.target.value = "";
     if (file) void loadFile(file);
   }
 
@@ -237,9 +245,9 @@ export default function TableConvertDemo({
   }
 
   function handleClear() {
-    supersedeUpload();
+    tickets.current += 1;
+    dispatchUpload({ type: "clear" });
     setInputText("");
-    setFileName(null);
     setError(null);
     setHasUserInput(false);
     setTableData(DEFAULT_TABLE);
@@ -340,8 +348,8 @@ export default function TableConvertDemo({
                     Clear view
                   </Button>
                   <input ref={fileRef} type="file" onChange={handleFileChange} className="hidden" />
-                  {fileName && (
-                    <span className="text-xs text-muted-foreground">Selected: {fileName}</span>
+                  {(upload?.name ?? fileName) && (
+                    <span className="text-xs text-muted-foreground">Selected: {upload?.name ?? fileName}</span>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
