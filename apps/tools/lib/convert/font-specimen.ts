@@ -3,7 +3,7 @@
 // on white, drawn with the font by ImageMagick (FreeType). The image is as
 // wide as the longest line needs (up to MAX_WIDTH) and grey, so a PNG or LZW
 // TIFF of it is tens of kilobytes. SVG output wraps this image (encode.ts):
-// it isn't the font's outlines.
+// it isn't the font's outlines (#274).
 import type { IMagickImage } from "@imagemagick/magick-wasm";
 
 type MagickModule = typeof import("@imagemagick/magick-wasm");
