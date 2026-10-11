@@ -57,3 +57,19 @@ re-measure your Tools against a local Worker with
 `pnpm -C apps/tools tool-status`. Leave out `--resume`: it skips every Tool that
 already has a measured row, including the ones `staging`'s copy measured
 before your change. On a conflict in the view alone, run `tool-status`.
+
+## Canary sweep
+
+`pnpm -C apps/tools tool-canary --base-url http://localhost:8787` runs the Tools
+in `scripts/lib/tool-canary.mjs` through the sweep: one passing Tool for each
+engine and each kind of page, each with the path it guards. It writes to a
+temporary file, so the committed results are untouched, and exits 1 if any
+canary doesn't pass. A canary that fails runs once more; a pass the second time
+is a warning. CI runs it on every PR, after the [browser smoke test](browser-smoke.md),
+and it takes well under a minute. It catches a broken engine, not a broken
+Tool: run the sweep with `--only` on the Tools a change touches.
+
+`pnpm test` fails when an engine or page that has a passing Tool has no canary,
+or when a canary doesn't pass in `tool-sweep-results.json`. A new engine needs a
+canary in the same PR. When a canary Tool is retired, pick another passing Tool
+with the same engine.

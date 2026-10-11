@@ -110,6 +110,12 @@ jobs:
       - name: Check internal links
         run: pnpm -C apps/tools smoke:links --base-url http://localhost:8787
 
+      # One passing Tool for each engine and kind of page
+      # (apps/tools/scripts/lib/tool-canary.mjs), so a change that breaks an
+      # engine fails here. Results go to a temporary file.
+      - name: Run the canary sweep
+        run: pnpm -C apps/tools tool-canary --base-url http://localhost:8787
+
       - name: Show the Worker log
         if: failure()
         run: cat wrangler-dev.log || true
