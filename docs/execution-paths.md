@@ -85,6 +85,26 @@ Conversion picks an engine by input format:
   Illustrator file); an image to EPUB is a one-page EPUB 3 built with fflate.
   Raster images to AI are written as a PDF with the image on one page, and
   ImageMagick writes PCD, which is always 768x512.
+- **Images into one PDF** (`lib/convert/image-pdf.ts`, since #277): Image to PDF
+  reads any image the engines above read (fonts aside), by the file's first
+  bytes, else its extension, and writes one PDF with pdf-lib, a page per image
+  in the visitor's order. As in JPG to PDF, a page is its image's size, one
+  point a pixel (a side over Acrobat's 14,400 pt is scaled down). A JPEG's image
+  data goes in as it is, turned by its EXIF orientation and with its ICC
+  profile, without its other metadata (EXIF with GPS, XMP) or what follows the
+  image (a Motion Photo's video, a gain map); a CMYK, 12-bit, lossless or
+  arithmetic-coded one is decoded instead. An opaque photo in another format
+  (HEIC, AVIF, lossy WebP, JPEG XL, JPEG 2000, camera RAW, HDR, EXR) is stored
+  as a JPEG at quality 92, and anything else keeps its pixels: Flate, a band of
+  rows at a time, with PNG's Paeth predictor when that's smaller on a sample of
+  rows, one channel when grey, a soft mask when transparent. The format pages
+  (`jpg-to-pdf` and the rest) still embed a PNG with pdf-lib: a 2.3 MB 4032x3024
+  JPEG makes a 28 MB PDF there and a 2.3 MB one here. One PDF holds up to 100
+  images and 250 MB of image data (`image-pdf-inputs.ts`), since the tab holds
+  it about three times over while saving it, and an image it decodes is at most
+  50 megapixels. That size is read from the header of a JPEG, PNG, GIF, WebP
+  or BMP, and of the PNG ImageMagick writes, before the browser decodes it;
+  HEIC, AVIF, ICO, SVG, ICNS and KTX are checked once decoded.
 - **Image to text** (`lib/convert/image-text.ts`): JPG and PNG to TXT is OCR
   with tesseract.js, in the browser. Its worker, SIMD LSTM core and English
   model (4.0.0 best_int) are served from `public/vendor/tesseract/`, and a

@@ -448,6 +448,8 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "png", "ai"), "browser-raster");
   assert.equal(engine("convert", "jpg", "txt"), "tesseract");
   assert.equal(engine("convert", "png", "docx"), "docx");
+  assert.equal(engine("convert", "image", "pdf"), "image-pdf");
+  assert.equal(engine("convert", "png", "pdf"), "browser-raster");
   assert.equal(engine("compress", "heic", "heic"), "server-image-compress");
   assert.equal(engine("compress", "pdf", "pdf"), "server-pdf-compress");
   assert.equal(engine("compress", "mp4", "mp4"), "ffmpeg-wasm");

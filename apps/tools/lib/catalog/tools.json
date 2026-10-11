@@ -6923,6 +6923,22 @@
     ]
   },
   {
+    "id": "avif-to-pdf",
+    "name": "AVIF to PDF",
+    "description": "Convert AVIF images to PDF format",
+    "operation": "convert",
+    "route": "/avif-to-pdf",
+    "from": "avif",
+    "to": "pdf",
+    "isActive": true,
+    "tags": [
+      "avif",
+      "pdf",
+      "convert",
+      "image"
+    ]
+  },
+  {
     "id": "avif-to-pgm",
     "name": "AVIF to PGM",
     "description": "Convert AVIF to PGM format",
@@ -71553,6 +71569,128 @@
     ]
   },
   {
+    "id": "image-to-pdf",
+    "name": "Image to PDF",
+    "description": "Convert images to PDF, or combine several images into one PDF",
+    "operation": "convert",
+    "route": "/image-to-pdf",
+    "from": "image",
+    "to": "pdf",
+    "isActive": true,
+    "tags": [
+      "image",
+      "pdf",
+      "convert",
+      "combine",
+      "jpg",
+      "png",
+      "heic",
+      "photo"
+    ],
+    "content": {
+      "tool": {
+        "title": "Image to PDF",
+        "subtitle": "Convert any image to PDF in your browser. Choose several images to combine them into one PDF, one page each, in the order you choose.",
+        "from": "image",
+        "to": "pdf"
+      },
+      "faqs": [
+        {
+          "question": "How do I convert an image to PDF?",
+          "answer": "Choose or drop the image above. The PDF downloads as soon as it's made, named after the image."
+        },
+        {
+          "question": "How do I combine several images into one PDF?",
+          "answer": "Choose them all at once, or add more with Add images. They're listed in the order they'll appear in the PDF: move any of them up or down, or remove it, then press Combine into one PDF. Each image gets a page of its own, and the PDF is named after the first one."
+        },
+        {
+          "question": "Which image formats can I use?",
+          "answer": "JPG, PNG, HEIC and HEIF, WebP, AVIF, GIF, BMP, TIFF, SVG, ICO, Photoshop PSD, GIMP XCF, camera RAW (CR2, CR3, CRW, NEF, ARW, DNG, ORF, RAF and RW2), JPEG XL, JPEG 2000, and older formats such as PCX, TGA, Netpbm and MacPaint. One PDF can mix them."
+        },
+        {
+          "question": "Will my photos lose quality?",
+          "answer": "A JPG goes into the PDF exactly as it is, without being compressed again, and turned the way your phone shows it. Other photos, such as HEIC, AVIF and camera RAW, are stored as high-quality JPEG (quality 92) so the PDF stays a sensible size. Screenshots, drawings and images with transparency keep every pixel."
+        },
+        {
+          "question": "How big is each page?",
+          "answer": "Each page is the size of its image, one point for each pixel, so nothing is cropped or stretched. To print on paper, choose fit to page in the print dialog."
+        },
+        {
+          "question": "Is there a limit?",
+          "answer": "One PDF holds up to 100 images and up to 250 MB of images, because it's built in your browser's memory. For more, make two PDFs."
+        },
+        {
+          "question": "Are my images uploaded?",
+          "answer": "No. The PDF is made in your browser, so your images never leave your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "Images and PDF",
+        "fromFormat": {
+          "name": "Image",
+          "fullName": "Photos, screenshots and drawings",
+          "description": "Any image your phone, camera or computer saves",
+          "details": [
+            "JPG, PNG, HEIC, WebP, AVIF, GIF and TIFF",
+            "Camera RAW: CR2, NEF, ARW, DNG and more",
+            "Layered PSD and XCF",
+            "Several formats in one PDF"
+          ]
+        },
+        "toFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "One document that looks the same on every device",
+          "details": [
+            "A page for each image",
+            "Easy to share, attach and print",
+            "Opens in any browser"
+          ]
+        }
+      },
+      "howTo": {
+        "title": "How to convert images to PDF",
+        "intro": "Turn one image, or a set of them, into one PDF in your browser.",
+        "steps": [
+          "Choose or drop your images. A single image becomes a PDF straight away.",
+          "With several, put them in order with the arrows, and remove any you don't want.",
+          "Press Combine into one PDF.",
+          "The PDF downloads, with one page for each image."
+        ]
+      },
+      "infoArticle": {
+        "title": "About converting images to PDF",
+        "markdown": "Image to PDF turns your images into one PDF document in your browser, without uploading them. One image makes a one-page PDF; several make one PDF with a page for each image, in the order you set.\n\nEach page is the size of its image, so a photo isn't cropped and a screenshot isn't stretched. A JPG is placed in the PDF as it is, and other photos are stored as high-quality JPEG, so a PDF of phone photos stays about the size of the photos. Screenshots, scans and drawings keep every pixel.\n\n**Good to know**\n\n- One PDF holds up to 100 images and 250 MB of images.\n\n- Photos taken sideways are turned upright, as your phone shows them.\n\n- Transparent areas show the white of the page."
+      },
+      "changelog": [
+        {
+          "date": "October 2026",
+          "changes": [
+            "Launched Image to PDF: any image to PDF, and several images combined into one PDF"
+          ]
+        }
+      ],
+      "relatedTools": [
+        {
+          "title": "JPG to PDF",
+          "toolId": "jpg-to-pdf"
+        },
+        {
+          "title": "PNG to PDF",
+          "toolId": "png-to-pdf"
+        },
+        {
+          "title": "HEIC to PDF",
+          "toolId": "heic-to-pdf"
+        },
+        {
+          "title": "PDF to JPG",
+          "toolId": "pdf-to-jpg"
+        }
+      ]
+    }
+  },
+  {
     "id": "jfif-to-ico",
     "name": "JFIF to ICO",
     "description": "Convert JFIF to ICO format",
@@ -74480,6 +74618,22 @@
     ]
   },
   {
+    "id": "jps-to-pdf",
+    "name": "JPS to PDF",
+    "description": "Convert JPS stereo images to PDF format",
+    "operation": "convert",
+    "route": "/jps-to-pdf",
+    "from": "jps",
+    "to": "pdf",
+    "isActive": true,
+    "tags": [
+      "jps",
+      "pdf",
+      "convert",
+      "image"
+    ]
+  },
+  {
     "id": "json-to-csv",
     "name": "JSON to CSV",
     "description": "Convert JSON data to CSV format",
@@ -77292,6 +77446,22 @@
     "tags": [
       "mac",
       "jpg",
+      "convert",
+      "image"
+    ]
+  },
+  {
+    "id": "mac-to-pdf",
+    "name": "MAC to PDF",
+    "description": "Convert MacPaint (MAC) images to PDF format",
+    "operation": "convert",
+    "route": "/mac-to-pdf",
+    "from": "mac",
+    "to": "pdf",
+    "isActive": true,
+    "tags": [
+      "mac",
+      "pdf",
       "convert",
       "image"
     ]
@@ -89525,6 +89695,23 @@
     ]
   },
   {
+    "id": "nef-to-pdf",
+    "name": "NEF to PDF",
+    "description": "Convert NEF images to PDF format",
+    "operation": "convert",
+    "route": "/nef-to-pdf",
+    "from": "nef",
+    "to": "pdf",
+    "isActive": true,
+    "tags": [
+      "nef",
+      "pdf",
+      "convert",
+      "image",
+      "raw"
+    ]
+  },
+  {
     "id": "nef-to-pgm",
     "name": "NEF to PGM",
     "description": "Convert NEF to PGM format",
@@ -91991,6 +92178,22 @@
     "tags": [
       "pcx",
       "jpg",
+      "convert",
+      "image"
+    ]
+  },
+  {
+    "id": "pcx-to-pdf",
+    "name": "PCX to PDF",
+    "description": "Convert PCX images to PDF format",
+    "operation": "convert",
+    "route": "/pcx-to-pdf",
+    "from": "pcx",
+    "to": "pdf",
+    "isActive": true,
+    "tags": [
+      "pcx",
+      "pdf",
       "convert",
       "image"
     ]
@@ -103262,6 +103465,22 @@
     "tags": [
       "xcf",
       "jpg",
+      "convert",
+      "image"
+    ]
+  },
+  {
+    "id": "xcf-to-pdf",
+    "name": "XCF to PDF",
+    "description": "Convert XCF images to PDF format",
+    "operation": "convert",
+    "route": "/xcf-to-pdf",
+    "from": "xcf",
+    "to": "pdf",
+    "isActive": true,
+    "tags": [
+      "xcf",
+      "pdf",
       "convert",
       "image"
     ]

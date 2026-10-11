@@ -424,6 +424,13 @@
       "notes": "Canonical JPEG fixture (also used for .jpeg)."
     },
     {
+      "format": "jps",
+      "status": "ready",
+      "input": "file",
+      "fixture": "fixtures/sample.jps",
+      "notes": "JPEG stereo pair, 192x96 side by side: sample.ppm beside a copy shifted 4 px (magick +append, JPEG quality 90), with a JPS APP3 _JPSJPS_ block (stereo, side by side) inserted after APP0. Read back with file (JPEG, baseline, 192x96), magick identify (JPEG 192x96, 0 pixels differ from the JPEG without the block) and exiftool (JPS Type Stereo, Layout Side By Side)."
+    },
+    {
       "format": "json",
       "status": "ready",
       "input": "text",
@@ -1024,6 +1031,10 @@
     "png-to-txt": {
       "input": "file",
       "fixture": "fixtures/sample-text.png"
+    },
+    "image-to-pdf": {
+      "input": "file",
+      "fixture": "fixtures/sample.png"
     }
   }
 }
