@@ -19,6 +19,7 @@ test.after(() => {
   globalThis.fetch = originalFetch;
 });
 const { convertWithMagickInBrowser, encodePngWithMagick } = await import("./magickBrowser.ts");
+const { convertWithWorker } = await import("./workerClient.ts");
 // The same module instance magickBrowser.ts initialised, for reading outputs back.
 const magick = await import("@imagemagick/magick-wasm");
 
@@ -110,5 +111,145 @@ test("camera RAW decodes to the photo native ImageMagick reads", async () => {
     );
     assert.ok(Math.abs(mean - native.mean) < 2, `${from} mean ${mean.toFixed(1)}, native ${native.mean}`);
     assert.ok(Math.abs(standardDeviation - native.sd) < 2, `${from} sd ${standardDeviation.toFixed(1)}, native ${native.sd}`);
+  }
+});
+
+// Mean and standard deviation (0-255) of every channel of each fixture as
+// native ImageMagick writes it to PNG: `magick <file> png:- | magick -
+// -format "%[fx:mean*255] %[fx:standard_deviation*255]" info:`, with `mac:`
+// named for MacPaint, and EXR and HDR encoded to sRGB (`-set colorspace RGB
+// -colorspace sRGB` for EXR, `-colorspace sRGB` for HDR). Before #263 the
+// browser's own decoder got all of them, and failed.
+const NATIVE = {
+  pam: { mean: 146.9, sd: 72.9 },
+  pbm: { mean: 166.6, sd: 121.4 },
+  pgm: { mean: 149.2, sd: 54.3 },
+  ppm: { mean: 146.9, sd: 72.9 },
+  pcx: { mean: 146.9, sd: 72.9 },
+  jxl: { mean: 146.9, sd: 72.8 },
+  jp2: { mean: 146.9, sd: 72.9 },
+  xpm: { mean: 146.8, sd: 73.0 },
+  wpg: { mean: 146.8, sd: 73.0 },
+  pcd: { mean: 152.2, sd: 90.1 },
+  mac: { mean: 193.9, sd: 108.8 },
+  sfw: { mean: 111.5, sd: 68.0 },
+  exr: { mean: 207.9, sd: 55.8 },
+  hdr: { mean: 146.4, sd: 73.2 },
+};
+
+const pngStatistics = (buffer) =>
+  magick.ImageMagick.read(new Uint8Array(buffer), magick.MagickFormat.Png, (image) => {
+    const { mean, standardDeviation } = image.statistics().composite();
+    return { mean, sd: standardDeviation, width: image.width, height: image.height, gamma: image.gamma };
+  });
+
+test("Netpbm, PCX, JXL, JP2, XPM, WPG, Photo CD, MacPaint, SFW, EXR and HDR decode to the picture native ImageMagick reads", async () => {
+  for (const [from, native] of Object.entries(NATIVE)) {
+    const { buffer, format } = await convertWithMagickInBrowser(read(`sample.${from}`), from, "png");
+    assert.equal(format, "png", from);
+    const { mean, sd } = pngStatistics(buffer);
+    assert.ok(Math.abs(mean - native.mean) < 1, `${from} mean ${mean.toFixed(1)}, native ${native.mean}`);
+    assert.ok(Math.abs(sd - native.sd) < 1, `${from} sd ${sd.toFixed(1)}, native ${native.sd}`);
+  }
+});
+
+// A 4 x 1 Radiance HDR, uncompressed: each pixel is a shared-exponent RGBE
+// grey of 0, 0.25, 1 and 16.
+function radianceHdr() {
+  const header = new TextEncoder().encode("#?RADIANCE\nFORMAT=32-bit_rle_rgbe\n\n-Y 1 +X 4\n");
+  // value = mantissa * 2^(exponent - 136)
+  const pixels = [
+    [0, 0, 0, 0],
+    [128, 128, 128, 127],
+    [128, 128, 128, 129],
+    [128, 128, 128, 133],
+  ].flat();
+  return Uint8Array.from([...header, ...pixels]).buffer;
+}
+
+test("HDR and EXR: linear light is encoded to sRGB and values above 1.0 are white", async () => {
+  const { buffer } = await convertWithMagickInBrowser(radianceHdr(), "hdr", "png");
+  const greys = magick.ImageMagick.read(new Uint8Array(buffer), magick.MagickFormat.Png, (image) =>
+    [0, 1, 2, 3].map((x) => image.getPixels((pixels) => pixels.getPixel(x, 0)[0])),
+  );
+  // 0.25 linear is 137 in sRGB; 1.0 and 16 are both white.
+  assert.deepEqual(greys, [0, 137, 255, 255]);
+  // sample.exr ramps from black at the left to (4, 2, 1) at the right
+  // (fixture-matrix.json): each channel is white where it passes 1.0, and
+  // below white where it's under.
+  const { buffer: exrPng } = await convertWithMagickInBrowser(read("sample.exr"), "exr", "png");
+  const row = magick.ImageMagick.read(new Uint8Array(exrPng), magick.MagickFormat.Png, (image) =>
+    image.getPixels((pixels) => pixels.toByteArray(0, 0, image.width, 1, "RGB")),
+  );
+  assert.equal(row.length, 96 * 3);
+  for (let x = 0; x < 96; x += 1) {
+    [4, 2, 1].forEach((peak, channel) => {
+      const linear = (peak * x) / 95;
+      const value = row[x * 3 + channel];
+      if (linear > 1) assert.equal(value, 255, `x ${x} channel ${channel}: ${linear.toFixed(3)} linear`);
+      if (linear < 0.99) assert.ok(value < 255, `x ${x} channel ${channel}: ${linear.toFixed(3)} linear is white`);
+    });
+  }
+  // Tagged as sRGB, not gamma 1.0, which a viewer would show washed out.
+  for (const from of ["exr", "hdr"]) {
+    const { buffer: png } = await convertWithMagickInBrowser(read(`sample.${from}`), from, "png");
+    assert.ok(Math.abs(pngStatistics(png).gamma - 1 / 2.2) < 0.001, `${from} gamma ${pngStatistics(png).gamma}`);
+  }
+});
+
+test("EXR keeps its alpha as it is: only colour is encoded to sRGB", async () => {
+  // A 64 (0.25 linear) grey at half opacity, made into an EXR by ImageMagick,
+  // whose writer stores the values as they are.
+  const image = magick.MagickImage.create(new magick.MagickColor(64, 64, 64, 128), 16, 16);
+  const exr = image.write(magick.MagickFormat.Exr, (data) => data.slice());
+  image.dispose();
+  const { buffer } = await convertWithMagickInBrowser(exr.buffer, "exr", "png");
+  const pixel = magick.ImageMagick.read(new Uint8Array(buffer), magick.MagickFormat.Png, (png) =>
+    png.getPixels((pixels) => [...pixels.toByteArray(0, 0, 1, 1, "RGBA")]),
+  );
+  assert.deepEqual(pixel, [137, 137, 137, 128]);
+});
+
+// The share of an image's pixels that aren't white (within 8 of 255).
+function inkShare(buffer, format) {
+  return magick.ImageMagick.read(new Uint8Array(buffer), format, (image) => {
+    const rgba = image.getPixels((pixels) => pixels.toByteArray(0, 0, image.width, image.height, "RGBA"));
+    let ink = 0;
+    for (let index = 0; index < rgba.length; index += 4) if (rgba[index] < 247) ink += 1;
+    return ink / (rgba.length / 4);
+  });
+}
+
+test("TTF and OTF convert to a specimen of the font, a few kilobytes as PNG or TIFF", async () => {
+  for (const from of ["ttf", "otf"]) {
+    const { buffer: png } = await convertWithMagickInBrowser(read(`sample.${from}`), from, "png");
+    const { buffer: tiff, format } = await convertWithMagickInBrowser(read(`sample.${from}`), from, "tiff");
+    assert.equal(format, "tiff");
+    assert.deepEqual(checkOutputFormat(tiff, "tiff"), { ok: true }, from);
+    const { width, height } = pngStatistics(png);
+    // Name, three lines of characters and five pangrams, at most 2400 px wide.
+    assert.ok(width >= 400 && width <= 2400 && height > 400 && height < 800, `${from} specimen is ${width} x ${height}`);
+    // The fixture fonts draw only S E R P T O L, still more than twice the
+    // 0.1% of the picture the sweep's blank check needs.
+    assert.ok(inkShare(png, magick.MagickFormat.Png) > 0.002, `${from} specimen is nearly blank`);
+    // Grey, and LZW in a TIFF: about 1 MB uncompressed.
+    assert.ok(png.byteLength < 10_000 && tiff.byteLength < 10_000, `${from}: PNG ${png.byteLength}, TIFF ${tiff.byteLength} bytes`);
+  }
+});
+
+test("a file that isn't a font says so", async () => {
+  const text = new TextEncoder().encode("not a font").buffer;
+  await assert.rejects(convertWithMagickInBrowser(text, "ttf", "png"), /isn't a font the converter can read/);
+  // The next font still draws.
+  const { buffer } = await convertWithMagickInBrowser(read("sample.otf"), "otf", "png");
+  assert.deepEqual(checkOutputFormat(buffer, "png"), { ok: true });
+});
+
+test("each new input converts through the converter with ImageMagick, not the browser's decoder", async () => {
+  // With no worker, the browser-decoder path would throw.
+  for (const from of [...Object.keys(NATIVE), "ttf", "otf"]) {
+    const result = await convertWithWorker({ worker: undefined, from, to: "png", buf: read(`sample.${from}`) });
+    assert.equal(result.kind, "single", from);
+    assert.deepEqual(checkOutputFormat(result.buffer, "png"), { ok: true }, from);
   }
 });

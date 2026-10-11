@@ -425,6 +425,11 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "ai", "png"), "pdfjs");
   assert.equal(engine("convert", "pdf", "jpg"), "pdfjs");
   assert.equal(engine("convert", "dng", "jpg"), "imagemagick-wasm");
+  for (const from of ["pam", "pbm", "pgm", "ppm", "pcx", "jxl", "jp2", "xpm", "wpg", "pcd", "mac", "sfw", "exr", "hdr"]) {
+    assert.equal(engine("convert", from, "png"), "imagemagick-wasm", from);
+  }
+  assert.equal(engine("convert", "ttf", "svg"), "imagemagick-wasm");
+  assert.equal(engine("convert", "otf", "png"), "imagemagick-wasm");
   assert.equal(engine("convert", "heic", "png"), "heif-decoder");
   assert.equal(engine("convert", "mp4", "mp3"), "ffmpeg-wasm");
   assert.equal(engine("convert", "gif", "mp4"), "ffmpeg-wasm");

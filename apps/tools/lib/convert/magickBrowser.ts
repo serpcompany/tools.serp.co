@@ -1,5 +1,6 @@
 // ImageMagick (WASM) in the browser, for inputs the browser can't decode:
-// camera RAW, PSD, TGA, DDS, TIFF, XCF. Loads the 14 MB wasm on first use.
+// camera RAW, layered, legacy, Netpbm and high dynamic range images, and
+// fonts. Loads the 14 MB wasm on first use.
 import type { IMagickImage, MagickFormat as MagickFormatType } from "@imagemagick/magick-wasm";
 
 const WASM_URL = "/vendor/imagemagick/magick.wasm";
@@ -35,12 +36,22 @@ function magickFormat(magick: MagickModule, ext: string): MagickFormatType | und
   return key ? magick.MagickFormat[key as keyof typeof magick.MagickFormat] : undefined;
 }
 
-// Formats the browser can't decode that ImageMagick reads: camera RAW and
-// layered or legacy image formats.
+// Formats the browser can't decode that ImageMagick reads: camera RAW,
+// layered or legacy image formats, Netpbm, JPEG XL and JPEG 2000, high
+// dynamic range images (EXR, HDR) and fonts (TTF, OTF, drawn as a specimen).
+// MacPaint (MAC) has no signature, so it's read with its format named, as
+// every input is. SFW is repaired into a JPEG first (sfw.ts).
 export const MAGICK_BROWSER_INPUTS = new Set([
   "arw", "cr2", "cr3", "crw", "dng", "nef", "orf", "raf", "rw2",
   "dds", "psd", "tga", "tif", "tiff", "xcf",
+  "pam", "pbm", "pgm", "ppm", "pcx", "jxl", "jp2", "xpm", "wpg", "pcd", "mac", "sfw",
+  "exr", "hdr",
+  "ttf", "otf",
 ]);
+
+const FONT_INPUTS = new Set(["ttf", "otf"]);
+// High dynamic range inputs, encoded from linear light to sRGB (linear-light.ts).
+const LINEAR_LIGHT_INPUTS = new Set(["exr", "hdr"]);
 
 // Formats ImageMagick writes that a canvas can't (ICNS and KTX have their own
 // writers in texture-formats.ts). Camera RAW and HEIC can't be written by any
@@ -81,6 +92,37 @@ function writeImage(magick: MagickModule, image: IMagickImage, format: string): 
   return image.write(magickFormat(magick, format)!, (data) => data.slice());
 }
 
+// Reads `bytes` as `from` (`source` in ImageMagick) and hands the image to
+// `handle`. The code for fonts, SFW and linear light loads only when one is
+// converted, so it isn't in the script every converter page loads.
+async function readInput<T>(
+  magick: MagickModule,
+  bytes: Uint8Array,
+  from: string,
+  source: MagickFormatType,
+  handle: (image: IMagickImage) => T,
+): Promise<T> {
+  if (FONT_INPUTS.has(from)) {
+    const { drawFontSpecimen } = await import("./font-specimen.ts");
+    return drawFontSpecimen(magick, bytes, from, handle);
+  }
+  if (from === "sfw") {
+    const { sfwToJpeg } = await import("./sfw.ts");
+    return magick.ImageMagick.read(sfwToJpeg(bytes), magick.MagickFormat.Jpeg, (image) => {
+      image.flip();
+      return handle(image);
+    });
+  }
+  if (LINEAR_LIGHT_INPUTS.has(from)) {
+    const { encodeLinearLight } = await import("./linear-light.ts");
+    return magick.ImageMagick.read(bytes, source, (image) => {
+      encodeLinearLight(magick, image);
+      return handle(image);
+    });
+  }
+  return magick.ImageMagick.read(bytes, source, handle);
+}
+
 // Converts `from` to `to` when ImageMagick can write `to`; otherwise to PNG,
 // for the caller to re-encode. Returns the bytes and the format written.
 export async function convertWithMagickInBrowser(
@@ -94,9 +136,7 @@ export async function convertWithMagickInBrowser(
     throw new Error(`${from.toUpperCase()} isn't supported by the image converter.`);
   }
   const format = MAGICK_BROWSER_OUTPUTS.has(to) ? to : "png";
-  const bytes = magick.ImageMagick.read(new Uint8Array(buf), source, (image) =>
-    writeImage(magick, image, format),
-  );
+  const bytes = await readInput(magick, new Uint8Array(buf), from, source, (image) => writeImage(magick, image, format));
   return { buffer: bytes.buffer as ArrayBuffer, format };
 }
 

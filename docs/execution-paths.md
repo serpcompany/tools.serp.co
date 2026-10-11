@@ -60,6 +60,20 @@ Conversion picks an engine by input format:
   bundles for camera RAW. Since #269 that's `@imagemagick/magick-wasm` 0.0.42
   (LibRaw 0.22.2): 0.0.37 read Nikon's lossy NEF as all white and Olympus ORF
   as coloured noise. **HEIC and HEIF:** libheif.
+- **Netpbm, PCX, JXL, JP2, XPM, WPG, Photo CD, MacPaint, SFW, EXR, HDR and
+  fonts** (since #263): ImageMagick WASM too, reading each input with its
+  format named, since MacPaint has no signature. ImageMagick repairs an SFW
+  (a JPEG with renumbered markers) through a temporary file, which fails in
+  WASM, so `lib/convert/sfw.ts` repairs it in memory instead. EXR and HDR
+  hold linear light: this 8-bit build clamps values above 1.0 to white as it
+  reads, keeping the exposure the file was saved with, and the rest is
+  encoded to sRGB (`lib/convert/linear-light.ts`; native `magick` leaves it
+  linear, and dark). The 8-bit build rounds linear light to 256 levels before
+  encoding it, so dark gradients band where native `magick` keeps them smooth,
+  until #275. TTF and OTF become a specimen (`lib/convert/font-specimen.ts`):
+  the font's name, A to Z, a to z, digits and a pangram at 16 to 64 px, drawn
+  with the font in black on white, grey, as wide as its longest line; a TIFF
+  is LZW. As SVG it's that image wrapped, not the font's outlines, until #274.
 - **PDF and AI:** pdf.js renders each page, one file per page, at twice its
   size in points but never more than 4096x4096 pixels, Safari's canvas limit.
   Targets other than PNG and JPEG are encoded from that render. AI to PDF
