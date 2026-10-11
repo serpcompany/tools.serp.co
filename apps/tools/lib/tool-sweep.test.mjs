@@ -1,18 +1,23 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  BLANK_SHARE,
+  checksPixels,
   classifyRun,
   converterEngine,
   countStatuses,
   ffmpegError,
   hasSignature,
   loadFixtures,
+  measurePixels,
   mergeRows,
   pageComponent,
   parseArgs,
@@ -23,8 +28,16 @@ import {
   serializeResults,
   textOutputTimeout,
   thrownError,
+  topColour,
   treeIsDirty,
 } from "../scripts/lib/tool-sweep.mjs";
+
+// The ImageMagick WASM build the app ships, which the sweep decodes image
+// outputs with.
+const magick = await import("@imagemagick/magick-wasm");
+await magick.initializeImageMagick(
+  readFileSync(createRequire(import.meta.url).resolve("@imagemagick/magick-wasm/magick.wasm")),
+);
 
 const benchmarksDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../benchmarks");
 const fixturesDir = path.join(benchmarksDir, "fixtures");
@@ -193,6 +206,109 @@ test("an output format without a signature passes unchecked, unless text markers
   assert.match(lost.error, /missing Gamma/);
 });
 
+// A real PNG: `width` x `height` of `background`, with `draw` run on it first.
+function png(width, height, background, draw = () => {}) {
+  return magick.ImageMagick.read(new magick.MagickColor(background), width, height, (image) => {
+    draw(image);
+    return image.write(magick.MagickFormat.Png, (data) => data.slice());
+  });
+}
+
+// Paints a `width` x `height` grey block (black by default) at the top left.
+function block(width, height, level = 0) {
+  return (image) =>
+    image.getPixels((pixels) => {
+      for (let y = 0; y < height; y += 1) {
+        pixels.setArea(0, y, width, 1, new Uint8Array(width * image.channelCount).fill(level));
+      }
+    });
+}
+
+test("a blank PNG measures as one colour, and a photo doesn't", () => {
+  // The all-white image ImageMagick WASM 0.0.37 made of the NEF fixture.
+  assert.deepEqual(measurePixels(magick, png(3039, 2014, "#FFFFFF"), "png"), {
+    colour: "#FFFFFF",
+    share: 1,
+    width: 3039,
+    height: 2014,
+  });
+  // The DNG fixture's photo (native read-back: mean 76.5, sd 34.0) as a PNG.
+  const photo = magick.ImageMagick.read(readFileSync(path.join(fixturesDir, "sample.dng")), magick.MagickFormat.Dng, (image) =>
+    image.write(magick.MagickFormat.Png, (data) => data.slice()),
+  );
+  const measured = measurePixels(magick, photo, "png");
+  assert.deepEqual([measured.width, measured.height], [644, 644]);
+  assert.ok(measured.share < 0.5, `the photo's top colour covers ${measured.share}`);
+  // A one-colour fixture is a real PNG of one colour too.
+  assert.equal(measurePixels(magick, readFileSync(path.join(fixturesDir, "sample.png")), "png").share, 1);
+});
+
+test("nearly one colour is blank; a small drawing on a plain background isn't", () => {
+  // 25 stray pixels in 60,000.
+  const stray = measurePixels(magick, png(300, 200, "#FFFFFF", block(5, 5)), "png");
+  assert.ok(stray.share >= BLANK_SHARE && stray.share < 1);
+  // A difference within PIXEL_TOLERANCE is the same colour.
+  assert.equal(measurePixels(magick, png(300, 200, "#F8F8F8", block(150, 200, 0xfc)), "png").share, 1);
+  // 1% of the pixels drawn: a page with a line of text, say.
+  const drawn = measurePixels(magick, png(300, 200, "#FFFFFF", block(30, 20)), "png");
+  assert.ok(drawn.share < BLANK_SHARE);
+  // The noise of a lossy encoder doesn't make a blank image varied.
+  const jpeg = magick.ImageMagick.read(new magick.MagickColor("#3366CC"), 300, 200, (image) => {
+    image.quality = 30;
+    return image.write(magick.MagickFormat.Jpeg, (data) => data.slice());
+  });
+  assert.ok(measurePixels(magick, jpeg, "jpg").share >= BLANK_SHARE);
+});
+
+test("transparent pixels count as one colour, whatever their RGB", () => {
+  const rgba = new Uint8Array([255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 3, 10, 20, 30, 255]);
+  assert.deepEqual(topColour(rgba), { colour: "#00000000", share: 0.75 });
+});
+
+test("an SVG is measured by the raster it wraps, and other formats aren't measured", () => {
+  const white = Buffer.from(png(40, 30, "#FFFFFF")).toString("base64");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="30" viewBox="0 0 40 30"><image href="data:image/png;base64,${white}" width="40" height="30" /></svg>`;
+  assert.deepEqual(measurePixels(magick, new TextEncoder().encode(svg), "svg"), {
+    colour: "#FFFFFF",
+    share: 1,
+    width: 40,
+    height: 30,
+  });
+  const vector = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>';
+  assert.equal(measurePixels(magick, new TextEncoder().encode(vector), "svg"), null);
+  assert.equal(measurePixels(magick, new Uint8Array(16), "icns"), null);
+  assert.throws(() => measurePixels(magick, new Uint8Array(64).fill(7), "png"));
+  assert.deepEqual(["png", "JPG", "svg", "tga", "xbm", "icns", "ktx", "rgb", "eps", "mp4"].map(checksPixels), [
+    true, true, true, true, true, false, false, false, false, false,
+  ]);
+});
+
+test("a blank or undecodable image fails; a decoded one passes with its top colour's share", () => {
+  const run = (pixels) => classifyRun({ outcome: "completed", outputs: [output("sample.png", { pixels })] }, { to: "png" });
+  assert.deepEqual(run({ colour: "#FFFFFF", share: 1, width: 3039, height: 2014 }), {
+    status: "error",
+    error: "saved a blank image: 100% of its pixels are #FFFFFF (sample.png)",
+    formatCheck: "signature",
+  });
+  assert.match(run({ colour: "#000000", share: 0.9995 }).error, /^saved a blank image: 99.9% of its pixels are #000000/);
+  assert.deepEqual(run({ colour: "#282726", share: 0.096874 }), {
+    status: "pass",
+    error: null,
+    formatCheck: "signature",
+    topColourShare: 0.0968,
+  });
+  assert.deepEqual(run({ error: "improper image header" }), {
+    status: "error",
+    error: "saved an image that doesn't decode (sample.png): improper image header",
+    formatCheck: "signature",
+  });
+  // The format check comes first.
+  assert.equal(
+    classifyRun({ outcome: "completed", outputs: [output("sample.png", { pixels: { error: "x" } })] }, { to: "gif" }).status,
+    "wrong_format",
+  );
+});
+
 test("hasSignature asks the app's check which formats it can verify", () => {
   for (const format of ["png", "jpg", "gif", "pdf", "mp3", "mp4", "svg", "ico", "ktx2", "av1", "hevc"]) {
     assert.equal(hasSignature(format), true, format);
@@ -288,6 +404,11 @@ test("planTool picks a driver and fixture, or says why a Tool isn't run", () => 
     [png.handler, png.engine, png.driver, png.fixtures, png.timeoutMs, png.status],
     ["ToolPageRenderer", "browser-raster", "file", ["/f/sample.png"], 60, undefined],
   );
+  // sample.png is one colour, so a blank JPG can't be told from a faithful one.
+  assert.equal(png.pixelCheck, false);
+  const nefOptions = { ...options, fixtures: { ...fixtures, byFormat: new Map([["nef", "/f/sample.nef"]]) } };
+  const nef = (to) => planTool({ id: `nef-to-${to}`, route: `/nef-to-${to}`, operation: "convert", from: "nef", to }, nefOptions);
+  assert.deepEqual(["png", "svg", "xbm", "pdf"].map((to) => nef(to).pixelCheck), [true, true, true, false]);
   const video = plan({ id: "mp4-to-mp3", route: "/mp4-to-mp3", operation: "convert", from: "mp4", to: "mp3" });
   assert.equal(video.timeoutMs, 180);
   assert.equal(plan({ id: "mp4-to-mxf", route: "/mp4-to-mxf", operation: "convert", from: "mp4", to: "mxf" }).timeoutMs, 180);
@@ -424,7 +545,7 @@ test("ffmpegError names the encoder that refused, not the exit code", () => {
 
 test("the summary counts statuses, splits passes by check and lists failing ids", () => {
   const results = [
-    { id: "a", from: "png", engine: "browser-raster", status: "pass", formatCheck: "signature" },
+    { id: "a", from: "png", engine: "browser-raster", status: "pass", formatCheck: "signature", topColourShare: 0.2 },
     { id: "b", from: "png", engine: "browser-raster", status: "pass", formatCheck: "none" },
     { id: "c", from: "mp4", engine: "ffmpeg-wasm", status: "error", error: "FFmpeg failed", detail: "[h263] size" },
     { id: "d", from: "icns", status: "no_fixture" },
@@ -438,7 +559,10 @@ test("the summary counts statuses, splits passes by check and lists failing ids"
     { activeCount: 6 },
   );
   assert.match(summary, /`0123456`.*concurrency 4, 1 h 30 min/);
-  assert.match(summary, /\| pass \| 2 \(file signature checked: 1, text content checked: 0, no check for the output format: 1\) \|/);
+  assert.match(
+    summary,
+    /\| pass \| 2 \(file signature checked: 1, text content checked: 0, no check for the output format: 1; image decoded and not blank: 1\) \|/,
+  );
   assert.match(summary, /\| \*\*run \/ active\*\* \| 3 \/ 6 \|/);
   assert.match(summary, /Non-passing Tools by engine\n\n\| +\| wrong_format/);
   assert.match(summary, /\| ffmpeg-wasm \| 0 \| 1 \| 0 \|/);

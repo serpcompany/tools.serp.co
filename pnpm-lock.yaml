@@ -49,8 +49,8 @@ importers:
         specifier: ^0.12.15
         version: 0.12.15
       '@imagemagick/magick-wasm':
-        specifier: ^0.0.37
-        version: 0.0.37
+        specifier: ^0.0.42
+        version: 0.0.42
       '@jsquash/jpeg':
         specifier: ^1.6.0
         version: 1.6.0
@@ -1244,8 +1244,8 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@imagemagick/magick-wasm@0.0.37':
-    resolution: {integrity: sha512-tVs9hcWu9u7I3Jz/XvUYVvCEniuxAR+JjZEzI+yKtQmYAtNsLF1WjoH1HZGCKPumaB9jAHZlcf2RGT9+1l3nxQ==}
+  '@imagemagick/magick-wasm@0.0.42':
+    resolution: {integrity: sha512-SUX54Pf3uMBS4ThdmHvbcKqP83W2FRc8kVnqxtwm1csgeaDPn8h47zQh6Yt7U1kmZL7ziV22j4W3GmAef5uLWg==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -7318,7 +7318,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@imagemagick/magick-wasm@0.0.37': {}
+  '@imagemagick/magick-wasm@0.0.42': {}
 
   '@img/colour@1.1.0': {}
 

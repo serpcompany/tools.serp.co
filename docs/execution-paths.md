@@ -56,8 +56,10 @@ Conversion picks an engine by input format:
   different computer, and the run is recorded as handed off, not failed. HEVC
   input stays on FFmpeg.
 - **Camera RAW, PSD, TGA, DDS, TIFF and XCF:** ImageMagick WASM
-  (`lib/convert/magickBrowser.ts`) on the main thread. **HEIC and HEIF:**
-  libheif.
+  (`lib/convert/magickBrowser.ts`) on the main thread, with the LibRaw it
+  bundles for camera RAW. Since #269 that's `@imagemagick/magick-wasm` 0.0.42
+  (LibRaw 0.22.2): 0.0.37 read Nikon's lossy NEF as all white and Olympus ORF
+  as coloured noise. **HEIC and HEIF:** libheif.
 - **PDF and AI:** pdf.js renders each page, one file per page, at twice its
   size in points but never more than 4096x4096 pixels, Safari's canvas limit.
   Targets other than PNG and JPEG are encoded from that render. AI to PDF

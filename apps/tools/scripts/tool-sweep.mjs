@@ -22,6 +22,7 @@ import { Buffer } from "node:buffer";
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 import { activeTools, toolHref } from "../lib/catalog/catalog.ts";
@@ -31,6 +32,7 @@ import {
   countStatuses,
   ffmpegError,
   loadFixtures,
+  measurePixels,
   mergeRows,
   parseArgs,
   planTool,
@@ -147,6 +149,36 @@ function writeResults() {
 
 const { chromium } = await import("playwright");
 const ffmpegWasm = readFileSync(path.resolve(appRoot, "node_modules/@ffmpeg/core/dist/esm/ffmpeg-core.wasm"));
+
+// ImageMagick WASM in Node, loaded on first use, decodes image outputs for
+// the blank check.
+let magickPromise = null;
+function loadMagick() {
+  magickPromise ??= (async () => {
+    const magick = await import("@imagemagick/magick-wasm");
+    const wasm = createRequire(import.meta.url).resolve("@imagemagick/magick-wasm/magick.wasm");
+    await magick.initializeImageMagick(readFileSync(wasm));
+    return magick;
+  })();
+  return magickPromise;
+}
+
+// Measures each output's pixels (bytes from a ZIP, or base64 from the page)
+// for classifyRun, then drops the bytes.
+async function measureOutputPixels(outputs, format) {
+  const magick = await loadMagick();
+  for (const output of outputs) {
+    const bytes = output.bytes ?? Buffer.from(output.base64 ?? "", "base64");
+    delete output.bytes;
+    delete output.base64;
+    if (!bytes.length) continue;
+    try {
+      output.pixels = measurePixels(magick, bytes, format) ?? undefined;
+    } catch (error) {
+      output.pixels = { error: String(error?.message ?? error).split("\n")[0] };
+    }
+  }
+}
 const baseOrigin = new URL(args.baseUrl).origin;
 
 // The full Chromium build in new headless mode, the browser visitors run, or
@@ -336,7 +368,10 @@ async function runFileTool(page, plan) {
       state.event === "tool_run_handed_off" ? `handed off: ${state.errorCode}` : state.message;
     return { outcome: "failed", message, errorCode: state.errorCode };
   }
-  return { outcome: "completed", outputs: await readOutputs(page, { text: plan.markers.length > 0 }) };
+  return {
+    outcome: "completed",
+    outputs: await readOutputs(page, { text: plan.markers.length > 0, base64: plan.pixelCheck }),
+  };
 }
 
 // Table converters (TableConvertLanding): upload the fixture, let the page
@@ -452,7 +487,8 @@ async function runBatchCompress(page, plan) {
   const outputs = [];
   for (const entry of entries) {
     const bytes = await entry.getData(new Uint8ArrayWriter());
-    outputs.push({ name: entry.filename, size: bytes.length, head: Array.from(bytes.subarray(0, 4096)) });
+    const output = { name: entry.filename, size: bytes.length, head: Array.from(bytes.subarray(0, 4096)) };
+    outputs.push(plan.pixelCheck ? { ...output, bytes } : output);
   }
   await reader.close();
   if (outputs.length !== plan.fixtures.length) {
@@ -574,12 +610,16 @@ async function measure(plan) {
     await context.close().catch(() => {});
   }
 
+  const durationMs = Date.now() - started;
+  if (plan.pixelCheck && observation.outcome === "completed") {
+    await measureOutputPixels(observation.outputs ?? [], plan.to);
+  }
   const verdict = classifyRun(observation, plan);
   const outputs = observation.outputs ?? [];
   return toRow(plan, {
     ...verdict,
     detail: /FFmpeg failed/.test(verdict.error ?? "") ? ffmpegError(ffmpegLog) : undefined,
-    durationMs: Date.now() - started,
+    durationMs,
     output: outputs.length
       ? {
           files: outputs.length,

@@ -19,6 +19,8 @@ test.after(() => {
   globalThis.fetch = originalFetch;
 });
 const { convertWithMagickInBrowser, encodePngWithMagick } = await import("./magickBrowser.ts");
+// The same module instance magickBrowser.ts initialised, for reading outputs back.
+const magick = await import("@imagemagick/magick-wasm");
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
 const read = (name) => {
@@ -56,4 +58,27 @@ test("a PNG larger than 256 px encodes to ICO, fitted inside 256 px", async () =
 test("a small image keeps its size as an icon", async () => {
   const ico = await encodePngWithMagick(read("sample.png"), "ico");
   assert.deepEqual(iconSize(await ico.arrayBuffer()), { width: 96, height: 96 });
+});
+
+test("the wasm the site serves is the installed ImageMagick package's", () => {
+  const vendored = readFileSync(path.resolve(fixtures, "../../public/vendor/imagemagick/magick.wasm"));
+  assert.ok(vendored.equals(wasm), "public/vendor/imagemagick/magick.wasm differs from @imagemagick/magick-wasm");
+});
+
+// Mean and standard deviation (0-255) of every channel, as native ImageMagick
+// reads the fixture (`magick <file> -format "%[fx:mean*255]
+// %[fx:standard_deviation*255]" info:`). Before 0.0.38 (LibRaw 0.22) this
+// Nikon lossy NEF decoded as all white and the ORF as coloured noise.
+test("camera RAW decodes to the photo native ImageMagick reads", async () => {
+  for (const [file, from, native] of [
+    ["sample.nef", "nef", { mean: 111.7, sd: 81.2 }],
+    ["sample.orf", "orf", { mean: 105.1, sd: 53.8 }],
+  ]) {
+    const { buffer } = await convertWithMagickInBrowser(read(file), from, "png");
+    const { mean, standardDeviation } = magick.ImageMagick.read(new Uint8Array(buffer), magick.MagickFormat.Png, (image) =>
+      image.statistics().composite(),
+    );
+    assert.ok(Math.abs(mean - native.mean) < 2, `${from} mean ${mean.toFixed(1)}, native ${native.mean}`);
+    assert.ok(Math.abs(standardDeviation - native.sd) < 2, `${from} sd ${standardDeviation.toFixed(1)}, native ${native.sd}`);
+  }
 });
