@@ -624,7 +624,7 @@
       "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.nef",
-      "notes": "Nikon D40 camera RAW (12-bit lossy-compressed NEF, 3039x2014), CC0, from raw.pixls.us: https://raw.pixls.us/data/Nikon/D40/DSC_1842.NEF; its SHA-256 matches the one the site lists for DSC_1842.NEF. Read back with file (TIFF, NIKON D40) and magick identify (NEF 3039x2014). Replaces a Nikon COOLSCAN film scan that wasn't a camera RAW. Known false pass: the app's ImageMagick WASM (0.0.37) decodes this lossy NEF as all white while native ImageMagick reads the photo, so the 15 NEF Tools' sweep `pass` rows only prove a valid file was saved; #269 fixes the decode and adds a blank-image check to the sweep."
+      "notes": "Nikon D40 camera RAW (12-bit lossy-compressed NEF, 3039x2014), CC0, from raw.pixls.us: https://raw.pixls.us/data/Nikon/D40/DSC_1842.NEF; its SHA-256 matches the one the site lists for DSC_1842.NEF. Read back with file (TIFF, NIKON D40) and magick identify (NEF 3039x2014). Replaces a Nikon COOLSCAN film scan that wasn't a camera RAW. Native ImageMagick reads the photo at mean 112, standard deviation 81 (of 255), as the app's ImageMagick WASM does since #269 (0.0.42); 0.0.37 read it as all white."
     },
     {
       "format": "odt",
@@ -666,7 +666,7 @@
       "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.orf",
-      "notes": "Olympus ORF camera RAW sample."
+      "notes": "Olympus ORF camera RAW sample. Native ImageMagick reads the photo (leaves) at mean 105, standard deviation 54 (of 255), as the app's ImageMagick WASM does since #269 (0.0.42); 0.0.37 read it as coloured noise."
     },
     {
       "format": "otf",

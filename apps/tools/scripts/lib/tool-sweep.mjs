@@ -2,6 +2,7 @@
 // run and how, how one run's observation becomes a status, and how results
 // merge across runs. The command drives the browser and does the I/O.
 
+import { Buffer } from "node:buffer";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
@@ -262,6 +263,22 @@ const TEXT_MARKERS = {
 };
 const TEXT_DRIVERS = new Set(["table", "html-to-markdown", "json-to-csv", "csv-combiner"]);
 
+// Fixtures whose picture is a single colour when read back natively (most
+// are 96x96 solid blue; a video's first frame, with FFmpeg). An image output
+// of one is rightly one colour too, so the sweep can't tell it from a blank
+// one and doesn't check its pixels. Every other fixture's image output must
+// not be blank (see measurePixels).
+export const ONE_COLOUR_FIXTURES = new Set([
+  "sample.ai", "sample.avif", "sample.bin", "sample.bmp", "sample.cur", "sample.dds", "sample.gif",
+  "sample.heic", "sample.heif", "sample.ico", "sample.jfif", "sample.jpg", "sample.pdf", "sample.png",
+  "sample-2.png", "sample.psd", "sample.tga", "sample.tif", "sample.tiff", "sample.webp",
+  // Videos.
+  "sample.3gp", "sample.asf", "sample.av1", "sample.avchd", "sample.avi", "sample.divx", "sample.f4v",
+  "sample.flv", "sample.hevc", "sample.m2ts", "sample.m4v", "sample.mjpeg", "sample.mkv", "sample.mov",
+  "sample.mp4", "sample.mpeg", "sample.mpeg2", "sample.mpg", "sample.mts", "sample.mxf", "sample.ogv",
+  "sample.rm", "sample.swf", "sample.ts", "sample.vob", "sample.webm", "sample.wmv",
+]);
+
 // fixture-matrix.json: ready inputs by format, and per-Tool fixtures.
 export function loadFixtures(benchmarksDir) {
   const matrix = JSON.parse(readFileSync(path.join(benchmarksDir, "fixture-matrix.json"), "utf8"));
@@ -306,6 +323,7 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
     driver,
     fixtures: files,
     markers,
+    pixelCheck: checksPixels(tool.to) && !files.some((file) => ONE_COLOUR_FIXTURES.has(path.basename(file))),
     compress: tool.operation === "compress" || tool.operation === "bulk",
     timeoutMs: slow ? ffmpegTimeoutMs : timeoutMs,
   };
@@ -315,6 +333,110 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
 // zero bytes match none of the signatures it has.
 export function hasSignature(format) {
   return !checkOutputFormat(new ArrayBuffer(16), format).ok;
+}
+
+// Image outputs the sweep decodes to catch a blank one: every pixel, or
+// nearly, one colour, as the NEF Tools saved before #269 with a valid
+// signature. They're decoded in Node by the ImageMagick WASM build the app
+// ships, which writes or can read each of them; an SVG is checked through
+// the PNG or JPEG it embeds (lib/convert/encode.ts). Not decoded: ICNS, KTX
+// and KTX2 (lib/convert/texture-formats.ts writes them; ImageMagick can't
+// read them), headerless RGB, EPS (no Ghostscript) and vector SVG.
+const PIXEL_FORMATS = {
+  avif: "Avif", bmp: "Bmp", cur: "Cur", dds: "Dds", exr: "Exr", gif: "Gif", hdr: "Hdr", ico: "Ico",
+  jfif: "Jpeg", jif: "Jpeg", jp2: "Jp2", jpeg: "Jpeg", jpg: "Jpeg", jxl: "Jxl", pam: "Pam", pbm: "Pbm",
+  pcd: "Pcd", pcx: "Pcx", pgm: "Pgm", png: "Png", ppm: "Ppm", psd: "Psd", tga: "Tga", tif: "Tiff",
+  tiff: "Tiff", wbmp: "Wbmp", webp: "WebP", xbm: "Xbm", xpm: "Xpm",
+};
+
+export function checksPixels(format) {
+  const name = format?.toLowerCase();
+  return name === "svg" || Object.hasOwn(PIXEL_FORMATS, name ?? "");
+}
+
+// A pixel within this many levels (of 255) of the top colour in every
+// channel counts as that colour, which absorbs a lossy encoder's noise. A
+// pixel with alpha under TRANSPARENT counts as transparent, whatever its RGB.
+export const PIXEL_TOLERANCE = 8;
+const TRANSPARENT = 8;
+// An image is blank when its top colour covers at least this share of its
+// pixels.
+export const BLANK_SHARE = 0.999;
+
+// The colour most of an image's pixels have (within PIXEL_TOLERANCE), and the
+// share of pixels that have it. `rgba` is 8-bit RGBA, 4 bytes a pixel.
+export function topColour(rgba) {
+  const pixels = rgba.length / 4;
+  // Channel `offset` of the pixel at byte `index`.
+  const channel = (index, offset) => (rgba[index + 3] < TRANSPARENT ? 0 : rgba[index + offset]);
+  // The busiest bin of a 4-bit-a-channel histogram, then that bin's mean.
+  const binOf = (index) =>
+    ((channel(index, 0) >> 4) << 12) |
+    ((channel(index, 1) >> 4) << 8) |
+    ((channel(index, 2) >> 4) << 4) |
+    (channel(index, 3) >> 4);
+  const bins = new Uint32Array(1 << 16);
+  for (let index = 0; index < rgba.length; index += 4) bins[binOf(index)] += 1;
+  let top = 0;
+  for (let bin = 1; bin < bins.length; bin += 1) if (bins[bin] > bins[top]) top = bin;
+  const sum = [0, 0, 0, 0];
+  for (let index = 0; index < rgba.length; index += 4) {
+    if (binOf(index) !== top) continue;
+    for (let offset = 0; offset < 4; offset += 1) sum[offset] += channel(index, offset);
+  }
+  const colour = sum.map((total) => Math.round(total / bins[top]));
+  let same = 0;
+  for (let index = 0; index < rgba.length; index += 4) {
+    let near = true;
+    for (let offset = 0; offset < 4 && near; offset += 1) {
+      near = Math.abs(channel(index, offset) - colour[offset]) <= PIXEL_TOLERANCE;
+    }
+    if (near) same += 1;
+  }
+  const hex = colour
+    .slice(0, colour[3] === 255 ? 3 : 4)
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("");
+  return { colour: `#${hex.toUpperCase()}`, share: pixels ? same / pixels : 1 };
+}
+
+// The PNG or JPEG an SVG wraps as its only content, as encode.ts writes a
+// raster image to SVG.
+function embeddedRaster(svg) {
+  const match = svg.match(
+    /^\s*(?:<\?xml[^>]*>\s*)?<svg\b[^>]*>\s*<image\b[^>]*\bhref="data:image\/(png|jpeg);base64,([A-Za-z0-9+/=]+)"[^>]*\/>\s*<\/svg>\s*$/,
+  );
+  return match ? { format: match[1], bytes: new Uint8Array(Buffer.from(match[2], "base64")) } : null;
+}
+
+// Decodes an image output with ImageMagick (an initialised
+// @imagemagick/magick-wasm module) and measures its top colour: for a file
+// with several frames (an animation, an icon's sizes), the least uniform
+// frame, so it's blank only if every frame is. A PSD is measured by its
+// merged image, not its layers. Returns null for a format the sweep doesn't
+// decode; throws when ImageMagick can't read the file.
+export function measurePixels(magick, bytes, format) {
+  const name = format.toLowerCase();
+  if (name === "svg") {
+    const raster = embeddedRaster(new TextDecoder().decode(bytes));
+    return raster ? measurePixels(magick, raster.bytes, raster.format) : null;
+  }
+  if (!Object.hasOwn(PIXEL_FORMATS, name)) return null;
+  return magick.ImageMagick.readCollection(bytes, magick.MagickFormat[PIXEL_FORMATS[name]], (images) => {
+    if (!images.length) throw new Error("no image in the file");
+    if (images.length > 1 && (name === "gif" || name === "webp")) images.coalesce();
+    const frames = name === "psd" ? [images[0]] : [...images];
+    const measures = frames.map((image) => {
+      const rgba = image.getPixels((pixels) => pixels.toByteArray(0, 0, image.width, image.height, "RGBA"));
+      if (!rgba) throw new Error("ImageMagick returned no pixels");
+      return { ...topColour(rgba), width: image.width, height: image.height };
+    });
+    return measures.reduce((least, measure) => (measure.share < least.share ? measure : least));
+  });
+}
+
+function percent(share) {
+  return `${Math.floor(share * 1000) / 10}%`;
 }
 
 const WRONG_FORMAT_MESSAGE = /produced \S+ instead of \S+/i;
@@ -328,12 +450,16 @@ function formatName(format) {
   return format === "unknown" ? "unrecognised bytes" : format.toUpperCase();
 }
 
-// One run's observation -> { status, error, formatCheck }.
+// One run's observation -> { status, error, formatCheck, topColourShare? }.
 //   outcome: completed | failed | timeout | error
 //   message: what the page showed (or the harness error)
 //   errorCode: the tool_run_failed telemetry code, when one was sent
-//   outputs: [{ name, size, head: number[] (first bytes), text? }]
-export function classifyRun(observation, { to, markers = [] }) {
+//   outputs: [{ name, size, head: number[] (first bytes), text?, pixels? }]
+//     pixels: measurePixels' result (null for a format it doesn't decode), or
+//     { error } when the image didn't decode
+// A plan with pixelCheck needs every output measured: an output the sweep
+// never read the bytes of fails, rather than passing unchecked.
+export function classifyRun(observation, { to, markers = [], pixelCheck = false }) {
   const message = observation.message?.trim() || null;
   if (observation.outcome === "timeout") {
     return { status: "timeout", error: message ?? "no result before the timeout" };
@@ -371,7 +497,31 @@ export function classifyRun(observation, { to, markers = [] }) {
       formatCheck,
     };
   }
-  return { status: "pass", error: null, formatCheck };
+  const unread = pixelCheck && outputs.find((output) => output.pixels === undefined);
+  if (unread) {
+    return {
+      status: "error",
+      error: `harness: the sweep didn't read the saved image (${unread.name}), so it couldn't check it isn't blank`,
+      formatCheck,
+    };
+  }
+  const measured = outputs.filter((output) => output.pixels);
+  for (const { name, pixels } of measured) {
+    if (pixels.error) {
+      return { status: "error", error: `saved an image that doesn't decode (${name}): ${pixels.error}`, formatCheck };
+    }
+    if (pixels.share >= BLANK_SHARE) {
+      return {
+        status: "error",
+        error: `saved a blank image: ${percent(pixels.share)} of its pixels are ${pixels.colour} (${name})`,
+        formatCheck,
+      };
+    }
+  }
+  if (!measured.length) return { status: "pass", error: null, formatCheck };
+  // How close the least varied output came to blank, for later audits.
+  const topColourShare = Math.max(...measured.map(({ pixels }) => Math.floor(pixels.share * 10_000) / 10_000));
+  return { status: "pass", error: null, formatCheck, topColourShare };
 }
 
 // A text driver that waited for the fixture's data and gave up: an output
@@ -449,6 +599,8 @@ export function selectRuns(plans, previousRows, { resume, retry = new Set(), lim
 // One results row: what the plan says about the Tool, what the run observed,
 // and the commit and tree state (dirty: uncommitted changes outside the
 // results file; null outside a git checkout) it was measured at.
+// topColourShare is set on a pass whose image outputs were decoded: the
+// largest share of an output's pixels that its top colour covers.
 export function sweepRow(plan, result, { commit, dirty }) {
   return {
     id: plan.id,
@@ -462,6 +614,7 @@ export function sweepRow(plan, result, { commit, dirty }) {
     error: result.error ?? undefined,
     detail: result.detail,
     formatCheck: result.formatCheck,
+    topColourShare: result.topColourShare,
     fixture: plan.fixtures?.map((file) => path.basename(file)).join(","),
     output: result.output,
     blocked: result.blocked?.length ? result.blocked : undefined,
@@ -558,7 +711,7 @@ export function renderSummary({ meta, results }, { activeCount = results.length 
       [
         [
           "pass",
-          `${counts.pass} (file signature checked: ${checks.signature}, text content checked: ${checks.content}, no check for the output format: ${checks.none})`,
+          `${counts.pass} (file signature checked: ${checks.signature}, text content checked: ${checks.content}, no check for the output format: ${checks.none}; image decoded and not blank: ${passes.filter((row) => row.topColourShare !== undefined).length})`,
         ],
         ...STATUSES.slice(1).map((status) => [status, String(counts[status])]),
         ["**run / active**", `${results.filter((row) => MEASURED_STATUSES.has(row.status)).length} / ${activeCount}`],

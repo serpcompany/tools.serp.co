@@ -69,8 +69,14 @@ export function mimeTypeFor(ext: string) {
 const ICON_MAX_SIZE = 256;
 
 function writeImage(magick: MagickModule, image: IMagickImage, format: string): Uint8Array<ArrayBuffer> {
-  if ((format === "ico" || format === "cur") && (image.width > ICON_MAX_SIZE || image.height > ICON_MAX_SIZE)) {
-    image.resize(ICON_MAX_SIZE, ICON_MAX_SIZE);
+  if (format === "ico" || format === "cur") {
+    if (image.width > ICON_MAX_SIZE || image.height > ICON_MAX_SIZE) {
+      image.resize(ICON_MAX_SIZE, ICON_MAX_SIZE);
+    }
+    // Store a 256 x 256 icon as a PNG, as Windows icons do and as magick-wasm
+    // 0.0.37 did. Newer ImageMagick stores it as an uncompressed bitmap
+    // unless this is set: 270 KB for any square image of 256 px or more.
+    image.settings.setDefine(magick.MagickFormat.Icon, "png-compression-size", String(ICON_MAX_SIZE));
   }
   return image.write(magickFormat(magick, format)!, (data) => data.slice());
 }

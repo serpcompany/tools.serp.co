@@ -19,6 +19,8 @@ test.after(() => {
   globalThis.fetch = originalFetch;
 });
 const { convertWithMagickInBrowser, encodePngWithMagick } = await import("./magickBrowser.ts");
+// The same module instance magickBrowser.ts initialised, for reading outputs back.
+const magick = await import("@imagemagick/magick-wasm");
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
 const read = (name) => {
@@ -53,7 +55,60 @@ test("a PNG larger than 256 px encodes to ICO, fitted inside 256 px", async () =
   assert.deepEqual(iconSize(buffer), { width: 256, height: 256 });
 });
 
+// The image data of an icon's first entry: its offset is the uint32 at byte 18.
+function firstIconEntry(buffer) {
+  const bytes = new Uint8Array(buffer);
+  return bytes.subarray(new DataView(bytes.buffer, bytes.byteOffset).getUint32(18, true));
+}
+const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+
+// A 256 px icon is stored as a PNG, as magick-wasm 0.0.37 wrote it; without
+// icon:png-compression-size, 0.0.42 wrote a 270,398-byte bitmap.
+test("a 256 px icon stores its image as a PNG", async () => {
+  const { buffer: dngIco } = await convertWithMagickInBrowser(read("sample.dng"), "dng", "ico");
+  const { buffer: dngCur } = await convertWithMagickInBrowser(read("sample.dng"), "dng", "cur");
+  // A flat 512 x 512 PNG, made by ImageMagick.
+  const image = magick.MagickImage.create(new magick.MagickColor("#3366CC"), 512, 512);
+  const flat = image.write(magick.MagickFormat.Png, (data) => data.slice());
+  image.dispose();
+  const flatIco = await (await encodePngWithMagick(flat.buffer, "ico")).arrayBuffer();
+  const flatCur = await (await encodePngWithMagick(flat.buffer, "cur")).arrayBuffer();
+  for (const [name, buffer, most] of [
+    ["DNG to ICO", dngIco, 130_000],
+    ["DNG to CUR", dngCur, 130_000],
+    ["flat PNG to ICO", flatIco, 2_000],
+    ["flat PNG to CUR", flatCur, 2_000],
+  ]) {
+    assert.deepEqual(iconSize(buffer), { width: 256, height: 256 }, name);
+    assert.deepEqual([...firstIconEntry(buffer).subarray(0, 8)], PNG_SIGNATURE, `${name}: the entry isn't a PNG`);
+    assert.ok(buffer.byteLength < most, `${name} is ${buffer.byteLength} bytes`);
+  }
+});
+
 test("a small image keeps its size as an icon", async () => {
   const ico = await encodePngWithMagick(read("sample.png"), "ico");
   assert.deepEqual(iconSize(await ico.arrayBuffer()), { width: 96, height: 96 });
+});
+
+test("the wasm the site serves is the installed ImageMagick package's", () => {
+  const vendored = readFileSync(path.resolve(fixtures, "../../public/vendor/imagemagick/magick.wasm"));
+  assert.ok(vendored.equals(wasm), "public/vendor/imagemagick/magick.wasm differs from @imagemagick/magick-wasm");
+});
+
+// Mean and standard deviation (0-255) of every channel, as native ImageMagick
+// reads the fixture (`magick <file> -format "%[fx:mean*255]
+// %[fx:standard_deviation*255]" info:`). Before 0.0.38 (LibRaw 0.22) this
+// Nikon lossy NEF decoded as all white and the ORF as coloured noise.
+test("camera RAW decodes to the photo native ImageMagick reads", async () => {
+  for (const [file, from, native] of [
+    ["sample.nef", "nef", { mean: 111.7, sd: 81.2 }],
+    ["sample.orf", "orf", { mean: 105.1, sd: 53.8 }],
+  ]) {
+    const { buffer } = await convertWithMagickInBrowser(read(file), from, "png");
+    const { mean, standardDeviation } = magick.ImageMagick.read(new Uint8Array(buffer), magick.MagickFormat.Png, (image) =>
+      image.statistics().composite(),
+    );
+    assert.ok(Math.abs(mean - native.mean) < 2, `${from} mean ${mean.toFixed(1)}, native ${native.mean}`);
+    assert.ok(Math.abs(standardDeviation - native.sd) < 2, `${from} sd ${standardDeviation.toFixed(1)}, native ${native.sd}`);
+  }
 });

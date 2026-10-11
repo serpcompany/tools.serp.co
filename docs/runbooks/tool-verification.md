@@ -22,7 +22,13 @@ the owner approves an outside sample. Download an approved one into its own
 empty directory, read it back there, and record its source URL and licence in
 `notes`. A Tool whose output is text (a table
 converter, or any Tool to TXT) also needs its fixture's data in `TEXT_MARKERS`
-in `scripts/lib/tool-sweep.mjs`, or the sweep reports it as `no_fixture`. The
+in `scripts/lib/tool-sweep.mjs`, or the sweep reports it as `no_fixture`. An
+image or video fixture whose picture is a single colour (most are 96x96 solid
+blue) needs its name in `ONE_COLOUR_FIXTURES` there, or the sweep fails its
+Tools' image outputs as blank; a photo or drawing needs nothing.
+`lib/tool-sweep.test.mjs` decodes each listed still image, and pins each
+listed video, PDF and AI by hash, so a replaced one fails until it's read back
+again. The
 table converter page picks its input format from the file's extension, so a
 table fixture needs one the page maps to its format: a `.sql` file switches a
 MySQL page to SQL, so the MySQL fixture is a `.txt`.
@@ -49,7 +55,13 @@ Build both the same way; only `cf:build:production` covers ads and indexing.
 active converter and compressor Tool once in headless Chromium against a local
 Worker (started as in [the browser smoke runbook](browser-smoke.md)), checks
 each saved file with `lib/convert/output-format.ts` and writes
-`benchmarks/tool-sweep-results.json`. `--resume` continues an interrupted run;
+`benchmarks/tool-sweep-results.json`. An image output of a fixture with more
+than one colour is also decoded, in Node with the app's ImageMagick WASM
+build, and fails as blank when its top colour covers 99.9% of the pixels
+(within 8 of 255 a channel), or when it doesn't decode; its pass records that
+share as `topColourShare`. An output the sweep didn't read the bytes of fails
+as a harness error rather than passing unchecked. ICNS, KTX, KTX2, RGB, EPS and vector SVG outputs
+aren't decoded; a raster SVG is checked through the image it wraps. `--resume` continues an interrupted run;
 `--summary` prints the Markdown table. It measures; it isn't part of
 `pnpm check`. `--channel chrome` (or `msedge`) runs an installed Chrome or Edge
 instead of Playwright's Chromium, whose codecs can differ (H.264, HEVC and AAC
