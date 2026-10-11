@@ -191,6 +191,7 @@ export default function LanderHeroTwoColumn({
             progress: 100,
             status: "completed",
             message: "Conversion complete!",
+            notice: result.notice,
           });
         }
       } catch (err: unknown) {

@@ -11,8 +11,10 @@ import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
 export type ConversionOp = "raster" | "pdf-pages" | "video";
 
+// A notice says what the visitor should know about the file, such as the
+// rows a table image leaves out.
 export type ConversionResult =
-  | { kind: "single"; buffer: ArrayBuffer }
+  | { kind: "single"; buffer: ArrayBuffer; notice?: string }
   | { kind: "multiple"; buffers: ArrayBuffer[] };
 
 export type ProgressUpdate = {
@@ -276,7 +278,7 @@ async function convertTableToImage(from: string, to: string, args: ConvertArgs):
     if (!table) throw new Error(error ?? "This CSV file couldn't be read.");
     const output = await writeTableOutput(to === "png" ? "png" : "jpeg", table);
     args.onProgress?.({ status: "processing", progress: 100 });
-    return { kind: "single", buffer: output.buffer };
+    return { kind: "single", buffer: output.buffer, notice: output.notice };
   } catch (error) {
     throw createTelemetryError(
       "convert_failed",
