@@ -21,6 +21,7 @@ export const CANARY_TOOLS = {
   "mp4-to-av1": "AV1 encoding with WebCodecs (Mediabunny)",
   "av1-to-mp4": "AV1 decoding with WebCodecs (Mediabunny)",
   "jpg-to-pdf": "canvas image conversion, to PDF",
+  "image-to-pdf": "Image to PDF: a browser-decoded image written losslessly into a PDF with pdf-lib",
   "cr2-to-jpg": "ImageMagick WASM, camera RAW input",
   "compress-gif": "ImageMagick WASM image compression",
   "compress-jpg": "jSquash image compression in a worker",

@@ -25,6 +25,7 @@ const ICON_BY_TOOL_ID: Record<string, ToolIconName> = {
   "heif-to-jpg": "image",
   "heif-to-png": "image",
   "heif-to-pdf": "file-image",
+  "image-to-pdf": "file-image",
   "pdf-to-jpg": "file-image",
   "pdf-to-png": "file-image",
   "pdf-editor": "file-image",

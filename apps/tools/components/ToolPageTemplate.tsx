@@ -1,4 +1,5 @@
 import HeroConverter from "@/components/HeroConverter";
+import ImagesToPdfConverter from "@/components/ImagesToPdfConverter";
 import LanderHeroTwoColumn from "@/components/LanderHeroTwoColumn";
 import { AboutFormatsSection } from "@/components/sections/AboutFormatsSection";
 import { FAQSection } from "@/components/sections/FAQSection";
@@ -88,16 +89,28 @@ export default function ToolPageTemplate({
         </>
       ) : (
         <>
-          <HeroConverter
-            toolId={tool.id}
-            title={tool.title}
-            subtitle={tool.subtitle}
-            note={note}
-            from={tool.from}
-            to={tool.to}
-            accept={tool.accept}
-            operation={tool.operation}
-          />
+          {/* Image to PDF takes any image, and combines several into one PDF. */}
+          {tool.from === "image" && tool.to === "pdf" ? (
+            <ImagesToPdfConverter
+              toolId={tool.id}
+              title={tool.title}
+              subtitle={tool.subtitle}
+              note={note}
+              from={tool.from}
+              to={tool.to}
+            />
+          ) : (
+            <HeroConverter
+              toolId={tool.id}
+              title={tool.title}
+              subtitle={tool.subtitle}
+              note={note}
+              from={tool.from}
+              to={tool.to}
+              accept={tool.accept}
+              operation={tool.operation}
+            />
+          )}
           {/* About the Formats Section - Right after regular hero */}
           {aboutSection && (
             <AboutFormatsSection

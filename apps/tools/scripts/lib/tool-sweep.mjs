@@ -182,7 +182,8 @@ const COMPRESSION_ENGINES = {
   video: "ffmpeg-wasm",
 };
 
-// The engine the generic converter page uses for a Tool: the branch order of
+// The engine the generic converter page uses for a Tool: Image to PDF's own
+// (lib/convert/image-pdf.ts, any image in), the branch order of
 // compressFile and convertUnchecked in lib/convert/workerClient.ts, the AV1
 // and HEVC Tools of lib/convert/webcodecs.ts, and the server-only outputs of
 // shouldUseServerConversion in lib/convert/video.ts. Those try
@@ -197,6 +198,7 @@ export function converterEngine({ operation, from, to }) {
     if (compression === "image-browser") return source === "svg" ? "svgo" : "imagemagick-wasm";
     return COMPRESSION_ENGINES[compression] ?? "unsupported";
   }
+  if (source === "image" && target === "pdf") return "image-pdf";
   if (source === "ai" || source === "pdf") return "pdfjs";
   if (isImageDocumentConversion(source, target)) return "image-documents";
   if (isImageTextConversion(source, target)) return target === "txt" ? "tesseract" : "docx";
@@ -237,6 +239,7 @@ export const ENGINE_LOCATIONS = {
   "image-documents": "client-only",
   tesseract: "client-only",
   docx: "client-only",
+  "image-pdf": "client-only",
   svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",

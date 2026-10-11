@@ -59,6 +59,9 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
 ## Rendering and shared page behavior
 
 - Standard Tools use the shared Tool page renderer and template.
+- Image to PDF (`from: "image"`, `to: "pdf"`) is a standard Tool whose hero is
+  `ImagesToPdfConverter`: one image becomes a PDF at once, as on every
+  converter, and several are listed to order before they become one PDF.
 - Specialized Tools may use custom renderers, but their registry identity and
   public route still come from the canonical catalog intent.
 - `packages/app-core/src/data/related-apps.json` owns Related App entries;
