@@ -190,7 +190,11 @@ export default function ImagesToPdfConverter({
   async function combine() {
     const files = queue.map((item) => item.file);
     setNotice(null);
-    if (files.length && (await makePdf(files))) setQueue([]);
+    if (!files.length || !(await makePdf(files))) return;
+    // The list and this button go: focus moves to the add button, as after
+    // Clear, which is enabled again by the time the list has gone.
+    focusNext.current = "add";
+    setQueue([]);
   }
 
   function onDrag(e: React.DragEvent) {

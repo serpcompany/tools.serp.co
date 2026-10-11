@@ -102,7 +102,9 @@ Conversion picks an engine by input format:
   JPEG makes a 28 MB PDF there and a 2.3 MB one here. One PDF holds up to 100
   images and 250 MB of image data (`image-pdf-inputs.ts`), since the tab holds
   it about three times over while saving it, and an image it decodes is at most
-  50 megapixels (a PNG's or JPEG's size is read before decoding).
+  50 megapixels. That size is read from the header of a JPEG, PNG, GIF, WebP
+  or BMP, and of the PNG ImageMagick writes, before the browser decodes it;
+  HEIC, AVIF, ICO, SVG, ICNS and KTX are checked once decoded.
 - **Image to text** (`lib/convert/image-text.ts`): JPG and PNG to TXT is OCR
   with tesseract.js, in the browser. Its worker, SIMD LSTM core and English
   model (4.0.0 best_int) are served from `public/vendor/tesseract/`, and a

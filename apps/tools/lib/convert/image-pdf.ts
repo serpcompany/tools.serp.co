@@ -476,6 +476,86 @@ export async function createImagePdf(): Promise<ImagePdf> {
   };
 }
 
+// --- Sizes from headers -----------------------------------------------------
+
+export type Size = { width: number; height: number };
+
+// A PNG's IHDR, the first chunk.
+function pngSize(bytes: Uint8Array): Size | null {
+  if (bytes.length < 24 || !startsWith(bytes.subarray(12), "IHDR")) return null;
+  return { width: readU32(bytes, 16), height: readU32(bytes, 20) };
+}
+
+// A GIF's logical screen, grown to hold its first frame: browsers decode
+// the first frame, and Chromium's decoder (Wuffs) makes the image the union
+// of the screen and that frame's rectangle.
+function gifSize(bytes: Uint8Array): Size | null {
+  if (bytes.length < 13 || !startsWith(bytes, "GIF")) return null;
+  let width = readU16(bytes, 6, true);
+  let height = readU16(bytes, 8, true);
+  // The global colour table, when there is one, follows the screen.
+  let offset = 13 + (bytes[10]! & 0x80 ? 3 << ((bytes[10]! & 7) + 1) : 0);
+  while (offset < bytes.length) {
+    if (bytes[offset] === 0x2c) {
+      // The image descriptor: left, top, width, height.
+      if (offset + 9 > bytes.length) break;
+      width = Math.max(width, readU16(bytes, offset + 1, true) + readU16(bytes, offset + 5, true));
+      height = Math.max(height, readU16(bytes, offset + 3, true) + readU16(bytes, offset + 7, true));
+      break;
+    }
+    if (bytes[offset] !== 0x21) break;
+    // An extension: its label, then sub-blocks up to an empty one.
+    offset += 2;
+    while (offset < bytes.length && bytes[offset] !== 0) offset += bytes[offset]! + 1;
+    offset += 1;
+  }
+  return { width, height };
+}
+
+// A WebP's first chunk: VP8X's canvas (an animated or transparent WebP), or
+// the frame header of a lossy (VP8) or lossless (VP8L) image.
+function webpSize(bytes: Uint8Array): Size | null {
+  if (bytes.length < 30 || !startsWith(bytes, "RIFF") || !startsWith(bytes.subarray(8), "WEBP")) return null;
+  const chunk = String.fromCharCode(...bytes.subarray(12, 16));
+  const u24 = (at: number) => bytes[at]! | (bytes[at + 1]! << 8) | (bytes[at + 2]! << 16);
+  if (chunk === "VP8X") return { width: u24(24) + 1, height: u24(27) + 1 };
+  if (chunk === "VP8L" && bytes[20] === 0x2f) {
+    const bits = readU32(bytes, 21, true);
+    return { width: (bits & 0x3fff) + 1, height: ((bits >>> 14) & 0x3fff) + 1 };
+  }
+  // After the 3-byte frame tag, the key frame's start code 9D 01 2A.
+  if (chunk === "VP8 " && bytes[23] === 0x9d && bytes[24] === 0x01 && bytes[25] === 0x2a) {
+    return { width: readU16(bytes, 26, true) & 0x3fff, height: readU16(bytes, 28, true) & 0x3fff };
+  }
+  return null;
+}
+
+// A BMP's DIB header: OS/2's 12-byte core header has 16-bit sides, the
+// others signed 32-bit ones (a negative height is stored top down).
+function bmpSize(bytes: Uint8Array): Size | null {
+  if (bytes.length < 26 || !startsWith(bytes, "BM")) return null;
+  const header = readU32(bytes, 14, true);
+  if (header === 12) return { width: readU16(bytes, 18, true), height: readU16(bytes, 20, true) };
+  if (header < 16) return null;
+  return { width: Math.abs(readU32(bytes, 18, true) | 0), height: Math.abs(readU32(bytes, 22, true) | 0) };
+}
+
+// The size a JPEG, PNG, GIF, WebP or BMP will decode to, read from its
+// header, so a small file that declares a huge image is refused before it's
+// decoded. Null for other formats, or a header that isn't there: their size
+// is checked once they're decoded.
+export function headerSize(format: string, bytes: Uint8Array): Size | null {
+  if (format === "jpg") {
+    const info = readJpeg(bytes);
+    return info && { width: info.width, height: info.height };
+  }
+  if (format === "png") return pngSize(bytes);
+  if (format === "gif") return gifSize(bytes);
+  if (format === "webp") return webpSize(bytes);
+  if (format === "bmp") return bmpSize(bytes);
+  return null;
+}
+
 // --- Images to one PDF ---------------------------------------------------
 
 // Formats whose images are photos, stored lossily or straight from a camera:
@@ -502,6 +582,10 @@ export function isLosslessWebp(bytes: Uint8Array): boolean {
 export type ImagePdfDecoders = {
   // The image's pixels, 8-bit RGBA in sRGB.
   decode(format: string, buffer: ArrayBuffer): Promise<Pixels>;
+  // For the formats only ImageMagick reads (MAGICK_BROWSER_INPUTS): the image
+  // as a PNG, whose header is checked before `decode` reads it as "png".
+  // Without it, `decode` reads those formats itself.
+  magickToPng?(format: string, buffer: ArrayBuffer): Promise<ArrayBuffer>;
   // A JPEG of the pixels at `quality` (0 to 1).
   encodeJpeg(pixels: Pixels, quality: number): Promise<Uint8Array>;
 };
@@ -512,12 +596,11 @@ export type ImagePdfDecoders = {
 const browserDecoders: ImagePdfDecoders = {
   async decode(format, buffer) {
     const { decodeToRGBA } = await import("./decode.ts");
-    if (MAGICK_BROWSER_INPUTS.has(format)) {
-      const { convertWithMagickInBrowser } = await import("./magickBrowser.ts");
-      const png = await convertWithMagickInBrowser(buffer, format, "png");
-      return decodeToRGBA("png", png.buffer);
-    }
     return decodeToRGBA(format, buffer);
+  },
+  async magickToPng(format, buffer) {
+    const { convertWithMagickInBrowser } = await import("./magickBrowser.ts");
+    return (await convertWithMagickInBrowser(buffer, format, "png")).buffer;
   },
   async encodeJpeg(pixels, quality) {
     const { encodeFromRGBA } = await import("./encode.ts");
@@ -550,9 +633,9 @@ export class ImagePdfError extends Error {
 }
 
 // Refuses an image too large to decode and encode in a tab, by its name.
-function checkPixels(file: ImageFile, format: string, width: number, height: number) {
-  if (width * height <= IMAGE_PDF_MAX_PIXELS) return;
-  throw new ImagePdfError(imageTooLargeMessage(file.name, width, height), "image_too_large", format);
+function checkPixels(file: ImageFile, format: string, size: Size | null) {
+  if (!size || size.width * size.height <= IMAGE_PDF_MAX_PIXELS) return;
+  throw new ImagePdfError(imageTooLargeMessage(file.name, size.width, size.height), "image_too_large", format);
 }
 
 async function addImage(
@@ -567,14 +650,21 @@ async function addImage(
     const info = readJpeg(bytes);
     const image = info && embedsAsIs(info) ? jpegImageData(bytes) : null;
     if (info && image) return pdf.addJpeg(image, info);
-    if (info) checkPixels(file, format, info.width, info.height);
   }
-  // A PNG says its size up front, so a small file of a huge image isn't decoded.
-  if (format === "png" && bytes.length >= 24 && startsWith(bytes.subarray(12), "IHDR")) {
-    checkPixels(file, format, readU32(bytes, 16), readU32(bytes, 20));
+  // From the header where it says (JPEG, PNG, GIF, WebP, BMP), so a small
+  // file of a huge image isn't decoded at all; otherwise once it's decoded.
+  checkPixels(file, format, headerSize(format, bytes));
+  let source = buffer;
+  let decodeAs = format;
+  if (decoders.magickToPng && MAGICK_BROWSER_INPUTS.has(format)) {
+    // ImageMagick has read the file to write this PNG; it isn't decoded
+    // again when it's too large.
+    source = await decoders.magickToPng(format, buffer);
+    decodeAs = "png";
+    checkPixels(file, format, headerSize("png", new Uint8Array(source)));
   }
-  const pixels = await decoders.decode(format, buffer);
-  checkPixels(file, format, pixels.width, pixels.height);
+  const pixels = await decoders.decode(decodeAs, source);
+  checkPixels(file, format, pixels);
   const photo = PHOTO_FORMATS.has(format) && !(format === "webp" && isLosslessWebp(bytes));
   if (photo && isOpaque(pixels)) {
     const jpeg = await decoders.encodeJpeg(pixels, PHOTO_QUALITY);

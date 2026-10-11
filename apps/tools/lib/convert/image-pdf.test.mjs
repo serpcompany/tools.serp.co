@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  AlphaAction,
   ColorSpace,
   ImageMagick,
   Interlace,
@@ -41,6 +42,7 @@ import {
   MAX_PAGE_SIDE,
   PHOTO_QUALITY,
   embedsAsIs,
+  headerSize,
   imagesToPdf,
   isLosslessWebp,
   jpegImageData,
@@ -93,7 +95,14 @@ function testDecoders() {
         calls.decode.push(format);
         const bytes = new Uint8Array(buffer);
         if (format === "png") return pngPixels(bytes);
-        const names = { pcx: MagickFormat.Pcx, ppm: MagickFormat.Ppm, jpg: MagickFormat.Jpeg };
+        const names = {
+          pcx: MagickFormat.Pcx,
+          ppm: MagickFormat.Ppm,
+          jpg: MagickFormat.Jpeg,
+          gif: MagickFormat.Gif,
+          webp: MagickFormat.WebP,
+          bmp: MagickFormat.Bmp,
+        };
         return magickPixels(bytes, names[format]);
       },
       async encodeJpeg(pixels, quality) {
@@ -506,24 +515,24 @@ test("a JPEG whose markers don't make sense is decoded instead", async () => {
 
 test("an image over 50 megapixels is refused by name before it's decoded or encoded", async () => {
   assert.equal(IMAGE_PDF_MAX_PIXELS, 50_000_000);
-  const message = /^huge\.(xcf|png|jpg) is 10,000 x 5,001 pixels, over the 50 megapixels a browser tab can turn into a PDF page safely\. Make it smaller first\.$/;
+  const message = /^huge\.(heic|png|jpg) is 10,000 x 5,001 pixels, over the 50 megapixels a browser tab can turn into a PDF page safely\. Make it smaller first\.$/;
   const { decoders: real } = testDecoders();
   const calls = [];
   const decoders = {
     // Only the size: nothing reads these pixels once it's refused.
     decode: async (format, buffer) => {
       calls.push(format);
-      return format === "xcf" ? { width: 10_000, height: 5_001, data: new Uint8Array(4) } : real.decode(format, buffer);
+      return format === "heic" ? { width: 10_000, height: 5_001, data: new Uint8Array(4) } : real.decode(format, buffer);
     },
     encodeJpeg: async () => assert.fail("not encoded"),
   };
-  // After it's decoded, in a batch: the error names that image.
-  await assert.rejects(imagesToPdf([file("first.png", bytesOf("sample.png")), file("huge.xcf", bytesOf("sample.xcf"))], { decoders }), {
+  // A HEIC's size is checked once it's decoded, in a batch: the error names that image.
+  await assert.rejects(imagesToPdf([file("first.png", bytesOf("sample.png")), file("huge.heic", bytesOf("sample.heic"))], { decoders }), {
     telemetryCode: "image_too_large",
-    telemetryMetadata: { engine: "image-pdf", format: "xcf" },
+    telemetryMetadata: { engine: "image-pdf", format: "heic" },
     message,
   });
-  assert.deepEqual(calls, ["png", "xcf"]);
+  assert.deepEqual(calls, ["png", "heic"]);
 
   // A PNG and a JPEG say their size up front, so they aren't decoded at all.
   const pngOfSize = (width, height) => {
@@ -544,6 +553,118 @@ test("an image over 50 megapixels is refused by name before it's decoded or enco
   const stop = { ...decoders, decode: async (format) => (calls.push(format), assert.fail("decoded")) };
   await assert.rejects(imagesToPdf([file("edge.png", pngOfSize(10_000, 5_000))], { decoders: stop }), { telemetryCode: "convert_failed" });
   assert.deepEqual(calls, ["png"]);
+});
+
+// sample.png (96 x 96) written by ImageMagick in another format.
+function rewritten(format, setup = () => {}) {
+  return ImageMagick.read(bytesOf("sample.png"), MagickFormat.Png, (image) => {
+    setup(image);
+    return image.write(format, (data) => data.slice());
+  });
+}
+// A copy of the bytes with a header changed through a DataView.
+function patched(bytes, patch) {
+  const copy = bytes.slice();
+  patch(new DataView(copy.buffer, copy.byteOffset, copy.length));
+  return copy;
+}
+const setU24 = (view, at, value) => {
+  view.setUint16(at, value & 0xffff, true);
+  view.setUint8(at + 2, value >>> 16);
+};
+const tooLarge = (name) =>
+  `${name} is 10,000 x 10,000 pixels, over the 50 megapixels a browser tab can turn into a PDF page safely. Make it smaller first.`;
+
+test("a GIF, WebP or BMP is held to 50 megapixels by the size in its header, before it's decoded", async () => {
+  const fourcc = (bytes) => String.fromCharCode(...bytes.subarray(12, 16));
+  const images = {
+    "screen.gif": bytesOf("sample.gif"),
+    "lossy.webp": bytesOf("sample.webp"),
+    "lossless.webp": rewritten(MagickFormat.WebP, (image) => image.settings.setDefine(MagickFormat.WebP, "lossless", true)),
+    "canvas.webp": rewritten(MagickFormat.WebP, (image) => image.alpha(AlphaAction.Activate)),
+    "top-down.bmp": bytesOf("sample.bmp"),
+    "bottom-up.bmp": rewritten(MagickFormat.Bmp3),
+    "os2.bmp": rewritten(MagickFormat.Bmp2),
+  };
+  // Every kind of header: WebP's three first chunks, BMP's three headers.
+  assert.deepEqual(["lossy.webp", "lossless.webp", "canvas.webp"].map((name) => fourcc(images[name])), ["VP8 ", "VP8L", "VP8X"]);
+  const bmpHeader = (bytes) => new DataView(bytes.buffer, bytes.byteOffset).getUint32(14, true);
+  assert.deepEqual(["top-down.bmp", "bottom-up.bmp", "os2.bmp"].map((name) => bmpHeader(images[name])), [40, 40, 12]);
+  assert.ok(new DataView(images["top-down.bmp"].buffer).getInt32(22, true) < 0, "stored top down");
+  for (const [name, bytes] of Object.entries(images)) {
+    assert.deepEqual(headerSize(imageFormatOf(name, bytes), bytes), { width: 96, height: 96 }, name);
+  }
+  // A GIF's first frame past its logical screen grows the image, as Chromium decodes it.
+  const gif = images["screen.gif"];
+  const frame = 33;
+  assert.equal(gif[frame], 0x2c, "sample.gif's first image descriptor");
+  const smallScreen = patched(gif, (view) => (view.setUint16(6, 10, true), view.setUint16(8, 10, true)));
+  assert.deepEqual(headerSize("gif", smallScreen), { width: 96, height: 96 });
+  const movedFrame = patched(gif, (view) => (view.setUint16(frame + 1, 50, true), view.setUint16(frame + 3, 4, true)));
+  assert.deepEqual(headerSize("gif", movedFrame), { width: 146, height: 100 });
+
+  // Within the limit, each converts: a 96 x 96 page, from the decoder.
+  const { decoders, calls } = testDecoders();
+  const pdf = await imagesToPdf(Object.entries(images).map(([name, bytes]) => file(name, bytes)), { decoders });
+  assert.deepEqual((await readPages(pdf)).map((page) => [page.width, page.height]), Object.keys(images).map(() => [96, 96]));
+  assert.deepEqual(calls.decode, ["gif", "webp", "webp", "webp", "bmp", "bmp", "bmp"]);
+
+  // Declaring 10,000 x 10,000 in a few bytes: refused by name, never decoded.
+  const huge = {
+    "screen.gif": patched(gif, (view) => (view.setUint16(6, 10_000, true), view.setUint16(8, 10_000, true))),
+    "frame.gif": patched(gif, (view) => (view.setUint16(frame + 5, 10_000, true), view.setUint16(frame + 7, 10_000, true))),
+    "lossy.webp": patched(images["lossy.webp"], (view) => (view.setUint16(26, 10_000, true), view.setUint16(28, 10_000, true))),
+    "lossless.webp": patched(images["lossless.webp"], (view) => {
+      const bits = view.getUint32(21, true);
+      view.setUint32(21, ((bits & 0xf0000000) | 9_999 | (9_999 << 14)) >>> 0, true);
+    }),
+    "canvas.webp": patched(images["canvas.webp"], (view) => (setU24(view, 24, 9_999), setU24(view, 27, 9_999))),
+    "top-down.bmp": patched(images["top-down.bmp"], (view) => (view.setInt32(18, 10_000, true), view.setInt32(22, -10_000, true))),
+    "os2.bmp": patched(images["os2.bmp"], (view) => (view.setUint16(18, 10_000, true), view.setUint16(20, 10_000, true))),
+  };
+  for (const [name, bytes] of Object.entries(huge)) {
+    assert.ok(bytes.length < 30_000, `${name} is a small file`);
+    const { decoders, calls } = testDecoders();
+    await assert.rejects(imagesToPdf([file(name, bytes)], { decoders }), {
+      telemetryCode: "image_too_large",
+      telemetryMetadata: { engine: "image-pdf", format: name.split(".")[1] },
+      message: tooLarge(name),
+    });
+    assert.deepEqual(calls.decode, [], `${name} isn't decoded`);
+  }
+});
+
+test("ImageMagick's PNG of a format only it reads is held to 50 megapixels before the browser decodes it", async () => {
+  const xcfPng = ImageMagick.read(bytesOf("sample.xcf"), MagickFormat.Xcf, (image) => image.write(MagickFormat.Png, (data) => data.slice()));
+  const decodersFor = (png) => {
+    const calls = { magickToPng: [], decode: [] };
+    const decoders = {
+      async magickToPng(format) {
+        calls.magickToPng.push(format);
+        return png.slice().buffer;
+      },
+      async decode(format, buffer) {
+        calls.decode.push(format);
+        return pngPixels(new Uint8Array(buffer));
+      },
+      encodeJpeg: async () => assert.fail("a graphic stays lossless"),
+    };
+    return { calls, decoders };
+  };
+  // ImageMagick writes the XCF as a PNG, which is decoded: a page.
+  const { calls, decoders } = decodersFor(xcfPng);
+  const pages = await readPages(await imagesToPdf([file("first.png", bytesOf("sample.png")), file("art.xcf", bytesOf("sample.xcf"))], { decoders }));
+  assert.deepEqual(pages.map((page) => [page.width, page.height]), [[96, 96], [96, 96]]);
+  assert.deepEqual(calls, { magickToPng: ["xcf"], decode: ["png", "png"] });
+
+  // Its PNG declaring 10,000 x 10,000 is refused, named as the XCF, and not decoded.
+  const huge = decodersFor(patched(xcfPng, (view) => (view.setUint32(16, 10_000), view.setUint32(20, 10_000))));
+  await assert.rejects(imagesToPdf([file("huge.xcf", bytesOf("sample.xcf"))], { decoders: huge.decoders }), {
+    telemetryCode: "image_too_large",
+    telemetryMetadata: { engine: "image-pdf", format: "xcf" },
+    message: tooLarge("huge.xcf"),
+  });
+  assert.deepEqual(huge.calls, { magickToPng: ["xcf"], decode: [] });
 });
 
 test("a large image is compressed a band at a time with the filter a sample chose, and fflate does it without CompressionStream", async () => {
