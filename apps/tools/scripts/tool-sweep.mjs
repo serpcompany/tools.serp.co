@@ -30,6 +30,7 @@ import { SMOKE_TEST_HEADER } from "../lib/site-environment.ts";
 import {
   classifyRun,
   countStatuses,
+  decodeTableOutputs,
   ffmpegError,
   loadFixtures,
   measurePixels,
@@ -309,13 +310,13 @@ async function waitForOutputs(page, count, timeout) {
   await page.waitForFunction((n) => globalThis.__sweep.outputs.length >= n, count, { timeout });
 }
 
-// Clicks a download control and waits for the file. A click that saves
-// nothing is the Tool's failure; classifyRun reports it as finishing without
-// saving a file.
-async function download(page, control, { timeout = 5_000, ...read } = {}) {
+// Clicks a download control and waits for the file, the run's `count`th. A
+// click that saves nothing is the Tool's failure; classifyRun reports it as
+// finishing without saving a file.
+async function download(page, control, { timeout = 5_000, count = 1, ...read } = {}) {
   await control.click();
   try {
-    await waitForOutputs(page, 1, timeout);
+    await waitForOutputs(page, count, timeout);
   } catch (error) {
     if (!isTimeout(error)) throw error;
   }
@@ -384,6 +385,7 @@ async function runTableTool(page, plan) {
   await setup("upload", () =>
     page.getByText(`Selected: ${path.basename(plan.fixtures[0])}`).waitFor({ timeout: plan.timeoutMs }),
   );
+  if (plan.tableFile) return runTableFile(page, plan);
   // Done when the output shows the fixture's data, or when a parse error or
   // an output notice ("not wired yet", "Waiting for valid input") holds for
   // a second with the file's text loaded. The page shows both for a moment
@@ -417,6 +419,43 @@ async function runTableTool(page, plan) {
   }
   if (state.problem) return { outcome: "failed", message: state.problem };
   return download(page, page.getByRole("button", { name: "Download", exact: true }), { text: true, base64: plan.pixelCheck });
+}
+
+// A table output the page writes as a file (Excel, PDF, PNG, JPEG, Avro,
+// Protobuf): wait until the output panel says it's ready, or shows why not,
+// then save it, and for Protobuf the .proto beside it. A parse error that
+// holds for a second fails the run too.
+async function runTableFile(page, plan) {
+  let state;
+  try {
+    const handle = await page.waitForFunction(
+      () => {
+        const doc = globalThis.document;
+        const panel = doc.querySelector('[data-testid="table-output"]');
+        if (panel?.dataset.state === "ready") return { problem: null };
+        if (panel?.dataset.state === "error") return { problem: panel.textContent?.trim() || "the output failed" };
+        const parseError = doc.querySelector("div.bg-red-50")?.textContent?.trim() ?? null;
+        const sweep = globalThis.__sweep;
+        if (parseError !== sweep.problem?.text) sweep.problem = { text: parseError, since: Date.now() };
+        return parseError && Date.now() - sweep.problem.since >= 1_000 ? { problem: parseError } : null;
+      },
+      null,
+      { timeout: plan.timeoutMs, polling: 100 },
+    );
+    state = await handle.jsonValue();
+  } catch (error) {
+    if (!isTimeout(error)) throw error;
+    const shown = await page
+      .locator('[data-testid="table-output"]')
+      .getAttribute("data-state", { timeout: 1_000 })
+      .catch(() => null);
+    return { outcome: "timeout", message: `the ${plan.to} file wasn't ready after ${plan.timeoutMs / 1000} s (state: ${shown ?? "none"})` };
+  }
+  if (state.problem) return { outcome: "failed", message: state.problem };
+  const read = { text: true, base64: true };
+  const saved = await download(page, page.getByRole("button", { name: "Download", exact: true }), read);
+  if (plan.to !== "protobuf" || !saved.outputs.length) return saved;
+  return download(page, page.getByRole("button", { name: "Download .proto", exact: true }), { ...read, count: 2 });
 }
 
 // Text converters show their output in a textarea. html-to-markdown converts
@@ -612,6 +651,9 @@ async function measure(plan) {
   }
 
   const durationMs = Date.now() - started;
+  if (plan.decode && observation.outcome === "completed") {
+    await decodeTableOutputs(observation.outputs ?? [], plan.to);
+  }
   if (plan.pixelCheck && observation.outcome === "completed") {
     await measureOutputPixels(observation.outputs ?? [], plan.to);
   }

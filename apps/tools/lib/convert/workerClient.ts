@@ -1,6 +1,6 @@
 import { detectCapabilities, requiresVideoConversion } from "../capabilities.ts";
 import { resolveCompressionTarget } from "../compression-utils.ts";
-import { isImageDocumentConversion, isImageTextConversion } from "./image-document-targets.ts";
+import { isImageDocumentConversion, isImageTextConversion, isTableImageConversion } from "./image-document-targets.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
@@ -206,6 +206,9 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
   if (isImageTextConversion(fromExt, toExt)) {
     return convertImageToText(fromExt, toExt, args);
   }
+  if (isTableImageConversion(fromExt, toExt)) {
+    return convertTableToImage(fromExt, toExt, args);
+  }
   const op = resolveConversionOp(args.from, args.to);
   if (op === "video") {
     return convertVideoOnMainThread(args);
@@ -256,6 +259,29 @@ async function convertImageToText(from: string, to: string, args: ConvertArgs): 
       "convert_failed",
       error instanceof Error ? error.message : String(error),
       { from, to, engine },
+    );
+  }
+}
+
+// CSV to an image: read with the table converters' CSV parser and drawn as
+// the table pages draw PNG and JPEG (table-outputs.ts).
+async function convertTableToImage(from: string, to: string, args: ConvertArgs): Promise<ConversionResult> {
+  args.onProgress?.({ status: "processing", progress: 10 });
+  try {
+    const [{ parseCsvTable }, { writeTableOutput }] = await Promise.all([
+      import("./table-data.ts"),
+      import("./table-outputs.ts"),
+    ]);
+    const { table, error } = parseCsvTable(new TextDecoder().decode(args.buf));
+    if (!table) throw new Error(error ?? "This CSV file couldn't be read.");
+    const output = await writeTableOutput(to === "png" ? "png" : "jpeg", table);
+    args.onProgress?.({ status: "processing", progress: 100 });
+    return { kind: "single", buffer: output.buffer };
+  } catch (error) {
+    throw createTelemetryError(
+      "convert_failed",
+      error instanceof Error ? error.message : String(error),
+      { from, to, engine: "table-outputs" },
     );
   }
 }

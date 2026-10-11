@@ -1,7 +1,4 @@
-export type TableData = {
-  headers: string[];
-  rows: string[][];
-};
+export type { TableData } from "@/lib/convert/table-data";
 
 export type FormatOption = { value: string; label: string };
 

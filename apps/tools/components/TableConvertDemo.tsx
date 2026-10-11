@@ -13,6 +13,7 @@ import {
 import { Badge } from "@serp-tools/ui/components/badge";
 import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
+import BinaryOutputPreview, { type BinaryOutputState } from "@/components/table-convert/BinaryOutputPreview";
 import DataGridEditor from "@/components/table-convert/DataGridEditor";
 import FormatTabs from "@/components/table-convert/FormatTabs";
 import TablePreview from "@/components/table-convert/TablePreview";
@@ -24,9 +25,13 @@ import {
   detectFormatFromFile,
   getLabel,
   getPlaceholder,
+  isBinaryOutput,
+  outputFileName,
+  outputMimeType,
 } from "@/components/table-convert/formats";
 import { parseInput, serializeOutput } from "@/components/table-convert/convert";
 import { InputFormat, OutputFormat, TableData, ViewMode } from "@/components/table-convert/types";
+import type { BinaryTableFormat } from "@/lib/convert/table-outputs";
 
 type TableConvertDemoProps = {
   initialInputFormat?: InputFormat;
@@ -36,6 +41,13 @@ type TableConvertDemoProps = {
 };
 
 const DEFAULT_TABLE: TableData = SAMPLE_TABLE;
+// How long edits settle before a binary output is written again.
+const BINARY_DELAY_MS = 300;
+
+// The text output panel shows; binary outputs are written separately.
+function textOutput(format: OutputFormat, table: TableData) {
+  return isBinaryOutput(format) ? "" : serializeOutput(format, table).text;
+}
 
 export default function TableConvertDemo({
   initialInputFormat = "csv",
@@ -49,9 +61,8 @@ export default function TableConvertDemo({
   const [inputView, setInputView] = useState<ViewMode>("raw");
   const [outputView, setOutputView] = useState<ViewMode>("raw");
   const [inputText, setInputText] = useState("");
-  const [outputText, setOutputText] = useState(
-    () => serializeOutput(initialOutputFormat, DEFAULT_TABLE).text
-  );
+  const [outputText, setOutputText] = useState(() => textOutput(initialOutputFormat, DEFAULT_TABLE));
+  const [binaryOutput, setBinaryOutput] = useState<BinaryOutputState>({ state: "idle" });
   const [outputNotice, setOutputNotice] = useState<string | null>(null);
   const [tableData, setTableData] = useState<TableData | null>(DEFAULT_TABLE);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +73,9 @@ export default function TableConvertDemo({
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);
   const outputLabel = getLabel(OUTPUT_FORMATS, outputFormat);
+  const binary = isBinaryOutput(outputFormat);
+  const downloadName = outputFileName(fileName, outputFormat);
+  const schemaFileName = outputFileName(fileName, "protobuf", "proto");
   const inputPreviewMessage = error ?? "Rendered input preview will appear here.";
   const outputPreviewMessage =
     outputNotice ??
@@ -93,11 +107,58 @@ export default function TableConvertDemo({
       setOutputNotice("Waiting for valid input.");
       return;
     }
-    const serialized = serializeOutput(outputFormat, tableData);
-    setOutputText(serialized.text);
-    setOutputNotice(serialized.supported ? null : serialized.notice ?? null);
+    if (isBinaryOutput(outputFormat)) {
+      setOutputText("");
+      setOutputNotice(null);
+    } else {
+      const serialized = serializeOutput(outputFormat, tableData);
+      setOutputText(serialized.text);
+      setOutputNotice(serialized.supported ? null : serialized.notice ?? null);
+    }
     setStatus(`Auto-converting ${inputLabel} to ${outputLabel}.`);
   }, [tableData, outputFormat, inputLabel, outputLabel]);
+
+  // A binary output is written once edits settle, with its library loaded
+  // only now, and never for the placeholder table a page opens with.
+  useEffect(() => {
+    if (!isBinaryOutput(outputFormat)) return;
+    if (!tableData || !hasUserInput) {
+      setBinaryOutput({ state: "idle" });
+      return;
+    }
+    let cancelled = false;
+    setBinaryOutput({ state: "working" });
+    const timer = window.setTimeout(async () => {
+      try {
+        const { writeTableOutput } = await import("@/lib/convert/table-outputs");
+        const output = await writeTableOutput(outputFormat as BinaryTableFormat, tableData);
+        if (cancelled) return;
+        const previewUrl =
+          outputFormat === "png" || outputFormat === "jpeg"
+            ? URL.createObjectURL(new Blob([output.buffer], { type: outputMimeType(outputFormat) }))
+            : undefined;
+        setBinaryOutput({ state: "ready", ...output, previewUrl });
+      } catch (writeError) {
+        if (cancelled) return;
+        setBinaryOutput({
+          state: "error",
+          message: writeError instanceof Error ? writeError.message : String(writeError),
+        });
+      }
+    }, BINARY_DELAY_MS);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [outputFormat, tableData, hasUserInput]);
+
+  // An image preview's blob URL is released when the image is replaced.
+  useEffect(() => {
+    const url = binaryOutput.state === "ready" ? binaryOutput.previewUrl : undefined;
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [binaryOutput]);
 
   function handleInputFormatChange(nextFormat: InputFormat, reserialize = true) {
     if (nextFormat === inputFormat) return;
@@ -150,26 +211,43 @@ export default function TableConvertDemo({
     setError(null);
     setHasUserInput(false);
     setTableData(DEFAULT_TABLE);
-    setOutputText(serializeOutput(outputFormat, DEFAULT_TABLE).text);
+    setOutputText(textOutput(outputFormat, DEFAULT_TABLE));
     setOutputNotice(null);
     setStatus("Cleared current view.");
   }
 
+  // Protobuf's copyable text is its .proto schema; other binary outputs have
+  // none.
+  const copyText = binary ? (binaryOutput.state === "ready" ? binaryOutput.schema ?? "" : "") : outputText;
+
   async function handleCopyOutput() {
-    if (!outputText) return;
+    if (!copyText) return;
     try {
-      await navigator.clipboard.writeText(outputText);
+      await navigator.clipboard.writeText(copyText);
       setStatus(`Copied ${outputLabel} output.`);
     } catch {
       setStatus("Copy failed.");
     }
   }
 
+  // Saves the output under the uploaded file's name (sales.csv becomes
+  // sales.json), or table.<extension> for pasted text. A binary output was
+  // checked against its format's signature when it was written.
   function handleDownload() {
-    if (!outputText) return;
-    const blob = new Blob([outputText], { type: "text/plain" });
-    saveBlob(blob, `tableconvert-demo.${outputFormat}.txt`);
-    setStatus(`Downloaded ${outputLabel} output.`);
+    if (binary) {
+      if (binaryOutput.state !== "ready") return;
+      saveBlob(new Blob([binaryOutput.buffer], { type: outputMimeType(outputFormat) }), downloadName);
+    } else {
+      if (!outputText) return;
+      saveBlob(new Blob([outputText], { type: outputMimeType(outputFormat) }), downloadName);
+    }
+    setStatus(`Downloaded ${downloadName}.`);
+  }
+
+  function handleDownloadSchema() {
+    if (binaryOutput.state !== "ready" || !binaryOutput.schema) return;
+    saveBlob(new Blob([binaryOutput.schema], { type: "text/plain;charset=utf-8" }), schemaFileName);
+    setStatus(`Downloaded ${schemaFileName}.`);
   }
 
   function handleEditorChange(nextTable: TableData) {
@@ -288,32 +366,51 @@ export default function TableConvertDemo({
                 />
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Button size="sm" variant="outline" onClick={handleCopyOutput}>
+                  <Button size="sm" variant="outline" onClick={handleCopyOutput} disabled={!copyText}>
                     Copy
                   </Button>
-                  <Button size="sm" variant="outline" onClick={handleDownload}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleDownload}
+                    disabled={binary ? binaryOutput.state !== "ready" : !outputText}
+                  >
                     Download
                   </Button>
                 </div>
                 {outputNotice && <p className="text-xs text-muted-foreground">{outputNotice}</p>}
                 <div className="text-xs text-muted-foreground">{status}</div>
 
-                <ViewToggle value={outputView} onChange={setOutputView} />
-
-                {outputView === "raw" ? (
-                  <textarea
-                    readOnly
-                    value={outputText}
-                    className="min-h-[280px] w-full resize-none rounded-lg border bg-muted/20 px-4 py-3 font-mono text-sm shadow-sm"
-                    spellCheck={false}
+                {binary ? (
+                  <BinaryOutputPreview
+                    format={outputFormat}
+                    label={outputLabel}
+                    output={binaryOutput}
+                    table={tableData}
+                    fileName={downloadName}
+                    schemaFileName={schemaFileName}
+                    onDownloadSchema={handleDownloadSchema}
                   />
                 ) : (
-                  <TablePreview
-                    table={tableData}
-                    emptyMessage={outputPreviewMessage}
-                    format={outputFormat}
-                    text={outputText}
-                  />
+                  <>
+                    <ViewToggle value={outputView} onChange={setOutputView} />
+
+                    {outputView === "raw" ? (
+                      <textarea
+                        readOnly
+                        value={outputText}
+                        className="min-h-[280px] w-full resize-none rounded-lg border bg-muted/20 px-4 py-3 font-mono text-sm shadow-sm"
+                        spellCheck={false}
+                      />
+                    ) : (
+                      <TablePreview
+                        table={tableData}
+                        emptyMessage={outputPreviewMessage}
+                        format={outputFormat}
+                        text={outputText}
+                      />
+                    )}
+                  </>
                 )}
               </CardContent>
             </Card>

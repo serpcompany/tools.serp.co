@@ -105,6 +105,38 @@ Conversion picks an engine by input format:
   50 megapixels. That size is read from the header of a JPEG, PNG, GIF, WebP
   or BMP, and of the PNG ImageMagick writes, before the browser decodes it;
   HEIC, AVIF, ICO, SVG, ICNS and KTX are checked once decoded.
+- **Tables into files** (`lib/convert/table-outputs.ts`, since #249): the
+  table converter pages (`TableConvertDemo`) write Excel, PDF, PNG, JPEG, Avro
+  and Protobuf in the browser, once a visitor has given them a table, and load
+  each output's library only then: write-excel-file, jsPDF with
+  jspdf-autotable, avsc, protobufjs. Excel is one sheet with a bold, frozen
+  header row; a cell is a number only when it's a plain number Excel keeps
+  exactly (no leading zero, at most 15 digits), so zip codes, IDs and dates
+  stay text. A table past Excel's limits (1,048,576 rows, 16,384 columns,
+  32,767 characters a cell) is refused. A PDF is A4 with the header row on
+  each page, landscape when the columns need it, and columns that don't fit
+  continue on the next pages. Its text is in jsPDF's built-in Helvetica when
+  every character is in Windows-1252; otherwise the page loads DejaVu Sans
+  2.37 (`public/vendor/fonts/dejavu/`, 757 KB, about 380 KB gzipped, Bitstream
+  Vera licence), which covers Latin, Greek, Cyrillic, Hebrew and Arabic. Text it
+  has no glyph for (Chinese, Japanese, Korean, Indic and Thai scripts, emoji)
+  fails with a message pointing to PNG or Excel, rather than a garbled file;
+  right-to-left lines are drawn in display order and aligned right. PNG and
+  JPEG are drawn on a canvas at twice the size, in the system sans-serif font,
+  at most 4096 px a side: a larger table shows its first rows and columns, and
+  the image and the page say how many. Avro is an object container (null
+  codec) of a `Row` record of nullable strings, an empty cell null and each
+  field's `doc` its header; Protobuf is a `Table` of `Row` messages with a
+  string field per column, saved as a `.pb` beside the `.proto` it was written
+  with. Field names are the headers made valid and unique. Each file is
+  checked against its format's signature before the page offers it. CSV to
+  JPG, on the generic converter page, reads the CSV with the same parser
+  (`lib/convert/table-data.ts`) and draws the same image.
+- **Table downloads:** every table converter saves a file named after the
+  uploaded one (`sales.csv` saves as `sales.json`), or `table.<extension>` for
+  pasted text, with its format's media type (`OUTPUT_FILE_TYPES` in
+  `components/table-convert/formats.ts`; text is UTF-8, and a format without
+  an extension of its own saves as `.txt`).
 - **Image to text** (`lib/convert/image-text.ts`): JPG and PNG to TXT is OCR
   with tesseract.js, in the browser. Its worker, SIMD LSTM core and English
   model (4.0.0 best_int) are served from `public/vendor/tesseract/`, and a
