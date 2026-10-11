@@ -26,8 +26,11 @@ export function normalizeTable(headers: string[], rows: string[][]): TableData {
 
 export function parseCsvTable(text: string): { table: TableData | null; error: string | null } {
   const parsed = Papa.parse<string[]>(text, { skipEmptyLines: true });
-  if (parsed.errors.length) {
-    return { table: null, error: parsed.errors[0]?.message ?? "CSV parse error" };
+  // Papa can't guess the delimiter of a one-column CSV, which has none; it
+  // reads it with a comma, which is right, so that warning isn't an error.
+  const errors = parsed.errors.filter((error) => error.code !== "UndetectableDelimiter");
+  if (errors.length) {
+    return { table: null, error: errors[0]?.message ?? "CSV parse error" };
   }
   const data = parsed.data as string[][];
   const headerRow = data[0];

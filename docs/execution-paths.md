@@ -131,7 +131,8 @@ Conversion picks an engine by input format:
   with. Field names are the headers made valid and unique. Each file is
   checked against its format's signature before the page offers it. CSV to
   JPG, on the generic converter page, reads the CSV with the same parser
-  (`lib/convert/table-data.ts`) and draws the same image.
+  (`lib/convert/table-data.ts`, which reads a one-column CSV as one column)
+  and draws the same image.
 - **Table downloads:** every table converter saves a file named after the
   uploaded one (`sales.csv` saves as `sales.json`), or `table.<extension>` for
   pasted text, with its format's media type (`OUTPUT_FILE_TYPES` in
