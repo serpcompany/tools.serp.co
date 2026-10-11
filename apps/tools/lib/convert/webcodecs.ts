@@ -8,7 +8,7 @@
 //   browser decodes it and hands FFmpeg VP8 in WebM, and FFmpeg converts that
 //   like any other input (convertVideo).
 // - To AV1 or HEVC: FFmpeg decodes the input to VP8 in WebM at the size and
-//   frame rate of its other video outputs, the browser encodes that, and
+//   frame rate limits of its other video outputs, the browser encodes that, and
 //   FFmpeg writes the elementary stream the extension names: IVF for .av1
 //   (what aomenc writes, and what our fixture is) and Annex B for .hevc.
 //   Neither holds audio.
@@ -20,6 +20,7 @@
 
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 import { AUDIO_FORMATS } from "../capabilities.ts";
+import { MAX_VIDEO_FPS, MAX_VIDEO_SIZE, fitWithin } from "./ffmpeg-args.ts";
 
 const AUDIO_FORMAT_SET = new Set<string>(AUDIO_FORMATS);
 
@@ -88,23 +89,42 @@ export function planSteps(from: string, to: string): Step[] {
   ];
 }
 
+// The frame rate a raw stream records, from the rate measured over the
+// hand-off's millisecond timestamps: the whole or NTSC rate (30000/1001 is
+// 29.97) it is within 0.05% of, or else the measured rate to a thousandth.
+export function streamFrameRate(measured: number): string {
+  const whole = Math.round(measured);
+  const ntsc = Math.round(measured * 1.001);
+  const [label, rate] =
+    Math.abs(whole - measured) <= Math.abs((ntsc * 1000) / 1001 - measured)
+      ? [String(whole), whole]
+      : [`${ntsc * 1000}/1001`, (ntsc * 1000) / 1001];
+  return rate > 0 && Math.abs(rate - measured) <= measured * 0.0005
+    ? label
+    : `${Math.round(measured * 1000)}/1000`;
+}
+
 // Arguments between FFmpeg's input and output names. VP8 at near-lossless
 // quality is the hand-off both ways: FFmpeg encodes it fast and every browser
 // with WebCodecs decodes it. Going to the browser it is converted to BT.601
 // and tagged so. Untagged inputs, most of these legacy formats, are BT.601 to
 // FFmpeg, so for them that changes nothing; left untagged, the browser would
-// read them as BT.709 and shift their colours.
+// read them as BT.709 and shift their colours. `frameRate` is the hand-off's,
+// as streamFrameRate names it, and only writing HEVC needs it.
 export function ffmpegStepArgs(
   step: "copy-av1" | "to-vp8" | "write-av1" | "write-hevc",
-  { width, frameRate }: { width: number; frameRate: number },
+  { frameRate }: { frameRate: string },
 ): string[] {
   switch (step) {
     case "copy-av1":
       return ["-map", "0:v:0", "-map", "0:a:0?", "-c", "copy"];
     case "to-vp8":
+      // The size and rate limits of FFmpeg's other video outputs, at a
+      // constant rate, since a raw HEVC stream has no timestamps.
       return [
         "-map", "0:v:0", "-an",
-        "-vf", `fps=${frameRate},scale=${width}:-2:flags=fast_bilinear:out_color_matrix=bt601`,
+        "-vf", `${fitWithin(MAX_VIDEO_SIZE)}:out_color_matrix=bt601`,
+        "-fpsmax", String(MAX_VIDEO_FPS), "-fps_mode", "cfr",
         "-colorspace", "smpte170m", "-color_primaries", "smpte170m", "-color_trc", "smpte170m",
         "-c:v", "libvpx", "-deadline", "realtime", "-cpu-used", "8",
         "-crf", "4", "-b:v", "8M", "-auto-alt-ref", "0", "-pix_fmt", "yuv420p",

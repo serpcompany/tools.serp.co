@@ -20,11 +20,23 @@ Conversion picks an engine by input format:
   scripts don't send the COEP headers the multi-threaded build needs. Its 32 MB
   wasm is too big for Workers Static Assets, so it loads from
   `NEXT_PUBLIC_ASSETS_BASE_URL`.
+- **Video sizes** (`lib/convert/ffmpeg-args.ts`, since #245): a video output
+  keeps the source's frame size and frame rate, up to 1920 px on the longer
+  side and 30 fps. A smaller frame isn't scaled up, a slower source keeps its
+  rate, and sides are rounded down to even numbers. MXF is always 25 fps, a
+  broadcast rate, and 3GP stays 352x288 at 12 fps, since H.263 only encodes
+  fixed frame sizes. A remux, such as MKV to MP4, copies the streams as they
+  are. RM and RMVB keep the source size uncapped: RealVideo needs sides that
+  are multiples of 16. GIF is at most 480 px on the longer side at 15 fps, as
+  the MP4 to GIF page promises: 15 fps is every other frame of a 30 or 60 fps
+  source, and a hard-to-compress 10 s 720p clip came to 10 MB, against 12 MB
+  at 640 px and 10 fps.
 - **AV1 input, and AV1 or HEVC output:** the browser's own codecs (WebCodecs)
   through Mediabunny (`lib/convert/webcodecs.ts`), since FFmpeg.wasm has no
   software AV1 decoder or encoder and its HEVC encoder doesn't finish. FFmpeg
   still reads and writes the containers and does the scaling around the
-  browser's steps, handing frames over as near-lossless VP8. A `.av1` output is
+  browser's steps, handing frames over as near-lossless VP8 within the same
+  limits, at a constant rate that a `.hevc` stream records. A `.av1` output is
   AV1 in IVF and a `.hevc` output a raw Annex B stream, neither with audio, and
   every page that reads or writes one says "video only". A browser without the
   codec is told which one and to try a recent Chrome or Edge on a different
