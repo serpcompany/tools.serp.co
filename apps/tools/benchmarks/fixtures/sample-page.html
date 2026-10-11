@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nova Travel: Spring Plans</title>
+    <style>
+      :root { --ink: #0f172a; --muted: #475569; --accent: #2563eb; --paper: #f8fafc; }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: var(--ink); background: var(--paper); }
+      header { padding: 48px 64px; color: #fff; background: linear-gradient(120deg, #1e3a8a, #2563eb 55%, #0ea5e9); }
+      header h1 { margin: 0 0 8px; font: 700 44px/1.1 "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.5px; }
+      header p { margin: 0; font-size: 18px; opacity: 0.9; }
+      main { padding: 40px 64px 56px; }
+      .cards { display: flex; gap: 24px; margin-bottom: 40px; }
+      .card { flex: 1; padding: 24px; border-radius: 14px; background: #fff; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12); }
+      .card h2 { margin: 12px 0 6px; font: 600 22px Arial, sans-serif; }
+      .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+      .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font: 600 12px Arial, sans-serif; color: #fff; background: var(--accent); }
+      .badge.green { background: #16a34a; } .badge.amber { background: #d97706; }
+      table { width: 100%; border-collapse: collapse; font: 15px Arial, sans-serif; background: #fff; }
+      th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+      th { color: #fff; background: var(--ink); }
+      tr:nth-child(even) td { background: #eff6ff; }
+      figure { display: flex; align-items: center; gap: 24px; margin: 40px 0 0; }
+      figcaption { color: var(--muted); font-style: italic; }
+      footer { padding: 16px 64px; font: 13px Arial, sans-serif; color: #cbd5e1; background: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Spring Plans 2026</h1>
+      <p>Three trips, one table and an inline drawing: a styled page for the HTML to image converters.</p>
+    </header>
+    <main>
+      <section class="cards">
+        <article class="card"><span class="badge">City</span><h2>Berlin</h2><p>Four days of museums, markets and the river walk.</p></article>
+        <article class="card"><span class="badge green">Coast</span><h2>Lisbon</h2><p>Tram rides, tiled streets and a day trip to Sintra.</p></article>
+        <article class="card"><span class="badge amber">Mountains</span><h2>Innsbruck</h2><p>Cable cars up, a long lunch, and the slow way down.</p></article>
+      </section>
+      <table>
+        <thead><tr><th>Traveller</th><th>City</th><th>Plan</th><th>Nights</th></tr></thead>
+        <tbody>
+          <tr><td>Nova</td><td>Berlin</td><td>Pro</td><td>4</td></tr>
+          <tr><td>Ari</td><td>Lisbon</td><td>Team</td><td>5</td></tr>
+          <tr><td>Mika</td><td>Innsbruck</td><td>Pro</td><td>3</td></tr>
+        </tbody>
+      </table>
+      <figure>
+        <img alt="A route map" width="240" height="120" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='120' viewBox='0 0 240 120'%3E%3Crect width='240' height='120' rx='12' fill='%23e0f2fe'/%3E%3Cpath d='M20 95 C70 20 120 110 220 30' fill='none' stroke='%232563eb' stroke-width='5' stroke-dasharray='10 7'/%3E%3Ccircle cx='20' cy='95' r='9' fill='%2316a34a'/%3E%3Ccircle cx='220' cy='30' r='9' fill='%23dc2626'/%3E%3C/svg%3E" />
+        <figcaption>The route, drawn as an SVG inside the page.</figcaption>
+      </figure>
+    </main>
+    <footer>Made for the tools.serp.co converter tests.</footer>
+  </body>
+</html>

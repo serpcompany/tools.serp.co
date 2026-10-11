@@ -13610,7 +13610,7 @@
   {
     "id": "docx-to-jpeg",
     "name": "DOCX to JPEG",
-    "description": "Convert DOCX to JPEG format",
+    "description": "Convert DOCX to JPEG: a JPEG of each page of your Word document, laid out and drawn in your browser.",
     "operation": "convert",
     "route": "/docx-to-jpeg",
     "from": "docx",
@@ -13626,7 +13626,7 @@
   {
     "id": "docx-to-svg",
     "name": "DOCX to SVG",
-    "description": "Convert DOCX to SVG format",
+    "description": "Convert DOCX to SVG: an SVG of each page of your Word document. Each holds a picture of the page, so its text isn't editable.",
     "operation": "convert",
     "route": "/docx-to-svg",
     "from": "docx",
@@ -13642,7 +13642,7 @@
   {
     "id": "docx-to-tiff",
     "name": "DOCX to TIFF",
-    "description": "Convert DOCX to TIFF format",
+    "description": "Convert DOCX to TIFF: a TIFF of each page of your Word document, laid out and drawn in your browser.",
     "operation": "convert",
     "route": "/docx-to-tiff",
     "from": "docx",
@@ -65099,7 +65099,7 @@
   {
     "id": "dxf-to-jpg",
     "name": "DXF to JPG",
-    "description": "Convert DXF to JPG format",
+    "description": "Convert DXF to JPG: a picture of the whole drawing, text included, on a white background.",
     "operation": "convert",
     "route": "/dxf-to-jpg",
     "from": "dxf",
@@ -65115,7 +65115,7 @@
   {
     "id": "dxf-to-png",
     "name": "DXF to PNG",
-    "description": "Convert DXF to PNG format",
+    "description": "Convert DXF to PNG: a picture of the whole drawing, text included, on a white background.",
     "operation": "convert",
     "route": "/dxf-to-png",
     "from": "dxf",
@@ -70541,7 +70541,7 @@
   {
     "id": "html-to-gif",
     "name": "HTML to GIF",
-    "description": "Convert HTML to GIF format",
+    "description": "Convert HTML to GIF: a picture of the page, 1280 px wide. External images and stylesheets aren't loaded, and scripts don't run.",
     "operation": "convert",
     "route": "/html-to-gif",
     "from": "html",
@@ -70656,7 +70656,7 @@
   {
     "id": "html-to-svg",
     "name": "HTML to SVG",
-    "description": "Convert HTML to SVG format",
+    "description": "Convert HTML to SVG: an SVG holding a picture of the page, 1280 px wide, so its text isn't editable. External images and stylesheets aren't loaded.",
     "operation": "convert",
     "route": "/html-to-svg",
     "from": "html",
@@ -70672,7 +70672,7 @@
   {
     "id": "html-to-webp",
     "name": "HTML to WebP",
-    "description": "Convert HTML to WebP format",
+    "description": "Convert HTML to WebP: a picture of the page, 1280 px wide. External images and stylesheets aren't loaded, and scripts don't run.",
     "operation": "convert",
     "route": "/html-to-webp",
     "from": "html",

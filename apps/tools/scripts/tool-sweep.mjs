@@ -191,7 +191,11 @@ const baseOrigin = new URL(args.baseUrl).origin;
 let browserPromise = null;
 function getBrowser() {
   if (!browserPromise) {
-    const launching = chromium.launch({ channel: args.channel, headless: !args.headed }).then((browser) => {
+    // WebGL (DXF to image) on a machine with no GPU, such as a CI runner:
+    // Chrome no longer falls back to its software renderer, SwiftShader,
+    // unless told to. Playwright already passes this on macOS.
+    const launchArgs = ["--enable-unsafe-swiftshader"];
+    const launching = chromium.launch({ channel: args.channel, headless: !args.headed, args: launchArgs }).then((browser) => {
       runEntry.browserVersion = browser.version();
       browser.on("disconnected", () => {
         if (browserPromise === launching) browserPromise = null;

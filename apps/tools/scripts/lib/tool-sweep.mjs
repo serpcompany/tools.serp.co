@@ -12,6 +12,8 @@ import { MAGICK_BROWSER_INPUTS } from "../../lib/convert/magickBrowser.ts";
 import { checkOutputFormat } from "../../lib/convert/output-format.ts";
 import { usesWebCodecs } from "../../lib/convert/webcodecs.ts";
 import {
+  DOCUMENT_IMAGE_ENGINES,
+  isDocumentImageConversion,
   isImageDocumentConversion,
   isImageTextConversion,
   isTableImageConversion,
@@ -207,6 +209,7 @@ export function converterEngine({ operation, from, to }) {
   if (isImageDocumentConversion(source, target)) return "image-documents";
   if (isImageTextConversion(source, target)) return target === "txt" ? "tesseract" : "docx";
   if (isTableImageConversion(source, target)) return "table-outputs";
+  if (isDocumentImageConversion(source, target)) return DOCUMENT_IMAGE_ENGINES[source];
   if (MAGICK_BROWSER_INPUTS.has(source)) return "imagemagick-wasm";
   if (source === "heic" || source === "heif") return "heif-decoder";
   if (usesWebCodecs(source, target)) return "ffmpeg-wasm + webcodecs";
@@ -246,6 +249,9 @@ export const ENGINE_LOCATIONS = {
   docx: "client-only",
   "image-pdf": "client-only",
   "table-outputs": "client-only",
+  "docx-preview": "client-only",
+  "dxf-viewer": "client-only",
+  "html-render": "client-only",
   svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",
@@ -295,6 +301,13 @@ export const ONE_COLOUR_FIXTURES = new Set([
   "sample.rm", "sample.swf", "sample.ts", "sample.vob", "sample.webm", "sample.wmv",
 ]);
 
+// Fixtures with several pages, and how many: a Tool that saves an image of
+// each page must save this many, since a page left out (or two run
+// together) passes every other check.
+export const PAGE_COUNTS = {
+  "sample-pages.docx": 3,
+};
+
 // fixture-matrix.json: ready inputs by format, and per-Tool fixtures.
 export function loadFixtures(benchmarksDir) {
   const matrix = JSON.parse(readFileSync(path.join(benchmarksDir, "fixture-matrix.json"), "utf8"));
@@ -343,6 +356,7 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
     fixtures: files,
     markers,
     pixelCheck: checksPixels(tool.to) && !files.some((file) => ONE_COLOUR_FIXTURES.has(path.basename(file))),
+    pages: checksPixels(tool.to) && files.length === 1 ? PAGE_COUNTS[path.basename(files[0])] : undefined,
     tableFile,
     decode: tableFile && DECODED_TABLE_OUTPUTS.has(target),
     compress: tool.operation === "compress" || tool.operation === "bulk",
@@ -482,8 +496,9 @@ function formatName(format) {
 //     { error } when it didn't open
 // A plan with pixelCheck needs every output measured, and one with decode
 // every output opened: an output the sweep never read the bytes of fails,
-// rather than passing unchecked.
-export function classifyRun(observation, { to, markers = [], pixelCheck = false, decode = false }) {
+// rather than passing unchecked. One with `pages` (PAGE_COUNTS) needs a file
+// for each page.
+export function classifyRun(observation, { to, markers = [], pixelCheck = false, decode = false, pages }) {
   const message = observation.message?.trim() || null;
   if (observation.outcome === "timeout") {
     return { status: "timeout", error: message ?? "no result before the timeout" };
@@ -502,6 +517,9 @@ export function classifyRun(observation, { to, markers = [], pixelCheck = false,
   if (!outputs.length) return { status: "error", error: "finished without saving a file" };
   const empty = outputs.find((output) => !output.size);
   if (empty) return { status: "error", error: `saved an empty file (${empty.name})` };
+  if (pages && outputs.length !== pages) {
+    return { status: "error", error: `saved ${outputs.length} files for the fixture's ${pages} pages, not one a page` };
+  }
   for (const output of outputs) {
     const check = checkOutputFormat(toArrayBuffer(output.head), to);
     if (!check.ok) {

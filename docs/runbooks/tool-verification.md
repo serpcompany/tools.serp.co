@@ -65,7 +65,11 @@ aren't decoded; a raster SVG is checked through the image it wraps. A table
 converter's Excel, PDF, Avro or Protobuf file is opened in Node the way an app
 would (fflate, pdf.js, avsc, protobufjs with the `.proto` saved beside the
 `.pb`) and must hold the fixture's data; its pass records `formatCheck:
-"decoded"`. Its PNG and JPEG are checked as images. `--resume` continues an interrupted run;
+"decoded"`. Its PNG and JPEG are checked as images. A fixture with several
+pages, named in `PAGE_COUNTS` in `scripts/lib/tool-sweep.mjs`, must give an
+image of each page, no more and no fewer. Chromium runs with
+`--enable-unsafe-swiftshader`, so DXF pages get WebGL on a machine with no
+GPU, such as a CI runner. `--resume` continues an interrupted run;
 `--summary` prints the Markdown table. It measures; it isn't part of
 `pnpm check`. `--channel chrome` (or `msedge`) runs an installed Chrome or Edge
 instead of Playwright's Chromium, whose codecs can differ (H.264, HEVC and AAC
