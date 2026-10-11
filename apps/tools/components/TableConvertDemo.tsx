@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import {
   Card,
@@ -30,6 +30,7 @@ import {
   outputMimeType,
 } from "@/components/table-convert/formats";
 import { parseInput, serializeOutput } from "@/components/table-convert/convert";
+import { canOfferOutput, nextUpload } from "@/components/table-convert/output-state";
 import { InputFormat, OutputFormat, TableData, ViewMode } from "@/components/table-convert/types";
 import type { BinaryTableFormat } from "@/lib/convert/table-outputs";
 
@@ -44,11 +45,6 @@ const DEFAULT_TABLE: TableData = SAMPLE_TABLE;
 // How long edits settle before a binary output is written again.
 const BINARY_DELAY_MS = 300;
 
-// The text the output panel shows; binary outputs are written separately.
-function textOutput(format: OutputFormat, table: TableData) {
-  return isBinaryOutput(format) ? "" : serializeOutput(format, table).text;
-}
-
 export default function TableConvertDemo({
   initialInputFormat = "csv",
   initialOutputFormat = "json",
@@ -61,15 +57,20 @@ export default function TableConvertDemo({
   const [inputView, setInputView] = useState<ViewMode>("raw");
   const [outputView, setOutputView] = useState<ViewMode>("raw");
   const [inputText, setInputText] = useState("");
-  const [outputText, setOutputText] = useState(() => textOutput(initialOutputFormat, DEFAULT_TABLE));
   const [binaryOutput, setBinaryOutput] = useState<BinaryOutputState>({ state: "idle" });
-  const [outputNotice, setOutputNotice] = useState<string | null>(null);
   const [tableData, setTableData] = useState<TableData | null>(DEFAULT_TABLE);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("Auto-convert is on.");
   const [dragActive, setDragActive] = useState(false);
   const [hasUserInput, setHasUserInput] = useState(false);
+  // A file being read, and the tickets that let an edit or a newer file win
+  // over it (output-state.ts).
+  const [upload, dispatchUpload] = useReducer(nextUpload, null);
+  const tickets = useRef(0);
+  // Counts files loaded, so a file's text is parsed (and its upload ends)
+  // even when it matches the text already in the input.
+  const [loads, setLoads] = useState(0);
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);
   const outputLabel = getLabel(OUTPUT_FORMATS, outputFormat);
@@ -77,11 +78,38 @@ export default function TableConvertDemo({
   const downloadName = outputFileName(fileName, outputFormat);
   const schemaFileName = outputFileName(fileName, "protobuf", "proto");
   const inputPreviewMessage = error ?? "Rendered input preview will appear here.";
+
+  // A text output is serialized from the table on screen as it renders, so
+  // it can't lag behind it; binary outputs are written separately, below.
+  const serialized = useMemo(
+    () => (tableData && !isBinaryOutput(outputFormat) ? serializeOutput(outputFormat, tableData) : null),
+    [tableData, outputFormat],
+  );
+  const outputText = serialized?.text ?? "";
+  const outputNotice = !tableData || error
+    ? "Waiting for valid input."
+    : serialized && !serialized.supported
+      ? serialized.notice ?? null
+      : null;
+
+  // Only an output written from the input on screen is shown and offered for
+  // download: not while a file is read, nor while the input has an error.
+  const pageInput = { upload, error, table: tableData, outputFormat };
+  const textCurrent = canOfferOutput(pageInput, tableData && serialized ? { table: tableData, format: outputFormat } : null);
+  const shownText = textCurrent ? outputText : "";
+  const currentBinary = binaryOutput.state === "ready" && canOfferOutput(pageInput, binaryOutput) ? binaryOutput : null;
+  const shownBinary: BinaryOutputState = upload
+    ? { state: "working", message: `Reading ${upload.name}…` }
+    : binaryOutput.state === "ready" && !currentBinary
+      ? { state: "working" }
+      : binaryOutput;
+  const shownNotice = upload && !binary ? `Reading ${upload.name}…` : outputNotice;
   const outputPreviewMessage =
-    outputNotice ??
-    (tableData ? "Rendered output preview will appear here." : "Waiting for valid input.");
+    shownNotice ?? (tableData ? "Rendered output preview will appear here." : "Waiting for valid input.");
 
   useEffect(() => {
+    // A file's upload ends once its text is parsed.
+    dispatchUpload({ type: "parsed" });
     if (!hasUserInput && !inputText.trim()) {
       setError(null);
       setTableData(DEFAULT_TABLE);
@@ -99,24 +127,11 @@ export default function TableConvertDemo({
     }
     setError(null);
     setTableData(result.table);
-  }, [hasUserInput, inputText, inputFormat]);
+  }, [hasUserInput, inputText, inputFormat, loads]);
 
   useEffect(() => {
-    if (!tableData) {
-      setOutputText("");
-      setOutputNotice("Waiting for valid input.");
-      return;
-    }
-    if (isBinaryOutput(outputFormat)) {
-      setOutputText("");
-      setOutputNotice(null);
-    } else {
-      const serialized = serializeOutput(outputFormat, tableData);
-      setOutputText(serialized.text);
-      setOutputNotice(serialized.supported ? null : serialized.notice ?? null);
-    }
-    setStatus(`Auto-converting ${inputLabel} to ${outputLabel}.`);
-  }, [tableData, outputFormat, inputLabel, outputLabel]);
+    if (tableData) setStatus(`Auto-converting ${inputLabel} to ${outputLabel}.`);
+  }, [tableData, inputLabel, outputLabel]);
 
   // A binary output is written once edits settle, with its library loaded
   // only now; never for the placeholder table a page opens with, nor while
@@ -138,7 +153,7 @@ export default function TableConvertDemo({
           outputFormat === "png" || outputFormat === "jpeg"
             ? URL.createObjectURL(new Blob([output.buffer], { type: outputMimeType(outputFormat) }))
             : undefined;
-        setBinaryOutput({ state: "ready", ...output, previewUrl });
+        setBinaryOutput({ state: "ready", ...output, previewUrl, table: tableData, format: outputFormat });
       } catch (writeError) {
         if (cancelled) return;
         setBinaryOutput({
@@ -161,13 +176,13 @@ export default function TableConvertDemo({
     };
   }, [binaryOutput]);
 
-  function handleInputFormatChange(nextFormat: InputFormat, reserialize = true) {
+  function handleInputFormatChange(nextFormat: InputFormat) {
     if (nextFormat === inputFormat) return;
     setInputFormat(nextFormat);
-    if (!tableData || !reserialize || !hasUserInput) return;
-    const serialized = serializeOutput(nextFormat, tableData);
-    if (serialized.supported) {
-      setInputText(serialized.text);
+    if (!tableData || !hasUserInput) return;
+    const reserialized = serializeOutput(nextFormat, tableData);
+    if (reserialized.supported) {
+      setInputText(reserialized.text);
       setError(null);
     }
   }
@@ -176,50 +191,64 @@ export default function TableConvertDemo({
     fileRef.current?.click();
   }
 
-  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const detected = detectFormatFromFile(file);
-    if (detected && detected !== inputFormat) {
-      handleInputFormatChange(detected, false);
-    }
+  // Typing, pasting, editing the grid or clearing wins over a file still
+  // being read.
+  function supersedeUpload() {
+    tickets.current += 1;
+    dispatchUpload({ type: "cancel" });
+  }
+
+  // Until a chosen or dropped file is read and parsed, the output panel says
+  // it's being read and offers nothing to download. A file that finishes
+  // reading after a newer file or an edit is dropped.
+  async function loadFile(file: File) {
+    const ticket = ++tickets.current;
+    dispatchUpload({ type: "start", name: file.name, ticket });
     setFileName(file.name);
+    let text: string;
+    try {
+      text = await file.text();
+    } catch (readError) {
+      if (ticket !== tickets.current) return;
+      dispatchUpload({ type: "cancel" });
+      setError(`${file.name} couldn't be read: ${readError instanceof Error ? readError.message : String(readError)}`);
+      return;
+    }
+    if (ticket !== tickets.current) return;
+    const detected = detectFormatFromFile(file);
+    if (detected) setInputFormat(detected);
     setHasUserInput(true);
-    const text = await file.text();
     setInputText(text);
+    setLoads((count) => count + 1);
+    dispatchUpload({ type: "read", ticket });
     setStatus(`Loaded ${file.name}.`);
   }
 
-  async function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) void loadFile(file);
+  }
+
+  function handleDrop(event: React.DragEvent<HTMLDivElement>) {
     event.preventDefault();
     setDragActive(false);
     const file = event.dataTransfer.files?.[0];
-    if (!file) return;
-    const detected = detectFormatFromFile(file);
-    if (detected && detected !== inputFormat) {
-      handleInputFormatChange(detected, false);
-    }
-    setFileName(file.name);
-    setHasUserInput(true);
-    const text = await file.text();
-    setInputText(text);
-    setStatus(`Loaded ${file.name}.`);
+    if (file) void loadFile(file);
   }
 
   function handleClear() {
+    supersedeUpload();
     setInputText("");
     setFileName(null);
     setError(null);
     setHasUserInput(false);
     setTableData(DEFAULT_TABLE);
-    setOutputText(textOutput(outputFormat, DEFAULT_TABLE));
-    setOutputNotice(null);
     setStatus("Cleared current view.");
   }
 
   // Protobuf's copyable text is its .proto schema; other binary outputs have
   // none.
-  const copyText = binary ? (binaryOutput.state === "ready" ? binaryOutput.schema ?? "" : "") : outputText;
+  const copyText = binary ? currentBinary?.schema ?? "" : shownText;
 
   async function handleCopyOutput() {
     if (!copyText) return;
@@ -236,27 +265,28 @@ export default function TableConvertDemo({
   // checked against its format's signature when it was written.
   function handleDownload() {
     if (binary) {
-      if (binaryOutput.state !== "ready") return;
-      saveBlob(new Blob([binaryOutput.buffer], { type: outputMimeType(outputFormat) }), downloadName);
+      if (!currentBinary) return;
+      saveBlob(new Blob([currentBinary.buffer], { type: outputMimeType(outputFormat) }), downloadName);
     } else {
-      if (!outputText) return;
-      saveBlob(new Blob([outputText], { type: outputMimeType(outputFormat) }), downloadName);
+      if (!shownText) return;
+      saveBlob(new Blob([shownText], { type: outputMimeType(outputFormat) }), downloadName);
     }
     setStatus(`Downloaded ${downloadName}.`);
   }
 
   function handleDownloadSchema() {
-    if (binaryOutput.state !== "ready" || !binaryOutput.schema) return;
-    saveBlob(new Blob([binaryOutput.schema], { type: "text/plain;charset=utf-8" }), schemaFileName);
+    if (!currentBinary?.schema) return;
+    saveBlob(new Blob([currentBinary.schema], { type: "text/plain;charset=utf-8" }), schemaFileName);
     setStatus(`Downloaded ${schemaFileName}.`);
   }
 
   function handleEditorChange(nextTable: TableData) {
+    supersedeUpload();
     setHasUserInput(true);
     setTableData(nextTable);
-    const serialized = serializeOutput(inputFormat, nextTable);
-    if (serialized.supported) {
-      setInputText(serialized.text);
+    const asInput = serializeOutput(inputFormat, nextTable);
+    if (asInput.supported) {
+      setInputText(asInput.text);
       setError(null);
     }
   }
@@ -324,6 +354,7 @@ export default function TableConvertDemo({
                   <textarea
                     value={inputText}
                     onChange={(event) => {
+                      supersedeUpload();
                       setHasUserInput(true);
                       setInputText(event.target.value);
                     }}
@@ -374,20 +405,19 @@ export default function TableConvertDemo({
                     size="sm"
                     variant="outline"
                     onClick={handleDownload}
-                    disabled={binary ? binaryOutput.state !== "ready" : !outputText}
+                    disabled={binary ? !currentBinary : !shownText}
                   >
                     Download
                   </Button>
                 </div>
-                {outputNotice && <p className="text-xs text-muted-foreground">{outputNotice}</p>}
+                {shownNotice && <p className="text-xs text-muted-foreground">{shownNotice}</p>}
                 <div className="text-xs text-muted-foreground">{status}</div>
 
                 {binary ? (
                   <BinaryOutputPreview
                     format={outputFormat}
                     label={outputLabel}
-                    output={binaryOutput}
-                    table={tableData}
+                    output={shownBinary}
                     fileName={downloadName}
                     schemaFileName={schemaFileName}
                     onDownloadSchema={handleDownloadSchema}
@@ -399,16 +429,16 @@ export default function TableConvertDemo({
                     {outputView === "raw" ? (
                       <textarea
                         readOnly
-                        value={outputText}
+                        value={shownText}
                         className="min-h-[280px] w-full resize-none rounded-lg border bg-muted/20 px-4 py-3 font-mono text-sm shadow-sm"
                         spellCheck={false}
                       />
                     ) : (
                       <TablePreview
-                        table={tableData}
+                        table={textCurrent ? tableData : null}
                         emptyMessage={outputPreviewMessage}
                         format={outputFormat}
-                        text={outputText}
+                        text={shownText}
                       />
                     )}
                   </>

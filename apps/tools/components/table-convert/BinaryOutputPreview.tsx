@@ -6,12 +6,14 @@ import type { OutputFormat, TableData } from "./types";
 
 // A binary output (Excel, PDF, PNG, JPEG, Avro, Protobuf) as the output
 // panel shows it while lib/convert/table-outputs.ts writes it, and once it's
-// ready to download.
+// ready to download, with the table and format it was written from.
 export type BinaryOutputState =
   | { state: "idle" }
-  | { state: "working" }
+  | { state: "working"; message?: string }
   | {
       state: "ready";
+      table: TableData;
+      format: OutputFormat;
       buffer: ArrayBuffer;
       notice?: string;
       schema?: string;
@@ -25,7 +27,6 @@ type BinaryOutputPreviewProps = {
   format: OutputFormat;
   label: string;
   output: BinaryOutputState;
-  table: TableData | null;
   fileName: string;
   schemaFileName: string;
   onDownloadSchema: () => void;
@@ -48,7 +49,6 @@ export default function BinaryOutputPreview({
   format,
   label,
   output,
-  table,
   fileName,
   schemaFileName,
   onDownloadSchema,
@@ -63,18 +63,21 @@ export default function BinaryOutputPreview({
     );
   } else if (output.state === "working") {
     body = (
-      <div className={`${panel} bg-muted/20 px-4 py-3 text-sm text-muted-foreground`}>Writing the {label} file…</div>
+      <div className={`${panel} bg-muted/20 px-4 py-3 text-sm text-muted-foreground`}>
+        {output.message ?? `Writing the ${label} file…`}
+      </div>
     );
   } else if (output.state === "error") {
     body = (
       <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{output.message}</div>
     );
   } else {
+    const { table } = output;
     const parts = [fileName, formatBytes(output.buffer.byteLength)];
     if (output.pages) parts.push(plural(output.pages, "page"));
     if (output.image) parts.push(`${output.image.width.toLocaleString("en-US")} × ${output.image.height.toLocaleString("en-US")} px`);
-    if (table) parts.push(`${plural(table.rows.length, "row")}, ${plural(table.headers.length, "column")}`);
-    const shown = table && table.rows.length > PREVIEW_ROWS ? { ...table, rows: table.rows.slice(0, PREVIEW_ROWS) } : table;
+    parts.push(`${plural(table.rows.length, "row")}, ${plural(table.headers.length, "column")}`);
+    const shown = table.rows.length > PREVIEW_ROWS ? { ...table, rows: table.rows.slice(0, PREVIEW_ROWS) } : table;
     body = (
       <div className="space-y-3">
         <p className="text-sm font-medium" data-testid="table-output-summary">

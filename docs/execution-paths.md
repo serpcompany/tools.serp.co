@@ -136,7 +136,10 @@ Conversion picks an engine by input format:
   uploaded one (`sales.csv` saves as `sales.json`), or `table.<extension>` for
   pasted text, with its format's media type (`OUTPUT_FILE_TYPES` in
   `components/table-convert/formats.ts`; text is UTF-8, and a format without
-  an extension of its own saves as `.txt`).
+  an extension of its own saves as `.txt`). Download offers only an output
+  written from the input on screen (`components/table-convert/output-state.ts`):
+  while a new file is read and parsed the panel says so, and a file that
+  finishes reading after a newer file or an edit is dropped.
 - **Image to text** (`lib/convert/image-text.ts`): JPG and PNG to TXT is OCR
   with tesseract.js, in the browser. Its worker, SIMD LSTM core and English
   model (4.0.0 best_int) are served from `public/vendor/tesseract/`, and a
