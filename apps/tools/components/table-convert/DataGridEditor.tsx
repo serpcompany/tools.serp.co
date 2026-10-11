@@ -46,6 +46,43 @@ const SCRIPT_MARKER = "data-dgxl-script";
 
 const NO_TABLE = "The editor shows the table once the input reads as one.";
 
+// DataGridXL moves focus into its cell editor a moment after its data
+// changes, and then takes the keys typed anywhere on the page (select all,
+// delete) until a mousedown outside it. So while the visitor types in the
+// input, the keys that follow a change would edit the grid instead. When the
+// page changes the grid's data, focus that was outside the grid goes back
+// there, with a mousedown outside the grid to tell it the visitor isn't in
+// it, unless the visitor reaches for the grid (a pointer or Tab) meanwhile.
+const FOCUS_GUARD_MS = 1000;
+function keepFocusOutside(container: HTMLElement) {
+  const focused = document.activeElement;
+  if (!(focused instanceof HTMLElement) || focused === document.body || container.contains(focused)) return;
+  const stop = () => {
+    window.clearTimeout(timer);
+    container.removeEventListener("focusin", restore);
+    container.removeEventListener("pointerdown", stop, true);
+    document.removeEventListener("keydown", onKey, true);
+  };
+  // Focus goes back to where it came from, once the grid is done focusing
+  // itself.
+  const restore = (event: FocusEvent) => {
+    const from = event.relatedTarget;
+    if (!(from instanceof HTMLElement) || container.contains(from)) return;
+    queueMicrotask(() => {
+      if (!from.isConnected || !container.contains(document.activeElement)) return;
+      from.focus({ preventScroll: true });
+      from.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, view: window }));
+    });
+  };
+  const onKey = (event: KeyboardEvent) => {
+    if (event.key === "Tab") stop();
+  };
+  const timer = window.setTimeout(stop, FOCUS_GUARD_MS);
+  container.addEventListener("focusin", restore);
+  container.addEventListener("pointerdown", stop, true);
+  document.addEventListener("keydown", onKey, true);
+}
+
 const areArraysEqual = (left: string[], right: string[]) =>
   left.length === right.length && left.every((value, index) => value === right[index]);
 
@@ -107,6 +144,7 @@ export default function DataGridEditor({ tableData, origin, onChange }: DataGrid
       }
       removeGrid();
       syncingRef.current = true;
+      keepFocusOutside(container);
       const grid = new DataGridXL(containerId, {
         data: tableDataToObjects(nextData),
       });
@@ -209,6 +247,8 @@ export default function DataGridEditor({ tableData, origin, onChange }: DataGrid
     }
 
     syncingRef.current = true;
+    const container = document.getElementById(containerId);
+    if (container) keepFocusOutside(container);
     const currentRows = currentTable.rows.length;
     const currentCols = currentTable.headers.length;
     const nextRows = tableData.rows.length;
@@ -229,7 +269,7 @@ export default function DataGridEditor({ tableData, origin, onChange }: DataGrid
     }
     shownOriginRef.current = origin;
     syncingRef.current = false;
-  }, [initializeGrid, removeGrid, tableData, origin]);
+  }, [containerId, initializeGrid, removeGrid, tableData, origin]);
 
   return (
     <div className="space-y-3">
