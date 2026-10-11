@@ -137,13 +137,15 @@ Conversion picks an engine by input format:
   uploaded one (`sales.csv` saves as `sales.json`), or `table.<extension>` for
   pasted text, with its format's media type (`OUTPUT_FILE_TYPES` in
   `components/table-convert/formats.ts`; text is UTF-8, and a format without
-  an extension of its own saves as `.txt`). Download offers only an output
-  written from the input on screen (`components/table-convert/output-state.ts`):
-  while a new file is read and parsed the panel says so, and a file that
-  finishes reading after a newer file or an edit is dropped. A file's name is
-  taken only once its text is in the input, and while the input has an error
-  (an input format the page can't read yet) choosing another input format
-  re-parses the text on screen instead of rewriting it from the last table.
+  an extension of its own saves as `.txt`). The name and the output always
+  describe the same table: every change to the input, the table on screen and
+  the name goes through one reducer (`components/table-convert/output-state.ts`).
+  A file's name is taken only in the update that parses its text into the
+  table; typing, a grid edit or another input format keeps the name that table
+  had; a read or parse that fails clears the table, the grid and the name.
+  Download offers only an output written from the table on screen, and
+  nothing while a file is read; a read that finishes after a newer file or an
+  edit, and a grid edit made on an earlier table, are dropped.
 - **Image to text** (`lib/convert/image-text.ts`): JPG and PNG to TXT is OCR
   with tesseract.js, in the browser. Its worker, SIMD LSTM core and English
   model (4.0.0 best_int) are served from `public/vendor/tesseract/`, and a
