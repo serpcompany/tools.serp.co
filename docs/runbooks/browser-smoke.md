@@ -22,6 +22,10 @@ against a running Worker. CI runs it in two places:
   telemetry request.
 - A telemetry request with `Sec-GPC: 1` gets a 204 (the route returns before
   storing anything).
+- The Worker serves the self-hosted PDF font
+  (`/vendor/fonts/dejavu/DejaVuSans.ttf`) with a font type and the bytes in
+  `public/`. Table pages load it only for text outside Windows-1252, which no
+  sweep fixture has.
 - A dynamic Tool page requested with a Chrome user agent has its `<title>`,
   meta description and `rel=canonical` in `<head>`, not streamed into
   `<body>`.

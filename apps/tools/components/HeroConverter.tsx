@@ -165,7 +165,8 @@ export default function HeroConverter({
             name: file.name,
             progress: 100,
             status: 'completed',
-            message: 'Conversion complete!'
+            message: 'Conversion complete!',
+            notice: result.notice,
           });
 
           run.finishSuccess({ outputBytes: result.buffer.byteLength });

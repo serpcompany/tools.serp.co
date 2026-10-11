@@ -12,6 +12,7 @@ interface VideoProgressProps {
   progress: number;
   status: ProgressStatus;
   message?: string;
+  notice?: string;
   completedLabel?: string;
 }
 
@@ -20,6 +21,7 @@ export function VideoProgress({
   progress,
   status,
   message,
+  notice,
   completedLabel,
 }: VideoProgressProps) {
   const getStatusIcon = () => {
@@ -78,6 +80,12 @@ export function VideoProgress({
             <span>Processing file...</span>
             <span>{Math.round(progress)}%</span>
           </div>
+        )}
+
+        {notice && (
+          <p className="text-xs text-amber-700" data-testid="tool-result-notice">
+            {notice}
+          </p>
         )}
       </div>
     </Card>

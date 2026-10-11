@@ -11,7 +11,11 @@ import { resolveCompressionTarget } from "../../lib/compression-utils.ts";
 import { MAGICK_BROWSER_INPUTS } from "../../lib/convert/magickBrowser.ts";
 import { checkOutputFormat } from "../../lib/convert/output-format.ts";
 import { usesWebCodecs } from "../../lib/convert/webcodecs.ts";
-import { isImageDocumentConversion, isImageTextConversion } from "../../lib/convert/image-document-targets.ts";
+import {
+  isImageDocumentConversion,
+  isImageTextConversion,
+  isTableImageConversion,
+} from "../../lib/convert/image-document-targets.ts";
 
 export const STATUSES = ["pass", "wrong_format", "error", "timeout", "no_fixture", "skipped"];
 // Statuses that come from running the Tool. A resumed run skips Tools that
@@ -202,6 +206,7 @@ export function converterEngine({ operation, from, to }) {
   if (source === "ai" || source === "pdf") return "pdfjs";
   if (isImageDocumentConversion(source, target)) return "image-documents";
   if (isImageTextConversion(source, target)) return target === "txt" ? "tesseract" : "docx";
+  if (isTableImageConversion(source, target)) return "table-outputs";
   if (MAGICK_BROWSER_INPUTS.has(source)) return "imagemagick-wasm";
   if (source === "heic" || source === "heif") return "heif-decoder";
   if (usesWebCodecs(source, target)) return "ffmpeg-wasm + webcodecs";
@@ -240,6 +245,7 @@ export const ENGINE_LOCATIONS = {
   tesseract: "client-only",
   docx: "client-only",
   "image-pdf": "client-only",
+  "table-outputs": "client-only",
   svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",
@@ -265,6 +271,13 @@ const TEXT_MARKERS = {
   "sample.xlsx": "Alpha",
 };
 const TEXT_DRIVERS = new Set(["table", "html-to-markdown", "json-to-csv", "csv-combiner"]);
+
+// Table outputs the page writes as files (lib/convert/table-outputs.ts)
+// rather than as text in its output panel. The sweep opens each one and
+// looks for the fixture's data in what it reads (decodeTableOutput); PNG and
+// JPEG are checked as images instead.
+export const TABLE_FILE_OUTPUTS = new Set(["excel", "pdf", "png", "jpeg", "avro", "protobuf"]);
+const DECODED_TABLE_OUTPUTS = new Set(["excel", "pdf", "avro", "protobuf"]);
 
 // Fixtures whose picture is a single colour when read back natively (most
 // are 96x96 solid blue; a video's first frame, with FFmpeg). An image output
@@ -314,8 +327,11 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
     return { ...base, status: "no_fixture", reason: `no ready ${tool.from} fixture in fixture-matrix.json` };
   }
   // A text output has no byte signature: without the fixture's data to look
-  // for, a pass would prove nothing.
-  const textOutput = TEXT_DRIVERS.has(driver) || tool.to?.toLowerCase() === "txt";
+  // for, a pass would prove nothing. An image can't be searched for text;
+  // its pixels are checked instead.
+  const target = tool.to?.toLowerCase();
+  const tableFile = driver === "table" && TABLE_FILE_OUTPUTS.has(target);
+  const textOutput = (TEXT_DRIVERS.has(driver) && !checksPixels(target)) || target === "txt";
   const markers = textOutput ? files.map((file) => TEXT_MARKERS[path.basename(file)]) : [];
   if (markers.some((marker) => !marker)) {
     return { ...base, status: "no_fixture", reason: `no data marker for the ${tool.from} fixture in TEXT_MARKERS` };
@@ -327,6 +343,8 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
     fixtures: files,
     markers,
     pixelCheck: checksPixels(tool.to) && !files.some((file) => ONE_COLOUR_FIXTURES.has(path.basename(file))),
+    tableFile,
+    decode: tableFile && DECODED_TABLE_OUTPUTS.has(target),
     compress: tool.operation === "compress" || tool.operation === "bulk",
     timeoutMs: slow ? ffmpegTimeoutMs : timeoutMs,
   };
@@ -457,12 +475,15 @@ function formatName(format) {
 //   outcome: completed | failed | timeout | error
 //   message: what the page showed (or the harness error)
 //   errorCode: the tool_run_failed telemetry code, when one was sent
-//   outputs: [{ name, size, head: number[] (first bytes), text?, pixels? }]
+//   outputs: [{ name, size, head: number[] (first bytes), text?, pixels?, decoded? }]
 //     pixels: measurePixels' result (null for a format it doesn't decode), or
 //     { error } when the image didn't decode
-// A plan with pixelCheck needs every output measured: an output the sweep
-// never read the bytes of fails, rather than passing unchecked.
-export function classifyRun(observation, { to, markers = [], pixelCheck = false }) {
+//     decoded: decodeTableOutputs' result, { text } read from the file, or
+//     { error } when it didn't open
+// A plan with pixelCheck needs every output measured, and one with decode
+// every output opened: an output the sweep never read the bytes of fails,
+// rather than passing unchecked.
+export function classifyRun(observation, { to, markers = [], pixelCheck = false, decode = false }) {
   const message = observation.message?.trim() || null;
   if (observation.outcome === "timeout") {
     return { status: "timeout", error: message ?? "no result before the timeout" };
@@ -491,8 +512,24 @@ export function classifyRun(observation, { to, markers = [], pixelCheck = false 
       };
     }
   }
-  const formatCheck = hasSignature(to) ? "signature" : markers.length ? "content" : "none";
-  const missing = markers.filter((marker) => !outputs.some((output) => output.text?.includes(marker)));
+  const formatCheck = decode ? "decoded" : hasSignature(to) ? "signature" : markers.length ? "content" : "none";
+  if (decode) {
+    const unopened = outputs.find((output) => output.decoded === undefined);
+    if (unopened) {
+      return {
+        status: "error",
+        error: `harness: the sweep didn't open the saved file (${unopened.name}), so it couldn't check what it holds`,
+        formatCheck,
+      };
+    }
+    const broken = outputs.find((output) => output.decoded.error);
+    if (broken) {
+      return { status: "error", error: `saved a file that doesn't open (${broken.name}): ${broken.decoded.error}`, formatCheck };
+    }
+  }
+  const missing = markers.filter(
+    (marker) => !outputs.some((output) => (decode ? output.decoded.text : output.text)?.includes(marker)),
+  );
   if (missing.length) {
     return {
       status: "error",
@@ -525,6 +562,86 @@ export function classifyRun(observation, { to, markers = [], pixelCheck = false 
   // How close the least varied output came to blank, for later audits.
   const topColourShare = Math.max(...measured.map(({ pixels }) => Math.floor(pixels.share * 10_000) / 10_000));
   return { status: "pass", error: null, formatCheck, topColourShare };
+}
+
+// Opens a table output the way a visitor's app would, and returns the text it
+// holds: an XLSX's cells (a ZIP with a workbook and a worksheet), a PDF's
+// text (pdf.js, at least one page), an Avro container's records, or a
+// Protobuf Table's rows, decoded with the .proto the page saved beside it.
+// Throws when the file doesn't open.
+export async function decodeTableOutput(format, bytes, { schema = null } = {}) {
+  const data = new Uint8Array(bytes);
+  if (format === "excel") {
+    const { unzipSync, strFromU8 } = await import("fflate");
+    const files = unzipSync(data);
+    const sheets = Object.keys(files).filter((name) => /^xl\/worksheets\/[^/]+\.xml$/.test(name));
+    if (!files["xl/workbook.xml"] || !sheets.length) throw new Error("no workbook or worksheet in the ZIP");
+    const xml = [files["xl/sharedStrings.xml"], ...sheets.map((name) => files[name])].filter(Boolean).map(strFromU8);
+    const entities = { lt: "<", gt: ">", quot: '"', apos: "'", amp: "&" };
+    const values = xml.flatMap((part) =>
+      [...part.matchAll(/<(?:t|v)(?:\s[^>]*)?>([^<]*)<\/(?:t|v)>/g)].map((match) =>
+        match[1].replace(/&(lt|gt|quot|apos|amp);/g, (_, name) => entities[name]),
+      ),
+    );
+    return { text: values.join("\n") };
+  }
+  if (format === "pdf") {
+    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    const task = pdfjs.getDocument({ data, verbosity: 0 });
+    try {
+      const doc = await task.promise;
+      if (!doc.numPages) throw new Error("the PDF has no pages");
+      const pages = [];
+      for (let number = 1; number <= Math.min(doc.numPages, 20); number += 1) {
+        const content = await (await doc.getPage(number)).getTextContent();
+        pages.push(content.items.map((item) => item.str).join(" "));
+      }
+      return { text: pages.join("\n") };
+    } finally {
+      await task.destroy();
+    }
+  }
+  if (format === "avro") {
+    const avro = (await import("avsc")).default;
+    const records = await new Promise((resolve, reject) => {
+      const decoder = new avro.streams.BlockDecoder();
+      const rows = [];
+      decoder.on("data", (record) => rows.push(record));
+      decoder.on("end", () => resolve(rows));
+      decoder.on("error", reject);
+      decoder.end(Buffer.from(data));
+    });
+    if (!records.length) throw new Error("the Avro file holds no records");
+    return { text: JSON.stringify(records) };
+  }
+  if (format === "protobuf") {
+    if (!schema) throw new Error("no .proto was saved with the .pb");
+    const protobuf = (await import("protobufjs")).default;
+    const Table = protobuf.parse(schema, { keepCase: true }).root.lookupType("Table");
+    const { rows = [] } = Table.toObject(Table.decode(data));
+    if (!rows.length) throw new Error("the Table message holds no rows");
+    return { text: JSON.stringify(rows) };
+  }
+  throw new Error(`no decoder for ${format}`);
+}
+
+// Opens each saved table file (decodeTableOutput) and records what it holds
+// as output.decoded. A Protobuf run saves two files: the .pb, decoded with
+// the .proto beside it, and the .proto, which is read by that decoding.
+// `outputs` carry each file's bytes as base64.
+export async function decodeTableOutputs(outputs, format) {
+  const files = outputs.map((output) => ({ output, bytes: Buffer.from(output.base64 ?? "", "base64") }));
+  const proto = files.find(({ output }) => output.name.endsWith(".proto"));
+  const schema = proto ? proto.bytes.toString("utf8") : null;
+  for (const { output, bytes } of files) {
+    if (output === proto?.output) continue;
+    try {
+      output.decoded = await decodeTableOutput(format, bytes, { schema });
+    } catch (error) {
+      output.decoded = { error: String(error?.message ?? error).split("\n")[0] };
+    }
+  }
+  if (proto) proto.output.decoded = { text: schema };
 }
 
 // A text driver that waited for the fixture's data and gave up: an output

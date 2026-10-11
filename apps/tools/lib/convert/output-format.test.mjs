@@ -62,3 +62,17 @@ test("an .av1 must be AV1 in IVF and an .hevc a raw H.265 stream, not an MP4 nam
   // A three-byte start code and an access unit delimiter first are both fine.
   assert.equal(checkOutputFormat(bytes(0, 0, 1, 0x46, 0x01, 0x50), "hevc").ok, true);
 });
+
+test("an Excel output must be an XLSX workbook, and an Avro output an object container file", () => {
+  const xlsx = read("sample.xlsx");
+  assert.deepEqual(checkOutputFormat(xlsx, "xlsx"), { ok: true });
+  assert.deepEqual(checkOutputFormat(xlsx, "excel"), { ok: true });
+  assert.deepEqual(checkOutputFormat(xlsx, "docx"), { ok: true }, "any Office file passes as DOCX, as before");
+  // A ZIP with [Content_Types].xml but no workbook part, such as a DOCX.
+  const docx = new TextEncoder().encode("PK\x03\x04....[Content_Types].xml....word/document.xml").buffer;
+  assert.equal(checkOutputFormat(docx, "excel").ok, false);
+  assert.deepEqual(checkOutputFormat(read("sample.pdf"), "excel"), { ok: false, expected: "excel", detected: "pdf" });
+  assert.deepEqual(checkOutputFormat(new Uint8Array([0x4f, 0x62, 0x6a, 0x01, 4, 0x14]).buffer, "avro"), { ok: true });
+  assert.equal(checkOutputFormat(new TextEncoder().encode("Obj\x02").buffer, "avro").ok, false);
+  assert.equal(checkOutputFormat(new TextEncoder().encode('{"name":"Alpha"}').buffer, "avro").ok, false);
+});

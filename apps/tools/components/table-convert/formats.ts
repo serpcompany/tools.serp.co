@@ -1,4 +1,4 @@
-import { FormatOption, InputFormat, TableData } from "./types";
+import type { FormatOption, InputFormat, OutputFormat, TableData } from "./types.ts";
 
 export const INPUT_FORMATS: FormatOption[] = [
   { value: "csv", label: "CSV" },
@@ -53,6 +53,81 @@ export const OUTPUT_FORMATS: FormatOption[] = [
   { value: "png", label: "PNG" },
   { value: "jpeg", label: "JPEG" },
 ];
+
+// What each output saves as: the file extension and its media type. A format
+// with no usual extension of its own saves as .txt.
+const TEXT = "text/plain";
+export const OUTPUT_FILE_TYPES: Record<OutputFormat, { extension: string; mimeType: string }> = {
+  json: { extension: "json", mimeType: "application/json" },
+  jsonlines: { extension: "jsonl", mimeType: "application/jsonl" },
+  csv: { extension: "csv", mimeType: "text/csv" },
+  markdown: { extension: "md", mimeType: "text/markdown" },
+  html: { extension: "html", mimeType: "text/html" },
+  sql: { extension: "sql", mimeType: "application/sql" },
+  mysql: { extension: "sql", mimeType: "application/sql" },
+  xml: { extension: "xml", mimeType: "application/xml" },
+  yaml: { extension: "yaml", mimeType: "application/yaml" },
+  latex: { extension: "tex", mimeType: "application/x-tex" },
+  // The extension this page reads back as MediaWiki.
+  mediawiki: { extension: "wiki", mimeType: TEXT },
+  ascii: { extension: "txt", mimeType: TEXT },
+  asciidoc: { extension: "adoc", mimeType: TEXT },
+  bbcode: { extension: "txt", mimeType: TEXT },
+  jira: { extension: "txt", mimeType: TEXT },
+  textile: { extension: "textile", mimeType: TEXT },
+  tracwiki: { extension: "txt", mimeType: TEXT },
+  restructuredtext: { extension: "rst", mimeType: "text/x-rst" },
+  ini: { extension: "ini", mimeType: TEXT },
+  toml: { extension: "toml", mimeType: "application/toml" },
+  php: { extension: "php", mimeType: "application/x-httpd-php" },
+  ruby: { extension: "rb", mimeType: "text/x-ruby" },
+  actionscript: { extension: "as", mimeType: TEXT },
+  asp: { extension: "asp", mimeType: TEXT },
+  matlab: { extension: "m", mimeType: "text/x-matlab" },
+  pandasdataframe: { extension: "py", mimeType: "text/x-python" },
+  rdataframe: { extension: "R", mimeType: "text/x-r" },
+  dax: { extension: "dax", mimeType: TEXT },
+  // A Qlik load script.
+  qlik: { extension: "qvs", mimeType: TEXT },
+  firebase: { extension: "json", mimeType: "application/json" },
+  // N-Triples.
+  rdf: { extension: "nt", mimeType: "application/n-triples" },
+  avro: { extension: "avro", mimeType: "application/avro" },
+  protobuf: { extension: "pb", mimeType: "application/x-protobuf" },
+  excel: { extension: "xlsx", mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+  pdf: { extension: "pdf", mimeType: "application/pdf" },
+  png: { extension: "png", mimeType: "image/png" },
+  jpeg: { extension: "jpeg", mimeType: "image/jpeg" },
+};
+
+// Outputs written as files by lib/convert/table-outputs.ts rather than as
+// text in the output panel.
+export const BINARY_OUTPUT_FORMATS: ReadonlySet<OutputFormat> = new Set([
+  "avro",
+  "protobuf",
+  "excel",
+  "pdf",
+  "png",
+  "jpeg",
+]);
+
+export function isBinaryOutput(format: OutputFormat): boolean {
+  return BINARY_OUTPUT_FORMATS.has(format);
+}
+
+// The media type a download is saved with; text is UTF-8.
+export function outputMimeType(format: OutputFormat): string {
+  const { mimeType } = OUTPUT_FILE_TYPES[format];
+  return isBinaryOutput(format) ? mimeType : `${mimeType};charset=utf-8`;
+}
+
+// A download is named after the uploaded file (sales.csv saves as
+// sales.json), or "table" for pasted text. `extension` overrides the
+// format's, as for the .proto saved beside a .pb.
+export function outputFileName(sourceName: string | null, format: OutputFormat, extension?: string): string {
+  const base = (sourceName ?? "").replace(/\.[^.]*$/, "").trim() || "table";
+  return `${base}.${extension ?? OUTPUT_FILE_TYPES[format].extension}`;
+}
 
 export const SAMPLE_TABLE: TableData = {
   headers: Array.from({ length: 10 }, (_, index) => `Column ${index + 1}`),

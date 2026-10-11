@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import {
   Card,
@@ -13,6 +13,7 @@ import {
 import { Badge } from "@serp-tools/ui/components/badge";
 import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
+import BinaryOutputPreview, { type BinaryOutputState } from "@/components/table-convert/BinaryOutputPreview";
 import DataGridEditor from "@/components/table-convert/DataGridEditor";
 import FormatTabs from "@/components/table-convert/FormatTabs";
 import TablePreview from "@/components/table-convert/TablePreview";
@@ -24,9 +25,19 @@ import {
   detectFormatFromFile,
   getLabel,
   getPlaceholder,
+  isBinaryOutput,
+  outputFileName,
+  outputMimeType,
 } from "@/components/table-convert/formats";
 import { parseInput, serializeOutput } from "@/components/table-convert/convert";
+import {
+  initialTablePage,
+  offeredDownload,
+  tablePageReducer,
+  type TablePageEvent,
+} from "@/components/table-convert/output-state";
 import { InputFormat, OutputFormat, TableData, ViewMode } from "@/components/table-convert/types";
+import type { BinaryTableFormat } from "@/lib/convert/table-outputs";
 
 type TableConvertDemoProps = {
   initialInputFormat?: InputFormat;
@@ -36,6 +47,12 @@ type TableConvertDemoProps = {
 };
 
 const DEFAULT_TABLE: TableData = SAMPLE_TABLE;
+// How long edits settle before a binary output is written again.
+const BINARY_DELAY_MS = 300;
+
+// The input, the table on screen and the name downloads take change only
+// here, together (output-state.ts).
+const nextTablePage = tablePageReducer({ parse: parseInput, serialize: serializeOutput, placeholder: DEFAULT_TABLE });
 
 export default function TableConvertDemo({
   initialInputFormat = "csv",
@@ -44,142 +61,205 @@ export default function TableConvertDemo({
   subtitle = "Paste or upload on the left, convert to a target format, and preview on the right.",
 }: TableConvertDemoProps) {
   const fileRef = useRef<HTMLInputElement | null>(null);
-  const [inputFormat, setInputFormat] = useState<InputFormat>(initialInputFormat);
+  const [page, dispatch] = useReducer(nextTablePage, initialInputFormat, (format: InputFormat) =>
+    initialTablePage(format, DEFAULT_TABLE),
+  );
+  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload } = page;
   const [outputFormat, setOutputFormat] = useState<OutputFormat>(initialOutputFormat);
   const [inputView, setInputView] = useState<ViewMode>("raw");
   const [outputView, setOutputView] = useState<ViewMode>("raw");
-  const [inputText, setInputText] = useState("");
-  const [outputText, setOutputText] = useState(
-    () => serializeOutput(initialOutputFormat, DEFAULT_TABLE).text
-  );
-  const [outputNotice, setOutputNotice] = useState<string | null>(null);
-  const [tableData, setTableData] = useState<TableData | null>(DEFAULT_TABLE);
-  const [error, setError] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
+  const [binaryOutput, setBinaryOutput] = useState<BinaryOutputState>({ state: "idle" });
   const [status, setStatus] = useState<string>("Auto-convert is on.");
   const [dragActive, setDragActive] = useState(false);
-  const [hasUserInput, setHasUserInput] = useState(false);
+  // Numbers each upload, so a read that finishes after a newer upload or an
+  // edit is dropped.
+  const tickets = useRef(0);
+  // Whether the change being made to the input replaces all of its text (a
+  // paste or typing over a select-all, or deleting it all), from the
+  // selection just before it. That text is the visitor's own, so a download
+  // of it is table.<extension>, not the uploaded file's name.
+  const replacesInput = useRef(false);
+  const watchInput = useCallback((textarea: HTMLTextAreaElement | null) => {
+    if (!textarea) return;
+    const beforeChange = () => {
+      replacesInput.current = textarea.selectionStart === 0 && textarea.selectionEnd === textarea.value.length;
+    };
+    textarea.addEventListener("beforeinput", beforeChange);
+    return () => textarea.removeEventListener("beforeinput", beforeChange);
+  }, []);
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);
   const outputLabel = getLabel(OUTPUT_FORMATS, outputFormat);
+  const binary = isBinaryOutput(outputFormat);
+  const downloadName = outputFileName(fileName, outputFormat);
+  const schemaFileName = outputFileName(fileName, "protobuf", "proto");
   const inputPreviewMessage = error ?? "Rendered input preview will appear here.";
+  // The file being read, or the one the input's text came from: the name a
+  // download takes.
+  const selectedName = upload?.name ?? fileName;
+
+  // A text output is serialized from the table on screen as it renders, so
+  // it can't lag behind it; binary outputs are written separately, below.
+  const serialized = useMemo(
+    () => (tableData && !isBinaryOutput(outputFormat) ? serializeOutput(outputFormat, tableData) : null),
+    [tableData, outputFormat],
+  );
+  const outputNotice = !tableData || error
+    ? "Waiting for valid input."
+    : serialized && !serialized.supported
+      ? serialized.notice ?? null
+      : null;
+
+  // Only an output written from the table on screen is shown and offered for
+  // download, under the name of the file that table came from: not while a
+  // file is read, nor while the input has an error.
+  const textOffer = offeredDownload(
+    page,
+    outputFormat,
+    tableData && serialized ? { table: tableData, format: outputFormat, text: serialized.text } : null,
+  );
+  const binaryOffer = offeredDownload(page, outputFormat, binaryOutput.state === "ready" ? binaryOutput : null);
+  const shownText = textOffer?.output.text ?? "";
+  const currentBinary = binaryOffer?.output ?? null;
+  const shownBinary: BinaryOutputState = upload
+    ? { state: "working", message: `Reading ${upload.name}…` }
+    : binaryOutput.state === "ready" && !currentBinary
+      ? { state: "working" }
+      : binaryOutput;
+  const shownNotice = upload && !binary ? `Reading ${upload.name}…` : outputNotice;
   const outputPreviewMessage =
-    outputNotice ??
-    (tableData ? "Rendered output preview will appear here." : "Waiting for valid input.");
+    shownNotice ?? (tableData ? "Rendered output preview will appear here." : "Waiting for valid input.");
 
   useEffect(() => {
-    if (!hasUserInput && !inputText.trim()) {
-      setError(null);
-      setTableData(DEFAULT_TABLE);
-      return;
-    }
-    const result = parseInput(inputFormat, inputText);
-    if (!result.supported) {
-      setError(result.error ?? "Input format not supported.");
-      return;
-    }
-    if (!result.table) {
-      setTableData(null);
-      setError(result.error ?? null);
-      return;
-    }
-    setError(null);
-    setTableData(result.table);
-  }, [hasUserInput, inputText, inputFormat]);
+    if (tableData) setStatus(`Auto-converting ${inputLabel} to ${outputLabel}.`);
+  }, [tableData, inputLabel, outputLabel]);
 
+  // A binary output is written once edits settle, with its library loaded
+  // only now; never for the placeholder table a page opens with, nor while
+  // the input has no table.
   useEffect(() => {
-    if (!tableData) {
-      setOutputText("");
-      setOutputNotice("Waiting for valid input.");
+    if (!isBinaryOutput(outputFormat)) return;
+    if (!tableData || !hasUserInput || error) {
+      setBinaryOutput({ state: "idle" });
       return;
     }
-    const serialized = serializeOutput(outputFormat, tableData);
-    setOutputText(serialized.text);
-    setOutputNotice(serialized.supported ? null : serialized.notice ?? null);
-    setStatus(`Auto-converting ${inputLabel} to ${outputLabel}.`);
-  }, [tableData, outputFormat, inputLabel, outputLabel]);
+    let cancelled = false;
+    setBinaryOutput({ state: "working" });
+    const timer = window.setTimeout(async () => {
+      try {
+        const { writeTableOutput } = await import("@/lib/convert/table-outputs");
+        const output = await writeTableOutput(outputFormat as BinaryTableFormat, tableData);
+        if (cancelled) return;
+        const previewUrl =
+          outputFormat === "png" || outputFormat === "jpeg"
+            ? URL.createObjectURL(new Blob([output.buffer], { type: outputMimeType(outputFormat) }))
+            : undefined;
+        setBinaryOutput({ state: "ready", ...output, previewUrl, table: tableData, format: outputFormat });
+      } catch (writeError) {
+        if (cancelled) return;
+        setBinaryOutput({
+          state: "error",
+          message: writeError instanceof Error ? writeError.message : String(writeError),
+        });
+      }
+    }, BINARY_DELAY_MS);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [outputFormat, tableData, hasUserInput, error]);
 
-  function handleInputFormatChange(nextFormat: InputFormat, reserialize = true) {
-    if (nextFormat === inputFormat) return;
-    setInputFormat(nextFormat);
-    if (!tableData || !reserialize || !hasUserInput) return;
-    const serialized = serializeOutput(nextFormat, tableData);
-    if (serialized.supported) {
-      setInputText(serialized.text);
-      setError(null);
-    }
-  }
+  // An image preview's blob URL is released when the image is replaced.
+  useEffect(() => {
+    const url = binaryOutput.state === "ready" ? binaryOutput.previewUrl : undefined;
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [binaryOutput]);
 
   function handleUploadClick() {
     fileRef.current?.click();
   }
 
-  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const detected = detectFormatFromFile(file);
-    if (detected && detected !== inputFormat) {
-      handleInputFormatChange(detected, false);
+  // Until a chosen or dropped file is read and parsed, the output panel says
+  // it's being read and offers nothing to download. Typing, pasting, editing
+  // the grid, clearing or a newer file wins over it (its read is dropped).
+  async function loadFile(file: File) {
+    const ticket = ++tickets.current;
+    dispatch({ type: "upload", name: file.name, ticket });
+    let event: TablePageEvent;
+    try {
+      event = { type: "read", ticket, text: await file.text(), format: detectFormatFromFile(file) };
+    } catch (readError) {
+      const reason = readError instanceof Error ? readError.message : String(readError);
+      event = { type: "readFailed", ticket, error: `${file.name} couldn't be read: ${reason}` };
     }
-    setFileName(file.name);
-    setHasUserInput(true);
-    const text = await file.text();
-    setInputText(text);
-    setStatus(`Loaded ${file.name}.`);
+    dispatch(event);
   }
 
-  async function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    // Choosing the same file again (after a failed read, say) fires change
+    // again only once the input is emptied.
+    event.target.value = "";
+    if (file) void loadFile(file);
+  }
+
+  function handleDrop(event: React.DragEvent<HTMLDivElement>) {
     event.preventDefault();
     setDragActive(false);
     const file = event.dataTransfer.files?.[0];
-    if (!file) return;
-    const detected = detectFormatFromFile(file);
-    if (detected && detected !== inputFormat) {
-      handleInputFormatChange(detected, false);
-    }
-    setFileName(file.name);
-    setHasUserInput(true);
-    const text = await file.text();
-    setInputText(text);
-    setStatus(`Loaded ${file.name}.`);
+    if (file) void loadFile(file);
   }
 
   function handleClear() {
-    setInputText("");
-    setFileName(null);
-    setError(null);
-    setHasUserInput(false);
-    setTableData(DEFAULT_TABLE);
-    setOutputText(serializeOutput(outputFormat, DEFAULT_TABLE).text);
-    setOutputNotice(null);
+    dispatch({ type: "clear" });
     setStatus("Cleared current view.");
   }
 
+  // Protobuf's copyable text is its .proto schema; other binary outputs have
+  // none.
+  const copyText = binary ? currentBinary?.schema ?? "" : shownText;
+
   async function handleCopyOutput() {
-    if (!outputText) return;
+    if (!copyText) return;
     try {
-      await navigator.clipboard.writeText(outputText);
+      await navigator.clipboard.writeText(copyText);
       setStatus(`Copied ${outputLabel} output.`);
     } catch {
       setStatus("Copy failed.");
     }
   }
 
+  // Saves the output under the name of the file the input's text came from
+  // (sales.csv becomes sales.json), or table.<extension> for pasted text. A
+  // binary output was checked against its format's signature when it was
+  // written.
   function handleDownload() {
-    if (!outputText) return;
-    const blob = new Blob([outputText], { type: "text/plain" });
-    saveBlob(blob, `tableconvert-demo.${outputFormat}.txt`);
-    setStatus(`Downloaded ${outputLabel} output.`);
+    const mimeType = outputMimeType(outputFormat);
+    let name: string;
+    if (binary) {
+      if (!binaryOffer) return;
+      saveBlob(new Blob([binaryOffer.output.buffer], { type: mimeType }), binaryOffer.name);
+      name = binaryOffer.name;
+    } else {
+      if (!textOffer?.output.text) return;
+      saveBlob(new Blob([textOffer.output.text], { type: mimeType }), textOffer.name);
+      name = textOffer.name;
+    }
+    setStatus(`Downloaded ${name}.`);
   }
 
-  function handleEditorChange(nextTable: TableData) {
-    setHasUserInput(true);
-    setTableData(nextTable);
-    const serialized = serializeOutput(inputFormat, nextTable);
-    if (serialized.supported) {
-      setInputText(serialized.text);
-      setError(null);
-    }
+  function handleDownloadSchema() {
+    if (!currentBinary?.schema) return;
+    saveBlob(new Blob([currentBinary.schema], { type: "text/plain;charset=utf-8" }), schemaFileName);
+    setStatus(`Downloaded ${schemaFileName}.`);
+  }
+
+  // The grid reports which table it was showing; an edit of an earlier table
+  // is dropped.
+  function handleEditorChange(nextTable: TableData, editedOrigin: number) {
+    dispatch({ type: "editGrid", table: nextTable, origin: editedOrigin });
   }
 
   return (
@@ -220,7 +300,7 @@ export default function TableConvertDemo({
                   badgeLabel={inputLabel}
                   options={INPUT_FORMATS}
                   value={inputFormat}
-                  onChange={(value) => handleInputFormatChange(value as InputFormat)}
+                  onChange={(value) => dispatch({ type: "inputFormat", format: value as InputFormat })}
                 />
 
                 <div className="flex flex-wrap items-center gap-2">
@@ -231,9 +311,7 @@ export default function TableConvertDemo({
                     Clear view
                   </Button>
                   <input ref={fileRef} type="file" onChange={handleFileChange} className="hidden" />
-                  {fileName && (
-                    <span className="text-xs text-muted-foreground">Selected: {fileName}</span>
-                  )}
+                  {selectedName && <span className="text-xs text-muted-foreground">Selected: {selectedName}</span>}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Drag and drop a file anywhere in this panel to load it.
@@ -243,10 +321,11 @@ export default function TableConvertDemo({
 
                 {inputView === "raw" ? (
                   <textarea
+                    ref={watchInput}
                     value={inputText}
                     onChange={(event) => {
-                      setHasUserInput(true);
-                      setInputText(event.target.value);
+                      dispatch({ type: "type", text: event.target.value, replacesInput: replacesInput.current });
+                      replacesInput.current = false;
                     }}
                     placeholder={getPlaceholder(inputFormat)}
                     className={`min-h-[280px] w-full resize-none rounded-lg border bg-background px-4 py-3 font-mono text-sm shadow-sm focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
@@ -288,32 +367,50 @@ export default function TableConvertDemo({
                 />
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Button size="sm" variant="outline" onClick={handleCopyOutput}>
+                  <Button size="sm" variant="outline" onClick={handleCopyOutput} disabled={!copyText}>
                     Copy
                   </Button>
-                  <Button size="sm" variant="outline" onClick={handleDownload}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleDownload}
+                    disabled={binary ? !currentBinary : !shownText}
+                  >
                     Download
                   </Button>
                 </div>
-                {outputNotice && <p className="text-xs text-muted-foreground">{outputNotice}</p>}
+                {shownNotice && <p className="text-xs text-muted-foreground">{shownNotice}</p>}
                 <div className="text-xs text-muted-foreground">{status}</div>
 
-                <ViewToggle value={outputView} onChange={setOutputView} />
-
-                {outputView === "raw" ? (
-                  <textarea
-                    readOnly
-                    value={outputText}
-                    className="min-h-[280px] w-full resize-none rounded-lg border bg-muted/20 px-4 py-3 font-mono text-sm shadow-sm"
-                    spellCheck={false}
+                {binary ? (
+                  <BinaryOutputPreview
+                    format={outputFormat}
+                    label={outputLabel}
+                    output={shownBinary}
+                    fileName={downloadName}
+                    schemaFileName={schemaFileName}
+                    onDownloadSchema={handleDownloadSchema}
                   />
                 ) : (
-                  <TablePreview
-                    table={tableData}
-                    emptyMessage={outputPreviewMessage}
-                    format={outputFormat}
-                    text={outputText}
-                  />
+                  <>
+                    <ViewToggle value={outputView} onChange={setOutputView} />
+
+                    {outputView === "raw" ? (
+                      <textarea
+                        readOnly
+                        value={shownText}
+                        className="min-h-[280px] w-full resize-none rounded-lg border bg-muted/20 px-4 py-3 font-mono text-sm shadow-sm"
+                        spellCheck={false}
+                      />
+                    ) : (
+                      <TablePreview
+                        table={textOffer ? tableData : null}
+                        emptyMessage={outputPreviewMessage}
+                        format={outputFormat}
+                        text={shownText}
+                      />
+                    )}
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -327,7 +424,7 @@ export default function TableConvertDemo({
                 </CardAction>
               </CardHeader>
               <CardContent className="space-y-4">
-                <DataGridEditor tableData={tableData} onChange={handleEditorChange} />
+                <DataGridEditor tableData={tableData} origin={origin} onChange={handleEditorChange} />
               </CardContent>
             </Card>
           </div>

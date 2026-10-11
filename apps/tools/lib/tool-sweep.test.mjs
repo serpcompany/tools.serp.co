@@ -14,6 +14,8 @@ import {
   classifyRun,
   converterEngine,
   countStatuses,
+  decodeTableOutput,
+  decodeTableOutputs,
   ffmpegError,
   hasSignature,
   loadFixtures,
@@ -32,6 +34,7 @@ import {
   topColour,
   treeIsDirty,
 } from "../scripts/lib/tool-sweep.mjs";
+import { writeTableOutput } from "./convert/table-outputs.ts";
 
 // The ImageMagick WASM build the app ships, which the sweep decodes image
 // outputs with.
@@ -448,6 +451,8 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "png", "ai"), "browser-raster");
   assert.equal(engine("convert", "jpg", "txt"), "tesseract");
   assert.equal(engine("convert", "png", "docx"), "docx");
+  assert.equal(engine("convert", "csv", "jpg"), "table-outputs");
+  assert.equal(engine("convert", "csv", "png"), "table-outputs");
   assert.equal(engine("convert", "image", "pdf"), "image-pdf");
   assert.equal(engine("convert", "png", "pdf"), "browser-raster");
   assert.equal(engine("compress", "heic", "heic"), "server-image-compress");
@@ -522,6 +527,28 @@ test("planTool picks a driver and fixture, or says why a Tool isn't run", () => 
   assert.equal(plan({ id: "mp4-to-mxf", route: "/mp4-to-mxf", operation: "convert", from: "mp4", to: "mxf" }).timeoutMs, 180);
   const table = plan({ id: "csv-to-json", route: "/csv-to-json", operation: "convert", from: "csv", to: "json" });
   assert.deepEqual([table.driver, table.markers, table.compress], ["table", ["Alpha"], false]);
+  assert.deepEqual([table.tableFile, table.decode], [false, false]);
+  // A table written as a file is opened and searched for the fixture's data;
+  // a table image can't be searched, so its pixels are checked.
+  const tableFile = (to) =>
+    planTool(
+      { id: `csv-to-${to}`, route: `/csv-to-${to}`, operation: "convert", from: "csv", to },
+      { ...options, handlers: new Map([[`/csv-to-${to}`, "TableConvertLanding"]]), fixtures: { ...fixtures, byFormat: new Map([["csv", "/f/sample.csv"]]) } },
+    );
+  assert.deepEqual(
+    ["excel", "pdf", "avro", "protobuf", "png", "jpeg"].map((to) => {
+      const { driver, tableFile: file, decode, markers, pixelCheck } = tableFile(to);
+      return [to, driver, file, decode, markers, pixelCheck];
+    }),
+    [
+      ["excel", "table", true, true, ["Alpha"], false],
+      ["pdf", "table", true, true, ["Alpha"], false],
+      ["avro", "table", true, true, ["Alpha"], false],
+      ["protobuf", "table", true, true, ["Alpha"], false],
+      ["png", "table", true, false, [], true],
+      ["jpeg", "table", true, false, [], true],
+    ],
+  );
   const compress = plan({ id: "compress-png", route: "/compress-png", operation: "compress", from: "png", to: "png" });
   assert.equal(compress.compress, true);
   // A text converter whose fixture has no known data marker can't be checked.
@@ -677,4 +704,76 @@ test("the summary counts statuses, splits passes by check and lists failing ids"
   assert.match(summary, /error: FFmpeg failed \[\[h263\] size\] \| 1 \|/);
   assert.match(summary, /no fixture for the input format: icns 1 \| 1 \|/);
   assert.match(summary, /<summary>error Tool ids \(1\)<\/summary>\n\n- `c`: FFmpeg failed/);
+});
+
+const SWEEP_TABLE = { headers: ["name", "count"], rows: [["Alpha", "1"], ["Beta", "2"]] };
+const base64Of = (buffer) => Buffer.from(buffer).toString("base64");
+
+test("each table file the pages write opens, and holds the fixture's data", async () => {
+  for (const format of ["excel", "pdf", "avro"]) {
+    const { buffer } = await writeTableOutput(format, SWEEP_TABLE);
+    const { text } = await decodeTableOutput(format, Buffer.from(buffer));
+    assert.ok(text.includes("Alpha") && text.includes("Beta"), `${format}: ${text}`);
+  }
+  const protobuf = await writeTableOutput("protobuf", SWEEP_TABLE);
+  const { text } = await decodeTableOutput("protobuf", Buffer.from(protobuf.buffer), { schema: protobuf.schema });
+  assert.equal(text, JSON.stringify([{ name: "Alpha", count: "1" }, { name: "Beta", count: "2" }]));
+});
+
+test("a table file that doesn't open, or holds nothing, is caught", async () => {
+  const csv = Buffer.from("name,count\nAlpha,1\n");
+  for (const format of ["excel", "pdf", "avro"]) {
+    await assert.rejects(decodeTableOutput(format, csv), format);
+  }
+  // A ZIP with a [Content_Types].xml and an xl/ folder but no worksheet.
+  const { zipSync, strToU8 } = await import("fflate");
+  const hollow = zipSync({ "[Content_Types].xml": strToU8("<Types/>"), "xl/workbook.xml": strToU8("<workbook/>") });
+  await assert.rejects(decodeTableOutput("excel", Buffer.from(hollow)), /no workbook or worksheet/);
+  const empty = await writeTableOutput("avro", { headers: ["name"], rows: [] });
+  await assert.rejects(decodeTableOutput("avro", Buffer.from(empty.buffer)), /no records/);
+  const protobuf = await writeTableOutput("protobuf", SWEEP_TABLE);
+  await assert.rejects(decodeTableOutput("protobuf", Buffer.from(protobuf.buffer)), /no .proto/);
+});
+
+test("a Protobuf run's .pb is decoded with the .proto saved beside it", async () => {
+  const protobuf = await writeTableOutput("protobuf", SWEEP_TABLE);
+  const outputs = [
+    { name: "sample.pb", size: protobuf.buffer.byteLength, head: [], base64: base64Of(protobuf.buffer) },
+    { name: "sample.proto", size: protobuf.schema.length, head: [], base64: base64Of(Buffer.from(protobuf.schema)) },
+  ];
+  await decodeTableOutputs(outputs, "protobuf");
+  assert.match(outputs[0].decoded.text, /Alpha/);
+  assert.equal(outputs[1].decoded.text, protobuf.schema);
+  assert.deepEqual(classifyRun({ outcome: "completed", outputs }, { to: "protobuf", markers: ["Alpha"], decode: true }), {
+    status: "pass",
+    error: null,
+    formatCheck: "decoded",
+  });
+});
+
+test("a decoded table file passes only when it opens and holds the fixture's data", async () => {
+  const { buffer } = await writeTableOutput("excel", SWEEP_TABLE);
+  const xlsx = () => ({ name: "sample.xlsx", size: buffer.byteLength, head: Array.from(new Uint8Array(buffer).subarray(0, 1024)) });
+  const plan = { to: "excel", markers: ["Alpha"], decode: true };
+  assert.deepEqual(classifyRun({ outcome: "completed", outputs: [{ ...xlsx(), decoded: { text: "Alpha\n1" } }] }, plan), {
+    status: "pass",
+    error: null,
+    formatCheck: "decoded",
+  });
+  assert.deepEqual(classifyRun({ outcome: "completed", outputs: [{ ...xlsx(), decoded: { text: "Gamma" } }] }, plan), {
+    status: "error",
+    error: "the saved file doesn't contain the input's data (missing Alpha)",
+    formatCheck: "decoded",
+  });
+  assert.deepEqual(classifyRun({ outcome: "completed", outputs: [{ ...xlsx(), decoded: { error: "bad zip" } }] }, plan), {
+    status: "error",
+    error: "saved a file that doesn't open (sample.xlsx): bad zip",
+    formatCheck: "decoded",
+  });
+  assert.match(classifyRun({ outcome: "completed", outputs: [xlsx()] }, plan).error, /^harness: the sweep didn't open/);
+  // The raw bytes holding the marker isn't enough: the file must open.
+  assert.equal(
+    classifyRun({ outcome: "completed", outputs: [{ ...xlsx(), text: "Alpha", decoded: { error: "bad zip" } }] }, plan).status,
+    "error",
+  );
 });

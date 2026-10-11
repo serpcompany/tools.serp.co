@@ -61,7 +61,11 @@ build, and fails as blank when its top colour covers 99.9% of the pixels
 (within 8 of 255 a channel), or when it doesn't decode; its pass records that
 share as `topColourShare`. An output the sweep didn't read the bytes of fails
 as a harness error rather than passing unchecked. ICNS, KTX, KTX2, RGB, EPS and vector SVG outputs
-aren't decoded; a raster SVG is checked through the image it wraps. `--resume` continues an interrupted run;
+aren't decoded; a raster SVG is checked through the image it wraps. A table
+converter's Excel, PDF, Avro or Protobuf file is opened in Node the way an app
+would (fflate, pdf.js, avsc, protobufjs with the `.proto` saved beside the
+`.pb`) and must hold the fixture's data; its pass records `formatCheck:
+"decoded"`. Its PNG and JPEG are checked as images. `--resume` continues an interrupted run;
 `--summary` prints the Markdown table. It measures; it isn't part of
 `pnpm check`. `--channel chrome` (or `msedge`) runs an installed Chrome or Edge
 instead of Playwright's Chromium, whose codecs can differ (H.264, HEVC and AAC

@@ -15,6 +15,8 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { PDF_FONT_URL } from "../lib/convert/table-outputs.ts";
+
 const { chromium } = await import("playwright");
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -274,6 +276,22 @@ await step("a dynamic tool page serves its title, description and canonical in <
   for (const tag of ["<title>", '<meta name="description"', '<link rel="canonical"']) {
     assert(head.includes(tag), `${tag} is not in <head>`);
   }
+});
+
+await step("the Worker serves the self-hosted PDF font", async () => {
+  // Table pages fetch it only for a PDF with text outside Windows-1252
+  // (lib/convert/table-outputs.ts); the sweep's fixtures are Latin, so this
+  // is the request that proves it's served.
+  const response = await context.request.get(`${args.baseUrl}${PDF_FONT_URL}`, {
+    headers: { [SMOKE_TEST_HEADER]: "1" },
+    maxRedirects: 0,
+  });
+  assert(response.status() === 200, `status ${response.status()}`);
+  const type = response.headers()["content-type"] ?? "";
+  assert(/^(font\/(ttf|sfnt)|application\/(font-sfnt|x-font-ttf))\b/.test(type), `content-type ${type}`);
+  const served = await response.body();
+  const expected = readFileSync(path.join(appRoot, "public", PDF_FONT_URL));
+  assert(served.equals(expected), `served ${served.length} bytes, not the ${expected.length} bytes of public${PDF_FONT_URL}`);
 });
 
 await step("webm-to-mp3 converts with FFmpeg in the browser", async (page, telemetryStatuses) => {

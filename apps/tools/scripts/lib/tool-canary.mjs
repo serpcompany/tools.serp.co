@@ -33,6 +33,8 @@ export const CANARY_TOOLS = {
   "png-to-epub": "image to EPUB",
   "compress-svg": "SVGO",
   "csv-to-json": "table converter page",
+  "csv-to-pdf": "table converter page writing a file: jsPDF and jspdf-autotable, loaded when the output is chosen",
+  "csv-to-jpg": "CSV drawn as a table on a canvas, on the generic converter page (table-outputs.ts)",
   "json-to-csv": "JSON to CSV page",
   "csv-combiner": "CSV combiner page: two files in, one out",
   "html-to-markdown": "HTML to Markdown page",

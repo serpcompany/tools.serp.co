@@ -7,6 +7,8 @@ export type ToolProgressFile = {
   progress: number;
   status: ProgressStatus;
   message?: string;
+  // What to know about the result, such as the rows a table image leaves out.
+  notice?: string;
 };
 
 type ToolProgressIndicatorProps = {
@@ -29,6 +31,7 @@ export function ToolProgressIndicator({
         progress={currentFile.progress}
         status={currentFile.status}
         message={currentFile.message}
+        notice={currentFile.notice}
         completedLabel={completedLabel}
       />
     </div>

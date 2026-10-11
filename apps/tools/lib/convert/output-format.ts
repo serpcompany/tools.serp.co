@@ -38,6 +38,15 @@ const isHevcAnnexB: Signature = (bytes) => {
   const header = bytes[start] ?? 0x80;
   return start > 0 && (header & 0x80) === 0 && HEVC_FIRST_NAL_TYPES.has(header >> 1);
 };
+// Office Open XML: a ZIP whose entries include [Content_Types].xml, and for
+// a workbook an xl/ part. Entry names sit in the local headers, so the
+// first 4 KB hold the first few.
+const isOfficeZip = (part?: string): Signature => (bytes) => {
+  if (!startsWith(0x50, 0x4b, 0x03, 0x04)(bytes, "")) return false;
+  const names = ascii(bytes, 0, bytes.length);
+  return names.includes("[Content_Types].xml") && (!part || names.includes(part));
+};
+const isXlsx = isOfficeZip("xl/");
 const isNetpbm = (...kinds: string[]): Signature => (bytes) =>
   bytes[0] === 0x50 && kinds.includes(String.fromCharCode(bytes[1] ?? 0));
 
@@ -76,9 +85,12 @@ const SIGNATURES: Record<string, Signature> = {
   pam: isNetpbm("7"),
   svg: (_bytes, text) => /<svg[\s>]/i.test(text),
   pdf: startsWithText("%PDF"),
-  // Office Open XML: a ZIP whose entries include [Content_Types].xml.
-  docx: (bytes) =>
-    startsWith(0x50, 0x4b, 0x03, 0x04)(bytes, "") && ascii(bytes, 0, bytes.length).includes("[Content_Types].xml"),
+  docx: isOfficeZip(),
+  xlsx: isXlsx,
+  // The table converters' Excel output is an XLSX workbook.
+  excel: isXlsx,
+  // An Avro object container file.
+  avro: startsWith(0x4f, 0x62, 0x6a, 0x01),
   // Illustrator's PDF-compatible AI files are PDFs.
   ai: startsWithText("%PDF"),
   // Kodak Photo CD: the image pack header sits after 2048 bytes of padding.

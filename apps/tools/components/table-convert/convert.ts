@@ -1,6 +1,7 @@
 import Papa from "papaparse";
 import { markdownTable } from "markdown-table";
 import YAML from "yaml";
+import { normalizeTable, parseCsvTable } from "@/lib/convert/table-data";
 import { InputFormat, OutputFormat, TableData } from "./types";
 
 type AnyFormat = InputFormat | OutputFormat;
@@ -16,17 +17,6 @@ type SerializeResult = {
   supported: boolean;
   notice?: string;
 };
-
-function normalizeTable(headers: string[], rows: string[][]) {
-  const maxColumns = Math.max(headers.length, ...rows.map((row) => row.length), 0);
-  const safeHeaders = headers.length
-    ? headers
-    : Array.from({ length: maxColumns }, (_, index) => `column_${index + 1}`);
-  const normalizedRows = rows.map((row) =>
-    safeHeaders.map((_, index) => (row[index] ?? "").toString())
-  );
-  return { headers: safeHeaders, rows: normalizedRows };
-}
 
 export function tableDataToObjects(table: TableData) {
   return table.rows.map((row) => {
@@ -53,20 +43,6 @@ export function objectsToTableData(list: Array<Record<string, unknown>>) {
     })
   );
   return normalizeTable(headers, rows);
-}
-
-function parseCsv(text: string) {
-  const parsed = Papa.parse<string[]>(text, { skipEmptyLines: true });
-  if (parsed.errors.length) {
-    return { table: null, error: parsed.errors[0]?.message ?? "CSV parse error" };
-  }
-  const data = parsed.data as string[][];
-  const headerRow = data[0];
-  if (!headerRow) {
-    return { table: null, error: "CSV is empty." };
-  }
-  const rows = data.slice(1);
-  return { table: normalizeTable(headerRow, rows), error: null };
 }
 
 function parseJson(text: string) {
@@ -950,6 +926,7 @@ export function serializeOutput(format: AnyFormat, table: TableData): SerializeR
         text: buildRdfTriples(table),
         supported: true,
       };
+    // Files, not text: lib/convert/table-outputs.ts writes them.
     case "avro":
     case "protobuf":
     case "excel":
@@ -957,9 +934,9 @@ export function serializeOutput(format: AnyFormat, table: TableData): SerializeR
     case "png":
     case "jpeg":
       return {
-        text: `Binary output placeholder for ${format.toUpperCase()}.`,
+        text: "",
         supported: false,
-        notice: `${format.toUpperCase()} output is not wired yet in the demo.`,
+        notice: `${format.toUpperCase()} is saved as a file, not text.`,
       };
     default:
       return {
@@ -977,7 +954,7 @@ export function parseInput(format: InputFormat, text: string): ParseResult {
   try {
     switch (format) {
       case "csv":
-        return { ...parseCsv(text), supported: true };
+        return { ...parseCsvTable(text), supported: true };
       case "json":
         return { ...parseJson(text), supported: true };
       case "markdown":
