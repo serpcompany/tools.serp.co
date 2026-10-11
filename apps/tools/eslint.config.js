@@ -3,6 +3,8 @@ import { nextJsConfig } from "@serp-tools/eslint-config/next-js";
 const turboEnvAllowList = [
   "^YTDLP_BINARY_URL$",
   "^YOUTUBE_DL_HOST$",
+  "^GITHUB_ACTIONS$",
+  "^GITHUB_STEP_SUMMARY$",
   "^GITHUB_TOKEN$",
   "^GH_TOKEN$",
   "^ADSENSE_PUBLISHER_ID$",

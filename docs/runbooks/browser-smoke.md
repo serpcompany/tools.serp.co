@@ -6,7 +6,8 @@ against a running Worker. CI runs it in two places:
 - the `smoke` job of `.github/workflows/check.yml`, on every PR: it builds the
   Worker with the local config, applies every migration to a fresh local D1
   with Wrangler, starts `wrangler dev`, and runs the script with
-  `--require-dashboard`;
+  `--require-dashboard`, then the
+  [canary sweep](tool-verification.md#canary-sweep) on the same Worker;
 - the Deploy workflow, after each Staging deploy, through the staging Worker's
   `*.workers.dev` host. It never runs against Production.
 
