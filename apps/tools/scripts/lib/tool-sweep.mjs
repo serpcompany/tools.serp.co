@@ -268,7 +268,7 @@ const TEXT_DRIVERS = new Set(["table", "html-to-markdown", "json-to-csv", "csv-c
 // of one is rightly one colour too, so the sweep can't tell it from a blank
 // one and doesn't check its pixels. Every other fixture's image output must
 // not be blank (see measurePixels).
-const ONE_COLOUR_FIXTURES = new Set([
+export const ONE_COLOUR_FIXTURES = new Set([
   "sample.ai", "sample.avif", "sample.bin", "sample.bmp", "sample.cur", "sample.dds", "sample.gif",
   "sample.heic", "sample.heif", "sample.ico", "sample.jfif", "sample.jpg", "sample.pdf", "sample.png",
   "sample-2.png", "sample.psd", "sample.tga", "sample.tif", "sample.tiff", "sample.webp",
@@ -455,8 +455,11 @@ function formatName(format) {
 //   message: what the page showed (or the harness error)
 //   errorCode: the tool_run_failed telemetry code, when one was sent
 //   outputs: [{ name, size, head: number[] (first bytes), text?, pixels? }]
-//     pixels: measurePixels' result, or { error } when the image didn't decode
-export function classifyRun(observation, { to, markers = [] }) {
+//     pixels: measurePixels' result (null for a format it doesn't decode), or
+//     { error } when the image didn't decode
+// A plan with pixelCheck needs every output measured: an output the sweep
+// never read the bytes of fails, rather than passing unchecked.
+export function classifyRun(observation, { to, markers = [], pixelCheck = false }) {
   const message = observation.message?.trim() || null;
   if (observation.outcome === "timeout") {
     return { status: "timeout", error: message ?? "no result before the timeout" };
@@ -491,6 +494,14 @@ export function classifyRun(observation, { to, markers = [] }) {
     return {
       status: "error",
       error: `the saved file doesn't contain the input's data (missing ${missing.join(", ")})`,
+      formatCheck,
+    };
+  }
+  const unread = pixelCheck && outputs.find((output) => output.pixels === undefined);
+  if (unread) {
+    return {
+      status: "error",
+      error: `harness: the sweep didn't read the saved image (${unread.name}), so it couldn't check it isn't blank`,
       formatCheck,
     };
   }

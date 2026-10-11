@@ -164,7 +164,8 @@ function loadMagick() {
 }
 
 // Measures each output's pixels (bytes from a ZIP, or base64 from the page)
-// for classifyRun, then drops the bytes.
+// for classifyRun, then drops the bytes. An output whose bytes weren't read
+// is left without `pixels`, which classifyRun fails.
 async function measureOutputPixels(outputs, format) {
   const magick = await loadMagick();
   for (const output of outputs) {
@@ -173,7 +174,7 @@ async function measureOutputPixels(outputs, format) {
     delete output.base64;
     if (!bytes.length) continue;
     try {
-      output.pixels = measurePixels(magick, bytes, format) ?? undefined;
+      output.pixels = measurePixels(magick, bytes, format);
     } catch (error) {
       output.pixels = { error: String(error?.message ?? error).split("\n")[0] };
     }
@@ -415,7 +416,7 @@ async function runTableTool(page, plan) {
     return textOutputTimeout(shown, plan);
   }
   if (state.problem) return { outcome: "failed", message: state.problem };
-  return download(page, page.getByRole("button", { name: "Download", exact: true }), { text: true });
+  return download(page, page.getByRole("button", { name: "Download", exact: true }), { text: true, base64: plan.pixelCheck });
 }
 
 // Text converters show their output in a textarea. html-to-markdown converts
@@ -443,7 +444,7 @@ async function runTextTool(page, plan, { input, convert, output, save }) {
     if (shown) return { outcome: "failed", message: shown };
     return textOutputTimeout(await page.locator(output).inputValue().catch(() => ""), plan);
   }
-  return download(page, page.locator(save).first(), { text: true });
+  return download(page, page.locator(save).first(), { text: true, base64: plan.pixelCheck });
 }
 
 async function runCsvCombiner(page, plan) {
@@ -460,7 +461,7 @@ async function runCsvCombiner(page, plan) {
     return { outcome: "timeout", message: `no combined file after ${plan.timeoutMs / 1000} s` };
   }
   if (await problem.isVisible()) return { outcome: "failed", message: await problem.first().textContent() };
-  return download(page, combined, { text: true });
+  return download(page, combined, { text: true, base64: plan.pixelCheck });
 }
 
 // Batch PNG compression saves one ZIP; the PNGs inside are what's checked.

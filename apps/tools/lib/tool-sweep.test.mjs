@@ -19,6 +19,7 @@ import {
   loadFixtures,
   measurePixels,
   mergeRows,
+  ONE_COLOUR_FIXTURES,
   pageComponent,
   parseArgs,
   planTool,
@@ -283,6 +284,89 @@ test("an SVG is measured by the raster it wraps, and other formats aren't measur
   ]);
 });
 
+// A fixture in ONE_COLOUR_FIXTURES switches its Tools' blank check off, so
+// it must be one colour. Still images are decoded here. Videos (their first
+// frame, `ffmpeg -frames:v 1`), PDF and AI (rendered by macOS `sips`) can't
+// be decoded in Node, so each is pinned by the start of its SHA-256, taken
+// when it was last read back as one colour. A replaced file fails here until
+// it's read back again and its hash updated, or it's taken off the list.
+const ONE_COLOUR_PINNED = {
+  "sample.ai": "8dce8dea347f1f76", "sample.pdf": "31158c227972d9f8", "sample.3gp": "8ec96c8d49420884",
+  "sample.asf": "a6236a221c720be8", "sample.av1": "6bbdc1e92480a78d", "sample.avchd": "49ab202279bce962",
+  "sample.avi": "d31dfa2defb637cd", "sample.divx": "4f7157fe1c8d825c", "sample.f4v": "fb1e589941fa9ee2",
+  "sample.flv": "8046843cd3092f5a", "sample.hevc": "0bd85ad2602a6a5d", "sample.m2ts": "d959d9bb96421795",
+  "sample.m4v": "ae070ff22272420b", "sample.mkv": "e8ae2671322da8f4", "sample.mov": "8847e70f900e25b0",
+  "sample.mp4": "b92d75ca17d1dfc6", "sample.mpeg": "e5417e4e0289721f", "sample.mpeg2": "95fe7024a2d4425c",
+  "sample.mpg": "e5417e4e0289721f", "sample.mts": "5d75fca0bf476728", "sample.mxf": "b9d1e4794942d5a5",
+  "sample.ogv": "e842e3289dcfa066", "sample.rm": "3dff70fcf0cd760b", "sample.swf": "aedcf460a80047f9",
+  "sample.ts": "8b86ba801d889855", "sample.vob": "96ccc44081483b98", "sample.webm": "dd3486db3b6de909",
+  "sample.wmv": "3d5909f2d398462e",
+};
+
+test("every fixture listed as one colour is one colour", () => {
+  // ImageMagick can't tell these formats from their first bytes.
+  const formats = { cur: magick.MagickFormat.Cur, ico: magick.MagickFormat.Ico, tga: magick.MagickFormat.Tga };
+  // The share of each frame, as shown, that its top colour covers.
+  const shares = (images) => {
+    images.coalesce();
+    return [...images].map(
+      (image) => topColour(image.getPixels((pixels) => pixels.toByteArray(0, 0, image.width, image.height, "RGBA"))).share,
+    );
+  };
+  for (const name of ONE_COLOUR_FIXTURES) {
+    const bytes = readFileSync(path.join(fixturesDir, name));
+    if (Object.hasOwn(ONE_COLOUR_PINNED, name)) {
+      const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+      assert.equal(hash, ONE_COLOUR_PINNED[name], `${name} has changed: read it back, then update its hash or unlist it`);
+      continue;
+    }
+    const format = formats[path.extname(name).slice(1)];
+    const measured = format
+      ? magick.ImageMagick.readCollection(bytes, format, shares)
+      : magick.ImageMagick.readCollection(bytes, shares);
+    assert.ok(measured.length && measured.every((share) => share === 1), `${name} isn't one colour: ${measured}`);
+  }
+  for (const name of Object.keys(ONE_COLOUR_PINNED)) assert.ok(ONE_COLOUR_FIXTURES.has(name), `${name} isn't listed`);
+});
+
+// Several frames: test files made with native ImageMagick 7.1.2, 64 x 64.
+const measureFixture = (name) => measurePixels(magick, readFileSync(path.join(fixturesDir, name)), path.extname(name).slice(1));
+
+test("a file with several frames is blank only if every frame is", () => {
+  // `magick -size 64x64 xc:white \( -size 64x64 xc:white -fill black -draw
+  // "rectangle 0,0 15,15" \) -set delay 50 -loop 0`: a blank frame, then a
+  // drawn one. The least uniform frame decides.
+  const drawn = measureFixture("sample-frames-blank-then-drawn.gif");
+  assert.equal(drawn.share, 0.9375);
+  assert.ok(drawn.share < BLANK_SHARE);
+  // `magick -size 64x64 xc:white xc:white -set delay 50 -loop 0`.
+  assert.deepEqual(measureFixture("sample-frames-blank.gif"), { colour: "#FFFFFF", share: 1, width: 64, height: 64 });
+});
+
+test("GIF and WebP animation frames are measured as shown, not as stored", () => {
+  // A white frame, then a frame that stores only an 8 x 8 black square at
+  // +28+28. Stored, each frame is one colour; shown, the second is 1.6%
+  // black. The GIF: `magick -size 64x64 xc:white \( -size 8x8 xc:black -set
+  // page +28+28 \) -set dispose none -set delay 50 -loop 0`. The WebP: two
+  // full 64 x 64 frames, which the WebP encoder stores as the change.
+  for (const name of ["sample-frames-delta.gif", "sample-frames-delta.webp"]) {
+    const stored = magick.ImageMagick.readCollection(readFileSync(path.join(fixturesDir, name)), (images) =>
+      images.map((image) => `${image.width}x${image.height}`),
+    );
+    assert.deepEqual(stored, ["64x64", "8x8"], name);
+    assert.deepEqual(measureFixture(name), { colour: "#FFFFFF", share: 1 - 64 / 4096, width: 64, height: 64 }, name);
+  }
+});
+
+test("a PSD is measured by its merged image, not its layers", () => {
+  // The first image written is the merged image, the rest are layers, as
+  // `magick <merged> <layer> -depth 8 -compress RLE` writes them. A blank
+  // merged image (a drawn layer that's hidden) is blank:
+  assert.equal(measureFixture("sample-layers-merged-blank.psd").share, 1);
+  // and a drawn merged image over a blank layer isn't.
+  assert.equal(measureFixture("sample-layers-merged-drawn.psd").share, 0.5);
+});
+
 test("a blank or undecodable image fails; a decoded one passes with its top colour's share", () => {
   const run = (pixels) => classifyRun({ outcome: "completed", outputs: [output("sample.png", { pixels })] }, { to: "png" });
   assert.deepEqual(run({ colour: "#FFFFFF", share: 1, width: 3039, height: 2014 }), {
@@ -307,6 +391,23 @@ test("a blank or undecodable image fails; a decoded one passes with its top colo
     classifyRun({ outcome: "completed", outputs: [output("sample.png", { pixels: { error: "x" } })] }, { to: "gif" }).status,
     "wrong_format",
   );
+});
+
+test("a checked image the sweep never read fails, rather than passing unchecked", () => {
+  const run = (outputs, plan) => classifyRun({ outcome: "completed", outputs }, { to: "png", ...plan });
+  assert.deepEqual(run([output("sample.png", { pixels: { colour: "#282726", share: 0.5 } }), output("sample.png")], { pixelCheck: true }), {
+    status: "error",
+    error: "harness: the sweep didn't read the saved image (sample.png), so it couldn't check it isn't blank",
+    formatCheck: "signature",
+  });
+  // An output read but in a form measurePixels doesn't decode (a vector SVG) passes.
+  assert.deepEqual(run([output("sample.png", { pixels: null })], { pixelCheck: true }), {
+    status: "pass",
+    error: null,
+    formatCheck: "signature",
+  });
+  // A Tool whose fixture is one colour isn't checked.
+  assert.equal(run([output("sample.png")], { pixelCheck: false }).status, "pass");
 });
 
 test("hasSignature asks the app's check which formats it can verify", () => {
