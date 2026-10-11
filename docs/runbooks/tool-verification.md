@@ -13,7 +13,10 @@ records `ready` or `missing`; custom Tool fixtures live under `toolFixtures`. Fi
 
 Make a fixture locally with a native tool (FFmpeg, ImageMagick, `iconutil`) or
 as plain text, keep it small (video 320x240 for about a second, images 96x96),
-and say in its `notes` how it was made. Don't download one unasked: a format
+and say in its `notes` how it was made. Before marking it `ready`, read it back
+with something other than the app (`ffprobe`, `magick identify`, `file`, or the
+format's spec) and name it in `notes`, so a failure is the Tool's, not the
+fixture's. Don't download one unasked: a format
 that can't be made locally stays `missing`, with the reason in `notes`, until
 the owner approves an outside sample. A Tool whose output is text (a table
 converter, or any Tool to TXT) also needs its fixture's data in `TEXT_MARKERS`
