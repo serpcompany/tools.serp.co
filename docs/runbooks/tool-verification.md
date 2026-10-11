@@ -11,6 +11,17 @@ Benchmark fixtures and their declared coverage live under `benchmarks/`. In
 `benchmarks/fixture-matrix.json`, `formats` is keyed by input format and
 records `ready` or `missing`; custom Tool fixtures live under `toolFixtures`. Fixtures are reusable inputs, not proof that a Tool works.
 
+Make a fixture locally with a native tool (FFmpeg, ImageMagick, `iconutil`) or
+as plain text, keep it small (video 320x240 for about a second, images 96x96),
+and say in its `notes` how it was made. Don't download one unasked: a format
+that can't be made locally stays `missing`, with the reason in `notes`, until
+the owner approves an outside sample. A Tool whose output is text (a table
+converter, or any Tool to TXT) also needs its fixture's data in `TEXT_MARKERS`
+in `scripts/lib/tool-sweep.mjs`, or the sweep reports it as `no_fixture`. The
+table converter page picks its input format from the file's extension, so a
+table fixture needs one the page maps to its format: a `.sql` file switches a
+MySQL page to SQL, so the MySQL fixture is a `.txt`.
+
 ## Deterministic checks
 
 For deterministic verification from the repository root, run `pnpm test`.
