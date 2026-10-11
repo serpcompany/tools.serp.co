@@ -181,6 +181,19 @@ test("HDR and EXR: linear light is encoded to sRGB and values above 1.0 are whit
   }
 });
 
+test("EXR keeps its alpha as it is: only colour is encoded to sRGB", async () => {
+  // A 64 (0.25 linear) grey at half opacity, made into an EXR by ImageMagick,
+  // whose writer stores the values as they are.
+  const image = magick.MagickImage.create(new magick.MagickColor(64, 64, 64, 128), 16, 16);
+  const exr = image.write(magick.MagickFormat.Exr, (data) => data.slice());
+  image.dispose();
+  const { buffer } = await convertWithMagickInBrowser(exr.buffer, "exr", "png");
+  const pixel = magick.ImageMagick.read(new Uint8Array(buffer), magick.MagickFormat.Png, (png) =>
+    png.getPixels((pixels) => [...pixels.toByteArray(0, 0, 1, 1, "RGBA")]),
+  );
+  assert.deepEqual(pixel, [137, 137, 137, 128]);
+});
+
 // The share of an image's pixels that aren't white (within 8 of 255).
 function inkShare(buffer, format) {
   return magick.ImageMagick.read(new Uint8Array(buffer), format, (image) => {
