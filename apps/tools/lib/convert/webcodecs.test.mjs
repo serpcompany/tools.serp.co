@@ -6,12 +6,14 @@ import {
   videoOnlyNote,
   codecUnsupportedError,
   codecUnsupportedMessage,
+  FRAME_AREA_PROBE,
   ffmpegStepArgs,
+  handOffBitrate,
   planSteps,
   streamFrameRate,
   usesWebCodecs,
 } from "./webcodecs.ts";
-import { fitWithin } from "./ffmpeg-args.ts";
+import { VIDEO_FILTER, fitWithin } from "./ffmpeg-args.ts";
 
 const rate = { frameRate: "30" };
 
@@ -48,14 +50,41 @@ test("AV1 to HEVC decodes in the browser first, so FFmpeg still does the scaling
   );
 });
 
-test("the hand-off to the browser keeps FFmpeg's size and rate limits, at a constant rate, tagged BT.601", () => {
+test("the hand-off to the browser is deinterlaced within FFmpeg's size and rate limits, at a constant rate, tagged BT.601", () => {
   const args = ffmpegStepArgs("to-vp8", rate);
-  assert.equal(args[args.indexOf("-vf") + 1], `${fitWithin(1920)}:out_color_matrix=bt601`);
+  assert.equal(args[args.indexOf("-vf") + 1], `${VIDEO_FILTER}:out_color_matrix=bt601`);
+  assert.ok(VIDEO_FILTER.startsWith("yadif=deint=interlaced,"));
   assert.equal(args[args.indexOf("-fpsmax") + 1], "30");
   assert.equal(args[args.indexOf("-fps_mode") + 1], "cfr");
   assert.equal(args[args.indexOf("-colorspace") + 1], "smpte170m");
   assert.equal(args[args.indexOf("-c:v") + 1], "libvpx");
   assert.ok(args.includes("-an"));
+});
+
+test("the hand-off's bitrate limit is 8 Mbit/s at 720p and grows with the frame, up to 40 Mbit/s", () => {
+  assert.equal(handOffBitrate(1280 * 720), "8000k");
+  assert.equal(handOffBitrate(1920 * 1080), "18000k");
+  assert.equal(handOffBitrate(1080 * 1920), "18000k");
+  assert.equal(handOffBitrate(1920 * 1920), "32000k");
+  assert.equal(handOffBitrate(320 * 180), "8000k");
+  assert.equal(handOffBitrate(0), "8000k");
+  assert.equal(handOffBitrate(3840 * 2160), "40000k");
+  const bitrate = (frameArea) => {
+    const args = ffmpegStepArgs("to-vp8", { ...rate, frameArea });
+    return args[args.indexOf("-b:v") + 1];
+  };
+  assert.equal(bitrate(1920 * 1080), "18000k");
+  assert.equal(bitrate(undefined), "8000k");
+});
+
+test("the frame-area probe writes one grey frame at the hand-off's size, a byte a pixel", () => {
+  const { args, output } = FRAME_AREA_PROBE;
+  assert.equal(args[args.indexOf("-frames:v") + 1], "1");
+  assert.equal(args[args.indexOf("-vf") + 1], fitWithin(1920));
+  assert.ok(`${VIDEO_FILTER}:out_color_matrix=bt601`.includes(fitWithin(1920)));
+  assert.equal(args[args.indexOf("-pix_fmt") + 1], "gray");
+  assert.equal(args[args.indexOf("-f") + 1], "rawvideo");
+  assert.equal(output, "frame.gray");
 });
 
 test("the .av1 stream is copied with any audio; outputs are IVF and Annex B with the frame rate", () => {

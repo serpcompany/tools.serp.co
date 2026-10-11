@@ -23,6 +23,7 @@ import { convertVideo, runFFmpeg } from "./video.ts";
 import {
   type BrowserCodec,
   type CodecAction,
+  FRAME_AREA_PROBE,
   codecUnsupportedError,
   ffmpegStepArgs,
   planSteps,
@@ -109,7 +110,16 @@ export async function convertWithWebCodecs(
     const progress = (ratio: number) =>
       onProgress?.(Math.round(((index + Math.min(1, Math.max(0, ratio))) / steps.length) * 100));
     if (step.run === "ffmpeg") {
-      data = await runFFmpeg({ name, data }, ffmpegStepArgs(step.args, { frameRate }), step.output, progress);
+      // The hand-off's bitrate limit follows its frame area, which FFmpeg
+      // reads from the same file first.
+      const args =
+        step.args === "to-vp8"
+          ? {
+              probe: FRAME_AREA_PROBE,
+              args: (frame: Uint8Array) => ffmpegStepArgs("to-vp8", { frameRate, frameArea: frame.byteLength }),
+            }
+          : ffmpegStepArgs(step.args, { frameRate });
+      data = await runFFmpeg({ name, data }, args, step.output, progress);
       name = step.output;
     } else if (step.run === "browser") {
       data = await browserStep(data, step.job, progress);

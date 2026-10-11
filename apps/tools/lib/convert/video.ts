@@ -152,11 +152,32 @@ async function loadFFmpeg(): Promise<FFmpeg> {
   return ffmpeg;
 }
 
+// A command whose arguments depend on the file: FFmpeg first runs `probe` on
+// the same file, and `args` gets the file the probe writes (empty if it
+// failed). Writing the file once matters: writing it to FFmpeg empties the
+// caller's buffer.
+export type ProbedArgs = {
+  probe: { args: string[]; output: string };
+  args: (probeOutput: Uint8Array) => string[];
+};
+
+async function runProbe(ff: FFmpeg, inputName: string, { args, output }: ProbedArgs["probe"]) {
+  try {
+    const exitCode = await ff.exec(["-y", "-nostdin", "-i", inputName, ...args, output]);
+    const data = exitCode === 0 ? await ff.readFile(output) : undefined;
+    return data instanceof Uint8Array ? data : new Uint8Array();
+  } catch {
+    return new Uint8Array();
+  } finally {
+    await ff.deleteFile(output).catch(() => {});
+  }
+}
+
 // Runs one FFmpeg command on one file and returns the file it writes. `args`
 // go between the input and the output name.
 export async function runFFmpeg(
   input: { name: string; data: ArrayBuffer },
-  args: string[],
+  args: string[] | ProbedArgs,
   outputName: string,
   onProgress?: (ratio: number) => void,
 ): Promise<ArrayBuffer> {
@@ -164,11 +185,12 @@ export async function runFFmpeg(
   const progressHandler = onProgress
     ? ({ progress }: { progress: number }) => onProgress(Math.min(1, Math.max(0, progress || 0)))
     : null;
-  if (progressHandler) ff.on("progress", progressHandler);
   let data: Uint8Array | string;
   try {
     await ff.writeFile(input.name, new Uint8Array(input.data));
-    const exitCode = await ff.exec(["-y", "-nostdin", "-i", input.name, ...args, outputName]);
+    const commandArgs = Array.isArray(args) ? args : args.args(await runProbe(ff, input.name, args.probe));
+    if (progressHandler) ff.on("progress", progressHandler);
+    const exitCode = await ff.exec(["-y", "-nostdin", "-i", input.name, ...commandArgs, outputName]);
     if (exitCode !== 0) {
       throw new Error(`FFmpeg failed with exit code ${exitCode}`);
     }

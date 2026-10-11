@@ -22,15 +22,23 @@ export function fitWithin(size: number): string {
   return `scale=w='min(iw,${size})':h='min(ih,${size})':force_original_aspect_ratio=decrease:force_divisible_by=2`;
 }
 
+// Interlaced frames (1080i camcorder footage, broadcast TS, DVD VOBs) would
+// comb on every moving edge at the source's size, so frames flagged interlaced
+// are deinterlaced first, one frame for each. Progressive frames pass through.
+const DEINTERLACE = "yadif=deint=interlaced";
+// The filter of every video output at the source's size.
+export const VIDEO_FILTER = `${DEINTERLACE},${fitWithin(MAX_VIDEO_SIZE)}`;
 // -fpsmax keeps a slower source's own rate; the fps filter would add frames.
-const VIDEO_SIZE_AND_RATE = ["-vf", fitWithin(MAX_VIDEO_SIZE), "-fpsmax", String(MAX_VIDEO_FPS)];
+const VIDEO_SIZE_AND_RATE = ["-vf", VIDEO_FILTER, "-fpsmax", String(MAX_VIDEO_FPS)];
 // A slower source gets repeated frames here, which cost a GIF almost nothing.
-const GIF_FILTER = `fps=${GIF_FPS},${fitWithin(MAX_GIF_SIZE)}`;
+// An SD interlaced source shrinks too little at 480 px to hide its combing.
+const GIF_FILTER = `${DEINTERLACE},fps=${GIF_FPS},${fitWithin(MAX_GIF_SIZE)}`;
 
 // H.263 encodes only its five standard frame sizes. 352x288 (CIF) is the one
 // closest to 320x240: fit the picture inside it and pad the rest. Squaring the
 // pixels first keeps an anamorphic source's display shape (a 16:9 DVD at
-// 720x576 would otherwise play as 5:4).
+// 720x576 would otherwise play as 5:4). Not deinterlaced: like the 320 px
+// outputs before #245, the shrink to CIF hides most combing.
 const H263_CIF_FILTER =
   "scale=trunc(iw*sar/2)*2:ih,setsar=1," +
   "scale=352:288:force_original_aspect_ratio=decrease:force_divisible_by=2:flags=fast_bilinear," +
@@ -207,7 +215,7 @@ export function buildConvertCommand(fromFormat: string, toFormat: string): FFmpe
     // MXF (OP1a) only takes 48 kHz audio and broadcast frame rates, so its
     // rate stays 25 whatever the source's.
     args.push('-c:v', 'mpeg2video', '-b:v', '2000k', '-pix_fmt', 'yuv422p');
-    args.push('-vf', fitWithin(MAX_VIDEO_SIZE), '-r', '25');
+    args.push('-vf', VIDEO_FILTER, '-r', '25');
     args.push('-c:a', 'pcm_s16le', '-ar', '48000', '-ac', '2');
     args.push('-f', 'mxf');
   } else if (toFormat === 'f4v') {
@@ -230,8 +238,9 @@ export function buildConvertCommand(fromFormat: string, toFormat: string): FFmpe
     args.push('-f', 'mpegts');
     outputName = outputName.replace('.avchd', '.m2ts'); // Use M2TS container
   } else if (toFormat === 'mjpeg') {
-    // Motion JPEG
-    args.push('-c:v', 'mjpeg', '-q:v', '8');
+    // Motion JPEG. FFmpeg 5.1's default optimal Huffman tables crash or hang
+    // FFmpeg.wasm on detailed 1080p frames; the standard tables don't.
+    args.push('-c:v', 'mjpeg', '-q:v', '8', '-huffman', 'default');
     args.push('-c:a', 'pcm_s16le');
     args.push(...VIDEO_SIZE_AND_RATE);
     outputName = outputName.replace('.mjpeg', '.avi'); // Use AVI container

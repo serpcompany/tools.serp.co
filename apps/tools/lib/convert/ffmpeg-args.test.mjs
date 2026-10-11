@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { buildCompressionCommand, buildConvertCommand, fitWithin } from "./ffmpeg-args.ts";
+import { VIDEO_FILTER, buildCompressionCommand, buildConvertCommand, fitWithin } from "./ffmpeg-args.ts";
 
 const VIDEO_INPUTS = ["3gp", "avi", "flv", "mjpeg", "mkv", "mov", "mp4", "mpeg", "rm", "swf", "ts", "webm"];
 // Video outputs FFmpeg encodes at the source's size and rate, within limits.
@@ -26,10 +26,11 @@ function frameSize(args) {
 }
 
 // The frame FFmpeg's scale filter makes of a width x height source from a
-// fitWithin filter: the box is min(source, limit) on each side, the frame is
-// shrunk to fit it keeping its shape, and both sides are rounded down to even.
+// filter chain ending in fitWithin: the box is min(source, limit) on each side,
+// the frame is shrunk to fit it keeping its shape, and both sides are rounded
+// down to even.
 function fittedSize(filter, width, height) {
-  const match = /^scale=w='min\(iw,(\d+)\)':h='min\(ih,(\d+)\)':force_original_aspect_ratio=decrease:force_divisible_by=2/.exec(filter);
+  const match = /scale=w='min\(iw,(\d+)\)':h='min\(ih,(\d+)\)':force_original_aspect_ratio=decrease:force_divisible_by=2/.exec(filter);
   assert.ok(match, filter);
   const boxW = Math.min(width, Number(match[1]));
   const boxH = Math.min(height, Number(match[2]));
@@ -41,7 +42,8 @@ function fittedSize(filter, width, height) {
 test("video outputs keep the source's size up to 1920 px on the longer side, never scaled up", () => {
   for (const to of [...VIDEO_TARGETS, "mxf"]) {
     const filter = option(buildConvertCommand("avi", to).args, "-vf");
-    assert.equal(filter, fitWithin(1920), to);
+    assert.equal(filter, VIDEO_FILTER, to);
+    assert.ok(filter.endsWith(fitWithin(1920)), to);
     assert.equal(fittedSize(filter, 1280, 720), "1280x720", to);
     assert.equal(fittedSize(filter, 1920, 1080), "1920x1080", to);
     assert.equal(fittedSize(filter, 3840, 2160), "1920x1080", to);
@@ -61,6 +63,24 @@ test("video outputs keep the source's frame rate up to 30 fps, without adding fr
   }
 });
 
+test("frames flagged interlaced are deinterlaced, one frame for each, before the frame is fitted", () => {
+  const deinterlace = "yadif=deint=interlaced,";
+  for (const to of [...VIDEO_TARGETS, "mxf"]) {
+    assert.ok(option(buildConvertCommand("vob", to).args, "-vf").startsWith(deinterlace), to);
+  }
+  const { prepass, args } = buildConvertCommand("mts", "gif");
+  assert.ok(option(prepass, "-vf").startsWith(deinterlace));
+  assert.ok(option(args, "-lavfi").startsWith(deinterlace));
+  // 3GP shrinks every source to CIF, which hides most combing, as before #245.
+  assert.doesNotMatch(option(buildConvertCommand("vob", "3gp").args, "-vf"), /yadif/);
+});
+
+test("MJPEG output uses the standard Huffman tables, which detailed 1080p frames don't crash", () => {
+  const { args } = buildConvertCommand("mp4", "mjpeg");
+  assert.equal(option(args, "-c:v"), "mjpeg");
+  assert.equal(option(args, "-huffman"), "default");
+});
+
 test("a remux keeps the streams as they are", () => {
   for (const [from, to] of [["mkv", "mp4"], ["mp4", "mkv"], ["mp4", "mov"], ["mp4", "ts"]]) {
     const { args } = buildConvertCommand(from, to);
@@ -72,7 +92,7 @@ test("a remux keeps the streams as they are", () => {
 
 test("GIF output is at most 480 px on the longer side, at 15 fps, in both passes", () => {
   const { prepass, args } = buildConvertCommand("mp4", "gif");
-  const filter = `fps=15,${fitWithin(480)}`;
+  const filter = `yadif=deint=interlaced,fps=15,${fitWithin(480)}`;
   assert.equal(option(prepass, "-vf"), `${filter},palettegen`);
   assert.equal(option(args, "-lavfi"), `${filter}[x];[x][1:v]paletteuse`);
   assert.equal(fittedSize(fitWithin(480), 1920, 1080), "480x270");
