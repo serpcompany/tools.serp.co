@@ -1,14 +1,23 @@
 // A table page's input, the table on screen and the name Download saves it
 // under (#281 reviews).
 //
+// The name follows the input text's origin, as #249 asks: the file whose
+// text is in the input, as read or since edited (sales.csv saves as
+// sales.json), or none for pasted text (table.json). A file's name is taken
+// only in the update that puts its text in the input, so a file that can't
+// be read never names anything. Typing, a grid edit or another input format
+// edits that text and keeps its origin. A change that replaces all of the
+// text (a paste over it, say), typing into an empty input, and Clear leave
+// text of the visitor's own, with no origin. A read or parse that fails
+// clears the table, and with it the grid and the download, but not the
+// origin: once the text parses again, the download is named after it.
+//
 // The invariant: the download name and the downloadable output always
-// describe the same table. A file's name is taken only when that file's text
-// is read and parsed into the table on screen, in the same update that puts
-// the table there. Every other change to the table (typing or pasting, an
-// edit in the grid, another input format) keeps the name that table already
-// had. A read or parse that fails clears the table, and with it the grid and
-// the name, so nothing is offered until a table is on screen again; an edit
-// made in a grid showing an earlier table is dropped.
+// describe the same table. The table on screen is the input parsed (or the
+// placeholder), the name is that input's origin, and offeredDownload offers
+// only an output written from the table on screen. The name changes only in
+// updates that replace the table too, so an output written before can't
+// take a name given after it.
 //
 // Every change to the input text, its format, the table and the name goes
 // through nextTablePage; TableConvertDemo keeps no other copy of them.
@@ -37,16 +46,13 @@ export type TablePage = {
   // The table on screen: in the grid, the previews and every output. Null
   // while the input doesn't read or parse.
   table: TableData | null;
-  // The file the table on screen came from (sales.csv saves as sales.json);
-  // null for typed or pasted input and the placeholder. Null whenever the
-  // table is.
+  // The file the input's text came from, as read or since edited; null for
+  // the visitor's own text and the placeholder. It stays while the text
+  // doesn't parse, when nothing is offered.
   fileName: string | null;
   // Which table the grid may edit: it changes whenever a table starts afresh
   // (a file read, a failure, a clear) and stays through edits of that table.
   origin: number;
-  // The file whose text is in the input unchanged. If it didn't parse,
-  // choosing the input format it does parse in still takes its name.
-  textFrom: string | null;
   error: string | null;
   upload: Upload;
 };
@@ -58,8 +64,9 @@ export type TablePageEvent =
   | { type: "read"; ticket: number; text: string; format: InputFormat | null }
   // It couldn't be read.
   | { type: "readFailed"; ticket: number; error: string }
-  // The visitor typed or pasted into the input.
-  | { type: "type"; text: string }
+  // The visitor typed, pasted or deleted in the input. `replacesInput`: the
+  // change replaced all of its text (a paste over a select-all, say).
+  | { type: "type"; text: string; replacesInput?: boolean }
   // The visitor edited the grid, which was showing the table of `origin`.
   | { type: "editGrid"; table: TableData; origin: number }
   // The visitor chose another input format.
@@ -75,7 +82,6 @@ export function initialTablePage(inputFormat: InputFormat, placeholder: TableDat
     table: placeholder,
     fileName: null,
     origin: 0,
-    textFrom: null,
     error: null,
     upload: null,
   };
@@ -90,40 +96,27 @@ export function tablePageReducer({
   serialize: SerializeTable;
   placeholder: TableData;
 }) {
-  // Parses the input into the table on screen, and names it in the same
-  // update: `name` is the name the table takes if the input parses. A failure
-  // clears the table and the name together.
+  // Parses the input into the table on screen. A failure clears the table,
+  // and with it the grid and any download, but the text keeps its origin.
   function settle(
     state: TablePage,
-    input: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "textFrom" | "upload">,
-    name: (continues: boolean) => string | null,
+    input: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "fileName" | "upload">,
     fromFile = false,
   ): TablePage {
     if (!input.hasUserInput && !input.inputText.trim()) {
       const continues = state.table === placeholder;
-      return { ...state, ...input, table: placeholder, fileName: null, error: null, origin: continues ? state.origin : state.origin + 1 };
+      return { ...state, ...input, fileName: null, table: placeholder, error: null, origin: continues ? state.origin : state.origin + 1 };
     }
     const result = parse(input.inputFormat, input.inputText);
     if (!result.supported || !result.table) {
       const error = result.error ?? (result.supported ? null : "Input format not supported.");
-      return { ...state, ...input, table: null, fileName: null, error, origin: state.origin + 1 };
+      return { ...state, ...input, table: null, error, origin: state.origin + 1 };
     }
-    // An edit of the table on screen keeps its name; a file read, or a table
+    // An edit of the table on screen continues it; a file read, or a table
     // after a failure, starts afresh.
     const continues = Boolean(state.table) && !fromFile;
-    return {
-      ...state,
-      ...input,
-      table: result.table,
-      fileName: name(continues),
-      error: null,
-      origin: continues ? state.origin : state.origin + 1,
-    };
+    return { ...state, ...input, table: result.table, error: null, origin: continues ? state.origin : state.origin + 1 };
   }
-
-  // An edit keeps the name of the table it edits; a table typed after a
-  // failure has none.
-  const kept = (state: TablePage) => (continues: boolean) => (continues ? state.fileName : null);
 
   return function nextTablePage(state: TablePage, event: TablePageEvent): TablePage {
     switch (event.type) {
@@ -132,63 +125,61 @@ export function tablePageReducer({
       case "read": {
         const { upload } = state;
         if (!upload || upload.ticket !== event.ticket) return state;
+        // The file's text is in the input now, so it takes the file's name.
         return settle(
           state,
           {
             inputFormat: event.format ?? state.inputFormat,
             inputText: event.text,
             hasUserInput: true,
-            textFrom: upload.name,
+            fileName: upload.name,
             upload: null,
           },
-          () => upload.name,
           true,
         );
       }
       case "readFailed":
         if (!state.upload || state.upload.ticket !== event.ticket) return state;
-        // The input keeps the text it had; the table and name go.
-        return { ...state, upload: null, table: null, fileName: null, error: event.error, origin: state.origin + 1 };
-      case "type":
-        return settle(
-          state,
-          { inputFormat: state.inputFormat, inputText: event.text, hasUserInput: true, textFrom: null, upload: null },
-          kept(state),
-        );
+        // The input keeps its text, and that text its origin; the table goes.
+        return { ...state, upload: null, table: null, error: event.error, origin: state.origin + 1 };
+      case "type": {
+        // Text that replaces all of the input, or is typed into an empty one,
+        // is the visitor's own; any other change edits the text that was there.
+        const own = event.replacesInput || !state.inputText.trim();
+        return settle(state, {
+          inputFormat: state.inputFormat,
+          inputText: event.text,
+          hasUserInput: true,
+          fileName: own ? null : state.fileName,
+          upload: null,
+        });
+      }
       case "editGrid": {
         // Only the table on screen can be edited: not a table the grid still
         // shows from before a file was read, nor one that failed to parse.
         if (!state.table || event.origin !== state.origin) return state;
         const asInput = serialize(state.inputFormat, event.table);
         if (!asInput.supported) {
-          return { ...state, hasUserInput: true, table: event.table, textFrom: null, upload: null, error: null };
+          return { ...state, hasUserInput: true, table: event.table, upload: null, error: null };
         }
-        return settle(
-          state,
-          { inputFormat: state.inputFormat, inputText: asInput.text, hasUserInput: true, textFrom: null, upload: null },
-          kept(state),
-        );
+        return settle(state, {
+          inputFormat: state.inputFormat,
+          inputText: asInput.text,
+          hasUserInput: true,
+          fileName: state.fileName,
+          upload: null,
+        });
       }
       case "inputFormat": {
         if (event.format === state.inputFormat) return state;
         // A table parsed from the visitor's input is rewritten in the new
         // format (CSV text becomes the same table as JSON). Otherwise the text
-        // on screen is parsed in the new format; if it's a file's text,
-        // untouched, the table takes that file's name.
-        const { hasUserInput, upload } = state;
+        // on screen is parsed in the new format. Either way it's the same
+        // text, so it keeps its origin.
+        const { hasUserInput, upload, fileName } = state;
         const rewritten = state.table && hasUserInput ? serialize(event.format, state.table) : null;
-        if (rewritten?.supported) {
-          return settle(
-            state,
-            { inputFormat: event.format, inputText: rewritten.text, hasUserInput, textFrom: null, upload },
-            kept(state),
-          );
-        }
-        return settle(
-          state,
-          { inputFormat: event.format, inputText: state.inputText, hasUserInput, textFrom: state.textFrom, upload },
-          (continues) => (continues ? state.fileName : state.textFrom),
-        );
+        const inputText = rewritten?.supported ? rewritten.text : state.inputText;
+        return settle(state, { inputFormat: event.format, inputText, hasUserInput, fileName, upload });
       }
       case "clear":
         return {
@@ -198,7 +189,6 @@ export function tablePageReducer({
           table: placeholder,
           fileName: null,
           origin: state.origin + 1,
-          textFrom: null,
           error: null,
           upload: null,
         };
@@ -220,8 +210,8 @@ export function canOfferOutput(input: PageInput, written: OutputSource | null): 
 }
 
 // What Download saves, or null when nothing may be saved: the output written
-// from the table on screen, under the name of the file that table came from
-// (or table.<extension>).
+// from the table on screen, under the name of the file the input's text came
+// from (or table.<extension>).
 export function offeredDownload<T extends OutputSource>(
   page: TablePage,
   outputFormat: OutputFormat,

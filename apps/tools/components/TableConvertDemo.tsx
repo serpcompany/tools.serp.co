@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import {
   Card,
@@ -74,6 +74,19 @@ export default function TableConvertDemo({
   // Numbers each upload, so a read that finishes after a newer upload or an
   // edit is dropped.
   const tickets = useRef(0);
+  // Whether the change being made to the input replaces all of its text (a
+  // paste or typing over a select-all, or deleting it all), from the
+  // selection just before it. That text is the visitor's own, so a download
+  // of it is table.<extension>, not the uploaded file's name.
+  const replacesInput = useRef(false);
+  const watchInput = useCallback((textarea: HTMLTextAreaElement | null) => {
+    if (!textarea) return;
+    const beforeChange = () => {
+      replacesInput.current = textarea.selectionStart === 0 && textarea.selectionEnd === textarea.value.length;
+    };
+    textarea.addEventListener("beforeinput", beforeChange);
+    return () => textarea.removeEventListener("beforeinput", beforeChange);
+  }, []);
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);
   const outputLabel = getLabel(OUTPUT_FORMATS, outputFormat);
@@ -81,9 +94,9 @@ export default function TableConvertDemo({
   const downloadName = outputFileName(fileName, outputFormat);
   const schemaFileName = outputFileName(fileName, "protobuf", "proto");
   const inputPreviewMessage = error ?? "Rendered input preview will appear here.";
-  // The file being read, or the one whose table or text is in the input
-  // (even when it doesn't parse, and so gives no download name).
-  const selectedName = upload?.name ?? fileName ?? page.textFrom;
+  // The file being read, or the one the input's text came from: the name a
+  // download takes.
+  const selectedName = upload?.name ?? fileName;
 
   // A text output is serialized from the table on screen as it renders, so
   // it can't lag behind it; binary outputs are written separately, below.
@@ -218,9 +231,10 @@ export default function TableConvertDemo({
     }
   }
 
-  // Saves the output under the uploaded file's name (sales.csv becomes
-  // sales.json), or table.<extension> for pasted text. A binary output was
-  // checked against its format's signature when it was written.
+  // Saves the output under the name of the file the input's text came from
+  // (sales.csv becomes sales.json), or table.<extension> for pasted text. A
+  // binary output was checked against its format's signature when it was
+  // written.
   function handleDownload() {
     const mimeType = outputMimeType(outputFormat);
     let name: string;
@@ -307,8 +321,12 @@ export default function TableConvertDemo({
 
                 {inputView === "raw" ? (
                   <textarea
+                    ref={watchInput}
                     value={inputText}
-                    onChange={(event) => dispatch({ type: "type", text: event.target.value })}
+                    onChange={(event) => {
+                      dispatch({ type: "type", text: event.target.value, replacesInput: replacesInput.current });
+                      replacesInput.current = false;
+                    }}
                     placeholder={getPlaceholder(inputFormat)}
                     className={`min-h-[280px] w-full resize-none rounded-lg border bg-background px-4 py-3 font-mono text-sm shadow-sm focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
                       error ? "border-red-400" : ""

@@ -58,16 +58,19 @@ test("typing, a grid edit or a clear during a read wins over it", () => {
   assert.equal(next(cleared, lateB), cleared);
 });
 
-test("a read or parse that fails clears the table and the name together", () => {
+test("a read or parse that fails clears the table, but the input's text keeps its origin", () => {
   const a = afterA();
-  // b.csv couldn't be read: no table, no name, and the next edit has none.
+  // b.csv couldn't be read: a.csv's text is still in the input, so its name
+  // stays, but there's no table, and nothing is offered.
   const unreadable = run(a, { type: "upload", name: "b.csv", ticket: 2 }, { type: "readFailed", ticket: 2, error: "b.csv couldn't be read" });
-  assert.deepEqual([unreadable.table, unreadable.fileName, unreadable.error], [null, null, "b.csv couldn't be read"]);
+  assert.deepEqual([unreadable.table, unreadable.fileName, unreadable.error], [null, "a.csv", "b.csv couldn't be read"]);
+  assert.equal(offeredDownload(unreadable, "json", { table: a.table, format: "json" }), null);
+  // Editing a.csv's text afterwards is still a.csv's; never b.csv's.
   const typed = next(unreadable, { type: "type", text: "csv:AAA_FIRST|EDITED" });
-  assert.deepEqual([cells(typed), typed.fileName], [["AAA_FIRST", "EDITED"], null]);
-  // Typing that stops parsing drops the name too.
+  assert.deepEqual([cells(typed), typed.fileName], [["AAA_FIRST", "EDITED"], "a.csv"]);
+  // Typing that stops parsing drops the table, not the name.
   const broken = next(a, { type: "type", text: "csv:AAA BROKEN" });
-  assert.deepEqual([broken.table, broken.fileName], [null, null]);
+  assert.deepEqual([broken.table, broken.fileName], [null, "a.csv"]);
   // A failed first upload leaves no name; the same file chosen again is read.
   const failedFirst = run(start(), { type: "upload", name: "b.csv", ticket: 1 }, { type: "readFailed", ticket: 1, error: "gone" });
   assert.equal(failedFirst.fileName, null);
@@ -77,13 +80,50 @@ test("a read or parse that fails clears the table and the name together", () => 
   assert.equal(next(a, { type: "clear" }).fileName, null);
 });
 
-test("round 3: a grid edit after an upload that doesn't parse doesn't save the previous table under the new name", () => {
+test("round 4: the name follows the input's text: a typo and its fix keep the file's name, a paste over all of it is table.<ext>", () => {
+  // data.json uploaded on JSON to Markdown.
+  const data = run(start("json"), { type: "upload", name: "data.json", ticket: 1 }, { type: "read", ticket: 1, text: "json:R1|R2|R3", format: "json" });
+  const download = (state) => offeredDownload(state, "markdown", state.table ? { table: state.table, format: "markdown" } : null);
+  assert.equal(download(data).name, "data.md");
+  // A row typed in: the first keystrokes don't parse, so nothing is offered...
+  const typo = next(data, { type: "type", text: "json:R1|R2|R3 BROKEN" });
+  assert.deepEqual([typo.table, typo.fileName, download(typo)], [null, "data.json", null]);
+  // ...and once it parses again, the download is still named after data.json.
+  const fixed = next(typo, { type: "type", text: "json:R1|R2|R3|R4" });
+  assert.deepEqual([cells(fixed), download(fixed).name], [["R1", "R2", "R3", "R4"], "data.md"]);
+  // A grid edit and another input format edit the same text, and keep it.
+  const edited = next(fixed, { type: "editGrid", table: { headers: ["value"], rows: [["R1"], ["G1"]] }, origin: fixed.origin });
+  assert.deepEqual([edited.inputText, edited.fileName], ["json:R1|G1", "data.json"]);
+  const asCsv = next(edited, { type: "inputFormat", format: "csv" });
+  assert.deepEqual([asCsv.inputText, download(asCsv).name], ["csv:R1|G1", "data.md"]);
+  // A paste over the whole input is the visitor's own text: table.md.
+  const pasted = next(fixed, { type: "type", text: "json:P1|P2", replacesInput: true });
+  assert.deepEqual([cells(pasted), pasted.fileName, download(pasted).name], [["P1", "P2"], null, "table.md"]);
+  // So is text typed into an input emptied a character at a time.
+  const emptied = next(fixed, { type: "type", text: "" });
+  assert.deepEqual([emptied.table, emptied.fileName], [null, "data.json"]);
+  const retyped = next(emptied, { type: "type", text: "json:T1" });
+  assert.deepEqual([cells(retyped), download(retyped).name], [["T1"], "table.md"]);
+  // A paste that replaces only part of the text edits it: still data.json's.
+  const partial = next(fixed, { type: "type", text: "json:R1|R2|R3|R4|P1" });
+  assert.equal(download(partial).name, "data.md");
+});
+
+test("round 3: a new upload that doesn't read or parse never lends its name to the previous table", () => {
   const a = afterA();
   const b = run(a, { type: "upload", name: "b.json", ticket: 2 }, { type: "read", ticket: 2, text: 'json:{"name": "BBB_ BROKEN', format: "json" });
-  assert.deepEqual([b.table, b.fileName, b.error], [null, null, "Unclosed quote."]);
+  // b.json's text is in the input, so it's b.json's, but there's no table.
+  assert.deepEqual([b.table, b.fileName, b.error], [null, "b.json", "Unclosed quote."]);
   // The grid still showing a.csv's table reports a.csv's origin: dropped.
   const edit = { type: "editGrid", table: { headers: ["value"], rows: [["EDITED"]] }, origin: a.origin };
   assert.equal(next(b, edit), b);
+  // b.json's text, fixed by typing, is b.json's table.
+  const fixedB = next(b, { type: "type", text: 'json:{"name": "BBB_"}' });
+  assert.deepEqual([cells(fixedB), fixedB.fileName], [['{"name": "BBB_"}'], "b.json"]);
+  // b.csv that can't be read: a.csv's text stays, under a.csv's name.
+  const unreadable = run(a, { type: "upload", name: "b.csv", ticket: 4 }, { type: "readFailed", ticket: 4, error: "gone" });
+  assert.deepEqual([unreadable.inputText, unreadable.fileName], ["csv:AAA_FIRST", "a.csv"]);
+  assert.equal(next(unreadable, { ...edit, origin: unreadable.origin }), unreadable, "no table, so no edit");
   // b.json as the first upload: the placeholder's grid can't be edited into b.json either.
   const first = run(start("json"), { type: "upload", name: "b.json", ticket: 1 }, { type: "read", ticket: 1, text: "json:BROKEN", format: "json" });
   assert.equal(next(first, { ...edit, origin: 0 }), first);
@@ -94,20 +134,22 @@ test("round 3: a grid edit after an upload that doesn't parse doesn't save the p
 });
 
 test("round 2: an input the page can't read isn't rewritten from the previous table when the input format changes", () => {
-  // a.csv, then b.xlsx: Excel input can't be read, so no table and no name.
+  // a.csv, then b.xlsx: Excel input can't be read, so no table; b.xlsx's
+  // bytes are in the input, so the name is b.xlsx's.
   const b = run(afterA(), { type: "upload", name: "b.xlsx", ticket: 2 }, { type: "read", ticket: 2, text: "PK\u0003\u0004", format: "excel" });
-  assert.deepEqual([b.table, b.fileName], [null, null]);
+  assert.deepEqual([b.table, b.fileName], [null, "b.xlsx"]);
   // CSV picked: b.xlsx's text is parsed as CSV, never a.csv's table.
   const asCsv = next(b, { type: "inputFormat", format: "csv" });
-  assert.deepEqual([asCsv.inputText, asCsv.table, asCsv.fileName], ["PK\u0003\u0004", null, null]);
-  // b.xlsx holding CSV text parses once CSV is picked, and takes its name.
+  assert.deepEqual([asCsv.inputText, asCsv.table, asCsv.fileName], ["PK\u0003\u0004", null, "b.xlsx"]);
+  // b.xlsx holding CSV text parses once CSV is picked, under its own name.
+  // (Round 3 needed an exception for this; now it is the text's origin.)
   const csvText = run(afterA(), { type: "upload", name: "b.xlsx", ticket: 2 }, { type: "read", ticket: 2, text: "csv:BBB_SECOND", format: "excel" });
   const picked = next(csvText, { type: "inputFormat", format: "csv" });
   assert.deepEqual([cells(picked), picked.fileName], [["BBB_SECOND"], "b.xlsx"]);
   // b.xlsx as the first upload: the placeholder isn't written into the input.
   const first = run(start(), { type: "upload", name: "b.xlsx", ticket: 1 }, { type: "read", ticket: 1, text: "PK", format: "excel" });
   const firstCsv = next(first, { type: "inputFormat", format: "csv" });
-  assert.deepEqual([firstCsv.inputText, firstCsv.table, firstCsv.fileName], ["PK", null, null]);
+  assert.deepEqual([firstCsv.inputText, firstCsv.table, firstCsv.fileName], ["PK", null, "b.xlsx"]);
   // A table on screen is rewritten in the new format and keeps its name.
   const json = next(afterA(), { type: "inputFormat", format: "json" });
   assert.deepEqual([json.inputText, cells(json), json.fileName], ["json:AAA_FIRST", ["AAA_FIRST"], "a.csv"]);
@@ -138,12 +180,16 @@ test("an output written from the previous table or for another format isn't offe
 
 // Generated sequences. Each runs visitor actions and the page's asynchronous
 // work in a random order: uploads that read, can't be read, don't parse or
-// are in another format, finishing late and out of order; typing; grid edits
-// from a grid that may still show an earlier table; input and output format
-// switches; binary outputs that finish after the table changed; clears.
-// After every step a reference model, kept here from the rules alone, says
-// which file (if any) the table on screen came from, and the test checks
-// the page's name, its table and whatever Download would save against it.
+// are in another format, finishing late and out of order; typing (edits,
+// typos and their fixes, pastes over all of the input, emptying it); grid
+// edits from a grid that may still show an earlier table; input and output
+// format switches; binary outputs that finish after the table changed;
+// clears. A reference model, kept here from the rules alone, follows the
+// same events: it holds its own input text and format, parses that text with
+// the stand-in to know whether there's a table, and tracks the text's origin
+// and the upload still being read. It never reads the page's state. After
+// every step the test checks the page's input, table, error and name against
+// it, and that Download offers exactly what it should, under that name.
 const SEQUENCES = 5000;
 const STEPS = 40;
 const SEED = 281249;
@@ -160,13 +206,52 @@ function mulberry32(seed) {
 }
 
 const ACTIONS = [
-  ["upload", 3], ["finish", 4], ["type", 3], ["editGrid", 4], ["syncGrid", 3],
+  ["upload", 3], ["finish", 4], ["type", 4], ["editGrid", 4], ["syncGrid", 3],
   ["inputFormat", 2], ["outputFormat", 2], ["writeStart", 2], ["writeFinish", 2], ["clear", 1],
 ];
 const INPUT_FORMATS = ["csv", "json", "excel"];
 const OUTPUT_FORMATS = ["json", "csv", "excel", "pdf"];
 const BINARY = new Set(["excel", "pdf"]);
 const EXTENSIONS = { csv: "csv", json: "json", excel: "xlsx" };
+
+// The model: what the rules say the page holds.
+function newModel(format) {
+  return {
+    format,
+    text: "",
+    userInput: false,
+    // The file the input's text came from, or null.
+    name: null,
+    // The ticket of the upload still being read.
+    pending: null,
+    // The table the text parses into (the placeholder before any input),
+    // or null; and whether the page shows an error.
+    table: placeholder,
+    error: false,
+    // A new object whenever a table starts afresh (a file read, a failure, a
+    // clear): the grid may edit only the table of the lineage it shows.
+    lineage: {},
+    // Counts every change to the table, so a written output is of the table
+    // on screen only if nothing changed it since.
+    version: 0,
+  };
+}
+
+// The model's table, from its own text: the placeholder until the visitor
+// gives any input, else the text parsed in its format.
+function reparse(model, { afresh = false } = {}) {
+  const had = model.table;
+  if (!model.userInput && !model.text.trim()) {
+    model.table = placeholder;
+    model.error = false;
+    model.name = null;
+  } else {
+    model.table = parse(model.format, model.text).table;
+    model.error = !model.table;
+  }
+  model.version += 1;
+  if (afresh || !had || !model.table) model.lineage = {};
+}
 
 function runSequence(rng, seen, log) {
   const pick = (list) => list[Math.floor(rng() * list.length)];
@@ -175,23 +260,19 @@ function runSequence(rng, seen, log) {
     for (const [name, weight] of ACTIONS) if ((roll -= weight) < 0) return name;
     return ACTIONS[0][0];
   };
-  let state = start(pick(INPUT_FORMATS));
+  const firstFormat = pick(INPUT_FORMATS);
+  let state = start(firstFormat);
+  const model = newModel(firstFormat);
   let outputFormat = pick(OUTPUT_FORMATS);
   let tickets = 0;
   let cellCount = 0;
   const reads = []; // uploads still being read, in any order
   const writes = []; // binary outputs being written
   let written = null; // the last binary output written
-
-  // The reference model: which file the table on screen came from
-  // (`lineage.name`), the upload still to be read, and the file whose text
-  // is in the input untouched.
-  let lineage = { name: null };
-  let pending = null;
-  let textFrom = null;
   // What the grid holds: the table it last synced, with that table's origin
-  // and lineage; null once it's removed because there's no table.
-  let grid = { table: state.table, origin: state.origin, lineage };
+  // (which its edits report) and the model's lineage; null once it's removed
+  // because there's no table.
+  let grid = { table: state.table, origin: state.origin, lineage: model.lineage };
 
   for (let step = 0; step < STEPS; step += 1) {
     const action = weighted();
@@ -215,33 +296,38 @@ function runSequence(rng, seen, log) {
       event.file = read;
     } else if (action === "type") {
       cellCount += 1;
-      const kind = pick(["append", "fresh", "broken", "other", "empty"]);
-      const other = pick(INPUT_FORMATS.filter((format) => format !== state.inputFormat));
+      const other = pick(INPUT_FORMATS.filter((format) => format !== model.format));
+      const kind = pick(["append", "typo", "fix", "fix", "fresh", "freshBroken", "other", "empty"]);
       const text = {
-        append: `${state.inputText}|T${cellCount}`,
-        fresh: `${state.inputFormat}:T${cellCount}`,
-        broken: `${state.inputFormat}:T${cellCount} BROKEN`,
+        append: `${model.text}|T${cellCount}`,
+        typo: `${model.text} BROKEN`,
+        fix: model.text.replaceAll(" BROKEN", ""),
+        fresh: `${model.format}:T${cellCount}`,
+        freshBroken: `${model.format}:T${cellCount} BROKEN`,
         other: `${other}:T${cellCount}`,
         empty: "",
       }[kind];
-      event = { type: "type", text };
+      // A change that leaves the text as it was fires no change event.
+      if (text === model.text) continue;
+      // Whether it replaced all of the text (a paste over a select-all).
+      event = { type: "type", text, replacesInput: rng() < 0.35 };
     } else if (action === "editGrid") {
       if (!grid) continue;
       cellCount += 1;
       event = { type: "editGrid", table: { headers: grid.table.headers, rows: [...grid.table.rows, [`G${cellCount}`]] }, origin: grid.origin };
     } else if (action === "syncGrid") {
       // The editor's effect: the grid takes the table on screen, or goes.
-      grid = state.table ? { table: state.table, origin: state.origin, lineage } : null;
+      grid = state.table ? { table: state.table, origin: state.origin, lineage: model.lineage } : null;
       continue;
     } else if (action === "inputFormat") {
-      event = { type: "inputFormat", format: pick(INPUT_FORMATS.filter((format) => format !== state.inputFormat)) };
+      event = { type: "inputFormat", format: pick(INPUT_FORMATS.filter((format) => format !== model.format)) };
     } else if (action === "outputFormat") {
       outputFormat = pick(OUTPUT_FORMATS);
       log.push(`output ${outputFormat}`);
     } else if (action === "writeStart") {
       // As the page's effect: a binary output of the table on screen.
       if (BINARY.has(outputFormat) && state.table && state.hasUserInput && !state.error) {
-        writes.push({ table: state.table, format: outputFormat, lineage });
+        writes.push({ table: state.table, format: outputFormat, version: model.version, name: model.name });
         log.push("write start");
       }
     } else if (action === "writeFinish") {
@@ -249,7 +335,7 @@ function runSequence(rng, seen, log) {
       // write's cancellation, must keep it from being offered.
       if (!writes.length) continue;
       written = writes.splice(Math.floor(rng() * writes.length), 1)[0];
-      log.push(`write finish (${written.lineage?.name ?? "no file"})`);
+      log.push(`write finish (${written.name ?? "no file"})`);
     } else if (action === "clear") {
       event = { type: "clear" };
     }
@@ -257,99 +343,128 @@ function runSequence(rng, seen, log) {
     if (event) {
       const { file, ...pageEvent } = event;
       const before = state;
+      const had = { table: model.table, name: model.name };
       log.push(JSON.stringify(pageEvent));
       state = next(before, pageEvent);
       const unchanged = () => assert.equal(state, before, "the event changes nothing");
 
       switch (event.type) {
         case "upload":
-          assert.deepEqual([state.table, state.fileName, state.inputText], [before.table, before.fileName, before.inputText]);
-          pending = event.ticket;
+          model.pending = event.ticket;
           break;
         case "read":
-        case "readFailed": {
-          if (pending !== event.ticket) {
+        case "readFailed":
+          if (model.pending !== event.ticket) {
             seen.droppedReads += 1;
             unchanged();
             break;
           }
-          pending = null;
+          model.pending = null;
           if (event.type === "readFailed") {
+            // The input keeps its text and origin; the table goes.
             seen.unreadable += 1;
-            lineage = null;
+            if (model.name) seen.unreadableKeepsName += 1;
+            model.table = null;
+            model.error = true;
+            model.version += 1;
+            model.lineage = {};
             break;
           }
-          textFrom = file.name;
-          const expected = parse(event.format ?? before.inputFormat, event.text).table;
-          assert.deepEqual(state.table, expected, "a read file's table is its text, parsed");
-          if (expected) seen.readOk += 1;
+          // The file's text is in the input: it's the file's.
+          model.text = event.text;
+          model.format = event.format ?? model.format;
+          model.userInput = true;
+          model.name = file.name;
+          reparse(model, { afresh: true });
+          if (model.table) seen.readOk += 1;
           else seen.readUnparseable += 1;
-          lineage = expected ? { name: file.name } : null;
           break;
-        }
         case "type":
-          pending = null;
-          textFrom = null;
-          lineage = state.table ? lineage ?? { name: null } : null;
+          model.pending = null;
+          // Text replacing all of the input, or typed into an empty one, is
+          // the visitor's own; anything else edits the text that was there.
+          if (event.replacesInput || !model.text.trim()) model.name = null;
+          model.text = event.text;
+          model.userInput = true;
+          reparse(model);
+          if (had.name && event.replacesInput) seen.replacedNamed += 1;
+          if (!had.table && model.table && model.name) seen.fixKeepsName += 1;
+          if (had.table && !model.table && model.name) seen.typoKeepsName += 1;
           break;
         case "editGrid": {
-          // An edit applies only to the table on screen: same lineage as the
-          // grid's, and there is a table.
-          const applies = lineage !== null && grid.lineage === lineage;
-          if (!applies) {
-            if (!before.table) seen.editsWithoutTable += 1;
+          // An edit applies only to the table on screen: there is one, and
+          // the grid shows its lineage.
+          if (!model.table || grid.lineage !== model.lineage) {
+            if (!model.table) seen.editsWithoutTable += 1;
             else seen.staleEdits += 1;
             unchanged();
             break;
           }
           seen.edits += 1;
-          assert.notEqual(state, before, "an edit of the table on screen applies");
-          assert.equal(state.inputText, serialize(before.inputFormat, event.table).text);
-          pending = null;
-          textFrom = null;
-          lineage = state.table ? lineage : null;
-          break;
-        }
-        case "inputFormat":
-          if (state.inputText !== before.inputText) textFrom = null;
-          if (!state.table) lineage = null;
-          else if (state.table !== before.table && !lineage) {
-            lineage = { name: state.hasUserInput ? textFrom : null };
-            if (lineage.name) seen.formatTakesFileName += 1;
+          model.pending = null;
+          model.userInput = true;
+          const asInput = serialize(model.format, event.table);
+          if (asInput.supported) {
+            model.text = asInput.text;
+            reparse(model);
+          } else {
+            // An input format the page can't write (Excel): the grid's table
+            // stands, and the input keeps its text.
+            model.table = event.table;
+            model.error = false;
+            model.version += 1;
           }
           break;
+        }
+        case "inputFormat": {
+          // A table from the visitor's input is rewritten in the new format;
+          // otherwise the same text is parsed in it. The text keeps its origin.
+          const rewritten = model.table && model.userInput ? serialize(event.format, model.table) : null;
+          if (rewritten?.supported) model.text = rewritten.text;
+          model.format = event.format;
+          reparse(model);
+          if (!had.table && model.table && model.name) seen.formatTakesFileName += 1;
+          break;
+        }
         case "clear":
-          pending = null;
-          textFrom = null;
-          lineage = { name: null };
+          model.pending = null;
+          model.text = "";
+          model.userInput = false;
+          model.name = null;
+          model.table = placeholder;
+          model.error = false;
+          model.version += 1;
+          model.lineage = {};
           break;
       }
     }
 
-    // The name always belongs to the file the table on screen came from,
-    // and there's no name without a table.
-    assert.equal(state.table === null, lineage === null, "a table is on screen exactly when the model has one");
-    assert.equal(state.fileName, lineage ? lineage.name : null, "the name is the file the table came from");
-    if (state.error) assert.equal(state.table, null, "an error leaves no table");
-    // The table on screen is the input parsed (or the placeholder, or a grid
-    // edit in an input format the page can't write, Excel).
-    if (state.table && state.hasUserInput && state.inputFormat !== "excel") {
-      assert.deepEqual(state.table, parse(state.inputFormat, state.inputText).table, "the table is the input, parsed");
-    }
-    if (!state.hasUserInput && state.table) assert.equal(state.table, placeholder);
+    // The page holds what the model says.
+    assert.equal(state.inputText, model.text, "the input is the model's text");
+    assert.equal(state.inputFormat, model.format, "the input format is the model's");
+    assert.equal(state.hasUserInput, model.userInput);
+    assert.equal(state.upload?.ticket ?? null, model.pending, "the upload being read is the model's");
+    assert.equal(state.table === null, model.table === null, "a table is on screen exactly when the model's text parses");
+    assert.deepEqual(state.table, model.table, "the table on screen is the model's text, parsed");
+    if (model.table === placeholder) assert.equal(state.table, placeholder);
+    assert.equal(Boolean(state.error), model.error, "an error exactly when there's no table");
+    assert.equal(state.fileName, model.name, "the name is the origin of the model's text");
 
     // Download: a text output is serialized from the table as the page
-    // renders; a binary one is whatever write finished last.
-    const textOutput = state.table ? { table: state.table, format: outputFormat, lineage } : null;
-    const offer = offeredDownload(state, outputFormat, BINARY.has(outputFormat) ? written : textOutput);
-    if (state.upload) assert.equal(offer, null, "nothing is offered while a file is read");
+    // renders; a binary one is whatever write finished last. It's offered
+    // exactly when it was written from the table on screen, for the output
+    // format chosen, with no upload being read and no error.
+    const textOutput = state.table ? { table: state.table, format: outputFormat, version: model.version, name: model.name } : null;
+    const output = BINARY.has(outputFormat) ? written : textOutput;
+    const offer = offeredDownload(state, outputFormat, output);
+    const offerable = Boolean(model.table) && !model.error && model.pending === null;
+    const current = Boolean(output) && output.version === model.version && output.format === outputFormat;
+    assert.equal(Boolean(offer), offerable && current, "Download offers exactly the output of the table on screen");
     if (offer) {
-      assert.ok(state.table && !state.error, "an offer needs a table on screen");
       assert.equal(offer.output.table, state.table, "the offer is of the table on screen");
-      assert.equal(offer.output.format, outputFormat);
-      assert.equal(offer.output.lineage, lineage, "the offer's bytes come from the table's file");
-      assert.equal(offer.name, outputFileName(lineage.name, outputFormat), "the offer takes that file's name");
-      if (lineage.name) seen.namedOffers += 1;
+      assert.equal(offer.output.name, model.name, "its bytes were written while the input had the same origin");
+      assert.equal(offer.name, outputFileName(model.name, outputFormat), "the offer takes that origin's name");
+      if (model.name) seen.namedOffers += 1;
     }
   }
 }
@@ -357,8 +472,8 @@ function runSequence(rng, seen, log) {
 test(`the name and the offered download always describe the table on screen (${SEQUENCES} generated sequences of ${STEPS} steps)`, (t) => {
   const rng = mulberry32(SEED);
   const seen = {
-    readOk: 0, readUnparseable: 0, unreadable: 0, droppedReads: 0, edits: 0, staleEdits: 0,
-    editsWithoutTable: 0, formatTakesFileName: 0, namedOffers: 0,
+    readOk: 0, readUnparseable: 0, unreadable: 0, unreadableKeepsName: 0, droppedReads: 0, edits: 0, staleEdits: 0,
+    editsWithoutTable: 0, typoKeepsName: 0, fixKeepsName: 0, replacedNamed: 0, formatTakesFileName: 0, namedOffers: 0,
   };
   for (let sequence = 0; sequence < SEQUENCES; sequence += 1) {
     const log = [];
