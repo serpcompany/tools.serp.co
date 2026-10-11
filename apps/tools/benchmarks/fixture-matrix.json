@@ -295,7 +295,7 @@
       "status": "ready",
       "input": "file",
       "fixture": "fixtures/sample.exr",
-      "notes": "OpenEXR with ZIP compression, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick -compress ZIP."
+      "notes": "OpenEXR with ZIP compression, scene-linear as renderers write EXR, from sample.ppm, a 96x96 test image (gradient, circle, two bars): magick sample.ppm -colorspace RGB -compress ZIP. Read back with magick -set colorspace RGB -colorspace sRGB: 85 dB PSNR against sample.ppm."
     },
     {
       "format": "f4v",

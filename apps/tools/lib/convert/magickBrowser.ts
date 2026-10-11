@@ -1,6 +1,10 @@
 // ImageMagick (WASM) in the browser, for inputs the browser can't decode:
-// camera RAW, PSD, TGA, DDS, TIFF, XCF. Loads the 14 MB wasm on first use.
+// camera RAW, layered, legacy, Netpbm and high dynamic range images, and
+// fonts. Loads the 14 MB wasm on first use.
 import type { IMagickImage, MagickFormat as MagickFormatType } from "@imagemagick/magick-wasm";
+
+import { drawFontSpecimen } from "./font-specimen.ts";
+import { sfwToJpeg } from "./sfw.ts";
 
 const WASM_URL = "/vendor/imagemagick/magick.wasm";
 
@@ -35,12 +39,20 @@ function magickFormat(magick: MagickModule, ext: string): MagickFormatType | und
   return key ? magick.MagickFormat[key as keyof typeof magick.MagickFormat] : undefined;
 }
 
-// Formats the browser can't decode that ImageMagick reads: camera RAW and
-// layered or legacy image formats.
+// Formats the browser can't decode that ImageMagick reads: camera RAW,
+// layered or legacy image formats, Netpbm, JPEG XL and JPEG 2000, high
+// dynamic range images (EXR, HDR) and fonts (TTF, OTF, drawn as a specimen).
+// MacPaint (MAC) has no signature, so it's read with its format named, as
+// every input is. SFW is repaired into a JPEG first (sfw.ts).
 export const MAGICK_BROWSER_INPUTS = new Set([
   "arw", "cr2", "cr3", "crw", "dng", "nef", "orf", "raf", "rw2",
   "dds", "psd", "tga", "tif", "tiff", "xcf",
+  "pam", "pbm", "pgm", "ppm", "pcx", "jxl", "jp2", "xpm", "wpg", "pcd", "mac", "sfw",
+  "exr", "hdr",
+  "ttf", "otf",
 ]);
+
+const FONT_INPUTS = new Set(["ttf", "otf"]);
 
 // Formats ImageMagick writes that a canvas can't (ICNS and KTX have their own
 // writers in texture-formats.ts). Camera RAW and HEIC can't be written by any
@@ -81,6 +93,60 @@ function writeImage(magick: MagickModule, image: IMagickImage, format: string): 
   return image.write(magickFormat(magick, format)!, (data) => data.slice());
 }
 
+// Linear light (0 to 1) -> 8-bit sRGB, for each 8-bit linear value.
+const SRGB_ENCODE = Uint8Array.from({ length: 256 }, (_, value) => {
+  const linear = value / 255;
+  const encoded = linear <= 0.0031308 ? 12.92 * linear : 1.055 * linear ** (1 / 2.4) - 0.055;
+  return Math.round(encoded * 255);
+});
+
+// OpenEXR and Radiance HDR store linear light with no upper limit. This 8-bit
+// build of ImageMagick clamps each value above 1.0 to 1.0 as it reads one
+// (there are no floating-point pixels left to tone map), so the image keeps
+// the exposure it was saved with, as macOS Preview shows it, and highlights
+// brighter than white are white. The linear values are encoded to sRGB, or
+// the image would look dark, as `magick in.exr out.png` writes it.
+function encodeLinearLight(magick: MagickModule, image: IMagickImage) {
+  const { ColorSpace } = magick;
+  // ImageMagick labels Radiance HDR linear RGB, and converting that to sRGB
+  // encodes it. It labels OpenEXR sRGB, though its values are linear, so
+  // those are encoded here; setting sRGB then only resets the gamma, or a
+  // PNG would be tagged gamma 1.0 and shown washed out.
+  if (image.colorSpace !== ColorSpace.RGB && image.colorSpace !== ColorSpace.LinearGray) {
+    image.getPixels((pixels) => {
+      const area = pixels.getArea(0, 0, image.width, image.height);
+      const alpha = image.hasAlpha ? pixels.getChannelIndex(magick.PixelChannel.Alpha) : -1;
+      const stride = image.channelCount;
+      for (let index = 0; index < area.length; index += 1) {
+        if (index % stride !== alpha) area[index] = SRGB_ENCODE[area[index]!]!;
+      }
+      pixels.setArea(0, 0, image.width, image.height, area);
+    });
+  }
+  image.colorSpace = ColorSpace.sRGB;
+}
+
+// Reads `bytes` as `from` (`source` in ImageMagick) and hands the image to `handle`.
+function readInput<T>(
+  magick: MagickModule,
+  bytes: Uint8Array,
+  from: string,
+  source: MagickFormatType,
+  handle: (image: IMagickImage) => T,
+): T {
+  if (FONT_INPUTS.has(from)) return drawFontSpecimen(magick, bytes, from, handle);
+  if (from === "sfw") {
+    return magick.ImageMagick.read(sfwToJpeg(bytes), magick.MagickFormat.Jpeg, (image) => {
+      image.flip();
+      return handle(image);
+    });
+  }
+  return magick.ImageMagick.read(bytes, source, (image) => {
+    if (from === "exr" || from === "hdr") encodeLinearLight(magick, image);
+    return handle(image);
+  });
+}
+
 // Converts `from` to `to` when ImageMagick can write `to`; otherwise to PNG,
 // for the caller to re-encode. Returns the bytes and the format written.
 export async function convertWithMagickInBrowser(
@@ -94,9 +160,7 @@ export async function convertWithMagickInBrowser(
     throw new Error(`${from.toUpperCase()} isn't supported by the image converter.`);
   }
   const format = MAGICK_BROWSER_OUTPUTS.has(to) ? to : "png";
-  const bytes = magick.ImageMagick.read(new Uint8Array(buf), source, (image) =>
-    writeImage(magick, image, format),
-  );
+  const bytes = readInput(magick, new Uint8Array(buf), from, source, (image) => writeImage(magick, image, format));
   return { buffer: bytes.buffer as ArrayBuffer, format };
 }
 
