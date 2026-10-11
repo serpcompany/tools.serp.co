@@ -21,7 +21,6 @@
     "NEXT_PUBLIC_RELEASE",
     "WORKERS_CI_COMMIT_SHA"
   ],
-  "globalPassThroughEnv": ["GITHUB_ACTIONS", "GITHUB_STEP_SUMMARY"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

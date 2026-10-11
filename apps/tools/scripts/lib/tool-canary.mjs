@@ -3,7 +3,7 @@
 // a change that breaks an engine fails CI instead of reaching visitors. Each
 // entry says what it guards. lib/tool-canary.test.mjs checks that every canary
 // passes in benchmarks/tool-sweep-results.json, and that every engine and page
-// with a passing Tool has a canary.
+// the sweep can run has a canary or is in UNGUARDED.
 //
 // HEVC output is left out: Playwright's Chromium on Linux has no HEVC encoder.
 
@@ -49,14 +49,22 @@ export function failingCanaries(rows, ids) {
   });
 }
 
-// The engines and page handlers that have a passing Tool but no canary. Rows
-// carry the engine and handler the current code assigns.
-export function uncoveredPaths(rows, canaryIds) {
+// Engines and pages the sweep can run that have no passing Tool to guard them
+// with, and why. The test fails when an entry is no longer needed.
+export const UNGUARDED = {
+  "server-pdf-compress": "compress-pdf fails on Workers until PDF compression is decided (#244)",
+};
+
+// The engines and page handlers of runnable Tools that have no canary and
+// aren't in unguarded. Plans carry the engine and handler the current code
+// assigns.
+export function uncoveredPaths(plans, canaryIds, unguarded = {}) {
   const canaries = new Set(canaryIds);
   const missing = (key) => {
-    const passing = new Set(rows.filter((row) => row.status === "pass" && row[key]).map((row) => row[key]));
-    for (const row of rows) if (canaries.has(row.id)) passing.delete(row[key]);
-    return [...passing].sort();
+    const paths = new Set(plans.map((plan) => plan[key]).filter(Boolean));
+    for (const plan of plans) if (canaries.has(plan.id)) paths.delete(plan[key]);
+    for (const label of Object.keys(unguarded)) paths.delete(label);
+    return [...paths].sort();
   };
   return { engines: missing("engine"), handlers: missing("handler") };
 }

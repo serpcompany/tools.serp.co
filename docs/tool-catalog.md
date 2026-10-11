@@ -98,3 +98,5 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
    would: keep only active Tools' rows (`mergeRows` with no new rows) and
    recount `meta.counts`. `pnpm test` fails while a retired Tool keeps a row.
 3. Run `pnpm -C apps/tools tool-status` and commit the regenerated view.
+4. If it is in `CANARY_TOOLS` (`scripts/lib/tool-canary.mjs`), replace it with
+   another passing Tool on the same engine; `pnpm test` fails until you do.
