@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -15,13 +16,24 @@ import {
 } from "@imagemagick/magick-wasm";
 import { unzlibSync } from "fflate";
 import { deflateSync } from "node:zlib";
-import { PDFDocument, PDFName, PDFArray, PDFRef, PDFRawStream } from "pdf-lib";
+import {
+  PDFArray,
+  PDFDocument,
+  PDFName,
+  PDFRawStream,
+  PDFRef,
+  concatTransformationMatrix,
+  drawObject,
+  popGraphicsState,
+  pushGraphicsState,
+} from "pdf-lib";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import UPNG from "upng-js";
 
 import {
   IMAGE_PDF_ACCEPT,
   IMAGE_PDF_MAX_IMAGES,
+  IMAGE_PDF_MAX_PIXELS,
   imageFormatOf,
   imagePdfName,
 } from "./image-pdf-inputs.ts";
@@ -31,6 +43,7 @@ import {
   embedsAsIs,
   imagesToPdf,
   isLosslessWebp,
+  jpegImageData,
   placement,
   imageRows,
   readJpeg,
@@ -159,9 +172,9 @@ test("three images in three formats make one PDF, a page each in the order chose
     for (const [index, page] of pages.entries()) {
       const { name } = order[index];
       if (name === "scan.jpg") {
-        // The JPEG's own bytes, at its own size.
+        // The JPEG's own image data, at its own size.
         assert.deepEqual([page.width, page.height, page.filter], [480, 120, "/DCTDecode"], name);
-        assert.deepEqual(page.stored, bytesOf("sample-text.jpg"), name);
+        assert.deepEqual(page.stored, jpegImageData(bytesOf("sample-text.jpg")), name);
         assert.deepEqual([page.pixels.width, page.pixels.height], [480, 120], name);
         continue;
       }
@@ -188,7 +201,8 @@ test("a JPEG goes in as it is, and its EXIF orientation turns the page upright",
   const { decoders, calls } = testDecoders();
   const [page] = await readPages(await imagesToPdf([file("phone.jpg", jpeg)], { decoders }));
   assert.deepEqual(calls.decode, []);
-  assert.deepEqual(page.stored, jpeg);
+  // The image data alone: the EXIF segment is read, then left out.
+  assert.deepEqual(page.stored, jpegImageData(bytesOf("sample-text.jpg")));
   // 480 x 120 stored, turned a quarter clockwise: a 120 x 480 page.
   assert.deepEqual([page.width, page.height], [120, 480]);
   assert.deepEqual(page.matrix, [0, -480, 120, 0, 0, 480]);
@@ -368,6 +382,212 @@ test("a JPEG's ICC profile goes into the PDF with it, when it matches the image"
   const twoParts = withIcc(bytesOf("sample.jpg"), profile, 2);
   const secondPart = 2 + 2 + ((twoParts[4] << 8) | twoParts[5]);
   assert.equal(readJpeg(new Uint8Array([0xff, 0xd8, ...twoParts.subarray(secondPart)])).icc, null);
+});
+
+const ascii = (text) => [...text].map((char) => char.charCodeAt(0));
+const jpegSegment = (marker, body) => [0xff, marker, (body.length + 2) >> 8, (body.length + 2) & 0xff, ...body];
+const holds = (bytes, text) => Buffer.from(bytes).includes(Buffer.from(text, "latin1"));
+// How many times marker 0xFF `code` appears. Entropy-coded data never holds
+// one: its 0xFF bytes are followed by 0 or a restart marker.
+const markerCount = (bytes, code) => bytes.reduce((sum, byte, index) => sum + (byte === 0xff && bytes[index + 1] === code ? 1 : 0), 0);
+
+// A page holding the JPEG's whole file, as this page stored it before: the
+// pixels a reader shows for the original.
+async function pixelsOfWholeJpeg(jpeg) {
+  const { width, height, components } = readJpeg(jpeg);
+  const doc = await PDFDocument.create();
+  const image = doc.context.register(
+    doc.context.stream(jpeg, {
+      Type: "XObject",
+      Subtype: "Image",
+      Width: width,
+      Height: height,
+      ColorSpace: components === 1 ? "DeviceGray" : "DeviceRGB",
+      BitsPerComponent: 8,
+      Filter: "DCTDecode",
+    }),
+  );
+  const page = doc.addPage([width, height]);
+  const name = page.node.newXObject("Image", image);
+  page.pushOperators(pushGraphicsState(), concatTransformationMatrix(width, 0, 0, height, 0, 0), drawObject(name), popGraphicsState());
+  return (await readPages(await doc.save()))[0].pixels;
+}
+
+// A phone photo as it's shared: EXIF with the orientation and a GPS block,
+// XMP, an ICC profile, MPF, a comment, then after the image's EOI a second
+// image (MPF's, or an Ultra HDR gain map) and a Motion Photo's MP4 video.
+function phonePhoto(jpeg, profile) {
+  const tiff = [
+    ...ascii("MM"), 0, 42, 0, 0, 0, 8,
+    // IFD0: the orientation (6), and where the GPS IFD is.
+    0, 2, 0x01, 0x12, 0, 3, 0, 0, 0, 1, 0, 6, 0, 0, 0x88, 0x25, 0, 4, 0, 0, 0, 1, 0, 0, 0, 38, 0, 0, 0, 0,
+    // GPS IFD: GPSMapDatum, 20 ASCII bytes at 56.
+    0, 1, 0, 0x12, 0, 2, 0, 0, 0, 20, 0, 0, 0, 56, 0, 0, 0, 0,
+    ...ascii("GPS-SECRET-48.8584N\0"),
+  ];
+  const head = [
+    ...jpegSegment(0xe1, [...ascii("Exif\0\0"), ...tiff]),
+    ...jpegSegment(0xe1, ascii("http://ns.adobe.com/xap/1.0/\0<x:xmpmeta>XMP-SECRET GCamera:MotionPhoto=\"1\"</x:xmpmeta>")),
+    ...jpegSegment(0xe2, [...ascii("MPF\0MM"), 0, 42, ...ascii("MPF-SECRET")]),
+    ...jpegSegment(0xfe, ascii("COMMENT-SECRET")),
+  ];
+  const withProfile = withIcc(jpeg, profile);
+  const video = [0, 0, 0, 0x18, ...ascii("ftypmp42"), 0, 0, 0, 0, ...ascii("mp42isom"), ...ascii("MOTION-PHOTO-VIDEO")];
+  return new Uint8Array([0xff, 0xd8, ...head, ...withProfile.subarray(2), ...bytesOf("sample.jpg"), ...video]);
+}
+
+test("a JPEG goes in as its image alone: no EXIF, GPS, XMP, MPF, comment, second image or video", async () => {
+  const source = magickPixels(bytesOf("sample.ppm"), MagickFormat.Ppm);
+  const jpeg = jpegOf(source);
+  const profile = fakeProfile("RGB ");
+  const photo = phonePhoto(jpeg, profile);
+  assert.equal(readJpeg(photo).orientation, 6);
+
+  const { decoders, calls } = testDecoders();
+  const [page] = await readPages(await imagesToPdf([file("PXL_20261012.MP.jpg", photo)], { decoders }));
+  assert.deepEqual(calls.decode, [], "not decoded");
+  const stored = page.stored;
+  for (const secret of ["Exif", "GPS-SECRET", "XMP-SECRET", "xmpmeta", "MPF", "COMMENT-SECRET", "ICC_PROFILE", "ftyp", "MOTION-PHOTO"]) {
+    assert.equal(holds(stored, secret), false, `${secret} is left out`);
+  }
+  // One image, SOI to the EOI that ends its scan, and nothing after it.
+  assert.deepEqual([...stored.subarray(0, 2), ...stored.subarray(-2)], [0xff, 0xd8, 0xff, 0xd9]);
+  assert.deepEqual([markerCount(stored, 0xd8), markerCount(stored, 0xd9), markerCount(stored, 0xda)], [1, 1, 1]);
+  assert.ok(stored.length < jpeg.length, "smaller than the bare JPEG, whose JFIF segment goes too");
+
+  // Its orientation and ICC profile, read before they were left out, still apply.
+  assert.deepEqual([page.width, page.height], [96, 96]);
+  assert.deepEqual(page.matrix, [0, -96, 96, 0, 0, 96]);
+  assert.equal(page.colorSpace.get(0).toString(), "/ICCBased");
+  assert.deepEqual(unzlibSync(page.context.lookup(page.colorSpace.get(1), PDFRawStream).contents), profile);
+  // And the pixels are the ones the whole file shows.
+  assert.deepEqual(page.pixels, await pixelsOfWholeJpeg(photo));
+});
+
+test("a progressive JPEG keeps every scan, and restart markers and Adobe's colour marker are kept", async () => {
+  const source = magickPixels(bytesOf("sample.ppm"), MagickFormat.Ppm);
+  const progressive = jpegOf(source, { interlace: Interlace.Jpeg });
+  assert.ok(markerCount(progressive, 0xda) > 1, "a progressive JPEG has several scans");
+  // Adobe's APP14 with transform 0: the colours are stored as they are, not as
+  // YCbCr. Left out, a reader would turn them from YCbCr and show other colours.
+  const adobe = jpegSegment(0xee, [...ascii("Adobe"), 0, 100, 0, 0, 0, 0, 0]);
+  const asStored = new Uint8Array([0xff, 0xd8, ...adobe, ...jpegOf(source).subarray(2)]);
+  assert.notDeepEqual(await pixelsOfWholeJpeg(asStored), await pixelsOfWholeJpeg(jpegOf(source)));
+  // sample.jpg has a restart interval (DRI) and restart markers in its scan.
+  assert.ok(markerCount(bytesOf("sample.jpg"), 0xdd) === 1 && markerCount(bytesOf("sample.jpg"), 0xd0) > 0);
+
+  for (const [name, jpeg] of [["progressive.jpg", progressive], ["adobe.jpg", asStored], ["restarts.jpg", bytesOf("sample.jpg")]]) {
+    const [page] = await readPages(await imagesToPdf([file(name, jpeg)], testDecoders()));
+    assert.equal(page.filter, "/DCTDecode", name);
+    for (const code of [0xda, 0xdd, 0xd0, 0xc4, 0xdb]) {
+      assert.equal(markerCount(page.stored, code), markerCount(jpeg, code), `${name}: marker ${code.toString(16)}`);
+    }
+    assert.equal(holds(page.stored, "Adobe"), name === "adobe.jpg", name);
+    assert.deepEqual(page.pixels, await pixelsOfWholeJpeg(jpeg), name);
+  }
+});
+
+test("a JPEG whose markers don't make sense is decoded instead", async () => {
+  const jpeg = bytesOf("sample.jpg");
+  assert.equal(jpegImageData(new Uint8Array([0xff, 0xd8, 0xff, 0xd9])), null, "no scan");
+  assert.equal(jpegImageData(new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x40, 0])), null, "a segment past the end");
+  const cut = jpegImageData(jpeg.subarray(0, jpeg.length - 40));
+  assert.deepEqual([...cut.subarray(-2)], [0xff, 0xd9], "a cut-short file still ends its image");
+  // A stray byte after the frame header: readJpeg reads the frame, the walk to the scans fails.
+  const sof = jpeg.findIndex((byte, index) => byte === 0xff && jpeg[index + 1] === 0xc0);
+  const afterSof = sof + 2 + ((jpeg[sof + 2] << 8) | jpeg[sof + 3]);
+  const broken = new Uint8Array([...jpeg.subarray(0, afterSof), 0x00, ...jpeg.subarray(afterSof)]);
+  assert.ok(embedsAsIs(readJpeg(broken)));
+  assert.equal(jpegImageData(broken), null);
+  const { decoders, calls } = testDecoders();
+  await imagesToPdf([file("broken.jpg", broken)], { decoders }).catch(() => {});
+  assert.deepEqual(calls.decode, ["jpg"]);
+});
+
+test("an image over 50 megapixels is refused by name before it's decoded or encoded", async () => {
+  assert.equal(IMAGE_PDF_MAX_PIXELS, 50_000_000);
+  const message = /^huge\.(xcf|png|jpg) is 10,000 x 5,001 pixels, over the 50 megapixels a browser tab can turn into a PDF page safely\. Make it smaller first\.$/;
+  const { decoders: real } = testDecoders();
+  const calls = [];
+  const decoders = {
+    // Only the size: nothing reads these pixels once it's refused.
+    decode: async (format, buffer) => {
+      calls.push(format);
+      return format === "xcf" ? { width: 10_000, height: 5_001, data: new Uint8Array(4) } : real.decode(format, buffer);
+    },
+    encodeJpeg: async () => assert.fail("not encoded"),
+  };
+  // After it's decoded, in a batch: the error names that image.
+  await assert.rejects(imagesToPdf([file("first.png", bytesOf("sample.png")), file("huge.xcf", bytesOf("sample.xcf"))], { decoders }), {
+    telemetryCode: "image_too_large",
+    telemetryMetadata: { engine: "image-pdf", format: "xcf" },
+    message,
+  });
+  assert.deepEqual(calls, ["png", "xcf"]);
+
+  // A PNG and a JPEG say their size up front, so they aren't decoded at all.
+  const pngOfSize = (width, height) => {
+    const png = bytesOf("sample.png").slice();
+    new DataView(png.buffer).setUint32(16, width);
+    new DataView(png.buffer).setUint32(20, height);
+    return png;
+  };
+  calls.length = 0;
+  await assert.rejects(imagesToPdf([file("huge.png", pngOfSize(10_000, 5_001))], { decoders }), { telemetryCode: "image_too_large", message });
+  const cmyk = jpegOf(magickPixels(bytesOf("sample.ppm"), MagickFormat.Ppm), { colorSpace: ColorSpace.CMYK });
+  const sof = cmyk.findIndex((byte, index) => byte === 0xff && cmyk[index + 1] === 0xc0);
+  new DataView(cmyk.buffer, cmyk.byteOffset).setUint16(sof + 5, 5_001);
+  new DataView(cmyk.buffer, cmyk.byteOffset).setUint16(sof + 7, 10_000);
+  await assert.rejects(imagesToPdf([file("huge.jpg", cmyk)], { decoders }), { telemetryCode: "image_too_large", message });
+  assert.deepEqual(calls, []);
+  // Exactly 50 megapixels goes on to the decoder.
+  const stop = { ...decoders, decode: async (format) => (calls.push(format), assert.fail("decoded")) };
+  await assert.rejects(imagesToPdf([file("edge.png", pngOfSize(10_000, 5_000))], { decoders: stop }), { telemetryCode: "convert_failed" });
+  assert.deepEqual(calls, ["png"]);
+});
+
+test("a large image is compressed a band at a time with the filter a sample chose, and fflate does it without CompressionStream", async () => {
+  // 1,500 x 1,000 RGB is 4.5 MB of rows: over the 2 MB tried both ways, and
+  // two 4 MB bands.
+  // mulberry32: a million values without the floating-point LCG's short cycles.
+  let seed = 11;
+  const random = () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const smooth = pixels(1500, 1000, (x, y) => [(x * 255) / 1500, (y * 255) / 1000, ((x * y) >> 11) & 255, x < 1400 ? 255 : 90]);
+  const speckled = pixels(1500, 1000, () => [random() < 0.5 ? 0 : 255, random() < 0.5 ? 0 : 255, random() < 0.5 ? 0 : 255, 255]);
+  const images = [smooth, speckled];
+  // The file's first byte says which image it is; its extension says PNG.
+  const files = images.map((_, index) => file(`${index}.png`, new Uint8Array([index, ...bytesOf("sample.png").subarray(1)])));
+  const decoders = {
+    decode: async (_format, buffer) => images[new Uint8Array(buffer)[0]],
+    encodeJpeg: async () => assert.fail("not a photo"),
+  };
+  // What trying both on all the rows would choose.
+  const best = images.map(({ data }) => {
+    const [plain, paeth] = [false, true].map((predicted) => deflateSync(imageRows(data, 1500, 1000, [0, 1, 2], predicted)).length);
+    return paeth < plain ? "15" : null;
+  });
+  assert.deepEqual(best, ["15", null]);
+
+  const check = async () => {
+    const pages = await readPages(await imagesToPdf(files, { decoders }));
+    for (const [index, page] of pages.entries()) assert.deepEqual(page.pixels.data, images[index].data, `page ${index + 1}`);
+    assert.deepEqual(pages.map((page) => page.predictor), best);
+    assert.ok(pages[0].softMask, "the smooth image's transparent edge has a soft mask");
+  };
+  await check();
+  const { CompressionStream } = globalThis;
+  delete globalThis.CompressionStream;
+  try {
+    // Safari before 16.4: the same pages, pixel for pixel.
+    await check();
+  } finally {
+    globalThis.CompressionStream = CompressionStream;
+  }
 });
 
 test("a file is read as what its bytes say, else as what its extension says", () => {

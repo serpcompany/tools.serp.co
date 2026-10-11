@@ -3,9 +3,11 @@
 // pixel, and the image fills it. pdf-lib writes the document; each image goes
 // in as one of:
 //
-// - A JPEG's own bytes (DCTDecode), so a photo is neither re-encoded nor
+// - A JPEG's own image data (DCTDecode), so a photo is neither re-encoded nor
 //   enlarged. Its EXIF orientation turns the page, as a browser shows it, and
-//   its ICC profile (an iPhone's Display P3, say) is embedded with it.
+//   its ICC profile (an iPhone's Display P3, say) is embedded with it; the
+//   rest of its metadata (EXIF, with GPS, and XMP) and anything stored after
+//   the image (a Motion Photo's video, an Ultra HDR gain map) is left out.
 // - A JPEG at quality 92, for an opaque photo in any other format (HEIC,
 //   AVIF, lossy WebP, camera RAW...): those PDFs would otherwise run to tens
 //   of megabytes a page.
@@ -28,8 +30,10 @@ import {
 
 import {
   IMAGE_PDF_MAX_BYTES,
+  IMAGE_PDF_MAX_PIXELS,
   IMAGE_PDF_MAX_IMAGES,
   imageFormatOf,
+  imageTooLargeMessage,
   pdfTooLargeMessage,
   tooManyImagesMessage,
 } from "./image-pdf-inputs.ts";
@@ -165,6 +169,83 @@ export function embedsAsIs(info: JpegInfo): boolean {
   );
 }
 
+// Segments a decoder reads besides frames and scans: quantisation and Huffman
+// tables (DQT, DHT), arithmetic conditioning (DAC), the restart interval
+// (DRI), the line count (DNL) and EXP.
+const DECODER_SEGMENTS = new Set([0xdb, 0xc4, 0xcc, 0xdd, 0xdc, 0xdf]);
+const isRestart = (marker: number) => marker >= 0xd0 && marker <= 0xd7;
+
+// The JPEG's image alone, as a PDF's DCTDecode stream holds it: SOI, the
+// tables, the frame, every scan with its entropy-coded data (a progressive
+// JPEG has several) and the EOI that ends the last scan, with an Adobe APP14
+// segment, which says whether the colours are YCbCr or stored as they are.
+// EXIF, XMP, ICC (read by readJpeg first), MPF and the other APP segments and
+// comments are left out, and so is everything after that EOI: a Motion
+// Photo's video, an Ultra HDR gain map or MPF's other images. Null when the
+// markers don't make sense; the image is then decoded instead.
+export function jpegImageData(bytes: Uint8Array): Uint8Array | null {
+  if (bytes[0] !== 0xff || bytes[1] !== 0xd8) return null;
+  const kept: [number, number][] = [[0, 2]];
+  let scans = 0;
+  let offset = 2;
+  let ended = false;
+  while (offset + 1 < bytes.length) {
+    if (bytes[offset] !== 0xff) return null;
+    const marker = bytes[offset + 1]!;
+    if (marker === 0xff) {
+      offset += 1; // fill byte
+      continue;
+    }
+    if (marker === 0xd9) {
+      if (!scans) return null;
+      kept.push([offset, offset + 2]);
+      ended = true;
+      break;
+    }
+    if (marker === 0x01 || isRestart(marker)) {
+      offset += 2;
+      continue;
+    }
+    if (marker === 0xd8 || offset + 4 > bytes.length) return null;
+    const end = offset + 2 + readU16(bytes, offset + 2);
+    if (end < offset + 4 || end > bytes.length) return null;
+    if (marker !== 0xda) {
+      const adobe = marker === 0xee && startsWith(bytes.subarray(offset + 4, end), "Adobe");
+      if (adobe || isFrame(marker) || DECODER_SEGMENTS.has(marker)) kept.push([offset, end]);
+      offset = end;
+      continue;
+    }
+    // A scan: its header, then entropy-coded data up to the next marker. In
+    // that data a 0xFF is followed by 0 (a stuffed byte), a restart marker or
+    // another 0xFF (fill before a marker).
+    let at = end;
+    for (;;) {
+      at = bytes.indexOf(0xff, at);
+      if (at < 0 || at + 1 >= bytes.length) {
+        at = bytes.length;
+        break;
+      }
+      const next = bytes[at + 1]!;
+      if (next !== 0 && next !== 0xff && !isRestart(next)) break;
+      at += next === 0xff ? 1 : 2;
+    }
+    kept.push([offset, at]);
+    scans += 1;
+    offset = at;
+  }
+  if (!scans) return null;
+  // A file cut short still ends its image, as its decoder would.
+  const tail = ended ? [] : [0xff, 0xd9];
+  const out = new Uint8Array(kept.reduce((sum, [start, end]) => sum + end - start, tail.length));
+  let at = 0;
+  for (const [start, end] of kept) {
+    out.set(bytes.subarray(start, end), at);
+    at += end - start;
+  }
+  out.set(tail, at);
+  return out;
+}
+
 // --- Pages ------------------------------------------------------------------
 
 // Acrobat's largest page side, 200 inches. A larger image keeps its pixels
@@ -199,22 +280,25 @@ export function placement(width: number, height: number, orientation = 1): Place
   return { pageWidth: w, pageHeight: h, matrix: matrices[orientation] ?? matrices[1]! };
 }
 
-// The channels at `offsets` of RGBA pixels, row by row. With `paeth`, each
-// row is a PNG row filtered with Paeth, as a /Predictor 15 Flate stream holds
-// it: a filter byte (4), then each byte's difference from the nearest of its
-// left, upper and upper-left neighbours' sum. Without, the bytes as they are.
+// The channels at `offsets` of RGBA pixels, rows `from` to `to`. With
+// `paeth`, each row is a PNG row filtered with Paeth, as a /Predictor 15 Flate
+// stream holds it: a filter byte (4), then each byte's difference from the
+// nearest of its left, upper and upper-left neighbours' sum. Without, the
+// bytes as they are.
 export function imageRows(
   data: ArrayLike<number>,
   width: number,
   height: number,
   offsets: readonly number[],
   paeth: boolean,
+  from = 0,
+  to = height,
 ): Uint8Array<ArrayBuffer> {
   const rowBytes = width * offsets.length;
-  const out = new Uint8Array(height * (rowBytes + (paeth ? 1 : 0)));
+  const out = new Uint8Array((to - from) * (rowBytes + (paeth ? 1 : 0)));
   const stride = width * 4;
   let at = 0;
-  for (let y = 0; y < height; y += 1) {
+  for (let y = from; y < to; y += 1) {
     if (paeth) out[at++] = 4;
     const row = y * stride;
     const up = row - stride;
@@ -239,15 +323,63 @@ export function imageRows(
   return out;
 }
 
-// zlib, as a Flate stream holds it: the browser's own CompressionStream, or
-// fflate where there's none (Safari before 16.4).
-async function deflate(bytes: Uint8Array<ArrayBuffer>): Promise<Uint8Array> {
+// zlib, as a Flate stream holds it, of `count` chunks made one at a time by
+// `chunk`: the browser's own CompressionStream, or fflate where there's none
+// (Safari before 16.4).
+async function deflate(count: number, chunk: (index: number) => Uint8Array<ArrayBuffer>): Promise<Uint8Array> {
   if (typeof CompressionStream === "function") {
-    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate"));
-    return new Uint8Array(await new Response(stream).arrayBuffer());
+    const stream = new CompressionStream("deflate");
+    const compressed = new Response(stream.readable).arrayBuffer();
+    const writer = stream.writable.getWriter();
+    for (let index = 0; index < count; index += 1) await writer.write(chunk(index));
+    await writer.close();
+    return new Uint8Array(await compressed);
   }
-  const { zlibSync } = await import("fflate");
-  return zlibSync(bytes);
+  const { Zlib } = await import("fflate");
+  const parts: Uint8Array[] = [];
+  const zlib = new Zlib();
+  zlib.ondata = (part) => parts.push(part);
+  for (let index = 0; index < count; index += 1) zlib.push(chunk(index), index === count - 1);
+  const out = new Uint8Array(parts.reduce((sum, part) => sum + part.length, 0));
+  let at = 0;
+  for (const part of parts) {
+    out.set(part, at);
+    at += part.length;
+  }
+  return out;
+}
+
+// Rows are filtered and compressed a band of about 4 MB at a time, so an
+// image's rows are never held whole beside its pixels.
+const BAND_BYTES = 4 * 1024 * 1024;
+// Paeth halves a photo; a screenshot or drawing often compresses better as it
+// is. Both are tried on up to 2 MB of rows, all of a small image's or eight
+// bands spread down a larger one, and the smaller wins.
+const SAMPLE_BYTES = 2 * 1024 * 1024;
+const SAMPLE_BANDS = 8;
+
+// The channels at `offsets` as a Flate stream, and whether its rows are Paeth's.
+async function flateRows(
+  { data, width, height }: Pixels,
+  offsets: readonly number[],
+): Promise<{ compressed: Uint8Array; paeth: boolean }> {
+  const rowBytes = width * offsets.length;
+  const rows = (paeth: boolean, from: number, to: number) => imageRows(data, width, height, offsets, paeth, from, to);
+  if (rowBytes * height <= SAMPLE_BYTES) {
+    const plain = await deflate(1, () => rows(false, 0, height));
+    const paeth = await deflate(1, () => rows(true, 0, height));
+    return paeth.byteLength < plain.byteLength ? { compressed: paeth, paeth: true } : { compressed: plain, paeth: false };
+  }
+  const bandRows = Math.max(1, Math.floor(SAMPLE_BYTES / SAMPLE_BANDS / rowBytes));
+  const sampleAt = (index: number) => Math.floor((index * (height - bandRows)) / (SAMPLE_BANDS - 1));
+  const sample = (paeth: boolean) =>
+    deflate(SAMPLE_BANDS, (index) => rows(paeth, sampleAt(index), sampleAt(index) + bandRows));
+  const paeth = (await sample(true)).byteLength < (await sample(false)).byteLength;
+  const band = Math.max(1, Math.floor(BAND_BYTES / rowBytes));
+  const compressed = await deflate(Math.ceil(height / band), (index) =>
+    rows(paeth, index * band, Math.min(height, (index + 1) * band)),
+  );
+  return { compressed, paeth };
 }
 
 export type ImagePdf = {
@@ -282,13 +414,8 @@ export async function createImagePdf(): Promise<ImagePdf> {
     colorSpace: string,
     extra: Record<string, PDFRef> = {},
   ) => {
-    const { data, width, height } = pixels;
-    // Paeth halves a photo; a screenshot or drawing often compresses better
-    // as it is. Both are tried, one at a time, and the smaller kept.
-    const plain = await deflate(imageRows(data, width, height, offsets, false));
-    const paeth = await deflate(imageRows(data, width, height, offsets, true));
-    const predicted = paeth.byteLength < plain.byteLength;
-    const compressed = predicted ? paeth : plain;
+    const { width, height } = pixels;
+    const { compressed, paeth: predicted } = await flateRows(pixels, offsets);
     imageBytes += compressed.byteLength;
     return context.register(
       context.stream(compressed, {
@@ -403,7 +530,12 @@ export type ImageFile = { name: string; arrayBuffer(): Promise<ArrayBuffer> };
 
 // Why a PDF couldn't be made, in words for the visitor, with the telemetry
 // code and metadata that getTelemetryFailure (lib/telemetry.ts) reads.
-export type ImagePdfErrorCode = "too_many_images" | "pdf_too_large" | "unsupported_input" | "convert_failed";
+export type ImagePdfErrorCode =
+  | "too_many_images"
+  | "pdf_too_large"
+  | "image_too_large"
+  | "unsupported_input"
+  | "convert_failed";
 
 export class ImagePdfError extends Error {
   readonly telemetryCode: ImagePdfErrorCode;
@@ -417,18 +549,38 @@ export class ImagePdfError extends Error {
   }
 }
 
-async function addImage(pdf: ImagePdf, format: string, buffer: ArrayBuffer, decoders: ImagePdfDecoders) {
+// Refuses an image too large to decode and encode in a tab, by its name.
+function checkPixels(file: ImageFile, format: string, width: number, height: number) {
+  if (width * height <= IMAGE_PDF_MAX_PIXELS) return;
+  throw new ImagePdfError(imageTooLargeMessage(file.name, width, height), "image_too_large", format);
+}
+
+async function addImage(
+  pdf: ImagePdf,
+  file: ImageFile,
+  format: string,
+  buffer: ArrayBuffer,
+  decoders: ImagePdfDecoders,
+) {
+  const bytes = new Uint8Array(buffer);
   if (format === "jpg") {
-    const bytes = new Uint8Array(buffer);
     const info = readJpeg(bytes);
-    if (info && embedsAsIs(info)) return pdf.addJpeg(bytes, info);
+    const image = info && embedsAsIs(info) ? jpegImageData(bytes) : null;
+    if (info && image) return pdf.addJpeg(image, info);
+    if (info) checkPixels(file, format, info.width, info.height);
+  }
+  // A PNG says its size up front, so a small file of a huge image isn't decoded.
+  if (format === "png" && bytes.length >= 24 && startsWith(bytes.subarray(12), "IHDR")) {
+    checkPixels(file, format, readU32(bytes, 16), readU32(bytes, 20));
   }
   const pixels = await decoders.decode(format, buffer);
-  const photo = PHOTO_FORMATS.has(format) && !(format === "webp" && isLosslessWebp(new Uint8Array(buffer)));
+  checkPixels(file, format, pixels.width, pixels.height);
+  const photo = PHOTO_FORMATS.has(format) && !(format === "webp" && isLosslessWebp(bytes));
   if (photo && isOpaque(pixels)) {
     const jpeg = await decoders.encodeJpeg(pixels, PHOTO_QUALITY);
     const info = readJpeg(jpeg);
-    if (info && embedsAsIs(info)) return pdf.addJpeg(jpeg, { ...info, orientation: 1 });
+    const image = info && embedsAsIs(info) ? jpegImageData(jpeg) : null;
+    if (info && image) return pdf.addJpeg(image, { ...info, orientation: 1 });
   }
   return pdf.addPixels(pixels);
 }
@@ -464,8 +616,9 @@ export async function imagesToPdf(
     const format = imageFormatOf(file.name, new Uint8Array(buffer, 0, Math.min(buffer.byteLength, 4096)));
     if (!format) throw new ImagePdfError(`${file.name} isn't an image this page can read.`, "unsupported_input");
     try {
-      await addImage(pdf, format, buffer, decoders);
+      await addImage(pdf, file, format, buffer, decoders);
     } catch (error) {
+      if (error instanceof ImagePdfError) throw error;
       const reason = error instanceof Error ? error.message : String(error);
       throw new ImagePdfError(`Couldn't read ${file.name}: ${reason}`, "convert_failed", format);
     }

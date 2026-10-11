@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUp, X } from "lucide-react";
 import { Button } from "@serp-tools/ui/components/button";
 import { saveBlob } from "@/components/saveAs";
@@ -30,6 +30,7 @@ type Props = {
 };
 
 type Queued = { id: number; file: File };
+type RowAction = "up" | "down" | "remove";
 
 const sizeLabel = (bytes: number) =>
   bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -48,6 +49,12 @@ export default function ImagesToPdfConverter({
   to,
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const addRef = useRef<HTMLButtonElement | null>(null);
+  const listRef = useRef<HTMLOListElement | null>(null);
+  // Where keyboard focus goes once the list has changed: a row's button, or
+  // the add button when the list empties. Otherwise a removed row's button,
+  // or an arrow that can't go further, would leave focus on the page itself.
+  const focusNext = useRef<{ id: number; action: RowAction } | "add" | null>(null);
   const nextId = useRef(0);
   const [queue, setQueue] = useState<Queued[]>([]);
   const [busy, setBusy] = useState(false);
@@ -57,6 +64,17 @@ export default function ImagesToPdfConverter({
   const [currentFile, setCurrentFile] = useState<ToolProgressFile | null>(null);
   const [completedLabel, setCompletedLabel] = useState<string | undefined>(undefined);
   const color = toolColor(from, to);
+
+  useEffect(() => {
+    const target = focusNext.current;
+    if (!target) return;
+    focusNext.current = null;
+    const button =
+      target === "add"
+        ? addRef.current
+        : listRef.current?.querySelector<HTMLButtonElement>(`[data-row="${target.id}"][data-action="${target.action}"]`);
+    button?.focus();
+  }, [queue]);
 
   function onPick() {
     inputRef.current?.click();
@@ -143,17 +161,30 @@ export default function ImagesToPdfConverter({
   }
 
   function move(index: number, by: number) {
+    const target = index + by;
+    const moved = queue[index];
+    if (!moved || target < 0 || target >= queue.length) return;
+    // Focus stays with the moved row: on the arrow pressed, or on its other
+    // arrow once it reaches the top or bottom.
+    const [pressed, other]: [RowAction, RowAction] = by < 0 ? ["up", "down"] : ["down", "up"];
+    const atEnd = by < 0 ? target === 0 : target === queue.length - 1;
+    focusNext.current = { id: moved.id, action: atEnd ? other : pressed };
     setQueue((items) => {
-      const target = index + by;
-      if (target < 0 || target >= items.length) return items;
+      if (target >= items.length) return items;
       const next = [...items];
       [next[index], next[target]] = [next[target]!, next[index]!];
       return next;
     });
   }
 
-  function remove(id: number) {
-    setQueue((items) => items.filter((item) => item.id !== id));
+  // Focus moves to the Remove button now in this place (the next row's), or
+  // the previous row's when this was last, or the add button.
+  function remove(index: number) {
+    const removed = queue[index];
+    if (!removed) return;
+    const next = queue[index + 1] ?? queue[index - 1];
+    focusNext.current = next ? { id: next.id, action: "remove" } : "add";
+    setQueue((items) => items.filter((item) => item.id !== removed.id));
   }
 
   async function combine() {
@@ -210,6 +241,7 @@ export default function ImagesToPdfConverter({
               </svg>
 
               <Button
+                ref={addRef}
                 size="lg"
                 className="h-12 px-8 rounded-xl text-white shadow-lg"
                 style={{ backgroundColor: color, borderColor: color }}
@@ -262,6 +294,7 @@ export default function ImagesToPdfConverter({
                   variant="ghost"
                   size="sm"
                   onClick={() => {
+                    focusNext.current = "add";
                     setQueue([]);
                     setNotice(null);
                   }}
@@ -270,7 +303,7 @@ export default function ImagesToPdfConverter({
                   Clear
                 </Button>
               </div>
-              <ol className="divide-y rounded-xl border bg-white dark:bg-transparent">
+              <ol ref={listRef} className="divide-y rounded-xl border bg-white dark:bg-transparent">
                 {queue.map((item, index) => (
                   <li key={item.id} className="flex items-center gap-2 px-3 py-2 text-sm">
                     <span className="w-6 shrink-0 tabular-nums text-muted-foreground">{index + 1}</span>
@@ -283,6 +316,8 @@ export default function ImagesToPdfConverter({
                       size="icon"
                       className="size-8"
                       aria-label={`Move ${item.file.name} up`}
+                      data-row={item.id}
+                      data-action="up"
                       disabled={busy || index === 0}
                       onClick={() => move(index, -1)}
                     >
@@ -293,6 +328,8 @@ export default function ImagesToPdfConverter({
                       size="icon"
                       className="size-8"
                       aria-label={`Move ${item.file.name} down`}
+                      data-row={item.id}
+                      data-action="down"
                       disabled={busy || index === queue.length - 1}
                       onClick={() => move(index, 1)}
                     >
@@ -303,8 +340,10 @@ export default function ImagesToPdfConverter({
                       size="icon"
                       className="size-8"
                       aria-label={`Remove ${item.file.name}`}
+                      data-row={item.id}
+                      data-action="remove"
                       disabled={busy}
-                      onClick={() => remove(item.id)}
+                      onClick={() => remove(index)}
                     >
                       <X />
                     </Button>

@@ -34,6 +34,19 @@ export const IMAGE_PDF_ACCEPT = ["image/*", ...IMAGE_PDF_INPUTS.map((format) => 
 export const IMAGE_PDF_MAX_IMAGES = 100;
 export const IMAGE_PDF_MAX_BYTES = 250 * 1024 * 1024;
 
+// The most pixels an image is decoded to on its way into a PDF: 50
+// megapixels, 200 MB of RGBA once decoded, before the PDF so far and the
+// decoder's own copies. The largest images the page was run with were 48.8
+// megapixels (an 8064 x 6048 HEIC and an 8000 x 6000 PNG), which every 48 MP
+// phone camera's full-size photo is, and the tab held them. A JPEG that goes
+// in as it is isn't decoded, so it isn't held to this.
+export const IMAGE_PDF_MAX_PIXELS = 50_000_000;
+
+export function imageTooLargeMessage(fileName: string, width: number, height: number): string {
+  const size = `${width.toLocaleString("en-US")} x ${height.toLocaleString("en-US")} pixels`;
+  return `${fileName} is ${size}, over the ${IMAGE_PDF_MAX_PIXELS / 1_000_000} megapixels a browser tab can turn into a PDF page safely. Make it smaller first.`;
+}
+
 export function tooManyImagesMessage(count: number): string {
   return `A PDF made here holds up to ${IMAGE_PDF_MAX_IMAGES} images, and you chose ${count}. Make two PDFs instead.`;
 }
