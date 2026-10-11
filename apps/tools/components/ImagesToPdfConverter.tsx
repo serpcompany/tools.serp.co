@@ -136,8 +136,9 @@ export default function ImagesToPdfConverter({
     }
     setNotice(notices.join(" ") || null);
     if (added.length) {
+      const items = added.map((file) => ({ id: nextId.current++, file }));
       setCurrentFile(null);
-      setQueue((items) => [...items, ...added.map((file) => ({ id: nextId.current++, file }))]);
+      setQueue((listedItems) => [...listedItems, ...items]);
     }
   }
 
@@ -257,7 +258,15 @@ export default function ImagesToPdfConverter({
                 <p className="text-sm font-medium">
                   {queue.length} {queue.length === 1 ? "image" : "images"}: one page each, in this order
                 </p>
-                <Button variant="ghost" size="sm" onClick={() => setQueue([])} disabled={busy}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setQueue([]);
+                    setNotice(null);
+                  }}
+                  disabled={busy}
+                >
                   Clear
                 </Button>
               </div>
