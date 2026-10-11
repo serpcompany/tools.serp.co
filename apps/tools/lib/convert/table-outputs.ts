@@ -193,10 +193,18 @@ export function isRightToLeft(text: string): boolean {
   return Boolean(letter && RTL_LETTER.test(letter[0]));
 }
 
-async function fetchPdfFont(): Promise<ArrayBuffer> {
-  const response = await fetch(PDF_FONT_URL);
-  if (!response.ok) throw new Error(`The PDF font didn't load (HTTP ${response.status}).`);
-  return response.arrayBuffer();
+// Fetched once a page, when a PDF first needs it; a failed fetch is tried
+// again next time.
+let pdfFont: Promise<ArrayBuffer> | null = null;
+function fetchPdfFont(): Promise<ArrayBuffer> {
+  pdfFont ??= fetch(PDF_FONT_URL).then((response) => {
+    if (!response.ok) throw new Error(`The PDF font didn't load (HTTP ${response.status}).`);
+    return response.arrayBuffer();
+  });
+  pdfFont.catch(() => {
+    pdfFont = null;
+  });
+  return pdfFont;
 }
 
 function toBase64(buffer: ArrayBuffer): string {
