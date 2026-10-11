@@ -91599,7 +91599,7 @@
   {
     "id": "otf-to-png",
     "name": "OTF to PNG",
-    "description": "Convert OTF to PNG format",
+    "description": "Convert OTF to PNG: a specimen image of the font, with its name, letters, digits and a sample sentence.",
     "operation": "convert",
     "route": "/otf-to-png",
     "from": "otf",
@@ -91615,7 +91615,7 @@
   {
     "id": "otf-to-svg",
     "name": "OTF to SVG",
-    "description": "Convert OTF to SVG format",
+    "description": "Convert OTF to SVG: an SVG holding a specimen picture of the font (its name, letters, digits and a sample sentence), not its glyph outlines.",
     "operation": "convert",
     "route": "/otf-to-svg",
     "from": "otf",
@@ -98246,7 +98246,7 @@
   {
     "id": "ttf-to-png",
     "name": "TTF to PNG",
-    "description": "Convert TTF to PNG format",
+    "description": "Convert TTF to PNG: a specimen image of the font, with its name, letters, digits and a sample sentence.",
     "operation": "convert",
     "route": "/ttf-to-png",
     "from": "ttf",
@@ -98262,7 +98262,7 @@
   {
     "id": "ttf-to-svg",
     "name": "TTF to SVG",
-    "description": "Convert TTF to SVG format",
+    "description": "Convert TTF to SVG: an SVG holding a specimen picture of the font (its name, letters, digits and a sample sentence), not its glyph outlines.",
     "operation": "convert",
     "route": "/ttf-to-svg",
     "from": "ttf",
@@ -98278,7 +98278,7 @@
   {
     "id": "ttf-to-tiff",
     "name": "TTF to TIFF",
-    "description": "Convert TTF to TIFF format",
+    "description": "Convert TTF to TIFF: a specimen image of the font, with its name, letters, digits and a sample sentence.",
     "operation": "convert",
     "route": "/ttf-to-tiff",
     "from": "ttf",
