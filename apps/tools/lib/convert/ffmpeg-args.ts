@@ -25,6 +25,7 @@ export function fitWithin(size: number): string {
 // Interlaced frames (1080i camcorder footage, broadcast TS, DVD VOBs) would
 // comb on every moving edge at the source's size, so frames flagged interlaced
 // are deinterlaced first, one frame for each. Progressive frames pass through.
+// 3GP (H263_CIF_FILTER) and RM/RMVB (no filter) don't get it.
 const DEINTERLACE = "yadif=deint=interlaced";
 // The filter of every video output at the source's size.
 export const VIDEO_FILTER = `${DEINTERLACE},${fitWithin(MAX_VIDEO_SIZE)}`;

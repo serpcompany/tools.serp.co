@@ -26,6 +26,8 @@ Conversion picks an engine by input format:
   slower source keeps its rate, and sides are rounded down to even numbers.
   Frames flagged interlaced (1080i camcorder footage, broadcast TS, DVD VOBs)
   are deinterlaced first, one frame for each; progressive frames pass through.
+  3GP isn't deinterlaced (its shrink to CIF hides most combing), and neither
+  are RM and RMVB, which get no filter until #255 moves them to the browser.
   MXF is always 25 fps, a broadcast rate, and 3GP stays 352x288 at 12 fps,
   since H.263 only encodes fixed frame sizes. A remux, such as MKV to MP4,
   copies the streams as they are. RM and RMVB keep the source size uncapped:
@@ -43,7 +45,9 @@ Conversion picks an engine by input format:
   still reads and writes the containers and does the scaling around the
   browser's steps, handing frames over as VP8 within the same limits, at a
   constant rate that a `.hevc` stream records. That VP8's bitrate limit grows
-  with the frame: 8 Mbit/s at 720p, 18 at 1080p, at most 40. Ordinary footage
+  with the frame: 8 Mbit/s at 720p, 18 at 1080p, and 32 for the largest
+  frame the size limit allows (1920x1920); a 40 Mbit/s bound only guards a
+  larger limit. Ordinary footage
   comes through near-lossless (median 56 dB PSNR on FFmpeg's `testsrc2` at
   1080p); very detailed frames lose a little (44 dB on `mandelbrot`). A `.av1`
   output is AV1 in IVF and a `.hevc` output a raw Annex B stream, neither with
