@@ -11,6 +11,7 @@ import { MAX_IMAGE_SIDE } from "./document-images.ts";
 import type { RGBA } from "./heif.ts";
 import type { GraphvizJob, GraphvizReply } from "./graphviz.worker.ts";
 import { prepareSvgForImage, rasterizeSvg, svgImageSize, svgSize } from "./svg-image.ts";
+import { runInWorker, type WorkerLike } from "./worker-run.ts";
 
 // A DOT file is code: anything bigger than this isn't a graph a picture of
 // could show.
@@ -50,41 +51,22 @@ export function graphScaleNotice(size: { width: number; height: number }, image:
 
 // ------------------------------------------------------------- browser --
 
-type WorkerLike = Pick<Worker, "postMessage" | "terminate"> & {
-  onmessage: ((event: MessageEvent<GraphvizReply>) => void) | null;
-  onerror: ((event: ErrorEvent) => void) | null;
-};
-
-const startWorker = (): WorkerLike => new Worker(new URL("./graphviz.worker.ts", import.meta.url), { type: "module" });
+const startWorker = (): WorkerLike<GraphvizReply> =>
+  new Worker(new URL("./graphviz.worker.ts", import.meta.url), { type: "module" });
 
 // Lays the graph out in a new worker, which is terminated when it answers,
 // fails, or runs past `timeoutMs` (an Error with code "layout_timeout").
-export function layoutGraph(
+export async function layoutGraph(
   job: GraphvizJob,
-  { timeoutMs = LAYOUT_TIMEOUT_MS, createWorker = startWorker }: { timeoutMs?: number; createWorker?: () => WorkerLike } = {},
+  { timeoutMs = LAYOUT_TIMEOUT_MS, createWorker = startWorker }: { timeoutMs?: number; createWorker?: () => WorkerLike<GraphvizReply> } = {},
 ): Promise<{ svg: string; warnings: string[] }> {
-  const worker = createWorker();
-  return new Promise((resolve, reject) => {
-    const finish = () => {
-      clearTimeout(timer);
-      worker.terminate();
-    };
-    const timer = setTimeout(() => {
-      finish();
-      reject(Object.assign(new Error(LAYOUT_TIMEOUT_MESSAGE), { code: "layout_timeout" }));
-    }, timeoutMs);
-    worker.onmessage = (event) => {
-      finish();
-      const reply = event.data;
-      if (reply.ok) resolve({ svg: reply.svg, warnings: reply.warnings });
-      else reject(new Error(`This DOT file couldn't be laid out (${reply.error}).`));
-    };
-    worker.onerror = (event) => {
-      finish();
-      reject(new Error(`Graphviz stopped while laying out this graph (${event.message || "out of memory"}).`));
-    };
-    worker.postMessage(job);
+  const reply = await runInWorker(createWorker(), job, {
+    timeoutMs,
+    timedOut: () => Object.assign(new Error(LAYOUT_TIMEOUT_MESSAGE), { code: "layout_timeout" }),
+    crashed: (event) => new Error(`Graphviz stopped while laying out this graph (${event.message || "out of memory"}).`),
   });
+  if (!reply.ok) throw new Error(`This DOT file couldn't be laid out (${reply.error}).`);
+  return { svg: reply.svg, warnings: reply.warnings };
 }
 
 export async function renderGraph(buf: ArrayBuffer): Promise<{ rgba: RGBA; notice?: string }> {

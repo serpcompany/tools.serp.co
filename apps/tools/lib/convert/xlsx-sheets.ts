@@ -5,14 +5,22 @@
 // and hidden columns are left out, as Excel leaves them out of a printout.
 // Charts, pictures, comments and cell styles aren't read.
 //
-// Read with fflate (already the app's ZIP library) and a small XML scanner,
-// on the main thread: a workbook part is inflated only when it's needed and
-// only up to the size its ZIP entry declares, so a ZIP bomb can't fill the
-// tab's memory.
-
-import { unzipSync } from "fflate";
+// Read with fflate (already the app's ZIP library) and a small XML scanner
+// (ooxml.ts), on the main thread: a workbook part is inflated only when it's
+// needed and only up to the size its ZIP entry declares, so a ZIP bomb can't
+// fill the tab's memory.
 
 import { BUILT_IN_FORMATS, formatCellNumber } from "./excel-number-format.ts";
+import {
+  isOleFile,
+  isZipFile,
+  mainPartPath,
+  parseRelationships,
+  partText as text,
+  readParts,
+  relationshipsPath,
+  scanXml,
+} from "./ooxml.ts";
 import type { TableData } from "./table-data.ts";
 
 // A part bigger than this (inflated) isn't read: about 500,000 rows of ten
@@ -25,65 +33,13 @@ export const KEPT_COLUMNS = 200;
 
 export type Sheet = { name: string; table: TableData };
 
-// ------------------------------------------------------------------ XML --
-
-const XML_TOKEN =
-  /<(\/?)([A-Za-z_][\w.:-]*)((?:\s+[^\s=/>]+\s*=\s*(?:"[^"]*"|'[^']*'))*)\s*(\/?)>|<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<!\[CDATA\[([\s\S]*?)\]\]>|<![^>]*>|([^<]+)/g;
-const XML_ATTRIBUTE = /([^\s=]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
-const ENTITY = /&(?:#(\d+)|#x([0-9a-fA-F]+)|(lt|gt|amp|quot|apos));/g;
-const NAMED: Record<string, string> = { lt: "<", gt: ">", amp: "&", quot: '"', apos: "'" };
-
-export function decodeEntities(text: string): string {
-  if (!text.includes("&")) return text;
-  return text.replace(ENTITY, (whole, decimal?: string, hex?: string, name?: string) => {
-    if (name) return NAMED[name] ?? whole;
-    const code = decimal ? Number(decimal) : parseInt(hex!, 16);
-    return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : "";
-  });
-}
+// --------------------------------------------------------------- strings --
 
 // Excel writes characters XML can't hold as _xHHHH_ (and a literal
 // "_x0041_" as "_x005F_x0041_").
 export function decodeExcelEscapes(text: string): string {
   if (!text.includes("_x")) return text;
   return text.replace(/_x([0-9A-Fa-f]{4})_/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)));
-}
-
-const localName = (name: string) => name.slice(name.indexOf(":") + 1);
-
-type XmlHandlers = {
-  open?: (name: string, attributes: Record<string, string>, selfClosing: boolean) => void;
-  close?: (name: string) => void;
-  text?: (text: string) => void;
-};
-
-// Calls back for each element and text run, with local names (a prefix
-// such as "x:" dropped) and attributes decoded.
-export function scanXml(xml: string, { open, close, text }: XmlHandlers): void {
-  XML_TOKEN.lastIndex = 0;
-  for (let match = XML_TOKEN.exec(xml); match; match = XML_TOKEN.exec(xml)) {
-    const [, slash, name, attributeText, selfClosing, cdata, run] = match;
-    if (name !== undefined) {
-      const local = localName(name);
-      if (slash) {
-        close?.(local);
-        continue;
-      }
-      const attributes: Record<string, string> = {};
-      if (open && attributeText) {
-        XML_ATTRIBUTE.lastIndex = 0;
-        for (let pair = XML_ATTRIBUTE.exec(attributeText); pair; pair = XML_ATTRIBUTE.exec(attributeText)) {
-          attributes[localName(pair[1]!)] = decodeEntities(pair[2] ?? pair[3] ?? "");
-        }
-      }
-      open?.(local, attributes, Boolean(selfClosing));
-      if (selfClosing) close?.(local);
-    } else if (cdata !== undefined) {
-      text?.(cdata);
-    } else if (run !== undefined) {
-      text?.(decodeEntities(run));
-    }
-  }
 }
 
 // ------------------------------------------------------------ the parts --
@@ -104,31 +60,6 @@ export function parseWorkbook(xml: string): WorkbookInfo {
     },
   });
   return info;
-}
-
-// A part's relationships: id to target part path and type.
-export function parseRelationships(xml: string, partPath: string): Map<string, { target: string; type: string }> {
-  const base = partPath.slice(0, partPath.lastIndexOf("/") + 1);
-  const relationships = new Map<string, { target: string; type: string }>();
-  scanXml(xml, {
-    open(name, attributes) {
-      if (name !== "Relationship" || attributes.TargetMode === "External") return;
-      relationships.set(attributes.Id ?? "", { target: resolvePart(base, attributes.Target ?? ""), type: attributes.Type ?? "" });
-    },
-  });
-  return relationships;
-}
-
-// A relationship's target as a path in the ZIP: relative to the part's
-// folder, or from the root when it starts with "/".
-export function resolvePart(base: string, target: string): string {
-  const segments = (target.startsWith("/") ? target.slice(1) : base + target).split("/");
-  const parts: string[] = [];
-  for (const segment of segments) {
-    if (segment === "..") parts.pop();
-    else if (segment && segment !== ".") parts.push(segment);
-  }
-  return parts.join("/");
 }
 
 export function parseSharedStrings(xml: string): string[] {
@@ -348,53 +279,24 @@ export function sheetTable(cells: SheetCells): TableData | null {
 
 // ----------------------------------------------------------------- read --
 
-const OLE_SIGNATURE = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1];
-
-function unzipParts(bytes: Uint8Array, wanted: (name: string) => boolean): Record<string, Uint8Array> {
-  const tooBig: string[] = [];
-  let parts: Record<string, Uint8Array>;
-  try {
-    parts = unzipSync(bytes, {
-      filter: (file) => {
-        if (!wanted(file.name)) return false;
-        if (file.originalSize > MAX_PART_BYTES) {
-          tooBig.push(file.name);
-          return false;
-        }
-        return true;
-      },
-    });
-  } catch {
-    throw new Error("This XLSX file couldn't be read: it isn't a complete ZIP archive.");
-  }
-  if (tooBig.length) {
-    throw new Error(
-      `This workbook is too large to draw here: a sheet holds more than ${MAX_PART_BYTES / 1024 / 1024} MB of cells.`,
-    );
-  }
-  return parts;
-}
-
-const text = (bytes: Uint8Array | undefined) => (bytes ? new TextDecoder().decode(bytes) : "");
-
 // The workbook's sheets that show, in order, as tables, and how many hidden
 // sheets were left out; sheets with no values are left out too.
 export function readWorkbookSheets(buf: ArrayBuffer): { sheets: Sheet[]; hidden: number } {
   const bytes = new Uint8Array(buf);
-  if (OLE_SIGNATURE.every((byte, index) => bytes[index] === byte)) {
+  if (isOleFile(bytes)) {
     throw new Error(
       "This is an older Excel workbook (.xls) or a password-protected one: open it in Excel and save it as an unprotected .xlsx first.",
     );
   }
-  if (bytes[0] !== 0x50 || bytes[1] !== 0x4b) throw new Error("This file isn't an XLSX workbook: it isn't a ZIP archive.");
-
-  const root = unzipParts(bytes, (name) => name === "_rels/.rels");
-  const office = [...parseRelationships(text(root["_rels/.rels"]), "").values()].find((relation) =>
-    relation.type.endsWith("/officeDocument"),
-  );
-  const workbookPath = office?.target || "xl/workbook.xml";
-  const relsPath = `${workbookPath.slice(0, workbookPath.lastIndexOf("/") + 1)}_rels/${workbookPath.slice(workbookPath.lastIndexOf("/") + 1)}.rels`;
-  const head = unzipParts(bytes, (name) => name === workbookPath || name === relsPath);
+  if (!isZipFile(bytes)) throw new Error("This file isn't an XLSX workbook: it isn't a ZIP archive.");
+  const read = {
+    maxBytes: MAX_PART_BYTES,
+    tooBig: `This workbook is too large to draw here: a sheet holds more than ${MAX_PART_BYTES / 1024 / 1024} MB of cells.`,
+    kind: "XLSX file",
+  };
+  const workbookPath = mainPartPath(bytes, "xl/workbook.xml", read);
+  const relsPath = relationshipsPath(workbookPath);
+  const head = readParts(bytes, (name) => name === workbookPath || name === relsPath, read);
   if (!head[workbookPath]) throw new Error("This file isn't an XLSX workbook: it has no workbook part.");
   const workbook = parseWorkbook(text(head[workbookPath]));
   const relationships = parseRelationships(text(head[relsPath]), workbookPath);
@@ -407,7 +309,7 @@ export function readWorkbookSheets(buf: ArrayBuffer): { sheets: Sheet[]; hidden:
     .map((sheet) => ({ name: sheet.name, relation: relationships.get(sheet.relation) }))
     .filter((sheet) => sheet.relation?.type.endsWith("/worksheet"));
   const paths = new Set([stringsPath, stylesPath, ...visible.map((sheet) => sheet.relation!.target)].filter(Boolean));
-  const parts = unzipParts(bytes, (name) => paths.has(name));
+  const parts = readParts(bytes, (name) => paths.has(name), read);
   const context: CellContext = {
     strings: stringsPath ? parseSharedStrings(text(parts[stringsPath])) : [],
     formats: stylesPath ? parseStyles(text(parts[stylesPath])) : [],

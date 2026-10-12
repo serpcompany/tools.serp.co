@@ -42,6 +42,7 @@ export const CANARY_TOOLS = {
   "txt-to-png": "plain text drawn on a canvas in the self-hosted DejaVu Sans, long lines wrapped",
   "dot-to-png": "a Graphviz DOT graph laid out by Viz.js (Graphviz in WebAssembly) in a worker, drawn through an <img>",
   "xlsx-to-png": "an XLSX sheet read with fflate, its numbers in their formats, drawn as the table converters draw a table",
+  "pptx-to-png": "a PowerPoint slide drawn as SVG by pptx-glimpse in a worker, then through an <img>",
   "json-to-csv": "JSON to CSV page",
   "csv-combiner": "CSV combiner page: two files in, one out",
   "html-to-markdown": "HTML to Markdown page",

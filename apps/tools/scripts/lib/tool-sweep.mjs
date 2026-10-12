@@ -255,6 +255,7 @@ export const ENGINE_LOCATIONS = {
   "text-render": "client-only",
   "viz-js": "client-only",
   "xlsx-table": "client-only",
+  "pptx-glimpse": "client-only",
   svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",
@@ -313,6 +314,8 @@ export const PAGE_COUNTS = {
   "sample-long-table.docx": 4,
   // An image of each sheet that shows: two of three (one is hidden).
   "sample-sheets.xlsx": 2,
+  // An image of each slide that shows: two of three (one is hidden).
+  "sample-deck.pptx": 2,
 };
 
 // fixture-matrix.json: ready inputs by format, and per-Tool fixtures.

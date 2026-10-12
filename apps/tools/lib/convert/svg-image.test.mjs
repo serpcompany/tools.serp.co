@@ -37,3 +37,10 @@ test("the SVG drawn loses stylesheet links and outside images, and takes the ima
   assert.match(prepared, /<svg width="124" height="232" preserveAspectRatio="none" viewBox="0 0 62 116"/);
   assert.equal((prepared.match(/<svg\b[^>]*>/)[0].match(/\swidth=/g) ?? []).length, 1);
 });
+
+test("text that names no font gets the font asked for, and only that one", () => {
+  const svg = '<svg width="10" height="10" font-family="Times"><text>x</text></svg>';
+  assert.match(prepareSvgForImage(svg, 20, 20, "'Segoe UI', sans-serif"), /^<svg width="20" height="20" preserveAspectRatio="none" font-family="'Segoe UI', sans-serif">/);
+  assert.doesNotMatch(prepareSvgForImage(svg, 20, 20, '"><script>alert(1)</script>'), /<script/);
+  assert.match(prepareSvgForImage(svg, 20, 20), /font-family="Times"/);
+});

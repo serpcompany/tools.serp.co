@@ -1095,6 +1095,11 @@
       "input": "file",
       "fixture": "fixtures/sample-sheets.xlsx",
       "notes": "Three sheets written as SpreadsheetML by a Python script with zipfile (no Excel or download): Sales (dates, #,##0, a custom \"$\"#,##0.00 and 0% formats, booleans, SUM formulas with cached results, a hidden row and a hidden column), Payroll (hidden) and Notes (Greek, Cyrillic, Hebrew and Arabic text). Read back with `file` (Microsoft Excel 2007+) and macOS Quick Look (qlmanage -t), which draws Sales without its hidden row and column. Two sheets show, so two images (PAGE_COUNTS in scripts/lib/tool-sweep.mjs); xlsx-sheets.test.mjs checks each cell's text and that nothing hidden is read."
+    },
+    "pptx-to-jpg": {
+      "input": "file",
+      "fixture": "fixtures/sample-deck.pptx",
+      "notes": "Three 16:9 slides written by pptxgenjs 4.0.1 in a scratch folder (no PowerPoint or download): a title, a bulleted list with Greek, Cyrillic and Hebrew, an embedded PNG made with magick, a rounded rectangle, an arrow and a circle; a slide marked hidden afterwards by a Python script with zipfile (<p:sld show=\"0\">); a table with row heights and a column chart, with speaker notes. Read back with `file` (Microsoft PowerPoint 2007+) and macOS Quick Look (qlmanage -t), which draws the first slide. Two slides show, so two images (PAGE_COUNTS in scripts/lib/tool-sweep.mjs); pptx-slides.test.mjs checks the hidden slide and the notes aren't drawn."
     }
   }
 }

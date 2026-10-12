@@ -1,8 +1,8 @@
 // DOCX, DXF and HTML files drawn as images (issue #250), in the visitor's
 // browser and on the main thread, since laying out a page needs the DOM.
-// Plain text, Graphviz DOT and XLSX (#265) are drawn by their own modules,
-// text-image.ts, graphviz-image.ts and xlsx-sheets.ts with table-image.ts,
-// and encoded here like the rest.
+// Plain text, Graphviz DOT, XLSX and PPTX (#265) are drawn by their own
+// modules, text-image.ts, graphviz-image.ts, xlsx-sheets.ts with
+// table-image.ts, and pptx-slides.ts, and encoded here like the rest.
 // HTML and DOCX are laid out in a sandboxed iframe that runs no script and
 // loads nothing, then captured with modern-screenshot; DXF is drawn by
 // dxf-viewer with three.js and WebGL. Each picture is encoded as any image
@@ -917,7 +917,8 @@ async function encode(rgba: RGBA, to: string, quality: number): Promise<ArrayBuf
 
 // One image per DOCX page (kind "multiple", like PDF pages), or one of a DXF
 // drawing, an HTML page, a text file or a DOT graph, or one per XLSX sheet
-// with values (kind "single" for a workbook with one), in `to`'s format.
+// with values or PPTX slide that shows (kind "single" when there's one), in
+// `to`'s format.
 // Throws an Error whose `code` is set when the browser, not the file, is
 // the reason.
 export async function convertDocumentToImages(
@@ -942,6 +943,16 @@ export async function convertDocumentToImages(
     return { kind: "single", buffer };
   }
   if (from === "xlsx") return convertWorkbook(buf, to, quality, onProgress);
+  if (from === "pptx") {
+    const { renderSlides } = await import("./pptx-slides.ts");
+    const { buffers, notice } = await renderSlides(
+      buf,
+      (rgba) => encode(rgba, to, quality),
+      (done, count) => onProgress?.({ status: "processing", progress: Math.min(95, 20 + (75 * done) / count) }),
+    );
+    onProgress?.({ status: "processing", progress: 100 });
+    return buffers.length === 1 ? { kind: "single", buffer: buffers[0]!, notice } : { kind: "multiple", buffers, notice };
+  }
   const render =
     from === "html"
       ? renderHtml

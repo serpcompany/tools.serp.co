@@ -16,9 +16,9 @@ import {
   parseSheet,
   parseStyles,
   readWorkbookSheets,
-  resolvePart,
   sheetTable,
 } from "./xlsx-sheets.ts";
+import { resolvePart } from "./ooxml.ts";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
 

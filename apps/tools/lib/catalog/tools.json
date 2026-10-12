@@ -93905,7 +93905,7 @@
   {
     "id": "pptx-to-jpeg",
     "name": "PPTX to JPEG",
-    "description": "Convert PPTX to JPEG format",
+    "description": "Convert PPTX to JPEG: a JPEG of each slide of your PowerPoint file, drawn in your browser. Hidden slides and speaker notes aren't included, and video and linked pictures aren't drawn.",
     "operation": "convert",
     "route": "/pptx-to-jpeg",
     "from": "pptx",
@@ -93921,7 +93921,7 @@
   {
     "id": "pptx-to-jpg",
     "name": "PPTX to JPG",
-    "description": "Convert PPTX to JPG format",
+    "description": "Convert PPTX to JPG: a JPG of each slide of your PowerPoint file, drawn in your browser. Hidden slides and speaker notes aren't included, and video and linked pictures aren't drawn.",
     "operation": "convert",
     "route": "/pptx-to-jpg",
     "from": "pptx",
@@ -93937,7 +93937,7 @@
   {
     "id": "pptx-to-png",
     "name": "PPTX to PNG",
-    "description": "Convert PPTX to PNG format",
+    "description": "Convert PPTX to PNG: a PNG of each slide of your PowerPoint file, drawn in your browser. Hidden slides and speaker notes aren't included, and video and linked pictures aren't drawn.",
     "operation": "convert",
     "route": "/pptx-to-png",
     "from": "pptx",

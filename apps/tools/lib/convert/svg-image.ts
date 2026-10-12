@@ -40,15 +40,18 @@ export function svgImageSize(width: number, height: number, scale: number): { wi
 // The SVG as it's drawn: `width` x `height` pixels, without a stylesheet
 // link (Graphviz's `stylesheet` attribute) or an image that isn't in the SVG
 // itself (a picture a slide links to). An <img> wouldn't load either; they're
-// removed anyway.
-export function prepareSvgForImage(svg: string, width: number, height: number): string {
+// removed anyway. `fontFamily` is the font of text that names none, which
+// would otherwise be the browser's default serif.
+export function prepareSvgForImage(svg: string, width: number, height: number, fontFamily?: string): string {
+  const font = fontFamily ? ` font-family="${fontFamily.replace(/[^\p{L}\p{N}\s,.'-]/gu, "")}"` : "";
   return svg
     .replace(/<\?xml-stylesheet[\s\S]*?\?>/g, "")
     .replace(/<image\b[^>]*?(?:\/>|>[\s\S]*?<\/image>)/g, (tag) => (/\shref\s*=\s*["']data:/.test(tag.replace(/xlink:href/g, "href")) ? tag : ""))
     .replace(/<svg\b[^>]*>/, (root) =>
       root
         .replace(/\s(width|height)\s*=\s*"[^"]*"/g, "")
-        .replace(/^<svg\b/, `<svg width="${width}" height="${height}" preserveAspectRatio="none"`),
+        .replace(/\sfont-family\s*=\s*"[^"]*"/g, font ? "" : "$&")
+        .replace(/^<svg\b/, `<svg width="${width}" height="${height}" preserveAspectRatio="none"${font}`),
     );
 }
 

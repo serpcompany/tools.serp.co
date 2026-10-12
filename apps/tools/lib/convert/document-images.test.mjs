@@ -34,10 +34,11 @@ import { convertWithWorker } from "./workerClient.ts";
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const bytes = (text) => new TextEncoder().encode(text);
 
-test("DOCX, DXF, HTML, TXT, DOT and XLSX to an image route to document-images.ts, and nothing else does", () => {
+test("DOCX, DXF, HTML, TXT, DOT, XLSX and PPTX to an image route to document-images.ts, and nothing else does", () => {
   for (const id of [
     "docx-to-jpeg", "docx-to-svg", "docx-to-tiff", "dxf-to-jpg", "dxf-to-png", "html-to-gif", "html-to-svg", "html-to-webp",
     "txt-to-jpeg", "txt-to-jpg", "txt-to-png", "txt-to-svg", "dot-to-jpg", "dot-to-png", "xlsx-to-jpg", "xlsx-to-png",
+    "pptx-to-jpeg", "pptx-to-jpg", "pptx-to-png",
   ]) {
     const [from, to] = id.split("-to-");
     assert.equal(isDocumentImageConversion(from, to), true, id);
@@ -55,6 +56,8 @@ test("DOCX, DXF, HTML, TXT, DOT and XLSX to an image route to document-images.ts
     ["txt", "docx"],
     ["xlsx", "csv"],
     ["xls", "png"],
+    ["ppt", "png"],
+    ["pptx", "pdf"],
     ["dot", "svg2"],
   ]) {
     assert.equal(isDocumentImageConversion(from, to), false, `${from} to ${to}`);
@@ -66,6 +69,7 @@ test("DOCX, DXF, HTML, TXT, DOT and XLSX to an image route to document-images.ts
     txt: "text-render",
     dot: "viz-js",
     xlsx: "xlsx-table",
+    pptx: "pptx-glimpse",
   });
 });
 
@@ -90,6 +94,7 @@ test("the converter sends these files to document-images.ts, not the image decod
     ["txt", "png", " \n\t\n", "This text file is empty: there's no text to draw.", "text-render"],
     ["dot", "jpg", "\n", "This DOT file is empty.", "viz-js"],
     ["xlsx", "png", "name,count\n", "This file isn't an XLSX workbook: it isn't a ZIP archive.", "xlsx-table"],
+    ["pptx", "jpg", "not a deck", "This file isn't a PowerPoint (.pptx) file: it isn't a ZIP archive.", "pptx-glimpse"],
   ]) {
     await assert.rejects(
       convertWithWorker({ worker: undefined, from, to, buf: bytes(input).buffer }),
