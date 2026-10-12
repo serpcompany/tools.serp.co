@@ -12,6 +12,7 @@ import {
   defaultFontFamily,
   isHiddenSlide,
   renderSlideSvgsInWorker,
+  slideBatches,
   slidesNotice,
   themeBodyFont,
   visibleSlides,
@@ -93,6 +94,12 @@ test("a slide's linked pictures and links fetch nothing, and count as not drawn"
   assert.equal(reply.skipped, 2);
   const svg = reply.slides[0].svg;
   assert.doesNotMatch(svg, /example\.net|\/hostile\//);
+});
+
+test("slides go to the worker ten at a time", () => {
+  assert.deepEqual(slideBatches([1, 2, 3], 2), [[1, 2], [3]]);
+  assert.equal(slideBatches(Array.from({ length: 100 }, (_, index) => index + 1)).length, 10);
+  assert.deepEqual(slideBatches([]), []);
 });
 
 test("what the page says about the slides saved", () => {

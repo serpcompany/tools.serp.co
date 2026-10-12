@@ -10,6 +10,7 @@ import {
   KEPT_COLUMNS,
   KEPT_ROWS,
   MAX_PART_BYTES,
+  MAX_SHEETS,
   cellPosition,
   decodeExcelEscapes,
   parseSharedStrings,
@@ -141,6 +142,15 @@ test("hidden sheets, chart sheets and empty sheets aren't drawn; the rest keep t
     ],
   );
   assert.equal(hidden, 2);
+});
+
+test("a workbook gives at most MAX_SHEETS images, and counts the rest", () => {
+  const cell = (text) => worksheet(`<row r="1"><c r="A1" t="inlineStr"><is><t>${text}</t></is></c></row>`);
+  const sheets = Array.from({ length: MAX_SHEETS + 3 }, (_, index) => ({ name: `S${index + 1}`, xml: cell(`v${index + 1}`) }));
+  const result = readWorkbookSheets(workbook(sheets));
+  assert.equal(result.sheets.length, MAX_SHEETS);
+  assert.equal(result.sheets.at(-1).name, `S${MAX_SHEETS}`);
+  assert.equal(result.skipped, 3);
 });
 
 test("the committed XLSX fixtures read back", () => {

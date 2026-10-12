@@ -981,7 +981,7 @@ async function convertWorkbook(
     import("./xlsx-sheets.ts"),
     import("./table-image.ts"),
   ]);
-  const { sheets, hidden } = readWorkbookSheets(buf);
+  const { sheets, hidden, skipped } = readWorkbookSheets(buf);
   if (!sheets.length) throw new Error("This workbook has no visible sheet with values to draw.");
   const buffers: ArrayBuffer[] = [];
   const notes: string[] = [];
@@ -992,15 +992,16 @@ async function convertWorkbook(
     onProgress?.({ status: "processing", progress: Math.min(95, 20 + (75 * buffers.length) / sheets.length) });
   }
   onProgress?.({ status: "processing", progress: 100 });
-  const notice = workbookNotice(sheets.map((sheet) => sheet.name), notes, hidden);
+  const notice = workbookNotice(sheets.map((sheet) => sheet.name), notes, hidden, skipped);
   return sheets.length === 1 ? { kind: "single", buffer: buffers[0]!, notice } : { kind: "multiple", buffers, notice };
 }
 
 // What the page says about a workbook's images: which file is which sheet,
 // what each leaves out, and the hidden sheets it doesn't draw.
-export function workbookNotice(names: string[], notes: string[], hidden: number): string | undefined {
+export function workbookNotice(names: string[], notes: string[], hidden: number, skipped = 0): string | undefined {
   const parts: string[] = [];
   if (names.length > 1) parts.push(`One image a sheet, in the workbook's order: ${names.join(", ")}.`);
+  if (skipped) parts.push(`${skipped} more ${skipped === 1 ? "sheet isn't" : "sheets aren't"} drawn: one workbook gives at most 100 images here.`);
   if (notes.length) parts.push(`${notes.join(" ")} An image holds what fits in ${MAX_IMAGE_SIDE} pixels.`);
   if (hidden) parts.push(`${hidden} hidden ${hidden === 1 ? "sheet isn't" : "sheets aren't"} drawn.`);
   return parts.length ? parts.join(" ") : undefined;

@@ -26,6 +26,7 @@ import {
   resolveCounterContent,
   spansAcross,
   splitRow,
+  workbookNotice,
 } from "./document-images.ts";
 import { DOCUMENT_IMAGE_ENGINES, isDocumentImageConversion } from "./image-document-targets.ts";
 import { PDF_FONT_URL } from "./table-outputs.ts";
@@ -355,4 +356,13 @@ test("a page taller than an image can be says what the image leaves out", () => 
 test("DXF text is drawn with the DejaVu Sans the table PDFs self-host", () => {
   assert.equal(DXF_FONT_URL, PDF_FONT_URL);
   assert.ok(existsSync(path.join(appRoot, "public", DXF_FONT_URL)));
+});
+
+test("the page says which image is which sheet, and what each leaves out", () => {
+  assert.equal(workbookNotice(["Only"], [], 0), undefined);
+  assert.equal(
+    workbookNotice(["Sales", "Notes"], ["Sales: Showing the first 54 of 9,999 rows."], 1),
+    "One image a sheet, in the workbook's order: Sales, Notes. Sales: Showing the first 54 of 9,999 rows. An image holds what fits in 4096 pixels. 1 hidden sheet isn't drawn.",
+  );
+  assert.equal(workbookNotice(["A", "B"], [], 2, 5), "One image a sheet, in the workbook's order: A, B. 5 more sheets aren't drawn: one workbook gives at most 100 images here. 2 hidden sheets aren't drawn.");
 });

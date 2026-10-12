@@ -24,7 +24,7 @@ export const GRAPH_SCALE = 2;
 // A graph with more edges than this is laid out with Graphviz's own limits
 // on its slowest steps (crossing reduction and rank assignment), unless the
 // file sets them: a random 2,000-node graph with 3,000 edges took 150 s
-// without them and 21 s with them.
+// without them and 15 s with them in Chromium.
 export const LARGE_GRAPH_EDGES = 1000;
 export const LARGE_GRAPH_ATTRIBUTES: Record<string, string> = { mclimit: "0.1", nslimit: "1", nslimit1: "1" };
 

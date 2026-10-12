@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  MAX_LINE_CHARS,
   MAX_TEXT_LINES,
   TEXT_FONT_URL,
   TEXT_LINE_HEIGHT,
@@ -110,6 +111,18 @@ test("one line of 5 MB without a space is cut quickly, part way through", () => 
   assert.equal(layout.lines.length, MAX_TEXT_LINES - 1);
   assert.deepEqual(layout.cutAt, { line: 1, partial: true });
   assert.match(layout.note, /^… cut part way through line 1 of 1:/);
+});
+
+test("a line of characters with no width is still cut, not dropped", () => {
+  const layout = layoutText("\u0301".repeat(MAX_LINE_CHARS + 50_000), () => 0);
+  assert.deepEqual(layout.cutAt, { line: 1, partial: true });
+});
+
+test("tabs in a long line expand in one pass", () => {
+  const started = performance.now();
+  const line = cleanLine("a\t".repeat(30_000));
+  assert.ok(performance.now() - started < 500, `${performance.now() - started} ms`);
+  assert.equal(line.length, 120_000);
 });
 
 test("a line that wraps past the image's end is cut inside it", () => {

@@ -30,6 +30,8 @@ export const MAX_PART_BYTES = 64 * 1024 * 1024;
 // 55 rows and 50 columns, table-image.ts); the rest are only counted.
 export const KEPT_ROWS = 500;
 export const KEPT_COLUMNS = 200;
+// The most sheets one workbook becomes images of.
+export const MAX_SHEETS = 100;
 
 export type Sheet = { name: string; table: TableData };
 
@@ -169,7 +171,6 @@ export function parseSheet(xml: string, context: CellContext): SheetCells {
     first: null,
     last: { row: -1, column: -1 },
   };
-  let firstColumn = Infinity;
   let rowIndex = -1;
   let rowHidden = false;
   let rowCells: Map<number, string> | null = null;
@@ -230,9 +231,9 @@ export function parseSheet(xml: string, context: CellContext): SheetCells {
         // values cover every column a table of KEPT_COLUMNS can show.
         if (sheet.rows.length < KEPT_ROWS && rowCells && rowCells.size < KEPT_COLUMNS) rowCells.set(column, shown);
         sheet.first ??= { row: rowIndex, column };
-        firstColumn = Math.min(firstColumn, column);
-        sheet.first.column = firstColumn;
-        sheet.last = { row: rowIndex, column: Math.max(sheet.last.column, column) };
+        sheet.first.row = Math.min(sheet.first.row, rowIndex);
+        sheet.first.column = Math.min(sheet.first.column, column);
+        sheet.last = { row: Math.max(sheet.last.row, rowIndex), column: Math.max(sheet.last.column, column) };
       }
     },
     text(text) {
@@ -279,9 +280,10 @@ export function sheetTable(cells: SheetCells): TableData | null {
 
 // ----------------------------------------------------------------- read --
 
-// The workbook's sheets that show, in order, as tables, and how many hidden
-// sheets were left out; sheets with no values are left out too.
-export function readWorkbookSheets(buf: ArrayBuffer): { sheets: Sheet[]; hidden: number } {
+// The workbook's sheets that show, in order, as tables (up to MAX_SHEETS),
+// how many hidden sheets were left out, and how many past MAX_SHEETS; sheets
+// with no values are left out too.
+export function readWorkbookSheets(buf: ArrayBuffer): { sheets: Sheet[]; hidden: number; skipped: number } {
   const bytes = new Uint8Array(buf);
   if (isOleFile(bytes)) {
     throw new Error(
@@ -308,18 +310,25 @@ export function readWorkbookSheets(buf: ArrayBuffer): { sheets: Sheet[]; hidden:
     .filter((sheet) => sheet.state === "visible")
     .map((sheet) => ({ name: sheet.name, relation: relationships.get(sheet.relation) }))
     .filter((sheet) => sheet.relation?.type.endsWith("/worksheet"));
-  const paths = new Set([stringsPath, stylesPath, ...visible.map((sheet) => sheet.relation!.target)].filter(Boolean));
-  const parts = readParts(bytes, (name) => paths.has(name), read);
+  const shared = new Set([stringsPath, stylesPath].filter(Boolean));
+  const parts = readParts(bytes, (name) => shared.has(name), read);
   const context: CellContext = {
     strings: stringsPath ? parseSharedStrings(text(parts[stringsPath])) : [],
     formats: stylesPath ? parseStyles(text(parts[stylesPath])) : [],
     date1904: workbook.date1904,
   };
+  // One sheet inflated at a time, so a workbook of many large sheets holds
+  // one in memory.
   const sheets: Sheet[] = [];
-  for (const sheet of visible) {
-    const xml = text(parts[sheet.relation!.target]);
+  for (const sheet of visible.slice(0, MAX_SHEETS)) {
+    const path = sheet.relation!.target;
+    const xml = text(readParts(bytes, (name) => name === path, read)[path]);
     const table = xml ? sheetTable(parseSheet(xml, context)) : null;
     if (table) sheets.push({ name: sheet.name, table });
   }
-  return { sheets, hidden: workbook.sheets.filter((sheet) => sheet.state !== "visible").length };
+  return {
+    sheets,
+    hidden: workbook.sheets.filter((sheet) => sheet.state !== "visible").length,
+    skipped: Math.max(0, visible.length - MAX_SHEETS),
+  };
 }

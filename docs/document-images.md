@@ -88,7 +88,8 @@ still running after 60 s by terminating the worker (`layout_timeout`). A graph
 with more than 1,000 edges gets Graphviz's limits on its slowest steps
 (`mclimit=0.1`, `nslimit=1`, `nslimit1=1`) unless it sets its own: a random
 2,000-node graph with 3,000 edges took 150 s without them and 15 s with them in
-Chromium; a 2,000-node tree takes a fraction of a second. The SVG loses any
+Chromium; a 2,000-node tree takes a fraction of a second. A file holding
+several graphs draws the first. The SVG loses any
 `xml-stylesheet` link and any picture that isn't a `data:` URL, and is drawn
 through an `<img>` (`lib/convert/svg-image.ts`), which runs nothing and loads
 nothing, at twice its size in points; a graph too big for that is drawn smaller
@@ -110,7 +111,7 @@ and other text in the format, dates and times (1900 and 1904 date systems),
 TRUE and FALSE, error values, and a formula's saved result. Fractions are
 shown as decimals, and cells keep the table renderer's left alignment. A merged
 cell shows its value in its first cell; charts, pictures, comments and colours
-aren't drawn. 10,000 rows in three
+aren't drawn, and at most 100 sheets become images. 10,000 rows in three
 sheets read in about half a second; rows past the first 500 with values are
 counted, not kept. An XLS file, or a workbook saved with a password, is told to
 save it again as an unprotected `.xlsx`.
@@ -118,7 +119,8 @@ save it again as an unprotected `.xlsx`.
 ## PPTX (since #265)
 
 pptx-glimpse 5.3.1 (MIT) draws each slide that shows as SVG in a worker
-(`lib/convert/pptx.worker.ts`), stopped after 90 s (`layout_timeout`), and
+(`lib/convert/pptx.worker.ts`), ten slides a worker so a long presentation's
+SVGs aren't all held at once, all stopped after 90 s (`layout_timeout`), and
 `lib/convert/pptx-slides.ts` draws each SVG through an `<img>` at twice the
 slide's size in points (1440x810 for a 10-inch 16:9 slide, 1920x1080 for
 PowerPoint's 13.33-inch one), encoding each slide before drawing the next.

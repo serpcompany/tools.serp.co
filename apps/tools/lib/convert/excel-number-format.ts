@@ -141,21 +141,25 @@ export function isDateFormat(code: string): boolean {
   return DATE_CODES.test(codes.replace(/General/gi, "").replace(/E[+-]/g, ""));
 }
 
-// Excel's General: integers as they are up to 11 digits, other numbers to
-// 10 significant digits, very large or small ones in scientific notation.
+// Excel's General: at most 11 characters, as in a cell of Excel's default
+// width. Integers up to 11 digits are shown whole; numbers of 12 or more
+// digits, and those under 0.0001, in scientific notation (1.23457E+11);
+// others rounded to the decimals that fit.
 export function formatGeneral(value: number): string {
   if (!Number.isFinite(value)) return String(value);
   if (value === 0) return "0";
   const abs = Math.abs(value);
-  if (abs >= 1e11 || abs < 1e-9) {
+  if (Number.isInteger(value) && abs < 1e11) return String(value);
+  if (abs >= 1e11 || abs < 1e-4) {
     const [mantissa, exponent] = value.toExponential(5).split("e");
     const trimmed = mantissa!.replace(/\.?0+$/, "");
     const power = Number(exponent);
     return `${trimmed}E${power < 0 ? "-" : "+"}${String(Math.abs(power)).padStart(2, "0")}`;
   }
-  if (Number.isInteger(value)) return String(value);
-  const precise = Number(value.toPrecision(10));
-  return String(precise).includes("e") ? precise.toFixed(10).replace(/\.?0+$/, "") : String(precise);
+  const integerDigits = String(Math.floor(abs)).length;
+  const decimals = Math.max(0, 11 - (value < 0 ? 1 : 0) - integerDigits - 1);
+  const text = toFixedRounded(abs, decimals).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+  return value < 0 ? `-${text}` : text;
 }
 
 // `value` rounded half away from zero to `decimals` places, as a string

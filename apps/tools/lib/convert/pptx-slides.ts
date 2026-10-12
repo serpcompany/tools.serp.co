@@ -149,8 +149,19 @@ export async function renderSlideSvgsInWorker(
   return reply;
 }
 
+// The slides asked of each worker: a few at a time, so the SVGs of a long
+// presentation, each with its pictures inlined, aren't all held at once.
+export const SLIDES_PER_WORKER = 10;
+
+export function slideBatches(numbers: number[], size = SLIDES_PER_WORKER): number[][] {
+  const batches: number[][] = [];
+  for (let index = 0; index < numbers.length; index += size) batches.push(numbers.slice(index, index + size));
+  return batches;
+}
+
 // Each slide that shows as an image, encoded by `encode` as soon as it's
-// drawn, so only one slide's pixels are held at a time.
+// drawn, so only one slide's pixels are held at a time. SLIDES_TIMEOUT_MS
+// bounds the whole presentation, not each batch.
 export async function renderSlides(
   buf: ArrayBuffer,
   encode: (rgba: RGBA) => Promise<ArrayBuffer>,
@@ -160,16 +171,22 @@ export async function renderSlides(
   if (!total) throw new Error("This presentation has no slides.");
   if (!numbers.length) throw new Error("Every slide in this presentation is hidden: there's no slide to draw.");
   const shown = numbers.slice(0, MAX_SLIDES);
-  const { slides, skipped } = await renderSlideSvgsInWorker({ bytes: buf.slice(0), slides: shown });
-  if (!slides.length) throw new Error("This presentation's slides couldn't be drawn.");
+  const deadline = Date.now() + SLIDES_TIMEOUT_MS;
+  const font = defaultFontFamily(bodyFont);
   const buffers: ArrayBuffer[] = [];
-  for (const slide of slides) {
-    const size = svgSize(slide.svg);
-    if (!size) throw new Error(`Slide ${slide.number} couldn't be drawn.`);
-    const image = svgImageSize(size.width, size.height, SLIDE_SCALE);
-    const svg = prepareSvgForImage(slide.svg, image.width, image.height, defaultFontFamily(bodyFont));
-    buffers.push(await encode(await rasterizeSvg(svg, image.width, image.height)));
-    onSlide?.(buffers.length, slides.length);
+  let skipped = 0;
+  for (const batch of slideBatches(shown)) {
+    const reply = await renderSlideSvgsInWorker({ bytes: buf.slice(0), slides: batch }, { timeoutMs: Math.max(1, deadline - Date.now()) });
+    skipped += reply.skipped;
+    for (const slide of reply.slides) {
+      const size = svgSize(slide.svg);
+      if (!size) throw new Error(`Slide ${slide.number} couldn't be drawn.`);
+      const image = svgImageSize(size.width, size.height, SLIDE_SCALE);
+      const svg = prepareSvgForImage(slide.svg, image.width, image.height, font);
+      buffers.push(await encode(await rasterizeSvg(svg, image.width, image.height)));
+      onSlide?.(buffers.length, shown.length);
+    }
   }
+  if (!buffers.length) throw new Error("This presentation's slides couldn't be drawn.");
   return { buffers, notice: slidesNotice({ shown: buffers.length, visible: numbers.length, hidden, skipped }) };
 }

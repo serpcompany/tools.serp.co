@@ -10,15 +10,20 @@ import {
   splitSections,
 } from "./excel-number-format.ts";
 
-test("General shows integers whole and other numbers to 10 significant digits", () => {
+test("General fits 11 characters, as in a cell of Excel's default width", () => {
   assert.equal(formatGeneral(0), "0");
   assert.equal(formatGeneral(42), "42");
   assert.equal(formatGeneral(-7), "-7");
-  assert.equal(formatGeneral(1 / 3), "0.3333333333");
+  assert.equal(formatGeneral(1 / 3), "0.333333333");
+  assert.equal(formatGeneral(-1 / 3), "-0.33333333");
   assert.equal(formatGeneral(0.1 + 0.2), "0.3");
+  assert.equal(formatGeneral(123456.789123), "123456.7891");
+  assert.equal(formatGeneral(2.5), "2.5");
   assert.equal(formatGeneral(12345678901), "12345678901");
   assert.equal(formatGeneral(123456789012), "1.23457E+11");
-  assert.equal(formatGeneral(0.0000000001234), "1.234E-10");
+  assert.equal(formatGeneral(4006381333931), "4.00638E+12");
+  assert.equal(formatGeneral(0.0001234), "0.0001234");
+  assert.equal(formatGeneral(0.00001234), "1.234E-05");
   assert.equal(formatCellNumber(3.5, "General"), "3.5");
   assert.equal(formatCellNumber(3.5, ""), "3.5");
 });

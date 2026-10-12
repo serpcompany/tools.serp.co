@@ -67,8 +67,16 @@ export function cleanLine(line: string): string {
   const text = line.replace(ESCAPE_SEQUENCE, "").replace(CONTROL, "");
   if (!text.includes("\t")) return text;
   let out = "";
+  let column = 0;
   for (const char of text) {
-    out += char === "\t" ? " ".repeat(TAB_SIZE - (Array.from(out).length % TAB_SIZE)) : char;
+    if (char === "\t") {
+      const spaces = TAB_SIZE - (column % TAB_SIZE);
+      out += " ".repeat(spaces);
+      column += spaces;
+    } else {
+      out += char;
+      column += 1;
+    }
   }
   return out;
 }
@@ -161,8 +169,9 @@ function formatCount(count: number): string {
 }
 
 // A source line is never wrapped past this many characters: more than
-// MAX_TEXT_LINES lines hold, however narrow the characters.
-const MAX_LINE_CHARS = MAX_TEXT_LINES * LONGEST_FIT;
+// MAX_TEXT_LINES lines hold, however narrow the characters (a line holds at
+// most LONGEST_FIT), so a longer line is always cut.
+export const MAX_LINE_CHARS = (MAX_TEXT_LINES + 1) * LONGEST_FIT;
 
 // The text's lines, wrapped, as many as an image holds. Only the lines
 // shown are measured, so a file of millions of lines lays out as fast as a
