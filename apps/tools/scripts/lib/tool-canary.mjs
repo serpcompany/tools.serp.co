@@ -36,6 +36,7 @@ export const CANARY_TOOLS = {
   "csv-to-pdf": "table converter page writing a file: jsPDF and jspdf-autotable, loaded when the output is chosen",
   "csv-to-jpg": "CSV drawn as a table on a canvas, on the generic converter page (table-outputs.ts)",
   "docx-to-jpeg": "DOCX pages laid out by docx-preview in a sandboxed iframe and captured by modern-screenshot, an image a page",
+  "docx-to-svg": "DOCX pages the converter continues itself: text and a table run past a page's end, the table keeping its merged column and header row",
   "dxf-to-png": "DXF drawn by dxf-viewer with three.js and WebGL, its text in the self-hosted DejaVu Sans",
   "html-to-webp": "an HTML page laid out in a sandboxed iframe that loads nothing, captured by modern-screenshot",
   "json-to-csv": "JSON to CSV page",

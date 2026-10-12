@@ -109,8 +109,10 @@ Conversion picks an engine by input format:
   DXF and HTML to an image, on the main thread, each library loaded only when
   its input is converted. An HTML file is parsed without running or loading
   anything (DOMParser) and loses what runs, loads or embeds: scripts, `<base>`,
-  `<link>`, `<meta http-equiv>`, frames, objects, event attributes, external
-  `<use>`, audio, and video (an image of its poster when the file holds it).
+  `<link>`, `<meta http-equiv>`, frames, objects, event attributes, any SVG
+  `<use>` that points outside the page (read as the URL parser reads it),
+  audio, and video (an image of its poster when the file holds it); the
+  `<use>`, audio and video rules run again on the sandbox's own copy.
   It's then laid out 1280 px wide, in an 800 px window for `vh` units, in an
   off-screen `<iframe sandbox="allow-same-origin">` with no `allow-scripts`,
   whose `srcdoc` starts with a Content Security Policy allowing only inline
@@ -120,11 +122,15 @@ Conversion picks an engine by input format:
   `data:` fonts and images in the file, and a blank image for any other. The
   picture is as tall as the page, up to 4096 px; a taller page is cut there
   and the page says so. A DOCX is laid out by docx-preview 0.4.1 in the same
-  sandbox, one file a page, at twice its size in points as a PDF page is
-  (1224x1584 for US Letter), at most 4096 px a side. Pages break where the file
-  says, and where text runs past a page's height, between paragraphs or table
-  rows, with the header and footer repeated; a file with no page size is US
-  Letter with 1-inch margins. List numbers are written out as text, since the
+  kind of sandbox, every node built in the sandbox's document (its `h`
+  option), so a picture the file links to but doesn't hold loads nothing;
+  one file a page, at twice its size in points as a PDF page is (1224x1584 for
+  US Letter), at most 4096 px a side. Pages break where the file says, and
+  where text runs past a page's height, between paragraphs or table rows,
+  with the header and footer repeated; a table continues with its header rows
+  (`w:tblHeader`) and its columns, and a cell merged down across the break
+  continues, empty, on the next page; a file with no page size is US Letter
+  with 1-inch margins. List numbers are written out as text, since the
   capture drops CSS counters; numbering in other scripts (CJK, Hebrew) comes
   out as decimal. Fonts the browser doesn't have fall back to its default, and
   an altChunk (HTML inside the file) is left out. A DXF is drawn by dxf-viewer

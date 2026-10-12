@@ -15,7 +15,9 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { DOCUMENT_PAGE_EVENT } from "../lib/convert/document-images.ts";
 import { PDF_FONT_URL } from "../lib/convert/table-outputs.ts";
+import { PAGE_COUNTS } from "./lib/tool-sweep.mjs";
 
 const { chromium } = await import("playwright");
 
@@ -337,6 +339,200 @@ await step("png-to-gif writes a real GIF, not a relabelled PNG", async (page, te
   const bytes = await convertFixture(page, "png-to-gif", "sample.png", "gif");
   assert(bytes.subarray(0, 4).toString("latin1") === "GIF8", `not a GIF: starts with ${bytes.subarray(0, 4).toString("hex")}`);
   await expectCompletedRun(page, telemetryStatuses, "png-to-gif");
+});
+
+// ------------------------------------------------ documents to images --
+// DOCX and HTML files are laid out as pages in a sandboxed iframe and
+// captured (lib/convert/document-images.ts). These steps keep the files the
+// converter saves in the page instead of downloading them, and record what
+// it lays out before each DOCX page is captured (the page dispatches
+// DOCUMENT_PAGE_EVENT on window with the page's element).
+
+async function watchDocumentConversion(page) {
+  await page.addInitScript((eventName) => {
+    const saved = [];
+    const pages = [];
+    globalThis.__smokeSaved = saved;
+    globalThis.__smokeDocumentPages = pages;
+    const blobs = new Map();
+    const createObjectURL = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = (object) => {
+      const url = createObjectURL(object);
+      if (object instanceof Blob) blobs.set(url, object);
+      return url;
+    };
+    const anchor = globalThis.HTMLAnchorElement.prototype;
+    const click = anchor.click;
+    anchor.click = function keepDownload() {
+      const blob = this.hasAttribute("download") ? blobs.get(this.href) : undefined;
+      if (!blob) return click.call(this);
+      const name = this.download;
+      blob.arrayBuffer().then((buffer) => {
+        saved.push({ name, size: buffer.byteLength, head: Array.from(new Uint8Array(buffer.slice(0, 12))) });
+      });
+    };
+    // Each table's shown cells, with their box relative to the page.
+    globalThis.addEventListener(eventName, (event) => {
+      const section = event.detail;
+      const view = section.ownerDocument.defaultView;
+      const origin = section.getBoundingClientRect();
+      const tables = Array.from(section.querySelectorAll("table"), (table) =>
+        Array.from(table.rows, (row) =>
+          Array.from(row.cells)
+            .filter((cell) => view.getComputedStyle(cell).display !== "none")
+            .map((cell) => {
+              const box = cell.getBoundingClientRect();
+              return {
+                text: cell.textContent.trim(),
+                left: box.left - origin.left,
+                right: box.right - origin.left,
+                top: box.top - origin.top,
+                bottom: box.bottom - origin.top,
+              };
+            }),
+        ),
+      );
+      pages.push({ height: origin.height, tables });
+    });
+  }, DOCUMENT_PAGE_EVENT);
+}
+
+// Uploads a fixture on `toolId`'s page and waits for the run to finish;
+// returns the files it saved.
+async function convertInPage(page, telemetryStatuses, toolId, fixture, expectedFiles) {
+  await page.locator('input[type="file"]').first().setInputFiles(path.join(appRoot, "benchmarks/fixtures", fixture));
+  await expectCompletedRun(page, telemetryStatuses, toolId);
+  let saved = [];
+  for (const deadline = Date.now() + TELEMETRY_TIMEOUT_MS; Date.now() < deadline; await sleep(100)) {
+    saved = await page.evaluate(() => globalThis.__smokeSaved);
+    if (saved.length >= expectedFiles) break;
+  }
+  assert(saved.length === expectedFiles, `saved ${saved.length} files, expected ${expectedFiles}`);
+  return saved;
+}
+
+const isJpeg = (head) => head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff;
+const isWebp = (head) =>
+  String.fromCharCode(...head.slice(0, 4)) === "RIFF" && String.fromCharCode(...head.slice(8, 12)) === "WEBP";
+
+// The hostile fixtures point every URL at /hostile/ on this site or at a
+// host under example.net, and their scripts and event handlers set
+// __hostileRan on this page. After the upload, a request that leaves the
+// browser fails the step when it goes to this site outside the app's chunks
+// (/_next/static/) and telemetry (Next's own route prefetches, sent with an
+// `rsc` header, aside), to example.net, or from a frame other than the page
+// to any host. Other hosts the page itself asks for are its ads, which the
+// route above blocks; they aren't the file's. Loads the sandbox's policy
+// refuses never leave the browser, so they never reach a route; the page's
+// "request" event would count them too.
+async function watchRequests(page) {
+  // The page's own loading is done before the upload.
+  await page.waitForLoadState("networkidle", { timeout: 10_000 }).catch(() => {});
+  const unexpected = [];
+  await page.route("**/*", (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    let frame = "the page";
+    try {
+      if (request.frame() !== page.mainFrame()) frame = `a frame at ${request.frame().url().slice(0, 60)}`;
+    } catch {
+      // A request no frame made (a service worker's).
+    }
+    const allowed =
+      frame === "the page" &&
+      (url.origin === baseOrigin
+        ? url.pathname.startsWith("/_next/static/") || url.pathname === "/api/telemetry" || request.headers().rsc === "1"
+        : !/(^|\.)example\.net$/.test(url.hostname));
+    if (!allowed) unexpected.push(`${request.method()} ${request.url()} (from ${frame})`);
+    return route.fallback();
+  });
+  return unexpected;
+}
+
+async function expectNothingRanOrLoaded(page, unexpected) {
+  // A fetch the capture starts late still shows up.
+  await sleep(1_000);
+  assert(!unexpected.length, `requested what the file named:\n        ${unexpected.join("\n        ")}`);
+  const ran = await page.evaluate(() => globalThis.__hostileRan);
+  assert(ran === undefined, `the file's script ran (${ran})`);
+}
+
+await step("html-to-webp runs none of a hostile page's scripts and loads none of its URLs", async (page, telemetryStatuses) => {
+  await watchDocumentConversion(page);
+  await page.goto(`${args.baseUrl}/html-to-webp/`);
+  const unexpected = await watchRequests(page);
+  const [saved] = await convertInPage(page, telemetryStatuses, "html-to-webp", "hostile-page.html", 1);
+  assert(isWebp(saved.head), `not a WebP: starts with ${Buffer.from(saved.head).toString("hex")}`);
+  await expectNothingRanOrLoaded(page, unexpected);
+});
+
+await step("docx-to-jpeg loads none of a DOCX's linked or missing pictures", async (page, telemetryStatuses) => {
+  await watchDocumentConversion(page);
+  await page.goto(`${args.baseUrl}/docx-to-jpeg/`);
+  const unexpected = await watchRequests(page);
+  const [saved] = await convertInPage(page, telemetryStatuses, "docx-to-jpeg", "hostile-links.docx", 1);
+  assert(isJpeg(saved.head), `not a JPEG: starts with ${Buffer.from(saved.head).toString("hex")}`);
+  await expectNothingRanOrLoaded(page, unexpected);
+});
+
+// The columns a table's header row names, left to right, on the first page
+// that shows the table.
+const LONG_TABLE_COLUMNS = ["GROUP", "ITEM", "PRICE"];
+
+// Every table part on every page: the header row first, each cell's edges
+// on column edges, each label in the column it names ("Item 24" under ITEM;
+// a cell spanning columns starts in the one it names), and no row missing a
+// column.
+function checkLongTablePages(pages) {
+  const header = pages.flatMap((page) => page.tables).find((rows) => rows[0]?.[0]?.text === "GROUP")?.[0];
+  assert(header?.length === LONG_TABLE_COLUMNS.length, "no GROUP | ITEM | PRICE header row");
+  const columns = header.map((cell) => ({ name: cell.text, left: cell.left, right: cell.right }));
+  const edges = [columns[0].left, ...columns.map((column) => column.right)];
+  const onEdge = (x) => edges.some((edge) => Math.abs(edge - x) <= 1.5);
+  let parts = 0;
+  pages.forEach((page, pageIndex) => {
+    for (const rows of page.tables) {
+      if (!rows.length) continue;
+      parts += 1;
+      const where = `page ${pageIndex + 1}`;
+      assert(
+        rows[0].map((cell) => cell.text).join("|") === LONG_TABLE_COLUMNS.join("|"),
+        `${where}: the table part starts with "${rows[0].map((cell) => cell.text).join(" | ")}", not its header row`,
+      );
+      const cells = rows.flat();
+      for (const cell of cells) {
+        assert(onEdge(cell.left) && onEdge(cell.right), `${where}: "${cell.text}" isn't on the columns' edges`);
+        const word = cell.text.split(" ")[0]?.toUpperCase();
+        const column = columns.find((candidate) => cell.left >= candidate.left - 1.5 && cell.left < candidate.right - 1.5);
+        if (word && LONG_TABLE_COLUMNS.includes(word)) {
+          assert(column?.name === word, `${where}: "${cell.text}" is under ${column?.name ?? "no column"}`);
+        }
+      }
+      for (const row of rows) {
+        // A row ends where its shortest cell does: a merged cell runs on below.
+        const middle = (Math.min(...row.map((cell) => cell.top)) + Math.min(...row.map((cell) => cell.bottom))) / 2;
+        for (const column of columns) {
+          const x = (column.left + column.right) / 2;
+          const covered = cells.some((cell) => cell.left <= x && x <= cell.right && cell.top <= middle && middle <= cell.bottom);
+          assert(covered, `${where}: the row with "${row[0].text}" has no cell under ${column.name}`);
+        }
+      }
+    }
+  });
+  return parts;
+}
+
+await step("docx-to-jpeg continues a long table on the next pages, each cell under its header", async (page, telemetryStatuses) => {
+  const fixture = "sample-long-table.docx";
+  const expected = PAGE_COUNTS[fixture];
+  await watchDocumentConversion(page);
+  await page.goto(`${args.baseUrl}/docx-to-jpeg/`);
+  const saved = await convertInPage(page, telemetryStatuses, "docx-to-jpeg", fixture, expected);
+  assert(saved.every((file) => isJpeg(file.head)), "a page isn't a JPEG");
+  const pages = await page.evaluate(() => globalThis.__smokeDocumentPages);
+  assert(pages.length === expected, `laid out ${pages.length} pages, expected ${expected}`);
+  const parts = checkLongTablePages(pages);
+  assert(parts >= 3, `the table is on ${parts} pages, expected it to run over at least 3`);
 });
 
 // Each tool's row in the dashboard's status table must say `live`.

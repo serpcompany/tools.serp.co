@@ -1,0 +1,77 @@
+<!doctype html>
+<!-- A page for scripts/smoke-browser.mjs. Every URL in it is on this site under /hostile/ or on a host under example.net, and its scripts and handlers set top.__hostileRan: converting it to an image must run none of them and request none of the URLs. -->
+<html>
+<head>
+<meta charset="utf-8">
+<base href="https://base.example.net/">
+<meta http-equiv="refresh" content="0;url=https://refresh.example.net/">
+<meta http-equiv="Set-Cookie" content="hostile=1">
+<link rel="stylesheet" href="https://css.example.net/x.css">
+<link rel="stylesheet" href="/hostile/relative.css">
+<link rel="dns-prefetch" href="//dns.example.net">
+<link rel="preconnect" href="https://preconnect.example.net">
+<link rel="prefetch" href="/hostile/prefetch">
+<link rel="icon" href="/hostile/icon.png">
+<link rel="preload" as="image" href="/hostile/preload.png">
+<link rel="modulepreload" href="/hostile/module.js">
+<style>
+@import url("https://import.example.net/import.css");
+@import "/hostile/import2.css";
+@font-face { font-family: Remote; src: url("https://font.example.net/f.woff2") format("woff2"); }
+@font-face { font-family: Local; src: url("/hostile/font.woff2"); }
+body { font-family: Remote, Local, sans-serif; background-image: url("https://bg.example.net/bg.png"); }
+.cssimg { width: 120px; height: 40px; background: url("/hostile/css-bg.png"); border: 2px solid red; }
+.mask { -webkit-mask-image: url("https://mask.example.net/m.png"); list-style-image: url("/hostile/list.png"); }
+.imageset { width: 40px; height: 20px; background-image: image-set("/hostile/image-set.png" 1x); cursor: url("/hostile/cursor.png"), auto; border: 4px solid; border-image: url("https://border.example.net/b.png") 4; }
+.after::after { content: url("https://content.example.net/c.png"); }
+</style>
+<script>top.__hostileRan = "script"; document.title = "SCRIPT RAN"; fetch("/hostile/script-fetch"); new Image().src = "https://script.example.net/img";</script>
+</head>
+<body onload="fetch('/hostile/onload')">
+<h1 id="h">Hostile test page</h1>
+<p>If any request below reaches a server, the sandbox leaks.</p>
+<img src="https://img.example.net/a.png" alt="external img">
+<img src="/hostile/relative.png" alt="relative img">
+<img src="relative-after-base.png" alt="relative after base">
+<img src="x" onerror="fetch('/hostile/onerror')" alt="onerror">
+<img srcset="https://srcset.example.net/a.png 1x" alt="srcset">
+<picture><source srcset="/hostile/source.webp"><img src="/hostile/picture.png" alt="picture"></picture>
+<img src="/hostile/lazy.png" loading="lazy" alt="lazy">
+<div class="cssimg">css bg</div>
+<ul class="mask"><li>list</li></ul>
+<div class="after">after</div>
+<div style="background-image:url('https://inline.example.net/i.png'); width:50px; height:20px">inline</div>
+<iframe src="https://iframe.example.net/"></iframe>
+<iframe srcdoc="<script>parent.fetch('/hostile/srcdoc')</script><img src='/hostile/srcdoc.png'>"></iframe>
+<object data="/hostile/object.swf"></object>
+<embed src="https://embed.example.net/e.swf">
+<video src="/hostile/video.mp4" poster="https://poster.example.net/p.png" autoplay muted></video>
+<audio src="https://audio.example.net/a.mp3" autoplay></audio>
+<input type="image" src="/hostile/input.png" alt="input image">
+<svg width="60" height="30"><use href="https://use.example.net/s.svg#a"/><image href="https://svgimage.example.net/s.png" width="20" height="20"/></svg>
+<a href="https://link.example.net/" ping="https://ping.example.net/">a link</a>
+<form action="https://form.example.net/post" method="post"><input name="q" autofocus><button>Send</button></form>
+<template shadowrootmode="open"><meta http-equiv="refresh" content="0;url=/hostile/shadow-refresh"><img src="/hostile/shadow.png"><slot></slot></template>
+<svg><script>fetch('/hostile/svg-script')</script></svg>
+<math><mi xlink:href="javascript:fetch('/hostile/math')">m</mi></math>
+<details open ontoggle="fetch('/hostile/ontoggle')"><summary>details</summary>x</details>
+<marquee onstart="fetch('/hostile/marquee')">m</marquee>
+<div class="imageset">image-set</div>
+<table background="/hostile/table-bg.png"><tr><td background="https://td.example.net/td.png">legacy background</td></tr></table>
+<img srcset="/hostile/srcset-same.png 2x" alt="srcset same origin">
+<noscript><img src="/hostile/noscript.png" alt="noscript"></noscript>
+<video poster="/hostile/poster-only.png"></video>
+<video><source src="https://source.example.net/v.mp4"></video>
+<svg width="200" height="40"><defs><symbol id="dot"><circle cx="10" cy="10" r="8" fill="teal"/></symbol></defs>
+<use href="#dot"/>
+<use href=" #missing-space"/>
+<use href="&#xA0;#missing-nbsp"/>
+<use xlink:href="&#9;/hostile/use-tab.svg#a"/>
+<use href="/hostile/use-same.svg#missing"/>
+<use href="https://use2.example.net/s.svg#missing"/>
+<image href="/hostile/svg-image-same.png" width="20" height="20"/>
+<style>@import url("/hostile/svg-style-import.css");</style></svg>
+<img src="x" onerror="top.__hostileRan = 'onerror'">
+<details open ontoggle="top.__hostileRan = 'ontoggle'"><summary>details 2</summary>y</details>
+</body>
+</html>

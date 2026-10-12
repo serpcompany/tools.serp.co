@@ -306,6 +306,8 @@ export const ONE_COLOUR_FIXTURES = new Set([
 // together) passes every other check.
 export const PAGE_COUNTS = {
   "sample-pages.docx": 3,
+  // Its pages break where the text runs past them, not where the file says.
+  "sample-long-table.docx": 4,
 };
 
 // fixture-matrix.json: ready inputs by format, and per-Tool fixtures.

@@ -11,15 +11,21 @@ import {
   MAX_IMAGE_SIDE,
   NO_WEBGL_MESSAGE,
   SANDBOX_POLICY,
+  DOCUMENT_PAGE_EVENT,
   buildSrcdoc,
+  columnWidths,
   counterPairs,
   counterText,
   drawingImageSize,
+  gridColumns,
   htmlCharset,
   htmlCutNotice,
+  inPageReference,
   overflowIndex,
   pageScale,
   resolveCounterContent,
+  spansAcross,
+  splitRow,
 } from "./document-images.ts";
 import { DOCUMENT_IMAGE_ENGINES, isDocumentImageConversion } from "./image-document-targets.ts";
 import { PDF_FONT_URL } from "./table-outputs.ts";
@@ -166,6 +172,117 @@ test("a page that runs past its end continues from the first block below it", ()
   // The first block alone is too tall: 0, so only its own rows can split.
   assert.equal(overflowIndex([900, 950], 800), 0);
   assert.equal(overflowIndex([], 800), null);
+});
+
+// A table as docx-preview renders it: `rows` of [text, colSpan, rowSpan],
+// a vertically merged cell's rowSpan on its first cell and the cells it
+// covers kept, hidden (text null).
+const table = (rows) =>
+  rows.map((cells) => cells.map(([text, colSpan = 1, rowSpan = 1]) => ({ text, colSpan, rowSpan, hidden: text === null })));
+
+// What splitTable does to the cells, on the model: cut each cell merged
+// across `split` there, continue it in a cell of its own on the moved rows,
+// and give the moved part the header rows. Returns the moved part.
+function splitModel(rows, split, headers = 0) {
+  const columns = gridColumns(rows);
+  const moved = rows.slice(split).map((cells) => [...cells]);
+  for (const span of spansAcross(rows, columns, split)) {
+    rows[span.row][span.cell] = { ...rows[span.row][span.cell], rowSpan: span.above };
+    const at = rows[split].findIndex((cell, c) => columns[split][c] > span.column);
+    const continued = { ...rows[span.row][span.cell], text: "", rowSpan: span.below };
+    moved[0].splice(at === -1 ? moved[0].length : moved[0].indexOf(rows[split][at]), 0, continued);
+  }
+  return [...rows.slice(0, headers).map((cells) => [...cells]), ...moved];
+}
+
+// Each shown cell's text and the columns it covers, row by row.
+const layout = (rows) => {
+  const columns = gridColumns(rows);
+  return rows.map((cells, r) =>
+    cells.flatMap((cell, c) => (cell.hidden ? [] : [[cell.text, columns[r][c], columns[r][c] + cell.colSpan - 1]])),
+  );
+};
+
+test("a table split inside a merged first column keeps every cell under its header", () => {
+  // The review's case: GROUP merged down 70 rows, the page ending after Item 23.
+  const rows = table([
+    [["GROUP"], ["ITEM"], ["PRICE"]],
+    ...Array.from({ length: 70 }, (_, i) => [i === 0 ? ["Group A", 1, 70] : [null], [`Item ${i + 1}`], [`Price ${i + 1}`]]),
+  ]);
+  assert.deepEqual(gridColumns(rows)[24], [-1, 1, 2]);
+  assert.deepEqual(spansAcross(rows, gridColumns(rows), 24), [{ row: 1, cell: 0, column: 0, above: 23, below: 47 }]);
+  const moved = splitModel(rows, 24, 1);
+  const cells = layout(moved);
+  assert.deepEqual(cells[0], [["GROUP", 0, 0], ["ITEM", 1, 1], ["PRICE", 2, 2]]);
+  assert.deepEqual(cells[1], [["", 0, 0], ["Item 24", 1, 1], ["Price 24", 2, 2]]);
+  assert.deepEqual(cells.at(-1), [["Item 70", 1, 1], ["Price 70", 2, 2]]);
+  // The merged cell ends at the split on the first part, and its rows add up.
+  assert.equal(rows[1][0].rowSpan, 23);
+  assert.equal(moved[1].find((cell) => cell.text === "").rowSpan, 47);
+});
+
+test("a split keeps cells merged across columns, and several merges, in their columns", () => {
+  const rows = table([
+    [["Group A", 1, 4], ["Item 1"], ["Price 1"]],
+    [[null], ["Item 2 discontinued", 2]],
+    [[null], ["Item 3"], ["Note", 1, 3]],
+    [[null], ["Item 4"], [null]],
+    [["Group A subtotal", 2], [null]],
+    [["Group B"], ["Item 5"], ["Price 5"]],
+  ]);
+  assert.deepEqual(gridColumns(rows), [[0, 1, 2], [-1, 1], [-1, 1, 2], [-1, 1, -1], [0, -1], [0, 1, 2]]);
+  // Split at row 3: Group A (column 0) and Note (column 2) both run across it.
+  const moved = splitModel(rows, 3);
+  assert.deepEqual(layout(moved), [
+    [["", 0, 0], ["Item 4", 1, 1], ["", 2, 2]],
+    [["Group A subtotal", 0, 1]],
+    [["Group B", 0, 0], ["Item 5", 1, 1], ["Price 5", 2, 2]],
+  ]);
+  assert.deepEqual(layout(rows.slice(0, 3)), [
+    [["Group A", 0, 0], ["Item 1", 1, 1], ["Price 1", 2, 2]],
+    [["Item 2 discontinued", 1, 2]],
+    [["Item 3", 1, 1], ["Note", 2, 2]],
+  ]);
+  assert.equal(rows[0][0].rowSpan, 3);
+  // A merge that ends before the split doesn't run across it.
+  assert.deepEqual(spansAcross(table([[["A", 1, 2], ["B"]], [[null], ["C"]], [["D"], ["E"]]]), [[0, 1], [-1, 1], [0, 1]], 2), []);
+});
+
+test("a table continues after its header rows and at least one more", () => {
+  // Rows 0-1 are headers; row 5 is the first below the page's end.
+  assert.equal(splitRow(5, 2, 10, false), 5);
+  assert.equal(splitRow(null, 2, 10, false), null);
+  // Only the headers fit: the table moves to the next page whole...
+  assert.equal(splitRow(2, 2, 10, false), null);
+  assert.equal(splitRow(0, 0, 10, false), null);
+  // ...unless it starts the page already: it keeps one row after them.
+  assert.equal(splitRow(2, 2, 10, true), 3);
+  assert.equal(splitRow(0, 0, 10, true), 1);
+  // Nothing left to move.
+  assert.equal(splitRow(0, 0, 1, true), null);
+  assert.equal(splitRow(1, 1, 2, true), null);
+});
+
+test("each column keeps the width it was laid out with, an edge no cell shows split evenly", () => {
+  assert.deepEqual(columnWidths([0, 100, 250, 400]), [100, 150, 150]);
+  assert.deepEqual(columnWidths([0, undefined, undefined, 300]), [100, 100, 100]);
+  assert.deepEqual(columnWidths([0, 100, undefined]), [100, 0]);
+  assert.deepEqual(columnWidths([]), []);
+});
+
+test("an SVG <use> keeps only a reference into the page, as the URL parser reads it", () => {
+  assert.equal(inPageReference("#icon"), "#icon");
+  // modern-screenshot fetches the part before "#" as written: " " is this page.
+  assert.equal(inPageReference(" #icon"), "#icon");
+  assert.equal(inPageReference("\t#i\ncon\r "), "#icon");
+  assert.equal(inPageReference("\u0000#icon"), "#icon");
+  // A no-break space isn't trimmed by the URL parser: /%C2%A0 on this site.
+  assert.equal(inPageReference(" #icon"), null);
+  assert.equal(inPageReference("sprite.svg#icon"), null);
+  assert.equal(inPageReference("/hostile/use.svg#a"), null);
+  assert.equal(inPageReference("https://example.net/s.svg#a"), null);
+  assert.equal(inPageReference(""), null);
+  assert.equal(DOCUMENT_PAGE_EVENT, "document-images:page");
 });
 
 test("list numbers are worked out from the counters docx-preview sets", () => {
