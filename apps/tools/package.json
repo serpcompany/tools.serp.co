@@ -50,6 +50,7 @@
     "@serp-tools/app-core": "workspace:*",
     "@serp-tools/tool-telemetry": "workspace:*",
     "@serp-tools/ui": "workspace:*",
+    "@viz-js/viz": "3.31.0",
     "@zip.js/zip.js": "^2.7.72",
     "avsc": "5.7.9",
     "docx": "9.7.2",

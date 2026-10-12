@@ -34,8 +34,11 @@ import { convertWithWorker } from "./workerClient.ts";
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const bytes = (text) => new TextEncoder().encode(text);
 
-test("DOCX, DXF and HTML to an image route to document-images.ts, and nothing else does", () => {
-  for (const id of ["docx-to-jpeg", "docx-to-svg", "docx-to-tiff", "dxf-to-jpg", "dxf-to-png", "html-to-gif", "html-to-svg", "html-to-webp"]) {
+test("DOCX, DXF, HTML, TXT, DOT and XLSX to an image route to document-images.ts, and nothing else does", () => {
+  for (const id of [
+    "docx-to-jpeg", "docx-to-svg", "docx-to-tiff", "dxf-to-jpg", "dxf-to-png", "html-to-gif", "html-to-svg", "html-to-webp",
+    "txt-to-jpeg", "txt-to-jpg", "txt-to-png", "txt-to-svg", "dot-to-jpg", "dot-to-png", "xlsx-to-jpg", "xlsx-to-png",
+  ]) {
     const [from, to] = id.split("-to-");
     assert.equal(isDocumentImageConversion(from, to), true, id);
     assert.equal(isDocumentImageConversion(from.toUpperCase(), to.toUpperCase()), true, id);
@@ -48,10 +51,22 @@ test("DOCX, DXF and HTML to an image route to document-images.ts, and nothing el
     ["dxf", "dwg"],
     ["pdf", "png"],
     ["svg", "html"],
+    ["txt", "pdf"],
+    ["txt", "docx"],
+    ["xlsx", "csv"],
+    ["xls", "png"],
+    ["dot", "svg2"],
   ]) {
     assert.equal(isDocumentImageConversion(from, to), false, `${from} to ${to}`);
   }
-  assert.deepEqual(DOCUMENT_IMAGE_ENGINES, { docx: "docx-preview", dxf: "dxf-viewer", html: "html-render" });
+  assert.deepEqual(DOCUMENT_IMAGE_ENGINES, {
+    docx: "docx-preview",
+    dxf: "dxf-viewer",
+    html: "html-render",
+    txt: "text-render",
+    dot: "viz-js",
+    xlsx: "xlsx-table",
+  });
 });
 
 test("the converter sends these files to document-images.ts, not the image decoder", async () => {
@@ -71,6 +86,17 @@ test("the converter sends these files to document-images.ts, not the image decod
     convertWithWorker({ worker: undefined, from: "html", to: "gif", buf: bytes("  \n").buffer }),
     (error) => error.message === "This HTML file is empty." && error.telemetryMetadata.engine === "html-render",
   );
+  for (const [from, to, input, message, engine] of [
+    ["txt", "png", " \n\t\n", "This text file is empty: there's no text to draw.", "text-render"],
+    ["dot", "jpg", "\n", "This DOT file is empty.", "viz-js"],
+    ["xlsx", "png", "name,count\n", "This file isn't an XLSX workbook: it isn't a ZIP archive.", "xlsx-table"],
+  ]) {
+    await assert.rejects(
+      convertWithWorker({ worker: undefined, from, to, buf: bytes(input).buffer }),
+      (error) => error.message === message && error.telemetryCode === "convert_failed" && error.telemetryMetadata.engine === engine,
+      `${from} to ${to}`,
+    );
+  }
 });
 
 test("a browser without WebGL is told DXF needs it, under its own error code", async () => {

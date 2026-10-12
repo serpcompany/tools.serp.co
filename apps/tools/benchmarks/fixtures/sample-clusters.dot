@@ -1,0 +1,25 @@
+// A styled graph: two clusters, record and HTML-like labels, colours,
+// edge labels and a rank set, laid out by dot.
+digraph pipeline {
+  graph [rankdir=LR, fontname="Helvetica", label="Upload pipeline", labelloc=t, fontsize=18];
+  node [shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0369a1", fontname="Helvetica"];
+  edge [color="#475569", fontname="Helvetica", fontsize=10];
+
+  subgraph cluster_browser {
+    label="In the browser"; style="filled"; fillcolor="#f8fafc"; color="#94a3b8";
+    pick [label="Pick a file"];
+    read [label="Read bytes"];
+    convert [label=<<B>Convert</B><BR/><FONT POINT-SIZE="10">Graphviz in WebAssembly</FONT>>, fillcolor="#dcfce7", color="#15803d"];
+    pick -> read -> convert;
+  }
+
+  subgraph cluster_output {
+    label="Output"; style="dashed"; color="#a16207";
+    record [shape=record, style=filled, fillcolor="#fef9c3", label="{image|{PNG|JPEG}|saved}"];
+  }
+
+  convert -> record [label="draw"];
+  read -> error [label="bad file", style=dashed, color="#b91c1c", fontcolor="#b91c1c"];
+  error [label="Say why", shape=octagon, fillcolor="#fee2e2", color="#b91c1c"];
+  { rank=same; convert; error; }
+}

@@ -21,7 +21,7 @@ export type ConversionOp = "raster" | "pdf-pages" | "video";
 // rows a table image leaves out.
 export type ConversionResult =
   | { kind: "single"; buffer: ArrayBuffer; notice?: string }
-  | { kind: "multiple"; buffers: ArrayBuffer[] };
+  | { kind: "multiple"; buffers: ArrayBuffer[]; notice?: string };
 
 export type ProgressUpdate = {
   status?: string;
@@ -297,9 +297,11 @@ async function convertTableToImage(from: string, to: string, args: ConvertArgs):
   }
 }
 
-// DOCX, DXF or HTML to an image (document-images.ts), on the main thread: a
-// picture of each DOCX page, of the DXF drawing, or of the HTML page. A
-// browser without WebGL can't draw DXF; that's its own error code.
+// DOCX, DXF, HTML, TXT, DOT or XLSX to an image (document-images.ts), on the
+// main thread: a picture of each DOCX page or XLSX sheet, of the DXF
+// drawing, the HTML page, the text or the graph. A browser without WebGL
+// can't draw DXF, and a graph whose layout runs too long is stopped; each is
+// its own error code.
 async function convertDocumentToImage(from: string, to: string, args: ConvertArgs): Promise<ConversionResult> {
   try {
     const { convertDocumentToImages } = await import("./document-images.ts");
@@ -307,7 +309,7 @@ async function convertDocumentToImage(from: string, to: string, args: ConvertArg
   } catch (error) {
     const code = (error as { code?: unknown } | null)?.code;
     throw createTelemetryError(
-      code === "webgl_unavailable" ? code : "convert_failed",
+      code === "webgl_unavailable" || code === "layout_timeout" ? code : "convert_failed",
       error instanceof Error ? error.message : String(error),
       { from, to, engine: DOCUMENT_IMAGE_ENGINES[from] ?? from },
     );

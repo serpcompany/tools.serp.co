@@ -252,6 +252,9 @@ export const ENGINE_LOCATIONS = {
   "docx-preview": "client-only",
   "dxf-viewer": "client-only",
   "html-render": "client-only",
+  "text-render": "client-only",
+  "viz-js": "client-only",
+  "xlsx-table": "client-only",
   svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",
@@ -308,6 +311,8 @@ export const PAGE_COUNTS = {
   "sample-pages.docx": 3,
   // Its pages break where the text runs past them, not where the file says.
   "sample-long-table.docx": 4,
+  // An image of each sheet that shows: two of three (one is hidden).
+  "sample-sheets.xlsx": 2,
 };
 
 // fixture-matrix.json: ready inputs by format, and per-Tool fixtures.

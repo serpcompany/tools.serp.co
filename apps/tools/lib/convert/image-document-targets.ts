@@ -1,6 +1,7 @@
 // Which conversions image-documents.ts, image-text.ts, table-outputs.ts and
 // document-images.ts write. Kept apart from them so the converter can route
-// without loading fflate, jsPDF, svg2pdf, docx-preview or three.js.
+// without loading fflate, jsPDF, svg2pdf, docx-preview, three.js or
+// Graphviz.
 
 export const EPUB_IMAGE_TYPES: Record<string, string> = {
   png: "image/png",
@@ -28,15 +29,20 @@ export function isTableImageConversion(from: string, to: string): boolean {
   return from.toLowerCase() === "csv" && ["png", "jpg", "jpeg"].includes(to.toLowerCase());
 }
 
-// A DOCX, DXF or HTML file drawn as an image by document-images.ts: a
-// picture of each DOCX page, of the DXF drawing, or of the HTML page. (HTML
-// to PNG and to JPEG are table converter pages, which don't come here.)
-export const DOCUMENT_IMAGE_INPUTS = new Set(["docx", "dxf", "html"]);
-// The library that draws each, as telemetry and the Tool sweep name it.
+// A file drawn as an image by document-images.ts: a picture of each DOCX
+// page, of the DXF drawing, of the HTML page, of a plain-text file (#265),
+// of a Graphviz DOT graph, or of each sheet of an XLSX workbook. (HTML to
+// PNG and to JPEG are table converter pages, which don't come here.)
+export const DOCUMENT_IMAGE_INPUTS = new Set(["docx", "dxf", "html", "txt", "dot", "xlsx"]);
+// The library or renderer that draws each, as telemetry and the Tool sweep
+// name it.
 export const DOCUMENT_IMAGE_ENGINES: Record<string, string> = {
   docx: "docx-preview",
   dxf: "dxf-viewer",
   html: "html-render",
+  txt: "text-render",
+  dot: "viz-js",
+  xlsx: "xlsx-table",
 };
 const DOCUMENT_IMAGE_OUTPUTS = new Set(["png", "jpg", "jpeg", "webp", "gif", "bmp", "tif", "tiff", "svg"]);
 

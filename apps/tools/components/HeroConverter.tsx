@@ -142,7 +142,8 @@ export default function HeroConverter({
             name: file.name,
             progress: 100,
             status: 'completed',
-            message: 'Conversion complete!'
+            message: 'Conversion complete!',
+            notice: result.notice,
           });
         } else {
           if (!result.buffer || result.buffer.byteLength === 0) {

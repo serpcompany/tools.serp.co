@@ -1,5 +1,8 @@
 // DOCX, DXF and HTML files drawn as images (issue #250), in the visitor's
 // browser and on the main thread, since laying out a page needs the DOM.
+// Plain text, Graphviz DOT and XLSX (#265) are drawn by their own modules,
+// text-image.ts, graphviz-image.ts and xlsx-sheets.ts with table-image.ts,
+// and encoded here like the rest.
 // HTML and DOCX are laid out in a sandboxed iframe that runs no script and
 // loads nothing, then captured with modern-screenshot; DXF is drawn by
 // dxf-viewer with three.js and WebGL. Each picture is encoded as any image
@@ -913,8 +916,10 @@ async function encode(rgba: RGBA, to: string, quality: number): Promise<ArrayBuf
 }
 
 // One image per DOCX page (kind "multiple", like PDF pages), or one of a DXF
-// drawing or an HTML page, in `to`'s format. Throws an Error whose `code`
-// is set when the browser, not the file, is the reason.
+// drawing, an HTML page, a text file or a DOT graph, or one per XLSX sheet
+// with values (kind "single" for a workbook with one), in `to`'s format.
+// Throws an Error whose `code` is set when the browser, not the file, is
+// the reason.
 export async function convertDocumentToImages(
   buf: ArrayBuffer,
   from: string,
@@ -936,11 +941,56 @@ export async function convertDocumentToImages(
     onProgress?.({ status: "processing", progress: 100 });
     return { kind: "single", buffer };
   }
-  if (from === "html") {
-    const { rgba, notice } = await renderHtml(buf);
-    const buffer = await encode(rgba, to, quality);
-    onProgress?.({ status: "processing", progress: 100 });
-    return { kind: "single", buffer, notice };
+  if (from === "xlsx") return convertWorkbook(buf, to, quality, onProgress);
+  const render =
+    from === "html"
+      ? renderHtml
+      : from === "txt"
+        ? (await import("./text-image.ts")).renderTextImage
+        : from === "dot"
+          ? (await import("./graphviz-image.ts")).renderGraph
+          : null;
+  if (!render) throw new Error(`${from.toUpperCase()} files can't be drawn as images here.`);
+  const { rgba, notice } = await render(buf);
+  const buffer = await encode(rgba, to, quality);
+  onProgress?.({ status: "processing", progress: 100 });
+  return { kind: "single", buffer, notice };
+}
+
+// An image of each sheet that shows, drawn as the table converters draw a
+// table (table-image.ts): the first row as the header, as many rows and
+// columns as fit, and a note in the image when some don't.
+async function convertWorkbook(
+  buf: ArrayBuffer,
+  to: string,
+  quality: number,
+  onProgress?: (update: ProgressUpdate) => void,
+): Promise<ConversionResult> {
+  const [{ readWorkbookSheets }, { renderTableImage }] = await Promise.all([
+    import("./xlsx-sheets.ts"),
+    import("./table-image.ts"),
+  ]);
+  const { sheets, hidden } = readWorkbookSheets(buf);
+  if (!sheets.length) throw new Error("This workbook has no visible sheet with values to draw.");
+  const buffers: ArrayBuffer[] = [];
+  const notes: string[] = [];
+  for (const sheet of sheets) {
+    const { rgba, note } = renderTableImage(sheet.table);
+    buffers.push(await encode(rgba, to, quality));
+    if (note) notes.push(sheets.length > 1 ? `${sheet.name}: ${note}` : note);
+    onProgress?.({ status: "processing", progress: Math.min(95, 20 + (75 * buffers.length) / sheets.length) });
   }
-  throw new Error(`${from.toUpperCase()} files can't be drawn as images here.`);
+  onProgress?.({ status: "processing", progress: 100 });
+  const notice = workbookNotice(sheets.map((sheet) => sheet.name), notes, hidden);
+  return sheets.length === 1 ? { kind: "single", buffer: buffers[0]!, notice } : { kind: "multiple", buffers, notice };
+}
+
+// What the page says about a workbook's images: which file is which sheet,
+// what each leaves out, and the hidden sheets it doesn't draw.
+export function workbookNotice(names: string[], notes: string[], hidden: number): string | undefined {
+  const parts: string[] = [];
+  if (names.length > 1) parts.push(`One image a sheet, in the workbook's order: ${names.join(", ")}.`);
+  if (notes.length) parts.push(`${notes.join(" ")} An image holds what fits in ${MAX_IMAGE_SIDE} pixels.`);
+  if (hidden) parts.push(`${hidden} hidden ${hidden === 1 ? "sheet isn't" : "sheets aren't"} drawn.`);
+  return parts.length ? parts.join(" ") : undefined;
 }
