@@ -1,6 +1,12 @@
 import { detectCapabilities, requiresVideoConversion } from "../capabilities.ts";
 import { resolveCompressionTarget } from "../compression-utils.ts";
-import { isImageDocumentConversion, isImageTextConversion, isTableImageConversion } from "./image-document-targets.ts";
+import {
+  DOCUMENT_IMAGE_ENGINES,
+  isDocumentImageConversion,
+  isImageDocumentConversion,
+  isImageTextConversion,
+  isTableImageConversion,
+} from "./image-document-targets.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
@@ -211,6 +217,9 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
   if (isTableImageConversion(fromExt, toExt)) {
     return convertTableToImage(fromExt, toExt, args);
   }
+  if (isDocumentImageConversion(fromExt, toExt)) {
+    return convertDocumentToImage(fromExt, toExt, args);
+  }
   const op = resolveConversionOp(args.from, args.to);
   if (op === "video") {
     return convertVideoOnMainThread(args);
@@ -284,6 +293,23 @@ async function convertTableToImage(from: string, to: string, args: ConvertArgs):
       "convert_failed",
       error instanceof Error ? error.message : String(error),
       { from, to, engine: "table-outputs" },
+    );
+  }
+}
+
+// DOCX, DXF or HTML to an image (document-images.ts), on the main thread: a
+// picture of each DOCX page, of the DXF drawing, or of the HTML page. A
+// browser without WebGL can't draw DXF; that's its own error code.
+async function convertDocumentToImage(from: string, to: string, args: ConvertArgs): Promise<ConversionResult> {
+  try {
+    const { convertDocumentToImages } = await import("./document-images.ts");
+    return await convertDocumentToImages(args.buf, from, to, { quality: args.quality, onProgress: args.onProgress });
+  } catch (error) {
+    const code = (error as { code?: unknown } | null)?.code;
+    throw createTelemetryError(
+      code === "webgl_unavailable" ? code : "convert_failed",
+      error instanceof Error ? error.message : String(error),
+      { from, to, engine: DOCUMENT_IMAGE_ENGINES[from] ?? from },
     );
   }
 }

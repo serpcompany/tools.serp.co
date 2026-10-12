@@ -22,6 +22,18 @@ against a running Worker. CI runs it in two places:
   telemetry request.
 - A telemetry request with `Sec-GPC: 1` gets a 204 (the route returns before
   storing anything).
+- Documents to images (`lib/convert/document-images.ts`), with the files kept
+  in the page instead of downloaded: `html-to-webp` converts
+  `hostile-page.html` and `docx-to-jpeg` converts `hostile-links.docx` (in
+  `benchmarks/fixtures/`) running none of their scripts, and after the upload
+  no request leaves the browser for the file: none to this site outside
+  `/_next/static/` and `/api/telemetry`, none to the fixtures' `example.net`
+  hosts, and none from the sandboxed frame. A load the sandbox's policy
+  refuses doesn't count, since it never leaves the browser. `docx-to-jpeg`
+  then converts `sample-long-table.docx` to its four pages, reading each page
+  as laid out before it's captured: the table's header row starts each page
+  it runs onto, every cell sits on the columns' edges and under the header it
+  names, and no row is missing a column.
 - The Worker serves the self-hosted PDF font
   (`/vendor/fonts/dejavu/DejaVuSans.ttf`) with a font type and the bytes in
   `public/`. Table pages load it only for text outside Windows-1252, which no

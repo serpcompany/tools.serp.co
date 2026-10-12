@@ -22,6 +22,7 @@ import {
   measurePixels,
   mergeRows,
   ONE_COLOUR_FIXTURES,
+  PAGE_COUNTS,
   pageComponent,
   parseArgs,
   planTool,
@@ -99,6 +100,18 @@ test("a failure keeps the message the page showed", () => {
     status: "error",
     error: "convert_failed",
   });
+});
+
+test("a multi-page fixture must give one image a page", () => {
+  const run = (count) =>
+    classifyRun(
+      { outcome: "completed", outputs: Array.from({ length: count }, (_, i) => output("sample.jpg", { name: `s_page${i + 1}.jpeg` })) },
+      { to: "jpeg", pages: 3 },
+    );
+  assert.equal(run(3).status, "pass");
+  assert.deepEqual(run(1), { status: "error", error: "saved 1 files for the fixture's 3 pages, not one a page" });
+  assert.equal(run(4).error, "saved 4 files for the fixture's 3 pages, not one a page");
+  assert.equal(PAGE_COUNTS["sample-pages.docx"], 3);
 });
 
 test("finishing without a file, or with an empty one, is an error", () => {
@@ -453,6 +466,11 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "png", "docx"), "docx");
   assert.equal(engine("convert", "csv", "jpg"), "table-outputs");
   assert.equal(engine("convert", "csv", "png"), "table-outputs");
+  assert.equal(engine("convert", "docx", "jpeg"), "docx-preview");
+  assert.equal(engine("convert", "docx", "tiff"), "docx-preview");
+  assert.equal(engine("convert", "dxf", "png"), "dxf-viewer");
+  assert.equal(engine("convert", "html", "svg"), "html-render");
+  assert.equal(engine("convert", "html", "webp"), "html-render");
   assert.equal(engine("convert", "image", "pdf"), "image-pdf");
   assert.equal(engine("convert", "png", "pdf"), "browser-raster");
   assert.equal(engine("compress", "heic", "heic"), "server-image-compress");
@@ -549,6 +567,15 @@ test("planTool picks a driver and fixture, or says why a Tool isn't run", () => 
       ["jpeg", "table", true, false, [], true],
     ],
   );
+  // A DOCX fixture with several pages expects an image of each, but not as one PDF.
+  const pagesOptions = {
+    ...options,
+    fixtures: { ...fixtures, byTool: new Map([["docx-to-jpeg", ["/f/sample-pages.docx"]], ["docx-to-pdf", ["/f/sample-pages.docx"]]]) },
+  };
+  const docx = (to) => planTool({ id: `docx-to-${to}`, route: `/docx-to-${to}`, operation: "convert", from: "docx", to }, pagesOptions);
+  assert.deepEqual([docx("jpeg").engine, docx("jpeg").pages, docx("jpeg").pixelCheck], ["docx-preview", 3, true]);
+  assert.equal(docx("pdf").pages, undefined);
+  assert.equal(png.pages, undefined);
   const compress = plan({ id: "compress-png", route: "/compress-png", operation: "compress", from: "png", to: "png" });
   assert.equal(compress.compress, true);
   // A text converter whose fixture has no known data marker can't be checked.

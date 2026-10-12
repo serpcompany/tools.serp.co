@@ -105,6 +105,40 @@ Conversion picks an engine by input format:
   50 megapixels. That size is read from the header of a JPEG, PNG, GIF, WebP
   or BMP, and of the PNG ImageMagick writes, before the browser decodes it;
   HEIC, AVIF, ICO, SVG, ICNS and KTX are checked once decoded.
+- **Documents to images** (`lib/convert/document-images.ts`, since #250): DOCX,
+  DXF and HTML to an image, on the main thread, each library loaded only when
+  its input is converted. An HTML file is parsed without running or loading
+  anything (DOMParser) and loses what runs, loads or embeds: scripts, `<base>`,
+  `<link>`, `<meta http-equiv>`, frames, objects, event attributes, any SVG
+  `<use>` that points outside the page (read as the URL parser reads it),
+  audio, and video (an image of its poster when the file holds it); the
+  `<use>`, audio and video rules run again on the sandbox's own copy.
+  It's then laid out 1280 px wide, in an 800 px window for `vh` units, in an
+  off-screen `<iframe sandbox="allow-same-origin">` with no `allow-scripts`,
+  whose `srcdoc` starts with a Content Security Policy allowing only inline
+  styles and `data:` images and fonts, so nothing is fetched from this site or
+  any other. modern-screenshot 4.7.0 copies it into an SVG foreignObject and
+  draws it; its own fetches run outside the sandbox, so it gets only the
+  `data:` fonts and images in the file, and a blank image for any other. The
+  picture is as tall as the page, up to 4096 px; a taller page is cut there
+  and the page says so. A DOCX is laid out by docx-preview 0.4.1 in the same
+  kind of sandbox, every node built in the sandbox's document (its `h`
+  option), so a picture the file links to but doesn't hold loads nothing;
+  one file a page, at twice its size in points as a PDF page is (1224x1584 for
+  US Letter), at most 4096 px a side. Pages break where the file says, and
+  where text runs past a page's height, between paragraphs or table rows,
+  with the header and footer repeated; a table continues with its header rows
+  (`w:tblHeader`) and its columns, and a cell merged down across the break
+  continues, empty, on the next page; a file with no page size is US Letter
+  with 1-inch margins. List numbers are written out as text, since the
+  capture drops CSS counters; numbering in other scripts (CJK, Hebrew) comes
+  out as decimal. Fonts the browser doesn't have fall back to its default, and
+  an altChunk (HTML inside the file) is left out. A DXF is drawn by dxf-viewer
+  1.0.49 (three.js and WebGL) on white, 2048 px on its longer side, with its
+  TEXT and MTEXT in the DejaVu Sans the table PDFs below use; a browser
+  without WebGL is told so (`webgl_unavailable`). Each picture is then encoded as any image is
+  (`encode.ts`): an SVG is the PNG wrapped, not text or vectors, and a TIFF is
+  LZW.
 - **Tables into files** (`lib/convert/table-outputs.ts`, since #249): the
   table converter pages (`TableConvertDemo`) write Excel, PDF, PNG, JPEG, Avro
   and Protobuf in the browser, once a visitor has given them a table, and load

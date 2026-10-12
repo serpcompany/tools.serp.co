@@ -1035,6 +1035,46 @@
     "image-to-pdf": {
       "input": "file",
       "fixture": "fixtures/sample.png"
+    },
+    "docx-to-jpeg": {
+      "input": "file",
+      "fixture": "fixtures/sample-pages.docx",
+      "notes": "Three US Letter pages with two page breaks saved in the file: a title, headings, a PNG chart, a table and a numbered list. Made with pandoc 3.9 from Markdown (the chart with magick), then pandoc's sectPr, which has no page size, replaced by a US Letter page with 1-inch margins (w:pgSz 12240x15840, w:pgMar 1440). Read back with textutil (all the text) and `file` (Microsoft Word 2007+); its document.xml holds two w:br w:type=\"page\", so three pages (PAGE_COUNTS in scripts/lib/tool-sweep.mjs)."
+    },
+    "docx-to-svg": {
+      "input": "file",
+      "fixture": "fixtures/sample-long-table.docx",
+      "notes": "Four US Letter pages with no page break saved in the file, so every page after the first is one the converter continues itself: a title and 30 one-line paragraphs that run past the first page, then a 3-column table (GROUP | ITEM | PRICE) of a header row marked to repeat on each page (w:tblHeader) and 70 items in two groups, the GROUP cell of each merged down its group (w:vMerge) across a page's end, with rows merged across columns (w:gridSpan: three 'discontinued' items over ITEM and PRICE, and two subtotals over GROUP and ITEM), then a closing paragraph; a page header and footer. Every line and row has an exact height (w:lineRule exact, w:hRule exact), so the pages break in the same places with any font. Written as WordprocessingML by a Python script with zipfile (no Word, pandoc or download). Read back with textutil (all the text) and `file` (Microsoft Word 2007+). scripts/smoke-browser.mjs checks each page's table cells sit under their header; PAGE_COUNTS in scripts/lib/tool-sweep.mjs has its page count."
+    },
+    "docx-to-tiff": {
+      "input": "file",
+      "fixture": "fixtures/sample-pages.docx",
+      "notes": "The fixture docx-to-jpeg uses; see its notes."
+    },
+    "dxf-to-jpg": {
+      "input": "file",
+      "fixture": "fixtures/sample-plan.dxf",
+      "notes": "The fixture dxf-to-png uses; see its notes."
+    },
+    "dxf-to-png": {
+      "input": "file",
+      "fixture": "fixtures/sample-plan.dxf",
+      "notes": "A small R2000 (AC1015) floor plan written by a Python script as group-code pairs: a closed LWPOLYLINE and LINE walls, a CIRCLE, an ARC, a TEXT title and two-line MTEXT labels on four layers with their own colours. Read back with `file` (AutoCAD Drawing Exchange Format, version 2000) and a group-code parser: HEADER, TABLES and ENTITIES sections, 13 entities, ending in EOF."
+    },
+    "html-to-gif": {
+      "input": "file",
+      "fixture": "fixtures/sample-page.html",
+      "notes": "The fixture html-to-webp uses; see its notes."
+    },
+    "html-to-svg": {
+      "input": "file",
+      "fixture": "fixtures/sample-page.html",
+      "notes": "The fixture html-to-webp uses; see its notes."
+    },
+    "html-to-webp": {
+      "input": "file",
+      "fixture": "fixtures/sample-page.html",
+      "notes": "A styled page written as plain text: a gradient header, three cards with shadows, a striped table, an inline data: SVG drawing and a dark footer; no external resources. Read back with `file` (HTML document text)."
     }
   }
 }
