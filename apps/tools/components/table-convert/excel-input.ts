@@ -6,7 +6,7 @@
 
 import { MAX_CELL_CHARS, OLD_WORKBOOK, TABLE_CELLS, TABLE_CHARS } from "../../lib/convert/excel-cells.ts";
 import type { WorkbookText } from "../../lib/convert/xlsx.worker.ts";
-import type { Workbook } from "./output-state.ts";
+import type { WorkbookRead } from "./output-state.ts";
 import type { InputFormat } from "./types.ts";
 
 const formatCount = (value: number) => value.toLocaleString("en-US");
@@ -56,7 +56,7 @@ const quoted = (names: string[]) => {
 
 // The workbook a read gives the page, or an Error saying why there's no
 // sheet to show.
-export function workbookInput(read: WorkbookText): Omit<Workbook, "sheet"> {
+export function workbookInput(read: WorkbookText): WorkbookRead {
   if (!read.sheets.length) {
     if (read.tooLarge?.length) {
       throw new Error(`its sheets are larger than this page converts at once (${LIMITS}). Save the rows you need in a smaller workbook.`);
@@ -73,7 +73,7 @@ export function workbookInput(read: WorkbookText): Omit<Workbook, "sheet"> {
 }
 
 // What the page says was left out of a workbook.
-export function workbookNotes(workbook: Omit<Workbook, "sheet">): string[] {
+export function workbookNotes(workbook: Pick<WorkbookRead, "hidden" | "skipped" | "stop" | "tooLarge">): string[] {
   const notes: string[] = [];
   const { hidden, skipped, stop, tooLarge = [] } = workbook;
   if (tooLarge.length) {

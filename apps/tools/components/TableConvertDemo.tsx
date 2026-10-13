@@ -30,7 +30,7 @@ import {
   outputFileName,
   outputMimeType,
 } from "@/components/table-convert/formats";
-import { parseInput, serializeInput, serializeOutput } from "@/components/table-convert/convert";
+import { inputPageCells, parseInput, serializeInput, serializeOutput } from "@/components/table-convert/convert";
 import { fileTextFormat, readsAsWorkbook, workbookInput, workbookNotes } from "@/components/table-convert/excel-input";
 import { excelPaste } from "@/components/table-convert/excel-paste";
 import {
@@ -55,7 +55,7 @@ const BINARY_DELAY_MS = 300;
 
 // The input, the table on screen and the name downloads take change only
 // here, together (output-state.ts).
-const nextTablePage = tablePageReducer({ parse: parseInput, serialize: serializeInput, placeholder: DEFAULT_TABLE });
+const nextTablePage = tablePageReducer({ parse: parseInput, serialize: serializeInput, pageCellsOf: inputPageCells, placeholder: DEFAULT_TABLE });
 
 export default function TableConvertDemo({
   initialInputFormat = "csv",
@@ -67,7 +67,7 @@ export default function TableConvertDemo({
   const [page, dispatch] = useReducer(nextTablePage, initialInputFormat, (format: InputFormat) =>
     initialTablePage(format, DEFAULT_TABLE),
   );
-  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload, workbook, written } = page;
+  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload, workbook } = page;
   const sheetSelectId = useId();
   const [outputFormat, setOutputFormat] = useState<OutputFormat>(initialOutputFormat);
   const [inputView, setInputView] = useState<ViewMode>("raw");
@@ -117,13 +117,12 @@ export default function TableConvertDemo({
       value: textarea.value,
       start: textarea.selectionStart,
       end: textarea.selectionEnd,
-      written,
     });
     if (!paste) return;
     event.preventDefault();
     if (paste.value === textarea.value) textarea.setSelectionRange(paste.caret, paste.caret);
     else pastedCaret.current = paste.caret;
-    dispatch({ type: "type", text: paste.value, replacesInput: paste.replacesInput, written: paste.written });
+    dispatch({ type: "type", text: paste.value, replacesInput: paste.replacesInput, wrote: paste.wrote });
   }
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);

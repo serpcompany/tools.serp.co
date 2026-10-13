@@ -171,17 +171,21 @@ Conversion picks an engine by input format:
   quote). It is read as Excel writes it (`lib/convert/excel-cells.ts`): a
   cell that starts with a quote but isn't quoted that way (`"Best" seller`, a
   ditto mark) is its text. Where a quote reads two ways (ditto marks in a
-  column copy as a quoted cell holding line breaks would), who wrote the text
-  decides (`written` in the reducer): text the page wrote (a sheet, a grid
-  edit, a rewrite) reads as written, through the visitor's edits too; the
-  visitor's text (typed, pasted, a text file) never has rows merged on a
-  quote unless no reading keeps every line a row of one width, and then
-  merges the fewest lines that make every row as wide. A paste takes the
-  clipboard's plain text, which keeps each cell's text exactly, and the HTML
-  table Excel puts next to it decides its shape (`excel-paste.ts`, scanned
-  as text, nothing rendered or fetched): when the visitor's reading differs,
-  the page puts the text in as its own. In the visitor's text, empty rows at
-  the end aren't rows; in the page's (a row added in the grid), they stay.
+  column copy as a quoted cell holding line breaks would), one rule decides:
+  a quoted cell that spans lines is one cell only if the page wrote that
+  exact cell. The reducer keeps those cells, by their exact text, with the
+  input's text (`pageCells`): a sheet's, a grid edit's, a rewrite's, a paste
+  the page wrote. Every other quote, typed or pasted, is read the visitor's
+  way, which never merges rows on a quote unless no reading keeps every line
+  a row of one width, and then merges the fewest lines that make every row
+  as wide. Text the visitor types that is exactly a cell the page wrote reads
+  as that cell. A paste takes the clipboard's plain text, which keeps each
+  cell's text exactly, and the HTML table Excel puts next to it decides its
+  shape and the text of a cell that starts with a quote (`excel-paste.ts`,
+  scanned as text, nothing rendered or fetched): when the visitor's reading
+  differs, the page puts the cells in as its own. Blank lines at the end
+  aren't rows, as in a CSV input; a row of empty cells (one added in the
+  grid) is.
   So cells pasted from Excel convert too, and a sheet reaches the table, the
   name and Download through the reducer above like any file's text, under
   the workbook's name. The first

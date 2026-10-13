@@ -24,7 +24,7 @@ import {
   sheetTable,
 } from "./xlsx-sheets.ts";
 import { resolvePart } from "./ooxml.ts";
-import { MAX_CELL_CHARS, TABLE_CELLS, TABLE_CHARS, excelCellSize, writeExcelCells } from "./excel-cells.ts";
+import { MAX_CELL_CHARS, TABLE_CELLS, TABLE_CHARS, excelCellSize, excelPageCells, writeExcelCells } from "./excel-cells.ts";
 import { parseExcelCells } from "./table-data.ts";
 import { WORKBOOK_TIMEOUT_MS, readWorkbookInWorker, readWorkbookTextInWorker } from "./xlsx-workbook.ts";
 import { readWorkbookJob } from "./xlsx.worker.ts";
@@ -463,7 +463,7 @@ test("read in the worker for a table converter, each sheet comes back as its cel
     tooLarge: [],
     sheets: [{ name: "S", number: 1, text: 'Name\tNote\nAlpha\t"two\tcells?"' }],
   });
-  assert.deepEqual(parseExcelCells(reply.sheets[0].text, true).table, readWorkbookSheets(workbook([{ name: "S", xml }])).sheets[0].table);
+  assert.deepEqual(parseExcelCells(reply.sheets[0].text, excelPageCells(reply.sheets[0].text)).table, readWorkbookSheets(workbook([{ name: "S", xml }])).sheets[0].table);
   const answering = () => {
     const fake = { onmessage: null, onerror: null, terminate() {} };
     fake.postMessage = (job) => setTimeout(() => fake.onmessage({ data: readWorkbookJob(job) }));

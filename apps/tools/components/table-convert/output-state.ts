@@ -32,15 +32,19 @@
 // so choosing another sheet and coming back brings the edits back (#299
 // review).
 //
-// Who wrote the input's text decides how an Excel input's text reads where
-// a quote reads two ways (excel-cells.ts, #299 review): the page (a sheet, a
-// grid edit, a table rewritten in the input's format) or the visitor (typed,
-// pasted, a text file). The page's text keeps that through the visitor's
-// edits, as it keeps its origin; text of the visitor's own, a file's text
-// and Clear are the visitor's. A paste the page writes in its own way (one
-// the clipboard's HTML table says reads differently, TableConvertDemo) is
-// the page's.
+// Where a quote in an Excel input's text reads two ways, one rule settles
+// it (excel-cells.ts, #299 review): a quoted cell that spans lines is one
+// cell only if the page wrote that exact cell; every other quote is read
+// the visitor's way, which never merges rows on it. So the input's text
+// comes with the quoted cells holding line breaks that the page wrote into
+// it (pageCells), by their exact text: a sheet's, a grid edit's, a table
+// rewritten in the input's format, a paste the page wrote its own way (the
+// clipboard's HTML table says its text reads differently,
+// TableConvertDemo). The visitor's edits keep them, though a cell edited
+// no longer matches; each sheet keeps its own; text of the visitor's own, a
+// file's text and Clear have none.
 
+import { NO_PAGE_CELLS, type PageCells } from "../../lib/convert/excel-cells.ts";
 import type { WorkbookText } from "../../lib/convert/xlsx.worker.ts";
 import { outputFileName } from "./formats.ts";
 import type { InputFormat, OutputFormat, TableData } from "./types.ts";
@@ -48,10 +52,15 @@ import type { InputFormat, OutputFormat, TableData } from "./types.ts";
 export type ParseTable = (
   format: InputFormat,
   text: string,
-  written: boolean,
+  pageCells: PageCells,
 ) => { table: TableData | null; supported: boolean; error?: string | null };
 
 export type SerializeTable = (format: InputFormat, table: TableData) => { text: string; supported: boolean };
+
+// The cells of text the page has just written in a format that only the
+// page can say how to read (an Excel input's quoted cells holding line
+// breaks); none in other formats.
+export type PageCellsOf = (format: InputFormat, text: string) => PageCells;
 
 // A file chosen or dropped and still being read. Each upload takes a new
 // ticket, so a read that finishes after a newer upload, typing, a grid edit
@@ -59,10 +68,14 @@ export type SerializeTable = (format: InputFormat, table: TableData) => { text: 
 export type Upload = { name: string; ticket: number } | null;
 
 // A workbook read for an Excel input: its sheets with values, each as the
-// text the input holds for it (as read, or as last edited), what was left
-// out (hidden sheets, sheets too large, sheets not read), and which sheet
-// the input's text came from.
-export type Workbook = Omit<WorkbookText, "sheets"> & { sheets: { name: string; text: string }[]; sheet: number };
+// text the input holds for it, what was left out (hidden sheets, sheets too
+// large, sheets not read).
+export type WorkbookRead = Omit<WorkbookText, "sheets"> & { sheets: { name: string; text: string }[] };
+
+// That workbook on the page: each sheet's text as read, or as last edited,
+// with the cells the page wrote into it, and which sheet the input's text
+// came from.
+export type Workbook = Omit<WorkbookRead, "sheets"> & { sheets: { name: string; text: string; pageCells: PageCells }[]; sheet: number };
 
 export type TablePage = {
   inputFormat: InputFormat;
@@ -85,8 +98,10 @@ export type TablePage = {
   // The workbook the input's text came from: there exactly while the text's
   // origin (fileName) is a workbook, as read or since edited.
   workbook: Workbook | null;
-  // Whether the page wrote the input's text, as written or since edited.
-  written: boolean;
+  // The quoted cells holding line breaks that the page wrote into the
+  // input's text, by their exact text: they read as one cell. None outside
+  // an Excel input's text the page wrote.
+  pageCells: PageCells;
 };
 
 export type TablePageEvent =
@@ -95,15 +110,16 @@ export type TablePageEvent =
   // Its text was read; `format` is the one its name or type says, if any.
   | { type: "read"; ticket: number; text: string; format: InputFormat | null }
   // It was read as an Excel workbook, its sheets as an Excel input's text.
-  | { type: "readWorkbook"; ticket: number; workbook: Omit<Workbook, "sheet"> }
+  | { type: "readWorkbook"; ticket: number; workbook: WorkbookRead }
   // The visitor chose another sheet of the workbook the input came from.
   | { type: "sheet"; sheet: number }
   // It couldn't be read.
   | { type: "readFailed"; ticket: number; error: string }
   // The visitor typed, pasted or deleted in the input. `replacesInput`: the
   // change replaced all of its text (a paste over a select-all, say).
-  // `written`: the page wrote the paste in its own way.
-  | { type: "type"; text: string; replacesInput?: boolean; written?: boolean }
+  // `wrote`: the text the page wrote in it, a paste written its own way (all
+  // of `text`, or the cells it put in).
+  | { type: "type"; text: string; replacesInput?: boolean; wrote?: string }
   // The visitor edited the grid, which was showing the table of `origin`.
   | { type: "editGrid"; table: TableData; origin: number }
   // The visitor chose another input format.
@@ -122,17 +138,19 @@ export function initialTablePage(inputFormat: InputFormat, placeholder: TableDat
     error: null,
     upload: null,
     workbook: null,
-    written: false,
+    pageCells: NO_PAGE_CELLS,
   };
 }
 
 export function tablePageReducer({
   parse,
   serialize,
+  pageCellsOf,
   placeholder,
 }: {
   parse: ParseTable;
   serialize: SerializeTable;
+  pageCellsOf: PageCellsOf;
   placeholder: TableData;
 }) {
   // Parses the input into the table on screen. A failure clears the table,
@@ -142,16 +160,16 @@ export function tablePageReducer({
   // the last it had.
   function settle(
     state: TablePage,
-    edited: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "fileName" | "upload" | "workbook" | "written">,
+    edited: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "fileName" | "upload" | "workbook" | "pageCells">,
     fromFile = false,
   ): TablePage {
     const { workbook } = edited;
-    const input = workbook && edited.inputFormat === "excel" ? { ...edited, workbook: keepSheetText(workbook, edited.inputText) } : edited;
+    const input = workbook && edited.inputFormat === "excel" ? { ...edited, workbook: keepSheetText(workbook, edited.inputText, edited.pageCells) } : edited;
     if (!input.hasUserInput && !input.inputText.trim()) {
       const continues = state.table === placeholder;
       return { ...state, ...input, fileName: null, workbook: null, table: placeholder, error: null, origin: continues ? state.origin : state.origin + 1 };
     }
-    const result = parse(input.inputFormat, input.inputText, input.written);
+    const result = parse(input.inputFormat, input.inputText, input.pageCells);
     if (!result.supported || !result.table) {
       const error = result.error ?? (result.supported ? null : "Input format not supported.");
       return { ...state, ...input, table: null, error, origin: state.origin + 1 };
@@ -179,7 +197,7 @@ export function tablePageReducer({
             fileName: upload.name,
             upload: null,
             workbook: null,
-            written: false,
+            pageCells: NO_PAGE_CELLS,
           },
           true,
         );
@@ -193,7 +211,8 @@ export function tablePageReducer({
           return { ...state, upload: null, table: null, error: `${upload.name} has no visible sheet with values.`, origin: state.origin + 1 };
         }
         // Its first sheet's text is in the input, as an Excel input's, and
-        // takes the file's name.
+        // takes the file's name. The page wrote each sheet's text.
+        const sheets = event.workbook.sheets.map((sheet) => ({ ...sheet, pageCells: pageCellsOf("excel", sheet.text) }));
         return settle(
           state,
           {
@@ -202,8 +221,8 @@ export function tablePageReducer({
             hasUserInput: true,
             fileName: upload.name,
             upload: null,
-            workbook: { ...event.workbook, sheet: 0 },
-            written: true,
+            workbook: { ...event.workbook, sheets, sheet: 0 },
+            pageCells: sheets[0]!.pageCells,
           },
           true,
         );
@@ -224,7 +243,7 @@ export function tablePageReducer({
             fileName: state.fileName,
             upload: null,
             workbook: { ...workbook, sheet: event.sheet },
-            written: true,
+            pageCells: sheet.pageCells,
           },
           true,
         );
@@ -235,8 +254,12 @@ export function tablePageReducer({
         return { ...state, upload: null, table: null, error: event.error, origin: state.origin + 1 };
       case "type": {
         // Text that replaces all of the input, or is typed into an empty one,
-        // is the visitor's own; any other change edits the text that was there.
+        // is the visitor's own; any other change edits the text that was
+        // there, and keeps the cells the page wrote. A paste the page wrote
+        // adds its own.
         const own = event.replacesInput || !state.inputText.trim();
+        const wrote = event.wrote === undefined ? NO_PAGE_CELLS : pageCellsOf(state.inputFormat, event.wrote);
+        const pageCells = own || !state.pageCells.size ? wrote : wrote.size ? new Set([...state.pageCells, ...wrote]) : state.pageCells;
         return settle(state, {
           inputFormat: state.inputFormat,
           inputText: event.text,
@@ -244,7 +267,7 @@ export function tablePageReducer({
           fileName: own ? null : state.fileName,
           upload: null,
           workbook: own ? null : state.workbook,
-          written: event.written ?? (own ? false : state.written),
+          pageCells,
         });
       }
       case "editGrid": {
@@ -262,7 +285,7 @@ export function tablePageReducer({
           fileName: state.fileName,
           upload: null,
           workbook: state.workbook,
-          written: true,
+          pageCells: pageCellsOf(state.inputFormat, asInput.text),
         });
       }
       case "inputFormat": {
@@ -274,8 +297,8 @@ export function tablePageReducer({
         const { hasUserInput, upload, fileName, workbook } = state;
         const rewritten = state.table && hasUserInput ? serialize(event.format, state.table) : null;
         const inputText = rewritten?.supported ? rewritten.text : state.inputText;
-        const written = rewritten?.supported ? true : state.written;
-        return settle(state, { inputFormat: event.format, inputText, hasUserInput, fileName, upload, workbook, written });
+        const pageCells = rewritten?.supported ? pageCellsOf(event.format, inputText) : state.pageCells;
+        return settle(state, { inputFormat: event.format, inputText, hasUserInput, fileName, upload, workbook, pageCells });
       }
       case "clear":
         return {
@@ -288,17 +311,18 @@ export function tablePageReducer({
           error: null,
           upload: null,
           workbook: null,
-          written: false,
+          pageCells: NO_PAGE_CELLS,
         };
     }
   };
 }
 
-// The workbook with its sheet shown holding `text`.
-function keepSheetText(workbook: Workbook, text: string): Workbook {
+// The workbook with its sheet shown holding `text`, and the cells the page
+// wrote into it.
+function keepSheetText(workbook: Workbook, text: string, pageCells: PageCells): Workbook {
   const shown = workbook.sheets[workbook.sheet];
-  if (!shown || shown.text === text) return workbook;
-  const sheets = workbook.sheets.map((sheet, index) => (index === workbook.sheet ? { ...sheet, text } : sheet));
+  if (!shown || (shown.text === text && shown.pageCells === pageCells)) return workbook;
+  const sheets = workbook.sheets.map((sheet, index) => (index === workbook.sheet ? { ...sheet, text, pageCells } : sheet));
   return { ...workbook, sheets };
 }
 

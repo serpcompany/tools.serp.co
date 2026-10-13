@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { writeExcelCells } from "../../lib/convert/excel-cells.ts";
+import { excelPageCells, writeExcelCells } from "../../lib/convert/excel-cells.ts";
 import { parseExcelCells } from "../../lib/convert/table-data.ts";
 import { copiedShape, excelPaste } from "./excel-paste.ts";
 
@@ -21,7 +21,7 @@ ${rows}
 <!--EndFragment-->
 </table></body></html>`;
 
-test("Excel's clipboard HTML gives the copied cells' shape: rows, cells, merged cells, line breaks and leading quotes", () => {
+test("Excel's clipboard HTML gives the copied cells' shape: rows, cells, merged cells, line breaks, and the text of cells that start with a quote", () => {
   const html = excelHtml(`
  <tr height=20 style='height:15.0pt'>
   <td height=20 class=xl65 style='height:15.0pt;width:48pt'>Item</td>
@@ -39,7 +39,7 @@ test("Excel's clipboard HTML gives the copied cells' shape: rows, cells, merged 
   const shape = copiedShape(html);
   assert.deepEqual(shape.widths, [2, 2, 2, 2, 2, 2, 2]);
   assert.deepEqual([...shape.quoted], ["1:1"]);
-  assert.deepEqual([...shape.quoteFirst], ["2:1", "5:1", "6:1"]);
+  assert.deepEqual([...shape.quoteFirst], [["2:1", '"'], ["5:1", '"x""y"'], ["6:1", '"']]);
 });
 
 test("other spreadsheets' clipboard HTML, and HTML that isn't a table", () => {
@@ -48,7 +48,7 @@ test("other spreadsheets' clipboard HTML, and HTML that isn't a table", () => {
     '<google-sheets-html-origin><style type="text/css"><!--td {border: 1px solid #cccccc;}br {mso-data-placement:same-cell;}--></style>' +
     '<table xmlns="http://www.w3.org/1999/xhtml" cellspacing="0" cellpadding="0" dir="ltr" border="1"><colgroup><col width="100"/><col width="100"/></colgroup>' +
     '<tbody><tr style="height:21px;"><td style="overflow:hidden;">a</td><td>b<br>c</td></tr><tr><td>x\ty</td><td></td></tr></tbody></table>';
-  assert.deepEqual(copiedShape(sheets), { widths: [2, 2], quoted: new Set(["0:1", "1:0"]), quoteFirst: new Set() });
+  assert.deepEqual(copiedShape(sheets), { widths: [2, 2], quoted: new Set(["0:1", "1:0"]), quoteFirst: new Map() });
   assert.equal(copiedShape("<p>Just text</p>"), null);
   assert.equal(copiedShape(""), null);
   assert.equal(copiedShape("<table><tr><td><table><tr><td>x</td></tr></table></td></tr></table>"), null);
@@ -63,7 +63,9 @@ const html = (rows) =>
   );
 const copy = (value) => (/[\t\n\r]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value);
 const excelText = (rows) => `${rows.map((cells) => cells.map(copy).join("\t")).join("\r\n")}\r\n`;
-const paste = (rows, input = {}) => ({ plain: excelText(rows), html: html(rows), value: "", start: 0, end: 0, written: false, ...input });
+const paste = (rows, input = {}) => ({ plain: excelText(rows), html: html(rows), value: "", start: 0, end: 0, ...input });
+// The table the input's text reads as, with the cells the page wrote there.
+const reads = (result) => parseExcelCells(result.value, excelPageCells(result.wrote)).table;
 const asTable = ([headers, ...rows]) => ({ headers, rows });
 
 test("a paste the visitor's reading gets right is the browser's own; the review's ditto marks are such a paste", () => {
@@ -83,15 +85,17 @@ test("a paste the clipboard's HTML says reads differently goes in as the page's 
   const addresses = [["Address"], ["1 Main St\nSpringfield"], ["2 Oak Ave\nShelbyville"]];
   const result = excelPaste(paste(addresses));
   const text = 'Address\n"1 Main St\nSpringfield"\n"2 Oak Ave\nShelbyville"\n';
-  assert.deepEqual(result, { value: text, caret: text.length, written: true, replacesInput: true });
-  assert.deepEqual(parseExcelCells(result.value, true).table, asTable(addresses));
+  assert.deepEqual(result, { value: text, caret: text.length, wrote: text, replacesInput: true });
+  assert.deepEqual(reads(result), asTable(addresses));
+  // Without them, the visitor's reading keeps every line a row.
+  assert.equal(parseExcelCells(result.value).table.rows.length, 4);
   // Ditto marks in that column too: neither reading of the text as it is
   // gives the copied table, so the page writes it its own way.
   const both = [["Address"], ['"'], ['"'], ["1 Main St\nSpringfield"]];
   const written = excelPaste(paste(both));
-  assert.deepEqual(written, { value: writeExcelCells(asTable(both)), caret: written.value.length, written: true, replacesInput: true });
+  assert.deepEqual(written, { value: writeExcelCells(asTable(both)), caret: written.value.length, wrote: written.value, replacesInput: true });
   assert.equal(written.value, 'Address\n""""\n""""\n"1 Main St\nSpringfield"');
-  assert.deepEqual(parseExcelCells(written.value, true).table, asTable(both));
+  assert.deepEqual(reads(written), asTable(both));
   // A real multi-line cell between ditto marks in two columns: the visitor's
   // reading already gets it right.
   const mixed = [["Item", "Note"], ["Shirt", "line1\nline2"], ["Pants", '"'], ["Hat", '"']];
@@ -99,24 +103,30 @@ test("a paste the clipboard's HTML says reads differently goes in as the page's 
   assert.deepEqual(parseExcelCells(excelText(mixed).replaceAll("\r\n", "\n")).table, asTable(mixed));
 });
 
-test("cells pasted into text the page wrote are written its way; a single cell, or the visitor's text, is pasted as it is", () => {
-  const value = "Item\tColor\nShirt\tRed";
-  const rows = [["Pants", '"'], ["Hat", '"']];
-  const result = excelPaste(paste(rows, { value, start: value.length, end: value.length, written: true }));
-  // The paste starts a new line in the text as Excel's copy ends with one.
-  assert.deepEqual(excelPaste(paste(rows, { value: `${value}\n`, start: value.length + 1, end: value.length + 1, written: true })), {
-    value: `${value}\nPants\t""""\nHat\t""""\n`,
-    caret: value.length + 1 + 'Pants\t""""\nHat\t""""\n'.length,
-    written: true,
-    replacesInput: false,
-  });
-  assert.equal(result.value, `${value}Pants\t""""\nHat\t""""\n`);
-  // Without the HTML, the visitor's reading of the cells is written; here
-  // at the start of a line, as rows above it.
-  assert.equal(excelPaste({ ...paste(rows, { value, start: 11, end: 11, written: true }), html: "" }).value, `Item\tColor\nPants\t""""\nHat\t""""\nShirt\tRed`);
-  // One cell, or no quote: the browser pastes.
-  assert.equal(excelPaste({ plain: '12"', html: "", value, start: 5, end: 5, written: true }), null);
-  assert.equal(excelPaste({ plain: "a\tb\r\n", html: "", value, start: 5, end: 5, written: true }), null);
-  // Into the visitor's own text, the browser pastes and the visitor's reading applies.
-  assert.equal(excelPaste(paste(rows, { value, start: value.length, end: value.length, written: false })), null);
+test("Excel's HTML says `\"\"\"\"` and `\"\"\"Doc\"\"\"` are cells' text as it stands: the page writes them so they read back (#299 review)", () => {
+  const rows = [["Code", "Note"], ['""""', "empty string"], ['"""Doc"""', "docstring"]];
+  // The visitor's reading takes them as quoted for their quotes.
+  assert.deepEqual(parseExcelCells(excelText(rows)).table.rows, [['"', "empty string"], ['"Doc"', "docstring"]]);
+  const result = excelPaste(paste(rows));
+  assert.equal(result.value, 'Code\tNote\n""""""""""\tempty string\n"""""""Doc"""""""\tdocstring');
+  assert.deepEqual(reads(result), asTable(rows));
+});
+
+test("cells pasted into part of the input with the HTML are written the page's way when the visitor's reading differs; one cell of one line, or no HTML, is pasted as it is", () => {
+  // One column: a cell holding line breaks and a ditto mark read as copied
+  // only as the page's cells.
+  const value = "Address\n9 Pine Rd\n";
+  const rows = [["1 Main St\nSpringfield"], ['"']];
+  const insert = '"1 Main St\nSpringfield"\n""""\n';
+  const result = excelPaste(paste(rows, { value, start: value.length, end: value.length }));
+  assert.deepEqual(result, { value: `${value}${insert}`, caret: value.length + insert.length, wrote: insert, replacesInput: false });
+  assert.deepEqual(reads(result).rows, [["9 Pine Rd"], ...rows]);
+  // In the middle of the text, as rows above the next.
+  assert.equal(excelPaste(paste(rows, { value, start: 8, end: 8 })).value, `Address\n${insert}9 Pine Rd\n`);
+  // Ditto marks the visitor's reading gets right: the browser pastes.
+  const colors = "Item\tColor\nShirt\tRed\n";
+  assert.equal(excelPaste(paste([["Pants", '"'], ["Hat", '"']], { value: colors, start: colors.length, end: colors.length })), null);
+  // One cell of one line, whatever its quotes, or no HTML: the browser pastes.
+  assert.equal(excelPaste(paste([['""""']], { value, start: 3, end: 3 })), null);
+  assert.equal(excelPaste({ ...paste(rows, { value, start: 8, end: 8 }), html: "" }), null);
 });

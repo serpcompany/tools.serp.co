@@ -1,27 +1,37 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import Papa from "papaparse";
+import { excelPageCells, writeExcelCells } from "../../lib/convert/excel-cells.ts";
+import { parseCsvTable, parseExcelCells } from "../../lib/convert/table-data.ts";
+import { excelPaste } from "./excel-paste.ts";
 import { outputFileName } from "./formats.ts";
 import { canOfferOutput, initialTablePage, offeredDownload, tablePageReducer } from "./output-state.ts";
 
 // A small stand-in for convert.ts: text is `<format>:<cell>|<cell>…`, one
 // column. Text in another format, with BROKEN in it, or empty doesn't parse.
 // Every input format, Excel's included (cells as Excel copies them, #266),
-// is parsed and written as text, as on the page. Excel text the page wrote
-// reads differently from the visitor's (#299 review): its header says which.
-function parse(format, text, written) {
+// is parsed and written as text, as on the page. In Excel text, a cell
+// holding `^` (a line break) is one cell only if the page wrote that exact
+// cell (#299 review); otherwise each of its lines is a row.
+function parse(format, text, pageCells) {
   if (!text.trim()) return { table: null, supported: true, error: "Paste or upload data to begin." };
   if (!text.startsWith(`${format}:`)) return { table: null, supported: true, error: `This isn't ${format}.` };
   const body = text.slice(format.length + 1);
   if (body.includes("BROKEN")) return { table: null, supported: true, error: "Unclosed quote." };
-  const header = format === "excel" && written ? "value as written" : "value";
-  return { table: { headers: [header], rows: body.split("|").map((cell) => [cell]) }, supported: true };
+  const lines = (cell) => (format === "excel" && cell.includes("^") && !pageCells.has(cell) ? cell.split("^") : [cell]);
+  return { table: { headers: ["value"], rows: body.split("|").flatMap(lines).map((cell) => [cell]) }, supported: true };
 }
 function serialize(format, table) {
   return { text: `${format}:${table.rows.map((row) => row[0]).join("|")}`, supported: true };
 }
+// The cells holding `^` in Excel text the page wrote (all of it, or a part
+// it pasted), as convert.ts's inputPageCells.
+function pageCellsOf(format, text) {
+  return new Set(format === "excel" ? text.slice(text.indexOf(":") + 1).split("|").filter((cell) => cell.includes("^")) : []);
+}
 const placeholder = { headers: ["Column 1"], rows: [[""]] };
-const next = tablePageReducer({ parse, serialize, placeholder });
+const next = tablePageReducer({ parse, serialize, pageCellsOf, placeholder });
 const start = (format = "csv") => initialTablePage(format, placeholder);
 const run = (state, ...events) => events.reduce(next, state);
 const cells = (state) => state.table?.rows.map((row) => row[0]) ?? null;
@@ -169,7 +179,8 @@ const book = (prefix, count = 2, extra = {}) => ({
 test("a workbook's first sheet arrives as an Excel input under the file's name; another sheet replaces it under the same name", () => {
   const sheets = book("S", 3);
   const read = run(afterA(), { type: "upload", name: "book.xlsx", ticket: 2 }, { type: "readWorkbook", ticket: 2, workbook: sheets });
-  assert.deepEqual([read.inputFormat, read.inputText, read.fileName, read.workbook.sheet, read.workbook.sheets], ["excel", "excel:S1a|S1b", "book.xlsx", 0, sheets.sheets]);
+  const sheetTexts = read.workbook.sheets.map(({ name, text }) => ({ name, text }));
+  assert.deepEqual([read.inputFormat, read.inputText, read.fileName, read.workbook.sheet, sheetTexts], ["excel", "excel:S1a|S1b", "book.xlsx", 0, sheets.sheets]);
   assert.equal(offeredDownload(read, "csv", { table: read.table, format: "csv" }).name, "book.csv");
   const second = next(read, { type: "sheet", sheet: 1 });
   assert.deepEqual([cells(second), second.fileName, second.workbook.sheet], [["S2a", "S2b"], "book.xlsx", 1]);
@@ -191,28 +202,94 @@ test("a workbook's first sheet arrives as an Excel input under the file's name; 
   assert.equal(next(next(asCsv, { type: "inputFormat", format: "excel" }), { type: "sheet", sheet: 2 }).inputText, "excel:S3a|S3b");
 });
 
-test("who wrote the Excel input's text decides how it reads: the page's text stays the page's through edits (#299 review)", () => {
-  const header = (state) => state.table?.headers[0] ?? null;
-  // A workbook's sheet is the page's text.
-  const read = run(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: book("S") });
-  assert.deepEqual([read.written, header(read)], [true, "value as written"]);
-  // Typing in it edits it: still the page's. Typing over all of it: the visitor's.
-  const edited = next(read, { type: "type", text: `${read.inputText}|typed` });
-  assert.deepEqual([edited.written, header(edited), cells(edited)], [true, "value as written", ["S1a", "S1b", "typed"]]);
-  const own = next(edited, { type: "type", text: "excel:mine", replacesInput: true });
-  assert.deepEqual([own.written, header(own), own.fileName], [false, "value", null]);
-  // A paste the page writes its own way is the page's, over all of it or not.
-  const pasted = next(own, { type: "type", text: "excel:pasted", replacesInput: true, written: true });
-  assert.deepEqual([pasted.written, header(pasted), pasted.fileName], [true, "value as written", null]);
-  // A grid edit and a rewrite in another format are the page's; a file's
-  // text and Clear are the visitor's.
-  const grid = next(own, { type: "editGrid", table: { headers: ["value"], rows: [["g"]] }, origin: own.origin });
-  assert.deepEqual([grid.written, header(grid)], [true, "value as written"]);
-  const csv = run(afterA(), { type: "inputFormat", format: "excel" });
-  assert.deepEqual([csv.written, header(csv)], [true, "value as written"]);
-  const text = run(read, { type: "upload", name: "cells.txt", ticket: 2 }, { type: "read", ticket: 2, text: "excel:t", format: null });
-  assert.deepEqual([text.written, header(text)], [false, "value"]);
-  assert.equal(next(read, { type: "clear" }).written, false);
+test("an Excel input's text comes with the cells holding line breaks that the page wrote there: only they read as one cell (#299 review)", () => {
+  const notes = { ...book("S"), sheets: [{ name: "Notes", text: "excel:S1a^two|S1b" }, { name: "Other", text: "excel:S2a|S2b^two" }] };
+  const read = run(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: notes });
+  assert.deepEqual([[...read.pageCells], cells(read)], [["S1a^two"], ["S1a^two", "S1b"]]);
+  // The visitor's edits keep them. Text typed holding `^` is read as typed,
+  // a row a line; so is the page's cell once edited, until it's typed back.
+  const typed = next(read, { type: "type", text: "excel:S1a^two|S1b|T^U" });
+  assert.deepEqual(cells(typed), ["S1a^two", "S1b", "T", "U"]);
+  const changed = next(read, { type: "type", text: 'excel:S1a"^two|S1b' });
+  assert.deepEqual(cells(changed), ['S1a"', "two", "S1b"]);
+  assert.deepEqual(cells(next(changed, { type: "type", text: "excel:S1a^two|S1b" })), ["S1a^two", "S1b"]);
+  // Each sheet keeps its own, with its edits.
+  const second = next(typed, { type: "sheet", sheet: 1 });
+  assert.deepEqual([[...second.pageCells], cells(second)], [["S2b^two"], ["S2a", "S2b^two"]]);
+  assert.deepEqual(cells(next(second, { type: "sheet", sheet: 0 })), ["S1a^two", "S1b", "T", "U"]);
+  // Text of the visitor's own has none; a paste the page wrote has its own,
+  // over all of the input or added to the cells already there.
+  const own = next(read, { type: "type", text: "excel:S1a^two", replacesInput: true });
+  assert.deepEqual([own.pageCells.size, cells(own)], [0, ["S1a", "two"]]);
+  const pasted = next(own, { type: "type", text: "excel:P^1|P2", replacesInput: true, wrote: "excel:P^1|P2" });
+  assert.deepEqual([[...pasted.pageCells], cells(pasted), pasted.fileName], [["P^1"], ["P^1", "P2"], null]);
+  const added = next(read, { type: "type", text: "excel:S1a^two|S1b|Q^1", wrote: "|Q^1" });
+  assert.deepEqual([[...added.pageCells], cells(added)], [["S1a^two", "Q^1"], ["S1a^two", "S1b", "Q^1"]]);
+  // A grid edit and a rewrite in another format write all of the text.
+  const grid = next(own, { type: "editGrid", table: { headers: ["value"], rows: [["g^1"], ["h"]] }, origin: own.origin });
+  assert.deepEqual([[...grid.pageCells], cells(grid)], [["g^1"], ["g^1", "h"]]);
+  const csv = run(start("csv"), { type: "type", text: "csv:c^1|d" }, { type: "inputFormat", format: "excel" });
+  assert.deepEqual([[...csv.pageCells], cells(csv)], [["c^1"], ["c^1", "d"]]);
+  assert.equal(next(csv, { type: "inputFormat", format: "csv" }).pageCells.size, 0);
+  // A file's text and Clear have none.
+  const text = run(read, { type: "upload", name: "cells.txt", ticket: 2 }, { type: "read", ticket: 2, text: "excel:S1a^two", format: null });
+  assert.deepEqual([text.pageCells.size, cells(text)], [0, ["S1a", "two"]]);
+  assert.equal(next(read, { type: "clear" }).pageCells.size, 0);
+});
+
+// The page's own Excel and CSV readers and writers, as convert.ts uses them.
+const realNext = tablePageReducer({
+  parse: (format, text, pageCells) => ({ ...(format === "excel" ? parseExcelCells(text, pageCells) : parseCsvTable(text)), supported: true }),
+  serialize: (format, table) => ({ text: format === "excel" ? writeExcelCells(table) : Papa.unparse([table.headers, ...table.rows]), supported: true }),
+  pageCellsOf: (format, text) => (format === "excel" ? excelPageCells(text) : new Set()),
+  placeholder,
+});
+const realRun = (state, ...events) => events.reduce(realNext, state);
+const sheetRead = (rows) =>
+  realRun(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, {
+    type: "readWorkbook",
+    ticket: 1,
+    workbook: { sheets: [{ name: "Sheet1", text: writeExcelCells({ headers: rows[0], rows: rows.slice(1) }) }], hidden: 0, skipped: 0, tooLarge: [] },
+  });
+// Typing that replaces one cell's text with another, as the visitor does.
+const retype = (state, ...edits) => edits.reduce((page, [from, to]) => realNext(page, { type: "type", text: page.inputText.replace(from, to) }), state);
+const rowsOf = (state) => state.table?.rows ?? null;
+
+test("with the page's reader: quotes typed into a sheet merge no rows, after a grid edit, a format switch or a paste the page wrote too (#299 review)", () => {
+  // The review's case: two colors of a sheet replaced by ditto marks.
+  const colors = sheetRead([["Item", "Color"], ["Shirt", "Red"], ["Pants", "Blue"], ["Hat", "Green"], ["Sock", "Blue"]]);
+  assert.deepEqual(rowsOf(retype(colors, ["Pants\tBlue", 'Pants\t"'], ["Hat\tGreen", 'Hat\t"'])), [["Shirt", "Red"], ["Pants", '"'], ["Hat", '"'], ["Sock", "Blue"]]);
+  // A ditto mark typed above an inch value typed after it.
+  const pipes = sheetRead([["Size", "Item"], ['12"', "Pipe"], ["x", "Valve"], ["y", "Cap"]]);
+  assert.deepEqual(rowsOf(retype(pipes, ["x\tValve", '"\tValve'], ["y\tCap", '14"\tCap'])), [['12"', "Pipe"], ['"', "Valve"], ['14"', "Cap"]]);
+  // A sheet's cells holding line breaks stay one cell while ditto marks are
+  // typed around them, and come back so with the sheet.
+  const notes = sheetRead([["Item", "Note"], ["Shirt", "line1\nline2"], ["Pants", "Blue"], ["Hat", "Green"]]);
+  const dittos = retype(notes, ["Pants\tBlue", 'Pants\t"'], ["Hat\tGreen", 'Hat\t"']);
+  assert.deepEqual(rowsOf(dittos), [["Shirt", "line1\nline2"], ["Pants", '"'], ["Hat", '"']]);
+  // After a grid edit that adds a cell holding a line break.
+  const grid = realNext(dittos, { type: "editGrid", table: { headers: ["Item", "Note"], rows: [...rowsOf(dittos), ["Cap", "a\nb"], ["Sock", "Gray"]] }, origin: dittos.origin });
+  assert.deepEqual(rowsOf(retype(grid, ["Sock\tGray", 'Sock\t"'])).slice(-2), [["Cap", "a\nb"], ["Sock", '"']]);
+  // After a switch to CSV and back, which rewrites the text.
+  const back = realRun(dittos, { type: "inputFormat", format: "csv" }, { type: "inputFormat", format: "excel" });
+  assert.deepEqual(rowsOf(retype(back, ["Shirt\t", '"\t'])), [['"', "line1\nline2"], ["Pants", '"'], ["Hat", '"']]);
+  // After a paste the page wrote: a column of addresses, each over two lines.
+  const plain = 'Address\r\n"1 Main St\nSpringfield"\r\n"2 Oak Ave\nShelbyville"\r\nGone\r\n';
+  const html = "<table><tr><td>Address</td></tr><tr><td>1 Main St<br>Springfield</td></tr><tr><td>2 Oak Ave<br>Shelbyville</td></tr><tr><td>Gone</td></tr></table>";
+  const paste = excelPaste({ plain, html, value: "", start: 0, end: 0 });
+  const pasted = realNext(start("excel"), { type: "type", text: paste.value, replacesInput: paste.replacesInput, wrote: paste.wrote });
+  assert.deepEqual(rowsOf(pasted), [["1 Main St\nSpringfield"], ["2 Oak Ave\nShelbyville"], ["Gone"]]);
+  assert.deepEqual(rowsOf(retype(pasted, ["Gone", '"\n"'])), [["1 Main St\nSpringfield"], ["2 Oak Ave\nShelbyville"], ['"'], ['"']]);
+});
+
+test("with the page's reader: blank lines typed at the end add no rows; the empty row the grid adds stays (#299 review)", () => {
+  const colors = sheetRead([["Item", "Color"], ["Shirt", "Red"]]);
+  for (const enters of ["\n", "\n\n", "\n\n\n"]) {
+    assert.deepEqual(rowsOf(realNext(colors, { type: "type", text: `${colors.inputText}${enters}` })), [["Shirt", "Red"]]);
+  }
+  const grid = realNext(colors, { type: "editGrid", table: { headers: ["Item", "Color"], rows: [["Shirt", "Red"], ["", ""]] }, origin: colors.origin });
+  assert.deepEqual(rowsOf(grid), [["Shirt", "Red"], ["", ""]]);
+  assert.deepEqual(rowsOf(realNext(grid, { type: "type", text: `${grid.inputText}\n\n` })), [["Shirt", "Red"], ["", ""]]);
 });
 
 test("a workbook stays with the input's text: edits keep it, text of the visitor's own, Clear or another file drop it", () => {
@@ -312,15 +389,19 @@ test("an output written from the previous table or for another format isn't offe
 // files on the Excel input that are text (#299 review: an .xls of
 // tab-separated cells or an HTML table, a tab-delimited .txt); choosing a
 // sheet, while another file is read or not, and coming back to a sheet
-// after editing it; typing (edits, typos and their fixes,
-// pastes over all of the input, emptying it); grid edits from a grid that
-// may still show an earlier table; input and output format switches; binary
-// outputs that finish after the table changed; clears. A reference model,
-// kept here from the rules alone, follows the same events: it holds its own
-// input text and format, parses that text with the stand-in to know whether
-// there's a table, and tracks the text's origin, the workbook it came from
-// (each sheet's text as last edited) and the upload still being read. It
-// never reads the page's state. After
+// after editing it; typing (edits, typos and their fixes, pastes over all
+// of the input, emptying it; #299 review: cells holding line breaks, quotes
+// typed into the page's cells, a page's cell typed again); pastes the page
+// writes its own way, over all of the input or into it; grid edits from a
+// grid that may still show an earlier table; input and output format
+// switches; binary outputs that finish after the table changed; clears.
+// Sheets, grid edits and pastes hold cells with line breaks. A reference
+// model, kept here from the rules alone, follows the same events: it holds
+// its own input text and format, parses that text with the stand-in to know
+// whether there's a table, and tracks the text's origin, the workbook it
+// came from (each sheet's text as last edited), the upload still being read
+// and its own record of the cells holding line breaks that the page wrote.
+// It never reads the page's state. After
 // every step the test checks the page's input, table, error, name and
 // workbook against it, and that Download offers exactly what it should,
 // under that name.
@@ -361,9 +442,10 @@ function newModel(format) {
     // The workbook the text came from: its file, its sheets and the one
     // whose text went into the input; null for any other text.
     workbook: null,
-    // Whether the page wrote the text (a sheet, a grid edit, a rewrite, a
-    // paste it wrote), as written or since edited.
-    written: false,
+    // The cells holding line breaks that the page wrote into the text (a
+    // sheet, a grid edit, a rewrite, a paste it wrote), from what the model
+    // itself had the page write.
+    pageCells: new Set(),
     // The table the text parses into (the placeholder before any input),
     // or null; and whether the page shows an error.
     table: placeholder,
@@ -387,7 +469,7 @@ function reparse(model, { afresh = false } = {}) {
     model.name = null;
     model.workbook = null;
   } else {
-    model.table = parse(model.format, model.text, model.written).table;
+    model.table = parse(model.format, model.text, model.pageCells).table;
     model.error = !model.table;
   }
   model.version += 1;
@@ -433,17 +515,20 @@ function runSequence(rng, seen, log) {
         const outcome = pick(["ok", "ok", "ok", "partial", "brokenSheet", "unreadable", "tooLarge", "noSheets"]);
         const count = outcome === "noSheets" ? 0 : 1 + Math.floor(rng() * 3);
         const broken = outcome === "brokenSheet" ? Math.floor(rng() * count) : -1;
+        // Some sheets have a cell holding a line break, which the page wrote.
+        const lines = Array.from({ length: count }, () => rng() < 0.5);
+        const pageCells = lines.map((holds, index) => new Set(holds ? [`W${id}s${index + 1}a^n`] : []));
         const workbook = {
           sheets: Array.from({ length: count }, (_, index) => ({
             name: `S${index + 1}`,
-            text: `excel:W${id}s${index + 1}a|W${id}s${index + 1}b${index === broken ? " BROKEN" : ""}`,
+            text: `excel:W${id}s${index + 1}a${lines[index] ? "^n" : ""}|W${id}s${index + 1}b${index === broken ? " BROKEN" : ""}`,
           })),
           hidden: Math.floor(rng() * 2),
           skipped: outcome === "partial" ? 1 : 0,
           ...(outcome === "partial" ? { stop: "size" } : {}),
           tooLarge: outcome === "partial" ? ["Big"] : [],
         };
-        reads.push({ name, ticket: id, workbook, outcome });
+        reads.push({ name, ticket: id, workbook, outcome, pageCells });
       } else {
         // An Excel file's text is cells as Excel copies them, or an HTML
         // table; a file with no format of its own is read in the input's.
@@ -469,27 +554,44 @@ function runSequence(rng, seen, log) {
       event.file = read;
     } else if (action === "type") {
       cellCount += 1;
-      const other = pick(INPUT_FORMATS.filter((format) => format !== model.format));
-      const kind = pick(["append", "typo", "fix", "fix", "fresh", "freshBroken", "other", "empty"]);
-      const text = {
-        append: `${model.text}|T${cellCount}`,
-        typo: `${model.text} BROKEN`,
-        fix: model.text.replaceAll(" BROKEN", ""),
-        fresh: `${model.format}:T${cellCount}`,
-        freshBroken: `${model.format}:T${cellCount} BROKEN`,
-        other: `${other}:T${cellCount}`,
-        empty: "",
-      }[kind];
-      // A change that leaves the text as it was fires no change event.
-      if (text === model.text) continue;
-      // Whether it replaced all of the text (a paste over a select-all); on
-      // the Excel input, a paste the page wrote its own way (excel-paste.ts).
-      event = { type: "type", text, replacesInput: rng() < 0.35 };
-      if (model.format === "excel" && rng() < 0.3) event.written = true;
+      const n = cellCount;
+      if (model.format === "excel" && rng() < 0.25) {
+        // On the Excel input, a paste the page writes its own way
+        // (excel-paste.ts): over all of the input, or added to it.
+        const replaces = rng() < 0.5;
+        const pasted = [`P${n}^p`, `P${n}b`];
+        const wrote = replaces ? `excel:${pasted.join("|")}` : `|${pasted.join("|")}`;
+        event = { type: "type", text: replaces ? wrote : `${model.text}${wrote}`, replacesInput: replaces, wrote, pasted: [pasted[0]] };
+      } else {
+        const other = pick(INPUT_FORMATS.filter((format) => format !== model.format));
+        // A cell the page wrote holding a line break, still in the text.
+        const pageCell = [...model.pageCells].find((cell) => model.text.includes(cell));
+        const kind = pick(["append", "lines", "quote", "copyPage", "typo", "fix", "fix", "fresh", "freshBroken", "other", "empty"]);
+        const text = {
+          append: `${model.text}|T${n}`,
+          // A cell typed holding a line break.
+          lines: `${model.text}|T${n}^t`,
+          // A quote typed into a cell the page wrote, or a ditto mark.
+          quote: pageCell ? model.text.replace(pageCell, pageCell.replace("^", '"^')) : `${model.text}|"`,
+          // A cell the page wrote, typed again exactly.
+          copyPage: pageCell ? `${model.text}|${pageCell}` : `${model.text}|T${n}`,
+          typo: `${model.text} BROKEN`,
+          fix: model.text.replaceAll(" BROKEN", ""),
+          fresh: `${model.format}:T${n}`,
+          freshBroken: `${model.format}:T${n} BROKEN`,
+          other: `${other}:T${n}`,
+          empty: "",
+        }[kind];
+        // A change that leaves the text as it was fires no change event.
+        if (text === model.text) continue;
+        // Whether it replaced all of the text (a paste over a select-all).
+        event = { type: "type", text, replacesInput: rng() < 0.35, kind, pageCell };
+      }
     } else if (action === "editGrid") {
       if (!grid) continue;
       cellCount += 1;
-      event = { type: "editGrid", table: { headers: grid.table.headers, rows: [...grid.table.rows, [`G${cellCount}`]] }, origin: grid.origin };
+      const added = rng() < 0.4 ? `G${cellCount}^g` : `G${cellCount}`;
+      event = { type: "editGrid", table: { headers: grid.table.headers, rows: [...grid.table.rows, [added]] }, origin: grid.origin };
     } else if (action === "syncGrid") {
       // The editor's effect: the grid takes the table on screen, or goes.
       grid = state.table ? { table: state.table, origin: state.origin, lineage: model.lineage } : null;
@@ -524,7 +626,7 @@ function runSequence(rng, seen, log) {
     }
 
     if (event) {
-      const { file, ...pageEvent } = event;
+      const { file, pasted, kind, pageCell, ...pageEvent } = event;
       const before = state;
       const had = { table: model.table, name: model.name, workbook: model.workbook, pending: model.pending };
       log.push(JSON.stringify(pageEvent));
@@ -562,15 +664,21 @@ function runSequence(rng, seen, log) {
             // it's the file's, and so is the workbook. The page wrote it.
             model.text = file.workbook.sheets[0].text;
             model.format = "excel";
-            model.written = true;
-            model.workbook = { file: file.name, read: file.workbook.sheets, sheets: file.workbook.sheets.map((sheet) => sheet.text), sheet: 0 };
+            model.pageCells = file.pageCells[0];
+            model.workbook = {
+              file: file.name,
+              read: file.workbook.sheets,
+              sheets: file.workbook.sheets.map((sheet) => sheet.text),
+              pageCells: file.pageCells.slice(),
+              sheet: 0,
+            };
             seen.workbookReads += 1;
           } else {
             // The file's text is in the input: it's the file's, and the
             // visitor's to read.
             model.text = event.text;
             model.format = event.format ?? model.format;
-            model.written = false;
+            model.pageCells = new Set();
             if (model.workbook) seen.textDropsWorkbook += 1;
             model.workbook = null;
             if (file.kind) seen[file.kind] += 1;
@@ -594,11 +702,12 @@ function runSequence(rng, seen, log) {
           // comes back as it was last edited.
           if (model.pending !== null) seen.sheetWinsOverRead += 1;
           if (workbook.sheets[event.sheet] !== workbook.read[event.sheet].text) seen.sheetBackWithEdits += 1;
+          if (workbook.pageCells[event.sheet].size) seen.sheetWithPageCells += 1;
           seen.sheetSwitches += 1;
           model.pending = null;
           model.workbook = { ...workbook, sheet: event.sheet, previous: workbook.sheet };
           model.text = workbook.sheets[event.sheet];
-          model.written = true;
+          model.pageCells = workbook.pageCells[event.sheet];
           model.userInput = true;
           reparse(model, { afresh: true });
           break;
@@ -607,18 +716,22 @@ function runSequence(rng, seen, log) {
           model.pending = null;
           // Text replacing all of the input, or typed into an empty one, is
           // the visitor's own; anything else edits the text that was there,
-          // and keeps who wrote it. A paste the page wrote is the page's.
+          // and keeps the cells the page wrote. A paste the page wrote adds
+          // its own.
           if (event.replacesInput || !model.text.trim()) {
             if (model.workbook) seen.ownTextDropsWorkbook += 1;
-            if (model.written && !event.written) seen.ownTextIsVisitors += 1;
+            if (model.pageCells.size && !pasted) seen.ownTextDropsPageCells += 1;
             model.name = null;
             model.workbook = null;
-            model.written = false;
-          } else if (model.written && !event.written && model.format === "excel") seen.editsKeepWritten += 1;
-          if (event.written) {
-            model.written = true;
-            seen.writtenPastes += 1;
+            model.pageCells = new Set(pasted ?? []);
+          } else {
+            if (model.pageCells.size && model.format === "excel") seen.editsKeepPageCells += 1;
+            if (pasted) model.pageCells = new Set([...model.pageCells, ...pasted]);
           }
+          if (pasted) seen[event.replacesInput ? "pagePastes" : "pagePastesAdded"] += 1;
+          if (model.format === "excel" && kind === "lines") seen.typedLines += 1;
+          if (model.format === "excel" && pageCell && kind === "quote") seen.quotedPageCells += 1;
+          if (model.format === "excel" && pageCell && kind === "copyPage") seen.copiedPageCells += 1;
           model.text = event.text;
           model.userInput = true;
           reparse(model);
@@ -641,7 +754,10 @@ function runSequence(rng, seen, log) {
           const asInput = serialize(model.format, event.table);
           if (asInput.supported) {
             model.text = asInput.text;
-            model.written = true;
+            // Every cell of it is the page's.
+            const lines = event.table.rows.map((row) => row[0]).filter((cell) => cell.includes("^"));
+            model.pageCells = new Set(model.format === "excel" ? lines : []);
+            if (model.format === "excel" && lines.length) seen.gridPageCells += 1;
             reparse(model);
           } else {
             // An input format the page can't write (Excel): the grid's table
@@ -658,7 +774,7 @@ function runSequence(rng, seen, log) {
           const rewritten = model.table && model.userInput ? serialize(event.format, model.table) : null;
           if (rewritten?.supported) {
             model.text = rewritten.text;
-            model.written = true;
+            model.pageCells = new Set(event.format === "excel" ? model.table.rows.map((row) => row[0]).filter((cell) => cell.includes("^")) : []);
           }
           model.format = event.format;
           reparse(model);
@@ -671,7 +787,7 @@ function runSequence(rng, seen, log) {
           model.userInput = false;
           model.name = null;
           model.workbook = null;
-          model.written = false;
+          model.pageCells = new Set();
           model.table = placeholder;
           model.error = false;
           model.version += 1;
@@ -681,11 +797,14 @@ function runSequence(rng, seen, log) {
     }
 
     // While the input is Excel, the sheet shown holds its text, as typed,
-    // edited or rewritten; in another format the sheet keeps what it had.
+    // edited or rewritten, and the cells the page wrote there; in another
+    // format the sheet keeps what it had.
     if (model.workbook && model.format === "excel") {
       const sheets = model.workbook.sheets.slice();
+      const pageCells = model.workbook.pageCells.slice();
       sheets[model.workbook.sheet] = model.text;
-      model.workbook = { ...model.workbook, sheets };
+      pageCells[model.workbook.sheet] = model.pageCells;
+      model.workbook = { ...model.workbook, sheets, pageCells };
     }
 
     // The page holds what the model says.
@@ -698,11 +817,13 @@ function runSequence(rng, seen, log) {
     if (model.table === placeholder) assert.equal(state.table, placeholder);
     assert.equal(Boolean(state.error), model.error, "an error exactly when there's no table");
     assert.equal(state.fileName, model.name, "the name is the origin of the model's text");
-    assert.equal(state.written, model.written, "the text is read as the model says who wrote it");
+    assert.deepEqual(state.pageCells, model.pageCells, "the cells the page wrote are the ones the model had it write");
     assert.deepEqual(
       state.workbook?.sheets ?? null,
-      model.workbook ? model.workbook.read.map((sheet, index) => ({ ...sheet, text: model.workbook.sheets[index] })) : null,
-      "the workbook is the one the text came from, each sheet as last edited",
+      model.workbook
+        ? model.workbook.read.map((sheet, index) => ({ ...sheet, text: model.workbook.sheets[index], pageCells: model.workbook.pageCells[index] }))
+        : null,
+      "the workbook is the one the text came from, each sheet as last edited, with the cells the page wrote there",
     );
     assert.equal(state.workbook?.sheet ?? null, model.workbook?.sheet ?? null, "the sheet is the one whose text went in last");
     if (model.workbook) assert.equal(state.fileName, model.workbook.file, "a workbook is there only under its own file's name");
@@ -733,7 +854,8 @@ test(`the name and the offered download always describe the table on screen (${S
     editsWithoutTable: 0, typoKeepsName: 0, fixKeepsName: 0, replacedNamed: 0, formatTakesFileName: 0, namedOffers: 0,
     workbookReads: 0, workbookFailures: 0, unreadableKeepsWorkbook: 0, sheetSwitches: 0, sheetWinsOverRead: 0,
     ignoredSheets: 0, ownTextDropsWorkbook: 0, sheetBackWithEdits: 0, excelText: 0, textOnExcel: 0, textDropsWorkbook: 0,
-    writtenPastes: 0, editsKeepWritten: 0, ownTextIsVisitors: 0,
+    pagePastes: 0, pagePastesAdded: 0, editsKeepPageCells: 0, ownTextDropsPageCells: 0, typedLines: 0, quotedPageCells: 0,
+    copiedPageCells: 0, gridPageCells: 0, sheetWithPageCells: 0,
   };
   for (let sequence = 0; sequence < SEQUENCES; sequence += 1) {
     const log = [];

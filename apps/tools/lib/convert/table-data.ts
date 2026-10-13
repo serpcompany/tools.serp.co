@@ -4,7 +4,7 @@
 // Excel input, read as cells copied from Excel (excel-cells.ts).
 
 import Papa from "papaparse";
-import { readExcelCells } from "./excel-cells.ts";
+import { readExcelCells, type PageCells } from "./excel-cells.ts";
 
 export type TableData = {
   headers: string[];
@@ -43,18 +43,17 @@ export function parseCsvTable(text: string): { table: TableData | null; error: s
 }
 
 // Cells copied from Excel, or a sheet as writeExcelCells (excel-cells.ts)
-// writes it, read as readExcelCells reads them (`written`: the page wrote
-// the text), the first row the header.
-export function parseExcelCells(text: string, written = false): { table: TableData | null; error: string | null } {
-  return excelTable(readExcelCells(text, written), !written);
+// writes it, read as readExcelCells reads them (`page`: the quoted cells
+// holding line breaks that the page wrote there), the first row the header.
+export function parseExcelCells(text: string, page?: PageCells): { table: TableData | null; error: string | null } {
+  return excelTable(readExcelCells(text, page));
 }
 
-// Rows of cells as a table, the first row the header. With `trimEnd`, rows
-// at the end with every cell empty aren't rows: a selection copied past a
-// sheet's last value adds them. Text the page wrote keeps them, as a CSV
-// input keeps an empty last row (one added in the grid, say).
-export function excelTable(rows: string[][], trimEnd: boolean): { table: TableData | null; error: string | null } {
-  if (trimEnd) while (rows.length && rows[rows.length - 1]!.every((cell) => cell === "")) rows.pop();
+// Rows of cells as a table, the first row the header. A row of one empty
+// cell at the end is a blank line, not a row, as in readExcelCells and as a
+// CSV input skips it; a row of empty cells (tabs) stays.
+export function excelTable(rows: string[][]): { table: TableData | null; error: string | null } {
+  for (let last = rows.at(-1); last && last.length === 1 && last[0] === ""; last = rows.at(-1)) rows.pop();
   const headerRow = rows[0];
   if (!headerRow) return { table: null, error: "There are no cells to convert." };
   return { table: normalizeTable(headerRow, rows.slice(1)), error: null };

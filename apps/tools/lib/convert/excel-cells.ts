@@ -104,27 +104,128 @@ function cellEnd(text: string, at: number): number {
   return end;
 }
 
+// Where the first cell starts: after a byte order mark, which isn't text.
+const firstCell = (text: string) => (text.charCodeAt(0) === 0xfeff ? 1 : 0);
+
+// Whether a cell can start at `at`: the first cell, or after a tab or a line
+// break.
+function cellCanStart(text: string, at: number, first: number): boolean {
+  if (at === first) return true;
+  const before = text.charCodeAt(at - 1);
+  return before === TAB || before === LF || before === CR;
+}
+
+// The quoted cells holding a line break that the page wrote into an Excel
+// input's text, each by its exact text, quotes included (#299 review). The
+// page keeps them with the text (output-state.ts): a quoted cell that spans
+// lines reads as one cell only when it is one of these.
+export type PageCells = ReadonlySet<string>;
+export const NO_PAGE_CELLS: PageCells = new Set();
+
+// The quoted cells holding a line break in text the page has just written
+// (writeExcelCells, or a copy it found reads as copied), where every cell
+// that starts with a quote is quoted.
+export function excelPageCells(text: string): Set<string> {
+  const cells = new Set<string>();
+  const first = firstCell(text);
+  for (let quote = text.indexOf('"', first); quote >= 0; ) {
+    const cell = cellCanStart(text, quote, first) ? quotedCell(text, quote) : null;
+    if (!cell) {
+      quote = text.indexOf('"', quote + 1);
+      continue;
+    }
+    if (LINE_BREAK.test(cell.value)) cells.add(text.slice(quote, cell.end));
+    quote = text.indexOf('"', cell.end);
+  }
+  return cells;
+}
+
+// The page's cells where they are in a text, in order, none inside another:
+// each quoted cell holding a line break, where a cell starts, whose exact
+// text is one of the page's. Cells start as in the text the page wrote,
+// every cell that opens with a quote quoted, except that the visitor's
+// quotes can't hide one of the page's cells: a quoted cell holding a line
+// break that isn't the page's (a ditto mark above another) is passed over
+// only by its quote, as the visitor's reading doesn't merge it, and so is
+// one of a line that one of the page's cells starts inside (a ditto mark
+// and a tab before it). Each is one cell in every reading, and no other
+// quoted cell may run past the start of one, so each starts a cell.
+type Pinned = { cells: Map<number, Quoted>; starts: number[] };
+
+function pinnedCells(text: string, page: PageCells): Pinned | null {
+  if (!page.size) return null;
+  const pageCell = (at: number) => {
+    const cell = quotedCell(text, at);
+    return cell && LINE_BREAK.test(cell.value) && page.has(text.slice(at, cell.end)) ? cell : null;
+  };
+  // Whether one of the page's cells starts after a tab between `from` and
+  // `to`, inside a quoted cell of one line.
+  const pageCellInside = (from: number, to: number) => {
+    for (let tab = text.indexOf("\t", from); tab >= 0 && tab + 1 < to; tab = text.indexOf("\t", tab + 1)) {
+      if (text.charCodeAt(tab + 1) === QUOTE && pageCell(tab + 1)) return true;
+    }
+    return false;
+  };
+  const cells = new Map<number, Quoted>();
+  const starts: number[] = [];
+  const first = firstCell(text);
+  for (let quote = text.indexOf('"', first); quote >= 0; ) {
+    const cell = cellCanStart(text, quote, first) ? quotedCell(text, quote) : null;
+    const lines = cell !== null && LINE_BREAK.test(cell.value);
+    if (lines && page.has(text.slice(quote, cell.end))) {
+      cells.set(quote, cell);
+      starts.push(quote);
+    }
+    const passed = cell && (lines ? cells.has(quote) : !pageCellInside(quote + 1, cell.end - 1));
+    quote = text.indexOf('"', passed ? cell.end : quote + 1);
+  }
+  return starts.length ? { cells, starts } : null;
+}
+
+// Whether a quoted cell from `at` to `end` runs past a pinned cell's start.
+function crossesPinned({ starts }: Pinned, at: number, end: number): boolean {
+  let low = 0;
+  let high = starts.length;
+  while (low < high) {
+    const middle = (low + high) >> 1;
+    if (starts[middle]! <= at) low = middle + 1;
+    else high = middle;
+  }
+  return low < starts.length && starts[low]! < end;
+}
+
+// The quoted cell that starts at `at` in a reading where no `pinned` cell
+// may be crossed: a pinned cell there, or a cell that starts with a quote
+// and can be quoted (quotedCell) without crossing one; else null.
+function quotedAt(text: string, at: number, pinned: Pinned | null): { cell: Quoted; pinned: boolean } | null {
+  const pin = pinned?.cells.get(at);
+  if (pin) return { cell: pin, pinned: true };
+  const cell = text.charCodeAt(at) === QUOTE ? quotedCell(text, at) : null;
+  return cell && !(pinned && crossesPinned(pinned, at, cell.end)) ? { cell, pinned: false } : null;
+}
+
 // Whether a cell that starts with a quote and can be read as a quoted cell
 // is one, from that cell, where it starts, and its row and column.
 type Take = (cell: Quoted, at: number, row: number, column: number) => boolean;
 
-// Reads the text's cells in order, row by row: each cell that starts with a
-// quote and can be quoted is quoted when `take` says so, and is its text as
-// it stands otherwise. `cell` gets each cell, `rowEnd` each row's end. The
-// line break after the last row isn't a row, and a byte order mark before
-// the first cell isn't text.
+// Reads the text's cells in order, row by row: each pinned cell is quoted,
+// and each other cell that starts with a quote and can be quoted is quoted
+// when `take` says so, and is its text as it stands otherwise. `cell` gets
+// each cell, `rowEnd` each row's end. The line break after the last row
+// isn't a row, and a byte order mark before the first cell isn't text.
 function readCells(
   text: string,
-  take: Take | null,
+  take: Take,
+  pinned: Pinned | null,
   cell: (at: number, end: number, quoted: Quoted | null) => void,
   rowEnd: () => void,
 ): void {
   let row = 0;
   let column = 0;
-  let at = text.charCodeAt(0) === 0xfeff ? 1 : 0;
+  let at = firstCell(text);
   for (;;) {
-    let quoted = take && text.charCodeAt(at) === QUOTE ? quotedCell(text, at) : null;
-    if (quoted && !take!(quoted, at, row, column)) quoted = null;
+    const found = quotedAt(text, at, pinned);
+    const quoted = found && (found.pinned || take(found.cell, at, row, column)) ? found.cell : null;
     const end = quoted ? quoted.end : cellEnd(text, at);
     cell(at, end, quoted);
     column += 1;
@@ -141,12 +242,13 @@ function readCells(
   rowEnd();
 }
 
-function splitCells(text: string, take: Take | null): string[][] {
+function splitCells(text: string, take: Take, pinned: Pinned | null): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
   readCells(
     text,
     take,
+    pinned,
     (at, end, quoted) => row.push(quoted ? quoted.value : text.slice(at, end)),
     () => {
       rows.push(row);
@@ -157,12 +259,13 @@ function splitCells(text: string, take: Take | null): string[][] {
 }
 
 // Each row's cells in a reading, without building it.
-function rowWidths(text: string, take: Take | null): number[] {
+function rowWidths(text: string, take: Take, pinned: Pinned | null): number[] {
   const widths: number[] = [];
   let cells = 0;
   readCells(
     text,
     take,
+    pinned,
     () => (cells += 1),
     () => {
       widths.push(cells);
@@ -171,8 +274,6 @@ function rowWidths(text: string, take: Take | null): number[] {
   );
   return widths;
 }
-
-const rectangular = (rows: string[][]) => rows.every((row) => row.length === rows[0]!.length);
 
 const always: Take = () => true;
 // Quoted cells that don't cross a line break: every line a row.
@@ -190,48 +291,51 @@ const inPlace = (cell: Quoted) => !BOUNDARY.test(cell.value);
 //
 // Text can read more than one way: a ditto mark `"` and a later cell that
 // ends with a quote (another ditto mark below it, `14"` after it) copy as a
-// quoted cell holding a tab or a line break would. Which reading is taken
-// depends on who wrote the text:
-// - `written`, text this page wrote (writeExcelCells: a sheet, a grid edit,
-//   a table rewritten as Excel) quotes every cell that holds a quote, so a
-//   cell that opens with a quote it can close is a quoted cell: it reads
-//   back exactly. Should the visitor's edits leave that reading's rows of
-//   different widths, and every cell as it stands doesn't, that is taken.
-// - Otherwise the text is the visitor's (typed, pasted, a text file), and
-//   rows are never merged on an ambiguous quote (readTypedCells).
-export function readExcelCells(text: string, written: boolean): string[][] {
-  if (!written) return readTypedCells(text);
-  const read = splitCells(text, always);
-  if (rectangular(read)) return read;
-  const literal = splitCells(text, null);
-  return rectangular(literal) ? literal : read;
+// quoted cell holding a tab or a line break would. One rule settles it,
+// whoever wrote which part of the text (#299 review): a quoted cell that
+// spans lines is one cell only if the page wrote that exact cell (`page`,
+// output-state.ts keeps them). Every other quote, whatever the visitor typed
+// or pasted, is read the visitor's way, which never merges rows on an
+// ambiguous quote (readTypedCells). A paste with Excel's HTML table is read
+// by that table's shape instead (readPastedCells, excel-paste.ts).
+//
+// Line breaks at the end of the text end its last row: blank lines there
+// aren't rows, as a CSV input skips them (#299 review). A row of empty
+// cells (the one the grid adds: tabs) stays a row.
+export function readExcelCells(text: string, page: PageCells = NO_PAGE_CELLS): string[][] {
+  let end = text.length;
+  for (let code = text.charCodeAt(end - 1); code === LF || code === CR; code = text.charCodeAt(end - 1)) end -= 1;
+  const body = end < text.length ? text.slice(0, end) : text;
+  return readTypedCells(body, pinnedCells(body, page));
 }
 
-// The visitor's text. Rows are merged on a quote only when no reading
-// keeps every line a row of one width: first, each line is read with its
-// quoted cells or as it stands, whichever keeps it as wide as the first
-// line. Failing that (a cell really holds a line break), of the readings
-// whose rows are all as wide as the table, the one that merges the fewest
-// lines is taken (fewestMerged), the table's width being the most common
-// row width when every quote is read as quoted, else the first line's.
-// Excel copies a rectangle, and a cell it quoted for a line break leaves
-// its lines shorter or longer than a row whenever the table has two or more
-// columns, so that cell is merged and a ditto mark's row isn't. Text with no
-// such reading (rows typed of different widths) keeps every line a row.
-export function readTypedCells(text: string): string[][] {
-  // Neither reading crosses a line break, so each has a row a line.
-  const quoted = rowWidths(text, withinLine);
-  const plain = rowWidths(text, inPlace);
+// The visitor's reading, each of the page's cells (`pinned`) one cell in
+// it. Rows are merged on a quote only when no reading keeps every line a
+// row of one width: first, each line is read with its quoted cells or as it
+// stands, whichever keeps it as wide as the first line. Failing that (a
+// cell really holds a line break), of the readings whose rows are all as
+// wide as the table, the one that merges the fewest lines is taken
+// (fewestMerged), the table's width being the most common row width when
+// every quote is read as quoted, else the first line's. Excel copies a
+// rectangle, and a cell it quoted for a line break leaves its lines shorter
+// or longer than a row whenever the table has two or more columns, so that
+// cell is merged and a ditto mark's row isn't. Text with no such reading
+// (rows typed of different widths) keeps every line a row.
+function readTypedCells(text: string, pinned: Pinned | null): string[][] {
+  // Neither reading crosses a line break outside a pinned cell, so each has
+  // the same rows: a line each, but where a pinned cell joins lines.
+  const quoted = rowWidths(text, withinLine, pinned);
+  const plain = rowWidths(text, inPlace, pinned);
   for (const width of new Set([quoted[0]!, plain[0]!])) {
     if (quoted.every((cells, line) => cells === width || plain[line] === width)) {
-      return splitCells(text, (cell, _at, line) => (quoted[line] === width ? withinLine(cell) : inPlace(cell)));
+      return splitCells(text, (cell, _at, line) => (quoted[line] === width ? withinLine(cell) : inPlace(cell)), pinned);
     }
   }
-  for (const width of new Set([commonWidth(rowWidths(text, always)), plain[0]!, quoted[0]!])) {
-    const choices = fewestMerged(text, width);
-    if (choices) return splitCells(text, (cell, at) => inPlace(cell) || choices.get(at) === true);
+  for (const width of new Set([commonWidth(rowWidths(text, always, pinned)), plain[0]!, quoted[0]!])) {
+    const choices = fewestMerged(text, width, pinned);
+    if (choices) return splitCells(text, (cell, at) => inPlace(cell) || choices.get(at) === true, pinned);
   }
-  return splitCells(text, withinLine);
+  return splitCells(text, withinLine, pinned);
 }
 
 // The width most rows have (the first row's, on a tie).
@@ -277,8 +381,8 @@ const MAX_BRANCHES = 4_000_000;
 // reading has rows that wide. A search over the cells that read two ways,
 // in the text's order, each reached at a column with the fewest merged
 // lines kept: one pass over the text for each column a cell can be reached
-// at.
-function fewestMerged(text: string, width: number): Map<number, boolean> | null {
+// at. A pinned cell is one cell in every reading.
+function fewestMerged(text: string, width: number, pinned: Pinned | null): Map<number, boolean> | null {
   const heap: Branch[] = [];
   let best: { merged: number; edges: number; parent: Branch | null; quoted: boolean } | null = null;
   let branches = 0;
@@ -330,12 +434,12 @@ function fewestMerged(text: string, width: number): Map<number, boolean> | null 
           edged += edges(first.value);
         }
       } else {
-        const cell = text.charCodeAt(at) === QUOTE ? quotedCell(text, at) : null;
-        if (cell && !inPlace(cell)) {
-          push({ at, column, merged, edges: edged, cell, parent, quoted });
+        const found = quotedAt(text, at, pinned);
+        if (found && !found.pinned && !inPlace(found.cell)) {
+          push({ at, column, merged, edges: edged, cell: found.cell, parent, quoted });
           return;
         }
-        end = cell ? cell.end : cellEnd(text, at);
+        end = found ? found.cell.end : cellEnd(text, at);
       }
       column += 1;
       if (end < text.length && text.charCodeAt(end) === TAB) {
@@ -356,7 +460,7 @@ function fewestMerged(text: string, width: number): Map<number, boolean> | null 
     }
   };
 
-  scan(text.charCodeAt(0) === 0xfeff ? 1 : 0, 0, 0, 0, null, false);
+  scan(firstCell(text), 0, 0, 0, null, false);
   // The cells already read from at this position, by column.
   let position = -1;
   const reached = new Set<number>();
@@ -384,22 +488,36 @@ function fewestMerged(text: string, width: number): Map<number, boolean> | null 
 
 // Copied cells' shape, from the HTML table a spreadsheet puts on the
 // clipboard next to the text (excel-paste.ts): each row's cells, the cells
-// (`row:column`) that hold a tab or a line break, which the text quotes, and
-// the cells whose text starts with a quote.
-export type CopiedShape = { widths: number[]; quoted: Set<string>; quoteFirst: Set<string> };
+// (`row:column`) that hold a tab or a line break, which the text quotes,
+// and the text of each cell that starts with a quote, as the table has it.
+export type CopiedShape = { widths: number[]; quoted: Set<string>; quoteFirst: Map<string, string> };
+
+// Text with each run of spaces as one, as HTML shows it.
+const spaced = (text: string) => text.replace(/[\s\u00a0]+/g, " ").trim();
 
 // Cells pasted with the HTML table they were copied as, a reading taken
 // only if its rows are that table's (null when none is). A cell that starts
 // with a quote is quoted where the table says it holds a tab or a line
-// break. One quoted for nothing else (a doubled quote, `"x""y"`) is quoted
-// unless it's text Excel left as it stands: the table's cell starts with a
-// quote and the quoted value doesn't.
+// break. One quoted for nothing else (`"x""y"`, `""""`, `"""Doc"""`) is
+// whichever reading is the table's text for that cell, spaces aside: quoted,
+// as a spreadsheet that quotes a cell for its quotes writes it, or as it
+// stands, as Excel leaves it (#299 review). When neither is, it's quoted
+// unless the table's cell starts with a quote and the quoted value doesn't.
 export function readPastedCells(text: string, shape: CopiedShape): string[][] | null {
-  const rows = splitCells(text, (cell, _at, row, column) => {
-    const key = `${row}:${column}`;
-    if (BOUNDARY.test(cell.value)) return shape.quoted.has(key);
-    return !shape.quoteFirst.has(key) || cell.value.charCodeAt(0) === QUOTE;
-  });
+  const rows = splitCells(
+    text,
+    (cell, at, row, column) => {
+      const key = `${row}:${column}`;
+      if (BOUNDARY.test(cell.value)) return shape.quoted.has(key);
+      const html = shape.quoteFirst.get(key);
+      if (html === undefined) return true;
+      const shown = spaced(html);
+      if (spaced(cell.value) === shown) return true;
+      if (spaced(text.slice(at, cell.end)) === shown) return false;
+      return cell.value.charCodeAt(0) === QUOTE;
+    },
+    null,
+  );
   const same = rows.length === shape.widths.length && rows.every((row, index) => row.length === shape.widths[index]);
   return same ? rows : null;
 }
