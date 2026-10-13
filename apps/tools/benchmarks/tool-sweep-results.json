@@ -3,7 +3,7 @@
     "issue": "https://github.com/serpcompany/tools.serp.co/issues/147",
     "command": "pnpm -C apps/tools tool-sweep",
     "baseUrl": "http://localhost:8812",
-    "commit": "75a581039d2ebb5830d417f187702a4d619d6303",
+    "commit": "54face0909bac4859baa2ed98235bffc946e6f13",
     "activeTools": 2530,
     "counts": {
       "pass": 2102,
@@ -3824,6 +3824,25 @@
           "markdown-to-csv"
         ],
         "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "54face0909bac4859baa2ed98235bffc946e6f13",
+        "dirty": false,
+        "startedAt": "2026-10-13T11:16:15.440Z",
+        "finishedAt": "2026-10-13T11:16:17.334Z",
+        "wallMs": 1894,
+        "measured": 4,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "excel-to-csv",
+          "excel-to-markdown",
+          "xlsx-to-png",
+          "xlsx-to-jpg"
+        ],
+        "browserVersion": "143.0.7499.4"
       }
     ]
   },
@@ -4766,8 +4785,8 @@
     {"id":"dxf-to-png","route":"/dxf-to-png","from":"dxf","to":"png","handler":"ToolPageRenderer","engine":"dxf-viewer","status":"pass","durationMs":1394,"formatCheck":"signature","topColourShare":0.9688,"fixture":"sample-plan.dxf","output":{"files":1,"bytes":108756,"name":"sample-plan.png"},"commit":"652005251f133784a2127dcba46d9fef884856c5","dirty":false},
     {"id":"emf-to-png","route":"/emf-to-png","from":"emf","to":"png","handler":"ToolPageRenderer","engine":"browser-raster","status":"no_fixture","reason":"no ready emf fixture in fixture-matrix.json","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"eps-to-pdf","route":"/eps-to-pdf","from":"eps","to":"pdf","handler":"ToolPageRenderer","engine":"browser-raster","status":"error","durationMs":746,"error":"Image decode failed.","fixture":"sample.eps","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
-    {"id":"excel-to-csv","route":"/excel-to-csv","from":"excel","to":"csv","handler":"TableConvertLanding","engine":"table-convert + xlsx","status":"pass","durationMs":1717,"formatCheck":"content","fixture":"sample-sheets.xlsx","output":{"files":1,"bytes":208,"name":"sample-sheets.csv"},"commit":"75a581039d2ebb5830d417f187702a4d619d6303","dirty":false},
-    {"id":"excel-to-markdown","route":"/excel-to-markdown","from":"excel","to":"markdown","handler":"TableConvertLanding","engine":"table-convert + xlsx","status":"pass","durationMs":1134,"formatCheck":"content","fixture":"sample-sheets.xlsx","output":{"files":1,"bytes":383,"name":"sample-sheets.md"},"commit":"75a581039d2ebb5830d417f187702a4d619d6303","dirty":false},
+    {"id":"excel-to-csv","route":"/excel-to-csv","from":"excel","to":"csv","handler":"TableConvertLanding","engine":"table-convert + xlsx","status":"pass","durationMs":1486,"formatCheck":"content","fixture":"sample-sheets.xlsx","output":{"files":1,"bytes":208,"name":"sample-sheets.csv"},"commit":"54face0909bac4859baa2ed98235bffc946e6f13","dirty":false},
+    {"id":"excel-to-markdown","route":"/excel-to-markdown","from":"excel","to":"markdown","handler":"TableConvertLanding","engine":"table-convert + xlsx","status":"pass","durationMs":1514,"formatCheck":"content","fixture":"sample-sheets.xlsx","output":{"files":1,"bytes":383,"name":"sample-sheets.md"},"commit":"54face0909bac4859baa2ed98235bffc946e6f13","dirty":false},
     {"id":"exr-to-jpeg","route":"/exr-to-jpeg","from":"exr","to":"jpeg","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1283,"formatCheck":"signature","topColourShare":0.125,"fixture":"sample.exr","output":{"files":1,"bytes":1315,"name":"sample.jpeg"},"commit":"c2d1a16dbe7db763d81f85804950039a035f2aa9","dirty":false},
     {"id":"exr-to-jpg","route":"/exr-to-jpg","from":"exr","to":"jpg","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1413,"formatCheck":"signature","topColourShare":0.125,"fixture":"sample.exr","output":{"files":1,"bytes":1315,"name":"sample.jpg"},"commit":"c2d1a16dbe7db763d81f85804950039a035f2aa9","dirty":false},
     {"id":"exr-to-png","route":"/exr-to-png","from":"exr","to":"png","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1880,"formatCheck":"signature","topColourShare":0.1354,"fixture":"sample.exr","output":{"files":1,"bytes":738,"name":"sample.png"},"commit":"c2d1a16dbe7db763d81f85804950039a035f2aa9","dirty":false},
@@ -6347,8 +6366,8 @@
     {"id":"xcf-to-svg","route":"/xcf-to-svg","from":"xcf","to":"svg","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1284,"formatCheck":"signature","topColourShare":0.231,"fixture":"sample.xcf","output":{"files":1,"bytes":2683,"name":"sample.svg"},"commit":"3999147a6911b81ab8eddb2450c85cf98664c936","dirty":false},
     {"id":"xls-to-jpg","route":"/xls-to-jpg","from":"xls","to":"jpg","handler":"ToolPageRenderer","engine":"browser-raster","status":"no_fixture","reason":"no ready xls fixture in fixture-matrix.json","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"xls-to-png","route":"/xls-to-png","from":"xls","to":"png","handler":"ToolPageRenderer","engine":"browser-raster","status":"no_fixture","reason":"no ready xls fixture in fixture-matrix.json","commit":"9d4cd4ca1b5d1c8baa862256319aab7f0303f85a","dirty":false},
-    {"id":"xlsx-to-jpg","route":"/xlsx-to-jpg","from":"xlsx","to":"jpg","handler":"ToolPageRenderer","engine":"xlsx-table","status":"pass","durationMs":732,"formatCheck":"signature","topColourShare":0.7551,"fixture":"sample-sheets.xlsx","output":{"files":2,"bytes":78772,"name":"sample-sheets_Sales.jpg"},"commit":"75a581039d2ebb5830d417f187702a4d619d6303","dirty":false},
-    {"id":"xlsx-to-png","route":"/xlsx-to-png","from":"xlsx","to":"png","handler":"ToolPageRenderer","engine":"xlsx-table","status":"pass","durationMs":739,"formatCheck":"signature","topColourShare":0.7354,"fixture":"sample.xlsx","output":{"files":1,"bytes":11011,"name":"sample.png"},"commit":"75a581039d2ebb5830d417f187702a4d619d6303","dirty":false},
+    {"id":"xlsx-to-jpg","route":"/xlsx-to-jpg","from":"xlsx","to":"jpg","handler":"ToolPageRenderer","engine":"xlsx-table","status":"pass","durationMs":1634,"formatCheck":"signature","topColourShare":0.7551,"fixture":"sample-sheets.xlsx","output":{"files":2,"bytes":78772,"name":"sample-sheets_Sales.jpg"},"commit":"54face0909bac4859baa2ed98235bffc946e6f13","dirty":false},
+    {"id":"xlsx-to-png","route":"/xlsx-to-png","from":"xlsx","to":"png","handler":"ToolPageRenderer","engine":"xlsx-table","status":"pass","durationMs":1624,"formatCheck":"signature","topColourShare":0.7354,"fixture":"sample.xlsx","output":{"files":1,"bytes":11011,"name":"sample.png"},"commit":"54face0909bac4859baa2ed98235bffc946e6f13","dirty":false},
     {"id":"xml-to-csv","route":"/xml-to-csv","from":"xml","to":"csv","handler":"TableConvertLanding","engine":"table-convert","status":"pass","durationMs":611,"formatCheck":"content","fixture":"sample.xml","output":{"files":1,"bytes":27,"name":"sample.csv"},"commit":"3570a3077b3b908d3a15a454102e6a622bf69270","dirty":false},
     {"id":"xml-to-markdown","route":"/xml-to-markdown","from":"xml","to":"markdown","handler":"TableConvertLanding","engine":"table-convert","status":"pass","durationMs":535,"formatCheck":"content","fixture":"sample.xml","output":{"files":1,"bytes":71,"name":"sample.md"},"commit":"3570a3077b3b908d3a15a454102e6a622bf69270","dirty":false},
     {"id":"xpm-to-jpeg","route":"/xpm-to-jpeg","from":"xpm","to":"jpeg","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1835,"formatCheck":"signature","topColourShare":0.2183,"fixture":"sample.xpm","output":{"files":1,"bytes":3393,"name":"sample.jpeg"},"commit":"3999147a6911b81ab8eddb2450c85cf98664c936","dirty":false},
