@@ -224,6 +224,9 @@ export function converterEngine({ operation, from, to }) {
 
 export function engineFor(tool, handler) {
   if (handler === "ToolPageRenderer") return converterEngine(tool);
+  // A table page's Excel input is read by the XLSX reader in a worker
+  // (lib/convert/xlsx-sheets.ts, #266) before the table converter has it.
+  if (handler === "TableConvertLanding" && tool.from?.toLowerCase() === "excel") return "table-convert + xlsx";
   return ENGINES[handler] ?? null;
 }
 
@@ -241,6 +244,7 @@ export const ENGINE_LOCATIONS = {
   pdfjs: "client-only",
   "heif-decoder": "client-only",
   "table-convert": "client-only",
+  "table-convert + xlsx": "client-only",
   "html-to-markdown-wasm": "client-only",
   javascript: "client-only",
   "jsquash-worker": "client-only",
@@ -263,7 +267,8 @@ export const ENGINE_LOCATIONS = {
 };
 
 // Strings from the text fixtures that a converted copy must still contain,
-// so a text output (no byte signature) proves it holds the input's data.
+// so a text output (no byte signature) proves it holds the input's data. A
+// fixture can name several; each must be there.
 const TEXT_MARKERS = {
   "sample.csv": "Alpha",
   "sample-2.csv": "Gamma",
@@ -279,6 +284,15 @@ const TEXT_MARKERS = {
   "sample.sql": "Alpha",
   "sample.xml": "Alpha",
   "sample.xlsx": "Alpha",
+  // Its first sheet, Sales, as Excel shows it: a name, a date, a thousands
+  // separator, currency, a percentage and a formula's saved result
+  // (xlsx-sheets.test.mjs reads each cell).
+  "sample-sheets.xlsx": ["North", "3/14/2026", "1,200", "$15,234.50", "25%", "$67,105.75"],
+};
+// Strings a fixture hides, which a converted copy must not hold: sample-sheets.xlsx's
+// hidden row and column, and its hidden sheet.
+const HIDDEN_TEXT = {
+  "sample-sheets.xlsx": ["Hidden row", "secret", "Internal", "cost 9.10", "Hidden sheet", "Salary"],
 };
 const TEXT_DRIVERS = new Set(["table", "html-to-markdown", "json-to-csv", "csv-combiner"]);
 
@@ -355,16 +369,18 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
   const target = tool.to?.toLowerCase();
   const tableFile = driver === "table" && TABLE_FILE_OUTPUTS.has(target);
   const textOutput = (TEXT_DRIVERS.has(driver) && !checksPixels(target)) || target === "txt";
-  const markers = textOutput ? files.map((file) => TEXT_MARKERS[path.basename(file)]) : [];
+  const markers = textOutput ? files.flatMap((file) => TEXT_MARKERS[path.basename(file)] ?? [null]) : [];
   if (markers.some((marker) => !marker)) {
     return { ...base, status: "no_fixture", reason: `no data marker for the ${tool.from} fixture in TEXT_MARKERS` };
   }
+  const hidden = textOutput ? files.flatMap((file) => HIDDEN_TEXT[path.basename(file)] ?? []) : [];
   const slow = engine.includes("ffmpeg-wasm");
   return {
     ...base,
     driver,
     fixtures: files,
     markers,
+    ...(hidden.length ? { hidden } : {}),
     pixelCheck: checksPixels(tool.to) && !files.some((file) => ONE_COLOUR_FIXTURES.has(path.basename(file))),
     pages: checksPixels(tool.to) && files.length === 1 ? PAGE_COUNTS[path.basename(files[0])] : undefined,
     tableFile,
@@ -508,7 +524,7 @@ function formatName(format) {
 // every output opened: an output the sweep never read the bytes of fails,
 // rather than passing unchecked. One with `pages` (PAGE_COUNTS) needs a file
 // for each page.
-export function classifyRun(observation, { to, markers = [], pixelCheck = false, decode = false, pages }) {
+export function classifyRun(observation, { to, markers = [], hidden = [], pixelCheck = false, decode = false, pages }) {
   const message = observation.message?.trim() || null;
   if (observation.outcome === "timeout") {
     return { status: "timeout", error: message ?? "no result before the timeout" };
@@ -564,6 +580,10 @@ export function classifyRun(observation, { to, markers = [], pixelCheck = false,
       error: `the saved file doesn't contain the input's data (missing ${missing.join(", ")})`,
       formatCheck,
     };
+  }
+  const shown = hidden.filter((text) => outputs.some((output) => (decode ? output.decoded.text : output.text)?.includes(text)));
+  if (shown.length) {
+    return { status: "error", error: `the saved file holds what the input hides (${shown.join(", ")})`, formatCheck };
   }
   const unread = pixelCheck && outputs.find((output) => output.pixels === undefined);
   if (unread) {

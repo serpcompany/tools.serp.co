@@ -1,5 +1,6 @@
-// An XLSX workbook read as tables (issue #265), for XLSX to an image: each
-// sheet a visitor would see in Excel, its cells as Excel shows them (numbers
+// An XLSX workbook read as tables (issue #265), for XLSX to an image and,
+// since #266, for the table converters' Excel input: each sheet a visitor
+// would see in Excel, its cells as Excel shows them (numbers
 // in their number format, dates as dates, formulas as their saved result),
 // its first row as the header. Hidden and very hidden sheets, hidden rows
 // and hidden columns are left out, as Excel leaves them out of a printout.
@@ -41,6 +42,12 @@ export const MAX_COLUMNS = 16_384;
 // 55 rows and 50 columns, table-image.ts); the rest are only counted.
 export const KEPT_ROWS = 500;
 export const KEPT_COLUMNS = 200;
+// How much of a sheet is kept with its cells: rows and columns, and at most
+// `cells` values. An image keeps what it can show; a table converter keeps
+// every row and column of each sheet, up to a number of cells for the whole
+// workbook (readWorkbookSheets' `cells`).
+export type Kept = { rows: number; columns: number; cells: number };
+export const IMAGE_KEPT: Kept = { rows: KEPT_ROWS, columns: KEPT_COLUMNS, cells: Infinity };
 // The most sheets one workbook becomes images of.
 export const MAX_SHEETS = 100;
 
@@ -56,6 +63,9 @@ export type WorkbookSheets = {
   // parts read reached MAX_WORKBOOK_BYTES.
   skipped: number;
   stop?: "sheets" | "size";
+  // Read as tables (`cells` given): the sheets with values left out because
+  // they would take the cells kept past it.
+  tooManyCells?: string[];
 };
 
 // --------------------------------------------------------------- strings --
@@ -185,9 +195,13 @@ export function cellText(type: string, value: string, style: number, context: Ce
 }
 
 type SheetCells = {
-  // Rows with a value, in order, kept up to KEPT_ROWS: row index and its
+  // Rows with a value, in order, kept up to the rows kept: row index and its
   // cells by column.
   rows: { index: number; cells: Map<number, string> }[];
+  // Values kept, and whether some weren't because there were more than the
+  // cells kept.
+  kept: number;
+  overflow: boolean;
   hiddenRows: Set<number>;
   hiddenColumns: Set<number>;
   // Rows not listed are hidden too (sheetFormatPr zeroHeight).
@@ -196,12 +210,15 @@ type SheetCells = {
   last: { row: number; column: number };
 };
 
-// A worksheet's cells that show: values in visible rows and columns. A row
-// or cell numbered outside Excel's grid (row 0, row 2000000, column XFE, a
-// number that isn't one) isn't a cell Excel shows, and is left out.
-export function parseSheet(xml: string, context: CellContext): SheetCells {
+// A worksheet's cells that show: values in visible rows and columns, as
+// many as `kept` keeps. A row or cell numbered outside Excel's grid (row 0,
+// row 2000000, column XFE, a number that isn't one) isn't a cell Excel
+// shows, and is left out.
+export function parseSheet(xml: string, context: CellContext, kept: Kept = IMAGE_KEPT): SheetCells {
   const sheet: SheetCells = {
     rows: [],
+    kept: 0,
+    overflow: false,
     hiddenRows: new Set(),
     hiddenColumns: new Set(),
     listedRows: null,
@@ -222,7 +239,7 @@ export function parseSheet(xml: string, context: CellContext): SheetCells {
   let inSheetData = false;
 
   const finishRow = () => {
-    if (rowCells?.size && sheet.rows.length < KEPT_ROWS) sheet.rows.push({ index: rowIndex, cells: rowCells });
+    if (rowCells?.size && sheet.rows.length < kept.rows) sheet.rows.push({ index: rowIndex, cells: rowCells });
     rowCells = null;
   };
 
@@ -275,9 +292,14 @@ export function parseSheet(xml: string, context: CellContext): SheetCells {
         const shown = rowHidden || sheet.hiddenColumns.has(column) ? "" : cellText(cell.type, cell.value, cell.style, context);
         cell = null;
         if (!shown.trim() || column < 0 || rowIndex < 0) return;
-        // A row's cells arrive left to right, so its first KEPT_COLUMNS
-        // values cover every column a table of KEPT_COLUMNS can show.
-        if (sheet.rows.length < KEPT_ROWS && rowCells && rowCells.size < KEPT_COLUMNS) rowCells.set(column, shown);
+        // A row's cells arrive left to right, so its first `kept.columns`
+        // values cover every column a table of that many can show.
+        if (sheet.rows.length < kept.rows && rowCells && rowCells.size < kept.columns) {
+          if (sheet.kept < kept.cells) {
+            rowCells.set(column, shown);
+            sheet.kept += 1;
+          } else sheet.overflow = true;
+        }
         sheet.first ??= { row: rowIndex, column };
         sheet.first.row = Math.min(sheet.first.row, rowIndex);
         sheet.first.column = Math.min(sheet.first.column, column);
@@ -292,21 +314,21 @@ export function parseSheet(xml: string, context: CellContext): SheetCells {
 }
 
 // The cells as a table: the rows and columns from the first value to the
-// last that aren't hidden, the first row as its header. Rows past KEPT_ROWS
-// and columns past KEPT_COLUMNS are counted but not filled in: the rows are
-// holes in `rows` (table-image.ts draws a missing row as empty, and never
-// gets that far down) and the columns empty headers, so the image's note
-// says how many there are.
-export function sheetTable(cells: SheetCells): TableData | null {
+// last that aren't hidden, the first row as its header. Rows and columns
+// past those kept are counted but not filled in: the rows are holes in
+// `rows` (table-image.ts draws a missing row as empty, and never gets that
+// far down) and the columns empty headers, so the image's note says how many
+// there are.
+export function sheetTable(cells: SheetCells, kept: Kept = IMAGE_KEPT): TableData | null {
   if (!cells.first) return null;
   const columns: number[] = [];
   let columnCount = 0;
   for (let column = cells.first.column; column <= cells.last.column; column += 1) {
     if (cells.hiddenColumns.has(column)) continue;
     columnCount += 1;
-    if (columns.length < KEPT_COLUMNS) columns.push(column);
+    if (columns.length < kept.columns) columns.push(column);
   }
-  const shows = (row: number) => !cells.hiddenRows.has(row) && (!cells.listedRows || cells.listedRows.has(row));
+  const shows = (row: number) => rowShows(cells, row);
   const byIndex = new Map(cells.rows.map((row) => [row.index, row.cells]));
   const lastKept = cells.rows[cells.rows.length - 1]?.index ?? -1;
   let header: string[] = [];
@@ -314,7 +336,7 @@ export function sheetTable(cells: SheetCells): TableData | null {
   let count = 0;
   for (let row = cells.first.row; row <= cells.last.row; row += 1) {
     if (!shows(row)) continue;
-    if (row <= lastKept && count <= KEPT_ROWS) {
+    if (row <= lastKept && count <= kept.rows) {
       const values = byIndex.get(row);
       const line = columns.map((column) => values?.get(column) ?? "");
       if (count === 0) header = line;
@@ -326,6 +348,24 @@ export function sheetTable(cells: SheetCells): TableData | null {
   return { headers: Array.from({ length: columnCount }, (_, index) => header[index] ?? ""), rows };
 }
 
+const rowShows = (cells: SheetCells, row: number) =>
+  !cells.hiddenRows.has(row) && (!cells.listedRows || cells.listedRows.has(row));
+
+// The cells sheetTable's table has, header and empty cells included: its
+// rows times its columns, counted without building it.
+export function sheetCellCount(cells: SheetCells): number {
+  if (!cells.first) return 0;
+  let columns = 0;
+  for (let column = cells.first.column; column <= cells.last.column; column += 1) {
+    if (!cells.hiddenColumns.has(column)) columns += 1;
+  }
+  let rows = 0;
+  for (let row = cells.first.row; row <= cells.last.row; row += 1) {
+    if (rowShows(cells, row)) rows += 1;
+  }
+  return rows * columns;
+}
+
 // ----------------------------------------------------------------- read --
 
 // The workbook's sheets that show, in order, as tables, sheets with no
@@ -333,7 +373,16 @@ export function sheetTable(cells: SheetCells): TableData | null {
 // up to MAX_WORKBOOK_BYTES. Says how many hidden sheets were left out, and
 // how many visible sheets weren't read and why. A worksheet part two sheets
 // name is read once.
-export function readWorkbookSheets(buf: ArrayBuffer, { budget = MAX_WORKBOOK_BYTES }: { budget?: number } = {}): WorkbookSheets {
+//
+// For an image, each table keeps the rows and columns an image can show
+// (IMAGE_KEPT). With `cells` (a table converter, #266), each keeps all of
+// them, and a sheet is kept only while the kept tables' cells add up to at
+// most `cells`; one that would take them past it is left out and named.
+export function readWorkbookSheets(
+  buf: ArrayBuffer,
+  { budget = MAX_WORKBOOK_BYTES, cells }: { budget?: number; cells?: number } = {},
+): WorkbookSheets {
+  const doing = cells === undefined ? "draw" : "convert";
   const bytes = new Uint8Array(buf);
   if (isOleFile(bytes)) {
     throw new Error(
@@ -343,10 +392,10 @@ export function readWorkbookSheets(buf: ArrayBuffer, { budget = MAX_WORKBOOK_BYT
   if (!isZipFile(bytes)) throw new Error("This file isn't an XLSX workbook: it isn't a ZIP archive.");
   const read = {
     maxBytes: MAX_PART_BYTES,
-    tooBig: `This workbook is too large to draw here: a sheet holds more than ${MAX_PART_BYTES / 1024 / 1024} MB of cells.`,
+    tooBig: `This workbook is too large to ${doing} here: a sheet holds more than ${MAX_PART_BYTES / 1024 / 1024} MB of cells.`,
     kind: "XLSX file",
   };
-  const tooLarge = `This workbook is too large to draw here: its sheets hold more than ${Math.round(budget / 1024 / 1024)} MB of cells.`;
+  const tooLarge = `This workbook is too large to ${doing} here: its sheets hold more than ${Math.round(budget / 1024 / 1024)} MB of cells.`;
   // Each part's declared size, inflated, and the running total of the parts
   // read.
   let sizes: Map<string, number>;
@@ -388,6 +437,8 @@ export function readWorkbookSheets(buf: ArrayBuffer, { budget = MAX_WORKBOOK_BYT
   // one in memory.
   const sheets: Sheet[] = [];
   const seen = new Set<string>();
+  const tooManyCells: string[] = [];
+  let cellsKept = 0;
   let index = 0;
   let stop: WorkbookSheets["stop"];
   for (; index < visible.length; index += 1) {
@@ -405,13 +456,30 @@ export function readWorkbookSheets(buf: ArrayBuffer, { budget = MAX_WORKBOOK_BYT
     }
     take([path]);
     const xml = text(readParts(bytes, (name) => name === path, read)[path]);
-    const table = xml ? sheetTable(parseSheet(xml, context)) : null;
-    if (table) sheets.push({ name: visible[index]!.name, number: visible[index]!.number, table });
+    const { name, number } = visible[index]!;
+    if (cells === undefined) {
+      const table = xml ? sheetTable(parseSheet(xml, context)) : null;
+      if (table) sheets.push({ name, number, table });
+      continue;
+    }
+    // A table converter's: values are kept only up to the cells left, so a
+    // sheet too large to keep is never held whole.
+    const kept = { rows: MAX_ROWS, columns: MAX_COLUMNS, cells: cells - cellsKept };
+    const parsed = xml ? parseSheet(xml, context, kept) : null;
+    if (!parsed?.first) continue;
+    const count = sheetCellCount(parsed);
+    if (parsed.overflow || count > kept.cells) {
+      tooManyCells.push(name);
+      continue;
+    }
+    cellsKept += count;
+    sheets.push({ name, number, table: sheetTable(parsed, kept)! });
   }
   return {
     sheets,
     hidden: workbook.sheets.filter((sheet) => sheet.state !== "visible").length,
     skipped: visible.length - index,
     ...(stop ? { stop } : {}),
+    ...(cells === undefined ? {} : { tooManyCells }),
   };
 }

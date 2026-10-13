@@ -21,7 +21,15 @@
 //
 // Every change to the input text, its format, the table and the name goes
 // through nextTablePage; TableConvertDemo keeps no other copy of them.
+//
+// An Excel workbook (#266) is read in a worker into the text an Excel input
+// holds, each sheet's cells as Excel copies them, and arrives as one event:
+// its first sheet's text goes into the input, which takes the file's name,
+// as any file's text does. Its other sheets stay with that text: choosing
+// one replaces the input with that sheet's text, from the same file, so the
+// name stays. They go when the name does.
 
+import type { WorkbookText } from "../../lib/convert/xlsx.worker.ts";
 import { outputFileName } from "./formats.ts";
 import type { InputFormat, OutputFormat, TableData } from "./types.ts";
 
@@ -36,6 +44,12 @@ export type SerializeTable = (format: InputFormat, table: TableData) => { text: 
 // ticket, so a read that finishes after a newer upload, typing, a grid edit
 // or a clear is dropped.
 export type Upload = { name: string; ticket: number } | null;
+
+// A workbook read for an Excel input: its sheets with values, each as the
+// text the input holds for it, what was left out (hidden sheets, sheets with
+// too many cells, sheets not read), and which sheet the input's text came
+// from.
+export type Workbook = Omit<WorkbookText, "sheets"> & { sheets: { name: string; text: string }[]; sheet: number };
 
 export type TablePage = {
   inputFormat: InputFormat;
@@ -55,6 +69,9 @@ export type TablePage = {
   origin: number;
   error: string | null;
   upload: Upload;
+  // The workbook the input's text came from: there exactly while the text's
+  // origin (fileName) is a workbook, as read or since edited.
+  workbook: Workbook | null;
 };
 
 export type TablePageEvent =
@@ -62,6 +79,10 @@ export type TablePageEvent =
   | { type: "upload"; name: string; ticket: number }
   // Its text was read; `format` is the one its name or type says, if any.
   | { type: "read"; ticket: number; text: string; format: InputFormat | null }
+  // It was read as an Excel workbook, its sheets as an Excel input's text.
+  | { type: "readWorkbook"; ticket: number; workbook: Omit<Workbook, "sheet"> }
+  // The visitor chose another sheet of the workbook the input came from.
+  | { type: "sheet"; sheet: number }
   // It couldn't be read.
   | { type: "readFailed"; ticket: number; error: string }
   // The visitor typed, pasted or deleted in the input. `replacesInput`: the
@@ -84,6 +105,7 @@ export function initialTablePage(inputFormat: InputFormat, placeholder: TableDat
     origin: 0,
     error: null,
     upload: null,
+    workbook: null,
   };
 }
 
@@ -100,12 +122,12 @@ export function tablePageReducer({
   // and with it the grid and any download, but the text keeps its origin.
   function settle(
     state: TablePage,
-    input: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "fileName" | "upload">,
+    input: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "fileName" | "upload" | "workbook">,
     fromFile = false,
   ): TablePage {
     if (!input.hasUserInput && !input.inputText.trim()) {
       const continues = state.table === placeholder;
-      return { ...state, ...input, fileName: null, table: placeholder, error: null, origin: continues ? state.origin : state.origin + 1 };
+      return { ...state, ...input, fileName: null, workbook: null, table: placeholder, error: null, origin: continues ? state.origin : state.origin + 1 };
     }
     const result = parse(input.inputFormat, input.inputText);
     if (!result.supported || !result.table) {
@@ -134,6 +156,50 @@ export function tablePageReducer({
             hasUserInput: true,
             fileName: upload.name,
             upload: null,
+            workbook: null,
+          },
+          true,
+        );
+      }
+      case "readWorkbook": {
+        const { upload } = state;
+        if (!upload || upload.ticket !== event.ticket) return state;
+        const first = event.workbook.sheets[0];
+        // A workbook with no sheet to show is a file that can't be read.
+        if (!first) {
+          return { ...state, upload: null, table: null, error: `${upload.name} has no visible sheet with values.`, origin: state.origin + 1 };
+        }
+        // Its first sheet's text is in the input, as an Excel input's, and
+        // takes the file's name.
+        return settle(
+          state,
+          {
+            inputFormat: "excel",
+            inputText: first.text,
+            hasUserInput: true,
+            fileName: upload.name,
+            upload: null,
+            workbook: { ...event.workbook, sheet: 0 },
+          },
+          true,
+        );
+      }
+      case "sheet": {
+        const { workbook } = state;
+        const sheet = workbook?.sheets[event.sheet];
+        if (!workbook || !sheet || state.inputFormat !== "excel" || event.sheet === workbook.sheet) return state;
+        // The chosen sheet's text replaces the input's, from the same file:
+        // a table afresh under the same name. Like typing, it wins over a
+        // file still being read.
+        return settle(
+          state,
+          {
+            inputFormat: "excel",
+            inputText: sheet.text,
+            hasUserInput: true,
+            fileName: state.fileName,
+            upload: null,
+            workbook: { ...workbook, sheet: event.sheet },
           },
           true,
         );
@@ -152,6 +218,7 @@ export function tablePageReducer({
           hasUserInput: true,
           fileName: own ? null : state.fileName,
           upload: null,
+          workbook: own ? null : state.workbook,
         });
       }
       case "editGrid": {
@@ -168,6 +235,7 @@ export function tablePageReducer({
           hasUserInput: true,
           fileName: state.fileName,
           upload: null,
+          workbook: state.workbook,
         });
       }
       case "inputFormat": {
@@ -176,10 +244,10 @@ export function tablePageReducer({
         // format (CSV text becomes the same table as JSON). Otherwise the text
         // on screen is parsed in the new format. Either way it's the same
         // text, so it keeps its origin.
-        const { hasUserInput, upload, fileName } = state;
+        const { hasUserInput, upload, fileName, workbook } = state;
         const rewritten = state.table && hasUserInput ? serialize(event.format, state.table) : null;
         const inputText = rewritten?.supported ? rewritten.text : state.inputText;
-        return settle(state, { inputFormat: event.format, inputText, hasUserInput, fileName, upload });
+        return settle(state, { inputFormat: event.format, inputText, hasUserInput, fileName, upload, workbook });
       }
       case "clear":
         return {
@@ -191,6 +259,7 @@ export function tablePageReducer({
           origin: state.origin + 1,
           error: null,
           upload: null,
+          workbook: null,
         };
     }
   };

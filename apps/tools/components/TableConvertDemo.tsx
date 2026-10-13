@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useReducer, useRef, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import {
   Card,
@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@serp-tools/ui/components/card";
 import { Badge } from "@serp-tools/ui/components/badge";
+import { Label } from "@serp-tools/ui/components/label";
 import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import BinaryOutputPreview, { type BinaryOutputState } from "@/components/table-convert/BinaryOutputPreview";
@@ -29,7 +30,8 @@ import {
   outputFileName,
   outputMimeType,
 } from "@/components/table-convert/formats";
-import { parseInput, serializeOutput } from "@/components/table-convert/convert";
+import { parseInput, serializeInput, serializeOutput } from "@/components/table-convert/convert";
+import { readsAsWorkbook, workbookInput, workbookNotes } from "@/components/table-convert/excel-input";
 import {
   initialTablePage,
   offeredDownload,
@@ -52,7 +54,7 @@ const BINARY_DELAY_MS = 300;
 
 // The input, the table on screen and the name downloads take change only
 // here, together (output-state.ts).
-const nextTablePage = tablePageReducer({ parse: parseInput, serialize: serializeOutput, placeholder: DEFAULT_TABLE });
+const nextTablePage = tablePageReducer({ parse: parseInput, serialize: serializeInput, placeholder: DEFAULT_TABLE });
 
 export default function TableConvertDemo({
   initialInputFormat = "csv",
@@ -64,7 +66,8 @@ export default function TableConvertDemo({
   const [page, dispatch] = useReducer(nextTablePage, initialInputFormat, (format: InputFormat) =>
     initialTablePage(format, DEFAULT_TABLE),
   );
-  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload } = page;
+  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload, workbook } = page;
+  const sheetSelectId = useId();
   const [outputFormat, setOutputFormat] = useState<OutputFormat>(initialOutputFormat);
   const [inputView, setInputView] = useState<ViewMode>("raw");
   const [outputView, setOutputView] = useState<ViewMode>("raw");
@@ -183,13 +186,23 @@ export default function TableConvertDemo({
 
   // Until a chosen or dropped file is read and parsed, the output panel says
   // it's being read and offers nothing to download. Typing, pasting, editing
-  // the grid, clearing or a newer file wins over it (its read is dropped).
+  // the grid, choosing a sheet, clearing or a newer file wins over it (its
+  // read is dropped). An Excel workbook is read in a worker, its reader
+  // loaded only now, into the text an Excel input holds for each sheet.
   async function loadFile(file: File) {
     const ticket = ++tickets.current;
     dispatch({ type: "upload", name: file.name, ticket });
     let event: TablePageEvent;
     try {
-      event = { type: "read", ticket, text: await file.text(), format: detectFormatFromFile(file) };
+      const format = detectFormatFromFile(file);
+      const head = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+      if (readsAsWorkbook(format, inputFormat, head)) {
+        const { readWorkbookTextInWorker } = await import("@/lib/convert/xlsx-workbook");
+        const read = await readWorkbookTextInWorker(await file.arrayBuffer());
+        event = { type: "readWorkbook", ticket, workbook: workbookInput(read) };
+      } else {
+        event = { type: "read", ticket, text: await file.text(), format };
+      }
     } catch (readError) {
       const reason = readError instanceof Error ? readError.message : String(readError);
       event = { type: "readFailed", ticket, error: `${file.name} couldn't be read: ${reason}` };
@@ -313,6 +326,40 @@ export default function TableConvertDemo({
                   <input ref={fileRef} type="file" onChange={handleFileChange} className="hidden" />
                   {selectedName && <span className="text-xs text-muted-foreground">Selected: {selectedName}</span>}
                 </div>
+                {workbook && inputFormat === "excel" && (
+                  <div className="space-y-1 text-xs text-muted-foreground" data-testid="excel-sheet">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {workbook.sheets.length > 1 && (
+                        <>
+                          <Label htmlFor={sheetSelectId} className="text-xs">
+                            Sheet
+                          </Label>
+                          <select
+                            id={sheetSelectId}
+                            value={workbook.sheet}
+                            onChange={(event) => dispatch({ type: "sheet", sheet: Number(event.target.value) })}
+                            className="h-8 max-w-[16rem] rounded-md border border-input bg-background px-2 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                          >
+                            {workbook.sheets.map((sheet, index) => (
+                              <option key={index} value={index}>
+                                {sheet.name}
+                              </option>
+                            ))}
+                          </select>
+                        </>
+                      )}
+                      <span>
+                        Showing sheet “{workbook.sheets[workbook.sheet]?.name}”
+                        {workbook.sheets.length > 1
+                          ? `, ${workbook.sheet + 1} of the ${workbook.sheets.length} sheets with values.`
+                          : "."}
+                      </span>
+                    </div>
+                    {workbookNotes(workbook).map((note) => (
+                      <p key={note}>{note}</p>
+                    ))}
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">
                   Drag and drop a file anywhere in this panel to load it.
                 </p>

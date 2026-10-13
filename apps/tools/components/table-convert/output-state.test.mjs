@@ -5,18 +5,17 @@ import { outputFileName } from "./formats.ts";
 import { canOfferOutput, initialTablePage, offeredDownload, tablePageReducer } from "./output-state.ts";
 
 // A small stand-in for convert.ts: text is `<format>:<cell>|<cell>…`, one
-// column. Text in another format, with BROKEN in it, or empty doesn't parse,
-// and Excel input can't be parsed or written, as on the page.
+// column. Text in another format, with BROKEN in it, or empty doesn't parse.
+// Every input format, Excel's included (cells as Excel copies them, #266),
+// is parsed and written as text, as on the page.
 function parse(format, text) {
   if (!text.trim()) return { table: null, supported: true, error: "Paste or upload data to begin." };
-  if (format === "excel") return { table: null, supported: false, error: "EXCEL input parsing is not wired yet." };
   if (!text.startsWith(`${format}:`)) return { table: null, supported: true, error: `This isn't ${format}.` };
   const body = text.slice(format.length + 1);
   if (body.includes("BROKEN")) return { table: null, supported: true, error: "Unclosed quote." };
   return { table: { headers: ["value"], rows: body.split("|").map((cell) => [cell]) }, supported: true };
 }
 function serialize(format, table) {
-  if (format === "excel") return { text: "", supported: false };
   return { text: `${format}:${table.rows.map((row) => row[0]).join("|")}`, supported: true };
 }
 const placeholder = { headers: ["Column 1"], rows: [[""]] };
@@ -134,25 +133,100 @@ test("round 3: a new upload that doesn't read or parse never lends its name to t
 });
 
 test("round 2: an input the page can't read isn't rewritten from the previous table when the input format changes", () => {
-  // a.csv, then b.xlsx: Excel input can't be read, so no table; b.xlsx's
-  // bytes are in the input, so the name is b.xlsx's.
-  const b = run(afterA(), { type: "upload", name: "b.xlsx", ticket: 2 }, { type: "read", ticket: 2, text: "PK\u0003\u0004", format: "excel" });
-  assert.deepEqual([b.table, b.fileName], [null, "b.xlsx"]);
-  // CSV picked: b.xlsx's text is parsed as CSV, never a.csv's table.
+  // a.csv, then b.json that isn't JSON (round 2's was an XLSX read as text,
+  // before #266 read workbooks): no table; b.json's text is in the input,
+  // so the name is b.json's.
+  const b = run(afterA(), { type: "upload", name: "b.json", ticket: 2 }, { type: "read", ticket: 2, text: "PK\u0003\u0004", format: "json" });
+  assert.deepEqual([b.table, b.fileName], [null, "b.json"]);
+  // CSV picked: b.json's text is parsed as CSV, never a.csv's table.
   const asCsv = next(b, { type: "inputFormat", format: "csv" });
-  assert.deepEqual([asCsv.inputText, asCsv.table, asCsv.fileName], ["PK\u0003\u0004", null, "b.xlsx"]);
-  // b.xlsx holding CSV text parses once CSV is picked, under its own name.
+  assert.deepEqual([asCsv.inputText, asCsv.table, asCsv.fileName], ["PK\u0003\u0004", null, "b.json"]);
+  // b.json holding CSV text parses once CSV is picked, under its own name.
   // (Round 3 needed an exception for this; now it is the text's origin.)
-  const csvText = run(afterA(), { type: "upload", name: "b.xlsx", ticket: 2 }, { type: "read", ticket: 2, text: "csv:BBB_SECOND", format: "excel" });
+  const csvText = run(afterA(), { type: "upload", name: "b.json", ticket: 2 }, { type: "read", ticket: 2, text: "csv:BBB_SECOND", format: "json" });
   const picked = next(csvText, { type: "inputFormat", format: "csv" });
-  assert.deepEqual([cells(picked), picked.fileName], [["BBB_SECOND"], "b.xlsx"]);
-  // b.xlsx as the first upload: the placeholder isn't written into the input.
-  const first = run(start(), { type: "upload", name: "b.xlsx", ticket: 1 }, { type: "read", ticket: 1, text: "PK", format: "excel" });
+  assert.deepEqual([cells(picked), picked.fileName], [["BBB_SECOND"], "b.json"]);
+  // b.json as the first upload: the placeholder isn't written into the input.
+  const first = run(start(), { type: "upload", name: "b.json", ticket: 1 }, { type: "read", ticket: 1, text: "PK", format: "json" });
   const firstCsv = next(first, { type: "inputFormat", format: "csv" });
-  assert.deepEqual([firstCsv.inputText, firstCsv.table, firstCsv.fileName], ["PK", null, "b.xlsx"]);
+  assert.deepEqual([firstCsv.inputText, firstCsv.table, firstCsv.fileName], ["PK", null, "b.json"]);
   // A table on screen is rewritten in the new format and keeps its name.
   const json = next(afterA(), { type: "inputFormat", format: "json" });
   assert.deepEqual([json.inputText, cells(json), json.fileName], ["json:AAA_FIRST", ["AAA_FIRST"], "a.csv"]);
+});
+
+// An Excel workbook (#266), read in a worker into each sheet's text.
+const book = (prefix, count = 2, extra = {}) => ({
+  sheets: Array.from({ length: count }, (_, index) => ({ name: `Sheet${index + 1}`, text: `excel:${prefix}${index + 1}a|${prefix}${index + 1}b` })),
+  hidden: 1,
+  skipped: 0,
+  tooManyCells: [],
+  ...extra,
+});
+
+test("a workbook's first sheet arrives as an Excel input under the file's name; another sheet replaces it under the same name", () => {
+  const sheets = book("S", 3);
+  const read = run(afterA(), { type: "upload", name: "book.xlsx", ticket: 2 }, { type: "readWorkbook", ticket: 2, workbook: sheets });
+  assert.deepEqual([read.inputFormat, read.inputText, read.fileName, read.workbook.sheet, read.workbook.sheets], ["excel", "excel:S1a|S1b", "book.xlsx", 0, sheets.sheets]);
+  assert.equal(offeredDownload(read, "csv", { table: read.table, format: "csv" }).name, "book.csv");
+  const second = next(read, { type: "sheet", sheet: 1 });
+  assert.deepEqual([cells(second), second.fileName, second.workbook.sheet], [["S2a", "S2b"], "book.xlsx", 1]);
+  // A table afresh: the grid's edit of the first sheet's table, and an
+  // output written from it, are another table's.
+  assert.notEqual(second.origin, read.origin);
+  const staleEdit = { type: "editGrid", table: { headers: ["value"], rows: [["EDITED"]] }, origin: read.origin };
+  assert.equal(next(second, staleEdit), second);
+  assert.equal(offeredDownload(second, "excel", { table: read.table, format: "excel" }), null);
+  // Choosing the sheet shown, a sheet the workbook hasn't, or a sheet on
+  // another input format changes nothing.
+  assert.equal(next(second, { type: "sheet", sheet: 1 }), second);
+  assert.equal(next(second, { type: "sheet", sheet: 3 }), second);
+  const asCsv = next(second, { type: "inputFormat", format: "csv" });
+  assert.equal(next(asCsv, { type: "sheet", sheet: 0 }), asCsv);
+  // ...whose text is still the workbook's, so it keeps it for when Excel is
+  // picked again.
+  assert.deepEqual([asCsv.inputText, asCsv.fileName, asCsv.workbook.sheet], ["csv:S2a|S2b", "book.xlsx", 1]);
+  assert.equal(next(next(asCsv, { type: "inputFormat", format: "excel" }), { type: "sheet", sheet: 2 }).inputText, "excel:S3a|S3b");
+});
+
+test("a workbook stays with the input's text: edits keep it, text of the visitor's own, Clear or another file drop it", () => {
+  const read = run(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: book("S") });
+  const typed = next(read, { type: "type", text: "excel:S1a|S1b|TYPED" });
+  assert.deepEqual([typed.fileName, typed.workbook?.sheet], ["book.xlsx", 0]);
+  const edited = next(read, { type: "editGrid", table: { headers: ["value"], rows: [["G"]] }, origin: read.origin });
+  assert.deepEqual([edited.inputText, edited.fileName, edited.workbook?.sheet], ["excel:G", "book.xlsx", 0]);
+  // A typo keeps it too: the text is still the file's, and a sheet brings a table back.
+  const typo = next(read, { type: "type", text: "excel:S1a BROKEN" });
+  assert.deepEqual([typo.table, typo.fileName], [null, "book.xlsx"]);
+  assert.deepEqual(cells(next(typo, { type: "sheet", sheet: 1 })), ["S2a", "S2b"]);
+  // A file that can't be read leaves the input's text, so the workbook too.
+  const unreadable = run(read, { type: "upload", name: "old.xls", ticket: 2 }, { type: "readFailed", ticket: 2, error: "old.xls couldn't be read" });
+  assert.deepEqual([unreadable.table, unreadable.fileName, unreadable.workbook?.sheets.length], [null, "book.xlsx", 2]);
+  for (const dropped of [
+    next(read, { type: "type", text: "excel:PASTED", replacesInput: true }),
+    next(read, { type: "clear" }),
+    run(read, { type: "upload", name: "c.csv", ticket: 3 }, { type: "read", ticket: 3, text: "csv:C", format: "csv" }),
+  ]) {
+    assert.equal(dropped.workbook, null);
+    assert.equal(next(dropped, { type: "sheet", sheet: 1 }), dropped);
+  }
+});
+
+test("choosing a sheet while another file is read wins over it, as typing does; a late workbook read is dropped", () => {
+  const read = run(start("excel"), { type: "upload", name: "a.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: book("A") });
+  const reading = next(read, { type: "upload", name: "b.xlsx", ticket: 2 });
+  const chosen = next(reading, { type: "sheet", sheet: 1 });
+  assert.deepEqual([chosen.upload, chosen.fileName, cells(chosen)], [null, "a.xlsx", ["A2a", "A2b"]]);
+  assert.equal(next(chosen, { type: "readWorkbook", ticket: 2, workbook: book("B") }), chosen);
+  // b.xlsx read in time replaces a.xlsx, its first sheet shown.
+  const replaced = next(reading, { type: "readWorkbook", ticket: 2, workbook: book("B") });
+  assert.deepEqual([replaced.fileName, cells(replaced), replaced.workbook.sheet], ["b.xlsx", ["B1a", "B1b"], 0]);
+});
+
+test("a workbook with no sheet to show fails as an unreadable file: no table, the input's text keeps its name", () => {
+  const empty = run(afterA(), { type: "upload", name: "empty.xlsx", ticket: 2 }, { type: "readWorkbook", ticket: 2, workbook: book("E", 0) });
+  assert.deepEqual([empty.table, empty.fileName, empty.inputText, empty.workbook, empty.upload], [null, "a.csv", "csv:AAA_FIRST", null, null]);
+  assert.match(empty.error, /empty\.xlsx has no visible sheet/);
 });
 
 test("nothing is offered while a file is read, or while the input has an error", () => {
@@ -161,7 +235,7 @@ test("nothing is offered while a file is read, or while the input has an error",
   const page = { upload: null, error: null, table: tableA, outputFormat: "excel" };
   assert.equal(canOfferOutput(page, written), true);
   assert.equal(canOfferOutput({ ...page, upload: { name: "b.csv", ticket: 2 } }, written), false);
-  assert.equal(canOfferOutput({ ...page, error: "EXCEL input parsing is not wired yet." }, written), false);
+  assert.equal(canOfferOutput({ ...page, error: "Unclosed quote." }, written), false);
   assert.equal(canOfferOutput({ ...page, table: null }, written), false);
   assert.equal(canOfferOutput(page, null), false);
 });
@@ -180,18 +254,22 @@ test("an output written from the previous table or for another format isn't offe
 
 // Generated sequences. Each runs visitor actions and the page's asynchronous
 // work in a random order: uploads that read, can't be read, don't parse or
-// are in another format, finishing late and out of order; typing (edits,
-// typos and their fixes, pastes over all of the input, emptying it); grid
-// edits from a grid that may still show an earlier table; input and output
-// format switches; binary outputs that finish after the table changed;
-// clears. A reference model, kept here from the rules alone, follows the
-// same events: it holds its own input text and format, parses that text with
-// the stand-in to know whether there's a table, and tracks the text's origin
+// are in another format, finishing late and out of order; Excel workbooks
+// (#266) of one to three sheets, that can't be read, are over the reader's
+// limits, have no sheet to show or leave some sheets out; choosing a sheet,
+// while another file is read or not; typing (edits, typos and their fixes,
+// pastes over all of the input, emptying it); grid edits from a grid that
+// may still show an earlier table; input and output format switches; binary
+// outputs that finish after the table changed; clears. A reference model,
+// kept here from the rules alone, follows the same events: it holds its own
+// input text and format, parses that text with the stand-in to know whether
+// there's a table, and tracks the text's origin, the workbook it came from
 // and the upload still being read. It never reads the page's state. After
-// every step the test checks the page's input, table, error and name against
-// it, and that Download offers exactly what it should, under that name.
-const SEQUENCES = 5000;
-const STEPS = 40;
+// every step the test checks the page's input, table, error, name and
+// workbook against it, and that Download offers exactly what it should,
+// under that name.
+const SEQUENCES = 12000;
+const STEPS = 50;
 const SEED = 281249;
 
 function mulberry32(seed) {
@@ -207,7 +285,7 @@ function mulberry32(seed) {
 
 const ACTIONS = [
   ["upload", 3], ["finish", 4], ["type", 4], ["editGrid", 4], ["syncGrid", 3],
-  ["inputFormat", 2], ["outputFormat", 2], ["writeStart", 2], ["writeFinish", 2], ["clear", 1],
+  ["inputFormat", 2], ["outputFormat", 2], ["writeStart", 2], ["writeFinish", 2], ["clear", 1], ["sheet", 4],
 ];
 const INPUT_FORMATS = ["csv", "json", "excel"];
 const OUTPUT_FORMATS = ["json", "csv", "excel", "pdf"];
@@ -224,6 +302,9 @@ function newModel(format) {
     name: null,
     // The ticket of the upload still being read.
     pending: null,
+    // The workbook the text came from: its file, its sheets and the one
+    // whose text went into the input; null for any other text.
+    workbook: null,
     // The table the text parses into (the placeholder before any input),
     // or null; and whether the page shows an error.
     table: placeholder,
@@ -245,6 +326,7 @@ function reparse(model, { afresh = false } = {}) {
     model.table = placeholder;
     model.error = false;
     model.name = null;
+    model.workbook = null;
   } else {
     model.table = parse(model.format, model.text).table;
     model.error = !model.table;
@@ -279,20 +361,43 @@ function runSequence(rng, seen, log) {
     let event = null;
     if (action === "upload") {
       const id = (tickets += 1);
-      const detected = pick([...INPUT_FORMATS, null]);
-      const textFormat = detected === "excel" ? pick(["csv", "json"]) : detected ?? pick(["csv", "json"]);
-      const outcome = pick(["ok", "ok", "unparseable", "unreadable", "empty"]);
-      const name = `f${id}.${detected ? EXTENSIONS[detected] : "txt"}`;
-      const text = outcome === "empty" ? "" : `${textFormat}:F${id}a|F${id}b${outcome === "unparseable" ? " BROKEN" : ""}`;
-      reads.push({ name, ticket: id, text, format: detected, outcome });
+      const detected = pick([...INPUT_FORMATS, "excel", null]);
+      const name = `f${id}.${detected ? EXTENSIONS[detected] : "dat"}`;
+      // As the page decides when the file is chosen: Excel by its name or
+      // type, or nothing says otherwise and the input is Excel.
+      if (detected === "excel" || (detected === null && model.format === "excel")) {
+        const outcome = pick(["ok", "ok", "ok", "partial", "brokenSheet", "unreadable", "tooLarge", "noSheets"]);
+        const count = outcome === "noSheets" ? 0 : 1 + Math.floor(rng() * 3);
+        const broken = outcome === "brokenSheet" ? Math.floor(rng() * count) : -1;
+        const workbook = {
+          sheets: Array.from({ length: count }, (_, index) => ({
+            name: `S${index + 1}`,
+            text: `excel:W${id}s${index + 1}a|W${id}s${index + 1}b${index === broken ? " BROKEN" : ""}`,
+          })),
+          hidden: Math.floor(rng() * 2),
+          skipped: outcome === "partial" ? 1 : 0,
+          ...(outcome === "partial" ? { stop: "size" } : {}),
+          tooManyCells: outcome === "partial" ? ["Big"] : [],
+        };
+        reads.push({ name, ticket: id, workbook, outcome });
+      } else {
+        const textFormat = detected ?? pick(INPUT_FORMATS);
+        const outcome = pick(["ok", "ok", "unparseable", "unreadable", "empty"]);
+        const text = outcome === "empty" ? "" : `${textFormat}:F${id}a|F${id}b${outcome === "unparseable" ? " BROKEN" : ""}`;
+        reads.push({ name, ticket: id, text, format: detected, outcome });
+      }
       event = { type: "upload", name, ticket: id };
     } else if (action === "finish") {
       if (!reads.length) continue;
       // Any read may finish next: a slow earlier one can finish last.
       const read = reads.splice(Math.floor(rng() * reads.length), 1)[0];
-      event = read.outcome === "unreadable"
-        ? { type: "readFailed", ticket: read.ticket, error: `${read.name} couldn't be read` }
-        : { type: "read", ticket: read.ticket, text: read.text, format: read.format };
+      if (read.outcome === "unreadable" || read.outcome === "tooLarge") {
+        event = { type: "readFailed", ticket: read.ticket, error: `${read.name} couldn't be read` };
+      } else if (read.workbook) {
+        event = { type: "readWorkbook", ticket: read.ticket, workbook: read.workbook };
+      } else {
+        event = { type: "read", ticket: read.ticket, text: read.text, format: read.format };
+      }
       event.file = read;
     } else if (action === "type") {
       cellCount += 1;
@@ -338,12 +443,16 @@ function runSequence(rng, seen, log) {
       log.push(`write finish (${written.name ?? "no file"})`);
     } else if (action === "clear") {
       event = { type: "clear" };
+    } else if (action === "sheet") {
+      // The picker's choice: any sheet, or the one shown; and, as a stale
+      // or stray event would, one the workbook hasn't.
+      event = { type: "sheet", sheet: Math.floor(rng() * ((model.workbook?.sheets.length ?? 1) + 1)) };
     }
 
     if (event) {
       const { file, ...pageEvent } = event;
       const before = state;
-      const had = { table: model.table, name: model.name };
+      const had = { table: model.table, name: model.name, workbook: model.workbook, pending: model.pending };
       log.push(JSON.stringify(pageEvent));
       state = next(before, pageEvent);
       const unchanged = () => assert.equal(state, before, "the event changes nothing");
@@ -353,6 +462,7 @@ function runSequence(rng, seen, log) {
           model.pending = event.ticket;
           break;
         case "read":
+        case "readWorkbook":
         case "readFailed":
           if (model.pending !== event.ticket) {
             seen.droppedReads += 1;
@@ -360,30 +470,66 @@ function runSequence(rng, seen, log) {
             break;
           }
           model.pending = null;
-          if (event.type === "readFailed") {
-            // The input keeps its text and origin; the table goes.
+          if (event.type === "readFailed" || (event.type === "readWorkbook" && !file.workbook.sheets.length)) {
+            // The input keeps its text and origin, and the workbook that
+            // text came from; the table goes.
             seen.unreadable += 1;
             if (model.name) seen.unreadableKeepsName += 1;
+            if (model.workbook) seen.unreadableKeepsWorkbook += 1;
+            if (file.workbook) seen.workbookFailures += 1;
             model.table = null;
             model.error = true;
             model.version += 1;
             model.lineage = {};
             break;
           }
-          // The file's text is in the input: it's the file's.
-          model.text = event.text;
-          model.format = event.format ?? model.format;
+          if (event.type === "readWorkbook") {
+            // The first sheet's text is in the input, as an Excel input's:
+            // it's the file's, and so is the workbook.
+            model.text = file.workbook.sheets[0].text;
+            model.format = "excel";
+            model.workbook = { file: file.name, sheets: file.workbook.sheets, sheet: 0 };
+            seen.workbookReads += 1;
+          } else {
+            // The file's text is in the input: it's the file's.
+            model.text = event.text;
+            model.format = event.format ?? model.format;
+            model.workbook = null;
+          }
           model.userInput = true;
           model.name = file.name;
           reparse(model, { afresh: true });
           if (model.table) seen.readOk += 1;
           else seen.readUnparseable += 1;
           break;
+        case "sheet": {
+          // Only another sheet of the workbook the Excel input's text came
+          // from replaces it.
+          const { workbook } = model;
+          if (!workbook || model.format !== "excel" || event.sheet >= workbook.sheets.length || event.sheet === workbook.sheet) {
+            seen.ignoredSheets += 1;
+            unchanged();
+            break;
+          }
+          // Like typing, it wins over a file still being read.
+          if (model.pending !== null) seen.sheetWinsOverRead += 1;
+          seen.sheetSwitches += 1;
+          model.pending = null;
+          model.workbook = { ...workbook, sheet: event.sheet };
+          model.text = workbook.sheets[event.sheet].text;
+          model.userInput = true;
+          reparse(model, { afresh: true });
+          break;
+        }
         case "type":
           model.pending = null;
           // Text replacing all of the input, or typed into an empty one, is
           // the visitor's own; anything else edits the text that was there.
-          if (event.replacesInput || !model.text.trim()) model.name = null;
+          if (event.replacesInput || !model.text.trim()) {
+            if (model.workbook) seen.ownTextDropsWorkbook += 1;
+            model.name = null;
+            model.workbook = null;
+          }
           model.text = event.text;
           model.userInput = true;
           reparse(model);
@@ -431,6 +577,7 @@ function runSequence(rng, seen, log) {
           model.text = "";
           model.userInput = false;
           model.name = null;
+          model.workbook = null;
           model.table = placeholder;
           model.error = false;
           model.version += 1;
@@ -449,6 +596,9 @@ function runSequence(rng, seen, log) {
     if (model.table === placeholder) assert.equal(state.table, placeholder);
     assert.equal(Boolean(state.error), model.error, "an error exactly when there's no table");
     assert.equal(state.fileName, model.name, "the name is the origin of the model's text");
+    assert.equal(state.workbook?.sheets ?? null, model.workbook?.sheets ?? null, "the workbook is the one the text came from");
+    assert.equal(state.workbook?.sheet ?? null, model.workbook?.sheet ?? null, "the sheet is the one whose text went in last");
+    if (model.workbook) assert.equal(state.fileName, model.workbook.file, "a workbook is there only under its own file's name");
 
     // Download: a text output is serialized from the table as the page
     // renders; a binary one is whatever write finished last. It's offered
@@ -474,6 +624,8 @@ test(`the name and the offered download always describe the table on screen (${S
   const seen = {
     readOk: 0, readUnparseable: 0, unreadable: 0, unreadableKeepsName: 0, droppedReads: 0, edits: 0, staleEdits: 0,
     editsWithoutTable: 0, typoKeepsName: 0, fixKeepsName: 0, replacedNamed: 0, formatTakesFileName: 0, namedOffers: 0,
+    workbookReads: 0, workbookFailures: 0, unreadableKeepsWorkbook: 0, sheetSwitches: 0, sheetWinsOverRead: 0,
+    ignoredSheets: 0, ownTextDropsWorkbook: 0,
   };
   for (let sequence = 0; sequence < SEQUENCES; sequence += 1) {
     const log = [];

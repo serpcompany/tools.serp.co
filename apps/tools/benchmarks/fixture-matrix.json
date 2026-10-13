@@ -287,8 +287,8 @@
       "format": "excel",
       "status": "ready",
       "input": "file",
-      "fixture": "fixtures/sample.xlsx",
-      "notes": "The table page's Excel input takes .xlsx files: the xlsx fixture."
+      "fixture": "fixtures/sample-sheets.xlsx",
+      "notes": "The table page's Excel input takes .xlsx files (#266): the three-sheet XLSX fixture that XLSX to an image uses (see xlsx-to-jpg in toolFixtures), so a pass shows its first visible sheet, Sales, as Excel shows it (dates, currency, percentages, a formula's saved result: TEXT_MARKERS in scripts/lib/tool-sweep.mjs) and nothing hidden (HIDDEN_TEXT there)."
     },
     {
       "format": "exr",

@@ -1,7 +1,8 @@
 import Papa from "papaparse";
 import { markdownTable } from "markdown-table";
 import YAML from "yaml";
-import { normalizeTable, parseCsvTable } from "@/lib/convert/table-data";
+import { writeExcelCells } from "@/lib/convert/excel-cells";
+import { normalizeTable, parseCsvTable, parseExcelCells } from "@/lib/convert/table-data";
 import { InputFormat, OutputFormat, TableData } from "./types";
 
 type AnyFormat = InputFormat | OutputFormat;
@@ -947,6 +948,14 @@ export function serializeOutput(format: AnyFormat, table: TableData): SerializeR
   }
 }
 
+// The table as an input format's text, for the input panel: Excel's is the
+// cells as Excel copies them, which parseInput reads back; an Excel output
+// is a file instead (lib/convert/table-outputs.ts).
+export function serializeInput(format: InputFormat, table: TableData): SerializeResult {
+  if (format === "excel") return { text: writeExcelCells(table), supported: true };
+  return serializeOutput(format, table);
+}
+
 export function parseInput(format: InputFormat, text: string): ParseResult {
   if (!text.trim()) {
     return { table: null, supported: true, error: "Paste or upload data to begin." };
@@ -969,12 +978,10 @@ export function parseInput(format: InputFormat, text: string): ParseResult {
         return { ...parseSql(text), supported: true };
       case "latex":
         return { ...parseLatex(text), supported: true };
+      // Cells as Excel copies them: pasted, or a sheet of an uploaded
+      // workbook (TableConvertDemo reads it in a worker).
       case "excel":
-        return {
-          table: null,
-          supported: false,
-          error: `${format.toUpperCase()} input parsing is not wired yet.`,
-        };
+        return { ...parseExcelCells(text), supported: true };
       case "mysql":
         return { ...parseMySql(text), supported: true };
       case "mediawiki":
