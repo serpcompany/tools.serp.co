@@ -9,7 +9,7 @@ import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetization
 import { detectCapabilities, type Capabilities } from "@/lib/capabilities";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { CODEC_UNSUPPORTED } from "@/lib/convert/webcodecs";
-import { compressFile, convertWithWorker, getOutputMimeType } from "@/lib/convert/workerClient";
+import { compressFile, convertWithWorker, getOutputMimeType, multipleOutputName } from "@/lib/convert/workerClient";
 import { resolveCompressionTarget } from "@/lib/compression-utils";
 import type { OperationType } from "@/types";
 
@@ -168,7 +168,7 @@ export default function LanderHeroTwoColumn({
           const mimeType = getOutputMimeType(to);
           result.buffers.forEach((buffer, i) => {
             const blob = new Blob([buffer], { type: mimeType });
-            const name = file.name.replace(/\.[^.]+$/, "") + `_page${i + 1}.${to}`;
+            const name = multipleOutputName(file.name, to, i, result.names);
             saveBlob(blob, name);
           });
           run.finishSuccess({

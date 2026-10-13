@@ -3,8 +3,10 @@ import assert from "node:assert/strict";
 
 import {
   BUILT_IN_FORMATS,
+  closestFraction,
   dateParts,
   formatCellNumber,
+  formatCellText,
   formatGeneral,
   isDateFormat,
   splitSections,
@@ -117,4 +119,63 @@ test("date formats are told from number formats", () => {
 
 test("sections split at semicolons outside quotes and escapes", () => {
   assert.deepEqual(splitSections('0;"a;b";\\;0'), ["0", '"a;b"', "\\;0"]);
+});
+
+test("a section left empty shows nothing, as Excel hides values with it", () => {
+  // ";;;" hides every value; "0;-0;;@" zeros; "0;;0" negative numbers.
+  for (const value of [5, -5, 0, 0.25]) assert.equal(formatCellNumber(value, ";;;"), "", `${value}`);
+  assert.equal(formatCellNumber(0, "0;-0;;@"), "");
+  assert.equal(formatCellNumber(5, "0;-0;;@"), "5");
+  assert.equal(formatCellNumber(-5, "0;-0;;@"), "-5");
+  assert.equal(formatCellNumber(-5, "0;;0"), "");
+  assert.equal(formatCellNumber(0, "0;;0"), "0");
+  assert.equal(formatCellNumber(-5, "0;"), "");
+  assert.equal(formatCellNumber(5, "0;"), "5");
+  assert.equal(formatCellNumber(-5, "[<0];0"), "");
+  // A last text section isn't a number section: negatives keep the first.
+  assert.equal(formatCellNumber(-5, "0.00;@"), "-5.00");
+  assert.equal(formatCellNumber(5, '"Name: "@'), "5");
+});
+
+test("text shows through the format's text section", () => {
+  assert.equal(formatCellText("secret text", ";;;"), "");
+  assert.equal(formatCellText("a", "0;-0;;@"), "a");
+  assert.equal(formatCellText("a", "0;-0;0;"), "");
+  assert.equal(formatCellText("a", '0;0;0;"x"@"y"'), "xay");
+  assert.equal(formatCellText("a", '"Name: "@'), "Name: a");
+  assert.equal(formatCellText("a", "0.00;@\\!"), "a!");
+  assert.equal(formatCellText("a", "0;0;0;General"), "a");
+  // No text section: the text as it is.
+  assert.equal(formatCellText("a", "0.00"), "a");
+  assert.equal(formatCellText("a", "0;-0;0"), "a");
+  assert.equal(formatCellText("TRUE", "General"), "TRUE");
+});
+
+test("fractions show as fractions", () => {
+  const cases = [
+    [1.5, BUILT_IN_FORMATS[12], "1 1/2"],
+    [1.5, BUILT_IN_FORMATS[13], "1  1/2 "],
+    [Math.PI, "# ?/?", "3 1/7"],
+    [Math.PI, "# ??/??", "3 14/99"],
+    [Math.PI, "# ???/???", "3  16/113"],
+    [0.5, "# ?/?", "1/2"],
+    [0.5, "?/4", "2/4"],
+    [0.75, "# ?/4", "3/4"],
+    [2.3, "# ?/8", "2 2/8"],
+    [1.25, "# ??/100", "1 25/100"],
+    [1.5, "?/?", "3/2"],
+    [0, "?/?", "0/1"],
+    [12.5, '0 ?/?" in"', "12 1/2 in"],
+    [1234.5, "#,##0 ?/?", "1,234 1/2"],
+    [-1.5, "# ?/?", "-1 1/2"],
+  ];
+  for (const [value, code, expected] of cases) assert.equal(formatCellNumber(value, code), expected, `${value} in ${code}`);
+  // A whole number keeps the fraction's width in spaces; 0.999 rounds up.
+  assert.equal(formatCellNumber(2, "# ?/?"), "2    ");
+  assert.equal(formatCellNumber(0.999, "# ?/?"), "1    ");
+  assert.equal(formatCellNumber(0, "# ?/?"), "0    ");
+  assert.deepEqual(closestFraction(0.333333, 9), [1, 3]);
+  assert.deepEqual(closestFraction(0.14159265, 9), [1, 7]);
+  // Dates keep their slashes.
+  assert.equal(formatCellNumber(46095, "m/d/yyyy"), "3/14/2026");
 });

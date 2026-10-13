@@ -19,9 +19,17 @@ export type ConversionOp = "raster" | "pdf-pages" | "video";
 
 // A notice says what the visitor should know about the file, such as the
 // rows a table image leaves out.
+// Several outputs are saved as "<name>_page1", "<name>_page2"... in order,
+// unless `names` gives each its own label (a slide's number, "slide3"; a
+// sheet's name), already safe in a file name.
 export type ConversionResult =
   | { kind: "single"; buffer: ArrayBuffer; notice?: string }
-  | { kind: "multiple"; buffers: ArrayBuffer[]; notice?: string };
+  | { kind: "multiple"; buffers: ArrayBuffer[]; names?: string[]; notice?: string };
+
+// The name output `index` of several is saved under.
+export function multipleOutputName(fileName: string, to: string, index: number, names?: string[]): string {
+  return `${fileName.replace(/\.[^.]+$/, "")}_${names?.[index] ?? `page${index + 1}`}.${to}`;
+}
 
 export type ProgressUpdate = {
   status?: string;
@@ -297,11 +305,11 @@ async function convertTableToImage(from: string, to: string, args: ConvertArgs):
   }
 }
 
-// DOCX, DXF, HTML, TXT, DOT or XLSX to an image (document-images.ts), on the
-// main thread: a picture of each DOCX page or XLSX sheet, of the DXF
-// drawing, the HTML page, the text or the graph. A browser without WebGL
-// can't draw DXF, and a graph whose layout runs too long is stopped; each is
-// its own error code.
+// DOCX, DXF, HTML, TXT, DOT, XLSX or PPTX to an image (document-images.ts):
+// a picture of each DOCX page, XLSX sheet or PPTX slide, of the DXF drawing,
+// the HTML page, the text or the graph. A browser without WebGL can't draw
+// DXF, and a graph, workbook or presentation that takes too long is
+// stopped; each is its own error code.
 async function convertDocumentToImage(from: string, to: string, args: ConvertArgs): Promise<ConversionResult> {
   try {
     const { convertDocumentToImages } = await import("./document-images.ts");

@@ -4,19 +4,32 @@
 // with the visitor's fonts when the SVG becomes an image, so no font file is
 // fetched; pictures the file holds are inlined as data: URLs.
 
-import { convertPptxToSvg } from "pptx-glimpse";
+import { readPptx } from "@pptx-glimpse/document";
+import { renderPptxSourceModelToSvg } from "pptx-glimpse";
 
-export type PptxJob = { bytes: ArrayBuffer; slides: number[] };
+// The slide parts to draw (pptx-slides.ts chose them: the ones not hidden).
+export type PptxJob = { bytes: ArrayBuffer; parts: string[] };
 export type PptxReply =
-  | { ok: true; slides: { number: number; svg: string }[]; skipped: number }
+  | { ok: true; slides: { number: number; part: string; svg: string }[]; skipped: number }
   | { ok: false; error: string };
 
-// The slides `job.slides` names (1-based, in the presentation's order) as
-// SVG, and how many elements pptx-glimpse couldn't draw.
+// The slides at `job.parts` as SVG, each with the number pptx-glimpse gives
+// it (its place in pptx-glimpse's own slide list, from 1) and its part, and
+// how many elements pptx-glimpse couldn't draw. The numbers come from
+// pptx-glimpse's list, not the page's, so the slide drawn is always the part
+// asked for; a part it doesn't list fails the job rather than drawing
+// another slide.
 export async function renderSlideSvgs(job: PptxJob): Promise<PptxReply> {
   try {
-    const report = await convertPptxToSvg(new Uint8Array(job.bytes), {
-      slides: job.slides,
+    const source = readPptx(new Uint8Array(job.bytes));
+    const order = source.presentation.slidePartPaths as readonly string[];
+    const wanted = new Set(job.parts);
+    if (job.parts.some((part) => !order.includes(part))) {
+      return { ok: false, error: "its slides aren't all where its slide list says" };
+    }
+    const numbers = order.flatMap((part, index) => (wanted.has(part) ? [index + 1] : []));
+    const report = await renderPptxSourceModelToSvg(source, {
+      slides: numbers,
       textOutput: "text",
       logLevel: "off",
       // Node only (tests): no scan of the machine's fonts.
@@ -24,7 +37,9 @@ export async function renderSlideSvgs(job: PptxJob): Promise<PptxReply> {
     });
     return {
       ok: true,
-      slides: report.slides.map((slide) => ({ number: slide.slideNumber, svg: slide.svg })),
+      slides: report.slides
+        .filter((slide) => wanted.has(order[slide.slideNumber - 1] ?? ""))
+        .map((slide) => ({ number: slide.slideNumber, part: order[slide.slideNumber - 1]!, svg: slide.svg })),
       skipped: report.supportCoverage.overall.skippedElements + report.supportCoverage.overall.unresolvedElements,
     };
   } catch (error) {

@@ -26,11 +26,13 @@ import {
   resolveCounterContent,
   spansAcross,
   splitRow,
+  fileNameLabels,
   workbookNotice,
 } from "./document-images.ts";
 import { DOCUMENT_IMAGE_ENGINES, isDocumentImageConversion } from "./image-document-targets.ts";
 import { PDF_FONT_URL } from "./table-outputs.ts";
-import { convertWithWorker } from "./workerClient.ts";
+import { convertWithWorker, multipleOutputName } from "./workerClient.ts";
+import { readWorkbookJob } from "./xlsx.worker.ts";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const bytes = (text) => new TextEncoder().encode(text);
@@ -74,7 +76,7 @@ test("DOCX, DXF, HTML, TXT, DOT, XLSX and PPTX to an image route to document-ima
   });
 });
 
-test("the converter sends these files to document-images.ts, not the image decoder", async () => {
+test("the converter sends these files to document-images.ts, not the image decoder", async (t) => {
   // Node has no DOM, so each run fails inside the renderer, and its error
   // names that renderer's engine; the raster path would name "worker".
   for (const [from, to, engine] of [
@@ -91,6 +93,15 @@ test("the converter sends these files to document-images.ts, not the image decod
     convertWithWorker({ worker: undefined, from: "html", to: "gif", buf: bytes("  \n").buffer }),
     (error) => error.message === "This HTML file is empty." && error.telemetryMetadata.engine === "html-render",
   );
+  // XLSX is read in a worker: here, one that runs the worker's job in Node.
+  const previousWorker = globalThis.Worker;
+  globalThis.Worker = class {
+    postMessage(job) {
+      setTimeout(() => this.onmessage?.({ data: readWorkbookJob(job) }));
+    }
+    terminate() {}
+  };
+  t.after(() => (globalThis.Worker = previousWorker));
   for (const [from, to, input, message, engine] of [
     ["txt", "png", " \n\t\n", "This text file is empty: there's no text to draw.", "text-render"],
     ["dot", "jpg", "\n", "This DOT file is empty.", "viz-js"],
@@ -362,7 +373,30 @@ test("the page says which image is which sheet, and what each leaves out", () =>
   assert.equal(workbookNotice(["Only"], [], 0), undefined);
   assert.equal(
     workbookNotice(["Sales", "Notes"], ["Sales: Showing the first 54 of 9,999 rows."], 1),
-    "One image a sheet, in the workbook's order: Sales, Notes. Sales: Showing the first 54 of 9,999 rows. An image holds what fits in 4096 pixels. 1 hidden sheet isn't drawn.",
+    "One image a sheet, named after it, in the workbook's order: Sales, Notes. Sales: Showing the first 54 of 9,999 rows. An image holds what fits in 4096 pixels. 1 hidden sheet isn't drawn.",
   );
-  assert.equal(workbookNotice(["A", "B"], [], 2, 5), "One image a sheet, in the workbook's order: A, B. 5 more sheets aren't drawn: one workbook gives at most 100 images here. 2 hidden sheets aren't drawn.");
+  assert.equal(
+    workbookNotice(["A", "B"], [], 2, 5),
+    "One image a sheet, named after it, in the workbook's order: A, B. 5 more sheets aren't drawn: one workbook gives at most 100 images here. 2 hidden sheets aren't drawn.",
+  );
+  assert.equal(
+    workbookNotice(["A", "B"], [], 0, 1, "size"),
+    "One image a sheet, named after it, in the workbook's order: A, B. 1 more sheet isn't drawn: the workbook holds more cells than one conversion reads here.",
+  );
+});
+
+test("several images are saved under their sheet's name or slide's number, others by page", () => {
+  assert.deepEqual(fileNameLabels(["Sales", "Q1/Q2: costs?", "sales", " ..Notes.. ", "", "a\u202Egnp.exe", "x".repeat(80)], (index) => `sheet${index + 1}`), [
+    "Sales",
+    "Q1_Q2_ costs_",
+    "sales_2",
+    "Notes",
+    "sheet5",
+    "a_gnp.exe",
+    "x".repeat(60),
+  ]);
+  assert.equal(multipleOutputName("deck.pptx", "png", 0, ["slide3"]), "deck_slide3.png");
+  assert.equal(multipleOutputName("book.v2.xlsx", "jpg", 1, ["Sales", "Costs"]), "book.v2_Costs.jpg");
+  // Other converters (DOCX and PDF pages) keep their page numbers.
+  assert.equal(multipleOutputName("report.docx", "png", 1), "report_page2.png");
 });

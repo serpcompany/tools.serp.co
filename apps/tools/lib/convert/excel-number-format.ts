@@ -1,10 +1,12 @@
 // A number in an XLSX cell as Excel shows it, from the cell's number format
 // (issue #265): General, decimals, thousands separators, percentages,
-// scientific notation, currency and other literal text, dates and times.
-// A workbook stores numbers, not the text a cell shows, so a picture of a
-// sheet needs this to show "12%" and "3/14/2026" rather than 0.12 and 46095.
-// Fractions ("# ?/?") are shown as decimals, and conditions ("[>100]") pick
-// a section as Excel does for the common forms only.
+// scientific notation, fractions, currency and other literal text, dates and
+// times; and text in the format's text section. A workbook stores numbers,
+// not the text a cell shows, so a picture of a sheet needs this to show
+// "12%" and "3/14/2026" rather than 0.12 and 46095. A section left empty
+// shows nothing, as in Excel (";;;" hides a cell's value, "0;-0;;@" its
+// zeros), and conditions ("[>100]") pick a section as Excel does for the
+// common forms only.
 
 // Excel's built-in formats, by id; a workbook names only the formats it
 // adds (ids 164 and up). Dates and currencies follow Excel's en-US locale.
@@ -246,6 +248,100 @@ function formatNumberSection(value: number, tokens: Token[]): string {
   return `${before}${text}${after}`;
 }
 
+// A fraction section ("# ?/?", "# ??/??", "?/4", "0 ?/8"): the number as a
+// whole part and a fraction, or as one fraction when the format has no
+// whole part. A denominator of placeholders takes the closest fraction with
+// that many digits at most; a written one ("/4", "/100") is fixed and not
+// reduced (0.5 in "?/4" is "2/4"). Null when `tokens` isn't a fraction.
+function formatFractionSection(value: number, tokens: Token[]): string | null {
+  const isCode = (index: number, pattern: RegExp) => tokens[index]?.kind === "code" && pattern.test(tokens[index]!.text);
+  const SPACE = /^ $/;
+  const slash = tokens.findIndex((token, index) => {
+    if (token.kind !== "code" || token.text !== "/") return false;
+    let before = index - 1;
+    while (isCode(before, SPACE)) before -= 1;
+    let after = index + 1;
+    while (isCode(after, SPACE)) after += 1;
+    return isPlaceholder(tokens[before]) && isCode(after, /^[0-9#?]$/);
+  });
+  if (slash === -1) return null;
+  // The numerator's placeholders, right before the slash.
+  let index = slash - 1;
+  while (isCode(index, SPACE)) index -= 1;
+  const numeratorEnd = index;
+  while (isPlaceholder(tokens[index])) index -= 1;
+  const numeratorStart = index + 1;
+  // A whole part: placeholders, then at least one space, before the
+  // numerator.
+  while (isCode(index, SPACE)) index -= 1;
+  const hasWhole = index < numeratorStart - 1 && isPlaceholder(tokens[index]);
+  const wholeEnd = hasWhole ? index : numeratorStart;
+  if (hasWhole) while (isPlaceholder(tokens[index]) || isCode(index, /^,$/)) index -= 1;
+  const wholeStart = hasWhole ? index + 1 : numeratorStart;
+  // The denominator: placeholders, or digits written out.
+  let end = slash + 1;
+  while (isCode(end, SPACE)) end += 1;
+  const denominatorStart = end;
+  while (isCode(end, /^[0-9#?]$/)) end += 1;
+  const text = (from: number, to: number) => tokens.slice(from, to).map((token) => token.text).join("");
+  const wholeCodes = text(wholeStart, wholeEnd + (hasWhole ? 1 : 0));
+  const numeratorCodes = text(numeratorStart, numeratorEnd + 1);
+  const denominatorCodes = text(denominatorStart, end);
+
+  const fixed = /^[1-9]\d*$/.test(denominatorCodes) ? Number(denominatorCodes) : null;
+  let whole = hasWhole ? Math.floor(value) : 0;
+  const rest = value - whole;
+  let numerator: number;
+  let denominator: number;
+  if (fixed) [numerator, denominator] = [Math.round(rest * fixed), fixed];
+  else [numerator, denominator] = closestFraction(rest, 10 ** Math.min(7, denominatorCodes.length) - 1);
+  if (hasWhole && numerator === denominator) [whole, numerator] = [whole + 1, 0];
+
+  // "?" pads with a space, "0" with a zero; the numerator is right-aligned,
+  // the denominator left-aligned, as Excel lines fractions up.
+  const pad = (digits: string, codes: string, left: boolean) => {
+    const width = codes.replace(/#/g, "").length;
+    if (digits.length >= width) return digits;
+    const fill = codes.includes("0") ? "0" : " ";
+    return left ? digits.padStart(width, fill) : digits.padEnd(width, " ");
+  };
+  let wholeText = "";
+  if (hasWhole) {
+    wholeText = whole === 0 ? (numerator === 0 || wholeCodes.includes("0") ? "0" : "") : String(whole);
+    if (/[0#?],+[0#?]/.test(wholeCodes)) wholeText = groupThousands(wholeText);
+  }
+  // The slash and any spaces around it, as the format writes them.
+  const separator = text(numeratorEnd + 1, denominatorStart);
+  const fraction =
+    hasWhole && numerator === 0
+      ? " ".repeat(numeratorCodes.length + separator.length + denominatorCodes.length)
+      : `${pad(String(numerator), numeratorCodes, true)}${separator}${fixed ? String(denominator) : pad(String(denominator), denominatorCodes, false)}`;
+  const between = hasWhole && wholeText ? text(wholeEnd + 1, numeratorStart) : "";
+  return `${text(0, wholeStart)}${wholeText}${between}${fraction}${text(end, tokens.length)}`;
+}
+
+// The fraction closest to `value` (0 to 1, or more for a fraction with no
+// whole part) whose denominator is at most `maxDenominator`: continued
+// fractions, with the best semiconvergent at the limit.
+export function closestFraction(value: number, maxDenominator: number): [number, number] {
+  let [p0, q0, p1, q1] = [0, 1, 1, 0];
+  let rest = value;
+  for (let step = 0; step < 64; step += 1) {
+    const term = Math.floor(rest);
+    const q2 = q0 + term * q1;
+    if (q2 > maxDenominator) {
+      const k = Math.floor((maxDenominator - q0) / q1);
+      const [p, q] = [p0 + k * p1, q0 + k * q1];
+      return Math.abs(value - p / q) < Math.abs(value - p1 / q1) ? [p, q] : [p1, q1];
+    }
+    [p0, q0, p1, q1] = [p1, q1, p0 + term * p1, q2];
+    const fraction = rest - term;
+    if (fraction < 1e-10) break;
+    rest = 1 / fraction;
+  }
+  return [p1, q1];
+}
+
 // ----------------------------------------------------------------- dates --
 
 export type DateParts = {
@@ -393,9 +489,21 @@ function formatDateSection(value: number, tokens: Token[], date1904: boolean): s
     .join("");
 }
 
+// A section that formats text: it holds an "@" outside quotes.
+const isTextSection = (section: string) => tokenize(section).some((token) => token.kind === "code" && token.text === "@");
+
+// The sections that format numbers: positive; negative; zero. A last
+// section that formats text, in a code of fewer than four ("0.00;@"),
+// isn't one of them.
+function numberSections(sections: string[]): string[] {
+  return sections.length < 4 && isTextSection(sections[sections.length - 1]!) ? sections.slice(0, -1) : sections.slice(0, 3);
+}
+
 // The text a number cell shows in `code`'s format.
 export function formatCellNumber(value: number, code: string, date1904 = false): string {
-  const sections = splitSections(code || "General");
+  const all = splitSections(code || "General");
+  const sections = numberSections(all);
+  if (!sections.length) return formatGeneral(value);
   // Sections with conditions ("[>=100]") apply where the condition holds.
   const conditional = sections.map((section) => /\[(<=|>=|<>|<|>|=)(-?[\d.]+)\]/.exec(section));
   let section: string;
@@ -417,7 +525,7 @@ export function formatCellNumber(value: number, code: string, date1904 = false):
     const fallback = conditional.findIndex((match, position) => !match && position < 3);
     section = sections[index !== -1 ? index : fallback !== -1 ? fallback : 0]!.replace(/\[(<=|>=|<>|<|>|=)-?[\d.]+\]/, "");
     if (index === -1 && value < 0) shown = Math.abs(value);
-  } else if (value < 0 && sections.length >= 2 && sections[1]!.trim() !== "") {
+  } else if (value < 0 && sections.length >= 2) {
     section = sections[1]!;
     shown = Math.abs(value);
   } else if (value === 0 && sections.length >= 3) {
@@ -425,12 +533,29 @@ export function formatCellNumber(value: number, code: string, date1904 = false):
   } else {
     section = sections[0]!;
   }
+  // A section left empty shows nothing: ";;;" hides every value, "0;-0;;@"
+  // zeros, "0;;0" negative numbers.
+  if (section === "" && all.length > 1) return "";
   const tokens = tokenize(section);
-  if (/^\s*General\s*$/i.test(section) || !tokens.length) return formatGeneral(value);
+  if (/^\s*General\s*$/i.test(section) || !tokens.length) return formatGeneral(shown);
   if (isDateFormat(section)) {
     return formatDateSection(shown, tokens, date1904);
   }
-  const text = formatNumberSection(Math.abs(shown), tokens);
+  const text = formatFractionSection(Math.abs(shown), tokens) ?? formatNumberSection(Math.abs(shown), tokens);
   // One section: a negative number gets its minus sign in front.
   return shown < 0 && !/^-?0?\.?0*$/.test(text.replace(/[^\d.-]/g, "")) ? `-${text}` : text;
+}
+
+// The text a text cell (or TRUE/FALSE) shows in `code`'s format: the text
+// section, the fourth or a last one with "@" ('"Name: "@'), with each "@"
+// replaced by the text; an empty one hides it (";;;"). A code with no text
+// section shows the text as it is.
+export function formatCellText(text: string, code: string): string {
+  const sections = splitSections(code || "General");
+  const last = sections[sections.length - 1]!;
+  const section = sections.length >= 4 ? sections[3]! : isTextSection(last) ? last : null;
+  if (section === null || /^\s*General\s*$/i.test(section)) return text;
+  return tokenize(section)
+    .map((token) => (token.kind === "code" && token.text === "@" ? text : token.text))
+    .join("");
 }

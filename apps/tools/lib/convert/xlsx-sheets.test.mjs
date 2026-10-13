@@ -9,9 +9,12 @@ import { layoutTableImage } from "./table-image.ts";
 import {
   KEPT_COLUMNS,
   KEPT_ROWS,
+  MAX_COLUMNS,
   MAX_PART_BYTES,
+  MAX_ROWS,
   MAX_SHEETS,
   cellPosition,
+  cellText,
   decodeExcelEscapes,
   parseSharedStrings,
   parseSheet,
@@ -20,6 +23,8 @@ import {
   sheetTable,
 } from "./xlsx-sheets.ts";
 import { resolvePart } from "./ooxml.ts";
+import { WORKBOOK_TIMEOUT_MS, readWorkbookInWorker } from "./xlsx-workbook.ts";
+import { readWorkbookJob } from "./xlsx.worker.ts";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
 
@@ -235,4 +240,136 @@ test("old XLS files, broken files and parts bigger than the limit are refused", 
     }
   }
   assert.throws(() => readWorkbookSheets(bytes.buffer), /too large to draw here/);
+});
+
+test("row and cell numbers outside Excel's grid are left out, and can't keep the reader busy", () => {
+  assert.deepEqual(cellPosition("XFD1048576"), { row: MAX_ROWS - 1, column: MAX_COLUMNS - 1 });
+  for (const reference of ["XFE1", "ZZZ1", "A0", "A1048577", "A99999999999", "A" + "9".repeat(400)]) assert.equal(cellPosition(reference), null, reference);
+  const started = Date.now();
+  for (const [row, label] of [
+    ['<row r="Infinity"><c><v>2</v></c></row>', "Infinity"],
+    ['<row r="200000000"><c r="A200000000"><v>2</v></c></row>', "200,000,000"],
+    ['<row r="0"><c><v>2</v></c></row>', "0"],
+    ['<row r="-3"><c><v>2</v></c></row>', "-3"],
+    ['<row r="1.5"><c><v>2</v></c></row>', "1.5"],
+    ['<row r="1e3"><c><v>2</v></c></row>', "1e3"],
+    ['<row r="2"><c r="A99999999999"><v>2</v></c><c r="XFE2"><v>2</v></c></row>', "cells past the grid"],
+  ]) {
+    const table = sheetTable(parseSheet(worksheet(`<row r="1"><c r="A1"><v>1</v></c></row>${row}`), context));
+    assert.deepEqual(table, { headers: ["1"], rows: [] }, label);
+  }
+  // The last row and column Excel has still count, and a row with no number
+  // follows the last one inside the grid.
+  const edge = sheetTable(
+    parseSheet(worksheet(`<row r="1"><c r="A1"><v>1</v></c></row><row r="1048576"><c r="XFD1048576"><v>2</v></c></row><row r="Infinity"><c><v>3</v></c></row>`), context),
+  );
+  assert.equal(edge.headers.length, MAX_COLUMNS);
+  assert.equal(edge.rows.length, MAX_ROWS - 1);
+  const unnumbered = sheetTable(parseSheet(worksheet(`<row r="1"><c r="A1"><v>1</v></c></row><row r="x"><c><v>9</v></c></row><row><c><v>2</v></c><c><v>3</v></c></row>`), context));
+  assert.deepEqual(unnumbered, { headers: ["1", ""], rows: [["2", "3"]] });
+  // Hidden column ranges stay inside the grid.
+  const columns = parseSheet(
+    worksheet(`<row r="1"><c r="A1"><v>1</v></c><c r="F1"><v>6</v></c></row>`, '<cols><col min="-1000000000000" max="5" hidden="1"/><col min="7" max="Infinity" hidden="1"/><col min="x" max="9" hidden="1"/></cols>'),
+    context,
+  );
+  assert.equal(columns.hiddenColumns.size, 5 + (MAX_COLUMNS - 6));
+  assert.ok(Date.now() - started < 5000, `${Date.now() - started} ms`);
+});
+
+test("a number format that hides a cell's value hides it in the image too", () => {
+  const formats = ["General", ";;;", "0;-0;;@", "0;;0", '"Name: "@', "0.00;@"];
+  const show = (type, value, style) => cellText(type, value, style, { strings: ["secret text"], formats, date1904: false });
+  assert.equal(show("n", "5", 1), "");
+  assert.equal(show("s", "0", 1), "");
+  assert.equal(show("inlineStr", "secret", 1), "");
+  assert.equal(show("str", "secret", 1), "");
+  assert.equal(show("b", "1", 1), "");
+  assert.equal(show("n", "0", 2), "");
+  assert.equal(show("n", "5", 2), "5");
+  assert.equal(show("s", "0", 2), "secret text");
+  assert.equal(show("n", "-5", 3), "");
+  assert.equal(show("n", "5", 3), "5");
+  assert.equal(show("s", "0", 4), "Name: secret text");
+  assert.equal(show("n", "-5", 5), "-5.00");
+  // A sheet whose only values are hidden has nothing to draw.
+  const styles = `<styleSheet ${NS}><numFmts><numFmt numFmtId="164" formatCode=";;;"/></numFmts><cellXfs><xf numFmtId="0"/><xf numFmtId="164"/></cellXfs></styleSheet>`;
+  const hidden = worksheet(`<row r="1"><c r="A1" s="1" t="s"><v>0</v></c><c r="B1" s="1"><v>42</v></c></row>`);
+  const shown = worksheet(`<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" s="1"><v>42</v></c></row>`);
+  const result = readWorkbookSheets(workbook([{ name: "Hidden", xml: hidden }, { name: "Shown", xml: shown }], { strings: ["password"], styles }));
+  assert.deepEqual(result.sheets.map((sheet) => [sheet.name, sheet.table]), [["Shown", { headers: ["password"], rows: [] }]]);
+});
+
+test("empty sheets don't count toward the most images a workbook gives", () => {
+  const cell = (text) => worksheet(`<row r="1"><c r="A1" t="inlineStr"><is><t>${text}</t></is></c></row>`);
+  const empty = worksheet("");
+  const lateData = Array.from({ length: MAX_SHEETS }, (_, index) => ({ name: `E${index + 1}`, xml: empty })).concat({ name: "Data", xml: cell("v") });
+  const late = readWorkbookSheets(workbook(lateData));
+  assert.deepEqual(late.sheets.map((sheet) => [sheet.name, sheet.number]), [["Data", MAX_SHEETS + 1]]);
+  assert.equal(late.skipped, 0);
+  const mixed = Array.from({ length: 2 * MAX_SHEETS + 10 }, (_, index) => ({ name: `S${index + 1}`, xml: index % 2 ? cell(`v${index + 1}`) : empty }));
+  const result = readWorkbookSheets(workbook(mixed));
+  assert.equal(result.sheets.length, MAX_SHEETS);
+  assert.equal(result.sheets.at(-1).name, `S${2 * MAX_SHEETS}`);
+  assert.equal(result.stop, "sheets");
+  assert.equal(result.skipped, 10);
+});
+
+test("the parts a workbook reads add up to a limit, and a sheet part named twice is read once", () => {
+  const rows = (count) => worksheet(Array.from({ length: count }, (_, index) => `<row r="${index + 1}"><c r="A${index + 1}"><v>${index}</v></c></row>`).join(""));
+  const book = workbook([1, 2, 3].map((number) => ({ name: `S${number}`, xml: rows(200) })));
+  const sheetBytes = new TextEncoder().encode(rows(200)).length;
+  // Room for the workbook's own parts and two sheets.
+  const partial = readWorkbookSheets(book, { budget: 2 * sheetBytes + 2000 });
+  assert.deepEqual(partial.sheets.map((sheet) => sheet.name), ["S1", "S2"]);
+  assert.equal(partial.stop, "size");
+  assert.equal(partial.skipped, 1);
+  assert.throws(() => readWorkbookSheets(book, { budget: sheetBytes / 2 }), /too large to draw here/);
+  assert.equal(readWorkbookSheets(book).sheets.length, 3);
+
+  const files = {
+    "_rels/.rels": `<Relationships><Relationship Id="rId1" Type="${REL}/officeDocument" Target="xl/workbook.xml"/></Relationships>`,
+    "xl/workbook.xml": `<workbook ${NS}><sheets>${Array.from({ length: 50 }, (_, index) => `<sheet name="S${index + 1}" sheetId="${index + 1}" r:id="rId${index + 1}"/>`).join("")}</sheets></workbook>`,
+    "xl/_rels/workbook.xml.rels": `<Relationships>${Array.from({ length: 50 }, (_, index) => `<Relationship Id="rId${index + 1}" Type="${REL}/worksheet" Target="worksheets/sheet1.xml"/>`).join("")}</Relationships>`,
+    "xl/worksheets/sheet1.xml": rows(200),
+  };
+  const zipped = zipSync(Object.fromEntries(Object.entries(files).map(([name, text]) => [name, strToU8(text)])));
+  // Read 50 times, the sheet would pass the limit; read once, it doesn't.
+  const repeated = readWorkbookSheets(zipped.buffer, { budget: 2 * sheetBytes + 20_000 });
+  assert.deepEqual(repeated.sheets.map((sheet) => sheet.name), ["S1"]);
+  assert.equal(repeated.stop, undefined);
+});
+
+test("a sheet's r:id is read by name, before or after its other attributes", () => {
+  const files = {
+    "_rels/.rels": `<Relationships><Relationship Id="rId1" Type="${REL}/officeDocument" Target="xl/workbook.xml"/></Relationships>`,
+    "xl/workbook.xml": `<workbook ${NS}><sheets><sheet r:id="rId2" name="Second" id="rId1" sheetId="1"/><sheet name="First" r:id="rId1" sheetId="2"/></sheets></workbook>`,
+    "xl/_rels/workbook.xml.rels": `<Relationships><Relationship Id="rId1" Type="${REL}/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="${REL}/worksheet" Target="worksheets/sheet2.xml"/></Relationships>`,
+    "xl/worksheets/sheet1.xml": worksheet('<row r="1"><c r="A1" t="inlineStr"><is><t>one</t></is></c></row>'),
+    "xl/worksheets/sheet2.xml": worksheet('<row r="1"><c r="A1" t="inlineStr"><is><t>two</t></is></c></row>'),
+  };
+  const zipped = zipSync(Object.fromEntries(Object.entries(files).map(([name, text]) => [name, strToU8(text)])));
+  assert.deepEqual(readWorkbookSheets(zipped.buffer).sheets.map((sheet) => [sheet.name, sheet.table.headers[0]]), [["Second", "two"], ["First", "one"]]);
+});
+
+test("the workbook is read in a worker that is stopped after its time limit", async () => {
+  const worker = { terminated: false, posted: null, onmessage: null, onerror: null };
+  worker.postMessage = (job, transfer) => (worker.posted = { job, transfer });
+  worker.terminate = () => (worker.terminated = true);
+  const bytes = new ArrayBuffer(8);
+  await assert.rejects(
+    readWorkbookInWorker(bytes, { timeoutMs: 20, createWorker: () => worker }),
+    (error) => error.code === "layout_timeout" && error.message.includes(`more than ${WORKBOOK_TIMEOUT_MS / 1000} seconds`),
+  );
+  assert.equal(worker.terminated, true);
+  assert.deepEqual(worker.posted.transfer, [bytes]);
+
+  // The worker's answer, and its message for a file it can't read.
+  const answering = () => {
+    const fake = { onmessage: null, onerror: null, terminate() {} };
+    fake.postMessage = (job) => setTimeout(() => fake.onmessage({ data: readWorkbookJob(job) }));
+    return fake;
+  };
+  const read = await readWorkbookInWorker(workbook([{ name: "S", xml: worksheet('<row r="1"><c r="A1"><v>1</v></c></row>') }]), { createWorker: answering });
+  assert.deepEqual(read, { sheets: [{ name: "S", number: 1, table: { headers: ["1"], rows: [] } }], hidden: 0, skipped: 0 });
+  await assert.rejects(readWorkbookInWorker(strToU8("a,b\n").buffer, { createWorker: answering }), { message: "This file isn't an XLSX workbook: it isn't a ZIP archive." });
 });

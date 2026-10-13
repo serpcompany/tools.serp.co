@@ -28,8 +28,10 @@ type XmlHandlers = {
   text?: (text: string) => void;
 };
 
-// Calls back for each element and text run, with local names (a prefix
-// such as "x:" dropped) and attributes decoded.
+// Calls back for each element and text run, with element names as local
+// names (a prefix such as "x:" dropped) and attributes by the name the file
+// writes, prefix kept, values decoded: `r:id` (a relationship) and `id` are
+// different attributes, in any order.
 export function scanXml(xml: string, { open, close, text }: XmlHandlers): void {
   const tokens = new RegExp(XML_TOKEN.source, "g");
   const attributePairs = new RegExp(XML_ATTRIBUTE.source, "g");
@@ -45,7 +47,7 @@ export function scanXml(xml: string, { open, close, text }: XmlHandlers): void {
       if (open && attributeText) {
         attributePairs.lastIndex = 0;
         for (let pair = attributePairs.exec(attributeText); pair; pair = attributePairs.exec(attributeText)) {
-          attributes[localName(pair[1]!)] = decodeEntities(pair[2] ?? pair[3] ?? "");
+          attributes[pair[1]!] = decodeEntities(pair[2] ?? pair[3] ?? "");
         }
       }
       open?.(local, attributes, Boolean(selfClosing));
@@ -58,19 +60,60 @@ export function scanXml(xml: string, { open, close, text }: XmlHandlers): void {
   }
 }
 
+// An element's relationship id (`r:id`): its first prefixed attribute named
+// "id", whatever the prefix, as pptx-glimpse reads it, so the slides we
+// choose and the slides it numbers are the same list. An unprefixed `id` is
+// the element's own number, not a relationship.
+export function relationshipId(attributes: Record<string, string>): string | undefined {
+  for (const [name, value] of Object.entries(attributes)) {
+    const colon = name.indexOf(":");
+    if (colon !== -1 && name.slice(colon + 1) === "id") return value;
+  }
+  return undefined;
+}
+
+// The root element's local name and attributes, read without scanning the
+// rest of the part.
+export function rootElement(xml: string): { name: string; attributes: Record<string, string> } | null {
+  let root: { name: string; attributes: Record<string, string> } | null = null;
+  const tokens = new RegExp(XML_TOKEN.source, "g");
+  for (let match = tokens.exec(xml); match && !root; match = tokens.exec(xml)) {
+    const [whole, slash, name] = match;
+    if (name === undefined || slash) continue;
+    scanXml(whole, {
+      open(local, attributes) {
+        root ??= { name: local, attributes };
+      },
+    });
+  }
+  return root;
+}
+
 // ------------------------------------------------------------ packages --
 
-// A part's relationships: id to target part path and type.
-export function parseRelationships(xml: string, partPath: string): Map<string, { target: string; type: string }> {
+export type Relationship = { target: string; type: string; external: boolean };
+
+// A part's relationships: id to target part path and type. The first of two
+// with the same id wins, as in pptx-glimpse; one to a file outside the
+// package (TargetMode="External") is kept, marked, so it can't be mistaken
+// for a part.
+export function parseRelationships(xml: string, partPath: string): Map<string, Relationship> {
   const base = partPath.slice(0, partPath.lastIndexOf("/") + 1);
-  const relationships = new Map<string, { target: string; type: string }>();
+  const relationships = new Map<string, Relationship>();
   scanXml(xml, {
     open(name, attributes) {
-      if (name !== "Relationship" || attributes.TargetMode === "External") return;
-      relationships.set(attributes.Id ?? "", { target: resolvePart(base, attributes.Target ?? ""), type: attributes.Type ?? "" });
+      const id = attributes.Id ?? "";
+      if (name !== "Relationship" || relationships.has(id)) return;
+      const external = attributes.TargetMode === "External";
+      relationships.set(id, { target: external ? "" : resolvePart(base, attributes.Target ?? ""), type: attributes.Type ?? "", external });
     },
   });
   return relationships;
+}
+
+// The first internal relationship whose type ends in `suffix` ("/styles").
+export function relationEndingIn(relationships: Map<string, Relationship>, suffix: string): Relationship | undefined {
+  return [...relationships.values()].find((relation) => !relation.external && relation.type.endsWith(suffix));
 }
 
 // A relationship's target as a path in the ZIP: relative to the part's
@@ -148,8 +191,6 @@ export const partText = (bytes: Uint8Array | undefined) => (bytes ? new TextDeco
 // root relationships.
 export function mainPartPath(bytes: Uint8Array, fallback: string, read: ReadOptions): string {
   const root = readParts(bytes, (name) => name === "_rels/.rels", read);
-  const office = [...parseRelationships(partText(root["_rels/.rels"]), "").values()].find((relation) =>
-    relation.type.endsWith("/officeDocument"),
-  );
+  const office = relationEndingIn(parseRelationships(partText(root["_rels/.rels"]), ""), "/officeDocument");
   return office?.target || fallback;
 }

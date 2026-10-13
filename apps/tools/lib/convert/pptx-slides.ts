@@ -4,8 +4,9 @@
 // drawn through an <img> (svg-image.ts), which runs nothing and loads
 // nothing, at twice the slide's size in points (1920x1080 for a 13.33-inch
 // widescreen slide). Hidden slides are left out, as a slide show leaves them
-// out; so are speaker notes and comments. document-images.ts loads this
-// module only when a PPTX file is converted.
+// out; so are speaker notes and comments. Each image is named after its
+// slide's number, hidden slides counted, as PowerPoint numbers them.
+// document-images.ts loads this module only when a PPTX file is converted.
 
 import type { RGBA } from "./heif.ts";
 import {
@@ -16,9 +17,13 @@ import {
   parseRelationships,
   partText,
   readParts,
+  relationEndingIn,
+  relationshipId,
   relationshipsPath,
+  rootElement,
   scanXml,
   type ReadOptions,
+  type Relationship,
 } from "./ooxml.ts";
 import type { PptxJob, PptxReply } from "./pptx.worker.ts";
 import { prepareSvgForImage, rasterizeSvg, svgImageSize, svgSize } from "./svg-image.ts";
@@ -41,14 +46,31 @@ const READ: ReadOptions = {
 
 export const SLIDES_TIMEOUT_MESSAGE = `This presentation took more than ${SLIDES_TIMEOUT_MS / 1000} seconds to draw in the browser, so it was stopped. Try saving fewer slides in a copy of it.`;
 
-// The slide parts in the presentation's order (its sldIdLst).
-export function slideTargets(presentationXml: string, relationships: Map<string, { target: string; type: string }>): string[] {
+// The relationship type pptx-glimpse takes as a slide (Transitional OOXML,
+// which PowerPoint writes).
+export const SLIDE_RELATIONSHIP = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide";
+
+// The slide parts in the presentation's order, read as pptx-glimpse reads
+// them, so a slide's place here is the number pptx-glimpse gives it: each
+// <p:sldId> of the presentation's first <p:sldIdLst>, by its r:id
+// (relationshipId), when that names an internal relationship of the slide
+// type; any other entry is skipped and not numbered.
+export function slideTargets(presentationXml: string, relationships: Map<string, Relationship>): string[] {
   const targets: string[] = [];
+  let depth = 0;
+  let list: "before" | "in" | "after" = "before";
   scanXml(presentationXml, {
     open(name, attributes) {
-      if (name !== "sldId") return;
-      const relation = relationships.get(attributes.id ?? "");
-      if (relation?.type.endsWith("/slide")) targets.push(relation.target);
+      depth += 1;
+      if (depth === 2 && name === "sldIdLst" && list === "before") list = "in";
+      else if (depth === 3 && name === "sldId" && list === "in") {
+        const relation = relationships.get(relationshipId(attributes) ?? "");
+        if (relation && !relation.external && relation.type === SLIDE_RELATIONSHIP) targets.push(relation.target);
+      }
+    },
+    close(name) {
+      if (depth === 2 && name === "sldIdLst" && list === "in") list = "after";
+      depth -= 1;
     },
   });
   return targets;
@@ -80,13 +102,18 @@ export function defaultFontFamily(bodyFont: string | null): string {
 
 // A slide marked hidden (<p:sld show="0">), which a slide show skips.
 export function isHiddenSlide(slideXml: string): boolean {
-  const root = /<(?:[\w.-]+:)?sld\b[^>]*>/.exec(slideXml)?.[0] ?? "";
-  return /\sshow\s*=\s*["'](?:0|false)["']/.test(root);
+  const root = rootElement(slideXml);
+  const show = root?.name === "sld" ? root.attributes.show?.trim() : undefined;
+  return show === "0" || show === "false";
 }
 
-// The slides that show, as 1-based numbers in the presentation's order;
-// how many slides it has, how many are hidden, and the theme's body font.
-export function visibleSlides(buf: ArrayBuffer): { numbers: number[]; total: number; hidden: number; bodyFont: string | null } {
+// A slide: its number (its place in the presentation, hidden slides
+// counted, from 1) and its part.
+export type SlideRef = { number: number; part: string };
+
+// The slides that show, in the presentation's order; how many slides it
+// has, how many are hidden, and the theme's body font.
+export function visibleSlides(buf: ArrayBuffer): { slides: SlideRef[]; total: number; hidden: number; bodyFont: string | null } {
   const bytes = new Uint8Array(buf);
   if (isOleFile(bytes)) {
     throw new Error(
@@ -108,23 +135,23 @@ export function visibleSlides(buf: ArrayBuffer): { numbers: number[]; total: num
   if (!head[presentationPath]) throw new Error("This file isn't a PowerPoint (.pptx) file: it has no presentation part.");
   const relationships = parseRelationships(partText(head[relsPath]), presentationPath);
   const targets = slideTargets(partText(head[presentationPath]), relationships);
-  const themePath = [...relationships.values()].find((relation) => relation.type.endsWith("/theme"))?.target;
+  const themePath = relationEndingIn(relationships, "/theme")?.target;
   const wanted = new Set([...targets, themePath]);
-  const slides = readParts(bytes, (name) => wanted.has(name), READ);
-  const numbers: number[] = [];
-  targets.forEach((target, index) => {
-    const xml = partText(slides[target]);
-    if (xml && !isHiddenSlide(xml)) numbers.push(index + 1);
+  const parts = readParts(bytes, (name) => wanted.has(name), READ);
+  const slides: SlideRef[] = [];
+  targets.forEach((part, index) => {
+    const xml = partText(parts[part]);
+    if (xml && !isHiddenSlide(xml)) slides.push({ number: index + 1, part });
   });
-  const bodyFont = themePath ? themeBodyFont(partText(slides[themePath])) : null;
-  return { numbers, total: targets.length, hidden: targets.length - numbers.length, bodyFont };
+  const bodyFont = themePath ? themeBodyFont(partText(parts[themePath])) : null;
+  return { slides, total: targets.length, hidden: targets.length - slides.length, bodyFont };
 }
 
 // What the page says about the slides saved: the hidden ones left out, the
 // ones past MAX_SLIDES, and elements pptx-glimpse couldn't draw.
 export function slidesNotice({ shown, visible, hidden, skipped }: { shown: number; visible: number; hidden: number; skipped: number }): string | undefined {
   const parts: string[] = [];
-  if (shown > 1) parts.push(`One image a slide, in order.`);
+  if (shown > 1) parts.push(`One image a slide, in order, each named after its slide's number.`);
   if (visible > shown) parts.push(`The first ${shown} of ${visible} slides are saved, the most one presentation gives here.`);
   if (hidden) parts.push(`${hidden} hidden ${hidden === 1 ? "slide isn't" : "slides aren't"} drawn.`);
   if (skipped) parts.push(`${skipped} ${skipped === 1 ? "element" : "elements"} this converter can't draw ${skipped === 1 ? "is" : "are"} left out.`);
@@ -138,7 +165,7 @@ const startWorker = (): WorkerLike<PptxReply> => new Worker(new URL("./pptx.work
 export async function renderSlideSvgsInWorker(
   job: PptxJob,
   { timeoutMs = SLIDES_TIMEOUT_MS, createWorker = startWorker }: { timeoutMs?: number; createWorker?: () => WorkerLike<PptxReply> } = {},
-): Promise<{ slides: { number: number; svg: string }[]; skipped: number }> {
+): Promise<{ slides: { number: number; part: string; svg: string }[]; skipped: number }> {
   const reply = await runInWorker(createWorker(), job, {
     timeoutMs,
     timedOut: () => Object.assign(new Error(SLIDES_TIMEOUT_MESSAGE), { code: "layout_timeout" }),
@@ -153,40 +180,48 @@ export async function renderSlideSvgsInWorker(
 // presentation, each with its pictures inlined, aren't all held at once.
 export const SLIDES_PER_WORKER = 10;
 
-export function slideBatches(numbers: number[], size = SLIDES_PER_WORKER): number[][] {
-  const batches: number[][] = [];
-  for (let index = 0; index < numbers.length; index += size) batches.push(numbers.slice(index, index + size));
+export function slideBatches<T>(slides: T[], size = SLIDES_PER_WORKER): T[][] {
+  const batches: T[][] = [];
+  for (let index = 0; index < slides.length; index += size) batches.push(slides.slice(index, index + size));
   return batches;
 }
 
 // Each slide that shows as an image, encoded by `encode` as soon as it's
-// drawn, so only one slide's pixels are held at a time. SLIDES_TIMEOUT_MS
-// bounds the whole presentation, not each batch.
+// drawn, so only one slide's pixels are held at a time, and named after its
+// number ("slide3"). The worker is asked for slide parts, not numbers: it
+// draws the slides pptx-glimpse finds at those parts, so a hidden slide is
+// never drawn in a visible one's place, and each image it returns is checked
+// against the parts asked for. SLIDES_TIMEOUT_MS bounds the whole
+// presentation, not each batch.
 export async function renderSlides(
   buf: ArrayBuffer,
   encode: (rgba: RGBA) => Promise<ArrayBuffer>,
   onSlide?: (done: number, count: number) => void,
-): Promise<{ buffers: ArrayBuffer[]; notice?: string }> {
-  const { numbers, total, hidden, bodyFont } = visibleSlides(buf);
+): Promise<{ buffers: ArrayBuffer[]; names: string[]; notice?: string }> {
+  const { slides, total, hidden, bodyFont } = visibleSlides(buf);
   if (!total) throw new Error("This presentation has no slides.");
-  if (!numbers.length) throw new Error("Every slide in this presentation is hidden: there's no slide to draw.");
-  const shown = numbers.slice(0, MAX_SLIDES);
+  if (!slides.length) throw new Error("Every slide in this presentation is hidden: there's no slide to draw.");
+  const shown = slides.slice(0, MAX_SLIDES);
   const deadline = Date.now() + SLIDES_TIMEOUT_MS;
   const font = defaultFontFamily(bodyFont);
   const buffers: ArrayBuffer[] = [];
+  const names: string[] = [];
   let skipped = 0;
-  for (const batch of slideBatches(shown)) {
-    const reply = await renderSlideSvgsInWorker({ bytes: buf.slice(0), slides: batch }, { timeoutMs: Math.max(1, deadline - Date.now()) });
+  for (const batch of slideBatches([...new Set(shown.map((slide) => slide.part))])) {
+    const reply = await renderSlideSvgsInWorker({ bytes: buf.slice(0), parts: batch }, { timeoutMs: Math.max(1, deadline - Date.now()) });
     skipped += reply.skipped;
     for (const slide of reply.slides) {
+      if (!batch.includes(slide.part)) throw new Error("This presentation's slides couldn't be told apart, so none were saved.");
+      if (buffers.length >= MAX_SLIDES) break;
       const size = svgSize(slide.svg);
       if (!size) throw new Error(`Slide ${slide.number} couldn't be drawn.`);
       const image = svgImageSize(size.width, size.height, SLIDE_SCALE);
       const svg = prepareSvgForImage(slide.svg, image.width, image.height, font);
       buffers.push(await encode(await rasterizeSvg(svg, image.width, image.height)));
+      names.push(`slide${slide.number}`);
       onSlide?.(buffers.length, shown.length);
     }
   }
   if (!buffers.length) throw new Error("This presentation's slides couldn't be drawn.");
-  return { buffers, notice: slidesNotice({ shown: buffers.length, visible: numbers.length, hidden, skipped }) };
+  return { buffers, names, notice: slidesNotice({ shown: buffers.length, visible: slides.length, hidden, skipped }) };
 }
