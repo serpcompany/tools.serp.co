@@ -31,6 +31,15 @@
 // edits: while the input is Excel, the sheet shown holds the input's text,
 // so choosing another sheet and coming back brings the edits back (#299
 // review).
+//
+// Who wrote the input's text decides how an Excel input's text reads where
+// a quote reads two ways (excel-cells.ts, #299 review): the page (a sheet, a
+// grid edit, a table rewritten in the input's format) or the visitor (typed,
+// pasted, a text file). The page's text keeps that through the visitor's
+// edits, as it keeps its origin; text of the visitor's own, a file's text
+// and Clear are the visitor's. A paste the page writes in its own way (one
+// the clipboard's HTML table says reads differently, TableConvertDemo) is
+// the page's.
 
 import type { WorkbookText } from "../../lib/convert/xlsx.worker.ts";
 import { outputFileName } from "./formats.ts";
@@ -39,6 +48,7 @@ import type { InputFormat, OutputFormat, TableData } from "./types.ts";
 export type ParseTable = (
   format: InputFormat,
   text: string,
+  written: boolean,
 ) => { table: TableData | null; supported: boolean; error?: string | null };
 
 export type SerializeTable = (format: InputFormat, table: TableData) => { text: string; supported: boolean };
@@ -75,6 +85,8 @@ export type TablePage = {
   // The workbook the input's text came from: there exactly while the text's
   // origin (fileName) is a workbook, as read or since edited.
   workbook: Workbook | null;
+  // Whether the page wrote the input's text, as written or since edited.
+  written: boolean;
 };
 
 export type TablePageEvent =
@@ -90,7 +102,8 @@ export type TablePageEvent =
   | { type: "readFailed"; ticket: number; error: string }
   // The visitor typed, pasted or deleted in the input. `replacesInput`: the
   // change replaced all of its text (a paste over a select-all, say).
-  | { type: "type"; text: string; replacesInput?: boolean }
+  // `written`: the page wrote the paste in its own way.
+  | { type: "type"; text: string; replacesInput?: boolean; written?: boolean }
   // The visitor edited the grid, which was showing the table of `origin`.
   | { type: "editGrid"; table: TableData; origin: number }
   // The visitor chose another input format.
@@ -109,6 +122,7 @@ export function initialTablePage(inputFormat: InputFormat, placeholder: TableDat
     error: null,
     upload: null,
     workbook: null,
+    written: false,
   };
 }
 
@@ -128,7 +142,7 @@ export function tablePageReducer({
   // the last it had.
   function settle(
     state: TablePage,
-    edited: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "fileName" | "upload" | "workbook">,
+    edited: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "fileName" | "upload" | "workbook" | "written">,
     fromFile = false,
   ): TablePage {
     const { workbook } = edited;
@@ -137,7 +151,7 @@ export function tablePageReducer({
       const continues = state.table === placeholder;
       return { ...state, ...input, fileName: null, workbook: null, table: placeholder, error: null, origin: continues ? state.origin : state.origin + 1 };
     }
-    const result = parse(input.inputFormat, input.inputText);
+    const result = parse(input.inputFormat, input.inputText, input.written);
     if (!result.supported || !result.table) {
       const error = result.error ?? (result.supported ? null : "Input format not supported.");
       return { ...state, ...input, table: null, error, origin: state.origin + 1 };
@@ -165,6 +179,7 @@ export function tablePageReducer({
             fileName: upload.name,
             upload: null,
             workbook: null,
+            written: false,
           },
           true,
         );
@@ -188,6 +203,7 @@ export function tablePageReducer({
             fileName: upload.name,
             upload: null,
             workbook: { ...event.workbook, sheet: 0 },
+            written: true,
           },
           true,
         );
@@ -208,6 +224,7 @@ export function tablePageReducer({
             fileName: state.fileName,
             upload: null,
             workbook: { ...workbook, sheet: event.sheet },
+            written: true,
           },
           true,
         );
@@ -227,6 +244,7 @@ export function tablePageReducer({
           fileName: own ? null : state.fileName,
           upload: null,
           workbook: own ? null : state.workbook,
+          written: event.written ?? (own ? false : state.written),
         });
       }
       case "editGrid": {
@@ -244,6 +262,7 @@ export function tablePageReducer({
           fileName: state.fileName,
           upload: null,
           workbook: state.workbook,
+          written: true,
         });
       }
       case "inputFormat": {
@@ -255,7 +274,8 @@ export function tablePageReducer({
         const { hasUserInput, upload, fileName, workbook } = state;
         const rewritten = state.table && hasUserInput ? serialize(event.format, state.table) : null;
         const inputText = rewritten?.supported ? rewritten.text : state.inputText;
-        return settle(state, { inputFormat: event.format, inputText, hasUserInput, fileName, upload, workbook });
+        const written = rewritten?.supported ? true : state.written;
+        return settle(state, { inputFormat: event.format, inputText, hasUserInput, fileName, upload, workbook, written });
       }
       case "clear":
         return {
@@ -268,6 +288,7 @@ export function tablePageReducer({
           error: null,
           upload: null,
           workbook: null,
+          written: false,
         };
     }
   };

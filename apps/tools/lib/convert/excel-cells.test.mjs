@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { TABLE_CHARS, excelCellSize, readExcelCells, writeExcelCells } from "./excel-cells.ts";
+import { TABLE_CHARS, excelCellSize, readExcelCells, readPastedCells, writeExcelCells } from "./excel-cells.ts";
 import { parseExcelCells } from "./table-data.ts";
 
 function mulberry32(seed) {
@@ -15,7 +15,7 @@ function mulberry32(seed) {
   };
 }
 
-test("a sheet's cells read back as the same table, whatever they hold (2,000 generated tables)", () => {
+test("text the page wrote reads back as the same table, whatever its cells hold (2,000 generated tables)", () => {
   const rng = mulberry32(266);
   // Pieces a cell can be made of: the characters the text's format uses
   // (tabs, line breaks, quotes), a byte order mark, spaces, other scripts.
@@ -25,12 +25,13 @@ test("a sheet's cells read back as the same table, whatever they hold (2,000 gen
     const columns = 1 + Math.floor(rng() * 4);
     const row = () => Array.from({ length: columns }, cell);
     const table = { headers: row(), rows: Array.from({ length: Math.floor(rng() * 6) }, row) };
-    // A sheet's table ends at its last value (xlsx-sheets.ts), and starts at
-    // its first: a one-column sheet never ends on an empty cell.
+    // An empty last row stays (one added in the grid, #299 review), but in
+    // one column it's an empty last line, which the format can't tell from
+    // the line break that ends the text (nor can a CSV).
     const last = table.rows.at(-1) ?? table.headers;
-    if (last.every((value) => !value.trim())) last[0] = "x";
+    if (columns === 1 && !last[0]) last[0] = "x";
     const text = writeExcelCells(table);
-    assert.deepEqual(parseExcelCells(text), { table, error: null }, JSON.stringify(text));
+    assert.deepEqual(parseExcelCells(text, true), { table, error: null }, JSON.stringify(text));
   }
 });
 
@@ -66,21 +67,24 @@ test("a cell that starts with a quote is quoted only when Excel would have quote
   });
   // Quotes inside an unquoted cell, a lone quote, a quote at the end, a
   // cell in quotes that holds nothing Excel would quote.
-  assert.deepEqual(readExcelCells('say "hi"\t"\tend\t""x\t"Best"\t""'), [['say "hi"', '"', "end", '""x', '"Best"', '""']]);
+  assert.deepEqual(readExcelCells('say "hi"\t"\tend\t""x\t"Best"\t""', false), [['say "hi"', '"', "end", '""x', '"Best"', '""']]);
   // Quoted as Excel quotes: the closing quote ends the cell, before a tab, a
   // line break or the end of the text, and the cell holds a tab, a line
   // break or a quote (doubled).
-  assert.deepEqual(readExcelCells('"a"b\t"c""d"\r\n"e\tf"\t"g\r\nh"\n"""q"""'), [
+  assert.deepEqual(readExcelCells('"a"b\t"c""d"\r\n"e\tf"\t"g\r\nh"\n"""q"""\tz', false), [
     ['"a"b', 'c"d'],
     ["e\tf", "g\r\nh"],
-    ['"q"'],
+    ['"q"', "z"],
   ]);
+  // Rows typed of different widths: no reading makes them one width, so no
+  // rows are merged.
+  assert.deepEqual(readExcelCells('a\tb\n"x\ny"\tc\td', false), [["a", "b"], ['"x'], ['y"', "c", "d"]]);
   // A quote that opens a cell and closes in a later one, with text after it,
   // isn't a quoted cell: each cell is its own text.
-  assert.deepEqual(readExcelCells('"one\ttwo" three\tfour'), [['"one', 'two" three', "four"]]);
+  assert.deepEqual(readExcelCells('"one\ttwo" three\tfour', false), [['"one', 'two" three', "four"]]);
   // Empty cells, a byte order mark before the first, Excel's \r\n, a lone \r.
-  assert.deepEqual(readExcelCells("\uFEFFa\t\tc\r\n\t\t\rx\t\t"), [["a", "", "c"], ["", "", ""], ["x", "", ""]]);
-  assert.deepEqual(readExcelCells(""), [[""]]);
+  assert.deepEqual(readExcelCells("\uFEFFa\t\tc\r\n\t\t\rx\t\t", false), [["a", "", "c"], ["", "", ""], ["x", "", ""]]);
+  assert.deepEqual(readExcelCells("", false), [[""]]);
 });
 
 test("empty rows at the end aren't rows, however many columns: a selection copied past the last value adds them", () => {
@@ -92,47 +96,149 @@ test("empty rows at the end aren't rows, however many columns: a selection copie
   assert.match(parseExcelCells("\t\r\n\t\r\n").error, /no cells/);
 });
 
-test("cells as Excel copies them, quoted only where they hold a tab or a line break, read back as the same table (2,000 generated tables)", () => {
+// Cells as Excel copies them: a cell in quotes, its quotes doubled, only
+// when it holds a tab or a line break, and a line break after the last row.
+// With the copy's HTML table, as the clipboard has it: each row's cells,
+// which cells hold a tab or a line break, and which start with a quote.
+const QUOTED = /[\t\n\r]/;
+const copy = (value) => (QUOTED.test(value) ? `"${value.replaceAll('"', '""')}"` : value);
+const excelCopy = (rows) => `${rows.map((cells) => cells.map(copy).join("\t")).join("\r\n")}\r\n`;
+function copiedShape(rows) {
+  const keys = (test) => new Set(rows.flatMap((cells, row) => cells.flatMap((value, column) => (test(value) ? [`${row}:${column}`] : []))));
+  return { widths: rows.map((cells) => cells.length), quoted: keys((value) => QUOTED.test(value)), quoteFirst: keys((value) => value.trimStart().startsWith('"')) };
+}
+// A cell Excel leaves as it stands that reads as one quoted for a doubled
+// quote: `"x""y"`, `""""`.
+const quotedForQuotes = /^"(?:[^"]|"")*""(?:[^"]|"")*"$/;
+
+test("cells copied with Excel's HTML table read back exactly, whatever they hold: ditto marks, quotes, tabs, line breaks (2,000 generated tables)", () => {
   const rng = mulberry32(299);
-  // No byte order mark: Excel's clipboard text has none.
   const pieces = ["a", "B", "1", " ", "\t", "\n", "\r\n", '"', '""', ",", "é", "日本", ""];
-  const quoted = (value) => /[\t\n\r]/.test(value);
-  // An unquoted cell that starts with a quote closes it, as `"Best" seller`
-  // or `"Best"` do; a ditto mark `"` or `"x` can read as the start of a
-  // quoted cell (the next test).
-  const closes = /^"[^"]*"(?!")/;
   const cell = () => {
     for (;;) {
       const value = Array.from({ length: Math.floor(rng() * 5) }, () => pieces[Math.floor(rng() * pieces.length)]).join("");
-      if (quoted(value) || !value.startsWith('"') || closes.test(value)) return value;
+      // Text Excel leaves as it stands that reads as a quoted cell whose
+      // value starts with a quote (`""""`, `"""x"`), the way a spreadsheet
+      // that quotes a cell for its quotes writes `"x`: read as that.
+      if (QUOTED.test(value) || !/^"""(?:[^"]|"")*"$/.test(value)) return value;
     }
   };
-  const copy = (value) => (quoted(value) ? `"${value.replaceAll('"', '""')}"` : value);
-  let startsWithQuote = 0;
+  let ambiguous = 0;
   for (let index = 0; index < 2_000; index += 1) {
     const columns = 1 + Math.floor(rng() * 4);
-    const row = () => Array.from({ length: columns }, cell);
-    const table = { headers: row(), rows: Array.from({ length: Math.floor(rng() * 6) }, row) };
-    const last = table.rows.at(-1) ?? table.headers;
-    if (last.every((value) => !value.trim())) last[0] = "x";
-    const all = [table.headers, ...table.rows];
-    if (all.some((cells) => cells.some((value) => !quoted(value) && value.startsWith('"')))) startsWithQuote += 1;
-    const text = `${all.map((cells) => cells.map(copy).join("\t")).join("\r\n")}\r\n`;
-    assert.deepEqual(parseExcelCells(text), { table, error: null }, JSON.stringify(text));
+    const rows = Array.from({ length: 1 + Math.floor(rng() * 6) }, () => Array.from({ length: columns }, cell));
+    const text = excelCopy(rows);
+    if (JSON.stringify(readExcelCells(text, false)) !== JSON.stringify(rows)) ambiguous += 1;
+    assert.deepEqual(readPastedCells(text, copiedShape(rows)), rows, JSON.stringify(text));
   }
-  assert.ok(startsWithQuote >= 200, `${startsWithQuote} tables with an unquoted cell starting with a quote`);
+  // Many of them read differently without the HTML: the text alone can't
+  // say which reading Excel meant.
+  assert.ok(ambiguous >= 200, `${ambiguous} tables the text alone reads differently`);
 });
 
-test("a ditto mark and a cell ending in a quote copy as a quoted cell would: the reading that keeps the rows as wide is taken", () => {
-  // `"` then `14"`: read as one quoted cell, the row would be one cell wide.
-  assert.deepEqual(parseExcelCells('Pipe\tSize\r\nCopper\t12"\r\n"\t14"\r\n').table, {
-    headers: ["Pipe", "Size"],
-    rows: [["Copper", '12"'], ['"', '14"']],
-  });
-  // With a cell that holds a line break too, no reading of every cell as it
-  // stands keeps the rows as wide either: the text reads as Excel would
-  // write a quoted cell. Excel's copy can't tell these apart.
-  assert.deepEqual(readExcelCells('Pipe\tNote\r\n"\t14"\r\nCopper\t"two\nlines"\r\n'), [["Pipe", "Note"], ["\t14"], ["Copper", "two\nlines"]]);
+test("cells copied without the HTML: rows are never merged on a quote, wherever quotes are (2,000 generated tables)", () => {
+  const rng = mulberry32(2992);
+  // No tabs or line breaks in a cell; ditto marks, quotes at either end,
+  // unclosed quotes.
+  const pieces = ["a", "B", "1", " ", '"', '"', '""', "14", ",", "é", ""];
+  const cell = () => {
+    for (;;) {
+      const value = Array.from({ length: Math.floor(rng() * 4) }, () => pieces[Math.floor(rng() * pieces.length)]).join("");
+      if (!quotedForQuotes.test(value)) return value;
+    }
+  };
+  let dittos = 0;
+  for (let index = 0; index < 2_000; index += 1) {
+    const columns = 1 + Math.floor(rng() * 4);
+    const header = Array.from({ length: columns }, (_, column) => `Column ${column + 1}`);
+    const rows = [header, ...Array.from({ length: Math.floor(rng() * 8) }, () => Array.from({ length: columns }, cell))];
+    if (rows.flat().filter((value) => value === '"').length >= 2) dittos += 1;
+    const text = excelCopy(rows);
+    assert.deepEqual(readExcelCells(text, false), rows, JSON.stringify(text));
+  }
+  assert.ok(dittos >= 200, `${dittos} tables with two or more ditto marks`);
+});
+
+test("cells copied without the HTML: a cell holding line breaks is one cell, and ditto marks around it stay in their rows (2,000 generated tables)", () => {
+  const rng = mulberry32(2993);
+  // A cell is a value of one line, with quotes anywhere (ditto marks, inch
+  // values, quoted words), or text over two or more lines, with quotes
+  // inside its words.
+  const oneLine = ["a", "B", "1", " ", '"', '"', '""', "14", "é", ""];
+  const words = ["word", "Main St", 'say "hi"', '12" pipe', "é", "1"];
+  const breaks = ["\n", "\r\n", "\n\n"];
+  const pick = (pieces) => pieces[Math.floor(rng() * pieces.length)];
+  const cell = () => {
+    if (rng() < 0.25) {
+      return Array.from({ length: 2 + Math.floor(rng() * 3) }, () => pick(words)).reduce((text, word) => text + pick(breaks) + word);
+    }
+    for (;;) {
+      const value = Array.from({ length: Math.floor(rng() * 4) }, () => pick(oneLine)).join("");
+      if (!quotedForQuotes.test(value)) return value;
+    }
+  };
+  let multiLine = 0;
+  for (let index = 0; index < 2_000; index += 1) {
+    // Two or more columns: in one, a line break inside a cell and a ditto
+    // mark under a ditto mark copy alike (the HTML tells them apart).
+    const columns = 2 + Math.floor(rng() * 3);
+    const header = Array.from({ length: columns }, (_, column) => `Column ${column + 1}`);
+    const rows = [header, ...Array.from({ length: 1 + Math.floor(rng() * 8) }, () => Array.from({ length: columns }, cell))];
+    if (rows.flat().some((value) => QUOTED.test(value))) multiLine += 1;
+    const text = excelCopy(rows);
+    assert.deepEqual(readExcelCells(text, false), rows, JSON.stringify(text));
+  }
+  assert.ok(multiLine >= 1_000, `${multiLine} tables with a cell holding a line break`);
+});
+
+test("the review's ditto marks: with or without the HTML, every row stays a row", () => {
+  const cases = [
+    // Two ditto marks in a column.
+    [["Item", "Color"], ["Shirt", "Red"], ["Pants", '"'], ["Hat", '"'], ["Sock", "Blue"]],
+    // A ditto mark above a later inch value.
+    [["Size", "Item"], ['12"', "Pipe"], ['"', "Valve"], ['14"', "Cap"]],
+    // A ditto mark and an inch value in one row, and a cell that holds a
+    // line break below them.
+    [["Pipe", "Note"], ['"', '14"'], ["Copper", "two\nlines"]],
+    // A cell holding a line break above two ditto marks.
+    [["Item", "Note"], ["Shirt", "line1\nline2"], ["Pants", '"'], ["Hat", '"']],
+  ];
+  for (const rows of cases) {
+    const text = excelCopy(rows);
+    assert.deepEqual(readExcelCells(text, false), rows, JSON.stringify(text));
+    assert.deepEqual(readPastedCells(text, copiedShape(rows)), rows, JSON.stringify(text));
+  }
+  // One column: a cell holding line breaks copies as ditto marks around a
+  // value would. Without the HTML the rows stay rows; with it, it's one cell.
+  const column = [["Address"], ["1 Main St\nSpringfield"], ["2 Oak Ave"]];
+  const text = excelCopy(column);
+  assert.deepEqual(readExcelCells(text, false), [["Address"], ['"1 Main St'], ['Springfield"'], ["2 Oak Ave"]]);
+  assert.deepEqual(readPastedCells(text, copiedShape(column)), column);
+  // A shape the text can't have: no reading is taken.
+  assert.equal(readPastedCells(text, { widths: [1, 1], quoted: new Set(), quoteFirst: new Set() }), null);
+});
+
+test("1,000,000 pasted rows with a ditto mark in the first column stay 1,000,000 rows, read quickly", () => {
+  const text = `Mark\tItem\r\n${'"\tx\r\n'.repeat(1_000_000)}`;
+  const started = performance.now();
+  const { table } = parseExcelCells(text);
+  const elapsed = performance.now() - started;
+  assert.equal(table.rows.length, 1_000_000);
+  assert.deepEqual([table.rows[0], table.rows.at(-1)], [['"', "x"], ['"', "x"]]);
+  assert.ok(elapsed < 3_000, `${Math.round(elapsed)} ms`);
+  // With a cell holding a line break as well, each quote is read alone.
+  const mixed = `Mark\tItem\r\nx\t"two\nlines"\r\n${'"\tx\r\n'.repeat(1_000_000)}`;
+  const timed = performance.now();
+  const rows = readExcelCells(mixed, false);
+  assert.equal(rows.length, 1_000_002);
+  assert.deepEqual(rows.slice(0, 3), [["Mark", "Item"], ["x", "two\nlines"], ['"', "x"]]);
+  assert.ok(performance.now() - timed < 3_000, `${Math.round(performance.now() - timed)} ms`);
+});
+
+test("text the page wrote keeps an empty last row; pasted text doesn't (#299 review)", () => {
+  const table = { headers: ["a", "b"], rows: [["1", "2"], ["", ""]] };
+  assert.deepEqual(parseExcelCells(writeExcelCells(table), true).table, table);
+  assert.deepEqual(parseExcelCells("a\tb\r\n1\t2\r\n\t\r\n").table, { headers: ["a", "b"], rows: [["1", "2"]] });
 });
 
 test("a cell's size is its length as written, quotes counted", () => {

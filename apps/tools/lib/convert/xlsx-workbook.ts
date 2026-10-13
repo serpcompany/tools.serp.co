@@ -38,7 +38,13 @@ async function readInWorker(job: XlsxJob, { timeoutMs = WORKBOOK_TIMEOUT_MS, cre
 export async function readWorkbookInWorker(bytes: ArrayBuffer, options: WorkerOptions = {}): Promise<WorkbookSheets> {
   const reply = await readInWorker({ bytes }, options);
   if (reply.cells) throw new Error("The workbook was read as text, not tables.");
-  return { sheets: reply.sheets, hidden: reply.hidden, skipped: reply.skipped, ...(reply.stop ? { stop: reply.stop } : {}) };
+  return {
+    sheets: reply.sheets,
+    hidden: reply.hidden,
+    skipped: reply.skipped,
+    ...(reply.stop ? { stop: reply.stop } : {}),
+    ...(reply.longCells?.length ? { longCells: reply.longCells } : {}),
+  };
 }
 
 // The workbook's sheets as a table converter's Excel input: every row and

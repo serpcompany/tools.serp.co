@@ -956,7 +956,9 @@ export function serializeInput(format: InputFormat, table: TableData): Serialize
   return serializeOutput(format, table);
 }
 
-export function parseInput(format: InputFormat, text: string): ParseResult {
+// `written`: the page wrote the text (output-state.ts), which decides how an
+// Excel input's text reads where a quote reads two ways (excel-cells.ts).
+export function parseInput(format: InputFormat, text: string, written = false): ParseResult {
   if (!text.trim()) {
     return { table: null, supported: true, error: "Paste or upload data to begin." };
   }
@@ -981,7 +983,7 @@ export function parseInput(format: InputFormat, text: string): ParseResult {
       // Cells as Excel copies them: pasted, or a sheet of an uploaded
       // workbook (TableConvertDemo reads it in a worker).
       case "excel":
-        return { ...parseExcelCells(text), supported: true };
+        return { ...parseExcelCells(text, written), supported: true };
       case "mysql":
         return { ...parseMySql(text), supported: true };
       case "mediawiki":

@@ -7,13 +7,15 @@ import { canOfferOutput, initialTablePage, offeredDownload, tablePageReducer } f
 // A small stand-in for convert.ts: text is `<format>:<cell>|<cell>…`, one
 // column. Text in another format, with BROKEN in it, or empty doesn't parse.
 // Every input format, Excel's included (cells as Excel copies them, #266),
-// is parsed and written as text, as on the page.
-function parse(format, text) {
+// is parsed and written as text, as on the page. Excel text the page wrote
+// reads differently from the visitor's (#299 review): its header says which.
+function parse(format, text, written) {
   if (!text.trim()) return { table: null, supported: true, error: "Paste or upload data to begin." };
   if (!text.startsWith(`${format}:`)) return { table: null, supported: true, error: `This isn't ${format}.` };
   const body = text.slice(format.length + 1);
   if (body.includes("BROKEN")) return { table: null, supported: true, error: "Unclosed quote." };
-  return { table: { headers: ["value"], rows: body.split("|").map((cell) => [cell]) }, supported: true };
+  const header = format === "excel" && written ? "value as written" : "value";
+  return { table: { headers: [header], rows: body.split("|").map((cell) => [cell]) }, supported: true };
 }
 function serialize(format, table) {
   return { text: `${format}:${table.rows.map((row) => row[0]).join("|")}`, supported: true };
@@ -160,7 +162,7 @@ const book = (prefix, count = 2, extra = {}) => ({
   sheets: Array.from({ length: count }, (_, index) => ({ name: `Sheet${index + 1}`, text: `excel:${prefix}${index + 1}a|${prefix}${index + 1}b` })),
   hidden: 1,
   skipped: 0,
-  tooManyCells: [],
+  tooLarge: [],
   ...extra,
 });
 
@@ -187,6 +189,30 @@ test("a workbook's first sheet arrives as an Excel input under the file's name; 
   // picked again.
   assert.deepEqual([asCsv.inputText, asCsv.fileName, asCsv.workbook.sheet], ["csv:S2a|S2b", "book.xlsx", 1]);
   assert.equal(next(next(asCsv, { type: "inputFormat", format: "excel" }), { type: "sheet", sheet: 2 }).inputText, "excel:S3a|S3b");
+});
+
+test("who wrote the Excel input's text decides how it reads: the page's text stays the page's through edits (#299 review)", () => {
+  const header = (state) => state.table?.headers[0] ?? null;
+  // A workbook's sheet is the page's text.
+  const read = run(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: book("S") });
+  assert.deepEqual([read.written, header(read)], [true, "value as written"]);
+  // Typing in it edits it: still the page's. Typing over all of it: the visitor's.
+  const edited = next(read, { type: "type", text: `${read.inputText}|typed` });
+  assert.deepEqual([edited.written, header(edited), cells(edited)], [true, "value as written", ["S1a", "S1b", "typed"]]);
+  const own = next(edited, { type: "type", text: "excel:mine", replacesInput: true });
+  assert.deepEqual([own.written, header(own), own.fileName], [false, "value", null]);
+  // A paste the page writes its own way is the page's, over all of it or not.
+  const pasted = next(own, { type: "type", text: "excel:pasted", replacesInput: true, written: true });
+  assert.deepEqual([pasted.written, header(pasted), pasted.fileName], [true, "value as written", null]);
+  // A grid edit and a rewrite in another format are the page's; a file's
+  // text and Clear are the visitor's.
+  const grid = next(own, { type: "editGrid", table: { headers: ["value"], rows: [["g"]] }, origin: own.origin });
+  assert.deepEqual([grid.written, header(grid)], [true, "value as written"]);
+  const csv = run(afterA(), { type: "inputFormat", format: "excel" });
+  assert.deepEqual([csv.written, header(csv)], [true, "value as written"]);
+  const text = run(read, { type: "upload", name: "cells.txt", ticket: 2 }, { type: "read", ticket: 2, text: "excel:t", format: null });
+  assert.deepEqual([text.written, header(text)], [false, "value"]);
+  assert.equal(next(read, { type: "clear" }).written, false);
 });
 
 test("a workbook stays with the input's text: edits keep it, text of the visitor's own, Clear or another file drop it", () => {
@@ -335,6 +361,9 @@ function newModel(format) {
     // The workbook the text came from: its file, its sheets and the one
     // whose text went into the input; null for any other text.
     workbook: null,
+    // Whether the page wrote the text (a sheet, a grid edit, a rewrite, a
+    // paste it wrote), as written or since edited.
+    written: false,
     // The table the text parses into (the placeholder before any input),
     // or null; and whether the page shows an error.
     table: placeholder,
@@ -358,7 +387,7 @@ function reparse(model, { afresh = false } = {}) {
     model.name = null;
     model.workbook = null;
   } else {
-    model.table = parse(model.format, model.text).table;
+    model.table = parse(model.format, model.text, model.written).table;
     model.error = !model.table;
   }
   model.version += 1;
@@ -412,7 +441,7 @@ function runSequence(rng, seen, log) {
           hidden: Math.floor(rng() * 2),
           skipped: outcome === "partial" ? 1 : 0,
           ...(outcome === "partial" ? { stop: "size" } : {}),
-          tooManyCells: outcome === "partial" ? ["Big"] : [],
+          tooLarge: outcome === "partial" ? ["Big"] : [],
         };
         reads.push({ name, ticket: id, workbook, outcome });
       } else {
@@ -453,8 +482,10 @@ function runSequence(rng, seen, log) {
       }[kind];
       // A change that leaves the text as it was fires no change event.
       if (text === model.text) continue;
-      // Whether it replaced all of the text (a paste over a select-all).
+      // Whether it replaced all of the text (a paste over a select-all); on
+      // the Excel input, a paste the page wrote its own way (excel-paste.ts).
       event = { type: "type", text, replacesInput: rng() < 0.35 };
+      if (model.format === "excel" && rng() < 0.3) event.written = true;
     } else if (action === "editGrid") {
       if (!grid) continue;
       cellCount += 1;
@@ -528,15 +559,18 @@ function runSequence(rng, seen, log) {
           }
           if (event.type === "readWorkbook") {
             // The first sheet's text is in the input, as an Excel input's:
-            // it's the file's, and so is the workbook.
+            // it's the file's, and so is the workbook. The page wrote it.
             model.text = file.workbook.sheets[0].text;
             model.format = "excel";
+            model.written = true;
             model.workbook = { file: file.name, read: file.workbook.sheets, sheets: file.workbook.sheets.map((sheet) => sheet.text), sheet: 0 };
             seen.workbookReads += 1;
           } else {
-            // The file's text is in the input: it's the file's.
+            // The file's text is in the input: it's the file's, and the
+            // visitor's to read.
             model.text = event.text;
             model.format = event.format ?? model.format;
+            model.written = false;
             if (model.workbook) seen.textDropsWorkbook += 1;
             model.workbook = null;
             if (file.kind) seen[file.kind] += 1;
@@ -564,6 +598,7 @@ function runSequence(rng, seen, log) {
           model.pending = null;
           model.workbook = { ...workbook, sheet: event.sheet, previous: workbook.sheet };
           model.text = workbook.sheets[event.sheet];
+          model.written = true;
           model.userInput = true;
           reparse(model, { afresh: true });
           break;
@@ -571,11 +606,18 @@ function runSequence(rng, seen, log) {
         case "type":
           model.pending = null;
           // Text replacing all of the input, or typed into an empty one, is
-          // the visitor's own; anything else edits the text that was there.
+          // the visitor's own; anything else edits the text that was there,
+          // and keeps who wrote it. A paste the page wrote is the page's.
           if (event.replacesInput || !model.text.trim()) {
             if (model.workbook) seen.ownTextDropsWorkbook += 1;
+            if (model.written && !event.written) seen.ownTextIsVisitors += 1;
             model.name = null;
             model.workbook = null;
+            model.written = false;
+          } else if (model.written && !event.written && model.format === "excel") seen.editsKeepWritten += 1;
+          if (event.written) {
+            model.written = true;
+            seen.writtenPastes += 1;
           }
           model.text = event.text;
           model.userInput = true;
@@ -599,6 +641,7 @@ function runSequence(rng, seen, log) {
           const asInput = serialize(model.format, event.table);
           if (asInput.supported) {
             model.text = asInput.text;
+            model.written = true;
             reparse(model);
           } else {
             // An input format the page can't write (Excel): the grid's table
@@ -613,7 +656,10 @@ function runSequence(rng, seen, log) {
           // A table from the visitor's input is rewritten in the new format;
           // otherwise the same text is parsed in it. The text keeps its origin.
           const rewritten = model.table && model.userInput ? serialize(event.format, model.table) : null;
-          if (rewritten?.supported) model.text = rewritten.text;
+          if (rewritten?.supported) {
+            model.text = rewritten.text;
+            model.written = true;
+          }
           model.format = event.format;
           reparse(model);
           if (!had.table && model.table && model.name) seen.formatTakesFileName += 1;
@@ -625,6 +671,7 @@ function runSequence(rng, seen, log) {
           model.userInput = false;
           model.name = null;
           model.workbook = null;
+          model.written = false;
           model.table = placeholder;
           model.error = false;
           model.version += 1;
@@ -651,6 +698,7 @@ function runSequence(rng, seen, log) {
     if (model.table === placeholder) assert.equal(state.table, placeholder);
     assert.equal(Boolean(state.error), model.error, "an error exactly when there's no table");
     assert.equal(state.fileName, model.name, "the name is the origin of the model's text");
+    assert.equal(state.written, model.written, "the text is read as the model says who wrote it");
     assert.deepEqual(
       state.workbook?.sheets ?? null,
       model.workbook ? model.workbook.read.map((sheet, index) => ({ ...sheet, text: model.workbook.sheets[index] })) : null,
@@ -685,6 +733,7 @@ test(`the name and the offered download always describe the table on screen (${S
     editsWithoutTable: 0, typoKeepsName: 0, fixKeepsName: 0, replacedNamed: 0, formatTakesFileName: 0, namedOffers: 0,
     workbookReads: 0, workbookFailures: 0, unreadableKeepsWorkbook: 0, sheetSwitches: 0, sheetWinsOverRead: 0,
     ignoredSheets: 0, ownTextDropsWorkbook: 0, sheetBackWithEdits: 0, excelText: 0, textOnExcel: 0, textDropsWorkbook: 0,
+    writtenPastes: 0, editsKeepWritten: 0, ownTextIsVisitors: 0,
   };
   for (let sequence = 0; sequence < SEQUENCES; sequence += 1) {
     const log = [];

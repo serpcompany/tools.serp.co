@@ -463,7 +463,7 @@ test("read in the worker for a table converter, each sheet comes back as its cel
     tooLarge: [],
     sheets: [{ name: "S", number: 1, text: 'Name\tNote\nAlpha\t"two\tcells?"' }],
   });
-  assert.deepEqual(parseExcelCells(reply.sheets[0].text).table, readWorkbookSheets(workbook([{ name: "S", xml }])).sheets[0].table);
+  assert.deepEqual(parseExcelCells(reply.sheets[0].text, true).table, readWorkbookSheets(workbook([{ name: "S", xml }])).sheets[0].table);
   const answering = () => {
     const fake = { onmessage: null, onerror: null, terminate() {} };
     fake.postMessage = (job) => setTimeout(() => fake.onmessage({ data: readWorkbookJob(job) }));
@@ -497,11 +497,12 @@ test("a small file repeating one long string in every cell is refused before its
     const started = performance.now();
     const table = readWorkbookJob({ bytes: book.slice(0), cells: true });
     assert.deepEqual(table, { ok: true, cells: true, hidden: 0, skipped: 0, tooLarge: ["S"], sheets: [] });
-    // An image of it: refused with a message, not a reply too large to clone.
+    // An image of it: refused with a message, not a reply too large to
+    // clone. Each cell is longer than Excel allows, and it's the only sheet.
     const image = readWorkbookJob({ bytes: book.slice(0) });
     assert.deepEqual(image, {
       ok: false,
-      error: `This workbook is too large to draw here: its first sheet holds more than 10,000,000 characters, or a cell longer than Excel allows (32,767 characters).`,
+      error: `This workbook can't be drawn here: each of its sheets with values has a cell longer than Excel allows (32,767 characters).`,
     });
     assert.ok(performance.now() - started < 3000, `${performance.now() - started} ms`);
   }
@@ -537,13 +538,35 @@ test("a table converter's sheets add up to at most TABLE_CHARS characters of tex
   assert.ok(total <= TABLE_CHARS && total > 0.9 * TABLE_CHARS, `${total}`);
 });
 
-test("a cell longer than Excel allows leaves its sheet out of a table and stops an image's read", () => {
+test("a cell longer than Excel allows leaves only its own sheet out, named, of a table and of the images (#299 review)", async () => {
   const ok = repeated(2, 2, { length: MAX_CELL_CHARS, name: "Ok" });
   assert.deepEqual(readWorkbookSheets(crafted(ok), { table: TABLE }).tooLarge, []);
   assert.equal(readWorkbookSheets(crafted(ok)).sheets[0].table.headers[0].length, MAX_CELL_CHARS);
   const long = repeated(2, 2, { length: MAX_CELL_CHARS + 1, name: "Long" });
   assert.deepEqual(readWorkbookSheets(crafted(long), { table: TABLE }).tooLarge, ["Long"]);
-  assert.throws(() => readWorkbookSheets(crafted(long)), /a cell longer than Excel allows \(32,767 characters\)/);
+  // The review's case: three small sheets, the second with a 40,000-character
+  // cell (Google Sheets allows 50,000). The first and third are drawn.
+  const sheet = (name, length) => ({
+    name,
+    xml: worksheet(`<row r="1"><c r="A1" t="inlineStr"><is><t>${"x".repeat(length)}</t></is></c><c r="B1"><v>1</v></c></row>`),
+  });
+  const middle = readWorkbookSheets(workbook([sheet("A", 10), sheet("B", 40_000), sheet("C", 10)]));
+  assert.deepEqual([middle.sheets.map((each) => each.name), middle.longCells, middle.skipped, middle.stop], [["A", "C"], ["B"], 0, undefined]);
+  // In the first sheet: the others are still drawn, and the worker says so,
+  // through to the page (convertWorkbook's note).
+  const first = readWorkbookJob({ bytes: workbook([sheet("B", 40_000), sheet("A", 10), sheet("C", 10)]) });
+  assert.deepEqual([first.ok, first.sheets.map((each) => each.name), first.longCells], [true, ["A", "C"], ["B"]]);
+  const answering = () => {
+    const fake = { onmessage: null, onerror: null, terminate() {} };
+    fake.postMessage = (job) => setTimeout(() => fake.onmessage({ data: readWorkbookJob(job) }));
+    return fake;
+  };
+  const page = await readWorkbookInWorker(workbook([sheet("B", 40_000), sheet("A", 10)]), { createWorker: answering });
+  assert.deepEqual([page.sheets.map((each) => each.name), page.longCells], [["A"], ["B"]]);
+  // A table converter leaves it out and names it as before.
+  assert.deepEqual(readWorkbookSheets(workbook([sheet("A", 10), sheet("B", 40_000)]), { table: TABLE }).tooLarge, ["B"]);
+  // With no other sheet to draw, the workbook is refused, saying why.
+  assert.throws(() => readWorkbookSheets(crafted(long)), /can't be drawn here: each of its sheets with values has a cell longer than Excel allows \(32,767 characters\)/);
 });
 
 test("an image's read stops at the sheet that would take its tables past IMAGE_RETURNED, and counts it and the rest as not read", () => {

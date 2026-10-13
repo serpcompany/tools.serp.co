@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import {
   Card,
@@ -32,6 +32,7 @@ import {
 } from "@/components/table-convert/formats";
 import { parseInput, serializeInput, serializeOutput } from "@/components/table-convert/convert";
 import { fileTextFormat, readsAsWorkbook, workbookInput, workbookNotes } from "@/components/table-convert/excel-input";
+import { excelPaste } from "@/components/table-convert/excel-paste";
 import {
   initialTablePage,
   offeredDownload,
@@ -66,7 +67,7 @@ export default function TableConvertDemo({
   const [page, dispatch] = useReducer(nextTablePage, initialInputFormat, (format: InputFormat) =>
     initialTablePage(format, DEFAULT_TABLE),
   );
-  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload, workbook } = page;
+  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload, workbook, written } = page;
   const sheetSelectId = useId();
   const [outputFormat, setOutputFormat] = useState<OutputFormat>(initialOutputFormat);
   const [inputView, setInputView] = useState<ViewMode>("raw");
@@ -82,14 +83,48 @@ export default function TableConvertDemo({
   // selection just before it. That text is the visitor's own, so a download
   // of it is table.<extension>, not the uploaded file's name.
   const replacesInput = useRef(false);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const watchInput = useCallback((textarea: HTMLTextAreaElement | null) => {
     if (!textarea) return;
+    inputRef.current = textarea;
     const beforeChange = () => {
       replacesInput.current = textarea.selectionStart === 0 && textarea.selectionEnd === textarea.value.length;
     };
     textarea.addEventListener("beforeinput", beforeChange);
-    return () => textarea.removeEventListener("beforeinput", beforeChange);
+    return () => {
+      textarea.removeEventListener("beforeinput", beforeChange);
+      if (inputRef.current === textarea) inputRef.current = null;
+    };
   }, []);
+  // Where the caret goes once a paste the page wrote is in the input.
+  const pastedCaret = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const caret = pastedCaret.current;
+    pastedCaret.current = null;
+    if (caret !== null) inputRef.current?.setSelectionRange(caret, caret);
+  }, [inputText]);
+
+  // Cells pasted into the Excel input: when the clipboard's HTML table says
+  // its text reads differently from the visitor's reading of it (ditto
+  // marks, cells holding line breaks), the page puts the text in its own
+  // way (excel-paste.ts); otherwise the browser pastes.
+  function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
+    if (inputFormat !== "excel") return;
+    const textarea = event.currentTarget;
+    const paste = excelPaste({
+      plain: event.clipboardData.getData("text/plain"),
+      html: event.clipboardData.getData("text/html"),
+      value: textarea.value,
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd,
+      written,
+    });
+    if (!paste) return;
+    event.preventDefault();
+    if (paste.value === textarea.value) textarea.setSelectionRange(paste.caret, paste.caret);
+    else pastedCaret.current = paste.caret;
+    dispatch({ type: "type", text: paste.value, replacesInput: paste.replacesInput, written: paste.written });
+  }
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);
   const outputLabel = getLabel(OUTPUT_FORMATS, outputFormat);
@@ -371,6 +406,7 @@ export default function TableConvertDemo({
                   <textarea
                     ref={watchInput}
                     value={inputText}
+                    onPaste={handlePaste}
                     onChange={(event) => {
                       dispatch({ type: "type", text: event.target.value, replacesInput: replacesInput.current });
                       replacesInput.current = false;

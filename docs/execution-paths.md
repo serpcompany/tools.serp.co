@@ -168,20 +168,31 @@ Conversion picks an engine by input format:
   characters and show in about 5 seconds. An Excel input's text is a sheet's
   cells as Excel copies them: tab-separated, a cell in quotes, its quotes
   doubled, when it holds a tab or a line break (and, as written here, a
-  quote). It is read as Excel writes it: a cell that starts with a quote but
-  isn't quoted that way (`"Best" seller`, a ditto mark) is its text, and of
-  two readings the one that keeps the rows as wide wins. So cells pasted from
-  Excel convert too (the textarea takes the clipboard's plain text, which
-  keeps each cell's text exactly; the HTML Excel also puts there collapses
-  spaces), and a sheet reaches the table, the name and Download through the
-  reducer above like any file's text, under the workbook's name. The first
+  quote). It is read as Excel writes it (`lib/convert/excel-cells.ts`): a
+  cell that starts with a quote but isn't quoted that way (`"Best" seller`, a
+  ditto mark) is its text. Where a quote reads two ways (ditto marks in a
+  column copy as a quoted cell holding line breaks would), who wrote the text
+  decides (`written` in the reducer): text the page wrote (a sheet, a grid
+  edit, a rewrite) reads as written, through the visitor's edits too; the
+  visitor's text (typed, pasted, a text file) never has rows merged on a
+  quote unless no reading keeps every line a row of one width, and then
+  merges the fewest lines that make every row as wide. A paste takes the
+  clipboard's plain text, which keeps each cell's text exactly, and the HTML
+  table Excel puts next to it decides its shape (`excel-paste.ts`, scanned
+  as text, nothing rendered or fetched): when the visitor's reading differs,
+  the page puts the text in as its own. In the visitor's text, empty rows at
+  the end aren't rows; in the page's (a row added in the grid), they stay.
+  So cells pasted from Excel convert too, and a sheet reaches the table, the
+  name and Download through the reducer above like any file's text, under
+  the workbook's name. The first
   visible sheet with values shows; when there are more, a select picks
   another, which replaces the input's text from the same file, as last
   edited: each sheet keeps the visitor's edits. The page says which sheet is
   shown and what was left out. An `.xls` that is an OLE file (Excel 97-2003,
-  or a password-protected workbook) is refused with the reader's message to
-  save it as an unprotected `.xlsx`; one that is text, as web apps' "Export
-  to Excel" often writes, is read as its HTML table or tab-separated cells.
+  or a password-protected workbook) or Excel 2003 XML is refused with the
+  reader's message to save it as an unprotected `.xlsx`; one that is text,
+  as web apps' "Export to Excel" often writes, is read as its HTML table or
+  tab-separated cells.
   On the Excel input, a file whose extension the page doesn't map is a
   workbook when its first bytes are a ZIP's or an OLE file's, and text
   otherwise (Excel's tab-delimited `.txt`).

@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import { OLD_WORKBOOK } from "../../lib/convert/excel-cells.ts";
+import { readWorkbookSheets } from "../../lib/convert/xlsx-sheets.ts";
 import { fileTextFormat, readsAsWorkbook, workbookInput, workbookNotes } from "./excel-input.ts";
 
 const zip = new Uint8Array([0x50, 0x4b, 0x03, 0x04, 0x14, 0, 0, 0]);
@@ -39,6 +41,20 @@ test("an .xls file is a workbook only by its bytes: a real one goes to the reade
   // Any other file's text is in the format its name or type says, or the input's.
   assert.equal(fileTextFormat("csv", "<table>"), "csv");
   assert.equal(fileTextFormat(null, "a\tb"), null);
+});
+
+test("an .xls in the Excel 2003 XML format is refused as an older workbook is, not read as an empty HTML table (#299 review)", () => {
+  const spreadsheetML =
+    '<?xml version="1.0"?>\r\n<?mso-application progid="Excel.Sheet"?>\r\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' +
+    '<Worksheet ss:Name="Sheet1"><Table><Row><Cell><Data ss:Type="String">Name</Data></Cell></Row></Table></Worksheet></Workbook>';
+  assert.throws(() => fileTextFormat("excel", spreadsheetML), (error) => error.message === OLD_WORKBOOK);
+  assert.match(OLD_WORKBOOK, /save it as an unprotected \.xlsx/);
+  // The same message as a binary .xls gets from the reader.
+  const ole = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 0, 0]).buffer;
+  assert.throws(() => readWorkbookSheets(ole), (error) => error.message === OLD_WORKBOOK);
+  // Excel's own HTML export, and XML that isn't a workbook, aren't refused.
+  assert.equal(fileTextFormat("excel", '<html xmlns:x="urn:schemas-microsoft-com:office:excel"><body><table><tr><td>a</td></tr></table>'), "html");
+  assert.equal(fileTextFormat("excel", '<?xml version="1.0"?>\n<rows><row>a</row></rows>'), "excel");
 });
 
 test("a workbook with no sheet to show is a file that can't be read, and says why", () => {

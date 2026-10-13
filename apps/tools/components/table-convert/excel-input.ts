@@ -4,7 +4,7 @@
 // draws XLSX files as images (lib/convert/xlsx-sheets.ts, #265): hidden
 // sheets, rows and columns left out, each cell as Excel shows it.
 
-import { MAX_CELL_CHARS, TABLE_CELLS, TABLE_CHARS } from "../../lib/convert/excel-cells.ts";
+import { MAX_CELL_CHARS, OLD_WORKBOOK, TABLE_CELLS, TABLE_CHARS } from "../../lib/convert/excel-cells.ts";
 import type { WorkbookText } from "../../lib/convert/xlsx.worker.ts";
 import type { Workbook } from "./output-state.ts";
 import type { InputFormat } from "./types.ts";
@@ -37,9 +37,15 @@ export function readsAsWorkbook(name: string, detected: InputFormat | null, inpu
 
 // The format of a file read as text: the one its name or type says, except
 // that an Excel file's text is an HTML table when it is one, and otherwise
-// cells as Excel copies them (tab-separated).
+// cells as Excel copies them (tab-separated). An Excel file in the Excel
+// 2003 XML format (SpreadsheetML, which older "Export to Excel" features
+// write as .xls) is refused as an older workbook is: its <Table> isn't an
+// HTML table.
 export function fileTextFormat(detected: InputFormat | null, text: string): InputFormat | null {
   if (detected !== "excel") return detected;
+  if (/^\uFEFF?\s*<\?xml/i.test(text) && text.slice(0, 64 * 1024).includes("urn:schemas-microsoft-com:office:spreadsheet")) {
+    throw new Error(OLD_WORKBOOK);
+  }
   return /^\s*</.test(text) && /<table[\s>]/i.test(text) ? "html" : "excel";
 }
 

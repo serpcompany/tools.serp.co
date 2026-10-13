@@ -43,13 +43,19 @@ export function parseCsvTable(text: string): { table: TableData | null; error: s
 }
 
 // Cells copied from Excel, or a sheet as writeExcelCells (excel-cells.ts)
-// writes it, read as Excel writes them (readExcelCells), the first row the
-// header. Rows at the end with every cell empty aren't rows: a sheet's
-// table ends at its last value, and a selection copied past it adds them.
-export function parseExcelCells(text: string): { table: TableData | null; error: string | null } {
-  const data = readExcelCells(text);
-  while (data.length && data[data.length - 1]!.every((cell) => cell === "")) data.pop();
-  const headerRow = data[0];
+// writes it, read as readExcelCells reads them (`written`: the page wrote
+// the text), the first row the header.
+export function parseExcelCells(text: string, written = false): { table: TableData | null; error: string | null } {
+  return excelTable(readExcelCells(text, written), !written);
+}
+
+// Rows of cells as a table, the first row the header. With `trimEnd`, rows
+// at the end with every cell empty aren't rows: a selection copied past a
+// sheet's last value adds them. Text the page wrote keeps them, as a CSV
+// input keeps an empty last row (one added in the grid, say).
+export function excelTable(rows: string[][], trimEnd: boolean): { table: TableData | null; error: string | null } {
+  if (trimEnd) while (rows.length && rows[rows.length - 1]!.every((cell) => cell === "")) rows.pop();
+  const headerRow = rows[0];
   if (!headerRow) return { table: null, error: "There are no cells to convert." };
-  return { table: normalizeTable(headerRow, data.slice(1)), error: null };
+  return { table: normalizeTable(headerRow, rows.slice(1)), error: null };
 }

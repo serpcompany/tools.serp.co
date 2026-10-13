@@ -125,9 +125,11 @@ counted, not kept. What the worker returns is bounded too (#298): sheets are
 read while their tables add up to 1,000,000 cells and 10,000,000 characters
 (`IMAGE_RETURNED` in `xlsx-sheets.ts`), counted as values are read, and the
 sheet that would pass it and those after it aren't drawn; a first sheet that
-would, or a cell longer than Excel's 32,767 characters, refuses the
-workbook. So a few KB of ZIP that repeats one long string in every cell gets
-a message, not a reply too large to clone. An XLS file, or a workbook saved
+would refuses the workbook. A sheet with a cell longer than Excel's 32,767
+characters is left out and named in the note, and the next sheets are
+still drawn; a workbook with no other sheet to draw is refused. So a few KB
+of ZIP that repeats one long string in every cell gets a message, not a
+reply too large to clone. An XLS file, or a workbook saved
 with a password, is told to save it again as an unprotected `.xlsx`. The table converters' Excel input
 (#266) uses the same reader, keeping every row and column instead
 ([execution-paths.md](execution-paths.md#in-the-browser)).
