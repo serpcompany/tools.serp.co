@@ -26,16 +26,23 @@ import {
   resolveCounterContent,
   spansAcross,
   splitRow,
+  fileNameLabels,
+  workbookNotice,
 } from "./document-images.ts";
 import { DOCUMENT_IMAGE_ENGINES, isDocumentImageConversion } from "./image-document-targets.ts";
 import { PDF_FONT_URL } from "./table-outputs.ts";
-import { convertWithWorker } from "./workerClient.ts";
+import { convertWithWorker, multipleOutputName } from "./workerClient.ts";
+import { readWorkbookJob } from "./xlsx.worker.ts";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const bytes = (text) => new TextEncoder().encode(text);
 
-test("DOCX, DXF and HTML to an image route to document-images.ts, and nothing else does", () => {
-  for (const id of ["docx-to-jpeg", "docx-to-svg", "docx-to-tiff", "dxf-to-jpg", "dxf-to-png", "html-to-gif", "html-to-svg", "html-to-webp"]) {
+test("DOCX, DXF, HTML, TXT, DOT, XLSX and PPTX to an image route to document-images.ts, and nothing else does", () => {
+  for (const id of [
+    "docx-to-jpeg", "docx-to-svg", "docx-to-tiff", "dxf-to-jpg", "dxf-to-png", "html-to-gif", "html-to-svg", "html-to-webp",
+    "txt-to-jpeg", "txt-to-jpg", "txt-to-png", "txt-to-svg", "dot-to-jpg", "dot-to-png", "xlsx-to-jpg", "xlsx-to-png",
+    "pptx-to-jpeg", "pptx-to-jpg", "pptx-to-png",
+  ]) {
     const [from, to] = id.split("-to-");
     assert.equal(isDocumentImageConversion(from, to), true, id);
     assert.equal(isDocumentImageConversion(from.toUpperCase(), to.toUpperCase()), true, id);
@@ -48,13 +55,28 @@ test("DOCX, DXF and HTML to an image route to document-images.ts, and nothing el
     ["dxf", "dwg"],
     ["pdf", "png"],
     ["svg", "html"],
+    ["txt", "pdf"],
+    ["txt", "docx"],
+    ["xlsx", "csv"],
+    ["xls", "png"],
+    ["ppt", "png"],
+    ["pptx", "pdf"],
+    ["dot", "svg2"],
   ]) {
     assert.equal(isDocumentImageConversion(from, to), false, `${from} to ${to}`);
   }
-  assert.deepEqual(DOCUMENT_IMAGE_ENGINES, { docx: "docx-preview", dxf: "dxf-viewer", html: "html-render" });
+  assert.deepEqual(DOCUMENT_IMAGE_ENGINES, {
+    docx: "docx-preview",
+    dxf: "dxf-viewer",
+    html: "html-render",
+    txt: "text-render",
+    dot: "viz-js",
+    xlsx: "xlsx-table",
+    pptx: "pptx-glimpse",
+  });
 });
 
-test("the converter sends these files to document-images.ts, not the image decoder", async () => {
+test("the converter sends these files to document-images.ts, not the image decoder", async (t) => {
   // Node has no DOM, so each run fails inside the renderer, and its error
   // names that renderer's engine; the raster path would name "worker".
   for (const [from, to, engine] of [
@@ -71,6 +93,27 @@ test("the converter sends these files to document-images.ts, not the image decod
     convertWithWorker({ worker: undefined, from: "html", to: "gif", buf: bytes("  \n").buffer }),
     (error) => error.message === "This HTML file is empty." && error.telemetryMetadata.engine === "html-render",
   );
+  // XLSX is read in a worker: here, one that runs the worker's job in Node.
+  const previousWorker = globalThis.Worker;
+  globalThis.Worker = class {
+    postMessage(job) {
+      setTimeout(() => this.onmessage?.({ data: readWorkbookJob(job) }));
+    }
+    terminate() {}
+  };
+  t.after(() => (globalThis.Worker = previousWorker));
+  for (const [from, to, input, message, engine] of [
+    ["txt", "png", " \n\t\n", "This text file is empty: there's no text to draw.", "text-render"],
+    ["dot", "jpg", "\n", "This DOT file is empty.", "viz-js"],
+    ["xlsx", "png", "name,count\n", "This file isn't an XLSX workbook: it isn't a ZIP archive.", "xlsx-table"],
+    ["pptx", "jpg", "not a deck", "This file isn't a PowerPoint (.pptx) file: it isn't a ZIP archive.", "pptx-glimpse"],
+  ]) {
+    await assert.rejects(
+      convertWithWorker({ worker: undefined, from, to, buf: bytes(input).buffer }),
+      (error) => error.message === message && error.telemetryCode === "convert_failed" && error.telemetryMetadata.engine === engine,
+      `${from} to ${to}`,
+    );
+  }
 });
 
 test("a browser without WebGL is told DXF needs it, under its own error code", async () => {
@@ -324,4 +367,36 @@ test("a page taller than an image can be says what the image leaves out", () => 
 test("DXF text is drawn with the DejaVu Sans the table PDFs self-host", () => {
   assert.equal(DXF_FONT_URL, PDF_FONT_URL);
   assert.ok(existsSync(path.join(appRoot, "public", DXF_FONT_URL)));
+});
+
+test("the page says which image is which sheet, and what each leaves out", () => {
+  assert.equal(workbookNotice(["Only"], [], 0), undefined);
+  assert.equal(
+    workbookNotice(["Sales", "Notes"], ["Sales: Showing the first 54 of 9,999 rows."], 1),
+    "One image a sheet, named after it, in the workbook's order: Sales, Notes. Sales: Showing the first 54 of 9,999 rows. An image holds what fits in 4096 pixels. 1 hidden sheet isn't drawn.",
+  );
+  assert.equal(
+    workbookNotice(["A", "B"], [], 2, 5),
+    "One image a sheet, named after it, in the workbook's order: A, B. 5 more sheets aren't drawn: one workbook gives at most 100 images here. 2 hidden sheets aren't drawn.",
+  );
+  assert.equal(
+    workbookNotice(["A", "B"], [], 0, 1, "size"),
+    "One image a sheet, named after it, in the workbook's order: A, B. 1 more sheet isn't drawn: the workbook holds more cells than one conversion reads here.",
+  );
+});
+
+test("several images are saved under their sheet's name or slide's number, others by page", () => {
+  assert.deepEqual(fileNameLabels(["Sales", "Q1/Q2: costs?", "sales", " ..Notes.. ", "", "a\u202Egnp.exe", "x".repeat(80)], (index) => `sheet${index + 1}`), [
+    "Sales",
+    "Q1_Q2_ costs_",
+    "sales_2",
+    "Notes",
+    "sheet5",
+    "a_gnp.exe",
+    "x".repeat(60),
+  ]);
+  assert.equal(multipleOutputName("deck.pptx", "png", 0, ["slide3"]), "deck_slide3.png");
+  assert.equal(multipleOutputName("book.v2.xlsx", "jpg", 1, ["Sales", "Costs"]), "book.v2_Costs.jpg");
+  // Other converters (DOCX and PDF pages) keep their page numbers.
+  assert.equal(multipleOutputName("report.docx", "png", 1), "report_page2.png");
 });

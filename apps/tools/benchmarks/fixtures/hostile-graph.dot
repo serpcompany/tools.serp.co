@@ -1,0 +1,21 @@
+// A hostile graph for the browser smoke test and graphviz-image.test.mjs:
+// every attribute that names a file or a URL points at /hostile/ on this
+// site, at example.net, or at a file on the visitor's disk. Graphviz in the
+// browser reads no file and fetches nothing, so the graph is drawn without
+// them.
+digraph hostile {
+  stylesheet="https://example.net/hostile.css";
+  fontpath="/etc";
+  imagepath="/etc:/hostile";
+  URL="https://example.net/graph";
+  label=<<TABLE BORDER="0"><TR><TD><IMG SRC="https://example.net/label.png"/></TD><TD>Hostile graph</TD></TR></TABLE>>;
+  a [label="A", image="https://example.net/a.png", href="https://example.net/a", URL="/hostile/a"];
+  b [label="B", image="/etc/passwd", tooltip="b"];
+  c [label="C", shape=custom, shapefile="/hostile/shape.svg"];
+  d [label="D", image="passwd"];
+  e [label="E", shape=epsf, shapefile="/etc/hosts"];
+  a -> b [href="https://example.net/edge", labelURL="https://example.net/label", label="edge"];
+  b -> c;
+  c -> d;
+  d -> e;
+}

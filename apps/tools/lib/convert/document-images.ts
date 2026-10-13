@@ -1,5 +1,8 @@
 // DOCX, DXF and HTML files drawn as images (issue #250), in the visitor's
 // browser and on the main thread, since laying out a page needs the DOM.
+// Plain text, Graphviz DOT, XLSX and PPTX (#265) are drawn by their own
+// modules, text-image.ts, graphviz-image.ts, xlsx-sheets.ts with
+// table-image.ts, and pptx-slides.ts, and encoded here like the rest.
 // HTML and DOCX are laid out in a sandboxed iframe that runs no script and
 // loads nothing, then captured with modern-screenshot; DXF is drawn by
 // dxf-viewer with three.js and WebGL. Each picture is encoded as any image
@@ -913,8 +916,11 @@ async function encode(rgba: RGBA, to: string, quality: number): Promise<ArrayBuf
 }
 
 // One image per DOCX page (kind "multiple", like PDF pages), or one of a DXF
-// drawing or an HTML page, in `to`'s format. Throws an Error whose `code`
-// is set when the browser, not the file, is the reason.
+// drawing, an HTML page, a text file or a DOT graph, or one per XLSX sheet
+// with values or PPTX slide that shows (kind "single" when there's one), in
+// `to`'s format.
+// Throws an Error whose `code` is set when the browser, not the file, is
+// the reason.
 export async function convertDocumentToImages(
   buf: ArrayBuffer,
   from: string,
@@ -936,11 +942,103 @@ export async function convertDocumentToImages(
     onProgress?.({ status: "processing", progress: 100 });
     return { kind: "single", buffer };
   }
-  if (from === "html") {
-    const { rgba, notice } = await renderHtml(buf);
-    const buffer = await encode(rgba, to, quality);
+  if (from === "xlsx") return convertWorkbook(buf, to, quality, onProgress);
+  if (from === "pptx") {
+    const { renderSlides } = await import("./pptx-slides.ts");
+    const { buffers, names, notice } = await renderSlides(
+      buf,
+      (rgba) => encode(rgba, to, quality),
+      (done, count) => onProgress?.({ status: "processing", progress: Math.min(95, 20 + (75 * done) / count) }),
+    );
     onProgress?.({ status: "processing", progress: 100 });
-    return { kind: "single", buffer, notice };
+    return buffers.length === 1 ? { kind: "single", buffer: buffers[0]!, notice } : { kind: "multiple", buffers, names, notice };
   }
-  throw new Error(`${from.toUpperCase()} files can't be drawn as images here.`);
+  const render =
+    from === "html"
+      ? renderHtml
+      : from === "txt"
+        ? (await import("./text-image.ts")).renderTextImage
+        : from === "dot"
+          ? (await import("./graphviz-image.ts")).renderGraph
+          : null;
+  if (!render) throw new Error(`${from.toUpperCase()} files can't be drawn as images here.`);
+  const { rgba, notice } = await render(buf);
+  const buffer = await encode(rgba, to, quality);
+  onProgress?.({ status: "processing", progress: 100 });
+  return { kind: "single", buffer, notice };
+}
+
+// An image of each sheet that shows, drawn as the table converters draw a
+// table (table-image.ts): the first row as the header, as many rows and
+// columns as fit, and a note in the image when some don't. The sheets are
+// read in a worker with a time limit (xlsx-workbook.ts), and each image is
+// named after its sheet.
+async function convertWorkbook(
+  buf: ArrayBuffer,
+  to: string,
+  quality: number,
+  onProgress?: (update: ProgressUpdate) => void,
+): Promise<ConversionResult> {
+  const [{ readWorkbookInWorker }, { renderTableImage }] = await Promise.all([
+    import("./xlsx-workbook.ts"),
+    import("./table-image.ts"),
+  ]);
+  const { sheets, hidden, skipped, stop } = await readWorkbookInWorker(buf.slice(0));
+  if (!sheets.length) throw new Error("This workbook has no visible sheet with values to draw.");
+  const buffers: ArrayBuffer[] = [];
+  const notes: string[] = [];
+  for (const sheet of sheets) {
+    const { rgba, note } = renderTableImage(sheet.table);
+    buffers.push(await encode(rgba, to, quality));
+    if (note) notes.push(sheets.length > 1 ? `${sheet.name}: ${note}` : note);
+    onProgress?.({ status: "processing", progress: Math.min(95, 20 + (75 * buffers.length) / sheets.length) });
+  }
+  onProgress?.({ status: "processing", progress: 100 });
+  const notice = workbookNotice(sheets.map((sheet) => sheet.name), notes, hidden, skipped, stop);
+  return sheets.length === 1
+    ? { kind: "single", buffer: buffers[0]!, notice }
+    : { kind: "multiple", buffers, names: fileNameLabels(sheets.map((sheet) => sheet.name), (index) => `sheet${sheets[index]!.number}`), notice };
+}
+
+const FILE_NAME_LABEL_LENGTH = 60;
+
+// Labels for several outputs' file names ("<name>_<label>.png") from names
+// in a file (sheet names): characters a file name can't hold, control and
+// direction characters become "_", spaces and dots at the ends go, each is
+// at most FILE_NAME_LABEL_LENGTH characters, a repeat gets "_2", and an
+// empty one takes `fallback`'s.
+export function fileNameLabels(names: string[], fallback: (index: number) => string): string[] {
+  const used = new Set<string>();
+  return names.map((name, index) => {
+    const cleaned = [...name.replace(/[<>:"/\\|?*\p{Cc}\p{Cf}]/gu, "_")]
+      .slice(0, FILE_NAME_LABEL_LENGTH)
+      .join("")
+      .replace(/^[\s.]+|[\s.]+$/g, "");
+    const base = cleaned || fallback(index);
+    let label = base;
+    for (let copy = 2; used.has(label.toLowerCase()); copy += 1) label = `${base}_${copy}`;
+    used.add(label.toLowerCase());
+    return label;
+  });
+}
+
+// What the page says about a workbook's images: which file is which sheet,
+// what each leaves out, the visible sheets not read and the hidden sheets it
+// doesn't draw.
+export function workbookNotice(
+  names: string[],
+  notes: string[],
+  hidden: number,
+  skipped = 0,
+  stop: "sheets" | "size" = "sheets",
+): string | undefined {
+  const parts: string[] = [];
+  if (names.length > 1) parts.push(`One image a sheet, named after it, in the workbook's order: ${names.join(", ")}.`);
+  if (skipped) {
+    const why = stop === "size" ? "the workbook holds more cells than one conversion reads here" : "one workbook gives at most 100 images here";
+    parts.push(`${skipped} more ${skipped === 1 ? "sheet isn't" : "sheets aren't"} drawn: ${why}.`);
+  }
+  if (notes.length) parts.push(`${notes.join(" ")} An image holds what fits in ${MAX_IMAGE_SIDE} pixels.`);
+  if (hidden) parts.push(`${hidden} hidden ${hidden === 1 ? "sheet isn't" : "sheets aren't"} drawn.`);
+  return parts.length ? parts.join(" ") : undefined;
 }

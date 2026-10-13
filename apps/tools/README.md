@@ -20,6 +20,9 @@ says which browser engine handles each input, how output is checked before it
 is saved, which server routes remain, which of them fail on Cloudflare
 Workers, and the request contracts they share. Read it before changing an
 engine, a worker or an API route.
+[docs/document-images.md](../../docs/document-images.md) covers the documents,
+text, graphs, workbooks and slides drawn as images, and the inputs that can't
+be.
 
 **Downloader Landers.** [docs/downloader-landers.md](../../docs/downloader-landers.md)
 covers the shared downloader template and rate limit, why downloads use this

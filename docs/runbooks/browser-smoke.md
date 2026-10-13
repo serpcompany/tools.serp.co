@@ -34,6 +34,12 @@ against a running Worker. CI runs it in two places:
   as laid out before it's captured: the table's header row starts each page
   it runs onto, every cell sits on the columns' edges and under the header it
   names, and no row is missing a column.
+- Graphviz and PowerPoint to images (#265), the same way: `dot-to-png`
+  converts `hostile-graph.dot`, whose images, shape files, stylesheet and links
+  name example.net, `/hostile/` and files on disk, and `pptx-to-jpg` converts
+  `hostile-links.pptx`, whose pictures are linked rather than embedded; after
+  the upload no request leaves the browser for either file. The layout workers'
+  scripts load from `/_next/static/`.
 - The Worker serves the self-hosted PDF font
   (`/vendor/fonts/dejavu/DejaVuSans.ttf`) with a font type and the bytes in
   `public/`. Table pages load it only for text outside Windows-1252, which no

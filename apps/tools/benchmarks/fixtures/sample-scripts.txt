@@ -1,0 +1,11 @@
+SERP Tools: plain text drawn as an image
+
+Latin: The quick brown fox jumps over the lazy dog. Ça va? Größe, señor, Øresund.
+Greek: Γρήγορη καφέ αλεπού πηδά πάνω από τον τεμπέλη σκύλο.
+Cyrillic: Съешь же ещё этих мягких французских булок, да выпей чаю.
+Hebrew: עטלף אבק נס דרך מזגן שהתפוצץ כי חם.
+Arabic: نص حكيم له سر قاطع وذو شأن عظيم مكتوب على ثوب أخضر.
+	Tabbed: one	two	three
+
+A long line that wraps: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+A long word: Supercalifragilisticexpialidocious-Pneumonoultramicroscopicsilicovolcanoconiosis-Hippopotomonstrosesquippedaliophobia-Floccinaucinihilipilification

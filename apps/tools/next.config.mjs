@@ -5,6 +5,9 @@ import { createRequire } from "node:module";
 import ffmpegPath from "ffmpeg-static";
 
 const require = createRequire(import.meta.url);
+// require.resolve gives the package's CommonJS build; its browser build sits
+// beside it.
+const pptxGlimpseBrowser = path.join(path.dirname(require.resolve("pptx-glimpse")), "browser.js");
 const appRoot = path.dirname(fileURLToPath(import.meta.url));
 const tracingRoot = path.resolve(appRoot, "../..");
 const toolsPath = path.resolve(appRoot, "lib/catalog/tools.json");
@@ -157,6 +160,10 @@ const nextConfig = {
   outputFileTracingIncludes,
   webpack(config) {
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
+    // pptx-glimpse's browser build (PPTX to an image, lib/convert/pptx.worker.ts).
+    // Its exports name it under a "browser" condition this build doesn't use,
+    // and its Node build imports Node-only modules.
+    config.resolve.alias = { ...config.resolve.alias, "pptx-glimpse$": pptxGlimpseBrowser };
     config.output = { ...config.output, hashFunction: "sha256" };
     return config;
   },

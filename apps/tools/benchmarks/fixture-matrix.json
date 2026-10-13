@@ -1075,6 +1075,31 @@
       "input": "file",
       "fixture": "fixtures/sample-page.html",
       "notes": "A styled page written as plain text: a gradient header, three cards with shadows, a striped table, an inline data: SVG drawing and a dark footer; no external resources. Read back with `file` (HTML document text)."
+    },
+    "txt-to-jpg": {
+      "input": "file",
+      "fixture": "fixtures/sample-scripts.txt",
+      "notes": "Eleven lines of UTF-8 text written as plain text: a pangram each in Latin (with accents), Greek, Cyrillic, Hebrew and Arabic, a tab-indented line, a line long enough to wrap and a word too long for a line. Read back with `file` (Unicode text, UTF-8 text) and `wc -l`."
+    },
+    "txt-to-svg": {
+      "input": "file",
+      "fixture": "fixtures/sample-scripts.txt",
+      "notes": "The fixture txt-to-jpg uses; see its notes."
+    },
+    "dot-to-jpg": {
+      "input": "file",
+      "fixture": "fixtures/sample-clusters.dot",
+      "notes": "A styled Graphviz graph written as plain text: two clusters, a record node, an HTML-like label, colours, edge labels and a rank set (left to right). Read back with @hpcc-js/wasm-graphviz 1.29.2 (Graphviz 16.1.0, a different build from the app's Viz.js) in a scratch folder: 5 nodes, 4 edges, 2 clusters."
+    },
+    "xlsx-to-jpg": {
+      "input": "file",
+      "fixture": "fixtures/sample-sheets.xlsx",
+      "notes": "Three sheets written as SpreadsheetML by a Python script with zipfile (no Excel or download): Sales (dates, #,##0, a custom \"$\"#,##0.00 and 0% formats, booleans, SUM formulas with cached results, a hidden row and a hidden column), Payroll (hidden) and Notes (Greek, Cyrillic, Hebrew and Arabic text). Read back with `file` (Microsoft Excel 2007+) and macOS Quick Look (qlmanage -t), which draws Sales without its hidden row and column. Two sheets show, so two images (PAGE_COUNTS in scripts/lib/tool-sweep.mjs); xlsx-sheets.test.mjs checks each cell's text and that nothing hidden is read."
+    },
+    "pptx-to-jpg": {
+      "input": "file",
+      "fixture": "fixtures/sample-deck.pptx",
+      "notes": "Three 16:9 slides written by pptxgenjs 4.0.1 in a scratch folder (no PowerPoint or download): a title, a bulleted list with Greek, Cyrillic and Hebrew, an embedded PNG made with magick, a rounded rectangle, an arrow and a circle; a slide marked hidden afterwards by a Python script with zipfile (<p:sld show=\"0\">); a table with row heights and a column chart, with speaker notes. Read back with `file` (Microsoft PowerPoint 2007+) and macOS Quick Look (qlmanage -t), which draws the first slide. Two slides show, so two images (PAGE_COUNTS in scripts/lib/tool-sweep.mjs); pptx-slides.test.mjs checks the hidden slide and the notes aren't drawn."
     }
   }
 }

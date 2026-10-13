@@ -13658,7 +13658,7 @@
   {
     "id": "dot-to-jpg",
     "name": "DOT to JPG",
-    "description": "Convert DOT to JPG format",
+    "description": "Convert DOT to JPG: your Graphviz graph laid out by Graphviz itself, in your browser, on a white background. Pictures and links the graph names aren't loaded.",
     "operation": "convert",
     "route": "/dot-to-jpg",
     "from": "dot",
@@ -13674,7 +13674,7 @@
   {
     "id": "dot-to-png",
     "name": "DOT to PNG",
-    "description": "Convert DOT to PNG format",
+    "description": "Convert DOT to PNG: your Graphviz graph laid out by Graphviz itself, in your browser, on a white background. Pictures and links the graph names aren't loaded.",
     "operation": "convert",
     "route": "/dot-to-png",
     "from": "dot",
@@ -66191,7 +66191,7 @@
     "route": "/fig-to-tiff",
     "from": "fig",
     "to": "tiff",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "fig",
       "tiff",
@@ -89923,7 +89923,7 @@
     "route": "/odt-to-jpg",
     "from": "odt",
     "to": "jpg",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "odt",
       "jpg",
@@ -93905,7 +93905,7 @@
   {
     "id": "pptx-to-jpeg",
     "name": "PPTX to JPEG",
-    "description": "Convert PPTX to JPEG format",
+    "description": "Convert PPTX to JPEG: a JPEG of each slide of your PowerPoint file, drawn in your browser. Hidden slides and speaker notes aren't included, and video and linked pictures aren't drawn.",
     "operation": "convert",
     "route": "/pptx-to-jpeg",
     "from": "pptx",
@@ -93921,7 +93921,7 @@
   {
     "id": "pptx-to-jpg",
     "name": "PPTX to JPG",
-    "description": "Convert PPTX to JPG format",
+    "description": "Convert PPTX to JPG: a JPG of each slide of your PowerPoint file, drawn in your browser. Hidden slides and speaker notes aren't included, and video and linked pictures aren't drawn.",
     "operation": "convert",
     "route": "/pptx-to-jpg",
     "from": "pptx",
@@ -93937,7 +93937,7 @@
   {
     "id": "pptx-to-png",
     "name": "PPTX to PNG",
-    "description": "Convert PPTX to PNG format",
+    "description": "Convert PPTX to PNG: a PNG of each slide of your PowerPoint file, drawn in your browser. Hidden slides and speaker notes aren't included, and video and linked pictures aren't drawn.",
     "operation": "convert",
     "route": "/pptx-to-png",
     "from": "pptx",
@@ -93958,7 +93958,7 @@
     "route": "/ps-to-jpg",
     "from": "ps",
     "to": "jpg",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "ps",
       "jpg",
@@ -93974,7 +93974,7 @@
     "route": "/ps-to-png",
     "from": "ps",
     "to": "png",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "ps",
       "png",
@@ -98497,7 +98497,7 @@
   {
     "id": "txt-to-jpeg",
     "name": "TXT to JPEG",
-    "description": "Convert TXT to JPEG format",
+    "description": "Convert TXT to JPEG: your text drawn as an image in your browser, long lines wrapped, in a font for Latin, Greek, Cyrillic, Hebrew and Arabic. A very long text is cut at 4,096 px, and the image says where.",
     "operation": "convert",
     "route": "/txt-to-jpeg",
     "from": "txt",
@@ -98513,7 +98513,7 @@
   {
     "id": "txt-to-jpg",
     "name": "TXT to JPG",
-    "description": "Convert TXT to JPG format",
+    "description": "Convert TXT to JPG: your text drawn as an image in your browser, long lines wrapped, in a font for Latin, Greek, Cyrillic, Hebrew and Arabic. A very long text is cut at 4,096 px, and the image says where.",
     "operation": "convert",
     "route": "/txt-to-jpg",
     "from": "txt",
@@ -98529,7 +98529,7 @@
   {
     "id": "txt-to-png",
     "name": "TXT to PNG",
-    "description": "Convert TXT to PNG format",
+    "description": "Convert TXT to PNG: your text drawn as an image in your browser, long lines wrapped, in a font for Latin, Greek, Cyrillic, Hebrew and Arabic. A very long text is cut at 4,096 px, and the image says where.",
     "operation": "convert",
     "route": "/txt-to-png",
     "from": "txt",
@@ -98545,7 +98545,7 @@
   {
     "id": "txt-to-svg",
     "name": "TXT to SVG",
-    "description": "Convert TXT to SVG format",
+    "description": "Convert TXT to SVG: an SVG holding a picture of your text, so the text isn't editable. Long lines wrap, and a very long text is cut at 4,096 px, with the image saying where.",
     "operation": "convert",
     "route": "/txt-to-svg",
     "from": "txt",
@@ -103552,7 +103552,7 @@
   {
     "id": "xlsx-to-jpg",
     "name": "XLSX to JPG",
-    "description": "Convert XLSX to JPG format",
+    "description": "Convert XLSX to JPG: a picture of each sheet's cells, numbers and dates as Excel shows them, the first row as the header. Hidden sheets, rows and columns, charts and pictures aren't drawn.",
     "operation": "convert",
     "route": "/xlsx-to-jpg",
     "from": "xlsx",
@@ -103568,7 +103568,7 @@
   {
     "id": "xlsx-to-png",
     "name": "XLSX to PNG",
-    "description": "Convert XLSX to PNG format",
+    "description": "Convert XLSX to PNG: a picture of each sheet's cells, numbers and dates as Excel shows them, the first row as the header. Hidden sheets, rows and columns, charts and pictures aren't drawn.",
     "operation": "convert",
     "route": "/xlsx-to-png",
     "from": "xlsx",

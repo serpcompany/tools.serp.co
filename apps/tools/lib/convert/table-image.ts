@@ -4,6 +4,7 @@
 // limit, as for pdf.js pages); a table that doesn't fit shows its first rows
 // and columns, and the image and the page say how many.
 
+import type { RGBA } from "./heif.ts";
 import type { TableData } from "./table-data.ts";
 
 // Drawn at twice its size in CSS pixels, so text stays sharp when zoomed.
@@ -49,7 +50,9 @@ export type TableImageLayout = {
 
 const RTL_LETTER = /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufeff]/;
 
-function isRightToLeft(text: string): boolean {
+// Right to left when its first letter is Hebrew or Arabic (text-image.ts
+// sets a text line's direction the same way).
+export function isRightToLeft(text: string): boolean {
   const letter = /\p{L}/u.exec(text);
   return Boolean(letter && RTL_LETTER.test(letter[0]));
 }
@@ -253,10 +256,8 @@ async function encode(canvas: OffscreenCanvas | HTMLCanvasElement, type: string)
   );
 }
 
-export async function writeTableImage(
-  table: TableData,
-  format: "png" | "jpeg",
-): Promise<{ buffer: ArrayBuffer; notice?: string; image: { width: number; height: number } }> {
+// The table drawn on a canvas: the layout, and the canvas at IMAGE_SCALE.
+function drawTableCanvas(table: TableData) {
   const measuring = context2d(makeCanvas(1, 1));
   const widths = new Map<string, number>();
   const measure: MeasureText = (text, bold) => {
@@ -275,6 +276,22 @@ export async function writeTableImage(
   const context = context2d(canvas);
   context.scale(IMAGE_SCALE, IMAGE_SCALE);
   drawTable(context, layout, measure);
+  return { canvas, context, layout, image };
+}
+
+// The table's image as pixels, for a converter that encodes it itself (XLSX
+// to an image, document-images.ts), and the note it shows when cut.
+export function renderTableImage(table: TableData): { rgba: RGBA; note: string | null } {
+  const { context, layout, image } = drawTableCanvas(table);
+  const { data } = context.getImageData(0, 0, image.width, image.height);
+  return { rgba: { data, width: image.width, height: image.height }, note: layout.note };
+}
+
+export async function writeTableImage(
+  table: TableData,
+  format: "png" | "jpeg",
+): Promise<{ buffer: ArrayBuffer; notice?: string; image: { width: number; height: number } }> {
+  const { canvas, layout, image } = drawTableCanvas(table);
   const blob = await encode(canvas, format === "png" ? "image/png" : "image/jpeg");
   return {
     buffer: await blob.arrayBuffer(),

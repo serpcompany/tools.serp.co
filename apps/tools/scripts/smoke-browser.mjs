@@ -475,6 +475,29 @@ await step("docx-to-jpeg loads none of a DOCX's linked or missing pictures", asy
   await expectNothingRanOrLoaded(page, unexpected);
 });
 
+// Graphviz and pptx-glimpse lay a file out in a worker (#265); its scripts
+// load from /_next/static/, and a file the graph or a slide names loads from
+// nowhere.
+const isPng = (head) => head[0] === 0x89 && String.fromCharCode(...head.slice(1, 4)) === "PNG";
+
+await step("dot-to-png loads none of the files and URLs a hostile graph names", async (page, telemetryStatuses) => {
+  await watchDocumentConversion(page);
+  await page.goto(`${args.baseUrl}/dot-to-png/`);
+  const unexpected = await watchRequests(page);
+  const [saved] = await convertInPage(page, telemetryStatuses, "dot-to-png", "hostile-graph.dot", 1);
+  assert(isPng(saved.head), `not a PNG: starts with ${Buffer.from(saved.head).toString("hex")}`);
+  await expectNothingRanOrLoaded(page, unexpected);
+});
+
+await step("pptx-to-jpg loads none of a slide's linked pictures or links", async (page, telemetryStatuses) => {
+  await watchDocumentConversion(page);
+  await page.goto(`${args.baseUrl}/pptx-to-jpg/`);
+  const unexpected = await watchRequests(page);
+  const [saved] = await convertInPage(page, telemetryStatuses, "pptx-to-jpg", "hostile-links.pptx", 1);
+  assert(isJpeg(saved.head), `not a JPEG: starts with ${Buffer.from(saved.head).toString("hex")}`);
+  await expectNothingRanOrLoaded(page, unexpected);
+});
+
 // The columns a table's header row names, left to right, on the first page
 // that shows the table.
 const LONG_TABLE_COLUMNS = ["GROUP", "ITEM", "PRICE"];

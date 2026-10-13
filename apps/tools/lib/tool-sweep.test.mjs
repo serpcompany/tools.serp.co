@@ -471,6 +471,13 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "dxf", "png"), "dxf-viewer");
   assert.equal(engine("convert", "html", "svg"), "html-render");
   assert.equal(engine("convert", "html", "webp"), "html-render");
+  assert.equal(engine("convert", "txt", "svg"), "text-render");
+  assert.equal(engine("convert", "txt", "jpeg"), "text-render");
+  assert.equal(engine("convert", "dot", "png"), "viz-js");
+  assert.equal(engine("convert", "xlsx", "jpg"), "xlsx-table");
+  assert.equal(engine("convert", "pptx", "jpeg"), "pptx-glimpse");
+  assert.equal(engine("convert", "ppt", "png"), "browser-raster");
+  assert.equal(engine("convert", "txt", "pdf"), "browser-raster");
   assert.equal(engine("convert", "image", "pdf"), "image-pdf");
   assert.equal(engine("convert", "png", "pdf"), "browser-raster");
   assert.equal(engine("compress", "heic", "heic"), "server-image-compress");
