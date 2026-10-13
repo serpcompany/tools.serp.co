@@ -235,21 +235,34 @@ test("the review's ditto marks: with or without the HTML, every row stays a row"
   assert.equal(readPastedCells(text, { widths: [1, 1], quoted: new Set(), quoteFirst: new Set() }), null);
 });
 
-test("1,000,000 pasted rows with a ditto mark in the first column stay 1,000,000 rows, read quickly", () => {
-  const text = `Mark\tItem\r\n${'"\tx\r\n'.repeat(1_000_000)}`;
-  const started = performance.now();
-  const { table } = parseExcelCells(text);
-  const elapsed = performance.now() - started;
-  assert.equal(table.rows.length, 1_000_000);
-  assert.deepEqual([table.rows[0], table.rows.at(-1)], [['"', "x"], ['"', "x"]]);
-  assert.ok(elapsed < 3_000, `${Math.round(elapsed)} ms`);
-  // With a cell holding a line break as well, each quote is read alone.
-  const mixed = `Mark\tItem\r\nx\t"two\nlines"\r\n${'"\tx\r\n'.repeat(1_000_000)}`;
-  const timed = performance.now();
-  const rows = readExcelCells(mixed);
-  assert.equal(rows.length, 1_000_002);
-  assert.deepEqual(rows.slice(0, 3), [["Mark", "Item"], ["x", "two\nlines"], ['"', "x"]]);
-  assert.ok(performance.now() - timed < 3_000, `${Math.round(performance.now() - timed)} ms`);
+test("1,000,000 pasted rows with a ditto mark in the first column stay 1,000,000 rows, in time linear in the rows", () => {
+  // Time grows with the rows, not their square: ten times the rows take far
+  // less than a hundred times as long. The ceiling is only a backstop for a
+  // slow machine (#299 CI).
+  const dittos = (rows) => `Mark\tItem\r\n${'"\tx\r\n'.repeat(rows)}`;
+  // With a cell holding a line break as well, each quote is read alone, by
+  // the search for the fewest merged lines.
+  const mixed = (rows) => `Mark\tItem\r\nx\t"two\nlines"\r\n${'"\tx\r\n'.repeat(rows)}`;
+  const timed = (text) => {
+    const started = performance.now();
+    const rows = readExcelCells(text);
+    return { rows, ms: performance.now() - started };
+  };
+  for (const [name, make, head] of [
+    ["ditto marks", dittos, [["Mark", "Item"], ['"', "x"]]],
+    ["ditto marks and a two-line cell", mixed, [["Mark", "Item"], ["x", "two\nlines"], ['"', "x"]]],
+  ]) {
+    // The smaller read three times, its fastest kept, so a pause in one
+    // doesn't make the larger look slow.
+    const small = Math.min(...[0, 1, 2].map(() => timed(make(100_000)).ms));
+    const large = timed(make(1_000_000));
+    assert.equal(large.rows.length, head.length - 1 + 1_000_000, name);
+    assert.deepEqual(large.rows.slice(0, head.length), head, name);
+    assert.deepEqual(large.rows.at(-1), ['"', "x"], name);
+    assert.ok(large.ms / small < 30, `${name}: 1,000,000 rows took ${Math.round(large.ms)} ms, 100,000 took ${Math.round(small)} ms`);
+    assert.ok(large.ms < 20_000, `${name}: ${Math.round(large.ms)} ms`);
+  }
+  assert.equal(parseExcelCells(dittos(1_000_000)).table.rows.length, 1_000_000);
 });
 
 test("Excel's HTML table gives a cell copied as it stands its text: `\"\"\"\"` and `\"\"\"Doc\"\"\"` aren't read as quoted (#299 review)", () => {

@@ -194,14 +194,12 @@ function crossesPinned({ starts }: Pinned, at: number, end: number): boolean {
   return low < starts.length && starts[low]! < end;
 }
 
-// The quoted cell that starts at `at` in a reading where no `pinned` cell
-// may be crossed: a pinned cell there, or a cell that starts with a quote
-// and can be quoted (quotedCell) without crossing one; else null.
-function quotedAt(text: string, at: number, pinned: Pinned | null): { cell: Quoted; pinned: boolean } | null {
-  const pin = pinned?.cells.get(at);
-  if (pin) return { cell: pin, pinned: true };
+// The quoted cell other than a pinned one that starts at `at`: one that
+// starts with a quote and can be quoted (quotedCell) without crossing a
+// pinned cell's start; else null.
+function freeQuotedCell(text: string, at: number, pinned: Pinned | null): Quoted | null {
   const cell = text.charCodeAt(at) === QUOTE ? quotedCell(text, at) : null;
-  return cell && !(pinned && crossesPinned(pinned, at, cell.end)) ? { cell, pinned: false } : null;
+  return cell && pinned && crossesPinned(pinned, at, cell.end) ? null : cell;
 }
 
 // Whether a cell that starts with a quote and can be read as a quoted cell
@@ -224,8 +222,11 @@ function readCells(
   let column = 0;
   let at = firstCell(text);
   for (;;) {
-    const found = quotedAt(text, at, pinned);
-    const quoted = found && (found.pinned || take(found.cell, at, row, column)) ? found.cell : null;
+    let quoted = pinned?.cells.get(at) ?? null;
+    if (!quoted) {
+      quoted = freeQuotedCell(text, at, pinned);
+      if (quoted && !take(quoted, at, row, column)) quoted = null;
+    }
     const end = quoted ? quoted.end : cellEnd(text, at);
     cell(at, end, quoted);
     column += 1;
@@ -434,12 +435,13 @@ function fewestMerged(text: string, width: number, pinned: Pinned | null): Map<n
           edged += edges(first.value);
         }
       } else {
-        const found = quotedAt(text, at, pinned);
-        if (found && !found.pinned && !inPlace(found.cell)) {
-          push({ at, column, merged, edges: edged, cell: found.cell, parent, quoted });
+        const pin = pinned?.cells.get(at);
+        const cell = pin ? null : freeQuotedCell(text, at, pinned);
+        if (cell && !inPlace(cell)) {
+          push({ at, column, merged, edges: edged, cell, parent, quoted });
           return;
         }
-        end = found ? found.cell.end : cellEnd(text, at);
+        end = pin ? pin.end : cell ? cell.end : cellEnd(text, at);
       }
       column += 1;
       if (end < text.length && text.charCodeAt(end) === TAB) {
