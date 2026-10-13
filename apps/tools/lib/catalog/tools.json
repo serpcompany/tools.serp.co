@@ -66191,7 +66191,7 @@
     "route": "/fig-to-tiff",
     "from": "fig",
     "to": "tiff",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "fig",
       "tiff",
@@ -89923,7 +89923,7 @@
     "route": "/odt-to-jpg",
     "from": "odt",
     "to": "jpg",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "odt",
       "jpg",
@@ -93958,7 +93958,7 @@
     "route": "/ps-to-jpg",
     "from": "ps",
     "to": "jpg",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "ps",
       "jpg",
@@ -93974,7 +93974,7 @@
     "route": "/ps-to-png",
     "from": "ps",
     "to": "png",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "ps",
       "png",

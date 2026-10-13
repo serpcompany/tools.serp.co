@@ -13,8 +13,10 @@ loads each renderer only when its input is converted. Each picture is then
 encoded as any image is (`encode.ts`): an SVG is the PNG wrapped, not text or
 vectors, and a TIFF is LZW. No side of an image passes 4096 px, Safari's canvas
 limit. A file with several pages, sheets or slides becomes one image each,
-saved as `name_page1`, `name_page2` in order, and the page says which is which
-and what was left out. `DOCUMENT_IMAGE_ENGINES` names each renderer for
+saved as `name_page1`, `name_page2` in order, a slide as `name_slide3` (its
+own number, hidden slides counted) and a sheet as `name_Sales` (its name, made
+safe for a file name, `_2` on a repeat); the page says which is which and what
+was left out. `DOCUMENT_IMAGE_ENGINES` names each renderer for
 telemetry and the Tool sweep.
 
 ## HTML and DOCX (since #250)
@@ -98,9 +100,13 @@ to fit 4096 px, and the page says so.
 ## XLSX (since #265)
 
 `lib/convert/xlsx-sheets.ts` reads the workbook with fflate and a small XML
-scanner (`lib/convert/ooxml.ts`), inflating a part only when it's needed and
-only up to the size its ZIP entry declares, and refusing a sheet that declares
-more than 64 MB. Each sheet that shows becomes an image drawn as the table
+scanner (`lib/convert/ooxml.ts`) in a worker (`lib/convert/xlsx.worker.ts`,
+started by `xlsx-workbook.ts`) stopped after 60 s (`layout_timeout`). It
+inflates a part only when it's needed and only up to the size its ZIP entry
+declares, refuses a sheet that declares more than 64 MB, and stops reading
+sheets once the parts read add up to 256 MB (a sheet part two sheets name is
+read once). A row or cell numbered outside Excel's grid (1,048,576 rows,
+16,384 columns) is left out. Each sheet that shows becomes an image drawn as the table
 converters draw a table (`table-image.ts`): its first row as the header, as
 many rows and columns as fit, and a note in the image when some don't. Hidden
 and very hidden sheets, hidden rows and hidden columns are left out, as Excel
@@ -108,10 +114,12 @@ leaves them out of a printout, and the page counts the hidden sheets. A cell
 shows what Excel shows (`lib/convert/excel-number-format.ts`): General,
 decimals, thousands separators, percentages, scientific notation, currency
 and other text in the format, dates and times (1900 and 1904 date systems),
-TRUE and FALSE, error values, and a formula's saved result. Fractions are
-shown as decimals, and cells keep the table renderer's left alignment. A merged
-cell shows its value in its first cell; charts, pictures, comments and colours
-aren't drawn, and at most 100 sheets become images. 10,000 rows in three
+fractions, TRUE and FALSE, error values, and a formula's saved result. Text
+goes through the format's text section, and a section left empty hides the
+value, as in Excel (`;;;`, `0;-0;;@`). Cells keep the table renderer's left
+alignment. A merged cell shows its value in its first cell; charts, pictures,
+comments and colours aren't drawn, and at most 100 sheets with values become
+images. 10,000 rows in three
 sheets read in about half a second; rows past the first 500 with values are
 counted, not kept. An XLS file, or a workbook saved with a password, is told to
 save it again as an unprotected `.xlsx`.
@@ -121,7 +129,11 @@ save it again as an unprotected `.xlsx`.
 pptx-glimpse 5.3.1 (MIT) draws each slide that shows as SVG in a worker
 (`lib/convert/pptx.worker.ts`), ten slides a worker so a long presentation's
 SVGs aren't all held at once, all stopped after 90 s (`layout_timeout`), and
-`lib/convert/pptx-slides.ts` draws each SVG through an `<img>` at twice the
+`lib/convert/pptx-slides.ts` picks the slides that show by part, reading the
+slide list as pptx-glimpse reads it (each `<p:sldId>`'s `r:id`), and the
+worker numbers them from pptx-glimpse's own list (`readPptx` from
+`@pptx-glimpse/document` 0.16.0), so a hidden slide is never drawn in a
+visible one's place. It draws each SVG through an `<img>` at twice the
 slide's size in points (1440x810 for a 10-inch 16:9 slide, 1920x1080 for
 PowerPoint's 13.33-inch one), encoding each slide before drawing the next.
 Text is SVG text in the slide's own fonts with metric-compatible fallbacks,
@@ -138,8 +150,9 @@ package exports only under a `browser` condition this build doesn't use.
 
 ## Not drawn
 
-ODT, PostScript and XFig still fail with "Image decode failed." (#265 has the
-research and the proposals): no maintained, permissive renderer runs them in
-the browser. LibreOffice in WebAssembly is ruled out for now, Ghostscript is
-AGPL (#244), the one ODT preview package reads only headings and paragraphs,
-and no maintained XFig reader exists for the browser.
+`odt-to-jpg`, `ps-to-jpg`, `ps-to-png` and `fig-to-tiff` are retired (#265,
+the owner's decision): no maintained, permissive renderer runs ODT, PostScript
+or XFig in the browser. LibreOffice in WebAssembly is ruled out for now,
+Ghostscript is AGPL (#244), the one ODT preview package reads only headings
+and paragraphs, and no maintained XFig reader exists for the browser. ODT to
+JPG comes back with a reader of our own (#297).
