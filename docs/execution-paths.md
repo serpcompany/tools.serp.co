@@ -160,20 +160,31 @@ Conversion picks an engine by input format:
   ([document-images.md](document-images.md#xlsx-since-265)), in its worker,
   loaded only then: each cell as Excel shows it, hidden sheets, rows and
   columns left out. Every row and column of each visible sheet with values is
-  kept, up to 1,000,000 cells a workbook (`TABLE_CELLS` in
-  `lib/convert/excel-cells.ts`, about a second to read and 7 MB of text); a
-  sheet that would take it past that is left out, and the page names it. An
-  Excel input's text is a sheet's cells as Excel copies them: tab-separated,
-  a cell in quotes when it holds a tab, a line break or a quote. So cells
-  pasted from Excel convert too, and a sheet reaches the table, the name and
-  Download through the reducer above like any file's text, under the
-  workbook's name. The first visible sheet with values shows; when there are
-  more, a select picks another, which replaces the input's text from the same
-  file. The page says which sheet is shown and what was left out. An XLS file
-  or a password-protected workbook is refused with the reader's message to
-  save it as an unprotected `.xlsx`. On the Excel input, a file whose
-  extension the page doesn't map is a workbook when its first bytes are a
-  ZIP's or an OLE file's, and text otherwise (Excel's tab-delimited `.txt`).
+  kept, up to 1,000,000 cells and 10,000,000 characters of text a workbook
+  (`TABLE_CELLS` and `TABLE_CHARS` in `lib/convert/excel-cells.ts`), counted
+  as values are read, before any text is built; a sheet that would take
+  either past it, or has a cell longer than Excel's 32,767 characters, is left
+  out, and the page names it. A million cells of short numbers are 6.9 million
+  characters and show in about 5 seconds. An Excel input's text is a sheet's
+  cells as Excel copies them: tab-separated, a cell in quotes, its quotes
+  doubled, when it holds a tab or a line break (and, as written here, a
+  quote). It is read as Excel writes it: a cell that starts with a quote but
+  isn't quoted that way (`"Best" seller`, a ditto mark) is its text, and of
+  two readings the one that keeps the rows as wide wins. So cells pasted from
+  Excel convert too (the textarea takes the clipboard's plain text, which
+  keeps each cell's text exactly; the HTML Excel also puts there collapses
+  spaces), and a sheet reaches the table, the name and Download through the
+  reducer above like any file's text, under the workbook's name. The first
+  visible sheet with values shows; when there are more, a select picks
+  another, which replaces the input's text from the same file, as last
+  edited: each sheet keeps the visitor's edits. The page says which sheet is
+  shown and what was left out. An `.xls` that is an OLE file (Excel 97-2003,
+  or a password-protected workbook) is refused with the reader's message to
+  save it as an unprotected `.xlsx`; one that is text, as web apps' "Export
+  to Excel" often writes, is read as its HTML table or tab-separated cells.
+  On the Excel input, a file whose extension the page doesn't map is a
+  workbook when its first bytes are a ZIP's or an OLE file's, and text
+  otherwise (Excel's tab-delimited `.txt`).
 - **Image to text** (`lib/convert/image-text.ts`): JPG and PNG to TXT is OCR
   with tesseract.js, in the browser. Its worker, SIMD LSTM core and English
   model (4.0.0 best_int) are served from `public/vendor/tesseract/`, and a

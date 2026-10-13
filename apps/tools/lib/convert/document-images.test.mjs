@@ -381,7 +381,7 @@ test("the page says which image is which sheet, and what each leaves out", () =>
   );
   assert.equal(
     workbookNotice(["A", "B"], [], 0, 1, "size"),
-    "One image a sheet, named after it, in the workbook's order: A, B. 1 more sheet isn't drawn: the workbook holds more cells than one conversion reads here.",
+    "One image a sheet, named after it, in the workbook's order: A, B. 1 more sheet isn't drawn: the workbook holds more cells or text than one conversion reads here.",
   );
 });
 

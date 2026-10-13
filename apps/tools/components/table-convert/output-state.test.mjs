@@ -212,6 +212,32 @@ test("a workbook stays with the input's text: edits keep it, text of the visitor
   }
 });
 
+test("a sheet keeps its edits: typing or a grid edit, then another sheet and back, shows the edited text (#299 review)", () => {
+  const read = run(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: book("S", 3) });
+  const typed = next(read, { type: "type", text: "excel:S1a|S1b|TYPED" });
+  const back = run(typed, { type: "sheet", sheet: 1 }, { type: "sheet", sheet: 0 });
+  assert.deepEqual([back.inputText, cells(back), back.fileName], ["excel:S1a|S1b|TYPED", ["S1a", "S1b", "TYPED"], "book.xlsx"]);
+  // A table afresh each time, so nothing written before the switch is offered.
+  assert.notEqual(back.origin, typed.origin);
+  assert.equal(offeredDownload(back, "excel", { table: typed.table, format: "excel" }), null);
+  assert.equal(offeredDownload(back, "csv", { table: back.table, format: "csv" }).name, "book.csv");
+  // A grid edit on the second sheet stays with it; the first keeps its own.
+  const second = next(back, { type: "sheet", sheet: 1 });
+  const edited = next(second, { type: "editGrid", table: { headers: ["value"], rows: [["G"]] }, origin: second.origin });
+  assert.deepEqual(edited.workbook.sheets.map((sheet) => sheet.text), ["excel:S1a|S1b|TYPED", "excel:G", "excel:S3a|S3b"]);
+  assert.equal(run(edited, { type: "sheet", sheet: 0 }, { type: "sheet", sheet: 1 }).inputText, "excel:G");
+  // A typo is kept as typed too: it's what the input held.
+  const typo = run(edited, { type: "type", text: "excel:G BROKEN" }, { type: "sheet", sheet: 2 }, { type: "sheet", sheet: 1 });
+  assert.deepEqual([typo.inputText, typo.table], ["excel:G BROKEN", null]);
+  // In another format the text isn't a sheet's: the sheet keeps the last
+  // Excel text it had, and takes the table's again when Excel is picked.
+  const asCsv = run(edited, { type: "inputFormat", format: "csv" }, { type: "type", text: "csv:G|CSV" });
+  assert.equal(asCsv.workbook.sheets[1].text, "excel:G");
+  const asExcel = next(asCsv, { type: "inputFormat", format: "excel" });
+  assert.deepEqual([asExcel.inputText, asExcel.workbook.sheets[1].text], ["excel:G|CSV", "excel:G|CSV"]);
+  assert.equal(run(asExcel, { type: "sheet", sheet: 0 }, { type: "sheet", sheet: 1 }).inputText, "excel:G|CSV");
+});
+
 test("choosing a sheet while another file is read wins over it, as typing does; a late workbook read is dropped", () => {
   const read = run(start("excel"), { type: "upload", name: "a.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: book("A") });
   const reading = next(read, { type: "upload", name: "b.xlsx", ticket: 2 });
@@ -256,15 +282,19 @@ test("an output written from the previous table or for another format isn't offe
 // work in a random order: uploads that read, can't be read, don't parse or
 // are in another format, finishing late and out of order; Excel workbooks
 // (#266) of one to three sheets, that can't be read, are over the reader's
-// limits, have no sheet to show or leave some sheets out; choosing a sheet,
-// while another file is read or not; typing (edits, typos and their fixes,
+// limits, have no sheet to show or leave some sheets out; Excel files and
+// files on the Excel input that are text (#299 review: an .xls of
+// tab-separated cells or an HTML table, a tab-delimited .txt); choosing a
+// sheet, while another file is read or not, and coming back to a sheet
+// after editing it; typing (edits, typos and their fixes,
 // pastes over all of the input, emptying it); grid edits from a grid that
 // may still show an earlier table; input and output format switches; binary
 // outputs that finish after the table changed; clears. A reference model,
 // kept here from the rules alone, follows the same events: it holds its own
 // input text and format, parses that text with the stand-in to know whether
 // there's a table, and tracks the text's origin, the workbook it came from
-// and the upload still being read. It never reads the page's state. After
+// (each sheet's text as last edited) and the upload still being read. It
+// never reads the page's state. After
 // every step the test checks the page's input, table, error, name and
 // workbook against it, and that Download offers exactly what it should,
 // under that name.
@@ -285,7 +315,7 @@ function mulberry32(seed) {
 
 const ACTIONS = [
   ["upload", 3], ["finish", 4], ["type", 4], ["editGrid", 4], ["syncGrid", 3],
-  ["inputFormat", 2], ["outputFormat", 2], ["writeStart", 2], ["writeFinish", 2], ["clear", 1], ["sheet", 4],
+  ["inputFormat", 2], ["outputFormat", 2], ["writeStart", 2], ["writeFinish", 2], ["clear", 1], ["sheet", 4], ["sheetBack", 5],
 ];
 const INPUT_FORMATS = ["csv", "json", "excel"];
 const OUTPUT_FORMATS = ["json", "csv", "excel", "pdf"];
@@ -362,10 +392,15 @@ function runSequence(rng, seen, log) {
     if (action === "upload") {
       const id = (tickets += 1);
       const detected = pick([...INPUT_FORMATS, "excel", null]);
-      const name = `f${id}.${detected ? EXTENSIONS[detected] : "dat"}`;
-      // As the page decides when the file is chosen: Excel by its name or
-      // type, or nothing says otherwise and the input is Excel.
-      if (detected === "excel" || (detected === null && model.format === "excel")) {
+      const xls = detected === "excel" && rng() < 0.4;
+      const name = `f${id}.${xls ? "xls" : detected ? EXTENSIONS[detected] : "dat"}`;
+      // As the page decides when the file is chosen: a workbook when its
+      // first bytes are a ZIP's or an OLE file's and its name says Excel, or
+      // nothing does and the input is Excel; an .xlsx whatever it holds.
+      // Anything else is text.
+      const workbookBytes = rng() < 0.6;
+      const asWorkbook = detected === "excel" ? !xls || workbookBytes : detected === null && model.format === "excel" && workbookBytes;
+      if (asWorkbook) {
         const outcome = pick(["ok", "ok", "ok", "partial", "brokenSheet", "unreadable", "tooLarge", "noSheets"]);
         const count = outcome === "noSheets" ? 0 : 1 + Math.floor(rng() * 3);
         const broken = outcome === "brokenSheet" ? Math.floor(rng() * count) : -1;
@@ -381,10 +416,14 @@ function runSequence(rng, seen, log) {
         };
         reads.push({ name, ticket: id, workbook, outcome });
       } else {
-        const textFormat = detected ?? pick(INPUT_FORMATS);
+        // An Excel file's text is cells as Excel copies them, or an HTML
+        // table; a file with no format of its own is read in the input's.
+        const format = detected === "excel" ? pick(["excel", "html"]) : detected;
+        const textFormat = format ?? pick(INPUT_FORMATS);
         const outcome = pick(["ok", "ok", "unparseable", "unreadable", "empty"]);
         const text = outcome === "empty" ? "" : `${textFormat}:F${id}a|F${id}b${outcome === "unparseable" ? " BROKEN" : ""}`;
-        reads.push({ name, ticket: id, text, format: detected, outcome });
+        const kind = detected === "excel" ? "excelText" : detected === null && model.format === "excel" ? "textOnExcel" : null;
+        reads.push({ name, ticket: id, text, format, outcome, kind });
       }
       event = { type: "upload", name, ticket: id };
     } else if (action === "finish") {
@@ -447,6 +486,10 @@ function runSequence(rng, seen, log) {
       // The picker's choice: any sheet, or the one shown; and, as a stale
       // or stray event would, one the workbook hasn't.
       event = { type: "sheet", sheet: Math.floor(rng() * ((model.workbook?.sheets.length ?? 1) + 1)) };
+    } else if (action === "sheetBack") {
+      // Back to the sheet shown before, as a visitor checks an edit.
+      if (model.workbook?.previous === undefined) continue;
+      event = { type: "sheet", sheet: model.workbook.previous };
     }
 
     if (event) {
@@ -488,13 +531,15 @@ function runSequence(rng, seen, log) {
             // it's the file's, and so is the workbook.
             model.text = file.workbook.sheets[0].text;
             model.format = "excel";
-            model.workbook = { file: file.name, sheets: file.workbook.sheets, sheet: 0 };
+            model.workbook = { file: file.name, read: file.workbook.sheets, sheets: file.workbook.sheets.map((sheet) => sheet.text), sheet: 0 };
             seen.workbookReads += 1;
           } else {
             // The file's text is in the input: it's the file's.
             model.text = event.text;
             model.format = event.format ?? model.format;
+            if (model.workbook) seen.textDropsWorkbook += 1;
             model.workbook = null;
+            if (file.kind) seen[file.kind] += 1;
           }
           model.userInput = true;
           model.name = file.name;
@@ -511,12 +556,14 @@ function runSequence(rng, seen, log) {
             unchanged();
             break;
           }
-          // Like typing, it wins over a file still being read.
+          // Like typing, it wins over a file still being read. The sheet
+          // comes back as it was last edited.
           if (model.pending !== null) seen.sheetWinsOverRead += 1;
+          if (workbook.sheets[event.sheet] !== workbook.read[event.sheet].text) seen.sheetBackWithEdits += 1;
           seen.sheetSwitches += 1;
           model.pending = null;
-          model.workbook = { ...workbook, sheet: event.sheet };
-          model.text = workbook.sheets[event.sheet].text;
+          model.workbook = { ...workbook, sheet: event.sheet, previous: workbook.sheet };
+          model.text = workbook.sheets[event.sheet];
           model.userInput = true;
           reparse(model, { afresh: true });
           break;
@@ -586,6 +633,14 @@ function runSequence(rng, seen, log) {
       }
     }
 
+    // While the input is Excel, the sheet shown holds its text, as typed,
+    // edited or rewritten; in another format the sheet keeps what it had.
+    if (model.workbook && model.format === "excel") {
+      const sheets = model.workbook.sheets.slice();
+      sheets[model.workbook.sheet] = model.text;
+      model.workbook = { ...model.workbook, sheets };
+    }
+
     // The page holds what the model says.
     assert.equal(state.inputText, model.text, "the input is the model's text");
     assert.equal(state.inputFormat, model.format, "the input format is the model's");
@@ -596,7 +651,11 @@ function runSequence(rng, seen, log) {
     if (model.table === placeholder) assert.equal(state.table, placeholder);
     assert.equal(Boolean(state.error), model.error, "an error exactly when there's no table");
     assert.equal(state.fileName, model.name, "the name is the origin of the model's text");
-    assert.equal(state.workbook?.sheets ?? null, model.workbook?.sheets ?? null, "the workbook is the one the text came from");
+    assert.deepEqual(
+      state.workbook?.sheets ?? null,
+      model.workbook ? model.workbook.read.map((sheet, index) => ({ ...sheet, text: model.workbook.sheets[index] })) : null,
+      "the workbook is the one the text came from, each sheet as last edited",
+    );
     assert.equal(state.workbook?.sheet ?? null, model.workbook?.sheet ?? null, "the sheet is the one whose text went in last");
     if (model.workbook) assert.equal(state.fileName, model.workbook.file, "a workbook is there only under its own file's name");
 
@@ -625,7 +684,7 @@ test(`the name and the offered download always describe the table on screen (${S
     readOk: 0, readUnparseable: 0, unreadable: 0, unreadableKeepsName: 0, droppedReads: 0, edits: 0, staleEdits: 0,
     editsWithoutTable: 0, typoKeepsName: 0, fixKeepsName: 0, replacedNamed: 0, formatTakesFileName: 0, namedOffers: 0,
     workbookReads: 0, workbookFailures: 0, unreadableKeepsWorkbook: 0, sheetSwitches: 0, sheetWinsOverRead: 0,
-    ignoredSheets: 0, ownTextDropsWorkbook: 0,
+    ignoredSheets: 0, ownTextDropsWorkbook: 0, sheetBackWithEdits: 0, excelText: 0, textOnExcel: 0, textDropsWorkbook: 0,
   };
   for (let sequence = 0; sequence < SEQUENCES; sequence += 1) {
     const log = [];

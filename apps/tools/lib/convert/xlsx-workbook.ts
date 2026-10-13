@@ -42,7 +42,8 @@ export async function readWorkbookInWorker(bytes: ArrayBuffer, options: WorkerOp
 }
 
 // The workbook's sheets as a table converter's Excel input: every row and
-// column of each, as text, up to TABLE_CELLS cells in all (excel-cells.ts).
+// column of each, as text, up to TABLE_CELLS cells and TABLE_CHARS
+// characters in all (excel-cells.ts).
 export async function readWorkbookTextInWorker(bytes: ArrayBuffer, options: WorkerOptions = {}): Promise<WorkbookText> {
   const reply = await readInWorker({ bytes, cells: true }, options);
   if (!reply.cells) throw new Error("The workbook was read as tables, not text.");
@@ -51,6 +52,6 @@ export async function readWorkbookTextInWorker(bytes: ArrayBuffer, options: Work
     hidden: reply.hidden,
     skipped: reply.skipped,
     ...(reply.stop ? { stop: reply.stop } : {}),
-    tooManyCells: reply.tooManyCells ?? [],
+    tooLarge: reply.tooLarge ?? [],
   };
 }

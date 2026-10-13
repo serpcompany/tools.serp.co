@@ -31,7 +31,7 @@ import {
   outputMimeType,
 } from "@/components/table-convert/formats";
 import { parseInput, serializeInput, serializeOutput } from "@/components/table-convert/convert";
-import { readsAsWorkbook, workbookInput, workbookNotes } from "@/components/table-convert/excel-input";
+import { fileTextFormat, readsAsWorkbook, workbookInput, workbookNotes } from "@/components/table-convert/excel-input";
 import {
   initialTablePage,
   offeredDownload,
@@ -196,12 +196,13 @@ export default function TableConvertDemo({
     try {
       const format = detectFormatFromFile(file);
       const head = new Uint8Array(await file.slice(0, 8).arrayBuffer());
-      if (readsAsWorkbook(format, inputFormat, head)) {
+      if (readsAsWorkbook(file.name, format, inputFormat, head)) {
         const { readWorkbookTextInWorker } = await import("@/lib/convert/xlsx-workbook");
         const read = await readWorkbookTextInWorker(await file.arrayBuffer());
         event = { type: "readWorkbook", ticket, workbook: workbookInput(read) };
       } else {
-        event = { type: "read", ticket, text: await file.text(), format };
+        const text = await file.text();
+        event = { type: "read", ticket, text, format: fileTextFormat(format, text) };
       }
     } catch (readError) {
       const reason = readError instanceof Error ? readError.message : String(readError);

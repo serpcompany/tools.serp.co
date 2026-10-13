@@ -1035,7 +1035,7 @@ export function workbookNotice(
   const parts: string[] = [];
   if (names.length > 1) parts.push(`One image a sheet, named after it, in the workbook's order: ${names.join(", ")}.`);
   if (skipped) {
-    const why = stop === "size" ? "the workbook holds more cells than one conversion reads here" : "one workbook gives at most 100 images here";
+    const why = stop === "size" ? "the workbook holds more cells or text than one conversion reads here" : "one workbook gives at most 100 images here";
     parts.push(`${skipped} more ${skipped === 1 ? "sheet isn't" : "sheets aren't"} drawn: ${why}.`);
   }
   if (notes.length) parts.push(`${notes.join(" ")} An image holds what fits in ${MAX_IMAGE_SIDE} pixels.`);

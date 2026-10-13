@@ -121,8 +121,14 @@ alignment. A merged cell shows its value in its first cell; charts, pictures,
 comments and colours aren't drawn, and at most 100 sheets with values become
 images. 10,000 rows in three
 sheets read in about half a second; rows past the first 500 with values are
-counted, not kept. An XLS file, or a workbook saved with a password, is told to
-save it again as an unprotected `.xlsx`. The table converters' Excel input
+counted, not kept. What the worker returns is bounded too (#298): sheets are
+read while their tables add up to 1,000,000 cells and 10,000,000 characters
+(`IMAGE_RETURNED` in `xlsx-sheets.ts`), counted as values are read, and the
+sheet that would pass it and those after it aren't drawn; a first sheet that
+would, or a cell longer than Excel's 32,767 characters, refuses the
+workbook. So a few KB of ZIP that repeats one long string in every cell gets
+a message, not a reply too large to clone. An XLS file, or a workbook saved
+with a password, is told to save it again as an unprotected `.xlsx`. The table converters' Excel input
 (#266) uses the same reader, keeping every row and column instead
 ([execution-paths.md](execution-paths.md#in-the-browser)).
 

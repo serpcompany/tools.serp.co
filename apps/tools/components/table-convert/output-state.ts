@@ -27,7 +27,10 @@
 // its first sheet's text goes into the input, which takes the file's name,
 // as any file's text does. Its other sheets stay with that text: choosing
 // one replaces the input with that sheet's text, from the same file, so the
-// name stays. They go when the name does.
+// name stays. They go when the name does. Each sheet keeps the visitor's
+// edits: while the input is Excel, the sheet shown holds the input's text,
+// so choosing another sheet and coming back brings the edits back (#299
+// review).
 
 import type { WorkbookText } from "../../lib/convert/xlsx.worker.ts";
 import { outputFileName } from "./formats.ts";
@@ -46,9 +49,9 @@ export type SerializeTable = (format: InputFormat, table: TableData) => { text: 
 export type Upload = { name: string; ticket: number } | null;
 
 // A workbook read for an Excel input: its sheets with values, each as the
-// text the input holds for it, what was left out (hidden sheets, sheets with
-// too many cells, sheets not read), and which sheet the input's text came
-// from.
+// text the input holds for it (as read, or as last edited), what was left
+// out (hidden sheets, sheets too large, sheets not read), and which sheet
+// the input's text came from.
 export type Workbook = Omit<WorkbookText, "sheets"> & { sheets: { name: string; text: string }[]; sheet: number };
 
 export type TablePage = {
@@ -120,11 +123,16 @@ export function tablePageReducer({
 }) {
   // Parses the input into the table on screen. A failure clears the table,
   // and with it the grid and any download, but the text keeps its origin.
+  // The workbook's sheet shown takes the text of an Excel input, edited or
+  // not; in another format the text isn't a sheet's, and the sheet keeps
+  // the last it had.
   function settle(
     state: TablePage,
-    input: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "fileName" | "upload" | "workbook">,
+    edited: Pick<TablePage, "inputFormat" | "inputText" | "hasUserInput" | "fileName" | "upload" | "workbook">,
     fromFile = false,
   ): TablePage {
+    const { workbook } = edited;
+    const input = workbook && edited.inputFormat === "excel" ? { ...edited, workbook: keepSheetText(workbook, edited.inputText) } : edited;
     if (!input.hasUserInput && !input.inputText.trim()) {
       const continues = state.table === placeholder;
       return { ...state, ...input, fileName: null, workbook: null, table: placeholder, error: null, origin: continues ? state.origin : state.origin + 1 };
@@ -263,6 +271,14 @@ export function tablePageReducer({
         };
     }
   };
+}
+
+// The workbook with its sheet shown holding `text`.
+function keepSheetText(workbook: Workbook, text: string): Workbook {
+  const shown = workbook.sheets[workbook.sheet];
+  if (!shown || shown.text === text) return workbook;
+  const sheets = workbook.sheets.map((sheet, index) => (index === workbook.sheet ? { ...sheet, text } : sheet));
+  return { ...workbook, sheets };
 }
 
 // The table and format an output was written from.

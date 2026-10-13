@@ -4,6 +4,7 @@
 // Excel input, read as cells copied from Excel (excel-cells.ts).
 
 import Papa from "papaparse";
+import { readExcelCells } from "./excel-cells.ts";
 
 export type TableData = {
   headers: string[];
@@ -42,15 +43,12 @@ export function parseCsvTable(text: string): { table: TableData | null; error: s
 }
 
 // Cells copied from Excel, or a sheet as writeExcelCells (excel-cells.ts)
-// writes it: tab-separated, quoted as Excel quotes, the first row the
-// header. Excel ends the last row with a line break too; that isn't a row.
+// writes it, read as Excel writes them (readExcelCells), the first row the
+// header. Rows at the end with every cell empty aren't rows: a sheet's
+// table ends at its last value, and a selection copied past it adds them.
 export function parseExcelCells(text: string): { table: TableData | null; error: string | null } {
-  const parsed = Papa.parse<string[]>(text, { delimiter: "\t", skipEmptyLines: false });
-  if (parsed.errors.length) {
-    return { table: null, error: parsed.errors[0]?.message ?? "These cells couldn't be read." };
-  }
-  const data = parsed.data as string[][];
-  while (data.length && data[data.length - 1]!.length === 1 && data[data.length - 1]![0] === "") data.pop();
+  const data = readExcelCells(text);
+  while (data.length && data[data.length - 1]!.every((cell) => cell === "")) data.pop();
   const headerRow = data[0];
   if (!headerRow) return { table: null, error: "There are no cells to convert." };
   return { table: normalizeTable(headerRow, data.slice(1)), error: null };
