@@ -3,7 +3,7 @@
     "issue": "https://github.com/serpcompany/tools.serp.co/issues/147",
     "command": "pnpm -C apps/tools tool-sweep",
     "baseUrl": "http://localhost:8812",
-    "commit": "ea22b99ef0cd107c968e701b6c4ecadf5a6b0fed",
+    "commit": "5f579ea2ed8e49e4c84897a44bc7f81f29d47a14",
     "activeTools": 2530,
     "counts": {
       "pass": 2102,
@@ -3860,6 +3860,23 @@
           "excel-to-markdown"
         ],
         "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "5f579ea2ed8e49e4c84897a44bc7f81f29d47a14",
+        "dirty": false,
+        "startedAt": "2026-10-13T12:20:33.428Z",
+        "finishedAt": "2026-10-13T12:20:34.577Z",
+        "wallMs": 1149,
+        "measured": 2,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "excel-to-csv",
+          "excel-to-markdown"
+        ],
+        "browserVersion": "143.0.7499.4"
       }
     ]
   },
@@ -4802,8 +4819,8 @@
     {"id":"dxf-to-png","route":"/dxf-to-png","from":"dxf","to":"png","handler":"ToolPageRenderer","engine":"dxf-viewer","status":"pass","durationMs":1394,"formatCheck":"signature","topColourShare":0.9688,"fixture":"sample-plan.dxf","output":{"files":1,"bytes":108756,"name":"sample-plan.png"},"commit":"652005251f133784a2127dcba46d9fef884856c5","dirty":false},
     {"id":"emf-to-png","route":"/emf-to-png","from":"emf","to":"png","handler":"ToolPageRenderer","engine":"browser-raster","status":"no_fixture","reason":"no ready emf fixture in fixture-matrix.json","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"eps-to-pdf","route":"/eps-to-pdf","from":"eps","to":"pdf","handler":"ToolPageRenderer","engine":"browser-raster","status":"error","durationMs":746,"error":"Image decode failed.","fixture":"sample.eps","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
-    {"id":"excel-to-csv","route":"/excel-to-csv","from":"excel","to":"csv","handler":"TableConvertLanding","engine":"table-convert + xlsx","status":"pass","durationMs":791,"formatCheck":"content","fixture":"sample-sheets.xlsx","output":{"files":1,"bytes":208,"name":"sample-sheets.csv"},"commit":"ea22b99ef0cd107c968e701b6c4ecadf5a6b0fed","dirty":false},
-    {"id":"excel-to-markdown","route":"/excel-to-markdown","from":"excel","to":"markdown","handler":"TableConvertLanding","engine":"table-convert + xlsx","status":"pass","durationMs":864,"formatCheck":"content","fixture":"sample-sheets.xlsx","output":{"files":1,"bytes":383,"name":"sample-sheets.md"},"commit":"ea22b99ef0cd107c968e701b6c4ecadf5a6b0fed","dirty":false},
+    {"id":"excel-to-csv","route":"/excel-to-csv","from":"excel","to":"csv","handler":"TableConvertLanding","engine":"table-convert + xlsx","status":"pass","durationMs":906,"formatCheck":"content","fixture":"sample-sheets.xlsx","output":{"files":1,"bytes":208,"name":"sample-sheets.csv"},"commit":"5f579ea2ed8e49e4c84897a44bc7f81f29d47a14","dirty":false},
+    {"id":"excel-to-markdown","route":"/excel-to-markdown","from":"excel","to":"markdown","handler":"TableConvertLanding","engine":"table-convert + xlsx","status":"pass","durationMs":979,"formatCheck":"content","fixture":"sample-sheets.xlsx","output":{"files":1,"bytes":383,"name":"sample-sheets.md"},"commit":"5f579ea2ed8e49e4c84897a44bc7f81f29d47a14","dirty":false},
     {"id":"exr-to-jpeg","route":"/exr-to-jpeg","from":"exr","to":"jpeg","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1283,"formatCheck":"signature","topColourShare":0.125,"fixture":"sample.exr","output":{"files":1,"bytes":1315,"name":"sample.jpeg"},"commit":"c2d1a16dbe7db763d81f85804950039a035f2aa9","dirty":false},
     {"id":"exr-to-jpg","route":"/exr-to-jpg","from":"exr","to":"jpg","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1413,"formatCheck":"signature","topColourShare":0.125,"fixture":"sample.exr","output":{"files":1,"bytes":1315,"name":"sample.jpg"},"commit":"c2d1a16dbe7db763d81f85804950039a035f2aa9","dirty":false},
     {"id":"exr-to-png","route":"/exr-to-png","from":"exr","to":"png","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1880,"formatCheck":"signature","topColourShare":0.1354,"fixture":"sample.exr","output":{"files":1,"bytes":738,"name":"sample.png"},"commit":"c2d1a16dbe7db763d81f85804950039a035f2aa9","dirty":false},
