@@ -2955,7 +2955,7 @@ svg-to-svg,live,convert,svg,svg,client-only,browser-raster,pass,format check: si
 svg-to-tga,live,convert,svg,tga,client-only,browser-raster,pass,format check: none,fe5c5df11d1b,svg to tga,exact,,,20,10,,,,ahrefs-2026-01,,
 svg-to-tif,live,convert,svg,tif,client-only,browser-raster,pass,format check: signature,fe5c5df11d1b,svg to tif,exact,,,50,10,,,,ahrefs-2026-01,,
 svg-to-tiff,live,convert,svg,tiff,client-only,browser-raster,pass,format check: signature,fe5c5df11d1b,svg to tiff,exact,,,600,100,0,30,20,ahrefs-2026-01,,
-svg-to-ttf,live,convert,svg,ttf,client-only,svg-font,pass,format check: decoded,aa9d22a0610a,svg to ttf,exact,,,500,80,0,60,40,ahrefs-2026-01,,
+svg-to-ttf,live,convert,svg,ttf,client-only,svg-font,pass,format check: decoded,241bff63a517,svg to ttf,exact,,,500,80,0,60,40,ahrefs-2026-01,,
 svg-to-webp,live,convert,svg,webp,client-only,browser-raster,pass,format check: signature,fe5c5df11d1b,svg to webp,exact,,,8200,400,1,,,ahrefs-2026-01,,
 ,not built,convert,svg,xbm,,,,,,svg to xbm,none,,,,,,,,ahrefs-2026-01,,
 svg-to-xcf,retired,convert,svg,xcf,unknown,,not swept,the sweep runs live Tools only,,,,,,,,,,,,,
