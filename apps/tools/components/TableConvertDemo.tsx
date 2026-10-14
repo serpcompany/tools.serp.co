@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Button } from "@serp-tools/ui/components/button";
 import {
   Card,
@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@serp-tools/ui/components/card";
 import { Badge } from "@serp-tools/ui/components/badge";
+import { Label } from "@serp-tools/ui/components/label";
 import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
 import BinaryOutputPreview, { type BinaryOutputState } from "@/components/table-convert/BinaryOutputPreview";
@@ -29,7 +30,9 @@ import {
   outputFileName,
   outputMimeType,
 } from "@/components/table-convert/formats";
-import { parseInput, serializeOutput } from "@/components/table-convert/convert";
+import { parseInput, serializeInput, serializeOutput } from "@/components/table-convert/convert";
+import { fileTextFormat, readsAsWorkbook, workbookInput, workbookNotes } from "@/components/table-convert/excel-input";
+import { excelPaste } from "@/components/table-convert/excel-paste";
 import {
   initialTablePage,
   offeredDownload,
@@ -52,7 +55,7 @@ const BINARY_DELAY_MS = 300;
 
 // The input, the table on screen and the name downloads take change only
 // here, together (output-state.ts).
-const nextTablePage = tablePageReducer({ parse: parseInput, serialize: serializeOutput, placeholder: DEFAULT_TABLE });
+const nextTablePage = tablePageReducer({ parse: parseInput, serialize: serializeInput, placeholder: DEFAULT_TABLE });
 
 export default function TableConvertDemo({
   initialInputFormat = "csv",
@@ -64,7 +67,9 @@ export default function TableConvertDemo({
   const [page, dispatch] = useReducer(nextTablePage, initialInputFormat, (format: InputFormat) =>
     initialTablePage(format, DEFAULT_TABLE),
   );
-  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload } = page;
+  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload, workbook, readOnly } = page;
+  const sheetSelectId = useId();
+  const readOnlyNoteId = useId();
   const [outputFormat, setOutputFormat] = useState<OutputFormat>(initialOutputFormat);
   const [inputView, setInputView] = useState<ViewMode>("raw");
   const [outputView, setOutputView] = useState<ViewMode>("raw");
@@ -79,14 +84,48 @@ export default function TableConvertDemo({
   // selection just before it. That text is the visitor's own, so a download
   // of it is table.<extension>, not the uploaded file's name.
   const replacesInput = useRef(false);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const watchInput = useCallback((textarea: HTMLTextAreaElement | null) => {
     if (!textarea) return;
+    inputRef.current = textarea;
     const beforeChange = () => {
       replacesInput.current = textarea.selectionStart === 0 && textarea.selectionEnd === textarea.value.length;
     };
     textarea.addEventListener("beforeinput", beforeChange);
-    return () => textarea.removeEventListener("beforeinput", beforeChange);
+    return () => {
+      textarea.removeEventListener("beforeinput", beforeChange);
+      if (inputRef.current === textarea) inputRef.current = null;
+    };
   }, []);
+  // Where the caret goes once a paste the page wrote is in the input.
+  const pastedCaret = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const caret = pastedCaret.current;
+    pastedCaret.current = null;
+    if (caret !== null) inputRef.current?.setSelectionRange(caret, caret);
+  }, [inputText]);
+
+  // Cells pasted into the Excel input: when the clipboard's HTML table says
+  // its text reads differently from the visitor's reading of it (ditto
+  // marks, cells holding line breaks), the page puts the text in its own
+  // way (excel-paste.ts); otherwise the browser pastes. Nothing is pasted
+  // into read-only text.
+  function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
+    if (inputFormat !== "excel" || readOnly) return;
+    const textarea = event.currentTarget;
+    const paste = excelPaste({
+      plain: event.clipboardData.getData("text/plain"),
+      html: event.clipboardData.getData("text/html"),
+      value: textarea.value,
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd,
+    });
+    if (!paste) return;
+    event.preventDefault();
+    if (paste.value === textarea.value) textarea.setSelectionRange(paste.caret, paste.caret);
+    else pastedCaret.current = paste.caret;
+    dispatch({ type: "type", text: paste.value, replacesInput: paste.replacesInput, written: paste.written });
+  }
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);
   const outputLabel = getLabel(OUTPUT_FORMATS, outputFormat);
@@ -97,6 +136,8 @@ export default function TableConvertDemo({
   // The file being read, or the one the input's text came from: the name a
   // download takes.
   const selectedName = upload?.name ?? fileName;
+  // Where read-only text came from: the Excel file, and the sheet shown.
+  const readOnlySource = workbook ? `${fileName}, sheet “${workbook.sheets[workbook.sheet]?.name}”` : fileName;
 
   // A text output is serialized from the table on screen as it renders, so
   // it can't lag behind it; binary outputs are written separately, below.
@@ -183,13 +224,25 @@ export default function TableConvertDemo({
 
   // Until a chosen or dropped file is read and parsed, the output panel says
   // it's being read and offers nothing to download. Typing, pasting, editing
-  // the grid, clearing or a newer file wins over it (its read is dropped).
+  // the grid, choosing a sheet, clearing or a newer file wins over it (its
+  // read is dropped). An Excel workbook is read in a worker, its reader
+  // loaded only now, into the text an Excel input holds for each sheet.
   async function loadFile(file: File) {
     const ticket = ++tickets.current;
     dispatch({ type: "upload", name: file.name, ticket });
     let event: TablePageEvent;
     try {
-      event = { type: "read", ticket, text: await file.text(), format: detectFormatFromFile(file) };
+      const format = detectFormatFromFile(file);
+      const head = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+      if (readsAsWorkbook(file.name, format, inputFormat, head)) {
+        const { readWorkbookTextInWorker } = await import("@/lib/convert/xlsx-workbook");
+        const read = await readWorkbookTextInWorker(await file.arrayBuffer());
+        event = { type: "readWorkbook", ticket, workbook: workbookInput(read) };
+      } else {
+        // An Excel file that is text is read-only once read, as a workbook is.
+        const text = await file.text();
+        event = { type: "read", ticket, text, format: fileTextFormat(format, text), fromExcel: format === "excel" };
+      }
     } catch (readError) {
       const reason = readError instanceof Error ? readError.message : String(readError);
       event = { type: "readFailed", ticket, error: `${file.name} couldn't be read: ${reason}` };
@@ -313,6 +366,49 @@ export default function TableConvertDemo({
                   <input ref={fileRef} type="file" onChange={handleFileChange} className="hidden" />
                   {selectedName && <span className="text-xs text-muted-foreground">Selected: {selectedName}</span>}
                 </div>
+                {workbook && inputFormat === "excel" && (
+                  <div className="space-y-1 text-xs text-muted-foreground" data-testid="excel-sheet">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {workbook.sheets.length > 1 && (
+                        <>
+                          <Label htmlFor={sheetSelectId} className="text-xs">
+                            Sheet
+                          </Label>
+                          <select
+                            id={sheetSelectId}
+                            value={workbook.sheet}
+                            onChange={(event) => dispatch({ type: "sheet", sheet: Number(event.target.value) })}
+                            className="h-8 max-w-[16rem] rounded-md border border-input bg-background px-2 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                          >
+                            {workbook.sheets.map((sheet, index) => (
+                              <option key={index} value={index}>
+                                {sheet.name}
+                              </option>
+                            ))}
+                          </select>
+                        </>
+                      )}
+                      <span>
+                        Showing sheet “{workbook.sheets[workbook.sheet]?.name}”
+                        {workbook.sheets.length > 1
+                          ? `, ${workbook.sheet + 1} of the ${workbook.sheets.length} sheets with values.`
+                          : "."}
+                      </span>
+                    </div>
+                    {workbookNotes(workbook).map((note) => (
+                      <p key={note}>{note}</p>
+                    ))}
+                  </div>
+                )}
+                {/* After an Excel upload the input's text is read-only: cells
+                    are edited in the grid, and Clear makes the input the
+                    visitor's again (output-state.ts). */}
+                {readOnly && (
+                  <p id={readOnlyNoteId} className="text-xs text-muted-foreground" data-testid="input-read-only">
+                    <span className="font-medium text-foreground">Read-only:</span> the text from {readOnlySource}. Edit
+                    cells in the online table editor below, or press Clear view to paste or type your own data.
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground">
                   Drag and drop a file anywhere in this panel to load it.
                 </p>
@@ -323,14 +419,19 @@ export default function TableConvertDemo({
                   <textarea
                     ref={watchInput}
                     value={inputText}
+                    readOnly={readOnly}
+                    aria-label={`${inputLabel} input`}
+                    aria-describedby={readOnly ? readOnlyNoteId : undefined}
+                    data-testid="table-input"
+                    onPaste={handlePaste}
                     onChange={(event) => {
                       dispatch({ type: "type", text: event.target.value, replacesInput: replacesInput.current });
                       replacesInput.current = false;
                     }}
                     placeholder={getPlaceholder(inputFormat)}
-                    className={`min-h-[280px] w-full resize-none rounded-lg border bg-background px-4 py-3 font-mono text-sm shadow-sm focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
-                      error ? "border-red-400" : ""
-                    }`}
+                    className={`min-h-[280px] w-full resize-none rounded-lg border px-4 py-3 font-mono text-sm shadow-sm focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
+                      readOnly ? "bg-muted/40 text-foreground/80" : "bg-background"
+                    } ${error ? "border-red-400" : ""}`}
                     spellCheck={false}
                   />
                 ) : (
@@ -380,7 +481,7 @@ export default function TableConvertDemo({
                   </Button>
                 </div>
                 {shownNotice && <p className="text-xs text-muted-foreground">{shownNotice}</p>}
-                <div className="text-xs text-muted-foreground">{status}</div>
+                <div className="text-xs text-muted-foreground" role="status">{status}</div>
 
                 {binary ? (
                   <BinaryOutputPreview

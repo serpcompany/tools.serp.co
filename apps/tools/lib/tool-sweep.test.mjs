@@ -224,6 +224,13 @@ test("an output format without a signature passes unchecked, unless text markers
   const lost = classifyRun({ outcome: "completed", outputs: [bytes] }, { to: "json", markers: ["Alpha", "Gamma"] });
   assert.equal(lost.status, "error");
   assert.match(lost.error, /missing Gamma/);
+  // Text the fixture hides (a hidden sheet, row or column) fails the output
+  // that holds it.
+  const leaked = classifyRun(
+    { outcome: "completed", outputs: [{ ...bytes, text: "North,$15,234.50\nHidden row,secret" }] },
+    { to: "csv", markers: ["North"], hidden: ["Hidden row", "secret", "Salary"] },
+  );
+  assert.deepEqual(leaked, { status: "error", error: "the saved file holds what the input hides (Hidden row, secret)", formatCheck: "content" });
 });
 
 // A real PNG: `width` x `height` of `background`, with `draw` run on it first.
@@ -588,6 +595,22 @@ test("planTool picks a driver and fixture, or says why a Tool isn't run", () => 
   assert.equal(png.pages, undefined);
   const compress = plan({ id: "compress-png", route: "/compress-png", operation: "compress", from: "png", to: "png" });
   assert.equal(compress.compress, true);
+  // An Excel input is read by the XLSX reader first: its own engine, its
+  // fixture's shown values to find and its hidden ones to miss.
+  const excel = planTool(
+    { id: "excel-to-csv", route: "/excel-to-csv", operation: "convert", from: "excel", to: "csv" },
+    { ...options, handlers: new Map([["/excel-to-csv", "TableConvertLanding"]]), fixtures: { ...fixtures, byFormat: new Map([["excel", "/f/sample-sheets.xlsx"]]) } },
+  );
+  assert.deepEqual(
+    [excel.engine, excel.driver, excel.markers, excel.hidden],
+    [
+      "table-convert + xlsx",
+      "table",
+      ["North", "3/14/2026", "1,200", "$15,234.50", "25%", "$67,105.75"],
+      ["Hidden row", "secret", "Internal", "cost 9.10", "Hidden sheet", "Salary"],
+    ],
+  );
+  assert.equal(table.hidden, undefined);
   // A text converter whose fixture has no known data marker can't be checked.
   const markerless = planTool(
     { id: "csv-to-xml", route: "/csv-to-xml", operation: "convert", from: "csv", to: "xml" },

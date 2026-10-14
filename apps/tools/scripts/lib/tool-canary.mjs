@@ -33,6 +33,7 @@ export const CANARY_TOOLS = {
   "png-to-epub": "image to EPUB",
   "compress-svg": "SVGO",
   "csv-to-json": "table converter page",
+  "excel-to-csv": "table converter page with an XLSX upload, read by the XLSX reader in a worker, its cells as Excel shows them",
   "csv-to-pdf": "table converter page writing a file: jsPDF and jspdf-autotable, loaded when the output is chosen",
   "csv-to-jpg": "CSV drawn as a table on a canvas, on the generic converter page (table-outputs.ts)",
   "docx-to-jpeg": "DOCX pages laid out by docx-preview in a sandboxed iframe and captured by modern-screenshot, an image a page",

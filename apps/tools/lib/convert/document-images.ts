@@ -11,6 +11,7 @@
 // (isDocumentImageConversion in image-document-targets.ts).
 
 import { encodeFromRGBA } from "./encode.ts";
+import { MAX_CELL_CHARS } from "./excel-cells.ts";
 import type { RGBA } from "./heif.ts";
 import type { ConversionResult, ProgressUpdate } from "./workerClient.ts";
 
@@ -983,7 +984,7 @@ async function convertWorkbook(
     import("./xlsx-workbook.ts"),
     import("./table-image.ts"),
   ]);
-  const { sheets, hidden, skipped, stop } = await readWorkbookInWorker(buf.slice(0));
+  const { sheets, hidden, skipped, stop, longCells = [] } = await readWorkbookInWorker(buf.slice(0));
   if (!sheets.length) throw new Error("This workbook has no visible sheet with values to draw.");
   const buffers: ArrayBuffer[] = [];
   const notes: string[] = [];
@@ -994,7 +995,7 @@ async function convertWorkbook(
     onProgress?.({ status: "processing", progress: Math.min(95, 20 + (75 * buffers.length) / sheets.length) });
   }
   onProgress?.({ status: "processing", progress: 100 });
-  const notice = workbookNotice(sheets.map((sheet) => sheet.name), notes, hidden, skipped, stop);
+  const notice = workbookNotice(sheets.map((sheet) => sheet.name), notes, hidden, skipped, stop, longCells);
   return sheets.length === 1
     ? { kind: "single", buffer: buffers[0]!, notice }
     : { kind: "multiple", buffers, names: fileNameLabels(sheets.map((sheet) => sheet.name), (index) => `sheet${sheets[index]!.number}`), notice };
@@ -1023,19 +1024,25 @@ export function fileNameLabels(names: string[], fallback: (index: number) => str
 }
 
 // What the page says about a workbook's images: which file is which sheet,
-// what each leaves out, the visible sheets not read and the hidden sheets it
-// doesn't draw.
+// what each leaves out, the sheets left out for a cell longer than Excel
+// allows, the visible sheets not read and the hidden sheets it doesn't draw.
 export function workbookNotice(
   names: string[],
   notes: string[],
   hidden: number,
   skipped = 0,
   stop: "sheets" | "size" = "sheets",
+  longCells: string[] = [],
 ): string | undefined {
   const parts: string[] = [];
   if (names.length > 1) parts.push(`One image a sheet, named after it, in the workbook's order: ${names.join(", ")}.`);
+  if (longCells.length) {
+    const one = longCells.length === 1;
+    const list = longCells.map((name) => `“${name}”`).join(", ");
+    parts.push(`${one ? "Sheet" : "Sheets"} ${list} ${one ? "isn't" : "aren't"} drawn: ${one ? "it has" : "each has"} a cell longer than Excel allows (${MAX_CELL_CHARS.toLocaleString("en-US")} characters).`);
+  }
   if (skipped) {
-    const why = stop === "size" ? "the workbook holds more cells than one conversion reads here" : "one workbook gives at most 100 images here";
+    const why = stop === "size" ? "the workbook holds more cells or text than one conversion reads here" : "one workbook gives at most 100 images here";
     parts.push(`${skipped} more ${skipped === 1 ? "sheet isn't" : "sheets aren't"} drawn: ${why}.`);
   }
   if (notes.length) parts.push(`${notes.join(" ")} An image holds what fits in ${MAX_IMAGE_SIDE} pixels.`);

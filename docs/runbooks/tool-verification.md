@@ -22,7 +22,10 @@ the owner approves an outside sample. Download an approved one into its own
 empty directory, read it back there, and record its source URL and licence in
 `notes`. A Tool whose output is text (a table
 converter, or any Tool to TXT) also needs its fixture's data in `TEXT_MARKERS`
-in `scripts/lib/tool-sweep.mjs`, or the sweep reports it as `no_fixture`. An
+in `scripts/lib/tool-sweep.mjs`, or the sweep reports it as `no_fixture`; a
+fixture can list several strings, and each must be in the output. Text a
+fixture hides (`sample-sheets.xlsx`'s hidden sheet, row and column), listed in
+`HIDDEN_TEXT` there, must not be. An
 image or video fixture whose picture is a single colour (most are 96x96 solid
 blue) needs its name in `ONE_COLOUR_FIXTURES` there, or the sweep fails its
 Tools' image outputs as blank; a photo or drawing needs nothing.
