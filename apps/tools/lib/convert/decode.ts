@@ -1,3 +1,4 @@
+import { decodeFailure } from "./decode-failure.ts";
 import { decodeHeifToRGBA, type RGBA } from "./heif.ts";
 
 type CanvasSource = CanvasImageSource & {
@@ -61,7 +62,7 @@ async function decodeViaImage(blob: Blob): Promise<RGBA> {
 
     const loaded = new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
-      img.onerror = () => reject(new Error("Image decode failed."));
+      img.onerror = () => reject(decodeFailure("Image decode failed."));
     });
 
     img.src = url;
@@ -104,6 +105,24 @@ async function decodeWithImageDecoder(mime: string | undefined, buf: ArrayBuffer
   }
 }
 
+// The browser decoders' formats, by the type ImageDecoder is given.
+const MIME_TYPES: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+  bmp: "image/bmp",
+  avif: "image/avif",
+  ico: "image/x-icon",
+  svg: "image/svg+xml",
+  tiff: "image/tiff",
+};
+
+// Every format decodeToRGBA reads by name (bin-image.test.mjs checks that
+// each has a signature).
+export const DECODE_INPUTS: readonly string[] = ["heic", "heif", "ktx", "ktx2", "icns", ...Object.keys(MIME_TYPES)];
+
 export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA> {
   const e = (ext || "").toLowerCase();
 
@@ -122,20 +141,7 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
     return decodeToRGBA("png", png.slice().buffer);
   }
 
-  const mimeMap: Record<string, string> = {
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    png: "image/png",
-    webp: "image/webp",
-    gif: "image/gif",
-    bmp: "image/bmp",
-    avif: "image/avif",
-    ico: "image/x-icon",
-    svg: "image/svg+xml",
-    tiff: "image/tiff",
-  };
-
-  const mime = mimeMap[e];
+  const mime = MIME_TYPES[e];
 
   // Prefer ImageDecoder when available (works in workers too).
   const decoded = await decodeWithImageDecoder(mime, buf);

@@ -1,6 +1,8 @@
 // lib/convert/heif.ts
 // HEIC/HEIF → RGBA using a self-hosted bundle that works in both window + worker.
 
+import { decodeFailure } from "./decode-failure.ts";
+
 export type RGBA = { data: Uint8ClampedArray; width: number; height: number };
 
 type HeifImage = {
@@ -138,7 +140,7 @@ export async function decodeHeifToRGBA(buf: ArrayBuffer): Promise<RGBA> {
     const dec = new g.HeifDecoder();
     const images = dec.decode(bytes);
     const [img] = images ?? [];
-    if (!img) throw new Error("No images in HEIF");
+    if (!img) throw decodeFailure("No images in HEIF");
     const width = img.get_width();
     const height = img.get_height();
     const rgba = new Uint8ClampedArray(width * height * 4);

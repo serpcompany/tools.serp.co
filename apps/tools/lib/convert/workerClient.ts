@@ -7,8 +7,16 @@ import {
   isImageTextConversion,
   isTableImageConversion,
 } from "./image-document-targets.ts";
-import { BIN_HEAD_BYTES, binImageFormat, notAnImageMessage, unreadableImageMessage } from "./bin-image.ts";
+import {
+  BIN_HEAD_BYTES,
+  binConvertFailedMessage,
+  binPicture,
+  notAnImageMessage,
+  unreadableImageMessage,
+  type BinPicture,
+} from "./bin-image.ts";
 import { decodeToRGBA } from "./decode.ts";
+import { decodeFailure, isDecodeFailure } from "./decode-failure.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { copyProtectedMessage, isCopyProtected } from "./fairplay.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
@@ -132,6 +140,8 @@ type WorkerMessage = {
   error?: string;
   blob?: ArrayBuffer;
   blobs?: ArrayBuffer[];
+  // The worker's decoder found the file's picture undecodable (decode-failure.ts).
+  decodeFailure?: boolean;
 };
 
 type TelemetryError = Error & {
@@ -184,34 +194,43 @@ export async function convertWithWorker(args: ConvertArgs): Promise<ConversionRe
 // several gigabytes. convertWithWorker checks the same again.
 export async function checkInputFile(file: Blob, from: string, to: string): Promise<void> {
   if (from.toLowerCase() !== "bin") return;
-  binFormatOrRefuse(new Uint8Array(await file.slice(0, BIN_HEAD_BYTES).arrayBuffer()), to.toLowerCase());
+  const head = new Uint8Array(await file.slice(0, BIN_HEAD_BYTES).arrayBuffer());
+  binPictureOrRefuse(head, file.size, to.toLowerCase());
 }
 
-function binFormatOrRefuse(bytes: Uint8Array, to: string): string {
-  const format = binImageFormat(bytes);
-  if (!format) {
+function binPictureOrRefuse(head: Uint8Array, size: number, to: string): BinPicture {
+  const picture = binPicture(head, size);
+  if (!picture) {
     throw createTelemetryError("not_an_image", notAnImageMessage(to), { from: "bin", to, engine: "bin-image" });
   }
-  return format;
+  return picture;
 }
 
 // A picture saved with a .bin name, converted as the format its first bytes
-// say (bin-image.ts). One that doesn't convert is reported as a damaged
-// picture, whatever the engine's own error was.
+// say (bin-image.ts), from where its bytes start (past a MacBinary header).
+// Only a decoder's verdict that the picture can't be decoded
+// (decode-failure.ts) is reported as a damaged picture. Any other failure, an
+// engine that didn't load or ran out of memory, gets a plain message, and
+// telemetry keeps that engine's own code.
 async function convertBinImage(args: ConvertArgs): Promise<ConversionResult> {
   const to = args.to.toLowerCase();
-  const format = binFormatOrRefuse(new Uint8Array(args.buf), to);
+  const { format, start, end } = binPictureOrRefuse(new Uint8Array(args.buf), args.buf.byteLength, to);
+  const buf = start === 0 && end === args.buf.byteLength ? args.buf : args.buf.slice(start, end);
   try {
-    return await convertUnchecked({ ...args, from: format });
+    return await convertUnchecked({ ...args, from: format, buf });
   } catch (error) {
-    const unreadable = createTelemetryError("unreadable_image", unreadableImageMessage(format), {
-      from: "bin",
-      to,
-      format,
-      engine: "bin-image",
-    });
-    unreadable.cause = error;
-    throw unreadable;
+    const inner = error as TelemetryError;
+    const failure = isDecodeFailure(error)
+      ? createTelemetryError("unreadable_image", unreadableImageMessage(format), { from: "bin", to, format, engine: "bin-image" })
+      : createTelemetryError(inner.telemetryCode ?? "convert_failed", binConvertFailedMessage(format, to), {
+          engine: "bin-image",
+          ...inner.telemetryMetadata,
+          from: "bin",
+          to,
+          format,
+        });
+    failure.cause = error;
+    throw failure;
   }
 }
 
@@ -239,11 +258,13 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
     try {
       converted = await convertWithMagickInBrowser(args.buf, fromExt, toExt);
     } catch (error) {
-      throw createTelemetryError(
+      const failure = createTelemetryError(
         "convert_failed",
         error instanceof Error ? error.message : String(error),
         { from: args.from, to: args.to, engine: "browser-magick" },
       );
+      failure.cause = error;
+      throw failure;
     }
     if (converted.format === toExt) {
       args.onProgress?.({ status: "processing", progress: 100 });
@@ -429,13 +450,13 @@ async function convertWithWorkerInner(args: {
       }
 
       if (!ev.data?.ok) {
-        return reject(
-          createTelemetryError(
-            "worker_convert_failed",
-            ev.data?.error || "Convert failed",
-            { op: args.op, from: args.from, to: args.to, engine: "worker" }
-          )
+        const failure = createTelemetryError(
+          "worker_convert_failed",
+          ev.data?.error || "Convert failed",
+          { op: args.op, from: args.from, to: args.to, engine: "worker" }
         );
+        if (ev.data.decodeFailure) failure.cause = decodeFailure(failure.message);
+        return reject(failure);
       }
 
       if (ev.data.blobs) {

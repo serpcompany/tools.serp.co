@@ -3,6 +3,8 @@
 // fonts. Loads the 14 MB wasm on first use.
 import type { IMagickImage, MagickFormat as MagickFormatType } from "@imagemagick/magick-wasm";
 
+import { decodeFailure } from "./decode-failure.ts";
+
 const WASM_URL = "/vendor/imagemagick/magick.wasm";
 
 type MagickModule = typeof import("@imagemagick/magick-wasm");
@@ -136,8 +138,23 @@ export async function convertWithMagickInBrowser(
     throw new Error(`${from.toUpperCase()} isn't supported by the image converter.`);
   }
   const format = MAGICK_BROWSER_OUTPUTS.has(to) ? to : "png";
-  const bytes = await readInput(magick, new Uint8Array(buf), from, source, (image) => writeImage(magick, image, format));
+  let bytes: Uint8Array<ArrayBuffer>;
+  try {
+    bytes = await readInput(magick, new Uint8Array(buf), from, source, (image) => writeImage(magick, image, format));
+  } catch (error) {
+    throw isFileError(magick, error) ? decodeFailure(error.message, error) : error;
+  }
   return { buffer: bytes.buffer as ArrayBuffer, format };
+}
+
+// ImageMagick's errors about the file itself: a header or data it can't make
+// sense of, such as a file cut short (CorruptImageError), or one the
+// format's own decoder (libtiff, LibRaw, OpenJPEG...) rejected (CoderError).
+// Its others are about the engine: memory and size limits, a missing
+// delegate.
+function isFileError(magick: MagickModule, error: unknown): error is Error {
+  const { CorruptImageError, CoderError } = magick.MagickErrorSeverity;
+  return error instanceof magick.MagickError && (error.severity === CorruptImageError || error.severity === CoderError);
 }
 
 // Re-encodes a PNG into a format a canvas can't produce.

@@ -1,4 +1,5 @@
 import { decodeToRGBA } from "../lib/convert/decode";
+import { isDecodeFailure } from "../lib/convert/decode-failure";
 import { encodeFromRGBA } from "../lib/convert/encode";
 
 self.onmessage = async (e) => {
@@ -74,6 +75,7 @@ self.onmessage = async (e) => {
 
     self.postMessage({ ok: false, error: "Unknown op" });
   } catch (err) {
-    self.postMessage({ ok: false, error: err?.message || String(err) });
+    // decodeFailure: the file's picture can't be decoded (decode-failure.ts).
+    self.postMessage({ ok: false, error: err?.message || String(err), decodeFailure: isDecodeFailure(err) });
   }
 };

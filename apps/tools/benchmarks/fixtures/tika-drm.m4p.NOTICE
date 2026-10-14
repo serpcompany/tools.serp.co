@@ -6,7 +6,8 @@ Size: 664 bytes. Git blob: b2211d3cb3bf8c85f8b76003006a49ab8e8c4c3b.
 SHA-256: 44f7f209a312071df44cb17c2bd75302eb93afa573fb9c16691c3d652cfae76b
 
 It is used unchanged, as test data only. Licensed under the Apache License,
-Version 2.0: https://www.apache.org/licenses/LICENSE-2.0
+Version 2.0: https://www.apache.org/licenses/LICENSE-2.0. A full copy of the
+License is beside it, in tika-drm.m4p.LICENSE.
 
 Apache Tika's NOTICE:
 
