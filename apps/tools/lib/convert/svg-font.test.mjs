@@ -538,7 +538,7 @@ test("the boolean step keeps to its memory and work: the 198 KB file that took 3
 
 test("each shape is checked for crossings with its own allowance: one that runs out is filled as drawn on its own", async () => {
   // 3,200 thin bars in one path, apart but side by side, so finding that
-  // they don't cross means comparing about five million pairs of edges: more
+  // they don't cross means comparing about 80 million pairs of edges: more
   // than that shape's allowance. A ring with a hole after it (or before it)
   // still keeps its hole, and the notice says what happened.
   let bars = "";
