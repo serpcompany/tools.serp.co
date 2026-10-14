@@ -157,7 +157,7 @@ export function getPlaceholder(format: InputFormat) {
     case "latex":
       return "Paste LaTeX tabular";
     case "excel":
-      return "Upload an Excel file (.xlsx, .xls)";
+      return "Upload an Excel workbook (.xlsx), or paste cells copied from Excel";
     case "mysql":
       return "Paste MySQL output";
     case "mediawiki":

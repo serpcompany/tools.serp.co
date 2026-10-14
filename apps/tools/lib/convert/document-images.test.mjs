@@ -381,7 +381,16 @@ test("the page says which image is which sheet, and what each leaves out", () =>
   );
   assert.equal(
     workbookNotice(["A", "B"], [], 0, 1, "size"),
-    "One image a sheet, named after it, in the workbook's order: A, B. 1 more sheet isn't drawn: the workbook holds more cells than one conversion reads here.",
+    "One image a sheet, named after it, in the workbook's order: A, B. 1 more sheet isn't drawn: the workbook holds more cells or text than one conversion reads here.",
+  );
+  // A sheet left out for a cell longer than Excel allows is named (#299 review).
+  assert.equal(
+    workbookNotice(["A", "C"], [], 0, 0, "sheets", ["B"]),
+    "One image a sheet, named after it, in the workbook's order: A, C. Sheet “B” isn't drawn: it has a cell longer than Excel allows (32,767 characters).",
+  );
+  assert.equal(
+    workbookNotice(["A"], [], 0, 0, "sheets", ["B", "C"]),
+    "Sheets “B”, “C” aren't drawn: each has a cell longer than Excel allows (32,767 characters).",
   );
 });
 

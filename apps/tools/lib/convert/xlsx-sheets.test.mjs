@@ -13,6 +13,7 @@ import {
   MAX_PART_BYTES,
   MAX_ROWS,
   MAX_SHEETS,
+  IMAGE_RETURNED,
   cellPosition,
   cellText,
   decodeExcelEscapes,
@@ -23,7 +24,9 @@ import {
   sheetTable,
 } from "./xlsx-sheets.ts";
 import { resolvePart } from "./ooxml.ts";
-import { WORKBOOK_TIMEOUT_MS, readWorkbookInWorker } from "./xlsx-workbook.ts";
+import { MAX_CELL_CHARS, TABLE_CELLS, TABLE_CHARS, excelCellSize, writeExcelCells } from "./excel-cells.ts";
+import { parseExcelCells } from "./table-data.ts";
+import { WORKBOOK_TIMEOUT_MS, readWorkbookInWorker, readWorkbookTextInWorker } from "./xlsx-workbook.ts";
 import { readWorkbookJob } from "./xlsx.worker.ts";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
@@ -372,4 +375,204 @@ test("the workbook is read in a worker that is stopped after its time limit", as
   const read = await readWorkbookInWorker(workbook([{ name: "S", xml: worksheet('<row r="1"><c r="A1"><v>1</v></c></row>') }]), { createWorker: answering });
   assert.deepEqual(read, { sheets: [{ name: "S", number: 1, table: { headers: ["1"], rows: [] } }], hidden: 0, skipped: 0 });
   await assert.rejects(readWorkbookInWorker(strToU8("a,b\n").buffer, { createWorker: answering }), { message: "This file isn't an XLSX workbook: it isn't a ZIP archive." });
+});
+
+// A table converter's Excel input (#266): what the worker reads for it.
+const TABLE = { cells: TABLE_CELLS, chars: TABLE_CHARS, size: excelCellSize };
+
+test("read for a table converter, every row and column of each sheet is kept, as Excel shows it", () => {
+  const rows = Array.from(
+    { length: 10_000 },
+    (_, index) =>
+      `<row r="${index + 1}"${index === 5000 ? ' hidden="1"' : ""}>${Array.from({ length: 8 }, (_, column) => `<c r="${String.fromCharCode(65 + column)}${index + 1}"><v>${index * 8 + column}</v></c>`).join("")}</row>`,
+  ).join("");
+  const wide = Array.from({ length: 300 }, (_, column) => `<c><v>${column}</v></c>`).join("");
+  const book = workbook([
+    { name: "One", xml: worksheet(rows) },
+    { name: "Hidden", xml: worksheet(rows), state: "hidden" },
+    { name: "Wide", xml: worksheet(`<row r="1">${wide}</row><row r="2">${wide}</row>`) },
+  ]);
+  const started = performance.now();
+  const { sheets, hidden, tooLarge } = readWorkbookSheets(book, { table: TABLE });
+  assert.ok(performance.now() - started < 5000, `${performance.now() - started} ms`);
+  assert.deepEqual([sheets.map((sheet) => sheet.name), hidden, tooLarge], [["One", "Wide"], 1, []]);
+  const { table } = sheets[0];
+  // Row 5001 is hidden: 9,998 rows under the header, every one filled in.
+  assert.equal(table.rows.length, 9_998);
+  assert.deepEqual(table.rows.at(-1), Array.from({ length: 8 }, (_, column) => String(9_999 * 8 + column)));
+  assert.ok(table.rows.every((row) => row.length === 8));
+  assert.ok(!table.rows.some((row) => row[0] === String(5_000 * 8)));
+  assert.equal(sheets[1].table.rows[0].length, 300);
+  // An image keeps only what it can show of the same workbook.
+  const image = readWorkbookSheets(book);
+  assert.equal(image.sheets[0].table.rows[KEPT_ROWS + 10], undefined);
+  assert.equal(image.sheets[1].table.rows[0].length, KEPT_COLUMNS);
+  assert.equal(image.tooLarge, undefined);
+});
+
+test("a table converter keeps at most `cells` cells of a workbook: a sheet that would take it past them is left out and named", () => {
+  const block = (rows, columns, prefix) =>
+    worksheet(
+      Array.from(
+        { length: rows },
+        (_, row) => `<row r="${row + 1}">${Array.from({ length: columns }, (_, column) => `<c r="${String.fromCharCode(65 + column)}${row + 1}" t="inlineStr"><is><t>${prefix}${row}.${column}</t></is></c>`).join("")}</row>`,
+      ).join(""),
+    );
+  const book = workbook([
+    { name: "Small", xml: block(10, 2, "s") }, // 20 cells
+    { name: "Big", xml: block(30, 3, "b") }, // 90 cells
+    { name: "Medium", xml: block(20, 2, "m") }, // 40 cells
+    // Two values far apart: 50 rows by 26 columns, nearly all of them empty.
+    { name: "Sparse", xml: worksheet(`<row r="1"><c r="A1"><v>1</v></c></row><row r="50"><c r="Z50"><v>2</v></c></row>`) },
+  ]);
+  const read = readWorkbookSheets(book, { table: { ...TABLE, cells: 100 } });
+  assert.deepEqual(read.sheets.map((sheet) => sheet.name), ["Small", "Medium"]);
+  assert.deepEqual(read.tooLarge, ["Big", "Sparse"]);
+  assert.equal(read.sheets[1].table.rows.at(-1)[1], "m19.1");
+  // A budget that the first sheet alone takes past: none fits.
+  assert.deepEqual(readWorkbookSheets(book, { table: { ...TABLE, cells: 10 } }).sheets, []);
+  // The parse stops keeping values once they pass the cells left, so a
+  // sheet too large to keep is never held whole.
+  const cells = parseSheet(block(30, 3, "b"), context, { rows: MAX_ROWS, columns: MAX_COLUMNS, cells: 25, chars: Infinity });
+  assert.equal(cells.overflow, true);
+  assert.equal(cells.kept, 25);
+});
+
+test("the committed fixtures read the same for a table converter as for an image", () => {
+  for (const name of ["sample.xlsx", "sample-sheets.xlsx"]) {
+    const bytes = readFileSync(path.join(fixtures, name));
+    const buffer = () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    const { tooLarge, ...asTables } = readWorkbookSheets(buffer(), { table: TABLE });
+    assert.deepEqual(asTables, readWorkbookSheets(buffer()));
+    assert.deepEqual(tooLarge, []);
+  }
+});
+
+test("read in the worker for a table converter, each sheet comes back as its cells' text", async () => {
+  const xml = worksheet(
+    `<row r="1"><c r="A1" t="inlineStr"><is><t>Name</t></is></c><c r="B1" t="inlineStr"><is><t>Note</t></is></c></row>` +
+      `<row r="2"><c r="A2" t="inlineStr"><is><t>Alpha</t></is></c><c r="B2" t="inlineStr"><is><t xml:space="preserve">two\tcells?</t></is></c></row>`,
+  );
+  const book = workbook([{ name: "S", xml }, { name: "Gone", xml, state: "hidden" }]);
+  const reply = readWorkbookJob({ bytes: book, cells: true });
+  assert.deepEqual(reply, {
+    ok: true,
+    cells: true,
+    hidden: 1,
+    skipped: 0,
+    tooLarge: [],
+    sheets: [{ name: "S", number: 1, text: 'Name\tNote\nAlpha\t"two\tcells?"' }],
+  });
+  assert.deepEqual(parseExcelCells(reply.sheets[0].text, true).table, readWorkbookSheets(workbook([{ name: "S", xml }])).sheets[0].table);
+  const answering = () => {
+    const fake = { onmessage: null, onerror: null, terminate() {} };
+    fake.postMessage = (job) => setTimeout(() => fake.onmessage({ data: readWorkbookJob(job) }));
+    return fake;
+  };
+  const read = await readWorkbookTextInWorker(workbook([{ name: "S", xml }]), { createWorker: answering });
+  assert.deepEqual(read, { sheets: reply.sheets, hidden: 0, skipped: 0, tooLarge: [] });
+  // An old XLS file is refused with the reader's message.
+  const ole = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 0, 0]).buffer;
+  await assert.rejects(readWorkbookTextInWorker(ole, { createWorker: answering }), /older Excel workbook \(\.xls\)/);
+});
+
+// What a read returns is bounded however long the workbook's strings are
+// (#298, #299 review): the review's crafted files repeat one 100 KB shared
+// string in every cell.
+const repeated = (rows, columns, { length = 100_000, name = "S" } = {}) => ({
+  name,
+  xml: worksheet(
+    Array.from({ length: rows }, (_, row) => `<row r="${row + 1}">${`<c t="s"><v>0</v></c>`.repeat(columns)}</row>`).join(""),
+  ),
+  strings: ["x".repeat(length)],
+});
+const crafted = (...sheets) => workbook(sheets, { strings: sheets[0].strings });
+
+test("a small file repeating one long string in every cell is refused before its text is built: the review's crafted workbooks", () => {
+  for (const rows of [100, 600]) {
+    const book = crafted(repeated(rows, 10));
+    // A few KB of ZIP that would be 100 MB (100 rows) or 600 MB (600 rows)
+    // of sheet text: left out, named, and nothing built.
+    assert.ok(book.byteLength < 20_000, `${book.byteLength} bytes`);
+    const started = performance.now();
+    const table = readWorkbookJob({ bytes: book.slice(0), cells: true });
+    assert.deepEqual(table, { ok: true, cells: true, hidden: 0, skipped: 0, tooLarge: ["S"], sheets: [] });
+    // An image of it: refused with a message, not a reply too large to
+    // clone. Each cell is longer than Excel allows, and it's the only sheet.
+    const image = readWorkbookJob({ bytes: book.slice(0) });
+    assert.deepEqual(image, {
+      ok: false,
+      error: `This workbook can't be drawn here: each of its sheets with values has a cell longer than Excel allows (32,767 characters).`,
+    });
+    assert.ok(performance.now() - started < 3000, `${performance.now() - started} ms`);
+  }
+});
+
+test("a table converter's sheets add up to at most TABLE_CHARS characters of text, counted exactly as written", () => {
+  const xml = worksheet(
+    `<row r="1"><c r="A1" t="inlineStr"><is><t>Name</t></is></c><c r="C1" t="inlineStr"><is><t>Note</t></is></c></row>` +
+      `<row r="3"><c r="A3" t="inlineStr"><is><t xml:space="preserve">say "hi"	twice</t></is></c><c r="B3"><v>1.5</v></c></row>`,
+  );
+  const book = workbook([{ name: "S", xml }]);
+  const text = writeExcelCells(readWorkbookSheets(book, { table: TABLE }).sheets[0].table);
+  // The text is its cells' sizes plus one a cell, less the last: within
+  // `chars` exactly when it fits.
+  assert.equal(text, 'Name\t\tNote\n\t\t\n"say ""hi""\ttwice"\t1.5\t');
+  const fits = readWorkbookSheets(book, { table: { ...TABLE, chars: text.length + 1 } });
+  assert.deepEqual([fits.sheets.length, fits.tooLarge], [1, []]);
+  assert.deepEqual(readWorkbookSheets(book, { table: { ...TABLE, chars: text.length } }).tooLarge, ["S"]);
+  // Sheets add up: the second that would pass it is left out, a third that fits is read.
+  const book3 = crafted(repeated(10, 10, { length: 1_000, name: "A" }), repeated(10, 10, { length: 1_000, name: "B" }), {
+    name: "C",
+    xml,
+  });
+  const read = readWorkbookSheets(book3, { table: { ...TABLE, chars: 150_000 } });
+  assert.deepEqual([read.sheets.map((sheet) => sheet.name), read.tooLarge], [["A", "C"], ["B"]]);
+  // In the worker, at TABLE_CHARS: 9 sheets of 1,000,000 characters fit, the
+  // 10th and 11th don't (their tabs and line breaks count too); the reply
+  // is within TABLE_CHARS.
+  const sheets = Array.from({ length: 11 }, (_, index) => repeated(100, 10, { length: 1_000, name: `S${index + 1}` }));
+  const reply = readWorkbookJob({ bytes: crafted(...sheets), cells: true });
+  assert.deepEqual(reply.tooLarge, ["S10", "S11"]);
+  const total = reply.sheets.reduce((sum, sheet) => sum + sheet.text.length, 0);
+  assert.ok(total <= TABLE_CHARS && total > 0.9 * TABLE_CHARS, `${total}`);
+});
+
+test("a cell longer than Excel allows leaves only its own sheet out, named, of a table and of the images (#299 review)", async () => {
+  const ok = repeated(2, 2, { length: MAX_CELL_CHARS, name: "Ok" });
+  assert.deepEqual(readWorkbookSheets(crafted(ok), { table: TABLE }).tooLarge, []);
+  assert.equal(readWorkbookSheets(crafted(ok)).sheets[0].table.headers[0].length, MAX_CELL_CHARS);
+  const long = repeated(2, 2, { length: MAX_CELL_CHARS + 1, name: "Long" });
+  assert.deepEqual(readWorkbookSheets(crafted(long), { table: TABLE }).tooLarge, ["Long"]);
+  // The review's case: three small sheets, the second with a 40,000-character
+  // cell (Google Sheets allows 50,000). The first and third are drawn.
+  const sheet = (name, length) => ({
+    name,
+    xml: worksheet(`<row r="1"><c r="A1" t="inlineStr"><is><t>${"x".repeat(length)}</t></is></c><c r="B1"><v>1</v></c></row>`),
+  });
+  const middle = readWorkbookSheets(workbook([sheet("A", 10), sheet("B", 40_000), sheet("C", 10)]));
+  assert.deepEqual([middle.sheets.map((each) => each.name), middle.longCells, middle.skipped, middle.stop], [["A", "C"], ["B"], 0, undefined]);
+  // In the first sheet: the others are still drawn, and the worker says so,
+  // through to the page (convertWorkbook's note).
+  const first = readWorkbookJob({ bytes: workbook([sheet("B", 40_000), sheet("A", 10), sheet("C", 10)]) });
+  assert.deepEqual([first.ok, first.sheets.map((each) => each.name), first.longCells], [true, ["A", "C"], ["B"]]);
+  const answering = () => {
+    const fake = { onmessage: null, onerror: null, terminate() {} };
+    fake.postMessage = (job) => setTimeout(() => fake.onmessage({ data: readWorkbookJob(job) }));
+    return fake;
+  };
+  const page = await readWorkbookInWorker(workbook([sheet("B", 40_000), sheet("A", 10)]), { createWorker: answering });
+  assert.deepEqual([page.sheets.map((each) => each.name), page.longCells], [["A"], ["B"]]);
+  // A table converter leaves it out and names it as before.
+  assert.deepEqual(readWorkbookSheets(workbook([sheet("A", 10), sheet("B", 40_000)]), { table: TABLE }).tooLarge, ["B"]);
+  // With no other sheet to draw, the workbook is refused, saying why.
+  assert.throws(() => readWorkbookSheets(crafted(long)), /can't be drawn here: each of its sheets with values has a cell longer than Excel allows \(32,767 characters\)/);
+});
+
+test("an image's read stops at the sheet that would take its tables past IMAGE_RETURNED, and counts it and the rest as not read", () => {
+  // 30,000 characters in each of 120 cells: 3,600,000 characters a sheet.
+  const sheet = (name) => repeated(12, 10, { length: 30_000, name });
+  const read = readWorkbookSheets(crafted(sheet("A"), sheet("B"), sheet("C"), sheet("D")));
+  assert.deepEqual([read.sheets.map((each) => each.name), read.skipped, read.stop], [["A", "B"], 2, "size"]);
+  assert.ok(2 * 3_600_000 <= IMAGE_RETURNED.chars && 3 * 3_600_000 > IMAGE_RETURNED.chars);
 });

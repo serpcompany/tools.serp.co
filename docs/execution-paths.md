@@ -155,6 +155,57 @@ Conversion picks an engine by input format:
   an output written from the table on screen, and nothing while a file is
   read; a read that finishes after a newer file or an edit, and a grid edit
   made on an earlier table, are dropped.
+- **Excel input** (`components/table-convert/excel-input.ts`, since #266): an
+  uploaded `.xlsx` is read by the XLSX reader that draws workbooks as images
+  ([document-images.md](document-images.md#xlsx-since-265)), in its worker,
+  loaded only then: each cell as Excel shows it, hidden sheets, rows and
+  columns left out. Every row and column of each visible sheet with values is
+  kept, up to 1,000,000 cells and 10,000,000 characters of text a workbook
+  (`TABLE_CELLS` and `TABLE_CHARS` in `lib/convert/excel-cells.ts`), counted
+  as values are read, before any text is built; a sheet that would take
+  either past it, or has a cell longer than Excel's 32,767 characters, is left
+  out, and the page names it. A million cells of short numbers are 6.9 million
+  characters and show in about 5 seconds. An Excel input's text is a sheet's
+  cells as Excel copies them: tab-separated, a cell in quotes, its quotes
+  doubled, when it holds a tab or a line break (and, as written here, a
+  quote). It is read as Excel writes it (`lib/convert/excel-cells.ts`): a
+  cell that starts with a quote but isn't quoted that way (`"Best" seller`, a
+  ditto mark) is its text. After an Excel upload (a workbook's sheet, or an
+  `.xls` that is text) the input's text is read-only (#299, the owner's
+  decision): the page says so, cells are edited in the grid, whose edits the
+  page writes back, and Clear view empties the input and makes it editable.
+  So the visitor's quotes never mix with text the page wrote, where a quote
+  can read two ways (ditto marks in a column copy as a quoted cell holding
+  line breaks would). Who wrote all of the text decides how it reads
+  (`written` in the reducer): text the page wrote (a sheet, a grid edit, a
+  rewrite in the input's format, a paste it wrote over all of the input),
+  untouched since, reads exactly as written. Any other text, typed or pasted
+  or edited, is read the visitor's way, which never merges rows on a quote
+  unless no reading keeps every line a row of one width, and then merges the
+  fewest lines that make every row as wide. Typing into text the page wrote
+  (not an Excel upload's, which is read-only) can split a cell holding line
+  breaks into rows: in one column, and in a table of two or more columns when
+  that cell's lines happen to be as wide as a row. A grid edit writes it back.
+  A paste takes the clipboard's plain text, which keeps each cell's text
+  exactly, and the HTML table Excel puts next to it decides its shape and the
+  text of a cell that starts with a quote (`excel-paste.ts`, scanned as text,
+  nothing rendered or fetched): when the visitor's reading differs, the page
+  puts the cells in its own way. Blank lines at the end aren't rows, as in a
+  CSV input; a row of empty cells (one added in the grid) is.
+  So cells pasted from Excel convert too, and a sheet reaches the table, the
+  name and Download through the reducer above like any file's text, under
+  the workbook's name. The first
+  visible sheet with values shows; when there are more, a select picks
+  another, which replaces the input's text from the same file, as last
+  edited: each sheet keeps its grid edits. The page says which sheet is
+  shown and what was left out. An `.xls` that is an OLE file (Excel 97-2003,
+  or a password-protected workbook) or Excel 2003 XML is refused with the
+  reader's message to save it as an unprotected `.xlsx`; one that is text,
+  as web apps' "Export to Excel" often writes, is read as its HTML table or
+  tab-separated cells.
+  On the Excel input, a file whose extension the page doesn't map is a
+  workbook when its first bytes are a ZIP's or an OLE file's, and text
+  otherwise (Excel's tab-delimited `.txt`).
 - **Image to text** (`lib/convert/image-text.ts`): JPG and PNG to TXT is OCR
   with tesseract.js, in the browser. Its worker, SIMD LSTM core and English
   model (4.0.0 best_int) are served from `public/vendor/tesseract/`, and a
