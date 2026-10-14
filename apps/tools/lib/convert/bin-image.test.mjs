@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { resolveObjectURL } from "node:buffer";
 import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -11,10 +12,11 @@ import {
   binImageFormat,
   binPicture,
   notAnImageMessage,
+  tooLargeImageMessage,
   unreadableImageMessage,
 } from "./bin-image.ts";
-import { DECODE_INPUTS } from "./decode.ts";
-import { isDecodeFailure } from "./decode-failure.ts";
+import { DECODE_INPUTS, browserSample } from "./decode.ts";
+import { isDecodeFailure, noBrowserDecoderMessage } from "./decode-failure.ts";
 import { IMAGE_PDF_INPUTS, imageFormatOf } from "./image-pdf-inputs.ts";
 import { NO_SIGNATURE } from "./image-signature.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
@@ -196,6 +198,11 @@ test("the messages say what the file is and what converts, with the right articl
     assert.match(unreadableImageMessage(format), /^This file starts like a [A-Z]/, format);
   }
   assert.match(unreadableImageMessage("nef"), /starts like a Nikon NEF image/);
+  assert.match(tooLargeImageMessage("psd"), /^This file starts like a PSD image, .*: it may be damaged, or too large to convert here\.$/);
+  assert.equal(
+    noBrowserDecoderMessage("webp"),
+    "This browser can't open WebP files; try a current Chrome, Edge, Firefox or Safari.",
+  );
   assert.equal(
     binConvertFailedMessage("avif", "png"),
     "The AVIF image in this file couldn't be converted to PNG. Try again, or reload the page.",
@@ -286,13 +293,6 @@ test("an engine that fails to load or runs out of memory isn't reported as a dam
   assert.equal(memory.message, binConvertFailedMessage("jpg", "jpg"));
   assert.equal(memory.telemetryCode, "worker_convert_failed");
   assert.deepEqual(memory.telemetryMetadata, { op: "raster", from: "bin", to: "jpg", format: "jpg", engine: "worker" });
-  // No decoder at all: the worker's fails, and Node has no browser decoder
-  // for the page to fall back on.
-  const cut = bytes("sample.jpg").slice(0, 200);
-  const declined = fakeWorker(() => ({ ok: false, error: "The source image cannot be decoded." })).worker;
-  const none = await failure(convertWithWorker({ worker: declined, from: "bin", to: "png", buf: buffer(cut) }));
-  assert.equal(none.message, binConvertFailedMessage("jpg", "png"));
-  assert.equal(none.telemetryCode, "convert_failed");
 });
 
 test("a .bin whose picture a decoder can't read says the picture is damaged", async () => {
@@ -322,4 +322,159 @@ test("a RAW photo saved as .bin is read by the RAW decoder, not as its small TIF
   const result = await convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.nef")) });
   const png = new DataView(result.buffer);
   assert.deepEqual([png.getUint32(16), png.getUint32(20)], [3039, 2014]);
+});
+
+// A worker that leaves every picture to the page, as a browser's does when
+// its decoders in workers fail.
+const declined = fakeWorker(() => ({ ok: false, error: "This format isn’t natively supported by your browser." })).worker;
+const sameBytes = (a, b) => a.length === b.length && a.every((value, index) => value === b[index]);
+
+// Runs `run` on a page whose browser has neither ImageDecoder nor
+// createImageBitmap (as in Node), only an <img>, which loads the files
+// `decodes(bytes)` accepts and fails on the rest. `tried` lists the files it
+// was given.
+async function onPage(decodes, run) {
+  const tried = [];
+  const context = { drawImage() {}, getImageData: (x, y, width, height) => ({ data: new Uint8ClampedArray(width * height * 4), width, height }) };
+  globalThis.document = { createElement: () => ({ getContext: () => context }) };
+  globalThis.Image = class {
+    naturalWidth = 1;
+    naturalHeight = 1;
+    set src(url) {
+      resolveObjectURL(url).arrayBuffer().then((data) => {
+        const file = new Uint8Array(data);
+        tried.push(file);
+        (decodes(file) ? this.onload : this.onerror)();
+      });
+    }
+  };
+  try {
+    return await run(tried);
+  } finally {
+    delete globalThis.document;
+    delete globalThis.Image;
+  }
+}
+
+test("each format the browser decodes has a 1 x 1 sample of it, to tell a browser without its decoder", async () => {
+  serveMagick = true;
+  const magick = await import("@imagemagick/magick-wasm");
+  for (const format of [...DECODE_INPUTS, "cur"].filter((format) => !["heic", "heif", "ktx", "ktx2", "icns", "tiff"].includes(format))) {
+    const sample = browserSample(format);
+    assert.ok(sample, `${format} has a sample`);
+    assert.equal(binImageFormat(sample), SAME_AS[format] ?? format, format);
+    if (format === "svg") continue;
+    const name = { jpg: "jpeg", cur: "ico" }[format] ?? format;
+    const magickFormat = magick.MagickFormat[Object.keys(magick.MagickFormat).find((key) => key.toLowerCase() === name)];
+    const size = magick.ImageMagick.read(sample, magickFormat, (image) => [image.width, image.height]);
+    assert.deepEqual(size, [1, 1], format);
+  }
+  assert.equal(browserSample("tiff"), null, "only Safari decodes TIFF; the converters send it to ImageMagick");
+});
+
+test("a browser without a decoder for the format isn't told the file is damaged", async () => {
+  serveMagick = true;
+  // No AVIF decoder (Safari before 16.4): ImageMagick reads the picture
+  // instead. The browser's sample is decoded once, not once a file.
+  const avif = browserSample("avif");
+  await onPage((file) => binImageFormat(file) !== "avif", async (tried) => {
+    for (let run = 0; run < 2; run += 1) {
+      const result = await convertWithWorker({ worker: declined, from: "bin", to: "png", buf: buffer(bytes("sample.avif")) });
+      const png = new DataView(result.buffer);
+      assert.deepEqual([png.getUint32(16), png.getUint32(20)], [96, 96]);
+    }
+    assert.equal(tried.filter((file) => sameBytes(file, avif)).length, 1);
+  });
+  // A browser that decodes JPEG: a JPEG it can't load is damaged.
+  const jpeg = browserSample("jpg");
+  await onPage((file) => sameBytes(file, jpeg), async () => {
+    const cut = await failure(convertWithWorker({ worker: declined, from: "bin", to: "png", buf: buffer(bytes("sample.jpg").slice(0, 200)) }));
+    assert.equal(cut.message, unreadableImageMessage("jpg"));
+    assert.equal(cut.telemetryCode, "unreadable_image");
+  });
+  // No SVG decoder, and no other engine here reads SVG.
+  await onPage(() => false, async () => {
+    const svg = text('<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"/>');
+    const none = await failure(convertWithWorker({ worker: declined, from: "bin", to: "png", buf: buffer(svg) }));
+    assert.equal(none.message, "This browser can't open SVG files; try a current Chrome, Edge, Firefox or Safari.");
+    assert.equal(none.telemetryCode, "convert_failed");
+    assert.deepEqual(none.telemetryMetadata, { engine: "bin-image", from: "bin", to: "png", format: "svg" });
+  });
+});
+
+// `data` (a TIFF-based RAW) with every image directory, SubIFDs included,
+// declaring `size` x `size` pixels.
+function declaringSize(data, size) {
+  const view = new DataView(data.buffer, data.byteOffset);
+  const little = data[0] === 0x49;
+  const seen = new Set();
+  const walk = (offset) => {
+    for (; offset && !seen.has(offset); offset = view.getUint32(offset + 2 + view.getUint16(offset, little) * 12, little)) {
+      seen.add(offset);
+      for (let entry = offset + 2; entry < offset + 2 + view.getUint16(offset, little) * 12; entry += 12) {
+        const tag = view.getUint16(entry, little);
+        if ((tag === 256 || tag === 257) && view.getUint16(entry + 2, little) === 3) view.setUint16(entry + 8, size, little);
+        else if (tag === 256 || tag === 257) view.setUint32(entry + 8, size, little);
+        if (tag === 330 && view.getUint32(entry + 4, little) === 1) walk(view.getUint32(entry + 8, little));
+      }
+    }
+  };
+  walk(view.getUint32(4, little));
+  return data;
+}
+
+test("a camera RAW or DDS cut short says the picture is damaged, whatever its reader throws", async () => {
+  serveMagick = true;
+  // LibRaw throws a C++ exception, which arrives as a bare number; DDS's
+  // reader gives up without an error. A Panasonic RW2 cut to a third
+  // converts, as far as LibRaw reads it.
+  for (const name of ["sample.nef", "sample.dng", "sample.arw", "sample.cr2", "sample.cr3", "sample.crw", "sample.orf", "sample.raf", "sample.rw2"]) {
+    const whole = bytes(name);
+    const format = binImageFormat(whole);
+    for (const part of name === "sample.rw2" ? [2] : [3, 2]) {
+      const cut = whole.slice(0, Math.floor(whole.length / part));
+      const error = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(cut) }));
+      assert.equal(error.message, unreadableImageMessage(format), `${name} cut to 1/${part}`);
+      assert.equal(error.telemetryCode, "unreadable_image");
+    }
+  }
+  const nef = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.nef").slice(0, 2e6)) }));
+  assert.equal(nef.cause.message, "The RAW file ends before its picture does: it may be incomplete.");
+  const dds = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.dds").slice(0, 2368)) }));
+  assert.equal(dds.message, unreadableImageMessage("dds"));
+  // The engine still converts after these.
+  const result = await convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.dds")) });
+  assert.equal(new DataView(result.buffer).getUint32(16), 96);
+});
+
+test("a picture whose header declares a size too large to convert here says so; running out of memory doesn't", async () => {
+  serveMagick = true;
+  // LibRaw's own verdict: a DNG declaring 60,000 x 60,000 pixels.
+  const dng = declaringSize(bytes("sample.dng"), 60000);
+  const raw = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(dng) }));
+  assert.equal(raw.message, tooLargeImageMessage("dng"));
+  assert.equal(raw.telemetryCode, "unreadable_image");
+  // ImageMagick's ResourceLimitError (as a 30,000 x 30,000 PSD gives, after
+  // half a minute): too large when the header declares a picture this
+  // engine can't hold, and out of memory when it can.
+  const magick = await import("@imagemagick/magick-wasm");
+  const { read } = magick.ImageMagick;
+  const xpm = (size) => text(`/* XPM */\nstatic char *x[] = {\n"${size} ${size} 1 1",\n"a c #ff0000",\n"a",\n};\n`);
+  try {
+    magick.ImageMagick.read = () => {
+      throw new magick.MagickError("CacheResourcesExhausted", magick.MagickErrorSeverity.ResourceLimitError);
+    };
+    const huge = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(xpm(60000)) }));
+    assert.equal(huge.message, tooLargeImageMessage("xpm"));
+    const ordinary = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.xpm")) }));
+    assert.equal(ordinary.message, binConvertFailedMessage("xpm", "png"));
+    assert.deepEqual(ordinary.telemetryMetadata, { from: "bin", to: "png", format: "xpm", engine: "browser-magick" });
+    magick.ImageMagick.read = () => {
+      throw new RangeError("Array buffer allocation failed");
+    };
+    const memory = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.xpm")) }));
+    assert.equal(memory.message, binConvertFailedMessage("xpm", "png"));
+  } finally {
+    magick.ImageMagick.read = read;
+  }
 });

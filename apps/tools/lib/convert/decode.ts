@@ -1,4 +1,4 @@
-import { decodeFailure } from "./decode-failure.ts";
+import { decodeFailure, noBrowserDecoder } from "./decode-failure.ts";
 import { decodeHeifToRGBA, type RGBA } from "./heif.ts";
 
 type CanvasSource = CanvasImageSource & {
@@ -50,6 +50,10 @@ async function bitmapToRGBA(source: CanvasSource): Promise<RGBA> {
   return { data: img.data, width: img.width, height: img.height };
 }
 
+// An <img> couldn't load the file: it's damaged, or this browser has no
+// decoder for its format (decodeToRGBA tells which).
+class ImageLoadError extends Error {}
+
 async function decodeViaImage(blob: Blob): Promise<RGBA> {
   if (typeof document === "undefined") {
     throw new Error("Image decoding requires a document.");
@@ -62,7 +66,7 @@ async function decodeViaImage(blob: Blob): Promise<RGBA> {
 
     const loaded = new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
-      img.onerror = () => reject(decodeFailure("Image decode failed."));
+      img.onerror = () => reject(new ImageLoadError("Image decode failed."));
     });
 
     img.src = url;
@@ -142,12 +146,22 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
   }
 
   const mime = MIME_TYPES[e];
+  try {
+    return await decodeInBrowser(mime, buf);
+  } catch (error) {
+    if (!(error instanceof ImageLoadError)) throw error;
+    // The file is damaged if the browser decodes its format's sample.
+    if (await browserDecodes(e)) throw decodeFailure(error.message);
+    throw noBrowserDecoder(e);
+  }
+}
 
-  // Prefer ImageDecoder when available (works in workers too).
+// Decodes with the browser: ImageDecoder when there is one (in workers too),
+// else createImageBitmap, else, on a page, an <img>.
+async function decodeInBrowser(mime: string | undefined, buf: ArrayBuffer): Promise<RGBA> {
   const decoded = await decodeWithImageDecoder(mime, buf);
   if (decoded) return decoded;
 
-  // Browser-native decoders handle: jpg/jpeg/png/webp/gif/bmp/avif/ico (varies by engine)
   const blob = new Blob([buf], { type: mime || "application/octet-stream" });
 
   try {
@@ -162,4 +176,42 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
     }
     throw new Error("This format isn’t natively supported by your browser.");
   }
+}
+
+// A 1 x 1 picture in each format the browser decodes for decodeToRGBA (made
+// with ImageMagick: 8-bit, and AVIF's AV1 Main profile, which every browser
+// that shows AVIF decodes), to tell a browser with no decoder for a format
+// (AVIF before Safari 16.4) from a damaged file. TIFF has none: only Safari
+// decodes it, and the converters send it to ImageMagick.
+const SAMPLES: Readonly<Record<string, string>> = {
+  jpg: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAAB//EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAVAQEBAAAAAAAAAAAAAAAAAAAHCP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AD9ToUf/2Q==",
+  png: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12MwKLgAAAJEAXGkv/cwAAAAAElFTkSuQmCC",
+  gif: "R0lGODlhAQABAPAAADBw0AAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",
+  webp: "UklGRjgAAABXRUJQVlA4ICwAAADQAQCdASoBAAEAAgA0JaACdLoB+AADsAD+6zb//PTNeYP8nP/izkYjsvAAAA==",
+  bmp: "Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA0HAwAA==",
+  avif: "AAAAHGZ0eXBhdmlmAAAAAG1pZjFhdmlmbWlhZgAAANZtZXRhAAAAAAAAACFoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAAAAAAA5waXRtAAAAAAABAAAAImlsb2MAAAAAREAAAQABAAAAAAD6AAEAAAAAAAAAHQAAACNpaW5mAAAAAAABAAAAFWluZmUCAAAAAAEAAGF2MDEAAAAAVmlwcnAAAAA4aXBjbwAAAAxhdjFDgQAMAAAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAABZpcG1hAAAAAAAAAAEAAQOBAgMAAAAlbWRhdBIACggYAAYICGg0IDIPGAAKKKKEAACwDGH8MILE",
+  ico: "AAABAAEAAQEAAAEAIAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAADQcDD/AAAAAA==",
+  cur: "AAACAAEAAQEAAAAAAAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAADQcDD/AAAAAA==",
+  svg: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiLz4=",
+};
+
+// `format`'s sample (SAMPLES), or null.
+export function browserSample(format: string): Uint8Array<ArrayBuffer> | null {
+  const sample = SAMPLES[format === "jpeg" ? "jpg" : format];
+  return sample ? Uint8Array.from(atob(sample), (char) => char.charCodeAt(0)) : null;
+}
+
+const browserSupport = new Map<string, Promise<boolean>>();
+
+// Whether this browser decodes `format`, from its sample, decoded once.
+// Without a sample, the browser is taken to decode it.
+function browserDecodes(format: string): Promise<boolean> {
+  const sample = browserSample(format);
+  if (!sample) return Promise.resolve(true);
+  let supported = browserSupport.get(format);
+  if (!supported) {
+    supported = decodeInBrowser(MIME_TYPES[format], sample.buffer).then(() => true, () => false);
+    browserSupport.set(format, supported);
+  }
+  return supported;
 }

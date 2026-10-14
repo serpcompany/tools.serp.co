@@ -111,6 +111,14 @@ export function unreadableImageMessage(format: string): string {
   return `This file starts like ${imageName(format)} image, but the picture in it couldn't be read: it may be damaged or incomplete.`;
 }
 
+// For a picture whose header declares a size the engine can't hold.
+export function tooLargeImageMessage(format: string): string {
+  return (
+    `This file starts like ${imageName(format)} image, but the picture in it couldn't be read: it may be damaged, ` +
+    "or too large to convert here."
+  );
+}
+
 // For a failure that isn't the file's: an engine that didn't load, ran out
 // of memory, or failed some other way.
 export function binConvertFailedMessage(format: string, to: string): string {

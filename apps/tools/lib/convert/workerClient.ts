@@ -12,14 +12,21 @@ import {
   binConvertFailedMessage,
   binPicture,
   notAnImageMessage,
+  tooLargeImageMessage,
   unreadableImageMessage,
   type BinPicture,
 } from "./bin-image.ts";
 import { decodeToRGBA } from "./decode.ts";
-import { decodeFailure, isDecodeFailure } from "./decode-failure.ts";
+import {
+  decodeFailure,
+  isDecodeFailure,
+  isTooLargeFailure,
+  noBrowserDecoderFormat,
+  noBrowserDecoderMessage,
+} from "./decode-failure.ts";
 import { encodeFromRGBA } from "./encode.ts";
 import { copyProtectedMessage, isCopyProtected } from "./fairplay.ts";
-import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
+import { MAGICK_BROWSER_INPUTS, MAGICK_FALLBACK_INPUTS } from "./magickBrowser.ts";
 import { checkOutputFormat } from "./output-format.ts";
 import { usesWebCodecs } from "./webcodecs.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
@@ -209,28 +216,46 @@ function binPictureOrRefuse(head: Uint8Array, size: number, to: string): BinPict
 // A picture saved with a .bin name, converted as the format its first bytes
 // say (bin-image.ts), from where its bytes start (past a MacBinary header).
 // Only a decoder's verdict that the picture can't be decoded
-// (decode-failure.ts) is reported as a damaged picture. Any other failure, an
-// engine that didn't load or ran out of memory, gets a plain message, and
-// telemetry keeps that engine's own code.
+// (decode-failure.ts) is reported as a damaged picture, or as one too large
+// to convert here, and a browser with no decoder for the format says so. Any
+// other failure, an engine that didn't load or ran out of memory, gets a
+// plain message, and telemetry keeps that engine's own code.
 async function convertBinImage(args: ConvertArgs): Promise<ConversionResult> {
   const to = args.to.toLowerCase();
   const { format, start, end } = binPictureOrRefuse(new Uint8Array(args.buf), args.buf.byteLength, to);
   const buf = start === 0 && end === args.buf.byteLength ? args.buf : args.buf.slice(start, end);
   try {
-    return await convertUnchecked({ ...args, from: format, buf });
+    return await convertPicture({ ...args, from: format, buf });
   } catch (error) {
     const inner = error as TelemetryError;
-    const failure = isDecodeFailure(error)
-      ? createTelemetryError("unreadable_image", unreadableImageMessage(format), { from: "bin", to, format, engine: "bin-image" })
-      : createTelemetryError(inner.telemetryCode ?? "convert_failed", binConvertFailedMessage(format, to), {
-          engine: "bin-image",
-          ...inner.telemetryMetadata,
-          from: "bin",
-          to,
-          format,
-        });
+    let failure: TelemetryError;
+    if (isDecodeFailure(error)) {
+      const message = isTooLargeFailure(error) ? tooLargeImageMessage(format) : unreadableImageMessage(format);
+      failure = createTelemetryError("unreadable_image", message, { from: "bin", to, format, engine: "bin-image" });
+    } else {
+      const noDecoder = noBrowserDecoderFormat(error);
+      const message = noDecoder ? noBrowserDecoderMessage(noDecoder) : binConvertFailedMessage(format, to);
+      failure = createTelemetryError(inner.telemetryCode ?? "convert_failed", message, {
+        engine: "bin-image",
+        ...inner.telemetryMetadata,
+        from: "bin",
+        to,
+        format,
+      });
+    }
     failure.cause = error;
     throw failure;
+  }
+}
+
+// A picture converted as its format (`args.from`); when the browser has no
+// decoder for that format, by ImageMagick, if it reads it.
+async function convertPicture(args: ConvertArgs): Promise<ConversionResult> {
+  try {
+    return await convertUnchecked(args);
+  } catch (error) {
+    if (!noBrowserDecoderFormat(error) || !MAGICK_FALLBACK_INPUTS.has(args.from)) throw error;
+    return convertWithMagick(args);
   }
 }
 
@@ -252,31 +277,7 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
     return convertAi(args.buf, toExt, args.quality);
   }
   if (MAGICK_BROWSER_INPUTS.has(fromExt)) {
-    args.onProgress?.({ status: "processing", progress: 5 });
-    const { convertWithMagickInBrowser } = await import("./magickBrowser.ts");
-    let converted: { buffer: ArrayBuffer; format: string };
-    try {
-      converted = await convertWithMagickInBrowser(args.buf, fromExt, toExt);
-    } catch (error) {
-      const failure = createTelemetryError(
-        "convert_failed",
-        error instanceof Error ? error.message : String(error),
-        { from: args.from, to: args.to, engine: "browser-magick" },
-      );
-      failure.cause = error;
-      throw failure;
-    }
-    if (converted.format === toExt) {
-      args.onProgress?.({ status: "processing", progress: 100 });
-      return { kind: "single", buffer: converted.buffer };
-    }
-    args.onProgress?.({ status: "processing", progress: 90 });
-    return convertRasterOnMainThread({
-      from: "png",
-      to: args.to,
-      buf: converted.buffer,
-      quality: args.quality,
-    });
+    return convertWithMagick(args);
   }
   if (fromExt === "heic" || fromExt === "heif") {
     return convertRasterOnMainThread(args);
@@ -312,6 +313,38 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
     }
     throw error;
   }
+}
+
+// ImageMagick (WASM) in the browser, for the formats in MAGICK_BROWSER_INPUTS,
+// and for a BIN picture the browser has no decoder for.
+async function convertWithMagick(args: ConvertArgs): Promise<ConversionResult> {
+  const fromExt = args.from.toLowerCase();
+  const toExt = args.to.toLowerCase();
+  args.onProgress?.({ status: "processing", progress: 5 });
+  const { convertWithMagickInBrowser } = await import("./magickBrowser.ts");
+  let converted: { buffer: ArrayBuffer; format: string };
+  try {
+    converted = await convertWithMagickInBrowser(args.buf, fromExt, toExt);
+  } catch (error) {
+    const failure = createTelemetryError(
+      "convert_failed",
+      error instanceof Error ? error.message : String(error),
+      { from: args.from, to: args.to, engine: "browser-magick" },
+    );
+    failure.cause = error;
+    throw failure;
+  }
+  if (converted.format === toExt) {
+    args.onProgress?.({ status: "processing", progress: 100 });
+    return { kind: "single", buffer: converted.buffer };
+  }
+  args.onProgress?.({ status: "processing", progress: 90 });
+  return convertRasterOnMainThread({
+    from: "png",
+    to: args.to,
+    buf: converted.buffer,
+    quality: args.quality,
+  });
 }
 
 // SVG to HTML or vector AI, and an image to EPUB (image-documents.ts).

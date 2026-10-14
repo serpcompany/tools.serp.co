@@ -139,11 +139,18 @@ Conversion picks an engine by input format:
   fork. Any other file is refused from its first 4 KB, before the page reads
   the rest, so a disc image of gigabytes is refused at once. A picture is
   reported as damaged (`unreadable_image`) only when its decoder rejects the
-  file's bytes (`lib/convert/decode-failure.ts`): ImageMagick's
-  CorruptImageError or CoderError, the browser's "Image decode failed.", a
-  KTX, ICNS, SFW or HEIF reader's own. An engine that doesn't load or runs
-  out of memory gets a plain "try again" message, and telemetry keeps that
-  engine's code.
+  file's bytes (`lib/convert/decode-failure.ts`). For ImageMagick that is any
+  failure while it reads the file, once loaded, whatever it throws: LibRaw's
+  C++ exceptions arrive as bare numbers and are read by their LibRaw code,
+  and DDS's reader returns no picture. A ResourceLimitError is the file's
+  ("damaged, or too large to convert here") when its header declares over
+  about 537 megapixels, and running out of memory otherwise. In the browser
+  it is an `<img>` that won't load a format the browser decodes a 1 x 1
+  sample of (`decode.ts`); for a format it can't decode at all, ImageMagick
+  reads the picture, or the page says the browser can't open that format.
+  KTX, ICNS, SFW and HEIF readers mark their own. An engine that doesn't
+  load, crashes or runs out of memory gets a plain "try again" message, and
+  telemetry keeps that engine's code.
 - **Other images:** `workers/convert.worker.js` decodes with the browser and
   encodes with a canvas, retrying on the main thread if the worker fails.
   ImageMagick writes the formats a canvas can't, fitting ICO and CUR inside
