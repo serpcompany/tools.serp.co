@@ -3,7 +3,7 @@
     "issue": "https://github.com/serpcompany/tools.serp.co/issues/147",
     "command": "pnpm -C apps/tools tool-sweep",
     "baseUrl": "http://localhost:8812",
-    "commit": "896bc97735b2ae6ef43aa71fd81519d08a432630",
+    "commit": "e3d15e048167e6d32e1f967ab3ec85f39538ac01",
     "activeTools": 2529,
     "counts": {
       "pass": 2103,
@@ -3966,6 +3966,22 @@
           "svg-to-ttf"
         ],
         "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "e3d15e048167e6d32e1f967ab3ec85f39538ac01",
+        "dirty": false,
+        "startedAt": "2026-10-14T10:38:15.187Z",
+        "finishedAt": "2026-10-14T10:38:16.431Z",
+        "wallMs": 1244,
+        "measured": 1,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "svg-to-ttf"
+        ],
+        "browserVersion": "143.0.7499.4"
       }
     ]
   },
@@ -6178,7 +6194,7 @@
     {"id":"svg-to-tga","route":"/svg-to-tga","from":"svg","to":"tga","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1307,"formatCheck":"none","topColourShare":0.7708,"fixture":"sample.svg","output":{"files":1,"bytes":57618,"name":"sample.tga"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"svg-to-tif","route":"/svg-to-tif","from":"svg","to":"tif","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1357,"formatCheck":"signature","topColourShare":0.7708,"fixture":"sample.svg","output":{"files":1,"bytes":57878,"name":"sample.tif"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"svg-to-tiff","route":"/svg-to-tiff","from":"svg","to":"tiff","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1187,"formatCheck":"signature","topColourShare":0.7708,"fixture":"sample.svg","output":{"files":1,"bytes":57878,"name":"sample.tiff"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
-    {"id":"svg-to-ttf","route":"/svg-to-ttf","from":"svg","to":"ttf","handler":"ToolPageRenderer","engine":"svg-font","status":"pass","durationMs":1372,"formatCheck":"decoded","fixture":"sample-icon.svg","output":{"files":1,"bytes":1716,"name":"sample-icon.ttf"},"commit":"896bc97735b2ae6ef43aa71fd81519d08a432630","dirty":false},
+    {"id":"svg-to-ttf","route":"/svg-to-ttf","from":"svg","to":"ttf","handler":"ToolPageRenderer","engine":"svg-font","status":"pass","durationMs":1019,"formatCheck":"decoded","fixture":"sample-icon.svg","output":{"files":1,"bytes":1716,"name":"sample-icon.ttf"},"commit":"e3d15e048167e6d32e1f967ab3ec85f39538ac01","dirty":false},
     {"id":"svg-to-webp","route":"/svg-to-webp","from":"svg","to":"webp","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1222,"formatCheck":"signature","topColourShare":0.7479,"fixture":"sample.svg","output":{"files":1,"bytes":1838,"name":"sample.webp"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"svg-to-xpm","route":"/svg-to-xpm","from":"svg","to":"xpm","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1722,"formatCheck":"none","topColourShare":0.7708,"fixture":"sample.svg","output":{"files":1,"bytes":16278,"name":"sample.xpm"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"swf-to-3gp","route":"/swf-to-3gp","from":"swf","to":"3gp","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":2173,"formatCheck":"signature","fixture":"sample.swf","output":{"files":1,"bytes":14801,"name":"sample.3gp"},"commit":"73501d1c36b87f5d4513a43d45f064533e49ffb7","dirty":false},
