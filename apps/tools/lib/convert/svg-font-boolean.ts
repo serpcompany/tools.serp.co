@@ -7,7 +7,8 @@
 // its own allowance of work (REGIONS_WORK) and memory (REGIONS_MEMORY), so
 // one intricate shape never decides another's outcome; but their regions
 // share the one glyph's points (RegionsJob's `room`), and the job stops at
-// the first region the glyph has no room for.
+// the first region the glyph has no room for: svg-font.ts takes that shape,
+// and those after it, as drawn.
 //
 // The shape's outlines, its curves already lines (ringOf), are cut into
 // horizontal slabs at every corner's height and every crossing's, so that
@@ -37,8 +38,9 @@ export type RegionsJob = { shapes: RegionShape[]; room: number };
 // MAX_CROSSINGS times, the region needs more points than a glyph holds, or
 // the work or memory allowed ran out; svg-font.ts then takes it as drawn.
 // Or "glyph": with the regions found before it, it needs more points than
-// the glyph has room for, so the file is too detailed for one glyph, and
-// the job stops there.
+// the glyph has room for, and the job stops there (svg-font.ts takes it,
+// and the shapes after it, as drawn, which may fit: the room counts the
+// region's lines, not the curves a shape taken as drawn keeps).
 export type RegionsFallback = "crossings" | "points" | "work" | "memory" | "glyph";
 // A shape's contours as x, y pairs (straight lines, not closed), clockwise
 // outlines and counterclockwise holes, or why there are none.

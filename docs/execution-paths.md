@@ -158,14 +158,14 @@ Conversion picks an engine by input format:
   Over 10 MB, 5,000 shapes or 60,000 path commands is refused as too
   detailed (`too_complex`), and so is stylesheet matching past 2,000,000 rule
   checks. The whole drawing shares the glyph's 65,535 points (TrueType's
-  most), and a file that needs more is refused as too detailed to become one
-  character as soon as that is known: every shape counted at a point a
-  segment, a shape for the worker at its curves as lines before they are
-  made, the regions in the worker as each is found (it stops at the first
-  that doesn't fit, and the page checks again), and the glyph's points as
-  svg2ttf will write them (two for each quadratic its cubicToQuad makes of a
-  curve) before svg2ttf runs, whose `simplify` runs in one pass, as its own
-  took time as the square of the points. A number past a billion
+  most), counted exactly: `svg-font-ttf.ts` makes a curve's points as svg2ttf
+  does (its quadratics less the points in line or implied, about one each),
+  a contour at a time from its end, and svg2ttf is handed them, so neither
+  holds every quadratic at once. Past 65,535 the file is refused as too
+  detailed to become one character. The boolean step keeps to the room the
+  glyph has (a shape at its curves as lines, its region as found): a shape
+  past it, and any the worker didn't reach, are taken as drawn, with the
+  notice. A number past a billion
   (1e400 reads as Infinity) gets the damaged-file message with its own code,
   `number_out_of_range`. svg2ttf's point flags overflow on very long runs, so
   the glyph is read back before it's saved.

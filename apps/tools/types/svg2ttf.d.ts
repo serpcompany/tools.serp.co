@@ -1,4 +1,5 @@
-// svg2ttf 6.1.0 ships no types: the parts lib/convert/svg-font.ts uses.
+// svg2ttf 6.1.0 ships no types: the parts lib/convert/svg-font.ts and
+// svg-font-ttf.ts use.
 declare module "svg2ttf" {
   type Svg2ttfOptions = {
     copyright?: string;
@@ -16,34 +17,43 @@ declare module "svg2ttf" {
 }
 
 // svg2ttf's steps on a glyph's TrueType points, which lib/ttf.js looks up on
-// this module's exports each time it runs: svg-font.ts swaps two of them.
+// this module's exports each time it runs: svg-font-ttf.ts makes the points
+// as these do, and swaps two for steps that leave its points be.
 declare module "svg2ttf/lib/ttf/utils.js" {
   type TtfPoint = { x: number; y: number; onCurve: boolean };
   const steps: {
     simplify: (contours: TtfPoint[][], accuracy: number) => TtfPoint[][];
-    roundPoints: (contours: TtfPoint[][]) => TtfPoint[][];
+    interpolate: (contours: TtfPoint[][], accuracy: number) => TtfPoint[][];
   };
   export default steps;
 }
 
-// svg2ttf's step that turns a cubic curve (a "C" segment from x, y) into
-// quadratic ones ("Q" segments), to the accuracy given: svg-font.ts counts
-// the points they will take before svg2ttf runs.
+// svg2ttf's steps that turn a cubic curve (a "C" segment from x, y) into
+// quadratic ones ("Q" segments), to the accuracy given, and a glyph's path
+// (an svgpath object) into TrueType points, which index.js looks up on this
+// module's exports each time it runs: svg-font-ttf.ts makes the points with
+// the first, and swaps both so svg2ttf takes its points as they are.
 declare module "svg2ttf/lib/svg.js" {
   type Segment = [string, ...number[]];
+  type TtfPoint = { x: number; y: number; onCurve: boolean };
   const svg: {
     cubicToQuad: (segment: Segment, index: number, x: number, y: number, accuracy: number) => Segment[] | undefined;
+    toSfntCoutours: (path: { segments: Segment[] }) => TtfPoint[][];
   };
   export default svg;
 }
 
-// svg2ttf's geometry helpers: svg-font.ts's one-pass `simplify` uses its
-// test for a point on the line between two others, to give the same result.
+// svg2ttf's geometry helpers: svg-font-ttf.ts tests and measures points with
+// them as svg2ttf's `simplify` and `interpolate` do, to give the same result.
 declare module "svg2ttf/lib/math.js" {
   class Point {
     constructor(x: number, y: number);
     x: number;
     y: number;
+    add(point: Point): Point;
+    sub(point: Point): Point;
+    div(value: number): Point;
+    dist(): number;
   }
   const math: {
     Point: typeof Point;

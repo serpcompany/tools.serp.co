@@ -9,17 +9,14 @@
 // rule, across every contour of the glyph; svg-font-regions.ts), with a
 // boolean step, in a worker with a time limit, for a shape whose outlines
 // cross (svg-font-boolean.ts); outlines of straight lines are snapped to
-// whole font units (snapRound); svg2ttf writes the TrueType file, which is
-// read back before it is saved. The whole drawing shares the glyph's 65,535
-// points, and a file that needs more is refused as soon as that is known
-// (fillShapes, encodeShapes). Loaded only when an SVG is converted to TTF
-// (workerClient.ts).
+// whole font units (snapRound), and curves made into TrueType's points as
+// svg2ttf makes them (svg-font-ttf.ts); svg2ttf writes the TrueType file,
+// which is read back before it is saved. The whole drawing shares the
+// glyph's 65,535 points, counted exactly, and a file that needs more is
+// refused as soon as that is known (encodeShapes). Loaded only when an SVG
+// is converted to TTF (workerClient.ts).
 
 import { Readable } from "stream";
-import svg2ttf from "svg2ttf";
-import svg2ttfMath from "svg2ttf/lib/math.js";
-import svg2ttfSvg from "svg2ttf/lib/svg.js";
-import svg2ttfSteps from "svg2ttf/lib/ttf/utils.js";
 import { SVGIcons2SVGFontStream } from "svgicons2svgfont";
 import { SVGPathData } from "svg-pathdata";
 
@@ -59,6 +56,7 @@ import {
   type LeftOut,
   type SvgShape,
 } from "./svg-font-shapes.ts";
+import { curvePoints, writeTtf, type TtfPoint } from "./svg-font-ttf.ts";
 import type { WorkerLike } from "./worker-run.ts";
 
 export const SVG_FONT_CODE_POINT = 0xe000;
@@ -361,21 +359,25 @@ const allClockwise = (contours: Contour[]) => contours.map(clockwise);
 //   opposite ways) goes to the boolean step, in a worker with a time limit.
 // A shape is taken as drawn instead (`takenAsDrawn` says why): "crossings",
 // the contours that meet clockwise, so they all fill, and the rest by their
-// nesting, when its curves as lines are more points than a glyph holds, or
-// the boolean step ran out of its allowances or time; "failed", the same,
-// when the worker didn't run; and "unchecked", every contour clockwise, so
-// its holes fill too, when where its outlines cross wasn't all found: its
-// own allowance for looking ran out, or they meet more than MAX_CROSSINGS
-// times.
+// nesting, when its curves as lines don't fit the points the glyph has left
+// for them, or the boolean step ran out of its allowances, its time or that
+// room; "failed", the same, when the worker didn't run; and "unchecked",
+// every contour clockwise, so its holes fill too, when where its outlines
+// cross wasn't all found: its own allowance for looking ran out, or they
+// meet more than MAX_CROSSINGS times.
 //
-// The shapes share the glyph's MAX_GLYPH_POINTS points, and a file that
-// needs more is refused as too detailed (TOO_DETAILED_MESSAGE) as soon as
-// that is known, before the work that grows with it: every shape is counted
-// first at one point a segment, the fewest it can take; a shape for the
-// boolean step then at its curves as lines (ringSize), before its rings are
-// made; and the regions found, in the worker as each is found
-// (resolveRegions) and here again before they are used. (encodeShapes counts
-// the glyph's points exactly.)
+// The shapes share the glyph's MAX_GLYPH_POINTS points, which encodeShapes
+// counts exactly, refusing a file that needs more. Before that, the boolean
+// step is kept to the room the glyph has, which bounds its work and the
+// points it hands back: every shape is counted at a point a segment
+// (`drawn`), a shape for the step at its curves as lines (ringSize) before
+// its rings are made, and its region as found, in the worker
+// (resolveRegions, which stops at the first that doesn't fit) and here again
+// before it is used. A shape past that room is taken as drawn ("crossings"),
+// its curves kept, as are the shapes the worker didn't get to. These counts
+// are bounds on the work, not on the glyph (a point a segment isn't the
+// fewest: points in line, or on one spot once rounded, are dropped), so
+// none of them refuses a file.
 async function fillShapes(
   placed: Placed[],
   budget: Budget,
@@ -383,10 +385,9 @@ async function fillShapes(
 ): Promise<{ shapes: Filled[]; takenAsDrawn: Set<TakenAsDrawn> }> {
   const job: RegionShape[] = [];
   const takenAsDrawn = new Set<TakenAsDrawn>();
-  const glyph: Budget = { left: MAX_GLYPH_POINTS, exceeded: tooDetailed };
   const drawn = placed.map(({ contours }) => contours.reduce((sum, contour) => sum + contour.segments.length, 0));
-  spend(glyph, drawn.reduce((sum, points) => sum + points, 0));
-  const room = glyph.left;
+  const room = MAX_GLYPH_POINTS - drawn.reduce((sum, points) => sum + points, 0);
+  let left = room;
   type Plan = { done: Filled } | { job: number; shape: Placed; meetings: Meetings };
   const fallback = ({ contours, fillRule }: Placed, meetings: Meetings, reason: TakenAsDrawn): Filled => {
     if (meetings.stopped) {
@@ -415,23 +416,30 @@ async function fillShapes(
       if (!meetings.stopped && !meetings.selfMeet && sameWay) return { done: { contours: allClockwise(contours), snap: "contour" } };
     }
     if (meetings.stopped) return { done: fallback(shape, meetings, "unchecked") };
-    const lines = contours.reduce((sum, contour) => sum + ringSize(contour), 0);
-    if (lines > MAX_GLYPH_POINTS) return { done: fallback(shape, meetings, "crossings") };
-    spend(glyph, lines - drawn[index]!);
+    // Its curves as lines, beyond its segments, past the room left (or past
+    // a glyph's points on their own): taken as drawn, before its rings are
+    // made.
+    const extra = contours.reduce((sum, contour) => sum + ringSize(contour), 0) - drawn[index]!;
+    if (extra > left) return { done: fallback(shape, meetings, "crossings") };
+    left -= extra;
     job.push({ fillRule, rings: contours.map(ringOf), drawn: drawn[index]! });
     return { job: job.length - 1, shape, meetings };
   });
   let outcome: RegionsOutcome = { shapes: [], stopped: null };
   if (job.length) outcome = await regions({ shapes: job, room }).catch((): RegionsOutcome => ({ shapes: [], stopped: "failed" }));
+  // The regions found, in the room the glyph has, as the worker counts them
+  // (whatever it sent): one past it is taken as drawn.
   let used = 0;
-  outcome.shapes.forEach((resolved, index) => {
-    if (resolved && "fallback" in resolved && resolved.fallback === "glyph") throw tooDetailed();
-    if (resolved && "contours" in resolved) used += resolved.contours.reduce((sum, points) => sum + points.length / 2, 0) - job[index]!.drawn;
+  const found = outcome.shapes.map((resolved, index): ResolvedShape | undefined => {
+    if (!resolved || !("contours" in resolved)) return resolved;
+    const extra = resolved.contours.reduce((sum, points) => sum + points.length / 2, 0) - job[index]!.drawn;
+    if (used + extra > room) return { fallback: "glyph" };
+    used += extra;
+    return resolved;
   });
-  if (used > room) throw tooDetailed();
   const shapes = plans.map((plan): Filled => {
     if ("done" in plan) return plan.done;
-    const resolved = outcome.shapes[plan.job];
+    const resolved = found[plan.job];
     if (resolved && "contours" in resolved) {
       return { contours: resolved.contours.flatMap((points) => polygonContour(points) ?? []), snap: "shape" };
     }
@@ -461,30 +469,21 @@ function boundsOfPoints(points: Point[]): Contour["box"] {
   return box;
 }
 
-// The accuracy, in font units, to which svg2ttf turns a cubic curve into
-// quadratic ones (cubicToQuad) for a glyph 500 units or more wide or tall,
-// as every glyph here is (its height is the em's 1,000 units).
-const SVG2TTF_ACCURACY = 0.3;
-
-// The glyph's outlines as path data, in font units, and how many there are.
-// Outlines of straight lines (all a boolean step's are) are in whole units:
-// snapped (snapRound) where they can be, together as Filled.snap says, so
-// none crosses another or itself, or else rounded point by point; each is
-// cleaned (cleanOutline), so no segment has no length. Curves are written to
-// a hundredth, for svg2ttf to turn into TrueType's quadratic curves and
-// round (svg2ttfCleaned).
+// The glyph's TrueType points, contour by contour. Outlines of straight
+// lines (all a boolean step's are) are in whole units: snapped (snapRound)
+// where they can be, together as Filled.snap says, so none crosses another
+// or itself, or else rounded point by point; each is cleaned (cleanOutline),
+// so no segment has no length, and every point of it is kept. Curves are
+// made into TrueType's points as svg2ttf 6.1.0 makes them (curvePoints): a
+// quadratic curve takes one point or two, after svg2ttf drops the points
+// that lie in line or that TrueType implies.
 //
-// The glyph's points are counted as they are written, as svg2ttf will hold
-// them: a point for each corner, and two for each of the quadratic curves
-// svg2ttf's own cubicToQuad makes of a cubic curve. Past MAX_GLYPH_POINTS
-// the file is refused as too detailed, before svg2ttf runs, as its work
-// grows with them (it drops a point that lies on a straight line through
-// its neighbours later, which this count doesn't foresee).
-function encodeShapes(shapes: Filled[]): { d: string; count: number } {
+// The points are counted exactly, as the glyph holds them: past
+// MAX_GLYPH_POINTS the file is refused as too detailed for one glyph, as
+// soon as that is known, with no more than that many points made.
+function encodeShapes(shapes: Filled[]): TtfPoint[][] {
   const snapWork: Budget = { left: SNAP_WORK, exceeded: () => new SnapWorkOut() };
   const glyph: Budget = { left: MAX_GLYPH_POINTS, exceeded: tooDetailed };
-  const hundredth = (value: number) => Math.round(value * 100) / 100;
-  const xy = (point: Point) => `${hundredth(point.x)} ${hundredth(point.y)}`;
   const rounded = (outlines: Point[][]) =>
     outlines.flatMap((outline) => {
       const cleaned = cleanOutline(outline.map(({ x, y }) => ({ x: Math.round(x), y: Math.round(y) })));
@@ -500,14 +499,14 @@ function encodeShapes(shapes: Filled[]): { d: string; count: number } {
     }
     return rounded(outlines);
   };
-  const parts: string[] = [];
+  const glyphContours: TtfPoint[][] = [];
   for (const { contours, snap } of shapes) {
     const isLines = (contour: Contour) => contour.segments.every((segment) => !segment.c1);
     const lines = contours.filter(isLines).map((contour) => [contour.start, ...contour.segments.map((segment) => segment.to)]);
     const whole = snap === "shape" ? snapped(lines) : snap === "contour" ? lines.flatMap((line) => snapped([line])) : rounded(lines);
     for (const outline of whole) {
       spend(glyph, outline.length);
-      parts.push(`M${outline.map(({ x, y }) => `${x} ${y}`).join("L")}Z`);
+      glyphContours.push(outline.map(({ x, y }) => ({ x, y, onCurve: true })));
     }
     for (const contour of contours) {
       if (isLines(contour)) continue;
@@ -515,98 +514,13 @@ function encodeShapes(shapes: Filled[]): { d: string; count: number } {
       // would round to a point or a line: it draws nothing.
       const box = boundsOfPoints([contour.start, ...contour.segments.flatMap(({ c1, c2, to }) => (c1 && c2 ? [c1, c2, to] : [to]))]);
       if (box.maxX - box.minX < 1 || box.maxY - box.minY < 1) continue;
-      spend(glyph, 1);
-      let from = contour.start;
-      for (const { c1, c2, to } of contour.segments) {
-        const quads = c1 && c2
-          ? svg2ttfSvg.cubicToQuad(
-              ["C", hundredth(c1.x), hundredth(c1.y), hundredth(c2.x), hundredth(c2.y), hundredth(to.x), hundredth(to.y)],
-              0,
-              hundredth(from.x),
-              hundredth(from.y),
-              SVG2TTF_ACCURACY,
-            )
-          : undefined;
-        spend(glyph, quads ? 2 * quads.length : 1);
-        from = to;
-      }
-      parts.push(
-        `M${xy(contour.start)}` +
-          contour.segments.map((segment) => (segment.c1 && segment.c2 ? `C${xy(segment.c1)} ${xy(segment.c2)} ${xy(segment.to)}` : `L${xy(segment.to)}`)).join("") +
-          "Z",
-      );
+      const points = curvePoints(contour, glyph.left);
+      if (!points) throw tooDetailed();
+      spend(glyph, points.length);
+      glyphContours.push(points);
     }
   }
-  return { d: parts.join(""), count: parts.length };
-}
-
-export type TtfPoint = { x: number; y: number; onCurve: boolean };
-
-// A contour's TrueType points, rounded, without a point that repeats the
-// one before it (cyclically): an on-curve point is kept over an off-curve
-// one on the same spot, which leaves the same outline. At least one point
-// is left, as svg2ttf counts the contour already.
-function withoutRepeats(contour: TtfPoint[]): TtfPoint[] {
-  const kept: TtfPoint[] = [];
-  for (const point of contour) {
-    const last = kept.at(-1);
-    if (last && last.x === point.x && last.y === point.y) {
-      if (!last.onCurve && point.onCurve) kept[kept.length - 1] = point;
-      continue;
-    }
-    kept.push(point);
-  }
-  while (kept.length > 1 && kept[0]!.x === kept.at(-1)!.x && kept[0]!.y === kept.at(-1)!.y) {
-    const last = kept.pop()!;
-    if (!kept[0]!.onCurve && last.onCurve) kept[0] = last;
-  }
-  return kept;
-}
-
-// svg2ttf's `simplify` (lib/ttf/utils.js) on one contour, in one pass: from
-// the end back, a point between two on-curve points that lies on the line
-// through them (to `accuracy`, by svg2ttf's own isInLine) is dropped, and
-// the point before it is then checked against the one after it that was
-// kept. svg2ttf takes each point out of the array as it goes, in time that
-// grows as the square of the points (1.4 seconds for 64,000 points of
-// tightly bent curves); this stacks the points it keeps instead, with the
-// same result.
-export function simplifyContour(contour: TtfPoint[], accuracy: number): TtfPoint[] {
-  const last = contour.length - 1;
-  if (last < 3) return contour;
-  const { Point, isInLine } = svg2ttfMath;
-  const kept = [contour[last]!];
-  for (let index = last - 1; index > 1; index -= 1) {
-    const before = contour[index - 1]!;
-    const point = contour[index]!;
-    const after = kept[kept.length - 1]!;
-    if (before.onCurve && after.onCurve && isInLine(new Point(before.x, before.y), new Point(point.x, point.y), new Point(after.x, after.y), accuracy)) continue;
-    kept.push(point);
-  }
-  kept.push(contour[1]!, contour[0]!);
-  return kept.reverse();
-}
-
-// svg2ttf with two of its steps on a glyph's points changed (lib/ttf/
-// utils.js, whose functions svg2ttf 6.1.0 looks up on that module each time
-// it runs). Its `simplify` drops every point within 0.3 units of a straight
-// line through its neighbours, before rounding: where an outline passes
-// through a point twice, or touches itself, that can move one pass across
-// the other. encodeShapes has already rounded and cleaned the outlines of
-// straight lines, so `simplify` is skipped for them and still runs for
-// curves, in one pass (simplifyContour). Its `roundPoints` can leave two
-// points on one spot where a curve is under a unit long: those are merged
-// (withoutRepeats).
-function svg2ttfCleaned(svgFont: string, options: Parameters<typeof svg2ttf>[1]): ReturnType<typeof svg2ttf> {
-  const { simplify, roundPoints } = svg2ttfSteps;
-  const whole = (contour: TtfPoint[]) => contour.every((point) => point.onCurve && Number.isInteger(point.x) && Number.isInteger(point.y));
-  svg2ttfSteps.simplify = (contours, accuracy) => contours.map((contour) => (whole(contour) ? contour : simplifyContour(contour, accuracy)));
-  svg2ttfSteps.roundPoints = (contours) => roundPoints(contours).map(withoutRepeats);
-  try {
-    return svg2ttf(svgFont, options);
-  } finally {
-    Object.assign(svg2ttfSteps, { simplify, roundPoints });
-  }
+  return glyphContours;
 }
 
 export const FAR_OUTSIDE_MESSAGE =
@@ -761,11 +675,17 @@ export async function svgToTtf(
   const placed = shapes
     .map((shape, index) => ({ fillRule: shape.fillRule, contours: perShape[index]!.flatMap((contour) => mapContour(contour, toFont) ?? []) }))
     .filter((shape) => shape.contours.length);
+  // The contours in the root's units are let go: a detailed drawing's take
+  // tens of megabytes.
+  perShape = [];
   const filled = await fillShapes(placed, budget, regions ?? (typeof Worker === "function" ? regionsInWorker() : regionsInThread));
-  const { d, count } = encodeShapes(filled.shapes);
-  if (!count) failNothing();
-  if (count > 30_000) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
+  const contours = encodeShapes(filled.shapes);
+  if (!contours.length) failNothing();
+  if (contours.length > 30_000) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
+  const points = contours.reduce((sum, contour) => sum + contour.length, 0);
 
+  // The glyph's points are handed to svg2ttf as they are (writeTtf): its
+  // path data here only marks it as the glyph that has them.
   const name = postScriptName(family);
   const svgFont =
     '<?xml version="1.0" standalone="no"?>\n' +
@@ -773,9 +693,9 @@ export async function svgToTtf(
     `<font id="${escapeXml(name)}" horiz-adv-x="${advance}">\n` +
     `<font-face font-family="${escapeXml(family)}" units-per-em="${UNITS_PER_EM}" ascent="${ASCENT}" descent="-${DESCENT}"/>\n` +
     '<missing-glyph horiz-adv-x="0"/>\n' +
-    `<glyph glyph-name="uniE000" unicode="&#xE000;" horiz-adv-x="${advance}" d="${d}"/>\n` +
+    `<glyph glyph-name="uniE000" unicode="&#xE000;" horiz-adv-x="${advance}" d="M0 0"/>\n` +
     "</font></defs></svg>\n";
-  const ttf = svg2ttfCleaned(svgFont, {
+  const ttf = writeTtf(svgFont, contours, {
     familyname: family,
     fullname: family,
     description: `An icon on U+E000, made from ${family}.svg with tools.serp.co SVG to TTF.`,
@@ -783,10 +703,16 @@ export async function svgToTtf(
     version: "1.0",
   });
   const bytes = new Uint8Array(ttf.buffer);
+  let read: { contours: number; points: number };
   try {
-    readGlyph(bytes);
+    read = readGlyph(bytes);
   } catch (error) {
     throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE, error);
+  }
+  // svg2ttf wrote the points it was handed (a bundler that copied one of
+  // its modules would leave it making its own).
+  if (read.points !== points || read.contours !== contours.length) {
+    throw new Error(`The glyph has ${read.points} points in ${read.contours} contours, not ${points} in ${contours.length}.`);
   }
   const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
   return {

@@ -19,9 +19,9 @@ import {
   fontFamilyName,
   readGlyph,
   regionsInWorker,
-  simplifyContour,
   svgToTtf,
 } from "./svg-font.ts";
+import { curvePoints } from "./svg-font-ttf.ts";
 import { REGIONS_MEMORY, resolveRegions, resolveShape } from "./svg-font-boolean.ts";
 import { MAX_GLYPH_POINTS } from "./svg-font-regions.ts";
 import { LIMITS, UNREADABLE_SVG_MESSAGE } from "./svg-font-shapes.ts";
@@ -600,14 +600,15 @@ function bentLoops(shapes, loops, { square = true } = {}) {
 
 // svgToTtf on a Node worker thread whose heap is capped at `heapMb`, as a
 // phone's browser caps a page's (a thread past it stops with an error): the
-// refusal's code and message, and how long it took. The boolean step isn't
-// run there: the test's files are refused before it.
-function refusedInCappedThread(text, heapMb) {
+// glyph's points, or the refusal's code and message, and how long it took.
+// The boolean step isn't run there: nothing in the tests' files needs it.
+function inCappedThread(text, heapMb) {
   const svgFont = new URL("./svg-font.ts", import.meta.url).href;
   const source =
-    `import { parentPort } from "node:worker_threads"; import { svgToTtf } from ${JSON.stringify(svgFont)};` +
+    `import { parentPort } from "node:worker_threads"; import { svgToTtf, readGlyph } from ${JSON.stringify(svgFont)};` +
     `parentPort.on("message", async (text) => { const started = Date.now();` +
-    `try { await svgToTtf(new TextEncoder().encode(text).buffer, "icon.svg", { regions: () => { throw new Error("the boolean step ran"); } }); parentPort.postMessage({ converted: true }); }` +
+    `try { const { buffer } = await svgToTtf(new TextEncoder().encode(text).buffer, "icon.svg", { regions: () => { throw new Error("the boolean step ran"); } });` +
+    ` parentPort.postMessage({ points: readGlyph(new Uint8Array(buffer)).points, ms: Date.now() - started }); }` +
     `catch (error) { parentPort.postMessage({ code: error.code, message: error.message, ms: Date.now() - started }); } });`;
   return new Promise((resolve, reject) => {
     const worker = new NodeWorker(new URL(`data:text/javascript,${encodeURIComponent(source)}`), { resourceLimits: { maxOldGenerationSizeMb: heapMb } });
@@ -620,19 +621,20 @@ function refusedInCappedThread(text, heapMb) {
   });
 }
 
-test("the drawing shares one glyph's 65,535 points: a file that needs more is refused as too detailed, as soon as that is known", async () => {
+test("the boolean step keeps to the room the glyph has: a shape past it is taken as drawn, and the file is refused only for its exact points", async () => {
   assert.equal(MAX_GLYPH_POINTS, 65_535);
-  // The review's 1.76 MB file: each copy's curves as lines are 65,031
-  // points, and with the other copies at their 259 segments the first
-  // already can't fit. It is refused before its rings are made, and before
-  // the boolean step: in 0.5 s, with the page's heap capped
-  // at 128 MB (it fails at 96 MB). At 10d79a7 it took 11.9 s, the worker
-  // posted 2.93 million points, and the page peaked at 2.0 to 2.5 GB. Here
-  // the thread's heap is capped at 256 MB, half the 512 MB of a phone with
-  // 2 GB.
+  // The round-4 review's 1.76 MB file: each copy's curves as lines are
+  // 65,031 points, past the room the glyph has beside the other copies'
+  // 259 segments, so every copy is taken as drawn, before its rings are
+  // made and without the boolean step. Its curves then make more points
+  // than a glyph holds (each copy about 1,500), so the file is refused as
+  // too detailed: in 0.8 s, with the page's heap capped at 128 MB (it fails
+  // at 96 MB, as at f80448e). At 10d79a7 it took 11.9 s, the worker posted
+  // 2.93 million points, and the page peaked at 2.0 to 2.5 GB. Here the
+  // thread's heap is capped at 256 MB, half the 512 MB of a phone with 2 GB.
   const review = bentLoops(225, 254);
   assert.equal(review.length, 1_756_876);
-  const refused = await refusedInCappedThread(review, 256);
+  const refused = await inCappedThread(review, 256);
   assert.equal(refused.code, "too_complex");
   assert.equal(refused.message, TOO_DETAILED_MESSAGE);
   assert.ok(refused.ms < 3_000, `took ${refused.ms} ms`);
@@ -654,8 +656,10 @@ test("the drawing shares one glyph's 65,535 points: a file that needs more is re
 
   // The regions found are counted in the worker as each is found: crossings
   // add points, so grids of bars that cross (16,200 points each as found,
-  // 270 as drawn) fit four to a glyph. Of five, the fifth is refused; of
-  // forty, the worker stops at the fourth and the rest are never worked out.
+  // 270 as drawn) fit four to the room the glyph has beside five, and three
+  // beside forty. The worker stops at the first that doesn't fit, which and
+  // the rest are taken as drawn, each bar filled where they cross, with a
+  // notice; the glyph holds them all.
   const grid = (count) => {
     const step = 1000 / 45;
     let d = "";
@@ -664,68 +668,232 @@ test("the drawing shares one glyph's 65,535 points: a file that needs more is re
     const paths = Array.from({ length: count }, (_, index) => `<path fill-rule="evenodd" transform="translate(${index * 3} ${index * 3})" d="${d}"/>`);
     return svg(paths.join(""), 'viewBox="0 0 1020 1020"');
   };
+  // Where the first grid's first bars cross, and the last grid's last
+  // (the grids are 3 units apart, so no other grid's bars are there; of
+  // forty, the last's are off the artboard): a hole when worked out, filled
+  // when taken as drawn.
+  const firstCrossing = at(1.5, 1.5, 1020);
+  const lastCrossing = (count) => at((count - 1) * 3 + 983.7, (count - 1) * 3 + 983.7, 1020);
   for (const [count, worked] of [[5, 5], [40, 4]]) {
     posted.length = 0;
     started = Date.now();
-    const error = await refusal(grid(count), "icon.svg", { regions });
+    const { glyph, result } = await font(grid(count), "icon.svg", { regions });
     assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
-    assert.equal(error.code, "too_complex");
-    assert.equal(error.message, TOO_DETAILED_MESSAGE);
     assert.equal(posted.length, worked);
     assert.deepEqual(posted.at(-1).shape, { fallback: "glyph" });
+    assert.ok(result.notice.endsWith(CROSSINGS_NOTICE));
+    assert.ok(!inked(glyph, ...firstCrossing), "the first grid's crossings are holes");
+    if (count === 5) assert.ok(inked(glyph, ...lastCrossing(count)), "the last grid's crossings are filled");
+    assert.ok(readGlyph(new Uint8Array(result.buffer)).points <= MAX_GLYPH_POINTS);
   }
-  assert.ok((await font(grid(4), "icon.svg", { regions })).glyph.getContours().length > 4 * 1_000);
-  // And again on the page's thread, whatever the worker sent.
+  const four = await font(grid(4), "icon.svg", { regions });
+  assert.ok(four.glyph.getContours().length > 4 * 1_000);
+  assert.ok(!inked(four.glyph, ...lastCrossing(4)));
+  assert.doesNotMatch(four.result.notice, /fill/);
+  // And again on the page's thread, whatever the worker sent: the fifth
+  // grid, past the room, is taken as drawn.
   const unbounded = regionsInWorker({ createWorker: nodeWorker("job.shapes.forEach((shape, index) => parentPort.postMessage({ index, shape: resolveShape(shape) })); parentPort.postMessage({ done: true });") });
-  assert.equal((await refusal(grid(5), "icon.svg", { regions: unbounded })).message, TOO_DETAILED_MESSAGE);
+  const fifth = await font(grid(5), "icon.svg", { regions: unbounded });
+  assert.ok(fifth.result.notice.endsWith(CROSSINGS_NOTICE));
+  assert.ok(!inked(fifth.glyph, ...firstCrossing) && inked(fifth.glyph, ...lastCrossing(5)));
   // In the job, a region with no room left stops it.
   const square = (x, y, size) => Float64Array.from([x, y, x + size, y, x + size, y + size, x, y + size, x, y]);
-  const crossing = { fillRule: "evenodd", rings: [square(0, 0, 10), square(5, 5, 10)], drawn: 8 };
-  assert.deepEqual(resolveRegions({ shapes: [crossing, crossing, crossing], room: 4 }).map((shape) => "contours" in shape || shape.fallback), [true, "glyph"]);
-  assert.equal(resolveRegions({ shapes: [crossing, crossing, crossing], room: 12 }).length, 3);
+  const squares = { fillRule: "evenodd", rings: [square(0, 0, 10), square(5, 5, 10)], drawn: 8 };
+  assert.deepEqual(resolveRegions({ shapes: [squares, squares, squares], room: 4 }).map((shape) => "contours" in shape || shape.fallback), [true, "glyph"]);
+  assert.equal(resolveRegions({ shapes: [squares, squares, squares], room: 12 }).length, 3);
   await until(() => exits.length === 4, "the workers ended");
 });
 
-test("curves taken as drawn are counted as svg2ttf will write them, so a file of too many is refused before svg2ttf runs", async () => {
-  // 5,000 tightly bent curves, which cross nothing (no square), so they stay
-  // curves: svg2ttf would make them 99,000 points before dropping those in
-  // line (30,008 left). At 10d79a7 it converted in 2.4 s, and 20,000 such
-  // curves (1.4 MB) ran svg2ttf 20 s into a stack overflow (a "try again").
-  // Both are refused in well under a second now.
-  for (const loops of [5_000, 20_000]) {
+test("a shape too detailed for the room the glyph has is taken as drawn, so a less detailed one is never refused where a more detailed one converts", async () => {
+  // The review's repro: a path of tightly bent loops round a square that
+  // crosses it (bentLoops), beside a zigzag of 2,000 points that crosses
+  // nothing. With 250 loops, its curves as lines (64,000 points) don't fit
+  // beside the zigzag, and with 262 they are more than a glyph holds on
+  // their own: either way the loops are taken as drawn, their curves kept,
+  // and the font is made, with a notice. (At f80448e the 250 loops were
+  // refused, though 262 converted.)
+  const zigzag = () => {
+    let d = "M-400 90";
+    for (let index = 0; index < 2_000; index += 1) d += `L${(-400 + (800 * index) / 2_000).toFixed(2)} ${index % 2 ? 50 : 60}`;
+    return `<path d="${d}L400 90Z"/>`;
+  };
+  for (const loops of [250, 262]) {
+    const text = bentLoops(1, loops).replace("</svg>", `${zigzag()}</svg>`);
     const started = Date.now();
-    const error = await refusal(bentLoops(1, loops, { square: false }), "icon.svg", { regions: () => assert.fail("nothing crosses") });
+    const { glyph, result } = await font(text, "icon.svg", { regions: () => assert.fail("the loops don't fit the room left") });
     assert.ok(Date.now() - started < 3_000, `${loops} took ${Date.now() - started} ms`);
-    assert.equal(error.message, TOO_DETAILED_MESSAGE);
+    assert.ok(result.notice.endsWith(CROSSINGS_NOTICE), `${loops}: ${result.notice}`);
+    // The zigzag (y 60 to 90 in the artboard, -900 to 100: 125 to 140 units
+    // below the baseline) and the loops' far side (x 2,800, past the
+    // artboard's right edge, where only the path's last lines are) are drawn.
+    assert.ok(inked(glyph, 500, -125) && inked(glyph, 3300, 600), `${loops}`);
   }
-  // 3,200 are 63,700 points as svg2ttf makes them, under the glyph's: the
-  // font is made in about half a second (1.9 s with svg2ttf's own simplify).
-  const started = Date.now();
-  const { glyph } = await font(bentLoops(1, 3_200, { square: false }), "icon.svg", { regions: () => assert.fail("nothing crosses") });
-  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
-  assert.equal(glyph.getContours().length, 1);
+  // Alone, the 250 loops fit, and are worked out.
+  const alone = await font(bentLoops(1, 250), "icon.svg", { regions: regionsInWorker({ createWorker: nodeWorker() }) });
+  assert.doesNotMatch(alone.result.notice, /fill/);
 });
 
-test("svg2ttf's simplify, done in one pass, drops the same points", async () => {
-  const require = createRequire(import.meta.url);
-  const { simplify } = require("svg2ttf/lib/ttf/utils.js");
-  let seed = 11;
-  const random = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
-  let dropped = 0;
-  for (let index = 0; index < 5_000; index += 1) {
-    // Runs along straight lines and jumps, on and off the curve, some a
-    // little off the line.
-    let [x, y] = [0, 0];
-    const contour = Array.from({ length: Math.floor(random() * 30) }, () => {
-      if (random() < 0.6) [x, y] = [x + Math.round(random() * 4 - 1), y + Math.round(random() * 2)];
-      else [x, y] = [Math.round(random() * 10), Math.round(random() * 10)];
-      return { x: x + (random() < 0.2 ? random() * 0.4 : 0), y, onCurve: random() < 0.75 };
-    });
-    const ours = simplifyContour(contour.map((point) => ({ ...point })), 0.3);
-    assert.deepEqual(ours, simplify([contour.map((point) => ({ ...point }))], 0.3)[0]);
-    dropped += contour.length - ours.length;
+test("the glyph's points are counted as svg2ttf writes them: smooth curves keep about one point a quadratic, and the cap is exact", async () => {
+  const noRegions = () => assert.fail("nothing crosses");
+  // The review's 4,000 circles (r 5 in a 1,000-unit artboard, 0.16 MB): at
+  // f80448e refused as needing over 65,535 points, as each of svg2ttf's
+  // quadratics was counted as two; svg2ttf writes 37,410, as at 10d79a7.
+  const circles = (count) =>
+    svg(Array.from({ length: count }, (_, index) => `<circle cx="${(index % 70) * 14 + 7}" cy="${Math.floor(index / 70) * 13.5 + 7}" r="5"/>`).join(""), 'viewBox="0 0 1000 1000"');
+  for (const [count, expected] of [[4_000, 37_410], [4_999, 46_700]]) {
+    const started = Date.now();
+    const { result } = await font(circles(count), "icon.svg", { regions: noRegions });
+    assert.ok(Date.now() - started < 3_000, `${count} took ${Date.now() - started} ms`);
+    assert.equal(readGlyph(new Uint8Array(result.buffer)).points, expected);
   }
-  assert.ok(dropped > 1_000, `${dropped} dropped`);
+  // At the cap and one over: 6,800 dots in one path (63,716 points) and a
+  // zigzag below them, each of whose corners is a point.
+  const capped = (corners) => {
+    let dots = "";
+    for (let index = 0; index < 6_800; index += 1) {
+      const [x, y] = [(index % 85) * 11.7 + 6, Math.floor(index / 85) * 11.5 + 6];
+      dots +=
+        `M${x + 5} ${y}C${x + 5} ${y + 2.76} ${x + 2.76} ${y + 5} ${x} ${y + 5}C${x - 2.76} ${y + 5} ${x - 5} ${y + 2.76} ${x - 5} ${y}` +
+        `C${x - 5} ${y - 2.76} ${x - 2.76} ${y - 5} ${x} ${y - 5}C${x + 2.76} ${y - 5} ${x + 5} ${y - 2.76} ${x + 5} ${y}Z`;
+    }
+    let zigzag = "M0 990";
+    for (let index = 1; index < corners - 1; index += 1) zigzag += `L${index} ${index % 2 ? 960 : 970}`;
+    return svg(`<path d="${dots}"/><path d="${zigzag}L${corners - 2} 990Z"/>`, 'viewBox="0 0 1000 1000"');
+  };
+  let started = Date.now();
+  const { result } = await font(capped(1_819), "icon.svg", { regions: noRegions });
+  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  assert.equal(readGlyph(new Uint8Array(result.buffer)).points, MAX_GLYPH_POINTS);
+  started = Date.now();
+  const error = await refusal(capped(1_820), "icon.svg", { regions: noRegions });
+  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  assert.equal(error.code, "too_complex");
+  assert.equal(error.message, TOO_DETAILED_MESSAGE);
+});
+
+test("curves taken as drawn are made into the glyph's points one contour at a time, and a file of too many is refused before svg2ttf runs", async () => {
+  // Tightly bent curves, which cross nothing (no square), so they stay
+  // curves. 5,000 are 99,000 points as svg2ttf's quadratics, and svg2ttf
+  // keeps 30,008: the font is made, as at 10d79a7, which took 2.4 s
+  // (svg2ttf's own simplify took time as the square of the points).
+  let started = Date.now();
+  const { result } = await font(bentLoops(1, 5_000, { square: false }), "icon.svg", { regions: () => assert.fail("nothing crosses") });
+  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  assert.deepEqual(readGlyph(new Uint8Array(result.buffer)), { contours: 1, points: 30_008 });
+  // 20,000 (1.07 MB) keep about 120,000: refused as soon as 65,535 are
+  // made. At 10d79a7 svg2ttf ran 20 s into a stack overflow (a "try
+  // again").
+  started = Date.now();
+  const error = await refusal(bentLoops(1, 20_000, { square: false }), "icon.svg", { regions: () => assert.fail("nothing crosses") });
+  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  assert.equal(error.message, TOO_DETAILED_MESSAGE);
+  // A curve that runs back along a line makes many quadratics and may keep
+  // few points; they are never held at once. 20,000 of them in one contour
+  // (0.55 MB) are 320,000 points as svg2ttf's quadratics, and keep 40,006:
+  // the font is made, with the page's heap capped at 64 MB (f80448e refused
+  // it, counting the quadratics). 59,990 (1.63 MB, under 60,000 path
+  // commands) are 960,000 points as quadratics: refused once 65,535 are
+  // kept, with the page's heap capped at 256 MB, as for the review's file
+  // above (reading and flattening 60,000 curves takes most of it).
+  const back = (count) => {
+    let d = "M0 0";
+    for (let index = 0; index < count; index += 1) d += `C${(index * 0.05 + 400).toFixed(2)} 0 ${(index * 0.05 - 300).toFixed(2)} 0 ${((index + 1) * 0.05).toFixed(2)} 0`;
+    const width = (count * 0.05).toFixed(2);
+    return svg(`<path d="${d}L${width} 500L0 500Z"/>`, `viewBox="0 -500 ${Math.ceil(count * 0.05)} 1000"`);
+  };
+  const kept = await inCappedThread(back(20_000), 64);
+  assert.equal(kept.points, 40_006);
+  assert.ok(kept.ms < 3_000, `took ${kept.ms} ms`);
+  const refused = await inCappedThread(back(59_990), 256);
+  assert.equal(refused.message, TOO_DETAILED_MESSAGE);
+  assert.ok(refused.ms < 5_000, `took ${refused.ms} ms`);
+});
+
+test("the glyph's points are svg2ttf's own: its quadratics, simplify, interpolate and rounding, made from the end of each contour", async () => {
+  // svg2ttf 6.1.0's steps, as svg-font.ts had svg2ttf run them before this
+  // module made the points: path data to a hundredth, svgpath and
+  // cubicToQuad at 0.3, toSfntCoutours, `simplify` twice (skipped for a
+  // contour all on the curve in whole units), `interpolate`, `roundPoints`,
+  // repeated points merged, removeClosingReturnPoints.
+  const require = createRequire(import.meta.url);
+  const SvgPath = createRequire(require.resolve("svg2ttf"))("svgpath");
+  const svgSteps = require("svg2ttf/lib/svg.js");
+  const steps = require("svg2ttf/lib/ttf/utils.js");
+  const hundredth = (value) => Math.round(value * 100) / 100;
+  const whole = (contour) => contour.every((point) => point.onCurve && Number.isInteger(point.x) && Number.isInteger(point.y));
+  const counts = { skipped: 0, simplified: 0, interpolated: 0 };
+  const svg2ttfPoints = ({ start, segments }) => {
+    const xy = (point) => `${hundredth(point.x)} ${hundredth(point.y)}`;
+    const d = `M${xy(start)}${segments.map(({ c1, c2, to }) => (c1 ? `C${xy(c1)} ${xy(c2)} ${xy(to)}` : `L${xy(to)}`)).join("")}Z`;
+    const path = new SvgPath(d).abs().unshort().unarc().iterate((segment, index, x, y) => svgSteps.cubicToQuad(segment, index, x, y, 0.3));
+    let [contour] = svgSteps.toSfntCoutours(path).map((points) => points.map(({ x, y, onCurve }) => ({ x, y, onCurve })));
+    for (let pass = 0; pass < 2; pass += 1) {
+      if (whole(contour)) counts.skipped += 1;
+      else [contour] = steps.simplify([contour], 0.3);
+    }
+    const simplified = contour.length;
+    [contour] = steps.interpolate([contour], 1.1);
+    counts.interpolated += simplified - contour.length;
+    [contour] = steps.roundPoints([contour]);
+    const kept = [];
+    for (const point of contour) {
+      const last = kept.at(-1);
+      if (last && last.x === point.x && last.y === point.y) kept[kept.length - 1] = { ...last, onCurve: last.onCurve || point.onCurve };
+      else kept.push(point);
+    }
+    while (kept.length > 1 && kept[0].x === kept.at(-1).x && kept[0].y === kept.at(-1).y) {
+      const last = kept.pop();
+      kept[0] = { ...kept[0], onCurve: kept[0].onCurve || last.onCurve };
+    }
+    return steps.removeClosingReturnPoints([kept])[0];
+  };
+  let seed = 7;
+  const random = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+  const pick = (...values) => values[Math.floor(random() * values.length)];
+  for (let index = 0; index < 3_000; index += 1) {
+    // Curves of every size, some under a unit, some running back along a
+    // line, some straight, in whole units or not, between lines.
+    const kind = pick("float", "whole", "tiny", "straight");
+    let at = { x: Math.round(random() * 1000 - 500) + (kind === "float" ? random() : 0), y: Math.round(random() * 1000 - 500) };
+    const start = { ...at };
+    const segments = [];
+    for (let count = 1 + Math.floor(random() * 25); segments.length < count; ) {
+      if (kind === "straight") {
+        // Straight curves a third and two thirds along, or with their
+        // controls on their ends: simplify may keep only whole points.
+        const [dx, dy] = [3 * Math.round((random() - 0.5) * 20), 3 * Math.round((random() - 0.5) * 20)];
+        const to = { x: at.x + dx, y: at.y + dy };
+        const shape = segments.length && random() > 0.3 ? pick("thirds", "ends") : "line";
+        if (shape === "line") segments.push({ to });
+        else if (shape === "thirds") segments.push({ c1: { x: at.x + dx / 3, y: at.y + dy / 3 }, c2: { x: at.x + (2 * dx) / 3, y: at.y + (2 * dy) / 3 }, to });
+        else segments.push({ c1: { ...at }, c2: { ...to }, to });
+        at = to;
+        continue;
+      }
+      const size = kind === "tiny" ? 0.6 : kind === "whole" ? Math.round(random() * 40) : random() * 200;
+      let to = { x: at.x + (random() - 0.5) * size, y: at.y + (random() - 0.5) * size };
+      if (kind === "whole") to = { x: Math.round(to.x), y: Math.round(to.y) };
+      const shape = pick("line", "curve", "curve", "back", "small", "same");
+      if (shape === "same") to = { ...at };
+      if (shape === "line" || shape === "same") segments.push({ to });
+      else if (shape === "back") {
+        const along = (t) => ({ x: at.x + (to.x - at.x) * t, y: at.y + (to.y - at.y) * t });
+        segments.push({ c1: along(pick(0.3, -0.5, 1.4)), c2: along(pick(0.7, 1.5, -0.4)), to });
+      } else {
+        const spread = shape === "small" ? 0.8 : size * 2;
+        const near = (point) => ({ x: point.x + (random() - 0.5) * spread, y: point.y + (random() - 0.5) * spread });
+        segments.push({ c1: near(at), c2: near(to), to });
+      }
+      at = to;
+    }
+    if (!segments.some((segment) => segment.c1)) segments.push({ c1: { x: at.x + 30, y: at.y + 40 }, c2: { x: start.x - 20, y: start.y + 10 }, to: { ...start } });
+    const expected = svg2ttfPoints({ start, segments });
+    assert.deepEqual(curvePoints({ start, segments }, MAX_GLYPH_POINTS), expected);
+    // Exactly as many as they are fit; one fewer doesn't.
+    assert.equal(curvePoints({ start, segments }, expected.length).length, expected.length);
+    assert.equal(curvePoints({ start, segments }, expected.length - 1), null);
+  }
+  assert.ok(counts.skipped > 300 && counts.interpolated > 10_000, JSON.stringify(counts));
 });
 
 // The glyph's contours as TrueType stores them: whole-unit points, x, y.

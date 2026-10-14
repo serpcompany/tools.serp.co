@@ -54,8 +54,10 @@ export const LIMITS = {
   // them to elements (5,000 rules for every element would be 500 million).
   rules: 5_000,
   ruleChecks: 2_000_000,
-  // Path commands across all shapes (a TrueType glyph holds at most 65,535
-  // points; a curve needs at least two).
+  // Path commands across all shapes: the work and memory of reading,
+  // flattening and filling the shapes grow with them, before the glyph's
+  // points are counted (a TrueType glyph holds at most 65,535; a curve
+  // keeps one or two for each quadratic svg2ttf makes of it, a line one).
   commands: 60_000,
   // <use> inside <use>, as deep as a browser would follow it here.
   useDepth: 16,
