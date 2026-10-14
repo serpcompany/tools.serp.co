@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 import { Worker as NodeWorker } from "node:worker_threads";
 
 import opentype from "opentype.js";
@@ -12,14 +13,17 @@ import {
   FAR_OUTSIDE_MESSAGE,
   OUTSIDE_ARTBOARD_MESSAGE,
   REGIONS_TIMEOUT_MS,
+  TOO_DETAILED_MESSAGE,
   UNCHECKED_NOTICE,
   WORKER_FAILED_NOTICE,
   fontFamilyName,
   readGlyph,
   regionsInWorker,
+  simplifyContour,
   svgToTtf,
 } from "./svg-font.ts";
-import { REGIONS_MEMORY, resolveShape } from "./svg-font-boolean.ts";
+import { REGIONS_MEMORY, resolveRegions, resolveShape } from "./svg-font-boolean.ts";
+import { MAX_GLYPH_POINTS } from "./svg-font-regions.ts";
 import { LIMITS, UNREADABLE_SVG_MESSAGE } from "./svg-font-shapes.ts";
 import { checkInputFile, convertWithWorker, getOutputMimeType } from "./workerClient.ts";
 
@@ -110,14 +114,15 @@ const seenBounds = (glyph) => {
 
 // The boolean step in a Node worker thread, as the page runs it in a Web
 // Worker (svg-font.worker.ts): `code` runs on each job, posting each
-// shape's region and then `done` unless a test gives other code. `exits`
-// collects the threads that ended; `heapMb` caps the thread's heap, as a
-// phone's browser would (a thread past it stops with an error).
-const RESOLVE_EACH = "job.shapes.forEach((shape, index) => parentPort.postMessage({ index, shape: resolveShape(shape) })); parentPort.postMessage({ done: true });";
-function nodeWorker(code = RESOLVE_EACH, exits = [], { heapMb } = {}) {
+// shape's region as it is found and then `done`, as the worker does, unless
+// a test gives other code. `exits` collects the threads that ended;
+// `heapMb` caps the thread's heap, as a phone's browser would (a thread past
+// it stops with an error); `posted` collects the shapes' messages.
+const RESOLVE_EACH = "resolveRegions(job, (index, shape) => parentPort.postMessage({ index, shape })); parentPort.postMessage({ done: true });";
+function nodeWorker(code = RESOLVE_EACH, exits = [], { heapMb, posted } = {}) {
   const boolean = new URL("./svg-font-boolean.ts", import.meta.url).href;
   const source =
-    `import { parentPort } from "node:worker_threads"; import { resolveShape } from ${JSON.stringify(boolean)};` +
+    `import { parentPort } from "node:worker_threads"; import { resolveRegions, resolveShape } from ${JSON.stringify(boolean)};` +
     `parentPort.on("message", (job) => { ${code} });`;
   return () => {
     const worker = new NodeWorker(new URL(`data:text/javascript,${encodeURIComponent(source)}`), heapMb ? { resourceLimits: { maxOldGenerationSizeMb: heapMb } } : {});
@@ -127,7 +132,10 @@ function nodeWorker(code = RESOLVE_EACH, exits = [], { heapMb } = {}) {
       postMessage: (message, transfer) => worker.postMessage(message, transfer),
       terminate: () => void worker.terminate(),
     };
-    worker.on("message", (data) => like.onmessage?.({ data }));
+    worker.on("message", (data) => {
+      if (!("done" in data)) posted?.push(data);
+      like.onmessage?.({ data });
+    });
     worker.on("error", (error) => like.onerror?.({ message: error.message }));
     worker.on("exit", () => exits.push(worker.threadId));
     return like;
@@ -425,8 +433,8 @@ test("crossing outlines are worked out in a worker with a time limit, in bounded
   }
   // A grid of thin bars (a font unit wide) crossing 640,000 and 2,560,000
   // times (17 and 36 KB, which took martinez 7 and 27 seconds) passes
-  // MAX_CROSSINGS: taken as drawn, every bar filled, with a notice, in well
-  // under the limit.
+  // MAX_CROSSINGS: taken as drawn, every bar filled, in well under the limit,
+  // with the notice that says its holes, if it had any, would fill too.
   for (const bars of [400, 800]) {
     let d = "";
     for (let index = 0; index < bars; index += 1) d += `M0 ${index * (10000 / bars)}H10000V${index * (10000 / bars) + 10}H0Z`;
@@ -434,7 +442,7 @@ test("crossing outlines are worked out in a worker with a time limit, in bounded
     started = Date.now();
     const grid = await font(svg(`<path fill-rule="evenodd" d="${d}"/>`, 'viewBox="0 0 10000 10000"'), "icon.svg", { regions });
     assert.ok(Date.now() - started < 3_000, `${bars} bars took ${Date.now() - started} ms`);
-    assert.match(grid.result.notice, new RegExp(CROSSINGS_NOTICE.slice(0, 40)));
+    assert.ok(grid.result.notice.endsWith(UNCHECKED_NOTICE));
     // Each bar is a contour of its own, turned clockwise to fill.
     assert.equal(grid.glyph.getContours().length, 2 * bars);
   }
@@ -541,9 +549,12 @@ test("each shape is checked for crossings with its own allowance: one that runs 
   // they don't cross means comparing about 80 million pairs of edges: more
   // than that shape's allowance. A ring with a hole after it (or before it)
   // still keeps its hole, and the notice says what happened.
-  let bars = "";
-  for (let index = 0; index < 3_200; index += 1) bars += `M200 ${200 + index * 0.3125}H1200V${200 + index * 0.3125 + 0.094}H200Z`;
-  const many = `<g transform="scale(.01)"><path d="${bars}"/></g>`;
+  const bars = (count) => {
+    let d = "";
+    for (let index = 0; index < count; index += 1) d += `M200 ${200 + index * 0.3125}H1200V${200 + index * 0.3125 + 0.094}H200Z`;
+    return d;
+  };
+  const many = `<g transform="scale(.01)"><path d="${bars(3_200)}"/></g>`;
   const ring = '<path fill-rule="evenodd" d="M14 14H22V22H14Z M16 16H20V20H16Z"/>';
   for (const body of [many + ring, ring + many]) {
     const started = Date.now();
@@ -553,6 +564,167 @@ test("each shape is checked for crossings with its own allowance: one that runs 
     assert.ok(result.notice.endsWith(UNCHECKED_NOTICE));
     assert.ok(!result.notice.includes(CROSSINGS_NOTICE));
   }
+  // The same ring in the bars' own even-odd path (review's repro): the
+  // whole shape is filled as drawn, every contour clockwise, so the ring's
+  // hole fills though nothing crosses it, and the notice says holes may
+  // fill. With 100 bars the shape is checked: the hole stays, no notice.
+  const ringPath = "M1400 1400H2200V2200H1400Z M1600 1600H2000V2000H1600Z";
+  for (const count of [3_200, 100]) {
+    const body = `<g transform="scale(.01)"><path fill-rule="evenodd" d="${bars(count)}${ringPath}"/></g>`;
+    const { glyph, result } = await font(svg(body), "icon.svg", { regions: () => assert.fail("no shape needs the boolean step") });
+    assert.ok(inkAt(glyph, 15, 15));
+    if (count === 3_200) {
+      assert.ok(inkAt(glyph, 18, 18), "the hole fills");
+      assert.ok(result.notice.endsWith(UNCHECKED_NOTICE));
+      assert.match(UNCHECKED_NOTICE, /their holes, and gaps where their outlines cross, may fill in/);
+    } else {
+      assert.ok(!inkAt(glyph, 18, 18), "the hole stays");
+      assert.doesNotMatch(result.notice, /fill/);
+    }
+  }
+});
+
+// The round-4 review's drawing: `shapes` copies of one even-odd path of
+// `loops` tightly bent curves, each of which the boolean step makes 256
+// lines (ringOf's most), round a square that crosses the first, so each
+// copy goes to the boolean step (without the square nothing crosses, and
+// the curves stay curves). Its 225 copies of 254 loops are 1.76 MB, each
+// copy under every limit of its own.
+function bentLoops(shapes, loops, { square = true } = {}) {
+  const step = Math.min(24, 6096 / loops);
+  let d = "M0 0";
+  for (let index = 0; index < loops; index += 1) d += `C7300 ${-index * step} -7300 ${-(index + 1) * step} 0 ${-(index + 1) * step}`;
+  d += `L3000 ${-loops * step}L3000 0Z${square ? " M-50 -5H50V5H-50Z" : ""}`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -900 1000 1000">${`<path fill-rule="evenodd" d="${d}"/>`.repeat(shapes)}</svg>`;
+}
+
+// svgToTtf on a Node worker thread whose heap is capped at `heapMb`, as a
+// phone's browser caps a page's (a thread past it stops with an error): the
+// refusal's code and message, and how long it took. The boolean step isn't
+// run there: the test's files are refused before it.
+function refusedInCappedThread(text, heapMb) {
+  const svgFont = new URL("./svg-font.ts", import.meta.url).href;
+  const source =
+    `import { parentPort } from "node:worker_threads"; import { svgToTtf } from ${JSON.stringify(svgFont)};` +
+    `parentPort.on("message", async (text) => { const started = Date.now();` +
+    `try { await svgToTtf(new TextEncoder().encode(text).buffer, "icon.svg", { regions: () => { throw new Error("the boolean step ran"); } }); parentPort.postMessage({ converted: true }); }` +
+    `catch (error) { parentPort.postMessage({ code: error.code, message: error.message, ms: Date.now() - started }); } });`;
+  return new Promise((resolve, reject) => {
+    const worker = new NodeWorker(new URL(`data:text/javascript,${encodeURIComponent(source)}`), { resourceLimits: { maxOldGenerationSizeMb: heapMb } });
+    worker.on("message", (message) => {
+      resolve(message);
+      void worker.terminate();
+    });
+    worker.on("error", reject);
+    worker.postMessage(text);
+  });
+}
+
+test("the drawing shares one glyph's 65,535 points: a file that needs more is refused as too detailed, as soon as that is known", async () => {
+  assert.equal(MAX_GLYPH_POINTS, 65_535);
+  // The review's 1.76 MB file: each copy's curves as lines are 65,035
+  // points, so the second can't fit. It is refused before its rings are
+  // made, and before the boolean step: in 0.5 s, with the page's heap capped
+  // at 128 MB (it fails at 96 MB). At 10d79a7 it took 11.9 s, the worker
+  // posted 2.93 million points, and the page peaked at 2.0 to 2.5 GB. Here
+  // the thread's heap is capped at 256 MB, half the 512 MB of a phone with
+  // 2 GB.
+  const review = bentLoops(225, 254);
+  assert.equal(review.length, 1_756_876);
+  const refused = await refusedInCappedThread(review, 256);
+  assert.equal(refused.code, "too_complex");
+  assert.equal(refused.message, TOO_DETAILED_MESSAGE);
+  assert.ok(refused.ms < 3_000, `took ${refused.ms} ms`);
+
+  // Just under: two copies of 127 loops, 65,044 points as lines, are worked
+  // out in the worker (65,046 points as found) and make a glyph (12,204
+  // points once rounded to whole units), in about a third of a second, with
+  // the page's heap capped at 32 MB.
+  const exits = [];
+  const posted = [];
+  const regions = regionsInWorker({ createWorker: nodeWorker(undefined, exits, { posted }) });
+  let started = Date.now();
+  const under = await font(bentLoops(2, 127), "icon.svg", { regions });
+  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  assert.equal(posted.length, 2);
+  const { points } = readGlyph(new Uint8Array(under.result.buffer));
+  assert.ok(points > 10_000, `${points} points`);
+  assert.doesNotMatch(under.result.notice, /fill/);
+
+  // The regions found are counted in the worker as each is found: crossings
+  // add points, so grids of bars that cross (16,200 points each as found,
+  // 450 as drawn) fit four to a glyph. Of five, the fifth is refused; of
+  // forty, the worker stops at the fourth and the rest are never worked out.
+  const grid = (count) => {
+    const step = 1000 / 45;
+    let d = "";
+    for (let index = 0; index < 45; index += 1) d += `M0 ${index * step}H1000V${index * step + step / 3}H0Z`;
+    for (let index = 0; index < 45; index += 1) d += `M${index * step} 0V1000H${index * step + step / 3}V0Z`;
+    const paths = Array.from({ length: count }, (_, index) => `<path fill-rule="evenodd" transform="translate(${index * 3} ${index * 3})" d="${d}"/>`);
+    return svg(paths.join(""), 'viewBox="0 0 1020 1020"');
+  };
+  for (const [count, worked] of [[5, 5], [40, 4]]) {
+    posted.length = 0;
+    started = Date.now();
+    const error = await refusal(grid(count), "icon.svg", { regions });
+    assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+    assert.equal(error.code, "too_complex");
+    assert.equal(error.message, TOO_DETAILED_MESSAGE);
+    assert.equal(posted.length, worked);
+    assert.deepEqual(posted.at(-1).shape, { fallback: "glyph" });
+  }
+  assert.ok((await font(grid(4), "icon.svg", { regions })).glyph.getContours().length > 4 * 1_000);
+  // And again on the page's thread, whatever the worker sent.
+  const unbounded = regionsInWorker({ createWorker: nodeWorker("job.shapes.forEach((shape, index) => parentPort.postMessage({ index, shape: resolveShape(shape) })); parentPort.postMessage({ done: true });") });
+  assert.equal((await refusal(grid(5), "icon.svg", { regions: unbounded })).message, TOO_DETAILED_MESSAGE);
+  // In the job, a region with no room left stops it.
+  const square = (x, y, size) => Float64Array.from([x, y, x + size, y, x + size, y + size, x, y + size, x, y]);
+  const crossing = { fillRule: "evenodd", rings: [square(0, 0, 10), square(5, 5, 10)], drawn: 8 };
+  assert.deepEqual(resolveRegions({ shapes: [crossing, crossing, crossing], room: 4 }).map((shape) => "contours" in shape || shape.fallback), [true, "glyph"]);
+  assert.equal(resolveRegions({ shapes: [crossing, crossing, crossing], room: 12 }).length, 3);
+  await until(() => exits.length === 4, "the workers ended");
+});
+
+test("curves taken as drawn are counted as svg2ttf will write them, so a file of too many is refused before svg2ttf runs", async () => {
+  // 5,000 tightly bent curves, which cross nothing (no square), so they stay
+  // curves: svg2ttf would make them 99,000 points before dropping those in
+  // line (30,008 left). At 10d79a7 it converted in 2.4 s, and 20,000 such
+  // curves (1.4 MB) ran svg2ttf 20 s into a stack overflow (a "try again").
+  // Both are refused in well under a second now.
+  for (const loops of [5_000, 20_000]) {
+    const started = Date.now();
+    const error = await refusal(bentLoops(1, loops, { square: false }), "icon.svg", { regions: () => assert.fail("nothing crosses") });
+    assert.ok(Date.now() - started < 3_000, `${loops} took ${Date.now() - started} ms`);
+    assert.equal(error.message, TOO_DETAILED_MESSAGE);
+  }
+  // 3,200 are 63,700 points as svg2ttf makes them, under the glyph's: the
+  // font is made in about half a second (1.9 s with svg2ttf's own simplify).
+  const started = Date.now();
+  const { glyph } = await font(bentLoops(1, 3_200, { square: false }), "icon.svg", { regions: () => assert.fail("nothing crosses") });
+  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  assert.equal(glyph.getContours().length, 1);
+});
+
+test("svg2ttf's simplify, done in one pass, drops the same points", async () => {
+  const require = createRequire(import.meta.url);
+  const { simplify } = require("svg2ttf/lib/ttf/utils.js");
+  let seed = 11;
+  const random = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+  let dropped = 0;
+  for (let index = 0; index < 5_000; index += 1) {
+    // Runs along straight lines and jumps, on and off the curve, some a
+    // little off the line.
+    let [x, y] = [0, 0];
+    const contour = Array.from({ length: Math.floor(random() * 30) }, () => {
+      if (random() < 0.6) [x, y] = [x + Math.round(random() * 4 - 1), y + Math.round(random() * 2)];
+      else [x, y] = [Math.round(random() * 10), Math.round(random() * 10)];
+      return { x: x + (random() < 0.2 ? random() * 0.4 : 0), y, onCurve: random() < 0.75 };
+    });
+    const ours = simplifyContour(contour.map((point) => ({ ...point })), 0.3);
+    assert.deepEqual(ours, simplify([contour.map((point) => ({ ...point }))], 0.3)[0]);
+    dropped += contour.length - ours.length;
+  }
+  assert.ok(dropped > 1_000, `${dropped} dropped`);
 });
 
 // The glyph's contours as TrueType stores them: whole-unit points, x, y.
@@ -839,7 +1011,7 @@ test("a 2 MB SVG converts, or is refused as too detailed for a glyph, in seconds
   assert.ok(inkAt(glyph, 12, 12));
   assert.match(result.notice, /filled shapes only: embedded pictures\./);
   // An illustration of 2 MB of curves: more points than one TrueType glyph
-  // holds (65,535).
+  // holds (65,535), so too detailed to become one character.
   const paths = [];
   for (let index = 0; paths.join("").length < 2_000_000; index += 1) {
     const x = (index % 40) * 25;
@@ -858,7 +1030,7 @@ test("a 2 MB SVG converts, or is refused as too detailed for a glyph, in seconds
   const error = await refusal(svg(paths.join("\n"), 'viewBox="0 0 1000 1000"'));
   assert.ok(Date.now() - started < 10_000, `took ${Date.now() - started} ms`);
   assert.equal(error.code, "too_complex");
-  assert.match(error.message, /more detail than a font can hold/);
+  assert.equal(error.message, TOO_DETAILED_MESSAGE);
 });
 
 test("Illustrator's entity namespaces, a UTF-16 file and a stylesheet with at-rules are read", async () => {

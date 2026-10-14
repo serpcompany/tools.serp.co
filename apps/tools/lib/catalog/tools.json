@@ -96656,7 +96656,7 @@
         },
         {
           "question": "Does the font keep my icon's colours?",
-          "answer": "No. A TrueType glyph takes the colour of the text around it. Every filled shape becomes part of the icon, so a white shape drawn over a dark one fills in rather than leaving a gap. Holes cut into a shape, with the even-odd fill rule or a path drawn the other way round, stay holes, as do the gaps an even-odd outline leaves where it crosses itself, as in a star (outlines that cross too many times to work out fill in instead, and the page says so). Text, embedded pictures, clipping paths and masks are left out."
+          "answer": "No. A TrueType glyph takes the colour of the text around it. Every filled shape becomes part of the icon, so a white shape drawn over a dark one fills in rather than leaving a gap. Holes cut into a shape, with the even-odd fill rule or a path drawn the other way round, stay holes, as do the gaps an even-odd outline leaves where it crosses itself, as in a star (a shape whose outlines cross too many times, or that has too many points, to work out in the browser is filled as drawn instead, where its gaps and holes may fill in, and the page says so). Text, embedded pictures, clipping paths and masks are left out."
         },
         {
           "question": "How big is the icon in the font?",

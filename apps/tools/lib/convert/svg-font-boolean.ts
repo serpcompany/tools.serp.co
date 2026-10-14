@@ -5,7 +5,9 @@
 // hollow middle. It runs in a worker (svg-font.worker.ts) that svg-font.ts
 // stops after REGIONS_TIMEOUT_MS. Each shape is worked out on its own, with
 // its own allowance of work (REGIONS_WORK) and memory (REGIONS_MEMORY), so
-// one intricate shape never decides another's outcome.
+// one intricate shape never decides another's outcome; but their regions
+// share the one glyph's points (RegionsJob's `room`), and the job stops at
+// the first region the glyph has no room for.
 //
 // The shape's outlines, its curves already lines (ringOf), are cut into
 // horizontal slabs at every corner's height and every crossing's, so that
@@ -22,12 +24,22 @@
 
 import { MAX_CROSSINGS, MAX_GLYPH_POINTS, finishContour, spend, type Budget, type FillRule } from "./svg-font-regions.ts";
 
-export type RegionShape = { fillRule: FillRule; rings: Float64Array[] };
-export type RegionsJob = { shapes: RegionShape[] };
+// A shape for the boolean step: its fill rule, its rings, and `drawn`, the
+// points svg-font.ts counted it as in the glyph before its region is found
+// (its segments, one point each).
+export type RegionShape = { fillRule: FillRule; rings: Float64Array[]; drawn: number };
+// `room`: how many points the glyph has beyond what every shape of the file
+// was counted as (MAX_GLYPH_POINTS less their `drawn` points): the regions
+// found may take that many more than their shapes' `drawn` points between
+// them, and no more.
+export type RegionsJob = { shapes: RegionShape[]; room: number };
 // Why a shape's region wasn't found: its outlines cross more than
 // MAX_CROSSINGS times, the region needs more points than a glyph holds, or
-// the work or memory allowed ran out. svg-font.ts then takes it as drawn.
-export type RegionsFallback = "crossings" | "points" | "work" | "memory";
+// the work or memory allowed ran out; svg-font.ts then takes it as drawn.
+// Or "glyph": with the regions found before it, it needs more points than
+// the glyph has room for, so the file is too detailed for one glyph, and
+// the job stops there.
+export type RegionsFallback = "crossings" | "points" | "work" | "memory" | "glyph";
 // A shape's contours as x, y pairs (straight lines, not closed), clockwise
 // outlines and counterclockwise holes, or why there are none.
 export type ResolvedShape = { contours: Float64Array[] } | { fallback: RegionsFallback };
@@ -277,9 +289,10 @@ function firstFrom(order: Int32Array, pieces: Pieces, x: number, y: number): num
 }
 
 // The region `fillRule` fills inside `rings`, as contours winding once round
-// it, outlines counterclockwise and holes clockwise (y up), as x, y pairs.
-// Throws OutOf when it can't be found within the allowances.
-function regionOf({ fillRule, rings }: RegionShape, work: Budget, memory: Budget, cap: number): Float64Array[] {
+// it, outlines counterclockwise and holes clockwise (y up), as x, y pairs,
+// of at most `glyphLeft` points. Throws OutOf when it can't be found within
+// the allowances.
+function regionOf({ fillRule, rings }: RegionShape, work: Budget, memory: Budget, cap: number, glyphLeft: number): Float64Array[] {
   const edges = edgesOf(rings, memory);
   const count = edges.count;
   spend(work, count * Math.log2(count + 1));
@@ -545,6 +558,7 @@ function regionOf({ fillRule, rings }: RegionShape, work: Budget, memory: Budget
     if (!contour) continue;
     points += ends.length;
     if (points > MAX_GLYPH_POINTS) throw new OutOf("points");
+    if (points > glyphLeft) throw new OutOf("glyph");
     const flat = new Float64Array(2 * ends.length);
     ends.forEach((point, at) => {
       flat[2 * at] = point.x;
@@ -557,24 +571,53 @@ function regionOf({ fillRule, rings }: RegionShape, work: Budget, memory: Budget
 
 // One shape's region, by its own fill rule, as clockwise outlines and
 // counterclockwise holes (as TrueType's run), within its own allowances of
-// work and memory, or why it wasn't found.
+// work and memory and the points the glyph has left for it (`glyphLeft`),
+// or why it wasn't found.
 export function resolveShape(
   shape: RegionShape,
-  { work = REGIONS_WORK, memory = REGIONS_MEMORY, cap = MAX_CROSSINGS }: { work?: number; memory?: number; cap?: number } = {},
+  {
+    work = REGIONS_WORK,
+    memory = REGIONS_MEMORY,
+    cap = MAX_CROSSINGS,
+    glyphLeft = MAX_GLYPH_POINTS,
+  }: { work?: number; memory?: number; cap?: number; glyphLeft?: number } = {},
 ): ResolvedShape {
   const workLeft: Budget = { left: work, exceeded: () => new OutOf("work") };
   const memoryLeft: Budget = { left: memory, exceeded: () => new OutOf("memory") };
   try {
-    return { contours: regionOf(shape, workLeft, memoryLeft, cap).map(reverse) };
+    return { contours: regionOf(shape, workLeft, memoryLeft, cap, glyphLeft).map(reverse) };
   } catch (error) {
     if (error instanceof OutOf) return { fallback: error.reason };
     throw error;
   }
 }
 
-// Every shape of a job, each on its own (resolveShape).
-export function resolveRegions(job: RegionsJob, allowances?: Parameters<typeof resolveShape>[1]): ResolvedShape[] {
-  return job.shapes.map((shape) => resolveShape(shape, allowances));
+// The points of a resolved shape's contours.
+export function pointsOf(shape: ResolvedShape): number {
+  return "contours" in shape ? shape.contours.reduce((sum, points) => sum + points.length / 2, 0) : 0;
+}
+
+// The shapes of a job, each on its own (resolveShape), each handed to
+// `found` as soon as it is found, in the glyph's room (RegionsJob): a
+// shape's region may take its `drawn` points and what the regions before it
+// have left of `room`. The job stops at the first that doesn't fit ("glyph").
+export function resolveRegions(
+  job: RegionsJob,
+  found: (index: number, shape: ResolvedShape) => void = () => {},
+  allowances: { work?: number; memory?: number; cap?: number } = {},
+): ResolvedShape[] {
+  const shapes: ResolvedShape[] = [];
+  let used = 0;
+  for (const [index, shape] of job.shapes.entries()) {
+    const resolved = resolveShape(shape, { ...allowances, glyphLeft: shape.drawn + job.room - used });
+    // Counted before `found`, which may hand the contours' buffers away. A
+    // shape taken as drawn stays at its `drawn` points.
+    if ("contours" in resolved) used += pointsOf(resolved) - shape.drawn;
+    shapes.push(resolved);
+    found(index, resolved);
+    if ("fallback" in resolved && resolved.fallback === "glyph") break;
+  }
+  return shapes;
 }
 
 // x, y pairs in the opposite order: counterclockwise to clockwise.

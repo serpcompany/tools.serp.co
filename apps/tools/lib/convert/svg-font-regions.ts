@@ -314,8 +314,31 @@ export const MAX_CROSSINGS = 10_000;
 // em; a curve's chords of n equal steps are within max|B''| / 8n² of it).
 const FLATNESS = 0.25;
 const MAX_CURVE_STEPS = 256;
-// The most points one TrueType glyph holds.
+// The most points one TrueType glyph holds (its contours' last points are
+// stored as 16-bit numbers). The whole drawing becomes one glyph, so this is
+// also the most a file's shapes may put in it together (svg-font.ts).
 export const MAX_GLYPH_POINTS = 65_535;
+
+// How many lines ringOf makes of the curve from `previous`.
+function curveSteps(previous: Point, c1: Point, c2: Point, to: Point): number {
+  const bend = 6 * Math.max(
+    Math.hypot(previous.x - 2 * c1.x + c2.x, previous.y - 2 * c1.y + c2.y),
+    Math.hypot(c1.x - 2 * c2.x + to.x, c1.y - 2 * c2.y + to.y),
+  );
+  return Math.min(MAX_CURVE_STEPS, Math.max(1, Math.ceil(Math.sqrt(bend / (8 * FLATNESS)))));
+}
+
+// How many points ringOf's ring of `contour` has (not counting the last,
+// which repeats the first), worked out without making it.
+export function ringSize(contour: Contour): number {
+  let size = 1;
+  let previous = contour.start;
+  for (const { c1, c2, to } of contour.segments) {
+    size += c1 && c2 ? curveSteps(previous, c1, c2, to) : 1;
+    previous = to;
+  }
+  return size;
+}
 
 // A contour as a closed ring of x, y pairs (the last point is the first),
 // its curves as lines within FLATNESS font units of them.
@@ -324,11 +347,7 @@ export function ringOf(contour: Contour): Float64Array {
   let previous = contour.start;
   for (const { c1, c2, to } of contour.segments) {
     if (c1 && c2) {
-      const bend = 6 * Math.max(
-        Math.hypot(previous.x - 2 * c1.x + c2.x, previous.y - 2 * c1.y + c2.y),
-        Math.hypot(c1.x - 2 * c2.x + to.x, c1.y - 2 * c2.y + to.y),
-      );
-      const steps = Math.min(MAX_CURVE_STEPS, Math.max(1, Math.ceil(Math.sqrt(bend / (8 * FLATNESS)))));
+      const steps = curveSteps(previous, c1, c2, to);
       for (let step = 1; step < steps; step += 1) {
         const point = cubicAt(previous, c1, c2, to, step / steps);
         ring.push(point.x, point.y);

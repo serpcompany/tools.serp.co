@@ -131,12 +131,13 @@ Conversion picks an engine by input format:
   region by a sweep in slabs, its curves as lines within a quarter of a font
   unit, in a worker stopped after 5 seconds; each shape has its own
   allowance of work (about a second) and memory (64 MB, charged as the
-  sweep's data grows) and is posted as soon as it is found. A shape whose
-  outlines meet over 10,000 times, or that ran out of its allowance or the
-  time, is taken as drawn instead, its crossing outlines all filling, and the
-  page says gaps may fill in; so is one with too many points to check for
-  crossings on the page (its share of 50 million comparisons), on its own,
-  and the page says that, or that the worker couldn't run. Outlines of
+  sweep's data grows) and is posted as soon as it is found. A shape that ran
+  out of its allowance or the time is taken as drawn instead, its crossing
+  outlines all filling, and the page says gaps where outlines cross may fill
+  in, or that the worker couldn't run. One whose outlines meet over 10,000
+  times, or with too many points to check for crossings on the page (its
+  share of 50 million comparisons), is taken as drawn whole, every contour
+  filling, and the page says its holes may fill in too. Outlines of
   straight lines, all the sweep's, are snapped to whole font units (snap
   rounding), so none crosses itself or has a zero-length segment, and
   svg2ttf's own simplifying, which could move one across another, is
@@ -154,9 +155,17 @@ Conversion picks an engine by input format:
   height, 150 below the baseline. Strokes, text, pictures, colours, clipping
   and masks aren't a font's: a stroke is left out with a notice, and a
   stroke-only icon is refused with how to outline it.
-  Over 10 MB, 5,000 shapes or 60,000 path commands, or past TrueType's
-  65,535 points a glyph, is refused as too detailed (`too_complex`), and so is
-  stylesheet matching past 2,000,000 rule checks. A number past a billion
+  Over 10 MB, 5,000 shapes or 60,000 path commands is refused as too
+  detailed (`too_complex`), and so is stylesheet matching past 2,000,000 rule
+  checks. The whole drawing shares the glyph's 65,535 points (TrueType's
+  most), and a file that needs more is refused as too detailed to become one
+  character as soon as that is known: every shape counted at a point a
+  segment, a shape for the worker at its curves as lines before they are
+  made, the regions in the worker as each is found (it stops at the first
+  that doesn't fit, and the page checks again), and the glyph's points as
+  svg2ttf will write them (two for each quadratic its cubicToQuad makes of a
+  curve) before svg2ttf runs, whose `simplify` runs in one pass, as its own
+  took time as the square of the points. A number past a billion
   (1e400 reads as Infinity) gets the damaged-file message with its own code,
   `number_out_of_range`. svg2ttf's point flags overflow on very long runs, so
   the glyph is read back before it's saved.

@@ -25,3 +25,29 @@ declare module "svg2ttf/lib/ttf/utils.js" {
   };
   export default steps;
 }
+
+// svg2ttf's step that turns a cubic curve (a "C" segment from x, y) into
+// quadratic ones ("Q" segments), to the accuracy given: svg-font.ts counts
+// the points they will take before svg2ttf runs.
+declare module "svg2ttf/lib/svg.js" {
+  type Segment = [string, ...number[]];
+  const svg: {
+    cubicToQuad: (segment: Segment, index: number, x: number, y: number, accuracy: number) => Segment[] | undefined;
+  };
+  export default svg;
+}
+
+// svg2ttf's geometry helpers: svg-font.ts's one-pass `simplify` uses its
+// test for a point on the line between two others, to give the same result.
+declare module "svg2ttf/lib/math.js" {
+  class Point {
+    constructor(x: number, y: number);
+    x: number;
+    y: number;
+  }
+  const math: {
+    Point: typeof Point;
+    isInLine: (p1: Point, m: Point, p2: Point, accuracy: number) => boolean;
+  };
+  export default math;
+}
