@@ -622,9 +622,10 @@ function refusedInCappedThread(text, heapMb) {
 
 test("the drawing shares one glyph's 65,535 points: a file that needs more is refused as too detailed, as soon as that is known", async () => {
   assert.equal(MAX_GLYPH_POINTS, 65_535);
-  // The review's 1.76 MB file: each copy's curves as lines are 65,035
-  // points, so the second can't fit. It is refused before its rings are
-  // made, and before the boolean step: in 0.5 s, with the page's heap capped
+  // The review's 1.76 MB file: each copy's curves as lines are 65,031
+  // points, and with the other copies at their 259 segments the first
+  // already can't fit. It is refused before its rings are made, and before
+  // the boolean step: in 0.5 s, with the page's heap capped
   // at 128 MB (it fails at 96 MB). At 10d79a7 it took 11.9 s, the worker
   // posted 2.93 million points, and the page peaked at 2.0 to 2.5 GB. Here
   // the thread's heap is capped at 256 MB, half the 512 MB of a phone with
@@ -636,7 +637,7 @@ test("the drawing shares one glyph's 65,535 points: a file that needs more is re
   assert.equal(refused.message, TOO_DETAILED_MESSAGE);
   assert.ok(refused.ms < 3_000, `took ${refused.ms} ms`);
 
-  // Just under: two copies of 127 loops, 65,044 points as lines, are worked
+  // Just under: two copies of 127 loops, 65,038 points as lines, are worked
   // out in the worker (65,046 points as found) and make a glyph (12,204
   // points once rounded to whole units), in about a third of a second, with
   // the page's heap capped at 32 MB.
@@ -653,7 +654,7 @@ test("the drawing shares one glyph's 65,535 points: a file that needs more is re
 
   // The regions found are counted in the worker as each is found: crossings
   // add points, so grids of bars that cross (16,200 points each as found,
-  // 450 as drawn) fit four to a glyph. Of five, the fifth is refused; of
+  // 270 as drawn) fit four to a glyph. Of five, the fifth is refused; of
   // forty, the worker stops at the fourth and the rest are never worked out.
   const grid = (count) => {
     const step = 1000 / 45;
