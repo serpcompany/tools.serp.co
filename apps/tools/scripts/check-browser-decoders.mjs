@@ -5,7 +5,7 @@
 //   damaged, and one without it says it can't open the format;
 // - each format decode.ts takes every current browser to decode (it has no
 //   sample) decodes in every engine, from its fixture;
-// - a damaged file (its first bytes) is called damaged where the engine
+// - a damaged file (its first 8 bytes) is called damaged where the engine
 //   decodes its format, and "can't open" where it doesn't.
 // It runs decode.ts itself, transpiled, in a page on a secure origin, as the
 // site's pages are, so ImageDecoder is there in the engines that have it. It
@@ -30,13 +30,18 @@ const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const fixtures = path.join(appRoot, "benchmarks/fixtures");
 const ENGINES = ["chromium", "firefox", "webkit"];
 
+// Playwright's WebKit decodes pictures with its platform's decoders: on
+// macOS Apple's ImageIO, as Safari does, which reads TIFF; on Linux, where CI
+// runs it, WebKit's own, which don't.
+const WEBKIT_READS_TIFF = process.platform === "darwin";
+
 // The engines that decode each sampled format, as Playwright 1.57 ships them
 // (Chromium 143, Firefox 144, WebKit 26). A Playwright update that changes
 // one fails here: update the pin, and decode.ts if every engine now decodes
 // the format.
 const SAMPLED = {
   avif: ["chromium", "firefox", "webkit"],
-  tiff: ["webkit"],
+  tiff: WEBKIT_READS_TIFF ? ["webkit"] : [],
 };
 
 // The formats every current browser decodes, by a fixture of each.
@@ -55,8 +60,11 @@ const EVERY_BROWSER = {
 // decodeToRGBA reads these with libheif or its own decoders, not the browser.
 const NOT_THE_BROWSERS = new Set(["heic", "heif", "ktx", "ktx2", "icns"]);
 
-// A damaged file: the first bytes of a whole one, too few to hold a picture.
-const DAMAGED_BYTES = 16;
+// A damaged file: the first 8 bytes of a whole one, too few to hold even the
+// picture's size. Cut after its size, a picture may be drawn as far as it
+// goes instead (a WebP, icon or cursor of 40 bytes in Chromium, a GIF of 16
+// in WebKit on Linux), as a visitor's cut-short file is.
+const DAMAGED_BYTES = 8;
 
 const ORIGIN = "https://decoders.test";
 
@@ -169,4 +177,4 @@ if (problems.length) {
   for (const problem of problems) console.error(`FAIL ${problem}`);
   process.exit(1);
 }
-console.log(`Browser decoders: as decode.ts assumes in ${args.engines.join(", ")}.`);
+console.log(`Browser decoders: as decode.ts assumes in ${args.engines.join(", ")} on ${process.platform}.`);

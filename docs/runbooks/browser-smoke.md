@@ -65,9 +65,11 @@ Each format some current browsers can't decode (AVIF, TIFF) has a 1 x 1
 sample there, which must decode in exactly the engines the script pins, so
 a damaged file is called damaged where the browser has the decoder. Every
 other format the browser decodes must decode from its fixture in every
-engine, and a file cut to 16 bytes must be called damaged. A Playwright
-update that changes an engine's formats fails it: update the pin, and the
-samples if needed.
+engine, and a file cut to 8 bytes must be called damaged. WebKit decodes
+with its platform's decoders: on macOS Apple's, as Safari does, which read
+TIFF; on Linux, where CI runs it, its own, which don't. Run it on a Mac to
+check Safari's. A Playwright update that changes an engine's formats fails
+it: update the pin, and the samples if needed.
 
 ```bash
 pnpm -C apps/tools smoke:decoders [--engines chromium,webkit]
