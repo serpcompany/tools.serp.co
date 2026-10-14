@@ -182,15 +182,16 @@ Conversion picks an engine by input format:
   untouched since, reads exactly as written. Any other text, typed or pasted
   or edited, is read the visitor's way, which never merges rows on a quote
   unless no reading keeps every line a row of one width, and then merges the
-  fewest lines that make every row as wide. In one column that keeps a cell
-  holding line breaks as rows, so typing into text the page wrote can split
-  such a cell; a grid edit writes it back. A paste takes the clipboard's
-  plain text, which keeps each cell's text exactly, and the HTML table Excel
-  puts next to it decides its shape and the text of a cell that starts with a
-  quote (`excel-paste.ts`, scanned as text, nothing rendered or fetched):
-  when the visitor's reading differs, the page puts the cells in its own way.
-  Blank lines at the end aren't rows, as in a CSV input; a row of empty cells
-  (one added in the grid) is.
+  fewest lines that make every row as wide. Typing into text the page wrote
+  (not an Excel upload's, which is read-only) can split a cell holding line
+  breaks into rows: in one column, and in a table of two or more columns when
+  that cell's lines happen to be as wide as a row. A grid edit writes it back.
+  A paste takes the clipboard's plain text, which keeps each cell's text
+  exactly, and the HTML table Excel puts next to it decides its shape and the
+  text of a cell that starts with a quote (`excel-paste.ts`, scanned as text,
+  nothing rendered or fetched): when the visitor's reading differs, the page
+  puts the cells in its own way. Blank lines at the end aren't rows, as in a
+  CSV input; a row of empty cells (one added in the grid) is.
   So cells pasted from Excel convert too, and a sheet reaches the table, the
   name and Download through the reducer above like any file's text, under
   the workbook's name. The first

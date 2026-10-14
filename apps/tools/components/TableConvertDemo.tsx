@@ -481,7 +481,7 @@ export default function TableConvertDemo({
                   </Button>
                 </div>
                 {shownNotice && <p className="text-xs text-muted-foreground">{shownNotice}</p>}
-                <div className="text-xs text-muted-foreground">{status}</div>
+                <div className="text-xs text-muted-foreground" role="status">{status}</div>
 
                 {binary ? (
                   <BinaryOutputPreview

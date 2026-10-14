@@ -226,9 +226,10 @@ export function readExcelCells(text: string, written = false): string[][] {
 // lines is taken (fewestMerged), the table's width being the most common
 // row width when every quote is read as quoted, else the first line's.
 // Excel copies a rectangle, and a cell it quoted for a line break leaves its
-// lines shorter or longer than a row whenever the table has two or more
-// columns, so that cell is merged and a ditto mark's row isn't. Text with no
-// such reading (rows typed of different widths) keeps every line a row.
+// lines shorter or longer than a row when the table has two or more columns,
+// so that cell is merged and a ditto mark's row isn't. When that cell's lines
+// are as wide as a row, it stays split, and a grid edit writes it back. Text
+// with no such reading (rows typed of different widths) keeps every line a row.
 function readTypedCells(text: string): string[][] {
   // Neither reading crosses a line break, so each has a row a line.
   const quoted = rowWidths(text, withinLine);
