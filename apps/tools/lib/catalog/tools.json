@@ -76588,7 +76588,7 @@
           "description": "MP3 plays on almost every phone, computer, car stereo and music app.",
           "details": [
             "Plays almost everywhere",
-            "Lossy: a little smaller than AAC at the same quality"
+            "Lossy: converting from AAC loses a little quality"
           ]
         }
       }
