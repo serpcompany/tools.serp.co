@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { TABLE_CHARS, excelCellSize, excelPageCells, readExcelCells, readPastedCells, writeExcelCells } from "./excel-cells.ts";
+import { TABLE_CHARS, excelCellSize, readExcelCells, readPastedCells, writeExcelCells } from "./excel-cells.ts";
 import { parseExcelCells } from "./table-data.ts";
 
 function mulberry32(seed) {
@@ -15,11 +15,14 @@ function mulberry32(seed) {
   };
 }
 
-test("text the page wrote reads back as the same table, whatever its cells hold (2,000 generated tables)", () => {
+test("text the page wrote reads back exactly as written, whatever its cells hold (2,000 generated tables)", () => {
   const rng = mulberry32(266);
   // Pieces a cell can be made of: the characters the text's format uses
-  // (tabs, line breaks, quotes), a byte order mark, spaces, other scripts.
-  const pieces = ["a", "B", "1", " ", "\t", "\n", "\r", "\r\n", '"', '""', "﻿", ",", ";", "'", "é", "日本", "😀", ""];
+  // (tabs, line breaks, quotes), a byte order mark, spaces, other scripts,
+  // and what a visitor puts in the grid: ditto marks and inch values, and
+  // quotes around a tab or a line break, which a ditto mark's quote could
+  // close in a reading of typed text (#299 review round 4).
+  const pieces = ["a", "B", "1", " ", "\t", "\n", "\r", "\r\n", '"', '""', "﻿", ",", ";", "'", "é", "日本", "😀", "", '"\t"', '"\n"', '14"'];
   const cell = () => Array.from({ length: Math.floor(rng() * 5) }, () => pieces[Math.floor(rng() * pieces.length)]).join("");
   for (let index = 0; index < 2_000; index += 1) {
     const columns = 1 + Math.floor(rng() * 4);
@@ -29,10 +32,8 @@ test("text the page wrote reads back as the same table, whatever its cells hold 
     // one column it's a blank last line, which isn't a row, as in a CSV.
     const last = table.rows.at(-1) ?? table.headers;
     if (columns === 1 && !last[0]) last[0] = "x";
-    // The page keeps the cells it wrote that hold a line break, the only
-    // quoted cells read across lines.
     const text = writeExcelCells(table);
-    assert.deepEqual(parseExcelCells(text, excelPageCells(text)), { table, error: null }, JSON.stringify(text));
+    assert.deepEqual(parseExcelCells(text, true), { table, error: null }, JSON.stringify(text));
   }
 });
 
@@ -279,93 +280,36 @@ test("Excel's HTML table gives a cell copied as it stands its text: `\"\"\"\"` a
   assert.deepEqual(readPastedCells(quoting, shape), [["Code"], ['say "hi"  there']]);
 });
 
-// A table the page wrote, then edited in the input: plain cells replaced
-// by text typed as it is (ditto marks, inch values, stray quotes), none in
-// the header. The page keeps the cells holding line breaks that it wrote.
-function edited(table, typed, rng) {
-  const page = excelPageCells(writeExcelCells(table));
-  const rows = [table.headers, ...table.rows].map((row, index) =>
-    row.map((value) => {
-      const plain = index > 0 && !/["\t\n\r]/.test(value) && rng() < 0.4;
-      return plain ? { typed: typed[Math.floor(rng() * typed.length)] } : value;
-    }),
-  );
-  const text = rows.map((row) => row.map((value) => (typeof value === "string" ? writeExcelCells({ headers: [value], rows: [] }) : value.typed)).join("\t")).join("\n");
-  const typedCells = rows.flat().filter((value) => typeof value !== "string").length;
-  return { rows: rows.map((row) => row.map((value) => (typeof value === "string" ? value : value.typed))), text, page, typedCells };
-}
-
-test("quotes typed into text the page wrote merge no rows, and the page's cells holding line breaks stay one cell (#299 review)", () => {
-  // The review's case: a sheet, and two colors replaced by ditto marks.
-  const sheet = { headers: ["Item", "Color"], rows: [["Shirt", "Red"], ["Pants", "Blue"], ["Hat", "Green"], ["Sock", "Blue"]] };
-  const text = writeExcelCells(sheet).replace("Pants\tBlue", 'Pants\t"').replace("Hat\tGreen", 'Hat\t"');
-  assert.deepEqual(parseExcelCells(text, excelPageCells(writeExcelCells(sheet))).table, {
-    headers: ["Item", "Color"],
-    rows: [["Shirt", "Red"], ["Pants", '"'], ["Hat", '"'], ["Sock", "Blue"]],
-  });
-  // A ditto mark typed above a typed inch value.
-  const pipes = { headers: ["Size", "Item"], rows: [['12"', "Pipe"], ["x", "Valve"], ["y", "Cap"]] };
-  const typed = writeExcelCells(pipes).replace("x\tValve", '"\tValve').replace("y\tCap", '14"\tCap');
-  assert.deepEqual(parseExcelCells(typed, excelPageCells(writeExcelCells(pipes))).table.rows, [['12"', "Pipe"], ['"', "Valve"], ['14"', "Cap"]]);
-  // A sheet with cells holding line breaks, in one column and in two: they
-  // stay one cell while ditto marks are typed around them; one the visitor
-  // edits is the visitor's text, read as typed.
-  const notes = { headers: ["Item", "Note"], rows: [["Shirt", "line1\nline2"], ["Pants", "Blue"], ["Hat", "Green"], ["Cap", '"\nquoted'] ] };
-  const written = writeExcelCells(notes);
-  const dittos = written.replace("Pants\tBlue", 'Pants\t"').replace("Hat\tGreen", 'Hat\t"');
-  assert.deepEqual(parseExcelCells(dittos, excelPageCells(written)).table.rows, [["Shirt", "line1\nline2"], ["Pants", '"'], ["Hat", '"'], ["Cap", '"\nquoted']]);
-  const column = { headers: ["Address"], rows: [["1 Main St\nSpringfield"], ["2 Oak Ave"], ["3 Elm St"]] };
-  const addresses = writeExcelCells(column).replace("2 Oak Ave", '"').replace("3 Elm St", '"');
-  assert.deepEqual(parseExcelCells(addresses, excelPageCells(writeExcelCells(column))).table.rows, [["1 Main St\nSpringfield"], ['"'], ['"']]);
-  // A ditto mark typed before a cell of the page's that opens with a quote
-  // and a line break, which the ditto mark's quote could close; its lines
-  // would make rows as wide as the table.
-  const opens = { headers: ["Item", "Note"], rows: [["x", '"\nn\tm'], ["y", "z"]] };
-  const before = writeExcelCells(opens);
-  assert.equal(before, 'Item\tNote\nx\t"""\nn\tm"\ny\tz');
-  assert.deepEqual(parseExcelCells(before.replace("x\t", '"\t'), excelPageCells(before)).table.rows, [['"', '"\nn\tm'], ["y", "z"]]);
-  const changed = writeExcelCells(column).replace("Springfield", "Shelbyville");
-  assert.deepEqual(parseExcelCells(changed, excelPageCells(writeExcelCells(column))).table.rows, [['"1 Main St'], ['Shelbyville"'], ["2 Oak Ave"], ["3 Elm St"]]);
+test("the review's ditto marks, put in a sheet's cells in the grid, read exactly as the page writes them (#299 review rounds 3 and 4)", () => {
+  const reads = (table) => assert.deepEqual(parseExcelCells(writeExcelCells(table), true).table, table, JSON.stringify(writeExcelCells(table)));
+  // Round 4: a ditto mark before a note that opens with a line break and
+  // holds a tab.
+  const note = { headers: ["Item", "Note"], rows: [['"', "\nfoo\tbar"], ["y", "z"]] };
+  assert.equal(writeExcelCells(note), 'Item\tNote\n""""\t"\nfoo\tbar"\ny\tz');
+  reads(note);
+  // Round 4: a cell holding only a line break, ditto marks below it, and two
+  // full rows of them.
+  reads({ headers: ["A", "B"], rows: [["p", "\n"], ["q", '"'], ['"', "s"]] });
+  reads({ headers: ["A", "B"], rows: [["p", "\n"], ['"', '"'], ['"', '"']] });
+  // Round 3: ditto marks in a column, a ditto mark above an inch value, and
+  // the limit round 3 named: in one column, a cell holding only a line break
+  // above two ditto marks.
+  reads({ headers: ["Item", "Color"], rows: [["Shirt", "Red"], ["Pants", '"'], ["Hat", '"'], ["Sock", "Blue"]] });
+  reads({ headers: ["Size", "Item"], rows: [['12"', "Pipe"], ['"', "Valve"], ['14"', "Cap"]] });
+  reads({ headers: ["Item"], rows: [["\n"], ['"'], ['"']] });
 });
 
-test("text the page wrote, edited with quotes typed anywhere, keeps every row and every cell it wrote (2,000 generated tables)", () => {
-  const rng = mulberry32(2994);
-  // The page's cells: words, quotes, line breaks, spaces; typed ones: ditto
-  // marks, inch values, quotes at either end or unclosed.
-  const pieces = ["a", "B", "1", " ", "\n", "\r\n", '"', '""', "é", ""];
-  const typed = ['"', '"', '14"', '"x', 'x"', '""', '"a b"', '" "'];
-  const cell = () => {
-    const value = Array.from({ length: Math.floor(rng() * 4) }, () => pieces[Math.floor(rng() * pieces.length)]).join("");
-    // A cell of line breaks and quotes alone is text that typed quotes can
-    // make too (two ditto marks, one at the end of a line and one at the
-    // start of the next, are `"\n"`): see the test after this one.
-    return /[\n\r]/.test(value) && !/[aB1é]/.test(value) ? `${value}a` : value;
-  };
-  let mixed = 0;
-  for (let index = 0; index < 2_000; index += 1) {
-    const columns = 1 + Math.floor(rng() * 4);
-    const headers = Array.from({ length: columns }, (_, column) => `Column ${column + 1}`);
-    const table = { headers, rows: Array.from({ length: 1 + Math.floor(rng() * 8) }, () => Array.from({ length: columns }, cell)) };
-    const last = table.rows.at(-1);
-    if (columns === 1 && !last[0]) last[0] = "x";
-    const { rows, text, page, typedCells } = edited(table, typed, rng);
-    if (page.size && typedCells >= 2) mixed += 1;
-    assert.deepEqual(readExcelCells(text, page), rows, JSON.stringify(text));
-  }
-  assert.ok(mixed >= 500, `${mixed} tables with cells the page wrote holding line breaks and two or more typed cells`);
-});
-
-test("typed text that is exactly a cell the page wrote reads as that cell: the rule's one limit", () => {
-  // The page wrote a cell holding only a line break; two ditto marks typed
-  // one above the other in one column are that text.
-  const table = { headers: ["Item"], rows: [["\n"], ["Pants"], ["Hat"]] };
-  const written = writeExcelCells(table);
-  const page = excelPageCells(written);
-  assert.deepEqual([...page], ['"\n"']);
-  const dittos = written.replace("Pants\nHat", '"\n"');
-  assert.deepEqual(readExcelCells(dittos, page), [["Item"], ["\n"], ["\n"]]);
-  // Any other quote typed into it merges nothing.
-  assert.deepEqual(readExcelCells(written.replace("Pants\nHat", '"\nHat"'), page), [["Item"], ["\n"], ['"'], ['Hat"']]);
+test("the same edit typed into the page's text can't be read back: why a sheet's text is read-only (#299, the owner's decision)", () => {
+  // Round 4's first case typed: the visitor's reading can't know that the
+  // note was one cell, as its lines are rows as wide as the table. The page
+  // refuses typing in a sheet's text (output-state.ts), so this text only
+  // arises from typing the whole of it.
+  const sheet = writeExcelCells({ headers: ["Item", "Note"], rows: [["x", "\nfoo\tbar"], ["y", "z"]] });
+  const typed = sheet.replace("x\t", '"\t');
+  assert.deepEqual(readExcelCells(typed), [["Item", "Note"], ['"', '"'], ["foo", 'bar"'], ["y", "z"]]);
+  // Nor can a reading of the page's: its quotes now open a cell holding a
+  // tab, and the note's lines are rows.
+  assert.deepEqual(readExcelCells(typed, true), [["Item", "Note"], ["\t"], ["foo", 'bar"'], ["y", "z"]]);
 });
 
 test("a cell's size is its length as written, quotes counted", () => {

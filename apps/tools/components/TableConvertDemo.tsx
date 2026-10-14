@@ -30,7 +30,7 @@ import {
   outputFileName,
   outputMimeType,
 } from "@/components/table-convert/formats";
-import { inputPageCells, parseInput, serializeInput, serializeOutput } from "@/components/table-convert/convert";
+import { parseInput, serializeInput, serializeOutput } from "@/components/table-convert/convert";
 import { fileTextFormat, readsAsWorkbook, workbookInput, workbookNotes } from "@/components/table-convert/excel-input";
 import { excelPaste } from "@/components/table-convert/excel-paste";
 import {
@@ -55,7 +55,7 @@ const BINARY_DELAY_MS = 300;
 
 // The input, the table on screen and the name downloads take change only
 // here, together (output-state.ts).
-const nextTablePage = tablePageReducer({ parse: parseInput, serialize: serializeInput, pageCellsOf: inputPageCells, placeholder: DEFAULT_TABLE });
+const nextTablePage = tablePageReducer({ parse: parseInput, serialize: serializeInput, placeholder: DEFAULT_TABLE });
 
 export default function TableConvertDemo({
   initialInputFormat = "csv",
@@ -67,8 +67,9 @@ export default function TableConvertDemo({
   const [page, dispatch] = useReducer(nextTablePage, initialInputFormat, (format: InputFormat) =>
     initialTablePage(format, DEFAULT_TABLE),
   );
-  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload, workbook } = page;
+  const { inputFormat, inputText, hasUserInput, table: tableData, fileName, origin, error, upload, workbook, readOnly } = page;
   const sheetSelectId = useId();
+  const readOnlyNoteId = useId();
   const [outputFormat, setOutputFormat] = useState<OutputFormat>(initialOutputFormat);
   const [inputView, setInputView] = useState<ViewMode>("raw");
   const [outputView, setOutputView] = useState<ViewMode>("raw");
@@ -107,9 +108,10 @@ export default function TableConvertDemo({
   // Cells pasted into the Excel input: when the clipboard's HTML table says
   // its text reads differently from the visitor's reading of it (ditto
   // marks, cells holding line breaks), the page puts the text in its own
-  // way (excel-paste.ts); otherwise the browser pastes.
+  // way (excel-paste.ts); otherwise the browser pastes. Nothing is pasted
+  // into read-only text.
   function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
-    if (inputFormat !== "excel") return;
+    if (inputFormat !== "excel" || readOnly) return;
     const textarea = event.currentTarget;
     const paste = excelPaste({
       plain: event.clipboardData.getData("text/plain"),
@@ -122,7 +124,7 @@ export default function TableConvertDemo({
     event.preventDefault();
     if (paste.value === textarea.value) textarea.setSelectionRange(paste.caret, paste.caret);
     else pastedCaret.current = paste.caret;
-    dispatch({ type: "type", text: paste.value, replacesInput: paste.replacesInput, wrote: paste.wrote });
+    dispatch({ type: "type", text: paste.value, replacesInput: paste.replacesInput, written: paste.written });
   }
 
   const inputLabel = getLabel(INPUT_FORMATS, inputFormat);
@@ -134,6 +136,8 @@ export default function TableConvertDemo({
   // The file being read, or the one the input's text came from: the name a
   // download takes.
   const selectedName = upload?.name ?? fileName;
+  // Where read-only text came from: the Excel file, and the sheet shown.
+  const readOnlySource = workbook ? `${fileName}, sheet “${workbook.sheets[workbook.sheet]?.name}”` : fileName;
 
   // A text output is serialized from the table on screen as it renders, so
   // it can't lag behind it; binary outputs are written separately, below.
@@ -235,8 +239,9 @@ export default function TableConvertDemo({
         const read = await readWorkbookTextInWorker(await file.arrayBuffer());
         event = { type: "readWorkbook", ticket, workbook: workbookInput(read) };
       } else {
+        // An Excel file that is text is read-only once read, as a workbook is.
         const text = await file.text();
-        event = { type: "read", ticket, text, format: fileTextFormat(format, text) };
+        event = { type: "read", ticket, text, format: fileTextFormat(format, text), fromExcel: format === "excel" };
       }
     } catch (readError) {
       const reason = readError instanceof Error ? readError.message : String(readError);
@@ -395,6 +400,15 @@ export default function TableConvertDemo({
                     ))}
                   </div>
                 )}
+                {/* After an Excel upload the input's text is read-only: cells
+                    are edited in the grid, and Clear makes the input the
+                    visitor's again (output-state.ts). */}
+                {readOnly && (
+                  <p id={readOnlyNoteId} className="text-xs text-muted-foreground" data-testid="input-read-only">
+                    <span className="font-medium text-foreground">Read-only:</span> the text from {readOnlySource}. Edit
+                    cells in the online table editor below, or press Clear view to paste or type your own data.
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground">
                   Drag and drop a file anywhere in this panel to load it.
                 </p>
@@ -405,15 +419,19 @@ export default function TableConvertDemo({
                   <textarea
                     ref={watchInput}
                     value={inputText}
+                    readOnly={readOnly}
+                    aria-label={`${inputLabel} input`}
+                    aria-describedby={readOnly ? readOnlyNoteId : undefined}
+                    data-testid="table-input"
                     onPaste={handlePaste}
                     onChange={(event) => {
                       dispatch({ type: "type", text: event.target.value, replacesInput: replacesInput.current });
                       replacesInput.current = false;
                     }}
                     placeholder={getPlaceholder(inputFormat)}
-                    className={`min-h-[280px] w-full resize-none rounded-lg border bg-background px-4 py-3 font-mono text-sm shadow-sm focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
-                      error ? "border-red-400" : ""
-                    }`}
+                    className={`min-h-[280px] w-full resize-none rounded-lg border px-4 py-3 font-mono text-sm shadow-sm focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
+                      readOnly ? "bg-muted/40 text-foreground/80" : "bg-background"
+                    } ${error ? "border-red-400" : ""}`}
                     spellCheck={false}
                   />
                 ) : (

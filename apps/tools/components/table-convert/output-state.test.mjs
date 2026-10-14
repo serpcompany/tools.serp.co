@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import Papa from "papaparse";
-import { excelPageCells, writeExcelCells } from "../../lib/convert/excel-cells.ts";
+import { writeExcelCells } from "../../lib/convert/excel-cells.ts";
 import { parseCsvTable, parseExcelCells } from "../../lib/convert/table-data.ts";
 import { excelPaste } from "./excel-paste.ts";
 import { outputFileName } from "./formats.ts";
@@ -12,26 +12,22 @@ import { canOfferOutput, initialTablePage, offeredDownload, tablePageReducer } f
 // column. Text in another format, with BROKEN in it, or empty doesn't parse.
 // Every input format, Excel's included (cells as Excel copies them, #266),
 // is parsed and written as text, as on the page. In Excel text, a cell
-// holding `^` (a line break) is one cell only if the page wrote that exact
-// cell (#299 review); otherwise each of its lines is a row.
-function parse(format, text, pageCells) {
+// holding `^` (a line break) is one cell when the page wrote all of the text
+// (`written`), which reads exactly as written; in text the visitor typed or
+// pasted, each of its lines is a row (#299).
+function parse(format, text, written) {
   if (!text.trim()) return { table: null, supported: true, error: "Paste or upload data to begin." };
   if (!text.startsWith(`${format}:`)) return { table: null, supported: true, error: `This isn't ${format}.` };
   const body = text.slice(format.length + 1);
   if (body.includes("BROKEN")) return { table: null, supported: true, error: "Unclosed quote." };
-  const lines = (cell) => (format === "excel" && cell.includes("^") && !pageCells.has(cell) ? cell.split("^") : [cell]);
+  const lines = (cell) => (format === "excel" && cell.includes("^") && !written ? cell.split("^") : [cell]);
   return { table: { headers: ["value"], rows: body.split("|").flatMap(lines).map((cell) => [cell]) }, supported: true };
 }
 function serialize(format, table) {
   return { text: `${format}:${table.rows.map((row) => row[0]).join("|")}`, supported: true };
 }
-// The cells holding `^` in Excel text the page wrote (all of it, or a part
-// it pasted), as convert.ts's inputPageCells.
-function pageCellsOf(format, text) {
-  return new Set(format === "excel" ? text.slice(text.indexOf(":") + 1).split("|").filter((cell) => cell.includes("^")) : []);
-}
 const placeholder = { headers: ["Column 1"], rows: [[""]] };
-const next = tablePageReducer({ parse, serialize, pageCellsOf, placeholder });
+const next = tablePageReducer({ parse, serialize, placeholder });
 const start = (format = "csv") => initialTablePage(format, placeholder);
 const run = (state, ...events) => events.reduce(next, state);
 const cells = (state) => state.table?.rows.map((row) => row[0]) ?? null;
@@ -202,146 +198,206 @@ test("a workbook's first sheet arrives as an Excel input under the file's name; 
   assert.equal(next(next(asCsv, { type: "inputFormat", format: "excel" }), { type: "sheet", sheet: 2 }).inputText, "excel:S3a|S3b");
 });
 
-test("an Excel input's text comes with the cells holding line breaks that the page wrote there: only they read as one cell (#299 review)", () => {
+const gridEdit = (state, rows) => next(state, { type: "editGrid", table: { headers: state.table.headers, rows }, origin: state.origin });
+
+test("after an Excel upload the input is read-only: typing changes nothing, the grid edits it, Clear makes it the visitor's again (#299, the owner's decision)", () => {
   const notes = { ...book("S"), sheets: [{ name: "Notes", text: "excel:S1a^two|S1b" }, { name: "Other", text: "excel:S2a|S2b^two" }] };
   const read = run(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: notes });
-  assert.deepEqual([[...read.pageCells], cells(read)], [["S1a^two"], ["S1a^two", "S1b"]]);
-  // The visitor's edits keep them. Text typed holding `^` is read as typed,
-  // a row a line; so is the page's cell once edited, until it's typed back.
-  const typed = next(read, { type: "type", text: "excel:S1a^two|S1b|T^U" });
-  assert.deepEqual(cells(typed), ["S1a^two", "S1b", "T", "U"]);
-  const changed = next(read, { type: "type", text: 'excel:S1a"^two|S1b' });
-  assert.deepEqual(cells(changed), ['S1a"', "two", "S1b"]);
-  assert.deepEqual(cells(next(changed, { type: "type", text: "excel:S1a^two|S1b" })), ["S1a^two", "S1b"]);
-  // Each sheet keeps its own, with its edits.
-  const second = next(typed, { type: "sheet", sheet: 1 });
-  assert.deepEqual([[...second.pageCells], cells(second)], [["S2b^two"], ["S2a", "S2b^two"]]);
-  assert.deepEqual(cells(next(second, { type: "sheet", sheet: 0 })), ["S1a^two", "S1b", "T", "U"]);
-  // Text of the visitor's own has none; a paste the page wrote has its own,
-  // over all of the input or added to the cells already there.
-  const own = next(read, { type: "type", text: "excel:S1a^two", replacesInput: true });
-  assert.deepEqual([own.pageCells.size, cells(own)], [0, ["S1a", "two"]]);
-  const pasted = next(own, { type: "type", text: "excel:P^1|P2", replacesInput: true, wrote: "excel:P^1|P2" });
-  assert.deepEqual([[...pasted.pageCells], cells(pasted), pasted.fileName], [["P^1"], ["P^1", "P2"], null]);
-  const added = next(read, { type: "type", text: "excel:S1a^two|S1b|Q^1", wrote: "|Q^1" });
-  assert.deepEqual([[...added.pageCells], cells(added)], [["S1a^two", "Q^1"], ["S1a^two", "S1b", "Q^1"]]);
-  // A grid edit and a rewrite in another format write all of the text.
-  const grid = next(own, { type: "editGrid", table: { headers: ["value"], rows: [["g^1"], ["h"]] }, origin: own.origin });
-  assert.deepEqual([[...grid.pageCells], cells(grid)], [["g^1"], ["g^1", "h"]]);
+  // The page wrote the sheet's text, which reads exactly as written.
+  assert.deepEqual([read.readOnly, read.written, cells(read)], [true, true, ["S1a^two", "S1b"]]);
+  // Typing, deleting or a paste, the page's own included, changes nothing.
+  for (const event of [
+    { type: "type", text: "excel:S1a^two|S1b|T" },
+    { type: "type", text: 'excel:S1a"^two|S1b' },
+    { type: "type", text: "excel:P", replacesInput: true },
+    { type: "type", text: "excel:P^1|P2", replacesInput: true, written: true },
+    { type: "type", text: "" },
+  ]) {
+    assert.equal(next(read, event), read);
+  }
+  // The grid edits it: the page writes the grid's table into the input, which
+  // reads as written, under the file's name, still read-only.
+  const edited = gridEdit(read, [["S1a^two"], ["g^1"]]);
+  assert.deepEqual([edited.inputText, cells(edited), edited.fileName, edited.readOnly, edited.written], ["excel:S1a^two|g^1", ["S1a^two", "g^1"], "book.xlsx", true, true]);
+  // Another sheet, another input format: still read-only and the page's.
+  const other = next(edited, { type: "sheet", sheet: 1 });
+  assert.deepEqual([cells(other), other.readOnly, other.written], [["S2a", "S2b^two"], true, true]);
+  const asCsv = next(other, { type: "inputFormat", format: "csv" });
+  assert.deepEqual([asCsv.inputText, asCsv.readOnly, asCsv.written], ["csv:S2a|S2b^two", true, true]);
+  assert.equal(next(asCsv, { type: "type", text: "csv:typed" }), asCsv);
+  // A file that can't be read leaves the workbook's text, read-only.
+  const unreadable = run(edited, { type: "upload", name: "old.xls", ticket: 2 }, { type: "readFailed", ticket: 2, error: "old.xls couldn't be read" });
+  assert.deepEqual([unreadable.table, unreadable.readOnly, unreadable.fileName], [null, true, "book.xlsx"]);
+  // Clear empties it and makes it the visitor's: typing goes in, and typed
+  // text reads the visitor's way.
+  const cleared = next(edited, { type: "clear" });
+  assert.deepEqual([cleared.inputText, cleared.readOnly, cleared.written, cleared.workbook], ["", false, false, null]);
+  const typed = next(cleared, { type: "type", text: "excel:T^1|T2" });
+  assert.deepEqual([cells(typed), typed.readOnly, typed.written, typed.fileName], [["T", "1", "T2"], false, false, null]);
+  // An Excel file that is text (an .xls of tab-separated cells) is read-only
+  // too; its text is the file's, read the visitor's way.
+  const xls = run(start("csv"), { type: "upload", name: "export.xls", ticket: 1 }, { type: "read", ticket: 1, text: "excel:X^1|X2", format: "excel", fromExcel: true });
+  assert.deepEqual([cells(xls), xls.readOnly, xls.written, xls.fileName], [["X", "1", "X2"], true, false, "export.xls"]);
+  assert.equal(next(xls, { type: "type", text: "excel:X" }), xls);
+  assert.deepEqual([gridEdit(xls, [["X^1"]]).written, cells(gridEdit(xls, [["X^1"]]))], [true, ["X^1"]]);
+  // Any other file is the visitor's to edit, and so is the input after it.
+  const txt = run(edited, { type: "upload", name: "cells.txt", ticket: 3 }, { type: "read", ticket: 3, text: "excel:X^1", format: null, fromExcel: false });
+  assert.deepEqual([cells(txt), txt.readOnly, txt.workbook, txt.fileName], [["X", "1"], false, null, "cells.txt"]);
+  assert.deepEqual(cells(next(txt, { type: "type", text: "excel:X^1|Y" })), ["X", "1", "Y"]);
+});
+
+test("text the page wrote reads exactly until the visitor types in it; then all of it reads the visitor's way (#299)", () => {
+  // A table rewritten in the Excel format is the page's text.
   const csv = run(start("csv"), { type: "type", text: "csv:c^1|d" }, { type: "inputFormat", format: "excel" });
-  assert.deepEqual([[...csv.pageCells], cells(csv)], [["c^1"], ["c^1", "d"]]);
-  assert.equal(next(csv, { type: "inputFormat", format: "csv" }).pageCells.size, 0);
-  // A file's text and Clear have none.
-  const text = run(read, { type: "upload", name: "cells.txt", ticket: 2 }, { type: "read", ticket: 2, text: "excel:S1a^two", format: null });
-  assert.deepEqual([text.pageCells.size, cells(text)], [0, ["S1a", "two"]]);
-  assert.equal(next(read, { type: "clear" }).pageCells.size, 0);
+  assert.deepEqual([csv.inputText, cells(csv), csv.written, csv.readOnly], ["excel:c^1|d", ["c^1", "d"], true, false]);
+  // Typing in it makes it the visitor's text, under the same origin.
+  const typed = next(csv, { type: "type", text: "excel:c^1|d|e" });
+  assert.deepEqual([cells(typed), typed.written], [["c", "1", "d", "e"], false]);
+  // A grid edit writes all of it again.
+  const edited = gridEdit(typed, [["g^1"], ["h"]]);
+  assert.deepEqual([edited.inputText, cells(edited), edited.written], ["excel:g^1|h", ["g^1", "h"], true]);
+  // A paste the page wrote over all of the input is the page's text, but the
+  // visitor's own, with no file's name.
+  const pasted = next(edited, { type: "type", text: "excel:P^1|P2", replacesInput: true, written: true });
+  assert.deepEqual([cells(pasted), pasted.written, pasted.fileName], [["P^1", "P2"], true, null]);
+  // Rows the page put into part of the input are the visitor's text with it.
+  const added = next(pasted, { type: "type", text: "excel:P^1|P2|Q^1" });
+  assert.deepEqual([cells(added), added.written], [["P", "1", "P2", "Q", "1"], false]);
+  // A file's text and Clear are not the page's.
+  const text = run(edited, { type: "upload", name: "cells.txt", ticket: 1 }, { type: "read", ticket: 1, text: "excel:S^1", format: null });
+  assert.deepEqual([cells(text), text.written], [["S", "1"], false]);
+  assert.equal(next(edited, { type: "clear" }).written, false);
 });
 
 // The page's own Excel and CSV readers and writers, as convert.ts uses them.
 const realNext = tablePageReducer({
-  parse: (format, text, pageCells) => ({ ...(format === "excel" ? parseExcelCells(text, pageCells) : parseCsvTable(text)), supported: true }),
+  parse: (format, text, written) => ({ ...(format === "excel" ? parseExcelCells(text, written) : parseCsvTable(text)), supported: true }),
   serialize: (format, table) => ({ text: format === "excel" ? writeExcelCells(table) : Papa.unparse([table.headers, ...table.rows]), supported: true }),
-  pageCellsOf: (format, text) => (format === "excel" ? excelPageCells(text) : new Set()),
   placeholder,
 });
 const realRun = (state, ...events) => events.reduce(realNext, state);
-const sheetRead = (rows) =>
+// A workbook of sheets, each given as its rows, the first the header.
+const sheetsRead = (...sheets) =>
   realRun(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, {
     type: "readWorkbook",
     ticket: 1,
-    workbook: { sheets: [{ name: "Sheet1", text: writeExcelCells({ headers: rows[0], rows: rows.slice(1) }) }], hidden: 0, skipped: 0, tooLarge: [] },
+    workbook: {
+      sheets: sheets.map((rows, index) => ({ name: `Sheet${index + 1}`, text: writeExcelCells({ headers: rows[0], rows: rows.slice(1) }) })),
+      hidden: 0,
+      skipped: 0,
+      tooLarge: [],
+    },
   });
+const realGrid = (state, rows) => realNext(state, { type: "editGrid", table: { headers: state.table.headers, rows }, origin: state.origin });
 // Typing that replaces one cell's text with another, as the visitor does.
 const retype = (state, ...edits) => edits.reduce((page, [from, to]) => realNext(page, { type: "type", text: page.inputText.replace(from, to) }), state);
 const rowsOf = (state) => state.table?.rows ?? null;
 
-test("with the page's reader: quotes typed into a sheet merge no rows, after a grid edit, a format switch or a paste the page wrote too (#299 review)", () => {
-  // The review's case: two colors of a sheet replaced by ditto marks.
-  const colors = sheetRead([["Item", "Color"], ["Shirt", "Red"], ["Pants", "Blue"], ["Hat", "Green"], ["Sock", "Blue"]]);
-  assert.deepEqual(rowsOf(retype(colors, ["Pants\tBlue", 'Pants\t"'], ["Hat\tGreen", 'Hat\t"'])), [["Shirt", "Red"], ["Pants", '"'], ["Hat", '"'], ["Sock", "Blue"]]);
-  // A ditto mark typed above an inch value typed after it.
-  const pipes = sheetRead([["Size", "Item"], ['12"', "Pipe"], ["x", "Valve"], ["y", "Cap"]]);
-  assert.deepEqual(rowsOf(retype(pipes, ["x\tValve", '"\tValve'], ["y\tCap", '14"\tCap'])), [['12"', "Pipe"], ['"', "Valve"], ['14"', "Cap"]]);
-  // A sheet's cells holding line breaks stay one cell while ditto marks are
-  // typed around them, and come back so with the sheet.
-  const notes = sheetRead([["Item", "Note"], ["Shirt", "line1\nline2"], ["Pants", "Blue"], ["Hat", "Green"]]);
-  const dittos = retype(notes, ["Pants\tBlue", 'Pants\t"'], ["Hat\tGreen", 'Hat\t"']);
-  assert.deepEqual(rowsOf(dittos), [["Shirt", "line1\nline2"], ["Pants", '"'], ["Hat", '"']]);
-  // After a grid edit that adds a cell holding a line break.
-  const grid = realNext(dittos, { type: "editGrid", table: { headers: ["Item", "Note"], rows: [...rowsOf(dittos), ["Cap", "a\nb"], ["Sock", "Gray"]] }, origin: dittos.origin });
-  assert.deepEqual(rowsOf(retype(grid, ["Sock\tGray", 'Sock\t"'])).slice(-2), [["Cap", "a\nb"], ["Sock", '"']]);
-  // After a switch to CSV and back, which rewrites the text.
-  const back = realRun(dittos, { type: "inputFormat", format: "csv" }, { type: "inputFormat", format: "excel" });
-  assert.deepEqual(rowsOf(retype(back, ["Shirt\t", '"\t'])), [['"', "line1\nline2"], ["Pants", '"'], ["Hat", '"']]);
-  // After a paste the page wrote: a column of addresses, each over two lines.
+test("with the page's reader: the review's ditto marks can't be typed into a sheet; put in the grid, they read exactly, on any sheet (#299 review rounds 3 and 4)", () => {
+  // Round 4: a note that opens with a line break and holds a tab, and a
+  // quote typed over the cell before it, which split the note. Typing is
+  // now refused; the same edit in the grid keeps the note one cell.
+  const notes = sheetsRead([["Item", "Note"], ["x", "\nfoo\tbar"], ["y", "z"]]);
+  assert.equal(retype(notes, ["x\t", '"\t']), notes);
+  const noteRows = [['"', "\nfoo\tbar"], ["y", "z"]];
+  assert.deepEqual(rowsOf(realGrid(notes, noteRows)), noteRows);
+  // Round 4: a cell holding only a line break, and ditto marks over x and r,
+  // which dropped a cell; and two full rows of ditto marks.
+  const breaks = sheetsRead([["A", "B"], ["p", "\n"], ["q", "x"], ["r", "s"]], [["Item", "Color"], ["Shirt", "Red"], ["Pants", "Blue"], ["Hat", "Green"]]);
+  assert.equal(retype(breaks, ["q\tx", 'q\t"'], ["r\ts", '"\ts']), breaks);
+  for (const rows of [
+    [["p", "\n"], ["q", '"'], ['"', "s"]],
+    [["p", "\n"], ['"', '"'], ['"', '"']],
+  ]) {
+    const edited = realGrid(breaks, rows);
+    assert.deepEqual(rowsOf(edited), rows);
+    // On another sheet and back, and after a switch to CSV and back.
+    assert.deepEqual(rowsOf(realRun(edited, { type: "sheet", sheet: 1 }, { type: "sheet", sheet: 0 })), rows);
+    assert.deepEqual(rowsOf(realRun(edited, { type: "inputFormat", format: "csv" }, { type: "inputFormat", format: "excel" })), rows);
+  }
+  // Round 3: two colors replaced by ditto marks, and a ditto mark above an
+  // inch value, in the grid.
+  const colors = [["Shirt", "Red"], ["Pants", '"'], ["Hat", '"'], ["Sock", "Blue"]];
+  assert.deepEqual(rowsOf(realGrid(sheetsRead([["Item", "Color"], ...colors]), colors)), colors);
+  const pipes = [['12"', "Pipe"], ['"', "Valve"], ['14"', "Cap"]];
+  assert.deepEqual(rowsOf(realGrid(sheetsRead([["Size", "Item"], ['12"', "Pipe"], ["x", "Valve"], ["y", "Cap"]]), pipes)), pipes);
+  // Round 3's limit is gone: in one column, a cell holding only a line break
+  // above two ditto marks reads as the grid has it.
+  const column = [["\n"], ['"'], ['"']];
+  assert.deepEqual(rowsOf(realGrid(sheetsRead([["Item"], ["\n"], ["Pants"], ["Hat"]]), column)), column);
+});
+
+test("with the page's reader: after Clear, typed and pasted text reads the visitor's way; blank lines at the end add no rows; the grid's empty row stays (#299 review)", () => {
+  const cleared = realNext(sheetsRead([["Item", "Color"], ["Shirt", "Red"]]), { type: "clear" });
+  const typed = realNext(cleared, { type: "type", text: 'Item\tColor\nShirt\tRed\nPants\t"\nHat\t"\nSock\tBlue' });
+  assert.deepEqual(rowsOf(typed), [["Shirt", "Red"], ["Pants", '"'], ["Hat", '"'], ["Sock", "Blue"]]);
+  for (const enters of ["\n", "\n\n", "\n\n\n"]) {
+    assert.deepEqual(rowsOf(realNext(typed, { type: "type", text: `${typed.inputText}${enters}` })), rowsOf(typed));
+  }
+  const withRow = realGrid(typed, [...rowsOf(typed), ["", ""]]);
+  assert.deepEqual(rowsOf(withRow).at(-1), ["", ""]);
+  assert.deepEqual(rowsOf(realNext(withRow, { type: "type", text: `${withRow.inputText}\n\n` })), rowsOf(withRow));
+  // A paste the page wrote over all of the input: a column of addresses,
+  // each over two lines, reads as copied.
   const plain = 'Address\r\n"1 Main St\nSpringfield"\r\n"2 Oak Ave\nShelbyville"\r\nGone\r\n';
   const html = "<table><tr><td>Address</td></tr><tr><td>1 Main St<br>Springfield</td></tr><tr><td>2 Oak Ave<br>Shelbyville</td></tr><tr><td>Gone</td></tr></table>";
   const paste = excelPaste({ plain, html, value: "", start: 0, end: 0 });
-  const pasted = realNext(start("excel"), { type: "type", text: paste.value, replacesInput: paste.replacesInput, wrote: paste.wrote });
+  const pasted = realNext(cleared, { type: "type", text: paste.value, replacesInput: paste.replacesInput, written: paste.written });
   assert.deepEqual(rowsOf(pasted), [["1 Main St\nSpringfield"], ["2 Oak Ave\nShelbyville"], ["Gone"]]);
-  assert.deepEqual(rowsOf(retype(pasted, ["Gone", '"\n"'])), [["1 Main St\nSpringfield"], ["2 Oak Ave\nShelbyville"], ['"'], ['"']]);
+  // Typed in, it's the visitor's text: in one column, the visitor's reading
+  // can't tell a cell holding a line break from ditto marks, and keeps
+  // every line a row. A grid edit writes it back as the page's.
+  const edited = retype(pasted, ["Gone", "Went"]);
+  assert.deepEqual(rowsOf(edited), [['"1 Main St'], ['Springfield"'], ['"2 Oak Ave'], ['Shelbyville"'], ["Went"]]);
+  const fixed = realGrid(edited, [["1 Main St\nSpringfield"], ["2 Oak Ave\nShelbyville"], ["Went"]]);
+  assert.deepEqual(rowsOf(fixed), [["1 Main St\nSpringfield"], ["2 Oak Ave\nShelbyville"], ["Went"]]);
+  // In two columns, the visitor's reading keeps such a cell one cell.
+  const two = realNext(cleared, { type: "type", text: 'Item\tNote\nShirt\t"line1\nline2"\nPants\t"\nHat\t"' });
+  assert.deepEqual(rowsOf(two), [["Shirt", "line1\nline2"], ["Pants", '"'], ["Hat", '"']]);
 });
 
-test("with the page's reader: blank lines typed at the end add no rows; the empty row the grid adds stays (#299 review)", () => {
-  const colors = sheetRead([["Item", "Color"], ["Shirt", "Red"]]);
-  for (const enters of ["\n", "\n\n", "\n\n\n"]) {
-    assert.deepEqual(rowsOf(realNext(colors, { type: "type", text: `${colors.inputText}${enters}` })), [["Shirt", "Red"]]);
-  }
-  const grid = realNext(colors, { type: "editGrid", table: { headers: ["Item", "Color"], rows: [["Shirt", "Red"], ["", ""]] }, origin: colors.origin });
-  assert.deepEqual(rowsOf(grid), [["Shirt", "Red"], ["", ""]]);
-  assert.deepEqual(rowsOf(realNext(grid, { type: "type", text: `${grid.inputText}\n\n` })), [["Shirt", "Red"], ["", ""]]);
-});
-
-test("a workbook stays with the input's text: edits keep it, text of the visitor's own, Clear or another file drop it", () => {
+test("a workbook stays with the input's text: grid edits keep it; Clear or another file drop it", () => {
   const read = run(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: book("S") });
-  const typed = next(read, { type: "type", text: "excel:S1a|S1b|TYPED" });
-  assert.deepEqual([typed.fileName, typed.workbook?.sheet], ["book.xlsx", 0]);
-  const edited = next(read, { type: "editGrid", table: { headers: ["value"], rows: [["G"]] }, origin: read.origin });
+  const edited = gridEdit(read, [["G"]]);
   assert.deepEqual([edited.inputText, edited.fileName, edited.workbook?.sheet], ["excel:G", "book.xlsx", 0]);
-  // A typo keeps it too: the text is still the file's, and a sheet brings a table back.
-  const typo = next(read, { type: "type", text: "excel:S1a BROKEN" });
-  assert.deepEqual([typo.table, typo.fileName], [null, "book.xlsx"]);
-  assert.deepEqual(cells(next(typo, { type: "sheet", sheet: 1 })), ["S2a", "S2b"]);
   // A file that can't be read leaves the input's text, so the workbook too.
   const unreadable = run(read, { type: "upload", name: "old.xls", ticket: 2 }, { type: "readFailed", ticket: 2, error: "old.xls couldn't be read" });
   assert.deepEqual([unreadable.table, unreadable.fileName, unreadable.workbook?.sheets.length], [null, "book.xlsx", 2]);
+  // A sheet brings a table back.
+  assert.deepEqual(cells(next(unreadable, { type: "sheet", sheet: 1 })), ["S2a", "S2b"]);
   for (const dropped of [
-    next(read, { type: "type", text: "excel:PASTED", replacesInput: true }),
     next(read, { type: "clear" }),
     run(read, { type: "upload", name: "c.csv", ticket: 3 }, { type: "read", ticket: 3, text: "csv:C", format: "csv" }),
   ]) {
     assert.equal(dropped.workbook, null);
+    assert.equal(dropped.readOnly, false);
     assert.equal(next(dropped, { type: "sheet", sheet: 1 }), dropped);
   }
 });
 
-test("a sheet keeps its edits: typing or a grid edit, then another sheet and back, shows the edited text (#299 review)", () => {
+test("a sheet keeps its grid edits: another sheet and back shows the edited text (#299 review)", () => {
   const read = run(start("excel"), { type: "upload", name: "book.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: book("S", 3) });
-  const typed = next(read, { type: "type", text: "excel:S1a|S1b|TYPED" });
-  const back = run(typed, { type: "sheet", sheet: 1 }, { type: "sheet", sheet: 0 });
-  assert.deepEqual([back.inputText, cells(back), back.fileName], ["excel:S1a|S1b|TYPED", ["S1a", "S1b", "TYPED"], "book.xlsx"]);
+  const edited = gridEdit(read, [["S1a"], ["S1b"], ["G1"]]);
+  const back = run(edited, { type: "sheet", sheet: 1 }, { type: "sheet", sheet: 0 });
+  assert.deepEqual([back.inputText, cells(back), back.fileName], ["excel:S1a|S1b|G1", ["S1a", "S1b", "G1"], "book.xlsx"]);
   // A table afresh each time, so nothing written before the switch is offered.
-  assert.notEqual(back.origin, typed.origin);
-  assert.equal(offeredDownload(back, "excel", { table: typed.table, format: "excel" }), null);
+  assert.notEqual(back.origin, edited.origin);
+  assert.equal(offeredDownload(back, "excel", { table: edited.table, format: "excel" }), null);
   assert.equal(offeredDownload(back, "csv", { table: back.table, format: "csv" }).name, "book.csv");
   // A grid edit on the second sheet stays with it; the first keeps its own.
-  const second = next(back, { type: "sheet", sheet: 1 });
-  const edited = next(second, { type: "editGrid", table: { headers: ["value"], rows: [["G"]] }, origin: second.origin });
-  assert.deepEqual(edited.workbook.sheets.map((sheet) => sheet.text), ["excel:S1a|S1b|TYPED", "excel:G", "excel:S3a|S3b"]);
-  assert.equal(run(edited, { type: "sheet", sheet: 0 }, { type: "sheet", sheet: 1 }).inputText, "excel:G");
-  // A typo is kept as typed too: it's what the input held.
-  const typo = run(edited, { type: "type", text: "excel:G BROKEN" }, { type: "sheet", sheet: 2 }, { type: "sheet", sheet: 1 });
-  assert.deepEqual([typo.inputText, typo.table], ["excel:G BROKEN", null]);
+  const second = gridEdit(next(back, { type: "sheet", sheet: 1 }), [["G"]]);
+  assert.deepEqual(second.workbook.sheets.map((sheet) => sheet.text), ["excel:S1a|S1b|G1", "excel:G", "excel:S3a|S3b"]);
+  assert.equal(run(second, { type: "sheet", sheet: 0 }, { type: "sheet", sheet: 1 }).inputText, "excel:G");
   // In another format the text isn't a sheet's: the sheet keeps the last
   // Excel text it had, and takes the table's again when Excel is picked.
-  const asCsv = run(edited, { type: "inputFormat", format: "csv" }, { type: "type", text: "csv:G|CSV" });
-  assert.equal(asCsv.workbook.sheets[1].text, "excel:G");
+  const asCsv = gridEdit(next(second, { type: "inputFormat", format: "csv" }), [["G"], ["CSV"]]);
+  assert.deepEqual([asCsv.inputText, asCsv.workbook.sheets[1].text], ["csv:G|CSV", "excel:G"]);
   const asExcel = next(asCsv, { type: "inputFormat", format: "excel" });
-  assert.deepEqual([asExcel.inputText, asExcel.workbook.sheets[1].text], ["excel:G|CSV", "excel:G|CSV"]);
+  assert.deepEqual([asExcel.inputText, asExcel.workbook.sheets[1].text, asExcel.readOnly], ["excel:G|CSV", "excel:G|CSV", true]);
   assert.equal(run(asExcel, { type: "sheet", sheet: 0 }, { type: "sheet", sheet: 1 }).inputText, "excel:G|CSV");
 });
 
-test("choosing a sheet while another file is read wins over it, as typing does; a late workbook read is dropped", () => {
+test("choosing a sheet while another file is read wins over it, as a grid edit does; a late workbook read is dropped", () => {
   const read = run(start("excel"), { type: "upload", name: "a.xlsx", ticket: 1 }, { type: "readWorkbook", ticket: 1, workbook: book("A") });
   const reading = next(read, { type: "upload", name: "b.xlsx", ticket: 2 });
   const chosen = next(reading, { type: "sheet", sheet: 1 });
@@ -390,21 +446,22 @@ test("an output written from the previous table or for another format isn't offe
 // tab-separated cells or an HTML table, a tab-delimited .txt); choosing a
 // sheet, while another file is read or not, and coming back to a sheet
 // after editing it; typing (edits, typos and their fixes, pastes over all
-// of the input, emptying it; #299 review: cells holding line breaks, quotes
-// typed into the page's cells, a page's cell typed again); pastes the page
-// writes its own way, over all of the input or into it; grid edits from a
-// grid that may still show an earlier table; input and output format
-// switches; binary outputs that finish after the table changed; clears.
-// Sheets, grid edits and pastes hold cells with line breaks. A reference
-// model, kept here from the rules alone, follows the same events: it holds
-// its own input text and format, parses that text with the stand-in to know
-// whether there's a table, and tracks the text's origin, the workbook it
-// came from (each sheet's text as last edited), the upload still being read
-// and its own record of the cells holding line breaks that the page wrote.
-// It never reads the page's state. After
-// every step the test checks the page's input, table, error, name and
-// workbook against it, and that Download offers exactly what it should,
-// under that name.
+// of the input, emptying it, cells holding line breaks), which the page
+// refuses while the input is read-only (#299, the owner's decision: after
+// an Excel file, until Clear); pastes the page writes its own way, over all
+// of the input or into it; grid edits from a grid that may still show an
+// earlier table; input and output format switches; binary outputs that
+// finish after the table changed; clears. Sheets, files, grid edits and
+// pastes hold cells with line breaks, which read as one cell only in text
+// the page wrote. A reference model, kept here from the rules alone,
+// follows the same events: it holds its own input text and format, parses
+// that text with the stand-in to know whether there's a table, and tracks
+// the text's origin, the workbook it came from (each sheet's text as last
+// edited), the upload still being read, whether the input is read-only and
+// whether the page wrote all of its text. It never reads the page's state.
+// After every step the test checks the page's input, table, error, name,
+// workbook, read-only state and writer against it, and that Download
+// offers exactly what it should, under that name.
 const SEQUENCES = 12000;
 const STEPS = 50;
 const SEED = 281249;
@@ -422,7 +479,7 @@ function mulberry32(seed) {
 
 const ACTIONS = [
   ["upload", 3], ["finish", 4], ["type", 4], ["editGrid", 4], ["syncGrid", 3],
-  ["inputFormat", 2], ["outputFormat", 2], ["writeStart", 2], ["writeFinish", 2], ["clear", 1], ["sheet", 4], ["sheetBack", 5],
+  ["inputFormat", 2], ["outputFormat", 2], ["writeStart", 2], ["writeFinish", 2], ["clear", 2], ["sheet", 4], ["sheetBack", 5],
 ];
 const INPUT_FORMATS = ["csv", "json", "excel"];
 const OUTPUT_FORMATS = ["json", "csv", "excel", "pdf"];
@@ -442,10 +499,15 @@ function newModel(format) {
     // The workbook the text came from: its file, its sheets and the one
     // whose text went into the input; null for any other text.
     workbook: null,
-    // The cells holding line breaks that the page wrote into the text (a
-    // sheet, a grid edit, a rewrite, a paste it wrote), from what the model
-    // itself had the page write.
-    pageCells: new Set(),
+    // The text is an Excel file's, as read or as the page rewrote it: the
+    // visitor can't type in it until Clear.
+    readOnly: false,
+    // The page wrote all of the text (a sheet, a grid edit, a rewrite, a
+    // paste it wrote over all of it), and nobody typed in it since.
+    written: false,
+    // Clear emptied a read-only input, and nothing was typed since (only
+    // counted, to show typing goes in again).
+    cleared: false,
     // The table the text parses into (the placeholder before any input),
     // or null; and whether the page shows an error.
     table: placeholder,
@@ -469,7 +531,7 @@ function reparse(model, { afresh = false } = {}) {
     model.name = null;
     model.workbook = null;
   } else {
-    model.table = parse(model.format, model.text, model.pageCells).table;
+    model.table = parse(model.format, model.text, model.written).table;
     model.error = !model.table;
   }
   model.version += 1;
@@ -517,7 +579,6 @@ function runSequence(rng, seen, log) {
         const broken = outcome === "brokenSheet" ? Math.floor(rng() * count) : -1;
         // Some sheets have a cell holding a line break, which the page wrote.
         const lines = Array.from({ length: count }, () => rng() < 0.5);
-        const pageCells = lines.map((holds, index) => new Set(holds ? [`W${id}s${index + 1}a^n`] : []));
         const workbook = {
           sheets: Array.from({ length: count }, (_, index) => ({
             name: `S${index + 1}`,
@@ -528,16 +589,19 @@ function runSequence(rng, seen, log) {
           ...(outcome === "partial" ? { stop: "size" } : {}),
           tooLarge: outcome === "partial" ? ["Big"] : [],
         };
-        reads.push({ name, ticket: id, workbook, outcome, pageCells });
+        reads.push({ name, ticket: id, workbook, outcome });
       } else {
         // An Excel file's text is cells as Excel copies them, or an HTML
         // table; a file with no format of its own is read in the input's.
         const format = detected === "excel" ? pick(["excel", "html"]) : detected;
         const textFormat = format ?? pick(INPUT_FORMATS);
         const outcome = pick(["ok", "ok", "unparseable", "unreadable", "empty"]);
-        const text = outcome === "empty" ? "" : `${textFormat}:F${id}a|F${id}b${outcome === "unparseable" ? " BROKEN" : ""}`;
+        // Some hold a cell with a line break: the file's text, not the page's.
+        const lines = rng() < 0.4 ? "^f" : "";
+        const text = outcome === "empty" ? "" : `${textFormat}:F${id}a${lines}|F${id}b${outcome === "unparseable" ? " BROKEN" : ""}`;
         const kind = detected === "excel" ? "excelText" : detected === null && model.format === "excel" ? "textOnExcel" : null;
-        reads.push({ name, ticket: id, text, format, outcome, kind });
+        // The page says whether the file is an Excel file (read-only once read).
+        reads.push({ name, ticket: id, text, format, outcome, kind, fromExcel: detected === "excel" });
       }
       event = { type: "upload", name, ticket: id };
     } else if (action === "finish") {
@@ -549,7 +613,7 @@ function runSequence(rng, seen, log) {
       } else if (read.workbook) {
         event = { type: "readWorkbook", ticket: read.ticket, workbook: read.workbook };
       } else {
-        event = { type: "read", ticket: read.ticket, text: read.text, format: read.format };
+        event = { type: "read", ticket: read.ticket, text: read.text, format: read.format, fromExcel: read.fromExcel };
       }
       event.file = read;
     } else if (action === "type") {
@@ -557,24 +621,20 @@ function runSequence(rng, seen, log) {
       const n = cellCount;
       if (model.format === "excel" && rng() < 0.25) {
         // On the Excel input, a paste the page writes its own way
-        // (excel-paste.ts): over all of the input, or added to it.
+        // (excel-paste.ts): over all of the input, which is then the page's
+        // text, or added to it, the visitor's text still.
         const replaces = rng() < 0.5;
-        const pasted = [`P${n}^p`, `P${n}b`];
-        const wrote = replaces ? `excel:${pasted.join("|")}` : `|${pasted.join("|")}`;
-        event = { type: "type", text: replaces ? wrote : `${model.text}${wrote}`, replacesInput: replaces, wrote, pasted: [pasted[0]] };
+        const rows = `P${n}^p|P${n}b`;
+        event = replaces
+          ? { type: "type", text: `excel:${rows}`, replacesInput: true, written: true, pasted: "all" }
+          : { type: "type", text: `${model.text}|${rows}`, replacesInput: false, written: false, pasted: "part" };
       } else {
         const other = pick(INPUT_FORMATS.filter((format) => format !== model.format));
-        // A cell the page wrote holding a line break, still in the text.
-        const pageCell = [...model.pageCells].find((cell) => model.text.includes(cell));
-        const kind = pick(["append", "lines", "quote", "copyPage", "typo", "fix", "fix", "fresh", "freshBroken", "other", "empty"]);
+        const kind = pick(["append", "lines", "typo", "fix", "fix", "fresh", "freshBroken", "other", "empty"]);
         const text = {
           append: `${model.text}|T${n}`,
           // A cell typed holding a line break.
           lines: `${model.text}|T${n}^t`,
-          // A quote typed into a cell the page wrote, or a ditto mark.
-          quote: pageCell ? model.text.replace(pageCell, pageCell.replace("^", '"^')) : `${model.text}|"`,
-          // A cell the page wrote, typed again exactly.
-          copyPage: pageCell ? `${model.text}|${pageCell}` : `${model.text}|T${n}`,
           typo: `${model.text} BROKEN`,
           fix: model.text.replaceAll(" BROKEN", ""),
           fresh: `${model.format}:T${n}`,
@@ -585,9 +645,12 @@ function runSequence(rng, seen, log) {
         // A change that leaves the text as it was fires no change event.
         if (text === model.text) continue;
         // Whether it replaced all of the text (a paste over a select-all).
-        event = { type: "type", text, replacesInput: rng() < 0.35, kind, pageCell };
+        event = { type: "type", text, replacesInput: rng() < 0.35, kind };
       }
     } else if (action === "editGrid") {
+      // While the input is read-only, the grid is where the visitor edits:
+      // often the grid on screen, synced to the table first.
+      if (model.readOnly && state.table && rng() < 0.5) grid = { table: state.table, origin: state.origin, lineage: model.lineage };
       if (!grid) continue;
       cellCount += 1;
       const added = rng() < 0.4 ? `G${cellCount}^g` : `G${cellCount}`;
@@ -626,9 +689,9 @@ function runSequence(rng, seen, log) {
     }
 
     if (event) {
-      const { file, pasted, kind, pageCell, ...pageEvent } = event;
+      const { file, pasted, kind, ...pageEvent } = event;
       const before = state;
-      const had = { table: model.table, name: model.name, workbook: model.workbook, pending: model.pending };
+      const had = { table: model.table, name: model.name, workbook: model.workbook, pending: model.pending, readOnly: model.readOnly };
       log.push(JSON.stringify(pageEvent));
       state = next(before, pageEvent);
       const unchanged = () => assert.equal(state, before, "the event changes nothing");
@@ -661,25 +724,28 @@ function runSequence(rng, seen, log) {
           }
           if (event.type === "readWorkbook") {
             // The first sheet's text is in the input, as an Excel input's:
-            // it's the file's, and so is the workbook. The page wrote it.
+            // it's the file's, and so is the workbook. The page wrote it, and
+            // it's read-only.
             model.text = file.workbook.sheets[0].text;
             model.format = "excel";
-            model.pageCells = file.pageCells[0];
+            model.written = true;
+            model.readOnly = true;
             model.workbook = {
               file: file.name,
               read: file.workbook.sheets,
               sheets: file.workbook.sheets.map((sheet) => sheet.text),
-              pageCells: file.pageCells.slice(),
               sheet: 0,
             };
             seen.workbookReads += 1;
           } else {
-            // The file's text is in the input: it's the file's, and the
-            // visitor's to read.
+            // The file's text is in the input: it's the file's, read the
+            // visitor's way, and read-only when the file is an Excel file.
             model.text = event.text;
             model.format = event.format ?? model.format;
-            model.pageCells = new Set();
+            model.written = false;
+            model.readOnly = file.kind === "excelText";
             if (model.workbook) seen.textDropsWorkbook += 1;
+            if (had.readOnly && !model.readOnly) seen.fileMakesEditable += 1;
             model.workbook = null;
             if (file.kind) seen[file.kind] += 1;
           }
@@ -702,36 +768,41 @@ function runSequence(rng, seen, log) {
           // comes back as it was last edited.
           if (model.pending !== null) seen.sheetWinsOverRead += 1;
           if (workbook.sheets[event.sheet] !== workbook.read[event.sheet].text) seen.sheetBackWithEdits += 1;
-          if (workbook.pageCells[event.sheet].size) seen.sheetWithPageCells += 1;
+          if (workbook.sheets[event.sheet].includes("^")) seen.sheetWithLines += 1;
           seen.sheetSwitches += 1;
           model.pending = null;
           model.workbook = { ...workbook, sheet: event.sheet, previous: workbook.sheet };
           model.text = workbook.sheets[event.sheet];
-          model.pageCells = workbook.pageCells[event.sheet];
+          model.written = true;
+          model.readOnly = true;
           model.userInput = true;
           reparse(model, { afresh: true });
           break;
         }
         case "type":
+          // Read-only text can't be typed in: the page's textarea refuses
+          // it, and so does the page's state.
+          if (model.readOnly) {
+            seen[pasted ? "pastesRefused" : "typingRefused"] += 1;
+            unchanged();
+            break;
+          }
           model.pending = null;
           // Text replacing all of the input, or typed into an empty one, is
-          // the visitor's own; anything else edits the text that was there,
-          // and keeps the cells the page wrote. A paste the page wrote adds
-          // its own.
+          // the visitor's own; anything else edits the text that was there.
+          // Either way it's the visitor's text, unless the page wrote all of
+          // it (a paste it wrote over all of the input).
           if (event.replacesInput || !model.text.trim()) {
-            if (model.workbook) seen.ownTextDropsWorkbook += 1;
-            if (model.pageCells.size && !pasted) seen.ownTextDropsPageCells += 1;
             model.name = null;
             model.workbook = null;
-            model.pageCells = new Set(pasted ?? []);
-          } else {
-            if (model.pageCells.size && model.format === "excel") seen.editsKeepPageCells += 1;
-            if (pasted) model.pageCells = new Set([...model.pageCells, ...pasted]);
           }
-          if (pasted) seen[event.replacesInput ? "pagePastes" : "pagePastesAdded"] += 1;
+          if (model.written && model.format === "excel" && model.text.includes("^") && !pasted) seen.typedIntoWritten += 1;
+          // Typing goes in once Clear ended a read-only input.
+          if (model.cleared) seen.typedAfterClear += 1;
+          model.cleared = false;
+          model.written = pasted === "all";
+          if (pasted) seen[pasted === "all" ? "pagePastes" : "pagePastesAdded"] += 1;
           if (model.format === "excel" && kind === "lines") seen.typedLines += 1;
-          if (model.format === "excel" && pageCell && kind === "quote") seen.quotedPageCells += 1;
-          if (model.format === "excel" && pageCell && kind === "copyPage") seen.copiedPageCells += 1;
           model.text = event.text;
           model.userInput = true;
           reparse(model);
@@ -749,15 +820,15 @@ function runSequence(rng, seen, log) {
             break;
           }
           seen.edits += 1;
+          if (model.readOnly) seen.readOnlyGridEdits += 1;
           model.pending = null;
           model.userInput = true;
           const asInput = serialize(model.format, event.table);
           if (asInput.supported) {
+            // The page writes all of it, read-only still if it was.
             model.text = asInput.text;
-            // Every cell of it is the page's.
-            const lines = event.table.rows.map((row) => row[0]).filter((cell) => cell.includes("^"));
-            model.pageCells = new Set(model.format === "excel" ? lines : []);
-            if (model.format === "excel" && lines.length) seen.gridPageCells += 1;
+            model.written = true;
+            if (model.format === "excel" && model.text.includes("^")) seen.gridWritesLines += 1;
             reparse(model);
           } else {
             // An input format the page can't write (Excel): the grid's table
@@ -774,20 +845,25 @@ function runSequence(rng, seen, log) {
           const rewritten = model.table && model.userInput ? serialize(event.format, model.table) : null;
           if (rewritten?.supported) {
             model.text = rewritten.text;
-            model.pageCells = new Set(event.format === "excel" ? model.table.rows.map((row) => row[0]).filter((cell) => cell.includes("^")) : []);
+            model.written = true;
           }
+          if (model.readOnly) seen.readOnlyFormats += 1;
           model.format = event.format;
           reparse(model);
           if (!had.table && model.table && model.name) seen.formatTakesFileName += 1;
           break;
         }
         case "clear":
+          // The input is empty and editable.
+          if (model.readOnly) seen.clearMakesEditable += 1;
+          model.cleared = model.readOnly;
           model.pending = null;
           model.text = "";
           model.userInput = false;
           model.name = null;
           model.workbook = null;
-          model.pageCells = new Set();
+          model.readOnly = false;
+          model.written = false;
           model.table = placeholder;
           model.error = false;
           model.version += 1;
@@ -796,15 +872,13 @@ function runSequence(rng, seen, log) {
       }
     }
 
-    // While the input is Excel, the sheet shown holds its text, as typed,
-    // edited or rewritten, and the cells the page wrote there; in another
-    // format the sheet keeps what it had.
+    // While the input is Excel, the sheet shown holds its text, as edited
+    // in the grid or rewritten; in another format the sheet keeps what it
+    // had.
     if (model.workbook && model.format === "excel") {
       const sheets = model.workbook.sheets.slice();
-      const pageCells = model.workbook.pageCells.slice();
       sheets[model.workbook.sheet] = model.text;
-      pageCells[model.workbook.sheet] = model.pageCells;
-      model.workbook = { ...model.workbook, sheets, pageCells };
+      model.workbook = { ...model.workbook, sheets };
     }
 
     // The page holds what the model says.
@@ -817,13 +891,14 @@ function runSequence(rng, seen, log) {
     if (model.table === placeholder) assert.equal(state.table, placeholder);
     assert.equal(Boolean(state.error), model.error, "an error exactly when there's no table");
     assert.equal(state.fileName, model.name, "the name is the origin of the model's text");
-    assert.deepEqual(state.pageCells, model.pageCells, "the cells the page wrote are the ones the model had it write");
+    assert.equal(state.readOnly, model.readOnly, "the input is read-only exactly when the model's text is an Excel file's");
+    assert.equal(state.written, model.written, "the page wrote all of the text exactly when the model had it write all of it");
+    if (state.workbook) assert.equal(state.readOnly, true, "a workbook's text is read-only");
+    if (state.readOnly) assert.notEqual(state.fileName, null, "read-only text is a file's");
     assert.deepEqual(
       state.workbook?.sheets ?? null,
-      model.workbook
-        ? model.workbook.read.map((sheet, index) => ({ ...sheet, text: model.workbook.sheets[index], pageCells: model.workbook.pageCells[index] }))
-        : null,
-      "the workbook is the one the text came from, each sheet as last edited, with the cells the page wrote there",
+      model.workbook ? model.workbook.read.map((sheet, index) => ({ ...sheet, text: model.workbook.sheets[index] })) : null,
+      "the workbook is the one the text came from, each sheet as last edited",
     );
     assert.equal(state.workbook?.sheet ?? null, model.workbook?.sheet ?? null, "the sheet is the one whose text went in last");
     if (model.workbook) assert.equal(state.fileName, model.workbook.file, "a workbook is there only under its own file's name");
@@ -853,9 +928,10 @@ test(`the name and the offered download always describe the table on screen (${S
     readOk: 0, readUnparseable: 0, unreadable: 0, unreadableKeepsName: 0, droppedReads: 0, edits: 0, staleEdits: 0,
     editsWithoutTable: 0, typoKeepsName: 0, fixKeepsName: 0, replacedNamed: 0, formatTakesFileName: 0, namedOffers: 0,
     workbookReads: 0, workbookFailures: 0, unreadableKeepsWorkbook: 0, sheetSwitches: 0, sheetWinsOverRead: 0,
-    ignoredSheets: 0, ownTextDropsWorkbook: 0, sheetBackWithEdits: 0, excelText: 0, textOnExcel: 0, textDropsWorkbook: 0,
-    pagePastes: 0, pagePastesAdded: 0, editsKeepPageCells: 0, ownTextDropsPageCells: 0, typedLines: 0, quotedPageCells: 0,
-    copiedPageCells: 0, gridPageCells: 0, sheetWithPageCells: 0,
+    ignoredSheets: 0, sheetBackWithEdits: 0, excelText: 0, textOnExcel: 0, textDropsWorkbook: 0,
+    pagePastes: 0, pagePastesAdded: 0, typedLines: 0, sheetWithLines: 0, gridWritesLines: 0,
+    typingRefused: 0, pastesRefused: 0, readOnlyGridEdits: 0, readOnlyFormats: 0, clearMakesEditable: 0,
+    fileMakesEditable: 0, typedIntoWritten: 0, typedAfterClear: 0,
   };
   for (let sequence = 0; sequence < SEQUENCES; sequence += 1) {
     const log = [];

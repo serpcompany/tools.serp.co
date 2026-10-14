@@ -45,12 +45,19 @@ const buildAboutSection = (fromLabel: string, toLabel: string) => ({
   },
 });
 
-const buildHowToSection = (fromLabel: string, toLabel: string) => ({
+// An uploaded Excel file's text is read-only on the page: its cells are
+// edited in the grid (#299, TableConvertDemo).
+const EXCEL_EDITING =
+  "After you upload a workbook, the input shows the sheet's cells as read-only text: edit cells in the online table editor, and the input and output follow. To paste or type your own data instead, press Clear view.";
+
+const buildHowToSection = (from: InputFormat, fromLabel: string, toLabel: string) => ({
   title: `How to convert ${fromLabel} to ${toLabel}`,
   intro: `Follow these steps to convert ${fromLabel} to ${toLabel} online.`,
   steps: [
     `Paste or upload your ${fromLabel} data.`,
-    "Review the table preview and make edits if needed.",
+    from === "excel"
+      ? "Review the table, and edit cells in the online table editor if needed."
+      : "Review the table preview and make edits if needed.",
     `Copy or download the ${toLabel} output when it is ready.`,
   ],
 });
@@ -190,14 +197,17 @@ const buildStatsSection = () => ({
   ],
 });
 
-const buildFaqs = (fromLabel: string, toLabel: string): FAQ[] => [
+const buildFaqs = (from: InputFormat, fromLabel: string, toLabel: string): FAQ[] => [
   {
     question: `How do I convert ${fromLabel} to ${toLabel}?`,
     answer: `Paste or upload ${fromLabel} data, then copy or download the ${toLabel} output from the right panel.`,
   },
   {
     question: "Can I edit the table before exporting?",
-    answer: "Yes. Use the online table editor in the middle to make quick edits before exporting.",
+    answer:
+      from === "excel"
+        ? `Yes. ${EXCEL_EDITING}`
+        : "Yes. Use the online table editor in the middle to make quick edits before exporting.",
   },
   {
     question: "Does this run in the browser?",
@@ -222,14 +232,14 @@ export default function TableConvertLanding({
   const toLabel = formatTableLabel(to);
   const resolvedSubtitle = subtitle ?? buildSubtitle(fromLabel, toLabel);
   const aboutSection = buildAboutSection(fromLabel, toLabel);
-  const howTo = buildHowToSection(fromLabel, toLabel);
+  const howTo = buildHowToSection(from, fromLabel, toLabel);
   const infoArticle = buildInfoArticleSection(fromLabel, toLabel);
   const workflow = buildWorkflowSection(fromLabel, toLabel);
   const outputDetails = buildOutputDetailsSection(fromLabel, toLabel);
   const quickActions = buildQuickActionsSection(fromLabel, toLabel);
   const socialProof = buildSocialProofSection(fromLabel, toLabel);
   const stats = buildStatsSection();
-  const faqs = buildFaqs(fromLabel, toLabel);
+  const faqs = buildFaqs(from, fromLabel, toLabel);
   const currentSlug = `${from}-to-${to}`;
 
   return (

@@ -8,14 +8,7 @@
 // HTML is only scanned for that, as text: nothing is rendered, run or
 // fetched.
 
-import {
-  excelPageCells,
-  readExcelCells,
-  readPastedCells,
-  writeExcelCells,
-  writeExcelRows,
-  type CopiedShape,
-} from "../../lib/convert/excel-cells.ts";
+import { readExcelCells, readPastedCells, writeExcelCells, writeExcelRows, type CopiedShape } from "../../lib/convert/excel-cells.ts";
 import { excelTable, parseExcelCells } from "../../lib/convert/table-data.ts";
 
 // Clipboard HTML longer than this isn't scanned (about a million cells as
@@ -155,22 +148,24 @@ export type Paste = {
 };
 
 // What a paste into the Excel input leaves there: the input's text, where
-// the caret goes, the text the page wrote (all of it, or the cells it put
-// in), whose quoted cells holding line breaks read as one cell
-// (output-state.ts), and whether it replaced all of the input; or null, and
-// the browser pastes the text as it does anywhere, read the visitor's way.
+// the caret goes, whether the page wrote all of it (so it reads exactly as
+// written, output-state.ts), and whether it replaced all of the input; or
+// null, and the browser pastes the text as it does anywhere, read the
+// visitor's way. The page never pastes into read-only text
+// (TableConvertDemo).
 //
 // Only a paste with an HTML table whose shape the text has is the page's to
 // write, and only when the visitor's reading of its text isn't that table.
 // Over all of the input (or into an empty one), the page puts in the text
-// as copied, if that reads as the table once its cells holding line breaks
-// are the page's, or else the table as the page writes it (a ditto mark as
-// `""""`). Into part of the input, it puts in the copied rows as it writes
-// them; a single cell of one line is pasted as it is.
+// as copied, if that reads as the table when read exactly as written, or
+// else the table as the page writes it (a ditto mark as `""""`): all of the
+// input is the page's text. Into part of the input, it puts in the copied
+// rows as it writes them, and the input's text is still the visitor's, read
+// the visitor's way; a single cell of one line is pasted as it is.
 export function excelPaste({ plain, html, value, start, end }: Paste): {
   value: string;
   caret: number;
-  wrote: string;
+  written: boolean;
   replacesInput: boolean;
 } | null {
   // As a textarea takes it: every line break a \n.
@@ -181,11 +176,11 @@ export function excelPaste({ plain, html, value, start, end }: Paste): {
   if ((start === 0 && end === value.length) || !value.trim()) {
     const table = excelTable(copied).table;
     if (!table || same(parseExcelCells(text).table, table)) return null;
-    const written = same(parseExcelCells(text, excelPageCells(text)).table, table) ? text : writeExcelCells(table);
-    return { value: written, caret: written.length, wrote: written, replacesInput: true };
+    const pasted = same(parseExcelCells(text, true).table, table) ? text : writeExcelCells(table);
+    return { value: pasted, caret: pasted.length, written: true, replacesInput: true };
   }
   const single = copied.length === 1 && copied[0]!.length === 1 && !/[\n\r]/.test(copied[0]![0]!);
   if (single || same(readExcelCells(text), copied)) return null;
   const insert = writeExcelRows(copied) + (text.endsWith("\n") ? "\n" : "");
-  return { value: value.slice(0, start) + insert + value.slice(end), caret: start + insert.length, wrote: insert, replacesInput: false };
+  return { value: value.slice(0, start) + insert + value.slice(end), caret: start + insert.length, written: false, replacesInput: false };
 }

@@ -394,16 +394,20 @@ async function runTableTool(page, plan) {
   // an output notice ("not wired yet", "Waiting for valid input") holds for
   // a second with the file's text loaded, or once the page has stopped
   // reading it (a workbook it couldn't read leaves no text). The page shows
-  // both for a moment while it reads the file.
-  const output = page.locator("textarea[readonly]");
+  // both for a moment while it reads the file. The output is a read-only
+  // textarea; so is the input after an Excel upload (#299), which the page
+  // marks as the input.
+  const OUTPUT = 'textarea[readonly]:not([data-testid="table-input"])';
+  const output = page.locator(OUTPUT);
   let state;
   try {
     const handle = await page.waitForFunction(
-      (markers) => {
+      ({ markers, outputs }) => {
         const doc = globalThis.document;
-        const output = [...doc.querySelectorAll("textarea[readonly]")].map((area) => area.value).join("\n");
+        const output = [...doc.querySelectorAll(outputs)].map((area) => area.value).join("\n");
         if (markers.every((marker) => output.includes(marker))) return { problem: null };
-        const loaded = [...doc.querySelectorAll("textarea:not([readonly])")].some((area) => area.value.trim());
+        const inputs = [...doc.querySelectorAll('textarea[data-testid="table-input"], textarea:not([readonly])')];
+        const loaded = inputs.some((area) => area.value.trim());
         const parseError = doc.querySelector("div.bg-red-50")?.textContent?.trim();
         const notices = [...doc.querySelectorAll("p")].map((element) => element.textContent?.trim() ?? "");
         const notice = notices.find((text) => /not wired yet|Waiting for valid input/i.test(text));
@@ -413,7 +417,7 @@ async function runTableTool(page, plan) {
         if (problem !== sweep.problem?.text) sweep.problem = { text: problem, since: Date.now() };
         return problem && Date.now() - sweep.problem.since >= 1_000 ? { problem } : null;
       },
-      plan.markers,
+      { markers: plan.markers, outputs: OUTPUT },
       { timeout: plan.timeoutMs, polling: 100 },
     );
     state = await handle.jsonValue();

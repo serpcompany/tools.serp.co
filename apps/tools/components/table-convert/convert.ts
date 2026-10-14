@@ -1,7 +1,7 @@
 import Papa from "papaparse";
 import { markdownTable } from "markdown-table";
 import YAML from "yaml";
-import { NO_PAGE_CELLS, excelPageCells, writeExcelCells, type PageCells } from "@/lib/convert/excel-cells";
+import { writeExcelCells } from "@/lib/convert/excel-cells";
 import { normalizeTable, parseCsvTable, parseExcelCells } from "@/lib/convert/table-data";
 import { InputFormat, OutputFormat, TableData } from "./types";
 
@@ -956,16 +956,10 @@ export function serializeInput(format: InputFormat, table: TableData): Serialize
   return serializeOutput(format, table);
 }
 
-// The cells of text the page has just written in an input format that only
-// the page can say how to read: an Excel input's quoted cells holding line
-// breaks (excel-cells.ts, output-state.ts).
-export function inputPageCells(format: InputFormat, text: string): PageCells {
-  return format === "excel" ? excelPageCells(text) : NO_PAGE_CELLS;
-}
-
-// `pageCells`: the quoted cells holding line breaks that the page wrote into
-// an Excel input's text, the only ones read as one cell (excel-cells.ts).
-export function parseInput(format: InputFormat, text: string, pageCells: PageCells = NO_PAGE_CELLS): ParseResult {
+// `written`: the page wrote all of the text (a sheet, a grid edit, a
+// rewrite), so an Excel input's text reads exactly as written; otherwise the
+// visitor's reading (excel-cells.ts, output-state.ts).
+export function parseInput(format: InputFormat, text: string, written = false): ParseResult {
   if (!text.trim()) {
     return { table: null, supported: true, error: "Paste or upload data to begin." };
   }
@@ -990,7 +984,7 @@ export function parseInput(format: InputFormat, text: string, pageCells: PageCel
       // Cells as Excel copies them: pasted, or a sheet of an uploaded
       // workbook (TableConvertDemo reads it in a worker).
       case "excel":
-        return { ...parseExcelCells(text, pageCells), supported: true };
+        return { ...parseExcelCells(text, written), supported: true };
       case "mysql":
         return { ...parseMySql(text), supported: true };
       case "mediawiki":

@@ -4,7 +4,7 @@
 // Excel input, read as cells copied from Excel (excel-cells.ts).
 
 import Papa from "papaparse";
-import { readExcelCells, type PageCells } from "./excel-cells.ts";
+import { readExcelCells } from "./excel-cells.ts";
 
 export type TableData = {
   headers: string[];
@@ -43,10 +43,11 @@ export function parseCsvTable(text: string): { table: TableData | null; error: s
 }
 
 // Cells copied from Excel, or a sheet as writeExcelCells (excel-cells.ts)
-// writes it, read as readExcelCells reads them (`page`: the quoted cells
-// holding line breaks that the page wrote there), the first row the header.
-export function parseExcelCells(text: string, page?: PageCells): { table: TableData | null; error: string | null } {
-  return excelTable(readExcelCells(text, page));
+// writes it, read as readExcelCells reads them (`written`: the page wrote
+// all of the text, which reads exactly as written), the first row the
+// header.
+export function parseExcelCells(text: string, written = false): { table: TableData | null; error: string | null } {
+  return excelTable(readExcelCells(text, written));
 }
 
 // Rows of cells as a table, the first row the header. A row of one empty

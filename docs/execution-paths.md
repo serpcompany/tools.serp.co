@@ -170,28 +170,33 @@ Conversion picks an engine by input format:
   doubled, when it holds a tab or a line break (and, as written here, a
   quote). It is read as Excel writes it (`lib/convert/excel-cells.ts`): a
   cell that starts with a quote but isn't quoted that way (`"Best" seller`, a
-  ditto mark) is its text. Where a quote reads two ways (ditto marks in a
-  column copy as a quoted cell holding line breaks would), one rule decides:
-  a quoted cell that spans lines is one cell only if the page wrote that
-  exact cell. The reducer keeps those cells, by their exact text, with the
-  input's text (`pageCells`): a sheet's, a grid edit's, a rewrite's, a paste
-  the page wrote. Every other quote, typed or pasted, is read the visitor's
-  way, which never merges rows on a quote unless no reading keeps every line
-  a row of one width, and then merges the fewest lines that make every row
-  as wide. Text the visitor types that is exactly a cell the page wrote reads
-  as that cell. A paste takes the clipboard's plain text, which keeps each
-  cell's text exactly, and the HTML table Excel puts next to it decides its
-  shape and the text of a cell that starts with a quote (`excel-paste.ts`,
-  scanned as text, nothing rendered or fetched): when the visitor's reading
-  differs, the page puts the cells in as its own. Blank lines at the end
-  aren't rows, as in a CSV input; a row of empty cells (one added in the
-  grid) is.
+  ditto mark) is its text. After an Excel upload (a workbook's sheet, or an
+  `.xls` that is text) the input's text is read-only (#299, the owner's
+  decision): the page says so, cells are edited in the grid, whose edits the
+  page writes back, and Clear view empties the input and makes it editable.
+  So the visitor's quotes never mix with text the page wrote, where a quote
+  can read two ways (ditto marks in a column copy as a quoted cell holding
+  line breaks would). Who wrote all of the text decides how it reads
+  (`written` in the reducer): text the page wrote (a sheet, a grid edit, a
+  rewrite in the input's format, a paste it wrote over all of the input),
+  untouched since, reads exactly as written. Any other text, typed or pasted
+  or edited, is read the visitor's way, which never merges rows on a quote
+  unless no reading keeps every line a row of one width, and then merges the
+  fewest lines that make every row as wide. In one column that keeps a cell
+  holding line breaks as rows, so typing into text the page wrote can split
+  such a cell; a grid edit writes it back. A paste takes the clipboard's
+  plain text, which keeps each cell's text exactly, and the HTML table Excel
+  puts next to it decides its shape and the text of a cell that starts with a
+  quote (`excel-paste.ts`, scanned as text, nothing rendered or fetched):
+  when the visitor's reading differs, the page puts the cells in its own way.
+  Blank lines at the end aren't rows, as in a CSV input; a row of empty cells
+  (one added in the grid) is.
   So cells pasted from Excel convert too, and a sheet reaches the table, the
   name and Download through the reducer above like any file's text, under
   the workbook's name. The first
   visible sheet with values shows; when there are more, a select picks
   another, which replaces the input's text from the same file, as last
-  edited: each sheet keeps the visitor's edits. The page says which sheet is
+  edited: each sheet keeps its grid edits. The page says which sheet is
   shown and what was left out. An `.xls` that is an OLE file (Excel 97-2003,
   or a password-protected workbook) or Excel 2003 XML is refused with the
   reader's message to save it as an unprotected `.xlsx`; one that is text,
