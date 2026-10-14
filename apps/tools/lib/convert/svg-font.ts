@@ -90,6 +90,9 @@ export const PICTURE_ONLY_MESSAGE =
   "This SVG holds only a picture (a bitmap), and a font holds filled shapes. Trace the picture into shapes in " +
   "your editor (Image Trace in Illustrator, Trace Bitmap in Inkscape) and try again.";
 export const NOTHING_TO_DRAW_MESSAGE = "This SVG has no filled shapes to make a font from.";
+export const OUTSIDE_ARTBOARD_MESSAGE =
+  "This SVG's shapes are all outside its artboard (its viewBox), where a browser doesn't show them. " +
+  "Move them onto the artboard and try again.";
 
 // ---- Flattening ----
 
@@ -442,6 +445,7 @@ export async function svgToTtf(buf: ArrayBuffer, fileName: string): Promise<SvgF
   let contours = perShape.flat();
   if (artboard) {
     box = { left: artboard.x, bottom: 1 - artboard.y - artboard.height, width: artboard.width, height: artboard.height };
+    const drawn = contours.length;
     contours = contours.filter(
       (contour) =>
         contour.box.maxX > box.left &&
@@ -449,12 +453,16 @@ export async function svgToTtf(buf: ArrayBuffer, fileName: string): Promise<SvgF
         contour.box.maxY > box.bottom &&
         contour.box.minY < box.bottom + box.height,
     );
+    if (drawn && !contours.length) throw svgFontError("nothing_to_draw", OUTSIDE_ARTBOARD_MESSAGE);
   } else {
-    const minX = Math.min(...contours.map((contour) => contour.box.minX));
-    const minY = Math.min(...contours.map((contour) => contour.box.minY));
-    const maxX = Math.max(...contours.map((contour) => contour.box.maxX));
-    const maxY = Math.max(...contours.map((contour) => contour.box.maxY));
-    box = { left: minX, bottom: minY, width: maxX - minX, height: maxY - minY };
+    const bounds = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+    for (const { box: own } of contours) {
+      bounds.minX = Math.min(bounds.minX, own.minX);
+      bounds.minY = Math.min(bounds.minY, own.minY);
+      bounds.maxX = Math.max(bounds.maxX, own.maxX);
+      bounds.maxY = Math.max(bounds.maxY, own.maxY);
+    }
+    box = { left: bounds.minX, bottom: bounds.minY, width: bounds.maxX - bounds.minX, height: bounds.maxY - bounds.minY };
   }
   if (!contours.length || !(box.width > 0 && box.height > 0)) failNothing();
   if (contours.length > 30_000) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);

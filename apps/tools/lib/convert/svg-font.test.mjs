@@ -8,7 +8,7 @@ import opentype from "opentype.js";
 
 import { fontFamilyName, readGlyph, svgToTtf } from "./svg-font.ts";
 import { LIMITS } from "./svg-font-shapes.ts";
-import { convertWithWorker } from "./workerClient.ts";
+import { checkInputFile, convertWithWorker, getOutputMimeType } from "./workerClient.ts";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
 const encode = (text) => new TextEncoder().encode(text).buffer;
@@ -211,6 +211,9 @@ test("text, a picture, or nothing at all gets a plain message", async () => {
     assert.equal(error.code, "nothing_to_draw");
     assert.equal(error.message, "This SVG has no filled shapes to make a font from.");
   }
+  const outside = await refusal(svg('<rect x="40" y="40" width="8" height="8"/>'));
+  assert.equal(outside.code, "nothing_to_draw");
+  assert.match(outside.message, /all outside its artboard/);
   const { result } = await font(svg('<rect width="24" height="24"/><text>Hi</text><image href="x.png" width="4" height="4"/>'));
   assert.match(result.notice, /filled shapes only: text and embedded pictures\./);
 });
@@ -373,4 +376,12 @@ test("convertWithWorker makes the font and names it after the upload; a refusal 
     convertWithWorker({ worker: undefined, from: "svg", to: "ttf", buf: encode(svg('<line x2="9" stroke="red"/>')), fileName: "a.svg" }),
     (error) => error.telemetryCode === "nothing_to_draw" && error.telemetryMetadata.engine === "svg-font" && /strokes/.test(error.message),
   );
+});
+
+test("an SVG over 10 MB is refused before the page reads it, and the font is saved as font/ttf", async () => {
+  const large = new Blob([new Uint8Array(10 * 1024 * 1024 + 1)]);
+  await assert.rejects(checkInputFile(large, "svg", "ttf"), (error) => error.telemetryCode === "too_complex" && /over 10 MB/.test(error.message));
+  await checkInputFile(large, "svg", "png");
+  await checkInputFile(new Blob([svg('<rect width="24" height="24"/>')]), "svg", "ttf");
+  assert.equal(getOutputMimeType("ttf"), "font/ttf");
 });
