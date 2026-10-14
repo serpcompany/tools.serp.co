@@ -14,8 +14,9 @@ import {
   classifyRun,
   converterEngine,
   countStatuses,
+  decodeFontOutput,
+  decodeOutputs,
   decodeTableOutput,
-  decodeTableOutputs,
   EXPECTED_REFUSALS,
   ffmpegError,
   hasSignature,
@@ -489,6 +490,8 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "ppt", "png"), "browser-raster");
   assert.equal(engine("convert", "txt", "pdf"), "browser-raster");
   assert.equal(engine("convert", "image", "pdf"), "image-pdf");
+  assert.equal(engine("convert", "svg", "ttf"), "svg-font");
+  assert.equal(engine("convert", "svg", "png"), "browser-raster");
   assert.equal(engine("convert", "png", "pdf"), "browser-raster");
   assert.equal(engine("compress", "heic", "heic"), "server-image-compress");
   assert.equal(engine("compress", "pdf", "pdf"), "server-pdf-compress");
@@ -860,7 +863,7 @@ test("a Protobuf run's .pb is decoded with the .proto saved beside it", async ()
     { name: "sample.pb", size: protobuf.buffer.byteLength, head: [], base64: base64Of(protobuf.buffer) },
     { name: "sample.proto", size: protobuf.schema.length, head: [], base64: base64Of(Buffer.from(protobuf.schema)) },
   ];
-  await decodeTableOutputs(outputs, "protobuf");
+  await decodeOutputs(outputs, "protobuf");
   assert.match(outputs[0].decoded.text, /Alpha/);
   assert.equal(outputs[1].decoded.text, protobuf.schema);
   assert.deepEqual(classifyRun({ outcome: "completed", outputs }, { to: "protobuf", markers: ["Alpha"], decode: true }), {
@@ -894,5 +897,33 @@ test("a decoded table file passes only when it opens and holds the fixture's dat
   assert.equal(
     classifyRun({ outcome: "completed", outputs: [{ ...xlsx(), text: "Alpha", decoded: { error: "bad zip" } }] }, plan).status,
     "error",
+  );
+});
+
+test("SVG to TTF's font is opened with a font parser, and must have an outlined glyph on U+E000", async () => {
+  const fixtures = loadFixtures(benchmarksDir);
+  const plan = planTool(
+    { id: "svg-to-ttf", route: "/svg-to-ttf", operation: "convert", from: "svg", to: "ttf", isActive: true },
+    { handlers: new Map(), fixtures, timeoutMs: 60, ffmpegTimeoutMs: 180 },
+  );
+  assert.deepEqual(
+    [plan.engine, plan.driver, plan.fixtures.map((file) => path.basename(file)), plan.decode, plan.pixelCheck],
+    ["svg-font", "file", ["sample-icon.svg"], true, false],
+  );
+  const { svgToTtf } = await import("./convert/svg-font.ts");
+  const icon = readFileSync(plan.fixtures[0]);
+  const { buffer } = await svgToTtf(icon.buffer.slice(icon.byteOffset, icon.byteOffset + icon.byteLength), "sample-icon.svg");
+  const decoded = await decodeFontOutput(Buffer.from(buffer));
+  assert.match(decoded.text, /^sample-icon: U\+E000 has \d+ contours$/);
+  // A font without the glyph (the TTF fixture has none there), and bytes
+  // that aren't a font.
+  await assert.rejects(decodeFontOutput(readFileSync(path.join(fixturesDir, "sample.ttf"))), /no glyph on U\+E000/);
+  await assert.rejects(decodeFontOutput(Buffer.from([0, 1, 0, 0, 0, 0])));
+  const output = { name: "sample-icon.ttf", size: buffer.byteLength, head: Array.from(new Uint8Array(buffer).subarray(0, 64)), base64: base64Of(buffer) };
+  await decodeOutputs([output], "ttf");
+  assert.deepEqual(classifyRun({ outcome: "completed", outputs: [output] }, plan), { status: "pass", error: null, formatCheck: "decoded" });
+  assert.deepEqual(
+    classifyRun({ outcome: "completed", outputs: [{ ...output, decoded: { error: "no glyph on U+E000" } }] }, plan),
+    { status: "error", error: "saved a file that doesn't open (sample-icon.ttf): no glyph on U+E000", formatCheck: "decoded" },
   );
 });

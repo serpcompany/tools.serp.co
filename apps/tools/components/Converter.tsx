@@ -126,6 +126,7 @@ export default function Converter({
           from,
           to,
           buf,
+          fileName: item.file.name,
           quality: to === "jpg" || to === "jpeg" ? quality / 100 : undefined,
         });
 

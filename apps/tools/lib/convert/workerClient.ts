@@ -5,7 +5,10 @@ import {
   isDocumentImageConversion,
   isImageDocumentConversion,
   isImageTextConversion,
+  isSvgFontConversion,
   isTableImageConversion,
+  SVG_FONT_MAX_BYTES,
+  SVG_FONT_TOO_LARGE_MESSAGE,
 } from "./image-document-targets.ts";
 import {
   BIN_HEAD_BYTES,
@@ -124,6 +127,7 @@ const MIME_MAP: Record<string, string> = {
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   html: "text/html",
   txt: "text/plain",
+  ttf: "font/ttf",
 };
 
 export function getOutputMimeType(format: string) {
@@ -174,6 +178,9 @@ type ConvertArgs = {
   from: string;
   to: string;
   buf: ArrayBuffer;
+  // The uploaded file's name, which names what a converter makes from it
+  // (an SVG's font family).
+  fileName?: string;
   onProgress?: (update: ProgressUpdate) => void;
   quality?: number;
 };
@@ -198,8 +205,12 @@ export async function convertWithWorker(args: ConvertArgs): Promise<ConversionRe
 
 // Refuses a file its Tool can't convert from its first bytes, before the
 // page reads it whole: a .bin that holds no image may be a disc image of
-// several gigabytes. convertWithWorker checks the same again.
+// several gigabytes. An SVG too large to make a font from is refused by its
+// size. convertWithWorker checks the same again.
 export async function checkInputFile(file: Blob, from: string, to: string): Promise<void> {
+  if (isSvgFontConversion(from, to) && file.size > SVG_FONT_MAX_BYTES) {
+    throw createTelemetryError("too_complex", SVG_FONT_TOO_LARGE_MESSAGE, { from: "svg", to: "ttf", engine: "svg-font" });
+  }
   if (from.toLowerCase() !== "bin") return;
   const head = new Uint8Array(await file.slice(0, BIN_HEAD_BYTES).arrayBuffer());
   binPictureOrRefuse(head, file.size, to.toLowerCase());
@@ -298,6 +309,9 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
   }
   if (isDocumentImageConversion(fromExt, toExt)) {
     return convertDocumentToImage(fromExt, toExt, args);
+  }
+  if (isSvgFontConversion(fromExt, toExt)) {
+    return convertSvgToFont(args);
   }
   const op = resolveConversionOp(args.from, args.to);
   if (op === "video") {
@@ -424,6 +438,36 @@ async function convertDocumentToImage(from: string, to: string, args: ConvertArg
       error instanceof Error ? error.message : String(error),
       { from, to, engine: DOCUMENT_IMAGE_ENGINES[from] ?? from },
     );
+  }
+}
+
+// The codes svg-font.ts throws with for a file it can't make a font from.
+const SVG_FONT_REFUSALS = new Set(["unreadable_image", "nothing_to_draw", "too_complex"]);
+
+// SVG to TTF (svg-font.ts): the SVG's filled shapes as one glyph, on U+E000,
+// in a font named after the file. A file that is damaged, draws nothing a
+// font can hold, or is too large or detailed is told so; any other failure
+// (the engine didn't load, or failed) gets a plain "try again", and the
+// engine's own error stays the telemetry error's cause.
+async function convertSvgToFont(args: ConvertArgs): Promise<ConversionResult> {
+  args.onProgress?.({ status: "processing", progress: 10 });
+  try {
+    const { svgToTtf } = await import("./svg-font.ts");
+    const { buffer, notice } = await svgToTtf(args.buf, args.fileName ?? "icon.svg");
+    args.onProgress?.({ status: "processing", progress: 100 });
+    return { kind: "single", buffer, notice };
+  } catch (error) {
+    const code = (error as { code?: unknown } | null)?.code;
+    const refused = typeof code === "string" && SVG_FONT_REFUSALS.has(code);
+    const failure = createTelemetryError(
+      refused ? code : "convert_failed",
+      refused && error instanceof Error
+        ? error.message
+        : "This SVG couldn't be made into a font. Try again, or reload the page.",
+      { from: "svg", to: "ttf", engine: "svg-font" },
+    );
+    failure.cause = error;
+    throw failure;
   }
 }
 

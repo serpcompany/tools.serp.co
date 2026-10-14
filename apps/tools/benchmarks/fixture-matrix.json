@@ -1116,6 +1116,11 @@
       "input": "file",
       "fixture": "fixtures/sample-heic.bin",
       "notes": "A HEIC saved with a .bin name: the picture in sample-tiff.bin, 8-bit, quality 80, made with magick 7.1.2 (libheif 1.20.2). Read back with file (HEIF Image HEVC Main) and magick identify (HEIC 96x96 8-bit, 124 colours)."
+    },
+    "svg-to-ttf": {
+      "input": "file",
+      "fixture": "fixtures/sample-icon.svg",
+      "notes": "A one-colour house icon written as plain text, the multi-shape icon SVG to TTF makes a font of: a polygon roof, an even-odd body with a window hole and a door notch, a chimney placed by a transform, all filled from their group, on a viewBox offset to -2 -2 (28 x 28) with a width and height of 96. Read back with xmllint (well-formed) and rsvg-convert (a blue house with the window and door open). The sweep opens the font with opentype.js and needs an outlined glyph on U+E000 (decodeFontOutput)."
     }
   }
 }

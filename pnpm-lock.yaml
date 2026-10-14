@@ -171,12 +171,24 @@ importers:
       remark-gfm:
         specifier: ^4.0.0
         version: 4.0.1
+      sax:
+        specifier: 1.6.1
+        version: 1.6.1
       sharp:
         specifier: ^0.35.4
         version: 0.35.5(@types/node@20.19.23)
+      svg-pathdata:
+        specifier: 9.0.0
+        version: 9.0.0
       svg2pdf.js:
         specifier: 2.8.1
         version: 2.8.1(jspdf@4.2.1)
+      svg2ttf:
+        specifier: 6.1.0
+        version: 6.1.0
+      svgicons2svgfont:
+        specifier: 16.0.0
+        version: 16.0.0
       svgo:
         specifier: ^4.1.0
         version: 4.1.0
@@ -223,12 +235,18 @@ importers:
       '@types/react-dom':
         specifier: ^19.1.8
         version: 19.2.2(@types/react@19.2.2)
+      '@types/sax':
+        specifier: 1.2.7
+        version: 1.2.7
       drizzle-kit:
         specifier: ^0.31.11
         version: 0.31.11
       eslint:
         specifier: ^9.38.0
         version: 9.38.0(jiti@2.6.1)
+      opentype.js:
+        specifier: 1.3.4
+        version: 1.3.4
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -2558,6 +2576,9 @@ packages:
   '@types/responselike@1.0.3':
     resolution: {integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==}
 
+  '@types/sax@1.2.7':
+    resolution: {integrity: sha512-rO73L89PJxeYM3s3pPPjiPgVVcymqU490g0YO5n5By0k2Erzj6tay/4lr1CHAAU4JyOWd1rpQ8bCf6cZfHU96A==}
+
   '@types/stats.js@0.17.4':
     resolution: {integrity: sha512-jIBvWWShCvlBqBNIZt0KAshWpvSjhkwkEu4ZUcASoAvhmrgAUI2t1dXrjSL4xXVLB4FznPrIsX3nKXFl/Dt4vA==}
 
@@ -2647,6 +2668,10 @@ packages:
 
   '@viz-js/viz@3.31.0':
     resolution: {integrity: sha512-r7zlQdRvcwvIpjHGgs+KNWHeE/P5/Dq7k8ZAKaMCbZqomxCBJV78gVuQYaHzFVca+kB0mX0fMW9UFevCOBG50A==}
+
+  '@xmldom/xmldom@0.9.12':
+    resolution: {integrity: sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==}
+    engines: {node: '>=14.6'}
 
   '@zip.js/zip.js@2.8.8':
     resolution: {integrity: sha512-v0KutehhSAuaoFAFGLp+V4+UiZ1mIxQ8vNOYMD7k9ZJaBbtQV49MYlg568oRLiuwWDg2Di58Iw3Q0ESNWR+5JA==}
@@ -3062,6 +3087,10 @@ packages:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
     engines: {node: '>=16'}
 
+  commander@14.0.3:
+    resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
+    engines: {node: '>=20'}
+
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
 
@@ -3167,6 +3196,9 @@ packages:
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
+
+  cubic2quad@1.2.1:
+    resolution: {integrity: sha512-wT5Y7mO8abrV16gnssKdmIhIbA9wSkeMzhh27jAguKrV82i24wER0vL5TGhUJ9dbJNDcigoRZ0IAHFEEEI4THQ==}
 
   dargs@7.0.0:
     resolution: {integrity: sha512-2iy1EkLdlBzQGvbweYRFxmFath8+K7+AKB0TlhHWkNuH+TmovaMH/Wp7V7R4u7f4SnX3OgLsU9t1NI9ioDnUpg==}
@@ -3972,6 +4004,10 @@ packages:
     engines: {node: 20 || >=22}
     hasBin: true
 
+  glob@13.0.6:
+    resolution: {integrity: sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==}
+    engines: {node: 18 || 20 || >=22}
+
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
     deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
@@ -4743,6 +4779,9 @@ packages:
 
   meshoptimizer@1.1.1:
     resolution: {integrity: sha512-oRFNWJRDA/WTrVj7NWvqa5HqE1t9MYDj2VaWirQCzCCrAd2GHrqR/sQezCxiWATPNlKTcRaPRHPJwIRoPBAp5g==}
+
+  microbuffer@1.0.0:
+    resolution: {integrity: sha512-O/SUXauVN4x6RaEJFqSPcXNtLFL+QzJHKZlyDVYFwcDDRVca3Fa/37QXXC+4zAGGa4YhHrHxKXuuHvLDIQECtA==}
 
   micromark-core-commonmark@2.0.3:
     resolution: {integrity: sha512-RDBrHEMSxVFLg6xvnXmb1Ayr2WzLAWjeSATAoxwKYJV94TeNavgoIdA0a9ytzDSVzBy2YKFK+emCPOEibLeCrg==}
@@ -5920,10 +5959,23 @@ packages:
     resolution: {integrity: sha512-qsjeeq5YjBZ5eMdFuUa4ZosMLxgr5RZ+F+Y1OrDhuOCEInRMA3x74XdBtggJcj9kOeInz0WE+LgCPDkZFlBYJw==}
     engines: {node: '>=12.0.0'}
 
+  svg-pathdata@9.0.0:
+    resolution: {integrity: sha512-h9FuqmNsgDKq2hQBqTMOWjZwqdZOnWijZmcg6FL4iSmH6VvRnobhHrBQSdOiP0W9nwgv0qiW5vQ3//Arrmp19g==}
+    engines: {node: '>=24.14.0'}
+
   svg2pdf.js@2.8.1:
     resolution: {integrity: sha512-AzXfPHjHnFt9dpdRPhWWBOKipnMSWQZRKiV3FTTPdY6wwRgT3labbA4s0HIQaskNhwAhrcI2u2rDhD8j8udfNQ==}
     peerDependencies:
       jspdf: ^4.0.0 || ^3.0.0 || ^2.0.0
+
+  svg2ttf@6.1.0:
+    resolution: {integrity: sha512-EjxgcmhKcBpx/3fR1hPwVtJAbUc/ZsDpwOTF74SI3PbzCg4pDHnxVmoSuqgEqxVJGqqkSCI6+82cucpn2D5aOw==}
+    hasBin: true
+
+  svgicons2svgfont@16.0.0:
+    resolution: {integrity: sha512-3y4fcCuu9/XYgkoDfnNAR1RUEjmbX6lX2oTTu8NVLHYbf2xmYyZB0NZzK7WNthn8oSY68thfyEARRgWyAveZOw==}
+    engines: {node: '>=24.14.0'}
+    hasBin: true
 
   svgo@4.1.0:
     resolution: {integrity: sha512-bkxnTg1kSU0guhIBmibA6UUhrQmPVA1XsQLN+ylCd+UWzbnLkySOcXpyk1mrl05f+pcaCx2eHb+sp6BgMZWX+Q==}
@@ -6035,6 +6087,9 @@ packages:
 
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
+
+  transformation-matrix@3.1.0:
+    resolution: {integrity: sha512-oYubRWTi2tYFHAL2J8DLvPIqIYcYZ0fSOi2vmSy042Ho4jBW2ce6VP7QfD44t65WQz6bw5w1Pk22J7lcUpaTKA==}
 
   trim-lines@3.0.1:
     resolution: {integrity: sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==}
@@ -6454,6 +6509,10 @@ packages:
 
   yauzl@2.10.0:
     resolution: {integrity: sha512-p4a9I6X6nu6IhoGmBqAcbJy1mlC4j27vEPZX9F4L4/vZT3Lyq1VkFHw/V/PUcB9Buo+DG3iHkT0x3Qya58zc3g==}
+
+  yerror@9.1.1:
+    resolution: {integrity: sha512-6XGifXCr19Zy0O3YuoWs7287A/9Ush4C/xN9buokIBVUVGrblN3FTrumLmIZFSsSdDlKdJhjXV2GLpba3qoljA==}
+    engines: {node: '>=24.14.0'}
 
   yn@3.1.1:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
@@ -8638,6 +8697,10 @@ snapshots:
     dependencies:
       '@types/node': 20.19.23
 
+  '@types/sax@1.2.7':
+    dependencies:
+      '@types/node': 20.19.23
+
   '@types/stats.js@0.17.4': {}
 
   '@types/three@0.186.0':
@@ -8760,6 +8823,8 @@ snapshots:
   '@ungap/structured-clone@1.3.0': {}
 
   '@viz-js/viz@3.31.0': {}
+
+  '@xmldom/xmldom@0.9.12': {}
 
   '@zip.js/zip.js@2.8.8': {}
 
@@ -9226,6 +9291,8 @@ snapshots:
 
   commander@11.1.0: {}
 
+  commander@14.0.3: {}
+
   commander@2.20.3: {}
 
   comment-json@4.6.2:
@@ -9327,6 +9394,8 @@ snapshots:
       css-tree: 2.2.1
 
   csstype@3.1.3: {}
+
+  cubic2quad@1.2.1: {}
 
   dargs@7.0.0: {}
 
@@ -10339,6 +10408,12 @@ snapshots:
       package-json-from-dist: 1.0.1
       path-scurry: 2.0.2
 
+  glob@13.0.6:
+    dependencies:
+      minimatch: 10.2.5
+      minipass: 7.1.3
+      path-scurry: 2.0.2
+
   glob@7.2.3:
     dependencies:
       fs.realpath: 1.0.0
@@ -11262,6 +11337,8 @@ snapshots:
   merge2@1.4.1: {}
 
   meshoptimizer@1.1.1: {}
+
+  microbuffer@1.0.0: {}
 
   micromark-core-commonmark@2.0.3:
     dependencies:
@@ -12657,6 +12734,8 @@ snapshots:
   svg-pathdata@6.0.3:
     optional: true
 
+  svg-pathdata@9.0.0: {}
+
   svg2pdf.js@2.8.1(jspdf@4.2.1):
     dependencies:
       cssesc: 3.0.0
@@ -12664,6 +12743,28 @@ snapshots:
       jspdf: 4.2.1
       specificity: 0.4.1
       svgpath: 2.6.0
+
+  svg2ttf@6.1.0:
+    dependencies:
+      '@xmldom/xmldom': 0.9.12
+      argparse: 2.0.1
+      cubic2quad: 1.2.1
+      lodash: 4.17.21
+      microbuffer: 1.0.0
+      svgpath: 2.6.0
+
+  svgicons2svgfont@16.0.0:
+    dependencies:
+      '@types/sax': 1.2.7
+      commander: 14.0.3
+      debug: 4.4.3
+      glob: 13.0.6
+      sax: 1.6.1
+      svg-pathdata: 9.0.0
+      transformation-matrix: 3.1.0
+      yerror: 9.1.1
+    transitivePeerDependencies:
+      - supports-color
 
   svgo@4.1.0:
     dependencies:
@@ -12794,6 +12895,8 @@ snapshots:
       ieee754: 1.2.1
 
   tr46@0.0.3: {}
+
+  transformation-matrix@3.1.0: {}
 
   trim-lines@3.0.1: {}
 
@@ -13229,6 +13332,8 @@ snapshots:
     dependencies:
       buffer-crc32: 0.2.13
       fd-slicer: 1.1.0
+
+  yerror@9.1.1: {}
 
   yn@3.1.1: {}
 

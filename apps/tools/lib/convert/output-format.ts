@@ -91,6 +91,8 @@ const SIGNATURES: Record<string, Signature> = {
   excel: isXlsx,
   // An Avro object container file.
   avro: startsWith(0x4f, 0x62, 0x6a, 0x01),
+  // TrueType: version 1.0, or Apple's "true".
+  ttf: (bytes) => startsWith(0x00, 0x01, 0x00, 0x00)(bytes, "") || startsWithText("true")(bytes, ""),
   // Illustrator's PDF-compatible AI files are PDFs.
   ai: startsWithText("%PDF"),
   // Kodak Photo CD: the image pack header sits after 2048 bytes of padding.
