@@ -1279,14 +1279,14 @@ eps-to-webp,retired,convert,eps,webp,unknown,,not swept,the sweep runs live Tool
 ,not built,convert,epub,word,,,,,,epub to word,none,,,3000,300,1,600,150,ahrefs-2026-01,,
 ,not built,convert,excel,ascii,,,,,,excel to ascii,none,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,excel,bbcode,,,,,,excel to bbcode,none,,,,,,,,ahrefs-2026-01,,
-excel-to-csv,live,convert,excel,csv,client-only,table-convert + xlsx,pass,format check: content,5f579ea2ed8e,excel to csv,exact,,,,,,,,ahrefs-2026-01,xlsx to csv,26000
+excel-to-csv,live,convert,excel,csv,client-only,table-convert + xlsx,pass,format check: content,1ec9b59bb449,excel to csv,exact,,,,,,,,ahrefs-2026-01,xlsx to csv,26000
 ,not built,convert,excel,excel,,,,,,excel to excel,none,,yes,,,,,,ahrefs-2026-01,,
 ,not built,convert,excel,html,,,,,,excel to html,none,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,excel,jira,,,,,,excel to jira,none,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,excel,json,,,,,,excel to json,none,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,excel,jsonlines,,,,,,excel to jsonlines,none,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,excel,latex,,,,,,excel to latex,none,,,,,,,,ahrefs-2026-01,,
-excel-to-markdown,live,convert,excel,markdown,client-only,table-convert + xlsx,pass,format check: content,5f579ea2ed8e,excel to markdown,exact,,,,,,,,ahrefs-2026-01,,
+excel-to-markdown,live,convert,excel,markdown,client-only,table-convert + xlsx,pass,format check: content,1ec9b59bb449,excel to markdown,exact,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,excel,pandasdataframe,,,,,,excel to pandasdataframe,none,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,excel,php,,,,,,excel to php,none,,,,,,,,ahrefs-2026-01,,
 ,alias page,convert,excel,png,,,,,,excel to png,alias,xlsx-to-png,,,,,,,ahrefs-2026-01,,
