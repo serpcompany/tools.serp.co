@@ -456,7 +456,8 @@ test("a picture whose header declares a size too large to convert here says so; 
   assert.equal(raw.telemetryCode, "unreadable_image");
   // ImageMagick's ResourceLimitError (as a 30,000 x 30,000 PSD gives, after
   // half a minute): too large when the header declares a picture this
-  // engine can't hold, and out of memory when it can.
+  // engine can't hold, and out of memory when it can. The same for a failed
+  // allocation.
   const magick = await import("@imagemagick/magick-wasm");
   const { read } = magick.ImageMagick;
   const xpm = (size) => text(`/* XPM */\nstatic char *x[] = {\n"${size} ${size} 1 1",\n"a c #ff0000",\n"a",\n};\n`);
@@ -469,11 +470,14 @@ test("a picture whose header declares a size too large to convert here says so; 
     const ordinary = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.xpm")) }));
     assert.equal(ordinary.message, binConvertFailedMessage("xpm", "png"));
     assert.deepEqual(ordinary.telemetryMetadata, { from: "bin", to: "png", format: "xpm", engine: "browser-magick" });
+    // An allocation that fails, as Chromium's does for that DNG.
     magick.ImageMagick.read = () => {
       throw new RangeError("Array buffer allocation failed");
     };
     const memory = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.xpm")) }));
     assert.equal(memory.message, binConvertFailedMessage("xpm", "png"));
+    const allocation = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(xpm(60000)) }));
+    assert.equal(allocation.message, tooLargeImageMessage("xpm"));
   } finally {
     magick.ImageMagick.read = read;
   }

@@ -174,20 +174,23 @@ function readPicture<T>(
   }
 }
 
-// What a failure while ImageMagick reads a file says: the file's (a decode
-// failure, decode-failure.ts), or memory running out (the error as it is):
-// a JavaScript allocation (RangeError), a WASM trap, LibRaw's allocation
-// errors, or a ResourceLimitError while reading a file whose declared size
-// the engine can hold. With a declared size it can't hold, a
-// ResourceLimitError is the file's: damaged, or too large to convert here.
+// What a failure while ImageMagick reads a file says. Running out of memory
+// (an allocation's RangeError, a WASM trap, ImageMagick's
+// ResourceLimitError) is the file's when its header declares a picture the
+// engine can't hold: damaged, or too large to convert here. Otherwise it's
+// the engine's, and the error is passed on as it is. Any other failure is
+// the file's: a decode failure (decode-failure.ts).
 function readFailure(magick: MagickModule, bytes: Uint8Array, format: MagickFormatType, error: unknown): unknown {
-  if (error instanceof RangeError || error instanceof WebAssembly.RuntimeError) return error;
-  if (typeof error === "number") return cppFailure(magick, error);
-  if (error instanceof magick.MagickError && error.severity === magick.MagickErrorSeverity.ResourceLimitError) {
-    return declaresTooLarge(magick, bytes, format) ? tooLargeFailure(error.message, error) : error;
+  const failure = typeof error === "number" ? cppFailure(magick, error) : error;
+  const outOfMemory =
+    failure instanceof RangeError ||
+    failure instanceof WebAssembly.RuntimeError ||
+    (failure instanceof magick.MagickError && failure.severity === magick.MagickErrorSeverity.ResourceLimitError);
+  if (outOfMemory) {
+    return declaresTooLarge(magick, bytes, format) ? tooLargeFailure(failure.message, failure) : failure;
   }
-  if (isDecodeFailure(error)) return error;
-  return decodeFailure(error instanceof Error ? error.message : String(error), error);
+  if (isDecodeFailure(failure)) return failure;
+  return decodeFailure(failure instanceof Error ? failure.message : String(failure), failure);
 }
 
 // The most memory this engine can have: a 32-bit WASM module addresses 4 GB.
@@ -195,14 +198,15 @@ const ENGINE_MEMORY = 2 ** 32;
 
 // Whether the file's header declares a picture this engine can't hold: its
 // pixels alone (4 bytes each, 8-bit RGBA) would take over half the engine's
-// memory, about 537 megapixels. A header that can't be read counts as one.
+// memory, about 537 megapixels. A header ImageMagick can't read is the
+// file's too; one it can't read for want of memory isn't.
 function declaresTooLarge(magick: MagickModule, bytes: Uint8Array, format: MagickFormatType): boolean {
   const image = magick.MagickImage.create();
   try {
     image.ping(bytes, new magick.MagickReadSettings({ format }));
     return image.width * image.height * 4 > ENGINE_MEMORY / 2;
-  } catch {
-    return true;
+  } catch (error) {
+    return error instanceof magick.MagickError && error.severity !== magick.MagickErrorSeverity.ResourceLimitError;
   } finally {
     image.dispose();
   }
@@ -226,14 +230,15 @@ const LIBRAW_EXCEPTIONS: Readonly<Record<number, { kind: "file" | "too-large" | 
 };
 
 // A C++ exception thrown out of the WASM build, which arrives as a bare
-// number, the address of the thrown object: LibRaw's (a RAW file cut short
-// or damaged) by its code, std::bad_alloc as memory running out. Any other,
-// thrown while reading a file, is the file's.
+// number, the address of the thrown object, as an error: LibRaw's (a RAW
+// file cut short or damaged) by its code, std::bad_alloc as memory running
+// out (a RangeError, as a JavaScript allocation's is). Any other, thrown
+// while reading a file, is the file's.
 function cppFailure(magick: MagickModule, pointer: number): Error {
   const thrown = cppException(magick, pointer);
   const libraw = thrown?.type === "17LibRaw_exceptions" ? LIBRAW_EXCEPTIONS[thrown.value] : undefined;
   if (libraw?.kind === "memory" || thrown?.type === "St9bad_alloc") {
-    return new Error(libraw?.message ?? "ImageMagick ran out of memory reading the file.", { cause: pointer });
+    return new RangeError(libraw?.message ?? "ImageMagick ran out of memory reading the file.", { cause: pointer });
   }
   if (libraw?.kind === "too-large") return tooLargeFailure(libraw.message, pointer);
   return decodeFailure(libraw?.message ?? "The picture in this file couldn't be read.", pointer);
