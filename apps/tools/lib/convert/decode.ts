@@ -150,7 +150,7 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
     return await decodeInBrowser(mime, buf);
   } catch (error) {
     if (!(error instanceof ImageLoadError)) throw error;
-    // The file is damaged if the browser decodes its format's sample.
+    // The file is damaged if the browser decodes its format (browserDecodes).
     if (await browserDecodes(e)) throw decodeFailure(error.message);
     throw noBrowserDecoder(e);
   }
@@ -178,40 +178,43 @@ async function decodeInBrowser(mime: string | undefined, buf: ArrayBuffer): Prom
   }
 }
 
-// A 1 x 1 picture in each format the browser decodes for decodeToRGBA (made
-// with ImageMagick: 8-bit, and AVIF's AV1 Main profile, which every browser
-// that shows AVIF decodes), to tell a browser with no decoder for a format
-// (AVIF before Safari 16.4) from a damaged file. TIFF has none: only Safari
-// decodes it, and the converters send it to ImageMagick.
+// A 1 x 1 picture in each format decodeToRGBA hands the browser whose
+// support differs between current browsers, to tell a browser with no
+// decoder for it from a damaged file: AVIF (not before Safari 16.4) and TIFF
+// (only Safari). Made with ImageMagick: AVIF in AV1's Main profile, which
+// every browser that shows AVIF decodes, and TIFF as 8-bit RGB, uncompressed.
+// Every current browser decodes the rest (JPEG, PNG, GIF, WebP, BMP, ICO,
+// CUR and SVG), so they have no sample: a file in one of them that won't
+// load is damaged. HEIC and HEIF go to libheif, and JPEG XL to
+// ImageMagick, never to the browser. scripts/check-browser-decoders.mjs
+// checks which Playwright engines decode each sample, and that a damaged
+// file in any format is called damaged where the browser decodes it.
 const SAMPLES: Readonly<Record<string, string>> = {
-  jpg: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAAB//EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAVAQEBAAAAAAAAAAAAAAAAAAAHCP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AD9ToUf/2Q==",
-  png: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12MwKLgAAAJEAXGkv/cwAAAAAElFTkSuQmCC",
-  gif: "R0lGODlhAQABAPAAADBw0AAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",
-  webp: "UklGRjgAAABXRUJQVlA4ICwAAADQAQCdASoBAAEAAgA0JaACdLoB+AADsAD+6zb//PTNeYP8nP/izkYjsvAAAA==",
-  bmp: "Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA0HAwAA==",
   avif: "AAAAHGZ0eXBhdmlmAAAAAG1pZjFhdmlmbWlhZgAAANZtZXRhAAAAAAAAACFoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAAAAAAA5waXRtAAAAAAABAAAAImlsb2MAAAAAREAAAQABAAAAAAD6AAEAAAAAAAAAHQAAACNpaW5mAAAAAAABAAAAFWluZmUCAAAAAAEAAGF2MDEAAAAAVmlwcnAAAAA4aXBjbwAAAAxhdjFDgQAMAAAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAABZpcG1hAAAAAAAAAAEAAQOBAgMAAAAlbWRhdBIACggYAAYICGg0IDIPGAAKKKKEAACwDGH8MILE",
-  ico: "AAABAAEAAQEAAAEAIAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAADQcDD/AAAAAA==",
-  cur: "AAACAAEAAQEAAAAAAAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAADQcDD/AAAAAA==",
-  svg: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiLz4=",
+  tiff: "SUkqAAwAAAAwcNAADwAAAQMAAQAAAAEAAAABAQMAAQAAAAEAAAACAQMAAwAAAMYAAAADAQMAAQAAAAEAAAAGAQMAAQAAAAIAAAAKAQMAAQAAAAEAAAARAQQAAQAAAAgAAAASAQMAAQAAAAEAAAAVAQMAAQAAAAMAAAAWAQMAAQAAAAEAAAAXAQQAAQAAAAMAAAAcAQMAAQAAAAEAAAApAQMAAgAAAAAAAQA+AQUAAgAAAPwAAAA/AQUABgAAAMwAAAAAAAAACAAIAAgAhetRAAAAgADD9agAAAAAAs3MTAAAAAABzcxMAAAAgADNzEwAAAAAAo/C9QAAAAAQNxqgAAAAAAIrhwoAAAAgAA==",
 };
+
+// The formats with a sample: the ones a browser may have no decoder for.
+export const SAMPLED_FORMATS: readonly string[] = Object.keys(SAMPLES);
 
 // `format`'s sample (SAMPLES), or null.
 export function browserSample(format: string): Uint8Array<ArrayBuffer> | null {
-  const sample = SAMPLES[format === "jpeg" ? "jpg" : format];
+  const sample = SAMPLES[format === "tif" ? "tiff" : format];
   return sample ? Uint8Array.from(atob(sample), (char) => char.charCodeAt(0)) : null;
 }
 
 const browserSupport = new Map<string, Promise<boolean>>();
 
 // Whether this browser decodes `format`, from its sample, decoded once.
-// Without a sample, the browser is taken to decode it.
+// Without a sample, every current browser decodes it.
 function browserDecodes(format: string): Promise<boolean> {
-  const sample = browserSample(format);
+  const name = format === "tif" ? "tiff" : format;
+  const sample = browserSample(name);
   if (!sample) return Promise.resolve(true);
-  let supported = browserSupport.get(format);
+  let supported = browserSupport.get(name);
   if (!supported) {
-    supported = decodeInBrowser(MIME_TYPES[format], sample.buffer).then(() => true, () => false);
-    browserSupport.set(format, supported);
+    supported = decodeInBrowser(MIME_TYPES[name], sample.buffer).then(() => true, () => false);
+    browserSupport.set(name, supported);
   }
   return supported;
 }

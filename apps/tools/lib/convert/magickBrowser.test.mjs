@@ -96,6 +96,12 @@ test("the wasm the site serves is the installed ImageMagick package's", () => {
   assert.ok(vendored.equals(wasm), "public/vendor/imagemagick/magick.wasm differs from @imagemagick/magick-wasm");
 });
 
+// magickBrowser.ts reads LibRaw's exceptions by their codes in this version's
+// libraw_const.h (LIBRAW_EXCEPTIONS).
+test("the wasm's LibRaw is 0.22.2, the version whose exceptions the converter reads", () => {
+  assert.ok(wasm.includes("0.22.2-Release"), "LibRaw changed: check LIBRAW_EXCEPTIONS in magickBrowser.ts against its libraw_const.h");
+});
+
 // Mean and standard deviation (0-255) of every channel, as native ImageMagick
 // reads the fixture (`magick <file> -format "%[fx:mean*255]
 // %[fx:standard_deviation*255]" info:`). Before 0.0.38 (LibRaw 0.22) this

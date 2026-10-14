@@ -15,11 +15,11 @@ import {
   tooLargeImageMessage,
   unreadableImageMessage,
 } from "./bin-image.ts";
-import { DECODE_INPUTS, browserSample } from "./decode.ts";
+import { DECODE_INPUTS, SAMPLED_FORMATS, browserSample, decodeToRGBA } from "./decode.ts";
 import { isDecodeFailure, noBrowserDecoderMessage } from "./decode-failure.ts";
 import { IMAGE_PDF_INPUTS, imageFormatOf } from "./image-pdf-inputs.ts";
 import { NO_SIGNATURE } from "./image-signature.ts";
-import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
+import { MAGICK_BROWSER_INPUTS, MAGICK_FALLBACK_INPUTS } from "./magickBrowser.ts";
 import { sfwToJpeg } from "./sfw.ts";
 import { decodeKtx1 } from "./texture-formats.ts";
 import { checkInputFile, convertWithWorker } from "./workerClient.ts";
@@ -356,23 +356,32 @@ async function onPage(decodes, run) {
   }
 }
 
-test("each format the browser decodes has a 1 x 1 sample of it, to tell a browser without its decoder", async () => {
+// The formats every current browser decodes (scripts/check-browser-decoders.mjs
+// checks each in Chromium, Firefox and WebKit): a file in one that won't load
+// is damaged, with no sample to check the browser against.
+const EVERY_BROWSER_DECODES = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "ico", "cur", "svg"];
+
+test("only a format some current browsers can't decode has a 1 x 1 sample, to tell a browser without its decoder", async () => {
   serveMagick = true;
   const magick = await import("@imagemagick/magick-wasm");
-  for (const format of [...DECODE_INPUTS, "cur"].filter((format) => !["heic", "heif", "ktx", "ktx2", "icns", "tiff"].includes(format))) {
+  assert.deepEqual(SAMPLED_FORMATS, ["avif", "tiff"]);
+  for (const format of SAMPLED_FORMATS) {
     const sample = browserSample(format);
-    assert.ok(sample, `${format} has a sample`);
-    assert.equal(binImageFormat(sample), SAME_AS[format] ?? format, format);
-    if (format === "svg") continue;
-    const name = { jpg: "jpeg", cur: "ico" }[format] ?? format;
-    const magickFormat = magick.MagickFormat[Object.keys(magick.MagickFormat).find((key) => key.toLowerCase() === name)];
+    assert.equal(binImageFormat(sample), format, format);
+    const magickFormat = magick.MagickFormat[Object.keys(magick.MagickFormat).find((key) => key.toLowerCase() === format)];
     const size = magick.ImageMagick.read(sample, magickFormat, (image) => [image.width, image.height]);
     assert.deepEqual(size, [1, 1], format);
   }
-  assert.equal(browserSample("tiff"), null, "only Safari decodes TIFF; the converters send it to ImageMagick");
+  assert.deepEqual(browserSample("tif"), browserSample("tiff"));
+  for (const format of [...DECODE_INPUTS, "cur"].filter((format) => !["heic", "heif", "ktx", "ktx2", "icns"].includes(format))) {
+    assert.ok(SAMPLED_FORMATS.includes(format) !== EVERY_BROWSER_DECODES.includes(format), `${format}: sampled, or decoded by every browser`);
+  }
+  for (const format of EVERY_BROWSER_DECODES) assert.equal(browserSample(format), null, format);
+  // On BIN pages, ImageMagick reads what a browser may not, unless it reads it anyway.
+  assert.deepEqual([...MAGICK_FALLBACK_INPUTS], SAMPLED_FORMATS.filter((format) => !MAGICK_BROWSER_INPUTS.has(format)));
 });
 
-test("a browser without a decoder for the format isn't told the file is damaged", async () => {
+test("a browser without a decoder for the format isn't told the file is damaged; one that has it is", async () => {
   serveMagick = true;
   // No AVIF decoder (Safari before 16.4): ImageMagick reads the picture
   // instead. The browser's sample is decoded once, not once a file.
@@ -385,20 +394,24 @@ test("a browser without a decoder for the format isn't told the file is damaged"
     }
     assert.equal(tried.filter((file) => sameBytes(file, avif)).length, 1);
   });
-  // A browser that decodes JPEG: a JPEG it can't load is damaged.
-  const jpeg = browserSample("jpg");
-  await onPage((file) => sameBytes(file, jpeg), async () => {
-    const cut = await failure(convertWithWorker({ worker: declined, from: "bin", to: "png", buf: buffer(bytes("sample.jpg").slice(0, 200)) }));
-    assert.equal(cut.message, unreadableImageMessage("jpg"));
-    assert.equal(cut.telemetryCode, "unreadable_image");
+  // A format every browser decodes, here a JPEG, an icon (which Safari
+  // decodes, though not every icon) and an SVG: one that won't load is
+  // damaged, with no sample tried.
+  await onPage(() => false, async (tried) => {
+    for (const [name, format, size] of [["sample.jpg", "jpg", 200], ["sample.ico", "ico", 100], ["sample.svg", "svg", 30]]) {
+      const cut = await failure(convertWithWorker({ worker: declined, from: "bin", to: "png", buf: buffer(bytes(name).slice(0, size)) }));
+      assert.equal(cut.message, unreadableImageMessage(format), format);
+      assert.equal(cut.telemetryCode, "unreadable_image");
+    }
+    assert.equal(tried.length, 3, "no sample is tried");
+    // ICO to PNG, as Safari runs it: the decoder's own message.
+    const icon = await failure(convertWithWorker({ worker: declined, from: "ico", to: "png", buf: buffer(bytes("sample.ico").slice(0, 100)) }));
+    assert.equal(icon.message, "Image decode failed.");
   });
-  // No SVG decoder, and no other engine here reads SVG.
+  // No TIFF decoder (every browser but Safari).
   await onPage(() => false, async () => {
-    const svg = text('<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"/>');
-    const none = await failure(convertWithWorker({ worker: declined, from: "bin", to: "png", buf: buffer(svg) }));
-    assert.equal(none.message, "This browser can't open SVG files; try a current Chrome, Edge, Firefox or Safari.");
-    assert.equal(none.telemetryCode, "convert_failed");
-    assert.deepEqual(none.telemetryMetadata, { engine: "bin-image", from: "bin", to: "png", format: "svg" });
+    const tiff = await failure(decodeToRGBA("tiff", buffer(bytes("sample.tif"))));
+    assert.equal(tiff.message, "This browser can't open TIFF files; try a current Chrome, Edge, Firefox or Safari.");
   });
 });
 
@@ -445,6 +458,58 @@ test("a camera RAW or DDS cut short says the picture is damaged, whatever its re
   // The engine still converts after these.
   const result = await convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.dds")) });
   assert.equal(new DataView(result.buffer).getUint32(16), 96);
+});
+
+// A C++ exception as the ImageMagick WASM build throws it: the address of
+// the thrown value (`value`), with the address of its type, whose name is
+// `type`, 20 bytes before it, where Emscripten keeps it.
+function cppException(magick, type, value) {
+  const api = magick.ImageMagick._api;
+  const block = api._malloc(64);
+  const view = new DataView(api.HEAPU8.buffer);
+  api.stringToUTF8(type, block + 40, 24);
+  view.setUint32(block + 36, block + 40, true);
+  view.setUint32(block + 4, block + 32, true);
+  view.setInt32(block + 24, value, true);
+  return { pointer: block + 24, free: () => api._free(block) };
+}
+
+test("LibRaw's exceptions mean what LibRaw 0.22.2 throws them for: a full allocation table is the file's, an empty allocation isn't", async () => {
+  serveMagick = true;
+  const magick = await import("@imagemagick/magick-wasm");
+  await convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: buffer(bytes("sample.ppm")) });
+  const { read } = magick.ImageMagick;
+  const nef = buffer(bytes("sample.nef"));
+  const cases = [
+    // LIBRAW_EXCEPTION_MEMPOOL: on a crafted or damaged file, not for want of memory.
+    ["17LibRaw_exceptions", 11, unreadableImageMessage("nef"), "unreadable_image", "The RAW file couldn't be read: it may be damaged."],
+    ["17LibRaw_exceptions", 12, unreadableImageMessage("nef"), "unreadable_image", /^The RAW file's compression can't be decoded here/],
+    ["17LibRaw_exceptions", 10, tooLargeImageMessage("nef"), "unreadable_image", "The RAW file, or the picture it declares, is too large to convert here."],
+    // LIBRAW_EXCEPTION_ALLOC and std::bad_alloc, for a file whose header declares an ordinary size: try again.
+    ["17LibRaw_exceptions", 1, binConvertFailedMessage("nef", "png"), "convert_failed", "LibRaw ran out of memory reading the RAW file."],
+    ["St9bad_alloc", 0, binConvertFailedMessage("nef", "png"), "convert_failed", "ImageMagick ran out of memory reading the file."],
+    // A crop box (7) can't be set here; any other C++ exception while reading is the file's.
+    ["17LibRaw_exceptions", 7, unreadableImageMessage("nef"), "unreadable_image", "The picture in this file couldn't be read."],
+  ];
+  try {
+    for (const [type, value, message, code, cause] of cases) {
+      const thrown = cppException(magick, type, value);
+      magick.ImageMagick.read = () => {
+        throw thrown.pointer;
+      };
+      try {
+        const error = await failure(convertWithWorker({ worker: noWorker, from: "bin", to: "png", buf: nef }));
+        assert.equal(error.message, message, `${type} ${value}`);
+        assert.equal(error.telemetryCode, code, `${type} ${value}`);
+        if (cause instanceof RegExp) assert.match(error.cause.message, cause, `${type} ${value}`);
+        else assert.equal(error.cause.message, cause, `${type} ${value}`);
+      } finally {
+        thrown.free();
+      }
+    }
+  } finally {
+    magick.ImageMagick.read = read;
+  }
 });
 
 test("a picture whose header declares a size too large to convert here says so; running out of memory doesn't", async () => {

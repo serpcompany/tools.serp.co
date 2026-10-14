@@ -55,6 +55,24 @@ Requests to other origins (analytics, ads) are blocked, and the
 uploads screenshots, page text and the Worker log as the `smoke-failure`
 artifact.
 
+## Browser decoders
+
+Before it builds the Worker, the `smoke` job runs
+`apps/tools/scripts/check-browser-decoders.mjs` in Playwright's Chromium,
+Firefox and WebKit (Safari's engine). It needs no Worker: it runs
+`lib/convert/decode.ts` in a page and checks what the converters assume.
+Each format some current browsers can't decode (AVIF, TIFF) has a 1 x 1
+sample there, which must decode in exactly the engines the script pins, so
+a damaged file is called damaged where the browser has the decoder. Every
+other format the browser decodes must decode from its fixture in every
+engine, and a file cut to 16 bytes must be called damaged. A Playwright
+update that changes an engine's formats fails it: update the pin, and the
+samples if needed.
+
+```bash
+pnpm -C apps/tools smoke:decoders [--engines chromium,webkit]
+```
+
 ## Run it locally
 
 Start a Worker with a dashboard token first:

@@ -51,10 +51,10 @@ export const MAGICK_BROWSER_INPUTS = new Set([
   "ttf", "otf",
 ]);
 
-// Formats the browser decodes that ImageMagick reads too, for a browser
-// with no decoder for one (BIN to JPG, JPEG and PNG, workerClient.ts). Not
-// SVG: this build hands it to Inkscape, which it hasn't got.
-export const MAGICK_FALLBACK_INPUTS = new Set(["avif", "bmp", "cur", "gif", "ico", "jpeg", "jpg", "png", "webp"]);
+// Formats a browser may have no decoder for (the ones with a sample in
+// decode.ts) that ImageMagick reads too, for BIN to JPG, JPEG and PNG
+// (workerClient.ts). TIFF goes to ImageMagick in the first place.
+export const MAGICK_FALLBACK_INPUTS = new Set(["avif"]);
 
 const FONT_INPUTS = new Set(["ttf", "otf"]);
 // High dynamic range inputs, encoded from linear light to sRGB (linear-light.ts).
@@ -212,21 +212,37 @@ function declaresTooLarge(magick: MagickModule, bytes: Uint8Array, format: Magic
   }
 }
 
-// LibRaw's exceptions (LibRaw_exceptions in libraw_const.h, 0.21): whether
-// each is the file's, too large, or memory, and what it says. 6, cancelled
-// by a callback, can't happen: none is set.
+// LibRaw's exceptions (LibRaw_exceptions, libraw/libraw_const.h:755-770 in
+// LibRaw 0.22.2, the version magick-wasm 0.0.42 bundles; a test fails when
+// the bundled version changes), by what LibRaw throws each for: whether it's
+// the file's, too large, or memory running out, and what it says.
+// - 1: an allocation came back empty (src/utils/utils_libraw.cpp).
+// - 2, 3, 9: a decoder found no picture data, or JPEG or JPEG 2000 data it
+//   couldn't decode.
+// - 4, 5: the file ends early, or its structure is broken.
+// - 8: the header gives values its decoder can't take.
+// - 10: the picture's data would take more than LibRaw may allocate
+//   (ImageMagick allows 8 GB), or the file is over 2 GB.
+// - 11: LibRaw's table of 512 allocations is full. libraw_const.h:75-79 says
+//   it's enough for files that aren't damaged, and overflows on crafted ones.
+// - 12: a compression LibRaw decodes only with an SDK this build hasn't got.
+// 6 (cancelled by a progress callback) and 7 (a crop box outside the
+// picture) can't happen: ImageMagick's coders/dng.c sets neither.
 const LIBRAW_EXCEPTIONS: Readonly<Record<number, { kind: "file" | "too-large" | "memory"; message: string }>> = {
   1: { kind: "memory", message: "LibRaw ran out of memory reading the RAW file." },
   2: { kind: "file", message: "The RAW file's picture couldn't be decoded: it may be damaged." },
   3: { kind: "file", message: "The RAW file's JPEG-compressed picture couldn't be decoded: it may be damaged." },
   4: { kind: "file", message: "The RAW file ends before its picture does: it may be incomplete." },
   5: { kind: "file", message: "The RAW file is damaged." },
-  7: { kind: "file", message: "The RAW file's crop area is outside its picture: it may be damaged." },
   8: { kind: "file", message: "The RAW file couldn't be read: it may be damaged." },
   9: { kind: "file", message: "The RAW file's JPEG 2000 picture couldn't be decoded: it may be damaged." },
-  10: { kind: "too-large", message: "The RAW file declares a picture too large to convert here." },
-  11: { kind: "memory", message: "LibRaw ran out of memory reading the RAW file." },
-  12: { kind: "file", message: "The RAW file is in a format LibRaw doesn't read, or it is damaged." },
+  10: { kind: "too-large", message: "The RAW file, or the picture it declares, is too large to convert here." },
+  11: { kind: "file", message: "The RAW file couldn't be read: it may be damaged." },
+  12: {
+    kind: "file",
+    message:
+      "The RAW file's compression can't be decoded here (Nikon's High Efficiency RAW, or a JPEG XL or GoPro DNG), or the file is damaged.",
+  },
 };
 
 // A C++ exception thrown out of the WASM build, which arrives as a bare

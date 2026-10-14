@@ -52,7 +52,8 @@ jobs:
       - name: Run deterministic production check
         run: pnpm check
 
-  # Builds the real Worker, applies every migration to a fresh local D1 with
+  # Checks the browsers' image decoders in Chromium, Firefox and WebKit, then
+  # builds the real Worker, applies every migration to a fresh local D1 with
   # Wrangler (as staging and production do), and drives the critical tools in
   # Chromium, including the telemetry write and dashboard read paths.
   smoke:
@@ -78,8 +79,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install pinned browser runtime
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install pinned browser runtimes
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      # Which formats each engine's image decoders read, as
+      # lib/convert/decode.ts assumes (docs/runbooks/browser-smoke.md).
+      - name: Check the browsers' image decoders
+        run: pnpm -C apps/tools smoke:decoders
 
       - name: Build the Worker with the local config
         run: pnpm -C apps/tools cf:build
