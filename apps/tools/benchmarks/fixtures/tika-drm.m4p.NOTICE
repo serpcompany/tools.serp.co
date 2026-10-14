@@ -1,0 +1,17 @@
+tika-drm.m4p is testMP4_drm_frma.m4a from Apache Tika's test documents, renamed.
+
+Source: https://github.com/apache/tika/blob/7cb848a1ac9c3374ebaa909225ba2185a54ae074/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-audiovideo-module/src/test/resources/test-documents/testMP4_drm_frma.m4a
+Commit: 7cb848a1ac9c3374ebaa909225ba2185a54ae074 (the file was added in 9cad39e1d58423084d8d0bb0667d7459a2491e7e)
+Size: 664 bytes. Git blob: b2211d3cb3bf8c85f8b76003006a49ab8e8c4c3b.
+SHA-256: 44f7f209a312071df44cb17c2bd75302eb93afa573fb9c16691c3d652cfae76b
+
+It is used unchanged, as test data only. Licensed under the Apache License,
+Version 2.0: https://www.apache.org/licenses/LICENSE-2.0
+
+Apache Tika's NOTICE:
+
+  Apache Tika
+  Copyright 2007-2026 The Apache Software Foundation
+
+  This product includes software developed at
+  The Apache Software Foundation (http://www.apache.org/).

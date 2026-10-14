@@ -16,6 +16,7 @@ import {
   countStatuses,
   decodeTableOutput,
   decodeTableOutputs,
+  EXPECTED_REFUSALS,
   ffmpegError,
   hasSignature,
   loadFixtures,
@@ -26,6 +27,7 @@ import {
   pageComponent,
   parseArgs,
   planTool,
+  refusalProblem,
   renderSummary,
   scanPageHandlers,
   selectRuns,
@@ -34,6 +36,7 @@ import {
   thrownError,
   topColour,
   treeIsDirty,
+  withRefusals,
 } from "../scripts/lib/tool-sweep.mjs";
 import { writeTableOutput } from "./convert/table-outputs.ts";
 
@@ -603,6 +606,65 @@ test("planTool picks a driver and fixture, or says why a Tool isn't run", () => 
   assert.match(skipped({ id: "mp3-to-transcript", route: "/mp3-to-transcript", operation: "convert", from: "mp3", to: "txt" }), /transcription/);
   assert.match(skipped({ id: "video-editor", route: "/video-editor", operation: "video-editor" }), /placeholder/);
   assert.match(skipped({ id: "pdf-reader", route: "/pdf-reader", operation: "view", from: "pdf", to: "pdf" }), /viewer/);
+});
+
+test("a format's refusal fixtures run on its converter pages, each with the message it must show", () => {
+  const fixtures = {
+    byFormat: new Map([["bin", "/f/sample.bin"], ["csv", "/f/sample.csv"]]),
+    byTool: new Map(),
+    refusals: new Map([["bin", ["/f/not-an-image.bin"]], ["csv", ["/f/not-an-image.bin"]]]),
+  };
+  const options = { handlers: new Map([["/csv-to-json", "TableConvertLanding"]]), fixtures, timeoutMs: 60, ffmpegTimeoutMs: 180 };
+  const binTool = { id: "bin-to-png", route: "/bin-to-png", operation: "convert", from: "bin", to: "png" };
+  const bin = planTool(binTool, options);
+  assert.equal(bin.engine, "bin-image");
+  assert.deepEqual(bin.refusals, [{ fixture: "/f/not-an-image.bin", errorCode: "not_an_image", message: "isn't an image" }]);
+  // Only the generic converter page is driven with one.
+  const table = planTool({ id: "csv-to-json", route: "/csv-to-json", operation: "convert", from: "csv", to: "json" }, options);
+  assert.deepEqual(table.refusals, []);
+  // A refusal with no expected message would prove nothing.
+  const unknown = planTool(binTool, { ...options, fixtures: { ...fixtures, refusals: new Map([["bin", ["/f/other.bin"]]]) } });
+  assert.equal(unknown.status, "no_fixture");
+  assert.match(unknown.reason, /other\.bin in EXPECTED_REFUSALS/);
+});
+
+test("every refusal fixture in fixture-matrix.json exists and has its expected message", () => {
+  const listed = [...loadFixtures(benchmarksDir).refusals.values()].flat();
+  assert.deepEqual(listed.map((file) => path.basename(file)).sort(), Object.keys(EXPECTED_REFUSALS).sort());
+  for (const file of listed) assert.ok(readFileSync(file).length > 0, file);
+});
+
+test("a refusal passes only with the expected message, and code when the event was seen", () => {
+  const expected = { fixture: "/f/tika-drm.m4p", errorCode: "copy_protected", message: "copy-protected" };
+  const message = "This M4P file is copy-protected (Apple's FairPlay), so it can't be converted to MP3.";
+  assert.equal(refusalProblem({ outcome: "failed", message, errorCode: "copy_protected" }, expected), null);
+  assert.equal(refusalProblem({ outcome: "failed", message, errorCode: null }, expected), null);
+  assert.equal(
+    refusalProblem({ outcome: "completed", outputs: [{ name: "a.mp3" }] }, expected),
+    'expected a refusal saying "copy-protected", but it converted the file (1 saved)',
+  );
+  assert.equal(
+    refusalProblem({ outcome: "failed", message: "FFmpeg failed with exit code 1", errorCode: "convert_failed" }, expected),
+    'expected a refusal saying "copy-protected", but it failed with: FFmpeg failed with exit code 1',
+  );
+  assert.match(refusalProblem({ outcome: "failed", message, errorCode: "convert_failed" }, expected), /telemetry code was convert_failed$/);
+  assert.match(refusalProblem({ outcome: "timeout", message: "no result after 180 s" }, expected), /, but no result after 180 s$/);
+  assert.match(refusalProblem({ outcome: "error", message: "harness: upload: closed" }, expected), /, but harness: upload: closed$/);
+});
+
+test("a Tool that converts its fixture but doesn't refuse an input fails, and its refusals are recorded", () => {
+  const pass = { status: "pass", error: null, formatCheck: "signature", topColourShare: 0.5 };
+  assert.deepEqual(withRefusals(pass, []), pass);
+  const message = "This M4P file is copy-protected";
+  const refused = [{ fixture: "/f/tika-drm.m4p", errorCode: "copy_protected", message, problem: null }];
+  assert.deepEqual(withRefusals(pass, refused), { ...pass, refusals: [{ fixture: "tika-drm.m4p", message }] });
+  const problem = 'expected a refusal saying "copy-protected", but it converted the file (1 saved)';
+  const converted = [{ fixture: "/f/tika-drm.m4p", errorCode: "copy_protected", message: undefined, problem }];
+  const failed = withRefusals(pass, converted);
+  assert.deepEqual([failed.status, failed.error, failed.topColourShare], ["error", `tika-drm.m4p: ${problem}`, undefined]);
+  assert.deepEqual(failed.refusals, [{ fixture: "tika-drm.m4p", problem }]);
+  // Any other verdict stands.
+  assert.equal(withRefusals({ status: "timeout", error: "no result" }, converted).error, "no result");
 });
 
 test("parseArgs takes defaults, validates numbers and refuses non-local targets", () => {

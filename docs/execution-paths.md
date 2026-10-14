@@ -19,7 +19,11 @@ Conversion picks an engine by input format:
   It is single-threaded (`NEXT_PUBLIC_FFMPEG_SINGLE_THREAD`) because the worker
   scripts don't send the COEP headers the multi-threaded build needs. Its 32 MB
   wasm is too big for Workers Static Assets, so it loads from
-  `NEXT_PUBLIC_ASSETS_BASE_URL`.
+  `NEXT_PUBLIC_ASSETS_BASE_URL`. An M4P protected by Apple's FairPlay (Apple
+  Music downloads, older iTunes Store songs) is refused before FFmpeg loads
+  (`lib/convert/fairplay.ts`, since #267), since FFmpeg can't decrypt it. A
+  `drms` or `drmi` sample entry, Common Encryption's `enca` or `encv`, or a
+  `sinf` box inside an entry marks one.
 - **Video sizes** (`lib/convert/ffmpeg-args.ts`, since #245): a video output
   that FFmpeg.wasm writes keeps the source's frame size and frame rate, up to
   1920 px on the longer side and 30 fps. A smaller frame isn't scaled up, a
@@ -161,6 +165,13 @@ Conversion picks an engine by input format:
   test checks the worker and core match the installed packages. JPG and PNG to
   DOCX writes a Word page showing the image at up to the 6.5-inch text width,
   with the `docx` library.
+- **BIN** (`lib/convert/bin-image.ts`, since #267): a .bin file is read as
+  the image its first bytes say it is (`lib/convert/image-signature.ts`:
+  JPEG, PNG, GIF, WebP, BMP, TIFF, ICO, AVIF, HEIC, PSD, JPEG XL, JPEG 2000,
+  EXR, HDR, XCF, DDS or ICNS) and converted by that format's engine below.
+  Any other file is refused from its first 64 bytes, before the page reads
+  the rest, so a disc image of gigabytes is refused at once; a picture that
+  doesn't decode is reported as damaged.
 - **Other images:** `workers/convert.worker.js` decodes with the browser and
   encodes with a canvas, retrying on the main thread if the worker fails.
   ImageMagick writes the formats a canvas can't, fitting ICO and CUR inside

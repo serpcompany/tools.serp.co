@@ -167,6 +167,8 @@ test("the sweep note says why a Tool failed, why it wasn't run, or how a pass wa
   const reason = "coming-soon placeholder: nothing to run";
   assert.equal(sweepNote({ status: "skipped", reason }), reason);
   assert.equal(sweepNote({ status: "pass", formatCheck: "signature" }), "format check: signature");
+  const refusals = [{ fixture: "tika-drm.m4p", message: "This M4P file is copy-protected" }];
+  assert.equal(sweepNote({ status: "pass", formatCheck: "signature", refusals }), "format check: signature; refuses tika-drm.m4p");
 });
 
 test("a row's commit is its own, shortened, with -dirty for a run with uncommitted changes", () => {

@@ -189,7 +189,8 @@ const COMPRESSION_ENGINES = {
 };
 
 // The engine the generic converter page uses for a Tool: Image to PDF's own
-// (lib/convert/image-pdf.ts, any image in), the branch order of
+// (lib/convert/image-pdf.ts, any image in), BIN's (the picture inside, by
+// its first bytes), the branch order of
 // compressFile and convertUnchecked in lib/convert/workerClient.ts, the AV1
 // and HEVC Tools of lib/convert/webcodecs.ts, and the server-only outputs of
 // shouldUseServerConversion in lib/convert/video.ts. Those try
@@ -210,6 +211,8 @@ export function converterEngine({ operation, from, to }) {
   if (isImageTextConversion(source, target)) return target === "txt" ? "tesseract" : "docx";
   if (isTableImageConversion(source, target)) return "table-outputs";
   if (isDocumentImageConversion(source, target)) return DOCUMENT_IMAGE_ENGINES[source];
+  // The picture in a .bin is read by its format's engine (bin-image.ts).
+  if (source === "bin") return "bin-image";
   if (MAGICK_BROWSER_INPUTS.has(source)) return "imagemagick-wasm";
   if (source === "heic" || source === "heif") return "heif-decoder";
   if (usesWebCodecs(source, target)) return "ffmpeg-wasm + webcodecs";
@@ -256,6 +259,7 @@ export const ENGINE_LOCATIONS = {
   "viz-js": "client-only",
   "xlsx-table": "client-only",
   "pptx-glimpse": "client-only",
+  "bin-image": "client-only",
   svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",
@@ -318,20 +322,35 @@ export const PAGE_COUNTS = {
   "sample-deck.pptx": 2,
 };
 
-// fixture-matrix.json: ready inputs by format, and per-Tool fixtures.
+// Inputs a Tool must refuse, by fixture name: the telemetry code of the
+// refusal and words its message must hold. A format's `refusals` in
+// fixture-matrix.json lists them; each Tool that reads the format is run once
+// more with each, after its own fixture, and must show that message rather
+// than convert the file or fail some other way.
+export const EXPECTED_REFUSALS = {
+  // A raw CD sector: a .bin that isn't a picture (lib/convert/bin-image.ts).
+  "not-an-image.bin": { errorCode: "not_an_image", message: "isn't an image" },
+  // Apache Tika's FairPlay test file (lib/convert/fairplay.ts).
+  "tika-drm.m4p": { errorCode: "copy_protected", message: "copy-protected" },
+};
+
+// fixture-matrix.json: ready inputs by format, per-Tool fixtures, and the
+// inputs each format's Tools must refuse.
 export function loadFixtures(benchmarksDir) {
   const matrix = JSON.parse(readFileSync(path.join(benchmarksDir, "fixture-matrix.json"), "utf8"));
   const resolve = (relative) => path.join(benchmarksDir, relative);
   const byFormat = new Map();
+  const refusals = new Map();
   for (const entry of matrix.formats ?? []) {
     if (entry.status === "ready" && entry.fixture) byFormat.set(entry.format, resolve(entry.fixture));
+    if (entry.refusals?.length) refusals.set(entry.format, entry.refusals.map(resolve));
   }
   const byTool = new Map();
   for (const [toolId, entry] of Object.entries(matrix.toolFixtures ?? {})) {
     const files = entry.fixtures ?? (entry.fixture ? [entry.fixture] : []);
     if (files.length) byTool.set(toolId, files.map(resolve));
   }
-  return { byFormat, byTool };
+  return { byFormat, byTool, refusals };
 }
 
 // Everything the sweep needs to know about one Tool before opening it. A plan
@@ -359,11 +378,18 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
   if (markers.some((marker) => !marker)) {
     return { ...base, status: "no_fixture", reason: `no data marker for the ${tool.from} fixture in TEXT_MARKERS` };
   }
+  // Only the generic converter page is driven with a refusal.
+  const refusals = driver === "file" ? (fixtures.refusals?.get(tool.from) ?? []) : [];
+  const unexpected = refusals.find((file) => !EXPECTED_REFUSALS[path.basename(file)]);
+  if (unexpected) {
+    return { ...base, status: "no_fixture", reason: `no expected refusal for ${path.basename(unexpected)} in EXPECTED_REFUSALS` };
+  }
   const slow = engine.includes("ffmpeg-wasm");
   return {
     ...base,
     driver,
     fixtures: files,
+    refusals: refusals.map((file) => ({ fixture: file, ...EXPECTED_REFUSALS[path.basename(file)] })),
     markers,
     pixelCheck: checksPixels(tool.to) && !files.some((file) => ONE_COLOUR_FIXTURES.has(path.basename(file))),
     pages: checksPixels(tool.to) && files.length === 1 ? PAGE_COUNTS[path.basename(files[0])] : undefined,
@@ -592,6 +618,41 @@ export function classifyRun(observation, { to, markers = [], pixelCheck = false,
   return { status: "pass", error: null, formatCheck, topColourShare };
 }
 
+// A run with an input the Tool must refuse (EXPECTED_REFUSALS) -> null when
+// the page refused it with the expected message, else what happened
+// instead. `expected`: { fixture, errorCode, message }. The telemetry code is
+// checked when the page's event was seen.
+export function refusalProblem(observation, expected) {
+  const shown = observation.message?.trim() || null;
+  const want = `a refusal saying "${expected.message}"`;
+  if (observation.outcome === "completed") {
+    return `expected ${want}, but it converted the file (${observation.outputs?.length ?? 0} saved)`;
+  }
+  if (observation.outcome === "timeout") return `expected ${want}, but ${shown ?? "nothing happened before the timeout"}`;
+  if (observation.outcome !== "failed") return `expected ${want}, but ${shown ?? `the run ended with ${observation.outcome}`}`;
+  if (!shown?.includes(expected.message)) return `expected ${want}, but it failed with: ${shown ?? "no message"}`;
+  if (observation.errorCode && observation.errorCode !== expected.errorCode) {
+    return `expected ${want} (${expected.errorCode}), but its telemetry code was ${observation.errorCode}`;
+  }
+  return null;
+}
+
+// A run's verdict with its refusal runs: each refusal's fixture and message,
+// or what went wrong. A Tool that converts its fixture but doesn't refuse
+// an input it must fails as an error; any other verdict stands.
+export function withRefusals(verdict, refusals) {
+  if (!refusals.length) return verdict;
+  const recorded = refusals.map(({ fixture, problem, message }) => ({
+    fixture: path.basename(fixture),
+    ...(problem ? { problem } : { message }),
+  }));
+  const failed = recorded.find((refusal) => refusal.problem);
+  if (verdict.status === "pass" && failed) {
+    return { ...verdict, status: "error", error: `${failed.fixture}: ${failed.problem}`, topColourShare: undefined, refusals: recorded };
+  }
+  return { ...verdict, refusals: recorded };
+}
+
 // Opens a table output the way a visitor's app would, and returns the text it
 // holds: an XLSX's cells (a ZIP with a workbook and a worksheet), a PDF's
 // text (pdf.js, at least one page), an Avro container's records, or a
@@ -763,6 +824,7 @@ export function sweepRow(plan, result, { commit, dirty }) {
     detail: result.detail,
     formatCheck: result.formatCheck,
     topColourShare: result.topColourShare,
+    refusals: result.refusals,
     fixture: plan.fixtures?.map((file) => path.basename(file)).join(","),
     output: result.output,
     blocked: result.blocked?.length ? result.blocked : undefined,

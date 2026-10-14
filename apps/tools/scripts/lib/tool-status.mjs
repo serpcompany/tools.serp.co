@@ -140,10 +140,15 @@ export function processingLocation(tool, sweepRow) {
 const oneLine = (text) => String(text ?? "").replace(/\s+/g, " ").trim();
 
 // The error and FFmpeg's reason for a failure, why a Tool wasn't run, or how
-// a pass was checked.
+// a pass was checked: its output's format, and the inputs it refused.
 export function sweepNote(sweepRow) {
   if (!sweepRow) return "";
-  if (sweepRow.status === "pass") return sweepRow.formatCheck ? `format check: ${sweepRow.formatCheck}` : "";
+  if (sweepRow.status === "pass") {
+    const refused = sweepRow.refusals?.map((refusal) => refusal.fixture).join(", ");
+    return [sweepRow.formatCheck && `format check: ${sweepRow.formatCheck}`, refused && `refuses ${refused}`]
+      .filter(Boolean)
+      .join("; ");
+  }
   if (sweepRow.error) return oneLine(`${sweepRow.error}${sweepRow.detail ? ` [${sweepRow.detail}]` : ""}`);
   return oneLine(sweepRow.reason);
 }

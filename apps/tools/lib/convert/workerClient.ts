@@ -7,8 +7,10 @@ import {
   isImageTextConversion,
   isTableImageConversion,
 } from "./image-document-targets.ts";
+import { BIN_HEAD_BYTES, binImageFormat, notAnImageMessage, unreadableImageMessage } from "./bin-image.ts";
 import { decodeToRGBA } from "./decode.ts";
 import { encodeFromRGBA } from "./encode.ts";
+import { copyProtectedMessage, isCopyProtected } from "./fairplay.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
 import { checkOutputFormat } from "./output-format.ts";
 import { usesWebCodecs } from "./webcodecs.ts";
@@ -177,9 +179,56 @@ export async function convertWithWorker(args: ConvertArgs): Promise<ConversionRe
   return result;
 }
 
+// Refuses a file its Tool can't convert from its first bytes, before the
+// page reads it whole: a .bin that holds no image may be a disc image of
+// several gigabytes. convertWithWorker checks the same again.
+export async function checkInputFile(file: Blob, from: string, to: string): Promise<void> {
+  if (from.toLowerCase() !== "bin") return;
+  binFormatOrRefuse(new Uint8Array(await file.slice(0, BIN_HEAD_BYTES).arrayBuffer()), to.toLowerCase());
+}
+
+function binFormatOrRefuse(bytes: Uint8Array, to: string): string {
+  const format = binImageFormat(bytes);
+  if (!format) {
+    throw createTelemetryError("not_an_image", notAnImageMessage(to), { from: "bin", to, engine: "bin-image" });
+  }
+  return format;
+}
+
+// A picture saved with a .bin name, converted as the format its first bytes
+// say (bin-image.ts). One that doesn't convert is reported as a damaged
+// picture, whatever the engine's own error was.
+async function convertBinImage(args: ConvertArgs): Promise<ConversionResult> {
+  const to = args.to.toLowerCase();
+  const format = binFormatOrRefuse(new Uint8Array(args.buf), to);
+  try {
+    return await convertUnchecked({ ...args, from: format });
+  } catch (error) {
+    const unreadable = createTelemetryError("unreadable_image", unreadableImageMessage(format), {
+      from: "bin",
+      to,
+      format,
+      engine: "bin-image",
+    });
+    unreadable.cause = error;
+    throw unreadable;
+  }
+}
+
 async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
   const fromExt = args.from.toLowerCase();
   const toExt = args.to.toLowerCase();
+  if (fromExt === "bin") {
+    return convertBinImage(args);
+  }
+  // FFmpeg can't decrypt a FairPlay-protected M4P (fairplay.ts).
+  if (fromExt === "m4p" && isCopyProtected(new Uint8Array(args.buf))) {
+    throw createTelemetryError("copy_protected", copyProtectedMessage(toExt), {
+      from: "m4p",
+      to: toExt,
+      engine: "ffmpeg-wasm",
+    });
+  }
   if (fromExt === "ai") {
     return convertAi(args.buf, toExt, args.quality);
   }
