@@ -158,12 +158,27 @@ const nextConfig = {
   },
   outputFileTracingRoot: tracingRoot,
   outputFileTracingIncludes,
-  webpack(config) {
+  webpack(config, { isServer, webpack }) {
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
     // pptx-glimpse's browser build (PPTX to an image, lib/convert/pptx.worker.ts).
     // Its exports name it under a "browser" condition this build doesn't use,
     // and its Node build imports Node-only modules.
     config.resolve.alias = { ...config.resolve.alias, "pptx-glimpse$": pptxGlimpseBrowser };
+    if (!isServer) {
+      // svgicons2svgfont and yerror, which SVG to TTF runs in the browser
+      // (lib/convert/svg-font.ts), import Node's modules by "node:" names,
+      // which this build can't read. They get Next's browser stand-ins for
+      // stream, path and os, and no file system: only svgicons2svgfont's
+      // folder helpers use it, and SVG to TTF never calls them.
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(/^node:(fs|os|path|stream)$/, (resource) => {
+          if (/[\\/](svgicons2svgfont|yerror)[\\/]/.test(resource.contextInfo?.issuer ?? "")) {
+            resource.request = resource.request.slice("node:".length);
+          }
+        }),
+      );
+      config.resolve.fallback = { ...config.resolve.fallback, fs: false };
+    }
     config.output = { ...config.output, hashFunction: "sha256" };
     return config;
   },
