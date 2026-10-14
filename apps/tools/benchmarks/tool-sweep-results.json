@@ -3,14 +3,14 @@
     "issue": "https://github.com/serpcompany/tools.serp.co/issues/147",
     "command": "pnpm -C apps/tools tool-sweep",
     "baseUrl": "http://localhost:8812",
-    "commit": "a038936bb5a27dbe75d73390aec6bb1bac8aea49",
-    "activeTools": 2530,
+    "commit": "09e964c078f7a7f2e32ba3b328f0f1a05997eece",
+    "activeTools": 2529,
     "counts": {
       "pass": 2100,
       "wrong_format": 0,
       "error": 65,
       "timeout": 0,
-      "no_fixture": 50,
+      "no_fixture": 49,
       "skipped": 315
     },
     "runs": [
@@ -3777,6 +3777,26 @@
           "pptx-to-png"
         ],
         "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "09e964c078f7a7f2e32ba3b328f0f1a05997eece",
+        "dirty": false,
+        "startedAt": "2026-10-14T05:29:39.127Z",
+        "finishedAt": "2026-10-14T05:29:42.754Z",
+        "wallMs": 3627,
+        "measured": 5,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "bin-to-jpg",
+          "bin-to-jpeg",
+          "bin-to-png",
+          "m4p-to-mp3",
+          "image-to-pdf"
+        ],
+        "browserVersion": "143.0.7499.4"
       }
     ]
   },
@@ -4132,9 +4152,9 @@
     {"id":"avif-to-webp","route":"/avif-to-webp","from":"avif","to":"webp","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1046,"formatCheck":"signature","fixture":"sample.avif","output":{"files":1,"bytes":586,"name":"sample.webp"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"avif-to-xbm","route":"/avif-to-xbm","from":"avif","to":"xbm","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1188,"formatCheck":"none","fixture":"sample.avif","output":{"files":1,"bytes":7266,"name":"sample.xbm"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"batch-compress-png","route":"/batch-compress-png","from":"png","to":"png","handler":"BatchHeroConverter","engine":"jsquash-worker","status":"pass","durationMs":1256,"formatCheck":"signature","fixture":"sample.png,sample-2.png","output":{"files":2,"bytes":222,"name":"sample_compressed.png","inputBytes":571},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
-    {"id":"bin-to-jpeg","route":"/bin-to-jpeg","from":"bin","to":"jpeg","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":953,"formatCheck":"signature","fixture":"sample.bin","output":{"files":1,"bytes":816,"name":"sample.jpeg"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
-    {"id":"bin-to-jpg","route":"/bin-to-jpg","from":"bin","to":"jpg","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":821,"formatCheck":"signature","fixture":"sample.bin","output":{"files":1,"bytes":816,"name":"sample.jpg"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
-    {"id":"bin-to-png","route":"/bin-to-png","from":"bin","to":"png","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":746,"formatCheck":"signature","fixture":"sample.bin","output":{"files":1,"bytes":536,"name":"sample.png"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
+    {"id":"bin-to-jpeg","route":"/bin-to-jpeg","from":"bin","to":"jpeg","handler":"ToolPageRenderer","engine":"bin-image","status":"pass","durationMs":2688,"formatCheck":"signature","topColourShare":0.24,"refusals":[{"fixture":"not-an-image.bin","message":"This file isn't an image, so it can't become a JPEG. Only pictures saved as .bin files convert, such as Outlook's ATT00001.bin attachments."}],"fixture":"sample-heic.bin","output":{"files":1,"bytes":1277,"name":"sample-heic.jpeg"},"commit":"09e964c078f7a7f2e32ba3b328f0f1a05997eece","dirty":false},
+    {"id":"bin-to-jpg","route":"/bin-to-jpg","from":"bin","to":"jpg","handler":"ToolPageRenderer","engine":"bin-image","status":"pass","durationMs":2715,"formatCheck":"signature","refusals":[{"fixture":"not-an-image.bin","message":"This file isn't an image, so it can't become a JPG. Only pictures saved as .bin files convert, such as Outlook's ATT00001.bin attachments."}],"fixture":"sample.bin","output":{"files":1,"bytes":816,"name":"sample.jpg"},"commit":"09e964c078f7a7f2e32ba3b328f0f1a05997eece","dirty":false},
+    {"id":"bin-to-png","route":"/bin-to-png","from":"bin","to":"png","handler":"ToolPageRenderer","engine":"bin-image","status":"pass","durationMs":2708,"formatCheck":"signature","topColourShare":0.25,"refusals":[{"fixture":"not-an-image.bin","message":"This file isn't an image, so it can't become a PNG. Only pictures saved as .bin files convert, such as Outlook's ATT00001.bin attachments."}],"fixture":"sample-tiff.bin","output":{"files":1,"bytes":1122,"name":"sample-tiff.png"},"commit":"09e964c078f7a7f2e32ba3b328f0f1a05997eece","dirty":false},
     {"id":"bmp-to-bmp","route":"/bmp-to-bmp","from":"bmp","to":"bmp","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1088,"formatCheck":"signature","fixture":"sample.bmp","output":{"files":1,"bytes":37002,"name":"sample.bmp"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"bmp-to-cur","route":"/bmp-to-cur","from":"bmp","to":"cur","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1284,"formatCheck":"signature","fixture":"sample.bmp","output":{"files":1,"bytes":38078,"name":"sample.cur"},"commit":"7bfa8558c8c9ef0aa66edfd1a2ce01adfce108c6","dirty":false},
     {"id":"bmp-to-dds","route":"/bmp-to-dds","from":"bmp","to":"dds","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1504,"formatCheck":"signature","fixture":"sample.bmp","output":{"files":1,"bytes":9344,"name":"sample.dds"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
@@ -4971,7 +4991,7 @@
     {"id":"ico-to-webp","route":"/ico-to-webp","from":"ico","to":"webp","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1410,"formatCheck":"signature","fixture":"sample.ico","output":{"files":1,"bytes":586,"name":"sample.webp"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"ico-to-xbm","route":"/ico-to-xbm","from":"ico","to":"xbm","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1421,"formatCheck":"none","fixture":"sample.ico","output":{"files":1,"bytes":7266,"name":"sample.xbm"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"image-editor","route":"/image-editor","from":"image","to":"image","handler":"ToolPlaceholder","engine":null,"status":"skipped","reason":"coming-soon placeholder: nothing to run","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
-    {"id":"image-to-pdf","route":"/image-to-pdf","from":"image","to":"pdf","handler":"ToolPageRenderer","engine":"image-pdf","status":"pass","durationMs":1798,"formatCheck":"signature","fixture":"sample.png","output":{"files":1,"bytes":973,"name":"sample.pdf"},"commit":"97397f36eb26beb8f21741f8cda125549dcbed62","dirty":false},
+    {"id":"image-to-pdf","route":"/image-to-pdf","from":"image","to":"pdf","handler":"ToolPageRenderer","engine":"image-pdf","status":"pass","durationMs":1755,"formatCheck":"signature","fixture":"sample.png","output":{"files":1,"bytes":973,"name":"sample.pdf"},"commit":"09e964c078f7a7f2e32ba3b328f0f1a05997eece","dirty":false},
     {"id":"jfif-to-ico","route":"/jfif-to-ico","from":"jfif","to":"ico","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1481,"formatCheck":"signature","fixture":"sample.jfif","output":{"files":1,"bytes":38078,"name":"sample.ico"},"commit":"7bfa8558c8c9ef0aa66edfd1a2ce01adfce108c6","dirty":false},
     {"id":"jfif-to-jpeg","route":"/jfif-to-jpeg","from":"jfif","to":"jpeg","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1110,"formatCheck":"signature","fixture":"sample.jfif","output":{"files":1,"bytes":816,"name":"sample.jpeg"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"jfif-to-jpg","route":"/jfif-to-jpg","from":"jfif","to":"jpg","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":812,"formatCheck":"signature","fixture":"sample.jfif","output":{"files":1,"bytes":816,"name":"sample.jpg"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
@@ -5144,7 +5164,7 @@
     {"id":"m4a-to-wav","route":"/m4a-to-wav","from":"m4a","to":"wav","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":1422,"formatCheck":"signature","fixture":"sample.m4a","output":{"files":1,"bytes":90190,"name":"sample.wav"},"commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"m4a-to-wma","route":"/m4a-to-wma","from":"m4a","to":"wma","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":1801,"formatCheck":"none","fixture":"sample.m4a","output":{"files":1,"bytes":35894,"name":"sample.wma"},"commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"m4b-to-mp3","route":"/m4b-to-mp3","from":"m4b","to":"mp3","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":1917,"formatCheck":"signature","fixture":"sample.m4b","output":{"files":1,"bytes":26474,"name":"sample.mp3"},"commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
-    {"id":"m4p-to-mp3","route":"/m4p-to-mp3","from":"m4p","to":"mp3","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":1333,"formatCheck":"signature","fixture":"sample.m4p","output":{"files":1,"bytes":26474,"name":"sample.mp3"},"commit":"1b2ec9e0832c8da5ace51edd5547eb8260ee530b","dirty":false},
+    {"id":"m4p-to-mp3","route":"/m4p-to-mp3","from":"m4p","to":"mp3","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":1643,"formatCheck":"signature","refusals":[{"fixture":"tika-drm.m4p","message":"This M4P file is copy-protected by Apple (FairPlay), so it can't be converted to MP3. Only unprotected M4P files convert."}],"fixture":"sample.m4p","output":{"files":1,"bytes":26474,"name":"sample.mp3"},"commit":"09e964c078f7a7f2e32ba3b328f0f1a05997eece","dirty":false},
     {"id":"m4r-to-aac","route":"/m4r-to-aac","from":"m4r","to":"aac","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":1784,"formatCheck":"none","fixture":"sample.m4r","output":{"files":1,"bytes":16005,"name":"sample.aac"},"commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"m4r-to-aiff","route":"/m4r-to-aiff","from":"m4r","to":"aiff","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":1537,"formatCheck":"signature","fixture":"sample.m4r","output":{"files":1,"bytes":90166,"name":"sample.aiff"},"commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"m4r-to-alac","route":"/m4r-to-alac","from":"m4r","to":"alac","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":1904,"formatCheck":"none","fixture":"sample.m4r","output":{"files":1,"bytes":68089,"name":"sample.alac"},"commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
@@ -5964,7 +5984,6 @@
     {"id":"rw2-to-webp","route":"/rw2-to-webp","from":"rw2","to":"webp","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":3204,"formatCheck":"signature","topColourShare":0.0749,"fixture":"sample.rw2","output":{"files":1,"bytes":771720,"name":"sample.webp"},"commit":"3999147a6911b81ab8eddb2450c85cf98664c936","dirty":false},
     {"id":"sfw-to-jpeg","route":"/sfw-to-jpeg","from":"sfw","to":"jpeg","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1652,"formatCheck":"signature","topColourShare":0.1591,"fixture":"sample.sfw","output":{"files":1,"bytes":42079,"name":"sample.jpeg"},"commit":"c2d1a16dbe7db763d81f85804950039a035f2aa9","dirty":false},
     {"id":"sfw-to-jpg","route":"/sfw-to-jpg","from":"sfw","to":"jpg","handler":"ToolPageRenderer","engine":"imagemagick-wasm","status":"pass","durationMs":1664,"formatCheck":"signature","topColourShare":0.1591,"fixture":"sample.sfw","output":{"files":1,"bytes":42079,"name":"sample.jpg"},"commit":"c2d1a16dbe7db763d81f85804950039a035f2aa9","dirty":false},
-    {"id":"sk-to-jpg","route":"/sk-to-jpg","from":"sk","to":"jpg","handler":"ToolPageRenderer","engine":"browser-raster","status":"no_fixture","reason":"no ready sk fixture in fixture-matrix.json","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"sql-to-csv","route":"/sql-to-csv","from":"sql","to":"csv","handler":"TableConvertLanding","engine":"table-convert","status":"pass","durationMs":794,"formatCheck":"content","fixture":"sample.sql","output":{"files":1,"bytes":27,"name":"sample.csv"},"commit":"3570a3077b3b908d3a15a454102e6a622bf69270","dirty":false},
     {"id":"sql-to-markdown","route":"/sql-to-markdown","from":"sql","to":"markdown","handler":"TableConvertLanding","engine":"table-convert","status":"pass","durationMs":677,"formatCheck":"content","fixture":"sample.sql","output":{"files":1,"bytes":71,"name":"sample.md"},"commit":"3570a3077b3b908d3a15a454102e6a622bf69270","dirty":false},
     {"id":"svg-to-ai","route":"/svg-to-ai","from":"svg","to":"ai","handler":"ToolPageRenderer","engine":"image-documents","status":"pass","durationMs":835,"formatCheck":"signature","fixture":"sample.svg","output":{"files":1,"bytes":3270,"name":"sample.ai"},"commit":"83d6a2cd502a8b07f4f7186441f7621e948760e8","dirty":false},
