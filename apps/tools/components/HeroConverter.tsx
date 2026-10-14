@@ -9,7 +9,13 @@ import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
 import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetizationPanel";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { CODEC_UNSUPPORTED } from "@/lib/convert/webcodecs";
-import { compressFile, convertWithWorker, getOutputMimeType, multipleOutputName } from "@/lib/convert/workerClient";
+import {
+  checkInputFile,
+  compressFile,
+  convertWithWorker,
+  getOutputMimeType,
+  multipleOutputName,
+} from "@/lib/convert/workerClient";
 import { resolveCompressionTarget } from "@/lib/compression-utils";
 import type { OperationType } from "@/types";
 
@@ -84,6 +90,7 @@ export default function HeroConverter({
       });
 
       try {
+        await checkInputFile(file, from, to);
         const buf = await file.arrayBuffer();
         if (isCompression) {
           const compressedBuffer = await compressFile({

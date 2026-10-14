@@ -7354,7 +7354,7 @@
   {
     "id": "bin-to-jpeg",
     "name": "BIN to JPEG",
-    "description": "Convert BIN to JPEG format",
+    "description": "Recover a picture saved as a .bin file, such as an Outlook ATT00001.bin attachment or a browser download, as a JPEG. Firmware, CD images and other binary files aren't pictures and can't be converted.",
     "operation": "convert",
     "route": "/bin-to-jpeg",
     "from": "bin",
@@ -7365,12 +7365,61 @@
       "jpeg",
       "convert",
       "image"
-    ]
+    ],
+    "content": {
+      "tool": {
+        "title": "BIN to JPEG",
+        "subtitle": "Recover a picture saved as a .bin file, such as an Outlook ATT00001.bin attachment or a browser download, as a JPEG. Firmware, CD images and other binary files aren't pictures and can't be converted.",
+        "from": "bin",
+        "to": "jpeg"
+      },
+      "faqs": [
+        {
+          "question": "How do I convert BIN to JPEG?",
+          "answer": "Drop the .bin file in the converter above. If it holds a picture, the JPEG downloads when it's ready; if it doesn't, the converter says so instead."
+        },
+        {
+          "question": "Why is my picture a .bin file?",
+          "answer": "Outlook and some other email programs save an attachment they can't identify as ATT00001.bin, and a browser may save a download as .bin when the website doesn't say what it is. The picture inside is usually intact: only its name is wrong."
+        },
+        {
+          "question": "What if my .bin file isn't a picture?",
+          "answer": "The converter tells you, and saves nothing. Firmware updates, CD and DVD images, game ROMs and other binary files don't hold a picture, so they can't become one."
+        },
+        {
+          "question": "Is this conversion private?",
+          "answer": "Yes. The file is read and converted in your browser, and never uploaded."
+        }
+      ],
+      "aboutSection": {
+        "title": "BIN to JPEG: what a .bin file holds",
+        "fromFormat": {
+          "name": "BIN",
+          "fullName": "Binary file",
+          "description": "A .bin name only says a file holds binary data. Outlook names attachments it can't identify ATT00001.bin, and a browser may save a download as .bin, so many .bin files are ordinary pictures under the wrong name. The converter reads the picture's format from the file's first bytes.",
+          "details": [
+            "Pictures it recovers: JPEG, PNG, GIF, WebP, BMP, TIFF, HEIC, AVIF, ICO, PSD and other image formats",
+            "Outlook ATT00001.bin attachments and browser downloads saved as .bin",
+            "Not pictures: firmware, CD and DVD images, game ROMs and other binary files can't be converted"
+          ]
+        },
+        "toFormat": {
+          "name": "JPEG",
+          "fullName": "JPEG image",
+          "description": "A JPEG opens on every phone, computer and website, so the recovered picture can be viewed and shared anywhere.",
+          "details": [
+            "Opens everywhere",
+            "Small files for photos",
+            "No transparency"
+          ]
+        }
+      }
+    }
   },
   {
     "id": "bin-to-jpg",
     "name": "BIN to JPG",
-    "description": "Convert BIN to JPG format",
+    "description": "Recover a picture saved as a .bin file, such as an Outlook ATT00001.bin attachment or a browser download, as a JPG. Firmware, CD images and other binary files aren't pictures and can't be converted.",
     "operation": "convert",
     "route": "/bin-to-jpg",
     "from": "bin",
@@ -7381,12 +7430,61 @@
       "jpg",
       "convert",
       "image"
-    ]
+    ],
+    "content": {
+      "tool": {
+        "title": "BIN to JPG",
+        "subtitle": "Recover a picture saved as a .bin file, such as an Outlook ATT00001.bin attachment or a browser download, as a JPG. Firmware, CD images and other binary files aren't pictures and can't be converted.",
+        "from": "bin",
+        "to": "jpg"
+      },
+      "faqs": [
+        {
+          "question": "How do I convert BIN to JPG?",
+          "answer": "Drop the .bin file in the converter above. If it holds a picture, the JPG downloads when it's ready; if it doesn't, the converter says so instead."
+        },
+        {
+          "question": "Why is my picture a .bin file?",
+          "answer": "Outlook and some other email programs save an attachment they can't identify as ATT00001.bin, and a browser may save a download as .bin when the website doesn't say what it is. The picture inside is usually intact: only its name is wrong."
+        },
+        {
+          "question": "What if my .bin file isn't a picture?",
+          "answer": "The converter tells you, and saves nothing. Firmware updates, CD and DVD images, game ROMs and other binary files don't hold a picture, so they can't become one."
+        },
+        {
+          "question": "Is this conversion private?",
+          "answer": "Yes. The file is read and converted in your browser, and never uploaded."
+        }
+      ],
+      "aboutSection": {
+        "title": "BIN to JPG: what a .bin file holds",
+        "fromFormat": {
+          "name": "BIN",
+          "fullName": "Binary file",
+          "description": "A .bin name only says a file holds binary data. Outlook names attachments it can't identify ATT00001.bin, and a browser may save a download as .bin, so many .bin files are ordinary pictures under the wrong name. The converter reads the picture's format from the file's first bytes.",
+          "details": [
+            "Pictures it recovers: JPEG, PNG, GIF, WebP, BMP, TIFF, HEIC, AVIF, ICO, PSD and other image formats",
+            "Outlook ATT00001.bin attachments and browser downloads saved as .bin",
+            "Not pictures: firmware, CD and DVD images, game ROMs and other binary files can't be converted"
+          ]
+        },
+        "toFormat": {
+          "name": "JPG",
+          "fullName": "JPEG image",
+          "description": "A JPEG opens on every phone, computer and website, so the recovered picture can be viewed and shared anywhere.",
+          "details": [
+            "Opens everywhere",
+            "Small files for photos",
+            "No transparency"
+          ]
+        }
+      }
+    }
   },
   {
     "id": "bin-to-png",
     "name": "BIN to PNG",
-    "description": "Convert BIN to PNG format",
+    "description": "Recover a picture saved as a .bin file, such as an Outlook ATT00001.bin attachment or a browser download, as a PNG. Firmware, CD images and other binary files aren't pictures and can't be converted.",
     "operation": "convert",
     "route": "/bin-to-png",
     "from": "bin",
@@ -7397,7 +7495,56 @@
       "png",
       "convert",
       "image"
-    ]
+    ],
+    "content": {
+      "tool": {
+        "title": "BIN to PNG",
+        "subtitle": "Recover a picture saved as a .bin file, such as an Outlook ATT00001.bin attachment or a browser download, as a PNG. Firmware, CD images and other binary files aren't pictures and can't be converted.",
+        "from": "bin",
+        "to": "png"
+      },
+      "faqs": [
+        {
+          "question": "How do I convert BIN to PNG?",
+          "answer": "Drop the .bin file in the converter above. If it holds a picture, the PNG downloads when it's ready; if it doesn't, the converter says so instead."
+        },
+        {
+          "question": "Why is my picture a .bin file?",
+          "answer": "Outlook and some other email programs save an attachment they can't identify as ATT00001.bin, and a browser may save a download as .bin when the website doesn't say what it is. The picture inside is usually intact: only its name is wrong."
+        },
+        {
+          "question": "What if my .bin file isn't a picture?",
+          "answer": "The converter tells you, and saves nothing. Firmware updates, CD and DVD images, game ROMs and other binary files don't hold a picture, so they can't become one."
+        },
+        {
+          "question": "Is this conversion private?",
+          "answer": "Yes. The file is read and converted in your browser, and never uploaded."
+        }
+      ],
+      "aboutSection": {
+        "title": "BIN to PNG: what a .bin file holds",
+        "fromFormat": {
+          "name": "BIN",
+          "fullName": "Binary file",
+          "description": "A .bin name only says a file holds binary data. Outlook names attachments it can't identify ATT00001.bin, and a browser may save a download as .bin, so many .bin files are ordinary pictures under the wrong name. The converter reads the picture's format from the file's first bytes.",
+          "details": [
+            "Pictures it recovers: JPEG, PNG, GIF, WebP, BMP, TIFF, HEIC, AVIF, ICO, PSD and other image formats",
+            "Outlook ATT00001.bin attachments and browser downloads saved as .bin",
+            "Not pictures: firmware, CD and DVD images, game ROMs and other binary files can't be converted"
+          ]
+        },
+        "toFormat": {
+          "name": "PNG",
+          "fullName": "Portable Network Graphics",
+          "description": "A PNG keeps every pixel of the picture exactly, transparency included, and opens on every phone, computer and website.",
+          "details": [
+            "Lossless: no detail is lost",
+            "Keeps transparency",
+            "Larger files than JPEG for photos"
+          ]
+        }
+      }
+    }
   },
   {
     "id": "bmp-to-bmp",
@@ -76385,7 +76532,7 @@
   {
     "id": "m4p-to-mp3",
     "name": "M4P to MP3",
-    "description": "Convert M4P files to MP3 format",
+    "description": "Convert an unprotected M4P file to MP3 in your browser. Songs copy-protected by Apple's FairPlay (Apple Music downloads, most iTunes Store songs bought before 2009) can't be converted, and the converter says so.",
     "operation": "convert",
     "route": "/m4p-to-mp3",
     "from": "m4p",
@@ -76397,7 +76544,55 @@
       "convert",
       "audio"
     ],
-    "requiresFFmpeg": true
+    "requiresFFmpeg": true,
+    "content": {
+      "tool": {
+        "title": "M4P to MP3",
+        "subtitle": "Convert an unprotected M4P file to MP3 in your browser. Songs copy-protected by Apple's FairPlay (Apple Music downloads, most iTunes Store songs bought before 2009) can't be converted, and the converter says so.",
+        "from": "m4p",
+        "to": "mp3"
+      },
+      "faqs": [
+        {
+          "question": "How do I convert M4P to MP3?",
+          "answer": "Drop the M4P file in the converter above. An unprotected file converts in your browser, and the MP3 downloads when it's ready."
+        },
+        {
+          "question": "Can I convert a copy-protected M4P?",
+          "answer": "No. A song protected with Apple's FairPlay is encrypted for the Apple account that bought or downloaded it, and this converter can't read it. It checks for the protection before converting, and tells you so instead of failing with an error or saving a broken MP3."
+        },
+        {
+          "question": "How can I tell whether my M4P is protected?",
+          "answer": "Drop it in the converter: it checks the file first. In Apple's Music app or iTunes, Get Info on the song: a protected one's kind reads Protected AAC audio file or Apple Music AAC audio file."
+        },
+        {
+          "question": "Is this conversion private?",
+          "answer": "Yes. The file is converted in your browser, and never uploaded."
+        }
+      ],
+      "aboutSection": {
+        "title": "M4P to MP3: protected and unprotected files",
+        "fromFormat": {
+          "name": "M4P",
+          "fullName": "MPEG-4 Protected Audio",
+          "description": "M4P is AAC audio in an MPEG-4 file, the extension Apple gives songs protected with its FairPlay copy protection: Apple Music downloads, and most iTunes Store songs bought before 2009. A protected song plays only for the Apple account that has it, and can't be converted. An M4P without the protection is an ordinary M4A under another name, and converts.",
+          "details": [
+            "Unprotected M4P: converts to MP3",
+            "FairPlay-protected M4P: can't be converted",
+            "iTunes Store songs sold since 2009 are unprotected M4A files"
+          ]
+        },
+        "toFormat": {
+          "name": "MP3",
+          "fullName": "MPEG-1 Audio Layer III",
+          "description": "MP3 plays on almost every phone, computer, car stereo and music app.",
+          "details": [
+            "Plays almost everywhere",
+            "Lossy: converting from AAC loses a little quality"
+          ]
+        }
+      }
+    }
   },
   {
     "id": "m4r-to-aac",
@@ -95929,7 +96124,7 @@
     "route": "/sk-to-jpg",
     "from": "sk",
     "to": "jpg",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "sk",
       "jpg",

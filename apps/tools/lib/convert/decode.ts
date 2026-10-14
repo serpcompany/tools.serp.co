@@ -1,3 +1,4 @@
+import { decodeFailure, noBrowserDecoder } from "./decode-failure.ts";
 import { decodeHeifToRGBA, type RGBA } from "./heif.ts";
 
 type CanvasSource = CanvasImageSource & {
@@ -49,6 +50,10 @@ async function bitmapToRGBA(source: CanvasSource): Promise<RGBA> {
   return { data: img.data, width: img.width, height: img.height };
 }
 
+// An <img> couldn't load the file: it's damaged, or this browser has no
+// decoder for its format (decodeToRGBA tells which).
+class ImageLoadError extends Error {}
+
 async function decodeViaImage(blob: Blob): Promise<RGBA> {
   if (typeof document === "undefined") {
     throw new Error("Image decoding requires a document.");
@@ -61,7 +66,7 @@ async function decodeViaImage(blob: Blob): Promise<RGBA> {
 
     const loaded = new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
-      img.onerror = () => reject(new Error("Image decode failed."));
+      img.onerror = () => reject(new ImageLoadError("Image decode failed."));
     });
 
     img.src = url;
@@ -104,6 +109,24 @@ async function decodeWithImageDecoder(mime: string | undefined, buf: ArrayBuffer
   }
 }
 
+// The browser decoders' formats, by the type ImageDecoder is given.
+const MIME_TYPES: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+  bmp: "image/bmp",
+  avif: "image/avif",
+  ico: "image/x-icon",
+  svg: "image/svg+xml",
+  tiff: "image/tiff",
+};
+
+// Every format decodeToRGBA reads by name (bin-image.test.mjs checks that
+// each has a signature).
+export const DECODE_INPUTS: readonly string[] = ["heic", "heif", "ktx", "ktx2", "icns", ...Object.keys(MIME_TYPES)];
+
 export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA> {
   const e = (ext || "").toLowerCase();
 
@@ -122,26 +145,23 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
     return decodeToRGBA("png", png.slice().buffer);
   }
 
-  const mimeMap: Record<string, string> = {
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    png: "image/png",
-    webp: "image/webp",
-    gif: "image/gif",
-    bmp: "image/bmp",
-    avif: "image/avif",
-    ico: "image/x-icon",
-    svg: "image/svg+xml",
-    tiff: "image/tiff",
-  };
+  const mime = MIME_TYPES[e];
+  try {
+    return await decodeInBrowser(mime, buf);
+  } catch (error) {
+    if (!(error instanceof ImageLoadError)) throw error;
+    // The file is damaged if the browser decodes its format (browserDecodes).
+    if (await browserDecodes(e)) throw decodeFailure(error.message);
+    throw noBrowserDecoder(e);
+  }
+}
 
-  const mime = mimeMap[e];
-
-  // Prefer ImageDecoder when available (works in workers too).
+// Decodes with the browser: ImageDecoder when there is one (in workers too),
+// else createImageBitmap, else, on a page, an <img>.
+async function decodeInBrowser(mime: string | undefined, buf: ArrayBuffer): Promise<RGBA> {
   const decoded = await decodeWithImageDecoder(mime, buf);
   if (decoded) return decoded;
 
-  // Browser-native decoders handle: jpg/jpeg/png/webp/gif/bmp/avif/ico (varies by engine)
   const blob = new Blob([buf], { type: mime || "application/octet-stream" });
 
   try {
@@ -156,4 +176,45 @@ export async function decodeToRGBA(ext: string, buf: ArrayBuffer): Promise<RGBA>
     }
     throw new Error("This format isn’t natively supported by your browser.");
   }
+}
+
+// A 1 x 1 picture in each format decodeToRGBA hands the browser whose
+// support differs between current browsers, to tell a browser with no
+// decoder for it from a damaged file: AVIF (not before Safari 16.4) and TIFF
+// (only Safari). Made with ImageMagick: AVIF in AV1's Main profile, which
+// every browser that shows AVIF decodes, and TIFF as 8-bit RGB, uncompressed.
+// Every current browser decodes the rest (JPEG, PNG, GIF, WebP, BMP, ICO,
+// CUR and SVG), so they have no sample: a file in one of them that won't
+// load is damaged. HEIC and HEIF go to libheif, and JPEG XL to
+// ImageMagick, never to the browser. scripts/check-browser-decoders.mjs
+// checks which Playwright engines decode each sample, and that a damaged
+// file in any format is called damaged where the browser decodes it.
+const SAMPLES: Readonly<Record<string, string>> = {
+  avif: "AAAAHGZ0eXBhdmlmAAAAAG1pZjFhdmlmbWlhZgAAANZtZXRhAAAAAAAAACFoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAAAAAAA5waXRtAAAAAAABAAAAImlsb2MAAAAAREAAAQABAAAAAAD6AAEAAAAAAAAAHQAAACNpaW5mAAAAAAABAAAAFWluZmUCAAAAAAEAAGF2MDEAAAAAVmlwcnAAAAA4aXBjbwAAAAxhdjFDgQAMAAAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAABZpcG1hAAAAAAAAAAEAAQOBAgMAAAAlbWRhdBIACggYAAYICGg0IDIPGAAKKKKEAACwDGH8MILE",
+  tiff: "SUkqAAwAAAAwcNAADwAAAQMAAQAAAAEAAAABAQMAAQAAAAEAAAACAQMAAwAAAMYAAAADAQMAAQAAAAEAAAAGAQMAAQAAAAIAAAAKAQMAAQAAAAEAAAARAQQAAQAAAAgAAAASAQMAAQAAAAEAAAAVAQMAAQAAAAMAAAAWAQMAAQAAAAEAAAAXAQQAAQAAAAMAAAAcAQMAAQAAAAEAAAApAQMAAgAAAAAAAQA+AQUAAgAAAPwAAAA/AQUABgAAAMwAAAAAAAAACAAIAAgAhetRAAAAgADD9agAAAAAAs3MTAAAAAABzcxMAAAAgADNzEwAAAAAAo/C9QAAAAAQNxqgAAAAAAIrhwoAAAAgAA==",
+};
+
+// The formats with a sample: the ones a browser may have no decoder for.
+export const SAMPLED_FORMATS: readonly string[] = Object.keys(SAMPLES);
+
+// `format`'s sample (SAMPLES), or null.
+export function browserSample(format: string): Uint8Array<ArrayBuffer> | null {
+  const sample = SAMPLES[format === "tif" ? "tiff" : format];
+  return sample ? Uint8Array.from(atob(sample), (char) => char.charCodeAt(0)) : null;
+}
+
+const browserSupport = new Map<string, Promise<boolean>>();
+
+// Whether this browser decodes `format`, from its sample, decoded once.
+// Without a sample, every current browser decodes it.
+function browserDecodes(format: string): Promise<boolean> {
+  const name = format === "tif" ? "tiff" : format;
+  const sample = browserSample(name);
+  if (!sample) return Promise.resolve(true);
+  let supported = browserSupport.get(name);
+  if (!supported) {
+    supported = decodeInBrowser(MIME_TYPES[name], sample.buffer).then(() => true, () => false);
+    browserSupport.set(name, supported);
+  }
+  return supported;
 }

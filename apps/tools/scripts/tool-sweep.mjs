@@ -37,6 +37,7 @@ import {
   mergeRows,
   parseArgs,
   planTool,
+  refusalProblem,
   renderSummary,
   scanPageHandlers,
   selectRuns,
@@ -45,6 +46,7 @@ import {
   textOutputTimeout,
   thrownError,
   treeIsDirty,
+  withRefusals,
 } from "./lib/tool-sweep.mjs";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -328,11 +330,12 @@ async function download(page, control, { timeout = 5_000, count = 1, ...read } =
 }
 
 // The generic converter and compressor (HeroConverter, LanderHeroTwoColumn):
-// choose the fixture, then wait until the progress card shows the result.
-async function runFileTool(page, plan) {
+// choose the fixture (or `file`), then wait until the progress card shows the
+// result.
+async function runFileTool(page, plan, file = plan.fixtures[0]) {
   const selector = '[data-testid="tool-file-input"]';
   await waitForHydration(page, "file input", selector);
-  await page.locator(selector).setInputFiles(plan.fixtures[0]);
+  await page.locator(selector).setInputFiles(file);
   let state;
   try {
     const handle = await page.waitForFunction(
@@ -568,6 +571,28 @@ const DRIVERS = {
 
 class BrowserLost extends Error {}
 
+// Each input the Tool must refuse (plan.refusals), on a fresh load of its
+// page, with what the page showed and refusalProblem's verdict.
+async function runRefusals(page, plan, browser) {
+  const results = [];
+  for (const refusal of plan.refusals ?? []) {
+    let observation;
+    try {
+      await page.goto(`${args.baseUrl}${toolHref(plan)}`, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
+      observation = await runFileTool(page, plan, refusal.fixture);
+    } catch (error) {
+      if (!browser.isConnected()) throw new BrowserLost(error.message);
+      const setupStep = error instanceof HarnessError ? error : {};
+      observation = {
+        outcome: "error",
+        message: thrownError({ message: error.message, step: setupStep.step, hydration: setupStep.hydration }),
+      };
+    }
+    results.push({ ...refusal, message: observation.message?.trim(), problem: refusalProblem(observation, refusal) });
+  }
+  return results;
+}
+
 // Each Tool run is its own visitor to the server-action cooldown (one server
 // action per minute per client and IP): an address from 198.18.0.0/15, the
 // range reserved for benchmarking.
@@ -628,6 +653,7 @@ async function measure(plan) {
   });
 
   let observation;
+  let refusals = [];
   try {
     const response = await page.goto(`${args.baseUrl}${toolHref(plan)}`, {
       waitUntil: "domcontentloaded",
@@ -641,6 +667,7 @@ async function measure(plan) {
       if (observation.outcome === "timeout" && pageErrors[0]) {
         observation.message = `${observation.message} (page error: ${pageErrors[0]})`;
       }
+      refusals = await runRefusals(page, plan, browser);
     }
   } catch (error) {
     if (!browser.isConnected()) throw new BrowserLost(error.message);
@@ -666,7 +693,7 @@ async function measure(plan) {
   if (plan.pixelCheck && observation.outcome === "completed") {
     await measureOutputPixels(observation.outputs ?? [], plan.to);
   }
-  const verdict = classifyRun(observation, plan);
+  const verdict = withRefusals(classifyRun(observation, plan), refusals);
   const outputs = observation.outputs ?? [];
   return toRow(plan, {
     ...verdict,

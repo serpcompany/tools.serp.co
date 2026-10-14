@@ -31,7 +31,9 @@ blue) needs its name in `ONE_COLOUR_FIXTURES` there, or the sweep fails its
 Tools' image outputs as blank; a photo or drawing needs nothing.
 `lib/tool-sweep.test.mjs` decodes each listed still image, and pins each
 listed video, PDF and AI by hash, so a replaced one fails until it's read back
-again. The
+again. An input a format's Tools must refuse (a .bin that isn't a picture, a
+copy-protected M4P) is listed in that format's `refusals`, with the telemetry
+code and words of its message in `EXPECTED_REFUSALS` there. The
 table converter page picks its input format from the file's extension, so a
 table fixture needs one the page maps to its format: a `.sql` file switches a
 MySQL page to SQL, so the MySQL fixture is a `.txt`.
@@ -70,7 +72,10 @@ would (fflate, pdf.js, avsc, protobufjs with the `.proto` saved beside the
 `.pb`) and must hold the fixture's data; its pass records `formatCheck:
 "decoded"`. Its PNG and JPEG are checked as images. A fixture with several
 pages, named in `PAGE_COUNTS` in `scripts/lib/tool-sweep.mjs`, must give an
-image of each page, no more and no fewer. Chromium runs with
+image of each page, no more and no fewer. A converter page whose input format
+has `refusals` is loaded again with each, and must show the expected message
+rather than convert it or fail another way; otherwise its pass becomes an
+error. The row records each refusal's message in `refusals`. Chromium runs with
 `--enable-unsafe-swiftshader`, so DXF pages get WebGL on a machine with no
 GPU, such as a CI runner. `--resume` continues an interrupted run;
 `--summary` prints the Markdown table. It measures; it isn't part of

@@ -3,6 +3,8 @@
 // fonts. Loads the 14 MB wasm on first use.
 import type { IMagickImage, MagickFormat as MagickFormatType } from "@imagemagick/magick-wasm";
 
+import { decodeFailure, isDecodeFailure, tooLargeFailure } from "./decode-failure.ts";
+
 const WASM_URL = "/vendor/imagemagick/magick.wasm";
 
 type MagickModule = typeof import("@imagemagick/magick-wasm");
@@ -48,6 +50,11 @@ export const MAGICK_BROWSER_INPUTS = new Set([
   "exr", "hdr",
   "ttf", "otf",
 ]);
+
+// Formats a browser may have no decoder for (the ones with a sample in
+// decode.ts) that ImageMagick reads too, for BIN to JPG, JPEG and PNG
+// (workerClient.ts). TIFF goes to ImageMagick in the first place.
+export const MAGICK_FALLBACK_INPUTS = new Set(["avif"]);
 
 const FONT_INPUTS = new Set(["ttf", "otf"]);
 // High dynamic range inputs, encoded from linear light to sRGB (linear-light.ts).
@@ -108,19 +115,19 @@ async function readInput<T>(
   }
   if (from === "sfw") {
     const { sfwToJpeg } = await import("./sfw.ts");
-    return magick.ImageMagick.read(sfwToJpeg(bytes), magick.MagickFormat.Jpeg, (image) => {
+    return readPicture(magick, sfwToJpeg(bytes), magick.MagickFormat.Jpeg, (image) => {
       image.flip();
       return handle(image);
     });
   }
   if (LINEAR_LIGHT_INPUTS.has(from)) {
     const { encodeLinearLight } = await import("./linear-light.ts");
-    return magick.ImageMagick.read(bytes, source, (image) => {
+    return readPicture(magick, bytes, source, (image) => {
       encodeLinearLight(magick, image);
       return handle(image);
     });
   }
-  return magick.ImageMagick.read(bytes, source, handle);
+  return readPicture(magick, bytes, source, handle);
 }
 
 // Converts `from` to `to` when ImageMagick can write `to`; otherwise to PNG,
@@ -132,12 +139,147 @@ export async function convertWithMagickInBrowser(
 ): Promise<{ buffer: ArrayBuffer; format: string }> {
   const magick = await loadMagick();
   const source = magickFormat(magick, from);
-  if (!source || !MAGICK_BROWSER_INPUTS.has(from)) {
+  if (!source || !(MAGICK_BROWSER_INPUTS.has(from) || MAGICK_FALLBACK_INPUTS.has(from))) {
     throw new Error(`${from.toUpperCase()} isn't supported by the image converter.`);
   }
   const format = MAGICK_BROWSER_OUTPUTS.has(to) ? to : "png";
   const bytes = await readInput(magick, new Uint8Array(buf), from, source, (image) => writeImage(magick, image, format));
   return { buffer: bytes.buffer as ArrayBuffer, format };
+}
+
+// Reads `bytes` as `format` and hands the picture to `use`. ImageMagick has
+// loaded by now, so a failure while it reads the file is the file's
+// (readFailure); a failure in `use`, such as writing the picture, isn't.
+function readPicture<T>(
+  magick: MagickModule,
+  bytes: Uint8Array,
+  format: MagickFormatType,
+  use: (image: IMagickImage) => T,
+): T {
+  let read = false;
+  try {
+    return magick.ImageMagick.read(bytes, format, (image) => {
+      // A reader that gives up without an error (DDS's, on a file cut
+      // short) leaves no picture: the image is already disposed.
+      try {
+        void image.width;
+      } catch (error) {
+        throw decodeFailure("The picture in this file couldn't be read.", error);
+      }
+      read = true;
+      return use(image);
+    });
+  } catch (error) {
+    throw read ? error : readFailure(magick, bytes, format, error);
+  }
+}
+
+// What a failure while ImageMagick reads a file says. Running out of memory
+// (an allocation's RangeError, a WASM trap, ImageMagick's
+// ResourceLimitError) is the file's when its header declares a picture the
+// engine can't hold: damaged, or too large to convert here. Otherwise it's
+// the engine's, and the error is passed on as it is. Any other failure is
+// the file's: a decode failure (decode-failure.ts).
+function readFailure(magick: MagickModule, bytes: Uint8Array, format: MagickFormatType, error: unknown): unknown {
+  const failure = typeof error === "number" ? cppFailure(magick, error) : error;
+  const outOfMemory =
+    failure instanceof RangeError ||
+    failure instanceof WebAssembly.RuntimeError ||
+    (failure instanceof magick.MagickError && failure.severity === magick.MagickErrorSeverity.ResourceLimitError);
+  if (outOfMemory) {
+    return declaresTooLarge(magick, bytes, format) ? tooLargeFailure(failure.message, failure) : failure;
+  }
+  if (isDecodeFailure(failure)) return failure;
+  return decodeFailure(failure instanceof Error ? failure.message : String(failure), failure);
+}
+
+// The most memory this engine can have: a 32-bit WASM module addresses 4 GB.
+const ENGINE_MEMORY = 2 ** 32;
+
+// Whether the file's header declares a picture this engine can't hold: its
+// pixels alone (4 bytes each, 8-bit RGBA) would take over half the engine's
+// memory, about 537 megapixels. A header ImageMagick can't read is the
+// file's too; one it can't read for want of memory isn't.
+function declaresTooLarge(magick: MagickModule, bytes: Uint8Array, format: MagickFormatType): boolean {
+  const image = magick.MagickImage.create();
+  try {
+    image.ping(bytes, new magick.MagickReadSettings({ format }));
+    return image.width * image.height * 4 > ENGINE_MEMORY / 2;
+  } catch (error) {
+    return error instanceof magick.MagickError && error.severity !== magick.MagickErrorSeverity.ResourceLimitError;
+  } finally {
+    image.dispose();
+  }
+}
+
+// LibRaw's exceptions (LibRaw_exceptions, libraw/libraw_const.h:755-770 in
+// LibRaw 0.22.2, the version magick-wasm 0.0.42 bundles; a test fails when
+// the bundled version changes), by what LibRaw throws each for: whether it's
+// the file's, too large, or memory running out, and what it says.
+// - 1: an allocation came back empty (src/utils/utils_libraw.cpp).
+// - 2, 3, 9: a decoder found no picture data, or JPEG or JPEG 2000 data it
+//   couldn't decode.
+// - 4, 5: the file ends early, or its structure is broken.
+// - 8: the header gives values its decoder can't take.
+// - 10: the picture's data would take more than LibRaw may allocate
+//   (ImageMagick allows 8 GB), or the file is over 2 GB.
+// - 11: LibRaw's table of 512 allocations is full. libraw_const.h:75-79 says
+//   it's enough for files that aren't damaged, and overflows on crafted ones.
+// - 12: a compression LibRaw decodes only with an SDK this build hasn't got.
+// 6 (cancelled by a progress callback) and 7 (a crop box outside the
+// picture) can't happen: ImageMagick's coders/dng.c sets neither.
+const LIBRAW_EXCEPTIONS: Readonly<Record<number, { kind: "file" | "too-large" | "memory"; message: string }>> = {
+  1: { kind: "memory", message: "LibRaw ran out of memory reading the RAW file." },
+  2: { kind: "file", message: "The RAW file's picture couldn't be decoded: it may be damaged." },
+  3: { kind: "file", message: "The RAW file's JPEG-compressed picture couldn't be decoded: it may be damaged." },
+  4: { kind: "file", message: "The RAW file ends before its picture does: it may be incomplete." },
+  5: { kind: "file", message: "The RAW file is damaged." },
+  8: { kind: "file", message: "The RAW file couldn't be read: it may be damaged." },
+  9: { kind: "file", message: "The RAW file's JPEG 2000 picture couldn't be decoded: it may be damaged." },
+  10: { kind: "too-large", message: "The RAW file, or the picture it declares, is too large to convert here." },
+  11: { kind: "file", message: "The RAW file couldn't be read: it may be damaged." },
+  12: {
+    kind: "file",
+    message:
+      "The RAW file's compression can't be decoded here (Nikon's High Efficiency RAW, or a JPEG XL or GoPro DNG), or the file is damaged.",
+  },
+};
+
+// A C++ exception thrown out of the WASM build, which arrives as a bare
+// number, the address of the thrown object, as an error: LibRaw's (a RAW
+// file cut short or damaged) by its code, std::bad_alloc as memory running
+// out (a RangeError, as a JavaScript allocation's is). Any other, thrown
+// while reading a file, is the file's.
+function cppFailure(magick: MagickModule, pointer: number): Error {
+  const thrown = cppException(magick, pointer);
+  const libraw = thrown?.type === "17LibRaw_exceptions" ? LIBRAW_EXCEPTIONS[thrown.value] : undefined;
+  if (libraw?.kind === "memory" || thrown?.type === "St9bad_alloc") {
+    return new RangeError(libraw?.message ?? "ImageMagick ran out of memory reading the file.", { cause: pointer });
+  }
+  if (libraw?.kind === "too-large") return tooLargeFailure(libraw.message, pointer);
+  return decodeFailure(libraw?.message ?? "The picture in this file couldn't be read.", pointer);
+}
+
+type MagickHeap = { HEAPU8?: Uint8Array; UTF8ToString?: (pointer: number) => string };
+
+// The type and first 4 bytes of the C++ exception thrown at `pointer`, or
+// null. Emscripten keeps the exception's type 20 bytes before the object
+// (in its __cxa_throw ExceptionInfo), and a type_info keeps its name 4
+// bytes in. The heap is magick-wasm's (`ImageMagick._api`), not its API.
+function cppException(magick: MagickModule, pointer: number): { type: string; value: number } | null {
+  try {
+    const api = (magick.ImageMagick as unknown as { _api?: MagickHeap })._api;
+    const heap = api?.HEAPU8;
+    if (!heap || !api.UTF8ToString || !Number.isInteger(pointer) || pointer < 20 || pointer + 4 > heap.length) {
+      return null;
+    }
+    const view = new DataView(heap.buffer, heap.byteOffset, heap.byteLength);
+    const typeInfo = view.getUint32(pointer - 20, true);
+    if (typeInfo + 8 > heap.length) return null;
+    return { type: api.UTF8ToString(view.getUint32(typeInfo + 4, true)), value: view.getInt32(pointer, true) };
+  } catch {
+    return null;
+  }
 }
 
 // Re-encodes a PNG into a format a canvas can't produce.

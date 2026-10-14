@@ -9,7 +9,13 @@ import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetization
 import { detectCapabilities, type Capabilities } from "@/lib/capabilities";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { CODEC_UNSUPPORTED } from "@/lib/convert/webcodecs";
-import { compressFile, convertWithWorker, getOutputMimeType, multipleOutputName } from "@/lib/convert/workerClient";
+import {
+  checkInputFile,
+  compressFile,
+  convertWithWorker,
+  getOutputMimeType,
+  multipleOutputName,
+} from "@/lib/convert/workerClient";
 import { resolveCompressionTarget } from "@/lib/compression-utils";
 import type { OperationType } from "@/types";
 
@@ -120,6 +126,7 @@ export default function LanderHeroTwoColumn({
         message: undefined,
       });
       try {
+        await checkInputFile(file, from, to);
         const buf = await file.arrayBuffer();
         if (isCompression) {
           const compressedBuffer = await compressFile({
