@@ -312,6 +312,13 @@ const DECODED_TABLE_OUTPUTS = new Set(["excel", "pdf", "avro", "protobuf"]);
 // Fonts the sweep opens with a font parser (decodeFontOutput), since a
 // signature says nothing about the glyph inside: SVG to TTF's.
 const DECODED_FONT_OUTPUTS = new Set(["ttf"]);
+// Engines whose fixture must be worked out in a Web Worker the page starts,
+// which must answer. Each has a fallback without the worker that still
+// saves a good file (SVG to TTF takes crossing outlines as drawn), so a
+// worker that fails to load, as #303 found the raster worker's could,
+// would otherwise pass unseen. The page's Worker is watched by the sweep
+// (scripts/tool-sweep.mjs, installCapture).
+const WORKER_ENGINES = new Set(["svg-font"]);
 
 // Fixtures whose picture is a single colour when read back natively (most
 // are 96x96 solid blue; a video's first frame, with FFmpeg). An image output
@@ -417,6 +424,7 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
     pages: checksPixels(tool.to) && files.length === 1 ? PAGE_COUNTS[path.basename(files[0])] : undefined,
     tableFile,
     decode: (tableFile && DECODED_TABLE_OUTPUTS.has(target)) || DECODED_FONT_OUTPUTS.has(target),
+    ...(WORKER_ENGINES.has(engine) ? { worker: true } : {}),
     compress: tool.operation === "compress" || tool.operation === "bulk",
     timeoutMs: slow ? ffmpegTimeoutMs : timeoutMs,
   };
@@ -556,7 +564,7 @@ function formatName(format) {
 // every output opened: an output the sweep never read the bytes of fails,
 // rather than passing unchecked. One with `pages` (PAGE_COUNTS) needs a file
 // for each page.
-export function classifyRun(observation, { to, markers = [], hidden = [], pixelCheck = false, decode = false, pages }) {
+export function classifyRun(observation, { to, markers = [], hidden = [], pixelCheck = false, decode = false, pages, worker = false }) {
   const message = observation.message?.trim() || null;
   if (observation.outcome === "timeout") {
     return { status: "timeout", error: message ?? "no result before the timeout" };
@@ -616,6 +624,13 @@ export function classifyRun(observation, { to, markers = [], hidden = [], pixelC
   const shown = hidden.filter((text) => outputs.some((output) => (decode ? output.decoded.text : output.text)?.includes(text)));
   if (shown.length) {
     return { status: "error", error: `the saved file holds what the input hides (${shown.join(", ")})`, formatCheck };
+  }
+  if (worker && !(observation.workers?.answered > 0)) {
+    return {
+      status: "error",
+      error: "the page's worker never answered, so the file came from the fallback for a worker that doesn't load",
+      formatCheck,
+    };
   }
   const unread = pixelCheck && outputs.find((output) => output.pixels === undefined);
   if (unread) {

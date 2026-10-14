@@ -12,11 +12,14 @@ import {
   FAR_OUTSIDE_MESSAGE,
   OUTSIDE_ARTBOARD_MESSAGE,
   REGIONS_TIMEOUT_MS,
+  UNCHECKED_NOTICE,
+  WORKER_FAILED_NOTICE,
   fontFamilyName,
   readGlyph,
   regionsInWorker,
   svgToTtf,
 } from "./svg-font.ts";
+import { REGIONS_MEMORY, resolveShape } from "./svg-font-boolean.ts";
 import { LIMITS, UNREADABLE_SVG_MESSAGE } from "./svg-font-shapes.ts";
 import { checkInputFile, convertWithWorker, getOutputMimeType } from "./workerClient.ts";
 
@@ -106,15 +109,18 @@ const seenBounds = (glyph) => {
 };
 
 // The boolean step in a Node worker thread, as the page runs it in a Web
-// Worker (svg-font.worker.ts): `code` runs on each job, `resolveRegions`
-// unless a test gives other code. `exits` collects the threads that ended.
-function nodeWorker(code = "parentPort.postMessage(resolveRegions(job))", exits = []) {
+// Worker (svg-font.worker.ts): `code` runs on each job, posting each
+// shape's region and then `done` unless a test gives other code. `exits`
+// collects the threads that ended; `heapMb` caps the thread's heap, as a
+// phone's browser would (a thread past it stops with an error).
+const RESOLVE_EACH = "job.shapes.forEach((shape, index) => parentPort.postMessage({ index, shape: resolveShape(shape) })); parentPort.postMessage({ done: true });";
+function nodeWorker(code = RESOLVE_EACH, exits = [], { heapMb } = {}) {
   const boolean = new URL("./svg-font-boolean.ts", import.meta.url).href;
   const source =
-    `import { parentPort } from "node:worker_threads"; import { resolveRegions } from ${JSON.stringify(boolean)};` +
+    `import { parentPort } from "node:worker_threads"; import { resolveShape } from ${JSON.stringify(boolean)};` +
     `parentPort.on("message", (job) => { ${code} });`;
   return () => {
-    const worker = new NodeWorker(new URL(`data:text/javascript,${encodeURIComponent(source)}`));
+    const worker = new NodeWorker(new URL(`data:text/javascript,${encodeURIComponent(source)}`), heapMb ? { resourceLimits: { maxOldGenerationSizeMb: heapMb } } : {});
     const like = {
       onmessage: null,
       onerror: null,
@@ -417,13 +423,14 @@ test("crossing outlines are worked out in a worker with a time limit, in bounded
       assert.deepEqual(disagreements(drawn, polygons, rule, (x, y) => x < 0.5 && y < 0.5), [], `${rule} ${pathOf(polygons)}`);
     }
   }
-  // A grid of thin bars crossing 640,000 and 2,560,000 times (17 and 36
-  // KB, which took martinez 7 and 27 seconds) passes MAX_CROSSINGS: taken
-  // as drawn, every bar filled, with a notice, in well under the limit.
+  // A grid of thin bars (a font unit wide) crossing 640,000 and 2,560,000
+  // times (17 and 36 KB, which took martinez 7 and 27 seconds) passes
+  // MAX_CROSSINGS: taken as drawn, every bar filled, with a notice, in well
+  // under the limit.
   for (const bars of [400, 800]) {
     let d = "";
-    for (let index = 0; index < bars; index += 1) d += `M0 ${index * (10000 / bars)}H10000V${index * (10000 / bars) + 1}H0Z`;
-    for (let index = 0; index < bars; index += 1) d += `M${index * (10000 / bars)} 0V10000H${index * (10000 / bars) + 1}V0Z`;
+    for (let index = 0; index < bars; index += 1) d += `M0 ${index * (10000 / bars)}H10000V${index * (10000 / bars) + 10}H0Z`;
+    for (let index = 0; index < bars; index += 1) d += `M${index * (10000 / bars)} 0V10000H${index * (10000 / bars) + 10}V0Z`;
     started = Date.now();
     const grid = await font(svg(`<path fill-rule="evenodd" d="${d}"/>`, 'viewBox="0 0 10000 10000"'), "icon.svg", { regions });
     assert.ok(Date.now() - started < 3_000, `${bars} bars took ${Date.now() - started} ms`);
@@ -448,17 +455,205 @@ test("past the time limit, or when the worker fails, crossing outlines are taken
   // zero, so the other shape is whole.
   assert.ok(inkAt(stuck.glyph, 4, 12) && inkAt(stuck.glyph, 12, 12) && inkAt(stuck.glyph, 20, 20) && inkAt(stuck.glyph, 21, 3));
   assert.ok(!inkAt(stuck.glyph, 5, 5));
-  // A worker that fails to start, or crashes.
+  // A worker that fails to start, or crashes, says so.
   for (const createWorker of [() => { throw new Error("no worker"); }, nodeWorker("throw new Error('crash')")]) {
     const failed = await font(squares, "icon.svg", { regions: regionsInWorker({ createWorker }) });
-    assert.ok(failed.result.notice.endsWith(CROSSINGS_NOTICE) && inkAt(failed.glyph, 12, 12));
+    assert.ok(failed.result.notice.endsWith(WORKER_FAILED_NOTICE) && inkAt(failed.glyph, 12, 12));
+    assert.ok(!failed.result.notice.includes(CROSSINGS_NOTICE));
   }
+  // A shape found before the time limit is kept; only the one the worker
+  // hadn't finished is taken as drawn.
+  const two = svg(
+    '<path fill-rule="evenodd" d="M2 2H10V10H2Z M6 6H12V12H6Z"/><path fill-rule="evenodd" d="M13 13H21V21H13Z M17 17H23V23H17Z"/>',
+  );
+  const half = await font(two, "icon.svg", {
+    regions: regionsInWorker({ timeoutMs: 300, createWorker: nodeWorker("parentPort.postMessage({ index: 0, shape: resolveShape(job.shapes[0]) }); for (;;);") }),
+  });
+  assert.ok(!inkAt(half.glyph, 8, 8), "the first shape keeps its even-odd overlap empty");
+  assert.ok(inkAt(half.glyph, 19, 19), "the second, taken as drawn, fills its overlap");
+  assert.ok(half.result.notice.endsWith(CROSSINGS_NOTICE));
   // Without crossings there is no worker and no notice.
   const plain = await font(svg('<path fill-rule="evenodd" d="M2 2H22V22H2Z M8 8H16V16H8Z"/>'), "icon.svg", {
     regions: () => assert.fail("no shape needs the boolean step"),
   });
   assert.doesNotMatch(plain.result.notice, /cross/);
   assert.equal(REGIONS_TIMEOUT_MS, 5_000);
+});
+
+// Tall bars, a bar across the first two (so the shape goes to the boolean
+// step), and a staircase of `stairs` points at as many heights: the slabs
+// times the edges in each grow large while the file stays small. With 400
+// bars and 12,000 stairs it is the 198 KB file that took the worker to 3 GB
+// in review. `inkAt` reads its glyph in the file's own units (y down).
+function barsAndStairs(bars, stairs) {
+  let d = "";
+  for (let index = 0; index < bars; index += 1) d += `M${index * 10} 0h4v1000h-4z`;
+  d += "M-5 500H15V501H-5Z";
+  const x0 = bars * 10 + 100;
+  d += `M${x0} 0`;
+  for (let k = 1; k < stairs; k += 1) d += `L${(x0 + k * 0.5 + (k % 2) * 0.3).toFixed(2)} ${((k * 1000) / stairs).toFixed(3)}`;
+  d += `L${x0 + stairs * 0.5 + 10} 1000L${x0 + stairs * 0.5 + 10} 0Z`;
+  const width = x0 + stairs * 0.5 + 30;
+  const scale = Math.min(1000 / 1020, 16000 / width);
+  return {
+    text: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 ${width} 1020"><path fill-rule="evenodd" d="${d}"/></svg>`,
+    x0,
+    inkAt: (glyph, x, y) => inked(glyph, (x + 10) * scale, (1010 - y) * scale - 150),
+  };
+}
+
+test("the boolean step keeps to its memory and work: the 198 KB file that took 3 GB is worked out in a capped thread, a larger one taken as drawn", async () => {
+  // The thread's heap is capped at 64 MB, as a phone's browser caps a
+  // worker's: past it the thread stops, and the notice would say the step
+  // didn't run. (Measured in review's file: 14 MB at its peak, against 3 GB
+  // before the step charged what it keeps to REGIONS_MEMORY.)
+  const regions = regionsInWorker({ createWorker: nodeWorker(undefined, [], { heapMb: 64 }) });
+  const review = barsAndStairs(400, 12_000);
+  assert.equal(review.text.length, 198_107);
+  let started = Date.now();
+  const exact = await font(review.text, "icon.svg", { regions });
+  assert.ok(Date.now() - started < 4_000, `took ${Date.now() - started} ms`);
+  assert.doesNotMatch(exact.result.notice, /cross|couldn't run/);
+  const { inkAt: at400 } = review;
+  assert.ok(at400(exact.glyph, 32, 250) && !at400(exact.glyph, 37, 250), "a bar, and the gap beside it");
+  assert.ok(at400(exact.glyph, 7, 500.5) && !at400(exact.glyph, 2, 500.5), "the bar across: filled between the bars, empty where it crosses one");
+  assert.ok(at400(exact.glyph, review.x0 + 4500, 500) && !at400(exact.glyph, review.x0 + 1500, 500), "the staircase");
+  // Four times the bars: past REGIONS_WORK, so taken as drawn (every bar
+  // filled, where they cross too), in about a second, in the same 64 MB.
+  const larger = barsAndStairs(1_600, 12_000);
+  started = Date.now();
+  const drawn = await font(larger.text, "icon.svg", { regions });
+  assert.ok(Date.now() - started < 4_000, `took ${Date.now() - started} ms`);
+  assert.ok(drawn.result.notice.endsWith(CROSSINGS_NOTICE));
+  assert.ok(larger.inkAt(drawn.glyph, 2, 500.5) && larger.inkAt(drawn.glyph, 32, 250) && larger.inkAt(drawn.glyph, larger.x0 + 4500, 500));
+  // What the step keeps is charged to REGIONS_MEMORY as it grows: past it,
+  // the shape is taken as drawn.
+  const square = (x, y, size) => Float64Array.from([x, y, x + size, y, x + size, y + size, x, y + size, x, y]);
+  const crossing = { fillRule: "evenodd", rings: [square(0, 0, 10), square(5, 5, 10)] };
+  assert.deepEqual(resolveShape(crossing, { memory: 1_000 }), { fallback: "memory" });
+  // Two L shapes, which touch at two corners.
+  assert.equal(resolveShape(crossing).contours.length, 2);
+  assert.equal(REGIONS_MEMORY, 64 * 1024 * 1024);
+});
+
+test("each shape is checked for crossings with its own allowance: one that runs out is filled as drawn on its own", async () => {
+  // 3,200 thin bars in one path, apart but side by side, so finding that
+  // they don't cross means comparing about five million pairs of edges: more
+  // than that shape's allowance. A ring with a hole after it (or before it)
+  // still keeps its hole, and the notice says what happened.
+  let bars = "";
+  for (let index = 0; index < 3_200; index += 1) bars += `M200 ${200 + index * 0.3125}H1200V${200 + index * 0.3125 + 0.094}H200Z`;
+  const many = `<g transform="scale(.01)"><path d="${bars}"/></g>`;
+  const ring = '<path fill-rule="evenodd" d="M14 14H22V22H14Z M16 16H20V20H16Z"/>';
+  for (const body of [many + ring, ring + many]) {
+    const started = Date.now();
+    const { glyph, result } = await font(svg(body), "icon.svg", { regions: () => assert.fail("no shape needs the boolean step") });
+    assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+    assert.ok(!inkAt(glyph, 18, 18) && inkAt(glyph, 15, 15), "the ring keeps its hole");
+    assert.ok(result.notice.endsWith(UNCHECKED_NOTICE));
+    assert.ok(!result.notice.includes(CROSSINGS_NOTICE));
+  }
+});
+
+// The glyph's contours as TrueType stores them: whole-unit points, x, y.
+function glyphContours(glyph) {
+  const contours = [];
+  let start = 0;
+  for (const end of glyph.endPointIndices) {
+    contours.push(glyph.points.slice(start, end + 1).map((point) => [point.x, point.y]));
+    start = end + 1;
+  }
+  return contours;
+}
+const turn = (p, q, r) => (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]);
+// Whether segments ab and cd cross at a point inside both.
+function crossInside(a, b, c, d) {
+  const [d1, d2, d3, d4] = [turn(c, d, a), turn(c, d, b), turn(a, b, c), turn(a, b, d)];
+  return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+}
+// Whether a contour passes through one of its points twice, crossing
+// itself there: the two passes' ways in and out alternate round the point.
+function crossesAtAPoint(points) {
+  const visits = new Map();
+  points.forEach(([x, y], index) => visits.set(`${x},${y}`, [...(visits.get(`${x},${y}`) ?? []), index]));
+  const angle = (from, to) => Math.atan2(points[to][1] - points[from][1], points[to][0] - points[from][0]);
+  const around = (value, from) => (value - from + 4 * Math.PI) % (2 * Math.PI);
+  for (const indices of visits.values()) {
+    const passes = indices.map((index) => [angle(index, (index - 1 + points.length) % points.length), angle(index, (index + 1) % points.length)]);
+    for (let a = 0; a < passes.length; a += 1) {
+      for (let b = a + 1; b < passes.length; b += 1) {
+        const [in1, out1] = passes[a];
+        const inside = (value) => around(value, in1) > 0 && around(value, in1) < around(out1, in1);
+        if (passes[b].every((value) => value !== in1 && value !== out1) && inside(passes[b][0]) !== inside(passes[b][1])) return true;
+      }
+    }
+  }
+  return false;
+}
+
+test("the font's outlines have no zero-length segments and don't cross themselves, after rounding to whole units", async () => {
+  // Random outlines that cross: one even-odd shape, a nonzero shape beside a
+  // square (so it goes to the boolean step too), and two or three even-odd
+  // shapes; corners anywhere, and on a grid (where crossings meet at
+  // corners). Before snap rounding, two thirds of such fonts had repeated
+  // points and some a contour crossing itself.
+  let seed = 11;
+  const random = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+  const path = (onGrid) => {
+    const coordinate = () => (onGrid ? 1 + Math.floor(random() * 7) * 3.6 : 1 + random() * 22).toFixed(6);
+    let d = "";
+    for (let ring = 0; ring < 1 + Math.floor(random() * 3); ring += 1) {
+      const corners = 3 + Math.floor(random() * 9);
+      for (let corner = 0; corner < corners; corner += 1) d += `${corner ? "L" : "M"}${coordinate()} ${coordinate()}`;
+      d += "Z";
+    }
+    return d;
+  };
+  let checked = 0;
+  for (let index = 0; index < 240; index += 1) {
+    const onGrid = index % 2 === 1;
+    const kind = index % 3;
+    const shapes =
+      kind === 0 ? [["evenodd", path(onGrid)]] : kind === 1 ? [["nonzero", path(onGrid)], ["nonzero", "M0 0H0.5V0.5H0Z"]] : [["evenodd", path(onGrid)], ["evenodd", path(onGrid)]];
+    const text = svg(shapes.map(([rule, d]) => `<path fill-rule="${rule}" d="${d}"/>`).join(""));
+    const made = await svgToTtf(encode(text), "icon.svg").catch((error) => error);
+    if (made.code === "nothing_to_draw") continue;
+    checked += 1;
+    const glyph = opentype.parse(made.buffer).charToGlyph(String.fromCodePoint(0xe000));
+    void glyph.path;
+    const contours = glyphContours(glyph);
+    for (const points of contours) {
+      const segments = points.map((point, at) => [point, points[(at + 1) % points.length]]);
+      assert.ok(!segments.some(([a, b]) => a[0] === b[0] && a[1] === b[1]), `a zero-length segment: ${text}`);
+      for (let i = 0; i < segments.length; i += 1) {
+        for (let j = i + 2; j < segments.length; j += 1) {
+          if (i === 0 && j === segments.length - 1) continue;
+          assert.ok(!crossInside(...segments[i], ...segments[j]), `a contour crosses itself: ${text}`);
+        }
+      }
+      assert.ok(!crossesAtAPoint(points), `a contour crosses itself at a corner: ${text}`);
+    }
+    // One shape's contours don't cross one another either.
+    if (shapes.length === 1) {
+      for (let u = 0; u < contours.length; u += 1) {
+        for (let v = u + 1; v < contours.length; v += 1) {
+          const [first, second] = [contours[u], contours[v]];
+          for (const [i, a] of first.entries()) {
+            for (const [j, c] of second.entries()) {
+              assert.ok(!crossInside(a, first[(i + 1) % first.length], c, second[(j + 1) % second.length]), `two contours cross: ${text}`);
+            }
+          }
+        }
+      }
+    }
+  }
+  assert.ok(checked > 200);
+  // Curves: svg2ttf rounds them to TrueType's; a curve under a unit long
+  // leaves no point twice.
+  const tiny = await font(svg('<path d="M2 2H22V22H2Z"/><circle cx="12" cy="12" r="0.01"/><path d="M5 5c0.001 0.002 0.003 0.001 0.004 0L9 9L5 9Z"/>'));
+  for (const points of glyphContours(tiny.glyph)) {
+    assert.ok(points.every((point, at) => String(point) !== String(points[(at + 1) % points.length])));
+  }
 });
 
 test("a root transform-origin and CSS transform place the icon as Chromium draws them", async () => {

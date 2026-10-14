@@ -907,8 +907,8 @@ test("SVG to TTF's font is opened with a font parser, and must have an outlined 
     { handlers: new Map(), fixtures, timeoutMs: 60, ffmpegTimeoutMs: 180 },
   );
   assert.deepEqual(
-    [plan.engine, plan.driver, plan.fixtures.map((file) => path.basename(file)), plan.decode, plan.pixelCheck],
-    ["svg-font", "file", ["sample-icon.svg"], true, false],
+    [plan.engine, plan.driver, plan.fixtures.map((file) => path.basename(file)), plan.decode, plan.pixelCheck, plan.worker],
+    ["svg-font", "file", ["sample-icon.svg"], true, false, true],
   );
   const { svgToTtf } = await import("./convert/svg-font.ts");
   const icon = readFileSync(plan.fixtures[0]);
@@ -934,9 +934,30 @@ test("SVG to TTF's font is opened with a font parser, and must have an outlined 
   assert.match((await decodeFontOutput(fontWith("M0 0L500 500L1000 0Z"))).text, /U\+E000 has 1 contours$/);
   const output = { name: "sample-icon.ttf", size: buffer.byteLength, head: Array.from(new Uint8Array(buffer).subarray(0, 64)), base64: base64Of(buffer) };
   await decodeOutputs([output], "ttf");
-  assert.deepEqual(classifyRun({ outcome: "completed", outputs: [output] }, plan), { status: "pass", error: null, formatCheck: "decoded" });
+  const workers = { started: 1, answered: 1 };
+  assert.deepEqual(classifyRun({ outcome: "completed", outputs: [output], workers }, plan), { status: "pass", error: null, formatCheck: "decoded" });
   assert.deepEqual(
-    classifyRun({ outcome: "completed", outputs: [{ ...output, decoded: { error: "no glyph on U+E000" } }] }, plan),
+    classifyRun({ outcome: "completed", outputs: [{ ...output, decoded: { error: "no glyph on U+E000" } }], workers }, plan),
     { status: "error", error: "saved a file that doesn't open (sample-icon.ttf): no glyph on U+E000", formatCheck: "decoded" },
   );
+  // The fixture's outlines meet, so the page works them out in its worker
+  // (svg-font.worker.ts). A worker that didn't load, or never answered,
+  // still leaves a good font from the fallback: the run fails all the same.
+  let sent = 0;
+  await svgToTtf(icon.buffer.slice(icon.byteOffset, icon.byteOffset + icon.byteLength), "sample-icon.svg", {
+    regions: async (job) => {
+      sent += job.shapes.length;
+      return { shapes: [], stopped: "failed" };
+    },
+  });
+  assert.equal(sent, 1);
+  for (const missing of [{ started: 0, answered: 0 }, { started: 1, answered: 0 }, undefined]) {
+    assert.deepEqual(classifyRun({ outcome: "completed", outputs: [output], workers: missing }, plan), {
+      status: "error",
+      error: "the page's worker never answered, so the file came from the fallback for a worker that doesn't load",
+      formatCheck: "decoded",
+    });
+  }
+  // Other Tools don't need a worker to answer.
+  assert.equal(classifyRun({ outcome: "completed", outputs: [output] }, { ...plan, worker: undefined }).status, "pass");
 });

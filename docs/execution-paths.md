@@ -129,9 +129,18 @@ Conversion picks an engine by input format:
   touch, as a star drawn as one outline; a nonzero one whose outlines run
   both ways round or cross themselves), `svg-font-boolean.ts` finds the
   region by a sweep in slabs, its curves as lines within a quarter of a font
-  unit, in a worker stopped after 5 seconds. A shape whose outlines meet over
-  10,000 times, or that the worker didn't finish, is taken as drawn instead,
-  its crossing outlines all filling, and the page says gaps may fill in. A
+  unit, in a worker stopped after 5 seconds; each shape has its own
+  allowance of work (about a second) and memory (64 MB, charged as the
+  sweep's data grows) and is posted as soon as it is found. A shape whose
+  outlines meet over 10,000 times, or that ran out of its allowance or the
+  time, is taken as drawn instead, its crossing outlines all filling, and the
+  page says gaps may fill in; so is one with too many points to check for
+  crossings on the page (its share of 50 million comparisons), on its own,
+  and the page says that, or that the worker couldn't run. Outlines of
+  straight lines, all the sweep's, are snapped to whole font units (snap
+  rounding), so none crosses itself or has a zero-length segment, and
+  svg2ttf's own simplifying, which could move one across another, is
+  skipped for them; points its rounding puts on one spot are merged. A
   `<use>` of a `<symbol>` with no size fills the viewport it is in, and a
   transform on the root `<svg>` (the attribute, or CSS `transform` in a style
   or stylesheet) moves the drawing as Chromium does, in pixels about its
