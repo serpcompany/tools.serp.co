@@ -132,7 +132,7 @@ of ZIP that repeats one long string in every cell gets a message, not a
 reply too large to clone. An XLS file, or a workbook saved
 with a password, is told to save it again as an unprotected `.xlsx`. The table converters' Excel input
 (#266) uses the same reader, keeping every row and column instead
-([execution-paths.md](execution-paths.md#in-the-browser)).
+([table-converters.md](table-converters.md#excel-input-since-266)).
 
 ## PPTX (since #265)
 

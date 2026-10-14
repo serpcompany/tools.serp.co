@@ -18,6 +18,7 @@ import { isDecodeFailure } from "./decode-failure.ts";
 import { IMAGE_PDF_INPUTS, imageFormatOf } from "./image-pdf-inputs.ts";
 import { NO_SIGNATURE } from "./image-signature.ts";
 import { MAGICK_BROWSER_INPUTS } from "./magickBrowser.ts";
+import { sfwToJpeg } from "./sfw.ts";
 import { decodeKtx1 } from "./texture-formats.ts";
 import { checkInputFile, convertWithWorker } from "./workerClient.ts";
 
@@ -310,6 +311,7 @@ test("a .bin whose picture a decoder can't read says the picture is damaged", as
   // A decoder in the worker, here KTX's, finds the file cut short.
   const cut = bytes("sample.ktx").slice(0, 100);
   assert.throws(() => decodeKtx1(cut), (error) => isDecodeFailure(error));
+  assert.throws(() => sfwToJpeg(text("SFW94A and nothing else")), (error) => isDecodeFailure(error));
   const { worker } = fakeWorker(() => ({ ok: false, error: "The texture file is truncated.", decodeFailure: true }));
   const ktx = await failure(convertWithWorker({ worker, from: "bin", to: "png", buf: buffer(cut) }));
   assert.equal(ktx.message, unreadableImageMessage("ktx"));
