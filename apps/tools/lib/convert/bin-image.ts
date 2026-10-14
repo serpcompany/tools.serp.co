@@ -25,8 +25,8 @@ export const BIN_HEAD_BYTES = IMAGE_SIGNATURE_BYTES;
 
 export function notAnImageMessage(to: string): string {
   return (
-    `This file isn't an image, so it can't become a ${to.toUpperCase()}. Only pictures saved with a .bin name ` +
-    "convert, such as Outlook's ATT00001.bin attachments; firmware, disc images and other binary files can't."
+    `This file isn't an image, so it can't become a ${to.toUpperCase()}. Only pictures saved as .bin files ` +
+    "convert, such as Outlook's ATT00001.bin attachments."
   );
 }
 

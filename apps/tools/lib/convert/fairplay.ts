@@ -16,8 +16,8 @@ const PATH = ["moov", "trak", "mdia", "minf", "stbl", "stsd"];
 
 export function copyProtectedMessage(to: string): string {
   return (
-    "This M4P file is copy-protected (Apple's FairPlay, used on Apple Music downloads and older iTunes Store " +
-    `songs), so it can't be converted to ${to.toUpperCase()}. Only unprotected M4P files convert.`
+    `This M4P file is copy-protected by Apple (FairPlay), so it can't be converted to ${to.toUpperCase()}. ` +
+    "Only unprotected M4P files convert."
   );
 }
 

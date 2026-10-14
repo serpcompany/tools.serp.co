@@ -73,7 +73,7 @@ test("Image to PDF still trusts only JPEG, PNG, GIF, WebP, HEIC and AVIF over th
 
 test("the messages say what the file is and what converts", () => {
   assert.match(notAnImageMessage("png"), /^This file isn't an image, so it can't become a PNG\./);
-  assert.match(notAnImageMessage("jpg"), /ATT00001\.bin.*firmware, disc images/);
+  assert.match(notAnImageMessage("jpg"), /Only pictures saved as \.bin files convert, such as Outlook's ATT00001\.bin attachments\.$/);
   assert.match(unreadableImageMessage("jpg"), /starts like a JPEG image.*damaged or incomplete/);
   assert.match(unreadableImageMessage("tiff"), /starts like a TIFF image/);
 });

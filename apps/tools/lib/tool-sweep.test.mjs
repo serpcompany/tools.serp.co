@@ -636,7 +636,7 @@ test("every refusal fixture in fixture-matrix.json exists and has its expected m
 
 test("a refusal passes only with the expected message, and code when the event was seen", () => {
   const expected = { fixture: "/f/tika-drm.m4p", errorCode: "copy_protected", message: "copy-protected" };
-  const message = "This M4P file is copy-protected (Apple's FairPlay), so it can't be converted to MP3.";
+  const message = "This M4P file is copy-protected by Apple (FairPlay), so it can't be converted to MP3.";
   assert.equal(refusalProblem({ outcome: "failed", message, errorCode: "copy_protected" }, expected), null);
   assert.equal(refusalProblem({ outcome: "failed", message, errorCode: null }, expected), null);
   assert.equal(
