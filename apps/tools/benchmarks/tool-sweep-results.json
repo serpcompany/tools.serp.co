@@ -3,7 +3,7 @@
     "issue": "https://github.com/serpcompany/tools.serp.co/issues/147",
     "command": "pnpm -C apps/tools tool-sweep",
     "baseUrl": "http://localhost:8812",
-    "commit": "2c3438ef7ff0b3d23a21967eaaa12c3098f2300c",
+    "commit": "348f8eec0ecdc1efca46c76432645e9e52314373",
     "activeTools": 2529,
     "counts": {
       "pass": 2102,
@@ -3932,6 +3932,24 @@
           "bin-to-png"
         ],
         "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "348f8eec0ecdc1efca46c76432645e9e52314373",
+        "dirty": false,
+        "startedAt": "2026-10-14T07:04:11.441Z",
+        "finishedAt": "2026-10-14T07:04:13.570Z",
+        "wallMs": 2129,
+        "measured": 3,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "bin-to-jpg",
+          "bin-to-jpeg",
+          "bin-to-png"
+        ],
+        "browserVersion": "143.0.7499.4"
       }
     ]
   },
@@ -4287,9 +4305,9 @@
     {"id":"avif-to-webp","route":"/avif-to-webp","from":"avif","to":"webp","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1046,"formatCheck":"signature","fixture":"sample.avif","output":{"files":1,"bytes":586,"name":"sample.webp"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"avif-to-xbm","route":"/avif-to-xbm","from":"avif","to":"xbm","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1188,"formatCheck":"none","fixture":"sample.avif","output":{"files":1,"bytes":7266,"name":"sample.xbm"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"batch-compress-png","route":"/batch-compress-png","from":"png","to":"png","handler":"BatchHeroConverter","engine":"jsquash-worker","status":"pass","durationMs":1256,"formatCheck":"signature","fixture":"sample.png,sample-2.png","output":{"files":2,"bytes":222,"name":"sample_compressed.png","inputBytes":571},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
-    {"id":"bin-to-jpeg","route":"/bin-to-jpeg","from":"bin","to":"jpeg","handler":"ToolPageRenderer","engine":"bin-image","status":"pass","durationMs":2049,"formatCheck":"signature","topColourShare":0.24,"refusals":[{"fixture":"not-an-image.bin","message":"This file isn't an image, so it can't become a JPEG. Only pictures saved as .bin files convert, such as Outlook's ATT00001.bin attachments."}],"fixture":"sample-heic.bin","output":{"files":1,"bytes":1277,"name":"sample-heic.jpeg"},"commit":"2c3438ef7ff0b3d23a21967eaaa12c3098f2300c","dirty":false},
-    {"id":"bin-to-jpg","route":"/bin-to-jpg","from":"bin","to":"jpg","handler":"ToolPageRenderer","engine":"bin-image","status":"pass","durationMs":2331,"formatCheck":"signature","refusals":[{"fixture":"not-an-image.bin","message":"This file isn't an image, so it can't become a JPG. Only pictures saved as .bin files convert, such as Outlook's ATT00001.bin attachments."}],"fixture":"sample.bin","output":{"files":1,"bytes":816,"name":"sample.jpg"},"commit":"2c3438ef7ff0b3d23a21967eaaa12c3098f2300c","dirty":false},
-    {"id":"bin-to-png","route":"/bin-to-png","from":"bin","to":"png","handler":"ToolPageRenderer","engine":"bin-image","status":"pass","durationMs":2341,"formatCheck":"signature","topColourShare":0.25,"refusals":[{"fixture":"not-an-image.bin","message":"This file isn't an image, so it can't become a PNG. Only pictures saved as .bin files convert, such as Outlook's ATT00001.bin attachments."}],"fixture":"sample-tiff.bin","output":{"files":1,"bytes":1122,"name":"sample-tiff.png"},"commit":"2c3438ef7ff0b3d23a21967eaaa12c3098f2300c","dirty":false},
+    {"id":"bin-to-jpeg","route":"/bin-to-jpeg","from":"bin","to":"jpeg","handler":"ToolPageRenderer","engine":"bin-image","status":"pass","durationMs":1671,"formatCheck":"signature","topColourShare":0.24,"refusals":[{"fixture":"not-an-image.bin","message":"This file isn't an image, so it can't become a JPEG. Only pictures saved as .bin files convert, such as Outlook's ATT00001.bin attachments."}],"fixture":"sample-heic.bin","output":{"files":1,"bytes":1277,"name":"sample-heic.jpeg"},"commit":"348f8eec0ecdc1efca46c76432645e9e52314373","dirty":false},
+    {"id":"bin-to-jpg","route":"/bin-to-jpg","from":"bin","to":"jpg","handler":"ToolPageRenderer","engine":"bin-image","status":"pass","durationMs":1965,"formatCheck":"signature","refusals":[{"fixture":"not-an-image.bin","message":"This file isn't an image, so it can't become a JPG. Only pictures saved as .bin files convert, such as Outlook's ATT00001.bin attachments."}],"fixture":"sample.bin","output":{"files":1,"bytes":816,"name":"sample.jpg"},"commit":"348f8eec0ecdc1efca46c76432645e9e52314373","dirty":false},
+    {"id":"bin-to-png","route":"/bin-to-png","from":"bin","to":"png","handler":"ToolPageRenderer","engine":"bin-image","status":"pass","durationMs":1949,"formatCheck":"signature","topColourShare":0.25,"refusals":[{"fixture":"not-an-image.bin","message":"This file isn't an image, so it can't become a PNG. Only pictures saved as .bin files convert, such as Outlook's ATT00001.bin attachments."}],"fixture":"sample-tiff.bin","output":{"files":1,"bytes":1122,"name":"sample-tiff.png"},"commit":"348f8eec0ecdc1efca46c76432645e9e52314373","dirty":false},
     {"id":"bmp-to-bmp","route":"/bmp-to-bmp","from":"bmp","to":"bmp","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1088,"formatCheck":"signature","fixture":"sample.bmp","output":{"files":1,"bytes":37002,"name":"sample.bmp"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"bmp-to-cur","route":"/bmp-to-cur","from":"bmp","to":"cur","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1284,"formatCheck":"signature","fixture":"sample.bmp","output":{"files":1,"bytes":38078,"name":"sample.cur"},"commit":"7bfa8558c8c9ef0aa66edfd1a2ce01adfce108c6","dirty":false},
     {"id":"bmp-to-dds","route":"/bmp-to-dds","from":"bmp","to":"dds","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1504,"formatCheck":"signature","fixture":"sample.bmp","output":{"files":1,"bytes":9344,"name":"sample.dds"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
