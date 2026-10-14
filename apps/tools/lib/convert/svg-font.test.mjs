@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
+import process from "node:process";
 import { Worker as NodeWorker } from "node:worker_threads";
 
 import opentype from "opentype.js";
@@ -598,18 +599,29 @@ function bentLoops(shapes, loops, { square = true } = {}) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -900 1000 1000">${`<path fill-rule="evenodd" d="${d}"/>`.repeat(shapes)}</svg>`;
 }
 
+// The CPU time this thread has used, in milliseconds. The time limits on
+// the heaviest conversions below are on the converting thread's own CPU
+// time, not the clock: on CI's runners, other test files and their threads
+// run beside this one, and the clock counts their time too.
+const threadCpu = () => {
+  const { user, system } = process.threadCpuUsage ? process.threadCpuUsage() : process.cpuUsage();
+  return (user + system) / 1000;
+};
+
 // svgToTtf on a Node worker thread whose heap is capped at `heapMb`, as a
 // phone's browser caps a page's (a thread past it stops with an error): the
-// glyph's points, or the refusal's code and message, and how long it took.
-// The boolean step isn't run there: nothing in the tests' files needs it.
+// glyph's points, or the refusal's code and message, and the thread's CPU
+// time for it (cpuMs). The boolean step isn't run there: nothing in the
+// tests' files needs it.
 function inCappedThread(text, heapMb) {
   const svgFont = new URL("./svg-font.ts", import.meta.url).href;
   const source =
     `import { parentPort } from "node:worker_threads"; import { svgToTtf, readGlyph } from ${JSON.stringify(svgFont)};` +
-    `parentPort.on("message", async (text) => { const started = Date.now();` +
+    `const threadCpu = ${threadCpu};` +
+    `parentPort.on("message", async (text) => { const started = threadCpu();` +
     `try { const { buffer } = await svgToTtf(new TextEncoder().encode(text).buffer, "icon.svg", { regions: () => { throw new Error("the boolean step ran"); } });` +
-    ` parentPort.postMessage({ points: readGlyph(new Uint8Array(buffer)).points, ms: Date.now() - started }); }` +
-    `catch (error) { parentPort.postMessage({ code: error.code, message: error.message, ms: Date.now() - started }); } });`;
+    ` parentPort.postMessage({ points: readGlyph(new Uint8Array(buffer)).points, cpuMs: threadCpu() - started }); }` +
+    `catch (error) { parentPort.postMessage({ code: error.code, message: error.message, cpuMs: threadCpu() - started }); } });`;
   return new Promise((resolve, reject) => {
     const worker = new NodeWorker(new URL(`data:text/javascript,${encodeURIComponent(source)}`), { resourceLimits: { maxOldGenerationSizeMb: heapMb } });
     worker.on("message", (message) => {
@@ -637,7 +649,7 @@ test("the boolean step keeps to the room the glyph has: a shape past it is taken
   const refused = await inCappedThread(review, 256);
   assert.equal(refused.code, "too_complex");
   assert.equal(refused.message, TOO_DETAILED_MESSAGE);
-  assert.ok(refused.ms < 3_000, `took ${refused.ms} ms`);
+  assert.ok(refused.cpuMs < 3_000, `took ${refused.cpuMs} ms`);
 
   // Just under: two copies of 127 loops, 65,038 points as lines, are worked
   // out in the worker (65,046 points as found) and make a glyph (12,204
@@ -741,9 +753,9 @@ test("the glyph's points are counted as svg2ttf writes them: smooth curves keep 
   const circles = (count) =>
     svg(Array.from({ length: count }, (_, index) => `<circle cx="${(index % 70) * 14 + 7}" cy="${Math.floor(index / 70) * 13.5 + 7}" r="5"/>`).join(""), 'viewBox="0 0 1000 1000"');
   for (const [count, expected] of [[4_000, 37_410], [4_999, 46_700]]) {
-    const started = Date.now();
-    const { result } = await font(circles(count), "icon.svg", { regions: noRegions });
-    assert.ok(Date.now() - started < 3_000, `${count} took ${Date.now() - started} ms`);
+    const started = threadCpu();
+    const result = await svgToTtf(encode(circles(count)), "icon.svg", { regions: noRegions });
+    assert.ok(threadCpu() - started < 3_000, `${count} took ${threadCpu() - started} ms`);
     assert.equal(readGlyph(new Uint8Array(result.buffer)).points, expected);
   }
   // At the cap and one over: 6,800 dots in one path (63,716 points) and a
@@ -760,13 +772,13 @@ test("the glyph's points are counted as svg2ttf writes them: smooth curves keep 
     for (let index = 1; index < corners - 1; index += 1) zigzag += `L${index} ${index % 2 ? 960 : 970}`;
     return svg(`<path d="${dots}"/><path d="${zigzag}L${corners - 2} 990Z"/>`, 'viewBox="0 0 1000 1000"');
   };
-  let started = Date.now();
-  const { result } = await font(capped(1_819), "icon.svg", { regions: noRegions });
-  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  let started = threadCpu();
+  const result = await svgToTtf(encode(capped(1_819)), "icon.svg", { regions: noRegions });
+  assert.ok(threadCpu() - started < 3_000, `took ${threadCpu() - started} ms`);
   assert.equal(readGlyph(new Uint8Array(result.buffer)).points, MAX_GLYPH_POINTS);
-  started = Date.now();
+  started = threadCpu();
   const error = await refusal(capped(1_820), "icon.svg", { regions: noRegions });
-  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  assert.ok(threadCpu() - started < 3_000, `took ${threadCpu() - started} ms`);
   assert.equal(error.code, "too_complex");
   assert.equal(error.message, TOO_DETAILED_MESSAGE);
 });
@@ -776,25 +788,25 @@ test("curves taken as drawn are made into the glyph's points one contour at a ti
   // curves. 5,000 are 99,000 points as svg2ttf's quadratics, and svg2ttf
   // keeps 30,008: the font is made, as at 10d79a7, which took 2.4 s
   // (svg2ttf's own simplify took time as the square of the points).
-  let started = Date.now();
-  const { result } = await font(bentLoops(1, 5_000, { square: false }), "icon.svg", { regions: () => assert.fail("nothing crosses") });
-  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  let started = threadCpu();
+  const result = await svgToTtf(encode(bentLoops(1, 5_000, { square: false })), "icon.svg", { regions: () => assert.fail("nothing crosses") });
+  assert.ok(threadCpu() - started < 3_000, `took ${threadCpu() - started} ms`);
   assert.deepEqual(readGlyph(new Uint8Array(result.buffer)), { contours: 1, points: 30_008 });
   // 20,000 (1.07 MB) keep about 120,000: refused as soon as 65,535 are
   // made. At 10d79a7 svg2ttf ran 20 s into a stack overflow (a "try
   // again").
-  started = Date.now();
+  started = threadCpu();
   const error = await refusal(bentLoops(1, 20_000, { square: false }), "icon.svg", { regions: () => assert.fail("nothing crosses") });
-  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  assert.ok(threadCpu() - started < 3_000, `took ${threadCpu() - started} ms`);
   assert.equal(error.message, TOO_DETAILED_MESSAGE);
   // A curve that runs back along a line makes many quadratics and may keep
   // few points; they are never held at once. 20,000 of them in one contour
   // (0.55 MB) are 320,000 points as svg2ttf's quadratics, and keep 40,006:
   // the font is made, with the page's heap capped at 64 MB (f80448e refused
-  // it, counting the quadratics). 59,990 (1.63 MB, under 60,000 path
-  // commands) are 960,000 points as quadratics: refused once 65,535 are
-  // kept, with the page's heap capped at 256 MB, as for the review's file
-  // above (reading and flattening 60,000 curves takes most of it).
+  // it, counting the quadratics). 40,000 (1.09 MB) are 640,000 points as
+  // quadratics and would keep 80,006: refused once 65,535 are kept, with
+  // the page's heap capped at 256 MB, as for the review's file above
+  // (reading and flattening the curves takes most of it).
   const back = (count) => {
     let d = "M0 0";
     for (let index = 0; index < count; index += 1) d += `C${(index * 0.05 + 400).toFixed(2)} 0 ${(index * 0.05 - 300).toFixed(2)} 0 ${((index + 1) * 0.05).toFixed(2)} 0`;
@@ -803,10 +815,10 @@ test("curves taken as drawn are made into the glyph's points one contour at a ti
   };
   const kept = await inCappedThread(back(20_000), 64);
   assert.equal(kept.points, 40_006);
-  assert.ok(kept.ms < 3_000, `took ${kept.ms} ms`);
-  const refused = await inCappedThread(back(59_990), 256);
+  assert.ok(kept.cpuMs < 3_000, `took ${kept.cpuMs} ms`);
+  const refused = await inCappedThread(back(40_000), 256);
   assert.equal(refused.message, TOO_DETAILED_MESSAGE);
-  assert.ok(refused.ms < 5_000, `took ${refused.ms} ms`);
+  assert.ok(refused.cpuMs < 5_000, `took ${refused.cpuMs} ms`);
 });
 
 test("the glyph's points are svg2ttf's own: its quadratics, simplify, interpolate and rounding, made from the end of each contour", async () => {
