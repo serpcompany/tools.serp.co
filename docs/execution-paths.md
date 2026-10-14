@@ -123,13 +123,21 @@ Conversion picks an engine by input format:
   the same file, never another file's. Each shape is filled by its own fill
   rule (from attributes, a stylesheet's simple selectors or a style
   attribute, inherited), then its contours are turned so the font's nonzero
-  rule fills what the SVG paints: overlapping shapes all fill, and holes stay
-  holes. An even-odd shape whose outlines cross or touch (a star drawn as one
-  outline) is first redrawn without crossings by martinez-polygon-clipping
-  0.9.0, loaded only then, its curves as lines within a quarter of a font
-  unit. A `<use>` of a `<symbol>` with no size fills the viewport it is in,
-  and a transform on the root `<svg>` moves the drawing as browsers do, in
-  pixels and about the artboard's centre. svgicons2svgfont 16.0.0 flattens
+  rule fills what the SVG paints, winding once round each shape's region and
+  never less: overlapping shapes all fill, none cuts into another, and holes
+  stay holes. Where that needs it (an even-odd shape whose outlines cross or
+  touch, as a star drawn as one outline; a nonzero one whose outlines run
+  both ways round or cross themselves), `svg-font-boolean.ts` finds the
+  region by a sweep in slabs, its curves as lines within a quarter of a font
+  unit, in a worker stopped after 5 seconds. A shape whose outlines meet over
+  10,000 times, or that the worker didn't finish, is taken as drawn instead,
+  its crossing outlines all filling, and the page says gaps may fill in. A
+  `<use>` of a `<symbol>` with no size fills the viewport it is in, and a
+  transform on the root `<svg>` (the attribute, or CSS `transform` in a style
+  or stylesheet) moves the drawing as Chromium does, in pixels about its
+  `transform-origin` (the centre unless set), leaving out what it moves off
+  the artboard; on other elements those two CSS properties aren't read.
+  svgicons2svgfont 16.0.0 flattens
   each shape under one matrix, as lines and curves only (svg-pathdata 9.0.0,
   which it uses, turns an absolute H or V wrongly under a rotation), and
   svg2ttf 6.1.0 writes the font: 1,000 units to the em, the artboard

@@ -6,8 +6,9 @@
 // svg-font-shapes.ts reads the file's filled shapes; svgicons2svgfont
 // flattens each, with its transforms, into one path; this module fills each
 // shape by its own fill rule and joins them (a font fills by the nonzero
-// rule, across every contour of the glyph), with martinez-polygon-clipping
-// for an even-odd shape whose outlines cross; svg2ttf writes the TrueType
+// rule, across every contour of the glyph; svg-font-regions.ts), with
+// a boolean step, in a worker with a time limit, for a shape whose outlines
+// cross (svg-font-boolean.ts); svg2ttf writes the TrueType
 // file, which is read back before it is saved. Loaded only when an SVG is
 // converted to TTF (workerClient.ts).
 
@@ -17,6 +18,26 @@ import { SVGIcons2SVGFontStream } from "svgicons2svgfont";
 import { SVGPathData } from "svg-pathdata";
 
 import { SVG_FONT_MAX_BYTES, SVG_FONT_TOO_LARGE_MESSAGE } from "./image-document-targets.ts";
+import type { RegionShape, RegionsJob, RegionsReply } from "./svg-font-boolean.ts";
+import {
+  MAX_CROSSINGS,
+  MAX_GLYPH_POINTS,
+  boundsOf,
+  clockwise,
+  findMeetings,
+  finishContour,
+  normalizeContours,
+  polygonContour,
+  polygonOf,
+  reversed,
+  ringOf,
+  type Budget,
+  type Contour,
+  type FillRule,
+  type Meetings,
+  type Point,
+  type Segment,
+} from "./svg-font-regions.ts";
 import {
   IDENTITY,
   TOO_COMPLEX_MESSAGE,
@@ -26,6 +47,7 @@ import {
   type LeftOut,
   type SvgShape,
 } from "./svg-font-shapes.ts";
+import { runInWorker, type WorkerLike } from "./worker-run.ts";
 
 export const SVG_FONT_CODE_POINT = 0xe000;
 
@@ -39,9 +61,6 @@ export const DESCENT = 150;
 const MAX_ADVANCE = 16_000;
 // TrueType stores coordinates as 16-bit integers.
 const MAX_COORDINATE = 32_000;
-// Work allowed for finding which contours cross or hold which: edges and
-// boxes compared, polygon edges tested.
-const NESTING_BUDGET = 100_000_000;
 
 // The family name: the file's name without its extension, in plain ASCII
 // letters, digits, spaces, hyphens and underscores (svg2ttf writes names
@@ -66,9 +85,13 @@ function postScriptName(family: string): string {
   return family.replace(/[^A-Za-z0-9_-]/g, "") || "Icon";
 }
 
-// What the page tells the visitor about the font: where the icon is, and
-// what the SVG had that a font can't hold.
-export function svgFontNotice(family: string, leftOut: LeftOut): string {
+export const CROSSINGS_NOTICE =
+    "Where this SVG's outlines cross, the font may fill in gaps the SVG leaves empty: the crossings were too many or too intricate to work out in the browser.";
+
+// What the page tells the visitor about the font: where the icon is, what
+// the SVG had that a font can't hold, and whether crossing outlines were
+// taken as drawn (fillShapes).
+export function svgFontNotice(family: string, leftOut: LeftOut, approximated = false): string {
   const parts = [
     `The icon is character U+E000 of the font "${family}": in HTML &#xE000;, in CSS content: "\\e000".`,
   ];
@@ -81,6 +104,7 @@ export function svgFontNotice(family: string, leftOut: LeftOut): string {
     const list = missing.length > 1 ? `${missing.slice(0, -1).join(", ")} and ${missing.at(-1)}` : missing[0];
     parts.push(`Left out, as a font holds filled shapes only: ${list}.`);
   }
+  if (approximated) parts.push(CROSSINGS_NOTICE);
   return parts.join(" ");
 }
 
@@ -130,84 +154,14 @@ async function flattenShapes(shapes: SvgShape[]): Promise<string[]> {
 
 // ---- Contours ----
 
-type Point = { x: number; y: number };
-type Segment = { to: Point; c1?: Point; c2?: Point };
-type Contour = {
-  start: Point;
-  segments: Segment[];
-  // For working out which contour holds which: the outline as a polygon
-  // (curves sampled), its signed area (positive when counterclockwise, y
-  // up) and its bounds.
-  polygon: Point[];
-  area: number;
-  box: { minX: number; minY: number; maxX: number; maxY: number };
-};
-
-const CURVE_SAMPLES = 8;
-
 const outOfRange = (cause?: unknown) => svgFontError("number_out_of_range", UNREADABLE_SVG_MESSAGE, cause);
 
-function cubicAt(p0: Point, c1: Point, c2: Point, p3: Point, t: number): Point {
-  const u = 1 - t;
-  return {
-    x: u * u * u * p0.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t * t * t * p3.x,
-    y: u * u * u * p0.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t * t * t * p3.y,
-  };
-}
-
-// Whether all of `polygon` lies on one line (to a billionth of its length):
-// an outline that encloses nothing.
-function onOneLine(polygon: Point[]): boolean {
-  const first = polygon[0]!;
-  let far = first;
-  let farthest = 0;
-  for (const point of polygon) {
-    const distance = (point.x - first.x) ** 2 + (point.y - first.y) ** 2;
-    if (distance > farthest) {
-      farthest = distance;
-      far = point;
-    }
-  }
-  const dx = far.x - first.x;
-  const dy = far.y - first.y;
-  return polygon.every((point) => Math.abs(dx * (point.y - first.y) - dy * (point.x - first.x)) <= farthest * 1e-9);
-}
-
-function finishContour(start: Point, segments: Segment[]): Contour | null {
-  if (!segments.length) return null;
-  const polygon: Point[] = [start];
-  let previous = start;
-  for (const segment of segments) {
-    if (segment.c1 && segment.c2) {
-      for (let step = 1; step <= CURVE_SAMPLES; step += 1) {
-        polygon.push(cubicAt(previous, segment.c1, segment.c2, segment.to, step / CURVE_SAMPLES));
-      }
-    } else {
-      polygon.push(segment.to);
-    }
-    previous = segment.to;
-  }
-  // svg-font-shapes.ts bounds every number, so this is only a backstop.
+// finishContour, refusing a point past a double's range. svg-font-shapes.ts
+// bounds every number, so this is only a backstop.
+function checkedContour(start: Point, segments: Segment[]): Contour | null {
+  const polygon = polygonOf(start, segments);
   if (!polygon.every((point) => Number.isFinite(point.x) && Number.isFinite(point.y))) throw outOfRange();
-  let area = 0;
-  const box = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
-  // Measured from the start, so a small contour far from the origin keeps
-  // its precision.
-  for (let index = 0; index < polygon.length; index += 1) {
-    const a = polygon[index]!;
-    const b = polygon[(index + 1) % polygon.length]!;
-    area += (a.x - start.x) * (b.y - start.y) - (b.x - start.x) * (a.y - start.y);
-    box.minX = Math.min(box.minX, a.x);
-    box.minY = Math.min(box.minY, a.y);
-    box.maxX = Math.max(box.maxX, a.x);
-    box.maxY = Math.max(box.maxY, a.y);
-  }
-  // A contour with no width or no height (a line, a point), or whose points
-  // are all on one line, fills nothing.
-  const size = Math.max(box.maxX - box.minX, box.maxY - box.minY);
-  if (!(size > 0) || box.maxX - box.minX <= size * 1e-9 || box.maxY - box.minY <= size * 1e-9) return null;
-  if (onOneLine(polygon)) return null;
-  return { start, segments, polygon, area: area / 2, box };
+  return finishContour(start, segments, polygon);
 }
 
 // Path data (absolute or not, any commands) as closed contours of lines
@@ -228,7 +182,7 @@ function contoursOf(d: string): Contour[] {
   let closed = false;
   const finish = () => {
     if (start) {
-      const contour = finishContour(start, segments);
+      const contour = checkedContour(start, segments);
       if (contour) contours.push(contour);
     }
     segments = [];
@@ -267,7 +221,7 @@ function contoursOf(d: string): Contour[] {
 // `contour` with every point moved by `map`, an affine map, so its curves
 // stay curves; null when it no longer encloses anything.
 function mapContour(contour: Contour, map: (point: Point) => Point): Contour | null {
-  return finishContour(
+  return checkedContour(
     map(contour.start),
     contour.segments.map((segment) =>
       segment.c1 && segment.c2 ? { c1: map(segment.c1), c2: map(segment.c2), to: map(segment.to) } : { to: map(segment.to) },
@@ -275,276 +229,110 @@ function mapContour(contour: Contour, map: (point: Point) => Point): Contour | n
   );
 }
 
-// The bounds of all of `contours`.
-function boundsOf(contours: Contour[]): Contour["box"] {
-  const bounds = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
-  for (const { box } of contours) {
-    bounds.minX = Math.min(bounds.minX, box.minX);
-    bounds.minY = Math.min(bounds.minY, box.minY);
-    bounds.maxX = Math.max(bounds.maxX, box.maxX);
-    bounds.maxY = Math.max(bounds.maxY, box.maxY);
-  }
-  return bounds;
-}
+// ---- Filling each shape ----
 
-function boxHolds(outer: Contour["box"], inner: Contour["box"]): boolean {
-  return outer.minX <= inner.minX && outer.minY <= inner.minY && outer.maxX >= inner.maxX && outer.maxY >= inner.maxY;
-}
+// Work allowed on the page's thread for finding which contours hold which
+// (edges and boxes compared, polygon edges tested), past which a file is
+// refused as too detailed; and for finding where outlines cross (pairs of
+// edges compared), past which a shape's outlines are taken as drawn.
+const NESTING_BUDGET = 100_000_000;
+const SWEEP_WORK = 50_000_000;
+// How long the boolean step (svg-font-boolean.ts) may run in its worker.
+export const REGIONS_TIMEOUT_MS = 5_000;
 
-// Whether `point` is inside `polygon` (crossings of a ray to the right).
-function inside(point: Point, polygon: Point[]): boolean {
-  let crossings = false;
-  for (let index = 0, previous = polygon.length - 1; index < polygon.length; previous = index, index += 1) {
-    const a = polygon[index]!;
-    const b = polygon[previous]!;
-    if (a.y > point.y !== b.y > point.y && point.x < ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x) {
-      crossings = !crossings;
-    }
-  }
-  return crossings;
-}
+export type RegionsRunner = (job: RegionsJob) => Promise<RegionsReply>;
 
-type Budget = { left: number };
+const startRegionsWorker = (): WorkerLike<RegionsReply> =>
+  new Worker(new URL("./svg-font.worker.ts", import.meta.url), { type: "module" });
 
-function spend(budget: Budget, work: number): void {
-  budget.left -= work;
-  if (budget.left < 0) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
-}
-
-// Whether `outer` holds `inner`: most of three of inner's points are inside
-// it (one may sit on outer's edge, where a hole touches its outline).
-function holds(outer: Contour, inner: Contour, budget: Budget): boolean {
-  const points = inner.polygon;
-  const picks = [0, Math.floor(points.length / 3), Math.floor((2 * points.length) / 3)];
-  spend(budget, picks.length * outer.polygon.length);
-  const votes = picks.filter((index) => inside(points[index]!, outer.polygon)).length;
-  return votes >= 2;
-}
-
-function reversed(contour: Contour): Contour {
-  const points = [contour.start, ...contour.segments.map((segment) => segment.to)];
-  const segments: Segment[] = [];
-  // The closing line, from the last point back to the start, comes first.
-  const last = points.at(-1)!;
-  if (last.x !== contour.start.x || last.y !== contour.start.y) segments.push({ to: last });
-  for (let index = contour.segments.length - 1; index >= 0; index -= 1) {
-    const segment = contour.segments[index]!;
-    const to = points[index]!;
-    segments.push(segment.c1 && segment.c2 ? { c1: segment.c2, c2: segment.c1, to } : { to });
-  }
-  return { ...contour, segments, area: -contour.area };
-}
-
-// One shape's contours, none crossing or touching another, turned so that
-// the nonzero rule fills exactly what the shape's own rule fills, with a
-// winding number of one: an outline clockwise (as TrueType's are), a hole
-// counterclockwise, and a contour that changes nothing left out. Every
-// shape's filled area then counts the same, so where shapes overlap a font
-// fills them all, as the SVG paints them, and a hole in one shape is a hole
-// only where nothing else is drawn.
-//
-// Which contour holds which comes from the smallest contour around it.
-function normalizeContours(contours: Contour[], fillRule: "nonzero" | "evenodd", budget: Budget): Contour[] {
-  const order = contours.map((_, index) => index).sort((a, b) => Math.abs(contours[a]!.area) - Math.abs(contours[b]!.area));
-  const parent = new Array<number>(contours.length).fill(-1);
-  // Only a larger contour can hold one; contours of the same size (a grid
-  // of dots) aren't compared.
-  let larger = 0;
-  order.forEach((index, rank) => {
-    const contour = contours[index]!;
-    const size = Math.abs(contour.area);
-    larger = Math.max(larger, rank + 1);
-    while (larger < order.length && Math.abs(contours[order[larger]!]!.area) <= size) larger += 1;
-    for (let next = larger; next < order.length; next += 1) {
-      spend(budget, 1);
-      const candidate = contours[order[next]!]!;
-      if (!boxHolds(candidate.box, contour.box)) continue;
-      if (holds(candidate, contour, budget)) {
-        parent[index] = order[next]!;
-        break;
-      }
-    }
-  });
-  // Outermost first, so a contour's parent is done before it.
-  const winding = new Array<number>(contours.length).fill(0);
-  const depth = new Array<number>(contours.length).fill(0);
-  const target = new Array<number>(contours.length).fill(0);
-  const result: Contour[] = [];
-  for (const index of [...order].reverse()) {
-    const contour = contours[index]!;
-    const up = parent[index]! === -1 ? null : parent[index]!;
-    winding[index] = (up === null ? 0 : winding[up]!) + (contour.area < 0 ? -1 : 1);
-    depth[index] = (up === null ? 0 : depth[up]!) + 1;
-    const filled = fillRule === "evenodd" ? depth[index]! % 2 === 1 : winding[index] !== 0;
-    target[index] = filled ? 1 : 0;
-    const turn = target[index]! - (up === null ? 0 : target[up]!);
-    if (turn === 0) continue;
-    // Clockwise (negative area, y up) adds one; counterclockwise takes one off.
-    const clockwise = contour.area < 0;
-    result.push((turn > 0) === clockwise ? contour : reversed(contour));
-  }
-  return result;
-}
-
-function orientation(a: Point, b: Point, c: Point): number {
-  return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-}
-
-function within(a: Point, b: Point, point: Point): boolean {
-  return (
-    Math.min(a.x, b.x) <= point.x &&
-    point.x <= Math.max(a.x, b.x) &&
-    Math.min(a.y, b.y) <= point.y &&
-    point.y <= Math.max(a.y, b.y)
-  );
-}
-
-// Whether the segments ab and cd cross or touch.
-function segmentsMeet(a: Point, b: Point, c: Point, d: Point): boolean {
-  const d1 = orientation(c, d, a);
-  const d2 = orientation(c, d, b);
-  const d3 = orientation(a, b, c);
-  const d4 = orientation(a, b, d);
-  if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) return true;
-  return (
-    (d1 === 0 && within(c, d, a)) ||
-    (d2 === 0 && within(c, d, b)) ||
-    (d3 === 0 && within(a, b, c)) ||
-    (d4 === 0 && within(a, b, d))
-  );
-}
-
-// Whether any of a shape's contours crosses or touches another, or itself
-// (by their polygons: curves sampled). Then nesting can't tell what the
-// shape fills. Edges are swept along the drawing's longer side.
-function contoursMeet(contours: Contour[], budget: Budget): boolean {
-  const bounds = boundsOf(contours);
-  const alongX = bounds.maxX - bounds.minX >= bounds.maxY - bounds.minY;
-  type Edge = { contour: number; index: number; count: number; a: Point; b: Point; low: number; high: number; from: number; to: number };
-  const edges: Edge[] = [];
-  contours.forEach((contour, which) => {
-    const points = contour.polygon.filter((point, index, all) => {
-      const next = all[(index + 1) % all.length]!;
-      return point.x !== next.x || point.y !== next.y;
+// The boolean step in a new worker, terminated when it answers, fails, or
+// runs past `timeoutMs` (then the shapes it had are taken as drawn).
+export function regionsInWorker({
+  timeoutMs = REGIONS_TIMEOUT_MS,
+  createWorker = startRegionsWorker,
+}: { timeoutMs?: number; createWorker?: () => WorkerLike<RegionsReply> } = {}): RegionsRunner {
+  return (job) =>
+    runInWorker(createWorker(), job, {
+      timeoutMs,
+      timedOut: () => new Error(`The crossing outlines took over ${timeoutMs} ms to work out.`),
+      crashed: (event) => new Error(`The crossing outlines worker stopped (${event.message || "out of memory"}).`),
+      transfer: job.shapes.flatMap((shape) => shape.rings.map((ring) => ring.buffer)),
     });
-    spend(budget, points.length);
-    points.forEach((a, index) => {
-      const b = points[(index + 1) % points.length]!;
-      const [u1, u2, v1, v2] = alongX ? [a.x, b.x, a.y, b.y] : [a.y, b.y, a.x, b.x];
-      edges.push({ contour: which, index, count: points.length, a, b, low: Math.min(u1, u2), high: Math.max(u1, u2), from: Math.min(v1, v2), to: Math.max(v1, v2) });
-    });
+}
+
+// Where there is no Worker (Node, in tests): on this thread, unbounded.
+const regionsInThread: RegionsRunner = async (job) => (await import("./svg-font-boolean.ts")).resolveRegions(job);
+
+type Placed = { fillRule: FillRule; contours: Contour[] };
+
+const allClockwise = (contours: Contour[]) => contours.map(clockwise);
+
+// The shapes' contours, ready to join in one glyph: each shape's own region,
+// by its own fill rule, with a winding of one inside it and none outside, so
+// that no shape cuts into another where they overlap (normalizeContours).
+// - Outlines that neither cross nor touch: their nesting says what fills.
+// - A nonzero shape whose outlines meet, all running the same way round and
+//   none meeting itself, never winds below zero: it is taken as drawn,
+//   turned clockwise. So is a nonzero shape alone in the glyph, since the
+//   font's rule is then its own.
+// - Any other shape whose outlines meet (an even-odd star, two squares drawn
+//   opposite ways) goes to the boolean step, in a worker with a time limit.
+// A shape whose outlines meet more than MAX_CROSSINGS times, or more than a
+// glyph's points once its curves are lines, or that the boolean step didn't
+// finish within REGIONS_TIMEOUT_MS, is taken as drawn instead: the contours
+// that meet clockwise, so they all fill, and the rest by their nesting
+// (`approximated`: where outlines cross, gaps the SVG leaves may fill).
+async function fillShapes(
+  placed: Placed[],
+  budget: Budget,
+  regions: RegionsRunner,
+): Promise<{ contours: Contour[]; approximated: boolean }> {
+  const sweep = { left: SWEEP_WORK };
+  const job: RegionShape[] = [];
+  let approximated = false;
+  type Plan = { done: Contour[] } | { job: number; shape: Placed; meetings: Meetings };
+  const fallback = ({ contours, fillRule }: Placed, meetings: Meetings): Contour[] => {
+    approximated = true;
+    if (meetings.capped) return allClockwise(contours);
+    return normalizeContours(contours, fillRule, budget, { outward: (index) => meetings.meeting.has(index) });
+  };
+  const plans = placed.map((shape): Plan => {
+    const { contours, fillRule } = shape;
+    const meetings = findMeetings(contours, MAX_CROSSINGS, sweep);
+    if (!meetings.capped && !meetings.count) return { done: normalizeContours(contours, fillRule, budget) };
+    if (fillRule === "nonzero") {
+      const direction = Math.sign(contours[0]!.area);
+      const sameWay = contours.every((contour) => Math.sign(contour.area) === direction);
+      if (placed.length === 1) return { done: contours.reduce((sum, contour) => sum + contour.area, 0) > 0 ? contours.map(reversed) : contours };
+      if (!meetings.capped && !meetings.selfMeet && sameWay) return { done: allClockwise(contours) };
+    }
+    if (meetings.capped) return { done: fallback(shape, meetings) };
+    const rings = contours.map(ringOf);
+    if (rings.reduce((sum, ring) => sum + ring.length / 2, 0) > MAX_GLYPH_POINTS) return { done: fallback(shape, meetings) };
+    job.push({ fillRule, rings });
+    return { job: job.length - 1, shape, meetings };
   });
-  edges.sort((e, f) => e.low - f.low);
-  for (let i = 0; i < edges.length; i += 1) {
-    const e = edges[i]!;
-    for (let j = i + 1; j < edges.length && edges[j]!.low <= e.high; j += 1) {
-      spend(budget, 1);
-      const f = edges[j]!;
-      if (f.from > e.to || f.to < e.from) continue;
-      // Neighbouring edges of one contour share their corner.
-      const gap = Math.abs(e.index - f.index);
-      if (e.contour === f.contour && (gap === 1 || gap === e.count - 1)) continue;
-      if (segmentsMeet(e.a, e.b, f.a, f.b)) return true;
+  let reply: RegionsReply | null = null;
+  if (job.length) {
+    try {
+      reply = await regions({ shapes: job });
+    } catch {
+      // Past its time limit, or the worker didn't load: every shape it had
+      // is taken as drawn.
+      reply = null;
     }
   }
-  return false;
-}
-
-// martinez works on polygons: a curve becomes enough straight steps to keep
-// within FLATNESS font units of it (invisible at 1,000 units to the em; a
-// curve's chords of n equal steps are within max|B''| / 8n² of it).
-const FLATNESS = 0.25;
-const MAX_CURVE_STEPS = 256;
-// The most points one TrueType glyph holds.
-const MAX_GLYPH_POINTS = 65_535;
-
-function ringOf(contour: Contour): [number, number][] {
-  const ring: [number, number][] = [[contour.start.x, contour.start.y]];
-  let previous = contour.start;
-  for (const { c1, c2, to } of contour.segments) {
-    if (c1 && c2) {
-      const bend = 6 * Math.max(
-        Math.hypot(previous.x - 2 * c1.x + c2.x, previous.y - 2 * c1.y + c2.y),
-        Math.hypot(c1.x - 2 * c2.x + to.x, c1.y - 2 * c2.y + to.y),
-      );
-      const steps = Math.min(MAX_CURVE_STEPS, Math.max(1, Math.ceil(Math.sqrt(bend / (8 * FLATNESS)))));
-      for (let step = 1; step < steps; step += 1) {
-        const point = cubicAt(previous, c1, c2, to, step / steps);
-        ring.push([point.x, point.y]);
-      }
-    }
-    ring.push([to.x, to.y]);
-    previous = to;
-  }
-  ring.push(ring[0]!);
-  return ring;
-}
-
-// `points` (a ring of martinez's output, not closed) split where it comes
-// back to a point it has passed: martinez writes a hole that touches its
-// outline, or two parts that meet at a corner, as one ring, which only the
-// even-odd rule reads rightly. Each loop returned passes a point once.
-function simpleLoops(points: Point[]): Point[][] {
-  const loops: Point[][] = [];
-  const path: Point[] = [];
-  const seen = new Map<string, number>();
-  for (const point of points) {
-    const at = seen.get(`${point.x},${point.y}`);
-    if (at === undefined) {
-      seen.set(`${point.x},${point.y}`, path.length);
-      path.push(point);
+  const contours: Contour[] = [];
+  for (const plan of plans) {
+    if ("done" in plan) {
+      contours.push(...plan.done);
       continue;
     }
-    const loop = path.splice(at + 1);
-    for (const passed of loop) seen.delete(`${passed.x},${passed.y}`);
-    loops.push([path[at]!, ...loop]);
+    const resolved = reply?.ok ? reply.shapes[plan.job] : undefined;
+    if (resolved && "contours" in resolved) contours.push(...resolved.contours.flatMap((points) => polygonContour(points) ?? []));
+    else contours.push(...fallback(plan.shape, plan.meetings));
   }
-  loops.push(path);
-  return loops;
-}
-
-// An even-odd shape whose contours cross or touch (a star drawn as one
-// outline, two overlapping squares in one path), as outlines and holes
-// that don't: the region it fills, found by martinez-polygon-clipping
-// (Martinez-Rueda boolean operations, which read a polygon's rings by the
-// even-odd rule), loaded only for such a shape, as loops that neither cross
-// nor touch themselves, whose nesting then says which are holes. Its
-// curves become lines.
-async function withoutCrossings(contours: Contour[]): Promise<Contour[]> {
-  const rings = contours.map(ringOf);
-  if (rings.reduce((sum, ring) => sum + ring.length, 0) > MAX_GLYPH_POINTS) {
-    throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
-  }
-  const { intersection } = await import("martinez-polygon-clipping");
-  // Cut by a box around the shape: an operation with an empty polygon
-  // returns the shape as it is.
-  const { minX, minY, maxX, maxY } = boundsOf(contours);
-  const [left, bottom, right, top] = [minX - 1, minY - 1, maxX + 1, maxY + 1];
-  const frame: [number, number][][] = [[[left, bottom], [right, bottom], [right, top], [left, top], [left, bottom]]];
-  const result: Contour[] = [];
-  for (const polygon of intersection(rings, frame)) {
-    for (const ring of polygon) {
-      // Its rings are closed: the last point is the first.
-      for (const [first, ...rest] of simpleLoops(ring.slice(0, -1).map(([x, y]) => ({ x, y })))) {
-        const contour = first ? finishContour(first, rest.map((to) => ({ to }))) : null;
-        if (contour) result.push(contour);
-      }
-    }
-  }
-  return result;
-}
-
-// One shape's contours, ready to join the glyph (normalizeContours). When
-// they cross or touch: an even-odd shape is first redrawn without crossings
-// (withoutCrossings); a nonzero shape is taken as drawn, since its own
-// winding is what the SVG fills, and turned as a whole to run clockwise,
-// so that it adds to the shapes under it. A single contour of a nonzero
-// shape fills the same either way.
-async function fillShape(contours: Contour[], fillRule: "nonzero" | "evenodd", budget: Budget): Promise<Contour[]> {
-  const meet = (fillRule === "evenodd" || contours.length > 1) && contoursMeet(contours, budget);
-  if (!meet) return normalizeContours(contours, fillRule, budget);
-  if (fillRule === "evenodd") return normalizeContours(await withoutCrossings(contours), "evenodd", budget);
-  return contours.reduce((sum, contour) => sum + contour.area, 0) > 0 ? contours.map(reversed) : contours;
+  return { contours, approximated };
 }
 
 // ---- The font ----
@@ -636,7 +424,13 @@ export type SvgFontResult = { buffer: ArrayBuffer; family: string; notice: strin
 // an Error with a `code` (svg-font-shapes.ts) for a file that is damaged,
 // draws nothing a font can hold, or is too large or detailed; any other
 // error is this converter's.
-export async function svgToTtf(buf: ArrayBuffer, fileName: string): Promise<SvgFontResult> {
+export async function svgToTtf(
+  buf: ArrayBuffer,
+  fileName: string,
+  // Where the boolean step runs: a worker with a time limit, unless there
+  // is no Worker (Node).
+  { regions }: { regions?: RegionsRunner } = {},
+): Promise<SvgFontResult> {
   if (buf.byteLength > SVG_FONT_MAX_BYTES) throw svgFontError("too_complex", SVG_FONT_TOO_LARGE_MESSAGE);
   const { artboard, transform, shapes, leftOut, strokeOnly } = readSvgShapes(decodeSvgText(new Uint8Array(buf)));
   const family = fontFamilyName(fileName);
@@ -655,22 +449,29 @@ export async function svgToTtf(buf: ArrayBuffer, fileName: string): Promise<SvgF
   let perShape = shapes.map((_, index) => contoursOf(paths[index]!));
 
   // Off the artboard, a browser shows nothing: contours wholly outside it
-  // (an editor's spare parts) are left out of the glyph too.
+  // (an editor's spare parts) are left out of the glyph too, before the
+  // root's own transform and after it (a turn about the box's corner can
+  // take the drawing off it).
   let box: Box | null = null;
-  if (artboard) {
-    const frame = { left: artboard.x, bottom: 1 - artboard.y - artboard.height, width: artboard.width, height: artboard.height };
+  const onArtboard = (frame: Box) => {
     const drawn = perShape.some((contours) => contours.length);
+    // A contour that only touches the artboard's edge (to a billionth of
+    // its size, as a turn's rounding leaves it) isn't seen either.
+    const margin = Math.max(frame.width, frame.height) * 1e-9;
     perShape = perShape.map((contours) =>
       contours.filter(
         ({ box: own }) =>
-          own.maxX > frame.left &&
-          own.minX < frame.left + frame.width &&
-          own.maxY > frame.bottom &&
-          own.minY < frame.bottom + frame.height,
+          own.maxX > frame.left + margin &&
+          own.minX < frame.left + frame.width - margin &&
+          own.maxY > frame.bottom + margin &&
+          own.minY < frame.bottom + frame.height - margin,
       ),
     );
     if (drawn && !perShape.some((contours) => contours.length)) throw svgFontError("nothing_to_draw", OUTSIDE_ARTBOARD_MESSAGE);
-    box = frame;
+  };
+  if (artboard) {
+    box = { left: artboard.x, bottom: 1 - artboard.y - artboard.height, width: artboard.width, height: artboard.height };
+    onArtboard(box);
   }
   // The root's own transform moves the drawing and its artboard together:
   // the drawing is moved, and the artboard stays the glyph's frame.
@@ -678,6 +479,7 @@ export async function svgToTtf(buf: ArrayBuffer, fileName: string): Promise<SvgF
     const [a, b, c, d, e, f] = transform;
     const move = ({ x, y }: Point): Point => ({ x: a * x + c * (1 - y) + e, y: 1 - (b * x + d * (1 - y) + f) });
     perShape = perShape.map((contours) => contours.flatMap((contour) => mapContour(contour, move) ?? []));
+    if (box) onArtboard(box);
   }
   if (!box) {
     const bounds = boundsOf(perShape.flat());
@@ -698,12 +500,11 @@ export async function svgToTtf(buf: ArrayBuffer, fileName: string): Promise<SvgF
     }
     return point;
   };
-  const budget = { left: NESTING_BUDGET };
-  const contours: Contour[] = [];
-  for (const [index, shape] of shapes.entries()) {
-    const placed = perShape[index]!.flatMap((contour) => mapContour(contour, toFont) ?? []);
-    contours.push(...(await fillShape(placed, shape.fillRule, budget)));
-  }
+  const budget: Budget = { left: NESTING_BUDGET, exceeded: () => svgFontError("too_complex", TOO_COMPLEX_MESSAGE) };
+  const placed = shapes
+    .map((shape, index) => ({ fillRule: shape.fillRule, contours: perShape[index]!.flatMap((contour) => mapContour(contour, toFont) ?? []) }))
+    .filter((shape) => shape.contours.length);
+  const { contours, approximated } = await fillShapes(placed, budget, regions ?? (typeof Worker === "function" ? regionsInWorker() : regionsInThread));
   if (!contours.length) failNothing();
   if (contours.length > 30_000) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
 
@@ -731,5 +532,9 @@ export async function svgToTtf(buf: ArrayBuffer, fileName: string): Promise<SvgF
     throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE, error);
   }
   const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
-  return { buffer, family, notice: svgFontNotice(family, { ...leftOut, strokes: leftOut.strokes || strokeOnly > 0 }) };
+  return {
+    buffer,
+    family,
+    notice: svgFontNotice(family, { ...leftOut, strokes: leftOut.strokes || strokeOnly > 0 }, approximated),
+  };
 }

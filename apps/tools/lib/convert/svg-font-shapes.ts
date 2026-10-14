@@ -88,7 +88,7 @@ export type SvgShapes = {
   artboard: Artboard | null;
   // The root's own transform, in its user units (rootTransform): it moves
   // the drawing and its artboard together, so it is applied after shapes
-  // off the artboard are left out.
+  // off the artboard are left out (and what it moves off is left out too).
   transform: Matrix;
   shapes: SvgShape[];
   leftOut: LeftOut;
@@ -204,7 +204,11 @@ const PROPERTIES = [
   "opacity", "display", "visibility",
 ] as const;
 type Property = (typeof PROPERTIES)[number];
-type Declarations = Partial<Record<Property, string>>;
+// Read from the root <svg> only (rootTransform): its CSS transform and
+// transform-origin.
+const ROOT_PROPERTIES = ["transform", "transform-origin"] as const;
+type RootProperty = (typeof ROOT_PROPERTIES)[number];
+type Declarations = Partial<Record<Property | RootProperty, string>>;
 const INHERITED = ["fill", "fill-opacity", "fill-rule", "stroke", "stroke-width", "stroke-opacity", "visibility"] as const;
 
 type Style = {
@@ -240,8 +244,8 @@ function declarations(text: string): Declarations {
   for (const part of text.split(";")) {
     const colon = part.indexOf(":");
     if (colon === -1) continue;
-    const name = part.slice(0, colon).trim().toLowerCase() as Property;
-    if (!(PROPERTIES as readonly string[]).includes(name)) continue;
+    const name = part.slice(0, colon).trim().toLowerCase() as Property | RootProperty;
+    if (!(PROPERTIES as readonly string[]).includes(name) && !(ROOT_PROPERTIES as readonly string[]).includes(name)) continue;
     result[name] = part.slice(colon + 1).replace(/!\s*important\s*$/i, "").trim();
   }
   return result;
@@ -337,6 +341,34 @@ function indexRules(rules: Rule[]): StyleSheets {
   return { index, checks: 0 };
 }
 
+// The stylesheet rules that match `element`, by specificity and order.
+function matchingRules(element: Element, sheets: StyleSheets): Rule[] {
+  if (!sheets.index.size) return [];
+  const classes = new Set((element.attrs.class ?? "").split(/\s+/).filter(Boolean));
+  const keys = ["*", element.name, ...[...classes].map((name) => `.${name}`)];
+  if (element.attrs.id) keys.push(`#${element.attrs.id}`);
+  const matching: Rule[] = [];
+  const charge = (checks: number) => {
+    sheets.checks += checks;
+    if (sheets.checks > LIMITS.ruleChecks) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
+  };
+  for (const key of keys) {
+    charge(1);
+    for (const rule of sheets.index.get(key) ?? []) {
+      // A rule costs a look at each class its selector names.
+      charge(1 + rule.classes.length);
+      if (
+        (!rule.tag || rule.tag === element.name) &&
+        (!rule.id || rule.id === element.attrs.id) &&
+        rule.classes.every((name) => classes.has(name))
+      ) {
+        matching.push(rule);
+      }
+    }
+  }
+  return matching.sort((a, b) => a.specificity - b.specificity || a.order - b.order);
+}
+
 // The element's own declarations: presentation attributes, then matching
 // rules by specificity and order, then its style attribute.
 function specified(element: Element, sheets: StyleSheets): Declarations {
@@ -345,34 +377,18 @@ function specified(element: Element, sheets: StyleSheets): Declarations {
     const value = element.attrs[name];
     if (value !== undefined) result[name] = value.trim();
   }
-  if (sheets.index.size) {
-    const classes = new Set((element.attrs.class ?? "").split(/\s+/).filter(Boolean));
-    const keys = ["*", element.name, ...[...classes].map((name) => `.${name}`)];
-    if (element.attrs.id) keys.push(`#${element.attrs.id}`);
-    const matching: Rule[] = [];
-    const charge = (checks: number) => {
-      sheets.checks += checks;
-      if (sheets.checks > LIMITS.ruleChecks) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
-    };
-    for (const key of keys) {
-      charge(1);
-      for (const rule of sheets.index.get(key) ?? []) {
-        // A rule costs a look at each class its selector names.
-        charge(1 + rule.classes.length);
-        if (
-          (!rule.tag || rule.tag === element.name) &&
-          (!rule.id || rule.id === element.attrs.id) &&
-          rule.classes.every((name) => classes.has(name))
-        ) {
-          matching.push(rule);
-        }
-      }
-    }
-    matching.sort((a, b) => a.specificity - b.specificity || a.order - b.order);
-    for (const rule of matching) Object.assign(result, rule.decls);
-  }
+  for (const rule of matchingRules(element, sheets)) Object.assign(result, rule.decls);
   if (element.attrs.style) Object.assign(result, declarations(element.attrs.style));
   return result;
+}
+
+// Every CSS value `element` is given for `name`, from the stylesheet's
+// rules and its style attribute, the one that wins last: a browser uses the
+// last that it can read.
+function cssValues(element: Element, sheets: StyleSheets, name: RootProperty): string[] {
+  const values = matchingRules(element, sheets).flatMap((rule) => rule.decls[name] ?? []);
+  const own = element.attrs.style ? declarations(element.attrs.style)[name] : undefined;
+  return own === undefined ? values : [...values, own];
 }
 
 function inherit(parent: Style, own: Declarations): Style {
@@ -778,25 +794,183 @@ function rootArtboard(root: Element): Artboard | null {
   return width && height && width > 0 && height > 0 ? { x: 0, y: 0, width, height } : null;
 }
 
-// The root <svg>'s transform attribute (SVG 2), in its user units. A browser
-// applies it as a CSS transform of the root's box: in CSS pixels (the
-// root's width and height; its viewBox's units when it has none), about the
-// box's centre, to the drawing and the artboard together.
-function rootTransform(root: Element, artboard: Artboard | null): Matrix {
-  const transform = parseTransform(root.attrs.transform);
-  // Without an artboard the drawing's own bounds frame it: where it turns
-  // or how far it moves changes nothing.
-  if (transform === IDENTITY || !artboard) return transform;
-  const ratio = artboard.width / artboard.height;
+// ---- The root's transform ----
+
+// CSS lengths in pixels (a font size of 16px for em and rem).
+const CSS_UNITS: Record<string, number> = { ...UNITS, q: 96 / 101.6, rem: 16 };
+const CSS_ANGLES: Record<string, number> = { deg: 1, rad: 180 / Math.PI, grad: 0.9, turn: 360 };
+const CSS_NUMBER = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?/i;
+
+// A CSS <length-percentage> in pixels (a percentage of `reference`), as a
+// browser reads it in a stylesheet: a number needs a unit unless it is 0.
+// In a presentation attribute (`attribute`) a bare number is pixels too.
+function cssLength(token: string, reference: number, attribute = false): number | null {
+  const number = CSS_NUMBER.exec(token);
+  if (!number) return null;
+  const value = checkNumber(Number(number[0]));
+  const unit = token.slice(number[0].length).toLowerCase();
+  if (unit === "%") return checkNumber((value / 100) * reference);
+  if (!unit) return value === 0 || attribute ? value : null;
+  const scale = CSS_UNITS[unit];
+  return scale ? checkNumber(value * scale) : null;
+}
+
+function cssAngle(token: string): number | null {
+  const number = CSS_NUMBER.exec(token);
+  if (!number) return null;
+  const value = checkNumber(Number(number[0]));
+  const unit = token.slice(number[0].length).toLowerCase();
+  if (!unit) return value === 0 ? 0 : null;
+  const scale = CSS_ANGLES[unit];
+  return scale ? checkNumber(value * scale) : null;
+}
+
+function cssNumber(token: string, percent = false): number | null {
+  const number = CSS_NUMBER.exec(token);
+  if (!number) return null;
+  const rest = token.slice(number[0].length);
+  if (rest === "%" && percent) return checkNumber(Number(number[0]) / 100);
+  return rest ? null : checkNumber(Number(number[0]));
+}
+
+const rotation = (degrees: number): Matrix => {
+  const radians = (degrees * Math.PI) / 180;
+  return [Math.cos(radians), Math.sin(radians), -Math.sin(radians), Math.cos(radians), 0, 0];
+};
+
+// A CSS `transform` value as one matrix in pixels, or null when a browser
+// can't read it (and so uses the value before it, or the attribute): a
+// function list with comma-separated arguments, lengths with units and
+// angles with units. `box`: the root's box, for percentages. 3D functions
+// other than those that stay flat (translate3d, translateZ, scale3d,
+// scaleZ, rotateZ) aren't read.
+function cssTransform(value: string, box: Viewport): Matrix | null {
+  const list = value.trim();
+  if (/^none$/i.test(list)) return IDENTITY;
+  const item = /\s*([a-zA-Z0-9]+)\(([^()]*)\)\s*/y;
+  let matrix = IDENTITY;
+  let at = 0;
+  for (; at < list.length; ) {
+    item.lastIndex = at;
+    const match = item.exec(list);
+    if (!match) return null;
+    at = item.lastIndex;
+    const args = match[2]!.split(",").map((arg) => arg.trim());
+    if (args.some((arg) => !arg || /\s/.test(arg))) return null;
+    const all = <T>(read: (arg: string) => T | null): T[] | null => {
+      const values = args.map(read);
+      return values.every((one) => one !== null) ? (values as T[]) : null;
+    };
+    let step: Matrix | null = null;
+    const name = match[1]!.toLowerCase();
+    const count = args.length;
+    if (name === "matrix" && count === 6) {
+      const n = all((arg) => cssNumber(arg));
+      if (n) step = [n[0]!, n[1]!, n[2]!, n[3]!, n[4]!, n[5]!];
+    } else if (name === "translate" && (count === 1 || count === 2)) {
+      const x = cssLength(args[0]!, box.width);
+      const y = count === 2 ? cssLength(args[1]!, box.height) : 0;
+      if (x !== null && y !== null) step = translation(x, y);
+    } else if (name === "translatex" && count === 1) {
+      const x = cssLength(args[0]!, box.width);
+      if (x !== null) step = translation(x, 0);
+    } else if (name === "translatey" && count === 1) {
+      const y = cssLength(args[0]!, box.height);
+      if (y !== null) step = translation(0, y);
+    } else if (name === "translate3d" && count === 3) {
+      const x = cssLength(args[0]!, box.width);
+      const y = cssLength(args[1]!, box.height);
+      const z = args[2]!.endsWith("%") ? null : cssLength(args[2]!, 0);
+      if (x !== null && y !== null && z !== null) step = translation(x, y);
+    } else if (name === "translatez" && count === 1) {
+      if (!args[0]!.endsWith("%") && cssLength(args[0]!, 0) !== null) step = IDENTITY;
+    } else if ((name === "scale" && (count === 1 || count === 2)) || (name === "scale3d" && count === 3)) {
+      const n = all((arg) => cssNumber(arg, true));
+      if (n) step = [n[0]!, 0, 0, name === "scale" ? (n[1] ?? n[0]!) : n[1]!, 0, 0];
+    } else if ((name === "scalex" || name === "scaley" || name === "scalez") && count === 1) {
+      const n = cssNumber(args[0]!, true);
+      if (n !== null) step = name === "scalex" ? [n, 0, 0, 1, 0, 0] : name === "scaley" ? [1, 0, 0, n, 0, 0] : IDENTITY;
+    } else if ((name === "rotate" || name === "rotatez") && count === 1) {
+      const angle = cssAngle(args[0]!);
+      if (angle !== null) step = rotation(angle);
+    } else if (name === "skew" && (count === 1 || count === 2)) {
+      const angles = all(cssAngle);
+      if (angles) step = [1, Math.tan(((angles[1] ?? 0) * Math.PI) / 180), Math.tan((angles[0]! * Math.PI) / 180), 1, 0, 0];
+    } else if ((name === "skewx" || name === "skewy") && count === 1) {
+      const angle = cssAngle(args[0]!);
+      if (angle !== null) {
+        const tan = Math.tan((angle * Math.PI) / 180);
+        step = name === "skewx" ? [1, 0, tan, 1, 0, 0] : [1, tan, 0, 1, 0, 0];
+      }
+    }
+    if (!step || !step.every(Number.isFinite)) return null;
+    matrix = checkMatrix(multiply(matrix, step));
+  }
+  return at > 0 ? matrix : null;
+}
+
+const HORIZONTAL = new Set(["left", "center", "right"]);
+const VERTICAL = new Set(["top", "center", "bottom"]);
+const KEYWORD_AT: Record<string, number> = { left: 0, top: 0, center: 0.5, right: 1, bottom: 1 };
+
+// A `transform-origin` value as a point of the root's box, in pixels, or
+// null when a browser can't read it: one to three values, keywords or
+// lengths (a third, the depth, is a length and is ignored). In the
+// presentation attribute (`attribute`) a bare number is pixels.
+function transformOrigin(value: string, box: Viewport, attribute: boolean): [number, number] | null {
+  const tokens = value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (tokens.length < 1 || tokens.length > 3) return null;
+  if (tokens.length === 3) {
+    const depth = tokens.pop()!;
+    if (depth.endsWith("%") || cssLength(depth, 0, attribute) === null) return null;
+  }
+  const keyword = (token: string) => token in KEYWORD_AT;
+  const along = (token: string, size: number) => (keyword(token) ? KEYWORD_AT[token]! * size : cssLength(token, size, attribute));
+  let [x, y] = tokens.length === 1 ? (VERTICAL.has(tokens[0]!) && tokens[0] !== "center" ? ["center", tokens[0]!] : [tokens[0]!, "center"]) : tokens;
+  // Two keywords may come either way round: "top left".
+  if (keyword(x!) && keyword(y!) && !(HORIZONTAL.has(x!) && VERTICAL.has(y!)) && HORIZONTAL.has(y!) && VERTICAL.has(x!)) [x, y] = [y, x];
+  if ((keyword(x!) && !HORIZONTAL.has(x!)) || (keyword(y!) && !VERTICAL.has(y!))) return null;
+  const left = along(x!, box.width);
+  const top = along(y!, box.height);
+  return left === null || top === null ? null : [left, top];
+}
+
+// The root <svg>'s transform, in its user units. A browser applies it as a
+// CSS transform of the root's box: in CSS pixels (the root's width and
+// height; its viewBox's units when it has none), about its transform-origin
+// (by default the box's centre), to the drawing and the artboard together.
+// The CSS property, from a stylesheet or the style attribute, wins over the
+// transform attribute, and so does transform-origin's; a value a browser
+// can't read is passed over for the one before it.
+function rootTransform(root: Element, artboard: Artboard | null, sheets: StyleSheets): Matrix {
   const width = length(root.attrs.width, 0);
   const height = length(root.attrs.height, 0);
   // One of width and height alone: the other keeps the artboard's shape.
-  const boxWidth = width && width > 0 ? width : height && height > 0 ? height * ratio : artboard.width;
-  const boxHeight = height && height > 0 ? height : boxWidth / ratio;
-  const box = viewBox(root.attrs.viewBox);
-  const fit = box ? viewportTransform(box, 0, 0, boxWidth, boxHeight, root.attrs.preserveAspectRatio) : IDENTITY;
-  const centre = translation(boxWidth / 2, boxHeight / 2);
-  const about = multiply(multiply(centre, transform), translation(-boxWidth / 2, -boxHeight / 2));
+  // Without an artboard the drawing's own bounds frame it, so where it is
+  // moved to, and the box percentages are of, changes nothing.
+  const ratio = artboard ? artboard.width / artboard.height : 1;
+  const boxWidth = width && width > 0 ? width : height && height > 0 ? height * ratio : (artboard?.width ?? 0);
+  const boxHeight = height && height > 0 ? height : artboard ? boxWidth / ratio : 0;
+  const box = { width: boxWidth, height: boxHeight };
+  const lastRead = <T>(values: string[], read: (value: string) => T | null): T | null => {
+    for (const value of [...values].reverse()) {
+      const result = read(value);
+      if (result !== null) return result;
+    }
+    return null;
+  };
+  const transform = lastRead(cssValues(root, sheets, "transform"), (value) => cssTransform(value, box)) ?? parseTransform(root.attrs.transform);
+  if (transform === IDENTITY || transform.every((value, index) => value === IDENTITY[index])) return IDENTITY;
+  if (!artboard) return transform;
+  const [originX, originY] =
+    lastRead(cssValues(root, sheets, "transform-origin"), (value) => transformOrigin(value, box, false)) ??
+    (root.attrs["transform-origin"] !== undefined ? transformOrigin(root.attrs["transform-origin"], box, true) : null) ?? [
+      boxWidth / 2,
+      boxHeight / 2,
+    ];
+  const viewBoxFit = viewBox(root.attrs.viewBox);
+  const fit = viewBoxFit ? viewportTransform(viewBoxFit, 0, 0, boxWidth, boxHeight, root.attrs.preserveAspectRatio) : IDENTITY;
+  const about = multiply(multiply(translation(originX, originY), transform), translation(-originX, -originY));
   return checkMatrix(multiply(multiply(invert(fit), about), fit));
 }
 
@@ -809,14 +983,15 @@ export function readSvgShapes(text: string): SvgShapes {
   const ids = new Map<string, Element>();
   indexIds(root, ids);
   const artboard = rootArtboard(root);
+  const sheets = indexRules(rules);
   const result: SvgShapes = {
     artboard,
-    transform: rootTransform(root, artboard),
+    transform: rootTransform(root, artboard, sheets),
     shapes: [],
     leftOut: { strokes: false, text: false, pictures: false },
     strokeOnly: 0,
   };
-  const context: Context = { sheets: indexRules(rules), visits: 0, ids, result, commands: 0 };
+  const context: Context = { sheets, visits: 0, ids, result, commands: 0 };
   const own = specified(root, context.sheets);
   if (own.display?.trim().toLowerCase() === "none" || (own.opacity !== undefined && zero(own.opacity))) return result;
   const style = inherit(INITIAL_STYLE, own);

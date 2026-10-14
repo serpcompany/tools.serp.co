@@ -3,10 +3,20 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { Worker as NodeWorker } from "node:worker_threads";
 
 import opentype from "opentype.js";
 
-import { FAR_OUTSIDE_MESSAGE, fontFamilyName, readGlyph, svgToTtf } from "./svg-font.ts";
+import {
+  CROSSINGS_NOTICE,
+  FAR_OUTSIDE_MESSAGE,
+  OUTSIDE_ARTBOARD_MESSAGE,
+  REGIONS_TIMEOUT_MS,
+  fontFamilyName,
+  readGlyph,
+  regionsInWorker,
+  svgToTtf,
+} from "./svg-font.ts";
 import { LIMITS, UNREADABLE_SVG_MESSAGE } from "./svg-font-shapes.ts";
 import { checkInputFile, convertWithWorker, getOutputMimeType } from "./workerClient.ts";
 
@@ -15,8 +25,8 @@ const encode = (text) => new TextEncoder().encode(text).buffer;
 const svg = (body, root = 'viewBox="0 0 24 24"') => `<svg xmlns="http://www.w3.org/2000/svg" ${root}>${body}</svg>`;
 
 // The font, read back by a font parser (opentype.js), and its glyph on U+E000.
-async function font(text, name = "icon.svg") {
-  const result = await svgToTtf(typeof text === "string" ? encode(text) : text, name);
+async function font(text, name = "icon.svg", options) {
+  const result = await svgToTtf(typeof text === "string" ? encode(text) : text, name, options);
   const parsed = opentype.parse(result.buffer);
   const glyph = parsed.charToGlyph(String.fromCodePoint(0xe000));
   // opentype.js reads a glyph's points when its path is first asked for.
@@ -24,9 +34,9 @@ async function font(text, name = "icon.svg") {
   return { result, font: parsed, glyph };
 }
 
-async function refusal(text, name = "icon.svg") {
+async function refusal(text, name = "icon.svg", options) {
   try {
-    await svgToTtf(typeof text === "string" ? encode(text) : text, name);
+    await svgToTtf(typeof text === "string" ? encode(text) : text, name, options);
   } catch (error) {
     return error;
   }
@@ -87,6 +97,81 @@ const inkAt = (glyph, x, y, size) => inked(glyph, ...at(x, y, size));
 // points (x1, y1) to (x2, y2), y down, as the glyph would have them.
 const bounds = (glyph) => Object.values(glyph.getBoundingBox()).map(Math.round);
 const artboardBounds = (x1, y1, x2, y2, size) => at(x1, y2, size).concat(at(x2, y1, size)).map(Math.round);
+// The glyph's ink within a 24-unit artboard, in its units (y down) to a
+// tenth, as a browser shows it: what is off the artboard isn't seen.
+const seenBounds = (glyph) => {
+  const box = glyph.getBoundingBox();
+  const unit = (value) => Math.round(Math.min(24, Math.max(0, value)) * 10) / 10;
+  return [unit((box.x1 / 1000) * 24), unit(((850 - box.y2) / 1000) * 24), unit((box.x2 / 1000) * 24), unit(((850 - box.y1) / 1000) * 24)];
+};
+
+// The boolean step in a Node worker thread, as the page runs it in a Web
+// Worker (svg-font.worker.ts): `code` runs on each job, `resolveRegions`
+// unless a test gives other code. `exits` collects the threads that ended.
+function nodeWorker(code = "parentPort.postMessage(resolveRegions(job))", exits = []) {
+  const boolean = new URL("./svg-font-boolean.ts", import.meta.url).href;
+  const source =
+    `import { parentPort } from "node:worker_threads"; import { resolveRegions } from ${JSON.stringify(boolean)};` +
+    `parentPort.on("message", (job) => { ${code} });`;
+  return () => {
+    const worker = new NodeWorker(new URL(`data:text/javascript,${encodeURIComponent(source)}`));
+    const like = {
+      onmessage: null,
+      onerror: null,
+      postMessage: (message, transfer) => worker.postMessage(message, transfer),
+      terminate: () => void worker.terminate(),
+    };
+    worker.on("message", (data) => like.onmessage?.({ data }));
+    worker.on("error", (error) => like.onerror?.({ message: error.message }));
+    worker.on("exit", () => exits.push(worker.threadId));
+    return like;
+  };
+}
+
+// Whether the SVG paints (x, y) of a path's polygons by `rule`, as a browser
+// fills it; points this close to an edge are left out (a font's integer
+// units move edges by up to half a unit, a fiftieth of a 24-unit artboard).
+function paints(polygons, rule, x, y) {
+  let winding = 0;
+  for (const polygon of polygons) {
+    for (let index = 0; index < polygon.length; index += 1) {
+      const [ax, ay] = polygon[index];
+      const [bx, by] = polygon[(index + 1) % polygon.length];
+      const side = (bx - ax) * (y - ay) - (x - ax) * (by - ay);
+      if (ay <= y && by > y && side > 0) winding += 1;
+      else if (ay > y && by <= y && side < 0) winding -= 1;
+    }
+  }
+  return rule === "evenodd" ? winding % 2 !== 0 : winding !== 0;
+}
+function nearEdge(polygons, x, y) {
+  return polygons.some((polygon) =>
+    polygon.some(([ax, ay], index) => {
+      const [bx, by] = polygon[(index + 1) % polygon.length];
+      const [dx, dy] = [bx - ax, by - ay];
+      const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy || 1)));
+      return Math.hypot(x - ax - t * dx, y - ay - t * dy) < 0.05;
+    }),
+  );
+}
+// The points of a 24 x 24 grid, off the artboard's lines, the glyph and the
+// SVG disagree on.
+function disagreements(glyph, polygons, rule, also = () => false) {
+  const wrong = [];
+  for (let row = 0; row < 24; row += 1) {
+    for (let column = 0; column < 24; column += 1) {
+      const [x, y] = [column + 0.3137, row + 0.4729];
+      if (nearEdge(polygons, x, y)) continue;
+      if (inkAt(glyph, x, y) !== (paints(polygons, rule, x, y) || also(x, y))) wrong.push([x, y]);
+    }
+  }
+  return wrong;
+}
+async function until(done, what) {
+  for (let wait = 0; wait < 100 && !done(); wait += 1) await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.ok(done(), what);
+}
+const pathOf = (polygons) => polygons.map((polygon) => `M${polygon.map(([x, y]) => `${x} ${y}`).join("L")}Z`).join("");
 
 test("an SVG icon becomes one glyph on U+E000, read back by a font parser, in a family named after the file", async () => {
   const bytes = readFileSync(path.join(fixtures, "sample-icon.svg"));
@@ -274,6 +359,156 @@ test("an even-odd outline that crosses itself or another keeps its holes, as the
   assert.equal(twice.code, "nothing_to_draw");
   // An outline with no area (it goes out and back along a line) neither.
   assert.equal((await refusal(svg('<path d="M2 2L20 20L11 11Z"/>'))).code, "nothing_to_draw");
+});
+
+test("a nonzero shape's parts that wind the other way never cut a hole in another shape", async () => {
+  // Two squares drawn opposite ways in one path: their overlap is empty,
+  // and a square drawn over either part of them is filled.
+  const body = '<path d="M2 2H14V14H2Z M10 10V22H22V10Z"/><rect x="3" y="3" width="4" height="4"/><rect x="17" y="17" width="4" height="4"/>';
+  const { glyph } = await font(svg(body));
+  assert.ok(inkAt(glyph, 5, 5) && inkAt(glyph, 19, 19), "both small squares");
+  assert.ok(inkAt(glyph, 12, 5) && inkAt(glyph, 19, 12), "both large squares");
+  assert.ok(!inkAt(glyph, 12, 12), "their overlap");
+  // A bow tie, whose two loops wind opposite ways, over a square.
+  const crossed = (await font(svg('<path d="M2 2L22 22V2L2 22Z"/><rect x="16" y="10" width="4" height="4"/>'))).glyph;
+  assert.ok(inkAt(crossed, 18, 12) && inkAt(crossed, 4, 12) && !inkAt(crossed, 12, 4), "a bow tie over a square");
+  // Outlines drawn on top of each other the same way round wind twice, so
+  // where one drawn the other way crosses them they still fill.
+  const stacked = (await font(svg('<path d="M2 2H14V14H2Z M2 2H14V14H2Z M2 2H8V8H2Z M10 10V22H22V10Z"/><rect x="20" y="0" width="2" height="2"/>'))).glyph;
+  assert.ok(inkAt(stacked, 4, 4) && inkAt(stacked, 6, 12) && inkAt(stacked, 12, 12) && inkAt(stacked, 18, 18) && !inkAt(stacked, 6, 18));
+});
+
+test("crossing outlines are worked out in a worker with a time limit, in bounded time", async () => {
+  const exits = [];
+  const regions = regionsInWorker({ createWorker: nodeWorker(undefined, exits) });
+  // A 26-point even-odd path that sent martinez-polygon-clipping into an
+  // endless loop: its region, exactly as the SVG fills it.
+  const star =
+    "M10.285714285714285 10.285714285714285L6.857142857142857 3.4285714285714284L0 6.857142857142857L10.285714285714285 17.142857142857142" +
+    "L10.285714285714285 0L6.857142857142857 13.714285714285714L20.57142857142857 10.285714285714285Z" +
+    "M6.857142857142857 10.285714285714285L20.57142857142857 0L13.714285714285714 10.285714285714285L17.142857142857142 17.142857142857142" +
+    "L6.857142857142857 10.285714285714285L17.142857142857142 10.285714285714285L6.857142857142857 3.4285714285714284" +
+    "L13.714285714285714 13.714285714285714L10.285714285714285 17.142857142857142L0 6.857142857142857Z" +
+    "M17.142857142857142 3.4285714285714284L0 20.57142857142857L17.142857142857142 6.857142857142857L13.714285714285714 17.142857142857142" +
+    "L6.857142857142857 13.714285714285714L6.857142857142857 3.4285714285714284L20.57142857142857 10.285714285714285" +
+    "L3.4285714285714284 3.4285714285714284L6.857142857142857 6.857142857142857Z";
+  const rings = star.split("Z").filter(Boolean).map((ring) => [...ring.matchAll(/[ML]([\d.]+) ([\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]));
+  let started = Date.now();
+  const { glyph, result } = await font(svg(`<path fill-rule="evenodd" d="${star}"/>`), "icon.svg", { regions });
+  assert.ok(Date.now() - started < 3_000, `took ${Date.now() - started} ms`);
+  assert.doesNotMatch(result.notice, /cross/);
+  assert.deepEqual(disagreements(glyph, rings, "evenodd"), []);
+  await until(() => exits.length === 1, "the worker ended");
+  // Random outlines that cross, touch and run along each other, each rule:
+  // the glyph fills what the SVG fills, beside a square of another shape.
+  let seed = 7;
+  const random = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+  for (let index = 0; index < 40; index += 1) {
+    const grid = 2 + Math.floor(random() * 6);
+    const polygons = Array.from({ length: 1 + Math.floor(random() * 3) }, () =>
+      Array.from({ length: 3 + Math.floor(random() * 8) }, () => [Math.floor(random() * grid) * (24 / grid), Math.floor(random() * grid) * (24 / grid)]),
+    );
+    for (const rule of ["evenodd", "nonzero"]) {
+      const text = svg(`<path fill-rule="${rule}" d="${pathOf(polygons)}"/><rect width="0.5" height="0.5"/>`);
+      const made = await svgToTtf(encode(text), "icon.svg").catch((error) => error);
+      if (made.code === "nothing_to_draw") continue;
+      const drawn = opentype.parse(made.buffer).charToGlyph(String.fromCodePoint(0xe000));
+      void drawn.path;
+      assert.deepEqual(disagreements(drawn, polygons, rule, (x, y) => x < 0.5 && y < 0.5), [], `${rule} ${pathOf(polygons)}`);
+    }
+  }
+  // A grid of thin bars crossing 640,000 and 2,560,000 times (17 and 36
+  // KB, which took martinez 7 and 27 seconds) passes MAX_CROSSINGS: taken
+  // as drawn, every bar filled, with a notice, in well under the limit.
+  for (const bars of [400, 800]) {
+    let d = "";
+    for (let index = 0; index < bars; index += 1) d += `M0 ${index * (10000 / bars)}H10000V${index * (10000 / bars) + 1}H0Z`;
+    for (let index = 0; index < bars; index += 1) d += `M${index * (10000 / bars)} 0V10000H${index * (10000 / bars) + 1}V0Z`;
+    started = Date.now();
+    const grid = await font(svg(`<path fill-rule="evenodd" d="${d}"/>`, 'viewBox="0 0 10000 10000"'), "icon.svg", { regions });
+    assert.ok(Date.now() - started < 3_000, `${bars} bars took ${Date.now() - started} ms`);
+    assert.match(grid.result.notice, new RegExp(CROSSINGS_NOTICE.slice(0, 40)));
+    // Each bar is a contour of its own, turned clockwise to fill.
+    assert.equal(grid.glyph.getContours().length, 2 * bars);
+  }
+});
+
+test("past the time limit, or when the worker fails, crossing outlines are taken as drawn, with a notice", async () => {
+  const exits = [];
+  const squares = svg('<path fill-rule="evenodd" d="M2 2H14V14H2Z M10 10H22V22H10Z M4 4H6V6H4Z"/><rect x="20" y="2" width="2" height="2"/>');
+  // A worker that never answers is stopped at the limit.
+  const started = Date.now();
+  const stuck = await font(squares, "icon.svg", { regions: regionsInWorker({ timeoutMs: 300, createWorker: nodeWorker("for (;;);", exits) }) });
+  assert.ok(Date.now() - started < 2_000, `took ${Date.now() - started} ms`);
+  await until(() => exits.length === 1, "the stuck worker was terminated");
+  assert.match(stuck.result.notice, /U\+E000/);
+  assert.ok(stuck.result.notice.endsWith(CROSSINGS_NOTICE));
+  // The squares that cross both fill, their overlap too; the small square
+  // inside one, which crosses nothing, is still a hole; nothing winds below
+  // zero, so the other shape is whole.
+  assert.ok(inkAt(stuck.glyph, 4, 12) && inkAt(stuck.glyph, 12, 12) && inkAt(stuck.glyph, 20, 20) && inkAt(stuck.glyph, 21, 3));
+  assert.ok(!inkAt(stuck.glyph, 5, 5));
+  // A worker that fails to start, or crashes.
+  for (const createWorker of [() => { throw new Error("no worker"); }, nodeWorker("throw new Error('crash')")]) {
+    const failed = await font(squares, "icon.svg", { regions: regionsInWorker({ createWorker }) });
+    assert.ok(failed.result.notice.endsWith(CROSSINGS_NOTICE) && inkAt(failed.glyph, 12, 12));
+  }
+  // Without crossings there is no worker and no notice.
+  const plain = await font(svg('<path fill-rule="evenodd" d="M2 2H22V22H2Z M8 8H16V16H8Z"/>'), "icon.svg", {
+    regions: () => assert.fail("no shape needs the boolean step"),
+  });
+  assert.doesNotMatch(plain.result.notice, /cross/);
+  assert.equal(REGIONS_TIMEOUT_MS, 5_000);
+});
+
+test("a root transform-origin and CSS transform place the icon as Chromium draws them", async () => {
+  const half = '<rect width="12" height="6"/>';
+  const box = 'viewBox="0 0 24 24"';
+  // Ink within the artboard, measured in Chromium 143 (an <img> at the
+  // SVG's own size): x1, y1, x2, y2 in user units, y down.
+  const cases = [
+    [`${box} transform="rotate(90)" transform-origin="12 6"`, half, [12, 0, 18, 6]],
+    [`${box} transform="rotate(90)" style="transform-origin:12px 6px"`, half, [12, 0, 18, 6]],
+    // A bare number isn't a CSS length: the origin stays the centre.
+    [`${box} transform="rotate(90)" style="transform-origin:12 6"`, half, [18, 0, 24, 12]],
+    [`${box} transform="rotate(90)" transform-origin="25% 0"`, half, [0, 0, 6, 6]],
+    [`${box} transform="rotate(90)" transform-origin="0"`, half, [6, 12, 12, 24]],
+    [`${box} transform="rotate(90)" style="transform-origin:0 left"`, half, [18, 0, 24, 12]],
+    [`${box} transform="rotate(90)" style="transform-origin:2pt 0"`, half, [0, 0, 2.7, 9.3]],
+    [`width="240" height="240" ${box} transform="rotate(90)" transform-origin="120 60"`, half, [12, 0, 18, 6]],
+    [`${box} style="transform:rotate(90deg)"`, half, [18, 0, 24, 12]],
+    // A CSS angle needs its unit; the attribute is used instead.
+    [`${box} style="transform:rotate(90)"`, half, [0, 0, 12, 6]],
+    [`${box} transform="translate(12 0)" style="transform:rotate(90)"`, half, [12, 0, 24, 6]],
+    [`${box} transform="translate(12 0)" style="transform:rotate(90deg)"`, half, [18, 0, 24, 12]],
+    [`${box} style="transform:none" transform="rotate(90)"`, half, [0, 0, 12, 6]],
+    [`${box} style="transform:translate(50%, 0)"`, half, [12, 0, 24, 6]],
+    [`${box} style="transform:ROTATE(90DEG) translate(6px, 0)"`, half, [18, 6, 24, 18]],
+    [`${box} style="transform:scale(0.5, 1)"`, '<rect width="24" height="6"/>', [6, 0, 18, 6]],
+    [`${box} style="transform:scale(0.5 1)"`, '<rect width="24" height="6"/>', [0, 0, 24, 6]],
+    [`${box} style="transform:translate3d(12px, 0, 0)"`, half, [12, 0, 24, 6]],
+    [`${box}`, `<style>svg{transform:translate(12px,0)}</style>${half}`, [12, 0, 24, 6]],
+    [`${box}`, `<style>svg{transform:translate(12,0)}</style>${half}`, [0, 0, 12, 6]],
+    [`${box} transform="rotate(90)" style="transform-origin:center center"`, half, [18, 0, 24, 12]],
+  ];
+  for (const [root, body, expected] of cases) {
+    const seen = seenBounds((await font(svg(body, root))).glyph);
+    assert.ok(seen.every((value, index) => Math.abs(value - expected[index]) <= 0.2), `${root}: ${seen} vs ${expected}`);
+  }
+  // Turned about the top left corner, the drawing leaves the artboard, and
+  // a browser shows nothing: as the attribute, a style, a stylesheet, or
+  // with keywords.
+  for (const [root, body] of [
+    [`${box} transform="rotate(90)" transform-origin="0 0"`, half],
+    [`${box} transform="rotate(90)" style="transform-origin:left top"`, half],
+    [`${box} transform="rotate(90)" transform-origin="0 0 5"`, half],
+    [`${box} transform="rotate(90)"`, `<style>svg{transform-origin:0 0}</style>${half}`],
+    [`${box} style="transform:rotate(90deg); transform-origin:0 0"`, half],
+  ]) {
+    const error = await refusal(svg(body, root));
+    assert.equal(error.code, "nothing_to_draw", root);
+    assert.equal(error.message, OUTSIDE_ARTBOARD_MESSAGE);
+  }
 });
 
 test("a number too large to draw with is refused as damaged, with its own code", async () => {
