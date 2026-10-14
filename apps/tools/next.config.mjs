@@ -9,6 +9,7 @@ const require = createRequire(import.meta.url);
 // beside it.
 const pptxGlimpseBrowser = path.join(path.dirname(require.resolve("pptx-glimpse")), "browser.js");
 const appRoot = path.dirname(fileURLToPath(import.meta.url));
+const svgFontNoFs = path.resolve(appRoot, "lib/convert/svg-font-no-fs.ts");
 const tracingRoot = path.resolve(appRoot, "../..");
 const toolsPath = path.resolve(appRoot, "lib/catalog/tools.json");
 const appDir = path.resolve(appRoot, "app");
@@ -167,17 +168,18 @@ const nextConfig = {
     if (!isServer) {
       // svgicons2svgfont and yerror, which SVG to TTF runs in the browser
       // (lib/convert/svg-font.ts), import Node's modules by "node:" names,
-      // which this build can't read. They get Next's browser stand-ins for
-      // stream, path and os, and no file system: only svgicons2svgfont's
-      // folder helpers use it, and SVG to TTF never calls them.
+      // which this build can't read. Their imports, and only theirs, get
+      // Next's browser stand-ins for stream, path and os, and a file system
+      // that throws (lib/convert/svg-font-no-fs.ts): only svgicons2svgfont's
+      // folder helpers use it, and SVG to TTF never calls them. An import of
+      // fs from anywhere else still fails the build.
       config.plugins.push(
         new webpack.NormalModuleReplacementPlugin(/^node:(fs|os|path|stream)$/, (resource) => {
           if (/[\\/](svgicons2svgfont|yerror)[\\/]/.test(resource.contextInfo?.issuer ?? "")) {
-            resource.request = resource.request.slice("node:".length);
+            resource.request = resource.request === "node:fs" ? svgFontNoFs : resource.request.slice("node:".length);
           }
         }),
       );
-      config.resolve.fallback = { ...config.resolve.fallback, fs: false };
     }
     config.output = { ...config.output, hashFunction: "sha256" };
     return config;

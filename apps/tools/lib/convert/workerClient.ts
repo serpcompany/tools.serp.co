@@ -442,7 +442,7 @@ async function convertDocumentToImage(from: string, to: string, args: ConvertArg
 }
 
 // The codes svg-font.ts throws with for a file it can't make a font from.
-const SVG_FONT_REFUSALS = new Set(["unreadable_image", "nothing_to_draw", "too_complex"]);
+const SVG_FONT_REFUSALS = new Set(["unreadable_image", "number_out_of_range", "nothing_to_draw", "too_complex"]);
 
 // SVG to TTF (svg-font.ts): the SVG's filled shapes as one glyph, on U+E000,
 // in a font named after the file. A file that is damaged, draws nothing a

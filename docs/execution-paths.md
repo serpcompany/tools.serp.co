@@ -124,16 +124,25 @@ Conversion picks an engine by input format:
   rule (from attributes, a stylesheet's simple selectors or a style
   attribute, inherited), then its contours are turned so the font's nonzero
   rule fills what the SVG paints: overlapping shapes all fill, and holes stay
-  holes. svgicons2svgfont 16.0.0 flattens each shape under one matrix, as
-  lines and curves only (svg-pathdata 9.0.0, which it uses, turns an absolute
-  H or V wrongly under a rotation), and svg2ttf 6.1.0 writes the font: 1,000
-  units to the em, the artboard (viewBox, else width and height, else the
-  drawing's bounds) its full height, 150 below the baseline. Strokes, text,
-  pictures, colours, clipping and masks aren't a font's: a stroke is left out
-  with a notice, and a stroke-only icon is refused with how to outline it.
+  holes. An even-odd shape whose outlines cross or touch (a star drawn as one
+  outline) is first redrawn without crossings by martinez-polygon-clipping
+  0.9.0, loaded only then, its curves as lines within a quarter of a font
+  unit. A `<use>` of a `<symbol>` with no size fills the viewport it is in,
+  and a transform on the root `<svg>` moves the drawing as browsers do, in
+  pixels and about the artboard's centre. svgicons2svgfont 16.0.0 flattens
+  each shape under one matrix, as lines and curves only (svg-pathdata 9.0.0,
+  which it uses, turns an absolute H or V wrongly under a rotation), and
+  svg2ttf 6.1.0 writes the font: 1,000 units to the em, the artboard
+  (viewBox, else width and height, else the drawing's bounds) its full
+  height, 150 below the baseline. Strokes, text, pictures, colours, clipping
+  and masks aren't a font's: a stroke is left out with a notice, and a
+  stroke-only icon is refused with how to outline it.
   Over 10 MB, 5,000 shapes or 60,000 path commands, or past TrueType's
-  65,535 points a glyph, is refused as too detailed. svg2ttf's point flags
-  overflow on very long runs, so the glyph is read back before it's saved.
+  65,535 points a glyph, is refused as too detailed (`too_complex`), and so is
+  stylesheet matching past 2,000,000 rule checks. A number past a billion
+  (1e400 reads as Infinity) gets the damaged-file message with its own code,
+  `number_out_of_range`. svg2ttf's point flags overflow on very long runs, so
+  the glyph is read back before it's saved.
 - **Tables** (`lib/convert/table-outputs.ts`, since #249, and
   `components/table-convert/excel-input.ts`, since #266): the table converter
   pages write Excel, PDF, PNG, JPEG, Avro and Protobuf, name each download

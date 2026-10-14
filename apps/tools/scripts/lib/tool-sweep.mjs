@@ -550,7 +550,7 @@ function formatName(format) {
 //   outputs: [{ name, size, head: number[] (first bytes), text?, pixels?, decoded? }]
 //     pixels: measurePixels' result (null for a format it doesn't decode), or
 //     { error } when the image didn't decode
-//     decoded: decodeTableOutputs' result, { text } read from the file, or
+//     decoded: decodeOutputs' result, { text } read from the file, or
 //     { error } when it didn't open
 // A plan with pixelCheck needs every output measured, and one with decode
 // every output opened: an output the sweep never read the bytes of fails,
@@ -743,11 +743,23 @@ export async function decodeTableOutput(format, bytes, { schema = null } = {}) {
 // The code point SVG to TTF puts its glyph on (lib/convert/svg-font.ts).
 const ICON_CODE_POINT = 0xe000;
 
+// The area a TrueType contour's points enclose (its on- and off-curve
+// points as a polygon): zero when they all lie on one line.
+function contourArea(points) {
+  let area = 0;
+  for (let index = 0; index < points.length; index += 1) {
+    const a = points[index];
+    const b = points[(index + 1) % points.length];
+    area += a.x * b.y - b.x * a.y;
+  }
+  return Math.abs(area) / 2;
+}
+
 // Opens a font the way an app would (opentype.js) and finds the glyph on
 // U+E000, where SVG to TTF puts the icon: it must be a glyph of its own
-// with an outline, a contour of three or more points. Returns { text }
-// naming the family and the glyph; throws when the font doesn't open or
-// the glyph is missing or empty.
+// with an outline that encloses something, a contour of three or more
+// points with an area. Returns { text } naming the family and the glyph;
+// throws when the font doesn't open or the glyph is missing or empty.
 export async function decodeFontOutput(bytes) {
   const opentype = (await import("opentype.js")).default;
   const data = new Uint8Array(bytes);
@@ -758,7 +770,9 @@ export async function decodeFontOutput(bytes) {
   const commands = glyph.path.commands.length;
   const contours = glyph.getContours().filter((contour) => contour.length >= 3);
   if (!commands || !contours.length) throw new Error("the glyph on U+E000 has no outline");
-  return { text: `${font.names.fontFamily?.en ?? "(no family)"}: U+E000 has ${contours.length} contours` };
+  const filled = contours.filter((contour) => contourArea(contour) > 0);
+  if (!filled.length) throw new Error("the glyph on U+E000 encloses nothing (its outline has no area)");
+  return { text: `${font.names.fontFamily?.en ?? "(no family)"}: U+E000 has ${filled.length} contours` };
 }
 
 // Opens each saved file the sweep decodes (decodeTableOutput,

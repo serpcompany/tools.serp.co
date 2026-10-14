@@ -6,8 +6,8 @@ import { fileURLToPath } from "node:url";
 
 import opentype from "opentype.js";
 
-import { fontFamilyName, readGlyph, svgToTtf } from "./svg-font.ts";
-import { LIMITS } from "./svg-font-shapes.ts";
+import { FAR_OUTSIDE_MESSAGE, fontFamilyName, readGlyph, svgToTtf } from "./svg-font.ts";
+import { LIMITS, UNREADABLE_SVG_MESSAGE } from "./svg-font-shapes.ts";
 import { checkInputFile, convertWithWorker, getOutputMimeType } from "./workerClient.ts";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
@@ -83,6 +83,10 @@ function inked(glyph, x, y) {
 // the em, 1,000 units, from 150 below the baseline.
 const at = (x, y, size = 24) => [(x / size) * 1000, ((size - y) / size) * 1000 - 150];
 const inkAt = (glyph, x, y, size) => inked(glyph, ...at(x, y, size));
+// The glyph's bounds in font units, rounded, and the bounds of artboard
+// points (x1, y1) to (x2, y2), y down, as the glyph would have them.
+const bounds = (glyph) => Object.values(glyph.getBoundingBox()).map(Math.round);
+const artboardBounds = (x1, y1, x2, y2, size) => at(x1, y2, size).concat(at(x2, y1, size)).map(Math.round);
 
 test("an SVG icon becomes one glyph on U+E000, read back by a font parser, in a family named after the file", async () => {
   const bytes = readFileSync(path.join(fixtures, "sample-icon.svg"));
@@ -189,9 +193,112 @@ test("a shape is filled as its styles say: inherited, from a stylesheet or a sty
   assert.equal(await filled(`<defs>${disc} id="d"/></defs><use href="#d"/>`), true);
   assert.equal(await filled(`<defs><rect id="r" width="4" height="4"/></defs><use xlink:href="#r" x="10" y="10" xmlns:xlink="http://www.w3.org/1999/xlink"/>`), true);
   const symbol = '<symbol id="s" viewBox="0 0 2 2"><rect width="2" height="2"/></symbol><use href="#s" x="10" y="10" width="4" height="4"/>';
-  assert.deepEqual(Object.values((await font(svg(symbol))).glyph.getBoundingBox()).map(Math.round), at(10, 14).concat(at(14, 10)).map(Math.round));
+  assert.deepEqual(bounds((await font(svg(symbol))).glyph), artboardBounds(10, 10, 14, 14));
   // A <use> of itself, or of its own group, is drawn once and stops.
   assert.equal(await filled(`<g id="g">${disc}/><use href="#g"/></g><use href="#u" id="u"/>`), true);
+});
+
+test("a <use> of a <symbol> with no width or height fills the viewport it is in, as browsers size it", async () => {
+  // A 512-unit icon symbol in a 24-unit file.
+  const icon = '<symbol id="i" viewBox="0 0 512 512"><path d="M0 0H512V512H0Z"/></symbol>';
+  assert.deepEqual(bounds((await font(svg(`${icon}<use href="#i"/>`))).glyph), [0, -150, 1000, 850]);
+  assert.deepEqual(bounds((await font(svg(`${icon}<use href="#i" x="6" y="6" width="12" height="12"/>`))).glyph), artboardBounds(6, 6, 18, 18));
+  // The symbol's own width and height, when the <use> has none; and its
+  // preserveAspectRatio.
+  const sized = '<symbol id="t" viewBox="0 0 512 256" width="12" height="12" preserveAspectRatio="xMinYMin meet"><path d="M0 0H512V256H0Z"/></symbol>';
+  assert.deepEqual(bounds((await font(svg(`${sized}<use href="#t"/>`))).glyph), artboardBounds(0, 0, 12, 6));
+  // Nested: a <use> inside a symbol fills that symbol's viewport, and one
+  // inside a group fills the viewport the group is drawn in.
+  const nested = `${icon}<symbol id="o" viewBox="0 0 48 48"><use href="#i"/></symbol><use href="#o" width="12" height="12"/>`;
+  assert.deepEqual(bounds((await font(svg(nested))).glyph), artboardBounds(0, 0, 12, 12));
+  const inGroup = `<defs>${icon}<g id="g"><use href="#i"/></g></defs><use href="#g" transform="translate(12 12) scale(0.5)"/>`;
+  assert.deepEqual(bounds((await font(svg(inGroup))).glyph), artboardBounds(12, 12, 24, 24));
+  // A symbol of 1,024 units or more isn't taken as drawn far off the artboard.
+  const large = '<symbol id="l" viewBox="0 0 2048 2048"><circle cx="1024" cy="1024" r="1024"/></symbol><use href="#l"/>';
+  assert.ok(inkAt((await font(svg(large))).glyph, 12, 12));
+  // A width or height of zero draws nothing.
+  assert.equal((await refusal(svg(`${icon}<use href="#i" width="0"/>`))).code, "nothing_to_draw");
+});
+
+test("a transform on the root <svg> places the icon as a browser does: in CSS pixels, about the artboard's centre", async () => {
+  const half = '<rect width="12" height="6"/>';
+  // Translated, in pixels: 120 of a 240-pixel box is 12 of its 24 units.
+  for (const root of ['viewBox="0 0 24 24" transform="translate(12 0)"', 'width="240" height="240" viewBox="0 0 24 24" transform="translate(120 0)"']) {
+    assert.deepEqual(bounds((await font(svg(half, root))).glyph), artboardBounds(12, 0, 24, 6), root);
+  }
+  // Turned about the centre: the top left corner goes to the top right, as
+  // Chromium draws it.
+  assert.deepEqual(bounds((await font(svg(half, 'viewBox="0 0 24 24" transform="rotate(90)"'))).glyph), artboardBounds(18, 0, 24, 12));
+  // Scaled about the centre.
+  const scaled = (await font(svg('<rect width="24" height="24"/>', 'width="48" height="48" viewBox="0 0 24 24" transform="scale(0.5)"'))).glyph;
+  assert.deepEqual(bounds(scaled), artboardBounds(6, 6, 18, 18));
+  // A mirror keeps the outline clockwise, as TrueType's are.
+  const mirrored = (await font(svg(half, 'viewBox="0 0 24 24" transform="scale(-1 1)"'))).glyph;
+  assert.deepEqual(bounds(mirrored), artboardBounds(12, 0, 24, 6));
+  assert.ok(inkAt(mirrored, 18, 3));
+  // With no artboard the drawing's bounds frame it, turned.
+  const bare = (await font(svg('<rect width="20" height="10"/>', 'transform="rotate(90)"'))).glyph;
+  assert.equal(bare.advanceWidth, 500);
+});
+
+test("an even-odd outline that crosses itself or another keeps its holes, as the SVG paints it", async () => {
+  // A star drawn as one outline: hollow in the middle by the even-odd rule,
+  // filled by the nonzero rule.
+  const star = '<polygon points="12,1 18.96,22.6 0.48,9.4 23.52,9.4 5.04,22.6"';
+  const evenodd = (await font(svg(`${star} fill-rule="evenodd"/>`))).glyph;
+  assert.ok(!inkAt(evenodd, 12, 13), "even-odd: the middle is empty");
+  assert.ok(inkAt(evenodd, 12, 4) && inkAt(evenodd, 3, 10) && inkAt(evenodd, 6, 20), "the points are filled");
+  const nonzero = (await font(svg(`${star}/>`))).glyph;
+  assert.ok(inkAt(nonzero, 12, 13) && inkAt(nonzero, 12, 4), "nonzero: all filled");
+  // Two partly overlapping squares in one even-odd path: the overlap is empty.
+  const squares = (await font(svg('<path fill-rule="evenodd" d="M2 2H14V14H2Z M10 10H22V22H10Z"/>'))).glyph;
+  assert.ok(!inkAt(squares, 12, 12) && inkAt(squares, 4, 4) && inkAt(squares, 20, 20));
+  // The same squares by the nonzero rule: filled when drawn the same way
+  // round, empty when drawn opposite ways, as a browser fills them.
+  const same = (await font(svg('<path d="M2 2H14V14H2Z M10 10H22V22H10Z"/>'))).glyph;
+  assert.ok(inkAt(same, 12, 12) && inkAt(same, 4, 4) && inkAt(same, 20, 20));
+  const opposite = (await font(svg('<path d="M2 2H14V14H2Z M10 10V22H22V10Z"/>'))).glyph;
+  assert.ok(!inkAt(opposite, 12, 12) && inkAt(opposite, 4, 4) && inkAt(opposite, 20, 20));
+  // Two overlapping circles: a lens-shaped hole, with the circles' edges
+  // within a font unit of where their curves are.
+  const circles = 'M2 12a6 6 0 1 0 12 0a6 6 0 1 0 -12 0Z M10 12a6 6 0 1 0 12 0a6 6 0 1 0 -12 0Z';
+  const lens = (await font(svg(`<path fill-rule="evenodd" d="${circles}"/>`))).glyph;
+  assert.ok(!inkAt(lens, 12, 12) && inkAt(lens, 4, 12) && inkAt(lens, 20, 12));
+  const edges = lens.getBoundingBox();
+  assert.ok(Math.abs(edges.x1 - at(2, 0)[0]) < 1 && Math.abs(edges.x2 - at(22, 0)[0]) < 1 && Math.abs(edges.y2 - at(0, 6)[1]) < 1);
+  // Another shape over the star's empty middle fills it.
+  const covered = (await font(svg(`${star} fill-rule="evenodd"/><rect x="10" y="11" width="4" height="4"/>`))).glyph;
+  assert.ok(inkAt(covered, 12, 13));
+  // Two outlines exactly on top of each other fill nothing.
+  const twice = await refusal(svg('<path fill-rule="evenodd" d="M2 2H22V22H2Z M2 2H22V22H2Z"/>'));
+  assert.equal(twice.code, "nothing_to_draw");
+  // An outline with no area (it goes out and back along a line) neither.
+  assert.equal((await refusal(svg('<path d="M2 2L20 20L11 11Z"/>'))).code, "nothing_to_draw");
+});
+
+test("a number too large to draw with is refused as damaged, with its own code", async () => {
+  const huge = [
+    '<polygon points="0,0 1e400,0 0,1"/>',
+    '<rect x="1e308" width="1e308" height="1"/>',
+    '<path d="M0 0L1e400 0L0 1Z"/>',
+    '<path d="M0 0H1e308V1e308H0Z" transform="translate(1e308 0)"/>',
+    '<path d="M0 0h9e8h9e8v1Z"/>',
+    `${'<g transform="scale(1e5)">'.repeat(2)}<rect width="1" height="1"/>${"</g>".repeat(2)}`,
+    '<svg viewBox="0 0 1e-300 1e-300" width="24" height="24"><rect width="1" height="1"/></svg>',
+  ];
+  for (const body of [...huge.map((shape) => svg(shape)), svg('<rect width="24" height="24"/>', 'viewBox="0 0 1e400 24"')]) {
+    const error = await refusal(body);
+    assert.equal(error.code, "number_out_of_range", body);
+    assert.equal(error.message, UNREADABLE_SVG_MESSAGE);
+  }
+  await assert.rejects(
+    convertWithWorker({ worker: undefined, from: "svg", to: "ttf", buf: encode(svg(huge[0])), fileName: "a.svg" }),
+    (error) => error.telemetryCode === "number_out_of_range" && error.message === UNREADABLE_SVG_MESSAGE,
+  );
+  // A shape partly on the artboard that reaches farther than a glyph can.
+  const far = await refusal(svg('<rect width="24000" height="24"/>'));
+  assert.equal(far.code, "too_complex");
+  assert.equal(far.message, FAR_OUTSIDE_MESSAGE);
 });
 
 test("a font holds no strokes: a stroke-only icon is refused with a way out, and a filled shape's stroke is left out", async () => {
@@ -264,6 +371,12 @@ test("a hostile SVG runs nothing, fetches nothing, and takes bounded time", asyn
   // Fan-out through <use>, and text built to make a parser backtrack.
   const fan = Array.from({ length: 12 }, (_, index) => `<g id="f${index}">${`<use href="#f${index + 1}"/>`.repeat(20)}</g>`).join("");
   assert.equal((await refusal(svg(`<defs>${fan}<g id="f12"/></defs><use href="#f0"/>`))).code, "too_complex");
+  // Stylesheet matching: 5,000 rules for every element, on nearly 100,000
+  // elements, is refused as soon as it passes LIMITS.ruleChecks.
+  const sheet = `<style>${"*{fill:#000}".repeat(LIMITS.rules)}</style>`;
+  const before = Date.now();
+  assert.equal((await refusal(svg(`${sheet}${'<rect width="1" height="1"/>'.repeat(LIMITS.elements - 10)}`))).code, "too_complex");
+  assert.ok(Date.now() - before < 2_000, `stylesheet matching took ${Date.now() - before} ms`);
   const slow = [
     svg(`<style>${"/*".repeat(200_000)}</style><rect width="24" height="24"/>`),
     svg(`<style>${"@import x;".repeat(100_000)}</style><rect width="24" height="24"/>`),

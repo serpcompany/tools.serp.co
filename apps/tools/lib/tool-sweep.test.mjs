@@ -919,6 +919,19 @@ test("SVG to TTF's font is opened with a font parser, and must have an outlined 
   // that aren't a font.
   await assert.rejects(decodeFontOutput(readFileSync(path.join(fixturesDir, "sample.ttf"))), /no glyph on U\+E000/);
   await assert.rejects(decodeFontOutput(Buffer.from([0, 1, 0, 0, 0, 0])));
+  // A glyph on U+E000 that is empty, or whose only contour encloses nothing
+  // (its points on one line).
+  const svg2ttf = (await import("svg2ttf")).default;
+  const fontWith = (d) =>
+    Buffer.from(
+      svg2ttf(
+        '<svg xmlns="http://www.w3.org/2000/svg"><defs><font id="t" horiz-adv-x="1000"><font-face font-family="t" units-per-em="1000" ascent="850" descent="-150"/>' +
+          `<missing-glyph horiz-adv-x="0"/><glyph glyph-name="uniE000" unicode="&#xE000;" horiz-adv-x="1000" d="${d}"/></font></defs></svg>`,
+      ).buffer,
+    );
+  await assert.rejects(decodeFontOutput(fontWith("")), /has no outline/);
+  await assert.rejects(decodeFontOutput(fontWith("M0 0L500 500L1000 1000Z")), /encloses nothing/);
+  assert.match((await decodeFontOutput(fontWith("M0 0L500 500L1000 0Z"))).text, /U\+E000 has 1 contours$/);
   const output = { name: "sample-icon.ttf", size: buffer.byteLength, head: Array.from(new Uint8Array(buffer).subarray(0, 64)), base64: base64Of(buffer) };
   await decodeOutputs([output], "ttf");
   assert.deepEqual(classifyRun({ outcome: "completed", outputs: [output] }, plan), { status: "pass", error: null, formatCheck: "decoded" });

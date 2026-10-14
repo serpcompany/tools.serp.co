@@ -6,7 +6,8 @@
 // svg-font-shapes.ts reads the file's filled shapes; svgicons2svgfont
 // flattens each, with its transforms, into one path; this module fills each
 // shape by its own fill rule and joins them (a font fills by the nonzero
-// rule, across every contour of the glyph); svg2ttf writes the TrueType
+// rule, across every contour of the glyph), with martinez-polygon-clipping
+// for an even-odd shape whose outlines cross; svg2ttf writes the TrueType
 // file, which is read back before it is saved. Loaded only when an SVG is
 // converted to TTF (workerClient.ts).
 
@@ -17,7 +18,9 @@ import { SVGPathData } from "svg-pathdata";
 
 import { SVG_FONT_MAX_BYTES, SVG_FONT_TOO_LARGE_MESSAGE } from "./image-document-targets.ts";
 import {
+  IDENTITY,
   TOO_COMPLEX_MESSAGE,
+  UNREADABLE_SVG_MESSAGE,
   readSvgShapes,
   svgFontError,
   type LeftOut,
@@ -36,8 +39,8 @@ export const DESCENT = 150;
 const MAX_ADVANCE = 16_000;
 // TrueType stores coordinates as 16-bit integers.
 const MAX_COORDINATE = 32_000;
-// Work allowed for finding which contours hold which: box comparisons and
-// polygon edges tested.
+// Work allowed for finding which contours cross or hold which: edges and
+// boxes compared, polygon edges tested.
 const NESTING_BUDGET = 100_000_000;
 
 // The family name: the file's name without its extension, in plain ASCII
@@ -142,12 +145,32 @@ type Contour = {
 
 const CURVE_SAMPLES = 8;
 
+const outOfRange = (cause?: unknown) => svgFontError("number_out_of_range", UNREADABLE_SVG_MESSAGE, cause);
+
 function cubicAt(p0: Point, c1: Point, c2: Point, p3: Point, t: number): Point {
   const u = 1 - t;
   return {
     x: u * u * u * p0.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t * t * t * p3.x,
     y: u * u * u * p0.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t * t * t * p3.y,
   };
+}
+
+// Whether all of `polygon` lies on one line (to a billionth of its length):
+// an outline that encloses nothing.
+function onOneLine(polygon: Point[]): boolean {
+  const first = polygon[0]!;
+  let far = first;
+  let farthest = 0;
+  for (const point of polygon) {
+    const distance = (point.x - first.x) ** 2 + (point.y - first.y) ** 2;
+    if (distance > farthest) {
+      farthest = distance;
+      far = point;
+    }
+  }
+  const dx = far.x - first.x;
+  const dy = far.y - first.y;
+  return polygon.every((point) => Math.abs(dx * (point.y - first.y) - dy * (point.x - first.x)) <= farthest * 1e-9);
 }
 
 function finishContour(start: Point, segments: Segment[]): Contour | null {
@@ -164,6 +187,8 @@ function finishContour(start: Point, segments: Segment[]): Contour | null {
     }
     previous = segment.to;
   }
+  // svg-font-shapes.ts bounds every number, so this is only a backstop.
+  if (!polygon.every((point) => Number.isFinite(point.x) && Number.isFinite(point.y))) throw outOfRange();
   let area = 0;
   const box = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
   // Measured from the start, so a small contour far from the origin keeps
@@ -177,17 +202,25 @@ function finishContour(start: Point, segments: Segment[]): Contour | null {
     box.maxX = Math.max(box.maxX, a.x);
     box.maxY = Math.max(box.maxY, a.y);
   }
-  // A contour with no width or no height (a line, a point) fills nothing.
+  // A contour with no width or no height (a line, a point), or whose points
+  // are all on one line, fills nothing.
   const size = Math.max(box.maxX - box.minX, box.maxY - box.minY);
   if (!(size > 0) || box.maxX - box.minX <= size * 1e-9 || box.maxY - box.minY <= size * 1e-9) return null;
-  if (!polygon.every((point) => Number.isFinite(point.x) && Number.isFinite(point.y))) return null;
+  if (onOneLine(polygon)) return null;
   return { start, segments, polygon, area: area / 2, box };
 }
 
 // Path data (absolute or not, any commands) as closed contours of lines
 // and cubic curves.
 function contoursOf(d: string): Contour[] {
-  const commands = new SVGPathData(d).toAbs().normalizeHVZ(false).normalizeST().qtToC().aToC().commands;
+  let commands: SVGPathData["commands"];
+  try {
+    commands = new SVGPathData(d).toAbs().normalizeHVZ(false).normalizeST().qtToC().aToC().commands;
+  } catch (error) {
+    // svgicons2svgfont writes a number past a double's range as Infinity.
+    if (/Infinity|NaN/.test(d)) throw outOfRange(error);
+    throw error;
+  }
   const contours: Contour[] = [];
   let start: Point | null = null;
   let segments: Segment[] = [];
@@ -231,6 +264,29 @@ function contoursOf(d: string): Contour[] {
   return contours;
 }
 
+// `contour` with every point moved by `map`, an affine map, so its curves
+// stay curves; null when it no longer encloses anything.
+function mapContour(contour: Contour, map: (point: Point) => Point): Contour | null {
+  return finishContour(
+    map(contour.start),
+    contour.segments.map((segment) =>
+      segment.c1 && segment.c2 ? { c1: map(segment.c1), c2: map(segment.c2), to: map(segment.to) } : { to: map(segment.to) },
+    ),
+  );
+}
+
+// The bounds of all of `contours`.
+function boundsOf(contours: Contour[]): Contour["box"] {
+  const bounds = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+  for (const { box } of contours) {
+    bounds.minX = Math.min(bounds.minX, box.minX);
+    bounds.minY = Math.min(bounds.minY, box.minY);
+    bounds.maxX = Math.max(bounds.maxX, box.maxX);
+    bounds.maxY = Math.max(bounds.maxY, box.maxY);
+  }
+  return bounds;
+}
+
 function boxHolds(outer: Contour["box"], inner: Contour["box"]): boolean {
   return outer.minX <= inner.minX && outer.minY <= inner.minY && outer.maxX >= inner.maxX && outer.maxY >= inner.maxY;
 }
@@ -250,13 +306,17 @@ function inside(point: Point, polygon: Point[]): boolean {
 
 type Budget = { left: number };
 
+function spend(budget: Budget, work: number): void {
+  budget.left -= work;
+  if (budget.left < 0) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
+}
+
 // Whether `outer` holds `inner`: most of three of inner's points are inside
 // it (one may sit on outer's edge, where a hole touches its outline).
 function holds(outer: Contour, inner: Contour, budget: Budget): boolean {
   const points = inner.polygon;
   const picks = [0, Math.floor(points.length / 3), Math.floor((2 * points.length) / 3)];
-  budget.left -= picks.length * outer.polygon.length;
-  if (budget.left < 0) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
+  spend(budget, picks.length * outer.polygon.length);
   const votes = picks.filter((index) => inside(points[index]!, outer.polygon)).length;
   return votes >= 2;
 }
@@ -275,15 +335,15 @@ function reversed(contour: Contour): Contour {
   return { ...contour, segments, area: -contour.area };
 }
 
-// One shape's contours, turned so that the nonzero rule fills exactly what
-// the shape's own rule fills, with a winding number of one: an outline
-// clockwise (as TrueType's are), a hole counterclockwise, and a contour
-// that changes nothing left out. Every shape's filled area then counts the
-// same, so where shapes overlap a font fills them all, as the SVG paints
-// them, and a hole in one shape is a hole only where nothing else is drawn.
+// One shape's contours, none crossing or touching another, turned so that
+// the nonzero rule fills exactly what the shape's own rule fills, with a
+// winding number of one: an outline clockwise (as TrueType's are), a hole
+// counterclockwise, and a contour that changes nothing left out. Every
+// shape's filled area then counts the same, so where shapes overlap a font
+// fills them all, as the SVG paints them, and a hole in one shape is a hole
+// only where nothing else is drawn.
 //
 // Which contour holds which comes from the smallest contour around it.
-// Contours of one shape that cross each other are taken as they are.
 function normalizeContours(contours: Contour[], fillRule: "nonzero" | "evenodd", budget: Budget): Contour[] {
   const order = contours.map((_, index) => index).sort((a, b) => Math.abs(contours[a]!.area) - Math.abs(contours[b]!.area));
   const parent = new Array<number>(contours.length).fill(-1);
@@ -296,7 +356,7 @@ function normalizeContours(contours: Contour[], fillRule: "nonzero" | "evenodd",
     larger = Math.max(larger, rank + 1);
     while (larger < order.length && Math.abs(contours[order[larger]!]!.area) <= size) larger += 1;
     for (let next = larger; next < order.length; next += 1) {
-      if ((budget.left -= 1) < 0) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
+      spend(budget, 1);
       const candidate = contours[order[next]!]!;
       if (!boxHolds(candidate.box, contour.box)) continue;
       if (holds(candidate, contour, budget)) {
@@ -326,19 +386,174 @@ function normalizeContours(contours: Contour[], fillRule: "nonzero" | "evenodd",
   return result;
 }
 
+function orientation(a: Point, b: Point, c: Point): number {
+  return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+}
+
+function within(a: Point, b: Point, point: Point): boolean {
+  return (
+    Math.min(a.x, b.x) <= point.x &&
+    point.x <= Math.max(a.x, b.x) &&
+    Math.min(a.y, b.y) <= point.y &&
+    point.y <= Math.max(a.y, b.y)
+  );
+}
+
+// Whether the segments ab and cd cross or touch.
+function segmentsMeet(a: Point, b: Point, c: Point, d: Point): boolean {
+  const d1 = orientation(c, d, a);
+  const d2 = orientation(c, d, b);
+  const d3 = orientation(a, b, c);
+  const d4 = orientation(a, b, d);
+  if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) return true;
+  return (
+    (d1 === 0 && within(c, d, a)) ||
+    (d2 === 0 && within(c, d, b)) ||
+    (d3 === 0 && within(a, b, c)) ||
+    (d4 === 0 && within(a, b, d))
+  );
+}
+
+// Whether any of a shape's contours crosses or touches another, or itself
+// (by their polygons: curves sampled). Then nesting can't tell what the
+// shape fills. Edges are swept along the drawing's longer side.
+function contoursMeet(contours: Contour[], budget: Budget): boolean {
+  const bounds = boundsOf(contours);
+  const alongX = bounds.maxX - bounds.minX >= bounds.maxY - bounds.minY;
+  type Edge = { contour: number; index: number; count: number; a: Point; b: Point; low: number; high: number; from: number; to: number };
+  const edges: Edge[] = [];
+  contours.forEach((contour, which) => {
+    const points = contour.polygon.filter((point, index, all) => {
+      const next = all[(index + 1) % all.length]!;
+      return point.x !== next.x || point.y !== next.y;
+    });
+    spend(budget, points.length);
+    points.forEach((a, index) => {
+      const b = points[(index + 1) % points.length]!;
+      const [u1, u2, v1, v2] = alongX ? [a.x, b.x, a.y, b.y] : [a.y, b.y, a.x, b.x];
+      edges.push({ contour: which, index, count: points.length, a, b, low: Math.min(u1, u2), high: Math.max(u1, u2), from: Math.min(v1, v2), to: Math.max(v1, v2) });
+    });
+  });
+  edges.sort((e, f) => e.low - f.low);
+  for (let i = 0; i < edges.length; i += 1) {
+    const e = edges[i]!;
+    for (let j = i + 1; j < edges.length && edges[j]!.low <= e.high; j += 1) {
+      spend(budget, 1);
+      const f = edges[j]!;
+      if (f.from > e.to || f.to < e.from) continue;
+      // Neighbouring edges of one contour share their corner.
+      const gap = Math.abs(e.index - f.index);
+      if (e.contour === f.contour && (gap === 1 || gap === e.count - 1)) continue;
+      if (segmentsMeet(e.a, e.b, f.a, f.b)) return true;
+    }
+  }
+  return false;
+}
+
+// martinez works on polygons: a curve becomes enough straight steps to keep
+// within FLATNESS font units of it (invisible at 1,000 units to the em; a
+// curve's chords of n equal steps are within max|B''| / 8n² of it).
+const FLATNESS = 0.25;
+const MAX_CURVE_STEPS = 256;
+// The most points one TrueType glyph holds.
+const MAX_GLYPH_POINTS = 65_535;
+
+function ringOf(contour: Contour): [number, number][] {
+  const ring: [number, number][] = [[contour.start.x, contour.start.y]];
+  let previous = contour.start;
+  for (const { c1, c2, to } of contour.segments) {
+    if (c1 && c2) {
+      const bend = 6 * Math.max(
+        Math.hypot(previous.x - 2 * c1.x + c2.x, previous.y - 2 * c1.y + c2.y),
+        Math.hypot(c1.x - 2 * c2.x + to.x, c1.y - 2 * c2.y + to.y),
+      );
+      const steps = Math.min(MAX_CURVE_STEPS, Math.max(1, Math.ceil(Math.sqrt(bend / (8 * FLATNESS)))));
+      for (let step = 1; step < steps; step += 1) {
+        const point = cubicAt(previous, c1, c2, to, step / steps);
+        ring.push([point.x, point.y]);
+      }
+    }
+    ring.push([to.x, to.y]);
+    previous = to;
+  }
+  ring.push(ring[0]!);
+  return ring;
+}
+
+// `points` (a ring of martinez's output, not closed) split where it comes
+// back to a point it has passed: martinez writes a hole that touches its
+// outline, or two parts that meet at a corner, as one ring, which only the
+// even-odd rule reads rightly. Each loop returned passes a point once.
+function simpleLoops(points: Point[]): Point[][] {
+  const loops: Point[][] = [];
+  const path: Point[] = [];
+  const seen = new Map<string, number>();
+  for (const point of points) {
+    const at = seen.get(`${point.x},${point.y}`);
+    if (at === undefined) {
+      seen.set(`${point.x},${point.y}`, path.length);
+      path.push(point);
+      continue;
+    }
+    const loop = path.splice(at + 1);
+    for (const passed of loop) seen.delete(`${passed.x},${passed.y}`);
+    loops.push([path[at]!, ...loop]);
+  }
+  loops.push(path);
+  return loops;
+}
+
+// An even-odd shape whose contours cross or touch (a star drawn as one
+// outline, two overlapping squares in one path), as outlines and holes
+// that don't: the region it fills, found by martinez-polygon-clipping
+// (Martinez-Rueda boolean operations, which read a polygon's rings by the
+// even-odd rule), loaded only for such a shape, as loops that neither cross
+// nor touch themselves, whose nesting then says which are holes. Its
+// curves become lines.
+async function withoutCrossings(contours: Contour[]): Promise<Contour[]> {
+  const rings = contours.map(ringOf);
+  if (rings.reduce((sum, ring) => sum + ring.length, 0) > MAX_GLYPH_POINTS) {
+    throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
+  }
+  const { intersection } = await import("martinez-polygon-clipping");
+  // Cut by a box around the shape: an operation with an empty polygon
+  // returns the shape as it is.
+  const { minX, minY, maxX, maxY } = boundsOf(contours);
+  const [left, bottom, right, top] = [minX - 1, minY - 1, maxX + 1, maxY + 1];
+  const frame: [number, number][][] = [[[left, bottom], [right, bottom], [right, top], [left, top], [left, bottom]]];
+  const result: Contour[] = [];
+  for (const polygon of intersection(rings, frame)) {
+    for (const ring of polygon) {
+      // Its rings are closed: the last point is the first.
+      for (const [first, ...rest] of simpleLoops(ring.slice(0, -1).map(([x, y]) => ({ x, y })))) {
+        const contour = first ? finishContour(first, rest.map((to) => ({ to }))) : null;
+        if (contour) result.push(contour);
+      }
+    }
+  }
+  return result;
+}
+
+// One shape's contours, ready to join the glyph (normalizeContours). When
+// they cross or touch: an even-odd shape is first redrawn without crossings
+// (withoutCrossings); a nonzero shape is taken as drawn, since its own
+// winding is what the SVG fills, and turned as a whole to run clockwise,
+// so that it adds to the shapes under it. A single contour of a nonzero
+// shape fills the same either way.
+async function fillShape(contours: Contour[], fillRule: "nonzero" | "evenodd", budget: Budget): Promise<Contour[]> {
+  const meet = (fillRule === "evenodd" || contours.length > 1) && contoursMeet(contours, budget);
+  if (!meet) return normalizeContours(contours, fillRule, budget);
+  if (fillRule === "evenodd") return normalizeContours(await withoutCrossings(contours), "evenodd", budget);
+  return contours.reduce((sum, contour) => sum + contour.area, 0) > 0 ? contours.map(reversed) : contours;
+}
+
 // ---- The font ----
 
 type Box = { left: number; bottom: number; width: number; height: number };
 
-function encodeContours(contours: Contour[], map: (point: Point) => Point): string {
+function encodeContours(contours: Contour[]): string {
   const round = (value: number) => String(Math.round(value * 100) / 100);
-  const xy = (point: Point) => {
-    const mapped = map(point);
-    if (Math.abs(mapped.x) > MAX_COORDINATE || Math.abs(mapped.y) > MAX_COORDINATE) {
-      throw svgFontError("too_complex", FAR_OUTSIDE_MESSAGE);
-    }
-    return `${round(mapped.x)} ${round(mapped.y)}`;
-  };
+  const xy = (point: Point) => `${round(point.x)} ${round(point.y)}`;
   return contours
     .map(
       (contour) =>
@@ -423,7 +638,7 @@ export type SvgFontResult = { buffer: ArrayBuffer; family: string; notice: strin
 // error is this converter's.
 export async function svgToTtf(buf: ArrayBuffer, fileName: string): Promise<SvgFontResult> {
   if (buf.byteLength > SVG_FONT_MAX_BYTES) throw svgFontError("too_complex", SVG_FONT_TOO_LARGE_MESSAGE);
-  const { artboard, shapes, leftOut, strokeOnly } = readSvgShapes(decodeSvgText(new Uint8Array(buf)));
+  const { artboard, transform, shapes, leftOut, strokeOnly } = readSvgShapes(decodeSvgText(new Uint8Array(buf)));
   const family = fontFamilyName(fileName);
   const failNothing = (): never => {
     if (strokeOnly > 0) throw svgFontError("nothing_to_draw", STROKES_ONLY_MESSAGE);
@@ -434,45 +649,65 @@ export async function svgToTtf(buf: ArrayBuffer, fileName: string): Promise<SvgF
   if (!shapes.length) failNothing();
 
   // svgicons2svgfont reads only what svg-font-shapes.ts wrote, so its
-  // failure is this converter's, not the file's.
+  // failure is this converter's, not the file's. Each shape's contours are
+  // in the root's user units, y up (y' = 1 - y).
   const paths = await flattenShapes(shapes);
+  let perShape = shapes.map((_, index) => contoursOf(paths[index]!));
 
-  const budget = { left: NESTING_BUDGET };
-  const perShape = shapes.map((shape, index) => normalizeContours(contoursOf(paths[index]!), shape.fillRule, budget));
-  // Off the artboard, a browser shows nothing: shapes wholly outside it
+  // Off the artboard, a browser shows nothing: contours wholly outside it
   // (an editor's spare parts) are left out of the glyph too.
-  let box: Box;
-  let contours = perShape.flat();
+  let box: Box | null = null;
   if (artboard) {
-    box = { left: artboard.x, bottom: 1 - artboard.y - artboard.height, width: artboard.width, height: artboard.height };
-    const drawn = contours.length;
-    contours = contours.filter(
-      (contour) =>
-        contour.box.maxX > box.left &&
-        contour.box.minX < box.left + box.width &&
-        contour.box.maxY > box.bottom &&
-        contour.box.minY < box.bottom + box.height,
+    const frame = { left: artboard.x, bottom: 1 - artboard.y - artboard.height, width: artboard.width, height: artboard.height };
+    const drawn = perShape.some((contours) => contours.length);
+    perShape = perShape.map((contours) =>
+      contours.filter(
+        ({ box: own }) =>
+          own.maxX > frame.left &&
+          own.minX < frame.left + frame.width &&
+          own.maxY > frame.bottom &&
+          own.minY < frame.bottom + frame.height,
+      ),
     );
-    if (drawn && !contours.length) throw svgFontError("nothing_to_draw", OUTSIDE_ARTBOARD_MESSAGE);
-  } else {
-    const bounds = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
-    for (const { box: own } of contours) {
-      bounds.minX = Math.min(bounds.minX, own.minX);
-      bounds.minY = Math.min(bounds.minY, own.minY);
-      bounds.maxX = Math.max(bounds.maxX, own.maxX);
-      bounds.maxY = Math.max(bounds.maxY, own.maxY);
-    }
+    if (drawn && !perShape.some((contours) => contours.length)) throw svgFontError("nothing_to_draw", OUTSIDE_ARTBOARD_MESSAGE);
+    box = frame;
+  }
+  // The root's own transform moves the drawing and its artboard together:
+  // the drawing is moved, and the artboard stays the glyph's frame.
+  if (transform.some((value, index) => value !== IDENTITY[index])) {
+    const [a, b, c, d, e, f] = transform;
+    const move = ({ x, y }: Point): Point => ({ x: a * x + c * (1 - y) + e, y: 1 - (b * x + d * (1 - y) + f) });
+    perShape = perShape.map((contours) => contours.flatMap((contour) => mapContour(contour, move) ?? []));
+  }
+  if (!box) {
+    const bounds = boundsOf(perShape.flat());
     box = { left: bounds.minX, bottom: bounds.minY, width: bounds.maxX - bounds.minX, height: bounds.maxY - bounds.minY };
   }
-  if (!contours.length || !(box.width > 0 && box.height > 0)) failNothing();
+  if (!perShape.some((contours) => contours.length) || !(box.width > 0 && box.height > 0)) failNothing();
+
+  // Font units from here: the artboard fills the em, its bottom left at
+  // (0, -DESCENT).
+  const scale = Math.min(UNITS_PER_EM / box.height, MAX_ADVANCE / box.width);
+  if (!Number.isFinite(scale)) throw outOfRange();
+  const advance = Math.max(1, Math.round(box.width * scale));
+  const { left, bottom } = box;
+  const toFont = ({ x, y }: Point): Point => {
+    const point = { x: (x - left) * scale, y: (y - bottom) * scale - DESCENT };
+    if (!(Math.abs(point.x) <= MAX_COORDINATE && Math.abs(point.y) <= MAX_COORDINATE)) {
+      throw svgFontError("too_complex", FAR_OUTSIDE_MESSAGE);
+    }
+    return point;
+  };
+  const budget = { left: NESTING_BUDGET };
+  const contours: Contour[] = [];
+  for (const [index, shape] of shapes.entries()) {
+    const placed = perShape[index]!.flatMap((contour) => mapContour(contour, toFont) ?? []);
+    contours.push(...(await fillShape(placed, shape.fillRule, budget)));
+  }
+  if (!contours.length) failNothing();
   if (contours.length > 30_000) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
 
-  const scale = Math.min(UNITS_PER_EM / box.height, MAX_ADVANCE / box.width);
-  const advance = Math.max(1, Math.round(box.width * scale));
-  const d = encodeContours(contours, (point) => ({
-    x: (point.x - box.left) * scale,
-    y: (point.y - box.bottom) * scale - DESCENT,
-  }));
+  const d = encodeContours(contours);
   const name = postScriptName(family);
   const svgFont =
     '<?xml version="1.0" standalone="no"?>\n' +

@@ -21,15 +21,23 @@ import sax from "sax";
 import { SVGPathData } from "svg-pathdata";
 
 // The error codes svg-font.ts throws with: the file is damaged or isn't an
-// SVG; it has nothing a font can hold; or it is larger or more detailed
-// than this page converts.
-export type SvgFontErrorCode = "unreadable_image" | "nothing_to_draw" | "too_complex";
+// SVG; it holds a number too large to draw with (damaged, as far as a
+// visitor can tell: it gets the same message); it has nothing a font can
+// hold; or it is larger or more detailed than this page converts.
+export type SvgFontErrorCode = "unreadable_image" | "number_out_of_range" | "nothing_to_draw" | "too_complex";
 
 export function svgFontError(code: SvgFontErrorCode, message: string, cause?: unknown): Error & { code: SvgFontErrorCode } {
   return Object.assign(new Error(message, cause === undefined ? undefined : { cause }), { code });
 }
 
 export const UNREADABLE_SVG_MESSAGE = "This SVG couldn't be read: it may be damaged, or not an SVG file.";
+
+// `value`, when it is a number no larger than LIMITS.largestNumber either
+// way; otherwise (1e400 reads as Infinity) the file is refused as damaged.
+function checkNumber(value: number): number {
+  if (!(Math.abs(value) <= LIMITS.largestNumber)) throw svgFontError("number_out_of_range", UNREADABLE_SVG_MESSAGE);
+  return value;
+}
 export const TOO_COMPLEX_MESSAGE =
   "This SVG has more detail than a font can hold here. Simplify its paths, or remove shapes, and try again.";
 
@@ -42,8 +50,10 @@ export const LIMITS = {
   // Shapes drawn, counting each <use> of one, and elements visited.
   shapes: 5_000,
   visits: 200_000,
-  // Rules in the file's stylesheets.
+  // Rules in the file's stylesheets, and rules looked at while matching
+  // them to elements (5,000 rules for every element would be 500 million).
   rules: 5_000,
+  ruleChecks: 2_000_000,
   // Path commands across all shapes (a TrueType glyph holds at most 65,535
   // points; a curve needs at least two).
   commands: 60_000,
@@ -51,6 +61,11 @@ export const LIMITS = {
   useDepth: 16,
   // Characters a file's own entities (<!ENTITY>) may add when expanded.
   entityExpansion: 1_000_000,
+  // The largest number, in the file or worked out from it (a coordinate, a
+  // length, a transform's scale or offset), that is drawn. No icon needs
+  // one past a billion, and with every number under it, sums and products
+  // of them can't overflow to Infinity.
+  largestNumber: 1e9,
 };
 
 export type Artboard = { x: number; y: number; width: number; height: number };
@@ -71,6 +86,10 @@ export type SvgShapes = {
   // The root's viewBox, else its width and height; null when it has neither,
   // and the shapes' own bounds are the drawing's.
   artboard: Artboard | null;
+  // The root's own transform, in its user units (rootTransform): it moves
+  // the drawing and its artboard together, so it is applied after shapes
+  // off the artboard are left out.
+  transform: Matrix;
   shapes: SvgShape[];
   leftOut: LeftOut;
   // Visible shapes drawn only with a stroke.
@@ -302,37 +321,53 @@ function collectStyleSheets(element: Element, rules: Rule[]): void {
   for (const child of element.children) collectStyleSheets(child, rules);
 }
 
-// Rules by the one part of their selector an element must have: its id,
-// else its first class, else its tag, else "*".
-type RuleIndex = Map<string, Rule[]>;
+// The file's rules by the one part of their selector an element must have:
+// its id, else its first class, else its tag, else "*". `checks` counts the
+// rules looked at while matching, against LIMITS.ruleChecks.
+type StyleSheets = { index: Map<string, Rule[]>; checks: number };
 
-function indexRules(rules: Rule[]): RuleIndex {
-  const index: RuleIndex = new Map();
+function indexRules(rules: Rule[]): StyleSheets {
+  const index = new Map<string, Rule[]>();
   for (const rule of rules) {
     const key = rule.id !== null ? `#${rule.id}` : rule.classes.length ? `.${rule.classes[0]}` : (rule.tag ?? "*");
-    index.set(key, [...(index.get(key) ?? []), rule]);
+    const list = index.get(key);
+    if (list) list.push(rule);
+    else index.set(key, [rule]);
   }
-  return index;
+  return { index, checks: 0 };
 }
 
 // The element's own declarations: presentation attributes, then matching
 // rules by specificity and order, then its style attribute.
-function specified(element: Element, rules: RuleIndex): Declarations {
+function specified(element: Element, sheets: StyleSheets): Declarations {
   const result: Declarations = {};
   for (const name of PROPERTIES) {
     const value = element.attrs[name];
     if (value !== undefined) result[name] = value.trim();
   }
-  if (rules.size) {
+  if (sheets.index.size) {
     const classes = new Set((element.attrs.class ?? "").split(/\s+/).filter(Boolean));
     const keys = ["*", element.name, ...[...classes].map((name) => `.${name}`)];
     if (element.attrs.id) keys.push(`#${element.attrs.id}`);
-    const matching = keys.flatMap((key) => rules.get(key) ?? []).filter(
-      (rule) =>
-        (!rule.tag || rule.tag === element.name) &&
-        (!rule.id || rule.id === element.attrs.id) &&
-        rule.classes.every((name) => classes.has(name)),
-    );
+    const matching: Rule[] = [];
+    const charge = (checks: number) => {
+      sheets.checks += checks;
+      if (sheets.checks > LIMITS.ruleChecks) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
+    };
+    for (const key of keys) {
+      charge(1);
+      for (const rule of sheets.index.get(key) ?? []) {
+        // A rule costs a look at each class its selector names.
+        charge(1 + rule.classes.length);
+        if (
+          (!rule.tag || rule.tag === element.name) &&
+          (!rule.id || rule.id === element.attrs.id) &&
+          rule.classes.every((name) => classes.has(name))
+        ) {
+          matching.push(rule);
+        }
+      }
+    }
     matching.sort((a, b) => a.specificity - b.specificity || a.order - b.order);
     for (const rule of matching) Object.assign(result, rule.decls);
   }
@@ -382,19 +417,19 @@ const NUMBER = /[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?/gi;
 const UNITS: Record<string, number> = { "": 1, px: 1, pt: 4 / 3, pc: 16, mm: 96 / 25.4, cm: 96 / 2.54, in: 96, em: 16, ex: 8 };
 
 // A length in user units; a percentage of `reference`, the viewport's width,
-// height or diagonal. Null when it isn't one.
+// height or diagonal. Null when it isn't one; refused (checkNumber) when it
+// is too large.
 function length(value: string | undefined, reference: number): number | null {
   if (value === undefined) return null;
   const match = /^\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)\s*(px|pt|pc|mm|cm|in|em|ex|%)?\s*$/i.exec(value);
   if (!match) return null;
-  const number = Number(match[1]);
+  const number = checkNumber(Number(match[1]));
   const unit = (match[2] ?? "").toLowerCase();
-  const result = unit === "%" ? (number / 100) * reference : number * UNITS[unit]!;
-  return Number.isFinite(result) ? result : null;
+  return checkNumber(unit === "%" ? (number / 100) * reference : number * UNITS[unit]!);
 }
 
 function numbers(value: string | undefined): number[] {
-  return (value?.match(NUMBER) ?? []).map(Number);
+  return (value?.match(NUMBER) ?? []).map((token) => checkNumber(Number(token)));
 }
 
 function viewBox(value: string | undefined): Artboard | null {
@@ -409,8 +444,8 @@ function num(value: number): string {
 }
 
 // An affine transform, as SVG's matrix(a b c d e f).
-type Matrix = [number, number, number, number, number, number];
-const IDENTITY: Matrix = [1, 0, 0, 1, 0, 0];
+export type Matrix = [number, number, number, number, number, number];
+export const IDENTITY: Matrix = [1, 0, 0, 1, 0, 0];
 
 function multiply(m: Matrix, n: Matrix): Matrix {
   return [
@@ -444,7 +479,7 @@ export function parseTransform(value: string | undefined): Matrix {
     for (const token of match[2]!.trim().split(/[\s,]+/).filter(Boolean)) {
       const number = /^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)(deg|rad|grad|turn|px)?$/i.exec(token);
       if (!number) return IDENTITY;
-      args.push(Number(number[1]) * ANGLE_UNITS[(number[2] ?? "").toLowerCase()]!);
+      args.push(checkNumber(Number(number[1]) * ANGLE_UNITS[(number[2] ?? "").toLowerCase()]!));
     }
     const [a = 0, b, c, d, e, f] = args;
     const radians = (a * Math.PI) / 180;
@@ -473,9 +508,22 @@ export function parseTransform(value: string | undefined): Matrix {
         break;
     }
     if (!step || !step.every(Number.isFinite)) return IDENTITY;
-    matrix = multiply(matrix, step);
+    matrix = checkMatrix(multiply(matrix, step));
   }
   return matrix;
+}
+
+// `matrix`, when its scales and offsets are all within LIMITS.largestNumber,
+// as a drawing placed by it is; otherwise the file is refused (a transform
+// that overflows, or a viewBox scaled past any screen).
+function checkMatrix(matrix: Matrix): Matrix {
+  for (const value of matrix) checkNumber(value);
+  return matrix;
+}
+
+function invert([a, b, c, d, e, f]: Matrix): Matrix {
+  const det = a * d - b * c;
+  return [d / det, -b / det, -c / det, a / det, (c * f - d * e) / det, (b * e - a * f) / det];
 }
 
 // The transform that fits a viewBox into a viewport of `width` x `height` at
@@ -502,6 +550,16 @@ function viewportTransform(box: Artboard, x: number, y: number, width: number, h
 
 type Viewport = { width: number; height: number };
 
+// `path`, when every number in it is within LIMITS.largestNumber (checkNumber).
+function checkPath(path: SVGPathData): SVGPathData {
+  for (const command of path.commands) {
+    for (const [name, value] of Object.entries(command)) {
+      if (name !== "type" && typeof value === "number") checkNumber(value);
+    }
+  }
+  return path;
+}
+
 // The shape as path data in its own user units, or null when it draws
 // nothing (a zero size, no points). Throws on path data that can't be read.
 function shapePath(element: Element, viewport: Viewport): SVGPathData | null {
@@ -519,6 +577,7 @@ function shapePath(element: Element, viewport: Viewport): SVGPathData | null {
       } catch (error) {
         throw svgFontError("unreadable_image", UNREADABLE_SVG_MESSAGE, error);
       }
+      checkPath(path);
       // Path data must start with a move; a browser draws nothing otherwise.
       return path.commands[0]?.type === SVGPathData.MOVE_TO ? path : null;
     }
@@ -577,7 +636,7 @@ const SHAPES = new Set(["path", "rect", "circle", "ellipse", "polygon", "polylin
 // ---- Walking the drawing ----
 
 type Context = {
-  rules: RuleIndex;
+  sheets: StyleSheets;
   visits: number;
   ids: Map<string, Element>;
   result: SvgShapes;
@@ -599,12 +658,13 @@ function hrefOf(element: Element): string | undefined {
 // against a reference to itself.
 function walk(element: Element, parent: Style, transform: Matrix, viewport: Viewport, context: Context, uses: string[]): void {
   if ((context.visits += 1) > LIMITS.visits) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
-  const own = specified(element, context.rules);
+  const own = specified(element, context.sheets);
   if (own.display?.trim().toLowerCase() === "none") return;
   if (own.opacity !== undefined && zero(own.opacity)) return;
   const style = inherit(parent, own);
   const visible = !["hidden", "collapse"].includes(style.visibility.trim().toLowerCase());
-  const placed = element.attrs.transform === undefined ? transform : multiply(transform, parseTransform(element.attrs.transform));
+  const placed =
+    element.attrs.transform === undefined ? transform : checkMatrix(multiply(transform, parseTransform(element.attrs.transform)));
 
   switch (element.name) {
     case "g":
@@ -622,12 +682,14 @@ function walk(element: Element, parent: Style, transform: Matrix, viewport: View
       // A nested <svg>: a viewport of its own at (x, y).
       const width = length(element.attrs.width, viewport.width) ?? viewport.width;
       const height = length(element.attrs.height, viewport.height) ?? viewport.height;
+      // A viewport of no size draws nothing.
+      if (!(width > 0 && height > 0)) return;
       const box = viewBox(element.attrs.viewBox);
       const x = length(element.attrs.x, viewport.width) ?? 0;
       const y = length(element.attrs.y, viewport.height) ?? 0;
       const fit = box ? viewportTransform(box, x, y, width, height, element.attrs.preserveAspectRatio) : translation(x, y);
       const inner = box ? { width: box.width, height: box.height } : { width, height };
-      for (const child of element.children) walk(child, style, multiply(placed, fit), inner, context, uses);
+      for (const child of element.children) walk(child, style, checkMatrix(multiply(placed, fit)), inner, context, uses);
       return;
     }
     case "use": {
@@ -640,20 +702,23 @@ function walk(element: Element, parent: Style, transform: Matrix, viewport: View
       if (uses.length >= LIMITS.useDepth) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
       const x = length(element.attrs.x, viewport.width) ?? 0;
       const y = length(element.attrs.y, viewport.height) ?? 0;
-      const at = multiply(placed, translation(x, y));
+      const at = checkMatrix(multiply(placed, translation(x, y)));
       if (target.name === "symbol" || target.name === "svg") {
-        const targetOwn = specified(target, context.rules);
+        const targetOwn = specified(target, context.sheets);
         if (targetOwn.display?.trim().toLowerCase() === "none") return;
         if (targetOwn.opacity !== undefined && zero(targetOwn.opacity)) return;
         const targetStyle = inherit(style, targetOwn);
+        // Its viewport: the <use>'s width and height, else the symbol's (or
+        // the <svg>'s), else all of the viewport the <use> is in (100%, as
+        // browsers size it), into which its viewBox is fitted.
+        const width = length(element.attrs.width ?? target.attrs.width, viewport.width) ?? viewport.width;
+        const height = length(element.attrs.height ?? target.attrs.height, viewport.height) ?? viewport.height;
+        if (!(width > 0 && height > 0)) return;
         const box = viewBox(target.attrs.viewBox);
-        const width = length(element.attrs.width ?? target.attrs.width, viewport.width);
-        const height = length(element.attrs.height ?? target.attrs.height, viewport.height);
-        const fit =
-          box && width && height && width > 0 && height > 0
-            ? multiply(at, viewportTransform(box, 0, 0, width, height, target.attrs.preserveAspectRatio))
-            : at;
-        const inner = box ? { width: box.width, height: box.height } : viewport;
+        const fit = box
+          ? checkMatrix(multiply(at, viewportTransform(box, 0, 0, width, height, target.attrs.preserveAspectRatio)))
+          : at;
+        const inner = box ? { width: box.width, height: box.height } : { width, height };
         for (const child of target.children) walk(child, targetStyle, fit, inner, context, [...uses, id]);
         return;
       }
@@ -687,10 +752,10 @@ function walk(element: Element, parent: Style, transform: Matrix, viewport: View
   // svgicons2svgfont transforms paths with, turns an absolute H or V the
   // wrong way under a rotation or skew (it reads the turned point before
   // it), and arcs and smooth curves are simplest turned as curves.
-  const path = shape.toAbs().normalizeHVZ(false).normalizeST().qtToC().aToC();
+  // Relative steps add up: the absolute path is checked too.
+  const path = checkPath(shape.toAbs().normalizeHVZ(false).normalizeST().qtToC().aToC());
   context.commands += path.commands.length;
   if (context.commands > LIMITS.commands) throw svgFontError("too_complex", TOO_COMPLEX_MESSAGE);
-  if (!placed.every(Number.isFinite)) return;
   const moved = placed.some((value, index) => value !== IDENTITY[index]);
   context.result.shapes.push({
     svg:
@@ -713,6 +778,28 @@ function rootArtboard(root: Element): Artboard | null {
   return width && height && width > 0 && height > 0 ? { x: 0, y: 0, width, height } : null;
 }
 
+// The root <svg>'s transform attribute (SVG 2), in its user units. A browser
+// applies it as a CSS transform of the root's box: in CSS pixels (the
+// root's width and height; its viewBox's units when it has none), about the
+// box's centre, to the drawing and the artboard together.
+function rootTransform(root: Element, artboard: Artboard | null): Matrix {
+  const transform = parseTransform(root.attrs.transform);
+  // Without an artboard the drawing's own bounds frame it: where it turns
+  // or how far it moves changes nothing.
+  if (transform === IDENTITY || !artboard) return transform;
+  const ratio = artboard.width / artboard.height;
+  const width = length(root.attrs.width, 0);
+  const height = length(root.attrs.height, 0);
+  // One of width and height alone: the other keeps the artboard's shape.
+  const boxWidth = width && width > 0 ? width : height && height > 0 ? height * ratio : artboard.width;
+  const boxHeight = height && height > 0 ? height : boxWidth / ratio;
+  const box = viewBox(root.attrs.viewBox);
+  const fit = box ? viewportTransform(box, 0, 0, boxWidth, boxHeight, root.attrs.preserveAspectRatio) : IDENTITY;
+  const centre = translation(boxWidth / 2, boxHeight / 2);
+  const about = multiply(multiply(centre, transform), translation(-boxWidth / 2, -boxHeight / 2));
+  return checkMatrix(multiply(multiply(invert(fit), about), fit));
+}
+
 // The filled shapes `text` (an SVG file's text) draws. Throws an Error with
 // a `code` (svgFontError) when it can't be read or is over LIMITS.
 export function readSvgShapes(text: string): SvgShapes {
@@ -724,12 +811,13 @@ export function readSvgShapes(text: string): SvgShapes {
   const artboard = rootArtboard(root);
   const result: SvgShapes = {
     artboard,
+    transform: rootTransform(root, artboard),
     shapes: [],
     leftOut: { strokes: false, text: false, pictures: false },
     strokeOnly: 0,
   };
-  const context: Context = { rules: indexRules(rules), visits: 0, ids, result, commands: 0 };
-  const own = specified(root, context.rules);
+  const context: Context = { sheets: indexRules(rules), visits: 0, ids, result, commands: 0 };
+  const own = specified(root, context.sheets);
   if (own.display?.trim().toLowerCase() === "none" || (own.opacity !== undefined && zero(own.opacity))) return result;
   const style = inherit(INITIAL_STYLE, own);
   const viewport = artboard ? { width: artboard.width, height: artboard.height } : { width: 100, height: 100 };
