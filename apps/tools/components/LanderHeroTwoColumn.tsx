@@ -161,6 +161,7 @@ export default function LanderHeroTwoColumn({
           from,
           to,
           buf,
+          fileName: file.name,
           onProgress: (update) => {
             setCurrentFile({
               name: file.name,

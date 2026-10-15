@@ -3,12 +3,12 @@
     "issue": "https://github.com/serpcompany/tools.serp.co/issues/147",
     "command": "pnpm -C apps/tools tool-sweep",
     "baseUrl": "http://localhost:8812",
-    "commit": "348f8eec0ecdc1efca46c76432645e9e52314373",
+    "commit": "241bff63a517a7d958658a09988275d4170c815e",
     "activeTools": 2529,
     "counts": {
-      "pass": 2102,
+      "pass": 2103,
       "wrong_format": 0,
-      "error": 63,
+      "error": 62,
       "timeout": 0,
       "no_fixture": 49,
       "skipped": 315
@@ -3950,6 +3950,102 @@
           "bin-to-png"
         ],
         "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "896bc97735b2ae6ef43aa71fd81519d08a432630",
+        "dirty": false,
+        "startedAt": "2026-10-14T08:53:38.889Z",
+        "finishedAt": "2026-10-14T08:53:40.483Z",
+        "wallMs": 1594,
+        "measured": 1,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "svg-to-ttf"
+        ],
+        "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "e3d15e048167e6d32e1f967ab3ec85f39538ac01",
+        "dirty": false,
+        "startedAt": "2026-10-14T10:38:15.187Z",
+        "finishedAt": "2026-10-14T10:38:16.431Z",
+        "wallMs": 1244,
+        "measured": 1,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "svg-to-ttf"
+        ],
+        "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "681d6114ed2f9ee5eebfa8eefb9df784e3c462f4",
+        "dirty": false,
+        "startedAt": "2026-10-14T11:55:58.957Z",
+        "finishedAt": "2026-10-14T11:56:00.514Z",
+        "wallMs": 1557,
+        "measured": 1,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "svg-to-ttf"
+        ],
+        "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "d9be806c18d0072ff820176dc5351d22eb9c5a1a",
+        "dirty": false,
+        "startedAt": "2026-10-14T13:43:50.382Z",
+        "finishedAt": "2026-10-14T13:43:51.906Z",
+        "wallMs": 1524,
+        "measured": 1,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "svg-to-ttf"
+        ],
+        "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "aa9d22a0610aca42fffcb22a0f918e0a902b945c",
+        "dirty": false,
+        "startedAt": "2026-10-14T14:37:32.335Z",
+        "finishedAt": "2026-10-14T14:37:33.615Z",
+        "wallMs": 1280,
+        "measured": 1,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "svg-to-ttf"
+        ],
+        "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "241bff63a517a7d958658a09988275d4170c815e",
+        "dirty": false,
+        "startedAt": "2026-10-14T15:40:53.380Z",
+        "finishedAt": "2026-10-14T15:40:55.053Z",
+        "wallMs": 1673,
+        "measured": 1,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "svg-to-ttf"
+        ],
+        "browserVersion": "143.0.7499.4"
       }
     ]
   },
@@ -6162,7 +6258,7 @@
     {"id":"svg-to-tga","route":"/svg-to-tga","from":"svg","to":"tga","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1307,"formatCheck":"none","topColourShare":0.7708,"fixture":"sample.svg","output":{"files":1,"bytes":57618,"name":"sample.tga"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"svg-to-tif","route":"/svg-to-tif","from":"svg","to":"tif","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1357,"formatCheck":"signature","topColourShare":0.7708,"fixture":"sample.svg","output":{"files":1,"bytes":57878,"name":"sample.tif"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"svg-to-tiff","route":"/svg-to-tiff","from":"svg","to":"tiff","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1187,"formatCheck":"signature","topColourShare":0.7708,"fixture":"sample.svg","output":{"files":1,"bytes":57878,"name":"sample.tiff"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
-    {"id":"svg-to-ttf","route":"/svg-to-ttf","from":"svg","to":"ttf","handler":"ToolPageRenderer","engine":"browser-raster","status":"error","durationMs":660,"error":"Converting to TTF isn't supported.","fixture":"sample.svg","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
+    {"id":"svg-to-ttf","route":"/svg-to-ttf","from":"svg","to":"ttf","handler":"ToolPageRenderer","engine":"svg-font","status":"pass","durationMs":1420,"formatCheck":"decoded","fixture":"sample-icon.svg","output":{"files":1,"bytes":1712,"name":"sample-icon.ttf"},"commit":"241bff63a517a7d958658a09988275d4170c815e","dirty":false},
     {"id":"svg-to-webp","route":"/svg-to-webp","from":"svg","to":"webp","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1222,"formatCheck":"signature","topColourShare":0.7479,"fixture":"sample.svg","output":{"files":1,"bytes":1838,"name":"sample.webp"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"svg-to-xpm","route":"/svg-to-xpm","from":"svg","to":"xpm","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1722,"formatCheck":"none","topColourShare":0.7708,"fixture":"sample.svg","output":{"files":1,"bytes":16278,"name":"sample.xpm"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"swf-to-3gp","route":"/swf-to-3gp","from":"swf","to":"3gp","handler":"ToolPageRenderer","engine":"ffmpeg-wasm","status":"pass","durationMs":2173,"formatCheck":"signature","fixture":"sample.swf","output":{"files":1,"bytes":14801,"name":"sample.3gp"},"commit":"73501d1c36b87f5d4513a43d45f064533e49ffb7","dirty":false},

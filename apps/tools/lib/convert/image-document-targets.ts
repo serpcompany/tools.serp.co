@@ -1,7 +1,7 @@
-// Which conversions image-documents.ts, image-text.ts, table-outputs.ts and
-// document-images.ts write. Kept apart from them so the converter can route
-// without loading fflate, jsPDF, svg2pdf, docx-preview, three.js, Graphviz
-// or pptx-glimpse.
+// Which conversions image-documents.ts, image-text.ts, table-outputs.ts,
+// document-images.ts and svg-font.ts write. Kept apart from them so the
+// converter can route without loading fflate, jsPDF, svg2pdf, docx-preview,
+// three.js, Graphviz, pptx-glimpse, svgicons2svgfont or svg2ttf.
 
 export const EPUB_IMAGE_TYPES: Record<string, string> = {
   png: "image/png",
@@ -51,3 +51,16 @@ const DOCUMENT_IMAGE_OUTPUTS = new Set(["png", "jpg", "jpeg", "webp", "gif", "bm
 export function isDocumentImageConversion(from: string, to: string): boolean {
   return DOCUMENT_IMAGE_INPUTS.has(from.toLowerCase()) && DOCUMENT_IMAGE_OUTPUTS.has(to.toLowerCase());
 }
+
+// SVG to TTF: the SVG's filled shapes as one glyph of a font, on U+E000
+// (svg-font.ts, #251).
+export function isSvgFontConversion(from: string, to: string): boolean {
+  return from.toLowerCase() === "svg" && to.toLowerCase() === "ttf";
+}
+
+// A larger SVG isn't made into a font, and is refused before the page reads
+// it: an icon's SVG is a few kilobytes, a detailed illustration a few
+// megabytes.
+export const SVG_FONT_MAX_BYTES = 10 * 1024 * 1024;
+export const SVG_FONT_TOO_LARGE_MESSAGE =
+  "This SVG is too large to make a font from here (over 10 MB). An icon's SVG is usually a few kilobytes.";

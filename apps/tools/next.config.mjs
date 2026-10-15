@@ -9,6 +9,7 @@ const require = createRequire(import.meta.url);
 // beside it.
 const pptxGlimpseBrowser = path.join(path.dirname(require.resolve("pptx-glimpse")), "browser.js");
 const appRoot = path.dirname(fileURLToPath(import.meta.url));
+const svgFontNoFs = path.resolve(appRoot, "lib/convert/svg-font-no-fs.ts");
 const tracingRoot = path.resolve(appRoot, "../..");
 const toolsPath = path.resolve(appRoot, "lib/catalog/tools.json");
 const appDir = path.resolve(appRoot, "app");
@@ -158,12 +159,28 @@ const nextConfig = {
   },
   outputFileTracingRoot: tracingRoot,
   outputFileTracingIncludes,
-  webpack(config) {
+  webpack(config, { isServer, webpack }) {
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
     // pptx-glimpse's browser build (PPTX to an image, lib/convert/pptx.worker.ts).
     // Its exports name it under a "browser" condition this build doesn't use,
     // and its Node build imports Node-only modules.
     config.resolve.alias = { ...config.resolve.alias, "pptx-glimpse$": pptxGlimpseBrowser };
+    if (!isServer) {
+      // svgicons2svgfont and yerror, which SVG to TTF runs in the browser
+      // (lib/convert/svg-font.ts), import Node's modules by "node:" names,
+      // which this build can't read. Their imports, and only theirs, get
+      // Next's browser stand-ins for stream, path and os, and a file system
+      // that throws (lib/convert/svg-font-no-fs.ts): only svgicons2svgfont's
+      // folder helpers use it, and SVG to TTF never calls them. An import of
+      // fs from anywhere else still fails the build.
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(/^node:(fs|os|path|stream)$/, (resource) => {
+          if (/[\\/](svgicons2svgfont|yerror)[\\/]/.test(resource.contextInfo?.issuer ?? "")) {
+            resource.request = resource.request === "node:fs" ? svgFontNoFs : resource.request.slice("node:".length);
+          }
+        }),
+      );
+    }
     config.output = { ...config.output, hashFunction: "sha256" };
     return config;
   },

@@ -96623,7 +96623,64 @@
       "ttf",
       "convert",
       "image"
-    ]
+    ],
+    "content": {
+      "tool": {
+        "title": "SVG to TTF",
+        "subtitle": "Make a TrueType icon font from an SVG icon in your browser. The icon becomes character U+E000, in a font named after your file.",
+        "from": "svg",
+        "to": "ttf"
+      },
+      "howTo": {
+        "title": "How to make a TTF icon font from an SVG",
+        "intro": "Your SVG's filled shapes become one character of the font, at U+E000.",
+        "steps": [
+          "Upload your SVG icon.",
+          "We turn its filled shapes into one glyph at U+E000, the first Private Use Area code point, in a font named after your file.",
+          "Download the TTF, then install it or load it on a web page with @font-face.",
+          "Type the character U+E000 in that font: &#xE000; in HTML, or content: \"\\e000\" in CSS."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Which character is my icon on?",
+          "answer": "U+E000, the first code point of Unicode's Private Use Area, where icon fonts put their icons so they never stand in for a letter. In HTML write &#xE000;, and in CSS content: \"\\e000\". On a Mac, the Unicode Hex Input keyboard types it: hold Option and type E000. In Word on Windows, type E000 and press Alt+X."
+        },
+        {
+          "question": "What is the font called?",
+          "answer": "It's named after your file: home-icon.svg makes the font \"home-icon\". The name keeps plain letters, digits, spaces, hyphens and underscores, up to 31 characters. Accents are dropped, and a name with none of these becomes \"Icon\"."
+        },
+        {
+          "question": "Why was my outline icon refused?",
+          "answer": "A font holds filled shapes only, and an icon drawn with strokes, as many outline icon sets are, has nothing to fill. Convert its strokes to outlines first (Object > Path > Outline Stroke in Illustrator, Path > Stroke to Path in Inkscape, Outline stroke in Figma), then convert it again. A filled shape's stroke is left out, and the page says so."
+        },
+        {
+          "question": "Does the font keep my icon's colours?",
+          "answer": "No. A TrueType glyph takes the colour of the text around it. Every filled shape becomes part of the icon, so a white shape drawn over a dark one fills in rather than leaving a gap. Holes cut into a shape, with the even-odd fill rule or a path drawn the other way round, stay holes, as do the gaps an even-odd outline leaves where it crosses itself, as in a star (a shape whose outlines cross too many times, or that has too many points, to work out in the browser is filled as drawn instead, where its gaps and holes may fill in, and the page says so). Text, embedded pictures, clipping paths and masks are left out."
+        },
+        {
+          "question": "How big is the icon in the font?",
+          "answer": "The SVG's artboard (its viewBox) fills the font's full height: 1,000 units, 150 of them below the baseline, so the icon lines up with text like a capital letter. A wide artboard makes a wide character. Shapes entirely outside the artboard are left out."
+        },
+        {
+          "question": "Is my SVG uploaded anywhere?",
+          "answer": "No. The font is made in your browser, and your SVG never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "SVG icons and TTF fonts",
+        "fromFormat": {
+          "name": "SVG",
+          "fullName": "Scalable Vector Graphics",
+          "description": "SVG describes a drawing as shapes and paths in XML. Design tools such as Illustrator, Figma and Inkscape export icons as SVG files."
+        },
+        "toFormat": {
+          "name": "TTF",
+          "fullName": "TrueType Font",
+          "description": "TTF is the TrueType font format, which every desktop system and browser reads. An icon font keeps icons as characters, so they scale with the text and take its colour."
+        }
+      }
+    }
   },
   {
     "id": "svg-to-webp",

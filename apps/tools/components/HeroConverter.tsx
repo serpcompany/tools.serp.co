@@ -125,6 +125,7 @@ export default function HeroConverter({
           from,
           to,
           buf,
+          fileName: file.name,
           onProgress: (update) => {
             setCurrentFile({
               name: file.name,

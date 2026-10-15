@@ -70,7 +70,11 @@ aren't decoded; a raster SVG is checked through the image it wraps. A table
 converter's Excel, PDF, Avro or Protobuf file is opened in Node the way an app
 would (fflate, pdf.js, avsc, protobufjs with the `.proto` saved beside the
 `.pb`) and must hold the fixture's data; its pass records `formatCheck:
-"decoded"`. Its PNG and JPEG are checked as images. A fixture with several
+"decoded"`. Its PNG and JPEG are checked as images. SVG to TTF's font is
+opened with opentype.js and must have a glyph with an outline on U+E000, also
+recorded as `"decoded"`, and its page's worker must answer: the sweep watches
+the Web Workers a page starts, since a fallback that still makes a font would
+hide a worker that doesn't load. A fixture with several
 pages, named in `PAGE_COUNTS` in `scripts/lib/tool-sweep.mjs`, must give an
 image of each page, no more and no fewer. A converter page whose input format
 has `refusals` is loaded again with each, and must show the expected message

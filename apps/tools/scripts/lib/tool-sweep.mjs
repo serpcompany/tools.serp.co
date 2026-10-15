@@ -16,6 +16,7 @@ import {
   isDocumentImageConversion,
   isImageDocumentConversion,
   isImageTextConversion,
+  isSvgFontConversion,
   isTableImageConversion,
 } from "../../lib/convert/image-document-targets.ts";
 
@@ -211,6 +212,7 @@ export function converterEngine({ operation, from, to }) {
   if (isImageTextConversion(source, target)) return target === "txt" ? "tesseract" : "docx";
   if (isTableImageConversion(source, target)) return "table-outputs";
   if (isDocumentImageConversion(source, target)) return DOCUMENT_IMAGE_ENGINES[source];
+  if (isSvgFontConversion(source, target)) return "svg-font";
   // The picture in a .bin is read by its format's engine (bin-image.ts).
   if (source === "bin") return "bin-image";
   if (MAGICK_BROWSER_INPUTS.has(source)) return "imagemagick-wasm";
@@ -264,6 +266,7 @@ export const ENGINE_LOCATIONS = {
   "xlsx-table": "client-only",
   "pptx-glimpse": "client-only",
   "bin-image": "client-only",
+  "svg-font": "client-only",
   svgo: "client-only",
   "server-image-compress": "server-executed",
   "server-pdf-compress": "server-executed",
@@ -306,6 +309,16 @@ const TEXT_DRIVERS = new Set(["table", "html-to-markdown", "json-to-csv", "csv-c
 // JPEG are checked as images instead.
 export const TABLE_FILE_OUTPUTS = new Set(["excel", "pdf", "png", "jpeg", "avro", "protobuf"]);
 const DECODED_TABLE_OUTPUTS = new Set(["excel", "pdf", "avro", "protobuf"]);
+// Fonts the sweep opens with a font parser (decodeFontOutput), since a
+// signature says nothing about the glyph inside: SVG to TTF's.
+const DECODED_FONT_OUTPUTS = new Set(["ttf"]);
+// Engines whose fixture must be worked out in a Web Worker the page starts,
+// which must answer. Each has a fallback without the worker that still
+// saves a good file (SVG to TTF takes crossing outlines as drawn), so a
+// worker that fails to load, as #303 found the raster worker's could,
+// would otherwise pass unseen. The page's Worker is watched by the sweep
+// (scripts/tool-sweep.mjs, installCapture).
+const WORKER_ENGINES = new Set(["svg-font"]);
 
 // Fixtures whose picture is a single colour when read back natively (most
 // are 96x96 solid blue; a video's first frame, with FFmpeg). An image output
@@ -410,7 +423,8 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
     pixelCheck: checksPixels(tool.to) && !files.some((file) => ONE_COLOUR_FIXTURES.has(path.basename(file))),
     pages: checksPixels(tool.to) && files.length === 1 ? PAGE_COUNTS[path.basename(files[0])] : undefined,
     tableFile,
-    decode: tableFile && DECODED_TABLE_OUTPUTS.has(target),
+    decode: (tableFile && DECODED_TABLE_OUTPUTS.has(target)) || DECODED_FONT_OUTPUTS.has(target),
+    ...(WORKER_ENGINES.has(engine) ? { worker: true } : {}),
     compress: tool.operation === "compress" || tool.operation === "bulk",
     timeoutMs: slow ? ffmpegTimeoutMs : timeoutMs,
   };
@@ -544,13 +558,13 @@ function formatName(format) {
 //   outputs: [{ name, size, head: number[] (first bytes), text?, pixels?, decoded? }]
 //     pixels: measurePixels' result (null for a format it doesn't decode), or
 //     { error } when the image didn't decode
-//     decoded: decodeTableOutputs' result, { text } read from the file, or
+//     decoded: decodeOutputs' result, { text } read from the file, or
 //     { error } when it didn't open
 // A plan with pixelCheck needs every output measured, and one with decode
 // every output opened: an output the sweep never read the bytes of fails,
 // rather than passing unchecked. One with `pages` (PAGE_COUNTS) needs a file
 // for each page.
-export function classifyRun(observation, { to, markers = [], hidden = [], pixelCheck = false, decode = false, pages }) {
+export function classifyRun(observation, { to, markers = [], hidden = [], pixelCheck = false, decode = false, pages, worker = false }) {
   const message = observation.message?.trim() || null;
   if (observation.outcome === "timeout") {
     return { status: "timeout", error: message ?? "no result before the timeout" };
@@ -610,6 +624,13 @@ export function classifyRun(observation, { to, markers = [], hidden = [], pixelC
   const shown = hidden.filter((text) => outputs.some((output) => (decode ? output.decoded.text : output.text)?.includes(text)));
   if (shown.length) {
     return { status: "error", error: `the saved file holds what the input hides (${shown.join(", ")})`, formatCheck };
+  }
+  if (worker && !(observation.workers?.answered > 0)) {
+    return {
+      status: "error",
+      error: "the page's worker never answered, so the file came from the fallback for a worker that doesn't load",
+      formatCheck,
+    };
   }
   const unread = pixelCheck && outputs.find((output) => output.pixels === undefined);
   if (unread) {
@@ -734,18 +755,56 @@ export async function decodeTableOutput(format, bytes, { schema = null } = {}) {
   throw new Error(`no decoder for ${format}`);
 }
 
-// Opens each saved table file (decodeTableOutput) and records what it holds
-// as output.decoded. A Protobuf run saves two files: the .pb, decoded with
-// the .proto beside it, and the .proto, which is read by that decoding.
-// `outputs` carry each file's bytes as base64.
-export async function decodeTableOutputs(outputs, format) {
+// The code point SVG to TTF puts its glyph on (lib/convert/svg-font.ts).
+const ICON_CODE_POINT = 0xe000;
+
+// The area a TrueType contour's points enclose (its on- and off-curve
+// points as a polygon): zero when they all lie on one line.
+function contourArea(points) {
+  let area = 0;
+  for (let index = 0; index < points.length; index += 1) {
+    const a = points[index];
+    const b = points[(index + 1) % points.length];
+    area += a.x * b.y - b.x * a.y;
+  }
+  return Math.abs(area) / 2;
+}
+
+// Opens a font the way an app would (opentype.js) and finds the glyph on
+// U+E000, where SVG to TTF puts the icon: it must be a glyph of its own
+// with an outline that encloses something, a contour of three or more
+// points with an area. Returns { text } naming the family and the glyph;
+// throws when the font doesn't open or the glyph is missing or empty.
+export async function decodeFontOutput(bytes) {
+  const opentype = (await import("opentype.js")).default;
+  const data = new Uint8Array(bytes);
+  const font = opentype.parse(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
+  const glyph = font.charToGlyph(String.fromCodePoint(ICON_CODE_POINT));
+  if (!glyph || glyph.index === 0) throw new Error("no glyph on U+E000");
+  // opentype.js reads a glyph's points when its path is first asked for.
+  const commands = glyph.path.commands.length;
+  const contours = glyph.getContours().filter((contour) => contour.length >= 3);
+  if (!commands || !contours.length) throw new Error("the glyph on U+E000 has no outline");
+  const filled = contours.filter((contour) => contourArea(contour) > 0);
+  if (!filled.length) throw new Error("the glyph on U+E000 encloses nothing (its outline has no area)");
+  return { text: `${font.names.fontFamily?.en ?? "(no family)"}: U+E000 has ${filled.length} contours` };
+}
+
+// Opens each saved file the sweep decodes (decodeTableOutput,
+// decodeFontOutput) and records what it holds as output.decoded. A
+// Protobuf run saves two files: the .pb, decoded with the .proto beside it,
+// and the .proto, which is read by that decoding. `outputs` carry each
+// file's bytes as base64.
+export async function decodeOutputs(outputs, format) {
   const files = outputs.map((output) => ({ output, bytes: Buffer.from(output.base64 ?? "", "base64") }));
   const proto = files.find(({ output }) => output.name.endsWith(".proto"));
   const schema = proto ? proto.bytes.toString("utf8") : null;
   for (const { output, bytes } of files) {
     if (output === proto?.output) continue;
     try {
-      output.decoded = await decodeTableOutput(format, bytes, { schema });
+      output.decoded = DECODED_FONT_OUTPUTS.has(format)
+        ? await decodeFontOutput(bytes)
+        : await decodeTableOutput(format, bytes, { schema });
     } catch (error) {
       output.decoded = { error: String(error?.message ?? error).split("\n")[0] };
     }

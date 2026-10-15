@@ -30,7 +30,7 @@ import { SMOKE_TEST_HEADER } from "../lib/site-environment.ts";
 import {
   classifyRun,
   countStatuses,
-  decodeTableOutputs,
+  decodeOutputs,
   ffmpegError,
   loadFixtures,
   measurePixels,
@@ -215,8 +215,26 @@ const BROWSER_ATTEMPTS = 3;
 // anchor with a download attribute: keep the blob and skip the download.
 // Telemetry beacons are recorded the way smoke-browser.mjs records them.
 function installCapture() {
-  const state = { outputs: [], telemetry: [], terminalSeenAt: null };
+  const state = { outputs: [], telemetry: [], terminalSeenAt: null, workers: { started: 0, answered: 0 } };
   globalThis.__sweep = state;
+  // Web Workers the page starts, and how many of them posted a message: a
+  // Tool with a fallback for a worker that doesn't load must show its worker
+  // answered (classifyRun's `worker`).
+  const NativeWorker = globalThis.Worker;
+  if (NativeWorker) {
+    globalThis.Worker = class SweepWorker extends NativeWorker {
+      constructor(...args) {
+        super(...args);
+        state.workers.started += 1;
+        let answered = false;
+        this.addEventListener("message", () => {
+          if (answered) return;
+          answered = true;
+          state.workers.answered += 1;
+        });
+      }
+    };
+  }
   const blobs = new Map();
   const createObjectURL = URL.createObjectURL.bind(URL);
   URL.createObjectURL = (object) => {
@@ -379,7 +397,8 @@ async function runFileTool(page, plan, file = plan.fixtures[0]) {
   }
   return {
     outcome: "completed",
-    outputs: await readOutputs(page, { text: plan.markers.length > 0, base64: plan.pixelCheck }),
+    outputs: await readOutputs(page, { text: plan.markers.length > 0, base64: plan.pixelCheck || plan.decode }),
+    workers: await page.evaluate(() => ({ ...globalThis.__sweep.workers })),
   };
 }
 
@@ -688,7 +707,7 @@ async function measure(plan) {
 
   const durationMs = Date.now() - started;
   if (plan.decode && observation.outcome === "completed") {
-    await decodeTableOutputs(observation.outputs ?? [], plan.to);
+    await decodeOutputs(observation.outputs ?? [], plan.to);
   }
   if (plan.pixelCheck && observation.outcome === "completed") {
     await measureOutputPixels(observation.outputs ?? [], plan.to);

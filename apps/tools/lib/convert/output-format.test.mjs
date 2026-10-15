@@ -17,7 +17,7 @@ test("real sample files pass the check for their own format", () => {
     "png", "apng", "jpg", "jfif", "gif", "webp", "bmp", "tif", "tiff", "ico", "cur", "psd",
     "dds", "avif", "heic", "svg", "pdf", "mp3", "wav", "ogg", "oga", "ogv", "opus", "flac",
     "aiff", "aif", "aifc", "webm", "mkv", "mp4", "m4a", "m4v", "m4r", "mov", "3gp", "3g2",
-    "avi", "flv", "av1", "hevc",
+    "avi", "flv", "av1", "hevc", "ttf",
   ];
   const checked = formats.filter((format) => existsSync(path.join(fixtures, `sample.${format}`)));
   assert.ok(checked.length > 30, `only ${checked.length} fixtures found`);
@@ -34,6 +34,14 @@ test("a PNG saved as GIF, TIFF or ICO is caught and named", () => {
       detected: "png",
     });
   }
+});
+
+test("a TTF must be TrueType: version 1.0 or Apple's 'true', not a CFF OpenType font or an SVG", () => {
+  const bytes = (...values) => Uint8Array.from(values).buffer;
+  assert.deepEqual(checkOutputFormat(bytes(0x00, 0x01, 0x00, 0x00, 0x00, 0x0a), "ttf"), { ok: true });
+  assert.deepEqual(checkOutputFormat(new TextEncoder().encode("true\0\x0a").buffer, "ttf"), { ok: true });
+  assert.equal(checkOutputFormat(read("sample.otf"), "ttf").ok, false);
+  assert.equal(checkOutputFormat(read("sample.svg"), "ttf").ok, false);
 });
 
 test("audio in the wrong container is caught", () => {

@@ -45,6 +45,7 @@ export const CANARY_TOOLS = {
   "xlsx-to-png": "an XLSX sheet read with fflate, its numbers in their formats, drawn as the table converters draw a table",
   "pptx-to-png": "a PowerPoint slide drawn as SVG by pptx-glimpse in a worker, then through an <img>",
   "bin-to-png": "a TIFF saved as .bin, found by its first bytes and read by ImageMagick WASM; a .bin that isn't a picture refused",
+  "svg-to-ttf": "an SVG icon's filled shapes as one TrueType glyph on U+E000 (svgicons2svgfont, svg2ttf), opened with opentype.js",
   "json-to-csv": "JSON to CSV page",
   "csv-combiner": "CSV combiner page: two files in, one out",
   "html-to-markdown": "HTML to Markdown page",
