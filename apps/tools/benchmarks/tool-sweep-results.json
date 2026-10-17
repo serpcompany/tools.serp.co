@@ -3,7 +3,7 @@
     "issue": "https://github.com/serpcompany/tools.serp.co/issues/147",
     "command": "pnpm -C apps/tools tool-sweep",
     "baseUrl": "http://localhost:8812",
-    "commit": "8dac26423f8fe3c318ec67d9afd81e789b34144e",
+    "commit": "c7ae017ebe8425581bf6395156b8bed971f084ee",
     "activeTools": 2532,
     "counts": {
       "pass": 2106,
@@ -4109,6 +4109,24 @@
           "pdf-to-jpg"
         ],
         "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "c7ae017ebe8425581bf6395156b8bed971f084ee",
+        "dirty": false,
+        "startedAt": "2026-10-17T13:16:04.572Z",
+        "finishedAt": "2026-10-17T13:16:43.184Z",
+        "wallMs": 38612,
+        "measured": 3,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "pdf-to-txt",
+          "pdf-to-html",
+          "pdf-to-epub"
+        ],
+        "browserVersion": "143.0.7499.4"
       }
     ]
   },
@@ -6135,11 +6153,11 @@
     {"id":"pdf-reader-extension","route":"/pdf-reader-extension","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"pdf-reader-mac","route":"/pdf-reader-mac","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"pdf-reader-windows","route":"/pdf-reader-windows","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
-    {"id":"pdf-to-epub","route":"/pdf-to-epub","from":"pdf","to":"epub","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":4187,"formatCheck":"decoded","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":2107,"name":"sample-text.epub"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
-    {"id":"pdf-to-html","route":"/pdf-to-html","from":"pdf","to":"html","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":3856,"formatCheck":"decoded","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":842,"name":"sample-text.html"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
+    {"id":"pdf-to-epub","route":"/pdf-to-epub","from":"pdf","to":"epub","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":8193,"formatCheck":"decoded","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract (it may be a scan, or its pages may be blank). Reading the words in a scan needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":2108,"name":"sample-text.epub"},"commit":"c7ae017ebe8425581bf6395156b8bed971f084ee","dirty":false},
+    {"id":"pdf-to-html","route":"/pdf-to-html","from":"pdf","to":"html","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":6989,"formatCheck":"decoded","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract (it may be a scan, or its pages may be blank). Reading the words in a scan needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":842,"name":"sample-text.html"},"commit":"c7ae017ebe8425581bf6395156b8bed971f084ee","dirty":false},
     {"id":"pdf-to-jpg","route":"/pdf-to-jpg","from":"pdf","to":"jpg","handler":"ToolPageRenderer","engine":"pdfjs","status":"pass","durationMs":2178,"formatCheck":"signature","fixture":"sample.pdf","output":{"files":1,"bytes":978,"name":"sample_page1.jpg"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
     {"id":"pdf-to-png","route":"/pdf-to-png","from":"pdf","to":"png","handler":"ToolPageRenderer","engine":"pdfjs","status":"pass","durationMs":2270,"formatCheck":"signature","fixture":"sample.pdf","output":{"files":1,"bytes":1559,"name":"sample_page1.png"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
-    {"id":"pdf-to-txt","route":"/pdf-to-txt","from":"pdf","to":"txt","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":2395,"formatCheck":"content","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":231,"name":"sample-text.txt"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
+    {"id":"pdf-to-txt","route":"/pdf-to-txt","from":"pdf","to":"txt","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":8178,"formatCheck":"content","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract (it may be a scan, or its pages may be blank). Reading the words in a scan needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":231,"name":"sample-text.txt"},"commit":"c7ae017ebe8425581bf6395156b8bed971f084ee","dirty":false},
     {"id":"pdf-viewer","route":"/pdf-viewer","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"pdf-viewer-extension","route":"/pdf-viewer-extension","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"pdf-viewer-windows","route":"/pdf-viewer-windows","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
