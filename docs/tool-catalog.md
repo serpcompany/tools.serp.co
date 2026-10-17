@@ -94,12 +94,13 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   matching uses a Tool's input and output formats and de-duplicates by app id.
 - Tool pages and Landers (`ToolPageTemplate`, `DownloaderPageTemplate`) carry
   one `<script type="application/ld+json">` from `lib/structured-data.ts`: a
-  free `WebApplication` (the page's H1 and subtitle, its canonical URL) and a
-  `BreadcrumbList` from the homepage through the Tool's category page. It has
-  no `Review`, `AggregateRating`, `FAQPage` or `HowTo` markup: Lander reviews
-  have no verifiable source, FAQ rich results are limited to government and
-  health sites, and HowTo rich results are retired. Other page families emit
-  none.
+  free `WebApplication` (the page's H1 and subtitle, its canonical URL). It
+  has no `Review`, `AggregateRating`, `FAQPage` or `HowTo` markup: Lander
+  reviews have no verifiable source, FAQ rich results are limited to
+  government and health sites, and HowTo rich results are retired. It has no
+  `BreadcrumbList` either, because no page shows a breadcrumb trail. Tool
+  pages outside the two templates (table converters, transcription, PDF and
+  others) have none yet; #337 tracks them.
 - The shared site footer is mounted by
   `packages/app-core/src/components/app-layout.tsx`. Do not add a second page
   footer without an intentional product-specific reason.

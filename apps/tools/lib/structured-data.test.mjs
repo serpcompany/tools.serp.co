@@ -1,15 +1,29 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { registerHooks } from "node:module";
 
 import { activeTools, allTools } from "./catalog/catalog.ts";
-import { normalizePath } from "./sitemap.ts";
 import {
-  SITE_NAME,
   serializeJsonLd,
-  siteOrigin,
+  structuredDataOrigin,
   toolStructuredData,
 } from "./structured-data.ts";
+
+// lib/metadata.ts imports by the "@/" alias (tsconfig paths), which Node
+// doesn't read: resolve it to apps/tools/ with the extension Next.js adds.
+const appRoot = new URL("../", import.meta.url);
+registerHooks({
+  resolve(specifier, context, next) {
+    if (!specifier.startsWith("@/")) return next(specifier, context);
+    const base = new URL(specifier.slice(2), appRoot).href;
+    const url = [base, `${base}.ts`, `${base}.tsx`, `${base}/index.ts`].find(
+      (candidate) => /\.tsx?$/.test(candidate) && existsSync(new URL(candidate)),
+    );
+    return url ? { url, shortCircuit: true } : next(specifier, context);
+  },
+});
+const { buildToolMetadata } = await import("./metadata.ts");
 
 const ORIGIN = "https://tools.serp.co";
 
@@ -29,10 +43,16 @@ const byId = (id) => {
   return tool;
 };
 
-// The page's <link rel="canonical">: metadata.ts writes normalizePath(route)
-// and Next.js resolves it against app/layout.tsx's metadataBase.
-const canonicalOf = (tool, origin = ORIGIN) =>
-  new URL(normalizePath(tool.route), new URL(origin)).href;
+// The page's <link rel="canonical">: what buildToolMetadata (each Tool route's
+// generateMetadata) puts in alternates.canonical, resolved on
+// app/layout.tsx's metadataBase as Next.js does. Calling the real code, not a
+// copy, fails this test if metadata.ts changes how a canonical is built and
+// structured-data.ts doesn't follow.
+const canonicalOf = (tool, origin = ORIGIN) => {
+  const canonical = buildToolMetadata(tool.id).alternates?.canonical;
+  assert.equal(typeof canonical, "string", `${tool.id} has a canonical`);
+  return new URL(canonical, new URL(origin)).href;
+};
 
 // What a crawler reads back from the <script> tag.
 const parsed = (tool, origin = ORIGIN) => {
@@ -40,8 +60,6 @@ const parsed = (tool, origin = ORIGIN) => {
   assert.ok(data, `${tool.id} has structured data`);
   return JSON.parse(serializeJsonLd(data));
 };
-
-const nodeOf = (data, type) => data["@graph"].find((node) => node["@type"] === type);
 
 const typesIn = (value, types = new Set()) => {
   if (Array.isArray(value)) {
@@ -62,98 +80,73 @@ const templatedTools = () =>
       ((tool.operation === "convert" || tool.operation === "compress") && tool.from && tool.to),
   );
 
-test("a converter page is a free WebApplication under Home > Convert Tools", () => {
-  const data = parsed(byId("mp4-to-mp3"));
+test("a converter page is a free WebApplication at its canonical URL", () => {
+  const tool = byId("mp4-to-mp3");
 
-  assert.equal(data["@context"], "https://schema.org");
-  assert.deepEqual(data["@graph"].map((node) => node["@type"]), ["WebApplication", "BreadcrumbList"]);
-  assert.deepEqual(nodeOf(data, "WebApplication"), {
+  assert.deepEqual(parsed(tool), {
+    "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: pageText(byId("mp4-to-mp3")).name,
+    name: pageText(tool).name,
     url: "https://tools.serp.co/mp4-to-mp3/",
-    description: pageText(byId("mp4-to-mp3")).description,
+    description: pageText(tool).description,
     applicationCategory: "MultimediaApplication",
     operatingSystem: "Any",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   });
-  assert.deepEqual(nodeOf(data, "BreadcrumbList").itemListElement, [
-    { "@type": "ListItem", position: 1, name: SITE_NAME, item: "https://tools.serp.co" },
-    { "@type": "ListItem", position: 2, name: "Convert Tools", item: "https://tools.serp.co/category/convert/" },
-    {
-      "@type": "ListItem",
-      position: 3,
-      name: pageText(byId("mp4-to-mp3")).name,
-      item: "https://tools.serp.co/mp4-to-mp3/",
-    },
-  ]);
 });
 
-test("a Lander sits under Downloaders and a compressor under Compress Tools, at its route", () => {
+test("a Lander and a compressor are at their routes", () => {
   const lander = parsed(byId("download-thisvid-videos"));
-  assert.equal(nodeOf(lander, "WebApplication").url, "https://tools.serp.co/download-thisvid-videos/");
-  assert.equal(nodeOf(lander, "WebApplication").name, "ThisVid Video Downloader");
-  assert.equal(nodeOf(lander, "WebApplication").applicationCategory, "MultimediaApplication");
-  assert.deepEqual(
-    nodeOf(lander, "BreadcrumbList").itemListElement[1],
-    { "@type": "ListItem", position: 2, name: "Downloaders", item: "https://tools.serp.co/category/download/" },
-  );
+  assert.equal(lander.url, "https://tools.serp.co/download-thisvid-videos/");
+  assert.equal(lander.name, "ThisVid Video Downloader");
+  assert.equal(lander.applicationCategory, "MultimediaApplication");
 
   // Registry id png-to-png is served at /compress-png/.
   const compressor = parsed(byId("png-to-png"));
-  assert.equal(nodeOf(compressor, "WebApplication").url, "https://tools.serp.co/compress-png/");
-  assert.equal(nodeOf(compressor, "WebApplication").applicationCategory, "UtilitiesApplication");
-  assert.equal(nodeOf(compressor, "BreadcrumbList").itemListElement[1].item, "https://tools.serp.co/category/compress/");
+  assert.equal(compressor.url, "https://tools.serp.co/compress-png/");
+  assert.equal(compressor.applicationCategory, "UtilitiesApplication");
 
-  assert.equal(nodeOf(parsed(byId("jpg-to-png")), "WebApplication").applicationCategory, "UtilitiesApplication");
+  assert.equal(parsed(byId("jpg-to-png")).applicationCategory, "UtilitiesApplication");
 });
 
-test("every templated Tool page: valid JSON, absolute canonical URLs, breadcrumbs from position 1", () => {
+test("every templated Tool page: valid JSON, url is the canonical metadata.ts writes, nothing it can't back", () => {
   const tools = templatedTools();
   assert.ok(tools.length > 2000, `${tools.length} templated Tools`);
 
   for (const tool of tools) {
     const data = parsed(tool);
-    const app = nodeOf(data, "WebApplication");
-    const crumbs = nodeOf(data, "BreadcrumbList").itemListElement;
 
-    assert.equal(app.url, canonicalOf(tool), tool.id);
-    assert.ok(app.name && app.description, tool.id);
-    assert.deepEqual(app.offers, { "@type": "Offer", price: "0", priceCurrency: "USD" }, tool.id);
-    assert.equal(app.operatingSystem, "Any", tool.id);
+    assert.equal(data["@type"], "WebApplication", tool.id);
+    assert.equal(data.url, canonicalOf(tool), tool.id);
+    assert.equal(new URL(data.url).origin, ORIGIN, tool.id);
+    assert.ok(data.name && data.description, tool.id);
+    assert.deepEqual(data.offers, { "@type": "Offer", price: "0", priceCurrency: "USD" }, tool.id);
+    assert.equal(data.operatingSystem, "Any", tool.id);
 
-    assert.deepEqual(crumbs.map((crumb) => crumb.position), [1, 2, 3], tool.id);
-    assert.equal(crumbs[0].item, ORIGIN, tool.id);
-    assert.equal(crumbs[1].item, `${ORIGIN}/category/${tool.operation}/`, tool.id);
-    assert.equal(crumbs[2].item, app.url, tool.id);
-    assert.equal(crumbs[2].name, app.name, tool.id);
-    for (const crumb of crumbs) {
-      assert.equal(new URL(crumb.item).origin, ORIGIN, `${tool.id}: ${crumb.item}`);
-      assert.ok(crumb.name, tool.id);
-    }
-
-    // Nothing the page can't back: no ratings, reviews, FAQ or HowTo markup.
-    assert.deepEqual(
-      [...typesIn(data)].sort(),
-      ["BreadcrumbList", "ListItem", "Offer", "WebApplication"],
-      tool.id,
-    );
+    // No ratings, reviews, FAQ, HowTo or breadcrumb markup.
+    assert.deepEqual([...typesIn(data)].sort(), ["Offer", "WebApplication"], tool.id);
   }
 });
 
-test("URLs use the build's site origin, as the canonical does", () => {
-  assert.equal(siteOrigin(undefined), "https://tools.serp.co");
-  assert.equal(siteOrigin("https://tools.serp.co"), "https://tools.serp.co");
-  assert.equal(siteOrigin("https://staging.tools.serp.co/"), "https://staging.tools.serp.co");
-  assert.equal(siteOrigin("tools.serp.co"), "https://tools.serp.co");
-  assert.equal(siteOrigin("http://localhost:8787"), "http://localhost:8787");
+test("URLs use the deployment's canonical origin, as the canonical does", () => {
+  const production = { siteEnv: "production", siteUrl: "https://tools.serp.co" };
+  const staging = { siteEnv: "staging", siteUrl: "https://staging.tools.serp.co" };
+  assert.equal(structuredDataOrigin(production), "https://tools.serp.co");
+  assert.equal(structuredDataOrigin(staging), "https://staging.tools.serp.co");
+  assert.equal(structuredDataOrigin({ siteEnv: "staging", siteUrl: "https://staging.tools.serp.co/" }), "https://staging.tools.serp.co");
+  assert.equal(structuredDataOrigin({ siteEnv: "production", siteUrl: "tools.serp.co" }), "https://tools.serp.co");
+  // A deployed build without its URL fails instead of writing another origin.
+  assert.throws(() => structuredDataOrigin({ siteEnv: "production", siteUrl: undefined }), /NEXT_PUBLIC_SITE_URL is unset/);
+  // Local runs: a cf:build inlines the production URL, next dev none; either
+  // way metadataBase is https://tools.serp.co.
+  for (const env of [{ siteEnv: undefined, siteUrl: "https://tools.serp.co" }, { siteEnv: undefined, siteUrl: undefined }]) {
+    assert.equal(structuredDataOrigin(env), "https://tools.serp.co");
+  }
 
-  const staging = "https://staging.tools.serp.co";
-  const data = parsed(byId("mp4-to-mp3"), staging);
-  assert.equal(nodeOf(data, "WebApplication").url, canonicalOf(byId("mp4-to-mp3"), staging));
-  assert.deepEqual(
-    nodeOf(data, "BreadcrumbList").itemListElement.map((crumb) => crumb.item),
-    [staging, `${staging}/category/convert/`, `${staging}/mp4-to-mp3/`],
-  );
+  const tool = byId("mp4-to-mp3");
+  const origin = structuredDataOrigin(staging);
+  assert.equal(parsed(tool, origin).url, "https://staging.tools.serp.co/mp4-to-mp3/");
+  assert.equal(parsed(tool, origin).url, canonicalOf(tool, staging.siteUrl));
 });
 
 test("an id that isn't an active Tool gets no structured data", () => {

@@ -1,28 +1,30 @@
 import { getTool } from "./catalog/catalog.ts";
-import { categoryHref } from "./catalog/href.ts";
-import { CATEGORY_CONTENT, isToolOperation } from "./catalog/operations.ts";
-import { toSitemapUrl } from "./sitemap.ts";
+import { getSiteOrigin } from "./site-environment.ts";
+import { normalizePath } from "./sitemap.ts";
 
 // The JSON-LD a Tool page or Lander describes itself with (issue #324): a
-// WebApplication for the Tool on the page and a BreadcrumbList from the
-// homepage through the Tool's category to the page. StructuredData.tsx
-// renders it; it reads the registry, so only Server Components import it.
+// WebApplication for the Tool on the page. StructuredData.tsx renders it; it
+// reads the registry, so only Server Components import it.
 //
 // It claims only what the page backs: the Tool is free and runs in a browser.
 // No Review, AggregateRating, FAQPage or HowTo: Lander reviews have no
 // verifiable source, FAQ rich results are limited to government and health
-// sites, and HowTo rich results are retired.
+// sites, and HowTo rich results are retired. No BreadcrumbList either: no
+// page shows a breadcrumb trail, and markup must describe what readers see.
 
-// The homepage's title and H1.
-export const SITE_NAME = "SERP Tools";
-
-// The origin every canonical URL is written on. It matches the metadataBase
-// that app/layout.tsx resolves canonicals against, so a URL here equals the
-// page's <link rel="canonical">. Pass process.env.NEXT_PUBLIC_SITE_URL, which
-// the build inlines.
-export function siteOrigin(siteUrl: string | undefined): string {
-  const url = siteUrl ?? "https://tools.serp.co";
-  return new URL(url.startsWith("http") ? url : `https://${url}`).origin;
+// The origin the JSON-LD's URL is written on: a deployed build's canonical
+// origin, from getSiteOrigin as the sitemap's is. A static page has no
+// request, so a local run uses the URL app/layout.tsx's metadataBase falls
+// back to. Pass process.env.NEXT_PUBLIC_SITE_ENV and NEXT_PUBLIC_SITE_URL,
+// which the build inlines.
+export function structuredDataOrigin({
+  siteEnv,
+  siteUrl,
+}: {
+  siteEnv: string | undefined;
+  siteUrl: string | undefined;
+}): string {
+  return getSiteOrigin({ requestUrl: siteUrl ?? "https://tools.serp.co", siteEnv, siteUrl });
 }
 
 // What the page shows: its H1 and the line under it.
@@ -34,27 +36,15 @@ export type ToolPageText = {
 
 type ApplicationCategory = "MultimediaApplication" | "UtilitiesApplication";
 
-type ListItem = {
-  "@type": "ListItem";
-  position: number;
-  name: string;
-  item: string;
-};
-
 export type ToolStructuredData = {
   "@context": "https://schema.org";
-  "@graph": [
-    {
-      "@type": "WebApplication";
-      name: string;
-      url: string;
-      description?: string;
-      applicationCategory: ApplicationCategory;
-      operatingSystem: "Any";
-      offers: { "@type": "Offer"; price: "0"; priceCurrency: "USD" };
-    },
-    { "@type": "BreadcrumbList"; itemListElement: ListItem[] },
-  ];
+  "@type": "WebApplication";
+  name: string;
+  url: string;
+  description?: string;
+  applicationCategory: ApplicationCategory;
+  operatingSystem: "Any";
+  offers: { "@type": "Offer"; price: "0"; priceCurrency: "USD" };
 };
 
 // Audio and video Tools (the registry marks each with requiresFFmpeg) and the
@@ -70,47 +60,26 @@ function applicationCategory(tool: {
 }
 
 // The structured data for the active Tool `toolId`, or null when there is no
-// such Tool. Every URL is absolute and canonical: the homepage is the bare
-// origin and every other page ends in a slash.
+// such Tool or it has no route. `url` is the page's canonical URL: the path
+// lib/metadata.ts writes (normalizePath of the route), resolved on the origin
+// as Next.js resolves it on metadataBase. structured-data.test.mjs checks it
+// against buildToolMetadata itself.
 export function toolStructuredData(
   { toolId, name, description }: ToolPageText,
   origin: string,
 ): ToolStructuredData | null {
   const tool = toolId ? getTool(toolId) : undefined;
-  if (!tool) return null;
-
-  const url = toSitemapUrl(origin, tool.route);
-  const crumbs = [{ name: SITE_NAME, url: toSitemapUrl(origin, "/") }];
-  if (isToolOperation(tool.operation)) {
-    crumbs.push({
-      name: CATEGORY_CONTENT[tool.operation].title,
-      url: toSitemapUrl(origin, categoryHref(tool.operation)),
-    });
-  }
-  crumbs.push({ name, url });
+  if (!tool?.route) return null;
 
   return {
     "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebApplication",
-        name,
-        url,
-        ...(description ? { description } : {}),
-        applicationCategory: applicationCategory(tool),
-        operatingSystem: "Any",
-        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: crumbs.map((crumb, index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          name: crumb.name,
-          item: crumb.url,
-        })),
-      },
-    ],
+    "@type": "WebApplication",
+    name,
+    url: new URL(normalizePath(tool.route), origin).href,
+    ...(description ? { description } : {}),
+    applicationCategory: applicationCategory(tool),
+    operatingSystem: "Any",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
 }
 
