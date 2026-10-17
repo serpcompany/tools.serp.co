@@ -14,6 +14,7 @@ import {
   classifyRun,
   converterEngine,
   countStatuses,
+  decodeDocumentOutput,
   decodeFontOutput,
   decodeOutputs,
   decodeTableOutput,
@@ -39,6 +40,7 @@ import {
   treeIsDirty,
   withRefusals,
 } from "../scripts/lib/tool-sweep.mjs";
+import { imageToEpub, writeEpub } from "./convert/image-documents.ts";
 import { writeTableOutput } from "./convert/table-outputs.ts";
 
 // The ImageMagick WASM build the app ships, which the sweep decodes image
@@ -451,6 +453,7 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "png", "jpg"), "browser-raster");
   assert.equal(engine("convert", "ai", "png"), "pdfjs");
   assert.equal(engine("convert", "pdf", "jpg"), "pdfjs");
+  for (const to of ["txt", "html", "epub"]) assert.equal(engine("convert", "pdf", to), "pdfjs-text", to);
   assert.equal(engine("convert", "dng", "jpg"), "imagemagick-wasm");
   for (const from of ["pam", "pbm", "pgm", "ppm", "pcx", "jxl", "jp2", "xpm", "wpg", "pcd", "mac", "sfw", "exr", "hdr"]) {
     assert.equal(engine("convert", from, "png"), "imagemagick-wasm", from);
@@ -655,9 +658,45 @@ test("a format's refusal fixtures run on its converter pages, each with the mess
 });
 
 test("every refusal fixture in fixture-matrix.json exists and has its expected message", () => {
-  const listed = [...loadFixtures(benchmarksDir).refusals.values()].flat();
+  const { refusals, toolRefusals } = loadFixtures(benchmarksDir);
+  const listed = [...new Set([...refusals.values(), ...toolRefusals.values()].flat())];
   assert.deepEqual(listed.map((file) => path.basename(file)).sort(), Object.keys(EXPECTED_REFUSALS).sort());
   for (const file of listed) assert.ok(readFileSync(file).length > 0, file);
+});
+
+test("PDF to TXT, HTML and EPUB look for both pages' text, open the HTML and EPUB, and refuse what they must", () => {
+  const fixtures = loadFixtures(benchmarksDir);
+  const options = { handlers: new Map(), fixtures, timeoutMs: 60, ffmpegTimeoutMs: 180 };
+  const plans = Object.fromEntries(
+    ["txt", "html", "epub"].map((to) => [
+      to,
+      planTool({ id: `pdf-to-${to}`, route: `/pdf-to-${to}`, operation: "convert", from: "pdf", to, isActive: true }, options),
+    ]),
+  );
+  for (const [to, plan] of Object.entries(plans)) {
+    assert.equal(plan.engine, "pdfjs-text", to);
+    assert.deepEqual(plan.fixtures.map((file) => path.basename(file)), ["sample-text.pdf"], to);
+    assert.deepEqual(plan.markers, ["Alpha", "Bravo", "Salt & pepper <b>not bold</b>"], to);
+    assert.deepEqual(
+      plan.refusals.map(({ fixture, errorCode }) => [path.basename(fixture), errorCode]),
+      [
+        ["sample-scan.pdf", "no_text"],
+        ["sample-protected.pdf", "password_protected"],
+        ["sample-truncated.pdf", "unreadable_pdf"],
+      ],
+      to,
+    );
+  }
+  // The TXT is searched as it is; the HTML and EPUB are opened first.
+  assert.deepEqual([plans.txt.decode, plans.html.decode, plans.epub.decode], [false, true, true]);
+  // Rendering a PDF to a picture refuses none of them: a scan converts.
+  const png = planTool({ id: "pdf-to-png", route: "/pdf-to-png", operation: "convert", from: "pdf", to: "png", isActive: true }, options);
+  assert.deepEqual([png.engine, png.refusals, png.markers], ["pdfjs", [], []]);
+  // An image's EPUB is opened too, with no text to look for; an SVG's HTML isn't.
+  const epub = planTool({ id: "png-to-epub", route: "/png-to-epub", operation: "convert", from: "png", to: "epub", isActive: true }, options);
+  assert.deepEqual([epub.decode, epub.markers], [true, []]);
+  const html = planTool({ id: "svg-to-html", route: "/svg-to-html", operation: "convert", from: "svg", to: "html", isActive: true }, options);
+  assert.deepEqual([html.decode, html.markers], [false, []]);
 });
 
 test("a refusal passes only with the expected message, and code when the event was seen", () => {
@@ -960,4 +999,87 @@ test("SVG to TTF's font is opened with a font parser, and must have an outlined 
   }
   // Other Tools don't need a worker to answer.
   assert.equal(classifyRun({ outcome: "completed", outputs: [output] }, { ...plan, worker: undefined }).status, "pass");
+});
+
+// An EPUB with the given files after its mimetype, stored first as
+// writeEpub stores it.
+async function epubWith(files, { compressMimetype = false } = {}) {
+  const { strToU8, zipSync } = await import("fflate");
+  const entries = { mimetype: [strToU8("application/epub+zip"), { level: compressMimetype ? 9 : 0 }] };
+  for (const [name, text] of Object.entries(files)) entries[name] = strToU8(text);
+  return zipSync(entries);
+}
+
+test("an EPUB is opened as a reader would, its spine's XHTML read in order", async () => {
+  const book = writeEpub({
+    title: "Book & <title>",
+    language: "en",
+    style: "",
+    documents: [
+      { id: "one", href: "one.xhtml", title: "One", body: "<p>First &amp; &lt;b&gt;</p>" },
+      { id: "two", href: "two.xhtml", title: "Two", body: "<p>Second</p>" },
+    ],
+  });
+  assert.deepEqual(await decodeDocumentOutput("epub", book), { text: "First & <b>\nSecond" });
+  // An image's EPUB opens with its picture and no text.
+  const png = readFileSync(path.join(fixturesDir, "sample.png"));
+  assert.deepEqual(await decodeDocumentOutput("epub", imageToEpub(png.buffer.slice(png.byteOffset, png.byteOffset + png.byteLength), "png", "a.png")), { text: "" });
+});
+
+test("an EPUB that wouldn't open in a reader is caught", async () => {
+  const container =
+    '<?xml version="1.0"?><container xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf"/></rootfiles></container>';
+  const opf = (items, spine) =>
+    `<?xml version="1.0"?><package xmlns="http://www.idpf.org/2007/opf"><manifest><item id="nav" href="nav.xhtml" properties="nav"/>${items}</manifest><spine>${spine}</spine></package>`;
+  const page = (body) => `<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml"><body>${body}</body></html>`;
+  const good = {
+    "META-INF/container.xml": container,
+    "OEBPS/content.opf": opf('<item id="p" href="p.xhtml"/>', '<itemref idref="p"/>'),
+    "OEBPS/nav.xhtml": page("<nav/>"),
+    "OEBPS/p.xhtml": page("<p>Text</p>"),
+  };
+  assert.deepEqual(await decodeDocumentOutput("epub", await epubWith(good)), { text: "Text" });
+  const broken = {
+    "an unescaped ampersand": { "OEBPS/p.xhtml": page("<p>Salt & pepper</p>") },
+    "markup left open": { "OEBPS/p.xhtml": page("<p>Salt <b>pepper</p>") },
+    "a NUL": { "OEBPS/p.xhtml": page("<p>a\u0000b</p>") },
+    "U+FFFE": { "OEBPS/p.xhtml": page("<p>a\uFFFEb</p>") },
+    "a missing page": { "OEBPS/p.xhtml": undefined },
+    "no navigation document": { "OEBPS/content.opf": opf('<item id="p" href="p.xhtml"/>', '<itemref idref="p"/>').replace(' properties="nav"', "") },
+    "a spine item not in the manifest": { "OEBPS/content.opf": opf("", '<itemref idref="p"/>') },
+    "no container": { "META-INF/container.xml": undefined },
+  };
+  for (const [label, change] of Object.entries(broken)) {
+    const files = Object.fromEntries(Object.entries({ ...good, ...change }).filter(([, text]) => text !== undefined));
+    await assert.rejects(decodeDocumentOutput("epub", await epubWith(files)), Error, label);
+  }
+  await assert.rejects(decodeDocumentOutput("epub", await epubWith(good, { compressMimetype: true })), /compressed/);
+});
+
+test("an HTML page's text is its body's, as a browser shows it", async () => {
+  const html = new TextEncoder().encode(
+    '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Alpha</title><style>p{}</style></head>' +
+      "<body><section><p>Salt &amp; pepper &lt;b&gt;not bold&lt;/b&gt;</p><script>Bravo</script><p>Done</p></section></body></html>",
+  );
+  assert.deepEqual(await decodeDocumentOutput("html", html), { text: "Salt & pepper <b>not bold</b>Done" });
+  // Markup left unescaped isn't the text it was.
+  const raw = new TextEncoder().encode("<html><body><p>Salt & pepper <b>not bold</b></p></body></html>");
+  assert.doesNotMatch((await decodeDocumentOutput("html", raw)).text, /<b>/);
+});
+
+test("a PDF to HTML or EPUB run passes only when the opened file holds the fixture's text", async () => {
+  const markers = ["Alpha", "Bravo"];
+  const run = async (format, bytes) => {
+    const outputs = [{ name: `sample-text.${format}`, size: bytes.length, head: Array.from(bytes.subarray(0, 64)), base64: Buffer.from(bytes).toString("base64") }];
+    await decodeOutputs(outputs, format);
+    return classifyRun({ outcome: "completed", outputs }, { to: format, markers, decode: true });
+  };
+  const book = (body) => writeEpub({ title: "t", language: "en", style: "", documents: [{ id: "p", href: "p.xhtml", title: "p", body }] });
+  assert.deepEqual(await run("epub", new Uint8Array(book("<p>Alpha</p><p>Bravo</p>"))), { status: "pass", error: null, formatCheck: "decoded" });
+  assert.match((await run("epub", new Uint8Array(book("<p>Alpha</p>")))).error, /missing Bravo/);
+  assert.match((await run("epub", new Uint8Array(book("<p>Alpha & Bravo</p>")))).error, /doesn't open/);
+  const page = (body) => new TextEncoder().encode(`<!DOCTYPE html><html><body>${body}</body></html>`);
+  assert.equal((await run("html", page("<p>Alpha</p><p>Bravo</p>"))).status, "pass");
+  // A marker in the head or an attribute isn't the page's text.
+  assert.match((await run("html", page('<p title="Bravo">Alpha</p>'))).error, /missing Bravo/);
 });
