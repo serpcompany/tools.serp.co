@@ -10,9 +10,12 @@ const installed = import.meta.resolve("pdfjs-dist/legacy/build/pdf.mjs");
 const vendor = new URL("../../public/vendor/pdfjs/", import.meta.url).href;
 // Its Node polyfills (DOMMatrix and others), from where pdfjs-dist has them.
 const canvas = pathToFileURL(createRequire(installed).resolve("@napi-rs/canvas")).href;
+// Each module whose pdf.js import was redirected to the vendored copy.
+const redirected = new Set();
 registerHooks({
   resolve(specifier, context, next) {
     if (specifier === "pdfjs-dist/legacy/build/pdf.mjs") {
+      redirected.add(context.parentURL);
       return { url: `${vendor}pdf.min.mjs`, format: "module", shortCircuit: true };
     }
     if (specifier === "@napi-rs/canvas" && context.parentURL?.startsWith(vendor)) {
@@ -26,9 +29,14 @@ registerHooks({
 globalThis.pdfjsWorker = await import(`${vendor}pdf.worker.min.js`);
 const { version } = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
+const tests = new URL("./pdf-text.test.mjs", import.meta.url).href;
+
 describe(`on the browser's pdf.js ${version} (public/vendor/pdfjs)`, async () => {
-  test("the tests import the vendored pdf.js", () => {
-    assert.equal(import.meta.resolve("pdfjs-dist/legacy/build/pdf.mjs"), `${vendor}pdf.min.mjs`);
+  // Runs after the import below has loaded pdf-text.test.mjs. If that file
+  // imports pdf.js by any other path, nothing redirects it and it would test
+  // Node's pdfjs-dist again under this title.
+  test("pdf-text.test.mjs imports the vendored pdf.js", () => {
+    assert.ok(redirected.has(tests), `pdf-text.test.mjs's pdf.js import wasn't redirected to ${vendor}pdf.min.mjs`);
   });
   await import("./pdf-text.test.mjs");
 });

@@ -33,7 +33,7 @@ const convert = (buf, to, fileName = "sample-text.pdf", options = {}) =>
 
 // What XML 1.0 forbids in a document: no file the converter writes may hold one.
 // eslint-disable-next-line no-control-regex -- the control characters are what it finds
-const XML_FORBIDDEN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
+const XML_FORBIDDEN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
 
 // Parses XML strictly, as an e-reader does, and returns its text (the
 // elements' text, entities decoded) and the elements it opened. Throws on
@@ -310,7 +310,7 @@ test("text that looks like markup or holds characters XML forbids stays text, an
   // pdf.js gives every one of them, so what keeps them out of the files is
   // cleanText.
   assert.ok(
-    (await pdfjsRuns(pdf.slice(0))).join("").includes("A\u0000A\u0007A￾A￿A\u0085A\u007FA\u{1F600}A\uD800A\uDC00A"),
+    (await pdfjsRuns(pdf.slice(0))).join("").includes("A\u0000A\u0007A\uFFFEA\uFFFFA\u0085A\u007FA\u{1F600}A\uD800A\uDC00A"),
     "pdf.js gives the characters as drawn",
   );
   const txt = decode((await convert(pdf.slice(0), "txt", "<evil> & co.pdf")).buffer);
@@ -332,7 +332,7 @@ test("text that looks like markup or holds characters XML forbids stays text, an
 });
 
 test("cleanText drops what isn't text and keeps every character that is", () => {
-  assert.equal(cleanText("a\u0000b\u0008c\u000Bd\u001Fe\u007Ff\u0085g\u009Fh￾i￿j"), "abcdefghij");
+  assert.equal(cleanText("a\u0000b\u0008c\u000Bd\u001Fe\u007Ff\u0085g\u009Fh\uFFFEi\uFFFFj"), "abcdefghij");
   assert.equal(cleanText("lone \uD800 high, lone \uDC00 low, \uDC00\uD800 reversed"), "lone  high, lone  low,  reversed");
   assert.equal(cleanText("tab\tnew\nline\rend"), "tab new line end");
   const kept = "Ünïcödé — “quotes” 中文 العربية עברית \u{1F600}  nbsp ­soft";
