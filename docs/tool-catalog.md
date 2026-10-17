@@ -105,10 +105,12 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   in, so the markup and the H1 are one string. The "coming soon" editors,
   the uncatalogued table pages (#221), the homepage and the category pages
   have none. `lib/structured-data.test.mjs` follows each page's components
-  and fails when a live Tool page renders none or more than one. It has no
-  `Review`, `AggregateRating`, `FAQPage` or `HowTo` markup: Lander reviews
-  have no verifiable source, FAQ rich results are limited to government and
-  health sites, and HowTo rich results are retired. It has no
+  and fails when a live Tool page renders none or more than one. A page
+  imports `StructuredData` after its own component, because the tool sweep
+  files a page under its first `@/components` import; the test checks that
+  too. It has no `Review`, `AggregateRating`, `FAQPage` or `HowTo` markup:
+  Lander reviews have no verifiable source, FAQ rich results are limited to
+  government and health sites, and HowTo rich results are retired. It has no
   `BreadcrumbList` either, because no page shows a breadcrumb trail.
 - The shared site footer is mounted by
   `packages/app-core/src/components/app-layout.tsx`. Do not add a second page
