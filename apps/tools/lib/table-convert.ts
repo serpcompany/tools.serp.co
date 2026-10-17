@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-import { normalizePath } from "@/lib/sitemap";
+import { FREE, composeDescription, pageMetadata } from "./page-metadata.ts";
+import { normalizePath } from "./sitemap.ts";
 
 const TABLE_CONVERT_LABELS: Record<string, string> = {
   csv: "CSV",
@@ -54,6 +55,10 @@ type TableConvertMetadataInput = {
   slug: string;
 };
 
+// TableConvertLanding converts in the page, Excel workbooks included (read in
+// a web worker), and sends the table nowhere.
+const TABLE_IN_BROWSER = "It runs in your browser, so your data stays on your device.";
+
 export function buildTableConvertMetadata({
   from,
   to,
@@ -62,23 +67,32 @@ export function buildTableConvertMetadata({
 }: TableConvertMetadataInput): Metadata {
   const fromLabel = formatTableLabel(from);
   const toLabel = formatTableLabel(to);
-  const description = `Convert ${fromLabel} to ${toLabel} online with a live table preview.`;
-  const canonical = normalizePath(slug);
+  const description = composeDescription(
+    `Convert ${fromLabel} to ${toLabel} online with a live table preview.`,
+    [
+      TABLE_IN_BROWSER,
+      FREE,
+      `Paste or drop in your ${fromLabel} data, then download the ${toLabel} result.`,
+    ],
+  );
 
-  return {
-    title: `${title} | SERP Tools`,
+  return pageMetadata({
+    title,
     description,
-    alternates: canonical ? { canonical } : undefined,
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      url: canonical,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
-  };
+    canonical: normalizePath(slug),
+    image: "convert",
+  });
+}
+
+// /table-convert-demo/, the table converter with every input and output
+// format, which TableConvertLanding pages fix to one pair. It sets no
+// canonical: nothing links to it and no sitemap lists it, and whether it
+// should be indexed is not decided yet.
+export function buildTableConvertDemoMetadata(): Metadata {
+  return pageMetadata({
+    title: "Table Converter Demo",
+    description:
+      "Paste or upload a table as CSV, Excel, JSON, Markdown, HTML or SQL, convert it to another format and preview both side by side, in your browser.",
+    image: "convert",
+  });
 }

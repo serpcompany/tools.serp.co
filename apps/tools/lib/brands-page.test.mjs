@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+import { buildBrandsMetadata } from "./metadata.ts";
+
 const networkBrands = JSON.parse(
   readFileSync(
     new URL("../../../packages/app-core/src/data/network-brands.json", import.meta.url),
@@ -34,10 +36,13 @@ test("brands route exists and is backed by network brands data", () => {
 
 test("brands route is static and exports page metadata", () => {
   assert.match(brandsPageSource, /dynamic\s*=\s*"force-static"/);
-  assert.match(brandsPageSource, /title:\s*"Brands \| SERP Tools"/);
-  assert.match(brandsPageSource, /canonical:\s*"\/brands\/"/);
-  assert.match(brandsPageSource, /openGraph/);
-  assert.match(brandsPageSource, /twitter/);
+  assert.match(brandsPageSource, /export const metadata = buildBrandsMetadata\(brands\.length\)/);
+  const metadata = buildBrandsMetadata(38);
+  assert.equal(metadata.title, "Brands");
+  assert.equal(metadata.alternates.canonical, "/brands/");
+  assert.equal(metadata.openGraph.url, "/brands/");
+  assert.match(metadata.description, /^Browse the 38 public sites/);
+  assert.equal(metadata.twitter.card, "summary_large_image");
 });
 
 test("brands page renders compact directory brand cards", () => {

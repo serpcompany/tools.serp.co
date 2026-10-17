@@ -1,7 +1,7 @@
 // Load FFmpeg.wasm for video conversion
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { normalizeBlobPart } from "../blob-parts";
-import { AUDIO_FORMATS, VIDEO_FORMATS, detectCapabilities } from '../capabilities';
+import { AUDIO_FORMATS, VIDEO_FORMATS, detectCapabilities, prefersServerConversion } from '../capabilities';
 import { createServerActionRequestHeaders } from "../server-action-client";
 import { buildConvertCommand } from "./ffmpeg-args";
 import { compressWithFFmpeg } from "./ffmpeg-compress";
@@ -37,13 +37,7 @@ function createTelemetryError(
 }
 
 export function shouldUseServerConversion(fromFormat: string, toFormat: string) {
-  const serverOnly = new Set(["rm", "rmvb"]);
-  if (serverOnly.has(toFormat.toLowerCase())) {
-    return true;
-  }
-  const from = fromFormat.toLowerCase();
-  const to = toFormat.toLowerCase();
-  if (from === "amr" && ["mp2", "oga", "ogg"].includes(to)) {
+  if (prefersServerConversion(fromFormat, toFormat)) {
     return true;
   }
   return !detectCapabilities().supportsVideoConversion;
