@@ -18,7 +18,8 @@ import { fileURLToPath } from "node:url";
 import { jsPDF } from "jspdf";
 
 const fixtures = path.join(path.dirname(fileURLToPath(import.meta.url)), "fixtures");
-const CREATED = new Date("2026-10-17T00:00:00Z");
+// A PDF date string: jsPDF would write a Date in the machine's time zone.
+const CREATED = "D:20261017000000+00'00'";
 
 function letter(options = {}) {
   const doc = new jsPDF({ unit: "pt", format: "letter", ...options });
