@@ -7,7 +7,8 @@
 // with anything else is set in the self-hosted DejaVu Sans (pdf-font.ts),
 // whose letters aren't all one width; its indentation still lines up, as it
 // is set in Courier's columns. A character that font can't show (Chinese,
-// Japanese, Korean, Indic, Thai, emoji) refuses the file, never a garbled PDF.
+// Japanese, Korean, Indic, Thai, emoji) or jsPDF can't set (Lao, N'Ko)
+// refuses the file, never a garbled PDF.
 
 import {
   fetchPdfFont,
@@ -15,6 +16,8 @@ import {
   isRightToLeft,
   UnsupportedScriptError,
   embedUnicodeFont,
+  shapeArabic,
+  withoutJoiners,
 } from "./pdf-font.ts";
 import { cleanLine, decodeText, textLines } from "./text-file.ts";
 import {
@@ -71,33 +74,55 @@ export type TextPdfOptions = {
 };
 
 // Characters no font draws: C1 controls, invisible formatting characters
-// (zero-width spaces and joiners, direction marks, soft hyphens, byte order
-// marks) and variation selectors. The rest is composed (NFC), so an accent
-// typed as a separate mark sits on its letter, in Courier when it can.
-const INVISIBLE = /[\u0080-\u009f\p{Cf}\ufe00-\ufe0f]/gu;
+// (zero-width spaces, direction marks, soft hyphens, byte order marks) and
+// variation selectors. The rest is composed (NFC), so an accent typed as a
+// separate mark sits on its letter, in Courier when it can. The zero-width
+// non-joiner and joiner stay: in Persian, Urdu or Kurdish they say where a
+// word's letters join (pdf-font.ts's shapeArabic), and the Unicode font has
+// them; text in Courier drops them.
+const INVISIBLE = /[\u0080-\u009f]|[\ufe00-\ufe0f]|(?!\u200c|\u200d)\p{Cf}/gu;
 export const printable = (text: string) => text.normalize("NFC").replace(INVISIBLE, "");
+// A line with nothing to see: spaces at most, and joiners with nothing to join.
+const isBlank = (text: string) => !withoutJoiners(text).trim();
 
 const tooLarge = (limits: TextPdfLimits) => new TextPdfError("too_large", tooManyPagesMessage(limits.pages));
 
 // ---------------------------------------------------------------- input --
 
+const BLANK_LINE: SourceLine = Object.freeze({ text: "", indent: 0, hang: 0, muted: false, rtl: false, right: false });
+
 // A text file's lines (text-file.ts): tabs to every fourth column, control
 // characters and terminal escape sequences dropped, the leading spaces as
 // the line's indent. A form feed starts a new page, as on a printer; blank
-// lines at the end are left out. Throws once the lines can't fit the pages.
+// lines and page breaks at the end are left out. Only the lines that are
+// laid out count towards the pages: blank lines and page breaks wait until
+// a line with text follows them. Throws once the lines can't fit the pages.
 export function textSourceLines(text: string, limits: TextPdfLimits): Source[] {
   const lines: Source[] = [];
   const most = limits.pages * LINES_PER_PAGE;
-  let count = 0;
+  // The blank lines and page breaks waiting, and how many blank lines: once
+  // they can't all fit, only counted.
+  let waiting: Source[] = [];
+  let blanks = 0;
   for (const { line, end } of textLines(text)) {
     const cleaned = printable(cleanLine(line)).trimEnd();
     const body = cleaned.trimStart();
-    if ((count += 1) > most) throw tooLarge(limits);
+    if (isBlank(body)) {
+      blanks += 1;
+      if (lines.length + blanks <= most) {
+        waiting.push(BLANK_LINE);
+        if (end === "\f") waiting.push("page-break");
+      }
+      continue;
+    }
+    if (lines.length + blanks + 1 > most) throw tooLarge(limits);
+    for (const source of waiting) lines.push(source);
+    waiting = [];
+    blanks = 0;
     const rtl = isRightToLeft(body);
     lines.push({ text: body, indent: cleaned.length - body.length, hang: 0, muted: false, rtl, right: rtl });
-    if (end === "\f") lines.push("page-break");
+    if (end === "\f") waiting.push("page-break");
   }
-  while (lines.length && (lines.at(-1) === "page-break" || !(lines.at(-1) as SourceLine).text)) lines.pop();
   return lines;
 }
 
@@ -300,13 +325,13 @@ export async function convertTextToPdf(
   if (buf.byteLength > limits.bytes) throw new TextPdfError("too_large", tooLargeFileMessage(buf.byteLength, limits.bytes));
   const source = from.toLowerCase();
   const bytes = new Uint8Array(buf);
-  const lines = source === "xml" ? xmlSourceLines(decodeXml(bytes), limits) : textSourceLines(decodeText(bytes), limits);
+  let lines = source === "xml" ? xmlSourceLines(decodeXml(bytes), limits) : textSourceLines(decodeText(bytes), limits);
   const texts = lines.flatMap((line) => (line === "page-break" ? [] : [line.text]));
-  if (!texts.some((text) => text.trim())) {
+  if (texts.every(isBlank)) {
     throw new TextPdfError("no_text", "This text file is empty: there's no text to put in a PDF.");
   }
 
-  const monospace = texts.every(isBuiltInText);
+  const monospace = texts.every((text) => isBuiltInText(withoutJoiners(text)));
   const [{ jsPDF }, fontBytes] = await Promise.all([
     import("jspdf"),
     monospace ? null : (options.loadFont ?? fetchPdfFont)(),
@@ -332,9 +357,17 @@ export async function convertTextToPdf(
   } else {
     doc.setFont("courier", "normal");
   }
+  // Each line as it is drawn: without joiners in Courier, its Arabic
+  // letters in their joined forms in the Unicode font.
+  const drawn = (text: string) => (monospace ? withoutJoiners(text) : shapeArabic(doc, text));
+  lines = lines.map((line) => {
+    if (line === "page-break") return line;
+    const text = drawn(line.text);
+    return text === line.text ? line : { ...line, text };
+  });
   doc.setFontSize(FONT_SIZE);
   doc.setLineHeightFactor(LINE_HEIGHT / FONT_SIZE);
-  const title = printable(fileName.replace(/\.[^.]+$/, "")).trim();
+  const title = withoutJoiners(printable(fileName.replace(/\.[^.]+$/, ""))).trim();
   // jsPDF writes the title in PDFDocEncoding, which holds Latin text only.
   if (title && isBuiltInText(title)) doc.setProperties({ title });
 

@@ -286,8 +286,9 @@ export const ENGINE_LOCATIONS = {
 // so a text output (no byte signature) proves it holds the input's data. A
 // fixture can name several; each must be there.
 const TEXT_MARKERS = {
-  // Its first, middle and last lines.
-  "sample.txt": ["SERP Tools sample text", "Alpha", "Gamma"],
+  // Its first line, and the end of its third through its last, each on its
+  // own line: a copy that lost or joined any of them fails.
+  "sample.txt": ["SERP Tools sample text", "separate lines:\nAlpha\nBeta\nGamma"],
   "sample.csv": "Alpha",
   "sample-2.csv": "Gamma",
   "sample.json": "Alpha",

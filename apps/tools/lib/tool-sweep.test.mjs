@@ -1094,7 +1094,7 @@ test("TXT and XML to PDF look for their fixture's text in the PDF, opened as PDF
   const txt = plan("txt");
   assert.deepEqual(
     [txt.engine, txt.fixtures.map((file) => path.basename(file)), txt.markers, txt.decode, txt.document],
-    ["text-pdf", ["sample.txt"], ["SERP Tools sample text", "Alpha", "Gamma"], true, true],
+    ["text-pdf", ["sample.txt"], ["SERP Tools sample text", "separate lines:\nAlpha\nBeta\nGamma"], true, true],
   );
   assert.deepEqual(txt.refusals.map(({ fixture, errorCode }) => [path.basename(fixture), errorCode]), [["sample-cjk.txt", "unsupported_script"]]);
   const xml = plan("xml");
@@ -1117,7 +1117,7 @@ test("TXT and XML to PDF look for their fixture's text in the PDF, opened as PDF
 test("a TXT or XML to PDF run passes only when its PDF's text holds the fixture's markers", async () => {
   const font = readFileSync(path.join(benchmarksDir, "../public/vendor/fonts/dejavu/DejaVuSans.ttf"));
   const loadFont = async () => font.buffer.slice(font.byteOffset, font.byteOffset + font.byteLength);
-  const markers = ["SERP Tools sample text", "Alpha", "Gamma"];
+  const markers = ["SERP Tools sample text", "separate lines:\nAlpha\nBeta\nGamma"];
   const run = async (bytes, { document = true } = {}) => {
     const outputs = [{ name: "sample.pdf", size: bytes.length, head: Array.from(bytes.subarray(0, 64)), base64: Buffer.from(bytes).toString("base64") }];
     await decodeOutputs(outputs, "pdf", { document });
@@ -1127,7 +1127,13 @@ test("a TXT or XML to PDF run passes only when its PDF's text holds the fixture'
     new Uint8Array((await convertTextToPdf(new TextEncoder().encode(text).buffer, from, `a.${from}`, { loadFont })).buffer);
   const sample = readFileSync(path.join(fixturesDir, "sample.txt"), "utf8");
   assert.deepEqual((await run(await pdf(sample))).verdict, { status: "pass", error: null, formatCheck: "decoded" });
-  assert.match((await run(await pdf("SERP Tools sample text\nAlpha"))).verdict.error, /missing Gamma/);
+  // A PDF that lost the last lines, or set them on one line, fails, though
+  // the third line names all three.
+  const heading = "SERP Tools sample text\n\nAlpha, Beta and Gamma are on separate lines:";
+  for (const text of [heading, `${heading}\nAlpha`, `${heading}\nAlpha\nBeta`, `${heading}\nAlpha Beta Gamma`, `${heading}\nAlpha\nGamma\nBeta`]) {
+    assert.match((await run(await pdf(text))).verdict.error, /missing separate lines:\nAlpha\nBeta\nGamma/, text);
+  }
+  assert.match((await run(await pdf(sample.replace("SERP Tools", "SERP")))).verdict.error, /missing SERP Tools sample text/);
   // Read as PDF to TXT reads it: lines and paragraphs, in the Unicode font too.
   const decoded = (await run(await pdf("SERP Tools sample text\n\nAlpha Ωmega\nGamma"))).decoded;
   assert.equal(decoded.text, "SERP Tools sample text\n\nAlpha Ωmega\nGamma\n");

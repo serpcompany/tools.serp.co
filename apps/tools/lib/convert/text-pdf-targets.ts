@@ -43,7 +43,11 @@ export class TextPdfError extends Error {
 const MB = 1024 * 1024;
 const count = (value: number) => value.toLocaleString("en-US");
 
+// The file's size rounded up and the limit down, a tenth of a MB at most,
+// so a file just over the limit never reads as within it.
+const megabytes = (bytes: number, round: (value: number) => number) =>
+  (round((bytes / MB) * 10) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 });
 export const tooLargeFileMessage = (bytes: number, limit = TEXT_PDF_LIMITS.bytes) =>
-  `This file is ${(bytes / MB).toFixed(1)} MB; files up to ${count(Math.floor(limit / MB))} MB can be converted to PDF here.`;
+  `This file is ${megabytes(bytes, Math.ceil)} MB, over the ${megabytes(limit, Math.floor)} MB limit for converting to PDF here.`;
 export const tooManyPagesMessage = (limit = TEXT_PDF_LIMITS.pages) =>
   `This file would fill more than ${count(limit)} pages, the most a PDF made here can have. Split it into smaller files and convert each.`;

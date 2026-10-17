@@ -25,8 +25,9 @@ CR, LF, NEL and the Unicode line and paragraph separators break lines; tabs
 stop every fourth column; control characters and terminal escape sequences are
 dropped. A form feed starts a new page, as on a printer, so a file paginated
 with form feeds (an RFC, a report) keeps its pages. Blank lines and leading
-spaces are kept; blank lines at the end are not. A line whose first letter is
-Hebrew or Arabic is set against the right margin, as an editor shows it.
+spaces are kept; blank lines and page breaks at the end are not, and don't
+count towards the page limit. A line whose first letter is Hebrew or Arabic
+is set against the right margin, as an editor shows it.
 
 ## XML
 
@@ -55,17 +56,25 @@ Anything else sets the whole file in DejaVu Sans, the self-hosted font table
 PDFs use (`lib/convert/pdf-font.ts`, #249), fetched once a page and embedded
 once. Its letters vary in width, so columns made with spaces don't line up,
 but indentation does: it is placed in Courier's columns, not as spaces.
-Right-to-left text is drawn in display order and Arabic joined, as in table
-PDFs. Text is composed (NFC) first, so an accent typed as a separate mark
-stays in Courier, and invisible characters (C1 controls, zero-width spaces and
-joiners, direction marks, soft hyphens, variation selectors) are dropped.
+Right-to-left text is drawn in display order. Arabic letters take the forms
+Unicode's joining rules give them (`shapeArabic`, shared with table PDFs):
+joined across vowel marks, a tatweel and a zero-width joiner, apart at a
+zero-width non-joiner, punctuation and digits. jsPDF's own shaping takes every
+character of the Arabic blocks for a joining letter, so a word before a comma
+would end in its initial form; it is handed forms it leaves alone, and only
+joins lam and alef. Text is composed (NFC) first, so an accent typed as a
+separate mark stays in Courier, and invisible characters (C1 controls,
+zero-width spaces, direction marks, soft hyphens, variation selectors) are
+dropped. The zero-width non-joiner and joiner stay in DejaVu Sans, where
+Persian, Urdu and Kurdish use them to part or join a word's letters; Courier
+drops them.
 
 ## Limits and refusals
 
 | Code | When | The page says |
 | --- | --- | --- |
-| `too_large` | over 20 MB, before the file is read (`checkInputFile`), or over 2,000 pages, counted as it is laid out and stopped there | which limit, and its size |
-| `unsupported_script` | a character DejaVu Sans has no glyph for: Chinese, Japanese, Korean, Indic, Thai, emoji | the characters, up to six, and (TXT) that TXT to PNG draws them |
+| `too_large` | over 20 MB, before the file is read (`checkInputFile`), or over 2,000 pages, counted on the lines laid out and stopped there | which limit; the file's size rounded up |
+| `unsupported_script` | a character DejaVu Sans has no glyph for (Chinese, Japanese, Korean, Indic, Thai, emoji), or one it has that jsPDF can't set: Lao (marks to place), N'Ko and the Arabic-script letters jsPDF has no joined forms for (Kurdish ڕ and ە, many of Pashto's, Sindhi's and Uyghur's) | the characters, up to six (a mark on a dotted circle), and (TXT) that TXT to PNG draws them |
 | `malformed_xml` | sax rejects the file, a second root element, or no element at all | sax's message, with line and column |
 | `unsupported_encoding` | the XML declaration names an encoding the browser can't decode, or bytes that aren't in it | save it as UTF-8 |
 | `no_text` | nothing but whitespace and control characters | it is empty |
@@ -83,6 +92,10 @@ engine `text-pdf` or `xml-pdf`.
 - A text file in a legacy encoding other than Windows-1252 (Shift_JIS, KOI8-R)
   is read as Windows-1252, as by TXT to PNG and a browser, and set as such.
 - XML is listed, not rendered: no XSLT, XSL-FO or e-invoice layout.
+- Marks (Arabic and Hebrew vowels, accents with no composed letter) sit where
+  the font draws them, over or under their letter, not placed by OpenType
+  positioning, which jsPDF doesn't do. The word الله is four joined letters:
+  the font has no ligature for it.
 
 ## Verification
 

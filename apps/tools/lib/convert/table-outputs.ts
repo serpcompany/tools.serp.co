@@ -4,7 +4,7 @@
 // so no page loads one before a visitor asks for that output.
 
 import { checkOutputFormat } from "./output-format.ts";
-import { fetchPdfFont, isBuiltInText, isRightToLeft, embedUnicodeFont } from "./pdf-font.ts";
+import { fetchPdfFont, isBuiltInText, isRightToLeft, embedUnicodeFont, shapeArabic, withoutJoiners } from "./pdf-font.ts";
 import type { TableData } from "./table-data.ts";
 import { writeTableImage } from "./table-image.ts";
 
@@ -169,26 +169,27 @@ const PDF_MIN_COLUMN = 90;
 const A4 = { width: 595.28, height: 841.89 };
 
 // What a PDF cell shows: line breaks as \n, tabs as spaces, and no control
-// or invisible formatting characters, which no font draws.
+// or invisible formatting characters, which no font draws, bar the zero-width
+// non-joiner and joiner (pdf-font.ts's withoutJoiners).
 export function pdfText(value: string): string {
   return value
     .replace(/\r\n?/g, "\n")
     .replace(/\t/g, "    ")
     // Control characters are what this removes.
     // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u0009\u000b-\u001f\u007f-\u009f\p{Cf}\ufe00-\ufe0f]/gu, "");
+    .replace(/[\u0000-\u0009\u000b-\u001f\u007f-\u009f]|[\ufe00-\ufe0f]|(?!\u200c|\u200d)\p{Cf}/gu, "");
 }
 
 export function needsUnicodeFont(cells: string[][]): boolean {
-  return cells.some((row) => row.some((cell) => !isBuiltInText(cell)));
+  return cells.some((row) => row.some((cell) => !isBuiltInText(withoutJoiners(cell))));
 }
 
 // A4 pages with the header row on each, landscape when the columns need it,
 // and columns that don't fit across continued on the following pages.
 async function writePdf(table: TableData, loadFont: () => Promise<ArrayBuffer>): Promise<TableOutput> {
-  const head = table.headers.map(pdfText);
-  const body = table.rows.map((row) => row.map(pdfText));
-  const cells = [head, ...body];
+  let head = table.headers.map(pdfText);
+  let body = table.rows.map((row) => row.map(pdfText));
+  let cells = [head, ...body];
   const unicode = needsUnicodeFont(cells);
   const [{ jsPDF }, { autoTable }, fontBytes] = await Promise.all([
     import("jspdf"),
@@ -201,6 +202,12 @@ async function writePdf(table: TableData, loadFont: () => Promise<ArrayBuffer>):
     // One font file, embedded once: the header row is shaded, not bold.
     font = embedUnicodeFont(doc, fontBytes, cells.flat(), "Save the table as PNG or Excel instead.");
   }
+  // Each cell as it is drawn: its Arabic letters in the forms their
+  // neighbours call for in the Unicode font, without joiners in Helvetica.
+  const drawn = (text: string) => (fontBytes ? shapeArabic(doc, text) : withoutJoiners(text));
+  head = head.map(drawn);
+  body = body.map((row) => row.map(drawn));
+  cells = [head, ...body];
 
   const headerStyle = unicode ? "normal" : "bold";
   doc.setFontSize(PDF_FONT_SIZE);

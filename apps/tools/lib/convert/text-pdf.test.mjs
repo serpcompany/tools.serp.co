@@ -7,7 +7,7 @@ import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 
 import { sampleCjk, sampleMalformedXml } from "../../benchmarks/make-text-fixtures.mjs";
 import { checkOutputFormat } from "./output-format.ts";
-import { PDF_FONT_URL } from "./pdf-font.ts";
+import { PDF_FONT_URL, shapeArabic } from "./pdf-font.ts";
 import {
   COLUMNS,
   LINES_PER_PAGE,
@@ -192,6 +192,13 @@ test("text the font can't show is refused with a clear message, never a garbled 
     ["Hello\n東京は晴れ\n", "“東”, “京”, “は”, “晴”, “れ”"],
     ["Good morning 😀\n", "“😀”"],
     ["ภาษาไทย", "“ภ”"],
+    // The font has these, but jsPDF can't set them: Lao's marks need
+    // placing, N'Ko's letters and Kurdish's ڕ and ە joining. A mark is
+    // shown on a dotted circle.
+    ["ພາສາລາວ", "“ພ”, “າ”, “ສ”, “ລ”, “ວ”"],
+    ["ߒߞߏ", "“ߒ”, “ߞ”, “ߏ”"],
+    ["کوردی ڕە", "“ڕ”, “ە”"],
+    [`x${String.fromCharCode(0xeb4)}`, `“${String.fromCharCode(0x25cc, 0xeb4)}”`],
   ]) {
     await assert.rejects(convert(text), (error) => {
       assert.ok(error instanceof TextPdfError);
@@ -212,11 +219,60 @@ test("text the font can't show is refused with a clear message, never a garbled 
 test("invisible characters go, and an accent typed as a mark joins its letter in Courier", async () => {
   const zwsp = String.fromCharCode(0x200b);
   const soft = String.fromCharCode(0xad);
+  const [zwnj, zwj] = [0x200c, 0x200d].map((code) => String.fromCharCode(code));
   assert.equal(printable(`a${zwsp}b${soft}c\u0085d`), "abcd");
+  // The joiners stay for the Unicode font; Courier drops them.
+  assert.equal(printable(`a${zwnj}b${zwj}c`), `a${zwnj}b${zwj}c`);
   fontLoads = 0;
-  const output = await convert(`café ${zwsp}x`);
-  assert.equal(fontLoads, 0, "é composed is in Windows-1252");
-  assert.deepEqual(texts(await pdfPages(output.buffer)), ["café x"]);
+  const output = await convert(`café ${zwsp}x${zwnj}y${zwj}z\n${zwnj}\n`);
+  assert.equal(fontLoads, 0, "é composed is in Windows-1252, and the joiners need no font");
+  assert.deepEqual(texts(await pdfPages(output.buffer)), ["café xyz"]);
+  await assert.rejects(convert(`${zwnj}\n${zwj}`), { code: "no_text" });
+});
+
+const codes = (text) => [...text].map((char) => char.codePointAt(0));
+
+test("a zero-width non-joiner keeps a Persian word's letters apart where it stands", async () => {
+  const zwnj = String.fromCharCode(0x200c);
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF();
+  // می‌خواهم ("I want"): with it, yeh is final and khah initial; without,
+  // both are medial and the word is one.
+  assert.deepEqual(codes(shapeArabic(doc, `می${zwnj}خواهم`)), [0xfee3, 0xfbfd, 0x200c, 0xfea7, 0xfeee, 0xfe8d, 0xfeeb, 0xfee2]);
+  assert.deepEqual(codes(shapeArabic(doc, "میخواهم")), [0xfee3, 0xfbff, 0xfea8, 0xfeee, 0xfe8d, 0xfeeb, 0xfee2]);
+  // And so in the PDF, read back (pdf.js reads the final yeh as the letter).
+  const read = async (text) => texts(await pdfPages((await convert(text)).buffer))[0];
+  assert.deepEqual(codes(await read(`می${zwnj}خواهم`)), [0xfee3, 0x6cc, 0xfea7, 0xfeee, 0xfe8d, 0xfeeb, 0xfee2]);
+  assert.deepEqual(codes(await read("میخواهم")), [0xfee3, 0xfbff, 0xfea8, 0xfeee, 0xfe8d, 0xfeeb, 0xfee2]);
+});
+
+test("Arabic letters join across vowel marks, a tatweel and a joiner, and never across punctuation or digits", async () => {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF();
+  const [fatha, damma, shadda, zwj] = [0x64e, 0x64f, 0x651, 0x200d].map((code) => String.fromCharCode(code));
+  const shaped = (text) => codes(shapeArabic(doc, text));
+  // Kaf initial, teh medial and beh final, whatever comes after the word.
+  for (const after of ["", "،", "؟", "٣", "!", " "]) {
+    assert.deepEqual(shaped(`كتب${after}`).slice(0, 3), [0xfedb, 0xfe98, 0xfe90], after);
+  }
+  assert.deepEqual(shaped(`ك${fatha}ت${fatha}ب${fatha}`), [0xfedb, 0x64e, 0xfe98, 0x64e, 0xfe90, 0x64e]);
+  // A shadda typed before its vowel goes after it, in Unicode's order.
+  assert.deepEqual(shaped(`م${damma}ح${fatha}م${shadda}${fatha}د`), [0xfee3, 0x64f, 0xfea4, 0x64e, 0xfee4, 0x64e, 0x651, 0xfeaa]);
+  assert.deepEqual(shaped("كـتـب"), [0xfedb, 0x640, 0xfe98, 0x640, 0xfe90]);
+  // A joiner joins: heh alone in its initial form.
+  assert.deepEqual(shaped(`ه${zwj}`), [0xfeeb, 0x200d]);
+  // Lam and alef become one letter, lam's vowel after them.
+  assert.deepEqual(codes(doc.processArabic(shapeArabic(doc, `ل${fatha}ا`))), [0xfefb, 0x64e]);
+  // Allah stays four letters joined: the font has no U+FDF2.
+  assert.deepEqual(shaped("الله"), [0xfe8d, 0xfedf, 0xfee0, 0x200d, 0xfeea]);
+  assert.deepEqual(codes(doc.processArabic(shapeArabic(doc, "الله"))), [0xfe8d, 0xfedf, 0xfee0, 0x200d, 0xfeea]);
+  assert.equal(shapeArabic(doc, "Ωmega שלום"), "Ωmega שלום");
+  // So a file with them converts, and reads back as written.
+  for (const line of ["بسم الله الرحمن الرحيم", "كتب، كتب؟ كتب٣"]) {
+    const [read] = texts(await pdfPages((await convert(line)).buffer));
+    assert.equal(read.normalize("NFKC").replace(/\s+/g, " "), line);
+  }
+  assert.equal((await convert(`ك${fatha}ت${fatha}ب${fatha}`)).pages, 1);
 });
 
 test("an empty or blank file is refused rather than made into a blank PDF", async () => {
@@ -239,10 +295,17 @@ test("a file over the size limit is refused before it's read", async () => {
     await assert.rejects(checkInputFile(huge, from, "pdf"), {
       telemetryCode: "too_large",
       telemetryMetadata: { from, to: "pdf", engine: TEXT_PDF_ENGINES[from] },
-      message: "This file is 50.0 MB; files up to 20 MB can be converted to PDF here.",
+      message: "This file is 50 MB, over the 20 MB limit for converting to PDF here.",
     });
   }
-  assert.equal(tooLargeFileMessage(TEXT_PDF_LIMITS.bytes + 1), "This file is 20.0 MB; files up to 20 MB can be converted to PDF here.");
+  assert.equal(tooLargeFileMessage(TEXT_PDF_LIMITS.bytes + 1), "This file is 20.1 MB, over the 20 MB limit for converting to PDF here.");
+  // A file's size is rounded up, so one just over the limit never reads as
+  // within it.
+  const MB = 1024 * 1024;
+  for (const bytes of [1, MB / 10 - 1, MB / 10, MB / 10 + 1, 50 * MB].map((over) => TEXT_PDF_LIMITS.bytes + over)) {
+    const [size, limit] = tooLargeFileMessage(bytes).match(/[\d,.]+(?= MB)/g).map((value) => Number(value.replaceAll(",", "")));
+    assert.ok(size > limit, tooLargeFileMessage(bytes));
+  }
   await checkInputFile(huge, "txt", "png");
   // convertTextToPdf checks again, for a caller that didn't.
   await assert.rejects(convert(new ArrayBuffer(TEXT_PDF_LIMITS.bytes + 1)), { code: "too_large" });
@@ -271,6 +334,65 @@ test("a text that would pass the page limit is refused as soon as it does, never
   const cyrillic = await convert("ж".repeat(5 * 1024 * 1024));
   assert.ok(cyrillic.pages > 900 && cyrillic.pages < TEXT_PDF_LIMITS.pages, `${cyrillic.pages} pages`);
   assert.ok(performance.now() - started < 30_000, `${performance.now() - started} ms`);
+});
+
+test("blank lines and page breaks at the end don't count towards the page limit", async () => {
+  const limits = { pages: 3 };
+  // One line and 200 blank lines fill a page; 150 lines of text fill three.
+  assert.equal((await convert(`x\n${"\n".repeat(200)}`, "txt", { limits })).pages, 1);
+  assert.equal((await convert("x\n".repeat(150), "txt", { limits })).pages, 3);
+  assert.equal((await convert(`x${"\n\f".repeat(500)}`, "txt", { limits })).pages, 1);
+  // Blank lines between lines of text count.
+  assert.equal((await convert(`x${"\n".repeat(3 * LINES_PER_PAGE - 1)}y`, "txt", { limits })).pages, 3);
+  await assert.rejects(convert(`x${"\n".repeat(3 * LINES_PER_PAGE)}y`, "txt", { limits }), { code: "too_large" });
+  // At the real limits: a line and 130,000 blank lines, 2,000 pages' worth
+  // and more, make one page.
+  assert.equal((await convert(`x${"\n".repeat(130_000)}`)).pages, 1);
+});
+
+test("generated files are refused for their pages exactly when the PDF they make would pass the limit", async () => {
+  // Seeded, so a failure repeats: lines of text, lines that wrap, blank and
+  // white lines, form feeds, CR LF, and blank lines and page breaks at the
+  // end; and XML with elements, comments, long text and blank lines.
+  let seed = 283;
+  const random = (n) => {
+    seed = (seed * 1_103_515_245 + 12_345) % 2 ** 31;
+    return Math.floor((seed / 2 ** 31) * n);
+  };
+  const piece = () => ["", "", " \t ", "\f", "\r", `line ${random(1000)}`, "word ".repeat(10 + random(80)), "x".repeat(random(400))][random(8)];
+  const tail = () => ["", "\n".repeat(random(400)), "\f\n".repeat(random(6)), `${" \n".repeat(random(200))}\f${"\n".repeat(random(200))}`][random(4)];
+  const element = () => ["<i/>", `<t>${"word ".repeat(random(100))}</t>`, "<!-- a note -->", "<p>a\n\n\nb</p>"][random(4)];
+  const files = [
+    ...Array.from({ length: 120 }, () => ["txt", Array.from({ length: random(250) }, piece).join("\n") + tail()]),
+    ...Array.from({ length: 40 }, () => ["xml", `<r>${Array.from({ length: random(160) }, element).join("")}</r>`]),
+  ];
+  const limits = { pages: 3 };
+  const converted = [];
+  const refused = [];
+  for (const [from, text] of files) {
+    let pages;
+    try {
+      // The pages it fills with no limit.
+      pages = (await convert(text, from, { limits: { pages: Infinity } })).pages;
+    } catch (error) {
+      assert.equal(error.code, "no_text", JSON.stringify(text.slice(0, 80)));
+      continue;
+    }
+    const outcome = await convert(text, from, { limits }).then((output) => output.pages, (error) => error.code);
+    const where = `${from}, ${pages} pages, ending ${JSON.stringify(text.slice(-60))}`;
+    if (pages > limits.pages) {
+      assert.equal(outcome, "too_large", where);
+      refused.push(pages);
+    } else {
+      assert.equal(outcome, pages, where);
+      converted.push(pages);
+    }
+  }
+  // Both sides of the limit, and the limit itself, were tried: no file is
+  // refused while one that fills more pages converts.
+  assert.ok(converted.length > 20 && refused.length > 20, `${converted.length} converted, ${refused.length} refused`);
+  assert.ok(converted.includes(limits.pages));
+  assert.ok(Math.max(...converted) < Math.min(...refused));
 });
 
 test("a file at the page limit converts, about 2,000 pages in seconds", async () => {
