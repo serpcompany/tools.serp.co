@@ -13,6 +13,9 @@
 // as data/sources/ahrefs-<yyyy-mm>-<topic>.csv, add it after the other
 // exports in KEYWORD_SOURCES with a source label such as "ahrefs-2026-11",
 // and run this command. Its rows replace older rows for the same keyword.
+// Rows for an operation not yet in the file change which retired Tools of that
+// operation answer 410 at the next build (see lib/gone-tool-routes.mjs), which
+// extends D3 (#313): get the owner's decision first.
 // Then run `pnpm -C apps/tools tool-status` so the status view picks it up.
 // lib/keywords.test.mjs fails when data/keywords.csv differs from a rebuild.
 

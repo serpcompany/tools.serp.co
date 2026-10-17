@@ -23,7 +23,9 @@ export const GONE_ROUTES_MODULE = "lib/gone-tool-routes.generated.js";
 // Only a Tool whose operation keywords.csv researched can show it has none:
 // a retired Tool of any other operation (a downloader Lander, an editor, a
 // viewer) has no row because nobody looked, so it keeps its 404, which is all
-// D3 decided for it. A route that an active Tool also serves is never gone.
+// D3 decided for it. So adding keyword rows for a new operation (say a Lander
+// export) makes its retired no-demand Tools answer 410 at the next build: that
+// extends D3 (#313) and is the owner's call. A route that an active Tool also serves is never gone.
 export function goneToolRoutes({ tools, keywords }) {
   const researched = new Set(keywords.map((row) => row.operation).filter(Boolean));
   const demanded = new Set(
