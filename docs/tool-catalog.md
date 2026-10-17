@@ -64,6 +64,19 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   converter, and several are listed to order before they become one PDF.
 - Specialized Tools may use custom renderers, but their registry identity and
   public route still come from the canonical catalog intent.
+- The Related Tools section on converter and compressor pages
+  (`lib/catalog/related-tools.ts`) lists a Tool's curated
+  `content.relatedTools` as written. Without one, it lists at most 24 active
+  Tools of the same kind that share a registry format (converters and
+  compressors, never a Lander): the reverse pair, then the same source format,
+  the same target format and the other shared-format Tools. The same source and
+  same target groups share the places; the others fill what is left. Which
+  Tools fill a group's places is fixed per page by a hash of the two Tool ids;
+  they show sorted by id. Lander, table converter and transcription pages
+  render no such section. Every converter and compressor page is on a list
+  another page renders, except table converter pages with a "More Table
+  Converters" section (87 of the 88; `/html-to-markdown/` has none): each of
+  those links the other 87, so one of them on a list reaches them all.
 - `packages/app-core/src/data/related-apps.json` owns Related App entries;
   matching uses a Tool's input and output formats and de-duplicates by app id.
 - The shared site footer is mounted by
