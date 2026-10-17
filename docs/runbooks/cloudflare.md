@@ -143,7 +143,33 @@ Dashboard access:
 ## Cache And Optimization Bindings
 
 OpenNext uses an R2 incremental cache with Cloudflare regional cache in
-`long-lived` mode.
+`long-lived` mode. A static page, including each Tool page the `[tool]` route
+serves, renders on its first request after a deploy and comes from the cache
+until the next one: entries are keyed by build id, and the deploy uploads no
+build-time pages. `apps/tools/lib/page-cache-filter.ts` keeps two kinds of
+render out of the cache: a page that answers 404, such as a `[tool]` slug that
+isn't an active Tool, and a page rendered for a URL with a query string
+(Next.js writes the query into the page). Each is answered as usual and not
+stored; after a query, the next request for the bare path stores the page.
+URLs that match no route share one cached not-found page.
+
+Page requests don't reach Next.js with their query in the first place:
+requests that arrive while a page renders share that render, so a cache rule
+alone can't keep one visitor's query from another.
+`apps/tools/lib/page-request.ts`, wired in `apps/tools/sentry-worker.mjs`,
+hands Next.js a `GET` or `HEAD` for a page path without its query, `_rsc`
+included (Next.js tells an RSC request by its header). `/api/`, `/_next/`,
+`/internal/` and files keep theirs, and a redirect is answered for the URL as
+requested, so it keeps the query. The address bar keeps it too.
+
+Entries from older builds are deleted after 30 days. An entry is about 600 KB,
+so a production build whose 2,542 sitemap pages are all requested leaves about
+1.5 GB behind (about 130 MB for the 218 pages that were static before #315).
+`tools-serp-co-inc-cache` and `tools-serp-co-inc-cache-preview` each have the
+lifecycle rule `expire-old-builds`, added 2026-10-18 (#326): objects under
+`incremental-cache/` are deleted 30 days after upload. Check it with
+`wrangler r2 bucket lifecycle list <bucket>`. A current page whose entry
+expires renders again on its next request.
 
 R2 buckets:
 

@@ -1,5 +1,6 @@
 import DownloaderExtensionCTA from "@/components/DownloaderExtensionCTA";
 import DownloaderPageHero from "@/components/DownloaderPageHero";
+import { StructuredData } from "@/components/StructuredData";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { ChangelogSection } from "@/components/sections/ChangelogSection";
@@ -46,6 +47,8 @@ export default function DownloaderPageTemplate({
 
   return (
     <main className="min-h-screen bg-background">
+      <StructuredData toolId={toolId} name={content.tool.title} description={content.tool.subtitle} />
+
       <DownloaderExtensionCTA extensionUrl={content.productLinks?.serplyUrl} />
 
       <DownloaderPageHero

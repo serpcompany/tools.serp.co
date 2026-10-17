@@ -11,6 +11,18 @@ type PageProps = {
   params: Promise<{ tool: string }>;
 };
 
+// Every Tool without its own folder is a static page, rendered on its first
+// request and served from the incremental cache afterwards (issue #315).
+// None is built ahead: the deploy doesn't upload build-time pages to R2, so
+// listing them would only lengthen the build. Nothing here may read request
+// data (lib/tool-route-static.test.mjs). A slug that isn't an active Tool
+// renders the 404, which open-next.config.ts never stores.
+export function generateStaticParams(): { tool: string }[] {
+  return [];
+}
+
+export const dynamicParams = true;
+
 export async function generateMetadata({ params }: PageProps) {
   const { tool: toolId } = await params;
   return buildToolMetadata(toolId);
