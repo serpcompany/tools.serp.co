@@ -56,6 +56,20 @@ test("middleware applies the pure decision for every non-asset route", () => {
   assert.match(middleware, /matcher: \["\/\(\(\?!_next\/static\|_next\/image\)\.\*\)"\]/);
 });
 
+test("retired Tool routes nobody searches for answer an uncached, noindex 410", () => {
+  const middleware = source("../middleware.ts");
+  assert.match(middleware, /import goneToolRoutes from "\.\/lib\/gone-tool-routes\.generated\.js";/);
+  assert.match(middleware, /goneRoutes: GONE_ROUTES,/);
+  assert.match(middleware, /if \(decision\.type === "gone"\) return goneResponse\(decision\.robotsTag\);/);
+  assert.match(middleware, /status: 410,/);
+  assert.match(middleware, /"Cache-Control": "no-store",/);
+  assert.match(middleware, /"X-Robots-Tag": robotsTag,/);
+  // The list is written before every build and dev run, never from a stale copy.
+  for (const script of ["build", "dev"]) {
+    assert.match(packageJson.scripts[script], /^node scripts\/gone-tool-routes\.mjs && /, script);
+  }
+});
+
 test("vendored static HTML is never indexed", () => {
   assert.match(source("../public/_headers"), /\/vendor\/\*\n\s+X-Robots-Tag: noindex/);
 });
