@@ -18,6 +18,7 @@ import {
   wrapLine,
 } from "./text-image.ts";
 import { MAX_IMAGE_SIDE } from "./document-images.ts";
+import { threadCpuMs } from "./test-cpu-time.mjs";
 
 // 10 px a character: 80 characters a line.
 const measure = (text) => Array.from(text).length * 10;
@@ -87,9 +88,9 @@ test("a text of exactly the most lines an image holds isn't cut", () => {
 
 test("50,000 lines show what fits in 4096 px and say where they stop", () => {
   const text = Array.from({ length: 50_000 }, (_, index) => `line ${index + 1}`).join("\n");
-  const started = performance.now();
+  const started = threadCpuMs();
   const layout = layoutText(text, measure);
-  assert.ok(performance.now() - started < 1000);
+  assert.ok(threadCpuMs() - started < 1000, `took ${threadCpuMs() - started} ms`);
   assert.equal(layout.lines.length, MAX_TEXT_LINES - 1);
   assert.equal(layout.lines.at(-1).text, `line ${MAX_TEXT_LINES - 1}`);
   assert.deepEqual(layout.cutAt, { line: MAX_TEXT_LINES, partial: false });
@@ -105,9 +106,9 @@ test("50,000 lines show what fits in 4096 px and say where they stop", () => {
 });
 
 test("one line of 5 MB without a space is cut quickly, part way through", () => {
-  const started = performance.now();
+  const started = threadCpuMs();
   const layout = layoutText("z".repeat(5_000_000), measure);
-  assert.ok(performance.now() - started < 2000, `${performance.now() - started} ms`);
+  assert.ok(threadCpuMs() - started < 2000, `${threadCpuMs() - started} ms`);
   assert.equal(layout.lines.length, MAX_TEXT_LINES - 1);
   assert.deepEqual(layout.cutAt, { line: 1, partial: true });
   assert.match(layout.note, /^… cut part way through line 1 of 1:/);
@@ -119,9 +120,9 @@ test("a line of characters with no width is still cut, not dropped", () => {
 });
 
 test("tabs in a long line expand in one pass", () => {
-  const started = performance.now();
+  const started = threadCpuMs();
   const line = cleanLine("a\t".repeat(30_000));
-  assert.ok(performance.now() - started < 500, `${performance.now() - started} ms`);
+  assert.ok(threadCpuMs() - started < 500, `${threadCpuMs() - started} ms`);
   assert.equal(line.length, 120_000);
 });
 

@@ -28,6 +28,7 @@ import { MAX_CELL_CHARS, TABLE_CELLS, TABLE_CHARS, excelCellSize, writeExcelCell
 import { parseExcelCells } from "./table-data.ts";
 import { WORKBOOK_TIMEOUT_MS, readWorkbookInWorker, readWorkbookTextInWorker } from "./xlsx-workbook.ts";
 import { readWorkbookJob } from "./xlsx.worker.ts";
+import { threadCpuMs } from "./test-cpu-time.mjs";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
 
@@ -194,7 +195,7 @@ test("10,000 rows in three sheets read quickly; the image counts every row but k
     (_, index) =>
       `<row r="${index + 1}">${Array.from({ length: 8 }, (_, column) => `<c r="${String.fromCharCode(65 + column)}${index + 1}"><v>${index * 8 + column}</v></c>`).join("")}</row>`,
   ).join("");
-  const started = performance.now();
+  const started = threadCpuMs();
   const { sheets } = readWorkbookSheets(
     workbook([
       { name: "One", xml: worksheet(rows) },
@@ -202,7 +203,7 @@ test("10,000 rows in three sheets read quickly; the image counts every row but k
       { name: "Three", xml: worksheet(rows) },
     ]),
   );
-  assert.ok(performance.now() - started < 5000, `${performance.now() - started} ms`);
+  assert.ok(threadCpuMs() - started < 5000, `${threadCpuMs() - started} ms`);
   assert.equal(sheets.length, 3);
   const { table } = sheets[0];
   assert.equal(table.rows.length, 9_999);
@@ -248,7 +249,7 @@ test("old XLS files, broken files and parts bigger than the limit are refused", 
 test("row and cell numbers outside Excel's grid are left out, and can't keep the reader busy", () => {
   assert.deepEqual(cellPosition("XFD1048576"), { row: MAX_ROWS - 1, column: MAX_COLUMNS - 1 });
   for (const reference of ["XFE1", "ZZZ1", "A0", "A1048577", "A99999999999", "A" + "9".repeat(400)]) assert.equal(cellPosition(reference), null, reference);
-  const started = Date.now();
+  const started = threadCpuMs();
   for (const [row, label] of [
     ['<row r="Infinity"><c><v>2</v></c></row>', "Infinity"],
     ['<row r="200000000"><c r="A200000000"><v>2</v></c></row>', "200,000,000"],
@@ -276,7 +277,7 @@ test("row and cell numbers outside Excel's grid are left out, and can't keep the
     context,
   );
   assert.equal(columns.hiddenColumns.size, 5 + (MAX_COLUMNS - 6));
-  assert.ok(Date.now() - started < 5000, `${Date.now() - started} ms`);
+  assert.ok(threadCpuMs() - started < 5000, `${threadCpuMs() - started} ms`);
 });
 
 test("a number format that hides a cell's value hides it in the image too", () => {
@@ -392,9 +393,9 @@ test("read for a table converter, every row and column of each sheet is kept, as
     { name: "Hidden", xml: worksheet(rows), state: "hidden" },
     { name: "Wide", xml: worksheet(`<row r="1">${wide}</row><row r="2">${wide}</row>`) },
   ]);
-  const started = performance.now();
+  const started = threadCpuMs();
   const { sheets, hidden, tooLarge } = readWorkbookSheets(book, { table: TABLE });
-  assert.ok(performance.now() - started < 5000, `${performance.now() - started} ms`);
+  assert.ok(threadCpuMs() - started < 5000, `${threadCpuMs() - started} ms`);
   assert.deepEqual([sheets.map((sheet) => sheet.name), hidden, tooLarge], [["One", "Wide"], 1, []]);
   const { table } = sheets[0];
   // Row 5001 is hidden: 9,998 rows under the header, every one filled in.
@@ -494,7 +495,7 @@ test("a small file repeating one long string in every cell is refused before its
     // A few KB of ZIP that would be 100 MB (100 rows) or 600 MB (600 rows)
     // of sheet text: left out, named, and nothing built.
     assert.ok(book.byteLength < 20_000, `${book.byteLength} bytes`);
-    const started = performance.now();
+    const started = threadCpuMs();
     const table = readWorkbookJob({ bytes: book.slice(0), cells: true });
     assert.deepEqual(table, { ok: true, cells: true, hidden: 0, skipped: 0, tooLarge: ["S"], sheets: [] });
     // An image of it: refused with a message, not a reply too large to
@@ -504,7 +505,7 @@ test("a small file repeating one long string in every cell is refused before its
       ok: false,
       error: `This workbook can't be drawn here: each of its sheets with values has a cell longer than Excel allows (32,767 characters).`,
     });
-    assert.ok(performance.now() - started < 3000, `${performance.now() - started} ms`);
+    assert.ok(threadCpuMs() - started < 3000, `${threadCpuMs() - started} ms`);
   }
 });
 
