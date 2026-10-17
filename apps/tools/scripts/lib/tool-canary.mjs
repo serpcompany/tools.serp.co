@@ -31,6 +31,7 @@ export const CANARY_TOOLS = {
   "png-to-txt": "Tesseract OCR with its self-hosted assets",
   "jpg-to-docx": "image to Word document",
   "png-to-epub": "image to EPUB",
+  "pdf-to-epub": "a PDF's text read with pdf.js into a reflowable EPUB 3, opened and its XHTML parsed; a scan, a password and a damaged PDF refused",
   "compress-svg": "SVGO",
   "csv-to-json": "table converter page",
   "excel-to-csv": "table converter page with an XLSX upload, read by the XLSX reader in a worker, its cells as Excel shows them",
