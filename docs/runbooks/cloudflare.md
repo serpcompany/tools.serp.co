@@ -56,7 +56,9 @@ After a deploy, check the environment rules: robots, `X-Robots-Tag`, and GTM
 and AdSense present only in production (the check assumes AdSense test mode is
 off). It also checks that the sitemap index lists only the canonical
 `/sitemap-<group>.xml` files, that the homepage entry has no slash, and that
-`/sitemap.xml` and retired sitemap names 308 into the tree. Add `--platform-url` with the Worker's
+`/sitemap.xml` and retired sitemap names 308 into the tree, and that the first
+numbered category page in `sitemap-categories.xml` answers 200, canonical to
+itself. Add `--platform-url` with the Worker's
 `*.workers.dev` URL to check the redirect too; it retries for 30 s while the
 new version rolls out.
 

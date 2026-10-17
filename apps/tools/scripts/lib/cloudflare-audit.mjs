@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { OPERATIONS } from "../../lib/catalog/operations.ts";
+import { getCategoryPaths as sitemapCategoryPaths } from "../../lib/sitemap.ts";
 
 export const scriptsRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const appRoot = path.resolve(scriptsRoot, "..");
@@ -93,16 +93,16 @@ export function getOperationCounts(tools = getActiveTools()) {
   return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a.localeCompare(b)));
 }
 
+// Every page of every category with an active Tool, numbered pages included:
+// the categories sitemap's list (lib/sitemap.ts), so the URLs have one source.
 export function getCategoryPaths(tools = getActiveTools()) {
-  const operations = new Set();
-  for (const tool of tools) {
-    if (OPERATIONS.includes(tool.operation)) {
-      operations.add(tool.operation);
-    }
-  }
-  return OPERATIONS.filter((operation) => operations.has(operation)).map(
-    (operation) => `/category/${operation}/`,
-  );
+  return sitemapCategoryPaths(tools);
+}
+
+// The first numbered category page (/category/{operation}/{n}/), or undefined
+// when no category has a second page.
+export function firstNumberedCategoryPath(tools = getActiveTools()) {
+  return getCategoryPaths(tools).find((pathname) => /\/\d+\/$/.test(pathname));
 }
 
 function addRoute(routes, pathValue, source, metadata = {}) {
