@@ -64,14 +64,47 @@ export function isInternalPath(pathname: string) {
   );
 }
 
+// A retired Tool's 410 is noindex in production too. It needs no nofollow:
+// its one link goes to the homepage.
+export const GONE_ROBOTS_TAG = "noindex";
+
+// The body of a 410: a short page with no scripts or styles from the build,
+// so it never depends on a page render.
+export const GONE_PAGE_HTML = [
+  "<!doctype html>",
+  '<html lang="en">',
+  "<head>",
+  '<meta charset="utf-8">',
+  '<meta name="viewport" content="width=device-width, initial-scale=1">',
+  '<meta name="robots" content="noindex">',
+  "<title>This tool was removed | SERP Tools</title>",
+  "</head>",
+  '<body style="font-family: system-ui, sans-serif; max-width: 40rem; margin: 4rem auto; padding: 0 1rem; line-height: 1.5">',
+  "<h1>This tool was removed</h1>",
+  "<p>This tool is no longer available. Every tool we still offer is on the homepage.</p>",
+  '<p><a href="/">Browse all tools</a></p>',
+  "</body>",
+  "</html>",
+  "",
+].join("\n");
+
 export type MiddlewareDecision =
   | { type: "redirect"; location: string }
+  | { type: "gone"; robotsTag: string }
   | { type: "continue"; requireDashboardAuth: boolean; noindex: boolean };
 
+type MiddlewareArgs = CanonicalRedirectArgs & {
+  // Canonical (slashed) paths that answer 410 Gone: the retired Tool routes
+  // nobody searches for (lib/gone-tool-routes.generated.js, issue #322).
+  goneRoutes: ReadonlySet<string>;
+};
+
 // Everything middleware.ts decides, as a pure function: redirect first (so a
-// platform host never prompts for the dashboard password), then whether the
-// path needs dashboard auth and whether the response must be noindex.
-export function decideMiddleware(args: CanonicalRedirectArgs): MiddlewareDecision {
+// platform host never prompts for the dashboard password), then 410 for a
+// gone route, then whether the path needs dashboard auth and whether the
+// response must be noindex. A gone route is matched only in its canonical
+// spelling, so a slashless or legacy spelling still takes its 308 first.
+export function decideMiddleware(args: MiddlewareArgs): MiddlewareDecision {
   const location = getCanonicalRedirectUrl(args);
   if (location) return { type: "redirect", location };
 
@@ -79,6 +112,13 @@ export function decideMiddleware(args: CanonicalRedirectArgs): MiddlewareDecisio
   const path = canonicalPath(url.pathname);
   if (path !== url.pathname) {
     return { type: "redirect", location: `${url.origin}${path}${url.search}` };
+  }
+
+  if (args.goneRoutes.has(path)) {
+    return {
+      type: "gone",
+      robotsTag: isProductionSite(args.siteEnv) ? GONE_ROBOTS_TAG : NOINDEX_ROBOTS_TAG,
+    };
   }
 
   return {
