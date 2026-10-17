@@ -21,7 +21,8 @@ that can't be made locally stays `missing`, with the reason in `notes`, until
 the owner approves an outside sample. Download an approved one into its own
 empty directory, read it back there, and record its source URL and licence in
 `notes`. A Tool whose output is text (a table
-converter, or any Tool to TXT) also needs its fixture's data in `TEXT_MARKERS`
+converter, any Tool to TXT, or PDF to HTML and EPUB, whose engine writes the
+input's text) also needs its fixture's data in `TEXT_MARKERS`
 in `scripts/lib/tool-sweep.mjs`, or the sweep reports it as `no_fixture`; a
 fixture can list several strings, and each must be in the output. Text a
 fixture hides (`sample-sheets.xlsx`'s hidden sheet, row and column), listed in
@@ -33,7 +34,9 @@ Tools' image outputs as blank; a photo or drawing needs nothing.
 listed video, PDF and AI by hash, so a replaced one fails until it's read back
 again. An input a format's Tools must refuse (a .bin that isn't a picture, a
 copy-protected M4P) is listed in that format's `refusals`, with the telemetry
-code and words of its message in `EXPECTED_REFUSALS` there. The
+code and words of its message in `EXPECTED_REFUSALS` there. One only some of
+its Tools refuse (a scanned PDF, which PDF to PNG converts and PDF to TXT
+can't) is listed in each of those Tools' `toolFixtures` entry instead. The
 table converter page picks its input format from the file's extension, so a
 table fixture needs one the page maps to its format: a `.sql` file switches a
 MySQL page to SQL, so the MySQL fixture is a `.txt`.
@@ -70,7 +73,11 @@ aren't decoded; a raster SVG is checked through the image it wraps. A table
 converter's Excel, PDF, Avro or Protobuf file is opened in Node the way an app
 would (fflate, pdf.js, avsc, protobufjs with the `.proto` saved beside the
 `.pb`) and must hold the fixture's data; its pass records `formatCheck:
-"decoded"`. Its PNG and JPEG are checked as images. SVG to TTF's font is
+"decoded"`. Its PNG and JPEG are checked as images. An EPUB is opened as a reader would
+(fflate and a strict sax parse: `mimetype` first and stored, every file its
+package lists, a navigation document, well-formed XHTML), and so is a text
+engine's HTML (its body text), and must hold the fixture's markers in its
+spine's or body's text, also recorded as `"decoded"`. SVG to TTF's font is
 opened with opentype.js and must have a glyph with an outline on U+E000, also
 recorded as `"decoded"`, and its page's worker must answer: the sweep watches
 the Web Workers a page starts, since a fallback that still makes a font would

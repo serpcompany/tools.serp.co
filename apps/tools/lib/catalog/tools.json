@@ -92652,6 +92652,181 @@
     ]
   },
   {
+    "id": "pdf-to-epub",
+    "name": "PDF to EPUB",
+    "description": "Convert PDF to an EPUB e-book",
+    "operation": "convert",
+    "route": "/pdf-to-epub",
+    "from": "pdf",
+    "to": "epub",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "epub",
+      "ebook",
+      "convert",
+      "document"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to EPUB",
+        "subtitle": "Convert a PDF to an EPUB e-book in your browser, with no upload. Its text reflows to fit any e-reader screen; layout, tables and images aren't kept.",
+        "from": "pdf",
+        "to": "epub",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to EPUB",
+        "intro": "The PDF's text is read in your browser and written as a reflowable EPUB 3 e-book named after your PDF.",
+        "steps": [
+          "Upload your PDF.",
+          "We read the text of each page in order and write it as paragraphs, one part of the book for each page.",
+          "Download the EPUB and open it in Apple Books, Kobo, Google Play Books or Calibre, or send it to your Kindle with Send to Kindle."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "What does the EPUB keep from my PDF?",
+          "answer": "Its words, in paragraphs that reflow to fit the screen and the text size you pick. Each page of the PDF becomes one part of the book, listed as Page 1, Page 2 and so on in its table of contents, and the book is titled with your file's name. Fonts, layout, columns, tables and images aren't kept."
+        },
+        {
+          "question": "Why is the text reflowed instead of keeping each page as it looks?",
+          "answer": "An e-reader's screen is smaller than a printed page, so a page kept as it looks has to be zoomed and scrolled. Reflowed text fills the screen at any size, the way e-books are meant to be read. A PDF whose look matters, such as a magazine or a comic, is better read as a PDF."
+        },
+        {
+          "question": "Why does my PDF say it has no text to extract?",
+          "answer": "Its pages are pictures, as a scanned book's are, so there are no letters to read, only pixels. Getting words out of a picture needs OCR (optical character recognition), which this converter doesn't do. If only some pages are pictures, the others are converted and the page names the ones with no text."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one (for example, print it to PDF), and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 2,000 pages and 20 million characters of text. A PDF that takes more than two minutes to read is stopped. A larger PDF is refused with a message saying which limit it passed."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. The e-book is made in your browser, and your PDF never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and EPUB",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look: its text, fonts, pictures and layout. Most PDFs made from a document hold their text as text; a scanned PDF holds pictures of pages."
+        },
+        "toFormat": {
+          "name": "EPUB",
+          "fullName": "Electronic Publication",
+          "description": "EPUB is the open e-book format: web pages and a table of contents in one file. Its text reflows to fit the screen and the reader's text size, unlike a PDF's fixed pages."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to TXT",
+          "toolId": "pdf-to-txt"
+        },
+        {
+          "title": "PDF to HTML",
+          "toolId": "pdf-to-html"
+        },
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        }
+      ]
+    }
+  },
+  {
+    "id": "pdf-to-html",
+    "name": "PDF to HTML",
+    "description": "Convert PDF to an HTML page",
+    "operation": "convert",
+    "route": "/pdf-to-html",
+    "from": "pdf",
+    "to": "html",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "html",
+      "convert",
+      "document"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to HTML",
+        "subtitle": "Convert a PDF to an HTML page in your browser, with no upload. Each page's text becomes a section of paragraphs; layout, tables and images aren't kept.",
+        "from": "pdf",
+        "to": "html",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to HTML",
+        "intro": "The PDF's text is read in your browser and written as one HTML file named after your PDF.",
+        "steps": [
+          "Upload your PDF.",
+          "We read the text of each page in order and write it as paragraphs, in a section for each page.",
+          "Download the HTML file and open it in a browser, or edit it in any text or web editor."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "What does the HTML keep from my PDF?",
+          "answer": "Its words, in paragraphs, with a section for each page in order. The lines of a paragraph are joined, so the text rewraps to fit the window. Fonts, layout, columns, tables, images and links aren't kept: it is the PDF's text as a plain web page, not a copy of how its pages look."
+        },
+        {
+          "question": "Is the HTML file safe to open?",
+          "answer": "Yes. The PDF's text is written as text, so anything in it that looks like HTML shows as characters rather than becoming part of the page, and the page loads and runs nothing."
+        },
+        {
+          "question": "Why does my PDF say it has no text to extract?",
+          "answer": "Its pages are pictures, as a scanned document's are, so there are no letters to read, only pixels. Getting words out of a picture needs OCR (optical character recognition), which this converter doesn't do. If only some pages are pictures, the others are converted and the page names the ones with no text."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one (for example, print it to PDF), and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 2,000 pages and 20 million characters of text. A PDF that takes more than two minutes to read is stopped. A larger PDF is refused with a message saying which limit it passed."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. The HTML is written in your browser, and your PDF never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and HTML",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look: its text, fonts, pictures and layout. Most PDFs made from a document hold their text as text; a scanned PDF holds pictures of pages."
+        },
+        "toFormat": {
+          "name": "HTML",
+          "fullName": "HyperText Markup Language",
+          "description": "HTML is the language of web pages. Its text wraps to fit any window, and every browser opens it, on any device."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to TXT",
+          "toolId": "pdf-to-txt"
+        },
+        {
+          "title": "PDF to EPUB",
+          "toolId": "pdf-to-epub"
+        },
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        }
+      ]
+    }
+  },
+  {
     "id": "pdf-to-jpg",
     "name": "PDF to JPG",
     "description": "Convert PDF pages to JPG images",
@@ -92862,6 +93037,94 @@
           "description": "Best practices for converting PDFs to images for web use.",
           "href": "#",
           "category": "WEB DEVELOPMENT"
+        }
+      ]
+    }
+  },
+  {
+    "id": "pdf-to-txt",
+    "name": "PDF to TXT",
+    "description": "Convert PDF to text (TXT)",
+    "operation": "convert",
+    "route": "/pdf-to-txt",
+    "from": "pdf",
+    "to": "txt",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "txt",
+      "text",
+      "convert",
+      "document"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to TXT: Convert PDF to Text",
+        "subtitle": "Convert PDF to text in your browser, with no upload. The words of every page are saved as a plain TXT file; layout, tables and images aren't kept.",
+        "from": "pdf",
+        "to": "txt",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to text",
+        "intro": "The PDF's text is read in your browser and saved as a UTF-8 TXT file named after your PDF.",
+        "steps": [
+          "Upload your PDF.",
+          "We read the text of each page in order, line by line, with a blank line between paragraphs and between pages.",
+          "Download the TXT file, which opens in any text editor."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "What does the TXT file keep from my PDF?",
+          "answer": "Its words, page by page in the order the PDF stores them, which is usually the order you read them. Each line of the PDF stays a line, and a blank line separates paragraphs and pages. Fonts, layout, columns, tables and images aren't kept: a table's cells come out as lines of text."
+        },
+        {
+          "question": "Why does my PDF say it has no text to extract?",
+          "answer": "Its pages are pictures, as a scanned document's are, so there are no letters to read, only pixels. Getting words out of a picture needs OCR (optical character recognition), which this converter doesn't do. If only some pages are pictures, the others are converted and the page names the ones with no text."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one (for example, print it to PDF), and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How are columns handled?",
+          "answer": "Text comes out in the order the PDF stores it. Most PDFs store one column after another, so each column's text stays together, but some store a row across all the columns at once, and then lines from neighbouring columns are mixed."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 2,000 pages and 20 million characters of text. A PDF that takes more than two minutes to read is stopped. A larger PDF is refused with a message saying which limit it passed."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. The text is read in your browser, and your PDF never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and plain text",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look: its text, fonts, pictures and layout. Most PDFs made from a document hold their text as text; a scanned PDF holds pictures of pages."
+        },
+        "toFormat": {
+          "name": "TXT",
+          "fullName": "Plain text",
+          "description": "A TXT file holds text and nothing else: no fonts, layout or pictures. Every computer and phone opens it, and its text is easy to search, copy and edit."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to HTML",
+          "toolId": "pdf-to-html"
+        },
+        {
+          "title": "PDF to EPUB",
+          "toolId": "pdf-to-epub"
+        },
+        {
+          "title": "PNG to TXT (text from a picture)",
+          "toolId": "png-to-txt"
         }
       ]
     }

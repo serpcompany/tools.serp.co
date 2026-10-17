@@ -1121,6 +1121,36 @@
       "input": "file",
       "fixture": "fixtures/sample-icon.svg",
       "notes": "A one-colour house icon written as plain text, the multi-shape icon SVG to TTF makes a font of: a polygon roof, an even-odd body with a window hole and a door notch, a chimney placed by a transform, all filled from their group, on a viewBox offset to -2 -2 (28 x 28) with a width and height of 96. Read back with xmllint (well-formed) and rsvg-convert (a blue house with the window and door open). The sweep opens the font with opentype.js and needs an outlined glyph on U+E000 (decodeFontOutput)."
+    },
+    "pdf-to-txt": {
+      "input": "file",
+      "fixture": "fixtures/sample-text.pdf",
+      "refusals": [
+        "fixtures/sample-scan.pdf",
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "Two US Letter pages of text written by benchmarks/make-pdf-fixtures.mjs with jsPDF 4.2.1 (Helvetica, not embedded): an 18 pt heading and two 12 pt paragraphs on page 1, the second line \"Salt & pepper <b>not bold</b> stays as text, not markup.\", and a two-line paragraph opening \"Bravo\" on page 2. Read back with file (PDF document, version 1.3, 2 pages) and macOS PDFKit (each page's text, line by line). Refusals, written by the same script: sample-scan.pdf, a page that is only sample-text.png as a picture (PDFKit: no text); sample-protected.pdf, a page of text behind the user password \"fixture\" (RC4, PDFKit: encrypted and locked, its text read once unlocked); and sample-truncated.pdf, the first half of sample-text.pdf's bytes (PDFKit can't open it). lib/convert/pdf-text.test.mjs checks the script still writes these bytes."
+    },
+    "pdf-to-html": {
+      "input": "file",
+      "fixture": "fixtures/sample-text.pdf",
+      "refusals": [
+        "fixtures/sample-scan.pdf",
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-txt uses; see its notes."
+    },
+    "pdf-to-epub": {
+      "input": "file",
+      "fixture": "fixtures/sample-text.pdf",
+      "refusals": [
+        "fixtures/sample-scan.pdf",
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-txt uses; see its notes."
     }
   }
 }

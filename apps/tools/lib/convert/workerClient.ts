@@ -31,6 +31,7 @@ import { encodeFromRGBA } from "./encode.ts";
 import { copyProtectedMessage, isCopyProtected } from "./fairplay.ts";
 import { MAGICK_BROWSER_INPUTS, MAGICK_FALLBACK_INPUTS } from "./magickBrowser.ts";
 import { checkOutputFormat } from "./output-format.ts";
+import { isPdfTextConversion, PDF_TEXT_REFUSALS } from "./pdf-text-targets.ts";
 import { usesWebCodecs } from "./webcodecs.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
@@ -293,6 +294,9 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
   if (fromExt === "heic" || fromExt === "heif") {
     return convertRasterOnMainThread(args);
   }
+  if (isPdfTextConversion(fromExt, toExt)) {
+    return convertPdfToText(toExt, args);
+  }
   if (fromExt === "pdf") {
     const { renderPdfPages } = await import("./pdf");
     const buffers = await renderPdfPages(args.buf, undefined, args.to);
@@ -468,6 +472,49 @@ async function convertSvgToFont(args: ConvertArgs): Promise<ConversionResult> {
     );
     failure.cause = error;
     throw failure;
+  }
+}
+
+// A pdf.js error's own name (UnknownErrorException, when its worker failed),
+// kept as the telemetry code, or convert_failed for an error without one.
+function engineErrorCode(error: unknown): string {
+  const name = (error as { name?: unknown } | null)?.name;
+  return typeof name === "string" && name !== "Error" && /^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(name)
+    ? name
+    : "convert_failed";
+}
+
+// What PDF to TXT, HTML or EPUB tells the visitor and telemetry when the
+// PDF's text wasn't converted: a file that is damaged or not a PDF,
+// password-protected, has no text, or is too large or slow to read is told
+// so (pdf-text.ts); any other failure gets a plain "try again", and
+// telemetry keeps pdf.js's error name as its code. The error stays the
+// telemetry error's cause.
+export function pdfTextFailure(error: unknown, to: string): Error {
+  const code = (error as { code?: unknown } | null)?.code;
+  const refused = typeof code === "string" && PDF_TEXT_REFUSALS.has(code) && error instanceof Error;
+  const failure = createTelemetryError(
+    refused ? code : engineErrorCode(error),
+    refused ? error.message : `This PDF couldn't be converted to ${to.toUpperCase()}. Try again, or reload the page.`,
+    { from: "pdf", to, engine: "pdfjs-text" },
+  );
+  failure.cause = error;
+  return failure;
+}
+
+// PDF to TXT, HTML or EPUB (pdf-text.ts): the PDF's text, titled after the
+// file, with a notice naming pages that have none.
+async function convertPdfToText(to: string, args: ConvertArgs): Promise<ConversionResult> {
+  args.onProgress?.({ status: "processing", progress: 5 });
+  try {
+    const { convertPdfText } = await import("./pdf-text.ts");
+    const { buffer, notice } = await convertPdfText(args.buf, to, args.fileName ?? "document.pdf", {
+      onProgress: (share) => args.onProgress?.({ status: "processing", progress: 5 + Math.round(share * 90) }),
+    });
+    args.onProgress?.({ status: "processing", progress: 100 });
+    return { kind: "single", buffer, notice };
+  } catch (error) {
+    throw pdfTextFailure(error, to);
   }
 }
 
