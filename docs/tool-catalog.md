@@ -108,6 +108,27 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   it with the next Lander by clicks that isn't for an adult site. Every other
   Lander is on the Downloaders category pages.
 
+## Titles, descriptions and share images
+
+`lib/metadata.ts` builds the Tool, category, `/categories/` and `/brands/`
+pages' metadata, and `lib/table-convert.ts` the table converters'. Both use
+`lib/page-metadata.ts`, which also holds the homepage's and the root layout's
+and reads no registry. A page sets only its own title: the layout's template
+adds " | SERP Tools". The homepage sets its full title, and keeps its
+slashless canonical and `og:url` in `app/page.tsx`.
+
+- A description is at most 160 characters. It starts with the curated
+  subtitle or the registry description, cut at a sentence, then adds true
+  facts while it is under 120: whether the converter page keeps the file in
+  the browser (not for the server-first conversions in `lib/capabilities.ts`,
+  PDF compression or a Tool in `TOOLS_WITH_OWN_PAGE`), "free, with no
+  sign-up", and what to do on the page. Placeholders say they are coming soon.
+- Each page family has a 1200x630 share image (`og:image`, `twitter:image`)
+  under `public/og/`, listed in `lib/share-images.ts`. After changing that
+  list, run `pnpm -C apps/tools share-images` and commit the PNGs.
+- `lib/metadata.test.mjs` checks the lengths, that no two pages share a
+  description, the images, and where the browser claim appears.
+
 ## Adding a Tool
 
 1. Add or update the registry entry with a stable Tool id, route, operation,
