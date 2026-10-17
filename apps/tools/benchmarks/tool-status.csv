@@ -2657,10 +2657,10 @@ pdf-reader-windows,live,view,pdf,pdf,unknown,,skipped,"PDF viewer or editor: int
 ,not built,convert,pdf,docx,,,,,,pdf to docx,none,,,186000,23000,35,85000,31000,ahrefs-2026-01,,
 ,not built,convert,pdf,dotx,,,,,,pdf to dotx,none,,,20,,,,,ahrefs-2026-01,,
 ,not built,convert,pdf,eps,,,,,,pdf to eps,none,,,4900,600,0,2600,700,ahrefs-2026-01,,
-pdf-to-epub,live,convert,pdf,epub,client-only,pdfjs-text,pass,"format check: decoded; refuses sample-scan.pdf, sample-protected.pdf, sample-truncated.pdf",8dac26423f8f,pdf to epub,exact,,,91000,12000,17,53000,8200,ahrefs-2026-01,,
+pdf-to-epub,live,convert,pdf,epub,client-only,pdfjs-text,pass,"format check: decoded; refuses sample-scan.pdf, sample-protected.pdf, sample-truncated.pdf",c7ae017ebe84,pdf to epub,exact,,,91000,12000,17,53000,8200,ahrefs-2026-01,,
 ,not built,convert,pdf,gif,,,,,,pdf to gif,none,,,2300,400,7,900,350,ahrefs-2026-01,,
 ,not built,convert,pdf,heic,,,,,,pdf to heic,none,,,600,200,0,150,100,ahrefs-2026-01,,
-pdf-to-html,live,convert,pdf,html,client-only,pdfjs-text,pass,"format check: decoded; refuses sample-scan.pdf, sample-protected.pdf, sample-truncated.pdf",8dac26423f8f,pdf to html,exact,,,23000,2900,17,18000,2800,ahrefs-2026-01,,
+pdf-to-html,live,convert,pdf,html,client-only,pdfjs-text,pass,"format check: decoded; refuses sample-scan.pdf, sample-protected.pdf, sample-truncated.pdf",c7ae017ebe84,pdf to html,exact,,,23000,2900,17,18000,2800,ahrefs-2026-01,,
 ,alias page,convert,pdf,jpeg,,,,,,pdf to jpeg,alias,pdf-to-jpg,,531000,35000,68,6240000,297000,ahrefs-2026-01,,
 pdf-to-jpg,live,convert,pdf,jpg,client-only,pdfjs,pass,format check: signature,8dac26423f8f,,,,,,,,,,,pdf to jpeg,531000
 ,not built,convert,pdf,mobi,,,,,,pdf to mobi,none,,,21000,2200,6,8900,1700,ahrefs-2026-01,,
@@ -2680,7 +2680,7 @@ pdf-to-png,live,convert,pdf,png,client-only,pdfjs,pass,format check: signature,8
 ,not built,convert,pdf,tga,,,,,,pdf to tga,none,,,20,10,,,,ahrefs-2026-01,,
 ,not built,convert,pdf,tif,,,,,,pdf to tif,none,,,1900,150,2,10000,1500,ahrefs-2026-01,,
 ,not built,convert,pdf,tiff,,,,,,pdf to tiff,none,,,21000,1600,1,10000,1500,ahrefs-2026-01,,
-pdf-to-txt,live,convert,pdf,txt,client-only,pdfjs-text,pass,"format check: content; refuses sample-scan.pdf, sample-protected.pdf, sample-truncated.pdf",8dac26423f8f,pdf to txt,exact,,,18000,3600,9,11000,2300,ahrefs-2026-01,pdf to text,77000
+pdf-to-txt,live,convert,pdf,txt,client-only,pdfjs-text,pass,"format check: content; refuses sample-scan.pdf, sample-protected.pdf, sample-truncated.pdf",c7ae017ebe84,pdf to txt,exact,,,18000,3600,9,11000,2300,ahrefs-2026-01,pdf to text,77000
 ,not built,convert,pdf,webp,,,,,,pdf to webp,none,,,3000,250,0,600,100,ahrefs-2026-01,,
 ,not built,convert,pdf,xbm,,,,,,pdf to xbm,none,,,,,,,,ahrefs-2026-01,,
 ,not built,convert,pdf,xlsx,,,,,,pdf to xlsx,none,,,11000,1100,75,140000,46000,ahrefs-2026-01,,
