@@ -38,6 +38,11 @@ const STEP_TIMEOUT_MS = 90_000;
 // reported.
 const STEP_ATTEMPTS = 2;
 const TELEMETRY_TIMEOUT_MS = 10_000;
+// The homepage's HTML ceiling: #317's 500 KB target, a quarter of the 2 MB
+// Googlebot reads and about 4x the homepage's 122 KB today. Inlining the Tool
+// index again (385 KB of JSON, more once escaped into the flight data) goes
+// past it.
+const HOME_HTML_MAX_BYTES = 500_000;
 // A desktop Chrome visitor: not on Next's list of HTML-limited bots.
 const CHROME_USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
@@ -211,11 +216,21 @@ async function expectCompletedRun(page, telemetryStatuses, toolId) {
 }
 
 // The homepage shows a few Tools per category with a link to each category's
-// pages, and the curated Downloaders in the file's order; its search fetches
-// /tool-index.json and finds Tools the page doesn't show.
-await step("home page links every category and the curated Downloaders, and its search finds a Tool", async (page) => {
+// pages, and the curated Downloaders in the file's order. Its HTML stays under
+// HOME_HTML_MAX_BYTES, and only its search fetches /tool-index.json, which
+// finds Tools the page doesn't show.
+await step("home page links every category and the curated Downloaders, and only its search fetches the Tool index", async (page) => {
+  let indexRequests = 0;
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === "/tool-index.json") indexRequests += 1;
+  });
   const response = await page.goto(`${args.baseUrl}/`);
   assert(response?.status() === 200, `status ${response?.status()}`);
+  const htmlBytes = (await response.body()).length;
+  assert(
+    htmlBytes <= HOME_HTML_MAX_BYTES,
+    `the homepage HTML is ${htmlBytes} B, over ${HOME_HTML_MAX_BYTES} B`,
+  );
   const operations = new Set(tools.filter((tool) => tool.isActive).map((tool) => tool.operation));
   for (const operation of operations) {
     const link = page.locator(`section[aria-labelledby="home-${operation}"] a[href="/category/${operation}/"]`);
@@ -229,6 +244,7 @@ await step("home page links every category and the curated Downloaders, and its 
     JSON.stringify(downloaders) === JSON.stringify(curated),
     `Downloaders ${downloaders.join(", ")}, expected ${curated.join(", ")}`,
   );
+  assert(indexRequests === 0, `/tool-index.json was requested ${indexRequests} times before a search`);
   const search = page.getByPlaceholder("Search tools...");
   await search.fill(toolName("png-to-jpg"));
   await page
@@ -236,6 +252,7 @@ await step("home page links every category and the curated Downloaders, and its 
     .getByRole("link", { name: toolName("png-to-jpg") })
     .first()
     .waitFor();
+  assert(indexRequests === 1, `/tool-index.json was requested ${indexRequests} times by one search`);
 });
 
 await step("png-to-jpg converts a PNG into a real JPEG", async (page, telemetryStatuses) => {

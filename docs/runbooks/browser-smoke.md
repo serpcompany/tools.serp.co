@@ -15,7 +15,9 @@ against a running Worker. CI runs it in two places:
 
 - The home page links each category's pages from its section, shows the
   curated Downloaders (`lib/catalog/homepage-downloaders.json`) in order, and
-  its search finds PNG to JPG, which the page itself doesn't show.
+  its search finds PNG to JPG, which the page itself doesn't show. Its HTML is
+  at most 500 KB, and it requests `/tool-index.json` only once the search is
+  used, so the full Tool index can't be inlined into the page again unnoticed.
 - PNG to JPG converts the sample PNG, and the download is a `.jpg` whose bytes
   start with the JPEG signature.
 - HTML to Markdown converts pasted HTML.

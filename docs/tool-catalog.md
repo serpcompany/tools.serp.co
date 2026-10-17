@@ -25,7 +25,12 @@ operation holds one "coming soon" placeholder Tool. Category pages use
 categories. A category lists its Tools 120 to a page in registry order
 (`lib/catalog/category-pages.ts`): page 1 is `/category/{operation}/`, page
 `n` from 2 is `/category/{operation}/{n}/`, `/1/` redirects (308) to page 1,
-and a number past the last page is a 404. Every page links every other, so
+and a number past the last page is a 404. Registry order is `tools.json`'s,
+which is kept in id order, so a new Tool goes in at its id's place, not at the
+end. A Tool added or retired moves every later Tool by one place: pages before
+it don't change, and one Tool crosses each later page boundary. #328's three
+PDF Tools, for example, moved the last three Tools of converter pages 15 to 18
+to the next page. Every page links every other, so
 each Tool is three clicks from the homepage. Category routes keep dynamic
 parameters enabled for OpenNext compatibility, validate the operation, and
 return `notFound()` for invalid or empty categories.

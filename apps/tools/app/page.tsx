@@ -53,6 +53,7 @@ export default function HomePage() {
                 </h2>
                 <Link
                   href={section.href}
+                  prefetch={false}
                   className="text-sm font-medium text-blue-700 hover:text-blue-800 hover:underline"
                 >
                   {section.count > section.tools.length

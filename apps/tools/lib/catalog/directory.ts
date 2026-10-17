@@ -175,6 +175,8 @@ export function directoryCategories(): readonly ToolDirectoryCategory[] {
 
 // Page `page` of a category's cards, CATEGORY_PAGE_SIZE to a page in registry
 // order, or undefined when the category has no active Tool or no such page.
+// tools.json is kept in id order, so a Tool added or retired moves one Tool
+// across each later page boundary (docs/tool-catalog.md).
 export function categoryPage(operation: string, page: number): CategoryPage | undefined {
   const category = directoryCategories().find((candidate) => candidate.id === operation);
   if (!category || !Number.isInteger(page)) return undefined;
