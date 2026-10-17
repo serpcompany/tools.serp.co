@@ -22,18 +22,19 @@ type PdfjsModule = {
   getDocument: (options: { data: ArrayBuffer }) => { promise: Promise<PdfjsDocument> };
 };
 
-let pdfjsPromise: Promise<PdfjsModule> | null = null;
+let pdfjsPromise: Promise<unknown> | null = null;
 
-async function getPdfjs() {
+// pdf.js, self-hosted under /vendor/pdfjs/, with its worker's URL set. The
+// caller types the part of the module it uses (pdf-text.ts reads text).
+export async function loadPdfjs<Module = PdfjsModule>(): Promise<Module> {
   if (!pdfjsPromise) {
-    pdfjsPromise = import(/* webpackIgnore: true */ "/vendor/pdfjs/pdf.min.mjs")
-      .then((mod) => mod as unknown as PdfjsModule)
-      .catch(async () => {
-        const mod = await import("pdfjs-dist/legacy/build/pdf");
-        return mod as unknown as PdfjsModule;
-      });
+    pdfjsPromise = import(/* webpackIgnore: true */ "/vendor/pdfjs/pdf.min.mjs").catch(
+      () => import("pdfjs-dist/legacy/build/pdf"),
+    );
   }
-  return pdfjsPromise;
+  const pdfjsLib = (await pdfjsPromise) as PdfjsModule;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerPublicUrl;
+  return pdfjsLib as unknown as Module;
 }
 
 // Safari's canvas area limit, the smallest of the browsers': a larger canvas
@@ -52,8 +53,7 @@ export function pageRenderScale(width: number, height: number) {
 }
 
 export async function renderPdfPages(buf: ArrayBuffer, page?: number, format?: string) {
-  const pdfjsLib = await getPdfjs();
-  pdfjsLib.GlobalWorkerOptions.workerSrc = workerPublicUrl;
+  const pdfjsLib = await loadPdfjs();
   const doc = await pdfjsLib.getDocument({ data: buf }).promise;
   const out: Array<ArrayBuffer> = [];
   const pages = page ? [page] : Array.from({ length: doc.numPages }, (_, i) => i + 1);

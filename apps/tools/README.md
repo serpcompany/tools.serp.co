@@ -25,7 +25,8 @@ text, graphs, workbooks and slides drawn as images, and the inputs that can't
 be.
 [docs/table-converters.md](../../docs/table-converters.md) covers the table
 converter pages: the files they write, how downloads are named, and Excel
-input.
+input. [docs/pdf-text.md](../../docs/pdf-text.md) covers PDF to TXT, HTML and
+EPUB: how the text is read, the files written, and the PDFs refused.
 
 **Downloader Landers.** [docs/downloader-landers.md](../../docs/downloader-landers.md)
 covers the shared downloader template and rate limit, why downloads use this

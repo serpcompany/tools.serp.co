@@ -82,6 +82,9 @@ Conversion picks an engine by input format:
   size in points but never more than 4096x4096 pixels, Safari's canvas limit.
   Targets other than PNG and JPEG are encoded from that render. AI to PDF
   saves the PDF a PDF-compatible AI file already is, vectors included.
+- **PDF to TXT, HTML and EPUB** (`lib/convert/pdf-text.ts`, since #282): pdf.js
+  reads each page's text instead, rebuilt into lines and paragraphs;
+  [pdf-text.md](pdf-text.md) says how, what is lost, and when a PDF is refused.
 - **Images into documents** (`lib/convert/image-documents.ts`): SVG to HTML
   wraps the drawing in a standalone page; SVG to AI draws it as vectors into a
   PDF page of the drawing's size, one SVG unit to a point as in Illustrator,
