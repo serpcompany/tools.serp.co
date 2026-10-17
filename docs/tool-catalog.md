@@ -94,6 +94,15 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   those links the other 87, so one of them on a list reaches them all.
 - `packages/app-core/src/data/related-apps.json` owns Related App entries;
   matching uses a Tool's input and output formats and de-duplicates by app id.
+- Tool pages and Landers (`ToolPageTemplate`, `DownloaderPageTemplate`) carry
+  one `<script type="application/ld+json">` from `lib/structured-data.ts`: a
+  free `WebApplication` (the page's H1 and subtitle, its canonical URL). It
+  has no `Review`, `AggregateRating`, `FAQPage` or `HowTo` markup: Lander
+  reviews have no verifiable source, FAQ rich results are limited to
+  government and health sites, and HowTo rich results are retired. It has no
+  `BreadcrumbList` either, because no page shows a breadcrumb trail. Tool
+  pages outside the two templates (table converters, transcription, PDF and
+  others) have none yet; #337 tracks them.
 - The shared site footer is mounted by
   `packages/app-core/src/components/app-layout.tsx`. Do not add a second page
   footer without an intentional product-specific reason.
@@ -150,12 +159,22 @@ slashless canonical and `og:url` in `app/page.tsx`.
 
 ## Retiring a Tool
 
-1. Set `isActive: false` on its registry entry. A page served by the shared
-   `[tool]` route then 404s and leaves the sitemap. The entry stays as the
-   record of the retirement. A page that renders without checking the catalog
-   (the table converters' `TableConvertLanding`) keeps serving until its folder
-   under `app/` is deleted and its entry is removed from lists such as
-   `lib/table-convert-pages.ts`.
+1. Set `isActive: false` on its registry entry. It leaves the sitemap, and
+   middleware answers it with `410 Gone` (noindex, `no-store`) when
+   `data/keywords.csv` has rows for its operation (today `convert` and
+   `compress`) and none joins its id with a global volume above 0. A retired
+   Tool with demand, or of an operation the file has no rows for (a
+   downloader Lander, an editor, a viewer), 404s from the shared `[tool]`
+   route until it is rebuilt or dropped (owner decision D3, #322).
+   `scripts/gone-tool-routes.mjs` derives the 410 list before every build and
+   dev run and never commits it, so making the Tool active again ends its
+   410. The entry stays as the record of the retirement. A Tool with its own
+   folder under `app/` (a table converter's `TableConvertLanding`, or a page
+   such as `cr3-to-jpg`) has the folder deleted, and its entry removed from
+   lists such as `lib/table-convert-pages.ts`, in the same change: a folder
+   left for a Tool on the 410 list fails `lib/gone-tool-routes.test.mjs`, and
+   one left for a Tool that 404s keeps serving, since a page there may render
+   without checking the catalog.
 2. Drop its rows from `benchmarks/tool-sweep-results.json`, as the next sweep
    would: keep only active Tools' rows (`mergeRows` with no new rows) and
    recount `meta.counts`. `pnpm test` fails while a retired Tool keeps a row.
