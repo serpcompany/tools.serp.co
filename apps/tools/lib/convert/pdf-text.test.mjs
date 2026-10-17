@@ -478,3 +478,19 @@ test("two PDFs converted at once each give their own text and title", async () =
   assert.deepEqual(two.texts, ["The second file", "and its second page"]);
   assert.match(two.opf, /<dc:title>second<\/dc:title>/);
 });
+
+test("pdf.js's worker is stopped even when opening the file throws at once", async () => {
+  let stopped = 0;
+  const broken = {
+    PDFWorker: class {
+      destroy() {
+        stopped += 1;
+      }
+    },
+    getDocument: () => {
+      throw new TypeError("Cannot perform Construct on a detached ArrayBuffer");
+    },
+  };
+  await assert.rejects(readPdfText(new ArrayBuffer(8), { pdfjs: broken }), TypeError);
+  assert.equal(stopped, 1);
+});

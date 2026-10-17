@@ -31,8 +31,8 @@ export type PdfjsText = {
 
 // A file is refused only past one of these, each counted exactly as the file
 // is read: its page count, the characters of text read so far, and the time
-// spent reading. A 2,000-page book holds about 6 million characters; the
-// limits keep the tab well clear of running out of memory.
+// spent reading. A 2,000-page book holds about 6 million characters; 19.5
+// million converted to each format in under 3 seconds in Chromium (#282).
 export const PDF_TEXT_LIMITS = { pages: 2_000, characters: 20_000_000, milliseconds: 120_000 };
 export type PdfTextLimits = typeof PDF_TEXT_LIMITS;
 
@@ -193,8 +193,9 @@ export async function readPdfText(
   const inTime = <T>(promise: Promise<T>) => Promise.race([promise, deadline]);
 
   const worker = new pdfjs.PDFWorker();
-  const task = pdfjs.getDocument({ data: new Uint8Array(buf), worker, isEvalSupported: false, verbosity: 0 });
+  let task: ReturnType<PdfjsText["getDocument"]> | undefined;
   try {
+    task = pdfjs.getDocument({ data: new Uint8Array(buf), worker, isEvalSupported: false, verbosity: 0 });
     const doc = await inTime(task.promise);
     if (doc.numPages > limits.pages) {
       throw new PdfTextError("too_large", tooManyPagesMessage(doc.numPages, limits.pages));
@@ -233,7 +234,7 @@ export async function readPdfText(
   } finally {
     clearTimeout(timer);
     // A worker that hangs never answers destroy(); stopping it ends it.
-    await Promise.race([task.destroy().catch(() => {}), wait(1_000)]);
+    if (task) await Promise.race([task.destroy().catch(() => {}), wait(1_000)]);
     worker.destroy();
   }
 }
