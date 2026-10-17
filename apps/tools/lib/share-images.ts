@@ -33,7 +33,8 @@ export const SHARE_IMAGES = {
     chips: ["PNG → JPG", "MP4 → MP3", "HEIC → JPG", "PDF → PNG"],
     accent: "#2563eb",
   },
-  // Compressor Tools and the Compress category.
+  // Compressor Tools, the Batch PNG Compressor, and the Compress and Bulk
+  // categories.
   compress: {
     path: "/og/compress.png",
     title: "File compressors",

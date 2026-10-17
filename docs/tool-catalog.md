@@ -126,7 +126,9 @@ pages' metadata, and `lib/table-convert.ts` the table converters'. Both use
 `lib/page-metadata.ts`, which also holds the homepage's and the root layout's
 and reads no registry. A page sets only its own title: the layout's template
 adds " | SERP Tools". The homepage sets its full title, and keeps its
-slashless canonical and `og:url` in `app/page.tsx`.
+slashless canonical and `og:url` in `app/page.tsx`. Every public `page.tsx`
+exports its own metadata; the layout's neutral `SERP Tools` defaults reach only
+the noindex 404s and the internal dashboard.
 
 - A description is at most 160 characters. It starts with the curated
   subtitle or the registry description, cut at a sentence, then adds true
@@ -138,7 +140,8 @@ slashless canonical and `og:url` in `app/page.tsx`.
   under `public/og/`, listed in `lib/share-images.ts`. After changing that
   list, run `pnpm -C apps/tools share-images` and commit the PNGs.
 - `lib/metadata.test.mjs` checks the lengths, that no two pages share a
-  description, the images, and where the browser claim appears.
+  description, the images, where the browser claim appears, and that every
+  public page exports its metadata.
 
 ## Adding a Tool
 

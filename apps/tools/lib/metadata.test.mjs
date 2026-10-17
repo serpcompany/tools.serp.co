@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import { handlerFor, scanPageHandlers } from "../scripts/lib/tool-sweep.mjs";
@@ -18,7 +18,9 @@ import {
 import {
   DESCRIPTION_MAX,
   DESCRIPTION_TARGET,
+  HOME_DESCRIPTION,
   HOME_TITLE,
+  SITE_NAME,
   TITLE_TEMPLATE,
   buildHomeMetadata,
   buildSiteMetadata,
@@ -108,6 +110,8 @@ test("each page family shows its own share image", () => {
   const imageOf = (metadata) => metadata.openGraph.images[0].url;
   assert.equal(imageOf(buildToolMetadata("mp4-to-mp3")), SHARE_IMAGES.convert.path);
   assert.equal(imageOf(buildToolMetadata("compress-mp4")), SHARE_IMAGES.compress.path);
+  assert.equal(imageOf(buildToolMetadata("batch-compress-png")), SHARE_IMAGES.compress.path);
+  assert.equal(imageOf(buildCategoryMetadata("bulk")), SHARE_IMAGES.compress.path);
   assert.equal(imageOf(buildToolMetadata("download-tiktok-videos")), SHARE_IMAGES.download.path);
   assert.equal(imageOf(buildToolMetadata("pdf-reader")), SHARE_IMAGES.pdf.path);
   assert.equal(imageOf(buildTableConvertMetadata(TABLE_CONVERT_PAGES[0])), SHARE_IMAGES.convert.path);
@@ -116,7 +120,7 @@ test("each page family shows its own share image", () => {
 });
 
 test("titles are the page's own: the layout's template adds the site name once", () => {
-  assert.deepEqual(buildSiteMetadata().title, { default: HOME_TITLE, template: TITLE_TEMPLATE });
+  assert.deepEqual(buildSiteMetadata().title, { default: SITE_NAME, template: TITLE_TEMPLATE });
   assert.equal(TITLE_TEMPLATE, "%s | SERP Tools");
   assert.equal(buildToolMetadata("png-to-jpg").title, "PNG to JPG");
   assert.equal(buildToolMetadata("download-tiktok-videos").title, "TikTok Video Downloader");
@@ -126,6 +130,46 @@ test("titles are the page's own: the layout's template adds the site name once",
     assert.equal(typeof metadata.title, "string", id);
     assert.doesNotMatch(metadata.title, /SERP Tools/, `${id} names the site in its own title`);
   }
+});
+
+test("the layout's defaults are the site's, not a copy of the homepage's head", () => {
+  const site = buildSiteMetadata();
+  assert.equal(site.title.default, "SERP Tools");
+  assert.notEqual(site.title.default, HOME_TITLE);
+  assert.notEqual(site.description, HOME_DESCRIPTION);
+  assert.equal(buildHomeMetadata().description, HOME_DESCRIPTION);
+});
+
+// A page that exports no metadata falls back to the layout's defaults. The
+// 404s are no page.tsx: Next renders its built-in not-found boundary (the app
+// has no not-found.tsx) with those defaults and a robots noindex tag, so they
+// are outside this scan. internal/ is the 401-gated dashboard.
+test("every public page.tsx exports metadata or generateMetadata", () => {
+  const appDir = new URL("../app/", import.meta.url);
+  const files = readdirSync(appDir, { recursive: true })
+    .filter((file) => file === "page.tsx" || file.endsWith("/page.tsx"))
+    .filter((file) => !file.startsWith("internal/"));
+  assert.ok(files.length > 250, `${files.length} pages`);
+  const missing = files.filter(
+    (file) =>
+      !/^export (?:const|(?:async )?function) (?:metadata|generateMetadata)\b/m.test(
+        readFileSync(new URL(file, appDir), "utf8"),
+      ),
+  );
+  assert.deepEqual(missing, []);
+  assert.equal(
+    readdirSync(appDir, { recursive: true }).some((file) => /(^|\/)not-found\.tsx$/.test(file)),
+    false,
+    "a not-found.tsx exists: check its metadata and noindex, then update this test",
+  );
+});
+
+test("the table converter demo has its own title and image, and no canonical", () => {
+  const demo = buildTableConvertDemoMetadata();
+  assert.equal(demo.title, "Table Converter Demo");
+  assert.equal(demo.alternates, undefined);
+  assert.equal(demo.openGraph.url, undefined);
+  assert.equal(demo.openGraph.images[0].url, SHARE_IMAGES.convert.path);
 });
 
 test("the homepage has a full title and tags, and leaves its canonical and og:url to the page", () => {

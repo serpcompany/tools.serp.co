@@ -85,13 +85,14 @@ export function buildTableConvertMetadata({
 }
 
 // /table-convert-demo/, the table converter with every input and output
-// format, which TableConvertLanding pages fix to one pair.
+// format, which TableConvertLanding pages fix to one pair. It sets no
+// canonical: nothing links to it and no sitemap lists it, and whether it
+// should be indexed is not decided yet.
 export function buildTableConvertDemoMetadata(): Metadata {
   return pageMetadata({
     title: "Table Converter Demo",
     description:
       "Paste or upload a table as CSV, Excel, JSON, Markdown, HTML or SQL, convert it to another format and preview both side by side, in your browser.",
-    canonical: normalizePath("/table-convert-demo/"),
     image: "convert",
   });
 }

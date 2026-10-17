@@ -22,7 +22,7 @@ export const DESCRIPTION_TARGET = 120;
 
 const HOME_HEADLINE = "Free File Converters, Compressors & Downloaders";
 export const HOME_TITLE = `${HOME_HEADLINE} | ${SITE_NAME}`;
-const HOME_DESCRIPTION =
+export const HOME_DESCRIPTION =
   "Free online file converters, compressors and video downloaders. Most converters run in your browser, with no sign-up and nothing to install.";
 
 // True of every page but a downloader's: the site has no accounts, and its
@@ -124,12 +124,18 @@ export function buildHomeMetadata(): Metadata {
   return { ...metadata, title: { absolute: HOME_TITLE } };
 }
 
-// The root layout's defaults, for a page that sets none of its own.
+// The root layout's defaults, for a page that sets none of its own: only the
+// noindex 404 pages and the internal dashboard do (metadata.test.mjs fails on
+// any other). They are neutral, not the homepage's, so such a page never
+// copies the homepage's head.
+const SITE_DESCRIPTION =
+  "Free online file converters, compressors, and utilities for images, audio, and video.";
+
 export function buildSiteMetadata(): Metadata {
   const images = [shareImage("default")];
   return {
-    title: { default: HOME_TITLE, template: TITLE_TEMPLATE },
-    description: HOME_DESCRIPTION,
+    title: { default: SITE_NAME, template: TITLE_TEMPLATE },
+    description: SITE_DESCRIPTION,
     openGraph: { type: "website", siteName: SITE_NAME, images },
     twitter: { card: "summary_large_image", images },
   };

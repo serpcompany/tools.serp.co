@@ -38,7 +38,7 @@ const OPERATION_IMAGES: Record<ToolOperation, ShareImageName> = {
   download: "download",
   compress: "compress",
   combine: "default",
-  bulk: "default",
+  bulk: "compress",
   edit: "pdf",
   "video-editor": "default",
   "image-editor": "default",
