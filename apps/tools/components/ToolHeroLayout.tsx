@@ -49,11 +49,9 @@ export function ToolHeroLayout({
     .join(" ");
   const inlineAdClasses = ["mt-6", inlineAdClassName].filter(Boolean).join(" ");
   const progressClasses = progressClassName ?? "mt-6 max-w-2xl mx-auto";
-  const showResultPanel =
-    Boolean(resultPanel) &&
-    (currentFile?.status === "completed" ||
-      currentFile?.status === "error" ||
-      currentFile?.status === "unsupported");
+  // The panel and its ad show from the visitor's action, with the progress
+  // bar, so the result arriving moves nothing on the page (#316).
+  const showResultPanel = Boolean(resultPanel) && currentFile !== null;
   const content = (
     <div className={contentClassName}>
       {hero}

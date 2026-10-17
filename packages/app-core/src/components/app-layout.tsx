@@ -1,8 +1,8 @@
-import Script from "next/script";
-
 import { AppHeader } from "./app-header";
 import { isProductionSite } from "../lib/site-env";
+import { adsenseScriptSrc } from "../lib/third-party-scripts";
 import { GTagManager } from "./gtag-manager";
+import { AdSenseScript } from "./third-party-scripts";
 import { SiteFooter } from "./site-footer";
 
 import "@serp-tools/ui/globals.css";
@@ -19,13 +19,7 @@ export function AppLayout({
     <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body className="bg-background font-sans antialiased">
         {adsenseClient && (isProductionSite(process.env.NEXT_PUBLIC_SITE_ENV) || adsenseTestMode) ? (
-          <Script
-            id="adsense-script"
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
+          <AdSenseScript src={adsenseScriptSrc(adsenseClient)} />
         ) : null}
         <GTagManager />
         <div className="flex min-h-screen flex-col">
