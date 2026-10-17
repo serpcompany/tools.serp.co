@@ -87,52 +87,95 @@ const isBlank = (text: string) => !withoutJoiners(text).trim();
 
 const tooLarge = (limits: TextPdfLimits) => new TextPdfError("too_large", tooManyPagesMessage(limits.pages));
 
+// ---------------------------------------------------------------- pages --
+
+// Where the next line goes: the pages filled before this one, and the lines
+// on this one. Reading a file and laying it out both move through the pages
+// with it, so they agree on what fills a page. A line goes on the next page
+// when this one is full. A page break ends this page if it has a line on it
+// (a blank one too), so the next line starts a new one, and does nothing on
+// a page with none. Two form feeds in a row in a text file hold an empty
+// line between them, so they leave a page with a blank line on it.
+//
+// Adding a line anywhere never moves the end back, so the pages counted on
+// a file's lines as read, a line each, are never more than the layout's,
+// where a line can wrap onto several.
+export class PageCursor {
+  readonly limit: number;
+  pages = 0;
+  lines = 0;
+  constructor(limit: number) {
+    this.limit = limit;
+  }
+
+  // How many more lines fit within the page limit; below 0 once past it.
+  get room() {
+    return (this.limit - this.pages) * LINES_PER_PAGE - this.lines;
+  }
+
+  get fits() {
+    return this.room >= 0;
+  }
+
+  // Moves past one line. False once the line is past the page limit.
+  line() {
+    if (this.lines === LINES_PER_PAGE) this.pageBreak();
+    this.lines += 1;
+    return this.fits;
+  }
+
+  pageBreak() {
+    if (!this.lines) return;
+    this.pages += 1;
+    this.lines = 0;
+  }
+}
+
 // ---------------------------------------------------------------- input --
 
 const BLANK_LINE: SourceLine = Object.freeze({ text: "", indent: 0, hang: 0, muted: false, rtl: false, right: false });
 
 // A text file's lines (text-file.ts): tabs to every fourth column, control
 // characters and terminal escape sequences dropped, the leading spaces as
-// the line's indent. A form feed starts a new page, as on a printer; blank
-// lines and page breaks at the end are left out. Only the lines that are
-// laid out count towards the pages: blank lines and page breaks wait until
-// a line with text follows them. Throws once the lines can't fit the pages.
+// the line's indent. A form feed starts a new page, as on a printer
+// (PageCursor); blank lines and page breaks at the end are left out, so
+// they never count. Throws as soon as the lines, a line each, pass the page
+// limit; layoutPages counts the lines they wrap onto.
 export function textSourceLines(text: string, limits: TextPdfLimits): Source[] {
   const lines: Source[] = [];
-  const most = limits.pages * LINES_PER_PAGE;
-  // The blank lines and page breaks waiting, and how many blank lines: once
-  // they can't all fit, only counted.
+  // Where the lines read so far end, the blank lines and page breaks
+  // waiting for a line with text included.
+  const at = new PageCursor(limits.pages);
+  // Those waiting, kept only while they fit: past the limit, a line with
+  // text after them is refused.
   let waiting: Source[] = [];
-  let blanks = 0;
   for (const { line, end } of textLines(text)) {
     const cleaned = printable(cleanLine(line)).trimEnd();
     const body = cleaned.trimStart();
     if (isBlank(body)) {
-      blanks += 1;
-      if (lines.length + blanks <= most) {
-        waiting.push(BLANK_LINE);
-        if (end === "\f") waiting.push("page-break");
-      }
-      continue;
+      if (at.line()) waiting.push(BLANK_LINE);
+    } else {
+      if (!at.line()) throw tooLarge(limits);
+      for (const source of waiting) lines.push(source);
+      waiting = [];
+      const rtl = isRightToLeft(body);
+      lines.push({ text: body, indent: cleaned.length - body.length, hang: 0, muted: false, rtl, right: rtl });
     }
-    if (lines.length + blanks + 1 > most) throw tooLarge(limits);
-    for (const source of waiting) lines.push(source);
-    waiting = [];
-    blanks = 0;
-    const rtl = isRightToLeft(body);
-    lines.push({ text: body, indent: cleaned.length - body.length, hang: 0, muted: false, rtl, right: rtl });
-    if (end === "\f") waiting.push("page-break");
+    if (end === "\f") {
+      at.pageBreak();
+      if (at.fits) waiting.push("page-break");
+    }
   }
   return lines;
 }
 
 // An XML file's listing (xml-listing.ts), left-aligned at its indent
-// whatever its script. Throws once the lines can't fit the pages.
+// whatever its script. Throws as soon as the lines pass the page limit.
 export function xmlSourceLines(text: string, limits: TextPdfLimits): Source[] {
   const lines: Source[] = [];
-  const most = limits.pages * LINES_PER_PAGE;
+  const at = new PageCursor(limits.pages);
   listXml(text, (line) => {
-    if (lines.length >= most) throw tooLarge(limits);
+    if (!at.line()) throw tooLarge(limits);
     const text = printable(line.text);
     lines.push({ text, indent: line.indent, hang: line.hang ?? 0, muted: Boolean(line.muted), rtl: isRightToLeft(text), right: false });
   });
@@ -210,7 +253,7 @@ export function wrapText(
   return lines;
 }
 
-// The lines set on each page, `LINES_PER_PAGE` at most. Throws once they
+// The lines set on each page, placed by PageCursor. Throws as soon as they
 // pass the page limit.
 export function layoutPages(
   sources: Iterable<Source>,
@@ -218,35 +261,29 @@ export function layoutPages(
   limits: TextPdfLimits,
 ): PlacedLine[][] {
   const pages: PlacedLine[][] = [];
-  let page: PlacedLine[] = [];
-  const newPage = () => {
-    pages.push(page);
-    page = [];
-    if (pages.length >= limits.pages) throw tooLarge(limits);
-  };
+  const at = new PageCursor(limits.pages);
   for (const source of sources) {
     if (source === "page-break") {
-      if (page.length) newPage();
+      at.pageBreak();
       continue;
     }
     const indent = Math.min(source.indent, COLUMNS - 1);
     const hang = Math.min(indent + source.hang, MAX_HANG);
-    const room = (limits.pages - pages.length) * LINES_PER_PAGE - page.length;
     const lines = wrapText(
       source.text,
       TEXT_WIDTH - indent * COLUMN_WIDTH,
       TEXT_WIDTH - hang * COLUMN_WIDTH,
       widthOf,
-      room,
+      at.room,
     );
-    if (lines.length > room) throw tooLarge(limits);
+    if (lines.length > at.room) throw tooLarge(limits);
     lines.forEach((text, index) => {
-      if (page.length === LINES_PER_PAGE) newPage();
-      page.push({ text, indent: index ? hang : indent, muted: source.muted, rtl: source.rtl, right: source.right });
+      at.line();
+      (pages[at.pages] ??= []).push({ text, indent: index ? hang : indent, muted: source.muted, rtl: source.rtl, right: source.right });
     });
   }
-  if (page.length || !pages.length) pages.push(page);
-  return pages;
+  // A file with nothing to set still makes a page.
+  return pages.length ? pages : [[]];
 }
 
 // --------------------------------------------------------------- output --

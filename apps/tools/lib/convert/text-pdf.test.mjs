@@ -350,6 +350,24 @@ test("blank lines and page breaks at the end don't count towards the page limit"
   assert.equal((await convert(`x${"\n".repeat(130_000)}`)).pages, 1);
 });
 
+test("a file paginated with form feeds counts the pages it fills, never its breaks as lines", async () => {
+  const limits = { pages: 3 };
+  const full = `${"x\n".repeat(LINES_PER_PAGE - 1)}x`;
+  // Three full pages joined by form feeds fill three pages, as 183 lines do.
+  assert.equal((await convert([full, full, full].join("\f"), "txt", { limits })).pages, 3);
+  assert.equal((await convert("x\n".repeat(3 * LINES_PER_PAGE), "txt", { limits })).pages, 3);
+  await assert.rejects(convert([full, full, full, "x"].join("\f"), "txt", { limits }), { code: "too_large" });
+  // A break on a page with no line on it does nothing; two in a row leave a
+  // page with a blank line on it, as a printer would.
+  assert.equal((await convert(`${full}\f\f`, "txt", { limits })).pages, 1);
+  assert.equal((await convert("a\f\fb", "txt", { limits })).pages, 3);
+  await assert.rejects(convert("a\f\fb\fc", "txt", { limits }), { code: "too_large" });
+  // At the real limits: 2,000 full pages joined by form feeds convert.
+  const output = await convert(Array(TEXT_PDF_LIMITS.pages).fill(full).join("\f"));
+  assert.equal(output.pages, TEXT_PDF_LIMITS.pages);
+  await assert.rejects(convert(Array(TEXT_PDF_LIMITS.pages + 1).fill(full).join("\f")), { code: "too_large" });
+});
+
 test("generated files are refused for their pages exactly when the PDF they make would pass the limit", async () => {
   // Seeded, so a failure repeats: lines of text, lines that wrap, blank and
   // white lines, form feeds, CR LF, and blank lines and page breaks at the
@@ -360,20 +378,40 @@ test("generated files are refused for their pages exactly when the PDF they make
     return Math.floor((seed / 2 ** 31) * n);
   };
   const piece = () => ["", "", " \t ", "\f", "\r", `line ${random(1000)}`, "word ".repeat(10 + random(80)), "x".repeat(random(400))][random(8)];
-  const tail = () => ["", "\n".repeat(random(400)), "\f\n".repeat(random(6)), `${" \n".repeat(random(200))}\f${"\n".repeat(random(200))}`][random(4)];
+  const tail = () =>
+    ["", "\n".repeat(random(400)), "\f\n".repeat(random(6)), `${" \n".repeat(random(200))}\f${"\n".repeat(random(200))}`, "\f".repeat(1 + random(4))][random(5)];
   const element = () => ["<i/>", `<t>${"word ".repeat(random(100))}</t>`, "<!-- a note -->", "<p>a\n\n\nb</p>"][random(4)];
+  // Files paginated with form feeds: pages of a page's worth of lines, give
+  // or take two, so each break falls before, at or after a page's end, with
+  // now and then a blank, white or wrapping line among them. A break alone,
+  // after or before a blank line, or two in a row.
+  const pageBreak = () => ["\f", "\f", "\n\f", "\f\n", "\f\f", "\n\f\n", "\f\r\n", "\f\n\f", "\f\f\f"][random(9)];
+  const page = () => {
+    const lines = Array.from({ length: LINES_PER_PAGE - 2 + random(5) }, () => `line ${random(1000)}`);
+    for (let changed = random(4); changed > 0; changed -= 1) {
+      lines[random(lines.length)] = ["", " \t ", "word ".repeat(17 + random(40))][random(3)];
+    }
+    return lines.join("\n");
+  };
+  const paged = () => Array.from({ length: 1 + random(5) }, () => page() + pageBreak()).join("") + tail();
   const files = [
     ...Array.from({ length: 120 }, () => ["txt", Array.from({ length: random(250) }, piece).join("\n") + tail()]),
+    ...Array.from({ length: 160 }, () => ["txt", paged(), "paged"]),
     ...Array.from({ length: 40 }, () => ["xml", `<r>${Array.from({ length: random(160) }, element).join("")}</r>`]),
   ];
   const limits = { pages: 3 };
   const converted = [];
   const refused = [];
-  for (const [from, text] of files) {
+  let pagedAtLimit = 0;
+  for (const [from, text, kind] of files) {
     let pages;
     try {
-      // The pages it fills with no limit.
-      pages = (await convert(text, from, { limits: { pages: Infinity } })).pages;
+      // The pages its PDF has with no limit, as pdf.js reads it.
+      const output = await convert(text, from, { limits: { pages: Infinity } });
+      const task = pdfjs.getDocument({ data: new Uint8Array(output.buffer), verbosity: 0 });
+      pages = (await task.promise).numPages;
+      await task.destroy();
+      assert.equal(output.pages, pages);
     } catch (error) {
       assert.equal(error.code, "no_text", JSON.stringify(text.slice(0, 80)));
       continue;
@@ -386,12 +424,13 @@ test("generated files are refused for their pages exactly when the PDF they make
     } else {
       assert.equal(outcome, pages, where);
       converted.push(pages);
+      if (kind === "paged" && pages === limits.pages) pagedAtLimit += 1;
     }
   }
-  // Both sides of the limit, and the limit itself, were tried: no file is
-  // refused while one that fills more pages converts.
-  assert.ok(converted.length > 20 && refused.length > 20, `${converted.length} converted, ${refused.length} refused`);
-  assert.ok(converted.includes(limits.pages));
+  // Both sides of the limit, and the limit itself, were tried, paginated
+  // files too: no file is refused while one that fills more pages converts.
+  assert.ok(converted.length > 40 && refused.length > 40, `${converted.length} converted, ${refused.length} refused`);
+  assert.ok(pagedAtLimit > 10, `${pagedAtLimit} paginated files at the limit`);
   assert.ok(Math.max(...converted) < Math.min(...refused));
 });
 

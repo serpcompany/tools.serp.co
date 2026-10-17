@@ -24,10 +24,12 @@ UTF-8 or UTF-16 by its byte order mark, else UTF-8, else Windows-1252; CR LF,
 CR, LF, NEL and the Unicode line and paragraph separators break lines; tabs
 stop every fourth column; control characters and terminal escape sequences are
 dropped. A form feed starts a new page, as on a printer, so a file paginated
-with form feeds (an RFC, a report) keeps its pages. Blank lines and leading
-spaces are kept; blank lines and page breaks at the end are not, and don't
-count towards the page limit. A line whose first letter is Hebrew or Arabic
-is set against the right margin, as an editor shows it.
+with form feeds (an RFC, a report) keeps its pages: it ends a page that has a
+line on it, a blank one too, and does nothing on a page with none, so two in a
+row leave a page with a blank line. Blank lines and leading spaces are kept;
+blank lines and page breaks at the end are not, and don't count towards the
+page limit. A line whose first letter is Hebrew or Arabic is set against the
+right margin, as an editor shows it.
 
 ## XML
 
@@ -73,7 +75,7 @@ drops them.
 
 | Code | When | The page says |
 | --- | --- | --- |
-| `too_large` | over 20 MB, before the file is read (`checkInputFile`), or over 2,000 pages, counted on the lines laid out and stopped there | which limit; the file's size rounded up |
+| `too_large` | over 20 MB, before the file is read (`checkInputFile`), or over 2,000 pages, counted as the layout fills them (`PageCursor`: wrapped lines and form feeds, never the breaks as lines) and stopped there | which limit; the file's size rounded up |
 | `unsupported_script` | a character DejaVu Sans has no glyph for (Chinese, Japanese, Korean, Indic, Thai, emoji), or one it has that jsPDF can't set: Lao (marks to place), N'Ko and the Arabic-script letters jsPDF has no joined forms for (Kurdish ڕ and ە, many of Pashto's, Sindhi's and Uyghur's) | the characters, up to six (a mark on a dotted circle), and (TXT) that TXT to PNG draws them |
 | `malformed_xml` | sax rejects the file, a second root element, or no element at all | sax's message, with line and column |
 | `unsupported_encoding` | the XML declaration names an encoding the browser can't decode, or bytes that aren't in it | save it as UTF-8 |
