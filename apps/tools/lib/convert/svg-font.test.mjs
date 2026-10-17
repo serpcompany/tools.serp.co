@@ -152,6 +152,14 @@ function nodeWorker(code = RESOLVE_EACH, exits = [], { heapMb, posted } = {}) {
 // The CPU time of a conversion whose boolean step runs in nodeWorkers: this
 // thread's and the workers'.
 const conversionCpuMs = () => threadCpuMs() + workersCpuMs;
+// The boolean step in a nodeWorker for tests that aren't about its time
+// limit. The page stops the step after REGIONS_TIMEOUT_MS (5 s) of the
+// clock; on a busy machine the worker waits for a core, so a step of under
+// a second of CPU time can pass 5 s and be taken as drawn. These tests give
+// it a minute instead, as a guard against a hang only: their bounds are on
+// CPU time (conversionCpuMs).
+const HANG_GUARD_MS = 60_000;
+const guardedRegions = (createWorker) => regionsInWorker({ timeoutMs: HANG_GUARD_MS, createWorker });
 
 // Whether the SVG paints (x, y) of a path's polygons by `rule`, as a browser
 // fills it; points this close to an edge are left out (a font's integer
@@ -405,7 +413,7 @@ test("a nonzero shape's parts that wind the other way never cut a hole in anothe
 
 test("crossing outlines are worked out in a worker with a time limit, in bounded time", async () => {
   const exits = [];
-  const regions = regionsInWorker({ createWorker: nodeWorker(undefined, exits) });
+  const regions = guardedRegions(nodeWorker(undefined, exits));
   // A 26-point even-odd path that sent martinez-polygon-clipping into an
   // endless loop: its region, exactly as the SVG fills it.
   const star =
@@ -477,7 +485,7 @@ test("past the time limit, or when the worker fails, crossing outlines are taken
   assert.ok(!inkAt(stuck.glyph, 5, 5));
   // A worker that fails to start, or crashes, says so.
   for (const createWorker of [() => { throw new Error("no worker"); }, nodeWorker("throw new Error('crash')")]) {
-    const failed = await font(squares, "icon.svg", { regions: regionsInWorker({ createWorker }) });
+    const failed = await font(squares, "icon.svg", { regions: guardedRegions(createWorker) });
     assert.ok(failed.result.notice.endsWith(WORKER_FAILED_NOTICE) && inkAt(failed.glyph, 12, 12));
     assert.ok(!failed.result.notice.includes(CROSSINGS_NOTICE));
   }
@@ -527,7 +535,7 @@ test("the boolean step keeps to its memory and work: the 198 KB file that took 3
   // worker's: past it the thread stops, and the notice would say the step
   // didn't run. (Measured in review's file: 14 MB at its peak, against 3 GB
   // before the step charged what it keeps to REGIONS_MEMORY.)
-  const regions = regionsInWorker({ createWorker: nodeWorker(undefined, [], { heapMb: 64 }) });
+  const regions = guardedRegions(nodeWorker(undefined, [], { heapMb: 64 }));
   const review = barsAndStairs(400, 12_000);
   assert.equal(review.text.length, 198_107);
   let started = conversionCpuMs();
@@ -659,7 +667,7 @@ test("the boolean step keeps to the room the glyph has: a shape past it is taken
   // the page's heap capped at 32 MB.
   const exits = [];
   const posted = [];
-  const regions = regionsInWorker({ createWorker: nodeWorker(undefined, exits, { posted }) });
+  const regions = guardedRegions(nodeWorker(undefined, exits, { posted }));
   let started = conversionCpuMs();
   const under = await font(bentLoops(2, 127), "icon.svg", { regions });
   assert.ok(conversionCpuMs() - started < 3_000, `took ${conversionCpuMs() - started} ms`);
@@ -706,7 +714,7 @@ test("the boolean step keeps to the room the glyph has: a shape past it is taken
   assert.doesNotMatch(four.result.notice, /fill/);
   // And again on the page's thread, whatever the worker sent: the fifth
   // grid, past the room, is taken as drawn.
-  const unbounded = regionsInWorker({ createWorker: nodeWorker("job.shapes.forEach((shape, index) => parentPort.postMessage({ index, shape: resolveShape(shape) })); parentPort.postMessage({ done: true });") });
+  const unbounded = guardedRegions(nodeWorker("job.shapes.forEach((shape, index) => parentPort.postMessage({ index, shape: resolveShape(shape) })); parentPort.postMessage({ done: true });"));
   const fifth = await font(grid(5), "icon.svg", { regions: unbounded });
   assert.ok(fifth.result.notice.endsWith(CROSSINGS_NOTICE));
   assert.ok(!inked(fifth.glyph, ...firstCrossing) && inked(fifth.glyph, ...lastCrossing(5)));
@@ -743,7 +751,7 @@ test("a shape too detailed for the room the glyph has is taken as drawn, so a le
     assert.ok(inked(glyph, 500, -125) && inked(glyph, 3300, 600), `${loops}`);
   }
   // Alone, the 250 loops fit, and are worked out.
-  const alone = await font(bentLoops(1, 250), "icon.svg", { regions: regionsInWorker({ createWorker: nodeWorker() }) });
+  const alone = await font(bentLoops(1, 250), "icon.svg", { regions: guardedRegions(nodeWorker()) });
   assert.doesNotMatch(alone.result.notice, /fill/);
 });
 
