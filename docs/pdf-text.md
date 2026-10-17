@@ -8,10 +8,10 @@ text" is PDF to TXT's alias page. Paths are under `apps/tools/`;
 
 ## Reading the text
 
-pdf.js (the copy in `public/vendor/pdfjs/`, 5.4.296; Node tests use
-`pdfjs-dist` 6) streams each page's text runs (`streamTextContent`) in the order
-the PDF stores them, which is usually reading order. A line ends where pdf.js
-marks one (`hasEOL`), and its spaces are collapsed. A paragraph ends at an empty
+pdf.js (the copy in `public/vendor/pdfjs/`, 5.4.296; Node has `pdfjs-dist` 6)
+streams each page's text runs (`streamTextContent`) in the order the PDF
+stores them, which is usually reading order. A line ends where pdf.js marks
+one (`hasEOL`), and its spaces are collapsed. A paragraph ends at an empty
 line, where the next line is higher up the page (the next column or block),
 where the font size changes by more than a fifth (a heading), or where the gap
 to the next line is over 1.3 times the page's usual spacing: the lower quartile
@@ -41,7 +41,7 @@ with a hyphen at a line's end keeps the hyphen. There is no OCR.
 Both HTML and EPUB are titled with the file's name, in the language the PDF's
 `/Lang` names when it is a BCP 47 tag, else English. A page with no text is an
 empty section (HTML) or document (EPUB) and adds nothing to the TXT, and the
-page says which pages had none when some did.
+page says which pages had none when some did: each may be a scan or blank.
 
 ## Untrusted text
 
@@ -63,7 +63,7 @@ counts exactly, so a file is never refused while a larger one converts:
 | --- | --- | --- |
 | `unreadable_pdf` | pdf.js throws `InvalidPDFException`: not a PDF, empty, or cut short past repair | it may be damaged or incomplete, or not a PDF |
 | `password_protected` | pdf.js throws `PasswordException` (an owner password alone opens and converts) | open it, save or print a copy without the password |
-| `no_text` | no page has any text but spaces, as in a scan | it has no text to extract; OCR isn't done |
+| `no_text` | no page has any text but spaces, as in a scan or a blank PDF | it has no text to extract (a scan, or blank); OCR isn't done |
 | `too_large` | over 2,000 pages (`numPages`, before reading), or over 20 million characters of pdf.js's text, counted as it streams | which limit, and its size |
 | `read_timeout` | over 2 minutes; the worker is stopped even if it hangs | it took too long |
 
@@ -85,7 +85,11 @@ is ever saved.
 
 `benchmarks/make-pdf-fixtures.mjs` writes the fixtures (`sample-text.pdf` and
 the three refusals), and `lib/convert/pdf-text.test.mjs` checks it still writes
-the committed bytes. The sweep looks for `sample-text.pdf`'s markers in the
-TXT, in the HTML's body text and in the EPUB's spine documents, which it parses
-strictly, and runs each refusal on all three pages
+the committed bytes. `pnpm test` runs that file twice: on `pdfjs-dist`, and
+through `pdf-text.vendored.test.mjs` on the vendored copy the browser loads,
+since the two versions differ (5.4 reads the tests' unembedded Helvetica's
+codes below 0x20 as spaces, so they draw characters from 0x20 up). The sweep
+looks for `sample-text.pdf`'s markers in the TXT, in the HTML's body text and
+in the EPUB's spine documents, which it parses strictly, and runs each refusal
+on all three pages
 ([tool-verification.md](runbooks/tool-verification.md#tool-sweep)).

@@ -92654,7 +92654,7 @@
   {
     "id": "pdf-to-epub",
     "name": "PDF to EPUB",
-    "description": "Convert PDF to an EPUB e-book",
+    "description": "Convert PDF to EPUB (an e-book)",
     "operation": "convert",
     "route": "/pdf-to-epub",
     "from": "pdf",
@@ -92670,7 +92670,7 @@
     "content": {
       "tool": {
         "title": "PDF to EPUB",
-        "subtitle": "Convert a PDF to an EPUB e-book in your browser, with no upload. Its text reflows to fit any e-reader screen; layout, tables and images aren't kept.",
+        "subtitle": "Convert PDF to EPUB in your browser, with no upload. Its text reflows to fit any e-reader screen; layout, tables and images aren't kept.",
         "from": "pdf",
         "to": "epub",
         "accept": ".pdf,application/pdf"
@@ -92695,7 +92695,7 @@
         },
         {
           "question": "Why does my PDF say it has no text to extract?",
-          "answer": "Its pages are pictures, as a scanned book's are, so there are no letters to read, only pixels. Getting words out of a picture needs OCR (optical character recognition), which this converter doesn't do. If only some pages are pictures, the others are converted and the page names the ones with no text."
+          "answer": "Its pages hold no letters to read: a scanned book's pages are pictures of text, only pixels, and a blank page has nothing on it. Getting words out of a picture needs OCR (optical character recognition), which this converter doesn't do. If only some pages have no text, the others are converted and the page names the ones without."
         },
         {
           "question": "Can I convert a password-protected PDF?",
@@ -92742,7 +92742,7 @@
   {
     "id": "pdf-to-html",
     "name": "PDF to HTML",
-    "description": "Convert PDF to an HTML page",
+    "description": "Convert PDF to HTML (a web page)",
     "operation": "convert",
     "route": "/pdf-to-html",
     "from": "pdf",
@@ -92757,7 +92757,7 @@
     "content": {
       "tool": {
         "title": "PDF to HTML",
-        "subtitle": "Convert a PDF to an HTML page in your browser, with no upload. Each page's text becomes a section of paragraphs; layout, tables and images aren't kept.",
+        "subtitle": "Convert PDF to HTML in your browser, with no upload. Each page's text becomes a section of paragraphs; layout, tables and images aren't kept.",
         "from": "pdf",
         "to": "html",
         "accept": ".pdf,application/pdf"
@@ -92782,7 +92782,7 @@
         },
         {
           "question": "Why does my PDF say it has no text to extract?",
-          "answer": "Its pages are pictures, as a scanned document's are, so there are no letters to read, only pixels. Getting words out of a picture needs OCR (optical character recognition), which this converter doesn't do. If only some pages are pictures, the others are converted and the page names the ones with no text."
+          "answer": "Its pages hold no letters to read: a scanned document's pages are pictures of text, only pixels, and a blank page has nothing on it. Getting words out of a picture needs OCR (optical character recognition), which this converter doesn't do. If only some pages have no text, the others are converted and the page names the ones without."
         },
         {
           "question": "Can I convert a password-protected PDF?",
@@ -93081,7 +93081,7 @@
         },
         {
           "question": "Why does my PDF say it has no text to extract?",
-          "answer": "Its pages are pictures, as a scanned document's are, so there are no letters to read, only pixels. Getting words out of a picture needs OCR (optical character recognition), which this converter doesn't do. If only some pages are pictures, the others are converted and the page names the ones with no text."
+          "answer": "Its pages hold no letters to read: a scanned document's pages are pictures of text, only pixels, and a blank page has nothing on it. Getting words out of a picture needs OCR (optical character recognition), which this converter doesn't do. If only some pages have no text, the others are converted and the page names the ones without."
         },
         {
           "question": "Can I convert a password-protected PDF?",

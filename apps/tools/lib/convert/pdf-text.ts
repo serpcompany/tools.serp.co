@@ -52,7 +52,7 @@ export const DAMAGED_MESSAGE =
 export const PASSWORD_MESSAGE =
   "This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy.";
 export const NO_TEXT_MESSAGE =
-  "This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do.";
+  "This PDF has no text to extract (it may be a scan, or its pages may be blank). Reading the words in a scan needs OCR, which this converter doesn't do.";
 export const tooManyPagesMessage = (pages: number, limit: number) =>
   `This PDF has ${count(pages)} pages; up to ${count(limit)} can be converted here.`;
 export const tooMuchTextMessage = (limit: number) =>
@@ -293,7 +293,8 @@ export function pdfTextToEpub({ pages, language }: PdfText, title: string): Arra
 }
 
 // Names the pages with no text, when some have text and some don't: up to
-// five by number, more by how many.
+// five by number, more by how many. Such a page may be a picture of text, as
+// a scanned page is, or blank, as a book's back pages often are.
 export function emptyPagesNotice({ pages }: PdfText): string | undefined {
   const empty = pages.flatMap((page, index) => (page.length ? [] : [index + 1]));
   if (!empty.length || empty.length === pages.length) return undefined;
@@ -302,8 +303,8 @@ export function emptyPagesNotice({ pages }: PdfText): string | undefined {
   const named =
     empty.length <= 5 ? `${one ? "Page" : "Pages"} ${listed}` : `${count(empty.length)} of ${count(pages.length)} pages`;
   return (
-    `${named} ${one ? "has" : "have"} no text to extract (${one ? "it's a picture" : "they're pictures"}, ` +
-    `as scanned pages are), so this file has no text from ${one ? "it" : "them"}.`
+    `${named} ${one ? "has" : "have"} no text to extract (${one ? "it may be a scan or a blank page" : "they may be scans or blank pages"}), ` +
+    `so this file has no text from ${one ? "it" : "them"}.`
   );
 }
 

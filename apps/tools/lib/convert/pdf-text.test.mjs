@@ -26,7 +26,8 @@ const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../
 const read = (name) => toBuffer(readFileSync(path.join(fixtures, name)));
 const toBuffer = (bytes) => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
 const decode = (buffer) => new TextDecoder().decode(buffer);
-// Node's pdf.js; the browser loads the copy in public/vendor/pdfjs.
+// Node's pdfjs-dist; pdf-text.vendored.test.mjs runs this file again on the
+// copy in public/vendor/pdfjs, the one the browser loads.
 const convert = (buf, to, fileName = "sample-text.pdf", options = {}) =>
   convertPdfText(buf, to, fileName, { pdfjs, ...options });
 
@@ -92,8 +93,12 @@ function openEpub(buffer) {
 
 // A PDF written by hand, so a test controls every byte of its text: pages of
 // content streams drawn in Helvetica, whose codes a ToUnicode CMap can map
-// to any characters.
-function handPdf({ pages, toUnicode = null, lang = null }) {
+// to any characters, and the glyph names of an encoding's `differences` to
+// the characters those names give (uniD800 is a lone surrogate) for codes it
+// leaves out. pdf.js 5.4 (the browser's) reads this font's codes below 0x20
+// as spaces, whatever they map to, so a test's characters are drawn from 0x20
+// up.
+function handPdf({ pages, toUnicode = null, differences = null, lang = null }) {
   const objects = [];
   const add = (body) => objects.push(body);
   const stream = (data) => `<< /Length ${data.length} >>\nstream\n${data}\nendstream`;
@@ -111,7 +116,8 @@ function handPdf({ pages, toUnicode = null, lang = null }) {
     );
     cmap = objects.length;
   }
-  add(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica${cmap ? ` /ToUnicode ${cmap} 0 R` : ""} >>`);
+  const encoding = differences ? ` /Encoding << /Type /Encoding /Differences [${differences}] >>` : "";
+  add(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica${encoding}${cmap ? ` /ToUnicode ${cmap} 0 R` : ""} >>`);
   const font = objects.length;
   const kids = pages.map((content) => {
     add(stream(content));
@@ -140,6 +146,19 @@ const textLines = (lines, { x = 72, top = 720, size = 12, leading = 14 } = {}) =
   lines
     .map((line, index) => `BT /F1 ${size} Tf ${x} ${top - index * leading} Td (${line.replace(/[()\\]/g, "\\$&")}) Tj ET`)
     .join("\n");
+
+// The text of each run on a PDF's pages as pdf.js itself gives it, before
+// readPdfText counts and cleans it.
+async function pdfjsRuns(buffer) {
+  const task = pdfjs.getDocument({ data: new Uint8Array(buffer), verbosity: 0 });
+  const doc = await task.promise;
+  const runs = [];
+  for (let number = 1; number <= doc.numPages; number += 1) {
+    for (const item of (await (await doc.getPage(number)).getTextContent()).items) runs.push(item.str);
+  }
+  await task.destroy();
+  return runs;
+}
 
 test("the PDF fixtures are the ones make-pdf-fixtures.mjs writes", () => {
   const made = { "sample-text.pdf": sampleText(), "sample-scan.pdf": sampleScan(), "sample-protected.pdf": sampleProtected() };
@@ -213,14 +232,15 @@ test("in EPUB, each page is an XHTML document in the spine, in order", async () 
   assert.match(epub.opf, /<dc:title>sample-text<\/dc:title>/);
 });
 
-test("a PDF of pictures, as a scan is, has no text, and nothing is saved", async () => {
+test("a PDF of pictures, as a scan is, or of blank pages has no text, and nothing is saved", async () => {
   for (const name of ["sample-scan.pdf", "sample.pdf"]) {
     for (const to of ["txt", "html", "epub"]) {
       await assert.rejects(convert(read(name), to), { name: "PdfTextError", code: "no_text", message: NO_TEXT_MESSAGE });
     }
   }
-  // Spaces alone aren't text either.
+  // Spaces alone aren't text either, and blank pages have none.
   await assert.rejects(convert(handPdf({ pages: [textLines(["   "])] }), "txt"), { code: "no_text" });
+  await assert.rejects(convert(handPdf({ pages: ["", ""] }), "txt"), { code: "no_text", message: NO_TEXT_MESSAGE });
 });
 
 test("a password-protected PDF is refused as one, keeping pdf.js's error", async () => {
@@ -274,19 +294,27 @@ test("the page and telemetry get the refusal's message and code, or a plain try-
 });
 
 test("text that looks like markup or holds characters XML forbids stays text, and every file parses", async () => {
-  // Codes 01-07 are mapped to NUL, BEL, U+FFFE, U+FFFF, a C1 control, an
-  // emoji and DEL; 41 is A.
+  // Between A's (41): codes 42-48 mapped to NUL, BEL, U+FFFE, U+FFFF, a C1
+  // control, DEL and an emoji, and 49 and 4A named as a lone high and a lone
+  // low surrogate.
   const pdf = handPdf({
     pages: [
       [
         "BT /F1 12 Tf 72 720 Td (<script>alert\\(1\\)</script> & ]]> <!-- x --> &amp; done) Tj ET",
-        "BT /F1 12 Tf 72 700 Td <01410241034104410541064107> Tj ET",
+        "BT /F1 12 Tf 72 700 Td <41424143414441454146414741484149414A41> Tj ET",
       ].join("\n"),
     ],
-    toUnicode: { "01": "0000", "02": "0007", "03": "FFFE", "04": "FFFF", "05": "0085", "06": "D83DDE00", "07": "007F", "41": "0041" },
+    toUnicode: { "41": "0041", "42": "0000", "43": "0007", "44": "FFFE", "45": "FFFF", "46": "0085", "47": "007F", "48": "D83DDE00" },
+    differences: "73 /uniD800 /uniDC00",
   });
+  // pdf.js gives every one of them, so what keeps them out of the files is
+  // cleanText.
+  assert.ok(
+    (await pdfjsRuns(pdf.slice(0))).join("").includes("A\u0000A\u0007A￾A￿A\u0085A\u007FA\u{1F600}A\uD800A\uDC00A"),
+    "pdf.js gives the characters as drawn",
+  );
   const txt = decode((await convert(pdf.slice(0), "txt", "<evil> & co.pdf")).buffer);
-  assert.equal(txt, "<script>alert(1)</script> & ]]> <!-- x --> &amp; done\n\nAAAAA\u{1F600}A\n");
+  assert.equal(txt, "<script>alert(1)</script> & ]]> <!-- x --> &amp; done\n\nAAAAAAA\u{1F600}AAA\n");
 
   const html = decode((await convert(pdf.slice(0), "html", "<evil> & co.pdf")).buffer);
   assert.doesNotMatch(html, XML_FORBIDDEN);
@@ -294,11 +322,12 @@ test("text that looks like markup or holds characters XML forbids stays text, an
   const page = parseXml(html, { strict: false });
   assert.ok(!page.elements.includes("script"), "no script element");
   assert.match(page.text, /<script>alert\(1\)<\/script> & \]\]> <!-- x --> &amp; done/);
+  assert.match(page.text, /AAAAAAA\u{1F600}AAA/u);
 
   const epub = openEpub((await convert(pdf.slice(0), "epub", "<evil> & co.pdf")).buffer);
   assert.equal(epub.texts.length, 1);
   assert.match(epub.texts[0], /<script>alert\(1\)<\/script> & \]\]> <!-- x --> &amp; done/);
-  assert.match(epub.texts[0], /AAAAA\u{1F600}A/u);
+  assert.match(epub.texts[0], /AAAAAAA\u{1F600}AAA/u);
   assert.match(epub.opf, /<dc:title>&lt;evil&gt; &amp; co<\/dc:title>/);
 });
 
@@ -321,13 +350,13 @@ test("a PDF's language becomes the HTML and EPUB language, if it is a language t
 test("a page with no text is named, and is empty where the others aren't", async () => {
   const pdf = handPdf({ pages: [textLines(["First page"]), "", textLines(["Third page"])] });
   const { buffer, notice } = await convert(pdf.slice(0), "html");
-  assert.equal(notice, "Page 2 has no text to extract (it's a picture, as scanned pages are), so this file has no text from it.");
+  assert.equal(notice, "Page 2 has no text to extract (it may be a scan or a blank page), so this file has no text from it.");
   assert.match(decode(buffer), /<section id="page-2" aria-label="Page 2">\n<\/section>/);
   assert.equal(decode((await convert(pdf.slice(0), "txt")).buffer), "First page\n\nThird page\n");
   assert.equal(openEpub((await convert(pdf.slice(0), "epub")).buffer).spine.length, 3);
 
   const many = handPdf({ pages: ["", textLines(["Text"]), "", "", "", "", ""] });
-  assert.match((await convert(many, "txt")).notice, /^6 of 7 pages have no text to extract \(they're pictures/);
+  assert.match((await convert(many, "txt")).notice, /^6 of 7 pages have no text to extract \(they may be scans or blank pages\), so this file has no text from them\.$/);
   const two = handPdf({ pages: [textLines(["Text"]), "", textLines(["Text"]), ""] });
   assert.match((await convert(two, "txt")).notice, /^Pages 2 and 4 have no text/);
 });
@@ -395,13 +424,7 @@ test("past its page or character limit a PDF is refused, counted exactly, never 
   const page = handPdf({
     pages: [0, 1, 2, 3, 4].map((index) => textLines(runs.slice(index * 50, index * 50 + 50), { top: 760 })),
   });
-  const task = pdfjs.getDocument({ data: new Uint8Array(page.slice(0)), verbosity: 0 });
-  const doc = await task.promise;
-  let characters = 0;
-  for (let number = 1; number <= 5; number += 1) {
-    for (const item of (await (await doc.getPage(number)).getTextContent()).items) characters += item.str.length;
-  }
-  await task.destroy();
+  const characters = (await pdfjsRuns(page.slice(0))).join("").length;
   assert.ok(characters >= 10_000, `${characters} characters`);
   const text = await readPdfText(page.slice(0), { pdfjs, limits: { characters } });
   assert.deepEqual(text.pages.flat(2), runs);
