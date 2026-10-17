@@ -149,8 +149,11 @@ const nextConfig = {
   // Blocking metadata for every user agent, not only Next's list of
   // HTML-limited bots: <title>, the description, rel=canonical and og tags
   // are always in <head>. Streamed, they land in <body> whenever a dynamic
-  // page's RSC payload outruns them: 354 [tool] pages did for browsers and
-  // Googlebot. Requests with no User-Agent still stream.
+  // page's RSC payload outruns them, as on 354 [tool] pages while that route
+  // rendered on every request. Since #315 it is static, and a static page is
+  // rendered whole before it is cached, so its <head> has them for any user
+  // agent; this still covers pages rendered per request. Requests with no
+  // User-Agent still stream.
   htmlLimitedBots: /.*/,
   env: {
     BUILD_MODE: "server",

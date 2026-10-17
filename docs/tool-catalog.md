@@ -72,6 +72,8 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
 ## Rendering and shared page behavior
 
 - Standard Tools use the shared Tool page renderer and template.
+- Pages render without their query on Workers (`lib/page-request.ts`), so
+  server code must not read it; client code reads `location.search`.
 - Image to PDF (`from: "image"`, `to: "pdf"`) is a standard Tool whose hero is
   `ImagesToPdfConverter`: one image becomes a PDF at once, as on every
   converter, and several are listed to order before they become one PDF.

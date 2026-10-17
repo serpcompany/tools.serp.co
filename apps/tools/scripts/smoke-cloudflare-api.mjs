@@ -333,11 +333,21 @@ function escapeRegExp(value) {
 const GTM_CONTAINER = "GTM-PP9W77LK";
 const ADSENSE_SCRIPT = "pagead/js/adsbygoogle.js";
 
+// The IndexNow key from public/<32 hex>.txt (pinned by lib/indexnow-key.test.mjs).
+// Ahrefs submits changed pages with it, and the engines fetch /<key>.txt.
+function indexNowKey() {
+  const keyFile = fs
+    .readdirSync(path.join(appRoot, "public"))
+    .find((name) => /^[0-9a-f]{32}\.txt$/.test(name));
+  return keyFile ? keyFile.slice(0, -".txt".length) : null;
+}
+
 function environmentChecks(args) {
   const checks = [];
   if (!args.expectEnv) return checks;
   const production = args.expectEnv === "production";
   const canonical = canonicalOrigin(args.expectEnv);
+  const key = indexNowKey();
 
   checks.push(
     {
@@ -352,6 +362,22 @@ function environmentChecks(args) {
           : response.status === 200 && body.includes("Disallow: /") && !body.includes("Sitemap:");
       },
       details: (_response, bytes) => ({ body: bytes.toString("utf8").slice(0, 200) }),
+    },
+    // Static assets skip the Worker, so this holds the same in every environment.
+    {
+      name: `IndexNow key /${key ?? "<none in public/>"}.txt is the key as text/plain, not noindex`,
+      url: buildUrl(args.baseUrl, `/${key ?? "missing-indexnow-key"}.txt`),
+      expect: (response, bytes) =>
+        key !== null &&
+        response.status === 200 &&
+        contentTypeEssence(response.headers.get("content-type")) === "text/plain" &&
+        bytes.toString("utf8") === key &&
+        !(response.headers.get("x-robots-tag") ?? "").toLowerCase().includes("noindex"),
+      details: (response, bytes) => ({
+        contentType: response.headers.get("content-type"),
+        xRobotsTag: response.headers.get("x-robots-tag"),
+        body: bytes.toString("utf8").slice(0, 64),
+      }),
     },
     {
       name: `sitemap index lists only ${canonical}/sitemap-<group>.xml files`,
