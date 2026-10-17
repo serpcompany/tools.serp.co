@@ -12,6 +12,7 @@ import {
   resolveImport,
   routeFiles,
 } from "../scripts/lib/module-graph.mjs";
+import { dynamicRouteHandler, scanPageHandlers } from "../scripts/lib/tool-sweep.mjs";
 import { activeTools, allTools } from "./catalog/catalog.ts";
 import {
   serializeJsonLd,
@@ -103,8 +104,15 @@ const pageFiles = new Map(
 const routeOf = (tool) => tool.route.replace(/\/+$/, "") || "/";
 
 // The components a module renders: one entry for each JSX element whose tag
-// is a name it imports from the repository, with the file it comes from.
+// is a name it imports from the repository, with the file it comes from and
+// the element's attributes. Cached by file: ~2,440 Tools share a few modules.
+const rendered = new Map();
 function renderedComponents(file) {
+  if (!rendered.has(file)) rendered.set(file, readRenderedComponents(file));
+  return rendered.get(file);
+}
+
+function readRenderedComponents(file) {
   const sourceFile = parse(file);
   const imported = new Map();
   for (const statement of sourceFile.statements) {
@@ -117,16 +125,16 @@ function renderedComponents(file) {
       for (const element of clause.namedBindings.elements) imported.set(element.name.text, target);
     }
   }
-  const rendered = [];
+  const components = [];
   const visit = (node) => {
     if ((ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) && ts.isIdentifier(node.tagName)) {
       const target = imported.get(node.tagName.text);
-      if (target) rendered.push({ name: node.tagName.text, file: target });
+      if (target) components.push({ name: node.tagName.text, file: target, attributes: node.attributes });
     }
     ts.forEachChild(node, visit);
   };
   visit(sourceFile);
-  return rendered;
+  return components;
 }
 
 // How many JSON-LD scripts a module renders: each <StructuredData> element in
@@ -146,29 +154,34 @@ function mounts(file) {
   return mountCounts.get(file);
 }
 
-// What app/(convert)/[tool]/page.tsx renders for a Tool with no folder of its
-// own. The "coming soon" editors get ToolPlaceholder, which has no JSON-LD.
-const COMING_SOON = new Set(["video-editor", "image-editor", "audio-editor"]);
-function toolRouteComponent(tool) {
-  if ((tool.operation === "convert" || tool.operation === "compress") && tool.from && tool.to) {
-    return "ToolPageRenderer";
-  }
-  if (tool.operation === "download") return "DownloaderPageRenderer";
-  if (COMING_SOON.has(tool.operation)) return "ToolPlaceholder";
-  if (tool.operation === "view" || tool.operation === "edit") return "PdfToolPage";
-  return undefined;
-}
+// The components app/(convert)/[tool]/page.tsx renders, by name.
 const toolRouteComponents = new Map(
   renderedComponents(toolRoutePage).map(({ name, file }) => [name, file]),
 );
 
 // The module that renders an active Tool's page: its folder's page, else the
-// component the [tool] route renders for it.
+// component the [tool] route renders for it, by the tool sweep's copy of that
+// route's dispatch (its "not-found" is no component).
 const pageModuleOf = (tool) =>
-  pageFiles.get(routeOf(tool)) ?? toolRouteComponents.get(toolRouteComponent(tool));
+  pageFiles.get(routeOf(tool)) ?? toolRouteComponents.get(dynamicRouteHandler(tool));
 
-const isComingSoon = (tool) => !pageFiles.has(routeOf(tool)) && COMING_SOON.has(tool.operation);
+// The "coming soon" editors get ToolPlaceholder, which has no JSON-LD.
+const COMING_SOON = ["audio-editor", "image-editor", "video-editor"];
+const isComingSoon = (tool) => !pageFiles.has(routeOf(tool)) && dynamicRouteHandler(tool) === "ToolPlaceholder";
 const liveTools = () => activeTools().filter((tool) => !isComingSoon(tool));
+
+// The toolId an element gets: a string literal, or a top-level string
+// constant of the page named by it (`toolId={toolId}`).
+function toolIdProp(file, attributes) {
+  const attribute = attributes.properties.find(
+    (property) => ts.isJsxAttribute(property) && ts.isIdentifier(property.name) && property.name.text === "toolId",
+  );
+  let value = attribute?.initializer;
+  if (value && ts.isJsxExpression(value)) value = value.expression;
+  if (!value) return undefined;
+  if (ts.isStringLiteral(value)) return value.text;
+  return ts.isIdentifier(value) ? stringConstants(file).get(value.text) : undefined;
+}
 
 // A page's top-level `const name = "value"` strings (`"csv" as const` too).
 function stringConstants(file) {
@@ -313,7 +326,7 @@ test("a table converter's url is the canonical its page's metadata writes", () =
 });
 
 test("the [tool] route renders a template, the PDF page or the placeholder, and nothing else", () => {
-  // A new branch there needs toolRouteComponent above to say which Tools get it.
+  // A new branch there needs the sweep's dynamicRouteHandler to say which Tools get it.
   assert.deepEqual(
     [...toolRouteComponents.keys()].sort(),
     ["DownloaderPageRenderer", "PdfToolPage", "ToolPageRenderer", "ToolPlaceholder"],
@@ -332,15 +345,58 @@ test("every live Tool page renders one JSON-LD script; the coming-soon editors n
   assert.ok(counts.length > 2500, `${counts.length} active Tools`);
   assert.deepEqual(
     counts.filter(({ count }) => count === 0).map(({ tool }) => tool.operation).sort(),
-    [...COMING_SOON].sort(),
+    COMING_SOON,
   );
 
-  // A folder page passes its own Tool's id.
+  // A folder page gives the element that renders its JSON-LD its own Tool's
+  // id. (A table page's id comes from its formats, checked above.)
+  let folderPages = 0;
   for (const { tool } of counts) {
     const file = pageFiles.get(routeOf(tool));
     if (!file || tablePage(file)) continue;
-    assert.equal(stringConstants(file).get("toolId"), tool.id, file);
+    folderPages += 1;
+    const passed = renderedComponents(file)
+      .filter((component) => mounts(component.file) > 0)
+      .map((component) => ({ component: component.name, toolId: toolIdProp(file, component.attributes) }));
+    assert.equal(passed.length, 1, file);
+    assert.equal(passed[0].toolId, tool.id, `${file}: ${passed[0].component}`);
   }
+  assert.ok(folderPages > 100, `${folderPages} folder pages`);
+});
+
+// The tool sweep files a folder page under its first @/components import
+// outside sections/ (scripts/lib/tool-sweep.mjs, pageComponent), so a page
+// imports StructuredData after its own component. The pages that render
+// <StructuredData> themselves, with the component the sweep filed each under
+// before they did.
+const SWEEP_HANDLERS = {
+  "/audio-to-text": "TranscribeTool",
+  "/audio-to-transcript": "TranscribeTool",
+  "/batch-compress-png": "BatchHeroConverter",
+  "/character-counter": "CharacterCounter",
+  "/csv-combiner": "CsvCombiner",
+  "/html-to-markdown": "HtmlToMarkdownConverter",
+  "/json-to-csv": "JsonToCsv",
+  "/mp3-to-transcript": "TranscribeTool",
+  "/mp4-to-transcript": "TranscribeTool",
+  "/tiktok-to-transcript": "TranscribeTool",
+  "/video-to-transcript": "TranscribeTool",
+  "/youtube-to-transcript": "TranscribeTool",
+  "/youtube-to-transcript-generator": "TranscribeTool",
+};
+
+test("the tool sweep files each page under its own component, never StructuredData", () => {
+  const handlers = scanPageHandlers(path.join(appDir, "app"));
+
+  const mounting = [...pageFiles]
+    .filter(([, file]) => renderedComponents(file).some(({ name }) => name === "StructuredData"))
+    .map(([route]) => route)
+    .sort();
+  assert.deepEqual(mounting, Object.keys(SWEEP_HANDLERS).sort(), "pages that render <StructuredData>");
+  assert.deepEqual(Object.fromEntries(mounting.map((route) => [route, handlers.get(route)])), SWEEP_HANDLERS);
+
+  const misfiled = [...handlers].filter(([, handler]) => handler === "StructuredData").map(([route]) => route);
+  assert.deepEqual(misfiled, []);
 });
 
 test("pages that aren't a live Tool's render no JSON-LD", () => {

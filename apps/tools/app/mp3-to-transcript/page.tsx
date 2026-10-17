@@ -1,5 +1,5 @@
-import { StructuredData } from "@/components/StructuredData";
 import TranscribeTool from "@/components/TranscribeTool";
+import { StructuredData } from "@/components/StructuredData";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { ChangelogSection } from "@/components/sections/ChangelogSection";
