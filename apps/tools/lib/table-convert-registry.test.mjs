@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 import { TABLE_CONVERT_PAGES } from "./table-convert-pages.ts";
-import { directoryGrid } from "./catalog/directory.ts";
+import { toolSearchIndex } from "./catalog/directory.ts";
 
 const toolsRegistry = JSON.parse(
   readFileSync(new URL("./catalog/tools.json", import.meta.url), "utf8"),
@@ -25,7 +25,7 @@ function normalizeRoute(route) {
 test("csv-to-markdown is discoverable through page, directory, and sitemap data", () => {
   const tableConvertEntry = TABLE_CONVERT_PAGES.find((entry) => entry.slug === "csv-to-markdown");
   const tool = toolsRegistry.find((entry) => entry.id === "csv-to-markdown");
-  const directoryEntry = directoryGrid().find((entry) => entry.href === "/csv-to-markdown/");
+  const directoryEntry = toolSearchIndex().find((entry) => entry.href === "/csv-to-markdown/");
   const sitemapRoutes = new Set(
     toolsRegistry
       .filter((entry) => entry.isActive)

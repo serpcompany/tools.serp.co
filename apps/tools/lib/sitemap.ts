@@ -1,4 +1,4 @@
-import { categoryHref } from "./catalog/href.ts";
+import { categoryPageHrefs } from "./catalog/category-pages.ts";
 import { operationsUsedBy } from "./catalog/operations.ts";
 
 // The sitemap tree follows the serp sitemap standard
@@ -62,8 +62,15 @@ export function getToolPaths(tools: readonly SitemapTool[]) {
     .map((tool) => normalizePath(tool.route as string));
 }
 
+// Every numbered page of every category with an active Tool
+// (lib/catalog/category-pages.ts), page 1 first.
 export function getCategoryPaths(tools: readonly SitemapTool[]) {
-  return operationsUsedBy(tools).map(categoryHref).map(normalizePath);
+  return operationsUsedBy(tools)
+    .flatMap((operation) => {
+      const count = tools.filter((tool) => tool.isActive && tool.operation === operation).length;
+      return categoryPageHrefs(operation, count);
+    })
+    .map(normalizePath);
 }
 
 function getGroupPaths(tools: readonly SitemapTool[]): Record<SitemapGroup, string[]> {

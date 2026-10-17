@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   appRoot,
+  firstNumberedCategoryPath,
   getWranglerConfig,
   repoRoot,
 } from "./lib/cloudflare-audit.mjs";
@@ -263,6 +264,8 @@ function safeGetChecks(args) {
     "/sitemap-pages.xml",
     "/sitemap-tools.xml",
   ];
+  const numberedCategoryPath = firstNumberedCategoryPath();
+  if (numberedCategoryPath) paths.push(numberedCategoryPath);
   const checks = paths.map((pathname) => ({
     name: `GET ${pathname}`,
     url: buildUrl(args.baseUrl, pathname),
@@ -405,6 +408,22 @@ function environmentChecks(args) {
     const location = response.headers.get("location");
     return location ? new URL(location, args.baseUrl).pathname : null;
   };
+  // Numbered category pages (#317) are canonical to themselves.
+  const numberedCategoryPath = firstNumberedCategoryPath();
+  if (numberedCategoryPath) {
+    checks.push({
+      name: `${numberedCategoryPath} answers 200 and is canonical to itself`,
+      url: buildUrl(args.baseUrl, numberedCategoryPath),
+      expect: (response, bytes) =>
+        response.status === 200 &&
+        bytes
+          .toString("utf8")
+          .includes(`<link rel="canonical" href="${canonical}${numberedCategoryPath}"/>`),
+      details: (_response, bytes) => ({
+        canonical: bytes.toString("utf8").match(/<link rel="canonical"[^>]*>/)?.[0] ?? null,
+      }),
+    });
+  }
   checks.push(
     {
       name: "homepage canonical and og:url are the bare origin",
