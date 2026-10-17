@@ -19,6 +19,7 @@ import {
   isSvgFontConversion,
   isTableImageConversion,
 } from "../../lib/convert/image-document-targets.ts";
+import { isPdfTextConversion } from "../../lib/convert/pdf-text-targets.ts";
 
 export const STATUSES = ["pass", "wrong_format", "error", "timeout", "no_fixture", "skipped"];
 // Statuses that come from running the Tool. A resumed run skips Tools that
@@ -191,7 +192,8 @@ const COMPRESSION_ENGINES = {
 
 // The engine the generic converter page uses for a Tool: Image to PDF's own
 // (lib/convert/image-pdf.ts, any image in), BIN's (the picture inside, by
-// its first bytes), the branch order of
+// its first bytes), PDF to TXT, HTML and EPUB's (lib/convert/pdf-text.ts,
+// pdf.js's text rather than its rendering), the branch order of
 // compressFile and convertUnchecked in lib/convert/workerClient.ts, the AV1
 // and HEVC Tools of lib/convert/webcodecs.ts, and the server-only outputs of
 // shouldUseServerConversion in lib/convert/video.ts. Those try
@@ -207,6 +209,7 @@ export function converterEngine({ operation, from, to }) {
     return COMPRESSION_ENGINES[compression] ?? "unsupported";
   }
   if (source === "image" && target === "pdf") return "image-pdf";
+  if (isPdfTextConversion(source, target)) return "pdfjs-text";
   if (source === "ai" || source === "pdf") return "pdfjs";
   if (isImageDocumentConversion(source, target)) return "image-documents";
   if (isImageTextConversion(source, target)) return target === "txt" ? "tesseract" : "docx";
@@ -247,6 +250,7 @@ export const ENGINE_LOCATIONS = {
   "imagemagick-wasm": "client-only",
   "browser-raster": "client-only",
   pdfjs: "client-only",
+  "pdfjs-text": "client-only",
   "heif-decoder": "client-only",
   "table-convert": "client-only",
   "table-convert + xlsx": "client-only",
@@ -295,6 +299,9 @@ const TEXT_MARKERS = {
   // separator, currency, a percentage and a formula's saved result
   // (xlsx-sheets.test.mjs reads each cell).
   "sample-sheets.xlsx": ["North", "3/14/2026", "1,200", "$15,234.50", "25%", "$67,105.75"],
+  // A word from each of its two pages, and a line of text that looks like
+  // markup: HTML or XHTML that didn't escape it would show "not bold" alone.
+  "sample-text.pdf": ["Alpha", "Bravo", "Salt & pepper <b>not bold</b>"],
 };
 // Strings a fixture hides, which a converted copy must not hold: sample-sheets.xlsx's
 // hidden row and column, and its hidden sheet.
@@ -302,6 +309,9 @@ const HIDDEN_TEXT = {
   "sample-sheets.xlsx": ["Hidden row", "secret", "Internal", "cost 9.10", "Hidden sheet", "Salary"],
 };
 const TEXT_DRIVERS = new Set(["table", "html-to-markdown", "json-to-csv", "csv-combiner"]);
+// Engines on the converter page whose output is the input's text, in any
+// format: their fixtures need TEXT_MARKERS too.
+const TEXT_ENGINES = new Set(["pdfjs-text"]);
 
 // Table outputs the page writes as files (lib/convert/table-outputs.ts)
 // rather than as text in its output panel. The sweep opens each one and
@@ -312,6 +322,11 @@ const DECODED_TABLE_OUTPUTS = new Set(["excel", "pdf", "avro", "protobuf"]);
 // Fonts the sweep opens with a font parser (decodeFontOutput), since a
 // signature says nothing about the glyph inside: SVG to TTF's.
 const DECODED_FONT_OUTPUTS = new Set(["ttf"]);
+// Documents the sweep opens as a reader would (decodeDocumentOutput): every
+// EPUB, whose signature proves only the ZIP's first entry, and the HTML a
+// text engine writes, which has no signature at all.
+const DECODED_DOCUMENT_OUTPUTS = new Set(["epub"]);
+const DECODED_TEXT_DOCUMENTS = new Set(["epub", "html"]);
 // Engines whose fixture must be worked out in a Web Worker the page starts,
 // which must answer. Each has a fallback without the worker that still
 // saves a good file (SVG to TTF takes crossing outlines as drawn), so a
@@ -359,10 +374,15 @@ export const EXPECTED_REFUSALS = {
   "not-an-image.bin": { errorCode: "not_an_image", message: "isn't an image" },
   // Apache Tika's FairPlay test file (lib/convert/fairplay.ts).
   "tika-drm.m4p": { errorCode: "copy_protected", message: "copy-protected" },
+  // PDF to TXT, HTML and EPUB (lib/convert/pdf-text.ts): a page that is a
+  // picture of text, a password-protected PDF, and a PDF cut off halfway.
+  "sample-scan.pdf": { errorCode: "no_text", message: "has no text to extract" },
+  "sample-protected.pdf": { errorCode: "password_protected", message: "password-protected" },
+  "sample-truncated.pdf": { errorCode: "unreadable_pdf", message: "damaged or incomplete" },
 };
 
 // fixture-matrix.json: ready inputs by format, per-Tool fixtures, and the
-// inputs each format's Tools must refuse.
+// inputs each format's Tools, or one Tool, must refuse.
 export function loadFixtures(benchmarksDir) {
   const matrix = JSON.parse(readFileSync(path.join(benchmarksDir, "fixture-matrix.json"), "utf8"));
   const resolve = (relative) => path.join(benchmarksDir, relative);
@@ -373,11 +393,13 @@ export function loadFixtures(benchmarksDir) {
     if (entry.refusals?.length) refusals.set(entry.format, entry.refusals.map(resolve));
   }
   const byTool = new Map();
+  const toolRefusals = new Map();
   for (const [toolId, entry] of Object.entries(matrix.toolFixtures ?? {})) {
     const files = entry.fixtures ?? (entry.fixture ? [entry.fixture] : []);
     if (files.length) byTool.set(toolId, files.map(resolve));
+    if (entry.refusals?.length) toolRefusals.set(toolId, entry.refusals.map(resolve));
   }
-  return { byFormat, byTool, refusals };
+  return { byFormat, byTool, refusals, toolRefusals };
 }
 
 // Everything the sweep needs to know about one Tool before opening it. A plan
@@ -400,13 +422,16 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
   // its pixels are checked instead.
   const target = tool.to?.toLowerCase();
   const tableFile = driver === "table" && TABLE_FILE_OUTPUTS.has(target);
-  const textOutput = (TEXT_DRIVERS.has(driver) && !checksPixels(target)) || target === "txt";
+  const textEngine = driver === "file" && TEXT_ENGINES.has(engine);
+  const textOutput = (TEXT_DRIVERS.has(driver) && !checksPixels(target)) || target === "txt" || textEngine;
+  const document = DECODED_DOCUMENT_OUTPUTS.has(target) || (textEngine && DECODED_TEXT_DOCUMENTS.has(target));
   const markers = textOutput ? files.flatMap((file) => TEXT_MARKERS[path.basename(file)] ?? [null]) : [];
   if (markers.some((marker) => !marker)) {
     return { ...base, status: "no_fixture", reason: `no data marker for the ${tool.from} fixture in TEXT_MARKERS` };
   }
-  // Only the generic converter page is driven with a refusal.
-  const refusals = driver === "file" ? (fixtures.refusals?.get(tool.from) ?? []) : [];
+  // Only the generic converter page is driven with a refusal: the Tool's
+  // own, else its input format's.
+  const refusals = driver === "file" ? (fixtures.toolRefusals?.get(tool.id) ?? fixtures.refusals?.get(tool.from) ?? []) : [];
   const unexpected = refusals.find((file) => !EXPECTED_REFUSALS[path.basename(file)]);
   if (unexpected) {
     return { ...base, status: "no_fixture", reason: `no expected refusal for ${path.basename(unexpected)} in EXPECTED_REFUSALS` };
@@ -423,7 +448,7 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
     pixelCheck: checksPixels(tool.to) && !files.some((file) => ONE_COLOUR_FIXTURES.has(path.basename(file))),
     pages: checksPixels(tool.to) && files.length === 1 ? PAGE_COUNTS[path.basename(files[0])] : undefined,
     tableFile,
-    decode: (tableFile && DECODED_TABLE_OUTPUTS.has(target)) || DECODED_FONT_OUTPUTS.has(target),
+    decode: (tableFile && DECODED_TABLE_OUTPUTS.has(target)) || DECODED_FONT_OUTPUTS.has(target) || document,
     ...(WORKER_ENGINES.has(engine) ? { worker: true } : {}),
     compress: tool.operation === "compress" || tool.operation === "bulk",
     timeoutMs: slow ? ffmpegTimeoutMs : timeoutMs,
@@ -790,8 +815,94 @@ export async function decodeFontOutput(bytes) {
   return { text: `${font.names.fontFamily?.en ?? "(no family)"}: U+E000 has ${filled.length} contours` };
 }
 
+// What XML 1.0 forbids in a document: C0 controls other than tab, LF and CR,
+// U+FFFE, U+FFFF and lone surrogates.
+// eslint-disable-next-line no-control-regex -- the control characters are what it finds
+const XML_FORBIDDEN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
+
+// Parses a document with sax: XML strictly, as an e-reader does, throwing on
+// anything that isn't well-formed or holds a character XML forbids; HTML
+// loosely, as a browser would. Returns its elements, with their attributes,
+// and the text of its <body> without scripts and styles.
+function parseDocument(sax, source, { xml }) {
+  if (xml) {
+    const forbidden = XML_FORBIDDEN.exec(source);
+    if (forbidden) {
+      throw new Error(`it holds U+${forbidden[0].codePointAt(0).toString(16).toUpperCase().padStart(4, "0")}, which XML forbids`);
+    }
+  }
+  const parser = sax.parser(xml, { lowercase: true });
+  const elements = [];
+  let text = "";
+  let body = 0;
+  let hidden = 0;
+  const local = (name) => name.toLowerCase().replace(/^.*:/, "");
+  parser.onerror = (error) => {
+    throw new Error(error.message.split("\n")[0]);
+  };
+  parser.onopentag = (node) => {
+    const name = local(node.name);
+    elements.push({ name, attributes: node.attributes });
+    if (name === "body") body += 1;
+    if (name === "script" || name === "style") hidden += 1;
+  };
+  parser.onclosetag = (tag) => {
+    const name = local(tag);
+    if (name === "body") body -= 1;
+    if (name === "script" || name === "style") hidden -= 1;
+  };
+  parser.ontext = (value) => {
+    if (body > 0 && !hidden) text += value;
+  };
+  parser.write(source).close();
+  return { elements, text };
+}
+
+// Opens an HTML page or an EPUB the way a reader would and returns its text:
+// the page's body, or the body of each XHTML document in the EPUB's spine, in
+// order. An EPUB must have its mimetype entry first and stored, a container
+// naming its package, every file the package lists, a navigation document,
+// and well-formed XHTML. Throws when the file doesn't open.
+export async function decodeDocumentOutput(format, bytes) {
+  const sax = (await import("sax")).default;
+  const data = new Uint8Array(bytes);
+  if (format === "html") return { text: parseDocument(sax, new TextDecoder().decode(data), { xml: false }).text };
+  if (format !== "epub") throw new Error(`no decoder for ${format}`);
+  const { unzipSync, strFromU8 } = await import("fflate");
+  const files = unzipSync(data);
+  if (Object.keys(files)[0] !== "mimetype" || strFromU8(files.mimetype) !== "application/epub+zip") {
+    throw new Error("its first entry isn't a mimetype of application/epub+zip");
+  }
+  if ((data[8] | (data[9] << 8)) !== 0) throw new Error("its mimetype entry is compressed, not stored");
+  const xmlFile = (name) => {
+    if (!files[name]) throw new Error(`${name} is missing`);
+    try {
+      return parseDocument(sax, strFromU8(files[name]), { xml: true });
+    } catch (error) {
+      throw new Error(`${name} doesn't parse: ${error.message}`);
+    }
+  };
+  const rootfile = xmlFile("META-INF/container.xml").elements.find((element) => element.name === "rootfile");
+  const packagePath = rootfile?.attributes["full-path"];
+  if (!packagePath) throw new Error("its container names no package");
+  const base = packagePath.replace(/[^/]*$/, "");
+  const opf = xmlFile(packagePath).elements;
+  const items = new Map(opf.filter((element) => element.name === "item").map(({ attributes }) => [attributes.id, attributes]));
+  for (const item of items.values()) {
+    if (!files[base + decodeURIComponent(item.href)]) throw new Error(`the package lists ${item.href}, which isn't in the file`);
+  }
+  if (![...items.values()].some((item) => item.properties?.split(/\s+/).includes("nav"))) {
+    throw new Error("it has no navigation document");
+  }
+  const spine = opf.filter((element) => element.name === "itemref").map(({ attributes }) => items.get(attributes.idref));
+  if (!spine.length || spine.some((item) => !item)) throw new Error("its spine is empty or lists an item the package doesn't");
+  const texts = spine.map((item) => xmlFile(base + decodeURIComponent(item.href)).text.trim());
+  return { text: texts.join("\n") };
+}
+
 // Opens each saved file the sweep decodes (decodeTableOutput,
-// decodeFontOutput) and records what it holds as output.decoded. A
+// decodeFontOutput, decodeDocumentOutput) and records what it holds as
+// output.decoded. A
 // Protobuf run saves two files: the .pb, decoded with the .proto beside it,
 // and the .proto, which is read by that decoding. `outputs` carry each
 // file's bytes as base64.
@@ -804,7 +915,9 @@ export async function decodeOutputs(outputs, format) {
     try {
       output.decoded = DECODED_FONT_OUTPUTS.has(format)
         ? await decodeFontOutput(bytes)
-        : await decodeTableOutput(format, bytes, { schema });
+        : DECODED_TEXT_DOCUMENTS.has(format)
+          ? await decodeDocumentOutput(format, bytes)
+          : await decodeTableOutput(format, bytes, { schema });
     } catch (error) {
       output.decoded = { error: String(error?.message ?? error).split("\n")[0] };
     }
