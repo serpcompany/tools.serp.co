@@ -309,8 +309,8 @@ test("an SVG is measured by the raster it wraps, and other formats aren't measur
   assert.equal(measurePixels(magick, new TextEncoder().encode(vector), "svg"), null);
   assert.equal(measurePixels(magick, new Uint8Array(16), "icns"), null);
   assert.throws(() => measurePixels(magick, new Uint8Array(64).fill(7), "png"));
-  assert.deepEqual(["png", "JPG", "svg", "tga", "xbm", "icns", "ktx", "rgb", "eps", "mp4"].map(checksPixels), [
-    true, true, true, true, true, false, false, false, false, false,
+  assert.deepEqual(["png", "JPG", "svg", "tga", "xbm", "rgb", "icns", "ktx", "eps", "mp4"].map(checksPixels), [
+    true, true, true, true, true, true, false, false, false, false,
   ]);
 });
 

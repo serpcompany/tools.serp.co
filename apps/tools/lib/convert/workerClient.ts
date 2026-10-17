@@ -31,6 +31,7 @@ import { encodeFromRGBA } from "./encode.ts";
 import { copyProtectedMessage, isCopyProtected } from "./fairplay.ts";
 import { MAGICK_BROWSER_INPUTS, MAGICK_FALLBACK_INPUTS } from "./magickBrowser.ts";
 import { checkOutputFormat } from "./output-format.ts";
+import type { PdfImageRefusal } from "./pdf-images.ts";
 import { isPdfTextConversion, PDF_TEXT_REFUSALS } from "./pdf-text-targets.ts";
 import {
   isTextPdfConversion,
@@ -43,7 +44,7 @@ import { usesWebCodecs } from "./webcodecs.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 
-export type ConversionOp = "raster" | "pdf-pages" | "video";
+export type ConversionOp = "raster" | "video";
 
 // A notice says what the visitor should know about the file, such as the
 // rows a table image leaves out.
@@ -143,7 +144,6 @@ export function getOutputMimeType(format: string) {
 }
 
 export function resolveConversionOp(from: string, to: string): ConversionOp {
-  if (from === "pdf") return "pdf-pages";
   if (requiresVideoConversion(from, to)) {
     return "video";
   }
@@ -158,7 +158,6 @@ type WorkerMessage = {
   ok?: boolean;
   error?: string;
   blob?: ArrayBuffer;
-  blobs?: ArrayBuffer[];
   // The worker's decoder found the file's picture undecodable (decode-failure.ts).
   decodeFailure?: boolean;
 };
@@ -302,7 +301,7 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
     });
   }
   if (fromExt === "ai") {
-    return convertAi(args.buf, toExt, args.quality);
+    return convertAi(toExt, args);
   }
   if (MAGICK_BROWSER_INPUTS.has(fromExt)) {
     return convertWithMagick(args);
@@ -317,9 +316,7 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
     return convertTextToPdfFile(fromExt, args);
   }
   if (fromExt === "pdf") {
-    const { renderPdfPages } = await import("./pdf");
-    const buffers = await renderPdfPages(args.buf, undefined, args.to);
-    return { kind: "multiple", buffers };
+    return convertPdfToImages("pdf", toExt, args);
   }
   if (isImageDocumentConversion(fromExt, toExt)) {
     return convertImageToDocument(fromExt, toExt, args.buf);
@@ -571,12 +568,57 @@ async function convertTextToPdfFile(from: string, args: ConvertArgs): Promise<Co
   }
 }
 
+// What PDF and AI to an image tell the visitor and telemetry when the pages
+// weren't converted: a file that is damaged or not a PDF, password-protected,
+// or too large to hold as images is told so (pdf-images.ts); any other
+// failure (pdf.js or the encoder didn't load, or failed) gets a plain "try
+// again", and telemetry keeps the engine's error name as its code. The error
+// stays the telemetry error's cause.
+const PDF_IMAGE_REFUSALS: Readonly<Record<PdfImageRefusal, true>> = {
+  unreadable_pdf: true,
+  password_protected: true,
+  too_large: true,
+};
+
+export function pdfImageFailure(error: unknown, from: string, to: string): Error {
+  const code = (error as { code?: unknown } | null)?.code;
+  const refused = typeof code === "string" && Object.hasOwn(PDF_IMAGE_REFUSALS, code) && error instanceof Error;
+  const failure = createTelemetryError(
+    refused ? code : engineErrorCode(error),
+    refused
+      ? error.message
+      : `This ${from === "ai" ? "AI file" : "PDF"} couldn't be converted to ${to.toUpperCase()}. Try again, or reload the page.`,
+    { from, to, engine: "pdfjs" },
+  );
+  failure.cause = error;
+  return failure;
+}
+
+// PDF or AI to an image (pdf-images.ts): one file a page, each drawn by
+// pdf.js and saved as `to`, as PNG and JPEG straight from the canvas and as
+// any other format from the page's pixels.
+async function convertPdfToImages(from: string, to: string, args: ConvertArgs): Promise<ConversionResult> {
+  args.onProgress?.({ status: "processing", progress: 5 });
+  try {
+    const { convertPdfPages } = await import("./pdf-images.ts");
+    const buffers = await convertPdfPages(args.buf, to, {
+      from,
+      quality: args.quality,
+      onProgress: (share) => args.onProgress?.({ status: "processing", progress: 5 + Math.round(share * 90) }),
+    });
+    args.onProgress?.({ status: "processing", progress: 100 });
+    return { kind: "multiple", buffers };
+  } catch (error) {
+    throw pdfImageFailure(error, from, to);
+  }
+}
+
 // Illustrator writes every AI file as a PDF unless "Create PDF Compatible
 // File" is turned off; older AI files are PostScript, which pdf.js can't read.
 // The PDF is the AI to PDF result as it is, vectors included; other formats
-// are encoded from the pages pdf.js renders.
-async function convertAi(buf: ArrayBuffer, to: string, quality?: number): Promise<ConversionResult> {
-  if (!checkOutputFormat(buf, "pdf").ok) {
+// are the images of its pages (artboards), as a PDF's are.
+async function convertAi(to: string, args: ConvertArgs): Promise<ConversionResult> {
+  if (!checkOutputFormat(args.buf, "pdf").ok) {
     throw createTelemetryError(
       "unsupported_input",
       "This AI file has no PDF inside. In Illustrator, save it again with Create PDF Compatible File turned on.",
@@ -584,22 +626,9 @@ async function convertAi(buf: ArrayBuffer, to: string, quality?: number): Promis
     );
   }
   if (to === "pdf") {
-    return { kind: "single", buffer: buf };
+    return { kind: "single", buffer: args.buf };
   }
-
-  const { renderPdfPages } = await import("./pdf");
-  const rendered = to === "jpg" || to === "jpeg" ? "jpg" : "png";
-  const pages = await renderPdfPages(buf, undefined, rendered);
-  if (to === rendered || to === "jpeg") {
-    return { kind: "multiple", buffers: pages };
-  }
-  const buffers = [];
-  for (const page of pages) {
-    const rgba = await decodeToRGBA("png", page);
-    const blob = await encodeFromRGBA(to, rgba, quality ?? 0.85);
-    buffers.push(await blob.arrayBuffer());
-  }
-  return { kind: "multiple", buffers };
+  return convertPdfToImages("ai", to, args);
 }
 
 async function convertWithWorkerInner(args: {
@@ -636,10 +665,6 @@ async function convertWithWorkerInner(args: {
         return reject(failure);
       }
 
-      if (ev.data.blobs) {
-        return resolve({ kind: "multiple", buffers: ev.data.blobs });
-      }
-
       if (ev.data.blob) {
         return resolve({ kind: "single", buffer: ev.data.blob });
       }
@@ -669,14 +694,6 @@ async function convertWithWorkerInner(args: {
         )
       );
     };
-
-    if (args.op === "pdf-pages") {
-      args.worker.postMessage(
-        { op: args.op, to: args.to, buf: args.buf, quality: args.quality },
-        [args.buf]
-      );
-      return;
-    }
 
     args.worker.postMessage(
       { op: args.op, from: args.from, to: args.to, buf: args.buf, quality: args.quality },
