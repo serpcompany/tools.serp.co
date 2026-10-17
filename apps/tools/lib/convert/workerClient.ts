@@ -32,6 +32,13 @@ import { copyProtectedMessage, isCopyProtected } from "./fairplay.ts";
 import { MAGICK_BROWSER_INPUTS, MAGICK_FALLBACK_INPUTS } from "./magickBrowser.ts";
 import { checkOutputFormat } from "./output-format.ts";
 import { isPdfTextConversion, PDF_TEXT_REFUSALS } from "./pdf-text-targets.ts";
+import {
+  isTextPdfConversion,
+  TEXT_PDF_ENGINES,
+  TEXT_PDF_LIMITS,
+  TEXT_PDF_REFUSALS,
+  tooLargeFileMessage,
+} from "./text-pdf-targets.ts";
 import { usesWebCodecs } from "./webcodecs.ts";
 import { createServerActionRequestHeaders } from "../server-action-client.ts";
 import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
@@ -206,11 +213,20 @@ export async function convertWithWorker(args: ConvertArgs): Promise<ConversionRe
 
 // Refuses a file its Tool can't convert from its first bytes, before the
 // page reads it whole: a .bin that holds no image may be a disc image of
-// several gigabytes. An SVG too large to make a font from is refused by its
-// size. convertWithWorker checks the same again.
+// several gigabytes. An SVG too large to make a font from, and a text or
+// XML file too large to make a PDF from, are refused by their size.
+// convertWithWorker checks the same again.
 export async function checkInputFile(file: Blob, from: string, to: string): Promise<void> {
   if (isSvgFontConversion(from, to) && file.size > SVG_FONT_MAX_BYTES) {
     throw createTelemetryError("too_complex", SVG_FONT_TOO_LARGE_MESSAGE, { from: "svg", to: "ttf", engine: "svg-font" });
+  }
+  if (isTextPdfConversion(from, to) && file.size > TEXT_PDF_LIMITS.bytes) {
+    const source = from.toLowerCase();
+    throw createTelemetryError("too_large", tooLargeFileMessage(file.size), {
+      from: source,
+      to: "pdf",
+      engine: TEXT_PDF_ENGINES[source] ?? source,
+    });
   }
   if (from.toLowerCase() !== "bin") return;
   const head = new Uint8Array(await file.slice(0, BIN_HEAD_BYTES).arrayBuffer());
@@ -296,6 +312,9 @@ async function convertUnchecked(args: ConvertArgs): Promise<ConversionResult> {
   }
   if (isPdfTextConversion(fromExt, toExt)) {
     return convertPdfToText(toExt, args);
+  }
+  if (isTextPdfConversion(fromExt, toExt)) {
+    return convertTextToPdfFile(fromExt, args);
   }
   if (fromExt === "pdf") {
     const { renderPdfPages } = await import("./pdf");
@@ -515,6 +534,40 @@ async function convertPdfToText(to: string, args: ConvertArgs): Promise<Conversi
     return { kind: "single", buffer, notice };
   } catch (error) {
     throw pdfTextFailure(error, to);
+  }
+}
+
+// What TXT and XML to PDF tell the visitor and telemetry when the file
+// wasn't converted: a file that is too large, empty, in a script the PDF's
+// font can't show, in an encoding that can't be read, or (XML) not
+// well-formed is told so (text-pdf.ts); any other failure (jsPDF or the font
+// didn't load, or failed) gets a plain "try again", with convert_failed as
+// its code. The error stays the telemetry error's cause.
+export function textPdfFailure(error: unknown, from: string): Error {
+  const code = (error as { code?: unknown } | null)?.code;
+  const refused = typeof code === "string" && TEXT_PDF_REFUSALS.has(code) && error instanceof Error;
+  const failure = createTelemetryError(
+    refused ? code : "convert_failed",
+    refused ? error.message : `This ${from.toUpperCase()} file couldn't be converted to PDF. Try again, or reload the page.`,
+    { from, to: "pdf", engine: TEXT_PDF_ENGINES[from] ?? from },
+  );
+  failure.cause = error;
+  return failure;
+}
+
+// TXT or XML to PDF (text-pdf.ts): the text, or the XML as an indented
+// listing, on A4 pages, titled after the file.
+async function convertTextToPdfFile(from: string, args: ConvertArgs): Promise<ConversionResult> {
+  args.onProgress?.({ status: "processing", progress: 5 });
+  try {
+    const { convertTextToPdf } = await import("./text-pdf.ts");
+    const { buffer } = await convertTextToPdf(args.buf, from, args.fileName ?? `document.${from}`, {
+      onProgress: (share) => args.onProgress?.({ status: "processing", progress: 5 + Math.round(share * 90) }),
+    });
+    args.onProgress?.({ status: "processing", progress: 100 });
+    return { kind: "single", buffer };
+  } catch (error) {
+    throw textPdfFailure(error, from);
   }
 }
 

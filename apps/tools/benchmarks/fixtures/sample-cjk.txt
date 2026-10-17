@@ -1,0 +1,4 @@
+SERP Tools sample text
+Japanese: 東京は晴れです
+Chinese: 你好，世界
+Korean: 안녕하세요

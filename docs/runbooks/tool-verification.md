@@ -76,8 +76,9 @@ would (fflate, pdf.js, avsc, protobufjs with the `.proto` saved beside the
 "decoded"`. Its PNG and JPEG are checked as images. An EPUB is opened as a reader would
 (fflate and a strict sax parse: `mimetype` first and stored, every file its
 package lists, a navigation document, well-formed XHTML), and so is a text
-engine's HTML (its body text), and must hold the fixture's markers in its
-spine's or body's text, also recorded as `"decoded"`. SVG to TTF's font is
+engine's HTML (its body text) and PDF (TXT and XML to PDF's, read as PDF to
+TXT reads a PDF, `lib/convert/pdf-text.ts`), and must hold the fixture's
+markers in its spine's, body's or pages' text, also recorded as `"decoded"`. SVG to TTF's font is
 opened with opentype.js and must have a glyph with an outline on U+E000, also
 recorded as `"decoded"`, and its page's worker must answer: the sweep watches
 the Web Workers a page starts, since a fallback that still makes a font would
