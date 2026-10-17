@@ -22,18 +22,30 @@ display order: `convert`, `download`, `compress`, `combine`, `bulk`, `edit`,
 `video-editor`, `image-editor`, `audio-editor`, and `view`. Each editor
 operation holds one "coming soon" placeholder Tool. Category pages use
 `/category/{operation}/`, and `/categories/` links to the active operation
-categories. Category routes keep dynamic parameters enabled for OpenNext
-compatibility, validate the operation, and return `notFound()` for invalid or
-empty categories.
+categories. A category lists its Tools 120 to a page in registry order
+(`lib/catalog/category-pages.ts`): page 1 is `/category/{operation}/`, page
+`n` from 2 is `/category/{operation}/{n}/`, `/1/` redirects (308) to page 1,
+and a number past the last page is a 404. Registry order is `tools.json`'s,
+which is kept in id order, so a new Tool goes in at its id's place, not at the
+end. A Tool added or retired moves every later Tool by one place: pages before
+it don't change, and one Tool crosses each later page boundary. #328's three
+PDF Tools, for example, moved the last three Tools of converter pages 15 to 18
+to the next page. Every page links every other, so
+each Tool is three clicks from the homepage. Category routes keep dynamic
+parameters enabled for OpenNext compatibility, validate the operation, and
+return `notFound()` for invalid or empty categories.
 
 ## Discovery lists and the client boundary
 
 Active Tools drive public discovery, metadata, and sitemap projections. The
-homepage grid, `/categories/`, the category pages and the link hub read their
+homepage, `/categories/`, the category pages and the link hub read their
 lists from `lib/catalog/directory.ts` in Server Components, which pass client
 components plain data as props. Props are serialized into every page that
-renders them, so each entry carries only what the client renders or filters
-on, and `lib/catalog/directory.test.mjs` pins the shapes and byte budgets.
+renders them, so each list is bounded, each entry carries only what the client
+renders or filters on, and `lib/catalog/directory.test.mjs` pins the shapes
+and byte budgets. Only the homepage search needs every Tool: it fetches
+`/tool-index.json` (`app/tool-index.json/route.ts`) the first time someone
+searches or filters, so no page inlines the full list.
 
 Nothing a `"use client"` module or a web worker imports may reach
 `lib/catalog/catalog.ts`, `lib/catalog/directory.ts` or `tools.json`, directly
@@ -52,7 +64,8 @@ included.
 [sitemap standard](https://github.com/serpcompany/serp/blob/main/docs/engineering/websites/features/xml-sitemaps.md):
 `/sitemap-index.xml` lists only root-level `/sitemap-{pages,tools,categories}.xml`
 URL sets (`-2`, `-3`... past 50,000 URLs). The homepage entry is the bare origin
-and other entries end in `/`. Deployed environments write their canonical
+and other entries end in `/`. `/sitemap-categories.xml` lists every numbered
+page of every category. Deployed environments write their canonical
 origin, local runs the request origin. `/sitemap.xml` and retired names
 (`/sitemap-0.xml`, `/tools-index.xml`, `/tools-0.xml`) 308 into the tree.
 
@@ -90,8 +103,18 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
 - The shared site footer is mounted by
   `packages/app-core/src/components/app-layout.tsx`. Do not add a second page
   footer without an intentional product-specific reason.
-- The Tool link hub groups by canonical operation and initially shows at most
-  48 links in its active category.
+- The Tool link hub groups by canonical operation. Each tab is sent and shows
+  at most 48 links (popular, then new, then by name) and links its category's
+  pages for the rest. Only the active tab's links are in the HTML.
+- The homepage shows the first 8 Tools of each category in the same order,
+  with a link to the category.
+- Downloaders, on the homepage and in the link hub's tab, instead shows the 8
+  Landers in `lib/catalog/homepage-downloaders.json`, in its order: the most
+  Search Console clicks, adult sites left out by name (owner decisions on
+  #326). Its `source`, `period` and `readOn` say where the clicks come from.
+  When one of them is retired or renamed, `directory.test.mjs` fails: replace
+  it with the next Lander by clicks that isn't for an adult site. Every other
+  Lander is on the Downloaders category pages.
 
 ## Adding a Tool
 
