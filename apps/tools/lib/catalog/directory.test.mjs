@@ -11,7 +11,7 @@ import {
   parseCategoryPage,
 } from "./category-pages.ts";
 import {
-  HOME_CURATED_CATEGORY,
+  CURATED_CATEGORY,
   HOME_TOOLS_PER_CATEGORY,
   LINK_HUB_TAB_LIMIT,
   categoryPage,
@@ -233,7 +233,7 @@ test("the download category holds every active download Tool, including each dow
   );
 });
 
-test("each link hub tab is its category and its first Tools' href and name: popular, then new, then by name", () => {
+test("each link hub tab but Downloaders is its category and its first Tools' href and name: popular, then new, then by name", () => {
   const tabs = toolLinkCategories();
 
   assert.deepEqual(tabs.map(withoutTools), directoryCategories());
@@ -241,11 +241,12 @@ test("each link hub tab is its category and its first Tools' href and name: popu
     assert.deepEqual(Object.keys(tab), ["id", "name", "title", "description", "count", "href", "tools"]);
   }
   for (const tab of tabs) {
+    for (const link of tab.tools) assert.deepEqual(Object.keys(link), ["href", "name"]);
+    if (tab.id === CURATED_CATEGORY) continue;
     const expected = inLinkHubOrder(activeIn(tab.id))
       .slice(0, LINK_HUB_TAB_LIMIT)
       .map((tool) => ({ href: toolHref(tool), name: tool.name }));
     assert.deepEqual(tab.tools, expected, tab.id);
-    for (const link of tab.tools) assert.deepEqual(Object.keys(link), ["href", "name"]);
   }
   assert.equal(tabs.find((tab) => tab.id === "convert").tools.length, LINK_HUB_TAB_LIMIT);
   assert.equal(toolLinkCategories(), toolLinkCategories());
@@ -256,7 +257,7 @@ test("each homepage section is its category and its first Tools' cards in link h
 
   assert.deepEqual(sections.map(withoutTools), directoryCategories());
   for (const section of sections) {
-    if (section.id === HOME_CURATED_CATEGORY) continue;
+    if (section.id === CURATED_CATEGORY) continue;
     assert.deepEqual(
       section.tools,
       inLinkHubOrder(activeIn(section.id)).slice(0, HOME_TOOLS_PER_CATEGORY).map(expectedCard),
@@ -266,10 +267,11 @@ test("each homepage section is its category and its first Tools' cards in link h
   assert.equal(homeCategorySections(), homeCategorySections());
 });
 
-// homepage-downloaders.json: the owner's curated list (#326, 2026-10-17).
+// homepage-downloaders.json: the owner's curated list for the homepage
+// (#326, 2026-10-17) and the link hub's Downloaders tab (#326, 2026-10-18).
 // When a Lander in it is retired or renamed, replace it in the file with the
 // next Lander by Search Console clicks that isn't for an adult site.
-test("the homepage Downloaders are exactly the curated Landers, in the file's order, each live", () => {
+test("the homepage Downloaders and the link hub's Downloaders tab are exactly the curated Landers, in the file's order, each live", () => {
   const curated = JSON.parse(
     readFileSync(new URL("./homepage-downloaders.json", import.meta.url), "utf8"),
   );
@@ -282,7 +284,7 @@ test("the homepage Downloaders are exactly the curated Landers, in the file's or
     const tool = registry.find((entry) => entry.id === id);
     assert.ok(tool, `${id} isn't in tools.json: renamed or removed`);
     assert.ok(tool.isActive, `${id} is retired`);
-    assert.equal(tool.operation, HOME_CURATED_CATEGORY, id);
+    assert.equal(tool.operation, CURATED_CATEGORY, id);
   }
   // Most clicks first, ties broken by impressions.
   const ranked = [...curated.landers].sort(
@@ -290,11 +292,17 @@ test("the homepage Downloaders are exactly the curated Landers, in the file's or
   );
   assert.deepEqual(ids, ranked.map((lander) => lander.id));
 
-  const section = homeCategorySections().find((entry) => entry.id === HOME_CURATED_CATEGORY);
+  const curatedTools = ids.map((id) => registry.find((entry) => entry.id === id));
+  const section = homeCategorySections().find((entry) => entry.id === CURATED_CATEGORY);
+  assert.deepEqual(section.tools, curatedTools.map(expectedCard));
+  const tab = toolLinkCategories().find((entry) => entry.id === CURATED_CATEGORY);
   assert.deepEqual(
-    section.tools,
-    ids.map((id) => expectedCard(registry.find((entry) => entry.id === id))),
+    tab.tools,
+    curatedTools.map((tool) => ({ href: toolHref(tool), name: tool.name })),
   );
+  // The tab still counts, and links to, every Lander.
+  assert.equal(tab.count, activeIn(CURATED_CATEGORY).length);
+  assert.equal(tab.href, categoryHref(CURATED_CATEGORY));
 });
 
 test("directory lists survive the Server-to-client props boundary unchanged", () => {
@@ -313,7 +321,7 @@ test("directory lists survive the Server-to-client props boundary unchanged", ()
 // every page, the homepage sections with the homepage, and the cards of the
 // largest category page. Fetched: the search index, when someone searches on
 // the homepage. Each sits about 10% above its size when it was set (#317,
-// 2,529 active Tools: link hub 9,654 B, homepage sections 7,329 B with the
+// 2,529 active Tools: link hub 6,667 B and homepage sections 7,329 B with the
 // curated Downloaders, largest category page 24,381 B, search index
 // 384,573 B). The inline lists are bounded by LINK_HUB_TAB_LIMIT,
 // HOME_TOOLS_PER_CATEGORY, homepage-downloaders.json and
@@ -321,7 +329,7 @@ test("directory lists survive the Server-to-client props boundary unchanged", ()
 // search index grows with every Tool, room for about 250 more. To raise one on
 // purpose, measure the list's UTF-8 JSON bytes, set the budget about 10% above
 // that, and say why in the PR.
-const LINK_HUB_BUDGET_BYTES = 10_600;
+const LINK_HUB_BUDGET_BYTES = 7_300;
 const HOME_SECTIONS_BUDGET_BYTES = 8_100;
 const CATEGORY_PAGE_BUDGET_BYTES = 26_800;
 const SEARCH_INDEX_BUDGET_BYTES = 423_000;

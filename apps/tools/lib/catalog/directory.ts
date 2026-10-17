@@ -26,16 +26,16 @@ import {
 // Tool whose operation isn't one of OPERATIONS (validate.ts rejects it) is left
 // out of every list, so the lists and the category counts always agree.
 
-// How many links each link hub tab sends and shows; the rest are on the
-// category's pages.
+// How many links each link hub tab sends and shows, except CURATED_CATEGORY's;
+// the rest are on the category's pages.
 export const LINK_HUB_TAB_LIMIT = 48;
 
 // How many Tool cards the homepage shows per category before "View all".
 export const HOME_TOOLS_PER_CATEGORY = 8;
 
-// The category whose homepage cards are a curated list,
+// The category whose homepage cards and link hub tab are a curated list,
 // homepage-downloaders.json, rather than its first Tools in link hub order.
-export const HOME_CURATED_CATEGORY: ToolOperation = "download";
+export const CURATED_CATEGORY: ToolOperation = "download";
 
 // A ToolCard: the Tool's name and description, linked. `icon` is left out
 // when it's the default.
@@ -65,14 +65,15 @@ export type ToolDirectoryCategory = {
 };
 
 // A link hub tab: one category, its Tool count, and a link to each of its
-// first LINK_HUB_TAB_LIMIT Tools in link hub order.
+// first LINK_HUB_TAB_LIMIT Tools in link hub order, or, for CURATED_CATEGORY,
+// to each Lander in homepage-downloaders.json.
 export type ToolLinkCategory = ToolDirectoryCategory & {
   tools: { href: string; name: string }[];
 };
 
 // A homepage section: one category and the cards of its first
-// HOME_TOOLS_PER_CATEGORY Tools in link hub order, or, for
-// HOME_CURATED_CATEGORY, of the Landers in homepage-downloaders.json.
+// HOME_TOOLS_PER_CATEGORY Tools in link hub order, or, for CURATED_CATEGORY,
+// of the Landers in homepage-downloaders.json.
 export type HomeCategorySection = ToolDirectoryCategory & {
   tools: ToolCardEntry[];
 };
@@ -185,31 +186,32 @@ export function categoryPage(operation: string, page: number): CategoryPage | un
   return { category, page, pageCount, first: start + 1, last: start + tools.length, tools };
 }
 
+// The curated Landers, in the file's order. An id that isn't a live Tool in
+// CURATED_CATEGORY is skipped, so a retired Lander never breaks the homepage
+// or the link hub; directory.test.mjs fails on one, so the file gets fixed.
+function curatedTools(): readonly Tool[] {
+  const live = new Map(activeIn(CURATED_CATEGORY).map((tool) => [tool.id, tool]));
+  return homepageDownloaders.landers.flatMap(({ id }) => live.get(id) ?? []);
+}
+
 // The link hub's tabs: each category with the links its tab shows.
 export function toolLinkCategories(): readonly ToolLinkCategory[] {
   linkCategories ??= directoryCategories().map((category) => ({
     ...category,
-    tools: activeInLinkHubOrder(category.id)
-      .slice(0, LINK_HUB_TAB_LIMIT)
-      .map((tool) => ({ href: toolHref(tool), name: tool.name })),
+    tools: (category.id === CURATED_CATEGORY
+      ? curatedTools()
+      : activeInLinkHubOrder(category.id).slice(0, LINK_HUB_TAB_LIMIT)
+    ).map((tool) => ({ href: toolHref(tool), name: tool.name })),
   }));
   return linkCategories;
-}
-
-// The curated Landers, in the file's order. An id that isn't a live Tool in
-// HOME_CURATED_CATEGORY is skipped, so a retired Lander never breaks the
-// homepage; directory.test.mjs fails on one, so the file gets fixed.
-function homeCuratedTools(): readonly Tool[] {
-  const live = new Map(activeIn(HOME_CURATED_CATEGORY).map((tool) => [tool.id, tool]));
-  return homepageDownloaders.landers.flatMap(({ id }) => live.get(id) ?? []);
 }
 
 // The homepage's sections: each category with the cards it shows.
 export function homeCategorySections(): readonly HomeCategorySection[] {
   homeSections ??= directoryCategories().map((category) => ({
     ...category,
-    tools: (category.id === HOME_CURATED_CATEGORY
-      ? homeCuratedTools()
+    tools: (category.id === CURATED_CATEGORY
+      ? curatedTools()
       : activeInLinkHubOrder(category.id).slice(0, HOME_TOOLS_PER_CATEGORY)
     ).map(toolCard),
   }));

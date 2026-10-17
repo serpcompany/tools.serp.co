@@ -1,5 +1,5 @@
 {
-  "about": "The Landers the homepage's Downloaders section shows, in this order: the Landers with the most Search Console clicks, ties broken by impressions, leaving out Landers for adult sites (owner decision on #326, 2026-10-17). A catalog flag for adult sites and Lander demand data replace this list later.",
+  "about": "The Landers the homepage's Downloaders section and the link hub's Downloaders tab show, in this order: the Landers with the most Search Console clicks, ties broken by impressions, leaving out Landers for adult sites (owner decisions on #326, 2026-10-17 for the homepage and 2026-10-18 for the link hub). A catalog flag for adult sites and Lander demand data replace this list later.",
   "source": "Ahrefs Search Console data for the tools.serp.co project, pages /download-*",
   "period": { "from": "2026-06-26", "to": "2026-09-25" },
   "readOn": "2026-10-18",
