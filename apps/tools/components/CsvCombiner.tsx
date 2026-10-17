@@ -11,6 +11,9 @@ import { beginToolRun } from "@/lib/telemetry";
 
 type Props = {
   toolId?: string;
+  // The H1 and the line under it, which the page's structured data repeats.
+  title: string;
+  subtitle: string;
   videoEmbedId?: string;
 };
 
@@ -124,7 +127,7 @@ function mergeCsvFiles(parsedFiles: ParsedCsv[]) {
   };
 }
 
-export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
+export default function CsvCombiner({ toolId, title, subtitle, videoEmbedId }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -218,10 +221,8 @@ export default function CsvCombiner({ toolId, videoEmbedId }: Props) {
       hero={
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold tracking-tight mb-4">CSV Combiner</h1>
-            <p className="mx-auto max-w-2xl text-lg text-gray-600">
-              Merge multiple CSV files into one clean dataset without uploads.
-            </p>
+            <h1 className="text-4xl font-bold tracking-tight mb-4">{title}</h1>
+            <p className="mx-auto max-w-2xl text-lg text-gray-600">{subtitle}</p>
           </div>
 
           <Card className="overflow-hidden border-gray-200 shadow-sm">

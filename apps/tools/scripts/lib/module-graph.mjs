@@ -72,6 +72,18 @@ function compilerOptions() {
   return options;
 }
 
+// The file `specifier` names when `file` imports it, if it is one of the
+// repository's own modules, including workspace packages; undefined for
+// third-party code and for what doesn't resolve.
+export function resolveImport(specifier, file) {
+  const resolved = ts.resolveModuleName(specifier, file, compilerOptions(), ts.sys).resolvedModule;
+  if (!resolved || resolved.resolvedFileName.endsWith(".d.ts")) return undefined;
+  const real = realpathSync(resolved.resolvedFileName);
+  if (!real.startsWith(repoRoot + path.sep) || real.split(path.sep).includes("node_modules")) return undefined;
+  if (!/\.(?:[cm]?[jt]sx?)$/.test(real)) return undefined;
+  return real;
+}
+
 // Visits every module reachable from the entry files once, as
 // visit(sourceFile, file, references). When visit returns false, that
 // module's imports aren't followed from there. Returns how many modules it
@@ -87,14 +99,8 @@ export function walkModules(entryFiles, visit) {
     const references = moduleReferences(sourceFile);
     if (visit(sourceFile, file, references) === false) continue;
     for (const { specifier } of references) {
-      const resolved = ts.resolveModuleName(specifier, file, compilerOptions(), ts.sys).resolvedModule;
-      if (!resolved || resolved.resolvedFileName.endsWith(".d.ts")) continue;
-      const real = realpathSync(resolved.resolvedFileName);
-      // The repository's own modules, including workspace packages; not
-      // third-party code.
-      if (!real.startsWith(repoRoot + path.sep) || real.split(path.sep).includes("node_modules")) continue;
-      if (!/\.(?:[cm]?[jt]sx?)$/.test(real)) continue;
-      queue.push(real);
+      const resolved = resolveImport(specifier, file);
+      if (resolved) queue.push(resolved);
     }
   }
   return seen.size;
