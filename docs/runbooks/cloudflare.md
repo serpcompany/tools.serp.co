@@ -141,7 +141,12 @@ Dashboard access:
 ## Cache And Optimization Bindings
 
 OpenNext uses an R2 incremental cache with Cloudflare regional cache in
-`long-lived` mode.
+`long-lived` mode. A static page, including each Tool page the `[tool]` route
+serves, renders on its first request after a deploy and comes from the cache
+until the next one: entries are keyed by build id, and the deploy uploads no
+build-time pages. A page whose render answers 404, such as a `[tool]` slug
+that isn't an active Tool, is never stored (`apps/tools/lib/not-found-cache.ts`);
+URLs that match no route share one cached not-found page.
 
 R2 buckets:
 
