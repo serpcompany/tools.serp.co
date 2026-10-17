@@ -18,13 +18,13 @@ test("tools link hub reads the catalog on the server and passes the tabs plain d
   assert.match(toolsLinkHubTabsSource, /^"use client";/);
 });
 
-test("tools link hub uses tabbed progressive disclosure for large tool sets", () => {
+test("tools link hub tabs show only the links they were sent, and link the category for the rest", () => {
   assert.match(toolsLinkHubTabsSource, /TabsList/);
   assert.match(toolsLinkHubTabsSource, /TabsTrigger/);
-  assert.match(toolsLinkHubTabsSource, /CATEGORY_PREVIEW_LIMIT\s*=\s*48/);
-  assert.match(toolsLinkHubTabsSource, /showAllTools/);
-  assert.match(toolsLinkHubTabsSource, /Show fewer tools/);
+  // No "show more": the tab never holds more than it shows.
+  assert.doesNotMatch(toolsLinkHubTabsSource, /showAllTools|CATEGORY_PREVIEW_LIMIT|\.slice\(/);
+  assert.match(toolsLinkHubTabsSource, /activeCategory\.tools\.map\(/);
   assert.match(toolsLinkHubTabsSource, /hiddenToolCount/);
-  assert.match(toolsLinkHubTabsSource, /setShowAllTools\(false\)/);
+  assert.match(toolsLinkHubTabsSource, /See all \{activeCategory\.count\} tools in \{activeCategory\.name\}/);
   assert.match(toolsLinkHubTabsSource, /View \{activeCategory\.name\} category/);
 });

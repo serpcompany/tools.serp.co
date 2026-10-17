@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import CategoryPageTemplate from "@/components/CategoryPageTemplate";
 import { availableOperations } from "@/lib/catalog/catalog";
-import { directoryCategories, toolCardsIn } from "@/lib/catalog/directory";
+import { categoryPage, directoryCategories } from "@/lib/catalog/directory";
 import { isToolOperation } from "@/lib/catalog/operations";
 import { buildCategoryMetadata } from "@/lib/metadata";
 
@@ -25,18 +25,12 @@ export default async function Page({ params }: PageProps) {
     return notFound();
   }
 
-  // Only operations with at least one active Tool have a category.
-  const categories = directoryCategories();
-  const activeCategory = categories.find((category) => category.id === categoryName);
-  if (!activeCategory) {
+  // Only operations with at least one active Tool have a category. Its
+  // other pages are under [page].
+  const firstPage = categoryPage(categoryName, 1);
+  if (!firstPage) {
     return notFound();
   }
 
-  return (
-    <CategoryPageTemplate
-      activeCategory={activeCategory}
-      categories={categories}
-      tools={toolCardsIn(categoryName)}
-    />
-  );
+  return <CategoryPageTemplate categoryPage={firstPage} categories={directoryCategories()} />;
 }

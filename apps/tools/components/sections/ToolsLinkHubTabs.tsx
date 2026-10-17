@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Button } from "@serp-tools/ui/components/button";
 import { Tabs, TabsList, TabsTrigger } from "@serp-tools/ui/components/tabs";
 import type { ToolLinkCategory } from "@/lib/catalog/directory";
 
@@ -10,14 +9,12 @@ type ToolsLinkHubTabsProps = {
   categories: readonly ToolLinkCategory[];
 };
 
-const CATEGORY_PREVIEW_LIMIT = 48;
-
-// The link hub's tabs and "show more", rendered from the plain-data categories
-// ToolsLinkHub passes in. It must not import the catalog: that would ship the
+// The link hub's tabs, rendered from the plain-data categories ToolsLinkHub
+// passes in: each tab holds only the links it shows, and links its category's
+// pages for the rest. It must not import the catalog: that would ship the
 // registry to the browser.
 export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
   const [activeCategoryId, setActiveCategoryId] = useState(categories[0]?.id ?? "");
-  const [showAllTools, setShowAllTools] = useState(false);
 
   const activeCategory =
     categories.find((category) => category.id === activeCategoryId) ?? categories[0];
@@ -26,11 +23,7 @@ export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
     return null;
   }
 
-  const hasHiddenTools = activeCategory.tools.length > CATEGORY_PREVIEW_LIMIT;
-  const visibleTools = showAllTools
-    ? activeCategory.tools
-    : activeCategory.tools.slice(0, CATEGORY_PREVIEW_LIMIT);
-  const hiddenToolCount = Math.max(activeCategory.tools.length - visibleTools.length, 0);
+  const hiddenToolCount = Math.max(activeCategory.count - activeCategory.tools.length, 0);
 
   return (
     <section className="border-t border-slate-200 bg-gradient-to-b from-slate-100 to-slate-50 py-14 sm:py-16">
@@ -50,7 +43,6 @@ export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
             }
 
             setActiveCategoryId(value);
-            setShowAllTools(false);
           }}
           className="mt-8"
         >
@@ -64,7 +56,7 @@ export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
                 >
                   <span className="font-semibold">{category.name}</span>
                   <span className="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">
-                    {category.tools.length}
+                    {category.count}
                   </span>
                 </TabsTrigger>
               ))}
@@ -87,13 +79,13 @@ export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
           </div>
 
           <div className="mb-4 text-sm text-slate-600">
-            Showing {visibleTools.length} of {activeCategory.tools.length} tools
+            Showing {activeCategory.tools.length} of {activeCategory.count} tools
           </div>
 
           <div className="grid grid-cols-1 gap-x-4 gap-y-1.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {visibleTools.map((tool) => (
-              // Up to every Tool in the category: prefetching each one in view
-              // would download its whole page payload.
+            {activeCategory.tools.map((tool) => (
+              // Dozens of links: prefetching each one in view would download
+              // its whole page payload.
               <Link
                 key={tool.href}
                 href={tool.href}
@@ -105,17 +97,14 @@ export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
             ))}
           </div>
 
-          {hasHiddenTools ? (
+          {hiddenToolCount > 0 ? (
             <div className="mt-5 flex justify-center">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="rounded-full border-slate-300 bg-white px-5 text-slate-700 hover:bg-slate-50"
-                onClick={() => setShowAllTools((current) => !current)}
+              <Link
+                href={activeCategory.href}
+                className="rounded-full border border-slate-300 bg-white px-5 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               >
-                {showAllTools ? "Show fewer tools" : `Show ${hiddenToolCount} more tools`}
-              </Button>
+                See all {activeCategory.count} tools in {activeCategory.name}
+              </Link>
             </div>
           ) : null}
         </div>
