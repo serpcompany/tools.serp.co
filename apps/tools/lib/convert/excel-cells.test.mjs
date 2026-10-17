@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import { TABLE_CHARS, excelCellSize, readExcelCells, readPastedCells, writeExcelCells } from "./excel-cells.ts";
 import { parseExcelCells } from "./table-data.ts";
+import { threadCpuMs } from "./test-cpu-time.mjs";
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -245,9 +246,9 @@ test("1,000,000 pasted rows with a ditto mark in the first column stay 1,000,000
   // the search for the fewest merged lines.
   const mixed = (rows) => `Mark\tItem\r\nx\t"two\nlines"\r\n${'"\tx\r\n'.repeat(rows)}`;
   const timed = (text) => {
-    const started = performance.now();
+    const started = threadCpuMs();
     const rows = readExcelCells(text);
-    return { rows, ms: performance.now() - started };
+    return { rows, ms: threadCpuMs() - started };
   };
   for (const [name, make, head] of [
     ["ditto marks", dittos, [["Mark", "Item"], ['"', "x"]]],

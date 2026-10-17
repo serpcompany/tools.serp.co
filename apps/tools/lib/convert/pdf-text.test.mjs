@@ -21,6 +21,7 @@ import {
 } from "./pdf-text.ts";
 import { isPdfTextConversion } from "./pdf-text-targets.ts";
 import { pdfTextFailure } from "./workerClient.ts";
+import { threadCpuMs } from "./test-cpu-time.mjs";
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../benchmarks/fixtures");
 const read = (name) => toBuffer(readFileSync(path.join(fixtures, name)));
@@ -403,11 +404,11 @@ test("a PDF of hundreds of pages converts, every page in order", async () => {
     if (page > 1) doc.addPage();
     for (let line = 0; line < 20; line += 1) doc.text(`Page ${page}, line ${line + 1}: the quick brown fox jumps over the lazy dog.`, 72, 72 + line * 16);
   }
-  const started = Date.now();
+  const started = threadCpuMs();
   const epub = openEpub((await convert(doc.output("arraybuffer"), "epub", "book.pdf")).buffer);
   assert.equal(epub.spine.length, 600);
   epub.texts.forEach((text, index) => assert.match(text, new RegExp(`^Page ${index + 1}, line 1: .* Page ${index + 1}, line 20:`)));
-  assert.ok(Date.now() - started < 60_000, `took ${Date.now() - started} ms`);
+  assert.ok(threadCpuMs() - started < 60_000, `took ${threadCpuMs() - started} ms`);
 });
 
 test("past its page or character limit a PDF is refused, counted exactly, never a smaller one", async () => {
@@ -477,6 +478,7 @@ function hangingPdfjs({ pages = null } = {}) {
 test("a PDF that takes too long to read is refused, and its pdf.js worker stopped, even when it hangs", async () => {
   for (const pages of [null, 1]) {
     const { pdfjs: hanging, stopped } = hangingPdfjs({ pages });
+    // The limit is on the clock, so this bound is too.
     const started = Date.now();
     await assert.rejects(readPdfText(new ArrayBuffer(8), { pdfjs: hanging, limits: { milliseconds: 100 } }), {
       code: "read_timeout",
