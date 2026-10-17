@@ -13,7 +13,9 @@ against a running Worker. CI runs it in two places:
 
 ## What it checks
 
-- The home page renders the tool directory.
+- The home page links each category's pages from its section, shows the
+  curated Downloaders (`lib/catalog/homepage-downloaders.json`) in order, and
+  its search finds PNG to JPG, which the page itself doesn't show.
 - PNG to JPG converts the sample PNG, and the download is a `.jpg` whose bytes
   start with the JPEG signature.
 - HTML to Markdown converts pasted HTML.

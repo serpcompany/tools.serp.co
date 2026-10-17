@@ -81,7 +81,12 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   at most 48 links (popular, then new, then by name) and links its category's
   pages for the rest. Only the active tab's links are in the HTML.
 - The homepage shows the first 8 Tools of each category in the same order,
-  with a link to the category.
+  with a link to the category. Downloaders instead shows the 8 Landers in
+  `lib/catalog/homepage-downloaders.json`, in its order: the most Search
+  Console clicks, adult sites left out by name (owner decision on #326). Its
+  `source`, `period` and `readOn` say where the clicks come from. When one of
+  them is retired or renamed, `directory.test.mjs` fails: replace it with the
+  next Lander by clicks that isn't for an adult site.
 
 ## Adding a Tool
 

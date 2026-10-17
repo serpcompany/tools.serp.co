@@ -25,6 +25,9 @@ const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const tools = JSON.parse(
   readFileSync(path.resolve(appRoot, "lib/catalog/tools.json"), "utf8"),
 );
+const homepageDownloaders = JSON.parse(
+  readFileSync(path.resolve(appRoot, "lib/catalog/homepage-downloaders.json"), "utf8"),
+);
 // Deployed Workers skip their canonical-host redirect for requests with this
 // header (issue #164), so the smoke test can run through *.workers.dev.
 const SMOKE_TEST_HEADER = "x-tools-serp-smoke-test";
@@ -207,10 +210,32 @@ async function expectCompletedRun(page, telemetryStatuses, toolId) {
   );
 }
 
-await step("home page renders the tool directory", async (page) => {
+// The homepage shows a few Tools per category with a link to each category's
+// pages, and the curated Downloaders in the file's order; its search fetches
+// /tool-index.json and finds Tools the page doesn't show.
+await step("home page links every category and the curated Downloaders, and its search finds a Tool", async (page) => {
   const response = await page.goto(`${args.baseUrl}/`);
   assert(response?.status() === 200, `status ${response?.status()}`);
-  await page.getByRole("link", { name: toolName("png-to-jpg") }).first().waitFor();
+  const operations = new Set(tools.filter((tool) => tool.isActive).map((tool) => tool.operation));
+  for (const operation of operations) {
+    const link = page.locator(`section[aria-labelledby="home-${operation}"] a[href="/category/${operation}/"]`);
+    assert((await link.count()) === 1, `the ${operation} section doesn't link /category/${operation}/`);
+  }
+  const downloaders = await page
+    .locator('section[aria-labelledby="home-download"] .grid a')
+    .evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+  const curated = homepageDownloaders.landers.map(({ id }) => `${tools.find((tool) => tool.id === id)?.route}/`);
+  assert(
+    JSON.stringify(downloaders) === JSON.stringify(curated),
+    `Downloaders ${downloaders.join(", ")}, expected ${curated.join(", ")}`,
+  );
+  const search = page.getByPlaceholder("Search tools...");
+  await search.fill(toolName("png-to-jpg"));
+  await page
+    .locator("section", { has: search })
+    .getByRole("link", { name: toolName("png-to-jpg") })
+    .first()
+    .waitFor();
 });
 
 await step("png-to-jpg converts a PNG into a real JPEG", async (page, telemetryStatuses) => {

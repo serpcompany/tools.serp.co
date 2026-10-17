@@ -2,6 +2,7 @@ import type { Tool } from "@/types";
 
 import { activeTools } from "./catalog.ts";
 import { CATEGORY_PAGE_SIZE, categoryPageCount } from "./category-pages.ts";
+import homepageDownloaders from "./homepage-downloaders.json" with { type: "json" };
 import { categoryHref, toolHref } from "./href.ts";
 import { DEFAULT_TOOL_ICON, toolIconName, type ToolIconName } from "./icons.ts";
 import {
@@ -31,6 +32,10 @@ export const LINK_HUB_TAB_LIMIT = 48;
 
 // How many Tool cards the homepage shows per category before "View all".
 export const HOME_TOOLS_PER_CATEGORY = 8;
+
+// The category whose homepage cards are a curated list,
+// homepage-downloaders.json, rather than its first Tools in link hub order.
+export const HOME_CURATED_CATEGORY: ToolOperation = "download";
 
 // A ToolCard: the Tool's name and description, linked. `icon` is left out
 // when it's the default.
@@ -66,7 +71,8 @@ export type ToolLinkCategory = ToolDirectoryCategory & {
 };
 
 // A homepage section: one category and the cards of its first
-// HOME_TOOLS_PER_CATEGORY Tools in link hub order.
+// HOME_TOOLS_PER_CATEGORY Tools in link hub order, or, for
+// HOME_CURATED_CATEGORY, of the Landers in homepage-downloaders.json.
 export type HomeCategorySection = ToolDirectoryCategory & {
   tools: ToolCardEntry[];
 };
@@ -190,11 +196,22 @@ export function toolLinkCategories(): readonly ToolLinkCategory[] {
   return linkCategories;
 }
 
+// The curated Landers, in the file's order. An id that isn't a live Tool in
+// HOME_CURATED_CATEGORY is skipped, so a retired Lander never breaks the
+// homepage; directory.test.mjs fails on one, so the file gets fixed.
+function homeCuratedTools(): readonly Tool[] {
+  const live = new Map(activeIn(HOME_CURATED_CATEGORY).map((tool) => [tool.id, tool]));
+  return homepageDownloaders.landers.flatMap(({ id }) => live.get(id) ?? []);
+}
+
 // The homepage's sections: each category with the cards it shows.
 export function homeCategorySections(): readonly HomeCategorySection[] {
   homeSections ??= directoryCategories().map((category) => ({
     ...category,
-    tools: activeInLinkHubOrder(category.id).slice(0, HOME_TOOLS_PER_CATEGORY).map(toolCard),
+    tools: (category.id === HOME_CURATED_CATEGORY
+      ? homeCuratedTools()
+      : activeInLinkHubOrder(category.id).slice(0, HOME_TOOLS_PER_CATEGORY)
+    ).map(toolCard),
   }));
   return homeSections;
 }
