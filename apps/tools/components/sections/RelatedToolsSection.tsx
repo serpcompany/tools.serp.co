@@ -1,96 +1,32 @@
 import Link from "next/link";
 import { Card } from "@serp-tools/ui/components/card";
-import { activeTools, getTool, getToolByRoute } from "@/lib/catalog/catalog";
-import { canonicalPath } from "@/lib/trailing-slash";
-
-type Tool = {
-  id: string;
-  name: string;
-  description: string;
-  route: string;
-  from?: string;
-  to?: string;
-  isActive: boolean;
-};
-
-type RelatedToolEntry = {
-  toolId?: string;
-  href?: string;
-  title: string;
-  description?: string;
-};
+import { relatedToolLinks, type CuratedEntry } from "@/lib/catalog/related-tools";
 
 type RelatedToolsSectionProps = {
+  // Unused: ToolPageTemplate passes its content's format labels, and the
+  // fallback reads the Tool's own formats from the registry instead.
   currentFrom?: string;
   currentTo?: string;
   currentRoute?: string; // to exclude current tool
   currentToolId?: string;
-  relatedTools?: RelatedToolEntry[];
+  relatedTools?: CuratedEntry[];
 };
 
+// The Tool's curated related list, or else up to RELATED_TOOLS_LIMIT Tools of
+// the same kind that share a format with it (lib/catalog/related-tools.ts).
 export function RelatedToolsSection({
-  currentFrom,
-  currentTo,
   currentRoute,
   currentToolId,
   relatedTools,
 }: RelatedToolsSectionProps) {
-  const candidates = activeTools();
-
-  const resolvedFromContent = (relatedTools ?? [])
-    .map((tool, index) => {
-      if (tool.toolId) {
-        const resolved = getTool(tool.toolId);
-        if (!resolved) return null;
-        return {
-          ...resolved,
-          description: tool.description ?? resolved.description,
-          name: tool.title || resolved.name,
-        };
-      }
-      if (tool.href) {
-        if (tool.href.startsWith("/")) {
-          const resolved = getToolByRoute(tool.href);
-          if (!resolved) return null;
-          return {
-            ...resolved,
-            description: tool.description ?? resolved.description,
-            name: tool.title || resolved.name,
-          };
-        }
-        return {
-          id: tool.toolId ?? `related-${index}`,
-          name: tool.title,
-          description: tool.description ?? "",
-          route: tool.href,
-          isActive: true,
-        } as Tool;
-      }
-      return null;
-    })
-    .filter(Boolean) as Tool[];
-
-  const curatedTools = resolvedFromContent.filter((tool) =>
-    (currentToolId ? tool.id !== currentToolId : true) &&
-    (currentRoute ? tool.route !== currentRoute : true)
-  );
-
-  // Find all tools that involve either format (combining both)
-  const relatedToolsFallback = currentFrom && currentTo
-    ? candidates.filter(tool =>
-        ((tool.from === currentFrom || tool.to === currentFrom ||
-          tool.from === currentTo || tool.to === currentTo)) &&
-        (currentRoute ? tool.route !== currentRoute : true) &&
-        (currentToolId ? tool.id !== currentToolId : true)
-      )
-    : [];
-
-  // Remove duplicates
-  const toolsToShow = curatedTools.length ? curatedTools : relatedToolsFallback;
-  const uniqueTools = Array.from(new Map(toolsToShow.map(tool => [tool.id || tool.route, tool])).values());
+  const tools = relatedToolLinks({
+    toolId: currentToolId,
+    route: currentRoute,
+    curated: relatedTools,
+  });
 
   // If no related tools, don't render the section
-  if (uniqueTools.length === 0) {
+  if (tools.length === 0) {
     return null;
   }
 
@@ -102,9 +38,9 @@ export function RelatedToolsSection({
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-          {uniqueTools.map((tool) => (
-            // Often hundreds of links: don't prefetch each one in view.
-            <Link key={tool.id} href={canonicalPath(tool.route)} prefetch={false}>
+          {tools.map((tool) => (
+            // A dense list: don't prefetch each link in view.
+            <Link key={tool.id} href={tool.href} prefetch={false}>
               <Card className="p-3 hover:shadow-md transition-all duration-200 cursor-pointer border-gray-200 hover:border-blue-300 hover:bg-blue-50/50">
                 <h4 className="font-semibold text-sm text-gray-900 mb-0.5 truncate">
                   {tool.name}
