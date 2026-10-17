@@ -3,7 +3,7 @@
     "issue": "https://github.com/serpcompany/tools.serp.co/issues/147",
     "command": "pnpm -C apps/tools tool-sweep",
     "baseUrl": "http://localhost:8812",
-    "commit": "2ffa0704a2909c9442ef52ef1977751850e90dd8",
+    "commit": "8dac26423f8fe3c318ec67d9afd81e789b34144e",
     "activeTools": 2532,
     "counts": {
       "pass": 2106,
@@ -4088,6 +4088,27 @@
           "pdf-to-jpg"
         ],
         "browserVersion": "143.0.7499.4"
+      },
+      {
+        "commit": "8dac26423f8fe3c318ec67d9afd81e789b34144e",
+        "dirty": false,
+        "startedAt": "2026-10-17T12:28:33.903Z",
+        "finishedAt": "2026-10-17T12:28:38.749Z",
+        "wallMs": 4846,
+        "measured": 6,
+        "concurrency": 4,
+        "channel": "chromium",
+        "timeoutMs": 60000,
+        "ffmpegTimeoutMs": 180000,
+        "only": [
+          "pdf-to-txt",
+          "pdf-to-html",
+          "pdf-to-epub",
+          "png-to-epub",
+          "pdf-to-png",
+          "pdf-to-jpg"
+        ],
+        "browserVersion": "143.0.7499.4"
       }
     ]
   },
@@ -6114,11 +6135,11 @@
     {"id":"pdf-reader-extension","route":"/pdf-reader-extension","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"pdf-reader-mac","route":"/pdf-reader-mac","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"pdf-reader-windows","route":"/pdf-reader-windows","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
-    {"id":"pdf-to-epub","route":"/pdf-to-epub","from":"pdf","to":"epub","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":5340,"formatCheck":"decoded","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":2107,"name":"sample-text.epub"},"commit":"2ffa0704a2909c9442ef52ef1977751850e90dd8","dirty":false},
-    {"id":"pdf-to-html","route":"/pdf-to-html","from":"pdf","to":"html","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":5326,"formatCheck":"decoded","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":842,"name":"sample-text.html"},"commit":"2ffa0704a2909c9442ef52ef1977751850e90dd8","dirty":false},
-    {"id":"pdf-to-jpg","route":"/pdf-to-jpg","from":"pdf","to":"jpg","handler":"ToolPageRenderer","engine":"pdfjs","status":"pass","durationMs":2403,"formatCheck":"signature","fixture":"sample.pdf","output":{"files":1,"bytes":978,"name":"sample_page1.jpg"},"commit":"2ffa0704a2909c9442ef52ef1977751850e90dd8","dirty":false},
-    {"id":"pdf-to-png","route":"/pdf-to-png","from":"pdf","to":"png","handler":"ToolPageRenderer","engine":"pdfjs","status":"pass","durationMs":2644,"formatCheck":"signature","fixture":"sample.pdf","output":{"files":1,"bytes":1559,"name":"sample_page1.png"},"commit":"2ffa0704a2909c9442ef52ef1977751850e90dd8","dirty":false},
-    {"id":"pdf-to-txt","route":"/pdf-to-txt","from":"pdf","to":"txt","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":3404,"formatCheck":"content","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":231,"name":"sample-text.txt"},"commit":"2ffa0704a2909c9442ef52ef1977751850e90dd8","dirty":false},
+    {"id":"pdf-to-epub","route":"/pdf-to-epub","from":"pdf","to":"epub","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":4187,"formatCheck":"decoded","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":2107,"name":"sample-text.epub"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
+    {"id":"pdf-to-html","route":"/pdf-to-html","from":"pdf","to":"html","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":3856,"formatCheck":"decoded","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":842,"name":"sample-text.html"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
+    {"id":"pdf-to-jpg","route":"/pdf-to-jpg","from":"pdf","to":"jpg","handler":"ToolPageRenderer","engine":"pdfjs","status":"pass","durationMs":2178,"formatCheck":"signature","fixture":"sample.pdf","output":{"files":1,"bytes":978,"name":"sample_page1.jpg"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
+    {"id":"pdf-to-png","route":"/pdf-to-png","from":"pdf","to":"png","handler":"ToolPageRenderer","engine":"pdfjs","status":"pass","durationMs":2270,"formatCheck":"signature","fixture":"sample.pdf","output":{"files":1,"bytes":1559,"name":"sample_page1.png"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
+    {"id":"pdf-to-txt","route":"/pdf-to-txt","from":"pdf","to":"txt","handler":"ToolPageRenderer","engine":"pdfjs-text","status":"pass","durationMs":2395,"formatCheck":"content","refusals":[{"fixture":"sample-scan.pdf","message":"This PDF has no text to extract: its pages are pictures, as a scan's are. Reading the words in a picture needs OCR, which this converter doesn't do."},{"fixture":"sample-protected.pdf","message":"This PDF is password-protected, so its text can't be read here. Open it with its password, save or print a copy without one, and convert that copy."},{"fixture":"sample-truncated.pdf","message":"This file couldn't be read as a PDF: it may be damaged or incomplete, or not a PDF at all."}],"fixture":"sample-text.pdf","output":{"files":1,"bytes":231,"name":"sample-text.txt"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
     {"id":"pdf-viewer","route":"/pdf-viewer","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"pdf-viewer-extension","route":"/pdf-viewer-extension","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
     {"id":"pdf-viewer-windows","route":"/pdf-viewer-windows","from":"pdf","to":"pdf","handler":"PdfToolPage","engine":null,"status":"skipped","reason":"PDF viewer or editor: interactive, converts nothing","commit":"ca5b9a53e93aad8dc434c0955bc8d75f466416b6","dirty":false},
@@ -6142,7 +6163,7 @@
     {"id":"png-to-cur","route":"/png-to-cur","from":"png","to":"cur","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":956,"formatCheck":"signature","fixture":"sample.png","output":{"files":1,"bytes":38078,"name":"sample.cur"},"commit":"7bfa8558c8c9ef0aa66edfd1a2ce01adfce108c6","dirty":false},
     {"id":"png-to-dds","route":"/png-to-dds","from":"png","to":"dds","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1471,"formatCheck":"signature","fixture":"sample.png","output":{"files":1,"bytes":9344,"name":"sample.dds"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"png-to-docx","route":"/png-to-docx","from":"png","to":"docx","handler":"ToolPageRenderer","engine":"docx","status":"pass","durationMs":3686,"formatCheck":"signature","fixture":"sample.png","output":{"files":1,"bytes":9268,"name":"sample.docx"},"commit":"6e665ba5a7ce213d56681a2086536b3e207dad1a","dirty":false},
-    {"id":"png-to-epub","route":"/png-to-epub","from":"png","to":"epub","handler":"ToolPageRenderer","engine":"image-documents","status":"pass","durationMs":1146,"formatCheck":"decoded","fixture":"sample.png","output":{"files":1,"bytes":2061,"name":"sample.epub"},"commit":"2ffa0704a2909c9442ef52ef1977751850e90dd8","dirty":false},
+    {"id":"png-to-epub","route":"/png-to-epub","from":"png","to":"epub","handler":"ToolPageRenderer","engine":"image-documents","status":"pass","durationMs":839,"formatCheck":"decoded","fixture":"sample.png","output":{"files":1,"bytes":2065,"name":"sample.epub"},"commit":"8dac26423f8fe3c318ec67d9afd81e789b34144e","dirty":false},
     {"id":"png-to-gif","route":"/png-to-gif","from":"png","to":"gif","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1473,"formatCheck":"signature","fixture":"sample.png","output":{"files":1,"bytes":151,"name":"sample.gif"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"png-to-hdr","route":"/png-to-hdr","from":"png","to":"hdr","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":1485,"formatCheck":"none","fixture":"sample.png","output":{"files":1,"bytes":1233,"name":"sample.hdr"},"commit":"fe5c5df11d1b69508b6492c2762e48b830693456","dirty":false},
     {"id":"png-to-ico","route":"/png-to-ico","from":"png","to":"ico","handler":"ToolPageRenderer","engine":"browser-raster","status":"pass","durationMs":835,"formatCheck":"signature","fixture":"sample.png","output":{"files":1,"bytes":38078,"name":"sample.ico"},"commit":"7bfa8558c8c9ef0aa66edfd1a2ce01adfce108c6","dirty":false},
