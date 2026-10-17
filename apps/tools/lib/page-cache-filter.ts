@@ -15,7 +15,9 @@ type IncrementalCache = Parameters<typeof withRegionalCache>[0];
 // - A page rendered for a URL with a query string, `?_rsc=` included. Next.js
 //   writes the request's query into the page, so one visitor's `?email=` or
 //   `gclid` would reach everyone. That request is answered as usual; the next
-//   request for the bare path renders the page that is stored.
+//   request for the bare path renders the page that is stored. The Worker
+//   already hands Next.js page requests without a query (page-request.ts);
+//   this catches any render that still has one.
 // Other entries, reads and deletes pass through.
 export function withPageCacheFilter(cache: IncrementalCache): IncrementalCache {
   return {

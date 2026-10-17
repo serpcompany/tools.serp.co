@@ -151,17 +151,23 @@ isn't an active Tool, and a page rendered for a URL with a query string
 stored; after a query, the next request for the bare path stores the page.
 URLs that match no route share one cached not-found page.
 
-Entries from older builds are never deleted: neither
-`tools-serp-co-inc-cache` nor `tools-serp-co-inc-cache-preview` has an
-expiration rule. An entry is about 600 KB, so a production build whose 2,542
-sitemap pages are all requested leaves about 1.5 GB behind (about 130 MB for
-the 218 pages that were static before #315).
+Page requests don't reach Next.js with their query in the first place:
+requests that arrive while a page renders share that render, so a cache rule
+alone can't keep one visitor's query from another.
+`apps/tools/lib/page-request.ts`, wired in `apps/tools/sentry-worker.mjs`,
+hands Next.js a `GET` or `HEAD` for a page path without its query, `_rsc`
+included (Next.js tells an RSC request by its header). `/api/`, `/_next/`,
+`/internal/` and files keep theirs, and a redirect is answered for the URL as
+requested, so it keeps the query. The address bar keeps it too.
 
-Owner step: add a lifecycle rule to both buckets that deletes objects under
-the `incremental-cache/` prefix 30 days after upload, in the dashboard (R2, the
-bucket, Settings, Object lifecycle rules) or with
-`wrangler r2 bucket lifecycle add <bucket> expire-old-builds incremental-cache/ --expire-days 30`.
-A current page whose entry expires renders again on its next request.
+Entries from older builds are deleted after 30 days. An entry is about 600 KB,
+so a production build whose 2,542 sitemap pages are all requested leaves about
+1.5 GB behind (about 130 MB for the 218 pages that were static before #315).
+`tools-serp-co-inc-cache` and `tools-serp-co-inc-cache-preview` each have the
+lifecycle rule `expire-old-builds`, added 2026-10-18 (#326): objects under
+`incremental-cache/` are deleted 30 days after upload. Check it with
+`wrangler r2 bucket lifecycle list <bucket>`. A current page whose entry
+expires renders again on its next request.
 
 R2 buckets:
 
