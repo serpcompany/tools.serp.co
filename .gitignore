@@ -47,3 +47,6 @@ smoke-artifacts/
 
 # Vendored binaries that global *.gz ignores would otherwise drop.
 !apps/tools/public/vendor/**/*.gz
+
+# Retired Tool routes that answer 410, written before every build (issue #322).
+apps/tools/lib/gone-tool-routes.generated.js
