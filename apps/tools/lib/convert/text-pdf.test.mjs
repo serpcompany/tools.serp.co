@@ -261,12 +261,16 @@ test("a text that would pass the page limit is refused as soon as it does, never
   let started = performance.now();
   await assert.rejects(convert("x\n".repeat(5_000_000)), { code: "too_large" });
   assert.ok(performance.now() - started < 5_000, `${performance.now() - started} ms`);
-  // One 10 MB line, in Courier and in the Unicode font, without a space.
-  for (const char of ["a", "ж"]) {
-    started = performance.now();
-    await assert.rejects(convert(char.repeat(10 * 1024 * 1024)), { code: "too_large" });
-    assert.ok(performance.now() - started < 10_000, `${char}: ${performance.now() - started} ms`);
-  }
+  // A 10 MB line without a space: under the size limit, refused by its
+  // pages in Courier. In the Unicode font, at two bytes a letter, it is half
+  // as many letters and fits, on about 1,000 pages, in bounded time.
+  started = performance.now();
+  await assert.rejects(convert("a".repeat(10 * 1024 * 1024)), { code: "too_large", message: /would fill more than 2,000 pages/ });
+  assert.ok(performance.now() - started < 10_000, `${performance.now() - started} ms`);
+  started = performance.now();
+  const cyrillic = await convert("ж".repeat(5 * 1024 * 1024));
+  assert.ok(cyrillic.pages > 900 && cyrillic.pages < TEXT_PDF_LIMITS.pages, `${cyrillic.pages} pages`);
+  assert.ok(performance.now() - started < 30_000, `${performance.now() - started} ms`);
 });
 
 test("a file at the page limit converts, about 2,000 pages in seconds", async () => {
