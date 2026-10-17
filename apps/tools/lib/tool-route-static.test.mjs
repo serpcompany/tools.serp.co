@@ -2,8 +2,9 @@
 // no folder of its own: about 2,000 converters and nearly all downloader
 // Landers. It renders each page on its first request and serves it from the
 // incremental cache afterwards (issue #315). These checks fail if it would
-// become dynamic again: a segment config that forces it, or a server module
-// it renders that reads request data. Its pages aren't built ahead, so Next.js
+// become dynamic again: a segment config, in the page or a layout above it,
+// that forces it, or a server module it renders that reads request data. Its
+// pages aren't built ahead, so Next.js
 // wouldn't notice the second at build time: every such page would answer 500,
 // "Page changed from static to dynamic at runtime".
 
@@ -27,6 +28,22 @@ const REQUEST_APIS = new Map([
 ]);
 // The segment files Next.js renders around a page, outermost first.
 const SEGMENT_FILES = ["layout", "template", "not-found"];
+const SEGMENT_EXTENSIONS = [".tsx", ".ts", ".jsx", ".js"];
+
+// The segment files in the app root, the route group and the route, outermost
+// first. A layout's segment config applies to every page below it.
+function segmentFiles() {
+  const files = [];
+  for (const dir of [path.join(appRoot, "app"), path.dirname(routeDir), routeDir]) {
+    for (const name of SEGMENT_FILES) {
+      for (const extension of SEGMENT_EXTENSIONS) {
+        const file = path.join(dir, `${name}${extension}`);
+        if (existsSync(file)) files.push(file);
+      }
+    }
+  }
+  return files;
+}
 
 function parse(filePath) {
   return ts.createSourceFile(
@@ -160,12 +177,6 @@ test("[tool] renders on demand and is cached: static params, no forced dynamic c
     true,
     "[tool] must export dynamicParams = true: a Tool not listed by generateStaticParams renders on its first request",
   );
-  assert.notEqual(literalValue(exports.get("dynamic")), "force-dynamic", "[tool] must not force dynamic rendering");
-  assert.notEqual(literalValue(exports.get("revalidate")), 0, "revalidate = 0 renders [tool] on every request");
-  assert.ok(
-    !["force-no-store", "default-no-store"].includes(literalValue(exports.get("fetchCache"))),
-    "an uncached fetch config renders [tool] on every request",
-  );
   assert.doesNotMatch(
     readFileSync(pagePath, "utf8"),
     /\bsearchParams\b/,
@@ -173,17 +184,28 @@ test("[tool] renders on demand and is cached: static params, no forced dynamic c
   );
 });
 
-test("[tool] and the segments around it read no request data", () => {
-  const segmentDirs = [path.join(appRoot, "app"), path.dirname(routeDir), routeDir];
-  const entries = [pagePath];
-  for (const dir of segmentDirs) {
-    for (const name of SEGMENT_FILES) {
-      const file = path.join(dir, `${name}.tsx`);
-      if (existsSync(file)) entries.push(file);
+test("neither [tool] nor a segment above it forces dynamic rendering", () => {
+  const files = [pagePath, ...segmentFiles()];
+  assert.ok(files.includes(path.join(appRoot, "app", "layout.tsx")), "expected the root layout among the segment files");
+
+  const problems = [];
+  for (const file of files) {
+    const exports = pageExports(parse(file));
+    const where = path.relative(repoRoot, file);
+    if (literalValue(exports.get("dynamic")) === "force-dynamic") problems.push(`${where}: dynamic = "force-dynamic"`);
+    if (literalValue(exports.get("revalidate")) === 0) problems.push(`${where}: revalidate = 0`);
+    if (["force-no-store", "default-no-store"].includes(literalValue(exports.get("fetchCache")))) {
+      problems.push(`${where}: fetchCache = "${literalValue(exports.get("fetchCache"))}"`);
+    }
+    if (file !== pagePath && literalValue(exports.get("dynamicParams")) === false) {
+      problems.push(`${where}: dynamicParams = false (a Tool not built ahead would answer 404)`);
     }
   }
+  assert.deepEqual(problems, [], "these render [tool] on every request, or stop it rendering on demand");
+});
 
-  const { uses, modules } = requestApiUses(entries);
+test("[tool] and the segments around it read no request data", () => {
+  const { uses, modules } = requestApiUses([pagePath, ...segmentFiles()]);
 
   // The walk reaches the renderers and their templates, not only the page.
   assert.ok(modules > 20, `expected the [tool] page's module graph, found ${modules} modules`);

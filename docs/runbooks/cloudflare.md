@@ -144,9 +144,24 @@ OpenNext uses an R2 incremental cache with Cloudflare regional cache in
 `long-lived` mode. A static page, including each Tool page the `[tool]` route
 serves, renders on its first request after a deploy and comes from the cache
 until the next one: entries are keyed by build id, and the deploy uploads no
-build-time pages. A page whose render answers 404, such as a `[tool]` slug
-that isn't an active Tool, is never stored (`apps/tools/lib/not-found-cache.ts`);
+build-time pages. `apps/tools/lib/page-cache-filter.ts` keeps two kinds of
+render out of the cache: a page that answers 404, such as a `[tool]` slug that
+isn't an active Tool, and a page rendered for a URL with a query string
+(Next.js writes the query into the page). Each is answered as usual and not
+stored; after a query, the next request for the bare path stores the page.
 URLs that match no route share one cached not-found page.
+
+Entries from older builds are never deleted: neither
+`tools-serp-co-inc-cache` nor `tools-serp-co-inc-cache-preview` has an
+expiration rule. An entry is about 600 KB, so a production build whose 2,542
+sitemap pages are all requested leaves about 1.5 GB behind (about 130 MB for
+the 218 pages that were static before #315).
+
+Owner step: add a lifecycle rule to both buckets that deletes objects under
+the `incremental-cache/` prefix 30 days after upload, in the dashboard (R2, the
+bucket, Settings, Object lifecycle rules) or with
+`wrangler r2 bucket lifecycle add <bucket> expire-old-builds incremental-cache/ --expire-days 30`.
+A current page whose entry expires renders again on its next request.
 
 R2 buckets:
 
