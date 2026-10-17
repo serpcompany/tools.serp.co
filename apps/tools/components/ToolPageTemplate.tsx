@@ -1,6 +1,7 @@
 import HeroConverter from "@/components/HeroConverter";
 import ImagesToPdfConverter from "@/components/ImagesToPdfConverter";
 import LanderHeroTwoColumn from "@/components/LanderHeroTwoColumn";
+import { StructuredData } from "@/components/StructuredData";
 import { AboutFormatsSection } from "@/components/sections/AboutFormatsSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
@@ -64,6 +65,8 @@ export default function ToolPageTemplate({
 
   return (
     <main className="min-h-screen bg-background">
+      <StructuredData toolId={tool.id} name={tool.title} description={tool.subtitle} />
+
       {/* Hero Section with Tool */}
       {shouldUseTwoColumn ? (
         <>
