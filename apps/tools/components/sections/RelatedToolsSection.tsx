@@ -3,6 +3,8 @@ import { Card } from "@serp-tools/ui/components/card";
 import { relatedToolLinks, type CuratedEntry } from "@/lib/catalog/related-tools";
 
 type RelatedToolsSectionProps = {
+  // Unused: ToolPageTemplate passes its content's format labels, and the
+  // fallback reads the Tool's own formats from the registry instead.
   currentFrom?: string;
   currentTo?: string;
   currentRoute?: string; // to exclude current tool
@@ -13,8 +15,6 @@ type RelatedToolsSectionProps = {
 // The Tool's curated related list, or else up to RELATED_TOOLS_LIMIT Tools of
 // the same kind that share a format with it (lib/catalog/related-tools.ts).
 export function RelatedToolsSection({
-  currentFrom,
-  currentTo,
   currentRoute,
   currentToolId,
   relatedTools,
@@ -22,8 +22,6 @@ export function RelatedToolsSection({
   const tools = relatedToolLinks({
     toolId: currentToolId,
     route: currentRoute,
-    from: currentFrom,
-    to: currentTo,
     curated: relatedTools,
   });
 

@@ -67,10 +67,13 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
 - The Related Tools section on converter and compressor pages
   (`lib/catalog/related-tools.ts`) lists a Tool's curated
   `content.relatedTools` as written. Without one, it lists at most 24 active
-  Tools of the same kind that share a format (converters and compressors, never
-  a Lander): the reverse pair, then the same source format, the same target
-  format and the other shared-format Tools, in registry order within each.
-  Lander pages have no such section.
+  Tools of the same kind that share a registry format (converters and
+  compressors, never a Lander): the reverse pair, then the same source format,
+  the same target format and the other shared-format Tools. The same source and
+  same target groups share the places; the others fill what is left. Which
+  Tools fill a group's places is fixed per page by a hash of the two Tool ids,
+  so every converter and compressor page is on some other page's list; they
+  show sorted by id. Lander pages have no such section.
 - `packages/app-core/src/data/related-apps.json` owns Related App entries;
   matching uses a Tool's input and output formats and de-duplicates by app id.
 - The shared site footer is mounted by

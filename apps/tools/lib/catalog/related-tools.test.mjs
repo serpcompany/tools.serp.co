@@ -21,15 +21,11 @@ const entry = (id, operation, from, to, isActive = true) => ({
 });
 const ids = (tools) => tools.map((tool) => tool.id);
 
-// The links a Tool page gets, from its registry entry.
+// The links a Tool page gets, from what its page passes: ToolPageRenderer
+// sets the content's id and route to the registry's (lib/tool-content.ts), and
+// RelatedToolsSection forwards those and the curated list.
 const linksFor = (tool) =>
-  relatedToolLinks({
-    toolId: tool.id,
-    route: tool.route,
-    from: tool.from,
-    to: tool.to,
-    curated: tool.content?.relatedTools,
-  });
+  relatedToolLinks({ toolId: tool.id, route: tool.route, curated: tool.content?.relatedTools });
 
 // Every page ToolPageTemplate renders the section on: converters and
 // compressors with both formats (app/(convert)/[tool]/page.tsx).
@@ -57,7 +53,7 @@ test("a converter's fallback lists converters and compressors, never Landers or 
     entry("3gp-to-avi", "convert", "3gp", "avi"),
   ];
 
-  assert.deepEqual(ids(fallbackRelatedTools(current, candidates)), ["3gp-to-avi", "mov-to-mp4", "compress-mp4"]);
+  assert.deepEqual(ids(fallbackRelatedTools(current, candidates)), ["3gp-to-avi", "compress-mp4", "mov-to-mp4"]);
 });
 
 test("a compressor's fallback lists converters too", () => {
@@ -82,7 +78,7 @@ test("a Lander's fallback lists Landers only", () => {
   assert.deepEqual(ids(fallbackRelatedTools(current, candidates)), ["download-loom-videos", "download-wistia-videos"]);
 });
 
-test("the fallback lists the reverse pair, then the same source, then the same target, then the rest, in registry order within each", () => {
+test("the fallback lists the reverse pair, then the same source, then the same target, then the rest, by id within each", () => {
   const current = entry("3gp-to-mp4", "convert", "3gp", "mp4");
   const candidates = [
     entry("avi-to-3gp", "convert", "avi", "3gp"), // into the source format
@@ -97,27 +93,65 @@ test("the fallback lists the reverse pair, then the same source, then the same t
 
   assert.deepEqual(ids(fallbackRelatedTools(current, candidates)), [
     "mp4-to-3gp",
-    "3gp-to-mov",
     "3gp-to-avi",
-    "mov-to-mp4",
+    "3gp-to-mov",
     "avi-to-mp4",
+    "mov-to-mp4",
     "mp4-to-avi",
     "avi-to-3gp",
   ]);
 });
 
-test("the fallback stops at the cap, keeping the closest matches", () => {
+// Synthetic groups for a 3GP to MP4 page.
+const group = (count, make) => Array.from({ length: count }, (_, i) => make(String(i).padStart(2, "0")));
+const sameSource = (count) => group(count, (i) => entry(`3gp-to-g${i}`, "convert", "3gp", `g${i}`));
+const sameTarget = (count) => group(count, (i) => entry(`f${i}-to-mp4`, "convert", `f${i}`, "mp4"));
+const onward = (count) => group(count, (i) => entry(`mp4-to-h${i}`, "convert", "mp4", `h${i}`));
+const into = (count) => group(count, (i) => entry(`k${i}-to-3gp`, "convert", `k${i}`, "3gp"));
+const countBy = (tools, prefix) => tools.filter((tool) => tool.id.startsWith(prefix)).length;
+
+test("the same source and same target groups share the 24 places", () => {
   const current = entry("3gp-to-mp4", "convert", "3gp", "mp4");
-  const sameTarget = Array.from({ length: 30 }, (_, i) => entry(`f${i}-to-mp4`, "convert", `f${i}`, "mp4"));
-  const sameSource = Array.from({ length: 10 }, (_, i) => entry(`3gp-to-g${i}`, "convert", "3gp", `g${i}`));
-  const listed = fallbackRelatedTools(current, [...sameTarget, ...sameSource]);
+  const reverse = entry("mp4-to-3gp", "convert", "mp4", "3gp");
+  const listed = fallbackRelatedTools(current, [...sameSource(30), ...sameTarget(30), ...onward(30), reverse]);
 
   assert.equal(listed.length, RELATED_TOOLS_LIMIT);
-  assert.deepEqual(ids(listed.slice(0, 10)), ids(sameSource));
-  assert.deepEqual(ids(listed.slice(10)), ids(sameTarget.slice(0, RELATED_TOOLS_LIMIT - 10)));
-  assert.equal(fallbackRelatedTools(current, sameTarget, 5).length, 5);
+  assert.equal(listed[0].id, "mp4-to-3gp");
+  assert.equal(countBy(listed, "3gp-to-"), 12);
+  assert.equal(countBy(listed, "f"), 11);
+  assert.equal(countBy(listed, "mp4-to-h"), 0);
+  assert.ok(listed.slice(1, 13).every((tool) => tool.id.startsWith("3gp-to-")));
+  assert.equal(fallbackRelatedTools(current, sameTarget(30), 5).length, 5);
 });
 
+test("a group short of its share leaves the rest to the others, and the other groups fill only what is left", () => {
+  const current = entry("3gp-to-mp4", "convert", "3gp", "mp4");
+
+  const fewSources = fallbackRelatedTools(current, [...sameSource(4), ...sameTarget(30), ...onward(30)]);
+  assert.equal(countBy(fewSources, "3gp-to-"), 4);
+  assert.equal(countBy(fewSources, "f"), 20);
+
+  const fewBoth = fallbackRelatedTools(current, [...sameSource(3), ...sameTarget(3), ...onward(30), ...into(30)]);
+  assert.equal(fewBoth.length, RELATED_TOOLS_LIMIT);
+  assert.equal(countBy(fewBoth, "mp4-to-h"), 9);
+  assert.equal(countBy(fewBoth, "k"), 9);
+  assert.deepEqual(ids(fewBoth.slice(0, 6)), [...ids(sameSource(3)), ...ids(sameTarget(3))]);
+});
+
+test("which Tools fill a group's places is fixed per page, varies between pages and ignores registry order", () => {
+  const candidates = [...sameSource(30), ...sameTarget(30)];
+  const listFor = (id, tools = candidates) => ids(fallbackRelatedTools(entry(id, "convert", "3gp", "mp4"), tools));
+
+  // A pinned list: the same on every run and every machine.
+  assert.deepEqual(listFor("3gp-to-mp4"), [
+    "3gp-to-g03", "3gp-to-g06", "3gp-to-g07", "3gp-to-g08", "3gp-to-g09", "3gp-to-g15",
+    "3gp-to-g16", "3gp-to-g18", "3gp-to-g20", "3gp-to-g21", "3gp-to-g25", "3gp-to-g26",
+    "f00-to-mp4", "f03-to-mp4", "f08-to-mp4", "f09-to-mp4", "f13-to-mp4", "f18-to-mp4",
+    "f21-to-mp4", "f22-to-mp4", "f23-to-mp4", "f25-to-mp4", "f27-to-mp4", "f28-to-mp4",
+  ]);
+  assert.deepEqual(listFor("3gp-to-mp4", candidates.toReversed()), listFor("3gp-to-mp4"));
+  assert.notDeepEqual(listFor("another-3gp-to-mp4"), listFor("3gp-to-mp4"));
+});
 test("the fallback never lists the current Tool or an inactive one", () => {
   const current = entry("3gp-to-mp4", "convert", "3gp", "mp4");
   const candidates = [
@@ -145,8 +179,6 @@ test("a curated list naming the current Tool or an inactive Tool drops them", ()
   const links = relatedToolLinks({
     toolId: current.id,
     route: current.route,
-    from: current.from,
-    to: current.to,
     curated: [
       { toolId: current.id, title: "Itself" },
       { toolId: inactive.id, title: "Retired" },
@@ -158,27 +190,62 @@ test("a curated list naming the current Tool or an inactive Tool drops them", ()
   assert.deepEqual(ids(links), ["mp4-to-3gp"]);
 });
 
-test("a fallback list is at most 24 links, and no converter or compressor page links a Lander", () => {
+test("every Tool page lists 1 to 24 links and no Lander, and a fallback lists only converters and compressors", () => {
   const fallbackPages = everyPageLinks().filter(([tool]) => !isCurated(tool));
   assert.ok(fallbackPages.length > 2000, "most Tool pages use the fallback");
 
-  for (const [tool, links] of fallbackPages) {
+  for (const [tool, links] of everyPageLinks()) {
     assert.ok(links.length > 0, `${tool.id} has no related Tools`);
     assert.ok(links.length <= RELATED_TOOLS_LIMIT, `${tool.id} lists ${links.length}`);
     for (const link of links) {
       const operation = getToolByRoute(link.href).operation;
+      assert.notEqual(operation, "download", `${tool.id} links the Lander ${link.href}`);
+      if (isCurated(tool)) continue;
       assert.ok(operation === "convert" || operation === "compress", `${tool.id} links ${link.href} (${operation})`);
     }
   }
 });
 
-test("/3gp-to-mp4/ lists MP4 to 3GP first, then other 3GP converters, and no Lander", () => {
+test("every converter and compressor page is linked from another page's list", () => {
+  const linked = new Set();
+  for (const [tool, links] of everyPageLinks()) {
+    for (const link of links) if (link.href !== toolHref(tool)) linked.add(link.href);
+  }
+  const unlinked = toolPages.filter((tool) => !linked.has(toolHref(tool))).map((tool) => tool.id);
+
+  assert.deepEqual(unlinked, []);
+});
+
+test("a page's fallback list doesn't depend on registry order", () => {
+  const reversed = activeTools().toReversed();
+  for (const tool of toolPages.filter((page) => !isCurated(page))) {
+    assert.deepEqual(ids(fallbackRelatedTools(tool, reversed)), ids(fallbackRelatedTools(tool, activeTools())), tool.id);
+  }
+});
+
+test("a page whose content names other formats than its registry entry still gets its list", () => {
+  const relabelled = toolPages.filter(
+    (tool) => tool.content?.tool && (tool.content.tool.from !== tool.from || tool.content.tool.to !== tool.to),
+  );
+  assert.ok(relabelled.some((tool) => tool.id === "mp4-to-transcript"));
+
+  for (const tool of relabelled) {
+    const links = linksFor(tool);
+    assert.ok(links.length > 0, `${tool.id} has no related Tools`);
+    assert.ok(
+      links.some((link) => link.href.startsWith(`/${tool.from}-to-`) || link.href.endsWith(`-to-${tool.to}/`)),
+      `${tool.id} lists nothing that shares ${tool.from} or ${tool.to}`,
+    );
+  }
+});
+
+test("/3gp-to-mp4/ lists MP4 to 3GP first, then 3GP converters, then MP4 converters, and no Lander", () => {
   const links = linksFor(activeTools().find((tool) => tool.id === "3gp-to-mp4"));
 
   assert.equal(links.length, RELATED_TOOLS_LIMIT);
   assert.equal(links[0].href, "/mp4-to-3gp/");
-  assert.ok(links.slice(1).every((link) => link.href.startsWith("/3gp-to-")));
-  assert.ok(links.every((link) => !link.href.startsWith("/download-")));
+  assert.ok(links.slice(1, 13).every((link) => link.href.startsWith("/3gp-to-")));
+  assert.ok(links.slice(13).every((link) => link.href.endsWith("-to-mp4/")));
 });
 
 test("a Lander's list is other Landers", () => {
@@ -217,8 +284,6 @@ test("a curated list renders as written: in order, with its titles, and uncapped
   const links = relatedToolLinks({
     toolId: current.id,
     route: current.route,
-    from: current.from,
-    to: current.to,
     curated: many.map((tool) => ({ toolId: tool.id, title: tool.name })),
   });
   assert.deepEqual(ids(links), ids(many.filter((tool) => tool.id !== current.id)));
