@@ -72,8 +72,9 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   the same target format and the other shared-format Tools. The same source and
   same target groups share the places; the others fill what is left. Which
   Tools fill a group's places is fixed per page by a hash of the two Tool ids,
-  so every converter and compressor page is on some other page's list; they
-  show sorted by id. Lander pages have no such section.
+  so every converter and compressor page is on another page's list; they show
+  sorted by id. Lander, table converter and transcription pages render no such
+  section; table converter pages link each other instead.
 - `packages/app-core/src/data/related-apps.json` owns Related App entries;
   matching uses a Tool's input and output formats and de-duplicates by app id.
 - The shared site footer is mounted by

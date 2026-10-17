@@ -12,7 +12,7 @@ import { activeTools, getTool, getToolByRoute } from "./catalog.ts";
 // share a format with the page's Tool (issue #318): converters and compressors
 // list converters and compressors, Landers list Landers. The places are shared
 // between groups and picked per page, so every converter and compressor page
-// is on some other page's list (related-tools.test.mjs checks the catalog).
+// is on another page's list (related-tools.test.mjs checks the catalog).
 
 export const RELATED_TOOLS_LIMIT = 24;
 

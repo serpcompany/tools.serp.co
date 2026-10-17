@@ -1,9 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { activeTools, allTools, getToolByRoute } from "./catalog.ts";
 import { toolHref } from "./href.ts";
+import { TABLE_CONVERT_PAGES } from "../table-convert-pages.ts";
 import {
   RELATED_TOOLS_LIMIT,
   fallbackRelatedTools,
@@ -27,11 +30,32 @@ const ids = (tools) => tools.map((tool) => tool.id);
 const linksFor = (tool) =>
   relatedToolLinks({ toolId: tool.id, route: tool.route, curated: tool.content?.relatedTools });
 
-// Every page ToolPageTemplate renders the section on: converters and
-// compressors with both formats (app/(convert)/[tool]/page.tsx).
+// Every converter and compressor page (app/(convert)/[tool]/page.tsx and the
+// folder routes beside it).
 const toolPages = activeTools().filter(
   (tool) => (tool.operation === "convert" || tool.operation === "compress") && tool.from && tool.to,
 );
+
+// The hrefs of folder routes that render a Tool page without ToolPageRenderer,
+// and so without a Related Tools section: table converters and transcription.
+const otherTemplateHrefs = () => {
+  const hrefs = new Set();
+  const walk = (dir, path) => {
+    for (const name of readdirSync(dir)) {
+      const child = join(dir, name);
+      if (name.startsWith("[") || !statSync(child).isDirectory()) continue;
+      const childPath = name.startsWith("(") ? path : `${path}${name}/`;
+      try {
+        if (!readFileSync(join(child, "page.tsx"), "utf8").includes("ToolPageRenderer")) hrefs.add(childPath);
+      } catch {
+        // No page here; its subfolders may have one.
+      }
+      walk(child, childPath);
+    }
+  };
+  walk(fileURLToPath(new URL("../../app/", import.meta.url)), "/");
+  return hrefs;
+};
 const isCurated = (tool) => (tool.content?.relatedTools?.length ?? 0) > 0;
 
 // Each page's links, worked out once for the tests that check every page.
@@ -206,14 +230,23 @@ test("every Tool page lists 1 to 24 links and no Lander, and a fallback lists on
   }
 });
 
-test("every converter and compressor page is linked from another page's list", () => {
+test("every converter and compressor page is on another page's rendered list, but for table converters, which link each other", () => {
+  const otherTemplates = otherTemplateHrefs();
+  assert.ok(otherTemplates.has("/csv-to-json/") && otherTemplates.has("/mp4-to-transcript/"));
+  assert.ok(!otherTemplates.has("/mp4-to-mov/"), "a ToolPageRenderer folder route renders the section");
+
   const linked = new Set();
   for (const [tool, links] of everyPageLinks()) {
+    if (otherTemplates.has(toolHref(tool))) continue;
     for (const link of links) if (link.href !== toolHref(tool)) linked.add(link.href);
   }
-  const unlinked = toolPages.filter((tool) => !linked.has(toolHref(tool))).map((tool) => tool.id);
+  const tableConverters = new Set(TABLE_CONVERT_PAGES.map((page) => `/${page.slug}/`));
+  const unlinked = toolPages.map(toolHref).filter((href) => !linked.has(href));
 
-  assert.deepEqual(unlinked, []);
+  // Each table converter page lists all the others (TableConvertLinksSection),
+  // so a visitor or crawler reaches them all once one is linked.
+  assert.deepEqual(unlinked.filter((href) => !tableConverters.has(href)), []);
+  assert.ok([...tableConverters].some((href) => linked.has(href)), "no table converter is on a rendered list");
 });
 
 test("a page's fallback list doesn't depend on registry order", () => {
@@ -223,7 +256,9 @@ test("a page's fallback list doesn't depend on registry order", () => {
   }
 });
 
-test("a page whose content names other formats than its registry entry still gets its list", () => {
+// Today these are transcription Tools, whose own pages render no section; the
+// rule keeps a ToolPageTemplate page with relabelled formats from losing its list.
+test("a Tool whose content names other formats than its registry entry still gets its list", () => {
   const relabelled = toolPages.filter(
     (tool) => tool.content?.tool && (tool.content.tool.from !== tool.from || tool.content.tool.to !== tool.to),
   );
