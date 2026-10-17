@@ -70,8 +70,10 @@ export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
               <h3 className="text-lg font-semibold text-slate-900">{activeCategory.title}</h3>
               <p className="mt-1 text-sm text-slate-600">{activeCategory.description}</p>
             </div>
+            {/* A category page is up to 120 cards: don't prefetch it on every page. */}
             <Link
               href={activeCategory.href}
+              prefetch={false}
               className="text-sm font-medium text-blue-700 transition-colors hover:text-blue-800 hover:underline"
             >
               View {activeCategory.name} category
@@ -101,6 +103,7 @@ export function ToolsLinkHubTabs({ categories }: ToolsLinkHubTabsProps) {
             <div className="mt-5 flex justify-center">
               <Link
                 href={activeCategory.href}
+                prefetch={false}
                 className="rounded-full border border-slate-300 bg-white px-5 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               >
                 See all {activeCategory.count} tools in {activeCategory.name}

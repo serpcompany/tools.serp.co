@@ -28,3 +28,11 @@ test("tools link hub tabs show only the links they were sent, and link the categ
   assert.match(toolsLinkHubTabsSource, /See all \{activeCategory\.count\} tools in \{activeCategory\.name\}/);
   assert.match(toolsLinkHubTabsSource, /View \{activeCategory\.name\} category/);
 });
+
+// The hub is on every page: a default <Link> to a category page would prefetch
+// up to 120 cards on each visit.
+test("tools link hub links don't prefetch", () => {
+  const links = toolsLinkHubTabsSource.match(/<Link\b[^>]*>/g) ?? [];
+  assert.ok(links.length >= 3);
+  for (const link of links) assert.match(link, /prefetch=\{false\}/, link);
+});
