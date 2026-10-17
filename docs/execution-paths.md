@@ -85,6 +85,8 @@ Conversion picks an engine by input format:
 - **PDF to TXT, HTML and EPUB** (`lib/convert/pdf-text.ts`, since #282): pdf.js
   reads each page's text instead, rebuilt into lines and paragraphs;
   [pdf-text.md](pdf-text.md) says how, what is lost, and when a PDF is refused.
+- **TXT and XML to PDF** (`lib/convert/text-pdf.ts`, since #283): the text, or
+  the XML listed, on A4 pages with jsPDF, as [text-pdf.md](text-pdf.md) says.
 - **Images into documents** (`lib/convert/image-documents.ts`): SVG to HTML
   wraps the drawing in a standalone page; SVG to AI draws it as vectors into a
   PDF page of the drawing's size, one SVG unit to a point as in Illustrator,

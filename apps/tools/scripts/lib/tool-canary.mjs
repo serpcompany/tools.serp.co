@@ -42,6 +42,8 @@ export const CANARY_TOOLS = {
   "dxf-to-png": "DXF drawn by dxf-viewer with three.js and WebGL, its text in the self-hosted DejaVu Sans",
   "html-to-webp": "an HTML page laid out in a sandboxed iframe that loads nothing, captured by modern-screenshot",
   "txt-to-png": "plain text drawn on a canvas in the self-hosted DejaVu Sans, long lines wrapped",
+  "txt-to-pdf": "plain text set on A4 pages in jsPDF's Courier, its text read back with pdf.js; Japanese text, which the PDF's font can't show, refused",
+  "xml-to-pdf": "XML read with sax and listed element by element on A4 pages with jsPDF, its text read back with pdf.js; malformed XML refused with the parser's message",
   "dot-to-png": "a Graphviz DOT graph laid out by Viz.js (Graphviz in WebAssembly) in a worker, drawn through an <img>",
   "xlsx-to-png": "an XLSX sheet read with fflate, its numbers in their formats, drawn as the table converters draw a table",
   "pptx-to-png": "a PowerPoint slide drawn as SVG by pptx-glimpse in a worker, then through an <img>",

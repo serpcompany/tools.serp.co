@@ -42,6 +42,7 @@ import {
 } from "../scripts/lib/tool-sweep.mjs";
 import { imageToEpub, writeEpub } from "./convert/image-documents.ts";
 import { writeTableOutput } from "./convert/table-outputs.ts";
+import { convertTextToPdf } from "./convert/text-pdf.ts";
 
 // The ImageMagick WASM build the app ships, which the sweep decodes image
 // outputs with.
@@ -487,11 +488,12 @@ test("converterEngine follows workerClient's branch order", () => {
   assert.equal(engine("convert", "html", "webp"), "html-render");
   assert.equal(engine("convert", "txt", "svg"), "text-render");
   assert.equal(engine("convert", "txt", "jpeg"), "text-render");
+  assert.equal(engine("convert", "txt", "pdf"), "text-pdf");
+  assert.equal(engine("convert", "xml", "pdf"), "xml-pdf");
   assert.equal(engine("convert", "dot", "png"), "viz-js");
   assert.equal(engine("convert", "xlsx", "jpg"), "xlsx-table");
   assert.equal(engine("convert", "pptx", "jpeg"), "pptx-glimpse");
   assert.equal(engine("convert", "ppt", "png"), "browser-raster");
-  assert.equal(engine("convert", "txt", "pdf"), "browser-raster");
   assert.equal(engine("convert", "image", "pdf"), "image-pdf");
   assert.equal(engine("convert", "svg", "ttf"), "svg-font");
   assert.equal(engine("convert", "svg", "png"), "browser-raster");
@@ -1082,4 +1084,57 @@ test("a PDF to HTML or EPUB run passes only when the opened file holds the fixtu
   assert.equal((await run("html", page("<p>Alpha</p><p>Bravo</p>"))).status, "pass");
   // A marker in the head or an attribute isn't the page's text.
   assert.match((await run("html", page('<p title="Bravo">Alpha</p>'))).error, /missing Bravo/);
+});
+
+test("TXT and XML to PDF look for their fixture's text in the PDF, opened as PDF to TXT reads one, and refuse what they must", () => {
+  const fixtures = loadFixtures(benchmarksDir);
+  const options = { handlers: new Map(), fixtures, timeoutMs: 60, ffmpegTimeoutMs: 180 };
+  const plan = (from) =>
+    planTool({ id: `${from}-to-pdf`, route: `/${from}-to-pdf`, operation: "convert", from, to: "pdf", isActive: true }, options);
+  const txt = plan("txt");
+  assert.deepEqual(
+    [txt.engine, txt.fixtures.map((file) => path.basename(file)), txt.markers, txt.decode, txt.document],
+    ["text-pdf", ["sample.txt"], ["SERP Tools sample text", "Alpha", "Gamma"], true, true],
+  );
+  assert.deepEqual(txt.refusals.map(({ fixture, errorCode }) => [path.basename(fixture), errorCode]), [["sample-cjk.txt", "unsupported_script"]]);
+  const xml = plan("xml");
+  assert.deepEqual(
+    [xml.engine, xml.fixtures.map((file) => path.basename(file)), xml.markers, xml.decode, xml.document],
+    ["xml-pdf", ["sample.xml"], ["Alpha"], true, true],
+  );
+  assert.deepEqual(xml.refusals.map(({ fixture, errorCode }) => [path.basename(fixture), errorCode]), [["sample-malformed.xml", "malformed_xml"]]);
+  // A table converter's PDF stays a table output, opened by decodeTableOutput.
+  const table = planTool(
+    { id: "csv-to-pdf", route: "/csv-to-pdf", operation: "convert", from: "csv", to: "pdf", isActive: true },
+    { ...options, handlers: new Map([["/csv-to-pdf", "TableConvertLanding"]]) },
+  );
+  assert.deepEqual([table.decode, table.document], [true, undefined]);
+  // The other text Tools' image outputs need no markers.
+  const png = planTool({ id: "txt-to-png", route: "/txt-to-png", operation: "convert", from: "txt", to: "png", isActive: true }, options);
+  assert.deepEqual([png.markers, png.refusals], [[], []]);
+});
+
+test("a TXT or XML to PDF run passes only when its PDF's text holds the fixture's markers", async () => {
+  const font = readFileSync(path.join(benchmarksDir, "../public/vendor/fonts/dejavu/DejaVuSans.ttf"));
+  const loadFont = async () => font.buffer.slice(font.byteOffset, font.byteOffset + font.byteLength);
+  const markers = ["SERP Tools sample text", "Alpha", "Gamma"];
+  const run = async (bytes, { document = true } = {}) => {
+    const outputs = [{ name: "sample.pdf", size: bytes.length, head: Array.from(bytes.subarray(0, 64)), base64: Buffer.from(bytes).toString("base64") }];
+    await decodeOutputs(outputs, "pdf", { document });
+    return { verdict: classifyRun({ outcome: "completed", outputs }, { to: "pdf", markers, decode: true }), decoded: outputs[0].decoded };
+  };
+  const pdf = async (text, from = "txt") =>
+    new Uint8Array((await convertTextToPdf(new TextEncoder().encode(text).buffer, from, `a.${from}`, { loadFont })).buffer);
+  const sample = readFileSync(path.join(fixturesDir, "sample.txt"), "utf8");
+  assert.deepEqual((await run(await pdf(sample))).verdict, { status: "pass", error: null, formatCheck: "decoded" });
+  assert.match((await run(await pdf("SERP Tools sample text\nAlpha"))).verdict.error, /missing Gamma/);
+  // Read as PDF to TXT reads it: lines and paragraphs, in the Unicode font too.
+  const decoded = (await run(await pdf("SERP Tools sample text\n\nAlpha Ωmega\nGamma"))).decoded;
+  assert.equal(decoded.text, "SERP Tools sample text\n\nAlpha Ωmega\nGamma\n");
+  // A PDF with no text on it doesn't open as a document.
+  const { jsPDF } = await import("jspdf");
+  const blank = new Uint8Array(new jsPDF().output("arraybuffer"));
+  assert.match((await run(blank)).verdict.error, /doesn't open .*no text/);
+  // As a table's PDF it is read item by item instead, and has nothing.
+  assert.deepEqual((await run(blank, { document: false })).decoded, { text: "" });
 });

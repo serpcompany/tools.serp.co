@@ -99042,6 +99042,94 @@
     ]
   },
   {
+    "id": "txt-to-pdf",
+    "name": "TXT to PDF",
+    "description": "Convert TXT to PDF in your browser: your text on A4 pages, long lines wrapped, blank lines and indentation kept, in Courier or, when the text needs it, a font for Greek, Cyrillic, Hebrew and Arabic.",
+    "operation": "convert",
+    "route": "/txt-to-pdf",
+    "from": "txt",
+    "to": "pdf",
+    "isActive": true,
+    "tags": [
+      "txt",
+      "pdf",
+      "text",
+      "convert",
+      "document"
+    ],
+    "content": {
+      "tool": {
+        "title": "TXT to PDF: Convert Text to PDF",
+        "subtitle": "Convert a plain-text file to PDF in your browser, with no upload. Your text is set on A4 pages, long lines wrapped, with its blank lines and indentation kept.",
+        "from": "txt",
+        "to": "pdf",
+        "accept": ".txt,text/plain"
+      },
+      "howTo": {
+        "title": "How to convert a TXT file to PDF",
+        "intro": "Your text is laid out in your browser and saved as a PDF named after your file.",
+        "steps": [
+          "Upload your TXT file.",
+          "We set its text on A4 pages, up to 61 lines of 81 characters each, wrapping longer lines and starting a new page at each form feed.",
+          "Download the PDF, which opens and prints the same on any device."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Which font is the PDF in?",
+          "answer": "Courier, the typewriter font every PDF reader has, when your text is written in Latin letters: every character is the same width, so columns and indentation line up as they do in your text editor. Text with Greek, Cyrillic, Hebrew or Arabic letters, or other characters outside Windows-1252, is set in DejaVu Sans, embedded in the PDF. Its letters aren't all one width, so columns lined up with spaces may not line up, though indentation still does."
+        },
+        {
+          "question": "Can it convert Chinese, Japanese or Korean text?",
+          "answer": "Not to PDF: the PDF's font has no Chinese, Japanese, Korean, Indic or Thai characters, or emoji, so a file with any of them is refused, with the characters named, rather than saved with blank boxes. TXT to PNG draws them with your browser's own fonts."
+        },
+        {
+          "question": "What happens to long lines, tabs and page breaks?",
+          "answer": "A line longer than the page wraps between words onto the next line, indented as far as the line it continues, and a word too long for a line is split. Tabs become spaces up to the next fourth column. A form feed, the page-break character some programs write, starts a new page."
+        },
+        {
+          "question": "Which text encodings can it read?",
+          "answer": "UTF-8, and UTF-16 with a byte order mark. A file that isn't valid UTF-8 is read as Windows-1252, as a browser reads a text file that doesn't say its encoding."
+        },
+        {
+          "question": "How large a file can I convert?",
+          "answer": "Up to 20 MB, making up to 2,000 pages, about 10 million characters. The PDF is made in your browser's memory, and a larger one could stall the tab, so a larger file is refused with a message saying which limit it passed."
+        },
+        {
+          "question": "Is my file uploaded anywhere?",
+          "answer": "No. The PDF is made in your browser, and your file never leaves your device. The font for Greek, Cyrillic, Hebrew and Arabic is downloaded from this site only when your text needs it."
+        }
+      ],
+      "aboutSection": {
+        "title": "Plain text and PDF",
+        "fromFormat": {
+          "name": "TXT",
+          "fullName": "Plain text",
+          "description": "A TXT file holds text and nothing else: no fonts, layout or pictures. Every computer opens it, but how it looks and where its pages break depends on the program."
+        },
+        "toFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, so it reads and prints the same on every device. Its text stays text: you can search it and copy it."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "TXT to PNG",
+          "toolId": "txt-to-png"
+        },
+        {
+          "title": "XML to PDF",
+          "toolId": "xml-to-pdf"
+        },
+        {
+          "title": "PDF to TXT",
+          "toolId": "pdf-to-txt"
+        }
+      ]
+    }
+  },
+  {
     "id": "txt-to-png",
     "name": "TXT to PNG",
     "description": "Convert TXT to PNG: your text drawn as an image in your browser, long lines wrapped, in a font for Latin, Greek, Cyrillic, Hebrew and Arabic. A very long text is cut at 4,096 px, and the image says where.",
@@ -104115,6 +104203,97 @@
     "from": "xml",
     "to": "markdown",
     "isActive": true
+  },
+  {
+    "id": "xml-to-pdf",
+    "name": "XML to PDF",
+    "description": "Convert XML to PDF in your browser: any well-formed XML file as an indented listing of its elements, attributes and text on A4 pages. A file that isn't well-formed is refused with the parser's message.",
+    "operation": "convert",
+    "route": "/xml-to-pdf",
+    "from": "xml",
+    "to": "pdf",
+    "isActive": true,
+    "tags": [
+      "xml",
+      "pdf",
+      "convert",
+      "document"
+    ],
+    "content": {
+      "tool": {
+        "title": "XML to PDF: Convert an XML File to PDF",
+        "subtitle": "Convert any well-formed XML file to PDF in your browser, with no upload: its elements, attributes and text listed with their nesting indented, ready to read, share or print.",
+        "from": "xml",
+        "to": "pdf",
+        "accept": ".xml,application/xml,text/xml"
+      },
+      "howTo": {
+        "title": "How to convert an XML file to PDF",
+        "intro": "Your XML is read in your browser and listed, an element a line, on A4 pages in a PDF named after your file.",
+        "steps": [
+          "Upload your XML file.",
+          "We check that it's well-formed, then list its elements, attributes, text, comments and CDATA, each level of nesting two spaces further in.",
+          "Download the PDF, which opens and prints the same on any device."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "What does the PDF show?",
+          "answer": "Your XML as an indented listing: each element on its own line with its attributes, its text beside it when that's all it holds, and each level of nesting two spaces further in, up to 20 levels. Comments, processing instructions and the DOCTYPE are shown in grey, and long lines wrap. It's your file's content laid out to read, not the file styled by a stylesheet."
+        },
+        {
+          "question": "Why does it say my XML isn't well-formed?",
+          "answer": "An XML file has to follow XML's rules to be read: every tag closed, and inside the element it opened in, attribute values in quotes, a lone ampersand written as &amp;, and one root element holding the rest. The message gives what the parser found and the line and column where it stopped, so you can fix the file and convert it again."
+        },
+        {
+          "question": "What happens to entities and the DOCTYPE?",
+          "answer": "XML's own five entities (&amp;, &lt;, &gt;, &quot; and &apos;) and character references such as &#169; are shown as the characters they stand for. Any other entity is shown as written, never expanded or fetched, so a file that refers to other files, or declares entities that multiply (a \"billion laughs\" file), converts as quickly as any other and loads nothing."
+        },
+        {
+          "question": "Which characters can it show?",
+          "answer": "Text in Latin letters is set in Courier, the typewriter font every PDF reader has. Greek, Cyrillic, Hebrew and Arabic are set in DejaVu Sans, embedded in the PDF. The font has no Chinese, Japanese, Korean, Indic or Thai characters, or emoji, so a file with any of them is refused, with the characters named, rather than saved with blank boxes."
+        },
+        {
+          "question": "Can it turn an e-invoice or an XSL-FO file into a formatted document?",
+          "answer": "No. It lists any XML file's content, but it doesn't apply an invoice's layout or an XSL-FO or XSLT stylesheet. For those, use the software your invoicing system or publisher recommends."
+        },
+        {
+          "question": "How large a file can I convert?",
+          "answer": "Up to 20 MB, making up to 2,000 pages. The PDF is made in your browser's memory, and a larger one could stall the tab, so a larger file is refused with a message saying which limit it passed."
+        },
+        {
+          "question": "Is my file uploaded anywhere?",
+          "answer": "No. It's read and converted in your browser, and never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "XML and PDF",
+        "fromFormat": {
+          "name": "XML",
+          "fullName": "Extensible Markup Language",
+          "description": "XML holds data as nested elements with attributes and text: feeds, settings, office documents, invoices and data exports. It's written for programs, so it's hard to read as it is."
+        },
+        "toFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, so it reads and prints the same on every device. Its text stays text: you can search it and copy it."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "XML to CSV",
+          "toolId": "xml-to-csv"
+        },
+        {
+          "title": "TXT to PDF",
+          "toolId": "txt-to-pdf"
+        },
+        {
+          "title": "XML to Markdown",
+          "toolId": "xml-to-markdown"
+        }
+      ]
+    }
   },
   {
     "id": "xpm-to-jpeg",

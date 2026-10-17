@@ -4,8 +4,11 @@
 // so no page loads one before a visitor asks for that output.
 
 import { checkOutputFormat } from "./output-format.ts";
+import { fetchPdfFont, isBuiltInText, isRightToLeft, embedUnicodeFont } from "./pdf-font.ts";
 import type { TableData } from "./table-data.ts";
 import { writeTableImage } from "./table-image.ts";
+
+export { PDF_FONT_URL, isRightToLeft } from "./pdf-font.ts";
 
 export type BinaryTableFormat = "excel" | "pdf" | "png" | "jpeg" | "avro" | "protobuf";
 
@@ -155,8 +158,6 @@ async function writeExcel(table: TableData): Promise<TableOutput> {
 
 // ------------------------------------------------------------------ PDF --
 
-export const PDF_FONT_URL = "/vendor/fonts/dejavu/DejaVuSans.ttf";
-const PDF_FONT = "DejaVuSans";
 const PDF_MARGIN = 36;
 const PDF_FONT_SIZE = 9;
 const PDF_PADDING = 4;
@@ -166,11 +167,6 @@ const PDF_MAX_COLUMN = 180;
 // to a letter a line by a long one.
 const PDF_MIN_COLUMN = 90;
 const A4 = { width: 595.28, height: 841.89 };
-
-// Text jsPDF's built-in Helvetica draws: Latin-1 and the rest of
-// Windows-1252 (its WinAnsiEncoding). Anything else needs the Unicode font.
-const BUILT_IN_TEXT = /^[\n\x20-\x7e\xa0-\xff€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ]*$/;
-const RTL_LETTER = /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufeff]/;
 
 // What a PDF cell shows: line breaks as \n, tabs as spaces, and no control
 // or invisible formatting characters, which no font draws.
@@ -184,89 +180,7 @@ export function pdfText(value: string): string {
 }
 
 export function needsUnicodeFont(cells: string[][]): boolean {
-  return cells.some((row) => row.some((cell) => !BUILT_IN_TEXT.test(cell)));
-}
-
-// Whether a line reads right to left: its first letter is Hebrew or Arabic.
-export function isRightToLeft(text: string): boolean {
-  const letter = /\p{L}/u.exec(text);
-  return Boolean(letter && RTL_LETTER.test(letter[0]));
-}
-
-// Fetched once a page, when a PDF first needs it; a failed fetch is tried
-// again next time.
-let pdfFont: Promise<ArrayBuffer> | null = null;
-function fetchPdfFont(): Promise<ArrayBuffer> {
-  pdfFont ??= fetch(PDF_FONT_URL).then((response) => {
-    if (!response.ok) throw new Error(`The PDF font didn't load (HTTP ${response.status}).`);
-    return response.arrayBuffer();
-  });
-  pdfFont.catch(() => {
-    pdfFont = null;
-  });
-  return pdfFont;
-}
-
-function toBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  for (let start = 0; start < bytes.length; start += 0x8000) {
-    binary += String.fromCharCode(...bytes.subarray(start, start + 0x8000));
-  }
-  return btoa(binary);
-}
-
-type JsPdf = import("jspdf").jsPDF;
-type TextPayload = { text: unknown; options?: Record<string, unknown> };
-type FontMetadata = { characterToGlyph(code: number): number };
-
-function textOf(text: unknown): string {
-  if (typeof text === "string") return text;
-  if (Array.isArray(text)) return text.map((item) => textOf(Array.isArray(item) ? item[0] : item)).join("\n");
-  return "";
-}
-
-// jsPDF reorders right-to-left text as if it were already in display order,
-// which reverses a Hebrew line's numbers and leaves its words backwards.
-// Cells are in the order they were typed: ask for display order, in the
-// direction of the text's first letter.
-function drawInDisplayOrder(doc: JsPdf) {
-  const events = (doc.internal as unknown as { events: { subscribe(topic: string, fn: (payload: TextPayload) => void): void } })
-    .events;
-  events.subscribe("preProcessText", (payload) => {
-    payload.options = {
-      ...payload.options,
-      isInputVisual: false,
-      isOutputVisual: true,
-      isInputRtl: isRightToLeft(textOf(payload.text)),
-      isOutputRtl: false,
-      isSymmetricSwapping: true,
-    };
-  });
-}
-
-// The characters of the table that the Unicode font has no glyph for, after
-// Arabic letters take their joined forms, as jsPDF draws them.
-function missingGlyphs(doc: JsPdf, cells: string[][]): string[] {
-  const metadata = (doc.getFont() as unknown as { metadata: FontMetadata }).metadata;
-  const shape = (doc as unknown as { processArabic(text: string): string }).processArabic;
-  const seen = new Set<string>();
-  const missing: string[] = [];
-  const check = (text: string) => {
-    for (const char of text) {
-      if (seen.has(char)) continue;
-      seen.add(char);
-      if (char !== "\n" && !metadata.characterToGlyph(char.codePointAt(0)!)) missing.push(char);
-    }
-  };
-  for (const row of cells) {
-    for (const cell of row) {
-      if (BUILT_IN_TEXT.test(cell)) continue;
-      check(cell);
-      if (/[\u0600-\u06ff]/.test(cell)) check(shape(cell));
-    }
-  }
-  return missing;
+  return cells.some((row) => row.some((cell) => !isBuiltInText(cell)));
 }
 
 // A4 pages with the header row on each, landscape when the columns need it,
@@ -284,20 +198,8 @@ async function writePdf(table: TableData, loadFont: () => Promise<ArrayBuffer>):
   const doc = new jsPDF({ unit: "pt", format: "a4", compress: true });
   let font = "helvetica";
   if (fontBytes) {
-    doc.addFileToVFS(`${PDF_FONT}.ttf`, toBase64(fontBytes));
-    // One font file, embedded once: the header row is shaded, not bold. (A
-    // second style, even of the same file, would embed it again.)
-    doc.addFont(`${PDF_FONT}.ttf`, PDF_FONT, "normal");
-    doc.setFont(PDF_FONT, "normal");
-    const missing = missingGlyphs(doc, cells);
-    if (missing.length) {
-      const shown = missing.slice(0, 6).map((char) => `“${char}”`).join(", ");
-      throw new Error(
-        `The PDF can't show ${shown}${missing.length > 6 ? " and more" : ""}: its font covers Latin, Greek, Cyrillic, Hebrew and Arabic, but not Chinese, Japanese, Korean, Indic or Thai text or emoji. Save the table as PNG or Excel instead.`,
-      );
-    }
-    font = PDF_FONT;
-    drawInDisplayOrder(doc);
+    // One font file, embedded once: the header row is shaded, not bold.
+    font = embedUnicodeFont(doc, fontBytes, cells.flat(), "Save the table as PNG or Excel instead.");
   }
 
   const headerStyle = unicode ? "normal" : "bold";
