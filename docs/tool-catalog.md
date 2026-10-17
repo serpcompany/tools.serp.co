@@ -71,10 +71,12 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   compressors, never a Lander): the reverse pair, then the same source format,
   the same target format and the other shared-format Tools. The same source and
   same target groups share the places; the others fill what is left. Which
-  Tools fill a group's places is fixed per page by a hash of the two Tool ids,
-  so every converter and compressor page is on another page's list; they show
-  sorted by id. Lander, table converter and transcription pages render no such
-  section; table converter pages link each other instead.
+  Tools fill a group's places is fixed per page by a hash of the two Tool ids;
+  they show sorted by id. Lander, table converter and transcription pages
+  render no such section. Every converter and compressor page is on a list
+  another page renders, except table converter pages with a "More Table
+  Converters" section (87 of the 88; `/html-to-markdown/` has none): each of
+  those links the other 87, so one of them on a list reaches them all.
 - `packages/app-core/src/data/related-apps.json` owns Related App entries;
   matching uses a Tool's input and output formats and de-duplicates by app id.
 - The shared site footer is mounted by

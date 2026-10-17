@@ -36,17 +36,16 @@ const toolPages = activeTools().filter(
   (tool) => (tool.operation === "convert" || tool.operation === "compress") && tool.from && tool.to,
 );
 
-// The hrefs of folder routes that render a Tool page without ToolPageRenderer,
-// and so without a Related Tools section: table converters and transcription.
-const otherTemplateHrefs = () => {
-  const hrefs = new Set();
+// Each folder route's href and its page.tsx source.
+const folderPageSources = () => {
+  const sources = new Map();
   const walk = (dir, path) => {
     for (const name of readdirSync(dir)) {
       const child = join(dir, name);
       if (name.startsWith("[") || !statSync(child).isDirectory()) continue;
       const childPath = name.startsWith("(") ? path : `${path}${name}/`;
       try {
-        if (!readFileSync(join(child, "page.tsx"), "utf8").includes("ToolPageRenderer")) hrefs.add(childPath);
+        sources.set(childPath, readFileSync(join(child, "page.tsx"), "utf8"));
       } catch {
         // No page here; its subfolders may have one.
       }
@@ -54,7 +53,21 @@ const otherTemplateHrefs = () => {
     }
   };
   walk(fileURLToPath(new URL("../../app/", import.meta.url)), "/");
-  return hrefs;
+  return sources;
+};
+const hrefsWhose = (matches) =>
+  new Set([...folderPageSources()].filter(([, source]) => matches(source)).map(([href]) => href));
+
+// The hrefs of folder routes that render a Tool page without ToolPageRenderer,
+// and so without a Related Tools section: table converters and transcription.
+const otherTemplateHrefs = () => hrefsWhose((source) => !source.includes("ToolPageRenderer"));
+
+// The hrefs of folder routes that render the "More Table Converters" section
+// (TableConvertLinksSection), itself or through TableConvertLanding.
+const tableLinksHrefs = () => {
+  const landing = readFileSync(new URL("../../components/table-convert/TableConvertLanding.tsx", import.meta.url), "utf8");
+  assert.ok(landing.includes("<TableConvertLinksSection"), "TableConvertLanding renders TableConvertLinksSection");
+  return hrefsWhose((source) => source.includes("<TableConvertLinksSection") || source.includes("<TableConvertLanding"));
 };
 const isCurated = (tool) => (tool.content?.relatedTools?.length ?? 0) > 0;
 
@@ -230,7 +243,7 @@ test("every Tool page lists 1 to 24 links and no Lander, and a fallback lists on
   }
 });
 
-test("every converter and compressor page is on another page's rendered list, but for table converters, which link each other", () => {
+test("every converter and compressor page is on another page's rendered list, but for table converters that link each other", () => {
   const otherTemplates = otherTemplateHrefs();
   assert.ok(otherTemplates.has("/csv-to-json/") && otherTemplates.has("/mp4-to-transcript/"));
   assert.ok(!otherTemplates.has("/mp4-to-mov/"), "a ToolPageRenderer folder route renders the section");
@@ -240,13 +253,22 @@ test("every converter and compressor page is on another page's rendered list, bu
     if (otherTemplates.has(toolHref(tool))) continue;
     for (const link of links) if (link.href !== toolHref(tool)) linked.add(link.href);
   }
-  const tableConverters = new Set(TABLE_CONVERT_PAGES.map((page) => `/${page.slug}/`));
-  const unlinked = toolPages.map(toolHref).filter((href) => !linked.has(href));
 
-  // Each table converter page lists all the others (TableConvertLinksSection),
-  // so a visitor or crawler reaches them all once one is linked.
-  assert.deepEqual(unlinked.filter((href) => !tableConverters.has(href)), []);
-  assert.ok([...tableConverters].some((href) => linked.has(href)), "no table converter is on a rendered list");
+  // A table converter page that renders "More Table Converters" lists every
+  // other one, so a visitor or crawler reaches them all once one is linked. A
+  // table converter page without that section gets no exemption.
+  const tableLinks = tableLinksHrefs();
+  const linkEachOther = new Set(
+    TABLE_CONVERT_PAGES.map((page) => `/${page.slug}/`).filter((href) => tableLinks.has(href)),
+  );
+  assert.ok(tableLinks.has("/csv-to-json/") && tableLinks.has("/json-to-csv/"));
+
+  const unlinked = toolPages.map(toolHref).filter((href) => !linked.has(href));
+  assert.deepEqual(unlinked.filter((href) => !linkEachOther.has(href)), []);
+  assert.ok(
+    [...linkEachOther].some((href) => linked.has(href)),
+    "no table converter page with a More Table Converters section is on a rendered list",
+  );
 });
 
 test("a page's fallback list doesn't depend on registry order", () => {
