@@ -19,12 +19,16 @@ type PageProps = {
   params: Promise<{ categoryName: string; page: string }>;
 };
 
-export function generateStaticParams({ params }: { params: { categoryName: string } }) {
-  const category = directoryCategories().find((candidate) => candidate.id === params.categoryName);
-  if (!category) return [];
-  return Array.from({ length: categoryPageCount(category.count) - 1 }, (_, index) => ({
-    page: String(index + 2),
-  }));
+// Every category's pages from 2. The category route's own
+// generateStaticParams is a page's, not a layout's, so it doesn't reach here:
+// this lists both params.
+export function generateStaticParams() {
+  return directoryCategories().flatMap((category) =>
+    Array.from({ length: categoryPageCount(category.count) - 1 }, (_, index) => ({
+      categoryName: category.id,
+      page: String(index + 2),
+    })),
+  );
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
