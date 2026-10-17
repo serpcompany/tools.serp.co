@@ -15,3 +15,11 @@ test("homepage does not render the request-a-tool CTA block", () => {
   );
   assert.doesNotMatch(homepageSource, /Request a Tool/);
 });
+
+// Category pages are prerendered and up to 120 cards each: a default <Link>
+// would prefetch all 10 as their sections scroll into view.
+test("homepage links don't prefetch", () => {
+  const links = homepageSource.match(/<Link\b[^>]*>/g) ?? [];
+  assert.ok(links.length > 0);
+  for (const link of links) assert.match(link, /prefetch=\{false\}/, link);
+});

@@ -72,11 +72,12 @@ test("the tools sitemap lists every active tool and no inactive one", () => {
   }
 });
 
-test("the categories sitemap lists the active operation categories", () => {
+test("the categories sitemap lists the active operation categories and their numbered pages", () => {
   const categoryLocs = locs(xml("sitemap-categories.xml"));
   assert.ok(categoryLocs.length > 0);
   for (const loc of categoryLocs) {
-    assert.match(loc, /^https:\/\/tools\.serp\.co\/category\/[a-z-]+\/$/);
+    assert.match(loc, /^https:\/\/tools\.serp\.co\/category\/[a-z-]+\/(?:[1-9]\d*\/)?$/);
+    assert.doesNotMatch(loc, /\/1\/$/, "page 1 is the category itself");
   }
 });
 
