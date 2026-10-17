@@ -10,13 +10,12 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import ts from "typescript";
 
-const appRoot = fileURLToPath(new URL("..", import.meta.url));
-const repoRoot = path.resolve(appRoot, "../..");
+import { appRoot, isClientModule, parse, repoRoot, walkModules } from "../scripts/lib/module-graph.mjs";
+
 const routeDir = path.join(appRoot, "app", "(convert)", "[tool]");
 const pagePath = path.join(routeDir, "page.tsx");
 
@@ -43,15 +42,6 @@ function segmentFiles() {
     }
   }
   return files;
-}
-
-function parse(filePath) {
-  return ts.createSourceFile(
-    filePath,
-    readFileSync(filePath, "utf8"),
-    ts.ScriptTarget.Latest,
-    true,
-  );
 }
 
 function hasExportModifier(node) {
@@ -85,87 +75,24 @@ function literalValue(node) {
   return undefined;
 }
 
-function isClientModule(sourceFile) {
-  const first = sourceFile.statements[0];
-  return Boolean(
-    first &&
-      ts.isExpressionStatement(first) &&
-      ts.isStringLiteral(first.expression) &&
-      first.expression.text === "use client",
-  );
-}
-
-// Every module a file imports or re-exports, with the names it imports.
-function moduleReferences(sourceFile) {
-  const references = [];
-  const visit = (node) => {
-    if (
-      (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
-      node.moduleSpecifier &&
-      ts.isStringLiteral(node.moduleSpecifier)
-    ) {
-      const names = [];
-      const bindings = ts.isImportDeclaration(node) ? node.importClause?.namedBindings : node.exportClause;
-      if (bindings && (ts.isNamedImports(bindings) || ts.isNamedExports(bindings))) {
-        for (const element of bindings.elements) {
-          names.push((element.propertyName ?? element.name).text);
-        }
-      }
-      references.push({ specifier: node.moduleSpecifier.text, names });
-    } else if (
-      ts.isCallExpression(node) &&
-      node.expression.kind === ts.SyntaxKind.ImportKeyword &&
-      node.arguments[0] &&
-      ts.isStringLiteral(node.arguments[0])
-    ) {
-      references.push({ specifier: node.arguments[0].text, names: [] });
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(sourceFile);
-  return references;
-}
-
-function compilerOptions() {
-  const configPath = path.join(appRoot, "tsconfig.json");
-  const { config } = ts.readConfigFile(configPath, ts.sys.readFile);
-  return ts.parseJsonConfigFileContent(config, ts.sys, appRoot).options;
-}
-
 // The request-time APIs that the server modules reachable from these entry
 // files use, as "<file>: <module> <name>". A client module ("use client")
 // can't use them, so its imports aren't followed.
 function requestApiUses(entryFiles) {
-  const options = compilerOptions();
   const uses = [];
-  const seen = new Set();
-  const queue = [...entryFiles];
-  while (queue.length) {
-    const file = queue.pop();
-    if (seen.has(file)) continue;
-    seen.add(file);
-    const sourceFile = parse(file);
-    if (isClientModule(sourceFile)) continue;
-    for (const { specifier, names } of moduleReferences(sourceFile)) {
-      if (REQUEST_APIS.has(specifier)) {
-        const apis = REQUEST_APIS.get(specifier);
-        const used = apis ? names.filter((name) => apis.has(name)) : [names.join(", ") || "*"];
-        for (const name of used) {
-          uses.push(`${path.relative(repoRoot, file)}: ${specifier} ${name}`);
-        }
-        continue;
+  const modules = walkModules(entryFiles, (sourceFile, file, references) => {
+    if (isClientModule(sourceFile)) return false;
+    for (const { specifier, names } of references) {
+      if (!REQUEST_APIS.has(specifier)) continue;
+      const apis = REQUEST_APIS.get(specifier);
+      const used = apis ? names.filter((name) => apis.has(name)) : [names.join(", ") || "*"];
+      for (const name of used) {
+        uses.push(`${path.relative(repoRoot, file)}: ${specifier} ${name}`);
       }
-      const resolved = ts.resolveModuleName(specifier, file, options, ts.sys).resolvedModule;
-      if (!resolved || resolved.resolvedFileName.endsWith(".d.ts")) continue;
-      const real = realpathSync(resolved.resolvedFileName);
-      // The repository's own modules, including workspace packages; not
-      // third-party code.
-      if (!real.startsWith(repoRoot + path.sep) || real.split(path.sep).includes("node_modules")) continue;
-      if (!/\.(?:[cm]?[jt]sx?)$/.test(real)) continue;
-      queue.push(real);
     }
-  }
-  return { uses, modules: seen.size };
+    return true;
+  });
+  return { uses, modules };
 }
 
 test("[tool] renders on demand and is cached: static params, no forced dynamic config", () => {

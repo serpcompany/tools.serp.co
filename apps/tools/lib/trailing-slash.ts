@@ -14,7 +14,7 @@ const FILE_EXTENSIONS = new Set([
 
 // Paths that aren't pages and are never redirected: /api (first segment
 // only, any case), /.well-known, and anything starting with `_` (/_next/).
-function isExempt(pathname: string) {
+export function isExempt(pathname: string) {
   return /^\/(api(\/|$)|\.well-known\/|_|cdn-cgi\/)/i.test(pathname);
 }
 

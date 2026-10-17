@@ -3,14 +3,13 @@
 // that arrives while a page renders, in the same isolate, gets that one
 // render, whatever its own query. page-cache-filter.ts keeps such a render out
 // of the cache, but a visitor's `?email=` could still reach whoever asked for
-// the same page at that moment. No page reads its query on the server, so the
-// Worker hands Next.js a page request without one. The address bar keeps it,
-// and client code reads location.search as before.
+// the same page at that moment. No page reads its query on the server
+// (page-request.test.mjs checks), so the Worker hands Next.js a page request
+// without one. The address bar keeps it, and client code reads location.search
+// as before.
 
-// Paths that aren't pages, or whose server code reads the query: API routes,
-// framework paths such as /_next/image, the internal dashboard. Checked on
-// the decoded path too, as middleware does for /internal/.
-const KEEPS_QUERY = /^\/(?:api\/|internal\/|\.well-known\/|cdn-cgi\/|_)/i;
+import { isInternalPath } from "./site-environment.ts";
+import { isExempt } from "./trailing-slash.ts";
 
 // The URL to hand Next.js for this request, or null to hand it the request
 // unchanged: a GET or HEAD for a page path (one that ends in "/", which every
@@ -30,6 +29,10 @@ export function barePageUrl(method: string, url: URL): URL | null {
   return bare;
 }
 
+// Paths that aren't pages, or whose server code reads the query, keep it:
+// those middleware never redirects (API routes, framework paths such as
+// /_next/image) and the internal dashboard. Checked on the decoded path too,
+// as middleware does for /internal/.
 function isPagePath(pathname: string): boolean {
   if (!pathname.endsWith("/")) return false;
   let decoded = pathname;
@@ -38,7 +41,7 @@ function isPagePath(pathname: string): boolean {
   } catch {
     // Malformed escapes: the raw path is all there is to check.
   }
-  return !KEEPS_QUERY.test(pathname) && !KEEPS_QUERY.test(decoded);
+  return !isExempt(pathname) && !isExempt(decoded) && !isInternalPath(pathname);
 }
 
 type FetchHandler<Env, Ctx> = {
