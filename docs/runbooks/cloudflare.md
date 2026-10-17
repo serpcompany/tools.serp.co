@@ -46,19 +46,23 @@ so they get neither the redirect nor the header; `public/_headers` marks
 `/vendor/*` (which includes the pdf.js viewer HTML) `noindex` everywhere.
 
 The IndexNow key is `public/<32 hex characters>.txt`, whose body is the key,
-served the same in every environment. Nothing in the repository submits URLs:
-the Ahrefs Site Audit project for `tools.serp.co` submits changed production
-pages with the key, so staging and previews never do. A new key needs the same
-change in that project's crawl settings;
-`apps/tools/lib/indexnow-key.test.mjs` checks the file.
+served the same in every environment. Nothing in the repository submits URLs.
+The Ahrefs Site Audit project for `tools.serp.co` submits changed production
+pages with the key only once the owner turns on IndexNow auto-submission in
+its crawl settings (#314 H4), which may need an Ahrefs Pro plan. Until then no
+engine hears about changes, and staging and previews never submit. A new key
+needs the same change in that project's crawl settings;
+`apps/tools/lib/indexnow-key.test.mjs` checks the file, and the environment
+check below checks its URL.
 
 After a deploy, check the environment rules: robots, `X-Robots-Tag`, and GTM
 and AdSense present only in production (the check assumes AdSense test mode is
 off). It also checks that the sitemap index lists only the canonical
 `/sitemap-<group>.xml` files, that the homepage entry has no slash, and that
-`/sitemap.xml` and retired sitemap names 308 into the tree, and that the first
+`/sitemap.xml` and retired sitemap names 308 into the tree, that the first
 numbered category page in `sitemap-categories.xml` answers 200, canonical to
-itself. Add `--platform-url` with the Worker's
+itself, and that the IndexNow key URL answers 200 `text/plain` with the key and
+no `noindex`. Add `--platform-url` with the Worker's
 `*.workers.dev` URL to check the redirect too; it retries for 30 s while the
 new version rolls out.
 
