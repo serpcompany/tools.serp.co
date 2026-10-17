@@ -45,6 +45,13 @@ These rules apply to responses the Worker renders. Files in
 so they get neither the redirect nor the header; `public/_headers` marks
 `/vendor/*` (which includes the pdf.js viewer HTML) `noindex` everywhere.
 
+The IndexNow key is `public/<32 hex characters>.txt`, whose body is the key,
+served the same in every environment. Nothing in the repository submits URLs:
+the Ahrefs Site Audit project for `tools.serp.co` submits changed production
+pages with the key, so staging and previews never do. A new key needs the same
+change in that project's crawl settings;
+`apps/tools/lib/indexnow-key.test.mjs` checks the file.
+
 After a deploy, check the environment rules: robots, `X-Robots-Tag`, and GTM
 and AdSense present only in production (the check assumes AdSense test mode is
 off). It also checks that the sitemap index lists only the canonical
