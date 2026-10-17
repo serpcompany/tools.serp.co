@@ -26,7 +26,7 @@ import {
   fitSentences,
 } from "./page-metadata.ts";
 import { SHARE_IMAGES, SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "./share-images.ts";
-import { buildTableConvertMetadata } from "./table-convert.ts";
+import { buildTableConvertDemoMetadata, buildTableConvertMetadata } from "./table-convert.ts";
 import { TABLE_CONVERT_PAGES } from "./table-convert-pages.ts";
 
 const IN_BROWSER = "It runs in your browser";
@@ -49,6 +49,7 @@ function servedPages() {
         metadata: buildCategoryMetadata(category.id, index + 1),
       })),
     ),
+    { id: "table converter demo", metadata: buildTableConvertDemoMetadata() },
     { id: "categories", metadata: buildCategoriesIndexMetadata() },
     { id: "brands", metadata: buildBrandsMetadata(38) },
     { id: "home", metadata: buildHomeMetadata() },

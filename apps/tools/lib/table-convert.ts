@@ -83,3 +83,15 @@ export function buildTableConvertMetadata({
     image: "convert",
   });
 }
+
+// /table-convert-demo/, the table converter with every input and output
+// format, which TableConvertLanding pages fix to one pair.
+export function buildTableConvertDemoMetadata(): Metadata {
+  return pageMetadata({
+    title: "Table Converter Demo",
+    description:
+      "Paste or upload a table as CSV, Excel, JSON, Markdown, HTML or SQL, convert it to another format and preview both side by side, in your browser.",
+    canonical: normalizePath("/table-convert-demo/"),
+    image: "convert",
+  });
+}
