@@ -40,6 +40,6 @@ test('numbered category pages redirect /1/, 404 past the last page, and are cano
   assert.match(numberedPageSource, /isToolOperation/);
   assert.match(numberedPageSource, /permanentRedirect\(categoryPageHref\(categoryName, 1\)\)/);
   assert.match(numberedPageSource, /return notFound\(\)/);
-  assert.match(numberedPageSource, /buildCategoryMetadata/);
-  assert.match(numberedPageSource, /canonical = categoryPageHref\(categoryName, listing\.page\)/);
+  // Its title and canonical: metadata.test.mjs.
+  assert.match(numberedPageSource, /buildCategoryMetadata\(categoryName, number\)/);
 });

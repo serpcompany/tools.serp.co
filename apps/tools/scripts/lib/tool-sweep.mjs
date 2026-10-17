@@ -20,6 +20,7 @@ import {
   isTableImageConversion,
 } from "../../lib/convert/image-document-targets.ts";
 import { isPdfTextConversion } from "../../lib/convert/pdf-text-targets.ts";
+import { isTextPdfConversion, TEXT_PDF_ENGINES } from "../../lib/convert/text-pdf-targets.ts";
 
 export const STATUSES = ["pass", "wrong_format", "error", "timeout", "no_fixture", "skipped"];
 // Statuses that come from running the Tool. A resumed run skips Tools that
@@ -193,7 +194,8 @@ const COMPRESSION_ENGINES = {
 // The engine the generic converter page uses for a Tool: Image to PDF's own
 // (lib/convert/image-pdf.ts, any image in), BIN's (the picture inside, by
 // its first bytes), PDF to TXT, HTML and EPUB's (lib/convert/pdf-text.ts,
-// pdf.js's text rather than its rendering), the branch order of
+// pdf.js's text rather than its rendering), TXT and XML to PDF's
+// (lib/convert/text-pdf.ts, text set on pages with jsPDF), the branch order of
 // compressFile and convertUnchecked in lib/convert/workerClient.ts, the AV1
 // and HEVC Tools of lib/convert/webcodecs.ts, and the server-only outputs of
 // shouldUseServerConversion in lib/convert/video.ts. Those try
@@ -210,6 +212,7 @@ export function converterEngine({ operation, from, to }) {
   }
   if (source === "image" && target === "pdf") return "image-pdf";
   if (isPdfTextConversion(source, target)) return "pdfjs-text";
+  if (isTextPdfConversion(source, target)) return TEXT_PDF_ENGINES[source];
   if (source === "ai" || source === "pdf") return "pdfjs";
   if (isImageDocumentConversion(source, target)) return "image-documents";
   if (isImageTextConversion(source, target)) return target === "txt" ? "tesseract" : "docx";
@@ -251,6 +254,8 @@ export const ENGINE_LOCATIONS = {
   "browser-raster": "client-only",
   pdfjs: "client-only",
   "pdfjs-text": "client-only",
+  "text-pdf": "client-only",
+  "xml-pdf": "client-only",
   "heif-decoder": "client-only",
   "table-convert": "client-only",
   "table-convert + xlsx": "client-only",
@@ -281,6 +286,9 @@ export const ENGINE_LOCATIONS = {
 // so a text output (no byte signature) proves it holds the input's data. A
 // fixture can name several; each must be there.
 const TEXT_MARKERS = {
+  // Its first line, and the end of its third through its last, each on its
+  // own line: a copy that lost or joined any of them fails.
+  "sample.txt": ["SERP Tools sample text", "separate lines:\nAlpha\nBeta\nGamma"],
   "sample.csv": "Alpha",
   "sample-2.csv": "Gamma",
   "sample.json": "Alpha",
@@ -311,7 +319,7 @@ const HIDDEN_TEXT = {
 const TEXT_DRIVERS = new Set(["table", "html-to-markdown", "json-to-csv", "csv-combiner"]);
 // Engines on the converter page whose output is the input's text, in any
 // format: their fixtures need TEXT_MARKERS too.
-const TEXT_ENGINES = new Set(["pdfjs-text"]);
+const TEXT_ENGINES = new Set(["pdfjs-text", "text-pdf", "xml-pdf"]);
 
 // Table outputs the page writes as files (lib/convert/table-outputs.ts)
 // rather than as text in its output panel. The sweep opens each one and
@@ -323,10 +331,11 @@ const DECODED_TABLE_OUTPUTS = new Set(["excel", "pdf", "avro", "protobuf"]);
 // signature says nothing about the glyph inside: SVG to TTF's.
 const DECODED_FONT_OUTPUTS = new Set(["ttf"]);
 // Documents the sweep opens as a reader would (decodeDocumentOutput): every
-// EPUB, whose signature proves only the ZIP's first entry, and the HTML a
-// text engine writes, which has no signature at all.
+// EPUB, whose signature proves only the ZIP's first entry, the HTML a text
+// engine writes, which has no signature at all, and the PDF one writes,
+// whose signature says nothing of the text on its pages.
 const DECODED_DOCUMENT_OUTPUTS = new Set(["epub"]);
-const DECODED_TEXT_DOCUMENTS = new Set(["epub", "html"]);
+const DECODED_TEXT_DOCUMENTS = new Set(["epub", "html", "pdf"]);
 // Engines whose fixture must be worked out in a Web Worker the page starts,
 // which must answer. Each has a fallback without the worker that still
 // saves a good file (SVG to TTF takes crossing outlines as drawn), so a
@@ -379,6 +388,10 @@ export const EXPECTED_REFUSALS = {
   "sample-scan.pdf": { errorCode: "no_text", message: "has no text to extract" },
   "sample-protected.pdf": { errorCode: "password_protected", message: "password-protected" },
   "sample-truncated.pdf": { errorCode: "unreadable_pdf", message: "damaged or incomplete" },
+  // TXT and XML to PDF (lib/convert/text-pdf.ts): Japanese, Chinese and
+  // Korean text, which the PDF's font can't show, and XML left unclosed.
+  "sample-cjk.txt": { errorCode: "unsupported_script", message: "The PDF can't show" },
+  "sample-malformed.xml": { errorCode: "malformed_xml", message: "isn't well-formed XML" },
 };
 
 // fixture-matrix.json: ready inputs by format, per-Tool fixtures, and the
@@ -449,6 +462,7 @@ export function planTool(tool, { handlers, fixtures, timeoutMs, ffmpegTimeoutMs 
     pages: checksPixels(tool.to) && files.length === 1 ? PAGE_COUNTS[path.basename(files[0])] : undefined,
     tableFile,
     decode: (tableFile && DECODED_TABLE_OUTPUTS.has(target)) || DECODED_FONT_OUTPUTS.has(target) || document,
+    ...(document ? { document: true } : {}),
     ...(WORKER_ENGINES.has(engine) ? { worker: true } : {}),
     compress: tool.operation === "compress" || tool.operation === "bulk",
     timeoutMs: slow ? ffmpegTimeoutMs : timeoutMs,
@@ -858,14 +872,25 @@ function parseDocument(sax, source, { xml }) {
   return { elements, text };
 }
 
-// Opens an HTML page or an EPUB the way a reader would and returns its text:
-// the page's body, or the body of each XHTML document in the EPUB's spine, in
-// order. An EPUB must have its mimetype entry first and stored, a container
-// naming its package, every file the package lists, a navigation document,
-// and well-formed XHTML. Throws when the file doesn't open.
+// Opens an HTML page, an EPUB or a PDF the way a reader would and returns
+// its text: the page's body, the body of each XHTML document in the EPUB's
+// spine, in order, or the PDF's text as PDF to TXT reads it
+// (lib/convert/pdf-text.ts, with Node's pdf.js): its lines and paragraphs,
+// page by page. An EPUB must have its mimetype entry first and stored, a
+// container naming its package, every file the package lists, a navigation
+// document, and well-formed XHTML; a PDF must open and hold text. Throws when
+// the file doesn't open.
 export async function decodeDocumentOutput(format, bytes) {
-  const sax = (await import("sax")).default;
   const data = new Uint8Array(bytes);
+  if (format === "pdf") {
+    const [pdfjs, { readPdfText, pdfTextToTxt }] = await Promise.all([
+      import("pdfjs-dist/legacy/build/pdf.mjs"),
+      import("../../lib/convert/pdf-text.ts"),
+    ]);
+    const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+    return { text: pdfTextToTxt(await readPdfText(buffer, { pdfjs })) };
+  }
+  const sax = (await import("sax")).default;
   if (format === "html") return { text: parseDocument(sax, new TextDecoder().decode(data), { xml: false }).text };
   if (format !== "epub") throw new Error(`no decoder for ${format}`);
   const { unzipSync, strFromU8 } = await import("fflate");
@@ -905,8 +930,9 @@ export async function decodeDocumentOutput(format, bytes) {
 // output.decoded. A
 // Protobuf run saves two files: the .pb, decoded with the .proto beside it,
 // and the .proto, which is read by that decoding. `outputs` carry each
-// file's bytes as base64.
-export async function decodeOutputs(outputs, format) {
+// file's bytes as base64. A PDF is a table's (a table converter page's)
+// unless `document` says a text engine wrote it (the plan's `document`).
+export async function decodeOutputs(outputs, format, { document = false } = {}) {
   const files = outputs.map((output) => ({ output, bytes: Buffer.from(output.base64 ?? "", "base64") }));
   const proto = files.find(({ output }) => output.name.endsWith(".proto"));
   const schema = proto ? proto.bytes.toString("utf8") : null;
@@ -915,7 +941,7 @@ export async function decodeOutputs(outputs, format) {
     try {
       output.decoded = DECODED_FONT_OUTPUTS.has(format)
         ? await decodeFontOutput(bytes)
-        : DECODED_TEXT_DOCUMENTS.has(format)
+        : DECODED_TEXT_DOCUMENTS.has(format) && (document || format !== "pdf")
           ? await decodeDocumentOutput(format, bytes)
           : await decodeTableOutput(format, bytes, { schema });
     } catch (error) {

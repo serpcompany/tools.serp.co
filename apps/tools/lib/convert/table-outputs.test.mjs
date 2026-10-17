@@ -219,6 +219,27 @@ test("PDF: text the font can't show fails with a clear message instead of a garb
     /The PDF can't show “名”, “前”, “東”, “京”, “😀”: .* Save the table as PNG or Excel instead\./,
   );
   await assert.rejects(writeTableOutput("pdf", { headers: ["a"], rows: [["ภาษาไทย"]] }, { loadFont }), /can't show “ภ”/);
+  // The font has Lao and N'Ko, and Kurdish's ڕ and ە, but jsPDF can't set
+  // them: Lao's marks need placing, N'Ko's letters and those two joining.
+  for (const [cell, shown] of [["ພາສາລາວ", "“ພ”"], ["ߒߞߏ", "“ߒ”"], ["کوردی ڕە", "“ڕ”, “ە”"]]) {
+    await assert.rejects(writeTableOutput("pdf", { headers: ["a"], rows: [[cell]] }, { loadFont }), (error) => {
+      assert.ok(error.message.startsWith(`The PDF can't show ${shown}`), error.message);
+      assert.match(error.message, /not Chinese, Japanese, Korean, Indic, Thai, Lao or N'Ko text, some letters of Urdu, Kurdish, Pashto/);
+      return true;
+    });
+  }
+});
+
+test("PDF: an Arabic word before a comma or a digit ends in its final form, الله converts, and a Persian non-joiner parts letters", async () => {
+  const zwnj = String.fromCharCode(0x200c);
+  const output = await writeTableOutput("pdf", { headers: ["a"], rows: [["كتب، ٣"], ["عبد الله"], [`می${zwnj}خواهم`]] }, { loadFont });
+  const items = (await pdfPages(output.buffer))[0].items;
+  // Khah initial (U+FEA7) after the non-joiner, not medial (U+FEA8).
+  const persian = items.find((item) => item.normalize("NFKC") === "میخواهم");
+  assert.ok(persian && [...persian].some((char) => char.codePointAt(0) === 0xfea7), items.join(" | "));
+  // Beh final (U+FE90), not initial (U+FE91), before the comma.
+  assert.ok(items.some((item) => item.includes("\ufedb\ufe98\ufe90\u060c")), items.map((item) => [...item].map((c) => c.codePointAt(0).toString(16))).join(" | "));
+  assert.ok(items.some((item) => item.normalize("NFKC").replace(/\s+/g, " ") === "عبد الله"), items.join(" | "));
 });
 
 test("PDF: text outside Windows-1252 fetches the self-hosted font once a page; Latin text fetches nothing", async () => {
@@ -245,6 +266,11 @@ test("PDF: text outside Windows-1252 fetches the self-hosted font once a page; L
 test("PDF text: control and invisible characters go, line breaks stay", () => {
   assert.equal(pdfText("a\r\nb\rc\td\u0000e​f‎g️h­i"), "a\nb\nc    defghi");
   assert.equal(needsUnicodeFont([["café €5 “x”"]]), false);
+  // The zero-width non-joiner and joiner stay, for the Unicode font; alone
+  // they need no font.
+  const [zwnj, zwj] = [0x200c, 0x200d].map((code) => String.fromCharCode(code));
+  assert.equal(pdfText(`a${zwnj}b${zwj}c`), `a${zwnj}b${zwj}c`);
+  assert.equal(needsUnicodeFont([[`caf${zwnj}e`]]), false);
   assert.equal(needsUnicodeFont([["ok"], ["Łódź"]]), true);
   assert.equal(isRightToLeft("123 שלום"), true);
   assert.equal(isRightToLeft("abc שלום"), false);

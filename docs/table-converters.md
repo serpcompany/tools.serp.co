@@ -21,9 +21,11 @@ continue on the next pages. Its text is in jsPDF's built-in Helvetica when
 every character is in Windows-1252; otherwise the page loads DejaVu Sans
 2.37 (`public/vendor/fonts/dejavu/`, 757 KB, about 380 KB gzipped, Bitstream
 Vera licence), which covers Latin, Greek, Cyrillic, Hebrew and Arabic. Text it
-has no glyph for (Chinese, Japanese, Korean, Indic and Thai scripts, emoji)
-fails with a message pointing to PNG or Excel, rather than a garbled file;
-right-to-left lines are drawn in display order and aligned right. PNG and
+has no glyph for (Chinese, Japanese, Korean, Indic and Thai scripts, emoji),
+or that jsPDF can't set (Lao, N'Ko, the Arabic-script letters it has no joined
+forms for), fails with a message pointing to PNG or Excel, rather than a
+garbled file; right-to-left lines are drawn in display order and aligned
+right, and Arabic letters joined as [text-pdf.md](text-pdf.md#fonts) says. PNG and
 JPEG are drawn on a canvas at twice the size, in the system sans-serif font,
 at most 4096 px a side: a larger table shows its first rows and columns, and
 the image and the page say how many. Avro is an object container (null

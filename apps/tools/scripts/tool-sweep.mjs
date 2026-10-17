@@ -707,7 +707,7 @@ async function measure(plan) {
 
   const durationMs = Date.now() - started;
   if (plan.decode && observation.outcome === "completed") {
-    await decodeOutputs(observation.outputs ?? [], plan.to);
+    await decodeOutputs(observation.outputs ?? [], plan.to, { document: plan.document });
   }
   if (plan.pixelCheck && observation.outcome === "completed") {
     await measureOutputPixels(observation.outputs ?? [], plan.to);

@@ -83,6 +83,19 @@ export function requiresVideoConversion(from: string, to: string): boolean {
 }
 
 /**
+ * Conversions the converter page sends to /api/video-convert before trying
+ * FFmpeg.wasm (shouldUseServerConversion in lib/convert/video.ts): RM and RMVB
+ * output, and AMR to MP2, OGA or OGG. The page runs every other conversion in
+ * the browser, and Tool descriptions say so (lib/metadata.ts).
+ */
+export function prefersServerConversion(from: string, to: string): boolean {
+  const source = from.toLowerCase();
+  const target = to.toLowerCase();
+  if (target === 'rm' || target === 'rmvb') return true;
+  return source === 'amr' && ['mp2', 'oga', 'ogg'].includes(target);
+}
+
+/**
  * Check if a tool will work on static builds
  */
 export function isStaticCompatible(from: string, to: string): boolean {

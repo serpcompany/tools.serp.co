@@ -34,23 +34,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { categoryName, page } = await params;
   const number = parseCategoryPage(page);
-  const listing = number && number > 1 ? categoryPage(categoryName, number) : undefined;
-  if (!listing) return {};
-
   // The category's own metadata, titled and canonical for this page.
-  const base = buildCategoryMetadata(categoryName);
-  const { title, description } = listing.category;
-  const pageTitle = `${title}, page ${listing.page} of ${listing.pageCount}`;
-  const pageDescription = `${description} Page ${listing.page} of ${listing.pageCount}.`;
-  const canonical = categoryPageHref(categoryName, listing.page);
-  return {
-    ...base,
-    title: `${pageTitle} | SERP Tools`,
-    description: pageDescription,
-    alternates: { ...base.alternates, canonical },
-    openGraph: { ...base.openGraph, title: pageTitle, description: pageDescription, url: canonical },
-    twitter: { ...base.twitter, title: pageTitle, description: pageDescription },
-  };
+  return number && number > 1 ? buildCategoryMetadata(categoryName, number) : {};
 }
 
 export default async function Page({ params }: PageProps) {

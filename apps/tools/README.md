@@ -27,6 +27,8 @@ be.
 converter pages: the files they write, how downloads are named, and Excel
 input. [docs/pdf-text.md](../../docs/pdf-text.md) covers PDF to TXT, HTML and
 EPUB: how the text is read, the files written, and the PDFs refused.
+[docs/text-pdf.md](../../docs/text-pdf.md) covers TXT and XML to PDF: the page,
+the fonts, the XML listing, and the files refused.
 
 **Downloader Landers.** [docs/downloader-landers.md](../../docs/downloader-landers.md)
 covers the shared downloader template and rate limit, why downloads use this

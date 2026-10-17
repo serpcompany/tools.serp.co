@@ -4,6 +4,9 @@ import { HomeToolDirectory } from "@/components/HomeToolDirectory";
 import { ToolCard } from "@/components/ToolCard";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
 import { directoryCategories, homeCategorySections } from "@/lib/catalog/directory";
+import { buildHomeMetadata } from "@/lib/page-metadata";
+
+export const metadata = buildHomeMetadata();
 
 // The homepage canonical and og:url are the bare origin, with no trailing
 // slash (serp url-trailing-slash standard). They're rendered here, not via

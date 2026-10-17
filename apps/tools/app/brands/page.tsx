@@ -1,31 +1,15 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { ExternalLink } from "lucide-react";
 
 import { getNetworkBrands } from "@serp-tools/app-core/lib/network-brands";
 
+import { buildBrandsMetadata } from "@/lib/metadata";
+
 export const dynamic = "force-static";
 
 const brands = getNetworkBrands();
-const description =
-  "Browse the public brands, apps, and websites in the SERP network.";
 
-export const metadata: Metadata = {
-  title: "Brands | SERP Tools",
-  description,
-  alternates: { canonical: "/brands/" },
-  openGraph: {
-    title: "Brands | SERP Tools",
-    description,
-    type: "website",
-    url: "/brands/",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Brands | SERP Tools",
-    description,
-  },
-};
+export const metadata = buildBrandsMetadata(brands.length);
 
 export default function Page() {
   return (

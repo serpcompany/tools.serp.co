@@ -1092,6 +1092,22 @@
       "fixture": "fixtures/sample-scripts.txt",
       "notes": "The fixture txt-to-jpg uses; see its notes."
     },
+    "txt-to-pdf": {
+      "input": "file",
+      "fixture": "fixtures/sample.txt",
+      "refusals": [
+        "fixtures/sample-cjk.txt"
+      ],
+      "notes": "sample.txt, the txt format fixture (Latin text, set in Courier). Refusal: sample-cjk.txt, four lines of UTF-8 text with Japanese, Chinese and Korean, which the PDF font (DejaVu Sans) has no glyphs for, written by benchmarks/make-text-fixtures.mjs. Read back with file (Unicode text, UTF-8 text) and wc -l (4 lines). lib/convert/text-pdf.test.mjs checks the script still writes these bytes."
+    },
+    "xml-to-pdf": {
+      "input": "file",
+      "fixture": "fixtures/sample.xml",
+      "refusals": [
+        "fixtures/sample-malformed.xml"
+      ],
+      "notes": "sample.xml, the xml format fixture (xmllint --noout: well-formed). Refusal: sample-malformed.xml, sample.xml with its second <row> left open, written by benchmarks/make-text-fixtures.mjs. Read back with xmllint --noout (line 5: Opening and ending tag mismatch: row line 4 and rows). lib/convert/text-pdf.test.mjs checks the script still writes these bytes."
+    },
     "dot-to-jpg": {
       "input": "file",
       "fixture": "fixtures/sample-clusters.dot",
