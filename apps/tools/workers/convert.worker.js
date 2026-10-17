@@ -14,13 +14,6 @@ self.onmessage = async (e) => {
       return;
     }
 
-    if (job.op === "pdf-pages") {
-      const { renderPdfPages } = await import("../lib/convert/pdf");
-      const bufs = await renderPdfPages(job.buf, job.page, job.to);
-      self.postMessage({ ok: true, blobs: bufs }, bufs);
-      return;
-    }
-
     if (job.op === "video") {
       try {
         const { convertVideo } = await import("../lib/convert/video");

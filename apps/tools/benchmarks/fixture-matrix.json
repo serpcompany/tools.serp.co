@@ -25,8 +25,8 @@
       "format": "ai",
       "status": "ready",
       "input": "file",
-      "fixture": "fixtures/sample.ai",
-      "notes": "AI fixture is a PDF-based Illustrator file."
+      "fixture": "fixtures/sample-colours.ai",
+      "notes": "One 360 x 240 pt artboard of coloured shapes, with a black bar at half opacity over the bare page, written as a PDF by benchmarks/make-pdf-fixtures.mjs with jsPDF 4.2.1 (#284): an AI file saved with Create PDF Compatible File is a PDF, and the converter reads only that PDF, so Illustrator's private data is left out. Read back with file (PDF document, version 1.3, 1 pages) and Ghostscript 10.03.1 through ImageMagick 7.1.1 (magick -density 144 pdf:sample-colours.ai: 720 x 480 pixels, each shape in its colour). lib/convert/pdf-images.test.mjs checks the script still writes these bytes. sample.ai, the one-colour artboard it replaces, stays for the AI to PDF test."
     },
     {
       "format": "aif",
@@ -720,8 +720,8 @@
       "format": "pdf",
       "status": "ready",
       "input": "file",
-      "fixture": "fixtures/sample.pdf",
-      "notes": "Add a real fixture for this format."
+      "fixture": "fixtures/sample-colours.pdf",
+      "notes": "Two pages, 300 x 200 pt and 200 x 300 pt, of coloured shapes and a line of black text, each with a black shape at half opacity over the bare page, written by benchmarks/make-pdf-fixtures.mjs with jsPDF 4.2.1 (#284). Read back with file (PDF document, version 1.3, 2 pages) and Ghostscript 10.03.1 through ImageMagick 7.1.1 (magick -density 144: 600 x 400 and 400 x 600 pixels, each shape in its colour, the half-opacity black grey on white). lib/convert/pdf-images.test.mjs checks the script still writes these bytes. sample.pdf, the one-colour page it replaces, stays for other tests."
     },
     {
       "format": "pes",
@@ -1167,6 +1167,96 @@
         "fixtures/sample-truncated.pdf"
       ],
       "notes": "The fixture and refusals pdf-to-txt uses; see its notes."
+    },
+    "pdf-to-png": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The pdf format's fixture, and the refusals of PDF and AI to an image (lib/convert/pdf-images.ts, #284): sample-protected.pdf, behind a password, and sample-truncated.pdf, cut off halfway, made for PDF to TXT (see pdf-to-txt's notes). They're listed for each Tool rather than for the pdf format, so Compress PDF isn't expected to refuse them."
+    },
+    "pdf-to-jpg": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-png uses; see its notes."
+    },
+    "pdf-to-tiff": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-png uses; see its notes."
+    },
+    "pdf-to-psd": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-png uses; see its notes."
+    },
+    "pdf-to-bmp": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-png uses; see its notes."
+    },
+    "pdf-to-webp": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-png uses; see its notes."
+    },
+    "pdf-to-gif": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-png uses; see its notes."
+    },
+    "pdf-to-ppm": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-png uses; see its notes."
+    },
+    "pdf-to-rgb": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-png uses; see its notes."
+    },
+    "pdf-to-tga": {
+      "input": "file",
+      "fixture": "fixtures/sample-colours.pdf",
+      "refusals": [
+        "fixtures/sample-protected.pdf",
+        "fixtures/sample-truncated.pdf"
+      ],
+      "notes": "The fixture and refusals pdf-to-png uses; see its notes."
     }
   }
 }

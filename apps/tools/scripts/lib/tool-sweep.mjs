@@ -364,6 +364,10 @@ export const ONE_COLOUR_FIXTURES = new Set([
 // each page must save this many, since a page left out (or two run
 // together) passes every other check.
 export const PAGE_COUNTS = {
+  // An image of each PDF page, and of the one artboard (PDF and AI to an
+  // image, lib/convert/pdf-images.ts).
+  "sample-colours.pdf": 2,
+  "sample-colours.ai": 1,
   "sample-pages.docx": 3,
   // Its pages break where the text runs past them, not where the file says.
   "sample-long-table.docx": 4,
@@ -479,9 +483,12 @@ export function hasSignature(format) {
 // nearly, one colour, as the NEF Tools saved before #269 with a valid
 // signature. They're decoded in Node by the ImageMagick WASM build the app
 // ships, which writes or can read each of them; an SVG is checked through
-// the PNG or JPEG it embeds (lib/convert/encode.ts). Not decoded: ICNS, KTX
-// and KTX2 (lib/convert/texture-formats.ts writes them; ImageMagick can't
-// read them), headerless RGB, EPS (no Ghostscript) and vector SVG.
+// the PNG or JPEG it embeds (lib/convert/encode.ts). Headerless RGB is read
+// as the size of the fixture's image (fixtureImageSizes): it must be width
+// x height x 3 bytes. Not decoded: ICNS, KTX and KTX2
+// (lib/convert/texture-formats.ts writes them; ImageMagick can't read them),
+// RGB of a fixture whose size the sweep doesn't know, EPS (no Ghostscript)
+// and vector SVG.
 const PIXEL_FORMATS = {
   avif: "Avif", bmp: "Bmp", cur: "Cur", dds: "Dds", exr: "Exr", gif: "Gif", hdr: "Hdr", ico: "Ico",
   jfif: "Jpeg", jif: "Jpeg", jp2: "Jp2", jpeg: "Jpeg", jpg: "Jpeg", jxl: "Jxl", pam: "Pam", pbm: "Pbm",
@@ -491,7 +498,7 @@ const PIXEL_FORMATS = {
 
 export function checksPixels(format) {
   const name = format?.toLowerCase();
-  return name === "svg" || Object.hasOwn(PIXEL_FORMATS, name ?? "");
+  return name === "svg" || name === "rgb" || Object.hasOwn(PIXEL_FORMATS, name ?? "");
 }
 
 // A pixel within this many levels (of 255) of the top colour in every
@@ -553,13 +560,25 @@ function embeddedRaster(svg) {
 // @imagemagick/magick-wasm module) and measures its top colour: for a file
 // with several frames (an animation, an icon's sizes), the least uniform
 // frame, so it's blank only if every frame is. A PSD is measured by its
-// merged image, not its layers. Returns null for a format the sweep doesn't
-// decode; throws when ImageMagick can't read the file.
-export function measurePixels(magick, bytes, format) {
+// merged image, not its layers. Headerless RGB is read as `size`, the
+// image's { width, height }, and must be 3 bytes a pixel of it. Returns null
+// for a format the sweep doesn't decode, and for RGB without a size; throws
+// when ImageMagick can't read the file, or RGB is the wrong length.
+export function measurePixels(magick, bytes, format, size = null) {
   const name = format.toLowerCase();
   if (name === "svg") {
     const raster = embeddedRaster(new TextDecoder().decode(bytes));
     return raster ? measurePixels(magick, raster.bytes, raster.format) : null;
+  }
+  if (name === "rgb") {
+    if (!size) return null;
+    const { width, height } = size;
+    if (bytes.length !== width * height * 3) {
+      throw new Error(`${bytes.length} bytes, not ${width} x ${height} x 3 = ${width * height * 3} for a ${width} x ${height} image`);
+    }
+    const rgba = new Uint8Array(width * height * 4).fill(255);
+    for (let pixel = 0; pixel < width * height; pixel += 1) rgba.set(bytes.subarray(pixel * 3, pixel * 3 + 3), pixel * 4);
+    return { ...topColour(rgba), width, height };
   }
   if (!Object.hasOwn(PIXEL_FORMATS, name)) return null;
   return magick.ImageMagick.readCollection(bytes, magick.MagickFormat[PIXEL_FORMATS[name]], (images) => {
@@ -573,6 +592,42 @@ export function measurePixels(magick, bytes, format) {
     });
     return measures.reduce((least, measure) => (measure.share < least.share ? measure : least));
   });
+}
+
+// The size of each image a fixture gives, in order: each page of a PDF, or
+// of the PDF an AI file is, at the size the app draws it (pageRenderScale,
+// with pdf.js), else the one picture of an image file, read with
+// ImageMagick. What a headerless RGB output of it must be (measurePixels).
+export async function fixtureImageSizes(magick, file) {
+  const bytes = new Uint8Array(readFileSync(file));
+  const extension = path.extname(file).slice(1).toLowerCase();
+  if (extension !== "pdf" && extension !== "ai") {
+    return [magick.ImageMagick.read(bytes, (image) => ({ width: image.width, height: image.height }))];
+  }
+  const [pdfjs, { pageCanvasSize, pageRenderScale }] = await Promise.all([
+    import("pdfjs-dist/legacy/build/pdf.mjs"),
+    import("../../lib/convert/pdf.ts"),
+  ]);
+  const task = pdfjs.getDocument({ data: bytes, verbosity: 0 });
+  try {
+    const doc = await task.promise;
+    const sizes = [];
+    for (let number = 1; number <= doc.numPages; number += 1) {
+      const page = await doc.getPage(number);
+      const { width, height } = page.getViewport({ scale: 1 });
+      sizes.push(pageCanvasSize(page.getViewport({ scale: pageRenderScale(width, height) })));
+    }
+    return sizes;
+  } finally {
+    await task.destroy();
+  }
+}
+
+// Which of a fixture's images an output is: page <N> of a name ending
+// "_page<N>", else the output's place in the run.
+export function outputImageIndex(name, index) {
+  const page = /_page(\d+)\.[^.]+$/.exec(name);
+  return page ? Number(page[1]) - 1 : index;
 }
 
 function percent(share) {
