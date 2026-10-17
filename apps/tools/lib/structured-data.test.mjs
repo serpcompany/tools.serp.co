@@ -1,8 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { registerHooks } from "node:module";
+import path from "node:path";
+import ts from "typescript";
 
+import {
+  appRoot as appDir,
+  isClientModule,
+  parse,
+  resolveImport,
+  routeFiles,
+} from "../scripts/lib/module-graph.mjs";
 import { activeTools, allTools } from "./catalog/catalog.ts";
 import {
   serializeJsonLd,
@@ -24,6 +33,7 @@ registerHooks({
   },
 });
 const { buildToolMetadata } = await import("./metadata.ts");
+const { buildTableConvertMetadata } = await import("./table-convert.ts");
 
 const ORIGIN = "https://tools.serp.co";
 
@@ -71,14 +81,126 @@ const typesIn = (value, types = new Set()) => {
   return types;
 };
 
-// The pages ToolPageTemplate and DownloaderPageTemplate serve: converters and
-// compressors with both formats, and every downloader.
-const templatedTools = () =>
-  activeTools().filter(
-    (tool) =>
-      tool.operation === "download" ||
-      ((tool.operation === "convert" || tool.operation === "compress") && tool.from && tool.to),
-  );
+// Which page renders each Tool, and how many JSON-LD scripts it renders,
+// read from the source with the TypeScript parser. No page can be rendered
+// here, so the module graph stands in for it.
+
+const realPath = (...segments) => realpathSync(path.join(appDir, ...segments));
+const structuredDataFile = realPath("components", "StructuredData.tsx");
+const toolRoutePage = realPath("app", "(convert)", "[tool]", "page.tsx");
+
+// Every page under app/ by the path it serves: route groups such as
+// (convert) add nothing to it.
+const pageFiles = new Map(
+  routeFiles(path.join(appDir, "app"), ["page"]).map((file) => {
+    const segments = path
+      .relative(path.join(appDir, "app"), path.dirname(file))
+      .split(path.sep)
+      .filter((segment) => segment && !/^\(.*\)$/.test(segment));
+    return [`/${segments.join("/")}`, realpathSync(file)];
+  }),
+);
+const routeOf = (tool) => tool.route.replace(/\/+$/, "") || "/";
+
+// The components a module renders: one entry for each JSX element whose tag
+// is a name it imports from the repository, with the file it comes from.
+function renderedComponents(file) {
+  const sourceFile = parse(file);
+  const imported = new Map();
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) continue;
+    const clause = statement.importClause;
+    const target = resolveImport(statement.moduleSpecifier.text, file);
+    if (!clause || clause.isTypeOnly || !target) continue;
+    if (clause.name) imported.set(clause.name.text, target);
+    if (clause.namedBindings && ts.isNamedImports(clause.namedBindings)) {
+      for (const element of clause.namedBindings.elements) imported.set(element.name.text, target);
+    }
+  }
+  const rendered = [];
+  const visit = (node) => {
+    if ((ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) && ts.isIdentifier(node.tagName)) {
+      const target = imported.get(node.tagName.text);
+      if (target) rendered.push({ name: node.tagName.text, file: target });
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  return rendered;
+}
+
+// How many JSON-LD scripts a module renders: each <StructuredData> element in
+// it and in the components it renders, all branches added up. A client module
+// renders none: StructuredData reads the registry, which must stay out of the
+// browser (catalog/client-boundary.test.mjs).
+const mountCounts = new Map();
+function mounts(file) {
+  if (file === structuredDataFile) return 1;
+  if (!mountCounts.has(file)) {
+    mountCounts.set(file, 0); // a cycle adds nothing
+    const count = isClientModule(parse(file))
+      ? 0
+      : renderedComponents(file).reduce((sum, component) => sum + mounts(component.file), 0);
+    mountCounts.set(file, count);
+  }
+  return mountCounts.get(file);
+}
+
+// What app/(convert)/[tool]/page.tsx renders for a Tool with no folder of its
+// own. The "coming soon" editors get ToolPlaceholder, which has no JSON-LD.
+const COMING_SOON = new Set(["video-editor", "image-editor", "audio-editor"]);
+function toolRouteComponent(tool) {
+  if ((tool.operation === "convert" || tool.operation === "compress") && tool.from && tool.to) {
+    return "ToolPageRenderer";
+  }
+  if (tool.operation === "download") return "DownloaderPageRenderer";
+  if (COMING_SOON.has(tool.operation)) return "ToolPlaceholder";
+  if (tool.operation === "view" || tool.operation === "edit") return "PdfToolPage";
+  return undefined;
+}
+const toolRouteComponents = new Map(
+  renderedComponents(toolRoutePage).map(({ name, file }) => [name, file]),
+);
+
+// The module that renders an active Tool's page: its folder's page, else the
+// component the [tool] route renders for it.
+const pageModuleOf = (tool) =>
+  pageFiles.get(routeOf(tool)) ?? toolRouteComponents.get(toolRouteComponent(tool));
+
+const isComingSoon = (tool) => !pageFiles.has(routeOf(tool)) && COMING_SOON.has(tool.operation);
+const liveTools = () => activeTools().filter((tool) => !isComingSoon(tool));
+
+// A page's top-level `const name = "value"` strings (`"csv" as const` too).
+function stringConstants(file) {
+  const constants = new Map();
+  for (const statement of parse(file).statements) {
+    if (!ts.isVariableStatement(statement)) continue;
+    for (const declaration of statement.declarationList.declarations) {
+      let value = declaration.initializer;
+      if (value && ts.isAsExpression(value)) value = value.expression;
+      if (ts.isIdentifier(declaration.name) && value && ts.isStringLiteral(value)) {
+        constants.set(declaration.name.text, value.text);
+      }
+    }
+  }
+  return constants;
+}
+
+// A table converter's page: what it passes TableConvertLanding and
+// buildTableConvertMetadata. TableConvertLanding gives StructuredData the
+// Tool id `${from}-to-${to}`; null for a page that isn't one.
+function tablePage(file) {
+  if (!renderedComponents(file).some(({ name }) => name === "TableConvertLanding")) return null;
+  const constants = stringConstants(file);
+  const page = {
+    from: constants.get("fromFormat"),
+    to: constants.get("toFormat"),
+    title: constants.get("title"),
+    slug: constants.get("slug"),
+  };
+  assert.ok(page.from && page.to && page.title && page.slug, `${file} declares its formats, title and slug`);
+  return { ...page, toolId: `${page.from}-to-${page.to}` };
+}
 
 test("a converter page is a free WebApplication at its canonical URL", () => {
   const tool = byId("mp4-to-mp3");
@@ -109,9 +231,9 @@ test("a Lander and a compressor are at their routes", () => {
   assert.equal(parsed(byId("jpg-to-png")).applicationCategory, "UtilitiesApplication");
 });
 
-test("every templated Tool page: valid JSON, url is the canonical metadata.ts writes, nothing it can't back", () => {
-  const tools = templatedTools();
-  assert.ok(tools.length > 2000, `${tools.length} templated Tools`);
+test("every live Tool page outside the table converters: valid JSON, url is the canonical metadata.ts writes, nothing it can't back", () => {
+  const tools = liveTools().filter((tool) => !tablePage(pageModuleOf(tool)));
+  assert.ok(tools.length > 2400, `${tools.length} Tool pages`);
 
   for (const tool of tools) {
     const data = parsed(tool);
@@ -172,10 +294,74 @@ test("page text can't end the script tag or change how HTML parses it", () => {
   assert.equal(html.toLowerCase().indexOf("</script"), html.length - "</script>".length);
 });
 
-test("each template mounts the one JSON-LD script once", () => {
-  for (const template of ["../components/ToolPageTemplate.tsx", "../components/DownloaderPageTemplate.tsx"]) {
-    assert.equal(source(template).match(/<StructuredData\b/g)?.length, 1, template);
+test("a table converter's url is the canonical its page's metadata writes", () => {
+  let pages = 0;
+  for (const tool of liveTools()) {
+    const page = tablePage(pageModuleOf(tool));
+    if (!page) continue;
+    pages += 1;
+
+    assert.equal(page.toolId, tool.id, `${routeOf(tool)} is the page of ${page.toolId}`);
+    const data = toolStructuredData({ toolId: page.toolId, name: page.title, description: "line" }, ORIGIN);
+    const canonical = buildTableConvertMetadata(page).alternates?.canonical;
+    assert.equal(typeof canonical, "string", `${tool.id} has a canonical`);
+    assert.equal(data?.url, new URL(canonical, ORIGIN).href, tool.id);
+    assert.equal(data.applicationCategory, "UtilitiesApplication", tool.id);
   }
+  // 86 TableConvertLanding pages; json-to-csv and html-to-markdown have their own.
+  assert.ok(pages >= 80, `${pages} table converter pages`);
+});
+
+test("the [tool] route renders a template, the PDF page or the placeholder, and nothing else", () => {
+  // A new branch there needs toolRouteComponent above to say which Tools get it.
+  assert.deepEqual(
+    [...toolRouteComponents.keys()].sort(),
+    ["DownloaderPageRenderer", "PdfToolPage", "ToolPageRenderer", "ToolPlaceholder"],
+  );
+});
+
+test("every live Tool page renders one JSON-LD script; the coming-soon editors none", () => {
+  const counts = activeTools().map((tool) => {
+    const page = pageModuleOf(tool);
+    assert.ok(page, `${tool.id}: a page renders it`);
+    return { tool, count: mounts(page) };
+  });
+
+  const wrong = counts.filter(({ tool, count }) => count !== (isComingSoon(tool) ? 0 : 1));
+  assert.deepEqual(wrong.map(({ tool, count }) => `${tool.id}: ${count}`), []);
+  assert.ok(counts.length > 2500, `${counts.length} active Tools`);
+  assert.deepEqual(
+    counts.filter(({ count }) => count === 0).map(({ tool }) => tool.operation).sort(),
+    [...COMING_SOON].sort(),
+  );
+
+  // A folder page passes its own Tool's id.
+  for (const { tool } of counts) {
+    const file = pageFiles.get(routeOf(tool));
+    if (!file || tablePage(file)) continue;
+    assert.equal(stringConstants(file).get("toolId"), tool.id, file);
+  }
+});
+
+test("pages that aren't a live Tool's render no JSON-LD", () => {
+  const toolPages = new Set(liveTools().map((tool) => pageFiles.get(routeOf(tool))));
+  let pages = 0;
+  for (const [route, file] of pageFiles) {
+    if (toolPages.has(file) || file === toolRoutePage) continue;
+    pages += 1;
+    // The uncatalogued table pages (#221) mount it, but no Tool has their id.
+    const table = tablePage(file);
+    if (table) {
+      assert.equal(toolStructuredData({ toolId: table.toolId, name: "x", description: "y" }, ORIGIN), null, route);
+    } else {
+      assert.equal(mounts(file), 0, route);
+    }
+  }
+  // The homepage, /categories/, the category pages, /brands/ and the others.
+  assert.ok(pageFiles.has("/") && pages > 5, `${pages} other pages`);
+});
+
+test("the component renders one script tag, escaped", () => {
   const component = source("../components/StructuredData.tsx");
   assert.equal(component.match(/application\/ld\+json/g)?.length, 1);
   assert.match(component, /serializeJsonLd\(/);

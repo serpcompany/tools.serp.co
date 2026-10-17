@@ -1,3 +1,4 @@
+import { StructuredData } from "@/components/StructuredData";
 import TableConvertDemo from "@/components/TableConvertDemo";
 import { AboutFormatsSection } from "@/components/sections/AboutFormatsSection";
 import { FAQSection } from "@/components/sections/FAQSection";
@@ -240,10 +241,14 @@ export default function TableConvertLanding({
   const socialProof = buildSocialProofSection(fromLabel, toLabel);
   const stats = buildStatsSection();
   const faqs = buildFaqs(from, fromLabel, toLabel);
+  // A catalogued table converter's Tool id and route are this slug. The
+  // uncatalogued pages (#221) are no Tool, so StructuredData renders nothing.
   const currentSlug = `${from}-to-${to}`;
 
   return (
     <main className="theme-light min-h-screen bg-background">
+      <StructuredData toolId={currentSlug} name={title} description={resolvedSubtitle} />
+
       <TableConvertDemo
         initialInputFormat={from}
         initialOutputFormat={to}

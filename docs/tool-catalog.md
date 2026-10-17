@@ -94,15 +94,22 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   those links the other 87, so one of them on a list reaches them all.
 - `packages/app-core/src/data/related-apps.json` owns Related App entries;
   matching uses a Tool's input and output formats and de-duplicates by app id.
-- Tool pages and Landers (`ToolPageTemplate`, `DownloaderPageTemplate`) carry
-  one `<script type="application/ld+json">` from `lib/structured-data.ts`: a
-  free `WebApplication` (the page's H1 and subtitle, its canonical URL). It
-  has no `Review`, `AggregateRating`, `FAQPage` or `HowTo` markup: Lander
-  reviews have no verifiable source, FAQ rich results are limited to
-  government and health sites, and HowTo rich results are retired. It has no
-  `BreadcrumbList` either, because no page shows a breadcrumb trail. Tool
-  pages outside the two templates (table converters, transcription, PDF and
-  others) have none yet; #337 tracks them.
+- Every live Tool page and Lander carries one
+  `<script type="application/ld+json">` from `lib/structured-data.ts`
+  (`components/StructuredData.tsx`): a free `WebApplication` (the page's H1
+  and the line under it, its canonical URL). `ToolPageTemplate` and
+  `DownloaderPageTemplate` mount it, and so do the pages with a hero of their
+  own: `TableConvertLanding`, `PdfToolPage`, the transcription pages, and
+  the JSON to CSV, HTML to Markdown, CSV combiner, character counter and
+  batch PNG pages. Where a client component draws the H1, the page passes it
+  in, so the markup and the H1 are one string. The "coming soon" editors,
+  the uncatalogued table pages (#221), the homepage and the category pages
+  have none. `lib/structured-data.test.mjs` follows each page's components
+  and fails when a live Tool page renders none or more than one. It has no
+  `Review`, `AggregateRating`, `FAQPage` or `HowTo` markup: Lander reviews
+  have no verifiable source, FAQ rich results are limited to government and
+  health sites, and HowTo rich results are retired. It has no
+  `BreadcrumbList` either, because no page shows a breadcrumb trail.
 - The shared site footer is mounted by
   `packages/app-core/src/components/app-layout.tsx`. Do not add a second page
   footer without an intentional product-specific reason.

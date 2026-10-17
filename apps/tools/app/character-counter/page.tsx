@@ -1,4 +1,5 @@
 import CharacterCounter from "@/components/CharacterCounter";
+import { StructuredData } from "@/components/StructuredData";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { ChangelogSection } from "@/components/sections/ChangelogSection";
@@ -10,6 +11,9 @@ import { toolContent } from '@/lib/tool-content';
 import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
 
 const toolId = "character-counter";
+// The H1 and the line under it.
+const title = "Character Counter";
+const subtitle = "Count characters, words, sentences, and paragraphs instantly";
 
 export const generateMetadata = () => buildToolMetadata(toolId);
 
@@ -26,8 +30,10 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-background">
+      <StructuredData toolId={toolId} name={title} description={subtitle} />
+
       {/* Custom Character Counter Component */}
-      <CharacterCounter videoEmbedId={videoEmbedId} />
+      <CharacterCounter title={title} subtitle={subtitle} videoEmbedId={videoEmbedId} />
 
       {/* Related Tools Section - Character counter doesn't have from/to formats */}
 
