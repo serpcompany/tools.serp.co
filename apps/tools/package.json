@@ -4,8 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "node scripts/dev.mjs next dev",
-    "build": "next build && node scripts/copy-ffmpeg.mjs && node scripts/copy-magick-wasm.mjs",
+    "dev": "node scripts/gone-tool-routes.mjs && node scripts/dev.mjs next dev",
+    "build": "node scripts/gone-tool-routes.mjs && next build && node scripts/copy-ffmpeg.mjs && node scripts/copy-magick-wasm.mjs",
     "cf:build": "node scripts/build-cloudflare.mjs",
     "cf:build:staging": "NEXT_PUBLIC_SITE_ENV=staging NEXT_PUBLIC_SITE_URL=https://staging.tools.serp.co node scripts/build-cloudflare.mjs",
     "cf:build:production": "NEXT_PUBLIC_SITE_ENV=production NEXT_PUBLIC_SITE_URL=https://tools.serp.co node scripts/build-cloudflare.mjs",

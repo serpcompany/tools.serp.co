@@ -1,7 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { fileURLToPath } from "node:url";
 
+import { readGoneToolRoutes } from "../scripts/lib/gone-tool-routes.mjs";
 import {
+  GONE_PAGE_HTML,
   decideMiddleware,
   getCanonicalRedirectUrl,
   getRobotsTxt,
@@ -89,7 +92,7 @@ test("robots.txt allows crawling and lists the sitemap only in production", () =
 
 test("middleware decisions across environments, hosts and paths", () => {
   const decide = (env, requestUrl, hasSmokeTestHeader = false) =>
-    decideMiddleware({ ...env, requestUrl, hasSmokeTestHeader });
+    decideMiddleware({ ...env, requestUrl, hasSmokeTestHeader, goneRoutes: new Set() });
   const local = { siteEnv: "local", siteUrl: "http://localhost:8787" };
 
   // Production on its canonical host: indexable, auth only under /internal.
@@ -161,6 +164,83 @@ test("middleware decisions across environments, hosts and paths", () => {
     decide(production, "https://tools-serp-co.serpcompany.workers.dev/internal/tools/", true),
     { type: "continue", requireDashboardAuth: true, noindex: false },
   );
+});
+
+test("a gone route answers 410 after the host and slash rules, and only in its canonical spelling", () => {
+  const goneRoutes = new Set(["/compress-heic/", "/png-to-png/"]);
+  const decide = (env, requestUrl, hasSmokeTestHeader = false) =>
+    decideMiddleware({ ...env, requestUrl, hasSmokeTestHeader, goneRoutes });
+  const gone = (robotsTag) => ({ type: "gone", robotsTag });
+
+  // Production: noindex. Staging keeps its environment-wide noindex, nofollow.
+  assert.deepEqual(decide(production, "https://tools.serp.co/compress-heic/"), gone("noindex"));
+  assert.deepEqual(decide(production, "https://tools.serp.co/compress-heic/?a=1"), gone("noindex"));
+  assert.deepEqual(
+    decide(staging, "https://staging.tools.serp.co/compress-heic/"),
+    gone("noindex, nofollow"),
+  );
+  assert.deepEqual(decide({ siteEnv: "local", siteUrl: undefined }, "http://localhost:8826/compress-heic/"), gone("noindex, nofollow"));
+
+  // The slashless spelling and a platform host take their one 308 first.
+  assert.deepEqual(decide(production, "https://tools.serp.co/compress-heic"), {
+    type: "redirect",
+    location: "https://tools.serp.co/compress-heic/",
+  });
+  assert.deepEqual(decide(production, "https://tools-serp-co.serpcompany.workers.dev/compress-heic"), {
+    type: "redirect",
+    location: "https://tools.serp.co/compress-heic/",
+  });
+  assert.deepEqual(
+    decide(production, "https://tools-serp-co.serpcompany.workers.dev/compress-heic/", true),
+    gone("noindex"),
+  );
+
+  // A gone path listed in LEGACY_PAGES keeps its redirect.
+  assert.deepEqual(decide(production, "https://tools.serp.co/png-to-png/"), {
+    type: "redirect",
+    location: "https://tools.serp.co/compress-png/",
+  });
+
+  // Other spellings and paths below it are left to the page routes (404).
+  for (const pathname of ["/Compress-HEIC/", "/compress-heic/x/", "/compress-heic.html", "/api/compress-heic/"]) {
+    assert.notEqual(decide(production, `https://tools.serp.co${pathname}`).type, "gone", pathname);
+  }
+});
+
+test("the build's gone list: retired Tools nobody searches for answer 410, everything else as before", () => {
+  const goneRoutes = new Set(readGoneToolRoutes(fileURLToPath(new URL("..", import.meta.url))));
+  const decide = (pathname) =>
+    decideMiddleware({
+      ...production,
+      requestUrl: `https://tools.serp.co${pathname}`,
+      hasSmokeTestHeader: false,
+      goneRoutes,
+    });
+
+  for (const pathname of ["/compress-heic/", "/avi-to-rmvb/", "/cr3-to-cr3/"]) {
+    assert.deepEqual(decide(pathname), { type: "gone", robotsTag: "noindex" }, pathname);
+  }
+  // Retired with keyword demand (html to mp3, eps to svg): the page's 404.
+  // Live, and a made-up slug: rendered as before.
+  for (const pathname of ["/html-to-mp3/", "/eps-to-svg/", "/jpeg-to-dxf/", "/mp4-to-mp3/", "/foo-to-bar-xyz/"]) {
+    assert.deepEqual(
+      decide(pathname),
+      { type: "continue", requireDashboardAuth: false, noindex: false },
+      pathname,
+    );
+  }
+  assert.deepEqual(decide("/download-stripcha-videos/"), {
+    type: "redirect",
+    location: "https://tools.serp.co/download-stripchat-videos/",
+  });
+});
+
+test("the 410 page is a short, self-contained noindex page", () => {
+  assert.match(GONE_PAGE_HTML, /^<!doctype html>/);
+  assert.match(GONE_PAGE_HTML, /<meta name="robots" content="noindex">/);
+  assert.match(GONE_PAGE_HTML, /<a href="\/">/);
+  assert.doesNotMatch(GONE_PAGE_HTML, /<script|<link|https?:/);
+  assert.ok(GONE_PAGE_HTML.length < 1024, String(GONE_PAGE_HTML.length));
 });
 
 test("absolute URLs use the canonical origin when deployed and the request origin otherwise", () => {

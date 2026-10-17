@@ -105,9 +105,14 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
 ## Retiring a Tool
 
 1. Set `isActive: false` on its registry entry. A page served by the shared
-   `[tool]` route then 404s and leaves the sitemap. The entry stays as the
-   record of the retirement. A page that renders without checking the catalog
-   (the table converters' `TableConvertLanding`) keeps serving until its folder
+   `[tool]` route then leaves the sitemap and answers `410 Gone` from
+   middleware (noindex, `no-store`), unless a keyword in `data/keywords.csv`
+   joins its id with a global volume above 0: that one 404s until it is
+   rebuilt or dropped (owner decision D3, #322). `scripts/gone-tool-routes.mjs`
+   derives the 410 list before every build and dev run and never commits it,
+   so making the Tool active again ends its 410. The entry stays as the record
+   of the retirement. A page that renders without checking the catalog (the
+   table converters' `TableConvertLanding`) keeps serving until its folder
    under `app/` is deleted and its entry is removed from lists such as
    `lib/table-convert-pages.ts`.
 2. Drop its rows from `benchmarks/tool-sweep-results.json`, as the next sweep
