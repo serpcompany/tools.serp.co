@@ -1,8 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { fileURLToPath } from "node:url";
 
-import { readGoneToolRoutes } from "../scripts/lib/gone-tool-routes.mjs";
+import { goneToolRoutes } from "../scripts/lib/gone-tool-routes.mjs";
 import {
   GONE_PAGE_HTML,
   decideMiddleware,
@@ -207,8 +206,23 @@ test("a gone route answers 410 after the host and slash rules, and only in its c
   }
 });
 
-test("the build's gone list: retired Tools nobody searches for answer 410, everything else as before", () => {
-  const goneRoutes = new Set(readGoneToolRoutes(fileURLToPath(new URL("..", import.meta.url))));
+test("the generator's list in middleware: retired Tools nobody searches for answer 410, everything else as before", () => {
+  // A fixture catalog and keyword data, so a rebuild or a volume refresh
+  // doesn't change this test; gone-tool-routes.test.mjs checks the real list.
+  const tool = (id, isActive, operation = "convert") => ({ id, isActive, operation, route: `/${id}` });
+  const tools = [
+    tool("compress-heic", false, "compress"),
+    tool("avi-to-rmvb", false),
+    tool("html-to-mp3", false),
+    tool("download-tellatv-videos", false, "download"),
+    tool("mp4-to-mp3", true),
+    tool("download-stripchat-videos", true, "download"),
+  ];
+  const keywords = [
+    { keyword: "html to mp3", global_volume: 800, operation: "convert" },
+    { keyword: "heic compressor", global_volume: 0, operation: "compress" },
+  ];
+  const goneRoutes = new Set(goneToolRoutes({ tools, keywords }));
   const decide = (pathname) =>
     decideMiddleware({
       ...production,
@@ -217,12 +231,12 @@ test("the build's gone list: retired Tools nobody searches for answer 410, every
       goneRoutes,
     });
 
-  for (const pathname of ["/compress-heic/", "/avi-to-rmvb/", "/cr3-to-cr3/"]) {
+  for (const pathname of ["/compress-heic/", "/avi-to-rmvb/"]) {
     assert.deepEqual(decide(pathname), { type: "gone", robotsTag: "noindex" }, pathname);
   }
-  // Retired with keyword demand (html to mp3, eps to svg): the page's 404.
-  // Live, and a made-up slug: rendered as before.
-  for (const pathname of ["/html-to-mp3/", "/eps-to-svg/", "/jpeg-to-dxf/", "/mp4-to-mp3/", "/foo-to-bar-xyz/"]) {
+  // Retired with keyword demand, a retired Lander (no download keywords are
+  // researched), a live Tool and a made-up slug: rendered as before.
+  for (const pathname of ["/html-to-mp3/", "/download-tellatv-videos/", "/mp4-to-mp3/", "/foo-to-bar-xyz/"]) {
     assert.deepEqual(
       decide(pathname),
       { type: "continue", requireDashboardAuth: false, noindex: false },

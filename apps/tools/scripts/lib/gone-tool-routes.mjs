@@ -20,14 +20,18 @@ export const GONE_ROUTES_MODULE = "lib/gone-tool-routes.generated.js";
 // The canonical (slashed) route of every retired Tool with no keyword demand,
 // sorted. Demand is a keyword joining the Tool's id exactly (keywordId, the
 // tool-status join) with a global volume above 0; alias keywords don't count.
-// A route that an active Tool also serves is never gone.
+// Only a Tool whose operation keywords.csv researched can show it has none:
+// a retired Tool of any other operation (a downloader Lander, an editor, a
+// viewer) has no row because nobody looked, so it keeps its 404, which is all
+// D3 decided for it. A route that an active Tool also serves is never gone.
 export function goneToolRoutes({ tools, keywords }) {
+  const researched = new Set(keywords.map((row) => row.operation).filter(Boolean));
   const demanded = new Set(
     keywords.filter((row) => row.global_volume > 0).map((row) => keywordId(row.keyword)),
   );
   const live = new Set(tools.filter((tool) => tool.isActive).map(toolHref));
   const gone = tools
-    .filter((tool) => !tool.isActive && !demanded.has(tool.id))
+    .filter((tool) => !tool.isActive && researched.has(tool.operation) && !demanded.has(tool.id))
     .map(toolHref)
     .filter((route) => !live.has(route));
   return [...new Set(gone)].sort();
