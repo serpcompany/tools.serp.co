@@ -68,16 +68,20 @@ environment from its branch: a push to `staging` deploys Staging, and a push to
   environment smoke check through the Worker's `*.workers.dev` host.
 - Staging also runs the browser smoke test ([browser-smoke.md](browser-smoke.md)).
   Production doesn't, because the test records real tool runs.
-- Last, in both environments, `audit:google-tags` checks the GTM container
-  the site loads (#346 F1). It reads the container's `gtm.js` and requests
-  `gtag/js` for each Google tag the container loads (each Google tag's Tag ID:
-  `G-`, `GT-`, `AW-` or `DC-`), and fails naming any that doesn't answer 200.
-  Google answers 200 for ids it doesn't know, so this catches a tag Google
-  refuses, not a typo; a GA4 Event tag loads no script and isn't checked. A
-  `gtm.js` that doesn't answer 200 fails too, except that no answer, a 5xx,
-  408 or 429 from Google, or a container with no Google tag it can read, only
-  warns. It runs after the other checks because the container changes in Tag
-  Manager, not in a deploy.
+- Last, in both environments, "Check the Google tags GTM loads"
+  (`audit:google-tags`) checks the GTM container the site loads (#346 F1). It
+  reads the container's `gtm.js` and requests `gtag/js` for each id the
+  container loads: each Google tag's Tag ID (`G-`, `GT-`, `AW-` or `DC-`) and
+  each `gtag/js` snippet in a Custom HTML tag. It fails naming any that
+  doesn't answer 200, and fails if `gtm.js` doesn't. Google answers 200 for
+  ids it doesn't know, so this catches a tag Google refuses, not a typo; a GA4
+  Event tag loads no script and isn't checked. No answer, or a 5xx, 408 or
+  429, for either file only warns, as do a container whose tags can't be read
+  and a Tag ID set from a variable other than a Constant.
+- **When only that step fails, the release is fine** (it already deployed)
+  **and the tag must be fixed in Tag Manager.** Don't roll back or revert the
+  code: fix the tag, confirm with `pnpm -C apps/tools audit:google-tags`, then
+  re-run the workflow. The step runs last for this reason.
 - Only the migrate and deploy steps see the `CLOUDFLARE_API_TOKEN` repository
   secret (an account-owned SERP token for Workers, D1 and the `serp.co` zone's
   Workers routes).
@@ -87,7 +91,9 @@ Cloudflare Workers Builds was disconnected from the production Worker on
 2026-10-06, after the first promotion deployed Production through this workflow
 (#188); the staging Worker never had it. This workflow is the only deploy path.
 
-Promote only a commit whose staging Deploy run passed:
+Promote only a commit whose staging Deploy run passed. A run that failed
+only at "Check the Google tags GTM loads" passes once the tag is fixed and
+the run re-run:
 
 ```bash
 git fetch origin && gh run list --workflow deploy.yml --branch staging --commit "$(git rev-parse origin/staging)"
@@ -95,7 +101,7 @@ git push origin origin/staging:main
 ```
 
 The promotion push needs the owner's bypass on the `main` ruleset (#188). If a
-production deploy turns out bad, roll back with
+production deploy turns out bad (not just its Google tag step), roll back with
 `pnpm -C apps/tools exec wrangler rollback --env production`. Rollback doesn't
 undo migrations, so a migration must keep working with the previous version of
 the code. A hotfix is a PR into `main`; merge `main` back into `staging` right

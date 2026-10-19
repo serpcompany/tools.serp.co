@@ -7,6 +7,8 @@
 export const GTM_CONTAINER = "GTM-PP9W77LK";
 
 const GTM_ORIGIN = "https://www.googletagmanager.com";
+// A gtag/js script in a Custom HTML tag, e.g. <script src=".../gtag/js?id=G-...">.
+const GTAG_SNIPPET = /googletagmanager\.com\/gtag\/js\?id=([A-Za-z0-9-]+)/g;
 
 export function containerUrl(containerId) {
   return `${GTM_ORIGIN}/gtm.js?id=${encodeURIComponent(containerId)}`;
@@ -47,14 +49,16 @@ export function containerResource(containerScript) {
 }
 
 // The ids a container loads gtag/js for: each Google tag's (__googtag) Tag ID
-// (G-, GT-, AW-, DC-), typed in or set from a Constant variable (__c). Other
-// tags load no script. A GA4 Event tag (__gaawe) sends to a destination that
-// a Google tag set up, and that destination's own gtag/js can answer 404:
-// G-6N5GK54MWY does, though GA4 records it through GT-T9CQH2XR. A Tag ID from
-// any other kind of variable can't be read here and counts as unresolved.
+// (G-, GT-, AW-, DC-), typed in or set from a Constant variable (__c), and
+// each gtag/js snippet in a Custom HTML tag (__html). Other tags load no
+// script. A GA4 Event tag (__gaawe) sends to a destination that a Google tag
+// set up, and that destination's own gtag/js can answer 404: G-6N5GK54MWY
+// does, though GA4 records it through GT-T9CQH2XR. A Tag ID from any other
+// kind of variable can't be read here and counts as unresolved.
 export function googleTags(resource) {
   const macros = Array.isArray(resource.macros) ? resource.macros : [];
-  const tagIds = (Array.isArray(resource.tags) ? resource.tags : [])
+  const tags = Array.isArray(resource.tags) ? resource.tags : [];
+  const tagIds = tags
     .filter((tag) => tag?.function === "__googtag")
     .map(({ vtp_tagId: tagId }) => {
       if (typeof tagId === "string") return tagId;
@@ -63,8 +67,11 @@ export function googleTags(resource) {
         ? macro.vtp_value
         : null;
     });
+  const snippetIds = tags
+    .filter((tag) => tag?.function === "__html" && typeof tag.vtp_html === "string")
+    .flatMap((tag) => Array.from(tag.vtp_html.matchAll(GTAG_SNIPPET), (match) => match[1]));
   return {
-    ids: [...new Set(tagIds.filter(Boolean))],
+    ids: [...new Set([...tagIds.filter(Boolean), ...snippetIds])],
     unresolved: tagIds.filter((tagId) => !tagId).length,
   };
 }
@@ -158,13 +165,18 @@ export async function checkGoogleTags(
   );
 }
 
+// A failure is in Tag Manager, not in the release the Deploy run just shipped.
+export const FAILURE_HINT =
+  "Fix the tag in Google Tag Manager. The deploy itself succeeded, so don't roll it back: confirm the fix with `pnpm -C apps/tools audit:google-tags`, then re-run the workflow.";
+
 // What scripts/check-google-tags.mjs prints and its exit code. Under GitHub
 // Actions a failure or warning is also an annotation on the run.
 export function outcomeReport({ state, message, tags }, { githubActions = false } = {}) {
   const annotation = { failed: "::error::", warning: "::warning::" }[state];
+  const hint = state === "failed" ? ` ${FAILURE_HINT}` : "";
   return {
     lines: [
-      `${githubActions && annotation ? annotation : ""}Google tags ${state}: ${message}`,
+      `${githubActions && annotation ? annotation : ""}Google tags ${state}: ${message}.${hint}`,
       ...Object.entries(tags).map(([id, status]) => `  ${googleTagUrl(id)}: ${status}`),
     ],
     exitCode: state === "failed" ? 1 : 0,

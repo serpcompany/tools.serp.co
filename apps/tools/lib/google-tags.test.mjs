@@ -7,6 +7,7 @@ import {
   containerUrl,
   googleTags,
   googleTagUrl,
+  FAILURE_HINT,
   outcomeReport,
 } from "../scripts/lib/google-tags.mjs";
 
@@ -28,11 +29,22 @@ const GA4_EVENT_TAG = {
   vtp_measurementIdOverride: "G-6N5GK54MWY",
   tag_id: 4,
 };
-// A Custom HTML tag, with a brace and escaped quotes inside its string.
+// A Custom HTML tag like the site's Ahrefs one, with a brace and escaped
+// quotes inside its string.
 const HTML_TAG = {
   function: "__html",
-  vtp_html: '<script src="https://www.googletagmanager.com/gtag/js?id=G-HTMLONLY"></script> {',
+  vtp_html:
+    '<script>var s=document.createElement("script");s.src="https://analytics.ahrefs.com/analytics.js";{}</script>',
   tag_id: 5,
+};
+// A Custom HTML tag that loads gtag/js itself, plus one URL built at run time,
+// which can't be read.
+const GTAG_HTML_TAG = {
+  function: "__html",
+  vtp_html:
+    '<script async src="https://www.googletagmanager.com/gtag/js?id=G-HTMLONLY&l=dataLayer"></script>' +
+    '<script>load("https://www.googletagmanager.com/gtag/js?id=" + id);</script>',
+  tag_id: 6,
 };
 
 // A gtm.js with this resource, and a quoted id in the runtime after it.
@@ -67,7 +79,7 @@ test("reads the container's resource object from gtm.js, or null", () => {
   assert.equal(containerResource('var data = {"resource": {"tags": ['), null);
 });
 
-test("finds only the ids Google tags load, typed in or from a Constant variable", () => {
+test("finds the ids Google tags load, typed in or from a Constant, and Custom HTML gtag snippets", () => {
   const macros = [
     { function: "__e" },
     { function: "__c", vtp_value: "G-CONSTANT1" },
@@ -81,9 +93,11 @@ test("finds only the ids Google tags load, typed in or from a Constant variable"
     { ...NEW_GOOGLE_TAG, tag_id: 9 },
     GA4_EVENT_TAG,
     HTML_TAG,
+    GTAG_HTML_TAG,
+    { ...GTAG_HTML_TAG, vtp_html: GTAG_HTML_TAG.vtp_html.replace("G-HTMLONLY", "GT-T9CQH2XR") },
   ];
   assert.deepEqual(googleTags({ macros, tags }), {
-    ids: ["GT-T9CQH2XR", "AW-951049332", "DC-6266241", "G-CONSTANT1"],
+    ids: ["GT-T9CQH2XR", "AW-951049332", "DC-6266241", "G-CONSTANT1", "G-HTMLONLY"],
     unresolved: 0,
   });
   // A lookup table, a missing variable and a missing Tag ID can't be read.
@@ -147,6 +161,27 @@ test("fails naming each Google tag that doesn't answer 200", async () => {
     "GTM-TEST loads Google tags whose gtag/js doesn't answer 200: G-6N5GK54MWY (answered 404)",
   );
   assert.deepEqual(result.tags, { "G-6N5GK54MWY": 404, "GT-T9CQH2XR": 200 });
+});
+
+test("checks a Custom HTML gtag snippet by the same rules", async () => {
+  const { fetch } = stubFetch({
+    ...container({ tags: [NEW_GOOGLE_TAG, GTAG_HTML_TAG] }),
+    [googleTagUrl("GT-T9CQH2XR")]: 200,
+    [googleTagUrl("G-HTMLONLY")]: 404,
+  });
+  const result = await checkGoogleTags("GTM-TEST", { fetch });
+  assert.equal(result.state, "failed");
+  assert.match(result.message, /: G-HTMLONLY \(answered 404\)$/);
+
+  const alone = stubFetch({
+    ...container({ tags: [GTAG_HTML_TAG] }),
+    [googleTagUrl("G-HTMLONLY")]: 503,
+  });
+  const unreached = await checkGoogleTags("GTM-TEST", { fetch: alone.fetch });
+  assert.deepEqual(
+    [unreached.state, unreached.message],
+    ["warning", "GTM-TEST: couldn't check G-HTMLONLY (answered 503)"],
+  );
 });
 
 test("fails when gtm.js answers anything but 200 or unavailable", async () => {
@@ -226,18 +261,20 @@ test("the report exits 1 only on a failure, and annotates failures and warnings 
   };
   assert.deepEqual(outcomeReport(failed, { githubActions: true }), {
     lines: [
-      "::error::Google tags failed: GTM-TEST loads …: G-6N5GK54MWY (answered 404)",
+      `::error::Google tags failed: GTM-TEST loads …: G-6N5GK54MWY (answered 404). ${FAILURE_HINT}`,
       "  https://www.googletagmanager.com/gtag/js?id=G-6N5GK54MWY: 404",
     ],
     exitCode: 1,
   });
+  // The run page says the release is fine and where to fix the tag.
+  assert.match(FAILURE_HINT, /Tag Manager.*don't roll it back.*audit:google-tags.*re-run/);
   const warning = { state: "warning", message: "GTM-TEST loads no Google tag", tags: {} };
   assert.deepEqual(outcomeReport(warning, { githubActions: true }), {
-    lines: ["::warning::Google tags warning: GTM-TEST loads no Google tag"],
+    lines: ["::warning::Google tags warning: GTM-TEST loads no Google tag."],
     exitCode: 0,
   });
   assert.deepEqual(outcomeReport(warning).lines, [
-    "Google tags warning: GTM-TEST loads no Google tag",
+    "Google tags warning: GTM-TEST loads no Google tag.",
   ]);
   const passed = {
     state: "passed",
@@ -246,7 +283,7 @@ test("the report exits 1 only on a failure, and annotates failures and warnings 
   };
   assert.equal(
     outcomeReport(passed, { githubActions: true }).lines[0],
-    "Google tags passed: GTM-TEST loads GT-T9CQH2XR",
+    "Google tags passed: GTM-TEST loads GT-T9CQH2XR.",
   );
   assert.equal(outcomeReport(passed).exitCode, 0);
 });
