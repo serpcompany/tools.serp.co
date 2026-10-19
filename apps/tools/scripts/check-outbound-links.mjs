@@ -8,19 +8,22 @@
 // --base-url, collects every link to another host, then requests each URL
 // once and follows its redirects to the end. A link passes when its first
 // answer is 2XX; it fails on 3XX, 4XX, 5XX or no answer, unless it matches a
-// documented exception below exactly. Every link is printed, failures first,
-// and the exit code is 1 when any link fails.
+// documented exception in lib/outbound-links.mjs exactly. Every link is
+// printed, failures first. The exit code is 1 when any link fails or any page
+// doesn't load (its links would go unchecked).
 //
 // Options:
-//   --user-agent <ua>  Request outbound URLs as another client, e.g. a
-//                      crawler, to see answers that only crawlers get.
+//   --user-agent <ua>  Request outbound URLs as another client. With a
+//                      crawler's user agent (e.g. AhrefsBot) it shows the
+//                      answers only crawlers get, and the crawler-only
+//                      exceptions apply.
 //   --failures-only    Print only the links that fail.
 
 import { readFileSync } from "node:fs";
 
+import { classify, isCrawlerUserAgent, outboundLinks, parseArgs, summarize } from "./lib/outbound-links.mjs";
+
 const SMOKE_TEST_HEADER = "x-tools-serp-smoke-test";
-const BROWSER_USER_AGENT =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 const EXTRA_PATHS = ["/brands/"];
 const REQUEST_TIMEOUT_MS = 20_000;
 const MAX_REDIRECTS = 10;
@@ -29,41 +32,16 @@ const PER_HOST_CONCURRENCY = 2;
 const MAX_ATTEMPTS = 5;
 const RETRY_DELAY_MS = 10_000;
 
-// Answers that are known and accepted, so they aren't failures. Each one
-// matches a single URL, on one page, with this exact status chain and final
-// URL; any other answer from that URL still fails.
-const BRANDED_DOMAIN =
-  "a branded domain the owner keeps on /brands/ as it is, redirect included (owner, 2026-10-19, #323)";
-const EXCEPTIONS = [
-  { url: "https://serp.best", page: "/brands/", hops: "301>200", finalUrl: "https://best.serp.co/", reason: BRANDED_DOMAIN },
-  { url: "https://serp.games", page: "/brands/", hops: "301>200", finalUrl: "https://games.serp.co/", reason: BRANDED_DOMAIN },
-  { url: "https://serp.media", page: "/brands/", hops: "301>200", finalUrl: "https://games.serp.co/", reason: BRANDED_DOMAIN },
-  { url: "https://serp.wiki", page: "/brands/", hops: "301>200", finalUrl: "https://serp.co/", reason: BRANDED_DOMAIN },
-  {
-    url: "https://devinschumacher.com",
-    page: "/brands/",
-    hops: "403",
-    finalUrl: "https://devinschumacher.com",
-    reason: "answers 403 only to crawlers such as AhrefsBot; a browser gets the page (#323)",
-  },
-];
-
-function parseArgs(argv) {
-  const args = { baseUrl: "", userAgent: BROWSER_USER_AGENT, failuresOnly: false };
-  for (let i = 0; i < argv.length; i += 1) {
-    if (argv[i] === "--base-url") args.baseUrl = argv[++i] ?? "";
-    else if (argv[i] === "--user-agent") args.userAgent = argv[++i] ?? "";
-    else if (argv[i] === "--failures-only") args.failuresOnly = true;
-    else if (argv[i] !== "--") throw new Error(`Unknown argument: ${argv[i]}`);
-  }
-  if (!args.baseUrl) throw new Error("--base-url is required");
-  if (!args.userAgent) throw new Error("--user-agent needs a value");
-  return args;
+let args;
+try {
+  args = parseArgs(process.argv.slice(2));
+} catch (error) {
+  console.error(error.message);
+  process.exit(2);
 }
-
-const args = parseArgs(process.argv.slice(2));
-const origin = new URL(args.baseUrl).origin;
+const origin = args.baseUrl;
 const siteHost = new URL(origin).host;
+const crawler = isCrawlerUserAgent(args.userAgent);
 
 const tools = JSON.parse(
   readFileSync(new URL("../lib/catalog/tools.json", import.meta.url), "utf8"),
@@ -83,24 +61,6 @@ async function runQueue(items, task) {
   await Promise.all(Array.from({ length: CONCURRENCY }, next));
 }
 
-function decodeHref(href) {
-  return href
-    .replace(/&amp;/g, "&")
-    .replace(/&#x27;|&#39;/g, "'")
-    .replace(/&quot;/g, '"');
-}
-
-function outboundLinks(html) {
-  const links = new Set();
-  for (const match of html.matchAll(/<a\s[^>]*?href="([^"]+)"/gi)) {
-    const href = decodeHref(match[1]);
-    if (!/^https?:\/\//i.test(href) || !URL.canParse(href)) continue;
-    if (new URL(href).host === siteHost) continue;
-    links.add(href);
-  }
-  return links;
-}
-
 const pageProblems = [];
 const linkPages = new Map(); // outbound URL -> pages that link to it
 
@@ -116,13 +76,14 @@ await runQueue(pagePaths, async (pathname) => {
       pageProblems.push(`${pathname}: page returned ${response.status}`);
       return;
     }
-    for (const link of outboundLinks(await response.text())) {
+    for (const link of outboundLinks(await response.text(), siteHost)) {
       const pages = linkPages.get(link) ?? [];
       pages.push(pathname);
       linkPages.set(link, pages);
     }
   } catch (error) {
-    pageProblems.push(`${pathname}: ${error.name === "TimeoutError" ? "timed out" : error.message}`);
+    const reason = error.name === "TimeoutError" ? "timed out" : (error.cause?.code ?? error.message);
+    pageProblems.push(`${pathname}: ${reason}`);
   }
 });
 
@@ -194,25 +155,7 @@ async function check(url) {
 const results = [];
 await runQueue([...linkPages.keys()], async (url) => {
   const { hops, finalUrl, error } = await check(url);
-  const first = hops[0] ?? 0;
-  const pages = linkPages.get(url).sort();
-  const exception = error
-    ? undefined
-    : EXCEPTIONS.find((candidate) => (
-      candidate.url === url &&
-      candidate.hops === hops.join(">") &&
-      candidate.finalUrl === finalUrl &&
-      pages.every((page) => page === candidate.page)
-    ));
-  results.push({
-    url,
-    hops,
-    finalUrl,
-    error,
-    exception,
-    failed: !exception && (Boolean(error) || first < 200 || first >= 300),
-    pages,
-  });
+  results.push(classify({ url, hops, finalUrl, error, pages: linkPages.get(url).sort() }, { crawler }));
 });
 
 function describe(result) {
@@ -231,28 +174,17 @@ results.sort((a, b) => (
   Number(Boolean(b.exception)) - Number(Boolean(a.exception)) ||
   a.url.localeCompare(b.url)
 ));
-const failures = results.filter((result) => result.failed);
-const known = results.filter((result) => result.exception);
-const shown = args.failuresOnly ? failures : results;
+const shown = args.failuresOnly ? results.filter((result) => result.failed) : results;
 if (shown.length) console.log(shown.map(describe).join("\n"));
 if (pageProblems.length) {
-  console.log(`\nPages not checked:\n${pageProblems.sort().map((problem) => `  ${problem}`).join("\n")}`);
+  console.log(`\nPages that didn't load:\n${pageProblems.sort().map((problem) => `  FAIL  ${problem}`).join("\n")}`);
 }
 
-const pagesWithFailures = new Set(failures.flatMap((result) => result.pages));
-const byClass = {};
-for (const result of failures) {
-  const first = result.hops[0] ?? 0;
-  const key = first ? `${String(first)[0]}XX` : "no answer";
-  byClass[key] = (byClass[key] ?? 0) + 1;
-}
-console.log(
-  `\nChecked ${results.length} outbound links on ${pagePaths.length - pageProblems.length} of ${pagePaths.length} pages (${landerPaths.length} Landers and ${EXTRA_PATHS.join(", ")}) at ${origin}.`,
-);
-console.log(
-  failures.length
-    ? `${failures.length} links fail (${Object.entries(byClass).map(([key, count]) => `${count} ${key}`).join(", ")}) on ${pagesWithFailures.size} pages.`
-    : "0 links answer 3XX, 4XX or 5XX unexpectedly.",
-);
-if (known.length) console.log(`${known.length} documented exceptions answered as expected.`);
-if (failures.length) process.exit(1);
+const { lines, exitCode } = summarize({
+  results,
+  pageProblems,
+  pageCount: pagePaths.length,
+  scope: `${landerPaths.length} Landers and ${EXTRA_PATHS.join(", ")} at ${origin}${crawler ? ", as a crawler" : ""}`,
+});
+console.log(`\n${lines.join("\n")}`);
+process.exitCode = exitCode;

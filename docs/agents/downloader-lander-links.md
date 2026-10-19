@@ -34,3 +34,9 @@ node scripts/validate-lander-outbound-links.mjs --tool-id=<tool-id>
 
 The outbound-link check is intentionally wired into repository lint hooks so
 fake lander links fail locally instead of shipping.
+
+To see the redirects and dead links visitors and crawlers get, run
+`node apps/tools/scripts/check-outbound-links.mjs --base-url <origin>` against a
+running site: before and after a link change, and against production after its
+release. It fails on any link that answers 3XX, 4XX or 5XX and on any page that
+doesn't load; its documented exceptions are in `scripts/lib/outbound-links.mjs`.
