@@ -28304,7 +28304,7 @@
     "route": "/download-tellatv-videos",
     "from": "TellaTV",
     "to": "mp4",
-    "isActive": true,
+    "isActive": false,
     "tags": [
       "tellatv",
       "video",
