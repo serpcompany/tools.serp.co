@@ -14,7 +14,7 @@ const SAMPLE_HTML = `<h1>Welcome to HTML to Markdown</h1>
 <ul>
   <li>Instant, client-side conversion</li>
   <li>Supports headings, lists, links, and more</li>
-  <li>Powered by <a href="https://github.com/kreuzberg-dev/html-to-markdown">html-to-markdown</a></li>
+  <li>Powered by <a href="https://github.com/xberg-io/html-to-markdown">html-to-markdown</a></li>
 </ul>
 <blockquote><p>Paste any HTML on the left and get clean Markdown on the right.</p></blockquote>`;
 

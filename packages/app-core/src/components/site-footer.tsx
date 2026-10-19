@@ -19,7 +19,7 @@ const networkLinks: FooterLink[] = [
   { href: "https://serp.co", label: "SERP" },
   { href: "https://apps.serp.co", label: "Apps" },
   { href: "https://extensions.serp.co", label: "Extensions" },
-  { href: "https://filetypes.serp.co", label: "Filetypes" },
+  { href: "https://wiki.serp.co/file-types/", label: "Filetypes" },
 ];
 
 function FooterLinkList({

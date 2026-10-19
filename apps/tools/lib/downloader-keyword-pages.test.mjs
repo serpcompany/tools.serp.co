@@ -195,11 +195,10 @@ const expectedThisVidOutboundUrls = [
   "https://apps.serp.co/thisvid-downloader",
   "https://github.com/serpapps/thisvid-downloader",
   "https://extensions.serp.co/extensions/serp/thisvid-downloader/",
-  "https://apify.com/serpxxx/thisvid-downloader/",
+  "https://apify.com/serpxxx/thisvid-downloader",
   "https://www.extensionhub.io/extensions/Thisvid-Downloader-1300",
-  "https://browserextensions.io/products/thisvid-downloader",
-  "https://serpdownloaders.com/products/thisvid-downloader",
-  "https://serp.co/products/thisvid-downloader/reviews/",
+  "https://browserextensions.io/products/thisvid-downloader/",
+  "https://serpdownloaders.com/products/thisvid-downloader/",
   "https://serp.ai/products/thisvid-downloader/reviews/",
 ];
 
