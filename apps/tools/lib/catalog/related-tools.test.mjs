@@ -428,4 +428,7 @@ test("RelatedToolsSection renders the links relatedToolLinks returns", () => {
   assert.match(source, /relatedToolLinks\(\{/);
   assert.match(source, /href=\{tool\.href\}/);
   assert.doesNotMatch(source, /activeTools/);
+  // Card titles sit one level under the section's heading.
+  assert.match(source, /<h2[\s\S]*Related Tools[\s\S]*<\/h2>[\s\S]*<h3 [^>]*>\s*\{tool\.name\}\s*<\/h3>/);
+  assert.doesNotMatch(source, /<h4/);
 });

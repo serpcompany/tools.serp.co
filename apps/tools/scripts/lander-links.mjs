@@ -9,46 +9,23 @@
 // page is `nofollow` (robots meta or X-Robots-Tag), so a local `cf:build`,
 // which serves every page noindex, nofollow, credits nothing: count against
 // `cf:build:production` or a deployed site. Links in scripts (the RSC payload)
-// aren't read, as a crawler doesn't.
+// aren't read, as a crawler doesn't. The parsing is in lib/lander-links.mjs.
 //
-// --min exits 1 when a Lander has fewer followed links than that from other
-// pages, or from other Landers.
+// Exit codes: 0 counted; 1 counted, and a Lander has fewer followed links than
+// --min from other pages or from other Landers; 2 couldn't count (bad
+// arguments, or no sitemap pages).
 
 import { activeTools, toolHref } from "../lib/catalog/catalog.ts";
+import { SMOKE_TEST_HEADER } from "../lib/site-environment.ts";
+import { followedLinks, pageIsNofollow, parseArgs, sitemapLocOrigins } from "./lib/lander-links.mjs";
 import { sitemapLocPaths } from "./lib/render-snapshot.mjs";
 
-// Deployed Workers skip their canonical-host redirect for requests with this
-// header, so a preview Worker can be read on its own host.
-const SMOKE_TEST_HEADER = "x-tools-serp-smoke-test";
 const SITEMAP_INDEX_PATH = "/sitemap-index.xml";
 const REQUEST_TIMEOUT_MS = 60_000;
-const USAGE =
-  "Usage: lander-links.mjs --base-url <url> [--min <n>] [--concurrency <n>] [--show <n>]";
 
-function parseArgs(argv) {
-  const args = { baseUrl: "", min: 0, concurrency: 8, show: 10 };
-  const number = (value, flag) => {
-    const parsed = Number(value);
-    if (!Number.isInteger(parsed) || parsed < 0) throw new Error(`${flag} needs a whole number\n${USAGE}`);
-    return parsed;
-  };
-  for (let i = 0; i < argv.length; i += 1) {
-    const flag = argv[i];
-    if (flag === "--") continue;
-    if (flag === "--base-url") args.baseUrl = argv[++i] ?? "";
-    else if (flag === "--min") args.min = number(argv[++i], flag);
-    else if (flag === "--concurrency") args.concurrency = Math.max(1, number(argv[++i], flag));
-    else if (flag === "--show") args.show = number(argv[++i], flag);
-    else throw new Error(`Unknown argument: ${flag}\n${USAGE}`);
-  }
-  if (!args.baseUrl) throw new Error(`--base-url is required\n${USAGE}`);
-  return args;
-}
-
-const args = parseArgs(process.argv.slice(2));
-const origin = new URL(args.baseUrl).origin;
-
-async function get(pathname) {
+// One GET, retried once on a network error. The header lets a deployed
+// preview Worker be read on its own host.
+async function get(origin, pathname) {
   for (let attempt = 1; ; attempt += 1) {
     try {
       const response = await fetch(`${origin}${pathname}`, {
@@ -63,133 +40,112 @@ async function get(pathname) {
   }
 }
 
-// The value of one attribute in a start tag, entities in it decoded.
-function attribute(tag, name) {
-  const match = tag.match(new RegExp(`\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, "i"));
-  const value = match ? (match[1] ?? match[2] ?? match[3]) : undefined;
-  return value?.replace(/&amp;/g, "&").replace(/&#x2F;/gi, "/").replace(/&quot;/g, '"');
-}
+// Each Lander's followed incoming links, and the pages that couldn't be read.
+async function count(args) {
+  const origin = args.baseUrl;
+  const internalOrigins = new Set([origin]);
+  const pagePaths = new Set();
+  const problems = [];
 
-// Whether a page tells crawlers not to follow its links.
-function pageIsNofollow(headers, html) {
-  if (/\bnofollow\b|\bnone\b/i.test(headers.get("x-robots-tag") ?? "")) return true;
-  for (const [tag] of html.matchAll(/<meta\b[^>]*>/gi)) {
-    if (/^(robots|googlebot)$/i.test(attribute(tag, "name") ?? "") && /\bnofollow\b|\bnone\b/i.test(attribute(tag, "content") ?? "")) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// The paths on this site that a page's followed <a href> links point at.
-function followedLinks(pagePath, html, internalOrigins) {
-  const links = new Set();
-  const markup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
-  for (const [tag] of markup.matchAll(/<a\b[^>]*>/gi)) {
-    const href = attribute(tag, "href");
-    if (!href || /\bnofollow\b/i.test(attribute(tag, "rel") ?? "")) continue;
-    let url;
-    try {
-      url = new URL(href, `${origin}${pagePath}`);
-    } catch {
+  const index = await get(origin, SITEMAP_INDEX_PATH);
+  if (index.status !== 200) throw new Error(`${SITEMAP_INDEX_PATH} returned ${index.status}`);
+  for (const urlSetPath of sitemapLocPaths(index.body)) {
+    const urlSet = await get(origin, urlSetPath);
+    if (urlSet.status !== 200) {
+      problems.push(`${urlSetPath}: returned ${urlSet.status}`);
       continue;
     }
-    if (internalOrigins.has(url.origin)) links.add(url.pathname);
+    for (const sitemapOrigin of sitemapLocOrigins(urlSet.body)) internalOrigins.add(sitemapOrigin);
+    for (const pagePath of sitemapLocPaths(urlSet.body)) pagePaths.add(pagePath);
   }
-  return links;
-}
+  if (pagePaths.size === 0) throw new Error("The sitemap tree lists no pages");
 
-// The sitemap tree: its pages, and the origins its <loc>s name (the canonical
-// origin on a production build), which count as this site in links.
-const internalOrigins = new Set([origin]);
-const pagePaths = new Set();
-const problems = [];
-const index = await get(SITEMAP_INDEX_PATH);
-if (index.status !== 200) throw new Error(`${SITEMAP_INDEX_PATH} returned ${index.status}`);
-for (const urlSetPath of sitemapLocPaths(index.body)) {
-  const urlSet = await get(urlSetPath);
-  if (urlSet.status !== 200) {
-    problems.push(`${urlSetPath}: returned ${urlSet.status}`);
-    continue;
-  }
-  for (const [, loc] of urlSet.body.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)) {
-    internalOrigins.add(new URL(loc.replace(/&amp;/g, "&")).origin);
-  }
-  for (const pagePath of sitemapLocPaths(urlSet.body)) pagePaths.add(pagePath);
-}
-if (pagePaths.size === 0) throw new Error("The sitemap tree lists no pages");
+  const landers = activeTools()
+    .filter((tool) => tool.operation === "download")
+    .map(toolHref)
+    .sort();
+  const linkedFrom = new Map(landers.map((lander) => [lander, new Set()]));
+  let nofollowPages = 0;
+  let read = 0;
 
-const landers = activeTools()
-  .filter((tool) => tool.operation === "download")
-  .map(toolHref)
-  .sort();
-const isLander = new Set(landers);
-const linkedFrom = new Map(landers.map((lander) => [lander, new Set()]));
-let nofollowPages = 0;
-let read = 0;
-
-const queue = [...pagePaths];
-async function worker() {
-  for (let pagePath = queue.shift(); pagePath !== undefined; pagePath = queue.shift()) {
-    try {
-      const page = await get(pagePath);
-      if (page.status !== 200) {
-        problems.push(`${pagePath}: returned ${page.status}`);
-        continue;
+  const queue = [...pagePaths];
+  async function worker() {
+    for (let pagePath = queue.shift(); pagePath !== undefined; pagePath = queue.shift()) {
+      try {
+        const page = await get(origin, pagePath);
+        if (page.status !== 200) {
+          problems.push(`${pagePath}: returned ${page.status}`);
+          continue;
+        }
+        read += 1;
+        if (pageIsNofollow(page.headers.get("x-robots-tag"), page.body)) {
+          nofollowPages += 1;
+          continue;
+        }
+        for (const link of followedLinks(`${origin}${pagePath}`, page.body, internalOrigins)) {
+          if (link !== pagePath) linkedFrom.get(link)?.add(pagePath);
+        }
+      } catch (error) {
+        problems.push(`${pagePath}: ${error.name === "TimeoutError" ? "timed out" : error.message}`);
       }
-      read += 1;
-      if (pageIsNofollow(page.headers, page.body)) {
-        nofollowPages += 1;
-        continue;
-      }
-      for (const link of followedLinks(pagePath, page.body, internalOrigins)) {
-        if (link !== pagePath) linkedFrom.get(link)?.add(pagePath);
-      }
-    } catch (error) {
-      problems.push(`${pagePath}: ${error.name === "TimeoutError" ? "timed out" : error.message}`);
     }
   }
+  await Promise.all(Array.from({ length: args.concurrency }, worker));
+
+  const isLander = new Set(landers);
+  const counts = landers.map((lander) => {
+    const sources = [...linkedFrom.get(lander)];
+    return { lander, all: sources.length, fromLanders: sources.filter((source) => isLander.has(source)).length, sources };
+  });
+  const missing = landers.filter((lander) => !pagePaths.has(lander));
+  return { origin, pages: pagePaths.size, read, nofollowPages, counts, missing, problems };
 }
-await Promise.all(Array.from({ length: args.concurrency }, worker));
 
-const counts = landers.map((lander) => {
-  const sources = [...linkedFrom.get(lander)];
-  return { lander, all: sources.length, fromLanders: sources.filter((source) => isLander.has(source)).length, sources };
-});
-const stats = (key) => {
-  const values = counts.map((count) => count[key]).sort((a, b) => a - b);
-  const median = values[Math.floor((values.length - 1) / 2)];
-  return `min ${values[0]}, median ${median}, max ${values.at(-1)}`;
-};
-const below = (key, n) => counts.filter((count) => count[key] < n);
-const threshold = Math.max(args.min, 3);
-const missing = landers.filter((lander) => !pagePaths.has(lander));
+function report(args, { origin, pages, read, nofollowPages, counts, missing, problems }) {
+  const stats = (key) => {
+    const values = counts.map((entry) => entry[key]).sort((a, b) => a - b);
+    const median = values[Math.floor((values.length - 1) / 2)];
+    return `min ${values[0]}, median ${median}, max ${values.at(-1)}`;
+  };
+  const below = (key, n) => counts.filter((entry) => entry[key] < n);
+  const threshold = Math.max(args.min, 3);
 
-console.log(`Read ${read} of ${pagePaths.size} sitemap pages at ${origin}; ${nofollowPages} of them are nofollow.`);
-console.log(`Landers: ${landers.length} active download Tools; ${missing.length} not in the sitemap${missing.length ? ` (${missing.join(", ")})` : ""}.`);
-console.log("Followed incoming links per Lander, counted once per linking page:");
-console.log(`  from any other page: ${stats("all")}`);
-console.log(`  from other Landers:  ${stats("fromLanders")}`);
-console.log(`Landers with fewer than ${threshold}: ${below("all", threshold).length} from any page, ${below("fromLanders", threshold).length} from Landers.`);
+  console.log(`Read ${read} of ${pages} sitemap pages at ${origin}; ${nofollowPages} of them are nofollow.`);
+  console.log(`Landers: ${counts.length} active download Tools; ${missing.length} not in the sitemap${missing.length ? ` (${missing.join(", ")})` : ""}.`);
+  console.log("Followed incoming links per Lander, counted once per linking page:");
+  console.log(`  from any other page: ${stats("all")}`);
+  console.log(`  from other Landers:  ${stats("fromLanders")}`);
+  console.log(`Landers with fewer than ${threshold}: ${below("all", threshold).length} from any page, ${below("fromLanders", threshold).length} from Landers.`);
 
-// Which pages hold the links of the Landers with fewest.
-const weak = below("all", threshold);
-if (weak.length) {
-  const holders = new Map();
-  for (const { sources } of weak) for (const source of sources) holders.set(source, (holders.get(source) ?? 0) + 1);
-  console.log(`Pages linking those ${weak.length} Landers (page: Landers it links):`);
-  for (const [source, n] of [...holders].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).slice(0, args.show)) {
-    console.log(`  ${source}: ${n}`);
+  // Which pages hold the links of the Landers with fewest.
+  const weak = below("all", threshold);
+  if (weak.length) {
+    const holders = new Map();
+    for (const { sources } of weak) for (const source of sources) holders.set(source, (holders.get(source) ?? 0) + 1);
+    console.log(`Pages linking those ${weak.length} Landers (page: Landers it links):`);
+    for (const [source, n] of [...holders].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).slice(0, args.show)) {
+      console.log(`  ${source}: ${n}`);
+    }
   }
-}
-const histogram = new Map();
-for (const { all } of counts) histogram.set(all, (histogram.get(all) ?? 0) + 1);
-console.log(
-  `Landers by followed incoming links (links: Landers): ${[...histogram].sort((a, b) => a[0] - b[0]).slice(0, args.show).map(([n, landerCount]) => `${n}: ${landerCount}`).join(", ")}${histogram.size > args.show ? ", ..." : ""}`,
-);
-if (problems.length) {
-  console.log(`Not read (${problems.length}):`);
-  console.log(problems.sort().slice(0, args.show).map((problem) => `  ${problem}`).join("\n"));
+  const histogram = new Map();
+  for (const { all } of counts) histogram.set(all, (histogram.get(all) ?? 0) + 1);
+  const buckets = [...histogram].sort((a, b) => a[0] - b[0]);
+  console.log(
+    `Landers by followed incoming links (links: Landers): ${buckets.slice(0, args.show).map(([n, landerCount]) => `${n}: ${landerCount}`).join(", ")}${buckets.length > args.show ? ", ..." : ""}`,
+  );
+  if (problems.length) {
+    console.log(`Not read (${problems.length}):`);
+    console.log(problems.sort().slice(0, args.show).map((problem) => `  ${problem}`).join("\n"));
+  }
+
+  return args.min > 0 && (below("all", args.min).length > 0 || below("fromLanders", args.min).length > 0);
 }
 
-if (args.min > 0 && (below("all", args.min).length || below("fromLanders", args.min).length)) process.exit(1);
+try {
+  const args = parseArgs(process.argv.slice(2));
+  const short = report(args, await count(args));
+  process.exitCode = short ? 1 : 0;
+} catch (error) {
+  console.error(error.message);
+  process.exitCode = 2;
+}
