@@ -13,4 +13,12 @@ export default defineCloudflareConfig({
       bypassTagCacheOnCacheHit: true,
     }),
   ),
+  // Answer a stored page before Next.js runs, with the lifetime stored in its
+  // entry: none, so `x-opennext-cache: HIT` and a year's s-maxage. Next.js
+  // keeps the lifetime of a page that isn't built ahead, such as every [tool]
+  // page, only in the memory of the isolate that rendered it. Any other
+  // isolate treated the stored page as stale 1 s after it was stored: it
+  // answered `x-nextjs-cache: STALE` without cache-control and rendered the
+  // page again (issue #347).
+  enableCacheInterception: true,
 });
