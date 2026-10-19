@@ -1,5 +1,8 @@
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+
+// Plain Markdown, without remark-gfm: GFM would turn bare "www." text into
+// http:// links to the source site (issue #323), and no article uses its
+// tables or strikethrough.
 
 type InfoArticleSectionProps = {
   title: string;
@@ -20,7 +23,6 @@ export function InfoArticleSection({
         </h2>
         <div className="space-y-4 text-gray-700 leading-relaxed">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
             components={{
               h3: ({ children }) => (
                 <h3 className="text-xl font-semibold text-gray-900 mt-6">
