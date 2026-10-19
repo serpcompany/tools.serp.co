@@ -7,8 +7,9 @@
 // It reads the Lander routes from the Tool registry, fetches each page from
 // --base-url, collects every link to another host, then requests each URL
 // once and follows its redirects to the end. A link passes when its first
-// answer is 2XX; it fails on 3XX, 4XX, 5XX or no answer. Every link is
-// printed, failures first, and the exit code is 1 when any link fails.
+// answer is 2XX; it fails on 3XX, 4XX, 5XX or no answer, unless it matches a
+// documented exception below exactly. Every link is printed, failures first,
+// and the exit code is 1 when any link fails.
 //
 // Options:
 //   --user-agent <ua>  Request outbound URLs as another client, e.g. a
@@ -25,8 +26,27 @@ const REQUEST_TIMEOUT_MS = 20_000;
 const MAX_REDIRECTS = 10;
 const CONCURRENCY = 8;
 const PER_HOST_CONCURRENCY = 2;
-const MAX_ATTEMPTS = 4;
-const RETRY_DELAY_MS = 5_000;
+const MAX_ATTEMPTS = 5;
+const RETRY_DELAY_MS = 10_000;
+
+// Answers that are known and accepted, so they aren't failures. Each one
+// matches a single URL, on one page, with this exact status chain and final
+// URL; any other answer from that URL still fails.
+const BRANDED_DOMAIN =
+  "a branded domain the owner keeps on /brands/ as it is, redirect included (owner, 2026-10-19, #323)";
+const EXCEPTIONS = [
+  { url: "https://serp.best", page: "/brands/", hops: "301>200", finalUrl: "https://best.serp.co/", reason: BRANDED_DOMAIN },
+  { url: "https://serp.games", page: "/brands/", hops: "301>200", finalUrl: "https://games.serp.co/", reason: BRANDED_DOMAIN },
+  { url: "https://serp.media", page: "/brands/", hops: "301>200", finalUrl: "https://games.serp.co/", reason: BRANDED_DOMAIN },
+  { url: "https://serp.wiki", page: "/brands/", hops: "301>200", finalUrl: "https://serp.co/", reason: BRANDED_DOMAIN },
+  {
+    url: "https://devinschumacher.com",
+    page: "/brands/",
+    hops: "403",
+    finalUrl: "https://devinschumacher.com",
+    reason: "answers 403 only to crawlers such as AhrefsBot; a browser gets the page (#323)",
+  },
+];
 
 function parseArgs(argv) {
   const args = { baseUrl: "", userAgent: BROWSER_USER_AGENT, failuresOnly: false };
@@ -175,13 +195,23 @@ const results = [];
 await runQueue([...linkPages.keys()], async (url) => {
   const { hops, finalUrl, error } = await check(url);
   const first = hops[0] ?? 0;
+  const pages = linkPages.get(url).sort();
+  const exception = error
+    ? undefined
+    : EXCEPTIONS.find((candidate) => (
+      candidate.url === url &&
+      candidate.hops === hops.join(">") &&
+      candidate.finalUrl === finalUrl &&
+      pages.every((page) => page === candidate.page)
+    ));
   results.push({
     url,
     hops,
     finalUrl,
     error,
-    failed: Boolean(error) || first < 200 || first >= 300,
-    pages: linkPages.get(url).sort(),
+    exception,
+    failed: !exception && (Boolean(error) || first < 200 || first >= 300),
+    pages,
   });
 });
 
@@ -191,11 +221,18 @@ function describe(result) {
   const pages = result.pages.length === 1
     ? result.pages[0]
     : `${result.pages.length} pages, e.g. ${result.pages[0]}`;
-  return `${result.failed ? "FAIL" : "ok  "} ${status.padEnd(8)} ${result.url}${target}  [${pages}]`;
+  const label = result.failed ? "FAIL" : result.exception ? "known" : "ok";
+  const reason = result.exception ? `  (${result.exception.reason})` : "";
+  return `${label.padEnd(5)} ${status.padEnd(8)} ${result.url}${target}  [${pages}]${reason}`;
 }
 
-results.sort((a, b) => Number(b.failed) - Number(a.failed) || a.url.localeCompare(b.url));
+results.sort((a, b) => (
+  Number(b.failed) - Number(a.failed) ||
+  Number(Boolean(b.exception)) - Number(Boolean(a.exception)) ||
+  a.url.localeCompare(b.url)
+));
 const failures = results.filter((result) => result.failed);
+const known = results.filter((result) => result.exception);
 const shown = args.failuresOnly ? failures : results;
 if (shown.length) console.log(shown.map(describe).join("\n"));
 if (pageProblems.length) {
@@ -215,6 +252,7 @@ console.log(
 console.log(
   failures.length
     ? `${failures.length} links fail (${Object.entries(byClass).map(([key, count]) => `${count} ${key}`).join(", ")}) on ${pagesWithFailures.size} pages.`
-    : "0 links answer 3XX, 4XX or 5XX.",
+    : "0 links answer 3XX, 4XX or 5XX unexpectedly.",
 );
+if (known.length) console.log(`${known.length} documented exceptions answered as expected.`);
 if (failures.length) process.exit(1);
