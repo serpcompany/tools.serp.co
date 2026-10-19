@@ -6,6 +6,7 @@ import { BlogSection } from "@/components/sections/BlogSection";
 import { ChangelogSection } from "@/components/sections/ChangelogSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
+import { RelatedToolsSection } from "@/components/sections/RelatedToolsSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
 import { withSerplyTracking } from "@/lib/downloader-extension-cta";
 import type { SourceLink, ToolContent } from "@/types";
@@ -217,6 +218,13 @@ export default function DownloaderPageTemplate({
       {content.blogPosts && <BlogSection blogPosts={content.blogPosts} />}
 
       {content.changelog && <ChangelogSection changelog={content.changelog} />}
+
+      {/* Other Landers, by the rotation in lib/catalog/related-tools.ts. */}
+      <RelatedToolsSection
+        currentToolId={toolId}
+        currentRoute={content.tool.route}
+        relatedTools={content.relatedTools}
+      />
 
       <ToolsLinkHub relatedTools={content.relatedTools} />
     </main>

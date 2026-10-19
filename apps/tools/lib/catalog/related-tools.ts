@@ -3,18 +3,22 @@ import type { RelatedTool, Tool } from "@/types";
 import { canonicalPath } from "../trailing-slash.ts";
 import { activeTools, getTool, getToolByRoute } from "./catalog.ts";
 
-// The links in a Tool page's Related Tools section (RelatedToolsSection). It
-// reads the registry, so only Server Components import it.
+// The links in a Tool page's or Lander's Related Tools section
+// (RelatedToolsSection). It reads the registry, so only Server Components
+// import it.
 //
 // A curated `content.relatedTools` list renders as written, less the page's
-// own Tool and any entry that isn't an active Tool. Without one, the section
-// falls back to at most RELATED_TOOLS_LIMIT active Tools of the same kind that
-// share a format with the page's Tool (issue #318): converters and compressors
-// list converters and compressors, Landers list Landers. The places are shared
-// between groups and picked per page, so every converter and compressor page
-// is on another page's list (related-tools.test.mjs checks the catalog).
+// own Tool and any entry that isn't an active Tool. Without one, a converter
+// or compressor page falls back to at most RELATED_TOOLS_LIMIT converters and
+// compressors that share a format with its Tool (issue #318). The places are
+// shared between groups and picked per page, so every converter and
+// compressor page is on another page's list. A Lander lists
+// LANDER_RELATED_LIMIT other Landers by a rotation, so every Lander is on
+// exactly that many Landers' lists (issue #349). related-tools.test.mjs checks
+// both on the catalog.
 
 export const RELATED_TOOLS_LIMIT = 24;
+export const LANDER_RELATED_LIMIT = 8;
 
 export type RelatedToolLink = {
   id: string;
@@ -117,6 +121,44 @@ export function fallbackRelatedTools<T extends Candidate>(
   return groups.flatMap((group) => group.tools.slice(0, group.places).sort(byId));
 }
 
+// A Lander's list: `limit` other active Landers (download Tools), sorted by id.
+// The Landers in id order form a ring of n, and the one at place i lists those
+// at i + stride, i + 2 × stride ... i + limit × stride, wrapping round. The
+// stride is n / (limit + 1), rounded down, so the last step stays short of n:
+// no Lander lists itself or another twice, each is listed by exactly `limit`
+// Landers (those the same steps behind it), and a list spans the whole ring
+// rather than a Lander's alphabetical neighbours. Only the ids decide it, not
+// registry order.
+export function landerRelatedTools<T extends Candidate>(
+  current: Pick<Tool, "id" | "operation"> & { route?: string },
+  candidates: readonly T[],
+  limit = LANDER_RELATED_LIMIT,
+): T[] {
+  const others = new Map(
+    candidates
+      .filter(
+        (tool) =>
+          tool.isActive &&
+          tool.operation === current.operation &&
+          tool.id !== current.id &&
+          tool.route !== current.route,
+      )
+      .map((tool) => [tool.id, tool]),
+  );
+  const ring = [current.id, ...others.keys()].sort();
+
+  const count = Math.min(limit, others.size);
+  const stride = Math.floor(ring.length / (count + 1));
+  const place = ring.indexOf(current.id);
+  const listed: T[] = [];
+  for (let step = 1; step <= count; step++) {
+    const id = ring[(place + step * stride) % ring.length];
+    const tool = id === undefined ? undefined : others.get(id);
+    if (tool) listed.push(tool);
+  }
+  return listed.sort(byId);
+}
+
 // A curated entry as a link, or null when it names no active Tool. An entry
 // with an off-site `href` is kept as written.
 function resolveCurated(entry: CuratedEntry, index: number) {
@@ -164,13 +206,14 @@ export function relatedToolLinks({ toolId, route, curated }: RelatedToolsQuery):
   let tools: { id: string; name: string; description: string; route: string }[] = curatedTools;
   if (tools.length === 0) {
     const current = toolId ? getTool(toolId) : route ? getToolByRoute(route) : undefined;
-    tools =
-      current?.from && current.to
-        ? fallbackRelatedTools(
-            { id: current.id, operation: current.operation, route, from: current.from, to: current.to },
-            activeTools(),
-          )
-        : [];
+    if (current?.operation === "download") {
+      tools = landerRelatedTools({ id: current.id, operation: current.operation, route }, activeTools());
+    } else if (current?.from && current.to) {
+      tools = fallbackRelatedTools(
+        { id: current.id, operation: current.operation, route, from: current.from, to: current.to },
+        activeTools(),
+      );
+    }
   }
 
   // One link per Tool: a repeated entry keeps its first place and its last

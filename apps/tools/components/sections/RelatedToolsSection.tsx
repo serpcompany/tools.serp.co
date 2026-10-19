@@ -13,7 +13,8 @@ type RelatedToolsSectionProps = {
 };
 
 // The Tool's curated related list, or else up to RELATED_TOOLS_LIMIT Tools of
-// the same kind that share a format with it (lib/catalog/related-tools.ts).
+// the same kind that share a format with it, or for a Lander
+// LANDER_RELATED_LIMIT other Landers (lib/catalog/related-tools.ts).
 export function RelatedToolsSection({
   currentRoute,
   currentToolId,

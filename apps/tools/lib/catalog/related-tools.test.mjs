@@ -8,8 +8,10 @@ import { activeTools, allTools, getToolByRoute } from "./catalog.ts";
 import { toolHref } from "./href.ts";
 import { TABLE_CONVERT_PAGES } from "../table-convert-pages.ts";
 import {
+  LANDER_RELATED_LIMIT,
   RELATED_TOOLS_LIMIT,
   fallbackRelatedTools,
+  landerRelatedTools,
   relatedToolLinks,
 } from "./related-tools.ts";
 
@@ -101,18 +103,6 @@ test("a compressor's fallback lists converters too", () => {
   ];
 
   assert.deepEqual(ids(fallbackRelatedTools(current, candidates)), ["mp4-to-mov"]);
-});
-
-test("a Lander's fallback lists Landers only", () => {
-  const current = entry("download-vimeo-videos", "download", "Vimeo", "mp4");
-  const candidates = [
-    entry("mov-to-mp4", "convert", "mov", "mp4"),
-    entry("compress-mp4", "compress", "mp4", "mp4"),
-    entry("download-loom-videos", "download", "Loom", "mp4"),
-    entry("download-wistia-videos", "download", "Wistia", "mp4"),
-  ];
-
-  assert.deepEqual(ids(fallbackRelatedTools(current, candidates)), ["download-loom-videos", "download-wistia-videos"]);
 });
 
 test("the fallback lists the reverse pair, then the same source, then the same target, then the rest, by id within each", () => {
@@ -305,14 +295,100 @@ test("/3gp-to-mp4/ lists MP4 to 3GP first, then 3GP converters, then MP4 convert
   assert.ok(links.slice(13).every((link) => link.href.endsWith("-to-mp4/")));
 });
 
-test("a Lander's list is other Landers", () => {
-  const lander = activeTools().find((tool) => tool.id === "download-vimeo-videos");
-  const links = linksFor(lander);
+// Landers (issue #349). Every active download Tool's page renders
+// DownloaderPageTemplate, and with it a Related Tools section.
+const landerPages = activeTools().filter((tool) => tool.operation === "download");
+const lander = (id, isActive = true) => entry(`download-${id}-videos`, "download", id, "mp4", isActive);
+// A ring of Landers with ids in order: download-s000-videos, download-s001-videos ...
+const landerRing = (count) => Array.from({ length: count }, (_, i) => lander(`s${String(i).padStart(3, "0")}`));
 
-  assert.equal(links.length, RELATED_TOOLS_LIMIT);
-  for (const link of links) {
-    assert.notEqual(link.id, lander.id);
-    assert.equal(getToolByRoute(link.href).operation, "download", link.href);
+test("a Lander lists 8 other Landers, more than the 3 links each needs", () => {
+  assert.equal(LANDER_RELATED_LIMIT, 8);
+});
+
+test("on any ring of Landers, each lists the limit or all the others, never itself or one twice, and is listed as often", () => {
+  for (const count of [1, 2, 3, 8, 9, 10, 17, 50, 291, 292, 293]) {
+    for (const limit of [3, LANDER_RELATED_LIMIT]) {
+      const ring = landerRing(count);
+      const expected = Math.min(limit, count - 1);
+      const listedBy = new Map(ring.map((tool) => [tool.id, 0]));
+      for (const tool of ring) {
+        const listed = ids(landerRelatedTools(tool, ring, limit));
+        assert.equal(listed.length, expected, `${tool.id} on a ring of ${count}`);
+        assert.equal(new Set(listed).size, listed.length, `${tool.id} lists a Lander twice`);
+        assert.ok(!listed.includes(tool.id), `${tool.id} lists itself`);
+        for (const id of listed) listedBy.set(id, listedBy.get(id) + 1);
+      }
+      for (const [id, times] of listedBy) assert.equal(times, expected, `${id} on a ring of ${count}, limit ${limit}`);
+    }
+  }
+});
+
+test("a Lander's list spans the ring, sorted by id, rather than naming its neighbours", () => {
+  // 90 Landers, 8 places: a stride of 10.
+  const ring = landerRing(90);
+  const listed = (index) => ids(landerRelatedTools(ring[index], ring));
+
+  assert.deepEqual(listed(0), [10, 20, 30, 40, 50, 60, 70, 80].map((i) => `download-s0${i}-videos`));
+  assert.deepEqual(listed(85), [5, 15, 25, 35, 45, 55, 65, 75].map((i) => `download-s0${String(i).padStart(2, "0")}-videos`));
+});
+
+test("a Lander lists only active Landers, the same whatever the registry order", () => {
+  const ring = landerRing(20);
+  const candidates = [
+    ...ring,
+    lander("retired", false),
+    entry("mov-to-mp4", "convert", "mov", "mp4"),
+    entry("compress-mp4", "compress", "mp4", "mp4"),
+    entry("mp4-combiner", "combine", "mp4", "mp4"),
+  ];
+
+  for (const tool of ring) {
+    const listed = landerRelatedTools(tool, candidates);
+    assert.equal(listed.length, LANDER_RELATED_LIMIT);
+    assert.ok(listed.every((other) => other.operation === "download" && other.isActive), tool.id);
+    assert.deepEqual(ids(landerRelatedTools(tool, candidates.toReversed())), ids(listed), tool.id);
+  }
+});
+
+test("every Lander page lists 8 other active Landers, and every active Lander is on exactly 8 Lander pages' lists", () => {
+  assert.ok(landerPages.length > 250, "the registry has its Landers");
+  const listedOn = new Map(landerPages.map((tool) => [toolHref(tool), new Set()]));
+
+  for (const tool of landerPages) {
+    const links = linksFor(tool);
+    assert.equal(links.length, LANDER_RELATED_LIMIT, tool.id);
+    for (const link of links) {
+      assert.notEqual(link.href, toolHref(tool), `${tool.id} links itself`);
+      assert.equal(getToolByRoute(link.href)?.operation, "download", `${tool.id} links ${link.href}`);
+      listedOn.get(link.href).add(tool.id);
+    }
+  }
+  for (const [href, listers] of listedOn) {
+    assert.equal(listers.size, LANDER_RELATED_LIMIT, `${href} is on ${listers.size} Lander pages' lists`);
+  }
+});
+
+test("every Lander page renders the Related Tools section for its own Tool", () => {
+  const template = readFileSync(new URL("../../components/DownloaderPageTemplate.tsx", import.meta.url), "utf8");
+  assert.match(
+    template,
+    /<RelatedToolsSection\s+currentToolId=\{toolId\}\s+currentRoute=\{content\.tool\.route\}\s+relatedTools=\{content\.relatedTools\}\s*\/>/,
+  );
+
+  // A Lander with its own folder renders the template with its own id; the
+  // others go through the shared route's DownloaderPageRenderer.
+  const shared = readFileSync(new URL("../../app/(convert)/[tool]/page.tsx", import.meta.url), "utf8");
+  assert.match(shared, /tool\.operation === "download"\) \{\s*return <DownloaderPageRenderer toolId=\{toolId\} \/>/);
+  const renderer = readFileSync(new URL("../../components/DownloaderPageRenderer.tsx", import.meta.url), "utf8");
+  assert.match(renderer, /<DownloaderPageTemplate toolId=\{toolId\}/);
+  const folders = folderPageSources();
+  const ownFolders = landerPages.filter((tool) => folders.has(toolHref(tool)));
+  assert.ok(ownFolders.length > 0);
+  for (const tool of ownFolders) {
+    const source = folders.get(toolHref(tool));
+    assert.match(source, /<DownloaderPageTemplate toolId=\{toolId\}/, tool.id);
+    assert.ok(source.includes(`const toolId = "${tool.id}";`), tool.id);
   }
 });
 
