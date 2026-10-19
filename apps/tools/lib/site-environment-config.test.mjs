@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import { getBuildEnvironmentError } from "../scripts/lib/build-environment.mjs";
+import { GTM_CONTAINER } from "../scripts/lib/google-tags.mjs";
 
 // Drift between the build scripts, wrangler vars and routes would noindex
 // production or 308 a whole canonical host away, so pin them together.
@@ -117,7 +118,7 @@ test("constants duplicated in scripts match their sources", () => {
   const gtmId = source("../../../packages/app-core/src/components/gtag-manager.tsx").match(
     /gtmId = "([^"]+)"/,
   )[1];
-  assert.ok(smokeScript.includes(`const GTM_CONTAINER = "${gtmId}";`), gtmId);
+  assert.equal(GTM_CONTAINER, gtmId);
 });
 
 test("non-canonical hosts get a permanent 308", () => {

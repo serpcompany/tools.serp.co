@@ -158,6 +158,14 @@ jobs:
         if: env.DEPLOY_ENV == 'staging'
         run: pnpm -C apps/tools smoke:browser --base-url "$PLATFORM_URL"
 
+      # GTM's tags change in Tag Manager, not in a deploy, so this runs after
+      # the deploy's own checks and a broken tag (#346 F1) can't skip them.
+      # It only warns when Google can't be reached. If only this step fails,
+      # the release is fine: fix the tag in Tag Manager and re-run, don't roll
+      # back (docs/runbooks/cloudflare.md).
+      - name: Check the Google tags GTM loads
+        run: pnpm -C apps/tools audit:google-tags
+
       - name: Upload smoke failure artifacts
         if: failure()
         uses: actions/upload-artifact@v4

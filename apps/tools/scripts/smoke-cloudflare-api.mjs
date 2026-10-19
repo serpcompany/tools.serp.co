@@ -8,6 +8,7 @@ import {
   getWranglerConfig,
   repoRoot,
 } from "./lib/cloudflare-audit.mjs";
+import { GTM_CONTAINER } from "./lib/google-tags.mjs";
 
 const DEFAULT_TIMEOUT_MS = 30000;
 // Must match SMOKE_TEST_HEADER in lib/site-environment.ts. It lets the smoke
@@ -329,8 +330,6 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// Must match the GTM id in gtag-manager.tsx (pinned by a test).
-const GTM_CONTAINER = "GTM-PP9W77LK";
 const ADSENSE_SCRIPT = "pagead/js/adsbygoogle.js";
 
 function environmentChecks(args) {
