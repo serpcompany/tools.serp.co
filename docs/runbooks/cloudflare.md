@@ -153,6 +153,17 @@ isn't an active Tool, and a page rendered for a URL with a query string
 stored; after a query, the next request for the bare path stores the page.
 URLs that match no route share one cached not-found page.
 
+A stored page is answered before Next.js runs (`enableCacheInterception` in
+`apps/tools/open-next.config.ts`), with `x-opennext-cache: HIT` and
+`cache-control: s-maxage=31536000, stale-while-revalidate=2592000`. Next.js
+holds the lifetime of a page that isn't built ahead, such as every `[tool]`
+page, only in the memory of the isolate that rendered it. Without
+interception, every other isolate treated the stored page as stale one second
+after it was stored: it answered `x-nextjs-cache: STALE` with no
+`cache-control`, rendered the page again, and failed to queue a revalidation,
+as no queue is configured (#347). A page that isn't stored yet, and a 404,
+still reach Next.js.
+
 Page requests don't reach Next.js with their query in the first place:
 requests that arrive while a page renders share that render, so a cache rule
 alone can't keep one visitor's query from another.

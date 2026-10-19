@@ -142,6 +142,28 @@ test("the OpenNext config wraps its whole incremental cache, regional layer incl
   assert.match(config, /incrementalCache:\s*withPageCacheFilter\(\s*withRegionalCache\(/);
 });
 
+// Without cache interception, an isolate that didn't render a [tool] page
+// itself answered its stored copy `x-nextjs-cache: STALE`, with no
+// cache-control, and rendered it again (issue #347).
+test("the OpenNext config answers a stored page before Next.js runs", () => {
+  const config = readFileSync(new URL("../open-next.config.ts", import.meta.url), "utf8");
+  assert.match(config, /^\s*enableCacheInterception:\s*true,/m);
+});
+
+// Interception gives a [tool] page a year's s-maxage because it finds the
+// entry of a page its dynamic route rendered at runtime (`fallback: null`) and
+// reads the lifetime stored in it (`revalidate: false`). If an upgrade changes
+// either, check on `cf:preview:production` that a stored [tool] page still
+// answers HIT on a fresh isolate (docs/runbooks/cloudflare.md).
+test("the installed OpenNext still answers a runtime-rendered page with its stored lifetime", () => {
+  const require = createRequire(import.meta.url);
+  const openNext = createRequire(require.resolve("@opennextjs/cloudflare"));
+  const interceptor = readFileSync(openNext.resolve("@opennextjs/aws/core/routing/cacheInterceptor.js"), "utf8");
+
+  assert.match(interceptor, /dynamicPrerender\.fallback !== null\) \{\s*return undefined;/);
+  assert.match(interceptor, /finalRevalidate = revalidate === false \? CACHE_ONE_YEAR : revalidate;/);
+});
+
 // The filter reads where Next.js writes the request's query. If an upgrade
 // moves it, every page would stop being stored (or, if this were relaxed, a
 // query could get through): re-check the payload, then update both.
