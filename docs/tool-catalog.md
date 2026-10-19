@@ -87,11 +87,22 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   the same target format and the other shared-format Tools. The same source and
   same target groups share the places; the others fill what is left. Which
   Tools fill a group's places is fixed per page by a hash of the two Tool ids;
-  they show sorted by id. Lander, table converter and transcription pages
-  render no such section. Every converter and compressor page is on a list
-  another page renders, except table converter pages with a "More Table
-  Converters" section (87 of the 88; `/html-to-markdown/` has none): each of
-  those links the other 87, so one of them on a list reaches them all.
+  they show sorted by id. Table converter and transcription pages render no
+  such section. Every converter and compressor page is on a list another page
+  renders, except table converter pages with a "More Table Converters" section
+  (87 of the 88; `/html-to-markdown/` has none): each of those links the other
+  87, so one of them on a list reaches them all.
+- Lander pages (`DownloaderPageTemplate`) render the same section with 8
+  other active Landers, adult-site and mainstream mixed (owner decision on
+  #349, 2026-10-19). In id order the Landers form a ring, and each lists the
+  Landers a fixed stride apart (their number divided by 9, rounded down), so
+  every Lander is on exactly 8 Landers' lists, beside its category page.
+  Adding or retiring one Lander shifts the ring, so most lists change
+  (retiring TellaTV would change 256 of the other 291); that is expected. Run
+  `node scripts/lander-links.mjs --base-url <url> --min 3` in `apps/tools`
+  against a production build or the site to count each Lander's followed
+  incoming links from the sitemap's pages; a local `cf:build` is nofollow
+  and credits none.
 - `packages/app-core/src/data/related-apps.json` owns Related App entries;
   matching uses a Tool's input and output formats and de-duplicates by app id.
 - Tool pages and Landers (`ToolPageTemplate`, `DownloaderPageTemplate`) carry

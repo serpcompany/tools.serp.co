@@ -13,7 +13,8 @@ type RelatedToolsSectionProps = {
 };
 
 // The Tool's curated related list, or else up to RELATED_TOOLS_LIMIT Tools of
-// the same kind that share a format with it (lib/catalog/related-tools.ts).
+// the same kind that share a format with it, or for a Lander
+// LANDER_RELATED_LIMIT other Landers (lib/catalog/related-tools.ts).
 export function RelatedToolsSection({
   currentRoute,
   currentToolId,
@@ -42,9 +43,9 @@ export function RelatedToolsSection({
             // A dense list: don't prefetch each link in view.
             <Link key={tool.id} href={tool.href} prefetch={false}>
               <Card className="p-3 hover:shadow-md transition-all duration-200 cursor-pointer border-gray-200 hover:border-blue-300 hover:bg-blue-50/50">
-                <h4 className="font-semibold text-sm text-gray-900 mb-0.5 truncate">
+                <h3 className="font-semibold text-sm text-gray-900 mb-0.5 truncate">
                   {tool.name}
-                </h4>
+                </h3>
                 <p className="text-xs text-gray-600 line-clamp-1">
                   {tool.description}
                 </p>
