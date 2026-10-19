@@ -164,6 +164,13 @@ after it was stored: it answered `x-nextjs-cache: STALE` with no
 as no queue is configured (#347). A page that isn't stored yet, and a 404,
 still reach Next.js.
 
+The `stale-while-revalidate=2592000` is OpenNext's fixed value, and browsers
+get it too. They ignore `s-maxage`, so a returning visitor's browser may show
+its own copy of a page once after a deploy, and the next load is current. A
+page's first answer after a deploy comes from Next.js (`x-nextjs-cache: MISS`)
+with `s-maxage=31536000` alone, so a `render-snapshot` diff of a cold build
+against a warm one shows `cache-control` changes that aren't regressions.
+
 Page requests don't reach Next.js with their query in the first place:
 requests that arrive while a page renders share that render, so a cache rule
 alone can't keep one visitor's query from another.

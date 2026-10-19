@@ -164,6 +164,33 @@ test("the installed OpenNext still answers a runtime-rendered page with its stor
   assert.match(interceptor, /finalRevalidate = revalidate === false \? CACHE_ONE_YEAR : revalidate;/);
 });
 
+// A stored page keeps every per-request layer only because OpenNext runs
+// next.config redirects and middleware (canonical-host and slash 308s, 410s,
+// the /internal/ 401) before the cache, then puts middleware's and
+// next.config's headers (X-Robots-Tag on staging, x-tools-release) on the
+// cached answer. An upgrade that intercepted first would skip all of them.
+test("the installed OpenNext still runs redirects and middleware before answering from the cache", () => {
+  const require = createRequire(import.meta.url);
+  const openNext = createRequire(require.resolve("@opennextjs/cloudflare"));
+  const handler = readFileSync(openNext.resolve("@opennextjs/aws/core/routingHandler.js"), "utf8");
+
+  const steps = [
+    "handleRedirects(eventOrResult, RoutesManifest.redirects)",
+    "await handleMiddleware(eventOrResult",
+    "...middlewareEventOrResult.responseHeaders",
+    "eventOrResult = await cacheInterceptor(eventOrResult, resolvedRoutes)",
+  ];
+  const positions = steps.map((step) => handler.indexOf(step));
+  for (const [i, step] of steps.entries()) {
+    assert.notEqual(positions[i], -1, `routingHandler.js no longer has ${step}`);
+    if (i > 0) assert.ok(positions[i] > positions[i - 1], `${step} now runs before ${steps[i - 1]}`);
+  }
+  assert.match(
+    handler,
+    /eventOrResult = await cacheInterceptor\(eventOrResult, resolvedRoutes\);\s*if \(isInternalResult\(eventOrResult\)\) \{\s*applyMiddlewareHeaders\(eventOrResult, headers\);\s*return eventOrResult;/,
+  );
+});
+
 // The filter reads where Next.js writes the request's query. If an upgrade
 // moves it, every page would stop being stored (or, if this were relaxed, a
 // query could get through): re-check the payload, then update both.
