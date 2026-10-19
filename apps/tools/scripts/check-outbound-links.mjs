@@ -10,7 +10,7 @@
 // answer is 2XX; it fails on 3XX, 4XX, 5XX or no answer, unless it matches a
 // documented exception in lib/outbound-links.mjs exactly. Every link is
 // printed, failures first. The exit code is 1 when any link fails or any page
-// doesn't load (its links would go unchecked).
+// doesn't load (its links would go unchecked), and 2 for bad arguments.
 //
 // Options:
 //   --user-agent <ua>  Request outbound URLs as another client. With a

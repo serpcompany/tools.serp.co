@@ -39,4 +39,5 @@ To see the redirects and dead links visitors and crawlers get, run
 `node apps/tools/scripts/check-outbound-links.mjs --base-url <origin>` against a
 running site: before and after a link change, and against production after its
 release. It fails on any link that answers 3XX, 4XX or 5XX and on any page that
-doesn't load; its documented exceptions are in `scripts/lib/outbound-links.mjs`.
+doesn't load; its documented exceptions are in
+`apps/tools/scripts/lib/outbound-links.mjs`.
