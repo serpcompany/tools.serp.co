@@ -51,9 +51,11 @@ off). It also checks that the sitemap index lists only the canonical
 `/sitemap-<group>.xml` files, that the homepage entry has no slash, and that
 `/sitemap.xml` and retired sitemap names 308 into the tree, and that the first
 numbered category page in `sitemap-categories.xml` answers 200, canonical to
-itself. Add `--platform-url` with the Worker's
-`*.workers.dev` URL to check the redirect too; it retries for 30 s while the
-new version rolls out.
+itself. In both environments, it reads the GTM container's `gtm.js` and fails
+naming any Google tag (`G-`, `GT-`, `AW-`) whose `gtag/js` doesn't answer 200
+(#346 F1); if Google can't be reached or answers 5xx, it only warns. Add
+`--platform-url` with the Worker's `*.workers.dev` URL to check the redirect
+too; it retries for 30 s while the new version rolls out.
 
 ```bash
 pnpm -C apps/tools audit:cf:api-smoke --base-url https://staging.tools.serp.co --expect-env staging
