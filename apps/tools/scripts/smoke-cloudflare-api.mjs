@@ -8,10 +8,9 @@ import {
   getWranglerConfig,
   repoRoot,
 } from "./lib/cloudflare-audit.mjs";
-import { checkGoogleTags } from "./lib/google-tags.mjs";
+import { GTM_CONTAINER } from "./lib/google-tags.mjs";
 
 const DEFAULT_TIMEOUT_MS = 30000;
-const USER_AGENT = "tools-serp-cloudflare-api-smoke/1.0";
 // Must match SMOKE_TEST_HEADER in lib/site-environment.ts. It lets the smoke
 // test reach a deployment through its *.workers.dev host without the
 // canonical-host redirect.
@@ -194,7 +193,7 @@ async function requestCheck(check, args) {
       method: check.method ?? "GET",
       body: check.body,
       headers: {
-        "user-agent": USER_AGENT,
+        "user-agent": "tools-serp-cloudflare-api-smoke/1.0",
         ...(check.skipSmokeTestHeader ? {} : { [SMOKE_TEST_HEADER]: "1" }),
         ...(check.headers ?? {}),
       },
@@ -331,38 +330,7 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// Must match the GTM id in gtag-manager.tsx (pinned by a test).
-const GTM_CONTAINER = "GTM-PP9W77LK";
 const ADSENSE_SCRIPT = "pagead/js/adsbygoogle.js";
-
-// The Google tags GTM_CONTAINER loads answer 200 (lib/google-tags.mjs). It runs
-// on staging too, though staging pages don't load GTM: the container changes in
-// Tag Manager, not in a deploy, and staging's run comes before promotion.
-function googleTagCheck(args) {
-  const name = `Google tags loaded by ${GTM_CONTAINER} answer 200`;
-  return {
-    name,
-    run: async () => {
-      const startedAt = Date.now();
-      const { state, message, tags } = await checkGoogleTags(GTM_CONTAINER, {
-        timeoutMs: args.timeoutMs,
-        headers: { "user-agent": USER_AGENT },
-      });
-      return {
-        name,
-        status: null,
-        ok: state === "passed",
-        passed: state !== "failed",
-        warning: state === "warning",
-        durationMs: Date.now() - startedAt,
-        contentType: null,
-        contentLength: 0,
-        details: { message, tags },
-        error: null,
-      };
-    },
-  };
-}
 
 function environmentChecks(args) {
   const checks = [];
@@ -432,7 +400,6 @@ function environmentChecks(args) {
         adsense: bytes.includes(Buffer.from(ADSENSE_SCRIPT)),
       }),
     },
-    googleTagCheck(args),
   );
 
   // serp url-trailing-slash standard (issue #165, #167).
@@ -651,13 +618,7 @@ function skipped(name, reason) {
 
 function renderReport(payload) {
   const rows = payload.results.map((result) => {
-    const status = result.skipped
-      ? "skipped"
-      : result.warning
-        ? "warning"
-        : result.passed
-          ? "passed"
-          : "failed";
+    const status = result.skipped ? "skipped" : result.passed ? "passed" : "failed";
     const detail = result.error || JSON.stringify(result.details ?? {});
     return `| ${result.name} | ${status} | ${result.status ?? "-"} | ${result.durationMs} | ${detail.replaceAll("|", "\\|")} |`;
   });
@@ -671,7 +632,6 @@ function renderReport(payload) {
     `- Asset base URL: ${payload.assetBaseUrl}`,
     `- Passed: ${payload.summary.passed}`,
     `- Failed: ${payload.summary.failed}`,
-    `- Warnings: ${payload.summary.warnings}`,
     `- Skipped: ${payload.summary.skipped}`,
     "",
     "| check | result | status | ms | details |",
@@ -751,7 +711,7 @@ for (const check of checks) {
     results.push(check);
     continue;
   }
-  results.push(check.run ? await check.run() : await requestCheckWithRetry(check, args));
+  results.push(await requestCheckWithRetry(check, args));
 }
 
 const payload = {
@@ -759,21 +719,12 @@ const payload = {
   baseUrl: args.baseUrl,
   assetBaseUrl: args.assetBaseUrl,
   summary: {
-    passed: results.filter((result) => result.passed && !result.skipped && !result.warning).length,
+    passed: results.filter((result) => result.passed && !result.skipped).length,
     failed: results.filter((result) => !result.passed).length,
-    warnings: results.filter((result) => result.warning).length,
     skipped: results.filter((result) => result.skipped).length,
   },
   results,
 };
-
-// A warning passes, so annotate it on the Deploy run rather than leave it in
-// the table.
-if (process.env.GITHUB_ACTIONS) {
-  for (const result of results.filter((item) => item.warning)) {
-    console.log(`::warning::${result.name}: ${result.details.message}`);
-  }
-}
 
 if (args.jsonPath) {
   fs.mkdirSync(path.dirname(args.jsonPath), { recursive: true });

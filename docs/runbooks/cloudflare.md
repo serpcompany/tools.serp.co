@@ -51,11 +51,9 @@ off). It also checks that the sitemap index lists only the canonical
 `/sitemap-<group>.xml` files, that the homepage entry has no slash, and that
 `/sitemap.xml` and retired sitemap names 308 into the tree, and that the first
 numbered category page in `sitemap-categories.xml` answers 200, canonical to
-itself. In both environments, it reads the GTM container's `gtm.js` and fails
-naming any Google tag (`G-`, `GT-`, `AW-`) whose `gtag/js` doesn't answer 200
-(#346 F1); if Google can't be reached or answers 5xx, it only warns. Add
-`--platform-url` with the Worker's `*.workers.dev` URL to check the redirect
-too; it retries for 30 s while the new version rolls out.
+itself. Add `--platform-url` with the Worker's
+`*.workers.dev` URL to check the redirect too; it retries for 30 s while the
+new version rolls out.
 
 ```bash
 pnpm -C apps/tools audit:cf:api-smoke --base-url https://staging.tools.serp.co --expect-env staging
@@ -70,6 +68,16 @@ environment from its branch: a push to `staging` deploys Staging, and a push to
   environment smoke check through the Worker's `*.workers.dev` host.
 - Staging also runs the browser smoke test ([browser-smoke.md](browser-smoke.md)).
   Production doesn't, because the test records real tool runs.
+- Last, in both environments, `audit:google-tags` checks the GTM container
+  the site loads (#346 F1). It reads the container's `gtm.js` and requests
+  `gtag/js` for each Google tag the container loads (each Google tag's Tag ID:
+  `G-`, `GT-`, `AW-` or `DC-`), and fails naming any that doesn't answer 200.
+  Google answers 200 for ids it doesn't know, so this catches a tag Google
+  refuses, not a typo; a GA4 Event tag loads no script and isn't checked. A
+  `gtm.js` that doesn't answer 200 fails too, except that no answer, a 5xx,
+  408 or 429 from Google, or a container with no Google tag it can read, only
+  warns. It runs after the other checks because the container changes in Tag
+  Manager, not in a deploy.
 - Only the migrate and deploy steps see the `CLOUDFLARE_API_TOKEN` repository
   secret (an account-owned SERP token for Workers, D1 and the `serp.co` zone's
   Workers routes).
