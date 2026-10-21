@@ -37,7 +37,8 @@
     "r2:upload-ffmpeg-assets": "node scripts/upload-r2-ffmpeg-assets.mjs",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "tool-video": "node scripts/tool-video.mjs"
   },
   "dependencies": {
     "@ffmpeg/core": "0.12.6",
