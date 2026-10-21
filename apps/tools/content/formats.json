@@ -1196,7 +1196,7 @@
     "summary": "HEIF images coded with HEVC, the default photo format on iPhone since iOS 11. The heic brand is defined in ISO/IEC 23008-12, the HEIF standard.",
     "usedFor": [
       "Photos taken on iPhone and iPad",
-      "Live Photos and image sequences"
+      "Portrait-mode photos with depth data"
     ],
     "properties": [
       "lossy HEVC compression",
@@ -1293,8 +1293,7 @@
     ],
     "openWith": [
       "Preview on macOS",
-      "Xcode",
-      "GIMP with a plugin"
+      "Xcode"
     ]
   },
   "ico": {
@@ -3278,7 +3277,7 @@
       "legacy format"
     ],
     "openWith": [
-      "Windows Media Player",
+      "Windows Media Player on Windows 7",
       "VLC media player"
     ]
   },
