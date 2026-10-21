@@ -104,3 +104,18 @@ test("a brief carries the facts for its Tool's target and engine only", () => {
   assert.match(brief(["mkv-to-mp4"]), /cap doesn't apply/);
   assert.match(brief(["mp3-to-mp4"]), /audio only, as AAC/);
 });
+
+test("a brief asks for a How-to heading only where the page shows one", () => {
+  const idea = { keyword: "x", volume: 1, terms: [{ keyword: "x", volume: 1 }], questions: [{ keyword: "how to convert x", volume: 1 }] };
+  const keywordIdeas = { source: "test", tools: { "csv-to-pdf": idea, "pdf-to-txt": idea, "webp-to-png": idea } };
+  const text = buildBrief({ name: "test", ids: ["csv-to-pdf", "pdf-to-txt", "webp-to-png"], tools, statusRows, formats: null, styleGuide, examples, readDoc, keywordIdeas });
+  assert.match(section(text, "csv-to-pdf"), /no generated How-to heading to replace: leave `seo\.howToHeading` out/);
+  assert.match(section(text, "pdf-to-txt"), /no generated How-to heading to replace: leave `seo\.howToHeading` out/);
+  assert.match(section(text, "webp-to-png"), /`seo\.howToHeading`: use the top "how to" question, "how to convert x"/);
+});
+
+test("a brief names several outputs' files only for Tools that can make several", () => {
+  const text = brief(["png-to-pdf", "pdf-to-png"]);
+  assert.doesNotMatch(section(text, "png-to-pdf"), /_page1/);
+  assert.match(section(text, "pdf-to-png"), /"<name>_page1"/);
+});

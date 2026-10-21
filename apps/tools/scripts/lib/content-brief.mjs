@@ -68,7 +68,7 @@ const volumeLine = (item) => `- ${item.keyword}: ${number(item.volume)} a month`
 
 // The Tool's keyword variants and questions from benchmarks/keyword-ideas.json
 // (the file may be missing, or lack the Tool).
-function variantSection(idea, ideas) {
+function variantSection(tool, idea, ideas) {
   const terms = byVolume(idea?.terms).slice(0, TOP_TERMS);
   const questions = byVolume(idea?.questions).slice(0, TOP_QUESTIONS);
   if (!terms.length && !questions.length) {
@@ -85,7 +85,9 @@ function variantSection(idea, ideas) {
     "",
     list([
       "The title keeps the head keyword and works in the biggest matching term where it fits.",
-      howTo
+      !onConverterPage(tool) || tool.content?.howTo
+        ? "This page has no generated How-to heading to replace: leave `seo.howToHeading` out."
+        : howTo
         ? `\`seo.howToHeading\`: use the top "how to" question, "${howTo.keyword}", worded as a heading.`
         : "No \"how to\" question is listed: leave `seo.howToHeading` out.",
       "The FAQs answer the listed questions, not invented ones.",
@@ -198,7 +200,7 @@ function toolSection(tool, status, formats, ideas) {
     "",
     "### Variants and questions",
     "",
-    variantSection(idea, ideas),
+    variantSection(tool, idea, ideas),
     "",
     "### Engine and execution path",
     "",

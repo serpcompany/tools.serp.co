@@ -18,7 +18,9 @@ export function converterPageFacts(tool) {
     "Several files can be chosen at once (the file input is `multiple`, components/HeroConverter.tsx). They run one after another and each downloads as its own file; there is no ZIP.",
     compress
       ? "The compressor asks for quality 0.82 (components/HeroConverter.tsx); the engine below says what that means."
-      : 'Conversions pass no quality setting (components/HeroConverter.tsx). A conversion that makes several files (a PDF\'s pages) names them "<name>_page1", "<name>_page2"… (lib/convert/workerClient.ts).',
+      : tool.to === "pdf"
+        ? "Conversions pass no quality setting (components/HeroConverter.tsx)."
+        : 'Conversions pass no quality setting (components/HeroConverter.tsx). A conversion that makes several files (a PDF\'s pages) names them "<name>_page1", "<name>_page2"… (lib/convert/workerClient.ts).',
     "There is no general file-size limit (checkInputFile in lib/convert/workerClient.ts checks the format, not the size). Some engines have their own, listed below.",
     'The output is checked against the target format: a wrong result fails with "The converter produced X instead of Y." (lib/convert/workerClient.ts).',
     "The visitor's original file isn't changed; they download a new copy.",
