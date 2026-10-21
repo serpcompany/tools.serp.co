@@ -1,0 +1,493 @@
+{
+  "webm-to-mp4": {
+    "seo": {
+      "title": "Convert WebM to MP4 Online (Free)",
+      "h1": "WebM to MP4 Converter",
+      "description": "Convert WebM to MP4 in your browser: the video is re-encoded as H.264 with AAC audio. Free, with no sign-up, and the file isn't uploaded.",
+      "howToHeading": "How to convert WebM to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn a WebM video into an MP4 with H.264 video and AAC audio, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What video and audio does the MP4 contain?",
+        "answer": "The video is re-encoded as H.264 and the sound as AAC at 96 kbps, so the MP4 plays in the apps and browsers that list MP4 support."
+      },
+      {
+        "question": "Is the MP4 limited in size or speed?",
+        "answer": "Yes, at the top end. Frames are scaled down when the longer side passes 1920 px, and a WebM above 30 fps is capped at 30 fps. Smaller values stay as they are."
+      },
+      {
+        "question": "Why does a long WebM take a while?",
+        "answer": "FFmpeg runs as single-threaded WebAssembly in your browser, and the page sets no timeout. A long video takes as long as your device needs."
+      },
+      {
+        "question": "What does a failed conversion mean?",
+        "answer": "You see an FFmpeg error with an exit code. The file may not be a valid WebM, or it may hold a stream FFmpeg can't read."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebM and MP4",
+      "fromFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "Royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "Supported by major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebM to MP4",
+      "points": [
+        "The video is re-encoded as H.264 with AAC audio at 96 kbps.",
+        "Frame size is capped at 1920 px on the longer side, and the frame rate at 30 fps.",
+        "Converting several WebM files gives one MP4 for each.",
+        "Your original WebM isn't changed: you download a new MP4.",
+        "FFmpeg runs in your browser, so a long video takes as long as your device needs."
+      ]
+    }
+  },
+  "heic-to-png": {
+    "seo": {
+      "title": "Convert HEIC to PNG Online (Free)",
+      "h1": "HEIC to PNG Converter",
+      "description": "Convert HEIC photos from an iPhone to PNG in your browser. The image is decoded to 8-bit pixels and saved losslessly. Free, with no sign-up.",
+      "howToHeading": "How to convert HEIC to PNG"
+    },
+    "tool": {
+      "subtitle": "Save an iPhone HEIC photo as a lossless PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Why is the PNG larger than the HEIC?",
+        "answer": "HEIC uses lossy HEVC compression, while PNG is lossless. The PNG stores the decoded pixels exactly, so it can take much more space than the HEIC."
+      },
+      {
+        "question": "Are camera details like EXIF kept in the PNG?",
+        "answer": "No. The photo is decoded to 8-bit RGB pixels, and EXIF data and ICC profiles aren't carried over to the PNG."
+      },
+      {
+        "question": "What happens if the HEIC holds more than one image?",
+        "answer": "Only the primary image is decoded, so you get one PNG. Other images stored in the same file are not converted."
+      },
+      {
+        "question": "Why does it say \"No images in HEIF\"?",
+        "answer": "The file has no image the decoder can read. Check that it is a real HEIC photo and not a renamed file."
+      },
+      {
+        "question": "Does the PNG keep the HEIC's 10-bit colour?",
+        "answer": "No. HEIC can hold 10-bit colour, but the converter decodes to 8-bit RGB pixels, so the PNG has 8 bits per channel."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIC and PNG",
+      "fromFormat": {
+        "name": "HEIC",
+        "fullName": "HEIF image with HEVC coding",
+        "description": "HEIF images coded with HEVC, the default photo format on iPhone since iOS 11. The heic brand is defined in ISO/IEC 23008-12, the HEIF standard.",
+        "details": [
+          "Lossy HEVC compression",
+          "Smaller files than JPEG at similar quality",
+          "Supports depth maps and alpha",
+          "10-bit colour"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEIC to PNG",
+      "points": [
+        "The PNG has 8 bits per channel, decoded from the HEIC's pixels.",
+        "EXIF data and ICC profiles aren't carried over.",
+        "Only the primary image of a HEIC is converted, so you get one PNG.",
+        "Converting several HEIC files gives one PNG for each.",
+        "libheif decodes the photo in your browser, so it isn't uploaded."
+      ]
+    }
+  },
+  "mp3-to-wav": {
+    "seo": {
+      "title": "Convert MP3 to WAV Online (Free)",
+      "h1": "MP3 to WAV Converter",
+      "description": "Convert MP3 to WAV in your browser: the audio is decoded to 16-bit PCM. Free, with no sign-up, and the file isn't uploaded to a server.",
+      "howToHeading": "How to convert MP3 to WAV"
+    },
+    "tool": {
+      "subtitle": "Decode an MP3 into an uncompressed 16-bit WAV file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will the WAV sound better than the MP3?",
+        "answer": "No. MP3 is lossy, and decoding it can't bring back what compression removed. The WAV holds the MP3's sound as it is."
+      },
+      {
+        "question": "Why is the WAV so much bigger than the MP3?",
+        "answer": "WAV usually holds uncompressed PCM audio, so files are large but exact. This converter writes 16-bit PCM, which takes far more space than a compressed MP3."
+      },
+      {
+        "question": "Is there a size limit for the WAV?",
+        "answer": "The WAV format has a 4 GB file size limit. The converter adds no limit of its own, so a very long MP3 can reach that format limit."
+      },
+      {
+        "question": "What if the MP3 won't convert?",
+        "answer": "You see an FFmpeg error with an exit code. The file may be damaged or not really an MP3, so check that it plays first."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and WAV",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "Usually uncompressed PCM",
+          "Lossless",
+          "Large files",
+          "4 GB file size limit"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to WAV",
+      "points": [
+        "The WAV holds 16-bit PCM audio decoded from the MP3.",
+        "Converting can't restore quality the MP3 already lost.",
+        "Expect a much larger file than the MP3.",
+        "Converting several MP3 files gives one WAV for each.",
+        "FFmpeg runs in your browser, so the MP3 isn't uploaded."
+      ]
+    }
+  },
+  "jpg-to-jpeg": {
+    "seo": {
+      "title": "Convert JPG to JPEG Online (Free)",
+      "h1": "JPG to JPEG Converter",
+      "description": "Convert JPG to JPEG in your browser. The image is decoded and saved again as a JPEG at quality 0.85. Free, with no sign-up, no upload.",
+      "howToHeading": "How to convert JPG to JPEG"
+    },
+    "tool": {
+      "subtitle": "Save a JPG image as a JPEG file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is there a difference between JPG and JPEG?",
+        "answer": "No. .jpg and .jpeg are the same format, so the picture type doesn't change when you convert."
+      },
+      {
+        "question": "Does converting JPG to JPEG change the picture?",
+        "answer": "Slightly. The converter doesn't just rename the file: it decodes the pixels and encodes a new JPEG at quality 0.85, and JPEG is lossy."
+      },
+      {
+        "question": "Does the JPEG keep the photo's camera and location data?",
+        "answer": "No. Only pixels are passed on, so EXIF, ICC profile and XMP data are dropped from the new JPEG."
+      },
+      {
+        "question": "Is my original JPG replaced?",
+        "answer": "No. Your JPG isn't changed. You download a new JPEG next to it, and the conversion can be repeated from the same file."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and JPEG",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The same format as JPG, defined by the Joint Photographic Experts Group (ISO/IEC 10918-1) and designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to JPEG",
+      "points": [
+        "JPG and JPEG are the same format, so the picture type doesn't change.",
+        "The image is encoded again at quality 0.85, not just renamed.",
+        "EXIF, ICC profile and XMP data are dropped.",
+        "Converting several JPG files gives one JPEG for each.",
+        "Your browser does the work, so the image isn't uploaded."
+      ]
+    }
+  },
+  "png-to-png": {
+    "seo": {
+      "title": "Compress PNG Files Online (Free)",
+      "h1": "PNG Compressor",
+      "description": "Compress PNG files in your browser with lossless oxipng recompression. If the result isn't smaller, you get your original back. Free, no sign-up.",
+      "howToHeading": "How to compress a PNG"
+    },
+    "tool": {
+      "subtitle": "Make a PNG file smaller without changing its pixels, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does compressing a PNG lower its quality?",
+        "answer": "No. The PNG goes through oxipng at level 1, which is lossless, so the pixels stay the same and only the way they are stored changes."
+      },
+      {
+        "question": "What if the compressed PNG isn't smaller?",
+        "answer": "You get your original file back. The compressor only returns a result that is smaller than the file you chose."
+      },
+      {
+        "question": "Can I compress several PNG files at once?",
+        "answer": "Yes. Choose them together and they run one after another. Each one downloads as its own file, not as a ZIP."
+      },
+      {
+        "question": "Is there a limit on PNG file size?",
+        "answer": "The page sets no size limit of its own. It runs in a Web Worker on your device, so a large PNG takes as long as your device needs."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before compressing a PNG",
+      "points": [
+        "Compression is lossless: oxipng at level 1 keeps the pixels as they are.",
+        "If the result isn't smaller, you get the original back.",
+        "Your original file isn't changed: you download a new copy.",
+        "Several PNG files are compressed one after another, each downloaded on its own.",
+        "The work happens in your browser, so the PNG isn't uploaded."
+      ]
+    }
+  },
+  "gif-to-mp4": {
+    "seo": {
+      "title": "Convert GIF to MP4 Online (Free)",
+      "h1": "GIF to MP4 Converter",
+      "description": "Convert GIF to MP4 in your browser: the animation is re-encoded as H.264 video. Free, with no sign-up, and the file isn't uploaded.",
+      "howToHeading": "How to convert GIF to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn an animated GIF into an H.264 MP4 video, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can you convert a GIF to MP4?",
+        "answer": "Yes. FFmpeg runs in your browser and re-encodes the GIF's frames as H.264 video in an MP4 file."
+      },
+      {
+        "question": "What size and frame rate does the MP4 have?",
+        "answer": "It follows the GIF, with two caps: 1920 px on the longer side and 30 fps. A GIF within those limits keeps its size and frame rate."
+      },
+      {
+        "question": "Does the MP4 still loop like a GIF?",
+        "answer": "The page doesn't set a loop for the MP4. It is re-encoded as H.264 video, and whether it repeats depends on the player you open it with."
+      },
+      {
+        "question": "What if the GIF fails to convert?",
+        "answer": "You see an FFmpeg error with an exit code. Check that the file really is a GIF, then try again."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and MP4",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colours per frame, and supports simple animation.",
+        "details": [
+          "256-colour palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to MP4",
+      "points": [
+        "The animation is re-encoded as H.264 video in an MP4 file.",
+        "Frame size is capped at 1920 px on the longer side, and the frame rate at 30 fps.",
+        "Converting several GIF files gives one MP4 for each.",
+        "Your original GIF isn't changed: you download a new MP4.",
+        "FFmpeg runs in your browser, so the GIF isn't uploaded."
+      ]
+    }
+  },
+  "jpg-to-webp": {
+    "seo": {
+      "title": "Convert JPG to WebP Online (Free)",
+      "h1": "JPG to WebP Converter",
+      "description": "Convert JPG to WebP in your browser. The image is decoded and saved again as a WebP at quality 0.85. Free, with no sign-up, no upload.",
+      "howToHeading": "How to convert JPG to WebP"
+    },
+    "tool": {
+      "subtitle": "Save a JPG photo as a WebP image, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does converting JPG to WebP lose quality?",
+        "answer": "Some. The JPG is decoded to pixels and written as a new WebP at quality 0.85, so it is encoded a second time with lossy compression."
+      },
+      {
+        "question": "Is the camera data copied to the WebP?",
+        "answer": "Nothing but pixels reaches the WebP. EXIF, ICC profile and XMP details from the JPG are left behind."
+      },
+      {
+        "question": "Will the WebP open everywhere?",
+        "answer": "WebP is supported by current major browsers, and Preview on macOS, GIMP and Windows Photos open it."
+      },
+      {
+        "question": "What if the browser can't open my JPG?",
+        "answer": "The page shows \"Image decode failed.\" or says your browser can't open the file. Try a current Chrome, Edge, Firefox or Safari."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and WebP",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to WebP",
+      "points": [
+        "The WebP is written at quality 0.85, so the photo is compressed a second time.",
+        "EXIF, ICC profile and XMP data are dropped.",
+        "Converting several JPG files gives one WebP for each.",
+        "Your original JPG isn't changed: you download a new WebP.",
+        "Your browser does the work, so the image isn't uploaded."
+      ]
+    }
+  },
+  "webp-to-gif": {
+    "seo": {
+      "title": "Convert WebP to GIF Online (Free)",
+      "h1": "WebP to GIF Converter",
+      "description": "Convert WebP to GIF in your browser. An animated WebP gives only its first frame. Free, with no sign-up, and the image isn't uploaded.",
+      "howToHeading": "How to convert WebP to GIF"
+    },
+    "tool": {
+      "subtitle": "Save a WebP image as a GIF file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will an animated WebP stay animated as a GIF?",
+        "answer": "No. An animated WebP gives its first frame only, so the GIF is a still image. This converter doesn't carry the animation over."
+      },
+      {
+        "question": "Why do the colours look different in the GIF?",
+        "answer": "GIF uses a palette of at most 256 colours per frame, while WebP can hold many more. A photo with smooth colour changes can look different."
+      },
+      {
+        "question": "Is transparency kept in the GIF?",
+        "answer": "GIF supports 1-bit transparency, not the smooth alpha transparency of WebP. The converter lists transparency as kept for PNG and WebP outputs only."
+      },
+      {
+        "question": "Why does it say \"Image decode failed\"?",
+        "answer": "Your browser could not read the file as an image. Check that it is a real WebP, or try a current Chrome, Edge, Firefox or Safari."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and GIF",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colours per frame, and supports simple animation.",
+        "details": [
+          "256-colour palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebP to GIF",
+      "points": [
+        "An animated WebP gives only its first frame, so the GIF is a still image.",
+        "The GIF uses at most 256 colours per frame.",
+        "EXIF, ICC profile and XMP data are dropped.",
+        "Converting several WebP files gives one GIF for each.",
+        "Your browser does the work, so the image isn't uploaded."
+      ]
+    }
+  }
+}

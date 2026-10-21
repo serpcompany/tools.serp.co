@@ -1,0 +1,509 @@
+{
+  "heic-to-pdf": {
+    "seo": {
+      "title": "Convert HEIC to PDF Online (Free)",
+      "h1": "HEIC to PDF Converter",
+      "description": "Convert HEIC to PDF in your browser: iPhone photos are decoded here, so the HEIC isn't uploaded. Free, with no sign-up and no software to install.",
+      "howToHeading": "How to convert HEIC to PDF"
+    },
+    "tool": {
+      "subtitle": "Turn an iPhone HEIC photo into a PDF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What if my HEIC holds more than one image?",
+        "answer": "Only the primary image is decoded, so a HEIC that holds several images gives you one. The other images in the file are not converted."
+      },
+      {
+        "question": "What does the decoder do to my HEIC before the PDF?",
+        "answer": "libheif turns the photo into 8-bit RGB pixels first. That step is why EXIF data and ICC profiles never reach the PDF."
+      },
+      {
+        "question": "Can I convert several HEIC photos at once?",
+        "answer": "Yes. Choose as many files as you like. They are converted one after another, and each one downloads as its own PDF. There is no ZIP."
+      },
+      {
+        "question": "Why does a file fail with No images in HEIF?",
+        "answer": "The file has no image the decoder can read, so there is nothing to put in a PDF. Check that the file opens as a photo on your device first."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIC and PDF",
+      "fromFormat": {
+        "name": "HEIC",
+        "fullName": "HEIF image with HEVC coding",
+        "description": "HEIF images coded with HEVC, the default photo format on iPhone since iOS 11. The heic brand is defined in ISO/IEC 23008-12, the HEIF standard.",
+        "details": [
+          "Photos taken on iPhone and iPad",
+          "Lossy HEVC compression",
+          "Smaller files than JPEG at similar quality",
+          "Supports depth maps and alpha"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Opens in any web browser",
+          "Vector and raster content",
+          "Used for forms, contracts and print-ready files"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEIC to PDF",
+      "points": [
+        "Only the primary image of a HEIC is decoded.",
+        "EXIF data and ICC profiles aren't carried over.",
+        "Each HEIC you choose downloads as its own PDF.",
+        "Your original HEIC isn't changed: you download a new copy.",
+        "libheif decodes the photo in your browser, so it isn't uploaded."
+      ]
+    }
+  },
+  "jpeg-to-png": {
+    "seo": {
+      "title": "Convert JPEG to PNG Online (Free)",
+      "h1": "JPEG to PNG Converter",
+      "description": "Convert JPEG to PNG in your browser. The PNG is lossless, with no quality setting, and the JPEG isn't uploaded. Free, with no sign-up.",
+      "howToHeading": "How to convert JPEG to PNG"
+    },
+    "tool": {
+      "subtitle": "Save a JPEG as a lossless PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will the PNG look better than the JPEG?",
+        "answer": "No. The PNG is built from the pixels your browser decodes from the JPEG, so it shows the same picture. PNG is lossless, so saving it again won't cost more quality."
+      },
+      {
+        "question": "Is the JPEG's EXIF data kept in the PNG?",
+        "answer": "No. Your browser decodes the JPEG to raw pixels and the PNG is written from those, so EXIF, ICC profiles and XMP are dropped."
+      },
+      {
+        "question": "Is there a quality setting for the PNG?",
+        "answer": "No. PNG has no quality setting here. It is a lossless format, so the converter doesn't ask you to choose one."
+      },
+      {
+        "question": "What does Image decode failed mean?",
+        "answer": "Your browser couldn't read the file as an image. It may be damaged, or not a JPEG. Try opening it in your browser or another app first."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and PNG",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A common image format for photographs. This converter decodes it with your browser's own image decoder.",
+        "details": [
+          "Opens in any web browser",
+          "Decoded by your browser"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to PNG",
+      "points": [
+        "The PNG has no quality setting, because PNG is lossless.",
+        "EXIF, ICC profiles and XMP are dropped.",
+        "Each JPEG you choose downloads as its own PNG.",
+        "Your original JPEG isn't changed: you download a new copy.",
+        "The conversion runs in your browser, so the JPEG isn't uploaded."
+      ]
+    }
+  },
+  "ogg-to-mp3": {
+    "seo": {
+      "title": "Convert OGG to MP3 Online (Free)",
+      "h1": "OGG to MP3 Converter",
+      "description": "Convert OGG to MP3 in your browser: FFmpeg re-encodes the sound as a 192 kbps MP3. Free, with no sign-up, and the OGG isn't uploaded.",
+      "howToHeading": "How to convert OGG to MP3"
+    },
+    "tool": {
+      "subtitle": "Re-encode an OGG audio file as a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps. FFmpeg re-encodes the sound with the LAME encoder at that bitrate, whatever the OGG used."
+      },
+      {
+        "question": "Will the MP3 sound better than the OGG?",
+        "answer": "No. Both formats are lossy, and converting can't add detail the OGG doesn't have. The MP3 is at best as good as its source."
+      },
+      {
+        "question": "What happens to a video in an OGG file?",
+        "answer": "It is dropped. The command asks for no video, so the MP3 holds audio only."
+      },
+      {
+        "question": "Why does the conversion fail with an FFmpeg error?",
+        "answer": "FFmpeg stopped with an exit code, for example because the file has no audio track to save. Check that the file plays with sound first."
+      }
+    ],
+    "aboutSection": {
+      "title": "OGG and MP3",
+      "fromFormat": {
+        "name": "OGG",
+        "fullName": "Ogg container",
+        "description": "A free container format maintained by Xiph.Org. The .ogg extension is most commonly used for Vorbis audio, a lossy codec.",
+        "details": [
+          "Open, patent-free format",
+          "Usually Vorbis audio",
+          "Lossy compression",
+          "Used for game audio and open-source music"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3). It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device",
+          "Used for music libraries and podcasts"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting OGG to MP3",
+      "points": [
+        "The MP3 is encoded at 192 kbps.",
+        "Only audio is kept: the output has no video.",
+        "Each OGG you choose downloads as its own MP3.",
+        "FFmpeg runs in your browser, so the OGG isn't uploaded.",
+        "A long file takes as long as your device needs."
+      ]
+    }
+  },
+  "pdf-to-epub": {
+    "seo": {
+      "title": "Convert PDF to EPUB Online (Free)",
+      "h1": "PDF to EPUB Converter",
+      "description": "Convert PDF to EPUB in your browser. The text reflows to fit any e-reader; layout, tables and images aren't kept. Free, with no upload."
+    },
+    "tool": {
+      "subtitle": "Turn a PDF's text into a reflowable EPUB e-book, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can you convert a PDF to EPUB without losing format?",
+        "answer": "Only the text is kept. Layout, fonts, tables, images, links and form fields are left out, and a table's cells come out as lines. The text reflows instead."
+      },
+      {
+        "question": "What does the EPUB contain?",
+        "answer": "A reflowable EPUB 3 with one part for each PDF page, listed as Page 1, Page 2 and so on in its table of contents. It is titled with your file's name."
+      },
+      {
+        "question": "Why does my PDF say it has no text to extract?",
+        "answer": "No page has any text, as in a scan or a blank PDF. Reading words from a picture needs OCR, which this converter doesn't do."
+      },
+      {
+        "question": "Can I convert a password-protected PDF?",
+        "answer": "Not while it needs a password to open. Save or print a copy without one and convert that. A PDF with only an owner password opens and converts."
+      },
+      {
+        "question": "How large a PDF can I convert?",
+        "answer": "Up to 2,000 pages and 20 million characters of text. Reading that takes at most 2 minutes, then the file is stopped. A larger PDF is refused, and the message names the limit."
+      }
+    ],
+    "aboutSection": {
+      "title": "PDF and EPUB",
+      "fromFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      },
+      "toFormat": {
+        "name": "EPUB",
+        "fullName": "Electronic Publication",
+        "description": "An open e-book standard maintained by the W3C. Content is HTML, CSS and images in a ZIP package, and text reflows to fit the screen.",
+        "details": [
+          "Reflowable text",
+          "ZIP package of HTML and CSS",
+          "Open standard",
+          "Opens in Apple Books, Kobo e-readers and Calibre"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PDF to EPUB",
+      "points": [
+        "Only the text is kept: no layout, fonts, tables, images or links.",
+        "A scanned PDF has no text to read, and OCR isn't done.",
+        "A password-protected PDF must be saved without the password first.",
+        "Each PDF you choose downloads as its own EPUB.",
+        "The e-book is made in your browser, so the PDF isn't uploaded."
+      ]
+    }
+  },
+  "png-to-jpeg": {
+    "seo": {
+      "title": "Convert PNG to JPEG Online (Free)",
+      "h1": "PNG to JPEG Converter",
+      "description": "Convert PNG to JPEG in your browser: the JPEG is written at quality 0.85 and metadata is dropped. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert PNG to JPEG"
+    },
+    "tool": {
+      "subtitle": "Save a PNG as a JPEG at quality 0.85, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does converting PNG to JPEG reduce quality?",
+        "answer": "Yes. A PNG is lossless, but the JPEG is lossy and is written at quality 0.85. Converting back to PNG won't restore what was lost."
+      },
+      {
+        "question": "Can I pick a quality for the JPEG?",
+        "answer": "There is no quality control on this page. The canvas encoder always writes the JPEG at 0.85."
+      },
+      {
+        "question": "Does the JPEG keep my PNG's transparency?",
+        "answer": "No. Transparency is kept only for PNG and WebP outputs. Which colour fills the transparent areas is up to your browser's JPEG encoder."
+      },
+      {
+        "question": "What happens to an animated PNG?",
+        "answer": "An animated input gives its first frame only, so you get a single still JPEG."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and JPEG",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Used for screenshots, logos and interface graphics",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A common image format for photographs. This converter writes it with your browser's canvas encoder at quality 0.85.",
+        "details": [
+          "Lossy output at quality 0.85",
+          "Opens in any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to JPEG",
+      "points": [
+        "The JPEG is written at quality 0.85, and you can't change it.",
+        "Transparency isn't kept in a JPEG.",
+        "An animated PNG gives its first frame only.",
+        "EXIF, ICC profiles and XMP are dropped.",
+        "Each PNG you choose downloads as its own JPEG."
+      ]
+    }
+  },
+  "heic-to-jpeg": {
+    "seo": {
+      "title": "Convert HEIC to JPEG Online (Free)",
+      "h1": "HEIC to JPEG Converter",
+      "description": "Convert HEIC to JPEG in your browser: iPhone photos are decoded here and saved at quality 0.85. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert HEIC to JPEG"
+    },
+    "tool": {
+      "subtitle": "Turn an iPhone HEIC photo into a JPEG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will I lose photo quality?",
+        "answer": "Some. HEIC is already lossy, and the JPEG is lossy too, written at quality 0.85. The page passes no quality setting, so you can't raise it."
+      },
+      {
+        "question": "What happens to a HEIC that holds several images?",
+        "answer": "Only the primary image is decoded, so you get one JPEG from it. The other images in the file aren't converted."
+      },
+      {
+        "question": "Where did my photo's EXIF data go?",
+        "answer": "The decoder produces 8-bit RGB pixels and nothing else, so the JPEG is written without EXIF data or an ICC profile."
+      },
+      {
+        "question": "Do several HEIC photos come back as a ZIP?",
+        "answer": "No. Each HEIC is converted on its own, one after another, and you get a separate JPEG for every file."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIC and JPEG",
+      "fromFormat": {
+        "name": "HEIC",
+        "fullName": "HEIF image with HEVC coding",
+        "description": "HEIF images coded with HEVC, the default photo format on iPhone since iOS 11. The heic brand is defined in ISO/IEC 23008-12, the HEIF standard.",
+        "details": [
+          "Photos taken on iPhone and iPad",
+          "Lossy HEVC compression",
+          "Smaller files than JPEG at similar quality",
+          "10-bit colour"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A common image format for photographs. This converter writes it at quality 0.85.",
+        "details": [
+          "Lossy output at quality 0.85",
+          "Opens in any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEIC to JPEG",
+      "points": [
+        "The JPEG is written at quality 0.85.",
+        "Only the primary image of a HEIC is decoded.",
+        "EXIF data and ICC profiles aren't carried over.",
+        "Each HEIC you choose downloads as its own JPEG.",
+        "libheif decodes the photo in your browser, so it isn't uploaded."
+      ]
+    }
+  },
+  "webp-to-jpeg": {
+    "seo": {
+      "title": "Convert WebP to JPEG Online (Free)",
+      "h1": "WebP to JPEG Converter",
+      "description": "Convert WebP to JPEG in your browser: an animated WebP gives its first frame, at quality 0.85. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert WebP to JPEG"
+    },
+    "tool": {
+      "subtitle": "Save a WebP image as a JPEG at quality 0.85, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What happens to an animated WebP?",
+        "answer": "You get its first frame only, as a single still JPEG. The rest of the animation is dropped."
+      },
+      {
+        "question": "What happens to a WebP with transparency?",
+        "answer": "JPEG has no transparency, because it is kept only for PNG and WebP outputs. Which colour fills the clear areas is up to your browser's JPEG encoder."
+      },
+      {
+        "question": "Is the WebP's quality setting carried into the JPEG?",
+        "answer": "No. The WebP is decoded to pixels, then the JPEG is written fresh at 0.85, whatever the WebP used."
+      },
+      {
+        "question": "Do EXIF and XMP tags survive from WebP to JPEG?",
+        "answer": "They don't. Only pixels pass through the conversion, so EXIF, ICC profiles and XMP are dropped from the JPEG."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and JPEG",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A common image format for photographs. This converter writes it with your browser's canvas encoder at quality 0.85.",
+        "details": [
+          "Lossy output at quality 0.85",
+          "Opens in any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebP to JPEG",
+      "points": [
+        "An animated WebP gives its first frame only.",
+        "Transparency isn't kept in a JPEG.",
+        "The JPEG is written at quality 0.85, and you can't change it.",
+        "EXIF, ICC profiles and XMP are dropped.",
+        "Your browser decodes the WebP, so the file isn't uploaded."
+      ]
+    }
+  },
+  "mp3-to-mp4": {
+    "seo": {
+      "title": "Convert MP3 to MP4 Online (Free)",
+      "h1": "MP3 to MP4 Converter",
+      "description": "Convert MP3 to MP4 in your browser: FFmpeg writes H.264 video with AAC audio at 96 kbps. Free, with no sign-up, and the MP3 isn't uploaded.",
+      "howToHeading": "How to convert MP3 to MP4"
+    },
+    "tool": {
+      "subtitle": "Wrap an MP3 in an MP4 file with AAC audio, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What audio does the MP4 contain?",
+        "answer": "AAC at 96 kbps. FFmpeg re-encodes the MP3's sound to that bitrate, so the audio is at best as good as the MP3 it came from."
+      },
+      {
+        "question": "Which codecs does the MP4 use?",
+        "answer": "H.264 for video (libx264) and AAC for audio, with the index moved to the front of the file so it can start playing sooner."
+      },
+      {
+        "question": "Do several MP3 files become one MP4?",
+        "answer": "No. Each MP3 you choose is converted on its own, and you download one MP4 for every MP3. Nothing is joined or zipped."
+      },
+      {
+        "question": "Why does the conversion fail with an FFmpeg error?",
+        "answer": "FFmpeg stopped with an exit code. Check that the file plays as audio first. A long file takes as long as your device needs, since there is no timeout."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and MP4",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3). It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device",
+          "Used for music libraries and podcasts"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Plays on nearly every device",
+          "Used for online video and sharing"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to MP4",
+      "points": [
+        "The audio is re-encoded as AAC at 96 kbps.",
+        "The video is written with H.264 (libx264).",
+        "Each MP3 you choose downloads as its own MP4.",
+        "FFmpeg runs in your browser, so the MP3 isn't uploaded.",
+        "Your original MP3 isn't changed: you download a new copy."
+      ]
+    }
+  }
+}

@@ -1,0 +1,483 @@
+{
+  "jpg-to-svg": {
+    "seo": {
+      "title": "Convert JPG to SVG Online (Free)",
+      "h1": "JPG to SVG Converter",
+      "description": "Convert JPG to SVG in your browser. Pick one or several JPG files and download an SVG for each. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert JPG to SVG"
+    },
+    "tool": {
+      "subtitle": "Turn a JPG photo into an SVG file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JPG to SVG?",
+        "answer": "Choose one or more JPG files above. They run one after another, and each result downloads as its own SVG file. Your original JPG isn't changed."
+      },
+      {
+        "question": "Will the SVG be sharper than the JPG?",
+        "answer": "Don't count on it. A JPG is a grid of pixels, and its detail is fixed at the size it was saved. SVG scales to any size when it holds shapes and paths, but converting can't restore detail the JPG already lost."
+      },
+      {
+        "question": "Does the SVG keep the JPG's EXIF data?",
+        "answer": "No. The image is read as raw pixels, so EXIF, ICC profiles and XMP in the JPG aren't carried over to the SVG."
+      },
+      {
+        "question": "What can open the SVG afterwards?",
+        "answer": "Any web browser, and vector editors such as Inkscape, Adobe Illustrator and Figma. SVG is XML text, so it is also styleable with CSS."
+      },
+      {
+        "question": "What if the conversion fails?",
+        "answer": "If the JPG can't be read, the page shows \"Image decode failed.\" If the result isn't an SVG, it fails with \"The converter produced X instead of Y.\" rather than giving you a wrong file."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and SVG",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group, designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Supports animation and scripting",
+          "Styleable with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to SVG",
+      "points": [
+        "A JPG is made of pixels; an SVG describes shapes, so a JPG's lost detail doesn't come back.",
+        "Several JPG files run one after another, and each downloads as its own SVG, with no ZIP.",
+        "EXIF, ICC profile and XMP data in the JPG aren't carried over.",
+        "The conversion runs in your browser, so the JPG isn't uploaded."
+      ]
+    }
+  },
+  "compress-gif": {
+    "seo": {
+      "title": "Compress GIF Size Online (Free)",
+      "h1": "GIF Compressor",
+      "description": "Compress a GIF to a smaller file in your browser. Every frame is re-optimised, and nothing is resized. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to compress a GIF"
+    },
+    "tool": {
+      "subtitle": "Make a GIF smaller by re-optimising every frame, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I compress a GIF?",
+        "answer": "Choose one or more GIF files above. Each is re-optimised frame by frame in your browser, and you download the smaller copy of each one when it's ready."
+      },
+      {
+        "question": "What if the GIF doesn't get any smaller?",
+        "answer": "You get the original back. The compressor only hands you its result when that file is smaller than the one you chose."
+      },
+      {
+        "question": "Does it make the GIF smaller in width and height?",
+        "answer": "No. Nothing is resized, so the compressed GIF has the same dimensions as the original. Only the way the frames are stored is optimised."
+      },
+      {
+        "question": "Can I compress several GIFs at once?",
+        "answer": "Yes. Choose them together and they run one after another, each downloading as its own file. There is no ZIP, and your originals aren't changed."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before compressing a GIF",
+      "points": [
+        "Every frame of the GIF is re-optimised.",
+        "Nothing is resized, so the width and height stay the same.",
+        "If the result isn't smaller, you get your original file back.",
+        "ImageMagick runs in your browser as WebAssembly, so the GIF isn't uploaded."
+      ]
+    }
+  },
+  "compress-mp4": {
+    "seo": {
+      "title": "Compress MP4 Video Online (Free)",
+      "h1": "MP4 Compressor",
+      "description": "Compress an MP4 video to a smaller file in your browser: H.264 at CRF 24 with 160 kbps AAC audio. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to compress an MP4"
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 into a smaller file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I compress an MP4 video?",
+        "answer": "Choose one or more MP4 files above. FFmpeg re-encodes each one in your browser, and you download the smaller copy when it finishes. A long video takes as long as your device needs."
+      },
+      {
+        "question": "What settings does the compressor use?",
+        "answer": "The video is re-encoded with libx264 at the medium preset and CRF 24. The audio is re-encoded as AAC at 160 kbps. The MP4 is also laid out so it can start playing before it has fully loaded."
+      },
+      {
+        "question": "Does compressing an MP4 lower its quality?",
+        "answer": "Possibly. The video is re-encoded with a lossy codec, so the result is not a lossless copy. The command doesn't resize the picture, so the frame size stays as it was."
+      },
+      {
+        "question": "What if the compressed MP4 isn't smaller?",
+        "answer": "You get your original file back. The compressor only hands you a new file when it is smaller than the one you chose."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before compressing an MP4",
+      "points": [
+        "The video is re-encoded with H.264 (CRF 24) and the audio as AAC at 160 kbps.",
+        "If the result isn't smaller, you get your original MP4 back.",
+        "Several files run one after another, and each downloads as its own file.",
+        "FFmpeg runs in your browser, so the video isn't uploaded. There is no size limit or timeout of its own."
+      ]
+    }
+  },
+  "mp3-to-ogg": {
+    "seo": {
+      "title": "Convert MP3 to OGG Online (Free)",
+      "h1": "MP3 to OGG Converter",
+      "description": "Convert MP3 to OGG in your browser: the audio is re-encoded as Vorbis at quality 5. Free, with no sign-up, and the file isn't uploaded.",
+      "howToHeading": "How to convert MP3 to OGG"
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP3 as an OGG Vorbis file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP3 to OGG?",
+        "answer": "Pick your MP3 files above, one or several. Each is re-encoded as Vorbis in your browser, and its OGG downloads on its own when it is done."
+      },
+      {
+        "question": "What quality is the OGG?",
+        "answer": "The audio is encoded with the libvorbis encoder at quality level 5. The page has no quality setting, so every MP3 is converted the same way."
+      },
+      {
+        "question": "Will the OGG sound better than the MP3?",
+        "answer": "No. Both formats are lossy, and the MP3 is decoded and encoded again, so converting can't bring back detail the MP3 already lost."
+      },
+      {
+        "question": "Is the converted file really an OGG?",
+        "answer": "The result is checked against the target format. If FFmpeg produced something else, you see \"The converter produced X instead of Y.\" instead of a wrong file."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and OGG",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG, developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "OGG",
+        "fullName": "Ogg container",
+        "description": "A free container format maintained by Xiph.Org. The .ogg extension is most commonly used for Vorbis audio, a lossy codec.",
+        "details": [
+          "Open, patent-free format",
+          "Usually Vorbis audio",
+          "Lossy compression",
+          "Streaming-friendly"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to OGG",
+      "points": [
+        "The audio is re-encoded as Vorbis with libvorbis at quality level 5.",
+        "Both formats are lossy, so the OGG can't be better than the MP3.",
+        "Several MP3 files run one after another, and each downloads as its own OGG.",
+        "FFmpeg runs in your browser, so the MP3 isn't uploaded."
+      ]
+    }
+  },
+  "mov-to-mp3": {
+    "seo": {
+      "title": "Convert MOV to MP3 Online (Free)",
+      "h1": "MOV to MP3 Converter",
+      "description": "Convert MOV to MP3 in your browser: the soundtrack becomes a 192 kbps MP3 and the video is dropped. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert MOV to MP3"
+    },
+    "tool": {
+      "subtitle": "Save the sound from a MOV video as a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a MOV to MP3?",
+        "answer": "Choose one or more MOV files above. FFmpeg takes the sound from each one in your browser, and every result downloads as its own MP3 file."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps. The sound is encoded to MP3 with the LAME encoder at that bitrate, and the page has no setting to change it."
+      },
+      {
+        "question": "What happens to the video?",
+        "answer": "It is dropped. The MP3 holds audio only, so the picture isn't kept, and your original MOV file isn't changed."
+      },
+      {
+        "question": "What if the MOV has no sound?",
+        "answer": "A MOV with no audio track can't be converted: you see an FFmpeg error, since there is nothing to save as MP3. Play the clip first to check it has sound."
+      },
+      {
+        "question": "Which track is used if the MOV has several?",
+        "answer": "The page doesn't choose one. It passes no track selection to FFmpeg, so FFmpeg's own defaults decide which audio is used."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and MP3",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "Multi-track container",
+          "Many codecs, including ProRes",
+          "Timecode and metadata tracks",
+          "Used for iPhone recordings"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG that became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to MP3",
+      "points": [
+        "Only the sound is kept: the video is dropped.",
+        "The MP3 is encoded at 192 kbps.",
+        "A MOV without an audio track can't be converted.",
+        "Several MOV files give one MP3 each, with no ZIP.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "txt-to-pdf": {
+    "seo": {
+      "title": "Convert TXT to PDF Online (Free)",
+      "h1": "TXT to PDF Converter",
+      "description": "Convert a TXT file to PDF in your browser. Your text is set on A4 pages with long lines wrapped and indentation kept. Free, no sign-up, no upload."
+    },
+    "tool": {
+      "subtitle": "Set a plain-text file on A4 pages as a PDF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a TXT file to PDF?",
+        "answer": "Choose one or more TXT files above. Each is laid out on A4 pages in your browser and downloads as a PDF with the same name as the file."
+      },
+      {
+        "question": "Which font is the PDF in?",
+        "answer": "Courier, when your text is all Windows-1252 characters: every character is the same width, so columns and indentation line up as in your text editor. Any other text is set in DejaVu Sans, embedded in the PDF. Its letters vary in width, so columns made with spaces may not line up, though indentation still does."
+      },
+      {
+        "question": "Can it convert Chinese, Japanese or Korean text?",
+        "answer": "No. The PDF's font has no Chinese, Japanese, Korean, Indic or Thai characters, or emoji, so a file with any of them is refused with the characters named, rather than saved with blank boxes."
+      },
+      {
+        "question": "What happens to long lines, tabs and page breaks?",
+        "answer": "A line longer than the page wraps between words, and the continuation is indented as far as the line it continues. A word too long for a line is split. Tabs become spaces up to the next fourth column. A form feed starts a new page."
+      },
+      {
+        "question": "Which text encodings can it read?",
+        "answer": "UTF-8, and UTF-16 with a byte order mark. A file that isn't valid UTF-8 is read as Windows-1252, as a browser reads a text file that doesn't say its encoding."
+      },
+      {
+        "question": "How large a file can I convert?",
+        "answer": "Up to 20 MB and 2,000 pages. The PDF is made in your browser's memory, so a larger file is refused with a message saying which limit it passed."
+      }
+    ],
+    "aboutSection": {
+      "title": "TXT and PDF",
+      "fromFormat": {
+        "name": "TXT",
+        "fullName": "Plain text file",
+        "description": "A file that holds unformatted text with no fonts, styles or images. It is readable by any text editor, on any operating system.",
+        "details": [
+          "No formatting",
+          "Character encoding such as UTF-8",
+          "Very small files",
+          "Readable everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TXT to PDF",
+      "points": [
+        "The pages are A4 portrait with 10 pt type: 61 lines a page and 81 characters a line in Courier.",
+        "Blank lines and leading spaces are kept; blank lines and page breaks at the end are not.",
+        "No header, footer or page numbers are added.",
+        "A file over 20 MB or 2,000 pages is refused, as is text with characters the font lacks.",
+        "The PDF is made in your browser, so the file isn't uploaded."
+      ]
+    }
+  },
+  "svg-to-jpg": {
+    "seo": {
+      "title": "Convert SVG to JPG Online (Free)",
+      "h1": "SVG to JPG Converter",
+      "description": "Convert SVG to JPG in your browser: the vector image becomes a JPG written at quality 0.85. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert SVG to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn an SVG image into a JPG photo-style file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an SVG to JPG?",
+        "answer": "Choose one or more SVG files above. Your browser draws each one and saves a JPG, and every result downloads as its own file. Your original SVG isn't changed."
+      },
+      {
+        "question": "What happens to transparent areas?",
+        "answer": "A JPG can't hold transparency, so transparent parts of the SVG can't stay see-through. The page has no setting for what replaces them, so check the JPG if the background matters."
+      },
+      {
+        "question": "What quality is the JPG?",
+        "answer": "The JPG is written at quality 0.85, and the page has no setting to change it. JPG is lossy, so it is not an exact copy of the drawing."
+      },
+      {
+        "question": "Can I still scale the JPG up cleanly?",
+        "answer": "No. SVG describes shapes that scale to any size, but a JPG is a fixed grid of pixels. Enlarging the JPG later can't bring back the sharpness of the SVG."
+      },
+      {
+        "question": "What if the SVG won't convert?",
+        "answer": "If the file can't be read, the page shows \"Image decode failed.\" If your browser can't open the format, it suggests a current Chrome, Edge, Firefox or Safari."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and JPG",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Supports animation and scripting",
+          "Styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group, designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SVG to JPG",
+      "points": [
+        "The JPG is written at quality 0.85.",
+        "JPG has no transparency, so transparent areas of the SVG can't stay transparent.",
+        "A JPG has a fixed pixel size; the SVG's ability to scale to any size is lost.",
+        "Several SVG files run one after another, and each downloads as its own JPG.",
+        "The conversion runs in your browser, so the SVG isn't uploaded."
+      ]
+    }
+  },
+  "mp4-to-webm": {
+    "seo": {
+      "title": "Convert MP4 to WebM Online (Free)",
+      "h1": "MP4 to WebM Converter",
+      "description": "Convert MP4 to WebM in your browser: the video is re-encoded as VP8 with Vorbis audio. Free, with no sign-up, and the video isn't uploaded.",
+      "howToHeading": "How to convert MP4 to WebM"
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 video as a WebM with VP8 video, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MP4 to WebM?",
+        "answer": "Add your MP4 videos above. The page re-encodes them one after another and gives you a separate WebM for each. A long video takes as long as your device needs."
+      },
+      {
+        "question": "What codecs does the WebM use?",
+        "answer": "VP8 video at CRF 40, with Vorbis audio at 64 kbps. The page has no quality setting, so every MP4 is encoded the same way."
+      },
+      {
+        "question": "Is the video resized?",
+        "answer": "Only if it is large. A picture over 1920 px on its longer side is scaled down to fit, and the frame rate is capped at 30 fps. Smaller or slower videos keep their own size and rate."
+      },
+      {
+        "question": "Is an interlaced video cleaned up?",
+        "answer": "The conversion runs FFmpeg's yadif deinterlacing filter on interlaced frames, and it keeps the width and height divisible by 2."
+      },
+      {
+        "question": "Why is the conversion slower than a simple container change?",
+        "answer": "An MP4 to WebM conversion re-encodes the video and audio. Some container changes, such as MP4 to MKV, copy the streams without re-encoding, but this one does not."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and WebM",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "Royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "Supported by major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to WebM",
+      "points": [
+        "The video is re-encoded as VP8 and the audio as Vorbis at 64 kbps.",
+        "Video over 1920 px on its longer side is scaled down, and the frame rate is capped at 30 fps.",
+        "This is a full re-encode, not a stream copy, so it takes longer than a container change.",
+        "Several MP4 files run one after another, and each downloads as its own WebM.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  }
+}

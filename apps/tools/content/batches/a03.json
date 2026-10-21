@@ -1,0 +1,511 @@
+{
+  "video-to-gif": {
+    "seo": {
+      "title": "Convert Video to GIF Online (Free)",
+      "h1": "Video to GIF Converter",
+      "description": "Convert video to GIF in your browser: a looping GIF at 15 frames a second, up to 480 px wide or tall. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert video to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn a video into a looping GIF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a video to a GIF?",
+        "answer": "Choose the video in the converter above. FFmpeg builds a color palette from it, then writes the GIF, and you download the result when it finishes."
+      },
+      {
+        "question": "How big and how smooth is the GIF?",
+        "answer": "The GIF plays at 15 frames a second. Its longer side is at most 480 px, so a larger video is scaled down, keeping its proportions. A smaller video isn't scaled up."
+      },
+      {
+        "question": "Does the GIF loop?",
+        "answer": "Yes. It is written to repeat forever, so it starts again as soon as it reaches the end."
+      },
+      {
+        "question": "Why do the colors in the GIF look different from the video?",
+        "answer": "A GIF holds at most 256 colors per frame. The converter first generates a palette from your video to pick those colors, but a video with many shades can still look flatter."
+      },
+      {
+        "question": "Can I convert several videos at once?",
+        "answer": "Yes. Pick as many videos as you like. The converter makes one GIF for each, one after another, and each downloads on its own."
+      }
+    ],
+    "aboutSection": {
+      "title": "Video and GIF",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Online video and streaming",
+          "Phone and camera recordings",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses a palette of at most 256 colors per frame and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Simple looping animation",
+          "1-bit transparency",
+          "Opens in any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting video to GIF",
+      "points": [
+        "The GIF runs at 15 frames a second, whatever the video's frame rate.",
+        "The longer side is capped at 480 px; smaller videos keep their size.",
+        "A GIF has at most 256 colors per frame, so the colors are reduced.",
+        "The GIF loops forever.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "m4a-to-mp3": {
+    "seo": {
+      "title": "Convert M4A to MP3 Online (Free)",
+      "h1": "M4A to MP3 Converter",
+      "description": "Convert M4A to MP3 in your browser: the audio is re-encoded as a 192 kbps MP3 with LAME. Free, with no sign-up, and the file isn't uploaded.",
+      "howToHeading": "How to convert M4A to MP3"
+    },
+    "tool": {
+      "subtitle": "Turn an M4A audio file into a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an M4A to an MP3?",
+        "answer": "Choose the M4A in the converter above. FFmpeg re-encodes the sound as an MP3, and you download the file when it finishes."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps, encoded with the LAME encoder. The page has no bitrate setting, so every M4A is written at that rate."
+      },
+      {
+        "question": "Will the MP3 sound better than the M4A?",
+        "answer": "No. MP3 is lossy, and converting can't restore detail the M4A already lacks. If the M4A holds lossless ALAC audio, the MP3 is a lossy copy of it."
+      },
+      {
+        "question": "Can I convert a protected M4P file?",
+        "answer": "No. A FairPlay-protected M4P file is refused with its own message. Only unprotected audio can be converted."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4A and MP3",
+      "fromFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container. It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "Music from iTunes and Apple Music",
+          "Podcasts and iPhone voice memos",
+          "AAC or ALAC audio",
+          "Metadata tags and cover art"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG that became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4A to MP3",
+      "points": [
+        "The MP3 is encoded at 192 kbps.",
+        "MP3 is lossy, so an M4A with lossless ALAC audio loses detail.",
+        "A protected M4P file is refused.",
+        "Each M4A gives its own MP3.",
+        "FFmpeg runs in your browser, so the file isn't uploaded."
+      ]
+    }
+  },
+  "avif-to-png": {
+    "seo": {
+      "title": "Convert AVIF to PNG Online (Free)",
+      "h1": "AVIF to PNG Converter",
+      "description": "Convert AVIF images to PNG in your browser, with transparency kept. Free, with no sign-up, and the image never leaves your device.",
+      "howToHeading": "How to convert AVIF to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn AVIF images into PNG files in your browser, transparency included."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVIF to PNG?",
+        "answer": "Choose the AVIF in the converter above. Your browser decodes it and writes a PNG, and you download the result when it finishes."
+      },
+      {
+        "question": "Does the PNG keep the AVIF's transparency?",
+        "answer": "Yes. Transparent areas of the AVIF stay transparent in the PNG."
+      },
+      {
+        "question": "Will the PNG be larger than the AVIF?",
+        "answer": "Often. PNG is lossless and has no quality setting, so it stores the decoded pixels in full. Converting can't bring back detail a lossy AVIF already lost."
+      },
+      {
+        "question": "Is the AVIF's metadata copied to the PNG?",
+        "answer": "No. The image passes through raw pixels, so EXIF data, color profiles and XMP are left out of the PNG."
+      },
+      {
+        "question": "What if my browser can't open the AVIF?",
+        "answer": "The converter uses your browser's own image decoder. If it can't read the file, you see a message asking you to try a current Chrome, Edge, Firefox or Safari."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and PNG",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images. It supports lossy and lossless compression, HDR and transparency.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "HDR and wide color gamut",
+          "10-bit and 12-bit depth"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless image format, standardized as ISO/IEC 15948 and a W3C Recommendation, that every browser opens.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Common for screenshots, logos and graphics",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVIF to PNG",
+      "points": [
+        "Transparency is kept: the PNG has the same transparent areas as the AVIF.",
+        "An animated AVIF gives a PNG of its first frame only.",
+        "EXIF, color profile and XMP data are not copied to the PNG.",
+        "The PNG is lossless, but it can't restore detail a lossy AVIF lost.",
+        "Your browser does the conversion, so the image isn't uploaded."
+      ]
+    }
+  },
+  "png-to-svg": {
+    "seo": {
+      "title": "Convert PNG to SVG Online (Free)",
+      "h1": "PNG to SVG Converter",
+      "description": "Convert PNG to SVG in your browser and download the result as an SVG file. Free, with no sign-up, and the PNG is not uploaded anywhere.",
+      "howToHeading": "How to convert PNG to SVG"
+    },
+    "tool": {
+      "subtitle": "Convert a PNG image to an SVG file in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Where can I convert a PNG to an SVG?",
+        "answer": "Right here. Choose the PNG in the converter above and download the SVG when it finishes. Nothing is uploaded, because your browser does the work."
+      },
+      {
+        "question": "How do I convert a PNG to an SVG?",
+        "answer": "Choose the PNG in the converter above. The result is checked to be an SVG before you can download it, and a wrong result fails with the message that the converter produced another format."
+      },
+      {
+        "question": "What is the difference between a PNG and an SVG?",
+        "answer": "A PNG is a raster image made of pixels. An SVG describes shapes, paths and text as XML, so it can be styled with CSS and scaled to any size."
+      },
+      {
+        "question": "What happens if the PNG can't be read?",
+        "answer": "You see the message \"Image decode failed.\" The converter opens the PNG with your browser's own image decoder first."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and SVG",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format, standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Screenshots and interface graphics",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Styleable with CSS",
+          "Logos, icons and diagrams"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to SVG",
+      "points": [
+        "A PNG is made of pixels; an SVG describes shapes, paths and text.",
+        "The result is checked to be an SVG before you can download it.",
+        "Each PNG gives its own SVG file.",
+        "Your original PNG is not changed; you download a new copy.",
+        "Your browser does the conversion, so the image isn't uploaded."
+      ]
+    }
+  },
+  "mkv-to-mp4": {
+    "seo": {
+      "title": "Convert MKV to MP4 Online (Free)",
+      "h1": "MKV to MP4 Converter",
+      "description": "Convert MKV to MP4 in your browser: the streams are copied into an MP4 without re-encoding. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert MKV to MP4"
+    },
+    "tool": {
+      "subtitle": "Move an MKV video into an MP4 file without re-encoding, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MKV to an MP4?",
+        "answer": "Choose the MKV in the converter above. FFmpeg copies its streams into an MP4 file, and you download the result when it finishes."
+      },
+      {
+        "question": "Will I lose quality?",
+        "answer": "Not from the conversion. The video and audio streams are copied as they are, not re-encoded, so the picture and sound are the ones in your MKV."
+      },
+      {
+        "question": "Why is it faster than other video conversions?",
+        "answer": "Copying streams is lighter than encoding them again. A long file still takes as long as your device needs, because the page sets no limit or timeout of its own."
+      },
+      {
+        "question": "What if the conversion fails?",
+        "answer": "You see an FFmpeg error with an exit code. Check that the MKV plays on your device first. The page can't promise that every MKV, which can hold almost any codec, fits into an MP4."
+      }
+    ],
+    "aboutSection": {
+      "title": "MKV and MP4",
+      "fromFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open container format that can hold unlimited video, audio, picture and subtitle tracks in one file.",
+        "details": [
+          "Open standard",
+          "Multiple audio and subtitle tracks",
+          "Chapters and metadata",
+          "Supports almost any codec"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata.",
+        "details": [
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MKV to MP4",
+      "points": [
+        "The streams are copied into the MP4, not re-encoded.",
+        "No quality setting applies, because nothing is compressed again.",
+        "MKV supports almost any codec, so some files may fail to fit an MP4.",
+        "Each MKV gives its own MP4.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "wav-to-mp3": {
+    "seo": {
+      "title": "Convert WAV to MP3 Online (Free)",
+      "h1": "WAV to MP3 Converter",
+      "description": "Convert WAV to MP3 in your browser: the audio is re-encoded as a 192 kbps MP3 with LAME. Free, with no sign-up, and the file isn't uploaded.",
+      "howToHeading": "How to convert WAV to MP3"
+    },
+    "tool": {
+      "subtitle": "Turn a WAV recording into a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a WAV to an MP3?",
+        "answer": "Add your WAV above, let FFmpeg finish, then save the MP3 it makes."
+      },
+      {
+        "question": "Can I choose a higher bitrate for the MP3?",
+        "answer": "No. The page passes no quality setting, so the MP3 is always 192 kbps. For full detail, keep the WAV."
+      },
+      {
+        "question": "Does the MP3 lose quality compared with the WAV?",
+        "answer": "Yes, some. A WAV usually holds uncompressed audio, while MP3 is lossy. Keep the WAV if you may edit the recording later, because the MP3 can't give the detail back."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and MP3",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM, based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "Usually uncompressed PCM",
+          "Lossless",
+          "Audio recording and editing",
+          "4 GB file size limit"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG that became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Music libraries and podcasts",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WAV to MP3",
+      "points": [
+        "The MP3 is encoded at 192 kbps.",
+        "WAV is usually lossless and MP3 is lossy, so detail is lost.",
+        "Keep your WAV if you want to edit the recording later.",
+        "Each WAV gives its own MP3.",
+        "FFmpeg runs in your browser, so the file isn't uploaded."
+      ]
+    }
+  },
+  "png-to-ico": {
+    "seo": {
+      "title": "Convert PNG to ICO Online (Free)",
+      "h1": "PNG to ICO Converter",
+      "description": "Convert PNG to ICO in your browser and download an icon file for Windows or a favicon. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert PNG to ICO"
+    },
+    "tool": {
+      "subtitle": "Turn a PNG image into an ICO icon file in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to an ICO?",
+        "answer": "Choose the PNG in the converter above. ImageMagick writes the ICO in your browser, and you download the file when it finishes."
+      },
+      {
+        "question": "What is an ICO file used for?",
+        "answer": "ICO is the Windows icon format, and browsers also use it for favicons. One ICO file can hold several image sizes."
+      },
+      {
+        "question": "What happens to an animated PNG?",
+        "answer": "The ICO is made from its first frame only. The other frames are left out."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and ICO",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format, standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Logos and images with transparency",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and colour depths. Browsers also use it for favicons.",
+        "details": [
+          "Multiple sizes in one file",
+          "Alpha transparency",
+          "Windows application icons",
+          "Website favicons"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to ICO",
+      "points": [
+        "ICO is the Windows icon format, and browsers also use it for favicons.",
+        "An animated PNG gives an icon from its first frame only.",
+        "EXIF, color profile and XMP data are not copied to the ICO.",
+        "Each PNG gives its own ICO file.",
+        "Your browser does the conversion, so the image isn't uploaded."
+      ]
+    }
+  },
+  "png-to-webp": {
+    "seo": {
+      "title": "Convert PNG to WebP Online (Free)",
+      "h1": "PNG to WebP Converter",
+      "description": "Convert PNG to WebP in your browser, with transparency kept and the WebP written at quality 0.85. Free, with no sign-up, and no upload.",
+      "howToHeading": "How to convert PNG to WebP"
+    },
+    "tool": {
+      "subtitle": "Turn PNG images into WebP files in your browser, transparency included."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to a WebP?",
+        "answer": "Add your PNG above and wait a moment. Your browser writes the WebP, and you save it from the page."
+      },
+      {
+        "question": "Does transparency survive the trip to WebP?",
+        "answer": "Yes. Clear and semi-clear areas of your PNG remain see-through in the WebP."
+      },
+      {
+        "question": "Is the WebP an exact copy of the PNG?",
+        "answer": "Not necessarily. The WebP is written at quality 0.85, and the page has no quality setting. A PNG is lossless, so the WebP can lose some fine detail."
+      },
+      {
+        "question": "What happens to an animated PNG?",
+        "answer": "The WebP is made from its first frame, so it is a still image."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and WebP",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format, standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Screenshots and interface graphics",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010. It supports lossy and lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to WebP",
+      "points": [
+        "Transparency is kept: the WebP has the same transparent areas as the PNG.",
+        "The WebP is written at quality 0.85, so it is not an exact copy.",
+        "An animated PNG gives a still WebP of its first frame.",
+        "EXIF, color profile and XMP data are not copied to the WebP.",
+        "Your browser does the conversion, so the image isn't uploaded."
+      ]
+    }
+  }
+}
