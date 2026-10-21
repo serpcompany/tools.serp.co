@@ -3,7 +3,7 @@
     "seo": {
       "title": "Convert HEIC to PDF Online (Free)",
       "h1": "HEIC to PDF Converter",
-      "description": "Convert HEIC to PDF in your browser: iPhone photos are decoded here, so the HEIC isn't uploaded. Free, with no sign-up and no software to install.",
+      "description": "Convert HEIC to PDF in your browser: each iPhone photo becomes a one-page PDF. It is decoded here, so the HEIC isn't uploaded. Free, no sign-up.",
       "howToHeading": "How to convert HEIC to PDF"
     },
     "tool": {
@@ -11,16 +11,24 @@
     },
     "faqs": [
       {
+        "question": "What size is the page in the HEIC's PDF?",
+        "answer": "The page matches the photo: 1 pixel is 1 point, with no margin and no A4 or Letter page. A HEIC gives one page."
+      },
+      {
+        "question": "Can I merge several HEIC photos into one PDF?",
+        "answer": "No. Each HEIC you choose becomes its own PDF, one after another, and several files are never merged into one. There is no ZIP either."
+      },
+      {
+        "question": "Is the photo recompressed inside the PDF?",
+        "answer": "No. The picture is embedded losslessly as a PNG, and the quality setting doesn't apply. The photo is decoded to 8-bit RGB pixels first."
+      },
+      {
         "question": "What if my HEIC holds more than one image?",
-        "answer": "Only the primary image is decoded, so a HEIC that holds several images gives you one. The other images in the file are not converted."
+        "answer": "Only the primary image is decoded, so a HEIC that holds several images gives you one PDF page. The other images in the file are not converted."
       },
       {
-        "question": "What does the decoder do to my HEIC before the PDF?",
-        "answer": "libheif turns the photo into 8-bit RGB pixels first. That step is why EXIF data and ICC profiles never reach the PDF."
-      },
-      {
-        "question": "Can I convert several HEIC photos at once?",
-        "answer": "Yes. Choose as many files as you like. They are converted one after another, and each one downloads as its own PDF. There is no ZIP."
+        "question": "Are EXIF data and ICC profiles kept in the PDF?",
+        "answer": "No. The decoder turns the photo into 8-bit RGB pixels, so EXIF data and ICC profiles never reach the PDF."
       },
       {
         "question": "Why does a file fail with No images in HEIF?",
@@ -55,10 +63,10 @@
     "pairNotes": {
       "title": "What to know before converting HEIC to PDF",
       "points": [
-        "Only the primary image of a HEIC is decoded.",
-        "EXIF data and ICC profiles aren't carried over.",
-        "Each HEIC you choose downloads as its own PDF.",
-        "Your original HEIC isn't changed: you download a new copy.",
+        "The PDF has one page the size of the image, with no margin and no A4 or Letter page.",
+        "Each HEIC you choose becomes its own PDF; several files are never merged.",
+        "The photo is embedded losslessly as a PNG.",
+        "Only the primary image of a HEIC is decoded, and EXIF data and ICC profiles aren't carried over.",
         "libheif decodes the photo in your browser, so it isn't uploaded."
       ]
     }
@@ -96,10 +104,13 @@
       "fromFormat": {
         "name": "JPEG",
         "fullName": "JPEG image",
-        "description": "A common image format for photographs. This converter decodes it with your browser's own image decoder.",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format. This converter decodes it with your browser's own image decoder.",
         "details": [
-          "Opens in any web browser",
-          "Decoded by your browser"
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere",
+          "Opens in Preview on macOS, Windows Photos and GIMP"
         ]
       },
       "toFormat": {
@@ -300,10 +311,12 @@
       "toFormat": {
         "name": "JPEG",
         "fullName": "JPEG image",
-        "description": "A common image format for photographs. This converter writes it with your browser's canvas encoder at quality 0.85.",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format. This converter writes it with your browser's canvas encoder at quality 0.85.",
         "details": [
-          "Lossy output at quality 0.85",
-          "Opens in any web browser"
+          "Lossy compression",
+          "No alpha transparency",
+          "Written at quality 0.85 here",
+          "Opens in any web browser, Preview on macOS, Windows Photos and GIMP"
         ]
       }
     },
@@ -362,10 +375,12 @@
       "toFormat": {
         "name": "JPEG",
         "fullName": "JPEG image",
-        "description": "A common image format for photographs. This converter writes it at quality 0.85.",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format. This converter writes it at quality 0.85.",
         "details": [
-          "Lossy output at quality 0.85",
-          "Opens in any web browser"
+          "Lossy compression",
+          "No alpha transparency",
+          "Written at quality 0.85 here",
+          "Opens in any web browser, Preview on macOS, Windows Photos and GIMP"
         ]
       }
     },
@@ -424,10 +439,12 @@
       "toFormat": {
         "name": "JPEG",
         "fullName": "JPEG image",
-        "description": "A common image format for photographs. This converter writes it with your browser's canvas encoder at quality 0.85.",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format. This converter writes it with your browser's canvas encoder at quality 0.85.",
         "details": [
-          "Lossy output at quality 0.85",
-          "Opens in any web browser"
+          "Lossy compression",
+          "No alpha transparency",
+          "Written at quality 0.85 here",
+          "Opens in any web browser, Preview on macOS, Windows Photos and GIMP"
         ]
       }
     },
@@ -446,7 +463,7 @@
     "seo": {
       "title": "Convert MP3 to MP4 Online (Free)",
       "h1": "MP3 to MP4 Converter",
-      "description": "Convert MP3 to MP4 in your browser: FFmpeg writes H.264 video with AAC audio at 96 kbps. Free, with no sign-up, and the MP3 isn't uploaded.",
+      "description": "Convert MP3 to MP4 in your browser: FFmpeg writes the audio into an MP4 as AAC at 96 kbps and adds no picture. Free, no sign-up, and no upload.",
       "howToHeading": "How to convert MP3 to MP4"
     },
     "tool": {
@@ -458,8 +475,8 @@
         "answer": "AAC at 96 kbps. FFmpeg re-encodes the MP3's sound to that bitrate, so the audio is at best as good as the MP3 it came from."
       },
       {
-        "question": "Which codecs does the MP4 use?",
-        "answer": "H.264 for video (libx264) and AAC for audio, with the index moved to the front of the file so it can start playing sooner."
+        "question": "Is there a picture or video in the MP4?",
+        "answer": "The conversion adds no picture of its own: an MP3 without cover art becomes an MP4 with audio only, as AAC at 96 kbps, which plays as audio, not as a video. What happens to cover art already inside the MP3 isn't promised."
       },
       {
         "question": "Do several MP3 files become one MP4?",
@@ -499,7 +516,7 @@
       "title": "What to know before converting MP3 to MP4",
       "points": [
         "The audio is re-encoded as AAC at 96 kbps.",
-        "The video is written with H.264 (libx264).",
+        "The conversion adds no picture or video: the MP4 carries the MP3's audio.",
         "Each MP3 you choose downloads as its own MP4.",
         "FFmpeg runs in your browser, so the MP3 isn't uploaded.",
         "Your original MP3 isn't changed: you download a new copy."

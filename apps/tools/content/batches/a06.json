@@ -70,7 +70,7 @@
     "seo": {
       "title": "Convert JFIF to PDF Online (Free)",
       "h1": "JFIF to PDF Converter",
-      "description": "Convert JFIF to PDF in your browser, with no upload. Each JFIF image becomes its own PDF file. Free, with no sign-up and nothing to install.",
+      "description": "Convert JFIF to PDF in your browser, with no upload. Each JFIF becomes its own one-page PDF the size of the image. Free, with no sign-up.",
       "howToHeading": "How to convert JFIF to PDF"
     },
     "tool": {
@@ -84,6 +84,14 @@
       {
         "question": "Can I combine several JFIF files into one PDF?",
         "answer": "No. You can choose several files at once, but they are converted one after another and each gives its own PDF. There is no ZIP and no merged document."
+      },
+      {
+        "question": "What page size does the JFIF PDF have?",
+        "answer": "One page, as big as the picture: each pixel of the JFIF becomes 1 point. The page has no margin and isn't A4 or Letter."
+      },
+      {
+        "question": "Is the image recompressed inside the PDF?",
+        "answer": "No JPEG quality setting applies. The picture is embedded losslessly as a PNG made from the decoded pixels, so the PDF doesn't add a new round of JPEG loss."
       },
       {
         "question": "Does the PDF keep the JFIF's metadata?",
@@ -121,8 +129,9 @@
     "pairNotes": {
       "title": "What to know before converting JFIF to PDF",
       "points": [
-        "Each JFIF file gives its own PDF; files are not merged.",
-        "A JFIF has no transparency, so there is none to lose.",
+        "Each JFIF file gives its own PDF with one page the size of the image; files are not merged.",
+        "The page has no margin and isn't A4 or Letter.",
+        "The picture is embedded losslessly as a PNG.",
         "EXIF, ICC profile and XMP data are dropped.",
         "Your browser decodes the image, so the file isn't uploaded."
       ]
@@ -215,12 +224,20 @@
         "answer": "No. The converter reads one image from the file, so a multi-page TIFF gives one picture, not a PDF page for each. The page can't say which TIFF page it keeps."
       },
       {
+        "question": "Is the TIFF's PDF page A4 or Letter?",
+        "answer": "Neither. The PDF has a single page cut to the picture's size, at 1 pixel to 1 point, with no margin."
+      },
+      {
+        "question": "Is the TIFF recompressed inside the PDF?",
+        "answer": "ImageMagick writes the picture as a PNG, and that PNG is embedded in the PDF losslessly. No quality setting applies, and transparent pixels stay transparent."
+      },
+      {
         "question": "Can I change several TIFF files to PDF at once?",
         "answer": "You can choose several files. They are converted one after another and each downloads as its own PDF, with no ZIP and no merging."
       },
       {
         "question": "Why does a very large TIFF fail?",
-        "answer": "A picture over about 537 megapixels fails with a \"too large to convert here\" message. Smaller pictures can still run out of memory on a phone."
+        "answer": "A picture over about 537 megapixels fails with a \"too large to convert here\" message."
       }
     ],
     "aboutSection": {
@@ -251,7 +268,8 @@
     "pairNotes": {
       "title": "What to know before converting TIFF to PDF",
       "points": [
-        "Only one image is read: a multi-page TIFF gives one picture.",
+        "Only one image is read: a multi-page TIFF gives one picture, on one PDF page.",
+        "The PDF page is the size of the image, with no margin and no A4 or Letter page.",
         "Each TIFF file gives its own PDF; files are not merged.",
         "A picture over about 537 megapixels can't be converted.",
         "ImageMagick runs in your browser, so the TIFF isn't uploaded."
@@ -357,12 +375,13 @@
       "fromFormat": {
         "name": "MPEG",
         "fullName": "MPEG video",
-        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video, and is also seen in older video downloads and broadcast capture.",
         "details": [
           "MPEG-1 or MPEG-2 video",
           "MPEG program stream",
           "Lossy compression",
-          "Legacy format"
+          "Legacy format",
+          "Opens in VLC, Windows Media Player and QuickTime Player"
         ]
       },
       "toFormat": {
@@ -404,11 +423,11 @@
       },
       {
         "question": "Can you convert AVI to MP4 without re-encoding?",
-        "answer": "Not here. AVI to MP4 isn't one of the changes that copy the streams, so the video and audio are re-encoded. Re-encoding is lossy, so quality can drop."
+        "answer": "Not here. The video is re-encoded as H.264 and the audio as AAC. Re-encoding is lossy, so quality can drop."
       },
       {
         "question": "Will the MP4 keep my video's size and frame rate?",
-        "answer": "Up to a limit. The size stays unless a side is over 1920 px, when it is scaled down, and the frame rate is capped at 30 fps. Smaller videos keep their size."
+        "answer": "Up to a limit. The size stays unless the longer side is over 1920 px, when it is scaled down, and the frame rate is capped at 30 fps. Smaller videos keep their size and frame rate."
       },
       {
         "question": "What happens to interlaced AVI video?",
@@ -449,7 +468,7 @@
       "points": [
         "The video is re-encoded as H.264, and the audio as AAC at 96 kbps.",
         "Re-encoding is lossy, so the MP4 is at best as good as the AVI.",
-        "Videos over 1920 px on a side are scaled down, and the frame rate is capped at 30 fps.",
+        "Frames are scaled down when the longer side passes 1920 px, and the frame rate is capped at 30 fps.",
         "Interlaced video is deinterlaced.",
         "Converting several AVI files gives one MP4 for each, with no ZIP."
       ]
@@ -476,7 +495,7 @@
       },
       {
         "question": "Why is the conversion so quick?",
-        "answer": "Nothing is re-encoded. Copying the streams into a new container takes far less work than encoding video, though a long file still takes as long as your device needs."
+        "answer": "Nothing is re-encoded: the streams are copied into the new container. A long file still takes as long as your device needs."
       },
       {
         "question": "Does the MOV keep the MP4's size and frame rate?",

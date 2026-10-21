@@ -1,0 +1,514 @@
+{
+  "tif-to-jpg": {
+    "seo": {
+      "title": "Convert TIF to JPG Online (Free)",
+      "h1": "TIF to JPG Converter",
+      "description": "Convert a TIF scan or photo to a JPG in your browser. A multi-page TIF gives one picture. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to change TIF to JPG"
+    },
+    "tool": {
+      "subtitle": "Change a TIF image into a JPG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I change a TIF to a JPG?",
+        "answer": "Choose the TIF in the converter above and wait for it to finish. The JPG then downloads as a new file, and your original TIF stays as it was."
+      },
+      {
+        "question": "What happens to a TIF with several pages?",
+        "answer": "The converter reads one image, so you get a single JPG, not one for each page. The code doesn't settle which page that is, so check the result."
+      },
+      {
+        "question": "Can I convert many TIF files at once?",
+        "answer": "Yes. Select several files and they run one after another. Each one downloads as its own JPG, and there is no ZIP."
+      },
+      {
+        "question": "Will the JPG lose detail?",
+        "answer": "JPG is a lossy format, so some detail is traded for a smaller file. TIF can be lossless, which makes the JPG a one-way copy: keep your TIF as the master."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIF and JPG",
+      "fromFormat": {
+        "name": "TIF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Multiple pages in one file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIF to JPG",
+      "points": [
+        "A TIF can hold several pages, but the JPG is one picture.",
+        "JPG is lossy, so the TIF stays your lossless master.",
+        "JPG has no alpha transparency.",
+        "Each TIF becomes its own JPG. Nothing is zipped.",
+        "ImageMagick runs in your browser, so the TIF isn't uploaded."
+      ]
+    }
+  },
+  "tiff-to-jpg": {
+    "seo": {
+      "title": "Convert TIFF to JPG Online (Free)",
+      "h1": "TIFF to JPG Converter",
+      "description": "Convert TIFF files to JPG in your browser, one or many at a time. A multi-page TIFF gives a single picture. Free, no sign-up, no upload.",
+      "howToHeading": "How to convert TIFF to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a TIFF file into a JPG in your browser, one file or a whole batch."
+    },
+    "faqs": [
+      {
+        "question": "Can you convert a TIFF to a JPG?",
+        "answer": "Yes. Pick the TIFF above and the converter makes a JPG from it. You download the JPG as a new file, and the TIFF itself isn't changed."
+      },
+      {
+        "question": "How do I convert TIFF to JPG without losing quality?",
+        "answer": "You can't fully avoid it. JPG compresses with loss, while TIFF can store lossless data. The tool sets no quality value of its own, so keep the TIFF if you need every detail."
+      },
+      {
+        "question": "How do I convert a batch of TIFF files?",
+        "answer": "Select all the files in one go. They are converted one at a time and each JPG downloads separately. No archive is made."
+      },
+      {
+        "question": "What if my TIFF is very large?",
+        "answer": "There is no file-size cap here. A picture of more than about 537 megapixels fails with a message that it is too large to convert in the browser."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIFF and JPG",
+      "fromFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Multiple pages in one file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIFF to JPG",
+      "points": [
+        "A multi-page TIFF gives one JPG, not one per page.",
+        "JPG is lossy and the TIFF can be lossless.",
+        "Pictures above about 537 megapixels fail.",
+        "Several TIFF files give several JPG files, downloaded one by one.",
+        "The conversion runs in your browser, so the TIFF stays on your device."
+      ]
+    }
+  },
+  "dds-to-png": {
+    "seo": {
+      "title": "Convert DDS to PNG Online (Free)",
+      "h1": "DDS to PNG Converter",
+      "description": "Convert DDS game textures to PNG in your browser with ImageMagick. Several files at once, each saved as its own PNG. Free, no sign-up.",
+      "howToHeading": "How to convert DDS to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn a DDS texture into a lossless PNG you can open anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I open a DDS texture as a PNG?",
+        "answer": "Choose the DDS file in the converter above. When it finishes, download the PNG, which any web browser can show. Your DDS file isn't changed."
+      },
+      {
+        "question": "Does the PNG keep the mipmaps and cubemap faces?",
+        "answer": "No. The converter reads one image and gives one PNG. A DDS can hold mipmaps or cubemaps, and the code doesn't settle which image is picked."
+      },
+      {
+        "question": "Can I convert a folder of DDS textures?",
+        "answer": "You can select many DDS files at once. They run one after another and each downloads as its own PNG, with no ZIP."
+      },
+      {
+        "question": "Is anything lost going from DDS to PNG?",
+        "answer": "PNG is lossless, so it holds the decoded pixels exactly. Any loss from the DDS's GPU block compression is already in the texture and doesn't come back."
+      }
+    ],
+    "aboutSection": {
+      "title": "DDS and PNG",
+      "fromFormat": {
+        "name": "DDS",
+        "fullName": "DirectDraw Surface",
+        "description": "A Microsoft container format for textures and cubemaps, originally from DirectX. It commonly stores GPU-compressed data in the DXT/BC block formats, with optional mipmaps.",
+        "details": [
+          "GPU block compression (DXT/BC)",
+          "Mipmaps",
+          "Cubemaps",
+          "Alpha channel"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DDS to PNG",
+      "points": [
+        "DDS often holds GPU-compressed data, and the PNG stores the decoded pixels.",
+        "Mipmaps and cubemaps in the DDS aren't split out: you get one PNG.",
+        "PNG is lossless and opens in any web browser.",
+        "Pictures above about 537 megapixels fail.",
+        "ImageMagick runs in your browser, so the DDS isn't uploaded."
+      ]
+    }
+  },
+  "mpeg-to-mp4": {
+    "seo": {
+      "title": "Convert MPEG to MP4 Online (Free)",
+      "h1": "MPEG to MP4 Converter",
+      "description": "Convert MPEG video to MP4 in your browser: H.264 video, AAC audio, capped at 1920 px and 30 fps. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert MPEG to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn an MPEG video into an MP4 that plays almost anywhere, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MPEG to an MP4?",
+        "answer": "Choose the MPEG file above. FFmpeg re-encodes it as H.264 video with AAC audio and you download the MP4 when it ends. The MPEG file stays as it was."
+      },
+      {
+        "question": "Can I convert a large MPEG file?",
+        "answer": "There is no size limit of its own, and no timeout. FFmpeg runs on your device, so a long file takes as long as your computer needs."
+      },
+      {
+        "question": "Will the MP4 be smaller or lower quality than the MPEG?",
+        "answer": "The video is re-encoded with lossy settings that favor speed, so it isn't a copy of the original. Frame size and rate are kept, up to 1920 px on the longer side and 30 fps."
+      },
+      {
+        "question": "What happens to interlaced MPEG video?",
+        "answer": "The command deinterlaces frames flagged as interlaced. This helps with old DVD or broadcast captures. The audio is encoded as AAC at 96 kbps."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPEG and MP4",
+      "fromFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "Lossy compression",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MPEG to MP4",
+      "points": [
+        "The MPEG is re-encoded, not just rewrapped, into H.264 video and 96 kbps AAC audio.",
+        "Video larger than 1920 px or faster than 30 fps is scaled or limited to that.",
+        "Frames flagged as interlaced are deinterlaced.",
+        "Several files give several MP4s, downloaded one by one.",
+        "FFmpeg runs in your browser, so the MPEG isn't uploaded."
+      ]
+    }
+  },
+  "png-to-dds": {
+    "seo": {
+      "title": "Convert PNG to DDS Online (Free)",
+      "h1": "PNG to DDS Converter",
+      "description": "Convert a PNG image to a DDS file in your browser. Metadata is dropped and the file isn't uploaded. Free, with no sign-up to use.",
+      "howToHeading": "How to convert PNG to DDS"
+    },
+    "tool": {
+      "subtitle": "Turn a PNG image into a DDS texture file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to a DDS?",
+        "answer": "Choose the PNG in the converter above and download the DDS when it finishes. Your PNG isn't changed, and you can select several files at once."
+      },
+      {
+        "question": "Does the DDS have mipmaps or block compression?",
+        "answer": "The code doesn't settle that, so this page doesn't promise it. Check the DDS in your game tool or editor if you need a specific compression or mip chain."
+      },
+      {
+        "question": "Does the DDS keep the PNG's metadata?",
+        "answer": "No. The image passes through raw pixels, so EXIF, ICC profiles and XMP are dropped. Only the picture itself is in the DDS."
+      },
+      {
+        "question": "What if the PNG is animated?",
+        "answer": "Only the first frame is used. The DDS holds one still image."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and DDS",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "DDS",
+        "fullName": "DirectDraw Surface",
+        "description": "A Microsoft container format for textures and cubemaps, originally from DirectX. It commonly stores GPU-compressed data in the DXT/BC block formats, with optional mipmaps.",
+        "details": [
+          "GPU block compression (DXT/BC)",
+          "Mipmaps",
+          "Cubemaps",
+          "Alpha channel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to DDS",
+      "points": [
+        "The DDS holds the pixels only: EXIF, ICC and XMP metadata is dropped.",
+        "Only the first frame of an animated PNG is used.",
+        "Mipmaps and the DDS compression type aren't promised here.",
+        "Each PNG becomes its own DDS, downloaded one by one.",
+        "Your browser does the work, so the PNG isn't uploaded."
+      ]
+    }
+  },
+  "png-to-gif": {
+    "seo": {
+      "title": "Convert PNG to GIF Online (Free)",
+      "h1": "PNG to GIF Converter",
+      "description": "Convert a PNG to a GIF in your browser. The result is a still image, since a GIF is limited to 256 colours per frame. Free, no sign-up.",
+      "howToHeading": "How to convert PNG to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn a PNG image into a GIF in your browser, with no upload."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to a GIF?",
+        "answer": "Choose the PNG above and wait for the converter to finish. Then download the GIF. Your PNG stays unchanged, and you can pick several files at once."
+      },
+      {
+        "question": "Does the PNG become an animated GIF?",
+        "answer": "No. A PNG converted here gives one still GIF. To get a moving GIF you need several frames, and this page converts each file by itself."
+      },
+      {
+        "question": "Will the GIF look different from the PNG?",
+        "answer": "It can. A GIF has a palette of at most 256 colours per frame, while a PNG can hold far more. Gradients and photos are the images most likely to change."
+      },
+      {
+        "question": "Is my PNG's metadata kept?",
+        "answer": "No. The image goes through raw pixels, so EXIF, ICC profiles and XMP are dropped. The GIF holds the picture only."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and GIF",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colours per frame, and supports simple animation.",
+        "details": [
+          "256-colour palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to GIF",
+      "points": [
+        "A GIF has at most 256 colours per frame, so a detailed PNG can lose colours.",
+        "The GIF is a single still image, not an animation.",
+        "GIF has 1-bit transparency only.",
+        "Each PNG becomes its own GIF. Nothing is zipped.",
+        "The conversion runs in your browser, so the PNG isn't uploaded."
+      ]
+    }
+  },
+  "psd-to-png": {
+    "seo": {
+      "title": "Convert PSD to PNG Online (Free)",
+      "h1": "PSD to PNG Converter",
+      "description": "Convert a PSD to a PNG in your browser, no Photoshop needed. You get one flat picture, not layers. Free, with no sign-up or upload.",
+      "howToHeading": "How to convert PSD to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn a Photoshop PSD into a flat PNG picture, without opening Photoshop."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PSD to a PNG?",
+        "answer": "Choose the PSD in the converter above. When it finishes, download the PNG. The PSD isn't changed and you don't need Photoshop."
+      },
+      {
+        "question": "Are the layers kept?",
+        "answer": "No. A PSD can hold layers and masks, but the converter gives one picture, and a PNG has no layers. Which layer or composite is used isn't settled by the code."
+      },
+      {
+        "question": "Can I convert a PSD to a PNG with transparency?",
+        "answer": "PNG supports alpha transparency, but the code doesn't settle how the converter treats transparent areas of your PSD. Open the PNG to check."
+      },
+      {
+        "question": "Is there a limit on the PSD's size?",
+        "answer": "No file-size limit applies. A picture above about 537 megapixels fails with a too-large message, and big files take longer on slow devices."
+      }
+    ],
+    "aboutSection": {
+      "title": "PSD and PNG",
+      "fromFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and colour information so a design can be edited later.",
+        "details": [
+          "Layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes",
+          "Proprietary Adobe format"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PSD to PNG",
+      "points": [
+        "Layers, masks and text are not kept: the PSD gives one flat PNG.",
+        "PNG has no layers, so keep the PSD if you want to edit later.",
+        "Pictures above about 537 megapixels fail.",
+        "Several PSD files give several PNG files, downloaded one by one.",
+        "ImageMagick runs in your browser, so the PSD isn't uploaded."
+      ]
+    }
+  },
+  "svg-to-pdf": {
+    "seo": {
+      "title": "Convert SVG to PDF Online (Free)",
+      "h1": "SVG to PDF Converter",
+      "description": "Convert an SVG to a one-page PDF in your browser. The PDF is the image's size and holds the picture as a PNG. Free, no sign-up.",
+      "howToHeading": "How to convert SVG to PDF"
+    },
+    "tool": {
+      "subtitle": "Turn an SVG into a one-page PDF the size of the image, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an SVG to a PDF?",
+        "answer": "Choose the SVG in the converter above. Your browser draws it and the converter wraps the picture in a PDF, which you download. The SVG isn't changed."
+      },
+      {
+        "question": "Is the PDF still a vector?",
+        "answer": "No. The picture is drawn by your browser and embedded in the PDF as a PNG, losslessly. It is a raster, so it won't stay sharp at any zoom like the SVG."
+      },
+      {
+        "question": "What size is the PDF page?",
+        "answer": "One page, the same size as the image: one pixel is one point, with no margin and no A4 or Letter paper. The size is the one your browser reports for the SVG."
+      },
+      {
+        "question": "Are transparent areas filled with white?",
+        "answer": "No. Nothing paints a background, so transparent pixels stay transparent in the PDF. Several SVG files give several PDFs and are never merged."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and PDF",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Supports animation and scripting",
+          "Styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SVG to PDF",
+      "points": [
+        "The PDF has one page, as big as the image.",
+        "The SVG is drawn to pixels first, so the PDF holds a PNG, not vectors.",
+        "Transparent areas stay transparent, with no white fill.",
+        "Several SVG files give separate PDFs, never one merged file.",
+        "The SVG is drawn at the size your browser reports for it."
+      ]
+    }
+  }
+}

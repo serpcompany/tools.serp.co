@@ -1,0 +1,516 @@
+{
+  "gif-to-jpg": {
+    "seo": {
+      "title": "Convert GIF to JPG Online (Free)",
+      "h1": "GIF to JPG Converter",
+      "description": "Convert GIF to JPG in your browser: an animated GIF gives its first frame as a JPG written at quality 0.85. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert GIF to JPG"
+    },
+    "tool": {
+      "subtitle": "Save a GIF, or the first frame of an animated one, as a JPG in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What happens to an animated GIF?",
+        "answer": "Only its first frame is kept, so you get one still JPG. JPG has no animation, and the other frames are left out of the result."
+      },
+      {
+        "question": "What quality is the JPG?",
+        "answer": "The JPG is written at quality 0.85. You can't change that setting on this page. JPG is lossy, so the file is not a pixel-for-pixel copy of the GIF."
+      },
+      {
+        "question": "What happens to a GIF with transparent areas?",
+        "answer": "JPG has no alpha transparency, so the transparency can't be kept. The converter doesn't let you pick a fill, and the browser's JPEG encoder decides how those areas look."
+      },
+      {
+        "question": "Does the JPG keep the GIF's metadata?",
+        "answer": "No. The image goes through raw pixels on the way to JPG, so EXIF, ICC profile and XMP data are dropped. Only the picture itself is saved."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and JPG",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression and a palette of at most 256 colours per frame, and it supports simple animation.",
+        "details": [
+          "256-colour palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to JPG",
+      "points": [
+        "An animated GIF gives its first frame only.",
+        "The JPG has no transparency, because JPG has no alpha channel.",
+        "The JPG is written at quality 0.85, and the setting can't be changed.",
+        "EXIF, ICC profile and XMP data aren't carried over.",
+        "Choose several GIFs and each one downloads as its own JPG."
+      ]
+    }
+  },
+  "mov-to-gif": {
+    "seo": {
+      "title": "Convert MOV to GIF Online (Free)",
+      "h1": "MOV to GIF Converter",
+      "description": "Convert MOV to GIF in your browser: the video becomes a looping GIF at 15 frames a second, up to 480 px wide. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert MOV to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn a MOV video into a looping GIF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How big and how smooth is the GIF?",
+        "answer": "The GIF runs at 15 frames a second. Its longer side is at most 480 px, and a smaller video keeps its own size. The shape of the picture stays the same."
+      },
+      {
+        "question": "Does the GIF loop?",
+        "answer": "Yes. The GIF is written to repeat forever, so it plays again from the start when it reaches the end."
+      },
+      {
+        "question": "Why can the colours look different from the video?",
+        "answer": "A GIF holds at most 256 colours per frame. The converter builds a palette from your video first, then paints each frame with it, but some colour detail is still lost."
+      },
+      {
+        "question": "How long a MOV can I convert?",
+        "answer": "The page sets no length or file-size limit and no timeout. FFmpeg runs on your own device, so a long video takes as long as your device needs."
+      },
+      {
+        "question": "Is my MOV uploaded?",
+        "answer": "No. FFmpeg runs as WebAssembly inside your browser, in its own worker, and the video stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and GIF",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "Multi-track container",
+          "Many codecs, including ProRes",
+          "Timecode and metadata tracks",
+          "Apple format"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression and a palette of at most 256 colours per frame, and it supports simple animation.",
+        "details": [
+          "256-colour palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to GIF",
+      "points": [
+        "The GIF plays at 15 frames a second.",
+        "The longer side is at most 480 px; a smaller video keeps its size.",
+        "A GIF holds at most 256 colours per frame, so a palette is generated from your video.",
+        "The GIF loops forever.",
+        "FFmpeg runs in your browser, so the MOV isn't uploaded."
+      ]
+    }
+  },
+  "heif-to-jpg": {
+    "seo": {
+      "title": "Convert HEIF to JPG Online (Free)",
+      "h1": "HEIF to JPG Converter",
+      "description": "Convert HEIF to JPG in your browser: the main image is decoded and saved as a JPG at quality 0.85. Free, with no sign-up and no upload.",
+      "howToHeading": "How to change HEIF to JPG"
+    },
+    "tool": {
+      "subtitle": "Save a HEIF or HEIC photo as a JPG that opens anywhere, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does it convert HEIC files too?",
+        "answer": "Yes. The decoder reads both HEIC and HEIF. HEIC is one of the variants of HEIF, so the same page handles photos from a phone and other HEIF files."
+      },
+      {
+        "question": "What if my HEIF holds several images?",
+        "answer": "You get one JPG. Only the primary image is decoded, so the other images in the file are not saved. HEIF can store several images in one file."
+      },
+      {
+        "question": "What quality is the JPG, and what is lost?",
+        "answer": "The JPG is written at quality 0.85, from 8-bit RGB pixels. JPG is lossy. EXIF data and ICC profiles are not carried over to the new file."
+      },
+      {
+        "question": "Why does the converter say \"No images in HEIF\"?",
+        "answer": "The file was read, but it holds no image to decode. Check that you chose the right file. Your original is never changed."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIF and JPG",
+      "fromFormat": {
+        "name": "HEIF",
+        "fullName": "High Efficiency Image File Format",
+        "description": "A container format standardized by MPEG as ISO/IEC 23008-12 for single images and image sequences, most often compressed with HEVC. HEIC and AVIF files are HEIF variants.",
+        "details": [
+          "Multiple images per file",
+          "Supports alpha and depth maps",
+          "HEVC or other codecs",
+          "Smaller files than JPEG"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEIF to JPG",
+      "points": [
+        "Only the primary image is converted; a file with several images gives one JPG.",
+        "The JPG is written at quality 0.85 from 8-bit RGB pixels.",
+        "EXIF data and ICC profiles aren't carried over.",
+        "A file with no image fails with the message \"No images in HEIF\".",
+        "The HEIF is decoded in your browser, so it isn't uploaded."
+      ]
+    }
+  },
+  "jpeg-to-webp": {
+    "seo": {
+      "title": "Convert JPEG to WebP Online (Free)",
+      "h1": "JPEG to WebP Converter",
+      "description": "Convert JPEG to WebP in your browser: the image is re-encoded as a WebP at quality 0.85. Free, with no sign-up, and your file isn't uploaded.",
+      "howToHeading": "How to convert JPEG to WebP"
+    },
+    "tool": {
+      "subtitle": "Save a JPEG as a WebP image, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What quality is the WebP?",
+        "answer": "The WebP is written at quality 0.85, and you can't change it on this page. Both formats are lossy here, so the result is a new encoding rather than an exact copy."
+      },
+      {
+        "question": "Is there any difference between JPEG and JPG here?",
+        "answer": "No. .jpg and .jpeg are the same format, so a file with either extension converts the same way."
+      },
+      {
+        "question": "Does the WebP keep my photo's EXIF data?",
+        "answer": "No. The image goes through raw pixels, so EXIF, ICC profile and XMP data are dropped. The WebP holds the picture only."
+      },
+      {
+        "question": "Will the WebP open everywhere?",
+        "answer": "WebP is supported by current major browsers. Older software may not open it, so keep your JPEG if you need it for a program that does not read WebP."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and WebP",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to WebP",
+      "points": [
+        "The WebP is written at quality 0.85.",
+        "JPEG and JPG are the same format, so both extensions work.",
+        "EXIF, ICC profile and XMP data aren't carried over.",
+        "Your browser does the conversion, so the JPEG isn't uploaded."
+      ]
+    }
+  },
+  "hevc-to-mp4": {
+    "seo": {
+      "title": "Convert HEVC to MP4 Online (Free)",
+      "h1": "HEVC to MP4 Converter",
+      "description": "Convert HEVC to MP4 in your browser: the video is re-encoded as H.264 with AAC sound, up to 1920 px and 30 fps. Free, with no sign-up or upload.",
+      "howToHeading": "How to convert HEVC to MP4"
+    },
+    "tool": {
+      "subtitle": "Re-encode an HEVC (H.265) video as an MP4 in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can you convert HEVC to MP4?",
+        "answer": "Yes. FFmpeg re-encodes the video as H.264 and the sound as AAC at 96 kbps, and puts them in an MP4. It runs in your browser."
+      },
+      {
+        "question": "Is the MP4 the same quality as the HEVC video?",
+        "answer": "No. The video is re-encoded, not copied, so the result is a new lossy encoding. The settings favour a quick conversion, so expect some loss compared with the source."
+      },
+      {
+        "question": "Does the MP4 keep my video's size and frame rate?",
+        "answer": "Up to a limit. The frame size is kept up to 1920 px on the longer side, and the frame rate up to 30 fps. A larger or faster video is scaled down to those limits."
+      },
+      {
+        "question": "How long does a conversion take?",
+        "answer": "The page sets no size limit and no timeout. FFmpeg runs on your device, single-threaded, so a long video takes as long as your device needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEVC and MP4",
+      "fromFormat": {
+        "name": "HEVC",
+        "fullName": "High Efficiency Video Coding (H.265)",
+        "description": "A video codec standardized as ITU-T H.265 and ISO/IEC 23008-2 in 2013. It compresses about as well as H.264 at roughly half the bitrate.",
+        "details": [
+          "Lossy compression",
+          "About 50 percent lower bitrate than H.264",
+          "Supports 8K and HDR",
+          "Patent licensing required"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEVC to MP4",
+      "points": [
+        "The video is re-encoded as H.264, not copied.",
+        "The sound is encoded as AAC at 96 kbps.",
+        "Frame size is kept up to 1920 px on the longer side, and frame rate up to 30 fps.",
+        "The conversion runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "jpg-to-ico": {
+    "seo": {
+      "title": "Convert JPG to ICO Online (Free)",
+      "h1": "JPG to ICO Converter",
+      "description": "Convert JPG to ICO in your browser: the ICO holds one image, fitted inside 256 x 256 if larger. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert JPG to ICO"
+    },
+    "tool": {
+      "subtitle": "Turn a JPG into an ICO icon file with one image, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does the ICO hold several sizes?",
+        "answer": "No. The ICO holds one image, not a set of sizes. The ICO format can store several sizes in one file, but this converter writes just one."
+      },
+      {
+        "question": "What size is the icon?",
+        "answer": "A side over 256 px is fitted inside 256 x 256, and the aspect ratio is kept. A smaller image keeps its size. A 256 px image is stored as a PNG inside the ICO."
+      },
+      {
+        "question": "Can I use the ICO as a favicon?",
+        "answer": "Browsers use ICO files for favicons, so it can serve as one. It is a single image, so check how it looks at the small sizes you need."
+      },
+      {
+        "question": "Does my JPG's metadata come along?",
+        "answer": "No. The picture goes through raw pixels, so EXIF, ICC profile and XMP data are dropped. A JPG has no alpha transparency of its own to carry over."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and ICO",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and colour depths in a single file. Browsers also use it for favicons.",
+        "details": [
+          "Multiple sizes in one file",
+          "Alpha transparency",
+          "PNG or bitmap entries"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to ICO",
+      "points": [
+        "The ICO holds one image, not a set of sizes.",
+        "A side over 256 px is fitted inside 256 x 256 with the aspect ratio kept.",
+        "A smaller image keeps its size.",
+        "A 256 px image is stored as a PNG inside the ICO.",
+        "EXIF, ICC profile and XMP data aren't carried over."
+      ]
+    }
+  },
+  "pdf-to-html": {
+    "seo": {
+      "title": "Convert PDF to HTML Online (Free)",
+      "h1": "PDF to HTML Converter",
+      "description": "Convert PDF to HTML in your browser, with no upload. Each page's text becomes a section of paragraphs; layout, tables and images aren't kept."
+    },
+    "tool": {
+      "subtitle": "Turn the text of a PDF into one HTML page, with a section for each page."
+    },
+    "faqs": [
+      {
+        "question": "What does the HTML keep from my PDF?",
+        "answer": "Its words, in paragraphs, with a section for each page in order. The lines of a paragraph are joined, so the text rewraps to fit the window. Fonts, layout, columns, tables, images and links aren't kept."
+      },
+      {
+        "question": "Why does it say my PDF has no text to extract?",
+        "answer": "Its pages hold no letters to read. A scanned document is pictures of text, and a blank page has nothing on it. Reading words from a picture needs OCR, which this converter doesn't do. If only some pages have no text, the others are converted and the page names the ones without."
+      },
+      {
+        "question": "Can I convert a password-protected PDF?",
+        "answer": "Not while it needs a password to open. Open it with its password, save or print a copy without one, and convert that copy. A PDF that only restricts printing or copying and opens without a password converts as usual."
+      },
+      {
+        "question": "How large a PDF can I convert to HTML?",
+        "answer": "Up to 2,000 pages and 20 million characters of text. A PDF that takes more than two minutes to read is stopped. A file over a limit is refused with a message that says which one."
+      },
+      {
+        "question": "Is the HTML file safe to open?",
+        "answer": "Yes. The PDF's text is written as plain text, so anything in it that looks like HTML shows as characters instead of becoming part of the page. The page loads and runs nothing."
+      }
+    ],
+    "aboutSection": {
+      "title": "PDF and HTML",
+      "fromFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      },
+      "toFormat": {
+        "name": "HTML",
+        "fullName": "HyperText Markup Language",
+        "description": "The standard markup language for web pages, maintained by the WHATWG as the HTML Living Standard. It describes the structure of a page with elements and attributes.",
+        "details": [
+          "Text-based markup",
+          "Elements and attributes",
+          "Styled with CSS",
+          "Rendered by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PDF to HTML",
+      "points": [
+        "Only the text is kept: no layout, fonts, tables, images or links.",
+        "Each page becomes a section, and each paragraph a <p> element.",
+        "A scanned PDF has no text to read, and there is no OCR.",
+        "A PDF that needs a password to open can't be converted.",
+        "The limits are 2,000 pages, 20 million characters and two minutes."
+      ]
+    }
+  },
+  "xps-to-jpg": {
+    "seo": {
+      "title": "Convert XPS to JPG Online (Free)",
+      "h1": "XPS to JPG Converter",
+      "description": "Convert XPS to JPG in your browser, with no upload. The JPG is written at quality 0.85 and carries no metadata. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert an XPS file to a JPG image in your browser, with no upload."
+    },
+    "faqs": [
+      {
+        "question": "What quality is the JPG?",
+        "answer": "The JPG is written at quality 0.85, and the page has no setting to change it. JPG is lossy, so the picture is a new encoding of the page."
+      },
+      {
+        "question": "What if the converter can't open my XPS?",
+        "answer": "It shows an error, such as \"Image decode failed\", or a message that your browser can't open that kind of file. Your original file is never changed."
+      },
+      {
+        "question": "Does the JPG keep the file's metadata?",
+        "answer": "No. The image goes through raw pixels, so EXIF, ICC profile and XMP data are dropped. A JPG has no alpha transparency either."
+      },
+      {
+        "question": "What is an XPS file?",
+        "answer": "A fixed-layout document format from Microsoft, standardized as ECMA-388. It is a ZIP package of XML pages, similar in purpose to PDF, and it is often made as Windows print output."
+      }
+    ],
+    "aboutSection": {
+      "title": "XPS and JPG",
+      "fromFormat": {
+        "name": "XPS",
+        "fullName": "XML Paper Specification",
+        "description": "A fixed-layout document format developed by Microsoft and standardized as ECMA-388. It is a ZIP package of XML pages, similar in purpose to PDF.",
+        "details": [
+          "Fixed page layout",
+          "ZIP package of XML",
+          "Vector graphics",
+          "ECMA standard"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting XPS to JPG",
+      "points": [
+        "The JPG is written at quality 0.85, and the setting can't be changed.",
+        "EXIF, ICC profile and XMP data aren't carried over.",
+        "If your browser can't open the file, the page shows an error.",
+        "The conversion runs in your browser, so the XPS isn't uploaded."
+      ]
+    }
+  }
+}

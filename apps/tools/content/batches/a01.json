@@ -220,6 +220,18 @@
         "answer": "Not on this page, which gives one PDF for each PNG with no ZIP. The Image to PDF converter joins images into a single PDF, one page each."
       },
       {
+        "question": "What size is the PDF page?",
+        "answer": "The PDF has one page, the same size as the image: 1 pixel is 1 point, with no margin and no A4 or Letter page."
+      },
+      {
+        "question": "What happens to a PNG's transparency?",
+        "answer": "It stays. Nothing paints a background, so see-through pixels stay see-through in the PDF."
+      },
+      {
+        "question": "Is the PNG compressed again in the PDF?",
+        "answer": "No. The picture is embedded losslessly as a PNG, so the page matches the image pixel for pixel."
+      },
+      {
         "question": "Is the PNG's metadata kept in the PDF?",
         "answer": "No. Since the picture is passed through raw pixels, EXIF, ICC profiles and XMP are not carried into the PDF."
       },
@@ -257,6 +269,8 @@
       "points": [
         "Each PNG you choose becomes its own PDF; the files are not joined.",
         "To put several images in one PDF, use the Image to PDF converter.",
+        "The PDF has one page the size of the image, with no margin and no A4 or Letter page.",
+        "The picture is embedded losslessly, and transparent pixels stay transparent.",
         "EXIF data, ICC profiles and XMP aren't copied to the PDF.",
         "Your original PNG isn't changed.",
         "Everything happens in your browser, so the PNG isn't uploaded."
@@ -283,6 +297,14 @@
         "answer": "No. Every JPEG becomes a separate PDF on this page, without a ZIP. The Image to PDF converter builds one PDF from many photos."
       },
       {
+        "question": "Will the PDF be A4 or Letter size?",
+        "answer": "Neither. Your photo gets a single page cut to its own dimensions, at 1 point per pixel and with no margin."
+      },
+      {
+        "question": "Does the PDF make the photo smaller or lower quality?",
+        "answer": "No. The picture is embedded losslessly as a PNG and no quality setting applies. Because it is lossless, the PDF can be larger than the JPEG."
+      },
+      {
         "question": "Does the PDF keep the JPEG's EXIF data?",
         "answer": "No. EXIF, ICC profiles and XMP are dropped, because the photo is rebuilt from raw pixels on the way."
       },
@@ -298,10 +320,10 @@
         "fullName": "JPEG image",
         "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
         "details": [
-          "Lossy compression",
+          "Lossy compression with adjustable quality",
           "No alpha transparency",
           ".jpg and .jpeg are the same format",
-          "Supported everywhere"
+          "Photographs on the web and digital camera output"
         ]
       },
       "toFormat": {
@@ -320,6 +342,8 @@
       "points": [
         "Each JPEG you choose becomes its own PDF; the files are not joined.",
         "To put several photos in one PDF, use the Image to PDF converter.",
+        "The PDF has one page the size of the image, with no margin and no A4 or Letter page.",
+        "The photo is embedded losslessly as a PNG, so no quality setting applies.",
         "EXIF data, ICC profiles and XMP aren't copied to the PDF.",
         "Your original JPEG isn't changed.",
         "Everything happens in your browser, so the JPEG isn't uploaded."
@@ -478,7 +502,7 @@
       },
       {
         "question": "What happens to AVIF's HDR and wide colour?",
-        "answer": "The JPG is a standard still image written from decoded pixels. EXIF data, ICC profiles and XMP are dropped, so don't expect the JPG to carry the AVIF's colour information."
+        "answer": "The JPG is a standard still image written from decoded pixels. EXIF data, ICC profiles and XMP are dropped, so the JPG doesn't carry them over from the AVIF."
       },
       {
         "question": "What happens to an animated AVIF?",

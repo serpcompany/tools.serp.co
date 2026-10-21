@@ -319,7 +319,7 @@
       },
       {
         "question": "Does the MP4 still loop like a GIF?",
-        "answer": "The page doesn't set a loop for the MP4. It is re-encoded as H.264 video, and whether it repeats depends on the player you open it with."
+        "answer": "The conversion sets no loop option, and an MP4 carries no loop flag of its own, so whether it repeats is up to the player you open it with."
       },
       {
         "question": "What if the GIF fails to convert?",

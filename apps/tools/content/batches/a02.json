@@ -12,7 +12,7 @@
     "faqs": [
       {
         "question": "Will the PNG look better than the JPG?",
-        "answer": "No. The JPG's compression loss is already in the pixels, and PNG only stores them without losing more. The PNG matches the JPG and is usually the larger file."
+        "answer": "No. The JPG's compression loss is already in the pixels, and PNG only stores them without losing more. The PNG matches the JPG."
       },
       {
         "question": "Does the PNG get a transparent background?",
@@ -285,7 +285,7 @@
       },
       {
         "question": "Is the MP4 the same quality as my MOV?",
-        "answer": "Not exactly. It is a fresh lossy encode at a fast, compact setting, so it favours speed and a small file over matching the MOV."
+        "answer": "Not exactly. It is a fresh lossy encode, not a copy of the MOV's video, so it won't match the MOV pixel for pixel."
       },
       {
         "question": "How long does converting a MOV take?",
@@ -347,8 +347,12 @@
         "answer": "No. An SVG describes shapes mathematically, so it scales to any size. A PNG is a grid of pixels, so keep the SVG if you need to resize later."
       },
       {
+        "question": "What size will the PNG be?",
+        "answer": "Your browser reports a size for the SVG and the PNG is drawn at that size, 1:1. The page adds no scale factor, size cap or viewBox handling, so there is no setting for a larger PNG."
+      },
+      {
         "question": "Does this work for animated or scripted SVGs?",
-        "answer": "The PNG is a single still image. SVG can hold animation and scripting, but an animated input gives its first frame only."
+        "answer": "The PNG is a single still image. Your browser draws the SVG, and this page adds no handling of its own for animation or scripts."
       },
       {
         "question": "Can I convert more than one SVG at once?",
@@ -385,7 +389,8 @@
       "points": [
         "A PNG is made of pixels, so it loses the SVG's resolution independence.",
         "Transparency is kept in the PNG.",
-        "Only a still image comes out: animation and scripting aren't carried over.",
+        "The PNG takes the size your browser reports for the SVG, drawn 1:1, with no scale option.",
+        "The PNG is a single still image; the page adds no handling for animation or scripts.",
         "The conversion happens in your browser, so the SVG isn't uploaded."
       ]
     }

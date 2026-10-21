@@ -1,0 +1,515 @@
+{
+  "jfif-to-jpeg": {
+    "seo": {
+      "title": "Convert JFIF to JPEG Online (Free)",
+      "h1": "JFIF to JPEG Converter",
+      "description": "Convert JFIF to JPEG in your browser. Each file is re-encoded as a standard JPEG at quality 0.85. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert JFIF to JPEG"
+    },
+    "tool": {
+      "subtitle": "Turn a .jfif file into a standard JPEG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is a JFIF file the same as a JPEG?",
+        "answer": "Nearly. A .jfif file holds ordinary JPEG image data, and most programs read it like a regular JPEG. The extension is what some apps and sites don't accept."
+      },
+      {
+        "question": "Does converting JFIF to JPEG change the quality?",
+        "answer": "Yes, slightly. The picture is decoded and written again as a JPEG at quality 0.85, so it is not a plain rename. JPEG is lossy, and a second save can lose a little detail."
+      },
+      {
+        "question": "Is my photo's EXIF data kept?",
+        "answer": "No. Pixels are what pass through, so EXIF, ICC profiles and XMP are left behind. The new JPEG carries only the picture."
+      },
+      {
+        "question": "Can I change several JFIF files at once?",
+        "answer": "Yes. Pick them together and the page works through them in order, saving each JPEG as a separate download."
+      }
+    ],
+    "aboutSection": {
+      "title": "JFIF and JPEG",
+      "fromFormat": {
+        "name": "JFIF",
+        "fullName": "JPEG File Interchange Format",
+        "description": "A container convention for JPEG-compressed images that specifies colour space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data.",
+        "details": [
+          "Lossy JPEG compression",
+          "No alpha transparency",
+          "Readable as a regular JPEG"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JFIF to JPEG",
+      "points": [
+        "The JPEG is written at quality 0.85, so the picture is re-encoded, not just renamed.",
+        "EXIF, ICC profile and XMP data are not carried over.",
+        "Neither format has transparency, so there is none to lose.",
+        "Several JFIF files give one JPEG each, downloaded separately.",
+        "Your original .jfif file isn't changed."
+      ]
+    }
+  },
+  "jpg-to-gif": {
+    "seo": {
+      "title": "Convert JPG to GIF Online (Free)",
+      "h1": "JPG to GIF Converter",
+      "description": "Convert JPG to GIF in your browser. You get one GIF for each JPG, limited to 256 colours per frame. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert JPG to GIF"
+    },
+    "tool": {
+      "subtitle": "Save a JPG photo as a GIF image, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will my JPG become an animated GIF?",
+        "answer": "No. Each JPG is converted on its own into its own GIF. Several JPGs are never joined into one animation."
+      },
+      {
+        "question": "Why can a photo look different as a GIF?",
+        "answer": "A GIF frame holds a palette of at most 256 colours, while a JPG photograph can use far more. Smooth gradients in a photo are the places that can change."
+      },
+      {
+        "question": "Is the JPG's metadata kept in the GIF?",
+        "answer": "No. Only the picture is written, so the camera and colour-profile details stored in the JPG are not in the GIF."
+      },
+      {
+        "question": "Can I convert many JPG files at once?",
+        "answer": "Yes. Select several JPGs and they are handled one after another. You download a separate GIF for each, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and GIF",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colours per frame, and supports simple animation.",
+        "details": [
+          "256-colour palette per frame",
+          "Lossless LZW compression",
+          "Supports animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to GIF",
+      "points": [
+        "A GIF frame has at most 256 colours, so a photo may look different.",
+        "Each JPG gives one GIF; several JPGs are not combined into an animation.",
+        "EXIF, ICC profile and XMP data are not carried over.",
+        "A JPG has no transparency, so the GIF has none to keep.",
+        "Your original JPG isn't changed."
+      ]
+    }
+  },
+  "psd-to-pdf": {
+    "seo": {
+      "title": "Convert PSD to PDF Online (Free)",
+      "h1": "PSD to PDF Converter",
+      "description": "Convert PSD to PDF in your browser. You get a one-page PDF the size of the image, with no layers. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to export PSD to PDF"
+    },
+    "tool": {
+      "subtitle": "Turn a Photoshop PSD file into a one-page PDF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Do I need Photoshop to export a PSD to PDF?",
+        "answer": "No. ImageMagick runs in your browser and reads the PSD, so nothing needs installing. You choose the file, then download the PDF."
+      },
+      {
+        "question": "Are the layers kept in the PDF?",
+        "answer": "No. A layered PSD gives one picture, and the PDF holds that picture on a single page. The layers, masks and text of the PSD are not editable in the PDF."
+      },
+      {
+        "question": "How big is the PDF page?",
+        "answer": "The single page matches the image, at one point per pixel. No margins are added, and the page isn't set to A4 or Letter."
+      },
+      {
+        "question": "Does the PDF keep transparent areas?",
+        "answer": "Yes. No background colour is painted behind the picture, so clear pixels in the PSD's merged image remain clear in the PDF."
+      },
+      {
+        "question": "What if my PSD is very large?",
+        "answer": "A picture over about 537 megapixels fails with a message that it is too large to convert here. Below that, there is no size limit of the page's own."
+      }
+    ],
+    "aboutSection": {
+      "title": "PSD and PDF",
+      "fromFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and colour information so a design can be edited later.",
+        "details": [
+          "Layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes",
+          "Proprietary Adobe format"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PSD to PDF",
+      "points": [
+        "The PSD becomes one picture, so layers are not kept.",
+        "The PDF has one page, the size of the image, with no margin.",
+        "The picture is embedded losslessly as a PNG.",
+        "Transparent pixels stay transparent in the PDF.",
+        "Several PSD files give one PDF each; they are never merged."
+      ]
+    }
+  },
+  "svg-to-ico": {
+    "seo": {
+      "title": "Convert SVG to ICO Online (Free)",
+      "h1": "SVG to ICO Converter",
+      "description": "Convert SVG to ICO in your browser. You get one icon image, fitted inside 256 x 256 if it is larger. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert SVG to ICO"
+    },
+    "tool": {
+      "subtitle": "Turn an SVG image into a Windows ICO icon, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does the ICO hold several sizes?",
+        "answer": "No. The ICO holds one image. The format can store several sizes in one file, but this page writes just one."
+      },
+      {
+        "question": "What size is the ICO?",
+        "answer": "Your browser draws the SVG and reports its size, and the ICO uses that size. A side over 256 px is fitted inside 256 x 256 with the aspect ratio kept. A smaller image keeps its size."
+      },
+      {
+        "question": "Is the SVG still a vector in the ICO?",
+        "answer": "No. The SVG is drawn to pixels first, so the ICO holds a bitmap. It does not scale like the SVG."
+      },
+      {
+        "question": "Can I use the ICO as a favicon?",
+        "answer": "Browsers use ICO files for favicons, and this page makes a normal ICO. Since it holds one size, it suits a single icon size rather than a full set."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and ICO",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Supports animation and scripting",
+          "Styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and colour depths in a single file. Browsers also use it for favicons.",
+        "details": [
+          "Multiple sizes in one file",
+          "Alpha transparency",
+          "PNG or bitmap entries"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SVG to ICO",
+      "points": [
+        "The ICO holds one image, not a set of sizes.",
+        "An image with a side over 256 px is fitted inside 256 x 256, keeping its aspect ratio.",
+        "A 256 px image is stored as a PNG inside the ICO.",
+        "The SVG is turned into pixels, so the ICO is no longer a vector.",
+        "Several SVG files give one ICO each, downloaded separately."
+      ]
+    }
+  },
+  "dng-to-jpg": {
+    "seo": {
+      "title": "Convert DNG to JPG Online (Free)",
+      "h1": "DNG to JPG Converter",
+      "description": "Convert DNG to JPG in your browser. Raw Digital Negative photos become one JPG each, ready to share. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert DNG to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a raw DNG photo into a JPG you can share, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What is a DNG file?",
+        "answer": "DNG, short for Digital Negative, is an open raw image format that Adobe published in 2004. It holds unprocessed sensor data and is based on TIFF/EP."
+      },
+      {
+        "question": "Can I still edit the raw data in the JPG?",
+        "answer": "No. A DNG holds unprocessed sensor data, and a JPG is a finished, lossy picture. Keep your DNG if you want to edit the raw data later."
+      },
+      {
+        "question": "Can I batch convert DNG to JPG?",
+        "answer": "Yes. Select as many DNG files as you like in one go. They are processed in turn, and every JPG is saved separately without a ZIP."
+      },
+      {
+        "question": "Is there a file size limit?",
+        "answer": "The page sets no limit on file size. A picture over about 537 megapixels fails with a message that it is too large to convert here."
+      }
+    ],
+    "aboutSection": {
+      "title": "DNG and JPG",
+      "fromFormat": {
+        "name": "DNG",
+        "fullName": "Digital Negative",
+        "description": "An open raw image format published by Adobe in 2004 as a single documented alternative to the many proprietary raw formats. It is based on TIFF/EP.",
+        "details": [
+          "Unprocessed sensor data",
+          "Publicly documented specification",
+          "TIFF-based structure",
+          "Optional lossless compression"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DNG to JPG",
+      "points": [
+        "The JPG is a finished picture, so the raw sensor data is not kept.",
+        "JPG is lossy, so the result can't match everything in the DNG.",
+        "Each DNG gives one JPG; several files are not zipped.",
+        "A picture over about 537 megapixels is too large to convert here.",
+        "Your original DNG isn't changed."
+      ]
+    }
+  },
+  "wma-to-mp3": {
+    "seo": {
+      "title": "Convert WMA to MP3 Online (Free)",
+      "h1": "WMA to MP3 Converter",
+      "description": "Convert WMA to MP3 in your browser: the audio is re-encoded at 192 kbps with FFmpeg. Free, with no sign-up, and the file isn't uploaded.",
+      "howToHeading": "How to convert WMA to MP3"
+    },
+    "tool": {
+      "subtitle": "Turn a WMA audio file into a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps. FFmpeg re-encodes the WMA with the LAME encoder at that bitrate, and the page has no setting to change it."
+      },
+      {
+        "question": "Will the MP3 sound better than the WMA?",
+        "answer": "No. Converting can't add quality the WMA doesn't have. Standard WMA is lossy and so is MP3, so the MP3 is at best as good as its source."
+      },
+      {
+        "question": "Is my WMA file uploaded?",
+        "answer": "No. FFmpeg runs inside your browser, so the file stays on your device. A long file takes as long as your device needs."
+      },
+      {
+        "question": "Can I convert several WMA files at once?",
+        "answer": "Yes. Choose them together and FFmpeg works through them in turn. Every MP3 is its own download, not zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMA and MP3",
+      "fromFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "A family of audio codecs developed by Microsoft and stored in the ASF container. The standard version is lossy, and a WMA Lossless variant exists.",
+        "details": [
+          "Lossy and lossless variants",
+          "ASF container",
+          "Proprietary Microsoft format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WMA to MP3",
+      "points": [
+        "The MP3 is encoded at 192 kbps.",
+        "The audio is re-encoded, so the MP3 can't be better than the WMA.",
+        "Converting several WMA files gives one MP3 for each.",
+        "FFmpeg runs in your browser, so the file isn't uploaded.",
+        "Your original WMA file isn't changed."
+      ]
+    }
+  },
+  "bmp-to-pdf": {
+    "seo": {
+      "title": "Convert BMP to PDF Online (Free)",
+      "h1": "BMP to PDF Converter",
+      "description": "Convert BMP to PDF in your browser. You get a one-page PDF the size of the image. Free, with no sign-up, and your file isn't uploaded.",
+      "howToHeading": "How do I convert BMP to PDF?"
+    },
+    "tool": {
+      "subtitle": "Turn a BMP image into a one-page PDF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can I put several BMP files into one PDF?",
+        "answer": "No. Each BMP becomes its own PDF, and several files are never merged into one."
+      },
+      {
+        "question": "What size is the PDF page?",
+        "answer": "One page, the size of the image: one pixel becomes one point, with no margin. It is not an A4 or Letter page."
+      },
+      {
+        "question": "Is the image quality kept in the PDF?",
+        "answer": "The picture is embedded losslessly as a PNG, with no quality setting to lower. EXIF, ICC profile and XMP data are not carried over."
+      },
+      {
+        "question": "What happens to transparent areas?",
+        "answer": "Nothing paints a background, so transparent pixels stay transparent in the PDF."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and PDF",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster image format introduced with Microsoft Windows that stores pixel data, usually uncompressed. It is simple to read and write but produces large files.",
+        "details": [
+          "Usually uncompressed",
+          "1 to 32 bits per pixel",
+          "Optional run-length compression",
+          "Large files"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to PDF",
+      "points": [
+        "The PDF has one page, the size of the image, with no margin.",
+        "The picture is embedded losslessly as a PNG.",
+        "Several BMP files give one PDF each; they are never merged.",
+        "Transparent pixels stay transparent in the PDF.",
+        "Your original BMP isn't changed."
+      ]
+    }
+  },
+  "jpeg-to-svg": {
+    "seo": {
+      "title": "Convert JPEG to SVG Online (Free)",
+      "h1": "JPEG to SVG Converter",
+      "description": "Convert JPEG to SVG in your browser. The picture is embedded as an image, not traced to vector shapes. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert JPEG to SVG"
+    },
+    "tool": {
+      "subtitle": "Wrap a JPEG photo in an SVG file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does this turn my JPEG into vector shapes?",
+        "answer": "No. The picture is not traced. The SVG holds a single image element with your picture embedded as a PNG, so it is still made of pixels."
+      },
+      {
+        "question": "Will the SVG scale without losing sharpness?",
+        "answer": "No. The embedded picture keeps its pixel width and height, so it doesn't scale like a true vector. Enlarging it shows the same pixels bigger."
+      },
+      {
+        "question": "Is the picture reduced or resized?",
+        "answer": "No. Nothing is resized or reduced. The full-colour picture is embedded as it is, at its own pixel width and height."
+      },
+      {
+        "question": "Is the photo's metadata inside the SVG?",
+        "answer": "No. Only the picture is embedded, so EXIF, ICC profile and XMP details from the JPEG are not in the SVG."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and SVG",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Supports animation and scripting",
+          "Styleable with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to SVG",
+      "points": [
+        "The JPEG is not traced: the SVG holds one embedded PNG image.",
+        "The embedded picture keeps its pixel width and height.",
+        "Nothing is resized or reduced.",
+        "EXIF, ICC profile and XMP data are not carried over.",
+        "Several JPEG files give one SVG each, downloaded separately."
+      ]
+    }
+  }
+}

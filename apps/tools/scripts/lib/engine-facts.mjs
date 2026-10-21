@@ -230,7 +230,7 @@ SOURCE_FACTS.tiff = SOURCE_FACTS.tif = SOURCE_FACTS.psd = { engines: MAGICK_PDF_
 export const TOOL_FACTS = {
   "mp3-to-mp4": {
     facts: [
-      "The MP4 holds the audio only, as AAC at 96 kbit/s; the command adds no picture (buildConvertCommand in lib/convert/ffmpeg-args.ts). It is not a video: do not call it H.264 video.",
+      "The command adds no picture of its own (buildConvertCommand in lib/convert/ffmpeg-args.ts): an MP3 without cover art gives an MP4 with audio only, as AAC at 96 kbit/s. Do not call it H.264 video. The command does set `-c:v libx264`, so embedded cover art may come through as a picture stream.",
     ],
     unsettled: ["What happens to cover art embedded in the MP3 (untested)."],
   },

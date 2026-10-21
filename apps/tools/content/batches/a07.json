@@ -3,11 +3,11 @@
     "seo": {
       "title": "Convert JPG to SVG Online (Free)",
       "h1": "JPG to SVG Converter",
-      "description": "Convert JPG to SVG in your browser. Pick one or several JPG files and download an SVG for each. Free, with no sign-up, and nothing is uploaded.",
+      "description": "Convert JPG to SVG in your browser. The picture is embedded in the SVG, not traced to vector shapes. Free, with no sign-up, and nothing is uploaded.",
       "howToHeading": "How to convert JPG to SVG"
     },
     "tool": {
-      "subtitle": "Turn a JPG photo into an SVG file, right in your browser."
+      "subtitle": "Wrap a JPG photo in an SVG file, right in your browser."
     },
     "faqs": [
       {
@@ -16,7 +16,11 @@
       },
       {
         "question": "Will the SVG be sharper than the JPG?",
-        "answer": "Don't count on it. A JPG is a grid of pixels, and its detail is fixed at the size it was saved. SVG scales to any size when it holds shapes and paths, but converting can't restore detail the JPG already lost."
+        "answer": "No. The SVG holds your picture as an embedded PNG image at the JPG's own pixel width and height, so it doesn't scale like a vector, and converting can't restore detail the JPG already lost."
+      },
+      {
+        "question": "Is the SVG a real vector image?",
+        "answer": "Not in the sense of shapes and paths. The picture isn't traced: the SVG holds one image element with your full-colour picture embedded inside it. Nothing is resized or reduced."
       },
       {
         "question": "Does the SVG keep the JPG's EXIF data?",
@@ -24,7 +28,7 @@
       },
       {
         "question": "What can open the SVG afterwards?",
-        "answer": "Any web browser, and vector editors such as Inkscape, Adobe Illustrator and Figma. SVG is XML text, so it is also styleable with CSS."
+        "answer": "Any web browser, and vector editors such as Inkscape, Adobe Illustrator and Figma. SVG is XML text, so the file opens as a vector document, but the picture inside it stays a pixel image."
       },
       {
         "question": "What if the conversion fails?",
@@ -59,7 +63,7 @@
     "pairNotes": {
       "title": "What to know before converting JPG to SVG",
       "points": [
-        "A JPG is made of pixels; an SVG describes shapes, so a JPG's lost detail doesn't come back.",
+        "The picture is embedded as a PNG inside the SVG, not traced to shapes, so it doesn't scale like a vector.",
         "Several JPG files run one after another, and each downloads as its own SVG, with no ZIP.",
         "EXIF, ICC profile and XMP data in the JPG aren't carried over.",
         "The conversion runs in your browser, so the JPG isn't uploaded."
@@ -90,6 +94,10 @@
         "answer": "No. Nothing is resized, so the compressed GIF has the same dimensions as the original. Only the way the frames are stored is optimised."
       },
       {
+        "question": "Is the compressed GIF lossless?",
+        "answer": "Yes, in the sense that matters here. Every frame is kept and no colours are reduced. The result is used only if it decodes to exactly the same pixels, frame by frame, as your original; otherwise you get the original back."
+      },
+      {
         "question": "Can I compress several GIFs at once?",
         "answer": "Yes. Choose them together and they run one after another, each downloading as its own file. There is no ZIP, and your originals aren't changed."
       }
@@ -98,6 +106,7 @@
       "title": "What to know before compressing a GIF",
       "points": [
         "Every frame of the GIF is re-optimised.",
+        "Every frame is kept, and the result is used only if its pixels match the original exactly.",
         "Nothing is resized, so the width and height stay the same.",
         "If the result isn't smaller, you get your original file back.",
         "ImageMagick runs in your browser as WebAssembly, so the GIF isn't uploaded."
@@ -125,7 +134,7 @@
       },
       {
         "question": "Does compressing an MP4 lower its quality?",
-        "answer": "Possibly. The video is re-encoded with a lossy codec, so the result is not a lossless copy. The command doesn't resize the picture, so the frame size stays as it was."
+        "answer": "Possibly. The video is re-encoded with a lossy codec, so the result is not a lossless copy. The picture isn't resized and the frame rate isn't changed, so the frame size and rate stay as they were."
       },
       {
         "question": "What if the compressed MP4 isn't smaller?",
@@ -288,6 +297,10 @@
         "answer": "Choose one or more TXT files above. Each is laid out on A4 pages in your browser and downloads as a PDF with the same name as the file."
       },
       {
+        "question": "Can I combine several TXT files into one PDF?",
+        "answer": "No. Several files run one after another and each downloads as its own PDF, with no ZIP. The page has no merge step."
+      },
+      {
         "question": "Which font is the PDF in?",
         "answer": "Courier, when your text is all Windows-1252 characters: every character is the same width, so columns and indentation line up as in your text editor. Any other text is set in DejaVu Sans, embedded in the PDF. Its letters vary in width, so columns made with spaces may not line up, though indentation still does."
       },
@@ -337,6 +350,7 @@
       "title": "What to know before converting TXT to PDF",
       "points": [
         "The pages are A4 portrait with 10 pt type: 61 lines a page and 81 characters a line in Courier.",
+        "Pages have 3/4 inch margins, and each file makes its own PDF.",
         "Blank lines and leading spaces are kept; blank lines and page breaks at the end are not.",
         "No header, footer or page numbers are added.",
         "A file over 20 MB or 2,000 pages is refused, as is text with characters the font lacks.",
@@ -366,6 +380,10 @@
       {
         "question": "What quality is the JPG?",
         "answer": "The JPG is written at quality 0.85, and the page has no setting to change it. JPG is lossy, so it is not an exact copy of the drawing."
+      },
+      {
+        "question": "How big is the JPG?",
+        "answer": "Your browser draws the SVG and the JPG gets the pixel size the browser reports for it, drawn 1:1. The page adds no scale factor and no size cap, so there is no setting to make it larger."
       },
       {
         "question": "Can I still scale the JPG up cleanly?",
@@ -440,8 +458,8 @@
         "answer": "The conversion runs FFmpeg's yadif deinterlacing filter on interlaced frames, and it keeps the width and height divisible by 2."
       },
       {
-        "question": "Why is the conversion slower than a simple container change?",
-        "answer": "An MP4 to WebM conversion re-encodes the video and audio. Some container changes, such as MP4 to MKV, copy the streams without re-encoding, but this one does not."
+        "question": "Is this a quick container change?",
+        "answer": "No. The video is re-encoded as VP8 and the audio as Vorbis, so a long video takes as long as your device needs."
       }
     ],
     "aboutSection": {
@@ -474,7 +492,7 @@
       "points": [
         "The video is re-encoded as VP8 and the audio as Vorbis at 64 kbps.",
         "Video over 1920 px on its longer side is scaled down, and the frame rate is capped at 30 fps.",
-        "This is a full re-encode, not a stream copy, so it takes longer than a container change.",
+        "This is a full re-encode, so a long video takes as long as your device needs.",
         "Several MP4 files run one after another, and each downloads as its own WebM.",
         "FFmpeg runs in your browser, so the video isn't uploaded."
       ]

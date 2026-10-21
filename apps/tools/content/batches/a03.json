@@ -149,8 +149,8 @@
         "answer": "Yes. Transparent areas of the AVIF stay transparent in the PNG."
       },
       {
-        "question": "Will the PNG be larger than the AVIF?",
-        "answer": "Often. PNG is lossless and has no quality setting, so it stores the decoded pixels in full. Converting can't bring back detail a lossy AVIF already lost."
+        "question": "Does converting AVIF to PNG bring back lost detail?",
+        "answer": "No. PNG is lossless and has no quality setting, so it stores the decoded pixels in full, but it can't bring back detail a lossy AVIF already lost."
       },
       {
         "question": "Is the AVIF's metadata copied to the PNG?",
@@ -201,7 +201,7 @@
     "seo": {
       "title": "Convert PNG to SVG Online (Free)",
       "h1": "PNG to SVG Converter",
-      "description": "Convert PNG to SVG in your browser and download the result as an SVG file. Free, with no sign-up, and the PNG is not uploaded anywhere.",
+      "description": "Convert PNG to SVG in your browser. The PNG is embedded in the SVG, not traced to vector shapes. Free, with no sign-up, and no upload.",
       "howToHeading": "How to convert PNG to SVG"
     },
     "tool": {
@@ -215,6 +215,14 @@
       {
         "question": "How do I convert a PNG to an SVG?",
         "answer": "Choose the PNG in the converter above. The result is checked to be an SVG before you can download it, and a wrong result fails with the message that the converter produced another format."
+      },
+      {
+        "question": "Is the SVG a real vector, and does it scale?",
+        "answer": "No. The PNG is not traced to vector shapes. The SVG holds one image with your PNG embedded in it, at the PNG's own pixel width and height, so it doesn't scale like a vector."
+      },
+      {
+        "question": "Is the picture reduced or resized in the SVG?",
+        "answer": "No. The full-colour picture is embedded as it is, and transparency is kept in the embedded PNG."
       },
       {
         "question": "What is the difference between a PNG and an SVG?",
@@ -254,6 +262,8 @@
       "title": "What to know before converting PNG to SVG",
       "points": [
         "A PNG is made of pixels; an SVG describes shapes, paths and text.",
+        "The PNG is embedded in the SVG, not traced, so the SVG doesn't scale like a vector.",
+        "Nothing is resized or reduced, and transparency is kept in the embedded PNG.",
         "The result is checked to be an SVG before you can download it.",
         "Each PNG gives its own SVG file.",
         "Your original PNG is not changed; you download a new copy.",
@@ -281,8 +291,8 @@
         "answer": "Not from the conversion. The video and audio streams are copied as they are, not re-encoded, so the picture and sound are the ones in your MKV."
       },
       {
-        "question": "Why is it faster than other video conversions?",
-        "answer": "Copying streams is lighter than encoding them again. A long file still takes as long as your device needs, because the page sets no limit or timeout of its own."
+        "question": "Is the video resized or limited in frame rate?",
+        "answer": "No. The streams are copied, so the picture keeps the MKV's size and frame rate. A long file takes as long as your device needs, because the page sets no limit or timeout of its own."
       },
       {
         "question": "What if the conversion fails?",
@@ -318,6 +328,7 @@
       "points": [
         "The streams are copied into the MP4, not re-encoded.",
         "No quality setting applies, because nothing is compressed again.",
+        "The picture keeps the source's size and frame rate.",
         "MKV supports almost any codec, so some files may fail to fit an MP4.",
         "Each MKV gives its own MP4.",
         "FFmpeg runs in your browser, so the video isn't uploaded."
@@ -401,7 +412,15 @@
       },
       {
         "question": "What is an ICO file used for?",
-        "answer": "ICO is the Windows icon format, and browsers also use it for favicons. One ICO file can hold several image sizes."
+        "answer": "ICO is the Windows icon format, and browsers also use it for favicons."
+      },
+      {
+        "question": "Does the ICO hold several sizes?",
+        "answer": "No. This ICO holds one image, not a set of sizes, even though the ICO format can hold several."
+      },
+      {
+        "question": "What size is the icon?",
+        "answer": "A side longer than 256 px is fitted inside 256 by 256 with the aspect ratio kept. A smaller image keeps its size, and a 256 px image is stored as a PNG inside the ICO."
       },
       {
         "question": "What happens to an animated PNG?",
@@ -426,7 +445,7 @@
         "fullName": "Windows icon",
         "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and colour depths. Browsers also use it for favicons.",
         "details": [
-          "Multiple sizes in one file",
+          "Can hold several sizes in one file",
           "Alpha transparency",
           "Windows application icons",
           "Website favicons"
@@ -437,6 +456,8 @@
       "title": "What to know before converting PNG to ICO",
       "points": [
         "ICO is the Windows icon format, and browsers also use it for favicons.",
+        "The ICO holds one image, not several sizes.",
+        "Anything larger than 256 px is fitted inside 256 by 256; smaller images keep their size.",
         "An animated PNG gives an icon from its first frame only.",
         "EXIF, color profile and XMP data are not copied to the ICO.",
         "Each PNG gives its own ICO file.",

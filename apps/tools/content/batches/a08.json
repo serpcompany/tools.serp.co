@@ -47,9 +47,10 @@
       "toFormat": {
         "name": "JPEG",
         "fullName": "JPEG image",
-        "description": "A lossy raster image format defined by the Joint Photographic Experts Group, designed for photographs. .jpg and .jpeg are the same format.",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
         "details": [
           "Lossy compression",
+          "Adjustable quality",
           "No alpha transparency",
           "Supported everywhere"
         ]
@@ -151,7 +152,7 @@
       },
       {
         "question": "What bitrate is the MP3?",
-        "answer": "192 kbps, written with the LAME encoder. Whether the Opus was a 6 kbps voice note or a 510 kbps music file, the MP3 comes out at that same rate."
+        "answer": "192 kbps, written with the LAME encoder. The page has no setting to change it, so the MP3 comes out at that same rate whatever bitrate the Opus file had."
       },
       {
         "question": "Will the MP3 sound better than the Opus file?",
@@ -223,7 +224,7 @@
       },
       {
         "question": "Will the MP4 be smaller or larger than the WMV?",
-        "answer": "The page does not promise either. The video is encoded for speed with a fast preset and a constant rate factor of 32, so the size depends on your video."
+        "answer": "The page does not promise either. The video is encoded for speed, with the ultrafast preset and a constant rate factor of 32, so the size depends on your video."
       },
       {
         "question": "Does the MP4 keep the WMV's size and frame rate?",
@@ -293,6 +294,10 @@
         "answer": "Choose one or more XML files above. Each is read in your browser and saved as a PDF named after the file, and each PDF downloads on its own."
       },
       {
+        "question": "What size are the PDF pages?",
+        "answer": "A4 portrait with 3/4 inch margins, in 10 pt type: 61 lines a page and 81 characters a line in Courier. A longer line wraps. No header, footer or page numbers are added."
+      },
+      {
         "question": "Why does it say my XML isn't well-formed?",
         "answer": "The file broke XML's rules, for example an unclosed tag, an unquoted attribute value or a second root element. The message gives what the parser found and the line and column where it stopped, so you can fix the file and convert it again."
       },
@@ -302,7 +307,7 @@
       },
       {
         "question": "Which characters can it show?",
-        "answer": "Latin text is set in Courier. Greek, Cyrillic, Hebrew and Arabic are set in DejaVu Sans, embedded in the PDF. Chinese, Japanese, Korean, Indic and Thai characters and emoji are refused, with the characters named, rather than saved as blank boxes."
+        "answer": "Text that is all Windows-1252 characters is set in Courier. Anything else is set in DejaVu Sans, embedded in the PDF, which covers scripts such as Arabic and Hebrew. Chinese, Japanese, Korean, Indic and Thai characters and emoji are refused, with the characters named, rather than saved as blank boxes."
       },
       {
         "question": "Can it turn an e-invoice or an XSL-FO file into a formatted document?",
@@ -497,7 +502,7 @@
       },
       {
         "question": "What bitrate is the MP3?",
-        "answer": "192 kbps, from the LAME encoder. There is no setting for another rate, so a hi-res FLAC and a CD rip both end up at the same bitrate."
+        "answer": "192 kbps, from the LAME encoder. There is no setting for another rate, so every FLAC ends up at the same bitrate."
       },
       {
         "question": "Do I lose quality going from FLAC to MP3?",
