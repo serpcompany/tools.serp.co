@@ -217,7 +217,7 @@
       },
       {
         "question": "Is the EXIF data kept in the new JPG?",
-        "answer": "No. The image passes through raw pixels, so EXIF, ICC profiles and XMP are dropped from the new file."
+        "answer": "No. Re-saving starts from decoded pixels, so the copy comes out without camera details, colour profile or XMP: a way to get a JPG with that information stripped."
       },
       {
         "question": "What if I choose a GIF or a WebP with motion?",
@@ -328,7 +328,7 @@
       },
       {
         "question": "What happens to transparency in my WebP?",
-        "answer": "It is kept. Nothing paints a background, so see-through pixels stay see-through in the PDF."
+        "answer": "Yes, it survives. The PDF page gets no background colour behind the picture, so areas that were clear in the WebP are still clear when the PDF is opened."
       },
       {
         "question": "What if my WebP is animated?",

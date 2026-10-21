@@ -80,7 +80,7 @@
       },
       {
         "question": "Are camera details like EXIF kept in the PNG?",
-        "answer": "No. The photo is decoded to 8-bit RGB pixels, and EXIF data and ICC profiles aren't carried over to the PNG."
+        "answer": "No. libheif hands the browser plain pixels, and a PNG written from them carries no camera details: EXIF data, including the capture date, and the colour profile are left behind."
       },
       {
         "question": "What happens if the HEIC holds more than one image?",

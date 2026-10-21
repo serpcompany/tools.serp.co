@@ -24,7 +24,7 @@
       },
       {
         "question": "Are the AVIF's EXIF and colour profile kept?",
-        "answer": "No. The image goes through raw pixels, so EXIF, ICC profiles and XMP are dropped from the JPEG."
+        "answer": "No. The browser decodes the AVIF into plain pixels before the JPEG is written, so camera details, the colour profile and XMP tags don't make it into the new file."
       },
       {
         "question": "Why does it say my browser can't open the file?",
