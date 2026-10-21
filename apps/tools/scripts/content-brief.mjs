@@ -2,7 +2,8 @@
 // compressor copy (docs/converter-copy.md): per Tool, its keyword and
 // volumes, its engine and what that engine really does, the format reference
 // (apps/tools/content/formats.json, once #357 adds it), its current copy and
-// an entry to fill in; once, the style guide and a finished example.
+// an entry to fill in; its keyword variants and questions come from
+// benchmarks/keyword-ideas.json when that exists; once, the style guide and a finished example.
 //
 //   pnpm content:brief <tool-id>... [--name <batch>]
 //
@@ -41,12 +42,14 @@ if (problems.length) {
 
 const read = (file) => readFileSync(file, "utf8");
 const formatsPath = path.join(appRoot, "content/formats.json");
+const ideasPath = path.join(appRoot, "benchmarks/keyword-ideas.json");
 const batch = name ?? ids[0];
 const brief = buildBrief({
   name: batch,
   ids,
   tools,
   statusRows: parseCsv(read(path.join(appRoot, STATUS_PATH))),
+  keywordIdeas: existsSync(ideasPath) ? JSON.parse(read(ideasPath)) : null,
   formats: existsSync(formatsPath) ? JSON.parse(read(formatsPath)) : null,
   styleGuide: read(path.join(repoRoot, "docs/converter-copy.md")),
   examples: JSON.parse(read(path.join(appRoot, BATCH_DIR, "examples.json"))),

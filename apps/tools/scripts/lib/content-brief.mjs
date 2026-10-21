@@ -60,7 +60,45 @@ export function statusIndex(rows) {
   return { tools, aliases };
 }
 
-function keywordSection(row, aliases) {
+export const TOP_TERMS = 8;
+export const TOP_QUESTIONS = 5;
+
+const byVolume = (items) => [...(items ?? [])].sort((a, b) => (b.volume ?? 0) - (a.volume ?? 0));
+const volumeLine = (item) => `- ${item.keyword}: ${number(item.volume)} a month`;
+
+// The Tool's keyword variants and questions from benchmarks/keyword-ideas.json
+// (the file may be missing, or lack the Tool).
+function variantSection(idea, ideas) {
+  const terms = byVolume(idea?.terms).slice(0, TOP_TERMS);
+  const questions = byVolume(idea?.questions).slice(0, TOP_QUESTIONS);
+  if (!terms.length && !questions.length) {
+    return "No variant data for this Tool (benchmarks/keyword-ideas.json has none). Write the title, How-to heading and FAQs as the style guide says without it.";
+  }
+  const country = (ideas.country ?? "").toUpperCase();
+  const lines = [`Source: ${ideas.source ?? "unknown"}${country ? `, ${country} volumes` : ""}.`];
+  lines.push("", "Matching terms, biggest first:", "", terms.length ? terms.map(volumeLine).join("\n") : "None.");
+  lines.push("", "Questions, biggest first:", "", questions.length ? questions.map(volumeLine).join("\n") : "None.");
+  const howTo = questions.find((question) => /^how (to|do|can)\b/i.test(question.keyword));
+  lines.push(
+    "",
+    "How to use them:",
+    "",
+    list([
+      "The title keeps the head keyword and works in the biggest matching term where it fits.",
+      howTo
+        ? `\`seo.howToHeading\`: use the top "how to" question, "${howTo.keyword}", worded as a heading.`
+        : "No \"how to\" question is listed: leave `seo.howToHeading` out.",
+      "The FAQs answer the listed questions, not invented ones.",
+    ]),
+  );
+  return lines.join("\n");
+}
+
+function keywordSection(row, aliases, idea, ideas) {
+  const headVolume = idea?.volume;
+  if (!row?.keyword && idea?.keyword) {
+    return `- Keyword: **${idea.keyword}**, ${number(headVolume)} searches a month (${ideas.source ?? "keyword-ideas.json"}${ideas.country ? `, ${ideas.country.toUpperCase()}` : ""}). The Tool has no keyword in benchmarks/tool-status.csv.`;
+  }
   if (!row?.keyword) return "No keyword is assigned to this Tool in benchmarks/tool-status.csv. Use the H1 pattern as it is.";
   const lines = [
     `- Keyword: **${row.keyword}** (${row.keyword_match} match), ${number(row.global_volume)} searches a month worldwide, ${number(row.us_volume)} in the US, keyword difficulty ${row.kd || "no data"}.`,
@@ -126,10 +164,11 @@ function skeleton(tool) {
   return { [tool.id]: entry };
 }
 
-function toolSection(tool, status, formats) {
+function toolSection(tool, status, formats, ideas) {
   const row = status.tools.get(tool.id);
   const engine = row?.engine || null;
   const facts = engineFactsFor(tool, engine);
+  const idea = ideas?.tools?.[tool.id];
   const lines = [
     `## ${tool.id}`,
     "",
@@ -137,7 +176,11 @@ function toolSection(tool, status, formats) {
     "",
     "### Keyword",
     "",
-    keywordSection(row, status.aliases.get(tool.id) ?? []),
+    keywordSection(row, status.aliases.get(tool.id) ?? [], idea, ideas),
+    "",
+    "### Variants and questions",
+    "",
+    variantSection(idea, ideas),
     "",
     "### Engine and execution path",
     "",
@@ -191,7 +234,7 @@ export function briefProblems(ids, tools) {
 
 // The whole brief: what to deliver, the style guide, one finished example,
 // then a section per Tool.
-export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, examples, readDoc }) {
+export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, examples, readDoc, keywordIdeas = null }) {
   const byId = new Map(tools.map((tool) => [tool.id, tool]));
   const selected = ids.map((id) => byId.get(id));
   const status = statusIndex(statusRows);
@@ -218,7 +261,8 @@ export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, 
     list([
       `One JSON file, \`apps/tools/${BATCH_DIR}/${name}.json\`, holding an entry for each Tool below, shaped like the example and the "Your entry" skeletons.`,
       `Title and H1 must contain the Tool's keyword, and take their noun from it (see "Titles, H1s and descriptions" in the style guide); the title is at most ${SEO_TITLE_MAX} characters with the "${SITE_TITLE_SUFFIX}" the layout adds, so ${SEO_TITLE_MAX - SITE_TITLE_SUFFIX.length} of your own, and never names the site. The description is ${DESCRIPTION_MIN}–${DESCRIPTION_MAX} characters.`,
-      `\`seo.howToHeading\` is optional and replaces a converter page's generated How-to heading: use the top question from the brief's questions when there is one (a "how to" keyword or alias keyword above, worded as a heading), else leave it out. It contains each word of the keyword and is at most ${HOW_TO_HEADING_MAX} characters.`,
+      `The title keeps the Tool's head keyword and works in the biggest matching term from its "Variants and questions" where it fits. FAQs answer the listed questions, not invented ones. A Tool with "No variant data" follows the style guide alone.`,
+      `\`seo.howToHeading\` is optional and replaces a converter page's generated How-to heading: use the top "how to" question from the Tool's "Variants and questions" when there is one (else a "how to" keyword or alias keyword above), worded as a heading, else leave it out. It contains each word of the keyword and is at most ${HOW_TO_HEADING_MAX} characters.`,
       `At least ${FAQS_MIN} FAQs and ${PAIR_NOTES_MIN} pair notes, each specific to its Tool: an answer that could sit on another Tool's page fails the check.`,
       "Every claim comes from this brief's engine facts or format reference. Nothing else: no dates, versions, statistics, or links off the site.",
       `Check it with \`pnpm content:check --batch ${name}\`, which writes nothing. The owner's side applies it with \`pnpm content:apply ${name}\`.`,
@@ -234,7 +278,7 @@ export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, 
     "",
     json({ [exampleId]: examples[exampleId] }),
     "",
-    ...selected.map((tool) => toolSection(tool, status, formats)),
+    ...selected.map((tool) => toolSection(tool, status, formats, keywordIdeas)),
     "",
     ...appendix,
   ].join("\n");
