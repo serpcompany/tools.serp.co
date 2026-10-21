@@ -238,3 +238,33 @@ test("compress-mp4 and compress-gif facts", () => {
   assert.match(gif.text, /Every frame is kept/);
   assert.match(gif.text, /exactly the same pixels/);
 });
+
+test("the JPEG compressor facts are @jsquash/jpeg's defaults and the worker's calls", async () => {
+  const { label, defaultOptions, defaultDecodeOptions } = await import("@jsquash/jpeg/meta.js");
+  const worker = readFileSync(path.join(appRoot, "workers/compress.worker.js"), "utf8");
+  // compressJpeg passes no decode options and only a quality to encode.
+  assert.match(worker, /await decodeJpeg\(buf\);/);
+  assert.match(worker, /encodeJpeg\(imageData, \{ quality: mapQualityToImageQuality\(quality\) \}\)/);
+  for (const id of ["compress-jpg", "compress-jpeg"]) {
+    const { text: facts } = factsOf(id);
+    assert.equal(label, "MozJPEG");
+    assert.match(facts, /with MozJPEG/);
+    assert.equal(defaultOptions.progressive, true);
+    assert.equal(defaultOptions.optimize_coding, true);
+    assert.match(facts, /a progressive JPEG with optimised Huffman tables/);
+    assert.equal(defaultDecodeOptions.preserveOrientation, false);
+    assert.match(facts, /EXIF orientation isn't applied on decode/);
+  }
+  assert.doesNotMatch(factsOf("compress-webp").text, /MozJPEG/);
+});
+
+test("m4a-to-mp3 drops cover art because the command has -vn", () => {
+  assert.ok(buildConvertCommand("m4a", "mp3").args.includes("-vn"));
+  assert.match(factsOf("m4a-to-mp3").text, /the MP3 has no cover art/);
+});
+
+test("a browser-raster output has 8 bits per channel, as the RGBA type holds", () => {
+  const heif = readFileSync(path.join(appRoot, "lib/convert/heif.ts"), "utf8");
+  assert.match(heif, /export type RGBA = \{ data: Uint8ClampedArray;/);
+  assert.match(text("browser-raster"), /a canvas output has 8 bits per channel/);
+});

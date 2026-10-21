@@ -59,6 +59,7 @@ export const ENGINE_FACTS = {
       "JPEG, WebP and AVIF outputs are written at quality 0.85 (workers/convert.worker.js); PNG has no quality setting.",
       "BMP, GIF, ICO and similar outputs are written by ImageMagick (lib/convert/encode.ts).",
       "Metadata isn't carried over: the image goes through raw pixels, so EXIF, ICC profiles and XMP are dropped (lib/convert/decode.ts, lib/convert/encode.ts).",
+      "The pixels pass through 8-bit RGBA (the RGBA type in lib/convert/heif.ts holds a Uint8ClampedArray), so a canvas output has 8 bits per channel: extra depth in the source, such as a 16-bit PNG or a 10- or 12-bit AVIF, is lost.",
       "No size limit of its own.",
       'Errors a visitor can see: "Image decode failed."; "This browser can\'t open … files; try a current Chrome, Edge, Firefox or Safari."',
     ],
@@ -264,13 +265,32 @@ for (const raw of ["hevc", "av1"]) {
   };
 }
 
+// The JPEG compressor (compressJpeg in workers/compress.worker.js) calls
+// @jsquash/jpeg's decode and encode with only a quality, so their defaults
+// (meta.js) decide the rest.
+const JPEG_COMPRESS = {
+  engines: ["jsquash-worker"],
+  facts: [
+    "The JPEG is decoded and encoded again with MozJPEG (@jsquash/jpeg) at its defaults apart from quality: a progressive JPEG with optimised Huffman tables. The width and height don't change.",
+    "The image goes through raw pixels, so EXIF (with GPS), the ICC profile and XMP are not in the result.",
+    "EXIF orientation isn't applied on decode (decodeJpeg is called without preserveOrientation, which defaults to false) and the tag is dropped, so a photo that stands upright only through its orientation tag comes out turned (unless the original comes back because the result isn't smaller). Copy must not claim the orientation is kept.",
+  ],
+};
+
 // Facts for single Tools, by Tool id.
 export const TOOL_FACTS = {
+  "compress-jpg": JPEG_COMPRESS,
+  "compress-jpeg": JPEG_COMPRESS,
   "mp3-to-mp4": {
     facts: [
       "The command adds no picture of its own (buildConvertCommand in lib/convert/ffmpeg-args.ts): an MP3 without cover art gives an MP4 with audio only, as AAC at 96 kbit/s. Do not call it H.264 video. The command does set `-c:v libx264`, so embedded cover art may come through as a picture stream.",
     ],
     unsettled: ["What happens to cover art embedded in the MP3 (untested)."],
+  },
+  "m4a-to-mp3": {
+    facts: [
+      "`-vn` leaves out every video stream, and FFmpeg reads cover art embedded in an M4A as one, so the MP3 has no cover art (buildConvertCommand in lib/convert/ffmpeg-args.ts).",
+    ],
   },
   "gif-to-mp4": {
     facts: ["The command sets no loop option and an MP4 carries no loop flag of its own, so whether the video repeats is up to the player (buildConvertCommand in lib/convert/ffmpeg-args.ts)."],
