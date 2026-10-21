@@ -36,10 +36,16 @@ console.log(
   ].join(" "),
 );
 
-const buildResult = spawnSync("opennextjs-cloudflare", ["build"], {
-  env,
-  stdio: "inherit",
-});
+// Next.js 15 left its support window on 2026-10-21. Remove this flag with
+// the Next.js 16 upgrade (#362).
+const buildResult = spawnSync(
+  "opennextjs-cloudflare",
+  ["build", "--dangerouslyUseUnsupportedNextVersion"],
+  {
+    env,
+    stdio: "inherit",
+  },
+);
 
 if (buildResult.status !== 0) {
   process.exit(buildResult.status ?? 1);
