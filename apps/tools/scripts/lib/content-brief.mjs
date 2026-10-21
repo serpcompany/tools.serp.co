@@ -113,17 +113,35 @@ function keywordSection(row, aliases, idea, ideas) {
   return lines.join("\n");
 }
 
+// A format's entry, following `aliasOf` (jpeg is jpg, tif is tiff...) to the
+// entry that holds the facts: { key, entry }, or null when there is none.
+export function resolveAlias(format, formats) {
+  let key = format;
+  for (let hops = 0; hops < 5; hops++) {
+    const entry = formats[key];
+    if (!entry) return null;
+    if (!entry.aliasOf) return { key, entry };
+    key = entry.aliasOf;
+  }
+  return null;
+}
+
 function formatSection(tool, formats) {
   if (!formats) {
     return "The shared format reference (apps/tools/content/formats.json, #357) doesn't exist yet. Say nothing about a format that you can't source; don't write format history or trivia.";
   }
-  const entries = [...new Set([tool.from, tool.to])].map((format) => [format, formats[format]]);
-  return entries
-    .map(([format, entry]) =>
-      entry
-        ? `**${format}** (apps/tools/content/formats.json, the only source for format facts):\n\n${json(entry)}`
-        : `**${format}** has no entry in apps/tools/content/formats.json: say nothing about it beyond the engine facts.`,
-    )
+  return [...new Set([tool.from, tool.to])]
+    .map((format) => {
+      const target = resolveAlias(format, formats);
+      if (!target) return `**${format}** has no entry in apps/tools/content/formats.json: say nothing about it beyond the engine facts.`;
+      if (target.key === format) {
+        return `**${format}** (apps/tools/content/formats.json, the only source for format facts):\n\n${json(target.entry)}`;
+      }
+      // The Tool's own format is an alias: show the target's facts under the
+      // alias's name (the card stays "JPEG", not "JPG").
+      const name = format.toUpperCase();
+      return `**${name}** (apps/tools/content/formats.json, the only source for format facts; ${name} is another name for ${target.entry.name ?? target.key}, so these are its facts):\n\n${json({ ...target.entry, name })}`;
+    })
     .join("\n\n");
 }
 

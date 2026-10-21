@@ -92,9 +92,7 @@ export const ENGINE_FACTS = {
       'Errors a visitor can see: "FFmpeg failed with exit code N" (for example a video with no audio track converted to audio); a FairPlay-protected M4P is refused with its own message.',
     ],
     convert: [
-      "Video outputs keep the source's frame size and frame rate up to 1920 px on the longer side and 30 fps (MAX_VIDEO_SIZE, MAX_VIDEO_FPS in lib/convert/ffmpeg-args.ts).",
       "Video to GIF: 15 fps, at most 480 px on the longer side, with a generated palette.",
-      "Some container changes copy the streams without re-encoding (`-c copy`): MKV to MP4, MOV or M4V, and MP4 to MKV, MOV, M4V, TS, MTS or M2TS (canRemux).",
     ],
     compress: [
       "Audio is re-encoded at 160 kbit/s; video with libx264 (preset medium, CRF 24), WebM with VP8 (CRF 38) (buildCompressionCommand at quality 0.82).",
@@ -179,17 +177,111 @@ export const ENGINE_FACTS = {
   },
 };
 
+
+// Facts for every Tool that writes one format (`to`), on the listed engines.
+export const TARGET_FACTS = {
+  pdf: {
+    engines: ["browser-raster", "imagemagick-wasm", "heif-decoder"],
+    facts: [
+      "Each file becomes its own PDF; several files are never merged into one (the loop in components/HeroConverter.tsx; kind \"single\" in lib/convert/workerClient.ts).",
+      "The PDF has one page, the size of the image: 1 pixel is 1 point, with no margin and no A4 or Letter page (encodeFromRGBA in lib/convert/encode.ts).",
+      "The picture is embedded losslessly as a PNG (pdf-lib embedPng); the quality setting doesn't apply.",
+      "Nothing paints a background: transparent pixels stay transparent in the PDF (stored as a soft mask) (lib/convert/encode.ts).",
+    ],
+  },
+  svg: {
+    engines: ["browser-raster"],
+    facts: [
+      "The picture is not traced to vector shapes. The SVG holds one `<image>` with the picture embedded as a PNG (base64), at the picture's pixel width and height, so it doesn't scale like a vector (encodeFromRGBA in lib/convert/encode.ts).",
+      "Nothing is resized or reduced: the full-colour picture is embedded, and transparency is kept in the embedded PNG.",
+    ],
+  },
+  ico: {
+    engines: ["browser-raster"],
+    facts: [
+      "The ICO holds one image, not a set of sizes (writeImage in lib/convert/magickBrowser.ts).",
+      "A side over 256 px is fitted inside 256 x 256 with the aspect ratio kept; a smaller image keeps its size. A 256 px image is stored as a PNG inside the ICO (lib/convert/magickBrowser.ts; lib/convert/magickBrowser.test.mjs).",
+    ],
+    unsettled: ["Whether transparency survives in the ICO (no code strips it and no test checks it)."],
+  },
+};
+
+// Facts for every Tool that reads one format (`from`), on the listed engines.
+export const SOURCE_FACTS = {
+  svg: {
+    engines: ["browser-raster"],
+    facts: [
+      "The browser's own decoder draws the SVG, and the output's pixel size is the size the browser reports for it, drawn 1:1. The code adds no scale factor, size cap or viewBox handling (lib/convert/decode.ts).",
+      "The code paints no background: the canvas starts transparent, so a PNG output keeps the SVG's transparent areas.",
+    ],
+    unsettled: ["How an animated or scripted SVG is drawn (the code doesn't handle it)."],
+  },
+};
+
+const MAGICK_PDF_ROUTE = {
+  engines: ["imagemagick-wasm"],
+  pdf: "A PDF output is made in two steps: ImageMagick writes a PNG, then the PNG is embedded in the PDF (lib/convert/magickBrowser.ts, lib/convert/workerClient.ts).",
+};
+SOURCE_FACTS.tiff = SOURCE_FACTS.tif = SOURCE_FACTS.psd = { engines: MAGICK_PDF_ROUTE.engines, facts: [], pdf: MAGICK_PDF_ROUTE.pdf };
+
+// Facts for single Tools, by Tool id.
+export const TOOL_FACTS = {
+  "mp3-to-mp4": {
+    facts: [
+      "The MP4 holds the audio only, as AAC at 96 kbit/s; the command adds no picture (buildConvertCommand in lib/convert/ffmpeg-args.ts). It is not a video: do not call it H.264 video.",
+    ],
+    unsettled: ["What happens to cover art embedded in the MP3 (untested)."],
+  },
+  "gif-to-mp4": {
+    facts: ["The command sets no loop option and an MP4 carries no loop flag of its own, so whether the video repeats is up to the player (buildConvertCommand in lib/convert/ffmpeg-args.ts)."],
+  },
+  "compress-mp4": {
+    facts: [
+      "Frame size and frame rate aren't changed: the compression command has no scale or frame-rate option (buildVideoCompressionArgs in lib/convert/ffmpeg-args.ts).",
+      "The file is written with `-movflags +faststart` (the moov atom moves to the front).",
+    ],
+  },
+  "compress-gif": {
+    facts: [
+      "Every frame is kept and nothing is resized or reduced in colours: ImageMagick re-optimises how the frames are stored (coalesce, optimizePlus, optimizeTransparency).",
+      "The result is used only if it decodes to exactly the same pixels, frame by frame, as the original (samePixels); otherwise, or if it isn't smaller, the visitor gets the original back (compressImageWithMagick in lib/convert/magickBrowser.ts).",
+    ],
+  },
+};
+
+const appliesTo = (entry, engine) => entry && (!entry.engines || entry.engines.includes(engine));
+
 // The facts for one Tool's engine, for an FFmpeg Tool the exact command
 // line, and the doc to append when this file has no summary of the engine.
 export function engineFactsFor(tool, engine) {
   const entry = ENGINE_FACTS[engine];
   const compress = tool.operation === "compress";
   const facts = entry ? [...(entry.facts ?? []), ...((compress ? entry.compress : entry.convert) ?? [])] : [];
-  const unsettled = entry?.unsettled ?? [];
+  const unsettled = entry ? [...(entry.unsettled ?? [])] : [];
+  if (entry) {
+    for (const scoped of [TARGET_FACTS[tool.to], SOURCE_FACTS[tool.from], TOOL_FACTS[tool.id]]) {
+      if (!appliesTo(scoped, engine)) continue;
+      facts.push(...(scoped.facts ?? []));
+      if (scoped.pdf && tool.to === "pdf") facts.push(scoped.pdf);
+      unsettled.push(...(scoped.unsettled ?? []));
+    }
+  }
   let command = null;
   if (engine?.startsWith("ffmpeg-wasm") || engine === "server-video, then ffmpeg-wasm") {
     try {
       const built = compress ? buildCompressionCommand(tool.from, 0.82) : buildConvertCommand(tool.from, tool.to);
+      if (!compress) {
+        const copies = built.args.some((arg, i) => arg === "-c" && built.args[i + 1] === "copy");
+        if (copies) {
+          facts.push(
+            "This conversion copies the streams without re-encoding (`-c copy`, canRemux in lib/convert/ffmpeg-args.ts): the video and audio aren't re-encoded, and the 1920 px / 30 fps cap doesn't apply, so the picture keeps the source's size and frame rate.",
+          );
+        } else if (built.args.includes("-fpsmax")) {
+          facts.push(
+            "The video is re-encoded and keeps the source's frame size and frame rate up to 1920 px on the longer side and 30 fps (MAX_VIDEO_SIZE, MAX_VIDEO_FPS in lib/convert/ffmpeg-args.ts).",
+          );
+        }
+      }
       command = [built.prepass && `ffmpeg ${built.prepass.join(" ")}`, `ffmpeg ${built.args.join(" ")}`].filter(Boolean).join("\n");
     } catch (error) {
       command = `(the command builder threw: ${error.message})`;

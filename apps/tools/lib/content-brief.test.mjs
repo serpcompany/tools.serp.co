@@ -40,7 +40,7 @@ test("a brief gives each Tool its keyword, engine facts, current copy and an ent
   assert.match(webp, /formats\.json, #357\) doesn't exist yet/);
   assert.match(webp, /The page's copy was written to the style guide\./);
   assert.match(webp, /- How-to heading: How to convert WebP to PNG\n/);
-  assert.match(text, /`seo\.howToHeading` is optional[^\n]*use the top question from the brief's questions when there is one/);
+  assert.match(text, /`seo\.howToHeading` is optional[^\n]*use the top "how to" question from the Tool's "Variants and questions" when there is one/);
   assert.match(text, /at most 60 characters with the " \| SERP Tools" the layout adds, so 47 of your own/);
 
   const m4a = section(text, "compress-m4a");
@@ -74,4 +74,33 @@ test("a brief refuses Tools that aren't live converters or compressors", () => {
     "download-loom-videos: not a converter or compressor (operation download)",
     "youtube-to-transcript: a transcription Tool; its copy is named in its own issue",
   ]);
+});
+
+test("an alias format shows its target's facts under the alias's own name", () => {
+  const formats = { jpeg: { aliasOf: "jpg" }, jpg: { name: "JPG", fullName: "JPEG image", summary: "A lossy format." }, png: { name: "PNG", summary: "Lossless." } };
+  const text = buildBrief({
+    name: "test",
+    ids: ["jpeg-to-png"],
+    tools,
+    statusRows,
+    formats,
+    styleGuide,
+    examples,
+    readDoc,
+  });
+  assert.match(text, /\*\*JPEG\*\* \(.*another name for JPG/);
+  assert.match(text, /"name": "JPEG"/);
+  assert.match(text, /"summary": "A lossy format\."/);
+  assert.doesNotMatch(text, /aliasOf/);
+  assert.match(text, /\*\*png\*\* \(/);
+});
+
+test("a brief carries the facts for its Tool's target and engine only", () => {
+  const pdf = brief(["png-to-pdf"]);
+  assert.match(pdf, /1 pixel is 1 point/);
+  const svg = brief(["png-to-svg"]);
+  assert.match(svg, /not traced/);
+  assert.doesNotMatch(svg, /1 pixel is 1 point/);
+  assert.match(brief(["mkv-to-mp4"]), /cap doesn't apply/);
+  assert.match(brief(["mp3-to-mp4"]), /audio only, as AAC/);
 });

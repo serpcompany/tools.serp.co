@@ -5,9 +5,14 @@
 // 537 megapixels, PDF.js's JPEG 0.9) are listed in PR #364 instead.
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
-import { ENGINE_FACTS } from "../scripts/lib/engine-facts.mjs";
+import { ENGINE_FACTS, engineFactsFor } from "../scripts/lib/engine-facts.mjs";
+import { splitRegistry } from "../scripts/lib/content.mjs";
+import { parseCsv } from "../scripts/lib/csv.mjs";
 import {
   mapQualityToAudioBitrate,
   mapQualityToImageQuality,
@@ -18,6 +23,17 @@ import { MAX_VIDEO_FPS, MAX_VIDEO_SIZE, buildCompressionCommand, buildConvertCom
 import { IMAGE_PDF_MAX_BYTES, IMAGE_PDF_MAX_IMAGES, IMAGE_PDF_MAX_PIXELS } from "./convert/image-pdf-inputs.ts";
 import { MAX_RENDER_PIXELS } from "./convert/pdf.ts";
 import { SERVER_ACTION_RATE_LIMIT_WINDOW_MS } from "./server-action-contract.js";
+
+
+// Facts that depend on the Tool (target format, source format, the command):
+// read through engineFactsFor with the registry's Tool and its engine.
+const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const registry = new Map(
+  splitRegistry(readFileSync(path.join(appRoot, "lib/catalog/tools.json"), "utf8")).map((entry) => JSON.parse(entry)).map((tool) => [tool.id, tool]),
+);
+const engines = new Map(
+  parseCsv(readFileSync(path.join(appRoot, "benchmarks/tool-status.csv"), "utf8")).filter((row) => row.tool_id).map((row) => [row.tool_id, row.engine]),
+);
 
 // The compressor's quality (components/HeroConverter.tsx), as the facts state it.
 const COMPRESS_QUALITY = 0.82;
@@ -30,7 +46,10 @@ const flags = (args) => args.join(" ");
 
 test("the FFmpeg facts are the command builders' and the size limits' numbers", () => {
   const ffmpeg = text("ffmpeg-wasm");
-  assert.match(ffmpeg, new RegExp(`up to ${MAX_VIDEO_SIZE} px on the longer side and ${MAX_VIDEO_FPS} fps`));
+  assert.match(
+    factsOf("avi-to-mp4").text,
+    new RegExp(`up to ${MAX_VIDEO_SIZE} px on the longer side and ${MAX_VIDEO_FPS} fps`),
+  );
 
   const gif = flags(buildConvertCommand("mp4", "gif").args);
   const [, gifFps] = gif.match(/fps=(\d+)/);
@@ -81,4 +100,98 @@ test("the server's wait between conversions is the server-action cooldown", () =
     text("server-video, then ffmpeg-wasm"),
     new RegExp(`waits ${SERVER_ACTION_RATE_LIMIT_WINDOW_MS / 1000} s before the next one`),
   );
+});
+
+const factsOf = (id) => {
+  const tool = registry.get(id);
+  assert.ok(tool, `${id} is a Tool`);
+  const result = engineFactsFor(tool, engines.get(id));
+  return { ...result, text: result.facts.join("\n"), unsettledText: result.unsettled.join("\n") };
+};
+
+test("every raster-to-PDF engine states the PDF facts", () => {
+  for (const id of ["png-to-pdf", "tiff-to-pdf", "heic-to-pdf", "psd-to-pdf"]) {
+    const { text } = factsOf(id);
+    assert.match(text, /own PDF; several files are never merged/, id);
+    assert.match(text, /1 pixel is 1 point/, id);
+    assert.match(text, /embedded losslessly as a PNG/, id);
+  }
+  assert.match(factsOf("psd-to-pdf").text, /ImageMagick writes a PNG, then the PNG is embedded/);
+  assert.doesNotMatch(factsOf("png-to-pdf").text, /ImageMagick writes a PNG/);
+  assert.doesNotMatch(factsOf("psd-to-png").text, /ImageMagick writes a PNG/);
+});
+
+test("PDF facts are not shown for other targets or for the merged image-to-pdf", () => {
+  assert.doesNotMatch(factsOf("jpeg-to-png").text, /1 pixel is 1 point/);
+  assert.doesNotMatch(factsOf("image-to-pdf").text, /several files are never merged/);
+});
+
+test("png-to-svg says the picture is embedded, not traced", () => {
+  const { text } = factsOf("png-to-svg");
+  assert.match(text, /not traced/);
+  assert.match(text, /data:image|embedded as a PNG/);
+  assert.doesNotMatch(factsOf("png-to-pdf").text, /not traced/);
+});
+
+test("ICO facts give the 256 px fit and leave alpha unsettled", () => {
+  const { text, unsettledText } = factsOf("png-to-ico");
+  assert.match(text, /one image, not a set of sizes/);
+  assert.match(text, /256 x 256/);
+  assert.match(unsettledText, /transparency survives in the ICO/);
+});
+
+test("SVG input facts give the browser's size and no background, and leave animation unsettled", () => {
+  const { text, unsettledText } = factsOf("svg-to-png");
+  assert.match(text, /no scale factor, size cap or viewBox handling/);
+  assert.match(text, /canvas starts transparent/);
+  assert.match(unsettledText, /animated or scripted SVG/);
+  assert.doesNotMatch(factsOf("png-to-svg").text, /viewBox handling/);
+});
+
+test("alpha and layer questions stay unsettled", () => {
+  assert.match(factsOf("png-to-jpg").unsettledText, /colour fills transparent areas in a JPG/);
+  assert.match(factsOf("heic-to-pdf").unsettledText, /alpha plane/);
+  assert.match(factsOf("psd-to-pdf").unsettledText, /Which page or layer/);
+});
+
+test("mkv-to-mp4 is a remux: no 1920 px / 30 fps cap", () => {
+  const { text, command } = factsOf("mkv-to-mp4");
+  assert.match(command, /-c copy/);
+  assert.match(text, /1920 px \/ 30 fps cap doesn't apply/);
+  assert.doesNotMatch(text, /re-encoded and keeps the source's frame size/);
+});
+
+test("a re-encoded video output states the cap, and a GIF or audio output does not", () => {
+  assert.match(factsOf("avi-to-mp4").text, /re-encoded and keeps the source's frame size and frame rate up to 1920 px .* 30 fps/);
+  assert.doesNotMatch(factsOf("mp4-to-gif").text, /up to 1920 px/);
+  assert.doesNotMatch(factsOf("mp4-to-mp3").text, /up to 1920 px/);
+});
+
+test("no FFmpeg Tool carries the old unqualified cap sentence", () => {
+  for (const id of ["mkv-to-mp4", "avi-to-mp4", "mp4-to-gif"]) {
+    assert.doesNotMatch(factsOf(id).text, /^Video outputs keep/m, id);
+  }
+});
+
+test("mp3-to-mp4 is audio only", () => {
+  const { text, unsettledText } = factsOf("mp3-to-mp4");
+  assert.match(text, /audio only, as AAC at 96 kbit\/s/);
+  assert.match(text, /not call it H\.264 video/);
+  assert.match(unsettledText, /cover art/);
+  assert.doesNotMatch(factsOf("wav-to-mp3").text, /audio only, as AAC/);
+});
+
+test("gif-to-mp4 sets no loop", () => {
+  const { text, command } = factsOf("gif-to-mp4");
+  assert.match(text, /sets no loop option/);
+  assert.doesNotMatch(command, /loop/);
+});
+
+test("compress-mp4 and compress-gif facts", () => {
+  const mp4 = factsOf("compress-mp4");
+  assert.match(mp4.text, /Frame size and frame rate aren't changed/);
+  assert.doesNotMatch(mp4.command, /-vf|-r |-fpsmax/);
+  const gif = factsOf("compress-gif");
+  assert.match(gif.text, /Every frame is kept/);
+  assert.match(gif.text, /exactly the same pixels/);
 });
