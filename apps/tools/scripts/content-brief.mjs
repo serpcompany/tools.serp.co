@@ -3,7 +3,9 @@
 // volumes, its engine and what that engine really does, the format reference
 // (apps/tools/content/formats.json, once #357 adds it), its current copy and
 // an entry to fill in; its keyword variants and questions come from
-// benchmarks/keyword-ideas.json when that exists; once, the style guide and a finished example.
+// benchmarks/keyword-ideas.json when that exists; for a Tool in
+// benchmarks/content-topics.json, what the ranking pages cover and the sourced
+// facts of content/format-guides.json; once, the style guide and a finished example.
 //
 //   pnpm content:brief <tool-id>... [--name <batch>]
 //
@@ -43,6 +45,8 @@ if (problems.length) {
 const read = (file) => readFileSync(file, "utf8");
 const formatsPath = path.join(appRoot, "content/formats.json");
 const ideasPath = path.join(appRoot, "benchmarks/keyword-ideas.json");
+const topicsPath = path.join(appRoot, "benchmarks/content-topics.json");
+const guidesPath = path.join(appRoot, "content/format-guides.json");
 const batch = name ?? ids[0];
 const brief = buildBrief({
   name: batch,
@@ -54,6 +58,9 @@ const brief = buildBrief({
   styleGuide: read(path.join(repoRoot, "docs/converter-copy.md")),
   examples: JSON.parse(read(path.join(appRoot, BATCH_DIR, "examples.json"))),
   readDoc: (doc) => read(path.join(repoRoot, doc)),
+  depth: existsSync(topicsPath)
+    ? { topics: JSON.parse(read(topicsPath)), guides: existsSync(guidesPath) ? JSON.parse(read(guidesPath)) : null }
+    : null,
 });
 
 const outDir = path.join(repoRoot, "tmp/content-briefs");

@@ -116,6 +116,20 @@ writes one.
 - **Format cards** (`aboutSection`): a card for each format, required on a
   converter. Take names, full names and facts from the format reference
   (`apps/tools/content/formats.json`, #357) once it exists.
+- **How-to** (`howTo`, optional): a title and at least 3 steps, in place of
+  the generated How-to. The title follows the How-to heading's rules, and
+  `seo.howToHeading` is then left out.
+- **Guide** (`guide`, optional): a Markdown article after the pair notes,
+  with `###` subheadings and no tables: the formats' background, how they
+  differ for this pair, and other ways to convert.
+
+### Writing in depth
+
+A Tool in `apps/tools/benchmarks/content-topics.json` gets a page as long as
+the pages ranking for its keyword. That file holds, per Tool, the topics
+Ahrefs Content Helper finds on those pages and their measured word counts.
+Its brief adds them, asks for at least 8 FAQs, a `howTo` and a `guide`, and
+lists the guide's sourced facts.
 
 ## What may be claimed
 
@@ -125,7 +139,11 @@ Every claim has a source a reviewer can check:
   "Briefs" below). If the brief says the code doesn't settle something, don't
   claim it either way.
 - What a format is: the format reference.
-- Nothing else. No dates, release notes, version numbers, statistics,
+- A format's background and other apps that convert it, in a guide: the
+  facts in `apps/tools/content/format-guides.json`, each with its primary
+  source (a standard, the developer's or vendor's own pages). wiki.serp.co is
+  a lead to check, never a source: its text is scraped from other sites.
+- Nothing else. Outside a guide's sourced facts, no dates, release notes, version numbers, statistics,
   percentages, speeds, user counts or reviews. Converter pages have no
   changelog and no blog posts; `content:check` fails a Tool that has either.
 - Never promise a result the engine can't give: "without losing quality" on a
