@@ -39,6 +39,9 @@ test("a brief gives each Tool its keyword, engine facts, current copy and an ent
   assert.match(webp, /Not settled by the code[^]*What colour fills transparent areas in a JPG output/);
   assert.match(webp, /formats\.json, #357\) doesn't exist yet/);
   assert.match(webp, /The page's copy was written to the style guide\./);
+  assert.match(webp, /- How-to heading: How to convert WebP to PNG\n/);
+  assert.match(text, /`seo\.howToHeading` is optional[^\n]*use the top question from the brief's questions when there is one/);
+  assert.match(text, /at most 60 characters with the " \| SERP Tools" the layout adds, so 47 of your own/);
 
   const m4a = section(text, "compress-m4a");
   assert.match(m4a, /The compressor asks for quality 0\.82/);

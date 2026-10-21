@@ -3,9 +3,26 @@
 // repository. Pure: the command reads the files and writes the brief.
 
 import { toolHref } from "../../lib/catalog/href.ts";
-import { isTranscriptionTool, onConverterPage, toolSeo } from "../../lib/metadata.ts";
+import {
+  SEO_TITLE_MAX,
+  SITE_TITLE_SUFFIX,
+  howToHeading,
+  isTranscriptionTool,
+  onConverterPage,
+  servedTitleLength,
+  toolSeo,
+} from "../../lib/metadata.ts";
 import { buildConverterFaqs } from "../../lib/tool-sections.ts";
-import { BATCH_DIR, DESCRIPTION_MAX, DESCRIPTION_MIN, FAQS_MIN, PAIR_NOTES_MIN, isConverter, pageFields } from "./content.mjs";
+import {
+  BATCH_DIR,
+  DESCRIPTION_MAX,
+  DESCRIPTION_MIN,
+  FAQS_MIN,
+  HOW_TO_HEADING_MAX,
+  PAIR_NOTES_MIN,
+  isConverter,
+  pageFields,
+} from "./content.mjs";
 import { converterPageFacts, engineFactsFor } from "./engine-facts.mjs";
 
 const SITE = "https://tools.serp.co";
@@ -76,8 +93,9 @@ function currentCopy(tool) {
   const seo = toolSeo(tool);
   const content = tool.content;
   const parts = [
-    `- Title: ${seo.title} (${seo.title.length} characters; the layout adds " | SERP Tools")`,
+    `- Title: ${seo.title} (${servedTitleLength(seo.title)} characters with the "${SITE_TITLE_SUFFIX}" the layout adds)`,
     `- H1: ${seo.h1}`,
+    ...(onConverterPage(tool) ? [`- How-to heading: ${content?.howTo?.title ?? howToHeading(tool)}`] : []),
     `- Description: ${seo.description} (${seo.description.length} characters)`,
     `- Subtitle: ${content?.tool.subtitle ?? tool.description}`,
   ];
@@ -199,7 +217,8 @@ export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, 
     "",
     list([
       `One JSON file, \`apps/tools/${BATCH_DIR}/${name}.json\`, holding an entry for each Tool below, shaped like the example and the "Your entry" skeletons.`,
-      `Title and H1 must contain the Tool's keyword, and take their noun from it (see "Titles, H1s and descriptions" in the style guide); the title is at most 60 characters and never names the site. The description is ${DESCRIPTION_MIN}–${DESCRIPTION_MAX} characters.`,
+      `Title and H1 must contain the Tool's keyword, and take their noun from it (see "Titles, H1s and descriptions" in the style guide); the title is at most ${SEO_TITLE_MAX} characters with the "${SITE_TITLE_SUFFIX}" the layout adds, so ${SEO_TITLE_MAX - SITE_TITLE_SUFFIX.length} of your own, and never names the site. The description is ${DESCRIPTION_MIN}–${DESCRIPTION_MAX} characters.`,
+      `\`seo.howToHeading\` is optional and replaces a converter page's generated How-to heading: use the top question from the brief's questions when there is one (a "how to" keyword or alias keyword above, worded as a heading), else leave it out. It contains each word of the keyword and is at most ${HOW_TO_HEADING_MAX} characters.`,
       `At least ${FAQS_MIN} FAQs and ${PAIR_NOTES_MIN} pair notes, each specific to its Tool: an answer that could sit on another Tool's page fails the check.`,
       "Every claim comes from this brief's engine facts or format reference. Nothing else: no dates, versions, statistics, or links off the site.",
       `Check it with \`pnpm content:check --batch ${name}\`, which writes nothing. The owner's side applies it with \`pnpm content:apply ${name}\`.`,

@@ -18,7 +18,7 @@ batch file, `apps/tools/content/batches/<batch>.json`, and
 ```json
 {
   "webp-to-png": {
-    "seo": { "title": "…", "h1": "…", "description": "…" },
+    "seo": { "title": "…", "h1": "…", "description": "…", "howToHeading": "…" },
     "tool": { "subtitle": "…" },
     "faqs": [{ "question": "…", "answer": "…" }],
     "aboutSection": { "title": "…", "fromFormat": {}, "toFormat": {} },
@@ -49,8 +49,9 @@ png". So each page uses all three shapes:
   and the alias keywords in the brief.
 - **H1**: the noun phrase. Take the noun from the keyword or an alias
   (converter, compressor, optimizer, generator); keep the keyword in it.
-- **How-to heading**: the top "how to" question. It is generated, as below;
-  a batch can't set it yet.
+- **How-to heading**: the top "how to" question. It is generated, as below,
+  unless the batch sets `seo.howToHeading` (optional): use the top question
+  from the brief's questions when there is one.
 
 With no `content.seo`, `toolSeo` in `apps/tools/lib/metadata.ts` generates the
 default from the Tool's name, and the layout adds " | SERP Tools":
@@ -62,8 +63,11 @@ default from the Tool's name, and the layout adds " | SERP Tools":
 
 The heading says "an" before a format read letter by letter from a vowel
 sound ("an MP4", "an M4A", "an SVG") and "a" otherwise ("a PNG", "a MOV", "a
-FLAC"). A title that would pass 60 characters drops " Online (Free)". A name
-that isn't a pair ("Character Counter") keeps the name. Write your own title
+FLAC"). A title that would pass 60 characters with the layout's " | SERP
+Tools" drops " Online (Free)": "Convert Markdown to Pandas DataFrame". A
+converter whose name isn't a pair ("Character Counter") keeps its name as its
+title. A compressor names its format as the format reference does ("WebP
+Compressor"), whatever the catalog name's casing. Write your own title
 in the same shape when the keyword has a noun the default lacks ("PNG
 Optimizer", "to X online"); otherwise keep the default. A writer's
 `content.seo` always wins: it replaces the generated title, H1 and
@@ -82,10 +86,13 @@ writes one.
 
 ## Lengths
 
-- Title: at most 60 characters, without " | SERP Tools". Never name the site.
+- Title: at most 60 characters with the " | SERP Tools" the layout adds, so
+  47 of your own. Never name the site.
 - H1: at most 60 characters, and contains the keyword, worded as above.
 - Description: 110 to 160 characters. Say what the page does, one fact that
   matters for the pair, and "free, with no sign-up" if room is left.
+- How-to heading (optional): at most 70 characters, with each word of the
+  keyword, in any order ("How do I convert a WebP to a PNG?").
 - Subtitle: one sentence under the H1, about 80 characters.
 
 ## What each field is for
@@ -152,7 +159,11 @@ compressor. It fails when:
 - the title or H1 lacks the Tool's keyword (`keyword` in
   `apps/tools/benchmarks/tool-status.csv`; letters and digits compared, case
   and spaces ignored);
-- the title or H1 is over 60 characters, or the title names the site;
+- the title is over 60 characters with " | SERP Tools", the H1 over 60, or
+  the title names the site;
+- a written How-to heading is over 70 characters, lacks a word of the keyword
+  (of the Tool's formats when it has none), or isn't shown: the Tool isn't on
+  the converter page, or its `content.howTo` replaces the section;
 - the description is outside 110–160 characters (Ahrefs reports one under
   110 as too short);
 - two Tools share a title, an H1 or a description;

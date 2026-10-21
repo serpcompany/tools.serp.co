@@ -23,6 +23,8 @@ import {
   runsInBrowser,
   toolSeo,
   SEO_TITLE_MAX,
+  SITE_TITLE_SUFFIX,
+  servedTitleLength,
 } from "../../lib/metadata.ts";
 import { buildConverterFaqs, converterAccept } from "../../lib/tool-sections.ts";
 import { parseCsv } from "./csv.mjs";
@@ -45,6 +47,9 @@ export const DESCRIPTION_MAX = 160;
 // answers score 0.04 at most.
 export const FAQ_SIMILARITY_MAX = 0.6;
 export const FAQS_MIN = 3;
+// A written How-to heading (content.seo.howToHeading): a question, as long as
+// people search one.
+export const HOW_TO_HEADING_MAX = 70;
 export const PAIR_NOTES_MIN = 2;
 
 // The fields a batch may set on a Tool, and the order content keys are
@@ -82,6 +87,15 @@ export function pageFields(tool) {
 // Lower case letters and digits only: "WebP to PNG" contains "webp to png",
 // and "CSV to Pandas DataFrame" contains "csv to pandasdataframe".
 const squash = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+// Whether text has each word of the keyword, in any order and with other
+// words between: "How do I convert a WebP to a PNG?" has "webp to png".
+const hasKeywordWords = (text, keyword) =>
+  keyword
+    .split(/\s+/)
+    .map(squash)
+    .filter(Boolean)
+    .every((word) => squash(text).includes(word));
 
 // The keyword each live Tool's row names in the Tool status view.
 export function keywordsFromStatus(csvText) {
@@ -176,6 +190,29 @@ function requiredFields(tool, content, fail) {
   }
 }
 
+// A written How-to heading: shown on the converter page, in place of the
+// generated one, so it holds the keyword's words (or, without a keyword, the
+// Tool's formats) and fits HOW_TO_HEADING_MAX.
+function checkHowToHeading(tool, content, keyword, fail) {
+  const heading = content.seo.howToHeading;
+  if (typeof heading !== "string" || !heading.trim()) {
+    fail("required", "content.seo.howToHeading is empty");
+    return;
+  }
+  if (!onConverterPage(tool)) {
+    fail("unshown", "content.seo.howToHeading is set, but this Tool's page has no generated How-to heading");
+  } else if (content.howTo) {
+    fail("unshown", "content.seo.howToHeading is set, but content.howTo replaces the How-to section");
+  }
+  if (heading.length > HOW_TO_HEADING_MAX) {
+    fail("length", `How-to heading is ${heading.length} characters, over ${HOW_TO_HEADING_MAX}`);
+  }
+  const words = keyword ?? [tool.from, tool.to].filter(Boolean).join(" ");
+  if (!hasKeywordWords(heading, words)) {
+    fail("keyword", `How-to heading "${heading}" lacks a word of ${keyword ? `the keyword "${keyword}"` : `the formats "${words}"`}`);
+  }
+}
+
 // A converter page's template FAQs vary by operation and by where the file
 // is converted: in-browser and server-first converters, and in-browser and
 // server compressors.
@@ -204,7 +241,9 @@ export function checkContent(tools, { keywords }) {
       if (!squash(seo.title).includes(squash(keyword))) fail("keyword", `title "${seo.title}" lacks the keyword "${keyword}"`);
       if (!squash(seo.h1).includes(squash(keyword))) fail("keyword", `H1 "${seo.h1}" lacks the keyword "${keyword}"`);
     }
-    if (seo.title.length > SEO_TITLE_MAX) fail("length", `title is ${seo.title.length} characters, over ${SEO_TITLE_MAX}`);
+    if (servedTitleLength(seo.title) > SEO_TITLE_MAX) {
+      fail("length", `title is ${servedTitleLength(seo.title)} characters with "${SITE_TITLE_SUFFIX}", over ${SEO_TITLE_MAX}`);
+    }
     if (seo.h1.length > SEO_TITLE_MAX) fail("length", `H1 is ${seo.h1.length} characters, over ${SEO_TITLE_MAX}`);
     if (/SERP Tools/i.test(seo.title)) fail("length", 'title names the site; the layout adds " | SERP Tools"');
     if (seo.description.length < DESCRIPTION_MIN || seo.description.length > DESCRIPTION_MAX) {
@@ -234,6 +273,7 @@ export function checkContent(tools, { keywords }) {
       answers.push({ tool, where: `faqs[${index}]`, phrases: phrases(tool, faq.answer), checked: Boolean(content.seo) });
     }
     if (content.seo) requiredFields(tool, content, fail);
+    if (content.seo?.howToHeading !== undefined) checkHowToHeading(tool, content, keyword, fail);
   }
 
   // The template FAQs a page without curated FAQs shows, as another Tool's

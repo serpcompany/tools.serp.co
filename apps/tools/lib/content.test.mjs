@@ -22,6 +22,7 @@ import {
 } from "../scripts/lib/content.mjs";
 import { activeTools } from "./catalog/catalog.ts";
 import { TOOLS_WITH_OWN_PAGE, isTranscriptionTool, toolSeo } from "./metadata.ts";
+import { buildHowToSection } from "./tool-sections.ts";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -95,31 +96,73 @@ test("the title and H1 must contain the Tool's keyword", () => {
   assert.match(failures[0].message, /title "Compress M4A Files Online \(Free\)" lacks the keyword "m4a audio shrinker"/);
 });
 
-test("the title is at most 60 characters and never names the site", () => {
+test("the title is at most 60 characters with the layout's suffix, and never names the site", () => {
   const tools = catalog();
-  tools[0].content.seo.title = `WebP to PNG ${"x".repeat(49)}`;
-  assert.equal(tools[0].content.seo.title.length, 61);
-  assert.deepEqual(rules(checkContent(tools, noKeywords)), ["length"]);
+  tools[0].content.seo.title = `WebP to PNG ${"x".repeat(35)}`;
+  assert.equal(tools[0].content.seo.title.length, 47);
+  assert.deepEqual(rules(checkContent(tools, noKeywords)), []);
+  tools[0].content.seo.title += "x";
+  assert.deepEqual(
+    checkContent(tools, noKeywords).map((failure) => failure.message),
+    ['title is 61 characters with " | SERP Tools", over 60'],
+  );
   tools[0].content.seo.title = "WebP to PNG | SERP Tools";
   assert.deepEqual(rules(checkContent(tools, noKeywords)), ["length"]);
 });
 
 test("a long name drops the suffix from the title, and an H1 over 60 characters fails", () => {
-  const long = converter("pandasdataframe-to-restructuredtext", "pandasdataframe", "restructuredtext", {
-    name: "Pandas DataFrame to reStructuredText Table",
+  const long = converter("markdown-to-pandasdataframe", "markdown", "pandasdataframe", {
+    name: "Markdown to Pandas DataFrame",
   });
-  // "Convert Pandas DataFrame to reStructuredText Table" is 50 characters:
-  // with " Online (Free)" it would be 64, so the title drops the suffix.
+  // "Convert Markdown to Pandas DataFrame Online (Free) | SERP Tools" would
+  // be 63 characters, so the title drops " Online (Free)": 49 served.
   const seo = toolSeo(long);
-  assert.equal(seo.h1, "Pandas DataFrame to reStructuredText Table Converter");
-  assert.equal(seo.title, "Convert Pandas DataFrame to reStructuredText Table");
+  assert.equal(seo.h1, "Markdown to Pandas DataFrame Converter");
+  assert.equal(seo.title, "Convert Markdown to Pandas DataFrame");
   assert.deepEqual(checkContent([long], noKeywords).filter((failure) => failure.rule === "length"), []);
 
   long.name = "Pandas DataFrame to reStructuredText Grid Table Markup";
   assert.equal(toolSeo(long).h1.length, 64);
   assert.deepEqual(
     checkContent([long], noKeywords).map((failure) => failure.message),
-    ["title is 62 characters, over 60", "H1 is 64 characters, over 60"],
+    ['title is 75 characters with " | SERP Tools", over 60', "H1 is 64 characters, over 60"],
+  );
+});
+
+test("a written How-to heading has the keyword's words, fits 70 characters, and is shown", () => {
+  const keywords = new Map([["webp-to-png", "webp to png"]]);
+  const tools = catalog();
+  tools[0].content.seo.howToHeading = "How do I convert a WebP to a PNG?";
+  assert.deepEqual(checkContent(tools, { keywords }), []);
+  assert.equal(
+    buildHowToSection(tools[0]).title,
+    "How do I convert a WebP to a PNG?",
+    "the converter page shows it in place of the generated heading",
+  );
+
+  tools[0].content.seo.howToHeading = "How do I convert a WebP image?";
+  assert.deepEqual(checkContent(tools, { keywords }).map((failure) => failure.message), [
+    'How-to heading "How do I convert a WebP image?" lacks a word of the keyword "webp to png"',
+  ]);
+  // Without a keyword, it names the Tool's formats.
+  assert.deepEqual(rules(checkContent(tools, noKeywords)), ["keyword"]);
+
+  tools[0].content.seo.howToHeading = `How to convert WebP to PNG ${"x".repeat(44)}`;
+  assert.deepEqual(checkContent(tools, { keywords }).map((failure) => failure.message), [
+    "How-to heading is 71 characters, over 70",
+  ]);
+
+  tools[0].content.seo.howToHeading = "How to convert WebP to PNG";
+  tools[0].content.howTo = { title: "Steps", intro: "Do this.", steps: ["One."] };
+  assert.deepEqual(checkContent(tools, { keywords }).map((failure) => failure.message), [
+    "content.seo.howToHeading is set, but content.howTo replaces the How-to section",
+  ]);
+
+  const table = written(converter("csv-to-json", "csv", "json"), "csv rows");
+  table.content.seo.howToHeading = "How to convert CSV to JSON";
+  assert.deepEqual(
+    checkContent([table], noKeywords).filter((failure) => failure.rule === "unshown").map((failure) => failure.message),
+    ["content.seo.howToHeading is set, but this Tool's page has no generated How-to heading"],
   );
 });
 
@@ -343,6 +386,14 @@ test("content:apply reports a batch that breaks a rule", () => {
   batch["mp4-to-mp3"].seo.description = "Too short.";
   const { problems } = applyBatch(registryOf(catalog()), batch, noKeywords);
   assert.deepEqual(problems, ["mp4-to-mp3 [length] description is 10 characters, outside 110–160"]);
+});
+
+test("content:apply writes a batch's How-to heading", () => {
+  const batch = batchFor("mp4 audio");
+  batch["mp4-to-mp3"].seo.howToHeading = "How to convert an MP4 to MP3";
+  const { text, problems } = applyBatch(registryOf(catalog()), batch, noKeywords);
+  assert.deepEqual(problems, []);
+  assert.equal(JSON.parse(splitRegistry(text)[1]).content.seo.howToHeading, "How to convert an MP4 to MP3");
 });
 
 test("tools.json splits into entries and joins back byte for byte, and holds the examples batch", () => {

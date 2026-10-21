@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { handlerFor, scanPageHandlers } from "../scripts/lib/tool-sweep.mjs";
 import { prefersServerConversion } from "./capabilities.ts";
 import { usesWebCodecs } from "./convert/webcodecs.ts";
+import { formatName } from "./format-names.ts";
 import { activeTools } from "./catalog/catalog.ts";
 import { categoryPageCount, categoryPageHref } from "./catalog/category-pages.ts";
 import { directoryCategories } from "./catalog/directory.ts";
@@ -19,6 +20,7 @@ import {
   indefiniteArticle,
   isTranscriptionTool,
   runsInBrowser,
+  servedTitleLength,
   toolHeading,
   toolDescription,
   toolSeo,
@@ -154,7 +156,15 @@ test("converter and compressor titles and H1s follow the owner's pattern, or the
   assert.deepEqual(seo("compress-m4a"), ["Compress M4A Files Online (Free)", "M4A Compressor"]);
   assert.deepEqual(seo("png-to-png"), ["Compress PNG Files Online (Free)", "PNG Compressor"]);
   assert.deepEqual(seo("csv-to-json"), ["Convert CSV to JSON Online (Free)", "CSV to JSON Converter"]);
-  assert.deepEqual(seo("character-counter"), ["Character Counter Online (Free)", "Character Counter"]);
+  // A converter whose name isn't a pair keeps it as its title, as staging serves it.
+  assert.deepEqual(seo("character-counter"), ["Character Counter", "Character Counter"]);
+  // Titles count the layout's " | SERP Tools": these two drop " Online (Free)".
+  assert.deepEqual(seo("markdown-to-pandasdataframe"), ["Convert Markdown to Pandas DataFrame", "Markdown to Pandas DataFrame Converter"]);
+  assert.deepEqual(seo("markdown-to-restructuredtext"), ["Convert Markdown to reStructuredText", "Markdown to reStructuredText Converter"]);
+  // A compressor names its format as the format reference does, whatever the
+  // catalog name's casing (WEBP Compressor).
+  assert.deepEqual(seo("compress-webp"), ["Compress WebP Files Online (Free)", "WebP Compressor"]);
+  assert.deepEqual(seo("compress-webm"), ["Compress WebM Files Online (Free)", "WebM Compressor"]);
   // Downloaders and the other operations keep their own titles.
   assert.equal(buildToolMetadata("download-tiktok-videos").title, "TikTok Video Downloader");
 
@@ -168,12 +178,12 @@ test("converter and compressor titles and H1s follow the owner's pattern, or the
   const titles = new Set();
   for (const tool of activeTools().filter(hasToolSeo)) {
     const { title, h1 } = toolSeo(tool);
-    assert.ok(title.length <= 60, `${tool.id}: ${title}`);
+    assert.ok(servedTitleLength(title) <= 60, `${tool.id}: ${title} | SERP Tools`);
     // The default: the verb phrase over the noun phrase. A writer's
     // content.seo follows the Tool's keyword instead.
     if (!tool.content?.seo && tool.operation === "compress") {
       assert.match(title, /^Compress .+ Files( Online \(Free\))?$/, tool.id);
-      assert.match(h1, / Compressor$/, tool.id);
+      assert.equal(h1, `${formatName(tool.from)} Compressor`, tool.id);
     } else if (!tool.content?.seo && / to /.test(tool.name)) {
       assert.match(title, /^Convert .+ to .+?( Online \(Free\))?$/, tool.id);
       assert.equal(h1, `${tool.name} Converter`, tool.id);
@@ -280,6 +290,11 @@ test("a converter page's How-to heading is the question people search, with a or
   assert.equal(heading("compress-mp4"), "How to compress an MP4 file");
   assert.equal(heading("compress-m4a"), "How to compress an M4A file");
   assert.equal(heading("png-to-png"), "How to compress a PNG file");
+  assert.equal(heading("compress-webp"), "How to compress a WebP file");
+  // A writer's content.seo.howToHeading replaces the generated one.
+  const webp = activeTools().find((tool) => tool.id === "webp-to-png");
+  const written = { ...webp, content: { ...webp.content, seo: { ...webp.content.seo, howToHeading: "How do I convert a WebP to a PNG?" } } };
+  assert.equal(buildHowToSection(written).title, "How do I convert a WebP to a PNG?");
   const article = (format) => `${indefiniteArticle(format)} ${format}`;
   assert.deepEqual(
     ["MP4", "M4A", "MKV", "FLV", "SVG", "AAC", "AVIF", "OGG", "MP3", "PNG", "MOV", "FLAC", "GIF", "WEBM", "JPEG", "PDF"].map(article),

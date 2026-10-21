@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
+import { formatNamesSource } from "../scripts/format-names.mjs";
+
 const formats = JSON.parse(readFileSync(new URL("./formats.json", import.meta.url), "utf8"));
 const registry = JSON.parse(
   readFileSync(new URL("../lib/catalog/tools.json", import.meta.url), "utf8"),
@@ -65,4 +67,9 @@ test("every fact entry has the documented shape and limits", () => {
       }
     }
   }
+});
+
+test("lib/format-names.ts is generated from the current formats.json", () => {
+  const generated = readFileSync(new URL("../lib/format-names.ts", import.meta.url), "utf8");
+  assert.equal(generated, formatNamesSource(formats), "run node apps/tools/scripts/format-names.mjs");
 });

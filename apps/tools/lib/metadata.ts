@@ -9,9 +9,11 @@ import { categoryPage, directoryCategories, type CategoryPage } from "./catalog/
 import { CATEGORY_CONTENT, isToolOperation, type ToolOperation } from "./catalog/operations.ts";
 import { resolveCompressionTarget } from "./compression-utils.ts";
 import { usesWebCodecs } from "./convert/webcodecs.ts";
+import { formatName } from "./format-names.ts";
 import {
   DESCRIPTION_MAX,
   FREE,
+  TITLE_TEMPLATE,
   composeDescription,
   pageMetadata,
   type Fact,
@@ -125,7 +127,7 @@ function toolFacts(tool: Tool, lead: string): Fact[] {
   if (tool.operation === "view" || tool.operation === "edit") return [PDF_TOOLBAR, free];
   if (!onConverterPage(tool)) return [free];
 
-  const from = formatLabel(tool, tool.from);
+  const from = tool.operation === "compress" ? compressedFormat(tool) : formatLabel(tool, tool.from);
   const steps =
     tool.operation === "compress"
       ? `Choose your ${from} file, then download the compressed copy.`
@@ -153,11 +155,16 @@ export function toolDescription(tool: Tool): string {
 // default pattern (#356), shaped by how people search each operation: the
 // title is the verb phrase, the H1 the noun phrase. "Convert WebP to PNG
 // Online (Free)" over an H1 of "WebP to PNG Converter", and "Compress MP4
-// Files Online (Free)" over "MP4 Compressor". A title that would pass 60
-// characters drops " Online (Free)". A name that isn't a pair, such as
-// Character Counter, keeps the name. docs/converter-copy.md has the rules
+// Files Online (Free)" over "MP4 Compressor". A title whose served form,
+// with the layout's " | SERP Tools", would pass 60 characters drops
+// " Online (Free)". A converter whose name isn't a pair, such as Character
+// Counter, keeps its name as its title. docs/converter-copy.md has the rules
 // `pnpm content:check` holds every one of them to.
 export const SEO_TITLE_MAX = 60;
+// What the root layout's title template adds after a page's own title.
+export const SITE_TITLE_SUFFIX = TITLE_TEMPLATE.replace("%s", "");
+// A title as search results show it: the page's own, then the site.
+export const servedTitleLength = (title: string) => title.length + SITE_TITLE_SUFFIX.length;
 const TITLE_SUFFIX = " Online (Free)";
 
 // Transcription Tools turn audio or video into a text transcript. The owner
@@ -173,9 +180,10 @@ export function hasToolSeo(tool: Tool): boolean {
   return (tool.operation === "convert" || tool.operation === "compress") && !isTranscriptionTool(tool);
 }
 
-// The format a compressor names: "M4A" for M4A Compressor.
+// The format a compressor names, as the format reference writes it
+// (lib/format-names.ts): "M4A", and "WebP" for the catalog's WEBP Compressor.
 function compressedFormat(tool: Tool): string {
-  return tool.name.match(/^(.+) Compressor$/)?.[1] ?? formatLabel(tool, tool.from ?? "");
+  return formatName(tool.from ?? "");
 }
 
 const isPair = (tool: Tool) => / to /.test(tool.name);
@@ -185,11 +193,11 @@ function generatedH1(tool: Tool): string {
   return isPair(tool) ? `${tool.name} Converter` : tool.name;
 }
 
-function generatedTitle(tool: Tool, h1: string): string {
-  let stem = h1;
-  if (tool.operation === "compress") stem = `Compress ${compressedFormat(tool)} Files`;
-  else if (isPair(tool)) stem = `Convert ${tool.name}`;
-  return `${stem}${TITLE_SUFFIX}`.length <= SEO_TITLE_MAX ? `${stem}${TITLE_SUFFIX}` : stem;
+function generatedTitle(tool: Tool): string {
+  if (tool.operation !== "compress" && !isPair(tool)) return tool.name;
+  const stem = tool.operation === "compress" ? `Compress ${compressedFormat(tool)} Files` : `Convert ${tool.name}`;
+  const full = `${stem}${TITLE_SUFFIX}`;
+  return servedTitleLength(full) <= SEO_TITLE_MAX ? full : stem;
 }
 
 // "a" or "an" before a format as it is said: "an MP4", "an M4A", "an AVIF",
@@ -205,8 +213,11 @@ export function indefiniteArticle(format: string): "a" | "an" {
 }
 
 // The How-to heading of a converter page: the question people search.
-// "How to convert WebP to PNG", "How to compress an MP4 file".
+// "How to convert WebP to PNG", "How to compress an MP4 file", or the
+// writer's content.seo.howToHeading.
 export function howToHeading(tool: Tool): string | undefined {
+  const written = tool.content?.seo?.howToHeading;
+  if (written) return written;
   if (tool.operation === "compress") {
     const format = compressedFormat(tool);
     return `How to compress ${indefiniteArticle(format)} ${format} file`;
@@ -218,7 +229,7 @@ export function toolSeo(tool: Tool): ToolSeo {
   const curated = tool.content?.seo;
   const h1 = curated?.h1 ?? generatedH1(tool);
   return {
-    title: curated?.title ?? generatedTitle(tool, h1),
+    title: curated?.title ?? generatedTitle(tool),
     h1,
     description: curated?.description ?? toolDescription(tool),
   };
