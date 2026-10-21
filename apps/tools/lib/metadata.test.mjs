@@ -95,7 +95,8 @@ test("every page's description fits what search results show, and no two pages s
 
 test("a Tool without curated content gets a description of 120 to 160 characters", () => {
   const generated = toolsWithToolMetadata.filter((tool) => !tool.content);
-  assert.ok(generated.length > 2000);
+  // Wave A (#358) and later waves curate the biggest Tools; thousands stay generated.
+  assert.ok(generated.length > 1000);
   for (const tool of generated) {
     const { description } = buildToolMetadata(tool.id);
     assert.ok(
@@ -274,7 +275,7 @@ test("a description says the file stays in the browser only where the page keeps
     }
   }
   assert.match(buildToolMetadata("3gp-to-hevc").description, new RegExp(IN_BROWSER));
-  assert.match(buildToolMetadata("png-to-jpg").description, new RegExp(IN_BROWSER));
+  assert.match(buildToolMetadata("png-to-bmp").description, new RegExp(IN_BROWSER));
   // Server first: /api/video-convert, /api/pdf-compress.
   assert.doesNotMatch(buildToolMetadata("mp4-to-rm").description, /browser/);
   assert.doesNotMatch(buildToolMetadata("amr-to-ogg").description, /browser/);
@@ -284,7 +285,12 @@ test("a description says the file stays in the browser only where the page keeps
 });
 
 test("a converter page's How-to heading is the question people search, with a or an as the format is said", () => {
-  const heading = (id) => buildHowToSection(activeTools().find((tool) => tool.id === id)).title;
+  // The generated heading, without any written content.seo.howToHeading.
+  const heading = (id) => {
+    const tool = activeTools().find((entry) => entry.id === id);
+    const seo = tool.content?.seo && { ...tool.content.seo, howToHeading: undefined };
+    return buildHowToSection(tool.content ? { ...tool, content: { ...tool.content, seo } } : tool).title;
+  };
   assert.equal(heading("png-to-pdf"), "How to convert PNG to PDF");
   assert.equal(heading("webp-to-png"), "How to convert WebP to PNG");
   assert.equal(heading("compress-mp4"), "How to compress an MP4 file");
