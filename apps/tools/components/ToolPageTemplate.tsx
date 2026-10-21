@@ -5,8 +5,6 @@ import { StructuredData } from "@/components/StructuredData";
 import { AboutFormatsSection } from "@/components/sections/AboutFormatsSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { BlogSection } from "@/components/sections/BlogSection";
-import { ChangelogSection } from "@/components/sections/ChangelogSection";
 import { RelatedToolsSection } from "@/components/sections/RelatedToolsSection";
 import { RelatedAppsSection } from "@/components/sections/RelatedAppsSection";
 import { HowToSection } from "@/components/sections/HowToSection";
@@ -18,9 +16,7 @@ import type {
   VideoSectionData,
   FAQ,
   AboutFormatsSection as AboutFormatsSectionData,
-  ChangelogEntry,
   RelatedTool,
-  BlogPost,
   HowToSectionData,
   InfoArticleSectionData
 } from "@/types";
@@ -33,12 +29,11 @@ type ToolPageProps = {
   aboutSection?: AboutFormatsSectionData;
   howTo?: HowToSectionData;
   infoArticle?: InfoArticleSectionData;
-  changelog?: ChangelogEntry[];
   relatedTools?: RelatedTool[];
-  blogPosts?: BlogPost[];
 };
 
-// A Server Component: it holds no state, and RelatedToolsSection and
+// Converter and compressor pages show no changelog or blog list: theirs were
+// invented (#356). A Server Component: it holds no state, and RelatedToolsSection and
 // ToolsLinkHub read the catalog, which must stay out of the browser bundle.
 // The converter heroes and FAQs are client components of their own.
 export default function ToolPageTemplate({
@@ -49,9 +44,7 @@ export default function ToolPageTemplate({
   aboutSection,
   howTo,
   infoArticle,
-  changelog,
   relatedTools,
-  blogPosts,
 }: ToolPageProps) {
   const videoEmbedId = getEnabledVideoEmbedId({ tool, videoSection });
   const shouldUseTwoColumn = Boolean(useTwoColumnLayout && videoEmbedId);
@@ -153,12 +146,6 @@ export default function ToolPageTemplate({
 
       {/* FAQs Section */}
       {faqs && <FAQSection faqs={faqs} />}
-
-      {/* Blog Articles Section */}
-      {blogPosts && <BlogSection blogPosts={blogPosts} />}
-
-      {/* Changelog Section */}
-      {changelog && <ChangelogSection changelog={changelog} />}
 
       {/* All tools link hub */}
       <ToolsLinkHub />

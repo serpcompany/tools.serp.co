@@ -124,9 +124,29 @@ export interface PermissionJustification {
   justification: string;
 }
 
+// A converter or compressor page's search result and heading
+// (docs/converter-copy.md). `title` is the page's own title: the layout adds
+// " | SERP Tools".
+export interface ToolSeo {
+  title: string;
+  h1: string;
+  description: string;
+  // The converter page's How-to heading, in place of the generated one.
+  howToHeading?: string;
+}
+
+// What changes between a converter's two formats, from the engine's real
+// behaviour; the page shows it in place of the template article.
+export interface PairNotes {
+  title: string;
+  points: string[];
+}
+
 // Tool content structure (landing page data)
 export interface ToolContent {
   tool: ToolInfo;
+  seo?: ToolSeo;
+  pairNotes?: PairNotes;
   videoSection?: VideoSectionData;
   // 18 converters have content without FAQs or an about section.
   faqs?: FAQ[];

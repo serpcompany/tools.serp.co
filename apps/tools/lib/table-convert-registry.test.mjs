@@ -33,7 +33,7 @@ test("csv-to-markdown is discoverable through page, directory, and sitemap data"
       .filter(Boolean),
   );
 
-  assert.match(csvToMarkdownPageSource, /const slug = "csv-to-markdown"/);
+  assert.match(csvToMarkdownPageSource, /const toolId = "csv-to-markdown"/);
   assert.match(csvToMarkdownPageSource, /const fromFormat = "csv"/);
   assert.match(csvToMarkdownPageSource, /const toFormat = "markdown"/);
 

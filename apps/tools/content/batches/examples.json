@@ -1,0 +1,131 @@
+{
+  "webp-to-png": {
+    "seo": {
+      "title": "Convert WebP to PNG Online (Free)",
+      "h1": "WebP to PNG Converter",
+      "description": "Convert WebP images to PNG in your browser, with transparency kept. Free, with no sign-up, and the image never leaves your device."
+    },
+    "tool": {
+      "subtitle": "Turn WebP images into PNG files in your browser, transparency included."
+    },
+    "faqs": [
+      {
+        "question": "Does the PNG keep the WebP's transparency?",
+        "answer": "Yes. Transparent and partly transparent areas of the WebP stay that way in the PNG."
+      },
+      {
+        "question": "What happens to an animated WebP?",
+        "answer": "You get a PNG of its first frame. The PNG is a still image, so the other frames are left out."
+      },
+      {
+        "question": "Will the PNG be larger than the WebP?",
+        "answer": "Often. PNG stores every pixel without lossy compression, which tends to take more space than WebP. Converting can't bring back detail a lossy WebP already lost."
+      },
+      {
+        "question": "Is the WebP's metadata copied to the PNG?",
+        "answer": "No. EXIF data, such as camera details and location, and embedded color profiles are left out of the PNG."
+      },
+      {
+        "question": "Is my WebP uploaded?",
+        "answer": "No. Your browser decodes the WebP and writes the PNG itself; the image isn't sent to a server."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and PNG",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google that supports lossy and lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless image format, standardized as ISO/IEC 15948 and a W3C Recommendation, that every browser opens.",
+        "details": [
+          "Lossless compression",
+          "Transparency",
+          "Common for screenshots, logos and graphics",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebP to PNG",
+      "points": [
+        "Transparency is kept: the PNG has the same transparent areas as the WebP.",
+        "An animated WebP gives a PNG of its first frame only.",
+        "EXIF data and color profiles aren't copied to the PNG.",
+        "Choose several WebP files at once and each PNG downloads on its own.",
+        "Everything happens in your browser, so the WebP isn't uploaded."
+      ]
+    }
+  },
+  "mp4-to-mp3": {
+    "seo": {
+      "title": "Convert MP4 to MP3 Online (Free)",
+      "h1": "MP4 to MP3 Converter",
+      "description": "Convert MP4 video to MP3 audio in your browser: the soundtrack becomes a 192 kbps MP3. Free, with no sign-up, and the video isn't uploaded."
+    },
+    "tool": {
+      "subtitle": "Save the sound from an MP4 video as a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps. The sound is re-encoded to MP3 at that constant bitrate with the LAME encoder, whatever the MP4's audio was."
+      },
+      {
+        "question": "Will the MP3 sound better than the video?",
+        "answer": "No. Converting can't add quality the MP4's audio doesn't have, and MP3 is lossy, so the MP3 is at best as good as its source."
+      },
+      {
+        "question": "What if the MP4 has no sound?",
+        "answer": "The conversion fails with an FFmpeg error, because there is no audio track to save. Check that the video plays with sound first."
+      },
+      {
+        "question": "Is the video uploaded?",
+        "answer": "No. FFmpeg runs inside your browser, so the MP4 stays on your device. A long video can take a while on a slow phone or laptop."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and MP3",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Holds video, audio and subtitles",
+          "H.264, H.265 and AV1 video",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG that became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to MP3",
+      "points": [
+        "Only the sound is kept: the video is dropped.",
+        "The MP3 is encoded at 192 kbps.",
+        "Converting several MP4 files gives one MP3 for each.",
+        "An MP4 without an audio track can't be converted.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  }
+}

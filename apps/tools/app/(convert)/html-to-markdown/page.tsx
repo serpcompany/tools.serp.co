@@ -3,7 +3,7 @@ import { FAQSection } from "@/components/sections/FAQSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { buildToolMetadata } from "@/lib/metadata";
+import { buildToolMetadata, toolHeading } from "@/lib/metadata";
 
 const toolId = "html-to-markdown";
 
@@ -12,7 +12,7 @@ export const generateMetadata = () => buildToolMetadata(toolId);
 export default function Page() {
   return (
     <main className="min-h-screen bg-background">
-      <HtmlToMarkdownConverter />
+      <HtmlToMarkdownConverter heading={toolHeading(toolId)} />
 
       <HowToSection
         title="How to convert HTML to Markdown"

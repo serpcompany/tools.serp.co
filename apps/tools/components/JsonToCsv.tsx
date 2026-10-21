@@ -11,10 +11,14 @@ import { beginToolRun } from "@/lib/telemetry";
 
 type Props = {
   toolId?: string;
+  // The page's H1 (toolHeading, lib/metadata.ts) and the line under it
+  // (content.tool.subtitle), so content:apply reaches them.
+  heading: string;
+  subtitle: string;
   videoEmbedId?: string;
 };
 
-export default function JsonToCsv({ toolId, videoEmbedId }: Props) {
+export default function JsonToCsv({ toolId, heading, subtitle, videoEmbedId }: Props) {
   const [jsonInput, setJsonInput] = useState("");
   const [csvOutput, setCsvOutput] = useState("");
   const [error, setError] = useState("");
@@ -127,10 +131,8 @@ export default function JsonToCsv({ toolId, videoEmbedId }: Props) {
       hero={
         <div>
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold tracking-tight mb-4">JSON to CSV Converter</h1>
-            <p className="text-lg text-gray-600">
-              Convert JSON data to CSV format for spreadsheets and data analysis
-            </p>
+            <h1 className="text-4xl font-bold tracking-tight mb-4">{heading}</h1>
+            <p className="text-lg text-gray-600">{subtitle}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
