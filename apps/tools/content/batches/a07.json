@@ -451,7 +451,7 @@
       },
       {
         "question": "Is the video resized?",
-        "answer": "Only if it is large. A picture over 1920 px on its longer side is scaled down to fit, and the frame rate is capped at 30 fps. Smaller or slower videos keep their own size and rate."
+        "answer": "Only if it is large. A picture over 1920 px on its longer side is scaled down to fit, and the frame rate is capped at 30 fps. Smaller or slower videos keep their rate and their size, apart from an odd width or height losing 1 px."
       },
       {
         "question": "Is an interlaced video cleaned up?",

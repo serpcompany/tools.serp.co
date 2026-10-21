@@ -15,7 +15,7 @@
       },
       {
         "question": "In what order do the images appear in the PDF?",
-        "answer": "In the order you chose them. Each image gets its own page, so the first image you picked is page one."
+        "answer": "In the order of the list. Images join the list in the order you pick them, and the move up, move down and remove buttons change it before the PDF is made. The image at the top of the list is page one."
       },
       {
         "question": "Is there a limit on how many images go into one PDF?",
@@ -56,7 +56,7 @@
     "pairNotes": {
       "title": "What to know before converting images to PDF",
       "points": [
-        "Several images become one PDF, one page each, in the order you chose.",
+        "Several images become one PDF, one page each, in the list's order, which you can change.",
         "One PDF takes up to 100 images, 250 MB in all, and 50 megapixels per image.",
         "A JPEG goes in as it is, with its ICC profile kept.",
         "Transparency becomes a soft mask in the PDF.",
@@ -229,7 +229,7 @@
       },
       {
         "question": "Is the PNG compressed again in the PDF?",
-        "answer": "No. The picture is embedded losslessly as a PNG, so the page matches the image pixel for pixel."
+        "answer": "No. The picture is embedded losslessly, as PNG data, so the PDF adds no lossy compression and no quality setting applies."
       },
       {
         "question": "Is the PNG's metadata kept in the PDF?",
@@ -438,7 +438,7 @@
       },
       {
         "question": "How sharp are the PNG pages?",
-        "answer": "Pages are drawn at twice their size, up to 4096 by 4096 pixels in total. A very large page is scaled down to stay within that."
+        "answer": "Pages are drawn at up to twice their size. The limit is on area, not on each side: a page is scaled down to stay within about 16.8 megapixels, so a very large page comes out at less than twice its size."
       },
       {
         "question": "Will the PNG have a transparent background?",
@@ -475,7 +475,7 @@
       "points": [
         "Every page becomes its own PNG, named after the PDF with the page number.",
         "There is no page limit and no ZIP; the images download one by one.",
-        "Pages are drawn at twice their size, capped at 4096 by 4096 pixels.",
+        "Pages are drawn at up to twice their size, within about 16.8 megapixels a page.",
         "The background of each page is opaque white.",
         "The PDF is read in your browser, so it isn't uploaded."
       ]

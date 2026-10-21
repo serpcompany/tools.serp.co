@@ -144,7 +144,7 @@
     "faqs": [
       {
         "question": "What frame rate and size is the GIF?",
-        "answer": "15 frames a second, and no more than 480 px on the longer side. A smaller video keeps its own size, and the shape of the picture stays the same."
+        "answer": "15 frames a second, and no more than 480 px on the longer side. A smaller video isn't scaled up, though an odd width or height is rounded down by 1 px, and the shape of the picture stays the same."
       },
       {
         "question": "Does the GIF loop?",
@@ -220,8 +220,8 @@
         "answer": "No. Re-saving starts from decoded pixels, so the copy comes out without camera details, colour profile or XMP: a way to get a JPG with that information stripped."
       },
       {
-        "question": "What if I choose a GIF or a WebP with motion?",
-        "answer": "An animated file gives its first frame only, saved as a single still JPG."
+        "question": "Which files can I choose?",
+        "answer": "Files ending in .jpg or .jpeg. Each one is decoded and written out again as a new .jpg, and the file you chose stays as it was."
       }
     ],
     "pairNotes": {
@@ -328,7 +328,7 @@
       },
       {
         "question": "What happens to transparency in my WebP?",
-        "answer": "Yes, it survives. The PDF page gets no background colour behind the picture, so areas that were clear in the WebP are still clear when the PDF is opened."
+        "answer": "It stays transparent. The PDF page gets no background colour behind the picture, so areas that were clear in the WebP are still clear when the PDF is opened."
       },
       {
         "question": "What if my WebP is animated?",

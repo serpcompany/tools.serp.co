@@ -228,7 +228,7 @@
       },
       {
         "question": "Does the MP4 keep the WMV's size and frame rate?",
-        "answer": "Up to a point. Frames larger than 1920 px on the longer side are scaled down, and anything above 30 fps is capped at 30. Smaller videos keep their size."
+        "answer": "Up to a point. Frames larger than 1920 px on the longer side are scaled down, and anything above 30 fps is capped at 30. Smaller videos keep their size, except that an odd width or height is rounded down by 1 px."
       },
       {
         "question": "What happens to an interlaced WMV?",

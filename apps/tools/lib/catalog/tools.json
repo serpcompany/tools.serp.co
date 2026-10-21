@@ -6131,7 +6131,7 @@
         },
         {
           "question": "Will the MP4 keep my video's size and frame rate?",
-          "answer": "Up to a limit. The size stays unless the longer side is over 1920 px, when it is scaled down, and the frame rate is capped at 30 fps. Smaller videos keep their size and frame rate."
+          "answer": "Up to a limit. The size stays unless the longer side is over 1920 px, when it is scaled down, and the frame rate is capped at 30 fps. Each side is rounded down to an even number, so an odd width or height is rounded down by 1 px."
         },
         {
           "question": "What happens to interlaced AVI video?",
@@ -67804,7 +67804,7 @@
         },
         {
           "question": "What size and frame rate does the MP4 have?",
-          "answer": "It follows the GIF, with two caps: 1920 px on the longer side and 30 fps. A GIF within those limits keeps its size and frame rate."
+          "answer": "It follows the GIF, with two caps: 1920 px on the longer side and 30 fps. A GIF within those limits keeps its frame rate and its size, except that an odd width or height is rounded down by 1 px."
         },
         {
           "question": "Does the MP4 still loop like a GIF?",
@@ -70220,13 +70220,17 @@
       "seo": {
         "title": "Convert HEVC to MP4 Online (Free)",
         "h1": "HEVC to MP4 Converter",
-        "description": "Convert HEVC to MP4 in your browser: the video is re-encoded as H.264 with AAC sound, up to 1920 px and 30 fps. Free, with no sign-up or upload.",
+        "description": "Convert HEVC to MP4 in your browser: the video is re-encoded as H.264, up to 1920 px and 30 fps. A .hevc file has no sound, so the MP4 has none.",
         "howToHeading": "How to convert HEVC to MP4"
       },
       "faqs": [
         {
           "question": "Can you convert HEVC to MP4?",
-          "answer": "Yes. FFmpeg re-encodes the video as H.264 and the sound as AAC at 96 kbps, and puts them in an MP4. It runs in your browser."
+          "answer": "Yes. FFmpeg re-encodes the video as H.264 and puts it in an MP4, in your browser. The MP4 has video only, because a .hevc file carries no sound."
+        },
+        {
+          "question": "Why does the MP4 have no sound?",
+          "answer": "Because the HEVC file has none. A .hevc file is a raw H.265 video stream with no audio track, so there is no sound to carry over, and the page marks the conversion as video only."
         },
         {
           "question": "Is the MP4 the same quality as the HEVC video?",
@@ -70234,7 +70238,7 @@
         },
         {
           "question": "Does the MP4 keep my video's size and frame rate?",
-          "answer": "Up to a limit. The frame size is kept up to 1920 px on the longer side, and the frame rate up to 30 fps. A larger or faster video is scaled down to those limits."
+          "answer": "Up to a limit. The frame size is kept up to 1920 px on the longer side, and the frame rate up to 30 fps; a larger or faster video is scaled down. Each side is also rounded down to an even number, so an odd width or height loses 1 px."
         },
         {
           "question": "How long does a conversion take?",
@@ -70270,8 +70274,8 @@
         "title": "What to know before converting HEVC to MP4",
         "points": [
           "The video is re-encoded as H.264, not copied.",
-          "The sound is encoded as AAC at 96 kbps.",
-          "Frame size is kept up to 1920 px on the longer side, and frame rate up to 30 fps.",
+          "A .hevc file is a raw video stream with no audio, so the MP4 has no sound.",
+          "Frame size is kept up to 1920 px on the longer side (an odd width or height loses 1 px), and frame rate up to 30 fps.",
           "The conversion runs in your browser, so the video isn't uploaded."
         ]
       }
@@ -71571,7 +71575,7 @@
         },
         {
           "question": "In what order do the images appear in the PDF?",
-          "answer": "In the order you chose them. Each image gets its own page, so the first image you picked is page one."
+          "answer": "In the order of the list. Images join the list in the order you pick them, and the move up, move down and remove buttons change it before the PDF is made. The image at the top of the list is page one."
         },
         {
           "question": "Is there a limit on how many images go into one PDF?",
@@ -71612,7 +71616,7 @@
       "pairNotes": {
         "title": "What to know before converting images to PDF",
         "points": [
-          "Several images become one PDF, one page each, in the order you chose.",
+          "Several images become one PDF, one page each, in the list's order, which you can change.",
           "One PDF takes up to 100 images, 250 MB in all, and 50 megapixels per image.",
           "A JPEG goes in as it is, with its ICC profile kept.",
           "Transparency becomes a soft mask in the PDF.",
@@ -71838,8 +71842,8 @@
       "pairNotes": {
         "title": "What to know before converting JFIF to JPG",
         "points": [
-          "A JFIF file already holds JPEG data, so the picture looks the same.",
-          "The new JPG is encoded again at quality 0.85, not just renamed.",
+          "A JFIF file already holds JPEG data, so the .jpg opens anywhere a JPG does.",
+          "The new JPG is encoded again at quality 0.85, not just renamed, so a little detail can be lost.",
           "EXIF, ICC profile and XMP data are not carried over.",
           "Your original .jfif file isn't changed."
         ]
@@ -72699,8 +72703,8 @@
       "pairNotes": {
         "title": "What to know before converting JPEG to JPG",
         "points": [
-          "JPEG and JPG are one format, so the picture looks the same.",
-          "The file is decoded and saved again at quality 0.85, not just renamed.",
+          "JPEG and JPG are one format; only the extension differs.",
+          "The file is decoded and saved again at quality 0.85, not just renamed, so a little detail can be lost.",
           "EXIF, ICC profile and XMP data are dropped.",
           "Your original file isn't changed; you download a new copy."
         ]
@@ -73826,8 +73830,8 @@
           "answer": "No. Re-saving starts from decoded pixels, so the copy comes out without camera details, colour profile or XMP: a way to get a JPG with that information stripped."
         },
         {
-          "question": "What if I choose a GIF or a WebP with motion?",
-          "answer": "An animated file gives its first frame only, saved as a single still JPG."
+          "question": "Which files can I choose?",
+          "answer": "Files ending in .jpg or .jpeg. Each one is decoded and written out again as a new .jpg, and the file you chose stays as it was."
         }
       ],
       "pairNotes": {
@@ -80445,7 +80449,7 @@
       "faqs": [
         {
           "question": "How big and how smooth is the GIF?",
-          "answer": "The GIF runs at 15 frames a second. Its longer side is at most 480 px, and a smaller video keeps its own size. The shape of the picture stays the same."
+          "answer": "The GIF runs at 15 frames a second. Its longer side is at most 480 px; a smaller video isn't scaled up, though an odd width or height is rounded down by 1 px. The shape of the picture stays the same."
         },
         {
           "question": "Does the GIF loop?",
@@ -80493,7 +80497,7 @@
         "title": "What to know before converting MOV to GIF",
         "points": [
           "The GIF plays at 15 frames a second.",
-          "The longer side is at most 480 px; a smaller video keeps its size.",
+          "The longer side is at most 480 px; a smaller video isn't scaled up.",
           "A GIF holds at most 256 colours per frame, so a palette is generated from your video.",
           "The GIF loops forever.",
           "FFmpeg runs in your browser, so the MOV isn't uploaded."
@@ -80767,7 +80771,7 @@
         },
         {
           "question": "Will a large or high-frame-rate MOV be reduced?",
-          "answer": "Yes, if it is bigger than the limits. The picture is capped at 1920 pixels on its longer side and 30 frames per second. Smaller or slower videos keep their size and rate."
+          "answer": "Yes, if it is bigger than the limits. The picture is capped at 1920 pixels on its longer side and 30 frames per second. Smaller or slower videos keep their rate and, apart from rounding an odd width or height down by 1 px, their size."
         },
         {
           "question": "Is the MP4 the same quality as my MOV?",
@@ -82955,7 +82959,7 @@
       "faqs": [
         {
           "question": "What size and frame rate is the GIF?",
-          "answer": "The GIF runs at 15 frames per second, and its longer side is at most 480 pixels. A smaller video keeps its own size, and the shape stays the same."
+          "answer": "The GIF runs at 15 frames per second, and its longer side is at most 480 pixels. A smaller video isn't scaled up, though an odd width or height is rounded down by 1 px, and the shape stays the same."
         },
         {
           "question": "Does the GIF loop and have sound?",
@@ -84952,7 +84956,7 @@
         },
         {
           "question": "Is the video resized?",
-          "answer": "Only if it is large. A picture over 1920 px on its longer side is scaled down to fit, and the frame rate is capped at 30 fps. Smaller or slower videos keep their own size and rate."
+          "answer": "Only if it is large. A picture over 1920 px on its longer side is scaled down to fit, and the frame rate is capped at 30 fps. Smaller or slower videos keep their rate and their size, apart from an odd width or height losing 1 px."
         },
         {
           "question": "Is an interlaced video cleaned up?",
@@ -85698,7 +85702,7 @@
         },
         {
           "question": "Will the MP4 be smaller or lower quality than the MPEG?",
-          "answer": "The video is re-encoded with lossy settings that favor speed, so it isn't a copy of the original. Frame size and rate are kept, up to 1920 px on the longer side and 30 fps."
+          "answer": "The video is re-encoded with lossy settings that favor speed, so it isn't a copy of the original. Frame size and rate are kept up to 1920 px on the longer side and 30 fps, with an odd width or height rounded down by 1 px."
         },
         {
           "question": "What happens to interlaced MPEG video?",
@@ -92347,7 +92351,7 @@
         },
         {
           "question": "How sharp are the PNG pages?",
-          "answer": "Pages are drawn at twice their size, up to 4096 by 4096 pixels in total. A very large page is scaled down to stay within that."
+          "answer": "Pages are drawn at up to twice their size. The limit is on area, not on each side: a page is scaled down to stay within about 16.8 megapixels, so a very large page comes out at less than twice its size."
         },
         {
           "question": "Will the PNG have a transparent background?",
@@ -92384,7 +92388,7 @@
         "points": [
           "Every page becomes its own PNG, named after the PDF with the page number.",
           "There is no page limit and no ZIP; the images download one by one.",
-          "Pages are drawn at twice their size, capped at 4096 by 4096 pixels.",
+          "Pages are drawn at up to twice their size, within about 16.8 megapixels a page.",
           "The background of each page is opaque white.",
           "The PDF is read in your browser, so it isn't uploaded."
         ]
@@ -93068,7 +93072,7 @@
       "seo": {
         "title": "Convert PNG to GIF Online (Free)",
         "h1": "PNG to GIF Converter",
-        "description": "Convert a PNG to a GIF in your browser. The result is a still image, since a GIF is limited to 256 colours per frame. Free, no sign-up.",
+        "description": "Convert a PNG to a GIF in your browser. The GIF is a still image, like the PNG, and holds at most 256 colours per frame. Free, with no sign-up.",
         "howToHeading": "How to convert PNG to GIF"
       },
       "faqs": [
@@ -93078,7 +93082,7 @@
         },
         {
           "question": "Does the PNG become an animated GIF?",
-          "answer": "No. A PNG converted here gives one still GIF. To get a moving GIF you need several frames, and this page converts each file by itself."
+          "answer": "No. The GIF is one still image, because the PNG is one: a PNG normally holds a single picture, and an animated PNG gives its first frame only."
         },
         {
           "question": "Will the GIF look different from the PNG?",
@@ -93453,7 +93457,7 @@
         },
         {
           "question": "Is the PNG compressed again in the PDF?",
-          "answer": "No. The picture is embedded losslessly as a PNG, so the page matches the image pixel for pixel."
+          "answer": "No. The picture is embedded losslessly, as PNG data, so the PDF adds no lossy compression and no quality setting applies."
         },
         {
           "question": "Is the PNG's metadata kept in the PDF?",
@@ -93521,14 +93525,14 @@
     "content": {
       "tool": {
         "title": "PNG Optimizer",
-        "subtitle": "Make a PNG file smaller without changing its pixels, in your browser.",
+        "subtitle": "Make a PNG file smaller in your browser, normally without changing its pixels.",
         "from": "png",
         "to": "png"
       },
       "seo": {
         "title": "Compress PNG Files Online (Free)",
         "h1": "PNG Compressor",
-        "description": "Compress PNG files in your browser with lossless oxipng recompression. If the result isn't smaller, you get your original back. Free, no sign-up.",
+        "description": "Compress PNG in your browser, normally losslessly with oxipng. If the browser can't run it, colours are reduced instead. Free, with no sign-up.",
         "howToHeading": "How to compress a PNG"
       },
       "videoSection": {
@@ -93537,7 +93541,7 @@
       "faqs": [
         {
           "question": "Does compressing a PNG lower its quality?",
-          "answer": "No. The PNG goes through oxipng at level 1, which is lossless, so the pixels stay the same and only the way they are stored changes."
+          "answer": "Normally, no. The PNG goes through oxipng at level 1, which is lossless, so the pixels stay the same. If your browser can't run that compressor, the page falls back to reducing the PNG to at most 210 colours, which can change the picture, and keeps only the first frame of an animated PNG."
         },
         {
           "question": "What if the compressed PNG isn't smaller?",
@@ -93582,7 +93586,7 @@
       "pairNotes": {
         "title": "What to know before compressing a PNG",
         "points": [
-          "Compression is lossless: oxipng at level 1 keeps the pixels as they are.",
+          "Compression is normally lossless (oxipng at level 1); if the browser can't run it, the fallback reduces the colours.",
           "If the result isn't smaller, you get the original back.",
           "Your original file isn't changed: you download a new copy.",
           "Several PNG files are compressed one after another, each downloaded on its own.",
@@ -94357,7 +94361,7 @@
         },
         {
           "question": "Are the layers kept in the PDF?",
-          "answer": "No. A layered PSD gives one picture, and the PDF holds that picture on a single page. The layers, masks and text of the PSD are not editable in the PDF."
+          "answer": "No. A layered PSD gives one picture, and the PDF holds it on a single page. The page doesn't say whether that picture is the whole composition or a single layer, and the PSD's layers, masks and text can't be edited in the PDF."
         },
         {
           "question": "How big is the PDF page?",
@@ -94365,7 +94369,7 @@
         },
         {
           "question": "Does the PDF keep transparent areas?",
-          "answer": "Yes. No background colour is painted behind the picture, so clear pixels in the PSD's merged image remain clear in the PDF."
+          "answer": "The page doesn't promise it either way. ImageMagick turns the PSD into a PNG before it goes into the PDF, and what it does with transparent areas isn't settled, so clear pixels may stay clear or may not."
         },
         {
           "question": "What if my PSD is very large?",
@@ -94400,10 +94404,10 @@
       "pairNotes": {
         "title": "What to know before converting PSD to PDF",
         "points": [
-          "The PSD becomes one picture, so layers are not kept.",
+          "The PSD becomes one picture, so layers are not kept, and the page doesn't say which layer or composite it is.",
           "The PDF has one page, the size of the image, with no margin.",
           "The picture is embedded losslessly as a PNG.",
-          "Transparent pixels stay transparent in the PDF.",
+          "The page doesn't promise whether transparent areas stay transparent.",
           "Several PSD files give one PDF each; they are never merged."
         ]
       }
@@ -98459,7 +98463,7 @@
         },
         {
           "question": "Is the TIFF recompressed inside the PDF?",
-          "answer": "ImageMagick writes the picture as a PNG, and that PNG is embedded in the PDF losslessly. No quality setting applies, and transparent pixels stay transparent."
+          "answer": "ImageMagick writes the picture as a PNG, and that PNG is embedded in the PDF losslessly, so no quality setting applies. The page doesn't promise what happens to transparent areas."
         },
         {
           "question": "Can I change several TIFF files to PDF at once?",
@@ -99172,7 +99176,7 @@
         },
         {
           "question": "Will the MP4 keep the TS frame size and frame rate?",
-          "answer": "Yes, up to a limit. The size and frame rate are kept as they are, but a frame larger than 1920 px on its longer side is scaled down to fit, and the rate is capped at 30 fps."
+          "answer": "Yes, up to a limit. The frame rate is kept up to 30 fps, and the size up to 1920 px on the longer side, where a larger frame is scaled down to fit. Each side is rounded down to an even number, so an odd width or height loses 1 px."
         },
         {
           "question": "What happens to interlaced video?",
@@ -99212,7 +99216,7 @@
         "title": "What to know before converting TS to MP4",
         "points": [
           "The video is re-encoded as H.264 with AAC audio at 96 kbps.",
-          "Frame size and frame rate are kept, up to 1920 px on the longer side and 30 fps.",
+          "Frame size and frame rate are kept up to 1920 px on the longer side and 30 fps, with an odd side rounded down by 1 px.",
           "Interlaced frames are deinterlaced.",
           "Converting several TS files gives one MP4 for each.",
           "FFmpeg runs in your browser, so the video isn't uploaded."
@@ -101400,7 +101404,7 @@
     "content": {
       "tool": {
         "title": "Video to GIF",
-        "subtitle": "Turn a video into a looping GIF, right in your browser.",
+        "subtitle": "Turn an MP4 video into a looping GIF, right in your browser.",
         "from": "mp4",
         "to": "gif",
         "accept": ".mp4"
@@ -101408,17 +101412,17 @@
       "seo": {
         "title": "Convert Video to GIF Online (Free)",
         "h1": "Video to GIF Converter",
-        "description": "Convert video to GIF in your browser: a looping GIF at 15 frames a second, up to 480 px wide or tall. Free, with no sign-up, and no upload.",
+        "description": "Convert an MP4 video to GIF in your browser: a looping GIF at 15 frames a second, up to 480 px wide or tall. Free, with no sign-up or upload.",
         "howToHeading": "How to convert video to GIF"
       },
       "faqs": [
         {
           "question": "How do I convert a video to a GIF?",
-          "answer": "Choose the video in the converter above. FFmpeg builds a color palette from it, then writes the GIF, and you download the result when it finishes."
+          "answer": "Choose an MP4 video in the converter above; this page takes .mp4 files only. FFmpeg builds a color palette from it, then writes the GIF, and you download the result when it finishes."
         },
         {
           "question": "How big and how smooth is the GIF?",
-          "answer": "The GIF plays at 15 frames a second. Its longer side is at most 480 px, so a larger video is scaled down, keeping its proportions. A smaller video isn't scaled up."
+          "answer": "The GIF plays at 15 frames a second. Its longer side is at most 480 px, so a larger video is scaled down, keeping its proportions. A smaller video isn't scaled up, though an odd width or height is rounded down by 1 px."
         },
         {
           "question": "Does the GIF loop?",
@@ -101430,7 +101434,7 @@
         },
         {
           "question": "Can I convert several videos at once?",
-          "answer": "Yes. Pick as many videos as you like. The converter makes one GIF for each, one after another, and each downloads on its own."
+          "answer": "Yes. Pick as many MP4 files as you like. The converter makes one GIF for each, one after another, and each downloads on its own."
         }
       ],
       "aboutSection": {
@@ -101461,7 +101465,7 @@
         "title": "What to know before converting video to GIF",
         "points": [
           "The GIF runs at 15 frames a second, whatever the video's frame rate.",
-          "The longer side is capped at 480 px; smaller videos keep their size.",
+          "The longer side is capped at 480 px; a smaller video isn't scaled up, apart from rounding each side to an even number.",
           "A GIF has at most 256 colors per frame, so the colors are reduced.",
           "The GIF loops forever.",
           "FFmpeg runs in your browser, so the video isn't uploaded."
@@ -102943,7 +102947,7 @@
       "faqs": [
         {
           "question": "What frame rate and size is the GIF?",
-          "answer": "15 frames a second, and no more than 480 px on the longer side. A smaller video keeps its own size, and the shape of the picture stays the same."
+          "answer": "15 frames a second, and no more than 480 px on the longer side. A smaller video isn't scaled up, though an odd width or height is rounded down by 1 px, and the shape of the picture stays the same."
         },
         {
           "question": "Does the GIF loop?",
@@ -103285,7 +103289,7 @@
         },
         {
           "question": "Is the MP4 limited in size or speed?",
-          "answer": "Yes, at the top end. Frames are scaled down when the longer side passes 1920 px, and a WebM above 30 fps is capped at 30 fps. Smaller values stay as they are."
+          "answer": "Yes, at the top end. Frames are scaled down when the longer side passes 1920 px, and a WebM above 30 fps is capped at 30 fps. Smaller values stay as they are, except that an odd width or height loses 1 px."
         },
         {
           "question": "Why does a long WebM take a while?",
@@ -103616,7 +103620,7 @@
         },
         {
           "question": "Is transparency kept in the GIF?",
-          "answer": "GIF supports 1-bit transparency, not the smooth alpha transparency of WebP. The converter lists transparency as kept for PNG and WebP outputs only."
+          "answer": "The page doesn't promise it. A GIF can mark pixels as fully transparent but has no smooth alpha like WebP, and ImageMagick writes the GIF here, whose handling of transparent areas isn't settled."
         },
         {
           "question": "Why does it say \"Image decode failed\"?",
@@ -103888,7 +103892,7 @@
         },
         {
           "question": "What happens to transparency in my WebP?",
-          "answer": "Yes, it survives. The PDF page gets no background colour behind the picture, so areas that were clear in the WebP are still clear when the PDF is opened."
+          "answer": "It stays transparent. The PDF page gets no background colour behind the picture, so areas that were clear in the WebP are still clear when the PDF is opened."
         },
         {
           "question": "What if my WebP is animated?",
@@ -104951,7 +104955,7 @@
         },
         {
           "question": "Does the MP4 keep the WMV's size and frame rate?",
-          "answer": "Up to a point. Frames larger than 1920 px on the longer side are scaled down, and anything above 30 fps is capped at 30. Smaller videos keep their size."
+          "answer": "Up to a point. Frames larger than 1920 px on the longer side are scaled down, and anything above 30 fps is capped at 30. Smaller videos keep their size, except that an odd width or height is rounded down by 1 px."
         },
         {
           "question": "What happens to an interlaced WMV?",
@@ -105640,7 +105644,73 @@
       "jpeg",
       "convert",
       "image"
-    ]
+    ],
+    "content": {
+      "tool": {
+        "title": "XPS to JPEG",
+        "subtitle": "Try saving an XPS document as a JPEG image, right in your browser.",
+        "from": "xps",
+        "to": "jpeg",
+        "accept": ".xps"
+      },
+      "seo": {
+        "title": "Convert XPS to JPEG Online (Free)",
+        "h1": "XPS to JPEG Converter",
+        "description": "XPS to JPEG in your browser: the file is passed to your browser's image decoder, which may not be able to open an XPS. Free, with no sign-up."
+      },
+      "faqs": [
+        {
+          "question": "Does XPS to JPEG work for every file?",
+          "answer": "There is no promise that it does. This page has no XPS reader of its own: it passes the file to the image decoder built into your browser, which may not understand XPS."
+        },
+        {
+          "question": "What do I see if the XPS can't be read?",
+          "answer": "An error message, such as \"Image decode failed\", or a note that your browser can't open files of that kind. The XPS you chose stays as it was."
+        },
+        {
+          "question": "Does the XPS leave my device?",
+          "answer": "No. Everything happens in this browser tab, and the file isn't sent to any server."
+        },
+        {
+          "question": "What kind of file is an XPS?",
+          "answer": "The XML Paper Specification, a Microsoft document format standardized as ECMA-388. An XPS file is a ZIP package of XML pages with fixed layout, often produced when Windows prints to a file."
+        }
+      ],
+      "aboutSection": {
+        "title": "XPS and JPEG",
+        "fromFormat": {
+          "name": "XPS",
+          "fullName": "XML Paper Specification",
+          "description": "A fixed-layout document format developed by Microsoft and standardized as ECMA-388. It is a ZIP package of XML pages, similar in purpose to PDF.",
+          "details": [
+            "Fixed page layout",
+            "ZIP package of XML",
+            "Vector graphics",
+            "ECMA standard"
+          ]
+        },
+        "toFormat": {
+          "name": "JPEG",
+          "fullName": "JPEG image",
+          "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+          "details": [
+            "Lossy compression",
+            "Adjustable quality",
+            "No alpha transparency",
+            "Supported everywhere"
+          ]
+        }
+      },
+      "pairNotes": {
+        "title": "What to know before converting XPS to JPEG",
+        "points": [
+          "The file goes to your browser's image decoder, which may not open an XPS.",
+          "This page has no XPS reader of its own, so a JPEG isn't promised.",
+          "When the file can't be read, an error is shown.",
+          "Nothing is uploaded: the attempt happens in your browser."
+        ]
+      }
+    }
   },
   {
     "id": "xps-to-jpg",
@@ -105660,7 +105730,7 @@
     "content": {
       "tool": {
         "title": "XPS to JPG",
-        "subtitle": "Convert an XPS file to a JPG image in your browser, with no upload.",
+        "subtitle": "Try turning an XPS file into a JPG image in your browser, with no upload.",
         "from": "xps",
         "to": "jpg",
         "accept": ".xps"
@@ -105668,20 +105738,20 @@
       "seo": {
         "title": "Convert XPS to JPG Online (Free)",
         "h1": "XPS to JPG Converter",
-        "description": "Convert XPS to JPG in your browser, with no upload. The JPG is written at quality 0.85 and carries no metadata. Free, with no sign-up."
+        "description": "XPS to JPG in your browser: the page tries to open the XPS with your browser's own image decoder, which may not read it. Free, with no sign-up."
       },
       "faqs": [
         {
-          "question": "What quality is the JPG?",
-          "answer": "The JPG is written at quality 0.85, and the page has no setting to change it. JPG is lossy, so the picture is a new encoding of the page."
+          "question": "Will this page convert my XPS file?",
+          "answer": "It may not. The page hands the file to your browser's own image decoder, and nothing on the page reads the XPS format itself, so there is no promise that a JPG comes out."
         },
         {
           "question": "What if the converter can't open my XPS?",
           "answer": "It shows an error, such as \"Image decode failed\", or a message that your browser can't open that kind of file. Your original file is never changed."
         },
         {
-          "question": "Does the JPG keep the file's metadata?",
-          "answer": "No. The image goes through raw pixels, so EXIF, ICC profile and XMP data are dropped. A JPG has no alpha transparency either."
+          "question": "Is my XPS file uploaded?",
+          "answer": "No. The page works on the file inside your browser, and nothing is sent to a server."
         },
         {
           "question": "What is an XPS file?",
@@ -105716,10 +105786,10 @@
       "pairNotes": {
         "title": "What to know before converting XPS to JPG",
         "points": [
-          "The JPG is written at quality 0.85, and the setting can't be changed.",
-          "EXIF, ICC profile and XMP data aren't carried over.",
+          "The page tries to open the XPS with your browser's image decoder, which may not read it.",
+          "Nothing on the page reads XPS pages itself, so a JPG isn't promised.",
           "If your browser can't open the file, the page shows an error.",
-          "The conversion runs in your browser, so the XPS isn't uploaded."
+          "The work happens in your browser, so the XPS isn't uploaded."
         ]
       }
     }

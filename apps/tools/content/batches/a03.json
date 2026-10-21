@@ -3,20 +3,20 @@
     "seo": {
       "title": "Convert Video to GIF Online (Free)",
       "h1": "Video to GIF Converter",
-      "description": "Convert video to GIF in your browser: a looping GIF at 15 frames a second, up to 480 px wide or tall. Free, with no sign-up, and no upload.",
+      "description": "Convert an MP4 video to GIF in your browser: a looping GIF at 15 frames a second, up to 480 px wide or tall. Free, with no sign-up or upload.",
       "howToHeading": "How to convert video to GIF"
     },
     "tool": {
-      "subtitle": "Turn a video into a looping GIF, right in your browser."
+      "subtitle": "Turn an MP4 video into a looping GIF, right in your browser."
     },
     "faqs": [
       {
         "question": "How do I convert a video to a GIF?",
-        "answer": "Choose the video in the converter above. FFmpeg builds a color palette from it, then writes the GIF, and you download the result when it finishes."
+        "answer": "Choose an MP4 video in the converter above; this page takes .mp4 files only. FFmpeg builds a color palette from it, then writes the GIF, and you download the result when it finishes."
       },
       {
         "question": "How big and how smooth is the GIF?",
-        "answer": "The GIF plays at 15 frames a second. Its longer side is at most 480 px, so a larger video is scaled down, keeping its proportions. A smaller video isn't scaled up."
+        "answer": "The GIF plays at 15 frames a second. Its longer side is at most 480 px, so a larger video is scaled down, keeping its proportions. A smaller video isn't scaled up, though an odd width or height is rounded down by 1 px."
       },
       {
         "question": "Does the GIF loop?",
@@ -28,7 +28,7 @@
       },
       {
         "question": "Can I convert several videos at once?",
-        "answer": "Yes. Pick as many videos as you like. The converter makes one GIF for each, one after another, and each downloads on its own."
+        "answer": "Yes. Pick as many MP4 files as you like. The converter makes one GIF for each, one after another, and each downloads on its own."
       }
     ],
     "aboutSection": {
@@ -59,7 +59,7 @@
       "title": "What to know before converting video to GIF",
       "points": [
         "The GIF runs at 15 frames a second, whatever the video's frame rate.",
-        "The longer side is capped at 480 px; smaller videos keep their size.",
+        "The longer side is capped at 480 px; a smaller video isn't scaled up, apart from rounding each side to an even number.",
         "A GIF has at most 256 colors per frame, so the colors are reduced.",
         "The GIF loops forever.",
         "FFmpeg runs in your browser, so the video isn't uploaded."

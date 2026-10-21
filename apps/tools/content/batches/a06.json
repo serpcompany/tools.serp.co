@@ -229,7 +229,7 @@
       },
       {
         "question": "Is the TIFF recompressed inside the PDF?",
-        "answer": "ImageMagick writes the picture as a PNG, and that PNG is embedded in the PDF losslessly. No quality setting applies, and transparent pixels stay transparent."
+        "answer": "ImageMagick writes the picture as a PNG, and that PNG is embedded in the PDF losslessly, so no quality setting applies. The page doesn't promise what happens to transparent areas."
       },
       {
         "question": "Can I change several TIFF files to PDF at once?",
@@ -427,7 +427,7 @@
       },
       {
         "question": "Will the MP4 keep my video's size and frame rate?",
-        "answer": "Up to a limit. The size stays unless the longer side is over 1920 px, when it is scaled down, and the frame rate is capped at 30 fps. Smaller videos keep their size and frame rate."
+        "answer": "Up to a limit. The size stays unless the longer side is over 1920 px, when it is scaled down, and the frame rate is capped at 30 fps. Each side is rounded down to an even number, so an odd width or height is rounded down by 1 px."
       },
       {
         "question": "What happens to interlaced AVI video?",

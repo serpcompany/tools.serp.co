@@ -76,7 +76,7 @@
     "faqs": [
       {
         "question": "How big and how smooth is the GIF?",
-        "answer": "The GIF runs at 15 frames a second. Its longer side is at most 480 px, and a smaller video keeps its own size. The shape of the picture stays the same."
+        "answer": "The GIF runs at 15 frames a second. Its longer side is at most 480 px; a smaller video isn't scaled up, though an odd width or height is rounded down by 1 px. The shape of the picture stays the same."
       },
       {
         "question": "Does the GIF loop?",
@@ -124,7 +124,7 @@
       "title": "What to know before converting MOV to GIF",
       "points": [
         "The GIF plays at 15 frames a second.",
-        "The longer side is at most 480 px; a smaller video keeps its size.",
+        "The longer side is at most 480 px; a smaller video isn't scaled up.",
         "A GIF holds at most 256 colours per frame, so a palette is generated from your video.",
         "The GIF loops forever.",
         "FFmpeg runs in your browser, so the MOV isn't uploaded."
@@ -262,7 +262,7 @@
     "seo": {
       "title": "Convert HEVC to MP4 Online (Free)",
       "h1": "HEVC to MP4 Converter",
-      "description": "Convert HEVC to MP4 in your browser: the video is re-encoded as H.264 with AAC sound, up to 1920 px and 30 fps. Free, with no sign-up or upload.",
+      "description": "Convert HEVC to MP4 in your browser: the video is re-encoded as H.264, up to 1920 px and 30 fps. A .hevc file has no sound, so the MP4 has none.",
       "howToHeading": "How to convert HEVC to MP4"
     },
     "tool": {
@@ -271,7 +271,11 @@
     "faqs": [
       {
         "question": "Can you convert HEVC to MP4?",
-        "answer": "Yes. FFmpeg re-encodes the video as H.264 and the sound as AAC at 96 kbps, and puts them in an MP4. It runs in your browser."
+        "answer": "Yes. FFmpeg re-encodes the video as H.264 and puts it in an MP4, in your browser. The MP4 has video only, because a .hevc file carries no sound."
+      },
+      {
+        "question": "Why does the MP4 have no sound?",
+        "answer": "Because the HEVC file has none. A .hevc file is a raw H.265 video stream with no audio track, so there is no sound to carry over, and the page marks the conversion as video only."
       },
       {
         "question": "Is the MP4 the same quality as the HEVC video?",
@@ -279,7 +283,7 @@
       },
       {
         "question": "Does the MP4 keep my video's size and frame rate?",
-        "answer": "Up to a limit. The frame size is kept up to 1920 px on the longer side, and the frame rate up to 30 fps. A larger or faster video is scaled down to those limits."
+        "answer": "Up to a limit. The frame size is kept up to 1920 px on the longer side, and the frame rate up to 30 fps; a larger or faster video is scaled down. Each side is also rounded down to an even number, so an odd width or height loses 1 px."
       },
       {
         "question": "How long does a conversion take?",
@@ -315,8 +319,8 @@
       "title": "What to know before converting HEVC to MP4",
       "points": [
         "The video is re-encoded as H.264, not copied.",
-        "The sound is encoded as AAC at 96 kbps.",
-        "Frame size is kept up to 1920 px on the longer side, and frame rate up to 30 fps.",
+        "A .hevc file is a raw video stream with no audio, so the MP4 has no sound.",
+        "Frame size is kept up to 1920 px on the longer side (an odd width or height loses 1 px), and frame rate up to 30 fps.",
         "The conversion runs in your browser, so the video isn't uploaded."
       ]
     }
@@ -451,27 +455,89 @@
       ]
     }
   },
+  "xps-to-jpeg": {
+    "seo": {
+      "title": "Convert XPS to JPEG Online (Free)",
+      "h1": "XPS to JPEG Converter",
+      "description": "XPS to JPEG in your browser: the file is passed to your browser's image decoder, which may not be able to open an XPS. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Try saving an XPS document as a JPEG image, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does XPS to JPEG work for every file?",
+        "answer": "There is no promise that it does. This page has no XPS reader of its own: it passes the file to the image decoder built into your browser, which may not understand XPS."
+      },
+      {
+        "question": "What do I see if the XPS can't be read?",
+        "answer": "An error message, such as \"Image decode failed\", or a note that your browser can't open files of that kind. The XPS you chose stays as it was."
+      },
+      {
+        "question": "Does the XPS leave my device?",
+        "answer": "No. Everything happens in this browser tab, and the file isn't sent to any server."
+      },
+      {
+        "question": "What kind of file is an XPS?",
+        "answer": "The XML Paper Specification, a Microsoft document format standardized as ECMA-388. An XPS file is a ZIP package of XML pages with fixed layout, often produced when Windows prints to a file."
+      }
+    ],
+    "aboutSection": {
+      "title": "XPS and JPEG",
+      "fromFormat": {
+        "name": "XPS",
+        "fullName": "XML Paper Specification",
+        "description": "A fixed-layout document format developed by Microsoft and standardized as ECMA-388. It is a ZIP package of XML pages, similar in purpose to PDF.",
+        "details": [
+          "Fixed page layout",
+          "ZIP package of XML",
+          "Vector graphics",
+          "ECMA standard"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting XPS to JPEG",
+      "points": [
+        "The file goes to your browser's image decoder, which may not open an XPS.",
+        "This page has no XPS reader of its own, so a JPEG isn't promised.",
+        "When the file can't be read, an error is shown.",
+        "Nothing is uploaded: the attempt happens in your browser."
+      ]
+    }
+  },
   "xps-to-jpg": {
     "seo": {
       "title": "Convert XPS to JPG Online (Free)",
       "h1": "XPS to JPG Converter",
-      "description": "Convert XPS to JPG in your browser, with no upload. The JPG is written at quality 0.85 and carries no metadata. Free, with no sign-up."
+      "description": "XPS to JPG in your browser: the page tries to open the XPS with your browser's own image decoder, which may not read it. Free, with no sign-up."
     },
     "tool": {
-      "subtitle": "Convert an XPS file to a JPG image in your browser, with no upload."
+      "subtitle": "Try turning an XPS file into a JPG image in your browser, with no upload."
     },
     "faqs": [
       {
-        "question": "What quality is the JPG?",
-        "answer": "The JPG is written at quality 0.85, and the page has no setting to change it. JPG is lossy, so the picture is a new encoding of the page."
+        "question": "Will this page convert my XPS file?",
+        "answer": "It may not. The page hands the file to your browser's own image decoder, and nothing on the page reads the XPS format itself, so there is no promise that a JPG comes out."
       },
       {
         "question": "What if the converter can't open my XPS?",
         "answer": "It shows an error, such as \"Image decode failed\", or a message that your browser can't open that kind of file. Your original file is never changed."
       },
       {
-        "question": "Does the JPG keep the file's metadata?",
-        "answer": "No. The image goes through raw pixels, so EXIF, ICC profile and XMP data are dropped. A JPG has no alpha transparency either."
+        "question": "Is my XPS file uploaded?",
+        "answer": "No. The page works on the file inside your browser, and nothing is sent to a server."
       },
       {
         "question": "What is an XPS file?",
@@ -506,10 +572,10 @@
     "pairNotes": {
       "title": "What to know before converting XPS to JPG",
       "points": [
-        "The JPG is written at quality 0.85, and the setting can't be changed.",
-        "EXIF, ICC profile and XMP data aren't carried over.",
+        "The page tries to open the XPS with your browser's image decoder, which may not read it.",
+        "Nothing on the page reads XPS pages itself, so a JPG isn't promised.",
         "If your browser can't open the file, the page shows an error.",
-        "The conversion runs in your browser, so the XPS isn't uploaded."
+        "The work happens in your browser, so the XPS isn't uploaded."
       ]
     }
   }

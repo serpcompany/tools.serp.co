@@ -212,7 +212,7 @@
       },
       {
         "question": "Will the MP4 be smaller or lower quality than the MPEG?",
-        "answer": "The video is re-encoded with lossy settings that favor speed, so it isn't a copy of the original. Frame size and rate are kept, up to 1920 px on the longer side and 30 fps."
+        "answer": "The video is re-encoded with lossy settings that favor speed, so it isn't a copy of the original. Frame size and rate are kept up to 1920 px on the longer side and 30 fps, with an odd width or height rounded down by 1 px."
       },
       {
         "question": "What happens to interlaced MPEG video?",
@@ -323,7 +323,7 @@
     "seo": {
       "title": "Convert PNG to GIF Online (Free)",
       "h1": "PNG to GIF Converter",
-      "description": "Convert a PNG to a GIF in your browser. The result is a still image, since a GIF is limited to 256 colours per frame. Free, no sign-up.",
+      "description": "Convert a PNG to a GIF in your browser. The GIF is a still image, like the PNG, and holds at most 256 colours per frame. Free, with no sign-up.",
       "howToHeading": "How to convert PNG to GIF"
     },
     "tool": {
@@ -336,7 +336,7 @@
       },
       {
         "question": "Does the PNG become an animated GIF?",
-        "answer": "No. A PNG converted here gives one still GIF. To get a moving GIF you need several frames, and this page converts each file by itself."
+        "answer": "No. The GIF is one still image, because the PNG is one: a PNG normally holds a single picture, and an animated PNG gives its first frame only."
       },
       {
         "question": "Will the GIF look different from the PNG?",

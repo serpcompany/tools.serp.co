@@ -118,8 +118,8 @@
     "pairNotes": {
       "title": "What to know before converting JPEG to JPG",
       "points": [
-        "JPEG and JPG are one format, so the picture looks the same.",
-        "The file is decoded and saved again at quality 0.85, not just renamed.",
+        "JPEG and JPG are one format; only the extension differs.",
+        "The file is decoded and saved again at quality 0.85, not just renamed, so a little detail can be lost.",
         "EXIF, ICC profile and XMP data are dropped.",
         "Your original file isn't changed; you download a new copy."
       ]
@@ -138,7 +138,7 @@
     "faqs": [
       {
         "question": "What size and frame rate is the GIF?",
-        "answer": "The GIF runs at 15 frames per second, and its longer side is at most 480 pixels. A smaller video keeps its own size, and the shape stays the same."
+        "answer": "The GIF runs at 15 frames per second, and its longer side is at most 480 pixels. A smaller video isn't scaled up, though an odd width or height is rounded down by 1 px, and the shape stays the same."
       },
       {
         "question": "Does the GIF loop and have sound?",
@@ -281,7 +281,7 @@
       },
       {
         "question": "Will a large or high-frame-rate MOV be reduced?",
-        "answer": "Yes, if it is bigger than the limits. The picture is capped at 1920 pixels on its longer side and 30 frames per second. Smaller or slower videos keep their size and rate."
+        "answer": "Yes, if it is bigger than the limits. The picture is capped at 1920 pixels on its longer side and 30 frames per second. Smaller or slower videos keep their rate and, apart from rounding an odd width or height down by 1 px, their size."
       },
       {
         "question": "Is the MP4 the same quality as my MOV?",
@@ -450,8 +450,8 @@
     "pairNotes": {
       "title": "What to know before converting JFIF to JPG",
       "points": [
-        "A JFIF file already holds JPEG data, so the picture looks the same.",
-        "The new JPG is encoded again at quality 0.85, not just renamed.",
+        "A JFIF file already holds JPEG data, so the .jpg opens anywhere a JPG does.",
+        "The new JPG is encoded again at quality 0.85, not just renamed, so a little detail can be lost.",
         "EXIF, ICC profile and XMP data are not carried over.",
         "Your original .jfif file isn't changed."
       ]

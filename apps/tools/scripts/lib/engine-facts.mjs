@@ -94,7 +94,7 @@ export const ENGINE_FACTS = {
       'Errors a visitor can see: "FFmpeg failed with exit code N" (for example a video with no audio track converted to audio); a FairPlay-protected M4P is refused with its own message.',
     ],
     convert: [
-      "Video to GIF: 15 fps, at most 480 px on the longer side, with a generated palette.",
+      "Video to GIF: 15 fps, at most 480 px on the longer side with both sides rounded down to an even number (fitWithin), and a generated palette.",
     ],
     compress: [
       "Audio is re-encoded at 160 kbit/s; video with libx264 (preset medium, CRF 24), WebM with VP8 (CRF 38) (buildCompressionCommand at quality 0.82).",
@@ -110,7 +110,6 @@ export const ENGINE_FACTS = {
   "ffmpeg-wasm + webcodecs": {
     where: "In the browser: the browser's own WebCodecs decoder or encoder for AV1 and HEVC, with FFmpeg.wasm for the rest (lib/convert/webcodecs.ts). No server.",
     facts: [
-      '`.av1` and `.hevc` outputs are raw video streams with no audio; the page says "Video only".',
       'A browser without the codec fails with "Your browser can\'t decode …" or "can\'t encode …".',
     ],
     unsettled: ["Which browsers have each codec; it depends on the device and its hardware."],
@@ -128,7 +127,7 @@ export const ENGINE_FACTS = {
     where: "In the browser: Mozilla's PDF.js renders each page (lib/convert/pdf.ts). No server.",
     facts: [
       "Every page becomes its own image file; there is no page limit and no ZIP.",
-      "Pages render at twice their size, capped at 4096 × 4096 pixels in total (MAX_RENDER_PIXELS).",
+      "Pages render at up to twice their size (scale at most 2). The cap is on area, not on each side: a page is scaled down so it stays within 16,777,216 pixels, about 16.8 megapixels (MAX_RENDER_PIXELS, pageRenderScale in lib/convert/pdf.ts).",
       "Backgrounds are opaque white; JPG output is quality 0.9.",
       'An Illustrator file without a PDF inside fails with "This AI file has no PDF inside…".',
     ],
@@ -148,14 +147,15 @@ export const ENGINE_FACTS = {
     where: "In the browser: jSquash encoders in a Web Worker (workers/compress.worker.js). No server.",
     compress: [
       "JPEG and WebP are re-encoded at quality 82; PNG goes through oxipng at level 1, which is lossless.",
+      "If the worker can't run oxipng (it fails or can't load), PNG falls back to the main thread (compressPngWithWorker, compressPngOnMainThread in lib/convert/workerClient.ts): UPNG reduces the picture to at most 210 colours, which is lossy, and keeps only the first frame of an animated PNG. Copy may call PNG compression lossless only with that exception.",
       "If the result isn't smaller, the visitor gets the original back.",
     ],
-    unsettled: ["What happens to an animated PNG or WebP."],
+    unsettled: ["What happens to an animated PNG or WebP.", "How often the oxipng worker fails in a given browser."],
   },
   "image-pdf": {
     where: "In the browser (lib/convert/image-pdf.ts). No server.",
     facts: [
-      "Several images become one PDF, one page each, in the order the visitor chose.",
+      "Several images become one PDF, one page each, in the order of the list: images join it in the order they are picked, and the Move up, Move down and Remove buttons change it (components/ImagesToPdfConverter.tsx).",
       "Limits: 100 images, 250 MB in all, 50 megapixels per image.",
       "Transparency becomes a soft mask; a JPEG goes in as it is, with its ICC profile kept.",
     ],
@@ -181,16 +181,26 @@ export const ENGINE_FACTS = {
 
 
 // Facts for every Tool that writes one format (`to`), on the listed engines.
+// An entry may be a list, when parts of it hold on different engines.
 export const TARGET_FACTS = {
-  pdf: {
-    engines: ["browser-raster", "imagemagick-wasm", "heif-decoder"],
-    facts: [
-      "Each file becomes its own PDF; several files are never merged into one (the loop in components/HeroConverter.tsx; kind \"single\" in lib/convert/workerClient.ts).",
-      "The PDF has one page, the size of the image: 1 pixel is 1 point, with no margin and no A4 or Letter page (encodeFromRGBA in lib/convert/encode.ts).",
-      "The picture is embedded losslessly as a PNG (pdf-lib embedPng); the quality setting doesn't apply.",
-      "Nothing paints a background: transparent pixels stay transparent in the PDF (stored as a soft mask) (lib/convert/encode.ts).",
-    ],
-  },
+  pdf: [
+    {
+      engines: ["browser-raster", "imagemagick-wasm", "heif-decoder"],
+      facts: [
+        "Each file becomes its own PDF; several files are never merged into one (the loop in components/HeroConverter.tsx; kind \"single\" in lib/convert/workerClient.ts).",
+        "The PDF has one page, the size of the image: 1 pixel is 1 point, with no margin and no A4 or Letter page (encodeFromRGBA in lib/convert/encode.ts).",
+        "The picture is embedded losslessly as a PNG (pdf-lib embedPng); the quality setting doesn't apply.",
+      ],
+    },
+    {
+      // ImageMagick writes the PNG on its route, and its transparency
+      // handling isn't settled (MAGICK_PDF_ROUTE).
+      engines: ["browser-raster", "heif-decoder"],
+      facts: [
+        "Nothing paints a background: transparent pixels in the decoded picture stay transparent in the PDF (stored as a soft mask) (lib/convert/encode.ts).",
+      ],
+    },
+  ],
   svg: {
     engines: ["browser-raster"],
     facts: [
@@ -224,7 +234,30 @@ const MAGICK_PDF_ROUTE = {
   engines: ["imagemagick-wasm"],
   pdf: "A PDF output is made in two steps: ImageMagick writes a PNG, then the PNG is embedded in the PDF (lib/convert/magickBrowser.ts, lib/convert/workerClient.ts).",
 };
-SOURCE_FACTS.tiff = SOURCE_FACTS.tif = SOURCE_FACTS.psd = { engines: MAGICK_PDF_ROUTE.engines, facts: [], pdf: MAGICK_PDF_ROUTE.pdf };
+// What the route leaves open, for a PDF output only.
+const MAGICK_PDF_UNSETTLED = [
+  "Whether transparency survives in the PDF: ImageMagick writes the PNG that is embedded, and its transparency handling isn't settled. Copy must claim neither a transparent nor a filled background.",
+  "Which page of a multi-page TIFF, or which layer of a PSD (the merged image or a single layer), ends up in the PDF. Copy must not name it.",
+];
+SOURCE_FACTS.tiff = SOURCE_FACTS.tif = SOURCE_FACTS.psd = {
+  engines: MAGICK_PDF_ROUTE.engines,
+  facts: [],
+  pdf: MAGICK_PDF_ROUTE.pdf,
+  pdfUnsettled: MAGICK_PDF_UNSETTLED,
+};
+
+// A raw .hevc or .av1 file is a video stream with no container and no audio,
+// whichever engine converts it (videoOnlyNote in lib/convert/webcodecs.ts).
+for (const raw of ["hevc", "av1"]) {
+  SOURCE_FACTS[raw] = {
+    facts: [
+      `A .${raw} input is a raw video stream with no audio track, so the output has no sound: copy must not promise audio, whatever audio options the command sets. The page says "Video only" (videoOnlyNote in lib/convert/webcodecs.ts).`,
+    ],
+  };
+  TARGET_FACTS[raw] = {
+    facts: [`A .${raw} output is a raw video stream with no audio; the page says "Video only" (videoOnlyNote in lib/convert/webcodecs.ts).`],
+  };
+}
 
 // Facts for single Tools, by Tool id.
 export const TOOL_FACTS = {
@@ -261,11 +294,12 @@ export function engineFactsFor(tool, engine) {
   const facts = entry ? [...(entry.facts ?? []), ...((compress ? entry.compress : entry.convert) ?? [])] : [];
   const unsettled = entry ? [...(entry.unsettled ?? [])] : [];
   if (entry) {
-    for (const scoped of [TARGET_FACTS[tool.to], SOURCE_FACTS[tool.from], TOOL_FACTS[tool.id]]) {
+    for (const scoped of [TARGET_FACTS[tool.to], SOURCE_FACTS[tool.from], TOOL_FACTS[tool.id]].flat()) {
       if (!appliesTo(scoped, engine)) continue;
       facts.push(...(scoped.facts ?? []));
       if (scoped.pdf && tool.to === "pdf") facts.push(scoped.pdf);
       unsettled.push(...(scoped.unsettled ?? []));
+      if (tool.to === "pdf") unsettled.push(...(scoped.pdfUnsettled ?? []));
     }
   }
   let command = null;
@@ -280,7 +314,7 @@ export function engineFactsFor(tool, engine) {
           );
         } else if (built.args.includes("-fpsmax")) {
           facts.push(
-            "The video is re-encoded and keeps the source's frame size and frame rate up to 1920 px on the longer side and 30 fps (MAX_VIDEO_SIZE, MAX_VIDEO_FPS in lib/convert/ffmpeg-args.ts).",
+            "The video is re-encoded and keeps the source's frame size and frame rate up to 1920 px on the longer side and 30 fps (MAX_VIDEO_SIZE, MAX_VIDEO_FPS in lib/convert/ffmpeg-args.ts). Both sides are rounded down to an even number (force_divisible_by=2 in fitWithin), so an odd width or height loses 1 px: copy must not say the size is kept exactly.",
           );
         }
       }

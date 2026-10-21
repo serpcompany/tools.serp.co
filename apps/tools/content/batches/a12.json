@@ -143,7 +143,7 @@
       },
       {
         "question": "Are the layers kept in the PDF?",
-        "answer": "No. A layered PSD gives one picture, and the PDF holds that picture on a single page. The layers, masks and text of the PSD are not editable in the PDF."
+        "answer": "No. A layered PSD gives one picture, and the PDF holds it on a single page. The page doesn't say whether that picture is the whole composition or a single layer, and the PSD's layers, masks and text can't be edited in the PDF."
       },
       {
         "question": "How big is the PDF page?",
@@ -151,7 +151,7 @@
       },
       {
         "question": "Does the PDF keep transparent areas?",
-        "answer": "Yes. No background colour is painted behind the picture, so clear pixels in the PSD's merged image remain clear in the PDF."
+        "answer": "The page doesn't promise it either way. ImageMagick turns the PSD into a PNG before it goes into the PDF, and what it does with transparent areas isn't settled, so clear pixels may stay clear or may not."
       },
       {
         "question": "What if my PSD is very large?",
@@ -186,10 +186,10 @@
     "pairNotes": {
       "title": "What to know before converting PSD to PDF",
       "points": [
-        "The PSD becomes one picture, so layers are not kept.",
+        "The PSD becomes one picture, so layers are not kept, and the page doesn't say which layer or composite it is.",
         "The PDF has one page, the size of the image, with no margin.",
         "The picture is embedded losslessly as a PNG.",
-        "Transparent pixels stay transparent in the PDF.",
+        "The page doesn't promise whether transparent areas stay transparent.",
         "Several PSD files give one PDF each; they are never merged."
       ]
     }

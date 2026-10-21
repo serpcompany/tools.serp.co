@@ -16,7 +16,7 @@
       },
       {
         "question": "Will the MP4 keep the TS frame size and frame rate?",
-        "answer": "Yes, up to a limit. The size and frame rate are kept as they are, but a frame larger than 1920 px on its longer side is scaled down to fit, and the rate is capped at 30 fps."
+        "answer": "Yes, up to a limit. The frame rate is kept up to 30 fps, and the size up to 1920 px on the longer side, where a larger frame is scaled down to fit. Each side is rounded down to an even number, so an odd width or height loses 1 px."
       },
       {
         "question": "What happens to interlaced video?",
@@ -56,7 +56,7 @@
       "title": "What to know before converting TS to MP4",
       "points": [
         "The video is re-encoded as H.264 with AAC audio at 96 kbps.",
-        "Frame size and frame rate are kept, up to 1920 px on the longer side and 30 fps.",
+        "Frame size and frame rate are kept up to 1920 px on the longer side and 30 fps, with an odd side rounded down by 1 px.",
         "Interlaced frames are deinterlaced.",
         "Converting several TS files gives one MP4 for each.",
         "FFmpeg runs in your browser, so the video isn't uploaded."

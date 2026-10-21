@@ -16,7 +16,7 @@
       },
       {
         "question": "Is the MP4 limited in size or speed?",
-        "answer": "Yes, at the top end. Frames are scaled down when the longer side passes 1920 px, and a WebM above 30 fps is capped at 30 fps. Smaller values stay as they are."
+        "answer": "Yes, at the top end. Frames are scaled down when the longer side passes 1920 px, and a WebM above 30 fps is capped at 30 fps. Smaller values stay as they are, except that an odd width or height loses 1 px."
       },
       {
         "question": "Why does a long WebM take a while?",
@@ -263,16 +263,16 @@
     "seo": {
       "title": "Compress PNG Files Online (Free)",
       "h1": "PNG Compressor",
-      "description": "Compress PNG files in your browser with lossless oxipng recompression. If the result isn't smaller, you get your original back. Free, no sign-up.",
+      "description": "Compress PNG in your browser, normally losslessly with oxipng. If the browser can't run it, colours are reduced instead. Free, with no sign-up.",
       "howToHeading": "How to compress a PNG"
     },
     "tool": {
-      "subtitle": "Make a PNG file smaller without changing its pixels, in your browser."
+      "subtitle": "Make a PNG file smaller in your browser, normally without changing its pixels."
     },
     "faqs": [
       {
         "question": "Does compressing a PNG lower its quality?",
-        "answer": "No. The PNG goes through oxipng at level 1, which is lossless, so the pixels stay the same and only the way they are stored changes."
+        "answer": "Normally, no. The PNG goes through oxipng at level 1, which is lossless, so the pixels stay the same. If your browser can't run that compressor, the page falls back to reducing the PNG to at most 210 colours, which can change the picture, and keeps only the first frame of an animated PNG."
       },
       {
         "question": "What if the compressed PNG isn't smaller?",
@@ -290,7 +290,7 @@
     "pairNotes": {
       "title": "What to know before compressing a PNG",
       "points": [
-        "Compression is lossless: oxipng at level 1 keeps the pixels as they are.",
+        "Compression is normally lossless (oxipng at level 1); if the browser can't run it, the fallback reduces the colours.",
         "If the result isn't smaller, you get the original back.",
         "Your original file isn't changed: you download a new copy.",
         "Several PNG files are compressed one after another, each downloaded on its own.",
@@ -315,7 +315,7 @@
       },
       {
         "question": "What size and frame rate does the MP4 have?",
-        "answer": "It follows the GIF, with two caps: 1920 px on the longer side and 30 fps. A GIF within those limits keeps its size and frame rate."
+        "answer": "It follows the GIF, with two caps: 1920 px on the longer side and 30 fps. A GIF within those limits keeps its frame rate and its size, except that an odd width or height is rounded down by 1 px."
       },
       {
         "question": "Does the MP4 still loop like a GIF?",
@@ -447,7 +447,7 @@
       },
       {
         "question": "Is transparency kept in the GIF?",
-        "answer": "GIF supports 1-bit transparency, not the smooth alpha transparency of WebP. The converter lists transparency as kept for PNG and WebP outputs only."
+        "answer": "The page doesn't promise it. A GIF can mark pixels as fully transparent but has no smooth alpha like WebP, and ImageMagick writes the GIF here, whose handling of transparent areas isn't settled."
       },
       {
         "question": "Why does it say \"Image decode failed\"?",

@@ -19,7 +19,7 @@ import {
   mapQualityToPngLevel,
   mapQualityToVideoCrf,
 } from "./compression-utils.ts";
-import { MAX_VIDEO_FPS, MAX_VIDEO_SIZE, buildCompressionCommand, buildConvertCommand } from "./convert/ffmpeg-args.ts";
+import { MAX_VIDEO_FPS, MAX_VIDEO_SIZE, VIDEO_FILTER, buildCompressionCommand, buildConvertCommand } from "./convert/ffmpeg-args.ts";
 import { IMAGE_PDF_MAX_BYTES, IMAGE_PDF_MAX_IMAGES, IMAGE_PDF_MAX_PIXELS } from "./convert/image-pdf-inputs.ts";
 import { MAX_RENDER_PIXELS } from "./convert/pdf.ts";
 import { SERVER_ACTION_RATE_LIMIT_WINDOW_MS } from "./server-action-contract.js";
@@ -73,6 +73,14 @@ test("the FFmpeg facts are the command builders' and the size limits' numbers", 
   assert.match(ffmpeg, new RegExp(`at quality ${COMPRESS_QUALITY}`));
 });
 
+test("the PNG compressor states its lossy main-thread fallback", () => {
+  // qualityToColorCount in lib/convert/workerClient.ts: round(quality * 256), at least 16.
+  const colours = Math.max(16, Math.round(COMPRESS_QUALITY * 256));
+  const { text: png } = factsOf("png-to-png");
+  assert.match(png, /oxipng at level 1, which is lossless/);
+  assert.match(png, new RegExp(`falls back to the main thread .*compressPngOnMainThread.*at most ${colours} colours, which is lossy, and keeps only the first frame`));
+});
+
 test("the image compressor facts are the quality mappings' numbers", () => {
   const quality = mapQualityToImageQuality(COMPRESS_QUALITY);
   assert.match(text("jsquash-worker"), new RegExp(`re-encoded at quality ${quality};`));
@@ -82,9 +90,10 @@ test("the image compressor facts are the quality mappings' numbers", () => {
 });
 
 test("the PDF and image-to-PDF limits are their constants", () => {
-  const side = Math.sqrt(MAX_RENDER_PIXELS);
-  assert.ok(Number.isInteger(side));
-  assert.match(text("pdfjs"), new RegExp(`capped at ${side} × ${side} pixels`));
+  // The cap is on area (pageRenderScale), so the fact gives pixels, not sides.
+  assert.match(text("pdfjs"), new RegExp(`within ${MAX_RENDER_PIXELS.toLocaleString("en-US")} pixels, about ${(MAX_RENDER_PIXELS / 1e6).toFixed(1)} megapixels`));
+  assert.match(text("pdfjs"), /scale at most 2/);
+  assert.doesNotMatch(text("pdfjs"), /4096 × 4096/);
 
   const imagePdf = text("image-pdf");
   assert.match(
@@ -108,6 +117,34 @@ const factsOf = (id) => {
   const result = engineFactsFor(tool, engines.get(id));
   return { ...result, text: result.facts.join("\n"), unsettledText: result.unsettled.join("\n") };
 };
+
+test("a raw .hevc or .av1 input has no audio, whatever the engine", () => {
+  // hevc-to-mp4 runs on plain ffmpeg-wasm, av1-to-mp4 on ffmpeg-wasm + webcodecs.
+  for (const id of ["hevc-to-mp4", "av1-to-mp4", "hevc-to-av1", "hevc-to-rm"]) {
+    assert.match(factsOf(id).text, /input is a raw video stream with no audio track, so the output has no sound/, id);
+  }
+  assert.match(factsOf("mp4-to-hevc").text, /\.hevc output is a raw video stream with no audio/);
+  assert.doesNotMatch(factsOf("mp4-to-mov").text, /raw video stream/);
+});
+
+test("transparency in a PDF is claimed only where the engine settles it", () => {
+  for (const id of ["png-to-pdf", "heic-to-pdf"]) {
+    assert.match(factsOf(id).text, /transparent pixels in the decoded picture stay transparent/, id);
+  }
+  for (const id of ["psd-to-pdf", "tiff-to-pdf"]) {
+    const { text, unsettledText } = factsOf(id);
+    assert.doesNotMatch(text, /stay transparent/, id);
+    assert.match(unsettledText, /Whether transparency survives in the PDF/, id);
+    assert.match(unsettledText, /which layer of a PSD .* ends up in the PDF/, id);
+  }
+  assert.doesNotMatch(factsOf("psd-to-png").unsettledText, /survives in the PDF/);
+});
+
+test("a re-encoded video rounds an odd side down by 1 px", () => {
+  assert.match(VIDEO_FILTER, /force_divisible_by=2/);
+  assert.match(factsOf("mov-to-mp4").text, /odd width or height loses 1 px/);
+  assert.doesNotMatch(factsOf("mkv-to-mp4").text, /loses 1 px/);
+});
 
 test("every raster-to-PDF engine states the PDF facts", () => {
   for (const id of ["png-to-pdf", "tiff-to-pdf", "heic-to-pdf", "psd-to-pdf"]) {
