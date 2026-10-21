@@ -59,26 +59,29 @@ type TableConvertMetadataInput = {
 // a web worker), and sends the table nowhere.
 const TABLE_IN_BROWSER = "It runs in your browser, so your data stays on your device.";
 
+// A table converter page's description, unless its Tool has curated SEO
+// fields (lib/metadata.ts).
+export function tableConvertDescription(from: string, to: string): string {
+  const fromLabel = formatTableLabel(from);
+  const toLabel = formatTableLabel(to);
+  return composeDescription(`Convert ${fromLabel} to ${toLabel} online with a live table preview.`, [
+    TABLE_IN_BROWSER,
+    FREE,
+    `Paste or drop in your ${fromLabel} data, then download the ${toLabel} result.`,
+  ]);
+}
+
+// The table converter pages of retired Tools that still have a folder; the
+// live ones are built by buildToolMetadata in lib/metadata.ts.
 export function buildTableConvertMetadata({
   from,
   to,
   title,
   slug,
 }: TableConvertMetadataInput): Metadata {
-  const fromLabel = formatTableLabel(from);
-  const toLabel = formatTableLabel(to);
-  const description = composeDescription(
-    `Convert ${fromLabel} to ${toLabel} online with a live table preview.`,
-    [
-      TABLE_IN_BROWSER,
-      FREE,
-      `Paste or drop in your ${fromLabel} data, then download the ${toLabel} result.`,
-    ],
-  );
-
   return pageMetadata({
     title,
-    description,
+    description: tableConvertDescription(from, to),
     canonical: normalizePath(slug),
     image: "convert",
   });

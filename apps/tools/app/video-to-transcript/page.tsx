@@ -1,11 +1,9 @@
 import TranscribeTool from "@/components/TranscribeTool";
 import { FAQSection } from "@/components/sections/FAQSection";
-import { BlogSection } from "@/components/sections/BlogSection";
-import { ChangelogSection } from "@/components/sections/ChangelogSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { buildToolMetadata } from "@/lib/metadata";
+import { buildToolMetadata, toolHeading } from "@/lib/metadata";
 import { toolContent } from "@/lib/tool-content";
 
 const toolId = "video-to-transcript";
@@ -23,7 +21,7 @@ export default function Page() {
     <main className="min-h-screen bg-background">
       <TranscribeTool
         toolId={toolId}
-        title={content.tool.title}
+        title={toolHeading(toolId)}
         subtitle={content.tool.subtitle}
       />
 
@@ -39,10 +37,6 @@ export default function Page() {
       )}
 
       {content.faqs && <FAQSection faqs={content.faqs} />}
-
-      {content.blogPosts && <BlogSection blogPosts={content.blogPosts} />}
-
-      {content.changelog && <ChangelogSection changelog={content.changelog} />}
 
       <ToolsLinkHub relatedTools={content.relatedTools} />
     </main>

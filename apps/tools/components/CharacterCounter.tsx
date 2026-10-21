@@ -40,10 +40,14 @@ function computeStats(text: string): Stats {
 }
 
 type Props = {
+  // The page's H1 (toolHeading, lib/metadata.ts) and the line under it
+  // (content.tool.subtitle), so content:apply reaches them.
+  heading: string;
+  subtitle: string;
   videoEmbedId?: string;
 };
 
-export default function CharacterCounter({ videoEmbedId }: Props) {
+export default function CharacterCounter({ heading, subtitle, videoEmbedId }: Props) {
   const [text, setText] = useState("");
   const [stats, setStats] = useState<Stats>(() => computeStats(""));
   const lastTelemetryAt = useRef(0);
@@ -106,10 +110,8 @@ export default function CharacterCounter({ videoEmbedId }: Props) {
     <section className="w-full bg-gradient-to-b from-gray-50 to-white py-16">
       <div className="mx-auto max-w-6xl px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Character Counter</h1>
-          <p className="text-lg text-gray-600">
-            Count characters, words, sentences, and paragraphs instantly
-          </p>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">{heading}</h1>
+          <p className="text-lg text-gray-600">{subtitle}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

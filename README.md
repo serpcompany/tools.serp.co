@@ -17,12 +17,15 @@ pnpm test
 pnpm lint
 pnpm typecheck
 pnpm verify:catalog
+pnpm content:check
 pnpm check:links
 ```
 
 `pnpm check` is the highest local verification seam. It composes deterministic
 lint, typechecking, the complete automated-test suite, agent workflow and Tool
-catalog structural verification, and the production-faithful Cloudflare build.
+catalog structural verification, the converter copy checks
+([docs/converter-copy.md](docs/converter-copy.md)), and the production-faithful
+Cloudflare build.
 It does not exercise deployed systems or run link checks, canaries, benchmarks,
 syncs, uploads, deploys, or remote migrations.
 

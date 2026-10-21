@@ -20,7 +20,8 @@ const SAMPLE_HTML = `<h1>Welcome to HTML to Markdown</h1>
 
 type ConvertFn = (html: string, options: null) => { content: string | null };
 
-export default function HtmlToMarkdownConverter() {
+// `heading` is the page's H1 (toolHeading, lib/metadata.ts).
+export default function HtmlToMarkdownConverter({ heading }: { heading: string }) {
   const [html, setHtml] = useState(SAMPLE_HTML);
   const [markdown, setMarkdown] = useState("");
   const [wasmReady, setWasmReady] = useState(false);
@@ -128,7 +129,7 @@ export default function HtmlToMarkdownConverter() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight mb-3">HTML to Markdown Converter</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-3">{heading}</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Paste HTML on the left and get clean Markdown on the right — instantly, in your browser.
           </p>

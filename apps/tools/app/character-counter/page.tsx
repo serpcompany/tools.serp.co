@@ -1,11 +1,9 @@
 import CharacterCounter from "@/components/CharacterCounter";
 import { FAQSection } from "@/components/sections/FAQSection";
-import { BlogSection } from "@/components/sections/BlogSection";
-import { ChangelogSection } from "@/components/sections/ChangelogSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
-import { buildToolMetadata } from "@/lib/metadata";
+import { buildToolMetadata, toolHeading } from "@/lib/metadata";
 import { toolContent } from '@/lib/tool-content';
 import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
 
@@ -27,7 +25,11 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-background">
       {/* Custom Character Counter Component */}
-      <CharacterCounter videoEmbedId={videoEmbedId} />
+      <CharacterCounter
+        heading={toolHeading(toolId)}
+        subtitle={content.tool.subtitle}
+        videoEmbedId={videoEmbedId}
+      />
 
       {/* Related Tools Section - Character counter doesn't have from/to formats */}
 
@@ -44,12 +46,6 @@ export default function Page() {
 
       {/* FAQs Section */}
       {content.faqs && <FAQSection faqs={content.faqs} />}
-
-      {/* Blog Articles Section */}
-      {content.blogPosts && <BlogSection blogPosts={content.blogPosts} />}
-
-      {/* Changelog Section */}
-      {content.changelog && <ChangelogSection changelog={content.changelog} />}
 
       {/* All tools link hub */}
       <ToolsLinkHub />

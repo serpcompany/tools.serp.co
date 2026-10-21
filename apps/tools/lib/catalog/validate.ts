@@ -73,6 +73,8 @@ const content = object({
     to: string,
     accept: optional(string),
   }),
+  seo: optional(object({ title: string, h1: string, description: string })),
+  pairNotes: optional(object({ title: string, points: strings })),
   videoSection: optional(object({ embedId: optional(string) })),
   faqs: optional(arrayOf(object({ question: string, answer: string }))),
   aboutSection: optional(

@@ -1,4 +1,11 @@
-import type { InfoArticleSectionData, HowToSectionData, Tool } from "@/types";
+import type { FAQ, InfoArticleSectionData, HowToSectionData, Tool } from "@/types";
+
+import { onConverterPage, runsInBrowser } from "./metadata.ts";
+
+// The template sections of a page without curated ones. Converter and
+// compressor pages say only what is true of every Tool they cover (#356):
+// where the file is converted follows runsInBrowser, and a compressor never
+// promises the same quality, since most re-encode lossily.
 
 const formatLabel = (value: string | undefined) => {
   if (!value) return "";
@@ -52,12 +59,15 @@ export function buildHowToSection(tool: Tool): HowToSectionData {
     title = `How to download ${fromLabel} files`;
     intro = `Follow these steps to download ${fromLabel} files to your device.`;
   } else if (isCompressionTool(tool) && fromLabel === toLabel) {
-    title = `How to compress ${fromLabel} to smaller ${toLabel} files`;
-    intro = `Follow these steps to compress ${fromLabel} files without losing quality.`;
+    title = `How to compress ${fromLabel} files`;
+    intro = `Follow these steps to make ${fromLabel} files smaller online.`;
   }
 
+  const converterPage = onConverterPage(tool);
   const steps: string[] = [
-    `Upload your ${fromLabel} file${tool.operation === "bulk" || tool.operation === "combine" ? "s" : ""}.`,
+    converterPage
+      ? `Choose your ${fromLabel} file, or several at once.`
+      : `Upload your ${fromLabel} file${tool.operation === "bulk" || tool.operation === "combine" ? "s" : ""}.`,
   ];
 
   if (tool.operation === "view") {
@@ -77,6 +87,12 @@ export function buildHowToSection(tool: Tool): HowToSectionData {
   } else if (tool.operation === "download") {
     steps.push("Start the download and wait for the file to finish.");
     steps.push("Save the file to your device.");
+  } else if (converterPage && tool.operation === "compress") {
+    steps.push(`Wait while the compressor makes a smaller ${toLabel} copy.`);
+    steps.push("Download the compressed file. If it can't be made smaller, you get the original back.");
+  } else if (converterPage) {
+    steps.push(`Wait while the converter turns each file into ${toLabel}.`);
+    steps.push(`Download each new ${toLabel} file. Your original file isn't changed.`);
   } else {
     steps.push(`We ${verb} your file and prepare the ${toLabel} output.`);
     steps.push(`Download the new ${toLabel} file when the conversion completes.`);
@@ -85,7 +101,91 @@ export function buildHowToSection(tool: Tool): HowToSectionData {
   return { title, intro, steps };
 }
 
+// The converter page's file filter for a Tool without curated content.
+// content:apply gives a Tool it adds content to the same one, so its page
+// keeps accepting the same files.
+export function converterAccept(from: string): string {
+  if (from === "pdf") return ".pdf";
+  if (from === "jpg") return ".jpg,.jpeg";
+  if (from === "jpeg") return ".jpeg,.jpg";
+  if (from === "tiff") return ".tif,.tiff";
+  return `.${from}`;
+}
+
+// Where a converter page's file is converted, for its article and FAQs. A
+// server-first conversion falls back to the browser when the server route
+// fails, as it does on Workers (docs/execution-paths.md), so its copy names
+// both; PDF compression has no fallback.
+function locationFacts(tool: Tool & { from: string; to: string }) {
+  if (runsInBrowser(tool)) {
+    return {
+      summary: "It runs in your browser, so the file stays on your device.",
+      bullet: "Runs in your browser: the file isn't uploaded.",
+      faq: "No. The conversion runs in your browser, so the file stays on your device.",
+    };
+  }
+  if (tool.operation === "compress") {
+    return {
+      summary: "The file is uploaded to the SERP Tools server, which makes the smaller copy.",
+      bullet: "The SERP Tools server does the work: the file is uploaded.",
+      faq: "Yes. This one uploads the file to the SERP Tools server, which compresses it.",
+    };
+  }
+  return {
+    summary: "The page first sends the file to the SERP Tools server, and converts it in your browser if the server can't.",
+    bullet: "Tries the SERP Tools server first, then your browser.",
+    faq: "Yes, at first. The page sends the file to the SERP Tools server, and converts it in your browser if the server can't.",
+  };
+}
+
+// A converter or compressor page's article: what the page does, and only
+// what holds for every Tool it covers.
+function converterArticle(tool: Tool & { from: string; to: string }): InfoArticleSectionData {
+  const { fromLabel, toLabel } = buildLabels(tool);
+  const location = locationFacts(tool);
+  if (tool.operation === "compress") {
+    return {
+      title: `About ${fromLabel} compression`,
+      markdown: [
+        `${tool.name} makes a smaller copy of a ${fromLabel} file. ${location.summary}`,
+        "How much smaller depends on the file: one that is already compressed may shrink little. If the copy wouldn't be smaller, you get the original back.",
+        "**What to expect**",
+        `- ${location.bullet}`,
+        "- Your original file isn't changed: you download a new copy.",
+        "- Several files can be chosen at once; each downloads on its own.",
+      ].join("\n\n"),
+    };
+  }
+  return {
+    title: `About ${fromLabel} to ${toLabel} conversions`,
+    markdown: [
+      `${tool.name} converts ${fromLabel} files to ${toLabel}. ${location.summary}`,
+      `Use it when a program, site or device needs ${toLabel} and you have ${fromLabel}. Larger files take longer to convert.`,
+      "**What to expect**",
+      `- ${location.bullet}`,
+      "- Your original file isn't changed: you download a new copy.",
+      "- Several files can be chosen at once; each downloads on its own.",
+    ].join("\n\n"),
+  };
+}
+
+// The FAQs of a converter or compressor page without curated ones.
+export function buildConverterFaqs(tool: Tool): FAQ[] {
+  if (!onConverterPage(tool)) return [];
+  const { fromLabel, toLabel } = buildLabels(tool);
+  const how =
+    tool.operation === "compress"
+      ? { question: `How do I compress ${fromLabel} files?`, answer: "Choose the file in the compressor above, then download the smaller copy when it's ready." }
+      : { question: `How do I convert ${fromLabel} to ${toLabel}?`, answer: "Choose the file in the converter above, then download the result when it finishes." };
+  return [
+    how,
+    { question: "Is my file uploaded?", answer: locationFacts(tool).faq },
+    { question: "Do I need to install anything?", answer: "No. The page works in a current web browser, with nothing to install and no sign-up." },
+  ];
+}
+
 export function buildInfoArticleSection(tool: Tool): InfoArticleSectionData {
+  if (onConverterPage(tool)) return converterArticle(tool);
   const { fromLabel, toLabel } = buildLabels(tool);
   const verb = actionVerb(tool);
   let title = `About ${fromLabel} to ${toLabel} conversions`;

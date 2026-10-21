@@ -14,6 +14,9 @@ import {
   buildCategoriesIndexMetadata,
   buildCategoryMetadata,
   buildToolMetadata,
+  hasToolSeo,
+  toolHeading,
+  toolSeo,
 } from "./metadata.ts";
 import {
   DESCRIPTION_MAX,
@@ -37,14 +40,21 @@ const DESCRIPTION_MIN = 110;
 
 const handlers = scanPageHandlers(fileURLToPath(new URL("../app", import.meta.url)));
 const handlerOf = (tool) => handlerFor(tool, handlers);
-// Table converter pages build their metadata in lib/table-convert.ts.
+// The Tools whose description toolFacts builds: table converter pages take
+// theirs from lib/table-convert.ts.
 const toolsWithToolMetadata = activeTools().filter((tool) => handlerOf(tool) !== "TableConvertLanding");
+const activeIds = new Set(activeTools().map((tool) => tool.id));
 
-// Every page the catalog serves, with the metadata it renders.
+// Every page the catalog serves, with the metadata it renders. A live
+// table converter's page builds it like any Tool's; the table converter
+// folders with no live Tool keep buildTableConvertMetadata.
 function servedPages() {
   const pages = [
-    ...toolsWithToolMetadata.map((tool) => ({ id: tool.id, tool, metadata: buildToolMetadata(tool.id) })),
-    ...TABLE_CONVERT_PAGES.map((page) => ({ id: `table ${page.slug}`, metadata: buildTableConvertMetadata(page) })),
+    ...activeTools().map((tool) => ({ id: tool.id, tool, metadata: buildToolMetadata(tool.id) })),
+    ...TABLE_CONVERT_PAGES.filter((page) => !activeIds.has(page.slug)).map((page) => ({
+      id: `table ${page.slug}`,
+      metadata: buildTableConvertMetadata(page),
+    })),
     ...directoryCategories().flatMap((category) =>
       Array.from({ length: categoryPageCount(category.count) }, (_, index) => ({
         id: `category ${category.id} ${index + 1}`,
@@ -122,13 +132,40 @@ test("each page family shows its own share image", () => {
 test("titles are the page's own: the layout's template adds the site name once", () => {
   assert.deepEqual(buildSiteMetadata().title, { default: SITE_NAME, template: TITLE_TEMPLATE });
   assert.equal(TITLE_TEMPLATE, "%s | SERP Tools");
-  assert.equal(buildToolMetadata("png-to-jpg").title, "PNG to JPG");
+  assert.equal(buildToolMetadata("png-to-jpg").title, "PNG to JPG Converter (Free, Online)");
   assert.equal(buildToolMetadata("download-tiktok-videos").title, "TikTok Video Downloader");
   assert.equal(buildCategoryMetadata("convert").title, "Convert Tools");
   assert.equal(buildCategoriesIndexMetadata().title, "Categories");
   for (const { id, metadata } of pages.filter((page) => page.id !== "home")) {
     assert.equal(typeof metadata.title, "string", id);
     assert.doesNotMatch(metadata.title, /SERP Tools/, `${id} names the site in its own title`);
+  }
+});
+
+test("converter and compressor titles and H1s follow the owner's pattern, or the Tool's content.seo", () => {
+  const seo = (id) => [buildToolMetadata(id).title, toolHeading(id)];
+  assert.deepEqual(seo("png-to-jpg"), ["PNG to JPG Converter (Free, Online)", "PNG to JPG Converter"]);
+  assert.deepEqual(seo("compress-m4a"), ["M4A Compressor (Free, Online)", "M4A Compressor"]);
+  assert.deepEqual(seo("png-to-png"), ["PNG Compressor (Free, Online)", "PNG Compressor"]);
+  assert.deepEqual(seo("csv-to-json"), ["CSV to JSON Converter (Free, Online)", "CSV to JSON Converter"]);
+  assert.deepEqual(seo("character-counter"), ["Character Counter (Free, Online)", "Character Counter"]);
+  // Downloaders and the other operations keep their own titles.
+  assert.equal(buildToolMetadata("download-tiktok-videos").title, "TikTok Video Downloader");
+
+  const curated = activeTools().filter((tool) => hasToolSeo(tool) && tool.content?.seo);
+  assert.ok(curated.length >= 2, "the examples batch is applied");
+  for (const tool of curated) {
+    assert.deepEqual(seo(tool.id), [tool.content.seo.title, tool.content.seo.h1], tool.id);
+    assert.equal(buildToolMetadata(tool.id).description, tool.content.seo.description, tool.id);
+  }
+
+  const titles = new Set();
+  for (const tool of activeTools().filter(hasToolSeo)) {
+    const { title, h1 } = toolSeo(tool);
+    assert.ok(title.length <= 60, `${tool.id}: ${title}`);
+    assert.ok(title.startsWith(h1), `${tool.id}: the title starts with the H1`);
+    assert.ok(!titles.has(title), `${tool.id} repeats the title ${title}`);
+    titles.add(title);
   }
 });
 

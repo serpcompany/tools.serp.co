@@ -1,0 +1,369 @@
+// Converter and compressor copy (#356, docs/converter-copy.md): the checks
+// every live converter and compressor passes (`pnpm content:check`), and
+// writing a writer's batch file into tools.json (`pnpm content:apply`).
+//
+// A Tool's title, H1 and description are what its page renders: content.seo
+// when the Tool has it, else the generated pattern (toolSeo in
+// lib/metadata.ts). The rules on FAQs and required fields hold for Tools with
+// content.seo, the ones written to the style guide; older curated copy repeats
+// itself across Tools and is replaced batch by batch (#355).
+
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+
+import { canonicalPath } from "../../lib/trailing-slash.ts";
+import { toolHref } from "../../lib/catalog/href.ts";
+import { operationsUsedBy } from "../../lib/catalog/operations.ts";
+import { validateCatalog } from "../../lib/catalog/validate.ts";
+import { TOOLS_WITH_OWN_PAGE, hasToolSeo, onConverterPage, toolSeo, SEO_TITLE_MAX } from "../../lib/metadata.ts";
+import { buildConverterFaqs, converterAccept } from "../../lib/tool-sections.ts";
+import { parseCsv } from "./csv.mjs";
+
+export const REGISTRY_PATH = "lib/catalog/tools.json";
+export const STATUS_PATH = "benchmarks/tool-status.csv";
+export const BATCH_DIR = "content/batches";
+
+// The issue (#356) asked for 70; lib/metadata.test.mjs already holds every
+// served description to 110, the length under which Ahrefs reports one as too
+// short, so a batch that passes this check also passes `pnpm test`.
+export const DESCRIPTION_MIN = 110;
+export const DESCRIPTION_MAX = 160;
+// Two FAQ answers are near-duplicates when this share of their three-word
+// phrases (Jaccard similarity) is the same, once each Tool's own format names
+// are blanked: "Your browser turns the WebP into a PNG" and "Your browser
+// turns the AVIF into a JPG" are one answer. Of the 551 curated converter
+// answers in October 2026, 200 were word-for-word copies (1.0), 291 scored
+// under 0.3 against every other Tool's, and 60 fell between; the two examples'
+// answers score 0.04 at most.
+export const FAQ_SIMILARITY_MAX = 0.6;
+export const FAQS_MIN = 3;
+export const PAIR_NOTES_MIN = 2;
+
+// The fields a batch may set on a Tool, and the order content keys are
+// written in. Keys this list doesn't name keep their order after these.
+export const BATCH_FIELDS = ["seo", "tool", "faqs", "aboutSection", "pairNotes"];
+const CONTENT_KEY_ORDER = [
+  "tool",
+  "seo",
+  "videoSection",
+  "faqs",
+  "aboutSection",
+  "pairNotes",
+  "howTo",
+  "infoArticle",
+  "relatedTools",
+];
+const BATCH_TOOL_FIELDS = new Set(["title", "subtitle"]);
+
+export const isConverter = (tool) => tool.isActive && hasToolSeo(tool);
+
+// The batch fields a Tool's page shows. The converter page shows them all.
+// The transcription pages, Character Counter and JSON to CSV show the
+// subtitle and FAQs; table converter pages and HTML to Markdown build their
+// copy in code and take only content.seo. content.test.mjs reads the pages
+// to keep this true.
+export const OWN_PAGE_FIELDS = ["seo", "tool", "faqs"];
+export const OWN_PAGES_WITHOUT_COPY = new Set(["html-to-markdown"]);
+export function pageFields(tool) {
+  if (onConverterPage(tool)) return BATCH_FIELDS;
+  if (TOOLS_WITH_OWN_PAGE.has(tool.id) && !OWN_PAGES_WITHOUT_COPY.has(tool.id)) return OWN_PAGE_FIELDS;
+  return ["seo"];
+}
+
+// Lower case letters and digits only: "WebP to PNG" contains "webp to png",
+// and "CSV to Pandas DataFrame" contains "csv to pandasdataframe".
+const squash = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+// The keyword each live Tool's row names in the Tool status view.
+export function keywordsFromStatus(csvText) {
+  const keywords = new Map();
+  for (const row of parseCsv(csvText)) {
+    if (row.catalog_state === "live" && row.keyword) keywords.set(row.tool_id, row.keyword);
+  }
+  return keywords;
+}
+
+// The paths a link in Tool copy may point at: every active Tool's page, the
+// homepage, the category pages and the two index pages.
+export function liveRoutes(tools) {
+  const active = tools.filter((tool) => tool.isActive);
+  return new Set([
+    "/",
+    "/categories/",
+    "/brands/",
+    ...operationsUsedBy(active).map((operation) => `/category/${operation}/`),
+    ...active.map((tool) => toolHref(tool)),
+  ]);
+}
+
+export function loadContext(appRoot) {
+  return {
+    keywords: keywordsFromStatus(readFileSync(path.join(appRoot, STATUS_PATH), "utf8")),
+  };
+}
+
+// Every string in a value, with where it is.
+function* strings(value, where) {
+  if (typeof value === "string") yield [where, value];
+  else if (Array.isArray(value)) {
+    for (const [index, item] of value.entries()) yield* strings(item, `${where}[${index}]`);
+  } else if (value && typeof value === "object") {
+    for (const [key, item] of Object.entries(value)) yield* strings(item, `${where}.${key}`);
+  }
+}
+
+// The links in a Tool's content: related Tools, blog posts, and Markdown or
+// HTML links in any text.
+function contentLinks(content) {
+  const links = [];
+  for (const [index, related] of (content.relatedTools ?? []).entries()) {
+    if (related.toolId !== undefined) links.push({ where: `relatedTools[${index}]`, toolId: related.toolId });
+    if (related.href !== undefined) links.push({ where: `relatedTools[${index}]`, href: related.href });
+  }
+  for (const [index, post] of (content.blogPosts ?? []).entries()) {
+    links.push({ where: `blogPosts[${index}]`, href: post.href });
+  }
+  for (const [where, text] of strings({ ...content, relatedTools: undefined, blogPosts: undefined }, "content")) {
+    for (const match of text.matchAll(/\]\(([^)\s]*)\)|href=["']([^"']*)["']/g)) {
+      links.push({ where, href: match[1] ?? match[2] });
+    }
+  }
+  return links;
+}
+
+// An answer as its three-word phrases, with the Tool's format names blanked.
+export function phrases(tool, text) {
+  let normalized = text.toLowerCase();
+  const names = [tool.from, tool.to].filter(Boolean).sort((a, b) => b.length - a.length);
+  for (const name of names) {
+    normalized = normalized.replace(new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "g"), " fmt ");
+  }
+  const words = normalized.replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(Boolean);
+  const set = new Set();
+  for (let index = 0; index + 3 <= words.length; index += 1) set.add(words.slice(index, index + 3).join(" "));
+  if (words.length < 3 && words.length) set.add(words.join(" "));
+  return set;
+}
+
+export function similarity(a, b) {
+  let shared = 0;
+  for (const phrase of a) if (b.has(phrase)) shared += 1;
+  const union = a.size + b.size - shared;
+  return union === 0 ? 0 : shared / union;
+}
+
+// The fields a Tool written to the style guide needs, of those its page shows.
+function requiredFields(tool, content, fail) {
+  const fields = pageFields(tool);
+  if (fields.includes("tool") && !content.tool?.subtitle?.trim()) fail("required", "content.tool.subtitle is missing");
+  if (fields.includes("faqs") && (content.faqs?.length ?? 0) < FAQS_MIN) {
+    fail("required", `content.faqs needs at least ${FAQS_MIN} questions`);
+  }
+  if (fields.includes("pairNotes") && (content.pairNotes?.points?.length ?? 0) < PAIR_NOTES_MIN) {
+    fail("required", `content.pairNotes needs a title and at least ${PAIR_NOTES_MIN} points`);
+  }
+  if (fields.includes("aboutSection") && tool.from !== tool.to && !content.aboutSection) {
+    fail("required", "content.aboutSection is missing (a converter describes both formats)");
+  }
+}
+
+// Every rule broken by the live converters and compressors in `tools`, as
+// { toolId, rule, message }. An empty list passes.
+export function checkContent(tools, { keywords }) {
+  const failures = [];
+  const converters = tools.filter(isConverter);
+  const activeIds = new Set(tools.filter((tool) => tool.isActive).map((tool) => tool.id));
+  const routes = liveRoutes(tools);
+  const seen = { title: new Map(), h1: new Map(), description: new Map() };
+  const answers = [];
+
+  for (const tool of converters) {
+    const fail = (rule, message) => failures.push({ toolId: tool.id, rule, message });
+    const seo = toolSeo(tool);
+    const keyword = keywords.get(tool.id);
+    if (keyword) {
+      if (!squash(seo.title).includes(squash(keyword))) fail("keyword", `title "${seo.title}" lacks the keyword "${keyword}"`);
+      if (!squash(seo.h1).includes(squash(keyword))) fail("keyword", `H1 "${seo.h1}" lacks the keyword "${keyword}"`);
+    }
+    if (seo.title.length > SEO_TITLE_MAX) fail("length", `title is ${seo.title.length} characters, over ${SEO_TITLE_MAX}`);
+    if (/SERP Tools/i.test(seo.title)) fail("length", 'title names the site; the layout adds " | SERP Tools"');
+    if (seo.description.length < DESCRIPTION_MIN || seo.description.length > DESCRIPTION_MAX) {
+      fail("length", `description is ${seo.description.length} characters, outside ${DESCRIPTION_MIN}–${DESCRIPTION_MAX}`);
+    }
+    for (const field of ["title", "h1", "description"]) {
+      const other = seen[field].get(seo[field]);
+      if (other) fail("duplicate", `${field} is the same as ${other}'s: "${seo[field]}"`);
+      else seen[field].set(seo[field], tool.id);
+    }
+
+    const content = tool.content;
+    if (!content) continue;
+    if (content.changelog) fail("invented", "content.changelog is present; converter pages have none");
+    if (content.blogPosts) fail("invented", "content.blogPosts is present; converter pages have none");
+    for (const link of contentLinks(content)) {
+      if (link.toolId !== undefined) {
+        if (!activeIds.has(link.toolId)) fail("link", `${link.where} names ${link.toolId}, which isn't a live Tool`);
+        continue;
+      }
+      const href = (link.href ?? "").trim();
+      if (!href || href.startsWith("#")) fail("link", `${link.where} links to "${href}"`);
+      else if (!href.startsWith("/") || href.startsWith("//")) fail("link", `${link.where} links off the site: ${href}`);
+      else if (!routes.has(canonicalPath(href.split(/[?#]/)[0]))) fail("link", `${link.where} links to ${href}, which isn't a live page`);
+    }
+    for (const [index, faq] of (content.faqs ?? []).entries()) {
+      answers.push({ tool, where: `faqs[${index}]`, phrases: phrases(tool, faq.answer), checked: Boolean(content.seo) });
+    }
+    if (content.seo) requiredFields(tool, content, fail);
+  }
+
+  // The template FAQs every page without curated FAQs shows, as another
+  // Tool's would be.
+  const template = converters.find((tool) => !tool.content);
+  if (template) {
+    for (const [index, faq] of buildConverterFaqs(template).entries()) {
+      answers.push({ tool: { id: "the template FAQs" }, where: `[${index}]`, phrases: phrases(template, faq.answer), checked: false });
+    }
+  }
+  for (const answer of answers.filter((candidate) => candidate.checked)) {
+    for (const other of answers) {
+      if (other.tool.id === answer.tool.id) continue;
+      const score = similarity(answer.phrases, other.phrases);
+      if (score >= FAQ_SIMILARITY_MAX) {
+        failures.push({
+          toolId: answer.tool.id,
+          rule: "faq-duplicate",
+          message: `${answer.where} repeats ${other.tool.id} ${other.where} (similarity ${score.toFixed(2)}, limit ${FAQ_SIMILARITY_MAX})`,
+        });
+      }
+    }
+  }
+  return failures;
+}
+
+// tools.json as text: each top-level entry's own text, so a write changes
+// only the entries it means to. JSON strings hold no raw newline, so the
+// boundary between two entries can't occur inside one.
+const ENTRY_BOUNDARY = "\n  },\n  {\n";
+
+export function splitRegistry(text) {
+  if (!text.startsWith("[\n  {\n") || !text.endsWith("\n  }\n]\n")) {
+    throw new Error("tools.json isn't in its usual layout: an array of 2-space indented objects");
+  }
+  const body = text.slice("[\n  {\n".length, -"\n  }\n]\n".length);
+  return body.split(ENTRY_BOUNDARY).map((inner) => `  {\n${inner}\n  }`);
+}
+
+export function joinRegistry(entries) {
+  return `[\n${entries.join(",\n")}\n]\n`;
+}
+
+// One entry as tools.json writes it: 2-space indent inside the array, and
+// ASCII only, every other character as a lower-case \u escape.
+export const serializeEntry = (entry) =>
+  JSON.stringify(entry, null, 2)
+    .replace(/[\u0080-￿]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`)
+    .split("\n")
+    .map((line) => `  ${line}`)
+    .join("\n");
+
+const deepEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+function orderContent(content) {
+  const ordered = {};
+  for (const key of CONTENT_KEY_ORDER) if (content[key] !== undefined) ordered[key] = content[key];
+  for (const [key, value] of Object.entries(content)) if (!(key in ordered) && value !== undefined) ordered[key] = value;
+  return ordered;
+}
+
+// A Tool's content with a batch entry's fields written in.
+function withBatchEntry(tool, entry) {
+  const content = tool.content
+    ? { ...tool.content }
+    : {
+        // The page a Tool without content showed, kept: its name stays the
+        // fallback title, its file filter the same (converterAccept).
+        tool: { title: tool.name, subtitle: tool.description, from: tool.from, to: tool.to, accept: converterAccept(tool.from) },
+      };
+  for (const field of BATCH_FIELDS) {
+    if (entry[field] === undefined) continue;
+    content[field] = field === "tool" ? { ...content.tool, ...entry.tool } : entry[field];
+  }
+  return { ...tool, content: orderContent(content) };
+}
+
+// Problems with a batch's shape: unknown or retired Tool ids, unknown fields.
+export function batchProblems(batch, tools) {
+  if (!batch || typeof batch !== "object" || Array.isArray(batch)) return ["a batch is an object of Tool ids"];
+  const byId = new Map(tools.map((tool) => [tool.id, tool]));
+  const problems = [];
+  for (const [id, entry] of Object.entries(batch)) {
+    const known = byId.get(id);
+    if (!known) problems.push(`${id}: no Tool has this id`);
+    else if (!known.isActive) problems.push(`${id}: the Tool is retired`);
+    else if (!hasToolSeo(known)) problems.push(`${id}: not a converter or compressor (operation ${known.operation})`);
+    const tool = known && isConverter(known) ? known : null;
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      problems.push(`${id}: its entry must be an object`);
+      continue;
+    }
+    for (const key of Object.keys(entry)) {
+      if (!BATCH_FIELDS.includes(key)) problems.push(`${id}.${key}: not a batch field (${BATCH_FIELDS.join(", ")})`);
+      else if (tool && !pageFields(tool).includes(key)) {
+        problems.push(`${id}.${key}: this Tool's page doesn't show it (it shows ${pageFields(tool).join(", ")})`);
+      }
+    }
+    for (const key of Object.keys(entry.tool ?? {})) {
+      if (!BATCH_TOOL_FIELDS.has(key)) problems.push(`${id}.tool.${key}: a batch sets only tool.title and tool.subtitle`);
+    }
+  }
+  return problems;
+}
+
+// The registry text with a batch written in, the Tools it changed, and every
+// problem: the batch's shape, the registry's shape, then checkContent over
+// the whole catalog. `content:apply` writes the text only when there are none.
+export function applyBatch(registryText, batch, context) {
+  const entries = splitRegistry(registryText);
+  const tools = entries.map((entry) => JSON.parse(entry));
+  const problems = batchProblems(batch, tools);
+  if (problems.length) return { text: registryText, changed: [], problems };
+
+  const changed = [];
+  const next = tools.map((tool, index) => {
+    const entry = batch[tool.id];
+    if (!entry) return tool;
+    const updated = withBatchEntry(tool, entry);
+    if (!deepEqual(updated, tool)) {
+      entries[index] = serializeEntry(updated);
+      changed.push(tool.id);
+    }
+    return updated;
+  });
+  const shape = validateCatalog(next);
+  const failures = checkContent(next, context).map(({ toolId, rule, message }) => `${toolId} [${rule}] ${message}`);
+  return { text: joinRegistry(entries), changed, problems: [...shape, ...failures] };
+}
+
+// A batch file's path: a name in content/batches, or a path to a .json file.
+export function batchPath(appRoot, name) {
+  if (name.endsWith(".json")) return path.resolve(name);
+  return path.join(appRoot, BATCH_DIR, `${name}.json`);
+}
+
+// A batch read from disk, or the reason it can't be: no such file, not JSON,
+// or not an object of Tool ids.
+export function readBatch(appRoot, name) {
+  const file = batchPath(appRoot, name);
+  const shown = path.relative(appRoot, file);
+  if (!existsSync(file)) return { error: `No batch file at apps/tools/${shown}.` };
+  let batch;
+  try {
+    batch = JSON.parse(readFileSync(file, "utf8"));
+  } catch (error) {
+    return { error: `apps/tools/${shown} isn't valid JSON: ${error.message}` };
+  }
+  if (!batch || typeof batch !== "object" || Array.isArray(batch)) {
+    return { error: `apps/tools/${shown} must be an object keyed by Tool id.` };
+  }
+  return { batch };
+}

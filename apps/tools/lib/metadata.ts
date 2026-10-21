@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import type { Tool } from "@/types";
+import type { Tool, ToolSeo } from "@/types";
 
 import { prefersServerConversion } from "./capabilities.ts";
 import { activeTools, getTool } from "./catalog/catalog.ts";
@@ -17,6 +17,8 @@ import {
 } from "./page-metadata.ts";
 import type { ShareImageName } from "./share-images.ts";
 import { normalizePath } from "./sitemap.ts";
+import { tableConvertDescription } from "./table-convert.ts";
+import { TABLE_CONVERT_PAGES } from "./table-convert-pages.ts";
 
 // The catalog's pages' metadata: Tools, categories, /categories/ and
 // /brands/, built with lib/page-metadata.ts (issue #320).
@@ -88,19 +90,27 @@ function formatLabel(tool: Tool, format: string): string {
   return tool.name.match(new RegExp(`\\b${escaped}\\b`, "i"))?.[0] ?? format.toUpperCase();
 }
 
+// The table converters on TableConvertLanding pages. HTML to Markdown and
+// JSON to CSV are listed with them but have pages of their own.
+const TABLE_CONVERTERS: ReadonlySet<string> = new Set(
+  TABLE_CONVERT_PAGES.map((page) => page.slug).filter((slug) => !TOOLS_WITH_OWN_PAGE.has(slug)),
+);
+
 // Whether the converter page (ToolPageRenderer) serves the Tool: the Tool
-// route renders it for converters and compressors with both formats.
-function onConverterPage(tool: Tool): tool is Tool & { from: string; to: string } {
+// route renders it for converters and compressors with both formats, except
+// those with a page of their own and the table converters.
+export function onConverterPage(tool: Tool): tool is Tool & { from: string; to: string } {
   return (
     (tool.operation === "convert" || tool.operation === "compress") &&
     Boolean(tool.from && tool.to) &&
-    !TOOLS_WITH_OWN_PAGE.has(tool.id)
+    !TOOLS_WITH_OWN_PAGE.has(tool.id) &&
+    !TABLE_CONVERTERS.has(tool.id)
   );
 }
 
 // Whether the converter page keeps the file in the browser: no server route
 // is tried first (lib/convert/workerClient.ts).
-function runsInBrowser(tool: Tool & { from: string; to: string }): boolean {
+export function runsInBrowser(tool: Tool & { from: string; to: string }): boolean {
   if (tool.operation === "compress") {
     return BROWSER_COMPRESSION_TARGETS.has(resolveCompressionTarget(tool.from));
   }
@@ -129,8 +139,49 @@ export function toolDescription(tool: Tool): string {
   if (media) {
     return `The ${tool.name.toLowerCase()} is coming soon to SERP Tools. Until then, convert or compress your ${media} files with the free ${media} converters and compressors.`;
   }
+  if (TABLE_CONVERTERS.has(tool.id) && tool.from && tool.to) {
+    return tableConvertDescription(tool.from, tool.to);
+  }
   const lead = tool.content?.tool.subtitle ?? tool.description;
   return composeDescription(lead, toolFacts(tool, lead));
+}
+
+// Converters and compressors take their title, H1 and description from
+// content.seo, else from the owner's pattern (#356): "WebP to PNG Converter
+// (Free, Online)" over an H1 of "WebP to PNG Converter", and "MP4 Compressor
+// (Free, Online)" over "MP4 Compressor". A name that isn't a pair, such as
+// Character Counter, stays as it is. docs/converter-copy.md has the rules
+// `pnpm content:check` holds every one of them to.
+export const SEO_TITLE_MAX = 60;
+const TITLE_SUFFIX = " (Free, Online)";
+
+export function hasToolSeo(tool: Tool): boolean {
+  return tool.operation === "convert" || tool.operation === "compress";
+}
+
+function generatedH1(tool: Tool): string {
+  if (tool.operation === "compress") {
+    return / Compressor$/.test(tool.name) ? tool.name : `${formatLabel(tool, tool.from ?? "")} Compressor`;
+  }
+  return / to /.test(tool.name) ? `${tool.name} Converter` : tool.name;
+}
+
+export function toolSeo(tool: Tool): ToolSeo {
+  const curated = tool.content?.seo;
+  const h1 = curated?.h1 ?? generatedH1(tool);
+  const title = `${h1}${TITLE_SUFFIX}`.length <= SEO_TITLE_MAX ? `${h1}${TITLE_SUFFIX}` : h1;
+  return {
+    title: curated?.title ?? title,
+    h1,
+    description: curated?.description ?? toolDescription(tool),
+  };
+}
+
+// A converter or compressor page's H1, for the pages with their own folder.
+export function toolHeading(toolId: string): string {
+  const tool = getTool(toolId);
+  if (!tool) throw new Error(`${toolId} is not a Tool`);
+  return toolSeo(tool).h1;
 }
 
 export function buildToolMetadata(toolId: string): Metadata {
@@ -139,9 +190,10 @@ export function buildToolMetadata(toolId: string): Metadata {
     return {};
   }
 
+  const seo = hasToolSeo(tool) ? toolSeo(tool) : undefined;
   return pageMetadata({
-    title: tool.content?.tool.title ?? tool.name,
-    description: toolDescription(tool),
+    title: seo?.title ?? tool.content?.tool.title ?? tool.name,
+    description: seo?.description ?? toolDescription(tool),
     canonical: tool.route ? normalizePath(tool.route) : undefined,
     image: OPERATION_IMAGES[tool.operation],
   });
