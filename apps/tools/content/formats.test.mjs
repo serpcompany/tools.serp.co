@@ -57,6 +57,12 @@ test("every fact entry has the documented shape and limits", () => {
         assert.equal(typeof item, "string", `${key}.${field}`);
         assert.ok(item.trim().length > 0, `${key}.${field}`);
       }
+      const seen = new Set();
+      for (const item of list) {
+        const normalized = item.trim().toLowerCase();
+        assert.ok(!seen.has(normalized), `${key}.${field} repeats "${item}"`);
+        seen.add(normalized);
+      }
     }
   }
 });

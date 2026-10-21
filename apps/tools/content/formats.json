@@ -257,19 +257,18 @@
   },
   "ascii": {
     "name": "ASCII",
-    "fullName": "ASCII text",
+    "fullName": "ASCII table",
     "kind": "text",
-    "summary": "Text that uses only the American Standard Code for Information Interchange character set, 128 characters including letters, digits and punctuation. ASCII is a subset of UTF-8.",
+    "summary": "A plain-text table drawn with ASCII characters, using +, - and | for borders and spaces to line up columns in a fixed-width font. ASCII is the 128-character set that UTF-8 also contains.",
     "usedFor": [
-      "Plain-text tables and output",
-      "Terminal and log files",
-      "Text that must work on any system"
+      "Tables in terminal output and logs",
+      "Tables in plain-text email and code comments"
     ],
     "properties": [
-      "7-bit character set",
-      "128 characters",
-      "no formatting",
-      "subset of UTF-8"
+      "plain text",
+      "fixed-width columns",
+      "+, - and | borders",
+      "7-bit ASCII characters"
     ],
     "openWith": [
       "Notepad",
@@ -568,12 +567,12 @@
       "uncompressed PCM",
       "16-bit, 44.1 kHz stereo",
       "74 to 80 minutes per disc",
-      "Red Book standard"
+      "Red Book standard",
+      "raw PCM with no header"
     ],
     "openWith": [
-      "VLC media player",
-      "Apple Music",
-      "Windows Media Player"
+      "Audacity, via Import > Raw Data",
+      "CD-burning tools that accept raw audio"
     ]
   },
   "cdr": {
@@ -593,7 +592,6 @@
     "openWith": [
       "CorelDRAW",
       "Inkscape",
-      "Affinity Designer",
       "LibreOffice Draw"
     ]
   },
@@ -711,12 +709,13 @@
     "name": "DAX",
     "fullName": "Data Analysis Expressions",
     "kind": "data",
-    "summary": "A formula and query language from Microsoft used in Power BI, Excel Power Pivot and SQL Server Analysis Services to define calculations and tables.",
+    "summary": "A formula and query language from Microsoft used in Power BI, Excel Power Pivot and SQL Server Analysis Services. The table is written as a DATATABLE(...) expression listing its columns and rows.",
     "usedFor": [
       "Power BI data models",
       "Calculated tables and measures"
     ],
     "properties": [
+      "DATATABLE expression",
       "formula language",
       "used in Power BI and Power Pivot",
       "made by Microsoft"
@@ -767,7 +766,7 @@
       "alpha channel"
     ],
     "openWith": [
-      "GIMP with a plugin",
+      "GIMP",
       "Adobe Photoshop with a plugin",
       "Paint.NET",
       "XnView MP"
@@ -842,23 +841,23 @@
   },
   "dot": {
     "name": "DOT",
-    "fullName": "Word 97-2003 template",
-    "kind": "document",
-    "summary": "The template format of Microsoft Word 97 to 2003, using the older binary file format. A template holds styles and layout for new documents.",
+    "fullName": "Graphviz DOT graph",
+    "kind": "text",
+    "summary": "A plain-text graph description language from the Graphviz project, also saved as .gv. A file lists nodes, edges and their attributes, and Graphviz tools such as dot lay out and render the graph.",
     "usedFor": [
-      "Reusable document templates",
-      "Legacy Word templates"
+      "Diagrams of graphs and networks",
+      "Dependency and flow diagrams"
     ],
     "properties": [
-      "legacy binary format",
-      "styles and macros",
-      "replaced by .dotx",
-      "opens as a new document"
+      "plain text",
+      "nodes, edges and attributes",
+      "directed and undirected graphs",
+      "rendered by Graphviz"
     ],
     "openWith": [
-      "Microsoft Word",
-      "LibreOffice Writer",
-      "Pages on macOS"
+      "Graphviz",
+      "Gephi",
+      "Any text editor"
     ]
   },
   "dss": {
@@ -876,9 +875,9 @@
       "used in dictation devices"
     ],
     "openWith": [
-      "Olympus Sonority",
-      "VLC media player",
-      "Switch Sound File Converter"
+      "OM System ODMS",
+      "Olympus DSS Player",
+      "NCH Switch on Windows"
     ]
   },
   "dst": {
@@ -966,7 +965,7 @@
       "Microsoft Office",
       "Inkscape",
       "LibreOffice",
-      "Windows Photos"
+      "IrfanView"
     ]
   },
   "eps": {
@@ -988,8 +987,7 @@
     "openWith": [
       "Adobe Illustrator",
       "Inkscape",
-      "Ghostscript",
-      "Preview on macOS"
+      "Ghostscript"
     ]
   },
   "epub": {
@@ -1193,9 +1191,9 @@
   },
   "heic": {
     "name": "HEIC",
-    "fullName": "High Efficiency Image Container",
+    "fullName": "HEIF image with HEVC coding",
     "kind": "image",
-    "summary": "Apple's name for images stored in the HEIF container with HEVC (H.265) compression. iPhones and iPads have saved photos this way by default since iOS 11.",
+    "summary": "HEIF images coded with HEVC, the default photo format on iPhone since iOS 11. The heic brand is defined in ISO/IEC 23008-12, the HEIF standard.",
     "usedFor": [
       "Photos taken on iPhone and iPad",
       "Live Photos and image sequences"
@@ -1209,7 +1207,7 @@
     "openWith": [
       "Preview on macOS",
       "Apple Photos",
-      "Windows Photos with the HEIF extension"
+      "Windows Photos with the HEIF and HEVC Video Extensions"
     ]
   },
   "heif": {
@@ -1291,7 +1289,7 @@
       "multiple sizes in one file",
       "alpha transparency",
       "Retina variants",
-      "used by macOS and iOS-derived tooling"
+      "used for macOS app icons"
     ],
     "openWith": [
       "Preview on macOS",
@@ -1404,7 +1402,7 @@
     "name": "Jira",
     "fullName": "Jira wiki markup",
     "kind": "text",
-    "summary": "The text formatting syntax of Atlassian Jira, used for issue descriptions and comments. Tables use pipe characters, with double pipes marking header cells.",
+    "summary": "The text formatting syntax of Atlassian Jira for issue descriptions and comments, with | and || marking table cells. Jira Cloud's editor stores Atlassian Document Format; wiki markup is the older format.",
     "usedFor": [
       "Jira issue descriptions and comments",
       "Tables in Jira"
@@ -1570,9 +1568,8 @@
       "defined by the Khronos Group"
     ],
     "openWith": [
-      "Khronos KTX tools",
-      "XnView MP",
-      "Khronos ktx-software tools"
+      "Khronos KTX-Software",
+      "AMD Compressonator"
     ]
   },
   "ktx2": {
@@ -1609,7 +1606,7 @@
     ],
     "properties": [
       "plain text source",
-      "excellent maths typesetting",
+      "mathematical typesetting",
       "produces PDF",
       "free software"
     ],
@@ -1657,7 +1654,7 @@
     ],
     "openWith": [
       "VLC media player",
-      "DVD authoring software"
+      "FFmpeg"
     ]
   },
   "m4a": {
@@ -1738,7 +1735,6 @@
     "properties": [
       "MPEG-4 container",
       "AAC audio",
-      "ringtone length limit of 40 seconds",
       "used by Apple devices"
     ],
     "openWith": [
@@ -1785,7 +1781,6 @@
     ],
     "openWith": [
       "XnView MP",
-      "GIMP",
       "ImageMagick"
     ]
   },
@@ -2096,22 +2091,22 @@
   },
   "mysql": {
     "name": "MySQL",
-    "fullName": "MySQL SQL dump",
-    "kind": "data",
-    "summary": "SQL statements in the MySQL dialect, such as those produced by mysqldump. MySQL is an open-source relational database owned by Oracle.",
+    "fullName": "MySQL client table output",
+    "kind": "text",
+    "summary": "The boxed text table the MySQL command-line client prints for query results, with + and - border lines and a | between columns. The first row holds the column names.",
     "usedFor": [
-      "MySQL database backups",
-      "Moving data between MySQL servers"
+      "Query results copied from a terminal",
+      "Turning query output or MySQL INSERT statements into tables"
     ],
     "properties": [
-      "plain text SQL",
-      "MySQL dialect",
-      "CREATE TABLE and INSERT statements"
+      "plain text",
+      "columns separated by |",
+      "+ and - border lines",
+      "header row of column names"
     ],
     "openWith": [
-      "MySQL Workbench",
-      "DBeaver",
-      "VS Code"
+      "MySQL command-line client",
+      "Any text editor"
     ]
   },
   "nef": {
@@ -2186,7 +2181,7 @@
     "summary": "The Ogg container extension for video files. It usually holds Theora video with Vorbis or Opus audio.",
     "usedFor": [
       "Open-source video",
-      "Web video in Firefox and Chrome"
+      "Web video in Firefox"
     ],
     "properties": [
       "Ogg container",
@@ -2196,8 +2191,7 @@
     ],
     "openWith": [
       "VLC media player",
-      "Firefox",
-      "Chrome"
+      "Firefox"
     ]
   },
   "opus": {
@@ -2292,7 +2286,7 @@
     "name": "Pandas DataFrame",
     "fullName": "pandas DataFrame",
     "kind": "data",
-    "summary": "A two-dimensional table of labelled rows and columns from pandas, the data analysis library for Python. It is the standard structure for tabular data in Python.",
+    "summary": "A two-dimensional table of labelled rows and columns from pandas, the data analysis library for Python. It is the most widely used structure for tabular data in Python.",
     "usedFor": [
       "Data analysis in Python",
       "Loading tabular data into notebooks"
@@ -2346,9 +2340,8 @@
       "legacy format"
     ],
     "openWith": [
-      "GIMP",
       "XnView MP",
-      "IrfanView with plugins"
+      "IrfanView"
     ]
   },
   "pcx": {
@@ -2369,8 +2362,7 @@
     "openWith": [
       "GIMP",
       "IrfanView",
-      "XnView MP",
-      "Windows Paint"
+      "XnView MP"
     ]
   },
   "pdf": {
@@ -2598,13 +2590,14 @@
     "name": "Qlik",
     "fullName": "Qlik",
     "kind": "data",
-    "summary": "Data prepared for Qlik, the business intelligence platform that includes Qlik Sense. Data is loaded into Qlik apps with a load script.",
+    "summary": "Data prepared for Qlik, the business intelligence platform that includes Qlik Sense. The table is written as a LOAD * INLINE [ … ]; statement that a Qlik load script runs to load the rows.",
     "usedFor": [
       "Loading data into Qlik Sense",
       "Business intelligence dashboards"
     ],
     "properties": [
-      "loaded with a load script",
+      "LOAD * INLINE load-script statement",
+      "comma-separated rows inside the brackets",
       "used in Qlik Sense and QlikView"
     ],
     "openWith": [
@@ -2666,7 +2659,7 @@
       "proprietary Fujifilm format"
     ],
     "openWith": [
-      "Fujifilm X RAW Studio",
+      "RawTherapee",
       "Adobe Lightroom",
       "Adobe Photoshop",
       "darktable"
@@ -2718,7 +2711,7 @@
     "name": "reStructuredText",
     "fullName": "reStructuredText",
     "kind": "text",
-    "summary": "A plain-text markup language from the Python Docutils project. It is the default format of Sphinx documentation and Python docstrings.",
+    "summary": "A plain-text markup language from the Python Docutils project. Sphinx uses it for documentation, and PEP 287 proposes it as the markup for Python docstrings.",
     "usedFor": [
       "Python documentation",
       "Technical manuals built with Sphinx"
@@ -2738,23 +2731,22 @@
   },
   "rgb": {
     "name": "RGB",
-    "fullName": "Silicon Graphics RGB image",
+    "fullName": "Raw RGB image data",
     "kind": "image",
-    "summary": "A raster image format from Silicon Graphics, also called SGI image and often using the extensions .sgi, .rgb or .bw. It can use run-length encoding.",
+    "summary": "Raw pixel data holding interleaved 8-bit red, green and blue samples, as written by ImageMagick's RGB format. The file has no header, so the width and height must be supplied to read it.",
     "usedFor": [
-      "Images from SGI workstations",
-      "Legacy 3D and visual-effects assets"
+      "Raw pixel input for image-processing programs",
+      "Exchanging pixels without an image file format"
     ],
     "properties": [
-      "optional run-length encoding",
-      "1 to 4 channels",
-      "8-bit or 16-bit samples",
-      "legacy format"
+      "no header",
+      "interleaved red, green and blue samples",
+      "8 bits per sample",
+      "width and height needed to read"
     ],
     "openWith": [
-      "GIMP",
-      "XnView MP",
-      "ImageMagick"
+      "GIMP, as Raw image data",
+      "ImageMagick with -size WxH rgb:file"
     ]
   },
   "rm": {
@@ -2906,7 +2898,7 @@
   "swf": {
     "name": "SWF",
     "fullName": "Shockwave Flash",
-    "kind": "video",
+    "kind": "other",
     "summary": "A file format for Adobe Flash animations, games and interactive content, originally from Macromedia. Flash Player reached end of life on 31 December 2020.",
     "usedFor": [
       "Flash animations and games",
@@ -2919,9 +2911,8 @@
       "legacy format"
     ],
     "openWith": [
-      "Ruffle",
-      "Adobe Animate",
-      "VLC media player"
+      "Ruffle, in a browser or as a desktop app",
+      "JPEXS Free Flash Decompiler"
     ]
   },
   "textile": {
@@ -3072,8 +3063,7 @@
     "openWith": [
       "Font Book on macOS",
       "Windows Fonts settings",
-      "FontForge",
-      "Any web browser"
+      "FontForge"
     ]
   },
   "txt": {
@@ -3276,7 +3266,7 @@
     "name": "WTV",
     "fullName": "Windows Recorded TV Show",
     "kind": "video",
-    "summary": "The file format used by Windows Media Center to record television, starting with Windows Vista and replacing DVR-MS. It stores broadcast video, audio and metadata.",
+    "summary": "The format Windows Media Center uses to record television. It arrived with the TV Pack 2008 update for Windows Vista, replacing DVR-MS, and became the default in Windows 7.",
     "usedFor": [
       "TV recordings from Windows Media Center",
       "Archived broadcast recordings"
@@ -3438,10 +3428,8 @@
       "ECMA standard"
     ],
     "openWith": [
-      "Windows XPS Viewer",
-      "Microsoft Edge",
-      "SumatraPDF",
-      "LibreOffice Draw"
+      "XPS Viewer, an optional Windows feature",
+      "SumatraPDF"
     ]
   },
   "yaml": {
