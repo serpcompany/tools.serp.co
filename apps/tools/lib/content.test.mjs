@@ -18,8 +18,10 @@ import {
   readBatch,
   serializeEntry,
   splitRegistry,
+  templateTools,
 } from "../scripts/lib/content.mjs";
-import { TOOLS_WITH_OWN_PAGE } from "./metadata.ts";
+import { activeTools } from "./catalog/catalog.ts";
+import { TOOLS_WITH_OWN_PAGE, isTranscriptionTool, toolSeo } from "./metadata.ts";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -52,7 +54,7 @@ const written = (tool, words) => ({
   content: {
     tool: { title: tool.name, subtitle: `A subtitle about ${words}.`, from: tool.from, to: tool.to },
     seo: {
-      title: `${tool.name} Converter (Free, Online)`,
+      title: `Convert ${tool.name} Online (Free)`,
       h1: `${tool.name} Converter`,
       description: `A description of ${words} that is long enough to pass the minimum length, which is one hundred and ten characters.`,
     },
@@ -90,7 +92,7 @@ test("the title and H1 must contain the Tool's keyword", () => {
     failures.map((failure) => [failure.toolId, failure.rule]),
     [["compress-m4a", "keyword"], ["compress-m4a", "keyword"]],
   );
-  assert.match(failures[0].message, /title "M4A Compressor \(Free, Online\)" lacks the keyword "m4a audio shrinker"/);
+  assert.match(failures[0].message, /title "Compress M4A Files Online \(Free\)" lacks the keyword "m4a audio shrinker"/);
 });
 
 test("the title is at most 60 characters and never names the site", () => {
@@ -100,6 +102,47 @@ test("the title is at most 60 characters and never names the site", () => {
   assert.deepEqual(rules(checkContent(tools, noKeywords)), ["length"]);
   tools[0].content.seo.title = "WebP to PNG | SERP Tools";
   assert.deepEqual(rules(checkContent(tools, noKeywords)), ["length"]);
+});
+
+test("a long name drops the suffix from the title, and an H1 over 60 characters fails", () => {
+  const long = converter("pandasdataframe-to-restructuredtext", "pandasdataframe", "restructuredtext", {
+    name: "Pandas DataFrame to reStructuredText Table",
+  });
+  // "Convert Pandas DataFrame to reStructuredText Table" is 50 characters:
+  // with " Online (Free)" it would be 64, so the title drops the suffix.
+  const seo = toolSeo(long);
+  assert.equal(seo.h1, "Pandas DataFrame to reStructuredText Table Converter");
+  assert.equal(seo.title, "Convert Pandas DataFrame to reStructuredText Table");
+  assert.deepEqual(checkContent([long], noKeywords).filter((failure) => failure.rule === "length"), []);
+
+  long.name = "Pandas DataFrame to reStructuredText Grid Table Markup";
+  assert.equal(toolSeo(long).h1.length, 64);
+  assert.deepEqual(
+    checkContent([long], noKeywords).map((failure) => failure.message),
+    ["title is 62 characters, over 60", "H1 is 64 characters, over 60"],
+  );
+});
+
+test("a title follows the Tool's keyword: Converter isn't required", () => {
+  const tools = [written(compressor("png"), "png images")];
+  tools[0].content.seo.title = "PNG Optimizer Online (Free)";
+  tools[0].content.seo.h1 = "PNG Optimizer";
+  delete tools[0].content.aboutSection;
+  assert.deepEqual(checkContent(tools, { keywords: new Map([["compress-png", "png optimizer"]]) }), []);
+
+  tools[0].content.seo.title = "Convert WebP to PNG Online, Free";
+  tools[0].content.seo.h1 = "Convert WebP to PNG Online";
+  assert.deepEqual(checkContent(tools, { keywords: new Map([["compress-png", "webp to png online"]]) }), []);
+  assert.deepEqual(rules(checkContent(tools, { keywords: new Map([["compress-png", "png optimizer"]]) })), ["keyword", "keyword"]);
+});
+
+test("transcription Tools are out of content:check and content:apply", () => {
+  const transcript = converter("audio-to-text", "mp3", "txt", { name: "Audio to Text" });
+  assert.equal(isTranscriptionTool(transcript), true);
+  // No keyword in the title, a short description: still not checked.
+  assert.deepEqual(checkContent([transcript], { keywords: new Map([["audio-to-text", "speech to text"]]) }), []);
+  const { problems } = applyBatch(registryOf([transcript]), { "audio-to-text": { seo: batchFor("x")["mp4-to-mp3"].seo } }, noKeywords);
+  assert.deepEqual(problems, ["audio-to-text: a transcription Tool; its copy is named in its own issue"]);
 });
 
 test("the description is 110 to 160 characters", () => {
@@ -140,6 +183,21 @@ test("a written FAQ answer may not repeat the template FAQs", () => {
   const failures = checkContent(tools, noKeywords);
   assert.deepEqual(rules(failures), ["faq-duplicate"]);
   assert.match(failures[0].message, /repeats the template FAQs/);
+});
+
+test("written FAQs are compared with the template of each operation and place of conversion", () => {
+  const tools = [...catalog(), converter("mp4-to-rm", "mp4", "rm"), compressor("pdf")];
+  assert.deepEqual(
+    templateTools(tools.filter((tool) => tool.isActive)).map((tool) => tool.id),
+    ["webp-to-png", "compress-m4a", "mp4-to-rm", "compress-pdf"],
+  );
+  tools[0].content.faqs[1].answer =
+    "Yes, at first. The page sends the file to the SERP Tools server, and converts it in your browser if the server can't.";
+  tools[0].content.faqs[2].answer = "Yes. This one uploads the file to the SERP Tools server, which compresses it.";
+  const failures = checkContent(tools, noKeywords);
+  assert.deepEqual(rules(failures), ["faq-duplicate", "faq-duplicate"]);
+  assert.match(failures[0].message, /repeats the template FAQs \(convert, server first, as on mp4-to-rm\)/);
+  assert.match(failures[1].message, /repeats the template FAQs \(compress, server first, as on compress-pdf\)/);
 });
 
 test("older curated FAQs may repeat each other until a batch replaces them", () => {
@@ -198,7 +256,7 @@ test("written copy has every field its page shows", () => {
 
   // A compressor has one format, so no format cards.
   const m4a = written(compressor("m4a"), "m4a sound");
-  m4a.content.seo.title = "M4A Compressor (Free, Online)";
+  m4a.content.seo.title = "Compress M4A Files Online (Free)";
   m4a.content.seo.h1 = "M4A Compressor";
   delete m4a.content.aboutSection;
   assert.deepEqual(checkContent([m4a], noKeywords), []);
@@ -263,7 +321,7 @@ test("content:apply refuses unknown, retired and non-converter Tools, and fields
       "old-to-new": entry,
       "x-dl": entry,
       "csv-to-json": { seo: entry.seo, faqs: entry.faqs },
-      "mp4-to-mp3": { ...entry, tool: { accept: ".mp4" }, howTo: {} },
+      "mp4-to-mp3": { ...entry, tool: { title: "MP4 to MP3", accept: ".mp4" }, howTo: {} },
     },
     noKeywords,
   );
@@ -275,7 +333,8 @@ test("content:apply refuses unknown, retired and non-converter Tools, and fields
     "x-dl: not a converter or compressor (operation download)",
     "csv-to-json.faqs: this Tool's page doesn't show it (it shows seo)",
     "mp4-to-mp3.howTo: not a batch field (seo, tool, faqs, aboutSection, pairNotes)",
-    "mp4-to-mp3.tool.accept: a batch sets only tool.title and tool.subtitle",
+    "mp4-to-mp3.tool.title: a batch sets only tool.subtitle",
+    "mp4-to-mp3.tool.accept: a batch sets only tool.subtitle",
   ]);
 });
 
@@ -298,7 +357,8 @@ test("tools.json splits into entries and joins back byte for byte, and holds the
 
 // pageFields says what each page shows; the pages are the truth.
 test("the Tools with pages of their own show the batch fields pageFields lists", () => {
-  for (const id of TOOLS_WITH_OWN_PAGE) {
+  const transcription = new Set(activeTools().filter(isTranscriptionTool).map((tool) => tool.id));
+  for (const id of [...TOOLS_WITH_OWN_PAGE].filter((own) => !transcription.has(own))) {
     const file = [`app/${id}/page.tsx`, `app/(convert)/${id}/page.tsx`]
       .map((candidate) => path.join(appRoot, candidate))
       .find((candidate) => {

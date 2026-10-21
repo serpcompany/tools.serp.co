@@ -3,7 +3,7 @@
 // repository. Pure: the command reads the files and writes the brief.
 
 import { toolHref } from "../../lib/catalog/href.ts";
-import { onConverterPage, toolSeo } from "../../lib/metadata.ts";
+import { isTranscriptionTool, onConverterPage, toolSeo } from "../../lib/metadata.ts";
 import { buildConverterFaqs } from "../../lib/tool-sections.ts";
 import { BATCH_DIR, DESCRIPTION_MAX, DESCRIPTION_MIN, FAQS_MIN, PAIR_NOTES_MIN, isConverter, pageFields } from "./content.mjs";
 import { converterPageFacts, engineFactsFor } from "./engine-facts.mjs";
@@ -150,7 +150,7 @@ function toolSection(tool, status, formats) {
     "",
     "### Your entry",
     "",
-    "Fill in every empty field and keep the title and H1 unless the keyword needs otherwise:",
+    "Fill in every empty field. The title (a verb phrase) and H1 (a noun phrase) below are the default: keep them, or rewrite both in the same shape when the keyword or an alias has a noun the default lacks (optimizer, generator, \"to X online\"):",
     "",
     json(skeleton(tool)),
   );
@@ -165,6 +165,7 @@ export function briefProblems(ids, tools) {
     const tool = byId.get(id);
     if (!tool) return [`${id}: no Tool has this id`];
     if (!tool.isActive) return [`${id}: the Tool is retired`];
+    if (isTranscriptionTool(tool)) return [`${id}: a transcription Tool; its copy is named in its own issue`];
     if (!isConverter(tool)) return [`${id}: not a converter or compressor (operation ${tool.operation})`];
     return [];
   });
@@ -198,7 +199,7 @@ export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, 
     "",
     list([
       `One JSON file, \`apps/tools/${BATCH_DIR}/${name}.json\`, holding an entry for each Tool below, shaped like the example and the "Your entry" skeletons.`,
-      `Title and H1 must contain the Tool's keyword; the title is at most 60 characters and never names the site. The description is ${DESCRIPTION_MIN}–${DESCRIPTION_MAX} characters.`,
+      `Title and H1 must contain the Tool's keyword, and take their noun from it (see "Titles, H1s and descriptions" in the style guide); the title is at most 60 characters and never names the site. The description is ${DESCRIPTION_MIN}–${DESCRIPTION_MAX} characters.`,
       `At least ${FAQS_MIN} FAQs and ${PAIR_NOTES_MIN} pair notes, each specific to its Tool: an answer that could sit on another Tool's page fails the check.`,
       "Every claim comes from this brief's engine facts or format reference. Nothing else: no dates, versions, statistics, or links off the site.",
       `Check it with \`pnpm content:check --batch ${name}\`, which writes nothing. The owner's side applies it with \`pnpm content:apply ${name}\`.`,

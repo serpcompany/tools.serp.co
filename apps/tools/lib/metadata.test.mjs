@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { handlerFor, scanPageHandlers } from "../scripts/lib/tool-sweep.mjs";
 import { prefersServerConversion } from "./capabilities.ts";
+import { usesWebCodecs } from "./convert/webcodecs.ts";
 import { activeTools } from "./catalog/catalog.ts";
 import { categoryPageCount, categoryPageHref } from "./catalog/category-pages.ts";
 import { directoryCategories } from "./catalog/directory.ts";
@@ -15,7 +16,11 @@ import {
   buildCategoryMetadata,
   buildToolMetadata,
   hasToolSeo,
+  indefiniteArticle,
+  isTranscriptionTool,
+  runsInBrowser,
   toolHeading,
+  toolDescription,
   toolSeo,
 } from "./metadata.ts";
 import {
@@ -33,6 +38,7 @@ import {
 import { SHARE_IMAGES, SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "./share-images.ts";
 import { buildTableConvertDemoMetadata, buildTableConvertMetadata } from "./table-convert.ts";
 import { TABLE_CONVERT_PAGES } from "./table-convert-pages.ts";
+import { buildConverterFaqs, buildHowToSection, buildInfoArticleSection } from "./tool-sections.ts";
 
 const IN_BROWSER = "It runs in your browser";
 // Ahrefs reports a description under 110 characters as too short.
@@ -132,7 +138,7 @@ test("each page family shows its own share image", () => {
 test("titles are the page's own: the layout's template adds the site name once", () => {
   assert.deepEqual(buildSiteMetadata().title, { default: SITE_NAME, template: TITLE_TEMPLATE });
   assert.equal(TITLE_TEMPLATE, "%s | SERP Tools");
-  assert.equal(buildToolMetadata("png-to-jpg").title, "PNG to JPG Converter (Free, Online)");
+  assert.equal(buildToolMetadata("png-to-jpg").title, "Convert PNG to JPG Online (Free)");
   assert.equal(buildToolMetadata("download-tiktok-videos").title, "TikTok Video Downloader");
   assert.equal(buildCategoryMetadata("convert").title, "Convert Tools");
   assert.equal(buildCategoriesIndexMetadata().title, "Categories");
@@ -144,11 +150,11 @@ test("titles are the page's own: the layout's template adds the site name once",
 
 test("converter and compressor titles and H1s follow the owner's pattern, or the Tool's content.seo", () => {
   const seo = (id) => [buildToolMetadata(id).title, toolHeading(id)];
-  assert.deepEqual(seo("png-to-jpg"), ["PNG to JPG Converter (Free, Online)", "PNG to JPG Converter"]);
-  assert.deepEqual(seo("compress-m4a"), ["M4A Compressor (Free, Online)", "M4A Compressor"]);
-  assert.deepEqual(seo("png-to-png"), ["PNG Compressor (Free, Online)", "PNG Compressor"]);
-  assert.deepEqual(seo("csv-to-json"), ["CSV to JSON Converter (Free, Online)", "CSV to JSON Converter"]);
-  assert.deepEqual(seo("character-counter"), ["Character Counter (Free, Online)", "Character Counter"]);
+  assert.deepEqual(seo("png-to-jpg"), ["Convert PNG to JPG Online (Free)", "PNG to JPG Converter"]);
+  assert.deepEqual(seo("compress-m4a"), ["Compress M4A Files Online (Free)", "M4A Compressor"]);
+  assert.deepEqual(seo("png-to-png"), ["Compress PNG Files Online (Free)", "PNG Compressor"]);
+  assert.deepEqual(seo("csv-to-json"), ["Convert CSV to JSON Online (Free)", "CSV to JSON Converter"]);
+  assert.deepEqual(seo("character-counter"), ["Character Counter Online (Free)", "Character Counter"]);
   // Downloaders and the other operations keep their own titles.
   assert.equal(buildToolMetadata("download-tiktok-videos").title, "TikTok Video Downloader");
 
@@ -163,7 +169,15 @@ test("converter and compressor titles and H1s follow the owner's pattern, or the
   for (const tool of activeTools().filter(hasToolSeo)) {
     const { title, h1 } = toolSeo(tool);
     assert.ok(title.length <= 60, `${tool.id}: ${title}`);
-    assert.ok(title.startsWith(h1), `${tool.id}: the title starts with the H1`);
+    // The default: the verb phrase over the noun phrase. A writer's
+    // content.seo follows the Tool's keyword instead.
+    if (!tool.content?.seo && tool.operation === "compress") {
+      assert.match(title, /^Compress .+ Files( Online \(Free\))?$/, tool.id);
+      assert.match(h1, / Compressor$/, tool.id);
+    } else if (!tool.content?.seo && / to /.test(tool.name)) {
+      assert.match(title, /^Convert .+ to .+?( Online \(Free\))?$/, tool.id);
+      assert.equal(h1, `${tool.name} Converter`, tool.id);
+    }
     assert.ok(!titles.has(title), `${tool.id} repeats the title ${title}`);
     titles.add(title);
   }
@@ -245,7 +259,8 @@ test("a description says the file stays in the browser only where the page keeps
     if (!description.includes(IN_BROWSER)) continue;
     assert.equal(handlerOf(tool), "ToolPageRenderer", `${tool.id} isn't on the converter page`);
     if (tool.operation === "convert") {
-      assert.equal(prefersServerConversion(tool.from, tool.to), false, `${tool.id} tries the server first`);
+      const serverFirst = prefersServerConversion(tool.from, tool.to) && !usesWebCodecs(tool.from, tool.to);
+      assert.equal(serverFirst, false, `${tool.id} tries the server first`);
     }
   }
   assert.match(buildToolMetadata("3gp-to-hevc").description, new RegExp(IN_BROWSER));
@@ -256,6 +271,67 @@ test("a description says the file stays in the browser only where the page keeps
   assert.doesNotMatch(buildToolMetadata("compress-pdf").description, /browser/);
   // Transcription has its own page.
   assert.doesNotMatch(buildToolMetadata("mp3-to-transcript").description, /browser|Choose your/);
+});
+
+test("a converter page's How-to heading is the question people search, with a or an as the format is said", () => {
+  const heading = (id) => buildHowToSection(activeTools().find((tool) => tool.id === id)).title;
+  assert.equal(heading("png-to-pdf"), "How to convert PNG to PDF");
+  assert.equal(heading("webp-to-png"), "How to convert WebP to PNG");
+  assert.equal(heading("compress-mp4"), "How to compress an MP4 file");
+  assert.equal(heading("compress-m4a"), "How to compress an M4A file");
+  assert.equal(heading("png-to-png"), "How to compress a PNG file");
+  const article = (format) => `${indefiniteArticle(format)} ${format}`;
+  assert.deepEqual(
+    ["MP4", "M4A", "MKV", "FLV", "SVG", "AAC", "AVIF", "OGG", "MP3", "PNG", "MOV", "FLAC", "GIF", "WEBM", "JPEG", "PDF"].map(article),
+    ["an MP4", "an M4A", "an MKV", "an FLV", "an SVG", "an AAC", "an AVIF", "an OGG", "an MP3", "a PNG", "a MOV", "a FLAC", "a GIF", "a WEBM", "a JPEG", "a PDF"],
+  );
+  // Other pages keep their headings: Batch PNG Compressor isn't on the converter page.
+  assert.equal(heading("batch-compress-png"), "How to compress PNG files");
+});
+
+test("AV1 to RM runs in the browser: workerClient takes the WebCodecs path before any server route", () => {
+  const tool = activeTools().find((candidate) => candidate.id === "av1-to-rm");
+  assert.ok(tool, "av1-to-rm is live");
+  assert.equal(prefersServerConversion(tool.from, tool.to), true);
+  assert.equal(runsInBrowser(tool), true);
+  assert.match(buildToolMetadata("av1-to-rm").description, new RegExp(IN_BROWSER));
+  const copy = JSON.stringify([buildInfoArticleSection(tool), buildConverterFaqs(tool)]);
+  assert.doesNotMatch(copy, /SERP Tools server/);
+  assert.match(copy, /Runs in your browser: the file isn't uploaded\./);
+  // MP4 to RM has no WebCodecs step, so it still tries the server first.
+  assert.equal(runsInBrowser(activeTools().find((candidate) => candidate.id === "mp4-to-rm")), false);
+});
+
+test("transcription Tools keep the title, H1 and description production serves", () => {
+  // The rule: audio or video in, txt out. It covers exactly the pages that
+  // render TranscribeTool.
+  const transcribePages = readdirSync(fileURLToPath(new URL("../app", import.meta.url)), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .filter((entry) => {
+      try {
+        return readFileSync(fileURLToPath(new URL(`../app/${entry.name}/page.tsx`, import.meta.url)), "utf8").includes(
+          "<TranscribeTool",
+        );
+      } catch {
+        return false;
+      }
+    })
+    .map((entry) => entry.name)
+    .sort();
+  const transcription = activeTools().filter(isTranscriptionTool);
+  assert.deepEqual(transcription.map((tool) => tool.id).sort(), transcribePages);
+  assert.equal(transcription.length, 8);
+  for (const tool of transcription) {
+    assert.equal(hasToolSeo(tool), false, tool.id);
+    const metadata = buildToolMetadata(tool.id);
+    assert.equal(metadata.title, tool.content?.tool.title ?? tool.name, tool.id);
+    assert.equal(metadata.description, toolDescription(tool), tool.id);
+    assert.doesNotMatch(metadata.title, /Convert|Free/, tool.id);
+  }
+  // OCR and text-to-image Tools aren't transcription.
+  for (const id of ["jpg-to-txt", "pdf-to-txt", "txt-to-pdf"]) {
+    assert.equal(isTranscriptionTool(activeTools().find((tool) => tool.id === id)), false, id);
+  }
 });
 
 test("TOOLS_WITH_OWN_PAGE lists the converters whose route isn't the converter page", () => {

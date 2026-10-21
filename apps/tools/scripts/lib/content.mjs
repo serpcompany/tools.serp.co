@@ -15,7 +15,15 @@ import { canonicalPath } from "../../lib/trailing-slash.ts";
 import { toolHref } from "../../lib/catalog/href.ts";
 import { operationsUsedBy } from "../../lib/catalog/operations.ts";
 import { validateCatalog } from "../../lib/catalog/validate.ts";
-import { TOOLS_WITH_OWN_PAGE, hasToolSeo, onConverterPage, toolSeo, SEO_TITLE_MAX } from "../../lib/metadata.ts";
+import {
+  TOOLS_WITH_OWN_PAGE,
+  hasToolSeo,
+  isTranscriptionTool,
+  onConverterPage,
+  runsInBrowser,
+  toolSeo,
+  SEO_TITLE_MAX,
+} from "../../lib/metadata.ts";
 import { buildConverterFaqs, converterAccept } from "../../lib/tool-sections.ts";
 import { parseCsv } from "./csv.mjs";
 
@@ -53,13 +61,14 @@ const CONTENT_KEY_ORDER = [
   "infoArticle",
   "relatedTools",
 ];
-const BATCH_TOOL_FIELDS = new Set(["title", "subtitle"]);
+// content.tool.title is shown by no page (the H1 is content.seo.h1, else the
+// pattern), so a batch sets only the subtitle.
+const BATCH_TOOL_FIELDS = new Set(["subtitle"]);
 
 export const isConverter = (tool) => tool.isActive && hasToolSeo(tool);
 
 // The batch fields a Tool's page shows. The converter page shows them all.
-// The transcription pages, Character Counter and JSON to CSV show the
-// subtitle and FAQs; table converter pages and HTML to Markdown build their
+// Character Counter and JSON to CSV show the subtitle and FAQs; table converter pages and HTML to Markdown build their
 // copy in code and take only content.seo. content.test.mjs reads the pages
 // to keep this true.
 export const OWN_PAGE_FIELDS = ["seo", "tool", "faqs"];
@@ -167,6 +176,16 @@ function requiredFields(tool, content, fail) {
   }
 }
 
+// A converter page's template FAQs vary by operation and by where the file
+// is converted: in-browser and server-first converters, and in-browser and
+// server compressors.
+export const templateKey = (tool) => `${tool.operation}, ${runsInBrowser(tool) ? "in the browser" : "server first"}`;
+export function templateTools(tools) {
+  const byKey = new Map();
+  for (const tool of tools.filter(onConverterPage)) if (!byKey.has(templateKey(tool))) byKey.set(templateKey(tool), tool);
+  return [...byKey.values()];
+}
+
 // Every rule broken by the live converters and compressors in `tools`, as
 // { toolId, rule, message }. An empty list passes.
 export function checkContent(tools, { keywords }) {
@@ -186,6 +205,7 @@ export function checkContent(tools, { keywords }) {
       if (!squash(seo.h1).includes(squash(keyword))) fail("keyword", `H1 "${seo.h1}" lacks the keyword "${keyword}"`);
     }
     if (seo.title.length > SEO_TITLE_MAX) fail("length", `title is ${seo.title.length} characters, over ${SEO_TITLE_MAX}`);
+    if (seo.h1.length > SEO_TITLE_MAX) fail("length", `H1 is ${seo.h1.length} characters, over ${SEO_TITLE_MAX}`);
     if (/SERP Tools/i.test(seo.title)) fail("length", 'title names the site; the layout adds " | SERP Tools"');
     if (seo.description.length < DESCRIPTION_MIN || seo.description.length > DESCRIPTION_MAX) {
       fail("length", `description is ${seo.description.length} characters, outside ${DESCRIPTION_MIN}–${DESCRIPTION_MAX}`);
@@ -216,12 +236,18 @@ export function checkContent(tools, { keywords }) {
     if (content.seo) requiredFields(tool, content, fail);
   }
 
-  // The template FAQs every page without curated FAQs shows, as another
-  // Tool's would be.
-  const template = converters.find((tool) => !tool.content);
-  if (template) {
+  // The template FAQs a page without curated FAQs shows, as another Tool's
+  // would be: one Tool for each operation and each place the file is
+  // converted (locationFacts in lib/tool-sections.ts), since each words its
+  // answers differently.
+  // An answer the templates share is compared once.
+  const templateAnswers = new Set();
+  for (const template of templateTools(converters)) {
+    const label = `the template FAQs (${templateKey(template)}, as on ${template.id})`;
     for (const [index, faq] of buildConverterFaqs(template).entries()) {
-      answers.push({ tool: { id: "the template FAQs" }, where: `[${index}]`, phrases: phrases(template, faq.answer), checked: false });
+      if (templateAnswers.has(faq.answer)) continue;
+      templateAnswers.add(faq.answer);
+      answers.push({ tool: { id: label }, where: `[${index}]`, phrases: phrases(template, faq.answer), checked: false });
     }
   }
   for (const answer of answers.filter((candidate) => candidate.checked)) {
@@ -300,6 +326,7 @@ export function batchProblems(batch, tools) {
     const known = byId.get(id);
     if (!known) problems.push(`${id}: no Tool has this id`);
     else if (!known.isActive) problems.push(`${id}: the Tool is retired`);
+    else if (isTranscriptionTool(known)) problems.push(`${id}: a transcription Tool; its copy is named in its own issue`);
     else if (!hasToolSeo(known)) problems.push(`${id}: not a converter or compressor (operation ${known.operation})`);
     const tool = known && isConverter(known) ? known : null;
     if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
@@ -313,7 +340,7 @@ export function batchProblems(batch, tools) {
       }
     }
     for (const key of Object.keys(entry.tool ?? {})) {
-      if (!BATCH_TOOL_FIELDS.has(key)) problems.push(`${id}.tool.${key}: a batch sets only tool.title and tool.subtitle`);
+      if (!BATCH_TOOL_FIELDS.has(key)) problems.push(`${id}.tool.${key}: a batch sets only tool.subtitle`);
     }
   }
   return problems;

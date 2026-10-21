@@ -81989,9 +81989,9 @@
         "to": "mp3"
       },
       "seo": {
-        "title": "MP4 to MP3 Converter (Free, Online)",
+        "title": "Convert MP4 to MP3 Online (Free)",
         "h1": "MP4 to MP3 Converter",
-        "description": "Convert MP4 video to MP3 audio in your browser: the soundtrack becomes a 192 kbps MP3. Free, with no sign-up, and nothing is uploaded."
+        "description": "Convert MP4 video to MP3 audio in your browser: the soundtrack becomes a 192 kbps MP3. Free, with no sign-up, and the video isn't uploaded."
       },
       "videoSection": {
         "embedId": "GTaOBy7mxF0"
@@ -99898,7 +99898,7 @@
         "accept": ".webp,image/webp"
       },
       "seo": {
-        "title": "WebP to PNG Converter (Free, Online)",
+        "title": "Convert WebP to PNG Online (Free)",
         "h1": "WebP to PNG Converter",
         "description": "Convert WebP images to PNG in your browser, with transparency kept. Free, with no sign-up, and the image never leaves your device."
       },
@@ -99924,7 +99924,7 @@
         },
         {
           "question": "Is my WebP uploaded?",
-          "answer": "No. Your browser decodes the WebP and writes the PNG itself; nothing is sent to a server."
+          "answer": "No. Your browser decodes the WebP and writes the PNG itself; the image isn't sent to a server."
         }
       ],
       "aboutSection": {

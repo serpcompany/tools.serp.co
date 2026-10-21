@@ -65,9 +65,10 @@ test("a brief's example is the FFmpeg one only when a Tool needs FFmpeg", () => 
 
 test("a brief refuses Tools that aren't live converters or compressors", () => {
   const retired = tools.find((tool) => !tool.isActive && tool.operation === "convert");
-  assert.deepEqual(briefProblems(["webp-to-png", "no-such-tool", retired.id, "download-loom-videos"], tools), [
+  assert.deepEqual(briefProblems(["webp-to-png", "no-such-tool", retired.id, "download-loom-videos", "youtube-to-transcript"], tools), [
     "no-such-tool: no Tool has this id",
     `${retired.id}: the Tool is retired`,
     "download-loom-videos: not a converter or compressor (operation download)",
+    "youtube-to-transcript: a transcription Tool; its copy is named in its own issue",
   ]);
 });

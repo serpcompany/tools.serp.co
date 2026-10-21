@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 
 import type { Tool, ToolSeo } from "@/types";
 
-import { prefersServerConversion } from "./capabilities.ts";
+import { AUDIO_FORMATS, VIDEO_FORMATS, prefersServerConversion } from "./capabilities.ts";
 import { activeTools, getTool } from "./catalog/catalog.ts";
 import { categoryPageHref } from "./catalog/category-pages.ts";
 import { categoryPage, directoryCategories, type CategoryPage } from "./catalog/directory.ts";
 import { CATEGORY_CONTENT, isToolOperation, type ToolOperation } from "./catalog/operations.ts";
 import { resolveCompressionTarget } from "./compression-utils.ts";
+import { usesWebCodecs } from "./convert/webcodecs.ts";
 import {
   DESCRIPTION_MAX,
   FREE,
@@ -109,12 +110,13 @@ export function onConverterPage(tool: Tool): tool is Tool & { from: string; to: 
 }
 
 // Whether the converter page keeps the file in the browser: no server route
-// is tried first (lib/convert/workerClient.ts).
+// is tried first (lib/convert/workerClient.ts). The WebCodecs path (AV1 and
+// HEVC) runs before the server check there, so AV1 to RM stays in the browser.
 export function runsInBrowser(tool: Tool & { from: string; to: string }): boolean {
   if (tool.operation === "compress") {
     return BROWSER_COMPRESSION_TARGETS.has(resolveCompressionTarget(tool.from));
   }
-  return !prefersServerConversion(tool.from, tool.to);
+  return usesWebCodecs(tool.from, tool.to) || !prefersServerConversion(tool.from, tool.to);
 }
 
 function toolFacts(tool: Tool, lead: string): Fact[] {
@@ -147,31 +149,76 @@ export function toolDescription(tool: Tool): string {
 }
 
 // Converters and compressors take their title, H1 and description from
-// content.seo, else from the owner's pattern (#356): "WebP to PNG Converter
-// (Free, Online)" over an H1 of "WebP to PNG Converter", and "MP4 Compressor
-// (Free, Online)" over "MP4 Compressor". A name that isn't a pair, such as
-// Character Counter, stays as it is. docs/converter-copy.md has the rules
+// content.seo, which a writer words around the Tool's keyword, else from the
+// default pattern (#356), shaped by how people search each operation: the
+// title is the verb phrase, the H1 the noun phrase. "Convert WebP to PNG
+// Online (Free)" over an H1 of "WebP to PNG Converter", and "Compress MP4
+// Files Online (Free)" over "MP4 Compressor". A title that would pass 60
+// characters drops " Online (Free)". A name that isn't a pair, such as
+// Character Counter, keeps the name. docs/converter-copy.md has the rules
 // `pnpm content:check` holds every one of them to.
 export const SEO_TITLE_MAX = 60;
-const TITLE_SUFFIX = " (Free, Online)";
+const TITLE_SUFFIX = " Online (Free)";
 
-export function hasToolSeo(tool: Tool): boolean {
-  return tool.operation === "convert" || tool.operation === "compress";
+// Transcription Tools turn audio or video into a text transcript. The owner
+// names them in their own issue, so this PR leaves their title, H1 and
+// description as production serves them (owner decision on #356): no pattern,
+// no content.seo, no content:check.
+const MEDIA_FORMATS: ReadonlySet<string> = new Set([...AUDIO_FORMATS, ...VIDEO_FORMATS]);
+export function isTranscriptionTool(tool: Tool): boolean {
+  return tool.operation === "convert" && tool.to === "txt" && MEDIA_FORMATS.has(tool.from ?? "");
 }
 
+export function hasToolSeo(tool: Tool): boolean {
+  return (tool.operation === "convert" || tool.operation === "compress") && !isTranscriptionTool(tool);
+}
+
+// The format a compressor names: "M4A" for M4A Compressor.
+function compressedFormat(tool: Tool): string {
+  return tool.name.match(/^(.+) Compressor$/)?.[1] ?? formatLabel(tool, tool.from ?? "");
+}
+
+const isPair = (tool: Tool) => / to /.test(tool.name);
+
 function generatedH1(tool: Tool): string {
+  if (tool.operation === "compress") return `${compressedFormat(tool)} Compressor`;
+  return isPair(tool) ? `${tool.name} Converter` : tool.name;
+}
+
+function generatedTitle(tool: Tool, h1: string): string {
+  let stem = h1;
+  if (tool.operation === "compress") stem = `Compress ${compressedFormat(tool)} Files`;
+  else if (isPair(tool)) stem = `Convert ${tool.name}`;
+  return `${stem}${TITLE_SUFFIX}`.length <= SEO_TITLE_MAX ? `${stem}${TITLE_SUFFIX}` : stem;
+}
+
+// "a" or "an" before a format as it is said: "an MP4", "an M4A", "an AVIF",
+// "a MOV", "a PNG". An initialism is read letter by letter, so one that
+// starts with F, H, L, M, N, R, S or X and then a consonant or digit takes
+// "an"; FLAC is said as a word.
+const SAID_AS_WORDS: ReadonlySet<string> = new Set(["FLAC"]);
+export function indefiniteArticle(format: string): "a" | "an" {
+  const upper = format.toUpperCase();
+  if (/^[AEIOU]/.test(upper)) return "an";
+  if (/^[FHLMNRSX][^AEIOU]/.test(upper) && !SAID_AS_WORDS.has(upper)) return "an";
+  return "a";
+}
+
+// The How-to heading of a converter page: the question people search.
+// "How to convert WebP to PNG", "How to compress an MP4 file".
+export function howToHeading(tool: Tool): string | undefined {
   if (tool.operation === "compress") {
-    return / Compressor$/.test(tool.name) ? tool.name : `${formatLabel(tool, tool.from ?? "")} Compressor`;
+    const format = compressedFormat(tool);
+    return `How to compress ${indefiniteArticle(format)} ${format} file`;
   }
-  return / to /.test(tool.name) ? `${tool.name} Converter` : tool.name;
+  return isPair(tool) ? `How to convert ${tool.name}` : undefined;
 }
 
 export function toolSeo(tool: Tool): ToolSeo {
   const curated = tool.content?.seo;
   const h1 = curated?.h1 ?? generatedH1(tool);
-  const title = `${h1}${TITLE_SUFFIX}`.length <= SEO_TITLE_MAX ? `${h1}${TITLE_SUFFIX}` : h1;
   return {
-    title: curated?.title ?? title,
+    title: curated?.title ?? generatedTitle(tool, h1),
     h1,
     description: curated?.description ?? toolDescription(tool),
   };

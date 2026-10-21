@@ -1,6 +1,6 @@
 import type { FAQ, InfoArticleSectionData, HowToSectionData, Tool } from "@/types";
 
-import { onConverterPage, runsInBrowser } from "./metadata.ts";
+import { howToHeading, onConverterPage, runsInBrowser } from "./metadata.ts";
 
 // The template sections of a page without curated ones. Converter and
 // compressor pages say only what is true of every Tool they cover (#356):
@@ -64,6 +64,8 @@ export function buildHowToSection(tool: Tool): HowToSectionData {
   }
 
   const converterPage = onConverterPage(tool);
+  // A converter page's heading is the question people search (#356).
+  if (converterPage) title = howToHeading(tool) ?? title;
   const steps: string[] = [
     converterPage
       ? `Choose your ${fromLabel} file, or several at once.`
