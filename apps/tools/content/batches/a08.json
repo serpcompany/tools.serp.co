@@ -1,0 +1,552 @@
+{
+  "avif-to-jpeg": {
+    "seo": {
+      "title": "Convert AVIF to JPEG Online (Free)",
+      "h1": "AVIF to JPEG Converter",
+      "description": "Convert AVIF to JPEG in your browser: your image is decoded and saved as a JPEG at quality 0.85, with no upload. Free, with no sign-up.",
+      "howToHeading": "How to convert AVIF to JPEG"
+    },
+    "tool": {
+      "subtitle": "Save an AVIF image as a JPEG that opens everywhere, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVIF to JPEG?",
+        "answer": "Choose one or more AVIF files above. Each is decoded by your browser and saved as its own JPEG, one after another, and each JPEG downloads separately with no ZIP."
+      },
+      {
+        "question": "What quality is the JPEG saved at?",
+        "answer": "Quality 0.85. The converter has no quality setting you can change. JPEG is lossy, so the result is a new compressed copy, not an exact one of the AVIF's pixels."
+      },
+      {
+        "question": "What happens to transparency in an AVIF?",
+        "answer": "AVIF supports alpha transparency, but JPEG does not. The converter keeps transparency only for PNG and WebP outputs, so use AVIF to PNG if you need it kept."
+      },
+      {
+        "question": "Are the AVIF's EXIF and colour profile kept?",
+        "answer": "No. The browser decodes the AVIF into plain pixels before the JPEG is written, so camera details, the colour profile and XMP tags don't make it into the new file."
+      },
+      {
+        "question": "Why does it say my browser can't open the file?",
+        "answer": "Your browser decodes the AVIF itself. If it can't, you see a message to try a current Chrome, Edge, Firefox or Safari. A file it can't read at all fails with Image decode failed."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and JPEG",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container. It supports lossy and lossless compression, HDR and transparency.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "HDR and wide colour gamut",
+          "10-bit and 12-bit depth"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVIF to JPEG",
+      "points": [
+        "The JPEG is written at quality 0.85, and you can't change it.",
+        "JPEG has no alpha transparency, which AVIF supports.",
+        "An animated AVIF gives its first frame only.",
+        "EXIF, ICC profiles and XMP are dropped.",
+        "Your browser decodes the file, so nothing is uploaded."
+      ]
+    }
+  },
+  "gif-to-png": {
+    "seo": {
+      "title": "Convert GIF to PNG Online (Free)",
+      "h1": "GIF to PNG Converter",
+      "description": "Convert GIF to PNG in your browser: an animated GIF gives its first frame as a PNG, with transparency kept. Free, with no sign-up or upload.",
+      "howToHeading": "How to convert GIF to PNG"
+    },
+    "tool": {
+      "subtitle": "Save a GIF as a PNG, with transparency kept, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert GIF to PNG?",
+        "answer": "Choose one or more GIFs above. They convert one after another in your browser, and each PNG downloads on its own. Your original GIFs are not changed."
+      },
+      {
+        "question": "What happens to an animated GIF?",
+        "answer": "You get its first frame only, as a single still PNG. The other frames are not saved, and the PNG does not animate."
+      },
+      {
+        "question": "Is transparency kept?",
+        "answer": "Yes. Transparency is kept for PNG outputs, so the see-through parts of your GIF stay see-through."
+      },
+      {
+        "question": "Will the PNG have more colours than the GIF?",
+        "answer": "Not by itself. A GIF holds at most 256 colours per frame, and converting can't add colours that were never in the image. PNG is lossless and has no quality setting, so the pixels are written as they were decoded."
+      },
+      {
+        "question": "Is anything lost besides the animation?",
+        "answer": "Metadata. The image goes through raw pixels, so EXIF, ICC profiles and XMP are not carried into the PNG."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and PNG",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colours per frame, and supports simple animation.",
+        "details": [
+          "256-colour palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to PNG",
+      "points": [
+        "Only the first frame of an animated GIF is saved.",
+        "Transparency is kept in the PNG.",
+        "PNG has no quality setting, so there is nothing to choose.",
+        "EXIF, ICC profiles and XMP are dropped.",
+        "Several GIFs give one PNG each, not a ZIP."
+      ]
+    }
+  },
+  "opus-to-mp3": {
+    "seo": {
+      "title": "Convert OPUS to MP3 Online (Free)",
+      "h1": "OPUS to MP3 Converter",
+      "description": "Convert OPUS to MP3 in your browser: the audio is re-encoded as a 192 kbps MP3 with the LAME encoder. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert OPUS to MP3"
+    },
+    "tool": {
+      "subtitle": "Save an Opus audio file as a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert OPUS to MP3?",
+        "answer": "Pick your Opus recordings above. Each one is re-encoded in turn, and the MP3s download one by one, with no ZIP."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps, written with the LAME encoder. The page has no setting to change it, so the MP3 comes out at that same rate whatever bitrate the Opus file had."
+      },
+      {
+        "question": "Will the MP3 sound better than the Opus file?",
+        "answer": "No. Opus and MP3 are both lossy, so converting re-compresses audio that has already lost detail. The MP3 is at best as good as its source."
+      },
+      {
+        "question": "Can a long Opus file be converted?",
+        "answer": "The page sets no size limit or timeout of its own. A long file takes as long as your device needs, so a slow phone or laptop will take longer."
+      },
+      {
+        "question": "Is my Opus file uploaded?",
+        "answer": "No. The conversion happens in your browser through WebAssembly, so your Opus recording never leaves the device."
+      }
+    ],
+    "aboutSection": {
+      "title": "Opus and MP3",
+      "fromFormat": {
+        "name": "Opus",
+        "fullName": "Opus audio",
+        "description": "An open lossy audio codec standardized by the IETF in RFC 6716. It works well for both speech and music and for low-delay use.",
+        "details": [
+          "Lossy compression",
+          "Low latency",
+          "Bitrates from 6 to 510 kbit/s",
+          "Royalty-free"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting Opus to MP3",
+      "points": [
+        "The MP3 is encoded at 192 kbps, whatever the Opus bitrate was.",
+        "Both formats are lossy, so the MP3 can't be better than the Opus.",
+        "Converting several Opus files gives one MP3 for each.",
+        "A long file takes as long as your device needs.",
+        "FFmpeg runs in your browser, so the file isn't uploaded."
+      ]
+    }
+  },
+  "wmv-to-mp4": {
+    "seo": {
+      "title": "Convert WMV to MP4 Online (Free)",
+      "h1": "WMV to MP4 Converter",
+      "description": "Convert WMV to MP4 in your browser: the video is re-encoded as H.264 with AAC sound, up to 1920 px and 30 fps. Free, with no sign-up or upload.",
+      "howToHeading": "How to convert WMV to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn a WMV video into an MP4 with H.264 video, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WMV to MP4?",
+        "answer": "Add your WMV videos above. Each is re-encoded in turn and downloads as a separate MP4, with no ZIP."
+      },
+      {
+        "question": "What is inside the MP4?",
+        "answer": "H.264 video and AAC audio at 96 kbps, with the index at the front of the file so it can start playing before it has fully loaded. A WMV is always re-encoded, never just re-wrapped."
+      },
+      {
+        "question": "Will the MP4 be smaller or larger than the WMV?",
+        "answer": "The page does not promise either. The video is encoded for speed, with the ultrafast preset and a constant rate factor of 32, so the size depends on your video."
+      },
+      {
+        "question": "Does the MP4 keep the WMV's size and frame rate?",
+        "answer": "Up to a point. Frames larger than 1920 px on the longer side are scaled down, and anything above 30 fps is capped at 30. Smaller videos keep their size, except that an odd width or height is rounded down by 1 px."
+      },
+      {
+        "question": "What happens to an interlaced WMV?",
+        "answer": "Frames flagged as interlaced are deinterlaced during the conversion, so the MP4 plays as ordinary progressive video."
+      },
+      {
+        "question": "How long does a big WMV take?",
+        "answer": "The page sets no size limit or timeout of its own. FFmpeg runs on your device, so a long video takes as long as your phone or laptop needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMV and MP4",
+      "fromFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "A family of video codecs developed by Microsoft, usually stored in the ASF container. It was widely used for Windows video and streaming.",
+        "details": [
+          "ASF container",
+          "Proprietary Microsoft codec",
+          "Lossy compression",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WMV to MP4",
+      "points": [
+        "The video is re-encoded as H.264, with AAC audio at 96 kbps.",
+        "Frames are scaled down to 1920 px on the longer side, and the frame rate is capped at 30 fps.",
+        "Interlaced frames are deinterlaced.",
+        "A long video takes as long as your device needs.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "xml-to-pdf": {
+    "seo": {
+      "title": "Convert XML to PDF Online (Free)",
+      "h1": "XML to PDF Converter",
+      "description": "Convert XML to PDF in your browser: your elements, attributes and text are listed as an indented PDF. Free, with no sign-up and no upload."
+    },
+    "tool": {
+      "subtitle": "Turn an XML file into an indented PDF listing you can read or print."
+    },
+    "faqs": [
+      {
+        "question": "Can you convert XML to PDF?",
+        "answer": "Yes, as a listing. The PDF shows your XML's content, one line a node, with each level of nesting indented two columns further, up to 20 levels. It is not the file styled by a stylesheet."
+      },
+      {
+        "question": "How do I convert XML to PDF?",
+        "answer": "Choose one or more XML files above. Each is read in your browser and saved as a PDF named after the file, and each PDF downloads on its own."
+      },
+      {
+        "question": "What size are the PDF pages?",
+        "answer": "A4 portrait with 3/4 inch margins, in 10 pt type: 61 lines a page and 81 characters a line in Courier. A longer line wraps. No header, footer or page numbers are added."
+      },
+      {
+        "question": "Why does it say my XML isn't well-formed?",
+        "answer": "The file broke XML's rules, for example an unclosed tag, an unquoted attribute value or a second root element. The message gives what the parser found and the line and column where it stopped, so you can fix the file and convert it again."
+      },
+      {
+        "question": "What happens to entities and the DOCTYPE?",
+        "answer": "XML's five built-in entities and character references are shown as the characters they stand for. Any other entity is shown as written, never expanded or fetched, so a file that refers to other files converts like any other and loads nothing."
+      },
+      {
+        "question": "Which characters can it show?",
+        "answer": "Text that is all Windows-1252 characters is set in Courier. Anything else is set in DejaVu Sans, embedded in the PDF, which covers scripts such as Arabic and Hebrew. Chinese, Japanese, Korean, Indic and Thai characters and emoji are refused, with the characters named, rather than saved as blank boxes."
+      },
+      {
+        "question": "Can it turn an e-invoice or an XSL-FO file into a formatted document?",
+        "answer": "No. It lists any XML file's content, but it doesn't apply an invoice's layout or an XSL-FO or XSLT stylesheet."
+      },
+      {
+        "question": "How large a file can I convert?",
+        "answer": "Up to 20 MB, making up to 2,000 pages. A larger file is refused with a message saying which limit it passed."
+      }
+    ],
+    "aboutSection": {
+      "title": "XML and PDF",
+      "fromFormat": {
+        "name": "XML",
+        "fullName": "Extensible Markup Language",
+        "description": "A markup language for structured data, maintained by the W3C. Custom tags describe the data, and both people and programs can read it.",
+        "details": [
+          "Text-based",
+          "User-defined tags",
+          "W3C Recommendation",
+          "Validated with schemas"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting XML to PDF",
+      "points": [
+        "The PDF lists your XML's elements, attributes and text. It does not apply a stylesheet.",
+        "The file must be well-formed XML, or it is refused with the line and column.",
+        "Pages are A4 portrait, and long lines wrap.",
+        "Comments, processing instructions and the DOCTYPE are shown in grey.",
+        "The limit is 20 MB and 2,000 pages."
+      ]
+    }
+  },
+  "psd-to-jpg": {
+    "seo": {
+      "title": "Convert PSD to JPG Online (Free)",
+      "h1": "PSD to JPG Converter",
+      "description": "Convert PSD to JPG in your browser: a layered Photoshop file is saved as one flat picture. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert PSD to JPG"
+    },
+    "tool": {
+      "subtitle": "Save a Photoshop PSD as a single JPG picture, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert PSD to JPG?",
+        "answer": "Choose one or more PSD files above. ImageMagick runs in your browser and converts them one after another, and each JPG downloads on its own. Your PSD is not changed."
+      },
+      {
+        "question": "Are the layers kept?",
+        "answer": "No. A layered PSD gives one picture, not one per layer, and a JPG has no layers. Keep your PSD if you still need to edit the design."
+      },
+      {
+        "question": "Is there a quality setting for the JPG?",
+        "answer": "No. The page passes no quality setting, and JPG is lossy, so the result is a compressed copy of the picture."
+      },
+      {
+        "question": "What happens to transparency in a PSD?",
+        "answer": "JPG has no alpha transparency, so a transparent PSD can't keep it in the result."
+      },
+      {
+        "question": "Why does a very large PSD fail?",
+        "answer": "A picture over about 537 megapixels is refused with a too large to convert here message. Smaller pictures convert in your browser, on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "PSD and JPG",
+      "fromFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and colour information so a design can be edited later.",
+        "details": [
+          "Layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes",
+          "Proprietary Adobe format"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PSD to JPG",
+      "points": [
+        "You get one flat picture, not one per layer.",
+        "JPG has no layers and no alpha transparency.",
+        "JPG is lossy, and the page has no quality setting.",
+        "A picture over about 537 megapixels is refused.",
+        "ImageMagick runs in your browser, so the file isn't uploaded."
+      ]
+    }
+  },
+  "aac-to-mp3": {
+    "seo": {
+      "title": "Convert AAC to MP3 Online (Free)",
+      "h1": "AAC to MP3 Converter",
+      "description": "Convert AAC to MP3 in your browser: the audio is re-encoded as a 192 kbps MP3 with the LAME encoder. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert AAC to MP3"
+    },
+    "tool": {
+      "subtitle": "Save an AAC audio file as a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AAC to MP3?",
+        "answer": "Add your AAC audio above. Every file is processed in order, and you download each MP3 separately."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps with the LAME encoder. You can't pick another rate, and a lower or higher AAC bitrate doesn't change it."
+      },
+      {
+        "question": "Will the MP3 sound better than the AAC file?",
+        "answer": "No. AAC and MP3 are both lossy, and AAC generally sounds better than MP3 at the same bitrate. Converting can't add back detail, so the MP3 is at best as good as its source."
+      },
+      {
+        "question": "Is my AAC file uploaded?",
+        "answer": "No. Everything runs inside your browser, so the AAC audio stays with you. Long tracks take as long as your own device needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "AAC and MP3",
+      "fromFormat": {
+        "name": "AAC",
+        "fullName": "Advanced Audio Coding",
+        "description": "A lossy audio codec standardized by MPEG (ISO/IEC 13818-7 and 14496-3) as the successor to MP3. It generally gives better quality than MP3 at the same bitrate.",
+        "details": [
+          "Lossy compression",
+          "Better efficiency than MP3",
+          "Raw .aac streams or MP4 containers",
+          "Widely supported"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AAC to MP3",
+      "points": [
+        "The MP3 is encoded at 192 kbps, whatever the AAC bitrate was.",
+        "Both formats are lossy, so the MP3 can't be better than the AAC.",
+        "Converting several AAC files gives one MP3 for each.",
+        "FFmpeg runs in your browser, so the file isn't uploaded."
+      ]
+    }
+  },
+  "flac-to-mp3": {
+    "seo": {
+      "title": "Convert FLAC to MP3 Online (Free)",
+      "h1": "FLAC to MP3 Converter",
+      "description": "Convert FLAC to MP3 in your browser: the lossless audio is re-encoded as a 192 kbps MP3 with the LAME encoder. Free, with no sign-up or upload.",
+      "howToHeading": "How to convert FLAC to MP3"
+    },
+    "tool": {
+      "subtitle": "Save a lossless FLAC file as a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can you convert FLAC to MP3?",
+        "answer": "Yes. FFmpeg runs in your browser and re-encodes the lossless FLAC audio as an MP3. Choose one or more files above, and each MP3 downloads as its own file."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps, from the LAME encoder. There is no setting for another rate, so every FLAC ends up at the same bitrate."
+      },
+      {
+        "question": "Do I lose quality going from FLAC to MP3?",
+        "answer": "Yes. FLAC is lossless and keeps every sample, while MP3 is lossy. The MP3 is a smaller approximation, and you can't turn it back into the original. Keep your FLAC if you want the lossless copy."
+      },
+      {
+        "question": "Is my FLAC file uploaded?",
+        "answer": "No. FFmpeg runs inside your tab, so your FLAC never leaves the device. A long album track takes as long as your device needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLAC and MP3",
+      "fromFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "An open, royalty-free lossless audio codec developed by Xiph.Org. It typically reduces files to about half the size of uncompressed audio while keeping every sample.",
+        "details": [
+          "Lossless compression",
+          "Open source",
+          "Metadata tags",
+          "Supports up to 32-bit depth"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting FLAC to MP3",
+      "points": [
+        "FLAC is lossless and MP3 is lossy, so the MP3 gives up some of the original detail.",
+        "The MP3 is encoded at 192 kbps.",
+        "Converting several FLAC files gives one MP3 for each.",
+        "Your FLAC file isn't changed, so you keep the lossless copy.",
+        "FFmpeg runs in your browser, so the file isn't uploaded."
+      ]
+    }
+  }
+}

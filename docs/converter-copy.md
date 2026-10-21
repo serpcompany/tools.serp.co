@@ -53,6 +53,15 @@ png". So each page uses all three shapes:
   unless the batch sets `seo.howToHeading` (optional): use the top question
   from the brief's questions when there is one.
 
+`pnpm content:brief` lists each Tool's top 8 matching terms and top 5
+questions, with volumes, from `apps/tools/benchmarks/keyword-ideas.json`
+(Ahrefs; the brief names its source). The title keeps the head keyword and
+works in the biggest term where it fits; the How-to heading uses the top "how
+to" question; the FAQs answer the listed questions, not invented ones. When
+the status CSV has no keyword (the compressors), the brief uses the file's
+head keyword and volume. A Tool the file lacks shows "No variant data": use
+the rules above without it.
+
 With no `content.seo`, `toolSeo` in `apps/tools/lib/metadata.ts` generates the
 default from the Tool's name, and the layout adds " | SERP Tools":
 

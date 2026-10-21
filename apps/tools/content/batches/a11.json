@@ -1,0 +1,441 @@
+{
+  "cr2-to-jpg": {
+    "seo": {
+      "title": "Convert CR2 to JPG Online (Free)",
+      "h1": "CR2 to JPG Converter",
+      "description": "Convert Canon CR2 RAW photos to JPG in your browser. Choose several at once and each saves as its own JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert CR2 to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn Canon CR2 RAW photos into JPG files in your browser, one or many at a time."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CR2 to JPG in bulk?",
+        "answer": "Choose all the CR2 files at once. They convert one after another and each downloads as its own JPG. There is no ZIP, so expect one download per photo."
+      },
+      {
+        "question": "Can I convert CR2 to JPG without losing quality?",
+        "answer": "JPG uses lossy compression, so a JPG can't hold everything a CR2 does. Your CR2 is left unchanged, though, so you can keep it for editing and use the JPG for sharing."
+      },
+      {
+        "question": "Will the CR2 be changed or replaced?",
+        "answer": "No. Your Canon file stays exactly as it was, and the JPG is a separate download. The RAW stays available if you want to edit it again later."
+      },
+      {
+        "question": "How large a CR2 can I convert?",
+        "answer": "The page sets no file size limit. Only an extremely large picture, about 537 megapixels or more, fails, with a message that it is too large to convert here."
+      },
+      {
+        "question": "Where is the CR2 converted?",
+        "answer": "In your browser, using ImageMagick compiled to WebAssembly. No server is involved, so the photo isn't uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "CR2 and JPG",
+      "fromFormat": {
+        "name": "CR2",
+        "fullName": "Canon RAW version 2",
+        "description": "The raw image format used by many Canon EOS cameras from the mid-2000s until CR3 replaced it. It stores unprocessed sensor data in a TIFF-based file.",
+        "details": [
+          "Unprocessed sensor data",
+          "Embedded JPEG preview",
+          "Proprietary Canon format"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CR2 to JPG",
+      "points": [
+        "Choose several CR2 files at once: each becomes its own JPG, with no ZIP.",
+        "JPG is lossy, and your CR2 is left unchanged for editing later.",
+        "A CR2 picture of about 537 megapixels or more is refused as too large.",
+        "ImageMagick runs in your browser, so the photo isn't uploaded."
+      ]
+    }
+  },
+  "mkv-to-mp3": {
+    "seo": {
+      "title": "Convert MKV to MP3 Online (Free)",
+      "h1": "MKV to MP3 Converter",
+      "description": "Convert MKV video to MP3 audio in your browser: the sound becomes a 192 kbps MP3. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert MKV to MP3"
+    },
+    "tool": {
+      "subtitle": "Save the sound from an MKV video as a 192 kbps MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What bitrate is the MP3 from an MKV?",
+        "answer": "192 kbps. The audio is re-encoded to MP3 with the LAME encoder at that bitrate, and the video is dropped."
+      },
+      {
+        "question": "Which audio track is used if my MKV has several?",
+        "answer": "The page doesn't let you pick. It gives FFmpeg no track choice, so FFmpeg's own default decides, and we can't promise which track you get."
+      },
+      {
+        "question": "Why did my MKV conversion fail?",
+        "answer": "The usual cause is a video with no audio track: FFmpeg stops with an error code because there is no sound to save. Play the file to check it has sound."
+      },
+      {
+        "question": "Does it take several MKV files in one go?",
+        "answer": "Yes. They are converted one by one, each giving a separate MP3 download. Nothing is zipped."
+      },
+      {
+        "question": "Is a large MKV a problem?",
+        "answer": "The page sets no size limit or timeout. FFmpeg runs on your device, so a long file takes as long as your phone or computer needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "MKV and MP3",
+      "fromFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open, free container format that can hold unlimited video, audio, picture and subtitle tracks in one file. WebM is a subset of Matroska.",
+        "details": [
+          "Multiple audio and subtitle tracks",
+          "Chapters and metadata",
+          "Supports almost any codec"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MKV to MP3",
+      "points": [
+        "Only the sound is kept: the video is dropped.",
+        "The MP3 is encoded at 192 kbps.",
+        "With several audio tracks, FFmpeg's default picks one.",
+        "An MKV without an audio track can't be converted.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "webm-to-gif": {
+    "seo": {
+      "title": "Convert WebM to GIF Online (Free)",
+      "h1": "WebM to GIF Converter",
+      "description": "Convert WebM video to an animated GIF in your browser: 15 frames a second, up to 480 px wide or tall. Free, with no sign-up.",
+      "howToHeading": "How to convert WebM to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn a WebM video into a looping GIF at 15 frames a second, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What frame rate and size is the GIF?",
+        "answer": "15 frames a second, and no more than 480 px on the longer side. A smaller video isn't scaled up, though an odd width or height is rounded down by 1 px, and the shape of the picture stays the same."
+      },
+      {
+        "question": "Does the GIF loop?",
+        "answer": "Yes. The conversion sets the GIF to loop without end."
+      },
+      {
+        "question": "Why can the colours look different in the GIF?",
+        "answer": "A GIF holds at most 256 colours per frame. The converter builds a colour palette from your video first, to match it as closely as that allows."
+      },
+      {
+        "question": "Can I choose a batch of WebM clips?",
+        "answer": "Yes. Select as many as you like; the page works through them in turn and downloads one GIF per clip, not a ZIP."
+      },
+      {
+        "question": "Does the video leave my computer?",
+        "answer": "No. The conversion happens in your browser with FFmpeg, so the WebM stays put. Long clips need more time on slower devices."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebM and GIF",
+      "fromFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "Royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Supported by major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colours per frame, and supports simple animation.",
+        "details": [
+          "256-colour palette per frame",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebM to GIF",
+      "points": [
+        "The GIF runs at 15 frames a second.",
+        "The longer side is at most 480 px, so a larger video is scaled down.",
+        "A GIF has at most 256 colours per frame, so a palette is made from your video.",
+        "The GIF loops without end.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    }
+  },
+  "jpg-to-jpg": {
+    "seo": {
+      "title": "Convert JPG to JPG Online (Free)",
+      "h1": "JPG to JPG Converter",
+      "description": "Convert a JPG to JPG in your browser: the photo is decoded and saved again as a new JPG at quality 0.85. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save a JPG again as a new JPG at quality 0.85, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What does converting a JPG to a JPG do?",
+        "answer": "The picture is decoded and written again as a new JPG at quality 0.85. Your original file is left unchanged."
+      },
+      {
+        "question": "Will the new JPG lose quality?",
+        "answer": "JPG is lossy and the picture is encoded a second time, so it can't be better than your original. Don't use this to improve a photo."
+      },
+      {
+        "question": "Is the EXIF data kept in the new JPG?",
+        "answer": "No. Re-saving starts from decoded pixels, so the copy comes out without camera details, colour profile or XMP: a way to get a JPG with that information stripped."
+      },
+      {
+        "question": "Which files can I choose?",
+        "answer": "Files ending in .jpg or .jpeg. Each one is decoded and written out again as a new .jpg, and the file you chose stays as it was."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting JPG to JPG",
+      "points": [
+        "The new JPG is written at quality 0.85.",
+        "EXIF, ICC profiles and XMP are not carried over.",
+        "The picture is encoded again, so it is not a lossless copy.",
+        "Several files convert one after another, each to its own JPG.",
+        "Your browser does the work, so the photo isn't uploaded."
+      ]
+    }
+  },
+  "csv-to-pdf": {
+    "seo": {
+      "title": "Convert CSV to PDF Online (Free)",
+      "h1": "CSV to PDF Converter",
+      "description": "Convert CSV to PDF in your browser: A4 pages with the header row repeated on each one. Free, with no sign-up, and no data is uploaded."
+    }
+  },
+  "pdf-to-txt": {
+    "seo": {
+      "title": "Convert PDF to TXT File Online (Free)",
+      "h1": "PDF to TXT Converter",
+      "description": "Convert a PDF to a TXT file in your browser. The words of each page are saved as plain text; layout and images aren't kept. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save the words of a PDF as a plain TXT file in your browser, with no upload."
+    },
+    "faqs": [
+      {
+        "question": "What does the TXT file keep from my PDF?",
+        "answer": "Its words, page by page in the order the PDF stores them, which is usually reading order. Paragraphs are separated by a blank line. Fonts, layout, tables and images aren't kept: a table's cells come out as lines of text."
+      },
+      {
+        "question": "Why does my PDF say it has no text to extract?",
+        "answer": "None of its pages hold text. A scanned PDF is made of pictures of pages, and a blank page has nothing on it. Reading words from a picture needs OCR, which this converter doesn't do."
+      },
+      {
+        "question": "Can I convert a password-protected PDF?",
+        "answer": "Not while it needs a password to open. Open it, save or print a copy without the password, and convert that copy."
+      },
+      {
+        "question": "How are columns handled?",
+        "answer": "Text comes out in the order the PDF stores it. Columns stored one after the other stay whole, but columns stored a row at a time come out mixed."
+      },
+      {
+        "question": "How large a PDF can I convert?",
+        "answer": "Up to 2,000 pages and 20 million characters of text. A PDF that takes more than 2 minutes to read is stopped, and a larger one is refused with a message naming the limit."
+      }
+    ],
+    "aboutSection": {
+      "title": "PDF and TXT",
+      "fromFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content"
+        ]
+      },
+      "toFormat": {
+        "name": "TXT",
+        "fullName": "Plain text file",
+        "description": "A file that holds unformatted text with no fonts, styles or images. It is readable by any text editor, on any operating system.",
+        "details": [
+          "No formatting",
+          "Character encoding such as UTF-8",
+          "Readable everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PDF to TXT",
+      "points": [
+        "Only the words are kept: no layout, tables, images or links.",
+        "A scanned PDF has no text to read, and there is no OCR.",
+        "A PDF that needs a password to open can't be converted.",
+        "Up to 2,000 pages and 20 million characters of text.",
+        "The TXT file is UTF-8, and your PDF is read in your browser."
+      ]
+    }
+  },
+  "webp-to-pdf": {
+    "seo": {
+      "title": "Convert WebP to PDF Online (Free)",
+      "h1": "WebP to PDF Converter",
+      "description": "Convert WebP to PDF in your browser: one page the size of the image, with transparency kept. Free, with no sign-up.",
+      "howToHeading": "How to convert WebP to PDF"
+    },
+    "tool": {
+      "subtitle": "Turn a WebP image into a one-page PDF the size of the picture, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How big is the page in the PDF?",
+        "answer": "The PDF has one page the size of the image: 1 pixel is 1 point, with no margin. It isn't an A4 or Letter page."
+      },
+      {
+        "question": "Do several WebP files become one PDF?",
+        "answer": "No. Each WebP becomes its own PDF and files are never merged. Choose them together and they convert one after another."
+      },
+      {
+        "question": "What happens to transparency in my WebP?",
+        "answer": "It stays transparent. The PDF page gets no background colour behind the picture, so areas that were clear in the WebP are still clear when the PDF is opened."
+      },
+      {
+        "question": "What if my WebP is animated?",
+        "answer": "Only the first frame is used, and it becomes the PDF's single page."
+      },
+      {
+        "question": "Is the picture compressed again inside the PDF?",
+        "answer": "No. The picture is embedded losslessly as a PNG, so the PDF adds no new lossy compression to it."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and PDF",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Vector and raster content",
+          "Opens in Adobe Acrobat Reader, Preview and any web browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebP to PDF",
+      "points": [
+        "Each WebP becomes its own one-page PDF; files aren't merged.",
+        "The page is the size of the image, with no margin.",
+        "Transparent areas stay transparent in the PDF.",
+        "An animated WebP gives its first frame only.",
+        "Your browser does the work, so the image isn't uploaded."
+      ]
+    }
+  },
+  "arw-to-jpg": {
+    "seo": {
+      "title": "Convert ARW to JPG Online (Free)",
+      "h1": "ARW to JPG Converter",
+      "description": "Convert Sony ARW RAW photos to JPG in your browser. Choose several at once and each saves as its own JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert ARW to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn Sony Alpha ARW RAW photos into JPG files in your browser, one or many at a time."
+    },
+    "faqs": [
+      {
+        "question": "Can I convert ARW to JPG without losing quality?",
+        "answer": "JPG uses lossy compression, so the JPG can't keep everything in the ARW. Your ARW is left unchanged, so you can keep it for editing and use the JPG for sharing."
+      },
+      {
+        "question": "Can I batch convert ARW to JPG?",
+        "answer": "Yes. Choose several ARW files at once. They convert one after another and each downloads as its own JPG, with no ZIP."
+      },
+      {
+        "question": "Does converting touch my Sony ARW original?",
+        "answer": "No. The ARW is left alone, and what you download is a new JPG next to it. Edit the RAW again whenever you like."
+      },
+      {
+        "question": "How big an ARW will it handle?",
+        "answer": "There is no file size limit on this page. A picture of about 537 megapixels or more is refused with a too large to convert here message."
+      },
+      {
+        "question": "Is my ARW photo uploaded?",
+        "answer": "No. ImageMagick runs as WebAssembly inside your browser, so the photo stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "ARW and JPG",
+      "fromFormat": {
+        "name": "ARW",
+        "fullName": "Sony Alpha RAW",
+        "description": "The raw image format of Sony Alpha cameras. It stores unprocessed sensor data, so white balance, exposure and colour can be adjusted later without losing quality.",
+        "details": [
+          "Unprocessed sensor data",
+          "12 to 14 bits per channel",
+          "TIFF-based structure"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ARW to JPG",
+      "points": [
+        "Choose several ARW files at once: each becomes its own JPG, with no ZIP.",
+        "JPG is lossy, and your ARW is left unchanged for editing later.",
+        "An ARW picture of about 537 megapixels or more is refused as too large.",
+        "ImageMagick runs in your browser, so the photo isn't uploaded."
+      ]
+    }
+  }
+}
