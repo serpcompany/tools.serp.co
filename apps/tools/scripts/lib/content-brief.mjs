@@ -15,6 +15,7 @@ import {
 import { buildConverterFaqs } from "../../lib/tool-sections.ts";
 import {
   BATCH_DIR,
+  DEPTH_FAQS_MIN,
   DESCRIPTION_MAX,
   DESCRIPTION_MIN,
   FAQS_MIN,
@@ -61,9 +62,9 @@ export function statusIndex(rows) {
 }
 
 export const TOP_TERMS = 8;
-// A page written in depth (a Tool in benchmarks/content-topics.json): at least
-// this many FAQs, so the page covers what the ranking pages answer.
-export const DEPTH_FAQS_MIN = 8;
+// A page written in depth (a Tool in benchmarks/content-topics.json) has at
+// least DEPTH_FAQS_MIN FAQs, which content:check enforces (content.mjs).
+export { DEPTH_FAQS_MIN };
 // The page length to aim at, at least: Ahrefs counted the rendered pages
 // ranking for "png to jpg" (Adobe Express, Canva) at a median of about 1,240
 // words, where their static HTML gives far fewer.
@@ -304,11 +305,11 @@ function depthSection(selected, depth) {
   return [
     "## Writing in depth",
     "",
-    "Tools with a \"Competing pages\" section get a longer page, modelled on a file-extension reference page (see \"Writing in depth\" in the style guide). The competing pages' topics show what visitors ask; they aren't an outline. No `howTo`: the generated How-to stays.",
+    "Tools with a \"Competing pages\" section get a longer page, modeled on a file-extension reference page (see \"Writing in depth\" in the style guide). The competing pages' topics show what visitors ask; they aren't an outline. No `howTo`: the generated How-to stays.",
     "",
     list([
       `\`faqs\`: at least ${DEPTH_FAQS_MIN}, answering the Tool's listed questions and the visitor questions the facts support.`,
-      "`guide`: a Markdown article after the pair notes, with paragraphs, bulleted lists, bold labels and these `###` sections, and no tables: what the source format is (maker, history, where people meet it); programs that open it, grouped by Windows, Mac, Linux, web and mobile; the two formats compared (extensions, media types, variants, compression, transparency, colour depth, metadata); other ways to convert (the methods in \"Guide facts\", with their menu paths and limits); problems with the source format and their fixes.",
+      "`guide`: a Markdown article after the pair notes, with paragraphs, bulleted lists, bold labels and these `###` sections, and no tables: what the source format is (maker, history, where people meet it); programs that open it, grouped by Windows, Mac, Linux, web and mobile; the two formats compared (extensions, media types, variants, compression, transparency, color depth, metadata); other ways to convert (the methods in \"Guide facts\", with their menu paths and limits); problems with the source format and their fixes.",
       "Facts come from \"Guide facts\", the format reference, the engine facts and the owner's wiki (wiki.serp.co/file-types/<ext>/). The wiki copies FileInfo.com word for word: take its facts, never its wording or its lists' order and notes, and leave out a claim that is wrong or that you can't confirm. No source URLs or links off the site.",
       "Aim the guide, FAQs, format cards and pair notes at 1,200 to 1,500 words together; stop short and say so rather than pad. Nothing repeats across sections, or across Tools' pages.",
     ]),
@@ -344,7 +345,7 @@ export function buildBrief({ name, ids, tools, statusRows, formats, styleGuide, 
   const appendix = docs.flatMap((doc) => [
     `## Appendix: ${doc}`,
     "",
-    "The engine's behaviour as the repository documents it from the code:",
+    "The engine's behavior as the repository documents it from the code:",
     "",
     demote(readDoc(doc)),
     "",

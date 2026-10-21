@@ -127,7 +127,7 @@ writes one.
 ### Writing in depth
 
 A Tool in `apps/tools/benchmarks/content-topics.json` gets a longer page,
-modelled on a file-extension reference page such as filext.com's (owner
+modeled on a file-extension reference page such as filext.com's (owner
 decision, 2026-10-22). That file holds the Ahrefs topics and lengths of the
 pages ranking for its keyword: a check on what visitors ask, not an outline
 to copy. The page has at least 8 FAQs and a `guide` with these `###`
@@ -138,7 +138,7 @@ sections, in this order, written for the pair:
 2. **Programs that open {FROM} files**: grouped under Windows, Mac, Linux,
    web and mobile, one line on each program.
 3. **{FROM} and {TO} compared**: extensions, media types, variants,
-   compression, transparency, colour depth and metadata, and how the two
+   compression, transparency, color depth and metadata, and how the two
    differ for this conversion.
 4. **Other ways to convert {FROM} to {TO}**: the methods in
    `apps/tools/content/format-guides.json`, with their menu paths and limits.
@@ -227,7 +227,14 @@ compressor. It fails when:
   Tool for each operation and each place the file is converted: in the
   browser or server first); or a required
   field is missing (subtitle, 3 FAQs, pair notes with 2 points, and format
-  cards on a converter).
+  cards on a converter);
+- for a Tool with a `guide` (written in depth): it has fewer than 8 FAQs; the
+  guide's `###` headings aren't the five sections of "Writing in depth", in
+  order (known by how they start or end: "What is", "Programs that",
+  "compared", "Other ways to", "Problems with"); the guide has a table; or
+  any field of its copy uses a common British spelling (colour, grey,
+  licence, modelled, centre, behaviour, -ise and -isation, and others in
+  `apps/tools/scripts/lib/content.mjs`).
 
 Near-duplicate means a Jaccard similarity of 0.6 or more between the two
 answers' three-word phrases, after lower-casing and replacing each Tool's own

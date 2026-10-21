@@ -64,9 +64,9 @@ export const ENGINE_FACTS = {
       'Errors a visitor can see: "Image decode failed."; "This browser can\'t open … files; try a current Chrome, Edge, Firefox or Safari."',
     ],
     unsettled: [
-      "What colour fills transparent areas in a JPG output (the canvas JPEG encoder decides).",
+      "What color fills transparent areas in a JPG output (the canvas JPEG encoder decides).",
       "Whether EXIF orientation is applied on decode.",
-      "How an ICC profile affects the decoded colours.",
+      "How an ICC profile affects the decoded colors.",
     ],
   },
   "imagemagick-wasm": {
@@ -77,7 +77,7 @@ export const ENGINE_FACTS = {
     ],
     convert: ["Conversions set no quality and strip nothing explicitly."],
     compress: [
-      "GIF: every frame is re-optimised. TIFF: LZW compression. BMP: RLE8 when the image has no transparency and 256 colours or fewer. AVIF: quality 82 (lib/convert/image-compress.ts).",
+      "GIF: every frame is re-optimized. TIFF: LZW compression. BMP: RLE8 when the image has no transparency and 256 colors or fewer. AVIF: quality 82 (lib/convert/image-compress.ts).",
       "If the result isn't smaller, the visitor gets the original back (compressImageInBrowser in lib/convert/image-compress.ts).",
       "Nothing is resized.",
     ],
@@ -148,7 +148,7 @@ export const ENGINE_FACTS = {
     where: "In the browser: jSquash encoders in a Web Worker (workers/compress.worker.js). No server.",
     compress: [
       "JPEG and WebP are re-encoded at quality 82; PNG goes through oxipng at level 1, which is lossless.",
-      "If the worker can't run oxipng (it fails or can't load), PNG falls back to the main thread (compressPngWithWorker, compressPngOnMainThread in lib/convert/workerClient.ts): UPNG reduces the picture to at most 210 colours, which is lossy, and keeps only the first frame of an animated PNG. Copy may call PNG compression lossless only with that exception.",
+      "If the worker can't run oxipng (it fails or can't load), PNG falls back to the main thread (compressPngWithWorker, compressPngOnMainThread in lib/convert/workerClient.ts): UPNG reduces the picture to at most 210 colors, which is lossy, and keeps only the first frame of an animated PNG. Copy may call PNG compression lossless only with that exception.",
       "If the result isn't smaller, the visitor gets the original back.",
     ],
     unsettled: ["What happens to an animated PNG or WebP.", "How often the oxipng worker fails in a given browser."],
@@ -211,7 +211,7 @@ export const TARGET_FACTS = {
     engines: ["browser-raster"],
     facts: [
       "The picture is not traced to vector shapes. The SVG holds one `<image>` with the picture embedded as a PNG (base64), at the picture's pixel width and height, so it doesn't scale like a vector (encodeFromRGBA in lib/convert/encode.ts).",
-      "Nothing is resized or reduced: the full-colour picture is embedded, and transparency is kept in the embedded PNG.",
+      "Nothing is resized or reduced: the full-color picture is embedded, and transparency is kept in the embedded PNG.",
     ],
   },
   ico: {
@@ -271,7 +271,7 @@ for (const raw of ["hevc", "av1"]) {
 const JPEG_COMPRESS = {
   engines: ["jsquash-worker"],
   facts: [
-    "The JPEG is decoded and encoded again with MozJPEG (@jsquash/jpeg) at its defaults apart from quality: a progressive JPEG with optimised Huffman tables. The width and height don't change.",
+    "The JPEG is decoded and encoded again with MozJPEG (@jsquash/jpeg) at its defaults apart from quality: a progressive JPEG with optimized Huffman tables. The width and height don't change.",
     "The image goes through raw pixels, so EXIF (with GPS), the ICC profile and XMP are not in the result.",
     "EXIF orientation isn't applied on decode (decodeJpeg is called without preserveOrientation, which defaults to false) and the tag is dropped, so a photo that stands upright only through its orientation tag comes out turned (unless the original comes back because the result isn't smaller). Copy must not claim the orientation is kept.",
   ],
@@ -303,7 +303,7 @@ export const TOOL_FACTS = {
   },
   "compress-gif": {
     facts: [
-      "Every frame is kept and nothing is resized or reduced in colours: ImageMagick re-optimises how the frames are stored (coalesce, optimizePlus, optimizeTransparency).",
+      "Every frame is kept and nothing is resized or reduced in colors: ImageMagick re-optimizes how the frames are stored (coalesce, optimizePlus, optimizeTransparency).",
       "The result is used only if it decodes to exactly the same pixels, frame by frame, as the original (samePixels); otherwise, or if it isn't smaller, the visitor gets the original back (compressImageWithMagick in lib/convert/magickBrowser.ts).",
     ],
   },

@@ -36,7 +36,7 @@ test("a brief gives each Tool its keyword, engine facts, current copy and an ent
   assert.match(webp, /Keyword: \*\*webp to png\*\* \(exact match\), [\d,]+ searches a month worldwide/);
   assert.match(webp, /Engine: browser-raster; runs client-only\./);
   assert.match(webp, /An animated input gives its first frame only/);
-  assert.match(webp, /Not settled by the code[^]*What colour fills transparent areas in a JPG output/);
+  assert.match(webp, /Not settled by the code[^]*What color fills transparent areas in a JPG output/);
   assert.match(webp, /formats\.json, #357\) doesn't exist yet/);
   assert.match(webp, /The page's copy was written to the style guide\./);
   assert.match(webp, /- How-to heading: How to convert WebP to PNG\n/);

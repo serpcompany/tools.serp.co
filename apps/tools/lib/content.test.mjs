@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   applyBatch,
+  britishSpellings,
   checkContent,
   joinRegistry,
   loadContext,
@@ -388,6 +389,67 @@ test("content:apply reports a batch that breaks a rule", () => {
   assert.deepEqual(problems, ["mp4-to-mp3 [length] description is 10 characters, outside 110–160"]);
 });
 
+// A page written in depth: the catalog's first Tool with eight FAQs and a
+// guide with the five sections.
+const SECTIONS = [
+  "What is a WebP file?",
+  "Programs that open WebP files",
+  "WebP and PNG compared",
+  "Other ways to convert WebP to PNG",
+  "Problems with WebP files",
+];
+const WORDS = ["amber", "basalt", "cobalt", "dune", "ember", "fjord", "garnet", "harbor", "indigo", "jasper"];
+function deepCatalog() {
+  const tools = catalog();
+  const { content } = tools[0];
+  content.faqs = WORDS.slice(0, 8).map((word, index) => ({ question: `Question ${index}?`, answer: `The ${word} answer.` }));
+  content.guide = { title: "About WebP files", markdown: SECTIONS.map((heading) => `### ${heading}\n\nText with a color cache.`).join("\n\n") };
+  return tools;
+}
+
+test("a page with a guide has at least 8 FAQs and the guide's five sections in order, with no table", () => {
+  assert.deepEqual(checkContent(deepCatalog(), noKeywords), []);
+
+  const tools = deepCatalog();
+  tools[0].content.faqs.pop();
+  tools[0].content.guide.markdown = tools[0].content.guide.markdown
+    .replace("### WebP and PNG compared", "### Problems first")
+    .concat("\n\n| a | b |\n|---|---|\n| 1 | 2 |");
+  const messages = checkContent(tools, noKeywords).map((failure) => `[${failure.rule}] ${failure.message}`);
+  assert.equal(messages.length, 3);
+  assert.equal(messages[0], "[depth] content.faqs needs at least 8 questions on a page with a guide");
+  assert.match(messages[1], /^\[depth\] content\.guide needs these ### sections, in order: "What is a \{FROM\} file", .* it has "What is a WebP file", "Programs that open WebP files", "Problems first", /);
+  assert.equal(messages[2], "[depth] content.guide has a table; write a list instead");
+
+  const missing = deepCatalog();
+  missing[0].content.guide.markdown = "No sections at all.";
+  assert.match(checkContent(missing, noKeywords)[0].message, /it has none$/);
+});
+
+test("copy on a page with a guide is in US spelling", () => {
+  assert.deepEqual(
+    britishSpellings("Colour, greyscale, a licence, modelled, optimised, centre, behaviour; colors, gray, analysis and analyses").map(({ word }) => word),
+    ["Colour", "greyscale", "licence", "modelled", "centre", "behaviour", "optimised"],
+  );
+
+  const tools = deepCatalog();
+  tools[0].content.guide.markdown += "\n\nIn greyscale or colour.";
+  tools[0].content.pairNotes.points[0] = "A licence fee.";
+  assert.deepEqual(
+    checkContent(tools, noKeywords).map((failure) => `[${failure.rule}] ${failure.message}`),
+    [
+      '[spelling] content.pairNotes.points[0] spells "licence" the British way (US: license)',
+      '[spelling] content.guide.markdown spells "colour" the British way (US: color)',
+      '[spelling] content.guide.markdown spells "greyscale" the British way (US: gray)',
+    ],
+  );
+
+  // A page without a guide isn't held to it yet: older copy is rewritten batch by batch.
+  const older = catalog();
+  older[0].content.pairNotes.points[0] = "A licence fee.";
+  assert.deepEqual(checkContent(older, noKeywords), []);
+});
+
 test("a written How-to's title is a How-to heading, over at least three steps", () => {
   const keywords = new Map([["webp-to-png", "webp to png"]]);
   const tools = catalog();
@@ -407,7 +469,13 @@ test("a written How-to's title is a How-to heading, over at least three steps", 
 test("content:apply writes a batch's How-to and guide", () => {
   const batch = batchFor("mp4 audio");
   batch["mp4-to-mp3"].howTo = { title: "How to convert MP4 to MP3", steps: ["One.", "Two.", "Three."] };
-  batch["mp4-to-mp3"].guide = { title: "About MP4 and MP3", markdown: "### MP4\n\nA container." };
+  batch["mp4-to-mp3"].faqs = WORDS.slice(0, 8).map((word, index) => ({ question: `Question ${index}?`, answer: `The ${word} answer.` }));
+  batch["mp4-to-mp3"].guide = {
+    title: "About MP4 and MP3",
+    markdown: ["What is an MP4 file?", "Programs that open MP4 files", "MP4 and MP3 compared", "Other ways to convert MP4 to MP3", "Problems with MP4 files"]
+      .map((heading) => `### ${heading}\n\nA container.`)
+      .join("\n\n"),
+  };
   const { text, problems } = applyBatch(registryOf(catalog()), batch, noKeywords);
   assert.deepEqual(problems, []);
   const written = JSON.parse(splitRegistry(text)[1]).content;

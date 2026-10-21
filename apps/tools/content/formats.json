@@ -237,7 +237,7 @@
     "name": "ARW",
     "fullName": "Sony Alpha RAW",
     "kind": "raster-camera",
-    "summary": "The raw image format of Sony Alpha cameras. It stores unprocessed sensor data, so white balance, exposure and colour can be adjusted later without losing quality.",
+    "summary": "The raw image format of Sony Alpha cameras. It stores unprocessed sensor data, so white balance, exposure and color can be adjusted later without losing quality.",
     "usedFor": [
       "Professional and enthusiast photography",
       "Editing photos before conversion to JPEG"
@@ -439,7 +439,7 @@
     "properties": [
       "lossy and lossless compression",
       "alpha transparency",
-      "HDR and wide colour gamut",
+      "HDR and wide color gamut",
       "10-bit and 12-bit depth"
     ],
     "openWith": [
@@ -739,7 +739,7 @@
     "properties": [
       "image plus patient and study metadata",
       "many compression options",
-      "16-bit greyscale data",
+      "16-bit grayscale data",
       "maintained by NEMA"
     ],
     "openWith": [
@@ -884,14 +884,14 @@
     "name": "DST",
     "fullName": "Tajima embroidery",
     "kind": "other",
-    "summary": "A machine embroidery stitch file format developed by Tajima. It stores needle positions and commands such as jumps, colour stops and trims rather than a picture.",
+    "summary": "A machine embroidery stitch file format developed by Tajima. It stores needle positions and commands such as jumps, color stops and trims rather than a picture.",
     "usedFor": [
       "Industrial embroidery machines",
       "Digitized embroidery designs"
     ],
     "properties": [
       "stitch coordinates",
-      "no colour information",
+      "no color information",
       "machine-readable stitch commands",
       "widely supported by embroidery software"
     ],
@@ -1126,14 +1126,14 @@
     "name": "GIF",
     "fullName": "Graphics Interchange Format",
     "kind": "image",
-    "summary": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colours per frame, and supports simple animation.",
+    "summary": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
     "usedFor": [
       "Short looping animations",
       "Simple graphics and icons",
       "Reaction images and stickers"
     ],
     "properties": [
-      "256-colour palette per frame",
+      "256-color palette per frame",
       "lossless LZW compression",
       "animation",
       "1-bit transparency"
@@ -1202,7 +1202,7 @@
       "lossy HEVC compression",
       "smaller files than JPEG at similar quality",
       "supports depth maps and alpha",
-      "10-bit colour"
+      "10-bit color"
     ],
     "openWith": [
       "Preview on macOS",
@@ -1300,7 +1300,7 @@
     "name": "ICO",
     "fullName": "Windows icon",
     "kind": "image",
-    "summary": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and colour depths in a single file. Browsers also use it for favicons.",
+    "summary": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and color depths in a single file. Browsers also use it for favicons.",
     "usedFor": [
       "Windows application icons",
       "Website favicons"
@@ -1362,7 +1362,7 @@
     "name": "JFIF",
     "fullName": "JPEG File Interchange Format",
     "kind": "image",
-    "summary": "A container convention for JPEG-compressed images that specifies colour space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data.",
+    "summary": "A container convention for JPEG-compressed images that specifies color space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data.",
     "usedFor": [
       "Images saved from some browsers and Windows tools",
       "Interchange of JPEG photographs"
@@ -2334,7 +2334,7 @@
     ],
     "properties": [
       "several resolutions in one file",
-      "YCC colour encoding",
+      "YCC color encoding",
       "proprietary Kodak format",
       "legacy format"
     ],
@@ -2391,14 +2391,14 @@
     "name": "PES",
     "fullName": "Brother embroidery",
     "kind": "other",
-    "summary": "A machine embroidery file format created by Brother and used by Brother and Babylock machines. It stores stitch data, thread colours and a design preview.",
+    "summary": "A machine embroidery file format created by Brother and used by Brother and Babylock machines. It stores stitch data, thread colors and a design preview.",
     "usedFor": [
       "Home embroidery machines",
       "Digitized embroidery designs"
     ],
     "properties": [
       "stitch coordinates",
-      "thread colour palette",
+      "thread color palette",
       "proprietary Brother format"
     ],
     "openWith": [
@@ -2412,13 +2412,13 @@
     "name": "PGM",
     "fullName": "Portable Graymap",
     "kind": "image",
-    "summary": "The greyscale member of the Netpbm family of formats. Each pixel is a grey value, stored as plain text or in a binary form.",
+    "summary": "The grayscale member of the Netpbm family of formats. Each pixel is a gray value, stored as plain text or in a binary form.",
     "usedFor": [
-      "Greyscale image interchange",
+      "Grayscale image interchange",
       "Image-processing experiments"
     ],
     "properties": [
-      "greyscale only",
+      "grayscale only",
       "8-bit or 16-bit samples",
       "plain text or binary encoding",
       "part of Netpbm"
@@ -2479,9 +2479,9 @@
     "name": "PPM",
     "fullName": "Portable Pixmap",
     "kind": "image",
-    "summary": "The colour member of the Netpbm family of formats. Each pixel stores red, green and blue values, in a plain text or binary encoding.",
+    "summary": "The color member of the Netpbm family of formats. Each pixel stores red, green and blue values, in a plain text or binary encoding.",
     "usedFor": [
-      "Simple colour image interchange",
+      "Simple color image interchange",
       "Image-processing experiments"
     ],
     "properties": [
@@ -2566,7 +2566,7 @@
     "name": "PSD",
     "fullName": "Adobe Photoshop Document",
     "kind": "image",
-    "summary": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and colour information so a design can be edited later.",
+    "summary": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
     "usedFor": [
       "Layered image editing",
       "Design mockups",
@@ -3394,14 +3394,14 @@
     "name": "XPM",
     "fullName": "X PixMap",
     "kind": "image",
-    "summary": "A colour image format of the X Window System. Like XBM, it is stored as C source code, with a colour table and one character per pixel.",
+    "summary": "A color image format of the X Window System. Like XBM, it is stored as C source code, with a color table and one character per pixel.",
     "usedFor": [
       "Icons in X11 programs",
-      "Small colour graphics"
+      "Small color graphics"
     ],
     "properties": [
       "stored as C source text",
-      "colour table",
+      "color table",
       "palette-based",
       "legacy format"
     ],

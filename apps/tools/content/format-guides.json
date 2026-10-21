@@ -64,7 +64,7 @@
           "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000153.shtml"
         },
         {
-          "fact": "PNG supports indexed, greyscale and truecolor images with 1 to 16 bits per sample, plus an optional alpha channel for per-pixel transparency.",
+          "fact": "PNG supports indexed, grayscale and truecolor images with 1 to 16 bits per sample, plus an optional alpha channel for per-pixel transparency.",
           "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000153.shtml"
         },
         {
@@ -108,7 +108,7 @@
           "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000017.shtml"
         },
         {
-          "fact": "JPEG stores 8 bits per colour channel and has no alpha channel, so it cannot hold transparency.",
+          "fact": "JPEG stores 8 bits per color channel and has no alpha channel, so it cannot hold transparency.",
           "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
         },
         {
@@ -180,6 +180,14 @@
           "source": "https://developers.google.com/speed/webp/faq"
         },
         {
+          "fact": "Google announced WebP on 30 September 2010. Its lossy compression is based on VP8, the video codec Google released as open source in May 2010, applying VP8's intra-frame coding to still images.",
+          "source": "https://blog.chromium.org/2010/09/webp-new-image-format-for-web.html"
+        },
+        {
+          "fact": "VP8 came from On2 Technologies: RFC 6386, the VP8 specification, is written around On2's reference VP8 decoder.",
+          "source": "https://www.rfc-editor.org/rfc/rfc6386.html#section-6"
+        },
+        {
           "fact": "WebP was documented in RFC 9649 in November 2024, which also registers the image/webp media type.",
           "source": "https://www.rfc-editor.org/rfc/rfc9649.html"
         },
@@ -188,7 +196,7 @@
           "source": "https://www.rfc-editor.org/rfc/rfc9649.html"
         },
         {
-          "fact": "Lossy WebP uses VP8 intra-frame (key frame) coding; lossless WebP uses a separate method built on LZ77, prefix codes and a colour cache.",
+          "fact": "Lossy WebP uses VP8 intra-frame (key frame) coding; lossless WebP uses a separate method built on LZ77, prefix codes and a color cache.",
           "source": "https://www.rfc-editor.org/rfc/rfc9649.html"
         },
         {
@@ -204,7 +212,7 @@
           "source": "https://developers.google.com/speed/webp/faq"
         },
         {
-          "fact": "WebP can hold an ICC colour profile and Exif and XMP metadata.",
+          "fact": "WebP can hold an ICC color profile and Exif and XMP metadata.",
           "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000577.shtml"
         },
         {
@@ -222,6 +230,16 @@
         {
           "fact": "Photoshop opens and saves WebP natively from version 23.2; GIMP has supported it since 2.10.",
           "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/image-file-formats-supported-in-photoshop.html"
+        },
+        {
+          "fact": "WhatsApp's animated stickers are WebP files: on iOS stickers are PNG or WebP, with animated stickers in WebP only, and on Android every sticker is WebP.",
+          "source": "https://github.com/WhatsApp/stickers/blob/main/iOS/README.md",
+          "supportSource": "https://github.com/WhatsApp/stickers/blob/main/Android/README.md"
+        },
+        {
+          "fact": "XnView MP reads and writes WebP, and is free for private or educational use (a company needs a license).",
+          "source": "https://www.xnview.com/en/image_formats/",
+          "supportSource": "https://www.xnview.com/en/xnviewmp/"
         }
       ]
     },
@@ -268,6 +286,10 @@
           "source": "https://apps.microsoft.com/detail/9pmmsr1cgpwg"
         },
         {
+          "fact": "In the Microsoft Store the HEIF Image Extensions are free and the HEVC Video Extensions cost $0.99; Photos needs both to open HEIC.",
+          "source": "https://support.microsoft.com/en-us/windows/apps/photos/photos-app-video-editor-error-can-t-view-this-file-type"
+        },
+        {
           "fact": "Photoshop opens HEIC on macOS 10.13 or later, and on Windows only once both Microsoft codecs are installed.",
           "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/export-files-to-different-formats/image-file-formats-supported-in-photoshop.html"
         },
@@ -292,11 +314,15 @@
           "source": "https://aomediacodec.github.io/av1-avif/"
         },
         {
-          "fact": "AVIF supports lossy and lossless compression, transparency, image sequences and up to 12 bits per channel for HDR and wide colour gamut.",
+          "fact": "An image item in AVIF's Baseline profile is at most 8,192 pixels wide, 4,352 high and 8,912,896 pixels in all; a larger picture is stored as a grid of such images.",
+          "source": "https://aomediacodec.github.io/av1-avif/#baseline-profile"
+        },
+        {
+          "fact": "AVIF supports lossy and lossless compression, transparency, image sequences and up to 12 bits per channel for HDR and wide color gamut.",
           "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000540.shtml"
         },
         {
-          "fact": "AVIF can carry Exif, XMP and an ICC colour profile.",
+          "fact": "AVIF can carry Exif, XMP and an ICC color profile.",
           "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000540.shtml"
         },
         {
@@ -432,11 +458,11 @@
           "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
         },
         {
-          "fact": "Each GIF image uses a palette of at most 256 colours.",
+          "fact": "Each GIF image uses a palette of at most 256 colors.",
           "source": "https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
         },
         {
-          "fact": "Transparency in a GIF works by marking one palette colour as fully transparent; there is no partial transparency.",
+          "fact": "Transparency in a GIF works by marking one palette color as fully transparent; there is no partial transparency.",
           "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
         },
         {
@@ -444,7 +470,7 @@
           "source": "https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
         },
         {
-          "fact": "Unisys began charging licence fees for LZW in 1994; the US patent ran out in 2003 and the European and Japanese ones in 2004.",
+          "fact": "Unisys began charging license fees for LZW in 1994; the US patent ran out in 2003 and the European and Japanese ones in 2004.",
           "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000133.shtml"
         },
         {
@@ -1097,9 +1123,10 @@
       "methods": [
         {
           "app": "Inkscape (Windows, Mac, Linux)",
-          "steps": "Open the SVG, choose File > Export PNG Image (Shift+Ctrl+E), pick Page, Drawing or Selection as the area, set the size, then export.",
-          "limits": "The background is transparent unless you set its opacity in Document Properties.",
-          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html"
+          "steps": "Open the SVG and choose File > Export (Shift+Ctrl+E). On the Single File tab, pick Document, Page, Selection or Custom as the area, set the image size or DPI, choose PNG from the format menu, then click Export.",
+          "limits": "This is the Export dialog of Inkscape 1.2 and later; older versions have File > Export PNG Image instead. Its Background Color option sets what fills transparent areas.",
+          "source": "https://gitlab.com/inkscape/inkscape/-/blob/1.4.x/share/ui/dialog-export.glade",
+          "supportSource": "https://gitlab.com/inkscape/inkscape/-/blob/1.4.x/share/keys/inkscape.xml"
         },
         {
           "app": "Adobe Illustrator (Windows, Mac)",

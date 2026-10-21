@@ -79,7 +79,7 @@ test("the PNG compressor states its lossy main-thread fallback", () => {
   const colours = Math.max(16, Math.round(COMPRESS_QUALITY * 256));
   const { text: png } = factsOf("png-to-png");
   assert.match(png, /oxipng at level 1, which is lossless/);
-  assert.match(png, new RegExp(`falls back to the main thread .*compressPngOnMainThread.*at most ${colours} colours, which is lossy, and keeps only the first frame`));
+  assert.match(png, new RegExp(`falls back to the main thread .*compressPngOnMainThread.*at most ${colours} colors, which is lossy, and keeps only the first frame`));
 });
 
 test("the image compressor facts are the quality mappings' numbers", () => {
@@ -192,7 +192,7 @@ test("SVG input facts give the browser's size and no background, and leave anima
 });
 
 test("alpha and layer questions stay unsettled", () => {
-  assert.match(factsOf("png-to-jpg").unsettledText, /colour fills transparent areas in a JPG/);
+  assert.match(factsOf("png-to-jpg").unsettledText, /color fills transparent areas in a JPG/);
   assert.match(factsOf("heic-to-pdf").unsettledText, /alpha plane/);
   assert.match(factsOf("psd-to-pdf").unsettledText, /Which page or layer/);
 });
@@ -251,7 +251,7 @@ test("the JPEG compressor facts are @jsquash/jpeg's defaults and the worker's ca
     assert.match(facts, /with MozJPEG/);
     assert.equal(defaultOptions.progressive, true);
     assert.equal(defaultOptions.optimize_coding, true);
-    assert.match(facts, /a progressive JPEG with optimised Huffman tables/);
+    assert.match(facts, /a progressive JPEG with optimized Huffman tables/);
     assert.equal(defaultDecodeOptions.preserveOrientation, false);
     assert.match(facts, /EXIF orientation isn't applied on decode/);
   }
