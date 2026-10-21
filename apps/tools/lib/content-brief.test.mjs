@@ -140,7 +140,7 @@ test("a Tool in the topics file gets a brief in depth: competing pages, guide fa
   const text = buildBrief({ name: "test", ids: ["webp-to-png", "compress-m4a"], tools, statusRows, formats: null, styleGuide, examples, readDoc, depth });
   assert.match(text, /## Writing in depth\n/);
   const webp = section(text, "webp-to-png");
-  assert.match(webp, /median of 1,200 words \(1 measured\)/);
+  assert.match(webp, /median of 1,200 words in their static HTML \(1 measured\)/);
   assert.match(webp, /\*\*WebP vs PNG\*\* \(theirs 50, ours 0\)/);
   assert.match(webp, /Google announced WebP in 2010\. \(https:\/\/developers\.google\.com\/speed\/webp\)/);
   assert.match(webp, /Preview \(macOS\): File > Export\./);

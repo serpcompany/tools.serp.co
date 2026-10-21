@@ -65,6 +65,10 @@ export const TOP_TERMS = 8;
 // A page written in depth (a Tool in benchmarks/content-topics.json): at least
 // this many FAQs, so the page covers what the ranking pages answer.
 export const DEPTH_FAQS_MIN = 8;
+// The page length to aim at, at least: Ahrefs counted the rendered pages
+// ranking for "png to jpg" (Adobe Express, Canva) at a median of about 1,240
+// words, where their static HTML gives far fewer.
+export const DEPTH_WORDS_MIN = 1200;
 export const TOP_QUESTIONS = 5;
 
 const byVolume = (items) => [...(items ?? [])].sort((a, b) => (b.volume ?? 0) - (a.volume ?? 0));
@@ -158,7 +162,7 @@ function formatSection(tool, formats) {
 function competitionSection(topics) {
   const counted = (topics.competitors ?? []).filter((page) => Number.isFinite(page.words));
   const lines = [
-    `Ahrefs Content Helper, US, ${topics.serpDate ?? "undated"}. The ranking pages run to a median of ${number(topics.targetWords)} words (${counted.length} measured); aim the whole page at about that, with every sentence earning its place.`,
+    `Ahrefs Content Helper, US, ${topics.serpDate ?? "undated"}. The ranking pages run to a median of ${number(topics.targetWords)} words in their static HTML (${counted.length} measured), which undercounts pages built in JavaScript. Aim the whole page at about ${number(Math.max(topics.targetWords ?? 0, DEPTH_WORDS_MIN))} words, with every sentence earning its place.`,
     "",
     "Topics they cover, with how well each covers it (0–100) and how well this page does now:",
     "",
