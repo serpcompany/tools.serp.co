@@ -1,6 +1,6 @@
 {
   "status": {
-    "complete": false,
+    "complete": true,
     "formatsDone": [
       "png",
       "jpg",
@@ -31,9 +31,14 @@
       "compress-jpg",
       "compress-jpeg",
       "mov-to-mp4",
-      "m4a-to-mp3"
+      "m4a-to-mp3",
+      "webp-to-jpg",
+      "avif-to-jpg",
+      "avif-to-png",
+      "svg-to-png",
+      "png-to-svg"
     ],
-    "remaining": "Tools with fewer than 3 verified methods: webp-to-jpg, avif-to-jpg, avif-to-png, svg-to-png, png-to-svg. Candidates not yet verified: Illustrator Image Trace (png-to-svg), Illustrator or Photoshop opening SVG (svg-to-png), GIMP opening PDF and SVG, iTunes for Windows conversion. filetypes.io could not be reached (DNS fails), so no facts came from it. 'supportSource' on a method is an added optional field: the page that shows the app reads the input format when 'source' gives only the menu path."
+    "remaining": "Nothing: each of the 20 pilot Tools has at least 3 verified methods. Left out because no primary source confirms them: Preview (Mac) opening WebP or AVIF (Apple's page on converting image files with Preview names only the formats it exports), and Photoshop opening SVG or AVIF (Adobe's Photoshop format list names neither). filetypes.io could not be reached (DNS fails), so no facts came from it. 'supportSource' on a method is an added optional field: the page that shows the app reads the input format when 'source' gives only the menu path."
   },
   "formats": {
     "png": {
@@ -702,6 +707,13 @@
           "limits": "GIMP 2.10 or later opens WebP.",
           "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
           "supportSource": "https://www.gimp.org/release-notes/gimp-2.10.html"
+        },
+        {
+          "app": "ImageMagick (command line, Windows, Mac, Linux)",
+          "steps": "Run magick input.webp output.jpg.",
+          "limits": "Reading WebP needs an ImageMagick build that includes the WebP delegate library.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
         }
       ]
     },
@@ -859,6 +871,13 @@
           "steps": "Open the file, tap the actions button next to its name, tap Export, then choose PNG.",
           "limits": "You set the image resolution when exporting a PDF to an image.",
           "source": "https://support.apple.com/guide/iphone/export-or-compress-pdfs-and-images-iph61c20afe1/ios"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Open the PDF, choose the pages and resolution in the PDF Import dialog, then choose File > Export As, give the file a .png name and click Export.",
+          "limits": "Set Open pages as to Images to get each page as its own image; transparent areas stay transparent unless Fill transparent areas with white is checked.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/import-file-formats.html"
         }
       ]
     },
@@ -870,6 +889,18 @@
           "limits": "GIMP 2.10.22 or later opens AVIF.",
           "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
           "supportSource": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        },
+        {
+          "app": "ImageMagick (command line, Windows, Mac, Linux)",
+          "steps": "Run magick input.avif output.jpg.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "avifdec from libavif (command line)",
+          "steps": "Run avifdec input.avif output.jpg; -q sets the JPEG quality, 90 by default.",
+          "limits": "Only the first frame of an image sequence is decoded unless --index names another frame, or all of them.",
+          "source": "https://github.com/AOMediaCodec/libavif/blob/main/doc/avifdec.1.md"
         }
       ]
     },
@@ -881,6 +912,18 @@
           "limits": "GIMP 2.10.22 or later opens AVIF.",
           "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
           "supportSource": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        },
+        {
+          "app": "ImageMagick (command line, Windows, Mac, Linux)",
+          "steps": "Run magick input.avif output.png.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "avifdec from libavif (command line)",
+          "steps": "Run avifdec input.avif output.png; -d sets 8 or 16 bits per channel.",
+          "limits": "Only the first frame of an image sequence is decoded unless --index names another frame, or all of them.",
+          "source": "https://github.com/AOMediaCodec/libavif/blob/main/doc/avifdec.1.md"
         }
       ]
     },
@@ -1029,6 +1072,13 @@
           "source": "https://support.apple.com/en-us/108961"
         },
         {
+          "app": "iTunes (Windows)",
+          "steps": "Choose Edit > Preferences, click General, then Import Settings, and set Import Using to MP3 Encoder; then select the songs and choose File > Convert > Create MP3 Version.",
+          "limits": "Converting between compressed formats such as AAC and MP3 can lower sound quality, and iTunes Store purchases convert only if they are iTunes Plus songs.",
+          "source": "https://support.apple.com/guide/itunes/convert-music-file-formats-itns2972/windows",
+          "supportSource": "https://support.apple.com/guide/itunes/choose-import-settings-itns2965/windows"
+        },
+        {
           "app": "VLC (Windows, Mac, Linux)",
           "steps": "Select Media > Convert/Save, click Add and pick the file, then choose an MP3 audio profile from the Profile menu, set the Destination file and click Start.",
           "limits": "VLC's guide does not list its profiles by name.",
@@ -1050,6 +1100,27 @@
           "steps": "Open the SVG, choose File > Export PNG Image (Shift+Ctrl+E), pick Page, Drawing or Selection as the area, set the size, then export.",
           "limits": "The background is transparent unless you set its opacity in Document Properties.",
           "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html"
+        },
+        {
+          "app": "Adobe Illustrator (Windows, Mac)",
+          "steps": "Open the SVG, choose File > Export > Export As, pick PNG as the format and click Export, then set the resolution and background color.",
+          "limits": "The Background Color option keeps transparency or fills it with white or black.",
+          "source": "https://helpx.adobe.com/illustrator/using/exporting-artwork.html",
+          "supportSource": "https://helpx.adobe.com/illustrator/kb/supported-file-formats-illustrator.html"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Open the SVG, choose File > Export As, give the file a .png name, then click Export.",
+          "limits": "GIMP is a raster editor, so it opens the SVG as a pixel image.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-using-paths-and-svg.html"
+        },
+        {
+          "app": "ImageMagick (command line, Windows, Mac, Linux)",
+          "steps": "Run magick input.svg output.png.",
+          "limits": "ImageMagick draws SVG with Inkscape, RSVG or its own MSVG renderer.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
         }
       ]
     },
@@ -1060,6 +1131,19 @@
           "steps": "Choose File > Import to bring in the PNG, select it, then choose Path > Trace Bitmap (Shift+Alt+B) and pick a mode such as Brightness cutoff.",
           "limits": "Tracing redraws the image as shapes rather than copying it, and works best on simple, high-contrast artwork.",
           "source": "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html"
+        },
+        {
+          "app": "Adobe Illustrator (Windows, Mac)",
+          "steps": "Choose File > Place to add the PNG, open Window > Image Trace and pick a preset, then save the result as SVG.",
+          "limits": "The trace replaces the placed image, and tracing time depends on the image's resolution.",
+          "source": "https://helpx.adobe.com/illustrator/desktop/manage-objects/traces-mockups-symbols/trace-images-to-convert-raster-into-vector-artwork.html",
+          "supportSource": "https://helpx.adobe.com/illustrator/kb/supported-file-formats-illustrator.html"
+        },
+        {
+          "app": "Potrace (command line, Windows, Mac, Linux)",
+          "steps": "Save a BMP copy of the PNG, then run potrace -s input.bmp -o output.svg.",
+          "limits": "Potrace reads PBM, PGM, PPM and BMP but not PNG, and traces in black and white at a cutoff set with -k (0.5 by default).",
+          "source": "https://potrace.sourceforge.net/"
         }
       ]
     }
