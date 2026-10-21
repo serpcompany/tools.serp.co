@@ -120,7 +120,7 @@ test("a brief names several outputs' files only for Tools that can make several"
   assert.match(section(text, "pdf-to-png"), /"<name>_page1"/);
 });
 
-test("a Tool in the topics file gets a brief in depth: competing pages, guide facts, How-to and guide", () => {
+test("a Tool in the topics file gets a brief in depth: competing pages, guide facts and a guide, with no written How-to", () => {
   const depth = {
     topics: {
       tools: {
@@ -144,8 +144,9 @@ test("a Tool in the topics file gets a brief in depth: competing pages, guide fa
   assert.match(webp, /\*\*WebP vs PNG\*\* \(theirs 50, ours 0\)/);
   assert.match(webp, /Google announced WebP in 2010\. \(https:\/\/developers\.google\.com\/speed\/webp\)/);
   assert.match(webp, /Preview \(macOS\): File > Export\./);
-  assert.match(webp, /"howTo": \{/);
+  assert.doesNotMatch(webp, /"howTo"/, "a page in depth keeps the generated How-to");
   assert.match(webp, /"guide": \{/);
+  assert.match(text, /programs that open it, grouped by Windows, Mac, Linux, web and mobile/);
   assert.equal(webp.match(/"question": ""/g).length, 8);
   const m4a = section(text, "compress-m4a");
   assert.doesNotMatch(m4a, /### Competing pages|"guide"/, "a Tool without topics gets the usual brief");

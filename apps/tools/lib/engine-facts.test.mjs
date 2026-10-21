@@ -20,7 +20,8 @@ import {
   mapQualityToVideoCrf,
 } from "./compression-utils.ts";
 import { MAX_VIDEO_FPS, MAX_VIDEO_SIZE, VIDEO_FILTER, buildCompressionCommand, buildConvertCommand } from "./convert/ffmpeg-args.ts";
-import { IMAGE_PDF_MAX_BYTES, IMAGE_PDF_MAX_IMAGES, IMAGE_PDF_MAX_PIXELS } from "./convert/image-pdf-inputs.ts";
+import { MAX_PAGE_SIDE, PHOTO_QUALITY } from "./convert/image-pdf.ts";
+import { IMAGE_PDF_INPUTS, IMAGE_PDF_MAX_BYTES, IMAGE_PDF_MAX_IMAGES, IMAGE_PDF_MAX_PIXELS } from "./convert/image-pdf-inputs.ts";
 import { MAX_RENDER_PIXELS } from "./convert/pdf.ts";
 import { SERVER_ACTION_RATE_LIMIT_WINDOW_MS } from "./server-action-contract.js";
 
@@ -102,6 +103,11 @@ test("the PDF and image-to-PDF limits are their constants", () => {
       `Limits: ${IMAGE_PDF_MAX_IMAGES} images, ${IMAGE_PDF_MAX_BYTES / 1024 / 1024} MB in all, ${IMAGE_PDF_MAX_PIXELS / 1_000_000} megapixels per image`,
     ),
   );
+  assert.match(imagePdf, new RegExp(`a side over ${MAX_PAGE_SIDE.toLocaleString("en-US")} points \\(${MAX_PAGE_SIDE / 72} inches`));
+  assert.match(imagePdf, new RegExp(`as a JPEG at quality ${Math.round(PHOTO_QUALITY * 100)} `));
+  for (const format of ["jpg", "png", "gif", "webp", "bmp", "avif", "ico", "svg", "heic", "heif", "tiff", "psd", "dng"]) {
+    assert.ok(IMAGE_PDF_INPUTS.includes(format), `the facts say Image to PDF reads ${format}`);
+  }
 });
 
 test("the server's wait between conversions is the server-action cooldown", () => {

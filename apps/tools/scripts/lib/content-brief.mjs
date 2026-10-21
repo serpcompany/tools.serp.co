@@ -19,7 +19,6 @@ import {
   DESCRIPTION_MIN,
   FAQS_MIN,
   HOW_TO_HEADING_MAX,
-  HOW_TO_STEPS_MIN,
   PAIR_NOTES_MIN,
   isConverter,
   pageFields,
@@ -76,7 +75,7 @@ const volumeLine = (item) => `- ${item.keyword}: ${number(item.volume)} a month`
 
 // The Tool's keyword variants and questions from benchmarks/keyword-ideas.json
 // (the file may be missing, or lack the Tool).
-function variantSection(tool, idea, ideas, deep = false) {
+function variantSection(tool, idea, ideas) {
   const terms = byVolume(idea?.terms).slice(0, TOP_TERMS);
   const questions = byVolume(idea?.questions).slice(0, TOP_QUESTIONS);
   if (!terms.length && !questions.length) {
@@ -93,9 +92,7 @@ function variantSection(tool, idea, ideas, deep = false) {
     "",
     list([
       "The title keeps the head keyword and works in the biggest matching term where it fits.",
-      deep
-        ? `Write \`howTo\` (see "Writing in depth") and leave \`seo.howToHeading\` out: the How-to's title is the heading${howTo ? `, from the top "how to" question, "${howTo.keyword}"` : ""}.`
-        : !onConverterPage(tool) || tool.content?.howTo
+      !onConverterPage(tool) || tool.content?.howTo
         ? "This page has no generated How-to heading to replace: leave `seo.howToHeading` out."
         : howTo
         ? `\`seo.howToHeading\`: use the top "how to" question, "${howTo.keyword}", worded as a heading.`
@@ -239,9 +236,6 @@ function skeleton(tool, deep = false) {
     entry.aboutSection = { title: "", fromFormat: format, toFormat: format };
   }
   if (fields.includes("pairNotes")) entry.pairNotes = { title: "", points: Array.from({ length: PAIR_NOTES_MIN }, () => "") };
-  if (deep && fields.includes("howTo")) {
-    entry.howTo = { title: "", intro: "", steps: Array.from({ length: HOW_TO_STEPS_MIN }, () => "") };
-  }
   if (deep && fields.includes("guide")) entry.guide = { title: "", markdown: "" };
   return { [tool.id]: entry };
 }
@@ -264,7 +258,7 @@ function toolSection(tool, status, formats, ideas, depth) {
     "",
     "### Variants and questions",
     "",
-    variantSection(tool, idea, ideas, deep),
+    variantSection(tool, idea, ideas),
     "",
     ...(deep ? ["### Competing pages", "", competitionSection(topics), ""] : []),
     ...(deep && depth.guides ? ["### Guide facts", "", guideFactsSection(tool, depth.guides, formats), ""] : []),
@@ -310,13 +304,13 @@ function depthSection(selected, depth) {
   return [
     "## Writing in depth",
     "",
-    "Tools with a \"Competing pages\" section get a longer page, to match what ranks for their keyword:",
+    "Tools with a \"Competing pages\" section get a longer page, modelled on a file-extension reference page (see \"Writing in depth\" in the style guide). The competing pages' topics show what visitors ask; they aren't an outline. No `howTo`: the generated How-to stays.",
     "",
     list([
-      `\`faqs\`: at least ${DEPTH_FAQS_MIN}, answering the Tool's listed questions and the competing pages' topics the facts support.`,
-      `\`howTo\`: replaces the generated How-to. Its \`title\` is the How-to heading, held to the same rules (the keyword's words, at most ${HOW_TO_HEADING_MAX} characters); \`seo.howToHeading\` is then left out. At least ${HOW_TO_STEPS_MIN} numbered steps for this page, from the engine facts: choosing files, what the page does, saving the result.`,
-      "`guide`: a Markdown article after the pair notes, with `###` subheadings and no tables: the formats' background, how they differ for this pair, and other ways to convert (the apps in \"Guide facts\", each with its steps and limits). Every sentence comes from \"Guide facts\", the format reference or the engine facts, in your own words. No source URLs, years beyond those in the facts, or links off the site.",
-      "Nothing repeats across sections: the guide says what the FAQs don't.",
+      `\`faqs\`: at least ${DEPTH_FAQS_MIN}, answering the Tool's listed questions and the visitor questions the facts support.`,
+      "`guide`: a Markdown article after the pair notes, with paragraphs, bulleted lists, bold labels and these `###` sections, and no tables: what the source format is (maker, history, where people meet it); programs that open it, grouped by Windows, Mac, Linux, web and mobile; the two formats compared (extensions, media types, variants, compression, transparency, colour depth, metadata); other ways to convert (the methods in \"Guide facts\", with their menu paths and limits); problems with the source format and their fixes.",
+      "Facts come from \"Guide facts\", the format reference, the engine facts and the owner's wiki (wiki.serp.co/file-types/<ext>/). The wiki copies FileInfo.com word for word: take its facts, never its wording or its lists' order and notes, and leave out a claim that is wrong or that you can't confirm. No source URLs or links off the site.",
+      "Aim the guide, FAQs, format cards and pair notes at 1,200 to 1,500 words together; stop short and say so rather than pad. Nothing repeats across sections, or across Tools' pages.",
     ]),
     "",
   ];
