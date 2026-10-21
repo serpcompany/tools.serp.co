@@ -29,6 +29,7 @@ type ToolPageProps = {
   aboutSection?: AboutFormatsSectionData;
   howTo?: HowToSectionData;
   infoArticle?: InfoArticleSectionData;
+  guide?: InfoArticleSectionData;
   relatedTools?: RelatedTool[];
 };
 
@@ -44,6 +45,7 @@ export default function ToolPageTemplate({
   aboutSection,
   howTo,
   infoArticle,
+  guide,
   relatedTools,
 }: ToolPageProps) {
   const videoEmbedId = getEnabledVideoEmbedId({ tool, videoSection });
@@ -143,6 +145,8 @@ export default function ToolPageTemplate({
           markdown={infoArticle.markdown}
         />
       )}
+
+      {guide && <InfoArticleSection title={guide.title} markdown={guide.markdown} />}
 
       {/* FAQs Section */}
       {faqs && <FAQSection faqs={faqs} />}

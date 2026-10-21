@@ -51,10 +51,12 @@ export const FAQS_MIN = 3;
 // people search one.
 export const HOW_TO_HEADING_MAX = 70;
 export const PAIR_NOTES_MIN = 2;
+// A written How-to (content.howTo) lists the steps on this site.
+export const HOW_TO_STEPS_MIN = 3;
 
 // The fields a batch may set on a Tool, and the order content keys are
 // written in. Keys this list doesn't name keep their order after these.
-export const BATCH_FIELDS = ["seo", "tool", "faqs", "aboutSection", "pairNotes"];
+export const BATCH_FIELDS = ["seo", "tool", "faqs", "aboutSection", "pairNotes", "howTo", "guide"];
 const CONTENT_KEY_ORDER = [
   "tool",
   "seo",
@@ -62,6 +64,7 @@ const CONTENT_KEY_ORDER = [
   "faqs",
   "aboutSection",
   "pairNotes",
+  "guide",
   "howTo",
   "infoArticle",
   "relatedTools",
@@ -204,6 +207,10 @@ function checkHowToHeading(tool, content, keyword, fail) {
   } else if (content.howTo) {
     fail("unshown", "content.seo.howToHeading is set, but content.howTo replaces the How-to section");
   }
+  headingRules(tool, heading, keyword, fail);
+}
+
+function headingRules(tool, heading, keyword, fail) {
   if (heading.length > HOW_TO_HEADING_MAX) {
     fail("length", `How-to heading is ${heading.length} characters, over ${HOW_TO_HEADING_MAX}`);
   }
@@ -211,6 +218,16 @@ function checkHowToHeading(tool, content, keyword, fail) {
   if (!hasKeywordWords(heading, words)) {
     fail("keyword", `How-to heading "${heading}" lacks a word of ${keyword ? `the keyword "${keyword}"` : `the formats "${words}"`}`);
   }
+}
+
+// A written How-to (content.howTo), on a Tool written to the style guide:
+// its title is the How-to heading, held to the same rules, over at least
+// HOW_TO_STEPS_MIN steps.
+function checkWrittenHowTo(tool, content, keyword, fail) {
+  const { title, steps } = content.howTo;
+  if (!title?.trim()) fail("required", "content.howTo.title is empty");
+  else headingRules(tool, title, keyword, fail);
+  if ((steps?.length ?? 0) < HOW_TO_STEPS_MIN) fail("required", `content.howTo needs at least ${HOW_TO_STEPS_MIN} steps`);
 }
 
 // A converter page's template FAQs vary by operation and by where the file
@@ -274,6 +291,7 @@ export function checkContent(tools, { keywords }) {
     }
     if (content.seo) requiredFields(tool, content, fail);
     if (content.seo?.howToHeading !== undefined) checkHowToHeading(tool, content, keyword, fail);
+    else if (content.seo && content.howTo) checkWrittenHowTo(tool, content, keyword, fail);
   }
 
   // The template FAQs a page without curated FAQs shows, as another Tool's

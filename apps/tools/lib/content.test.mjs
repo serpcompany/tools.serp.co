@@ -364,7 +364,7 @@ test("content:apply refuses unknown, retired and non-converter Tools, and fields
       "old-to-new": entry,
       "x-dl": entry,
       "csv-to-json": { seo: entry.seo, faqs: entry.faqs },
-      "mp4-to-mp3": { ...entry, tool: { title: "MP4 to MP3", accept: ".mp4" }, howTo: {} },
+      "mp4-to-mp3": { ...entry, tool: { title: "MP4 to MP3", accept: ".mp4" }, videoSection: {} },
     },
     noKeywords,
   );
@@ -375,7 +375,7 @@ test("content:apply refuses unknown, retired and non-converter Tools, and fields
     "old-to-new: the Tool is retired",
     "x-dl: not a converter or compressor (operation download)",
     "csv-to-json.faqs: this Tool's page doesn't show it (it shows seo)",
-    "mp4-to-mp3.howTo: not a batch field (seo, tool, faqs, aboutSection, pairNotes)",
+    "mp4-to-mp3.videoSection: not a batch field (seo, tool, faqs, aboutSection, pairNotes, howTo, guide)",
     "mp4-to-mp3.tool.title: a batch sets only tool.subtitle",
     "mp4-to-mp3.tool.accept: a batch sets only tool.subtitle",
   ]);
@@ -386,6 +386,32 @@ test("content:apply reports a batch that breaks a rule", () => {
   batch["mp4-to-mp3"].seo.description = "Too short.";
   const { problems } = applyBatch(registryOf(catalog()), batch, noKeywords);
   assert.deepEqual(problems, ["mp4-to-mp3 [length] description is 10 characters, outside 110–160"]);
+});
+
+test("a written How-to's title is a How-to heading, over at least three steps", () => {
+  const keywords = new Map([["webp-to-png", "webp to png"]]);
+  const tools = catalog();
+  tools[0].content.howTo = {
+    title: "How do I convert a WebP to a PNG?",
+    steps: ["Choose the WebP.", "Wait for the PNG.", "Save it."],
+  };
+  assert.deepEqual(checkContent(tools, { keywords }), []);
+
+  tools[0].content.howTo = { title: "How do I convert a WebP image?", steps: ["Choose it."] };
+  assert.deepEqual(checkContent(tools, { keywords }).map((failure) => failure.message), [
+    'How-to heading "How do I convert a WebP image?" lacks a word of the keyword "webp to png"',
+    "content.howTo needs at least 3 steps",
+  ]);
+});
+
+test("content:apply writes a batch's How-to and guide", () => {
+  const batch = batchFor("mp4 audio");
+  batch["mp4-to-mp3"].howTo = { title: "How to convert MP4 to MP3", steps: ["One.", "Two.", "Three."] };
+  batch["mp4-to-mp3"].guide = { title: "About MP4 and MP3", markdown: "### MP4\n\nA container." };
+  const { text, problems } = applyBatch(registryOf(catalog()), batch, noKeywords);
+  assert.deepEqual(problems, []);
+  const written = JSON.parse(splitRegistry(text)[1]).content;
+  assert.deepEqual(Object.keys(written), ["tool", "seo", "faqs", "aboutSection", "pairNotes", "guide", "howTo"]);
 });
 
 test("content:apply writes a batch's How-to heading", () => {

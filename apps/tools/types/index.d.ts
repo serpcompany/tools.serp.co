@@ -147,6 +147,9 @@ export interface ToolContent {
   tool: ToolInfo;
   seo?: ToolSeo;
   pairNotes?: PairNotes;
+  // A converter page's longer article: the formats' background and other ways
+  // to convert. It follows the pair notes.
+  guide?: InfoArticleSectionData;
   videoSection?: VideoSectionData;
   // 18 converters have content without FAQs or an about section.
   faqs?: FAQ[];

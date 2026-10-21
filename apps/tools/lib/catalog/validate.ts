@@ -77,6 +77,7 @@ const content = object({
     object({ title: string, h1: string, description: string, howToHeading: optional(string) }),
   ),
   pairNotes: optional(object({ title: string, points: strings })),
+  guide: optional(object({ title: string, markdown: string })),
   videoSection: optional(object({ embedId: optional(string) })),
   faqs: optional(arrayOf(object({ question: string, answer: string }))),
   aboutSection: optional(

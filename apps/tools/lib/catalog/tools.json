@@ -92490,7 +92490,7 @@
         ]
       },
       "howTo": {
-        "title": "How to convert a PDF to text",
+        "title": "How to convert a PDF to TXT (plain text)",
         "intro": "The PDF's text is read in your browser and saved as a UTF-8 TXT file named after your PDF.",
         "steps": [
           "Upload your PDF.",
