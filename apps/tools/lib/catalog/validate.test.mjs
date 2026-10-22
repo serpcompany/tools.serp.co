@@ -105,3 +105,82 @@ test("content follows ToolContent", () => {
     ],
   );
 });
+
+const video = (overrides = {}) => ({
+  id: "FJkyr2TEUs0",
+  title: "How to Convert WebP to PNG (Free Method)",
+  description: "WebP to PNG Convert: https://tools.serp.co/webp-to-png/",
+  uploadDate: "2026-10-22T00:15:20-07:00",
+  duration: "PT28S",
+  ...overrides,
+});
+
+test("a video has the id, text, upload date and duration its watch page and the video sitemap need", () => {
+  assert.deepEqual(validateCatalog([entry({ video: video() })]), []);
+  assert.deepEqual(
+    validateCatalog([entry({ video: video({ uploadDate: "2026-10-22T07:15:20Z", duration: "PT1H2M3S" }) })]),
+    [],
+  );
+
+  assert.deepEqual(
+    validateCatalog([
+      entry({
+        video: {
+          youtubeId: "FJkyr2TEUs0",
+          id: "https://youtu.be/FJkyr2TEUs0",
+          uploadDate: "2026-10-22",
+          duration: "28",
+        },
+      }),
+    ]),
+    [
+      "png-to-jpg.video.youtubeId is not a known field",
+      'png-to-jpg.video.id must be an 11-character YouTube video id, got "https://youtu.be/FJkyr2TEUs0"',
+      "png-to-jpg.video.title must be a non-empty string",
+      "png-to-jpg.video.description must be a non-empty string",
+      'png-to-jpg.video.uploadDate must be an ISO 8601 date and time with a time zone, e.g. 2026-10-22T00:15:20-07:00, got "2026-10-22"',
+      'png-to-jpg.video.duration must be an ISO 8601 duration in hours, minutes and seconds, e.g. PT28S, got "28"',
+    ],
+  );
+  // A bare id string, as the retired field held, is not a video.
+  assert.deepEqual(validateCatalog([entry({ video: "FJkyr2TEUs0" })]), ["png-to-jpg.video must be an object"]);
+  assert.match(validateCatalog([entry({ video: video({ duration: "PT" }) })])[0], /video\.duration must be an ISO 8601 duration/);
+  assert.match(
+    validateCatalog([entry({ video: video({ uploadDate: "2026-13-45T99:00:00Z" }) })])[0],
+    /video\.uploadDate is not a real date/,
+  );
+});
+
+test("a video's description is plain text that fits the video sitemap", () => {
+  assert.deepEqual(validateCatalog([entry({ video: video({ description: "x".repeat(2048) }) })]), []);
+  assert.deepEqual(validateCatalog([entry({ video: video({ description: "x".repeat(2049) }) })]), [
+    "png-to-jpg.video.description must be at most 2048 characters, got 2049",
+  ]);
+  assert.deepEqual(validateCatalog([entry({ video: video({ description: "Open <b>the</b> converter." }) })]), [
+    "png-to-jpg.video.description must be plain text, not HTML",
+  ]);
+  // A comparison is text, not a tag.
+  assert.deepEqual(validateCatalog([entry({ video: video({ description: "PNG < 5 MB and JPG > 1 MB." }) })]), []);
+});
+
+test("no two videos share an id, a title or a description", () => {
+  const other = entry({ id: "png-to-jpeg", route: "/png-to-jpeg" });
+  assert.deepEqual(
+    validateCatalog([
+      entry({ video: video() }),
+      { ...other, video: video({ title: "Another title", description: "Another description." }) },
+    ]),
+    ["png-to-jpeg.video.id repeats png-to-jpg's"],
+  );
+  assert.deepEqual(
+    validateCatalog([entry({ video: video() }), { ...other, video: video({ id: "AAAAAAAAAAA" }) }]),
+    ["png-to-jpeg.video.title repeats png-to-jpg's", "png-to-jpeg.video.description repeats png-to-jpg's"],
+  );
+});
+
+test("content has no video of its own: a Tool's video is its video field", () => {
+  assert.deepEqual(
+    validateCatalog([entry({ content: content({ videoSection: { embedId: "FJkyr2TEUs0" } }) })]),
+    ["png-to-jpg.content.videoSection is not a known field"],
+  );
+});

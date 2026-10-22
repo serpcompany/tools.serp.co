@@ -8,7 +8,6 @@ import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
 import { buildToolMetadata } from "@/lib/metadata";
 import { toolContent } from "@/lib/tool-content";
-import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
 
 const toolId = "csv-combiner";
 
@@ -20,14 +19,10 @@ export default function Page() {
   if (!content) {
     return <div>Tool not found</div>;
   }
-  const videoEmbedId = getEnabledVideoEmbedId({
-    tool: content.tool,
-    videoSection: content.videoSection,
-  });
 
   return (
     <main className="min-h-screen bg-background">
-      <CsvCombiner toolId={content.tool.id} videoEmbedId={videoEmbedId} />
+      <CsvCombiner toolId={content.tool.id} />
 
       {content.aboutSection && (
         <AboutFormatsSection

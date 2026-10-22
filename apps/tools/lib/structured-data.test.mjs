@@ -5,9 +5,12 @@ import { registerHooks } from "node:module";
 
 import { activeTools, allTools } from "./catalog/catalog.ts";
 import {
+  breadcrumbListStructuredData,
   serializeJsonLd,
   structuredDataOrigin,
   toolStructuredData,
+  videoListStructuredData,
+  videoObjectStructuredData,
 } from "./structured-data.ts";
 
 // lib/metadata.ts imports by the "@/" alias (tsconfig paths), which Node
@@ -24,6 +27,9 @@ registerHooks({
   },
 });
 const { buildToolMetadata } = await import("./metadata.ts");
+const { VIDEOS_TITLE, buildWatchMetadata, findWatchVideo, watchBreadcrumbs, watchVideos } = await import(
+  "./videos.ts"
+);
 
 const ORIGIN = "https://tools.serp.co";
 
@@ -177,6 +183,93 @@ test("each template mounts the one JSON-LD script once", () => {
     assert.equal(source(template).match(/<StructuredData\b/g)?.length, 1, template);
   }
   const component = source("../components/StructuredData.tsx");
-  assert.equal(component.match(/application\/ld\+json/g)?.length, 1);
-  assert.match(component, /serializeJsonLd\(/);
+  assert.equal(component.match(/<JsonLd\b/g)?.length, 1);
+  const script = source("../components/JsonLd.tsx");
+  assert.equal(script.match(/application\/ld\+json/g)?.length, 1);
+  assert.match(script, /serializeJsonLd\(data\)/);
+});
+
+test("a watch page's VideoObject is its video at its canonical URL, played by its embed, with no contentUrl", () => {
+  const video = findWatchVideo("webp-to-png", "FJkyr2TEUs0", ORIGIN);
+  const data = videoObjectStructuredData(video, ORIGIN);
+  assert.deepEqual(data, {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: "How to Convert WebP to PNG (Free Method)",
+    description:
+      "A WebP photo is dragged onto the WebP to PNG Converter and converted to PNG in the browser. The PNG downloads automatically and opens as the same picture.",
+    thumbnailUrl: ["https://i.ytimg.com/vi/FJkyr2TEUs0/maxresdefault.jpg"],
+    uploadDate: "2026-10-22T00:15:20-07:00",
+    duration: "PT27S",
+    embedUrl: "https://www.youtube-nocookie.com/embed/FJkyr2TEUs0",
+    url: "https://tools.serp.co/watch/webp-to-png/FJkyr2TEUs0/",
+    mainEntityOfPage: "https://tools.serp.co/watch/webp-to-png/FJkyr2TEUs0/",
+    isFamilyFriendly: true,
+    requiresSubscription: false,
+    publisher: { "@type": "Organization", name: "SERP Tools", url: ORIGIN },
+    potentialAction: {
+      "@type": "WatchAction",
+      target: { "@type": "EntryPoint", urlTemplate: "https://tools.serp.co/watch/webp-to-png/FJkyr2TEUs0/" },
+    },
+  });
+
+  for (const each of watchVideos(ORIGIN)) {
+    const object = videoObjectStructuredData(each, ORIGIN);
+    const metadata = buildWatchMetadata(each);
+    assert.equal(object.contentUrl, undefined);
+    assert.equal(object.name, metadata.title, "the name is the page's title and H1");
+    assert.equal(object.url, `${ORIGIN}${metadata.alternates.canonical}`, "the url is the canonical");
+    assert.notEqual(object.embedUrl, object.url, "the player is not the page");
+    assert.doesNotMatch(object.embedUrl, /youtube\.com\/watch/);
+    assert.match(object.uploadDate, /T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})$/, "a timestamp with its time zone");
+  }
+});
+
+test("a watch page's BreadcrumbList is the trail it shows, at canonical URLs", () => {
+  const video = findWatchVideo("webp-to-png", "FJkyr2TEUs0", ORIGIN);
+  const data = breadcrumbListStructuredData(watchBreadcrumbs(video), ORIGIN);
+  assert.deepEqual(data.itemListElement, [
+    { "@type": "ListItem", position: 1, name: "Home", item: ORIGIN },
+    { "@type": "ListItem", position: 2, name: "Videos", item: `${ORIGIN}/videos/` },
+    { "@type": "ListItem", position: 3, name: "WebP to PNG Converter", item: `${ORIGIN}/webp-to-png/` },
+    {
+      "@type": "ListItem",
+      position: 4,
+      name: "How to Convert WebP to PNG (Free Method)",
+      item: `${ORIGIN}/watch/webp-to-png/FJkyr2TEUs0/`,
+    },
+  ]);
+});
+
+test("the /videos/ ItemList lists each video at its watch page, in the page's order", () => {
+  const videos = watchVideos(ORIGIN);
+  const data = videoListStructuredData(VIDEOS_TITLE, videos);
+  assert.equal(data["@type"], "ItemList");
+  assert.equal(data.name, "How-to Videos");
+  assert.deepEqual(
+    data.itemListElement.map((item) => [item.position, item.url, item.item.name, item.item.embedUrl]),
+    videos.map((video, index) => [index + 1, video.watchUrl, video.title, video.embedUrl]),
+  );
+  for (const item of data.itemListElement) {
+    assert.equal(item.item.url, item.url);
+    assert.equal(item.item.contentUrl, undefined);
+  }
+});
+
+test("the watch page and the library mount their JSON-LD through JsonLd, and a converter page has no VideoObject", () => {
+  const watch = source("../app/watch/[tool]/[video]/page.tsx");
+  assert.equal(watch.match(/<JsonLd\b/g)?.length, 1);
+  assert.match(watch, /videoObjectStructuredData\(/);
+  // The trail the page shows is the one its BreadcrumbList describes.
+  assert.match(watch, /const crumbs = watchBreadcrumbs\(video\);/);
+  assert.match(watch, /<Breadcrumbs crumbs=\{crumbs\} \/>/);
+  assert.match(watch, /breadcrumbListStructuredData\(crumbs, siteOrigin\)/);
+  // The player is in the server HTML, playing the VideoObject's embedUrl.
+  assert.match(watch, /<iframe[^>]*\n\s*src=\{video\.embedUrl\}/);
+  const library = source("../app/videos/page.tsx");
+  assert.equal(library.match(/<JsonLd\b/g)?.length, 1);
+  assert.match(library, /videoListStructuredData\(/);
+  for (const template of ["../components/ToolPageTemplate.tsx", "../components/sections/ToolVideoSection.tsx"]) {
+    assert.doesNotMatch(source(template), /VideoObject|videoObjectStructuredData|JsonLd/, template);
+  }
 });

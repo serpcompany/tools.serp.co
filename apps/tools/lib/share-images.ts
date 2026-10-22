@@ -58,6 +58,14 @@ export const SHARE_IMAGES = {
     chips: ["Read", "Annotate", "Download"],
     accent: "#b91c1c",
   },
+  // The /videos/ library and every video's watch page.
+  videos: {
+    path: "/og/videos.png",
+    title: "How-to videos",
+    subtitle: "Short videos that show how to use our free converters and compressors, step by step.",
+    chips: [],
+    accent: "#dc2626",
+  },
 } as const satisfies Record<string, ShareImageDesign>;
 
 export type ShareImageName = keyof typeof SHARE_IMAGES;

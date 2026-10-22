@@ -101,7 +101,6 @@ export const BATCH_FIELDS = ["seo", "tool", "faqs", "aboutSection", "pairNotes",
 const CONTENT_KEY_ORDER = [
   "tool",
   "seo",
-  "videoSection",
   "faqs",
   "aboutSection",
   "pairNotes",

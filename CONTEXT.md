@@ -20,6 +20,12 @@ intent. Multiple Landers may share one renderer or execution engine. A
 keyword- or source-specific downloader Lander is still represented by its own
 registry Tool id when it is shipped.
 
+**Watch page** — The public page of one Tool's how-to video, at
+`/watch/<tool id>/<video id>/`, where the video is the main content. It links
+to its Tool's page; it is not a Lander. Its record names the Tool in the
+watch-pages standard's `product*` fields, which here always mean the Tool,
+never a Product.
+
 **Registry Entry** — One versioned object in
 `apps/tools/lib/catalog/tools.json`. It records shipped catalog intent such
 as Tool identity, route, operation, publication state, formats, and content.

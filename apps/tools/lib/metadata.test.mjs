@@ -41,6 +41,7 @@ import { SHARE_IMAGES, SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "./share-ima
 import { buildTableConvertDemoMetadata, buildTableConvertMetadata } from "./table-convert.ts";
 import { TABLE_CONVERT_PAGES } from "./table-convert-pages.ts";
 import { buildConverterFaqs, buildHowToSection, buildInfoArticleSection } from "./tool-sections.ts";
+import { buildVideosMetadata, buildWatchMetadata, watchVideos } from "./videos.ts";
 
 const IN_BROWSER = "It runs in your browser";
 // Ahrefs reports a description under 110 characters as too short.
@@ -73,6 +74,11 @@ function servedPages() {
     { id: "categories", metadata: buildCategoriesIndexMetadata() },
     { id: "brands", metadata: buildBrandsMetadata(38) },
     { id: "home", metadata: buildHomeMetadata() },
+    ...watchVideos("https://tools.serp.co").map((video) => ({
+      id: `watch ${video.watchPath}`,
+      metadata: buildWatchMetadata(video),
+    })),
+    { id: "videos", metadata: buildVideosMetadata() },
   ];
   return pages;
 }
@@ -136,6 +142,10 @@ test("each page family shows its own share image", () => {
   assert.equal(imageOf(buildTableConvertMetadata(TABLE_CONVERT_PAGES[0])), SHARE_IMAGES.convert.path);
   assert.equal(imageOf(buildCategoryMetadata("download")), SHARE_IMAGES.download.path);
   assert.equal(imageOf(buildHomeMetadata()), SHARE_IMAGES.default.path);
+  assert.equal(imageOf(buildVideosMetadata()), SHARE_IMAGES.videos.path);
+  for (const video of watchVideos("https://tools.serp.co")) {
+    assert.equal(imageOf(buildWatchMetadata(video)), SHARE_IMAGES.videos.path, video.watchPath);
+  }
 });
 
 test("titles are the page's own: the layout's template adds the site name once", () => {
