@@ -23,8 +23,8 @@ import {
 //   content, so Google can list it in video results (app/watch/).
 // - /videos/: the library, a card per video linking to its watch page.
 // - /sitemap-videos.xml: every video, beside its watch page (lib/sitemap.ts).
-// - The Tool's converter page shows it too, loaded on a click, and links to
-//   its watch page (components/sections/ToolVideoSection.tsx).
+// - The Tool's converter page shows it too, right under the converter, and
+//   links to its watch page (components/sections/ToolVideoSection.tsx).
 
 // A video as its pages, the JSON-LD and the video sitemap use it: the
 // standard's WatchVideo, on a product catalog site, where the product is the

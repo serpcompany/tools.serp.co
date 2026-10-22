@@ -57,12 +57,13 @@ test("cards show the small hqdefault thumbnail; only the JSON-LD and video sitem
   assert.doesNotMatch(card, /thumbnailUrl\}|MaxresThumbnail/);
 });
 
-test("the converter page links its video to the video's watch page, under the How-to section", () => {
+test("the converter page shows its video right under the converter and links it to its watch page", () => {
   assert.match(section, /href=\{watchPath\(toolId, video\.id\)\}/);
   assert.match(section, /href=\{VIDEOS_PATH\}/);
   assert.ok(
-    template.indexOf("<HowToSection") < template.indexOf("<ToolVideoSection"),
-    "the video follows the How-to section",
+    template.indexOf("<HeroConverter") < template.indexOf("<ToolVideoSection") &&
+      template.indexOf("<ToolVideoSection") < template.indexOf("<AboutFormatsSection"),
+    "the video follows the converter, before every other section",
   );
   assert.match(template, /shownToolVideo\(tool, video\)/);
 });

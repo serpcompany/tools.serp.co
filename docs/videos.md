@@ -23,8 +23,9 @@ Two thumbnails come from the id (`lib/youtube.ts`). The `VideoObject` and
 the video sitemap name `maxresdefault.jpg`, 1280 x 720 with no black bars,
 since Google shows that image in video results as it is. The video cards
 show `hqdefault.jpg`, 480 x 360, which every video has and which is a fifth
-the size; they crop it to 16:9, so its bars never show. YouTube makes `maxresdefault.jpg` only for uploads of 720p or more; all
-five videos have it (checked 2026-10-22).
+the size; they crop it to 16:9, so its bars never show. YouTube makes
+`maxresdefault.jpg` only for uploads of 720p or more; all five videos have it
+(checked 2026-10-22).
 
 `lib/catalog/validate.ts` holds each record to the standard: an 11-character
 YouTube id, a plain-text description of at most 2,048 characters, an
@@ -35,10 +36,10 @@ link.
 
 ## Where a video shows
 
-- **The converter page** (`ToolPageTemplate`), under the How-to section: the
-  YouTube's player in the server HTML, loaded lazily as a visitor scrolls
-  near it (`components/ToolVideoPlayer.tsx`), and links to the watch page
-  and to `/videos/`. The page has no `VideoObject`: Google lists a video from
+- **The converter page** (`ToolPageTemplate`), right under the converter:
+  YouTube's player in the server HTML, lazy but this near the top usually
+  loaded with the page (`components/ToolVideoPlayer.tsx`), and links to the
+  watch page and to `/videos/`. The page has no `VideoObject`: Google lists a video from
   the page where it is the main content. A page that is cross-origin isolated
   for multi-threaded FFmpeg shows no video (`lib/tool-video.ts`), since
   YouTube's player can't load there. Only Tools on the shared converter page

@@ -82,6 +82,7 @@ export default function ToolPageTemplate({
           operation={tool.operation}
         />
       )}
+      {shownVideo && tool.id && <ToolVideoSection toolId={tool.id} video={shownVideo} />}
       {/* About the Formats Section - Right after the hero */}
       {aboutSection && (
         <AboutFormatsSection
@@ -90,7 +91,6 @@ export default function ToolPageTemplate({
         />
       )}
       {howTo && <HowToSection title={howTo.title} intro={howTo.intro} steps={howTo.steps} />}
-      {shownVideo && tool.id && <ToolVideoSection toolId={tool.id} video={shownVideo} />}
 
       {/* Related Tools Section - right after format cards */}
       {showRelatedTools && (

@@ -1,7 +1,7 @@
 // The YouTube URLs a Tool's how-to video (ToolVideo) is played and described
-// with, and its length and date as a page shows them. No imports, so the
-// client player (components/ToolVideoPlayer.tsx) can use it; lib/videos.ts
-// builds each video's WatchVideo from it.
+// with, and its length and date as a page shows them. The converter page's
+// player (components/ToolVideoPlayer.tsx) uses it, and lib/videos.ts builds
+// each video's WatchVideo from it.
 
 // YouTube's hqdefault thumbnail, 480 x 360 with a 16:9 frame letterboxed. It
 // exists for every video and is a fifth the size of maxresdefault. The

@@ -10,11 +10,12 @@ type ToolVideoSectionProps = {
   video: ToolVideo;
 };
 
-// A converter page's how-to video, right under its guide (HowToSection) and
-// on the same band, so it reads as part of the guide: the player, and a link to the video's watch page, where Google lists it.
+// A converter page's how-to video, right under the converter (the hero), so
+// a visitor sees it first: the player, and a link to the video's watch page,
+// where Google lists it.
 export function ToolVideoSection({ toolId, video }: ToolVideoSectionProps) {
   return (
-    <section aria-label="How-to video" className="bg-gray-50 pb-20">
+    <section aria-label="How-to video" className="pb-16 pt-4">
       <figure className="mx-auto max-w-3xl px-6">
         <ToolVideoPlayer youtubeId={video.id} title={video.title} />
         <figcaption className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-sm text-gray-600">
