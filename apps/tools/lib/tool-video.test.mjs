@@ -39,29 +39,22 @@ test("a converter page shows its Tool's video unless the page is cross-origin is
   assert.equal(shownToolVideo(transcript, webpToPng.video), isolated ? undefined : webpToPng.video);
 });
 
-test("the converter page's player loads nothing from YouTube's player host until a visitor clicks play", () => {
-  assert.match(player, /^"use client";/);
-  const imports = [...player.matchAll(/^import [^;]* from "([^"]+)";/gm)].map((match) => match[1]);
-  assert.deepEqual(imports, ["react", "@/lib/youtube"], "the client player imports no registry code");
-
-  // One iframe, rendered only once `playing` is set by the play button.
+test("the converter page's player is in the server HTML and loads lazily, without autoplay", () => {
+  assert.doesNotMatch(player, /"use client"/);
+  // One iframe, always rendered, from YouTube's privacy-enhanced host.
   assert.equal(player.match(/<iframe\b/g)?.length, 1);
-  assert.match(player, /\{playing \? \(\s*<iframe/);
-  assert.match(player, /onClick=\{\(\) => setPlaying\(true\)\}/);
-  assert.match(player, /src=\{`\$\{youtubeEmbedUrl\(youtubeId\)\}\?autoplay=1&rel=0`\}/);
-
-  // The thumbnail has its own size, so nothing moves as it loads.
-  assert.match(player, /<img[\s\S]*?width=\{YOUTUBE_THUMBNAIL_WIDTH\}[\s\S]*?height=\{YOUTUBE_THUMBNAIL_HEIGHT\}/);
+  assert.match(player, /src=\{`\$\{youtubeEmbedUrl\(youtubeId\)\}\?rel=0`\}/);
+  assert.doesNotMatch(player, /autoplay=1/);
   assert.match(player, /loading="lazy"/);
+  // The box keeps the video's 16:9 shape, so nothing moves as it loads.
+  assert.match(player, /aspect-video/);
 });
 
-test("pages show the small hqdefault thumbnail; only the JSON-LD and video sitemap name the 1280 x 720 one", () => {
-  // WatchVideo.thumbnailUrl is maxresdefault, for Google. The player and the
-  // cards are sized for hqdefault (YOUTUBE_THUMBNAIL_WIDTH x HEIGHT).
-  for (const [name, file] of [["player", player], ["card", card]]) {
-    assert.match(file, /src=\{youtubeThumbnailUrl\(/, `the ${name} shows youtubeThumbnailUrl`);
-    assert.doesNotMatch(file, /thumbnailUrl\}|MaxresThumbnail/, `the ${name} shows no maxres thumbnail`);
-  }
+test("cards show the small hqdefault thumbnail; only the JSON-LD and video sitemap name the 1280 x 720 one", () => {
+  // WatchVideo.thumbnailUrl is maxresdefault, for Google. The cards are sized
+  // for hqdefault (YOUTUBE_THUMBNAIL_WIDTH x HEIGHT).
+  assert.match(card, /src=\{youtubeThumbnailUrl\(/);
+  assert.doesNotMatch(card, /thumbnailUrl\}|MaxresThumbnail/);
 });
 
 test("the converter page links its video to the video's watch page, under the How-to section", () => {

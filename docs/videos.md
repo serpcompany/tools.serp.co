@@ -21,10 +21,9 @@ Tool, never a Product in CONTEXT.md's sense.
 
 Two thumbnails come from the id (`lib/youtube.ts`). The `VideoObject` and
 the video sitemap name `maxresdefault.jpg`, 1280 x 720 with no black bars,
-since Google shows that image in video results as it is. The converter page's
-player and the video cards show `hqdefault.jpg`, 480 x 360, which every video
-has and which is a fifth the size; they crop it to 16:9, so its bars never
-show. YouTube makes `maxresdefault.jpg` only for uploads of 720p or more; all
+since Google shows that image in video results as it is. The video cards
+show `hqdefault.jpg`, 480 x 360, which every video has and which is a fifth
+the size; they crop it to 16:9, so its bars never show. YouTube makes `maxresdefault.jpg` only for uploads of 720p or more; all
 five videos have it (checked 2026-10-22).
 
 `lib/catalog/validate.ts` holds each record to the standard: an 11-character
@@ -37,8 +36,8 @@ link.
 ## Where a video shows
 
 - **The converter page** (`ToolPageTemplate`), under the How-to section: the
-  video's thumbnail and a play button, then YouTube's player once a visitor
-  clicks it (`components/ToolVideoPlayer.tsx`), and links to the watch page
+  YouTube's player in the server HTML, loaded lazily as a visitor scrolls
+  near it (`components/ToolVideoPlayer.tsx`), and links to the watch page
   and to `/videos/`. The page has no `VideoObject`: Google lists a video from
   the page where it is the main content. A page that is cross-origin isolated
   for multi-threaded FFmpeg shows no video (`lib/tool-video.ts`), since

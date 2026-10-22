@@ -96,10 +96,9 @@ Some converter pages have a how-to video on YouTube ([videos.md](videos.md)).
 This site records nothing about them: watching one sends no tool-run event
 and no error report. What a visitor's browser loads from YouTube, and when:
 
-- **A converter page** loads the video's thumbnail, an image from
-  `i.ytimg.com`, as the video section nears the screen. YouTube's player, its
-  scripts and anything it stores in the browser load from
-  `www.youtube-nocookie.com` only after the visitor clicks play.
+- **A converter page** loads YouTube's player, its scripts and anything it
+  stores in the browser from `www.youtube-nocookie.com` as the video section,
+  under the guide, nears the screen.
 - **A watch page** (`/watch/<tool id>/<video id>/`) is the video's own page,
   so the player loads from `www.youtube-nocookie.com` with the page, and the
   other videos' thumbnails from `i.ytimg.com` as they near the screen.

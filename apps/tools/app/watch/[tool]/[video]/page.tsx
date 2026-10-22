@@ -25,8 +25,9 @@ import { durationLabel, uploadDateLabel } from "@/lib/youtube";
 
 // A how-to video's watch page (issue #374), per the SERP watch-pages
 // standard: the video is the page's main content, so Google can list it in
-// video results. Its player is in the server HTML, not loaded on a click as
-// on the converter page, and its src is the VideoObject's embedUrl. Every
+// video results. Its player is in the server HTML and loads with the page,
+// not lazily as on the converter page, and its src is the VideoObject's
+// embedUrl. Every
 // video is built ahead; any other pair of params is a 404.
 
 type PageProps = {
