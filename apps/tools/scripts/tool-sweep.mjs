@@ -347,7 +347,7 @@ async function download(page, control, { timeout = 5_000, count = 1, ...read } =
   return { outcome: "completed", outputs: await readOutputs(page, read) };
 }
 
-// The generic converter and compressor (HeroConverter, LanderHeroTwoColumn):
+// The generic converter and compressor (HeroConverter):
 // choose the fixture (or `file`), then wait until the progress card shows the
 // result.
 async function runFileTool(page, plan, file = plan.fixtures[0]) {

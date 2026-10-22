@@ -169,10 +169,6 @@ const requiredTestIds = [
     ids: ["tool-dropzone", "tool-file-input"],
   },
   {
-    file: "apps/tools/components/LanderHeroTwoColumn.tsx",
-    ids: ["tool-dropzone", "tool-file-input"],
-  },
-  {
     file: "apps/tools/components/Converter.tsx",
     ids: ["tool-dropzone", "tool-file-input", "tool-progress"],
   },

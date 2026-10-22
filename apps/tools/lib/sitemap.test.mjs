@@ -7,6 +7,7 @@ import {
   resolveSitemapRequest,
   SITEMAP_INDEX_PATH,
 } from "./sitemap.ts";
+import { watchVideos } from "./videos.ts";
 
 const tools = JSON.parse(
   readFileSync(new URL("./catalog/tools.json", import.meta.url), "utf8"),
@@ -157,4 +158,124 @@ test("URLs use the origin they are given, such as a local one", () => {
     type: "redirect",
     location: `${local}/sitemap-index.xml`,
   });
+});
+
+// A video as watchVideos (lib/videos.ts) gives it, with only the fields the
+// video sitemap reads.
+function sitemapVideo(index, overrides = {}) {
+  const id = `vid${String(index).padStart(8, "0")}`;
+  return {
+    watchPath: `/watch/tool-${index}/${id}/`,
+    title: `How to use tool ${index}`,
+    description: `Tool ${index}, step by step.`,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${id}`,
+    thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+    durationSeconds: 28,
+    uploadDate: "2026-10-22T00:15:20-07:00",
+    ...overrides,
+  };
+}
+
+function videoEntries(body) {
+  return [...body.matchAll(/<url><loc>([^<]*)<\/loc><video:video>([\s\S]*?)<\/video:video><\/url>/g)].map(
+    ([, loc, video]) => ({
+      loc,
+      tags: Object.fromEntries(
+        [...video.matchAll(/<video:([a-z_]+)(?: [^>]*)?>([^<]*)<\/video:\1>/g)].map(([, name, value]) => [name, value]),
+      ),
+      video,
+    }),
+  );
+}
+
+test("with videos, the index lists /sitemap-videos.xml last and the pages sitemap lists /videos/ and every watch page", () => {
+  const videos = watchVideos(origin);
+  assert.ok(videos.length > 0, "the registry has at least one video");
+
+  assert.deepEqual(locs(xml("sitemap-index.xml", { videos })), [
+    `${origin}/sitemap-pages.xml`,
+    `${origin}/sitemap-tools.xml`,
+    `${origin}/sitemap-categories.xml`,
+    `${origin}/sitemap-videos.xml`,
+  ]);
+  assert.deepEqual(locs(xml("sitemap-pages.xml", { videos })), [
+    origin,
+    `${origin}/categories/`,
+    `${origin}/brands/`,
+    `${origin}/videos/`,
+    ...videos.map((video) => video.watchUrl),
+  ]);
+  // The groups still list each URL once.
+  const groups = ["sitemap-pages.xml", "sitemap-tools.xml", "sitemap-categories.xml"].flatMap((fileName) =>
+    locs(xml(fileName, { videos })),
+  );
+  assert.equal(new Set(groups).size, groups.length);
+});
+
+test("the videos sitemap lists each watch page with its player, never a media file, and its length in seconds", () => {
+  const videos = watchVideos(origin);
+  const body = xml("sitemap-videos.xml", { videos });
+  assert.match(
+    body,
+    /^<\?xml version="1\.0" encoding="UTF-8"\?><urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9" xmlns:video="http:\/\/www\.google\.com\/schemas\/sitemap-video\/1\.1">/,
+  );
+  assert.doesNotMatch(body, /content_loc/);
+
+  const entries = videoEntries(body);
+  assert.deepEqual(
+    entries.map((entry) => entry.loc),
+    videos.map((video) => video.watchUrl),
+  );
+  for (const [index, video] of videos.entries()) {
+    const { loc, tags } = entries[index];
+    assert.deepEqual(tags, {
+      thumbnail_loc: video.thumbnailUrl,
+      title: video.title,
+      description: video.description,
+      player_loc: video.embedUrl,
+      duration: String(video.durationSeconds),
+      publication_date: video.uploadDate,
+      family_friendly: "yes",
+      live: "no",
+    });
+    assert.notEqual(tags.player_loc, loc, "the player is not the page");
+    assert.match(entries[index].video, /<video:player_loc allow_embed="yes">/);
+    assert.match(tags.duration, /^[1-9]\d*$/);
+  }
+
+  const webpToPng = entries.find((entry) => entry.loc === `${origin}/watch/webp-to-png/FJkyr2TEUs0/`);
+  assert.equal(webpToPng?.tags.duration, "28");
+  assert.equal(webpToPng?.tags.player_loc, "https://www.youtube-nocookie.com/embed/FJkyr2TEUs0");
+});
+
+test("the videos sitemap escapes what a title or description holds", () => {
+  const video = sitemapVideo(1, { title: `PNG & JPG <fast> "free"`, description: "Tom's tool & more." });
+  const body = xml("sitemap-videos.xml", { videos: [video] });
+  const [entry] = videoEntries(body);
+  assert.equal(entry.tags.title, "PNG &amp; JPG &lt;fast&gt; &quot;free&quot;");
+  assert.equal(entry.tags.description, "Tom&apos;s tool &amp; more.");
+});
+
+test("with no videos there is no videos sitemap and no /videos/ page in the tree", () => {
+  assert.ok(getSitemapFiles(tools).every((file) => file.group !== "videos"));
+  assert.ok(!xml("sitemap-pages.xml").includes("/videos/"));
+  assert.deepEqual(resolveSitemapRequest("sitemap-videos.xml", { origin, tools }), { type: "not-found" });
+  assert.deepEqual(resolveSitemapRequest("sitemap-videos.xml", { origin, tools, videos: [] }), {
+    type: "not-found",
+  });
+});
+
+test("the videos sitemap overflows into numbered files past the URL limit", () => {
+  const videos = Array.from({ length: 5 }, (_, index) => sitemapVideo(index));
+  const files = getSitemapFiles(tools, 2, videos).filter((file) => file.group === "videos");
+  assert.deepEqual(
+    files.map((file) => [file.path, file.videos.length]),
+    [
+      ["/sitemap-videos.xml", 2],
+      ["/sitemap-videos-2.xml", 2],
+      ["/sitemap-videos-3.xml", 1],
+    ],
+  );
+  const last = xml("sitemap-videos-3.xml", { videos, maxUrls: 2 });
+  assert.deepEqual(locs(last), [`${origin}${videos[4].watchPath}`]);
 });

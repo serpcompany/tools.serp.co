@@ -47,9 +47,23 @@ export interface ToolInfo {
   requiresFFmpeg?: boolean;
 }
 
-// Video section data
-export interface VideoSectionData {
-  embedId?: string;
+// A Tool's how-to video on the SERP Tools YouTube channel, as the registry
+// stores it: the values YouTube publishes for it (issue #374). lib/videos.ts
+// derives the rest of its WatchVideo (URLs, thumbnail, length in seconds),
+// so a video is added by adding this one record. Its watch page, the /videos/
+// library and /sitemap-videos.xml list it, and its converter page shows it.
+export interface ToolVideo {
+  // The 11-character YouTube id in youtu.be/<id>.
+  id: string;
+  // Its title on YouTube. No two videos share one.
+  title: string;
+  // Its description on YouTube, as plain text. No two videos share one.
+  description: string;
+  // When it was published, as YouTube's uploadDate gives it: ISO 8601 with
+  // a time zone, e.g. 2026-10-22T00:15:20-07:00.
+  uploadDate: string;
+  // Its length, as YouTube's duration gives it: ISO 8601, e.g. PT28S.
+  duration: string;
 }
 
 // Format info for about section
@@ -147,7 +161,6 @@ export interface ToolContent {
   tool: ToolInfo;
   seo?: ToolSeo;
   pairNotes?: PairNotes;
-  videoSection?: VideoSectionData;
   // 18 converters have content without FAQs or an about section.
   faqs?: FAQ[];
   aboutSection?: AboutFormatsSection;
@@ -190,8 +203,8 @@ export interface Tool {
   isNew?: boolean;
   isPopular?: boolean;
   requiresFFmpeg?: boolean;
-  // A YouTube video id on a few entries; no renderer reads it.
-  video?: string;
+  // Its how-to video (ToolVideo).
+  video?: ToolVideo;
   
   // Landing page content
   content?: ToolContent;

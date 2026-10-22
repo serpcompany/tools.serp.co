@@ -5,7 +5,6 @@ import { InfoArticleSection } from "@/components/sections/InfoArticleSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
 import { buildToolMetadata, toolHeading } from "@/lib/metadata";
 import { toolContent } from '@/lib/tool-content';
-import { getEnabledVideoEmbedId } from "@/lib/video-embeds";
 
 const toolId = "character-counter";
 
@@ -17,10 +16,6 @@ export default function Page() {
   if (!content) {
     return <div>Tool not found</div>;
   }
-  const videoEmbedId = getEnabledVideoEmbedId({
-    tool: content.tool,
-    videoSection: content.videoSection,
-  });
 
   return (
     <main className="min-h-screen bg-background">
@@ -28,7 +23,7 @@ export default function Page() {
       <CharacterCounter
         heading={toolHeading(toolId)}
         subtitle={content.tool.subtitle}
-        videoEmbedId={videoEmbedId}
+       
       />
 
       {/* Related Tools Section - Character counter doesn't have from/to formats */}

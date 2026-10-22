@@ -6,7 +6,6 @@ import { Alert, AlertDescription } from "@serp-tools/ui/components/alert";
 import { AlertTriangle, Download, FileImage, Loader2 } from "lucide-react";
 import { saveBlob } from "@/components/saveAs";
 import { ToolHeroLayout } from "@/components/ToolHeroLayout";
-import { ToolVideoPanel } from "@/components/ToolVideoPanel";
 import { beginToolRun } from "@/lib/telemetry";
 import { compressPngWithWorker, getOutputMimeType } from "@/lib/convert/workerClient";
 
@@ -17,7 +16,6 @@ type Props = {
   from: string;
   to: string;
   accept?: string;
-  videoEmbedId?: string;
 };
 
 export default function BatchHeroConverter({
@@ -27,7 +25,6 @@ export default function BatchHeroConverter({
   from,
   to,
   accept,
-  videoEmbedId,
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dropRef = useRef<HTMLDivElement | null>(null);
@@ -41,7 +38,6 @@ export default function BatchHeroConverter({
   const [error, setError] = useState<string | null>(null);
   const [compressionLevel, setCompressionLevel] = useState<'low' | 'medium' | 'high' | 'extreme'>('high');
   const [adsVisible, setAdsVisible] = useState(false);
-  const [videoPlaying, setVideoPlaying] = useState(false);
 
   const colors = [
     "#ef4444", "#f59e0b", "#22c55e", "#3b82f6", "#a855f7", "#ec4899",
@@ -80,7 +76,6 @@ export default function BatchHeroConverter({
     }
 
     if (!adsVisible) setAdsVisible(true);
-    if (!videoPlaying) setVideoPlaying(true);
     setFiles(pngFiles);
     setProcessedFiles(new Map());
     setCurrentFileIndex(0);
@@ -377,12 +372,6 @@ export default function BatchHeroConverter({
             <p>✓ No files are uploaded to any server</p>
             <p>✓ Batch compress multiple PNG files at once</p>
           </div>
-
-          {videoEmbedId && (
-            <div className="mt-10">
-              <ToolVideoPanel embedId={videoEmbedId} autoplay={videoPlaying} />
-            </div>
-          )}
         </div>
       }
     />

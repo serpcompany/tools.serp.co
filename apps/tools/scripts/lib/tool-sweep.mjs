@@ -154,7 +154,7 @@ export function handlerFor(tool, handlers) {
 }
 
 // How each page is driven. ToolPageRenderer is the generic converter and
-// compressor (HeroConverter or LanderHeroTwoColumn).
+// compressor (HeroConverter).
 const DRIVERS = {
   ToolPageRenderer: "file",
   TableConvertLanding: "table",
