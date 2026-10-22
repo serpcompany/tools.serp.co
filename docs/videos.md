@@ -15,9 +15,9 @@ A Tool's video is one registry field, its `video` in `lib/catalog/tools.json`
 page, since YouTube's can be a bare link. Nothing else is stored.
 `lib/videos.ts` derives the rest as a `WatchVideo`: the watch page's path and
 URL, the player (`https://www.youtube-nocookie.com/embed/<id>`), the
-thumbnail, the YouTube page, the length in seconds, and the Tool it shows. The standard names that Tool in its
-`productSlug`, `productName` and `productPath` fields; here it is always the
-Tool, never a Product in CONTEXT.md's sense.
+thumbnail, the YouTube page, the length in seconds, and the Tool it shows. The
+standard names that Tool in its `productSlug`, `productName` and `productPath`
+fields; here it is always the Tool, never a Product in CONTEXT.md's sense.
 
 Two thumbnails come from the id (`lib/youtube.ts`). The `VideoObject` and
 the video sitemap name `maxresdefault.jpg`, 1280 x 720 with no black bars,
@@ -39,11 +39,12 @@ link.
 - **The converter page** (`ToolPageTemplate`), right under the converter:
   YouTube's player in the server HTML, lazy but this near the top usually
   loaded with the page (`components/ToolVideoPlayer.tsx`), and links to the
-  watch page and to `/videos/`. The page has no `VideoObject`: Google lists a video from
-  the page where it is the main content. A page that is cross-origin isolated
-  for multi-threaded FFmpeg shows no video (`lib/tool-video.ts`), since
-  YouTube's player can't load there. Only Tools on the shared converter page
-  (`ToolPageRenderer`) can show one; `lib/videos.test.mjs` fails otherwise.
+  watch page and to `/videos/`. The page has no `VideoObject`: Google lists a
+  video from the page where it is the main content. A page that is
+  cross-origin isolated for multi-threaded FFmpeg shows no video
+  (`lib/tool-video.ts`), since YouTube's player can't load there. Only Tools
+  on the shared converter page (`ToolPageRenderer`) can show one;
+  `lib/videos.test.mjs` fails otherwise.
 - **The watch page**, `/watch/<tool id>/<video id>/` (`app/watch/`): built
   ahead for every video, and a 404 for any other pair. It shows the breadcrumb
   trail Home › Videos › Tool › video, the player in the server HTML, the
