@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { activeTools } from "@/lib/catalog/catalog";
 import { getSiteOrigin } from "@/lib/site-environment";
 import { resolveSitemapRequest } from "@/lib/sitemap";
+import { watchVideos } from "@/lib/videos";
 
 const CACHE_CONTROL = "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400";
 
@@ -16,9 +17,11 @@ export function requestSiteOrigin(request: Request) {
 
 // Serves one root-level sitemap file, such as "sitemap-tools.xml".
 export function sitemapFileResponse(request: Request, fileName: string) {
+  const origin = requestSiteOrigin(request);
   const result = resolveSitemapRequest(fileName, {
-    origin: requestSiteOrigin(request),
+    origin,
     tools: activeTools(),
+    videos: watchVideos(origin),
   });
 
   if (result.type === "redirect") {

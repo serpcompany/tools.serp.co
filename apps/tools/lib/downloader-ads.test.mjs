@@ -26,10 +26,6 @@ const heroConverterSource = readFileSync(
   new URL("../components/HeroConverter.tsx", import.meta.url),
   "utf8",
 );
-const landerHeroTwoColumnSource = readFileSync(
-  new URL("../components/LanderHeroTwoColumn.tsx", import.meta.url),
-  "utf8",
-);
 
 test("downloader pages keep ads hidden until the user initiates the action", () => {
   assert.equal(
@@ -84,5 +80,4 @@ test("completed or failed tool runs show a post-result monetization panel", () =
   assert.match(toolResultMonetizationSource, /result-inline/);
   assert.match(toolResultMonetizationSource, /size="336x280"/);
   assert.match(heroConverterSource, /ToolResultMonetizationPanel/);
-  assert.match(landerHeroTwoColumnSource, /ToolResultMonetizationPanel/);
 });

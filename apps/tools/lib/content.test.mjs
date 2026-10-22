@@ -342,15 +342,15 @@ test("content:apply keeps content a batch doesn't name", () => {
   const tools = catalog();
   tools[1].content = {
     tool: { title: "MP4 to MP3", subtitle: "Old.", from: "mp4", to: "mp3" },
-    videoSection: { embedId: "abc" },
+    howTo: { title: "How to", steps: [] },
     relatedTools: [{ toolId: "compress-m4a", title: "M4A Compressor" }],
   };
   const { text, problems } = applyBatch(registryOf(tools), batchFor("mp4 audio"), noKeywords);
   assert.deepEqual(problems, []);
   const content = JSON.parse(splitRegistry(text)[1]).content;
-  assert.deepEqual(Object.keys(content), ["tool", "seo", "videoSection", "faqs", "aboutSection", "pairNotes", "relatedTools"]);
+  assert.deepEqual(Object.keys(content), ["tool", "seo", "faqs", "aboutSection", "pairNotes", "howTo", "relatedTools"]);
   assert.equal(content.tool.subtitle, "A subtitle about mp4 audio.");
-  assert.deepEqual(content.videoSection, { embedId: "abc" });
+  assert.deepEqual(content.howTo, { title: "How to", steps: [] });
 });
 
 test("content:apply refuses unknown, retired and non-converter Tools, and fields a page doesn't show", () => {

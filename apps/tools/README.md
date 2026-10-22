@@ -15,6 +15,10 @@ and what client code may import, sitemaps, shared page rendering, and the
 checklist for adding a Tool. Read it before adding or changing a Tool, a
 category, a sitemap or a shared page section.
 
+**How-to videos.** [docs/videos.md](../../docs/videos.md) covers a Tool's
+how-to video: its registry record, the converter page's player, the watch
+page, the `/videos/` library, the video sitemap, and how to add a video.
+
 **Converter copy.** [docs/converter-copy.md](../../docs/converter-copy.md)
 is the style guide for converter and compressor pages: titles and H1s from
 the keyword, descriptions, FAQs and pair notes, what copy may claim, and the

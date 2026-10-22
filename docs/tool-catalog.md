@@ -68,6 +68,9 @@ and other entries end in `/`. `/sitemap-categories.xml` lists every numbered
 page of every category. Deployed environments write their canonical
 origin, local runs the request origin. `/sitemap.xml` and retired names
 (`/sitemap-0.xml`, `/tools-index.xml`, `/tools-0.xml`) 308 into the tree.
+While a Tool has a how-to video, the pages sitemap also lists `/videos/` and
+the watch pages, and `/sitemap-videos.xml` comes last in the index
+([videos.md](videos.md)).
 
 ## Rendering and shared page behavior
 
@@ -111,9 +114,11 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
   has no `Review`, `AggregateRating`, `FAQPage` or `HowTo` markup: Lander
   reviews have no verifiable source, FAQ rich results are limited to
   government and health sites, and HowTo rich results are retired. It has no
-  `BreadcrumbList` either, because no page shows a breadcrumb trail. Tool
-  pages outside the two templates (table converters, transcription, PDF and
-  others) have none yet; #337 tracks them.
+  `BreadcrumbList` either, because these pages show no breadcrumb trail, and
+  a converter page's how-to video has its `VideoObject` on its watch page
+  instead ([videos.md](videos.md)). Tool pages outside the two templates
+  (table converters, transcription, PDF and others) have none yet; #337
+  tracks them.
 - The shared site footer is mounted by
   `packages/app-core/src/components/app-layout.tsx`. Do not add a second page
   footer without an intentional product-specific reason.
@@ -133,7 +138,8 @@ origin, local runs the request origin. `/sitemap.xml` and retired names
 ## Titles, descriptions and share images
 
 `lib/metadata.ts` builds the Tool, category, `/categories/` and `/brands/`
-pages' metadata, and `lib/table-convert.ts` the table converters'. Both use
+pages' metadata, `lib/table-convert.ts` the table converters', and
+`lib/videos.ts` the watch pages' and `/videos/`'s. All use
 `lib/page-metadata.ts`, which also holds the homepage's and the root layout's
 and reads no registry. A page sets only its own title: the layout's template
 adds " | SERP Tools". The homepage sets its full title, and keeps its

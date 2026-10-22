@@ -2758,9 +2758,6 @@
         "description": "Convert Sony ARW RAW photos to JPG in your browser. Choose several at once and each saves as its own JPG. Free, with no sign-up.",
         "howToHeading": "How to convert ARW to JPG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "Can I convert ARW to JPG without losing quality?",
@@ -6685,9 +6682,6 @@
         "description": "Convert AVIF to JPEG in your browser: your image is decoded and saved as a JPEG at quality 0.85, with no upload. Free, with no sign-up.",
         "howToHeading": "How to convert AVIF to JPEG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert AVIF to JPEG?",
@@ -6757,6 +6751,13 @@
     "from": "avif",
     "to": "jpg",
     "isActive": true,
+    "video": {
+      "id": "X4nfORLX_Oo",
+      "title": "How to Convert AVIF to JPG",
+      "description": "A Google search leads to SERP Tools and its AVIF to JPG Converter, where an AVIF photo is chosen and converted to JPG in the browser.",
+      "uploadDate": "2026-10-22T01:19:08-07:00",
+      "duration": "PT34S"
+    },
     "content": {
       "tool": {
         "title": "AVIF to JPG",
@@ -6769,9 +6770,6 @@
         "h1": "AVIF to JPG Converter",
         "description": "Convert AVIF images to JPG in your browser. Choose several AVIF files at once and each downloads as its own JPG. Free, with no sign-up.",
         "howToHeading": "How to convert AVIF to JPG"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -7025,9 +7023,6 @@
         "description": "Convert AVIF images to PNG in your browser, with transparency kept. Free, with no sign-up, and the image never leaves your device.",
         "howToHeading": "How to convert AVIF to PNG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert AVIF to PNG?",
@@ -7266,9 +7261,6 @@
         "from": "png",
         "to": "png",
         "accept": ".png,image/png"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -7839,9 +7831,6 @@
         "from": "bmp",
         "to": "jpg"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is BMP format?",
@@ -8146,9 +8135,6 @@
         "subtitle": "Convert BMP images to PNG",
         "from": "bmp",
         "to": "png"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -8985,9 +8971,6 @@
         "from": "text",
         "to": "stats",
         "accept": ".txt,text/plain"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -9830,9 +9813,6 @@
         "description": "Convert Canon CR2 RAW photos to JPG in your browser. Choose several at once and each saves as its own JPG. Free, with no sign-up.",
         "howToHeading": "How to convert CR2 to JPG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert CR2 to JPG in bulk?",
@@ -10466,9 +10446,6 @@
         "from": "cr3",
         "to": "jpg"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is CR3 format?",
@@ -10920,9 +10897,6 @@
         "from": "csv",
         "to": "csv",
         "accept": ".csv,text/csv"
-      },
-      "videoSection": {
-        "embedId": "Yoglg9pNRc8"
       },
       "faqs": [
         {
@@ -13424,9 +13398,6 @@
         "h1": "DNG to JPG Converter",
         "description": "Convert DNG to JPG in your browser. Raw Digital Negative photos become one JPG each, ready to share. Free, with no sign-up, and nothing is uploaded.",
         "howToHeading": "How to convert DNG to JPG"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -67617,9 +67588,6 @@
         "description": "Convert GIF to JPG in your browser: an animated GIF gives its first frame as a JPG written at quality 0.85. Free, with no sign-up and no upload.",
         "howToHeading": "How to convert GIF to JPG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What happens to an animated GIF?",
@@ -67987,9 +67955,6 @@
         "description": "Convert GIF to PNG in your browser: an animated GIF gives its first frame as a PNG, with transparency kept. Free, with no sign-up or upload.",
         "howToHeading": "How to convert GIF to PNG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert GIF to PNG?",
@@ -68236,9 +68201,6 @@
         "subtitle": "Convert animated GIFs to WebP",
         "from": "gif",
         "to": "webp"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -68489,9 +68451,6 @@
         "description": "Convert HEIC to JPEG in your browser: iPhone photos are decoded here and saved at quality 0.85. Free, with no sign-up, and no upload.",
         "howToHeading": "How to convert HEIC to JPEG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "Will I lose photo quality?",
@@ -68578,6 +68537,13 @@
       "apple"
     ],
     "priority": 9,
+    "video": {
+      "id": "3_euIN48DC8",
+      "title": "How to Convert HEIC to JPG",
+      "description": "Starting from a Google search, the SERP Tools search box finds the HEIC to JPG Converter, and a HEIC photo chosen there is converted to JPG in the browser.",
+      "uploadDate": "2026-10-22T01:17:17-07:00",
+      "duration": "PT34S"
+    },
     "content": {
       "tool": {
         "title": "HEIC to JPG",
@@ -68590,9 +68556,6 @@
         "h1": "HEIC to JPG Converter",
         "description": "Convert iPhone HEIC photos to JPG in your browser. Choose several HEIC files at once and each downloads as its own JPG. Free, with no sign-up.",
         "howToHeading": "How to convert HEIC to JPG"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -68840,9 +68803,6 @@
         "description": "Convert HEIC to PDF in your browser: each iPhone photo becomes a one-page PDF. It is decoded here, so the HEIC isn't uploaded. Free, no sign-up.",
         "howToHeading": "How to convert HEIC to PDF"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What size is the page in the HEIC's PDF?",
@@ -68954,9 +68914,6 @@
         "h1": "HEIC to PNG Converter",
         "description": "Convert HEIC photos from an iPhone to PNG in your browser. The image is decoded to 8-bit pixels and saved losslessly. Free, with no sign-up.",
         "howToHeading": "How to convert HEIC to PNG"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -69241,9 +69198,6 @@
         "description": "Convert HEIF to JPG in your browser: the main image is decoded and saved as a JPG at quality 0.85. Free, with no sign-up and no upload.",
         "howToHeading": "How to change HEIF to JPG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "Does it convert HEIC files too?",
@@ -69458,9 +69412,6 @@
         "to": "pdf",
         "accept": ".heif,.heifs,image/heif"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "Can I combine multiple HEIF images into one PDF?",
@@ -69558,9 +69509,6 @@
         "from": "heif",
         "to": "png",
         "accept": ".heif,.heifs,image/heif"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -71319,9 +71267,6 @@
         "from": "ico",
         "to": "png"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is ICO format?",
@@ -71696,9 +71641,6 @@
         "description": "Convert JFIF to JPEG in your browser. Each file is re-encoded as a standard JPEG at quality 0.85. Free, with no sign-up, and nothing is uploaded.",
         "howToHeading": "How to convert JFIF to JPEG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "Is a JFIF file the same as a JPEG?",
@@ -71793,9 +71735,6 @@
         "h1": "JFIF to JPG Converter",
         "description": "Convert JFIF to JPG in your browser: the image is decoded and saved as a regular .jpg that opens in any viewer. Free, with no sign-up.",
         "howToHeading": "How to convert JFIF to JPG"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -71935,9 +71874,6 @@
         "description": "Convert JFIF to PDF in your browser, with no upload. Each JFIF becomes its own one-page PDF the size of the image. Free, with no sign-up.",
         "howToHeading": "How to convert JFIF to PDF"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert a JFIF to PDF?",
@@ -72048,9 +71984,6 @@
         "h1": "JFIF to PNG Converter",
         "description": "Convert JFIF to PNG in your browser, with no upload. The image is saved as lossless PNG pixels. Free, with no sign-up and nothing to install.",
         "howToHeading": "How to convert JFIF to PNG"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -72654,9 +72587,6 @@
         "description": "Convert JPEG to JPG in your browser: each image is decoded and saved again as a .jpg file. Free, with no sign-up, and no upload.",
         "howToHeading": "How to convert JPEG to JPG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "Is there a difference between JPEG and JPG?",
@@ -72868,9 +72798,6 @@
         "description": "Convert JPEG photos to PDF in your browser. Choose several JPEG files at once and each downloads as its own PDF. Free, with no sign-up.",
         "howToHeading": "How to convert JPEG to PDF"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert a JPEG to PDF?",
@@ -72979,9 +72906,6 @@
         "h1": "JPEG to PNG Converter",
         "description": "Convert JPEG to PNG in your browser. The PNG is lossless, with no quality setting, and the JPEG isn't uploaded. Free, with no sign-up.",
         "howToHeading": "How to convert JPEG to PNG"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -73282,9 +73206,6 @@
         "h1": "JPEG to WebP Converter",
         "description": "Convert JPEG to WebP in your browser: the image is re-encoded as a WebP at quality 0.85. Free, with no sign-up, and your file isn't uploaded.",
         "howToHeading": "How to convert JPEG to WebP"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -73990,9 +73911,6 @@
         "from": "jpg",
         "to": "pdf"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is JPG format?",
@@ -74119,9 +74037,6 @@
         "h1": "JPG to PNG Converter",
         "description": "Convert JPG to PNG in your browser: the photo is decoded and saved as a lossless PNG, one file per image. Free, with no sign-up.",
         "howToHeading": "How to convert JPG to PNG"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -74310,9 +74225,6 @@
         "description": "Convert JPG to SVG in your browser. The picture is embedded in the SVG, not traced to vector shapes. Free, with no sign-up, and nothing is uploaded.",
         "howToHeading": "How to convert JPG to SVG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert a JPG to SVG?",
@@ -74449,6 +74361,13 @@
     "from": "jpg",
     "to": "webp",
     "isActive": true,
+    "video": {
+      "id": "mC9TIVTM98A",
+      "title": "How to Convert JPG to WebP",
+      "description": "The SERP Tools search finds the JPG to WebP Converter, and a JPG photo chosen on its page is converted to a WebP image in the browser.",
+      "uploadDate": "2026-10-22T01:15:39-07:00",
+      "duration": "PT34S"
+    },
     "content": {
       "tool": {
         "title": "JPG to WebP",
@@ -74461,9 +74380,6 @@
         "h1": "JPG to WebP Converter",
         "description": "Convert JPG to WebP in your browser. The image is decoded and saved again as a WebP at quality 0.85. Free, with no sign-up, no upload.",
         "howToHeading": "How to convert JPG to WebP"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -74578,9 +74494,6 @@
         "from": "json",
         "to": "csv",
         "accept": ".json,application/json"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -78887,9 +78800,6 @@
         "from": "mkv",
         "to": "avi"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is MKV format?",
@@ -78954,7 +78864,6 @@
         }
       ]
     },
-    "video": "GTaOBy7mxF0",
     "requiresFFmpeg": true
   },
   {
@@ -79086,9 +78995,6 @@
         "from": "mkv",
         "to": "gif"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is MKV format?",
@@ -79153,7 +79059,6 @@
         }
       ]
     },
-    "video": "GTaOBy7mxF0",
     "requiresFFmpeg": true
   },
   {
@@ -79284,9 +79189,6 @@
         "from": "mkv",
         "to": "mov"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is MKV format?",
@@ -79351,7 +79253,6 @@
         }
       ]
     },
-    "video": "GTaOBy7mxF0",
     "requiresFFmpeg": true
   },
   {
@@ -79401,9 +79302,6 @@
         "h1": "MKV to MP3 Converter",
         "description": "Convert MKV video to MP3 audio in your browser: the sound becomes a 192 kbps MP3. Free, with no sign-up, and nothing is uploaded.",
         "howToHeading": "How to convert MKV to MP3"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -79472,7 +79370,6 @@
         }
       ]
     },
-    "video": "GTaOBy7mxF0",
     "requiresFFmpeg": true
   },
   {
@@ -79504,9 +79401,6 @@
         "h1": "MKV to MP4 Converter",
         "description": "Convert MKV to MP4 in your browser: the streams are copied into an MP4 without re-encoding. Free, with no sign-up, and no upload.",
         "howToHeading": "How to convert MKV to MP4"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -79576,7 +79470,6 @@
         }
       ]
     },
-    "video": "GTaOBy7mxF0",
     "requiresFFmpeg": true
   },
   {
@@ -79706,9 +79599,6 @@
         "from": "mkv",
         "to": "ogg"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is MKV format?",
@@ -79773,7 +79663,6 @@
         }
       ]
     },
-    "video": "GTaOBy7mxF0",
     "requiresFFmpeg": true
   },
   {
@@ -79886,9 +79775,6 @@
         "from": "mkv",
         "to": "wav"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is MKV format?",
@@ -79953,7 +79839,6 @@
         }
       ]
     },
-    "video": "GTaOBy7mxF0",
     "requiresFFmpeg": true
   },
   {
@@ -79979,9 +79864,6 @@
         "subtitle": "Convert MKV video files to WebM format",
         "from": "mkv",
         "to": "webm"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -80047,7 +79929,6 @@
         }
       ]
     },
-    "video": "GTaOBy7mxF0",
     "requiresFFmpeg": true
   },
   {
@@ -82013,9 +81894,6 @@
         "from": "mp4",
         "to": "3gp"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is 3GP format?",
@@ -82101,9 +81979,6 @@
         "subtitle": "Extract high-efficiency AAC audio from MP4 videos with superior compression",
         "from": "mp4",
         "to": "aac"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -82196,9 +82071,6 @@
         "subtitle": "Extract audio from MP4 videos and convert to Apple's uncompressed AIFF format",
         "from": "mp4",
         "to": "aiff"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -82321,9 +82193,6 @@
         "subtitle": "Convert MP4 videos to Advanced Systems Format for Windows Media",
         "from": "mp4",
         "to": "asf"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -82459,9 +82328,6 @@
         "from": "mp4",
         "to": "avi"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "Why would I convert MP4 to AVI?",
@@ -82585,9 +82451,6 @@
         "from": "mp4",
         "to": "divx"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is DivX format?",
@@ -82675,9 +82538,6 @@
         "from": "mp4",
         "to": "f4v"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is F4V format?",
@@ -82763,9 +82623,6 @@
         "subtitle": "Extract lossless FLAC audio from MP4 videos for audiophile-quality music archiving",
         "from": "mp4",
         "to": "flac"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -82857,9 +82714,6 @@
         "subtitle": "Convert MP4 videos to Flash Video format for legacy web applications",
         "from": "mp4",
         "to": "flv"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -82953,9 +82807,6 @@
         "description": "Convert MP4 to GIF in your browser: a looping animation at 15 fps, up to 480 px wide, with its own colour palette. Free, with no sign-up.",
         "howToHeading": "How to convert MP4 to GIF"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What size and frame rate is the GIF?",
@@ -83042,9 +82893,6 @@
         "from": "mp4",
         "to": "hevc"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is HEVC format?",
@@ -83126,9 +82974,6 @@
         "subtitle": "Convert MP4 videos to M2TS format for Blu-ray compatibility",
         "from": "mp4",
         "to": "m2ts"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -83216,9 +83061,6 @@
         "subtitle": "Extract M4A audio from MP4 videos for iTunes and Apple device compatibility",
         "from": "mp4",
         "to": "m4a"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -83328,9 +83170,6 @@
         "from": "mp4",
         "to": "m4v"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What's the difference between MP4 and M4V?",
@@ -83422,9 +83261,6 @@
         "from": "mp4",
         "to": "mjpeg"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is MJPEG format?",
@@ -83510,9 +83346,6 @@
         "subtitle": "Convert MP4 videos to MKV format with support for multiple streams and chapters",
         "from": "mp4",
         "to": "mkv"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -83619,9 +83452,6 @@
         "description": "Convert MP4 to MOV in your browser by copying the streams into a MOV container, with no re-encoding. Free, with no sign-up, and no upload.",
         "howToHeading": "How to convert MP4 to MOV"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert MP4 to MOV?",
@@ -83717,9 +83547,6 @@
         "from": "mp4",
         "to": "mp2"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is MP2 audio format?",
@@ -83810,9 +83637,6 @@
         "title": "Convert MP4 to MP3 Online (Free)",
         "h1": "MP4 to MP3 Converter",
         "description": "Convert MP4 video to MP3 audio in your browser: the soundtrack becomes a 192 kbps MP3. Free, with no sign-up, and the video isn't uploaded."
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -83908,9 +83732,6 @@
         "from": "mp4",
         "to": "mpeg"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is MPEG video format?",
@@ -84001,9 +83822,6 @@
         "subtitle": "Convert MP4 videos to MPEG-2 format for broadcast and DVD compatibility",
         "from": "mp4",
         "to": "mpeg2"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -84096,9 +83914,6 @@
         "from": "mp4",
         "to": "mpg"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "What is MPG format?",
@@ -84189,9 +84004,6 @@
         "subtitle": "Convert MP4 videos to MTS format for camcorder compatibility",
         "from": "mp4",
         "to": "mts"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -84314,9 +84126,6 @@
         "from": "mp4",
         "to": "ogg"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "Why choose OGG over MP3 for audio extraction?",
@@ -84424,9 +84233,6 @@
         "subtitle": "Extract cutting-edge Opus audio from MP4 videos for superior compression and quality",
         "from": "mp4",
         "to": "opus"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -84646,9 +84452,6 @@
         "from": "mp4",
         "to": "ts"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "Why convert MP4 to TS format?",
@@ -84739,9 +84542,6 @@
         "subtitle": "Convert MP4 videos to VOB format for DVD compatibility",
         "from": "mp4",
         "to": "vob"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -84838,9 +84638,6 @@
         "h1": "MP4 to WAV Converter",
         "description": "Convert MP4 to WAV in your browser: the soundtrack is saved as uncompressed 16-bit WAV audio and the video is dropped. Free, with no sign-up.",
         "howToHeading": "How to convert MP4 to WAV"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -84942,9 +84739,6 @@
         "description": "Convert MP4 to WebM in your browser: the video is re-encoded as VP8 with Vorbis audio. Free, with no sign-up, and the video isn't uploaded.",
         "howToHeading": "How to convert MP4 to WebM"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert an MP4 to WebM?",
@@ -85035,9 +84829,6 @@
         "subtitle": "Extract audio from MP4 videos and convert to Windows Media Audio format",
         "from": "mp4",
         "to": "wma"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -92333,9 +92124,6 @@
         "description": "Convert every page of a PDF to its own PNG image in your browser, on a white background. Free, with no sign-up.",
         "howToHeading": "How to convert PDF to PNG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert a PDF to PNG?",
@@ -93342,9 +93130,6 @@
         "description": "Convert PNG images to JPG in your browser. Choose several PNG files at once and each downloads as its own JPG. Free, with no sign-up.",
         "howToHeading": "How to convert PNG to JPG"
       },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
-      },
       "faqs": [
         {
           "question": "How do I convert a PNG to JPG?",
@@ -93534,9 +93319,6 @@
         "h1": "PNG Compressor",
         "description": "Compress PNG in your browser, normally losslessly with oxipng. If the browser can't run it, colours are reduced instead. Free, with no sign-up.",
         "howToHeading": "How to compress a PNG"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -93848,9 +93630,6 @@
         "h1": "PNG to WebP Converter",
         "description": "Convert PNG to WebP in your browser, with transparency kept and the WebP written at quality 0.85. Free, with no sign-up, and no upload.",
         "howToHeading": "How to convert PNG to WebP"
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {
@@ -96938,6 +96717,13 @@
       "image",
       "convert"
     ],
+    "video": {
+      "id": "G3vOu8oFjoY",
+      "title": "How to Convert SVG to PNG",
+      "description": "An SVG logo is dragged onto the SVG to PNG Converter and converted in the browser. The PNG downloads automatically and shows the same logo.",
+      "uploadDate": "2026-10-22T01:11:51-07:00",
+      "duration": "PT27S"
+    },
     "content": {
       "tool": {
         "title": "SVG to PNG",
@@ -103947,6 +103733,13 @@
     "from": "webp",
     "to": "png",
     "isActive": true,
+    "video": {
+      "id": "FJkyr2TEUs0",
+      "title": "How to Convert WebP to PNG (Free Method)",
+      "description": "A WebP photo is dragged onto the WebP to PNG Converter and converted to PNG in the browser. The PNG downloads automatically and opens as the same picture.",
+      "uploadDate": "2026-10-22T00:15:20-07:00",
+      "duration": "PT27S"
+    },
     "content": {
       "tool": {
         "title": "WebP to PNG",
@@ -103959,9 +103752,6 @@
         "title": "Convert WebP to PNG Online (Free)",
         "h1": "WebP to PNG Converter",
         "description": "Convert WebP images to PNG in your browser, with transparency kept. Free, with no sign-up, and the image never leaves your device."
-      },
-      "videoSection": {
-        "embedId": "GTaOBy7mxF0"
       },
       "faqs": [
         {

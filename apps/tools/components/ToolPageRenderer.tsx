@@ -54,7 +54,7 @@ export function ToolPageRenderer({ toolId }: ToolPageRendererProps) {
   return (
     <ToolPageTemplate
       tool={toolInfo}
-      videoSection={content?.videoSection}
+      video={tool.video}
       howTo={content?.howTo ?? buildHowToSection(tool)}
       infoArticle={
         pairNotes ? pairNotesArticle(pairNotes) : (content?.infoArticle ?? buildInfoArticleSection(tool))
