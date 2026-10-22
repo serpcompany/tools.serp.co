@@ -25,6 +25,7 @@ const source = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const player = source("../components/ToolVideoPlayer.tsx");
 const section = source("../components/sections/ToolVideoSection.tsx");
 const template = source("../components/ToolPageTemplate.tsx");
+const card = source("../components/videos/VideoCard.tsx");
 
 test("a converter page shows its Tool's video unless the page is cross-origin isolated", () => {
   const webpToPng = getTool("webp-to-png");
@@ -52,6 +53,15 @@ test("the converter page's player loads nothing from YouTube's player host until
   // The thumbnail has its own size, so nothing moves as it loads.
   assert.match(player, /<img[\s\S]*?width=\{YOUTUBE_THUMBNAIL_WIDTH\}[\s\S]*?height=\{YOUTUBE_THUMBNAIL_HEIGHT\}/);
   assert.match(player, /loading="lazy"/);
+});
+
+test("pages show the small hqdefault thumbnail; only the JSON-LD and video sitemap name the 1280 x 720 one", () => {
+  // WatchVideo.thumbnailUrl is maxresdefault, for Google. The player and the
+  // cards are sized for hqdefault (YOUTUBE_THUMBNAIL_WIDTH x HEIGHT).
+  for (const [name, file] of [["player", player], ["card", card]]) {
+    assert.match(file, /src=\{youtubeThumbnailUrl\(/, `the ${name} shows youtubeThumbnailUrl`);
+    assert.doesNotMatch(file, /thumbnailUrl\}|MaxresThumbnail/, `the ${name} shows no maxres thumbnail`);
+  }
 });
 
 test("the converter page links its video to the video's watch page, under the How-to section", () => {

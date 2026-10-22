@@ -198,7 +198,7 @@ test("a watch page's VideoObject is its video at its canonical URL, played by it
     name: "How to Convert WebP to PNG (Free Method)",
     description:
       "A WebP photo is dragged onto the WebP to PNG Converter and converted to PNG in the browser. The PNG downloads automatically and opens as the same picture.",
-    thumbnailUrl: ["https://i.ytimg.com/vi/FJkyr2TEUs0/hqdefault.jpg"],
+    thumbnailUrl: ["https://i.ytimg.com/vi/FJkyr2TEUs0/maxresdefault.jpg"],
     uploadDate: "2026-10-22T00:15:20-07:00",
     duration: "PT27S",
     embedUrl: "https://www.youtube-nocookie.com/embed/FJkyr2TEUs0",

@@ -9,7 +9,7 @@ import { VIDEOS_PATH, normalizePath, toSitemapUrl } from "./sitemap.ts";
 import {
   durationSeconds,
   youtubeEmbedUrl,
-  youtubeThumbnailUrl,
+  youtubeMaxresThumbnailUrl,
   youtubeWatchUrl,
 } from "./youtube.ts";
 
@@ -43,6 +43,8 @@ export type WatchVideo = {
   watchUrl: string;
   // The player the watch page embeds: never the watch page, never YouTube's.
   embedUrl: string;
+  // The 1280 x 720 thumbnail the VideoObject and video sitemap name. Pages
+  // show the smaller youtubeThumbnailUrl instead.
   thumbnailUrl: string;
   platform: "youtube";
   uploadDate: string;
@@ -81,7 +83,7 @@ export function toWatchVideo(tool: ToolWithVideo, origin: string): WatchVideo {
     watchPath: path,
     watchUrl: toSitemapUrl(origin, path),
     embedUrl: youtubeEmbedUrl(video.id),
-    thumbnailUrl: youtubeThumbnailUrl(video.id),
+    thumbnailUrl: youtubeMaxresThumbnailUrl(video.id),
     platform: "youtube",
     uploadDate: video.uploadDate,
     duration: video.duration,

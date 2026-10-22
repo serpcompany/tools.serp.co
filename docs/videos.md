@@ -15,10 +15,17 @@ A Tool's video is one registry field, its `video` in `lib/catalog/tools.json`
 page, since YouTube's can be a bare link. Nothing else is stored.
 `lib/videos.ts` derives the rest as a `WatchVideo`: the watch page's path and
 URL, the player (`https://www.youtube-nocookie.com/embed/<id>`), the
-thumbnail (YouTube's `hqdefault.jpg`, 480 x 360), the YouTube page, the length
-in seconds, and the Tool it shows. The standard names that Tool in its
+thumbnail, the YouTube page, the length in seconds, and the Tool it shows. The standard names that Tool in its
 `productSlug`, `productName` and `productPath` fields; here it is always the
 Tool, never a Product in CONTEXT.md's sense.
+
+Two thumbnails come from the id (`lib/youtube.ts`). The `VideoObject` and
+the video sitemap name `maxresdefault.jpg`, 1280 x 720 with no black bars,
+since Google shows that image in video results as it is. The converter page's
+player and the video cards show `hqdefault.jpg`, 480 x 360, which every video
+has and which is a fifth the size; they crop it to 16:9, so its bars never
+show. YouTube makes `maxresdefault.jpg` only for uploads of 720p or more; all
+five videos have it (checked 2026-10-22).
 
 `lib/catalog/validate.ts` holds each record to the standard: an 11-character
 YouTube id, a plain-text description of at most 2,048 characters, an
@@ -68,13 +75,17 @@ page. What a visitor's browser loads from YouTube, and when, is in
 2. Watch the video and write its `description`: one or two plain sentences
    saying what it shows, naming the Tool's page (its H1, such as "SVG to PNG
    Converter"). Claim nothing the video doesn't show.
-3. Add them as the Tool's `video` in `tools.json`, before its `content`. The
+3. Check the video has a 1280 x 720 thumbnail: `curl -sI
+   https://i.ytimg.com/vi/<id>/maxresdefault.jpg` answers 200 with a
+   `content-length` over 10 KB (a 404 or a 120 x 90 placeholder means
+   none). If it has none, upload it again at 720p or more first.
+4. Add them as the Tool's `video` in `tools.json`, before its `content`. The
    Tool must be active and on the shared converter page.
-4. Run `node --test apps/tools/lib/catalog/validate.test.mjs
+5. Run `node --test apps/tools/lib/catalog/validate.test.mjs
    apps/tools/lib/videos.test.mjs apps/tools/lib/sitemap.test.mjs
    apps/tools/lib/metadata.test.mjs`. The watch page's meta description is
    generated from the title and length, and must be 110 to 160 characters.
-5. On a preview build, open the converter page, the watch page, `/videos/` and
+6. On a preview build, open the converter page, the watch page, `/videos/` and
    `/sitemap-videos.xml`. After the deploy, run the watch page through Google's
    [Rich Results Test](https://search.google.com/test/rich-results), and watch
    Search Console's Video indexing report after the next crawl.

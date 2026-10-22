@@ -4,14 +4,23 @@
 // builds each video's WatchVideo from it.
 
 // YouTube's hqdefault thumbnail, 480 x 360 with a 16:9 frame letterboxed. It
-// exists for every video, unlike the larger maxresdefault. The converter
-// page's player shows it until a visitor clicks play, the video cards show
-// it, and the VideoObject and video sitemap name it.
+// exists for every video and is a fifth the size of maxresdefault. The
+// converter page's player and the video cards show it, cropped to 16:9 by
+// object-cover, so the bars never show.
 export const YOUTUBE_THUMBNAIL_WIDTH = 480;
 export const YOUTUBE_THUMBNAIL_HEIGHT = 360;
 
 export function youtubeThumbnailUrl(youtubeId: string): string {
   return `https://i.ytimg.com/vi/${encodeURIComponent(youtubeId)}/hqdefault.jpg`;
+}
+
+// YouTube's maxresdefault thumbnail, 1280 x 720 with no bars: the image
+// Google shows in video results, so the VideoObject and the video sitemap
+// name it. YouTube makes it only for videos uploaded at 720p or more, and
+// answers a 120 x 90 placeholder or a 404 otherwise; docs/videos.md says how
+// to check a new video has one.
+export function youtubeMaxresThumbnailUrl(youtubeId: string): string {
+  return `https://i.ytimg.com/vi/${encodeURIComponent(youtubeId)}/maxresdefault.jpg`;
 }
 
 // The privacy-enhanced player, which sets no cookies until the video plays:

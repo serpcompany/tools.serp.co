@@ -6,13 +6,16 @@ import {
   durationSeconds,
   uploadDateLabel,
   youtubeEmbedUrl,
+  youtubeMaxresThumbnailUrl,
   youtubeThumbnailUrl,
   youtubeWatchUrl,
 } from "./youtube.ts";
 
-test("a video's URLs: the privacy-enhanced player, its thumbnail and its YouTube page", () => {
+test("a video's URLs: the privacy-enhanced player, its two thumbnails and its YouTube page", () => {
   assert.equal(youtubeEmbedUrl("FJkyr2TEUs0"), "https://www.youtube-nocookie.com/embed/FJkyr2TEUs0");
+  // The small one pages show, and the 1280 x 720 one Google is given.
   assert.equal(youtubeThumbnailUrl("FJkyr2TEUs0"), "https://i.ytimg.com/vi/FJkyr2TEUs0/hqdefault.jpg");
+  assert.equal(youtubeMaxresThumbnailUrl("FJkyr2TEUs0"), "https://i.ytimg.com/vi/FJkyr2TEUs0/maxresdefault.jpg");
   assert.equal(youtubeWatchUrl("FJkyr2TEUs0"), "https://www.youtube.com/watch?v=FJkyr2TEUs0");
 });
 

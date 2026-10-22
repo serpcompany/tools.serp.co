@@ -169,7 +169,7 @@ function sitemapVideo(index, overrides = {}) {
     title: `How to use tool ${index}`,
     description: `Tool ${index}, step by step.`,
     embedUrl: `https://www.youtube-nocookie.com/embed/${id}`,
-    thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+    thumbnailUrl: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
     durationSeconds: 28,
     uploadDate: "2026-10-22T00:15:20-07:00",
     ...overrides,

@@ -33,7 +33,7 @@ test("a Tool's video is one registry record; everything else about it is derived
     watchPath: "/watch/webp-to-png/FJkyr2TEUs0/",
     watchUrl: "https://tools.serp.co/watch/webp-to-png/FJkyr2TEUs0/",
     embedUrl: "https://www.youtube-nocookie.com/embed/FJkyr2TEUs0",
-    thumbnailUrl: "https://i.ytimg.com/vi/FJkyr2TEUs0/hqdefault.jpg",
+    thumbnailUrl: "https://i.ytimg.com/vi/FJkyr2TEUs0/maxresdefault.jpg",
     platform: "youtube",
     uploadDate: "2026-10-22T00:15:20-07:00",
     duration: "PT27S",

@@ -5,6 +5,7 @@ import {
   YOUTUBE_THUMBNAIL_HEIGHT,
   YOUTUBE_THUMBNAIL_WIDTH,
   durationLabel,
+  youtubeThumbnailUrl,
 } from "@/lib/youtube";
 
 type VideoCardProps = {
@@ -29,7 +30,7 @@ export function VideoCard({ video, headingLevel }: VideoCardProps) {
         {/* The thumbnail comes from YouTube's image host, which Next's image optimizer doesn't serve. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={video.thumbnailUrl}
+          src={youtubeThumbnailUrl(video.id)}
           alt=""
           width={YOUTUBE_THUMBNAIL_WIDTH}
           height={YOUTUBE_THUMBNAIL_HEIGHT}
