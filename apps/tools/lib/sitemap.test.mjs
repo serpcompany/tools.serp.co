@@ -244,7 +244,7 @@ test("the videos sitemap lists each watch page with its player, never a media fi
   }
 
   const webpToPng = entries.find((entry) => entry.loc === `${origin}/watch/webp-to-png/FJkyr2TEUs0/`);
-  assert.equal(webpToPng?.tags.duration, "28");
+  assert.equal(webpToPng?.tags.duration, "27");
   assert.equal(webpToPng?.tags.player_loc, "https://www.youtube-nocookie.com/embed/FJkyr2TEUs0");
 });
 

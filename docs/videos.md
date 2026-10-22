@@ -10,8 +10,9 @@ Paths are under `apps/tools/` unless they start with `docs/`.
 ## The record
 
 A Tool's video is one registry field, its `video` in `lib/catalog/tools.json`
-(`ToolVideo` in `types/index.d.ts`): the YouTube `id`, and YouTube's `title`,
-`description`, `uploadDate` and `duration` for it. Nothing else is stored.
+(`ToolVideo` in `types/index.d.ts`): the YouTube `id`; YouTube's `title`,
+`uploadDate` and `duration` for it; and a `description` written for the watch
+page, since YouTube's can be a bare link. Nothing else is stored.
 `lib/videos.ts` derives the rest as a `WatchVideo`: the watch page's path and
 URL, the player (`https://www.youtube-nocookie.com/embed/<id>`), the
 thumbnail (YouTube's `hqdefault.jpg`, 480 x 360), the YouTube page, the length
@@ -22,7 +23,9 @@ Tool, never a Product in CONTEXT.md's sense.
 `lib/catalog/validate.ts` holds each record to the standard: an 11-character
 YouTube id, a plain-text description of at most 2,048 characters, an
 `uploadDate` that is an ISO 8601 date-time with its time zone, and an ISO 8601
-`duration` such as `PT28S`. No two videos share an id, title or description.
+`duration` such as `PT27S`. No two videos share an id, title or description.
+`lib/videos.test.mjs` checks that each description names its Tool and holds no
+link.
 
 ## Where a video shows
 
@@ -57,19 +60,21 @@ page. What a visitor's browser loads from YouTube, and when, is in
 
 ## Adding a video
 
-1. Read the facts from the video's YouTube page: its title and description as
-   written, its `uploadDate` (the page's `<meta itemprop="uploadDate">`, which
-   has the time zone), and its `duration` (`<meta itemprop="duration">`, such
-   as `PT0M28S`; write it as `PT28S`). The YouTube Data API's `videos.list`
-   gives the same facts. A description that is only a link reads thinly on the
-   watch page; improve it on YouTube first, then copy it.
-2. Add them as the Tool's `video` in `tools.json`, before its `content`. The
+1. Read the facts from the video's YouTube page: its title as written, its
+   `uploadDate` (the page's `<meta itemprop="uploadDate">`, which has the time
+   zone), and its length in seconds (`videoDetails.lengthSeconds` in the page's
+   player data; write 27 as `PT27S`). `<meta itemprop="duration">` rounds the
+   length up, so it can be a second longer.
+2. Watch the video and write its `description`: one or two plain sentences
+   saying what it shows, naming the Tool's page (its H1, such as "SVG to PNG
+   Converter"). Claim nothing the video doesn't show.
+3. Add them as the Tool's `video` in `tools.json`, before its `content`. The
    Tool must be active and on the shared converter page.
-3. Run `node --test apps/tools/lib/catalog/validate.test.mjs
+4. Run `node --test apps/tools/lib/catalog/validate.test.mjs
    apps/tools/lib/videos.test.mjs apps/tools/lib/sitemap.test.mjs
-   apps/tools/lib/metadata.test.mjs`. The watch page's description is
+   apps/tools/lib/metadata.test.mjs`. The watch page's meta description is
    generated from the title and length, and must be 110 to 160 characters.
-4. On a preview build, open the converter page, the watch page, `/videos/` and
+5. On a preview build, open the converter page, the watch page, `/videos/` and
    `/sitemap-videos.xml`. After the deploy, run the watch page through Google's
    [Rich Results Test](https://search.google.com/test/rich-results), and watch
    Search Console's Video indexing report after the next crawl.

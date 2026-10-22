@@ -161,8 +161,8 @@ export function lengthPhrase(seconds: number): string {
   return seconds < 60 ? `${seconds}-second` : `${Math.round(seconds / 60)}-minute`;
 }
 
-// A watch page's description: what the video is and which Tool it shows. The
-// video's own description is on the page; YouTube's can be a bare link.
+// A watch page's meta description: what the video is and which Tool it
+// shows. The video's written description is on the page itself.
 export function watchDescription(video: WatchVideo): string {
   return composeDescription(
     `Watch ${video.title}: a ${lengthPhrase(video.durationSeconds)} video showing how to use the ${video.productName} on SERP Tools.`,

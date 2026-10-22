@@ -27,7 +27,8 @@ test("a Tool's video is one registry record; everything else about it is derived
     id: "FJkyr2TEUs0",
     slug: "FJkyr2TEUs0",
     title: "How to Convert WebP to PNG (Free Method)",
-    description: "WebP to PNG Convert: https://tools.serp.co/webp-to-png/",
+    description:
+      "A WebP photo is dragged onto the WebP to PNG Converter and converted to PNG in the browser. The PNG downloads automatically and opens as the same picture.",
     sourceUrl: "https://www.youtube.com/watch?v=FJkyr2TEUs0",
     watchPath: "/watch/webp-to-png/FJkyr2TEUs0/",
     watchUrl: "https://tools.serp.co/watch/webp-to-png/FJkyr2TEUs0/",
@@ -35,8 +36,8 @@ test("a Tool's video is one registry record; everything else about it is derived
     thumbnailUrl: "https://i.ytimg.com/vi/FJkyr2TEUs0/hqdefault.jpg",
     platform: "youtube",
     uploadDate: "2026-10-22T00:15:20-07:00",
-    duration: "PT28S",
-    durationSeconds: 28,
+    duration: "PT27S",
+    durationSeconds: 27,
     productSlug: "webp-to-png",
     productName: "WebP to PNG Converter",
     productPath: "/webp-to-png/",
@@ -70,6 +71,18 @@ test("the library is newest first", () => {
   for (let index = 1; index < library.length; index += 1) {
     assert.ok(Date.parse(library[index - 1].uploadDate) >= Date.parse(library[index].uploadDate));
   }
+  assert.deepEqual(
+    library.map((video) => video.productSlug),
+    ["avif-to-jpg", "heic-to-jpg", "jpg-to-webp", "svg-to-png", "webp-to-png"],
+  );
+});
+
+test("each video has its own written description, naming the Tool it shows, not a link", () => {
+  for (const video of watchVideos(ORIGIN)) {
+    assert.doesNotMatch(video.description, /https?:\/\/|www\./, video.productSlug);
+    assert.match(video.description, /[.!?]$/, `${video.productSlug} ends as a sentence`);
+    assert.ok(video.description.includes(video.productName), `${video.productSlug} names ${video.productName}`);
+  }
 });
 
 test("a watch URL is served only for an active Tool and its own video", () => {
@@ -99,8 +112,8 @@ test("no Tool's route is under /videos/ or /watch/", () => {
   }
 });
 
-// A video for a real Tool, as the library would hold it once that Tool has
-// one: only webp-to-png has a video today.
+// A video for a real Tool, as the library would hold it if that Tool had
+// one.
 const fakeVideo = (toolId, uploadDate) => {
   const tool = getTool(toolId);
   assert.ok(tool, toolId);
@@ -129,6 +142,20 @@ test("a watch page's other videos: those sharing a format with its Tool first, t
   assert.deepEqual(relatedWatchVideos(current, [current]), [], "a lone video has none");
 });
 
+test("each watch page links to the other videos, WebP to PNG first to those sharing WebP or PNG", () => {
+  const library = watchVideos(ORIGIN);
+  for (const video of library) {
+    const related = relatedWatchVideos(video, library);
+    assert.equal(related.length, library.length - 1, video.productSlug);
+    assert.ok(related.every((other) => other.watchPath !== video.watchPath));
+  }
+  const webpToPng = findWatchVideo("webp-to-png", "FJkyr2TEUs0", ORIGIN);
+  assert.deepEqual(
+    relatedWatchVideos(webpToPng, library).map((video) => video.productSlug),
+    ["jpg-to-webp", "svg-to-png", "avif-to-jpg", "heic-to-jpg"],
+  );
+});
+
 test("the breadcrumb trail is Home, Videos, the Tool, then the video", () => {
   const video = findWatchVideo("webp-to-png", "FJkyr2TEUs0", ORIGIN);
   assert.deepEqual(watchBreadcrumbs(video), [
@@ -153,7 +180,7 @@ test("a watch page is titled as its video and canonical at its watch URL", () =>
   }
   assert.equal(
     watchDescription(findWatchVideo("webp-to-png", "FJkyr2TEUs0", ORIGIN)),
-    "Watch How to Convert WebP to PNG (Free Method): a 28-second video showing how to use the WebP to PNG Converter on SERP Tools.",
+    "Watch How to Convert WebP to PNG (Free Method): a 27-second video showing how to use the WebP to PNG Converter on SERP Tools.",
   );
 });
 

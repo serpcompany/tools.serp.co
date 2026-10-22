@@ -6751,6 +6751,13 @@
     "from": "avif",
     "to": "jpg",
     "isActive": true,
+    "video": {
+      "id": "X4nfORLX_Oo",
+      "title": "How to Convert AVIF to JPG",
+      "description": "A Google search leads to SERP Tools and its AVIF to JPG Converter, where an AVIF photo is chosen and converted to JPG in the browser.",
+      "uploadDate": "2026-10-22T01:19:08-07:00",
+      "duration": "PT34S"
+    },
     "content": {
       "tool": {
         "title": "AVIF to JPG",
@@ -68530,6 +68537,13 @@
       "apple"
     ],
     "priority": 9,
+    "video": {
+      "id": "3_euIN48DC8",
+      "title": "How to Convert HEIC to JPG",
+      "description": "Starting from a Google search, the SERP Tools search box finds the HEIC to JPG Converter, and a HEIC photo chosen there is converted to JPG in the browser.",
+      "uploadDate": "2026-10-22T01:17:17-07:00",
+      "duration": "PT34S"
+    },
     "content": {
       "tool": {
         "title": "HEIC to JPG",
@@ -74347,6 +74361,13 @@
     "from": "jpg",
     "to": "webp",
     "isActive": true,
+    "video": {
+      "id": "mC9TIVTM98A",
+      "title": "How to Convert JPG to WebP",
+      "description": "The SERP Tools search finds the JPG to WebP Converter, and a JPG photo chosen on its page is converted to a WebP image in the browser.",
+      "uploadDate": "2026-10-22T01:15:39-07:00",
+      "duration": "PT34S"
+    },
     "content": {
       "tool": {
         "title": "JPG to WebP",
@@ -96696,6 +96717,13 @@
       "image",
       "convert"
     ],
+    "video": {
+      "id": "G3vOu8oFjoY",
+      "title": "How to Convert SVG to PNG",
+      "description": "An SVG logo is dragged onto the SVG to PNG Converter and converted in the browser. The PNG downloads automatically and shows the same logo.",
+      "uploadDate": "2026-10-22T01:11:51-07:00",
+      "duration": "PT27S"
+    },
     "content": {
       "tool": {
         "title": "SVG to PNG",
@@ -103708,9 +103736,9 @@
     "video": {
       "id": "FJkyr2TEUs0",
       "title": "How to Convert WebP to PNG (Free Method)",
-      "description": "WebP to PNG Convert: https://tools.serp.co/webp-to-png/",
+      "description": "A WebP photo is dragged onto the WebP to PNG Converter and converted to PNG in the browser. The PNG downloads automatically and opens as the same picture.",
       "uploadDate": "2026-10-22T00:15:20-07:00",
-      "duration": "PT28S"
+      "duration": "PT27S"
     },
     "content": {
       "tool": {

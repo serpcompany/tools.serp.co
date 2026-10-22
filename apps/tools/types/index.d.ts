@@ -57,12 +57,14 @@ export interface ToolVideo {
   id: string;
   // Its title on YouTube. No two videos share one.
   title: string;
-  // Its description on YouTube, as plain text. No two videos share one.
+  // What the video shows, written for its watch page as one or two plain
+  // sentences that name the Tool: not YouTube's description, which can be a
+  // bare link. No two videos share one.
   description: string;
   // When it was published, as YouTube's uploadDate gives it: ISO 8601 with
   // a time zone, e.g. 2026-10-22T00:15:20-07:00.
   uploadDate: string;
-  // Its length, as YouTube's duration gives it: ISO 8601, e.g. PT28S.
+  // Its length, YouTube's videoDetails.lengthSeconds as ISO 8601, e.g. PT27S.
   duration: string;
 }
 
