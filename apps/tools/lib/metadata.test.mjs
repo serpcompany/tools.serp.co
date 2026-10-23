@@ -287,7 +287,7 @@ test("a description says the file stays in the browser only where the page keeps
   assert.match(buildToolMetadata("3gp-to-hevc").description, new RegExp(IN_BROWSER));
   assert.match(buildToolMetadata("png-to-bmp").description, new RegExp(IN_BROWSER));
   // Server first: /api/video-convert, /api/pdf-compress.
-  assert.doesNotMatch(buildToolMetadata("mp4-to-rm").description, /browser/);
+  assert.doesNotMatch(buildToolMetadata("mov-to-rm").description, /browser/);
   assert.doesNotMatch(buildToolMetadata("amr-to-ogg").description, /browser/);
   assert.doesNotMatch(buildToolMetadata("compress-pdf").description, /browser/);
   // Transcription has its own page.

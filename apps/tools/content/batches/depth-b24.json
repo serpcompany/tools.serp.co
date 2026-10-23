@@ -1,0 +1,327 @@
+{
+  "wpg-to-jpeg": {
+    "seo": {
+      "howToHeading": "How to convert WPG to JPEG",
+      "title": "Convert WPG to JPEG: WordPerfect Graphics",
+      "h1": "WPG to JPEG Converter",
+      "description": "Convert WPG to JPEG in your browser. The bitmap content of a WordPerfect Graphic is drawn and vector shapes are skipped. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Open a WordPerfect Graphic as a JPEG, with its bitmap content drawn and vector shapes skipped."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WPG to JPEG?",
+        "answer": "Choose the WPG file above. ImageMagick runs in your browser, reads the bitmap records and saves a JPEG for you to download; nothing leaves your device."
+      },
+      {
+        "question": "What is a WPG file?",
+        "answer": "WPG is what the WordPerfect word processor uses for graphics. It mostly holds clip art and older office graphics, and one file can contain drawn vector objects or bitmap data."
+      },
+      {
+        "question": "Why are shapes missing from my JPEG?",
+        "answer": "ImageMagick's WPG reader renders the bitmap records and skips the vector records, so a drawing built from lines and shapes can come out without them. Import the file in CorelDRAW with File > Import and export it from there."
+      },
+      {
+        "question": "Do I need WordPerfect or CorelDRAW to convert a WPG?",
+        "answer": "No. ImageMagick reads the WPG in your browser, so nothing needs installing. CorelDRAW only matters for a drawing whose vector shapes the page skips."
+      },
+      {
+        "question": "Can I convert several WPG files at once?",
+        "answer": "Yes. Choose them together and they convert one after another. Each JPEG downloads on its own, not in a ZIP."
+      },
+      {
+        "question": "What JPEG quality does the page use?",
+        "answer": "The page passes no quality setting to ImageMagick. If you want to pick one, use the ImageMagick command under Other ways to convert."
+      },
+      {
+        "question": "Can I get the vector shapes back from the JPEG?",
+        "answer": "No. A JPEG is a grid of pixels, so the shapes are no longer separate objects. Keep the WPG if you may need to edit the drawing."
+      },
+      {
+        "question": "Is my WPG file changed or uploaded?",
+        "answer": "Neither. The conversion runs on your device and your WPG stays as it is. The page downloads a new file named after it with a .jpeg ending."
+      }
+    ],
+    "aboutSection": {
+      "title": "WPG and JPEG",
+      "fromFormat": {
+        "name": "WPG",
+        "fullName": "WordPerfect Graphics",
+        "description": "A WordPerfect drawing that may mix vectors with bitmap material.",
+        "details": [
+          "Legacy illustration content",
+          "Version-sensitive import",
+          "Different from unrelated WPG data"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy pixel image suitable for sharing the drawing’s appearance.",
+        "details": [
+          "No editable vector objects",
+          "Compression can affect lettering",
+          "Opaque image format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WPG to JPEG",
+      "points": [
+        "ImageMagick's WPG reader draws bitmap content only. Vector shapes in the drawing are skipped.",
+        "Only one image is read from the file.",
+        "JPEG is lossy and has no transparency.",
+        "Your WPG is not changed. A new .jpeg file downloads."
+      ]
+    },
+    "guide": {
+      "title": "Understanding WPG and preparing JPEG",
+      "markdown": "### What is a WPG file?\n\nWPG is the WordPerfect Graphic format, used for drawings and clip art in WordPerfect documents. Corel describes it as primarily a vector format that can also store bitmap data. A file can contain up to 256 colors, chosen from a palette of more than 1 million. Corel separates version 1.0, for WordPerfect 5.1 and earlier, from version 2.0, for WordPerfect 6 and later. Most WPG files left today are old illustrations, so the usual job is getting one into a form that a modern document, web page or message accepts.\n\n### Programs that open WPG files\n\n**Windows, Mac and Linux:**\n\n- ImageMagick: reads WPG images.\n- XnView MP: lists WPG among readable formats and is free for private and educational use.\n\n**Windows:**\n\n- CorelDRAW: imports WPG through File > Import.\n- Corel PHOTO-PAINT: opens WPG as an image or imports it into an existing image.\n\n### WPG and JPEG compared\n\n- **Extensions and media types**: .wpg; .jpg or .jpeg with image/jpeg.\n- **Content**: a WPG can mix vector objects and bitmaps. A JPEG is pixels only.\n- **Compression**: JPEG is lossy.\n- **Transparency**: JPEG has none.\n\nImageMagick's reader draws the bitmap records of the WPG and skips the vector records, then writes the JPEG. The page reads one image from the file, and a larger picture, from about 537 megapixels up, is left unconverted with a message that it exceeds what the page can handle. A drawing made only of vector shapes can lose those shapes, so look at the result.\n\nThe JPEG is a flat picture and cannot hold the separate objects of the drawing. If the drawing matters, keep the WPG. Before converting, open the WPG in a program that draws vectors, if you have one, so you know what the drawing should look like, and compare the JPEG against it afterward.\n\n### Other ways to convert WPG to JPEG\n\n- **ImageMagick (command line):** run `magick 'legacy.wpg[0]' -quality 90 legacy-view.jpeg` to read the first image and save it with a quality of 90.\n- **CorelDRAW (Windows):** choose File > Import and pick the WPG filter, then File > Export and choose JPEG from the Save as type list.\n\n### Problems with WPG files\n\n- **Shapes disappear:** the vector records are skipped. Use CorelDRAW for vector drawings.\n- **Corel's import leaves things out:** embedded WMF and EMF graphics are preserved, other embedded graphic elements are lost, and Graphics Text Type 2 is not supported.\n- **A very large picture is refused:** the page stops at the memory limit described above.\n"
+    }
+  },
+  "wtv-to-mp4": {
+    "seo": {
+      "howToHeading": "How to convert WTV to MP4",
+      "title": "Convert WTV to MP4: Windows Recorded TV",
+      "h1": "WTV to MP4 Converter",
+      "description": "Convert WTV to MP4 in your browser. Windows Media Center recordings are re-encoded as H.264 with AAC sound, and your original stays untouched. Free."
+    },
+    "tool": {
+      "subtitle": "Turn a Windows Media Center recording into an MP4 you can share."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WTV to MP4?",
+        "answer": "Choose the WTV file above. FFmpeg runs in your browser and turns the recording into an H.264 and AAC MP4 that you then download."
+      },
+      {
+        "question": "What is a WTV file?",
+        "answer": "WTV is the format Windows Media Center uses to record television. It replaced the older DVR-MS format."
+      },
+      {
+        "question": "Why won't my protected recording play elsewhere?",
+        "answer": "A broadcaster can restrict a protected recording to the Media Center computer that recorded it. This page does not remove that restriction."
+      },
+      {
+        "question": "How do I read a WTV on a Mac or Linux?",
+        "answer": "FFmpeg and FFplay read WTV on Windows, Mac and Linux. Use FFmpeg to turn a recording that is not protected into an MP4, or this page."
+      },
+      {
+        "question": "Can I convert a whole season of WTV recordings in one go?",
+        "answer": "Yes, choose all the recordings together. They are handled in turn, and every MP4 is saved as its own file, not bundled in an archive."
+      },
+      {
+        "question": "Will the MP4 keep the size and frame rate?",
+        "answer": "A bigger picture is shrunk to fit and extra frames are dropped, but a smaller or slower video is left as it is, never enlarged. If a side has an odd pixel count, one pixel is trimmed, and frames marked as interlaced are deinterlaced."
+      },
+      {
+        "question": "Is there a limit on how long a recording can be?",
+        "answer": "Nothing in the page caps the length or file size, and there is no timeout. Conversion time follows the speed of your device."
+      },
+      {
+        "question": "Is my recording uploaded anywhere?",
+        "answer": "No. FFmpeg reads the recording inside this page and never sends it to a server. The WTV is left as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "WTV and MP4",
+      "fromFormat": {
+        "name": "WTV",
+        "fullName": "Windows Recorded TV Show",
+        "description": "A Windows Media Center television recording with media and related information.",
+        "details": [
+          "May include rights restrictions",
+          "Codec-dependent playback",
+          "Broadcast metadata possible"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A movie container holding the newly encoded television derivative.",
+        "details": [
+          "H.264 video requested",
+          "AAC at 96 kbps requested",
+          "Separate from the WTV archive"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WTV to MP4",
+      "points": [
+        "The video is re-encoded as H.264 with AAC sound, not just rewrapped.",
+        "Bigger pictures shrink and extra frames are dropped; nothing is enlarged.",
+        "Frames marked as interlaced are deinterlaced.",
+        "A protected recording can be locked to the Media Center computer that made it.",
+        "Your WTV is not changed. A new .mp4 file downloads."
+      ]
+    },
+    "guide": {
+      "title": "Understanding WTV and preparing MP4",
+      "markdown": "### What is a WTV file?\n\nWTV is recording storage from Windows Media Center, written through the Stream Buffer Engine. Microsoft documented it in September 2008. It superseded DVR-MS and uses a different file structure instead of ASF. A recording can combine MPEG-2 pictures with MPEG-1 Layer II or AC-3 audio and carries descriptive metadata and rights information. Most WTV files are old television captures, so people convert one to keep a show or to watch it away from the computer that recorded it.\n\n### Programs that open WTV files\n\n**Windows, Mac and Linux:**\n\n- FFmpeg: reads WTV through its demuxers, as a command-line converter.\n- FFplay: FFmpeg's own player.\n\n**Windows:**\n\n- Windows Media Center: the historical playback environment.\n\n### WTV and MP4 compared\n\n- **Container**: WTV is Media Center storage. MP4 is a track container.\n- **Video**: the MP4 made here holds H.264.\n- **Audio**: AAC at 96 kbps.\n- **Limits**: 1920 pixels on the longer side and 30 fps.\n\nFFmpeg decodes the recording and re-encodes it with libx264, so the result is a transcode, not a remux. Frames marked as interlaced are deinterlaced. A larger picture is scaled down and a faster frame rate loses frames, but nothing is scaled up. Play the MP4 from start to finish before you delete the WTV, and check the picture and sound at the point where a long recording changes format.\n\nThe result is a widely playable copy of the program. It is a new encode, so the WTV stays the better source if you may want to edit or re-encode the show later.\n\n### Other ways to convert WTV to MP4\n\n- **FFmpeg:** run `ffmpeg -i television.wtv -c:a aac -c:v libx264 television-share.mp4` to transcode the recording to H.264 and AAC.\n\n### Problems with WTV files\n\n- **A protected recording will not open elsewhere:** Microsoft documents recordings locked to the original computer.\n- **A DVR-MS-only program rejects the file:** it needs a DVR-MS copy; Windows 7 supplied WTVConverter.exe for that.\n- **Picture properties change mid-recording:** a recording can change its video resolution or compression partway through, so check the whole program, not only the opening seconds.\n- **The recording is hard to find:** the Stream Buffer Engine normally saves recordings under the public Recorded TV folder.\n"
+    }
+  },
+  "xls-to-png": {
+    "seo": {
+      "howToHeading": "How to convert XLS to PNG",
+      "title": "Convert XLS to PNG with Excel or Calc",
+      "h1": "XLS to PNG Converter",
+      "description": "Convert XLS to PNG using Excel or LibreOffice Calc. This page has no reader for Excel workbooks, so use these steps. Free."
+    },
+    "tool": {
+      "subtitle": "Save an Excel XLS sheet as a PNG picture using Excel or Calc."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert XLS to PNG?",
+        "answer": "Excel and LibreOffice Calc both work, and their steps are given further down."
+      },
+      {
+        "question": "Why can't this page open my XLS file?",
+        "answer": "This page cannot read Excel workbooks. The picture decoder in your browser is the only reader it has, and an XLS is a spreadsheet, not a picture."
+      },
+      {
+        "question": "Can I use this site to turn a spreadsheet into PNG?",
+        "answer": "Yes, for XLSX. Save the workbook as an unprotected .xlsx in Excel, then use the XLSX to PNG converter at /xlsx-to-png/."
+      },
+      {
+        "question": "What is the difference between XLS and XLSX?",
+        "answer": "XLS is the older binary Excel workbook format. XLSX is the newer Office Open XML format."
+      },
+      {
+        "question": "Does LibreOffice Calc open XLS files?",
+        "answer": "Yes. LibreOffice's guide lists legacy Excel .xls files among the spreadsheets Calc opens. Open the workbook there, export it as a PDF and render the PDF as a PNG."
+      },
+      {
+        "question": "Does the PNG keep formulas or sheet tabs?",
+        "answer": "No. A PNG is a picture of the displayed values, colors and chart shapes. Keep the XLS if someone needs to see how the numbers were calculated."
+      },
+      {
+        "question": "Why is my table cut off in the picture?",
+        "answer": "The selection you copied did not cover the whole table. Select a larger range in Excel and copy it as a picture again. In Calc, look through the PDF pages before you render them."
+      },
+      {
+        "question": "Can I make a PNG of every sheet?",
+        "answer": "Excel's Copy as Picture works on one selection at a time, so each sheet needs its own picture. The XLSX to PNG converter on this site makes one image per visible sheet."
+      }
+    ],
+    "aboutSection": {
+      "title": "XLS and PNG",
+      "fromFormat": {
+        "name": "XLS",
+        "fullName": "Legacy Excel workbook",
+        "description": "A legacy Excel workbook containing cells and calculation structure.",
+        "details": [
+          "Binary workbook variants",
+          "May contain several sheets",
+          "Requires spreadsheet interpretation"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A static pixel image of deliberately rendered spreadsheet content.",
+        "details": [
+          "Lossless compression",
+          "No formula model",
+          "No worksheet navigation"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting XLS to PNG",
+      "points": [
+        "This page has no reader for XLS workbooks.",
+        "Excel and LibreOffice Calc can turn the cells you choose into a PNG, as described below.",
+        "A PNG shows cell values and charts but has no formulas or tabs.",
+        "Saving the workbook as .xlsx first lets the XLSX to PNG converter on this site draw it."
+      ]
+    },
+    "guide": {
+      "title": "Understanding XLS and preparing PNG",
+      "markdown": "### What is an XLS file?\n\nXLS names older Microsoft Excel binary workbooks. The Excel 97-2003 workbook uses BIFF8, and Excel 5.0/95 used the BIFF5 variant with the same ending. A workbook holds calculations, charts and several sheets. Because it is built for calculating rather than for display, converting a workbook to PNG always starts with choosing a visible area.\n\n### Programs that open XLS files\n\n**Windows, Mac and Linux:**\n\n- LibreOffice Calc: opens legacy workbooks.\n\n**Windows and Mac:**\n\n- Microsoft Excel: opens legacy workbooks.\n\n**Mac:**\n\n- Apple Numbers: imports .xls for editing.\n\n**Linux:**\n\n- Gnumeric: imports legacy workbooks.\n\n**Web:**\n\n- Google Sheets: imports Excel files.\n\n**Mobile:**\n\n- Numbers for iPhone: imports .xls.\n- Excel for Android and iOS: opens it read-only.\n\n### XLS and PNG compared\n\n- **Content**: a workbook holds cells, formulas and sheets. A PNG holds pixels.\n- **Compression**: PNG is lossless.\n- **Result**: only the range you choose becomes the picture.\n\nThis page has no reader for XLS workbooks. Use one of the routes below, or save the file as .xlsx and use the [XLSX to PNG converter](/xlsx-to-png/), which draws each visible sheet as a table image.\n\nA PNG is a good way to put a table in a slide, a message or a web page where the numbers need to be seen but not edited. It is a poor way to share a model: the recipient cannot check a formula in a picture, so send the workbook as well when the calculation matters. Decide which cells should appear before you start, and open the PNG afterward to check that nothing is cut off.\n\n### Other ways to convert XLS to PNG\n\n- **Excel:** select the cells or chart, choose Home > the arrow beside Copy > Copy as Picture and click OK, then paste the picture. Right-click the picture, choose Save as Picture and pick PNG from the Save as type list.\n- **LibreOffice Calc and MuPDF:** open the XLS in Calc and choose File > Export As > Export as PDF. To render each page of that PDF as a PNG, run `mutool draw -o sheet-view-%d.png -r 150 workbook.pdf`.\n\n### Problems with XLS files\n\n- **Newer features can be lost:** saving a workbook in the Excel 97-2003 format may not carry over all its formatting, data and features.\n- **Excel opens it in Compatibility Mode:** to use new Excel features, save the workbook as xlsx, xlsb or xlsm.\n- **A copy saved as text loses its formatting:** Microsoft says that saving in any text format drops all of it.\n"
+    }
+  },
+  "xps-to-jpeg": {
+    "seo": {
+      "howToHeading": "How to convert XPS to JPEG",
+      "title": "Convert XPS to JPEG with MuPDF or PyMuPDF",
+      "h1": "XPS to JPEG Converter",
+      "description": "Convert XPS to JPEG with MuPDF or PyMuPDF. This page's image decoder cannot read XPS documents, so render the pages with a document tool. Free."
+    },
+    "tool": {
+      "subtitle": "Render the pages of an XPS document as JPEG images with MuPDF or PyMuPDF."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert XPS to JPEG?",
+        "answer": "Render each page to an image with MuPDF's mutool draw, then convert the PNG to JPEG with ImageMagick. PyMuPDF can write the JPEG directly. The commands follow in the guide."
+      },
+      {
+        "question": "Why can't this page open my XPS?",
+        "answer": "This page cannot read XPS documents. Your browser's image decoder is all it has, and an XPS is a document package, not a picture."
+      },
+      {
+        "question": "What is an XPS file?",
+        "answer": "XPS is the XML Paper Specification, a Microsoft format for fixed-layout documents. Its pages are XML files inside a ZIP package, in the way a PDF fixes how a page looks."
+      },
+      {
+        "question": "Does mutool draw write JPEG?",
+        "answer": "No. It writes image formats such as PNG, so render a PNG first and convert it to JPEG afterward."
+      },
+      {
+        "question": "Does one JPEG hold the whole document?",
+        "answer": "No. A JPEG is one image, so each page needs its own render. The %d in the mutool output name numbers the pages, and PyMuPDF can loop over them."
+      },
+      {
+        "question": "How sharp will the JPEG be?",
+        "answer": "That depends on the resolution you render at. Without -r, mutool draw uses its default resolution, so set a higher value for small print."
+      },
+      {
+        "question": "Is XPS the same as PDF?",
+        "answer": "No. XPS is a ZIP package of XML pages made for the same job as PDF, but it is a separate format, and the pages here are rendered from the XPS itself."
+      },
+      {
+        "question": "Can I edit the text after converting to JPEG?",
+        "answer": "No. The text becomes pixels. Edit the original document that the XPS was printed from."
+      }
+    ],
+    "aboutSection": {
+      "title": "XPS and JPEG",
+      "fromFormat": {
+        "name": "XPS",
+        "fullName": "XML Paper Specification",
+        "description": "A package of fixed document pages and resources.",
+        "details": [
+          "XML-based page descriptions",
+          "Can include text and graphics",
+          "Requires document interpretation"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster rendering of a selected page.",
+        "details": [
+          "No alpha channel",
+          "Text becomes pixels",
+          "No multipage document structure"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting XPS to JPEG",
+      "points": [
+        "This page has no reader for XPS pages.",
+        "MuPDF and PyMuPDF render XPS pages to images, as described below.",
+        "Each JPEG is one page, with text turned into pixels and no alpha channel.",
+        "Keep the original authoring file: XPS holds page descriptions, not editable source."
+      ]
+    },
+    "guide": {
+      "title": "Understanding XPS and preparing JPEG",
+      "markdown": "### What is an XPS file?\n\nXPS means XML Paper Specification, a format for electronic documents and printing. It uses XML and Open Packaging Conventions, and it fixes the page layout rather than reflowing the content. Fonts can be embedded. Its structure includes ordered fixed documents and fixed pages. XPS belongs to document and printing workflows, where page placement matters more than editable paragraphs, so most XPS files are printed output, such as a document saved through a print dialog.\n\n### Programs that open XPS files\n\n**Windows:**\n\n- SumatraPDF: a free reader with XPS support.\n\n**Windows and Linux:**\n\n- Okular: lists XPS among its formats.\n\n**Windows, Mac and Linux:**\n\n- MuPDF viewer: lists XPS among its formats.\n\n**Mac:**\n\n- mutool draw: reads XPS pages for rendering.\n\n### XPS and JPEG compared\n\n- **Content**: XPS keeps pages, text and resources together. JPEG is one picture.\n- **Compression**: JPEG is lossy.\n- **Transparency**: JPEG has no alpha channel.\n- **Text**: it becomes pixels.\n\nThis page cannot render XPS pages. A document tool must draw the page first, and then the pixels can be saved as JPEG. Producing a JPEG from XPS means choosing a page and a resolution; extracting an embedded photo would be a different task, because a page also holds text and vector drawing instructions.\n\nThe JPEG is a lossy picture of one page. It is easy to share and to upload, but it cannot be searched or copied as text, and each page you want needs its own file. Decide which pages you need before you start, because a long document gives one JPEG per page.\n\n### Other ways to convert XPS to JPEG\n\n- **PyMuPDF:** open the file with `pymupdf.open`, pick a page and call `get_pixmap(dpi=150, alpha=False)`, then save it as a .jpeg with `jpg_quality=90`. Writing JPEG needs version 1.22.0 or newer.\n- **MuPDF and ImageMagick:** run `mutool draw -r 150 -o xps-view-%d.png printed.xps`, then `magick xps-view-1.png -quality 90 printed-page.jpeg` for each page.\n\n### Problems with XPS files\n\n- **Small print is soft:** a page rendered at a low resolution loses fine type, so render it again with a larger -r.\n- **Only one page appears:** each render is a single page, so repeat it for every page you need.\n"
+    }
+  }
+}

@@ -1,0 +1,792 @@
+{
+  "pes-to-png": {
+    "seo": {
+      "title": "PES to PNG: Why This Page Can't Convert It",
+      "h1": "PES to PNG Converter",
+      "description": "This page can't read PES embroidery files. See how Ink/Stitch with Inkscape, or pyembroidery, turns a PES into a PNG picture of the design.",
+      "howToHeading": "How to convert PES to PNG"
+    },
+    "tool": {
+      "subtitle": "Embroidery PES files can't be read here; use Ink/Stitch or pyembroidery."
+    },
+    "faqs": [
+      {
+        "question": "Can I convert a PES file to PNG here?",
+        "answer": "No. This page hands the file to your browser's own image decoder, which doesn't understand embroidery, so you get \"Image decode failed.\" Ink/Stitch or pyembroidery will produce the PNG instead."
+      },
+      {
+        "question": "How do I turn a PES embroidery file into a picture?",
+        "answer": "Open it in Inkscape with Ink/Stitch using File > Open and export with Shift+Ctrl+E. If you prefer code, the pyembroidery Python library reads the PES and writes a PNG."
+      },
+      {
+        "question": "Can I open a PES file without Brother's software?",
+        "answer": "Yes. Ink/Stitch costs nothing and lets Inkscape open PES, and it can export PES again."
+      },
+      {
+        "question": "Is there a phone app that opens PES files?",
+        "answer": "Brother's Artspira app accepts PES uploads on iOS and Android."
+      },
+      {
+        "question": "Will the PNG still sew on my machine?",
+        "answer": "No, because a PNG has no stitch coordinates in it. The machine needs the PES."
+      },
+      {
+        "question": "Does a PES file contain a preview image?",
+        "answer": "Yes, the format stores a design preview next to the stitch data and thread colors. This page can't open the file to show it."
+      },
+      {
+        "question": "Can I choose the size of the PNG?",
+        "answer": "Yes. Inkscape's export dialog takes the size of the image in pixels, or a resolution, and updates the other values to match."
+      },
+      {
+        "question": "Can I change a PES and save it as a PES again?",
+        "answer": "Yes. Ink/Stitch opens the file in Manual Stitch Mode, where individual points can be edited, and File > Save a copy... writes a format your machine can read."
+      }
+    ],
+    "aboutSection": {
+      "title": "PES and PNG",
+      "fromFormat": {
+        "name": "PES",
+        "fullName": "Brother embroidery",
+        "description": "An embroidery pattern containing machine-oriented stitch and design information.",
+        "details": [
+          "Requires an embroidery-aware reader",
+          "A graphical preview is a separate derivative"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A losslessly compressed raster image supporting different color modes and optional alpha.",
+        "details": [
+          "Pixel-based representation",
+          "Does not retain embroidery instructions"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PES to PNG",
+      "points": [
+        "The browser's decoder can't read PES, so you get \"Image decode failed.\"",
+        "A PNG is a picture and holds no stitch data.",
+        "Ink/Stitch with Inkscape, and pyembroidery, can write the PNG.",
+        "Keep the PES for your machine."
+      ]
+    },
+    "guide": {
+      "title": "PES to PNG: background and alternatives",
+      "markdown": "### What is a PES file?\n\nBrother created PES for its embroidery machines, and Babylock machines use it too. Inside are the stitch coordinates, the thread colors and a small preview of the design. That is a sewing recipe for a machine, not a grid of pixels. In the full edition of Brother's PE-DESIGN 11, PES designs also appear as thumbnails in Explorer.\n\n### Programs that open PES files\n\n- **Windows:** PE-DESIGN 11, Brother's own application (its trial limits some features).\n- **Windows, Mac and Linux:** Ink/Stitch, a free extension for Inkscape that imports and exports PES.\n- **iOS and Android:** Artspira, Brother's own app, takes PES files.\n\n### PES and PNG compared\n\nA PNG is a raster picture, losslessly compressed, with optional transparency, and every major browser shows it. To get from PES to PNG, a program has to draw the stitches as an image. A sewing machine can't use that picture, so hold on to the PES.\n\nNothing on this page can draw it. Files are opened by your browser's built-in image decoder, and it has no idea what embroidery data is. Choosing a PES ends in the message \"Image decode failed.\" and no PNG appears. The programs below do the job.\n\n### Other ways to convert PES to PNG\n\n- **Ink/Stitch and Inkscape:** use File > Open on the PES; it opens in Manual Stitch Mode. Then press Shift+Ctrl+E to open the Export PNG Image dialog, export the page, all drawn objects, the selected objects or a custom area, then enter the size in pixels, name the file and click Export.\n- **pyembroidery:** in this Python library, `pyembroidery.write_png(pyembroidery.read_pes(\"design.pes\"), \"design.png\")` reads the PES and writes the PNG. PNG is write-only there.\n\n### Problems with PES files\n\n- **Image decode failed:** that is the browser telling you PES isn't a picture format. Use an embroidery program.\n- **The machine can't hold the design:** big designs can overflow a machine's USB storage; Brother recommends a USB flash drive where the machine supports one.\n- **Large files:** Brother's support page says PE-DESIGN 11 puts more design information into a PES, which can make the file bigger.\n- **More than 255 color changes:** Ink/Stitch's FAQ says a PES file can't save more.\n"
+    }
+  },
+  "pes-to-svg": {
+    "seo": {
+      "title": "PES to SVG: Why This Page Can't Convert It",
+      "h1": "PES to SVG Converter",
+      "description": "This page can't read PES embroidery files. See how Ink/Stitch with Inkscape, or pyembroidery, turns a PES into an SVG drawing of the design.",
+      "howToHeading": "How to convert PES to SVG"
+    },
+    "tool": {
+      "subtitle": "Embroidery PES files can't be read here; use Ink/Stitch or pyembroidery."
+    },
+    "faqs": [
+      {
+        "question": "Can I convert a PES file to SVG here?",
+        "answer": "No. Your browser's built-in image decoder gets the file here and can't read embroidery, so it ends with \"Image decode failed.\" Ink/Stitch or pyembroidery can make the SVG."
+      },
+      {
+        "question": "How do I get an SVG from a PES file?",
+        "answer": "Either open the PES in Inkscape with Ink/Stitch and save it as an SVG, or have pyembroidery's write_svg save a pattern loaded by read_pes."
+      },
+      {
+        "question": "What does the SVG contain?",
+        "answer": "A PES stores stitch coordinates and thread colors, so the file you open in Inkscape is made of those stitches. The artwork a digitizer started from isn't part of the PES."
+      },
+      {
+        "question": "Can the SVG be sewn on my machine?",
+        "answer": "No. An SVG describes shapes, paths and text, not machine stitches. Keep the PES, or have Ink/Stitch save a format your machine reads."
+      },
+      {
+        "question": "What does Ink/Stitch do when it opens a PES?",
+        "answer": "The design opens in Manual Stitch Mode, and from there individual points can be edited."
+      },
+      {
+        "question": "Which SVG type should I save, Inkscape SVG or Plain SVG?",
+        "answer": "Inkscape SVG keeps all the data in the file, including data only useful for editing in Inkscape. Plain SVG is meant for sharing with people who may not use Inkscape."
+      },
+      {
+        "question": "Is there a free way to make the SVG?",
+        "answer": "Yes. Ink/Stitch is free and runs inside Inkscape, which also opens the SVG it saves."
+      },
+      {
+        "question": "Can I get a PNG instead?",
+        "answer": "That works too; the PES to PNG page lists the Inkscape and pyembroidery routes."
+      }
+    ],
+    "aboutSection": {
+      "title": "PES and SVG",
+      "fromFormat": {
+        "name": "PES",
+        "fullName": "Brother embroidery",
+        "description": "An embroidery pattern containing machine-oriented stitch and design information.",
+        "details": [
+          "Requires an embroidery-aware reader",
+          "A graphical preview is a separate derivative"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML drawing that can contain paths, text, or embedded pictures.",
+        "details": [
+          "Content may be vector or raster",
+          "A drawing is not automatically a machine stitch project"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PES to SVG",
+      "points": [
+        "The browser's decoder can't read PES: \"Image decode failed.\"",
+        "An SVG saved from embroidery software holds the design's stitch points.",
+        "An SVG has no machine stitch data, so keep the PES for sewing.",
+        "Keep the PES and the digitizing project for later changes."
+      ]
+    },
+    "guide": {
+      "title": "PES to SVG: background and alternatives",
+      "markdown": "### What is a PES file?\n\nThe PES format comes from Brother and also runs on Babylock machines. Its payload is a list of stitch positions, a thread color palette and a preview of the design. A machine follows the stitches. The artwork a digitizer drew them from is something else entirely, so if you still have that project, keep it.\n\n### Programs that open PES files\n\n- **Windows:** Brother's PE-DESIGN 11, which has a trial with fewer features.\n- **Windows, Mac and Linux:** Ink/Stitch, a free Inkscape extension that imports and exports PES.\n- **iOS and Android:** the Artspira app accepts PES uploads.\n\n### PES and SVG compared\n\nSVG is an XML language for graphics. It describes shapes, text and embedded images, its shapes stay sharp at any size, and every major browser displays it. A PES, by contrast, lists stitches and thread colors.\n\nThis page can't produce either kind of result. A PES goes to your browser's image decoder, which doesn't read embroidery, and ends with \"Image decode failed.\" Even for pictures it does read, the SVG written here wraps one embedded PNG at the picture's pixel size; nothing is traced into vector shapes. For a drawing of the stitches, turn to the programs below.\n\n### Other ways to convert PES to SVG\n\n- **Ink/Stitch and Inkscape:** File > Open brings the PES in as Manual Stitch Mode. When you save, choose Inkscape SVG to keep all the editing data, or Plain SVG when you are sharing the drawing.\n- **pyembroidery:** with this Python library, `pyembroidery.write_svg(pyembroidery.read_pes(\"design.pes\"), \"design.svg\")` reads the PES and writes the SVG. SVG is write-only there.\n\n### Problems with PES files\n\n- **Image decode failed:** your browser read the PES as a picture and couldn't. An embroidery program is the right tool.\n- **Color changes over 255:** the Ink/Stitch FAQ says Brother's PES and PEC files can't store them.\n- **The design is too big for the machine:** USB storage on a machine can run out, and Brother points to a USB flash drive where one is supported.\n- **Bigger files from PE-DESIGN 11:** Brother's support page says the program writes more design information into a PES, so the file can grow.\n"
+    }
+  },
+  "png-to-xbm": {
+    "seo": {
+      "title": "Convert PNG to XBM Online (Free)",
+      "h1": "PNG to XBM Converter",
+      "description": "Turn a PNG into an XBM, the black-and-white bitmap of the X graphical environment, stored as C source. Color becomes monochrome. Runs in your browser.",
+      "howToHeading": "How to convert PNG to XBM"
+    },
+    "tool": {
+      "subtitle": "Convert a PNG to a black-and-white XBM bitmap in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn a PNG into an XBM?",
+        "answer": "Add the PNG with the picker above and save the XBM that appears, named after your PNG but ending in .xbm."
+      },
+      {
+        "question": "Will my colors survive?",
+        "answer": "No. XBM holds only black and white, so color artwork turns monochrome. View the result at its real size to see which thin lines and pale colors still show."
+      },
+      {
+        "question": "What happens to transparency?",
+        "answer": "XBM has no alpha channel. GIMP can write the alpha as a separate mask file, while this page writes only the bitmap."
+      },
+      {
+        "question": "Can I set the hot spot or the X10 format?",
+        "answer": "Not on this page, which has no options. GIMP's export dialog does: hot spot values, an identifier prefix and an X10 format bitmap."
+      },
+      {
+        "question": "What is inside an XBM file?",
+        "answer": "C source code: readable text that defines the bitmap. The X graphical environment used it for icons and pointer artwork."
+      },
+      {
+        "question": "Can I convert several PNGs at once?",
+        "answer": "Select a group of PNGs and the page converts them in turn. Every one is saved as a separate XBM, not bundled."
+      },
+      {
+        "question": "Does the PNG metadata come along?",
+        "answer": "No. The pixels pass through on their own, which leaves behind EXIF, ICC profiles and XMP."
+      },
+      {
+        "question": "What if my PNG is 16-bit?",
+        "answer": "Extra depth is discarded, because the pixels pass through at 8 bits per channel. GIMP also insists on an 8-bit image before it offers XBM export."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and XBM",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A losslessly compressed raster image supporting different color modes and optional alpha.",
+        "details": [
+          "Pixel-based representation",
+          "Does not retain embroidery instructions"
+        ]
+      },
+      "toFormat": {
+        "name": "XBM",
+        "fullName": "X BitMap",
+        "description": "A monochrome bitmap stored using C-style text.",
+        "details": [
+          "Historical interface and cursor use",
+          "May require a companion mask"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PNG to XBM",
+      "points": [
+        "XBM is black and white only, so color becomes monochrome.",
+        "XBM has no alpha channel; GIMP can write a separate mask file.",
+        "Metadata is dropped and extra bit depth is lost.",
+        "The page has no options for hot spot or X10 format."
+      ]
+    },
+    "guide": {
+      "title": "PNG to XBM: background and alternatives",
+      "markdown": "### What is a PNG file?\n\nDevelopers designed PNG to replace GIF without the patent worries. It reached W3C Recommendation status in October 1996, the first format to do so, and ISO/IEC 15948 came later. Pixels are always stored losslessly. Color can come from a palette, gray levels or full truecolor, and an alpha channel is available for see-through areas. Every major browser shows PNG, and macOS takes screenshots in this format by default.\n\n### Programs that open PNG files\n\n- **Windows, Mac and Linux:** GIMP imports PNG for editing.\n- **Windows, Mac and Linux:** ImageMagick reads PNG.\n- **Web and Mobile:** Google Chrome displays PNG.\n- **Web:** Mozilla Firefox displays PNG.\n- **Mobile:** Safari displays PNG.\n\n### PNG and XBM compared\n\nAn XBM keeps its picture as C source text, not as a binary image. It served the X graphical environment for icons and pointer artwork, and it may include coordinates for a pointer hot spot. Its image is monochrome, so the colors, grays and transparency of a PNG have nowhere to go and color artwork turns monochrome.\n\nOn this page your browser decodes the PNG, and ImageMagick then writes the XBM from those pixels. Metadata is dropped along the way.\n\n### Other ways to convert PNG to XBM\n\n- **GIMP:** open the PNG, choose File > Export As, type a name that ends in .xbm and click Export. GIMP offers XBM only for an image with 8 bits per channel. The export options are an X10 format bitmap, an identifier prefix, a comment, hot spot values, and a mask file that is enabled only when the image has an alpha channel.\n- **ImageMagick:** run `magick picture.png picture.xbm`. ImageMagick reads and writes XBM, for black and white only.\n- **ImageMagick, flattened first:** run `magick picture.png -background white -alpha remove -alpha off -monochrome picture.xbm`. Here `-alpha remove` composites the image over the background color, `-alpha off` disables the alpha channel and `-monochrome` transforms the image to black and white.\n\n### Problems with PNG files\n\n- **Compression setting:** pixels come through exactly as saved, because PNG never discards image data.\n- **Layer offsets:** the offset option in GIMP's PNG export places layers in a way other programs may not match, so leave it unchecked.\n- **Camera tags and profiles:** an export from GIMP carries them only if you enable its metadata controls.\n"
+    }
+  },
+  "ra-to-mp3": {
+    "seo": {
+      "title": "Convert RA to MP3 Online (RealAudio)",
+      "h1": "RA to MP3 Converter",
+      "description": "Turn an old RealAudio .ra recording into an MP3 that plays almost anywhere. FFmpeg does the work on your device in your browser, with no upload.",
+      "howToHeading": "How to convert RA to MP3"
+    },
+    "tool": {
+      "subtitle": "Convert a RealAudio recording to an MP3 that plays almost anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert RA to MP3?",
+        "answer": "Select the RA file above and download the MP3, named after your RA with the .mp3 extension. Several RA files at once each become their own MP3."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "The converter asks LAME for 192 kbit/s and offers no way to pick another. An old, low-rate RealAudio file ends up with a lower bitrate than that, and any video is left out."
+      },
+      {
+        "question": "Why does my RA file fail to convert?",
+        "answer": "RealAudio covers several codecs, and FFmpeg needs a decoder for the one yours uses. A variant it lacks a decoder for can't be converted here."
+      },
+      {
+        "question": "What is a .ram file and can I convert it?",
+        "answer": "A .ram file only points to a stream. The audio is in the .ra file it names, and that is the one to convert."
+      },
+      {
+        "question": "Will the MP3 sound better than the RA?",
+        "answer": "No. RA and MP3 are both lossy, so encoding again can't win back what RA lost."
+      },
+      {
+        "question": "Is the title kept?",
+        "answer": "Yes. The converter passes no tag options, so FFmpeg copies the RealAudio title into the MP3's title field."
+      },
+      {
+        "question": "Is the sample rate changed?",
+        "answer": "No. The command sets no sample rate, so the MP3 keeps the one your RA file has."
+      },
+      {
+        "question": "Is my RA file uploaded anywhere?",
+        "answer": "No. The work happens in your browser, your original stays as it was, and the MP3 is a new download."
+      }
+    ],
+    "aboutSection": {
+      "title": "RA and MP3",
+      "fromFormat": {
+        "name": "RA",
+        "fullName": "RealAudio",
+        "description": "A RealAudio recording from a family of audio codecs and packaging.",
+        "details": [
+          "Decoder support depends on the variant",
+          "A streaming reference is not the media itself"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "Perceptually compressed MPEG Audio Layer III sound.",
+        "details": [
+          "Lossy delivery audio",
+          "A new encode cannot recreate lost source detail"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting RA to MP3",
+      "points": [
+        "The MP3 is encoded with libmp3lame, and any video is left out.",
+        "Both formats are lossy, so quality can't improve.",
+        "A .ram link file has no sound in it.",
+        "RealAudio has several codecs, and FFmpeg needs a decoder for yours."
+      ]
+    },
+    "guide": {
+      "title": "RA to MP3: background and alternatives",
+      "markdown": "### What is an RA file?\n\nRealAudio is an audio format from RealNetworks, introduced in 1995 for streaming over the internet, and it carried online sound delivery from the mid-1990s onward. The .ra ending can identify audio delivered through RealMedia. The format is proprietary, with limited public technical documentation. The family spans several coding systems, so the extension alone doesn't tell you which codec a file uses. A RealAudio file can hold descriptive information such as a title or artist.\n\n### Programs that open RA files\n\n- **Windows:** RealPlayer, the free PC player, lists RA and RealAudio Lossless among its supported audio types.\n- **Windows, Mac and Linux:** FFmpeg reads RealMedia through its demuxers, though it is a command-line converter and not a graphical player.\n- **Windows, Mac and Linux:** FFplay, a portable player built on FFmpeg libraries.\n\n### RA and MP3 compared\n\nThe MP3 format dates to the late 1980s work at Fraunhofer IIS with fellow MPEG audio group members, and ISO/IEC 11172-3 standardized it in 1993. A model of human hearing decides which sound it throws away. Every major browser plays MP3, and ID3 structures inside the file store titles and further tags. RealAudio is lossy already, so an MP3 made from it adds one more generation of loss.\n\nOn this page FFmpeg runs in your browser and encodes with libmp3lame, asking for 192 kbit/s and leaving video out. Below 32 kHz that rate is out of reach for MP3, so audio sampled low gets a lower bitrate.\n\n### Other ways to convert RA to MP3\n\n- **FFmpeg:** run `ffmpeg -i archive.ra -vn -b:a 192k -c:a libmp3lame listening.mp3`.\n- **Switch Sound File Converter:** Switch converts from ra and to mp3. Click Add and choose the RA file, type mp3 into the Output Format field and click Convert.\n\n### Problems with RA files\n\n- **The file is just a link:** a .ram companion is a streaming metafile and is not interchangeable with the sound file itself. Look for the .ra it points to.\n- **Some RA files play and others don't:** playback needs a decoder for the particular RealAudio variant, because the family includes several different coding systems.\n- **Empty tags:** a RealAudio file only has a title or artist if one was stored in it, so otherwise the MP3 has nothing to copy.\n"
+    }
+  },
+  "svg-to-tga": {
+    "seo": {
+      "title": "Convert SVG to TGA Online (Free)",
+      "h1": "SVG to TGA Converter",
+      "description": "Turn an SVG into a TGA (Targa) raster image at the size your browser draws it, the format video and game workflows still use. Free, runs in your browser.",
+      "howToHeading": "How to convert SVG to TGA"
+    },
+    "tool": {
+      "subtitle": "Render an SVG as a TGA image at its drawn size, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an SVG to TGA?",
+        "answer": "Choose the SVG above and download the TGA, which is named after your SVG with the .tga extension. A batch of SVGs gives one TGA each."
+      },
+      {
+        "question": "What size will the TGA be?",
+        "answer": "The size the browser reports for the SVG, painted 1:1. Nothing multiplies or caps it."
+      },
+      {
+        "question": "Can I choose 24-bit or 32-bit?",
+        "answer": "Not here, since the page has no options for bit depth. A 24-bit TGA has no room for an alpha channel, while a 32-bit one adds an eight-bit alpha channel."
+      },
+      {
+        "question": "Does the page add a background color?",
+        "answer": "No. The drawing is made on a canvas that starts transparent, and nothing paints a color behind it."
+      },
+      {
+        "question": "Is the TGA still vector?",
+        "answer": "No. TGA is raster, so the artwork is fixed at one pixel size. Keep the SVG if you may need to resize or edit it."
+      },
+      {
+        "question": "Why did the text change?",
+        "answer": "Text uses only the fonts installed on your device. A font the SVG points to online is not loaded, and a substitute changes the letters. Outline the text in the SVG beforehand."
+      },
+      {
+        "question": "Why is a linked image missing?",
+        "answer": "The browser draws the SVG as a picture, so an image it merely links to is never fetched, online or not. Embed the picture in the SVG as data."
+      },
+      {
+        "question": "Does the SVG's metadata carry over?",
+        "answer": "No. Only raw pixels reach the TGA, not metadata."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and TGA",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML drawing that can contain paths, text, or embedded pictures.",
+        "details": [
+          "Content may be vector or raster",
+          "Embedded pictures keep their own pixel resolution"
+        ]
+      },
+      "toFormat": {
+        "name": "TGA",
+        "fullName": "Truevision TGA (Targa)",
+        "description": "A Targa raster image with options for color depth, alpha, and compression.",
+        "details": [
+          "Fixed pixel dimensions",
+          "Alpha depends on the chosen representation"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting SVG to TGA",
+      "points": [
+        "The TGA is raster, drawn at the dimensions the browser gives the SVG.",
+        "Nothing enlarges or shrinks the drawing.",
+        "Linked pictures and fonts the SVG points to never load; embedded data and installed fonts do.",
+        "Metadata isn't carried over."
+      ]
+    },
+    "guide": {
+      "title": "SVG to TGA: background and alternatives",
+      "markdown": "### What is an SVG file?\n\nAn SVG file lists shapes, text and embedded images in XML, and a renderer draws them: that is the Scalable Vector Graphics standard from the W3C. Since the shapes are instructions rather than pixels, the drawing keeps clean edges at whatever size you ask for. The file is text, CSS and JavaScript can act on it, and all major browsers show it. A pixel image embedded in an SVG is the exception, because it keeps its original resolution when enlarged.\n\n### Programs that open SVG files\n\n- **Windows, Mac and Linux:** Inkscape, for native SVG editing.\n- **Windows, Mac, Linux and Web:** Mozilla Firefox displays SVG.\n- **Web and Mobile:** Google Chrome displays SVG.\n- **Mobile:** Safari displays SVG.\n\n### SVG and TGA compared\n\nTarga, a raster format tied to Truevision's video boards, keeps turning up in video editing and in game development. It supports RGB, indexed-color and grayscale images. In a 24-bit file every color component gets eight bits; a 32-bit file adds an eight-bit alpha channel. Run-length encoding is optional. Moving from SVG to TGA locks the drawing to a single pixel size, so it can't be scaled up cleanly or edited as shapes again.\n\nYour browser paints the SVG at its reported dimensions; ImageMagick then writes the TGA from those pixels. Metadata doesn't come along. The browser loads nothing from outside the file, so the TGA shows only what the SVG embeds, plus fonts installed on the device.\n\n### Other ways to convert SVG to TGA\n\n- **ImageMagick:** run `magick -density 144 artwork.svg artwork.tga`. -density controls the resolution at which ImageMagick draws the SVG into pixels.\n- **Inkscape and ImageMagick:** use Inkscape to open the SVG, press Shift+Ctrl+E and choose an export area, set the width in pixels, name the file and click Export for a PNG. Then run `magick artwork.png artwork.tga`.\n\n### Problems with SVG files\n\n- **Lettering changed:** text layout depends on the fonts available, so a substitute for a missing one alters the drawing.\n- **A picture is missing:** artwork that the SVG only points to stays blank on this page; put the image inside the file.\n- **The texture looks soft:** bitmaps embedded in the SVG retain their original resolution when enlarged.\n"
+    }
+  },
+  "svg-to-tif": {
+    "seo": {
+      "title": "Convert SVG to TIF Online (Free)",
+      "h1": "SVG to TIF Converter",
+      "description": "Turn an SVG drawing into a TIF raster image at the size your browser draws it. Metadata is dropped. Free, runs in your browser.",
+      "howToHeading": "How to convert SVG to TIF"
+    },
+    "tool": {
+      "subtitle": "Render an SVG as a TIF image at its drawn size, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Which steps turn an SVG into a TIF?",
+        "answer": "Add the SVG above, then save the TIF, which is named after your SVG and ends in .tif. If you add several SVGs, each becomes a TIF of its own."
+      },
+      {
+        "question": "What pixel size will the TIF have?",
+        "answer": "Whatever size the browser reports for the SVG, drawn 1:1, with no scale factor or size cap added."
+      },
+      {
+        "question": "Is a TIF the same as a TIFF?",
+        "answer": "Yes. Both endings name the same format."
+      },
+      {
+        "question": "Is the TIF high bit depth or color-profiled?",
+        "answer": "No. Pixels travel at 8 bits per channel and metadata, ICC profiles included, is dropped."
+      },
+      {
+        "question": "Can I choose the TIF compression?",
+        "answer": "No. The page has no compression options and sets none."
+      },
+      {
+        "question": "Is the TIF still vector?",
+        "answer": "No, it is a raster at one fixed size. The SVG remains the file to scale or edit."
+      },
+      {
+        "question": "Why did the font change in my TIF?",
+        "answer": "Because the SVG is drawn as a picture, nothing outside the file is fetched, web fonts included. Text uses the fonts your device has, with a stand-in for the rest."
+      },
+      {
+        "question": "Does the page paint a background?",
+        "answer": "No. Your drawing sits on a canvas that starts transparent, and the code fills nothing behind it."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and TIF",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML drawing that can contain paths, text, or embedded pictures.",
+        "details": [
+          "Content may be vector or raster",
+          "Embedded pictures keep their own pixel resolution"
+        ]
+      },
+      "toFormat": {
+        "name": "TIF",
+        "fullName": "Tagged Image File Format",
+        "description": "An alternate filename ending for the TIFF tagged-image family.",
+        "details": [
+          "Varied encodings and channel depths",
+          "The suffix does not specify every image property"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting SVG to TIF",
+      "points": [
+        "The TIF is raster, at the size the browser reports for the SVG.",
+        "Metadata is dropped.",
+        "No compression options are offered.",
+        "Linked pictures and web fonts never load; embedded data and installed fonts do."
+      ]
+    },
+    "guide": {
+      "title": "SVG to TIF: background and alternatives",
+      "markdown": "### What is an SVG file?\n\nThe W3C's SVG format uses XML to describe flat graphics through shapes, text and embedded pictures. Stored as instructions, those shapes can be rendered large or small with no loss in sharpness. The format is readable text that CSS and JavaScript can style, and every major browser can display it. Pictures embedded in the file are the exception: they keep their original pixel resolution when enlarged.\n\n### Programs that open SVG files\n\n- **Windows, Mac and Linux:** Inkscape edits SVG natively.\n- **Windows, Mac, Linux and Web:** Mozilla Firefox displays SVG.\n- **Web and Mobile:** Google Chrome displays SVG.\n- **Mobile:** Safari displays SVG.\n\n### SVG and TIF compared\n\nTIFF wraps raster data in tags, and Aldus and Microsoft were behind its development. The 6.0 revision dates from 1992, and today the specification belongs to Adobe. One format sits behind both file endings, and its media type is image/tiff. Inside, the choice of compression and color representation varies from file to file, several images can share one file, and archivists rely on it for high-bit-depth imaging and preservation masters. An SVG converted to TIF becomes one raster picture at a fixed size, and its shapes are no longer editable.\n\nOn this page the browser paints the SVG at the dimensions it reports, then ImageMagick writes the TIF from those pixels. They pass through at 8 bits per channel, so the TIF is not a high-depth file, and metadata is dropped. The browser loads nothing from outside the SVG, so the result shows embedded data plus fonts installed on your device.\n\n### Other ways to convert SVG to TIF\n\n- **ImageMagick:** run `magick -density 180 illustration.svg illustration.tif`. A higher -density value gives a larger canvas when ImageMagick reads the SVG.\n- **Inkscape and ImageMagick:** in Inkscape, open the SVG and press Shift+Ctrl+E to get the Export PNG Image dialog. Export a PNG at the pixel width you want, then run `magick illustration.png illustration.tif`.\n\n### Problems with SVG files\n\n- **A font was swapped:** the lettering follows whichever fonts your device has, so the drawing changes when one is missing.\n- **A picture went missing:** an outside image the SVG points to is not drawn here; put the picture into the file itself.\n- **A photo in the drawing looks soft:** a bitmap inside the SVG stays at its own pixel resolution however far you enlarge it.\n"
+    }
+  },
+  "wav-to-amr": {
+    "seo": {
+      "title": "WAV to AMR: Why This Page Can't Convert It",
+      "h1": "WAV to AMR Converter",
+      "description": "This page can't encode AMR, because the FFmpeg inside it has no AMR encoder. See what AMR is and how Switch Sound File Converter writes one.",
+      "howToHeading": "How to convert WAV to AMR"
+    },
+    "tool": {
+      "subtitle": "AMR encoding isn't available in this browser; try Switch Sound File Converter."
+    },
+    "faqs": [
+      {
+        "question": "Can I convert WAV to AMR on this page?",
+        "answer": "No. The FFmpeg inside this page has no libopencore_amrnb encoder, which the AMR command asks for, so the run ends with an FFmpeg error."
+      },
+      {
+        "question": "What error does the page show?",
+        "answer": "The run fails with \"FFmpeg failed with exit code 1\", and FFmpeg's log reports an unknown encoder, libopencore_amrnb."
+      },
+      {
+        "question": "What does the page ask FFmpeg for?",
+        "answer": "A mono AMR at 8 kHz and 12.2 kbps, written with the libopencore_amrnb encoder and without video."
+      },
+      {
+        "question": "Is AMR good for music?",
+        "answer": "The standard behind AMR was written for GSM speech, so voice is its job rather than music."
+      },
+      {
+        "question": "How does AMR differ from AMR-WB?",
+        "answer": "AMR-WB works at a 16 kHz sampling rate. The two keep different storage signatures, so no extension change turns one into the other."
+      },
+      {
+        "question": "Will a stereo WAV stay stereo in an AMR?",
+        "answer": "No. FFmpeg's libopencore-amrnb encoder is mono-only, and narrowband AMR is sampled at 8 kHz."
+      },
+      {
+        "question": "Which program can write a WAV as an AMR?",
+        "answer": "Switch Sound File Converter, which handles both formats."
+      },
+      {
+        "question": "Is my WAV uploaded when I try?",
+        "answer": "No. No. The conversion attempt runs inside your browser, and the file you chose is left untouched."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and AMR",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "A RIFF-family wrapper for audio samples and related chunks.",
+        "details": [
+          "Often contains PCM",
+          "Sample rate and channels vary"
+        ]
+      },
+      "toFormat": {
+        "name": "AMR",
+        "fullName": "Adaptive Multi-Rate audio",
+        "description": "A speech-coding family with distinct narrowband and wideband representations.",
+        "details": [
+          "Narrowband operates at 8 kHz",
+          "Not interchangeable with AMR-WB by renaming"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WAV to AMR",
+      "points": [
+        "This page can't encode AMR: the libopencore_amrnb encoder is missing.",
+        "AMR narrowband is a speech codec sampled at 8 kHz.",
+        "Narrowband AMR can't supply the wider frequency range of an AMR-WB source.",
+        "Switch Sound File Converter has wav as a source and amr as an output."
+      ]
+    },
+    "guide": {
+      "title": "WAV to AMR: background and alternatives",
+      "markdown": "### What is a WAV file?\n\nA WAV does not name one audio encoding; it is a RIFF-based container for sound. Microsoft and IBM wrote the format down in a multimedia specification dated August 1991. Most files carry linear PCM, although a compressed encoding can sit inside as well. Expect the .wav ending, with audio/wav and audio/x-wav as the usual media-type labels. For production and preservation work there is the Broadcast WAVE extension, which adds metadata, and the Library of Congress recommends WAVE when building digital audio collections.\n\n### Programs that open WAV files\n\n- **Windows, Mac and Linux:** Audacity brings in most WAV recordings, PCM variants included.\n- **Windows, Mac and Linux:** ffplay, because FFmpeg has a demuxer for this format.\n- **Web:** Firefox plays WAV directly in the browser.\n- **Mobile:** VLC for Android, a free media player.\n\n### WAV and AMR compared\n\nAdaptive Multi-Rate is what AMR stands for. ETSI standardized it to carry GSM speech, after which 3GPP chose it for third-generation cellular networks. In the narrowband codec, speech is sampled at 8 kHz and coded in 20-millisecond frames, with eight modes running from 4.75 up to 12.2 kbps. The separate AMR-WB codec samples at 16 kHz, so a narrowband recording cannot supply AMR-WB's wider frequency range. The two also keep different storage signatures. RFC 4867 covers storage files, and audio/AMR is the narrowband media type.\n\nNo AMR file comes out of this page. The FFmpeg command it runs requests the libopencore_amrnb encoder, the FFmpeg inside the browser lacks that encoder, and the attempt ends in an unknown encoder error.\n\n### Other ways to convert WAV to AMR\n\n- **Switch Sound File Converter:** select the WAV with Add, set the Output Format field to amr and press Convert. Its supported-formats list names wav as an input and amr as an output.\n\n### Problems with WAV files\n\n- **A WAV that won't open:** recorders sometimes put proprietary compression inside the WAV, and for importing those Audacity recommends its FFmpeg library.\n- **Very large recordings:** the original RIFF size fields can fall short, and RF64 takes over.\n- **Tags vary by program:** standard INFO chunks hold different information from Broadcast WAVE extensions.\n"
+    }
+  },
+  "webp-to-webp": {
+    "seo": {
+      "title": "Re-encode WebP to WebP Online (Free)",
+      "h1": "WebP to WebP Converter",
+      "description": "Re-encode a WebP as a new WebP, keeping transparency, dropping metadata and keeping only the first frame of an animation. Runs in your browser.",
+      "howToHeading": "How to convert WEBP to WEBP"
+    },
+    "tool": {
+      "subtitle": "Rewrite a WebP as a fresh still WebP in your browser, with metadata dropped."
+    },
+    "faqs": [
+      {
+        "question": "Why convert WebP to WebP?",
+        "answer": "Mostly to flatten an animated WebP into a still, remove metadata such as EXIF and XMP, or get a freshly encoded file."
+      },
+      {
+        "question": "What quality does the new WebP use?",
+        "answer": "You can't set one: no quality value is passed. The browser's canvas encodes the file, and where the canvas can't write WebP, ImageMagick does, again without a quality set."
+      },
+      {
+        "question": "Is the rewrite lossless?",
+        "answer": "This page has no lossless option. It passes no encoder settings, and the output is a new encode of the decoded pixels."
+      },
+      {
+        "question": "What happens to an animated WebP?",
+        "answer": "You keep the first frame alone, so the output is a still."
+      },
+      {
+        "question": "Is transparency kept?",
+        "answer": "Yes, transparency survives in the output."
+      },
+      {
+        "question": "Is my EXIF or color profile kept?",
+        "answer": "No. Only pixels are carried across, so EXIF, ICC and XMP data are dropped."
+      },
+      {
+        "question": "Can I rewrite several WebP files at once?",
+        "answer": "Yes. Files you pick together convert in turn, and every one is downloaded as its own WebP rather than a ZIP."
+      },
+      {
+        "question": "Is my WebP uploaded anywhere?",
+        "answer": "No. No. Your browser does all the work, and the WebP you chose is never altered."
+      }
+    ],
+    "aboutSection": {
+      "title": "WEBP and WEBP",
+      "fromFormat": {
+        "name": "WEBP",
+        "fullName": "WebP image",
+        "description": "A RIFF-based image family with still and animated representations.",
+        "details": [
+          "Lossy and lossless coding available",
+          "Re-encoding can alter frames and metadata"
+        ]
+      },
+      "toFormat": {
+        "name": "WEBP",
+        "fullName": "WebP image",
+        "description": "A RIFF-based image family with still and animated representations.",
+        "details": [
+          "Lossy and lossless coding available",
+          "Re-encoding can alter frames and metadata"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WebP to WebP",
+      "points": [
+        "The WebP is decoded and written again as a new WebP.",
+        "An animation becomes its first frame.",
+        "Metadata is dropped; transparency is kept.",
+        "No quality or lossless setting is passed."
+      ]
+    },
+    "guide": {
+      "title": "WEBP to WEBP: background and alternatives",
+      "markdown": "### What is a WebP image file?\n\nWebP is Google's open-source image format, announced on 30 September 2010. Its lossy mode borrows from the VP8 video codec: still pictures are compressed the way VP8 compresses key frames. The lossless mode is a different design built on LZ77, prefix codes and a color cache. Inside a RIFF container, both modes can carry transparency and animation. Metadata such as an ICC profile, Exif and XMP can ride along.\n\n### Programs that open WebP files\n\n- **Windows, Mac and Linux:** GIMP, which has imported and exported WebP natively since 2.10.\n- **Windows, Mac and Linux:** ImageMagick reads WebP.\n- **Windows:** Microsoft's WebP Image Extension lets File Explorer and Photos open WebP images.\n- **Web and Mobile:** Google Chrome displays WebP.\n- **Web:** Mozilla Firefox displays WebP.\n- **Mobile:** Safari displays WebP.\n\n### WebP and WebP compared\n\nWith the same format on both sides, the file is still decoded and then encoded from scratch. Your browser reads the WebP and a canvas writes the new one, or ImageMagick does where the canvas can't produce WebP. Transparency stays. An animated file keeps only its first frame, and EXIF, ICC and XMP data are left behind. Pixels move through at 8 bits per channel. No quality value is passed along.\n\nThat makes it useful for turning an animation into a still or for stripping metadata from a file you plan to publish. For a lossless rewrite or a quality of your own, use a desktop tool.\n\n### Other ways to convert WebP to WebP\n\n- **cwebp:** run `cwebp -lossless -exact still.webp -o recoded.webp`. cwebp accepts WebP input if the file is static, and -exact preserves RGB values in transparent areas.\n- **GIMP:** load the WebP through File > Open, pick File > Export As, give it a different name ending in .webp and click Export. In the WebP dialog you will find Lossless, Image quality, Alpha quality, Save animation and the metadata switches Save Exif data, Save XMP data and Save color profile.\n- **ImageMagick:** run `magick still.webp -define webp:lossless=true rewritten.webp` to encode the new file without any quality loss.\n\n### Problems with WebP files\n\n- **Older browsers:** some versions show a still WebP but have no animation support.\n- **Too large:** WebP stops at 16,383 pixels along either axis, so a bigger picture can't be stored.\n- **ImageMagick without WebP:** ImageMagick needs the WEBP delegate library to read WebP.\n"
+    }
+  },
+  "wma-to-aiff": {
+    "seo": {
+      "title": "Convert WMA to AIFF Online (Free)",
+      "h1": "WMA to AIFF Converter",
+      "description": "Convert a WMA recording to AIFF in your browser: FFmpeg writes uncompressed PCM, audio only. Free, with no upload.",
+      "howToHeading": "How to convert WMA to AIFF"
+    },
+    "tool": {
+      "subtitle": "Convert a WMA recording to an uncompressed AIFF in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WMA to AIFF?",
+        "answer": "Choose the WMA at the top of the page, wait for the run, then save the AIFF."
+      },
+      {
+        "question": "What bit depth is the AIFF?",
+        "answer": "It's 16-bit. Each sample is signed PCM with big-endian byte order, as AIFF expects."
+      },
+      {
+        "question": "Will the AIFF sound better than the WMA?",
+        "answer": "No. AIFF holds uncompressed audio, but it can't restore what a lossy WMA encoder threw away. A lossless WMA does keep its detail."
+      },
+      {
+        "question": "Why is the AIFF so much bigger?",
+        "answer": "PCM keeps every sample value as is, so it needs more storage than a compressed WMA of the same recording."
+      },
+      {
+        "question": "Does the page let me set the sample rate?",
+        "answer": "No. The page asks only for 16-bit big-endian PCM with no video, and sets no rate, channel layout or stream choice."
+      },
+      {
+        "question": "What happens to the artist and title tags?",
+        "answer": "Title, artist and other global tags in the WMA are carried into the AIFF wherever it has a field for them."
+      },
+      {
+        "question": "Can I add more than one WMA?",
+        "answer": "Yes. Select them together and each turns into a separate AIFF download, one after the other; no archive is built."
+      },
+      {
+        "question": "Does the WMA get overwritten?",
+        "answer": "The original WMA is untouched. What you save is a new AIFF made in your browser tab."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMA and AIFF",
+      "fromFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "Windows Media audio generally carried in an ASF container.",
+        "details": [
+          "Several codec variants exist",
+          "Protected sources need an authorized alternative"
+        ]
+      },
+      "toFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "An audio container commonly used with linear PCM sample storage.",
+        "details": [
+          "Sample precision and rate need inspection",
+          "PCM cannot repair earlier lossy compression"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WMA to AIFF",
+      "points": [
+        "The AIFF holds uncompressed PCM audio, and any video is left out.",
+        "Uncompressed PCM makes the file much larger but doesn't restore lost detail.",
+        "Tags are copied where AIFF has fields for them.",
+        "Each file downloads as its own AIFF."
+      ]
+    },
+    "guide": {
+      "title": "WMA to AIFF: background and alternatives",
+      "markdown": "### What is a WMA file?\n\nWindows Media Audio is the name of four codecs: standard, Professional, Lossless and Voice. Microsoft's ASF container holds their data, and a .wma extension tells you the file is audio alone, not other ASF content. The media type usually associated with it is audio/x-ms-wma. Delivery workflows are one use and intermediate audio storage another, and WMA 9 can encode at a variable bit rate. The extension never tells you which of the four codecs is inside.\n\n### Programs that open WMA files\n\n**Windows, Mac and Linux:**\n\n- VLC media player names ASF/WMA among its inputs, with a number of WMA decoders.\n- Audacity brings in unprotected WMA only after its optional FFmpeg library has been added.\n- FFmpeg decodes WMA 1, WMA 2, Pro, Voice and Lossless in its support matrix.\n\n### WMA and AIFF compared\n\nAIFF is Apple's creation, a wrapper for audio that descends from the IFF family of Electronic Arts. Most often it stores linear PCM without compression; the AIFF-C variant adds compressed audio. Chunks with names exist for the author, a copyright line and annotations. Pro audio users keep masters and intermediate recordings in it, and audio/aiff and audio/x-aiff are common media types.\n\nHere, FFmpeg works in your browser tab and writes audio-only 16-bit big-endian PCM. PCM can't bring back detail a lossy encoder discarded, and it takes more storage than a compressed copy, so a standard WMA becomes an AIFF that is larger but not better. Before converting, check whether your WMA is the Lossless variant, which keeps all its detail, and whether it is copy-protected. Afterwards, play the AIFF from start to end and compare its length with the original.\n\n### Other ways to convert WMA to AIFF\n\n- **FFmpeg:** run `ffmpeg -i take.wma -vn -c:a pcm_s16be take.aiff`. The `.aiff` name selects the AIFF format, `-vn` leaves out video and `pcm_s16be` writes 16-bit big-endian samples.\n- **Switch Sound File Converter:** click Add and choose the WMA, open the Output Format field and select AIFF, then click Convert.\n\n### Problems with WMA files\n\n- **Protected files:** copy-protected WMA can't be imported through Audacity's FFmpeg library.\n- **Audacity offers no WMA import:** WMA import may be missing until the optional FFmpeg component is installed.\n- **One WMA opens and another doesn't:** a program may support one WMA codec but lack another, and the extension does not identify the variant.\n- **Adobe Audition:** WMA import works on Windows only, with DLMS Format Support enabled.\n"
+    }
+  },
+  "wmv-to-mkv": {
+    "seo": {
+      "title": "Convert WMV to MKV Online (Free)",
+      "h1": "WMV to MKV Converter",
+      "description": "Convert a WMV video to MKV in your browser. The video is re-encoded as H.264 and the sound as AAC, free and with no upload.",
+      "howToHeading": "How to convert WMV to MKV"
+    },
+    "tool": {
+      "subtitle": "Re-encode a WMV video as an H.264 MKV in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WMV to MKV?",
+        "answer": "Select the WMV at the top, let the run finish, and save the MKV."
+      },
+      {
+        "question": "Does it just change the container?",
+        "answer": "No. The page encodes a new H.264 video track and a new AAC audio track, so it is not a lossless rewrap."
+      },
+      {
+        "question": "Can I choose the quality?",
+        "answer": "No. The encoder settings are fixed and the page offers no control for them. For your own settings, run FFmpeg yourself."
+      },
+      {
+        "question": "Is the frame size kept?",
+        "answer": "Larger frames are scaled down to fit, smaller ones are never enlarged, and both sides are made even."
+      },
+      {
+        "question": "What happens to a high-frame-rate video?",
+        "answer": "Extra frames are dropped to stay within the page's cap and the duration stays the same. A slower video is never sped up."
+      },
+      {
+        "question": "How do I keep the original streams?",
+        "answer": "Use FFmpeg's stream copy from the command line, described under Other ways to convert. It moves the streams into MKV without re-encoding."
+      },
+      {
+        "question": "Can I select a batch of WMV files?",
+        "answer": "Yes. Pick them together and they are processed one by one, each giving a separate MKV download and no archive."
+      },
+      {
+        "question": "What about interlaced footage?",
+        "answer": "Yes, footage marked as interlaced goes through a deinterlacing filter."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMV and MKV",
+      "fromFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "Windows Media video commonly packaged with sound in ASF.",
+        "details": [
+          "Several video variants exist",
+          "Codec compatibility remains separate from packaging"
+        ]
+      },
+      "toFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "Matroska’s container for encoded media tracks and related elements.",
+        "details": [
+          "Can organize multiple track types",
+          "The container does not guarantee playback support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WMV to MKV",
+      "points": [
+        "The video is re-encoded as H.264 and the sound as AAC.",
+        "Large frames shrink to fit; smaller ones are never enlarged.",
+        "Interlaced frames are deinterlaced.",
+        "Use FFmpeg stream copy to rewrap without re-encoding."
+      ]
+    },
+    "guide": {
+      "title": "WMV to MKV: background and alternatives",
+      "markdown": "### What is a WMV file?\n\nInside a .wmv file, Windows Media coded content sits in Microsoft's ASF container. The ASF design aims at synchronized media storage and network delivery, with room for both audio and video streams. Three generations of Windows Media Video compression, numbered 7, 8 and 9, can encode the picture. The Library of Congress records video/x-ms-wmv as a commonly used media type, rather than an IANA registration.\n\n### Programs that open WMV files\n\n**Windows, Mac and Linux:**\n\n- VLC is a desktop player that reads ASF/WMV files and handles the first, second and ninth Windows Media Video codecs.\n- FFplay, bundled with the FFmpeg project, uses its decoders for WMV.\n\n### WMV and MKV compared\n\nMatroska, a container for sound and pictures, rests on EBML (a binary form descended from XML) and grew out of the older MCF project. A single file holds more than one video or audio stream, and the design includes chapter marks and descriptive tags. It prescribes no single compression method or fixed level of quality, and IANA registers video/matroska for it.\n\nNothing here is a plain rewrap. The in-browser FFmpeg builds a new video track with libx264 (ultrafast preset, CRF 32) and a new AAC audio track at 96 kbit/s. A picture whose longer edge passes 1920 pixels is shrunk to fit, a smaller picture stays as it is, and each dimension is rounded down to an even value, which trims one pixel from an odd edge. Frame rates above 30 per second lose frames without changing the duration, while a slower video keeps its rate. Footage marked interlaced goes through a deinterlacing filter. FFmpeg's defaults choose the streams and copy the global tags to the MKV where it can hold them. Before converting, note the source's frame size and rate; afterwards, play the MKV and compare picture, sound and length with the WMV.\n\n### Other ways to convert WMV to MKV\n\n- **FFmpeg stream copy:** run `ffmpeg -i footage.wmv -map 0 -c copy wrapped.mkv` to move the existing streams into Matroska without re-encoding.\n- **Prism for Windows:** click Add File(s) and pick the WMV, select MKV in the Output Format field, then click Convert.\n\n### Problems with WMV files\n\n- **Decoder gaps:** FFmpeg's own support table marks its decoder for version 9 as only partly working.\n- **The container reads but the video won't:** a program that can parse ASF may still lack the codec for the video inside, because the two abilities are independent.\n- **Quality varies:** how good the picture looks comes from the codec and its compression settings, and the file extension doesn't reveal either.\n"
+    }
+  }
+}

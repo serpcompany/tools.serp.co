@@ -1,0 +1,806 @@
+{
+  "hdr-to-jpeg": {
+    "seo": {
+      "title": "Convert HDR to JPEG Online (Free)",
+      "h1": "HDR to JPEG Converter",
+      "description": "Convert a Radiance HDR image to an 8-bit JPEG in your browser. Values brighter than white are clipped, with no tone-mapping controls. Free, no sign-up.",
+      "howToHeading": "How to convert HDR to JPEG"
+    },
+    "tool": {
+      "subtitle": "Turn a Radiance HDR image into a standard 8-bit JPEG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an HDR to a JPEG?",
+        "answer": "Add your Radiance .hdr file; it is read and converted straight away. The page downloads a JPEG of the same picture. A batch is processed in turn, with one JPEG saved per HDR."
+      },
+      {
+        "question": "Is this the HDR effect from my phone camera?",
+        "answer": "No. A .hdr file is a Radiance image, a format created for lighting simulation software; each pixel has three color values and one exponent they share."
+      },
+      {
+        "question": "Will the JPEG keep the full brightness range?",
+        "answer": "No. A JPEG keeps 8 bits for each channel, so anything brighter than white is clipped to white. Keep the HDR file if you need those highlights later."
+      },
+      {
+        "question": "Can I tone map the picture here?",
+        "answer": "No. The page has no tone-mapping controls and nothing to choose. For a rendition you choose yourself, use a tone mapper such as Luminance HDR."
+      },
+      {
+        "question": "Why does the JPEG not look dark?",
+        "answer": "The values in an HDR file are linear light. The page encodes them to sRGB before the JPEG is written, which keeps the exposure the file was saved with."
+      },
+      {
+        "question": "Is there a JPEG quality slider?",
+        "answer": "There is none, and the page passes no quality value to ImageMagick."
+      },
+      {
+        "question": "Why do dark gradients show steps?",
+        "answer": "The linear values are rounded to 256 levels before the sRGB encoding, which leaves few levels for deep shadows. A smooth dark gradient can band as a result."
+      },
+      {
+        "question": "Does my HDR file leave my device?",
+        "answer": "No. The work happens in this tab: ImageMagick, built for WebAssembly, reads your HDR locally and nothing is uploaded. A picture beyond about 537 megapixels stops with a message that it is too large to convert here."
+      }
+    ],
+    "aboutSection": {
+      "title": "HDR and JPEG",
+      "fromFormat": {
+        "name": "HDR",
+        "fullName": "Radiance HDR image",
+        "description": "An RGBE image format created by Greg Ward for the Radiance lighting simulation system.",
+        "details": [
+          "Red, green and blue bytes plus a shared exponent",
+          "Wide brightness range",
+          "image/vnd.radiance"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The lossy photo format named for the Joint Photographic Experts Group.",
+        "details": [
+          "8 bits per color channel",
+          "No alpha channel",
+          "image/jpeg"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HDR to JPEG",
+      "points": [
+        "Values brighter than white are clipped, not tone mapped.",
+        "The JPEG has 8 bits per channel, so the HDR range is gone.",
+        "The page passes no quality value and has no controls.",
+        "Choose several HDR files and each gives its own JPEG."
+      ]
+    },
+    "guide": {
+      "title": "About HDR and JPEG files",
+      "markdown": "### What is an HDR file?\n\nRadiance is a lighting simulation system, and Greg Ward made the .hdr picture format for it. The format is also called RGBE: a pixel is three color bytes plus one exponent that all three share, so a single file spans far more brightness than a 24-bit RGB file does. Radiance uses these pictures for computed brightness, and 3D artists load them as environment maps. Files can use run-length encoding and end in .hdr or .pic. The registered media type is image/vnd.radiance.\n\n### Programs that open HDR files\n\n- **Windows, Mac and Linux:** the HDR coder in ImageMagick covers this format for reading and writing.\n- **Windows and Mac:** Adobe Photoshop appears in the media type registration as a user of Radiance pictures.\n- **Linux:** Radiance itself, the rendering system the format came from, includes RGBE code.\n\n### HDR and JPEG compared\n\nThe target JPEG keeps only eight bits per color channel and has no alpha channel, so it holds far less brightness than an HDR file. That gap decides what this converter does. ImageMagick reads the Radiance file in your browser, and this 8-bit build clips each value above white to white. Those linear values then get an sRGB encoding before the JPEG is written, so highlights brighter than white end up white.\n\n### Other ways to convert HDR to JPEG\n\n- **Luminance HDR:** its command-line tool loads the file with `-l environment.hdr`, selects a tone-mapping operator with `--tmo` (mantiuk06 is the default) and names the tone-mapped output with `-o`. The `-q` option sets the quality from 1 to 100.\n- **GIMP:** open the HDR, which GIMP loads as Radiance RGBE, and export it as a JPEG. The JPEG dialog offers Quality, Progressive, Subsampling and metadata choices such as Save Exif data.\n- **ImageMagick:** run `magick environment.hdr preview.jpeg`. Its format list shows HDR and JPEG as both readable and writable.\n\n### Problems with HDR files\n\n- **Bright areas flatten**: squeezing the brightness range into eight bits throws highlight detail away, so pick a rendering on purpose, for instance with a tone mapper, instead of truncating.\n- **Colors look wrong elsewhere**: a program must decode the shared exponent, since the bytes are not ordinary packed RGB.\n- **The file will not read**: the .hdr name is not proof of the contents, and the registration for the Radiance type recommends looking at the full header.\n- **A very large picture**: beyond about 537 megapixels the page stops and reports that the picture is too large."
+    }
+  },
+  "heif-to-webp": {
+    "seo": {
+      "title": "Convert HEIF to WebP Online (Free)",
+      "h1": "HEIF to WebP Converter",
+      "description": "Convert HEIF to WebP in your browser. The primary image is decoded to 8-bit color, and EXIF data and ICC profiles are not carried over. Free, no sign-up.",
+      "howToHeading": "How to convert HEIF to WebP"
+    },
+    "tool": {
+      "subtitle": "Turn a HEIF photo into a WebP for the web, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert HEIF to WebP?",
+        "answer": "Drop in the .heif file and the page decodes it. The page downloads a WebP of the picture. When you add more than one file, they run in sequence and each WebP downloads on its own."
+      },
+      {
+        "question": "Can I use a .heic file here?",
+        "answer": "This page's picker takes .heif files. HEIC is one variant of HEIF, and the decoder is libheif."
+      },
+      {
+        "question": "Which picture from the file is converted?",
+        "answer": "Only the primary image. A file that holds several pictures or a sequence still gives one WebP."
+      },
+      {
+        "question": "Which WebP quality does the page use?",
+        "answer": "The page has no quality slider and no lossless option. Your browser's canvas or ImageMagick writes the WebP, depending on what the browser can encode."
+      },
+      {
+        "question": "Are EXIF data and the color profile still in the WebP?",
+        "answer": "No. Decoding leaves 8-bit RGB pixels only; neither EXIF data nor ICC profiles come along. Keep the HEIF if you need the camera tags or an embedded profile."
+      },
+      {
+        "question": "Why convert HEIF to WebP at all?",
+        "answer": "HEIF is used for photographs from modern phones, while WebP is a web image format that current major browsers support. A WebP is the file to put on a web page."
+      },
+      {
+        "question": "What does the \"No images in HEIF\" error tell me?",
+        "answer": "The file has no picture the decoder could find, so there is nothing to convert. Export the photo again from the device or program that made it."
+      },
+      {
+        "question": "Does my photo leave my device?",
+        "answer": "No. libheif runs in your browser tab, so the HEIF and the WebP stay on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIF and WebP",
+      "fromFormat": {
+        "name": "HEIF",
+        "fullName": "High Efficiency Image File Format",
+        "description": "An ISO/IEC 23008-12 container, built on the ISO Base Media File Format, that holds still images, collections and timed sequences.",
+        "details": [
+          "HEVC is one supported codec",
+          "Several images per file",
+          "image/heif"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google and released as open source, with lossy and lossless modes.",
+        "details": [
+          "RIFF container",
+          "Transparency and animation",
+          "image/webp"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEIF to WebP",
+      "points": [
+        "Only the primary image is converted.",
+        "The picture is decoded to 8-bit color before the WebP is written.",
+        "EXIF data and ICC profiles are not carried over.",
+        "Choose several HEIF files and each gives its own WebP."
+      ]
+    },
+    "guide": {
+      "title": "About HEIF and WebP files",
+      "markdown": "### What is a HEIF file?\n\nStandard ISO/IEC 23008-12 defines HEIF, the High Efficiency Image File Format, which organizes images in an ISO Base Media File Format container. A single HEIF file may contain separate still images, collections or timed sequences, and its container can tie metadata and derived images to the stored pictures. HEVC is one supported coding format, but the container is not itself the H.265 codec. Generic HEIF stills use the media type image/heif.\n\n### Programs that open HEIF files\n\n- **Windows, Mac and Linux:** GIMP added HEIF import and export in version 2.10.2.\n- **Windows and Linux:** XnView MP names HEIF among its supported formats, and companies need a license for it.\n- **Mac:** Preview can export HEIF as JPEG, and High Sierra was the macOS release that introduced HEIF support.\n- **Mobile:** Apple Photos has handled HEIF photos since iOS 11, and Adobe Lightroom for mobile documents support for HEIF and .heic images on iOS and Android.\n\n### HEIF and WebP compared\n\nWebP wraps its data in a RIFF container. Lossy files use VP8 intra-frame coding and lossless files use a separate method, and both can hold transparency and animation. Dimensions are capped at 16383 pixels per side.\n\nHere libheif decodes the primary image into 8-bit RGB, and the page writes the WebP from those pixels. Other images in the container are not exported, and EXIF data and ICC profiles are left behind.\n\n### Other ways to convert HEIF to WebP\n\n- **libheif:** run `heif-dec camera.heif picture.webp`. The program converts the images stored in a HEIF file to JPEG, PNG, TIFF, WebP or Y4M.\n- **GIMP:** open the HEIF and export it as WebP. The WebP dialog offers Source Type, Lossless, Image quality and Alpha quality.\n- **ImageMagick:** run `magick camera.heic website.webp`. Its format list names this format HEIC, and the HEIC and WebP rows need the libheif and WebP delegate libraries.\n\n### Problems with HEIF files\n\n- **The container opens but the picture does not**: a program needs support for both the container and the stored codec.\n- **Only one picture comes out**: a file can include several related pictures or a sequence, so a single-image export does not represent the whole container.\n- **Old Apple systems fail**: systems older than iOS 11 or macOS High Sierra have no built-in HEIF support.\n- **The file holds no image**: the page stops with the message \"No images in HEIF\" when the decoder finds no picture to convert."
+    }
+  },
+  "icns-to-svg": {
+    "seo": {
+      "title": "Convert ICNS to SVG Online (Free)",
+      "h1": "ICNS to SVG Converter",
+      "description": "Convert ICNS to SVG in your browser. The largest PNG icon is embedded in an SVG at its pixel size; nothing is traced into vector shapes. Free, no sign-up.",
+      "howToHeading": "How to convert ICNS to SVG"
+    },
+    "tool": {
+      "subtitle": "Wrap the largest PNG icon from an ICNS file in an SVG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert ICNS to SVG?",
+        "answer": "Add your .icns file and wait while the page reads it. The page downloads an SVG that holds the icon as an embedded picture. More files are handled one by one, and every SVG is a separate download."
+      },
+      {
+        "question": "Is the result a true vector?",
+        "answer": "No, it holds one image element: the icon as an embedded PNG at its own pixel width and height. It does not scale like a vector, because nothing is traced into shapes."
+      },
+      {
+        "question": "Which icon from the ICNS file is used?",
+        "answer": "The largest PNG-backed one: the page looks for the biggest size first and works down through the smaller ones. Only that one size ends up in the SVG."
+      },
+      {
+        "question": "What does the no PNG icon images message mean?",
+        "answer": "The page reads only PNG-backed icons. An ICNS that holds only older, non-PNG icon types fails with a message saying it has no PNG icon images."
+      },
+      {
+        "question": "Is the transparency kept?",
+        "answer": "Yes. It is kept in the embedded PNG, so the icon's transparent areas stay transparent."
+      },
+      {
+        "question": "Can I get the other sizes out of the ICNS?",
+        "answer": "Not here. On a Mac, `iconutil -c iconset` extracts an ICNS file to an iconset folder, and each picture can then be converted on its own."
+      },
+      {
+        "question": "Can I get editable shapes from the SVG?",
+        "answer": "Not from this page, because the SVG holds one embedded PNG and nothing is traced. A tracer such as Potrace reads a BMP and writes an SVG."
+      },
+      {
+        "question": "Is the icon uploaded anywhere?",
+        "answer": "No. The file is read and wrapped inside your browser, so nothing is uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "ICNS and SVG",
+      "fromFormat": {
+        "name": "ICNS",
+        "fullName": "Apple icon image",
+        "description": "A macOS container that packages application icon artwork in several sizes, including high-resolution ones.",
+        "details": [
+          "Standard and high-resolution icons",
+          "512-point icon uses a 1024-pixel image"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An open W3C XML format that describes two-dimensional graphics as shapes, text and embedded images.",
+        "details": [
+          "Plain text",
+          "image/svg+xml",
+          "Can embed pixel images"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ICNS to SVG",
+      "points": [
+        "The SVG embeds one PNG picture; nothing is traced to vectors.",
+        "Only the largest PNG-backed icon is used.",
+        "An ICNS with no PNG icons cannot be converted.",
+        "Choose several ICNS files and each gives its own SVG."
+      ]
+    },
+    "guide": {
+      "title": "About ICNS and SVG files",
+      "markdown": "### What is an ICNS file?\n\nApplication icons on macOS are bundled into ICNS files. A collection can supply standard and high-resolution representations, and Apple documents paired sizes from 16 through 512 points; the high-resolution 512-point icon uses a 1024-pixel image. The iconutil tool from Apple turns an iconset folder into an ICNS file and compresses it.\n\n### Programs that open ICNS files\n\n- **Windows, Mac and Linux:** GIMP opens ICNS through a plug-in for Apple Icon Image files; XnView MP names Macintosh ICNS images as a supported format.\n- **Mac:** iconutil turns an ICNS into an iconset folder, or builds an ICNS from one.\n\n### ICNS and SVG compared\n\nSVG is an XML language that describes graphics as shapes, text and embedded images. An SVG records its shapes as instructions, so they stay sharp when drawn at any size. An SVG may also embed pixel images, but those parts stay at their original resolution when enlarged.\n\nThis page makes the second kind. It finds the largest PNG icon in the ICNS, from 1024 pixels down to 16, and writes an SVG with one image element holding that PNG at its own width and height. Transparency stays in the PNG, and the other sizes are dropped.\n\n### Other ways to convert ICNS to SVG\n\n- **GIMP:** load the ICNS, export it as SVG and pick PNG (always) under \"Embed raster layers as\". The other choices embed opaque layers as JPEG or leave raster layers out.\n- **iconutil and GIMP:** run `iconutil -c iconset Brand.icns`, open one of the extracted pictures in GIMP and export an SVG the same way.\n- **Pillow and Potrace:** open the ICNS in Pillow, which reads the largest icon by default, save it as selected.bmp and run `potrace -s -o mark.svg selected.bmp` to trace shapes. Potrace turns the bitmap into black and white with a simple threshold.\n\n### Problems with ICNS files\n\n- **The icon looks soft**: a single enlarged small icon looks different from artwork drawn for the intended display size.\n- **A size is missing**: when representations are missing, the system has to choose among the available icon sizes.\n- **No PNG icons inside**: this page reads only PNG-backed icons, so an ICNS that holds only older icon types cannot be converted here."
+    }
+  },
+  "ico-to-pdf": {
+    "seo": {
+      "title": "Convert ICO to PDF Online (Free)",
+      "h1": "ICO to PDF Converter",
+      "description": "Convert ICO to PDF in your browser. Each icon becomes a one-page PDF sized 1 point per pixel, with the picture embedded as a lossless PNG. Free.",
+      "howToHeading": "How to convert ICO to PDF"
+    },
+    "tool": {
+      "subtitle": "Put an ICO icon on a PDF page the size of the picture, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How can I get a PDF out of an ICO file?",
+        "answer": "Add the .ico file, and the page reads it and downloads a PDF with the icon on a single page. Each file you add gets its own PDF."
+      },
+      {
+        "question": "How big is the PDF page?",
+        "answer": "Exactly the image's size, with each pixel becoming one point and no margin or A4 or Letter sheet. A 256-pixel icon gives a page 256 points wide."
+      },
+      {
+        "question": "Can I put several icons in one PDF?",
+        "answer": "No. Every ICO gives a separate PDF; the converter never joins several files into one document."
+      },
+      {
+        "question": "Which icon is used when the ICO holds several sizes?",
+        "answer": "Nothing on the page lets you pick an entry. To get a particular size, extract that image first and convert it."
+      },
+      {
+        "question": "Does the PDF keep the icon's quality?",
+        "answer": "The icon is embedded as a PNG image, so the PDF adds no JPEG compression and the page has no quality setting."
+      },
+      {
+        "question": "Is the transparent background kept?",
+        "answer": "Yes. Clear areas of the icon are left clear because the page adds no backdrop."
+      },
+      {
+        "question": "Does the PDF contain vector shapes?",
+        "answer": "No. What goes on the page is a pixel picture, and zooming in only enlarges pixels."
+      },
+      {
+        "question": "Is my icon uploaded to make the PDF?",
+        "answer": "No. The file is decoded by your browser and the PDF is built there, so nothing is uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "ICO and PDF",
+      "fromFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "Microsoft's image format for graphical interface icons. One file can contain more than one image.",
+        "details": [
+          "Several images per file",
+          "Little-endian byte order",
+          "image/vnd.microsoft.icon"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "Adobe's document format, standardized as ISO 32000, that mixes text, vector graphics and raster images.",
+        "details": [
+          "Images use Flate or JPEG compression",
+          "application/pdf"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ICO to PDF",
+      "points": [
+        "The PDF has one page, sized 1 point per pixel.",
+        "The picture is embedded losslessly and stays transparent.",
+        "The page has no control for choosing an entry from a multi-size ICO.",
+        "Choose several ICO files and each gives its own PDF."
+      ]
+    },
+    "guide": {
+      "title": "About ICO and PDF files",
+      "markdown": "### What is an ICO file?\n\nWhen Microsoft built its icon format, it let one file hold several pictures of the same icon. The registered media type is image/vnd.microsoft.icon, and numbers inside the file are stored in little-endian order. Each picture inside is stored as PNG data or as a bitmap, and the format supports alpha transparency. Most people meet it as a website favicon.\n\n### Programs that open ICO files\n\n- **Windows:** File Explorer shows ICO files in folders, and IrfanView also opens them.\n- **Windows, Mac and Linux:** GIMP opens ICO, ImageMagick reads it, and XnView MP lists ICO among its supported formats; a company needs a license for XnView MP.\n- **Web:** any web browser shows ICO files.\n\n### ICO and PDF compared\n\nAdobe's Camelot project, begun in 1991, led to PDF, and PDF 1.7 became ISO 32000-1 in 2008. A PDF looks the same on every device because text, fonts, images and layout travel inside the file. A PDF page can mix text, vector shapes and raster pictures, and the pictures can be stored with lossless Flate compression or as JPEG.\n\nThis converter makes a one-page document. The sheet measures one point per icon pixel in each direction, leaving no margin and no standard paper size. The icon goes in as a PNG, so nothing lossy is added.\n\n### Other ways to convert ICO to PDF\n\n- **GIMP:** load the ICO, then pick the .pdf extension on export. Layers as pages makes one page per layer, and Fill transparent areas with background color replaces transparency with the background color.\n- **Pillow:** it reads the largest icon in an ICO. When it saves a PDF, L, RGB and CMYK images use JPEG encoding and RGBA images use JPEG2000 encoding.\n- **ImageMagick:** run `magick badge.ico badge.pdf`. The formats page lists ICO under read and PDF under read and write.\n\n### Problems with ICO files\n\n- **Soft when enlarged**: a small icon stretched for a high-DPI screen looks blurry.\n- **PNG or bitmap data**: entries are stored in one of those two ways, and a viewer must understand whichever the icon uses.\n- **Several images in one file**: an ICO can hold more than one picture, and a preview shows just one."
+    }
+  },
+  "ico-to-tga": {
+    "seo": {
+      "title": "Convert ICO to TGA Online (Free)",
+      "h1": "ICO to TGA Converter",
+      "description": "Convert ICO to TGA in your browser. The icon is decoded to 8-bit pixels and written as a Targa image, with no RLE or origin options. Free, no sign-up.",
+      "howToHeading": "How to convert ICO to TGA"
+    },
+    "tool": {
+      "subtitle": "Turn a Windows icon into a Targa image for game or video work, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn an ICO into a TGA?",
+        "answer": "Drop the .ico on the converter and the Targa file downloads when it finishes. Add more icons and each one gets its own TGA."
+      },
+      {
+        "question": "Which size of icon becomes the TGA?",
+        "answer": "You cannot select an entry of a multi-size ICO on this page. Extract the size you want first if it matters."
+      },
+      {
+        "question": "Can I choose RLE compression or the origin?",
+        "answer": "No. The page passes no options to the Targa writer, so those settings are not available here. GIMP's TGA export offers both, as listed below."
+      },
+      {
+        "question": "Is the TGA the same pixel size as the icon?",
+        "answer": "Yes. It has the pixel size of the decoded icon, and nothing is scaled."
+      },
+      {
+        "question": "Is anything besides pixels copied into the TGA?",
+        "answer": "No. Only the pixels reach the Targa writer, so profiles and tags stay behind."
+      },
+      {
+        "question": "Why would I want a TGA?",
+        "answer": "Targa is used for game textures and for video and 3D rendering output. Check the file in your importer, since its alpha and orientation expectations decide whether it works."
+      },
+      {
+        "question": "What opens the TGA afterward?",
+        "answer": "GIMP, Adobe Photoshop, IrfanView and Paint.NET open TGA files."
+      },
+      {
+        "question": "Is the TGA made on a server?",
+        "answer": "No. The Targa file is made in this tab, so the icon is never uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "ICO and TGA",
+      "fromFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "Microsoft's image format for graphical interface icons. One file can contain more than one image.",
+        "details": [
+          "Several sizes in one file",
+          "PNG or bitmap entries",
+          "image/vnd.microsoft.icon"
+        ]
+      },
+      "toFormat": {
+        "name": "TGA",
+        "fullName": "Truevision Targa",
+        "description": "A raster format introduced by Truevision. It has optional run-length encoding and an alpha channel.",
+        "details": [
+          "8 to 32 bits per pixel",
+          "Optional RLE",
+          "Used for game textures and rendering output"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ICO to TGA",
+      "points": [
+        "One decoded icon becomes one TGA at the same pixel size.",
+        "The page has no RLE, origin or entry-selection options.",
+        "Metadata is not carried over.",
+        "Choose several ICO files and each gives its own TGA."
+      ]
+    },
+    "guide": {
+      "title": "About ICO and TGA files",
+      "markdown": "### What is an ICO file?\n\nWindows icons live in ICO files. A single ICO can package a set of pictures at different sizes and color depths, and the pictures inside may be PNG data or plain bitmaps. Alpha transparency is supported. Numbers in the file are little-endian, and image/vnd.microsoft.icon is the registered media type. Browsers reuse the format for favicons, which is why many people know the .ico extension.\n\n### Programs that open ICO files\n\n- **Windows:** IrfanView opens ICO files, and File Explorer previews them.\n- **Windows, Mac and Linux:** GIMP can open an ICO, and ImageMagick can read one. XnView MP also names ICO as a supported format; companies must buy a license for it.\n- **Web:** every web browser can show an ICO.\n\n### ICO and TGA compared\n\nTruevision introduced Targa in 1984. A TGA stores 8 to 32 bits per pixel, can use run-length encoding and has an alpha channel and a simple header. Game textures and video or 3D rendering output are its usual jobs.\n\nHere the browser decodes the icon and ImageMagick writes the Targa file. The output has the decoded icon's pixel size, and the page sets neither compression nor origin, so reach for GIMP when those settings matter. A game or video importer reads the file by its header, so check how it treats the alpha channel and image orientation.\n\n### Other ways to convert ICO to TGA\n\n- **GIMP:** open the icon and export it as TGA, then adjust Use RLE compression and Origin (Bottom left or Top left).\n- **ImageMagick:** run `magick cursor-art.ico sprite.tga`. The formats page lists ICO as read-only and TGA as read and write.\n- **Pillow:** open the ICO (Pillow reads the largest available icon) and save a .tga. Setting compression to `tga_rle` writes it run-length encoded.\n\n### Problems with ICO files\n\n- **Several pictures in one file**: an icon can hold many sizes and color depths, so a preview may show only one of them.\n- **Two kinds of entry**: each picture is PNG data or a bitmap, and a program has to read both.\n- **A small source for a texture**: icons are made for small screens, so a game asset may need larger artwork."
+    }
+  },
+  "ico-to-webp": {
+    "seo": {
+      "title": "Convert ICO to WebP Online (Free)",
+      "h1": "ICO to WebP Converter",
+      "description": "Convert ICO to WebP in your browser. The icon is decoded to 8-bit pixels and saved as a WebP, with transparency kept. Free, no sign-up.",
+      "howToHeading": "How to convert ICO to WebP"
+    },
+    "tool": {
+      "subtitle": "Turn a Windows icon into a WebP picture, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I save an ICO as a WebP?",
+        "answer": "Pick the .ico file and the WebP downloads once it has been decoded. A batch of icons gives a batch of separate WebP files."
+      },
+      {
+        "question": "Which size of icon becomes the WebP?",
+        "answer": "A multi-size ICO gives you no way to pick an entry on this page. To use a specific size, extract that image before converting."
+      },
+      {
+        "question": "Which WebP quality does the page use?",
+        "answer": "There is no slider and no lossless option. Where your browser's canvas can write WebP it does, and where it cannot, ImageMagick encodes the WebP instead."
+      },
+      {
+        "question": "Does the WebP stay transparent?",
+        "answer": "Yes. The page keeps transparency for WebP output, so the icon's clear areas stay clear."
+      },
+      {
+        "question": "Does the WebP keep every size from the ICO?",
+        "answer": "No. You receive one still picture, not a set of sizes."
+      },
+      {
+        "question": "Will the WebP carry over data stored in the ICO?",
+        "answer": "No. The WebP is built from the decoded pixels only, so EXIF, ICC profiles, XMP and any other data in the icon file are left behind."
+      },
+      {
+        "question": "Can I get lossless WebP from an ICO?",
+        "answer": "Yes, on the desktop. GIMP's WebP dialog has a Lossless checkbox, and ImageMagick accepts the webp:lossless define, as shown below."
+      },
+      {
+        "question": "Is my icon sent anywhere to make the WebP?",
+        "answer": "No. The decoding and the WebP encoding both happen in this tab, which means the file stays on your computer."
+      }
+    ],
+    "aboutSection": {
+      "title": "ICO and WebP",
+      "fromFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "Microsoft's image format for graphical interface icons. One file can contain more than one image.",
+        "details": [
+          "Several sizes in one file",
+          "PNG or bitmap entries",
+          "image/vnd.microsoft.icon"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "Google's image format with lossy and lossless modes. Lossy WebP is based on VP8 intra-frame coding.",
+        "details": [
+          "RIFF container",
+          "Transparency and animation",
+          "image/webp"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ICO to WebP",
+      "points": [
+        "Transparency is kept.",
+        "There is no way to choose an entry from a multi-size ICO.",
+        "Metadata is not carried over.",
+        "Choose several ICO files and each gives its own WebP."
+      ]
+    },
+    "guide": {
+      "title": "About ICO and WebP files",
+      "markdown": "### What is an ICO file?\n\nMicrosoft built ICO for Windows icons. The file is a container, and one container can hold several images in a range of sizes and color depths, each stored as PNG data or as a bitmap. The format keeps alpha transparency. Web developers know it best as the favicon, and its media type is image/vnd.microsoft.icon.\n\n### Programs that open ICO files\n\n- **Windows:** Windows File Explorer displays ICO files, and IrfanView is another viewer for the format.\n- **Windows, Mac and Linux:** open an ICO in GIMP, or read it with ImageMagick. XnView MP supports ICO too, with a license required for companies.\n- **Web:** web browsers draw ICO pictures in a page.\n\n### ICO and WebP compared\n\nWebP came from Google, which announced it on 30 September 2010 as open source. Files sit in a RIFF container. Lossy WebP reuses VP8 key-frame coding, lossless WebP uses another method, and both kinds hold transparency and animation. ICC profiles, Exif and XMP can ride along, and the largest size is 16383 x 16383 pixels.\n\nThe converter decodes the icon and saves a WebP, keeping transparency. It uses your browser's canvas where the canvas can write WebP and ImageMagick where it cannot, with no quality slider either way. You receive one still picture instead of a set of sizes, and anything else stored in the icon file is left behind.\n\n### Other ways to convert ICO to WebP\n\n- **GIMP:** open the ICO and export it as WebP. Set Source Type to Icon, and tick Lossless to keep the original quality.\n- **Pillow:** load the ICO, which gives the largest icon, and call save with a .webp name and lossless set to true.\n- **ImageMagick:** run `magick site-icon.ico -define webp:lossless=true site-art.webp` for lossless WebP. The WebP delegate library has to be present in your ImageMagick.\n\n### Problems with ICO files\n\n- **Several sizes in one file**: an icon holds many pictures, so check each size before trusting a preview.\n- **Bitmap or PNG inside**: readers that handle only one storage kind may not open every icon.\n- **Soft when enlarged**: an icon drawn for a small screen looks blurry when you scale it up."
+    }
+  },
+  "jpeg-to-hdr": {
+    "seo": {
+      "title": "Convert JPEG to HDR Online (Free)",
+      "h1": "JPEG to HDR Converter",
+      "description": "Convert JPEG to a Radiance HDR file in your browser. The 8-bit picture is written as RGBE, and lost highlights do not come back. Free, no upload.",
+      "howToHeading": "How to convert JPEG to HDR"
+    },
+    "tool": {
+      "subtitle": "Save a JPEG photo as a Radiance HDR file for lighting and rendering tools, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does converting JPEG to HDR bring back blown highlights?",
+        "answer": "No. A JPEG keeps only 8 bits per channel, and a white patch in it has no texture left to recover. The HDR file stores the same picture in a format that can hold more range."
+      },
+      {
+        "question": "Is this the same as merging bracketed exposures?",
+        "answer": "No. The page converts one picture and never combines several exposures. For real multi-exposure HDR, merge the separate originals in a tool built for it."
+      },
+      {
+        "question": "Why would I want a Radiance .hdr copy of a photo?",
+        "answer": "Rendering and lighting software uses RGBE files, for example as environment maps in 3D rendering. The conversion gives that software a file it accepts."
+      },
+      {
+        "question": "Will the HDR remove the JPEG's block artifacts?",
+        "answer": "No. Blocking and banding are baked into the JPEG's pixels, so the Radiance file inherits them."
+      },
+      {
+        "question": "Are the camera's EXIF settings kept?",
+        "answer": "No. EXIF, ICC profile and XMP data do not make it into the Radiance file."
+      },
+      {
+        "question": "Which programs open the HDR?",
+        "answer": "Radiance HDR files open in Blender, GIMP, Photoshop and Luminance HDR."
+      },
+      {
+        "question": "Is there a setting for exposure or tone?",
+        "answer": "No. Nothing about exposure or tone can be adjusted here; the picture is converted as it is."
+      },
+      {
+        "question": "Is my photo sent to a server?",
+        "answer": "No. The photo is decoded by your browser and ImageMagick writes the Radiance file in that same tab, so nothing is uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and HDR",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The lossy photo format named for the Joint Photographic Experts Group, built for photographs.",
+        "details": [
+          "8 bits per color channel",
+          "No alpha channel",
+          "image/jpeg"
+        ]
+      },
+      "toFormat": {
+        "name": "HDR",
+        "fullName": "Radiance HDR image",
+        "description": "An RGBE format created for the Radiance lighting simulation system.",
+        "details": [
+          "Red, green and blue bytes plus a shared exponent",
+          "image/vnd.radiance"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to HDR",
+      "points": [
+        "The HDR holds the same 8-bit picture; no highlights come back.",
+        "Only one picture is converted, with no exposure merging.",
+        "Camera metadata is not carried over.",
+        "Choose several JPEGs and each gives its own HDR file."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG and HDR files",
+      "markdown": "### What is a JPEG file?\n\nThe name JPEG comes from the committee that wrote it, which started work in 1986. Its lossy baseline mode cuts a picture into 8x8 blocks of pixels, runs each through a discrete cosine transform and codes the result with Huffman tables. Many cameras and scanners write JPEG directly, and its registered media type is image/jpeg. A progressive mode draws a rough image first and refines it.\n\n### Programs that open JPEG files\n\n- **Mac:** Preview views them.\n- **Windows:** Windows Photos views them.\n- **Windows, Mac and Linux:** GIMP is a full editor for JPEG pictures.\n- **Web:** every browser shows JPEG.\n\n### JPEG and HDR compared\n\nA Radiance HDR file is an RGBE image, an idea from Greg Ward. Every pixel is three color bytes with one shared exponent, which gives a brightness range that plain 24-bit RGB cannot reach. The format has run-length encoding, and its files end in .hdr or .pic. Lighting simulations in Radiance use it for computed light levels, and its media type is image/vnd.radiance.\n\nYour browser first turns the JPEG into pixels, and ImageMagick then writes the Radiance file from that 8-bit data. What you get is the same picture in a new container. A window that the camera blew out to white is still white, and nothing here merges exposures or lets you set exposure or tone. Keep the original JPEG too, because the Radiance copy holds no more detail than the source.\n\n### Other ways to convert JPEG to HDR\n\n- **GIMP:** open the JPEG, then export with a .hdr name or pick Radiance RGBE as the file type. No dialog opens and the export starts at once.\n- **ImageMagick:** run `magick photograph.jpeg environment.hdr`. Its format list shows JPEG and HDR as both readable and writable.\n- **OpenCV:** read the JPEG with `imread` and write it with `imwrite` under a .hdr file name; the library lists Radiance HDR as .hdr and .pic.\n\n### Problems with JPEG files\n\n- **No transparency**: a JPEG cannot carry see-through pixels, so a cutout needs another format.\n- **Compression damage**: the blocks and banding that lossy coding leaves are part of the picture for good.\n- **No layers**: a JPEG is one flat picture, so save the original artwork separately."
+    }
+  },
+  "jpeg-to-jxl": {
+    "seo": {
+      "title": "Convert JPEG to JXL Online (Free)",
+      "h1": "JPEG to JXL Converter",
+      "description": "Convert JPEG to JPEG XL in your browser. The photo is decoded and re-encoded as a new JXL, with no quality control and no bit-exact JPEG recovery.",
+      "howToHeading": "How to convert JPEG to JXL"
+    },
+    "tool": {
+      "subtitle": "Re-encode a JPEG photo as JPEG XL (.jxl) in your browser, with nothing uploaded."
+    },
+    "faqs": [
+      {
+        "question": "Can I get my original JPEG back from the JXL?",
+        "answer": "No. The page decodes your JPEG to pixels and encodes those as a new JXL, so it does not keep what is needed to rebuild the original file. Keep the JPEG if you need it back exactly."
+      },
+      {
+        "question": "Does the JXL have a quality setting here?",
+        "answer": "No. The page sets no quality and shows no slider."
+      },
+      {
+        "question": "Which programs open a JXL?",
+        "answer": "Safari, GIMP, XnView MP and IrfanView open JPEG XL files. Test the file in the program that will display it, since support varies."
+      },
+      {
+        "question": "Will the JXL be smaller than my JPEG?",
+        "answer": "That depends on the picture. Encoding decoded pixels does not guarantee a smaller file than the JPEG you started from, so compare the two sizes."
+      },
+      {
+        "question": "Does the JXL keep EXIF, ICC and XMP?",
+        "answer": "No. Those metadata blocks are not passed on, because the picture is reduced to pixels first."
+      },
+      {
+        "question": "Why make a JXL at all?",
+        "answer": "JPEG XL supports lossy and lossless coding, alpha, animation and HDR. Use it when the program receiving the file asks for JXL."
+      },
+      {
+        "question": "Does converting remove JPEG artifacts?",
+        "answer": "No. Compression blocks and banding already sit in the decoded pixels, and the JXL encodes them too."
+      },
+      {
+        "question": "Is the JXL made on a server?",
+        "answer": "No. Both the decoding and the JPEG XL encoding take place in your browser tab, so the photo never travels anywhere."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and JXL",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The lossy photo format named for the Joint Photographic Experts Group, built for photographs.",
+        "details": [
+          "8 bits per color channel",
+          "No alpha channel",
+          "image/jpeg"
+        ]
+      },
+      "toFormat": {
+        "name": "JXL",
+        "fullName": "JPEG XL image",
+        "description": "An image coding system from the JPEG committee with lossy and lossless coding, alpha, animation and HDR.",
+        "details": [
+          "Bare codestream or box-based container",
+          "image/jxl"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to JXL",
+      "points": [
+        "The JPEG is decoded to pixels and re-encoded, not repackaged.",
+        "No quality control is offered.",
+        "EXIF, ICC and XMP are not carried over.",
+        "Choose several JPEGs and each gives its own JXL."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG and JXL files",
+      "markdown": "### What is a JPEG file?\n\nThe 1992 edition of ITU-T T.81 holds JPEG's core standard, and ISO republished it in 1994 as ISO/IEC 10918-1. Cameras and scanners commonly write the format. Baseline coding discards detail: it works block by block on 8x8 pixels, applying a discrete cosine transform and finally Huffman coding. Each channel is limited to 8 bits and transparency is unavailable. The media type image/jpeg identifies the format, and .jpg and .jpeg are the same thing.\n\n### Programs that open JPEG files\n\n- **Mac:** Preview is the built-in viewer.\n- **Windows:** Windows Photos is its counterpart.\n- **Windows, Mac and Linux:** import a JPEG into GIMP to edit it.\n- **Web:** browsers show JPEG inline.\n\n### JPEG and JXL compared\n\nJPEG XL is a newer coding system from the same JPEG committee, standardized as ISO/IEC 18181. Both lossy and lossless coding are available, along with alpha, animation and progressive decoding, plus high bit depth, wide gamuts and HDR. JXL files come as a bare codestream or inside a box-based container; the container is where Exif, XMP and JUMBF metadata can live.\n\nHere your browser decodes the JPEG and ImageMagick encodes a fresh JXL from the pixels. The JPEG data is not repackaged, the page shows no quality control, and the metadata is left behind. The receiving program still needs a decoder that can open the result.\n\n### Other ways to convert JPEG to JXL\n\n- **libjxl cjxl:** run `cjxl photograph.jpeg reversible.jxl`. The man page says JPEG files are compressed losslessly by default and can be reconstructed bit for bit, which this page does not do.\n- **GIMP:** open the JPEG and export it as JXL. The dialog offers Lossless, Compression/maxError, Effort/Speed, Bit depth, Export as CMYK, Save Exif and Save XMP.\n- **ImageMagick:** run `magick photograph.jpeg modern.jxl`. The formats page lists JXL as readable and writable.\n\n### Problems with JPEG files\n\n- **No cutouts**: transparent regions cannot be stored in a JPEG, so keep that artwork in an alpha-capable format.\n- **Layers do not survive**: a JPEG cannot store layers, so retain the project file.\n- **Quality values vary**: matching numbers across editors do not guarantee matching file size or appearance."
+    }
+  },
+  "jpeg-to-ppm": {
+    "seo": {
+      "title": "Convert JPEG to PPM Online (Free)",
+      "h1": "JPEG to PPM Converter",
+      "description": "Convert JPEG to PPM in your browser. You get uncompressed RGB pixels in a Netpbm file, which can be many times the size of the JPEG. Free, no upload.",
+      "howToHeading": "How to convert JPEG to PPM"
+    },
+    "tool": {
+      "subtitle": "Turn a JPEG photo into an uncompressed Netpbm PPM for scripts and pixel tools, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Why does my PPM weigh so much more than the JPEG?",
+        "answer": "A PPM stores every pixel's red, green and blue samples with no compression, while a JPEG compresses the picture. Expect a PPM far larger than the JPEG."
+      },
+      {
+        "question": "Does a PPM keep my photo's quality?",
+        "answer": "It keeps the decoded pixels exactly, but it cannot undo the loss already in the JPEG. Blocks and banding from the JPEG stay in the PPM."
+      },
+      {
+        "question": "What can open a PPM?",
+        "answer": "GIMP, IrfanView, XnView MP and the Netpbm tools open PPM files."
+      },
+      {
+        "question": "Is there an option for ASCII or binary PPM?",
+        "answer": "No. This conversion offers no options on the page. GIMP's PPM export lets you choose ASCII or RAW, as shown below."
+      },
+      {
+        "question": "Is EXIF data kept?",
+        "answer": "No. A PPM has nowhere to hold camera metadata, and the picture goes through raw pixels, so it is dropped."
+      },
+      {
+        "question": "Why does my text editor show gibberish?",
+        "answer": "Binary PPM data is not text, so an editor shows odd characters after the header. Open the file in an image program or a PPM-aware tool."
+      },
+      {
+        "question": "Can a PPM hold transparency?",
+        "answer": "No. PPM carries RGB samples only and has no alpha channel, and a JPEG has none to bring along."
+      },
+      {
+        "question": "Is anything uploaded to make the PPM?",
+        "answer": "No. The JPEG is read and the PPM is written inside the browser, which keeps the photo on your computer."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and PPM",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The lossy photo format named for the Joint Photographic Experts Group, built for photographs.",
+        "details": [
+          "8 bits per color channel",
+          "No alpha channel",
+          "image/jpeg"
+        ]
+      },
+      "toFormat": {
+        "name": "PPM",
+        "fullName": "Portable Pixmap",
+        "description": "Netpbm's portable color pixel-map format. Each pixel carries red, green and blue samples.",
+        "details": [
+          "P6 binary or P3 plain text",
+          "Maximum sample value 1 to 65535"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to PPM",
+      "points": [
+        "The PPM skips compression, so it can dwarf the JPEG in size.",
+        "JPEG damage already in the picture stays.",
+        "The page offers no ASCII or binary choice.",
+        "Choose several JPEGs and each gives its own PPM."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG and PPM files",
+      "markdown": "### What is a JPEG file?\n\nTypical settings squeeze a picture to between 5 and 10 percent of its uncompressed size, which helps explain why the format is everywhere: cameras and scanners commonly build it in, and every major browser displays it. The .jpg and .jpeg extensions mean the same format, and work on it began in 1986 under the Joint Photographic Experts Group. The patents covering JPEG in the US ran out on 27 October 2006. Each color channel gets 8 bits, and neither alpha nor layers fit in the file.\n\n### Programs that open JPEG files\n\n- **Web:** a browser tab shows it directly.\n- **Windows:** Windows Photos can look at one.\n- **Mac:** Preview can look at one too.\n- **Windows, Mac and Linux:** GIMP opens a JPEG for editing.\n\n### JPEG and PPM compared\n\nIn the Netpbm family, PPM is the format for color. A binary PPM begins with P6 and a plain-text one begins with P3. A pixel holds red, green and blue samples, and the highest allowed sample value ranges from 1 up to 65535. A PPM is RGB only, with no alpha channel and no compression.\n\nThe browser decodes your JPEG and ImageMagick writes the PPM from the resulting pixels. You get the pixels without JPEG's compression, but the picture itself is not restored, and the page has no controls to change the output. Open the result in a tool that reads Netpbm files, or convert it onward with ImageMagick or Netpbm.\n\n### Other ways to convert JPEG to PPM\n\n- **Netpbm:** run `jpegtopnm photograph.jpeg > samples.ppm`. The tool writes to standard output, and a color JPEG gives a PPM while a grayscale one gives a PGM.\n- **GIMP:** open the JPEG and export it to a PPM file. The dialog's Data formatting setting chooses ASCII or RAW, and RAW makes smaller files.\n- **ImageMagick:** run `magick photograph.jpeg samples.ppm`. Its format list shows PPM, the Netpbm color pixmap format, as readable and writable.\n\n### Problems with JPEG files\n\n- **Flattened artwork**: a JPEG cannot store transparency, so cutouts need a format with alpha.\n- **Lossy damage**: blocks and banding left by compression stay in every copy you make.\n- **No layers**: only one flat picture fits in a JPEG, so keep the original project."
+    }
+  },
+  "jpeg-to-rgb": {
+    "seo": {
+      "title": "Convert JPEG to RGB Online (Free)",
+      "h1": "JPEG to RGB Converter",
+      "description": "Convert JPEG to raw RGB in your browser. The file has no header, so width, height and bit depth must be supplied when you read it back. Free.",
+      "howToHeading": "How to convert JPEG to RGB"
+    },
+    "tool": {
+      "subtitle": "Turn a JPEG photo into headerless raw RGB samples for image-processing code, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is this the RGB color mode?",
+        "answer": "No. It writes raw red, green and blue samples to a file, not a color-managed photo. The output is a data dump for programs that read pixels directly."
+      },
+      {
+        "question": "How do I open the RGB file afterward?",
+        "answer": "Supply the width, height and bit depth yourself, because the file does not store them. In ImageMagick that means a matching -size and -depth when you read it."
+      },
+      {
+        "question": "Is it an SGI image?",
+        "answer": "No. ImageMagick uses its RGB coder for raw sample streams and a separate SGI coder for Irix RGB images. This page uses the raw one."
+      },
+      {
+        "question": "Where do I find the image size?",
+        "answer": "Read it from the JPEG before converting, in any image viewer or with ImageMagick's identify command. Write it down next to the file."
+      },
+      {
+        "question": "Why does my import look striped?",
+        "answer": "Stripes mean the width, channels or row layout you chose does not match the data. Check those before blaming the converter."
+      },
+      {
+        "question": "Is the color profile or EXIF data kept?",
+        "answer": "No. A raw sample file has nowhere to store them."
+      },
+      {
+        "question": "Does the RGB file hold 8 bits per sample?",
+        "answer": "Yes. ImageMagick's RGB format writes interleaved red, green and blue samples at 8 bits each, so every pixel takes three bytes."
+      },
+      {
+        "question": "Is the raw RGB file produced on a server?",
+        "answer": "No. The conversion happens entirely in your browser tab, and the samples are saved from there."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and RGB",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The lossy photo format named for the Joint Photographic Experts Group, built for photographs.",
+        "details": [
+          "8 bits per color channel",
+          "No alpha channel",
+          "image/jpeg"
+        ]
+      },
+      "toFormat": {
+        "name": "RGB",
+        "fullName": "Raw RGB image data",
+        "description": "A raw sample stream with no header. ImageMagick's RGB coder needs the size and depth supplied to read it.",
+        "details": [
+          "No dimensions stored",
+          "Different from the SGI format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to RGB",
+      "points": [
+        "The RGB file is headerless raw samples.",
+        "You must keep the width, height and depth yourself.",
+        "It is not the SGI image format.",
+        "Choose several JPEGs and each gives its own RGB file."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG and RGB files",
+      "markdown": "### What is a JPEG file?\n\nA JPEG is the lossy photo format of the Joint Photographic Experts Group. Cameras and scanners commonly produce it, and browsers display it everywhere. Each channel gets 8 bits, so there is no alpha, and layers cannot be stored. IANA registers image/jpeg, and .jpg and .jpeg name one format.\n\n### Programs that open JPEG files\n\n- **Web:** browsers render them inline.\n- **Mac:** Preview displays a JPEG.\n- **Windows:** Windows Photos displays it too.\n- **Windows, Mac and Linux:** GIMP edits JPEG files.\n\n### JPEG and RGB compared\n\nAn .rgb ending can mean two different things. ImageMagick has a coder it calls Irix RGB for SGI images, and a separate RGB coder for raw sample streams. Raw streams store no dimensions, so a reader must be given the size and depth.\n\nThe browser decodes your JPEG, and ImageMagick's raw RGB coder writes the samples from those pixels. Write down the picture's width and height before you convert. The file will not tell you later, and a wrong guess shows up as a striped or sheared image. Reading it back takes those same numbers, in ImageMagick as a -size and -depth setting before the file name.\n\n### Other ways to convert JPEG to RGB\n\n- **ImageMagick:** run `magick photo.jpeg -depth 8 rgb:photo.rgb`, then read it back with `magick -size 640x480 -depth 8 rgb:photo.rgb photo.png`, using the real width and height. ImageMagick's format list describes RGB as raw sample streams that need the size and depth parameters.\n- **Pillow:** open the JPEG, write `image.tobytes()` to a binary file and save `image.size` separately.\n- **GIMP:** open the JPEG and export as Raw image data. Planar configuration offers Contiguous or Planar, which writes the channels as separate planes.\n\n### Problems with JPEG files\n\n- **Quality scales differ**: setting 85 in GIMP is not guaranteed to match 85 in another program, so judge by eye.\n- **No alpha**: JPEG has no way to mark pixels transparent, so cutouts need a different format.\n- **Lossy compression**: the decoded pixels carry the JPEG's blocks and banding into any raw copy.\n- **Single flat layer**: layered artwork is flattened in a JPEG, so keep the source project."
+    }
+  }
+}
