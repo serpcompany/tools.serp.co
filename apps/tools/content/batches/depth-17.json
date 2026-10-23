@@ -1,0 +1,882 @@
+{
+  "swf-to-mp4": {
+    "seo": {
+      "title": "Convert SWF to MP4 Online (Free)",
+      "h1": "SWF to MP4 Converter",
+      "description": "Convert SWF to MP4 in your browser. FFmpeg re-encodes the video and sound inside the SWF as H.264 and AAC, within a 1920 px and 30 fps cap. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn the video and sound inside an SWF into an MP4 that plays almost anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert SWF to MP4?",
+        "answer": "Open the SWF here, let FFmpeg encode it on your device, and download the MP4. Queue more than one SWF and every file yields a separate MP4 instead of a ZIP."
+      },
+      {
+        "question": "Why does my SWF to MP4 conversion fail?",
+        "answer": "The page can only read the video and sound embedded in an SWF. A game or lesson built from vector art and ActionScript is a program, not a movie. If the page reports an FFmpeg error, play the SWF in Ruffle and record the window with OBS Studio instead."
+      },
+      {
+        "question": "What sound does the MP4 have?",
+        "answer": "AAC audio at 96 kbps. There is no audio control, so all files get that same rate."
+      },
+      {
+        "question": "Will the buttons and menus of my SWF work in the MP4?",
+        "answer": "No. An MP4 is a plain video that plays from start to end. Clicks, keyboard input and ActionScript logic do not carry over, so a branching lesson cannot be played as a video."
+      },
+      {
+        "question": "How do I turn a Flash game into a video?",
+        "answer": "Open it in the Ruffle emulator, add the Ruffle window to OBS Studio as a source and press Start Recording while you play."
+      },
+      {
+        "question": "How large and how fast is the resulting video?",
+        "answer": "A clip keeps its own frame size and rate unless it is bigger or faster than the page allows. The longest side is capped at 1920 px, extra frames are dropped to reach 30 a second, and the clip keeps its length."
+      },
+      {
+        "question": "Is my SWF uploaded to a server?",
+        "answer": "No. FFmpeg runs as WebAssembly inside the page and reads the SWF there, so the file stays on your device."
+      },
+      {
+        "question": "How can I play an SWF file now that Flash Player is gone?",
+        "answer": "Ruffle emulates Flash in a browser or as a desktop app, though it does not implement every Flash API. Converting the video inside an SWF here gives an MP4 that ordinary players open."
+      },
+      {
+        "question": "Can I convert the SWF's artwork frame by frame instead?",
+        "answer": "Yes, with JPEXS Free Flash Decompiler on your own computer. Its command line exports an SWF's frames as an AVI, which FFmpeg can then turn into an MP4."
+      },
+      {
+        "question": "What video codec is inside the MP4?",
+        "answer": "H.264 video from the x264 encoder, with AAC sound. The page applies one quality setting to every file and offers no option to change it."
+      }
+    ],
+    "aboutSection": {
+      "title": "SWF and MP4",
+      "fromFormat": {
+        "name": "SWF",
+        "fullName": "Shockwave Flash",
+        "description": "A file format for Adobe Flash animations, games and interactive content, originally from Macromedia.",
+        "details": [
+          "vector animation",
+          "ActionScript interactivity",
+          "can embed video and audio"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting SWF to MP4",
+      "points": [
+        "FFmpeg re-encodes the video and sound inside the SWF as H.264 and AAC. The MP4 is a plain video, so buttons and ActionScript do not carry over.",
+        "The sound is AAC at 96 kbps, and the page has no setting to change it.",
+        "Frames larger than 1920 px on the long edge are reduced, faster clips lose frames to reach 30 fps, and both sides are rounded down to even numbers.",
+        "To capture a game or an interactive lesson, record it in Ruffle instead."
+      ]
+    },
+    "guide": {
+      "title": "About SWF and MP4",
+      "markdown": "### What is a SWF file?\n\nAn SWF is a Flash file, also known as Small Web Format. It is a legacy multimedia format associated with Macromedia and Adobe Flash, and Adobe acquired Macromedia in 2005. A single SWF may mix vector drawings, animation and bitmap video. Interactive ones put ActionScript on the timeline, and some point to outside media in place of holding every resource. Its registered media types include application/vnd.adobe.flash.movie.\n\nFlash Player was retired on 31 December 2020, after which it no longer ran Flash content at all. That is why SWF files now survive mostly as Flash animations, games and archived web content, and why people look for a way to keep them as video.\n\n### Programs that open SWF files\n\n- **Windows, Mac and Linux:** Ruffle is a Flash emulator. How well a file plays hinges on which ActionScript features it needs.\n- **Windows and Linux:** Lightspark is an incomplete Flash implementation.\n- **Mac:** Adobe Audition can import an SWF and extract the audio of video files when DLMS support is enabled. It is not an interactive Flash runtime.\n- **Web:** a browser can run Ruffle's web player, which uses WebAssembly to emulate Flash. Some APIs remain incomplete, and Ruffle also ships as browser extensions.\n\n### SWF and MP4 compared\n\nAn SWF describes a timeline with scripts, while an MP4 records a finished video. MP4 is a container defined in ISO/IEC 14496-14 that can hold video, audio and metadata, and H.264 video with AAC audio is its most common combination. Turning an SWF into an MP4 therefore keeps what can be played back and leaves the logic behind. No video can retain ActionScript interactions as executable controls, so a menu, a button or a game stays in the SWF.\n\nThis page reads the video and sound embedded in the SWF with FFmpeg. FFmpeg is not a Flash runtime, so it does not run ActionScript. The picture goes through x264 using CRF 32 and the ultrafast preset, while the sound is encoded by AAC at 96 kbps. The long edge of the frame tops out at 1920 px, and the rate tops out at 30 frames a second. A smaller frame is not enlarged, a slower clip is not sped up, and a faster clip has frames dropped while keeping its length. Both sides then drop to even numbers, which costs an odd side one pixel.\n\nYour download takes the SWF's name plus .mp4, and the original stays as it was. Files in the queue run in turn, each becoming a separate MP4.\n\n### Other ways to convert SWF to MP4\n\n- **FFmpeg (command line):** FFmpeg lists Flash (SWF) among the formats it can demux, so `ffmpeg -i movie.swf movie.mp4` converts the video and sound inside a file. It gives you control over the codecs and size, which this page fixes.\n- **JPEXS plus FFmpeg:** JPEXS Free Flash Decompiler exports from the command line with `ffdec -format frame:avi -export frame frames input.swf`. Its sound item type exports audio separately, and movie exports default to FLV without sound. Convert the exported AVI with `ffmpeg -i frames/movie.avi output.mp4`, using the file name JPEXS actually wrote.\n- **Ruffle and OBS Studio:** play the SWF in Ruffle, add its window to OBS with the + button under Sources and Window Capture, and press Start Recording. Ruffle's desktop apps for Windows, macOS and Linux suit this best. The capture holds only the route you play through, so it suits a game or a lesson that needs clicks, and OBS shows its recording format under Settings > Output.\n\n### Problems with SWF files\n\n**Adobe's player will not run it:** the retired Flash Player is not an option, so use an emulator such as Ruffle, or convert the video inside the file.\n\n**It plays differently in Ruffle:** Ruffle does not implement every Flash API, so an SWF may show graphical or behavioral differences from the original.\n\n**Pieces are missing:** an SWF can refer to external images, sound or video instead of containing them. Without those files beside it, it can behave incompletely, so keep them together.\n\n**Interactions disappear in a video:** a video conversion cannot retain ActionScript interactions as executable controls. Record the route you want to show, or keep the SWF for the interactive version.\n"
+    }
+  },
+  "wav-to-flac": {
+    "seo": {
+      "title": "Convert WAV to FLAC Online (Free)",
+      "h1": "WAV to FLAC Converter",
+      "description": "Convert WAV to FLAC in your browser. FFmpeg compresses the samples without discarding any, so the sound is unchanged. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn WAV recordings into lossless FLAC files, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is converting WAV to FLAC lossless?",
+        "answer": "Yes for ordinary integer PCM audio. FLAC compresses the samples without discarding any, so the FLAC decodes to the same sound the WAV held."
+      },
+      {
+        "question": "Does FLAC save space over WAV?",
+        "answer": "Often. A WAV stores samples directly and FLAC compresses them, but the saving depends on the recording, and a busy or noisy one gives the encoder less to work with."
+      },
+      {
+        "question": "Does FLAC sound different from WAV?",
+        "answer": "No. Both hold the same samples, so a PCM WAV and the FLAC made from it play back the same. FLAC changes only how the samples are stored."
+      },
+      {
+        "question": "Can I turn the FLAC back into a WAV?",
+        "answer": "Yes. The FLAC to WAV converter on this site decodes a FLAC into a WAV that holds the same samples as the one you started with."
+      },
+      {
+        "question": "Does FLAC remove hiss or noise?",
+        "answer": "No. Lossless compression stores the sound it is given, including hiss and clicks. Cleaning a recording needs an audio editor such as Audacity."
+      },
+      {
+        "question": "Which is better for archiving, WAV or FLAC?",
+        "answer": "Both keep every sample, so it comes down to what the next program reads. FLAC adds checksums, so a damaged frame fails its check instead of passing unnoticed."
+      },
+      {
+        "question": "Do the WAV's tags survive?",
+        "answer": "Title, artist and album tags go into the FLAC as Vorbis comments. For anything else use a tagger, as the page has no editor."
+      },
+      {
+        "question": "Can my phone play the FLAC file?",
+        "answer": "VLC on Android and on iOS both play FLAC. Android's own support is narrower than the format: mono or stereo audio, with 16-bit samples recommended."
+      },
+      {
+        "question": "How can I check that a FLAC is not damaged?",
+        "answer": "The reference flac tool has a --test option. It decodes the file and checks it without writing any output."
+      },
+      {
+        "question": "Can I queue many WAV files together?",
+        "answer": "Yes. Each WAV becomes a FLAC of its own and you download them in turn. The work happens in your browser, so no recording is uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and FLAC",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "large files"
+        ]
+      },
+      "toFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "An open, royalty-free lossless audio codec developed by Xiph.Org. It compresses audio while keeping every sample.",
+        "details": [
+          "lossless compression",
+          "open source",
+          "metadata tags"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WAV to FLAC",
+      "points": [
+        "FLAC is lossless: a PCM WAV decodes back to the same sound.",
+        "The page encodes with FFmpeg's FLAC encoder and drops any video track.",
+        "A FLAC can be smaller than the WAV, depending on the recording.",
+        "WAV tags such as title and artist are copied across where FLAC has fields for them."
+      ]
+    },
+    "guide": {
+      "title": "About WAV and FLAC",
+      "markdown": "### What is a WAV file?\n\nWAV is a RIFF-based wrapper for sound, not one particular audio encoding. Microsoft and IBM documented the format in their August 1991 multimedia specification, and Broadcast WAVE later extended it with metadata for production and preservation. Linear PCM is the common payload, so files are large but exact, although compressed encodings can appear inside a WAV too. The usual filename ending is .wav, and audio/wav and audio/x-wav are common media-type labels.\n\nBecause it keeps every sample, WAV serves for recording, editing, studio work and uncompressed masters. The Library of Congress also lists WAVE as a recommended format for digital audio collections. The cost is storage: a WAV records every sample at a steady rate whether the sound is music, silence or room noise.\n\n### Programs that open WAV files\n\n- **Windows, Mac and Linux:** Audacity brings in PCM WAV files of most kinds.\n- **Windows, Mac and Linux:** ffplay, the player from FFmpeg, plays WAV through FFmpeg's demuxer.\n- **Web:** Firefox plays supported media directly, and Mozilla lists WAV among the audio file types Firefox for Android supports.\n- **Mobile:** VLC for Android decodes whatever the file holds, and mpv for Android plays it too.\n\n### WAV and FLAC compared\n\nWAV names a container, while FLAC names a lossless codec. FLAC compresses integer PCM audio without discarding sample information. The specification is open, with an open-source reference implementation, and RFC 9639 standardized the format in December 2024.\n\n- **Extensions and media types:** .wav with audio/wav; .flac with audio/flac.\n- **Compression:** none for PCM WAV; lossless for FLAC.\n- **Channels and depth:** FLAC supports one through eight channels and sample depths from four through 32 bits.\n- **Metadata:** WAV uses INFO chunks or Broadcast WAVE extensions, which store different information. FLAC uses Vorbis comments, seek points and pictures.\n\nConverting here runs FFmpeg's FLAC encoder on the WAV and drops any video stream. The page sets no quality option, because lossless output has none to set. Title, artist and album tags are copied across where FLAC has a field for them. The saved file keeps your WAV's name with .flac in place of .wav, and the WAV is not touched.\n\nThe FLAC can be smaller. How much smaller depends on the recording, and a dense or noisy one compresses less than a quiet one. Choose WAV when the next program in your chain reads only WAV, and FLAC when you want the same samples in a smaller file.\n\n### Other ways to convert WAV to FLAC\n\n- **Audacity:** open the recording, choose File > Export Audio, and pick FLAC in the format list. FLAC is one of the formats Audacity writes without its optional FFmpeg library. Audacity can also edit or mix the recording before it exports, which changes the signal the encoder receives.\n- **The flac command-line tool:** run `flac recording.wav`. It reads WAVE input and writes the .flac file beside it. The tool supports linear PCM only, from 4 to 32 bits per sample, so it will not take a WAV with another encoding. Run `flac --test recording.flac` afterward to check the stream.\n- **FFmpeg (command line):** run `ffmpeg -i recording.wav -c:a flac recording.flac`. This is the same encoder the page uses, and it leaves you free to add options.\n\n### Problems with WAV files\n\n**Audacity cannot import it:** a recorder can wrap proprietary compression in the WAV, and Audacity suggests its optional FFmpeg library for those files.\n\n**A very long recording will not open:** the original WAV layout caps files at 4 GB, so long captures may use RF64 in place of the old RIFF size fields. Use software that understands the recorder's variant.\n\n**Notes from the recorder look different:** a WAV keeps text details in INFO chunks or Broadcast WAVE extensions, so what survives depends on how the recorder wrote them. Inspect them in a tagger before relying on them.\n\n**A player opens the file but plays nothing useful:** a .wav ending does not tell you what the samples are, so check which encoding the file holds before assuming a damaged file.\n\n**A WAV made from a lossy file:** when the WAV was decoded from an MP3 or similar, the detail is already gone, and FLAC cannot bring back samples that were discarded earlier.\n"
+    }
+  },
+  "wav-to-m4a": {
+    "seo": {
+      "title": "Convert WAV to M4A Online (Free)",
+      "h1": "WAV to M4A Converter",
+      "description": "Convert WAV to M4A in your browser. FFmpeg encodes the audio as lossy AAC at 192 kbps, not lossless ALAC. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Make an AAC M4A from a WAV recording, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the M4A from a WAV lossless?",
+        "answer": "No. The page encodes AAC, a lossy codec, and does not write Apple Lossless (ALAC). Keep the WAV if you may edit or remix the recording later."
+      },
+      {
+        "question": "What bitrate does the WAV to M4A converter use?",
+        "answer": "AAC at 192 kbps. The page has no bitrate or size setting, so every file gets the same rate."
+      },
+      {
+        "question": "Does the M4A save space over the WAV?",
+        "answer": "It can, since a WAV stores every PCM sample and the AAC here is written at 192 kbps. How much you save varies with the WAV's sample rate, bit depth and channels."
+      },
+      {
+        "question": "Can I get the WAV back from the M4A?",
+        "answer": "You can decode the M4A to a WAV, but it holds the decoded AAC, not the original samples. What the AAC encode discarded does not return."
+      },
+      {
+        "question": "What is the difference between M4A and MP3?",
+        "answer": "AAC and MP3 are both lossy codecs. M4A is an audio-only MPEG-4 file, usually holding AAC, with the media type audio/mp4, while MP3 is MPEG-1 Audio Layer III with the media type audio/mpeg."
+      },
+      {
+        "question": "Why is my WAV file so large?",
+        "answer": "A WAV usually holds uncompressed PCM, which stores every sample whether the sound is music, speech or silence. That is why people make an M4A copy to share or send."
+      },
+      {
+        "question": "Does the M4A play on my phone or in a browser?",
+        "answer": "Browsers play AAC inside MP4 files, and every Android version plays AAC in .m4a. Firefox may rely on system codecs for AAC."
+      },
+      {
+        "question": "Are my recording's tags kept?",
+        "answer": "The M4A receives title, artist and album wherever it has fields for them. Anything further needs a tagger, since the page has no tag editor of its own."
+      },
+      {
+        "question": "Why is there no M4A option in Audacity?",
+        "answer": "Audacity exports M4A (AAC) only through its optional FFmpeg library. Without that library installed, the format is missing from the export list."
+      },
+      {
+        "question": "Can I queue a stack of WAV recordings?",
+        "answer": "Yes. Each WAV in the queue produces its own M4A, and you save them one at a time. Nothing is zipped or uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and M4A",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "large files"
+        ]
+      },
+      "toFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WAV to M4A",
+      "points": [
+        "The M4A holds AAC at 192 kbps, not lossless ALAC.",
+        "AAC is lossy, so keep the WAV if you may edit it again.",
+        "The page changes only the encoding: it applies no noise reduction or loudness change.",
+        "Tags such as title and artist are copied across; the page has no tag editor."
+      ]
+    },
+    "guide": {
+      "title": "About WAV and M4A",
+      "markdown": "### What is a WAV file?\n\nA WAV keeps its sound in the RIFF layout laid out by Microsoft and IBM in an August 1991 multimedia specification. The usual payload is linear PCM, which stores every sample, but compressed encodings can sit inside a WAV as well, so the ending alone does not say what the audio is. Studios and field recorders rely on WAV as a master that is made before any compression, and Broadcast WAVE adds production and preservation metadata on top.\n\nConverting a finished WAV to M4A is a delivery step, not an editing step. A long interview or rehearsal becomes a small listening file, while the WAV stays in your archive for any later work.\n\n### Programs that open WAV files\n\n- **Windows, Mac and Linux:** Audacity opens nearly every PCM WAV and lets you edit the waveform first.\n- **Windows, Mac and Linux:** ffplay plays a WAV.\n- **Web:** Firefox handles WAV directly, and so does its Android edition.\n- **Mobile:** VLC for Android relies on the codec inside the file, while mpv for Android must be built with the matching demuxer and decoder.\n\n### WAV and M4A compared\n\nThe M4A ending marks an audio-only MPEG-4 file, a label Apple chose for its unprotected music. The sound inside is usually AAC, a lossy codec from MPEG-4 Part 3, though Apple Lossless (ALAC) can sit in the same kind of file. A PCM WAV is uncompressed, while AAC discards what listeners are least likely to miss. Apple used it for iTunes songs, and it was meant to beat MP3 at the same bitrate.\n\n- **Extensions and media types:** .wav; .m4a with audio/mp4.\n- **Compression:** none for PCM WAV; lossy for AAC.\n- **Metadata:** the M4A can carry tags and cover art.\n- **Editing:** a WAV passes through editors without another lossy encode, while each save as AAC re-encodes.\n\nFFmpeg encodes the AAC here at 192 kbps and drops any video. The page applies no noise reduction and no loudness change, so a quiet or noisy recording stays quiet or noisy. Do any cleanup on the WAV master first, then make the M4A once. Title, artist and album tags are copied across. The saved file borrows your WAV's name with .m4a on the end, and queued WAVs each give their own M4A.\n\nConverting the M4A back to WAV later expands the decoded audio without undoing what the AAC step discarded. If the WAV itself came from a lossy source, this adds another encoding stage on top. Apple Lossless is not written by this page; the FFmpeg route below can write it. Choose M4A for a small listening copy, and keep WAV for files that will pass through further editing.\n\n### Other ways to convert WAV to M4A\n\n- **Audacity:** load the WAV, then pick File > Export Audio and M4A (AAC) from the format dropdown. Audacity offers this output only through its optional FFmpeg library. The editor can also mix tracks or change project settings before it writes the file.\n- **FFmpeg (command line):** `ffmpeg -i take.wav -c:a aac -b:a 192k take.m4a` is the same codec and bitrate the page uses, and you can change either.\n- **FFmpeg, lossless:** `ffmpeg -i take.wav -c:a alac take.m4a` writes Apple Lossless instead. FFmpeg lists ALAC among the audio codecs it can encode, and the file stays an M4A.\n\n### Problems with WAV files\n\n**Audacity or another editor will not take it:** some recorders put proprietary compression inside the WAV, which Audacity handles better with its optional FFmpeg library. Play the sound in a player before you convert.\n\n**A very long recording is cut or refused:** a classic WAV tops out at 4 GB, so a bigger capture needs RF64 where the old RIFF size fields fall short.\n\n**The recorder's notes look different:** wording and fields written by one recorder may not match another's, because a WAV can use INFO chunks or Broadcast WAVE extensions. Look at the result in a tagger afterward.\n\n**The WAV was ripped from compressed audio:** if the samples were produced by decoding earlier compressed audio, the detail is already thinned out, and encoding to AAC thins it a further time.\n\n**Clipping or background noise is still there:** converting does not repair a recording. Fix it in an editor on the WAV, then convert.\n"
+    }
+  },
+  "xcf-to-png": {
+    "seo": {
+      "title": "Convert XCF to PNG Online (Free)",
+      "h1": "XCF to PNG Converter",
+      "description": "Convert XCF to PNG in your browser. ImageMagick reads one image from the GIMP file and writes it as a PNG, with no layer-by-layer export. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a GIMP XCF file into a PNG picture that opens in any viewer."
+    },
+    "faqs": [
+      {
+        "question": "How do I open an XCF file without GIMP?",
+        "answer": "Convert it to PNG here, then open the PNG in any image viewer. ImageMagick and Photopea also read XCF, but most ordinary viewers cannot."
+      },
+      {
+        "question": "Does the PNG keep my GIMP layers?",
+        "answer": "No. A PNG is one flat picture, so layers, masks, paths and text stay in the XCF. The page converts a single image from the file and makes no PNG per layer."
+      },
+      {
+        "question": "How do I convert XCF to PNG in GIMP?",
+        "answer": "In GIMP, open the file, pick File > Export As, name it with .png and press Export. Export writes a copy and leaves the XCF as it was, so use File > Save as well if you edited it."
+      },
+      {
+        "question": "Why does GIMP warn about unsaved changes after I export?",
+        "answer": "GIMP treats an export as a separate copy, so your edits still count as unsaved in the project. Save the XCF if you want them kept."
+      },
+      {
+        "question": "Is text still editable once the XCF is a PNG?",
+        "answer": "No. A PNG has no layers, so the letters exist only as pixels. Change the text layer in the XCF and convert again."
+      },
+      {
+        "question": "Does an XCF file include the undo history?",
+        "answer": "No. GIMP leaves the undo history out of the saved project, so it cannot be recovered from the file."
+      },
+      {
+        "question": "Why can't my computer open an XCF?",
+        "answer": "XCF is GIMP's native working format, and most ordinary image viewers do not read it. Open it in GIMP or convert it to PNG."
+      },
+      {
+        "question": "How big an XCF can this page convert?",
+        "answer": "The page sets no byte limit. The one refusal is for a picture past about 537 megapixels, which gets a too-large message."
+      },
+      {
+        "question": "Is my XCF uploaded to a server?",
+        "answer": "No. A WebAssembly build of ImageMagick does the work inside your browser, so the XCF never leaves your device."
+      },
+      {
+        "question": "Can I add a batch of XCF files?",
+        "answer": "Yes. Add them together and each XCF becomes its own PNG, downloaded one by one with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "XCF and PNG",
+      "fromFormat": {
+        "name": "XCF",
+        "fullName": "GIMP image",
+        "description": "The native file format of GIMP, the GNU Image Manipulation Program. It keeps layers, channels, paths and selections so an image can be edited again.",
+        "details": [
+          "layers and channels",
+          "paths and selections",
+          "lossless"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting XCF to PNG",
+      "points": [
+        "The PNG is a flat picture, not an editable GIMP project.",
+        "ImageMagick reads one image from the XCF; the page does not write a PNG per layer.",
+        "Keep the XCF: exporting never saves changes to the project file.",
+        "A picture over about 537 megapixels fails with a message that it is too large to convert here."
+      ]
+    },
+    "guide": {
+      "title": "About XCF and PNG",
+      "markdown": "### What is an XCF file?\n\nXCF is GIMP's native working-image format. GIMP writes it so that a project comes back next session with its layers and transparency still separate, not as one flat picture. It can also hold channels, paths and selections, which lets you return to a design and change one part without rebuilding it. The undo history is not part of the saved project.\n\nInside GIMP, only Save produces an XCF, while any other image format is written through Export. Other programs are not its audience. You will meet XCF files when someone shares an unfinished illustration, a layered banner or a retouching project, and the PNG is the copy meant for viewing.\n\n### Programs that open XCF files\n\n- **Windows, Mac and Linux:** GIMP is the project's home editor, and saving as XCF keeps the working image intact.\n- **Windows, Mac and Linux:** ImageMagick reads XCF, but do not assume its rendering reproduces every GIMP feature.\n\n### XCF and PNG compared\n\nXCF preserves editing structure, while a PNG stores one rendered raster image. As a patent-free alternative to GIF, PNG got W3C Recommendation status in October 1996, and ISO/IEC 15948 followed. It uses DEFLATE, a lossless method, and handles indexed, grayscale and truecolor pictures at 1 to 16 bits per sample, with optional per-pixel transparency.\n\n- **Extensions and media types:** .xcf for GIMP projects; .png with image/png.\n- **Layers and paths:** kept in XCF; a PNG has none.\n- **Transparency:** an XCF retains it, and a PNG can hold an alpha channel.\n- **Undo history:** never saved in an XCF.\n\nExporting changes the role of the file. A text layer becomes pixels and a mask shapes the visible result instead of staying a control you can adjust. That suits a recipient who only needs to place the graphic on a page, and it does not suit one who must change the wording or reuse individual pieces.\n\nThis page uses ImageMagick compiled to WebAssembly and run in your browser, so the XCF is not uploaded. It reads one image from the XCF and writes it as a PNG, with no setting for quality and nothing stripped on purpose. It does not write a PNG for each layer. The download is named after your XCF with a .png ending, and your original file is not changed. Compare the canvas and visible elements of the PNG with the project in GIMP before you rely on it.\n\n### Other ways to convert XCF to PNG\n\n- **GIMP:** with the project open, use File > Export As and end the name in .png. The PNG dialog offers choices such as pixel format, compression level, interlacing and metadata. Save the XCF separately, because exporting does not modify the project. PNG compression is lossless, so the compression level changes only the file size, and camera tags and profiles are optional, so switch on the metadata controls if you need them.\n- **ImageMagick:** `magick design.xcf -flatten design.png` merges the layers onto the background color, which removes transparency, before it writes the PNG. Leave out -flatten if you want to see what ImageMagick does without it. ImageMagick's format list shows XCF as readable and PNG as both readable and writable, so a single command covers this pair on any computer that has ImageMagick installed.\n- **Photopea:** use File > Open for the XCF, then File > Export As > PNG. Photopea's marketplace listing names XCF among the formats it opens, and its own rendering may differ from GIMP's.\n\n### Problems with XCF files\n\n**An ordinary image viewer cannot open it:** most viewers do not read XCF. Export a display copy from GIMP, or convert it to PNG here. Renaming the file to .png does not change what is inside it.\n\n**The flattened copy is missing project details:** saving a flattened export does not preserve every project property. Retain the XCF for future editing.\n\n**GIMP warns about unsaved changes:** GIMP may still ask about saving when you close, since an export leaves the XCF project itself unsaved.\n\n**Another program draws it differently:** other renderers do not copy every GIMP feature, so compare the PNG with GIMP's view when the exact look matters.\n\n**You only have the PNG and need to edit it:** a PNG cannot give back the layers. Ask for the original XCF, or redraw the parts you need on a new layer in GIMP.\n"
+    }
+  },
+  "youtube-to-avi": {
+    "seo": {
+      "title": "Convert YouTube to AVI Online (Free)",
+      "h1": "YouTube to AVI Converter",
+      "description": "Convert a YouTube MP4 you have saved to AVI in your browser. It does not take a YouTube link. Video becomes MPEG-4 (Xvid tag) and sound MP3. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an MP4 saved from YouTube into an AVI file, without leaving your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can I paste a YouTube link into this converter?",
+        "answer": "No. The page converts an MP4 file you choose from your device, and it does not fetch videos from a URL. Save the video first, then pick the MP4 here."
+      },
+      {
+        "question": "How do I convert a YouTube video to AVI?",
+        "answer": "Get the video as an MP4 file on your device, choose it on this page, and save the AVI when it finishes. YouTube itself is a service, so the file you convert is always a saved copy."
+      },
+      {
+        "question": "What video and audio codecs does the AVI use?",
+        "answer": "The video is re-encoded as MPEG-4 Part 2 with an Xvid tag, and the sound as MP3 at 96 kbps. AVI is a container for many codecs, so the extension alone does not tell a player which are inside."
+      },
+      {
+        "question": "Will the AVI keep the resolution of a 4K upload?",
+        "answer": "Not beyond 1920 px. A larger frame is reduced until its long side fits, while a smaller frame keeps its size. A source above 30 fps loses frames to reach 30, and the clip keeps its length."
+      },
+      {
+        "question": "Can I convert several YouTube MP4 files at once?",
+        "answer": "Yes. Add the files in one go and you get one AVI per source file. Nothing is zipped, and the page sets no size limit of its own."
+      },
+      {
+        "question": "Why does my old editor reject the AVI?",
+        "answer": "Some editors know AVI but have no decoder for the contents. This page writes MPEG-4 video with MP3 audio, so check that your editor supports that pair."
+      },
+      {
+        "question": "Does the AVI look worse than the YouTube video?",
+        "answer": "It can. The video is decoded and encoded again, and a re-encode cannot restore detail that YouTube's own compression already removed."
+      },
+      {
+        "question": "Is YouTube a video file format?",
+        "answer": "No. YouTube is a service, and a video watched on its site is not a file you can open directly. The file this page needs is an MP4 you have saved."
+      },
+      {
+        "question": "Is my video uploaded to a server?",
+        "answer": "No. The encoding happens in a WebAssembly FFmpeg inside this tab, and your MP4 never leaves the device."
+      },
+      {
+        "question": "How can I download and convert in one step?",
+        "answer": "The desktop tool yt-dlp has a --recode-video avi option that downloads a video and recodes it with FFmpeg. That runs on your computer and is separate from this page."
+      }
+    ],
+    "aboutSection": {
+      "title": "YouTube and AVI",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container format introduced by Microsoft based on RIFF. It interleaves video and audio data and can hold many different codecs.",
+        "details": [
+          "RIFF-based container",
+          "many codecs",
+          "limited support for modern features"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting YouTube to AVI",
+      "points": [
+        "The page converts an MP4 file you choose; it does not fetch a YouTube link.",
+        "Video is re-encoded as MPEG-4 with an Xvid tag, and sound as MP3 at 96 kbps.",
+        "Larger frames are reduced to 1920 px, faster clips lose frames to reach 30 fps, and both sides are rounded down to even numbers.",
+        "An AVI plays only where the program supports the codecs inside it."
+      ]
+    },
+    "guide": {
+      "title": "About YouTube and AVI",
+      "markdown": "### What is an MP4 file?\n\nThis page takes an MP4 file. YouTube itself is a service, not a file extension, so the thing you convert is a saved copy of the video. The MP4 format is MPEG-4 Part 14, numbered ISO/IEC 14496-14, and it dates from 2003. The design descends from Apple's QuickTime through the ISO Base Media File Format, so each file is a set of nested boxes, which QuickTime knew as atoms.\n\nMP4 is a container, so what plays depends on the codecs inside. The usual pairing is H.264 (AVC) with AAC, yet an MP4 can also carry AV1, VP9, MP3 or Opus. Video files use .mp4 or .m4v, and every major browser plays MP4. Turning a saved copy into AVI changes its delivery format. It does not recover your camera original, restore detail removed during earlier processing, or make the clip an editing master.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** ffplay plays MP4.\n- **Windows, Mac and Linux:** mpv, the desktop player, lets you switch audio and subtitle streams while an MP4 plays.\n- **Windows and Mac:** Adobe Premiere takes MP4 in when the decoder it needs is present.\n- **Web:** Firefox plays supported media on its own, though the system's codecs may decide whether AAC and H.264 work. Chrome plays the MP4 combinations it supports; the codec inside still matters.\n- **Mobile:** VLC for Android is free and decodes what the container holds. VLC for iOS plays most movie formats, whether the file is on the phone or on a network share.\n\n### MP4 and AVI compared\n\nInside an AVI, a RIFF file, timed pictures and sound travel together. Windows 3.1 brought it in from Microsoft, with a first specification written in 1992. The streams and their codecs are named by FOURCC codes, while the header notes sizes and frame rate. An AVI can hold raw, lossless or lossy video, which makes the ending a poor guide to picture quality or program support. The usual ending is .avi, and video/x-msvideo is a common media-type label.\n\n- **Container:** MPEG-4 Part 14 for the MP4; a RIFF file for the AVI.\n- **Codecs here:** MPEG-4 Part 2 video and MP3 sound in the AVI.\n- **Limits:** the first AVI specification has size limits that the later OpenDML extension lifts, and software treats aspect-ratio and scan-type metadata unevenly.\n- **Where it appears:** archives of production video and older desktop editing setups are where AVI still turns up.\n\nThis page re-encodes the saved MP4, so it is a real conversion and not a relabeling. FFmpeg writes MPEG-4 video tagged Xvid and MP3 sound at 96 kbps. The long edge stops at 1920 px and the rate at 30 frames a second. Width and height are each rounded down to an even number, which can cost an odd side one pixel. Frames flagged as interlaced are deinterlaced with yadif. Your file keeps its name with .avi at the end, and the MP4 you chose stays as it was.\n\nAVI is useful when a particular older program asks for it. For ordinary modern sharing, making an AVI only because it sounds more compatible can add an unnecessary encode. Keep the MP4 until you have checked the AVI in the program that asked for it.\n\n### Other ways to convert MP4 to AVI\n\n- **FFmpeg (command line):** `ffmpeg -i upload.mp4 -c:v mpeg4 -c:a libmp3lame upload.avi` encodes MPEG-4 video and MP3 audio into an AVI. FFmpeg lists both AVI and MPEG-4 part 2 as formats it can write.\n- **yt-dlp:** `yt-dlp --recode-video avi URL` downloads the video and then recodes it to AVI. It needs FFmpeg for the recode, and it runs on your computer.\n\n### Problems with MP4 files\n\n**A pasted link does nothing:** this page takes a file, not a web address. Save the video as an MP4 first.\n\n**It will not play, or the AVI plays on one machine only:** opening the container is not enough if a program has no decoder for its video or sound. Find out what the file holds, then what the target program reads.\n\n**The file is unfinished:** an MP4 usually stores its packet metadata together, which means a copy that was cut off partway can refuse to play. Fetch or copy it again.\n\n**The copy looks soft:** a re-encode cannot bring back detail the earlier compression removed. Convert your original file if you still have it.\n"
+    }
+  },
+  "avchd-to-mp4": {
+    "seo": {
+      "title": "Convert AVCHD to MP4 Online (Free)",
+      "h1": "AVCHD to MP4 Converter",
+      "description": "Convert AVCHD camcorder clips to MP4 in your browser. FFmpeg re-encodes to H.264 with AAC sound, deinterlaces flagged frames and caps size and rate. Free."
+    },
+    "tool": {
+      "subtitle": "Turn AVCHD camcorder clips into MP4 files that play on phones and computers."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVCHD to MP4?",
+        "answer": "Add the clip, let FFmpeg re-encode it on your device, and save the MP4. Queue several clips and each one produces its own MP4, with no ZIP."
+      },
+      {
+        "question": "Can I convert an MTS or M2TS file to MP4?",
+        "answer": "MTS and M2TS are the clip files an AVCHD camera writes. This page's file picker lists files ending in .avchd, and clips ending in .mts or .m2ts have their own MTS to MP4 and M2TS to MP4 converters on this site."
+      },
+      {
+        "question": "What is the difference between AVCHD and MP4?",
+        "answer": "AVCHD is a camera recording system that packages H.264 video as an MPEG transport stream on a card or disc. MP4 is a general container that phones, browsers and editors read."
+      },
+      {
+        "question": "Does converting AVCHD to MP4 lose quality?",
+        "answer": "It can. Both streams are re-encoded, so the MP4 is a viewing copy and not a duplicate of the camera original. Keep the original clips if you may edit again."
+      },
+      {
+        "question": "Will a 60p recording stay at 60 fps?",
+        "answer": "No. The frame rate stops at 30 frames a second, so 50p and 60p recordings drop frames to get there. The clip keeps its full length."
+      },
+      {
+        "question": "Is interlaced AVCHD footage deinterlaced?",
+        "answer": "Yes. Frames flagged as interlaced go through the yadif filter, so moving edges do not show combing. Progressive frames come out the same as they went in."
+      },
+      {
+        "question": "Why does my long recording stop at one file?",
+        "answer": "A recording that spans several files converts one file at a time, so each part gives its own MP4. Join the parts in an editor, or use software that reads the camera's whole structure."
+      },
+      {
+        "question": "Can I just rename the clip to .mp4?",
+        "answer": "No. A rename changes only the name, and the contents stay an MPEG transport stream. Converting writes a real MP4 container."
+      },
+      {
+        "question": "Do I need to keep the camera card folders?",
+        "answer": "Keep them for archived camera material, because an editor can import the original folder structure as camera media. The MP4 is a single file and carries none of the card's menus, playlists or folders."
+      },
+      {
+        "question": "Is my AVCHD clip uploaded?",
+        "answer": "No. The conversion is done by FFmpeg in a worker in your browser, and the MP4 is saved straight from your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVCHD and MP4",
+      "fromFormat": {
+        "name": "AVCHD",
+        "fullName": "Advanced Video Coding High Definition",
+        "description": "A format for HD camcorders introduced by Sony and Panasonic. It records H.264 video in MPEG transport stream files on cards, discs or drives.",
+        "details": [
+          "H.264 video",
+          "Dolby Digital or PCM audio",
+          "MTS or M2TS files"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVCHD to MP4",
+      "points": [
+        "The MP4 is a re-encoded viewing copy: H.264 video with AAC sound at 96 kbps.",
+        "Frames flagged interlaced are deinterlaced, and output is capped at 1920 px and 30 fps.",
+        "Each file converts on its own, so a take spread over several files gives several MP4s.",
+        "Keep the card folders if you want playlists, menus and the original recording."
+      ]
+    },
+    "guide": {
+      "title": "About AVCHD and MP4",
+      "markdown": "### What is an AVCHD file?\n\nAVCHD is a camera recording system designed for digital high-definition camcorders and introduced by Sony and Panasonic. It packages its streams as an MPEG-2 transport stream, and its standard video compression is MPEG-4 AVC/H.264. Audio may be Dolby Digital AC-3 or uncompressed linear PCM. The system includes interlaced and progressive HD modes, and the published format uses 8-bit samples with 4:2:0 chroma sampling. Recording media include memory cards, built-in storage and 8 cm DVD media.\n\nBecause AVCHD names a whole recording system and not one codec, two AVCHD clips can differ in scan type, frame rate and audio format.\n\nCamera clips commonly appear as MTS or M2TS files inside a larger folder structure. The transport stream and the compressed video are two layers, and a filename ending does not tell a player what lies inside. Copying one clip is fine for a short sharing job, but it is not a complete camera archive.\n\n### Programs that open AVCHD files\n\n- **Windows, Mac and Linux:** VLC can read MPEG transport streams and decode H.264 camera clips, though that does not promise reconstruction of camera menus.\n- **Windows, Mac and Linux:** FFmpeg reads MPEG-TS and H.264 streams for inspection and conversion of camera clips.\n- **Mac:** iMovie is documented by Sony for AVCHD PS-mode import, with iMovie 10 and OS X 10.9 or later.\n\n### AVCHD and MP4 compared\n\nAVCHD defines camera recording arrangements, while MP4 is a general media container. Both can carry H.264 video, but the files are not interchangeable.\n\n- **Extensions:** .mts or .m2ts clips from a camera; .mp4.\n- **Container:** MPEG transport stream for AVCHD; MPEG-4 Part 14 for MP4.\n- **Audio:** Dolby Digital or linear PCM in AVCHD; AAC in this page's MP4.\n- **Surroundings:** AVCHD sits in a folder structure with playlists, and an MP4 stands alone.\n\nThis page re-encodes rather than rewrapping. H.264 video comes from x264 at CRF 32 in its ultrafast preset, and the sound is written as AAC at 96 kbps. Frames never exceed 1920 px on the long edge or 30 fps, and width and height both drop to even numbers. A smaller frame is not enlarged. The original file stays untouched, and what you download carries its name with .mp4 on the end.\n\nThe frame-rate cap matters for 50p and 60p recordings, which lose frames to reach the cap while keeping their length. The MP4 is not a backup of menus, playlists or the rest of the card, so keep the original folders when you may need to edit again or rebuild a recording that spans several files.\n\n### Other ways to convert AVCHD to MP4\n\n- **HandBrake:** use Open Source to pick the individual clip, choose a preset, set the destination in the Save As box, and press Start. HandBrake opens TS, MTS and M2TS files. Its source-format documentation says AVCHD playlists are not fully supported and that streams spanning multiple files can be unreliable.\n- **FFmpeg:** `ffmpeg -i camera_take.mts -c:v libx264 -c:a aac camera_take.mp4` re-encodes the video with x264 and the sound as AAC.\n- **FFmpeg, copying the video:** `ffmpeg -i camera_take.mts -c:a aac -c:v copy camera_copy.mp4` keeps the H.264 video stream as recorded and re-encodes only the sound, so it is quick and the picture is untouched. This page's deinterlacing and its size and rate caps do not apply to it.\n\n### Problems with AVCHD files\n\n**The picture looks unstable in places:** abrupt changes in brightness or camera angle can make compressed AVCHD pictures look unstable without indicating a camera fault.\n\n**An old iMovie rejects it:** iMovie 08, 09 and 11 do not support AVCHD 2.0 recordings made in 1080/60p or 720/60p. Importing 50p or 60p PS-mode footage needs iMovie 10 or later on OS X 10.9 or later.\n\n**Combing on moving edges:** interlaced source material may require deinterlacing for progressive displays.\n\n**A player opens the clip with no sound or no picture:** opening the container is not enough, because a player must also decode the video and audio inside. AVCHD sound is Dolby Digital or PCM, which not every player decodes.\n\n**An editor will not import the clip as camera media:** keep the camera's original folder structure for archived material so an editor can import it as camera footage.\n"
+    }
+  },
+  "m4a-to-ogg": {
+    "seo": {
+      "title": "Convert M4A to OGG Online (Free)",
+      "h1": "M4A to OGG Converter",
+      "description": "Convert M4A to OGG in your browser. FFmpeg re-encodes the audio as Ogg Vorbis at quality 5, and any video track is dropped. Free."
+    },
+    "tool": {
+      "subtitle": "Turn M4A audio into Ogg Vorbis files for games, players and open-source tools."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4A to OGG?",
+        "answer": "Add the M4A, give FFmpeg a moment to encode it here, and save the OGG. Queue several M4As and each one gets its own OGG, with no ZIP."
+      },
+      {
+        "question": "What is the difference between M4A and OGG?",
+        "answer": "M4A is MPEG-4 audio, which Apple adopted for unprotected music files. Ogg is Xiph.Org's open container, and a .ogg file conventionally holds Vorbis audio."
+      },
+      {
+        "question": "What quality does the OGG get?",
+        "answer": "The audio is encoded with libvorbis at quality 5. That is a quality mode, and the page sets no bitrate of its own."
+      },
+      {
+        "question": "Does converting an AAC M4A to OGG lose quality?",
+        "answer": "Yes. AAC already discarded some sound, and Vorbis is lossy too, so the OGG is a second lossy encode. It cannot bring back what AAC removed."
+      },
+      {
+        "question": "Does OGG always mean Vorbis?",
+        "answer": "Usually. Playback needs the codec as well as Ogg support, and .oga is the broader audio extension. This page writes Vorbis."
+      },
+      {
+        "question": "Will the tags carry over?",
+        "answer": "Title, artist and album are copied to the OGG as its own comment fields. Nothing is set by hand, so check the result in your player if you rely on other fields."
+      },
+      {
+        "question": "Why won't Audacity open my M4A?",
+        "answer": "Audacity imports M4A only through its optional FFmpeg library. Install it, or convert here and open the OGG, since Audacity reads that without extra help."
+      },
+      {
+        "question": "Is there a file size limit?",
+        "answer": "File size is not capped by the page, so a long recording takes whatever time your device needs. A device with little memory may still struggle with a very large file."
+      },
+      {
+        "question": "Is my M4A uploaded anywhere?",
+        "answer": "No. FFmpeg encodes the OGG inside your browser and the M4A is never changed."
+      },
+      {
+        "question": "What happens to a video track in the file?",
+        "answer": "It is dropped. The OGG holds the audio only."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4A and OGG",
+      "fromFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container. Apple adopted the extension for unprotected music files, and most M4A files hold AAC audio.",
+        "details": [
+          "MPEG-4 container",
+          "audio only",
+          "usually AAC audio"
+        ]
+      },
+      "toFormat": {
+        "name": "OGG",
+        "fullName": "Ogg container",
+        "description": "A free container format maintained by Xiph.Org. The .ogg extension is most commonly used for Vorbis audio, a lossy codec.",
+        "details": [
+          "open container",
+          "maintained by Xiph.Org",
+          "usually Vorbis audio"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting M4A to OGG",
+      "points": [
+        "The OGG holds Vorbis audio, encoded with libvorbis at quality 5.",
+        "The page sets no bitrate, so the quality mode decides the size.",
+        "AAC is lossy already, so the OGG is a second lossy encode; keep the M4A if you need the original.",
+        "Title, artist and album tags are copied, and any video track is dropped."
+      ]
+    },
+    "guide": {
+      "title": "About M4A and OGG",
+      "markdown": "### What is an M4A file?\n\nM4A is the extension for MPEG-4 files that hold only audio, and Apple adopted it for unprotected music files. The audio inside is mostly AAC, specified in MPEG-4 Part 3 (ISO/IEC 14496-3). It is a lossy codec built to beat MP3 at a given bitrate. Apple used AAC for songs sold through iTunes. AAC handles sample rates from 8 to 96 kHz and bitrates up to 512 kbps, so one M4A can differ a lot from another in size and detail.\n\nThe media type for M4A is audio/mp4. Listening is easy: browsers play AAC in MP4 and Android plays .m4a on every version. It is less convenient when a game engine, an open-source editor or a system asks for Ogg, which is why people convert.\n\n### Programs that open M4A files\n\n- **Windows, Mac and Linux:** Audacity opens an M4A only through the optional FFmpeg library, and protected files cannot be imported.\n- **Windows, Mac and Linux:** ffplay, the player from FFmpeg, plays M4A through the demuxer that FFmpeg includes for it.\n- **Web:** Firefox and Chrome both play M4A themselves, with AAC support that may rest on the system's codecs.\n- **Mobile:** VLC for Android is a free media player that decodes what is inside the container, and mpv for Android, the port the mpv project links to, plays it too.\n\n### M4A and OGG compared\n\nOgg is an open container kept by Xiph.Org. Compressed sound and video streams can share one file, and each stream's compression is set by its codec. Its framing carries timestamps and error detection, and streams are read and written in sequence.\n\n- **Extensions:** .m4a; .ogg, with .oga as the broader audio extension.\n- **Media types:** audio/mp4 for M4A; audio/ogg for an audio-only Ogg stream, registered by the IETF in September 2008.\n- **Codecs:** usually AAC in M4A; Vorbis in this page's OGG.\n\nA file name can mislead, since RFC 5334 treats .ogg Vorbis, general .oga audio and .ogv video as different things. A player needs the codec inside as well as Ogg support. Damaged pages are detected, yet missing encoded audio is not rebuilt.\n\nOn the desktop, Audacity imports Ogg Vorbis directly, and VLC plays Ogg containers and decodes Vorbis audio on Windows, Mac and Linux. That makes the OGG a practical choice when the file is headed for an editor that has no FFmpeg library installed.\n\nThis page runs libvorbis at quality 5 and drops any video track. You download your file's name with .ogg at the end, and the M4A itself is left alone. Title, artist and album tags are copied to the OGG. A low-bitrate AAC file does not gain detail by becoming Vorbis, so convert when the destination needs Ogg and not to improve the sound.\n\nA game or playback library may ask for Ogg Vorbis because that is the decoder it ships, and that can justify the conversion even when M4A plays well elsewhere. If the receiving program accepts the AAC directly, re-encoding is unnecessary.\n\n### Other ways to convert M4A to OGG\n\n- **Audacity:** import the M4A, which needs the optional FFmpeg library, then open File > Export Audio and pick the format from the dropdown. Ctrl+Shift+E opens the same dialog. Some formats offer options such as quality or encoding, and Ogg Vorbis has its own export options page.\n- **FFmpeg:** `ffmpeg -i memo.m4a -c:a libvorbis -q:a 5 memo.ogg` encodes Vorbis at quality 5. libvorbis must be enabled when FFmpeg is built, and the quality range runs from -1.0 to 10.0.\n\n### Problems with M4A files\n\n**Audacity refuses to import:** it needs its optional FFmpeg library before it can import M4A.\n\n**A protected recording will not open:** DRM-protected recordings cannot be imported through Audacity's documented FFmpeg route.\n\n**The tags are wrong after a batch import:** bringing several recordings into one Audacity window leaves the project with the tags of the last file.\n\n**A player stays silent or refuses:** playback needs the matching decoder as well as the container, and a browser may depend on the system's AAC support. Try Firefox, Chrome or VLC for Android.\n\n**A later export sounds worse:** each lossy conversion adds loss. Return to the best source before making each new format, because AAC is already lossy.\n"
+    }
+  },
+  "png-to-tga": {
+    "seo": {
+      "title": "PNG to TGA Converter for Game Textures",
+      "h1": "PNG to TGA Converter",
+      "description": "Turn a PNG into a Targa (TGA) file for a game engine or video tool. The image is decoded to 8-bit RGBA and written as TGA in your browser."
+    },
+    "tool": {
+      "subtitle": "Convert a PNG to Targa (TGA) in your browser"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert PNG to TGA?",
+        "answer": "Add the PNG, run the conversion and save the .tga. Your browser decodes the image to 8-bit RGBA pixels and ImageMagick writes the Targa, all on your device."
+      },
+      {
+        "question": "Can the TGA keep my 16-bit PNG's depth?",
+        "answer": "No. Pixels go through 8-bit RGBA, which discards any extra depth. Keep the PNG if you need smooth gradients."
+      },
+      {
+        "question": "What does 32-bit TGA mean?",
+        "answer": "It normally means 32 bits per pixel, not 32 bits for each component. The extra eight bits hold alpha, which a 24-bit TGA has no room for."
+      },
+      {
+        "question": "Why does my TGA appear upside down?",
+        "answer": "Targa files record the row order in an Origin setting, and a reader that ignores it can flip the image. GIMP's export has an Origin option, but this page offers no settings."
+      },
+      {
+        "question": "Does an animated PNG become a TGA sequence?",
+        "answer": "No. Only the first frame is converted and you get one .tga file. Export each frame as its own PNG first if you need a numbered sequence."
+      },
+      {
+        "question": "Are the ICC profile and metadata copied into the TGA?",
+        "answer": "No. Raw pixels are all that reach the writer, so none of that information travels with them. Assign the color space again in the destination tool if it matters."
+      },
+      {
+        "question": "Can I convert several textures at once?",
+        "answer": "Yes. With several PNGs queued, every one comes out as its own .tga and nothing is zipped. For a whole folder on your own machine, ImageMagick's mogrify command does it in one pass."
+      },
+      {
+        "question": "Does my PNG leave my device?",
+        "answer": "No. Everything happens in your browser tab, and your original PNG is not changed. You download a new copy named after it with a .tga ending."
+      },
+      {
+        "question": "How large a texture can I convert?",
+        "answer": "No limit is set by the page. A big texture simply keeps your device busy for longer."
+      },
+      {
+        "question": "Why does it say the image could not be decoded?",
+        "answer": "The file could not be read as an image by your browser. Make sure the PNG opens in an editor or browser, then add it again."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and TGA",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "1 to 16 bits per sample"
+        ]
+      },
+      "toFormat": {
+        "name": "TGA",
+        "fullName": "Truevision TGA (Targa)",
+        "description": "A raster image format associated with Truevision video boards. It supports RGB, indexed-color and grayscale imagery with optional run-length encoding.",
+        "details": [
+          "optional run-length compression",
+          "24-bit RGB or 32-bit with alpha",
+          "still used in video and game workflows"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PNG to TGA",
+      "points": [
+        "A 16-bit PNG is reduced to 8 bits per channel.",
+        "The ICC profile, EXIF and other metadata are dropped.",
+        "An animated PNG gives one TGA from its first frame.",
+        "The page offers no settings, so check row order and alpha in your engine's importer."
+      ]
+    },
+    "guide": {
+      "title": "About PNG and TGA",
+      "markdown": "### What is a PNG file?\n\nPNG was created as a patent-free successor to GIF, and it was the first format ever published as a W3C Recommendation, in October 1996, and RFC 2083 plus ISO/IEC 15948:2004 followed. PNG compression is lossless, built on the DEFLATE algorithm, a combination of LZ77 and Huffman coding. A fixed signature starts the file, then come chunks such as IHDR for the header and IDAT for pixel data, with IEND at the end.\n\nYou can store indexed, grayscale or truecolor pictures with 1 to 16 bits per sample, and add alpha if each pixel needs its own transparency. The newest edition of the specification supports HDR with a cICP chunk and permits Exif data in an eXIf chunk. Screenshots on macOS are saved as PNG by default, and all major browsers display it. The registered media types are image/png and, for animated files, image/apng. A PNG headed for a TGA workflow often comes from a texture artist, a screenshot or an exported graphic, and the reason for converting is usually an older renderer or importer that asks for Targa.\n\n### Programs that open PNG files\n\n- **Windows, Mac and Linux:** GIMP imports PNG for editing, which lets you check the image ahead of a texture pipeline.\n- **Windows, Mac and Linux:** ImageMagick reads PNG, though you should inspect the installed format support first.\n- **Web:** Firefox and Chrome display PNG.\n- **Mobile:** Safari and Chrome display PNG.\n\n### PNG and TGA compared\n\nTarga is a raster image format associated with Truevision video boards. It supports RGB, indexed-color and grayscale imagery, and it can use optional run-length encoding to reduce storage. Video editing and game-development workflows still use Targa images. In ImageMagick, Truevision Targa shares a group with ICB, VDA and VST.\n\nEach color component of a 24-bit RGB TGA takes eight bits, and the 32-bit kind adds alpha to that. Saving RGB artwork at 24 bits removes the space needed for a Targa alpha channel. Open the result in the application that will use it before relying on it for a decal, cutout or particle texture.\n\nHere the browser's own decoder reads the PNG into 8-bit RGBA pixels, and ImageMagick then writes the TGA. It sets no quality or compression option. Passing through raw pixels costs a 16-bit PNG its extra depth, and EXIF, ICC profiles and XMP do not come along. A format change should not be treated as a color-management operation, particularly for maps where the destination expects a specific interpretation of channel values.\n\nAn animated PNG yields only its first frame, not a run of TGA files. For an animated texture, export the frames you need through a workflow that controls filenames and timing.\n\n### Other ways to convert PNG to TGA\n\n- **GIMP:** load the PNG, then File > Export As with a name that ends in .tga. The Targa export dialog has a Use RLE compression option and an Origin setting. Choose what the destination expects. GIMP's Targa plug-in does not preserve every version-2 extension field.\n- **ImageMagick:** `magick texture.png texture.tga` converts one file, and ImageMagick's format list shows PNG and TGA as readable and writable.\n- **ImageMagick mogrify:** `magick mogrify -format tga *.png` converts every PNG in the current folder. The -format option changes the suffix, so the PNGs stay beside the new .tga files.\n\n### Problems with PNG files\n\n**Layers sit in the wrong place after export from GIMP:** layer offsets may differ between GIMP and other applications, so avoid its PNG offset option when the image will travel.\n\n**Camera tags or profiles are missing:** they are optional in GIMP exports, so enable the relevant metadata controls when you need them. They would not survive this converter in any case, as the TGA is written from raw pixels.\n\n**An animation shows as a still:** a program that cannot play animated PNG shows the default still image, though the specification itself covers animation. This page, too, converts that first frame.\n\n**A smaller compression setting seems to cost quality:** it does not, because PNG compression is lossless and the setting never changes pixel fidelity. Only the size of the PNG changes, and the pixels this page reads stay the same.\n\n**Gradients band after conversion:** PNG can hold up to 16 bits per sample, and this converter works in 8 bits per channel. Keep the 16-bit PNG as the master, and use a desktop workflow when those values matter.\n"
+    }
+  },
+  "ttf-to-svg": {
+    "seo": {
+      "title": "TTF to SVG Font Specimen Converter",
+      "h1": "TTF to SVG Specimen Converter",
+      "description": "Turn a TTF into an SVG specimen sheet showing the font's name, letters, digits and a sample sentence. It is a picture, not glyph outlines, made in your browser."
+    },
+    "tool": {
+      "subtitle": "Make an SVG specimen sheet of a TTF font, not glyph outlines"
+    },
+    "faqs": [
+      {
+        "question": "What does the SVG from a TTF contain?",
+        "answer": "It holds a specimen picture of the font: its name, uppercase and lowercase letters, digits and punctuation, and the sentence \"The quick brown fox jumps over the lazy dog\" in several sizes, drawn in grayscale."
+      },
+      {
+        "question": "Does the SVG contain the glyph outlines?",
+        "answer": "No. What the converter makes is a drawn picture of the font, wrapped inside an SVG. The letters are not paths, so you cannot edit or recolor them in a vector editor."
+      },
+      {
+        "question": "Why does the specimen get blurry when enlarged?",
+        "answer": "The SVG embeds a pixel image, and an embedded pixel image keeps its original resolution when enlarged. Scaling it up enlarges pixels instead of redrawing curves."
+      },
+      {
+        "question": "Can I install the SVG as a font?",
+        "answer": "No. The SVG is a picture of the font and holds none of its tables, so no system or application can load it as a typeface. Keep the TTF for installing."
+      },
+      {
+        "question": "How do I get a single letter as a vector shape?",
+        "answer": "Open the TTF in FontForge, open the glyph in its outline view, and choose File > Export with SVG. That writes the glyph as vector artwork, which this converter does not do."
+      },
+      {
+        "question": "Can I script glyph export from a TTF?",
+        "answer": "Yes. In FontForge's Python API a glyph has an export method that takes a filename, so a short script can write any letter you name as its own SVG file."
+      },
+      {
+        "question": "Which name appears at the top of the specimen?",
+        "answer": "The font's full name from its name table, or its family name when there is no full name. A font with neither gets the label TTF font."
+      },
+      {
+        "question": "What if the converter says it can't read my font?",
+        "answer": "Something broken or not a font at all produces an error saying the TTF cannot be read as a font. A font with no drawable letters shows a message saying so."
+      },
+      {
+        "question": "Can I convert several fonts at once?",
+        "answer": "Yes. Each font you add becomes a separate SVG, named after the font file. They are not zipped, so you download them one by one."
+      },
+      {
+        "question": "Is my font uploaded anywhere?",
+        "answer": "No. ImageMagick runs in your browser and draws the specimen there. Your original TTF is not changed."
+      }
+    ],
+    "aboutSection": {
+      "title": "TTF and SVG",
+      "fromFormat": {
+        "name": "TTF",
+        "fullName": "TrueType font",
+        "description": "An outline font format developed by Apple and licensed to Microsoft. TrueType fonts describe scalable character outlines in individually tagged tables.",
+        "details": [
+          "scalable outlines",
+          "tagged tables",
+          "media type font/ttf"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An open W3C standard and XML language that describes two-dimensional graphics as shapes, text and embedded images.",
+        "details": [
+          "image/svg+xml",
+          "XML text",
+          "can embed pixel images"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting TTF to SVG",
+      "points": [
+        "The SVG wraps a picture of the font, not glyph outlines.",
+        "It shows the font name, letters, digits and a sample sentence at five sizes.",
+        "The lettering is black on white and cannot be edited as paths.",
+        "Use FontForge when you need the shape of an individual glyph."
+      ]
+    },
+    "guide": {
+      "title": "About TTF and SVG",
+      "markdown": "### What is a TTF file?\n\nApple created TrueType and licensed it to Microsoft; its first appearance was in System 7, in May 1991. TrueType fonts describe scalable character outlines, and the font information is organized into individually tagged tables. Inside, a font can hold glyph mappings, outlines, metrics and names, and font/ttf is its registered media type.\n\nA TTF is therefore more than a picture of its alphabet, even when a font and a picture can display the same letters on screen. People searching for TTF to SVG may want different results: one letter as a vector icon, a wordmark built from outlines, a specimen sheet, or a font defined in SVG. Decide which one you need before choosing a converter, because an image of sample letters cannot be installed as the original typeface.\n\n### Programs that open TTF files\n\n- **Windows, Mac and Linux:** FontForge loads TrueType files in its font editor, and it edits the outlines and tables.\n- **Windows:** double-click a font to inspect it in Windows Font Previewer before installing.\n- **Mac:** Font Book installs and validates font files.\n- **Linux:** GNOME Fonts shows installed typefaces and can install a .ttf you downloaded.\n\n### TTF and SVG compared\n\nAs an open W3C standard, SVG uses XML to describe flat pictures put together from shapes, text and embedded images. Browsers all display it, and its registered media type is image/svg+xml. As plain text, SVG opens in any text editor and can be searched, indexed and compressed. CSS and JavaScript work with it, so it can also be styled, scripted and animated. A normal SVG stores shapes as instructions, so it stays sharp at any size. An SVG ending alone does not tell you whether the file contains curves, live text that needs a font, or a pixel picture placed inside an SVG wrapper.\n\nThis page makes the third kind. It draws a specimen from the font you add: the font's name at the top, then uppercase letters, lowercase letters, digits and punctuation, and a sample sentence at five sizes. The lettering is black on white in grayscale, and the picture grows wider to fit its longest line. The SVG wraps that picture and does not describe the characters as outline paths. It is suitable for viewing the typeface's appearance, but enlarging it cannot reveal additional vector detail.\n\nText in an SVG depends on available fonts, so a substituted font can change the drawing. A specimen picture avoids that, because the letters are already drawn. It cannot do what a font does, however. It carries no glyph mappings, metrics or naming tables, and no program can install it. Keep the TTF for installing the font, and use a font editor for individual glyph artwork.\n\n### Other ways to convert TTF to SVG\n\n- **FontForge graphical export:** open the TTF, open a glyph in its outline view, then choose File > Export and select SVG. The command is in the outline window, so export the characters you need one at a time. The result is glyph artwork and not an installable font.\n- **FontForge Python:** import fontforge, then run `fontforge.open('font.ttf')['A'].export('A.svg')` to write the glyph A as an SVG. Run it in a FontForge-enabled Python environment. The glyph must exist in the font, and the destination folder must already exist.\n\n### Problems with TTF files\n\n**A damaged font fails to display:** a damaged font can fail to display. On a Mac, Font Book provides file validation.\n\n**Two copies conflict:** a second copy of the same font can clash with the first, and Font Book is able to settle duplicates.\n\n**The font is missing in another program:** if a font does not show up in a third-party program, that program's own troubleshooting may be needed.\n\n**This converter reports an unreadable font:** the specimen needs the font to be readable and to have letters it can draw. A damaged file, or one renamed from another type, is reported as not being a font the converter can read. A font with no letters it can draw gets a separate message.\n\n**You wanted a web font:** this page does not make one. The output is a picture of the font, so keep the TTF for any site that needs the typeface itself.\n\n**You expected outlines:** the SVG from this page is a picture. Use FontForge or another font editor when you need editable curves instead of a sample.\n"
+    }
+  },
+  "avi-to-mp3": {
+    "seo": {
+      "title": "AVI to MP3 Audio Extractor",
+      "h1": "AVI to MP3 Converter",
+      "description": "Pull the soundtrack out of an AVI as an MP3 in your browser. The video is dropped, the sound is always re-encoded, and title and artist tags carry over."
+    },
+    "tool": {
+      "subtitle": "Extract the soundtrack of an AVI as an MP3"
+    },
+    "faqs": [
+      {
+        "question": "How do I extract MP3 audio from an AVI?",
+        "answer": "Add the AVI and run the conversion. FFmpeg in your browser drops the picture and encodes the sound with the LAME MP3 encoder, then you download the .mp3 named after your file."
+      },
+      {
+        "question": "Does the MP3 keep the video?",
+        "answer": "No. MP3 holds sound only, so the picture is discarded. Keep the AVI if you need the visuals along with the soundtrack."
+      },
+      {
+        "question": "How many kbps is the MP3?",
+        "answer": "Its request is 192 kbit/s. A soundtrack under 32 kHz cannot reach that in MP3, so it comes out at a lower rate. The sample rate is not changed, and there is no bitrate control."
+      },
+      {
+        "question": "What happens if the AVI has no sound?",
+        "answer": "An AVI without an audio stream leaves FFmpeg nothing to encode, and the page shows an FFmpeg failed with exit code N error. A video-only AVI has no soundtrack to extract."
+      },
+      {
+        "question": "Is an MP3 already inside the AVI copied unchanged?",
+        "answer": "No. The audio is always re-encoded, even when the AVI already holds MP3, which costs a little quality. To copy the stream as it is, use FFmpeg with -c:a copy on your own machine."
+      },
+      {
+        "question": "Will the MP3 keep the AVI's tags and title?",
+        "answer": "Title and artist tags that FFmpeg finds in the AVI are copied into the MP3, which has fields for them. Add or fix any other ID3 tags afterwards in an editor."
+      },
+      {
+        "question": "Can I extract audio from a batch of AVIs?",
+        "answer": "Yes. A queue of AVIs gives a queue of MP3s, converted one after another. They are not zipped, so each downloads separately."
+      },
+      {
+        "question": "Does my AVI leave my computer?",
+        "answer": "No. A worker in this tab runs FFmpeg on the file, so the AVI stays with you and is left unchanged."
+      },
+      {
+        "question": "How long a recording can I convert?",
+        "answer": "No cap is built into the page. A long recording keeps converting for as long as your device takes."
+      },
+      {
+        "question": "Will a damaged AVI still give an MP3?",
+        "answer": "Often it does. FFmpeg notes the problem and writes the part it could read, which can leave the MP3 shorter than the recording. Listen to the result before relying on it."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVI and MP3",
+      "fromFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A RIFF-based container that Microsoft introduced with Windows 3.1. It carries timed pictures and sound, and FOURCC identifiers describe the streams and their codecs.",
+        "details": [
+          "RIFF-based container",
+          "FOURCC stream identifiers",
+          "many codecs"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "MPEG-1 Audio Layer III, a lossy audio format standardized as ISO/IEC 11172-3 in 1993 and developed at Fraunhofer IIS.",
+        "details": [
+          "lossy compression",
+          "ID3 tags",
+          "audio/mpeg"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVI to MP3",
+      "points": [
+        "The video is dropped; only the soundtrack becomes the MP3.",
+        "The audio is always re-encoded with LAME, even if the AVI already holds MP3.",
+        "Title and artist tags are copied into the MP3.",
+        "An AVI with no sound reports an FFmpeg error."
+      ]
+    },
+    "guide": {
+      "title": "About AVI and MP3",
+      "markdown": "### What is an AVI file?\n\nA RIFF file holds the timed pictures and sound of an AVI. Microsoft brought it out with Windows 3.1 and wrote the first specification in 1992. FOURCC codes label every stream and codec. Dimensions and frame rate live in the header, and the media sits in another chunk. Whether the video is raw, lossless or lossy cannot be read from the extension. The ending is normally .avi, and video/x-msvideo is a media-type label in common use.\n\nYou find AVI in production archives and older desktop workflows, where two files from one archive can differ widely in what they hold. An AVI-to-MP3 job often begins with an older camera clip, an interview capture or a screen recording, where the soundtrack is what you want. That is a different task from converting the movie for playback, because pictures and title cards will no longer accompany the spoken or musical material.\n\n### Programs that open AVI files\n\n- **Windows, Mac and Linux:** ffplay plays AVI, since FFmpeg includes the format's demuxer.\n- **Windows, Mac and Linux:** mpv, a desktop player, offers audio and subtitle stream selection for AVI.\n- **Windows and Mac:** Adobe Premiere imports AVI as long as the necessary decoder is installed.\n- **Mobile:** VLC for Android depends on the media inside the container, and VLC for iOS is a player for most movie formats.\n\n### AVI and MP3 compared\n\nMP3 is MPEG-1 Audio Layer III, a standard since 1993 as ISO/IEC 11172-3. It came out of work at Fraunhofer IIS and the wider MPEG audio group. The compression is lossy, based on a model of hearing that throws away what listeners are unlikely to notice. Song titles and other tags are stored in separate ID3 structures inside the file, and the registered media type is audio/mpeg. Every major browser plays MP3.\n\nConversion drops the visual part of the recording and writes a newly encoded sound file. This page uses the LAME encoder and omits video, and it asks for 192 kbit/s. MP3 cannot deliver that under 32 kHz, so a 16 to 24 kHz soundtrack gets at most 160 kbit/s from LAME and an 8 to 12 kHz one gets at most 64 kbit/s. It never copies a stream byte for byte, so even an AVI that already holds MP3 audio is re-encoded. If you need the existing stream preserved exactly, copy it with FFmpeg on your own machine, which works only when the codec suits an .mp3 file.\n\nThe output bitrate does not determine how good the original recording was. A muffled microphone, clipping or a low-bitrate source stays limited by its input. Editing an MP3 and exporting another introduces a second lossy stage, so work from the best source rather than repeatedly encoding previous copies.\n\nThe AVI's global tags are copied to any fields the MP3 offers. The page does not let you choose a sample rate or channel layout.\n\n### Other ways to convert AVI to MP3\n\n- **FFmpeg:** `ffmpeg -i interview.avi -c:a libmp3lame -b:a 192k -vn avi_sound.mp3` disables the video and encodes the audio with the LAME encoder at the requested bitrate.\n- **FFmpeg, copying the audio:** `ffmpeg -i interview.avi -vn -c:a copy interview.mp3` keeps the audio stream exactly as it is, with no second lossy pass. It works only when the AVI's audio is already MP3; for any other codec, use the encoding command above.\n\n### Problems with AVI files\n\n**An editor cannot open an otherwise playable AVI:** an editor may know the AVI container yet have no decoder for what this file holds. Recognizing the container and supporting the codec are separate things.\n\n**A large capture will not open:** the first AVI specification caps sizes, which OpenDML later eased, so a big capture needs compatible software.\n\n**Aspect ratio or scan type looks wrong:** software treats this metadata unevenly, so two players can show the same file differently.\n\n**The AVI has no soundtrack:** a silent recording or a file with video only cannot produce missing speech or music. Play the source first and check that the sound is there.\n\n**The MP3 sounds worse than the original:** re-encoding is lossy, and damaged or previously compressed audio does not improve with another pass. Return to the original capture if possible.\n"
+    }
+  }
+}
