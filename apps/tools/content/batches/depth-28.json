@@ -1,0 +1,917 @@
+{
+  "html-to-svg": {
+    "seo": {
+      "title": "Convert HTML to SVG Online (Free)",
+      "h1": "HTML to SVG Converter",
+      "description": "Turn an HTML file into an SVG holding a picture of the page, laid out 1280 px wide. Its text becomes pixels, and scripts and linked files are left out.",
+      "howToHeading": "How to convert HTML to SVG"
+    },
+    "tool": {
+      "subtitle": "Save an HTML page as an SVG that wraps a picture of it, 1280 px wide."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert HTML to SVG?",
+        "answer": "Choose the HTML file above and save the SVG when it finishes. The page is laid out and drawn to a picture, and that picture is wrapped in an SVG. Several files give one SVG each."
+      },
+      {
+        "question": "Is the text in the SVG editable?",
+        "answer": "No. The words are part of an embedded PNG, so no editing program can select letters in the SVG. For editable text, keep the HTML file."
+      },
+      {
+        "question": "Why are the pictures in my HTML missing from the SVG?",
+        "answer": "Pictures linked by address aren't loaded, because the page fetches nothing from any site. Pictures embedded in the file as data: URLs do appear. Save the page with its images embedded and try again."
+      },
+      {
+        "question": "Does the converter run the JavaScript in my HTML?",
+        "answer": "No. Scripts, frames, objects and event attributes are removed before the page is laid out. Content that a script builds after loading won't be in the SVG."
+      },
+      {
+        "question": "How wide is the page in the SVG?",
+        "answer": "Layout happens at 1280 px, whatever its screen size. A responsive page therefore shows its desktop layout, not the phone one. Heights set in vh units use an 800 px window."
+      },
+      {
+        "question": "Why does my long HTML page end partway down?",
+        "answer": "The picture can be at most 4096 px tall, because that's the largest canvas Safari allows. A taller page is cut at that line, and the page tells you. Convert the page in shorter parts to get the rest."
+      },
+      {
+        "question": "Is my separate CSS file applied?",
+        "answer": "No. The link to it is removed, so only inline styles and style blocks in the HTML itself apply. Copy the stylesheet into a style block first."
+      },
+      {
+        "question": "Is there a way to get real vector shapes from HTML?",
+        "answer": "Not from this converter, which draws the page to a picture. If the HTML already holds an inline SVG element, the XMLSerializer method under Other ways to convert returns that element's markup."
+      },
+      {
+        "question": "Why do the fonts look different from the website?",
+        "answer": "Web fonts loaded from a stylesheet or a font service aren't fetched, because the converter loads nothing from any site. Only fonts stored inside the file as data: URLs load."
+      },
+      {
+        "question": "Does enlarging the SVG make it blurry?",
+        "answer": "Yes. The SVG holds a PNG at the page's pixel size, so enlarging the SVG enlarges the pixels."
+      }
+    ],
+    "aboutSection": {
+      "title": "HTML and SVG",
+      "fromFormat": {
+        "name": "HTML",
+        "fullName": "HyperText Markup Language",
+        "description": "The standard markup language for web pages, maintained by the WHATWG as the HTML Living Standard. It describes the structure of a page with elements and attributes.",
+        "details": [
+          "text-based markup",
+          "elements and attributes",
+          "styled with CSS",
+          "rendered by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting",
+          "styleable with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HTML to SVG",
+      "points": [
+        "The SVG holds one embedded PNG of the page, not editable text or shapes.",
+        "The page is laid out 1280 px wide and cut at 4096 px tall.",
+        "Scripts, frames and linked stylesheets are removed; nothing is fetched.",
+        "Pictures and fonts show only when embedded in the file as data: URLs.",
+        "Each HTML file you choose gives its own SVG."
+      ]
+    },
+    "guide": {
+      "title": "Understanding HTML for SVG output",
+      "markdown": "### What is an HTML file?\n\nHTML, short for HyperText Markup Language, describes web pages and web applications. The early versions came out of CERN and, later, the IETF (1990 to 1995). Today the WHATWG keeps HTML as a Living Standard. An HTML file says what each part of a page is: a heading, a paragraph, a link, a picture. Appearance comes from CSS, and JavaScript adds behavior.\n\nAn HTML file can link to separate files instead of holding every asset itself, so a saved page may depend on pictures, fonts, stylesheets and scripts that stay on the website. Its registered media type is text/html.\n\n### Programs that open HTML files\n\n- **Windows, Mac and Linux:** Firefox renders a local HTML file; open one with Ctrl+O or Command+O.\n- **Windows, Mac and Linux:** Visual Studio Code is an editor with syntax highlighting, completion and formatting for HTML.\n\nA text editor shows the markup itself, which is what you check when a picture or style link looks wrong. A browser shows the finished page, which is what this converter draws.\n\n### HTML and SVG compared\n\n- **Extensions and media types**: .html goes with text/html; .svg goes with image/svg+xml, and gzip-compressing an SVG gives .svgz.\n- **What they hold**: HTML describes a document that a browser lays out. SVG is an XML language that describes two-dimensional graphics as shapes, text and embedded images.\n- **Readable as text**: an SVG is plain text, which any editor opens and ordinary tools can search, index or compress. In the SVG this page makes, the words are pixels, not text.\n- **Standards**: HTML is a WHATWG Living Standard. SVG is a W3C standard: version 1.0 reached Recommendation status in 2001, and 1.1 followed in 2003.\n- **Scripting and style**: both work with CSS and JavaScript, and an SVG can be styled, scripted and animated. This converter's SVG has nothing to animate.\n- **Where they show**: major browsers render SVG as a page of its own or inline within HTML.\n\nThis converter doesn't turn HTML into drawing shapes. It parses the file without running it, lays the page out 1280 px wide, and draws it to a picture. The picture is wrapped in an SVG as one embedded PNG at the page's pixel size. Height follows the page, up to 4096 px, where a longer page is cut off. The `vh` unit uses an 800 px window. The HTML stays as it was; the download is a fresh file with the same name, for example report.svg.\n\nScripts, frames, objects, event attributes, `<base>`, `<link>` and `<meta http-equiv>` elements and audio are removed, and nothing is fetched from any site. A video shows only its poster frame, if the file defines one. Inline styles and `<style>` blocks apply. Pictures and fonts apply only when they're included in the file as data: URLs.\n\n### Other ways to convert HTML to SVG\n\n- **Inkscape:** take a full-page screenshot of the page, then choose File > Import in Inkscape and pick it. A dialog asks whether to link or embed the image; embedding stores it inside the SVG file, and linking breaks if the screenshot moves. The SVG still holds a picture.\n- **modern-screenshot:** the library behind this page lists `domToSvg` among its functions. It runs inside a web page you control.\n- **XMLSerializer:** when the HTML already contains an inline `<svg>`, `new XMLSerializer().serializeToString(document.querySelector('svg'))` returns its markup as a string. It extracts existing artwork only; it doesn't convert the rest of the page.\n\n### Problems with HTML files\n\n- **Pictures or styling are missing**: a saved page links to files that stayed online, and without them it loses its pictures and styling. Save the page with its files, or embed them in the HTML, and convert again.\n- **The text looks garbled**: the character encoding is wrong or undeclared. HTML defines encoding declarations, so declare it in the file.\n- **The SVG ends early**: your page is taller than the converter's height limit. Break the HTML into shorter parts and convert each.\n- **The page looks different here**: linked fonts and stylesheets aren't loaded. Put the CSS inline and put the fonts in the file.\n- **An editor shows no errors in linked files**: Visual Studio Code limits its built-in HTML analysis to the current file, so it doesn't inspect linked scripts and styles."
+    }
+  },
+  "ico-to-svg": {
+    "seo": {
+      "title": "Convert ICO to SVG Online (Free)",
+      "h1": "ICO to SVG Converter",
+      "description": "Turn an ICO icon into an SVG that embeds the picture as a PNG at its pixel size. Transparency stays; nothing is traced to vector shapes.",
+      "howToHeading": "How to convert ICO to SVG"
+    },
+    "tool": {
+      "subtitle": "Wrap an ICO icon in an SVG as an embedded PNG, keeping its transparency."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an ICO to an SVG?",
+        "answer": "Choose the ICO above and save the SVG it makes. Your browser decodes the icon into one picture, and the page embeds that picture in an SVG. Several ICO files give one SVG each."
+      },
+      {
+        "question": "Is the SVG a real vector drawing of my icon?",
+        "answer": "No. It holds one embedded PNG, not paths, so it scales as a picture does. Tracing the icon in Inkscape, described under Other ways to convert, makes vector shapes, but they only approximate the icon."
+      },
+      {
+        "question": "Which size from my ICO ends up in the SVG?",
+        "answer": "You get one picture, and no setting lets you pick its size. If a particular size matters, check which images your ICO holds before you convert it."
+      },
+      {
+        "question": "Does the SVG keep the icon's transparency?",
+        "answer": "Yes. Transparent areas stay transparent in the embedded PNG, so the icon sits on any background you place it on."
+      },
+      {
+        "question": "Why is my favicon fuzzy when I enlarge the SVG?",
+        "answer": "Favicons are small, and the SVG keeps whatever pixel count the picture has. A small icon stays small in pixels however large you display the SVG."
+      },
+      {
+        "question": "Does it matter if my ICO holds PNG or bitmap images?",
+        "answer": "An ICO's images can be stored as PNG or as bitmaps. The page decodes the icon with your browser's image decoder either way, and the SVG embeds the result as a PNG."
+      },
+      {
+        "question": "Why does my ICO fail to convert?",
+        "answer": "When your browser can't decode an ICO, you see \"Image decode failed.\" and the file may be damaged or cut short. Get a fresh copy of the icon and retry."
+      },
+      {
+        "question": "Is my ICO uploaded anywhere?",
+        "answer": "No. The conversion runs in your browser, in a background worker, with no server involved. You download a new SVG and the ICO is not changed."
+      },
+      {
+        "question": "Does the SVG keep the icon's full color?",
+        "answer": "Yes. Nothing is reduced or resized: the full-color picture is embedded at 8 bits per channel, with its alpha. A source with more depth than that would lose the extra."
+      },
+      {
+        "question": "Is the ICO's metadata copied into the SVG?",
+        "answer": "No. The pixels travel and nothing else: EXIF, color profiles and XMP are gone. Keep the ICO if you need what it carries."
+      }
+    ],
+    "aboutSection": {
+      "title": "ICO and SVG",
+      "fromFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and color depths in a single file. Browsers also use it for favicons.",
+        "details": [
+          "multiple sizes in one file",
+          "alpha transparency",
+          "PNG or bitmap entries"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting",
+          "styleable with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ICO to SVG",
+      "points": [
+        "The SVG holds one embedded PNG of the icon, not traced shapes.",
+        "It is the picture's pixel size, so it doesn't scale like a vector.",
+        "Transparency is kept in the embedded PNG.",
+        "The page doesn't let you pick which icon size is used.",
+        "Each ICO you choose gives its own SVG."
+      ]
+    },
+    "guide": {
+      "title": "Understanding ICO for SVG output",
+      "markdown": "### What is an ICO file?\n\nMicrosoft created ICO for the icons you see in a graphical interface. One .ico file can hold more than one image, so a program can pick the size that suits a taskbar, a desktop shortcut or a title bar. The format stores its numbers in little-endian byte order, and its registered media type is image/vnd.microsoft.icon. Microsoft's guidance for Windows Vista icons adds 256-by-256 pictures aimed at high-DPI screens.\n\nYou meet ICO files as Windows application icons and as website favicons, and the .ico extension is widely associated with favicons. Each image inside is a bitmap, stored either as a PNG or as a plain bitmap, not a drawing made of shapes. An ICO can carry alpha transparency.\n\n### Programs that open ICO files\n\n- **Windows, Mac and Linux:** ImageMagick reads ICO images at the command line.\n- **Windows, Mac and Linux:** XnView MP lists ICO among the image formats it reads. Company use requires a license.\n- **Web:** Firefox and Chrome both display ICO pictures in a page.\n\n### ICO and SVG compared\n\n- **Extensions and media types**: .ico with image/vnd.microsoft.icon, against .svg with image/svg+xml; a gzip-compressed SVG takes the ending .svgz.\n- **Contents**: ICO holds a set of bitmaps of different sizes. SVG describes shapes, text and embedded images in XML.\n- **Scaling**: shape-based SVGs stay crisp at every size, while an ICO offers a few fixed pixel sizes.\n- **Transparency**: ICO images can have alpha transparency, and the PNG this converter embeds keeps it.\n- **Readable as text**: the markup is ordinary text, so a plain editor can open and change it, and search tools or compressors can handle it.\n- **Styling**: an SVG works with CSS and JavaScript, so it can be styled, scripted and animated.\n\nWhat this converter makes is not a drawing of the icon. Your browser decodes the ICO into one picture. The page writes that picture as a PNG and embeds it, in base64, in an SVG with a single `<image>` element. The SVG is sized in the picture's own pixels, width and height alike, and transparent areas stay transparent. Nothing is traced, resized or reduced in color. The ICO is left alone; you get a separate file with the same base name, such as favicon.svg. Several ICO files chosen at once each give their own SVG, one after another, with no ZIP.\n\nSVG can embed bitmaps, and a bitmap keeps its fixed resolution however large the SVG is shown. Metadata isn't copied: EXIF, color profiles and XMP are dropped, and only the pixels are carried over. Current browsers show SVG directly as a document or embedded in a web page.\n\n### Other ways to convert ICO to SVG\n\n- **GIMP:** open the ICO in GIMP, which the format reference lists among the programs that open it, then use File > Export As (Shift+Ctrl+E) and pick SVG. The Export Image as SVG dialog has an Embed raster layers as setting; PNG (always) includes raster layers as PNG images. The SVG holds the picture, as it does here.\n- **ImageMagick:** run `magick favicon.ico favicon.png`, following the pattern of ImageMagick's own `magick image.jpg image.png` example. Its format table lists ICO as readable. This gives you a PNG to use in other programs.\n- **Inkscape Trace Bitmap:** choose File > Import to bring in a PNG made from the icon, pick it with the Selector tool, and run Path > Trace Bitmap. Use Update to refresh the preview and confirm with OK. This makes vector paths, but the manual warns that a 100% faithful vector copy shouldn't be expected, and it suits dark silhouettes on a bright background best. A color trace creates one object per color.\n\nPick GIMP when you want a picture inside an SVG, as this page makes, and Trace Bitmap when you want shapes.\n\n### Problems with ICO files\n\n- **Soft icon**: a small image stretched for a high-DPI display looks soft. Use an ICO that includes a larger image.\n- **Only one size converts**: an ICO can hold many images, so look through its variants rather than trusting the first preview. This page converts one picture and offers no way to choose which.\n- **The file won't open**: malformed image offsets can confuse an ICO reader. That is a damaged file, not a missing file association. Get the icon again from its source."
+    }
+  },
+  "jif-to-png": {
+    "seo": {
+      "title": "Convert JIF to PNG Online (Free)",
+      "h1": "JIF to PNG Converter",
+      "description": "Convert a JIF photo to a lossless PNG. The browser decodes the JPEG data and PNG stores it without more loss; EXIF and color profiles are dropped.",
+      "howToHeading": "How to convert JIF to PNG"
+    },
+    "tool": {
+      "subtitle": "Save a JPEG Interchange Format picture as a lossless PNG, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How can I change a JIF into a PNG?",
+        "answer": "Choose the JIF above and save the PNG it makes. Your browser reads the picture and the page writes it out losslessly. Several files give one PNG each."
+      },
+      {
+        "question": "Could JIF be a GIF by another name?",
+        "answer": "No. JIF is the original JPEG file layout, so it holds JPEG-compressed picture data. GIF is a different format."
+      },
+      {
+        "question": "Is JIF just another name for JPG?",
+        "answer": "Mostly. A .jif usually holds JPEG data in the original JPEG layout, while .jpg files normally use JFIF or Exif, the layouts that replaced it. The compression is the same."
+      },
+      {
+        "question": "What program opens a JIF file?",
+        "answer": "The format reference lists GIMP, XnView and IrfanView as programs that open JIF, and any web browser shows a PNG. If a program won't take the .jif ending, converting here gives you a PNG."
+      },
+      {
+        "question": "Will the PNG fix the blur or blocks in my JIF?",
+        "answer": "No. JPEG compression already discarded that detail. The PNG keeps the decoded picture exactly as it looks and can't bring detail back."
+      },
+      {
+        "question": "Why did my file get bigger as a PNG?",
+        "answer": "JPEG gives up detail to save space while PNG holds each decoded pixel, which means a photo may need more bytes as a PNG. A larger PNG doesn't mean the conversion failed."
+      },
+      {
+        "question": "Does the PNG keep the EXIF and color profile?",
+        "answer": "No. Only the pixel data is written, so EXIF data, ICC profiles and XMP packets don't come along. Keep the JIF if you need them."
+      },
+      {
+        "question": "Can I get a transparent background from a JIF?",
+        "answer": "Not by converting. JPEG has no alpha channel, which makes the PNG fully opaque. Remove the background in an image editor, then save as PNG."
+      },
+      {
+        "question": "Why does it say the image decode failed?",
+        "answer": "The browser couldn't read the file: it might be damaged, truncated, or not a picture at all despite the .jif ending. Try another copy."
+      },
+      {
+        "question": "Can I just rename the .jif file to .png?",
+        "answer": "No. A rename only changes the name; the data inside is still JPEG, not PNG. Convert it to get real PNG data."
+      }
+    ],
+    "aboutSection": {
+      "title": "JIF and PNG",
+      "fromFormat": {
+        "name": "JIF",
+        "fullName": "JPEG Interchange Format",
+        "description": "The original file layout described in the JPEG standard for storing JPEG-compressed images. It was largely superseded by JFIF and Exif, and .jif files are rarely seen.",
+        "details": [
+          "lossy JPEG compression",
+          "no alpha transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JIF to PNG",
+      "points": [
+        "Your browser decodes the JIF, and the page writes a lossless PNG.",
+        "JPEG blocks and softness stay; the PNG can't restore lost detail.",
+        "The PNG is opaque, because a JPEG has no transparency.",
+        "EXIF, color profiles and XMP are dropped.",
+        "A photo can take more space as a PNG than as a JIF."
+      ]
+    },
+    "guide": {
+      "title": "Understanding JIF for PNG output",
+      "markdown": "### What is a JIF file?\n\nJIF expands to JPEG Interchange Format. It was the earliest layout in the JPEG standard for holding JPEG-compressed pictures. Later layouts, JFIF and Exif, largely superseded it, and .jif files are rarely seen.\n\nBehind the JPEG name stands a committee, the Joint Photographic Experts Group; its work started in 1986. The core standard was published by ITU-T as T.81 (1992) and by ISO/IEC as 10918-1 (1994). Baseline JPEG discards information. It tiles the image with 8x8-pixel blocks, gives each block a discrete cosine transform, and Huffman coding closes the process. With usual settings a file shrinks to roughly one tenth up to one twentieth of the uncompressed picture. Most digital cameras and scanners write JPEG, and all major browsers can show it. Whether you see .jpg, .jpeg or .jif, the picture format is JPEG, and its registered media type is image/jpeg.\n\n### Programs that open JIF files\n\n- **Windows, Mac and Linux:** GIMP imports JPEG for editing.\n- **Windows, Mac and Linux:** ImageMagick reads JPEG at the command line; its format table lists it as readable and writable.\n- **Web:** Chrome and Firefox display JPEG pictures.\n- **Mobile:** Safari and Chrome display JPEG pictures.\n\nA progressive mode also exists: a rough picture shows first, then gains detail while the rest loads.\n\n### JIF and PNG compared\n\n- **Extensions and media types**: .jif and image/jpeg for JPEG data; .png and image/png.\n- **Compression**: JPEG is lossy. PNG is always lossless, using DEFLATE (LZ77 plus Huffman coding).\n- **Transparency**: JPEG has no alpha channel. PNG supports an optional alpha channel.\n- **Color depth**: PNG samples can be 1 to 16 bits deep, while JPEG uses 8 bits for each color channel.\n- **Quality setting**: JPEG encoders accept a quality value, usually from 0 to 100, whose meaning varies by program. PNG has no such setting.\n- **Standards**: The aim behind PNG was a GIF alternative free of patents. The W3C issued it as its first Recommendation for an image format in October 1996, and the ISO/IEC 15948:2004 edition came later.\n- **Structure**: a PNG file opens with a fixed byte signature, and the rest is a series of chunks: IHDR, then IDAT with the pixels, and finally IEND.\n- **Metadata**: this page drops it, so EXIF, color profiles and XMP don't reach the PNG.\n\nYour browser's own image decoder reads the JIF, and the page writes the pixels as a PNG. PNG has no quality setting, and nothing is re-compressed with loss. The picture passes through 8-bit RGBA, which matches the JPEG's 8 bits per channel. The PNG shows what the JPEG shows, flaws included: blocks, ringing around edges and softness are already in the decoded pixels. A photo often grows as a PNG, because lossless storage of a photograph takes more bytes than JPEG. Your JIF isn't changed, and several files are processed one after another, each PNG downloading separately as a new copy named after the original, such as scan.png. The page sets no file-size limit. The PNG makes a good working copy for editing, where saving again would add another round of JPEG loss.\n\n### Other ways to convert JIF to PNG\n\n- **GIMP:** when you open a JPEG, GIMP imports it into its own XCF format as a new project. Next use File > Export As (Shift+Ctrl+E), the command for saving in any format besides XCF, and pick PNG.\n\n### Problems with JIF files\n\n- **The browser says \"Image decode failed.\"**: the file is damaged, cut short, or not an image. Get a fresh copy from the source.\n- **A transparent PNG was expected**: JPEG has no alpha channel, so it cannot hold transparency and the PNG is opaque. Cutting out a background takes an editor.\n- **The PNG is bigger**: lossless storage of a photograph can take more space than JPEG. Keep the JIF for storage and use the PNG for editing.\n- **A photo frame refuses it**: some older frames reject progressive JPEG. Export a JPEG with progressive mode disabled.\n- **Quality numbers differ**: a given value can behave differently across programs, so identical settings may still produce different file sizes and picture quality.\n- **You need the layers back**: JPEG doesn't preserve an editable layer stack, and this PNG holds a single picture. Keep the editing project file."
+    }
+  },
+  "jpg-to-tga": {
+    "seo": {
+      "title": "Convert JPG to TGA Online (Free)",
+      "h1": "JPG to TGA Converter",
+      "description": "Convert a JPG photo to a TGA (Targa) file for game and video tools. The picture is decoded in your browser; a JPG has no alpha, so none is added.",
+      "howToHeading": "How to convert JPG to TGA"
+    },
+    "tool": {
+      "subtitle": "Save a JPG as a Targa (TGA) file for game and video tools, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What's the way to convert a JPG into a TGA?",
+        "answer": "Choose the JPG above and save the TGA it makes. The browser decodes the JPG first, then the page writes a Targa file. Several JPGs give one TGA each, and none is uploaded."
+      },
+      {
+        "question": "Will the TGA have an alpha channel?",
+        "answer": "The pixels come from a JPG, and JPG carries no alpha channel at all, so the TGA can't inherit any transparency. To add one, cut out the subject in an editor and export a TGA with alpha from there."
+      },
+      {
+        "question": "Does converting JPG to TGA improve quality?",
+        "answer": "No. The JPG's compression artifacts are already in the pixels, and TGA keeps them. The conversion adds no new loss, but it can't restore detail either."
+      },
+      {
+        "question": "Why would a game or video program want a TGA?",
+        "answer": "Targa is associated with Truevision video boards, and some game and video workflows still ask for it. If a tool you work with wants TGA files, this converts your JPG to one."
+      },
+      {
+        "question": "Why is the TGA bigger than my JPG?",
+        "answer": "JPG throws away detail to be small, and TGA doesn't discard anything, so a TGA of a photo can be larger than the JPG. The page makes no promise about the size."
+      },
+      {
+        "question": "Is the EXIF data kept in the TGA?",
+        "answer": "No. Only the pixel data survives; EXIF, color profiles and XMP stay behind. Keep the JPG if you need its camera data."
+      },
+      {
+        "question": "What is the difference between a 24-bit and a 32-bit TGA?",
+        "answer": "When a TGA is called 32-bit, that normally counts all bits of one pixel instead of each component; the extra eight bits hold alpha. A JPG has no alpha, so its picture has nothing to put there."
+      },
+      {
+        "question": "Which programs open a TGA file?",
+        "answer": "GIMP's official Targa plug-in loads and exports TGA images. ImageMagick reads and writes Truevision Targa, and Adobe Photoshop opens Targa images."
+      },
+      {
+        "question": "Does the TGA keep the JPG's pixel size?",
+        "answer": "Yes. The page doesn't resize the picture."
+      },
+      {
+        "question": "Is .jpg the same as .jpeg when I convert?",
+        "answer": "Yes. They are the same format with two spellings, and the page converts both the same way."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and TGA",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "TGA",
+        "fullName": "Truevision TGA (Targa)",
+        "description": "A raster image format introduced by Truevision in 1984. It stores 8 to 32 bits per pixel with optional run-length encoding and an alpha channel.",
+        "details": [
+          "optional run-length compression",
+          "alpha channel",
+          "8 to 32 bits per pixel",
+          "simple header"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to TGA",
+      "points": [
+        "Your browser decodes the JPG and ImageMagick writes the TGA.",
+        "A JPG has no alpha channel, so the TGA has no transparency.",
+        "JPEG artifacts stay; TGA can't restore detail.",
+        "EXIF, color profiles and XMP are dropped.",
+        "Each JPG you choose gives its own TGA."
+      ]
+    },
+    "guide": {
+      "title": "Understanding JPG for TGA output",
+      "markdown": "### What is a JPG file?\n\nThe Joint Photographic Experts Group gave JPG its name and started the work in 1986. The core standard was released as ITU-T Recommendation T.81 and as ISO/IEC 10918-1, dated 1992 and 1994 respectively. The endings .jpg and .jpeg name the same format, registered as image/jpeg.\n\nBaseline JPEG is lossy. Pictures are split into 8x8 pixel blocks, transformed with a discrete cosine transform and entropy coded using Huffman tables, which typically cuts the size to between a tenth and a twentieth. JPEG keeps 8 bits per color channel and lacks an alpha channel, so there is no transparency or layer support. Digital cameras and scanners commonly produce JPEG, and each major browser shows it. The last US patents covering JPEG ran out on 27 October 2006.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** GIMP imports a JPEG for editing and exports at quality 85 by default.\n- **Windows, Mac and Linux:** ImageMagick reads JPG at the command line.\n- **Web:** Firefox and Chrome show JPG pictures in the browser.\n- **Mobile:** Safari and Chrome display JPG pictures.\n\nYou choose the quality when saving a JPG, normally from 0 to 100, and one number doesn't promise the same look in every program. Progressive JPEGs load as a blurry whole that sharpens as more of the data arrives.\n\n### JPG and TGA compared\n\n- **Extensions**: .jpg or .jpeg for JPG, with the media type image/jpeg; .tga for Targa.\n- **Compression**: JPG is lossy. TGA files may be run-length encoded, an optional step that saves space.\n- **Transparency**: JPG has none. A 32-bit TGA adds an eight-bit alpha channel to RGB.\n- **Color**: a 24-bit RGB TGA stores eight bits in each color component, the same depth as the 8 bits per color channel a JPG stores. TGA also supports indexed-color and grayscale images.\n- **Quality setting**: JPG quality is a value, normally 0 to 100, that one program scales differently from another. This page passes no quality setting.\n- **Related extensions**: ImageMagick groups ICB, VDA and VST with Truevision Targa, so you may see those endings on files of the same kind.\n- **Where each is used**: JPG comes from cameras and scanners. Targa was built for Truevision video boards and survives in video editing and game development.\n\nIn this page the browser decodes the JPG, then ImageMagick writes the TGA. The picture passes through 8-bit RGBA and metadata isn't copied, so camera data is not in the TGA. The JPG's blocky artifacts stay too, because they are already in the pixels. Converting to TGA doesn't recompress with loss, and it won't bring back detail. Because a JPG lacks alpha, there is no transparency to carry over.\n\nChoose TGA only when the receiving tool asks for it, since a photo stored this way can take more room. The page doesn't resize the picture or change its color depth beyond the 8 bits per channel it already has. It runs in your browser, and the download is a new file sharing the original's name, such as photo.tga. Pick several JPGs and they are processed in sequence; every TGA downloads separately, with no ZIP.\n\n### Other ways to convert JPG to TGA\n\n- **GIMP:** open the JPG, which GIMP imports as a new project, then use File > Export As (Shift+Ctrl+E) and select TGA. The Export Image as TarGA dialog has a Use RLE compression checkbox: checked, the image is compressed with Run-Length Encoding, and otherwise it is uncompressed. Its Origin choice of Bottom left or Top left sets how the image data is stored and has no visual effect.\n- **ImageMagick:** run `magick fabric-reference.jpg fabric-texture.tga`, which follows the `magick input output` pattern of ImageMagick's own examples. Its format table lists Truevision Targa as readable and writable.\n\n### Problems with JPG files\n\n- **No transparency after converting**: JPEG can't hold transparent pixels, so the TGA comes out opaque. Mask the picture in an editor that writes alpha and save it as TGA.\n- **A photo frame won't show the JPG**: some older frames reject progressive JPEG, which loads a rough image first. Save the JPG again with progressive mode disabled.\n- **Quality numbers don't match between programs**: the same number can mean different compression in different editors.\n- **Layers can't be recovered**: a JPEG holds no editable layer stack, so keep the original project file."
+    }
+  },
+  "m4r-to-mp3": {
+    "seo": {
+      "title": "Convert M4R to MP3 Online (Free)",
+      "h1": "M4R to MP3 Converter",
+      "description": "Convert an M4R iPhone ringtone to MP3 in your browser. FFmpeg re-encodes it with the LAME encoder and drops any video. Free, with no sign-up.",
+      "howToHeading": "How to convert M4R to MP3"
+    },
+    "tool": {
+      "subtitle": "Turn an M4R ringtone into an MP3 with FFmpeg, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How can I convert my M4R ringtone to MP3?",
+        "answer": "Pick the M4R above and save the MP3 that comes back. FFmpeg does the work in your browser, re-encoding the sound with the LAME encoder. A batch of ringtones gives one MP3 each."
+      },
+      {
+        "question": "What bitrate does the MP3 get?",
+        "answer": "The page asks the LAME encoder for 192 kbit/s. MP3 can't reach that below a 32 kHz sample rate, and the sample rate isn't changed, so a source with a lower rate gets a lower bitrate in the MP3."
+      },
+      {
+        "question": "Will the MP3 sound better than the ringtone?",
+        "answer": "No. Converting can't add quality, and both formats are lossy. Going from one lossy format to another adds a second lossy encoding step."
+      },
+      {
+        "question": "Can I use the MP3 as an iPhone ringtone?",
+        "answer": "Not directly. An iPhone ringtone has to be an M4R, and Apple's GarageBand workflow limits a ringtone to 30 seconds. The MP3 is for players and apps that take MP3 files."
+      },
+      {
+        "question": "What is the difference between M4R and M4A?",
+        "answer": "Both are MPEG-4 audio files. M4R is the ending for iPhone ringtones, while M4A marks MPEG-4 files carrying audio alone. This page reads the M4R and writes an MP3."
+      },
+      {
+        "question": "Will the MP3 keep the ringtone's tags?",
+        "answer": "FFmpeg's defaults copy the input's global tags, such as title and artist, to an output that can hold them, and an MP3 holds them in ID3. If a field matters to you, check the MP3 in a tag editor."
+      },
+      {
+        "question": "Why won't my M4R convert?",
+        "answer": "When FFmpeg cannot produce audio from the file, for example because there is no audio track, the result is the error \"FFmpeg failed with exit code N\" and no MP3. A damaged or cut-short ringtone often still converts, to a shorter MP3, so play the original first to see what it holds."
+      },
+      {
+        "question": "Is a 30-second ringtone converted whole?",
+        "answer": "Yes. The page sets no length limit of its own, and the MP3 is made from the whole sound."
+      },
+      {
+        "question": "What happens to my original M4R?",
+        "answer": "Nothing. The page doesn't change it. You download a new MP3 named after the ringtone, such as personal-tone.mp3."
+      },
+      {
+        "question": "Does the MP3 play everywhere?",
+        "answer": "Nearly. Every major browser plays MP3, and the format is listed as playing on nearly every device."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4R and MP3",
+      "fromFormat": {
+        "name": "M4R",
+        "fullName": "iPhone ringtone",
+        "description": "The file extension for iPhone ringtones. It is an MPEG-4 audio file with AAC audio, renamed so iTunes and the iPhone treat it as a ringtone.",
+        "details": [
+          "MPEG-4 container",
+          "AAC audio",
+          "used by Apple devices"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4R to MP3",
+      "points": [
+        "The sound is re-encoded as an MP3 with the LAME encoder.",
+        "Both formats are lossy, so converting can't add quality.",
+        "Any video is dropped; only audio is written.",
+        "FFmpeg's defaults copy global tags such as title and artist to the MP3.",
+        "FFmpeg runs in your browser, so the ringtone isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding M4R for MP3 output",
+      "markdown": "### What is an M4R file?\n\nThe M4R ending marks an iPhone ringtone. The contents are ordinary AAC in an MPEG-4 wrapper; only the ending sets it apart for iTunes and the iPhone. It sits in the MPEG-4 family, which keeps the container structure separate from the encoding of the tracks inside it. MediaInfo files the .m4r extension with the MPEG-4 formats, and NCH's WavePad manual calls M4R the ringtone type for iPhone. Like other MPEG-4 files, an M4R can carry track metadata beside the encoded sound. Audacity's documentation shows the other direction: its AAC export accepts .m4r as the filename of an MP4 ringtone.\n\nMost people meet an M4R when they make a custom ringtone. Apple's GarageBand workflow on iPhone limits a ringtone to 30 seconds and offers to shorten a longer sound before it finishes. A dimmed source song in that workflow can mean it hasn't been downloaded to the phone.\n\n### Programs that open M4R files\n\n- **Windows, Mac and Linux:** MediaInfo shows the container and stream properties, and its format registry includes .m4r. It is not an audio player.\n- **Windows:** WavePad reads and writes .m4r according to NCH's documentation, though it can't decode copy-protected input. NCH lists it on Windows but not on Mac, and links M4R output to the encoder options it shares with AAC and M4A.\n- **Windows, Mac and mobile:** Switch, NCH's converter, accepts M4R input on Windows, Mac and Android, but excludes copy-protected files.\n- **Mobile:** GarageBand for iPhone creates and installs custom ringtones from eligible audio.\n\n### M4R and MP3 compared\n\n- **Extensions and media types**: .m4r for ringtones; .mp3 for MP3, whose registered media type is audio/mpeg.\n- **Standard**: The name MP3 abbreviates MPEG-1 Audio Layer III, which became ISO/IEC 11172-3 in 1993. Fraunhofer IIS and other MPEG audio group members built it, starting in the late 1980s.\n- **Compression**: MP3 is lossy. It uses a model of human hearing to drop sound listeners are unlikely to notice. A 128 kbit/s MP3 occupies about one eleventh of the space that the same sound needs on a CD.\n- **Audio coding**: an M4R holds AAC audio in an MPEG-4 container. AAC is a perceptual audio coding family standardized through MPEG, placed in MPEG-4 Part 3, and it is lossy. It was designed to sound better than MP3 at the same bitrate.\n- **Sample rates and bitrates**: AAC covers sampling from 8 up to 96 kHz, with bitrates reaching 512 kbps. MP3 bitrates run from 32 to 320 kbps.\n- **Tags**: titles and similar tags in an MP3 sit in ID3 structures kept apart from the audio.\n- **Playback**: every major browser plays MP3. Patent licensing for the format ended on April 23, 2017.\n\nHere, FFmpeg in your browser uses the LAME encoder and asks it for 192 kbit/s. Audio sampled under 32 kHz ends up with a smaller bitrate, since the page leaves the sample rate alone. Any video is dropped. The command passes no track options, so FFmpeg's defaults pick the stream and copy the input's title, artist and similar tags to the MP3.\n\nMP3 keeps song titles and similar tags in ID3 structures, while the M4R keeps track metadata the MPEG-4 way. If a tag matters, check it in the MP3 and add it in a tag editor. A batch of ringtones is handled in sequence, and each MP3 is saved separately without a ZIP.\n\n### Other ways to convert M4R to MP3\n\n- **FFmpeg:** run `ffmpeg -i personal-tone.m4r -vn -c:a libmp3lame -b:a 192k personal-alert.mp3`. The `-vn` drops video, `libmp3lame` is FFmpeg's wrapper for the LAME encoder, and `-b:a` sets the audio bitrate in bits per second.\n\n### Problems with M4R files\n\n- **WavePad or Switch won't open it**: copy-protected input isn't decoded, so M4R support doesn't mean they can remove protection.\n- **A ringtone is cut to 30 seconds**: if an export exceeds 30 seconds, GarageBand offers to shorten it before completing the ringtone.\n- **A source song is dimmed in GarageBand**: it may be unavailable because it hasn't been downloaded to the iPhone.\n- **A player says the file is unsupported**: open the file in MediaInfo, which inspects container and stream properties, to see what its tracks hold. Then convert it here to get an MP3.\n- **This page reports \"FFmpeg failed with exit code N\"**: the file may have no audio track. Get the original ringtone again."
+    }
+  },
+  "m4v-to-mov": {
+    "seo": {
+      "title": "Convert M4V to MOV Online (Free)",
+      "h1": "M4V to MOV Converter",
+      "description": "Convert M4V video to MOV in your browser. FFmpeg re-encodes it as H.264 with AAC sound, and nothing is uploaded.",
+      "howToHeading": "How to convert M4V to MOV"
+    },
+    "tool": {
+      "subtitle": "Convert an M4V to a MOV with FFmpeg in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn an M4V into a MOV?",
+        "answer": "Select your M4V file above, let the conversion finish, and then save the MOV. A batch is processed in order, and every result downloads separately."
+      },
+      {
+        "question": "Does the page re-encode or just copy the video?",
+        "answer": "It re-encodes. Video becomes H.264 and audio becomes AAC, which makes the MOV a new generation with nothing passed through unchanged."
+      },
+      {
+        "question": "Will the MOV be smaller than the M4V?",
+        "answer": "Not necessarily. The re-encode uses a fast setting that favors speed over compression, so the MOV can come out larger or smaller than the M4V."
+      },
+      {
+        "question": "Is the resolution kept?",
+        "answer": "Up to 1920 px on the long side. Anything larger is shrunk to fit, and the even-side rule trims an odd width or height by one pixel."
+      },
+      {
+        "question": "Is the frame rate kept?",
+        "answer": "A video at or below 30 fps keeps its rate. A faster one has frames dropped to cap it at 30 fps, and the clip is not slowed down."
+      },
+      {
+        "question": "Can I convert an M4V from the iTunes Store?",
+        "answer": "FairPlay protection may be present on iTunes Store files, and this page does not strip it. Convert a file you made or are allowed to convert."
+      },
+      {
+        "question": "Why not just rename the M4V to MOV?",
+        "answer": "They are different formats. A rename changes only the label, and a program that checks the data may refuse the file. Converting writes real MOV data."
+      },
+      {
+        "question": "What is the difference between M4V and MP4?",
+        "answer": "Little beyond the ending and the codecs inside, since M4V can label an MPEG-4 container file. MOV is a different format from both."
+      },
+      {
+        "question": "Is interlaced M4V video fixed?",
+        "answer": "Yes. Interlaced frames are deinterlaced before the H.264 encode, and progressive video passes through that step unchanged. The picture keeps its shape."
+      },
+      {
+        "question": "Is my M4V uploaded?",
+        "answer": "No. FFmpeg runs in your browser, in its own worker, so the video stays on your device and the MOV is a new copy."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4V and MOV",
+      "fromFormat": {
+        "name": "M4V",
+        "fullName": "MPEG-4 video",
+        "description": "A video file format developed by Apple that is very close to MP4. Files from the iTunes Store may be protected with FairPlay DRM.",
+        "details": [
+          "MPEG-4 container",
+          "H.264 video with AAC audio",
+          "optional DRM",
+          "Apple format"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "multi-track container",
+          "many codecs, including ProRes",
+          "timecode and metadata tracks",
+          "Apple format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4V to MOV",
+      "points": [
+        "The video is re-encoded as H.264 and the sound as AAC.",
+        "Larger frames are scaled down, faster rates are capped, and both sides become even.",
+        "Interlaced frames are deinterlaced first.",
+        "Title and similar tags are copied where the MOV has fields for them.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding M4V for MOV output",
+      "markdown": "### What is an M4V file?\n\nM4V is a label for an MPEG-4 container file. HandBrake treats the .m4v and .mp4 files it writes as one container, and it chooses the M4V ending for some jobs that combine chapters, subtitles and AC3 passthrough. In FFmpeg's source, the reader for MOV and MP4 files names .m4v among the endings it accepts. Inside, the MPEG-4 family keeps audio and video as separate tracks and stores metadata in boxes, so what plays depends on how each track was encoded.\n\nYou meet M4V files as exports from video software, as phone and tablet video, and as films or shows in iTunes and the Apple TV app. The ending doesn't reveal the codecs, which is why one M4V plays everywhere and another opens only in certain apps. Playback hangs on the encodings inside, so the first thing to learn about a stubborn file is its codecs, not its extension.\n\n### Programs that open M4V files\n\n- **Windows, Mac and Linux:** FFmpeg, the command-line tool, reads .m4v input explicitly in its MOV/MP4 reader. VLC media player supports MPEG-4 containers plus common MPEG-4 video and AAC audio.\n- **Mac:** QuickTime Player opens M4V files and can export a movie as a MOV.\n\nThe MPEG-4 container family stores audio and video tracks, and M4V is one of its files.\n\n### M4V and MOV compared\n\n- **Names**: .m4v for M4V, and .mov or .qt for MOV, whose media type is video/quicktime.\n- **Origin**: Apple created MOV as the QuickTime format in 1991 and shipped it for Windows in 1994. It later served as the basis of the MPEG-4 file format, yet MOV and MP4 stay separate and can't be swapped freely.\n- **Structure**: a QuickTime file is assembled from objects named atoms, and software may skip any atom it can't read. The MPEG-4 family uses the same idea under the name boxes.\n- **Contents**: H.264, ProRes or Motion JPEG video, with AAC or uncompressed PCM sound.\n- **Reach**: browser support for MOV is patchy, and even Apple has largely moved to MP4. Mac screen recordings arrive as MOV files.\n\nHere the video isn't copied across. FFmpeg in your browser rewrites it as H.264, using the ultrafast preset at CRF 32, and rewrites the sound as AAC at 96 kbps. The index goes at the front of the MOV so playback can start early. Anything over 1920 px on either side is scaled down, and frame rates beyond 30 fps are capped. Both sides are trimmed to even values, which costs an odd-sized picture one pixel, and interlaced frames get deinterlaced before encoding. Because it re-encodes, the MOV is a second generation of a lossy video. A fast preset trades compression for speed, so the file may be larger than a slow, careful encode would give. Your M4V is untouched; the result comes back as a separate file.\n\n### Other ways to convert M4V to MOV\n\n- **FFmpeg:** run `ffmpeg -i family-film.m4v -c:v libx264 -crf 21 -c:a aac -b:a 160k family-review.mov`. A lower CRF keeps more quality than this page does.\n\n### Problems with M4V files\n\n- **It won't play**: a codec the player lacks stops playback, even if the app knows the container. Try another player such as VLC.\n- **Renaming didn't help**: a different suffix can't repair damage or add support for an unsupported encoding. Convert it instead.\n- **It stops partway**: a normal MOV or MP4-family recording can be unreadable if writing ended early, and an interrupted export gives the same result. Export it again from the source project if you still have it.\n- **The MOV is shorter than the M4V**: a damaged or cut-short M4V usually still produces a file: the MOV holds whatever the page managed to read and is shorter. Compare the lengths before deleting the original.\n- **The MOV is bigger than expected**: the fast preset favors speed over compression, so a heavy source can stay heavy. Run FFmpeg yourself with a higher CRF number if you need a smaller file, and expect some loss of detail.\n- **The MOV won't play in a web page**: browser support for MOV is limited, so check the result in a desktop player before you embed it.\n- **It came from the iTunes Store**: such files may carry FairPlay DRM, which this page does not remove."
+    }
+  },
+  "mkv-to-webm": {
+    "seo": {
+      "title": "Convert MKV to WebM Online (Free)",
+      "h1": "MKV to WebM Converter",
+      "description": "Convert MKV to WebM in your browser. FFmpeg re-encodes it as VP8 video with Vorbis sound. Free, and the file stays on your device.",
+      "howToHeading": "How to convert MKV to WebM"
+    },
+    "tool": {
+      "subtitle": "Convert an MKV to a WebM with FFmpeg, re-encoded as VP8 in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MKV to WebM?",
+        "answer": "Open your MKV above, let FFmpeg process it in the browser, and save the WebM. Queued files go one by one, each as its own download."
+      },
+      {
+        "question": "Does converting MKV to WebM re-encode the video?",
+        "answer": "Yes. The video is rebuilt as VP8 and the sound as Vorbis, even when the MKV already holds VP8. Nothing passes through untouched."
+      },
+      {
+        "question": "Which codecs does the WebM use?",
+        "answer": "VP8 video through libvpx, set for speed, plus Vorbis audio. There is no VP9 or AV1 option here. FFmpeg can write VP9 if you need it."
+      },
+      {
+        "question": "Is WebM just a renamed MKV?",
+        "answer": "No. WebM builds on a subset of Matroska. Its video is VP8, VP9 or AV1, and its audio is Vorbis or Opus. An MKV carrying H.264 or other codecs can't just be relabeled."
+      },
+      {
+        "question": "Does a 4K or 60 fps MKV stay 4K and 60 fps?",
+        "answer": "No. It keeps its own values only up to a longer side of 1920 px and at most 30 frames per second. Larger pictures shrink, faster footage is capped, and an odd dimension is trimmed by one pixel."
+      },
+      {
+        "question": "Are the title and other tags kept in the WebM?",
+        "answer": "The MKV's title and similar global tags are copied wherever the WebM has fields for them. If a particular tag matters, look at the WebM first and then decide about the original."
+      },
+      {
+        "question": "Why does the WebM look worse than my MKV?",
+        "answer": "The encode is tuned for speed over detail, and any re-encode is a second generation of the picture."
+      },
+      {
+        "question": "Will the WebM play in every browser?",
+        "answer": "That depends on the codecs, not the suffix. Older browsers may not play WebM at all. This page writes VP8 video with Vorbis audio, so test the file in the player or browser you need."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "Nothing in the page limits file size or run time. A long film simply keeps your device busy until it finishes."
+      },
+      {
+        "question": "Is my MKV uploaded anywhere?",
+        "answer": "No. FFmpeg compiled to WebAssembly does the work inside your browser, and the original file isn't changed."
+      }
+    ],
+    "aboutSection": {
+      "title": "MKV and WebM",
+      "fromFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open, free container format that can hold unlimited video, audio, picture and subtitle tracks in one file. WebM is a subset of Matroska.",
+        "details": [
+          "open standard",
+          "multiple audio and subtitle tracks",
+          "chapters and metadata",
+          "supports almost any codec"
+        ]
+      },
+      "toFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "supported by major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MKV to WebM",
+      "points": [
+        "The video is re-encoded as VP8 and the sound as Vorbis.",
+        "Larger frames are scaled down, faster rates are capped, and both sides become even.",
+        "Interlaced frames are deinterlaced first.",
+        "FFmpeg's defaults pick which streams go into the WebM.",
+        "The conversion runs in your browser; nothing is uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MKV for WebM output",
+      "markdown": "### What is an MKV file?\n\nMKV is Matroska, a container for audio and video built on EBML, a binary format derived from XML. Its roots lie in a previous project, MCF. A single file can hold multiple video, audio and subtitle streams, and the design includes chapters and tags that describe the content. IANA lists video/matroska as its media type. MKV turns up in high-quality video collections and Blu-ray rips.\n\nMatroska doesn't prescribe a compression method or a quality level. Two MKV files with the same ending can hold very different video and sound, so an MKV that plays in one app can fail in another that understands the container but lacks a decoder for what is inside. A file with several audio and subtitle streams can also start in the wrong language until you choose another track.\n\n### Programs that open MKV files\n\n- **Windows, Mac and Linux:** mpv offers desktop playback with a choice of audio and subtitle streams. ffplay comes with FFmpeg and its Matroska demuxer.\n- **Mobile:** VLC for Android costs nothing, and its decoding depends on the media in the container. VLC for iOS can play most video formats, taken from local storage or from network sources.\n- **Media servers:** Plex plays MKV libraries, and Windows Media Player opens MKV only with extra codecs installed.\n\nDesktop players differ in how much they decode, so if one refuses a file, try another before you decide it is damaged.\n\n### MKV and WebM compared\n\n- **Relationship**: the WebM Project backs an open format for delivering media on the web, and its container is based on Matroska.\n- **Codecs**: VP8 or VP9 for the picture, Vorbis or Opus for the sound. An MKV can hold far more.\n- **Media types**: video/webm for video, audio/webm for sound only.\n- **Typical uses**: MKV for video collections and rips; WebM for web video and browser screen recordings.\n- **Terms**: the project releases the format technology royalty-free.\n- **Playback**: browsers care about the codecs inside, not the .webm suffix. Safari 14.1 on macOS began playing WebM files that use VP8 or VP9 plus Vorbis.\n\nNothing is copied from the MKV here. FFmpeg in your browser rebuilds the video as VP8 with libvpx at CRF 40 in realtime mode and 4:2:0 color (yuv420p), and the sound as Vorbis at 64 kbps. These settings favor speed over compression, so expect lost detail and a bigger file than a slow encode would give. The frame keeps its size and speed, capped at 1920 px along the longer side and 30 frames per second. Both sides are trimmed to even values, so an odd-sized picture loses one pixel, and interlaced footage is deinterlaced first. Because the page doesn't map streams itself, FFmpeg's own defaults choose which video and audio tracks reach the WebM. The MKV itself isn't modified.\n\nKeep the MKV when chapters, extra tracks or attachments matter. The WebM is a narrower copy meant for playback on the web, and it can't bring back anything the re-encode discarded.\n\n### Other ways to convert MKV to WebM\n\n- **FFmpeg:** run `ffmpeg -i lecture-archive.mkv -c:v libvpx-vp9 -crf 31 -c:a libopus lecture-browser.webm` for VP9 video and Opus audio. Here -c:v libvpx-vp9 picks VP9, -crf 31 sets the quality level and -c:a libopus picks the audio encoder.\n\n### Problems with MKV files\n\n- **No sound or the wrong language**: the player may have picked another audio or subtitle stream. mpv lets you switch tracks.\n- **Seeking is slow or jumps**: missing or damaged cues make it harder to move around the file. Matroska stores cues apart from the media clusters, and a WebM with no cue index has the same trouble.\n- **It opens but won't play**: recognizing the container doesn't mean the player can decode every codec inside. Try VLC.\n- **The WebM looks softer than the MKV**: the encode favors speed, so fine detail and busy scenes lose the most. Use FFmpeg locally with a lower CRF number if quality matters more than speed.\n- **A track is missing after conversion**: no stream-mapping options are passed, so play the WebM before you delete the MKV.\n- **The WebM is shorter than the MKV**: with a damaged or cut-short MKV the conversion typically carries on and saves only the readable part, so check the running time before you delete anything."
+    }
+  },
+  "mov-to-m4a": {
+    "seo": {
+      "title": "Convert MOV to M4A Online (Free)",
+      "h1": "MOV to M4A Converter",
+      "description": "Extract the sound of a MOV as an M4A in your browser. FFmpeg drops the video and encodes the audio as AAC. Free, and the movie stays on your device.",
+      "howToHeading": "How to convert MOV to M4A"
+    },
+    "tool": {
+      "subtitle": "Extract audio from a MOV as an M4A, encoded as AAC, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a MOV to an M4A?",
+        "answer": "Select the MOV above and wait while FFmpeg works in your browser. It removes the video, encodes the sound as AAC and hands you the M4A to save."
+      },
+      {
+        "question": "Can I pull just the audio out of a MOV?",
+        "answer": "Yes, that is the job here. Video is left out and the audio becomes AAC, leaving a sound-only file that major browsers play."
+      },
+      {
+        "question": "Is the M4A the original audio untouched?",
+        "answer": "No. The page encodes the sound as AAC again, so you get a new lossy generation even when the MOV already used AAC."
+      },
+      {
+        "question": "What if my MOV has no audio?",
+        "answer": "You'll see \"FFmpeg failed with exit code\" and a code number. With no sound track there is nothing to put in an M4A."
+      },
+      {
+        "question": "Which audio track is used when a MOV has several?",
+        "answer": "The page leaves stream selection to FFmpeg's defaults. Check the M4A before deleting a MOV that holds several languages."
+      },
+      {
+        "question": "How does M4A compare with MP3?",
+        "answer": "M4A holds MPEG-4 audio, usually AAC. Both M4A and MP3 are lossy, and AAC inside an MP4 plays in every major browser."
+      },
+      {
+        "question": "Does the M4A keep the picture?",
+        "answer": "No. The video is dropped, so the M4A is sound only. Keep the MOV if slides or on-screen text matter to the listener."
+      },
+      {
+        "question": "What is the M4A file called?",
+        "answer": "It takes the MOV's name with the .m4a ending, such as interview.m4a, and the MOV itself is left as it was."
+      },
+      {
+        "question": "Is there a limit on the movie's length?",
+        "answer": "The page sets no limit on length. How long a conversion takes depends on your device."
+      },
+      {
+        "question": "Will the M4A play on my phone and in my browser?",
+        "answer": "Very likely. AAC in an MP4 container works in all major browsers, and Android supports .m4a AAC on every version."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and M4A",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "multi-track container",
+          "many codecs, including ProRes",
+          "timecode and metadata tracks",
+          "Apple format"
+        ]
+      },
+      "toFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art",
+          "widely supported"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to M4A",
+      "points": [
+        "The video is dropped and the sound is encoded as AAC.",
+        "A MOV with no audio track fails to convert.",
+        "FFmpeg's defaults pick the audio track when there are several.",
+        "The result is audio only, so the picture is gone.",
+        "The conversion runs in your browser; nothing is uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MOV for M4A output",
+      "markdown": "### What is a MOV file?\n\nA MOV is a movie in the QuickTime format, which Apple released in 1991 and which reached Windows in 1994. The files end in .mov or .qt and carry the media type video/quicktime. Inside, a QuickTime file is a set of objects called atoms, and a program can pass over any atom it doesn't understand. The video might be H.264, ProRes or Motion JPEG, and the sound might be AAC or uncompressed PCM. Screen recordings made on a Mac are saved as MOV, and iPhones record to it too; editors on macOS and professional pipelines use it as well.\n\nThe ending describes packaging, not quality or codecs, so one MOV can need decoders that another doesn't. QuickTime also fathered the MPEG-4 file format, though MOV and MP4 remain different and aren't interchangeable. Browsers support MOV only partly, and Apple now mostly uses MP4 itself. For this conversion what matters is the sound: a movie with no audio track can't give you a listenable file.\n\n### Programs that open MOV files\n\n- **Windows, Mac and Linux:** ffplay relies on FFmpeg's QuickTime demuxer plus the right decoders for the streams in the file. mpv gives desktop playback where the audio and subtitle tracks are yours to pick.\n- **Windows and Mac:** Adobe Premiere imports MOV when a decoder for its contents is available.\n- **Mac:** QuickTime Player plays the movie.\n- **Mobile:** VLC for Android plays what its codecs cover, free of charge. VLC for iOS opens most movie formats from local and network storage.\n\n### MOV and M4A compared\n\n- **What it holds**: The M4A ending marks MPEG-4 files with audio and nothing else. Apple adopted it for music files without copy protection.\n- **Codec**: almost every M4A holds AAC audio, a codec specified in MPEG-4 Part 3. AAC is lossy, and it was designed to beat MP3 at the same bitrate.\n- **Range**: AAC supports 8 to 96 kHz sampling and up to 512 kbps. Songs sold through iTunes used it.\n- **Reach**: all major browsers play AAC inside an MP4 container, and Android plays it in .m4a files on every release. Firefox may depend on system codecs for AAC.\n- **Media type**: audio/mp4, against video/quicktime for the MOV.\n- **Tracks**: the M4A carries one kind of track. Everything else in the movie, including any subtitles or extra video, stays in the MOV.\n\nHere the soundtrack is not copied across. FFmpeg in your browser discards the video and turns the audio into AAC at 192 kbps, so the M4A is a new lossy generation of the sound, even if the MOV already held AAC. No stream-mapping options are passed, which means FFmpeg's defaults choose the audio track when a movie has several. A movie with no audio fails with the error \"FFmpeg failed with exit code\" and then the code itself. Files in a queue run one at a time, each saved separately. AAC is lossy and the sound is encoded again, so avoid converting the same recording back and forth. The page sets no limit on size or run time, and the MOV itself is never changed.\n\n### Other ways to convert MOV to M4A\n\n- **FFmpeg:** run `ffmpeg -i interview-camera.mov -vn -c:a aac -b:a 192k interview-listening.m4a`. The movie needs a valid audio stream.\n\n### Problems with MOV files\n\n- **The sound plays but the movie will not in a browser**: MOV support in browsers is partial, whereas every major browser plays AAC held in an MP4 container, which makes the M4A the safer file for a web page.\n- **Your editor rejects it**: a QuickTime movie may use codecs the target editor doesn't have. Convert to a format it supports.\n- **Renaming didn't help**: a new filename ending neither transcodes the video nor installs a missing decoder.\n- **It broke after a crash**: a write cut short may leave an ordinary MOV unusable, though fragmented output recovers in a different way.\n- **You need the picture too**: the M4A holds sound only, so keep the MOV if slides, gestures or on-screen text carry information the listener would miss.\n- **The M4A is shorter than the movie**: a MOV that is damaged or cut short can still yield an M4A, but only for the stretch that could be read. Listen to the end before you delete the original."
+    }
+  },
+  "mov-to-wmv": {
+    "seo": {
+      "title": "Convert MOV to WMV Online (Free)",
+      "h1": "MOV to WMV Converter",
+      "description": "Convert MOV to WMV in your browser. FFmpeg re-encodes it as MS-MPEG4 v3 video with WMA v2 sound. Free, no upload.",
+      "howToHeading": "How to convert MOV to WMV"
+    },
+    "tool": {
+      "subtitle": "Convert a MOV to a WMV with FFmpeg, re-encoded in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a MOV to a WMV?",
+        "answer": "Select the MOV above, give FFmpeg a moment to rebuild it in your browser, and save the WMV. Extra files wait their turn and download separately."
+      },
+      {
+        "question": "Can I convert a MOV to WMV on a Mac?",
+        "answer": "Yes. The conversion runs in your browser, on your device, so a Mac, a Windows PC or a Linux machine with a current browser can do it."
+      },
+      {
+        "question": "Are the resolution and frame rate preserved?",
+        "answer": "Within limits: pictures larger than 1920 px on a side shrink, rates beyond 30 fps are capped, and an odd dimension loses one pixel."
+      },
+      {
+        "question": "Which codecs does the WMV use?",
+        "answer": "MS-MPEG4 v3 for the picture and WMA v2 for the sound, which are FFmpeg's defaults for a .wmv file. The picture codec is not Windows Media Video itself. The default video bitrate leaves busy pictures soft."
+      },
+      {
+        "question": "Will the WMV be smaller than the MOV?",
+        "answer": "Often, if the MOV was recorded at a higher bitrate. The video gets a fixed default bitrate whatever the picture holds, so the WMV can be small and a detailed scene loses detail."
+      },
+      {
+        "question": "Will my old Windows player open the WMV?",
+        "answer": "Maybe not. A player may read the container yet lack the decoder, and this page writes MS-MPEG4 v3 video with WMA v2 sound, not Windows Media Video. Check that the player supports those codecs."
+      },
+      {
+        "question": "Is WMV just ASF?",
+        "answer": "In practice, yes: .wmv names Windows Media content in an ASF container, a design meant for synchronized media and delivery over networks. This page writes that container with MS-MPEG4 v3 video rather than Windows Media Video."
+      },
+      {
+        "question": "Why not rename the MOV to WMV?",
+        "answer": "A new ending doesn't transcode anything. The data stays QuickTime, and a player that inspects the content will refuse it."
+      },
+      {
+        "question": "Why does detailed video look soft in the WMV?",
+        "answer": "The page sets no video bitrate, and the default is low for a sharp or busy picture. Fine texture and fast motion lose the most. For a sharper WMV, use the FFmpeg command in the guide with a higher video bitrate."
+      },
+      {
+        "question": "Does my movie leave my device?",
+        "answer": "No. FFmpeg compiled to WebAssembly runs inside the browser and no server is involved. You download a new copy and the original stays as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and WMV",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "multi-track container",
+          "many codecs, including ProRes",
+          "timecode and metadata tracks",
+          "Apple format"
+        ]
+      },
+      "toFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "A family of video codecs developed by Microsoft, usually stored in the ASF container. It was widely used for Windows video and streaming.",
+        "details": [
+          "ASF container",
+          "proprietary Microsoft codec",
+          "lossy compression",
+          "legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to WMV",
+      "points": [
+        "The video is re-encoded as MS-MPEG4 v3 with WMA v2 audio, at FFmpeg's default bitrates.",
+        "Larger frames are scaled down, faster rates are capped, and both sides become even.",
+        "Interlaced frames are deinterlaced first.",
+        "Title and similar tags are copied where the WMV has fields for them.",
+        "The conversion runs in your browser; nothing is uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MOV for WMV output",
+      "markdown": "### What is a MOV file?\n\nThe MOV is the QuickTime movie format, introduced by Apple in 1991 and available on Windows since 1994. Files use the .mov or .qt ending, and video/quicktime is the registered media type. A file is organized in objects called atoms, which a program may skip when it doesn't recognize them. Inside you might find H.264, ProRes or Motion JPEG pictures paired with AAC or PCM sound.\n\niPhones record to MOV, macOS editors and professional pipelines use it, and Mac screen recordings arrive as MOV files. MPEG-4's file format was built on QuickTime, but the two aren't the same and can't stand in for each other. Browsers handle MOV poorly, and Apple itself now leans on MP4. A MOV says how its contents are packaged but not which codecs they use, so a file that edits smoothly in one program can be refused by another.\n\n### Programs that open MOV files\n\n- **Windows, Mac and Linux:** ffplay depends on FFmpeg's demuxer for the format and needs decoders for the actual streams. mpv is a desktop player with a track menu for audio and subtitles.\n- **Windows and Mac:** Adobe Premiere imports MOV only when it has a matching decoder.\n- **Mobile:** VLC for Android is free, with codec support deciding what plays. VLC for iOS reads most movie formats, local or network.\n\n### MOV and WMV compared\n\n- **Container**: WMV files are ASF containers that carry Windows Media content. ASF suits synchronized media that has to travel over a network, and it holds audio and video streams.\n- **Delivery**: streams can come from a local disk or an HTTP server.\n- **Compression**: WMV can use Windows Media Video 7, 8 or 9.\n- **Media type**: the Library of Congress notes video/x-ms-wmv as commonly used, with no IANA registration.\n- **Players**: VLC supports the ASF and WMV container and handles the 1, 2 and 9 generations of Windows Media Video. In FFmpeg's own list, the Windows Media Video 9 decoder is marked as not completely working, so support varies by player.\n\nWhen a fixed hardware player or a legacy program asks for WMV, find out which codecs, maximum size and frame rate it accepts before converting. A new container can meet a delivery rule, but it can't make every movie run on every device. Keep the original MOV, since it may hold better quality than the copy.\n\nThe page re-encodes the video with FFmpeg in your browser and writes a WMV with FFmpeg's defaults for that container: MS-MPEG4 v3 video, which differs from Windows Media Video, plus WMA v2 sound at 128 kbit/s. Video keeps FFmpeg's default of 200 kbit/s, which leaves a busy scene looking soft. The frame is shrunk when it exceeds 1920 px on either side, the rate is held to 30 fps, and an odd-sized picture loses one pixel. Deinterlacing happens before encoding. Knowing the container isn't the same as having the video decoder, so an old player that opens some WMV files may still reject yours. Your MOV is not modified.\n\n### Other ways to convert MOV to WMV\n\n- **FFmpeg:** run `ffmpeg -i presentation-source.mov -b:v 1800k presentation-legacy.wmv`. FFmpeg guesses the WMV format from the ending and uses the -b:v option to set a higher video bitrate than this page does.\n\n### Problems with MOV files\n\n- **Your editor can't read it**: a QuickTime file can use codecs the destination editor never installed. Export a format it does handle.\n- **Renaming didn't help**: swapping the ending doesn't transcode the video or add a missing decoder.\n- **It stopped working after a crash**: an ordinary MOV may be unusable once writing was interrupted, whereas fragmented output has its own recovery behavior.\n- **The WMV looks soft**: the page sets no video bitrate, so the default applies. A tool where you choose the bitrate, such as the FFmpeg line above, gives you control.\n- **The player reads the file but shows nothing**: a program can parse the ASF wrapper without owning the decoder for what it holds, so a compatible reader is no promise of codec support.\n- **The WMV won't play on the old device**: picture quality depends on the codec and compression settings, not the .wmv ending, so a legacy player can still refuse the result. Check what it supports."
+    }
+  },
+  "mp3-to-webm": {
+    "seo": {
+      "title": "Convert MP3 to WEBM Online (Free)",
+      "h1": "MP3 to WEBM Converter",
+      "description": "Convert MP3 to WebM in your browser. FFmpeg encodes the sound as Vorbis for web projects. Free, and your audio stays on your device.",
+      "howToHeading": "How to convert MP3 to WEBM"
+    },
+    "tool": {
+      "subtitle": "Convert an MP3 to a WebM with FFmpeg, encoded as Vorbis in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MP3 to WebM?",
+        "answer": "Choose your MP3 above, let FFmpeg encode it on your device, then save the WebM. Several files are handled in turn, each with its own download."
+      },
+      {
+        "question": "Can an MP3 go inside a WebM file?",
+        "answer": "Not as MP3. WebM allows audio-only files, with the media type audio/webm, but MP3 isn't one of its codecs. The sound is encoded again, here as Vorbis. An MP3 with cover art gives a WebM with the picture as a video track."
+      },
+      {
+        "question": "Which audio codec does the WebM use?",
+        "answer": "Vorbis through libvorbis. FFmpeg can also write Opus, the other audio codec WebM allows, if you run it yourself."
+      },
+      {
+        "question": "Will the quality drop?",
+        "answer": "MP3 is lossy and so is Vorbis, so the WebM adds another lossy generation. Keep the MP3 as the master."
+      },
+      {
+        "question": "Can I choose the bitrate of the WebM?",
+        "answer": "No. The page offers no quality setting. To pick the audio bitrate yourself, run FFmpeg with the command in the guide."
+      },
+      {
+        "question": "Should I use WebM or MP3 for audio on a website?",
+        "answer": "Every major browser plays MP3. WebM is royalty-free and built for the web, but playback depends on the actual codecs inside. Use WebM when a project asks for it, and MP3 for the widest reach."
+      },
+      {
+        "question": "Will the WebM play in every browser?",
+        "answer": "What decides playback is the codecs inside, not the ending. This page writes Vorbis, one of the audio codecs WebM allows, so test the file in the browser or player you need before you delete the MP3."
+      },
+      {
+        "question": "Are the title and artist tags kept in the WebM?",
+        "answer": "The title, artist and album tags are copied into the WebM where the output has fields for them. Check the WebM in your player if a tag matters."
+      },
+      {
+        "question": "Is there a limit on file size?",
+        "answer": "Not in the page itself. A long file simply keeps your device busy longer."
+      },
+      {
+        "question": "Does my MP3 get uploaded?",
+        "answer": "No. FFmpeg compiled to WebAssembly runs inside your browser, so no server is involved and the original stays as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and WebM",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "supported by major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to WebM",
+      "points": [
+        "The sound is encoded again, as Vorbis.",
+        "It is a second lossy generation, so keep the MP3.",
+        "The original MP3 is never changed; you download a new copy.",
+        "The conversion runs in your browser; nothing is uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP3 for WebM output",
+      "markdown": "### What is an MP3 file?\n\nMP3, or MPEG-1 Audio Layer III, became a standard in 1993 as ISO/IEC 11172-3 and was extended in 1995 by ISO/IEC 13818-3. Fraunhofer IIS developed it from the late 1980s together with other people in the MPEG audio group. The format is lossy; it applies a model of hearing to drop sounds that listeners probably won't notice. At 128 kbit/s, an MP3 takes up roughly one eleventh of the space the same recording needs on a CD.\n\nSupported bitrates run from 32 to 320 kbps, with sampling at 32, 44.1 or 48 kHz. Titles and other tags live in ID3 structures stored apart from the audio inside the file. Patent licensing for MP3 ended on April 23, 2017. Every major browser plays it, and audio/mpeg is its media type. Because the discarded sound can't be recovered, each new lossy encode removes a little more.\n\nThe file is most often a song, a podcast episode or a voice note. Because MP3 is not one of the codecs WebM allows, a request for WebM is really a request for a different audio package.\n\n### Programs that open MP3 files\n\n- **Windows, Mac and Linux:** Audacity imports MP3 audio into an editable project. ffplay uses FFmpeg's demuxer.\n- **Web:** Firefox plays supported media directly. Chrome plays supported web audio, though the internal codec still matters.\n- **Mobile:** VLC for Android is free, and codec support decides what plays. mpv for Android plays it too.\n\n### MP3 and WebM compared\n\n- **Purpose**: WebM comes from the WebM Project, which promotes an open format for the web. The container is built on Matroska.\n- **Codecs**: VP8 or VP9 for video, Vorbis or Opus for sound. MP3 is not on that list, so the sound has to be encoded again.\n- **Media types**: video/webm, and audio/webm for a file with no picture.\n- **Typical uses**: WebM is used for video on the web, screen captures made in browsers and short animated clips, and the main browsers support it. MP3 serves songs, podcast episodes and voice notes.\n- **Terms**: the project offers the format technology royalty-free.\n- **Playback**: browsers look at the codecs inside, not the .webm ending. Safari gained support for VP8 or VP9 WebM with Vorbis in version 14.1 on macOS.\n\nOn this page, FFmpeg in your browser turns the sound of your MP3 into Vorbis at 64 kbps. Both formats are lossy, so the WebM is a second lossy generation, and you should keep the MP3 if quality matters. The original isn't changed, and the result is a separate download. Nothing in the page limits size or run time. Vorbis is one of the two audio codecs WebM defines, the other being Opus, so the output stays within the format's own choices. If you need Opus, run FFmpeg yourself with the command below. Play the WebM in the player you plan to use before you delete anything.\n\n### Other ways to convert MP3 to WebM\n\n- **FFmpeg:** run `ffmpeg -i spoken-note.mp3 -vn -c:a libopus -b:a 64k spoken-note-opus.webm` to write Opus instead of Vorbis. The -vn option turns off video, so an attached cover picture is left out.\n\n### Problems with MP3 files\n\n- **Import error**: a malformed MP3 can trigger an import error in an editor even though another player handles it.\n- **Lost tags in an editor**: bringing several files into a single Audacity project can overwrite earlier tags with those of the last file.\n- **Quality drops on re-export**: editing an MP3 and exporting a new MP3 adds a second lossy encoding stage. Export from the original source when you can.\n- **A tag looks wrong**: titles and other tags sit in ID3 structures inside the MP3, so an editor that reads them differently can show different text. Check them in the player you will use.\n- **Seeking is sluggish**: a missing cue index gives the player less direct location information, so jumping around in a WebM can be slower.\n- **An old browser balks**: what an early Safari did says little about current releases, so try the WebM in the very browser you need.\n- **Playback depends on the codec**: a player that recognizes the file may still lack the decoder, so try another one. VLC and mpv are free choices on Android."
+    }
+  }
+}

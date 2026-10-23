@@ -1,0 +1,398 @@
+{
+  "tools": {
+    "hevc-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg: re-encode",
+          "steps": "ffmpeg -i stream.hevc -c:v libx264 -an picture.mov",
+          "limits": "Decodes the raw HEVC stream and writes H.264; the output has no audio.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg: stream copy",
+          "steps": "ffmpeg -i stream.hevc -c:v copy -an retained.mov",
+          "limits": "Keeps the HEVC pictures unchanged; the player must decode HEVC.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg: fixed input frame rate",
+          "steps": "ffmpeg -r 24 -i stream.hevc -c:v libx264 fixed.mov",
+          "limits": "As an input option, -r ignores stored timestamps and assumes a constant rate; choose the rate your footage used.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "ico-to-jpg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick badge.ico -background white -alpha remove -alpha off badge.jpg",
+          "limits": "-alpha remove composites the image over the background color; quality is ImageMagick's default.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "ImageMagick: higher quality",
+          "steps": "magick favicon.ico -quality 95 -background white -alpha remove -alpha off favicon.jpg",
+          "limits": "-quality sets the compression level for JPEG output; larger files result.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "IrfanView",
+          "steps": "File > Open the .ico, then File > Save as, choose JPG, set the file name and save.",
+          "limits": "IrfanView lists ICO and JPG as readable and savable.",
+          "source": "https://www.irfanview.com/faq.htm",
+          "supportingSources": [
+            "https://www.irfanview.com/main_formats.htm"
+          ]
+        }
+      ]
+    },
+    "m2ts-to-mkv": {
+      "methods": [
+        {
+          "app": "mkvmerge",
+          "steps": "mkvmerge -o archive.mkv recording.m2ts",
+          "limits": "Copies the tracks without re-encoding; the documentation names .m2ts among the transport-stream file types it parses.",
+          "source": "https://mkvtoolnix.download/doc/mkvmerge.html"
+        },
+        {
+          "app": "mkvmerge: chosen tracks",
+          "steps": "mkvmerge --identify recording.m2ts, then mkvmerge -o archive.mkv --audio-tracks 1 --no-subtitles recording.m2ts",
+          "limits": "Track IDs come from --identify and are not simply track numbers.",
+          "source": "https://mkvtoolnix.download/doc/mkvmerge.html"
+        },
+        {
+          "app": "FFmpeg: copy all streams",
+          "steps": "ffmpeg -i recording.m2ts -map 0 -c copy archive.mkv",
+          "limits": "No re-encoding; Matroska must accept every stream codec.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mov-to-mpeg": {
+      "methods": [
+        {
+          "app": "FFmpeg: PAL DVD preset",
+          "steps": "ffmpeg -i interview.mov -target pal-dvd interview.mpeg",
+          "limits": "The preset sets codecs, bitrates and buffer sizes; vcd, svcd, dvd, dv and dv50 types exist, optionally prefixed pal-, ntsc- or film-.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg: preset without sound",
+          "steps": "ffmpeg -i interview.mov -an -target pal-dvd silent.mpeg",
+          "limits": "-an disables audio recording, so the output has no sound.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg: NTSC DVD clip",
+          "steps": "ffmpeg -i interview.mov -target ntsc-dvd -t 30 first-30-seconds.mpeg",
+          "limits": "As an output option, -t stops writing after the given duration.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mov-to-mpg": {
+      "methods": [
+        {
+          "app": "FFmpeg: VCD preset",
+          "steps": "ffmpeg -i presentation.mov -target ntsc-vcd presentation.mpg",
+          "limits": "The preset sets all format options automatically; vcd, svcd, dvd, dv and dv50 types exist.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg: SVCD preset",
+          "steps": "ffmpeg -i presentation.mov -target pal-svcd slides.mpg",
+          "limits": "The type may be prefixed with pal-, ntsc- or film-.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg: film DVD preset",
+          "steps": "ffmpeg -i presentation.mov -target film-dvd feature.mpg",
+          "limits": "The film- prefix selects the film standard; all format options are set automatically.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mp4-to-aac": {
+      "methods": [
+        {
+          "app": "FFmpeg: re-encode",
+          "steps": "ffmpeg -i recording.mp4 -vn -c:a aac -b:a 192k recording.aac",
+          "limits": "Lossy re-encode of the audio; -vn skips the video.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg: copy the stream",
+          "steps": "ffmpeg -i interview.mp4 -vn -c:a copy -f adts extracted.aac",
+          "limits": "Works when the MP4 audio is already AAC; the adts muxer accepts a single AAC stream.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "FFmpeg: choose an audio track",
+          "steps": "ffmpeg -i lecture.mp4 -map 0:a:1 -c:a aac -b:a 192k second-track.aac",
+          "limits": "The specifier 0:a:1 counts audio streams from zero; fails if the MP4 has fewer.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mp4-to-swf": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i clip.mp4 clip.swf",
+          "limits": "The .swf extension selects the SWF muxer; codecs are FFmpeg's defaults for it.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "FFmpeg: video only",
+          "steps": "ffmpeg -i clip.mp4 -an silent.swf",
+          "limits": "-an skips audio streams, so the SWF has no sound.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg: set the frame rate",
+          "steps": "ffmpeg -i clip.mp4 -r 15 slower.swf",
+          "limits": "As an output option, -r duplicates or drops frames to achieve a constant output frame rate.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "otf-to-svg": {
+      "methods": [
+        {
+          "app": "FontForge: export a glyph",
+          "steps": "File > Open the OTF, then in a glyph's outline view use File > Export and choose SVG.",
+          "limits": "Exports the splines of the current glyph, not the whole font.",
+          "source": "https://fontforge.org/docs/ui/menus/filemenu.html"
+        },
+        {
+          "app": "FontForge: SVG font",
+          "steps": "File > Open the OTF, then File > Generate Fonts and choose SVG font.",
+          "limits": "Writes an SVG font with contours for each glyph.",
+          "source": "https://fontforge.org/docs/ui/menus/filemenu.html",
+          "supportingSources": [
+            "https://fontforge.org/docs/ui/dialogs/generate.html"
+          ]
+        },
+        {
+          "app": "fontTools",
+          "steps": "fonttools pens.svgPathPen face.otf \"ABC\" > letters.svg",
+          "limits": "Draws paths for the characters you supply; it does not shape text.",
+          "source": "https://raw.githubusercontent.com/fonttools/fonttools/main/Lib/fontTools/pens/svgPathPen.py",
+          "supportingSources": [
+            "https://fonttools.readthedocs.io/en/latest/ttLib/ttFont.html",
+            "https://fonttools.readthedocs.io/en/latest/ttx.html"
+          ]
+        }
+      ]
+    },
+    "png-to-hdr": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick source.png destination.hdr",
+          "limits": "The format table lists PNG and HDR as readable and writable; the PNG gains no extra dynamic range.",
+          "source": "https://imagemagick.org/formats/",
+          "supportingSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        },
+        {
+          "app": "ImageMagick: format prefix",
+          "steps": "magick source.png HDR:destination.hdr",
+          "limits": "A format name before the file name selects the output format.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "ImageMagick and Radiance ra_ppm",
+          "steps": "magick source.png intermediate.ppm, then ra_ppm -r intermediate.ppm destination.hdr",
+          "limits": "-r converts a pixmap to a Radiance picture; ra_ppm applies a gamma of 2.2 by default, and -g and -e change gamma and exposure.",
+          "source": "https://radsite.lbl.gov/radiance/man_html/ra_ppm.1.html",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "ppm-to-jpg": {
+      "methods": [
+        {
+          "app": "Netpbm",
+          "steps": "pnmtojpeg -quality=90 image.ppm > image.jpg",
+          "limits": "Reads a Netpbm image and writes JFIF to standard output; -quality runs from 0 to 100.",
+          "source": "https://netpbm.sourceforge.net/doc/pnmtojpeg.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick image.ppm -quality 90 image.jpg",
+          "limits": "-quality sets the compression level for JPEG encoders.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "IrfanView",
+          "steps": "File > Open the PPM, then File > Save as and choose JPG.",
+          "limits": "IrfanView lists PPM and JPG as readable and savable.",
+          "source": "https://www.irfanview.com/faq.htm",
+          "supportingSources": [
+            "https://www.irfanview.com/main_formats.htm"
+          ]
+        }
+      ]
+    }
+  },
+  "formatFacts": {
+    "hevc": [
+      {
+        "fact": "HEVC is H.265, first published in 2013; profiles vary.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000530.shtml"
+      },
+      {
+        "fact": "VLC documents raw-HEVC and HEVC decoding; official release text inspected and saved as scratch/vlc3.txt.",
+        "source": "https://www.videolan.org/vlc/releases/3.0.0.html"
+      }
+    ],
+    "ico": [
+      {
+        "fact": "Icons can contain differently sized images and mask or graded transparency.",
+        "source": "https://netpbm.sourceforge.net/doc/winicontopam.html"
+      }
+    ],
+    "m2ts": [
+      {
+        "fact": "M2TS adds four bytes to 188-byte transport packets and may carry several stream types.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+      }
+    ],
+    "mkv": [
+      {
+        "fact": "Matroska organizes multimedia tracks and related elements.",
+        "source": "https://www.matroska.org/technical/basics.html"
+      }
+    ],
+    "mov": [
+      {
+        "fact": "MOV/QuickTime packaging is separate from encoded tracks; normal unfragmented files need complete metadata.",
+        "source": "https://ffmpeg.org/ffmpeg-formats.html"
+      },
+      {
+        "fact": "QuickTime wraps various media and uses atom-based structures; video/quicktime identifies movies.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000052.shtml"
+      }
+    ],
+    "mpeg": [
+      {
+        "fact": "MPEG-1/MPEG-2 program-stream writers are distinct from MPEG-4-family containers.",
+        "source": "https://ffmpeg.org/ffmpeg-formats.html"
+      }
+    ],
+    "mpg": [
+      {
+        "fact": "FFmpeg MPEG program-stream output uses the MPEG container family rather than a distinct MPG codec.",
+        "source": "https://ffmpeg.org/ffmpeg-formats.html"
+      }
+    ],
+    "mp4": [
+      {
+        "fact": "MP4 Part14 was standardized in 2003 and is an ISO base media subtype.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000155.shtml"
+      }
+    ],
+    "aac": [
+      {
+        "fact": "Standalone AAC can use ADTS; registered audio/aac also covers LATM/LOAS.",
+        "source": "https://www.iana.org/assignments/media-types/audio/aac"
+      }
+    ],
+    "swf": [
+      {
+        "fact": "SWF authoring can embed FLV or load external video; embedded H264 guides differ.",
+        "source": "https://helpx.adobe.com/animate/desktop/multimedia-and-video/add-video.html"
+      },
+      {
+        "fact": "Adobe Flash Player reached end of life and blocks content.",
+        "source": "https://www.adobe.com/products/flashplayer/end-of-life.html"
+      }
+    ],
+    "otf": [
+      {
+        "fact": "OpenType was jointly developed by Microsoft and Adobe and supports advanced typography.",
+        "source": "https://learn.microsoft.com/en-us/typography/opentype/"
+      }
+    ],
+    "svg": [
+      {
+        "fact": "SVG drawing may contain paths or embedded raster content.",
+        "source": "https://www.w3.org/TR/SVG2/"
+      }
+    ],
+    "png": [
+      {
+        "fact": "PNG has different color types and sample depths and uses lossless storage.",
+        "source": "https://www.w3.org/TR/png/"
+      }
+    ],
+    "hdr": [
+      {
+        "fact": "Greg Ward invented RGBE; three color bytes share an exponent.",
+        "source": "https://www.graphics.cornell.edu/~bjw/rgbe.html"
+      },
+      {
+        "fact": "The Radiance registered image type is image/vnd.radiance.",
+        "source": "https://www.iana.org/assignments/media-types/image/vnd.radiance"
+      }
+    ],
+    "ppm": [
+      {
+        "fact": "P6 binary and P3 plain forms differ; maximum values can reach65535 and image sequences are allowed.",
+        "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+      }
+    ],
+    "jpg": [
+      {
+        "fact": "JPEG output is lossy even at high quality settings.",
+        "source": "https://netpbm.sourceforge.net/doc/pnmtojpeg.html"
+      }
+    ]
+  },
+  "engineEvidence": {
+    "otf-to-svg": "Inspected read-only lib/convert/font-specimen.ts and magickBrowser.ts: font name, Latin cases, digits/punctuation, pangram16/24/32/48/64, grayscale black on white; SVG wraps raster; existing description agrees.",
+    "otherTools": "All ten generated tool engine sections and commands inspected; inherited current copy retained except unsupported HE-AAC marketing on MP4→AAC."
+  },
+  "sharedSheets": {
+    "svg": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json",
+    "png": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json",
+    "jpg": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json",
+    "hevc": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F07.json",
+    "mkv": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+    "mov": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+    "mp4": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+    "ico": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json",
+    "mpeg": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json",
+    "mpg": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json",
+    "m2ts": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F09.json",
+    "aac": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F04.json",
+    "swf": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F04.json",
+    "otf": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-05/apps/tools/content/sources/formats-F11.json",
+    "hdr": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-06/apps/tools/content/sources/formats-F06.json",
+    "ppm": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-06/apps/tools/content/sources/formats-F06.json",
+    "png/jpg/svg": "Read pilot format-guides.json background; coordinator01 sheets also available."
+  }
+}

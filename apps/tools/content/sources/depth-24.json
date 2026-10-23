@@ -1,0 +1,237 @@
+{
+  "tools": {
+    "png-to-txt": {
+      "methods": [
+        {
+          "app": "Tesseract",
+          "steps": "tesseract capture.png recognized -l eng",
+          "limits": "Needs Tesseract and the English language data installed; the output needs proofreading.",
+          "source": "https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html"
+        },
+        {
+          "app": "PowerToys Text Extractor",
+          "steps": "Display the PNG; Windows+Shift+T; drag over the text; paste the clipboard into a text editor and save as .txt.",
+          "limits": "Windows only; reads a screen region, not the file; the text may not be perfect and needs a quick proofread.",
+          "source": "https://learn.microsoft.com/en-us/windows/powertoys/text-extractor"
+        },
+        {
+          "app": "Preview and TextEdit",
+          "steps": "Open the PNG in Preview; drag to select the text; Control-click > Copy Text; paste into TextEdit; Format > Make Plain Text; save.",
+          "limits": "Live Text isn't available in all regions or languages.",
+          "source": "https://support.apple.com/guide/preview/interact-with-text-in-a-photo-prvw625a5b2c/mac",
+          "supportingSources": [
+            "https://support.apple.com/guide/textedit/create-open-and-convert-documents-txtee6663a0e/mac"
+          ]
+        }
+      ]
+    },
+    "ppt-to-png": {
+      "methods": [
+        {
+          "app": "Microsoft PowerPoint",
+          "steps": "Windows: select slide > File > Save As/Save a Copy > PNG > Save > Just This One or All Slides. Mac: Normal view > File > Export > File Format PNG > Save Current Slide Only (optional Width/Height) > Export.",
+          "limits": "Mac steps cover only the current slide; static images.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/save-a-slide-as-an-image-or-as-a-separate-presentation-file"
+        },
+        {
+          "app": "LibreOffice Impress",
+          "steps": "File > Open and select the PPT; File > Export; PNG as file type; Save; extra PNG options appear.",
+          "limits": "Export page does not describe the PNG options.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/simpress/01/01170000.html",
+          "supportingSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html"
+          ]
+        },
+        {
+          "app": "Apple Keynote",
+          "steps": "Open PPT; File > Export To > Images; choose an image format.",
+          "limits": "macOS only; source does not name PNG.",
+          "source": "https://support.apple.com/guide/keynote/export-to-powerpoint-or-another-file-format-tana0d19882a/mac",
+          "supportingSources": [
+            "https://support.apple.com/en-us/105050",
+            "https://support.apple.com/guide/keynote/open-or-close-a-presentation-tan72232b56/mac"
+          ]
+        }
+      ]
+    },
+    "tga-to-jpg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick texture.tga preview.jpg",
+          "limits": "Needs an ImageMagick build with TGA and JPEG support.",
+          "source": "https://imagemagick.org/formats/",
+          "supportingSources": [
+            "https://imagemagick.org/command-line-options/"
+          ]
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the TGA; File > Export As; enter a name ending in .jpg; Export; confirm the JPEG export options.",
+          "limits": "JPEG export supports no transparency or layers.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportingSources": [
+            "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/common/file-tga.c",
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ]
+        },
+        {
+          "app": "Pillow",
+          "steps": "from PIL import Image; Image.open(\"texture.tga\").convert(\"RGB\").save(\"preview.jpg\")",
+          "limits": "Needs Python and Pillow; the Targa must be converted to RGB before saving as JPEG.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportingSources": [
+            "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+          ]
+        }
+      ]
+    },
+    "wma-to-wav": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i archive.wma -vn -c:a pcm_s16le working.wav",
+          "limits": "16-bit PCM output; the source must be decodable; no DRM removal.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "MediaHuman Audio Converter",
+          "steps": "Add the WMA files; select the output format; click Start.",
+          "limits": "The product page lists WMA and WAV among the formats it converts but doesn't label input and output.",
+          "source": "https://www.mediahuman.com/audio-converter/"
+        },
+        {
+          "app": "Audacity with FFmpeg",
+          "steps": "Install the FFmpeg import library; open the unprotected WMA; File > Export Audio; choose WAV in Save as type; set the Encoding.",
+          "limits": "Protected audio is excluded.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportingSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html"
+          ]
+        }
+      ]
+    },
+    "wmv-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i lesson.wmv -c:a aac -c:v libx264 review.mov",
+          "limits": "Desktop defaults differ from this page's settings; the installed FFmpeg must decode WMV.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "arw-to-jpeg": {
+      "methods": [
+        {
+          "app": "Sony Imaging Edge Desktop",
+          "steps": "Open the image in Edit; Output icon or File > Output; enter file name, type, compression, color space and size; Save. Several: select in Viewer; Output icon or File > Export; set file settings; Continue.",
+          "limits": "Camera must be supported; raw development choices affect appearance.",
+          "source": "https://support.d-imaging.sony.co.jp/app/imagingedge/en/instruction/5_2_development.php"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick capture.arw delivery.jpeg; -define dng:use-camera-wb=true noted on the format page.",
+          "limits": "ARW listed as read-only (R), JPEG as read/write; build must support ARW.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "bin-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick identify suspect.bin; if a picture is recognized, magick suspect.bin recovered.png. Local test: PNG saved as .bin identified as PNG; random bytes gave no decode delegate.",
+          "limits": "Conditional image recognition only; arbitrary binary data is not decoded.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "GIMP after image identification",
+          "steps": "Copy with real extension; File > Open; File > Export As; edit Name field to recovered.png; Export.",
+          "limits": "Not a universal BIN decoder; identity and input support must be established first.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-open.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+          ]
+        },
+        {
+          "app": "Preview after image identification",
+          "steps": "Open a picture copy; File > Export; Format pop-up menu > PNG; name; Save.",
+          "limits": "macOS readable-image export only, not firmware or arbitrary binary conversion.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        }
+      ]
+    },
+    "dxf-to-png": {
+      "methods": [
+        {
+          "app": "LibreCAD",
+          "steps": "Open the drawing; File > Export (current drawing as CAM, pdf or image); PNG among supported bitmap formats.",
+          "limits": "Menu reference only; does not describe PNG options.",
+          "source": "https://docs.librecad.org/en/2.2.0_a/ref/menu.html"
+        },
+        {
+          "app": "QCAD Professional",
+          "steps": "dwg2bmp -o plan.png plan.dxf; converts a DXF or DWG file into a bitmap; -r pixels per drawing unit, -b background.",
+          "limits": "Command line tools ship with QCAD Professional.",
+          "source": "https://www.qcad.org/en/command-line-tools/"
+        }
+      ]
+    },
+    "gif-to-svg": {
+      "methods": [
+        {
+          "app": "Inkscape",
+          "steps": "File > Import the GIF; choose Embed (stores image inside the SVG); save as SVG. Optional: select the picture and Path > Trace Bitmap.",
+          "limits": "GIF animation unsupported on import; embedding does not create paths.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/1.3/import-pictures.html",
+          "supportingSources": [
+            "https://inkscape-manuals.readthedocs.io/en/1.3/import-other-formats.html",
+            "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html"
+          ]
+        },
+        {
+          "app": "LibreOffice Draw",
+          "steps": "Select bitmap; Shape > Convert > To Polygon; adjust dialog; File > Export, choose a graphics file type.",
+          "limits": "Export page lists SVG among types without an options dialog; polygon conversion is a vector approximation.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/simpress/guide/vectorize.html",
+          "supportingSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/00/00000200.html"
+          ]
+        }
+      ]
+    },
+    "heic-to-webp": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the HEIC; File > Export As; WebP in file-type list or name ending .webp; Export; WebP dialog: Lossless checkbox, image/alpha quality.",
+          "limits": "Requires HEIF import support; desktop settings differ from the page's fixed quality.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/file-webp-export.html",
+            "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick phone.heic published.webp",
+          "limits": "Format page: HEIC and WEBP are RW; HEIC requires libheif delegate, WEBP requires WEBP delegate.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "libheif",
+          "steps": "heif-dec phone.heic published.webp; format chosen from output suffix; README: JPEG, PNG, TIFF, WebP or Y4M.",
+          "limits": "WebP output requires a build with WebP support (HAVE_LIBWEBP); default WebP quality 75 in source.",
+          "source": "https://raw.githubusercontent.com/strukturag/libheif/master/examples/heif_dec.cc",
+          "supportingSources": [
+            "https://github.com/strukturag/libheif"
+          ]
+        }
+      ]
+    }
+  }
+}

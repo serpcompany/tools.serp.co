@@ -1,0 +1,802 @@
+{
+  "txt-to-svg": {
+    "seo": {
+      "title": "Convert TXT to SVG Online (Free)",
+      "h1": "TXT to SVG Converter",
+      "description": "Convert TXT to SVG in your browser: the text is drawn as a picture and wrapped in an SVG, so it is not editable text. Free, with no sign-up.",
+      "howToHeading": "How to convert TXT to SVG"
+    },
+    "tool": {
+      "subtitle": "Draw a text file as a picture inside an SVG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can I edit the words in the SVG afterward?",
+        "answer": "No. The SVG holds a picture of your text, not text objects, so you can't select or retype it. Edit the TXT and convert again."
+      },
+      {
+        "question": "Does enlarging the SVG keep it sharp?",
+        "answer": "No. The letters are pixels inside the SVG, not paths or text drawn from fonts, so enlarging the SVG does not redraw them any sharper."
+      },
+      {
+        "question": "How are long lines wrapped?",
+        "answer": "Lines break between words once they reach the picture's fixed width. A word too long for a line is broken inside the word."
+      },
+      {
+        "question": "Is there a limit on how much text fits?",
+        "answer": "Yes. Beyond a fixed number of lines the text is cut off, the final line names the line where it stopped, and the page tells you it was cut."
+      },
+      {
+        "question": "Why do my accented letters look wrong?",
+        "answer": "The page reads the file as UTF-8, or as UTF-16 when it starts with a byte order mark, and otherwise as Windows-1252. A file saved in another encoding shows the wrong characters, so save it as UTF-8 and try again."
+      },
+      {
+        "question": "Which font and colors does the picture use?",
+        "answer": "Black letters on white, set in DejaVu Sans with a margin around the text. Scripts that font lacks, such as Chinese or emoji, fall back to your browser's sans-serif font."
+      },
+      {
+        "question": "Does it handle Hebrew and Arabic?",
+        "answer": "Yes. When a line begins with a Hebrew or Arabic letter, it is drawn from right to left, and DejaVu Sans covers both scripts."
+      },
+      {
+        "question": "What happens to tabs and terminal colors?",
+        "answer": "Tabs stop every 4 characters. Other control characters and terminal color codes are dropped, so only the readable text is drawn."
+      }
+    ],
+    "aboutSection": {
+      "title": "TXT and SVG",
+      "fromFormat": {
+        "name": "TXT",
+        "fullName": "Plain text file",
+        "description": "Plain characters whose encoding must be interpreted before display.",
+        "details": [
+          "Plain character data",
+          "Encoding affects display",
+          "No page-layout instructions"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "A graphics document that can include both vector objects and pixel images.",
+        "details": [
+          "XML graphics document",
+          "Can embed raster images",
+          "Can represent vector objects"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting TXT to SVG",
+      "points": [
+        "The SVG encloses a PNG picture of your text, not selectable SVG text.",
+        "Long lines wrap, and a very long text is cut off with a notice drawn on the image.",
+        "Keep the TXT for searching, copying and later edits."
+      ]
+    },
+    "guide": {
+      "title": "TXT files and SVG output",
+      "markdown": "### What is a TXT file?\n\nPlain text is what a TXT file holds: characters with no fonts, styles or images. Any text editor opens it, which is why it turns up as notes, logs, readme files and configuration. It has no page layout either, so turning it into a graphic means choosing a font, a width and margins.\n\nThe one thing a TXT file does carry is a character encoding such as UTF-8. A receiving program reads the bytes through that encoding, so the same file can show correct text in one program and wrong characters in another.\n\n### Programs that open TXT files\n\n**Windows, Mac and Linux:**\n\n- Visual Studio Code opens and edits text files.\n- Vim edits plain text.\n\n**Mac:**\n\n- TextEdit works on plain text files. Converting rich text to plain text there removes its styles and formatting.\n\n### TXT and SVG compared\n\nA TXT file is text/plain, with no layout of its own. An SVG is XML with the type image/svg+xml, and it can describe shapes, text and embedded pixel images.\n\nThis page uses the embedded picture. It draws your text on a canvas in DejaVu Sans, black on white, at 16 px on 24 px lines with 32 px margins, wrapped at 800 px, and wraps the resulting PNG in an SVG. The SVG holds no text and no paths, so its words cannot be selected or searched.\n\n### Other ways to convert TXT to SVG\n\n- **LibreOffice Draw:** click the page, choose Insert > File, select the TXT and click Insert, then click OK in the Insert Text dialog. Choose File > Export, select SVG as the file type and save. SVG shows no options dialog on export.\n- **ImageMagick with Inkscape:** run `magick -size 800x -pointsize 16 caption:@note.txt note.png` to draw the text file as a PNG. Import the PNG into Inkscape with File > Import, choose the embed option and save the result as SVG. This also gives pixels, not text.\n\n### Problems with TXT files\n\n- **Strange characters**: the encoding was guessed wrongly. Save the file as UTF-8.\n- **Formatting disappeared**: plain text never held any. A TXT file keeps no formatting from a styled document.\n- **An image or table is missing**: a plain text file has no place to hold a picture or a table.\n"
+    }
+  },
+  "vob-to-mov": {
+    "seo": {
+      "title": "Convert VOB to MOV Online (Free)",
+      "h1": "VOB to MOV Converter",
+      "description": "Convert VOB to MOV in your browser: the DVD video is re-encoded as H.264 video with 96 kbps AAC sound. Free, no sign-up.",
+      "howToHeading": "How to convert VOB to MOV"
+    },
+    "tool": {
+      "subtitle": "Turn a DVD VOB file into a MOV with H.264 video and AAC sound, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert VOB to MOV?",
+        "answer": "Choose the VOB above and wait while it is re-encoded in your browser. The MOV downloads when it finishes. With several VOB files, every one gets converted separately and written as its own MOV."
+      },
+      {
+        "question": "Will my DVD menus come across?",
+        "answer": "No. The MOV is an ordinary video file, and the page does not recreate a DVD menu system."
+      },
+      {
+        "question": "Why does my MOV hold only part of the movie?",
+        "answer": "A single VOB is one piece of a disc, not always a whole title. Each VOB you choose becomes its own MOV and they are not joined, so pick the files you want and check the order."
+      },
+      {
+        "question": "Can I choose the audio language?",
+        "answer": "No. The page has no track selector, so FFmpeg's default stream choice decides which audio goes into the MOV."
+      },
+      {
+        "question": "What codecs are inside the MOV?",
+        "answer": "H.264 video and AAC sound at 96 kbps, with the index placed at the start of the file. The video uses a fast encoder preset and a fairly low quality setting, so it favors speed over fine detail."
+      },
+      {
+        "question": "What size and frame rate does the MOV have?",
+        "answer": "Both are kept up to the limits in the guide above. A frame already within the limits keeps its size, and a faster source has frames dropped but keeps its length. A video with an odd width or height comes out 1 pixel smaller, because dimensions round down to even values."
+      },
+      {
+        "question": "Is interlaced DVD video fixed?",
+        "answer": "Frames flagged as interlaced are deinterlaced by a filter before encoding. Progressive video passes through that step unchanged."
+      },
+      {
+        "question": "Will my editor open the MOV?",
+        "answer": "Only if it can decode H.264 and AAC, which are what the MOV holds. Among the programs that open MOV are QuickTime Player, Final Cut Pro, Adobe Premiere Pro and VLC."
+      }
+    ],
+    "aboutSection": {
+      "title": "VOB and MOV",
+      "fromFormat": {
+        "name": "VOB",
+        "fullName": "DVD Video Object",
+        "description": "DVD-Video media packaging that can contain picture, sound, and subpictures.",
+        "details": [
+          "DVD-Video media",
+          "Program-stream packaging",
+          "Can include multiple media streams"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "QuickTime media packaging whose playback requirements depend on its codecs.",
+        "details": [
+          "QuickTime container",
+          "Codec-dependent playback",
+          "Can carry sound and video"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting VOB to MOV",
+      "points": [
+        "This route creates H.264 video with AAC audio, rather than a DVD replica.",
+        "Frame size and frame rate are capped, and a smaller or slower video is never scaled up.",
+        "Check clip completeness and language selection against the source."
+      ]
+    },
+    "guide": {
+      "title": "VOB files and MOV output",
+      "markdown": "### What is a VOB file?\n\nVOB is the DVD Video Object. A DVD-Video disc keeps its video, sound, text overlays and menus inside VOB streams, which are based on the MPEG-2 program stream. A disc copy usually puts them in a VIDEO_TS folder next to companion IFO and BUP files, and a loose VOB does not replace that structure. A VOB file on a disc is limited to 1 GB, so a long film is split across several of them. People meet VOB files when ripping DVDs to files, and a disc can hold several titles, so choosing the wrong one gives the wrong clip.\n\n### Programs that open VOB files\n\n**Windows, Mac and Linux:**\n\n- VLC media player reads DVD-Video media and MPEG program streams.\n- HandBrake accepts VOB files as well as complete VIDEO_TS disc folders. Its input must be unprotected.\n\n### VOB and MOV compared\n\nA VOB is a DVD container with several audio and text-overlay streams, and some discs are encrypted with CSS. A MOV is Apple's QuickTime container, registered as video/quicktime, with the extension .mov or .qt. It holds video, audio, text and timecode tracks, and many codecs including H.264 and ProRes. The QuickTime format was the basis for the MPEG-4 file format, but MOV and MP4 are separate formats.\n\nThis page decodes the VOB and writes new H.264 video and AAC sound into a MOV, so it is not a copy of the DVD streams. Frames flagged as interlaced are deinterlaced. The picture may be 1920 px on its longer side at most, and the frame rate may be 30 fps at most.\n\n### Other ways to convert VOB to MOV\n\n- **FFmpeg, H.264 and AAC:** run `ffmpeg -i scene.vob -c:a aac -b:a 192k -c:v libx264 -crf 21 scene.mov` to re-encode both streams.\n- **FFmpeg, stream copy:** run `ffmpeg -i scene.vob -c copy scene-copy.mov`. Stream copy passes the packets through without decoding or encoding.\n- **FFmpeg, ProRes:** run `ffmpeg -i scene.vob -c:v prores_ks scene-edit.mov` to encode the video as ProRes, one of the codecs a MOV can hold.\n\n### Problems with VOB files\n\n- **The clip is too short**: you chose one segment, or the wrong title on a disc with several.\n- **No menus**: they are part of the DVD structure, which a loose VOB lacks.\n- **Overlays missing**: a player that plays MPEG-2 video can still skip the DVD text overlays, which can be bitmap images rather than text.\n- **A protected disc fails**: HandBrake does not process copy-protected DVD sources.\n"
+    }
+  },
+  "wav-to-opus": {
+    "seo": {
+      "title": "Convert WAV to OPUS Online (Free)",
+      "h1": "WAV to OPUS Converter",
+      "description": "Convert WAV to Opus in your browser: libopus writes a 128 kbps .opus file from your uncompressed recording. Free, with no sign-up.",
+      "howToHeading": "How to convert WAV to OPUS"
+    },
+    "tool": {
+      "subtitle": "Turn a WAV recording into a 128 kbps Opus file, encoded in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WAV to Opus?",
+        "answer": "Pick the WAV above and the .opus file downloads once it is encoded. If you add several WAV files, they are encoded in turn."
+      },
+      {
+        "question": "Which settings does the Opus file get?",
+        "answer": "The encoder is libopus, set to 128 kbps and compression level 4, with no controls to change either."
+      },
+      {
+        "question": "Is the Opus file lossless like my WAV?",
+        "answer": "No. WAV usually holds uncompressed PCM, while Opus is lossy and trades some detail for a compact file. You cannot get the WAV back from the Opus."
+      },
+      {
+        "question": "Is there a limit on WAV size?",
+        "answer": "The page puts no cap on length and has no timeout, so a long recording simply takes more time on your device. The WAV format itself stops at 4 GB."
+      },
+      {
+        "question": "Why does a player show 48 kHz for an Opus file?",
+        "answer": "Players report 48 kHz because Ogg Opus keeps its playback timing on that basis, which says nothing about how the WAV was recorded."
+      },
+      {
+        "question": "Is .opus the same as .ogg?",
+        "answer": "An .opus file commonly carries its audio inside an Ogg stream. The codec is Opus, and Ogg is the wrapper around it."
+      },
+      {
+        "question": "Will my player or service open Opus?",
+        "answer": "Not all do. Reading Vorbis in Ogg does not mean a program decodes Opus, so test one file first."
+      },
+      {
+        "question": "Is Opus good for voice recordings?",
+        "answer": "Yes. Opus was designed for both speech and music, including interactive communication, and low-bitrate speech recordings are a listed use."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and Opus",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "A RIFF-based audio format often used for PCM recordings.",
+        "details": [
+          "RIFF-based sound",
+          "Often contains PCM",
+          "Encoding can vary"
+        ]
+      },
+      "toFormat": {
+        "name": "OPUS",
+        "fullName": "Opus audio",
+        "description": "A lossy sound codec commonly stored in an Ogg Opus file.",
+        "details": [
+          "Lossy audio coding",
+          "Handles speech and music",
+          "Commonly packaged in Ogg"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WAV to OPUS",
+      "points": [
+        "Opus is lossy even when the WAV is uncompressed PCM.",
+        "The page has no setting for bitrate or compression level, so every file is encoded the same way.",
+        "Play the result before replacing the WAV, and keep the WAV if you need an exact copy."
+      ]
+    },
+    "guide": {
+      "title": "WAV files and OPUS output",
+      "markdown": "### What is a WAV file?\n\nThe Waveform Audio File Format (WAV) wraps sound in RIFF chunks and was documented by Microsoft and IBM in 1991. It usually holds uncompressed linear PCM, so files are large but exact. Compressed encodings can appear inside too. Broadcast WAVE extends it with production metadata, and the Library of Congress also recommends WAV for digital audio collections. People use it for recording, editing and professional sound production.\n\n### Programs that open WAV files\n\n**Windows, Mac and Linux:**\n\n- Audacity brings in most WAV files, all PCM variants included.\n- ffplay plays WAV, using the demuxer FFmpeg includes for it.\n\n**Mobile:**\n\n- Firefox for Android lists WAV among its supported audio types.\n- VLC for Android is a free mobile media player.\n- mpv for Android is the Android port linked by the mpv project.\n\n### WAV and Opus compared\n\nWAV is audio/wav or audio/x-wav and usually lossless, with a 4 GB file size limit. Opus is an open lossy codec from the IETF, defined in RFC 6716, which combines Skype's SILK and Xiph.Org's CELT. Ogg Opus supports descriptive metadata and seeking. Opus bitrates run from 6 to 510 kbit/s, it has low latency and it is royalty-free.\n\nHere FFmpeg in your browser runs libopus on the WAV's sound with a 128 kbps target and compression level 4. Any picture stream is dropped. Nothing in the page lets you change the sample rate, channels or tags.\n\n### Other ways to convert WAV to Opus\n\n- **opusenc:** run `opusenc --bitrate 128 take.wav take.opus` from the opus-tools. It reads Wave input and writes Ogg Opus, with the bitrate in kbit/s.\n- **FFmpeg:** run `ffmpeg -i take.wav -c:a libopus -b:a 128k take.opus`. The libopus encoder is a wrapper that requires --enable-libopus.\n- **Audacity:** choose File > Import > Audio and select the WAV. Then choose File > Export Audio, pick Opus as the format, name the file and export.\n\n### Problems with WAV files\n\n- **A recorder's WAV won't import**: it may use proprietary compression. Audacity recommends its FFmpeg library for such files.\n- **Very large recordings**: they may need RF64 instead of the original size fields.\n- **Tags differ**: INFO chunks and Broadcast WAVE store different information.\n"
+    }
+  },
+  "wma-to-m4a": {
+    "seo": {
+      "title": "Convert WMA to M4A Online (Free)",
+      "h1": "WMA to M4A Converter",
+      "description": "Convert WMA to M4A in your browser: the Windows Media audio is re-encoded as 192 kbps AAC in an M4A file. Free, with no sign-up.",
+      "howToHeading": "How to convert WMA to M4A"
+    },
+    "tool": {
+      "subtitle": "Turn a WMA audio file into an AAC M4A at 192 kbps, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WMA to M4A?",
+        "answer": "Pick the WMA above and FFmpeg re-encodes it as AAC in your browser. The M4A downloads when it is ready, and a batch is handled file by file."
+      },
+      {
+        "question": "What is inside the M4A?",
+        "answer": "AAC audio at 192 kbps, in an MPEG-4 container. M4A can also hold Apple Lossless, but this page writes AAC."
+      },
+      {
+        "question": "Is the M4A lossless?",
+        "answer": "No. AAC is lossy, so this is a new lossy encode of the decoded WMA. Even a WMA Lossless file ends up as lossy AAC."
+      },
+      {
+        "question": "Which name does the new file get?",
+        "answer": "The new file is named like the WMA but ends in .m4a, and the WMA itself is left alone."
+      },
+      {
+        "question": "Will every WMA file convert?",
+        "answer": "Only if FFmpeg can decode its variant. WMA has standard, Professional, Lossless and Voice codecs, and the extension doesn't say which one you have."
+      },
+      {
+        "question": "Does the cover picture come across?",
+        "answer": "No. The conversion leaves out picture streams, so the M4A carries the sound only."
+      },
+      {
+        "question": "Will the sound be better than the WMA?",
+        "answer": "No. A second lossy pass cannot add detail that the WMA already lost."
+      },
+      {
+        "question": "Can I just rename .wma to .m4a?",
+        "answer": "No. Renaming changes only the name. The data is still ASF with WMA audio, not an MPEG-4 file."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMA and M4A",
+      "fromFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "ASF-packaged audio from a Microsoft codec family with several variants.",
+        "details": [
+          "Microsoft audio family",
+          "Usually ASF packaging",
+          "Includes lossless variants"
+        ]
+      },
+      "toFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "MPEG-4 audio packaging that can contain AAC or Apple Lossless.",
+        "details": [
+          "MPEG-4 audio container",
+          "Can carry AAC",
+          "Can carry ALAC"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WMA to M4A",
+      "points": [
+        "The M4A contains AAC requested at 192 kbps, rather than ALAC.",
+        "A WMA Lossless file becomes a lossy copy with this encoder choice.",
+        "Picture streams, such as cover art, are left out of the M4A."
+      ]
+    },
+    "guide": {
+      "title": "WMA files and M4A output",
+      "markdown": "### What is a WMA file?\n\nMicrosoft's Windows Media Audio is a family of codecs, kept in the ASF container. The .wma extension separates audio-only files from other ASF content. Variants include standard, Professional, Lossless and Voice, and WMA 9 supports variable bit rate. The usual media type is audio/x-ms-wma. People use it for delivering music and sometimes for intermediate audio storage.\n\n### Programs that open WMA files\n\n**Windows, Mac and Linux:**\n\n- VLC media player supports ASF/WMA input and carries multiple Windows Media Audio decoders.\n- Audacity can read unprotected WMA, provided the optional FFmpeg library is added.\n- FFmpeg's support matrix covers decoding the WMA 1 and WMA 2 codecs, as well as Pro, Voice and Lossless.\n\n**Windows:**\n\n- Adobe Audition imports WMA only with DLMS Format Support switched on.\n\n### WMA and M4A compared\n\nWMA is a codec family, lossy except for the Lossless variant. Apple adopted the M4A extension, used for MPEG-4 files with audio only, for its unprotected music files. Most M4A files contain AAC, a lossy codec defined in MPEG-4 Part 3 that aims for better sound than MP3 at a comparable bitrate. Apple used it for songs sold through iTunes. The media type is audio/mp4. Android plays AAC in .m4a files, and the major browsers play AAC inside MP4.\n\nThis page decodes the WMA and encodes AAC at 192 kbps with FFmpeg in your browser. Picture streams are left out.\n\n### Other ways to convert WMA to M4A\n\n- **FFmpeg, AAC:** run `ffmpeg -i library.wma -vn -c:a aac -b:a 192k listening.m4a`. The `-vn` flag drops video streams, and the output is encoded afresh with loss.\n- **Audacity:** with the optional FFmpeg library installed, open the WMA and use File > Export Audio with the M4A(AAC) Files FFmpeg format.\n\n### Problems with WMA files\n\n- **Audacity can't import it**: the optional FFmpeg library is missing, or the file is protected.\n- **One program plays it, another doesn't**: an application may decode one WMA codec yet fail on another, because the .wma name does not reveal the variant inside.\n- **A protected file**: Audacity cannot import protected WMA through its FFmpeg library.\n- **Check the result**: play the M4A before deleting the WMA, since AAC discards detail from the decoded sound.\n"
+    }
+  },
+  "wpg-to-jpg": {
+    "seo": {
+      "title": "Convert WPG to JPG Online (Free)",
+      "h1": "WPG to JPG Converter",
+      "description": "Convert WPG to JPG in your browser: ImageMagick reads the WordPerfect graphic's bitmap records and saves a JPG. Free, with no sign-up, no upload.",
+      "howToHeading": "How to convert WPG to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a WordPerfect WPG graphic into a JPG picture, read by ImageMagick in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WPG to JPG?",
+        "answer": "Choose the WPG above. ImageMagick reads it in your browser and the JPG downloads when it is done. A batch is converted in turn, one JPG per WPG."
+      },
+      {
+        "question": "Why is part of my WPG drawing missing?",
+        "answer": "A WPG can hold vector objects, bitmap data or both. The reader here draws bitmap records and skips vector ones, so a drawing made only of lines and shapes can't be converted here. Export a JPG from CorelDRAW or LibreOffice Draw for those."
+      },
+      {
+        "question": "Can I set the JPG quality?",
+        "answer": "No. There is no quality control, and none is passed to the encoder."
+      },
+      {
+        "question": "Will see-through areas survive in the JPG?",
+        "answer": "No. JPG cannot store alpha transparency, so transparent areas of the picture cannot be kept."
+      },
+      {
+        "question": "Which name does the JPG get?",
+        "answer": "The JPG takes the WPG's base name with .jpg on the end, and the WPG stays as it was."
+      },
+      {
+        "question": "What was WPG used for?",
+        "answer": "WordPerfect documents used it for clip art, and offices kept legacy graphics in it."
+      },
+      {
+        "question": "What opens a WPG besides this page?",
+        "answer": "XnView MP and ImageMagick read WPG files, and CorelDRAW and Corel PHOTO-PAINT import them."
+      },
+      {
+        "question": "Can I get the vectors back from the JPG?",
+        "answer": "No. The JPG is a picture made of pixels. Keep the WPG if you need to edit the drawing."
+      }
+    ],
+    "aboutSection": {
+      "title": "WPG and JPG",
+      "fromFormat": {
+        "name": "WPG",
+        "fullName": "WordPerfect Graphics",
+        "description": "A WordPerfect graphics format that can combine vector and bitmap material.",
+        "details": [
+          "WordPerfect graphics",
+          "Vector and bitmap content",
+          "Requires a compatible reader"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format suited to sharing a flattened illustration.",
+        "details": [
+          "Lossy JPEG picture",
+          "Fixed pixel dimensions",
+          "No alpha channel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WPG to JPG",
+      "points": [
+        "Only the bitmap records of a WPG are drawn, and vector records are skipped.",
+        "A JPG is a lossy raster picture with no alpha channel.",
+        "Open the JPG next to the original drawing to see what was left out."
+      ]
+    },
+    "guide": {
+      "title": "WPG files and JPG output",
+      "markdown": "### What is a WPG file?\n\nWPG means WordPerfect Graphics, the graphics format of the WordPerfect word processor. It belongs to the WordPerfect graphics family and was used for clip art and legacy office graphics. Its files may hold vector drawing objects, bitmap data or both, and Corel describes a palette of up to 256 selected colors. Corel separates version 1.0, which targets WordPerfect 5.1 and earlier, from version 2.0, which targets WordPerfect 6 and newer.\n\n### Programs that open WPG files\n\n**Windows, Mac and Linux:**\n\n- ImageMagick can read WPG images.\n- XnView MP reads WPG too, and private or educational use costs nothing.\n\n**Windows:**\n\n- CorelDRAW imports WPG drawings through File > Import.\n- Corel PHOTO-PAINT can open a WPG as a new image or bring it into one that is already open.\n\n### WPG and JPG compared\n\nA WPG may be vector or raster. A JPG is a lossy raster format for photographs, defined by ISO/IEC 10918-1, with no alpha channel, and .jpg and .jpeg are the same format. Any vector structure is lost in the move to JPG.\n\nHere ImageMagick, running in your browser, reads one image from the WPG and writes the JPG. Only the bitmap records are drawn, and vector records are skipped. The page passes no quality setting. Beyond roughly 537 megapixels the picture is declined as too big. A batch gives one JPG per WPG.\n\n### Other ways to convert WPG to JPG\n\n- **CorelDRAW:** choose File > Import, select the WPG file type, click Import and click the page to place it. Then choose File > Export, pick JPG in the Save as type list and click Export. Corel lists limitations for WPG import.\n- **LibreOffice Draw:** open the WPG, which Draw lists among its graphics formats, then choose File > Export and pick JPEG.\n- **ImageMagick:** run `magick illustration.wpg illustration.jpg`. ImageMagick lists WPG as a format it reads.\n\n### Problems with WPG files\n\n- **Elements missing after import**: CorelDRAW keeps embedded WMF and EMF graphics but can discard other embedded elements, and it documents that Graphics Text Type 2 is not supported.\n- **Wrong version**: WPG 2.0 is not suitable when the destination needs WordPerfect 5.1 compatibility.\n- **This page can't convert the drawing**: it was made only of vector objects, which the reader here skips. Export from CorelDRAW or LibreOffice Draw instead.\n"
+    }
+  },
+  "xcf-to-svg": {
+    "seo": {
+      "title": "Convert XCF to SVG Online (Free)",
+      "h1": "XCF to SVG Converter",
+      "description": "Convert XCF to SVG in your browser: the GIMP image becomes one picture wrapped in an SVG, not vector paths. Free, with no sign-up.",
+      "howToHeading": "How to convert XCF to SVG"
+    },
+    "tool": {
+      "subtitle": "Wrap a GIMP XCF image as a picture inside an SVG, read by ImageMagick in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will the SVG contain vectors or my GIMP paths?",
+        "answer": "No. The SVG holds one embedded PNG picture, stored as base64. Paths, layers and selections from the XCF are not written into it."
+      },
+      {
+        "question": "What happens to my layers?",
+        "answer": "You get a single picture, not one file per layer, and no layer data in the SVG. Keep the XCF for editing."
+      },
+      {
+        "question": "Will it scale like a normal SVG?",
+        "answer": "No. The picture is pixels inside the SVG, so enlarging the SVG does not redraw it any sharper."
+      },
+      {
+        "question": "Will it look exactly like GIMP shows it?",
+        "answer": "Not necessarily. ImageMagick reads XCF, but you shouldn't assume it reproduces every GIMP feature."
+      },
+      {
+        "question": "How do I get my paths out as SVG?",
+        "answer": "In GIMP, open the Paths dialog, right-click the path and choose Export Paths. GIMP saves the path itself in SVG format, which Inkscape can import."
+      },
+      {
+        "question": "Can I turn the picture into real vector shapes?",
+        "answer": "Not on this page. You can export a PNG from GIMP, import it into Inkscape and use Path > Trace Bitmap, but the trace only approximates the picture."
+      },
+      {
+        "question": "What is the SVG file called?",
+        "answer": "It keeps the XCF's name with .svg in place of .xcf. Your original file is not changed."
+      },
+      {
+        "question": "How do I convert XCF to SVG?",
+        "answer": "Choose the XCF above. The SVG downloads when ImageMagick has read it, and several files run one after another."
+      }
+    ],
+    "aboutSection": {
+      "title": "XCF and SVG",
+      "fromFormat": {
+        "name": "XCF",
+        "fullName": "GIMP image",
+        "description": "GIMP working data with layers and other image-editing structures.",
+        "details": [
+          "GIMP working format",
+          "Stores image layers",
+          "Stores saved paths"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "A graphics document whose contents may be shapes, text, or embedded pixels.",
+        "details": [
+          "XML graphics document",
+          "Can embed raster images",
+          "Can represent vector objects"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting XCF to SVG",
+      "points": [
+        "The output is an SVG containing a PNG picture, not traced vector shapes.",
+        "Saved GIMP paths can be exported separately when geometry is the goal.",
+        "Keep the XCF for layer editing."
+      ]
+    },
+    "guide": {
+      "title": "XCF files and SVG output",
+      "markdown": "### What is an XCF file?\n\nGIMP, the GNU Image Manipulation Program, saves its working images as XCF. It keeps layers, channels, paths and selections so an image can be edited again, and it retains transparency rather than only a flattened picture. The undo history is not saved. GIMP's Save writes XCF, while other formats go through Export, and GIMP does not position XCF as an interchange format.\n\n### Programs that open XCF files\n\n**Windows, Mac and Linux:**\n\n- GIMP is the native project editor and preserves the working image when saved as XCF.\n- ImageMagick reads XCF, though you should not assume third-party rendering reproduces every GIMP feature.\n\n### XCF and SVG compared\n\nAn XCF is a layered, lossless working file. An SVG is an XML vector format with the type image/svg+xml, though it can also embed pixel images.\n\nThis page reads one picture from the XCF with ImageMagick and embeds it in an SVG as a PNG, so no paths are created and nothing in the SVG can be edited as a shape. Layers are not written out one by one. The page turns away anything above about 537 megapixels. A batch of XCF files is processed in turn, one SVG per file.\n\n### Other ways to convert XCF to SVG\n\n- **GIMP path export:** open the XCF in GIMP, choose Windows > Dockable Dialogs > Paths, right-click the path you want and pick Export Paths, then save the file. GIMP saves the path in SVG format.\n- **GIMP and Inkscape wrapper:** in GIMP choose File > Export As and export a PNG. Open Inkscape, bring the PNG in through File > Import with embed selected, and save it as SVG. The result keeps pixels instead of vector shapes.\n- **GIMP and Inkscape tracing:** export the picture as PNG in GIMP and import it into Inkscape. With the Selector tool on the image, open Path > Trace Bitmap, adjust the options, preview with Update and accept with Ok. Expect the trace to differ from the original.\n\n### Problems with XCF files\n\n- **A viewer can't open it**: most ordinary image viewers cannot read XCF, so export a display copy from GIMP.\n- **Flattened exports lose layers**: a flattened export cannot carry every project property, so the XCF is the file to edit later.\n- **A save warning after export**: an export leaves the XCF itself unsaved, so GIMP may still ask about saving on close.\n- **Rendering differs from GIMP**: another program that reads XCF may not reproduce every GIMP feature.\n"
+    }
+  },
+  "aac-to-flac": {
+    "seo": {
+      "title": "Convert AAC to FLAC Online (Free)",
+      "h1": "AAC to FLAC Converter",
+      "description": "Convert AAC to FLAC in your browser: the audio is decoded and stored losslessly, but it can't regain detail AAC removed. Free, no sign-up.",
+      "howToHeading": "How to convert AAC to FLAC"
+    },
+    "tool": {
+      "subtitle": "Store an AAC audio file as FLAC, decoded in your browser. The FLAC can be larger."
+    },
+    "faqs": [
+      {
+        "question": "Will the FLAC sound better than the AAC?",
+        "answer": "No. FLAC keeps every sample it is given, but the AAC had already lost detail, and converting cannot recreate it."
+      },
+      {
+        "question": "Why is the FLAC bigger than the AAC?",
+        "answer": "The AAC was compressed with loss, and FLAC stores the decoded audio without loss, so the file can be much larger."
+      },
+      {
+        "question": "Can I choose a FLAC compression level?",
+        "answer": "No. The page has no settings and runs a single FFmpeg command."
+      },
+      {
+        "question": "Does an .aac file work, or do I need .m4a?",
+        "answer": "The file picker offers .aac files. A standalone .aac usually carries ADTS framing, and renaming it to .m4a does not wrap it in an MP4 container."
+      },
+      {
+        "question": "Does a cover picture come along?",
+        "answer": "No. The command leaves out picture streams, so the FLAC holds the sound only."
+      },
+      {
+        "question": "Why convert AAC to FLAC at all?",
+        "answer": "FLAC is lossless, so it keeps the AAC's decoded sound as it is, though it cannot bring back the recording the AAC came from."
+      },
+      {
+        "question": "What name does the FLAC get?",
+        "answer": "The FLAC uses the AAC's base name with .flac on the end, and the AAC stays untouched."
+      },
+      {
+        "question": "How do I convert AAC to FLAC?",
+        "answer": "Pick the AAC above and FFmpeg decodes it in your browser, then the FLAC downloads. A batch is processed file by file."
+      }
+    ],
+    "aboutSection": {
+      "title": "AAC and FLAC",
+      "fromFormat": {
+        "name": "AAC",
+        "fullName": "Advanced Audio Coding",
+        "description": "A lossy audio coding family often used in standalone ADTS transport files.",
+        "details": [
+          "Lossy audio coding",
+          "Different coding profiles",
+          "Often uses ADTS framing"
+        ]
+      },
+      "toFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "Lossless audio compression that can retain the decoded recording.",
+        "details": [
+          "Lossless audio compression",
+          "Preserves decoded samples",
+          "Does not restore earlier losses"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AAC to FLAC",
+      "points": [
+        "FLAC preserves the decoded AAC sound without restoring what AAC removed.",
+        "Picture streams are dropped, so only the sound goes into the FLAC.",
+        "The page has no settings, so there is no compression level to choose."
+      ]
+    },
+    "guide": {
+      "title": "AAC files and FLAC output",
+      "markdown": "### What is an AAC file?\n\nAdvanced Audio Coding, or AAC, is a lossy, perceptual audio coding family standardized through MPEG. It is specified in MPEG-2 Part 7 and placed in MPEG-4 Part 3. AAC can sit in MP4, QuickTime or other wrappers, and a standalone .aac file commonly carries ADTS framing. The media type audio/aac covers ADTS and LATM/LOAS transport. LC, HE-AAC and HE-AAC v2 are among its profiles, and it serves streaming and delivery to listeners.\n\n### Programs that open AAC files\n\n**Windows, Mac and Linux:**\n\n- VLC media player reads raw AAC files and decodes MPEG-4 AAC.\n- FFmpeg decodes AAC and also has its own AAC encoder.\n\n**Windows and Mac:**\n\n- Adobe Audition imports AAC, including HE-AAC.\n\n### AAC and FLAC compared\n\nFLAC squeezes integer PCM audio and throws no samples away. It supports one through eight channels, carries metadata such as seek points, pictures and Vorbis comments, and uses the audio/flac media type. RFC 9639 standardized its description in December 2024. FLAC is an open, royalty-free codec developed by Xiph.Org, and people use it for music archiving, audiophile listening and lossless backups of CDs.\n\nThis page decodes the AAC and writes FLAC with FFmpeg in your browser, without a picture stream. The FLAC is lossless only from the point of decoding. The page has no settings, and a batch yields one FLAC per AAC.\n\n### Other ways to convert AAC to FLAC\n\n- **FFmpeg:** run `ffmpeg -i speech.aac -vn -c:a flac speech-decoded.flac`. With `-vn` no video stream is written, and `-c:a flac` picks the FLAC encoder.\n- **VLC:** choose Media > Convert/Save, add the AAC, click Convert, pick the Audio - FLAC profile, set a .flac destination and click Start.\n\n### Problems with AAC files\n\n- **The sound is not as good as hoped**: a lossy AAC already lost detail, and changing it to FLAC cannot recreate the samples that were removed.\n- **A decoder rejects it**: an MPEG-2 AAC decoder may not follow the MPEG-4 variants.\n- **Renaming did nothing**: giving the file an .m4a name leaves the ADTS framing as it was; no MP4 wrapper appears.\n- **The decoded file is much larger**: once decoded, the audio can need far more space than the compressed original did.\n"
+    }
+  },
+  "ai-to-tiff": {
+    "seo": {
+      "title": "Convert AI to TIFF Online (Free)",
+      "h1": "AI to TIFF Converter",
+      "description": "Convert AI to TIFF in your browser: each page of the PDF inside your Illustrator file becomes its own TIFF on a white background. Free.",
+      "howToHeading": "How to convert AI to TIFF"
+    },
+    "tool": {
+      "subtitle": "Render each page of the PDF inside an Illustrator AI file as a separate TIFF."
+    },
+    "faqs": [
+      {
+        "question": "Why does the page say my AI has no PDF inside?",
+        "answer": "This page renders the PDF stream stored in the AI. A file saved without PDF compatibility has none, so it fails with that message. Resave it from Illustrator with the Create PDF Compatible File option enabled."
+      },
+      {
+        "question": "Will the TIFF keep my editable paths and text?",
+        "answer": "No. Each page is drawn into a picture of pixels, and layers and vectors are flattened. Keep the AI if you need to edit the artwork."
+      },
+      {
+        "question": "Do several pages become one multipage TIFF?",
+        "answer": "No. Every page becomes its own TIFF, named like name_page1 and name_page2, and there is no ZIP."
+      },
+      {
+        "question": "Does a big artboard come out at full size?",
+        "answer": "Not always. Each page is drawn larger than its artboard, but an oversized artboard is reduced to stay inside a size limit."
+      },
+      {
+        "question": "Is the background transparent?",
+        "answer": "No. The background is opaque white."
+      },
+      {
+        "question": "Is this a print-resolution file?",
+        "answer": "The page offers no resolution setting. When a printer specifies dpi or a color model, export from Illustrator instead."
+      },
+      {
+        "question": "Can I export only some artboards?",
+        "answer": "No. Every page of the file is rendered, so delete the pages you don't need afterwards."
+      },
+      {
+        "question": "What happens to an old AI file with no PDF inside?",
+        "answer": "Files saved before Illustrator 9 are PostScript and have no PDF inside, so the page refuses them with the same message."
+      }
+    ],
+    "aboutSection": {
+      "title": "AI and TIFF",
+      "fromFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "Illustrator working artwork that can include a PDF-compatible rendition.",
+        "details": [
+          "Illustrator artwork",
+          "Can retain editable objects",
+          "Optional PDF compatibility"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster-image format used in imaging and page-layout workflows.",
+        "details": [
+          "Raster image format",
+          "Multiple compression choices",
+          "Different color representations"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AI to TIFF",
+      "points": [
+        "The file needs a PDF-compatible rendition inside it.",
+        "Every page becomes its own raster download.",
+        "Export from Illustrator when you need a chosen print resolution or color model."
+      ]
+    },
+    "guide": {
+      "title": "AI files and TIFF output",
+      "markdown": "### What is an AI file?\n\nAI is Adobe Illustrator's native artwork format. Inside it sit vector paths, shapes, text and effects arranged in layers and artboards, and pixel images can sit among the vector objects. Illustrator 9 changed the format in 2000, and earlier files used PostScript. This page reads the PDF rendition that the PDF-compatible saving option stores next to the Illustrator data. Logos, illustrations and print layouts are typical AI source files.\n\n### Programs that open AI files\n\n**Windows, Mac and Linux:**\n\n- ImageMagick reads AI as Illustrator CS2. That is rendering, not Illustrator editing.\n\n**Windows and Mac:**\n\n- Adobe Illustrator opens native artwork with its editable objects.\n\n**Linux:**\n\n- Inkscape imports AI artwork from Illustrator 9.0 onward, and some document features may be unavailable.\n\n### AI and TIFF compared\n\nTIFF is a tag-based raster wrapper developed by Aldus and Microsoft. Revision 6.0 appeared in 1992, and Adobe now controls the specification. Compression methods and color representations vary between TIFFs, and one file can hold several images, as in a scanned page sequence. Its extensions are .tif and .tiff, with the media type image/tiff.\n\nHere PDF.js draws each page of the PDF inside the AI, and the pixels are written as a TIFF on an opaque white background. Each page is drawn at up to double its size, and a very large artboard is scaled down to stay within a pixel budget of about 16.8 megapixels. Every page is a separate file with no ZIP, named name_page1, name_page2 and so on. You can choose several AI files at once, and they run one after another. The page sets no print resolution, so artwork meant for a printer's dpi spec should be exported from Illustrator. A file with no PDF inside fails with a message telling you to resave it with Create PDF Compatible File turned on.\n\n### Other ways to convert AI to TIFF\n\n- **ImageMagick:** run `magick -density 300 artwork.ai artwork.tiff`. The -density option sets the canvas resolution used when a vector format is rendered to a raster image.\n\n### Problems with AI files\n\n- **No PDF inside**: other software can fail on an AI that lacks its PDF-compatible representation. Resave it from Illustrator with that option on.\n- **Not editable afterwards**: reading the embedded PDF gives no native Illustrator objects, so the AI stays your editable master.\n- **Missing links**: a linked image stays outside the file unless Include Linked Files was ticked when saving, so the TIFF can lack it.\n- **Older Illustrator versions**: opening artwork in an older version can cause compatibility problems, so match or exceed the saving version.\n- **Blurry when enlarged**: the TIFF is pixels, so render again at the size you need.\n- **Layers are gone**: the TIFF is flattened.\n"
+    }
+  },
+  "aiff-to-m4a": {
+    "seo": {
+      "title": "Convert AIFF to M4A Online (Free)",
+      "h1": "AIFF to M4A Converter",
+      "description": "Convert AIFF to M4A in your browser: FFmpeg re-encodes your uncompressed audio as 192 kbps AAC, a much smaller lossy file. Free, no sign-up.",
+      "howToHeading": "How to convert AIFF to M4A"
+    },
+    "tool": {
+      "subtitle": "Re-encode AIFF audio as a 192 kbps AAC M4A in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the M4A lossless?",
+        "answer": "No. The page encodes AAC, which is lossy. M4A can also hold Apple Lossless, but that is not what is written here."
+      },
+      {
+        "question": "Can I pick the AAC bitrate?",
+        "answer": "No. The page encodes AAC at a fixed bitrate and has nothing to adjust."
+      },
+      {
+        "question": "What name does the M4A get?",
+        "answer": "The M4A is named like the AIFF but ends in .m4a, and the AIFF stays untouched."
+      },
+      {
+        "question": "Should I keep the AIFF?",
+        "answer": "Yes if you may edit the recording again. The M4A is a compressed listening copy and the AIFF still holds the original samples."
+      },
+      {
+        "question": "Will a higher bitrate fix a bad recording?",
+        "answer": "The page offers no higher setting, and AAC cannot repair clipping or noise already in the AIFF."
+      },
+      {
+        "question": "Is my file uploaded?",
+        "answer": "No. The AIFF is converted inside your browser and never leaves your device."
+      },
+      {
+        "question": "Does the page need FFmpeg on my computer?",
+        "answer": "No. FFmpeg runs inside the page in your browser, so nothing is installed on your computer."
+      },
+      {
+        "question": "Can I convert more than one AIFF in a go?",
+        "answer": "Yes. Select several files together and the page produces a separate M4A for each, working through them one by one."
+      }
+    ],
+    "aboutSection": {
+      "title": "AIFF and M4A",
+      "fromFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "Chunk-organized audio commonly carrying uncompressed PCM samples.",
+        "details": [
+          "Chunk-based sound",
+          "Commonly PCM",
+          "Stores sample information"
+        ]
+      },
+      "toFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "MPEG-4 audio packaging used for AAC as well as Apple Lossless.",
+        "details": [
+          "MPEG-4 audio container",
+          "Can carry AAC",
+          "Can carry ALAC"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AIFF to M4A",
+      "points": [
+        "This M4A uses lossy AAC, not Apple Lossless.",
+        "Keep the AIFF when exact sample preservation matters.",
+        "Check tags and channel layout in the app that will play the M4A."
+      ]
+    },
+    "guide": {
+      "title": "AIFF files and M4A output",
+      "markdown": "### What is an AIFF file?\n\nApple developed the Audio Interchange File Format in 1988 on top of the IFF container. It usually stores uncompressed PCM audio, so it is lossless and large, with metadata chunks. It serves for macOS audio production and professional sound editing.\n\n### Programs that open AIFF files\n\n**Windows, Mac and Linux:**\n\n- Audacity brings in AIFF recordings, every PCM variant included, with no extra library.\n- VLC media player opens AIFF.\n- FFmpeg includes both AIFF encoding and decoding.\n\n**Windows and Mac:**\n\n- Adobe Audition opens uncompressed AIFF and most compressed variants.\n\n**Mac:**\n\n- Apple Music and Logic Pro open it.\n\n### AIFF and M4A compared\n\nAn M4A is audio only, stored in the MPEG-4 container. It usually holds AAC, or lossless Apple Lossless (ALAC), and it supports tags and cover art. It is widely supported, and is the usual form for podcasts and music from the Apple stores.\n\nFFmpeg runs in your browser here with `-acodec aac -b:a 192k -vn`, which writes AAC at 192 kbps and drops any video stream. The result is lossy and far smaller than the AIFF. Choose several AIFF files and each is encoded in turn into a separate M4A. No sample rate or channel setting is passed, so there is no control for either. Before you delete the AIFF, play the M4A through once, because AAC discards some detail.\n\n### Other ways to convert AIFF to M4A\n\n- **FFmpeg:** run `ffmpeg -i master.aiff -c:a aac -b:a 192k listening-from-aiff.m4a`.\n- **Audacity:** after installing the optional FFmpeg library, open the AIFF, then File > Export Audio and M4A (AAC) Files (FFmpeg). Its AAC export has a quality setting for the bit rate.\n\n### Problems with AIFF files\n\n- **A huge file**: PCM audio takes up space by design, so size alone does not mean damage.\n- **Lossless is required**: AAC discards detail, so keep the AIFF as the master.\n- **Tracks sound different**: AAC is lossy, so compare the M4A with the AIFF before deleting anything.\n- **You need an editable file**: edit the AIFF first and convert last.\n- **Metadata**: AIFF carries metadata chunks, so look at the tags in your player after converting.\n"
+    }
+  },
+  "avi-to-m4v": {
+    "seo": {
+      "title": "Convert AVI to M4V Online (Free)",
+      "h1": "AVI to M4V Converter",
+      "description": "Convert AVI to M4V in your browser: the video is re-encoded as H.264 video with AAC sound in an MP4-style container. Free, no sign-up.",
+      "howToHeading": "How to convert AVI to M4V"
+    },
+    "tool": {
+      "subtitle": "Re-encode an AVI video as an H.264 and AAC M4V in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does it just copy the video into an M4V?",
+        "answer": "No. The video is encoded afresh to H.264 and the sound to AAC. Nothing is copied unchanged, so the conversion takes as long as an encode does."
+      },
+      {
+        "question": "Is M4V different from MP4?",
+        "answer": "Apple's M4V is very close to MP4. What you download is H.264 video and AAC sound inside an MPEG-4 container."
+      },
+      {
+        "question": "What happens to a video larger than the size limit?",
+        "answer": "The picture shrinks to fit, with its shape kept. Smaller videos keep their size."
+      },
+      {
+        "question": "Will a high frame rate stay as it is?",
+        "answer": "No. The output caps the frame rate, so a faster video has frames dropped but keeps its length."
+      },
+      {
+        "question": "Why did my video lose a pixel?",
+        "answer": "Each dimension drops to the nearest even value below it, which makes an odd size such as 641 px come out 1 px smaller."
+      },
+      {
+        "question": "How good is the quality?",
+        "answer": "The encode favors speed and small files over fine detail, so for more detail use FFmpeg with a lower CRF setting."
+      },
+      {
+        "question": "Is interlaced video handled?",
+        "answer": "Yes. A deinterlacing filter, yadif, runs on frames flagged as interlaced."
+      },
+      {
+        "question": "Is my AVI changed by the conversion?",
+        "answer": "No. The page writes a new M4V and leaves the AVI as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVI and M4V",
+      "fromFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A RIFF-based media container whose streams can use many different codecs.",
+        "details": [
+          "RIFF multimedia container",
+          "Different video codecs",
+          "Different audio codecs"
+        ]
+      },
+      "toFormat": {
+        "name": "M4V",
+        "fullName": "MPEG-4 video",
+        "description": "A video suffix often used for MP4 packaging, with tool-specific ambiguity.",
+        "details": [
+          "Often MP4-style packaging",
+          "Suffix can be ambiguous",
+          "Inspect actual container"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVI to M4V",
+      "points": [
+        "The browser makes a fresh H.264 and AAC encode.",
+        "Frame rate and picture size are capped.",
+        "On a desktop, name the MP4 format explicitly when you write an .m4v file."
+      ]
+    },
+    "guide": {
+      "title": "AVI files and M4V output",
+      "markdown": "### What is an AVI file?\n\nAVI, Audio Video Interleave, is a RIFF-based container that Microsoft introduced in 1992. It interleaves video with audio and can carry many codecs. It turns up as older Windows video, in camera or capture output, and in archives; modern features are poorly supported.\n\n### Programs that open AVI files\n\n**Windows, Mac and Linux:**\n\n- mpv plays AVI and lets you pick the audio track.\n- ffplay plays it.\n- Adobe Premiere imports AVI when the decoder is available.\n\n**Mobile:**\n\n- The VLC apps on Android and iOS play AVI on phones.\n\n### AVI and M4V compared\n\nM4V is a video format developed by Apple that is very close to MP4, with H.264 video and AAC audio. HandBrake treats .m4v and .mp4 outputs as the same container. Files from the iTunes Store may carry FairPlay DRM. iTunes and the Apple TV app use it for videos, and so do phones and tablets.\n\nThis page runs FFmpeg in your browser. It re-encodes the video as H.264 at CRF 30 with the ultrafast preset and the sound as AAC at 96 kbps, with the index placed first in the file. A filter deinterlaces frames flagged as interlaced, a picture bigger than 1920 px on a side is shrunk to fit, and no more than 30 frames a second are kept. Width and height are then rounded down to even numbers, and a video inside those limits otherwise keeps its size and rate. A batch of AVI files is encoded in turn, one M4V each.\n\n### Other ways to convert AVI to M4V\n\n- **FFmpeg encode:** run `ffmpeg -i archive.avi -c:v libx264 -crf 19 -c:a aac -f mp4 delivery.m4v`. The `-f mp4` picks MP4 packaging for the .m4v name.\n- **FFmpeg copy:** run `ffmpeg -i archive.avi -c copy -f mp4 copied.m4v`. The `-c copy` option leaves the streams unchanged instead of re-encoding them.\n\n### Problems with AVI files\n\n- **An old codec**: some players and decoders lack support for older AVI codecs.\n- **Sound out of sync**: check the whole clip, not only the opening seconds.\n- **Larger than expected**: the page sets no target size, so check the result against your needs.\n- **Looks softer than the AVI**: this page trades detail for speed, so use FFmpeg with a lower CRF for archival quality.\n"
+    }
+  }
+}

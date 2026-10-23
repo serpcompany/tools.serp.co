@@ -1,0 +1,119 @@
+{
+  "tools": {
+    "avif-to-bmp": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the AVIF; File > Export As; save it as BMP.",
+          "limits": "GIMP's BMP export dialog sets the pixel layout.",
+          "source": "https://docs.gimp.org/3.2/en/file-bmp-export.html",
+          "supportSource": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        }
+      ]
+    },
+    "bin-to-jpeg": {
+      "methods": []
+    },
+    "bmp-to-dds": {
+      "methods": [
+        {
+          "app": "DirectXTex texconv",
+          "steps": "texconv -ft dds -f BC3_UNORM texture.bmp",
+          "limits": "Writes a DDS with BC3 compression.",
+          "source": "https://github.com/microsoft/DirectXTex/wiki/texconv"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick surface.bmp surface.dds",
+          "limits": "BMP and DDS are both listed as readable and writable.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSource": "https://imagemagick.org/command-line-processing/"
+        }
+      ]
+    },
+    "cdr-to-jpeg": {
+      "methods": [
+        {
+          "app": "CorelDRAW",
+          "steps": "File > Export; choose JPG from the Save as type list; type a file name; optionally tick Export this page only or Selected only; click Export.",
+          "limits": "Export this page only and Selected only are not available for every format.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Export-files.html"
+        },
+        {
+          "app": "Corel PHOTO-PAINT",
+          "steps": "File > Import; choose CDR - CorelDRAW (*.cdr); click the filename; Import; click the image window; adjust the Convert to bitmap dialog; File > Export; choose a JPEG format in the Save as type list; Save.",
+          "limits": "The import rasterizes the drawing.",
+          "source": "https://product.corel.com/help/PHOTO-PAINT/Documentation-Windows/Corel-PHOTO-PAINT-en/Corel-PHOTO-PAINT-CorelDRAW-CDR.html",
+          "supportSource": "https://product.corel.com/help/PHOTO-PAINT/Documentation-Windows/Corel-PHOTO-PAINT-en/Corel-PHOTO-PAINT-Export-images-to-other-file-formats.html"
+        }
+      ]
+    },
+    "cr2-to-pdf": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick cr2:review.cr2 review.pdf",
+          "limits": "CR2 is read-only in ImageMagick, read with the cr2: prefix; PDF is writable.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "dst-to-svg": {
+      "methods": [
+        {
+          "app": "Pyembroidery",
+          "steps": "In Python, import pyembroidery and run pyembroidery.convert(\"sample.dst\", \"sample.svg\").",
+          "limits": "The project lists DST among the formats it reads and SVG among the utility formats it writes.",
+          "source": "https://github.com/EmbroidePy/pyembroidery"
+        }
+      ]
+    },
+    "dv-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i tape.dv -c:v libx264 -c:a aac viewing.mp4",
+          "limits": "DV video and MP4 are both listed as supported for decoding and encoding.",
+          "source": "https://ffmpeg.org/general.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "gif-to-psd": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick sticker.gif sticker.psd",
+          "limits": "GIF and PSD are readable and writable.",
+          "source": "https://imagemagick.org/command-line-processing/"
+        }
+      ]
+    },
+    "gif-to-swf": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i badge.gif -an -c:v flv badge.swf",
+          "limits": "GIF and SWF are both listed as readable and writable.",
+          "source": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "SWFTools gif2swf",
+          "steps": "gif2swf -o badge.swf badge.gif",
+          "limits": "-o sets the SWF output file; the GIF is the input file.",
+          "source": "https://github.com/swftools/swftools/blob/master/src/gif2swf.c"
+        }
+      ]
+    },
+    "jp2-to-jpeg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick scan.jp2 shared.jpeg",
+          "limits": "JP2 and JPEG are readable and writable.",
+          "source": "https://imagemagick.org/command-line-processing/"
+        }
+      ]
+    }
+  }
+}

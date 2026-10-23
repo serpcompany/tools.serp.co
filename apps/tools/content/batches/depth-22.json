@@ -1,0 +1,896 @@
+{
+  "webm-to-wav": {
+    "seo": {
+      "title": "Convert WebM to WAV Online (Free)",
+      "h1": "WebM to WAV Converter",
+      "description": "Convert WebM to WAV in your browser: the sound is decoded to 16-bit PCM and the video is dropped. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Pull the sound out of a WebM recording as an uncompressed 16-bit WAV."
+    },
+    "faqs": [
+      {
+        "question": "How do I extract the audio from a WebM file?",
+        "answer": "Pick the WebM here, then save the WAV the page hands back. The video is left out and the sound is decoded to 16-bit PCM."
+      },
+      {
+        "question": "What quality is the WAV?",
+        "answer": "The audio is written as 16-bit signed PCM. Decoding can't add detail the WebM's Opus or Vorbis sound had already lost, so the WAV is a faithful copy of the decoded sound and no better."
+      },
+      {
+        "question": "Why is the WAV file far larger than my WebM?",
+        "answer": "WebM audio is compressed, while PCM stores every sample as it is, so the WAV is larger than the WebM's sound."
+      },
+      {
+        "question": "What happens if my WebM has no sound?",
+        "answer": "The recording holds no audio to save, so the page stops with an FFmpeg error. Play it first to confirm it has sound."
+      },
+      {
+        "question": "Does the WAV keep the video?",
+        "answer": "No. The video is switched off, so the WAV holds the soundtrack only. Keep the WebM if you still need the picture."
+      },
+      {
+        "question": "Can I process many WebM files together?",
+        "answer": "Select as many as you like together. The page converts them one by one and saves each WAV separately, with no ZIP."
+      },
+      {
+        "question": "Does the page limit file size?",
+        "answer": "The page sets no cap. All processing is local, so a lengthy recording just takes more time."
+      },
+      {
+        "question": "Why do my browser recordings come out as .webm?",
+        "answer": "Browser screen recordings are one of WebM's common uses, so a screen capture saved from a browser can end in .webm."
+      },
+      {
+        "question": "Does .webm tell me which audio codec is inside?",
+        "answer": "No. A WebM carries Vorbis or Opus sound, and the extension doesn't say which."
+      },
+      {
+        "question": "Can I just rename the .webm file to .wav?",
+        "answer": "No. A WebM is a Matroska-based file and a WAV is a RIFF file, so a renamed file still holds WebM data. Converting writes a real WAV."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebM and WAV",
+      "fromFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "supported by major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container developed by Microsoft and IBM and based on RIFF. It usually holds uncompressed PCM, so files are large but exact.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "large files",
+          "4 GB file size limit"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WebM to WAV",
+      "points": [
+        "The WAV holds sound only; the WebM's video is dropped.",
+        "The sound is written as signed 16-bit PCM, so the file is uncompressed and large.",
+        "A WebM without an audio track fails with an FFmpeg error.",
+        "Several WebM files convert in turn, each to its own WAV.",
+        "FFmpeg runs in your browser, so the recording is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding WebM for WAV output",
+      "markdown": "### What is a WebM file?\n\nThe WebM Project describes WebM as an open media format meant for web delivery. It is built on Matroska; the video is VP8 or VP9, and the sound is Vorbis or Opus. The project supplies its format technology under royalty-free terms, and its container guidelines for streaming over HTTP are stricter than the Matroska specification itself. Audio tracks carry the codec IDs A_VORBIS or A_OPUS. A video WebM has the media type video/webm, and an audio-only one uses audio/webm. Its Uniform Type Identifier is org.webmproject.webm.\n\nWebM is used for web video, browser screen recordings and animated clips. If the file you have is a meeting or a lecture where the sound matters more than the picture, that is the reason to pull out a WAV.\n\nThe .webm suffix alone doesn't say what is inside. Whether a browser can play a given file depends on the video and audio codecs it holds, not on the suffix.\n\n### Programs that open WebM files\n\n- **Windows, Mac and Linux:** VLC media player reads Matroska-family media, which covers WebM.\n- **Windows, Mac and Linux:** FFplay, the player that comes with FFmpeg, plays WebM input with FFmpeg's decoders.\n- **Web:** Safari on macOS handles WebM files with VP8 or VP9 video and Vorbis sound from version 14.1.\n- **Mobile:** Android and iOS each have a VLC app; the Android one reuses the desktop decoding, while the iOS one plays local files through VLC's own engine.\n\n### WebM and WAV compared\n\n- **Extensions and media types**: .webm with video/webm or audio/webm; .wav with audio/wav or audio/x-wav.\n- **Wrapper**: WebM is built on Matroska. WAV is a sound wrapper built on RIFF that can hold various encodings; Microsoft and IBM documented it in a multimedia specification from August 1991. A WAV starts with the marker RIFF, then WAVE and a fmt chunk that describes the encoding, and a data chunk holds the samples.\n- **Compression**: WebM audio is lossy Opus or Vorbis. This page writes the WAV as linear PCM with 16 bits per sample, so each sample is stored in full. Linear PCM is a common WAV payload, though compressed encodings can appear in WAV too.\n- **Video**: WebM can carry it. A WAV holds sound, so the video is dropped. Multichannel sound in a WAV relies on the WAVE_FORMAT_EXTENSIBLE header that Windows 2000 introduced.\n- **Size**: the WAV is larger than the compressed audio in the WebM. A single WAV also tops out near 4 GB, the point where RF64 is needed instead of the original RIFF size fields.\n- **Metadata**: Tag handling in WAV varies: plain INFO chunks hold one set of fields and the Broadcast WAVE extensions another, aimed at production and preservation.\n- **Archiving**: the Library of Congress names WAVE as the recommended format when libraries build digital audio collections, with the Broadcast WAVE variant WAVE_BWF_1 as the archival master format for reformatted mono and stereo analog recordings. The European Broadcasting Union adopted the format as the basis for Broadcast Wave. Its specifications are freely available and it needs no licensing or patents.\n\nIn short, the conversion decodes Opus or Vorbis into plain samples. That suits editing, and it doesn't improve the sound.\n\n### Other ways to convert WebM to WAV\n\n- **FFmpeg (command line):** `ffmpeg -i recording.webm -vn -c:a pcm_s16le speech.wav` does it. The `-vn` option disables video, and `-c:a pcm_s16le` selects the encoder for the audio, because a codec option placed before an output file chooses the encoder for that file. FFmpeg's documentation lists both WebM and PCM signed 16-bit little-endian among what it supports for encoding and decoding.\n\n### Problems with WebM files\n\n- **A player refuses the file**: a browser's ability to play a WebM comes down to the codecs it holds, and the suffix says little. Try VLC, or play it in a current browser.\n- **Jumping to a time is sluggish**: a missing cue index can make seeking less efficient, since the player has fewer direct pointers to positions. The WebM guidelines say a demuxer disables seeking when a file has no keyframe Cues element.\n- **An older Safari on a Mac won't play it**: Safari 14.1 is the release that added WebM playback on macOS, so don't assume an older release handles it.\n- **A renamed file still fails**: changing the extension to .wav leaves WebM data inside. Convert the file instead.\n"
+    }
+  },
+  "wmv-to-mp3": {
+    "seo": {
+      "title": "Convert WMV to MP3 Online (Free)",
+      "h1": "WMV to MP3 Converter",
+      "description": "Convert WMV to MP3 in your browser: the soundtrack becomes an MP3 at up to 192 kbps and the video is dropped. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save the sound from a WMV video as an MP3 at up to 192 kbps, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a WMV video to MP3?",
+        "answer": "Pick the WMV here and save the MP3 the page returns. Only the soundtrack is kept, encoded at up to 192 kbps."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "The LAME encoder writes 192 kbps when the WMV soundtrack is at 32 kHz or higher. A lower-rate soundtrack comes out at a lower bitrate, down to 64 kbps. This page has no control for it."
+      },
+      {
+        "question": "Will the MP3 sound better than the WMV?",
+        "answer": "No. The WMV's sound is already lossy, and MP3 compresses it a second time, so the result can only match the source, never improve on it."
+      },
+      {
+        "question": "What if my WMV has no audio track?",
+        "answer": "With no sound to save, the page ends with an FFmpeg error. Play the video first to confirm it has audio."
+      },
+      {
+        "question": "Can I pull the audio from several WMV videos in one go?",
+        "answer": "Yes. Pick a handful of WMV videos at once; each soundtrack is encoded on its turn and saved as its own MP3, never bundled into a ZIP."
+      },
+      {
+        "question": "Does the MP3 keep the video?",
+        "answer": "No. The picture is switched off, so the MP3 holds sound only."
+      },
+      {
+        "question": "Why won't my WMV play anywhere except Windows?",
+        "answer": "WMV is a Microsoft format, an ASF file with Windows Media Video inside. Other players need a decoder for it. VLC reads ASF and WMV files."
+      },
+      {
+        "question": "Is the WMV uploaded?",
+        "answer": "Nothing is uploaded. The video stays on your device because FFmpeg does the work in the browser, and a long one takes as long as your device needs."
+      },
+      {
+        "question": "Are the title and artist tags copied to the MP3?",
+        "answer": "Yes. FFmpeg copies the WMV's global tags, such as the title and artist, into the MP3's ID3 fields. A WMV with no tags gives an MP3 with none."
+      },
+      {
+        "question": "Can I take just a section of the video?",
+        "answer": "No, the page converts the entire soundtrack because it has no start or end control. Trim the MP3 in an audio editor afterward."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMV and MP3",
+      "fromFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "A family of video codecs developed by Microsoft, usually stored in the ASF container.",
+        "details": [
+          "ASF container",
+          "proprietary Microsoft codec",
+          "lossy compression",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WMV to MP3",
+      "points": [
+        "Only the sound is kept; the video is dropped.",
+        "The MP3 is encoded with the LAME encoder at up to 192 kbps, which holds for a soundtrack at 32 kHz or more.",
+        "A WMV without an audio track fails with an FFmpeg error.",
+        "Several WMV files convert in turn, each to its own MP3.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding WMV for MP3 output",
+      "markdown": "### What is a WMV file?\n\nWMV means Windows Media Video, Microsoft's video compression, kept in the ASF container together with a soundtrack. The Advanced Systems Format is the container for Windows Media Audio and Windows Media Video content, and the extension wmv marks an ASF file that holds Windows Media video. ASF was designed for storing synchronized media streams and playing them from a disk or an HTTP server. The video inside may be Windows Media Video in version 7, 8 or 9, and the registered media type is video/x-ms-wmv.\n\nAn ASF file can hold several streams, including more than one audio stream. It is built from objects: a required Header object, a required Data object and an optional Index object that lets a player seek efficiently. Microsoft documents the wrapper fully, and the Library of Congress notes that Windows Movie Maker in Windows XP offered WMV as one of two video output formats. ASF's stated goals include efficient playback from media servers, HTTP servers and local storage, and support for scalable media types such as audio and video.\n\nWMV turns up in old Windows clips, screen captures and Windows Media streams. If you only want the speech or music from one of those files, an MP3 is a format that plays on nearly every device.\n\nA .wmv file isn't always a clean copy of one codec. How good a WMV looks or sounds depends on the codec and the settings behind it, and the extension doesn't reveal either.\n\n### Programs that open WMV files\n\n- **Windows, Mac and Linux:** VLC media player names ASF and WMV among its supported inputs, with decoding of Windows Media Video versions 1, 2 and 9.\n- **Windows, Mac and Linux:** FFplay uses FFmpeg's decoders to play WMV input.\n- **Mobile:** Android and iOS both get a VLC app, one reusing the desktop decoding and the other playing local media with its own player.\n\n### WMV and MP3 compared\n\n- **Extensions and media types**: .wmv with video/x-ms-wmv; .mp3 with audio/mpeg.\n- **What they hold**: a WMV carries video and sound in an ASF container. An MP3 is audio only.\n- **Compression**: both are lossy. The WMV's sound is encoded once already, and the MP3 encodes it again, so each step costs a little detail.\n- **Bitrate**: this page asks for 192 kbps, which MP3 can only reach at sample rates of 32 kHz or more. A soundtrack at a lower rate comes out at a lower bitrate.\n- **Metadata**: MP3 itself has no descriptive fields, so producers created ID3 as a separate structure for titles and artist names. FFmpeg copies the WMV's title and artist into those tags.\n- **Standards**: MP3 is defined in ISO/IEC 11172-3, published in 1993. MPEG-2 audio, which adds bit rates and sample rates, is ISO/IEC 13818-3. Fraunhofer states that its licensing program covering MP3 patents ended on 23 April 2017.\n\nThe conversion drops the picture and re-encodes the sound. The page doesn't let you choose a bitrate or trim the start or end, so use FFmpeg from the next section when you need that control.\n\n### Other ways to convert WMV to MP3\n\n- **FFmpeg (command line):** `ffmpeg -i lecture.wmv -vn -c:a libmp3lame -b:a 192k lecture.mp3` does the same job. The `-vn` option disables video, `-b:a 192k` sets the audio bitrate, and FFmpeg's documentation lists MP3 encoding through the external LAME library. Its format table lists the ASF container for both encoding and decoding.\n\n### Problems with WMV files\n\n- **A player opens the file but shows no picture**: reading ASF and decoding its video are separate capabilities, so a compatible container reader doesn't guarantee that every codec is present. Try VLC.\n- **Choppy or failing playback in FFmpeg-based tools**: FFmpeg lists its Windows Media Video 9 decoder as not completely working. If a tool struggles, open the file in VLC instead.\n- **Quality seems poor**: the WMV extension doesn't say how it was compressed. A low-quality source gives a low-quality MP3, because encoding again can only keep or lose detail, never add it.\n- **A partly downloaded file**: ASF is designed to tolerate inaccurate data reception, and a partially downloaded file can still be read as long as it contains the Header object and at least one Data object.\n- **A renamed file still fails**: calling a WMV .mp3 leaves ASF video inside. Convert it instead.\n"
+    }
+  },
+  "aac-to-wav": {
+    "seo": {
+      "title": "Convert AAC to WAV Online (Free)",
+      "h1": "AAC to WAV Converter",
+      "description": "Convert AAC to WAV in your browser: the audio is decoded to uncompressed 16-bit PCM, so the file takes more space. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Decode an AAC audio file into an uncompressed 16-bit WAV in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AAC to WAV?",
+        "answer": "Pick the AAC file here and save the WAV the page returns. It is decoded to 16-bit PCM."
+      },
+      {
+        "question": "Why does the WAV take up so much more space?",
+        "answer": "AAC stores its sound compressed. The WAV from this page holds every sample as it is, so decoded AAC can take much more space."
+      },
+      {
+        "question": "Does converting AAC to WAV improve the quality?",
+        "answer": "No. The detail AAC discarded when it was encoded is gone for good. The WAV holds the decoded sound exactly as it plays, and nothing more."
+      },
+      {
+        "question": "What bit depth is the WAV?",
+        "answer": "16-bit signed PCM. The conversion command sets that depth; it sets no sample rate or channel layout of its own."
+      },
+      {
+        "question": "Can I convert several AAC files together?",
+        "answer": "Yes. Choose them together; each is converted in sequence and saved as a separate WAV."
+      },
+      {
+        "question": "How are .aac and .m4a different?",
+        "answer": "A standalone .aac file usually has raw ADTS framing, while .m4a puts AAC in an MP4 wrapper. Renaming one to the other does not change the framing."
+      },
+      {
+        "question": "What happens if my AAC file is damaged?",
+        "answer": "A damaged or cut-short file usually still converts. FFmpeg reports the problem and saves whatever it managed to decode, which can leave the WAV shorter than the original recording. Play the WAV to check it."
+      },
+      {
+        "question": "Why would I need a WAV?",
+        "answer": "People use WAV when recording and editing, in professional sound work and as the starting point before compression. Plain PCM has no lossy codec left to decode."
+      },
+      {
+        "question": "Is there a file size limit?",
+        "answer": "The page sets none. A very long recording keeps your device working for longer, and a single WAV tops out near 4 GB."
+      },
+      {
+        "question": "Is my audio uploaded?",
+        "answer": "No. FFmpeg does the decoding in your browser tab, so the AAC stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "AAC and WAV",
+      "fromFormat": {
+        "name": "AAC",
+        "fullName": "Advanced Audio Coding",
+        "description": "Advanced Audio Coding, a perceptually compressed sound format found in standalone streams and media containers.",
+        "details": [
+          "lossy compression",
+          "better efficiency than MP3",
+          "raw .aac streams or MP4 containers"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container developed by Microsoft and IBM and based on RIFF. This page writes uncompressed 16-bit PCM into it.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "large files",
+          "4 GB file size limit"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AAC to WAV",
+      "points": [
+        "The WAV is uncompressed 16-bit PCM, so it takes more space than the AAC.",
+        "Decoding doesn't restore detail that AAC discarded.",
+        "Several AAC files convert in turn, each to its own WAV.",
+        "The page sets no size limit of its own.",
+        "FFmpeg runs in your browser, so the audio isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AAC for WAV output",
+      "markdown": "### What is an AAC file?\n\nAAC stands for Advanced Audio Coding, a family of lossy audio codecs standardized by MPEG. It is specified in Part 7 of MPEG-2 and again in Part 3 of MPEG-4, and the MPEG-4 form is a further refinement of the MPEG-2 one. It can travel inside MP4, QuickTime or other wrappers. A bare .aac file normally uses ADTS framing, and the registered type audio/aac covers both ADTS and LATM/LOAS transport. Its profiles include LC, HE-AAC and HE-AAC v2. The ADTS form uses the .aac extension, the LATM/LOAS form uses .loas, and receivers recognize ADTS by a 12-bit syncword at the start of the data. The audio/aac registration, written by an author at Fraunhofer IIS, lists multimedia, HLS audio-only streams and SHOUTcast or Icecast2 streams as applications.\n\nAAC is used for streaming audio and music downloads, for the audio in MP4 videos and on mobile devices. WAV suits recording and editing, so people convert to it when they want to work on the sound.\n\nThe Library of Congress says AAC supports up to 48 channels and 5.1 surround, and reports it as beating MP3 at a given data rate. In wrappers, the MP4 file format uses .mp4 and .m4a, QuickTime AAC uses .m4p, and Apple's Core Audio Format can carry AAC too.\n\nTwo things get confused with it. A .m4a file holds AAC too, but inside an MP4 wrapper rather than as a bare stream. And a decoder written for the older MPEG-2 form of AAC may not understand the MPEG-4 variants, which is one reason a loose file plays in one app and not another.\n\n### Programs that open AAC files\n\n- **Windows, Mac and Linux:** VLC media player opens raw AAC streams and decodes MPEG-4 AAC audio.\n- **Windows, Mac and Linux:** FFmpeg ships its own AAC decoder along with a built-in AAC encoder.\n- **Windows and Mac:** Adobe Audition imports AAC, including HE-AAC.\n\n### AAC and WAV compared\n\n- **Extensions and media types**: .aac with audio/aac; .wav with audio/wav or audio/x-wav.\n- **Compression**: AAC is lossy. The WAV made here is 16-bit linear PCM, one full value for every sample.\n- **Size**: decoded AAC can occupy much more space than the file it came from, because the original was compressed. The registration for audio/aac adds that lossless compression such as ZIP typically yields little benefit on an AAC stream.\n- **Wrapper**: a raw AAC stream is a run of ADTS frames, and its ID3v2 frames may appear at any frame boundary. WAV is the RIFF-based container that Microsoft and IBM documented in 1991.\n- **Metadata**: WAV files differ in where they keep text fields, since plain INFO chunks and the Broadcast WAVE extensions hold different information.\n- **Compatibility**: a decoder built only for MPEG-2 AAC can stumble on MPEG-4 variants. The Library of Congress names WAVE among its recommended formats for audio collections.\n- **Licensing**: royalties apply to the sale of AAC encoders and decoders, with no use-based fees, according to the Library of Congress. WAV needs no licensing or patents. AAC itself is an open standard developed by ISO JTC 1/SC 29 Working Group 11, which is MPEG.\n\nConverting leaves the sound where AAC left it. The WAV is a bigger container for the same information.\n\n### Other ways to convert AAC to WAV\n\n- **FFmpeg (command line):** `ffmpeg -i interview.aac -c:a pcm_s16le interview.wav` decodes it. The `-c:a` option selects the audio codec, and FFmpeg's documentation lists raw ADTS AAC and PCM signed 16-bit little-endian among the formats it supports for both decoding and encoding. The command sets no sample rate of its own.\n\n### Problems with AAC files\n\n- **The file won't play**: a decoder for one AAC variant may not understand another. Try VLC, which accepts raw AAC.\n- **Renaming to .m4a fixed nothing**: renaming .aac to .m4a leaves the bytes untouched, so the ADTS stream is not wrapped in MP4 and the file is still not an M4A.\n- **ZIP didn't shrink it**: an AAC is already compressed, so ZIP gains little.\n- **Private data inside the stream**: the audio/aac registration warns that private-use tags such as the Data Stream Element could carry arbitrary material, and that executable tagged content must not be executed if it is received. It also notes the data is neither signed nor encrypted.\n"
+    }
+  },
+  "avif-to-webp": {
+    "seo": {
+      "title": "Convert AVIF to WebP Online (Free)",
+      "h1": "AVIF to WebP Converter",
+      "description": "Convert AVIF images to WebP in your browser. The WebP is lossy, keeps transparency and uses only the first frame. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an AVIF image into a WebP that older browsers can show, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVIF to WebP?",
+        "answer": "Pick the AVIF here and save the WebP the page returns. A batch gives one WebP per AVIF."
+      },
+      {
+        "question": "Why convert AVIF to WebP at all?",
+        "answer": "Reach. Some browsers and apps that show WebP don't read AVIF, so a WebP copy opens in more places."
+      },
+      {
+        "question": "Does the WebP keep transparency?",
+        "answer": "Yes. WebP has an alpha channel, and the page carries the AVIF's transparency into the WebP."
+      },
+      {
+        "question": "What happens to an animated AVIF?",
+        "answer": "Just the first frame is used, so the WebP is a still picture. The page does not write an animated WebP."
+      },
+      {
+        "question": "What quality is the WebP?",
+        "answer": "It is lossy, and the page has no quality control. A lossy AVIF loses detail a second time."
+      },
+      {
+        "question": "Does HDR or 10-bit color survive?",
+        "answer": "No. Pixels go through 8-bit RGBA on the way, so a 10- or 12-bit AVIF drops to 8 bits for each channel."
+      },
+      {
+        "question": "Is the AVIF's metadata copied?",
+        "answer": "No. The image goes through raw pixels, which leaves EXIF data, ICC profiles and XMP behind."
+      },
+      {
+        "question": "Why does it say my browser can't open AVIF files?",
+        "answer": "The page relies on your browser's own AVIF decoder. If yours has none, it shows \"This browser can't open AVIF files\"; a current Chrome, Edge, Firefox or Safari solves that. A broken file shows \"Image decode failed.\""
+      },
+      {
+        "question": "Is the WebP smaller than the AVIF?",
+        "answer": "That depends on the picture. AVIF is built for small files and this WebP is a lossy re-encode, so compare the two sizes on your own image."
+      },
+      {
+        "question": "What is the biggest picture a WebP can hold?",
+        "answer": "WebP has a fixed maximum side length, so an AVIF larger than that cannot be saved as a single WebP. The guide gives the limit."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and WebP",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "HDR and wide color gamut",
+          "10-bit and 12-bit depth"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "A web image format with separate lossy and lossless modes, plus alpha and animation support.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "animation"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVIF to WebP",
+      "points": [
+        "The WebP is lossy, and the page has no quality setting.",
+        "Transparency is kept.",
+        "An animated AVIF gives a still WebP of its first frame.",
+        "EXIF data, ICC profiles and XMP aren't copied, and color depth is cut to 8 bits per channel.",
+        "Your browser decodes the AVIF, so an old browser may refuse it."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AVIF for WebP output",
+      "markdown": "### What is an AVIF file?\n\nThe name AVIF abbreviates AV1 Image File Format. The Alliance for Open Media specifies it, and it stores pictures coded with the AV1 video codec inside the HEIF container. Files normally end in .avif and use the media type image/avif. The specification defines the brands avif for a single image, avis for an image sequence and avio for an intra-only sequence, so one extension can hold either a still or an animation.\n\nAn AVIF can hold eight, ten or twelve bits per channel, lossy or lossless compression and an alpha channel. Its Baseline profile covers pictures up to 8192 by 4352 pixels and its Advanced profile up to 16384 by 8704. A larger picture is assembled from a grid of smaller coded tiles.\n\nWebP is the target here. Google's WebP FAQ describes its lossy mode as VP8-compatible, using 8-bit YUV 4:2:0, and its lossless mode as storing RGBA. Alpha, animation and the image/webp media type are part of the format, and any modern web browser shows WebP, which makes it a safe stand-in for an AVIF.\n\nYou usually meet the format on the web. Sites serve it because the files are small, so an image saved from a page can land on your disk as .avif. Plenty of editors, uploaders and older browsers still don't read it, which is why people ask for a WebP copy.\n\n### Programs that open AVIF files\n\n**Windows, Mac and Linux:**\n\n- GIMP imports and exports AVIF through libheif. Its developer standards page says animated AVIF images are not supported.\n- ImageMagick lists AVIF as read and write in its format table.\n\n**Web:**\n\n- Chrome, Firefox and Safari open AVIF files, and this page relies on the decoder inside your browser.\n\n### AVIF and WebP compared\n\n- **Extensions and MIME types**: .avif with image/avif; .webp with image/webp.\n- **Compression**: AVIF uses AV1 coding. Lossy WebP builds on VP8, a video codec, and WebP additionally has a lossless mode of its own.\n- **Transparency and animation**: both formats carry an alpha channel and both can hold animation. This converter writes a single still.\n- **Color depth**: AVIF allows more than eight bits per channel. WebP is limited to eight bits, and the pixels this page passes along are eight bits too.\n- **Largest picture**: a WebP can't be wider or taller than 16,383 pixels, so a very large AVIF has no single-file WebP equivalent.\n- **Metadata**: both formats can carry EXIF, ICC and XMP data. This page writes none of it: the picture is re-encoded from decoded pixels.\n\nThe conversion is not a repackaging: the AV1 data is decoded to pixels and those pixels are encoded again, which is why the result is a new lossy file rather than a copy of the original.\n\nYour browser decodes the AVIF for this page, and the page then writes the WebP. Transparency stays, and from a sequence only frame one goes into the file. Dropping the ICC profile can shift colors in a viewer that would have applied it.\n\n### Other ways to convert AVIF to WebP\n\n- **GIMP (Windows, Mac, Linux):** open the AVIF, use File > Export As and type a .webp file name. The WebP dialog offers a Lossless checkbox, Image quality, and checkboxes for saving Exif, XMP and the color profile.\n- **ImageMagick (command line):** run `magick source.avif result.webp`. The WebP side needs the WebP delegate library.\n\n### Problems with AVIF files\n\n- **An older browser shows nothing**: a browser without an AVIF decoder needs a JPEG, PNG or WebP stand-in. This page makes the WebP, and the [AVIF to JPG converter](/avif-to-jpg/) covers programs that read neither.\n- **\"This browser can't open AVIF files\"**: the page uses your browser's decoder, so open it in a different, up-to-date browser.\n- **Only one frame came out**: the WebP is a still, built from the first frame of an image sequence.\n- **Colors look flatter**: a 10- or 12-bit picture is reduced to 8 bits, and the ICC profile is dropped.\n- **A huge picture won't save**: WebP can't exceed 16,383 pixels on a side.\n- **\"Image decode failed.\"**: the file is often damaged, so fetch a fresh copy from wherever you got it.\n- **An animated AVIF opens as a still in GIMP**: GIMP doesn't support animated AVIF, so use this page or ImageMagick instead for the first frame.\n"
+    }
+  },
+  "cr2-to-jpeg": {
+    "seo": {
+      "title": "Convert CR2 to JPEG Online (Free)",
+      "h1": "CR2 to JPEG Converter",
+      "description": "Convert Canon CR2 raw photos to JPEG in your browser, one JPEG per file, with no camera software. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a Canon CR2 raw photo into a JPEG you can share, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CR2 to JPEG?",
+        "answer": "Add the CR2 to the converter and download the JPEG when it finishes. Choosing several CR2 files at once gives one JPEG for each, converted in sequence."
+      },
+      {
+        "question": "Do I need Canon's software?",
+        "answer": "No. The page reads the raw file with ImageMagick, running in your browser. For adjusting the photo first, Canon's Digital Photo Professional is the route."
+      },
+      {
+        "question": "What JPEG quality does it use?",
+        "answer": "No quality setting is applied by the page, so you get one lossy JPEG with nothing to choose."
+      },
+      {
+        "question": "Can I adjust white balance or exposure here?",
+        "answer": "No. The page offers no white balance or exposure controls. Raw files allow those choices after capture, so make them in darktable or Canon's software first."
+      },
+      {
+        "question": "Will it match what Canon's software shows?",
+        "answer": "Not necessarily. Other software may render the photo differently, and the page offers no development controls of its own."
+      },
+      {
+        "question": "What is inside a CR2 file?",
+        "answer": "Unprocessed sensor data from a Canon EOS camera, stored in a TIFF-based file. It needs processing before it looks like a photograph, so a JPEG is what you would share."
+      },
+      {
+        "question": "What does \"too large to convert here\" mean?",
+        "answer": "The file declares a picture beyond about 537 megapixels, more than this page's engine will take."
+      },
+      {
+        "question": "Is my CR2 changed or uploaded?",
+        "answer": "Neither. The conversion happens in your browser and gives you a new JPEG, and the CR2 on your disk is left alone."
+      },
+      {
+        "question": "Why won't my computer open a CR2?",
+        "answer": "A .cr2 suffix is recognized by many programs, but support depends on the camera model. Check the program's list of supported cameras."
+      },
+      {
+        "question": "How is CR2 different from CR3?",
+        "answer": "CR3 replaced CR2 on newer Canon EOS cameras. For those files use the [CR3 to PNG converter](/cr3-to-png/)."
+      }
+    ],
+    "aboutSection": {
+      "title": "CR2 and JPEG",
+      "fromFormat": {
+        "name": "CR2",
+        "fullName": "Canon RAW version 2",
+        "description": "A Canon camera RAW file containing sensor-derived image data for later development.",
+        "details": [
+          "unprocessed sensor data",
+          "TIFF-based structure",
+          "embedded JPEG preview"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting CR2 to JPEG",
+      "points": [
+        "The JPEG is lossy, and the page sets no quality value.",
+        "The page offers no development settings, so white balance and tone are not adjustable.",
+        "A picture over about 537 megapixels fails with a message that it is too large.",
+        "Several CR2 files convert in turn, each to its own JPEG."
+      ]
+    },
+    "guide": {
+      "title": "Understanding CR2 for JPEG output",
+      "markdown": "### What is a CR2 file?\n\nCR2 is Canon's camera-raw format, used by numerous EOS models from the mid-2000s and later superseded by CR3. It is a TIFF-based file made of unprocessed sensor data, and it is proprietary to Canon. The Library of Congress groups it with the other camera raw formats and notes that its extension identifies a Canon raw file.\n\nA raw file keeps what the sensor captured through the camera's color filter array, with very little processing. Turning it into a picture takes demosaicing, then white balance, a gamma curve and noise reduction, all done on a computer. That is the point of shooting raw: you choose those settings later instead of letting the camera bake them in. The cost is that almost no website, printer or phone gallery wants the file as it is, so a JPEG is the usual way to share the result.\n\nYou find a CR2 on the memory card of a Canon camera set to record raw, or in a folder of shots someone sent for editing.\n\nRaw files bring a preservation risk too. Makers seldom publish their specifications, and the layouts shift as new camera models arrive. The Library of Congress warns that a format may lose support if its maker stops supporting it. Adobe's DNG is one attempt to normalize raw data, and a DNG may hold a copy of the original raw file inside it.\n\n### Programs that open CR2 files\n\n**Windows, Mac and Linux:**\n\n- darktable names CR2 among its import extensions, and its RawSpeed library does the raw decoding. The documentation says most modern cameras work, though sensors that aren't Bayer (apart from Fujifilm X-Trans) are not decoded.\n- ImageMagick lists CR2 as read-only and needs the explicit specifier cr2:image.cr2.\n\n**Windows and Mac:**\n\n- Canon's Digital Photo Professional names .CR2 among its supported raw extensions, next to CR3 and CRW.\n\n### CR2 and JPEG compared\n\n- **Extensions and MIME types**: .cr2 for Canon raw; .jpg or .jpeg with image/jpeg.\n- **Contents**: a CR2 carries sensor measurements that need processing before they look like a photograph. A JPEG carries a finished, rendered picture.\n- **Interpretation**: a raw workflow leaves color and tone choices to the processing software, while a JPEG has them baked in.\n- **Compression**: JPEG is defined by ISO/IEC 10918-1 and is lossy, with an adjustable quality setting. This page sets none.\n- **Transparency**: a JPEG has no alpha channel.\n- **Support**: a recognized CR2 suffix doesn't guarantee that a program supports the camera behind it.\n\nIn this page ImageMagick, built for WebAssembly, runs inside your browser, reads the CR2 and saves a JPEG with no quality value set. None of the usual raw-developer adjustments are offered. You can add several CR2 files; they are processed one after another and each downloads as a separate JPEG. The result also won't necessarily match a camera's preview image, since a preview and a developed picture can differ.\n\n### Other ways to convert CR2 to JPEG\n\n- **Canon Digital Photo Professional (Windows, Mac):** pick the CR2 and use File > Convert and save, then set the image type to JPEG and save. The camera must be supported by that version, and the conversion applies your development recipe.\n- **darktable (Windows, Mac, Linux):** select the image and, in the export module, send it to a file on disk with JPEG as the format, then press start export. Camera support, development history and the export profile all affect the result.\n- **ImageMagick (command line):** run `magick cr2:photo.cr2 photo.jpeg`. The cr2: prefix names the format outright, which ImageMagick needs here.\n\n### Problems with CR2 files\n\n- **A program won't open it**: a recognized .cr2 suffix does not guarantee that your version supports the camera. Update the software or check its list of supported cameras.\n- **The JPEG looks different from the camera preview**: develop the CR2 in darktable or Canon's software when the look matters.\n- **It looks different in every program**: programs differ in how they turn the raw data into color and tone.\n- **A giant file fails**: the page gives up at about 537 megapixels and shows a \"too large to convert here\" notice. Develop such a file in desktop software instead.\n- **Keeping it for later**: keep the CR2 even after you make a JPEG, because only the raw file allows new white balance and tone choices.\n"
+    }
+  },
+  "cr3-to-png": {
+    "seo": {
+      "title": "Convert CR3 to PNG Online (Free)",
+      "h1": "CR3 to PNG Converter",
+      "description": "Convert Canon CR3 raw photos to PNG in your browser: a lossless 8-bit picture with no development settings. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a Canon CR3 raw photo into an 8-bit PNG, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CR3 to PNG?",
+        "answer": "Add the CR3 to the converter and download the PNG that comes back. A batch of CR3 files gives a separate PNG for each."
+      },
+      {
+        "question": "Is the PNG lossless?",
+        "answer": "PNG compression is lossless, but the picture inside is 8 bits per channel and has been developed from the raw data. Detail beyond that is not kept."
+      },
+      {
+        "question": "Can I get the raw data back from the PNG?",
+        "answer": "No. The PNG holds a developed picture with 8 bits per channel, not the sensor readings. Keep the CR3 if you may want a different development later."
+      },
+      {
+        "question": "Can I change white balance or exposure first?",
+        "answer": "No. The page offers no development options. Make those changes in Canon's software or darktable, then export."
+      },
+      {
+        "question": "Why not convert CR3 to JPEG instead?",
+        "answer": "PNG keeps every pixel exactly as developed, which suits editing and graphics. A JPEG is smaller but lossy. The photo has no transparency either way."
+      },
+      {
+        "question": "Which programs open a CR3 file?",
+        "answer": "Canon's own Digital Photo Professional and darktable are the programs this page's guide covers. Support depends on the camera model, so check the program's list."
+      },
+      {
+        "question": "Does the PNG have transparency?",
+        "answer": "No. A camera photograph has no transparent areas, so the PNG has no transparency to store."
+      },
+      {
+        "question": "What is inside a CR3 file?",
+        "answer": "Unprocessed sensor data in an ISO base media file format container, with lossy or lossless compression. It needs raw processing before it becomes a normal picture."
+      },
+      {
+        "question": "Is my CR3 uploaded?",
+        "answer": "No. ImageMagick does the work inside your browser tab, and the CR3 never leaves your disk."
+      },
+      {
+        "question": "How is CR3 different from CR2?",
+        "answer": "CR3 is Canon's newer raw format, used by newer EOS cameras, in an ISO base media container. The [CR2 to JPEG converter](/cr2-to-jpeg/) handles the older format."
+      }
+    ],
+    "aboutSection": {
+      "title": "CR3 and PNG",
+      "fromFormat": {
+        "name": "CR3",
+        "fullName": "Canon RAW version 3",
+        "description": "Canon RAW version 3, a camera file that requires RAW processing for a finished picture.",
+        "details": [
+          "unprocessed sensor data",
+          "ISO base media file format container",
+          "lossy and lossless options"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A losslessly compressed raster format suited to image exchange, graphics and transparency.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting CR3 to PNG",
+      "points": [
+        "The PNG is lossless but 8 bits per channel, developed from the raw data.",
+        "The page offers no development options, so white balance and tone cannot be changed.",
+        "A picture over about 537 megapixels fails with a message that it is too large.",
+        "Several CR3 files convert in turn, each to its own PNG."
+      ]
+    },
+    "guide": {
+      "title": "Understanding CR3 for PNG output",
+      "markdown": "### What is a CR3 file?\n\nCanon brought in CR3 as a raw image format in 2018, for its newer EOS cameras. Its container follows the ISO base media file format, the family that MP4 belongs to, and the compression inside can be lossy or lossless. It is a proprietary Canon format and the successor to CR2.\n\nA raw file holds sensor readings rather than a finished photograph. The Library of Congress describes camera raw data as captured through the sensor's color filter array with very little processing, so demosaicing, white balance, gamma correction and noise reduction all still lie ahead. Those choices are what a raw editor lets you make after the shot.\n\nYou find CR3 files on the cards of recent Canon cameras, or in a folder of shots sent over for editing. Almost nothing outside a raw editor displays one directly, which is why people convert them. Because the conversion makes a new file, the CR3 on your disk is not touched.\n\nRaw formats also carry a long-term risk. Manufacturers rarely publish the specification, and the formats change as new models arrive, so support can fade. Keeping the CR3 next to a PNG protects you if software later stops reading it. Adobe's DNG is another attempt to reduce that risk, since it normalizes camera raw data and can embed a copy of the original raw file.\n\n### Programs that open CR3 files\n\n**Windows, Mac and Linux:**\n\n- darktable imports CR3 files and decodes them through its RawSpeed library.\n\n**Windows and Mac:**\n\n- Canon's Digital Photo Professional names .CR3 among its supported raw extensions, beside CR2 and CRW.\n\n### CR3 and PNG compared\n\n- **Extensions and MIME types**: .cr3 for Canon raw; .png with image/png.\n- **Container**: CR3 is an ISO base media file. A PNG begins with an eight-byte signature followed by chunks, among them IHDR first, IDAT for the image data and IEND last.\n- **Compression**: PNG always compresses losslessly, using DEFLATE, so re-saving a PNG never costs quality. A CR3 may be lossy or lossless.\n- **Color depth**: PNG samples run from 1 to 16 bits, but the picture this page writes has 8 bits per channel.\n- **Origins**: PNG was designed as an open, patent-free alternative to GIF. The W3C published its Third Edition as a Recommendation on 24 June 2025, and the Library of Congress notes it is not yet an International Standard.\n- **Color types**: PNG supports indexed-color, grayscale and truecolor images. Optional chunks can carry gamma, chromaticity and an ICC profile.\n- **Transparency**: PNG can carry an alpha channel. A camera photograph has no transparency to carry.\n- **Metadata**: the Library of Congress notes that practices for storing Exif or XMP data in PNG have been inconsistent, and this page doesn't copy metadata across.\n\nThe conversion develops the raw data into an ordinary picture and then stores that picture without further loss. After that you can edit it in any program, but you cannot go back to the sensor values or change the white balance as a raw editor would. Select a group of CR3 files and each is rendered in turn, giving a separate PNG for every one. The page reads each file in your browser with ImageMagick compiled to WebAssembly, and it offers no development options.\n\n### Other ways to convert CR3 to PNG\n\n- **darktable (Windows, Mac, Linux):** after developing the CR3, open the export module, pick file on disk as the target storage, choose PNG as the file format, set the bit depth and profile, then press start export. The camera must be one that darktable supports.\n\n### Problems with CR3 files\n\n- **A program says the file is not supported**: an older version of a raw editor may not understand files from a newer camera. Update the software.\n- **A third-party program shows no preview**: its CR3 support has to cover your exact camera model, so check its list.\n- **Colors differ from the camera screen**: the raw data requires color and tone processing, and this page applies none of your choices.\n- **The result is lossless but not raw**: the PNG stores every developed pixel exactly. If you want different tone or white balance later, go back to the CR3.\n- **\"Too large to convert here\"**: the page refuses files declaring more than about 537 megapixels; develop those in desktop software.\n"
+    }
+  },
+  "dcm-to-jpg": {
+    "seo": {
+      "title": "DCM to JPG: DICOM Export Options",
+      "h1": "DCM to JPG Converter",
+      "description": "This page doesn't convert DICOM files. Use a DICOM viewer such as MicroDicom or RadiAnt, or ImageMagick, to export a JPG instead."
+    },
+    "tool": {
+      "subtitle": "This page doesn't convert DICOM files; here are viewers that export a DCM to JPG."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert DCM to JPG?",
+        "answer": "This page does not promise to. A DICOM file can end in \"Image decode failed.\" here. Pick one of the DICOM viewers below to export the JPG."
+      },
+      {
+        "question": "What is inside a DCM file?",
+        "answer": "Usually a DICOM object: medical image data together with attributes such as patient and study information. DICOM also covers objects that are not images, so not every DCM is a single picture."
+      },
+      {
+        "question": "Is a JPG a complete copy of a DICOM study?",
+        "answer": "No. It is a rendered picture. Study and series relationships, and the rest of the DICOM attributes, are not carried by a single JPEG."
+      },
+      {
+        "question": "Why did only one CT slice appear?",
+        "answer": "A series can span many files. Open the whole dataset in a DICOM viewer and select the series or frames to export."
+      },
+      {
+        "question": "Can exported JPEGs still show patient information?",
+        "answer": "They can. A viewer can draw annotations into the picture itself, and RadiAnt lets you choose Full, Basic (anonymous) or Disabled annotations. Look at the output before sharing."
+      },
+      {
+        "question": "How can MicroDicom export several images?",
+        "answer": "In its picture-file export dialog the scope can be one image, one series, a study, a patient or everything loaded. Choose JPG and check the scope before you export."
+      },
+      {
+        "question": "Can RadiAnt choose which series to export?",
+        "answer": "Yes. The scope choices run from a single image to every opened series. Pick the source first, then write the JPEG copies to a folder."
+      },
+      {
+        "question": "Can I change the size of the exported picture?",
+        "answer": "Yes, in the viewer. MicroDicom offers original size, as on screen or a custom size, and RadiAnt offers default 1:1, current size or fit to."
+      },
+      {
+        "question": "Can I rename .dcm to .jpg?",
+        "answer": "No. A DICOM file has its own header and structure, so renaming it changes only the name. A DICOM-aware program has to render the image and encode a real JPEG."
+      },
+      {
+        "question": "Will ImageMagick open every DICOM object?",
+        "answer": "Its format table lists DCM as read-only. The reader draws a picture from a single file and does not browse studies, so test your exact file."
+      }
+    ],
+    "aboutSection": {
+      "title": "DCM and JPG",
+      "fromFormat": {
+        "name": "DCM",
+        "fullName": "DICOM image",
+        "description": "A filename extension used for DICOM medical image objects and their associated information.",
+        "details": [
+          "image plus patient and study metadata",
+          "many compression options",
+          "16-bit grayscale data"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A common photographic image format that does not represent a complete DICOM study.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DCM to JPG",
+      "points": [
+        "This page doesn't promise to convert DICOM: a DICOM file ends with \"Image decode failed.\"",
+        "A JPG is a rendered picture, not the study, series and instance structure of a DICOM dataset.",
+        "Use a DICOM viewer when you need to choose frames, size or annotations."
+      ]
+    },
+    "guide": {
+      "title": "Understanding DCM for JPG output",
+      "markdown": "### What is a DCM file?\n\nA .dcm file is usually a DICOM object. DICOM stands for Digital Imaging and Communications in Medicine, and the DICOM site calls it the international standard for medical images and related information. ISO recognizes it as ISO 12052, and it is built into almost every radiology, cardiology imaging and radiotherapy device. The format reference adds that it stores X-rays, CT and MRI scans together with patient and study metadata, and that its image data can be 16-bit grayscale with many compression options.\n\nThe media type is application/dicom, and IANA recommends .dcm for saved files. Data inside a saved file follows a 128-byte preamble and then the text DICM. A DICOMDIR file is different: it indexes a collection, and the files it names must be present. Medical datasets are organized as patients, studies, series and instances, and a series can span many files. Converting one file to a picture therefore does not necessarily export an examination or even a complete series.\n\nThis page does not promise to convert a DCM. It reads pictures with your browser's own image decoder, and a DICOM file can end with the message \"Image decode failed.\" The sections below cover programs that open a DICOM and export a JPG.\n\n### Programs that open DCM files\n\n**Windows:**\n\n- MicroDicom is a DICOM viewer for the Windows platform, and its File > Export > To a picture file dialog writes JPG pictures.\n- RadiAnt has an Export button that writes JPEG copies of what you are viewing.\n\n**Windows, Mac and Linux:**\n\n- 3D Slicer imports DICOM folders into a local database organized by patient, study and series. Its core handles images, segmentations, parametric maps and some structured reports, and other object types need extensions.\n- ImageMagick lists DCM as read-only and notes that its reader handles window center and width tags. It does not browse a whole study.\n\n### DCM and JPG compared\n\n- **Purpose**: a DICOM object carries image samples together with patient and study attributes. A JPG carries one rendered picture.\n- **Standard**: DICOM is maintained by NEMA. JPEG is defined by ISO/IEC 10918-1.\n- **Compression**: a DCM may use many compression options. A JPG is always lossy and has an adjustable quality.\n- **Depth**: DICOM data can be 16-bit grayscale. A JPG is a presentation of the image, not the original sample values.\n- **Transparency**: a JPG has no alpha channel.\n- **Frames and slices**: a multi-frame DICOM can be exported as separate pictures, and a series needs an intentional export scope. A single JPG cannot stand in for the structure of a study.\n\nAnnotations and metadata are separate matters. MicroDicom can draw annotations onto the pictures it exports, and RadiAnt's annotation options are Full, Basic (anonymous) or Disabled. Inspect the actual output and the export settings before sharing a derivative. Keep the original dataset when the recipient requires DICOM, rather than assuming a JPG serves the same purpose.\n\n### Other ways to convert DCM to JPG\n\n- **MicroDicom (Windows):** with the images open, use File > Export > To a picture file (the shortcut is Shift+P). Set a destination folder, how much to export, from one image up to every patient, and JPG as the format; then click Export. More settings cover separate files for multi-frame images, annotations, image size and JPEG quality.\n- **RadiAnt (Windows):** click the Export button or press Ctrl+E. Choose JPEG, the scope (current image, current series or all opened series), click Export and select a folder. More options set the filename prefix, image size, annotations and JPEG quality.\n- **ImageMagick (command line):** run `magick scan.dcm preview.jpg`. Check the result, because the command is not a replacement for study browsing, frame selection or review in a DICOM viewer.\n\n### Problems with DCM files\n\n- **This page reports a decode error**: the page does not promise to read DICOM. Use one of the applications above instead.\n- **Only one slice appears**: check whether the study includes other instances in the series or whether one object contains multiple frames. Use the viewer's scope controls to export what you need.\n- **The picture is the wrong size**: check the image size option in the export settings of your viewer.\n- **Names or measurements remain visible**: inspect annotations and the image itself before sharing.\n- **A recipient asks for the original study**: supply the DICOM dataset through the appropriate workflow. RadiAnt can copy the source DICOM files when you choose DICOM as the export format.\n- **A file doesn't open as a picture**: a DICOM file begins with its own header, so a viewer that understands DICOM has to render it. Renaming it to .jpg changes nothing inside.\n"
+    }
+  },
+  "dng-to-jpeg": {
+    "seo": {
+      "title": "Convert DNG to JPEG Online (Free)",
+      "h1": "DNG to JPEG Converter",
+      "description": "Convert Adobe DNG raw photos to JPEG in your browser, with no Adobe software. The JPEG is lossy and the page sets no quality. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an Adobe DNG raw photo into a JPEG that opens everywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert DNG to JPEG?",
+        "answer": "Drop the DNG into the converter, wait for the render, and download the JPEG. A selection of several DNG files comes back as separate JPEGs, one per DNG."
+      },
+      {
+        "question": "Do I need Lightroom or Photoshop?",
+        "answer": "No. The page reads the DNG with ImageMagick in your browser. If you want to adjust the photo first, a raw editor such as darktable is a route."
+      },
+      {
+        "question": "What JPEG quality does it use?",
+        "answer": "Quality is not set by the page, so what you get is one lossy JPEG without a quality option."
+      },
+      {
+        "question": "Are exposure and white balance adjustable here?",
+        "answer": "No. The page offers no development controls, so adjust the DNG in a raw editor first."
+      },
+      {
+        "question": "Is a DNG a kind of TIFF?",
+        "answer": "Closely related. The Library of Congress describes DNG as an extension of TIFF 6, which is why the .tif extension is also accepted by readers."
+      },
+      {
+        "question": "How does DNG differ from my camera's own raw file?",
+        "answer": "Adobe publishes the DNG specification openly. Many camera raw formats are proprietary, and their makers rarely publish the details."
+      },
+      {
+        "question": "Is every DNG the same inside?",
+        "answer": "No. A DNG can hold mosaic sensor data or a demosaiced linear picture, and the two are not interchangeable."
+      },
+      {
+        "question": "Will the JPEG keep the metadata?",
+        "answer": "The page sets no metadata options, and nothing on it states what ends up in the JPEG. Keep the DNG as your archive copy."
+      },
+      {
+        "question": "Is my photo uploaded?",
+        "answer": "No. ImageMagick converts it right in your browser and hands you a fresh JPEG, while the DNG remains untouched."
+      },
+      {
+        "question": "Who publishes the DNG specification?",
+        "answer": "Adobe does, and it grants a patent license to developers of compliant software and hardware."
+      }
+    ],
+    "aboutSection": {
+      "title": "DNG and JPEG",
+      "fromFormat": {
+        "name": "DNG",
+        "fullName": "Digital Negative",
+        "description": "Adobe Digital Negative, a documented format for RAW image storage and interchange.",
+        "details": [
+          "unprocessed sensor data",
+          "publicly documented specification",
+          "TIFF-based structure"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DNG to JPEG",
+      "points": [
+        "The JPEG is lossy, and the page sets no quality value.",
+        "The page offers no development settings, so white balance and tone are not adjustable.",
+        "A picture over about 537 megapixels fails with a message that it is too large.",
+        "Several DNG files convert in turn, each to its own JPEG."
+      ]
+    },
+    "guide": {
+      "title": "Understanding DNG for JPEG output",
+      "markdown": "### What is a DNG file?\n\nDNG, short for Digital Negative, is a camera-raw format that Adobe publishes as an open specification. According to the Library of Congress, it extends TIFF 6, and the specification recommends the .dng extension while asking readers to accept .tif as well. Adobe released version 1.0 in 2004. Later versions followed, up to 1.7 in 2023. The specification is public so that others can implement it compliantly.\n\nInside, a DNG comes in two kinds. A raw DNG holds mosaiced sensor data. A linear DNG, which is rarer, holds RGB image data that has already been demosaiced, so the processing choices made at that stage can't be redone. The default conversion usually compresses the raw data with lossless JPEG. Because the wrapper is documented, programs besides Adobe's can read it, but the encoded image bitstream may still need tools to render.\n\nYou reach a DNG in a few ways. Adobe offers a free DNG Converter that processes raw files from many cameras, and it can keep them un-demosaiced or write a linear DNG. The format has no external dependencies, and the Library of Congress, which has no established preference for DNG, accepts it in its Recommended Formats Statement for digital photographs and graphic images. A DNG can also be a TIFF-compatible file, since the specification allows, but does not require, compliance with TIFF/EP as well. Either way, a DNG is meant for raw development, so a JPEG is what you make when you need a picture to share.\n\n### Programs that open DNG files\n\n**Windows, Mac and Linux:**\n\n- darktable imports .dng files and reads them with RawSpeed. Sensors that are not Bayer (other than Fujifilm X-Trans) are not decoded.\n- ImageMagick lists DNG as read-only and requires the explicit specifier dng:image.dng.\n\n### DNG and JPEG compared\n\n- **Extensions and MIME types**: .dng for Digital Negative; .jpg or .jpeg with image/jpeg.\n- **Contents**: a DNG keeps raw or linear image data. A JPEG keeps a finished picture with the processing choices applied.\n- **Compression**: a DNG usually stores its raw samples with lossless JPEG, while the JPEG you make here is lossy and defined by ISO/IEC 10918-1.\n- **Transparency**: a JPEG can't hold transparency.\n- **Support**: a DNG does not guarantee that every reader handles the sensor layout, and darktable lists the non-Bayer sensors it cannot decode.\n- **Latitude**: a raw DNG can be developed again with different choices. A JPEG has them fixed.\n\nThis page reads the DNG with ImageMagick, compiled to WebAssembly and running in your browser, and writes a JPEG without setting a quality value. Nothing you would adjust in a raw editor can be changed here. Several DNG files can be selected at once, and every result downloads separately as a JPEG. The original DNG isn't changed, so you can convert it again later with different software or settings.\n\n### Other ways to convert DNG to JPEG\n\n- **darktable (Windows, Mac, Linux):** after developing the DNG, set the export module's target storage to file on disk, choose JPEG as the file format, pick a location and press start export. Supported DNG variants and your edits decide the result.\n- **ImageMagick (command line):** run `magick dng:negative.dng photograph.jpeg`. The dng: prefix is the explicit specifier ImageMagick requires for this format.\n\n### Problems with DNG files\n\n- **A program fails on a non-Bayer sensor**: darktable documents limits here, so try a different raw editor.\n- **A converted DNG looks different**: converting to DNG gives no guarantee that every reader supports the stored sensor pattern. Compare the JPEG against the source app's own rendering.\n- **The phone's own JPEG looks different from this one**: a camera app develops its JPEG with its own choices, while this page offers no development controls.\n- **A DNG saved by an editing program**: it may hold a demosaiced linear picture rather than sensor mosaic data, and readers don't all treat the two the same way.\n- **The JPEG looks flat**: no development was applied, so the look comes from the reader alone. A raw editor lets you shape it before export.\n- **A raw file arrives with a .tif extension**: the DNG specification asks readers to accept .tif for compatibility with TIFF/EP, so a renamed DNG can still be a raw file inside.\n- **\"Too large to convert here\"**: the file declares more than about 537 megapixels. Use desktop software instead.\n"
+    }
+  },
+  "exr-to-png": {
+    "seo": {
+      "title": "Convert EXR to PNG Online (Free)",
+      "h1": "EXR to PNG Converter",
+      "description": "Convert OpenEXR images to PNG in your browser. Linear light is encoded to sRGB, and values above white clip. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an OpenEXR render into an sRGB PNG that shows as it looks on screen."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert EXR to PNG?",
+        "answer": "Open the EXR in the converter and download the PNG. Several EXR files are handled in turn, each giving its own PNG."
+      },
+      {
+        "question": "Why isn't the PNG as bright as my EXR?",
+        "answer": "A PNG here has 8 bits per channel and tops out at white. Anything brighter than 1.0 in the EXR is clipped to white when it is read."
+      },
+      {
+        "question": "Why does the converted image look the right brightness?",
+        "answer": "EXR stores linear light, so the page encodes it to sRGB. The PNG then looks as it does on screen instead of dark."
+      },
+      {
+        "question": "Is the PNG HDR?",
+        "answer": "No. The PNG holds 8 bits per channel, and the high dynamic range is gone."
+      },
+      {
+        "question": "Is the alpha channel kept?",
+        "answer": "Yes. Only the color is encoded to sRGB, and alpha is left as it is."
+      },
+      {
+        "question": "What about extra channels and layers?",
+        "answer": "The page reads one image from the EXR. Named channels such as depth or object IDs aren't written to the PNG."
+      },
+      {
+        "question": "Why do dark gradients show banding?",
+        "answer": "The values are reduced to 256 levels before the sRGB encoding, so fine dark gradients can band."
+      },
+      {
+        "question": "Can I keep the 16-bit float values?",
+        "answer": "Not on this page. For float output use an EXR-aware program such as Krita, which treats EXR as its main format for floating-point depths."
+      },
+      {
+        "question": "Is my render uploaded?",
+        "answer": "No. The PNG is built on your own device, because ImageMagick works inside your browser."
+      },
+      {
+        "question": "Why can't my viewer open an EXR?",
+        "answer": "EXR is a production format for rendering and compositing, and general image viewers often skip it. Convert it to PNG to share."
+      }
+    ],
+    "aboutSection": {
+      "title": "EXR and PNG",
+      "fromFormat": {
+        "name": "EXR",
+        "fullName": "OpenEXR image",
+        "description": "OpenEXR, a high-dynamic-range image format used for rendered and composited imagery.",
+        "details": [
+          "high dynamic range",
+          "16-bit and 32-bit float",
+          "lossless and lossy compression"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format used for portable rendered pictures and transparency.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting EXR to PNG",
+      "points": [
+        "Values above 1.0 clip to white; high dynamic range is lost.",
+        "Linear light is encoded to sRGB so the PNG looks right on screen.",
+        "The PNG is 8 bits per channel, so dark gradients can band.",
+        "One image is read; other channels and layers are not written.",
+        "Alpha is kept as it is."
+      ]
+    },
+    "guide": {
+      "title": "Understanding EXR for PNG output",
+      "markdown": "### What is an EXR file?\n\nEXR is the file extension of OpenEXR, a high-dynamic-range raster format created by Industrial Light & Magic and released as open source in 2003. It stores 16-bit half-float or 32-bit float pixel values. The project is now part of the Academy Software Foundation, and its documentation points to strong support for multi-part, multi-channel files, which is why one EXR can hold more than a single picture's worth of data.\n\nEXR shows up in visual effects, film compositing and 3D render output. Few ordinary programs show one correctly. Because the values are scene-referred and can go above white, numbers above 1.0 are normal inside the file and do not mean it is overexposed. Treating such data like a display-ready JPEG changes how it looks, which is why a converter has to decide what to do with the bright values.\n\nThis page makes that decision for you, and the decision is described below. If you want to pick an exposure yourself, use a program that can edit floating-point images.\n\n### Programs that open EXR files\n\n**Windows, Mac and Linux:**\n\n- GIMP loads and exports OpenEXR. Version 3.1.2 added loading of multi-layer files, which show up as individual layers, and the EXR export has no settings dialog.\n- Krita loads and saves EXR for paint-over work and for exchange with apps such as Blender, Nuke and Natron. EXR stores no color space, so Krita assigns a default on load, usually Rec 709 Linear.\n- ImageMagick lists EXR as read and write, and its notes say it requires the OpenEXR library.\n\n### EXR and PNG compared\n\n- **Extensions and MIME types**: .exr for OpenEXR; .png with image/png.\n- **Numbers**: EXR stores half or full floats, so values can go far above white. PNG samples are integers from 1 to 16 bits, and this page writes 8.\n- **Light**: EXR holds scene-linear values. A PNG is normally display-encoded, and this page applies the sRGB encoding.\n- **Channels**: EXR can carry many named channels. A PNG holds color and, optionally, alpha.\n- **Compression**: PNG compression is always lossless and DEFLATE-based.\n- **Alpha**: both formats can have it, and the page leaves alpha as it is.\n- **Typical use**: EXR serves rendering and compositing, while a PNG is a display-ready picture that browsers show.\n\nThe page reads the EXR into an 8-bit build of ImageMagick. That build clamps each value above 1.0 as it reads, so highlights brighter than white become white and cannot be recovered afterward. After that the linear values are converted to sRGB, since otherwise the PNG would appear dark. Before the conversion each is rounded to one of 256 levels, which is why dark gradients can band. Several EXR files can be selected together, each downloading as its own PNG, and the EXR files themselves are left as they were.\n\n### Other ways to convert EXR to PNG\n\n- **GIMP (Windows, Mac, Linux):** open the EXR, use File > Export As, and name the file with a .png ending. The PNG dialog offers a pixel format of 8 or 16 bits per channel, with or without alpha, plus a compression level.\n- **Krita (Windows, Mac, Linux):** open the EXR, choose File > Export and pick PNG. Decide the color transform before you export, because Krita assigns a color space on load.\n- **ImageMagick (command line):** run `magick render.exr preview.png`.\n\n### Problems with EXR files\n\n- **The picture looks dark in a viewer**: the data is linear. Convert it here to get an sRGB PNG.\n- **Highlights are blown out**: values over 1.0 clip to white in this conversion. Use an editor that handles floating point to pick an exposure first.\n- **Colors shift in an editor**: an editor that assigns a different working space changes color interpretation, and Krita documents an OCIO option that overrides its assigned profile.\n- **Channels are missing**: a PNG holds color and alpha, so keep the EXR for passes and layers.\n- **The EXR came from a 3D package**: a render can include extra named passes, and none of them reach the PNG.\n- **A very large frame fails**: a header declaring above 537 megapixels makes the page report that it is too large.\n- **Banding in dark areas**: this comes from the rounding to 256 levels, so a workflow with more than 8 bits suits gradients better.\n- **You need more than 8 bits**: GIMP's PNG dialog offers 16 bits per channel, while this page writes 8.\n- **The PNG has to go back into a render pipeline**: clipped highlights cannot be restored, so keep the EXR as the master and treat the PNG as a preview.\n"
+    }
+  },
+  "flac-to-m4a": {
+    "seo": {
+      "title": "Convert FLAC to M4A Online (Free)",
+      "h1": "FLAC to M4A Converter",
+      "description": "Convert FLAC to M4A in your browser: the lossless audio is re-encoded as 192 kbps AAC, a lossy copy. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Make a 192 kbps AAC M4A copy of a FLAC file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert FLAC to M4A?",
+        "answer": "Choose the FLAC on this page and save the M4A it produces. The audio is re-encoded as AAC at 192 kbps."
+      },
+      {
+        "question": "Is the M4A lossless?",
+        "answer": "No. This page writes AAC, which is lossy, not Apple Lossless (ALAC). Keep the FLAC as your master."
+      },
+      {
+        "question": "What bitrate does the M4A use?",
+        "answer": "Always 192 kbps AAC, whatever the FLAC held. The page offers no way to change it."
+      },
+      {
+        "question": "Will the M4A play on phones and in browsers?",
+        "answer": "The Library of Congress notes that Apple began using .m4a for unprotected music files. Mozilla's guide says AAC in an MP4 container is supported by all major browsers, and Android lists AAC in .m4a files."
+      },
+      {
+        "question": "Is the M4A smaller than the FLAC?",
+        "answer": "Usually, because FLAC keeps every sample while AAC is a lossy codec. Compare the two sizes on your own file."
+      },
+      {
+        "question": "Can I convert an album at once?",
+        "answer": "Select all the tracks at once and the page converts them in sequence, saving each as a separate M4A. There is no ZIP."
+      },
+      {
+        "question": "Does the M4A keep the FLAC's title, artist and album?",
+        "answer": "Normally. The page passes no stream or metadata mapping, so by default FFmpeg carries the input's global tags over to the M4A, including title, artist and album. FLAC stores them as Vorbis comments."
+      },
+      {
+        "question": "Does my FLAC get uploaded?",
+        "answer": "No. Conversion happens in your browser through FFmpeg, so the FLAC never leaves your device."
+      },
+      {
+        "question": "Is there a cap on file size?",
+        "answer": "Not on this page. A large FLAC only takes longer on a slower device."
+      },
+      {
+        "question": "Can I turn the M4A back into FLAC?",
+        "answer": "You can, but the FLAC would hold only what the AAC decodes to. Detail lost in the AAC does not come back."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLAC and M4A",
+      "fromFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "Free Lossless Audio Codec, an open format that preserves PCM audio information while compressing storage.",
+        "details": [
+          "lossless compression",
+          "open source",
+          "metadata tags"
+        ]
+      },
+      "toFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container. It usually holds AAC audio, which is what this page writes, or Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art",
+          "widely supported"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting FLAC to M4A",
+      "points": [
+        "The M4A holds AAC audio at 192 kbps, not Apple Lossless.",
+        "The result is lossy, so keep the FLAC if you want the original.",
+        "Several FLAC files convert in turn, each to its own M4A.",
+        "Tags such as title, artist and album are copied where the M4A has fields for them.",
+        "FFmpeg runs in your browser, so the audio isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding FLAC for M4A output",
+      "markdown": "### What is a FLAC file?\n\nFLAC, the Free Lossless Audio Codec, compresses audio without losing information, so decoding returns exactly the samples that went in. Its format description is RFC 9639, published in December 2024 as a Standards Track document. Streams can carry from one up to eight channels, at four to 32 bits per sample. Its metadata blocks can carry seek points, pictures and Vorbis comments, and the Vorbis comment block is where title, artist and album tags live.\n\nPeople keep FLAC for ripped CDs, music archives and purchases from lossless stores. It is the master copy, and the usual reason to convert is to get a file that plays on a phone or a player that doesn't take FLAC.\n\nLossless doesn't mean indestructible. Each frame ends with a 16-bit CRC, and the stream info block stores an MD5 checksum of the audio, so a decoder can detect errors in the data. Detecting damage is not the same as repairing it. A FLAC made from an MP3 or another lossy source also holds only that source's sound, since samples that were thrown away cannot be recreated.\n\n### Programs that open FLAC files\n\n**Windows, Mac and Linux:**\n\n- Audacity lists FLAC among the formats it imports as shipped, with no need for the optional FFmpeg library.\n- VLC media player lists FLAC among the audio it plays.\n- FFplay, the player from the FFmpeg project, decodes FLAC through FFmpeg's decoders.\n\n**Web:**\n\n- Mozilla's codec guide lists FLAC support in Chrome, Edge, Firefox, Opera and Safari.\n\n**Mobile:**\n\n- Android's media documentation lists FLAC in .flac files, in mono or stereo only, with 16-bit samples recommended.\n\n### FLAC and M4A compared\n\n- **Extensions and MIME types**: .flac with audio/flac; .m4a with audio/mp4 for sound without pictures.\n- **Compression**: FLAC is lossless. The M4A here is lossy AAC, because the page asks FFmpeg for its aac encoder.\n- **Bitrate**: this page encodes AAC at 192 kbps for every file.\n- **Container**: .m4a is an MPEG-4 audio-only file, that follows the ISO base media file format, organized in boxes. According to the Library of Congress, Apple took up the extension for files without copy protection. It can hold lossless ALAC too, but this page doesn't write it.\n- **Metadata**: FLAC uses Vorbis comments. The page maps nothing itself, so FFmpeg's defaults decide what carries over.\n- **Pictures**: FLAC can embed a picture. The page's command disables video, so don't count on artwork arriving in the M4A.\n\nConverting is a one-way trade of exactness for a different format. You can't recover the FLAC from the M4A. The page also uses one fixed bitrate for every file, so a quiet spoken-word FLAC and a dense orchestral one both come out at 192 kbps. You can select several FLAC files; the files are handled sequentially, and every M4A downloads separately, without a ZIP.\n\n### Other ways to convert FLAC to M4A\n\n- **FFmpeg (command line):** use `ffmpeg -i master.flac -c:a aac -b:a 192k portable-copy.m4a`. FFmpeg's format table lists FLAC decoding and AAC encoding with its internal encoder. The command makes AAC, not ALAC.\n- **Audacity (Windows, Mac, Linux):** import the FLAC, choose File > Export Audio and select M4A (AAC) Files (FFmpeg) as the format. The manual says FFmpeg is required for AAC export and isn't shipped with Audacity. Its bit rate setting is not always honored, according to the same page.\n\n### Problems with FLAC files\n\n- **Won't play on a device**: Android documents FLAC playback as mono or stereo, and recommends 16-bit samples. Convert to M4A for devices that balk.\n- **A damaged frame**: a FLAC frame can fail its CRC check. Lossless coding doesn't protect against corruption on disk, so keep a backup.\n- **A cut-short or damaged FLAC**: FFmpeg usually reports the error and saves the part it could decode, so the M4A may end up shorter than the original.\n- **The M4A sounds worse**: AAC is lossy. If you can hear the difference, keep the FLAC and use it as the source.\n- **The source was already lossy**: FLAC made from an MP3 holds only that MP3's sound. Converting it again adds a second loss.\n- **Tags are missing**: check the M4A in your player and re-enter them in a tag editor.\n- **A very large file**: the page sets no size limit, but the work happens locally, so a long album track simply takes more time on a slow phone.\n- **A renamed file**: calling a FLAC .m4a changes the label, not the data. Convert it.\n- **You wanted lossless M4A**: this page writes AAC. For Apple Lossless you need a tool that offers ALAC, and the FFmpeg command above won't make it.\n"
+    }
+  }
+}

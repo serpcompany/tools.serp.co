@@ -1,0 +1,214 @@
+{
+  "tools": {
+    "avi-to-wav": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.avi -vn output.wav. Add a -map option to choose one audio track.",
+          "limits": "Needs a local FFmpeg that can decode the AVI's audio.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "exr-to-jpg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick render.exr render.jpg.",
+          "limits": "Needs a build with the OpenEXR library.",
+          "source": "https://imagemagick.org/convert/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the EXR, choose File > Export As and save it as a JPEG; set the quality in the dialog.",
+          "limits": "GIMP supports basic EXR only; layered or multiresolution EXR files are not supported.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+          "supportingSources": [
+            "https://www.gimp.org/news/2015/11/27/gimp-2-9-2-released/",
+            "https://docs.gimp.org/3.2/en/gimp-file-export-as.html"
+          ]
+        }
+      ]
+    },
+    "jpeg-to-avif": {
+      "methods": [
+        {
+          "app": "avifenc",
+          "steps": "Run avifenc -q 80 photo.jpg photo.avif.",
+          "limits": "The -q option sets quality from 0 to 100.",
+          "source": "https://raw.githubusercontent.com/AOMediaCodec/libavif/main/doc/avifenc.1.md"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG, choose File > Export As and save it as AVIF.",
+          "limits": "AVIF import and export need GIMP 2.10.22 or later.",
+          "source": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/",
+          "supportingSources": [
+            "https://docs.gimp.org/3.2/en/gimp-file-export-as.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick photo.jpg photo.avif.",
+          "limits": "AVIF is listed as readable and writable.",
+          "source": "https://imagemagick.org/convert/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "jpeg-to-psd": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG, choose File > Export As and give the file the .psd extension.",
+          "limits": "Not all blending modes convert to an exact Photoshop equivalent.",
+          "source": "https://docs.gimp.org/3.2/en/file-psd-export.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.2/en/gimp-file-export-as.html"
+          ]
+        },
+        {
+          "app": "Photopea",
+          "steps": "Open the JPEG with File - Open, then choose File - Save as PSD.",
+          "limits": "Photopea converts every file you open into a PSD document.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        }
+      ]
+    },
+    "jxl-to-png": {
+      "methods": [
+        {
+          "app": "djxl",
+          "steps": "Run djxl image.jxl image.png.",
+          "limits": "The output extension picks the format; an animation writes one numbered file per frame.",
+          "source": "https://raw.githubusercontent.com/libjxl/libjxl/main/doc/man/djxl.txt"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the JXL, choose File > Export As and save it as PNG.",
+          "limits": "Stable JPEG XL import needs GIMP 2.10.32 or later.",
+          "source": "https://www.gimp.org/news/2022/06/14/gimp-2-10-32-released/",
+          "supportingSources": [
+            "https://docs.gimp.org/3.2/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.0/en/file-png-export.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick image.jxl image.png.",
+          "limits": "Needs a build with JPEG XL support.",
+          "source": "https://imagemagick.org/convert/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "mp2-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mp2 -c:a libmp3lame -b:a 192k output.mp3.",
+          "limits": "Needs a build with the libmp3lame encoder.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "Audacity",
+          "steps": "Import the MP2 with File > Import > Audio, then choose File > Export Audio and pick MP3 as the format.",
+          "limits": "MP2 is imported natively; saving a project alone does not create an MP3.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html",
+          "supportingSources": [
+            "https://manual.audacityteam.org/man/file_export_dialog.html"
+          ]
+        }
+      ]
+    },
+    "mp4-to-mjpeg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mp4 -c:v mjpeg -q:v 5 output.avi.",
+          "limits": "Differs from this page: no 1920 px or 30 fps limit.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        }
+      ]
+    },
+    "mp4-to-wma": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mp4 -vn output.wma.",
+          "limits": "-vn drops the video.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "With the FFmpeg library installed, import the MP4, choose File > Export Audio and pick WMA (version2) Files (FFmpeg).",
+          "limits": "FFmpeg library is required; protected media are not ordinary import sources.",
+          "source": "https://manual.audacityteam.org/man/wma_export_options.html",
+          "supportingSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html"
+          ]
+        }
+      ]
+    },
+    "mpeg2-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mpeg2 -c:v libx264 -c:a aac output.mp4.",
+          "limits": "Re-encodes video with libx264 and audio with the AAC encoder; FFmpeg must be built with libx264.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Avidemux",
+          "steps": "Open the file with the Open button, set the video encoder to Mpeg4 AVC (x264) instead of Copy, set the output format to MP4 Muxer and save.",
+          "limits": "Encoding is lossy.",
+          "source": "https://avidemux.org/admWiki/doku.php?id=using:quickstart",
+          "supportingSources": [
+            "https://avidemux.org/smif/index.php?topic=19747.15"
+          ]
+        }
+      ]
+    },
+    "opus-to-m4a": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.opus -c:a aac -b:a 192k output.m4a.",
+          "limits": "Writes lossy AAC in M4A.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "opusdec and Audacity",
+          "steps": "Run opusdec input.opus output.wav; in Audacity choose File > Import > Audio to open the WAV, then File > Export Audio and M4A(AAC) Files FFmpeg from the Format dropdown.",
+          "limits": "Two-stage workflow; Audacity needs its optional FFmpeg library for AAC export.",
+          "source": "https://opus-codec.org/docs/opus-tools/opusdec.html",
+          "supportingSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html",
+            "https://manual.audacityteam.org/man/file_export_dialog.html",
+            "https://manual.audacityteam.org/man/aac_export_options.html",
+            "https://manual.audacityteam.org/man/faq_installing_the_ffmpeg_import_export_library.html"
+          ]
+        }
+      ]
+    }
+  }
+}

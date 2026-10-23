@@ -1,0 +1,809 @@
+{
+  "gsm-to-mp3": {
+    "seo": {
+      "title": "Convert GSM to MP3 Online (Free)",
+      "h1": "GSM to MP3 Converter",
+      "description": "Turn GSM voice recordings into MP3 files most players open. FFmpeg runs in your browser, so the file stays on your device. Free."
+    },
+    "tool": {
+      "subtitle": "Turn a GSM voice recording into an MP3 that most players open."
+    },
+    "faqs": [
+      {
+        "question": "Will the MP3 sound better than the GSM file?",
+        "answer": "No. GSM is already a narrow speech codec, and MP3 cannot bring back what was discarded. The gain is compatibility, since nearly every device plays MP3."
+      },
+      {
+        "question": "Why does the MP3 take more space than the GSM file?",
+        "answer": "GSM stores speech at 13 kbit/s. The page asks for 192 kbit/s, but MP3 cannot reach that at the 8 kHz sample rate of a GSM recording, and the sample rate is not changed. The MP3 ends up at about 64 kbit/s, so it is larger than the GSM file."
+      },
+      {
+        "question": "Is a raw .gsm file the same as GSM inside a WAV?",
+        "answer": "No. Raw .gsm and WAV format 49 use incompatible framing, so they are not interchangeable byte layouts. Renaming one to the other will not make it play."
+      },
+      {
+        "question": "What happens if my GSM file is cut off at the end?",
+        "answer": "FFmpeg's raw GSM reader expects complete 33-byte blocks. If the last block is incomplete it logs an error, and the page still writes an MP3 from what it could read. Download the recording again if the very end matters."
+      },
+      {
+        "question": "Can I pick a different MP3 bitrate?",
+        "answer": "The bitrate on this page is fixed at 192 kbit/s with no control to change it. On your own computer FFmpeg's -b:a option sets a bitrate and -q:a takes a quality number for variable bitrate, as the methods below show."
+      },
+      {
+        "question": "How do I convert a batch of voicemails?",
+        "answer": "Choose all the GSM files in one go. FFmpeg works through them in order, and every MP3 is a separate download."
+      },
+      {
+        "question": "Should I keep the GSM file after converting?",
+        "answer": "Yes. The MP3 is a second lossy encode of speech that GSM has already compressed hard, so the GSM file is the closest copy you have of the original. Keep it if you may need to convert again."
+      },
+      {
+        "question": "Is my recording uploaded anywhere?",
+        "answer": "No server is involved. FFmpeg runs on your device inside the page and does not alter the GSM file you chose."
+      }
+    ],
+    "aboutSection": {
+      "title": "GSM and MP3",
+      "fromFormat": {
+        "name": "GSM",
+        "fullName": "GSM 06.10 audio",
+        "description": "A speech codec used in GSM mobile networks, also known as Full Rate. It compresses telephone-quality speech to 13 kbit/s.",
+        "details": [
+          "lossy speech compression",
+          "8 kHz sampling",
+          "13 kbit/s",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "widely supported for playback"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting GSM to MP3",
+      "points": [
+        "A GSM recording is sampled at 8 kHz. The page asks for 192 kbit/s, but MP3 at that sample rate comes out at about 64 kbit/s, more than GSM's 13 kbit/s.",
+        "A raw .gsm file and WAV-packed GSM use different framing and cannot be swapped by renaming.",
+        "If the final block of the .gsm file is cut short, FFmpeg logs an error and the page still writes an MP3 from what it could read."
+      ]
+    },
+    "guide": {
+      "title": "About GSM and MP3",
+      "markdown": "### What is a GSM file?\n\nGSM here means GSM 06.10, a lossy speech codec specified by ETSI for mobile telephony. Its RPE-LTP algorithm squeezes telephone speech into 13 kbit/s at an 8 kHz sample rate, packing each 160-sample block into a 264-bit frame. It turns up in voice recordings, telephony systems and voicemail, and it is a legacy format. The toast utility from libgsm writes compressed speech with the .gsm ending.\n\n### Programs that open GSM files\n\n- **Windows:** FFmpeg reads raw .gsm frames and exposes them as mono speech.\n- **Mac:** Audacity opens GSM audio.\n- **Linux:** toast and untoast, the libgsm command-line tools that encode and decode raw GSM speech.\n\nFFmpeg is listed for Mac and Linux too, and VLC media player and SoX are also listed as programs that open GSM.\n\n### GSM and MP3 compared\n\n- **Purpose**: GSM is built for narrow telephone speech. MP3 is a general-purpose lossy audio format from MPEG, and it grew into the standard way to distribute downloadable music.\n- **Packaging**: raw .gsm files and Microsoft's WAV GSM packing use different framing.\n- **Tags**: MP3 keeps tags such as the title in ID3 data inside the file.\n- **Playback**: MP3 plays on nearly every device, browsers included. GSM needs a program that knows the codec.\n\nHere FFmpeg works in your browser, asking libmp3lame for 192 kbit/s and leaving out any video. MP3 cannot reach that rate at GSM's 8 kHz, so the file comes out at about 64 kbit/s. Selected files are processed in sequence, and each MP3 downloads on its own.\n\n### Other ways to convert GSM to MP3\n\n- **FFmpeg:** `ffmpeg -i message.gsm -c:a libmp3lame -b:a 192k message.mp3`. The -b:a option sets the bitrate for the libmp3lame encoder.\n- **FFmpeg, variable bitrate:** `ffmpeg -i message.gsm -q:a N -c:a libmp3lame message.mp3`, where N is a quality number. The libmp3lame q option sets a constant quality for variable bitrate instead of a fixed bitrate.\n- **SoX:** `sox message.gsm message.mp3`. SoX lists GSM 06.10 and MP3 as optional formats, and MP3 writing needs SoX built with the LAME library.\n\n### Problems with GSM files\n\n- **Chirping or thin sound**: repeated GSM compression removes more information and can create audible chirping, so work from the first recording.\n- **The file will not open**: raw .gsm and WAV format 49 are not interchangeable byte layouts.\n- **A cut-off recording**: FFmpeg's raw reader expects complete 33-byte blocks, and a truncated last block is invalid to it. FFmpeg logs an error, and this page still writes the MP3 from what it could read, so download the file again if the end matters."
+    }
+  },
+  "hdr-to-jpg": {
+    "seo": {
+      "title": "Convert HDR to JPG Online (Free)",
+      "h1": "HDR to JPG Converter",
+      "description": "Convert a Radiance HDR image to a standard JPG you can share. ImageMagick runs in your browser, so the file stays on your device. Free."
+    },
+    "tool": {
+      "subtitle": "Turn a Radiance HDR image into an ordinary JPG."
+    },
+    "faqs": [
+      {
+        "question": "Which HDR does this convert?",
+        "answer": "The .hdr file, the Radiance RGBE format. It is used for environment maps, lighting simulation and HDR image storage."
+      },
+      {
+        "question": "Does the JPG keep the extra brightness range?",
+        "answer": "No. A JPG holds the ordinary eight-bit range, so highlights brighter than white come out white, and the linear light in the file is encoded to sRGB so the picture does not look dark."
+      },
+      {
+        "question": "Can I choose how the highlights are mapped?",
+        "answer": "Not on this page. It sets no quality or tone-mapping options, and the picture keeps the exposure it was saved with. For control over the result, condition the HDR with Radiance's pcond, described in the methods below."
+      },
+      {
+        "question": "How big an HDR can it handle?",
+        "answer": "The page has no size cap, but it gives up on a picture beyond roughly 537 megapixels. The error reads \"too large to convert here\". ImageMagick reads a single image from the file."
+      },
+      {
+        "question": "What does the shared exponent mean?",
+        "answer": "Each pixel stores red, green and blue bytes plus one shared exponent, in four bytes. Software must interpret the exponent, so the bytes are not plain RGB."
+      },
+      {
+        "question": "Will transparency be kept?",
+        "answer": "JPG has no alpha channel, so the output is always a flat picture."
+      },
+      {
+        "question": "Does my HDR file leave my computer?",
+        "answer": "No. The work is done by ImageMagick inside your browser tab, and the original HDR is not modified."
+      },
+      {
+        "question": "Can I queue more than one HDR?",
+        "answer": "You can pick many at a time. They are processed in sequence and each produces its own JPG download."
+      }
+    ],
+    "aboutSection": {
+      "title": "HDR and JPG",
+      "fromFormat": {
+        "name": "HDR",
+        "fullName": "Radiance HDR image",
+        "description": "A high-dynamic-range image format created for the Radiance lighting simulation software, also known as RGBE. It stores each pixel as an RGB mantissa with a shared exponent.",
+        "details": [
+          "high dynamic range",
+          "shared-exponent RGBE pixels",
+          "run-length encoding",
+          "extension .hdr or .pic"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "widely supported"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting HDR to JPG",
+      "points": [
+        "The JPG holds the ordinary eight-bit range, so values brighter than white are clamped to white.",
+        "No tone-mapping or quality setting is offered on this page.",
+        "Anything beyond roughly 537 megapixels is turned away."
+      ]
+    },
+    "guide": {
+      "title": "About HDR and JPG",
+      "markdown": "### What is an HDR file?\n\nHDR here is Radiance RGBE, a high-dynamic-range image format created by Greg Ward for the Radiance lighting simulation software. Each pixel is stored as red, green and blue bytes plus a shared exponent, four bytes in all, which allows a wider brightness range than ordinary 24-bit RGB. Files use run-length encoding and the extension .hdr or .pic; the registered media type is image/vnd.radiance. Radiance lighting simulations use RGBE images to represent calculated brightness, and the files also serve as environment maps for 3D rendering.\n\n### Programs that open HDR files\n\n- **Windows:** ImageMagick has an HDR coder for Radiance files in both directions.\n- **Mac:** Adobe Photoshop is named in the format's registration among the users of the Radiance media type.\n- **Linux:** Radiance, the original rendering system, which ships RGBE reading and writing code.\n\nImageMagick is listed on Mac and Linux as well, and Photoshop on Windows. Blender, GIMP and Luminance HDR are also listed as programs that open HDR.\n\n### HDR and JPG compared\n\n- **Range**: HDR keeps a wide brightness range. JPG is lossy and designed for photographs.\n- **Pixels**: HDR bytes are not ordinary packed RGB, so software has to interpret the exponent.\n- **Transparency**: JPG has no alpha channel.\n- **Storage**: HDR uses four bytes per pixel rather than three single-precision floating-point channels.\n- **Support**: JPG is widely supported. HDR opens in the programs listed above.\n\nThis page uses ImageMagick compiled to WebAssembly on the main thread. It reads a single image and passes no quality or mapping option, so you cannot steer the highlights. Each value above white is clamped to white, and the linear light is encoded to sRGB.\n\n### Other ways to convert HDR to JPG\n\n- **Radiance and ImageMagick:** run `pcond scene.hdr mapped.hdr` to condition the HDR for viewing, `ra_ppm mapped.hdr mapped.ppm` to write a PPM, then `magick mapped.ppm preview.jpg` to make the JPG.\n- **ImageMagick:** `magick scene.hdr -colorspace sRGB preview.jpg` on your own machine.\n\n### Problems with HDR files\n\n- **Washed-out or blown highlights**: clipping bright values to the ordinary eight-bit range can discard highlight information. Choose an appropriate rendering instead of truncating samples.\n- **Wrong colors in another program**: an HDR image needs software that interprets the shared exponent, because its bytes are not ordinary packed RGB pixels.\n- **A file that will not read**: the extension alone does not identify the contents, and the registered Radiance description advises checking the complete header."
+    }
+  },
+  "jfif-to-svg": {
+    "seo": {
+      "title": "Convert JFIF to SVG Online (Free)",
+      "h1": "JFIF to SVG Converter",
+      "description": "Wrap a JFIF picture in an SVG file. The photo is embedded at full size, not traced, and it stays on your device. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Embed a JFIF picture in an SVG file; the image is not traced to vector shapes."
+    },
+    "faqs": [
+      {
+        "question": "Does this turn my JFIF photo into vector shapes?",
+        "answer": "No. The picture is not traced. The SVG holds one image element with your picture embedded as a PNG at its own pixel width and height, so it does not scale like a true vector."
+      },
+      {
+        "question": "Why does the SVG look blurry when I enlarge it?",
+        "answer": "SVG files can contain pixel images, and those parts stay at their original resolution however far you zoom. The embedded picture is exactly as sharp as your JFIF was."
+      },
+      {
+        "question": "How do I get real vector shapes from a JFIF?",
+        "answer": "Trace it with Inkscape, as the second method below shows. A trace of a photograph will not be an exact copy."
+      },
+      {
+        "question": "Is the picture resized or reduced?",
+        "answer": "No. The full-color picture is embedded without resizing. Embedded metadata such as EXIF, ICC color profiles and XMP is dropped on the way to the SVG."
+      },
+      {
+        "question": "Is a .jfif different from an ordinary .jpg?",
+        "answer": "Only in name: a JFIF reads like a regular JPEG. The format specifies color space and pixel aspect ratio."
+      },
+      {
+        "question": "What if I have a whole folder of JFIF files?",
+        "answer": "Select them together; each JFIF turns into a separate SVG."
+      },
+      {
+        "question": "What does \"This browser can't open … files\" mean?",
+        "answer": "The decoder built into your browser could not read the picture. The page asks for a recent Chrome, Edge, Firefox or Safari, and it shows \"Image decode failed.\" when decoding fails."
+      },
+      {
+        "question": "Can I edit the SVG afterward?",
+        "answer": "You can open it in Inkscape or a browser, but the content is one embedded picture, so there are no shapes to edit. Replace it with a traced copy if you want paths."
+      }
+    ],
+    "aboutSection": {
+      "title": "JFIF and SVG",
+      "fromFormat": {
+        "name": "JFIF",
+        "fullName": "JPEG File Interchange Format",
+        "description": "A container convention for JPEG-compressed images that specifies color space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data.",
+        "details": [
+          "lossy JPEG compression",
+          "no alpha transparency",
+          "readable as a regular JPEG"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based W3C graphics format that can describe shapes, text and embedded raster images. Embedded photographs retain their original pixel-resolution limits.",
+        "details": [
+          "vector shapes and embedded raster pictures",
+          "XML text",
+          "supports animation and scripting",
+          "styleable with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JFIF to SVG",
+      "points": [
+        "The SVG wraps your picture; it is not traced into vector shapes.",
+        "The picture is embedded as a PNG at its own pixel size, so enlarging it does not add sharpness.",
+        "EXIF, color profiles and XMP are not carried over."
+      ]
+    },
+    "guide": {
+      "title": "About JFIF and SVG",
+      "markdown": "### What is a JFIF file?\n\nJFIF, the JPEG File Interchange Format, is a container convention for JPEG-compressed pictures that fixes the color space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data. Some browsers and Windows tools save pictures this way, and photographs are often exchanged in it. The compression is lossy and there is no alpha transparency. Because a JFIF can be read as a regular JPEG, any program that opens JPEG pictures opens it too.\n\n### Programs that open JFIF files\n\n- **Windows:** Windows Photos opens it, and ImageMagick reads it with its JPEG reader.\n- **Web and Mobile:** Google Chrome displays JFIF.\n- **Web:** Mozilla Firefox displays JFIF.\n- **Mobile:** Safari displays JFIF.\n\nGIMP is also listed as a program that opens it.\n\n### JFIF and SVG compared\n\n- **Kind**: JFIF is a pixel format. SVG is an XML-based W3C vector format that describes shapes, paths and text mathematically.\n- **Scaling**: true SVG vectors stay sharp at any size. A photo placed inside an SVG keeps its original resolution.\n- **Use**: SVG suits logos, icons and diagrams. JFIF suits photographs.\n\nOn this page your browser decodes the picture and a canvas builds the SVG. The resulting SVG contains one image element, with the picture stored as a base64 PNG sized to its own pixel dimensions. Nothing is resized, and the pixels pass through 8-bit RGBA.\n\n### Other ways to convert JFIF to SVG\n\n- **Inkscape, embedding:** File > Import, choose Embed rather than Link so the picture is stored inside the file, then File > Save As and pick Inkscape SVG.\n- **Inkscape, tracing:** File > Import, select the picture, run Path > Trace Bitmap, then save as SVG. This produces paths, but the manual says a trace suits dark silhouettes against a bright background and will disappoint if you expect a faithful copy.\n- **Photopea:** File > Open, then File > Export As > SVG.\n\n### Problems with JFIF files\n\n- **A .jfif file may simply hold ordinary JPEG data**: identify its encoding before deciding to re-encode.\n- **A reader rejects the file**: some JPEG extensions exceed a particular JFIF reader's capabilities, so try a baseline-compatible export.\n- **No transparency to keep**: a JFIF carries JPEG data, so transparency is not something it can store."
+    }
+  },
+  "jpg-to-cur": {
+    "seo": {
+      "title": "Convert JPG to CUR Online (Free)",
+      "h1": "JPG to CUR Converter",
+      "description": "Save a JPG as a .cur file: one image up to 256 px, no hotspot setting, and the file stays on your device. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Save a JPG as a CUR file: one image, up to 256 px, with no hotspot setting."
+    },
+    "faqs": [
+      {
+        "question": "Can I set the hotspot on this page?",
+        "answer": "No. A CUR stores a hotspot, the point where the pointer clicks, but this page has no setting for it. GIMP's Windows Cursor export has fields for it, as the method below shows."
+      },
+      {
+        "question": "How large will the image be?",
+        "answer": "One image, at most 256 px. A JPG larger than 256 px on a side shrinks to fit with its proportions kept, and a smaller one is never enlarged."
+      },
+      {
+        "question": "Will the cursor have a see-through background?",
+        "answer": "No. JPEG has no alpha channel, so the image is a solid rectangle. A shaped pointer needs a source with transparency, which a JPG cannot hold."
+      },
+      {
+        "question": "Does the CUR contain several sizes?",
+        "answer": "No, only the one image you gave it. Several sizes can share a CUR, but this page writes just one image."
+      },
+      {
+        "question": "Why is my image blurry or tiny?",
+        "answer": "The CUR holds one image made from your JPG, so a small or soft JPG gives a small or soft result. A JPG larger than 256 px is scaled down to fit."
+      },
+      {
+        "question": "Does the CUR keep the JPG's EXIF data or color profile?",
+        "answer": "No. The picture goes through raw pixels, so EXIF, color profile and XMP in the JPG do not appear in the CUR."
+      },
+      {
+        "question": "How do I make several cursor files?",
+        "answer": "Select several JPGs in the file picker. Each one becomes a separate CUR, written in turn, with no ZIP."
+      },
+      {
+        "question": "Does my JPG leave my device?",
+        "answer": "No. Both the decoding and the writing happen on your device, with no server involved."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and CUR",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "widely supported"
+        ]
+      },
+      "toFormat": {
+        "name": "CUR",
+        "fullName": "Windows cursor",
+        "description": "A cursor file format on Microsoft Windows that uses the same structure as ICO, with an added hotspot position that marks the point the pointer clicks.",
+        "details": [
+          "same layout as ICO",
+          "stores a hotspot coordinate",
+          "alpha transparency",
+          "multiple sizes per file"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPG to CUR",
+      "points": [
+        "The CUR holds one image of at most 256 px; larger JPGs are fitted inside 256 x 256.",
+        "JPEG has no transparency, so the image is a solid rectangle.",
+        "There is no hotspot control here; GIMP's export has Hot spot X and Hot spot Y fields."
+      ]
+    },
+    "guide": {
+      "title": "About JPG and CUR",
+      "markdown": "### What is a JPG file?\n\nThe committee behind JPEG, the Joint Photographic Experts Group, began its work in 1986, and the standard came out twice: T.81 from the ITU in 1992, then ISO/IEC 10918-1 in 1994. Baseline JPEG is lossy: it divides the image into 8x8 pixel tiles, applies a DCT to every tile and finishes with Huffman coding. A JPG has 8 bits per color channel, no alpha channel and no layers. The .jpg and .jpeg extensions are interchangeable names for it, and image/jpeg is its media type.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** GIMP imports JPEG for editing, and ImageMagick reads JPG.\n- **Web and Mobile:** Chrome shows JPG.\n- **Web:** Firefox shows JPG.\n- **Mobile:** Safari shows it as well.\n\nWindows Photos and Preview on macOS also open it.\n\n### JPG and CUR compared\n\n- **Purpose**: JPG stores photographs. CUR is the Windows cursor format, related to ICO but with coordinates for the active pointer location.\n- **Hotspot**: the pixel that does the clicking is called the hotspot. One CUR can hold images at several dimensions, each with hotspot information of its own.\n- **Transparency**: CUR supports alpha. JPG does not, so the converted image is opaque.\n- **Compression**: JPG is lossy, so the picture's quality is already settled before it becomes a cursor image.\n\nThe browser decodes the JPG first, and then ImageMagick writes the CUR with a single image in it. A larger JPG is scaled down, with its proportions intact, until both sides are 256 px or less. The page has no hotspot setting.\n\n### Other ways to convert JPG to CUR\n\n- **GIMP:** open the JPG and choose File > Export As, type a name ending in .cur and click Export. Hot spot X and Hot spot Y in the dialog place the pointer's click point.\n\n### Problems with JPG files\n\n- **Transparency is lost**: a JPEG export cannot keep transparent pixels, so a pointer with a shaped outline needs a format that has alpha.\n- **Progressive JPEG**: some older photo frames reject it, so try an export with progressive mode turned off.\n- **Quality numbers**: editors scale quality differently, so equal numbers can compress differently.\n- **Layers**: no layer stack survives inside a JPG, so keep your project file."
+    }
+  },
+  "jps-to-pdf": {
+    "seo": {
+      "title": "Convert JPS to PDF Online (Free)",
+      "h1": "JPS to PDF Converter",
+      "description": "Put a JPS stereo photo into a PDF. Both eye views stay side by side on one page, and the file stays on your device. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Put a JPS stereo photo on a one-page PDF, both eye views side by side."
+    },
+    "faqs": [
+      {
+        "question": "Will the PDF show my stereo photo in 3D?",
+        "answer": "No. The PDF page holds the whole picture, so you see both eye views next to each other, not a 3D image."
+      },
+      {
+        "question": "Does the stereo layout information survive?",
+        "answer": "No. Metadata is not carried over, because the picture goes through raw pixels. The layout marker that tells a viewer how the two views are arranged does not reach the PDF."
+      },
+      {
+        "question": "How big is the PDF page?",
+        "answer": "Each page matches the image dimensions, with one pixel mapped to one point and no paper-size margins. A 4000 x 1500 px JPS makes a 4000 x 1500 pt page."
+      },
+      {
+        "question": "Is the picture compressed again in the PDF?",
+        "answer": "No JPEG compression is added. The decoded picture is embedded in the PDF as a lossless PNG."
+      },
+      {
+        "question": "Will several JPS files become one PDF?",
+        "answer": "No. A separate PDF is made for every file, and the page never merges inputs."
+      },
+      {
+        "question": "Which programs show the stereo pair properly?",
+        "answer": "sView reads JPS stereo markers, and StereoPhoto Maker lets you choose the arrangement. Stereoscopic Player documents JPS descriptor support for automatic layout recognition. Use one of them for the 3D effect."
+      },
+      {
+        "question": "What if the page says it can't open my JPS?",
+        "answer": "The image decoder inside the browser could not open it. Use a recent Chrome, Edge, Firefox or Safari."
+      },
+      {
+        "question": "Does the JPS leave my device?",
+        "answer": "No. The conversion runs in your browser with no server involved, and the source JPS stays unchanged."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPS and PDF",
+      "fromFormat": {
+        "name": "JPS",
+        "fullName": "JPEG Stereoscopic",
+        "description": "A stereoscopic 3D image format that stores the left and right views side by side in one JPEG file.",
+        "details": [
+          "JPEG compression",
+          "left and right views in one image",
+          "lossy"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "fixed page layout",
+          "embedded fonts",
+          "vector and raster content",
+          "optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPS to PDF",
+      "points": [
+        "Both eye views stay side by side on one page; the PDF is not a 3D file.",
+        "The stereo layout marker is not carried over.",
+        "The page is the size of the image, 1 pixel per point, with no margin."
+      ]
+    },
+    "guide": {
+      "title": "About JPS and PDF",
+      "markdown": "### What is a JPS file?\n\nJPS is a stereoscopic 3D image format that stores the left and right views side by side in one JPEG file. A typical JPS arranges the two eye views for crossed-eye viewing. The VRex proposal described the stereo layout in a JPEG APP3 marker, and a JPS can carry an embedded preview thumbnail. It is used for stereoscopic 3D photos and for 3D viewers and VR headsets, with JPEG compression and lossy quality.\n\n### Programs that open JPS files\n\n- **Windows, Mac and Linux:** sView reads JPS stereo markers and treats .jps as a crossed-eye image pair.\n- **Windows:** StereoPhoto Maker opens JPS directly and lets you pick the stereo arrangement, and Stereoscopic Player documents JPS descriptor support.\n- **Mac:** Pro for Mac is the vendor's Wine-based package of StereoPhoto Maker.\n- **Mobile:** On a phone, sView for Android.\n\nXnView MP and IrfanView are also listed as programs that open JPS.\n\n### JPS and PDF compared\n\n- **Content**: a JPS is one picture holding two views. A PDF keeps a fixed page layout.\n- **Stereo data**: a PDF page here is a flat picture, so the viewer cannot rearrange the eyes.\n- **Layout choices**: StereoPhoto Maker supports side-by-side, above/below and interlaced layouts, and treats the file type separately from the stereo layout.\n- **Pages**: a PDF can hold many pages, while a JPS is a single picture.\n- **Support**: PDF opens in Adobe Acrobat Reader, Preview on macOS and any web browser.\n\nThe browser decodes each file and a separate PDF is written for it. The PDF has one page the size of the image, and the picture is embedded losslessly as a PNG. Metadata is not carried over.\n\n### Other ways to convert JPS to PDF\n\n- **Pillow (Python):** call Image.open on the JPS, then save it under a .pdf name.\n- **ImageMagick:** `magick stereo.jps stereo.pdf`.\n\n### Problems with JPS files\n\n- **The views look swapped or stretched**: selecting the wrong stereo arrangement displays the eye views incorrectly.\n- **A reader will not infer the layout**: a .jps extension does not guarantee that every reader knows it, and StereoPhoto Maker asks you to specify it.\n- **Quality drops after editing**: re-saving a JPS through JPEG output applies the selected compression quality again, so keep the source."
+    }
+  },
+  "mp3-to-amr": {
+    "seo": {
+      "title": "Convert MP3 to AMR: FFmpeg and SoX Steps",
+      "h1": "MP3 to AMR Converter",
+      "description": "This page's browser FFmpeg has no AMR-NB encoder, so it cannot write AMR yet. Use FFmpeg or SoX with AMR support on your device; steps inside."
+    },
+    "tool": {
+      "subtitle": "This page's FFmpeg has no AMR-NB encoder yet, so it cannot write AMR; use FFmpeg or SoX on your device."
+    },
+    "faqs": [
+      {
+        "question": "Why does MP3 to AMR fail on this page?",
+        "answer": "The page asks FFmpeg for the AMR-NB encoder libopencore_amrnb, and the FFmpeg build here does not include it. FFmpeg reports \"Unknown encoder\". A desktop FFmpeg built with that encoder can do the job."
+      },
+      {
+        "question": "What settings does an AMR voice file use?",
+        "answer": "Narrowband AMR is a speech codec with eight bitrate modes. The page's command asks for 8,000 Hz, mono and 12.2 kbps, the top mode."
+      },
+      {
+        "question": "Will my music still sound like music as AMR?",
+        "answer": "AMR is optimized for voice and compresses to very small files, so it suits voice messages and phone recordings, not songs."
+      },
+      {
+        "question": "Is AMR the same as AMR-WB?",
+        "answer": "No. AMR-WB is its own codec, sampled at 16 kHz. A narrowband file cannot supply the wider range of a wideband source, and the storage signatures differ."
+      },
+      {
+        "question": "Can I just rename the MP3 to .amr?",
+        "answer": "No. AMR and AMR-WB storage signatures differ, so changing an extension cannot change the encoded speech codec. The file must be encoded."
+      },
+      {
+        "question": "Which commands work on my own computer?",
+        "answer": "On a desktop FFmpeg that has the encoder, the first method below sets the encoder, bitrate, sample rate and channel count. SoX can write AMR-NB when it has the optional AMR encoder. Both are shown below."
+      },
+      {
+        "question": "What does -C 7 mean in the SoX command?",
+        "answer": "It selects AMR-NB mode 7, which is 12.2 kbit/s, the same top rate the page's command asks of FFmpeg. AMR-NB uses a fixed 8 kHz sample rate."
+      },
+      {
+        "question": "Will I lose quality going from MP3 to AMR?",
+        "answer": "Yes. MP3 is already lossy, and AMR adds a second lossy stage at a far lower bitrate. Convert from your original recording if you still have it."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and AMR",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "widely supported for playback"
+        ]
+      },
+      "toFormat": {
+        "name": "AMR",
+        "fullName": "Adaptive Multi-Rate audio",
+        "description": "A speech audio codec standardized by 3GPP and widely used in mobile phone networks. It is optimized for voice and compresses to very small files.",
+        "details": [
+          "lossy speech compression",
+          "8 kHz sampling",
+          "bitrates from 4.75 to 12.2 kbit/s",
+          "3GPP standard"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP3 to AMR",
+      "points": [
+        "This page cannot write AMR yet: its FFmpeg build has no libopencore_amrnb encoder.",
+        "AMR narrowband is 8 kHz mono voice at up to 12.2 kbps, so music is reduced to a thin voice-grade copy.",
+        "A desktop FFmpeg or SoX with AMR-NB writing support can make the file."
+      ]
+    },
+    "guide": {
+      "title": "About MP3 and AMR",
+      "markdown": "### What is an MP3 file\n\nShort for MPEG-1/2 Audio Layer III, MP3 is a lossy format that MPEG standardized under ISO/IEC 11172-3 with substantial help from the Fraunhofer Society, and it became the normal choice for music downloads, podcasts and portable players. It can be encoded at a constant or a variable bitrate, keeps song titles and other tags in ID3 structures, and has the media type audio/mpeg.\n\n### Programs that open MP3 files\n\n- **Windows and Mac:** Audacity edits it as an imported project.\n- **Windows:** Windows Media Player for listening.\n- **Linux:** ffplay, the FFmpeg player.\n- **Web:** Firefox and Chrome play it straight from a page.\n- **Mobile:** VLC for Android and the Android port of mpv.\n\nApple Music and VLC media player also play MP3.\n\n### MP3 and AMR compared\n\n- **Purpose**: MP3 carries music. AMR is a speech codec standardized by 3GPP for mobile phone networks, optimized for voice.\n- **Rate**: AMR narrowband spans 4.75 to 12.2 kbps at 8 kHz in 20-millisecond frames.\n- **Origin**: AMR expands to Adaptive Multi-Rate and was standardized by ETSI for GSM speech, and 3GPP adopted it for third-generation cellular systems.\n- **Storage**: RFC 4867 defines storage files as well as RTP transport, and the media type for narrowband AMR is audio/AMR.\n- **Use**: AMR is used for voice recordings and voice messages on phones.\n\nOn this page the command asks FFmpeg for the libopencore_amrnb encoder at 8,000 Hz, mono, 12.2 kbps. That encoder is missing from this page's FFmpeg build, so no AMR file is written. Use the methods below on your own machine.\n\n### Other ways to convert MP3 to AMR\n\n- **FFmpeg with an external AMR-NB encoder:** `ffmpeg -i song.mp3 -codec:a libopencore_amrnb -b:a 12.2k -ar 8000 -ac 1 voice.amr`.\n- **SoX with AMR-NB writing support:** `sox song.mp3 -t amr-nb -C 7 -c 1 -r 8000 voice.amr`.\n- **Switch Sound File Converter:** use the Add button or File > Add to load the MP3, choose AMR in the Output Format field and click Convert.\n\n### Problems with MP3 files\n\n- **Import errors**: Audacity can refuse a malformed MP3 that another player still plays.\n- **Tags replaced**: when you combine imports in a single Audacity project, tags from the latest file can replace earlier metadata.\n- **Two lossy stages**: exporting another lossy file after editing an MP3 compresses the audio a second time, so keep the original."
+    }
+  },
+  "mp3-to-mp2": {
+    "seo": {
+      "title": "Convert MP3 to MP2 Online (Free)",
+      "h1": "MP3 to MP2 Converter",
+      "description": "Convert MP3 to MP2 (MPEG Layer II) at 192 kbps. FFmpeg runs in your browser, so the file stays on your device. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert MP3 to MP2 (MPEG Audio Layer II) at 192 kbps."
+    },
+    "faqs": [
+      {
+        "question": "Why would I need an MP2 file?",
+        "answer": "MP2, or MPEG Audio Layer II, is used in digital radio, DVD-Video and broadcast television. A broadcast or DVD workflow may ask for it where MP3 is not accepted."
+      },
+      {
+        "question": "Is MP2 better quality than MP3?",
+        "answer": "Not by default. Both are lossy, but converting does not restore anything the MP3 discarded."
+      },
+      {
+        "question": "Will converting MP3 to MP2 lose quality?",
+        "answer": "Yes. MP3 is already lossy, so exporting MP2 adds a second lossy encoding stage, and decoding cannot recover what the first stage discarded."
+      },
+      {
+        "question": "What bitrate does the MP2 use?",
+        "answer": "192 kbps, asked of FFmpeg's mp2 encoder. The page sets no sample rate or channel count of its own."
+      },
+      {
+        "question": "Is an MP2 file an MPEG-2 video?",
+        "answer": "No. MP2 is Layer II audio, not a label for an MPEG-2 video recording. The page leaves out video, so the file holds sound only."
+      },
+      {
+        "question": "Can I choose a different bitrate?",
+        "answer": "Here the bitrate stays at 192 kbps. In Audacity, File > Export Audio with MP2 lets you pick 16 to 384 kbps, and FFmpeg's -b:a option sets one on the command line."
+      },
+      {
+        "question": "Does it handle an album's worth of tracks?",
+        "answer": "Pick all the tracks together. They are encoded one after another, and each MP2 downloads on its own."
+      },
+      {
+        "question": "Why is the MP2 larger than my MP3?",
+        "answer": "The MP2 is written at 192 kbps, which can be above the MP3's bitrate, so it can come out larger; a run on a short sample MP3 did. A higher bitrate does not add detail that the MP3 lacked."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and MP2",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "widely supported for playback"
+        ]
+      },
+      "toFormat": {
+        "name": "MP2",
+        "fullName": "MPEG-1 Audio Layer II",
+        "description": "A lossy audio format standardized by MPEG, defined as Layer II of MPEG-1 Audio. It is used in digital radio, DVD-Video and broadcast television.",
+        "details": [
+          "lossy compression",
+          "low decoding complexity",
+          "predecessor of MP3 Layer III"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP3 to MP2",
+      "points": [
+        "MP2 is audio only, MPEG Layer II, not an MPEG-2 video.",
+        "A second lossy pass is added, so keep the original MP3.",
+        "The page encodes at 192 kbps with FFmpeg's mp2 encoder."
+      ]
+    },
+    "guide": {
+      "title": "About MP3 and MP2",
+      "markdown": "### What is an MP3 file?\n\nMP3 comes out of Fraunhofer IIS, whose engineers worked with the wider MPEG audio group on it during the late 1980s. Two ISO standards cover it: 11172-3 from 1993 and 13818-3 from 1995. The allowed bitrate runs from 32 kbps at the low end to 320 kbps at the top, and the sampling rate is 32, 44.1 or 48 kHz. Music libraries, podcasts and portable players rely on it, and browsers all play it.\n\n### Programs that open MP3 files\n\n- **Linux:** Audacity brings MP3 audio into an editable project.\n- **Mac:** ffplay, the FFmpeg player.\n- **Windows:** Windows Media Player, or ffplay from the FFmpeg tools.\n- **Web:** Firefox and Chrome decode MP3 inside the browser.\n- **Mobile:** VLC for Android and mpv for Android.\n\nAudacity runs on Windows and Mac too. Apple Music and VLC media player also open MP3.\n\n### MP3 and MP2 compared\n\n- **Family**: both are MPEG audio. MP2 is Layer II of MPEG-1 Audio, finalized in 1992, and is specified by ISO/IEC 11172-3. It is the predecessor of MP3 Layer III.\n- **Where used**: MP2 appears in digital radio and television broadcasting, DVD-Video soundtracks and Video CD production.\n- **Media type**: the Library of Congress lists audio/mpeg for MP2 files.\n- **Complexity**: MP2 has low decoding complexity.\n- **Loss**: MP2 uses perceptual lossy coding, so decoding cannot recover the sound information it omitted. ISO/IEC 13818-3 later extended Layer II for MPEG-2.\n- **Programs**: VLC media player, Audacity and foobar2000 open MP2, and FFmpeg's audio codec list includes MP2 decoding and encoding.\n\nHere FFmpeg uses its mp2 encoder in your browser at 192 kbps, without video. The page passes no sample rate, channel count, stream mapping or tag option.\n\n### Other ways to convert MP3 to MP2\n\n- **FFmpeg, native encoder:** `ffmpeg -i track.mp3 -c:a mp2 -b:a 192k track.mp2`.\n- **FFmpeg with libtwolame:** `ffmpeg -i track.mp3 -c:a libtwolame -b:a 192k track.mp2`. The libtwolame encoder is a TwoLAME wrapper, a separate implementation of MP2.\n- **Audacity:** open the MP3, then pick File > Export Audio and select MP2 as the Format, set a bit rate from 16 to 384 kbps (the default is 160) and press Export.\n\n### Problems with MP3 files\n\n- **A failed import**: a damaged MP3 can make Audacity complain even when another player still opens it.\n- **Overwritten metadata**: tags from the most recently imported file may replace earlier tags in a shared Audacity project.\n- **Generation loss**: editing an MP3 and exporting a second lossy file adds another lossy encoding stage, so hold on to the original."
+    }
+  },
+  "mp4-to-avchd": {
+    "seo": {
+      "title": "Convert MP4 to AVCHD (M2TS) Online (Free)",
+      "h1": "MP4 to AVCHD Converter",
+      "description": "Re-encode an MP4 to an H.264 AVCHD (M2TS) transport stream. FFmpeg runs in your browser; the file stays on your device."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 to an H.264 AVCHD (M2TS) stream."
+    },
+    "faqs": [
+      {
+        "question": "What file do I get?",
+        "answer": "An AVCHD (M2TS) stream: an MPEG transport stream with H.264 video and AAC audio, in one file. It is not a camcorder folder or disc structure."
+      },
+      {
+        "question": "Will a camcorder or Blu-ray player accept it?",
+        "answer": "Not guaranteed. AVCHD's audio is AC-3 or Linear PCM, while this page writes AAC at 96 kbps, and FFmpeg's log warns that the AAC \"is muxed as a private data stream and may not be recognized upon reading\". For AC-3, use the FFmpeg command below."
+      },
+      {
+        "question": "Is the picture size kept exactly?",
+        "answer": "Almost. Pictures no larger than 1920 px stay at their size, but odd sizes are trimmed by one pixel so that both dimensions end up even."
+      },
+      {
+        "question": "What happens to a 60 fps clip?",
+        "answer": "The frame rate never exceeds 30 fps. Extra frames of a faster clip are discarded while the running time stays the same, so AVCHD 2.0 1080/60p is out of reach here."
+      },
+      {
+        "question": "Does the video get re-encoded?",
+        "answer": "Yes, every time. It is encoded with libx264 at CRF 30 using the ultrafast preset. A remux that only copies streams is a separate FFmpeg option, shown below."
+      },
+      {
+        "question": "Can I keep the streams as they are?",
+        "answer": "Not on this page, which always re-encodes. FFmpeg's -c copy remux with -mpegts_m2ts_mode 1, shown below, copies them when they already suit AVCHD."
+      },
+      {
+        "question": "Can I process several clips together?",
+        "answer": "Yes. The clips are converted one after the other and each is saved as an individual file."
+      },
+      {
+        "question": "Is my MP4 uploaded for the re-encode?",
+        "answer": "The encode runs in an FFmpeg worker on your device, so nothing goes to a server, and the MP4 you picked stays unchanged."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and AVCHD",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "widely supported for playback"
+        ]
+      },
+      "toFormat": {
+        "name": "AVCHD",
+        "fullName": "Advanced Video Coding High Definition",
+        "description": "A format for HD camcorders introduced by Sony and Panasonic. It records H.264 video in MPEG transport stream files on cards, discs or drives.",
+        "details": [
+          "H.264 video",
+          "Dolby Digital or PCM audio",
+          "MTS or M2TS files",
+          "Sony and Panasonic format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP4 to AVCHD",
+      "points": [
+        "The output is a single H.264 AVCHD (M2TS) transport stream, not a full camcorder folder structure.",
+        "Audio is AAC, while the AVCHD system lists AC-3 or Linear PCM.",
+        "Video is re-encoded at CRF 30, capped at 1920 px and 30 fps, with both sides rounded down to even numbers."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 and AVCHD",
+      "markdown": "### What is an MP4 file?\n\nA media container standardized as MPEG-4 Part 14 (ISO/IEC 14496-14) and published in 2003, MP4 bundles video, audio, subtitles and metadata. The common contents are H.264 video and AAC audio, and phones, cameras and streaming sites produce it. Browsers all play it.\n\n### Programs that open MP4 files\n\n- **Mac:** QuickTime Player opens it.\n- **Windows:** Adobe Premiere imports it once a decoder for the contents is present, and Windows Media Player plays it.\n- **Linux:** mpv lets you pick audio and subtitle streams.\n- **Web:** Chrome and Firefox play it directly.\n- **Mobile:** VLC has apps for Android and iOS.\n\nmpv and ffplay also run on Windows and Mac, and VLC media player plays MP4 too.\n\n### MP4 and AVCHD compared\n\n- **Origin**: AVCHD was introduced by Sony and Panasonic for HD camcorders. It packages its streams as MPEG-2 Transport Stream in MTS or M2TS files.\n- **Video**: its standard compression is MPEG-4 AVC/H.264, with 8-bit samples and 4:2:0 chroma, in interlaced and progressive HD modes.\n- **Audio**: Dolby Digital AC-3 or uncompressed Linear PCM.\n- **Media**: it records to memory cards, built-in storage or small 8 cm DVDs.\n\nOn this page, FFmpeg re-encodes the video with libx264 at CRF 30 and the audio as AAC at 96 kbps into an MPEG transport stream. The picture keeps its size when the longer side is 1920 px or less, extra frames are discarded to stay at or below 30 fps, and each width and height is rounded down to an even number.\n\n### Other ways to convert MP4 to AVCHD\n\n- **FFmpeg, H.264 and AC-3:** `ffmpeg -i clip.mp4 -f mpegts -mpegts_m2ts_mode 1 -c:a ac3 -c:v libx264 clip.m2ts`.\n- **FFmpeg, remux:** `ffmpeg -i clip.mp4 -c copy -mpegts_m2ts_mode 1 -f mpegts clip.m2ts`, which copies the streams and suits an MP4 whose codecs already fit AVCHD.\n- **tsMuxer:** write a meta file whose first line is `MUXOPT --avchd`, then a `V_MPEG4/ISO/AVC, clip.mp4, track=1` line and an `A_AC3, clip.mp4, track=2` line, setting track to each stream's number in the MP4. Run `tsMuxeR project.meta avchd-output`.\n\n### Problems with MP4 files\n\n- **A decoder may be missing**: a container that a program accepts can still hold video or sound it has no decoder for.\n- **No sound to extract**: an audio editor gets nothing from an MP4 that has no audio.\n- **Interrupted recordings**: the packet metadata of a normal MP4 stays together, so if writing stopped early the file may not play."
+    }
+  },
+  "mp4-to-mxf": {
+    "seo": {
+      "title": "Convert MP4 to MXF Online (Free)",
+      "h1": "MP4 to MXF Converter",
+      "description": "Convert an MP4 to MXF with MPEG-2 video at 25 fps and 16-bit PCM audio. FFmpeg runs in your browser; your file stays on your device."
+    },
+    "tool": {
+      "subtitle": "Convert an MP4 to MXF with MPEG-2 video at 25 fps and 16-bit PCM audio."
+    },
+    "faqs": [
+      {
+        "question": "What video and audio is inside the MXF?",
+        "answer": "MPEG-2 video with 4:2:2 color sampling, and 16-bit PCM stereo audio. MXF is only the wrapper, so the codec choice defines the quality."
+      },
+      {
+        "question": "Why is my video forced to 25 fps?",
+        "answer": "The page sets a fixed 25 fps for the output, so a 30 or 60 fps source is converted to 25 fps."
+      },
+      {
+        "question": "Will it be accepted by my broadcaster or editing system?",
+        "answer": "The page cannot promise that. MXF is used by broadcasters and professional cameras. Check your delivery specification for the codecs and wrapper details it names."
+      },
+      {
+        "question": "Is the picture resized?",
+        "answer": "A picture whose longer side is 1920 px or less keeps its size, with each side trimmed to an even number. A larger picture is scaled down to fit within 1920 px."
+      },
+      {
+        "question": "What if my MP4 is cut short?",
+        "answer": "FFmpeg logs the error and usually still writes what it could read, so the MXF is shorter."
+      },
+      {
+        "question": "Why is the MXF so much bigger than my MP4?",
+        "answer": "PCM audio is uncompressed, so it takes far more space than the AAC in an MP4, and the file can come out larger than the MP4. A run on a short sample MP4 did. The quality is not higher."
+      },
+      {
+        "question": "Can I send multiple MP4s through?",
+        "answer": "Yes. Pick as many files as you like and each is encoded in turn and saved as its own MXF."
+      },
+      {
+        "question": "Which programs can play the MXF?",
+        "answer": "VLC media player and FFmpeg read MXF on Windows, Mac and Linux. Some MXF essence structures are not arranged for ordinary playback, so a professional application may be needed."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and MXF",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "widely supported for playback"
+        ]
+      },
+      "toFormat": {
+        "name": "MXF",
+        "fullName": "Material Exchange Format",
+        "description": "A container format standardized by SMPTE (SMPTE 377M) for professional video and audio. It carries essence data together with timecode and metadata.",
+        "details": [
+          "SMPTE standard",
+          "timecode and metadata",
+          "many codecs",
+          "used by broadcasters"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP4 to MXF",
+      "points": [
+        "Output is MPEG-2 video at 2000 kbps, 4:2:2, fixed at 25 fps, with 16-bit PCM audio at 48 kHz stereo.",
+        "The picture is capped at 1920 px on the longer side and both sides are rounded down to even numbers.",
+        "Check your delivery specification: MXF alone does not define quality."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 and MXF",
+      "markdown": "### What is an MP4 file?\n\nDefined by ISO/IEC 14496-14 (MPEG-4 Part 14) on top of Apple's QuickTime lineage, MP4 is a container. A single file can carry H.264 video with AAC audio, or other video and audio codecs, along with subtitles and chapters.\n\n### Programs that open MP4 files\n\n- **Windows:** mpv offers desktop playback, and Windows Media Player opens MP4 as well.\n- **Mac:** QuickTime Player is the built-in viewer, and Premiere imports MP4 given the right decoder.\n- **Linux:** ffplay, the player that ships with FFmpeg.\n- **Web:** Firefox and Chrome.\n- **Mobile:** the VLC apps for Android and iOS.\n\nVLC media player is listed for MP4 as well.\n\n### MP4 and MXF compared\n\n- **Standard**: MXF, the Material Exchange Format, is standardized through SMPTE documents (SMPTE 377M) for professional video and audio.\n- **Contents**: it wraps media essence with descriptive or structural metadata, and the wrapper can carry different video encodings, so MXF alone does not define image quality.\n- **Use**: professional acquisition, exchange and preservation workflows. Its operational patterns describe arrangements of packages and essence.\n- **Extension and type**: the extension is .mxf and the media type is application/mxf.\n- **Caution**: some arrangements reference essence stored outside the file.\n\nThis page runs FFmpeg in your browser and writes MPEG-2 video at 2000 kbps in 4:2:2, with 16-bit PCM audio at 48 kHz stereo, at a fixed 25 fps. The longer side is capped at 1920 px, and both sides end up even after rounding down.\n\n### Other ways to convert MP4 to MXF\n\n- **FFmpeg:** `ffmpeg -i clip.mp4 -ar 48000 -b:v 2000k -c:a pcm_s16le -r 25 -c:v mpeg2video -ac 2 -pix_fmt yuv422p -f mxf clip.mxf`.\n- **FFmpeg OP-Atom:** swap in the mxf_opatom muxer with `ffmpeg -i clip.mp4 -an -c:v mpeg2video -b:v 4M -f mxf_opatom clip.mxf`. The -an option drops the audio, so the file is video only.\n\n### Problems with MP4 files\n\n- **Unreadable contents**: an editor can import the MP4 container and still fail on the codec inside it.\n- **Silent clips**: with no audio track in the MP4, an audio editor has nothing to import.\n- **Unfinished files**: if a recording was cut off before it finished, the MP4 can be left incomplete and unplayable."
+    }
+  },
+  "pcx-to-png": {
+    "seo": {
+      "title": "Convert PCX to PNG Online (Free)",
+      "h1": "PCX to PNG Converter",
+      "description": "Convert old PC Paintbrush PCX images to PNG. ImageMagick runs in your browser, so the file stays on your device. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert old PC Paintbrush PCX images to PNG."
+    },
+    "faqs": [
+      {
+        "question": "Why convert PCX to PNG?",
+        "answer": "PCX is a legacy DOS-era format, and applications may leave out support for it. PNG is lossless and supported by every browser."
+      },
+      {
+        "question": "Does converting lose image quality?",
+        "answer": "PNG compression is lossless, so saving adds no loss of its own. The PCX is first read as one picture, and no quality setting is applied."
+      },
+      {
+        "question": "What is a DCX file?",
+        "answer": "A DCX groups several PCX pictures, commonly for fax applications. The file picker on this page lists .pcx files, and the page reads one image only."
+      },
+      {
+        "question": "Is the picture resized?",
+        "answer": "No. The page resizes only when it writes an ICO or CUR, so the PNG keeps the PCX's pixel width and height."
+      },
+      {
+        "question": "Is there a maximum file size?",
+        "answer": "The page puts no cap on file size, though a picture over roughly 537 megapixels is refused with \"too large to convert here\"."
+      },
+      {
+        "question": "Can I drop in a stack of PCX files?",
+        "answer": "Yes, pick them together; each PCX gets a PNG of its own."
+      },
+      {
+        "question": "Is my old PCX art sent anywhere?",
+        "answer": "No. ImageMagick works in the browser tab, so the PCX stays on your computer and is read and converted there."
+      },
+      {
+        "question": "Can I convert PCX on my own computer?",
+        "answer": "Yes. ImageMagick and Pillow both read PCX and write PNG, as the methods below show."
+      }
+    ],
+    "aboutSection": {
+      "title": "PCX and PNG",
+      "fromFormat": {
+        "name": "PCX",
+        "fullName": "PC Paintbrush image",
+        "description": "A raster image format created by ZSoft for the PC Paintbrush program. It uses run-length encoding and was widely used on DOS and early Windows.",
+        "details": [
+          "run-length encoding",
+          "1 to 24 bits per pixel",
+          "palette-based images",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "widely supported in browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PCX to PNG",
+      "points": [
+        "PCX is a legacy run-length-encoded format, so PNG makes the picture readable in current software.",
+        "One image is read, so a DCX with several pictures is not split.",
+        "A picture over about 537 megapixels is refused."
+      ]
+    },
+    "guide": {
+      "title": "About PCX and PNG",
+      "markdown": "### What is a PCX file?\n\nPCX is a raster image format created by ZSoft for its PC Paintbrush program. It emerged for MS-DOS around 1984 and 1985 and uses run-length encoding, with 1 to 24 bits per pixel and often a palette. Each PCX opens with a 128-byte header, and some variants carry an additional palette at the end. It survives in legacy DOS and Windows graphics and old clip art collections. A DCX document groups PCX pictures, commonly for fax applications.\n\n### Programs that open PCX files\n\n- **Windows:** ImageMagick lists PCX reading and writing, and IrfanView opens PCX.\n- **Mac:** Pillow reads and writes PCX in its documented supported modes, and XnView MP opens PCX.\n- **Linux:** GIMP opens PCX.\n\nImageMagick and Pillow are each listed on all three desktop systems.\n\n### PCX and PNG compared\n\n- **Compression**: PCX is run-length encoded; PNG is a lossless format.\n- **Colors**: PCX is often palette-based. PNG supports 8-bit and 16-bit channels and alpha transparency.\n- **Origin**: PCX dates from the 1980s on DOS. PNG followed in the mid-1990s and is standardized as ISO/IEC 15948 and a W3C Recommendation.\n- **Typical use**: PCX turns up in old clip art collections. PNG suits screenshots, logos and web graphics that must stay sharp.\n- **Structure**: a PCX begins with a 128-byte header, while a PNG starts with a fixed signature and is built from chunks.\n- **Lineage**: PNG arrived as the patent-free replacement for GIF, and its media type is image/png.\n- **Support**: PNG is supported by every browser. Applications may omit PCX even when they open newer bitmap formats.\n\nThis page uses ImageMagick as WebAssembly on the main thread. It reads one image and sets no quality.\n\n### Other ways to convert PCX to PNG\n\n- **ImageMagick:** `magick drawing.pcx drawing.png` on your own machine.\n- **Pillow (Python):** call Image.open on the PCX, then save it under a .png name.\n\n### Problems with PCX files\n\n- **An application will not open it**: some programs have dropped PCX support while still opening newer bitmap formats, so convert to a current one.\n- **A fax set looks like one page**: reading a DCX as though it were one PCX loses the document's multiple-image structure."
+    }
+  }
+}

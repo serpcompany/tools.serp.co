@@ -1,0 +1,802 @@
+{
+  "avif-to-bmp": {
+    "seo": {
+      "title": "Convert AVIF to BMP Online (Free)",
+      "h1": "AVIF to BMP Converter",
+      "description": "Convert an AVIF picture to a BMP bitmap in your browser. Only the first frame is kept, in 8-bit color. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save an AVIF picture as a BMP bitmap, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an AVIF to a BMP?",
+        "answer": "Add the AVIF above and save the BMP that appears. Your browser decodes the picture and ImageMagick writes the bitmap. Several AVIFs give one BMP each."
+      },
+      {
+        "question": "Why is the BMP larger than my AVIF?",
+        "answer": "AVIF is built for small files, while a BMP usually stores its pixels uncompressed. The bitmap holds the same picture in more bytes and gains no detail."
+      },
+      {
+        "question": "What happens to an animated AVIF?",
+        "answer": "Only its first frame becomes the BMP. The later frames are not in the file."
+      },
+      {
+        "question": "Does a high-bit-depth AVIF keep its depth?",
+        "answer": "No. Anything deeper than 8 bits per channel is reduced on the way through, so only the AVIF keeps the full precision."
+      },
+      {
+        "question": "Are EXIF and the color profile kept?",
+        "answer": "No. EXIF, ICC and XMP data are dropped, because the BMP is written from raw pixels."
+      },
+      {
+        "question": "Can I choose the BMP version or bit depth?",
+        "answer": "Not on this page, which sets no BMP options. On the command line, ImageMagick writes older header versions as BMP3 or BMP2, and GIMP's BMP export dialog has an RGB format list."
+      },
+      {
+        "question": "What does the \"can't open\" message mean?",
+        "answer": "Your browser does the decoding, so one that can't read AVIF stops with that message. Open the page in a current Chrome, Edge, Firefox or Safari and add the file again."
+      },
+      {
+        "question": "Is my AVIF uploaded or changed?",
+        "answer": "Neither. The AVIF is decoded on your own device and never sent to a server, and the source file is untouched. What you save is a fresh BMP."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and BMP",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An AV1-based image format from the Alliance for Open Media that can carry transparency and high-precision color.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "HDR and wide color gamut"
+        ]
+      },
+      "toFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster format introduced with Microsoft Windows that stores pixel data, usually uncompressed.",
+        "details": [
+          "usually uncompressed",
+          "1 to 32 bits per pixel",
+          "optional run-length compression"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVIF to BMP",
+      "points": [
+        "A BMP usually stores raw pixels, so it can be larger than the AVIF.",
+        "Only the first frame of an animated AVIF is kept.",
+        "The picture passes through 8-bit RGBA, so deeper color is reduced and EXIF, ICC and XMP are dropped.",
+        "The page sets no BMP header version or bit depth."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AVIF for BMP output",
+      "markdown": "### What is an AVIF file?\n\nAVIF stands for AV1 Image File Format. Its specification was written by the Alliance for Open Media, which was founded in 2015 for royalty-free media formats, and the format stores AV1-coded pictures inside a HEIF container. A file can use lossy or lossless compression, hold transparency or an image sequence, and reach twelve bits per channel for HDR and wide-gamut color. It can also carry Exif, XMP and an ICC profile. Most people meet AVIF as small images on websites.\n\n### Programs that open AVIF files\n\n- **Windows, Mac and Linux:**\n  - GIMP: imports and exports AVIF since version 2.10.22.\n  - ImageMagick: reads AVIF files.\n- **Web:**\n  - Google Chrome: version 85 added AVIF decoding.\n  - Mozilla Firefox: version 93 added AVIF image support.\n- **Mobile:**\n  - Android: AVIF decoding starts with version 12.\n  - Safari: on iOS 16 it added still AVIF images.\n\n### AVIF and BMP compared\n\n- **Names and types**: .avif is image/avif and .bmp is image/bmp.\n- **Compression**: AVIF is compact. A BMP commonly keeps its pixels raw, with an optional lossless run-length scheme, so the file is bulky.\n- **Color**: a BMP stores between one and 32 bits for each pixel.\n- **Use**: BMP turns up in Windows screen captures, system graphics and simple pipelines that want plain pixels.\n\nYour browser handles the AVIF side, and ImageMagick encodes the BMP from the pixels. An animated AVIF gives frame one, and embedded metadata is left behind.\n\n### Other ways to convert AVIF to BMP\n\n- **GIMP:** GIMP 2.10.22 and later open AVIF. Open the file, choose File > Export As and save it as BMP. In the BMP export dialog, run-length encoding is available for indexed and grayscale images only, writing color space information is on by default and can be switched off for programs that can't read it, and an RGB format list sets the layout for other images.\n\n### Problems with AVIF files\n\n- **A browser shows nothing**: older browsers can fail to show AVIF, which is why sites keep a JPEG, PNG or WebP fallback. This converter also needs a browser that can decode AVIF.\n- **GIMP refuses it**: releases older than 2.10.22 lack the AVIF importer.\n- **Android depth**: handsets and tablets decode baseline 8-bit AVIF, and 10-bit decoding is optional.\n- **Slow opening**: decoding an AVIF is slow, and encoding can take several seconds per image.\n"
+    }
+  },
+  "bin-to-jpeg": {
+    "seo": {
+      "title": "Convert BIN to JPEG Online (Free)",
+      "h1": "BIN to JPEG Converter",
+      "description": "Turn a picture saved as a .bin file, such as an Outlook attachment, into a JPEG. The page reads the file's first bytes. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Recover a JPEG from a .bin file that holds a picture, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a BIN file to a JPEG?",
+        "answer": "Add the .bin above. The page checks the file's first bytes, and if they match a picture it converts it and gives you a JPEG named after your file. Several files each give their own JPEG."
+      },
+      {
+        "question": "What kinds of BIN files work?",
+        "answer": "Pictures saved under a .bin name, such as Outlook's ATT00001.bin attachments, a download saved as .bin, or a picture in MacBinary form."
+      },
+      {
+        "question": "Why does it say the file isn't an image?",
+        "answer": "A BIN may hold something that is not a picture at all, such as a disc image or firmware. When its first bytes match no picture format, there is nothing to turn into a JPEG."
+      },
+      {
+        "question": "How does the page know what picture format is inside?",
+        "answer": "It compares the start of the file with known picture signatures and converts the file as the format that matches. The name .bin plays no part."
+      },
+      {
+        "question": "What if it says the picture couldn't be read?",
+        "answer": "The file starts like a picture, but its data may be damaged or incomplete. Save or export the original again and add the new copy."
+      },
+      {
+        "question": "Is my .bin file uploaded?",
+        "answer": "No. The page runs in your browser with no server, and your original file isn't changed. You download a new JPEG."
+      },
+      {
+        "question": "What is MacBinary?",
+        "answer": "A wrapper that keeps a Mac file's name, type and forks in one file. The page skips its header and reads the picture behind it."
+      },
+      {
+        "question": "Does a picture with transparency keep it?",
+        "answer": "No. A JPEG has no alpha channel, so see-through pixels cannot stay see-through in the result."
+      }
+    ],
+    "aboutSection": {
+      "title": "BIN and JPEG",
+      "fromFormat": {
+        "name": "BIN",
+        "fullName": "Binary file",
+        "description": "A generic binary filename ending that does not identify one picture format.",
+        "details": [
+          "raw binary data",
+          "no fixed structure",
+          "type depends on the content"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format designed for photographs; .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting BIN to JPEG",
+      "points": [
+        "Only a .bin that holds a recognized picture converts. Disc images and other data are refused.",
+        "The page identifies the picture from the file's first bytes, not from the name.",
+        "A MacBinary wrapper is skipped before the picture is read.",
+        "JPEG has no transparency, so see-through pixels do not survive."
+      ]
+    },
+    "guide": {
+      "title": "Understanding BIN for JPEG output",
+      "markdown": "### What is a BIN file?\n\nThe .bin ending marks raw binary data and says nothing about which image encoding, if any, is inside. The content could be a disc image, a dump of a program's memory or an email attachment, and the name gives no hint which. GNU objcopy, for one, can turn an object file into a flat memory image with the symbols and relocation records left out. The files people bring to a page like this are mostly pictures saved under that name, such as the ATT00001.bin attachments Outlook produces, or a Mac file in MacBinary, whose own extension is .bin.\n\n### Programs that open BIN files\n\n- **Windows, Mac and Linux:**\n  - GNU Emacs Hexl: shows and edits the bytes with hexl-find-file.\n  - UltraEdit: gives a hex view of a .bin file.\n- **Web:**\n  - HexEd.it: inspects and edits the bytes in your browser.\n\nA binary editor lays out the bytes in hexadecimal beside a text view. It does not interpret them as a photograph, so none of these programs shows the picture.\n\n### BIN and JPEG compared\n\n- **Names**: .bin has no fixed type, while .jpg and .jpeg are the same format.\n- **Structure**: a BIN has no fixed layout. A JPEG is a lossy picture format built for photographs.\n- **Transparency**: a JPEG cannot hold an alpha channel, so see-through pixels are lost, and it keeps no editable layers.\n\nThis page reads the start of the file and checks it against the signatures of known picture formats. A Mac file saved as MacBinary is recognized too, by skipping its 128-byte header. When the bytes match a picture, the file is converted as that format and you get a JPEG. Anything else is refused with a message that the file isn't an image, without the page reading all of it.\n\n### Other ways to convert BIN to JPEG\n\nThis page works from the .bin itself. It identifies the picture from its first bytes, so you do not need to know beforehand whether the file is a PNG, a GIF or another picture format.\n\n### Problems with BIN files\n\n- **\"This file isn't an image\"**: the BIN contains data that is not a picture, so there is nothing to make a JPEG from.\n- **Raw pixel data**: a BIN of bare pixel values has no picture header for the page to recognize, so it is refused as not an image.\n- **The picture couldn't be read**: the file starts like an image but looks damaged or incomplete.\n- **Editing in a hex editor**: work on a copy, because changing the wrong bytes alters the data.\n"
+    }
+  },
+  "bmp-to-dds": {
+    "seo": {
+      "title": "Convert BMP to DDS Online (Free)",
+      "h1": "BMP to DDS Converter",
+      "description": "Turn a BMP into a DDS texture file in your browser. The page sets no compression or mipmaps, so use texconv for those. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save a BMP bitmap as a DDS texture file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What do I do to turn a BMP into a DDS?",
+        "answer": "Add the BMP above and save the DDS that appears. Your browser decodes the bitmap and ImageMagick writes the texture. Several BMPs give one DDS each."
+      },
+      {
+        "question": "Does the DDS have mipmaps?",
+        "answer": "The page sets no mipmap option. When your game or engine needs a chosen mipmap chain, run texconv and its -m option, which sets how many mipmap levels it generates, or use ImageMagick's DDS mipmap options."
+      },
+      {
+        "question": "Which compression does the DDS use, DXT1 or BC3?",
+        "answer": "The page does not choose one. For BC3 or another block format, run texconv with its -f option, or use the DXT compression options ImageMagick documents."
+      },
+      {
+        "question": "Which programs open a DDS?",
+        "answer": "GIMP and ImageMagick read and write it on Windows, Mac and Linux."
+      },
+      {
+        "question": "What is the difference between BMP and DDS?",
+        "answer": "BMP is a plain picture, usually uncompressed. DDS is a texture container that can hold compressed texture data, mipmaps, cube maps and volume textures."
+      },
+      {
+        "question": "Why does my game reject the DDS?",
+        "answer": "Not every DDS tool supports the DX10 extension header, so a game may prefer the older headers. Check what your engine reads."
+      },
+      {
+        "question": "Will metadata survive?",
+        "answer": "No. Only pixels reach the DDS; EXIF, ICC and XMP blocks stay behind."
+      },
+      {
+        "question": "Is my BMP uploaded or changed?",
+        "answer": "Neither. The bitmap is read and the texture written on your own computer, with no server involved, so your BMP is never sent anywhere or altered."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and DDS",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster bitmap family often encountered in Windows graphics exports.",
+        "details": [
+          "usually uncompressed",
+          "1 to 32 bits per pixel",
+          "optional run-length compression"
+        ]
+      },
+      "toFormat": {
+        "name": "DDS",
+        "fullName": "DirectDraw Surface",
+        "description": "Microsoft's DirectDraw Surface texture-file format, a container for texture surfaces and related levels.",
+        "details": [
+          "uncompressed or compressed texture data",
+          "mipmaps",
+          "cube maps and volume textures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting BMP to DDS",
+      "points": [
+        "The page sets no DDS compression format and no mipmap option.",
+        "The bitmap passes through 8-bit RGBA, and metadata is dropped.",
+        "For BC3 or mipmaps, use texconv or ImageMagick.",
+        "Several BMPs give several DDS files."
+      ]
+    },
+    "guide": {
+      "title": "Understanding BMP for DDS output",
+      "markdown": "### What is a BMP file?\n\nBMP is the Windows Bitmap family, controlled by Microsoft and used originally on Windows and OS/2. Pixels are normally stored uncompressed, with lossless compression as an option, and you will run into the format in Windows screen captures and built-in system graphics. Version 5 appeared with Windows 98 in 1998 and can hold an ICC profile and an alpha channel. A BMP holds no vector shapes and no live typography.\n\n### Programs that open BMP files\n\n- **Windows, Mac and Linux:**\n  - ImageMagick: reads BMP images.\n- **Web:**\n  - Mozilla Firefox: displays BMP pictures.\n  - Google Chrome: supports BMP images.\n\n### BMP and DDS compared\n\n- **Names and types**: .bmp is image/bmp. .dds is Microsoft's DirectDraw Surface texture format.\n- **Purpose**: BMP is a plain picture. DDS is a texture container for games and GPUs.\n- **Contents**: a DDS can hold raw pixels or compressed texture data, and a chain of mipmaps may accompany the largest surface. Cube maps and volume textures fit as well, and Direct3D 10 and 11 reach texture arrays by way of an extra header.\n\nThe decoding happens in your browser, and ImageMagick turns the resulting 8-bit RGBA pixels into a DDS. Neither a compression format nor a mipmap option is set, and metadata is dropped.\n\n### Other ways to convert BMP to DDS\n\n- **DirectXTex texconv:** run `texconv -ft dds -f BC3_UNORM texture.bmp` to choose the pixel format yourself. Here -ft names the output file type, and -f names the DXGI format. texconv reads a BMP through Windows Imaging Component, and DDS output gets a full mipmap chain unless -m sets a different number of levels.\n- **ImageMagick:** run `magick surface.bmp surface.dds`. ImageMagick lists BMP and DDS as readable and writable, and its DDS notes cover DXT compression and mipmaps.\n\n### Problems with BMP files\n\n- **Large files**: an uncompressed BMP can be rather large, and a PNG or JPEG is more practical to share.\n- **A program wants an older header**: some programs expect an older bitmap header, and ImageMagick writes those as BMP3 or BMP2.\n- **No editable shapes or text**: a BMP keeps no vector shapes or live typography, so keep the project file you drew it from.\n"
+    }
+  },
+  "cdr-to-jpeg": {
+    "seo": {
+      "title": "CDR to JPEG: Export From CorelDRAW",
+      "h1": "CDR to JPEG: Export a CorelDRAW File",
+      "description": "This page cannot read CorelDRAW files. Export a CDR to JPEG in CorelDRAW or Corel PHOTO-PAINT; the steps are below."
+    },
+    "tool": {
+      "subtitle": "This converter cannot read CDR files; use one of the programs below."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert a CDR to a JPEG?",
+        "answer": "No. This converter cannot read CorelDRAW files, so the attempt ends in \"Image decode failed.\" CorelDRAW can write the JPEG instead."
+      },
+      {
+        "question": "How do I export a JPEG from CorelDRAW?",
+        "answer": "In CorelDRAW choose File > Export, pick JPG as the file type, and click Export."
+      },
+      {
+        "question": "Which programs open a CDR besides CorelDRAW?",
+        "answer": "LibreOffice Draw reads CDR through libcdr on Windows, Mac and Linux, and CorelDRAW Web supports it in a browser for qualifying subscribers."
+      },
+      {
+        "question": "What happens to the vector shapes?",
+        "answer": "A JPEG is flat and made of pixels, so shapes and text no longer exist as objects. Keep the CDR if you may need to edit the drawing again."
+      },
+      {
+        "question": "Will the JPEG keep a transparent background?",
+        "answer": "No. JPEG has no alpha transparency."
+      },
+      {
+        "question": "Why won't my CDR open in an older CorelDRAW?",
+        "answer": "A newer release probably saved it. Open the file in that release or a newer one, then use Save As to write a copy for an earlier version, accepting that newer effects may change."
+      },
+      {
+        "question": "Does Corel PHOTO-PAINT keep the vector objects?",
+        "answer": "No. It rasterizes an imported CDR, and its Convert to bitmap dialog sets the width, height, resolution and color mode. That suits a JPEG but leaves no editable objects."
+      },
+      {
+        "question": "Does a CDR hold only vector shapes?",
+        "answer": "No. Corel calls it primarily vector, yet bitmap content can sit inside a drawing too."
+      }
+    ],
+    "aboutSection": {
+      "title": "CDR and JPEG",
+      "fromFormat": {
+        "name": "CDR",
+        "fullName": "CorelDRAW drawing",
+        "description": "CorelDRAW's default drawing format, primarily vector but able to hold bitmap content.",
+        "details": [
+          "vector artwork",
+          "bitmap content",
+          "proprietary Corel format"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format designed for photographs; .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before exporting CDR to JPEG",
+      "points": [
+        "This converter has no reader for CDR files and ends in \"Image decode failed.\"",
+        "Export the JPEG from CorelDRAW or Corel PHOTO-PAINT.",
+        "A JPEG is flat and has no transparency, so keep the CDR for editing.",
+        "A drawing can hold bitmaps as well as vectors."
+      ]
+    },
+    "guide": {
+      "title": "Understanding CDR for JPEG output",
+      "markdown": "### What is a CDR file?\n\nCorelDRAW saves its drawings as CDR by default. Corel calls the format primarily vector, with shapes, text and effects, though bitmap content can live in a drawing as well. Saving can compress bitmaps and graphic objects, which reduces the file size but slows opening and saving. Properties such as a title and subject can be stored, and fonts are embedded unless they are Asian fonts or lack embedding permission. For compatibility, the Save As dialog lists earlier CDR versions.\n\n### Programs that open CDR files\n\n- **Windows, Mac and Linux:**\n  - LibreOffice Draw: opens CDR by way of the libcdr library.\n- **Windows and Mac:**\n  - CorelDRAW: opens its native drawings,.\n\n### CDR and JPEG compared\n\n- **Names**: .cdr is a proprietary Corel file, and JPEG goes by .jpg or .jpeg.\n- **Structure**: a CDR holds shapes, text and pages that stay editable. A JPEG is a single flat picture and keeps no editable layers.\n- **Transparency**: a JPEG can't store an alpha channel, so see-through areas are lost.\n\nThis converter cannot read CDR files. If you add a CDR, the page stops with \"Image decode failed.\" Export the JPEG from a program that understands CorelDRAW drawings instead.\n\n### Other ways to convert CDR to JPEG\n\n- **CorelDRAW:** open the drawing and choose File > Export. Pick the folder, set Save as type to JPG and type a file name. Two optional check boxes limit what is exported: Export this page only, for the current page of a multipage file, and Selected only, for the selected objects. Neither is available for every format. Click Export.\n- **Corel PHOTO-PAINT:** choose File > Import, pick CDR - CorelDRAW (*.cdr) in the list next to the File name box, click the filename, click Import, then click the image window. In the Convert to bitmap dialog, adjust the width, height, resolution or color mode. Then choose File > Export, pick a JPEG format in the Save as type list, type a file name and click Save.\n\n### Problems with CDR files\n\n- **A newer drawing won't open**: an earlier CorelDRAW release can refuse it, and the documented workaround is a copy saved for the older version.\n- **Saving backward changes the drawing**: Corel warns that the copy can lose effects, change how items look or limit editing.\n- **PHOTO-PAINT lost the vectors**: imported CDR files are rasterized, so shapes cannot be edited afterward.\n- **Fonts**: embedding is limited by each font's permissions, and Asian fonts are not embedded, so check them before you share the CDR.\n"
+    }
+  },
+  "cr2-to-pdf": {
+    "seo": {
+      "title": "Convert CR2 to PDF Online (Free)",
+      "h1": "CR2 to PDF Converter",
+      "description": "Convert a Canon CR2 photo to a one-page PDF in your browser. The page matches the picture's pixel size. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Put a Canon CR2 photo on a one-page PDF, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can I get a PDF out of a CR2?",
+        "answer": "Add the CR2 above and save the PDF. The picture is read as one image and placed on a single page."
+      },
+      {
+        "question": "How big is the PDF page?",
+        "answer": "It matches the picture, with no margin, so expect something other than A4 or Letter."
+      },
+      {
+        "question": "Is the picture in the PDF compressed with loss?",
+        "answer": "No. The embedded PNG is lossless, so the PDF adds no JPEG artifacts."
+      },
+      {
+        "question": "Can I put several CR2 files in one PDF?",
+        "answer": "Not here. Each CR2 becomes its own one-page PDF, and files are never merged."
+      },
+      {
+        "question": "Can I set white balance or tone before the PDF?",
+        "answer": "No. This page has no white balance or tone controls. Develop the CR2 first in a raw program such as darktable."
+      },
+      {
+        "question": "Does my CR2 leave my computer?",
+        "answer": "No. Nothing is sent to a server; the file is read and the PDF is written on your device."
+      },
+      {
+        "question": "Why does a CR2 need special software?",
+        "answer": "It is a raw capture format, so a program has to convert it before it becomes an ordinary image."
+      },
+      {
+        "question": "Does the PDF keep the EXIF data?",
+        "answer": "No. The picture goes into the PDF as pixels, so the camera's metadata is not carried over."
+      }
+    ],
+    "aboutSection": {
+      "title": "CR2 and PDF",
+      "fromFormat": {
+        "name": "CR2",
+        "fullName": "Canon RAW version 2",
+        "description": "Canon raw capture data that needs photographic development.",
+        "details": [
+          "unprocessed sensor data",
+          "TIFF-based structure",
+          "embedded JPEG preview"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A page document that can display a rendered photograph in a PDF reader.",
+        "details": [
+          "fixed page layout",
+          "embedded fonts",
+          "vector and raster content"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting CR2 to PDF",
+      "points": [
+        "One PDF page matches the picture size, with no margin.",
+        "The picture is placed as a lossless PNG.",
+        "Each CR2 becomes its own PDF; files are not merged.",
+        "The camera's EXIF data is not carried into the PDF."
+      ]
+    },
+    "guide": {
+      "title": "Understanding CR2 for PDF output",
+      "markdown": "### What is a CR2 file?\n\nCanon RAW version 2, or CR2, is the raw image format of many Canon EOS cameras from the mid-2000s until CR3 replaced it. Inside a TIFF-based file sit unprocessed sensor readings and an embedded JPEG preview. The Library of Congress notes that raw formats need special software to turn them into usable images. CR2 is a proprietary Canon format, so long-term access depends on software keeping up with it.\n\n### Programs that open CR2 files\n\n- **Windows, Mac and Linux:**\n  - darktable: accepts CR2 on import and decodes supported raw files with RawSpeed.\n- **Windows and Mac:**\n  - Canon Digital Photo Professional: supports .CR2 among the raw extensions it opens, for images from compatible cameras.\n- **Linux:**\n  - LibRaw dcraw_emu: a LibRaw sample that emulates dcraw and takes its options as command-line keys.\n\n### CR2 and PDF compared\n\n- **Names**: .cr2 is a Canon camera format. .pdf is a document format with a fixed page layout.\n- **Contents**: a CR2 holds sensor data and a preview. A PDF page holds the finished picture.\n- **Use**: CR2 is for editing photos. PDF is for sharing and printing.\n\nImageMagick, compiled to WebAssembly, reads the CR2 in your browser as one picture. In the PDF you get one page that matches the image, one pixel per point and no margin, so it is neither A4 nor Letter. The image is embedded losslessly as PNG data, and each file gets a PDF of its own. Anything over about 537 megapixels is refused as too large.\n\n### Other ways to convert CR2 to PDF\n\n- **ImageMagick:** run `magick cr2:review.cr2 review.pdf`. ImageMagick lists CR2 as read-only and PDF as readable and writable, and the `cr2:` prefix tells it to read the file as a CR2.\n\n### Problems with CR2 files\n\n- **Your camera is not supported**: Canon's Digital Photo Professional handles .CR2 images from compatible cameras only, so check that yours is one of them.\n- **The page size is odd**: the PDF page matches the pixel size, so it is large on paper. Place the picture on a standard page in a layout program.\n- **Long-term access**: CR2 is a proprietary format, so reading it depends on software that keeps supporting it.\n"
+    }
+  },
+  "dst-to-svg": {
+    "seo": {
+      "title": "DST to SVG: How to Convert an Embroidery File",
+      "h1": "How to Convert DST to SVG",
+      "description": "This page cannot read DST embroidery files. pyembroidery can write an SVG from a DST in Python; the command is below."
+    },
+    "tool": {
+      "subtitle": "This converter cannot read DST stitch files; use pyembroidery in Python."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert a DST to an SVG?",
+        "answer": "No. Nothing here can read embroidery stitch files, so the page reports \"Image decode failed.\""
+      },
+      {
+        "question": "What is in a DST file?",
+        "answer": "A route for the needle plus machine actions such as thread cuts and color changes. It is a set of sewing instructions, not a picture."
+      },
+      {
+        "question": "Can pyembroidery write an SVG from a DST?",
+        "answer": "Yes. It reads DST and writes SVG, and pyembroidery.convert(\"sample.dst\", \"sample.svg\") runs the conversion."
+      },
+      {
+        "question": "Can I preview a DST in a browser?",
+        "answer": "Yes. Wilcom Library previews uploaded DST files at true scale in a browser, and it needs a Library user license."
+      },
+      {
+        "question": "Why are the colors wrong?",
+        "answer": "A DST does not store color information. In Ink/Stitch you can apply a threadlist to give an existing DST design colors."
+      },
+      {
+        "question": "Can I recolor a DST?",
+        "answer": "Yes. Embrilliance Essentials can show a DST that has no colors in color, and you can save a new file."
+      },
+      {
+        "question": "Can stitches be turned back into editable objects?",
+        "answer": "Only partly. EmbroideryStudio inspects the stitch patterns and does what it can, but not all objects are restored."
+      },
+      {
+        "question": "Will resizing the design change the stitches?",
+        "answer": "Yes. Scaling a basic DST up spreads the same stitches apart without adding any, and scaling it down packs them closer."
+      }
+    ],
+    "aboutSection": {
+      "title": "DST and SVG",
+      "fromFormat": {
+        "name": "DST",
+        "fullName": "Tajima embroidery",
+        "description": "A machine embroidery stitch format developed by Tajima, storing needle positions and commands rather than a picture.",
+        "details": [
+          "stitch coordinates",
+          "ordinary files lack a thread palette",
+          "machine commands"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard, in which shapes, paths and text are described mathematically.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DST to SVG",
+      "points": [
+        "This converter has no reader for DST files and ends in \"Image decode failed.\"",
+        "A DST holds stitch coordinates and commands, not a picture.",
+        "A plain DST has no thread colors.",
+        "Use pyembroidery in Python to write an SVG from a DST."
+      ]
+    },
+    "guide": {
+      "title": "Understanding DST for SVG output",
+      "markdown": "### What is a DST file?\n\nTajima developed DST as a machine embroidery stitch format. It stores needle positions plus machine commands: jumps, color stops and trims. It is not a picture. A machine must be told when to insert a color change, thread trim, tie off or tie in, and a DST carries those commands. It is used for industrial embroidery machines and digitized designs, and embroidery programs widely support it. A basic DST has no color information.\n\n### Programs that open DST files\n\n- **Windows, Mac and Linux:**\n  - Ink/Stitch: reads and writes DST embroidery files, and you open them as you would an SVG in Inkscape. The design opens in Manual Stitch Mode, where you can edit individual points.\n- **Windows and Mac:**\n  - Embrilliance Essentials: reads DST files and lets you change or remove individual colors and save a new file.\n- **Web:**\n  - Wilcom Library: accepts DST uploads and previews designs at true scale in a browser on Mac, PC and tablets, with a Library user license. You do not need EmbroideryStudio to use it.\n\n### DST and SVG compared\n\n- **Contents**: a DST has stitch coordinates and machine commands. An SVG describes shapes and paths as XML text that scales to any size.\n- **Color**: a DST stores no color information, while an SVG is XML that CSS can style.\n- **Use**: a DST feeds industrial embroidery machines. An SVG suits logos, illustrations and charts.\n\nThis converter cannot read DST files. A DST added here is met with \"Image decode failed.\" Use pyembroidery in Python to write the SVG.\n\n### Other ways to convert DST to SVG\n\n- **pyembroidery:** run `pyembroidery.convert(\"sample.dst\", \"sample.svg\")` in Python. The library reads DST and writes SVG. Its read_dst function loads a DST's stitch data, and a DST variant called extended adds a color sequence through its headers.\n\n### Problems with DST files\n\n- **Odd preview colors**: a DST stores no color information, so apply a threadlist, as Ink/Stitch allows, to give the design colors.\n- **Resizing changes the stitching**: enlarging a basic DST spreads the same stitches apart, while shrinking it tightens the spacing and shortens the stitches.\n- **Rebuilding objects**: EmbroideryStudio can try to rebuild objects from stitches, yet it cannot recreate the colors.\n"
+    }
+  },
+  "dv-to-mp4": {
+    "seo": {
+      "title": "Convert DV to MP4 Online (Free)",
+      "h1": "DV to MP4 Converter",
+      "description": "Convert DV camcorder video to an H.264 MP4 with AAC audio in your browser. Interlaced frames are deinterlaced. Free, no upload needed."
+    },
+    "tool": {
+      "subtitle": "Turn DV camcorder footage into an MP4, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a DV file to an MP4?",
+        "answer": "Add the DV above, let FFmpeg re-encode it in your browser, then save the MP4. Each file you add produces its own MP4."
+      },
+      {
+        "question": "Which codecs end up in the MP4?",
+        "answer": "H.264 for the picture, written by libx264, and AAC for the sound. DV is re-encoded rather than copied across."
+      },
+      {
+        "question": "Is the footage deinterlaced?",
+        "answer": "Yes. Interlaced frames are deinterlaced during conversion."
+      },
+      {
+        "question": "Does the MP4 keep the DV frame size?",
+        "answer": "Mostly. Nothing is enlarged, and an oversized frame is shrunk to fit a ceiling. An odd-sized frame also gives up a pixel when it is rounded."
+      },
+      {
+        "question": "Which frame rate will the MP4 use?",
+        "answer": "The source's own rate, held under a ceiling: a faster source loses frames but keeps its running time."
+      },
+      {
+        "question": "Does my footage leave my computer?",
+        "answer": "No. Nothing is sent anywhere, since the encoding happens in your browser. A long tape capture simply takes as long as your machine needs."
+      },
+      {
+        "question": "Is my original DV file changed?",
+        "answer": "No. The DV is untouched; what you download is a new MP4 named after it."
+      },
+      {
+        "question": "Which files can I add?",
+        "answer": "The picker accepts files ending in .dv. You can select several; they convert in turn and you save one MP4 per file, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "DV and MP4",
+      "fromFormat": {
+        "name": "DV",
+        "fullName": "Digital Video",
+        "description": "A video format and tape standard for consumer camcorders from the 1990s.",
+        "details": [
+          "intraframe compression",
+          "MiniDV camcorder footage",
+          "raw .dv or .dif files"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A movie container used here with H.264 pictures and AAC sound.",
+        "details": [
+          "container for several codecs",
+          "H.264 video with AAC sound here",
+          "plays in browsers and on phones"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DV to MP4",
+      "points": [
+        "The video is re-encoded as H.264 and the audio as AAC.",
+        "Interlaced frames are deinterlaced, and very large pictures and fast frame rates are capped.",
+        "Each side is trimmed to an even pixel count.",
+        "Encoding is local, so the DV is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "Understanding DV for MP4 output",
+      "markdown": "### What is a DV file?\n\nDV is a family of digital video encodings developed for videocassettes in the early 1990s, from a specification by a ten-company consortium later standardized by IEC. Each picture is compressed on its own with a discrete cosine transform, so DV does not compress from frame to frame the way MPEG-2 does. Raw DV data can be stored as a file with a .dv or .dif extension.\n\n### Programs that open DV files\n\n- **Windows, Mac and Linux:**\n  - FFmpeg: a command-line tool that both decodes and encodes DV video.\n  - VLC media player: a free and open source player with a DV demuxer registered for the .dv extension.\n\n### DV and MP4 compared\n\n- **Names**: .dv is a tape-based stream format. MP4 is MPEG-4 Part 14, a container for video and audio.\n- **Compression**: DV compresses each picture alone. MP4 here holds H.264 with AAC audio.\n- **Use**: DV is legacy camcorder footage. MP4 plays on nearly every device.\n\nThe work is done by a WebAssembly build of FFmpeg inside your browser tab. It re-encodes the video as H.264 with libx264, at the ultrafast preset with constant rate factor 32, and encodes the sound as AAC at 96 kbps. Interlaced frames get deinterlaced. The output stops at 1920 pixels on its longer side and 30 frames per second, and a smaller or slower source is never raised. Rounding costs a frame with odd dimensions one pixel. No upload takes place.\n\n### Other ways to convert DV to MP4\n\n- **FFmpeg:** run `ffmpeg -i tape.dv -c:v libx264 -c:a aac viewing.mp4`. FFmpeg lists DV video and MP4 as supported for both decoding and encoding, and the command picks H.264 video and AAC sound.\n\n### Problems with DV files\n\n- **Raw or wrapped**: the same DV data can sit raw in a .dv or .dif file or inside AVI, QuickTime or MXF. This page's picker takes files ending in .dv.\n- **Two kinds of DV**: there is a consumer kind and a professional kind, and DVCAM from Sony and DVCPRO from Panasonic are the professional developments.\n- **Frame metadata**: DV attaches metadata to every recorded frame. Your original file is left unchanged, so keep it.\n- **A long file is slow**: conversion runs on your own device, so time depends on its speed.\n"
+    }
+  },
+  "gif-to-psd": {
+    "seo": {
+      "title": "Convert GIF to PSD Online (Free)",
+      "h1": "GIF to PSD Converter",
+      "description": "Convert a GIF to a Photoshop PSD in your browser. Only the first frame is kept, in 8-bit color, with no layers. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save the first frame of a GIF as a PSD file for Photoshop, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What is the process for making a PSD from a GIF?",
+        "answer": "Add the GIF above and save the PSD that appears. Your browser decodes the first frame and ImageMagick writes the PSD. Several GIFs give one PSD each."
+      },
+      {
+        "question": "Will my animated GIF become layers?",
+        "answer": "No. Only the first frame is kept, and the page builds no layers or animation frames, so every PSD from this page is one flat picture."
+      },
+      {
+        "question": "Does the PSD have more than 256 colors?",
+        "answer": "The picture is stored as 8-bit RGBA, but it still shows the GIF's palette, because converting cannot add colors the GIF never had."
+      },
+      {
+        "question": "Why do the edges look hard?",
+        "answer": "GIF has no partial transparency, so soft edges were hard before the conversion and stay that way."
+      },
+      {
+        "question": "Are the GIF's comments copied?",
+        "answer": "No. Only pixels pass through, so comments, EXIF and other metadata are left out of the PSD."
+      },
+      {
+        "question": "Will it work in Photopea?",
+        "answer": "Yes. Photopea's main document format is PSD, and File > Open loads one."
+      },
+      {
+        "question": "Why would I want a PSD from a GIF?",
+        "answer": "To edit the picture in Photoshop or another PSD editor, add layers above it, or hand over a file in the format a designer asked for."
+      },
+      {
+        "question": "Is my GIF uploaded or changed?",
+        "answer": "Neither. The GIF is processed on your own machine and nothing leaves it; the file you began with is not modified."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and PSD",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A palette-based raster format used for short animations and simple graphics.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation"
+        ]
+      },
+      "toFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "Adobe Photoshop's native document file format.",
+        "details": [
+          "layers and masks",
+          "several sample depths",
+          "raw or compressed pixel data"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting GIF to PSD",
+      "points": [
+        "Only the first frame of an animated GIF is kept.",
+        "The PSD is built from 8-bit RGBA pixels and has no layers or frames.",
+        "The GIF's 256-color palette is still visible in the picture.",
+        "Metadata is not copied."
+      ]
+    },
+    "guide": {
+      "title": "Understanding GIF for PSD output",
+      "markdown": "### What is a GIF file?\n\nCompuServe introduced GIF, the Graphics Interchange Format, in 1987. Images are packed losslessly with LZW, each palette tops out at 256 colors, and simple animation is part of the design: one file can carry many images, spaced by delays measured in hundredths of a second. The July 1990 GIF89a revision added transparency, per-frame delays, comments and application data blocks. Transparency means choosing a single palette color to be invisible, so partial opacity is impossible. License fees for LZW from Unisys began in 1994, and the patents expired in 2003 and 2004. You see GIF in reaction images, stickers, icons and short looping clips.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:**\n  - GIMP: can export a still picture or a layered animation.\n  - ImageMagick: handles GIF input.\n- **Web:**\n  - Google Chrome and Mozilla Firefox: display GIF.\n- **Mobile:**\n  - Safari and Chrome: display GIF on a phone.\n\n### GIF and PSD compared\n\n- **Names and types**: .gif is image/gif. .psd is Photoshop's native document, image/vnd.adobe.photoshop.\n- **Color**: a GIF frame is capped at 256 palette entries. A PSD header lists one, eight, 16 and 32 bits as possible sample depths.\n- **Structure**: a PSD keeps layers, masks and image resources in separate sections. A GIF holds frames.\n- **Compression**: a PSD stores pixel data raw or encoded with RLE or ZIP, while GIF uses LZW.\n- **Limit**: a PSD side can be no longer than 30,000 pixels, and PSB removes that cap.\n\nYour browser decodes the GIF, and only its first frame is kept, so an animated GIF gives one still picture. The pixels pass through 8-bit RGBA, and ImageMagick writes the PSD. The page builds no layers and no animation frames.\n\n### Other ways to convert GIF to PSD\n\n- **ImageMagick:** run `magick sticker.gif sticker.psd` in a terminal. ImageMagick lists GIF and PSD as readable and writable.\n\n### Problems with GIF files\n\n- **Comments can drop out**: GIMP leaves out a GIF comment that uses characters beyond plain seven-bit text.\n- **Soft edges look hard**: a GIF cannot retain partial opacity.\n- **Banding**: a GIF holds at most 256 colors, so gradients can shift, and the PSD cannot restore the missing shades.\n- **Later frames look partial**: frame disposal changes how later images cover earlier ones."
+    }
+  },
+  "gif-to-swf": {
+    "seo": {
+      "title": "Convert GIF to SWF Online (Free)",
+      "h1": "GIF to SWF Converter",
+      "description": "Convert a GIF animation to a video SWF in your browser with FFmpeg. There is no sound and no ActionScript. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a GIF animation into a video SWF file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Which steps convert a GIF to SWF here?",
+        "answer": "Add the GIF above and wait while FFmpeg encodes it in your browser, then save the SWF. Several GIFs give one SWF each."
+      },
+      {
+        "question": "Does the SWF keep the animation?",
+        "answer": "Yes. The GIF becomes video, so its frames play in the SWF at the original rate, unless that rate is above a ceiling and frames are dropped."
+      },
+      {
+        "question": "Will the SWF be interactive?",
+        "answer": "No. The page writes a video SWF with no ActionScript, so there are no buttons or controls."
+      },
+      {
+        "question": "Does the SWF have sound?",
+        "answer": "No. Nothing in a GIF is audio, so the SWF is silent too."
+      },
+      {
+        "question": "Can I play the SWF today?",
+        "answer": "Flash Player is retired and won't run Flash content any more. Ruffle emulates Flash on a desktop or in a browser, with some Flash APIs still missing."
+      },
+      {
+        "question": "Is the picture resized?",
+        "answer": "Not enlarged, and a very large picture is shrunk to a ceiling. A side of odd length loses a single pixel."
+      },
+      {
+        "question": "Can I choose the SWF's video settings?",
+        "answer": "Not on this page, which offers no settings; FFmpeg's defaults pick the video codec. Run FFmpeg yourself if you want to choose them."
+      },
+      {
+        "question": "Does my GIF leave my device?",
+        "answer": "No. Encoding happens in your browser and nothing is sent anywhere."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and SWF",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster frame format used for small animations, with palettes and per-frame timing.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation"
+        ]
+      },
+      "toFormat": {
+        "name": "SWF",
+        "fullName": "Shockwave Flash",
+        "description": "A legacy Flash movie format that can carry graphics, timelines and encoded media.",
+        "details": [
+          "vector animation",
+          "ActionScript interactivity",
+          "can embed video and audio"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting GIF to SWF",
+      "points": [
+        "The SWF is a video of your GIF, with no ActionScript and no sound.",
+        "FFmpeg's own defaults decide how the video is encoded.",
+        "Very large pictures and fast frame rates are capped, and each side is trimmed to an even pixel count.",
+        "Flash Player has ended, and Ruffle is a Flash emulator."
+      ]
+    },
+    "guide": {
+      "title": "Understanding GIF for SWF output",
+      "markdown": "### What is a GIF file?\n\nGIF dates to 1987 and CompuServe. Its GIF89a revision of July 1990 introduced transparency, animation timing, comments and application blocks. Compression is lossless LZW, but every image has a palette of 256 colors at most. Many images in one file, separated by delays in hundredths of a second, make a GIF animate. The media type is image/gif, and every major browser displays it.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:**\n  - GIMP: writes still pictures or multilayer animations as GIF.\n  - ImageMagick: supports reading GIF.\n- **Web:**\n  - Google Chrome and Mozilla Firefox: show GIF in a tab.\n- **Mobile:**\n  - Safari and Chrome: handle GIF on a phone.\n\n### GIF and SWF compared\n\n- **Names and types**: .gif is image/gif. SWF has the media type application/vnd.adobe.flash.movie.\n- **Color**: GIF frames use palettes capped at 256 colors, while the SWF here carries video.\n- **Sound**: a GIF is silent. SWF can carry audio, but the file made here has none.\n- **Animation**: GIF repeats a stack of images. A SWF is a timeline-based legacy format that can also hold vector graphics and bitmap video.\n\nShockwave Flash started at Macromedia, which Adobe acquired in 2005, and carried Flash animations, games and interactive content with ActionScript behind them. Adobe Flash Player reached end of life on 31 December 2020. This page makes a video SWF, so no ActionScript is added.\n\nIn your browser, FFmpeg runs as WebAssembly and chooses the video codec itself: its default for SWF is Sorenson Spark (FLV1) video at 200 kbit/s. Interlaced frames are deinterlaced, and the picture is capped at 1920 pixels and 30 frames per second, with each side trimmed to an even value.\n\n### Other ways to convert GIF to SWF\n\n- **FFmpeg:** run `ffmpeg -i badge.gif -an -c:v flv badge.swf`. The `-an` option skips audio, and `-c:v` selects the video encoder. FFmpeg lists GIF and SWF as both readable and writable.\n- **SWFTools gif2swf:** run `gif2swf -o badge.swf badge.gif`. The `-o` option sets the name of the SWF output file, and the GIF is the input file.\n\n### Problems with GIF files\n\n- **Banding in gradients**: a GIF is limited to 256 colors, which changes smooth gradients.\n- **Frames overlay wrongly**: disposal settings decide how later images sit over earlier ones.\n- **Comments can drop out**: an export from GIMP skips a GIF comment holding characters outside the seven-bit range.\n- **Large GIFs**: a long, large GIF becomes many video frames, so conversion takes longer on a slow device."
+    }
+  },
+  "jp2-to-jpeg": {
+    "seo": {
+      "title": "Convert JP2 to JPEG Online (Free)",
+      "h1": "JP2 to JPEG Converter",
+      "description": "Convert a JP2 image to a JPEG in your browser with ImageMagick. One picture per file. Free, with no sign-up needed."
+    },
+    "tool": {
+      "subtitle": "Turn a JP2 image into a JPEG that opens everywhere, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JP2 to a JPEG?",
+        "answer": "Add the JP2 above and save the JPEG. ImageMagick runs in your browser and writes one JPEG for each file you choose."
+      },
+      {
+        "question": "Is a JP2 the same as a JPEG?",
+        "answer": "No. A JP2 holds wavelet-compressed image data, while JPEG is a separate lossy format with the extensions .jpg and .jpeg."
+      },
+      {
+        "question": "Is there a quality slider?",
+        "answer": "No. This page sets no JPEG quality."
+      },
+      {
+        "question": "Is it lossless?",
+        "answer": "No. JPEG compression is lossy, so keep the JP2 as your original."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "Only for an extremely large picture, which the page declines as too large to convert here."
+      },
+      {
+        "question": "Is my file uploaded?",
+        "answer": "No. The conversion runs locally in your browser, so the JP2 stays on your device."
+      },
+      {
+        "question": "Is a JPX file the same as a JP2?",
+        "answer": "No. JPX belongs to Part 2 of the standard, while JP2 is the basic Part 1 wrapper, so the two are not interchangeable."
+      },
+      {
+        "question": "Which files can I add?",
+        "answer": "Anything ending in .jp2. Select any number; each converts in turn and gives its own JPEG."
+      }
+    ],
+    "aboutSection": {
+      "title": "JP2 and JPEG",
+      "fromFormat": {
+        "name": "JP2",
+        "fullName": "JPEG 2000 image",
+        "description": "A still-image wrapper developed by the Joint Photographic Experts Group for wavelet-compressed picture data.",
+        "details": [
+          "wavelet compression",
+          "lossy and lossless modes",
+          "color profiles and opacity"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format designed for photographs; .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JP2 to JPEG",
+      "points": [
+        "The JP2 is read as one picture in your browser.",
+        "The page sets no JPEG quality.",
+        "A very large picture is declined as too big to convert here.",
+        "A JPX file is not a JP2."
+      ]
+    },
+    "guide": {
+      "title": "Understanding JP2 for JPEG output",
+      "markdown": "### What is a JP2 file?\n\nJP2 wraps a JPEG 2000 codestream in the Part 1 file format, developed by the Joint Photographic Experts Group. JPEG 2000 compression can be lossy or lossless, and the codestream inside decides which, not the wrapper. The wrapper can store color profiles, opacity information and other metadata. A JP2 reader ignores wrapper extensions it does not understand. Its standard extension is .jp2 and its registered media type is image/jp2. The Library of Congress serves digitized maps and newspapers as lossy JP2 images.\n\n### Programs that open JP2 files\n\n- **Windows, Mac and Linux:**\n  - ImageMagick: lists read and write support for JP2.\n  - OpenJPEG: an open-source JPEG 2000 codec written in C.\n- **Windows and Mac:**\n  - Adobe Photoshop: opens a JP2 file when you select it in the latest version.\n\n### JP2 and JPEG compared\n\n- **Names**: .jp2 is image/jp2; JPEG uses .jpg or .jpeg.\n- **Compression**: JPEG 2000 allows lossy or lossless coding, while JPEG is lossy.\n- **Opacity**: a JP2 may store opacity, which JPEG cannot hold because it has no alpha transparency.\n- **Metadata**: the JP2 wrapper can carry color profiles and other metadata alongside the picture.\n- **Use**: JP2 suits archives and service images, while JPEG is used for web photographs, camera output and email attachments.\n- **After converting**: open the JPEG and compare it with the JP2, since a lossy JPEG cannot return to the original and the JP2 should be kept.\n\nThe JP2 is opened as a single picture by ImageMagick running inside your browser tab, and the page sets no JPEG quality. The page refuses a file larger than about 537 megapixels.\n\n### Other ways to convert JP2 to JPEG\n\n- **ImageMagick:** run `magick scan.jp2 shared.jpeg`. ImageMagick lists JP2 and JPEG as readable and writable.\n\n### Problems with JP2 files\n\n- **JPX is not JP2**: the JPX variant belongs to Part 2 of JPEG 2000, not the basic wrapper of Part 1.\n- **Browsers do not decode it**: the Library of Congress notes that browsers do not natively decode JPEG 2000, so JP2 files are often converted to a web-friendly format.\n- **Few cameras write it**: most cameras do not encode JPEG 2000, so a JP2 is rarely straight out of a camera."
+    }
+  }
+}

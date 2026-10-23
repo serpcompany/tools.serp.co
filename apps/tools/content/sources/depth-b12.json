@@ -1,0 +1,201 @@
+{
+  "tools": {
+    "mov-to-hevc": {
+      "methods": [
+        {
+          "app": "FFmpeg libx265",
+          "steps": "Run ffmpeg -i camera.mov -an -c:v libx265 encoded.hevc.",
+          "limits": "Requires libx265; makes a new lossy encode.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg extraction",
+          "steps": "For HEVC source video run ffmpeg -i camera.mov -an -c:v copy extracted.hevc.",
+          "limits": "Source must already use HEVC.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "mov-to-m4v": {
+      "methods": [
+        {
+          "app": "FFmpeg MP4 encode",
+          "steps": "Run ffmpeg -i edit.mov -f mp4 -c:a aac -c:v libx264 movie.m4v.",
+          "limits": "Re-encodes.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg MP4 remux",
+          "steps": "Run ffmpeg -i edit.mov -c copy -f mp4 repacked.m4v.",
+          "limits": "Only compatible tracks can be copied.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mp3-to-oga": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i song.mp3 -c:a libvorbis -q:a 5 -f ogg song.oga.",
+          "limits": "Requires libvorbis; adds lossy encoding.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "File > Export Audio; set the Format dropdown to Ogg Vorbis; the quality slider runs from 0 to 10.",
+          "limits": "Re-encodes the audio as lossy Vorbis.",
+          "source": "https://manual.audacityteam.org/man/ogg_vorbis_export_options.html"
+        }
+      ]
+    },
+    "mp4-to-ts": {
+      "methods": [
+        {
+          "app": "FFmpeg remux",
+          "steps": "Run ffmpeg -i recording.mp4 -c copy transport.ts.",
+          "limits": "Source codecs must be compatible with TS.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg encode",
+          "steps": "Run ffmpeg -i recording.mp4 -c:a aac -c:v libx264 -f mpegts recoded.ts.",
+          "limits": "Re-encodes for a selected codec requirement.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ]
+    },
+    "mpg-to-wmv": {
+      "methods": [
+        {
+          "app": "FFmpeg automatic codecs",
+          "steps": "Run ffmpeg -i source.mpg legacy.wmv.",
+          "limits": "Inspect encoders selected by the installed build.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg named codecs",
+          "steps": "Run ffmpeg -i source.mpg -c:v wmv2 -c:a wmav2 specified.wmv.",
+          "limits": "Requires those encoders and adds lossy coding.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "otf-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick -font typeface.otf -pointsize 48 label:\"Sample ABC 123\" preview.png.",
+          "limits": "Draws selected text only.",
+          "source": "https://usage.imagemagick.org/text/",
+          "supportSource": "https://imagemagick.org/command-line-options/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Tools > Text; pick the typeface in the font selector, which lists installed fonts; enter a sample; File > Export As, choose PNG.",
+          "limits": "Needs an available installed font and the requested glyphs.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-tool-text.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "Inkscape",
+          "steps": "Use the Text tool and Text > Text and Font; select an installed family, enter a sample; File > Export PNG Image, choose Page, Drawing or Selection and set the image size in pixels.",
+          "limits": "Choose the output size in the export dialog.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/styling-text.html",
+          "supportSource": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html"
+        }
+      ]
+    },
+    "ppt-to-jpeg": {
+      "methods": [
+        {
+          "app": "PowerPoint Windows",
+          "steps": "Select slide; File > Save As; choose JPEG File Interchange Format; Save; Just This One.",
+          "limits": "Exports the chosen slide as a still image.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/save-a-slide-as-an-image-or-as-a-separate-presentation-file"
+        },
+        {
+          "app": "PowerPoint Mac",
+          "steps": "Open slide; File > Export; choose JPEG; Save Current Slide Only; set dimensions and Export.",
+          "limits": "A static export cannot preserve animation.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/save-a-slide-as-an-image-or-as-a-separate-presentation-file"
+        },
+        {
+          "app": "LibreOffice Impress plus ImageMagick",
+          "steps": "Open PPT; File > Export as > Export as PDF; then magick -density 150 slides.pdf slide.jpeg.",
+          "limits": "Requires Ghostscript for PDF input.",
+          "source": "https://books.libreoffice.org/en/IG75/IG7510-SlideShowsPrintEmailExport.html",
+          "supportSource": "https://imagemagick.org/formats/",
+          "inputSupportSource": "https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html"
+        }
+      ]
+    },
+    "rm-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i archive.rm -vn -c:a libmp3lame -b:a 192k realmedia-audio.mp3.",
+          "limits": "Requires RealMedia source decoding and LAME encoding.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "swf-to-flv": {
+      "methods": [
+        {
+          "app": "FFmpeg direct encode",
+          "steps": "Run ffmpeg -i media.swf -c:v libx264 -crf 27 -f flv -c:a aac direct.flv.",
+          "limits": "Reads only embedded media; no ActionScript or vector rendering.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/swfdec.c"
+        },
+        {
+          "app": "FFmpeg compatible-stream copy",
+          "steps": "Run ffmpeg -i media.swf -c copy -f flv copied.flv.",
+          "limits": "Extracted codecs must fit FLV; scripts/vectors are not rendered.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg reviewed intermediate",
+          "steps": "Run ffmpeg -i media.swf -c:v ffv1 -c:a pcm_s16le intermediate.mkv; inspect it; then ffmpeg -i intermediate.mkv -c:v libx264 -crf 27 -f flv -c:a aac reviewed.flv.",
+          "limits": "Two-stage media decode/encode; not a Flash runtime.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/swfdec.c"
+        }
+      ]
+    },
+    "txt-to-jpeg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick -background white -fill black -pointsize 20 -size 800x caption:@notes.txt notes.jpeg.",
+          "limits": "Needs an available font; security policy can disable the @file form; a trailing newline adds a blank line.",
+          "source": "https://usage.imagemagick.org/text/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Tools > Text; load the TXT with the folder icon in the Text Editor window; arrange canvas; File > Export As, choose .jpeg.",
+          "limits": "Inspect encoding and line fit before export.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-tool-text.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "Inkscape plus GIMP",
+          "steps": "Type the text with the Text tool; set the font in Text > Text and Font; File > Export PNG Image; open the PNG in GIMP and File > Export As, choose JPEG.",
+          "limits": "Two-stage layout workflow, not direct TXT renaming.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        }
+      ]
+    }
+  }
+}

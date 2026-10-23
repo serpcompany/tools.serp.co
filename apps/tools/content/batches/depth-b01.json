@@ -1,0 +1,729 @@
+{
+  "avi-to-wmv": {
+    "seo": {
+      "title": "Convert AVI to WMV Online (Free)",
+      "h1": "AVI to WMV Converter",
+      "description": "Convert AVI to WMV in your browser. Interlaced video is cleaned up and the picture is capped at 1920 px and 30 fps. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Re-encode AVI footage as a WMV file, up to 1920 px and 30 fps."
+    },
+    "faqs": [
+      {
+        "question": "What is the way to convert AVI to WMV?",
+        "answer": "Pick the AVI and let FFmpeg re-encode it inside your browser, then save the WMV. The file never leaves your device, so speed depends on your hardware and the clip length."
+      },
+      {
+        "question": "Will a 4K or 60 fps AVI keep its size and frame rate?",
+        "answer": "No. A longer side beyond 1920 px is scaled down, and the frame rate is held to 30 fps at most. A smaller clip keeps its dimensions, though a side with an odd pixel count is rounded down to an even one."
+      },
+      {
+        "question": "Why does my AVI play sound but show no picture?",
+        "answer": "AVI is only a container, and the video inside may use a codec your player lacks. Open it in FFplay or mpv, which bring their own decoders, to find out whether the AVI itself is at fault."
+      },
+      {
+        "question": "Is interlaced footage cleaned up?",
+        "answer": "Yes. A yadif filter runs over interlaced frames to remove combing along moving edges, and progressive footage is left alone."
+      },
+      {
+        "question": "What video and audio are inside the WMV?",
+        "answer": "This page names no codec for WMV, so FFmpeg's own defaults decide. The video is MS-MPEG4 rather than Windows Media Video proper, and the audio is WMA. Use the FFmpeg command below when you want the Windows Media encoders."
+      },
+      {
+        "question": "Can I queue several AVI files?",
+        "answer": "Yes. The converter runs through them one by one and gives each its own WMV file, with no archive and no size cap on the page."
+      },
+      {
+        "question": "What happens to a damaged AVI?",
+        "answer": "Usually the conversion still finishes, with the unreadable part missing. The WMV then ends earlier than the AVI, so compare both lengths and look at the last scene."
+      },
+      {
+        "question": "Does the converter change my original AVI?",
+        "answer": "No. You download a new copy named like the original but ending in .wmv, and the AVI stays as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVI and WMV",
+      "fromFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A RIFF-based audiovisual container that can carry several kinds of video and audio encoding.",
+        "details": [
+          "container rather than codec",
+          "compression varies",
+          "legacy video interchange"
+        ]
+      },
+      "toFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "Microsoft video compression commonly delivered inside an ASF file with a WMV extension.",
+        "details": [
+          "Windows Media video family",
+          "usually ASF-wrapped",
+          "lossy video"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVI to WMV",
+      "points": [
+        "The video is re-encoded, not copied into a new container.",
+        "The longer side is limited to 1920 px and the frame rate to 30 fps.",
+        "Interlaced frames are deinterlaced.",
+        "Your original AVI is never changed."
+      ]
+    },
+    "guide": {
+      "title": "About AVI files",
+      "markdown": "### What is an AVI file?\n\nAVI, short for Audio Video Interleave, is a RIFF container that Microsoft introduced with Windows 3.1 in 1992. Streams inside it are labeled with FOURCC codes, so the .avi extension reveals neither the codec nor the picture quality. Size limits in the first specification are not the ones OpenDML later allowed, which is why a long capture needs software that supports it.\n\nLegacy Windows clips, footage straight from cameras and capture devices, and archives are where AVI shows up. WMV is the target when an older Windows workflow expects Windows Media Video.\n\n### Programs that open AVI files\n\n- **Windows, Mac and Linux:** FFplay, FFmpeg's own player, plays AVI, and mpv offers desktop playback.\n- **Windows and Mac:** Adobe Premiere on both can import AVI, provided it has a decoder for what the file holds.\n- **Mobile:** VLC for Android is a free player, though what it can show hinges on the streams within the file, and VLC for iOS handles most movie formats along with local and network media.\n\n### AVI and WMV compared\n\n- **Extensions and media types**: .avi with video/x-msvideo; .wmv with video/x-ms-wmv, a label the Library of Congress records as commonly used, not an IANA registration.\n- **Container**: AVI is a RIFF container able to wrap many different codecs. A .wmv file uses Microsoft's ASF container with Windows Media coded content.\n- **Typical use**: AVI is found in legacy Windows clips and archived footage. WMV carried older Windows video, screencasts and Windows Media broadcasts.\n\nHere FFmpeg decodes the AVI and writes a new WMV. It deinterlaces the picture, scales the longer side to at most 1920 px with even dimensions, and caps the frame rate at 30 fps. The audio is re-encoded as well, so nothing is copied across untouched. The command names no codec, so FFmpeg's defaults decide, and a detailed picture can come out soft.\n\n### Other ways to convert AVI to WMV\n\n- **FFmpeg:** run `ffmpeg -i capture.avi -c:v wmv2 -c:a wmav2 archive.wmv` to pick FFmpeg's Windows Media Video and Windows Media Audio encoders yourself. This re-encodes both streams.\n\n### Problems with AVI files\n\nA black picture with working sound means the player lacks the video codec; the file is not empty. Opening it in a second player with its own decoders tells you which case you have.\n\nAspect ratio and scan type are recorded inconsistently across AVI implementations. A picture that looks stretched or combed in one player may look right in another, so judge the WMV in the same player you used for the AVI.\n"
+    }
+  },
+  "bmp-to-ico": {
+    "seo": {
+      "title": "Convert BMP to ICO Online (Free)",
+      "h1": "BMP to ICO Converter",
+      "description": "Convert BMP to ICO in your browser. You get one icon image, with a bitmap over 256 px fitted inside 256 by 256. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Turn a BMP into a one-image ICO, fitted inside 256 by 256 pixels."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert BMP to ICO?",
+        "answer": "Choose the BMP; it is decoded in the browser and an ICO comes back for you to save. Nothing is uploaded."
+      },
+      {
+        "question": "How big can the icon be?",
+        "answer": "Up to 256 by 256 pixels. If the longer side of the BMP is above 256 px, the picture is scaled down to fit that square with its proportions intact; a smaller bitmap keeps its own dimensions."
+      },
+      {
+        "question": "Does the ICO include 16, 32 and 48 px versions?",
+        "answer": "No, you get one image. Python's Pillow library can write several sizes through its sizes option when you need them."
+      },
+      {
+        "question": "Will a wide BMP become a square icon?",
+        "answer": "No, the proportions are kept, so a wide bitmap makes a wide icon. Icons are normally square, so crop or pad the BMP to a square before converting."
+      },
+      {
+        "question": "Will the ICO work as a site favicon?",
+        "answer": "Website favicons are the best-known use of the .ico ending, so the file fits that role. Bold simple shapes hold up better than a detailed bitmap at that size."
+      },
+      {
+        "question": "Why does the icon look blurry?",
+        "answer": "A bitmap is never enlarged, so a 32 px BMP stays 32 px and looks soft when it is shown larger. Large artwork loses its thin lines when it is scaled down."
+      },
+      {
+        "question": "Does the ICO keep the BMP's color profile?",
+        "answer": "No. The BMP is decoded to plain pixels, and metadata such as an ICC profile is dropped."
+      },
+      {
+        "question": "Can I pack several BMP files into one ICO?",
+        "answer": "No, each BMP produces a separate one-image ICO. For a multi-image icon, build one from a large source with Pillow's sizes list."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and ICO",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A bitmap file that describes an image using a pixel grid and a Windows bitmap header.",
+        "details": [
+          "raster image",
+          "several pixel depths",
+          "compression depends on variant"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "An icon resource file that can package images for Windows application and shortcut graphics.",
+        "details": [
+          "icon container",
+          "may hold several sizes",
+          "can contain PNG image data"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to ICO",
+      "points": [
+        "The ICO holds one image, not a set of sizes.",
+        "A side over 256 px is fitted inside 256 by 256 with the proportions kept.",
+        "A smaller bitmap keeps its size and is not enlarged.",
+        "Metadata such as the color profile is dropped."
+      ]
+    },
+    "guide": {
+      "title": "About BMP files",
+      "markdown": "### What is a BMP file?\n\nBMP is a raster image family that Microsoft controls, first seen on Windows and OS/2. Version 5 of the format shipped with Windows 98 in 1998 and added an ICC profile plus an alpha channel. Pixels are commonly stored uncompressed, though lossless compression exists. It is registered as image/bmp.\n\nWindows screen captures and system graphics are where BMP is commonly encountered.\n\n### Programs that open BMP files\n\n- **Windows, Mac and Linux:** ImageMagick reads BMP images. XnView MP also lists BMP among its supported formats; company use requires a license.\n- **Web:** Mozilla Firefox displays BMP pictures in browser content, and Google Chrome is listed as supporting BMP in Mozilla's compatibility data.\n\n### BMP and ICO compared\n\n- **Names and media types**: .bmp with image/bmp; .ico with image/vnd.microsoft.icon.\n- **What each holds**: a BMP is one picture. An ICO file can bundle several images and stores its numbers little-endian.\n- **Where ICO is used**: Microsoft's graphical interface icons and website favicons. Windows Vista icon guidance adds a larger image for high-DPI displays.\n\nThe ICO written here has one image only, and ImageMagick writes it from the decoded pixels. When the BMP is taller or wider than 256 px, it is fitted inside a square of that size with its proportions kept; a smaller one is left at its own size and not enlarged. A full-size image is stored as PNG data inside the ICO. The color profile and other metadata are dropped.\n\n### Other ways to convert BMP to ICO\n\n- **Pillow:** `Image.open(\"badge.bmp\").save(\"badge.ico\", sizes=[(16,16),(32,32),(48,48),(256,256)])` builds a multi-size icon in Python. Pillow ignores any size bigger than the original image.\n\n### Problems with BMP files\n\nEditable vector shapes and live type do not survive in a BMP, so thin strokes and small lettering that read well in a large preview can disappear when the picture is shrunk to icon size. Look at the icon at the size people will see.\n\nStretch a small icon over a high-DPI screen and it looks soft. Start from the largest clean picture you have, because a smaller bitmap is left at its size rather than scaled up.\n\nAn uncompressed BMP can also be bulky, so PNG or JPEG may be more practical when the picture is only being shared.\n"
+    }
+  },
+  "csv-to-html": {
+    "seo": {
+      "title": "Convert CSV to HTML Online (Free)",
+      "h1": "CSV to HTML Converter",
+      "description": "Convert CSV to HTML in your browser. The first row becomes the table header and cells are escaped; you get a bare table snippet."
+    }
+  },
+  "flv-to-avi": {
+    "seo": {
+      "title": "Convert FLV to AVI Online (Free)",
+      "h1": "FLV to AVI Converter",
+      "description": "Convert FLV to AVI in your browser. Video becomes MPEG-4 (Xvid-tagged) and sound MP3, capped at 1920 px and 30 fps. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Turn old Flash video into an AVI with MPEG-4 video and MP3 sound."
+    },
+    "faqs": [
+      {
+        "question": "Is Flash Player required for FLV to AVI?",
+        "answer": "No. Flash Player is discontinued, and no plug-in is involved: FFmpeg decodes the FLV inside your browser."
+      },
+      {
+        "question": "What video and audio does the AVI contain?",
+        "answer": "MPEG-4 video tagged Xvid, and MP3 audio at 96 kbps."
+      },
+      {
+        "question": "Is the AVI the same quality as the FLV?",
+        "answer": "No. The picture is decoded and encoded again at a fixed quality level, which is lossy, so some detail goes. Keep the FLV as your source."
+      },
+      {
+        "question": "Does my large FLV keep its resolution and frame rate?",
+        "answer": "Only up to a point. A longer side above 1920 px is shrunk to that, and anything above 30 frames per second drops to 30. A smaller clip keeps its dimensions, minus one pixel where a side is odd."
+      },
+      {
+        "question": "Does the converter deinterlace the video?",
+        "answer": "Yes, a yadif filter deinterlaces interlaced frames so moving edges lose their comb lines; progressive footage is untouched."
+      },
+      {
+        "question": "Can I queue several FLV files?",
+        "answer": "Yes. The queue runs file by file, every AVI saves separately, and the page imposes no size limit."
+      },
+      {
+        "question": "What happens to a cut-off FLV?",
+        "answer": "A truncated FLV generally converts as well, giving an AVI that stops where the readable data stops. Play the end of both files to compare."
+      },
+      {
+        "question": "Which codecs can an FLV hold?",
+        "answer": "Older FLV files often carry Sorenson or On2 VP6 pictures, with one track of each kind at most. Whatever it holds, the AVI gets newly encoded MPEG-4 video and MP3 audio."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLV and AVI",
+      "fromFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A Flash-era container for encoded audiovisual streams, still encountered in saved web videos.",
+        "details": [
+          "tagged media container",
+          "codec support varies",
+          "legacy web video"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A RIFF-based audiovisual container that can carry several kinds of video and audio encoding.",
+        "details": [
+          "container rather than codec",
+          "compression varies",
+          "legacy video interchange"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting FLV to AVI",
+      "points": [
+        "Video is re-encoded as MPEG-4 tagged Xvid, and audio as MP3 at 96 kbps.",
+        "The longer side is limited to 1920 px and the frame rate to 30 fps.",
+        "Interlaced frames are deinterlaced.",
+        "Your original FLV is never changed."
+      ]
+    },
+    "guide": {
+      "title": "About FLV files",
+      "markdown": "### What is an FLV file?\n\nFLV is a binary format associated with Macromedia Flash video delivery. FLV allows no more than one picture track and one sound track. Pictures use Sorenson or On2 VP6, sound uses MP3, PCM or ADPCM. ActionScript in a Flash SWF could point to a separate FLV file. Adobe ended Flash Player support on 31 December 2020, yet saved lectures and downloaded clips still sit around as FLV files.\n\n### Programs that open FLV files\n\n- **Windows, Mac and Linux:** VLC media player lists FLV input along with Sorenson and VP6-family decoding, and FFplay uses FFmpeg decoders for FLV.\n- **Mobile:** Android gets the desktop player's decoding features through VLC for Android, while VLC for iOS bypasses the system player for local files.\n\n### FLV and AVI compared\n\n- **Extensions and media types**: .flv; .avi, which goes with video/x-msvideo.\n- **Container**: FLV was built for Flash delivery and carries a single video and a single audio stream. AVI is a RIFF file that Microsoft introduced in 1992 to interleave video and audio.\n- **Codecs**: an AVI may hold raw, lossless or lossy pictures, which is why the extension never reveals what a player must decode.\n\nThe output is MPEG-4 video tagged Xvid with no B-frames, plus MP3 audio at 96 kbps. Interlaced frames are cleaned up, any side over 1920 px is shrunk to fit with even dimensions, and 30 fps is the ceiling. Everything runs in your browser, and your file stays on your device.\n\n### Other ways to convert FLV to AVI\n\n- **FFmpeg:** run `ffmpeg -i lecture.flv -c:v mpeg4 -q:v 4 -c:a libmp3lame lecture.avi` to choose the quality scale yourself. It re-encodes both streams.\n\n### Problems with FLV files\n\nAdobe retired Flash Player, so hunting for a copy of it will not help with an old FLV. Use a player that ships decoders of its own, such as VLC.\n\nThe FLV extension does not identify a single video codec; a reader also needs the decoder for the stream. A player that opens the file but shows no picture is missing that decoder.\n\nFLV offers one audio stream, so alternative language tracks have nowhere to go inside it.\n\nWhen the AVI is ready, watch for lip-sync drift and readable screen text, and keep the FLV until you have checked.\n"
+    }
+  },
+  "gif-to-ico": {
+    "seo": {
+      "title": "Convert GIF to ICO Online (Free)",
+      "h1": "GIF to ICO Converter",
+      "description": "Convert GIF to ICO in your browser. The first frame of the GIF becomes one icon image, fitted inside 256 by 256 px. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Turn the first frame of a GIF into a one-image ICO."
+    },
+    "faqs": [
+      {
+        "question": "Will my animated GIF become an animated ICO?",
+        "answer": "No. The converter takes the first frame of the GIF and writes it as a still icon. Timing and looping are dropped."
+      },
+      {
+        "question": "How do I make an icon from a later frame?",
+        "answer": "Save that frame as its own still image first, then convert it. Python's Pillow GIF loader supports seek(), so a script can move to the frame you want before saving."
+      },
+      {
+        "question": "Does one GIF give several icon sizes?",
+        "answer": "No. The ICO holds a single image. Pillow's sizes option can write a set of sizes."
+      },
+      {
+        "question": "What happens to a GIF wider than 256 px?",
+        "answer": "If its longer side passes 256 px, it is scaled down until the picture fits a 256 by 256 square, keeping its shape. A smaller GIF stays the size it is."
+      },
+      {
+        "question": "Will a tiny GIF gain detail as an ICO?",
+        "answer": "No. A small picture is not enlarged, so a 32 px GIF stays 32 px. Start from a larger drawing if you need a sharp big icon."
+      },
+      {
+        "question": "Why is the first frame wrong or half empty?",
+        "answer": "Disposal settings control how each frame overlays the one before, so a GIF may assemble its picture over several frames and the first one may be partial. Save a complete frame as a still and convert that."
+      },
+      {
+        "question": "Can I use the result as a favicon?",
+        "answer": "ICO is the format most associated with favicons, so yes. Flat, simple shapes survive that small size best."
+      },
+      {
+        "question": "Can I put several GIFs into one ICO?",
+        "answer": "No, every GIF turns into its own one-image ICO, and the page does not merge files."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and ICO",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "An indexed-color raster format that supports both individual pictures and timed image sequences.",
+        "details": [
+          "palette-based images",
+          "optional animation",
+          "single transparent palette entry"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "An icon resource file that can package images for Windows application and shortcut graphics.",
+        "details": [
+          "icon container",
+          "may hold several sizes",
+          "can contain PNG image data"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to ICO",
+      "points": [
+        "Only the first frame is used, so the animation is lost.",
+        "The ICO holds one image, fitted inside 256 by 256 if it is larger.",
+        "A smaller GIF keeps its size and is not enlarged.",
+        "Metadata is dropped."
+      ]
+    },
+    "guide": {
+      "title": "About GIF files",
+      "markdown": "### What is a GIF file?\n\nGIF is an indexed-color raster format that supports both individual pictures and timed image sequences. Every picture in a GIF draws from a palette limited to 256 entries, and transparency works by flagging one entry as clear, so soft edges cannot keep partial opacity. That suits flat logos and badges better than photographs.\n\nFor an icon, the real question is which frame carries the drawing.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:** GIMP can export a single picture or a multilayer animation as GIF, and ImageMagick reads GIF, though your install's own format list is the final word on support.\n- **Web:** Google Chrome and Mozilla Firefox display GIF files in the page.\n- **Mobile:** Safari shows GIF files, as does Chrome on a phone.\n\n### GIF and ICO compared\n\n- **Names and media types**: .gif and .ico; the registered media type for ICO is image/vnd.microsoft.icon.\n- **Content**: a GIF is a palette-based sequence of frames. ICO files may include several pictures and are little-endian.\n- **Typical use**: ICO is Microsoft's format for interface icons, and it is widely associated with website favicons.\n\nThe page decodes the GIF to pixels and keeps its first frame; delays and looping are not carried over. An image taller or wider than 256 px is shrunk to fit a 256 by 256 square with its shape unchanged, a smaller one stays as it is, and a full-size image goes into the ICO as PNG data. Metadata is dropped.\n\n### Other ways to convert GIF to ICO\n\n- **Pillow:** `Image.open(\"reaction.gif\").save(\"reaction.ico\", sizes=[(16,16),(32,32),(48,48)])` writes several sizes from one frame. The GIF loader supports seek() and tell(), so you can move to another frame before saving.\n\n### Problems with GIF files\n\nGIMP caps GIF exports at a 256-color palette, and gradients may shift as a result; the banding shows up once the picture is small. Look at the result on both light and dark backgrounds at its real size.\n\nHigh-DPI screens show a small icon blurry, so prepare the largest clean still you have.\n\nBecause the output holds one image, prepare the version you want as a still first. A small logo or badge converts best; an animated reaction rarely makes a readable icon.\n"
+    }
+  },
+  "jpeg-to-ai": {
+    "seo": {
+      "title": "Convert JPEG to AI Online (Free)",
+      "h1": "JPEG to AI Converter",
+      "description": "Convert JPEG to AI in your browser. You get a PDF with the .ai extension that holds the picture as pixels, not vector paths. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Wrap a JPEG as pixels in an AI file; it is not traced into vectors."
+    },
+    "faqs": [
+      {
+        "question": "Does converting JPEG to AI turn the picture into vectors?",
+        "answer": "No. The AI file is a PDF wrapped around your picture as a bitmap, so it still holds pixels and has no editable paths."
+      },
+      {
+        "question": "Can I scale the result up like a vector logo?",
+        "answer": "No. The pixel count is the same as in the JPEG, so enlarging it softens the edges just as it would in a JPEG."
+      },
+      {
+        "question": "Can I edit the picture's shapes after converting?",
+        "answer": "No shapes exist to edit. The file holds one embedded raster picture and nothing was traced. A program that reads a PDF inside an AI file does not necessarily expose native Illustrator objects either."
+      },
+      {
+        "question": "Does the JPEG get compressed again?",
+        "answer": "The JPEG is decoded and stored as a PNG, which adds no new JPEG loss. Artifacts already in the JPEG stay."
+      },
+      {
+        "question": "Are camera details and color profile kept?",
+        "answer": "No. EXIF, XMP and ICC data are dropped when the picture is decoded to pixels. Keep the JPEG if you need them."
+      },
+      {
+        "question": "What can an AI file hold that a JPEG can't?",
+        "answer": "An AI document can combine vector shapes with raster pictures and keeps editable effects, layers and transparency. A JPEG is only a flat grid of pixels."
+      },
+      {
+        "question": "How big is the page in the AI file?",
+        "answer": "The page takes the picture's pixel dimensions, and the picture fills it edge to edge."
+      },
+      {
+        "question": "Can I convert several JPEG files at once?",
+        "answer": "Yes. Add a batch and each file is converted in turn into its own AI download, without a ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and AI",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A photographic raster image format whose common lossy encoding trades detail for a smaller file.",
+        "details": [
+          "pixel-based photograph",
+          "typically lossy",
+          "no editable vector paths"
+        ]
+      },
+      "toFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "Illustrator artwork can combine editable paths, text, and placed pixel images in a design document.",
+        "details": [
+          "native Illustrator artwork",
+          "can include raster pictures",
+          "PDF compatibility is optional"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to AI",
+      "points": [
+        "The AI file holds your picture as a PNG inside a PDF.",
+        "Nothing is traced, so there are no vector paths.",
+        "EXIF, XMP and ICC metadata are dropped.",
+        "Several JPEGs can be queued; each becomes its own AI file."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG files",
+      "markdown": "### What is a JPEG file?\n\nJPEG is a lossy raster format from the Joint Photographic Experts Group committee. It suits photographs, and the .jpg and .jpeg endings mean the same thing. It has no alpha transparency and stores a grid of pixels, so camera output, web photographs and email attachments are typical JPEGs.\n\nA JPEG of a logo shows the shapes but holds none of the paths or type that drew them.\n\n### Programs that open JPEG files\n\n- **Windows, Mac and Linux:** GIMP opens JPEG files for editing; ImageMagick also reads them, but support depends on how your copy was built.\n- **Web:** Browsers such as Google Chrome and Mozilla Firefox show JPG images directly.\n- **Mobile:** Safari and Chrome show them on a phone.\n\n### JPEG and AI compared\n\n- **Extensions**: .jpg or .jpeg on one side, .ai on the other.\n- **Contents**: a JPEG is flat pixels. An AI is Adobe Illustrator's native artwork format, where vector objects and placed pixel pictures can share one document.\n- **History**: PostScript underlay AI files until Illustrator 9 reworked the format in 2000. Newer files can also include a PDF rendition alongside the Illustrator data.\n\nThe AI written here is a PDF made in your browser, with a PNG copy of your picture placed on a page the size of its pixels. It carries no Illustrator data and nothing is traced, so the picture remains pixels and has no editable paths. The JPEG is not uploaded.\n\n### Other ways to convert JPEG to AI\n\n- **ImageMagick:** run `magick photo.jpg photo.ai`. ImageMagick's format list shows both JPEG and AI as readable and writable.\n\n### Problems with JPEG files\n\nTransparent pixels cannot survive JPEG export, so a logo saved as a JPEG sits on a solid background, and that background goes into the AI file too.\n\nA JPEG keeps no editable layer stack. Retain the project file or the original vector artwork when you have one, because nothing in the JPEG can bring it back.\n\nTwo editors given an identical quality number may compress differently, so two JPEGs of one logo can look unlike. If the AI file is for print or packaging, start from the original artwork rather than from a picture that already lost detail.\n"
+    }
+  },
+  "m4a-to-aiff": {
+    "seo": {
+      "title": "Convert M4A to AIFF Online (Free)",
+      "h1": "M4A to AIFF Converter",
+      "description": "Convert M4A to AIFF in your browser. The audio is decoded to 16-bit PCM, which is larger than the M4A and can't restore lost detail."
+    },
+    "tool": {
+      "subtitle": "Decode M4A audio into uncompressed 16-bit AIFF for editing."
+    },
+    "faqs": [
+      {
+        "question": "Does converting AAC in an M4A to AIFF restore detail?",
+        "answer": "No. AAC is lossy, and the detail it threw away is gone for good. AIFF only stores what the decoder produces, so the sound is the same in a larger file."
+      },
+      {
+        "question": "Which AIFF format do I get?",
+        "answer": "Uncompressed 16-bit big-endian PCM, which is what AIFF often carries. It is not AIFF-C, the compressed variant."
+      },
+      {
+        "question": "Why is the AIFF larger than the M4A?",
+        "answer": "Nothing is compressed in this AIFF: uncompressed PCM takes up more space than a compressed delivery version of the same recording."
+      },
+      {
+        "question": "My M4A is Apple Lossless. Is the AIFF bit-identical?",
+        "answer": "Not if the original is deeper than 16 bits. The output is fixed at 16-bit PCM, so a 24-bit Apple Lossless file is reduced."
+      },
+      {
+        "question": "Why won't my protected M4A convert?",
+        "answer": "Protection means the file is encrypted, not corrupt. The page shows its own message for a FairPlay-protected file; convert a copy you ripped or recorded yourself instead."
+      },
+      {
+        "question": "Can I pick the sample rate or bit depth?",
+        "answer": "No. The page writes 16-bit PCM and offers no setting for it. Use FFmpeg when you need a different depth."
+      },
+      {
+        "question": "Does the AIFF keep album art?",
+        "answer": "No picture is written, as any video stream, which includes an attached cover image, is dropped. The audio is converted on its own."
+      },
+      {
+        "question": "Can I queue several M4A files?",
+        "answer": "Yes, in sequence. Each result is a separate AIFF file, and nothing gets zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4A and AIFF",
+      "fromFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An MPEG-4 audio file commonly containing AAC or Apple Lossless sound.",
+        "details": [
+          "audio-focused wrapper",
+          "AAC or ALAC may be inside",
+          "extension alone does not establish quality"
+        ]
+      },
+      "toFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "A chunk-based audio file commonly used for uncompressed PCM sound in recording and editing workflows.",
+        "details": [
+          "audio interchange",
+          "commonly PCM samples",
+          "size follows sample data"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4A to AIFF",
+      "points": [
+        "The sound is decoded to 16-bit big-endian PCM.",
+        "AAC losses stay; AIFF cannot bring them back.",
+        "The file is larger than the M4A.",
+        "A FairPlay-protected file is refused with its own message."
+      ]
+    },
+    "guide": {
+      "title": "About M4A files",
+      "markdown": "### What is an M4A file?\n\nAn M4A is MPEG-4 audio on its own, with no picture track. Inside you normally find AAC sound or lossless ALAC, plus tags and artwork. Songs from Apple's music apps, podcasts and iPhone voice memos are common examples. The extension alone does not establish quality, because the same .m4a ending covers both lossy and lossless sound.\n\n### Programs that open M4A files\n\n- **Windows, Mac and Linux:** Audacity imports M4A through its optional FFmpeg library and skips protected files, and FFplay plays the container.\n- **Web:** Firefox plays supported media directly, with AAC availability depending on system codecs, while Chrome plays supported MP4 audio and the codec inside still matters.\n- **Mobile:** VLC for Android is free and decodes whatever the container holds, and so does the mpv port for Android, which the mpv project links to.\n\n### M4A and AIFF compared\n\n- **Names and media types**: .m4a; .aiff with audio/aiff and audio/x-aiff.\n- **Origin**: Apple created AIFF as a relative of the IFF wrapper family from Electronic Arts. Its specification is dated 4 January 1989.\n- **Compression**: M4A is usually lossy AAC, or lossless ALAC. AIFF often carries uncompressed linear PCM, and AIFF-C extends the family to compressed audio.\n\nThe page decodes the M4A and writes 16-bit big-endian PCM, dropping any video stream. FFmpeg runs inside your browser as WebAssembly, so the audio is not uploaded, and a long recording simply takes longer on a slower device.\n\n### Other ways to convert M4A to AIFF\n\n- **FFmpeg:** run `ffmpeg -i interview.m4a -vn -c:a pcm_s24be interview.aiff` for 24-bit audio. It decodes the same way but keeps more bits per sample, and it cannot restore detail the M4A already lost.\n\n### Problems with M4A files\n\nAudacity cannot read M4A until its optional FFmpeg library is installed, and protected recordings are refused on that route. Opening several recordings in a single Audacity window leaves the project with the last file's tags.\n\nA very large AIFF is expected here. If you need only part of a recording, trim it in an editor before exporting.\n\nListen for clipping and compare the length of the new AIFF with the original.\n"
+    }
+  },
+  "mp4-to-opus": {
+    "seo": {
+      "title": "Convert MP4 to Opus Online (Free)",
+      "h1": "MP4 to Opus Converter",
+      "description": "Convert MP4 to Opus in your browser. The soundtrack is encoded at 128 kbps and the video is dropped. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Extract an MP4 soundtrack as a 128 kbps Opus audio file."
+    },
+    "faqs": [
+      {
+        "question": "Does the Opus file contain the video?",
+        "answer": "No. The picture is dropped and only the soundtrack is encoded."
+      },
+      {
+        "question": "What bitrate does the Opus file use?",
+        "answer": "128 kbps, with Opus compression level 4. The page offers no setting to change it."
+      },
+      {
+        "question": "Is converting an MP4 soundtrack to Opus lossless?",
+        "answer": "No. Opus is lossy, so the soundtrack is encoded a second time, which costs quality when it was already lossy. Keep the MP4 if you may want the best sound later."
+      },
+      {
+        "question": "What if my MP4 has no sound?",
+        "answer": "There is nothing to extract, and the run stops with an FFmpeg error. Check that the MP4 plays with audio first."
+      },
+      {
+        "question": "Is Opus the same as Ogg?",
+        "answer": "No. Opus is the codec and Ogg is a container that can carry it. A .opus file commonly stores Opus audio in an Ogg stream."
+      },
+      {
+        "question": "Does the Opus file keep the MP4's tags?",
+        "answer": "FFmpeg's defaults pass the MP4's global tags, a title for instance, to an output that has room for them, and Ogg Opus supports descriptive metadata. The page offers no way to edit them."
+      },
+      {
+        "question": "Can I convert several MP4 files at once?",
+        "answer": "Yes. The files are handled in turn, and every Opus file is a separate download rather than part of a ZIP."
+      },
+      {
+        "question": "Can opusenc read my MP4 directly?",
+        "answer": "No. The opus-tools encoder reads Wave, AIFF, FLAC, Ogg FLAC or raw PCM input, so the MP4 has to be turned into one of those first."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and Opus",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A multimedia container that can carry compressed picture and sound tracks together.",
+        "details": [
+          "container format",
+          "codec varies by track",
+          "can include video and audio"
+        ]
+      },
+      "toFormat": {
+        "name": "Opus",
+        "fullName": "Opus audio",
+        "description": "An audio codec designed for speech and music, commonly stored in an Ogg Opus file.",
+        "details": [
+          "lossy audio coding",
+          "speech and music",
+          "Ogg is a common wrapper"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to Opus",
+      "points": [
+        "Only the soundtrack is kept; the video is dropped.",
+        "The audio is encoded at 128 kbps.",
+        "Opus is lossy, so the soundtrack is encoded a second time.",
+        "An MP4 with no audio track gives an error."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 files",
+      "markdown": "### What is an MP4 file?\n\nMP4 is the MPEG-4 container, which can hold several kinds of track side by side. The extension does not say which codecs are inside, so one MP4 may carry H.264 and AAC while another has no sound at all. For pulling out audio, the thing that matters is whether a soundtrack exists.\n\nAn MP4 stores its index data in one place, so a recording that was interrupted midway may not play at all.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** mpv plays MP4 on the desktop, and FFplay plays it.\n- **Windows and Mac:** Adobe Premiere imports the container when the necessary decoder is available.\n- **Web:** Firefox plays supported media directly and may rely on system codecs for AAC and H.264, and Chrome plays supported combinations where the internal codec still matters.\n- **Mobile:** The VLC apps on Android and iPhone cost nothing; whether a file plays hinges on the streams inside.\n\n### MP4 and Opus compared\n\n- **Names**: .mp4; .opus, which commonly holds Opus audio in an Ogg stream as specified in RFC 7845.\n- **Standards**: RFC 6716 from the IETF, dated September 2012, defines Opus, which merges Skype's SILK with Xiph.Org's CELT.\n- **Contents**: MP4 carries picture and sound. Opus is lossy audio only, designed for speech and music.\n\nThe page drops the video and encodes the audio with libopus at 128 kbps. FFmpeg runs inside your browser, so the MP4 is not uploaded.\n\n### Other ways to convert MP4 to Opus\n\n- **FFmpeg:** run `ffmpeg -i talk.mp4 -vn -c:a libopus -b:a 96k talk.opus` to choose your own bitrate.\n- **Audacity:** open the MP4, which needs the optional FFmpeg library, then choose File > Export Audio (Ctrl+Shift+E) and pick Opus.\n- **opus-tools with FFmpeg:** run `ffmpeg -i session.mp4 -vn session.wav`, then `opusenc --bitrate 64 session.wav session.opus`.\n\n### Problems with MP4 files\n\nPlaying the container is not the same as decoding what it holds, so a player can open an MP4 yet lack the codec for its sound. A clip recorded without sound gives an editor no audio track to work with.\n\nReading Vorbis from Ogg is no proof that a program decodes Opus, since the Ogg mapping uses distinct Opus headers. If a player rejects the file, try another one before blaming the conversion.\n\nAfterward, listen to the result at dialogue breaks and music transitions.\n"
+    }
+  },
+  "mpg-to-avi": {
+    "seo": {
+      "title": "Convert MPG to AVI Online (Free)",
+      "h1": "MPG to AVI Converter",
+      "description": "Convert MPG to AVI in your browser. MPEG video is re-encoded as Xvid-tagged MPEG-4 with MP3 sound, deinterlaced and capped at 30 fps."
+    },
+    "tool": {
+      "subtitle": "Turn MPG video into an AVI with Xvid-tagged MPEG-4 and MP3 sound."
+    },
+    "faqs": [
+      {
+        "question": "Which MPEG files does the picker take?",
+        "answer": "The file picker is set to .mpg. The .mpeg suffix is used for the same kind of video, but this page asks for the .mpg ending."
+      },
+      {
+        "question": "Which video and audio does the AVI use?",
+        "answer": "Video is MPEG-4 tagged Xvid with no B-frames, and audio is MP3 at 96 kbps."
+      },
+      {
+        "question": "Will an interlaced capture stay interlaced?",
+        "answer": "No. Interlaced frames go through yadif deinterlacing, which takes the comb lines off moving edges, while progressive video is left alone."
+      },
+      {
+        "question": "Does a large MPG keep its resolution and frame rate?",
+        "answer": "A longer side of 1920 px or less stays untouched, apart from a pixel trimmed off an odd side. Larger sources are shrunk to fit, and no clip runs above 30 fps."
+      },
+      {
+        "question": "Is the AVI better quality than the MPG?",
+        "answer": "No. Decoding the MPEG and encoding it afresh at a fixed quality setting is lossy. The MPG should stay your master."
+      },
+      {
+        "question": "Can I queue several MPG files?",
+        "answer": "Yes. Files are converted in order, each yields its own AVI, and there is no ZIP or size cap."
+      },
+      {
+        "question": "Why does an old player reject a valid AVI?",
+        "answer": "AVI names only the container, and the player also needs the Xvid-tagged MPEG-4 and MP3 decoders. Try VLC or FFplay to confirm that the file itself plays."
+      },
+      {
+        "question": "Why is my converted video shorter than the MPG?",
+        "answer": "A truncated or damaged MPG typically still produces an AVI, which simply ends sooner than the source. Check the MPG's length in VLC before converting."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPG and AVI",
+      "fromFormat": {
+        "name": "MPG",
+        "fullName": "MPEG video",
+        "description": "A filename extension commonly used for MPEG program streams containing video and accompanying sound.",
+        "details": [
+          "MPEG media extension",
+          "often a program stream",
+          "encoding must be identified"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A RIFF-based audiovisual container that can carry several kinds of video and audio encoding.",
+        "details": [
+          "container rather than codec",
+          "compression varies",
+          "legacy video interchange"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MPG to AVI",
+      "points": [
+        "Video is re-encoded as Xvid-tagged MPEG-4, and audio as MP3 at 96 kbps.",
+        "Interlaced frames are deinterlaced.",
+        "The longer side is limited to 1920 px and the frame rate to 30 fps.",
+        "The conversion loses some detail, so keep the MPG."
+      ]
+    },
+    "guide": {
+      "title": "About MPG files",
+      "markdown": "### What is an MPG file?\n\nMPG is a suffix for MPEG video; the .mpeg and .mpg endings are both used. The MPEG-2 standard was written for broadcasting compressed TV pictures, and DVDs adopted it afterward. In MPEG systems, picture, sound and data are coded and carried as streams. The Library of Congress records video/mpeg as the media type.\n\nSome files are system streams and others raw video, so knowing which you have helps pick the right demuxer.\n\n### Programs that open MPG files\n\n- **Windows, Mac and Linux:** VLC accepts MPEG elementary, program and transport streams as input; FFplay uses FFmpeg's decoders.\n- **Mobile:** Phones are covered by VLC for Android, which reuses the desktop decoding, and by VLC for iOS for local movies.\n\n### MPG and AVI compared\n\n- **Extensions and media types**: .mpg with video/mpeg; .avi with video/x-msvideo.\n- **Container**: an MPEG file organizes coded picture and sound as streams. AVI is a RIFF container that Microsoft introduced in 1992.\n- **Codecs**: playback needs the audio decoder as well as the video one, and sharing a file does not make the two codecs interchangeable.\n\nThe AVI carries Xvid-tagged MPEG-4 video with no B-frames and MP3 sound at 96 kbps. Interlaced frames are deinterlaced, the longer side is fitted to 1920 px where needed with even dimensions, and the frame rate tops out at 30 fps. FFmpeg runs inside your browser, so the MPG is not uploaded. Several files are converted one after another, and each downloads as its own AVI.\n\n### Other ways to convert MPG to AVI\n\n- **FFmpeg:** run `ffmpeg -i broadcast.mpg -c:a libmp3lame -c:v mpeg4 -q:v 3 broadcast.avi` for a different quality setting. It re-encodes rather than copying streams.\n\n### Problems with MPG files\n\nMPEG compression is lossy and drops detail from the source picture; encoding a second time drops more. Keep the MPG until you have checked the AVI.\n\nComb lines and a stretched picture are easy to mistake for damage. Aspect ratio and scan type are not handled consistently across video file formats, so compare a moving scene with the MPG in the same player before blaming the conversion.\n\nA player that opens the AVI but shows no picture or plays no sound lacks one of the decoders; VLC is a quick way to tell.\n"
+    }
+  },
+  "mxf-to-mov": {
+    "seo": {
+      "title": "Convert MXF to MOV Online (Free)",
+      "h1": "MXF to MOV Converter",
+      "description": "Convert MXF to MOV in your browser. You get an H.264 and AAC review copy, not a ProRes master. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Make an H.264 and AAC MOV review copy from an MXF clip."
+    },
+    "faqs": [
+      {
+        "question": "Is an MXF file a video codec?",
+        "answer": "No. MXF, SMPTE's Material Exchange Format, is a wrapper for essence plus metadata, and the video inside can use different codecs. A camera MXF and a broadcast MXF may need different decoders."
+      },
+      {
+        "question": "Will the MOV be a ProRes master?",
+        "answer": "No. The result is a speed-first H.264 encode with AAC audio, which makes a review copy, not an editing master."
+      },
+      {
+        "question": "Is the MOV the same quality as the MXF?",
+        "answer": "No. The picture is compressed again with a lossy, speed-first setting, so detail is lost. Keep the MXF as your source."
+      },
+      {
+        "question": "Does a 4K MXF stay at full size and frame rate?",
+        "answer": "No. A 4K clip is shrunk until its longer side is 1920 px, and frames beyond 30 per second are dropped without shortening the clip. Clips already smaller keep their dimensions, less a pixel when a side is odd."
+      },
+      {
+        "question": "Does the MOV keep the MXF's metadata?",
+        "answer": "Global tags like a title come across when the MOV has matching fields. The video and audio inside are new encodes, and changing the wrapper does not guarantee that specialized metadata or ancillary streams are retained."
+      },
+      {
+        "question": "Why does my MXF look incomplete on its own?",
+        "answer": "A lone copy can be missing material, because certain MXF layouts keep essence outside the file. Keep the camera card's folder structure together."
+      },
+      {
+        "question": "Does the MOV start playing before it finishes downloading?",
+        "answer": "The converter moves the index to the beginning of the file with FFmpeg's fast start option, which is meant to let a player begin early when the MOV is served over the web."
+      },
+      {
+        "question": "Can I queue several MXF files?",
+        "answer": "Yes. Clips go through one at a time, each MOV downloads separately and no archive is built."
+      }
+    ],
+    "aboutSection": {
+      "title": "MXF and MOV",
+      "fromFormat": {
+        "name": "MXF",
+        "fullName": "Material Exchange Format",
+        "description": "A professional media container that packages audiovisual essence with descriptive and technical metadata.",
+        "details": [
+          "broadcast interchange",
+          "multiple operational patterns",
+          "essence codec varies"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "A QuickTime media container whose picture, sound, and other tracks depend on the source and encoding.",
+        "details": [
+          "track-based container",
+          "supports several codecs",
+          "extension does not imply ProRes"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MXF to MOV",
+      "points": [
+        "The MOV holds H.264 video and AAC audio, not ProRes.",
+        "The longer side is limited to 1920 px and the frame rate to 30 fps.",
+        "Global tags are copied where the MOV can hold them.",
+        "Keep the MXF as the source."
+      ]
+    },
+    "guide": {
+      "title": "About MXF files",
+      "markdown": "### What is an MXF file?\n\nMXF is the Material Exchange Format, standardized through SMPTE documents. Media essence and descriptive or structural metadata are packaged together in it, and professional acquisition, exchange and preservation workflows use it. Files end in .mxf and the media type is application/mxf.\n\nOperational patterns set out how packages and essence are arranged, and certain layouts point to essence kept elsewhere. A lone clip may therefore be incomplete without the files around it.\n\n### Programs that open MXF files\n\n- **Windows, Mac and Linux:** VLC media player lists MXF input, and FFmpeg reads MXF essence. Some MXF files may still require a professional application, because not every essence structure is arranged for ordinary playback.\n\n### MXF and MOV compared\n\n- **Extensions and media types**: .mxf with application/mxf; .mov with video/quicktime, and QuickTime files may also use .qt.\n- **Origin**: Apple introduced QuickTime's MOV format in 1991, and Windows got it in 1994. It is built from objects called atoms.\n- **Purpose**: MXF is built for production exchange. MOV picture tracks include H.264, ProRes and Motion JPEG, and sound is often AAC or raw PCM.\n\nThe MOV holds H.264 video at CRF 32 with an ultrafast preset, AAC audio at 96 kbps and a fast-start index. A longer side over 1920 px is shrunk, and 30 fps is the most it will keep. It is a review copy rather than a master. FFmpeg runs inside your browser, so the MXF is not uploaded, and the clip you chose stays unchanged on your device.\n\n### Other ways to convert MXF to MOV\n\n- **FFmpeg stream copy:** run `ffmpeg -i camera.mxf -c copy rewrap.mov` to copy the streams without decoding or encoding. It works only when the MOV container accepts the codecs inside the MXF.\n- **FFmpeg:** run `ffmpeg -i camera.mxf -c:v prores_ks -profile:v 2 -c:a pcm_s16le edit.mov` to encode ProRes video and PCM audio instead.\n\n### Problems with MXF files\n\nA clip that opens in one tool but not another often depends on a missing companion file or an essence codec the tool lacks. Keep the whole folder from the camera card.\n\nA QuickTime file can use a codec your editor lacks. Changing the ending of a file name does not re-encode its video or add a missing decoder.\n\nThe MOV is compressed again with a speed-first setting, so treat it as a copy. Use the MOV to review or share a rough cut, and go back to the MXF for color work and the final export.\n"
+    }
+  }
+}

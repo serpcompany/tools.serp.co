@@ -1,0 +1,161 @@
+{
+  "tools": {
+    "svg-to-svg": {
+      "methods": [
+        {
+          "app": "Inkscape",
+          "steps": "Save the drawing and choose Plain SVG as the type; save a separate copy.",
+          "limits": "The manual describes Plain SVG as for sharing a drawing with people who might not use Inkscape.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/1.1/saving.html"
+        },
+        {
+          "app": "Scour",
+          "steps": "Run scour -i design.svg -o cleaned.svg.",
+          "limits": "Optimization options are typically lossless but can be tweaked for more aggressive cleaning.",
+          "source": "https://github.com/scour-project/scour"
+        },
+        {
+          "app": "SVGO",
+          "steps": "Run svgo one.svg -o one.min.svg.",
+          "limits": "SVGO has a plugin architecture; configuration comes from svgo.config.mjs or the --config option.",
+          "source": "https://github.com/svg/svgo"
+        }
+      ]
+    },
+    "webm-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i clip.webm clip.avi.",
+          "limits": "The output format is guessed from the file extension for output files.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "xlsx-to-jpg": {
+      "methods": [
+        {
+          "app": "Microsoft Excel and GIMP",
+          "steps": "Select the range; Home > Copy > Copy as Picture; in GIMP choose Edit > Paste as > Paste as New Image; then File > Export As and save as JPEG.",
+          "limits": "The result is a picture of the cells, not an editable workbook.",
+          "source": "https://support.microsoft.com/en-us/excel/create-a-picture-from-cells-a-chart-or-an-object-in-excel",
+          "supportSource": "https://docs.gimp.org/3.2/en/gimp-edit-paste-as.html"
+        },
+        {
+          "app": "LibreOffice Calc and GIMP",
+          "steps": "In Calc choose File > Export As > Export as PDF; open the PDF in GIMP and pick the page in the import dialog; then File > Export As and save as JPEG.",
+          "limits": "The PDF page layout decides what the image shows.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/01/ref_pdf_export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/import-file-formats.html"
+        },
+        {
+          "app": "Numbers and Preview",
+          "steps": "In Numbers choose File > Export To > PDF; open the PDF in Preview and choose File > Export, then JPEG in the Format pop-up.",
+          "limits": "Mac only.",
+          "source": "https://support.apple.com/en-au/guide/numbers/tan3b922d4ad/mac",
+          "supportSource": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        }
+      ]
+    },
+    "avi-to-mpg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i tape-capture.avi -c:a mp2 -q:v 4 -c:v mpeg2video recording.mpg.",
+          "limits": "-c:v and -c:a select encoders; -q sets a fixed quality scale.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "bin-to-jpg": {
+      "methods": [
+        {
+          "app": "Pillow",
+          "steps": "In Python, run Image.open(\"photo.bin\"), then .convert(\"RGB\"), then .save(\"photo.jpg\").",
+          "limits": "Image.open opens and identifies the given image file; the save format is determined from the filename extension.",
+          "source": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick photo.bin recovered.jpg.",
+          "limits": "The command takes an input image and an output name whose extension picks the format.",
+          "source": "https://imagemagick.org/command-line-processing/"
+        }
+      ]
+    },
+    "bmp-to-svg": {
+      "methods": [
+        {
+          "app": "Inkscape",
+          "steps": "File > Import; choose the BMP; select Embed in the dialog that asks to link or embed.",
+          "limits": "Embeds the picture; does not trace it.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/import-pictures.html",
+          "supportSource": "https://inkscape-manuals.readthedocs.io/en/latest/import-other-formats.html"
+        },
+        {
+          "app": "Potrace",
+          "steps": "Run potrace -s -o outline.svg drawing.bmp.",
+          "limits": "The input should be black and white; -s selects the SVG backend and -o names the output.",
+          "source": "https://potrace.sourceforge.net/potrace.1.html"
+        }
+      ]
+    },
+    "f4v-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i archive.f4v -c copy migrated.mp4.",
+          "limits": "-c copy selects stream copy, which copies the streams without encoding them again.",
+          "source": "https://ffmpeg.org/ffmpeg.html#Streamcopy"
+        },
+        {
+          "app": "Shotcut",
+          "steps": "File > Export Video; leave the Default settings, which make an H.264 MP4; click Export File.",
+          "limits": "Encodes again with the export settings.",
+          "source": "https://forum.shotcut.org/t/export-basics/12953"
+        }
+      ]
+    },
+    "gif-to-avif": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the GIF; File > Export As with an .avif name; adjust the options in the AVIF dialog.",
+          "limits": "The dialog offers Lossless, Quality, Pixel format, Bit depth, Encoder speed and metadata options.",
+          "source": "https://docs.gimp.org/3.2/en/file-heif-av1-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick \"animation.gif[0]\" cover.avif.",
+          "limits": "The [0] suffix selects the first frame; the formats page lists AVIF as readable and writable.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Image.open the GIF; seek(0); save to a file ending in .avif.",
+          "limits": "The GIF loader supports seek and tell; AVIF is read and write; the save format comes from the extension.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ]
+    },
+    "icns-to-ico": {
+      "methods": [
+        {
+          "app": "Pillow",
+          "steps": "Open the ICNS; optionally set the size property before load(); save an ICO with a sizes list.",
+          "limits": "Sizes larger than the original or above 256 are ignored.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the ICNS; File > Export As with an .ico name; choose sizes and the Compressed (PNG) option in the ICO dialog.",
+          "limits": "GIMP warns that not all programs can read compressed icons.",
+          "source": "https://docs.gimp.org/3.2/en/file-ico-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+        }
+      ]
+    }
+  }
+}
