@@ -3,6 +3,10 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import {
+  adsenseScriptSrc,
+  loadAdSenseScript,
+} from "@serp-tools/app-core/lib/third-party-scripts";
+import {
   DEFAULT_ADSENSE_CLIENT,
   DEFAULT_ADSENSE_RESPONSIVE,
   DEFAULT_AD_SLOTS,
@@ -135,6 +139,9 @@ export function ToolAdSlot({
 
   useEffect(() => {
     if (!hasAdSense) return;
+    // The layout loads AdSense once the page is interactive; a slot shows only
+    // after the visitor acts, so it doesn't wait for that.
+    loadAdSenseScript(adsenseScriptSrc(ADSENSE_CLIENT));
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {

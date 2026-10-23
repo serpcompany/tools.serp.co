@@ -71,10 +71,9 @@ test("unfilled ad slots render house ads instead of inert placeholders", () => {
   assert.doesNotMatch(toolAdsSource, /border-dashed border-gray-200 bg-gray-50\/80/);
 });
 
-test("completed or failed tool runs show a post-result monetization panel", () => {
+test("tool runs show the result monetization panel from the visitor's action on", () => {
   assert.match(toolHeroLayoutSource, /resultPanel\?: React\.ReactNode/);
-  assert.match(toolHeroLayoutSource, /currentFile\?\.status === "completed"/);
-  assert.match(toolHeroLayoutSource, /currentFile\?\.status === "error"/);
+  assert.match(toolHeroLayoutSource, /showResultPanel = Boolean\(resultPanel\) && currentFile !== null/);
   assert.match(toolHeroLayoutSource, /showResultPanel \? resultPanel : null/);
   assert.match(toolResultMonetizationSource, /tool-result-monetization/);
   assert.match(toolResultMonetizationSource, /result-inline/);
