@@ -27,6 +27,6 @@ test("a compression keeps its extension and adds _compressed", () => {
 });
 
 test("several outputs take the same extension", () => {
-  assert.equal(multipleOutputName("deck.pptx", "png", 0, ["slide3"]), "deck_slide3.png");
   assert.equal(multipleOutputName("report.pdf", "mpeg2", 1), "report_page2.mpg");
+  assert.equal(multipleOutputName("clip.mp4", "avchd", 0, ["part1"]), "clip_part1.m2ts");
 });
