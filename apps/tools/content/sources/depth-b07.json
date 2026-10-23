@@ -1,0 +1,252 @@
+{
+  "tools": {
+    "vob-to-mkv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i title.vob -c:v libx264 -c:a aac title.mkv",
+          "limits": "Add -map to pick specific audio tracks.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Open Source; pick the VOB or VIDEO_TS folder; choose a title with the Title control; set the container to MKV; encode.",
+          "limits": "Does not process copy-protected DVD sources.",
+          "source": "https://handbrake.fr/docs/en/latest/workflow/open-video-source.html",
+          "supportSources": [
+            "https://handbrake.fr/docs/en/latest/technical/containers.html",
+            "https://handbrake.fr/docs/en/1.2.0/technical/source-formats.html"
+          ]
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Add VOB; Output Format: MKV; review Encoder Options; Convert.",
+          "limits": "Windows only.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html",
+            "https://www.nchsoftware.com/prism/index.html"
+          ]
+        }
+      ]
+    },
+    "vob-to-mp3": {
+      "methods": [
+        {
+          "app": "Switch",
+          "steps": "Add the VOB; set Output Format to MP3; review Encoder Options; Convert.",
+          "limits": "Windows version.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/switch/win/switchformats.html"
+          ]
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i chapter.vob -vn -c:a libmp3lame -b:a 192k chapter.mp3",
+          "limits": "Add -map to pick a specific audio track.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/general.html"
+          ]
+        }
+      ]
+    },
+    "avif-to-ico": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "File > Open the AVIF; File > Export As and save it as an ICO; review the icon options for each size.",
+          "limits": "Needs a GIMP release that imports AVIF.",
+          "source": "https://docs.gimp.org/3.2/en/file-ico-export.html",
+          "supportSources": [
+            "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/",
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+          ]
+        },
+        {
+          "app": "libavif and GIMP",
+          "steps": "avifdec artwork.avif decoded.png; open the PNG in GIMP and export it as ICO.",
+          "limits": "Two applications; icon options must still be reviewed.",
+          "source": "https://github.com/AOMediaCodec/libavif",
+          "supportSources": [
+            "https://docs.gimp.org/3.2/en/file-ico-export.html",
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+          ]
+        }
+      ]
+    },
+    "dst-to-jpg": {
+      "methods": [
+        {
+          "app": "Ink/Stitch and GIMP",
+          "steps": "With Ink/Stitch installed, File > Open in Inkscape and choose the DST; File > Export PNG Image; open the PNG in GIMP and export it as a JPEG.",
+          "limits": "Ink/Stitch must be installed in Inkscape.",
+          "source": "https://inkstitch.org/docs/import-export/",
+          "supportSources": [
+            "https://inkstitch.org/docs/file-formats/",
+            "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ]
+        },
+        {
+          "app": "pyembroidery and ImageMagick",
+          "steps": "pattern = pyembroidery.read_dst(\"design.dst\"); pyembroidery.write_png(pattern, \"preview.png\"); then magick preview.png preview.jpg",
+          "limits": "Needs Python and ImageMagick.",
+          "source": "https://github.com/EmbroidePy/pyembroidery",
+          "supportSources": [
+            "https://imagemagick.org/convert/"
+          ]
+        }
+      ]
+    },
+    "jfif-to-webp": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick picture.jfif picture.webp",
+          "limits": "Needs an ImageMagick build with WebP support.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "jpg-to-ppm": {
+      "methods": [
+        {
+          "app": "Netpbm",
+          "steps": "For color input: jpegtopnm photo.jpg > photo.ppm",
+          "limits": "Grayscale input yields PGM, not PPM.",
+          "source": "https://netpbm.sourceforge.net/doc/jpegtopnm.html"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open JPG; File > Export As; choose PPM; select ASCII or raw data formatting.",
+          "limits": "RGB without alpha.",
+          "source": "https://docs.gimp.org/3.2/en/file-pnm-export.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick photo.jpg photo.ppm",
+          "limits": "filename-based conversion; verify variant.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "m4a-to-wma": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i song.m4a -vn song.wma",
+          "limits": "Needs an FFmpeg build with the matching decoder and a WMA encoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "WavePad for Windows",
+          "steps": "Open M4A; File > Save As; select WMA.",
+          "limits": "WMA saving is documented on Windows, not Mac.",
+          "source": "https://help.nchsoftware.com/help/en/wavepad/win/files.html",
+          "supportSources": [
+            "https://www.nch.com.au/wavepad/kb/1414.html"
+          ]
+        }
+      ]
+    },
+    "m4r-to-wav": {
+      "methods": [
+        {
+          "app": "WavePad for Windows",
+          "steps": "Open M4R; File > Save As; select WAV and review encoding.",
+          "limits": "M4R input is Windows-only in the cited support table.",
+          "source": "https://help.nchsoftware.com/help/en/wavepad/win/files.html",
+          "supportSources": [
+            "https://www.nch.com.au/wavepad/kb/1414.html"
+          ]
+        },
+        {
+          "app": "Switch",
+          "steps": "Add M4R; Output Format: WAV; Encoder Options; Convert.",
+          "limits": "Copy-protected files are excluded.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/switch/win/switchformats.html",
+            "https://www.nch.com.au/switch/kb/1405.html"
+          ]
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i tone.m4r -vn tone.wav",
+          "limits": "Needs an FFmpeg build with the AAC decoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        }
+      ]
+    },
+    "m4v-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i recording.m4v recording.avi",
+          "limits": "Needs an FFmpeg build with the matching decoders and encoders.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Add M4V; Output Format: AVI; inspect Encoder Options; Convert.",
+          "limits": "Windows only.",
+          "source": "https://www.nchsoftware.com/prism/index.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ]
+        }
+      ]
+    },
+    "mov-to-flv": {
+      "methods": [
+        {
+          "app": "Prism for Windows",
+          "steps": "Add MOV; choose FLV Output Format; review Encoder Options; Convert.",
+          "limits": "Windows only.",
+          "source": "https://www.nchsoftware.com/prism/index.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ]
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i take.mov -c:a aac -f flv -c:v libx264 take.flv",
+          "limits": "Needs an FFmpeg build with libx264.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        }
+      ]
+    }
+  }
+}

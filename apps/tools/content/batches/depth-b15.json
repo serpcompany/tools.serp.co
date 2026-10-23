@@ -1,0 +1,802 @@
+{
+  "jpeg-to-tga": {
+    "seo": {
+      "title": "Convert JPEG to TGA Online (Free)",
+      "h1": "JPEG to TGA Converter",
+      "description": "Convert JPEG to TGA in your browser for game, texture and video tools. EXIF is dropped and each JPEG gives its own TGA. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a JPEG photo into a Targa (TGA) file for game and video tools, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPEG to TGA?",
+        "answer": "Choose the JPEG and give the page a moment. Your browser decodes the photo, ImageMagick writes the Targa file and you save it. A batch gives one TGA for each JPEG."
+      },
+      {
+        "question": "Why is the TGA bigger than the JPEG?",
+        "answer": "JPEG throws detail away to shrink a photo. A TGA has no lossy step, and run-length coding does little for a photograph, so the TGA usually comes out larger."
+      },
+      {
+        "question": "Will the TGA have transparency?",
+        "answer": "No. The JPEG holds no transparency, so there is nothing to carry across. If you need a cutout, add it in an editor afterwards."
+      },
+      {
+        "question": "Does converting remove JPEG compression artifacts?",
+        "answer": "No. The blocks and smudges are already part of the pixels, and the TGA stores those pixels as they are."
+      },
+      {
+        "question": "Is the photo's metadata kept?",
+        "answer": "No. Only pixels are written, so the EXIF block, the color profile and the XMP packet stay behind."
+      },
+      {
+        "question": "Does the TGA have more color depth than the JPEG?",
+        "answer": "No. A JPEG holds 8 bits per color channel and the page passes pixels through 8-bit RGBA, so the TGA has the same 8 bits per channel."
+      },
+      {
+        "question": "Who still uses TGA?",
+        "answer": "Video editing and game development. Game textures and render output are typical uses, while everyday photo viewers rarely ask for Targa."
+      },
+      {
+        "question": "Are JPG and JPEG different?",
+        "answer": "No. Both endings mean one format, and the picker takes either .jpeg or .jpg files."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and TGA",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "8 bits per color channel",
+          "No alpha transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "TGA",
+        "fullName": "Truevision TGA (Targa)",
+        "description": "A raster image format associated with Truevision video boards. It supports RGB, indexed-color and grayscale images, with optional run-length encoding.",
+        "details": [
+          "Optional run-length compression",
+          "32-bit form adds an alpha channel",
+          "Used in video and game workflows"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPEG to TGA",
+      "points": [
+        "The TGA is usually larger than the JPEG, because it has no lossy compression.",
+        "A JPEG has no transparency, so the TGA has no cutout.",
+        "EXIF, color profile and XMP are dropped.",
+        "Each JPEG gives its own TGA."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG and TGA",
+      "markdown": "### What is a JPEG file?\n\nThe committee behind JPEG, short for Joint Photographic Experts Group, issued its core specification first as ITU-T T.81 (1992) and then as ISO/IEC 10918-1 (1994). Pixels are grouped in 8x8 blocks, passed through a cosine transform and Huffman coded, which discards detail for good. Every color channel is limited to 8 bits in a JPEG, which also has no transparency and no layers. Both the .jpg and .jpeg endings name this format, whose media type is image/jpeg, and cameras and scanners write it by default.\n\n### Programs that open JPEG files\n\n- **Windows, Mac and Linux:** GIMP opens a JPEG as an editable image, and ImageMagick can read it.\n- **Web:** Chrome and Firefox show a JPEG directly in a tab.\n- **Mobile:** Safari displays JPEG on a phone.\n\n### JPEG and TGA compared\n\n- **Compression**: JPEG is lossy and typically makes an image ten to twenty times smaller than its raw pixels. TGA keeps the pixels as they are, and can add run-length encoding.\n- **Transparency**: a 32-bit TGA adds an 8-bit alpha channel to RGB, which a JPEG never has.\n- **Color depth**: a 24-bit TGA keeps 8 bits in each color component.\n- **Uses**: TGA turns up in video editing and game development, while JPEG is built into cameras and scanners.\n\nThe decoding step belongs to your browser; ImageMagick then takes the pixels and produces the Targa file. Everything passes through 8-bit RGBA, which is why the metadata does not follow. Photographs contain few repeated runs for run-length coding to exploit, so expect a file larger than the JPEG.\n\n### Other ways to convert JPEG to TGA\n\n- **GIMP:** Load the JPEG in GIMP, pick File > Export As and export it as TGA. The TGA dialog has a Use RLE compression checkbox and an Origin choice of Bottom left or Top left.\n- **ImageMagick:** `magick photograph.jpeg texture_copy.tga` writes the Targa file. ImageMagick reads and writes both JPEG and TGA.\n- **Tacent View:** `tacentview -c photograph.jpeg --out tga` runs in command-line mode, so no window opens. Its JPEG load option exifo=true applies the photo's EXIF orientation.\n\n### Problems with JPEG files\n\n- **Cutouts are missing**: the JPEG stores no transparency, so any mask has to be drawn in an editor afterwards.\n- **Layers are gone**: a JPEG flattens the picture, so an editable stack of layers survives only in your project file.\n- **Legacy displays balk**: certain old picture frames cannot show a progressive JPEG, and a baseline copy avoids that.\n- **Quality settings are not portable**: one quality figure gives different results from one editor to the next.\n"
+    }
+  },
+  "jpg-to-rgb": {
+    "seo": {
+      "title": "Convert JPG to RGB Online (Free)",
+      "h1": "JPG to RGB Converter",
+      "description": "Convert JPG to raw RGB samples in your browser. The file has no header, so you must supply width and height to read it. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Turn a JPG into raw red, green and blue samples, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What kind of RGB file does this make?",
+        "answer": "Raw RGB: three bytes per pixel in red, green, blue order, and no header. It is not the SGI image that some programs also call .rgb."
+      },
+      {
+        "question": "How do I open the .rgb file?",
+        "answer": "The file does not store its width, height or bit depth, so the program must be told. Give it the JPG's pixel dimensions, three channels and 8 bits per channel."
+      },
+      {
+        "question": "Why does a viewer show noise or a sheared picture?",
+        "answer": "The width or channel count is wrong. Raw samples have no row markers, so a wrong width shifts every row and the picture slants or scrambles."
+      },
+      {
+        "question": "How do I convert JPG to RGB?",
+        "answer": "Select the JPG and save the .rgb file when it appears. Your browser decodes it first, then ImageMagick writes out the raw samples."
+      },
+      {
+        "question": "Is the .rgb file smaller than the JPG?",
+        "answer": "No, it is larger. Raw samples take three bytes per pixel with no compression, while a JPG is lossy and compressed."
+      },
+      {
+        "question": "Does the .rgb carry the photo's metadata?",
+        "answer": "No. A raw file stores samples only, so the camera data, the color profile and XMP are gone."
+      },
+      {
+        "question": "What if I need an SGI .rgb image?",
+        "answer": "This page does not write that. It writes raw samples, whereas an SGI image has a header describing its size."
+      },
+      {
+        "question": "What do I get if I choose several JPGs?",
+        "answer": "One .rgb per JPG, each named after its source. The files are converted in turn and downloaded separately, not zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and RGB",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "8 bits per color channel",
+          "No alpha transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "RGB",
+        "fullName": "Raw RGB samples",
+        "description": "An uncompressed stream of red, green and blue samples. The file has no header, so readers need the width, height and bit depth supplied.",
+        "details": [
+          "No header",
+          "No compression",
+          "Three channels per pixel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPG to RGB",
+      "points": [
+        "The result is raw samples with no header.",
+        "You must supply width, height and bit depth to read it.",
+        "The file is larger than the JPG.",
+        "EXIF and color profile are dropped."
+      ]
+    },
+    "guide": {
+      "title": "About JPG and RGB",
+      "markdown": "### What is a JPG file?\n\nJPG is the everyday name for JPEG, the format of the Joint Photographic Experts Group. Its specification appeared as ITU-T T.81 (1992), then as ISO/IEC 10918-1 (1994). A JPG compresses a picture with a discrete cosine transform followed by Huffman coding, then adds a header that records its width and height. Every color channel gets 8 bits and nothing is kept for transparency. Both endings, .jpg and .jpeg, mean the same thing, and the registered media type is image/jpeg. Cameras and scanners write it by default.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** a JPG opens for editing in GIMP, and ImageMagick can read it.\n- **Web:** Chrome and Firefox display a JPG without extra software.\n- **Mobile:** Safari displays a JPG on a phone.\n\n### JPG and RGB compared\n\n- **Header**: a JPG records its size and settings inside the file, whereas raw RGB records none.\n- **Compression**: JPG is lossy, and raw samples are uncompressed.\n- **Samples**: the raw output is red, green and blue values with no alpha, one byte each.\n- **Name clash**: an .rgb ending may also mean an SGI image, which is laid out differently.\n\nA raw RGB file is nothing but red, green and blue samples in a row. With no header, nothing in it tells a program the width, height or bit depth. The browser decodes the JPG and passes the pixels to ImageMagick, which writes them as raw samples. They pass through 8-bit RGBA first, so the metadata is left behind. You must tell any reader the width, height and format yourself.\n\n### Other ways to convert JPG to RGB\n\n- **ImageMagick:** `magick photo.jpg -depth 8 RGB:samples.rgb` writes raw red, green and blue samples. The `-depth` option sets the depth of raw formats such as RGB, whose depth the file does not record.\n- **Pillow:** `from PIL import Image; pixels=Image.open('photo.jpg').convert('RGB'); open('samples.rgb','wb').write(pixels.tobytes())` saves the pixels as raw bytes. Pillow reads JPEG files, and `tobytes()` returns the unprocessed pixel data.\n\n### Problems with JPG files\n\n- **Blocky or smudged areas**: raw RGB shows the flaws exactly as decoded and can't repair them.\n- **No transparency**: a JPG has no alpha channel, so the samples have nothing to hold.\n- **Some old players stall**: progressive JPGs can be rejected by aging photo frames, and re-saving without progressive scans fixes it.\n- **The quality scale varies**: one editor's quality value is not another's, so identical settings can give different files.\n"
+    }
+  },
+  "ktx-to-png": {
+    "seo": {
+      "title": "Convert KTX to PNG Online (Free)",
+      "h1": "KTX to PNG Converter",
+      "description": "Convert an uncompressed KTX texture to PNG in your browser. Compressed textures are refused with a message. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a KTX texture into a PNG picture in your browser, if it stores plain 8-bit color."
+    },
+    "faqs": [
+      {
+        "question": "Which KTX files does this open?",
+        "answer": "Uncompressed 8-bit RGB and RGBA textures in the original KTX format. A texture that uses block compression, such as ETC or ASTC, is refused, and so is one with another bit depth."
+      },
+      {
+        "question": "What happens with a compressed texture?",
+        "answer": "The page stops and shows a message that compressed or non-8-bit KTX textures are not supported. Nothing is saved, so decode the texture in a texture tool first."
+      },
+      {
+        "question": "My KTX has mipmaps. Which one do I get?",
+        "answer": "One PNG, taken from the first image in the file. The smaller mipmap levels are not saved."
+      },
+      {
+        "question": "What about cubemaps and texture arrays?",
+        "answer": "The PNG is one picture. Cubemap faces and array layers are not written out as separate files."
+      },
+      {
+        "question": "Why does the PNG look upside down?",
+        "answer": "The page writes the rows in the order the file stores them and does not read the KTXorientation value. If the texture uses another origin than your viewer, flip the PNG in an editor."
+      },
+      {
+        "question": "Can it open a KTX2 file?",
+        "answer": "No. This page reads the original KTX only, and the file picker shows .ktx files. KTX2 has its own converter, KTX2 to PNG on this site."
+      },
+      {
+        "question": "Does the PNG keep transparency?",
+        "answer": "Yes, for an RGBA texture. An RGB texture has no alpha channel to keep."
+      },
+      {
+        "question": "Can it open a 16-bit or floating-point texture?",
+        "answer": "No. Anything that is not 8-bit is refused with a message, so decode such a texture in a texture tool first."
+      }
+    ],
+    "aboutSection": {
+      "title": "KTX and PNG",
+      "fromFormat": {
+        "name": "KTX",
+        "fullName": "Khronos Texture",
+        "description": "A texture container for OpenGL and OpenGL ES defined by the Khronos Group. It stores dimensions and the GL format its loader needs.",
+        "details": [
+          "Cubemaps and texture arrays",
+          "Mipmap levels, largest first",
+          "KTX2 is a separate container"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format developed as a patent-free replacement for GIF, standardized as ISO/IEC 15948.",
+        "details": [
+          "Lossless compression",
+          "Alpha channel",
+          "Opens in every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting KTX to PNG",
+      "points": [
+        "Only uncompressed 8-bit RGB and RGBA textures convert.",
+        "Compressed textures are refused with a message.",
+        "One PNG is written, from the first image in the file.",
+        "A flipped texture needs flipping in an editor."
+      ]
+    },
+    "guide": {
+      "title": "About KTX and PNG",
+      "markdown": "### What is a KTX file?\n\nKhronos Texture version 1, KTX, is a container for OpenGL and OpenGL ES textures. A file records the texture dimensions and the GL format that its loader needs. It can hold cubemap faces and texture arrays, stores mipmap levels from largest to smallest, and may carry named metadata such as texture orientation. KTX2 is a separate container whose structure is incompatible with the first.\n\n### Programs that open KTX files\n\n- **Windows, Mac and Linux:** KTX Software with its libktx library reads KTX 1 and 2, though it is a developer library and not a photo viewer. FFmpeg reads KTX 1.0 files that use ASTC formats, and kram is a command-line utility that decodes supported KTX and KTX2 textures.\n- **Windows and Linux:** PVRTexTool is a texture GUI and command-line tool that lists KTX and KTX2 among its inputs.\n- **Mac:** kramv is a viewer for supported KTX and KTX2 textures on Apple Silicon Macs.\n\n### KTX and PNG compared\n\n- **Purpose**: KTX feeds a GPU, while PNG is a lossless picture meant for people.\n- **Contents**: KTX can hold mipmaps, cubemap faces and arrays. A PNG holds one picture.\n- **Compression**: a KTX may use a GPU compression format, but a PNG is always lossless.\n\nThis page reads only the original KTX format, and only when the texture is uncompressed 8-bit RGB or RGBA. It takes the first image in the file and writes its pixels as a PNG. A compressed or non-8-bit texture is refused with a message, and nothing is saved. An RGBA texture keeps its transparency, and an RGB texture has none to keep.\n\n### Other ways to convert KTX to PNG\n\n- **PVRTexToolCLI:** `PVRTexToolCLI -i texture.ktx -d extracted.png -noout` decodes the texture and writes a PNG. The -i option accepts KTX and KTX2 files, -d saves a decompressed file with the extension you give it, and -noout stops the .pvr file from being written.\n- **Tacent View:** `tacentview -c texture.ktx --out png` converts from the command line without opening the GUI. Tacent View loads KTX and KTX2 and saves PNG, on Windows and Linux.\n\n### Problems with KTX files\n\n- **The picture is upside down**: a texture may look upside down when its coordinate origin differs from the viewer, so inspect KTXorientation and flip the PNG in an editor.\n- **The suffix was changed**: renaming a KTX2 file to .ktx does not convert it.\n- **Unsupported internal format**: a KTX texture does not guarantee that every OpenGL implementation supports its internal image format.\n- **Compressed texture**: decode it first in a tool such as PVRTexTool, which can save a decompressed copy.\n"
+    }
+  },
+  "m2v-to-mp4": {
+    "seo": {
+      "title": "Convert M2V to MP4 Online (Free)",
+      "h1": "M2V to MP4 Converter",
+      "description": "Convert M2V to MP4 in your browser: an MPEG-2 video stream becomes H.264 video, re-encoded on your device. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an MPEG-2 video stream (M2V) into an H.264 MP4 in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will the MP4 have sound?",
+        "answer": "No. An M2V is an elementary video stream with no audio channel, so the MP4 holds picture only. Add the soundtrack afterward, or run FFmpeg on your computer with the audio file as a second input."
+      },
+      {
+        "question": "How do I convert M2V to MP4?",
+        "answer": "Drop the M2V onto the page and give FFmpeg a moment to re-encode it, then save the MP4. A batch is processed file by file."
+      },
+      {
+        "question": "Which codec does the MP4 use?",
+        "answer": "H.264, written by libx264. The MPEG-2 picture is encoded again rather than copied."
+      },
+      {
+        "question": "Will a standard-definition M2V be enlarged to HD?",
+        "answer": "No. Pictures are never enlarged; only one above the size cap is shrunk. A DVD-sized stream keeps its dimensions."
+      },
+      {
+        "question": "What about interlaced video?",
+        "answer": "Frames marked as interlaced are deinterlaced, giving one frame for each. Progressive frames pass through untouched."
+      },
+      {
+        "question": "Is M2V the same as MPEG-2?",
+        "answer": "M2V holds MPEG-2 video, also called H.262 or MPEG-2 Part 2. Program and transport streams can carry that video together with audio, while M2V is the video alone."
+      },
+      {
+        "question": "Can I convert more than one M2V in one go?",
+        "answer": "Yes. Drop several onto the page, and they run one after another, with an MP4 saved for each."
+      },
+      {
+        "question": "What happens to a damaged M2V?",
+        "answer": "A cut-off or damaged file usually gives a shorter MP4 rather than a refusal, because FFmpeg keeps whatever it can decode."
+      }
+    ],
+    "aboutSection": {
+      "title": "M2V and MP4",
+      "fromFormat": {
+        "name": "M2V",
+        "fullName": "MPEG-2 video elementary stream",
+        "description": "A file ending for an MPEG-2 video elementary stream, also known as ITU-T H.262. It carries the picture without an audio channel.",
+        "details": [
+          "Video only",
+          "MPEG-2 (H.262)",
+          "Common in DVD authoring"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that holds video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "H.264, H.265 and AV1 video",
+          "Plays in every major browser",
+          "Built from nested boxes"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting M2V to MP4",
+      "points": [
+        "The MP4 has no sound, because M2V has none.",
+        "The video is encoded again as H.264.",
+        "The picture size and frame rate are capped.",
+        "Interlaced frames are deinterlaced."
+      ]
+    },
+    "guide": {
+      "title": "About M2V and MP4",
+      "markdown": "### What is an M2V file?\n\nA file ending in .m2v is an MPEG-2 video elementary stream: the picture data of MPEG-2 (ITU-T H.262, also called MPEG-2 Part 2) with nothing else attached. Sound lives elsewhere. A program stream bundles one video with its audio, and a transport stream can multiplex several channels, so an M2V on its own naturally gives a silent result. These streams mostly come out of DVD authoring tools and MPEG-2 encoders.\n\n### Programs that open M2V files\n\n- **Windows, Mac and Linux:** FFmpeg and ffplay decode MPEG-2 video and name .m2v for raw MPEG-2 output. VLC media player reads this kind of stream through its MPEG-I/II elementary-video demuxer.\n- **Windows and Mac:** Telestream Switch documents M2V input.\n\n### M2V and MP4 compared\n\n- **Contents**: an M2V stream holds video only, whereas an MP4 can hold video, audio, subtitles and metadata.\n- **Codec**: MPEG-2 (H.262) goes in and H.264 comes out.\n- **Reach**: every major browser plays MP4.\n\nEncoding is done by libx264 (ultrafast preset, CRF 32, zerolatency tune). Width and height are limited to 1920 pixels and the frame rate to a ceiling of 30. A smaller picture is never enlarged, so a standard-definition stream keeps its size apart from rounding an odd side down to even. The source never had audio, so the MP4 has none.\n\n### Other ways to convert M2V to MP4\n\n- **FFmpeg video only:** `ffmpeg -i pictures.m2v -c:v libx264 -an viewing.mp4` writes H.264 video and requests no audio, which suits a source that has none.\n- **FFmpeg separate audio:** `ffmpeg -i pictures.m2v -i soundtrack.wav -c:v libx264 -c:a aac -shortest complete.mp4` brings in a separate audio file as a second input, and -shortest ends the output with the shorter input. Check that the start and end line up before you share the result.\n\n### Problems with M2V files\n\n- **The MP4 is silent**: the M2V had no audio to begin with. Add the soundtrack separately, as the second method above shows.\n- **A stream looks wrong in a player**: program and transport streams are built differently from an elementary stream, so choose the stream type your player expects.\n- **The file is cut off or damaged**: FFmpeg usually still converts what it can read, so the MP4 can come out shorter than you expect.\n"
+    }
+  },
+  "mac-to-png": {
+    "seo": {
+      "title": "Convert MAC to PNG Online (Free)",
+      "h1": "MAC to PNG Converter",
+      "description": "Convert a MacPaint .mac file to PNG in your browser. The black-and-white picture opens anywhere. Free, no sign-up, no upload."
+    },
+    "tool": {
+      "subtitle": "Turn an old MacPaint (.mac) picture into a PNG you can open anywhere, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What is a .mac file?",
+        "answer": "It is a picture in the legacy MacPaint format. Each picture is a monochrome bitmap with one canvas size."
+      },
+      {
+        "question": "How do I convert MAC to PNG?",
+        "answer": "Choose the .mac file, wait a moment and save the PNG. ImageMagick, running in your browser, reads the MacPaint picture. A batch gives one PNG per file."
+      },
+      {
+        "question": "Why is the picture only black and white?",
+        "answer": "MacPaint pictures are monochrome, so the PNG shows the same black and white picture."
+      },
+      {
+        "question": "My picture is shifted or garbled. Why?",
+        "answer": "The file may carry an extra Finder-information prefix of 128 bytes, added when it was transferred. Netpbm's macptopbm has an `-extraskip` option for this."
+      },
+      {
+        "question": "Why won't my .mac file open on a Mac?",
+        "answer": "Classic Mac OS expects file identification that is stored outside the data fork. Without a MacBinary or BinHex wrapper, old software may not recognize it as a picture."
+      },
+      {
+        "question": "Does the PNG keep the whole canvas?",
+        "answer": "Yes. The PNG has the same dimensions as the MacPaint canvas."
+      },
+      {
+        "question": "What will the PNG be called?",
+        "answer": "The name of your .mac file with .png in place of the ending."
+      },
+      {
+        "question": "Is my file uploaded?",
+        "answer": "No. The WebAssembly build of ImageMagick works inside your browser tab, so the picture never leaves your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "MAC and PNG",
+      "fromFormat": {
+        "name": "MAC",
+        "fullName": "MacPaint",
+        "description": "The legacy MacPaint image format of the classic Mac. Pictures are black and white on a canvas of 576 by 720 pixels.",
+        "details": [
+          "Black and white",
+          "576 by 720 pixels",
+          "Run-length encoded data"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format developed as a patent-free replacement for GIF, standardized as ISO/IEC 15948.",
+        "details": [
+          "Lossless compression",
+          "Alpha channel",
+          "Opens in every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MAC to PNG",
+      "points": [
+        "Only MacPaint pictures convert.",
+        "The picture is black and white.",
+        "A shifted result means an extra 128-byte prefix.",
+        "Each file gives its own PNG."
+      ]
+    },
+    "guide": {
+      "title": "About MAC and PNG",
+      "markdown": "### What is a MAC file?\n\nA .mac file can hold an image in the legacy MacPaint format, the picture format of the drawing program released with the original Apple Macintosh in 1984. MacPaint pictures are black and white on a fixed canvas of 576 by 720 pixels, and the data is normally run-length encoded, although a file with the compression turned off can still conform to the format. The data fork alone does not carry all the classic Mac file identification information, so a copy without a MacBinary or BinHex wrapper may not be recognized as a picture. Today the format turns up in legacy Macintosh graphics and retro computing archives.\n\n### Programs that open MAC files\n\n- **Windows, Mac and Linux:** Deark is a free extractor whose raster formats include MacPaint, and Netpbm's macptopbm is a command-line reader that writes PBM.\n- **Mac:** GraphicConverter lists MacPaint import and export in its vendor manual.\n\n### MAC and PNG compared\n\n- **Colors**: MacPaint is black and white. A PNG can hold full color but here carries the same two tones.\n- **Canvas**: MacPaint has a fixed canvas, and its writers crop oversized input.\n- **Compression**: both formats are lossless.\n\nThe page runs ImageMagick compiled to WebAssembly on the main thread and reads the file as one image. Nothing is uploaded. The result is a PNG of the monochrome bitmap, written at the full size of the canvas, so there are no colors to lose.\n\n### Other ways to convert MAC to PNG\n\n- **Netpbm:** `macptopbm old_drawing.mac > drawing.pbm; pnmtopng drawing.pbm > drawing.png` converts in two steps through PBM. If the picture comes out shifted, the file may have a 128-byte prefix, and macptopbm has an `-extraskip` option for it.\n- **Deark:** `deark -m macpaint old_drawing.mac` selects the MacPaint module, which is needed because not every MacPaint file can be autodetected. Deark converts pictures to formats such as PNG.\n\n### Problems with MAC files\n\n- **The picture is shifted**: a 128-byte Finder prefix was probably added in transfer. Try macptopbm with `-extraskip`.\n- **The file will not open on classic Mac OS**: the data fork needs a MacBinary or BinHex wrapper to be identified.\n- **Oversized art is cropped**: the fixed canvas cannot hold a larger picture.\n"
+    }
+  },
+  "mjpeg-to-mp4": {
+    "seo": {
+      "title": "Convert MJPEG to MP4 Online (Free)",
+      "h1": "MJPEG to MP4 Converter",
+      "description": "Convert MJPEG to MP4 in your browser: a Motion JPEG recording becomes H.264 video, re-encoded on your device. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a Motion JPEG recording into an H.264 MP4 in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Why convert MJPEG to MP4?",
+        "answer": "MJPEG codes every frame as its own JPEG and never removes the redundancy between frames. H.264 does, and MP4 plays in every major browser, so the MP4 is the easier file to share and open."
+      },
+      {
+        "question": "How do I convert MJPEG to MP4?",
+        "answer": "Pick the recording, wait for FFmpeg to finish re-encoding and download the MP4. Several recordings each become a separate file."
+      },
+      {
+        "question": "Can I raise the quality of the MP4?",
+        "answer": "Not on this page, where the encoder settings are fixed and aimed at speed. For finer control, use one of the FFmpeg commands above on your computer."
+      },
+      {
+        "question": "What happens to a very large or very fast recording?",
+        "answer": "A very large or very fast recording is reduced in size and rate, as the guide above spells out. Smaller, slower ones keep theirs."
+      },
+      {
+        "question": "Is MJPEG a file type?",
+        "answer": "It is a video encoding. AVI and QuickTime files can hold it, and a raw MJPEG file is a plain stream of JPEG frames."
+      },
+      {
+        "question": "Will the MP4 have sound?",
+        "answer": "Only if the source has audio, and a raw MJPEG stream normally has none. When there is sound, it is re-encoded as AAC."
+      },
+      {
+        "question": "Does the picture get re-encoded?",
+        "answer": "Yes. Each frame is decoded and the video is written fresh as H.264, so the MP4 does not reuse the original JPEG data."
+      },
+      {
+        "question": "Where does MJPEG come from?",
+        "answer": "Mostly AVI files, where OpenDML documents a profile for it, and QuickTime. Editors also use it and then export another format for delivery."
+      }
+    ],
+    "aboutSection": {
+      "title": "MJPEG and MP4",
+      "fromFormat": {
+        "name": "MJPEG",
+        "fullName": "Motion JPEG",
+        "description": "A video encoding that codes each frame as a separate JPEG image. It is found in AVI and QuickTime files and in camera streams.",
+        "details": [
+          "Each frame is a JPEG",
+          "No inter-frame compression",
+          "Common in cameras and capture"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that holds video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "H.264, H.265 and AV1 video",
+          "Plays in every major browser",
+          "Built from nested boxes"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MJPEG to MP4",
+      "points": [
+        "The video is encoded again as H.264.",
+        "Large pictures and high frame rates are limited.",
+        "A raw stream has no sound to carry over.",
+        "Each recording gives its own MP4."
+      ]
+    },
+    "guide": {
+      "title": "About MJPEG and MP4",
+      "markdown": "### What is an MJPEG file?\n\nMotion JPEG is a way of coding video: each frame is compressed as an ordinary JPEG picture and the frames follow one another, with no prediction between them. It is therefore an encoding and not a container. AVI files carry it under the MJPG FourCC, following a profile that OpenDML documented in 1996 and 1997, and QuickTime can hold it as well. Cameras and capture hardware commonly record it, and editors sometimes work in it before exporting something lighter for delivery.\n\n### Programs that open MJPEG files\n\n- **Windows, Mac and Linux:** VLC media player lists MJPEG A/B decoding, and FFmpeg reads raw MJPEG.\n\n### MJPEG and MP4 compared\n\n- **Compression**: MJPEG compresses every frame on its own, so size follows the encoded images. H.264 also exploits similarity between frames.\n- **Container**: MJPEG is an encoding that sits in AVI, QuickTime or a raw stream, and MP4 is a container.\n- **Editing**: because every frame stands alone, editors can cut at any frame, while H.264 is made for delivery.\n- **Reach**: every major browser plays MP4.\n\nConversion happens in your browser with FFmpeg, and nothing is uploaded. libx264 does the work, set to ultrafast with CRF 32 and the zerolatency tune. A picture above 1920 pixels on either side is scaled down, and 30 frames a second is the ceiling. Interlaced frames are cleaned up on the way, and audio, if there is any, becomes AAC at 96 kbps. After converting, play the MP4 and check its length and speed against the original recording, since the page does not preview the result for you.\n\n### Other ways to convert MJPEG to MP4\n\n- **FFmpeg:** `ffmpeg -i camera.mjpeg -c:v libx264 -an camera_view.mp4` encodes H.264 and drops audio from the command.\n- **FFmpeg with a chosen pixel format:** `ffmpeg -i clip.mjpeg -pix_fmt yuv420p -c:v libx264 clip_player.mp4` also sets the pixel format to yuv420p.\n\n### Problems with MJPEG files\n\n- **The file will not parse**: raw MJPEG and multipart JPEG are different formats, and a wrong assumption can stop FFmpeg.\n- **A saved frame is not a valid JPEG**: an extracted frame can lack a Huffman table that a standalone decoder needs.\n- **The result has no sound**: a raw MJPEG stream normally carries none.\n"
+    }
+  },
+  "mkv-to-wmv": {
+    "seo": {
+      "title": "Convert MKV to WMV Online (Free)",
+      "h1": "MKV to WMV Converter",
+      "description": "Convert MKV to WMV in your browser. FFmpeg re-encodes the video and audio for the Windows Media file. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a Matroska (MKV) video into a Windows Media (WMV) file in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MKV to WMV?",
+        "answer": "Select the MKV, let FFmpeg re-encode it in the tab and download the WMV. Several files give one WMV each."
+      },
+      {
+        "question": "Which codecs does the WMV use?",
+        "answer": "FFmpeg chooses them from the .wmv ending: an MS-MPEG4 encoder for the picture and a Windows Media Audio encoder for the sound. The page offers no way to name other codecs."
+      },
+      {
+        "question": "Which audio track ends up in the WMV?",
+        "answer": "The page has no way to choose a track and passes no `-map`, so FFmpeg's defaults decide. To get a particular language, run FFmpeg on your computer with `-map` options."
+      },
+      {
+        "question": "Does the WMV keep the size of the MKV?",
+        "answer": "Mostly. Size and rate inside the limits described in the guide are left alone, while an odd width or height shrinks by a single pixel."
+      },
+      {
+        "question": "Why can the WMV look softer than the MKV?",
+        "answer": "The video is encoded again at the rate FFmpeg picks for the codec, so fine detail can suffer. For control over quality, run FFmpeg on your computer and set the bitrate yourself with `-b:v`."
+      },
+      {
+        "question": "Is my MKV changed?",
+        "answer": "No. The file you chose is untouched, and the WMV arrives as a separate new file."
+      },
+      {
+        "question": "Is a WMV the same as an ASF?",
+        "answer": "Almost. ASF is the container, and a .wmv is that container filled with Windows Media video. Microsoft built ASF for storing synchronized media and sending it over networks."
+      },
+      {
+        "question": "Can I convert a big MKV?",
+        "answer": "The page adds no limit of its own on file size. How much a browser tab copes with is down to your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "MKV and WMV",
+      "fromFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "A container built on EBML that can carry several video, audio and subtitle streams, with chapters and tags. It does not prescribe a compression method.",
+        "details": [
+          "Many streams in one file",
+          "Chapters and tags",
+          "Registered as video/matroska"
+        ]
+      },
+      "toFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "An ASF container with Windows Media coded content. It can use Windows Media Video 7, 8 or 9 compression.",
+        "details": [
+          "ASF container",
+          "Windows Media codecs",
+          "Made for storage and delivery"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MKV to WMV",
+      "points": [
+        "The video and audio are encoded again for the WMV.",
+        "Large pictures and high frame rates are limited.",
+        "The page has no audio track picker.",
+        "Each MKV gives its own WMV."
+      ]
+    },
+    "guide": {
+      "title": "About MKV and WMV",
+      "markdown": "### What is an MKV file?\n\nThe Matroska container is written in EBML, a binary relative of XML, and traces back to the MCF project. Several video, audio and subtitle streams fit in one file, next to chapter markers and tags. It leaves the codec and the quality up to whoever made the file, and its registered media type is video/matroska. Films, fan releases and screen recordings are common sources of MKV files.\n\n### Programs that open MKV files\n\n- **Windows, Mac and Linux:** mpv lets you switch between the audio and subtitle streams while an MKV plays, and ffplay opens the file too.\n- **Mobile:** on a phone, MKV plays in VLC for Android or VLC for iOS, depending on the streams inside.\n\n### MKV and WMV compared\n\n- **Container**: MKV is Matroska, built on EBML, and a WMV is an ASF container.\n- **Streams**: an MKV can carry many audio and subtitle streams, while an ASF holds audio, video and other streams.\n- **Codecs**: Windows Media Video versions 7, 8 and 9 appear in a WMV, whereas an MKV can wrap any codec.\n\nFFmpeg works inside your browser tab, and the .wmv ending makes FFmpeg choose MS-MPEG4 version 3 video at about 200 kbit/s and Windows Media Audio version 2. The page also limits pictures to 1920 pixels on the long side and the rate to 30 frames a second, and it deinterlaces flagged frames. Without a track picker, FFmpeg decides which audio lands in the file. Play the WMV afterwards and check the language, the length and the picture.\n\n### Other ways to convert MKV to WMV\n\n- **FFmpeg:** `ffmpeg -i film.mkv film.wmv` takes the Windows Media codecs from the .wmv ending.\n- **FFmpeg with chosen streams:** `ffmpeg -i multilingual.mkv -map 0:0 -map 0:1 delivery.wmv` uses `-map` to name the video and audio streams that go into the WMV. Change the second index to pick another audio track when the MKV has several.\n- **Prism for Windows:** add the MKV through Add File(s), set the Output Format to WMV, then click Convert. Prism lists MKV as an input when the Matroska DirectShow filter is installed.\n\n### Problems with MKV files\n\n- **Wrong language**: the page has no track picker, so choose the track with `-map` in FFmpeg.\n- **Seeking is slow in the MKV**: missing or damaged cues make seeking harder, and they are stored apart from the media.\n- **A stream cannot be decoded**: recognizing the Matroska container does not ensure that a player or converter can decode every codec inside it.\n"
+    }
+  },
+  "mp3-to-caf": {
+    "seo": {
+      "title": "Convert MP3 to CAF Online (Free)",
+      "h1": "MP3 to CAF Converter",
+      "description": "Convert MP3 to CAF in your browser: uncompressed PCM audio in an Apple Core Audio file. Free, with no sign-up and no upload."
+    },
+    "tool": {
+      "subtitle": "Turn an MP3 into an Apple Core Audio (CAF) file of uncompressed PCM, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP3 to CAF?",
+        "answer": "Choose the MP3, let FFmpeg decode it and save the CAF. A batch gives one CAF for each file."
+      },
+      {
+        "question": "What is inside the CAF?",
+        "answer": "Uncompressed 16-bit stereo PCM at 44.1 kHz. The page always writes that, whatever the MP3 used."
+      },
+      {
+        "question": "Will the CAF sound better than the MP3?",
+        "answer": "No. Sound the MP3 threw away is gone for good, and CAF cannot restore it. All the format does is prevent further loss."
+      },
+      {
+        "question": "Why is the CAF bigger than the MP3?",
+        "answer": "PCM stores every sample, while MP3 discards sound a hearing model says you would not notice. The CAF can therefore be much larger."
+      },
+      {
+        "question": "Why would I use a CAF instead of the MP3?",
+        "answer": "Each MP3 export is a lossy encode, so a round trip through an editor stacks another one. A CAF with PCM audio avoids that, and its 64-bit offsets lift the size limits of older fields."
+      },
+      {
+        "question": "Does a mono MP3 stay mono?",
+        "answer": "No. The page always writes two channels, so a mono MP3 comes out as stereo."
+      },
+      {
+        "question": "Who opens a CAF?",
+        "answer": "macOS handles it through Core Audio, and FFmpeg and ffplay read it on any system. Opening the container still leaves the audio codec to be decoded, which a given system might not support."
+      },
+      {
+        "question": "Is my file uploaded?",
+        "answer": "No. FFmpeg runs in your browser, so the MP3 stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and CAF",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized as ISO/IEC 11172-3 and developed with major contributions from Fraunhofer IIS.",
+        "details": [
+          "Lossy compression",
+          "32 to 320 kbps",
+          "ID3 tags for metadata"
+        ]
+      },
+      "toFormat": {
+        "name": "CAF",
+        "fullName": "Core Audio Format",
+        "description": "An Apple container designed to be flexible. It uses 64-bit offsets and a mandatory audio-description chunk, and can hold compressed or uncompressed audio.",
+        "details": [
+          "64-bit offsets",
+          "Multiple channels and layouts",
+          "Compressed or PCM audio"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP3 to CAF",
+      "points": [
+        "The CAF holds uncompressed PCM at a fixed rate.",
+        "It can be much larger than the MP3 and no better in quality.",
+        "A mono MP3 is written as stereo.",
+        "Each MP3 gives its own CAF."
+      ]
+    },
+    "guide": {
+      "title": "About MP3 and CAF",
+      "markdown": "### What is an MP3 file?\n\nMP3, formally MPEG-1 Audio Layer III, came out of Fraunhofer IIS and was standardized as ISO/IEC 11172-3 in 1993. It saves space by discarding what a hearing model says most listeners would not notice. Sampling can happen at 32, 44.1 or 48 kHz, with the bitrate set between 32 and 320 kbps; tags such as titles live in separate ID3 blocks. Every major browser plays MP3, which makes it the usual way to share a recording and a poor one to edit.\n\n### Programs that open MP3 files\n\n- **Windows, Mac and Linux:** an MP3 imported into Audacity becomes a project you can edit, and ffplay plays one.\n- **Web:** Firefox and Chrome play MP3 directly, so nothing needs installing just to listen.\n- **Mobile:** the Android port of mpv and VLC for Android handle MP3.\n\n### MP3 and CAF compared\n\n- **Compression**: MP3 is lossy, and a CAF written here holds uncompressed PCM.\n- **Container**: CAF uses 64-bit offsets, so it can hold recordings larger than older containers allow.\n- **Metadata**: MP3 keeps titles in separate ID3 blocks, while CAF has its own information chunks for descriptive text.\n- **Channels**: CAF supports multiple channels with optional layout information.\n\nEverything runs locally with FFmpeg and nothing is uploaded. FFmpeg decodes the MP3 and writes 16-bit little-endian stereo PCM at 44.1 kHz into the CAF. Those settings are fixed, so a mono or 48 kHz MP3 still comes out as two channels at 44.1 kHz. Decoding cannot restore sound the MP3 already discarded; the CAF only stops any further loss while you edit. Open the CAF in your editor afterwards and listen to the start and the end.\n\n### Other ways to convert MP3 to CAF\n\n- **FFmpeg PCM:** `ffmpeg -i listening.mp3 -c:a pcm_s16le -ar 44100 -ac 2 -f caf editing.caf` names the PCM encoder, the sample rate, the channel count and the CAF container, the same recipe this page runs.\n- **Apple afconvert:** `afconvert -f caff -d LEI16@44100 -c 2 listening.mp3 editing.caf` is the tool built into macOS. The `-f caff` option selects CAF and `-d LEI16@44100` selects 16-bit little-endian samples at 44.1 kHz.\n\n### Problems with MP3 files\n\n- **Re-exporting as MP3 costs quality**: every export is another lossy pass, so keep the CAF as the working copy.\n- **A damaged file will not import**: Audacity may refuse a broken MP3 that another player still handles.\n- **Tags can be overwritten**: bring several files into one Audacity project and the newest file's tags may replace the earlier ones.\n"
+    }
+  },
+  "mp3-to-cdda": {
+    "seo": {
+      "title": "Convert MP3 to CDDA Online (Free)",
+      "h1": "MP3 to CDDA Converter",
+      "description": "Convert MP3 to CDDA in your browser: raw CD-style audio samples with no header. Free, with no sign-up and no upload."
+    },
+    "tool": {
+      "subtitle": "Turn an MP3 into raw CD-style audio samples (CDDA) in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What is in the .cdda file this makes?",
+        "answer": "Headerless stereo PCM, 16 bits per sample and little-endian, sampled at 44.1 kHz. It is not an AIFF-C file."
+      },
+      {
+        "question": "Is it the same as the CDDA files on macOS?",
+        "answer": "No. On macOS, the CDDAFS file system shows the tracks of a mounted audio CD as AIFF-C files. This page writes headerless samples, which have a different layout."
+      },
+      {
+        "question": "How do I play the file?",
+        "answer": "Open it as raw audio. Set signed PCM, little-endian, two channels and the sample rate from the first answer. A player that expects AIFF-C will not recognize it."
+      },
+      {
+        "question": "How do I convert MP3 to CDDA?",
+        "answer": "Choose the MP3, wait while FFmpeg decodes it and save the .cdda file. A batch gives one file each."
+      },
+      {
+        "question": "Why is the file larger than the MP3?",
+        "answer": "Nothing is compressed in the result. The MP3 stores what is left after a hearing model discards sound, while the raw file holds every sample."
+      },
+      {
+        "question": "Do I get better quality than the MP3?",
+        "answer": "No. MP3 already discards sound, and the raw file cannot restore it."
+      },
+      {
+        "question": "What if I just need a WAV file?",
+        "answer": "Use the [MP3 to WAV converter](/mp3-to-wav/). WAV has a header, so players recognize it without extra settings."
+      },
+      {
+        "question": "Which programs list the .cdda ending?",
+        "answer": "Apple Motion lists .cdda among the audio formats it imports, and AVFoundation identifies .cdda as an extension for AIFC audio."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and CDDA",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized as ISO/IEC 11172-3 and developed with major contributions from Fraunhofer IIS.",
+        "details": [
+          "Lossy compression",
+          "32 to 320 kbps",
+          "ID3 tags for metadata"
+        ]
+      },
+      "toFormat": {
+        "name": "CDDA",
+        "fullName": "CD digital audio samples",
+        "description": "The .cdda ending appears on Apple systems for audio, which AVFoundation identifies as AIFC. This page writes raw CD-style samples instead.",
+        "details": [
+          "Raw CD-style samples",
+          "No header here",
+          "Larger than MP3"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP3 to CDDA",
+      "points": [
+        "The result is raw samples without a header.",
+        "It is not the AIFF-C file macOS shows for a CD track.",
+        "It is larger than the MP3.",
+        "Each MP3 gives its own file."
+      ]
+    },
+    "guide": {
+      "title": "About MP3 and CDDA",
+      "markdown": "### What is an MP3 file?\n\nMP3 is MPEG-1 Audio Layer III, defined in ISO/IEC 11172-3 in 1993. It omits sound that listeners are unlikely to hear, and its bitrates run from 32 to 320 kbps. ID3 tags carry the title and artist inside the same file, and it is the usual way to share a recording on the web.\n\n### Programs that open MP3 files\n\n- **Windows, Mac and Linux:** an imported MP3 becomes an editable project in Audacity, while ffplay handles playback.\n- **Web:** Firefox and Chrome play MP3 directly.\n- **Mobile:** a phone can play MP3 with either VLC for Android or the mpv port.\n\n### MP3 and CDDA compared\n\n- **Compression**: MP3 is lossy, while the result here is raw samples.\n- **Header**: MP3 has frames and ID3 tags. The raw file has no header, so nothing in it states the rate or channel count.\n- **Apple's .cdda**: on macOS the ending names AIFF-C audio, and a suffix alone cannot prove what is inside a file.\n\nNothing leaves your device, because FFmpeg runs inside the tab. The MP3 is decoded and the signed samples are written as a raw stream, always as two channels. The rate and sample format are fixed, so any player must be told them, and the output is not the AIFF-C file Apple software expects. Nothing is compressed, which is why the file is larger than the MP3. Open it as raw audio in an editor and listen before you rely on it.\n\n### Other ways to convert MP3 to CDDA\n\n- **FFmpeg raw PCM:** `ffmpeg -i track.mp3 -ar 44100 -ac 2 -c:a pcm_s16le -f s16le samples.cdda` writes headerless samples, the same layout this page writes.\n- **FFmpeg WAV and Python wave extraction:** Convert to WAV with FFmpeg first (`ffmpeg -i track.mp3 -ac 2 -ar 44100 -c:a pcm_s16le prepared.wav`), then use Python's `wave` module to read the frames with `readframes` and write them out with no header. A short script can check the channels, sample width and rate with `getnchannels`, `getsampwidth` and `getframerate` before writing.\n\n### Problems with MP3 files\n\n- **A broken MP3 is rejected**: a malformed file can trigger an import error in Audacity even when other players cope.\n- **Metadata follows the last import**: when several MP3s share one Audacity project, the latest file's tags can displace the earlier ones.\n- **Going back to MP3 loses more**: encoding the raw samples again as MP3 is a new lossy step.\n"
+    }
+  },
+  "mp4-to-asf": {
+    "seo": {
+      "title": "Convert MP4 to ASF Online (Free)",
+      "h1": "MP4 to ASF Converter",
+      "description": "Convert MP4 to ASF in your browser. FFmpeg writes Windows Media video and audio into an ASF file. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an MP4 video into a Windows Media ASF file in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to ASF?",
+        "answer": "Select the MP4, let FFmpeg re-encode it and download the ASF. A batch is converted one file after another."
+      },
+      {
+        "question": "Which codecs does the ASF use?",
+        "answer": "Windows Media Video for the picture and Windows Media Audio for the sound."
+      },
+      {
+        "question": "Why can the ASF look worse than the MP4?",
+        "answer": "The video bitrate is fixed and the video is encoded again, so a busy or high-resolution picture can lose detail."
+      },
+      {
+        "question": "Can I choose the bitrate of the ASF?",
+        "answer": "No. The page always writes the fixed bitrates given in the guide above. For a different rate, run FFmpeg on your computer with `-b:v`."
+      },
+      {
+        "question": "What is ASF?",
+        "answer": "Advanced Systems Format is Microsoft's multimedia wrapper for audio, video and other streams. It was designed for delivery, including streaming, and WMV and WMA are its subtypes."
+      },
+      {
+        "question": "Why won't my ASF play on my phone?",
+        "answer": "A phone's player may not have the decoders the streams inside need. VLC counts ASF, WMV and WMA among the formats it reads."
+      },
+      {
+        "question": "Does my MP4 leave my device?",
+        "answer": "No. FFmpeg runs inside your browser tab to write the ASF, so the video stays on your device."
+      },
+      {
+        "question": "Does a small MP4 get enlarged?",
+        "answer": "No. A picture is scaled down only when it exceeds the limit in the guide above, and an odd width or height gives up a pixel to become even."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and ASF",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that holds video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "H.264, H.265 and AV1 video",
+          "Plays in every major browser",
+          "Built from nested boxes"
+        ]
+      },
+      "toFormat": {
+        "name": "ASF",
+        "fullName": "Advanced Systems Format",
+        "description": "A container from Microsoft for audio, video and other streams, designed for media delivery. WMA and WMV are ASF subtypes.",
+        "details": [
+          "Windows Media streams",
+          "Designed for streaming",
+          "Header objects hold metadata"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP4 to ASF",
+      "points": [
+        "The ASF holds Windows Media video and audio at fixed bitrates.",
+        "Large pictures and high frame rates are limited.",
+        "A player needs Windows Media decoders for the ASF.",
+        "Each MP4 gives its own ASF."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 and ASF",
+      "markdown": "### What is an MP4 file?\n\nMP4, short for MPEG-4 Part 14 (ISO/IEC 14496-14), appeared in 2003. It descends from Apple's QuickTime by way of the ISO Base Media File Format, and its content sits in nested boxes. H.264 video paired with AAC sound is the usual payload, though other codecs fit as well. The .mp4 and .m4v endings mark video, and .m4a usually marks audio only.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** mpv lets you pick audio and subtitle streams while playing, and ffplay plays it too.\n- **Windows and Mac:** Adobe Premiere takes in MP4 files provided the right decoder exists.\n- **Web:** Firefox and Chrome play MP4 directly, though support for AAC and H.264 may depend on codecs the system provides.\n- **Mobile:** phones have VLC for iOS as well as VLC for Android.\n\n### MP4 and ASF compared\n\n- **Container**: MP4 is ISO/IEC 14496-14, while ASF is Microsoft's proprietary wrapper, whose specification is public.\n- **Streams**: an ASF is not limited to sound and pictures, since stills and other kinds of stream can ride along, and WMA and WMV are its subtypes.\n- **Metadata**: ASF header objects can carry titles, authorship and copyright data, and its registered MIME type is application/vnd.ms-asf.\n- **Reach**: every major browser plays MP4, whereas the .asf ending names a wrapper and does not say which decoders a player needs.\n\nNothing leaves your device, because FFmpeg does the encoding inside the tab. The video is written by the wmv2 encoder at 500 kbps and the audio by wmav2 at 96 kbps. A picture taller or wider than 1920 pixels shrinks to fit, and anything above 30 frames a second is thinned out. Play the ASF afterwards in a player that lists ASF, such as VLC, and check the picture and the sound.\n\n### Other ways to convert MP4 to ASF\n\n- **FFmpeg:** `ffmpeg -i presentation.mp4 -f asf presentation.asf` selects the ASF muxer and leaves the codecs to FFmpeg.\n- **FFmpeg with a video bitrate:** `ffmpeg -i presentation.mp4 -b:v 1400k -f asf presentation.asf` sets the video bitrate with `-b:v`, which gives you control the page does not offer.\n- **Prism for Windows:** add the MP4 through Add File(s), select ASF as the Output Format and click Convert. Prism lists MP4 as an input when an mp4 filter is installed.\n\n### Problems with MP4 files\n\n- **Missing picture or sound**: the player supports MP4 but lacks a decoder for the codec inside, since container support alone does not guarantee one.\n- **Interrupted recordings**: a normal MP4 keeps its packet metadata together, so a write that stopped early can leave a file no player opens.\n"
+    }
+  }
+}

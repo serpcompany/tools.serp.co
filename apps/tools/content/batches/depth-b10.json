@@ -1,0 +1,832 @@
+{
+  "pgm-to-png": {
+    "seo": {
+      "title": "Convert PGM to PNG Online (Free)",
+      "h1": "PGM to PNG Converter",
+      "description": "Convert a PGM graymap to PNG in your browser. ImageMagick reads the file and you download a PNG that every browser shows. Free, no sign-up.",
+      "howToHeading": "How to convert PGM to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn a Netpbm graymap into a PNG that every browser shows."
+    },
+    "faqs": [
+      {
+        "question": "Why won't my PGM open in a browser or photo app?",
+        "answer": "PGM is a Netpbm format, and the programs that open it are image tools such as GIMP, IrfanView, XnView MP and the Netpbm tools. A PNG opens in every browser."
+      },
+      {
+        "question": "Does the page read both P2 and P5 files?",
+        "answer": "Yes. It accepts plain graymaps that begin with P2 and raw graymaps that begin with P5."
+      },
+      {
+        "question": "What happens to a 16-bit PGM?",
+        "answer": "A Maxval above 255 means two bytes per sample. In a test with the page's ImageMagick, a 16-bit PGM came out as an 8-bit PNG, which holds at most 256 gray levels. For a PNG that follows the Maxval, use Netpbm's pnmtopng."
+      },
+      {
+        "question": "Do my gray values change?",
+        "answer": "The page adds no filter or curve of its own, and samples of eight bits or fewer keep their gray values."
+      },
+      {
+        "question": "Is a PGM mask the same as a picture?",
+        "answer": "No. Netpbm can use a PGM as an opacity mask too, where sample values mean something else. The page treats every PGM as a gray picture, so a mask comes out as gray pixels, not as transparency."
+      },
+      {
+        "question": "Does the file get uploaded?",
+        "answer": "No. ImageMagick runs inside your browser tab, so the graymap stays on your device."
+      },
+      {
+        "question": "How big can the image be?",
+        "answer": "A graymap bigger than about 537 megapixels is turned down, with a note that the image is more than the page can convert."
+      },
+      {
+        "question": "Can I convert several PGM files at once?",
+        "answer": "Select a stack of PGM files if you have them. Every one is converted on its own turn, and you download one PNG per graymap."
+      }
+    ],
+    "aboutSection": {
+      "title": "PGM and PNG",
+      "fromFormat": {
+        "name": "PGM",
+        "fullName": "Portable Graymap",
+        "description": "The grayscale member of the Netpbm family of formats. Each pixel is a gray value, stored as plain text or in a binary form.",
+        "details": [
+          "grayscale only",
+          "8-bit or 16-bit samples",
+          "plain text or binary encoding",
+          "part of Netpbm"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PGM to PNG",
+      "points": [
+        "Plain (P2) and raw (P5) graymaps are both accepted.",
+        "A PGM deeper than eight bits a sample comes out with eight.",
+        "A PGM that holds an opacity mask becomes a gray picture, not transparency.",
+        "Each file you choose becomes its own PNG."
+      ]
+    },
+    "guide": {
+      "title": "About PGM files",
+      "markdown": "### What is a PGM file?\n\nPGM stands for Portable Gray Map. It is the grayscale member of the Netpbm family and stores one gray value for each pixel. A raw PGM begins with P5 and keeps its samples in binary form. A plain PGM begins with P2 and writes each sample as decimal text. When the Maxval in the header is above 255, every raw sample takes two bytes.\n\nNetpbm also uses PGM for opacity masks, with a different reading of the sample values. The conventional media type is image/x-portable-graymap, which IANA has not registered. People meet PGM in image-processing experiments and in grayscale image interchange.\n\n### Programs that open PGM files\n\n**Windows, Mac and Linux**\n\n- ImageMagick: reads and writes the PGM member of the Netpbm family.\n- Netpbm: provides programs and libnetpbm for processing graymaps.\n\n### PGM and PNG compared\n\n- **Content**: a PGM holds gray samples and nothing else. A PNG can hold gray, color and an alpha channel.\n- **Encoding**: PGM is either plain text or binary. PNG compresses its data without loss.\n- **Depth**: a raw PGM uses one byte per sample up to a Maxval of 255 and two bytes above it. PNG allows 8-bit and 16-bit channels.\n- **Reach**: every browser supports PNG, while PGM belongs to image tools.\n\nHere a PGM goes through ImageMagick in your browser and comes out as a PNG. The step adds no filter, and it writes eight bits per sample.\n\n### Other ways to convert PGM to PNG\n\n- **Netpbm:** run pnmtopng measurement.pgm > measurement.png. The program maps the file's maximum value to a PNG depth.\n- **ImageMagick:** run magick measurement.pgm review.png.\n- **GIMP:** use File > Export As, add .png to the file name and confirm with Export. GIMP's PNM reader loads plain and raw files, and the export dialog that follows offers PNG options.\n\n### Problems with PGM files\n\n- **A program rejects the file**: older readers may refuse samples deeper than eight bits. The pamdepth program from Netpbm can reduce the Maxval.\n- **Only the first image shows**: some readers stop after one image, although a raw PGM may hold a sequence.\n- **The grays look wrong**: linear-light and sRGB variants can display differently from the BT.709 reading the specification describes.\n"
+    }
+  },
+  "swf-to-avi": {
+    "seo": {
+      "title": "Convert SWF to AVI Online (Free)",
+      "h1": "SWF to AVI Converter",
+      "description": "Convert the audio and video streams inside an SWF to AVI in your browser. It does not run ActionScript or play the Flash scene. Free, no sign-up.",
+      "howToHeading": "How to convert SWF to AVI"
+    },
+    "tool": {
+      "subtitle": "Extract the media inside a Flash SWF and re-encode it as an AVI, with no Flash runtime."
+    },
+    "faqs": [
+      {
+        "question": "Does this page play my Flash animation and record it?",
+        "answer": "No. FFmpeg reads the sound and video stored in the SWF and re-encodes them. It does not play the Flash scene."
+      },
+      {
+        "question": "Why doesn't my SWF game come out as a video?",
+        "answer": "A game is built from drawn shapes and ActionScript, and the converter does not run either. What it can use is the video and sound stored inside the file. To capture a game as it plays, play it in Ruffle, record it with OBS Studio and convert the recording."
+      },
+      {
+        "question": "What is inside the AVI?",
+        "answer": "The video is MPEG-4 with an Xvid tag, and the sound is MP3 at 96 kbit/s."
+      },
+      {
+        "question": "Does the picture size change?",
+        "answer": "A frame whose longer side is at most 1920 pixels keeps its size, with one pixel dropped from an odd width or height. Bigger frames are shrunk to fit, smaller ones are left alone, and a source faster than 30 frames per second loses frames but not length."
+      },
+      {
+        "question": "Will buttons and menus work in the AVI?",
+        "answer": "No. An AVI is a video file, and a video cannot keep ActionScript interactions as working controls."
+      },
+      {
+        "question": "What if the SWF loads other files?",
+        "answer": "An SWF may refer to media outside itself. The page reads only the file you choose, so media stored elsewhere is not part of the AVI."
+      },
+      {
+        "question": "Can I convert several SWF files at once?",
+        "answer": "Pick several at the same time if you like. The page handles them in sequence and each AVI is a separate download."
+      },
+      {
+        "question": "Is my file sent anywhere?",
+        "answer": "No. FFmpeg runs inside your browser, and the SWF is never sent anywhere."
+      }
+    ],
+    "aboutSection": {
+      "title": "SWF and AVI",
+      "fromFormat": {
+        "name": "SWF",
+        "fullName": "Shockwave Flash",
+        "description": "A file format for Adobe Flash animations, games and interactive content, originally from Macromedia. Flash Player reached end of life on 31 December 2020.",
+        "details": [
+          "vector animation",
+          "ActionScript interactivity",
+          "can embed video and audio",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container format introduced by Microsoft in 1992 based on RIFF. It interleaves video and audio data and can hold many different codecs.",
+        "details": [
+          "RIFF-based container",
+          "many codecs",
+          "limited support for modern features",
+          "legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SWF to AVI",
+      "points": [
+        "Only the sound and video stored in the SWF are converted. Vector drawings and ActionScript are not played.",
+        "Buttons and menus do not survive, because an AVI has no controls.",
+        "Media the SWF loads from other files is not included.",
+        "The AVI holds MPEG-4 video and MP3 sound."
+      ]
+    },
+    "guide": {
+      "title": "About SWF files",
+      "markdown": "### What is an SWF file?\n\nFlash animations, games and interactive pages were delivered as SWF files, a format that began at Macromedia. Adobe acquired Macromedia in 2005. The Library of Congress also records the expansion Small Web Format. A file can combine vector graphics, animation and bitmap video. Interactive content uses ActionScript alongside a timeline.\n\nAn SWF may refer to external media instead of holding every resource. Flash Player was discontinued by Adobe on 31 December 2020, which leaves SWF mostly as a format for old archived web content.\n\n### Programs that open SWF files\n\n**Windows, macOS and Linux**\n\n- Ruffle: emulates Flash, and how well a file plays depends on the ActionScript features it uses.\n\n**Windows and Linux**\n\n- Lightspark: a Flash implementation that is only partial.\n\n**Mac**\n\n- Adobe Audition: imports SWF to extract audio from a video file if DLMS support is enabled; it does not run interactive Flash.\n\n**Web**\n\n- Ruffle's web player: runs Flash in a browser through WebAssembly, and some APIs are still missing.\n\n### SWF and AVI compared\n\n- **Purpose**: an SWF is a Flash container for vector animation, ActionScript and embedded media. An AVI holds interleaved video and audio.\n- **Interaction**: an SWF can respond to clicks through ActionScript. An AVI plays from start to finish.\n- **Container**: an AVI is RIFF-based and can hold many codecs. Microsoft introduced it in 1992.\n- **Players**: AVI plays in QuickTime Player, in Windows Media Player and in VLC.\n\nHere FFmpeg takes the media streams out of the SWF, encodes the video as MPEG-4 and the sound as MP3, and wraps them in an AVI.\n\n### Other ways to convert SWF to AVI\n\n- **FFmpeg:** run ffmpeg -i clip.swf -c:v mpeg4 -c:a libmp3lame decoded.avi. FFmpeg's SWF reader decodes audio and video tags and skips the rest, so ActionScript does not run.\n- **JPEXS Free Flash Decompiler with FFmpeg:** on Linux, run ffdec -export movie extracted presentation.swf. The movie export defaults to FLV without sound. Then run ffmpeg -i extracted-movie.flv -c:v mpeg4 extracted-movie.avi, using the file name the export wrote.\n- **Ruffle with OBS Studio and FFmpeg:** play the SWF in Ruffle, then in OBS add a Window Capture or Display Capture source, review the audio settings and begin recording. Then run ffmpeg on the recording file, for example ffmpeg -i your-recording -c:v mpeg4 -c:a libmp3lame performance.avi. This captures a game as it plays.\n\n### Problems with SWF files\n\n- **Nothing runs**: Adobe Flash Player no longer runs Flash content after its end-of-life block. Open the file in Ruffle.\n- **A game acts differently**: some Flash APIs are missing from Ruffle, so visuals or behavior can change.\n- **Parts are missing**: an SWF that refers to external media may not behave as intended when those files are absent.\n"
+    }
+  },
+  "tiff-to-webp": {
+    "seo": {
+      "title": "Convert TIFF to WebP Online (Free)",
+      "h1": "TIFF to WebP Converter",
+      "description": "Convert a TIFF scan or photo to WebP in your browser. ImageMagick reads one picture from the file and you download a WebP. Free, no sign-up.",
+      "howToHeading": "How to convert TIFF to WebP"
+    },
+    "tool": {
+      "subtitle": "Turn a TIFF scan or photo into a WebP, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Why convert a TIFF to WebP?",
+        "answer": "TIFF is a format for scanning, archiving and print, and it opens in tools such as Preview, Windows Photos, GIMP and Photoshop. WebP is made for web images, and current major browsers support it."
+      },
+      {
+        "question": "Does a multi-page TIFF become several WebP files?",
+        "answer": "No. The page reads one picture from the file and you download one WebP. A TIFF can hold several images."
+      },
+      {
+        "question": "Can I choose lossy or lossless?",
+        "answer": "No. The page passes no quality setting. For that control, cwebp takes a quality value, and GIMP's WebP export dialog has Lossless and Image quality options."
+      },
+      {
+        "question": "How large can a TIFF be?",
+        "answer": "Above roughly 537 megapixels the page refuses the picture and tells you it is too large to convert here."
+      },
+      {
+        "question": "Which programs open the WebP?",
+        "answer": "Any modern web browser, Preview on macOS, GIMP and Windows Photos."
+      },
+      {
+        "question": "Does it accept both .tif and .tiff files?",
+        "answer": "Yes. The file picker lists both endings."
+      },
+      {
+        "question": "Can I convert several TIFF files at once?",
+        "answer": "Select as many TIFF files as you want. Each is converted in its turn, and each WebP is saved separately."
+      },
+      {
+        "question": "Does the file leave my computer?",
+        "answer": "No. The scan is processed by ImageMagick in your browser and is not sent anywhere."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIFF and WebP",
+      "fromFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "lossless or lossy compression",
+          "multiple pages in one file",
+          "high bit depth",
+          "CMYK support"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "animation",
+          "supported by current major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIFF to WebP",
+      "points": [
+        "One picture is read from the file, so you get one WebP.",
+        "The page sets no quality, so lossy or lossless can't be chosen here.",
+        "Very large pictures are refused.",
+        "Both .tif and .tiff files are accepted."
+      ]
+    },
+    "guide": {
+      "title": "About TIFF files",
+      "markdown": "### What is a TIFF file?\n\nTIFF stands for Tagged Image File Format. Aldus first published it in 1986, and the Library of Congress records Microsoft as a co-developer. The 6.0 revision dates from 1992, and Adobe holds the specification today. A file begins with II for little-endian or MM for big-endian byte order, and the specification sets no limit on how many images a file may contain. Tags make TIFF flexible: a single file can mix compression methods and color representations and contain more than one image.\n\nYou find TIFF in scanners and archives, in professional photography and print workflows, and in fax and document imaging. High-bit-depth work and preservation master files are established uses. The registered media type is image/tiff, and both .tif and .tiff extensions are in use.\n\n### Programs that open TIFF files\n\n**Windows, macOS and Linux**\n\n- GIMP: imports a TIFF as an editable image, and each export format carries over only some of a project's properties.\n- ImageMagick: reads and writes TIFF, including its compression, strip, tile and byte-order settings.\n\n**Mac**\n\n- Preview: File > Export lists TIFF as one of its formats.\n\n### TIFF and WebP compared\n\n- **Compression**: TIFF supports many methods, lossless or lossy, and WebP has its own lossy and lossless modes.\n- **Pages**: a TIFF can hold multiple images. WebP can hold the frames of an animation.\n- **Color and depth**: TIFF can store CMYK images and high bit depth.\n- **Origin**: Aldus and Microsoft developed TIFF. Google released WebP in 2010, built on the VP8 video codec for lossy images.\n- **Reach**: current major browsers support WebP.\n\nThis page reads one picture through ImageMagick and writes it as a WebP. It passes no quality setting.\n\n### Other ways to convert TIFF to WebP\n\n- **cwebp:** run cwebp -q 80 scan.tiff -o article.webp. Google's command-line encoder takes TIFF input, and -q sets the quality from 0 to 100.\n- **ImageMagick:** run magick scan.tiff scan.webp. ImageMagick needs its WebP delegate library for this.\n\n### Problems with TIFF files\n\n- **Colors differ between programs**: private tags, including some color-profile extensions, are not understood by every reader.\n- **A file approaches the limit**: classic TIFF uses 32-bit offsets, capping files at about 4 GB, a limit BigTIFF removes by widening them.\n"
+    }
+  },
+  "vob-to-avi": {
+    "seo": {
+      "title": "Convert VOB to AVI Online (Free)",
+      "h1": "VOB to AVI Converter",
+      "description": "Convert a DVD VOB file to AVI in your browser. The page re-encodes the video as MPEG-4 with MP3 sound, and nothing is uploaded. Free, no sign-up.",
+      "howToHeading": "How to convert VOB to AVI"
+    },
+    "tool": {
+      "subtitle": "Re-encode a DVD VOB file as an AVI with MPEG-4 video and MP3 sound."
+    },
+    "faqs": [
+      {
+        "question": "What does the AVI contain?",
+        "answer": "Inside the AVI the picture is MPEG-4, tagged Xvid, and the audio is 96 kbit/s MP3."
+      },
+      {
+        "question": "Why is my AVI only part of the movie?",
+        "answer": "One VOB can hold up to 1 GB, and a DVD backup commonly stores them inside a VIDEO_TS folder. The page converts only the file you pick, so pick each VOB you need."
+      },
+      {
+        "question": "What about interlaced DVD video?",
+        "answer": "The conversion applies the yadif filter to frames that are flagged as interlaced."
+      },
+      {
+        "question": "Does the picture size change?",
+        "answer": "Pictures whose longer side is 1920 pixels or under are left at their size, minus one pixel if the width or height is odd. Larger frames shrink to fit and small ones never grow. If the source runs above 30 frames per second, frames are dropped and the running time stays the same."
+      },
+      {
+        "question": "Is there a size limit for a VOB?",
+        "answer": "Neither the page nor a timeout caps the size. A long VOB takes as long as your device needs to encode it."
+      },
+      {
+        "question": "Where is my video processed?",
+        "answer": "In your browser. FFmpeg runs in the page, so the VOB is not uploaded."
+      },
+      {
+        "question": "Can I convert several VOB files at once?",
+        "answer": "Yes. Choose several VOB files together in one go, and each one is encoded in turn into its own separate AVI download."
+      },
+      {
+        "question": "Is the quality the same as the DVD?",
+        "answer": "No. The video is re-encoded as MPEG-4, so the AVI is a fresh encode and not a duplicate of what is on the disc."
+      }
+    ],
+    "aboutSection": {
+      "title": "VOB and AVI",
+      "fromFormat": {
+        "name": "VOB",
+        "fullName": "DVD Video Object",
+        "description": "The container used for video, audio and menus on DVD-Video discs. It is based on the MPEG-2 program stream.",
+        "details": [
+          "MPEG-2 program stream",
+          "multiple audio streams",
+          "may be encrypted with CSS",
+          "files up to 1 GB"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container format introduced by Microsoft in 1992 based on RIFF. It interleaves video and audio data and can hold many different codecs.",
+        "details": [
+          "RIFF-based container",
+          "many codecs",
+          "limited support for modern features",
+          "legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting VOB to AVI",
+      "points": [
+        "Only the one VOB file you choose is converted, not the whole disc.",
+        "The video is encoded again as MPEG-4, and the sound as MP3.",
+        "Very large frames are scaled down and very high frame rates are reduced; nothing is enlarged.",
+        "Frames flagged as interlaced are deinterlaced."
+      ]
+    },
+    "guide": {
+      "title": "About VOB files",
+      "markdown": "### What is a VOB file?\n\nDVD Video Object is what VOB stands for. Producers of DVDs keep a disc's video, sound and menus in VOB streams, which are closely related to MPEG-2 program-stream material. One file can hold up to 1 GB.\n\nA DVD backup commonly places those files in a VIDEO_TS directory. DVD authoring also needs companion IFO and BUP files that tell a player how the pieces fit together. People meet VOB when they rip a DVD into files.\n\n### Programs that open VOB files\n\n**Windows, macOS and Linux**\n\n- VLC: can open DVD-Video discs and MPEG program-stream files.\n- HandBrake: accepts VOB files as well as VIDEO_TS disc folders, so long as nothing on the disc is protected.\n\n### VOB and AVI compared\n\n- **Container**: a VOB is an MPEG-2 program stream. An AVI is RIFF-based, was introduced by Microsoft in 1992 and can hold many codecs.\n- **Streams**: a VOB can carry several audio streams. An AVI interleaves video and audio.\n- **Position on a disc**: VOB files sit in the VIDEO_TS folder alongside IFO and BUP files. An AVI stands alone.\n- **Players**: AVI files open in Windows Media Player, in VLC media player and in QuickTime Player.\n\nThe page hands the VOB to FFmpeg, which writes MPEG-4 for the picture and MP3 for the sound inside an AVI container.\n\n### Other ways to convert VOB to AVI\n\n- **Avidemux:** open the VOB with File > Open and let Avidemux index it. Choose MPEG-4 ASP (Xvid) video, MP3 (LAME) audio and the AVI output format, then use File > Save > Save Video. The program's own tutorial recommends two-pass encoding.\n- **FFmpeg:** run ffmpeg -i segment.vob -c:a libmp3lame -c:v mpeg4 segment-copy.avi. FFmpeg's format list includes MPEG-PS input, and both streams are encoded afresh.\n\n### Problems with VOB files\n\n- **A protected disc**: a VOB may be encrypted with CSS. HandBrake does not process copy-protected DVD sources.\n- **A loose file does not make a disc**: one VOB on its own does not replace the whole DVD structure that authoring needs.\n- **A clip from the wrong title**: one disc can hold several titles, so picking the wrong one gives you the wrong footage in the AVI.\n"
+    }
+  },
+  "wmv-to-mpg": {
+    "seo": {
+      "title": "Convert WMV to MPG Online (Free)",
+      "h1": "WMV to MPG Converter",
+      "description": "Convert a WMV video to MPG in your browser. FFmpeg re-encodes it as MPEG-2 video with MP2 sound, and nothing is uploaded. Free, no sign-up.",
+      "howToHeading": "How to convert WMV to MPG"
+    },
+    "tool": {
+      "subtitle": "Re-encode a Windows Media WMV as an MPEG-2 MPG with MP2 sound."
+    },
+    "faqs": [
+      {
+        "question": "What codecs does the MPG use?",
+        "answer": "MPEG-2 video and MP2 sound at 96 kbit/s."
+      },
+      {
+        "question": "Why would I need an MPG from a WMV?",
+        "answer": "An MPG fits players and editing workflows built around MPEG program streams, the format of Video CDs, while WMV belongs to Windows Media."
+      },
+      {
+        "question": "Can every WMV be read?",
+        "answer": "The page uses FFmpeg, which lists its decoder for Windows Media Video 9 as not completely working, so not every WMV is read."
+      },
+      {
+        "question": "Is the picture size changed?",
+        "answer": "The longer side is limited to 1920 pixels. Smaller pictures stay as they are, apart from a pixel lost on an odd width or height; larger ones are reduced, and nothing is enlarged. Frame rates over 30 per second are brought down by dropping frames, which keeps the length."
+      },
+      {
+        "question": "Is interlaced video handled?",
+        "answer": "Yes. Frames flagged as interlaced pass through the yadif deinterlacing filter."
+      },
+      {
+        "question": "Will quality drop?",
+        "answer": "Both WMV and MPG use lossy compression, and the video is encoded again, so the MPG is a second lossy generation."
+      },
+      {
+        "question": "Can I queue more than one WMV?",
+        "answer": "Yes. Add multiple WMV files and the page handles them in sequence, each one coming back as its own MPG."
+      },
+      {
+        "question": "Does the page upload the WMV?",
+        "answer": "No. FFmpeg works inside your browser, so the WMV is never sent anywhere."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMV and MPG",
+      "fromFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "A family of video codecs developed by Microsoft, usually stored in the ASF container. It was widely used for Windows video and streaming.",
+        "details": [
+          "ASF container",
+          "proprietary Microsoft codec",
+          "lossy compression",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MPG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "lossy compression",
+          "legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WMV to MPG",
+      "points": [
+        "The video is encoded again as MPEG-2 and the sound as MP2.",
+        "Very large frames are scaled down and very high frame rates are reduced; nothing is enlarged.",
+        "Frames flagged as interlaced are deinterlaced.",
+        "Each file you choose becomes its own MPG."
+      ]
+    },
+    "guide": {
+      "title": "About WMV files",
+      "markdown": "### What is a WMV file?\n\nWMV stands for Windows Media Video. Microsoft developed the family of codecs behind it, and a .wmv file stores the Windows Media content in the ASF container. WMV files use one of the Windows Media Video codecs, version 7, 8 or 9. It was a common choice for early Windows video, screen captures and Windows Media streams. The Library of Congress calls it often a final delivery format, and lists Windows Media Player and Windows Media Center among the programs that play it.\n\nMicrosoft designed ASF to keep media streams synchronized, whether they sit in a file or travel over a network. Audio and video streams fit in one container, which works from a local disk and from an HTTP server alike. The media type video/x-ms-wmv is the one the Library of Congress lists as commonly used, though IANA has not registered it.\n\n### Programs that open WMV files\n\n**Windows, macOS and Linux**\n\n- VLC media player: reads ASF/WMV files and decodes Windows Media Video in versions 1, 2 and 9.\n- FFplay: plays WMV with FFmpeg's decoders.\n\n**Mobile**\n\n- VLC for Android: includes the desktop player's decoding features.\n- VLC for iOS: opens local media in VLC's own player, not the system player.\n\n### WMV and MPG compared\n\n- **Container**: a WMV is an ASF file. An MPG is an MPEG program stream.\n- **Video codec**: WMV uses a proprietary Microsoft codec. MPG carries MPEG-1 or MPEG-2 video.\n- **Compression**: both are lossy, and both are legacy formats.\n- **Background**: MPG served as the standard for VCD and DVD video.\n- **Players**: MPG files play in QuickTime Player, VLC media player and Windows Media Player.\n\nHere FFmpeg decodes the WMV and encodes MPEG-2 video with MP2 sound into an MPG.\n\n### Other ways to convert WMV to MPG\n\n- **FFmpeg:** run ffmpeg -i legacy.wmv -c:a mp2 -c:v mpeg2video legacy-review.mpg. FFmpeg's format list includes ASF input, and the video is encoded anew.\n\n### Problems with WMV files\n\n- **Opens, but not fully**: a player may understand the ASF wrapper yet lack a codec for what is inside.\n- **Quality is not set by the extension**: how a WMV looks depends on its codec and compression settings.\n"
+    }
+  },
+  "au-to-mp3": {
+    "seo": {
+      "title": "Convert AU to MP3 Online (Free)",
+      "h1": "AU to MP3 Converter",
+      "description": "Convert a Sun or NeXT AU audio file to MP3 in your browser. MP3 is lossy and plays on nearly every device. Free, no sign-up.",
+      "howToHeading": "How to convert AU to MP3"
+    },
+    "tool": {
+      "subtitle": "Turn a Sun or NeXT AU audio file into an MP3 in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Which AU encodings work?",
+        "answer": "According to the specification, AU can hold ADPCM, floating point, A-law, mu-law or linear PCM data. In tests with this page's FFmpeg, AU files holding mu-law, A-law, 8-bit, 16-bit and 32-bit floating point samples all converted."
+      },
+      {
+        "question": "How good is the MP3?",
+        "answer": "The page asks the encoder for 192 kbit/s, which MP3 cannot reach below a 32 kHz sample rate. At 16 to 24 kHz the encoder writes at most 160 kbit/s, and at 8 kHz about 64 kbit/s. You cannot pick a bitrate here."
+      },
+      {
+        "question": "Does converting AU to MP3 lose quality?",
+        "answer": "MP3 compression is lossy, so the MP3 is not identical to the AU's samples. Keep the AU if you need them exactly."
+      },
+      {
+        "question": "Why does my AU sound thin?",
+        "answer": "Eight-bit mu-law is common in AU files, and IANA's audio/basic definition describes it at 8 kHz, a narrow telephone rate. The page does not change the sample rate, so the MP3 keeps the source's rate."
+      },
+      {
+        "question": "Can I convert an Audacity project?",
+        "answer": "Not as a whole. Old Audacity projects stored audio in small AU block files, and one block does not carry the arrangement stored in the project file. Open the project in Audacity and export from there."
+      },
+      {
+        "question": "Can I convert several AU files at once?",
+        "answer": "Yes. Select several AU files together; the page processes them in order and gives one MP3 per file."
+      },
+      {
+        "question": "Is my audio uploaded?",
+        "answer": "No. FFmpeg runs in the page and the AU is not uploaded."
+      },
+      {
+        "question": "What is the MP3 called?",
+        "answer": "It keeps the AU's name with an .mp3 ending, so interview.au downloads as interview.mp3. The AU itself is not touched."
+      }
+    ],
+    "aboutSection": {
+      "title": "AU and MP3",
+      "fromFormat": {
+        "name": "AU",
+        "fullName": "Sun/NeXT audio",
+        "description": "A simple audio file format from Sun Microsystems. A short header is followed by audio data, often 8-bit mu-law encoded.",
+        "details": [
+          "short header",
+          "mu-law or PCM data",
+          "simple structure",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AU to MP3",
+      "points": [
+        "MP3 is lossy, so the result is not identical to the AU's samples.",
+        "The sample rate is not changed, so a low-sample-rate AU gives a low-bitrate MP3.",
+        "You cannot choose a bitrate on this page.",
+        "A single Audacity block file is a piece of a project, not the project."
+      ]
+    },
+    "guide": {
+      "title": "About AU files",
+      "markdown": "### What is an AU file?\n\nAU is a simple audio format from Sun Microsystems, also called Sun or NeXT audio. Sun's published specification describes a fixed header, an annotation area and the audio samples. A file starts with the four-byte signature .snd. In the header you find the encoding, the sample rate and the number of channels, and multibyte numbers are big-endian.\n\nThe defined encodings include linear PCM, mu-law, A-law, floating point and ADPCM. Eight-bit mu-law is often used. People meet AU as Unix and Java system sounds and as legacy audio.\n\nFFmpeg uses audio/basic as the media label for its Sun AU writer. IANA's audio/basic definition describes mono eight-bit mu-law at 8 kHz, which is narrower than the full set of AU encodings.\n\n### Programs that open AU files\n\n**Windows, Mac and Linux**\n\n- Audacity: imports AU audio without adding the optional FFmpeg library.\n- Praat: reads supported NeXT and Sun encodings with Read from file.\n\n### AU and MP3 compared\n\n- **Structure**: an AU is a short header followed by samples. An MP3 is a stream of lossy compressed audio.\n- **Compression**: AU data is often mu-law or PCM. MP3 is always lossy.\n- **Metadata**: AU keeps notes in an annotation area, while MP3 relies on ID3 tags.\n- **Reach**: nearly every device plays MP3. AU is handled by Audacity, VLC media player and QuickTime Player.\n\nThe page decodes the AU with FFmpeg and encodes the result with its LAME MP3 encoder.\n\n### Other ways to convert AU to MP3\n\n- **Audacity:** open the AU with File > Open or File > Import > Audio, check that it plays, then choose File > Export Audio and pick MP3 in the Format list.\n- **FFmpeg:** run ffmpeg -i interview.au -c:a libmp3lame -b:a 128k interview-listen.mp3. FFmpeg lists Sun AU among the formats it reads.\n\n### Problems with AU files\n\n- **An old Audacity project is silent**: such a project needs its associated audio files in the places it expects them.\n- **More than two channels**: the specification allows more than two interleaved channels, but some applications cannot handle them.\n- **Clipping after a Praat export**: Praat's Sun export quantizes samples to 16-bit mono, so keep amplitudes below one.\n"
+    }
+  },
+  "avif-to-tiff": {
+    "seo": {
+      "title": "Convert AVIF to TIFF Online (Free)",
+      "h1": "AVIF to TIFF Converter",
+      "description": "Convert an AVIF image to TIFF in your browser. Only the pixels carry over, so EXIF, ICC profiles and XMP are left out. Free, no sign-up.",
+      "howToHeading": "How to convert AVIF to TIFF"
+    },
+    "tool": {
+      "subtitle": "Turn an AVIF into a TIFF for print or editing software that can't read AVIF."
+    },
+    "faqs": [
+      {
+        "question": "Why convert AVIF to TIFF?",
+        "answer": "AVIF is built for small web images, while TIFF is used for scanning, archiving and print. A program that can't read AVIF can still open a TIFF."
+      },
+      {
+        "question": "Will an animated AVIF become a TIFF sequence?",
+        "answer": "No. An animated file gives its first frame only, and you download one TIFF."
+      },
+      {
+        "question": "What about 10-bit or 12-bit AVIF?",
+        "answer": "The page passes pixels through at 8 bits per channel, which means extra depth in the source does not reach the TIFF."
+      },
+      {
+        "question": "Does the TIFF carry over metadata?",
+        "answer": "No. Only pixels pass through the page, so the TIFF has no EXIF, ICC profile or XMP data."
+      },
+      {
+        "question": "What if my browser can't show AVIF?",
+        "answer": "The page decodes the AVIF with your browser's own decoder. A browser without one shows a message asking you to switch to a newer browser."
+      },
+      {
+        "question": "Will the TIFF look better than the AVIF?",
+        "answer": "No. AVIF can use lossy compression, and a TIFF made from it cannot restore detail that compression already removed."
+      },
+      {
+        "question": "Can I add more than one AVIF?",
+        "answer": "Yes. Select as many AVIF files as you like and the page turns each into its own TIFF download, one after the other."
+      },
+      {
+        "question": "Is my file sent anywhere?",
+        "answer": "No. Decoding and encoding both happen in your browser, so the image is never sent anywhere."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and TIFF",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container. It supports lossy and lossless compression, HDR and transparency.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "HDR and wide color gamut",
+          "10-bit and 12-bit depth"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "lossless or lossy compression",
+          "multiple pages in one file",
+          "high bit depth",
+          "CMYK support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVIF to TIFF",
+      "points": [
+        "Only the first frame of an animated AVIF is converted.",
+        "Extra bit depth in the AVIF is lost.",
+        "EXIF, ICC profiles and XMP are not copied.",
+        "Each file you choose becomes its own TIFF."
+      ]
+    },
+    "guide": {
+      "title": "About AVIF files",
+      "markdown": "### What is an AVIF file?\n\nAVIF, from the Alliance for Open Media, is the AV1 Image File Format. It places AV1-compressed pictures inside a HEIF container, with lossy or lossless compression, transparency, HDR, wide color gamut and 10-bit or 12-bit depth. Web images with small files and HDR images are its main uses. The registered media type is image/avif, and a file can carry Exif, XMP and an ICC color profile. The format is royalty-free, though decoding an AVIF is slow and an encoder can need several seconds per picture.\n\n### Programs that open AVIF files\n\n**Windows, macOS and Linux**\n\n- GIMP: import and export arrived in GIMP 2.10.22.\n- ImageMagick: reads AVIF.\n\n**Web**\n\n- Google Chrome: decoding arrived in Chrome 85.\n- Mozilla Firefox: Firefox 93 added AVIF image support.\n\n**Mobile**\n\n- Chrome for Android: use a release with AVIF decoding.\n- Safari: iOS 16 added still AVIF images.\n\n### AVIF and TIFF compared\n\n- **Compression**: AVIF uses AV1 for lossy or lossless images. TIFF offers a long list of methods, both lossless and lossy.\n- **Depth**: AVIF channels can be 10 or 12 bits, and TIFF handles high bit depth and CMYK.\n- **Pages**: a TIFF can hold multiple images in one file.\n- **Use**: AVIF suits the web, while TIFF suits scanning, archiving and print.\n- **Support**: Chrome, Firefox, Safari and GIMP open AVIF, while Photoshop, GIMP, Windows Photos and Preview open TIFF.\n\n### Other ways to convert AVIF to TIFF\n\n- **GIMP:** load the AVIF, go to File > Export As, give the name a .tiff ending and press Export. The TIFF dialog covers compression and metadata.\n- **libheif:** run heif-dec artwork.avif artwork.tiff. The tool writes TIFF only when it was built with TIFF support.\n- **ImageMagick:** run magick artwork.avif working-copy.tiff.\n\n### Problems with AVIF files\n\n- **A browser shows nothing**: older browsers may fail to display AVIF, so offer a JPEG, PNG or WebP fallback on a web page.\n- **GIMP will not open it**: older GIMP releases lack the AVIF importer.\n- **Windows shows nothing**: viewing .avif files on Windows needs Microsoft's AV1 Video Extension alongside the HEIF Image Extension.\n- **A phone app rejects it**: from Android 12, devices decode baseline 8-bit AVIF, while 10-bit decoding is optional.\n"
+    }
+  },
+  "bmp-to-gif": {
+    "seo": {
+      "title": "Convert BMP to GIF Online (Free)",
+      "h1": "BMP to GIF Converter",
+      "description": "Convert a BMP bitmap to a GIF in your browser. The GIF is one still frame with a limited palette, so a full-color BMP loses colors. Free, no sign-up.",
+      "howToHeading": "How to convert BMP to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn a bitmap into a single-frame GIF that every browser shows."
+    },
+    "faqs": [
+      {
+        "question": "Will the GIF be animated?",
+        "answer": "A BMP is a single picture, so the GIF has a single frame. No motion is added."
+      },
+      {
+        "question": "Does the GIF keep all my colors?",
+        "answer": "Not if the BMP has more than 256. A BMP stores 1 to 32 bits per pixel, while a GIF frame holds a palette of at most 256 colors."
+      },
+      {
+        "question": "Why is my BMP file so large?",
+        "answer": "Pixels in a BMP are usually stored raw, even though a lossless compression option exists, which makes the files bulky."
+      },
+      {
+        "question": "Does the metadata survive?",
+        "answer": "No. Only the pixels make the trip, so EXIF, ICC and XMP data do not reach the GIF. A version 5 BMP can record an ICC profile, which the GIF will not have."
+      },
+      {
+        "question": "Is a PNG better than a GIF for a still?",
+        "answer": "A PNG keeps lossless 8-bit and 16-bit channels with alpha transparency, while a GIF frame has 256 colors and 1-bit transparency. Choose GIF when a site or app asks for it."
+      },
+      {
+        "question": "How is the file converted?",
+        "answer": "Your browser decodes the BMP, and ImageMagick writes the GIF from the pixels. Both steps run in your browser tab, so nothing is uploaded."
+      },
+      {
+        "question": "Can I convert several BMP files at once?",
+        "answer": "Yes. Pick several bitmaps at once; each becomes a separate GIF download, handled in turn."
+      },
+      {
+        "question": "What is the GIF called?",
+        "answer": "It takes the BMP's name and ends in .gif, so diagram.bmp downloads as diagram.gif. The BMP itself is not touched."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and GIF",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster image format introduced with Microsoft Windows that stores pixel data, usually uncompressed. It is simple to read and write but produces large files.",
+        "details": [
+          "usually uncompressed",
+          "1 to 32 bits per pixel",
+          "optional run-length compression",
+          "large files"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to GIF",
+      "points": [
+        "The GIF is one still frame.",
+        "A GIF frame holds at most 256 colors, so a BMP with more colors loses some.",
+        "EXIF, ICC profiles and XMP are not copied.",
+        "Each file you choose becomes its own GIF."
+      ]
+    },
+    "guide": {
+      "title": "About BMP files",
+      "markdown": "### What is a BMP file?\n\nBMP stands for Windows Bitmap. Microsoft controls this family of raster formats, which Windows and OS/2 used from the start. Windows 98 shipped in 1998 with version 5, which gained an alpha channel and ICC profile support. A BMP commonly stores uncompressed pixels, though lossless compression is available, and it can use 1 to 32 bits per pixel.\n\nPeople often meet BMP through Windows screenshots and the graphics Windows itself uses. The media type image/bmp is the one registered for it.\n\nA file opens with the two bytes BM for Windows, then a 14-byte file header and a DIB header that comes in several versions. The color table is mandatory at 8 bits per pixel or fewer, and 16 and 32 bit images are always uncompressed.\n\n### Programs that open BMP files\n\n**Windows, macOS and Linux**\n\n- ImageMagick: reads and writes BMP.\n- XnView MP: counts BMP among its supported formats, with a license needed for company use.\n\n**Web**\n\n- Mozilla Firefox: shows BMP pictures in web content.\n- Google Chrome: handles BMP images, per Mozilla's browser compatibility table.\n\n### BMP and GIF compared\n\n- **Compression**: a BMP is usually uncompressed. A GIF compresses with LZW, without loss.\n- **Colors**: a BMP pixel uses 1 to 32 bits, whereas each GIF frame draws on no more than 256 colors.\n- **Transparency**: BMP version 5 can hold an alpha channel. GIF has 1-bit transparency.\n- **Animation**: a BMP is one picture, and GIF supports simple animation.\n- **Origin**: Microsoft introduced BMP with Windows. CompuServe introduced GIF in 1987.\n\nIn this converter a browser-side decode of the BMP feeds ImageMagick, which writes one GIF frame.\n\n### Other ways to convert BMP to GIF\n\n- **ImageMagick:** run magick diagram.bmp diagram-share.gif. ImageMagick lists GIF with up to 256 palette entries.\n\n### Problems with BMP files\n\n- **The file is bulky**: uncompressed pixels make a BMP heavy, and PNG or JPEG can suit distribution better.\n- **An older program refuses it**: some programs expect the older bitmap header, and for them ImageMagick can write BMP3 or BMP2 instead of the default.\n- **Vector shapes are gone**: a BMP does not keep editable vector shapes or live type.\n"
+    }
+  },
+  "dds-to-jpeg": {
+    "seo": {
+      "title": "Convert DDS to JPEG Online (Free)",
+      "h1": "DDS to JPEG Converter",
+      "description": "Convert a DDS game texture to JPEG in your browser. ImageMagick reads one picture from the file and you download a JPEG. Free, no sign-up.",
+      "howToHeading": "How to convert DDS to JPEG"
+    },
+    "tool": {
+      "subtitle": "Preview a DDS game texture as a JPEG picture that any app opens."
+    },
+    "faqs": [
+      {
+        "question": "Why can't I view my DDS texture?",
+        "answer": "DDS is a texture format for games and graphics cards. It opens in GIMP, Paint.NET and XnView MP, and in Photoshop with a plugin. A JPEG opens in any browser."
+      },
+      {
+        "question": "Does the JPEG include every mipmap and cube face?",
+        "answer": "No. A DDS may hold a mipmap chain, cube maps and volume textures, but the page writes one JPEG from one picture in the file."
+      },
+      {
+        "question": "What happens to transparency?",
+        "answer": "A JPEG cannot store transparency, so a transparent texture loses it."
+      },
+      {
+        "question": "Can I use the JPEG in a game?",
+        "answer": "It is a preview. A JPEG has no mipmaps, no cube faces and no GPU block compression, so it does not replace the DDS."
+      },
+      {
+        "question": "What is the JPEG called?",
+        "answer": "It keeps the DDS name with a .jpeg ending, so albedo.dds downloads as albedo.jpeg. The DDS itself is not touched."
+      },
+      {
+        "question": "Will compression artifacts appear?",
+        "answer": "JPEG is a lossy format, so artifacts can show up, and the page picks no quality setting of its own."
+      },
+      {
+        "question": "Can I convert several DDS files at once?",
+        "answer": "Yes. Choose several textures at once and you get a separate JPEG for each, made in turn."
+      },
+      {
+        "question": "Does the texture get uploaded?",
+        "answer": "No. The texture is read by ImageMagick inside the page and is never sent to a server."
+      }
+    ],
+    "aboutSection": {
+      "title": "DDS and JPEG",
+      "fromFormat": {
+        "name": "DDS",
+        "fullName": "DirectDraw Surface",
+        "description": "A Microsoft container format for textures and cubemaps, originally from DirectX. It commonly stores GPU-compressed data in the DXT/BC block formats, with optional mipmaps.",
+        "details": [
+          "GPU block compression (DXT/BC)",
+          "mipmaps",
+          "cubemaps",
+          "alpha channel"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DDS to JPEG",
+      "points": [
+        "One JPEG is written from one picture in the file.",
+        "JPEG has no alpha channel, so transparency has nothing to be kept in.",
+        "The JPEG is a preview and does not replace the DDS in a game.",
+        "Each file you choose becomes its own JPEG."
+      ]
+    },
+    "guide": {
+      "title": "About DDS files",
+      "markdown": "### What is a DDS file?\n\nDirectDraw Surface, abbreviated DDS, is Microsoft's texture container, first made for DirectX and used for cubemaps too. Inside, the data may be plain pixels or compressed texture blocks, and the DXT or BC block formats meant for GPUs are common. Game textures and other GPU-ready assets are its typical uses.\n\nBeside the largest surface a file may carry a chain of mipmaps, and cube maps and volume textures also fit. With Direct3D 10 and 11 came an extra header that adds texture arrays. This DX10 header can name formats the original pixel-format structure cannot express.\n\n### Programs that open DDS files\n\n**Windows, macOS and Linux**\n\n- GIMP: built-in DDS support arrived in GIMP 2.10.10.\n- ImageMagick: reads and writes DDS, including documented DXT compression and mipmap options.\n\n### DDS and JPEG compared\n\n- **Purpose**: a DDS is a texture container for graphics hardware. A JPEG is a photographic image format.\n- **Compression**: a DDS commonly uses DXT or BC blocks. A JPEG is lossy with an adjustable quality.\n- **Extras**: a DDS can hold mipmaps and cube maps. A JPEG is one image.\n- **Alpha**: a DDS can have an alpha channel. A JPEG has none.\n- **Support**: JPEG opens everywhere.\n\nThe page has ImageMagick read a single picture from the DDS and write it out as a JPEG.\n\n### Other ways to convert DDS to JPEG\n\n- **texconv:** run texconv -ft jpg review-texture.dds. This Microsoft DirectXTex tool takes a DDS as input, and -ft sets the output file type.\n- **GIMP:** open the DDS, then choose File > Export As, use a .jpeg ending and click Export. The JPEG dialog offers a quality value from 0 to 100, and JPEG cannot hold transparency or multiple layers.\n- **ImageMagick:** run magick review-texture.dds texture-report.jpeg. ImageMagick lists DDS with DXT and mipmap support.\n\n### Problems with DDS files\n\n- **A reader refuses it**: tools that reject the DX10 extension may accept a legacy RGB or DXT1 to DXT5 header instead.\n- **The header is truncated**: a plain DDS header takes at least 128 bytes, and 148 with the DX10 extension.\n- **The texture looks scrambled**: a wrong pitch value can throw off how a reader interprets scan lines, so compute it for the stored format.\n"
+    }
+  },
+  "dng-to-tiff": {
+    "seo": {
+      "title": "Convert DNG to TIFF Online (Free)",
+      "h1": "DNG to TIFF Converter",
+      "description": "Convert a DNG raw photo to TIFF in your browser. ImageMagick develops one picture with default settings and no controls. Free, no sign-up.",
+      "howToHeading": "How to convert DNG to TIFF"
+    },
+    "tool": {
+      "subtitle": "Develop a DNG raw photo into a TIFF with default settings, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the TIFF still raw?",
+        "answer": "No. A DNG holds sensor data, and the TIFF holds a picture developed from it, so you cannot develop it again as a raw file. In a test with a sample DNG, the TIFF came out at 16 bits per channel. Keep the DNG for raw work."
+      },
+      {
+        "question": "Can I set white balance or exposure?",
+        "answer": "No. The page has no development controls, so ImageMagick develops the file with default settings. For control, develop in darktable and export a TIFF there."
+      },
+      {
+        "question": "Why convert a DNG to TIFF?",
+        "answer": "Preview, Windows Photos, GIMP and Photoshop open a TIFF without a raw developer, while the DNG stays the raw original. TIFF is also a long-standing choice for high-bit-depth work and preservation master files."
+      },
+      {
+        "question": "Which DNG files can't be converted?",
+        "answer": "A JPEG XL or GoPro DNG can't be decoded here, and the page says so."
+      },
+      {
+        "question": "What does the truncated-file message mean?",
+        "answer": "If the page reports that the file stops before its picture is complete, the data ends early and the file may be incomplete."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "From roughly 537 megapixels upward the page declines the raw file, because the picture is beyond what the page can convert."
+      },
+      {
+        "question": "Can I develop more than one DNG at a time?",
+        "answer": "Yes. Choose a handful of DNG files together and each is developed in turn into a TIFF of its own."
+      },
+      {
+        "question": "Is the DNG sent to a server?",
+        "answer": "No. ImageMagick develops the file in your browser, and nothing is sent to a server."
+      }
+    ],
+    "aboutSection": {
+      "title": "DNG and TIFF",
+      "fromFormat": {
+        "name": "DNG",
+        "fullName": "Digital Negative",
+        "description": "An open raw image format published by Adobe in 2004 as a single documented alternative to the many proprietary raw formats. It is based on TIFF/EP.",
+        "details": [
+          "unprocessed sensor data",
+          "publicly documented specification",
+          "TIFF-based structure",
+          "optional lossless compression"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "lossless or lossy compression",
+          "multiple pages in one file",
+          "high bit depth",
+          "CMYK support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DNG to TIFF",
+      "points": [
+        "The TIFF is a developed picture, not raw data.",
+        "The page has no controls for white balance, exposure or noise.",
+        "JPEG XL and GoPro DNG files can't be decoded here.",
+        "Each file you choose becomes its own TIFF."
+      ]
+    },
+    "guide": {
+      "title": "About DNG files",
+      "markdown": "### What is a DNG file?\n\nDNG stands for Digital Negative. Adobe published it in September 2004 as one documented format for camera-raw data, in place of the many proprietary raw formats. Its design adds to the TIFF family the tags needed to make sense of raw photographs. A DNG can store mosaic sensor data or a demosaiced linear representation, and it may use lossless JPEG compression for the raw samples. Exif metadata can accompany the image data.\n\nPhotographers use DNG to archive raw photos and to move them between raw editors. Some phones and cameras write DNG directly. Adobe offers DNG Converter to translate supported proprietary raw files into DNG.\n\n### Programs that open DNG files\n\n**Windows, macOS and Linux**\n\n- darktable: imports DNG. Decoding limitations still apply to some files.\n- ImageMagick: reads DNG, and the dng: prefix selects the format explicitly.\n\n**Windows and Mac**\n\n- Adobe Camera Raw: Adobe's raw processing workflow includes DNG support.\n\n### DNG and TIFF compared\n\n- **Content**: a DNG holds unprocessed sensor data or a linear representation. A TIFF holds a finished raster.\n- **Structure**: both are tag-based, since DNG extends the TIFF family.\n- **Compression**: DNG may compress raw samples losslessly, while TIFF offers many methods, lossless or lossy.\n- **Depth**: high bit depth and CMYK are part of what TIFF supports.\n- **Support**: Lightroom, Photoshop, darktable and RawTherapee open DNG, and TIFF is read by Preview, Windows Photos, GIMP and Photoshop.\n\nHere ImageMagick develops one picture from the DNG with default settings and writes it as a TIFF.\n\n### Other ways to convert DNG to TIFF\n\n- **darktable:** import the DNG and develop it. Open the export module and choose file on disk for the target storage, then select TIFF as the format and tune bit depth, compression, profile and size before you export.\n- **ImageMagick:** run magick dng:negative.dng developed.tiff. The dng: prefix names the format.\n\n### Problems with DNG files\n\n- **Sensor layout is not recognized**: a DNG can be valid and still use a sensor pattern some readers cannot handle, and darktable lists limits for non-Bayer sensors.\n- **A linear DNG is different**: its data is already demosaiced, so it cannot stand in for untouched sensor-mosaic samples.\n"
+    }
+  }
+}

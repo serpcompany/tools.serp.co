@@ -1,0 +1,251 @@
+{
+  "tools": {
+    "gsm-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i message.gsm -c:a libmp3lame -b:a 192k message.mp3",
+          "limits": "The -b:a option sets the bitrate for libmp3lame.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "FFmpeg, variable bitrate",
+          "steps": "ffmpeg -i message.gsm -c:a libmp3lame -q:a N message.mp3",
+          "limits": "The libmp3lame q option sets a constant quality for variable bitrate; N is a quality number.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "SoX",
+          "steps": "sox message.gsm message.mp3",
+          "limits": "GSM and MP3 support are optional in SoX; MP3 writing needs the LAME library.",
+          "source": "https://manpages.debian.org/bookworm/sox/soxformat.7.en.html",
+          "supportSources": [
+            "https://manpages.debian.org/bookworm/sox/sox.1.en.html"
+          ]
+        }
+      ]
+    },
+    "hdr-to-jpg": {
+      "methods": [
+        {
+          "app": "Radiance and ImageMagick",
+          "steps": "pcond scene.hdr mapped.hdr; ra_ppm mapped.hdr mapped.ppm; magick mapped.ppm preview.jpg",
+          "limits": "Requires installed Radiance and ImageMagick.",
+          "source": "https://radsite.lbl.gov/radiance/man_html/pcond.1.html",
+          "supportSources": [
+            "https://radsite.lbl.gov/radiance/man_html/ra_ppm.1.html",
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick scene.hdr -colorspace sRGB preview.jpg",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/",
+            "https://imagemagick.org/command-line-options/#colorspace"
+          ]
+        }
+      ]
+    },
+    "jfif-to-svg": {
+      "methods": [
+        {
+          "app": "Inkscape embedding",
+          "steps": "File > Import; choose Embed rather than Link; File > Save As; Inkscape SVG.",
+          "limits": "Embeds pixels rather than producing editable outlines.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/import-pictures.html",
+          "supportSources": [
+            "https://inkscape-manuals.readthedocs.io/en/latest/export-other-formats.html"
+          ]
+        },
+        {
+          "app": "Inkscape tracing",
+          "steps": "File > Import; select the picture; Path > Trace Bitmap; save as SVG.",
+          "limits": "The manual says a trace suits dark silhouettes against a bright background and warns against expecting a 100% faithful representation.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html",
+          "supportSources": [
+            "https://inkscape-manuals.readthedocs.io/en/latest/export-other-formats.html"
+          ]
+        },
+        {
+          "app": "Photopea",
+          "steps": "File > Open; File > Export As > SVG.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        }
+      ]
+    },
+    "jpg-to-cur": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPG; File > Export As; end the name in .cur; Export; set Hot spot X and Hot spot Y in the Windows Cursor export dialog.",
+          "source": "https://docs.gimp.org/3.2/en/file-cur-export.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.2/en/gimp-export-dialog.html"
+          ]
+        }
+      ]
+    },
+    "jps-to-pdf": {
+      "methods": [
+        {
+          "app": "Pillow",
+          "steps": "In Python, import Image from PIL, call Image.open on the JPS, and call save with a file name ending in .pdf.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSources": [
+            "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick stereo.jps stereo.pdf",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "mp3-to-amr": {
+      "methods": [
+        {
+          "app": "FFmpeg with external AMR-NB encoder",
+          "steps": "ffmpeg -i song.mp3 -codec:a libopencore_amrnb -b:a 12.2k -ar 8000 -ac 1 voice.amr",
+          "limits": "The build must be configured with --enable-libopencore-amrnb and --enable-version3.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "SoX with AMR-NB writing support",
+          "steps": "sox song.mp3 -t amr-nb -C 7 -c 1 -r 8000 voice.amr",
+          "limits": "-C 7 is mode 7, 12.2 kbit/s; AMR-NB uses a fixed 8 kHz rate.",
+          "source": "https://manpages.debian.org/bookworm/sox/soxformat.7.en.html",
+          "supportSources": [
+            "https://manpages.debian.org/bookworm/sox/sox.1.en.html"
+          ]
+        },
+        {
+          "app": "Switch Sound File Converter",
+          "steps": "Add the MP3 with the Add button or File > Add; set Output Format to AMR; press Convert.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/switch/win/switchformats.html"
+          ]
+        }
+      ]
+    },
+    "mp3-to-mp2": {
+      "methods": [
+        {
+          "app": "FFmpeg native MP2",
+          "steps": "ffmpeg -i track.mp3 -c:a mp2 -b:a 192k track.mp2",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "FFmpeg libtwolame",
+          "steps": "ffmpeg -i track.mp3 -c:a libtwolame -b:a 192k track.mp2",
+          "limits": "The libtwolame encoder is a TwoLAME MP2 encoder wrapper.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "Audacity",
+          "steps": "Open the MP3; File > Export Audio; Format: MP2; set Bit Rate; Export.",
+          "limits": "Bit rates run from 16 to 384 kbps; the default is 160.",
+          "source": "https://manual.audacityteam.org/man/mp2_export_options.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/file_export_dialog.html"
+          ]
+        }
+      ]
+    },
+    "mp4-to-avchd": {
+      "methods": [
+        {
+          "app": "FFmpeg transcode to an H.264/AC-3 transport stream",
+          "steps": "ffmpeg -i clip.mp4 -f mpegts -mpegts_m2ts_mode 1 -c:a ac3 -c:v libx264 clip.m2ts",
+          "limits": "-mpegts_m2ts_mode 1 enables m2ts mode.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "FFmpeg conditional remux",
+          "steps": "ffmpeg -i clip.mp4 -c copy -mpegts_m2ts_mode 1 -f mpegts clip.m2ts",
+          "limits": "Copies the streams; suits an MP4 whose codecs already fit AVCHD.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "tsMuxer AVCHD authoring",
+          "steps": "Create a meta file: first line MUXOPT --avchd; then V_MPEG4/ISO/AVC, clip.mp4, track=1; then A_AC3, clip.mp4, track=2; set track to each stream's number in the MP4. Run tsMuxeR project.meta avchd-output.",
+          "limits": "Input streams must already suit the target; the muxer does not transcode.",
+          "source": "https://github.com/justdan96/tsMuxer/blob/master/docs/USAGE.md",
+          "supportSources": [
+            "https://github.com/justdan96/tsMuxer"
+          ]
+        }
+      ]
+    },
+    "mp4-to-mxf": {
+      "methods": [
+        {
+          "app": "FFmpeg generic MXF",
+          "steps": "ffmpeg -i clip.mp4 -ar 48000 -b:v 2000k -c:a pcm_s16le -r 25 -c:v mpeg2video -ac 2 -pix_fmt yuv422p -f mxf clip.mxf",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "FFmpeg MXF OP-Atom",
+          "steps": "ffmpeg -i clip.mp4 -an -c:v mpeg2video -b:v 4M -f mxf_opatom clip.mxf",
+          "limits": "The -an option drops the audio, so the file is video only.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        }
+      ]
+    },
+    "pcx-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick drawing.pcx drawing.png",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        },
+        {
+          "app": "Pillow",
+          "steps": "In Python, import Image from PIL, call Image.open on the PCX, and call save with a file name ending in .png.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSources": [
+            "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+          ]
+        }
+      ]
+    }
+  }
+}
