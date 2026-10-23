@@ -1,0 +1,778 @@
+{
+  "formats": {
+    "bmp": {
+      "background": [
+        {
+          "fact": "Microsoft controls the BMP raster image family, used originally on Windows and OS/2.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000189.shtml"
+        },
+        {
+          "fact": "BMP version 5 arrived with Windows 98 in 1998.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000189.shtml"
+        },
+        {
+          "fact": "BMP commonly stores uncompressed pixels, although lossless compression is available.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000189.shtml"
+        },
+        {
+          "fact": "Version 5 can record an ICC profile and an alpha channel.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000189.shtml"
+        },
+        {
+          "fact": "BMP is commonly encountered in Windows screen captures and system graphics.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000189.shtml"
+        },
+        {
+          "fact": "The registered BMP media type is image/bmp.",
+          "source": "https://www.iana.org/assignments/media-types/image/bmp"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads BMP images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists BMP among supported image formats; company use requires a license.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads BMP images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists BMP among supported image formats; company use requires a license.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads BMP images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists BMP among supported image formats; company use requires a license.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Mozilla Firefox",
+            "note": "Displays BMP pictures in browser content.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Google Chrome",
+            "note": "Supports BMP images according to Mozilla’s browser compatibility table.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "An uncompressed BMP can be bulky; PNG or JPEG may be more practical for distribution.",
+          "source": "https://www.iana.org/assignments/media-types/image/bmp"
+        },
+        {
+          "fact": "A program expecting an older bitmap header may need BMP3 or BMP2 output rather than the default BMP version.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "fact": "A BMP does not preserve editable vector shapes or live typography.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000189.shtml"
+        }
+      ]
+    },
+    "ico": {
+      "background": [
+        {
+          "fact": "ICO is Microsoft's image format for graphical interface icons.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.microsoft.icon"
+        },
+        {
+          "fact": "The file may contain more than one image.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.microsoft.icon"
+        },
+        {
+          "fact": "ICO files use little-endian byte ordering.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.microsoft.icon"
+        },
+        {
+          "fact": "The registered media type is image/vnd.microsoft.icon.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.microsoft.icon"
+        },
+        {
+          "fact": "The .ico extension is widely associated with website favicons.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.microsoft.icon"
+        },
+        {
+          "fact": "Windows Vista icon guidance includes 256-by-256 images for high-DPI displays.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/uxguide/vis-icons"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads ICO images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists ICO among supported image formats; company use requires a license.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads ICO images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists ICO among supported image formats; company use requires a license.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads ICO images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists ICO among supported image formats; company use requires a license.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Mozilla Firefox",
+            "note": "Displays ICO pictures in browser content.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Google Chrome",
+            "note": "Supports ICO images according to Mozilla’s browser compatibility table.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Malformed image offsets can confuse an ICO reader; an invalid header is different from a missing file association.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.microsoft.icon"
+        },
+        {
+          "fact": "A small icon enlarged for a high-DPI display may look soft; include a suitable larger image in the icon.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/uxguide/vis-icons"
+        },
+        {
+          "fact": "An ICO may contain multiple images, so check its variants instead of assuming the first preview is the only image.",
+          "source": "https://www.xnview.com/en/xnview/"
+        }
+      ]
+    },
+    "wmv": {
+      "background": [
+        {
+          "fact": "A .wmv file uses the ASF container with Windows Media coded content.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/wmformat/overview-of-the-asf-format"
+        },
+        {
+          "fact": "ASF was designed for synchronized media storage and network delivery.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/wmformat/overview-of-the-asf-format"
+        },
+        {
+          "fact": "The container can accommodate audio and video streams.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/wmformat/overview-of-the-asf-format"
+        },
+        {
+          "fact": "ASF supports delivery from a local disk or an HTTP server.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/wmformat/overview-of-the-asf-format"
+        },
+        {
+          "fact": "WMV files can use Windows Media Video 7, 8, or 9 compression.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000091.shtml"
+        },
+        {
+          "fact": "The Library of Congress records video/x-ms-wmv as a commonly used media type, rather than an IANA registration.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000091.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Lists ASF/WMV input and Windows Media Video 1, 2, and 9 decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play WMV input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Lists ASF/WMV input and Windows Media Video 1, 2, and 9 decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play WMV input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Lists ASF/WMV input and Windows Media Video 1, 2, and 9 decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play WMV input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "The Android port includes the desktop player's media decoding features.",
+            "source": "https://www.videolan.org/vlc/download-android.html"
+          },
+          {
+            "app": "VLC for iOS",
+            "note": "Plays local media using VLC's player rather than requiring conversion through the system player.",
+            "source": "https://www.videolan.org/vlc/download-ios.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A player's decoder coverage matters: FFmpeg lists its Windows Media Video 9 decoder as not completely working.",
+          "source": "https://ffmpeg.org/general.html"
+        },
+        {
+          "fact": "Image fidelity depends on the codec and compression settings, so the WMV ending alone does not establish quality.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000091.shtml"
+        },
+        {
+          "fact": "Reading ASF and decoding its video are separate capabilities; a compatible container reader does not guarantee every codec is present.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/medfound/supported-media-formats-in-media-foundation"
+        }
+      ]
+    },
+    "flac": {
+      "background": [
+        {
+          "fact": "FLAC compresses integer PCM audio without discarding sample information.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9639.html"
+        },
+        {
+          "fact": "Its specification is open, and its reference implementation is open source.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9639.html"
+        },
+        {
+          "fact": "RFC 9639 standardized the format description in December 2024.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9639.html"
+        },
+        {
+          "fact": "The format supports one through eight channels and sample depths from four through 32 bits.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9639.html"
+        },
+        {
+          "fact": "A native FLAC stream uses the audio/flac media type.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9639.html"
+        },
+        {
+          "fact": "FLAC metadata can include seek points, pictures, and Vorbis comments.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9639.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Audacity",
+            "note": "Imports FLAC directly without the optional FFmpeg library.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Lists FLAC as an input format and a decoded audio codec.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play FLAC input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Audacity",
+            "note": "Imports FLAC directly without the optional FFmpeg library.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Lists FLAC as an input format and a decoded audio codec.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play FLAC input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Audacity",
+            "note": "Imports FLAC directly without the optional FFmpeg library.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Lists FLAC as an input format and a decoded audio codec.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play FLAC input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [
+          {
+            "app": "Mozilla Firefox",
+            "note": "Decodes FLAC audio; the documented native container is supported.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Audio_codecs"
+          },
+          {
+            "app": "Google Chrome",
+            "note": "FLAC decoding is listed in Mozilla’s browser support comparison.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Audio_codecs"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "The Android port includes the desktop player's media decoding features.",
+            "source": "https://www.videolan.org/vlc/download-android.html"
+          },
+          {
+            "app": "VLC for iOS",
+            "note": "Plays local media using VLC's player rather than requiring conversion through the system player.",
+            "source": "https://www.videolan.org/vlc/download-ios.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A damaged frame can fail its checksum; lossless encoding does not prevent storage corruption.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9639.html"
+        },
+        {
+          "fact": "Changing a lossy source to FLAC cannot recreate the audio samples that were removed earlier.",
+          "source": "https://www.rfc-editor.org/rfc/rfc9639.html"
+        },
+        {
+          "fact": "Android's documented native FLAC support is narrower than the format: mono or stereo audio, with 16-bit samples recommended.",
+          "source": "https://developer.android.com/media/platform/supported-formats"
+        }
+      ]
+    },
+    "webm": {
+      "background": [
+        {
+          "fact": "The WebM Project promotes an open media format intended for web delivery.",
+          "source": "https://www.webmproject.org/about/"
+        },
+        {
+          "fact": "The container is based on Matroska.",
+          "source": "https://www.webmproject.org/about/"
+        },
+        {
+          "fact": "WebM combines VP8 or VP9 video with Vorbis or Opus audio.",
+          "source": "https://www.webmproject.org/about/"
+        },
+        {
+          "fact": "The project supplies its format technology under royalty-free terms.",
+          "source": "https://www.webmproject.org/about/"
+        },
+        {
+          "fact": "WebM video uses video/webm; an audio-only WebM uses audio/webm.",
+          "source": "https://www.webmproject.org/docs/container/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Reads Matroska-family media; codec support must match the WebM streams.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play WEBM input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Reads Matroska-family media; codec support must match the WebM streams.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play WEBM input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Reads Matroska-family media; codec support must match the WebM streams.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play WEBM input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [
+          {
+            "app": "Safari on macOS",
+            "note": "Safari 14.1 added WebM files with VP8/VP9 video and Vorbis sound.",
+            "source": "https://webkit.org/blog/11648/new-webkit-features-in-safari-14-1/"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "The Android port includes the desktop player's media decoding features.",
+            "source": "https://www.videolan.org/vlc/download-android.html"
+          },
+          {
+            "app": "VLC for iOS",
+            "note": "Plays local media using VLC's player rather than requiring conversion through the system player.",
+            "source": "https://www.videolan.org/vlc/download-ios.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Browser playback depends on the actual video and audio codecs, rather than the WebM suffix alone.",
+          "source": "https://www.webmproject.org/docs/container/"
+        },
+        {
+          "fact": "A missing cue index can make seeking less efficient because the player has less direct location information.",
+          "source": "https://www.webmproject.org/docs/container/"
+        },
+        {
+          "fact": "Older Safari behavior should not be generalized to current releases: Safari 14.1 added macOS playback for WebM with VP8 or VP9 and Vorbis.",
+          "source": "https://webkit.org/blog/11648/new-webkit-features-in-safari-14-1/"
+        }
+      ]
+    },
+    "mpeg": {
+      "background": [
+        {
+          "fact": "MPEG-2 was developed for compressed television delivery and later adopted for DVDs.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000335.shtml"
+        },
+        {
+          "fact": "MPEG systems organize coded picture, sound, and data as streams.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000335.shtml"
+        },
+        {
+          "fact": "An elementary stream represents one coded media component.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000335.shtml"
+        },
+        {
+          "fact": "Packetized elementary streams divide those components into packets.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000335.shtml"
+        },
+        {
+          "fact": "The .mpeg and .mpg suffixes are both used for MPEG video files.",
+          "source": "https://support.microsoft.com/en-us/windows/apps/windowsmediaplayer/file-types-supported-by-windows-media-player"
+        },
+        {
+          "fact": "The Library of Congress records video/mpeg for MPEG video.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000035.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Lists MPEG elementary, program, and transport streams as readable input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play MPEG input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Lists MPEG elementary, program, and transport streams as readable input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play MPEG input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Lists MPEG elementary, program, and transport streams as readable input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play MPEG input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "The Android port includes the desktop player's media decoding features.",
+            "source": "https://www.videolan.org/vlc/download-android.html"
+          },
+          {
+            "app": "VLC for iOS",
+            "note": "Plays local media using VLC's player rather than requiring conversion through the system player.",
+            "source": "https://www.videolan.org/vlc/download-ios.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "An MPEG file may be a system stream or raw video; identifying its structure helps choose the correct demuxer.",
+          "source": "https://ffmpeg.org/general.html"
+        },
+        {
+          "fact": "A player must decode the audio as well as the video; multiplexing them does not make their codecs interchangeable.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000335.shtml"
+        },
+        {
+          "fact": "Lossy MPEG encoding cannot retain every detail from the uncompressed picture.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000035.shtml"
+        }
+      ]
+    },
+    "psd": {
+      "background": [
+        {
+          "fact": "PSD is Adobe Photoshop's native document file format.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        },
+        {
+          "fact": "The PSD header begins with the signature 8BPS.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        },
+        {
+          "fact": "PSD dimensions are limited to 30,000 pixels per side; PSB raises that limit.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        },
+        {
+          "fact": "The header supports sample depths of one, eight, 16, or 32 bits.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        },
+        {
+          "fact": "Image resources and layer/mask information occupy separate sections.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        },
+        {
+          "fact": "Pixel data can be raw or encoded with RLE or ZIP compression.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        },
+        {
+          "fact": "The registered PSD media type is image/vnd.adobe.photoshop.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.adobe.photoshop"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads PSD images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists PSD among supported image formats; company use requires a license.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads PSD images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists PSD among supported image formats; company use requires a license.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads PSD images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists PSD among supported image formats; company use requires a license.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Photopea",
+            "note": "Uses PSD as its main document format and opens files through File > Open.",
+            "source": "https://www.photopea.com/learn/opening-saving"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A document larger than the PSD dimension limit needs PSB or another suitable format.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        },
+        {
+          "fact": "A PSD includes layer and mask information that a simple flattened image export does not retain.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        },
+        {
+          "fact": "Third-party readers must interpret Photoshop-specific data structures; opening a preview does not establish full editing compatibility.",
+          "source": "https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/"
+        }
+      ]
+    },
+    "flv": {
+      "background": [
+        {
+          "fact": "FLV is a binary format associated with Macromedia Flash video delivery.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml"
+        },
+        {
+          "fact": "An FLV holds at most one video stream and one audio stream.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml"
+        },
+        {
+          "fact": "FLV can carry Sorenson video or On2 VP6 video.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml"
+        },
+        {
+          "fact": "Audio possibilities include MP3, PCM, and ADPCM.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml"
+        },
+        {
+          "fact": "A Flash SWF can reference a separate FLV through ActionScript.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml"
+        },
+        {
+          "fact": "Adobe ended Flash Player support on December 31, 2020.",
+          "source": "https://www.adobe.com/products/flashplayer/end-of-life.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Lists FLV input plus Sorenson and VP6-family decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play FLV input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Lists FLV input plus Sorenson and VP6-family decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play FLV input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Lists FLV input plus Sorenson and VP6-family decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Uses FFmpeg decoders to play FLV input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "The Android port includes the desktop player's media decoding features.",
+            "source": "https://www.videolan.org/vlc/download-android.html"
+          },
+          {
+            "app": "VLC for iOS",
+            "note": "Plays local media using VLC's player rather than requiring conversion through the system player.",
+            "source": "https://www.videolan.org/vlc/download-ios.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Flash Player is discontinued, so reinstalling it is not an appropriate route to playing an old FLV.",
+          "source": "https://www.adobe.com/products/flashplayer/end-of-life.html"
+        },
+        {
+          "fact": "The FLV extension does not identify a unique video codec; a reader also needs the stream's decoder.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml"
+        },
+        {
+          "fact": "A workflow requiring multiple alternative audio tracks cannot retain that structure inside the one-audio-stream FLV model.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml"
+        }
+      ]
+    },
+    "mpg": {
+      "sameAs": "mpeg"
+    }
+  }
+}

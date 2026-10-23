@@ -1,0 +1,722 @@
+{
+  "formats": {
+    "wpg": {
+      "background": [
+        {
+          "fact": "WPG means WordPerfect Graphic and belongs to the WordPerfect graphics family.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        },
+        {
+          "fact": "A WPG drawing can combine vector objects with bitmap content.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        },
+        {
+          "fact": "Corel documents a palette containing as many as 256 selected colors.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        },
+        {
+          "fact": "Corel distinguishes WPG version 1.0 from version 2.0.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        },
+        {
+          "fact": "WordPerfect 5.1 and earlier use the version 1.0 export option.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        },
+        {
+          "fact": "The version 2.0 option targets WordPerfect 6 and newer.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads WPG images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists WPG among readable image formats; private and educational use is free.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          },
+          {
+            "app": "CorelDRAW",
+            "note": "Imports WPG drawings through File > Import; inspect the documented limitations.",
+            "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+          },
+          {
+            "app": "Corel PHOTO-PAINT",
+            "note": "Opens WPG as an image or imports it into an existing image.",
+            "source": "https://product.corel.com/help/PHOTO-PAINT/540240626/Main/EN/Doc/CorelDRAW_WordPerfect_Graphic_WPG.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads WPG images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists WPG among readable image formats; private and educational use is free.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads WPG images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists WPG among readable image formats; private and educational use is free.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Choosing WPG 2.0 is inappropriate when the destination needs WordPerfect 5.1 compatibility.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        },
+        {
+          "fact": "CorelDRAW documents an import limitation for Graphics Text Type 2.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        },
+        {
+          "fact": "The documented CorelDRAW importer retains embedded WMF and EMF graphics but can discard other embedded graphic elements.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        }
+      ]
+    },
+    "xbm": {
+      "background": [
+        {
+          "fact": "XBM stores an image as readable C source rather than a conventional binary picture.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        },
+        {
+          "fact": "Its historical uses include icons and pointer artwork for the X graphical environment.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        },
+        {
+          "fact": "The image representation is monochrome, using black and white.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        },
+        {
+          "fact": "An XBM export may include coordinates for a pointer hotspot.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        },
+        {
+          "fact": "GIMP can write an accompanying mask file for an alpha channel.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        },
+        {
+          "fact": "The older X10 export variant writes short integers instead of individual bytes.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads XBM images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists XBM among readable image formats; private and educational use is free.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads XBM images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists XBM among readable image formats; private and educational use is free.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads XBM images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists XBM among readable image formats; private and educational use is free.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Color artwork becomes monochrome when exported as XBM.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        },
+        {
+          "fact": "C source representation can consume more space than a binary image encoding.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        },
+        {
+          "fact": "An added XBM comment can confuse some image viewers.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        },
+        {
+          "fact": "GIMP requires an 8-bit-per-channel image before its XBM export is available.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        },
+        {
+          "fact": "A separately exported alpha mask must accompany the bitmap when the receiving workflow uses it.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+        }
+      ]
+    },
+    "pbm": {
+      "background": [
+        {
+          "fact": "PBM expands to Portable Bit Map and represents two-tone raster images.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        },
+        {
+          "fact": "Netpbm uses PBM as an intermediate representation between image-processing programs.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        },
+        {
+          "fact": "A raw PBM image begins with P4 and stores its pixels as packed bits.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        },
+        {
+          "fact": "P1 identifies the plain variant, whose pixels are readable zeros and ones.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        },
+        {
+          "fact": "A one bit denotes black; a zero denotes white.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        },
+        {
+          "fact": "Raw PBM permits consecutive images, while plain PBM contains one image.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        },
+        {
+          "fact": "The conventional PBM MIME label is image/x-portable-bitmap; Netpbm notes that it is not registered with IANA.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads PBM images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists PBM among readable image formats; private and educational use is free.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads PBM images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists PBM among readable image formats; private and educational use is free.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads PBM images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Lists PBM among readable image formats; private and educational use is free.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Color and gray shading cannot be represented directly in a two-tone PBM image.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        },
+        {
+          "fact": "Plain PBM consumes more space because each pixel uses a text digit.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        },
+        {
+          "fact": "Some readers implement only a restricted subset of the PBM specification.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        },
+        {
+          "fact": "A reader expecting one image may not handle a raw PBM sequence; Netpbm recommends a minimal single-image layout for interoperability.",
+          "source": "https://netpbm.sourceforge.net/doc/pbm.html"
+        }
+      ]
+    },
+    "m4b": {
+      "background": [
+        {
+          "fact": "Apple documents .m4b as an AAC audiobook extension.",
+          "source": "https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/CreatingContentforSafarioniPhone/CreatingContentforSafarioniPhone.html"
+        },
+        {
+          "fact": "Apple lists audio/x-m4b for this audiobook file type in its archived iOS media documentation.",
+          "source": "https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/CreatingContentforSafarioniPhone/CreatingContentforSafarioniPhone.html"
+        },
+        {
+          "fact": "FFmpeg recognizes .m4b through its MOV and MPEG-4 container reader.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+        },
+        {
+          "fact": "The MOV/MPEG-4 family supports chapter metadata, which readers handle separately from audio samples.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "fact": "M4B is used for audiobooks distributed without DRM as well as in Apple-oriented listening workflows.",
+          "source": "https://apps.apple.com/us/app/bookplayer/id1138219998"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads an unencrypted M4B through its MOV/MPEG-4 demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Plays media through FFmpeg libraries; support depends on the included demuxers and decoders.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Processes unencrypted M4B audio using its MPEG-4 reader.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses FFmpeg libraries to play compatible unprotected audio.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Accepts M4B input through the MOV/MPEG-4 reader.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg-based playback for an accessible audio stream.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "BookPlayer",
+            "note": "iPhone audiobook player with M4B import and chapter navigation; intended for DRM-free audiobooks.",
+            "source": "https://apps.apple.com/us/app/bookplayer/id1138219998"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "BookPlayer is designed for DRM-free audiobooks, so protected purchases fall outside its stated scope.",
+          "source": "https://github.com/TortugaPower/BookPlayer"
+        },
+        {
+          "fact": "Chapter navigation may be missing in a non-seekable FFmpeg input because its MOV reader parses chapters only for seekable input.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "fact": "Nero-style chapter markers can conflict with some tagging applications; FFmpeg documents an option that writes only a QuickTime chapter track.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "xml": {
+      "background": [
+        {
+          "fact": "XML is a markup syntax developed within the World Wide Web Consortium.",
+          "source": "https://www.w3.org/TR/xml/"
+        },
+        {
+          "fact": "Its syntax derives from a subset of SGML.",
+          "source": "https://www.w3.org/TR/xml/"
+        },
+        {
+          "fact": "An XML document contains a single document element with properly nested content.",
+          "source": "https://www.w3.org/TR/xml/"
+        },
+        {
+          "fact": "Elements, attributes, character data, and entities make up its document structure.",
+          "source": "https://www.w3.org/TR/xml/"
+        },
+        {
+          "fact": "Conforming XML processors must accept both UTF-8 and UTF-16.",
+          "source": "https://www.w3.org/TR/xml/"
+        },
+        {
+          "fact": "The fifth edition of XML 1.0 became a W3C Recommendation in November 2008.",
+          "source": "https://www.w3.org/TR/xml/"
+        },
+        {
+          "fact": "RFC 7303 defines application/xml and treats text/xml as its alias.",
+          "source": "https://www.rfc-editor.org/rfc/rfc7303.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Visual Studio Code",
+            "note": "Opens XML source in its XML language mode.",
+            "source": "https://code.visualstudio.com/docs/languages/identifiers"
+          },
+          {
+            "app": "xmllint",
+            "note": "Reads XML and reports parsing errors; available with libxml2.",
+            "source": "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Visual Studio Code",
+            "note": "Opens XML source in its XML language mode.",
+            "source": "https://code.visualstudio.com/docs/languages/identifiers"
+          },
+          {
+            "app": "xmllint",
+            "note": "Reads XML and reports parsing errors; available with libxml2.",
+            "source": "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Visual Studio Code",
+            "note": "Opens XML source in its XML language mode.",
+            "source": "https://code.visualstudio.com/docs/languages/identifiers"
+          },
+          {
+            "app": "xmllint",
+            "note": "Reads XML and reports parsing errors; available with libxml2.",
+            "source": "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Unmatched tags or overlapping elements violate XML well-formedness and cause parsing errors.",
+          "source": "https://www.w3.org/TR/xml/"
+        },
+        {
+          "fact": "An undeclared entity reference can make an XML document fail well-formedness checks.",
+          "source": "https://www.w3.org/TR/xml/"
+        },
+        {
+          "fact": "Bytes that disagree with the declared character encoding can make a document unreadable to a conforming parser.",
+          "source": "https://www.w3.org/TR/xml/"
+        },
+        {
+          "fact": "Well-formed syntax does not establish that the data satisfies a particular DTD or application schema.",
+          "source": "https://www.w3.org/TR/xml/"
+        }
+      ]
+    },
+    "m4p": {
+      "background": [
+        {
+          "fact": "Apple identifies .m4p with protected AAC audio in its archived media-format documentation.",
+          "source": "https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/CreatingContentforSafarioniPhone/CreatingContentforSafarioniPhone.html"
+        },
+        {
+          "fact": "The documented media type for that protected audio is audio/x-m4p.",
+          "source": "https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/CreatingContentforSafarioniPhone/CreatingContentforSafarioniPhone.html"
+        },
+        {
+          "fact": "Older Apple music purchases can use Protected AAC rather than a freely convertible encoding.",
+          "source": "https://support.apple.com/en-us/108961"
+        },
+        {
+          "fact": "Apple applies a five-computer authorization limit to purchases linked to an Apple Account.",
+          "source": "https://support.apple.com/en-us/118292"
+        },
+        {
+          "fact": "Apple also used .m4p in an example preview URL in its iTunes Search API reference.",
+          "source": "https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/UnderstandingSearchResults.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Apple Music",
+            "note": "Authorizes a Windows computer for Apple Account purchases; protected tracks require the appropriate account.",
+            "source": "https://support.apple.com/en-us/118292"
+          },
+          {
+            "app": "iTunes",
+            "note": "NCH documents iTunes playback for protected M4P after account authorization.",
+            "source": "https://help.nchsoftware.com/help/en/switch/mac/m4pconversion.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Apple Music",
+            "note": "Plays authorized purchases; Apple documents the authorization workflow on Mac.",
+            "source": "https://support.apple.com/en-us/118292"
+          },
+          {
+            "app": "iTunes (legacy)",
+            "note": "NCH documents authorized iTunes playback for M4P; this is a legacy Mac workflow.",
+            "source": "https://help.nchsoftware.com/help/en/switch/mac/m4pconversion.html"
+          }
+        ],
+        "linux": [],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Apple Music cannot convert older purchases that remain in Protected AAC format.",
+          "source": "https://support.apple.com/en-us/108961"
+        },
+        {
+          "fact": "A new computer cannot be authorized while all five account authorization slots are occupied.",
+          "source": "https://support.apple.com/en-us/118292"
+        },
+        {
+          "fact": "Authorization must be performed on the computer being authorized, rather than from another device.",
+          "source": "https://support.apple.com/en-us/118292"
+        }
+      ]
+    },
+    "aif": {
+      "sameAs": "aiff"
+    },
+    "apng": {
+      "background": [
+        {
+          "fact": "Mozilla introduced APNG as an animated extension of PNG.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "An APNG can use either the .apng or .png filename ending.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "The animation uses lossless raster compression.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "Animated PNG supports full-color images and optional alpha transparency.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "Animation control and frame control chunks describe repetition, frame timing, and composition.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "The PNG third edition, published as a W3C Recommendation in June 2025, includes animation.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "The PNG specification defines image/apng as an Internet media type.",
+          "source": "https://www.w3.org/TR/png-3/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Firefox",
+            "note": "Supports animated PNG playback; Mozilla lists support from Firefox 3.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Supports APNG among its animated image formats.",
+            "source": "https://www.xnview.com/en/xnview/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Firefox",
+            "note": "Supports animated PNG playback; Mozilla lists support from Firefox 3.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Supports APNG among its animated image formats.",
+            "source": "https://www.xnview.com/en/xnview/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Firefox",
+            "note": "Supports animated PNG playback; Mozilla lists support from Firefox 3.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Supports APNG among its animated image formats.",
+            "source": "https://www.xnview.com/en/xnview/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Firefox",
+            "note": "Displays APNG in web content.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Chrome",
+            "note": "Displays APNG without the extension suggested by the wiki; support is listed from Chrome 59.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Safari",
+            "note": "Mozilla lists Safari support from version 8; browser playback includes APNG.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Firefox for Android",
+            "note": "Android browser for viewing APNG images within web pages; Mozilla documents Firefox APNG playback and its Gecko-based Android implementation. This entry does not promise image editing or system gallery integration.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A decoder that does not process animation can show the default PNG image instead.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "The default image is not required to belong to the animation, so a still preview may differ from its first animated frame.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "Incorrect frame sequence numbers signal an invalid animated PNG stream.",
+          "source": "https://www.w3.org/TR/png-3/"
+        },
+        {
+          "fact": "Incorrect blend or disposal handling can leave remnants of earlier frames in an animation.",
+          "source": "https://www.w3.org/TR/png-3/"
+        }
+      ]
+    },
+    "alac": {
+      "background": [
+        {
+          "fact": "ALAC is Apple's lossless audio codec, rather than a standalone image or video format.",
+          "source": "https://github.com/macosforge/alac"
+        },
+        {
+          "fact": "Apple's reference implementation supports 16-, 20-, 24-, and 32-bit sample depths.",
+          "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+        },
+        {
+          "fact": "The reference codec accepts configurations ranging from one to eight audio channels.",
+          "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+        },
+        {
+          "fact": "Apple documents integer sample rates through 384,000 Hz for its implementation.",
+          "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+        },
+        {
+          "fact": "Its default packet contains 4,096 sample frames.",
+          "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+        },
+        {
+          "fact": "Apple distributes source for both encoding and decoding ALAC.",
+          "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+        },
+        {
+          "fact": "Apple Music offers lossless listening using Apple Lossless audio technology.",
+          "source": "https://support.apple.com/en-us/118295"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "alacconvert",
+            "note": "Apple's sample utility reads ALAC in CAF; a Windows project is provided.",
+            "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+          },
+          {
+            "app": "iTunes",
+            "note": "Offers Apple Lossless encoding and playback of imported songs.",
+            "source": "https://support.apple.com/guide/itunes/choose-import-settings-itns2965/windows"
+          }
+        ],
+        "mac": [
+          {
+            "app": "alacconvert",
+            "note": "Apple's example converter accepts ALAC CAF input; its Xcode project targets Mac OS X.",
+            "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+          },
+          {
+            "app": "Apple Music",
+            "note": "Supports the service's lossless playback; playback hardware and sample-rate limits still apply.",
+            "source": "https://support.apple.com/en-us/118295"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Includes an ALAC decoder; the enclosing container must also be readable.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavcodec/alac.c"
+          },
+          {
+            "app": "alacconvert",
+            "note": "Apple provides a UNIX/Linux makefile; the sample utility handles ALAC CAF.",
+            "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "The sample alacconvert utility implements fewer channel and file-layout combinations than the underlying codec.",
+          "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+        },
+        {
+          "fact": "Nondefault ALAC packet sizes are not guaranteed to work on every supporting hardware device.",
+          "source": "https://raw.githubusercontent.com/macosforge/alac/master/ReadMe.txt"
+        },
+        {
+          "fact": "Apple Music lossless downloads consume more device storage than its compressed alternatives.",
+          "source": "https://support.apple.com/en-us/118295"
+        },
+        {
+          "fact": "Some Mac playback setups need an external DAC for sample rates above 48 kHz.",
+          "source": "https://support.apple.com/en-us/118295"
+        }
+      ]
+    }
+  }
+}

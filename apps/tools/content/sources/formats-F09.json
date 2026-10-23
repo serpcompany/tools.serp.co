@@ -1,0 +1,738 @@
+{
+  "formats": {
+    "m2ts": {
+      "background": [
+        {
+          "fact": "M2TS packages video, audio and additional streams for Blu-ray BDAV and AVCHD.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+        },
+        {
+          "fact": "Its transport structure modifies MPEG-2 TS rather than prescribing one video codec.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+        },
+        {
+          "fact": "Each source packet contains a 188-byte transport packet with four extra bytes.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+        },
+        {
+          "fact": "Blu-ray permits MPEG-2, AVC and VC-1 picture streams in this wrapper.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+        },
+        {
+          "fact": "AVCHD was announced by Sony and Panasonic in 2006.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+        },
+        {
+          "fact": "The related MPEG transport-stream media type is video/mp2t; it is not unique to M2TS.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads MPEG transport streams; installed decoder support still matters.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads MPEG transport streams; installed decoder support still matters.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads MPEG transport streams; installed decoder support still matters.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Copying a stream alone omits its associated clip-information files and disc organization.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+        },
+        {
+          "fact": "An M2TS extension does not identify which supported video decoder the recording needs.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+        },
+        {
+          "fact": "Blu-ray content can have AACS protection even though M2TS itself supplies no encryption.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+        }
+      ]
+    },
+    "mp2": {
+      "background": [
+        {
+          "fact": "MP2 means MPEG Audio Layer II and uses perceptual, lossy coding.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000338.shtml"
+        },
+        {
+          "fact": "MPEG-1 Layer II is specified by ISO/IEC 11172-3.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000338.shtml"
+        },
+        {
+          "fact": "ISO/IEC 13818-3 extends Layer II for MPEG-2.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000338.shtml"
+        },
+        {
+          "fact": "MPEG-1 Layer II was finalized in 1992.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000338.shtml"
+        },
+        {
+          "fact": "Layer II audio appears in digital broadcasting and Video CD production.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000338.shtml"
+        },
+        {
+          "fact": "The Library of Congress lists audio/mpeg for MP2 files.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000338.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Its audio codec list includes MP2 decoding and encoding.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Its audio codec list includes MP2 decoding and encoding.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Its audio codec list includes MP2 decoding and encoding.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "MP2 is Layer II audio, not a label for an MPEG-2 video recording.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000338.shtml"
+        },
+        {
+          "fact": "Lossy MP2 coding omits sound information; decoding cannot recover that discarded material.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000338.shtml"
+        },
+        {
+          "fact": "Surround playback needs a suitable multichannel speaker arrangement.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000338.shtml"
+        }
+      ]
+    },
+    "mpeg2": {
+      "background": [
+        {
+          "fact": "MPEG-2 video is the picture coding defined by ISO/IEC 13818-2 and ITU-T H.262.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "It combines block transforms with prediction between frames.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "A video elementary stream includes pictures and decoding headers.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "Audio and picture streams can be assembled into a program stream.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "Transport streams can combine several programs.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "The media type video/mpeg is registered for MPEG video.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Supports MPEG-2 video and MPEG program and transport streams.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Supports MPEG-2 video and MPEG program and transport streams.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Supports MPEG-2 video and MPEG program and transport streams.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A codec name alone does not identify whether the file uses an elementary, program or transport stream.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "Predicted pictures depend on reference pictures, so not every encoded frame stands alone.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "MPEG-2 compression can reduce detail; the encoder settings affect the visible result.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        }
+      ]
+    },
+    "orf": {
+      "background": [
+        {
+          "fact": "ORF is the raw-picture extension used by Olympus and OM SYSTEM cameras.",
+          "source": "https://helpx.adobe.com/camera-raw/desktop/dng-and-file-formats/camera-raw-plug-supported-cameras.html"
+        },
+        {
+          "fact": "Raw compatibility is tied to the camera model and application version.",
+          "source": "https://helpx.adobe.com/camera-raw/desktop/dng-and-file-formats/camera-raw-plug-supported-cameras.html"
+        },
+        {
+          "fact": "OM-1 ORF support starts with Camera Raw 14.2 in Adobe's table.",
+          "source": "https://helpx.adobe.com/camera-raw/desktop/dng-and-file-formats/camera-raw-plug-supported-cameras.html"
+        },
+        {
+          "fact": "OM Workspace develops raw images and provides white-balance and exposure adjustments.",
+          "source": "https://software.omsystem.com/omworkspace/"
+        },
+        {
+          "fact": "Workspace records processing choices so an edit can return to its original settings.",
+          "source": "https://software.omsystem.com/omworkspace/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "OM Workspace",
+            "note": "Manufacturer raw processing software.",
+            "source": "https://software.omsystem.com/omworkspace/"
+          },
+          {
+            "app": "Adobe Camera Raw",
+            "note": "Check the minimum version for the exact camera.",
+            "source": "https://helpx.adobe.com/camera-raw/desktop/dng-and-file-formats/camera-raw-plug-supported-cameras.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "OM Workspace",
+            "note": "Manufacturer raw processing software.",
+            "source": "https://software.omsystem.com/omworkspace/"
+          },
+          {
+            "app": "Adobe Camera Raw",
+            "note": "Check the minimum version for the exact camera.",
+            "source": "https://helpx.adobe.com/camera-raw/desktop/dng-and-file-formats/camera-raw-plug-supported-cameras.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists ORF as a readable camera raw format; verify local delegates.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "An older raw plug-in may lack the specific camera even when it understands other ORF files.",
+          "source": "https://helpx.adobe.com/camera-raw/desktop/dng-and-file-formats/camera-raw-plug-supported-cameras.html"
+        },
+        {
+          "fact": "Some Workspace processing options cannot be used for every raw image.",
+          "source": "https://software.omsystem.com/omworkspace/"
+        },
+        {
+          "fact": "High Res Shot raw processing requires at least 8 GB of memory in Workspace.",
+          "source": "https://software.omsystem.com/omworkspace/"
+        }
+      ]
+    },
+    "rgb": {
+      "background": [
+        {
+          "fact": "An .rgb ending can identify an SGI image; Pillow registers that extension for its SGI reader.",
+          "source": "https://raw.githubusercontent.com/python-pillow/Pillow/main/src/PIL/SgiImagePlugin.py"
+        },
+        {
+          "fact": "The SGI header stores image width, height and channel count.",
+          "source": "https://raw.githubusercontent.com/python-pillow/Pillow/main/src/PIL/SgiImagePlugin.py"
+        },
+        {
+          "fact": "SGI images can use either direct samples or run-length compression.",
+          "source": "https://raw.githubusercontent.com/python-pillow/Pillow/main/src/PIL/SgiImagePlugin.py"
+        },
+        {
+          "fact": "Pillow's SGI reader recognizes grayscale, RGB and RGBA arrangements.",
+          "source": "https://raw.githubusercontent.com/python-pillow/Pillow/main/src/PIL/SgiImagePlugin.py"
+        },
+        {
+          "fact": "ImageMagick uses the separate RGB coder for raw sample streams that require size and depth parameters.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "fact": "ImageMagick calls its SGI coder an Irix RGB image, distinguishing it from raw RGB.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Use SGI for an SGI image; RGB means raw samples.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Pillow",
+            "note": "Python library with an SGI reader and writer.",
+            "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Use SGI for an SGI image; RGB means raw samples.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Pillow",
+            "note": "Python library with an SGI reader and writer.",
+            "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Use SGI for an SGI image; RGB means raw samples.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Pillow",
+            "note": "Python library with an SGI reader and writer.",
+            "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Raw RGB and SGI are different data layouts despite the shared extension.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "fact": "A raw sample stream needs its dimensions and bit depth supplied by the user.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "fact": "Pillow can reject an SGI channel arrangement it does not implement.",
+          "source": "https://raw.githubusercontent.com/python-pillow/Pillow/main/src/PIL/SgiImagePlugin.py"
+        }
+      ]
+    },
+    "rm": {
+      "background": [
+        {
+          "fact": "RealNetworks described RealMedia as a streaming container in a March 1998 Internet-Draft.",
+          "source": "https://datatracker.ietf.org/doc/html/draft-heftagaub-rmff-00"
+        },
+        {
+          "fact": "The historical draft describes playback from local storage or over a network.",
+          "source": "https://datatracker.ietf.org/doc/html/draft-heftagaub-rmff-00"
+        },
+        {
+          "fact": "RMFF uses tagged chunks whose identifiers have four characters.",
+          "source": "https://datatracker.ietf.org/doc/html/draft-heftagaub-rmff-00"
+        },
+        {
+          "fact": "A .RMF header identifies a RealMedia file.",
+          "source": "https://datatracker.ietf.org/doc/html/draft-heftagaub-rmff-00"
+        },
+        {
+          "fact": "Separate headers describe overall media properties and individual streams.",
+          "source": "https://datatracker.ietf.org/doc/html/draft-heftagaub-rmff-00"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Lists RealMedia demuxing and muxing; individual codecs have separate support entries.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Lists RealMedia demuxing and muxing; individual codecs have separate support entries.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFplay",
+            "note": "Free playback utility using FFmpeg's libraries.",
+            "source": "https://www.ffmpeg.org/about.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Lists RealMedia demuxing and muxing; individual codecs have separate support entries.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Container recognition does not establish support for every codec stored inside it.",
+          "source": "https://ffmpeg.org/general.html"
+        },
+        {
+          "fact": "A damaged or missing initial .RMF header prevents normal file identification.",
+          "source": "https://datatracker.ietf.org/doc/html/draft-heftagaub-rmff-00"
+        },
+        {
+          "fact": "An old RM specification is work in progress, so its version-specific structures should not be treated as a current universal guarantee.",
+          "source": "https://datatracker.ietf.org/doc/html/draft-heftagaub-rmff-00"
+        }
+      ]
+    },
+    "pcx": {
+      "background": [
+        {
+          "fact": "ZSoft created PCX for its PC Paintbrush graphics program.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000585.shtml"
+        },
+        {
+          "fact": "The format emerged for MS-DOS in the 1984–1985 period.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000585.shtml"
+        },
+        {
+          "fact": "PCX is a raster image format using run-length encoding.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000585.shtml"
+        },
+        {
+          "fact": "A PCX begins with a 128-byte header.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000585.shtml"
+        },
+        {
+          "fact": "Some PCX variants carry an additional palette at the end of the file.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000585.shtml"
+        },
+        {
+          "fact": "A DCX document groups PCX pictures, commonly for fax applications.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists PCX reading and writing.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Pillow",
+            "note": "Reads and writes PCX in its documented supported modes.",
+            "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists PCX reading and writing.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Pillow",
+            "note": "Reads and writes PCX in its documented supported modes.",
+            "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists PCX reading and writing.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Pillow",
+            "note": "Reads and writes PCX in its documented supported modes.",
+            "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Applications may omit support for this older format even when they open newer bitmap formats.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000585.shtml"
+        },
+        {
+          "fact": "Reading a DCX as though it were one PCX loses the document's multiple-image structure.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        },
+        {
+          "fact": "Pillow's PCX writer accepts monochrome, grayscale, palette and RGB data, rather than arbitrary channel arrangements.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ]
+    },
+    "pes": {
+      "background": [
+        {
+          "fact": "PES contains embroidery data used by Brother's PE-DESIGN workflow.",
+          "source": "https://www.brother.com/common/hsm/ped11/ped11trial.html"
+        },
+        {
+          "fact": "PE-DESIGN 11 can display PES designs as Explorer thumbnails in its full edition.",
+          "source": "https://www.brother.com/common/hsm/ped11/ped11trial.html"
+        },
+        {
+          "fact": "PES files saved by PE-DESIGN 11 may be larger because they contain more design information.",
+          "source": "https://support.brother.com/g/b/faqend.aspx?c=sg&faqid=faqh00101653_000&lang=en&prod=hf_inovv3eas"
+        },
+        {
+          "fact": "Ink/Stitch can both import PES and export PES.",
+          "source": "https://inkstitch.org/docs/file-formats/"
+        },
+        {
+          "fact": "Brother Artspira accepts PES embroidery files on iOS and Android.",
+          "source": "https://www.brother-usa.com/apps/sewing-embroidery/artspira"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Ink/Stitch",
+            "note": "Free embroidery extension with PES import and export.",
+            "source": "https://inkstitch.org/docs/file-formats/"
+          },
+          {
+            "app": "PE-DESIGN 11",
+            "note": "Brother application; the trial has restricted features.",
+            "source": "https://www.brother.com/common/hsm/ped11/ped11trial.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Ink/Stitch",
+            "note": "PES import and export through its Inkscape extension.",
+            "source": "https://inkstitch.org/docs/file-formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Ink/Stitch",
+            "note": "PES import and export through its Inkscape extension.",
+            "source": "https://inkstitch.org/docs/file-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "Artspira",
+            "note": "Accepts PES uploads on iOS and Android.",
+            "source": "https://www.brother-usa.com/apps/sewing-embroidery/artspira"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A design may exceed a machine's USB-connected storage capacity; Brother suggests a USB flash drive where supported.",
+          "source": "https://support.brother.com/g/b/faqend.aspx?c=sg&faqid=faqh00101653_000&lang=en&prod=hf_inovv3eas"
+        },
+        {
+          "fact": "PES export cannot contain more than 255 color changes according to Ink/Stitch's troubleshooting documentation.",
+          "source": "https://inkstitch.org/docs/faq/"
+        },
+        {
+          "fact": "The PE-DESIGN 11 trial lacks the PES thumbnail integration included in the full program.",
+          "source": "https://www.brother.com/common/hsm/ped11/ped11trial.html"
+        }
+      ]
+    },
+    "epub": {
+      "background": [
+        {
+          "fact": "EPUB packages digital publications and their resources in one container.",
+          "source": "https://www.w3.org/TR/epub-33/"
+        },
+        {
+          "fact": "Its publication content can include HTML, CSS and SVG.",
+          "source": "https://www.w3.org/TR/epub-33/"
+        },
+        {
+          "fact": "An EPUB container uses ZIP packaging.",
+          "source": "https://www.w3.org/TR/epub-33/"
+        },
+        {
+          "fact": "The publication's reading sequence is described by its spine.",
+          "source": "https://www.w3.org/TR/epub-33/"
+        },
+        {
+          "fact": "The EPUB media type is application/epub+zip.",
+          "source": "https://www.w3.org/TR/epub-33/"
+        },
+        {
+          "fact": "EPUB 3.3 is maintained as a W3C Recommendation.",
+          "source": "https://www.w3.org/TR/epub-33/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "calibre E-book viewer",
+            "note": "Free reader with EPUB navigation and bookmarks.",
+            "source": "https://manual.calibre-ebook.com/viewer.html"
+          },
+          {
+            "app": "Adobe Digital Editions",
+            "note": "Free reader supporting EPUB and EPUB 3.",
+            "source": "https://www.adobe.com/solutions/ebook/digital-editions.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "calibre E-book viewer",
+            "note": "Free reader with EPUB navigation and bookmarks.",
+            "source": "https://manual.calibre-ebook.com/viewer.html"
+          },
+          {
+            "app": "Adobe Digital Editions",
+            "note": "Free reader supporting EPUB and EPUB 3.",
+            "source": "https://www.adobe.com/solutions/ebook/digital-editions.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Foliate",
+            "note": "Free Linux reader for EPUB publications.",
+            "source": "https://johnfactotum.github.io/foliate/"
+          },
+          {
+            "app": "calibre E-book viewer",
+            "note": "Launch from the desktop menu or ebook-viewer.",
+            "source": "https://manual.calibre-ebook.com/viewer.html"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Play Books",
+            "note": "Reads uploaded EPUB publications through a signed-in account.",
+            "source": "https://support.google.com/googleplay/answer/11012086?hl=en"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Google Play Books",
+            "note": "Imports EPUB files from device storage.",
+            "source": "https://support.google.com/googleplay/answer/11012086?hl=en"
+          },
+          {
+            "app": "Adobe Digital Editions",
+            "note": "Available for mobile devices and supports EPUB.",
+            "source": "https://www.adobe.com/solutions/ebook/digital-editions.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "An ACSM purchase file is a download instruction, not the EPUB itself; Digital Editions retrieves the book.",
+          "source": "https://manual.calibre-ebook.com/faq.html"
+        },
+        {
+          "fact": "DRM can keep calibre from opening a purchased EPUB even though it can store and transfer it.",
+          "source": "https://manual.calibre-ebook.com/faq.html"
+        },
+        {
+          "fact": "A converted EPUB may need a separate validity check before submission to a store.",
+          "source": "https://manual.calibre-ebook.com/faq.html"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,723 @@
+{
+  "formats": {
+    "png": {
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Imports PNG for editing.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads PNG; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Imports PNG for editing.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads PNG; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Imports PNG for editing.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads PNG; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Chrome",
+            "note": "PNG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "PNG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Google Chrome",
+            "note": "PNG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Safari",
+            "note": "PNG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A smaller compression setting does not reduce pixel fidelity; PNG compression is lossless.",
+          "source": "https://docs.gimp.org/3.0/en/file-png-export.html"
+        },
+        {
+          "fact": "Layer offsets may differ between GIMP and other applications; avoid its PNG offset option.",
+          "source": "https://docs.gimp.org/3.0/en/file-png-export.html"
+        },
+        {
+          "fact": "Camera tags and profiles are optional in GIMP exports; enable the relevant metadata controls when required.",
+          "source": "https://docs.gimp.org/3.0/en/file-png-export.html"
+        }
+      ]
+    },
+    "jpg": {
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Imports JPEG for editing.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads JPG; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Imports JPEG for editing.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads JPG; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Imports JPEG for editing.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads JPG; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Chrome",
+            "note": "JPG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "JPG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Google Chrome",
+            "note": "JPG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Safari",
+            "note": "JPG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Transparent pixels cannot survive JPEG export; choose a format with alpha instead.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "fact": "Some older photo frames reject progressive JPEG; try an export with progressive mode disabled.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "fact": "Matching quality numbers across editors do not guarantee matching compression or appearance.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "fact": "JPEG does not preserve an editable layer stack; retain the project file.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        }
+      ]
+    },
+    "jfif": {
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Its JPEG reader handles JFIF.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "Displays JPEG/JFIF data.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Its JPEG reader handles JFIF.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "Displays JPEG/JFIF data.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Its JPEG reader handles JFIF.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "Displays JPEG/JFIF data.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Chrome",
+            "note": "JFIF display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "JFIF display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Google Chrome",
+            "note": "JFIF display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Safari",
+            "note": "JFIF display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A .jfif suffix can contain ordinary JPEG data; identify its encoding before deciding to re-encode.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000018.shtml"
+        },
+        {
+          "fact": "Some JPEG extensions exceed a particular JFIF reader's capabilities; try a baseline-compatible export.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000018.shtml"
+        },
+        {
+          "fact": "JPEG data in a JFIF file cannot represent alpha transparency.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        }
+      ]
+    },
+    "webp": {
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Native import and export arrived in GIMP 2.10.",
+            "source": "https://www.gimp.org/release-notes/gimp-2.10.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads WEBP; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Native import and export arrived in GIMP 2.10.",
+            "source": "https://www.gimp.org/release-notes/gimp-2.10.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads WEBP; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Native import and export arrived in GIMP 2.10.",
+            "source": "https://www.gimp.org/release-notes/gimp-2.10.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads WEBP; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Chrome",
+            "note": "WEBP display.",
+            "source": "https://developers.google.com/speed/webp/faq"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "WEBP display.",
+            "source": "https://developers.google.com/speed/webp/faq"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Google Chrome",
+            "note": "WEBP display.",
+            "source": "https://developers.google.com/speed/webp/faq"
+          },
+          {
+            "app": "Safari",
+            "note": "WEBP display.",
+            "source": "https://developers.google.com/speed/webp/faq"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Older browser versions may lack animation support even when they display still WebP.",
+          "source": "https://developers.google.com/speed/webp/faq"
+        },
+        {
+          "fact": "An image beyond 16,383 pixels on either axis exceeds WebP's size limit.",
+          "source": "https://developers.google.com/speed/webp/faq"
+        },
+        {
+          "fact": "A WebP decode or encode may be unavailable in a particular ImageMagick installation; check its format list.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "heic": {
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Imports HEIC; 2.10.22 improved high-bit-depth handling.",
+            "source": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "HEIC needs the libheif delegate.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Microsoft Photos",
+            "note": "Install both HEIF and HEVC extensions.",
+            "source": "https://support.microsoft.com/en-us/windows/apps/photos/photos-app-video-editor-error-can-t-view-this-file-type"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Apple Preview",
+            "note": "Opens HEIF and exports JPEG or PNG. Apple documents HEIF system support from macOS High Sierra 10.13.",
+            "source": "https://support.apple.com/en-us/116944"
+          },
+          {
+            "app": "Apple Photos",
+            "note": "Opens HEIF and exports another format. Apple documents HEIF system support from macOS High Sierra 10.13.",
+            "source": "https://support.apple.com/en-us/116944"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Imports HEIC; 2.10.22 improved high-bit-depth handling.",
+            "source": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "HEIC needs the libheif delegate.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Safari",
+            "note": "Safari 17.0 added HEIC image display; requires a system that can run that Safari release.",
+            "source": "https://webkit.org/blog/14445/webkit-features-in-safari-17-0/"
+          },
+          {
+            "app": "Microsoft OneDrive",
+            "note": "The signed-in OneDrive website previews uploaded HEIF; local-file decoding is a separate capability.",
+            "source": "https://support.microsoft.com/en-us/onedrive/upload-heif-and-hevc-photos-and-videos-to-onedrive"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Apple Photos",
+            "note": "HEIF media support begins with iOS 11 in supporting apps; device and media limitations still apply.",
+            "source": "https://support.apple.com/en-us/116944"
+          },
+          {
+            "app": "Safari",
+            "note": "HEIC image support in Safari 17 on iOS 17 and iPadOS 17; not a claim about earlier mobile browsers.",
+            "source": "https://webkit.org/blog/14445/webkit-features-in-safari-17-0/"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Windows Photos can reject HEIC until both Microsoft media extensions are installed.",
+          "source": "https://support.microsoft.com/en-us/windows/apps/photos/photos-app-video-editor-error-can-t-view-this-file-type"
+        },
+        {
+          "fact": "USB import from an iPhone can produce JPEG instead; Keep Originals prevents that automatic conversion.",
+          "source": "https://support.apple.com/en-us/116944"
+        },
+        {
+          "fact": "An ImageMagick build without libheif cannot provide its HEIC reader.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "fact": "HEIF support depends on the Apple system version; iOS 11 and macOS High Sierra introduced it.",
+          "source": "https://support.apple.com/en-us/116944"
+        }
+      ]
+    },
+    "avif": {
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Import and export were added in GIMP 2.10.22.",
+            "source": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads AVIF; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Import and export were added in GIMP 2.10.22.",
+            "source": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads AVIF; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Import and export were added in GIMP 2.10.22.",
+            "source": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads AVIF; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Chrome",
+            "note": "Chrome 85 added AVIF decoding; this is browser support, not a guarantee that every OS viewer opens AVIF.",
+            "source": "https://developer.chrome.com/blog/new-in-chrome-85"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "Firefox 93 added AVIF image support; check animation and other feature support separately.",
+            "source": "https://www.mozilla.org/en-US/firefox/93.0/releasenotes/"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Google Chrome for Android",
+            "note": "Use a Chrome release with AVIF decoding; browser capability does not guarantee every Android app supports the same file.",
+            "source": "https://developer.chrome.com/blog/new-in-chrome-85"
+          },
+          {
+            "app": "Safari",
+            "note": "Safari on iOS 16 added still AVIF images; this initial support statement does not cover animation.",
+            "source": "https://webkit.org/blog/13152/webkit-features-in-safari-16-0/"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Older browsers may fail to display AVIF; supply a JPEG, PNG, or WebP fallback.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+        },
+        {
+          "fact": "Older GIMP releases lack the AVIF importer introduced in 2.10.22.",
+          "source": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        },
+        {
+          "fact": "Android 12 and later support baseline 8-bit AVIF decoding on handsets and tablets; 10-bit decoding is optional.",
+          "source": "https://developer.android.com/media/platform/supported-formats"
+        }
+      ]
+    },
+    "pdf": {
+      "programs": {
+        "windows": [
+          {
+            "app": "Mozilla Firefox",
+            "note": "Built-in PDF viewing and annotations.",
+            "source": "https://support.mozilla.org/en-US/kb/view-pdf-files-firefox-or-choose-another-viewer"
+          },
+          {
+            "app": "GIMP",
+            "note": "Imports PDF pages; password required for protected files.",
+            "source": "https://www.gimp.org/release-notes/gimp-2.10.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Apple Preview",
+            "note": "Shows PDF pages and thumbnails.",
+            "source": "https://support.apple.com/guide/preview/view-pdfs-and-images-prvw11470/mac"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "Built-in PDF reader.",
+            "source": "https://support.mozilla.org/en-US/kb/view-pdf-files-firefox-or-choose-another-viewer"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Evince",
+            "note": "PDF backend support.",
+            "source": "https://help.gnome.org/evince/formats.html"
+          },
+          {
+            "app": "Okular",
+            "note": "Uses Poppler for PDF rendering.",
+            "source": "https://okular.kde.org/formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Mozilla Firefox",
+            "note": "Reads most web PDFs.",
+            "source": "https://support.mozilla.org/en-US/kb/view-pdf-files-firefox-or-choose-another-viewer"
+          },
+          {
+            "app": "Adobe Acrobat online",
+            "note": "Upload a PDF for browser annotations; check account requirements.",
+            "source": "https://www.adobe.com/acrobat/online/pdf-editor.html"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Firefox for Android",
+            "note": "Opens PDFs stored on the device.",
+            "source": "https://support.mozilla.org/en-US/kb/using-firefox-android-view-saved-pdf-files"
+          },
+          {
+            "app": "Adobe Acrobat Reader",
+            "note": "Mobile PDF viewing on Android and iOS.",
+            "source": "https://www.adobe.com/acrobat/mobile/acrobat-reader.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "An incorrect web MIME type can prevent Firefox from using its PDF viewer.",
+          "source": "https://support.mozilla.org/en-US/kb/view-pdf-files-firefox-or-choose-another-viewer"
+        },
+        {
+          "fact": "Firefox can display some PDFs with incorrect fonts or blank pages; download one and try another PDF application.",
+          "source": "https://support.mozilla.org/en-US/kb/view-pdf-files-firefox-or-choose-another-viewer"
+        },
+        {
+          "fact": "A PDF import into GIMP needs the password when the document is protected.",
+          "source": "https://www.gimp.org/release-notes/gimp-2.10.html"
+        }
+      ]
+    },
+    "svg": {
+      "programs": {
+        "windows": [
+          {
+            "app": "Inkscape",
+            "note": "Native SVG editing.",
+            "source": "https://github.com/inkscape/inkscape"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "SVG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Inkscape",
+            "note": "Native SVG editing.",
+            "source": "https://github.com/inkscape/inkscape"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "SVG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Inkscape",
+            "note": "Native SVG editing.",
+            "source": "https://github.com/inkscape/inkscape"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "SVG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Chrome",
+            "note": "SVG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "SVG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Google Chrome",
+            "note": "SVG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Safari",
+            "note": "SVG display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Linked pictures may vanish when their referenced files are unavailable; preserve or embed those resources.",
+          "source": "https://www.w3.org/TR/SVG2/embedded.html"
+        },
+        {
+          "fact": "Text layout depends on available fonts, so substituted fonts can change the drawing.",
+          "source": "https://www.w3.org/TR/SVG2/text.html"
+        },
+        {
+          "fact": "An SVG can embed pixel images; those parts retain their original resolution when enlarged.",
+          "source": "https://www.w3.org/TR/SVG2/embedded.html"
+        }
+      ]
+    },
+    "gif": {
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Exports still pictures or multilayer animations.",
+            "source": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads GIF; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Exports still pictures or multilayer animations.",
+            "source": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads GIF; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Exports still pictures or multilayer animations.",
+            "source": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads GIF; inspect installed format support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Chrome",
+            "note": "GIF display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Mozilla Firefox",
+            "note": "GIF display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Google Chrome",
+            "note": "GIF display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          },
+          {
+            "app": "Safari",
+            "note": "GIF display.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Soft transparent edges cannot retain partial opacity in GIF.",
+          "source": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+        },
+        {
+          "fact": "GIMP reduces a GIF export to no more than 256 colors, which can change gradients.",
+          "source": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+        },
+        {
+          "fact": "Frame disposal changes how later images cover earlier ones; select combine or replace to match the animation.",
+          "source": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+        },
+        {
+          "fact": "GIMP omits a GIF comment containing characters outside seven-bit ASCII.",
+          "source": "https://docs.gimp.org/3.0/en/file-gif-export.html"
+        }
+      ]
+    }
+  }
+}

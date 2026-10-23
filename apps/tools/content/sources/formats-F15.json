@@ -1,0 +1,186 @@
+{
+  "formats": {
+    "ra": {
+      "background": [
+        {
+          "fact": "RA belongs to the RealNetworks RealAudio family of compressed sound formats.",
+          "source": "https://customer.real.com/hc/en-us/articles/204993067-File-types-in-RealPlayer-Converter"
+        },
+        {
+          "fact": "RealAudio was used for online sound delivery from the mid-1990s onward.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000051.shtml"
+        },
+        {
+          "fact": "The RealAudio 10 family includes AAC, RealAudio, lossless and multichannel coding options.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000051.shtml"
+        },
+        {
+          "fact": "The .ra ending can identify audio delivered through the RealMedia system.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000051.shtml"
+        },
+        {
+          "fact": "The Library of Congress lists audio/vnd.rn-realaudio as a vendor-associated media type for RA.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000051.shtml"
+        },
+        {
+          "fact": "RealAudio is proprietary, with limited publicly available technical documentation.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000051.shtml"
+        },
+        {
+          "fact": "RealAudio files can contain descriptive information such as a title or artist.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000051.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads RealMedia media through its demuxers; this is a command-line converter, not a graphical player.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Portable player using FFmpeg libraries; format and codec support depend on its build.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          },
+          {
+            "app": "RealPlayer",
+            "note": "The free PC player explicitly lists RA and RealAudio Lossless among supported audio types.",
+            "source": "https://customer.real.com/hc/en-us/articles/204307878-Media-Types"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads RealMedia media through its demuxers; this is a command-line converter, not a graphical player.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Portable player using FFmpeg libraries; format and codec support depend on its build.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads RealMedia media through its demuxers; this is a command-line converter, not a graphical player.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Portable player using FFmpeg libraries; format and codec support depend on its build.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A .ram companion is a streaming metafile; it is not interchangeable with the sound file itself.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000051.shtml"
+        },
+        {
+          "fact": "An RA extension alone does not identify its audio codec; the family includes several different coding systems.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000051.shtml"
+        },
+        {
+          "fact": "Playback requires a decoder for the particular RealAudio variant; FFmpeg lists separate decoders for multiple RealAudio codecs.",
+          "source": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "wtv": {
+      "background": [
+        {
+          "fact": "WTV is Microsoft Windows Media Center recording storage, written through the Stream Buffer Engine.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/windows-media-center-sdk/bb188788(v=msdn.10)"
+        },
+        {
+          "fact": "Microsoft documented WTV for developers in September 2008.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/cc963726(v=msdn.10)"
+        },
+        {
+          "fact": "WTV superseded DVR-MS and uses a different underlying file structure rather than ASF.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/cc963726(v=msdn.10)"
+        },
+        {
+          "fact": "A recording can combine MPEG-2 pictures with MPEG-1 Layer II or AC-3 audio.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/cc963726(v=msdn.10)"
+        },
+        {
+          "fact": "The format carries descriptive metadata and rights-management information alongside the media.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/cc963726(v=msdn.10)"
+        },
+        {
+          "fact": "The Stream Buffer Engine normally saves television recordings beneath the public Recorded TV directory.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/windows-media-center-sdk/bb188788(v=msdn.10)"
+        },
+        {
+          "fact": "WTV can signal changes in video resolution or compression while a recording is being read.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/cc963726(v=msdn.10)"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads WTV media through its demuxers; this is a command-line converter, not a graphical player.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Portable player using FFmpeg libraries; format and codec support depend on its build.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          },
+          {
+            "app": "Windows Media Center",
+            "note": "Historical Microsoft playback environment; protected broadcasts may require the PC that recorded them.",
+            "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/windows-media-center-sdk/bb188788(v=msdn.10)"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads WTV media through its demuxers; this is a command-line converter, not a graphical player.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Portable player using FFmpeg libraries; format and codec support depend on its build.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads WTV media through its demuxers; this is a command-line converter, not a graphical player.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Portable player using FFmpeg libraries; format and codec support depend on its build.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A broadcaster can restrict a protected recording to playback on its original Media Center computer.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/windows-media-center-sdk/bb188788(v=msdn.10)"
+        },
+        {
+          "fact": "A DVR-MS-only application needs a compatible copy; Windows 7 supplied WTVConverter.exe for this conversion.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/windows-media-center-sdk/bb188788(v=msdn.10)"
+        },
+        {
+          "fact": "Software reading WTV must handle media-type changes rather than assuming fixed video and audio properties throughout.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/cc963726(v=msdn.10)"
+        }
+      ]
+    }
+  }
+}

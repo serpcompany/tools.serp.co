@@ -1,0 +1,719 @@
+{
+  "formats": {
+    "mp4": {
+      "programs": {
+        "windows": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          },
+          {
+            "app": "Adobe Premiere",
+            "note": "Imports this container when the necessary decoder is available.",
+            "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          },
+          {
+            "app": "Adobe Premiere",
+            "note": "Imports this container when the necessary decoder is available.",
+            "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Firefox",
+            "note": "Plays supported media directly; AAC and H.264 availability can depend on system codecs.",
+            "source": "https://support.mozilla.org/en-US/kb/html5-audio-and-video-firefox"
+          },
+          {
+            "app": "Chrome",
+            "note": "Plays supported web audio and MP4 combinations; the internal codec still matters.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "Free mobile media player; decoding depends on the media inside the container.",
+            "source": "https://docs.videolan.me/vlc-android-user/"
+          },
+          {
+            "app": "VLC for iOS",
+            "note": "Mobile player for most movie formats, with local and network media access.",
+            "source": "https://docs.videolan.me/vlc-user/ios/3.X/en/index.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Container support alone does not guarantee that a decoder exists for the video or sound inside it.",
+          "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+        },
+        {
+          "fact": "An MP4 without audio cannot provide an audio track to an audio editor.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "fact": "Normal MP4 files keep packet metadata together; an interrupted write can leave an unfinished file unplayable.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "mov": {
+      "programs": {
+        "windows": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          },
+          {
+            "app": "Adobe Premiere",
+            "note": "Imports this container when the necessary decoder is available.",
+            "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          },
+          {
+            "app": "Adobe Premiere",
+            "note": "Imports this container when the necessary decoder is available.",
+            "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "Free mobile media player; decoding depends on the media inside the container.",
+            "source": "https://docs.videolan.me/vlc-android-user/"
+          },
+          {
+            "app": "VLC for iOS",
+            "note": "Mobile player for most movie formats, with local and network media access.",
+            "source": "https://docs.videolan.me/vlc-user/ios/3.X/en/index.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "QuickTime containers may use codecs absent from the destination editor.",
+          "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+        },
+        {
+          "fact": "Changing a filename ending does not transcode the video or install its missing decoder.",
+          "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+        },
+        {
+          "fact": "Regular MOV files may be unusable after an interrupted write; fragmented output has a different recovery behavior.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "m4a": {
+      "programs": {
+        "windows": [
+          {
+            "app": "Audacity",
+            "note": "Audio import requires the optional FFmpeg library; protected files are excluded.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Audacity",
+            "note": "Audio import requires the optional FFmpeg library; protected files are excluded.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Audacity",
+            "note": "Audio import requires the optional FFmpeg library; protected files are excluded.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          }
+        ],
+        "web": [
+          {
+            "app": "Firefox",
+            "note": "Plays supported media directly; AAC and H.264 availability can depend on system codecs.",
+            "source": "https://support.mozilla.org/en-US/kb/html5-audio-and-video-firefox"
+          },
+          {
+            "app": "Chrome",
+            "note": "Plays supported web audio and MP4 combinations; the internal codec still matters.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Audio_codecs"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "Free mobile media player; decoding depends on the media inside the container.",
+            "source": "https://docs.videolan.me/vlc-android-user/"
+          },
+          {
+            "app": "mpv for Android",
+            "note": "Android port linked by the mpv project.",
+            "source": "https://mpv.io/installation/"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Audacity needs its optional FFmpeg library before it can import M4A.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "fact": "DRM-protected recordings cannot be imported through Audacity's documented FFmpeg route.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "fact": "Importing multiple recordings into one Audacity window replaces the project tags with the last file's tags.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html"
+        }
+      ]
+    },
+    "mp3": {
+      "programs": {
+        "windows": [
+          {
+            "app": "Audacity",
+            "note": "Imports MP3 audio into an editable project.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Audacity",
+            "note": "Imports MP3 audio into an editable project.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Audacity",
+            "note": "Imports MP3 audio into an editable project.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          }
+        ],
+        "web": [
+          {
+            "app": "Firefox",
+            "note": "Plays supported media directly; AAC and H.264 availability can depend on system codecs.",
+            "source": "https://support.mozilla.org/en-US/kb/html5-audio-and-video-firefox"
+          },
+          {
+            "app": "Chrome",
+            "note": "Plays supported web audio and MP4 combinations; the internal codec still matters.",
+            "source": "https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Audio_codecs"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "Free mobile media player; decoding depends on the media inside the container.",
+            "source": "https://docs.videolan.me/vlc-android-user/"
+          },
+          {
+            "app": "mpv for Android",
+            "note": "Android port linked by the mpv project.",
+            "source": "https://mpv.io/installation/"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A malformed MP3 may produce an import error even when another player can play it.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "fact": "Combining imports in one Audacity project can replace earlier metadata with tags from the latest file.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "fact": "Editing an MP3 and exporting another MP3 introduces a second lossy encoding stage.",
+          "source": "https://manual.audacityteam.org/man/mp3_export_options.html"
+        }
+      ]
+    },
+    "jpeg": {
+      "sameAs": "jpg"
+    },
+    "wav": {
+      "programs": {
+        "windows": [
+          {
+            "app": "Audacity",
+            "note": "Imports most WAV recordings, including PCM variants.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Audacity",
+            "note": "Imports most WAV recordings, including PCM variants.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Audacity",
+            "note": "Imports most WAV recordings, including PCM variants.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          }
+        ],
+        "web": [
+          {
+            "app": "Firefox",
+            "note": "Plays supported media directly; AAC and H.264 availability can depend on system codecs.",
+            "source": "https://support.mozilla.org/en-US/kb/html5-audio-and-video-firefox"
+          },
+          {
+            "app": "Firefox for Android",
+            "note": "Mozilla lists WAV among its supported audio file types on Android.",
+            "source": "https://support.mozilla.org/en-US/kb/html5-audio-and-video-firefox"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "Free mobile media player; decoding depends on the media inside the container.",
+            "source": "https://docs.videolan.me/vlc-android-user/"
+          },
+          {
+            "app": "mpv for Android",
+            "note": "Android port linked by the mpv project.",
+            "source": "https://mpv.io/installation/"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A recorder may use proprietary compression inside WAV; Audacity recommends its FFmpeg library for such imports.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "fact": "Very large recordings may require RF64 rather than the original RIFF size fields.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml"
+        },
+        {
+          "fact": "Metadata handling varies: standard INFO chunks and Broadcast WAVE extensions store different information.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml"
+        }
+      ],
+      "background": [
+        {
+          "fact": "WAVE is a RIFF-based wrapper for sound, rather than one particular audio encoding.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml"
+        },
+        {
+          "fact": "Microsoft and IBM documented the format in their August 1991 multimedia specification.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml"
+        },
+        {
+          "fact": "Linear PCM is a common WAVE payload, but compressed encodings can appear too.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml"
+        },
+        {
+          "fact": "The usual filename ending is .wav; audio/wav and audio/x-wav are common media-type labels.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml"
+        },
+        {
+          "fact": "Broadcast WAVE extends the format with metadata for production and preservation.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml"
+        },
+        {
+          "fact": "The Library of Congress recommends WAVE for digital audio collections.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml"
+        }
+      ]
+    },
+    "avi": {
+      "programs": {
+        "windows": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          },
+          {
+            "app": "Adobe Premiere",
+            "note": "Imports this container when the necessary decoder is available.",
+            "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          },
+          {
+            "app": "Adobe Premiere",
+            "note": "Imports this container when the necessary decoder is available.",
+            "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "Free mobile media player; decoding depends on the media inside the container.",
+            "source": "https://docs.videolan.me/vlc-android-user/"
+          },
+          {
+            "app": "VLC for iOS",
+            "note": "Mobile player for most movie formats, with local and network media access.",
+            "source": "https://docs.videolan.me/vlc-user/ios/3.X/en/index.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "An editor can recognize AVI but still lack the decoder needed for its particular contents.",
+          "source": "https://helpx.adobe.com/premiere/desktop/organize-media/import-files/supported-file-formats.html"
+        },
+        {
+          "fact": "Original AVI size restrictions differ from the later OpenDML extension; large captures need compatible software.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        },
+        {
+          "fact": "Aspect ratio and scan-type metadata are not handled consistently across AVI implementations.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        }
+      ],
+      "background": [
+        {
+          "fact": "AVI carries timed pictures and sound inside a RIFF file.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        },
+        {
+          "fact": "Microsoft introduced AVI with Windows 3.1, and its first specification dates to 1992.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        },
+        {
+          "fact": "FOURCC identifiers describe the streams and their codecs.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        },
+        {
+          "fact": "The header records properties such as dimensions and frame rate; another chunk stores the media.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        },
+        {
+          "fact": "AVI can wrap uncompressed, lossless, or lossy video, so the extension alone does not identify quality.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        },
+        {
+          "fact": "Files normally end in .avi; video/x-msvideo is one commonly used media-type label.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        },
+        {
+          "fact": "AVI appears in video production archives and older desktop video workflows.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        }
+      ]
+    },
+    "tiff": {
+      "background": [
+        {
+          "fact": "TIFF is a tag-based raster wrapper developed by Aldus and Microsoft.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+        },
+        {
+          "fact": "TIFF revision 6.0 was published in 1992, and Adobe now controls its specification.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+        },
+        {
+          "fact": "A TIFF can use different compression methods and different color representations.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+        },
+        {
+          "fact": "The extensions .tif and .tiff refer to this format, with the media type image/tiff.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+        },
+        {
+          "fact": "TIFF can contain multiple images, making it useful for scanned document sequences.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+        },
+        {
+          "fact": "High-bit-depth imaging and preservation master files are established TIFF uses.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Imports image files for editing; export formats retain different subsets of project properties.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes TIFF with controls for compression, strips, tiles, and byte order.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Preview",
+            "note": "Provides TIFF among the formats in File > Export.",
+            "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+          },
+          {
+            "app": "GIMP",
+            "note": "Imports image files for editing; export formats retain different subsets of project properties.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes TIFF with controls for compression, strips, tiles, and byte order.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Imports image files for editing; export formats retain different subsets of project properties.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes TIFF with controls for compression, strips, tiles, and byte order.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Classic TIFF uses 32-bit offsets, which constrain size to about 4 GB; BigTIFF extends those fields.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+        },
+        {
+          "fact": "A reader may not understand every private tag, including some color-profile extensions.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+        },
+        {
+          "fact": "A TIFF may hold several images; use software that exposes the full image sequence.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml"
+        }
+      ]
+    },
+    "mkv": {
+      "programs": {
+        "windows": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ffplay",
+            "note": "FFmpeg includes this format's demuxer.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/allformats.c"
+          },
+          {
+            "app": "mpv",
+            "note": "Desktop playback with selectable audio and subtitle streams.",
+            "source": "https://mpv.io/manual/stable/"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "Free mobile media player; decoding depends on the media inside the container.",
+            "source": "https://docs.videolan.me/vlc-android-user/"
+          },
+          {
+            "app": "VLC for iOS",
+            "note": "Mobile player for most movie formats, with local and network media access.",
+            "source": "https://docs.videolan.me/vlc-user/ios/3.X/en/index.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Choosing the wrong audio or subtitle stream can give the wrong language; mpv provides track selection controls.",
+          "source": "https://mpv.io/manual/stable/"
+        },
+        {
+          "fact": "Missing or damaged cues can make seeking harder; Matroska defines cues separately from the media clusters.",
+          "source": "https://www.matroska.org/technical/cues.html"
+        },
+        {
+          "fact": "Container recognition does not ensure every embedded codec can be decoded by the chosen player.",
+          "source": "https://www.matroska.org/what_is_matroska.html"
+        }
+      ],
+      "background": [
+        {
+          "fact": "Matroska is an audiovisual container built on EBML, a binary structure derived from XML.",
+          "source": "https://www.matroska.org/technical/basics.html"
+        },
+        {
+          "fact": "The format developed from the earlier MCF project.",
+          "source": "https://www.matroska.org/technical/basics.html"
+        },
+        {
+          "fact": "A Matroska file can carry several video, audio, and subtitle streams.",
+          "source": "https://www.matroska.org/technical/basics.html"
+        },
+        {
+          "fact": "Chapters and descriptive tags are part of its design.",
+          "source": "https://www.matroska.org/technical/basics.html"
+        },
+        {
+          "fact": "The container does not prescribe one compression method or a fixed level of quality.",
+          "source": "https://www.matroska.org/technical/basics.html"
+        },
+        {
+          "fact": "IANA registers video/matroska for Matroska video.",
+          "source": "https://www.iana.org/assignments/media-types"
+        }
+      ]
+    }
+  }
+}

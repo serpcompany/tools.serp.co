@@ -285,7 +285,7 @@ test("a description says the file stays in the browser only where the page keeps
     }
   }
   assert.match(buildToolMetadata("3gp-to-hevc").description, new RegExp(IN_BROWSER));
-  assert.match(buildToolMetadata("png-to-bmp").description, new RegExp(IN_BROWSER));
+  assert.match(buildToolMetadata("svg-to-bmp").description, new RegExp(IN_BROWSER));
   // Server first: /api/video-convert, /api/pdf-compress.
   assert.doesNotMatch(buildToolMetadata("mov-to-rm").description, /browser/);
   assert.doesNotMatch(buildToolMetadata("amr-to-ogg").description, /browser/);
@@ -387,8 +387,11 @@ test("placeholder Tools and categories say the editor is coming soon", () => {
 });
 
 test("long curated text is cut at a sentence, never mid-word", () => {
-  // m4p-to-mp3's curated subtitle is 211 characters.
-  const m4p = buildToolMetadata("m4p-to-mp3").description;
+  // m4p-to-mp3's curated subtitle before its in-depth copy (#372): 211 characters.
+  const subtitle =
+    "Convert an unprotected M4P file to MP3 in your browser. Songs copy-protected by Apple's FairPlay (Apple Music downloads, most iTunes Store songs bought before 2009) can't be converted, and the converter says so.";
+  const tool = activeTools().find((entry) => entry.id === "m4p-to-mp3");
+  const m4p = toolDescription({ ...tool, content: { ...tool.content, tool:{ ...tool.content.tool, subtitle } } });
   assert.match(m4p, /^Convert an unprotected M4P file to MP3 in your browser\. /);
   assert.doesNotMatch(m4p, /FairPlay/);
 

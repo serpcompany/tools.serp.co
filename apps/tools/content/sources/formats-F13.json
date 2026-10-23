@@ -1,0 +1,731 @@
+{
+  "formats": {
+    "aifc": {
+      "background": [
+        {
+          "fact": "Apple developed the AIFF family; AIFF-C extended it to compressed sound in August 1991.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "AIFF-C stores sampled audio in an AIFF-related wrapper.",
+          "source": "https://docs.python.org/3.12/library/aifc.html"
+        },
+        {
+          "fact": "An AIFC file can contain uncompressed samples, despite the C in its name.",
+          "source": "https://docs.python.org/3.12/library/aifc.html"
+        },
+        {
+          "fact": "Python’s AIFF-C interface documents NONE, ULAW, ALAW, and G722 compression identifiers.",
+          "source": "https://docs.python.org/3.12/library/aifc.html"
+        },
+        {
+          "fact": "Channel count, sample width, and sampling frequency describe the stored sound.",
+          "source": "https://docs.python.org/3.12/library/aifc.html"
+        },
+        {
+          "fact": "AIFF-C can include markers identifying positions within the recording.",
+          "source": "https://docs.python.org/3.12/library/aifc.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads AIFF-C through its AIFF demuxer; decoding depends on the stored encoding.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/aiffdec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses FFmpeg libraries for playback.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          },
+          {
+            "app": "Adobe Audition",
+            "note": "Opens AIFC, including common compressed AIFF variants and files with up to 32 channels.",
+            "source": "https://helpx.adobe.com/audition/desktop/importing-recording-and-playing/supported-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads AIFF-C through its AIFF demuxer; decoding depends on the stored encoding.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/aiffdec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses FFmpeg libraries for playback.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          },
+          {
+            "app": "Adobe Audition",
+            "note": "Opens AIFC, including common compressed AIFF variants and files with up to 32 channels.",
+            "source": "https://helpx.adobe.com/audition/desktop/importing-recording-and-playing/supported-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads AIFF-C through its AIFF demuxer; decoding depends on the stored encoding.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/aiffdec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses FFmpeg libraries for playback.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A recognized AIFC wrapper can still contain a codec that the reader does not implement.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/aiffdec.c"
+        },
+        {
+          "fact": "Audition opens common compressed AIFF variants, but does not promise every variant.",
+          "source": "https://helpx.adobe.com/audition/desktop/importing-recording-and-playing/supported-file-formats.html"
+        },
+        {
+          "fact": "In Audition, AIFF author information appears under Dublin Core: Creator in the XMP metadata view.",
+          "source": "https://helpx.adobe.com/audition/desktop/importing-recording-and-playing/supported-file-formats.html"
+        }
+      ]
+    },
+    "mpv": {
+      "background": [
+        {
+          "fact": "MPV is used for MPEG video files; Adobe groups this suffix with MPEG-1 imports.",
+          "source": "https://helpx.adobe.com/after-effects/desktop/get-started/supported-file-formats/supported-file-formats.html"
+        },
+        {
+          "fact": "A raw MPEG video stream has no program-stream wrapper.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mpegvideodec.c"
+        },
+        {
+          "fact": "FFmpeg distinguishes raw video sequences from MPEG packets that contain audio.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mpegvideodec.c"
+        },
+        {
+          "fact": "Adobe Media Encoder lists MPV among its recognized MPEG input extensions.",
+          "source": "https://helpx.adobe.com/media-encoder/desktop/encoding-quick-start-and-basics/file-formats-supported-import.html"
+        },
+        {
+          "fact": "The extension alone should not be used to decide whether MPEG-1 or MPEG-2 decoding is needed.",
+          "source": "https://helpx.adobe.com/after-effects/desktop/get-started/supported-file-formats/supported-file-formats.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Its raw MPEG demuxer recognizes video sequences from their contents.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mpegvideodec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Plays through the FFmpeg libraries when MPEG decoding is included.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          },
+          {
+            "app": "Adobe After Effects",
+            "note": "Lists .mpv in its MPEG-1 import extensions.",
+            "source": "https://helpx.adobe.com/after-effects/desktop/get-started/supported-file-formats/supported-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Its raw MPEG demuxer recognizes video sequences from their contents.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mpegvideodec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Plays through the FFmpeg libraries when MPEG decoding is included.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          },
+          {
+            "app": "Adobe After Effects",
+            "note": "Lists .mpv in its MPEG-1 import extensions.",
+            "source": "https://helpx.adobe.com/after-effects/desktop/get-started/supported-file-formats/supported-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Its raw MPEG demuxer recognizes video sequences from their contents.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mpegvideodec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Plays through the FFmpeg libraries when MPEG decoding is included.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A raw video elementary stream has no companion soundtrack inside its video data.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mpegvideodec.c"
+        },
+        {
+          "fact": "Premiere Elements lists MPV among unsupported file extensions; After Effects has a different import list.",
+          "source": "https://helpx.adobe.com/premiere-elements/desktop/kb/removed-features-formats-elements.html"
+        },
+        {
+          "fact": "Adobe warns that changing an MPEG filename extension does not guarantee import compatibility.",
+          "source": "https://helpx.adobe.com/after-effects/desktop/get-started/supported-file-formats/supported-file-formats.html"
+        }
+      ]
+    },
+    "qt": {
+      "sameAs": "mov"
+    },
+    "3g2": {
+      "background": [
+        {
+          "fact": "3G2 belongs to the multimedia file-format family specified by 3GPP2.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        },
+        {
+          "fact": "It uses the ISO media file-format family as its foundation.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        },
+        {
+          "fact": "The wrapper can contain sound, moving pictures, and timed text.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        },
+        {
+          "fact": "RFC 4393 registered its media types in March 2006.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        },
+        {
+          "fact": "The preferred filename ending is .3g2; .3gpp2 is also identified.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        },
+        {
+          "fact": "The audio/3gpp2 label is restricted to files without visual material.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        },
+        {
+          "fact": "The video/3gpp2 label is valid for 3G2 content even when it contains only audio.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Registers .3g2 with its QuickTime and ISO base media demuxer.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses the FFmpeg demuxers and decoders.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          },
+          {
+            "app": "Adobe After Effects",
+            "note": "Recognizes .3g2 as an import extension.",
+            "source": "https://helpx.adobe.com/after-effects/desktop/get-started/supported-file-formats/supported-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Registers .3g2 with its QuickTime and ISO base media demuxer.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses the FFmpeg demuxers and decoders.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          },
+          {
+            "app": "Adobe After Effects",
+            "note": "Recognizes .3g2 as an import extension.",
+            "source": "https://helpx.adobe.com/after-effects/desktop/get-started/supported-file-formats/supported-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Registers .3g2 with its QuickTime and ISO base media demuxer.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses the FFmpeg demuxers and decoders.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A video/3gpp2 file may be audio-only, so a missing picture is not always a playback failure.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        },
+        {
+          "fact": "Timed text counts as visual content and should not be labeled audio/3gpp2.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        },
+        {
+          "fact": "Text-style transfer that changes line endings or strips high bits can corrupt this binary format.",
+          "source": "https://www.rfc-editor.org/info/rfc4393/"
+        }
+      ]
+    },
+    "emf": {
+      "background": [
+        {
+          "fact": "Microsoft’s Enhanced Metafile stores graphics as recorded drawing operations.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/gdi/enhanced-format-metafiles"
+        },
+        {
+          "fact": "An EMF contains a header, drawing records, and an end record.",
+          "source": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/daaf9447-0c47-446e-b72e-ac6bd7a2e8f1"
+        },
+        {
+          "fact": "Records describe graphics objects, property changes, and drawing orders.",
+          "source": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/daaf9447-0c47-446e-b72e-ac6bd7a2e8f1"
+        },
+        {
+          "fact": "Its device-independent design keeps drawing proportions across output devices.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/gdi/enhanced-format-metafiles"
+        },
+        {
+          "fact": "EMF’s first extension added a pixel-format record and OpenGL command support.",
+          "source": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/daaf9447-0c47-446e-b72e-ac6bd7a2e8f1"
+        },
+        {
+          "fact": "RFC 7903 identifies image/emf and the older image/x-emf media type.",
+          "source": "https://www.rfc-editor.org/rfc/rfc7903.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreOffice Draw",
+            "note": "Lists Enhanced Windows Metafile among its import formats.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Inkscape",
+            "note": "Its format matrix lists EMF input and output support.",
+            "source": "https://wiki.inkscape.org/wiki/Files:_Save"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreOffice Draw",
+            "note": "Lists Enhanced Windows Metafile among its import formats.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Inkscape",
+            "note": "Its format matrix lists EMF input and output support.",
+            "source": "https://wiki.inkscape.org/wiki/Files:_Save"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreOffice Draw",
+            "note": "Lists Enhanced Windows Metafile among its import formats.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Inkscape",
+            "note": "Its format matrix lists EMF input and output support.",
+            "source": "https://wiki.inkscape.org/wiki/Files:_Save"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A damaged record length can prevent a reader from locating the next drawing record.",
+          "source": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/daaf9447-0c47-446e-b72e-ac6bd7a2e8f1"
+        },
+        {
+          "fact": "Older EMF readers may not implement records introduced by the format’s extensions.",
+          "source": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/daaf9447-0c47-446e-b72e-ac6bd7a2e8f1"
+        },
+        {
+          "fact": "Import support does not establish complete fidelity: Inkscape warns that some imported formats lose unsupported features.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/import-other-formats.html"
+        }
+      ]
+    },
+    "rmvb": {
+      "background": [
+        {
+          "fact": "The .rmvb suffix identifies variable-bitrate RealMedia video in the RealNetworks family.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000050.shtml"
+        },
+        {
+          "fact": "RealVideo supports encoding toward an average bitrate or a constant visual quality.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000050.shtml"
+        },
+        {
+          "fact": "RealVideo 9 and 10 differ in coding efficiency, according to the Library of Congress description.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000050.shtml"
+        },
+        {
+          "fact": "RealMedia can hold descriptive information such as title, author, and copyright.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000050.shtml"
+        },
+        {
+          "fact": "The Library of Congress lists application/vnd.rn-realmedia for these RealMedia files.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000050.shtml"
+        },
+        {
+          "fact": "RealPlayer HD explicitly includes playback support for existing RMVB videos.",
+          "source": "https://realnetworks.com/products-services/realmedia-hd/realplayer-hd"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Includes a RealMedia demuxer and codec-specific handling.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/rmdec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Plays supported RealMedia streams through FFmpeg libraries.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          },
+          {
+            "app": "RealPlayer HD",
+            "note": "The vendor lists RMVB playback and Windows system requirements.",
+            "source": "https://realnetworks.com/products-services/realmedia-hd/realplayer-hd"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Includes a RealMedia demuxer and codec-specific handling.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/rmdec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Plays supported RealMedia streams through FFmpeg libraries.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Includes a RealMedia demuxer and codec-specific handling.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/rmdec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Plays supported RealMedia streams through FFmpeg libraries.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A player needs both the RealMedia reader and a decoder for the audio or video it finds.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/rmdec.c"
+        },
+        {
+          "fact": "FFmpeg rejects invalid RealMedia headers rather than treating every .rmvb name as readable media.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/rmdec.c"
+        },
+        {
+          "fact": "Some RealMedia streaming workflows use a separate .ram reference file; it is not the video payload.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000050.shtml"
+        }
+      ]
+    },
+    "gsm": {
+      "background": [
+        {
+          "fact": "GSM 06.10 is a lossy speech codec specified by ETSI.",
+          "source": "https://www.quut.com/gsm/"
+        },
+        {
+          "fact": "The RPE-LTP algorithm targets telephone speech at 13 kbit/s.",
+          "source": "https://www.quut.com/gsm/"
+        },
+        {
+          "fact": "The libgsm implementation packs each 160-sample input block into a 264-bit frame.",
+          "source": "https://www.quut.com/gsm/"
+        },
+        {
+          "fact": "The toast utility writes compressed speech with the .gsm ending.",
+          "source": "https://www.quut.com/gsm/"
+        },
+        {
+          "fact": "FFmpeg’s raw GSM reader uses mono audio and an 8,000 Hz default sample rate.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/gsmdec.c"
+        },
+        {
+          "fact": "Microsoft’s WAV GSM packing differs from the raw framing used by libgsm.",
+          "source": "https://www.quut.com/gsm/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads raw .gsm frames and exposes them as mono speech.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/gsmdec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Can play GSM through FFmpeg's reader and decoder.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads raw .gsm frames and exposes them as mono speech.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/gsmdec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Can play GSM through FFmpeg's reader and decoder.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads raw .gsm frames and exposes them as mono speech.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/gsmdec.c"
+          },
+          {
+            "app": "ffplay",
+            "note": "Can play GSM through FFmpeg's reader and decoder.",
+            "source": "https://ffmpeg.org/ffplay-all.html"
+          },
+          {
+            "app": "toast / untoast",
+            "note": "The libgsm command-line utilities encode and decode raw GSM speech.",
+            "source": "https://www.quut.com/gsm/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Repeated GSM compression removes more information and can create audible chirping.",
+          "source": "https://www.quut.com/gsm/"
+        },
+        {
+          "fact": "Raw .gsm and WAV format 49 use incompatible framing, so they are not interchangeable byte layouts.",
+          "source": "https://www.quut.com/gsm/"
+        },
+        {
+          "fact": "A truncated final block is invalid to FFmpeg’s raw GSM reader, which expects complete 33-byte blocks.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/gsmdec.c"
+        }
+      ]
+    },
+    "jps": {
+      "background": [
+        {
+          "fact": "JPS stores a stereoscopic picture using JPEG compression.",
+          "source": "https://stereo.jpn.org/eng/stphmkr/help/file_01.htm"
+        },
+        {
+          "fact": "A typical JPS arranges the two eye views side by side for crossed-eye viewing.",
+          "source": "https://stereo.jpn.org/eng/stphmkr/help/file_01.htm"
+        },
+        {
+          "fact": "The VRex proposal described stereo-layout information in a JPEG APP3 marker.",
+          "source": "https://stereo.jpn.org/eng/stphmkr/help/file_01.htm"
+        },
+        {
+          "fact": "StereoPhoto Maker treats the picture’s file type separately from its stereo layout.",
+          "source": "https://stereo.jpn.org/eng/stphmkr/help/file_01.htm"
+        },
+        {
+          "fact": "StereoPhoto Maker supports layouts including side-by-side, above/below, and interlaced views.",
+          "source": "https://stereo.jpn.org/eng/stphmkr/help/file_01.htm"
+        },
+        {
+          "fact": "JPS can carry an embedded preview thumbnail as a JPEG-format image.",
+          "source": "https://stereo.jpn.org/eng/stphmkr/help/file_29.htm"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "sView",
+            "note": "Reads JPS stereo markers and interprets .jps as a crossed-eye image pair.",
+            "source": "https://raw.githubusercontent.com/gkv311/sview/master/docs/stereoformats.md"
+          },
+          {
+            "app": "StereoPhoto Maker",
+            "note": "Directly opens JPS and lets you choose the stereo arrangement.",
+            "source": "https://stereo.jpn.org/eng/stphmkr/help/file_01.htm"
+          },
+          {
+            "app": "Stereoscopic Player",
+            "note": "Its release history documents JPS descriptor support for automatic layout recognition.",
+            "source": "https://3dtv.at/products/Player/History_en.aspx"
+          }
+        ],
+        "mac": [
+          {
+            "app": "sView",
+            "note": "Reads JPS stereo markers and interprets .jps as a crossed-eye image pair.",
+            "source": "https://raw.githubusercontent.com/gkv311/sview/master/docs/stereoformats.md"
+          },
+          {
+            "app": "StereoPhoto Maker Pro for Mac",
+            "note": "The vendor provides a Wine-based Mac package; its JPS reader is documented in the shared help.",
+            "source": "https://stereo.jpn.org/eng/stphmkr/mac/index.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "sView",
+            "note": "Reads JPS stereo markers and interprets .jps as a crossed-eye image pair.",
+            "source": "https://raw.githubusercontent.com/gkv311/sview/master/docs/stereoformats.md"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "sView (Android)",
+            "note": "Reads JPS stereo markers and interprets .jps as a crossed-eye image pair.",
+            "source": "https://raw.githubusercontent.com/gkv311/sview/master/docs/stereoformats.md"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Selecting the wrong stereo arrangement can display the eye views incorrectly.",
+          "source": "https://stereo.jpn.org/eng/stphmkr/help/file_01.htm"
+        },
+        {
+          "fact": "A JPS extension does not guarantee that every reader will infer its layout; StereoPhoto Maker asks the user to specify it.",
+          "source": "https://stereo.jpn.org/eng/stphmkr/help/file_01.htm"
+        },
+        {
+          "fact": "Re-saving a JPS through JPEG output applies the selected compression quality again; keep the source when editing.",
+          "source": "https://stereo.jpn.org/eng/stphmkr/help/file_09.htm"
+        }
+      ]
+    },
+    "dot": {
+      "background": [
+        {
+          "fact": "DOT is Microsoft’s legacy Word template extension.",
+          "source": "https://learn.microsoft.com/en-us/office/compatibility/office-file-format-reference"
+        },
+        {
+          "fact": "Microsoft labels it the Word 97–2003 Template format.",
+          "source": "https://learn.microsoft.com/en-us/office/compatibility/office-file-format-reference"
+        },
+        {
+          "fact": "A template provides a starting point for new documents rather than one finished document.",
+          "source": "https://support.microsoft.com/en-us/word/edit-templates"
+        },
+        {
+          "fact": "The newer DOTX template uses the XML-based Word format.",
+          "source": "https://learn.microsoft.com/en-us/office/compatibility/office-file-format-reference"
+        },
+        {
+          "fact": "DOTM is the newer macro-enabled template choice, distinct from DOTX.",
+          "source": "https://learn.microsoft.com/en-us/office/compatibility/office-file-format-reference"
+        },
+        {
+          "fact": "LibreOffice Writer includes .dot in its supported legacy Word imports.",
+          "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreOffice Writer",
+            "note": "Reads legacy Microsoft Word .dot templates.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Apache OpenOffice Writer",
+            "note": "Its file-management documentation lists .dot import.",
+            "source": "https://www.openoffice.org/documentation/manuals/oooauthors/file_management.pdf"
+          },
+          {
+            "app": "Microsoft Word",
+            "note": "Supports the legacy Word 97–2003 template format.",
+            "source": "https://learn.microsoft.com/en-us/office/compatibility/office-file-format-reference"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreOffice Writer",
+            "note": "Reads legacy Microsoft Word .dot templates.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Apache OpenOffice Writer",
+            "note": "Its file-management documentation lists .dot import.",
+            "source": "https://www.openoffice.org/documentation/manuals/oooauthors/file_management.pdf"
+          },
+          {
+            "app": "Microsoft Word",
+            "note": "Supports the legacy Word 97–2003 template format.",
+            "source": "https://learn.microsoft.com/en-us/office/compatibility/office-file-format-reference"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreOffice Writer",
+            "note": "Reads legacy Microsoft Word .dot templates.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Apache OpenOffice Writer",
+            "note": "Its file-management documentation lists .dot import.",
+            "source": "https://www.openoffice.org/documentation/manuals/oooauthors/file_management.pdf"
+          }
+        ],
+        "web": [
+          {
+            "app": "Word for the web",
+            "note": "Displays legacy DOT; editing saves a new modern-format copy rather than overwriting DOT.",
+            "source": "https://support.microsoft.com/en-us/word/differences-between-using-a-document-in-the-browser-and-in-word"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Word for iPhone",
+            "note": "Microsoft’s iPhone compatibility table lists binary .dot templates as readable and editable.",
+            "source": "https://support.microsoft.com/en-us/word/why-can-t-i-open-my-file"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "To change the template itself, open it through Word’s File > Open command and save the template after editing.",
+          "source": "https://support.microsoft.com/en-us/word/edit-templates"
+        },
+        {
+          "fact": "Modern Word templates that need macros use DOTM; DOTX is the macro-free choice.",
+          "source": "https://learn.microsoft.com/en-us/office/compatibility/office-file-format-reference"
+        },
+        {
+          "fact": "Word for the web cannot save in the old DOT format; editing creates a DOTX or DOCX copy.",
+          "source": "https://support.microsoft.com/en-us/word/differences-between-using-a-document-in-the-browser-and-in-word"
+        }
+      ]
+    }
+  }
+}

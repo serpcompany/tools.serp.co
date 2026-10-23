@@ -1,0 +1,767 @@
+{
+  "formats": {
+    "ai": {
+      "background": [
+        {
+          "fact": "AI is Adobe Illustrator's native artwork format.",
+          "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+        },
+        {
+          "fact": "An AI document can mix vector objects with pixel images.",
+          "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+        },
+        {
+          "fact": "Illustrator preserves editable effects, brushes, layers, and transparency in AI documents.",
+          "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+        },
+        {
+          "fact": "Illustrator 9 changed the AI format in 2000; earlier files used PostScript.",
+          "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+        },
+        {
+          "fact": "The PDF-compatible saving option includes a PDF rendition alongside Illustrator data.",
+          "source": "https://helpx.adobe.com/illustrator/using/saving-artwork.html"
+        },
+        {
+          "fact": "Designers use AI source files for logos, illustrations, and print layouts.",
+          "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Can read the AI format identified in its format list as Illustrator CS2; rendering is not native Illustrator editing.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Adobe Illustrator",
+            "note": "Opens native artwork with editable Illustrator objects.",
+            "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Can read the AI format identified in its format list as Illustrator CS2; rendering is not native Illustrator editing.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Adobe Illustrator",
+            "note": "Opens native artwork with editable Illustrator objects.",
+            "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Inkscape",
+            "note": "Its import manual lists AI artwork from Illustrator 9.0 onward; some document features may be unavailable.",
+            "source": "https://inkscape-manuals.readthedocs.io/en/latest/import-other-formats.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Can read the AI format identified in its format list as Illustrator CS2; rendering is not native Illustrator editing.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A program that reads the embedded PDF does not necessarily expose native Illustrator objects for editing.",
+          "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+        },
+        {
+          "fact": "An AI file saved without its PDF-compatible representation may fail in third-party software.",
+          "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+        },
+        {
+          "fact": "Opening artwork in an older Illustrator version can cause compatibility problems; Adobe advises matching or newer versions.",
+          "source": "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html"
+        },
+        {
+          "fact": "Linked images remain external unless Include Linked Files is selected while saving.",
+          "source": "https://helpx.adobe.com/illustrator/using/saving-artwork.html"
+        }
+      ]
+    },
+    "wma": {
+      "background": [
+        {
+          "fact": "WMA audio files use Microsoft's ASF container.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000027.shtml"
+        },
+        {
+          "fact": "The .wma extension distinguishes audio-only material from other ASF content.",
+          "source": "https://support.microsoft.com/en-us/windows/apps/windowsmediaplayer/file-types-supported-by-windows-media-player"
+        },
+        {
+          "fact": "Windows Media Audio has standard, Professional, Lossless, and Voice codec variants.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/medfound/about-the-windows-media-codecs"
+        },
+        {
+          "fact": "WMA 9 supports variable bit rate encoding.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/medfound/about-the-windows-media-codecs"
+        },
+        {
+          "fact": "The media type commonly associated with WMA is audio/x-ms-wma.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000027.shtml"
+        },
+        {
+          "fact": "WMA serves delivery workflows and sometimes intermediate audio storage.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000027.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Lists ASF/WMA input and multiple Windows Media Audio decoders.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "Audacity",
+            "note": "Imports unprotected WMA audio when its optional FFmpeg library is installed.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Decodes WMA 1, WMA 2, Pro, Voice, and Lossless in its support matrix.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Lists ASF/WMA input and multiple Windows Media Audio decoders.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "Audacity",
+            "note": "Imports unprotected WMA audio when its optional FFmpeg library is installed.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Decodes WMA 1, WMA 2, Pro, Voice, and Lossless in its support matrix.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Lists ASF/WMA input and multiple Windows Media Audio decoders.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "Audacity",
+            "note": "Imports unprotected WMA audio when its optional FFmpeg library is installed.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Decodes WMA 1, WMA 2, Pro, Voice, and Lossless in its support matrix.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Protected WMA files cannot be imported through Audacity's FFmpeg library.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "fact": "WMA import may be missing from Audacity until the optional FFmpeg component is installed.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "fact": "An application may support one WMA codec but lack another; the extension does not identify the variant.",
+          "source": "https://ffmpeg.org/general.html"
+        },
+        {
+          "fact": "Audition enables WMA import on Windows only, with DLMS Format Support enabled.",
+          "source": "https://helpx.adobe.com/audition/using/supported-file-formats.html"
+        }
+      ]
+    },
+    "vob": {
+      "background": [
+        {
+          "fact": "VOB means DVD Video Object.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "DVD producers store video, sound, subtitles, and menu content in VOB streams.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "VOB data is closely related to MPEG-2 program-stream material.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "DVD authoring also needs companion IFO and BUP files.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "A DVD backup commonly places VOB files inside a VIDEO_TS directory.",
+          "source": "https://handbrake.fr/docs/en/1.2.0/technical/source-formats.html"
+        },
+        {
+          "fact": "DVD subtitle streams can contain bitmap images rather than searchable text.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000571.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Reads DVD Video media and MPEG program streams.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "HandBrake",
+            "note": "Opens VOB files and VIDEO_TS disc folders; its input must be unprotected.",
+            "source": "https://handbrake.fr/docs/en/1.2.0/technical/source-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Reads DVD Video media and MPEG program streams.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "HandBrake",
+            "note": "Opens VOB files and VIDEO_TS disc folders; its input must be unprotected.",
+            "source": "https://handbrake.fr/docs/en/1.2.0/technical/source-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Reads DVD Video media and MPEG program streams.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "HandBrake",
+            "note": "Opens VOB files and VIDEO_TS disc folders; its input must be unprotected.",
+            "source": "https://handbrake.fr/docs/en/1.2.0/technical/source-formats.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "HandBrake does not process copy-protected DVD sources.",
+          "source": "https://handbrake.fr/features.php"
+        },
+        {
+          "fact": "A loose VOB does not replace the full DVD structure needed for authoring.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "A player that handles MPEG-2 video may still ignore DVD subtitle streams.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        },
+        {
+          "fact": "A disc source may contain several titles; choosing the wrong title produces the wrong clip.",
+          "source": "https://handbrake.fr/docs/en/latest/workflow/open-video-source.html"
+        }
+      ]
+    },
+    "aiff": {
+      "background": [
+        {
+          "fact": "Apple developed Audio Interchange File Format.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "AIFF is an audio wrapper derived from Electronic Arts' IFF family.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "AIFF often carries uncompressed linear PCM samples.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "AIFF-C extends the family to compressed audio.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "AIFF can include named chunks for author, copyright, and annotations.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "Professional audio users use AIFF for masters and intermediate recordings.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "Common AIFF media-type labels include audio/aiff and audio/x-aiff.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "Apple's AIFF 1.3 specification is dated January 4, 1989.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Audacity",
+            "note": "Imports most AIFF files, including all PCM variants, without its optional FFmpeg library.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Lists AIFF encoding and decoding support.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "Adobe Audition",
+            "note": "Opens uncompressed AIFF and most common compressed variants.",
+            "source": "https://helpx.adobe.com/audition/using/supported-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Audacity",
+            "note": "Imports most AIFF files, including all PCM variants, without its optional FFmpeg library.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Lists AIFF encoding and decoding support.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "Adobe Audition",
+            "note": "Opens uncompressed AIFF and most common compressed variants.",
+            "source": "https://helpx.adobe.com/audition/using/supported-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Audacity",
+            "note": "Imports most AIFF files, including all PCM variants, without its optional FFmpeg library.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Lists AIFF encoding and decoding support.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "AIFF-C compression requires a decoder for the actual encoding; the family name alone does not establish support.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "Uncompressed PCM needs more storage than a compressed delivery representation of the same recording.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        },
+        {
+          "fact": "An AIFF author field can appear in Audition under Dublin Core: Creator instead of a field labeled Author.",
+          "source": "https://helpx.adobe.com/audition/using/supported-file-formats.html"
+        },
+        {
+          "fact": "FFmpeg does not write AIFF ID3 tags unless that option is enabled.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html#aiff"
+        }
+      ]
+    },
+    "aac": {
+      "background": [
+        {
+          "fact": "Advanced Audio Coding is a perceptual audio coding family standardized through MPEG.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000114.shtml"
+        },
+        {
+          "fact": "MPEG-2 specifies AAC in Part 7; MPEG-4 places it in Part 3.",
+          "source": "https://www.iana.org/assignments/media-types/audio/aac"
+        },
+        {
+          "fact": "AAC can be carried in MP4, QuickTime, or other wrappers.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000114.shtml"
+        },
+        {
+          "fact": "A standalone .aac file commonly carries ADTS framing.",
+          "source": "https://www.iana.org/assignments/media-types/audio/aac"
+        },
+        {
+          "fact": "The registered media type audio/aac covers ADTS and LATM/LOAS transport.",
+          "source": "https://www.iana.org/assignments/media-types/audio/aac"
+        },
+        {
+          "fact": "AAC profiles include LC, HE-AAC, and HE-AAC v2.",
+          "source": "https://www.iana.org/assignments/media-types/audio/aac"
+        },
+        {
+          "fact": "AAC is used for streaming audio and end-user delivery.",
+          "source": "https://www.iana.org/assignments/media-types/audio/aac"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Accepts raw AAC input and decodes MPEG-4 AAC audio.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Includes AAC decoding and an internal AAC encoder.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "Adobe Audition",
+            "note": "Imports AAC, including HE-AAC.",
+            "source": "https://helpx.adobe.com/audition/using/supported-file-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Accepts raw AAC input and decodes MPEG-4 AAC audio.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Includes AAC decoding and an internal AAC encoder.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "Adobe Audition",
+            "note": "Imports AAC, including HE-AAC.",
+            "source": "https://helpx.adobe.com/audition/using/supported-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Accepts raw AAC input and decodes MPEG-4 AAC audio.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Includes AAC decoding and an internal AAC encoder.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A decoder for MPEG-2 AAC may not understand the MPEG-4 AAC variants.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000114.shtml"
+        },
+        {
+          "fact": "Changing .aac to .m4a does not replace ADTS framing with an MP4 wrapper.",
+          "source": "https://www.iana.org/assignments/media-types/audio/aac"
+        },
+        {
+          "fact": "Decoded AAC can occupy much more space because its stored audio is compressed.",
+          "source": "https://www.iana.org/assignments/media-types/audio/aac"
+        },
+        {
+          "fact": "ZIP compression usually offers little extra reduction for AAC streams.",
+          "source": "https://www.iana.org/assignments/media-types/audio/aac"
+        }
+      ]
+    },
+    "tga": {
+      "background": [
+        {
+          "fact": "Targa is a raster image format associated with Truevision video boards.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+        },
+        {
+          "fact": "TGA supports RGB, indexed-color, and grayscale imagery.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+        },
+        {
+          "fact": "A 24-bit RGB TGA stores eight bits in each color component.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+        },
+        {
+          "fact": "A 32-bit TGA adds an eight-bit alpha channel to RGB.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+        },
+        {
+          "fact": "TGA can use optional run-length encoding to reduce storage.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+        },
+        {
+          "fact": "Video editing and game-development workflows still use Targa images.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+        },
+        {
+          "fact": "ImageMagick groups ICB, VDA, and VST with Truevision Targa.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Its official Targa plug-in loads and exports TGA images.",
+            "source": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/common/file-tga.c"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes Truevision Targa, including the TGA, ICB, VDA, and VST family.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Adobe Photoshop",
+            "note": "Opens Targa images and provides Targa save options.",
+            "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Its official Targa plug-in loads and exports TGA images.",
+            "source": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/common/file-tga.c"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes Truevision Targa, including the TGA, ICB, VDA, and VST family.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Adobe Photoshop",
+            "note": "Opens Targa images and provides Targa save options.",
+            "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Its official Targa plug-in loads and exports TGA images.",
+            "source": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/common/file-tga.c"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes Truevision Targa, including the TGA, ICB, VDA, and VST family.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Saving RGB artwork at 24 bits removes the space needed for a Targa alpha channel.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+        },
+        {
+          "fact": "A TGA labeled 32-bit normally means 32 bits per pixel, rather than 32 bits for each component.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+        },
+        {
+          "fact": "GIMP's Targa implementation does not preserve every version-2 extension field.",
+          "source": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/common/file-tga.c"
+        },
+        {
+          "fact": "GIMP cannot export full partial-alpha information in an indexed Targa color map.",
+          "source": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/common/file-tga.c"
+        }
+      ]
+    },
+    "txt": {
+      "background": [
+        {
+          "fact": "TXT is commonly used for plain text documents.",
+          "source": "https://support.apple.com/guide/textedit/create-open-and-convert-documents-txtee6663a0e/mac"
+        },
+        {
+          "fact": "Plain text does not carry commands for typographic formatting.",
+          "source": "https://www.rfc-editor.org/rfc/rfc2046.txt"
+        },
+        {
+          "fact": "The MIME label for plain text is text/plain.",
+          "source": "https://www.rfc-editor.org/rfc/rfc2046.txt"
+        },
+        {
+          "fact": "The charset parameter tells a receiver how text bytes represent characters.",
+          "source": "https://www.rfc-editor.org/rfc/rfc2046.txt"
+        },
+        {
+          "fact": "Converting rich text to TXT in TextEdit removes styles and formatting.",
+          "source": "https://support.apple.com/guide/textedit/create-open-and-convert-documents-txtee6663a0e/mac"
+        },
+        {
+          "fact": "Plain text does not prescribe a page layout, font, or embedded image arrangement.",
+          "source": "https://www.rfc-editor.org/rfc/rfc2046.txt"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Visual Studio Code",
+            "note": "Opens and edits text files through its file-based editor.",
+            "source": "https://code.visualstudio.com/docs/editing/getting-started/userinterface"
+          },
+          {
+            "app": "Vim",
+            "note": "A text editor with Windows builds.",
+            "source": "https://github.com/vim/vim"
+          }
+        ],
+        "mac": [
+          {
+            "app": "TextEdit",
+            "note": "Opens, edits, and saves plain text documents.",
+            "source": "https://support.apple.com/guide/textedit/create-open-and-convert-documents-txtee6663a0e/mac"
+          },
+          {
+            "app": "Visual Studio Code",
+            "note": "Opens and edits text files through its file-based editor.",
+            "source": "https://code.visualstudio.com/docs/editing/getting-started/userinterface"
+          },
+          {
+            "app": "Vim",
+            "note": "Edits plain text; the project documents Unix and macOS use.",
+            "source": "https://www.vim.org/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Visual Studio Code",
+            "note": "Opens and edits text files through its file-based editor.",
+            "source": "https://code.visualstudio.com/docs/editing/getting-started/userinterface"
+          },
+          {
+            "app": "Vim",
+            "note": "Edits plain text; the project documents Unix and macOS use.",
+            "source": "https://www.vim.org/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Choosing the wrong character encoding can make valid text display as incorrect characters.",
+          "source": "https://support.apple.com/guide/textedit/if-characters-arent-displayed-correctly-txted1028/mac"
+        },
+        {
+          "fact": "Saving a styled document as TXT discards its formatting.",
+          "source": "https://support.apple.com/guide/textedit/create-open-and-convert-documents-txtee6663a0e/mac"
+        },
+        {
+          "fact": "Plain text cannot preserve an image or table as a word processor would.",
+          "source": "https://support.apple.com/guide/textedit/create-open-and-convert-documents-txtee6663a0e/mac"
+        }
+      ]
+    },
+    "tif": {
+      "sameAs": "tiff"
+    },
+    "swf": {
+      "background": [
+        {
+          "fact": "SWF is a legacy multimedia format associated with Macromedia and Adobe Flash.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        },
+        {
+          "fact": "SWF is also known as Small Web Format.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        },
+        {
+          "fact": "SWF can combine vector graphics, animation, and bitmap video.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        },
+        {
+          "fact": "Interactive SWF content uses ActionScript as well as a timeline.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        },
+        {
+          "fact": "An SWF may refer to external media instead of containing every resource.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        },
+        {
+          "fact": "Registered SWF media types include application/vnd.adobe.flash.movie.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        },
+        {
+          "fact": "Adobe acquired Macromedia in 2005.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Ruffle",
+            "note": "A Flash emulator; compatibility depends on the ActionScript features used.",
+            "source": "https://ruffle.rs/downloads"
+          },
+          {
+            "app": "Lightspark",
+            "note": "An incomplete Flash implementation for Windows and Linux.",
+            "source": "https://lightspark.github.io/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Ruffle",
+            "note": "A Flash emulator; compatibility depends on the ActionScript features used.",
+            "source": "https://ruffle.rs/downloads"
+          },
+          {
+            "app": "Adobe Audition",
+            "note": "Its documented SWF import extracts video-file audio with DLMS support enabled; it is not an interactive Flash runtime.",
+            "source": "https://helpx.adobe.com/audition/using/supported-file-formats.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Ruffle",
+            "note": "A Flash emulator; compatibility depends on the ActionScript features used.",
+            "source": "https://ruffle.rs/downloads"
+          },
+          {
+            "app": "Lightspark",
+            "note": "An incomplete Flash implementation for Windows and Linux.",
+            "source": "https://lightspark.github.io/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Ruffle web player",
+            "note": "Uses WebAssembly to emulate Flash in a browser; some APIs remain incomplete.",
+            "source": "https://ruffle.rs/"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Adobe Flash Player no longer runs Flash content after its end-of-life block.",
+          "source": "https://www.adobe.com/products/flashplayer/end-of-life.html"
+        },
+        {
+          "fact": "Ruffle does not implement every Flash API, so an SWF may have graphical or behavioral differences.",
+          "source": "https://ruffle.rs/compatibility"
+        },
+        {
+          "fact": "Missing external assets can prevent an otherwise intact SWF from behaving as intended.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        },
+        {
+          "fact": "A video conversion cannot retain ActionScript interactions as executable controls.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        }
+      ]
+    }
+  }
+}

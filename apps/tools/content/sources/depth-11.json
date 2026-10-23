@@ -1,0 +1,213 @@
+{
+  "tools": {
+    "tif-to-png": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the TIF; choose File > Export, pick PNG in the Format menu, then click Save.",
+          "limits": "The Format menu lists PNG alongside HEIC, JPEG, JPEG-2000, OpenEXR, PDF and TIFF.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Open the scan, choose File > Export As, type a name ending in .png and click Export.",
+          "limits": "GIMP names the default file Untitled.png; you edit the name and extension in the Name field.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+        },
+        {
+          "app": "ImageMagick (desktop terminal)",
+          "steps": "Run magick 'scan.tif[0]' scan.png.",
+          "limits": "A frame number in brackets picks one image from a multi-frame file, counting from zero; quote the name because shells interpret brackets.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php"
+        }
+      ]
+    },
+    "webp-to-svg": {
+      "methods": [
+        {
+          "app": "Inkscape with dwebp",
+          "steps": "Run dwebp input.webp -o input.png; in Inkscape choose File > Import, select the image with the Selector tool, then choose Path > Trace Bitmap, set the options and click OK.",
+          "limits": "Tracing is not a faithful copy, and color tracing makes one object per color; dwebp does not read animated WebP.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html",
+          "supportSource": "https://developers.google.com/speed/webp/docs/dwebp"
+        },
+        {
+          "app": "Potrace with dwebp",
+          "steps": "Run dwebp input.webp -bmp -o input.bmp, then potrace -s input.bmp -o output.svg.",
+          "limits": "Potrace reads PBM, PGM, PPM and BMP; dwebp does not read animated WebP.",
+          "source": "https://potrace.sourceforge.net/",
+          "supportSource": "https://developers.google.com/speed/webp/docs/dwebp"
+        }
+      ]
+    },
+    "arw-to-jpg": {
+      "methods": [
+        {
+          "app": "XnConvert",
+          "steps": "Drag the ARW into the Input tab; on the Output tab choose the destination folder, JPEG as the target format and its quality settings, then click Convert.",
+          "limits": "XnView's format list names Sony RAW with the extension arw.",
+          "source": "https://www.xnview.com/en/batch-image-converter/",
+          "supportSource": "https://www.xnview.com/en/image-formats/"
+        },
+        {
+          "app": "darktable",
+          "steps": "In the export module set target storage to file on disk, choose the file format, set the quality (default 95) and press Start export.",
+          "limits": "The export module's quality field defaults to 95.",
+          "source": "https://docs.darktable.org/usermanual/stable/en/module-reference/utility-modules/shared/export/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.arw output.jpg.",
+          "limits": "ImageMagick takes the output format from the file extension; its format list shows ARW as read-only and JPEG as read and write.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSource": "https://legacy.imagemagick.org/script/command-line-processing.php"
+        }
+      ]
+    },
+    "jfif-to-jpeg": {
+      "methods": [
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the picture, choose File > Export, pick JPEG in the Format menu, then click Save.",
+          "limits": "The quality slider appears for JPEG and JPEG-2000.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the file, choose File > Export As, type a name ending in .jpeg and click Export.",
+          "limits": "You edit the name and extension in the Name field.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jfif output.jpeg.",
+          "limits": "ImageMagick takes the output format from the file extension; its JPEG reader handles JFIF.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSource": "https://legacy.imagemagick.org/script/command-line-processing.php"
+        }
+      ]
+    },
+    "m4b-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i book.m4b -c:a libmp3lame -b:a 192k -vn book.mp3.",
+          "limits": "Needs a build with the libmp3lame encoder; -vn disables automatic selection of any video stream.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame"
+        }
+      ]
+    },
+    "mkv-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg (stream copy)",
+          "steps": "Run ffmpeg -i input.mkv -c copy output.mov.",
+          "limits": "The special value copy means the stream is not re-encoded, so MOV must accept the copied codecs.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg (re-encode)",
+          "steps": "Run ffmpeg -i input.mkv -c:v libx264 -c:a aac output.mov.",
+          "limits": "FFmpeg transcodes every stream unless you specify -c copy, so this is slower than a copy.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ]
+    },
+    "mp4-to-wmv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mp4 output.wmv.",
+          "limits": "FFmpeg chooses the default codecs for the output.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg (explicit codecs)",
+          "steps": "Run ffmpeg -i input.mp4 -c:v wmv2 -c:a wmav2 output.wmv.",
+          "limits": "Needs a build that includes the wmv2 and wmav2 encoders.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "VLC desktop",
+          "steps": "Use Media > Convert/Save, add the source, select Video - WMV + WMA (ASF), set a .wmv destination, then Start.",
+          "limits": "The profile uses WMV2 and WMA2.",
+          "source": "https://docs.videolan.me/vlc-user/desktop/3.0/en/basic/tipsandtricks/index.html",
+          "supportSource": "https://raw.githubusercontent.com/videolan/vlc/3.0.x/modules/gui/qt/components/sout/profiles.hpp"
+        }
+      ]
+    },
+    "png-to-bmp": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the PNG, choose File > Export As, put .bmp at the end of the Name field and click Export.",
+          "limits": "You edit the name and extension in the Name field.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.png output.bmp; use magick input.png BMP3:output.bmp only when version-three output is required.",
+          "limits": "BMP, BMP2 and BMP3 write different header versions; the default is version 4.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "XnConvert",
+          "steps": "Drag the PNG into the Input tab; on the Output tab choose the destination folder and BMP as the format, then click Convert.",
+          "limits": "XnConvert's format list names BMP.",
+          "source": "https://www.xnview.com/en/batch-image-converter/",
+          "supportSource": "https://www.xnview.com/en/image-formats/"
+        }
+      ]
+    },
+    "tiff-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick (desktop terminal)",
+          "steps": "Run magick 'master.tiff[0]' copy.png.",
+          "limits": "A frame number in brackets picks one image from a multi-frame file, counting from zero; quote the name because shells interpret brackets.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php"
+        },
+        {
+          "app": "GIMP (Windows, Mac, Linux)",
+          "steps": "Open the TIFF, choose File > Export As, type a name ending in .png and click Export.",
+          "limits": "You edit the name and extension in the Name field.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+        },
+        {
+          "app": "Preview (Mac)",
+          "steps": "Open the TIFF, choose File > Export, pick PNG in the Format menu and click Save.",
+          "limits": "To convert several files at once, open them in one Preview window and select them in the sidebar.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        }
+      ]
+    },
+    "ts-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.ts -c copy output.mp4.",
+          "limits": "Stream copy does not re-encode, and MP4 must be able to hold the copied streams.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Use Open Source, choose a preset, set the file name in Save As and the folder in To, then press Start.",
+          "limits": "HandBrake may switch an MP4's extension to M4V when AC3 pass-through, SRT subtitles or chapter markers are enabled; a preference turns that off.",
+          "source": "https://handbrake.fr/docs/en/latest/introduction/quick-start.html",
+          "supportSource": "https://handbrake.fr/docs/en/latest/technical/containers.html"
+        },
+        {
+          "app": "VLC",
+          "steps": "Use Media > Convert/Save, add the TS, choose Video - H.264 + MP3 (MP4), set the destination and Start.",
+          "limits": "The profile's name says MP3 sound; its audio codec value is mpga.",
+          "source": "https://docs.videolan.me/vlc-user/desktop/3.0/en/basic/tipsandtricks/index.html",
+          "supportSource": "https://raw.githubusercontent.com/videolan/vlc/3.0.x/modules/gui/qt/components/sout/profiles.hpp"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,906 @@
+{
+  "webm-to-gif": {
+    "seo": {
+      "title": "Convert WebM to GIF Online (Free)",
+      "h1": "WebM to GIF Converter",
+      "description": "Turn a WebM video into a looping GIF: 15 frames a second, no more than 480 px on the longer side, with a palette built from your clip. Free, no sign-up.",
+      "howToHeading": "How to convert WebM to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn a WebM clip into a looping GIF at 15 frames a second, in your browser."
+    },
+    "aboutSection": {
+      "title": "WebM and GIF",
+      "fromFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "Royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Supported by major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WebM to GIF?",
+        "answer": "Choose the WebM file, wait while your browser converts it, then save the GIF. FFmpeg runs inside the page, and the time depends on the clip and your device."
+      },
+      {
+        "question": "How big and how smooth is the GIF?",
+        "answer": "The longer side is capped at 480 px and the speed is 15 frames a second. A clip smaller than that keeps its size, except that an odd dimension is rounded down by a pixel so width and height are both even."
+      },
+      {
+        "question": "Does the GIF loop?",
+        "answer": "Yes. The conversion sets it to repeat forever, so it starts over each time it reaches the last frame."
+      },
+      {
+        "question": "What happens to the sound in my WebM?",
+        "answer": "It is dropped. A GIF is a picture format and has nowhere to store audio, so keep the WebM if the clip needs narration or music."
+      },
+      {
+        "question": "Why does my GIF look grainy or banded?",
+        "answer": "A GIF holds at most 256 colors per frame, and a video has far more. The converter builds a palette from your clip first, but smooth gradients and photographic scenes can still show dots or bands."
+      },
+      {
+        "question": "Why can the GIF be larger than the WebM?",
+        "answer": "A GIF keeps every frame as its own palette image, compressed losslessly, while a WebM is made with a video codec such as VP8, VP9 or AV1. A short clip can come out several times larger as a GIF, so trim it before converting."
+      },
+      {
+        "question": "Can I turn a browser screen recording into a GIF?",
+        "answer": "Yes, screen recorders that run in the browser often save WebM, and those files convert like any other. Small text is hard to read at 480 px, so record only the part of the screen you need."
+      },
+      {
+        "question": "Can I convert several WebM files at once?",
+        "answer": "Yes. Add as many as you like. The page works through them in sequence and each finishes as a separate GIF download, without a ZIP."
+      },
+      {
+        "question": "Is there a limit on the length of the clip?",
+        "answer": "The page sets no length limit, and your device does the work. A long or high-resolution WebM takes longer and gives a larger GIF."
+      },
+      {
+        "question": "Can I change the speed of the GIF?",
+        "answer": "No. The page fixes the rate at 15 frames a second and has no speed control. Change the speed of the WebM in a video editor first if you need it faster or slower."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting WebM to GIF",
+      "points": [
+        "The GIF runs at 15 frames a second, whatever the frame rate of the WebM.",
+        "The longer side is at most 480 px; a smaller video keeps its size, with odd sizes rounded down to even.",
+        "A GIF has no sound, so the audio track is left out.",
+        "Each frame is limited to 256 colors, taken from a palette built from your video.",
+        "The GIF loops without end, and a batch gives one GIF per WebM."
+      ]
+    },
+    "guide": {
+      "title": "About WebM files",
+      "markdown": "### What is a WebM file?\n\nWebM is an open media format that the WebM Project promotes for delivery over the web. The container is based on Matroska, and the streams inside are VP8, VP9 or AV1 video with Vorbis or Opus audio. The project offers its technology on royalty-free terms, and the major browsers support the format.\n\nVideo files carry the media type video/webm. A WebM holding nothing but sound is labeled audio/webm, so a .webm file is not always a video.\n\nTypical sources are web video, the recordings that browser-based screen recorders save, and short animated clips.\n\n### Programs that open WebM files\n\n**Windows, Mac and Linux**\n\n- The VLC media player reads Matroska-family media, though its codec support has to match the streams inside the WebM.\n- FFplay ships with FFmpeg and plays WebM through FFmpeg's decoders, so which codecs work depends on how that copy was built.\n\n**Web**\n\n- Chrome, Firefox and Edge open WebM files directly.\n- Safari 14.1 is where macOS gained WebM playback; the picture has to be VP8 or VP9 and the audio Vorbis.\n\n**Mobile**\n\n- Android and iPhone owners can use VLC for Android or VLC for iOS, which play local WebM files with VLC's own player rather than the system player.\n\n### WebM and GIF compared\n\n- **Names**: .webm goes with video/webm, and .gif with image/gif.\n- **Kind of file**: WebM wraps video. CompuServe brought out GIF in 1987 as an image format that can store several images one after another.\n- **Animation**: the GIF89a revision from July 1990 added the extensions for timing, comments, application data and transparency. Delays are counted in hundredths of a second, and a disposal setting decides how a later image sits on top of an earlier one.\n- **Colors**: every GIF image picks its colors from a palette that tops out at 256 entries. WebM video has no such ceiling.\n- **Compression**: GIF squeezes its images with LZW, which loses nothing. WebM depends on its video codecs.\n- **Sound**: a WebM can carry Vorbis or Opus audio. The GIF this page writes holds one picture stream and no audio.\n- **Transparency**: a single palette entry can be flagged as clear, and there is no partial opacity.\n- **Repeat count**: a GIF keeps its repeat count in an application extension, and the file this page writes has it set to repeat forever.\n- **Patents**: Unisys started asking for LZW license fees in 1994, and the last of those patents lapsed in 2004.\n- **Support**: every major browser displays GIF.\n\nFor this pair the page writes 15 frames a second, shrinks anything above 480 px on its longer side, and sets the GIF to repeat. Frames flagged as interlaced are deinterlaced before they are scaled.\n\n### Other ways to convert WebM to GIF\n\n- **FFmpeg:** run `ffmpeg -i input.webm output.gif`. FFmpeg takes the output format from the .gif ending, the same pattern its documentation shows with `ffmpeg -i input.avi output.mp4`. A plain command like this skips the frame-rate, size and palette steps this page applies.\n- **Gifski with FFmpeg:** run `ffmpeg -i input.webm frame%04d.png` to write one PNG per frame, then `gifski -o anim.gif frame*.png` to build the GIF. Gifski's documentation names `--width` and `--height` as the biggest levers for a smaller file, and `--quality` for lowering quality. Its site also shows `gifski --fps 10 --width 320 -o anim.gif video.mp4` for an MP4 source, where `--fps` sets the frame rate and a lower value gives a smaller file. On Windows, the frame pattern may need `%%04d`.\n\n### Problems with WebM files\n\n- **It plays in a browser but not in an editor**: playback depends on the video and audio codecs actually used, not on the .webm ending. Check which codecs the file really uses before blaming the container, then convert it here or open it in VLC.\n- **Seeking is slow or jumpy**: without a cue index, a player gets less direct location information, so jumping to a point is less efficient. Re-saving the file in a video editor rebuilds it.\n- **Safari won't play it**: releases before 14.1 predate WebM playback in Safari on macOS, so update the browser or use another one.\n- **It holds only sound**: an audio-only WebM is labeled audio/webm and has no picture to show, so play it in VLC to check what is inside.\n"
+    }
+  },
+  "dds-to-png": {
+    "seo": {
+      "title": "Convert DDS to PNG Online (Free)",
+      "h1": "DDS to PNG Converter",
+      "description": "Turn a DDS texture into a PNG you can open in any image viewer or editor. DDS files are read in your browser with ImageMagick. Free, no sign-up.",
+      "howToHeading": "How to convert DDS to PNG"
+    },
+    "tool": {
+      "subtitle": "Read a DDS texture in your browser and save it as a lossless PNG."
+    },
+    "aboutSection": {
+      "title": "DDS and PNG",
+      "fromFormat": {
+        "name": "DDS",
+        "fullName": "DirectDraw Surface",
+        "description": "A Microsoft container format for textures and cubemaps, originally from DirectX. It commonly stores GPU-compressed data in the DXT/BC block formats, with optional mipmaps.",
+        "details": [
+          "GPU block compression (DXT/BC)",
+          "Mipmaps",
+          "Cubemaps",
+          "Alpha channel"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert DDS to PNG?",
+        "answer": "Pick the DDS file and save the PNG when it appears. ImageMagick runs inside this page, so the texture never leaves your browser."
+      },
+      {
+        "question": "Can I convert a whole folder of DDS files?",
+        "answer": "Yes, within reason. Pick the files together and the converter handles them in order, handing you one PNG per texture. They aren't zipped."
+      },
+      {
+        "question": "What happens to the mipmaps of my texture?",
+        "answer": "A DDS can hold a chain of smaller copies of the texture. You get one PNG per DDS file, not one per mipmap."
+      },
+      {
+        "question": "Does a cube map or volume texture become several PNGs?",
+        "answer": "No. Each DDS file gives one PNG, and the page has no setting for choosing a face or slice."
+      },
+      {
+        "question": "Is the PNG lossless?",
+        "answer": "PNG compression is always lossless. Detail that block compression (DXT/BC) discarded when the texture was made stays gone."
+      },
+      {
+        "question": "Is there a size limit for the DDS?",
+        "answer": "The page sets no file-size limit, but a picture over roughly 537 megapixels fails with a \"too large to convert here\" message."
+      },
+      {
+        "question": "Can I get the DDS back from the PNG?",
+        "answer": "Not from this page, which only reads DDS. To make a DDS from a PNG, use the PNG to DDS converter or a tool such as GIMP or texconv."
+      },
+      {
+        "question": "Which programs open DDS directly?",
+        "answer": "GIMP opens DDS without a plug-in, and ImageMagick reads it too. Both are listed with their notes in the guide below."
+      },
+      {
+        "question": "What is a DDS file?",
+        "answer": "DDS comes from Microsoft and DirectX as a container for textures and cubemaps. It often holds GPU-compressed data in DXT/BC blocks, and it can carry mipmaps."
+      },
+      {
+        "question": "Does converting change my DDS file?",
+        "answer": "No. Your DDS is left as it is, and the PNG is a new file named after the texture with a .png ending."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting DDS to PNG",
+      "points": [
+        "The PNG is lossless, but a DDS built with DXT/BC compression already lost some detail when it was made.",
+        "A DDS with mipmaps, a cube map or a volume texture gives a single PNG per file.",
+        "The file is read with ImageMagick in your browser, so nothing is uploaded.",
+        "A picture over roughly 537 megapixels fails with a message instead of converting.",
+        "Choose several DDS files at once and each downloads as its own PNG."
+      ]
+    },
+    "guide": {
+      "title": "About DDS files",
+      "markdown": "### What is a DDS file?\n\nDirectDraw Surface, or DDS, is Microsoft's texture-file format, which came out of DirectX. Games use it for textures that a graphics card can load without further work. Inside, a DDS may store plain pixels or compressed texture data, usually in the DXT or BC block formats. Its listed uses are game textures, GPU-ready assets, and cubemaps and volume textures.\n\nThe file can also carry a mipmap chain next to its largest surface, plus cube maps and volume textures. Direct3D 10 and 11 added a second header, the DX10 extension, which covers texture arrays and pixel formats that the original header structure cannot express. An ordinary DDS is at least 128 bytes long because of its header, and 148 bytes when the DX10 extension is present.\n\n### Programs that open DDS files\n\n**Windows, Mac and Linux**\n\n- GIMP has handled DDS in its core plug-ins since version 2.10.10, so it loads and exports DDS out of the box.\n- ImageMagick reads and writes DDS, and its documentation covers DXT compression and mipmap options.\n\n### DDS and PNG compared\n\n- **Extensions**: .dds and .png. PNG's media type is image/png.\n- **Compression**: a DDS commonly keeps GPU block data in the DXT/BC formats. PNG always compresses losslessly.\n- **Mipmaps and extras**: DDS can hold mipmaps, cube maps and volumes. A PNG holds a single picture.\n- **Alpha**: both can carry an alpha channel.\n- **Color depth**: PNG stores between 1 and 16 bits per sample.\n- **Support**: every major browser displays PNG.\n- **Extension headers**: the DX10 header of a DDS describes formats the original header cannot, and a PNG has no counterpart for it.\n- **Typical use**: DDS holds game textures and other assets that are ready for a GPU. PNG is used for screenshots, interface graphics and logos.\n\nThis converter swaps a texture file for an ordinary picture. Detail that DXT compression dropped when the texture was made does not come back.\n\n### Other ways to convert DDS to PNG\n\n- **Microsoft DirectXTex (texconv):** run `texconv -ft png input.dds`. The -ft option sets the output type, which can also be bmp, jpg, tga, hdr, tif, wdp or ppm, and `-o` names the output directory. The `--ignore-mips` flag loads only the top mip level, which the texconv page suggests for malformed files that are missing data.\n- **GIMP:** load the DDS and pick File > Export As, then enter the name texture.png. GIMP loads DDS from version 2.10.10 on, and clicking Export opens the options for the PNG format.\n- **ImageMagick:** run `magick input.dds output.png`. The format list marks DDS as readable and writable, with DXT and mipmap options, and notes that PNG needs libpng.\n\n### Problems with DDS files\n\n- **The file won't open in an editor**: some DDS readers reject the DX10 header extension, while legacy RGB or DXT1 to DXT5 headers work in more tools. Re-export the texture with one of those.\n- **The file is cut short**: a truncated header makes a DDS invalid, because the header alone needs 128 bytes, or 148 with the DX10 extension. Copy the file again from its source.\n- **Only one picture comes out**: a DDS asset can hold a mipmap chain beside its largest surface, and cube maps and volume textures hold several faces or slices. A PNG holds a single image, so it cannot carry all of them.\n- **A garbled picture**: wrong pitch information, the number of bytes in a row, corrupts how a reader splits scan lines. Microsoft recommends computing the pitch for the stored pixel format.\n- **A header that is nonstandard**: texconv's `--permissive` option lets it load some malformed and variant headers that it would otherwise refuse.\n- **Older DXTn files with short mip blocks**: the smallest mip levels of some old files are slightly short. texconv's `--bad-tails` option copies the 4x4 data into those levels, which avoids corrupted data though it is not a full recompute.\n- **A BC texture whose top level isn't a multiple of 4**: Direct3D requires a multiple of 4, and texconv's `--fix-bc-4x4` option resizes such images, after which the mipmaps need regenerating.\n- **Legacy 24-bit files**: texconv has a `-dword` option for old DWORD-aligned files, which are typically 24 bits per pixel.\n- **Typeless pixel formats**: texconv's page warns that typeless formats will generally fail most operations, with `-tu` and `-tf` available to treat them as UNORM or float.\n"
+    }
+  },
+  "jpg-to-webp": {
+    "seo": {
+      "title": "Convert JPG to WebP Online (Free)",
+      "h1": "JPG to WebP Converter",
+      "description": "Re-save a JPG as a WebP in your browser. The picture is rebuilt from pixels, so EXIF data is left behind. Free, with no sign-up.",
+      "howToHeading": "How to convert JPG to WebP"
+    },
+    "tool": {
+      "subtitle": "Turn JPG photos into WebP files in your browser, one WebP for each JPG."
+    },
+    "aboutSection": {
+      "title": "JPG and WebP",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "Animation",
+          "Supported by current major browsers"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPG to WebP?",
+        "answer": "Choose the JPG, wait a moment and save the WebP. Your browser reads the JPG into pixels and writes the WebP from them, with no upload."
+      },
+      {
+        "question": "Will the WebP be smaller than the JPG?",
+        "answer": "The page sets no size target, so it can't promise it. The result depends on the picture, so compare the two files before you replace the originals."
+      },
+      {
+        "question": "Does converting JPG to WebP lose quality?",
+        "answer": "Plan for some loss. The WebP is encoded from the JPG's decoded pixels, so detail the JPG already dropped doesn't come back, and the encoder can discard more. Convert from the original JPG once rather than chaining conversions."
+      },
+      {
+        "question": "Can I pick lossless or choose the quality?",
+        "answer": "Not here: the page offers neither a quality slider nor a lossless mode. For a chosen quality or lossless output, use cwebp, GIMP or ImageMagick, shown below."
+      },
+      {
+        "question": "Why convert a JPG to WebP at all?",
+        "answer": "Smaller web images are what WebP is used for, and the current major browsers display it. It is a delivery format, so keep the JPG for editing and printing."
+      },
+      {
+        "question": "Does the WebP keep the EXIF data and GPS location?",
+        "answer": "No. EXIF, ICC profiles and XMP stay behind because the picture is rebuilt from pixels. That also drops camera details and any GPS location from the photo."
+      },
+      {
+        "question": "Where can I open a WebP?",
+        "answer": "Current Chrome, Edge, Firefox and Safari show WebP. Windows File Explorer and Photos need Microsoft's WebP Image Extension first, and many editors open it too."
+      },
+      {
+        "question": "Will a site that wants a JPG accept the WebP?",
+        "answer": "Not always. Check what the destination accepts before you replace your JPGs, and keep the originals."
+      },
+      {
+        "question": "Can I convert a whole folder of JPGs?",
+        "answer": "Yes. Add them all and the page works through them in turn, giving one WebP per JPG. There is no ZIP, so each file downloads separately."
+      },
+      {
+        "question": "Is there a size limit on the picture?",
+        "answer": "The page sets no file-size limit. WebP is limited to 16,383 pixels in each direction, so a JPG beyond that can't be stored as one."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting JPG to WebP",
+      "points": [
+        "The WebP is encoded from the JPG's decoded pixels, so detail can drop again.",
+        "EXIF data, ICC profiles and XMP aren't copied to the WebP.",
+        "The page has no quality slider and no lossless mode.",
+        "WebP caps each side at 16,383 pixels.",
+        "Choose several JPGs at once and each WebP downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "About JPG files",
+      "markdown": "### What is a JPG file?\n\nWork began in 1986 at the Joint Photographic Experts Group, which is where the name comes from. ITU-T published the core specification as T.81 in 1992, and ISO followed in 1994 with part 1 of its 10918 standard. In the baseline form, an encoder cuts the picture into blocks of 8 by 8 pixels, applies a discrete cosine transform per block and Huffman-codes the result. Because detail is thrown away, a typical file ends up between a tenth and a twentieth the size of the raw pixels.\n\nEvery color channel is stored with 8 bits. There is no alpha channel, which rules out transparency, and no layers. A quality scale from 0 to 100 is the usual control, and the same number in two programs does not promise the same look.\n\nMost digital cameras and scanners write JPG, and it is the everyday choice for photos on the web, email attachments and shared pictures. The two extensions, .jpg and .jpeg, are one format. The last of its US patents ran out on 27 October 2006.\n\n### Programs that open JPG files\n\n**Windows, macOS and Linux**\n\n- Editing is GIMP's strength, and its JPEG export dialog offers quality, smoothing, progressive mode, arithmetic coding, optimized entropy coding, restart markers, chroma subsampling and a choice of DCT method.\n- ImageMagick reads JPG at the command line. Its format list describes JPEG as lossy, with quality scaling plus Huffman and DCT options.\n\n**Web and mobile**\n\n- On desktops Chrome and Firefox show JPG, and phones do the same in Chrome and Safari. Every major browser handles it.\n\n### JPG and WebP compared\n\n- **Names**: JPG files use image/jpeg. WebP files end in .webp and use image/webp.\n- **Compression**: baseline JPEG always discards detail. Lossy WebP is based on VP8 coding, and the format has a separate lossless method.\n- **Transparency**: none in a JPG. WebP stores an alpha channel in both its lossy and lossless files.\n- **Animation**: a JPG is a single still, whereas WebP can hold an animation.\n- **Dimensions**: a WebP's width and height are each capped at 16,383 pixels.\n- **Metadata**: WebP can carry an ICC color profile, Exif and XMP.\n- **Origin**: Google announced WebP on 30 September 2010. Its lossy mode reuses the intra-frame coding of the VP8 video codec for still pictures, and JPEG is a standard from the early 1990s.\n- **Typical jobs**: WebP serves web images with smaller files, images needing transparency and short animations, while JPEG serves photographs.\n\nMoving from one to the other changes the compression. The page decodes the JPG into pixels, encodes those pixels as a WebP, and leaves the metadata behind.\n\n### Other ways to convert JPG to WebP\n\n- **cwebp:** run `cwebp -q 80 input.jpg -o output.webp`. The -q value runs from 0 to 100 and defaults to 75 when you leave it out. Adding `-lossless` encodes without loss, though that preserves what was decoded and not what the JPG had already discarded. The cwebp manual lists JPEG as an accepted input.\n- **GIMP:** bring the JPG in, go to File > Export As, and give the new file a name that ends in .webp. In the WebP dialog you can tick Lossless or move the sliders for image quality and alpha quality, and GIMP's page notes that higher quality usually means a larger file.\n- **ImageMagick:** run `magick input.jpg -quality 80 output.webp`, the pattern ImageMagick's documentation shows with a PNG input. Its format list notes that WebP needs the WEBP delegate library.\n\n### Problems with JPG files\n\n- **Transparency is missing**: JPEG export cannot keep transparent pixels. Pick a format that has alpha when you need see-through areas.\n- **An old photo frame or TV rejects the file**: some older devices cannot show progressive JPEG, where a coarse version appears first and sharpens while the rest loads. Export again with progressive mode off.\n- **Older software won't open it**: GIMP lists arithmetic coding among its JPEG options, says it can make files 5 to 10 percent smaller, and warns that older software may not open them.\n- **The same quality number looks different**: numbers differ between programs, so equal values do not guarantee equal compression or appearance.\n- **No layers survive**: a JPEG holds one flattened picture, so keep the project file you edited it from.\n"
+    }
+  },
+  "mkv-to-mp3": {
+    "seo": {
+      "title": "Convert MKV to MP3 Online (Free)",
+      "h1": "MKV to MP3 Converter",
+      "description": "Pull the soundtrack out of an MKV video as an MP3. The picture is dropped and FFmpeg runs in your browser. Free, with no sign-up.",
+      "howToHeading": "How to convert MKV to MP3"
+    },
+    "tool": {
+      "subtitle": "Save the soundtrack of an MKV video as an MP3, in your browser."
+    },
+    "aboutSection": {
+      "title": "MKV and MP3",
+      "fromFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open, free container format that can hold multiple video, audio, picture and subtitle tracks in one file. WebM is a subset of Matroska.",
+        "details": [
+          "Multiple audio and subtitle tracks",
+          "Chapters and metadata",
+          "Supports almost any codec"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It is used for downloadable audio.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "ID3 tags for metadata"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MKV to MP3?",
+        "answer": "Choose the MKV, wait while FFmpeg works in your browser and save the MP3. The video is dropped and the soundtrack is encoded as MP3."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "The request to LAME is 192 kbps, which MP3 can only reach for audio sampled at 32 kHz or higher; slower-sampled sound ends up at a lower bitrate. The page has no bitrate menu, so choose a desktop tool for any other rate."
+      },
+      {
+        "question": "My MKV has several audio tracks. Which one do I get?",
+        "answer": "The page gives FFmpeg no track choice, so the pick is FFmpeg's own and you can't set it here. To take a particular language or commentary, extract it with a command that maps the stream, as shown in the guide."
+      },
+      {
+        "question": "Why does the conversion fail with an FFmpeg error?",
+        "answer": "An MKV with no audio track at all ends in an error reading \"FFmpeg failed with exit code\" and a number, because there is no sound to save. Play the file in VLC to check that it has sound."
+      },
+      {
+        "question": "Will the MP3 sound worse than the MKV?",
+        "answer": "It can. MP3 is lossy, so a soundtrack that was already lossy is compressed a second time. A lossless soundtrack, such as FLAC, gives the encoder the cleanest start."
+      },
+      {
+        "question": "Will the MP3 keep the title and artist from my MKV?",
+        "answer": "Where the MKV carries global tags such as title, artist or album, FFmpeg can copy them to the MP3, which stores them as ID3 tags. A tag editor can add or fix them afterward."
+      },
+      {
+        "question": "How large will the MP3 be?",
+        "answer": "At the full 192 kbps it can run to about 24 KB for each second of sound, or roughly 1.4 MB a minute. A soundtrack sampled below 32 kHz is encoded at a lower rate and takes less."
+      },
+      {
+        "question": "Can I convert a Blu-ray rip or a long film?",
+        "answer": "The page sets no cap on length or size, but a feature-length file means a long wait, because the processing happens on your own machine."
+      },
+      {
+        "question": "Can I convert several MKV files in one go?",
+        "answer": "Yes. Add them all and they run one after another in the page, each giving its own MP3. There is no ZIP."
+      },
+      {
+        "question": "Is my video uploaded, and does my MKV change?",
+        "answer": "No upload happens: FFmpeg runs as WebAssembly inside your browser, so the MKV stays on your device and is left untouched. You download a new file named after the original, ending in .mp3."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting MKV to MP3",
+      "points": [
+        "The video is dropped; the MP3 holds sound only.",
+        "The MP3 asks for 192 kbps with LAME, and a soundtrack sampled below 32 kHz comes out lower.",
+        "When the MKV has several audio tracks, the page lets FFmpeg choose; you can't pick one here.",
+        "MP3 is lossy, so a soundtrack that was already lossy is compressed again.",
+        "An MKV with no audio track fails with an FFmpeg error."
+      ]
+    },
+    "guide": {
+      "title": "About MKV files",
+      "markdown": "### What is an MKV file?\n\nMatroska, the format behind .mkv, is a container built on EBML, a binary relative of XML. It grew out of an earlier project named MCF. One file can hold several video, audio and subtitle streams, along with chapters and descriptive tags. The container does not prescribe a compression method, so an MKV's quality depends on the codecs inside. IANA registers video/matroska for it.\n\nBecause the container only wraps other streams, two MKV files of the same length can differ widely in size and in what a player needs to decode them.\n\nYou meet MKV in high-quality video collections and Blu-ray rips, mostly because one file can carry multiple audio languages and subtitle tracks.\n\n### Programs that open MKV files\n\n**Windows, macOS and Linux**\n\n- mpv is a desktop player with selectable audio and subtitle streams.\n- FFplay ships with FFmpeg and plays MKV files.\n- VLC media player is a general-purpose desktop option.\n- Plex, and Windows Media Player once codecs are installed, are also listed as ways to open it.\n\n**Mobile**\n\n- On phones, the free VLC for Android and the VLC for iOS player both handle the format, though decoding depends on the media inside the container.\n\n### MKV and MP3 compared\n\n- **Extensions and media types**: .mkv with video/matroska; .mp3 with audio/mpeg.\n- **What they are**: MKV is a container for any mix of streams. MP3 is both a codec and a file format, MPEG-1 Audio Layer III, standardized in 1993.\n- **Compression**: MP3 discards sound that a model of hearing says listeners won't miss. The audio in an MKV may be lossy or lossless.\n- **Tracks**: MKV holds many. An MP3 holds one stream of sound.\n- **Metadata**: chapters and tags live inside an MKV, whereas an MP3 stores song titles and the rest in separate ID3 structures.\n- **Size**: set beside the same audio on a CD, a 128 kbit/s MP3 takes about one eleventh of the space, and a 192 kbit/s one about one seventh.\n- **Bitrate range**: bitrates span 32 to 320 kbps in MP3, and its sample rates are 32, 44.1 and 48 kHz.\n- **Origins of MP3**: Fraunhofer IIS started MP3 work in the late 1980s, joined by other MPEG audio group members. ISO/IEC 13818-3 extended ISO/IEC 11172-3 in 1995, and licensing of its patents stopped on 23 April 2017.\n- **Bitrate mode**: an MP3 can use a constant or a variable bitrate.\n- **Typical use**: MKV serves video libraries and rips. MP3 serves music libraries, podcasts and audio for portable players.\n- **Players**: Nearly every device is meant to play MP3, and each major browser does. An MKV needs a capable video player.\n\nThe command behind this page asks the LAME encoder for 192 kbit/s with the video disabled, so one MP3 holds the soundtrack FFmpeg selects. MP3 cannot reach that rate from sound sampled below 32 kHz, and the sample rate is left unchanged, so such a source gives a lower-rate file.\n\n### Other ways to convert MKV to MP3\n\n- **FFmpeg:** run `ffmpeg -i recording.mkv -map 0:a:0 -b:a 192k -c:a libmp3lame -vn soundtrack.mp3`. The `-map` option gives manual control of which stream is used, `-vn` turns video off.\n- **MKVToolNix:** run `mkvextract recording.mkv tracks 1:audio.mp3`, where 1 is a track ID from `mkvmerge --identify`. The tool writes the stream as it is stored, so this gives a playable MP3 only when the track is already MP3.\n\n### Problems with MKV files\n\n- **The wrong language plays**: the file has several audio streams. mpv lets you switch tracks, and FFmpeg's `-map` chooses one when converting.\n- **Seeking is slow**: missing or damaged cues make jumping through the file harder, because Matroska defines cues apart from the media clusters.\n- **It plays but won't convert**: the container is recognized, yet a codec inside may not decode in the chosen program.\n- **An error and no MP3**: the MKV may have no audio track. Check it in VLC first.\n- **A command that errors**: FFmpeg's `-map` must name a stream the file really has, and an MKV without audio leaves nothing to map.\n- **A second lossy pass**: re-exporting an edited MP3 as MP3 puts the audio through lossy encoding twice, so hold on to the first MP3 as the master.\n"
+    }
+  },
+  "jfif-to-png": {
+    "seo": {
+      "title": "Convert JFIF to PNG Online (Free)",
+      "h1": "JFIF to PNG Converter",
+      "description": "Open a .jfif file as a PNG that every app accepts. Your browser decodes the JFIF and writes the PNG losslessly. Free, with no sign-up.",
+      "howToHeading": "How to convert JFIF to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn a .jfif picture into a PNG that opens in any app, in your browser."
+    },
+    "aboutSection": {
+      "title": "JFIF and PNG",
+      "fromFormat": {
+        "name": "JFIF",
+        "fullName": "JPEG File Interchange Format",
+        "description": "A container convention for JPEG-compressed images that specifies color space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data.",
+        "details": [
+          "Lossy JPEG compression",
+          "No alpha transparency",
+          "Readable as a regular JPEG"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JFIF to PNG?",
+        "answer": "Select the .jfif file and download the PNG once it's ready. The decoding happens in your browser, so the picture isn't uploaded."
+      },
+      {
+        "question": "What is a .jfif file, and why do I have one?",
+        "answer": "JFIF is the wrapper most JPEG photos use, and some browsers and Windows tools save pictures with a .jfif ending. Inside it is ordinary JPEG data, so it reads as a regular JPEG."
+      },
+      {
+        "question": "Is JFIF to PNG lossless?",
+        "answer": "The PNG step loses nothing, since PNG compression is lossless. The JFIF was lossy JPEG data to begin with, so its artifacts are in the PNG as they were."
+      },
+      {
+        "question": "Why did my file grow?",
+        "answer": "A JPEG stays small by discarding detail. PNG keeps every decoded pixel, so a photo can end up larger than the JFIF it came from. PNG suits graphics better than photographs."
+      },
+      {
+        "question": "Does the PNG have a transparent background?",
+        "answer": "No. JPEG data can't hold transparency, so the PNG is fully opaque."
+      },
+      {
+        "question": "Can I just rename .jfif to .png?",
+        "answer": "No. The data inside is still JPEG, so a program that reads the contents may reject it. Converting is what produces a real PNG."
+      },
+      {
+        "question": "Would JPG be a better target?",
+        "answer": "It depends on what the app wants. PNG keeps every decoded pixel, while a JPG output is a fresh lossy JPEG encoding. Choose PNG when the picture will be edited again."
+      },
+      {
+        "question": "Is the photo's EXIF data kept?",
+        "answer": "No. The capture date, camera model and any location in the EXIF block aren't carried over, because only pixels pass through. ICC profiles and XMP are dropped too."
+      },
+      {
+        "question": "Can I do a whole batch of .jfif files?",
+        "answer": "Yes. Drop in a group of them and you get one PNG back per file, one after the other, without a ZIP."
+      },
+      {
+        "question": "Is any color depth lost?",
+        "answer": "Nothing beyond what JPEG had. A JPEG stores 8 bits for each channel and the pixels travel at 8 bits through this page, so the PNG ends up with 8 bits per channel too."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting JFIF to PNG",
+      "points": [
+        "A .jfif file holds ordinary JPEG data, so the PNG starts from lossy pixels.",
+        "The PNG is lossless but can be larger than the JFIF.",
+        "The PNG is opaque, since JPEG data has no transparency.",
+        "EXIF data, ICC profiles and XMP aren't copied.",
+        "Choose several .jfif files at once and each PNG downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "About JFIF files",
+      "markdown": "### What is a JFIF file?\n\nJPEG File Interchange Format, or JFIF, is a small wrapper so JPEG picture data can move between programs and platforms. Eric Hamilton of C-Cube Microsystems wrote it, with version 1.02 dating from 1992. ITU-T T.871 (approved May 2011) and ISO/IEC 10918-5 later standardized it. Every JFIF begins with a JPEG start-of-image marker, followed by an APP0 segment whose label reads JFIF. A small thumbnail can sit inside.\n\nJFIF was created because the JPEG standard itself left out practical details, among them the color space and the pixel aspect ratio.\n\nUnderneath, most files called JPEGs follow the JFIF layout. The .jfif ending shows up when a browser or Windows tool saves a picture under that name in place of .jpg, and the endings .jpeg, .jpe, .jfi and .jif belong to the same family. The media type remains image/jpeg.\n\n### Programs that open JFIF files\n\n**Windows, macOS and Linux**\n\n- ImageMagick reads it through its JPEG reader.\n- Firefox displays JPEG/JFIF data.\n- GIMP opens it as well.\n\n**Windows**\n\n- Windows Photos counts as a viewer.\n\n**Web and mobile**\n\n- Chrome and Firefox show JFIF in a page, and Chrome and Safari display it on phones.\n\n### JFIF and PNG compared\n\n- **Extensions and media types**: image/jpeg for .jfif, .jpg and .jpeg; image/png for .png.\n- **Compression**: the picture data in a JFIF is lossy and block-based, with 8x8 pixel tiles going through a discrete cosine transform and then entropy coding. A PNG always compresses losslessly with DEFLATE.\n- **Transparency**: JFIF has none. PNG supports an alpha channel.\n- **Color depth**: JPEG data holds 8 bits for each channel. PNG can store from 1 to 16 bits per sample.\n- **Metadata**: this page copies no EXIF, ICC profile or XMP into the PNG. The PNG format itself can hold Exif in an eXIf chunk since its third edition.\n- **Support**: every major browser displays both.\n- **Origins**: PNG began as a patent-free successor to GIF and became the first format published as a W3C Recommendation, in October 1996.\n- **Structure**: after a fixed signature, a PNG continues as chunks, with the header in IHDR, pixel data in IDAT and a closing IEND.\n- **One picture**: the present specification also describes animated PNG, and a player lacking animation support displays the default still image. A JFIF is one still, and so is the PNG written here.\n- **Opening the result**: GIMP, Windows Photos, Preview on macOS and any web browser all open PNG, and macOS writes its screenshots as PNG unless told otherwise.\n- **Editing**: PNG compression is lossless, so saving again costs no detail. JPEG data is lossy.\n- **Where you meet them**: a .jfif turns up among images saved from some browsers and Windows tools, and the format serves the interchange of JPEG photographs.\n- **Best for**: photographs moving between programs suit JFIF; screenshots, logos, transparent images and crisp web graphics suit PNG.\n\nThe conversion changes the wrapper and the way the pixels are stored. Your browser decodes the JFIF and the page writes those same pixels as a PNG. The pixels are the ones the JPEG data already held, so nothing more is lost, but the file can come out larger.\n\n### Other ways to convert JFIF to PNG\n\n- **ImageMagick:** run `magick input.jfif output.png`, the same input-then-output form its documentation shows for `magick image.jpg image.png`. Its format list calls the JPEG entry the JFIF format and marks it readable and writable, while PNG needs libpng and covers indexed, RGB and RGBA depths.\n\n### Problems with JFIF files\n\n- **An app rejects .jfif**: the data is ordinary JPEG, so identify its encoding before deciding to re-encode. Convert it to PNG, or to JPG with the [JFIF to JPG converter](/jfif-to-jpg/).\n- **A file won't open at all**: some JPEG extensions exceed what a particular JFIF reader handles. Try a baseline-compatible export or another viewer.\n- **You expected transparency**: JPEG data can't hold alpha, so a PNG made from it stays opaque. Remove a background in an editor afterward.\n- **Blocky edges around text**: JPEG works in 8x8 pixel blocks, so artifacts appear near sharp edges, and the PNG keeps them. Start from a better source if you can.\n- **A larger PNG**: lossless storage discards nothing, so a camera-sized photo can come out much bigger than the JFIF. Use JPG instead if file size matters more than lossless storage.\n"
+    }
+  },
+  "wmv-to-mp4": {
+    "seo": {
+      "title": "Convert WMV to MP4 Online (Free)",
+      "h1": "WMV to MP4 Converter",
+      "description": "Re-encode a WMV video as an MP4 with H.264 video and AAC sound, up to 1920 px and 30 fps. Runs in your browser, free, no sign-up.",
+      "howToHeading": "How to convert WMV to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn a WMV video into an MP4 that every major browser plays, in your browser."
+    },
+    "aboutSection": {
+      "title": "WMV and MP4",
+      "fromFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "A family of video codecs developed by Microsoft, usually stored in the ASF container. It was widely used for Windows video and streaming.",
+        "details": [
+          "ASF container",
+          "Proprietary Microsoft codec",
+          "Lossy compression",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WMV to MP4?",
+        "answer": "Choose the WMV file, wait while FFmpeg re-encodes it in your browser and save the MP4. Nothing is uploaded, so the time depends on your device."
+      },
+      {
+        "question": "What video and audio does the MP4 contain?",
+        "answer": "H.264 video and AAC audio at 96 kbps, the most common pairing inside an MP4. The video is encoded with x264 at a constant rate factor of 32 and the ultrafast preset, which is a speed-minded setting rather than a high-quality one."
+      },
+      {
+        "question": "Will the quality drop?",
+        "answer": "It can. The WMV is decoded and encoded again with a lossy codec, so detail can be lost that a plain copy would have kept. Convert the original WMV once and don't re-convert the MP4."
+      },
+      {
+        "question": "Does my 4K or 60 fps WMV keep its size and frame rate?",
+        "answer": "Not if it exceeds the limits. The longer side shrinks to 1920 px at most and motion is capped at 30 frames a second, with extra frames dropped and the length unchanged. A smaller video isn't enlarged, and both sides are rounded down to even numbers."
+      },
+      {
+        "question": "My WMV was interlaced. Is that fixed?",
+        "answer": "The converter applies the yadif deinterlacing filter to frames marked as interlaced, which removes the comb pattern on moving edges. Frames that aren't marked pass through it unchanged."
+      },
+      {
+        "question": "Will the MP4 start playing before it has finished downloading?",
+        "answer": "It can, if it is served over the web. The converter moves the MP4's index to the front of the file, so a player has what it needs at the start."
+      },
+      {
+        "question": "Why did the conversion fail?",
+        "answer": "The message begins \"FFmpeg failed with exit code\" and ends in the exit number. A stream that FFmpeg only partly decodes is one cause, since its own list describes one Windows Media Video decoder as not completely working; an unusual file can fail even when Windows plays it."
+      },
+      {
+        "question": "Can I convert several WMV files at once?",
+        "answer": "Yes. Add them together and the page converts each in order, giving you a separate MP4 every time. Nothing is zipped, and no size limit is set."
+      },
+      {
+        "question": "Does it run on a phone or a Mac?",
+        "answer": "It runs inside the browser, so the work happens on your own device wherever the page opens. Mac users who prefer an app can use HandBrake, which lists WMV among its source types."
+      },
+      {
+        "question": "Is the MP4 smaller than the WMV?",
+        "answer": "The page makes no promise. A run of its own settings on a small test clip gave a file a little smaller than the WMV, but the result depends on the video."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting WMV to MP4",
+      "points": [
+        "The video is re-encoded as H.264 and the sound as AAC at 96 kbps.",
+        "The longer side is limited to 1920 px and the frame rate to 30 fps.",
+        "The encode is lossy, so detail can be lost.",
+        "Frames marked as interlaced are deinterlaced, and the MP4 index is placed at the front of the file.",
+        "A failure shows an FFmpeg error with an exit code."
+      ]
+    },
+    "guide": {
+      "title": "About WMV files",
+      "markdown": "### What is a WMV file?\n\nWindows Media Video is Microsoft's video codec family, and a .wmv file wraps Windows Media content in the ASF container, short for Advanced Systems Format. ASF was built to keep audio and video synchronized and to stream from a disk or over HTTP. Inside you may find Windows Media Video 7, 8 or 9 compression. The Library of Congress lists video/x-ms-wmv as a commonly used media type, not an IANA registration.\n\nThe format is proprietary and counts as a legacy one, and its compression is lossy. The container holds audio and video streams side by side.\n\nStreaming through Windows Media, screen recordings and older Windows video are where WMV appears, and its listed players are Windows Media Player and VLC media player.\n\n### Programs that open WMV files\n\n**Linux, Windows and macOS**\n\n- The VLC media player lists ASF/WMV input and decodes Windows Media Video 1, 2 and 9.\n- Bundled with FFmpeg, FFplay plays WMV through its decoders.\n\n**Windows**\n\n- Windows Media Player is listed among the players.\n\n**Mobile**\n\n- On Android, VLC carries over the desktop player's decoding features.\n- Local files on iPhone and iPad play in VLC for iOS, which uses a player of its own instead of the system one.\n\n### WMV and MP4 compared\n\n- **Extensions and media types**: .wmv with video/x-ms-wmv; .mp4 with video/mp4.\n- **What they are**: WMV puts Microsoft's own codecs in an ASF container. MP4 is MPEG-4 Part 14, ISO/IEC 14496-14, first published in 2003, and it grew from the ISO Base Media File Format.\n- **Structure**: QuickTime calls them atoms, the nested boxes an MP4 consists of.\n- **Support**: every major browser plays MP4, and VLC, QuickTime Player and Windows Media Player open it. WMV needs decoders for Windows Media.\n- **Typical use**: MP4 serves online video, phone and camera recordings, and shared video files. WMV mostly holds older Windows video.\n- **Streams**: MP4 carries subtitles and chapters, and it holds codecs such as H.264, H.265 and AV1 for the picture.\n- **Extensions**: video MP4 files use .mp4 or .m4v, while audio-only MPEG-4 files often use .m4a.\n\nThis converter decodes the WMV and encodes new H.264 video and AAC audio. It limits the longer side to 1920 px and the rate to 30 fps, deinterlaces frames marked as interlaced, and writes the MP4 with its index at the front.\n\n### Other ways to convert WMV to MP4\n\n- **FFmpeg:** run `ffmpeg -i legacy.wmv -c:a aac -c:v libx264 shared.mp4`. It leaves out the size and quality settings this page uses, so supply your own when a destination demands them. To put the index first as this page does, add `-movflags +faststart`, which makes a second pass that moves the moov atom to the start of the file.\n- **HandBrake:** choose Open Source on the toolbar and pick the WMV, which the source-formats page lists. Choose a preset, such as the default Fast 1080p30, which writes MP4 with H.264 and AAC stereo and which the quick-start page calls fast and compatible with most devices. Set Save As and the To folder, then select Start.\n\n### Problems with WMV files\n\n- **The file opens but shows no picture**: a player may parse the ASF wrapper yet lack the matching video decoder, since reading the container and decoding its video are different jobs.\n- **A player has no decoder**: knowing the container does not mean a decoder exists for the video or audio inside it, so try VLC.\n- **Quality isn't set by the extension**: a .wmv can hold a high-quality recording or a very compressed one, so judge by the picture.\n- **The MP4 can look softer than the WMV**: the new encode is lossy. Resolution and frame rate limits also apply.\n- **Converting twice makes it worse**: each lossy pass can remove detail, so go back to the WMV and convert from there.\n- **Fast motion looks less fluid**: footage above 30 fps has frames dropped here, though the clip keeps its length and is not slowed down.\n- **An MP4 that won't play**: a write cut short can leave an incomplete MP4 that won't play, so copy it again when it came from a download.\n- **Big files take long**: the work runs on your device with a single-threaded encoder. Trim the video first if it is only partly needed.\n"
+    }
+  },
+  "heif-to-jpg": {
+    "seo": {
+      "title": "Convert HEIF to JPG Online (Free)",
+      "h1": "HEIF to JPG Converter",
+      "description": "Save a HEIF or HEIC photo as a JPG at quality 0.85. The main image is decoded in your browser with libheif. Free, with no upload or sign-up.",
+      "howToHeading": "How to change HEIF to JPG"
+    },
+    "tool": {
+      "subtitle": "Save a HEIF or HEIC photo as a JPG, decoded in your browser."
+    },
+    "aboutSection": {
+      "title": "HEIF and JPG",
+      "fromFormat": {
+        "name": "HEIF",
+        "fullName": "High Efficiency Image File Format",
+        "description": "A container format standardized by MPEG as ISO/IEC 23008-12 for single images and image sequences, most often compressed with HEVC. HEIC and AVIF files are HEIF variants.",
+        "details": [
+          "Multiple images per file",
+          "Supports alpha and depth maps",
+          "HEVC or other codecs"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert HEIF to JPG?",
+        "answer": "Choose the .heif or .heic file, wait while libheif decodes it in your browser and save the JPG. Nothing is uploaded."
+      },
+      {
+        "question": "Is HEIF the same as HEIC?",
+        "answer": "HEIF is the container and HEIC is the HEIF variant whose pictures are coded with HEVC. The decoder here reads both, so a phone photo and another HEIF file are handled the same way."
+      },
+      {
+        "question": "Why does my iPhone save photos as HEIF?",
+        "answer": "Apple's stated reason is better compression than JPEG. On the iPhone, Settings > Camera > Formats switches between High Efficiency and Most Compatible, which saves JPEG."
+      },
+      {
+        "question": "What quality is the JPG?",
+        "answer": "The JPG is written at quality 0.85 from 8-bit pixels. It is a new lossy encode, so keep the HEIF for editing."
+      },
+      {
+        "question": "Does the JPG keep the date, location and color profile?",
+        "answer": "No. EXIF data and ICC profiles are not copied, so the capture date, camera and location are not in the JPG."
+      },
+      {
+        "question": "What if my HEIF holds several photos?",
+        "answer": "You get one JPG, made from the primary image. The other pictures stored in the file are left out."
+      },
+      {
+        "question": "Why does Windows say it can't open the HEIC?",
+        "answer": "Windows asks for two Store add-ons before it opens .heic and .heif files: the HEIF Image Extension plus the HEVC Video Extensions, both from Microsoft. A conversion here skips that."
+      },
+      {
+        "question": "Why does the conversion say \"No images in HEIF\"?",
+        "answer": "libheif found no picture inside the file. Check that the file opens in another program, such as Preview on a Mac."
+      },
+      {
+        "question": "Can I convert many HEIF files at once?",
+        "answer": "Yes. Choose a whole set and the page converts them one by one, delivering a separate JPG for each. You won't get a ZIP."
+      },
+      {
+        "question": "Does the HEIF file itself change?",
+        "answer": "No. The original stays as it was, and the JPG is a new file named after it. Everything runs in your browser."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting HEIF to JPG",
+      "points": [
+        "Only the primary image is decoded, so a file with several pictures gives one JPG.",
+        "The JPG is written at quality 0.85 from 8-bit pixels.",
+        "EXIF data and ICC profiles are not copied.",
+        "A HEIF with no readable picture fails with \"No images in HEIF\".",
+        "Choose several files at once and each JPG downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "About HEIF files",
+      "markdown": "### What is a HEIF file?\n\nHEIF, the High Efficiency Image File Format, comes from MPEG as ISO/IEC 23008-12 and was first published in 2017. It uses the ISO Base Media File Format as its base and can store single stills, collections and timed sequences, with metadata and derived images attached. It is a container, not a codec: HEVC (H.265) is one coding it supports, and HEIC is the variant that uses it. Stills carry the media type image/heif and sequences image/heif-sequence.\n\nApple brought HEIF to photos with iOS 11 and macOS High Sierra, capturing it on iPhone 7 and later. Apple says HEIF gives better compression than JPEG. The container can hold several images, image sequences and depth maps, plus Exif or XMP metadata, high bit depths, and an alpha channel stored as an auxiliary image. A reader needs to understand the container and also the codec of each item.\n\nPhones are where most people meet it. The listed uses are photographs from modern phones and image sequences and bursts.\n\n### Programs that open HEIF files\n\n**Windows, macOS and Linux**\n\n- GIMP imports and exports HEIF since version 2.10.2.\n- XnView MP, a viewer with HEIF support, costs nothing for private and educational use on Windows and Linux.\n\n**Windows**\n\n- Photos needs both of Microsoft's media add-ons, one for HEIF and one for HEVC video.\n\n**macOS**\n\n- Preview, Apple's viewer, opens HEIF and exports it as JPEG.\n\n**Web**\n\n- Safari displays HEIC from version 17.0.\n\n**Mobile**\n\n- Android decodes HEIF from version 9, Apple Photos on iPhone and iPad opens them, and Adobe documents HEIF and .heic support in Lightroom for mobile on both iOS and Android.\n\n### HEIF and JPG compared\n\n- **Extensions and media types**: image/heif for .heif and .heic; image/jpeg for .jpg and .jpeg.\n- **What they are**: HEIF is a container that can hold many images and extras. A JPG is one picture.\n- **Compression**: HEIF files are listed as smaller than JPEG ones, and JPEG is lossy.\n- **Transparency**: HEIF can store alpha in an auxiliary image. JPG cannot.\n- **Bit depth**: HEIF supports high bit depths. JPG stores 8 bits per channel.\n- **Metadata**: HEIF can carry Exif and XMP. This page does not copy them to the JPG.\n- **Support**: every major browser shows JPG. HEIF support depends on the Apple system version, and Windows needs two extensions.\n- **Typical use**: HEIF is what modern phones store photos in, while JPG is the usual choice for pictures on the web, files from cameras, mail attachments and sharing photos.\n- **Extras**: this page decodes only the primary image, so other pictures in the file do not reach the JPG.\n\nThe JPG comes out at quality 0.85 from the 8-bit pixels of the primary image only.\n\n### Other ways to convert HEIF to JPG\n\n- **Preview:** on a Mac, open the HEIF in Preview, choose File > Export, and pick a format such as JPEG before saving. Apple describes this in its support article.\n- **libheif:** run `heif-dec input.heif output.jpg`. The tool picks the output format from the filename suffix, and jpg, jpeg and png are among the suffixes it recognizes. Its quality option applies to JPEG output, and a file with several images gives numbered outputs ending -1, -2 and so on.\n\n### Problems with HEIF files\n\n- **A program says unsupported**: knowing the HEIF wrapper is not enough, because the program also has to decode the codec stored inside. A HEIC needs an HEVC decoder.\n- **Only one photo is exported**: a file can hold several related pictures or a sequence, and a single-image export does not represent all of them.\n- **An old Mac or iPhone can't open it**: older Apple systems lack the built-in support Apple added in iOS 11 and macOS High Sierra, which is why conversion helps. Converting to JPG improves compatibility.\n- **Photos refuses it on Windows**: Windows Photos may decline HEIC until you add both of the Microsoft media extensions.\n- **USB copies turn into JPG**: photos copied from an iPhone over USB may be converted automatically unless Keep Originals is chosen in Photos settings.\n- **No EXIF in the result**: this page leaves metadata behind, so use another tool if you need the capture date or location kept.\n- **Check before deleting**: because metadata is left behind, look over the JPG before you remove the original HEIF.\n- **Future photos**: switch the iPhone camera to Most Compatible if you want JPG at capture time.\n"
+    }
+  },
+  "svg-to-jpg": {
+    "seo": {
+      "title": "Convert SVG to JPG Online (Free)",
+      "h1": "SVG to JPG Converter",
+      "description": "Draw an SVG at the size your browser reports for it and save the result as a JPG at quality 0.85. Free, in your browser, with no upload.",
+      "howToHeading": "How to convert SVG to JPG"
+    },
+    "tool": {
+      "subtitle": "Draw an SVG as a picture and save it as a JPG, in your browser."
+    },
+    "aboutSection": {
+      "title": "SVG and JPG",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Supports animation and scripting",
+          "Styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group, designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert SVG to JPG?",
+        "answer": "Choose the SVG, wait a moment and save the JPG. Your browser draws the SVG and saves that picture as a JPG, so nothing is uploaded."
+      },
+      {
+        "question": "How large is the JPG?",
+        "answer": "As large as your browser reports the SVG to be, drawn one pixel to one pixel. There is no scale option, so a bigger JPG means giving the SVG a bigger width and height first."
+      },
+      {
+        "question": "Why is my JPG so small and blurry?",
+        "answer": "The SVG can be drawn at a small size if it carries no usable dimensions, and the page adds no scale factor to enlarge it. Edit the SVG file to give it larger dimensions, or export a larger PNG from Inkscape."
+      },
+      {
+        "question": "What happens to transparent areas?",
+        "answer": "A JPG cannot store transparency. If you need a specific background, put a filled rectangle behind your drawing in the SVG before converting."
+      },
+      {
+        "question": "Is the text in my SVG still text?",
+        "answer": "No. The JPG is a grid of pixels, so text can't be selected or edited. Keep the SVG if you will change the wording or need sharp text at any size."
+      },
+      {
+        "question": "Why is the font different in the JPG?",
+        "answer": "Layout of text depends on which fonts exist, so a missing one is swapped for another. Your device's installed fonts are all that can be drawn, so a web font named by the file is never used."
+      },
+      {
+        "question": "Why are the images in my SVG missing?",
+        "answer": "Pictures that an SVG links to by address never load when it is drawn, whether you are online or not. Embed those images in the SVG as data so it carries them, then convert again."
+      },
+      {
+        "question": "What quality is the JPG?",
+        "answer": "Quality 0.85. The page has no setting for it, and JPEG is lossy. For graphics that must stay crisp, a PNG output suits better."
+      },
+      {
+        "question": "Can I convert several SVGs at once?",
+        "answer": "Yes. Several SVGs can go in at once; each comes out as a JPG file of its own, in sequence, with no ZIP."
+      },
+      {
+        "question": "Can I get the SVG back from the JPG?",
+        "answer": "No. The vector shapes are gone once the picture is made, so keep the SVG as your master copy."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting SVG to JPG",
+      "points": [
+        "The SVG is drawn at the size your browser reports for it, with no scale option.",
+        "The JPG is written at quality 0.85.",
+        "A JPG has no transparency, so add a background shape if you need a color.",
+        "Text and shapes become pixels and can't be edited afterward.",
+        "Each SVG in a batch downloads as its own JPG."
+      ]
+    },
+    "guide": {
+      "title": "About SVG files",
+      "markdown": "### What is an SVG file?\n\nScalable Vector Graphics is an open W3C standard. SVG 1.0 was recommended in 2001 and SVG 1.1 followed in 2003. The XML language lays out shapes, text and embedded pictures, so a drawing stays sharp at any size. The files are plain text that you can edit, search and compress, and a gzipped one ends in .svgz. Its media type is image/svg+xml.\n\nAn SVG is shown by itself or inside an HTML page. Because CSS and JavaScript apply to it, it can take styling, scripting and animation, and it also covers clipping paths, masks and filters. It is most often seen as logos and icons on the web, illustrations, diagrams, charts and maps.\n\n### Programs that open SVG files\n\n**Windows, macOS and Linux**\n\n- Inkscape is the native SVG editor.\n- Firefox displays SVG.\n- Adobe Illustrator and Figma are listed too.\n\n**Web and mobile**\n\n- Chrome and Firefox display SVG in a page, and so does every major browser.\n- On phones, Chrome and Safari show it.\n\n### SVG and JPG compared\n\n- **Extensions and media types**: .svg is image/svg+xml; JPG files use image/jpeg and the .jpg or .jpeg ending.\n- **What they are**: SVG stores shapes and text as instructions. JPG stores a fixed grid of pixels.\n- **Scaling**: shapes in an SVG stay sharp however large they are drawn, whereas a JPG has only the pixels it was saved with.\n- **Compression**: JPEG is lossy, splitting the picture into 8x8 pixel blocks. SVG is text.\n- **Transparency**: an SVG can leave areas empty. JPG cannot store an alpha channel.\n- **Editing**: SVG text and shapes stay editable. A JPG cannot store layers or live text.\n- **Typical use**: SVG serves graphics that must stay sharp. JPG serves photographs on the web, camera output, and email attachments and photo sharing.\n- **Origins**: work by the JPEG group began in 1986. The core standard was published as ITU-T T.81 in 1992 and as ISO/IEC 10918-1 in 1994, and 27 October 2006 is when its US patents expired.\n- **Quality scale**: programs usually take a quality figure from 0 to 100, and an identical figure can give different results between them; GIMP's default is 85. This page fixes it at 0.85.\n- **Browsers**: every major browser displays both formats.\n- **Bit depth**: JPG stores 8 bits per channel, and the pixels pass through at 8 bits here.\n\nThis converter has your browser draw the SVG at the size it reports for it, then stores the picture with JPEG quality 0.85. The code adds no scale factor and no size cap.\n\n### Other ways to convert SVG to JPG\n\n- **GIMP:** open the SVG as an image, which GIMP's glossary says it can import from vector graphics software. To save, pick File > Export As, type a .jpg name for the file and click Export, which brings up the JPEG options.\n- **ImageMagick:** run `magick input.svg output.jpg`. Its format list gives the SVG row read and write mode and says it renders with Inkscape, RSVG or its internal MSVG renderer.\n- **Inkscape and Preview:** in Inkscape, open the export dialog with Shift+Ctrl+E (File > Export PNG Image), select Page, Drawing, Selection or Custom, enter the size in pixels, give the file a name and click Export. Next, open that PNG in Preview on a Mac, open the File menu, choose Export and pick JPEG from the Format pop-up menu before clicking Save.\n\n### Problems with SVG files\n\n- **The text looks different**: layout depends on available fonts, so substituted fonts can change the drawing.\n- **Images are missing**: this page never draws a picture the SVG links to, even one that is online. Embed each one in the file as data.\n- **Embedded pictures look soft**: an SVG can embed pixel images, and those parts retain their original resolution when enlarged.\n- **The JPG is tiny**: the output is drawn one pixel to one pixel at the size the browser reports. Set a width and height in the file for a bigger result.\n- **An empty background can't stay clear**: JPG has no transparency, so draw your own background shape to control what fills the space.\n- **Fonts do not match the web page**: a web font loaded by a page isn't drawn in a standalone SVG.\n- **A style sheet is ignored**: an external stylesheet referenced by the file is left out of the drawing, so put the styles inside the SVG.\n"
+    }
+  },
+  "png-to-gif": {
+    "seo": {
+      "title": "Convert PNG to GIF Online (Free)",
+      "h1": "PNG to GIF Converter",
+      "description": "Save a PNG as a GIF in your browser. GIF holds 256 colors per frame, has 1-bit transparency and shows an animated PNG as its first frame. Free.",
+      "howToHeading": "How to convert PNG to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn a PNG into a GIF, written from its pixels in your browser."
+    },
+    "aboutSection": {
+      "title": "PNG and GIF",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert PNG to GIF?",
+        "answer": "Choose the PNG, wait a moment and save the GIF. Your browser decodes the PNG and the GIF is written from those pixels, with no upload."
+      },
+      {
+        "question": "Does this make an animated GIF from my PNGs?",
+        "answer": "No. Each PNG becomes one still GIF, and several PNGs do not combine into one animation. GIMP can export a multilayer image as an animation instead."
+      },
+      {
+        "question": "What happens to my colors?",
+        "answer": "A GIF frame holds at most 256 colors, so a photo or smooth gradient is reduced and can show bands or dots. Simple graphics and icons, among GIF's listed uses, suit a small palette better."
+      },
+      {
+        "question": "What happens to soft transparent edges?",
+        "answer": "In a GIF one palette color is set aside as the fully transparent one, so partial opacity, such as a drop shadow, can't be kept. Check the result on the background where it will appear."
+      },
+      {
+        "question": "What happens to an animated PNG?",
+        "answer": "Only the first frame is converted, so you get a still GIF. Animated PNG, or APNG, has frames the page doesn't carry over."
+      },
+      {
+        "question": "Will the GIF be bigger or smaller than the PNG?",
+        "answer": "The page makes no promise, because it depends on the picture. Both formats compress losslessly, but a GIF stores at most 256 colors, which can suit a graphic and strain a photo."
+      },
+      {
+        "question": "Why convert PNG to GIF?",
+        "answer": "Pick GIF when the destination wants a looping clip, a sticker or a small icon-style graphic. PNG began as a patent-free replacement for GIF, and every major browser displays both."
+      },
+      {
+        "question": "Does the GIF keep metadata?",
+        "answer": "No. EXIF, color profiles and XMP are not carried over, because only the decoded pixels reach the GIF writer, which is ImageMagick."
+      },
+      {
+        "question": "Can I convert several PNGs at once?",
+        "answer": "Yes. Pick several PNGs and each one becomes a GIF of its own, downloaded in sequence. Nothing is zipped."
+      },
+      {
+        "question": "Can I convert the GIF back to PNG without losing anything?",
+        "answer": "You can convert it back, but the colors that were dropped to fit 256 don't return. Keep the PNG as the master."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting PNG to GIF",
+      "points": [
+        "A GIF frame holds at most 256 colors, so photos and gradients lose detail.",
+        "GIF transparency is on or off, with no soft edges.",
+        "An animated PNG gives only its first frame as a still GIF.",
+        "EXIF data, ICC profiles and XMP are not copied.",
+        "Choose several PNGs at once and each GIF downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "About PNG files",
+      "markdown": "### What is a PNG file?\n\nDesigned to replace GIF without its patent baggage, PNG was published by the W3C as a Recommendation in October 1996, the first format to get that status. RFC 2083 and ISO/IEC 15948:2004 followed, and the third edition of the specification arrived on 24 June 2025. Files start with a signature and continue as chunks; the header lives in IHDR, the pixels in IDAT and a closing IEND.\n\nNothing is thrown away in PNG: DEFLATE, a blend of LZ77 and Huffman coding, does the compressing. Pictures may be indexed, grayscale or truecolor at between 1 and 16 bits per sample, and an added alpha channel gives every pixel its own transparency. The third edition brought HDR support via the cICP chunk and room for Exif metadata in an eXIf chunk.\n\nThat makes PNG a good fit for screenshots and interface graphics, logos and images with transparency, and web graphics that must stay sharp. macOS saves screenshots as PNG by default.\n\n### Programs that open PNG files\n\n**Windows, macOS and Linux**\n\n- GIMP imports PNG for editing.\n- ImageMagick reads PNG.\n\n**Windows**\n\n- Windows Photos opens the format.\n\n**macOS**\n\n- Preview counts among the macOS viewers.\n\n**Web and mobile**\n\n- Chrome and Firefox display PNG in a page, and Chrome and Safari do so on phones.\n\n### PNG and GIF compared\n\n- **Extensions and media types**: image/png for .png (image/apng for animated files); image/gif for .gif.\n- **Colors**: PNG allows up to 16 bits per sample and truecolor. A GIF picture draws from a palette capped at 256 colors.\n- **Compression**: both are lossless. PNG uses DEFLATE and GIF uses LZW, which Unisys began licensing in 1994 before the patents ran out in 2003 and 2004.\n- **Transparency**: PNG has a full alpha channel, so edges can fade out. GIF only lets one palette color be fully transparent.\n- **Animation**: GIF can hold many frames with delays set in hundredths of a second. The current PNG specification covers animated PNG too, and software that cannot animate shows the default still image.\n- **Typical use**: PNG fits screenshots and graphics you will edit again; GIF is for brief looping animations, plain graphics, icons, reaction images and stickers.\n- **Age**: CompuServe introduced GIF in 1987, and the GIF89a version of July 1990 added extensions for transparency, frame timing, comments and application data.\n- **Support**: every major browser displays both.\n- **Bit depth**: each channel is held at 8 bits on the way through, so a 16-bit PNG loses its extra depth.\n\nWhat changes in this conversion is the palette. The page decodes the PNG to pixels and writes a GIF, so anything beyond 256 colors is reduced, and animated PNGs reach the GIF as their first frame only.\n\n### Other ways to convert PNG to GIF\n\n- **GIMP:** with the PNG open, pick Export As from the File menu and finish the new name with .gif. The GIF dialog offers interlace, which lets an image on a web page appear progressively as it downloads, a comment, and As animation with loop forever, a delay and frame disposal. GIMP only exports a maximum of 256 colors, and its docs advise indexed mode first.\n- **ImageMagick:** run `magick input.png output.gif`. Its format list marks both PNG and GIF read and write, with GIF as 8-bit PseudoColor up to 256 palette entries.\n\n### Problems with PNG files\n\n- **Colors look banded after conversion**: the GIF has only 256 colors. A photo is a poor fit.\n- **Soft edges turn jagged or gain a halo**: GIF can't keep partial opacity, so shadows and anti-aliased edges are flattened.\n- **GIMP export looks different**: GIMP reduces a GIF export to no more than 256 colors, which can change gradients.\n- **A palette you didn't pick**: this page reduces colors for you, while GIMP's docs advise setting indexed mode first, so the palette is chosen on purpose.\n- **Layer offsets**: they may differ between GIMP and other programs, so avoid the PNG offset option.\n- **Metadata is missing**: camera tags and profiles are optional in GIMP's PNG exports and absent from this page's GIF.\n- **A comment goes missing**: GIMP omits a GIF comment containing characters outside seven-bit ASCII.\n- **An animated PNG shows one frame**: this page keeps the default still image and nothing else.\n- **Animation frames cover each other oddly**: GIMP's frame disposal setting decides how each later image covers the ones before, so choose combine or replace to suit.\n"
+    }
+  },
+  "jpeg-to-svg": {
+    "seo": {
+      "title": "Convert JPEG to SVG Online (Free)",
+      "h1": "JPEG to SVG Converter",
+      "description": "Put a JPEG inside an SVG file at its pixel width and height. The photo is embedded as a PNG, not traced into vector shapes. Free, in your browser.",
+      "howToHeading": "How to convert JPEG to SVG"
+    },
+    "tool": {
+      "subtitle": "Wrap a JPEG photo in an SVG file, in your browser. The photo is not traced."
+    },
+    "aboutSection": {
+      "title": "JPEG and SVG",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML graphics document that can contain paths, text and embedded raster pictures. This conversion supplies an embedded raster picture.",
+        "details": [
+          "XML document",
+          "Can contain vector objects",
+          "This output embeds a PNG"
+        ]
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPEG to SVG?",
+        "answer": "Choose the JPEG, wait a moment and save the SVG. Your browser decodes the picture and the page writes an SVG holding it as one embedded PNG image, with no upload."
+      },
+      {
+        "question": "Does this turn my JPEG into vector shapes?",
+        "answer": "No. The SVG holds the picture as a single image element at its pixel width and height, so it still enlarges like a photo. Only drawn shapes and text in an SVG are resolution independent."
+      },
+      {
+        "question": "Will the SVG scale without blur?",
+        "answer": "No. A photo placed in an SVG stays a photo: enlarge the file and the pixels grow with it, because embedded pixel images keep their own resolution."
+      },
+      {
+        "question": "Why would I want a JPEG inside an SVG?",
+        "answer": "Some workflows ask for an SVG file even when the content is a photo. The wrapper lets the picture go in as an image element, and you can then place shapes or text around it."
+      },
+      {
+        "question": "How do I get real vectors from a JPEG?",
+        "answer": "That takes tracing, which this page does not do. A tracing program rebuilds the picture from shapes, a job that suits flat logos far better than photographs."
+      },
+      {
+        "question": "Does the SVG keep the EXIF data and color profile?",
+        "answer": "No. Only decoded pixels are passed on, which leaves EXIF, ICC profiles and XMP behind."
+      },
+      {
+        "question": "Is the picture lossy again inside the SVG?",
+        "answer": "The embedded copy is a PNG, which compresses without loss, so the decoded pixels are stored as they are. Blocks and other JPEG artifacts stay visible, because the page does not clean them up."
+      },
+      {
+        "question": "Can the SVG hold transparency?",
+        "answer": "SVG supports transparency, but a JPEG has no alpha channel, so there is none to carry over. Make the background transparent in an editor first, then use a PNG as the source."
+      },
+      {
+        "question": "Can I convert several JPEGs at once?",
+        "answer": "Yes. Add as many JPEGs as you like; they convert one after another and each SVG saves as a separate file, with no ZIP."
+      },
+      {
+        "question": "Is my photo uploaded?",
+        "answer": "No. The conversion runs in your browser, so the JPEG never leaves your device."
+      }
+    ],
+    "pairNotes": {
+      "title": "What to know before converting JPEG to SVG",
+      "points": [
+        "The picture is not traced; it sits inside the SVG as an embedded PNG at its pixel size.",
+        "The SVG enlarges like a photo, because pixel images keep their resolution.",
+        "Real vectors need tracing, which this page does not do.",
+        "EXIF data, ICC profiles and XMP are not copied.",
+        "Choose several JPEGs at once and each SVG downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG files",
+      "markdown": "### What is a JPEG file?\n\nWork on JPEG began in 1986 inside the Joint Photographic Experts Group, whose name it carries. ITU-T T.81 appeared in 1992 as the core standard, and ISO/IEC 10918-1 followed in 1994. The baseline mode is lossy: Baseline JPEG cuts the image into 8x8 pixel blocks, applies a discrete cosine transform to each and finishes with Huffman coding, which is where detail is lost. At typical settings the output ends up 10 to 20 times smaller than the uncompressed image.\n\nBoth .jpg and .jpeg are one format, filed with IANA as image/jpeg. A channel stores 8 bits, and since no alpha channel exists, transparency is impossible. A progressive mode first shows a coarse version that sharpens as more data loads.\n\nPrograms usually ask for quality as a figure from 0 to 100; GIMP's default is 85. One figure can look different from one program to the next, so compare by eye. Layers cannot be stored in JPEG either.\n\nMost digital cameras and scanners produce JPEG directly, which is why photographs reach you in it. 27 October 2006 marks the expiry of its US patents, and every major browser can display it.\n\n### Programs that open JPEG files\n\n**Windows, macOS and Linux**\n\n- GIMP imports JPEG for editing.\n- ImageMagick reads JPG; which formats work depends on your install.\n\n**Web and mobile**\n\n- Desktop Chrome and Firefox display JPG, and on phones Chrome and Safari do.\n\n### JPEG and SVG compared\n\n- **Media types**: image/jpeg for JPEG, image/svg+xml for SVG.\n- **Kind of file**: a JPEG stores pixels. An SVG is XML that lays out flat graphics: shapes, text and images placed inside it. The W3C approved SVG 1.0 in 2001 and published version 1.1 in 2003. The standard is open.\n- **Sharpness**: shapes stored as instructions can be drawn at any size. A photo embedded in an SVG keeps its original resolution when enlarged.\n- **Compression**: JPEG discards detail to shrink. SVG is stored as text, so you can edit it by hand, and it lends itself to searching, indexing and compression.\n- **Transparency**: SVG can be transparent where JPEG cannot.\n- **Readable source**: you can open an SVG in a text editor and read it, which is how the hand-written method below works.\n- **Styling**: CSS and JavaScript can act on an SVG, which makes it styleable, scriptable and animatable. A JPEG cannot.\n- **Extras**: SVG adds clipping paths, masks and filters, and a gzipped file takes .svgz.\n- **The embedded copy**: PNG compresses without loss, so the pixels your browser decoded are stored exactly, JPEG's earlier losses included.\n- **Typical use**: JPEG is for web photographs, camera files, email attachments and sharing pictures. SVG is for logos, icons, illustrations, diagrams, charts and maps.\n- **Where it shows**: an SVG can open on its own or sit inside an HTML page, and every major browser draws it.\n\nNo tracing happens here. The page decodes the JPEG, then writes an SVG that holds a single image element sized to the picture's pixel width and height, with the pixels embedded as a PNG.\n\n### Other ways to convert JPEG to SVG\n\n- **Text editor, by hand:** save a text file ending in .svg that contains an svg element with a width, a height and the namespace http://www.w3.org/2000/svg. Inside it, add an image element whose href is the JPEG's file name, with width and height set to the picture's pixel size. MDN notes that JPEG, PNG and other SVG files are the formats SVG software must support, and that unlike HTML's img, width and height are required. This links the JPEG instead of embedding it, so keep the two files together or the picture can vanish. Open the finished SVG in any major browser to confirm the photo appears, then place the pair of files wherever the SVG is needed.\n\n### Problems with JPEG files\n\n- **Transparent areas are impossible**: a JPEG cannot hold transparent pixels. Remove the background in an editor and start from a format with alpha instead.\n- **Layers are gone**: JPEG does not keep an editable layer stack, so retain the project file you exported from. A flattened JPEG cannot be taken apart again.\n- **An older photo frame rejects it**: certain frames refuse progressive files; save the picture again with progressive switched off.\n- **The quality number misleads**: a setting copied from one editor to another will not reproduce the same file, so judge by the result and not the figure.\n"
+    }
+  }
+}

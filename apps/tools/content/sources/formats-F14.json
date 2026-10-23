@@ -1,0 +1,780 @@
+{
+  "formats": {
+    "dv": {
+      "background": [
+        {
+          "fact": "DV is a family of digital video encodings developed for videocassettes in the early 1990s.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000183.shtml"
+        },
+        {
+          "fact": "Its original specification came from a ten-company consortium and was standardized by IEC.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000183.shtml"
+        },
+        {
+          "fact": "DV compresses pictures independently using a discrete cosine transform.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000183.shtml"
+        },
+        {
+          "fact": "DVCAM and DVCPRO are related professional developments from Sony and Panasonic.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000183.shtml"
+        },
+        {
+          "fact": "Raw DV-DIF files commonly use .dv or .dif; the same data can be wrapped in AVI, QuickTime or MXF.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000173.shtml"
+        },
+        {
+          "fact": "DV-DIF divides the stream into 80-byte blocks carrying video, audio and auxiliary information.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000173.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg / ffplay",
+            "note": "Free command-line tools; the official capability list includes DV demuxing and decoding.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Free player with a raw-DV demuxer explicitly registered for .dv; installed decoder support still determines which DV variants play.",
+            "source": "https://raw.githubusercontent.com/videolan/vlc/master/modules/demux/rawdv.c"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg / ffplay",
+            "note": "Free command-line tools; the official capability list includes DV demuxing and decoding.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Free player with a raw-DV demuxer explicitly registered for .dv; installed decoder support still determines which DV variants play.",
+            "source": "https://raw.githubusercontent.com/videolan/vlc/master/modules/demux/rawdv.c"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg / ffplay",
+            "note": "Free command-line tools; the official capability list includes DV demuxing and decoding.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Free player with a raw-DV demuxer explicitly registered for .dv; installed decoder support still determines which DV variants play.",
+            "source": "https://raw.githubusercontent.com/videolan/vlc/master/modules/demux/rawdv.c"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "The extension alone does not distinguish raw DV-DIF from DV data inside another wrapper; inspect the stream and container.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000183.shtml"
+        },
+        {
+          "fact": "DV can include metadata attached to recorded frames; preservation work should inspect more than the visible picture.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000183.shtml"
+        },
+        {
+          "fact": "A reader must support the specific DV variant; DVCPRO HD is not the same encoding profile as consumer DV.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000183.shtml"
+        }
+      ]
+    },
+    "ktx": {
+      "background": [
+        {
+          "fact": "Khronos Texture version 1 is a texture container for OpenGL and OpenGL ES.",
+          "source": "https://registry.khronos.org/KTX/specs/1.0/ktxspec.v1.html"
+        },
+        {
+          "fact": "A KTX file stores texture dimensions and the GL format needed by its loader.",
+          "source": "https://registry.khronos.org/KTX/specs/1.0/ktxspec.v1.html"
+        },
+        {
+          "fact": "It can hold cubemap faces and texture arrays.",
+          "source": "https://registry.khronos.org/KTX/specs/1.0/ktxspec.v1.html"
+        },
+        {
+          "fact": "Mipmap levels are stored from largest to smallest.",
+          "source": "https://registry.khronos.org/KTX/specs/1.0/ktxspec.v1.html"
+        },
+        {
+          "fact": "A file may include named metadata values such as texture orientation.",
+          "source": "https://registry.khronos.org/KTX/specs/1.0/ktxspec.v1.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "KTX Software / libktx",
+            "note": "Free developer library that reads KTX version 1 and version 2; it is not a general photo viewer.",
+            "source": "https://github.khronos.org/KTX-Software/libktx/index.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Free reader for KTX 1.0 files using ASTC texture formats; other KTX encodings are not accepted by this demuxer.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "kram",
+            "note": "Free command-line utility for inspecting and decoding supported KTX/KTX2 texture payloads; available for Windows and Linux x64 and macOS arm64.",
+            "source": "https://github.com/alecazam/kram"
+          },
+          {
+            "app": "PVRTexTool",
+            "note": "Texture-processing GUI and CLI available for Windows and Linux; its documented input list includes KTX and KTX2. Check the payload and chosen output settings.",
+            "source": "https://docs.imgtec.com/tools-manuals/pvrtextool-manual/html/topics/cli/command-line-options.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "KTX Software / libktx",
+            "note": "Free developer library that reads KTX version 1 and version 2; it is not a general photo viewer.",
+            "source": "https://github.khronos.org/KTX-Software/libktx/index.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Free reader for KTX 1.0 files using ASTC texture formats; other KTX encodings are not accepted by this demuxer.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "kramv / kram",
+            "note": "Free kramv viewer for supported KTX/KTX2 textures on Apple Silicon Macs; exposes mip levels, faces and array entries. Its README notes disabled Intel viewer support.",
+            "source": "https://github.com/alecazam/kram"
+          }
+        ],
+        "linux": [
+          {
+            "app": "KTX Software / libktx",
+            "note": "Free developer library that reads KTX version 1 and version 2; it is not a general photo viewer.",
+            "source": "https://github.khronos.org/KTX-Software/libktx/index.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Free reader for KTX 1.0 files using ASTC texture formats; other KTX encodings are not accepted by this demuxer.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "kram",
+            "note": "Free command-line utility for inspecting and decoding supported KTX/KTX2 texture payloads; available for Windows and Linux x64 and macOS arm64.",
+            "source": "https://github.com/alecazam/kram"
+          },
+          {
+            "app": "PVRTexTool",
+            "note": "Texture-processing GUI and CLI available for Windows and Linux; its documented input list includes KTX and KTX2. Check the payload and chosen output settings.",
+            "source": "https://docs.imgtec.com/tools-manuals/pvrtextool-manual/html/topics/cli/command-line-options.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A texture may look upside down when its coordinate origin differs from the viewer; inspect KTXorientation.",
+          "source": "https://registry.khronos.org/KTX/specs/1.0/ktxspec.v1.html"
+        },
+        {
+          "fact": "A KTX texture does not guarantee that every OpenGL implementation supports its internal image format.",
+          "source": "https://registry.khronos.org/KTX/specs/1.0/ktxspec.v1.html"
+        },
+        {
+          "fact": "KTX2 has an incompatible container structure; changing its suffix to .ktx does not convert it.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        }
+      ]
+    },
+    "m2v": {
+      "background": [
+        {
+          "fact": "The .m2v suffix identifies an MPEG-2 video elementary stream.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "fact": "MPEG-2 video is also known as ITU-T H.262 / MPEG-2 Part 2.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "fact": "An elementary video stream contains picture content without an audio channel.",
+          "source": "https://support.apple.com/guide/compressor/general-properties-cpsr13c2b570/mac"
+        },
+        {
+          "fact": "A program stream combines a single video content channel with associated audio.",
+          "source": "https://support.apple.com/guide/compressor/general-properties-cpsr13c2b570/mac"
+        },
+        {
+          "fact": "A transport stream may multiplex several content channels and their audio.",
+          "source": "https://support.apple.com/guide/compressor/general-properties-cpsr13c2b570/mac"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg / ffplay",
+            "note": "Free tools with MPEG-2 video decoding; FFmpeg documents .m2v for its raw MPEG-2 video output.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Free player whose MPEG-I/II elementary-video demuxer reads the kind of video stream carried by M2V; this supplies no missing audio track.",
+            "source": "https://raw.githubusercontent.com/videolan/vlc/master/modules/demux/mpeg/mpgv.c"
+          },
+          {
+            "app": "Telestream Switch",
+            "note": "Switch 2.0 documents M2V elementary-stream input on Windows and Mac.",
+            "source": "https://www.telestream.net/download-files/switch/2-0/rel_Switch_2.0.pdf"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg / ffplay",
+            "note": "Free tools with MPEG-2 video decoding; FFmpeg documents .m2v for its raw MPEG-2 video output.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Free player whose MPEG-I/II elementary-video demuxer reads the kind of video stream carried by M2V; this supplies no missing audio track.",
+            "source": "https://raw.githubusercontent.com/videolan/vlc/master/modules/demux/mpeg/mpgv.c"
+          },
+          {
+            "app": "Telestream Switch",
+            "note": "Switch 2.0 documents M2V elementary-stream input on Windows and Mac.",
+            "source": "https://www.telestream.net/download-files/switch/2-0/rel_Switch_2.0.pdf"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg / ffplay",
+            "note": "Free tools with MPEG-2 video decoding; FFmpeg documents .m2v for its raw MPEG-2 video output.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Free player whose MPEG-I/II elementary-video demuxer reads the kind of video stream carried by M2V; this supplies no missing audio track.",
+            "source": "https://raw.githubusercontent.com/videolan/vlc/master/modules/demux/mpeg/mpgv.c"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Silence is expected from a video-only elementary stream; an accompanying audio file must be supplied separately.",
+          "source": "https://support.apple.com/guide/compressor/general-properties-cpsr13c2b570/mac"
+        },
+        {
+          "fact": "A program stream or transport stream is structurally different from an elementary stream; select the correct output stream type.",
+          "source": "https://support.apple.com/guide/compressor/general-properties-cpsr13c2b570/mac"
+        },
+        {
+          "fact": "FFmpeg raw muxers accept only one stream and cannot store timestamps or metadata; use a suitable container when those are needed.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "mac": {
+      "background": [
+        {
+          "fact": "MAC can identify an image in the legacy MacPaint format.",
+          "source": "https://www.lemkesoft.de/fileadmin/pdf/en/manual_en.pdf"
+        },
+        {
+          "fact": "MacPaint pictures are black and white with a 576 by 720 pixel canvas.",
+          "source": "https://www.lemkesoft.de/fileadmin/pdf/en/manual_en.pdf"
+        },
+        {
+          "fact": "The MacPaint data fork alone does not carry all the classic Mac file identification information.",
+          "source": "https://netpbm.sourceforge.net/doc/pbmtomacp.html"
+        },
+        {
+          "fact": "MacPaint normally compresses its image data with run-length encoding.",
+          "source": "https://netpbm.sourceforge.net/doc/pbmtomacp.html"
+        },
+        {
+          "fact": "A generated MacPaint image without that compression can still conform to the format.",
+          "source": "https://netpbm.sourceforge.net/doc/pbmtomacp.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Deark",
+            "note": "Free extractor whose supported raster formats include MacPaint.",
+            "source": "https://entropymine.com/deark/"
+          },
+          {
+            "app": "Netpbm macptopbm",
+            "note": "Free command-line reader that writes the picture as PBM.",
+            "source": "https://netpbm.sourceforge.net/doc/macptopbm.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Deark",
+            "note": "Free extractor whose supported raster formats include MacPaint.",
+            "source": "https://entropymine.com/deark/"
+          },
+          {
+            "app": "Netpbm macptopbm",
+            "note": "Free command-line reader that writes the picture as PBM.",
+            "source": "https://netpbm.sourceforge.net/doc/macptopbm.html"
+          },
+          {
+            "app": "GraphicConverter",
+            "note": "The vendor manual lists MacPaint import and export for its monochrome image format.",
+            "source": "https://www.lemkesoft.de/fileadmin/pdf/en/manual_en.pdf"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Deark",
+            "note": "Free extractor whose supported raster formats include MacPaint.",
+            "source": "https://entropymine.com/deark/"
+          },
+          {
+            "app": "Netpbm macptopbm",
+            "note": "Free command-line reader that writes the picture as PBM.",
+            "source": "https://netpbm.sourceforge.net/doc/macptopbm.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A shifted decoded picture can indicate an extra 128-byte Finder-information prefix introduced during transfer; macptopbm offers -extraskip.",
+          "source": "https://netpbm.sourceforge.net/doc/macptopbm.html"
+        },
+        {
+          "fact": "A data-fork-only file may not identify as PNTG on classic Mac OS without a suitable MacBinary or BinHex wrapper.",
+          "source": "https://netpbm.sourceforge.net/doc/pbmtomacp.html"
+        },
+        {
+          "fact": "The fixed MacPaint canvas cannot retain an arbitrarily large picture; the documented writer crops oversized input.",
+          "source": "https://netpbm.sourceforge.net/doc/pbmtomacp.html"
+        }
+      ]
+    },
+    "cdda": {
+      "background": [
+        {
+          "fact": "Apple Motion lists .cdda among the audio file formats it can import.",
+          "source": "https://support.apple.com/guide/motion/audio-files-motn897e5480/mac"
+        },
+        {
+          "fact": "Motion uses imported audio for music, dialogue and sound effects in a project.",
+          "source": "https://support.apple.com/guide/motion/audio-files-motn897e5480/mac"
+        },
+        {
+          "fact": "Apple's archived iOS web-content reference groups .cdda with AIFF audio and the audio/aiff and audio/x-aiff media types.",
+          "source": "https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/CreatingContentforSafarioniPhone/CreatingContentforSafarioniPhone.html"
+        },
+        {
+          "fact": "AVFoundation identifies .cdda as an extension for AIFC audio under the public.aifc-audio uniform type identifier.",
+          "source": "https://developer.apple.com/documentation/avfoundation/avfiletype/aifc"
+        },
+        {
+          "fact": "On macOS, the CDDAFS file system exposes tracks from a mounted audio CD as AIFF-C files.",
+          "source": "https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemDetails/FileSystemDetails.html"
+        }
+      ],
+      "programs": {
+        "windows": [],
+        "mac": [
+          {
+            "app": "Apple Motion",
+            "note": "Imports .cdda audio into a motion-graphics project.",
+            "source": "https://support.apple.com/guide/motion/audio-files-motn897e5480/mac"
+          }
+        ],
+        "linux": [],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "The suffix alone cannot verify the audio representation inside a particular .cdda file; inspect the actual file rather than assuming its encoding.",
+          "source": "https://support.apple.com/guide/motion/audio-files-motn897e5480/mac"
+        },
+        {
+          "fact": "Motion resamples imported audio to the sample rate and bit depth used by the audio interface; project playback is not proof that those source properties remained unchanged.",
+          "source": "https://support.apple.com/guide/motion/audio-files-motn897e5480/mac"
+        },
+        {
+          "fact": "For a .cdda file containing compressed AIFC audio, reading the container is only part of conversion: a decoder for the sound encoding must also be available.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Conceptual/CoreAudioOverview/ARoadmaptoCommonTasks/ARoadmaptoCommonTasks.html"
+        }
+      ]
+    },
+    "pcd": {
+      "background": [
+        {
+          "fact": "PCD is Kodak's Photo CD image format.",
+          "source": "https://www.irfanview.com/main_formats.htm"
+        },
+        {
+          "fact": "A standard Photo CD places numbered .pcd images in photo_cd/images.",
+          "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html"
+        },
+        {
+          "fact": "The overview.pcd file supplies thumbnail images for a contact sheet.",
+          "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html"
+        },
+        {
+          "fact": "Photo CD defines image sizes from 128 by 192 through 2048 by 3072 pixels.",
+          "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html"
+        },
+        {
+          "fact": "ProPhotoCD adds a 4096 by 6144 pixel resolution.",
+          "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html"
+        },
+        {
+          "fact": "The image representation stores luminance at full resolution and chromaticity at half resolution.",
+          "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "IrfanView",
+            "note": "Free for noncommercial use; reads PCD. Its Photo-CD plug-in adds high-resolution decoding.",
+            "source": "https://www.irfanview.com/plugins.htm"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Free command-line reader and writer for Photo CD; its documented write limit is 768 by 512 pixels.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Free command-line reader and writer for Photo CD; its documented write limit is 768 by 512 pixels.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "hpcdtoppm",
+            "note": "Photo CD decoder documented by Netpbm; distributed separately under restrictive licensing, rather than included in most installations.",
+            "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Free command-line reader and writer for Photo CD; its documented write limit is 768 by 512 pixels.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "hpcdtoppm",
+            "note": "Photo CD decoder documented by Netpbm; distributed separately under restrictive licensing, rather than included in most installations.",
+            "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A thumbnail extracted from overview.pcd is only Base/16 resolution; use the corresponding image file for a larger picture.",
+          "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html"
+        },
+        {
+          "fact": "The highest ProPhotoCD resolution needs its extension files and original directory layout, so copying only one PCD can lose access to it.",
+          "source": "https://netpbm.sourceforge.net/doc/hpcdtoppm.html"
+        },
+        {
+          "fact": "ImageMagick writes Photo CD only up to 768 by 512 pixels; writing a PCD is not a preservation copy of a larger scan.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "fact": "GraphicConverter's Mac App Store edition does not import PhotoCD.",
+          "source": "https://www.lemkesoft.de/produkte/graphicconverter/mac-app-store"
+        }
+      ]
+    },
+    "crw": {
+      "background": [
+        {
+          "fact": "CRW is a Canon camera RAW format built on CIFF.",
+          "source": "https://exiftool.sourceforge.net/canon_raw.html"
+        },
+        {
+          "fact": "CIFF means Camera Image File Format.",
+          "source": "https://exiftool.sourceforge.net/canon_raw.html"
+        },
+        {
+          "fact": "CRW is structurally different from TIFF-based CR2 and QuickTime-based CR3.",
+          "source": "https://exiftool.sourceforge.net/canon_raw.html"
+        },
+        {
+          "fact": "Its file header specifies byte order and points to a root directory.",
+          "source": "https://exiftool.sourceforge.net/canon_raw.html"
+        },
+        {
+          "fact": "CIFF records organize data in a hierarchy of directories.",
+          "source": "https://exiftool.sourceforge.net/canon_raw.html"
+        },
+        {
+          "fact": "Canon's EOS Digital Rebel records RAW images as CRW.",
+          "source": "https://www.usa.canon.com/support/p/eos-digital-rebel"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Free command-line reader; CRW appears as read-only in its format table.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "ExifTool",
+            "note": "Free metadata tool that inspects CRW/CIFF structure and tags; it is not a rendered-photo editor.",
+            "source": "https://exiftool.sourceforge.net/canon_raw.html"
+          },
+          {
+            "app": "Adobe Camera Raw",
+            "note": "The camera-support table lists older Canon models and their required Camera Raw versions; check the exact model.",
+            "source": "https://helpx.adobe.com/camera-raw/desktop/dng-and-file-formats/camera-raw-plug-supported-cameras.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Free command-line reader; CRW appears as read-only in its format table.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "ExifTool",
+            "note": "Free metadata tool that inspects CRW/CIFF structure and tags; it is not a rendered-photo editor.",
+            "source": "https://exiftool.sourceforge.net/canon_raw.html"
+          },
+          {
+            "app": "Adobe Camera Raw",
+            "note": "Use the camera table to verify the particular Canon model and plug-in version.",
+            "source": "https://helpx.adobe.com/camera-raw/desktop/dng-and-file-formats/camera-raw-plug-supported-cameras.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Free command-line reader; CRW appears as read-only in its format table.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "ExifTool",
+            "note": "Free metadata tool that inspects CRW/CIFF structure and tags; it is not a rendered-photo editor.",
+            "source": "https://exiftool.sourceforge.net/canon_raw.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "CRW, CR2 and CR3 use different structures; changing a suffix cannot translate between them.",
+          "source": "https://exiftool.sourceforge.net/canon_raw.html"
+        },
+        {
+          "fact": "Metadata and an embedded preview are not a substitute for decoding the RAW picture; inspect the record type before extracting data.",
+          "source": "https://exiftool.sourceforge.net/canon_raw.html"
+        },
+        {
+          "fact": "RAW support depends on the camera model and the library version actually bundled by the application.",
+          "source": "https://www.libraw.org/supported-cameras"
+        }
+      ]
+    },
+    "dss": {
+      "background": [
+        {
+          "fact": "Digital Speech Standard is an audio format used in professional dictation.",
+          "source": "https://audiosupport.omsystem.com/en/miscellaneous/1162-dss-ds2-file-formats/"
+        },
+        {
+          "fact": "DSS compresses recordings into compact files for dictation workflows.",
+          "source": "https://audiosupport.omsystem.com/en/miscellaneous/1162-dss-ds2-file-formats/"
+        },
+        {
+          "fact": "The dictation workflow supports insert and overwrite recording.",
+          "source": "https://audiosupport.omsystem.com/en/miscellaneous/1162-dss-ds2-file-formats/"
+        },
+        {
+          "fact": "DSS Classic recordings use .dss, while DSS Pro recordings use .ds2.",
+          "source": "https://audiosupport.omsystem.com/en/portable-dictation/562-recording-format/"
+        },
+        {
+          "fact": "DSS Pro adds encryption and more index marks than classic DSS.",
+          "source": "https://audiosupport.omsystem.com/wp-content/uploads/2021/11/DSSPlayer7_Manual_EN.pdf"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Free decoder for DSS Standard Play; this does not establish support for DSS Pro/DS2.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "OM SYSTEM DSS Player Standard",
+            "note": "The vendor provides a Windows dictation/transcription application.",
+            "source": "https://audiosupport.omsystem.com/en/product/dss-player-standard/"
+          },
+          {
+            "app": "Olympus Dictation Management System R7",
+            "note": "The Dictation Module opens DSS and DSS Pro recordings in its playback window.",
+            "source": "https://audiosupport.omsystem.com/wp-content/uploads/2021/11/DictationModule.pdf"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Free decoder for DSS Standard Play; this does not establish support for DSS Pro/DS2.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "DSS Player for Mac",
+            "note": "The vendor manual documents DSS and DSS Pro playback.",
+            "source": "https://audiosupport.omsystem.com/wp-content/uploads/2021/11/DSSPlayer7_Manual_EN.pdf"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Free decoder for DSS Standard Play; this does not establish support for DSS Pro/DS2.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "DSS and DS2 are related speech formats, but classic DSS does not have all the capabilities described for DSS Pro.",
+          "source": "https://audiosupport.omsystem.com/wp-content/uploads/2021/11/DSSPlayer7_Manual_EN.pdf"
+        },
+        {
+          "fact": "DSS Classic and DSS Pro are different; DSS Pro uses .ds2 rather than .dss.",
+          "source": "https://audiosupport.omsystem.com/en/portable-dictation/562-recording-format/"
+        },
+        {
+          "fact": "FFmpeg's capability list names only DSS Standard Play decoding, so it cannot establish blanket support for every recorder mode.",
+          "source": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "ktx2": {
+      "background": [
+        {
+          "fact": "KTX2 is Khronos's second-generation GPU texture container.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        },
+        {
+          "fact": "It stores image data for graphics APIs such as Vulkan and OpenGL.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        },
+        {
+          "fact": "KTX2 supports texture arrays, cube maps and mipmap levels.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        },
+        {
+          "fact": "The registered media type is image/ktx2.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        },
+        {
+          "fact": "The container can hold supercompressed or universal texture data.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        },
+        {
+          "fact": "Its layout is incompatible with the original image/ktx container.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "KTX Software ktx info / ktx extract",
+            "note": "Free command-line tools that inspect KTX2 metadata and extract selected images.",
+            "source": "https://github.khronos.org/KTX-Software/ktxtools/index.html"
+          },
+          {
+            "app": "KTX Software / libktx",
+            "note": "Free developer library that reads KTX version 1 and version 2; it is not a general photo viewer.",
+            "source": "https://github.khronos.org/KTX-Software/libktx/index.html"
+          },
+          {
+            "app": "kram",
+            "note": "Free command-line utility for inspecting and decoding supported KTX/KTX2 texture payloads; available for Windows and Linux x64 and macOS arm64.",
+            "source": "https://github.com/alecazam/kram"
+          },
+          {
+            "app": "PVRTexTool",
+            "note": "Texture-processing GUI and CLI available for Windows and Linux; its documented input list includes KTX and KTX2. Check the payload and chosen output settings.",
+            "source": "https://docs.imgtec.com/tools-manuals/pvrtextool-manual/html/topics/cli/command-line-options.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "KTX Software ktx info / ktx extract",
+            "note": "Free command-line tools that inspect KTX2 metadata and extract selected images.",
+            "source": "https://github.khronos.org/KTX-Software/ktxtools/index.html"
+          },
+          {
+            "app": "KTX Software / libktx",
+            "note": "Free developer library that reads KTX version 1 and version 2; it is not a general photo viewer.",
+            "source": "https://github.khronos.org/KTX-Software/libktx/index.html"
+          },
+          {
+            "app": "kramv / kram",
+            "note": "Free kramv viewer for supported KTX/KTX2 textures on Apple Silicon Macs; exposes mip levels, faces and array entries. Its README notes disabled Intel viewer support.",
+            "source": "https://github.com/alecazam/kram"
+          }
+        ],
+        "linux": [
+          {
+            "app": "KTX Software ktx info / ktx extract",
+            "note": "Free command-line tools that inspect KTX2 metadata and extract selected images.",
+            "source": "https://github.khronos.org/KTX-Software/ktxtools/index.html"
+          },
+          {
+            "app": "KTX Software / libktx",
+            "note": "Free developer library that reads KTX version 1 and version 2; it is not a general photo viewer.",
+            "source": "https://github.khronos.org/KTX-Software/libktx/index.html"
+          },
+          {
+            "app": "kram",
+            "note": "Free command-line utility for inspecting and decoding supported KTX/KTX2 texture payloads; available for Windows and Linux x64 and macOS arm64.",
+            "source": "https://github.com/alecazam/kram"
+          },
+          {
+            "app": "PVRTexTool",
+            "note": "Texture-processing GUI and CLI available for Windows and Linux; its documented input list includes KTX and KTX2. Check the payload and chosen output settings.",
+            "source": "https://docs.imgtec.com/tools-manuals/pvrtextool-manual/html/topics/cli/command-line-options.html"
+          }
+        ],
+        "web": [
+          {
+            "app": "Three.js KTX2Loader",
+            "note": "The specification lists a Three.js loader for KTX2 assets; this is developer integration, not native browser image display.",
+            "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A KTX1-only loader cannot read a KTX2 file just because the filename is renamed.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        },
+        {
+          "fact": "A universal compressed texture must be transcoded to a format supported by the destination GPU.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        },
+        {
+          "fact": "Mipmaps, array layers and cube faces are separate images; exporting a single image does not preserve the whole texture structure.",
+          "source": "https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html"
+        }
+      ]
+    }
+  }
+}

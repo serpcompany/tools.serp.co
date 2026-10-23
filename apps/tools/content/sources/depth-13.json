@@ -1,0 +1,321 @@
+{
+  "tools": {
+    "gif-to-webm": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i reaction.gif -c:v libvpx -pix_fmt yuv420p -an reaction.webm",
+          "limits": "Requires libvpx. Writes opaque VP8 video.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "GStreamer",
+          "steps": "gst-launch-1.0 filesrc location=reaction.gif ! gifdec loop=force-no ! videoconvert ! vp8enc ! webmmux ! filesink location=reaction.webm",
+          "limits": "Requires the gif, vpx and Matroska plug-ins. Writes a silent video.",
+          "source": "https://gstreamer.freedesktop.org/documentation/gif/gifdec.html",
+          "supportSources": [
+            "https://gstreamer.freedesktop.org/documentation/vpx/vp8enc.html",
+            "https://gstreamer.freedesktop.org/documentation/matroska/webmmux.html"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://www.w3.org/Graphics/GIF/spec-gif89a.txt",
+        "https://www.webmproject.org/docs/container/"
+      ]
+    },
+    "jpeg-to-ico": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "File > Open the JPEG; File > Export As; enter a file name with the .ico ending and click Export.",
+          "limits": "Export type is listed as Microsoft Windows icon.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSources": [
+            "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-ico/ico.c"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick portrait.jpeg -alpha off -define icon:auto-resize=\"16,32,48,64,96,128,256\" favicon.ico",
+          "limits": "Writes seven sizes into one ICO; input should be square.",
+          "source": "https://usage.imagemagick.org/thumbnails/#favicon",
+          "supportSources": []
+        },
+        {
+          "app": "IrfanView",
+          "steps": "File > Open the JPEG; File > Save as; choose ICO as output format, set the file name and save.",
+          "limits": "Lists ICO as a format it can read and save.",
+          "source": "https://www.irfanview.com/faq.htm",
+          "supportSources": [
+            "https://www.irfanview.com/main_formats.htm"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://jpeg.org/jpeg/index.html",
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000017.shtml",
+        "https://learn.microsoft.com/en-us/windows/win32/menurc/about-icons",
+        "https://www.iana.org/assignments/media-types/image/vnd.microsoft.icon"
+      ]
+    },
+    "tga-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick texture.tga texture.png",
+          "limits": "Format list shows TGA and PNG as RW.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "GIMP",
+          "steps": "File > Open the TGA; File > Export As; name it texture.png; confirm the options in the PNG export dialog.",
+          "limits": "PNG dialog lists pixel format and metadata options.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/file-png-export.html"
+          ]
+        },
+        {
+          "app": "IrfanView",
+          "steps": "File > Open the Targa; File > Save as; choose PNG as output format and save.",
+          "limits": "Format list marks TGA and PNG as readable and savable.",
+          "source": "https://www.irfanview.com/faq.htm",
+          "supportSources": [
+            "https://www.irfanview.com/main_formats.htm"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://www.w3.org/TR/png-3/",
+        "https://www.gimp.org/news/2022/06/14/gimp-2-10-32-released/"
+      ]
+    },
+    "3gp-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i phone.3gp -c:v libx264 -c:a aac phone.mp4",
+          "limits": "Re-encodes video and audio. Requires libx264 and an AAC encoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "VLC",
+          "steps": "Media > Convert/Save; Add the file; type the Destination file; choose a conversion profile from the Profile drop-down; Start.",
+          "limits": "Lists 3GP among its input formats.",
+          "source": "https://docs.videolan.me/vlc-user/desktop/3.0/en/basic/tipsandtricks/index.html",
+          "supportSources": [
+            "https://www.videolan.org/vlc/features.html"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://www.rfc-editor.org/rfc/rfc3839.html",
+        "https://ffmpeg.org/ffmpeg-formats.html",
+        "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+      ]
+    },
+    "mts-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i recording.mts -c:v libx264 -c:a aac recording.mp4",
+          "limits": "Re-encodes video and audio. Requires libx264 and an AAC encoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Open Source; select the Fast 1080p30 preset; type a name in Save As; click Start.",
+          "limits": "A full encode. AVCHD playlists are not fully supported.",
+          "source": "https://handbrake.fr/docs/en/latest/workflow/open-video-source.html",
+          "supportSources": [
+            "https://handbrake.fr/docs/en/latest/workflow/select-preset.html",
+            "https://handbrake.fr/docs/en/latest/workflow/start-encoding.html",
+            "https://handbrake.fr/docs/en/latest/technical/source-formats.html",
+            "https://handbrake.fr/docs/en/latest/technical/official-presets.html"
+          ]
+        },
+        {
+          "app": "GStreamer",
+          "steps": "gst-launch-1.0 -e mp4mux name=container ! filesink location=recording.mp4 filesrc location=recording.mts ! decodebin ! queue ! videoconvert ! x264enc ! h264parse ! container.video_0",
+          "limits": "Writes video only, with no sound. Needs decoders for the input plus x264enc, h264parse and mp4mux.",
+          "source": "https://gstreamer.freedesktop.org/documentation/x264/index.html",
+          "supportSources": [
+            "https://gstreamer.freedesktop.org/documentation/mpegtsdemux/tsdemux.html",
+            "https://gstreamer.freedesktop.org/documentation/playback/decodebin.html",
+            "https://gstreamer.freedesktop.org/documentation/isomp4/mp4mux.html",
+            "https://gstreamer.freedesktop.org/documentation/videoparsersbad/h264parse.html"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://helpguide.sony.net/ilc/1450/v1/en/contents/TP0000226747.html",
+        "https://ffmpeg.org/ffmpeg-formats.html"
+      ]
+    },
+    "bmp-to-jpg": {
+      "methods": [
+        {
+          "app": "IrfanView",
+          "steps": "File > Open the BMP; File > Save as; choose JPG as output format and set the new file name.",
+          "limits": "Format list marks BMP and JPG as readable and savable.",
+          "source": "https://www.irfanview.com/faq.htm",
+          "supportSources": [
+            "https://www.irfanview.com/main_formats.htm"
+          ]
+        },
+        {
+          "app": "GIMP",
+          "steps": "File > Open the BMP; File > Export As; name the file capture.jpg and press Export; set Quality in the JPEG export dialog.",
+          "limits": "JPEG has no layers or transparency.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick capture.bmp -quality 85 capture.jpg",
+          "limits": "-quality sets the compression level for JPEG encoders.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-options/#compress"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000189.shtml",
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000017.shtml"
+      ]
+    },
+    "flv-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i archive.flv -vn -c:a libmp3lame -b:a 192k archive.mp3",
+          "limits": "Requires an audio stream. Re-encodes it rather than copying MP3 packets.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "GStreamer",
+          "steps": "gst-launch-1.0 filesrc location=archive.flv ! decodebin ! audioconvert ! audioresample ! lamemp3enc ! filesink location=archive.mp3",
+          "limits": "Audio only. Needs an FLV demuxer, an audio decoder and the LAME encoder.",
+          "source": "https://gstreamer.freedesktop.org/documentation/flv/flvdemux.html",
+          "supportSources": [
+            "https://gstreamer.freedesktop.org/documentation/playback/decodebin.html",
+            "https://gstreamer.freedesktop.org/documentation/lame/index.html",
+            "https://gstreamer.freedesktop.org/documentation/audioconvert/index.html",
+            "https://gstreamer.freedesktop.org/documentation/audioresample/index.html"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml",
+        "https://ffmpeg.org/ffmpeg-formats.html",
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000012.shtml",
+        "https://www.adobe.com/products/flashplayer/end-of-life.html"
+      ]
+    },
+    "gif-to-webp": {
+      "methods": [
+        {
+          "app": "gif2webp",
+          "steps": "gif2webp animation.gif -o animation.webp",
+          "limits": "Offers -lossy and -mixed options.",
+          "source": "https://developers.google.com/speed/webp/docs/gif2webp"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick animation.gif -coalesce animation.webp",
+          "limits": "Needs WebP support in your ImageMagick; check its format list.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-options/#coalesce"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://www.w3.org/Graphics/GIF/spec-gif89a.txt",
+        "https://developers.google.com/speed/webp/faq"
+      ]
+    },
+    "m4p-to-mp3": {
+      "methods": [
+        {
+          "app": "Apple Music on a Mac",
+          "steps": "Music > Settings > Files > Import Settings; choose MP3 Encoder in the Import Using menu and click OK; select the song; File > Convert > Create MP3 Version.",
+          "limits": "Does not convert older purchases that remain Protected AAC.",
+          "source": "https://support.apple.com/en-us/120493",
+          "supportSources": [
+            "https://support.apple.com/en-us/108961"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/CreatingContentforSafarioniPhone/CreatingContentforSafarioniPhone.html",
+        "https://support.apple.com/en-us/108961",
+        "https://support.apple.com/en-us/118292",
+        "https://www.loc.gov/preservation/digital/formats/fdd/fdd000012.shtml"
+      ]
+    },
+    "heif-to-png": {
+      "methods": [
+        {
+          "app": "libheif heif-dec",
+          "steps": "heif-dec photo.heif photo.png",
+          "limits": "A file with several images is written as numbered files.",
+          "source": "https://github.com/strukturag/libheif",
+          "supportSources": [
+            "https://raw.githubusercontent.com/strukturag/libheif/master/examples/heif_dec.cc"
+          ]
+        },
+        {
+          "app": "GIMP",
+          "steps": "File > Open the HEIF; File > Export As; type photo.png as the name and click Export.",
+          "limits": "HEIF import needs GIMP 2.10.2 or later.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-file-open.html",
+            "https://docs.gimp.org/3.0/en/file-png-export.html",
+            "https://www.gimp.org/news/2018/05/20/gimp-2-10-2-released/"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick photo.heic photo.png",
+          "limits": "Reads HEIC only when the libheif delegate library is present.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ],
+      "formatSources": [
+        "https://nokiatech.github.io/heif/technical.html",
+        "https://www.w3.org/TR/png-3/",
+        "https://support.apple.com/en-us/116944"
+      ]
+    }
+  }
+}
