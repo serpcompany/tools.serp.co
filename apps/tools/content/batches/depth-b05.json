@@ -1,0 +1,792 @@
+{
+  "png-to-rgb": {
+    "seo": {
+      "title": "Convert PNG to RGB (Raw 8-Bit Pixel Data)",
+      "h1": "PNG to RGB Converter for Raw Pixel Data",
+      "description": "Turn a PNG into a headerless .rgb file of 8-bit red, green and blue samples, made in your browser. Alpha and metadata are not kept. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Writes your PNG as a headerless file of 8-bit red, green and blue samples."
+    },
+    "faqs": [
+      {
+        "question": "Does the .rgb file have a header?",
+        "answer": "No. The file holds only interleaved red, green and blue samples, one byte each, with nothing that records the picture's size. Note your PNG's width and height before converting, because the program that reads the file will ask for them."
+      },
+      {
+        "question": "How do I open the RGB file after converting?",
+        "answer": "GIMP can read it as Raw image data, and ImageMagick reads it with -size WxH rgb:file, where W and H are the PNG's width and height."
+      },
+      {
+        "question": "Is this the same as an SGI .rgb image?",
+        "answer": "No. This page writes raw samples, the layout ImageMagick calls RGB. An SGI image also ends in .rgb but has a header with width, height and channel count; the methods below show how to write one."
+      },
+      {
+        "question": "What happens to the transparent parts of my PNG?",
+        "answer": "The output stores three samples per pixel, so there is no alpha channel in it. If you need a particular background behind the artwork, put it there in an editor before converting."
+      },
+      {
+        "question": "Is a 16-bit PNG kept at 16 bits?",
+        "answer": "No. The picture passes through 8-bit RGBA on its way to the RGB file, and the file has 8 bits per sample. Extra depth in the PNG is lost."
+      },
+      {
+        "question": "Why does the picture look slanted or striped when I load the file?",
+        "answer": "The reading program was given the wrong width, so each row starts at the wrong byte. The file stores no dimensions, so the width you enter must match the PNG exactly."
+      },
+      {
+        "question": "How big will the RGB file be?",
+        "answer": "Width times height times three bytes, because the samples are stored without compression. A PNG that was small on disk can still give a large .rgb file."
+      },
+      {
+        "question": "Is my EXIF data kept, and what about animated PNGs?",
+        "answer": "Metadata such as EXIF, ICC profiles and XMP is not carried over. An animated PNG gives its first frame only."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and RGB",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format that stores its own width and height and can carry transparency.",
+        "details": [
+          "Lossless DEFLATE compression",
+          "1 to 16 bits per sample",
+          "Optional alpha channel"
+        ]
+      },
+      "toFormat": {
+        "name": "RGB",
+        "fullName": "Raw RGB image data",
+        "description": "Interleaved 8-bit red, green and blue samples with no header.",
+        "details": [
+          "No header",
+          "8 bits per sample",
+          "Width and height needed to read"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PNG to RGB",
+      "points": [
+        "The .rgb file is headerless: it needs the PNG's width and height to be read again.",
+        "Each pixel becomes three 8-bit samples, so transparency, 16-bit depth and metadata are not kept.",
+        "An SGI image shares the .rgb ending but is a different layout, written by the SGI method below."
+      ]
+    },
+    "guide": {
+      "title": "About PNG and RGB",
+      "markdown": "### What is a PNG file?\n\nPNG, or Portable Network Graphics, was created as a patent-free successor to GIF. Its 1996 specification was the first W3C Recommendation for a graphics format; the standards RFC 2083 and ISO/IEC 15948:2004 came after. Its compression is always lossless DEFLATE. Color can be stored as a palette index, as gray, or as full truecolor, with sample depths from one bit up to sixteen, plus an optional alpha channel. macOS saves screenshots as PNG, and every major browser displays it.\n\nEvery PNG opens with the same signature bytes and is made of chunks, and IHDR is the header chunk. A raw .rgb file has nothing like it.\n\n### Programs that open PNG files\n\n- **Windows, Mac and Linux:** GIMP opens PNG for editing, and ImageMagick reads it as well.\n- **Web:** Chrome and Firefox display PNG.\n- **Mobile:** Safari and Chrome show PNG pictures.\n\n### PNG and RGB compared\n\n- **Header**: a PNG carries its own dimensions; the .rgb file this page writes carries none, so its width and height must be supplied when it is read.\n- **Samples**: a PNG may hold 1 to 16 bits per sample and an alpha channel. The RGB file has three interleaved 8-bit samples per pixel.\n- **Same ending, different file**: an .rgb ending can also mean an SGI image, which Pillow reads and writes. ImageMagick separates the two: its SGI coder writes SGI, and its RGB coder writes raw samples.\n\nIn this converter your browser decodes the PNG, then ImageMagick writes the RGB file. The page sets no quality. Files you select together are converted one after another, each downloading on its own.\n\n### Other ways to convert PNG to RGB\n\n- **ImageMagick, raw samples:** run `magick texture.png -depth 8 rgb:texture.rgb`. ImageMagick's RGB format needs the size and depth supplied when it is read back, so write down the picture size.\n- **Pillow:** in Python, `Image.open(\"texture.png\").convert(\"RGB\").tobytes()` returns the raw bytes, which you save to a file. Pillow registers the .rgb ending for its SGI writer, so its own save call would make an SGI image.\n- **ImageMagick, SGI:** run `magick texture.png sgi:texture.rgb` when the receiving program wants an SGI header.\n\n### Problems with PNG files\n\n- **Layer offset from GIMP**: a PNG exported with GIMP's offset option can place the layer differently in other applications. Leave that option off when exporting.\n- **Missing camera tags or profile**: GIMP makes tags and profiles optional in a PNG export. Switch those metadata options on when you want them kept.\n- **Animated PNG**: a program that cannot animate shows the default still image, and that frame is the one this page keeps.\n"
+    }
+  },
+  "rm-to-mp4": {
+    "seo": {
+      "title": "Convert RM to MP4 (RealMedia to H.264)",
+      "h1": "RM to MP4 Converter for RealMedia Files",
+      "description": "Convert an old RealMedia .rm file to an H.264 MP4 with AAC sound, in your browser. Oversized frames are scaled down. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encodes RealMedia video as H.264 with AAC sound inside an MP4."
+    },
+    "faqs": [
+      {
+        "question": "How do I play an RM file?",
+        "answer": "VLC media player and RealPlayer open RM files. If you would rather not install anything, convert it here: the MP4 plays on nearly every device."
+      },
+      {
+        "question": "Can I just rename my .rm file to .mp4?",
+        "answer": "No. A new extension is only a label: the streams inside stay RealMedia. Converting decodes them and writes a new MP4."
+      },
+      {
+        "question": "Will the MP4 look better than the RM?",
+        "answer": "No. The video is decoded and then encoded again as H.264, a lossy step, so the MP4 cannot bring back detail the RM already lost."
+      },
+      {
+        "question": "What is inside the MP4 you get?",
+        "answer": "Video is H.264 and audio is AAC, both written new from what the RealMedia decoder produced. The encoder runs on a quick setting, so the MP4 is not squeezed as small as it could be."
+      },
+      {
+        "question": "Is there a cap on the length of the RM?",
+        "answer": "No limit is set on the file's size or on how long the job may run, so a long lecture simply keeps your device busy for longer."
+      },
+      {
+        "question": "Is the resolution or frame rate changed?",
+        "answer": "Frames above the converter's size ceiling are scaled down, and faster footage than its frame-rate cap loses frames while the running time stays put. Smaller or slower video is left alone, though one odd dimension gives up a pixel."
+      },
+      {
+        "question": "Can I convert several RM files and get one video?",
+        "answer": "Queue as many as you like. They run one after another and every MP4 downloads separately, so join them in an editor if you want a single video."
+      },
+      {
+        "question": "What if my RM file is damaged or cut short?",
+        "answer": "Damage in an RM seldom aborts the conversion. Expect an MP4 that finishes where the readable data finished, and scrub to its last seconds before the original goes in the trash."
+      }
+    ],
+    "aboutSection": {
+      "title": "RM and MP4",
+      "fromFormat": {
+        "name": "RM",
+        "fullName": "RealMedia",
+        "description": "A legacy multimedia container from RealNetworks, built for streaming audio and video over the internet.",
+        "details": [
+          "Tagged chunks",
+          "Separate stream headers",
+          "Codec set by the streams inside"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata.",
+        "details": [
+          "Nested boxes",
+          "H.264 and AAC here",
+          "video/mp4"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting RM to MP4",
+      "points": [
+        "RM is a container: whether it converts depends on the codec of the streams inside.",
+        "The MP4 holds newly encoded H.264 video and AAC audio, not the original streams.",
+        "Oversized frames are scaled down and fast frame rates have frames dropped, so the length stays the same."
+      ]
+    },
+    "guide": {
+      "title": "About RM and MP4",
+      "markdown": "### What is an RM file?\n\nRealNetworks described RealMedia as a streaming container in a March 1998 Internet-Draft. The format can be played from local storage or over a network. Its file format, RMFF, is built from tagged chunks with four-character identifiers, and a .RMF header marks a file as RealMedia. Separate headers describe the media as a whole and each stream inside it.\n\nThe container does not fix a codec. An RM file is a wrapper, and what it holds decides whether a given program can play it. Today it is a legacy format, met mostly as old streaming video and in media archives.\n\n### Programs that open RM files\n\n- **Windows, Mac and Linux:** FFplay is a free playback utility built on FFmpeg's libraries. FFmpeg itself lists RealMedia demuxing and muxing.\n\n### RM and MP4 compared\n\n- **Structure**: RM uses tagged chunks and stream headers. MP4 is the ISO/IEC 14496-14 file format, first published in 2003, a set of nested boxes in the ISO Base Media File Format that grew out of QuickTime.\n- **Playback**: every major browser plays MP4, and its media type is video/mp4.\n- **Contents**: MP4 commonly holds H.264 video with AAC audio, which is what this page writes.\n\nThe RM is decoded and then encoded from scratch, so the MP4 is a lossy copy of what the decoder produced. A picture bigger than 1920 px either way is scaled to fit, the frame rate cannot exceed 30 fps, and the audio is rewritten as AAC at 96 kbps. Interlaced frames are deinterlaced first.\n\n### Other ways to convert RM to MP4\n\n- **FFmpeg:** run `ffmpeg -i lecture.rm -c:v libx264 -c:a aac lecture.mp4`. The -c:v and -c:a options choose the video and audio encoders, and FFmpeg takes the output format from the .mp4 extension.\n\n### Problems with RM files\n\n- **No picture or no sound**: recognizing the container does not mean the codec inside can be decoded. Open the file in VLC media player or RealPlayer to see whether it plays at all.\n- **The file isn't recognized**: a damaged or missing .RMF header at the start stops normal identification. Download the file again.\n"
+    }
+  },
+  "tiff-to-gif": {
+    "seo": {
+      "title": "Convert TIFF to GIF (256-Color Palette)",
+      "h1": "TIFF to GIF Converter for 256-Color Images",
+      "description": "Convert a TIFF scan or photo to a GIF in your browser. GIF stores at most 256 colors per picture, and a multi-page TIFF gives one picture. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Writes one picture from your TIFF as a GIF with a palette of up to 256 colors."
+    },
+    "faqs": [
+      {
+        "question": "Why do the colors in my GIF look different from the TIFF?",
+        "answer": "A GIF can only use 256 colors per picture, while a TIFF can hold far more. A photo or a smooth gradient has to be cut down to that palette, so colors that were distinct in the TIFF can merge."
+      },
+      {
+        "question": "My TIFF has several pages. Do I get one GIF for each?",
+        "answer": "No. The converter reads one picture from the file, so a multi-page TIFF does not turn into one GIF per page. To pick the image yourself, use the ImageMagick command below with its number in square brackets."
+      },
+      {
+        "question": "Can I make an animated GIF from the pages of a TIFF?",
+        "answer": "Not on this page. A GIF can hold many pictures with a timed delay between them, but this converter writes a single still. GIMP can export a multi-layer image as an animated GIF."
+      },
+      {
+        "question": "What happens to transparency in a TIFF?",
+        "answer": "GIF marks one palette color as fully transparent and has no partial transparency. A soft, semi-transparent edge cannot be kept as it was in the TIFF."
+      },
+      {
+        "question": "Is a .tif file different from a .tiff file?",
+        "answer": "No. Both endings name the same Tagged Image File Format, and its media type is image/tiff. This page accepts either."
+      },
+      {
+        "question": "Is there a limit on the size of the TIFF?",
+        "answer": "There is no general file-size limit. A picture too large for the browser tab to handle is refused with an error saying so, rather than turned into a GIF."
+      },
+      {
+        "question": "Does a 16-bit TIFF keep its color depth in a GIF?",
+        "answer": "No. A GIF stores indexes into a palette of at most 256 colors, so the extra tonal range of a high-bit-depth TIFF does not carry over. Keep the TIFF as the file that holds that precision."
+      },
+      {
+        "question": "Can I convert a batch of TIFF scans together?",
+        "answer": "Select them together and they are converted one after another. Each scan becomes its own GIF, and there is no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIFF and GIF",
+      "fromFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A tag-based raster format developed by Aldus and Microsoft, whose specification Adobe now controls.",
+        "details": [
+          "Several images per file",
+          "Many compression methods",
+          "image/tiff"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "CompuServe's palette-based format with lossless LZW compression.",
+        "details": [
+          "At most 256 colors per image",
+          "On-or-off transparency",
+          "image/gif"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting TIFF to GIF",
+      "points": [
+        "A GIF picture holds at most 256 colors, so photos and gradients are reduced.",
+        "The converter reads one picture per TIFF; it does not make a GIF per page or an animation.",
+        "GIF has on-or-off transparency only, so soft edges lose their partial opacity."
+      ]
+    },
+    "guide": {
+      "title": "About TIFF and GIF",
+      "markdown": "### What is a TIFF file?\n\nTIFF is a tag-based raster format that Aldus and Microsoft developed, with revision 6.0 published in 1992 and the specification now controlled by Adobe. It allows several compression methods and color representations, and one file may hold multiple images, which suits scanned document sequences. High-bit-depth imaging and preservation masters are established uses. The endings .tif and .tiff mean the same thing.\n\n### Programs that open TIFF files\n\n- **Windows, Mac and Linux:** GIMP imports TIFF for editing. ImageMagick reads and writes it, and lets you choose the compression, strip or tile layout and byte order.\n- **Mac:** Preview offers TIFF in the File > Export format list.\n\n### TIFF and GIF compared\n\n- **Palette**: a GIF picture is capped at 256 colors, whereas a TIFF can hold far more, so a photograph gets reduced.\n- **Transparency**: GIF marks one palette color as transparent, with no partial transparency.\n- **Images per file**: both can hold several images. A GIF plays them in sequence with a delay between each, while a TIFF scan keeps them as pages.\n- **Compression**: GIF compresses with LZW, which is lossless, once the colors have been cut down.\n\nOn this page ImageMagick reads one picture from the TIFF and writes it as a GIF, with no quality setting. Every major browser displays GIF, but the GIF holds only a 256-color version of the scan, so keep the TIFF as your master copy.\n\n### Other ways to convert TIFF to GIF\n\n- **ImageMagick:** run `magick 'scan.tiff[0]' cover.gif`. The number in square brackets picks the image from a multi-image file, counting from 0, so `[1]` is the second one.\n- **IrfanView (Windows):** open the TIFF in IrfanView, which reads and saves both TIF and GIF, then use File > Save as and choose GIF as the output format.\n\n### Problems with TIFF files\n\n- **Several images in one file**: a TIFF can hold a whole sequence, and a tool that shows only one image hides the rest. Use software that exposes the full sequence.\n- **A TIFF over about 4 GB**: classic TIFF uses 32-bit offsets, which limit it to roughly that size; BigTIFF extends the fields.\n- **Unusual tags or profiles**: a reader may not understand every private tag, including some color-profile extensions.\n"
+    }
+  },
+  "avi-to-mpeg": {
+    "seo": {
+      "title": "Convert AVI to MPEG (MPEG-2 Video, MP2 Audio)",
+      "h1": "AVI to MPEG Converter with MPEG-2 Video",
+      "description": "Convert AVI to MPEG in your browser: the video is re-encoded as MPEG-2 and the sound as MP2, in a plain .mpeg file. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encodes your AVI as MPEG-2 video with MP2 sound in a .mpeg file."
+    },
+    "faqs": [
+      {
+        "question": "Can I burn this MPEG to a DVD?",
+        "answer": "Not as it is. The file holds MPEG-2 video and MP2 audio, but it is not an authored DVD: it has no disc structure, and its frame size follows your AVI rather than DVD values. Use DVD authoring software if you need a disc."
+      },
+      {
+        "question": "Which video and audio codecs does the MPEG use?",
+        "answer": "MPEG-2 video and MP2 audio at 96 kbps. The AVI can hold many different codecs, so the new file is a fresh encode, not a copy of the original streams."
+      },
+      {
+        "question": "Is the MP2 sound the same as MP3?",
+        "answer": "No. MP2 is MPEG audio layer 2, a codec of its own. The soundtrack is encoded as MP2 inside the MPEG file; it is not an MP3."
+      },
+      {
+        "question": "Will the MPEG look worse than my AVI?",
+        "answer": "It can. MPEG-2 compression is lossy, and the video is encoded again from the decoded AVI frames, so fine detail from the source does not all survive."
+      },
+      {
+        "question": "Is my frame rate or frame size changed?",
+        "answer": "Oversized pictures are scaled down and smaller ones keep their size. Footage faster than the frame-rate cap loses frames, yet the AVI's running time stays the same. Both sides must also come out even, so an odd one gives up a pixel."
+      },
+      {
+        "question": "Can I rename my .avi to .mpeg instead?",
+        "answer": "No. The file would still be an AVI inside, built on the RIFF structure. Converting decodes the AVI streams and writes new MPEG-2 and MP2 ones."
+      },
+      {
+        "question": "What if my AVI is damaged or cut short?",
+        "answer": "A truncated or partly corrupt AVI often still produces a file. Expect an MPEG that stops where the readable data stopped, and check its ending before you discard the capture."
+      },
+      {
+        "question": "Is there a limit on how big the AVI can be?",
+        "answer": "The page has no cap on file size and no timeout. Pick several AVIs and they go through one at a time, each saved as its own MPEG, so a long capture simply occupies your device for longer."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVI and MPEG",
+      "fromFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "Microsoft's RIFF-based container for pictures and sound.",
+        "details": [
+          "Codec named by FOURCC",
+          "Header holds size and frame rate",
+          "video/x-msvideo"
+        ]
+      },
+      "toFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "MPEG-2 video with MP2 audio here, in a .mpeg file.",
+        "details": [
+          "MPEG-2 video",
+          "MP2 audio",
+          "video/mpeg"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVI to MPEG",
+      "points": [
+        "The AVI is decoded and re-encoded as MPEG-2 video with MP2 audio.",
+        "The result is a .mpeg file, not an authored DVD or Video CD.",
+        "Fast footage has frames dropped and oversized frames shrink, so the running time stays the same."
+      ]
+    },
+    "guide": {
+      "title": "About AVI and MPEG",
+      "markdown": "### What is an AVI file?\n\nAVI arrived with Windows 3.1, and Microsoft's first specification is from 1992. It stores timed pictures and sound inside a RIFF file, where FOURCC codes name each stream's codec, the header notes dimensions and frame rate, and a separate chunk holds the media. The video inside may be uncompressed, lossless or lossy, which means the extension reveals nothing about quality. You find it in video production archives and older desktop workflows.\n\n### Programs that open AVI files\n\n- **Windows, Mac and Linux:** ffplay uses FFmpeg's demuxer to play AVI. mpv plays it on the desktop and lets you pick audio and subtitle streams.\n- **Windows and Mac:** Adobe Premiere imports the AVI container.\n- **Mobile:** VLC for Android is free, and the iOS version plays most movie files on iPhone and iPad.\n\n### AVI and MPEG compared\n\n- **What they are**: AVI is a container. The MPEG written here carries MPEG-2 video, a codec made for television that DVDs also use, together with MP2 audio.\n- **Streams**: MPEG packs coded picture, sound and data into separate streams that are cut into packets.\n- **Extensions and media types**: .avi is labeled video/x-msvideo. .mpeg and .mpg both name MPEG video, for which the Library of Congress records video/mpeg.\n\nThe converter decodes the AVI and encodes MPEG-2 video with a quality scale rather than a bitrate target, plus MP2 audio at 96 kbps. Interlaced frames are deinterlaced first, and because the compression is lossy, the result is a fresh encode rather than a copy of the source.\n\n### Other ways to convert AVI to MPEG\n\n- **FFmpeg:** run `ffmpeg -i capture.avi capture.mpeg`. FFmpeg reads AVI, and the .mpeg ending tells it to write an MPEG program stream.\n- **Prism (Windows):** run `prism.exe -convert \"C:\\Media\\capture.avi\" -format .mpg`. Prism lists AVI as an input and MPG as an output. It offers no completion message, so check its window yourself.\n\n### Problems with AVI files\n\n- **Picture missing, sound present**: an editor can recognize AVI without having the decoder for its contents.\n- **Very large captures**: original AVI size restrictions differ from the later OpenDML extension, so big captures need compatible software.\n- **Wrong shape or striped motion**: aspect ratio and scan-type metadata are not handled consistently across AVI implementations.\n"
+    }
+  },
+  "csv-to-jpg": {
+    "seo": {
+      "title": "Convert CSV to JPG (Table as a Grid Image)",
+      "h1": "CSV to JPG Converter for Table Images",
+      "description": "Convert a CSV file to a JPG picture of its table: a grid with a shaded header row. A table too big for the picture shows its first rows. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Draws your CSV as a gridded table and saves the picture as a JPG."
+    },
+    "faqs": [
+      {
+        "question": "What does the JPG of my CSV look like?",
+        "answer": "It is a table on a white background with grid lines, a shaded header row and light stripes on alternate rows, set in your system's sans-serif font. The image is drawn larger than it is shown, so the text stays sharp when you zoom in."
+      },
+      {
+        "question": "Why are some rows or columns missing from the picture?",
+        "answer": "The picture has a maximum size. A table that does not fit shows its first rows and columns, with a line under the grid and a notice on the page saying how many of each were drawn."
+      },
+      {
+        "question": "Is the first row of my CSV always the header?",
+        "answer": "Yes. The first row is drawn as the shaded header row, whatever it holds, so a CSV without headers will show its first data row in that style."
+      },
+      {
+        "question": "What happens to long text in a cell?",
+        "answer": "Text wider than the column limit ends in an ellipsis, and a cell with line breaks shows only its first few lines. The column is sized to the text it shows, up to that limit."
+      },
+      {
+        "question": "Can I use a semicolon- or tab-separated file?",
+        "answer": "Yes. The CSV parser works out the delimiter itself, so you do not set one. Quoted fields with commas or line breaks stay in one cell."
+      },
+      {
+        "question": "What if my CSV is broken or empty?",
+        "answer": "You get a message instead of an image. A quote that is never closed is refused with an error about the quote, and an empty file is reported as empty."
+      },
+      {
+        "question": "Why does small text look rough in the JPG?",
+        "answer": "JPEG is lossy and can fuzz thin lines and tiny characters. The picture is saved at a high JPEG quality setting. The [CSV to PNG converter](/csv-to-png/) is lossless, so it keeps edges sharper."
+      },
+      {
+        "question": "Are leading zeros and long ID numbers kept?",
+        "answer": "Yes. Every cell is drawn as the text in the file, so 00123 stays 00123 and a long number is not turned into scientific notation, which spreadsheets often do on opening."
+      }
+    ],
+    "aboutSection": {
+      "title": "CSV and JPG",
+      "fromFormat": {
+        "name": "CSV",
+        "fullName": "Comma-Separated Values",
+        "description": "Plain-text rows of fields, with a common form described in RFC 4180.",
+        "details": [
+          "One record per line",
+          "Quotes protect commas and line breaks",
+          "text/csv"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format designed for photographs, with no alpha transparency.",
+        "details": [
+          "Lossy compression",
+          "No transparency",
+          "image/jpeg"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting CSV to JPG",
+      "points": [
+        "The JPG is a picture of the table, not editable cells: values cannot be sorted or copied from it.",
+        "A table too big for the picture shows its first rows and columns, with a note saying how many.",
+        "The first CSV row is drawn as the shaded header row."
+      ]
+    },
+    "guide": {
+      "title": "About CSV and JPG",
+      "markdown": "### What is a CSV file?\n\nCSV exchanges rows of text fields between databases and spreadsheets. RFC 4180 documented a common representation in October 2005 rather than inventing the older format, and the registered media type is text/csv. A header record may come before the data rows, and double quotes protect fields that contain commas or line breaks. Dialects differ in delimiter and quoting, and a spreadsheet export stores one sheet's data without workbook formatting.\n\n### Programs that open CSV files\n\n- **Windows, Mac and Linux:** LibreOffice Calc opens Text CSV through an import dialog with delimiter and column-format choices.\n- **Windows and Mac:** Microsoft Excel imports and exports CSV; choose text handling with care for identifiers.\n- **Linux:** the Python csv module reads records with configurable dialects.\n- **Web:** Google provides a documented Apps Script for importing CSV into Google Sheets.\n\n### CSV and JPG compared\n\n- **Content**: CSV is text you can sort and calculate with. JPG holds pixels, so the numbers in the picture cannot be selected as data.\n- **Compression**: JPEG is lossy and has no alpha.\n- **Types**: text/csv against image/jpeg; .jpg and .jpeg are the same format.\n\nThe page reads the CSV with the same parser the table converters use and draws it on a canvas. The picture is saved at JPEG quality 0.92, with no other setting to choose. Several CSV files selected together become one JPG each.\n\n### Other ways to convert CSV to JPG\n\n- **Calc and ImageMagick:** in Calc, choose File > Open for the CSV, then File > Export As > Export as PDF. Turn the first PDF page into an image with `magick 'table.pdf[0]' table.jpg`. ImageMagick relies on Ghostscript to read PDF.\n- **Excel and GIMP:** open the CSV in Excel with File > Open, select the cells, and choose Home > Copy arrow > Copy as Picture. In GIMP choose File > Create > From Clipboard, then File > Export As and type a name ending in .jpg.\n- **Python and Pillow:** read the rows with `csv.reader`, draw them on an image with `ImageDraw.multiline_text` and save with `image.save(\"table.jpg\", \"JPEG\")`. You choose the canvas size, fonts and column widths in the script.\n\n### Problems with CSV files\n\n- **Everything lands in one column**: the delimiter does not match what the program expects. Set the separator in the import dialog.\n- **Dates or IDs changed**: Excel can reinterpret them on opening. Import with the column formats you want.\n- **Rows split in the wrong place**: a parser must honor quoted line breaks rather than treat each physical line as a record.\n- **Formatting is gone**: CSV saves the current sheet's data alone.\n"
+    }
+  },
+  "dcm-to-jpeg": {
+    "seo": {
+      "title": "DCM to JPEG: How to Export DICOM Images",
+      "h1": "DCM to JPEG: Exporting DICOM Images",
+      "description": "This page has no DICOM reader, so a DCM file fails to convert here. See how MicroDicom, ImageMagick and IrfanView export a DCM as a JPEG."
+    },
+    "tool": {
+      "subtitle": "This page can't read DICOM files; export a JPEG with MicroDicom, ImageMagick or IrfanView."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert my DCM file to JPEG?",
+        "answer": "No. The converter has no DICOM reader, so a DCM file stops with the message \"Image decode failed.\" Use one of the programs described below to make the JPEG."
+      },
+      {
+        "question": "Which programs can open a DCM file?",
+        "answer": "MicroDicom is a Windows viewer that is free for noncommercial use, and 3D Slicer imports DICOM studies on Windows, Mac and Linux. ImageMagick reads DICOM images, and RadiAnt DICOM Viewer, Horos and OsiriX are other viewers."
+      },
+      {
+        "question": "How do I export a whole series as JPEG files?",
+        "answer": "In MicroDicom, open the File menu, click Export, then To a picture file. You can export the current image, a series, a study, a patient or all patients, with JPG chosen as the image format."
+      },
+      {
+        "question": "Why do I get one slice from a DCM file?",
+        "answer": "A DICOM image series often spans many files, so opening a single file may show only one slice. Open the whole folder in a viewer to work with the series."
+      },
+      {
+        "question": "Can I choose the JPEG quality when I export?",
+        "answer": "In MicroDicom, yes. The More settings button in its export dialog covers the image size and the JPEG quality, plus drawing annotations and overlay text on the pictures."
+      },
+      {
+        "question": "Does the JPEG carry the patient's details?",
+        "answer": "DICOM objects can contain demographic information. MicroDicom can draw overlay text on the pictures and has an Anonymous overlay choice that hides patient information."
+      },
+      {
+        "question": "Can ImageMagick make the JPEG?",
+        "answer": "ImageMagick lists DCM as a format it can read, and its notes mention the window center and width tags. The command is in the ImageMagick method on this page; it is not a full study viewer, so look over the JPEG before you depend on it."
+      },
+      {
+        "question": "Can the JPEG replace the DICOM file?",
+        "answer": "No. A JPEG is a lossy picture with none of the study's attributes. Handing out a picture and handing out the study carry different privacy consequences too, so keep the DCM files as the record."
+      }
+    ],
+    "aboutSection": {
+      "title": "DCM and JPEG",
+      "fromFormat": {
+        "name": "DCM",
+        "fullName": "DICOM image",
+        "description": "The file extension for DICOM, the medical imaging standard maintained by NEMA.",
+        "details": [
+          "Image plus patient and study metadata",
+          "16-bit grayscale data",
+          "application/dicom"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format defined in ISO/IEC 10918-1.",
+        "details": [
+          "Lossy compression",
+          "No alpha",
+          "image/jpeg"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DCM to JPEG",
+      "points": [
+        "This page has no DICOM reader: a DCM file fails with \"Image decode failed.\"",
+        "MicroDicom, ImageMagick and IrfanView (with its plug-ins) can write a JPEG from a DCM.",
+        "A JPEG is a lossy picture; the DICOM file keeps the patient and study attributes."
+      ]
+    },
+    "guide": {
+      "title": "About DCM and JPEG",
+      "markdown": "### What is a DCM file?\n\nDCM is the usual ending for DICOM, the standard that defines medical objects such as images, waveforms and reports. The ACR-NEMA predecessor appeared in 1985 and the renamed DICOM standard followed in 1993. The registered media type is application/dicom, and the registration recommends .dcm for disk files other than DICOMDIR, which can index a collection of related files. A Part 10 file begins with a 128-byte preamble followed by the DICM marker. A DCM stores an image together with patient and study metadata, and its pixels can be 16-bit grayscale.\n\n### Programs that open DCM files\n\n- **Windows, Mac and Linux:** 3D Slicer imports DICOM studies into a database and then loads the series you choose. ImageMagick can read DICOM images, and its notes list window center and width tag handling.\n- **Windows:** MicroDicom is a viewer, free for noncommercial use, for CT, MRI and other DICOM studies. IrfanView lists DCM, ACR and IMA among its formats, which need its plug-ins.\n\n### DCM and JPEG compared\n\n- **Content**: a DCM holds the image and its attributes. A JPEG holds only a picture.\n- **Depth**: DICOM pixels can be 16-bit grayscale, while a JPEG has no transparency and is always lossy.\n- **Compression**: DICOM has many compression options.\n- **Types**: application/dicom against image/jpeg.\n\nNo conversion happens on this page: with no DICOM reader, the file is rejected with \"Image decode failed.\" Do the export in a program that understands the format.\n\n### Other ways to convert DCM to JPEG\n\n- **MicroDicom (Windows):** open the images, or a disc or folder with File > Scan for DICOM files, then choose File > Export > To a picture file or press Shift+P. Pick a destination folder, what to export and JPG as the image format, then click Export. More settings sets the JPEG quality and whether annotations and overlay text are drawn.\n- **ImageMagick:** run `magick image.dcm image.jpeg`. ImageMagick reads DICOM images and recognizes window center and width tags.\n- **IrfanView (Windows):** install the plug-ins IrfanView needs for DCM, open the file, then use File > Save as and choose JPG as the output format.\n\n### Problems with DCM files\n\n- **Only one slice opens**: a series often spans many files. Open the folder in a viewer.\n- **Can't tell whose study it is**: file and folder names do not reliably identify the patient, study or series. Use the DICOM attributes.\n- **Some objects will not load**: certain information objects need 3D Slicer extensions instead of its core importer.\n- **Patient details travel with the study**: DICOM objects can contain demographic information, so sharing an exported image and sharing the source study have different privacy consequences.\n"
+    }
+  },
+  "divx-to-mp4": {
+    "seo": {
+      "title": "Convert DIVX to MP4 (H.264 and AAC)",
+      "h1": "DIVX to MP4 Converter for DivX Videos",
+      "description": "Turn a DivX video into an H.264 MP4 with AAC sound, in your browser. The video is re-encoded, so the MP4 needs no DivX software. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encodes a DivX video as H.264 with AAC sound inside an MP4."
+    },
+    "faqs": [
+      {
+        "question": "How do I play a DIVX file?",
+        "answer": "DivX Player opens .divx files on Windows and macOS, and VLC media player decodes DivX video. The MP4 made here plays on nearly every device."
+      },
+      {
+        "question": "Is DivX the same thing as MP4?",
+        "answer": "No. DivX names a family of video software and codecs, while MP4 is the MPEG-4 Part 14 container. The MP4 made here holds H.264 video and AAC sound."
+      },
+      {
+        "question": "Does the file picker take a DivX video inside an AVI?",
+        "answer": "The picker on this page shows .divx files. DivX video is usually stored in AVI files, so a movie with an .avi ending is not offered by this page's picker."
+      },
+      {
+        "question": "What is inside the MP4 this page makes?",
+        "answer": "The picture is encoded as H.264 and the sound as AAC, once the DivX has been decoded. A speedy encoder setting is used, so the MP4 is not as compact as a slower pass would make it."
+      },
+      {
+        "question": "Does the picture size or speed change?",
+        "answer": "Pictures beyond the size ceiling shrink to fit, and an odd side drops a pixel. Footage faster than the frame-rate cap is thinned but keeps its length. A small, slow DivX clip stays as it is."
+      },
+      {
+        "question": "Why does my old DivX movie look blocky in the MP4?",
+        "answer": "Blocks already in the DivX are encoded into the MP4, because a fresh encode cannot restore what compression discarded. This page's fast encoder preset is lossy too."
+      },
+      {
+        "question": "Can I convert a whole folder of DIVX files?",
+        "answer": "Select as many as you like. They are processed one at a time, and every result is its own download."
+      },
+      {
+        "question": "What if my DIVX file is damaged or cut short?",
+        "answer": "With a damaged DIVX the conversion normally carries on, and the MP4 simply ends early. Watch it through to the end before you delete the source."
+      }
+    ],
+    "aboutSection": {
+      "title": "DIVX and MP4",
+      "fromFormat": {
+        "name": "DIVX",
+        "fullName": "DivX video",
+        "description": "Video from DivX's playback and authoring ecosystem, which can add menus and chapters.",
+        "details": [
+          "Subtitles and extra audio tracks possible",
+          "Menus and chapters from authoring",
+          "Device profiles"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata.",
+        "details": [
+          "Nested boxes",
+          "H.264 and AAC here",
+          "video/mp4"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DIVX to MP4",
+      "points": [
+        "The DivX video is decoded and encoded again, so the MP4 holds new H.264 and AAC streams.",
+        "Oversized frames are scaled down and fast frame rates have frames dropped, so the length stays the same.",
+        "Keep the original DIVX if you need it for a DivX-certified player."
+      ]
+    },
+    "guide": {
+      "title": "About DIVX and MP4",
+      "markdown": "### What is a DIVX file?\n\nA .divx file belongs to DivX's video playback and authoring ecosystem. The first DivX releases used MPEG-4 Part 2 video, normally inside AVI files, and H.264 came later. DivX authoring can add menus and chapter points to a movie, and a DivX movie can contain subtitles and more than one audio track. DivX certification profiles describe what each playback device can handle, so the advanced features depend on the device.\n\nDivX is mainly a delivery format. Adobe advises converting it before editing in Premiere.\n\n### Programs that open DIVX files\n\n- **Windows, Mac and Linux:** VLC media player decodes DivX video.\n- **Windows and Mac:** DivX Player lists the .divx extension and offers soundtrack selection.\n- **Linux:** FFplay, FFmpeg's test player, handles DivX streams and subtitle samples.\n\n### DIVX and MP4 compared\n\n- **Container**: MP4 is a nested-box container standardized as ISO/IEC 14496-14. DivX names a codec family and a set of player features.\n- **Extras**: menus and chapters belong to DivX authoring; MP4 can hold subtitles and chapters of its own.\n- **Playback**: every major browser plays MP4, with the media type video/mp4.\n\nConverting here decodes the DivX video and encodes a new H.264 picture beside AAC sound at 96 kbps. A picture over 1920 px in either direction shrinks to fit, and the rate is held to 30 fps. Interlaced frames are deinterlaced first.\n\n### Other ways to convert DIVX to MP4\n\n- **Prism (Windows):** Prism lists AVI files encoded with DivX as an input. Run `prism.exe -convert \"C:\\Media\\feature.avi\" -format .mp4` on the AVI that holds your DivX video. Prism reports nothing when the job ends, so watch its window.\n\n### Problems with DIVX files\n\n- **It plays in DivX Player only**: menus, chapters and extra tracks rely on the player's DivX profile, so a different player may skip them.\n- **A device refuses the DIVX**: certification profiles describe each device's limits, so a file can be fine on one player and rejected by another.\n- **Editing in Premiere**: Adobe advises converting DivX before editing, because DivX is primarily a delivery format.\n- **A decoder is not enough**: having a DivX video decoder does not by itself mean every advanced authoring feature will work.\n"
+    }
+  },
+  "flv-to-mov": {
+    "seo": {
+      "title": "Convert FLV to MOV (Flash Video to H.264)",
+      "h1": "FLV to MOV Converter for Flash Video",
+      "description": "Turn an old Flash FLV recording into a QuickTime MOV with H.264 video and AAC sound, in your browser. It is not ProRes. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encodes a Flash Video recording as H.264 with AAC sound inside a MOV."
+    },
+    "faqs": [
+      {
+        "question": "How do I play an FLV file now that Flash is gone?",
+        "answer": "VLC and FFplay open FLV files without Flash Player, which Adobe no longer supports. Reinstalling Flash is not the way to watch an old recording."
+      },
+      {
+        "question": "Does MOV make my FLV look better?",
+        "answer": "No. The container changes, but the pictures are a new H.264 encode of what the FLV already shows. Nothing lost in the original recording comes back."
+      },
+      {
+        "question": "Is the MOV a ProRes file?",
+        "answer": "No. The picture is H.264 and the sound is AAC. If your editor insists on ProRes, make that export from the MOV or the FLV in a desktop tool."
+      },
+      {
+        "question": "What kind of video is inside an FLV?",
+        "answer": "Only one track of each kind is allowed. Sorenson and On2 VP6 are the usual picture codecs, with MP3, PCM and ADPCM as sound options."
+      },
+      {
+        "question": "Why does my editor still reject the MOV?",
+        "answer": "MOV is a container, and an editor can be picky about the codec inside it. H.264 inside a MOV imports in most editors, but some want an intermediate codec such as ProRes."
+      },
+      {
+        "question": "Will a big or fast FLV be resized?",
+        "answer": "Big pictures are scaled down to fit under the size ceiling, fast footage loses frames to stay under the frame-rate cap, and both sides come out even. A small clip is never enlarged."
+      },
+      {
+        "question": "Can I drop in several FLV files together?",
+        "answer": "Yes. They are processed one after another, and every FLV produces its own MOV download."
+      },
+      {
+        "question": "What if my FLV is damaged or cut short?",
+        "answer": "A cut-off download tends to give a MOV that ends early. Open it and skip to the last seconds before you discard the FLV."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLV and MOV",
+      "fromFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A container from the Flash era that holds one video and one audio stream.",
+        "details": [
+          "Sorenson or On2 VP6 video",
+          "MP3, PCM or ADPCM audio",
+          "Legacy Flash format"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime movie",
+        "description": "Apple's QuickTime file format.",
+        "details": [
+          "Built from atoms",
+          "H.264 and AAC here",
+          "video/quicktime"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting FLV to MOV",
+      "points": [
+        "The MOV holds H.264 video and AAC sound, not ProRes.",
+        "A new encode can't add detail the FLV never had.",
+        "Oversized pictures shrink to fit and fast frame rates have frames dropped."
+      ]
+    },
+    "guide": {
+      "title": "About FLV and MOV",
+      "markdown": "### What is an FLV file?\n\nMacromedia's Flash video delivery gave us FLV, a binary container. The picture is typically Sorenson or On2 VP6, and the sound is MP3, PCM or ADPCM. Through ActionScript, a Flash SWF could point at an outside FLV, which is why many clips sat in separate files.\n\nAdobe stopped supporting Flash Player at the close of 2020, yet the recordings live on in archives, interview downloads and course libraries. The .flv ending names no codec, so a program also needs whichever decoder the stream inside requires.\n\n### Programs that open FLV files\n\n- **Windows, Mac and Linux:** VLC media player handles FLV, with Sorenson and VP6 decoding on its feature list. FFplay decodes through FFmpeg.\n- **Mobile:** On phones, the Android port of VLC shares the desktop player's decoding, and VLC for iOS opens local files in its own player.\n\n### FLV and MOV compared\n\n- **Origin**: FLV is a Flash-era delivery format. MOV is Apple's QuickTime container, built from atoms.\n- **Codecs**: a MOV may carry H.264, ProRes or Motion JPEG pictures beside AAC or PCM sound.\n- **Support**: MOV works best in Apple's own software and many editors; for the web, MP4 travels further.\n- **Types**: video/quicktime for MOV.\n\nHere the FLV is decoded and new H.264 video goes into the MOV with AAC sound at 96 kbps. Anything over 1920 px shrinks to fit, 30 fps is the frame-rate ceiling, and frames flagged as interlaced are deinterlaced first. The result is an access copy for watching or sharing, not an editing master.\n\n### Other ways to convert FLV to MOV\n\n- **FFmpeg:** `ffmpeg -i interview.flv -c:v libx264 -c:a aac interview.mov` makes an H.264 and AAC MOV. FFmpeg lists FLV and MOV for both reading and writing, takes the output format from the .mov extension, and gets H.264 from the external library libx264.\n\n### Problems with FLV files\n\n- **The FLV won't play**: the stream may need a decoder your player lacks. Try VLC rather than hunting for a Flash Player download.\n- **The editor refuses the MOV**: a QuickTime file can use codecs that the destination editor lacks. Check which codecs it imports before converting again.\n- **Soft picture**: Flash-era video was often small and heavily compressed, and the MOV can't be sharper than the FLV it came from.\n- **Several audio tracks**: the one-audio-stream FLV model cannot keep alternative audio tracks, so none are waiting to be recovered.\n"
+    }
+  },
+  "flv-to-wmv": {
+    "seo": {
+      "title": "Convert FLV to WMV (Flash to Windows Media)",
+      "h1": "FLV to WMV Converter for Flash Video",
+      "description": "Turn an old Flash FLV recording into a WMV in your browser, with FFmpeg's default Windows codecs and no settings to fuss over. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Writes a Flash Video recording as a WMV with MS-MPEG4 v3 video and WMA v2 audio."
+    },
+    "faqs": [
+      {
+        "question": "Which video codec does the WMV use?",
+        "answer": "FFmpeg's defaults for a WMV: MS-MPEG4 v3 video, which is not Windows Media Video, with WMA v2 audio. The page sets neither codec."
+      },
+      {
+        "question": "Can I just rename my FLV to WMV?",
+        "answer": "No. Flash Video data stays inside and a program that reads the contents will still see an FLV. Conversion writes a new WMV with newly encoded streams."
+      },
+      {
+        "question": "How do I play an FLV without Flash Player?",
+        "answer": "VLC and FFplay play FLV directly. Flash Player is no longer supported, so an old recording is better opened in a desktop player or converted."
+      },
+      {
+        "question": "Why does the WMV look soft?",
+        "answer": "The page leaves FFmpeg's default bitrates in place and nothing here raises them. A slide or a talking head survives that better than a busy, fast scene."
+      },
+      {
+        "question": "Will my old Windows device accept the file?",
+        "answer": "A device may reject a WMV that holds MS-MPEG4 v3 video if it expects true Windows Media Video. This page offers no way to pick another codec, so test the file on the device before relying on it."
+      },
+      {
+        "question": "Does the page resize or slow the video?",
+        "answer": "Pictures over the size ceiling are scaled down; smaller ones stay put. Faster footage has frames removed to meet the frame-rate cap while the running time is unchanged. An odd side then gives up one pixel."
+      },
+      {
+        "question": "Does the WMV look better than the FLV?",
+        "answer": "No. WMV is another lossy encode of what the FLV already shows. If you need several versions, make each from the FLV instead of re-encoding a WMV."
+      },
+      {
+        "question": "Can I convert more than one FLV?",
+        "answer": "Yes. Several files run one after another and every WMV is saved on its own."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLV and WMV",
+      "fromFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A container from the Flash era that holds one video and one audio stream.",
+        "details": [
+          "Sorenson or On2 VP6 video",
+          "MP3, PCM or ADPCM audio",
+          "Legacy Flash format"
+        ]
+      },
+      "toFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "Windows Media coded content stored in an ASF container.",
+        "details": [
+          "ASF container",
+          "Lossy compression",
+          "video/x-ms-wmv"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting FLV to WMV",
+      "points": [
+        "Codecs are FFmpeg's WMV defaults, MS-MPEG4 v3 video and WMA v2 audio; the page sets neither.",
+        "Oversized pictures shrink, and a fast source is thinned without being shortened.",
+        "Re-encoding adds loss, so make each delivery copy from the FLV."
+      ]
+    },
+    "guide": {
+      "title": "About FLV and WMV",
+      "markdown": "### What is an FLV file?\n\nAn FLV is a Flash-era recording, a binary layout tied to Macromedia's Flash video delivery. A file can hold just one video stream and one audio stream; Sorenson or On2 VP6 supply the picture, and MP3, PCM or ADPCM the sound. Flash Player is discontinued, so a saved lesson or interview now needs a desktop player.\n\nThe extension names no codec, so a program can read the file only if it has the decoder for the stream inside. Reinstalling Flash Player is not an appropriate way to play an old FLV.\n\n### Programs that open FLV files\n\n- **Windows, Mac and Linux:** VLC media player's feature list names FLV input as well as Sorenson and VP6 decoding. FFplay relies on FFmpeg's decoders.\n- **Mobile:** On Android, VLC brings the desktop player's decoding to phones. On iOS, VLC plays local files with its own engine.\n\n### FLV and WMV compared\n\n- **Container**: a .wmv file is Windows Media content inside ASF, a container designed for synchronized media storage and network delivery.\n- **Codecs**: Windows Media Video 7, 8 and 9 all fit the extension, so the extension alone doesn't say which one you hold.\n- **Types**: video/x-ms-wmv is what the Library of Congress records for WMV, since IANA has no registration.\n\nFFmpeg picks the codecs for the .wmv here: MS-MPEG4 v3 for the picture, which is not Windows Media Video, and WMA v2 for the sound. Its default bitrates stay in place, so fine lettering and busy scenes blur. Deinterlacing comes first, then oversized pictures shrink and a fast source is thinned without being shortened. Several files run one after another with no size or time limit.\n\n### Other ways to convert FLV to WMV\n\n- **FFmpeg:** `ffmpeg -i lesson.flv lesson.wmv`. FFmpeg lists Flash Video and ASF for both reading and writing, and it takes the output format from the .wmv extension, so no codec options are needed.\n\n### Problems with FLV files\n\n- **Player coverage**: In FFmpeg's documentation the Windows Media Video 9 decoder is not marked as completely working, so test the WMV in the player that will use it.\n- **Quality**: the WMV ending alone does not establish image quality. It depends on the codec and compression settings.\n- **A reader is not a decoder**: a program may read ASF without having every codec inside it, so a WMV can open and still show no picture.\n- **Another generation of loss**: start each attempt from the FLV, not from a previous WMV.\n"
+    }
+  },
+  "gif-to-bmp": {
+    "seo": {
+      "title": "Convert GIF to BMP (First Frame as Bitmap)",
+      "h1": "GIF to BMP Converter for the First Frame",
+      "description": "Save the first frame of a GIF as a BMP bitmap, made in your browser. Animation, timing and metadata are not kept. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Saves the first frame of your GIF as a BMP bitmap."
+    },
+    "faqs": [
+      {
+        "question": "Why is my BMP not animated?",
+        "answer": "A BMP holds a single picture, so the converter keeps only the first frame of the GIF. The delays between frames and the loop count are left out."
+      },
+      {
+        "question": "Can I choose a different frame?",
+        "answer": "Not on this page. ImageMagick counts frames from 0, so `badge.gif'[2]'` picks the third frame, and a range such as `[1-3]` picks several."
+      },
+      {
+        "question": "Why is the BMP bigger than the GIF?",
+        "answer": "LZW packs a GIF's palette indexes tightly, but a BMP commonly keeps every pixel uncompressed. Uncompressed pixels take room, which is why PNG or JPEG suits sharing better."
+      },
+      {
+        "question": "Does BMP bring back colors the GIF lost?",
+        "answer": "No. Each GIF frame was limited to a small palette of colors, and the BMP is built from that already reduced image. A new format can't restore the original colors."
+      },
+      {
+        "question": "Is the GIF comment kept?",
+        "answer": "No. Metadata, including comments, is dropped, and the picture is decoded to 8-bit RGBA first. Keep the GIF if its comment matters."
+      },
+      {
+        "question": "What happens to transparent areas?",
+        "answer": "This page keeps transparency only for PNG and WebP outputs, so the BMP has no transparent areas. Fill the transparent area in an editor first if you need a specific background color."
+      },
+      {
+        "question": "Can I get every frame as a BMP?",
+        "answer": "Not here, since only the first frame is written. ImageMagick can select a range of frames by index from the command line."
+      },
+      {
+        "question": "Why would I want a BMP at all?",
+        "answer": "BMP shows up in screenshots and built-in graphics on Windows, and some tools expect its plain, uncompressed pixel data."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and BMP",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A palette format from CompuServe that can hold timed frames.",
+        "details": [
+          "LZW compression",
+          "At most 256 colors per frame",
+          "One-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "BMP",
+        "fullName": "Windows bitmap",
+        "description": "A raster format controlled by Microsoft, used first on Windows and OS/2.",
+        "details": [
+          "Usually uncompressed",
+          "Alpha in the newest version",
+          "image/bmp"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting GIF to BMP",
+      "points": [
+        "Only the first GIF frame is written, so animation and timing are gone.",
+        "The picture goes through 8-bit RGBA and metadata is dropped.",
+        "A BMP is commonly uncompressed, so it can be much larger than the GIF."
+      ]
+    },
+    "guide": {
+      "title": "About GIF and BMP",
+      "markdown": "### What is a GIF file?\n\nCompuServe introduced GIF in 1987. It compresses with LZW, draws each frame from a palette of up to 256 colors, and can do simple animation. Transparency is one-bit: a palette entry is either clear or solid, so soft edges cannot keep partial opacity. Short looping animations are the format's usual job.\n\nBecause of the palette, the colors in a GIF are already limited before any conversion happens.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:** GIMP exports GIF as a single still or as an animation made from layers. ImageMagick reads GIF, but check which formats your install supports.\n- **Web browsers:** Firefox and Chrome display GIF.\n- **Mobile:** Safari and Chrome display GIF.\n\n### GIF and BMP compared\n\n- **Frames**: a GIF can hold many, a BMP only one.\n- **Compression**: GIF is lossless through LZW, while a BMP commonly stores its pixels uncompressed, although lossless compression is available.\n- **Color**: Version 5 of BMP arrived with Windows 98 and can record an ICC profile and an alpha channel.\n- **Types**: image/gif and image/bmp.\n\nThis page decodes the first GIF frame in the browser as 8-bit RGBA, leaves metadata behind, and has ImageMagick write the BMP. The rest of the animation is ignored, and so are its delays and loop count.\n\n### Other ways to convert GIF to BMP\n\n- **ImageMagick:** `magick badge.gif'[0]' badge.bmp` saves the first frame. The page on image indexes says the first image is index 0, the second is 1, and so on, and the output format comes from the .bmp suffix.\n- **Pillow:** `from PIL import Image; Image.open(\"badge.gif\").convert(\"RGB\").save(\"badge.bmp\")` converts the picture to RGB, which BMP writing supports, and takes the BMP format from the filename extension.\n\n### Problems with GIF files\n\n- **The BMP is very large**: a BMP with uncompressed pixels can be bulky, which makes PNG or JPEG the more practical choice for handing files around.\n- **An older program rejects the file**: software expecting an older bitmap header may need BMP3 or BMP2 output rather than ImageMagick's default BMP version.\n- **Jagged transparency**: GIF transparency has no partial opacity, so soft edges were already hard before converting.\n- **Gradients look different**: the small palette can change how a gradient is drawn.\n"
+    }
+  }
+}

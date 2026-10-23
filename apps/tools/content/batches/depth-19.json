@@ -1,0 +1,829 @@
+{
+  "png-to-epub": {
+    "seo": {
+      "title": "Convert PNG to EPUB Online (Free)",
+      "h1": "PNG to EPUB Converter",
+      "description": "Turn a PNG into a one-page EPUB e-book. The image is stored unchanged, with no text recognition. Free, with no sign-up.",
+      "howToHeading": "How to convert PNG to EPUB"
+    },
+    "tool": {
+      "subtitle": "Put a PNG image on the single page of an EPUB e-book."
+    },
+    "faqs": [
+      {
+        "question": "How can I put a PNG in an EPUB?",
+        "answer": "Pick the PNG above and wait a moment. The EPUB downloads with your file's name and the .epub extension. Open it in an e-book app such as calibre or Apple Books."
+      },
+      {
+        "question": "Does the converter read the words in my screenshot?",
+        "answer": "No. The words stay part of the picture, so you can't search, select or copy them in the e-book. A text-recognition tool has to run first if you want real text."
+      },
+      {
+        "question": "Can I put several PNGs into one EPUB?",
+        "answer": "Not here. Each PNG you choose becomes its own one-page EPUB. For a single book with many images, use LibreOffice Writer, Pages or Pandoc."
+      },
+      {
+        "question": "What kind of EPUB does this make?",
+        "answer": "A one-page EPUB whose page shows your image, scaled down to fit the screen. Its title comes from your file's name, and its language is set to English."
+      },
+      {
+        "question": "Is the picture inside the EPUB changed?",
+        "answer": "No. The PNG is copied into the package as it is, with no re-encoding, so its pixels and transparency are the same as in your file."
+      },
+      {
+        "question": "Is my PNG uploaded anywhere?",
+        "answer": "No. Your browser does the conversion and builds the EPUB from your file on your device. There is no ZIP when you pick several PNGs; each EPUB downloads on its own."
+      },
+      {
+        "question": "Can I add a title, author or cover?",
+        "answer": "Not on this page. The book's title is your PNG's file name without the extension, and no author or cover is written. An authoring tool such as Pages lets you set them."
+      },
+      {
+        "question": "Why does my transparent PNG show a white or black background?",
+        "answer": "The PNG's see-through pixels are kept, and the book's page style sets no background color. What shows behind them is up to the reader app."
+      },
+      {
+        "question": "Can I make a searchable scanned book from PNG pages?",
+        "answer": "Not from this page. A searchable book needs text, either recognized from the scans and proofread or typed in. This page only places the picture in a book."
+      },
+      {
+        "question": "Does the EPUB keep my PNG's file name?",
+        "answer": "Your PNG's name is reused: the file saves with an .epub ending, and the same name becomes the book's title and the picture's alt text."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and EPUB",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format for screenshots, diagrams, and images with transparent pixels.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "EPUB",
+        "fullName": "Electronic Publication",
+        "description": "A publication package containing reading content, navigation, styles, and image resources.",
+        "details": [
+          "reflowable text",
+          "ZIP package of HTML and CSS",
+          "embedded fonts and images",
+          "open standard"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PNG to EPUB",
+      "points": [
+        "The EPUB holds your PNG unchanged, as a single page scaled to fit the screen.",
+        "The words in a screenshot stay pixels. Nothing is recognized, so the book has no searchable text.",
+        "The book takes its title from your file's name, is set to English, and has no author or cover.",
+        "Several PNGs give several separate EPUBs, not one combined book."
+      ]
+    },
+    "guide": {
+      "title": "PNG to EPUB: formats and alternatives",
+      "markdown": "### What is a PNG file?\n\nA PNG file follows the Portable Network Graphics design, created as a replacement for GIF that avoided its patent trouble. Autumn 1996 brought the W3C Recommendation for PNG, a first for any format the W3C had published, and ISO later issued it as ISO/IEC 15948. A PNG always compresses without loss, using the DEFLATE method, and it can carry an alpha channel for per-pixel transparency.\n\nYou come across PNG all the time because macOS saves screenshots in it by default. It is also the usual choice for interface graphics and logos, where sharp edges matter more than file size, and every major browser displays it. Newer editions of the specification also allow Exif metadata and animated PNG, and software that can't animate shows the file's default still image instead.\n\n### Programs that open PNG files\n\n- **Windows, Mac and Linux:** for batch work, ImageMagick reads PNG from a terminal, which suits preparing many images at once, and GIMP opens it for editing while keeping its transparent areas.\n- **Web:** Google Chrome and Mozilla Firefox draw a PNG on the page.\n- **Mobile:** on an iPhone or iPad, PNG is displayed by Safari.\n\n### PNG and EPUB compared\n\n- **Extensions**: .png is image/png and .epub is application/epub+zip.\n- **What each holds**: a PNG is one picture. An EPUB packages HTML, CSS and images in one ZIP container, with a reading order called the spine.\n- **Text**: an EPUB can hold real text that reflows to the reader's screen. Words drawn into a PNG stay part of the picture.\n- **Standard**: EPUB 3.3 is maintained as a W3C Recommendation.\n\nThis page writes an EPUB 3 package holding a single page. The PNG is stored in it unchanged, with no re-encoding, so the picture inside is byte for byte the PNG you chose. The book takes your file's name as its title, the picture's alt text matches it, and the language is English. It does not read the words in the picture. Pick several PNGs and each one becomes its own EPUB.\n\nTo open the result you need an e-book reader, because an image viewer won't show it. calibre's E-book viewer and Adobe Digital Editions run on Windows and Mac, Foliate on Linux, and Google Play Books in a browser or on a phone.\n\n### Other ways to convert PNG to EPUB\n\n- **LibreOffice Writer (Windows, Mac, Linux):** place the PNG with Insert > Image, then choose File > Export As > Export as EPUB. The export dialog has a layout method setting for a reflowable or a fixed layout EPUB. Add real text around the picture if readers need selectable captions.\n- **Pandoc (command line):** write page.md with a Markdown image line (an exclamation mark, the description in square brackets, the PNG file name in parentheses), then run `pandoc page.md -o book.epub`. Pandoc includes local images linked from the Markdown in the EPUB it generates.\n- **Pages (Mac):** click the Insert Media button, choose Photos or Videos to pick the PNG, then choose File > Export To > EPUB. The export dialog asks for a title and author and offers a cover option, and the Layout setting offers fixed or reflowable for word-processing documents.\n\nThese tools build a book around text you supply, so the image can sit between paragraphs, headings and captions. Use one of them when you want an author name, a cover or several images in one book.\n\n### Problems with PNG files\n\n- **Words in a screenshot**: the letters are pixels of the picture, so the book can't search them or read them aloud. Searching and text-to-speech need real text, which means retyping the content or running a separate text-recognition tool first.\n- **A transparent diagram looks wrong**: see-through pixels show whatever page color the reader app draws behind them. Check white lines or text on both light and dark pages before you share the book.\n- **Several PNGs became several books**: each file converts on its own. Use Writer, Pages or Pandoc when you want one book with a shared table of contents.\n- **A PNG is very large**: a big screenshot makes a big EPUB, because the file is copied in whole. Shrink it in GIMP or with ImageMagick first if the book must stay small.\n- **Layer offsets differ between programs**: GIMP's PNG export has an offset option, and other applications may place layers differently, so leave that option off if other people will open the file.\n- **Camera tags and profiles**: a PNG export from GIMP omits them unless the metadata controls are switched on, so switch them on when you need them.\n"
+    }
+  },
+  "png-to-psd": {
+    "seo": {
+      "title": "Convert PNG to PSD Online (Free)",
+      "h1": "PNG to PSD Converter",
+      "description": "Save a PNG as a Photoshop PSD in your browser. It is a flat copy of the picture, in 8 bits per channel. Free, with no sign-up.",
+      "howToHeading": "How to convert PNG to PSD"
+    },
+    "tool": {
+      "subtitle": "Turn a PNG into a PSD file that opens in Photoshop and other editors."
+    },
+    "faqs": [
+      {
+        "question": "How do I save my PNG as a PSD?",
+        "answer": "Pick the PNG above, wait a moment, then save the PSD that appears. Several PNGs give one PSD each. Open the file in Photoshop or Photopea to keep editing."
+      },
+      {
+        "question": "Will the PSD have layers?",
+        "answer": "No. A PNG is already a single flattened picture, so there are no layers to carry over, and the PSD holds that picture. Layers merged before the PNG was exported can't be brought back."
+      },
+      {
+        "question": "Can I edit the text in my PNG after converting?",
+        "answer": "Not as text. The letters are pixels, and a PNG stores no font. Retype the words with the text tool in your editor, ideally in the original font."
+      },
+      {
+        "question": "If my PNG is 16-bit, does the PSD keep that?",
+        "answer": "No. Here the browser decodes the picture at 8 bits per channel, which drops any extra depth. Keep the original PNG if you need the full depth."
+      },
+      {
+        "question": "Does the PSD keep my PNG's EXIF, color profile or XMP?",
+        "answer": "No. Only the pixels travel to the PSD, so any EXIF, ICC profile or XMP block stays behind. Keep your PNG if you need those records."
+      },
+      {
+        "question": "Why would I want a PSD made from a PNG?",
+        "answer": "A PSD is a working document. Once the picture is in one, you can add layers, masks, text and adjustments above it and save your edits without touching the original PNG."
+      },
+      {
+        "question": "Is my PNG uploaded to make the PSD?",
+        "answer": "No. The PNG is decoded in your browser, and ImageMagick writes the PSD there, with no server involved. Several PNGs are handled in turn, and every PSD downloads separately."
+      },
+      {
+        "question": "Will it separate my logo from its background?",
+        "answer": "No. Converting the format does not select anything. A background drawn into the PNG needs a mask or a selection in an editor."
+      },
+      {
+        "question": "Can I rename the .png to .psd instead?",
+        "answer": "No. Renaming changes only the label. This page writes a real PSD, and the result is checked to begin with the 8BPS signature that a PSD starts with. A renamed PNG still starts like a PNG."
+      },
+      {
+        "question": "How big can the picture be?",
+        "answer": "The page itself puts no cap on size. A PSD itself can't be wider or taller than 30,000 pixels, and larger documents need the PSB variant."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and PSD",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format for screenshots, diagrams, and images with transparent pixels.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "A Photoshop document that can store authored layers, masks, and image information.",
+        "details": [
+          "layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes",
+          "proprietary Adobe format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting PNG to PSD",
+      "points": [
+        "The PSD is a flat copy of your PNG. Layers merged before export are not in it.",
+        "The picture passes through 8-bit pixels, so a 16-bit PNG loses depth.",
+        "EXIF data, ICC profiles and XMP are not copied to the PSD.",
+        "Text in the PNG stays pixels. Retype it with a text tool to edit it.",
+        "Several PNGs give several separate PSDs."
+      ]
+    },
+    "guide": {
+      "title": "PNG to PSD: formats and alternatives",
+      "markdown": "### What is a PNG file?\n\nPNG stores a raster picture without loss, and macOS uses it for screenshots. DEFLATE compresses the pixels, so decoding returns exactly what was saved. The design replaced GIF without its patent issues. The W3C turned PNG into a Recommendation in autumn 1996, a first among its formats, ISO later issued it as ISO/IEC 15948, and a third edition of the specification became a Recommendation in June 2025.\n\nThe file starts with a signature and then runs through chunks, with IHDR as the header, IDAT as the pixel data and IEND as the end marker. Images can be indexed, grayscale or truecolor, each sample 1 to 16 bits wide, with an optional alpha channel for transparency. You meet PNG as screenshots, interface graphics and logos, and web graphics that must stay sharp, and every major browser displays it.\n\n### Programs that open PNG files\n\n- **Windows, Mac and Linux:** to view or edit, GIMP opens PNG, and ImageMagick can read it from a terminal.\n- **Web:** PNG shows up in both Chrome and Firefox.\n- **Mobile:** iPhone and iPad display PNG in Safari.\n\n### PNG and PSD compared\n\n- **Extensions and media types**: .png is image/png, while .psd is image/vnd.adobe.photoshop, and the file begins with the signature 8BPS.\n- **Purpose**: a PNG stores a finished picture. A PSD is Photoshop's native document, with separate sections for layers, masks and image resources.\n- **Bit depth**: a PNG sample is up to 16 bits wide, while a PSD header allows 1, 8, 16 or 32.\n- **Size limit**: a PSD holds no more than 30,000 pixels per side, and PSB goes beyond that.\n- **Compression**: A PSD may store its pixels uncompressed, or packed with RLE or ZIP. PNG always uses DEFLATE, so both can be lossless.\n- **Metadata**: this page doesn't carry EXIF, ICC profiles or XMP across.\n\nYour PNG is already flat, so the PSD this page writes is a flattened copy of the same picture. Your browser decodes the PNG into 8-bit pixels, so a 16-bit PNG loses depth. ImageMagick then writes the PSD, and the page checks that the result starts with the 8BPS signature. Layers that were flattened before the PNG was saved are not in the file, and text stays pixels. Choosing several PNGs gives one PSD for each.\n\nTo open the PSD, ImageMagick and XnView MP read it on Windows, Mac and Linux, and Photopea in a browser uses it as its main document format. Programs other than Photoshop have to interpret Photoshop-specific data structures, so a preview opening doesn't prove that every layer feature will edit the same way.\n\n### Other ways to convert PNG to PSD\n\n- **Photopea (web):** choose File > Open and pick the PNG, then choose File > Save as PSD. The page says every file you open in Photopea is converted to PSD, and that the PSD format preserves the document's structure.\n- **ImageMagick (command line):** run `magick artwork.png artwork.psd`. The format table lists both PNG and PSD as readable and writable. It converts the pixels only, so objects baked into the PNG stay baked in.\n\nA PSD can hold layers and masks, which a flattened export doesn't keep, but neither route can bring back what a PNG no longer has. Add new layers, masks and text on top in the editor after the PSD is open.\n\n### Problems with PNG files\n\n- **The text can't be edited**: saving text to PNG turns the letters into pixels, which are hard to change, and a PNG stores no fonts. Ask whoever made the image for the original design file, or retype the words on a new text layer in Photopea or another editor.\n- **The PSD has one layer's worth of content**: the PNG was flattened when it was exported. Hidden layers can't be recovered from it.\n- **A 16-bit master lost depth**: this page works in 8 bits per channel, so keep the original PNG if the extra depth matters.\n- **Layer offsets differ between programs**: layers can sit differently in GIMP than in other applications, so skip GIMP's PNG offset option if you will share the file.\n- **Camera tags and profiles are optional in GIMP exports**: switch on the relevant metadata controls when you need them, and keep in mind that this page drops EXIF, ICC and XMP.\n- **The PNG is damaged**: the page says \"Image decode failed.\" Download the file again or check it in GIMP.\n"
+    }
+  },
+  "svg-to-webp": {
+    "seo": {
+      "title": "Convert SVG to WebP Online (Free)",
+      "h1": "SVG to WebP Converter",
+      "description": "Draw an SVG as a WebP picture at the size your browser reports for it. Empty areas stay transparent. Free, with no sign-up.",
+      "howToHeading": "How to convert SVG to WebP"
+    },
+    "tool": {
+      "subtitle": "Render an SVG drawing as a WebP picture, with transparency, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn an SVG into a WebP?",
+        "answer": "Add the SVG above, give it a moment, then save the WebP. Your browser draws the SVG and the result is a picture of it. Several SVGs give one WebP each."
+      },
+      {
+        "question": "What size will the WebP be?",
+        "answer": "The dimensions the browser gives the SVG, rendered 1:1. This page adds no scaling. To change the size, edit the width and height in the SVG before converting."
+      },
+      {
+        "question": "Does the WebP keep transparency?",
+        "answer": "Yes. The drawing is painted on a transparent canvas, and WebP can hold an alpha channel, so empty areas stay see-through."
+      },
+      {
+        "question": "Can I choose lossless or set the WebP quality?",
+        "answer": "No. There is no quality or lossless control on this page, and it passes none. For a lossless WebP, use cwebp on a PNG exported from your SVG, as described above."
+      },
+      {
+        "question": "Can I edit the paths or text in the WebP?",
+        "answer": "No. The WebP is only pixels, with no paths, text or object names to select. Keep your SVG for later changes."
+      },
+      {
+        "question": "Why does the text look different in my WebP?",
+        "answer": "Your browser draws the SVG with the fonts installed on your device. A web font the file points to never loads, so the text falls back to another font. Turning the text into paths first keeps the letter shapes."
+      },
+      {
+        "question": "Why is a picture missing from the WebP?",
+        "answer": "The SVG is drawn as an image, so the browser loads nothing outside the file, online or not. A photo or stylesheet it only links to is never drawn. Embed the picture in the SVG and convert again."
+      },
+      {
+        "question": "Is my SVG uploaded anywhere?",
+        "answer": "No. Everything happens inside your browser, in a Web Worker, and no server is involved. Several SVGs are converted in turn, and each WebP downloads separately."
+      },
+      {
+        "question": "Can I make the WebP bigger without losing sharpness?",
+        "answer": "Not from the WebP itself. Enlarging pixels softens them. Raise the width and height written in the SVG and convert again, and the new picture is sharper at the larger size."
+      },
+      {
+        "question": "Should I use WebP or keep the SVG on my website?",
+        "answer": "Keep the SVG for logos and icons that must stay sharp at every size. Use the WebP when a form, email or platform refuses SVG."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and WebP",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML graphics document containing shapes, text, and potentially embedded pixel images.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting",
+          "styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "A raster format offering lossy or lossless compression and optional transparency or animation.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "animation",
+          "supported by current major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting SVG to WebP",
+      "points": [
+        "Your browser draws the SVG at the size it reports, and the WebP keeps that size.",
+        "Transparent areas of the drawing stay transparent in the WebP.",
+        "Paths and text stay in the SVG. The WebP is a single picture made of pixels.",
+        "SVG metadata is not copied to the WebP."
+      ]
+    },
+    "guide": {
+      "title": "SVG to WebP: formats and alternatives",
+      "markdown": "### What is an SVG file?\n\nThe Scalable Vector Graphics format is an XML language from the W3C for describing drawings with shapes, paths and text instead of pixels. Because shapes are stored as instructions, a browser can draw an SVG at any size without losing sharpness, and CSS can style it. The W3C made SVG a Recommendation first in 2001 and issued the 1.1 edition in 2003. An SVG can also embed a raster picture, so not everything you see in one is a vector. Keep that in mind before you pick an export size.\n\nSVG turns up in web logos and icons, in illustrations, diagrams, charts and maps alike. Its media type is image/svg+xml, and each major browser can display it. Since the file is plain text, a plain editor opens it, and software can search, index or compress it. A compressed one uses the .svgz extension. The format also covers clipping paths, masks and filter effects, and an SVG can be shown on its own or placed inside an HTML page.\n\n### Programs that open SVG files\n\n- **Windows, Mac and Linux:** Inkscape, the native SVG editor, handles the file, and Mozilla Firefox displays it.\n- **Web:** Chrome displays SVG.\n- **Mobile:** Safari displays SVG on iPhone and iPad.\n\n### SVG and WebP compared\n\n- **Extensions**: .svg is image/svg+xml, .webp is image/webp.\n- **Stored as**: an SVG holds drawing instructions. A WebP holds pixels.\n- **Scaling**: an SVG redraws sharply at any size. A WebP has fixed dimensions and softens when enlarged.\n- **Transparency**: both can be see-through. WebP supports transparency in lossy and lossless files.\n- **Animation and scripts**: SVG supports both. A WebP can hold an animation too, but this page writes a single picture.\n- **Editing**: paths, text and object names stay in the SVG. The WebP has none of them.\n- **Limit**: a WebP image can be at most 16,383 pixels on either side.\n\nGoogle announced WebP in 2010, and a WebP file is a RIFF container. RFC 9649 documents the format and registers its image/webp media type.\n\nYour browser draws the SVG first, and the WebP has the pixel size the browser reports for it, 1:1, with no scale factor added by this page. The canvas starts transparent, so empty areas stay see-through. The picture has 8 bits per channel, and nothing from the SVG's metadata is carried over. Choose several SVGs and each downloads as its own WebP, named after its SVG, so a set of icons takes one visit.\n\nTo view a WebP, use Chrome or Firefox, GIMP opens it on Windows, Mac and Linux, and XnView MP reads and writes it.\n\n### Other ways to convert SVG to WebP\n\n- **ImageMagick (command line):** run `magick diagram.svg diagram.webp`. ImageMagick's format table marks SVG and WebP as readable and writable, and notes that SVG is drawn by Inkscape, RSVG or its own renderer. Compare the result with the original in a browser tab.\n- **Inkscape with cwebp:** export a PNG from Inkscape with File > Export PNG Image, choosing the area and the size in pixels, then run `cwebp -lossless diagram.png -o diagram.webp`. cwebp reads PNG, JPEG and TIFF input, and its -lossless option encodes without loss.\n\nBoth routes let you pick the size or a lossless WebP, which this page doesn't offer. Use them when you need an exact pixel size, or a whole folder converted at once.\n\n### Problems with SVG files\n\n- **The WebP is soft or small**: the size comes from the SVG's own width and height. Edit those in a text editor, or export at the size you need from Inkscape.\n- **Text looks different**: how text is laid out depends on which fonts exist, and a substituted font changes the drawing. Convert the text to paths before converting the file so the shapes travel with it.\n- **A linked picture is missing**: a picture the SVG links to never loads, because the page draws the file as an image whether you are online or not. Embed that picture in the SVG first.\n- **An embedded photo looks soft**: a small picture inside the SVG stays at its own resolution, however large the export.\n- **\"Image decode failed.\"**: the browser could not draw this file. Try it in a browser tab first, and repair any XML errors in an editor such as Inkscape.\n"
+    }
+  },
+  "tiff-to-jpeg": {
+    "seo": {
+      "title": "Convert TIFF to JPEG Online (Free)",
+      "h1": "TIFF to JPEG Converter",
+      "description": "Convert a TIFF scan or photo to a JPEG in your browser. Only one image is read, so a multi-page TIFF gives one JPEG.",
+      "howToHeading": "How to convert TIFF to JPEG"
+    },
+    "tool": {
+      "subtitle": "Turn a TIFF into a JPEG in your browser, using ImageMagick, with no upload."
+    },
+    "faqs": [
+      {
+        "question": "How do I change a TIFF to a JPEG?",
+        "answer": "Pick the TIFF above, wait a moment, then save the JPEG. A batch of TIFFs becomes one JPEG each. Your file stays in the browser."
+      },
+      {
+        "question": "Does my multi-page TIFF become several JPEGs?",
+        "answer": "No. The converter reads one image from the file, so you get one JPEG, not one per page. To pull out a particular page, use ImageMagick with a bracketed number after the file name."
+      },
+      {
+        "question": "Can I choose the JPEG quality?",
+        "answer": "Not on this page. It passes no quality setting. GIMP lets you set the quality when you export."
+      },
+      {
+        "question": "Do .tif and .tiff mean the same thing?",
+        "answer": "Yes. Both name the Tagged Image File Format, registered as image/tiff, and the file picker takes either ending."
+      },
+      {
+        "question": "Is my TIFF uploaded anywhere?",
+        "answer": "No. The conversion happens on your own device, because ImageMagick runs in the browser as WebAssembly and no server takes part."
+      },
+      {
+        "question": "Is JPG the same as JPEG?",
+        "answer": "Yes, they are one format. The result from this page is saved ending in .jpeg."
+      },
+      {
+        "question": "Will a 16-bit TIFF keep its depth?",
+        "answer": "No. JPEG samples are 8 bits wide, so extra bit depth can't be kept. Keep the TIFF as the master copy."
+      },
+      {
+        "question": "What happens to a transparent TIFF?",
+        "answer": "JPEG has no alpha channel, so transparent pixels can't survive in the JPEG. If you need to keep the see-through areas, choose a format with alpha such as PNG."
+      },
+      {
+        "question": "What is the biggest TIFF it accepts?",
+        "answer": "No file-size cap is set, but a picture whose header declares about 537 megapixels or more is refused, and the page says it is too large."
+      },
+      {
+        "question": "Should I delete the TIFF after converting?",
+        "answer": "Keep it if the scan matters. A TIFF can hold several images and use lossless compression, while a JPEG is a lossy copy of one."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIFF and JPG",
+      "fromFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A tagged image container with varied encodings, sample depths, and possible multiple images.",
+        "details": [
+          "lossless or lossy compression",
+          "multiple pages in one file",
+          "high bit depth",
+          "CMYK support"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The photographic JPEG format; .jpg and .jpeg are equivalent filename endings.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting TIFF to JPEG",
+      "points": [
+        "Only one image is read, so a multi-page TIFF gives a single JPEG.",
+        "A JPEG is lossy and holds 8 bits per channel, so some detail and any extra color depth are lost.",
+        "The page sets no quality of its own.",
+        "ImageMagick runs in your browser, so the TIFF is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "TIFF to JPG: formats and alternatives",
+      "markdown": "### What is a TIFF file?\n\nThe Tagged Image File Format, called TIFF, is a tag-based raster wrapper designed by Aldus and Microsoft. Its 6.0 revision appeared in 1992, and the specification is now controlled by Adobe. Each image in a file carries tags that say how its pixels are stored, so one file can use different compression methods and color representations. A TIFF can also contain multiple images, a design that fits scanned documents made of several pages.\n\nPeople meet TIFF as scanner output, in high-bit-depth imaging, and in preservation master files, where keeping every detail matters. In GIMP, export formats retain different subsets of a project's properties, so check what a given export keeps. Whether you write .tif or .tiff, the format is the same, and image/tiff is its media type.\n\n### Programs that open TIFF files\n\n- **Windows, Mac and Linux:** GIMP imports a TIFF for editing, and ImageMagick reads and writes TIFF and exposes settings for compression, strips, tiles and byte order.\n- **Mac:** the File > Export menu of Preview includes TIFF among its formats.\n\n### TIFF and JPEG compared\n\n- **Extensions**: .tif and .tiff are image/tiff, while .jpg and .jpeg are image/jpeg and name the same format.\n- **Compression**: a TIFF can use different compression methods. Baseline JPEG is lossy, splitting the image into 8x8 pixel blocks.\n- **Images per file**: TIFF can contain several. JPEG stores one.\n- **Color and depth**: high bit depths are an established TIFF use. Each color channel of a JPEG has 8 bits, and without an alpha channel it can't hold transparency.\n- **Layers**: a JPEG can't store layers.\n\nJPEG is short for Joint Photographic Experts Group, the committee that began its work in 1986. The standard itself came out twice: as ITU-T T.81 in 1992, then as ISO/IEC 10918-1 in 1994. Programs usually offer quality on a 0 to 100 scale, but one number can give different results in different programs. A progressive mode also exists, where a coarse picture appears first and sharpens as the rest loads. Every major browser displays JPEG, and the last US patents on it lapsed on 27 October 2006.\n\nThe ImageMagick build inside this page is WebAssembly, running in your browser, and it reads the TIFF as one picture. If the file has several pages, you get a single JPEG, not one per page. This page passes no quality setting, and it leaves your TIFF as it was. Because JPEG is lossy, some detail is traded away. A picture beyond about 537 megapixels is refused, and the page reports that it is too large for this converter. Choose several TIFFs and they run one after another, each saved as a separate JPEG with the .jpeg ending. No ZIP is made, and no file is uploaded, because the whole conversion happens on your device.\n\n### Other ways to convert TIFF to JPEG\n\n- **ImageMagick (command line):** run `magick \"scan.tiff[0]\" scan.jpeg`. ImageMagick's format table lists TIFF and JPEG as readable and writable. A frame number in brackets after the input name selects the frame to read. Counting starts at 0, so another number gives another page.\n- **sips (Mac, command line):** run `sips -s format jpeg scan.tiff --out scan.jpg` in Terminal. The format option lists tiff and jpeg among its values, and --out names the result.\n\nThese help when you need one chosen page of a scan. A multi-page document scan is the usual case where this page's single-image limit matters, and the bracket number is the way around it.\n\n### Problems with TIFF files\n\n- **You wanted every page but got one**: only one image is converted here. Because a TIFF may hold several images, pick software that exposes the whole sequence, for example ImageMagick's bracket selector.\n- **A private tag or color profile is ignored**: not every reader understands each private tag, and that includes some color-profile extensions. Check the color settings in GIMP before converting.\n- **The file is huge**: 32-bit offsets in classic TIFF limit a file to about 4 GB, and BigTIFF widens those fields.\n- **Transparency disappears**: a JPEG export drops transparent pixels. Pick a format with alpha if you need them.\n- **The JPEG looks softer**: JPEG is lossy, so keep the TIFF as the archive copy, because converting back cannot restore the detail JPEG discarded.\n"
+    }
+  },
+  "avif-to-svg": {
+    "seo": {
+      "title": "Convert AVIF to SVG Online (Free)",
+      "h1": "AVIF to SVG Converter",
+      "description": "Wrap an AVIF in an SVG file as an embedded PNG. The picture is not traced into vector shapes. Free, with no sign-up.",
+      "howToHeading": "How to convert AVIF to SVG"
+    },
+    "tool": {
+      "subtitle": "Put an AVIF picture inside an SVG file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How can I get an SVG out of an AVIF?",
+        "answer": "Add the AVIF above and save the SVG it produces. Each AVIF gets its own SVG, which carries the picture as an embedded image."
+      },
+      {
+        "question": "Does it trace the AVIF into vector paths?",
+        "answer": "No. Nothing is traced. The SVG has one image element that wraps a PNG of your picture, so it is still made of pixels."
+      },
+      {
+        "question": "Will the SVG stay sharp at any size?",
+        "answer": "No. The embedded picture keeps the AVIF's own pixel width and height, and a larger SVG just stretches those pixels like any bitmap."
+      },
+      {
+        "question": "Can I edit shapes or text in the SVG?",
+        "answer": "No. The SVG has a single image and no objects. Letters and shapes in the picture are pixels. Trace it in Inkscape if you need paths."
+      },
+      {
+        "question": "Is my AVIF uploaded anywhere?",
+        "answer": "No. Your browser builds the SVG from your file on your own device. Several AVIFs are done in turn, and every SVG downloads separately."
+      },
+      {
+        "question": "Is transparency kept?",
+        "answer": "Yes. The PNG inside the SVG keeps the AVIF's transparent areas, so a logo with a see-through background stays see-through."
+      },
+      {
+        "question": "What happens to a 10-bit or HDR AVIF?",
+        "answer": "The picture is decoded to 8 bits per channel before it is embedded, so extra depth is lost. Keep the AVIF if you need HDR or wide-gamut data."
+      },
+      {
+        "question": "Does it work in a browser that cannot show AVIF?",
+        "answer": "Yes. When the browser has no AVIF decoder, the page reads the file with ImageMagick instead."
+      },
+      {
+        "question": "Can I get real vector shapes from an AVIF?",
+        "answer": "Only with a separate tracing step. Decode the AVIF to PNG or BMP, then trace the bitmap in Inkscape or with Potrace. A trace approximates the picture, so check the paths afterward."
+      },
+      {
+        "question": "What if my AVIF is animated?",
+        "answer": "Only its first frame goes into the SVG. The page does not build an SVG animation from the frames."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and SVG",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format that combines AV1 coding with HEIF-family packaging.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "HDR and wide color gamut",
+          "10-bit and 12-bit depth"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML graphics document containing shapes, text, and potentially embedded pixel images.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting",
+          "styleable with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVIF to SVG",
+      "points": [
+        "The SVG contains your picture as one embedded PNG. It is not traced into paths.",
+        "The embedded picture keeps the AVIF's pixel size, so it does not scale like a vector.",
+        "The download is named after your AVIF with the .svg extension.",
+        "Metadata, HDR depth and animation frames after the first are not carried over."
+      ]
+    },
+    "guide": {
+      "title": "AVIF to SVG: formats and alternatives",
+      "markdown": "### What is an AVIF file?\n\nThe AV1 Image File Format was designed by the Alliance for Open Media, a group set up in 2015 for royalty-free media formats, and it released the AV1 video codec in 2018. The AVIF specification, version 1.0.0, carries the date 19 February 2019. Inside, AV1-coded images sit in a HEIF container. Lossy and lossless compression are both allowed, along with transparency, image sequences and a depth of 12 bits per channel at most, meant for HDR and wide color gamut. Exif and XMP data and an ICC profile may also be stored.\n\nAVIF is royalty-free, yet decoding its images is slow, and encoding a single one can take several seconds. The format's registered media type is image/avif, and an image item in the Baseline profile is limited to 8,192 pixels across and 4,352 down, so larger pictures are tiled as a grid of those items.\n\n### Programs that open AVIF files\n\n- **Windows, Mac and Linux:** ImageMagick reads AVIF as well, and AVIF import and export arrived in GIMP with version 2.10.22.\n- **Windows:** Windows itself can show .avif files only with Microsoft's AV1 Video Extension installed next to the HEIF Image Extension.\n- **Web:** Chrome 85 and Firefox 93 added AVIF decoding, Safari 16.1 and Edge 121 followed, and AVIF does not render progressively.\n- **Mobile:** Android 12 and later decode AVIF, and still AVIF images arrived in Safari on iOS 16.\n\n### AVIF and SVG compared\n\n- **Extensions**: .avif is image/avif, .svg is image/svg+xml.\n- **Stored as**: AVIF holds compressed pixels. SVG is XML that describes shapes, paths and text, and it can embed a picture.\n- **Scaling**: real vector shapes stay sharp at any size. A picture placed inside the SVG does not.\n- **Transparency and depth**: AVIF can be transparent and reach 12-bit samples for HDR, while the picture this page writes is 8 bits per channel.\n- **Display**: every major browser displays SVG.\n\nThis page does not trace the image. Your browser decodes the AVIF, and when it has no AVIF decoder the page uses ImageMagick instead. The pixels are encoded as a PNG and placed in the SVG as a single image element, base64-encoded, at the picture's pixel width and height. Nothing is resized, and transparency survives inside the PNG. Metadata such as Exif and the color profile is not carried over, and an animated AVIF contributes only its first frame.\n\n### Other ways to convert AVIF to SVG\n\n- **avifdec and Inkscape:** run `avifdec illustration.avif illustration.png`, then bring the PNG into Inkscape through File > Import and choose to embed it. An embedded image is stored inside the SVG file. The result holds a raster image unless you trace it.\n- **GIMP and Inkscape tracing:** load the AVIF in GIMP, which imports and exports it, and write a PNG out through File > Export As. In Inkscape use File > Import for that PNG, pick it with the Selector tool, choose Path > Trace Bitmap and click Ok. The trace appears on the canvas over the original, so delete the bitmap if you don't want it.\n- **ImageMagick and Potrace:** run `magick mark.avif mark.bmp`, then `potrace -s mark.bmp -o mark.svg`. ImageMagick lists AVIF and BMP as readable and writable, and Potrace takes BMP input and writes SVG with -s. It decides which pixels count as black with a cutoff setting, so it suits silhouettes and marks, not photographs.\n\nThe first route keeps color and detail but stays a bitmap, much like this page does. Only the tracing routes give real vector shapes. This page gives an SVG that contains the picture.\n\n### Problems with AVIF files\n\n- **A site or editor rejects the file**: older programs lack AVIF support. Convert it to JPG, PNG or WebP first.\n- **GIMP won't open it**: versions before 2.10.22 lack the AVIF importer, so update GIMP.\n- **Windows shows nothing**: add Microsoft's AV1 and HEIF extensions from the Store.\n- **An older browser can't display it**: supply a JPEG, PNG or WebP fallback.\n- **An Android device can't play a 10-bit file**: from Android 12 on, baseline 8-bit AVIF decoding is supported while 10-bit decoding is optional.\n- **The SVG won't edit like a drawing**: it holds one image. Shapes and text are not recovered from pixels, so trace the picture or redraw it.\n- **The SVG looks blurry when enlarged**: the embedded PNG has the AVIF's pixel size. Start from a larger source or trace it into paths.\n"
+    }
+  },
+  "cdr-to-svg": {
+    "seo": {
+      "title": "CDR to SVG: Export a CorelDRAW File",
+      "h1": "CDR to SVG Conversion Guide",
+      "description": "This page cannot read CDR files. Export SVG from CorelDRAW, Inkscape or LibreOffice, or ask the designer. Steps and limits here.",
+      "howToHeading": "How to convert CDR to SVG"
+    },
+    "tool": {
+      "subtitle": "This page cannot read CDR files. Export SVG from CorelDRAW, Inkscape or LibreOffice."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert my CDR to SVG?",
+        "answer": "No. The converter has no reader for CorelDRAW files, so a CDR fails here. Use CorelDRAW, Inkscape or LibreOffice, as described above."
+      },
+      {
+        "question": "How do I convert a CDR to SVG?",
+        "answer": "In CorelDRAW, use its export command and pick SVG as the type. Without CorelDRAW, open the file in Inkscape and save it as Plain SVG."
+      },
+      {
+        "question": "Which CorelDRAW files does Inkscape open?",
+        "answer": "Its documentation lists CorelDRAW 7 to X4 files. For a drawing from a later version, try LibreOffice Draw, or have the designer re-save it in an earlier version."
+      },
+      {
+        "question": "Does LibreOffice open CDR files?",
+        "answer": "Yes, through the libcdr importer. libcdr is separate from Corel's own software, so compare the result with the original drawing."
+      },
+      {
+        "question": "Will the text in the SVG stay editable?",
+        "answer": "If CorelDRAW exports it as text, the characters stay editable and searchable, and fonts can be embedded. Export as curves and the letters become shapes you can no longer edit as text."
+      },
+      {
+        "question": "Why did a shadow turn into a picture?",
+        "answer": "CorelDRAW rasterizes mesh fills and drop shadows when it writes SVG, so the file mixes those pictures with the vector paths."
+      },
+      {
+        "question": "My CorelDRAW is older than the file. What can I do?",
+        "answer": "Ask the designer for a copy saved as an earlier CorelDRAW version, made from the original or a newer release. Backward saves can change newer effects, so they should keep the original too."
+      },
+      {
+        "question": "Can I rename the .cdr to .svg?",
+        "answer": "No. Renaming changes only the label, and nothing in the file changes. The drawing has to be exported to get an SVG."
+      },
+      {
+        "question": "Can I open a CDR online, without installing anything?",
+        "answer": "CorelDRAW Web supports CDR in compatible browsers, but access comes with a qualifying Graphics Suite subscription or maintenance plan."
+      },
+      {
+        "question": "What is a CDR file used for?",
+        "answer": "CDR is the native file format of CorelDRAW, Corel's vector graphics editor. Designers use it for logos and illustrations and for signage and print design."
+      }
+    ],
+    "aboutSection": {
+      "title": "CDR and SVG",
+      "fromFormat": {
+        "name": "CDR",
+        "fullName": "CorelDRAW drawing",
+        "description": "A CorelDRAW drawing that can contain vector objects, text, effects, and placed images.",
+        "details": [
+          "vector artwork",
+          "multiple pages and layers",
+          "proprietary Corel format"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML graphics document containing shapes, text, and potentially embedded pixel images.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting",
+          "styleable with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting CDR to SVG",
+      "points": [
+        "This page cannot read CDR files and ends in \"Image decode failed.\"",
+        "CorelDRAW, Inkscape and LibreOffice read the drawing and can write SVG.",
+        "CorelDRAW exports objects with mesh fills or drop shadows as bitmaps.",
+        "CorelDRAW can export text as editable characters or as curves."
+      ]
+    },
+    "guide": {
+      "title": "CDR to SVG: formats and alternatives",
+      "markdown": "### What is a CDR file?\n\nCDR is CorelDRAW's default drawing format, and the format is proprietary to CorelDRAW. Corel describes it as a primarily vector drawing format, and a drawing can contain bitmap content as well as vector effects. A drawing can store reference properties such as its title and subject. Its save options include bitmap and graphic-object compression, font embedding is available subject to font permissions and other restrictions, and the Save As dialog offers earlier CDR versions for compatibility.\n\nThis page can't read CDR files. The converter here has no reader for the format, and a CDR you choose ends in the error \"Image decode failed.\" Open the file in one of the programs below instead.\n\n### Programs that open CDR files\n\n- **Windows and Mac:** CorelDRAW opens its native drawings. Corel says CorelDESIGNER and CorelCAD open CDR files too, and that other viewers exist with restricted features.\n- **Windows, Mac and Linux:** Inkscape uses libcdr for CDR input, and LibreOffice Draw imports CDR through libcdr as well.\n- **Web:** Compatible browsers can open CDR in CorelDRAW Web, which has documented CDR support. Access is a benefit for qualifying Graphics Suite subscribers and maintenance customers.\n\nCorel PHOTO-PAINT turns an imported drawing into pixels, so it keeps no vector objects and isn't a route to vector output.\n\n### CDR and SVG compared\n\n- **Extensions and media types**: .cdr is a proprietary Corel format, listed by LibreOffice as application/vnd.corel-draw. .svg is image/svg+xml, plain XML text.\n- **Text**: CorelDRAW's SVG export can write text as editable characters, known as glyphs, or as curves. Characters stay editable and searchable. Curves become vector shapes and are no longer editable as text.\n- **Effects**: CorelDRAW exports objects with mesh fills or drop shadows as bitmaps. An SVG can mix those pictures with paths.\n- **Fonts**: CorelDRAW can embed fonts in a CDR when the font's permissions allow it. When text is exported as characters, you can embed fonts for viewers who may not have them installed.\n- **Where it works**: every major browser displays SVG. CDR is proprietary to CorelDRAW, and the other programs above read it through an importer.\n\nA real conversion has to read the drawing's objects, which is what CorelDRAW, Inkscape and LibreOffice do. This site's converter has no CDR reader, so it can't make the SVG for you.\n\n### Other ways to convert CDR to SVG\n\n- **CorelDRAW (Windows, Mac):** use File > Export and set Save as type to SVG - Scalable vector graphics. The dialog also offers SVGZ, a compressed SVG. Under Compatibility you select the SVG version, and UTF-8 encoding is the default and gives a smaller file than UTF-16. Choose the text option, as text or as curves, before you export.\n- **Inkscape (Windows, Mac, Linux):** open a supported CDR, then save it and choose the .svg (Plain SVG) type, which Inkscape's manual recommends for sharing a drawing with people who may not use Inkscape. Its documented import list has two CorelDRAW entries, one marked UQ, and both name versions 7 to X4. The manual adds that some imports display an options dialog before the file opens.\n- **LibreOffice Draw (Windows, Mac, Linux):** LibreOffice imports CDR through libcdr, and its filter list shows the Corel Draw document type for import and an SVG export filter. From a terminal, the pattern is `soffice --convert-to svg drawing.cdr`, because --convert-to takes the output extension after it, as in `--convert-to pdf *.doc`. Without --outdir, the result is written to the current working directory, and --outdir picks another folder.\n\nCompare the result with a PDF or screenshot the designer exported, so you can spot misplaced objects.\n\n### Problems with CDR files\n\n- **This page can't read it**: there is no CDR reader here. Use a program above, or ask the designer for an SVG.\n- **An older CorelDRAW rejects the file**: a CorelDRAW file does not open backward in older versions, and an older save can change newer effects or limit editing.\n- **Text shifts after export**: a viewer that lacks the font can't draw the text as designed. Export text as curves, or embed the fonts when you export it as characters.\n- **Some objects became pictures**: shadows and mesh fills arrive as bitmaps, so check them at the largest size you will use.\n- **Inkscape or LibreOffice shows a different layout**: both read the file through libcdr, so features may differ from the designer's own export.\n"
+    }
+  },
+  "gif-to-jpeg": {
+    "seo": {
+      "title": "Convert GIF to JPEG Online (Free)",
+      "h1": "GIF to JPEG Converter",
+      "description": "Turn a GIF into a still JPEG in your browser. An animated GIF gives its first frame, and transparent areas are lost.",
+      "howToHeading": "How to convert GIF to JPEG"
+    },
+    "tool": {
+      "subtitle": "Save the first frame of a GIF as a JPEG in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I change a GIF into a JPEG?",
+        "answer": "Drop the GIF onto the page, let it finish, then save the JPEG. A batch of GIFs gives one JPEG each. The conversion happens in your browser."
+      },
+      {
+        "question": "Will an animated GIF stay animated?",
+        "answer": "No. A JPEG is a single still, so you get the first frame of the GIF. For a different frame, ImageMagick takes a bracket number such as [3]."
+      },
+      {
+        "question": "Is my GIF uploaded anywhere?",
+        "answer": "No. Decoding and writing both happen inside your browser, so no server is involved. Several GIFs go through in turn, and each JPEG downloads separately."
+      },
+      {
+        "question": "What JPEG quality does the page use?",
+        "answer": "Quality is not a setting here, so the browser's default JPEG encoder settings apply. For a quality of your choosing, export from GIMP, whose JPEG dialog lets you set it."
+      },
+      {
+        "question": "What happens to the GIF's transparency?",
+        "answer": "JPEG has no alpha channel, so transparent areas can't stay see-through. If you need transparency, convert the GIF to PNG instead."
+      },
+      {
+        "question": "Will the JPEG have more colors than the GIF?",
+        "answer": "No. A GIF frame holds a limited palette, and converting does not bring back tones the GIF never had."
+      },
+      {
+        "question": "Are the GIF's comments copied into the JPEG?",
+        "answer": "No. Comments and other metadata stay behind, because only pixels are carried over. Keep the GIF if you need them."
+      },
+      {
+        "question": "In the ImageMagick command, what is the 0 for?",
+        "answer": "It selects the first image in the GIF, counting from zero. Quote the file name so your shell doesn't treat the brackets as a pattern; zsh stops with \"no matches found\" otherwise."
+      },
+      {
+        "question": "Is JPEG a good choice for a GIF with text or line art?",
+        "answer": "Often not. JPEG is lossy, so sharp edges can pick up fuzz. PNG is lossless, so convert to PNG for diagrams and screenshots."
+      },
+      {
+        "question": "Should the file end in .jpg or .jpeg?",
+        "answer": "Either ending is the same format, and other programs accept both. This page names its download after your GIF and ends it .jpeg."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and JPG",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A palette-based image format with LZW storage and optional timed frames.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The photographic JPEG format; .jpg and .jpeg are equivalent filename endings.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting GIF to JPEG",
+      "points": [
+        "An animated GIF gives one still JPEG, taken from its first frame.",
+        "The browser writes the JPEG at quality 0.85, a new lossy encode.",
+        "Transparent areas are lost, because JPEG has no alpha channel.",
+        "A GIF frame has at most 256 colors, and converting doesn't add any.",
+        "Comments and other metadata are not copied."
+      ]
+    },
+    "guide": {
+      "title": "GIF to JPG: formats and alternatives",
+      "markdown": "### What is a GIF file?\n\nCompuServe released GIF, the Graphics Interchange Format, in 1987. GIF89a, a July 1990 revision, introduced extensions that cover transparency, frame timing, comments and application-specific data. LZW coding compresses the images without loss, and each image uses a palette of up to 256 colors. One GIF can hold many images with a pause between them, given in hundredths of a second, and that sequence is the animation.\n\nFor transparency, one palette color is flagged as fully clear, which leaves no partial transparency. In 1994 Unisys began to charge for licenses to use LZW. The relevant US patent ended in 2003, with European and Japanese ones following in 2004. Each frame also carries a disposal setting that tells a viewer what to do with the picture before drawing the next one. image/gif is the registered media type, and all major browsers display GIF. GIF is old and widely supported, which is why animated GIFs are still shared everywhere, while JPEG remains the usual choice for a single still picture.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:** GIMP exports still pictures or multilayer animations, and can set an animated GIF to loop forever. ImageMagick reads GIF from a terminal.\n- **Web:** GIF displays in Chrome and Firefox.\n- **Mobile:** Safari displays GIF on iPhone and iPad.\n\nOn a Mac, Preview opens an animated GIF too, and shows its frames in the sidebar when you choose View > Thumbnails.\n\n### GIF and JPEG compared\n\n- **Extensions**: .gif is image/gif; .jpg and .jpeg are one format, image/jpeg.\n- **Colors**: each GIF image draws from a small palette, against 8 bits for each color channel of a JPEG.\n- **Compression**: GIF loses nothing. Baseline JPEG is lossy and works on 8x8 pixel blocks.\n- **Transparency**: a GIF can flag a single palette color as clear, with no partial opacity. A JPEG lacks an alpha channel altogether.\n- **Animation**: GIF stores many images, JPEG only one.\n- **Patents**: the GIF LZW patents lapsed in 2003 and 2004, and JPEG's US patents on 27 October 2006.\n\nYour browser decodes the GIF and the page keeps one picture, the first frame, so an animated GIF yields a still JPEG. The browser writes that frame as a lossy JPEG at quality 0.85, which is a fixed encode rather than a setting you choose. A JPEG cannot restore colors the GIF never had. Transparent areas can't stay transparent in a JPEG. Comments and other metadata are not copied. A set of GIFs is processed in sequence. Every JPEG is saved on its own with the .jpeg ending, named after its GIF, and no ZIP is made. Nothing is uploaded, since the whole conversion stays in your browser.\n\n### Other ways to convert GIF to JPEG\n\n- **ImageMagick (command line):** run `magick \"reaction.gif[0]\" reaction.jpeg`. The frame number goes in brackets right after the input name, and frames are counted from 0. Quote the name so your shell doesn't read the brackets as a pattern.\n- **Preview (Mac):** open the GIF, choose File > Export, choose JPEG from the Format pop-up menu, then click Save. To handle more than one file, open them all in a single Preview window, then select them in the sidebar before you export.\n\nThe bracket number is the way to pull a specific frame, since this page always takes the first. Preview is handy for a quick one-off export, while a terminal suits repeat jobs. Use ImageMagick when you need a later frame or a whole folder converted with a single command.\n\n### Problems with GIF files\n\n- **The JPEG shows only the first frame**: JPEG cannot animate. ImageMagick's bracket number exports the frame you want.\n- **Banding or speckles**: a GIF frame has only 256 colors, and JPEG compression cannot add colors back. The limit comes from the GIF.\n- **A transparent background is lost**: JPEG has no transparency, and soft transparent edges cannot retain partial opacity in a GIF to begin with. Convert to PNG instead if you need see-through areas.\n- **Frames look wrong after combining**: when you open an animation as layers, disposal settings decide whether each layer replaces or builds on the one before, so match that choice in your editor.\n- **A GIF comment goes missing**: a GIF comment with characters beyond seven-bit ASCII is left out by GIMP, and this page copies no metadata at all.\n"
+    }
+  },
+  "html-to-csv": {
+    "seo": {
+      "title": "Convert HTML to CSV Online (Free)",
+      "h1": "HTML to CSV Converter",
+      "description": "Paste HTML or upload a file and its first table becomes CSV, shown in a live preview. Only cell text is kept. Free, with no sign-up."
+    }
+  },
+  "jpeg-to-gif": {
+    "seo": {
+      "title": "Convert JPEG to GIF Online (Free)",
+      "h1": "JPEG to GIF Converter",
+      "description": "Turn a JPEG into a still GIF in your browser. A GIF has a limited palette, so photos can look banded. Free, no sign-up.",
+      "howToHeading": "How to convert JPEG to GIF"
+    },
+    "tool": {
+      "subtitle": "Save a JPEG photo as a still GIF, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I save a JPEG as a GIF?",
+        "answer": "Add the JPEG above, wait a moment, then save the GIF. Several JPEGs give one GIF each, not a slideshow."
+      },
+      {
+        "question": "Will the GIF be animated?",
+        "answer": "No. A single JPEG gives a still GIF. To animate, put each image on its own layer in GIMP and export with its As animation option."
+      },
+      {
+        "question": "Why does the GIF look worse than my JPEG?",
+        "answer": "A GIF image can use only 256 colors, and a photograph has far more shades. Squeezing it into a palette causes banding."
+      },
+      {
+        "question": "Is my JPEG uploaded anywhere?",
+        "answer": "No. Your browser decodes the JPEG and the page writes the GIF on your device, with no server involved. Several files run one after another and download separately."
+      },
+      {
+        "question": "Does the GIF keep the JPEG's EXIF data?",
+        "answer": "No. Only pixels pass through, so EXIF and the color profile are not copied. Keep your JPEG if you need the camera details."
+      },
+      {
+        "question": "Can I make the background transparent?",
+        "answer": "Not here. There is nothing to carry over, so remove the background in an editor first."
+      },
+      {
+        "question": "Are .jpg and .jpeg handled the same?",
+        "answer": "Yes. The two endings name the same format, and the converter accepts either one."
+      },
+      {
+        "question": "Does the page let me choose the palette?",
+        "answer": "No. It sets no palette options. If you want to adjust how colors are reduced, export from GIMP."
+      },
+      {
+        "question": "What is the downloaded file called?",
+        "answer": "The name of your JPEG is reused with a .gif ending, so photo.jpeg is saved as photo.gif."
+      },
+      {
+        "question": "Can I use ImageMagick instead?",
+        "answer": "Yes. ImageMagick does the same job from a terminal, and the guide below shows the exact line."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and GIF",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The photographic JPEG format; .jpg and .jpeg are equivalent filename endings.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A palette-based image format with LZW storage and optional timed frames.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPEG to GIF",
+      "points": [
+        "The GIF is a single still frame. The page does not build an animation.",
+        "A GIF image has a limited palette, so photographs can look banded.",
+        "Camera data such as EXIF and the color profile are not copied.",
+        "Several JPEGs give several separate GIFs, not one slideshow."
+      ]
+    },
+    "guide": {
+      "title": "JPG to GIF: formats and alternatives",
+      "markdown": "### What is a JPEG file?\n\nJoint Photographic Experts Group is the committee behind JPEG, and it began in 1986. Lossy compression is the baseline design: a transform and Huffman coding are applied to every 8x8 pixel block, which ordinarily leaves a tenth to a twentieth of the raw size. Color channels get 8 bits, and without an alpha channel a JPEG simply cannot hold transparency. A progressive variant lets a rough version of the picture show first.\n\nMost cameras and scanners write the format directly. You can write the extension as .jpg or .jpeg, since they mean one thing, and the media type is image/jpeg. Browsers all display it, and the final US patents lapsed on 27 October 2006.\n\n### Programs that open JPEG files\n\n- **Windows, Mac and Linux:** ImageMagick reads a JPEG from a terminal, and GIMP imports it for editing.\n- **Web:** Google Chrome and Mozilla Firefox display JPEG.\n- **Mobile:** Chrome and Safari display JPEG.\n\nGIF is displayed by the same browsers, on phones as well as computers. GIMP exports GIF as a still picture or a multilayer animation, and ImageMagick reads GIF.\n\n### JPEG and GIF compared\n\n- **Extensions**: .jpg and .jpeg are image/jpeg. A GIF is image/gif.\n- **Colors**: 8 bits per channel for a JPEG, against a GIF image restricted to a palette.\n- **Compression**: JPEG is lossy. GIF is lossless, but mapping a photograph onto a palette discards distinctions first.\n- **Transparency**: JPEG has none. A GIF can make a palette color fully clear, with no partial opacity.\n- **Animation**: GIF can hold many frames, while JPEG is one picture.\n- **Layers**: neither format stores an editable layer stack.\n\nThe JPEG is decoded by your browser, and the GIF is then written by ImageMagick inside the page. The result is a single still frame, not an animation, and several JPEGs give several separate GIFs rather than a slideshow. Nothing is uploaded, because the conversion stays in your browser. The page sets no palette options and passes no quality setting. Camera data such as EXIF and the color profile do not carry over. Detail that JPEG compression removed does not come back in the GIF, and the palette adds a further limit on color. The download keeps your file's name with a .gif ending.\n\n### Other ways to convert JPEG to GIF\n\n- **GIMP:** on Windows, Mac or Linux, open the JPEG, go to File > Export As, save it as a GIF and confirm the options in the GIF Export dialog. GIMP exports at most 256 colors, which can change gradients.\n- **ImageMagick (command line):** run `magick photo.jpeg photo.gif`. It gives a still GIF and does not build an animation.\n\nThe GIF Export dialog in GIMP has an Interlace option and a Save comment option, and when the image has several layers it offers As animation, with controls for the delay between frames, the number of repeats and looping forever. ImageMagick suits scripts and whole folders. Both give a still GIF from a single JPEG. Animation takes a separate step in an editor that supports layers or frames, and GIMP's As animation option stays disabled for an image with only one layer.\n\n### Problems with JPEG files\n\n- **Transparent pixels cannot be kept**: transparency is impossible to store in a JPEG, so a background you want clear has to be removed in an editor before you save a GIF.\n- **Quality numbers do not match across programs**: the same 0 to 100 setting can give different compression and appearance in different editors, so compare the result rather than the number.\n- **Some older photo frames reject progressive JPEG**: if a device will not show a file, try saving it again with progressive mode turned off.\n- **Gradients change in the GIF**: smooth areas such as a sky have to be mapped onto a small palette, and GIMP warns that this can change gradients.\n- **Layers are not kept**: a JPEG has no layers to edit later, so save the project file as well.\n- **Camera details are gone after converting**: EXIF is left behind by this page. Keep the JPEG if you need the date, camera or location data.\n- **No animation came out**: the page converts one picture. To animate several images, build the frames as layers in GIMP and export a multilayer animation.\n"
+    }
+  },
+  "mp3-to-aiff": {
+    "seo": {
+      "title": "Convert MP3 to AIFF Online (Free)",
+      "h1": "MP3 to AIFF Converter",
+      "description": "Convert an MP3 to uncompressed 16-bit AIFF in your browser. The file gets larger, but no lost detail is restored. Free, no sign-up.",
+      "howToHeading": "How to convert MP3 to AIFF"
+    },
+    "tool": {
+      "subtitle": "Decode an MP3 into an AIFF file with 16-bit PCM audio, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn an MP3 into an AIFF file?",
+        "answer": "Add the MP3 above, wait while FFmpeg decodes it in your browser, then save the AIFF. A batch of MP3s gives one AIFF per file."
+      },
+      {
+        "question": "Does converting to AIFF improve the sound?",
+        "answer": "No. Detail the MP3 encoder threw away is gone for good, and AIFF cannot bring it back. The AIFF is the same sound stored in a bigger, uncompressed form."
+      },
+      {
+        "question": "Why does my AIFF take up so much more space?",
+        "answer": "PCM is not compressed, and an MP3 is, so a long track makes a much larger AIFF."
+      },
+      {
+        "question": "What audio format does the AIFF use?",
+        "answer": "Signed 16-bit big-endian PCM, written by FFmpeg with the pcm_s16be encoder."
+      },
+      {
+        "question": "Is the cover art copied into the AIFF?",
+        "answer": "No. The artwork does not come across. Add it again in your audio editor."
+      },
+      {
+        "question": "Is my MP3 uploaded anywhere?",
+        "answer": "No. FFmpeg is running as WebAssembly in your browser, which keeps the audio on your device with no server."
+      },
+      {
+        "question": "Can I rename the .mp3 to .aiff?",
+        "answer": "No. Renaming changes the name only, and the audio inside stays as it was. Converting writes real PCM audio."
+      },
+      {
+        "question": "Can I use iTunes or Apple Music instead?",
+        "answer": "Yes. Both have a Convert menu with an AIFF option, and the guide below has the steps."
+      },
+      {
+        "question": "Will several MP3s be joined into one AIFF?",
+        "answer": "No. Each MP3 becomes its own AIFF, run one after another and downloaded separately. If you want one long file, join the tracks in an audio editor afterward."
+      },
+      {
+        "question": "What is the downloaded file called?",
+        "answer": "It takes the name of your MP3 with an .aiff ending, so voice.mp3 is saved as voice.aiff."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and AIFF",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "Perceptually compressed MPEG Audio Layer III data for music and spoken recordings.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "An audio container commonly used with uncompressed linear PCM samples.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "metadata chunks",
+          "large files"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP3 to AIFF",
+      "points": [
+        "The AIFF holds 16-bit big-endian PCM decoded from the MP3. No lost detail comes back.",
+        "The file is much larger, because PCM is not compressed.",
+        "Embedded cover art is dropped.",
+        "Several MP3s give several AIFF files."
+      ]
+    },
+    "guide": {
+      "title": "MP3 to AIFF: formats and alternatives",
+      "markdown": "### What is an MP3 file?\n\nMP3 is short for MPEG-1 Audio Layer III, a standard that ISO published in 1993 and widened two years later. The work was led at Fraunhofer IIS, beginning in the late 1980s. Because it is lossy, an encoder throws away what a hearing model rates as least audible. At 128 kbit/s, the space an MP3 needs is roughly one eleventh of what the same audio takes on a CD. Bitrates range from 32 to 320 kbps.\n\nID3 structures kept apart from the audio hold the song title and other tags. MP3 is common in music libraries, downloads and podcasts. The media type is audio/mpeg, every major browser plays it, and the MP3 patent licensing programme ended on 23 April 2017.\n\n### Programs that open MP3 files\n\n- **Windows, Mac and Linux:** Audacity imports MP3 into an editable project, and ffplay, part of FFmpeg, can play it from a terminal.\n- **Web:** Firefox and Chrome play MP3 directly.\n- **Mobile:** VLC for Android and mpv for Android.\n\nAn AIFF opens in Audacity, which handles most AIFF files and every PCM variant, and Adobe Audition opens uncompressed AIFF as well.\n\n### MP3 and AIFF compared\n\n- **Extensions and media types**: .mp3 is audio/mpeg. .aiff is audio/aiff or audio/x-aiff.\n- **Compression**: MP3 is lossy. AIFF often carries uncompressed linear PCM, and the AIFF-C variant extends the family to compressed audio.\n- **Size**: a compressed version of a recording takes less storage than uncompressed PCM.\n- **Metadata**: MP3 uses ID3 tags. AIFF can carry named chunks for author, copyright and annotations.\n- **Origin**: Apple developed AIFF as an audio wrapper derived from the IFF family from Electronic Arts. Apple's version 1.3 specification is dated 4 January 1989.\n- **Use**: masters and intermediate recordings are where professional audio users rely on AIFF.\n- **Bit depth**: this page writes signed 16-bit big-endian samples.\n\nInside your browser, FFmpeg built as WebAssembly decodes the MP3 and writes the AIFF, as `ffmpeg -y -nostdin -i input.mp3 -acodec pcm_s16be -vn output.aiff`. The `-vn` option turns off video, and an MP3's embedded cover picture counts as a video stream, so the picture is not copied. The page sets no quality option. The AIFF is a decoded copy, so it carries every flaw of the MP3 and is much larger. Several MP3s run one after another, and each is saved as its own file named after the MP3 with an .aiff ending. Nothing is uploaded.\n\n### Other ways to convert MP3 to AIFF\n\n- **FFmpeg (command line):** run `ffmpeg -i voice.mp3 -c:a pcm_s16be voice.aiff`. The encoder name asks for signed 16-bit big-endian PCM.\n- **Apple Music (Mac):** open Music > Settings > Files > Import Settings and pick AIFF in the Import Using menu. Select the songs, then use File > Convert > Create AIFF Version. Apple says the song takes up much more space but sounds the same.\n- **iTunes (Windows):** choose Edit > Preferences > General > Import Settings and set Import Using to AIFF Encoder. Select the songs, open the File menu, choose Convert and then Create AIFF Version. Apple limits conversion of store purchases to iTunes Plus songs.\n\nApple Music and iTunes add the converted copy next to the original in your library. Converting a compressed file to an uncompressed one does not restore lost quality, so none of these methods improves the sound. FFmpeg suits scripts and a folder of files, while the Apple apps suit a music library.\n\n### Problems with MP3 files\n\n- **A damaged MP3 may not import**: Audacity can report an import error for a malformed MP3 even when another player can play it. Try re-downloading the file.\n- **Tags get replaced when you combine files**: a single Audacity project that receives several imports may overwrite earlier metadata with the tags of the last file. Check the title and artist before you export.\n- **A second lossy pass costs quality**: if you edit an MP3 and export another MP3, a second lossy encoding stage is added. Export to AIFF instead if you plan to keep editing.\n- **The cover picture does not carry over**: this page drops the embedded picture, so add the artwork again in your editor.\n- **It does not sound better**: detail was already lost when the MP3 was encoded. Look for a lossless original if you need a master.\n"
+    }
+  }
+}

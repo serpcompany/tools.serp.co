@@ -1,0 +1,311 @@
+{
+  "tools": {
+    "icns-to-png": {
+      "methods": [
+        {
+          "app": "Apple iconutil (Mac)",
+          "steps": "Run iconutil -c iconset input.icns and use the PNG representations in the resulting iconset directory.",
+          "limits": "Extracts every stored size into the iconset, not one picture.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Use from PIL import Image; Image.open(\"input.icns\").save(\"output.png\").",
+          "limits": "Its ICNS reader defaults to the largest available representation. Set a supported size before load for another representation.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSource": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        },
+        {
+          "app": "XnConvert",
+          "steps": "Add the ICNS on Input; choose PNG on Output and click Convert. No Action is needed for a plain conversion.",
+          "limits": "XnView's format list marks ICNS as read only, so it works as an input.",
+          "source": "https://www.xnview.com/en/how-to-batch-convert-and-batch-process/",
+          "supportSource": "https://www.xnview.com/en/image-formats/"
+        }
+      ]
+    },
+    "jp2-to-jpg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jp2 output.jpg.",
+          "limits": "The installed build must read JP2 and write JPEG; the formats page lists JP2 and JPEG as readable and writable.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "XnConvert",
+          "steps": "Add the JP2 files on Input; choose JPEG on Output and click Convert. No Action is needed for a plain conversion.",
+          "limits": "XnView's format list shows JPEG 2000 as readable and writable.",
+          "source": "https://www.xnview.com/en/how-to-batch-convert-and-batch-process/",
+          "supportSource": "https://www.xnview.com/en/image-formats/"
+        }
+      ]
+    },
+    "jpeg-to-bmp": {
+      "methods": [
+        {
+          "app": "XnConvert",
+          "steps": "Use Add files on Input to select the JPEG; choose BMP as the format on Output and run conversion without extra processing actions.",
+          "limits": "XnView's format list shows BMP as readable and writable; no Action is needed for a plain conversion.",
+          "source": "https://www.xnview.com/en/how-to-batch-convert-and-batch-process/",
+          "supportSource": "https://www.xnview.com/en/image-formats/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jpeg output.bmp.",
+          "limits": "BMP2 and BMP3 writers are documented alternatives to the default bitmap variant when required by a reader.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Use from PIL import Image; Image.open(\"input.jpeg\").save(\"output.bmp\").",
+          "limits": "Pillow documents BMP writing for 1, L, P and RGB modes.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSource": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        }
+      ]
+    },
+    "jpg-to-ai": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jpg output.ai.",
+          "limits": "Writes a raster-based file and does no tracing; the formats page lists AI as readable and writable. Test it in the program that will open it.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "jpg-to-dds": {
+      "methods": [
+        {
+          "app": "DirectXTex texconv",
+          "steps": "Run texconv -pow2 -f BC1_UNORM cat.jpg (Microsoft's example); add -m 1 to remove mipmaps.",
+          "limits": "The example fits textures to power-of-two sizes with -pow2 and generates all mipmaps by default; the default output type is DDS.",
+          "source": "https://github.com/microsoft/DirectXTex/wiki/Texconv"
+        },
+        {
+          "app": "GIMP",
+          "steps": "File > Export As, export to DDS, then set Compression and Mipmaps in the DDS dialog.",
+          "limits": "DDS support is built into GIMP from 2.10.10 (release notes).",
+          "source": "https://docs.gimp.org/3.2/en/file-dds-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "releaseSource": "https://www.gimp.org/news/2019/04/07/gimp-2-10-10-released/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jpg output.dds.",
+          "limits": "The formats page lists DDS as readable and writable with compression defines and mipmaps; inspect the result before delivery.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "m2ts-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.m2ts -c:v libx264 -c:a aac transfer.mp4.",
+          "limits": "A new encode rather than stream copy; a copied stream the MP4 cannot hold may be dropped or carried as data. Run locally: exit 0. This does not reproduce every browser quality or scale option.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Choose Open Source and pick the M2TS, select a preset, set the destination with Save As and Browse, then click Start.",
+          "limits": "HandBrake creates MKV and MP4 files. AVCHD playlists are not fully supported, and opening individual stream files is not reliable where a single stream spans multiple files.",
+          "source": "https://handbrake.fr/docs/en/latest/introduction/quick-start.html",
+          "supportSource": "https://handbrake.fr/docs/en/latest/technical/source-formats.html",
+          "containerSource": "https://handbrake.fr/docs/en/latest/technical/containers.html"
+        }
+      ]
+    },
+    "m4a-to-m4r": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.m4a -f ipod -b:a 192k -c:a aac output.m4r.",
+          "limits": "Re-encodes AAC. The -ss and -t options trim; no device installation is included. Run locally: exit 0, ipod AAC output.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html",
+          "codecSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "GarageBand (iPhone)",
+          "steps": "Add File(s), pick a Save to Folder or Output Folder (or Browse), choose M4R in the Output Format drop-down, then click Convert.",
+          "limits": "NCH lists Windows PC, Mac OS X and Android.",
+          "source": "https://support.apple.com/en-us/120692"
+        },
+        {
+          "app": "NCH Switch",
+          "steps": "Import the audio from Files, drag it to the far left of the Tracks view and trim it, then open My Songs, tap Share and choose Ringtone.",
+          "limits": "Ringtones can be up to 30 seconds. Protected songs and songs not downloaded to the iPhone are dimmed and cannot be used.",
+          "source": "https://www.nchsoftware.com/howto/convert/m4a_to_m4r_files.html"
+        }
+      ]
+    },
+    "mp3-to-wma": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mp3 -b:a 192k -c:a wmav2 output.wma.",
+          "limits": "Selects lossy WMA rather than WMA Lossless. Run locally: exit 0, wmav2 in ASF. Playback needs the receiving decoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "Audacity with FFmpeg",
+          "steps": "File > Export Audio, then choose WMA (version2) Files (FFmpeg) from the Format drop-down.",
+          "limits": "FFmpeg is not shipped with Audacity and must be installed separately. The export options offer Mono, Stereo or Custom mapping.",
+          "source": "https://manual.audacityteam.org/man/wma_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/export_formats_supported_by_audacity.html"
+        },
+        {
+          "app": "NCH Switch",
+          "steps": "Click Add File(s), pick a Save to Folder or Output Folder (or Browse), set the Output Format drop-down to WMA, then click Convert.",
+          "limits": "Check the receiving device's supported WMA variants.",
+          "source": "https://www.nchsoftware.com/howto/convert/mp3_to_wma_files.html"
+        }
+      ]
+    },
+    "mp4-to-3gp": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.mp4 -c:v h263 -s 352x288 -r 12 -c:a aac output.3gp.",
+          "limits": "The -s option forces the size and can change proportions. This is a desktop example, not the exact browser preset.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Prism",
+          "steps": "Use Add File(s) for the MP4, choose a folder with Save to Folder, Output Folder or Browse, set Output Format to 3GP, then click Convert.",
+          "limits": "The page lists MP4 among formats converted to and from 3GP.",
+          "source": "https://www.nchsoftware.com/howto/convert/video_to_3gp_files.html"
+        },
+        {
+          "app": "MP4Box: compatible-track repackaging",
+          "steps": "Run MP4Box -add input.mp4 -new output.3gp.",
+          "limits": "The .3gp extension turns on 3GPP rewriting and some tracks may be removed. This does not transcode.",
+          "source": "https://github.com/gpac/gpac/wiki/mp4box-import-opts",
+          "supportSource": "https://wiki.gpac.io/MP4Box/mp4box-gen-opts/"
+        }
+      ]
+    },
+    "mp4-to-hevc": {
+      "methods": [
+        {
+          "app": "FFmpeg with libx265",
+          "steps": "Run ffmpeg -i input.mp4 -an -c:v libx265 -f hevc output.hevc.",
+          "limits": "Needs libx265 in the installed build; writes raw video without audio.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "formatSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "Standalone x265 with decoded intermediate",
+          "steps": "Run ffmpeg -i input.mp4 -an -pix_fmt yuv420p intermediate.y4m, then x265 intermediate.y4m output.hevc.",
+          "limits": "x265 reads raw YUV or Y4M, not MP4 directly. The intermediate needs disk space; sound is excluded.",
+          "source": "https://x265.readthedocs.io/en/master/cli.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html",
+          "formatSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "MP4Box: conditional existing-HEVC extraction",
+          "steps": "Inspect MP4Box -info input.mp4, then use MP4Box -raw 1:output=output.hevc input.mp4 with 1 replaced by the verified HEVC track ID.",
+          "limits": "Only applies when the input already contains a HEVC track. Extraction is not encoding.",
+          "source": "https://wiki.gpac.io/MP4Box/mp4box-dump-opts/"
+        }
+      ]
+    }
+  },
+  "supportingFormatFacts": {
+    "icns": [
+      {
+        "fact": "Apple documents standard and high-resolution icon resources and iconutil extraction into iconset directories.",
+        "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+      }
+    ],
+    "jp2": [
+      {
+        "fact": "JP2 is the JPEG 2000 Part 1 wrapper and can carry opacity and profile metadata. Its media type is image/jp2.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000143.shtml"
+      },
+      {
+        "fact": "JPEG 2000 has both lossy and lossless coding modes.",
+        "source": "https://jpeg.org/jpeg2000/"
+      }
+    ],
+    "bmp": [
+      {
+        "fact": "Windows bitmap headers describe pixel dimensions, bit depth, color tables and possible compression.",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/gdi/bitmap-storage"
+      }
+    ],
+    "jpg": [
+      {
+        "fact": "Common JPEG is a lossy raster encoding; it cannot reconstruct detail discarded in a previous encode.",
+        "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+      },
+      {
+        "fact": "The registered JPEG media type is image/jpeg.",
+        "source": "https://www.iana.org/assignments/media-types/media-types.xhtml"
+      },
+      {
+        "fact": "The JPEG committee established the standard through work begun in 1986; the core technology includes the familiar lossy DCT photographic coding.",
+        "source": "https://jpeg.org/jpeg/"
+      }
+    ],
+    "ai": [
+      {
+        "fact": "AI saving can include a PDF representation and linked images; that is distinct from tracing.",
+        "source": "https://helpx.adobe.com/illustrator/using/saving-artwork.html"
+      },
+      {
+        "fact": "Image Trace interprets raster art to produce editable vector artwork.",
+        "source": "https://helpx.adobe.com/illustrator/desktop/manage-objects/traces-mockups-symbols/trace-images-to-convert-raster-into-vector-artwork.html"
+      }
+    ],
+    "dds": [
+      {
+        "fact": "DDS supports several pixel and surface organizations including compressed data and mipmaps.",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+      }
+    ],
+    "m2ts": [
+      {
+        "fact": "M2TS modifies MPEG-2 transport streams for BDAV/AVCHD and can have associated folder/playlist structures.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000636.shtml"
+      }
+    ],
+    "m4r": [
+      {
+        "fact": "NCH documents .m4r writing on Windows and identifies ringtone-oriented output in its manual.",
+        "source": "https://www.nch.com.au/wavepad/kb/1414.html"
+      }
+    ],
+    "wma": [
+      {
+        "fact": "Windows Media Audio is a codec family including a distinct lossless member.",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/medfound/about-the-windows-media-codecs"
+      }
+    ],
+    "3gp": [
+      {
+        "fact": "3GPP audiovisual files belong to the ISO media format family and have video/3gpp and audio/3gpp media types.",
+        "source": "https://www.rfc-editor.org/rfc/rfc3839.html"
+      }
+    ],
+    "hevc": [
+      {
+        "fact": "H.265 is High Efficiency Video Coding; raw HEVC output is separate from a multi-track container.",
+        "source": "https://www.itu.int/rec/T-REC-H.265"
+      },
+      {
+        "fact": "Raw-video muxers cannot store a general audio/video presentation.",
+        "source": "https://ffmpeg.org/ffmpeg-formats.html"
+      }
+    ]
+  }
+}

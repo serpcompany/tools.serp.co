@@ -1,0 +1,225 @@
+{
+  "tools": {
+    "swf-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i movie.swf movie.mp4",
+          "limits": "Converts the video and sound inside the file; the codecs and size are yours to set.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "formatSupportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "JPEXS and FFmpeg",
+          "steps": "ffdec -format frame:avi -export frame frames input.swf; then ffmpeg -i frames/movie.avi output.mp4",
+          "limits": "Movie exports default to FLV without sound; export sound separately and use the file name JPEXS wrote.",
+          "source": "https://github.com/jindrapetrik/jpexs-decompiler/wiki/Commandline-arguments",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Ruffle and OBS Studio",
+          "steps": "Play the SWF in Ruffle; in OBS press + under Sources and choose Window Capture; Start Recording.",
+          "limits": "Captures one playback session; the recording format is set under Settings > Output.",
+          "source": "https://obsproject.com/kb/quick-start-guide",
+          "supportSource": "https://ruffle.rs/downloads"
+        }
+      ]
+    },
+    "wav-to-flac": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "Open WAV; File > Export Audio; choose FLAC and review export sample format.",
+          "limits": "Project edits, mixing and rate changes can precede encoding.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportSource": "https://manual.audacityteam.org/man/export_formats_supported_by_audacity.html"
+        },
+        {
+          "app": "FLAC reference tool",
+          "steps": "flac recording.wav; use flac --test recording.flac to check the encoded stream.",
+          "limits": "Supports linear PCM only, 4 to 32 bits per sample.",
+          "source": "https://xiph.org/flac/documentation_tools_flac.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i recording.wav -c:a flac recording.flac",
+          "limits": "Same encoder as the page; add options as needed.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "formatSupportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "wav-to-m4a": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "Open WAV; File > Export Audio; select M4A (AAC).",
+          "limits": "Requires the optional FFmpeg library.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportSource": "https://manual.audacityteam.org/man/export_formats_supported_by_audacity.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i take.wav -c:a aac -b:a 192k take.m4a",
+          "limits": "Lossy AAC output; codec and bitrate can be changed.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "formatSupportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "FFmpeg, lossless",
+          "steps": "ffmpeg -i take.wav -c:a alac take.m4a",
+          "limits": "Apple Lossless instead of AAC; the file stays an M4A.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "xcf-to-png": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open XCF; File > Export As; use .png and review PNG options.",
+          "limits": "Export does not save the XCF project.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-png-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick design.xcf -flatten design.png",
+          "limits": "Flatten/background behavior and complex GIMP feature fidelity need visual review.",
+          "source": "https://imagemagick.org/command-line-options/#flatten",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Photopea",
+          "steps": "File > Open the XCF; File > Export As > PNG.",
+          "limits": "XCF support does not imply every native GIMP effect is reproduced.",
+          "source": "https://www.photopea.com/learn/opening-saving",
+          "supportSource": "https://workspace.google.com/marketplace/app/photopea/463342976776"
+        }
+      ]
+    },
+    "youtube-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i upload.mp4 -c:v mpeg4 -c:a libmp3lame upload.avi",
+          "limits": "Local input; choose codecs accepted by the destination.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "formatSupportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "yt-dlp with FFmpeg",
+          "steps": "yt-dlp --recode-video avi URL",
+          "limits": "Runs on your computer and needs FFmpeg for the recode.",
+          "source": "https://github.com/yt-dlp/yt-dlp"
+        }
+      ]
+    },
+    "avchd-to-mp4": {
+      "methods": [
+        {
+          "app": "HandBrake",
+          "steps": "Open Source; select an individual clip; choose a preset; set the destination in Save As; Start.",
+          "limits": "Opens TS, MTS and M2TS; AVCHD playlists are not fully supported and spanned streams can be unreliable.",
+          "source": "https://handbrake.fr/docs/en/latest/introduction/quick-start.html",
+          "supportSource": "https://handbrake.fr/docs/en/latest/technical/source-formats.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i camera_take.mts -c:v libx264 -c:a aac camera_take.mp4",
+          "limits": "Does not reconstruct camera playlists.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "FFmpeg, copying the video",
+          "steps": "ffmpeg -i camera_take.mts -c:v copy -c:a aac camera_take.mp4",
+          "limits": "Keeps the recorded H.264 video as it is; does not reconstruct camera playlists.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ]
+    },
+    "m4a-to-ogg": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "Import the M4A with the FFmpeg library; File > Export Audio; pick the format from the dropdown.",
+          "limits": "Optional FFmpeg library required for M4A import.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i memo.m4a -c:a libvorbis -q:a 5 memo.ogg",
+          "limits": "libvorbis must be enabled; quality range -1.0 to 10.0.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ]
+    },
+    "png-to-tga": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the PNG, choose File > Export As, name it with a .tga extension, then set Use RLE compression and Origin.",
+          "limits": "TGA plug-in does not preserve every version-2 extension field.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.2/en/file-tga-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick texture.png texture.tga",
+          "limits": "Inspect installed PNG/TGA support and output properties.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "ImageMagick mogrify",
+          "steps": "magick mogrify -format tga *.png",
+          "limits": "Converts every PNG in the folder; the originals are kept because -format changes the suffix.",
+          "source": "https://imagemagick.org/mogrify/"
+        }
+      ]
+    },
+    "ttf-to-svg": {
+      "methods": [
+        {
+          "app": "FontForge outline view",
+          "steps": "Open TTF; open the desired glyph's outline view; File > Export; choose SVG.",
+          "limits": "Exports glyph artwork, not an automatically equivalent installable font.",
+          "source": "https://fontforge.org/docs/ui/menus/filemenu.html"
+        },
+        {
+          "app": "FontForge Python API",
+          "steps": "In FontForge-enabled Python: import fontforge; fontforge.open('font.ttf')['A'].export('A.svg')",
+          "limits": "The glyph must exist and the destination folder must already exist.",
+          "source": "https://fontforge.org/docs/scripting/python/fontforge.html"
+        }
+      ]
+    },
+    "avi-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i interview.avi -c:a libmp3lame -b:a 192k -vn avi_sound.mp3",
+          "limits": "Re-encodes with LAME; MP3 192k cannot be reached below 32 kHz.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "FFmpeg, copying the audio",
+          "steps": "ffmpeg -i interview.avi -vn -c:a copy interview.mp3",
+          "limits": "Works only when the AVI's audio is already MP3; otherwise encode.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "formatSupportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    }
+  }
+}

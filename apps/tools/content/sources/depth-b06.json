@@ -1,0 +1,245 @@
+{
+  "tools": {
+    "gif-to-tga": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick 'animation.gif[0]' still.tga",
+          "limits": "Index [0] selects the first image; ImageMagick counts frames from zero.",
+          "source": "https://usage.imagemagick.org/files/#read_mods",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "GIF supports palette-based image data and graphic control extensions.",
+          "source": "https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+        },
+        {
+          "fact": "Targa can hold RGB with optional alpha and optional RLE.",
+          "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+        }
+      ]
+    },
+    "heic-to-svg": {
+      "methods": [
+        {
+          "app": "libheif and Inkscape",
+          "steps": "heif-dec input.heic intermediate.png; in Inkscape choose File > Import for the decoded PNG, then Path > Trace Bitmap.",
+          "limits": "Tracing produces vector paths from the bitmap.",
+          "source": "https://github.com/strukturag/libheif",
+          "supportSource": "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "HEIC uses HEIF structure with HEVC image coding.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000525.shtml"
+        },
+        {
+          "fact": "SVG may contain raster images through embedded content.",
+          "source": "https://www.w3.org/TR/SVG2/embedded.html"
+        }
+      ]
+    },
+    "jfif-to-ico": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick portrait.jfif -resize '256x256>' portrait-icon.ico",
+          "limits": "The > in the geometry shrinks only a picture larger than the box.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "JFIF wraps JPEG-coded images for interchange.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000018.shtml"
+        },
+        {
+          "fact": "ICO can contain several embedded images and uses image/vnd.microsoft.icon.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.microsoft.icon"
+        }
+      ]
+    },
+    "jpeg-to-jpeg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG, choose File > Export As, enter a new name and pick JPEG under Select File Type; set the quality level in the JPEG options.",
+          "limits": "The quality level runs from 0 to 100; GIMP lets you choose which metadata to keep.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick original.jpeg -quality 90 rewritten.jpeg",
+          "limits": "Quality scaling is the JPEG writer's own.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Preview",
+          "steps": "Open the JPEG, choose File > Export, pick JPEG from the Format pop-up menu, adjust the quality, type a new name and click Save.",
+          "limits": "The quality adjustment appears for JPEG and JPEG-2000.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "JPEG baseline compression is lossy.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000017.shtml"
+        },
+        {
+          "fact": "JPEG export lacks layers and alpha; settings affect storage and metadata.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        }
+      ]
+    },
+    "mov-to-mkv": {
+      "methods": [
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "ffmpeg -i source.mov -c copy remuxed-video.mkv",
+          "limits": "Works only when Matroska accepts the streams; this page re-encodes instead.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg re-encode",
+          "steps": "ffmpeg -i source.mov -c:a aac -c:v libx264 encoded-video.mkv",
+          "limits": "A fresh lossy encode; decoder and encoder availability depends on the installed build.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "MOV is a QuickTime media container.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000052.shtml"
+        },
+        {
+          "fact": "Matroska organizes multiple streams rather than dictating one codec.",
+          "source": "https://www.matroska.org/what_is_matroska.html"
+        }
+      ]
+    },
+    "mp4-to-aiff": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i interview.mp4 -vn interview.aiff",
+          "limits": "-vn disables video as an output option, so only the audio is written.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "MP4 is a container for timed media, not a single audio codec.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000155.shtml"
+        },
+        {
+          "fact": "AIFF commonly carries linear PCM and supports structured metadata chunks.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml"
+        }
+      ]
+    },
+    "mpeg-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg encode",
+          "steps": "ffmpeg -i source.mpeg -c:a libmp3lame -c:v mpeg4 converted-scene.avi",
+          "limits": "The native mpeg4 encoder writes MPEG-4 Part 2 video and libmp3lame writes MP3 audio.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "ffmpeg -i source.mpeg -c copy copied-scene.avi",
+          "limits": "copy means the streams are not re-encoded; the AVI and the player must accept them.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "MPEG systems organize elementary streams and timing.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000335.shtml"
+        },
+        {
+          "fact": "AVI is a RIFF-based container with codec identifiers.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        }
+      ]
+    },
+    "mpg-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i old-recording.mpg -b:a 192k -vn -c:a libmp3lame soundtrack-copy.mp3",
+          "limits": "-vn leaves out the video; -b:a sets the audio bitrate.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "MPG and MPEG filename endings occur on MPEG video files.",
+          "source": "https://support.microsoft.com/en-us/windows/apps/windowsmediaplayer/file-types-supported-by-windows-media-player"
+        },
+        {
+          "fact": "MP3 is lossy sound coding rather than a movie container.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000012.shtml"
+        }
+      ]
+    },
+    "pptx-to-jpeg": {
+      "methods": [
+        {
+          "app": "PowerPoint",
+          "steps": "On Windows open the PPTX, choose File > Save As, pick JPEG File Interchange Format, then choose All Slides or Just This One.",
+          "limits": "Saves a static picture of the selected slides, not an editable presentation.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/save-a-slide-as-an-image-or-as-a-separate-presentation-file"
+        },
+        {
+          "app": "LibreOffice Impress",
+          "steps": "soffice --convert-to jpg deck.pptx",
+          "limits": "Add --outdir with a folder name to choose where the output goes.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "PresentationML separates slides, notes, masters and other package parts.",
+          "source": "https://learn.microsoft.com/en-us/office/open-xml/presentation/structure-of-a-presentationml-document"
+        },
+        {
+          "fact": "A JPEG is a flattened raster view without slide objects.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        }
+      ]
+    },
+    "swf-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg embedded-media conversion",
+          "steps": "ffmpeg -i archive.swf -c:a aac -c:v libx264 extracted-movie.mov",
+          "limits": "Only decodable SWF media streams; the SWF demuxer is not a Flash/ActionScript scene renderer.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/swfdec.c"
+        }
+      ],
+      "facts": [
+        {
+          "fact": "SWF includes vector graphics, timeline animation, media and ActionScript.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000629.shtml"
+        },
+        {
+          "fact": "Ruffle documents remaining language/API compatibility gaps.",
+          "source": "https://ruffle.rs/compatibility"
+        }
+      ]
+    }
+  }
+}

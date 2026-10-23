@@ -1,0 +1,790 @@
+{
+  "vob-to-mkv": {
+    "seo": {
+      "title": "Convert VOB to MKV: DVD Video to Matroska",
+      "h1": "VOB to MKV Converter",
+      "description": "Turn a DVD VOB file into a Matroska MKV with H.264 video and AAC sound, right in your browser. Interlaced frames are cleaned up on the way."
+    },
+    "tool": {
+      "subtitle": "Turn a DVD VOB file into a Matroska MKV with H.264 video and AAC sound."
+    },
+    "faqs": [
+      {
+        "question": "How can I turn a DVD VOB file into an MKV?",
+        "answer": "Drop the VOB onto the page and start the conversion. The browser re-encodes the video and sound and saves a Matroska file. Nothing is uploaded, so a long DVD title takes as long as your own computer needs."
+      },
+      {
+        "question": "Does this copy the DVD streams or re-encode them?",
+        "answer": "It re-encodes them. The picture becomes H.264 and the sound becomes AAC, using a fast encoding preset. A lossless rewrap into MKV is not what this page does."
+      },
+      {
+        "question": "What is the MKV file called?",
+        "answer": "Your VOB's name is kept and only the extension changes to .mkv. Pick several VOBs together and they run in sequence, each saved separately without a ZIP."
+      },
+      {
+        "question": "Can I pick the audio language?",
+        "answer": "There is no track picker. The page passes no stream mapping to FFmpeg, so FFmpeg's own defaults decide which audio goes into the MKV. For a particular language, run FFmpeg yourself with its -map option."
+      },
+      {
+        "question": "Why is my MKV only part of the movie?",
+        "answer": "DVDs cut a long title into several VOB files of up to 1 GB each. Only the file you pick is converted, so a numbered piece yields just that stretch of the film; run every piece."
+      },
+      {
+        "question": "Does the MKV keep the original resolution and frame rate?",
+        "answer": "Small pictures and slow rates stay as they were. Oversized frames shrink, a source above the rate cap drops frames yet plays for the same time, and a side measuring an odd number of pixels is trimmed by one."
+      },
+      {
+        "question": "What happens to interlaced DVD video?",
+        "answer": "The converter runs FFmpeg's yadif filter on frames flagged as interlaced, which smooths the comb-like lines on moving edges. Frames that are not flagged pass through untouched."
+      },
+      {
+        "question": "Why not just rename .vob to .mkv?",
+        "answer": "A rename touches only the name, so the data inside is still a DVD program stream. Converting writes genuine Matroska, and the page tests the output to confirm it."
+      }
+    ],
+    "aboutSection": {
+      "title": "VOB and MKV",
+      "fromFormat": {
+        "name": "VOB",
+        "fullName": "DVD Video Object",
+        "description": "The container used for video, audio, subtitles and menus on DVD-Video discs. It is based on the MPEG-2 program stream.",
+        "details": [
+          "MPEG-2 program stream",
+          "multiple audio and subtitle streams",
+          "may be encrypted with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open, free container format that can hold unlimited video, audio, picture and subtitle tracks in one file. WebM is a subset of Matroska.",
+        "details": [
+          "open standard",
+          "multiple audio and subtitle tracks",
+          "chapters and metadata"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting VOB to MKV",
+      "points": [
+        "The video is re-encoded to H.264 and the sound to AAC at 96 kbps, not copied.",
+        "Each VOB becomes its own MKV, so a full DVD title needs every numbered file converted."
+      ]
+    },
+    "guide": {
+      "title": "Understanding VOB to MKV",
+      "markdown": "### What is a VOB file?\n\nThe letters stand for DVD Video Object, the container that holds a disc's video, sound, subtitles and menus. It is closely related to the MPEG-2 program stream, and CSS encryption may be applied. Copies of a disc usually sit in a VIDEO_TS folder next to IFO and BUP companion files, and a lengthy title is divided among VOBs of up to 1 GB each.\n\n### Programs that open VOB files\n\n- **Windows, Mac and Linux:** VLC can play discs in the DVD Video layout along with MPEG program streams. HandBrake accepts either a single VOB or an entire VIDEO_TS folder, so long as nothing on the source is protected.\n\n### VOB and MKV compared\n\nMatroska is a free, open container with space for as many video, audio, picture and subtitle tracks as you like, plus chapters and metadata. Nearly any codec fits, so the contents decide how it plays. It suits Blu-ray rips and films with many soundtracks, WebM is a subset of it, and a VOB by contrast follows the DVD-Video layout.\n\nHere the MKV holds H.264 picture and AAC sound at 96 kbps, made with a fast preset. Interlaced frames are cleaned up by the yadif filter. A picture over 1920 pixels on the long side is scaled down, motion above 30 frames per second is thinned to 30, and both dimensions end up even. Nothing is scaled up and no rate is raised.\n\n### Other ways to convert VOB to MKV\n\n- **FFmpeg:** `ffmpeg -i title.vob -c:v libx264 -c:a aac title.mkv` writes H.264 and AAC into Matroska. Add `-map` options when a disc has several soundtracks.\n- **HandBrake:** use Open Source to pick the VOB or the whole VIDEO_TS folder, choose a title with the Title control if the source holds several clips, set the container to MKV and encode.\n- **Prism for Windows:** add the VOB, choose MKV as the Output Format, review Encoder Options and press Convert.\n\n### Problems with VOB files\n\n- A short result tends to mean one numbered piece was converted, so run all of them.\n- A disc often holds several titles, and the wrong choice gives the wrong clip.\n- One VOB on its own cannot stand in for the full DVD structure that authoring needs.\n- Some MPEG-2 players ignore the subtitle streams of a DVD.\n- HandBrake does not defeat copy protection of any kind, so a protected disc has to be handled with other software."
+    }
+  },
+  "vob-to-mp3": {
+    "seo": {
+      "title": "Convert VOB to MP3: Rip DVD Audio to MP3",
+      "h1": "VOB to MP3 Converter",
+      "description": "Pull the soundtrack out of a DVD VOB file and save it as an MP3, right in your browser. The picture is dropped and nothing is uploaded."
+    },
+    "tool": {
+      "subtitle": "Pull the soundtrack from a DVD VOB file and save it as an MP3."
+    },
+    "faqs": [
+      {
+        "question": "How do I extract MP3 audio from a VOB file?",
+        "answer": "Select the VOB, and the page discards the video, encodes the audio as an MP3 and hands you the download. The work happens in your browser, so nothing is uploaded."
+      },
+      {
+        "question": "Can I rip a whole DVD to one MP3?",
+        "answer": "Not in one step. Films are often cut into several VOB files, and each one becomes a separate MP3, so a clip shorter than the film is just one piece. Join the MP3s in an audio editor for a single track."
+      },
+      {
+        "question": "Which audio track does the MP3 use?",
+        "answer": "Nothing lets you choose, and no mapping option is given, so the soundtrack is whichever FFmpeg selects by default. For a particular language on a multi-language disc, run FFmpeg yourself with -map."
+      },
+      {
+        "question": "How good is the MP3?",
+        "answer": "The request is for 192 kbps through LAME, which delivers it for VOB audio sampled at 32 kHz or more. Lower-sampled audio ends up with a lower bitrate, and the setting cannot be changed on this page."
+      },
+      {
+        "question": "Does the MP3 sound as good as the DVD?",
+        "answer": "Converting cannot add quality the VOB's audio does not have. MP3 is lossy, so it discards detail listeners are unlikely to notice. Convert once from the VOB and avoid re-encoding the MP3 again."
+      },
+      {
+        "question": "What is the MP3 file called?",
+        "answer": "The MP3 reuses your VOB's name with .mp3 as the extension. A multiple selection is handled in turn, and every MP3 is saved on its own."
+      },
+      {
+        "question": "Can I convert a copy-protected DVD this way?",
+        "answer": "The page does not remove DVD copy protection. It only reads the VOB file you give it, and HandBrake does not process copy-protected sources either."
+      },
+      {
+        "question": "What happens if the VOB has no audio?",
+        "answer": "There is no soundtrack to save, so the conversion fails and you see the page's FFmpeg error message with its exit code."
+      }
+    ],
+    "aboutSection": {
+      "title": "VOB and MP3",
+      "fromFormat": {
+        "name": "VOB",
+        "fullName": "DVD Video Object",
+        "description": "The container used for video, audio, subtitles and menus on DVD-Video discs. It is based on the MPEG-2 program stream.",
+        "details": [
+          "MPEG-2 program stream",
+          "multiple audio and subtitle streams",
+          "may be encrypted with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG, developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting VOB to MP3",
+      "points": [
+        "Only the sound is kept: the picture is dropped and the audio is encoded as an MP3.",
+        "Each VOB becomes a separate MP3, so a full DVD title needs every numbered file."
+      ]
+    },
+    "guide": {
+      "title": "Understanding VOB to MP3",
+      "markdown": "### What is a VOB file?\n\nVOB means DVD Video Object. Discs keep picture, audio, subtitles and menus inside these files, which are tied to MPEG-2 program streams. They are normally found in a VIDEO_TS folder beside IFO and BUP files. CSS may encrypt them, and with a limit of 1 GB per file, a long title runs across several VOBs.\n\n### Programs that open VOB files\n\n- **Windows, Mac and Linux:** Either a lone VOB or a whole VIDEO_TS folder opens in HandBrake when the source has no protection. VLC plays DVD Video media as well as MPEG program streams.\n\n### VOB and MP3 compared\n\nA VOB bundles picture, sound and subtitles, and can carry several audio and subtitle streams. MP3 stores sound alone. Its full name is MPEG-1 Audio Layer III, and the ISO/IEC 11172-3 standard of 1993 grew out of work at Fraunhofer IIS and elsewhere in the MPEG audio group.\n\nMP3 is lossy. A model of human hearing picks out sound that listeners are unlikely to notice, and that sound is thrown away. Song titles and other tags are stored apart, in ID3 structures, and every major browser plays MP3.\n\nThis page drops the video and encodes the soundtrack with the LAME encoder, asking for 192 kbps. Audio sampled under 32 kHz falls short of that rate and is written lower.\n\n### Other ways to convert VOB to MP3\n\n- **Switch:** add the VOB, set the Output Format to MP3, adjust Encoder Options if you like and press Convert. Switch lists VOB among its input formats.\n- **FFmpeg:** `ffmpeg -i chapter.vob -vn -c:a libmp3lame -b:a 192k chapter.mp3` does the same job as this page. Add `-map` when you need a specific audio track.\n\n### Problems with VOB files\n\n- If the audio ends early, you probably converted a single numbered piece; run the rest too.\n- A disc may hold more than one title, so check you chose the right one.\n- A lone VOB lacks the wider DVD structure that authoring relies on.\n- A player may handle the MPEG-2 video but skip DVD subtitle streams.\n- Protected discs need other software, because HandBrake leaves copy protection alone."
+    }
+  },
+  "avif-to-ico": {
+    "seo": {
+      "title": "Convert AVIF to ICO: Make a Favicon or Icon",
+      "h1": "AVIF to ICO Converter",
+      "description": "Turn an AVIF image into a Windows ICO for a favicon or app icon, in your browser. The ICO holds one image, and large pictures are scaled to fit."
+    },
+    "tool": {
+      "subtitle": "Turn an AVIF image into a single-image ICO for a favicon or Windows icon."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn an AVIF into an ICO file?",
+        "answer": "Pick the AVIF and run the conversion. The browser decodes the image, and the page writes it back out as an ICO named after your file. You can choose several AVIFs at once: each downloads as its own ICO, with no ZIP. Nothing leaves your device."
+      },
+      {
+        "question": "What size will the icon be?",
+        "answer": "The ICO holds one image. A large picture is shrunk to fit inside the icon size limit with the aspect ratio unchanged, and a smaller image keeps its own size."
+      },
+      {
+        "question": "Can I put several sizes into one ICO?",
+        "answer": "No. This page writes a single image per ICO. GIMP's ICO export supports multiple icon sizes and color depths, so use it when you need a set."
+      },
+      {
+        "question": "Is the ICO fine for a favicon?",
+        "answer": "Browsers also use ICO files as favicons. A wide image is fitted inside the icon size and not cropped, so start from a square AVIF if you want the icon to fill its frame."
+      },
+      {
+        "question": "What does the error \"this browser can't open AVIF files\" mean?",
+        "answer": "The browser decodes the AVIF before the ICO is written, so a browser without AVIF support stops there and shows that message. A current Chrome, Edge, Firefox or Safari opens AVIF."
+      },
+      {
+        "question": "What happens to an animated AVIF?",
+        "answer": "The ICO holds one image, so just the opening frame is used and the remaining animation is left behind."
+      },
+      {
+        "question": "Does the ICO keep the AVIF's HDR or color profile?",
+        "answer": "No. The pixels pass through 8-bit RGBA and metadata is dropped, so extra bit depth and embedded color profiles are gone."
+      },
+      {
+        "question": "Why not rename .avif to .ico?",
+        "answer": "A rename alters only the name while the AV1 data stays inside. Converting rewrites the pixels as an ICO, and the output is tested to be one."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and ICO",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container. It supports lossy and lossless compression, HDR and transparency.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "HDR and wide color gamut"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and color depths in a single file. Browsers also use it for favicons.",
+        "details": [
+          "multiple sizes in one file",
+          "alpha transparency",
+          "PNG or bitmap entries"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVIF to ICO",
+      "points": [
+        "The ICO holds a single image, not a bundle of sizes.",
+        "Large pictures are shrunk to fit, with the aspect ratio kept.",
+        "Only the first frame of an animated AVIF is used.",
+        "Color profiles and extra bit depth are dropped on the way."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AVIF to ICO",
+      "markdown": "### What is an AVIF file?\n\nAVIF, short for AV1 Image File Format, was created by the Alliance for Open Media. It stores AV1-compressed pictures in the HEIF container and supports lossy and lossless compression, transparency, HDR and up to 12 bits per channel. It is royalty-free, and an Exif block, XMP or an ICC color profile can be embedded. Version 1.0.0 of the specification is dated 19 February 2019.\n\n### Programs that open AVIF files\n\n- **Windows, Mac and Linux:** GIMP can import and export AVIF from version 2.10.22. ImageMagick also reads AVIF.\n- **Windows:** to view .avif files in the system you need the HEIF Image Extension plus Microsoft's AV1 Video Extension.\n- **Web:** Chrome 85 and Firefox 93 added AVIF display.\n- **Mobile:** Safari on iOS 16 gained still-image support, and Android 12 or newer decodes baseline 8-bit AVIF.\n\n### AVIF and ICO compared\n\nICO is Microsoft's icon format. One file can contain bitmap images in several sizes and color depths, as PNG or bitmap entries with alpha transparency, and browsers also use it for favicons. AVIF is built for small web images and HDR, while ICO is built for icons.\n\nHere the browser decodes the AVIF first, and then the page writes one image into the ICO. A side over 256 pixels is shrunk to fit inside 256 by 256 with its aspect ratio kept, and an image of exactly 256 pixels goes into the ICO as an embedded PNG. GIMP's own ICO export can save each icon size at its own color depth, or as compressed PNG, which not every program reads.\n\n### Other ways to convert AVIF to ICO\n\n- **GIMP:** use File > Open on the AVIF, then File > Export As and save it as an ICO, reviewing the icon options for each size.\n- **libavif and GIMP:** `avifdec artwork.avif decoded.png` makes a PNG, which you open in GIMP and export as ICO.\n\n### Problems with AVIF files\n\n- A website should offer a fallback picture, since some browsers cannot display AVIF.\n- GIMP gained its AVIF importer in 2.10.22, so earlier releases cannot open these files.\n- Creating an AVIF can take several seconds, and opening one is slow too."
+    }
+  },
+  "dst-to-jpg": {
+    "seo": {
+      "title": "DST to JPG: Preview an Embroidery Design",
+      "h1": "DST to JPG Converter Limits",
+      "description": "This page cannot read DST embroidery files, so it cannot make a JPG from one. Use Ink/Stitch or Embrilliance to preview a DST, then save a JPG."
+    },
+    "tool": {
+      "subtitle": "This page cannot read DST embroidery files; use an embroidery program for the JPG."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert a DST file to JPG?",
+        "answer": "No. The page decodes files with the browser's own image decoder, and a DST holds stitch data, not pixels. The decode fails with \"Image decode failed.\" instead of producing a JPG."
+      },
+      {
+        "question": "How do I get a JPG preview of a DST design?",
+        "answer": "Open the DST in an embroidery program and save or export a picture of it. Ink/Stitch inside Inkscape can export a PNG, which GIMP can save as JPG. Embrilliance Essentials displays DST designs and can recolor them."
+      },
+      {
+        "question": "Why does my DST preview have the wrong colors?",
+        "answer": "A basic DST does not store a thread palette. Unexpected preview colors can mean palette data is missing, and an external thread list is needed. Assign the thread colors you intend before exporting the picture."
+      },
+      {
+        "question": "Is a DST file an image?",
+        "answer": "No. It records needle positions and machine instructions. That is why it cannot be opened like a PNG or JPG."
+      },
+      {
+        "question": "What happens if I resize a DST before making a preview?",
+        "answer": "A bigger DST has the same stitches farther apart, and a smaller one packs them closer, with shorter stitches. Make the preview from the DST at its real size, and resize the picture afterward."
+      },
+      {
+        "question": "Will a JPG work on my embroidery machine?",
+        "answer": "No. A JPG is a bitmap with no embroidery data, and machines read stitch formats such as DST. Keep the DST for production and use the JPG for a preview."
+      },
+      {
+        "question": "Is my DST uploaded anywhere?",
+        "answer": "No. The page runs in your browser and nothing is sent away, but it cannot read a DST, so it produces no JPG."
+      },
+      {
+        "question": "How can a Python script render a DST?",
+        "answer": "The pyembroidery library reads DST with read_dst and writes a PNG with write_png. Convert that PNG to JPG with ImageMagick or any image editor."
+      }
+    ],
+    "aboutSection": {
+      "title": "DST and JPG",
+      "fromFormat": {
+        "name": "DST",
+        "fullName": "Tajima embroidery",
+        "description": "An embroidery stitch file that records needle movements and machine commands. Basic DST usually needs external thread-color information; extended variants can include more.",
+        "details": [
+          "stitch coordinates",
+          "machine actions",
+          "basic palette limitations"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting DST to JPG",
+      "points": [
+        "This converter cannot decode DST, so it cannot produce a JPG from one.",
+        "Preview the stitches in an embroidery program and keep the DST for production."
+      ]
+    },
+    "guide": {
+      "title": "Understanding DST to JPG",
+      "markdown": "### What is a DST file?\n\nA DST file is a machine embroidery stitch file developed by Tajima. It stores needle positions and commands such as jumps, color stops and trims rather than a picture. Ordinary DST files do not keep a thread palette, though pyembroidery documents an extended-header variant with color information. Making a design bigger only pulls the same stitches farther apart; nothing fills the gaps.\n\n### Programs that open DST files\n\n- **Windows, Mac and Linux:** Ink/Stitch for Inkscape reads and writes DST stitch files.\n- **Windows and Mac:** Embrilliance Essentials displays and recolors DST designs.\n- **Windows:** Wilcom EmbroideryStudio reads stitch files, and it can try to recover editable embroidery objects from those stitches.\n- **Linux:** pyembroidery is a library for Python, not a viewer with a window. Its read_dst function loads DST stitch data when a compatible Python environment is installed.\n\n### DST and JPG compared\n\nJPG is a lossy format for photographs that stores 8 bits per color channel and has no transparency. DST stores instructions for a machine, so making a JPG from one means drawing the stitches onto a canvas, which an embroidery program does and this page does not. Because ordinary DST files keep no thread palette, the colors in such a preview come from the thread list you assign, not from the file.\n\nThis page decodes a file with the browser's own image decoder. A DST has no picture inside, so the decode step fails with the message \"Image decode failed.\" and no JPG is produced.\n\n### Other ways to convert DST to JPG\n\n- **Ink/Stitch and GIMP:** in Inkscape with Ink/Stitch installed, open the DST through File > Open. Export it with File > Export PNG Image, then bring the PNG into GIMP and save it as a JPEG.\n- **pyembroidery and ImageMagick:** `pyembroidery.read_dst(\"design.dst\")` loads the stitches and `pyembroidery.write_png(pattern, \"preview.png\")` draws them. Finish with `magick preview.png preview.jpg`.\n\n### Problems with DST files\n\n- Unexpected preview colors can reflect missing palette data, so an external thread list is needed.\n- Reducing a design's coordinates squeezes both the spacing and the length of its stitches.\n- Reconstructing embroidery objects from stitches cannot restore every original editing property, so keep your source design next to the DST.\n- An SVG kept beside the machine output preserves an editable Ink/Stitch source."
+    }
+  },
+  "jfif-to-webp": {
+    "seo": {
+      "title": "Convert JFIF to WebP: Smaller Web Images",
+      "h1": "JFIF to WebP Converter",
+      "description": "Convert a JFIF image to WebP in your browser. The file is decoded and re-encoded on your device, metadata is dropped, and nothing is uploaded."
+    },
+    "tool": {
+      "subtitle": "Turn a JFIF photo into a WebP for web pages, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JFIF to WebP?",
+        "answer": "Choose the .jfif file and convert it. The browser decodes the picture and re-encodes it as WebP, and the result downloads to your device."
+      },
+      {
+        "question": "Is JFIF a different format from JPG?",
+        "answer": "In practice no. A JFIF file holds ordinary JPEG image data with a small JFIF header, and most programs that open a JPG read it too."
+      },
+      {
+        "question": "Will the WebP have transparency?",
+        "answer": "No. Alpha transparency cannot be stored in the JPEG data of a JFIF file, so there is none to carry over, and the WebP comes out fully opaque."
+      },
+      {
+        "question": "Will the picture look better as a WebP?",
+        "answer": "No. The pixels are decoded and encoded again, so detail the JPEG already threw away does not come back. The point is a different format for the web, not a better picture."
+      },
+      {
+        "question": "Does the WebP keep the photo's EXIF data?",
+        "answer": "No. Pixels pass through an 8-bit RGBA stage, so camera info, location and other metadata are dropped."
+      },
+      {
+        "question": "Can I batch several JFIF files?",
+        "answer": "Yes. Files run one after another, and each result downloads as its own WebP. The page does not bundle them into a ZIP."
+      },
+      {
+        "question": "Which browsers show WebP?",
+        "answer": "Current Chrome, Edge, Firefox and Safari all display WebP, and Android decodes it as well."
+      },
+      {
+        "question": "Can I set the WebP quality?",
+        "answer": "No. No quality setting is passed, which rules out asking for lossless output or choosing another level. A tool that exposes WebP quality settings, such as cwebp or GIMP, can do that."
+      }
+    ],
+    "aboutSection": {
+      "title": "JFIF and WebP",
+      "fromFormat": {
+        "name": "JFIF",
+        "fullName": "JPEG File Interchange Format",
+        "description": "A container convention for JPEG-compressed images that specifies color space and pixel aspect ratio. Files ending in .jfif contain ordinary JPEG image data.",
+        "details": [
+          "lossy JPEG compression",
+          "no alpha transparency",
+          "readable as a regular JPEG"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "Google’s raster format supports lossy and lossless image compression, alpha transparency, and animation.",
+        "details": [
+          "lossy or lossless encoding",
+          "alpha channel support",
+          "still or animated imagery"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JFIF to WEBP",
+      "points": [
+        "The page has no quality control, so you cannot choose lossless output.",
+        "EXIF and other metadata do not carry over to the WebP.",
+        "JFIF has no transparency, so the WebP has none either."
+      ]
+    },
+    "guide": {
+      "title": "Understanding JFIF to WEBP",
+      "markdown": "### What is a JFIF file?\n\nShort for JPEG File Interchange Format, JFIF lets JPEG data travel between programs and platforms. Eric Hamilton wrote it at C-Cube Microsystems, with version 1.02 dating from 1992, and it later became ITU-T T.871 and ISO/IEC 10918-5. The media type is image/jpeg, and the name may end in .jpg, .jpeg, .jpe, .jfi, .jfif or .jif. Most pictures sold or shared as JPEGs turn out to be JFIF files, and a small embedded thumbnail can ride along inside one.\n\n### Programs that open JFIF files\n\n- **Windows, Mac and Linux:** ImageMagick's JPEG reader handles JFIF, and Firefox displays it.\n- **Web and Mobile:** Chrome displays JFIF directly on both, and Safari does on mobile.\n\n### JFIF and WebP compared\n\nWebP is an open-source image format developed by Google and announced on 30 September 2010. The lossy mode reuses intra-frame coding from the VP8 video codec on still pictures, and lossless WebP uses a separate method. WebP files are RIFF containers. RFC 9649 describes the format and is where the image/webp media type is registered. The format also supports lossless compression, transparency, animation, ICC profiles and Exif or XMP metadata. JFIF holds plain JPEG data, so it has no alpha channel and no animation, while WebP can have both.\n\nThe browser decodes your JFIF and encodes the pixels as WebP through 8-bit RGBA. Metadata is dropped on the way, and the page offers no quality control. Quality already lost to JPEG compression stays lost, so the point of this conversion is the format that your site or app wants, and not a better picture.\n\n### Other ways to convert JFIF to WebP\n\n- **ImageMagick:** `magick picture.jfif picture.webp` converts by extension. ImageMagick's format list marks both JPEG and WebP as readable and writable. Reading or writing WebP needs ImageMagick's WebP delegate library.\n\n### Problems with JFIF files\n\nBehind a .jfif suffix sits ordinary JPEG data, so identify the file before deciding to re-encode it. Some JPEG files exceed what a particular JFIF reader handles, and a baseline-compatible export may solve that. Because JPEG cannot store transparency, a cut-out logo saved as JFIF has a solid background, and no converter can bring the transparency back."
+    }
+  },
+  "jpg-to-ppm": {
+    "seo": {
+      "title": "Convert JPG to PPM: Photo to Netpbm Image",
+      "h1": "JPG to PPM Converter",
+      "description": "Turn a JPG photo into an uncompressed PPM for image-processing code and Netpbm tools. It runs in your browser and the file never leaves your device."
+    },
+    "tool": {
+      "subtitle": "Turn a JPG photo into a plain RGB PPM for Netpbm tools and image-processing code."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JPG to PPM?",
+        "answer": "Choose the JPG and convert it. The browser decodes the photo, the page writes a PPM, and it downloads to your device without any upload."
+      },
+      {
+        "question": "Why is my PPM file much larger than the JPG?",
+        "answer": "PPM writes every pixel as red, green and blue values with no compression, while JPEG compresses the picture heavily. The PPM holds the same picture in a far bulkier form."
+      },
+      {
+        "question": "What is the PPM file called?",
+        "answer": "The PPM takes your JPG's name with .ppm as the extension, and the JPG itself is untouched."
+      },
+      {
+        "question": "Does the PPM get back the quality JPEG lost?",
+        "answer": "No. PPM stores the decoded pixels, so the JPEG's compression artifacts are written out exactly as they appear. Converting cannot restore camera detail."
+      },
+      {
+        "question": "Does the PPM keep EXIF data?",
+        "answer": "No. PPM has almost no metadata, and the image passes through an 8-bit RGBA step that drops the JPG's metadata."
+      },
+      {
+        "question": "Why use PPM at all?",
+        "answer": "PPM is a simple format that is easy to parse in a few lines of code. Courses, image-processing experiments and Netpbm tools use it for that reason."
+      },
+      {
+        "question": "Does PPM support transparency?",
+        "answer": "No. PPM is RGB only, with no alpha channel. A JPG has none either, so nothing is lost."
+      },
+      {
+        "question": "Can I do a whole folder of JPGs in one go?",
+        "answer": "Yes. Each JPG is converted in turn and gives its own PPM download, never a ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and PPM",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "PPM",
+        "fullName": "Portable Pixmap",
+        "description": "The color member of the Netpbm family of formats. Each pixel stores red, green and blue values, in a plain text or binary encoding.",
+        "details": [
+          "RGB only, no alpha",
+          "8-bit or 16-bit samples",
+          "plain text or binary encoding"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPG to PPM",
+      "points": [
+        "PPM stores raw RGB pixels, so the file is much larger than the JPG.",
+        "The JPG's metadata is dropped, and PPM has no alpha channel.",
+        "The JPG's compression artifacts are written into the PPM as they are."
+      ]
+    },
+    "guide": {
+      "title": "Understanding JPG to PPM",
+      "markdown": "### What is a JPG file?\n\nIts name honors the Joint Photographic Experts Group, a committee that started in 1986. ITU-T T.81 (1992) holds the core specification, and ISO/IEC 10918-1 followed in 1994. Baseline JPEG is lossy. It transforms 8x8 pixel blocks with a discrete cosine transform, then packs the result with Huffman coding. Color channels get 8 bits each, and there is no alpha channel or layer support. Quality usually runs on a 0 to 100 scale, yet one number can mean different results in different programs. Both .jpg and .jpeg name this format. US patents on it lapsed in October 2006.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** ImageMagick reads JPG from the command line, and GIMP imports it for editing.\n- **Web and Mobile:** Chrome displays JPG on both, Firefox on the web and Safari on phones.\n\n### JPG and PPM compared\n\nPPM is the color member of the Netpbm family. Each pixel carries red, green and blue samples, in a binary form that starts with P6 or a plain-text form that starts with P3. The maximum sample value can run from 1 to 65535, and PPM has no alpha channel. The media type image/x-portable-pixmap is conventional but not registered with IANA, and a raw PPM can hold a sequence of images with no separators.\n\nThe browser decodes your JPG and the page writes the pixels out with ImageMagick. Compression is gone, so the file balloons. Metadata is dropped, and quality lost to JPEG stays lost.\n\n### Other ways to convert JPG to PPM\n\n- **Netpbm:** `jpegtopnm photo.jpg > photo.ppm` handles color input. A grayscale JPG yields PGM, not PPM.\n- **GIMP:** load the JPG, use File > Export As with a .ppm name, and select ASCII or raw data formatting.\n- **ImageMagick:** `magick photo.jpg photo.ppm` converts by extension and writes color PPM.\n\n### Problems with JPG files\n\nJPEG export cannot keep transparent pixels, so for transparency use a format that has alpha. Some older photo frames reject progressive JPEG, and an export with progressive mode disabled fixes that. Equal quality values in two editors need not give equal compression or equal looks. Layers do not survive in a JPEG, so keep your project file for later edits."
+    }
+  },
+  "m4a-to-wma": {
+    "seo": {
+      "title": "Convert M4A to WMA: AAC Audio to Windows Media",
+      "h1": "M4A to WMA Converter",
+      "description": "Convert an M4A audio file to WMA for Windows players, re-encoded with the wmav2 codec at 192 kbps. It runs in your browser with no upload."
+    },
+    "tool": {
+      "subtitle": "Convert an M4A audio file to WMA for Windows players, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4A to WMA?",
+        "answer": "Select the M4A and convert it. The browser decodes the audio and re-encodes it as WMA with the wmav2 codec, with no upload."
+      },
+      {
+        "question": "Will the WMA sound worse than the M4A?",
+        "answer": "Slightly, if the M4A holds AAC. Both formats are lossy, so the sound is encoded a second time and detail the first pass threw away does not return. An M4A with Apple Lossless audio is also converted to lossy WMA."
+      },
+      {
+        "question": "Do the song title and artist carry over?",
+        "answer": "Usually. Global tags such as title, artist and album are left in place by the conversion and copied into the WMA wherever it has a matching field. Cover art is not something to count on."
+      },
+      {
+        "question": "What is the WMA file called?",
+        "answer": "The WMA is named after your M4A with .wma at the end, and the M4A itself stays untouched."
+      },
+      {
+        "question": "Can I change the bitrate?",
+        "answer": "No. Every file is encoded at 192 kbps, and there is no quality control to adjust that. For another rate, use a desktop encoder that lets you choose one."
+      },
+      {
+        "question": "Is the WMA lossless?",
+        "answer": "No. The standard WMA version is lossy, and the wmav2 codec this page uses writes that kind. A separate WMA Lossless variant exists, but this page does not produce it."
+      },
+      {
+        "question": "Can I convert a protected iTunes file?",
+        "answer": "No. A FairPlay-protected M4P is refused with its own message. Only unprotected files convert."
+      },
+      {
+        "question": "Can I convert several songs in one go?",
+        "answer": "Yes, as separate files. The page runs them one by one and each WMA downloads on its own, without a ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4A and WMA",
+      "fromFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art"
+        ]
+      },
+      "toFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "A family of audio codecs developed by Microsoft and stored in the ASF container. The standard version is lossy, and a WMA Lossless variant exists.",
+        "details": [
+          "lossy (and lossless) variants",
+          "ASF container",
+          "proprietary Microsoft format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting M4A to WMA",
+      "points": [
+        "Audio is re-encoded with wmav2, so it is lossy both before and after.",
+        "The video stream is dropped from the output.",
+        "A FairPlay-protected M4P is refused."
+      ]
+    },
+    "guide": {
+      "title": "Understanding M4A to WMA",
+      "markdown": "### What is an M4A file?\n\nFiles ending in .m4a are audio-only MPEG-4, a form Apple took up for unprotected music. AAC, defined in MPEG-4 Part 3, is what most of them hold, though some carry lossless Apple Lossless (ALAC). AAC is a lossy design meant to beat MP3 at a given bitrate, with support for sample rates between 8 and 96 kHz and bitrates reaching 512 kbps. iTunes songs were sold as AAC. All the major browsers play AAC inside MP4, Android plays .m4a on every release, and the media type is audio/mp4.\n\n### Programs that open M4A files\n\n- **Windows, Mac and Linux:** Audacity needs its optional FFmpeg library before it opens M4A, and protected files are excluded. ffplay, the player that comes with FFmpeg, opens it from the command line, using FFmpeg's decoders.\n- **Web:** Chrome and Firefox play AAC in MP4, though Firefox can depend on system codecs.\n- **Mobile:** VLC and mpv for Android handle it, depending on the media inside.\n\n### M4A and WMA compared\n\nMicrosoft developed WMA as a family of audio codecs kept in the ASF container. Its standard version is lossy, a Lossless variant also exists, and the format is proprietary. It served Windows media libraries and older portable music players, and Windows Media Player, VLC media player and foobar2000 open it.\n\nThis page decodes the M4A and writes WMA with the wmav2 encoder at 192 kbps. The video stream is dropped, and the rest of the choices are left to FFmpeg's defaults. AAC to WMA is a lossy-to-lossy step, so there is no quality gain.\n\n### Other ways to convert M4A to WMA\n\n- **FFmpeg:** `ffmpeg -i song.m4a -vn song.wma` drops any video stream and writes a WMA.\n- **WavePad for Windows:** open the M4A, choose File > Save As and select WMA. WMA saving is offered only in the Windows version.\n\n### Problems with M4A files\n\nThe FFmpeg library route cannot import DRM-protected recordings. If you import several recordings into one project window, the last file's tags replace the project tags. M4A import in that program depends on the optional library being installed, and a file that library cannot decode will not open."
+    }
+  },
+  "m4r-to-wav": {
+    "seo": {
+      "title": "Convert M4R to WAV: iPhone Ringtone to Audio",
+      "h1": "M4R to WAV Converter",
+      "description": "Turn an iPhone M4R ringtone into a 16-bit PCM WAV you can edit or play anywhere, right in your browser. Nothing is uploaded."
+    },
+    "tool": {
+      "subtitle": "Turn an iPhone M4R ringtone into a 16-bit PCM WAV you can edit or play anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an M4R ringtone to WAV?",
+        "answer": "Select the M4R and convert it. The browser decodes the AAC audio and writes a 16-bit PCM WAV, with no upload."
+      },
+      {
+        "question": "Is an M4R the same as an M4A?",
+        "answer": "They are the same kind of file. An M4R is an MPEG-4 audio file holding AAC, given a new extension so iTunes and the iPhone file it as a ringtone."
+      },
+      {
+        "question": "Will the WAV sound better than the ringtone?",
+        "answer": "No. WAV holds uncompressed PCM, but the M4R's AAC compression already discarded detail, and PCM cannot restore it. The benefit is that editors read the file with no further loss."
+      },
+      {
+        "question": "Why is the WAV file so big?",
+        "answer": "PCM stores every sample, while AAC compresses the sound. The WAV carries the same ringtone in a much bulkier form."
+      },
+      {
+        "question": "Is the ringtone trimmed?",
+        "answer": "No. The WAV keeps the ringtone's full length, because the page cuts nothing."
+      },
+      {
+        "question": "What is the WAV file called?",
+        "answer": "The WAV is named after your M4R with .wav at the end, and the ringtone you started with stays as it was."
+      },
+      {
+        "question": "Do the title and artist tags carry over?",
+        "answer": "Usually. The page does not strip the file's global tags, so title, artist and the like are copied where WAV has a field for them."
+      },
+      {
+        "question": "Can I convert several ringtones at once?",
+        "answer": "Yes. The files run one after another and each WAV downloads on its own, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4R and WAV",
+      "fromFormat": {
+        "name": "M4R",
+        "fullName": "iPhone ringtone",
+        "description": "The file extension for iPhone ringtones. It is an MPEG-4 audio file with AAC audio, renamed so iTunes and the iPhone treat it as a ringtone.",
+        "details": [
+          "MPEG-4 container",
+          "AAC audio",
+          "used by Apple devices"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "A RIFF-based audio container from Microsoft and IBM, commonly carrying PCM samples. Other audio encodings are also possible.",
+        "details": [
+          "audio container",
+          "often uncompressed PCM",
+          "encoding-dependent precision"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting M4R to WAV",
+      "points": [
+        "The WAV is 16-bit PCM at the ringtone's own length, with no compression.",
+        "PCM does not restore detail lost in the ringtone's AAC compression.",
+        "The video stream is dropped, so only audio is written."
+      ]
+    },
+    "guide": {
+      "title": "Understanding M4R to WAV",
+      "markdown": "### What is an M4R file?\n\nM4R is the file extension for iPhone ringtones. It is MPEG-4 audio with AAC sound, renamed to .m4r so that iTunes and the iPhone use it as a ringtone. An MPEG-4 file keeps its container structure apart from the encodings of its tracks, and it can store track metadata next to the encoded samples. Apple's GarageBand export limits a ringtone to 30 seconds.\n\n### Programs that open M4R files\n\n- **Windows, Mac and Linux:** MediaInfo inspects the container and stream properties, though it does not play audio, and its format registry includes .m4r.\n- **Windows and Mac:** Switch accepts M4R input, and copy-protected files are excluded.\n- **Windows:** WavePad lists .m4r as readable and writable here but not on Mac.\n- **Mobile:** GarageBand for iPhone can make a custom ringtone from eligible audio and install it. Switch lists Android M4R input support.\n\nAudacity's AAC export accepts .m4r as an MP4 ringtone filename.\n\n### M4R and WAV compared\n\nWAV is an audio container developed by Microsoft and IBM and based on RIFF. It usually holds uncompressed PCM, so files are large but exact, and it has a 4 GB file size limit. It suits recording, editing and professional sound production, and it often serves as a source format before compression. You can open it in Audacity, VLC, Windows Media Player or a web browser.\n\nThe page decodes the M4R and writes pcm_s16le, 16-bit little-endian PCM, with no video stream. Nothing is trimmed, so the WAV runs as long as the ringtone does. AAC detail that was lost stays lost.\n\n### Other ways to convert M4R to WAV\n\n- **WavePad for Windows:** open the M4R, choose File > Save As, select WAV and review the encoding.\n- **Switch:** add the M4R, pick WAV as the Output Format, look over Encoder Options and press Convert.\n- **FFmpeg:** `ffmpeg -i tone.m4r -vn tone.wav` writes a WAV and skips any video stream.\n\n### Problems with M4R files\n\nWavePad does not decode copy-protected input, so its M4R support does not cover protected tones. In GarageBand, a dimmed song is one not yet downloaded to the iPhone. When a ringtone runs over the limit, GarageBand proposes a shorter cut before it finishes the export."
+    }
+  },
+  "m4v-to-avi": {
+    "seo": {
+      "title": "Convert M4V to AVI for Older Players",
+      "h1": "M4V to AVI Converter",
+      "description": "Convert an M4V video to AVI with MPEG-4 Part 2 video and MP3 sound for older players. Big or fast footage may be reduced. It runs in your browser."
+    },
+    "tool": {
+      "subtitle": "Convert an M4V video to AVI with MPEG-4 Part 2 video and MP3 sound."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4V to AVI?",
+        "answer": "Select the M4V and convert it. The video becomes MPEG-4 Part 2, the sound becomes MP3, and the result is saved as an AVI with no upload."
+      },
+      {
+        "question": "Will the AVI look as good as my M4V?",
+        "answer": "Not exactly. The video is re-encoded, not copied, and the page passes no quality setting, so some detail from the original can soften."
+      },
+      {
+        "question": "Which codecs end up in the AVI?",
+        "answer": "Video is MPEG-4 Part 2 tagged xvid, with no B-frames, and the sound is MP3. The AVI container can hold many codecs, so these are the page's choice."
+      },
+      {
+        "question": "Does the page change the video size?",
+        "answer": "Only when it has to. A frame larger than the page's limit is scaled down, a faster frame rate is thinned, and odd dimensions are rounded down to even ones. A smaller frame is never scaled up. Interlaced frames are deinterlaced."
+      },
+      {
+        "question": "Can I convert an iTunes video?",
+        "answer": "Only an unprotected one is worth trying. FairPlay DRM can lock down iTunes Store purchases, so an M4V you made yourself is the safe choice."
+      },
+      {
+        "question": "Is M4V different from MP4?",
+        "answer": "Very little. M4V is an Apple video format very close to MP4, and FFmpeg's MOV/MP4 reader accepts both. Renaming does not change the encoding, so playback problems come from what is inside."
+      },
+      {
+        "question": "Can I choose the audio track?",
+        "answer": "No. There is no picker, and nothing maps streams by hand, so the streams that land in the AVI are the ones FFmpeg picks by default."
+      },
+      {
+        "question": "Does a damaged M4V still convert?",
+        "answer": "Often. FFmpeg reports the problem, saves what it was able to decode, and the AVI may end up shorter than the M4V."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4V and AVI",
+      "fromFormat": {
+        "name": "M4V",
+        "fullName": "MPEG-4 video",
+        "description": "A video file format developed by Apple that is very close to MP4. Files from the iTunes Store may be protected with FairPlay DRM.",
+        "details": [
+          "MPEG-4 container",
+          "H.264 video with AAC audio",
+          "optional DRM"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "Microsoft’s RIFF-based container interleaves video and audio streams. Playback depends on the codecs used inside it.",
+        "details": [
+          "RIFF-based container",
+          "multiple codec possibilities",
+          "legacy delivery workflows"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting M4V to AVI",
+      "points": [
+        "Video is re-encoded to MPEG-4 Part 2 and sound to MP3, so nothing is copied across.",
+        "Large frames are scaled down and fast frame rates are thinned.",
+        "Your M4V is not changed, because you download a new AVI."
+      ]
+    },
+    "guide": {
+      "title": "Understanding M4V to AVI",
+      "markdown": "### What is an M4V file?\n\nM4V is Apple's video format, a close sibling of MP4 used for videos in iTunes and the Apple TV app and for phone and tablet video. It typically carries H.264 video with AAC audio in an MPEG-4 container. HandBrake treats its .m4v and .mp4 outputs as the same MPEG-4 container. Apple's iTunes Store sold some files with FairPlay DRM protection. FFmpeg's MOV/MP4 demuxer lists .m4v among the extensions it handles. The MPEG-4 family stores timed audio and video tracks and metadata in boxes, and playback depends on the encodings inside.\n\n### Programs that open M4V files\n\n- **Windows, Mac and Linux:** VLC handles MPEG-4 containers with the usual MPEG-4 video and AAC audio codecs. FFmpeg lists M4V input explicitly, though processing also needs the relevant decoders.\n- **Mac:** On Apple devices, QuickTime Player and the Apple TV app play M4V.\n\n### M4V and AVI compared\n\nAVI is a container introduced by Microsoft in 1992, based on RIFF. It interleaves video and audio and can hold many codecs, so the extension alone says nothing about quality. Modern features are poorly supported, which makes it a legacy format, yet you will still meet it in old Windows video, capture files and archives. VLC media player, Windows Media Player and QuickTime Player open AVI.\n\nThe page writes MPEG-4 Part 2 video, tagged xvid and without B-frames, plus MP3 sound at 96 kbps. Output is deinterlaced where needed. A frame over 1920 pixels on its long side is scaled down, a rate over 30 fps is thinned, and both sides are rounded to even numbers. Nothing is scaled up.\n\n### Other ways to convert M4V to AVI\n\n- **FFmpeg:** `ffmpeg -i recording.m4v recording.avi` writes an AVI from the command line.\n- **Prism for Windows:** add the M4V, set the Output Format to AVI, review Encoder Options and press Convert.\n\n### Problems with M4V files\n\nAn unsupported codec can stop playback even when a player recognizes the container. Renaming the suffix cannot fix a damaged file or an unsupported encoding. A recording whose writing ended before the required metadata was finished may not open at all. If you need a different file than M4V provides, convert a copy and keep the original."
+    }
+  },
+  "mov-to-flv": {
+    "seo": {
+      "title": "Convert MOV to FLV: QuickTime to Flash Video",
+      "h1": "MOV to FLV Converter",
+      "description": "Convert a QuickTime MOV to an FLV with H.264 video and AAC sound for legacy Flash players and archives. It runs in your browser with no upload."
+    },
+    "tool": {
+      "subtitle": "Convert a QuickTime MOV to an FLV with H.264 video and AAC sound."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MOV to FLV?",
+        "answer": "Select the MOV and convert it. The video becomes H.264, the sound becomes AAC, and both are packed into an FLV with no upload."
+      },
+      {
+        "question": "Does anyone still need FLV?",
+        "answer": "Mainly for old Flash players and archives. FLV is a legacy format, so for new web video an MP4 is the better choice."
+      },
+      {
+        "question": "Is the FLV the same quality as the MOV?",
+        "answer": "No. The video is re-encoded with a fast preset aimed at small files, so it looks softer than the original. Keep the MOV when quality matters."
+      },
+      {
+        "question": "Does the size or frame rate change?",
+        "answer": "Only when it has to. Oversized frames shrink, a higher frame rate loses frames, and odd sizes become even. A smaller or lower-rate video is kept as it is, and interlaced frames are deinterlaced."
+      },
+      {
+        "question": "Will all my MOV audio tracks come over?",
+        "answer": "Not by choice. The page has no track picker and passes no stream mapping, so FFmpeg's defaults decide which streams are used."
+      },
+      {
+        "question": "Can I play the FLV afterwards?",
+        "answer": "Yes, in a desktop player. VLC media player and mpv open FLV, and so does Adobe Media Encoder. Browsers no longer rely on Flash."
+      },
+      {
+        "question": "Is MOV the same as MP4?",
+        "answer": "No. MPEG-4 grew out of QuickTime, yet MOV and MP4 remain separate formats that cannot stand in for each other. This page turns the MOV into an FLV rather than an MP4."
+      },
+      {
+        "question": "Does a damaged MOV still convert?",
+        "answer": "Often. FFmpeg notes the problem, writes whatever it managed to read, and the FLV may be shorter than your MOV."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and FLV",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "multi-track container",
+          "many codecs, including ProRes",
+          "timecode and metadata tracks"
+        ]
+      },
+      "toFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A media container associated with Macromedia and Adobe Flash video delivery. It now serves legacy playback and archive workflows.",
+        "details": [
+          "video delivery container",
+          "codec-dependent playback",
+          "legacy Flash ecosystem"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MOV to FLV",
+      "points": [
+        "Video is re-encoded to H.264 and sound to AAC, so the FLV cannot match the MOV exactly.",
+        "Very large frames are scaled down and fast frame rates are thinned.",
+        "Your MOV is not changed, because you download a new FLV."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MOV to FLV",
+      "markdown": "### What is a MOV file?\n\nApple's QuickTime movie format, MOV, appeared in 1991 and reached Windows in 1994. QuickTime files are made of atoms, and programs may skip any atom they do not recognize. Inside, video may be H.264, ProRes or Motion JPEG, and audio AAC or uncompressed PCM. QuickTime was the starting point for the MPEG-4 file format, though the two are not interchangeable. Mac screen recordings are saved as MOV, and its media type is video/quicktime. Few browsers handle it well, and Apple now favors MP4 in its own tools.\n\n### Programs that open MOV files\n\n- **Windows, Mac and Linux:** ffplay handles MOV through FFmpeg's demuxer, and mpv plays it on the desktop.\n- **Windows and Mac:** Adobe Premiere imports MOV when the necessary decoder is available.\n- **Mobile:** Phones can use VLC, on Android or iOS, though decoding depends on the media inside.\n\n### MOV and FLV compared\n\nMacromedia, and Adobe afterwards, built FLV to serve video through Flash Player. Streaming was the aim, and the typical contents are H.263 or H.264 picture with MP3 or AAC sound. With Flash at end of life it is now a legacy format for older web video and archived Flash content. VLC media player, mpv and Adobe Media Encoder can open it.\n\nThis page encodes H.264 with a fast preset and AAC at 96 kbps, wrapped as FLV. Interlaced frames are deinterlaced. Any side beyond 1920 pixels gets scaled down, and a rate beyond 30 fps is thinned by dropping frames, which leaves the length unchanged. Smaller or lower-rate video is left alone.\n\n### Other ways to convert MOV to FLV\n\n- **Prism for Windows:** add the MOV, set FLV as the Output Format, glance at the Encoder Options and click Convert.\n- **FFmpeg:** `ffmpeg -i take.mov -c:a aac -f flv -c:v libx264 take.flv` writes H.264 and AAC into FLV.\n\n### Problems with MOV files\n\nCodecs inside a QuickTime container may be missing from the editor you are moving to. A rename does not transcode the video or add the absent decoder, so a file that will not open under another extension still needs a real conversion."
+    }
+  }
+}

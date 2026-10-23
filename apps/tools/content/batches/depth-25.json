@@ -1,0 +1,900 @@
+{
+  "icns-to-png": {
+    "seo": {
+      "howToHeading": "How to convert ICNS to PNG",
+      "title": "Convert ICNS to PNG: Get the Largest Icon",
+      "h1": "ICNS to PNG Converter",
+      "description": "Convert ICNS to PNG in your browser. You get the largest PNG icon stored in the file, with its transparency kept. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Pull the largest icon out of an ICNS file as a PNG, right in your browser."
+    },
+    "aboutSection": {
+      "title": "ICNS and PNG",
+      "fromFormat": {
+        "name": "ICNS",
+        "fullName": "Apple icon image",
+        "description": "A package of raster icon representations used by macOS.",
+        "details": [
+          "Can contain several icon sizes",
+          "Standard and high-resolution artwork",
+          "Application icon resources"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A losslessly compressed picture format with optional transparency.",
+        "details": [
+          "Raster image data",
+          "Several color modes",
+          "Alpha can represent transparent edges"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ICNS to PNG",
+      "points": [
+        "You get one PNG: the largest PNG icon in the ICNS, up to 1024 pixels, not every size.",
+        "The icon is copied at its stored size and is not scaled.",
+        "Transparent corners and soft shadows stay transparent.",
+        "An ICNS that holds only older JPEG 2000 or bitmap icons fails with a \"no PNG icon images\" message.",
+        "Choose several ICNS files and each gives its own PNG."
+      ]
+    },
+    "guide": {
+      "title": "About ICNS and PNG files",
+      "markdown": "### What is an ICNS file?\n\nICNS is the icon format of macOS. One file packages an app's icon artwork and can supply standard and high-resolution versions of each icon. Apple documents paired icon sizes from 16 through 512 points, and the high-resolution version of the 512-point icon is a 1024-pixel image.\n\nApple's iconutil tool converts a folder of PNG files called an iconset into an ICNS file, compressing the result, and it can unpack an ICNS back into an iconset. The file names in an iconset are in points, and an @2x name doubles the pixels. Apple's guide says an iconset has no 1024-pixel size of its own, because that image is the @2x version of the 512-point icon. Older ICNS files can store icons as JPEG 2000 or bitmap data instead of PNG.\n\nBecause the sizes live in one file, an ICNS is where you look when you need an app's icon as an ordinary picture, for a website, a slide or a design mockup. PNG is the practical target for that, since every browser, editor and upload form accepts it and it keeps the icon's transparent corners.\n\n### Programs that open ICNS files\n\n**Windows**\n\n- GIMP: it opens ICNS files through the Apple Icon Image plug-in.\n\n**Mac**\n\n- iconutil: Apple's command-line tool, which extracts an ICNS to an iconset or builds one from an iconset.\n\n**Linux**\n\n- XnView MP: the vendor's supported-formats list includes Macintosh ICNS images.\n\n### ICNS and PNG compared\n\n- **Extensions and media types**: .icns for ICNS; .png and image/png for PNG.\n- **What a file holds**: an ICNS holds several icon pictures. A PNG holds one.\n- **Compression**: PNG is always lossless. In a modern ICNS each icon is itself stored as PNG data.\n- **Transparency**: both have an alpha channel.\n- **Color depth**: PNG allows 8 or 16 bits per channel. The converter passes the icon through 8-bit RGBA.\n- **Metadata**: the PNG carries nothing over from the ICNS.\n\nWhat changes in this conversion is the choice of one picture. The page reads the ICNS, takes the largest icon stored as PNG data (1024, 512, 256, 128, 64, 32, then 16 pixels) and re-saves it as a PNG at the same pixel size. The other sizes stay behind in the ICNS.\n\nIf you need every size, the iconutil method below writes each one to its own PNG. If you need one particular size that is not the largest, Pillow can load it when you set the size before opening the file. A file with only small icons gives a small PNG, and enlarging it later adds pixels but no detail.\n\n### Other ways to convert ICNS to PNG\n\n- **Apple iconutil (Mac):** run `iconutil -c iconset input.icns`, then use the PNG files in the iconset folder it writes. This gives every size, not one.\n- **Pillow (Python):** import Image from PIL, load the file with `Image.open(\"input.icns\")` and call `save(\"output.png\")` on it. Pillow reads the largest icon by default, and setting its size property before loading selects another.\n- **XnConvert:** open the Input tab, add the ICNS, set PNG on the Output tab and press Convert. The Action tab stays unused for a plain conversion. XnView's format list marks ICNS as read only, which is fine for an input.\n\n### Problems with ICNS files\n\n- **\"This ICNS file has no PNG icon images\"**: the file stores only older JPEG 2000 or bitmap icons, which this converter does not read. Open it in a desktop program that supports ICNS instead.\n- **\"This isn't an ICNS file\"**: the file's first bytes are not an ICNS header, often because another format was renamed to .icns. Check where the file came from.\n- **The PNG is small or soft**: the largest stored icon was small. Look for a bigger icon in a newer copy of the app, or redraw it from the source art.\n- **iconutil refuses to build an ICNS**: each PNG's pixel dimensions must match its iconset file name.\n- **You chose several ICNS files**: each one is converted on its own and downloads as its own PNG. Nothing is merged into a single picture.\n- **An icon looks different at one size**: a single enlarged small icon will not match artwork drawn for the larger size. When a size is missing, the system chooses among the sizes that remain.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert ICNS to PNG?",
+        "answer": "Choose the ICNS file above. The page finds the largest PNG icon inside it and downloads that picture as a PNG. On a Mac you can instead unpack every size with Apple's iconutil."
+      },
+      {
+        "question": "Which size does the PNG come out at?",
+        "answer": "The size of the biggest icon the file stores. A macOS app icon with a Retina version has a 1024-pixel image, so you get 1024 by 1024. An older or simpler ICNS may top out at 512, 256 or less, and you get that."
+      },
+      {
+        "question": "How do I get every size out of an ICNS file?",
+        "answer": "Apple's iconutil tool on a Mac unpacks an ICNS into an iconset folder with a PNG for each stored size; point it at the file with the iconset option. This page returns only the largest PNG."
+      },
+      {
+        "question": "Why does my ICNS fail with \"no PNG icon images\"?",
+        "answer": "ICNS files can hold icons in formats other than PNG, and this converter reads only the PNG ones. XnView MP, a desktop program that lists ICNS support, is the next thing to try."
+      },
+      {
+        "question": "Does the PNG keep the icon's transparent background?",
+        "answer": "Yes. PNG has an alpha channel and the page keeps it, so rounded corners and shadows stay see-through. Put the PNG on a dark page to check."
+      },
+      {
+        "question": "How can I open an ICNS file on Windows?",
+        "answer": "On a desktop, GIMP reads ICNS via a plug-in and XnView MP lists Macintosh ICNS among the formats it reads. Or convert it here and open the PNG in anything."
+      },
+      {
+        "question": "Can I pick a smaller size than the largest one?",
+        "answer": "Not on this page, which always takes the largest PNG icon. Pillow can load another size when you set its size property before loading, and iconutil on a Mac writes every size into an iconset folder."
+      },
+      {
+        "question": "Why does the PNG look small or blurry?",
+        "answer": "The largest icon in some ICNS files is only 128 or 256 pixels. Enlarging it adds pixels but no detail. A designer's source art or a newer version of the app may have a bigger icon."
+      },
+      {
+        "question": "What is inside an ICNS file?",
+        "answer": "One file that bundles several icon pictures, in standard and high-resolution versions. Apple's paired sizes span 16 to 512 points, and the 512-point high-resolution icon is a 1024-pixel image."
+      },
+      {
+        "question": "Can I make an ICNS file from PNG pictures?",
+        "answer": "On a Mac, put the PNG files in an iconset folder, name them as Apple's guide lists, then run iconutil -c icns on that folder. The pixel size of each PNG must match its file name, and an @2x file is twice the points in pixels."
+      }
+    ]
+  },
+  "jp2-to-jpg": {
+    "seo": {
+      "howToHeading": "How to convert JP2 to JPG",
+      "title": "Convert JP2 to JPG: JPEG 2000 to JPEG",
+      "h1": "JP2 to JPG Converter",
+      "description": "Convert JP2 to JPG in your browser. ImageMagick reads the JPEG 2000 file and writes an ordinary JPG. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a JPEG 2000 image into a JPG, right in your browser."
+    },
+    "aboutSection": {
+      "title": "JP2 and JPG",
+      "fromFormat": {
+        "name": "JPEG 2000",
+        "fullName": "JPEG 2000 image",
+        "description": "A wrapper for JPEG 2000 image coding, distinct from ordinary JPEG.",
+        "details": [
+          "Lossy or lossless coding",
+          "Can carry opacity information",
+          "Used for image exchange and service copies"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A photographic raster format commonly stored with lossy compression.",
+        "details": [
+          "Opaque photographic images",
+          "Also uses .jpeg",
+          "Existing compression artifacts remain in decoded pixels"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JP2 to JPG",
+      "points": [
+        "ImageMagick, running in your browser, reads the JP2 and writes the JPG. The page sets no quality of its own.",
+        "A JPG has no alpha channel, which a JP2 can have, so check the result if your image had transparency.",
+        "A picture over about 537 megapixels fails with a \"too large to convert here\" message.",
+        "A lossless JP2 becomes a lossy JPG, so keep the JP2 if you need the exact pixels.",
+        "Choose several JP2 files and each gives its own JPG."
+      ]
+    },
+    "guide": {
+      "title": "About JP2 and JPG files",
+      "markdown": "### What is a JP2 file?\n\nJP2 is the file format of JPEG 2000, a still-image standard from the Joint Photographic Experts Group. A JP2 wraps a JPEG 2000 compressed image in the Part 1 file format, which can also hold color profiles, opacity and other metadata. The extension is .jp2 and the media type is image/jp2.\n\nJPEG 2000 can compress with or without loss. A lossy JPEG 2000 image does not recover discarded detail simply by being saved as JP2. A JP2 is also not interchangeable with a JPX file, which belongs to Part 2 of the standard. You find JP2 files in archives and libraries, where the Library of Congress uses lossy JP2 service images for digitized maps and newspapers.\n\n### Programs that open JP2 files\n\n**Windows**\n\n- Adobe Photoshop: Adobe documents opening JP2 images.\n\n**Mac**\n\n- ImageMagick: its formats page marks JP2 as readable and writable.\n\n**Linux**\n\n- OpenJPEG: the open-source JPEG 2000 codec, with command-line utilities rather than an interactive viewer.\n\n### JP2 and JPG compared\n\n- **Extensions and media types**: .jp2 and image/jp2; .jpg or .jpeg and image/jpeg.\n- **Compression**: JPEG 2000 can be lossy or lossless. Baseline JPEG is always lossy and codes small pixel blocks.\n- **Transparency**: a JP2 can carry opacity. A JPG has no alpha channel.\n- **Color depth**: a JPG stores 8 bits per channel.\n- **Metadata**: a JP2 can carry color profiles and other metadata.\n- **Layers**: a JPG holds one flat picture with no layer stack to edit.\n- **Use**: JP2 turns up in archive and library service copies, while Chrome, Firefox and Safari all display JPG.\n- **Age**: JPEG is the older format, and the one built into cameras and scanners. ITU-T standardized its block coding as T.81 in 1992, and ISO/IEC 10918-1 arrived in 1994.\n\nThe codec is what really changes. ImageMagick, compiled to WebAssembly, reads the JP2 on this page and writes the JPG itself, and the page passes no quality setting. Because a JPG has no alpha channel, check the result when your JP2 had transparent parts.\n\nThe first JP2 you choose makes the page download the ImageMagick engine, which is about 14 MB, so that conversion starts a moment later than the ones after it. Everything runs on your device and the file is not uploaded. If you convert a scanned archive, check one result first: a JPG made from a lossy JP2 cannot look better than the JP2 did. Keep the original JP2 as your master copy, because a JPG cannot return detail that compression dropped.\n\nAnything above about 537 megapixels gets a too-large message instead of a JPG. With several JP2 files selected, the page converts them one at a time and each gets its own JPG download, unzipped.\n\n### Other ways to convert JP2 to JPG\n\n- **ImageMagick (command line):** run `magick input.jp2 output.jpg`. The command reads the JP2 and takes the output format from the .jpg ending.\n- **XnConvert:** load the JP2 files through Add files on the Input tab, select JPEG on the Output tab and press Convert. Errors appear on the Status tab, and the Action tab stays untouched for a plain conversion. XnView's format list shows JPEG 2000 as readable and writable.\n\n### Problems with JP2 files\n\n- **A program says it cannot open the file**: it has no JPEG 2000 decoder. Convert the file to JPG, or open it in Photoshop or ImageMagick.\n- **Pillow cannot open the JP2**: Pillow reads JPEG 2000 only through OpenJPEG 2.0.0 or higher, and it reads L, LA, RGB, RGBA and YCbCr images.\n- **A JPX file will not open as a JP2**: JPX belongs to JPEG 2000 Part 2, not the basic Part 1 file format.\n- **A lossy JP2**: the Library of Congress uses lossy JP2 service images for digitized maps and newspapers, so a JP2 from a library or archive can already be lossy.\n- **Transparent areas are not kept in a JPG**: JPEG export cannot keep transparent pixels. Keep the JP2, or use a format with alpha when you need the see-through areas.\n- **The JPG looks soft or blocky**: if the JP2 was lossy, the JPG adds a second round of compression. Detail lost in the first pass does not come back.\n- **\"Too large to convert here\"**: the picture is over about 537 megapixels. Use ImageMagick or OpenJPEG on a computer.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I open a JP2 file?",
+        "answer": "Photoshop opens JP2, and so do ImageMagick and Pillow (which needs OpenJPEG). Converting it to JPG here gives you a file that browsers display directly."
+      },
+      {
+        "question": "Is JP2 the same as JPG?",
+        "answer": "No. JP2 is the JPEG 2000 format and JPG is the older JPEG format. They come from the same committee but use different compression and different files, so renaming one does not turn it into the other."
+      },
+      {
+        "question": "Does converting JP2 to JPG lose quality?",
+        "answer": "Yes. A JPG is lossy, so even a lossless JP2 gets compressed on the way. A JP2 that was already lossy ends up as one more generation of loss in the JPG."
+      },
+      {
+        "question": "What happens to transparency in a JP2?",
+        "answer": "A JPG cannot store the opacity channel that a JP2 can. Inspect the output if transparency mattered, and keep the JP2 for it."
+      },
+      {
+        "question": "What JPG quality does the page use?",
+        "answer": "None. The page sets no JPG quality and has no control for one."
+      },
+      {
+        "question": "How big a JP2 can I convert?",
+        "answer": "Up to roughly 537 megapixels. Anything larger is stopped with a message saying the picture is too large for this page."
+      },
+      {
+        "question": "What is the difference between JP2 and JPX?",
+        "answer": "JP2 is the basic JPEG 2000 file format. JPX is the extended one, so a JPX is not interchangeable with a JP2."
+      },
+      {
+        "question": "Why does the first conversion take a moment?",
+        "answer": "The page loads ImageMagick's WebAssembly engine the first time you convert a JP2. After that, the next files start straight away."
+      },
+      {
+        "question": "Why do museums and libraries use JP2?",
+        "answer": "JP2 offers lossy and lossless compression plus room for color profiles and metadata, which suits archives. The Library of Congress, for one, keeps lossy JP2 service copies of digitized maps and newspapers."
+      },
+      {
+        "question": "Can I convert a stack of JP2 scans at once?",
+        "answer": "Yes. Pick the whole stack and the page works through the scans one at a time, handing back a JPG for each. Nothing is zipped, so allow multiple downloads if your browser asks."
+      }
+    ]
+  },
+  "jpeg-to-bmp": {
+    "seo": {
+      "howToHeading": "How to convert JPEG to BMP",
+      "title": "Convert JPEG to BMP Online, No Upload",
+      "h1": "JPEG to BMP Converter",
+      "description": "Convert JPEG to BMP in your browser. The BMP holds the decoded pixels, so it can be many times bigger than the JPEG. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save a JPEG photo as a BMP bitmap in your browser, with nothing uploaded."
+    },
+    "aboutSection": {
+      "title": "JPEG and BMP",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A compressed raster-image family also commonly named JPG.",
+        "details": [
+          "Full-color photographic pictures",
+          "Lossy encoding is common",
+          "No live text or vector objects"
+        ]
+      },
+      "toFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A bitmap format with headers describing its pixels and color interpretation.",
+        "details": [
+          "Raster picture storage",
+          "Multiple header variants",
+          "Often larger than a compressed photograph"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to BMP",
+      "points": [
+        "The BMP can be many times bigger than the JPEG it came from.",
+        "The BMP cannot restore detail the JPEG already lost.",
+        "ImageMagick writes the BMP. The page offers no bit-depth or header-version choice.",
+        "EXIF, ICC profile and XMP data from the JPEG are not copied.",
+        "Choose several JPEG files and each gives its own BMP."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG and BMP files",
+      "markdown": "### What is a JPEG file?\n\nJPEG, short for the Joint Photographic Experts Group, began as a 1986 effort, and ITU-T T.81 (1992) and ISO/IEC 10918-1 (1994) standardize it as a lossy format. Baseline coding splits the picture into blocks of 8x8 pixels, runs a discrete cosine transform on each block and entropy-codes the result, so a photo shrinks far below its raw size. Typical settings give files between a twentieth and a tenth of the raw size.\n\nThe US patents expired on 27 October 2006. Most cameras and scanners write JPEG, and every major browser can show it. Each color channel gets 8 bits, there is no alpha channel and layers do not exist. A progressive mode shows a coarse picture first and sharpens it while the rest loads. The names .jpg and .jpeg mean one format, and this page's file picker takes both. A 0 to 100 quality scale is typical, though 80 in one program need not look like 80 in another.\n\n### Programs that open JPEG files\n\n**Windows**\n\n- GIMP: imports JPEG for editing.\n\n**Mac**\n\n- ImageMagick: reads JPG.\n\n**Web**\n\n- Google Chrome and Mozilla Firefox: display JPG pictures.\n\n**Mobile**\n\n- Safari: displays JPG pictures.\n\n### JPEG and BMP compared\n\n- **Extensions and media types**: .bmp with image/bmp; .jpg or .jpeg with image/jpeg.\n- **Compression**: JPEG is lossy. BMP commonly stores pixels uncompressed, though lossless compression exists.\n- **Transparency**: a JPEG has none. BMP version 5 can record an alpha channel.\n- **Color depth**: 8 bits per channel for JPEG. A BMP header describes its own bit depth and color table.\n- **Metadata**: JPEG can carry EXIF, ICC and XMP. BMP version 5 can record an ICC profile.\n- **History**: Microsoft controls BMP, used first on Windows and OS/2. Version 5 arrived with Windows 98.\n- **Older readers**: software that expects an old bitmap header may want BMP3 or BMP2 rather than ImageMagick's default BMP version.\n\nWhat changes in this conversion is the storage. The browser decodes the JPEG to 8-bit pixels and ImageMagick writes them as a BMP, so the file grows and the photo looks the same as the decoded JPEG. EXIF, ICC and XMP data stay behind.\n\nA BMP will not improve a photo. It gives you a file that any bitmap reader handles, with decoded pixels and no further JPEG compression for the next program to work on. Size is the price: a photo can be many times larger as a BMP, so PNG or JPEG are usually more practical for sharing.\n\nPick several JPEG files and the page handles them one after another, giving every file its own BMP download. No ZIP and no merge happens.\n\n### Other ways to convert JPEG to BMP\n\n- **XnConvert:** add the JPEG on the Input tab, set the Output tab's format to BMP and press Convert. Nothing else is needed, and XnView lists BMP as readable and writable.\n- **ImageMagick (command line):** run `magick input.jpeg output.bmp`. ImageMagick also writes the BMP2 and BMP3 variants, for programs that need an older header.\n- **Pillow (Python):** after importing Image from PIL, chain `Image.open(\"input.jpeg\")` and `save(\"output.bmp\")`. Pillow documents BMP writing for 1, L, P and RGB images.\n\n### Problems with JPEG files\n\n- **A clear background is not there**: JPEG stores no alpha, so any transparency has to be added in an editor and saved in a format that has it.\n- **An older photo frame will not show it**: some old frames cannot read progressive JPEG, so save again with progressive mode off.\n- **One quality number, two results**: identical numbers in different editors do not guarantee the same compression or look.\n- **Layers are missing**: JPEG holds a flat picture, so keep the project file if you need the layers.\n- **Blocky edges or fuzzy text**: lossy compression put that damage in the JPEG before this page saw it, so look for a less compressed copy.\n- **Text in the photo cannot be edited**: a JPEG holds pixels only, with no live text or vector objects.\n- **The camera details are gone from the BMP**: the page writes pixels only, so the EXIF, ICC and XMP data in the JPEG stay behind. Keep the JPEG if you need them.\n- **A renamed file still fails**: renaming .jpeg to .bmp leaves JPEG data inside, so only a real conversion fixes it.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPEG to BMP?",
+        "answer": "Choose the JPEG above. Your browser decodes it and ImageMagick writes the pixels as a BMP, which downloads when it is ready."
+      },
+      {
+        "question": "Why is the BMP so much bigger than the JPEG?",
+        "answer": "A JPEG compresses a photo with a lossy method. A BMP commonly stores pixels uncompressed, so it can be many times bigger than the JPEG."
+      },
+      {
+        "question": "Will converting to BMP make the photo sharper?",
+        "answer": "No. The BMP is made from the pixels of the decoded JPEG, including any blockiness already there. The conversion does not add back lost detail."
+      },
+      {
+        "question": "Which BMP version does the page write?",
+        "answer": "The default one from ImageMagick. The page offers no setting for version, bit depth or compression. When a program insists on the older BMP2 or BMP3 header, run ImageMagick yourself and name that format."
+      },
+      {
+        "question": "Why would I convert a JPEG to BMP?",
+        "answer": "Some software only reads bitmaps, and a BMP stores decoded pixels with no extra JPEG compression. Windows screen captures and system graphics often use BMP. Confirm what your receiving program takes first."
+      },
+      {
+        "question": "Is a .jpeg file different from a .jpg file?",
+        "answer": "No. Both extensions name the same format, so you can choose either here. The page accepts them the same way."
+      },
+      {
+        "question": "Does the BMP keep the photo's EXIF data?",
+        "answer": "No. Only pixels are converted, so camera details, the ICC profile and XMP do not survive. The original JPEG remains the only copy of them."
+      },
+      {
+        "question": "Can I just rename the JPEG to .bmp?",
+        "answer": "That changes the name, not the data, so the file is still a JPEG inside. A strict program that checks the contents may reject it. Convert it to get real BMP data."
+      },
+      {
+        "question": "Can I convert many JPEG files at once?",
+        "answer": "Yes. Pick as many JPEG files as you like. Each becomes its own BMP, made in turn on your device."
+      },
+      {
+        "question": "Can I turn the BMP back into a JPEG?",
+        "answer": "Yes, with the BMP to JPEG converter at /bmp-to-jpeg/. The result is a fresh JPEG compression of the pixels, not the original file."
+      }
+    ]
+  },
+  "jpg-to-ai": {
+    "seo": {
+      "howToHeading": "How to convert JPG to AI",
+      "title": "Convert JPG to AI (Placed Image, Not Traced)",
+      "h1": "JPG to AI Converter",
+      "description": "Convert JPG to AI in your browser. The .ai file is a PDF page that holds your photo as pixels, not traced vector paths. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Wrap a JPG in an Illustrator-style .ai file in your browser, as a placed picture."
+    },
+    "aboutSection": {
+      "title": "JPG and AI",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A photographic raster format commonly stored with lossy compression.",
+        "details": [
+          "Opaque photographic images",
+          "Also uses .jpeg",
+          "Existing compression artifacts remain in decoded pixels"
+        ]
+      },
+      "toFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "Illustrator’s native document format can combine vector artwork and pixel images.",
+        "details": [
+          "Can contain placed photographs",
+          "Native editing depends on document contents",
+          "Saving as AI does not itself trace a photo"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to AI",
+      "points": [
+        "The .ai file is a PDF page the size of your picture, with the picture on it as pixels.",
+        "Nothing is traced, so there are no vector paths to edit.",
+        "The page is sized one point for each pixel of the JPG.",
+        "The picture is stored as PNG inside the PDF.",
+        "Choose several JPG files and each gives its own .ai file."
+      ]
+    },
+    "guide": {
+      "title": "About JPG and AI files",
+      "markdown": "### What is a JPG file?\n\nIn short, JPG (also written JPEG) is a lossy picture format whose standard grew out of 1986 work by the Joint Photographic Experts Group. T.81 from ITU-T (1992) and 10918-1 from ISO/IEC (1994) standardize it. The baseline method cuts the image into 8x8 pixel blocks, transforms each one with a discrete cosine transform and applies Huffman coding.\n\nCameras and scanners commonly produce JPG. It holds 8 bits for each color channel, with no transparency and no layers. The names .jpg and .jpeg are one format, and the patents behind it in the US expired on 27 October 2006. A quality scale of 0 to 100 is common, and equal numbers in different programs can give different results. Compression has already thrown away some detail, and no conversion restores it. People often ask for JPG to AI hoping to get a logo or drawing they can edit. A JPG contains only colored dots and no shapes, so this page gives you the same picture on a PDF page named .ai.\n\n### Programs that open JPG files\n\n**Windows**\n\n- ImageMagick: opens JPG input on the command line.\n\n**Mac**\n\n- GIMP: imports JPEG for editing.\n\n**Web**\n\n- Mozilla Firefox: displays JPG pictures in browser content.\n\n**Mobile**\n\n- Google Chrome and Safari: both display JPG pictures.\n\n### JPG and AI compared\n\n- **Extensions**: .jpg or .jpeg; .ai. The media type of a JPG is image/jpeg.\n- **What each is**: a JPG is one pixel picture. An AI file is Illustrator's native document format and can mix vector objects with pixel images.\n- **Compression**: a JPG is lossy. An AI document keeps what Illustrator puts in it: editable effects, brushes, layers and transparency.\n- **PDF link**: Illustrator can save an AI with a PDF-compatible copy inside. Illustrator 9 changed the format in 2000; earlier files used PostScript.\n- **Opening**: a third-party program that can read the embedded PDF does not always get Illustrator's native objects to edit, and an AI saved without the PDF-compatible copy may not open in it at all.\n- **Uses**: logos, illustrations and print layouts are what designers keep in AI source files, which is why people expect an editable result from this conversion.\n- **Linked images**: Illustrator keeps them external unless Include Linked Files is chosen while saving.\n- **Versions**: opening artwork in an older Illustrator can cause problems, and Adobe advises matching or newer versions.\n- **Metadata**: the page drops the JPG's EXIF, ICC profile and XMP.\n\nThe wrapper is what changes here. The page decodes the JPG, saves the pixels as PNG, places that PNG on a PDF page the size of the picture, one point for each pixel, and downloads the PDF with an .ai name. Saving as AI does not trace a photo.\n\nThat makes the .ai file useful when a workflow insists on the extension, or when you want the picture on a page to scale, position and combine with other artwork. It is the wrong tool when you want to recolor, reshape or enlarge a logo, because the picture is still pixels. For paths you need a tracing tool or the original vector file.\n\nSeveral JPG files are handled one after another, each producing its own .ai download with no ZIP and no merge.\n\n### Other ways to convert JPG to AI\n\n- **ImageMagick (command line):** run `magick input.jpg output.ai`. The formats page for ImageMagick shows AI as both readable and writable. The output is a raster-based file and nothing is traced, so try it in the program that will open it.\n\n### Problems with JPG files\n\n- **Transparency cannot come back**: a JPG stores no alpha, so cut the background out in an editor and save in a format that supports alpha.\n- **A picture frame will not open it**: certain older frames reject progressive JPEG, so export again with progressive mode turned off.\n- **Quality numbers disagree**: a matching number in two editors does not promise matching compression or appearance.\n- **Layers do not exist**: a JPG has no layers, so keep the project file.\n- **Soft text or blocky edges**: compression had already done that to the JPG, so a better source is the only fix.\n- **A logo looks fuzzy when scaled up**: the picture is still pixels, so enlarging it shows the pixels. Redraw the logo, or find the original vector file.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JPG to an AI file?",
+        "answer": "Choose the JPG above. The page puts it on a PDF page and downloads that file with an .ai ending. Open the result in the target program before relying on it."
+      },
+      {
+        "question": "Does this turn my JPG into a vector?",
+        "answer": "No. The picture stays a grid of pixels inside the file, and nothing is traced, so there are no editable paths."
+      },
+      {
+        "question": "Is the result a real Illustrator file?",
+        "answer": "No. It is a PDF page with an .ai extension that holds one picture and none of Illustrator's editable objects. Illustrator's own AI files can include a PDF rendition alongside Illustrator data when saved with the PDF-compatible option."
+      },
+      {
+        "question": "How big is the artboard?",
+        "answer": "The page is as many points wide and tall as the JPG has pixels, one point for each pixel, so the artboard follows the picture's size."
+      },
+      {
+        "question": "What format is the picture inside the .ai file?",
+        "answer": "PNG. The page decodes the JPG, stores the pixels as PNG on the PDF page and writes that PDF with an .ai name."
+      },
+      {
+        "question": "Does the quality of the picture change?",
+        "answer": "The pixels are the decoded JPG's pixels, passed through 8-bit color and stored without further loss. The JPG's own compression marks stay."
+      },
+      {
+        "question": "Can I convert more than one JPG at a time?",
+        "answer": "Yes. Choose several JPG files and each gets its own .ai download, produced one after another and never zipped or merged."
+      },
+      {
+        "question": "What is the difference between a JPG and an AI file?",
+        "answer": "A JPG holds a single grid of pixels. Illustrator's native AI format blends vectors and bitmaps, and carries editable effects, brushes, layers and transparency."
+      },
+      {
+        "question": "Is the JPG's EXIF data kept?",
+        "answer": "No. The page keeps pixels only, so EXIF, ICC and XMP data are not carried across."
+      },
+      {
+        "question": "Can I get an editable logo from a JPG this way?",
+        "answer": "No. A JPG holds pixels only, and saving as AI does not itself trace a photo. For editable shapes, find the original vector file."
+      }
+    ]
+  },
+  "jpg-to-dds": {
+    "seo": {
+      "howToHeading": "How to convert JPG to DDS",
+      "title": "Convert JPG to DDS Texture Online",
+      "h1": "JPG to DDS Converter",
+      "description": "Convert JPG to DDS in your browser. ImageMagick writes the texture with its default settings; the page offers no compression or mipmap options."
+    },
+    "tool": {
+      "subtitle": "Turn a JPG into a DDS texture file in your browser, with default settings."
+    },
+    "aboutSection": {
+      "title": "JPG and DDS",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A photographic raster format commonly stored with lossy compression.",
+        "details": [
+          "Opaque photographic images",
+          "Also uses .jpeg",
+          "Existing compression artifacts remain in decoded pixels"
+        ]
+      },
+      "toFormat": {
+        "name": "DDS",
+        "fullName": "DirectDraw Surface",
+        "description": "A texture container used for Direct3D image resources.",
+        "details": [
+          "Several texture encodings",
+          "Can contain mipmaps",
+          "May require renderer-specific settings"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to DDS",
+      "points": [
+        "ImageMagick writes the DDS with its defaults. The page sets no compression format and no mipmap option.",
+        "A game or engine may document its own compression and mipmap requirements, which this page does not choose.",
+        "The JPG's pixels pass through 8-bit RGBA, and its EXIF, ICC and XMP data are dropped.",
+        "The page does not resize the picture.",
+        "Choose several JPG files and each gives its own DDS."
+      ]
+    },
+    "guide": {
+      "title": "About JPG and DDS files",
+      "markdown": "### What is a JPG file?\n\nJPEG, the lossy picture format spelled JPG or JPEG, grew out of a 1986 start by the Joint Photographic Experts Group, and it was standardized as ITU-T T.81 in 1992 and ISO/IEC 10918-1 in 1994. Baseline coding divides a picture into 8x8 blocks, applies a discrete cosine transform and uses Huffman coding on the result.\n\nDigital cameras and scanners build JPG in, and every major browser shows it. It keeps 8 bits per color channel but no transparency or layers, and both .jpg and .jpeg are the same format. A progressive mode displays a coarse version of the picture first and sharpens it as more data loads. The quality scale runs 0 to 100, and GIMP starts at 85. The compression marks of a JPG remain after any conversion.\n\n### Programs that open JPG files\n\n**Windows**\n\n- ImageMagick: can read a JPG.\n\n**Mac**\n\n- GIMP: imports JPEG into an editor.\n\n**Web**\n\n- Google Chrome: displays JPG pictures in browser content.\n\n**Mobile**\n\n- Safari: displays JPG pictures.\n\n### JPG and DDS compared\n\n- **Extensions and media types**: .jpg and image/jpeg; .dds is Microsoft's DirectDraw Surface texture format.\n- **Compression**: a JPG is always lossy. A DDS can hold uncompressed pixels or compressed texture data.\n- **Mipmaps**: a DDS can include a mipmap chain beside its largest surface. A JPG is a single picture.\n- **Other surfaces**: DDS can hold cube maps and volume textures, and Direct3D 10 and 11 add texture arrays through an extra header.\n- **Transparency**: a JPG has no alpha channel. A DDS pixel format can carry an alpha mask.\n- **Headers**: the DX10 extension is rejected by some DDS readers, while legacy RGB and DXT1 to DXT5 headers work with more tools.\n- **Pixel formats**: formats that the original header structure cannot express can be described by the DX10 header.\n- **Pitch**: incorrect pitch information can corrupt how a reader interprets scan lines.\n- **Validity**: an ordinary DDS needs at least 128 bytes of header, or 148 with the DX10 extension, so a cut-off file is invalid.\n- **Metadata**: a JPG may carry EXIF, ICC and XMP, which the page drops.\n\nWhat changes in this conversion is the container. The browser decodes the JPG to 8-bit pixels, and ImageMagick writes them out as a DDS with its default settings. The page does not choose a compression format, build mipmaps or resize. A DDS can hold either uncompressed pixels or compressed texture data, so two valid DDS files from the same picture can differ widely in size and in how an engine reads them.\n\nThat is fine for a quick test or for a tool that reads a plain DDS and does the rest itself. It is not enough when a game or engine documents exact requirements. For those, texconv and GIMP let you set the format and mipmaps. Test one converted file in your engine before you convert a whole set.\n\nSelect several JPG files and the page processes them one after another, with each result downloaded as its own DDS and no ZIP.\n\n### Other ways to convert JPG to DDS\n\n- **texconv (DirectXTex):** Microsoft's example is `texconv -pow2 -f BC1_UNORM cat.jpg`. It fits the texture to power-of-two sizes through -pow2, and by default it generates all mipmaps; add `-m 1` to remove them. The default output type is DDS.\n- **GIMP:** load the JPG, pick File > Export As, choose DDS, then set Compression and Mipmaps in the export dialog. The DDS exporter is built into GIMP from 2.10.10 on.\n- **ImageMagick (command line):** run `magick input.jpg output.dds`. ImageMagick's formats page lists DDS as readable and writable, with compression defines such as dxt1 and dxt5 and mipmaps; check the result against your engine.\n\n### Problems with JPG files\n\n- **No transparency to use**: a JPG stores no alpha, so create the alpha channel in an editor before you export a texture.\n- **Progressive files trip some viewers**: some old photo frames cannot show progressive JPEG, so turn progressive mode off when you export.\n- **Quality settings are not comparable**: editors that share a quality number can still differ in compression and appearance.\n- **Layers are not stored**: a JPG keeps no editable layer stack, so keep your layered project file.\n- **Soft or blocky color edges**: JPG compression damaged them before the conversion, and a bigger or cleaner source helps.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JPG to DDS?",
+        "answer": "Choose the JPG above. The page decodes it in your browser and ImageMagick turns it into a DDS texture that downloads when it is done."
+      },
+      {
+        "question": "Which DDS compression does this use?",
+        "answer": "ImageMagick's default. The page has no control for BC1, BC3, BC7 or the older DXT names. If your engine needs one, use texconv, GIMP or ImageMagick with its DDS options."
+      },
+      {
+        "question": "Does the DDS include mipmaps?",
+        "answer": "The page does not ask for them. A DDS can hold a mipmap chain, and a tool such as texconv or GIMP lets you choose whether to generate one."
+      },
+      {
+        "question": "Does the page resize to power-of-two dimensions?",
+        "answer": "No, the page does not resize. If you need power-of-two sizes, texconv has a -pow2 option that fits each texture to a power-of-two width and height."
+      },
+      {
+        "question": "Which tools let me choose DDS compression and mipmaps?",
+        "answer": "texconv sets the DXGI format with -f and the mipmap count with -m. GIMP's DDS export dialog has Compression and Mipmaps settings. ImageMagick documents DXT compression and mipmap defines for DDS."
+      },
+      {
+        "question": "Why would I turn a JPG into a DDS?",
+        "answer": "DDS is Microsoft's DirectDraw Surface texture-file format. It can bundle a mipmap chain with the largest surface and store uncompressed or compressed texture data, while a JPG is a single picture."
+      },
+      {
+        "question": "Does converting JPG to DDS improve the image?",
+        "answer": "No. The DDS is made from the decoded JPG pixels, with the JPG's compression marks included."
+      },
+      {
+        "question": "Can a DDS be made from a JPG with transparency?",
+        "answer": "A JPG stores no alpha, so nothing transparent comes across. To get transparency in a texture, add it in an editor and export from there."
+      },
+      {
+        "question": "Is the DDS readable by every game?",
+        "answer": "Not always. Some readers reject the DX10 extension, while the older headers for plain RGB and the DXT family are accepted by more tools. See what your game documents."
+      },
+      {
+        "question": "Can I convert a DDS back to a JPG?",
+        "answer": "Yes, with the DDS to JPG converter at /dds-to-jpg/. The result is a JPG made from the decoded texture."
+      }
+    ]
+  },
+  "m4a-to-m4r": {
+    "seo": {
+      "howToHeading": "How to convert M4A to M4R",
+      "title": "Convert M4A to M4R for an iPhone Ringtone",
+      "h1": "M4A to M4R Converter",
+      "description": "Convert M4A to M4R in your browser. The whole track is re-encoded as AAC at 192 kbps, so trim it to 30 seconds first for a ringtone. Free."
+    },
+    "tool": {
+      "subtitle": "Turn an M4A song or recording into an M4R ringtone file, right in your browser."
+    },
+    "aboutSection": {
+      "title": "M4A and M4R",
+      "fromFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-focused MPEG-4-family file commonly containing AAC or lossless ALAC.",
+        "details": [
+          "Audio container",
+          "Codec depends on the file",
+          "Not every recording is a ready-made ringtone"
+        ]
+      },
+      "toFormat": {
+        "name": "M4R",
+        "fullName": "iPhone ringtone",
+        "description": "An MPEG-4-family ringtone file associated with iPhone audio.",
+        "details": [
+          "Ringtone-oriented extension",
+          "Contains encoded sound",
+          "File creation and phone installation are separate"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4A to M4R",
+      "points": [
+        "The whole audio track is re-encoded as AAC at 192 kbps. The page has no trim control.",
+        "Apple's GarageBand ringtone export is limited to 30 seconds, so cut a short excerpt first.",
+        "Only the audio is kept; any video or cover art is not.",
+        "A lossless ALAC source becomes a lossy AAC file.",
+        "The page does not put the ringtone on your phone."
+      ]
+    },
+    "guide": {
+      "title": "About M4A and M4R files",
+      "markdown": "### What is an M4A file?\n\nApple adopted the M4A extension, which MPEG-4 audio-only files use, for unprotected music. Container and codec are separate things: most M4A files hold AAC audio, which MPEG-4 Part 3 defines, yet an M4A can also contain lossless ALAC, so two files with one extension can have very different histories. MPEG-4 keeps the container structure apart from the encoding of its tracks, and files can carry track metadata beside the sound.\n\nThe media type is audio/mp4. AAC is lossy, and its aim was to outdo MP3 on sound quality at a given bitrate. It tops out at 512 kbps, with sample rates between 8 and 96 kHz. iTunes songs were sold as AAC, and every version of Android plays AAC held in .m4a files. Every major browser plays AAC audio in an MP4 container.\n\n### Programs that open M4A files\n\n**Windows**\n\n- Audacity: it imports M4A once its optional FFmpeg library is installed; protected files are excluded.\n\n**Mac**\n\n- FFplay: FFmpeg's player, which comes with FFmpeg and is run from the command line.\n\n**Web**\n\n- Firefox and Chrome: play M4A directly, though AAC availability can depend on system codecs.\n\n**Mobile**\n\n- VLC for Android: opens M4A.\n- mpv for Android: opens M4A too.\n\n### M4A and M4R compared\n\n- **Extensions**: .m4a and .m4r.\n- **Purpose**: the WavePad manual from NCH names M4R as the iPhone ringtone type, and MediaInfo files .m4r in the same MPEG-4 family as M4A.\n- **Container**: both are MPEG-4 family files, so M4R is mainly a label for ringtone use.\n- **Codec**: M4A can hold AAC or lossless ALAC. The M4R made here holds AAC.\n- **Length**: Apple's GarageBand ringtone export limits the selected sound to 30 seconds. This page does not cut anything.\n- **Metadata**: FFmpeg copies the M4A's global tags into the M4R where it has fields for them.\n\nWhat changes in this conversion is the encoding. FFmpeg decodes the M4A, drops any video stream, encodes the sound with its AAC encoder at 192 kbps and writes it in the iPod-style MP4 container with an .m4r name. An AAC source goes through a second lossy encode, and a lossless ALAC source becomes lossy.\n\nThe converter also leaves out video, including cover art. That is why the order of work matters. Trim the excerpt first, in an editor or in GarageBand, then convert the short clip. Converting a full song gives you a full-length M4R. Listen to the finished file before you rely on it, and remember that making the file does not install or select the tone on a phone; that step happens on the phone, for example through GarageBand. The M4R is a derivative made for one job; the M4A stays your listening copy.\n\nChoosing several M4A files queues them: each converts after the one before and downloads as an M4R of its own, with no ZIP.\n\n### Other ways to convert M4A to M4R\n\n- **FFmpeg (command line):** run `ffmpeg -i input.m4a -f ipod -b:a 192k -c:a aac output.m4r`. It re-encodes the audio. The -ss and -t options set where to start and how long to write if you need only a short excerpt.\n- **NCH Switch:** press Add File(s), set the destination through Save to Folder, Output Folder or Browse, pick M4R in the Output Format drop-down and press Convert. NCH lists Windows PC, Mac OS X and Android.\n- **GarageBand (iPhone):** import the audio from Files, drag it to the far left of the Tracks view and trim it, then open My Songs, tap Share and choose Ringtone. Apple limits ringtones to 30 seconds, and protected or undownloaded songs are dimmed and unavailable.\n\n### Problems with M4A files\n\n- **Audacity cannot import the file**: install its optional FFmpeg library first. Audacity also cannot import DRM-protected recordings through that route.\n- **The page refuses the file with a FairPlay message**: protected M4P purchases cannot be converted here.\n- **\"FFmpeg failed with exit code\"**: the file may hold no audio track.\n- **Importing many recordings into one Audacity window replaces the project tags**: Audacity keeps the last file's tags.\n- **The M4R is far longer than a ringtone**: the page has no trim control and converts the whole recording. Trim the clip before converting.\n- **A song in GarageBand is dimmed**: it is protected or has not been downloaded to the iPhone yet.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4A to M4R?",
+        "answer": "Choose the M4A above. Your browser runs FFmpeg to re-encode the audio as AAC inside an M4R file, and the download starts when it finishes. Nothing leaves your device."
+      },
+      {
+        "question": "Is M4R just a renamed M4A?",
+        "answer": "Not quite. Both are MPEG-4 audio files, but M4R marks a ringtone. This page re-encodes the sound as AAC at 192 kbps rather than only changing the name."
+      },
+      {
+        "question": "How long can an iPhone ringtone be?",
+        "answer": "Apple's GarageBand export for ringtones is limited to 30 seconds. If you export something longer, GarageBand offers to shorten it before it finishes the ringtone."
+      },
+      {
+        "question": "Does this page cut the song to 30 seconds?",
+        "answer": "No. It converts the whole file. Trim the passage you want in an editor such as Audacity first, then convert the short clip."
+      },
+      {
+        "question": "How do I make a ringtone on the iPhone itself?",
+        "answer": "GarageBand for iPhone can do it: bring the audio in from Files, put it at the very start of the Tracks view and trim to the part you want, then use My Songs, Share and Ringtone. Songs that are protected or not downloaded appear dimmed."
+      },
+      {
+        "question": "Why won't my M4A convert?",
+        "answer": "A file protected with FairPlay, usually an old iTunes purchase in M4P form, is refused with its own message. An FFmpeg failure with an exit code on the page can mean the file has no audio track."
+      },
+      {
+        "question": "Does converting lower the sound quality?",
+        "answer": "Yes. AAC is lossy, so an AAC source is encoded a second time, and a lossless ALAC source becomes a lossy file."
+      },
+      {
+        "question": "Which programs can open an M4A?",
+        "answer": "Audacity opens M4A once you install its optional FFmpeg library, and FFplay plays it. Firefox and Chrome play it in the browser, using system codecs for AAC where needed. Android plays AAC in .m4a files, and VLC and mpv have Android versions."
+      },
+      {
+        "question": "Is the song's title and artist kept?",
+        "answer": "Usually. FFmpeg copies the M4A's global tags, like title and artist, into the M4R wherever the M4R has a field for them, and the page itself neither adds nor strips any."
+      },
+      {
+        "question": "Is my audio uploaded anywhere?",
+        "answer": "No. FFmpeg runs inside your browser tab, so the audio and the M4R both stay on your device."
+      }
+    ]
+  },
+  "mp3-to-wma": {
+    "seo": {
+      "howToHeading": "How to convert MP3 to WMA",
+      "title": "Convert MP3 to WMA, Windows Media Audio",
+      "h1": "MP3 to WMA Converter",
+      "description": "Convert MP3 to WMA in your browser. The audio is re-encoded as lossy WMA at 192 kbps, so keep the MP3 as your master. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an MP3 into a WMA file for Windows Media workflows, right in your browser."
+    },
+    "aboutSection": {
+      "title": "MP3 and WMA",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio encoding used for listening and audio distribution.",
+        "details": [
+          "Compressed audio frames",
+          "Not a Windows Media codec",
+          "Re-encoding cannot restore discarded sound"
+        ]
+      },
+      "toFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "A Microsoft audio codec family normally stored in ASF.",
+        "details": [
+          "Several codec variants",
+          "Ordinary lossy WMA differs from WMA Lossless",
+          "Playback support can vary"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to WMA",
+      "points": [
+        "The audio is re-encoded as lossy WMA (version 2) at 192 kbps, not as WMA Lossless.",
+        "Converting an MP3 adds a second lossy step, and a higher bitrate cannot bring back detail already removed.",
+        "The WMA can be larger than the MP3 if the MP3 had a low bitrate.",
+        "Tags such as title and artist are copied into the WMA where it has fields for them.",
+        "Choose several MP3 files and each gives its own WMA."
+      ]
+    },
+    "guide": {
+      "title": "About MP3 and WMA files",
+      "markdown": "### What is an MP3 file?\n\nLayer III of MPEG-1 Audio, known as MP3, was standardized in 1993 as ISO/IEC 11172-3 and widened by ISO/IEC 13818-3 two years later. The format is lossy, using a model of human hearing to discard sound listeners are unlikely to notice. Fraunhofer IIS led its development from the late 1980s, working with other members of the MPEG audio group.\nThe media type is audio/mpeg, and every major browser plays MP3. Choose from 32, 44.1 or 48 kHz sampling, with bitrates from 32 to 320 kbps. ID3 structures inside the file hold titles and other tags. At 128 kbps the file is around one eleventh of the CD's size for the same audio. The patent licensing program ended in 2017.\nBecause the compression is lossy, an MP3 has already lost information that no converter can bring back. That matters when you move music into another compressed format such as WMA. Before you convert a library, check that the destination really needs WMA, because it may already play MP3. A new extension does not make a better copy of the performance, and the MP3s are worth keeping for any later migration.\n### Programs that open MP3 files\n**Windows**\n- Audacity: brings an MP3 into an editable project.\n**Mac**\n- FFplay: FFmpeg's own player, which plays MP3 files through FFmpeg's libraries.\n**Web**\n- Firefox and Chrome: play MP3 directly.\n**Mobile**\n- VLC for Android and mpv for Android: both play MP3.\n### MP3 and WMA compared\n- **Extensions**: .mp3 with the media type audio/mpeg; .wma, commonly audio/x-ms-wma.\n- **Codec family**: MP3 is MPEG Audio Layer III. WMA is Microsoft's family, with standard, Professional, Lossless and Voice variants.\n- **Container**: MP3 is a stream of audio frames with ID3 tags. WMA audio files use Microsoft's ASF container, and the .wma extension marks audio-only ASF content.\n- **Compression**: both are lossy by default. WMA Lossless exists, but this page does not use it.\n- **Bitrate**: MP3 runs from 32 to 320 kbps. WMA 9 supports variable bit rate encoding. This page writes WMA at 192 kbps.\n- **Tags**: an MP3 keeps its tags as ID3, and FFmpeg copies the title and artist across.\n- **Where it plays**: all major browsers play MP3; WMA is aimed at delivery workflows and occasionally intermediate storage.\nThe change that matters here is the codec. FFmpeg decodes the MP3 and encodes the sound with its WMA version 2 encoder at 192 kbps, then writes an ASF file with a .wma name. Any video stream is ignored.\nOutput size is not guaranteed to fall. A low-bitrate MP3 can become a larger file at 192 kbps WMA, because size follows duration and bitrate more than the extension. Compare the two files before you replace anything. VLC lists ASF/WMA input, so it can help you check the finished file.\nA WMA made from an MP3 is a copy of a copy. If you have the original recording, convert from that. If you only have the MP3, keep it too, because it is the better source for any later conversion.\n### Other ways to convert MP3 to WMA\n- **FFmpeg (command line):** run `ffmpeg -i input.mp3 -b:a 192k -c:a wmav2 output.wma`. This writes lossy WMA, not WMA Lossless.\n- **Audacity:** with the MP3 open, use File > Export Audio and pick WMA (version2) Files (FFmpeg) as the format. Audacity needs the separate FFmpeg library installed, and the export options offer Mono, Stereo or Custom mapping.\n- **NCH Switch:** use Add File(s), choose the output location from Save to Folder, Output Folder or Browse, select WMA from Output Format and press Convert.\n### Problems with MP3 files\n- **Importing many files into one Audacity project replaces earlier tags**: the project keeps tags from the latest file.\n- **The WMA sounds rough**: the MP3 was already compressed. Convert from an original recording.\n- **Editing then exporting MP3 again adds another lossy stage**: export to a lossless format while you work.\n- **Tags are missing or wrong**: FFmpeg copies the MP3's global tags into the WMA where it has fields for them, so a tag blank in the MP3 stays blank. Edit them in your music library afterward.\n\n- **Audacity refuses the file**: a damaged MP3 can be rejected on import although a different player copes with it.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP3 to WMA?",
+        "answer": "Choose the MP3 above. The page re-encodes it as WMA at 192 kbps with FFmpeg and offers the file for download, all inside your browser."
+      },
+      {
+        "question": "Can I just rename the MP3 to WMA?",
+        "answer": "No. WMA is a different codec family in Microsoft's ASF container, so the sound has to be decoded and encoded again."
+      },
+      {
+        "question": "Will the WMA sound better than the MP3?",
+        "answer": "No. The MP3 already lost detail when it was made, and WMA encoding adds a second lossy step. A higher bitrate cannot recreate what was removed. For the best result, convert from an original recording instead."
+      },
+      {
+        "question": "Is this WMA Lossless?",
+        "answer": "No. The page uses a lossy WMA encoder (WMA version 2) at 192 kbps. WMA Lossless is a separate variant, so this output is not an archival master."
+      },
+      {
+        "question": "Will the WMA be smaller than the MP3?",
+        "answer": "Not always. A WMA written at 192 kbps from a lower-bitrate MP3 can be larger than the MP3, because duration and bitrate set the size, not the extension."
+      },
+      {
+        "question": "Why does my device still not play the WMA?",
+        "answer": "WMA has standard, Professional, Lossless and Voice variants, and a device may support one but not another. The extension doesn't say which one a file uses. Check your device's supported formats."
+      },
+      {
+        "question": "Can I convert MP3 to WMA in Audacity?",
+        "answer": "Yes, if you install the optional FFmpeg library, which Audacity does not ship. Use File > Export Audio and choose WMA (version2) Files (FFmpeg) from the Format drop-down."
+      },
+      {
+        "question": "Are the song tags kept?",
+        "answer": "Usually. FFmpeg carries the MP3's global tags, like title and artist, across to the WMA where it has matching fields. The page does not add or remove tags itself."
+      },
+      {
+        "question": "Why would I convert MP3 to WMA?",
+        "answer": "WMA serves delivery workflows and sometimes intermediate audio storage, and it supports variable bit rate encoding from WMA 9. If your destination accepts MP3, there is usually no reason to convert."
+      },
+      {
+        "question": "Can I convert many MP3 files at once?",
+        "answer": "Yes. Choose several files and the page converts them one after another, giving each its own WMA download. Your browser may ask you to allow several downloads, since nothing is bundled."
+      }
+    ]
+  },
+  "m2ts-to-mp4": {
+    "seo": {
+      "howToHeading": "How to convert M2TS to MP4",
+      "title": "Convert M2TS to MP4 Online, Up to 1920 px",
+      "h1": "M2TS to MP4 Converter",
+      "description": "Convert M2TS to MP4 in your browser. Camcorder and Blu-ray video is re-encoded as H.264 with AAC sound, up to 1920 px and 30 fps. Free."
+    },
+    "tool": {
+      "subtitle": "Turn an M2TS camcorder or Blu-ray video file into an H.264 MP4, right in your browser."
+    },
+    "aboutSection": {
+      "title": "M2TS and MP4",
+      "fromFormat": {
+        "name": "M2TS",
+        "fullName": "Blu-ray MPEG transport stream",
+        "description": "A transport-based container used for disc and camera recordings.",
+        "details": [
+          "Can multiplex video and audio",
+          "Related files can organize clips",
+          "The container does not select a single video codec"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A media container that can hold encoded video alongside sound and other tracks.",
+        "details": [
+          "Container rather than codec",
+          "Multiple codec combinations",
+          "Track support depends on the receiving software"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M2TS to MP4",
+      "points": [
+        "The video is re-encoded as H.264 with AAC sound at 96 kbps, not just moved into a new container.",
+        "The longer side stops at 1920 pixels and the frame rate at 30 fps.",
+        "Width and height are rounded down to even numbers, so an odd size loses a pixel.",
+        "Frames marked as interlaced are deinterlaced.",
+        "Only the one stream file you choose is converted, not the disc or camera folder around it."
+      ]
+    },
+    "guide": {
+      "title": "About M2TS and MP4 files",
+      "markdown": "### What is an M2TS file?\n\nM2TS is the stream file of Blu-ray discs and AVCHD camcorders. It packages video, audio and additional streams in a modified MPEG-2 transport stream: each source packet is a 188-byte transport packet with four extra bytes. Its transport structure modifies MPEG-2 TS rather than prescribing one video codec. Blu-ray allows MPEG-2, AVC and VC-1 pictures in this wrapper, so the extension does not tell you which video codec is inside. Sony and Panasonic announced AVCHD in 2006.\n\nAn M2TS usually turns up on a camera card or in a copied disc folder. A stream copied alone leaves behind its clip-information files and the disc organization, so archive the whole folder and treat the MP4 as a viewing copy. The video/mp2t media type is shared with other transport-stream formats, so it does not identify M2TS by itself.\n\n### Programs that open M2TS files\n\n**Windows**\n\n- FFmpeg: reads MPEG transport streams; installed decoder support still matters.\n\n**Mac**\n\n- FFplay: FFmpeg's free playback utility for the command line.\n\n**Linux**\n\n- HandBrake: lists M2TS among the common video file types it reads from discs and cameras, and TS, MTS and M2TS under broadcast TV recordings.\n\n### M2TS and MP4 compared\n\n- **Extensions and media types**: .m2ts, whose transport-stream type video/mp2t is shared with other formats; .mp4 and video/mp4.\n- **Container**: M2TS is built from transport-stream packets. MP4 is an ISO base media file, ISO/IEC 14496-14, organized as tracks.\n- **Video codec**: M2TS carries MPEG-2, AVC or VC-1. The MP4 made here carries H.264.\n- **Audio**: the MP4 made here carries AAC at 96 kbps.\n- **Protection**: M2TS adds no encryption, but commercial Blu-ray content often has AACS protection.\n- **Output**: each M2TS file gives its own MP4 download, and only the stream file you choose is converted.\n\nThe conversion changes both wrapper and pictures. FFmpeg decodes the stream and re-encodes it with libx264, using the ultrafast preset, CRF 32 and the faststart flag. Video is held to 1920 pixels on its longer side and to 30 frames per second, and sides round down to even numbers, so an odd size loses a pixel. Frames marked as interlaced are deinterlaced.\n\nA smaller frame is never scaled up and a slower frame rate is never raised. A faster source has frames dropped and keeps its length, so it is not slowed down.\n\nThe result is not a copy of the original quality: a fine trade for sharing and a poor one for archiving, so keep the M2TS if the footage matters. Several M2TS files are converted in sequence, and each downloads as a separate MP4 without a ZIP. The disc or camera folder around the file is not converted, only the stream you pick.\n\n### Other ways to convert M2TS to MP4\n\n- **FFmpeg (command line):** run `ffmpeg -i input.m2ts -c:v libx264 -c:a aac output.mp4`. This re-encodes. With `-c copy` instead, a stream the MP4 cannot hold may be dropped or carried as a data stream without any error.\n- **HandBrake:** choose Open Source or drag the M2TS onto the main window, select a preset (its quick start suggests Fast 1080p30 as a general choice), set the destination with Save As and Browse, then click Start. HandBrake creates MKV and MP4 files. HandBrake's documentation warns that AVCHD playlists get incomplete support and that single stream files may open unreliably when one stream spans several files.\n\n### Problems with M2TS files\n\n- **The file will not play**: the extension does not say which video decoder the recording needs, so the player may lack the one inside, as Blu-ray permits three different picture codecs here. Convert it, or try FFplay, which plays through FFmpeg's libraries.\n- **Only part of the recording converted**: a single video stream can span several files, and converting one file gives just that part.\n- **A disc file will not convert or shows no picture**: commercial Blu-ray content is often AACS protected, and M2TS itself supplies no way around that.\n- **HandBrake opens only part of a camera folder**: AVCHD and AVCHD Lite playlists are not fully supported, though it may open individual video files from the Stream folder inside the BDMV folder.\n- **Clips are missing their structure**: a stream copied alone omits its clip-information files and disc organization, so keep the whole folder.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M2TS to MP4?",
+        "answer": "Choose the M2TS file above. FFmpeg, running in your browser, re-encodes it as H.264 video with AAC sound and the MP4 downloads when it is ready. The file is not uploaded."
+      },
+      {
+        "question": "Why won't my M2TS file play?",
+        "answer": "A player needs a decoder for the video inside the wrapper, and the .m2ts name does not say which video codec that is. AVCHD cameras and Blu-ray discs both use this wrapper. This page re-encodes the video as H.264 with AAC sound in an MP4."
+      },
+      {
+        "question": "Will the MP4 look as good as the M2TS?",
+        "answer": "No. The page re-encodes with H.264 at CRF 32 and AAC audio at 96 kbps, so it is no copy of the source quality and some picture detail is lost. The M2TS remains the best-quality copy."
+      },
+      {
+        "question": "What resolution and frame rate does the MP4 have?",
+        "answer": "The page keeps your original size and frame rate while they stay inside a 1920-pixel long side and 30 fps. Bigger or faster video is reduced to those limits, and each side is rounded down to an even number."
+      },
+      {
+        "question": "Is the video deinterlaced?",
+        "answer": "Yes, frames the file marks as interlaced are deinterlaced. That helps with camcorder and TV footage."
+      },
+      {
+        "question": "Can I change M2TS to MP4 without re-encoding?",
+        "answer": "It always re-encodes here. With FFmpeg's -c copy option the streams are copied instead, but any stream the MP4 cannot hold can end up dropped, or kept as data, with no error shown, so check what you get."
+      },
+      {
+        "question": "Can I convert a Blu-ray disc with this?",
+        "answer": "Only a single M2TS stream file, and only if it is not copy-protected. M2TS has no encryption of its own, but commercial discs often use AACS protection. The page does not read playlists or the disc folder."
+      },
+      {
+        "question": "Why is my camera recording split into several M2TS files?",
+        "answer": "Converting one part gives you just that part. HandBrake's documentation says that opening individual AVCHD stream files is not always reliable, for example where a single video stream spans multiple files."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "The page sets no cap. FFmpeg runs single-threaded inside the browser, and a long recording takes as long as your device needs."
+      },
+      {
+        "question": "Is my video uploaded anywhere?",
+        "answer": "No. The recording is processed by FFmpeg inside your browser tab and never leaves your device."
+      }
+    ]
+  },
+  "mp4-to-3gp": {
+    "seo": {
+      "title": "Convert MP4 to 3GP for Old Phones",
+      "h1": "MP4 to 3GP Converter",
+      "description": "Convert MP4 to 3GP in your browser. The video becomes 352 by 288 H.263 at 12 fps with mono 8 kHz sound. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Turn an MP4 into a low-resolution 3GP video, right in your browser."
+    },
+    "aboutSection": {
+      "title": "MP4 and 3GP",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A media container that can hold encoded video alongside sound and other tracks.",
+        "details": [
+          "Container rather than codec",
+          "Multiple codec combinations",
+          "Track support depends on the receiving software"
+        ]
+      },
+      "toFormat": {
+        "name": "3GP",
+        "fullName": "3GPP multimedia",
+        "description": "A mobile-oriented container based on the ISO media file family.",
+        "details": [
+          "Can carry video and sound",
+          "Container and codecs are separate",
+          "Device requirements differ"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to 3GP",
+      "points": [
+        "The 3GP is low quality on purpose: 352 by 288 pixels, 12 frames per second.",
+        "Video is H.263 at 200 kbps. Sound is mono AAC at 24 kbps and 8 kHz, so stereo is lost.",
+        "A widescreen video is shrunk to fit and padded with borders, not stretched.",
+        "A 3GP can hold other codecs and sizes than these fixed settings, so the phone's own list decides what it plays.",
+        "Keep the MP4 if you want higher quality later."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 and 3GP files",
+      "markdown": "### What is an MP4 file?\n\nISO/IEC 14496-14 defines the MP4 container, which stores video, audio, subtitles and metadata as tracks. H.264 video with AAC audio is the most common combination, but the extension does not name a codec. Two MP4 files can behave differently on the same device, because one may carry a combination an old phone accepts and another a codec it does not.\n\nA container that opens is no proof of decoding: a player or editor can accept an MP4 and still show no picture or no sound, so look at the codecs inside before you blame the file.\n\n### Programs that open MP4 files\n\n**Windows**\n\n- mpv: a desktop player with audio and subtitle stream switching.\n\n**Mac**\n\n- FFplay: the player that ships with FFmpeg, which plays MP4 through FFmpeg's MP4 demuxer.\n\n**Web**\n\n- Firefox: shows supported media itself; whether AAC and H.264 play can hinge on system codecs.\n- Chrome: plays the audio and video combinations in MP4 that it supports.\n\n**Mobile**\n\n- VLC for Android and iOS: plays local and network files in most movie formats.\n\n### MP4 and 3GP compared\n\n- **Extensions and media types**: .mp4 with video/mp4; .3gp with video/3gpp, or audio/3gpp for sound only.\n- **Container family**: 3GP is a specialization of the ISO base media file format from the 3GPP mobile standards, and MP4 is built on the same family. A file-type box names a 3GP profile.\n- **Purpose**: 3GP supports mobile messaging, download and streaming. MP4 targets general use.\n- **Video codec**: MP4 usually holds H.264. The 3GP standard registers H.263, MPEG-4 Visual, AVC and HEVC. This page writes H.263.\n- **Audio codec**: a 3GP can hold AMR variants or AAC. This page writes AAC.\n- **Contents**: video, speech, other sound and timed text can all live together in a 3GP presentation, while a sound-only 3GP has no video track to recover.\n- **Parsing**: parsers that follow the specification may skip boxes or codecs it does not cover, and the extension never says which permitted codec a 3GP recording holds.\n\nWhat changes in this conversion is the quality, not just the wrapper. FFmpeg corrects the source's pixel aspect ratio, scales the video to fit inside 352 by 288 and pads the rest of the frame, so a widescreen video gets borders instead of being stretched. The video is H.263 at 12 frames per second and 200 kbps. The sound is AAC at 24 kbps, 8 kHz and one channel.\n\nThose are big reductions from a typical modern MP4: fine detail softens, motion looks choppier and stereo is lost. The settings belong to this page rather than to every 3GP the standard allows. A particular phone may want a different resolution or audio type, so test on the real device before sending a batch.\n\nIf a service or an old handset tells you which resolution and codec it wants, trust that over these defaults and use a desktop tool where you can set them. Convert a short clip first and play it on the actual phone before you prepare a whole batch.\n\n### Other ways to convert MP4 to 3GP\n\n- **FFmpeg (command line):** run `ffmpeg -i input.mp4 -c:v h263 -s 352x288 -r 12 -c:a aac output.3gp`. The `-s` option forces the size and can distort a widescreen picture.\n- **NCH Prism:** choose Add File(s), choose where the file goes (Save to Folder, Output Folder or Browse), set Output Format to 3GP and click Convert.\n- **MP4Box:** run `MP4Box -add input.mp4 -new output.3gp`. A .3gp name switches on 3GPP rewriting, and some tracks may be removed. It repackages and does not transcode.\n\n### Problems with MP4 files\n\n- **The player opens the MP4 but shows no picture or no sound**: container support does not guarantee a decoder for the codec inside. Play it in a player that has the decoder.\n- **An audio editor finds nothing to import**: an MP4 with no audio has no audio track to hand over.\n- **A cut-short recording will not play**: a recording that stopped early can leave an unfinished MP4, since packet metadata normally stays together in one place. A damaged MP4 may still convert here, to a shorter 3GP.\n- **One phone plays the MP4 and another does not**: the extension does not name the codecs, and devices accept different combinations.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to 3GP?",
+        "answer": "Choose the MP4 above. FFmpeg, running in your browser, scales the video to fit 352 by 288, encodes it with H.263 and writes a 3GP, which downloads when it is ready. Nothing is uploaded."
+      },
+      {
+        "question": "Why does the 3GP look so much softer than my MP4?",
+        "answer": "The settings are tiny on purpose: 352 by 288 pixels, 12 frames per second, 200 kbps video and 24 kbps mono audio. Expect soft detail and choppier motion. A short, small MP4 can even come out larger as a 3GP, because the video bitrate is fixed."
+      },
+      {
+        "question": "Is the video stretched to 4:3?",
+        "answer": "No. The picture is shrunk to fit inside 352 by 288 with its shape kept, and the rest of the frame is padded. A widescreen recording gets bars at the top and bottom."
+      },
+      {
+        "question": "Why is the sound mono and thin?",
+        "answer": "Sound is encoded as AAC with a single channel at 24 kbps and a rate of 8 kHz. That keeps the audio data small, but stereo separation is gone."
+      },
+      {
+        "question": "Will every old phone play the 3GP?",
+        "answer": "Not necessarily. 3GP allows several video and audio codecs, and a handset may support only some. This page writes H.263 video with AAC sound, so check which codecs your phone lists."
+      },
+      {
+        "question": "What is a 3GP file?",
+        "answer": "3GP is the 3GPP mobile-media format, built for messaging, downloads and streaming on phones. It can hold video, speech and other sound, and timed text, and it uses the media type video/3gpp."
+      },
+      {
+        "question": "Can modern phones play 3GP?",
+        "answer": "Many can, but it depends on the phone and on the codecs inside the file. VLC and FFmpeg read 3GP on Windows, Mac and Linux. Use 3GP when a device or service asks for it."
+      },
+      {
+        "question": "Can I make the 3GP higher quality?",
+        "answer": "Not on this page, since the settings are fixed. A desktop tool such as FFmpeg lets you pick a resolution, bitrate and codec with command options."
+      },
+      {
+        "question": "Can I convert an MP4 to 3GP without re-encoding?",
+        "answer": "Not with this page: it re-encodes every file. MP4Box can write a .3gp with -add and -new, but the .3gp name switches on 3GPP rewriting, which may remove some tracks."
+      },
+      {
+        "question": "Is my video uploaded anywhere?",
+        "answer": "No. FFmpeg processes the video inside your browser tab, and neither it nor the 3GP is sent anywhere."
+      }
+    ]
+  },
+  "mp4-to-hevc": {
+    "seo": {
+      "title": "Convert MP4 to HEVC (Raw H.265, No Audio)",
+      "h1": "MP4 to HEVC Converter",
+      "description": "Convert MP4 to HEVC in your browser. Your browser's own encoder writes a raw H.265 stream with no audio. Keep the MP4 for sound. Free."
+    },
+    "tool": {
+      "subtitle": "Encode an MP4's video as a raw HEVC stream with your browser's own H.265 encoder."
+    },
+    "aboutSection": {
+      "title": "MP4 and HEVC",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A media container that can hold encoded video alongside sound and other tracks.",
+        "details": [
+          "Container rather than codec",
+          "Multiple codec combinations",
+          "Track support depends on the receiving software"
+        ]
+      },
+      "toFormat": {
+        "name": "HEVC",
+        "fullName": "High Efficiency Video Coding (H.265)",
+        "description": "The video coding standard also known as H.265.",
+        "details": [
+          "Video codec",
+          "Raw streams do not carry audio",
+          "Distinct from an MP4 container"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to HEVC",
+      "points": [
+        "The .hevc file is a raw H.265 video stream. It has no audio.",
+        "Your browser's own HEVC encoder does the work, so it needs a browser and device that offer one. Without it the conversion stops with a message.",
+        "The video is first reduced to at most 1920 pixels on the longer side and 30 fps.",
+        "Frames marked as interlaced are deinterlaced first.",
+        "A raw stream is not a movie file: it has no track structure, so a player may ask for a container."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 and HEVC files",
+      "markdown": "### What is an MP4 file?\n\nMP4 follows ISO/IEC 14496-14 and keeps video, audio, subtitles and metadata in separate tracks. The video inside may be H.264, H.265 or another codec, and the sound is usually a separate track. Container support alone does not mean a player has a decoder for what is inside, and an MP4 whose writing was interrupted can be left unplayable.\n\nAn MP4 file plays on nearly every device, which makes it the usual source for a video you want to re-encode. The extension names the wrapper and never the codec, so an MP4 can already hold H.265 without any sign of it in its name.\n\n### Programs that open MP4 files\n\n**Windows**\n\n- FFplay: ships with FFmpeg and plays MP4 through FFmpeg's MP4 demuxer.\n\n**Mac**\n\n- Adobe Premiere: can import MP4 once the decoder it needs is available.\n\n**Linux**\n\n- mpv: a desktop player that lets you switch audio and subtitle streams.\n\n**Web**\n\n- Firefox: opens MP4 files directly; AAC and H.264 may need system codecs.\n- Chrome: plays MP4 files whose audio and video combination it supports.\n\n**Mobile**\n\n- VLC on Android and iOS: a free mobile player for most movie files, local or networked; the codec inside the file decides whether decoding works.\n\n### MP4 and HEVC compared\n\n- **Layer**: MP4 is a container. HEVC is a video codec, so an MP4 may already hold HEVC.\n- **Audio**: an MP4 can carry sound. The .hevc file made here carries none.\n- **Structure**: a raw stream has no track organization and no timestamps.\n- **Profiles**: HEVC profiles set different feature combinations, including higher bit depths and full-resolution chroma. A decoder must support the stream's profile and level.\n- **Support**: Apple introduced HEVC media support with iOS 11 and macOS High Sierra 10.13, and older Apple devices may be limited by the video's resolution or frame rate.\n\nHEVC is a video codec, also named H.265 and MPEG-H Part 2. ISO/IEC and ITU-T standardized it jointly and first published it in 2013 for storage, television, streaming and video calls.\n\nWhat changes in this conversion is the whole video, in three steps. FFmpeg first decodes the MP4, deinterlaces frames marked interlaced, shrinks anything above 1920 pixels or 30 fps, and passes a constant-rate copy to your browser. The browser's own HEVC encoder then re-encodes it. FFmpeg finally writes the encoded video as an Annex B .hevc stream and records the frame rate in it, because a raw stream has no timestamps.\n\nBecause the encoder belongs to your browser, the result depends on your device. A browser without an HEVC encoder stops with a message and no file is made. The video always goes through a fresh encode, so it is lossy, and the new extension is not a sign of a lossless copy.\n\nPick this conversion when a tool asks for an elementary H.265 stream, for example a pipeline that adds its own container later. If you want a smaller movie that still has sound, use an exporter that writes HEVC into an MP4 instead.\n\n### Other ways to convert MP4 to HEVC\n\n- **FFmpeg with libx265 (command line):** run `ffmpeg -i input.mp4 -an -c:v libx265 -f hevc output.hevc`. It writes raw video without audio, and `-an` leaves the sound out.\n- **x265 (standalone):** run `ffmpeg -i input.mp4 -an -pix_fmt yuv420p intermediate.y4m`, then `x265 intermediate.y4m output.hevc`. x265 reads raw YUV or Y4M, not MP4, so the intermediate file needs disk space.\n- **MP4Box:** run `MP4Box -info input.mp4` to find the HEVC track, then `MP4Box -raw 1:output=output.hevc input.mp4`, replacing 1 with that track number. This only works when the MP4 already contains HEVC, and it copies rather than encodes.\n\n### Problems with MP4 files\n\n- **A player says it cannot decode the video**: opening the container does not mean the player has the decoder for the codec inside. Try a player with that decoder.\n- **An audio tool reports nothing to import**: this MP4 has no sound track, so there is no audio to give it.\n- **The file stops partway or will not play**: an interrupted write leaves an unfinished MP4, because its packet metadata is kept together. This page usually still converts such a file, to a shorter output.\n- **You only want the H.265 already inside**: extract it with MP4Box instead of encoding again.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to HEVC?",
+        "answer": "Choose the MP4 above. FFmpeg decodes the video, your browser's HEVC encoder re-encodes it and FFmpeg writes the result as a raw .hevc stream. The file never leaves your device."
+      },
+      {
+        "question": "Why does the HEVC file have no sound?",
+        "answer": "A .hevc file is a raw video stream, which has no place for audio. The page says Video only. Keep the MP4 if you need the soundtrack."
+      },
+      {
+        "question": "Is HEVC the same as H.265?",
+        "answer": "Yes. The two names refer to one codec, which ISO/IEC and ITU-T standardized together; it also goes by MPEG-H Part 2."
+      },
+      {
+        "question": "Will an HEVC file be smaller than my MP4?",
+        "answer": "It depends on the source and how it was encoded. The page re-encodes the video in the browser, and the size follows the picture and the encoder, not a fixed percentage."
+      },
+      {
+        "question": "Why do I get a message that my browser cannot encode HEVC?",
+        "answer": "The page uses the browser's built-in HEVC encoder, not software such as libx265. If the browser or device lacks one, the conversion stops with a message that your browser can't encode HEVC on this device. Try another browser or device."
+      },
+      {
+        "question": "Can I play a .hevc file?",
+        "answer": "FFmpeg and FFplay read raw HEVC streams. Many other players and editors expect an MP4 or other container, so wrap the stream if one rejects it."
+      },
+      {
+        "question": "I already have H.265 in my MP4. Can I just extract it?",
+        "answer": "Yes, with MP4Box: inspect the file with MP4Box -info, then run MP4Box -raw with the HEVC track number. That copies the stream without re-encoding. This page always re-encodes."
+      },
+      {
+        "question": "What resolution and frame rate does the output have?",
+        "answer": "The limits are a 1920-pixel long edge and 30 fps, with each side rounded down to an even number. Larger or faster video is reduced first, and the frame rate is held constant."
+      },
+      {
+        "question": "Does the HEVC keep my video's frame rate?",
+        "answer": "Up to 30 fps, yes. A slower source keeps its own rate, and the rate is written into the stream, which has no timestamps of its own. A faster source drops frames to reach 30 fps."
+      },
+      {
+        "question": "Is my video uploaded anywhere?",
+        "answer": "No. The video is decoded by FFmpeg inside your browser tab and encoded by your device's own HEVC encoder, so it never leaves your device."
+      }
+    ]
+  }
+}
