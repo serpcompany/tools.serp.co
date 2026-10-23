@@ -46,18 +46,11 @@ import type { ToolRunMetadata } from "@serp-tools/tool-telemetry";
 export type ConversionOp = "raster" | "pdf-pages" | "video";
 
 // A notice says what the visitor should know about the file, such as the
-// rows a table image leaves out.
-// Several outputs are saved as "<name>_page1", "<name>_page2"... in order,
-// unless `names` gives each its own label (a slide's number, "slide3"; a
-// sheet's name), already safe in a file name.
+// rows a table image leaves out. Several outputs are named by
+// multipleOutputName (output-name.ts), from `names` when given.
 export type ConversionResult =
   | { kind: "single"; buffer: ArrayBuffer; notice?: string }
   | { kind: "multiple"; buffers: ArrayBuffer[]; names?: string[]; notice?: string };
-
-// The name output `index` of several is saved under.
-export function multipleOutputName(fileName: string, to: string, index: number, names?: string[]): string {
-  return `${fileName.replace(/\.[^.]+$/, "")}_${names?.[index] ?? `page${index + 1}`}.${to}`;
-}
 
 export type ProgressUpdate = {
   status?: string;

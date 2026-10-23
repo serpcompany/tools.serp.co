@@ -30,8 +30,9 @@ import {
   workbookNotice,
 } from "./document-images.ts";
 import { DOCUMENT_IMAGE_ENGINES, isDocumentImageConversion } from "./image-document-targets.ts";
+import { multipleOutputName } from "./output-name.ts";
 import { PDF_FONT_URL } from "./table-outputs.ts";
-import { convertWithWorker, multipleOutputName } from "./workerClient.ts";
+import { convertWithWorker } from "./workerClient.ts";
 import { readWorkbookJob } from "./xlsx.worker.ts";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");

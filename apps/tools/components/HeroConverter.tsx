@@ -9,12 +9,12 @@ import type { ToolProgressFile } from "@/components/ToolProgressIndicator";
 import { ToolResultMonetizationPanel } from "@/components/ToolResultMonetizationPanel";
 import { beginToolRun, getTelemetryFailure } from "@/lib/telemetry";
 import { CODEC_UNSUPPORTED } from "@/lib/convert/webcodecs";
+import { multipleOutputName, outputFileName } from "@/lib/convert/output-name";
 import {
   checkInputFile,
   compressFile,
   convertWithWorker,
   getOutputMimeType,
-  multipleOutputName,
 } from "@/lib/convert/workerClient";
 import { resolveCompressionTarget } from "@/lib/compression-utils";
 import type { OperationType } from "@/types";
@@ -108,7 +108,7 @@ export default function HeroConverter({
             },
           });
           const blob = new Blob([compressedBuffer], { type: getOutputMimeType(normalizedFrom) });
-          const name = file.name.replace(/\.[^.]+$/, "") + `_compressed.${normalizedFrom}`;
+          const name = outputFileName(file.name, normalizedFrom, "_compressed");
           saveBlob(blob, name);
           run.finishSuccess({ outputBytes: blob.size });
           setCurrentFile({
@@ -167,7 +167,7 @@ export default function HeroConverter({
 
           const mimeType = getOutputMimeType(to);
           const blob = new Blob([result.buffer], { type: mimeType });
-          const name = file.name.replace(/\.[^.]+$/, "") + "." + to;
+          const name = outputFileName(file.name, to);
           saveBlob(blob, name);
 
           setCurrentFile({

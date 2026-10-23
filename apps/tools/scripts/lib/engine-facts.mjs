@@ -9,6 +9,7 @@
 // lib/convert/ffmpeg-args.ts for each Tool, so they can't drift.
 
 import { buildCompressionCommand, buildConvertCommand } from "../../lib/convert/ffmpeg-args.ts";
+import { outputExtension } from "../../lib/convert/output-name.ts";
 
 // HeroConverter (components/HeroConverter.tsx) and lib/convert/workerClient.ts
 // run every Tool on the generic converter page, whatever its engine.
@@ -25,10 +26,11 @@ export function converterPageFacts(tool) {
     'The output is checked against the target format: a wrong result fails with "The converter produced X instead of Y." (lib/convert/workerClient.ts).',
     "The visitor's original file isn't changed; they download a new copy.",
     // Every compression saves "_compressed" with the source extension, whichever
-    // engine runs it (the isCompression branch in HeroConverter).
+    // engine runs it (the isCompression branch in HeroConverter). The extension
+    // comes from lib/convert/output-name.ts, as the download's does.
     compress
-      ? `The download is named after the original with "_compressed" added: "<name>_compressed.${tool.from.toLowerCase()}" (components/HeroConverter.tsx).`
-      : `The download is named after the original with this Tool's target extension: "<name>.${tool.to}" (components/HeroConverter.tsx). An FFmpeg command below writes an internal file whose name the visitor never sees; copy must not give that name or its extension as the download's.`,
+      ? `The download is named after the original with "_compressed" added: "<name>_compressed.${outputExtension(tool.from.toLowerCase())}" (components/HeroConverter.tsx).`
+      : `The download is named after the original with this Tool's output extension: "<name>.${outputExtension(tool.to)}" (outputFileName in lib/convert/output-name.ts).${outputExtension(tool.to) === tool.to ? "" : ` The extension isn't the Tool's id, ${tool.to}: copy must not say the file ends in .${tool.to}.`} An FFmpeg command below writes a file named "output", which the visitor never sees; copy must not give that name as the download's.`,
   ];
 }
 

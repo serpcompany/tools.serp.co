@@ -1,7 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import { AUDIO_FORMATS } from "../capabilities.ts";
 import { VIDEO_FILTER, buildCompressionCommand, buildConvertCommand, fitWithin } from "./ffmpeg-args.ts";
+import { outputExtension } from "./output-name.ts";
 
 const VIDEO_INPUTS = ["3gp", "avi", "flv", "mjpeg", "mkv", "mov", "mp4", "mpeg", "rm", "swf", "ts", "webm"];
 // Video outputs FFmpeg encodes at the source's size and rate, within limits.
@@ -79,6 +81,20 @@ test("MJPEG output uses the standard Huffman tables, which detailed 1080p frames
   const { args } = buildConvertCommand("mp4", "mjpeg");
   assert.equal(option(args, "-c:v"), "mjpeg");
   assert.equal(option(args, "-huffman"), "default");
+});
+
+test("FFmpeg writes its file under the extension the visitor downloads it with", () => {
+  for (const to of [...VIDEO_TARGETS, ...AUDIO_FORMATS, "mxf", "3gp", "gif"]) {
+    assert.equal(buildConvertCommand("mp4", to).outputName, `output.${outputExtension(to)}`, to);
+  }
+  assert.equal(buildConvertCommand("avi", "mpeg2").outputName, "output.mpg");
+  assert.equal(buildConvertCommand("avi", "avchd").outputName, "output.m2ts");
+});
+
+test("DivX and MJPEG outputs are AVI files, whatever their extension", () => {
+  for (const to of ["divx", "mjpeg"]) {
+    assert.equal(option(buildConvertCommand("mp4", to).args, "-f"), "avi", to);
+  }
 });
 
 test("a remux keeps the streams as they are", () => {

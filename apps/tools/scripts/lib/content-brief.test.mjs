@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { OUTPUT_EXTENSIONS } from "../../lib/convert/output-name.ts";
 import { buildBrief } from "./content-brief.mjs";
 import { REGISTRY_PATH, STATUS_PATH, BATCH_DIR, splitRegistry } from "./content.mjs";
 import { parseCsv } from "./csv.mjs";
@@ -74,4 +75,16 @@ test("download name: every compressor adds _compressed, other Tools take the tar
   assert.match(brief(["compress-mp4"], null), /"<name>_compressed\.mp4"/);
   assert.doesNotMatch(brief(["compress-mp4"], null), /"<name>\.mp4"/);
   assert.match(brief(["webp-to-png"], null), /"<name>\.png"/);
+});
+
+test("download name: a target saved under another extension states that extension", () => {
+  assert.match(brief(["mp4-to-mpeg2"], null), /"<name>\.mpg"/);
+  assert.match(brief(["mp4-to-avchd"], null), /"<name>\.m2ts"/);
+  for (const [to, extension] of Object.entries(OUTPUT_EXTENSIONS)) {
+    const tool = tools.find((entry) => entry.to === to && entry.operation === "convert" && entry.isActive !== false);
+    assert.ok(tool, `an active Tool converts to ${to}`);
+    const text = brief([tool.id], null);
+    assert.match(text, new RegExp(`"<name>\\.${extension}"`), tool.id);
+    assert.doesNotMatch(text, new RegExp(`"<name>\\.${to}"`), tool.id);
+  }
 });
