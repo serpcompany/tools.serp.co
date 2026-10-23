@@ -1,0 +1,224 @@
+{
+  "tools": {
+    "hdr-to-jpeg": {
+      "methods": [
+        {
+          "app": "Luminance HDR",
+          "steps": "luminance-hdr-cli -l environment.hdr --tmo mantiuk06 -o <tone-mapped file>",
+          "limits": "-l loads an HDR, --tmo selects the tone mapping operator (default mantiuk06), -o names the tone mapped LDR file and -q sets its quality from 1 to 100.",
+          "source": "https://luminancehdr.readthedocs.io/en/latest/tone_mapping/command_line/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the HDR; export it as a JPEG; set the JPEG options such as Quality and Progressive.",
+          "limits": "GIMP's Radiance RGBE loader (extension hdr) is registered in https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/common/file-gegl.c",
+          "source": "https://docs.gimp.org/3.2/en/file-jpeg-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick environment.hdr preview.jpeg",
+          "limits": "The formats page lists HDR (Radiance RGBE image format) and JPEG as both read and write.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "heif-to-webp": {
+      "methods": [
+        {
+          "app": "libheif",
+          "steps": "heif-dec camera.heif picture.webp",
+          "limits": "The README says heif-dec converts all images stored in an HEIF/AVIF file to JPEG, PNG, TIFF, WebP or Y4M.",
+          "source": "https://github.com/strukturag/libheif"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the HEIF; export it as WebP; set Source Type, Lossless, Image quality or Alpha quality in the WebP dialog.",
+          "limits": "HEIF import and export were added in GIMP 2.10.2: https://www.gimp.org/news/2018/05/20/gimp-2-10-2-released/",
+          "source": "https://docs.gimp.org/3.2/en/file-webp-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick camera.heic website.webp",
+          "limits": "The formats page lists HEIC (requires the libheif delegate library) and WEBP (requires the WEBP delegate library), both read and write.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "icns-to-svg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the ICNS; export it as SVG; set Embed raster layers as to PNG (always).",
+          "limits": "GIMP's Apple Icon Image plug-in registers a loader for icns files: https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-icns/file-icns.c. The other Embed raster layers as choices are JPEG (for opaque images, PNG otherwise) and Do not export raster layers.",
+          "source": "https://docs.gimp.org/3.2/en/file-svg-export.html"
+        },
+        {
+          "app": "Apple iconutil and GIMP",
+          "steps": "iconutil -c iconset Brand.icns; open one extracted picture in GIMP; export it as SVG; set Embed raster layers as to PNG (always).",
+          "limits": "iconutil -c iconset <icns filename> converts an icns file to an iconset, written next to the icns file unless -o names another location; the SVG options are listed at https://docs.gimp.org/3.2/en/file-svg-export.html",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        },
+        {
+          "app": "Pillow and Potrace",
+          "steps": "Open the ICNS in Pillow, which reads the largest available icon by default, and save it as selected.bmp; potrace -s -o mark.svg selected.bmp.",
+          "limits": "Pillow reads and writes BMP files containing 1, L, P or RGB data (https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html). Potrace reads BMP and PBM, PGM and PPM, -s selects SVG output, and non-black-and-white input is converted with a simple threshold.",
+          "source": "https://potrace.sourceforge.net/potrace.1.html"
+        }
+      ]
+    },
+    "ico-to-pdf": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the ICO; export it as PDF by choosing the .pdf extension; check Layers as pages and Fill transparent areas with background color.",
+          "limits": "Layers as pages creates one page per layer and is disabled with one layer; Fill transparent areas replaces transparent areas with the background color. GIMP's ICO loader (extension ico): https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-ico/ico.c",
+          "source": "https://docs.gimp.org/3.2/en/file-pdf-export.html"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Open the ICO, which Pillow reads at its largest available icon, and save a PDF.",
+          "limits": "PDF saving: L, RGB and CMYK images use JPEG encoding; LA and RGBA images use JPEG2000 encoding; P images use HEX encoding.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick badge.ico badge.pdf",
+          "limits": "The formats page lists ICO as read and PDF as read and write.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "ico-to-tga": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the ICO; export it as TGA; set Use RLE compression and Origin (Bottom left or Top left).",
+          "limits": "The TGA export dialog has two options: Use RLE compression and Origin. GIMP's ICO loader (extension ico): https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-ico/ico.c",
+          "source": "https://docs.gimp.org/3.2/en/file-tga-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick cursor-art.ico sprite.tga",
+          "limits": "The formats page lists ICO as read and TGA as read and write.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Open the ICO, which Pillow reads at its largest available icon, and save a .tga; compression=\"tga_rle\" writes it run-length encoded.",
+          "limits": "The largest available icon is read; compression set to tga_rle makes the TGA run-length encoded.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ]
+    },
+    "ico-to-webp": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the ICO; export it as WebP; set Source Type to Icon and check Lossless if wanted.",
+          "limits": "The WebP export dialog lists Source Type (Default, Picture, Photo, Drawing, Icon, Text) and Lossless. GIMP's ICO loader (extension ico): https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-ico/ico.c",
+          "source": "https://docs.gimp.org/3.2/en/file-webp-export.html"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Open the ICO, which Pillow reads at its largest available icon, and save a .webp with lossless=True.",
+          "limits": "lossless: if present and true, instructs the WebP writer to use lossless compression.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick site-icon.ico -define webp:lossless=true site-art.webp",
+          "limits": "The webp:lossless define encodes the image without any quality loss; the formats page lists WEBP as needing the WebP delegate library and ICO as readable: https://imagemagick.org/formats/",
+          "source": "https://imagemagick.org/webp/"
+        }
+      ]
+    },
+    "jpeg-to-hdr": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG; export with a .hdr name or choose Radiance RGBE as the file type; no export dialog opens.",
+          "limits": "There are no settings to choose from, and the export starts automatically after you choose the filename.",
+          "source": "https://docs.gimp.org/3.2/en/file-rgbe-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick photograph.jpeg environment.hdr",
+          "limits": "The formats page lists HDR (Radiance RGBE image format) and JPEG as both read and write.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "OpenCV",
+          "steps": "Read the JPEG with imread; write it with imwrite under a .hdr file name.",
+          "limits": "imwrite chooses the format from the filename extension; the imread list gives Radiance HDR as *.hdr, *.pic.",
+          "source": "https://raw.githubusercontent.com/opencv/opencv/4.x/modules/imgcodecs/include/opencv2/imgcodecs.hpp"
+        }
+      ]
+    },
+    "jpeg-to-jxl": {
+      "methods": [
+        {
+          "app": "libjxl cjxl",
+          "steps": "cjxl photograph.jpeg reversible.jxl",
+          "limits": "Usage is cjxl [options] input [output.jxl]; lossy sources such as JPEG files are compressed losslessly by default and the original JPEG can then be reconstructed bit-for-bit.",
+          "source": "https://raw.githubusercontent.com/libjxl/libjxl/main/doc/man/cjxl.txt"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG and export it as JXL; the dialog lists Lossless, Compression/maxError, Effort/Speed, Bit depth, Export as CMYK, Save Exif and Save XMP.",
+          "limits": "The JPEG XL export dialog options as listed on the page.",
+          "source": "https://docs.gimp.org/3.2/en/file-jpegxl-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick photograph.jpeg modern.jxl",
+          "limits": "The formats page lists JXL as read and write, needing the JPEG XL delegate library.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "jpeg-to-ppm": {
+      "methods": [
+        {
+          "app": "Netpbm",
+          "steps": "jpegtopnm photograph.jpeg > samples.ppm",
+          "limits": "jpegtopnm writes to standard output; a grayscale JFIF input produces a PGM image, any other input a PPM.",
+          "source": "https://netpbm.sourceforge.net/doc/jpegtopnm.html"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG and export it to a PPM file; set Data formatting to ASCII or RAW.",
+          "limits": "PPM saves a color RGB image without transparency; RAW is more compact and results in smaller files.",
+          "source": "https://docs.gimp.org/3.2/en/file-pnm-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick photograph.jpeg samples.ppm",
+          "limits": "The formats page lists PPM (Netpbm color pixmap format) and JPEG as both read and write.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "jpeg-to-rgb": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick photo.jpeg -depth 8 rgb:photo.rgb; read it back with magick -size 640x480 -depth 8 rgb:photo.rgb photo.png",
+          "limits": "The formats page lists RGB as raw red, green, blue sample streams that need size and depth parameters; the command-line processing page forces raw streams with a format prefix, as in magick -size 640x480 -depth 8 rgb:image image.png.",
+          "source": "https://imagemagick.org/command-line-processing/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "image = Image.open(JPEG); write image.tobytes() to a binary file; record image.size",
+          "limits": "tobytes returns the image as a bytes object; size is the 2-tuple (width, height) in pixels.",
+          "source": "https://pillow.readthedocs.io/en/stable/reference/Image.html"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG; export as Raw image data; set Planar configuration to Contiguous or Planar.",
+          "limits": "The raw export dialog lists Planar configuration (Contiguous or Planar) and Palette's layout.",
+          "source": "https://docs.gimp.org/3.2/en/file-raw-export.html"
+        }
+      ]
+    }
+  }
+}

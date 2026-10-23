@@ -1,0 +1,138 @@
+{
+  "tools": {
+    "wpg-to-jpeg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick 'legacy.wpg[0]' -quality 90 legacy-view.jpeg",
+          "limits": "Selects the first image in the file.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://usage.imagemagick.org/files/#read_mods"
+          ]
+        },
+        {
+          "app": "CorelDRAW on Windows",
+          "steps": "File > Import with the \"WPG - Corel WordPerfect Graphic\" filter, then File > Export and choose JPEG as the type.",
+          "limits": "Corel keeps embedded WMF and EMF graphics and drops other embedded graphic elements; Graphics Text Type 2 is not imported.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html",
+          "supportSources": [
+            "https://product.corel.com/help/CorelDRAW/540223850/Main/EN/Documentation/CorelDRAW-Exporting-files.html",
+            "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-JPEG-JPG.html"
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "fact": "WordPerfect Graphic may combine vector drawing and bitmap data.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        },
+        {
+          "fact": "WPG versions and import restrictions affect legacy WordPerfect graphics.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-WordPerfect-Graphic-WPG.html"
+        },
+        {
+          "fact": "JPEG is lossy raster encoding without an alpha channel.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        }
+      ]
+    },
+    "wtv-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg transcode",
+          "steps": "ffmpeg -i television.wtv -c:a aac -c:v libx264 television-share.mp4",
+          "limits": "Protected recordings stay locked to their Media Center computer.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "fact": "WTV belongs to Windows Media Center and can include rights-management restrictions.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/windows-media-center-sdk/bb188788(v=msdn.10)"
+        },
+        {
+          "fact": "WTV carries compressed streams, metadata and possible dynamic format changes.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/cc963726(v=msdn.10)"
+        }
+      ]
+    },
+    "xls-to-png": {
+      "methods": [
+        {
+          "app": "Microsoft Excel",
+          "steps": "Select a range or chart; Home > arrow beside Copy > Copy as Picture > OK. Paste the picture; right-click it, Save as Picture, choose PNG in the Save as type list.",
+          "limits": "A static selection, one at a time.",
+          "source": "https://support.microsoft.com/en-us/excel/create-a-picture-from-cells-a-chart-or-an-object-in-excel",
+          "supportSources": [
+            "https://support.microsoft.com/en-us/office/graphics-visuals/save-a-picture-or-other-graphic-as-a-separate-file",
+            "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+          ]
+        },
+        {
+          "app": "LibreOffice Calc and MuPDF",
+          "steps": "Open the XLS in Calc. File > Export As > Export as PDF. Run mutool draw -o sheet-view-%d.png -r 150 workbook.pdf.",
+          "limits": "The PDF is an intermediate step.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/01/ref_pdf_export.html",
+          "supportSources": [
+            "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html",
+            "https://mupdf.readthedocs.io/en/1.26.1/mutool-draw.html"
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "fact": "Excel 97–2003 XLS uses BIFF8; earlier XLS variants also exist.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        },
+        {
+          "fact": "PNG compresses raster images without a lossy encoding stage.",
+          "source": "https://www.w3.org/TR/png-3/"
+        }
+      ]
+    },
+    "xps-to-jpeg": {
+      "methods": [
+        {
+          "app": "PyMuPDF",
+          "steps": "Python: import pymupdf; doc=pymupdf.open(\"printed.xps\"); doc[0].get_pixmap(dpi=150, alpha=False).save(\"printed-first.jpeg\", jpg_quality=90)",
+          "limits": "Renders only the first page in this example; loop over pages for a whole document. Writing JPEG needs PyMuPDF 1.22.0 or newer, and the dpi argument of get_pixmap came in 1.19.2.",
+          "source": "https://pymupdf.readthedocs.io/en/latest/tutorial.html",
+          "supportSources": [
+            "https://pymupdf.readthedocs.io/en/latest/page.html",
+            "https://pymupdf.readthedocs.io/en/latest/pixmap.html"
+          ]
+        },
+        {
+          "app": "MuPDF and ImageMagick",
+          "steps": "mutool draw -r 150 -o xps-view-%d.png printed.xps; then magick xps-view-1.png -quality 90 printed-page.jpeg",
+          "limits": "PNG is an explicit rendered intermediate; repeat the JPEG encoding for each required page.",
+          "source": "https://mupdf.readthedocs.io/en/1.26.1/mutool-draw.html",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/",
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "fact": "XPS uses fixed pages and packaging for electronic documents and printing.",
+          "source": "https://learn.microsoft.com/en-us/dotnet/desktop/wpf/documents/printing-overview"
+        },
+        {
+          "fact": "MuPDF supports XPS page rendering, but mutool draw does not directly list JPEG among its output image formats.",
+          "source": "https://mupdf.readthedocs.io/en/1.26.1/mutool-draw.html"
+        },
+        {
+          "fact": "Ordinary JPEG carries opaque pixels and uses lossy compression.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+        }
+      ]
+    }
+  }
+}

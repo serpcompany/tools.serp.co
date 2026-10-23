@@ -1,0 +1,260 @@
+{
+  "tools": {
+    "avif-to-eps": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the AVIF, choose File > Export As and give the file a name ending in .eps; set the width, height, offsets, Encapsulated PostScript and preview in the EPS dialog.",
+          "limits": "Raster artwork stays raster; the dialog sets the placed size.",
+          "source": "https://docs.gimp.org/3.2/en/file-eps-export.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    },
+    "bmp-to-tga": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick texture.bmp texture.tga.",
+          "limits": "Reads and writes both per the format table.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the BMP, File > Export As a name ending in .tga; RLE checkbox and Origin choice.",
+          "limits": "The origin setting changes how pixels are stored, not how the image looks.",
+          "source": "https://docs.gimp.org/3.2/en/file-tga-export.html",
+          "supportSources": [
+            "https://developer.gimp.org/core/standards/images/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    },
+    "bmp-to-tif": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick bitmap.bmp -compress LZW bitmap.tif.",
+          "limits": "LZW is lossless.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/",
+            "https://imagemagick.org/formats/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the BMP, File > Export As a name ending in .tif; choose the TIFF compression.",
+          "limits": "The dialog lists None, LZW, Pack Bits, Deflate and JPEG.",
+          "source": "https://docs.gimp.org/3.2/en/file-tiff-export.html",
+          "supportSources": [
+            "https://developer.gimp.org/core/standards/images/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    },
+    "bmp-to-webp": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick panel.bmp -define webp:lossless=true panel.webp.",
+          "limits": "Lossless output.",
+          "source": "https://imagemagick.org/webp/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the BMP, File > Export As a name ending in .webp; Lossless checkbox.",
+          "limits": "Lossless turns off Image quality and Alpha quality.",
+          "source": "https://docs.gimp.org/3.2/en/file-webp-export.html",
+          "supportSources": [
+            "https://developer.gimp.org/core/standards/images/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "ImageMagick plus cwebp",
+          "steps": "Run magick panel.bmp panel-stage.png, then cwebp -q 85 panel-stage.png -o panel.webp.",
+          "limits": "The -q value runs from 0 to 100.",
+          "source": "https://developers.google.com/speed/webp/docs/cwebp",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    },
+    "bmp-to-xbm": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick mark.bmp -threshold 50% mark.xbm.",
+          "limits": "The picture ends up black and white.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/",
+            "https://imagemagick.org/formats/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the BMP, File > Export As a name ending in .xbm.",
+          "limits": "Needs 8 bits per channel; the dialog offers prefix, hot spot, comment and mask file.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html",
+          "supportSources": [
+            "https://developer.gimp.org/core/standards/images/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "Pillow",
+          "steps": "Image.open the BMP, convert(\"1\"), save with a .xbm name.",
+          "limits": "Pillow reads and writes X bitmap in mode 1; conversion dithers by default.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSources": [
+            "https://pillow.readthedocs.io/en/stable/handbook/tutorial.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    },
+    "cr3-to-pdf": {
+      "methods": [
+        {
+          "app": "darktable plus GIMP",
+          "steps": "Export a TIFF from darktable (target storage file on disk, file format TIFF); open it in GIMP and export to a name ending in .pdf.",
+          "limits": "The PDF holds a rendered picture, not RAW data.",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportSources": [
+            "https://www.darktable.org/2021/12/darktable-3-8/",
+            "https://docs.gimp.org/3.2/en/file-pdf-export.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "Canon DPP plus ImageMagick",
+          "steps": "DPP File > Batch process, TIFF, Execute; then run magick developed.tif proof.pdf.",
+          "limits": "ImageMagick PDF support requires Ghostscript.",
+          "source": "https://cam.start.canon/en/S002/manual/html/UG-08_Function_0030.html",
+          "supportSources": [
+            "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html",
+            "https://imagemagick.org/formats/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    },
+    "cr3-to-tiff": {
+      "methods": [
+        {
+          "app": "Canon Digital Photo Professional",
+          "steps": "Select the CR3 images; File > Batch process; settings with TIFF; Execute.",
+          "limits": "Check that your camera model is supported.",
+          "source": "https://cam.start.canon/en/S002/manual/html/UG-08_Function_0030.html",
+          "supportSources": [
+            "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "darktable",
+          "steps": "Export module: target storage file on disk, file format TIFF; check bit depth and profile; export.",
+          "limits": "Needs a supported CR3 camera and decoding dependencies.",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportSources": [
+            "https://www.darktable.org/2021/12/darktable-3-8/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    },
+    "crw-to-jpg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick older-canon.crw older-canon.jpg.",
+          "limits": "Format table lists CRW as read-only.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "Canon Digital Photo Professional",
+          "steps": "Select the CRW; File > Batch process; settings with JPEG; Execute.",
+          "limits": "Supported cameras only.",
+          "source": "https://cam.start.canon/en/S002/manual/html/UG-08_Function_0030.html",
+          "supportSources": [
+            "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    },
+    "cur-to-gif": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick pointer.cur pointer.gif.",
+          "limits": "A GIF carries no hotspot.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "Pillow",
+          "steps": "Open the CUR with Image.open and save with a .gif file name.",
+          "limits": "CUR is read-only; decoder reads the largest cursor; animated cursors are not supported.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html",
+          "supportSources": [
+            "https://pillow.readthedocs.io/en/stable/handbook/tutorial.html"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        },
+        {
+          "app": "ImageMagick plus GIMP",
+          "steps": "Run magick pointer.cur pointer.png; open the PNG in GIMP; export as GIF.",
+          "limits": "GIMP exports a maximum of 256 colors.",
+          "source": "https://docs.gimp.org/3.2/en/file-gif-export.html",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-processing/"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    },
+    "docx-to-svg": {
+      "methods": [
+        {
+          "app": "LibreOffice Writer plus pdf2svg",
+          "steps": "Open the DOCX in Writer; File > Export As > Export as PDF; run pdf2svg writer-copy.pdf writer-page.svg 1.",
+          "limits": "pdf2svg takes a page number or all; DOCX import can change layout.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/01/ref_pdf_export_general.html",
+          "supportSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html",
+            "https://github.com/dawbarton/pdf2svg"
+          ],
+          "verification": "Fetched and checked: the cited pages show the steps, options and input format named here."
+        }
+      ]
+    }
+  }
+}

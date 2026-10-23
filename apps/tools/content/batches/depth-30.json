@@ -1,0 +1,907 @@
+{
+  "3g2-to-mp4": {
+    "seo": {
+      "title": "Convert 3G2 to MP4 Online (Free)",
+      "h1": "3G2 to MP4 Converter",
+      "description": "Turn a 3G2 phone video into an MP4 that plays on nearly every device. The video is re-encoded as H.264 with AAC sound. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn old 3G2 phone clips into MP4 videos that play on nearly every device."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert 3G2 to MP4?",
+        "answer": "Choose the 3G2 file above and wait while it converts in your browser, then save the MP4. Several files queue up and finish in order, and every MP4 downloads separately."
+      },
+      {
+        "question": "Does converting 3G2 to MP4 lose quality?",
+        "answer": "Yes, it can. The picture and the sound are both encoded anew: H.264 through x264 (CRF 32, ultrafast preset) and AAC at 96 kbps. Detail the phone never recorded cannot come back, and no quality control exists on the page."
+      },
+      {
+        "question": "Can I just rename a .3g2 file to .mp4?",
+        "answer": "A new extension only changes the label. The video and sound inside stay in whatever codecs the phone used, so a player that lacks one still fails. Converting writes new H.264 video and AAC audio."
+      },
+      {
+        "question": "What codecs end up inside the MP4?",
+        "answer": "Pictures are written as H.264, and sound as AAC at 96 kbps. You get no quality slider, because the page fixes the encoder settings itself."
+      },
+      {
+        "question": "Will the picture size and speed stay the same?",
+        "answer": "Mostly. The long edge is reduced when it passes 1920 pixels, the clip never plays faster than 30 frames per second, and a one-pixel trim fixes any odd width or height."
+      },
+      {
+        "question": "My 3G2 only has sound. Can it become an MP4?",
+        "answer": "A 3G2 can hold sound alone, and the registered type video/3gpp2 allows that. In a test, an audio-only 3G2 converted to an MP4 that held only the AAC sound and no picture. Play the 3G2 in VLC first to see what it holds."
+      },
+      {
+        "question": "Which program plays a 3G2 file?",
+        "answer": "VLC media player and QuickTime Player open 3G2. Programs built on FFmpeg, such as ffplay, read it too."
+      },
+      {
+        "question": "Is 3G2 the same as 3GP?",
+        "answer": "They are close relatives. 3G2 is defined by 3GPP2 for CDMA phones, 3GP by 3GPP, and both are based on the MPEG-4 container."
+      },
+      {
+        "question": "Can I convert many 3G2 files at once?",
+        "answer": "Yes. Choose a batch and the converter takes each clip in turn, saving a separate MP4 per clip rather than a ZIP."
+      },
+      {
+        "question": "Does the page cap file size?",
+        "answer": "No. It places no limit on file size. The conversion runs on your own device, so a long clip simply takes more time."
+      }
+    ],
+    "aboutSection": {
+      "title": "3G2 and MP4",
+      "fromFormat": {
+        "name": "3G2",
+        "fullName": "3GPP2 multimedia",
+        "description": "A container defined by 3GPP2 for video on CDMA mobile phones. It is similar to 3GP and based on the MPEG-4 container.",
+        "details": [
+          "MPEG-4-based container",
+          "H.264 or MPEG-4 video",
+          "Small files",
+          "Used for MMS video"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 that holds video, audio, subtitles and metadata. H.264 video with AAC audio is the most common pairing.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting 3G2 to MP4",
+      "points": [
+        "The MP4 holds H.264 video and AAC audio at 96 kbps, so the clip is compressed again.",
+        "A frame longer than 1920 pixels on its longer side is scaled down, and the frame rate is capped at 30 fps.",
+        "Renaming a 3G2 to .mp4 changes only the label.",
+        "Several 3G2 files convert in turn, one MP4 each."
+      ]
+    },
+    "guide": {
+      "title": "About 3G2 files",
+      "markdown": "### What is a 3G2 file?\n\n3G2 is a video container defined by 3GPP2, the standards group behind CDMA mobile networks, for clips shot and sent on phones. It uses the ISO media file format family as its foundation, and RFC 4393 registered its media types in March 2006. The preferred extension is .3g2, and .3gpp2 is also recognized.\n\nA 3G2 can carry sound, moving pictures and timed text. The type video/3gpp2 is valid even when the file holds only audio, while audio/3gpp2 is reserved for files with nothing visual, and timed text counts as visual content. So a 3G2 that plays without a picture is not always broken.\n\nYou meet these files on older CDMA phones and in their MMS video. The format keeps files small, and its video is H.264 or MPEG-4. Recognizing the container does not guarantee that a player has a decoder for the video or sound inside it, which is the usual reason a 3G2 opens on one device and not on another.\n\n### Programs that open 3G2 files\n\nVLC media player and QuickTime Player both open 3G2 clips. These programs also handle the format:\n\n**Windows, Mac and Linux**\n\n- FFmpeg: registers .3g2 with its QuickTime and ISO base media demuxer.\n- ffplay: the FFmpeg player, which uses the FFmpeg demuxers and decoders.\n\n**Windows and Mac**\n\n- Adobe After Effects: recognizes .3g2 as an import extension.\n\n### 3G2 and MP4 compared\n\n- **Extensions and media types**: .3g2 or .3gpp2 with video/3gpp2, where audio/3gpp2 is kept for files with nothing visual; .mp4 for MPEG-4 Part 14.\n- **Standards**: 3G2 comes from 3GPP2 and is based on the MPEG-4 container. MP4 is defined in ISO/IEC 14496-14.\n- **Video codecs**: a 3G2 holds H.264 or MPEG-4 video. MP4 takes H.264, H.265 and AV1.\n- **Extras**: MP4 can carry subtitles and chapters.\n- **Reach**: MP4 plays on nearly every device. The older 3G2 is kept small and was made for phones.\n\nWhat this page does is decode the clip and write a new MP4. The picture is re-encoded by x264 using CRF 32 and its ultrafast preset, while the soundtrack is re-encoded as 96 kbps AAC. An oversized picture is scaled down to 1920 pixels along its longer edge, and playback speed tops out at 30 frames per second. Your 3G2 itself is never changed; you download a new file next to it.\n\nConversion happens in your browser, one clip at a time, with no file-size cap from the page. Pick several files and they queue, each saved under its own name with the .mp4 ending. No stream-selection options are passed, which leaves FFmpeg's defaults to pick the streams that reach the MP4. An audio-only 3G2 gives an MP4 with sound and no picture.\n\n### Other ways to convert 3G2 to MP4\n\n- **FFmpeg with a re-encode:** on Windows, Mac or Linux, run `ffmpeg -i handset.3g2 -c:v libx264 -c:a aac handset-share.mp4`. It encodes video with libx264 and audio with aac, and the result is lossy.\n- **FFmpeg, copy the streams:** run `ffmpeg -i archive-phone.3g2 -c copy archive-phone.mp4`. Nothing is re-encoded, but it works only when MP4 accepts the streams inside.\n- **Prism (Windows):** click Add File(s), set Output Format to MP4, check Encoder Options, pick a folder under Save to Folder and click Convert. NCH lists 3G2 input for Windows only.\n\n### Problems with 3G2 files\n\n- **No picture**: a video/3gpp2 file may be audio only, so a missing picture is not always a playback failure.\n- **Won't play on a phone or in an editor**: the app in question may not have a decoder for the picture or sound stored in the file. Converting here writes new H.264 and AAC streams, provided FFmpeg can decode the original.\n- **Corrupt after a transfer**: a text-style transfer that changes line endings or strips high bits can corrupt this binary format.\n- **A damaged or cut-short clip**: a clip like this usually still converts, giving a shorter MP4, so compare the running time with the original.\n- **A soft or blocky result**: encoding uses CRF 32 with the ultrafast preset and offers no quality control, so the MP4 can look worse than the 3G2.\n- **An odd .3gpp2 ending**: it is the second registered extension for the same format. Rename it to .3g2 if a program only looks for that one.\n"
+    }
+  },
+  "avi-to-mkv": {
+    "seo": {
+      "title": "Convert AVI to MKV Online (Free)",
+      "h1": "AVI to MKV Converter",
+      "description": "Convert AVI video to MKV in your browser. The video is re-encoded as H.264 with AAC sound, not copied, so the MKV is a compressed copy. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Move an AVI into a Matroska file, re-encoded as H.264 and AAC."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVI to MKV?",
+        "answer": "Select your AVI, let the converter run and save the MKV it returns. A batch is processed in order, and each MKV downloads on its own."
+      },
+      {
+        "question": "Is this a lossless AVI to MKV remux?",
+        "answer": "No. The video is decoded and encoded again, with 96 kbps AAC sound added. For a container swap without re-encoding, run FFmpeg yourself with -c copy."
+      },
+      {
+        "question": "Could the MKV look worse than my AVI?",
+        "answer": "It can, because the video is compressed a second time at a fixed, speed-first setting that you cannot adjust."
+      },
+      {
+        "question": "Will the MKV be smaller than the AVI?",
+        "answer": "It can be, but nothing guarantees it. The page re-encodes at fixed settings with no size target, so the result depends on the codec inside the AVI. In one test run a small AVI came out smaller."
+      },
+      {
+        "question": "Which audio tracks end up in the MKV?",
+        "answer": "No -map option is given, so FFmpeg's defaults decide which streams are written. With an unusual AVI layout, play the MKV first and only then delete the original."
+      },
+      {
+        "question": "Why would I move from AVI to MKV?",
+        "answer": "Matroska is designed for many streams (video, audio, subtitles) plus chapters and tags in one file, and it does not tie you to one codec. AVI is an older RIFF container."
+      },
+      {
+        "question": "Will resolution and frame rate stay as they were?",
+        "answer": "Within limits. A frame whose longer side passes 1920 pixels is scaled down, the rate never exceeds 30 fps, and a pixel is trimmed from any odd side. Smaller footage keeps its size."
+      },
+      {
+        "question": "What plays an MKV file?",
+        "answer": "VLC media player and mpv play MKV on desktop, ffplay can too, and VLC's Android and iOS apps play it on phones. Whether a given file plays still depends on the codecs inside it."
+      },
+      {
+        "question": "Can I rename an AVI to .mkv instead?",
+        "answer": "No. A rename only changes the label. AVI is a RIFF file and Matroska is built on EBML, so the contents do not match the name. Converting writes a real Matroska file."
+      },
+      {
+        "question": "Is my AVI uploaded anywhere?",
+        "answer": "No. The video never travels anywhere: FFmpeg, built for WebAssembly, runs in your browser to make the MKV. Your AVI file is not modified, and the MKV arrives as a separate download."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVI and MKV",
+      "fromFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container introduced by Microsoft in 1992 and based on RIFF. It interleaves video and audio and can hold many different codecs.",
+        "details": [
+          "RIFF-based container",
+          "Many codecs",
+          "Limited support for modern features",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open container that holds any number of video, audio, picture and subtitle tracks in one file. WebM is a subset of Matroska.",
+        "details": [
+          "Open standard",
+          "Multiple audio and subtitle tracks",
+          "Chapters and metadata",
+          "Supports almost any codec"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVI to MKV",
+      "points": [
+        "The video is re-encoded as H.264 and the sound as AAC at 96 kbps, so this is not a lossless remux.",
+        "Footage larger than 1920 pixels on its longer side is scaled down, and the frame rate is capped at 30 fps.",
+        "The page passes no stream mapping, so FFmpeg's defaults choose which streams are written.",
+        "Several AVI files convert in turn, one MKV each."
+      ]
+    },
+    "guide": {
+      "title": "About AVI files",
+      "markdown": "### What is an AVI file?\n\nWindows 3.1 got AVI, short for Audio Video Interleave, from Microsoft, with a first specification from 1992. Pictures and sound that run on a timeline are stored in a RIFF file. One chunk holds the header (dimensions, frame rate and similar), another holds the media, and FOURCC codes name each stream and codec.\n\nUncompressed, lossless or lossy video can all live in an AVI, so the extension alone cannot tell you its quality or size. The usual ending is .avi, and one common media-type label is video/x-msvideo.\n\nYou find AVI in video production archives and in older desktop workflows such as camera and capture output. It is a legacy container, and people often replace it with something newer.\n\n### Programs that open AVI files\n\nQuickTime Player, VLC and Windows Media Player all play AVI. Sorted by platform, the fact sheet for AVI names these programs:\n\n**Windows, Mac and Linux**\n\n- ffplay: FFmpeg contains the AVI demuxer.\n- mpv: desktop playback where audio and subtitle streams are selectable.\n\n**Windows and Mac**\n\n- Adobe Premiere: takes in the container so long as the decoder it needs is there.\n\n**Mobile**\n\n- VLC for Android and VLC for iOS: the Android app is free, and what it decodes follows from the contents of the container; the iOS app is a mobile player that handles most movie formats and reaches both local and network media.\n\n### AVI and MKV compared\n\n- **Names and types**: .avi is commonly labeled video/x-msvideo, and IANA registers video/matroska for Matroska video.\n- **Structure**: AVI is built from RIFF chunks. Matroska rests on EBML, a binary structure that derives from XML.\n- **Tracks**: Matroska can carry several video, audio and subtitle streams, and chapters and descriptive tags are part of its design. AVI has limited support for modern features.\n- **Codecs**: no codec or quality level is built into either container. An AVI may hold uncompressed, lossless or lossy video, and Matroska leaves the compression method open.\n- **Origins**: Microsoft introduced AVI in 1992. Matroska developed from the earlier MCF project.\n\nThis page does not just rewrap the AVI. It decodes the video and writes it again through x264 at CRF 32 with its ultrafast preset, writes the sound as 96 kbps AAC, scales anything past 1920 pixels along the longer edge, and holds the rate to 30 fps. The MKV is a compressed copy, not an archival match of the AVI, and you cannot change the quality.\n\nNo stream mapping is passed, so FFmpeg's own defaults pick the streams, and its defaults also copy global tags where the output can hold them. For a plain one-video, one-audio AVI that is what you expect. Your original stays untouched, and the download is named after the AVI with the .mkv ending. Pick several files and they convert in turn, one MKV each. This page does not cap the size.\n\n### Other ways to convert AVI to MKV\n\n- **FFmpeg, remux (Windows, Mac, Linux):** run `ffmpeg -i capture-master.avi -c copy capture-master.mkv`. Streams are copied without re-encoding, and FFmpeg chooses them automatically.\n- **HandBrakeCLI:** run `HandBrakeCLI --input avi-review.avi --output avi-review.mkv --format av_mkv --encoder x264 --aencoder av_aac --quality 22`. This re-encodes, so it is a derivative copy.\n- **Prism (Windows):** add the AVI, set Output Format to MKV, review Encoder Options, set Save to Folder and click Convert. Its available codecs depend on the installation.\n\n### Problems with AVI files\n\n- **The player opens it but an editor rejects it**: an editor may identify AVI yet have no decoder for what is actually inside.\n- **A huge capture won't open**: the original AVI design limits size in ways the later OpenDML extension does not, so big captures need software that copes.\n- **Stretched or combed picture**: implementations of AVI do not treat aspect ratio and scan type in a consistent way. Check the MKV in a player.\n- **Wrong or missing extra track**: this page does not map tracks, and FFmpeg's defaults decide. Run FFmpeg yourself if you need a specific stream layout.\n- **A damaged or cut-short AVI**: it often converts anyway, yielding a shorter MKV. Compare its running time with the source.\n- **A smaller picture than the source**: this page scales footage whose longer side passes 1920 pixels. The FFmpeg remux keeps the original size.\n- **A soft or blocky result**: the page re-encodes at CRF 32 with the ultrafast preset, so the MKV can look worse than the AVI.\n"
+    }
+  },
+  "avi-to-webm": {
+    "seo": {
+      "title": "Convert AVI to WebM Online (Free)",
+      "h1": "AVI to WebM Converter",
+      "description": "Convert AVI video to WebM for the web. The video is encoded as VP8 with Vorbis sound in your browser, with frames over 1920 px scaled down. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an AVI video into a WebM clip that web browsers play."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVI to WebM?",
+        "answer": "Add your AVI, let the encode finish and download the WebM. Extra AVI files wait their turn and each produces a separate WebM."
+      },
+      {
+        "question": "What is inside the WebM?",
+        "answer": "VP8 pictures and Vorbis sound at 64 kbps. Both codecs are allowed: the picture in a WebM is VP8 or VP9, the sound Vorbis or Opus."
+      },
+      {
+        "question": "Might the WebM look worse than my AVI?",
+        "answer": "Possibly, since the encode favors speed and offers no quality setting. Fine texture and fast motion can look softer than in the AVI."
+      },
+      {
+        "question": "Can I choose VP9 or Opus?",
+        "answer": "No. The page writes VP8 and Vorbis and offers no codec choice. For VP9 and Opus, run FFmpeg yourself with libvpx-vp9 and libopus."
+      },
+      {
+        "question": "What happens to resolution and frame rate?",
+        "answer": "Anything above 1920 pixels on the longer edge is scaled down, and smaller frames keep their size. A faster source loses frames to stay at 30 fps, yet the clip lasts as long as before. Every side ends up an even number of pixels."
+      },
+      {
+        "question": "Does the WebM play in Safari?",
+        "answer": "Recent Safari releases on macOS play WebM files with VP8 or VP9 pictures and Vorbis sound, and Chrome, Firefox and Edge play WebM as well. Older Safari releases should not be assumed to."
+      },
+      {
+        "question": "Does the page keep my AVI's audio tracks?",
+        "answer": "No stream mapping is passed, so FFmpeg's defaults choose the streams that enter the WebM."
+      },
+      {
+        "question": "Why convert AVI to WebM instead of MP4?",
+        "answer": "WebM is an open, royalty-free format promoted for web delivery, so it suits a site that serves VP8 or VP9 video. MP4 plays on nearly every device, including outside the browser."
+      },
+      {
+        "question": "Does the WebM have the same pixel format as the AVI?",
+        "answer": "The page writes 8-bit yuv420p video, whatever pixel format the AVI used."
+      },
+      {
+        "question": "Can a long AVI be converted?",
+        "answer": "This page puts no cap on size or running time. How quickly a long video converts depends on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVI and WebM",
+      "fromFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container introduced by Microsoft in 1992 and based on RIFF. It interleaves video and audio and can hold many different codecs.",
+        "details": [
+          "RIFF-based container",
+          "Many codecs",
+          "Limited support for modern features",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "Royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "Supported by major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVI to WebM",
+      "points": [
+        "The output is VP8 video with Vorbis audio at 64 kbps, encoded for speed at CRF 40.",
+        "Footage over 1920 pixels on its longer side is scaled down, and the frame rate is capped at 30 fps.",
+        "The video is written as 8-bit yuv420p, whatever the AVI used.",
+        "Several AVI files convert in turn, one WebM each."
+      ]
+    },
+    "guide": {
+      "title": "About AVI files",
+      "markdown": "### What is an AVI file?\n\nWith Windows 3.1, Microsoft brought out Audio Video Interleave; the first specification followed in 1992. A RIFF file stores the timed pictures and sound, and a header in it notes things like size and frame rate. Another chunk contains the media, and FOURCC identifiers label every stream and codec.\n\nBecause the container leaves the codec open, the video inside can be uncompressed, lossless or lossy, and the .avi ending reveals nothing about quality. A commonly used media-type label is video/x-msvideo.\n\nAVI turns up in archived footage and in old Windows video, whether camera or capture output. It is a legacy format with limited support for modern features.\n\n### Programs that open AVI files\n\nAVI opens in Windows Media Player, QuickTime Player and VLC. By platform, the format's fact sheet adds:\n\n**Windows, Mac and Linux**\n\n- ffplay: the AVI demuxer ships with FFmpeg.\n- mpv: desktop player where you select audio and subtitle streams.\n\n**Windows and Mac**\n\n- Adobe Premiere: opens the container provided the required decoder is present.\n\n**Mobile**\n\n- VLC for Android and VLC for iOS: on Android it is free, and whether a file decodes hinges on the media inside the container; on iOS it is a phone and tablet player for most movie formats, covering local files and network media.\n\n### AVI and WebM compared\n\n- **Labels**: .avi is commonly tagged video/x-msvideo. WebM video uses video/webm, and an audio-only WebM uses audio/webm.\n- **Structure**: AVI is RIFF chunks. WebM is based on Matroska, which is built on EBML.\n- **Codecs**: AVI may hold uncompressed, lossless or lossy video. For WebM the picture is VP8 or VP9 (AV1 video is allowed too), with Vorbis or Opus as the sound.\n- **Licensing**: the WebM Project supplies its format technology under royalty-free terms.\n- **Browser reach**: major browsers support WebM, and Chrome, Firefox and Edge open it.\n- **Age**: Microsoft introduced AVI in 1992, and WebM is an open format promoted for web delivery.\n\nThis page decodes the AVI and writes a new WebM. The video is VP8 from libvpx at CRF 40 in its realtime mode with the fastest CPU setting, written as 8-bit yuv420p. The sound is Vorbis at 64 kbps. A picture past 1920 pixels along its longer edge is scaled down, and a quicker source is thinned to 30 frames per second without changing how long it lasts. The settings favor speed over detail, so keep the AVI if quality may matter later.\n\nFFmpeg's defaults decide which streams go in, since nothing is mapped by hand. Your AVI is never changed, and the download is named after it with the .webm ending. The page applies no size limit, so a long file simply keeps a slower device busy for longer. Pick several files and they convert in turn.\n\n### Other ways to convert AVI to WebM\n\n- **FFmpeg on a desktop:** run `ffmpeg -i web-source.avi -c:v libvpx-vp9 -b:v 1024k -crf 32 -c:a libopus web-delivery.webm` for VP9 and Opus in constrained-quality mode, which Google's VP9 guide recommends for on-demand video. The result is lossy.\n- **HandBrake (Windows, Mac, Linux):** choose the AVI under Open Source, then set the container to WebM. HandBrake lists VP8, VP9 and AV1 video encoders for WebM, with Vorbis or Opus audio.\n- **Prism (Windows):** add the file, choose WebM as the output, set the encoder and folder, then click Convert. NCH lists AVI as an input and WebM as an output.\n\n### Problems with AVI files\n\n- **An editor shows black frames or silence**: an editor can know AVI and still have no decoder for the specific contents.\n- **Two AVI files look nothing alike**: the file name does not reveal quality, since the contents may be uncompressed, lossless or lossy.\n- **The WebM looks soft in motion**: the page trades detail for speed. The FFmpeg command above uses VP9 and a quality target instead.\n- **The WebM plays in one browser and not another**: what plays is set by the real video and audio codecs, and the .webm suffix alone settles nothing.\n- **Seeking feels slow**: without a cue index, seeking can be less efficient, since the player has less direct information about where things are.\n- **An old Safari will not play it**: macOS Safari gained WebM playback in version 14.1 for VP8 or VP9 video with Vorbis sound, so do not assume older releases play it.\n- **Wrong picture shape**: AVI implementations differ in how they treat aspect ratio and scan type. Check the result in a player.\n- **A very large AVI fails to open**: the first AVI design has size restrictions that the later OpenDML extension does not, so large captures need compatible software.\n- **A damaged or cut-short AVI**: it commonly converts all the same, giving a shorter WebM. Compare its running time with the source.\n"
+    }
+  },
+  "bmp-to-jpeg": {
+    "seo": {
+      "title": "Convert BMP to JPEG Online (Free)",
+      "h1": "BMP to JPEG Converter",
+      "description": "Convert BMP images to JPEG in your browser. The JPEG is written at quality 0.85 and has no transparency. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn BMP bitmaps into JPEG images in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert BMP to JPEG?",
+        "answer": "Select the BMP and save the JPEG that appears a moment later. Multiple BMP files are handled in sequence, one JPEG apiece."
+      },
+      {
+        "question": "Will a JPEG be smaller than my BMP?",
+        "answer": "It can be. A BMP usually stores pixels uncompressed and can be bulky, while JPEG compresses the picture with a lossy method designed for photographs. For flat graphics, PNG compression is lossless and may suit them better."
+      },
+      {
+        "question": "Does converting BMP to JPEG lose quality?",
+        "answer": "Yes. JPEG is lossy, and the page writes it at quality 0.85, a setting it chooses and does not let you change. Detail is traded away to get the JPEG."
+      },
+      {
+        "question": "What happens to a BMP with transparency?",
+        "answer": "JPEG cannot hold transparency, so see-through areas cannot stay see-through. If you need to keep it, use the BMP to PNG converter, because the page keeps transparency for PNG output."
+      },
+      {
+        "question": "Is there a way to keep a BMP exact?",
+        "answer": "Not in JPEG, which is lossy. PNG compression is lossless, so use PNG when the pixels must stay exact."
+      },
+      {
+        "question": "Is .jpg different from .jpeg?",
+        "answer": "Nothing but the spelling. Both name the same format, so a program that opens one opens the other. This page names the download with the .jpeg ending."
+      },
+      {
+        "question": "Are 16-bit or deep-color BMPs kept at full depth?",
+        "answer": "No. The picture passes through 8-bit color, and a JPEG from a browser canvas has 8 bits per channel, so extra depth is lost."
+      },
+      {
+        "question": "Why does the page say the image decode failed?",
+        "answer": "The browser reads the BMP with its own decoder, and 'Image decode failed' means it could not. The file is probably damaged or cut short, or it is not really a BMP under the name."
+      },
+      {
+        "question": "Is any metadata copied from the BMP?",
+        "answer": "No. Only raw pixels pass through the canvas, so tags and an embedded ICC profile are left out of the JPEG."
+      },
+      {
+        "question": "Is my original BMP changed?",
+        "answer": "No. The page decodes your BMP and gives you a new JPEG to download, named after the BMP with the .jpeg ending. The original file stays as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and JPEG",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A raster format introduced with Microsoft Windows that stores pixel data, usually uncompressed. It is simple to read and write but produces large files.",
+        "details": [
+          "Usually uncompressed",
+          "1 to 32 bits per pixel",
+          "Optional run-length compression",
+          "Large files"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BMP to JPEG",
+      "points": [
+        "The JPEG is written at quality 0.85, so it is lossy.",
+        "JPEG has no transparency, which BMP version 5 can have.",
+        "Color passes through 8 bits per channel.",
+        "Metadata such as an ICC profile is not copied.",
+        "Several BMP files convert in turn, one JPEG each."
+      ]
+    },
+    "guide": {
+      "title": "About BMP files",
+      "markdown": "### What is a BMP file?\n\nBMP, the Windows Bitmap, is Microsoft's raster image family, used originally on Windows and OS/2. Windows 98 brought the fifth version in 1998, which is able to carry both an ICC profile and an alpha channel. The registered media type is image/bmp.\n\nPixels in a BMP are usually stored uncompressed, with run-length encoding as an optional lossless alternative. That makes the format simple to read and write, but it produces large files. Depth runs from 1 to 32 bits per pixel.\n\nMost BMP files are Windows screen captures or system graphics; the format also serves plain Windows artwork and image exchange without compression. Microsoft controls the format, and the Library of Congress documents it among the formats it follows for preservation.\n\n### Programs that open BMP files\n\nWindows Paint, Windows Photos, Preview on macOS and GIMP all open BMP. Further programs, from the format's fact sheet:\n\n**Windows, Mac and Linux**\n\n- ImageMagick: reads BMP images, which the magick command can then write out as JPEG.\n- XnView MP: BMP is among its supported image formats, and company use requires a license.\n\n**Web**\n\n- Firefox: shows BMP pictures inside web content.\n- Google Chrome: BMP images are supported, per Mozilla's browser compatibility table.\n\n### BMP and JPEG compared\n\n- **Names and types**: .bmp is image/bmp. A JPEG may end in .jpg or in .jpeg.\n- **Compression**: BMP commonly stores raw pixels, with lossless compression as an option. JPEG is lossy and designed for photographs.\n- **Transparency**: BMP version 5 can store an alpha channel. JPEG has no alpha transparency.\n- **Color depth**: BMP spans 1 to 32 bits per pixel. This page's JPEG comes from a browser canvas with 8 bits per channel.\n- **Metadata**: a BMP can carry an ICC profile from version 5. This page does not copy it.\n- **Typical use**: BMP serves simple Windows graphics and uncompressed image interchange. Web photographs, camera files, email attachments and shared photos are typically JPEGs.\n- **Standard**: ISO/IEC 10918-1 specifies JPEG, a format that the Joint Photographic Experts Group created. Microsoft controls the BMP family.\n- **Quality**: JPEG normally has an adjustable quality. This page fixes it at 0.85 and shows no slider.\n\nThe page asks your browser to decode the BMP with its own image decoder, then encodes a JPEG at quality 0.85 from a canvas. The picture goes through raw pixels with 8 bits per channel, so only the pixels survive: tags, an embedded ICC profile and any transparency are left behind. You get a single still picture, and the conversion runs on your own device with no server involved. The page imposes no size limit, and the BMP you started with stays as it was. A multi-file selection runs file after file, giving one JPEG per BMP, named like the BMP but ending .jpeg.\n\n### Other ways to convert BMP to JPEG\n\n- **GIMP on any desktop:** open the BMP, then pick File > Export As. A JPEG export dialog then lets you set the quality from 0 to 100, with a default of 85.\n- **ImageMagick (command line):** run `magick scan-bitmap.bmp -quality 90 scan-photo.jpeg`. The -quality option takes 1 to 100, so you pick the quality yourself, which this page never lets you do.\n\n### Problems with BMP files\n\n- **The BMP takes up too much space**: an uncompressed BMP can be large, so PNG or JPEG may suit distribution better.\n- **Transparency turned into something else**: JPEG cannot hold transparent pixels. Use the [BMP to PNG converter](/bmp-to-png/) if you must keep see-through areas.\n- **A decode error from this page**: the browser could not read the file, which suggests damage or a file that is not truly a BMP.\n- **Banding or blocks after converting**: JPEG is lossy, and here there is no way to raise the quality. Use the ImageMagick command above to pick a higher quality.\n- **A different size from another editor**: the same quality number in two editors does not promise the same compression or look.\n- **An old photo frame rejects a JPEG exported from GIMP**: some older photo frames reject progressive JPEG, so try an export with progressive mode disabled.\n- **You need to edit it later**: a BMP does not preserve editable vector shapes or live typography, and JPEG has no editable layers either. Keep your project file.\n"
+    }
+  },
+  "caf-to-wav": {
+    "seo": {
+      "title": "Convert CAF to WAV Online (Free)",
+      "h1": "CAF to WAV Converter",
+      "description": "Convert Apple CAF audio to WAV in your browser. CAF is decoded and written as 16-bit PCM WAV. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn Apple Core Audio Format files into 16-bit PCM WAV audio."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CAF to WAV?",
+        "answer": "Pick the CAF, let it convert and save the WAV. You can queue several CAF files, and every one comes back as a separate WAV."
+      },
+      {
+        "question": "What kind of WAV do I get?",
+        "answer": "A 16-bit PCM WAV. The audio is decoded from whatever the CAF holds and written as uncompressed samples."
+      },
+      {
+        "question": "Does CAF to WAV lose quality?",
+        "answer": "Not from compression, since PCM is uncompressed. But the output is 16-bit, so a 24-bit CAF becomes a 16-bit WAV; a test file did exactly that. A CAF that held compressed audio stays as good as its decoded sound, and no better."
+      },
+      {
+        "question": "Why is my WAV bigger than the CAF?",
+        "answer": "CAF can hold compressed audio, such as ALAC or AAC. WAV here is uncompressed PCM, so the same sound can take more space. A compressed test CAF came out several times larger as a WAV."
+      },
+      {
+        "question": "Is there a 4 GB limit?",
+        "answer": "CAF uses 64-bit offsets and has no 4 GB limit, while a WAV file tops out at 4 GB. No size limit comes from the page, and the conversion runs on your own device."
+      },
+      {
+        "question": "What is a CAF file?",
+        "answer": "Core Audio Format is Apple's flexible audio container, designed for Core Audio on macOS and iOS. It can hold compressed or uncompressed audio and many channels."
+      },
+      {
+        "question": "Which programs open CAF?",
+        "answer": "Logic Pro, Apple Music, QuickTime Player and Audacity open CAF, and FFmpeg reads and writes it."
+      },
+      {
+        "question": "Does the page keep the CAF title and artist?",
+        "answer": "Tag options are not passed, which means FFmpeg's own defaults carry global tags into the WAV where it can hold them. A test CAF's title and artist came through to the WAV. The page does not promise that markers or edit-comment chunks carry across."
+      },
+      {
+        "question": "What happens to a damaged or cut-short CAF?",
+        "answer": "It usually still converts, and the WAV comes out shorter than expected. A test CAF that was cut short gave a shorter WAV with no error, so compare the running time against the original."
+      },
+      {
+        "question": "Can I convert several CAF files in one go?",
+        "answer": "Yes. Pick several CAF files at once; the converter takes them one at a time and offers a separate WAV for each. No archive is created."
+      }
+    ],
+    "aboutSection": {
+      "title": "CAF and WAV",
+      "fromFormat": {
+        "name": "CAF",
+        "fullName": "Core Audio Format",
+        "description": "A container developed by Apple for Core Audio. It has no 4 GB size limit and can hold many audio codecs.",
+        "details": [
+          "No 4 GB limit",
+          "Many codecs supported",
+          "Metadata and markers",
+          "Apple format"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container developed by Microsoft and IBM, based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "Usually uncompressed PCM",
+          "Lossless",
+          "Large files",
+          "4 GB file size limit"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CAF to WAV",
+      "points": [
+        "The WAV is 16-bit PCM, so deeper audio is reduced to 16 bits.",
+        "A CAF holding compressed audio can become a larger uncompressed PCM WAV.",
+        "Video, if any, is dropped; the output is audio only.",
+        "WAV has a 4 GB limit that CAF does not.",
+        "Several CAF files convert in turn, one WAV each."
+      ]
+    },
+    "guide": {
+      "title": "About CAF files",
+      "markdown": "### What is a CAF file?\n\nCAF, Core Audio Format, is a container Apple designed as a flexible home for audio. Core Audio support dates to OS X 10.4, with OS X 10.3 support through QuickTime 7. Where older containers use small size fields, CAF uses 64-bit offsets, so it has no 4 GB ceiling.\n\nA CAF can hold compressed audio or uncompressed samples, with multiple channels and optional channel-layout information. A mandatory audio-description chunk identifies the stored audio encoding, and information and edit-comment chunks can carry descriptive text.\n\nYou meet CAF as audio on macOS and iOS, as long recordings and as sound effects in Apple apps. Many codecs fit inside it, so two CAF files can hold very different audio, and the format is also described as supporting metadata and markers. It is an Apple format.\n\n### Programs that open CAF files\n\nQuickTime Player, Apple Music, Logic Pro and Audacity open CAF files. The format's fact sheet adds these programs:\n\n**Windows, Mac and Linux**\n\n- FFmpeg: handles Core Audio Format containers in both directions.\n- ffplay: uses FFmpeg demuxers and decoders to play supported CAF audio.\n\n### CAF and WAV compared\n\n- **Extensions and media types**: .caf for CAF; .wav for WAV, with audio/wav and audio/x-wav as common media-type labels.\n- **Origin**: CAF is Apple's format. WAV comes from a Microsoft and IBM multimedia specification of August 1991.\n- **Structure**: CAF uses 64-bit offsets. WAV is a RIFF-based wrapper for sound rather than one particular audio encoding.\n- **Contents**: a CAF can hold compressed or uncompressed audio. WAV often holds linear PCM, though compressed encodings are possible as well.\n- **Size limit**: CAF has no 4 GB limit. WAV has a 4 GB file size limit.\n- **Metadata**: CAF has information and edit-comment chunks. What a WAV does with metadata varies, as INFO chunks and the Broadcast WAVE extensions store different details.\n- **Typical use**: WAV serves audio recording and editing and professional sound production.\n\nWAV, short for Waveform Audio File Format, is a RIFF-based sound wrapper described in the multimedia specification Microsoft and IBM published in August 1991. It usually holds uncompressed PCM audio, so files are large but exact. Broadcast WAVE carries production and preservation metadata. The Library of Congress names WAVE its recommendation for digital audio collections.\n\nThe conversion is a decode and rewrite. FFmpeg in your browser reads the CAF and writes 16-bit little-endian PCM into a WAV, dropping any video stream. The page passes no quality setting. No tag options are passed either; FFmpeg's defaults decide, and in a test the CAF's title and artist arrived in the WAV. The CAF stays unchanged, and the download takes its name with a .wav ending. A batch of CAF files runs in sequence and yields a separate WAV for each.\n\n### Other ways to convert CAF to WAV\n\n- **FFmpeg (Windows, Mac, Linux):** run `ffmpeg -i field-recording.caf -c:a pcm_s16le field-edit.wav`. 16-bit output can reduce the source depth.\n- **Switch (Windows):** add the CAF, choose WAV as the output format, set the encoder options and an output folder, then click Convert. NCH lists CAF input and WAV output for Windows, Mac and Android versions of the program.\n\n### Problems with CAF files\n\n- **It opens but there is no sound**: opening the container does not guarantee that a system can decode the audio codec inside it.\n- **The channel layout is not what you expected**: CAF can hold optional channel-layout information. Check the channel order in your editor after converting a multichannel recording.\n- **A 24-bit recording loses depth**: the page writes 16-bit PCM, so a deeper CAF is reduced to 16 bits.\n- **The WAV is much larger than expected**: the CAF held compressed audio, and PCM is uncompressed.\n- **CAF notes are missing from the WAV**: information and edit-comment chunks in a CAF can carry descriptive text, but this page promises only what FFmpeg's defaults copy, such as global tags. Check the WAV in your editor if the notes matter.\n- **A program cannot open the CAF at all**: FFmpeg reads and writes the Core Audio Format container, so it can turn the file into a WAV from the command line, and ffplay can play supported CAF audio.\n- **A damaged or cut-short CAF**: such a file usually still converts, giving a shorter WAV, so compare its running time with the CAF.\n"
+    }
+  },
+  "cdr-to-jpg": {
+    "seo": {
+      "title": "CDR to JPG: This Page Cannot Convert It",
+      "h1": "CDR to JPG Converter",
+      "description": "This page cannot open CorelDRAW CDR files. Export a JPG from CorelDRAW or LibreOffice Draw instead; steps for each are below."
+    },
+    "tool": {
+      "subtitle": "This converter has no CDR reader. Use CorelDRAW or LibreOffice Draw to make the JPG."
+    },
+    "faqs": [
+      {
+        "question": "Can I convert CDR to JPG on this page?",
+        "answer": "No: there is no CDR reader in this page at all. It hands the file to your browser's image decoder, and the conversion fails with the message 'Image decode failed.' Use one of the programs listed below to export the JPG."
+      },
+      {
+        "question": "What is the easiest way to turn a CDR into a JPG?",
+        "answer": "Open the file in CorelDRAW and use File > Export. Choose JPEG in the Save as type list, enter a file name and click Export; an export dialog follows. If you do not own CorelDRAW, LibreOffice Draw can open a CDR and export JPEG."
+      },
+      {
+        "question": "Which programs besides CorelDRAW open CDR files?",
+        "answer": "LibreOffice Draw imports CDR through libcdr, and Inkscape uses libcdr for CDR input too. Both run on Windows, Mac and Linux."
+      },
+      {
+        "question": "Why does my CDR not open in an older CorelDRAW?",
+        "answer": "An older CorelDRAW release can reject a drawing produced by a newer version. Corel's documented workaround is to save an earlier-version copy from the newer program, but saving backward may alter newer effects or restrict editing."
+      },
+      {
+        "question": "Does exporting to JPG keep the vectors?",
+        "answer": "No. JPEG is a raster format, so the drawing becomes a fixed grid of pixels at the size you export. Keep the CDR if you may need the vectors later."
+      },
+      {
+        "question": "Can I export only part of the drawing?",
+        "answer": "CorelDRAW's export dialog has an Export this page only option and a Selected only option, so you can export one page or just the objects you selected."
+      },
+      {
+        "question": "Does Corel PHOTO-PAINT keep the vector shapes?",
+        "answer": "No. PHOTO-PAINT rasterizes an imported CDR drawing, so that import does not retain vector objects. Keep the CDR for any later vector editing."
+      },
+      {
+        "question": "Can a CDR contain photos as well as vectors?",
+        "answer": "Yes. A drawing can contain bitmap content alongside vector effects, and its save options include compression for bitmaps and graphic objects."
+      },
+      {
+        "question": "Is my CDR uploaded anywhere when I try this page?",
+        "answer": "No. Nothing leaves your device, and because the page cannot read the format the attempt simply fails with 'Image decode failed.' instead of producing a JPG."
+      },
+      {
+        "question": "How is a CDR different from a JPG?",
+        "answer": "A CDR is the native file of CorelDRAW and holds vector shapes, text, effects, pages and layers. JPG is a lossy raster format built for photographs, and it cannot store alpha transparency."
+      }
+    ],
+    "aboutSection": {
+      "title": "CDR and JPG",
+      "fromFormat": {
+        "name": "CDR",
+        "fullName": "CorelDRAW drawing",
+        "description": "The native file format of CorelDRAW, the vector graphics editor from Corel. It stores vector shapes, text, effects and pages.",
+        "details": [
+          "Vector artwork",
+          "Multiple pages and layers",
+          "Proprietary Corel format",
+          "Opens in LibreOffice Draw and Inkscape"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format for photographs, defined by the Joint Photographic Experts Group. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Raster pixels",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "CDR to JPG on this page",
+      "points": [
+        "This page has no CDR reader: it cannot open the file, and the attempt ends with 'Image decode failed.'",
+        "CorelDRAW and LibreOffice Draw can export a JPG.",
+        "A JPG is raster, so the drawing is fixed at the export size.",
+        "Nothing is uploaded, and your CDR is not changed."
+      ]
+    },
+    "guide": {
+      "title": "About CDR files",
+      "markdown": "### What is a CDR file?\n\nThe default drawing format of CorelDRAW is CDR. Corel calls it a primarily vector format: instead of a grid of pixels, the drawing is kept as shapes, curves, text and effects, across multiple pages and layers. Bitmap content can sit inside a drawing next to vector effects, and the save options offer compression for bitmaps and for graphic objects.\n\nProperties like a title and subject can be stored in a CDR, and fonts can be embedded where permissions and other restrictions allow. In the Save As dialog you can pick an earlier CDR version for compatibility, which matters because an older CorelDRAW may reject a drawing from a newer one.\n\nYou meet CDR files as logos, illustrations, signage and print design. CDR is a proprietary Corel format, and LibreOffice Draw and Inkscape read it through libcdr.\n\nThe target, JPEG, is a raster format with lossy compression, which the Joint Photographic Experts Group specified as ISO/IEC 10918-1. Web photographs, camera files, mailed attachments and shared pictures commonly use it, and its quality can be adjusted.\n\n### Programs that open CDR files\n\n**Windows, Mac and Linux**\n\n- LibreOffice Draw: imports CDR through libcdr.\n- Inkscape: uses libcdr for CDR input.\n\n**Windows and Mac**\n\n- CorelDRAW: opens its native drawings.\n\n**Web**\n\n- The web edition, CorelDRAW Web: documentation covers CDR support in compatible browsers; qualifying Graphics Suite subscribers and maintenance customers get access as a benefit.\n\n### CDR and JPG compared\n\n- **Names and types**: .cdr is CorelDRAW's native format. JPEG files end in .jpg or .jpeg, which mean the same thing.\n- **Kind**: CDR is primarily vector. JPEG is a raster format designed for photographs, so shapes become pixels.\n- **Compression**: JPEG is lossy, with no alpha transparency, so transparent pixels cannot survive a JPEG export.\n- **Pages and layers**: a CDR can have multiple pages and layers. JPEG is one flat raster picture with no editable layers, so keep your CDR.\n- **Support**: a JPEG is supported everywhere, and you can view it in Windows Photos, GIMP, Preview on macOS or a browser. A CDR opens in CorelDRAW, LibreOffice Draw and Inkscape.\n\nThis page cannot do the conversion. It runs in your browser, has no CDR reader of its own, and hands the file to the browser's image decoder, and the attempt ends with an 'Image decode failed.' error. Your file is not uploaded and is not changed. Pick one of the programs below, or ask whoever sent the drawing for a JPG. Once the drawing is a JPG its vector shapes are pixels, so pick the export size you need before saving, because enlarging the JPG afterwards cannot restore sharp edges.\n\nLibreOffice Draw can export to any of the graphics formats BMP, EMF, EPS, GIF, JPEG, PNG, SVG, TIFF and WMF. CorelDRAW itself offers JPEG in its export dialog, with options for the current page or only the selected objects.\n\n### Other ways to convert CDR to JPG\n\n- **CorelDRAW on Windows or Mac:** open the drawing, choose File > Export, set Save as type to JPEG, type a file name, optionally tick Export this page only or Selected only, and click Export.\n- **LibreOffice Draw on Windows, Mac or Linux:** open the CDR, then export it as JPEG. LibreOffice's guide lists JPEG among the graphics formats Draw exports and Corel Draw (*.cdr) among the formats it opens.\n\n### Problems with CDR files\n\n- **An older CorelDRAW will not open it**: the drawing was probably saved by a newer version. Ask for a copy saved in an earlier version, which the newer program offers.\n- **The vectors are gone after PHOTO-PAINT**: that program turns an imported CDR into pixels. Keep the CDR for later vector edits.\n- **Lettering changes on another computer**: fonts embed only where font permissions and other restrictions allow, so a drawing sent to someone else may not bring its fonts along.\n- **This page stops with a decode message**: nothing here can read the format, so the file never reaches a JPG.\n- **The JPG cuts off part of the design**: CorelDRAW can export only the selected objects or the current page, so check which option you picked before saving.\n- **The JPG differs from what another program makes**: equal quality numbers in two programs do not mean equal compression or looks.\n- **You only need a preview**: ask whoever made the drawing for a JPG.\n"
+    }
+  },
+  "cr3-to-jpeg": {
+    "seo": {
+      "title": "Convert CR3 to JPEG Online (Free)",
+      "h1": "CR3 to JPEG Converter",
+      "description": "Convert Canon CR3 RAW photos to JPEG in your browser with ImageMagick and LibRaw. One picture per file, no upload and no sign-up needed."
+    },
+    "tool": {
+      "subtitle": "Turn Canon CR3 RAW photos into ordinary JPEG files in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CR3 to JPEG?",
+        "answer": "Select the CR3, give the converter a moment and download the JPEG. A multi-file selection is worked through in order, with a separate JPEG for each."
+      },
+      {
+        "question": "Is my CR3 photo uploaded?",
+        "answer": "No. The RAW file stays put, because ImageMagick is compiled to WebAssembly and executes inside your browser."
+      },
+      {
+        "question": "Which program reads the CR3?",
+        "answer": "ImageMagick compiled to WebAssembly, using the LibRaw library that ships with it. The page does not use Canon software."
+      },
+      {
+        "question": "Will the JPEG look like the camera's own JPEG?",
+        "answer": "Not necessarily. A RAW file holds sensor data that still needs processing; this page develops it with the LibRaw library, reached through ImageMagick."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "The one hard limit is picture size. Pictures above roughly 537 megapixels are refused, and the page tells you the picture is too big. Beyond that, the page sets no cap on size."
+      },
+      {
+        "question": "Can I choose the JPEG quality?",
+        "answer": "The page sends no quality setting at all. For control over quality and size, export from darktable, whose export module sets the file format, quality and size."
+      },
+      {
+        "question": "What happens to my original CR3?",
+        "answer": "Nothing. The conversion makes a new JPEG, named after the CR3 with the .jpeg ending, and your RAW file stays as it was."
+      },
+      {
+        "question": "Why not just shoot JPEG?",
+        "answer": "RAW holds sensor data that must be developed before it is delivered. With Canon's RAW+JPEG capture, two files share one image number, which means a JPEG may already sit beside each CR3."
+      },
+      {
+        "question": "What if the conversion fails?",
+        "answer": "A cut-off CR3 stops with a message that the RAW file may be incomplete, and a damaged one with a message that it is damaged. Re-copy the file from the card and retry."
+      },
+      {
+        "question": "Can I convert several CR3 photos at once?",
+        "answer": "Yes. Add a whole set of CR3 photos and they are handled in turn. You get one JPEG download per photo, and nothing is bundled into a ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "CR3 and JPEG",
+      "fromFormat": {
+        "name": "CR3",
+        "fullName": "Canon RAW version 3",
+        "description": "The raw image format Canon introduced in 2018 for newer EOS cameras. It uses a container based on the ISO base media file format and can use lossy or lossless compression.",
+        "details": [
+          "Unprocessed sensor data",
+          "ISO base media file format container",
+          "Lossy and lossless options",
+          "Proprietary Canon format"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format for photographs, defined by the Joint Photographic Experts Group. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Processed 8-bit pixels",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CR3 to JPEG",
+      "points": [
+        "The JPEG comes from ImageMagick with LibRaw, not from Canon's software.",
+        "One picture is made per file, and no quality setting is passed.",
+        "A picture over about 537 megapixels fails with a 'too large' message.",
+        "Your CR3 is not changed, and nothing is uploaded.",
+        "Several files convert in turn, one JPEG each."
+      ]
+    },
+    "guide": {
+      "title": "About CR3 files",
+      "markdown": "### What is a CR3 file?\n\nCR3 is the camera RAW format Canon introduced in 2018 for newer EOS cameras; Canon ties the .CR3 extension to EOS models released since then. It uses a container based on the ISO base media file format, with lossy or lossless compression.\n\nRAW records the sensor's data, and that needs image processing before ordinary delivery. The camera can also write Compact RAW, called C-RAW, which makes smaller files than the normal RAW option by using lossy compression. Shooting RAW+JPEG makes the camera write two separate files under one image number.\n\nCR3 is used for photography with recent Canon cameras and for editing photos before conversion to JPEG. Canon Digital Photo Professional, Adobe Lightroom, Adobe Photoshop and darktable open it. Processing a RAW file into a JPEG can leave the original RAW unchanged.\n\n### Programs that open CR3 files\n\n**Windows, Mac and Linux**\n\n- RawTherapee: CR3 decoding arrived in version 5.8, and that release lacked metadata support.\n- darktable: gained CR3 support in version 3.8, subject to camera and dependency requirements.\n\n**Windows and Mac**\n\n- Canon Digital Photo Professional: processes supported Canon RAW images.\n\n**Mobile**\n\n- Adobe Lightroom for mobile: for iOS and Android; it edits camera RAW only from supported camera files and with premium access. Check the Canon model; Android file-picker recognition may require share-to-Lightroom or camera PTP import.\n\n### CR3 and JPEG compared\n\n- **Extensions and names**: .cr3 is Canon's RAW format. The .jpg and .jpeg extensions both mean JPEG here, and .jpg is what the page writes.\n- **Contents**: CR3 holds unprocessed sensor data. JPEG holds a processed picture and is designed for photographs.\n- **Compression**: CR3 has lossy and lossless options. JPEG is lossy, with adjustable quality in general.\n- **Container and standard**: a CR3 is an ISO base media file. ISO/IEC 10918-1 is the standard in which the Joint Photographic Experts Group describes JPEG.\n- **Typical use**: CR3 serves photography with recent Canon cameras. Typical JPEG uses are web photos, camera output, mail attachments and sharing pictures.\n- **Support**: JPEG is supported everywhere. Third-party RAW support must be checked for the particular camera model.\n\nThe page reads the CR3 with ImageMagick compiled to WebAssembly, which uses the LibRaw library for camera RAW, and writes a JPEG. ImageMagick reads one image from the file and passes no quality setting, and nothing is stripped on purpose. A frame bigger than roughly 537 megapixels is turned away, and the page says the picture is too big for this converter. The work happens in your browser on the main thread, with no server involved. Your CR3 is not changed; you download a new JPEG next to it, named like the CR3 but ending .jpeg.\n\nIf you shot RAW+JPEG, look next to the CR3 first: Canon writes a separate file with the same image number, and the JPEG may already be what you need.\n\n### Other ways to convert CR3 to JPEG\n\n- **Canon Digital Photo Professional on Windows or Mac:** select an image, choose File > Convert and save, pick a destination, enter a file name and select an image type.\n- **RawTherapee (Windows, Mac, Linux):** click the disk icon to open a Save As dialog with the name, location, format, bit depth and compression level, then save immediately or put the image at the head or tail of the processing queue. The gears icon queues it.\n- **darktable (Windows, Mac, Linux):** in the export module, switch the target to file on disk, pick JPEG, adjust quality (default 95) and size, and press Export.\n\n### Problems with CR3 files\n\n- **Your editor does not know your camera**: an older Digital Photo Professional build may fail to understand RAW files from a newer camera.\n- **A third-party program shows nothing**: see whether that program supports your particular camera model.\n- **RawTherapee 5.8 lacks metadata**: it decoded CR3 pixels without CR3 metadata, and its release notes describe selecting an input profile manually.\n- **Lightroom for mobile does not list the file**: on Android, the file picker may only recognize it after share-to-Lightroom or a camera PTP import.\n- **The file will not convert here**: one message says the file may be incomplete, meaning it was cut short, and another says it is damaged. Copy it from the card again.\n- **The picture is too large**: a result over about 537 megapixels is refused here, and the page says it is too big.\n"
+    }
+  },
+  "dxf-to-jpg": {
+    "seo": {
+      "title": "Convert DXF to JPG Online (Free)",
+      "h1": "DXF to JPG Converter",
+      "description": "Convert a DXF CAD drawing to a JPG picture in your browser. It is drawn on white at 2048 px on the long side, with text in DejaVu Sans. Free."
+    },
+    "tool": {
+      "subtitle": "Render a DXF drawing as a JPG picture in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert DXF to JPG?",
+        "answer": "Select the DXF, let the page draw it and save the JPG. If you pick several drawings, they are rendered in sequence, one picture each."
+      },
+      {
+        "question": "What size is the JPG?",
+        "answer": "The drawing is drawn at 2048 pixels on its longer side, on a white background. No side of the output is over 4096 pixels. The size does not follow your drawing units."
+      },
+      {
+        "question": "Which text font appears in the JPG?",
+        "answer": "Drawing text (TEXT and MTEXT) comes out in DejaVu Sans, not in the font your drawing names, so lettering can differ from what your CAD program shows."
+      },
+      {
+        "question": "Why does the page say WebGL is unavailable?",
+        "answer": "The drawing is rendered with WebGL by the dxf-viewer library. A browser or device without WebGL cannot draw it, and the page tells you so. Try another browser or device."
+      },
+      {
+        "question": "Does it draw 3D drawings?",
+        "answer": "The page makes one still JPG per drawing. A DXF can hold 2D and 3D geometry, but the output is a single flat picture."
+      },
+      {
+        "question": "Is my DXF uploaded?",
+        "answer": "No. Rendering happens in your browser, and the file never leaves your device."
+      },
+      {
+        "question": "What is a DXF file?",
+        "answer": "Drawing Exchange Format is a CAD format from Autodesk for sharing drawings between AutoCAD and other programs. It can be text or binary."
+      },
+      {
+        "question": "Which programs open DXF?",
+        "answer": "LibreCAD and QCAD Community Edition read DXF on Windows, Mac and Linux, and AutoCAD opens it on Windows. Autodesk Viewer shows DXF in a browser."
+      },
+      {
+        "question": "Why is the JPG blurry when I zoom in?",
+        "answer": "A JPG is raster. The drawing was turned into pixels at 2048 on the long side, so fine detail cannot be recovered by zooming."
+      },
+      {
+        "question": "Will my DXF file be changed?",
+        "answer": "No. Your DXF is left exactly as it was. The JPG is a new file that takes the DXF name and ends in .jpg."
+      }
+    ],
+    "aboutSection": {
+      "title": "DXF and JPG",
+      "fromFormat": {
+        "name": "DXF",
+        "fullName": "Drawing Exchange Format",
+        "description": "A CAD data exchange format introduced by Autodesk in 1982 to share drawings between AutoCAD and other programs. It can be stored as text or binary.",
+        "details": [
+          "2D and 3D geometry",
+          "Layers",
+          "Text or binary encoding",
+          "Documented by Autodesk"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format for photographs, defined by the Joint Photographic Experts Group. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Raster pixels",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DXF to JPG",
+      "points": [
+        "The drawing is rendered with WebGL on a white background.",
+        "The longer side is 2048 pixels, and no side goes over 4096.",
+        "TEXT and MTEXT entities are set in DejaVu Sans.",
+        "A browser without WebGL cannot render it and says so.",
+        "Several DXF files convert in turn, one JPG each."
+      ]
+    },
+    "guide": {
+      "title": "About DXF files",
+      "markdown": "### What is a DXF file?\n\nDXF, Drawing Exchange Format, is a format Autodesk publishes to exchange AutoCAD drawing data with other programs. The first DXF documentation appeared in 1982, and the media type registered for it is image/vnd.dxf.\n\nA DXF is either text or binary. The text kind is a long run of group codes, every one followed by its value. New drawing capabilities have introduced additional codes and format versions.\n\nDXF is used to exchange CAD drawings, for CNC, laser cutting and plotting work, and for architectural and engineering drawings. It carries 2D and 3D geometry and layers.\n\nJPEG is the output here: a raster image format with lossy compression, the Joint Photographic Experts Group standardized it in ISO/IEC 10918-1. It fits web photos, pictures from cameras, emailed attachments and photo sharing, with a quality that can be set.\n\n### Programs that open DXF files\n\nInkscape and FreeCAD also open DXF. The fact sheet for the format lists these programs by platform:\n\n**Windows, Mac and Linux**\n\n- LibreCAD: opens DXF drawings in its 2D CAD workspace.\n- QCAD Community Edition: a free 2D CAD application that supports DXF; QCAD Professional is where advanced interchange features live.\n\n**Windows and Mac**\n\n- Adobe Illustrator: brings in DXF written by AutoCAD releases 2.5 to 2007, and offers unit and scale settings.\n\n**Windows**\n\n- AutoCAD: use Open Drawing and select DXF in the file-type list.\n\n**Web**\n\n- Autodesk Viewer: Autodesk offers browser viewing for CAD interchange files, DXF among them.\n\n### DXF and JPG compared\n\n- **Extensions and media types**: .dxf has the registered type image/vnd.dxf. JPEG takes the ending .jpg or .jpeg.\n- **Kind**: DXF exchanges AutoCAD drawing data. JPEG is a raster format designed for photographs.\n- **Geometry**: layers, flat shapes and 3D shapes can all live in a DXF. This page makes one flat picture of the drawing.\n- **Transparency**: JPEG has no alpha transparency, and this page draws on white.\n- **Output size**: the JPG is 2048 pixels on its longer side, and no side goes over 4096 pixels.\n- **Fonts**: TEXT and MTEXT are set in DejaVu Sans, whichever font your drawing names.\n\nThe page uses the dxf-viewer library, which draws with three.js and WebGL. It paints the drawing on a white background and scales it to 2048 pixels on the longer side, with no output side over 4096 pixels. TEXT and MTEXT objects are set in DejaVu Sans. The picture is then encoded like any other image. If your browser has no WebGL, the page says it is unavailable. Nothing is uploaded, and your DXF is not changed. Pick several drawings and they convert in turn, one JPG each, named after the DXF with the .jpg ending.\n\nThe pixel size comes from the page, not from the drawing's units. The longer side is always set to 2048 pixels, so a small part and a large site plan end up at the same picture size. The page has no size setting, so use the CAD program or one of the methods below if you need a specific size.\n\n### Other ways to convert DXF to JPG\n\n- **LibreCAD (Windows, Mac, Linux):** open the DXF and choose File > Export. The list of image formats includes JPEG.\n- **LibreOffice Draw:** LibreOffice's guide lists AutoCAD Interchange Format (*.dxf) among the formats Draw opens, and lists JPEG among the graphics formats Draw exports.\n- **QCAD Professional (command line):** run `dwg2bmp -o plan-review.jpg -x 2400 plan-review.dxf` to render a picture 2400 pixels wide. The tool reads DXF or DWG, and QCAD's page lists it as dwg2bmpPRO in Professional installs.\n\n### Problems with DXF files\n\n- **LibreCAD misses features**: it does not implement every DXF feature, and it lists supported versions through DXF 2007.\n- **Illustrator refuses the file**: drawings saved after the 2007 AutoCAD format are rejected, so you need an older export.\n- **Illustrator asks for missing files**: a drawing that points at separate files can make the import ask for those missing external references.\n- **The scale is wrong in Illustrator**: scale and unit mapping need attention when moving a CAD drawing there.\n- **The page says WebGL is unavailable**: try another browser or device.\n- **This JPG does not match another program's output**: identical quality settings in different programs do not assure identical compression or looks.\n- **Lettering looks different**: text objects of both kinds use DejaVu Sans here, so the typeface may not match your CAD view.\n"
+    }
+  },
+  "emf-to-png": {
+    "seo": {
+      "title": "EMF to PNG: This Page Cannot Convert It",
+      "h1": "EMF to PNG Converter",
+      "description": "This page cannot open Windows EMF files. Export a PNG from Inkscape, LibreOffice Draw or ImageMagick on Windows instead; the steps are below."
+    },
+    "tool": {
+      "subtitle": "This converter has no EMF reader. Use Inkscape, LibreOffice Draw or ImageMagick to make the PNG."
+    },
+    "faqs": [
+      {
+        "question": "Can I convert EMF to PNG on this page?",
+        "answer": "No: this page ships without any EMF reader. The browser's decoder receives the file and in a test failed on an EMF, so the page shows 'Image decode failed.' Pick a program from the guide below."
+      },
+      {
+        "question": "What is the easiest way to turn an EMF into a PNG?",
+        "answer": "Open it in Inkscape and choose File > Export PNG Image. LibreOffice Draw can open an EMF and export it as PNG too."
+      },
+      {
+        "question": "Is there a command-line way?",
+        "answer": "ImageMagick lists EMF as readable on Windows only, with the size option supported, so the plain two-file magick command from the first method below is the one to use there."
+      },
+      {
+        "question": "Where do EMF files come from?",
+        "answer": "EMF records Windows GDI drawing commands. Windows and Microsoft Office use it to embed graphics, among them pasted charts and diagrams, printing output and clipboard content."
+      },
+      {
+        "question": "Will the PNG keep the picture sharp?",
+        "answer": "Only at the size you export. EMF records drawing commands and keeps drawing proportions across output devices, while a PNG is a fixed grid of pixels."
+      },
+      {
+        "question": "Why does the picture look different from the original?",
+        "answer": "Import support does not establish complete fidelity. Inkscape warns that some imported formats lose unsupported features, and an older EMF reader may not implement newer records."
+      },
+      {
+        "question": "Can an EMF contain a bitmap?",
+        "answer": "Yes. An EMF can contain bitmaps next to its drawing records, so one file may mix both kinds."
+      },
+      {
+        "question": "Why will my EMF not open at all?",
+        "answer": "A damaged record length can prevent a reader from locating the next drawing record."
+      },
+      {
+        "question": "Does trying this page send my EMF anywhere?",
+        "answer": "No. Nothing leaves your device, and without an EMF reader in the browser the attempt just ends in an error."
+      },
+      {
+        "question": "Why would I want a PNG instead of an EMF?",
+        "answer": "EMF is a Windows format that stores vector drawing commands and scales without loss. PNG is a lossless raster format that supports alpha transparency, and any browser can show it."
+      }
+    ],
+    "aboutSection": {
+      "title": "EMF and PNG",
+      "fromFormat": {
+        "name": "EMF",
+        "fullName": "Enhanced Metafile",
+        "description": "A Microsoft vector graphics format that records Windows GDI drawing commands. It is used in Windows and Microsoft Office to embed graphics.",
+        "details": [
+          "Vector drawing commands",
+          "Can embed bitmaps",
+          "Windows format",
+          "Scales without loss"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format with support for transparency, widely used for graphics and screenshots.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Raster pixels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "EMF to PNG on this page",
+      "points": [
+        "This page has no EMF reader: it cannot open the file, and the attempt ends with 'Image decode failed.'",
+        "Inkscape, LibreOffice Draw and ImageMagick on Windows can export a PNG.",
+        "A PNG is raster, so the drawing is fixed at the export size.",
+        "Nothing is uploaded, and your EMF is not changed."
+      ]
+    },
+    "guide": {
+      "title": "About EMF files",
+      "markdown": "### What is an EMF file?\n\nEMF, Enhanced Metafile, is Microsoft's format for storing graphics as recorded drawing operations. Instead of pixels, the file holds a header, a series of drawing records and an end record. The records describe graphics objects, property changes and drawing orders.\n\nIts device-independent design keeps drawing proportions across output devices. The first extension to the format added a pixel-format record and OpenGL command support. RFC 7903 identifies image/emf and the older image/x-emf media type.\n\nEMF is used for charts and diagrams pasted into Office documents and for Windows printing and clipboard graphics. Bitmaps can be embedded too, so a single file may hold both kinds.\n\nThe target, PNG, is a lossless raster picture format. Created in the mid-1990s as a GIF successor free of patent trouble, PNG is covered by ISO standard 15948 and by a W3C Recommendation. It is used for screenshots and interface graphics, for logos and images with transparency, and for web graphics that must stay sharp. It has 8-bit and 16-bit channels.\n\n### Programs that open EMF files\n\nMicrosoft Office and IrfanView also open EMF. Two more programs come from the fact sheet for EMF:\n\n**Windows, Mac and Linux**\n\n- LibreOffice Draw: lists Enhanced Windows Metafile among its import formats.\n- Inkscape: its format matrix lists EMF input and output support.\n\n### EMF and PNG compared\n\n- **Extensions and media types**: .emf with image/emf, or the older image/x-emf. The .png ending names a PNG, the lossless raster format.\n- **Kind**: EMF stores drawing commands. PNG is a raster picture.\n- **Scaling**: EMF scales without loss. A PNG has a fixed pixel size.\n- **Compression**: PNG compression is lossless, so the pixels you export are kept exactly.\n- **Transparency**: PNG supports alpha transparency.\n- **Bitmaps**: an EMF can embed bitmaps, while a PNG is nothing but a bitmap.\n- **Typical use**: EMF serves graphics inside Windows and Office. PNG is for screenshots, logos and sharp web graphics.\n- **Support**: EMF is a Windows format that records Windows GDI drawing commands, while PNG is supported by every browser.\n\nThis page cannot do the conversion. It decodes images with the browser's own image decoder, and in a test that decoder could not read an EMF, so the attempt ends in an 'Image decode failed.' error. The file stays on your device and is not changed. Use one of the programs below. Both LibreOffice Draw and Inkscape run on Windows, Mac and Linux, so you do not need Windows to open an EMF.\n\nLibreOffice Draw's guide names PNG among the graphics formats it exports. Check any imported result against the original. A browser works for viewing the exported PNG, as do GIMP, Windows Photos and Preview on macOS. Inkscape's wiki format matrix lists EMF among the formats it can both read and write, which is why it also appears in the list of programs above. A PNG from either program is a fixed grid of pixels, so export at the size you need, since enlarging the PNG later will not restore sharp edges.\n\n### Other ways to convert EMF to PNG\n\n- **ImageMagick on Windows:** run `magick office-diagram.emf office-diagram.png`. The command reads the EMF and writes a PNG. The ImageMagick formats page marks EMF as readable on Windows only, with the size option supported.\n- **Inkscape (Windows, Mac, Linux):** open the EMF, press Shift+Ctrl+E or use File > Export PNG Image, choose the export area (Page, Drawing, Selection or Custom), set a size and a file name, and click Export.\n- **LibreOffice Draw:** open the EMF, then export it as PNG. LibreOffice's guide gives no menu path for this.\n\n### Problems with EMF files\n\n- **A damaged file will not draw**: if a record length is damaged, the reader cannot find the next record.\n- **A newer EMF looks wrong in an old program**: older EMF readers may not implement records introduced by the format's extensions.\n- **Inkscape output differs from the original**: features Inkscape cannot import are lost, so compare the two.\n- **Only part of a chart appears**: choose the Drawing export area in Inkscape instead of Page or Selection.\n- **ImageMagick cannot read it on Mac or Linux**: EMF reading is listed as Windows only.\n- **'Image decode failed.' shows on this page**: in a test the browser's decoder could not read the EMF.\n"
+    }
+  },
+  "gif-to-avi": {
+    "seo": {
+      "title": "Convert GIF to AVI Online (Free)",
+      "h1": "GIF to AVI Converter",
+      "description": "Convert an animated GIF to AVI in your browser. Frames are encoded as MPEG-4 (Xvid tag) in an AVI file, with frames capped at 1920 px and 30 fps. Free."
+    },
+    "tool": {
+      "subtitle": "Turn an animated GIF into an AVI video with MPEG-4 video."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert GIF to AVI?",
+        "answer": "Select the GIF, wait for the encode to finish and download the AVI. Queue more GIFs if you like; each yields its own AVI."
+      },
+      {
+        "question": "Which codec does the AVI use?",
+        "answer": "MPEG-4 video, tagged xvid. The command also lists MP3 audio at 96 kbps, but a GIF has no sound to encode, and in a test run the AVI came out with no audio stream."
+      },
+      {
+        "question": "Does the AVI loop like the GIF?",
+        "answer": "The page passes no loop setting, and the AVI is an ordinary video file, so use the repeat option in your player if you want it to loop. Keep the GIF where you need an endless loop."
+      },
+      {
+        "question": "Will the AVI look as sharp as the GIF?",
+        "answer": "Not necessarily. MPEG-4 is lossy and the page encodes at a fixed -q:v 10, so the AVI is not a pixel-exact copy of the GIF. The GIF itself loses nothing, but it is held to 256 colors in each frame."
+      },
+      {
+        "question": "What frame rate and size does the AVI have?",
+        "answer": "A longer side over 1920 pixels is scaled down, while a smaller GIF keeps its size. Playback is held to 30 fps, and a faster GIF loses some frames but runs for the same time. Any odd dimension is trimmed by a pixel to become even."
+      },
+      {
+        "question": "Can the AVI come out larger than the GIF?",
+        "answer": "Yes. In a test, a tiny GIF of 157 bytes became an AVI of 5,874 bytes. The size depends on the content, and the page sets no size target."
+      },
+      {
+        "question": "Does the AVI keep GIF transparency?",
+        "answer": "No. One palette color in a GIF can be marked clear, but the AVI uses the yuv420p pixel format, and that format has no alpha, so transparent areas cannot stay transparent."
+      },
+      {
+        "question": "Can I choose the quality?",
+        "answer": "No. The page uses a fixed setting and offers no slider. For a different quality, run FFmpeg yourself with another -q:v value."
+      },
+      {
+        "question": "Is my GIF uploaded?",
+        "answer": "No. FFmpeg executes as WebAssembly in your browser, and the GIF stays on your device."
+      },
+      {
+        "question": "Can I drop in more than one GIF?",
+        "answer": "Yes. Choose multiple GIFs and the page converts each in sequence. Every GIF becomes a separate AVI download, and no archive is built."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and AVI",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container introduced by Microsoft in 1992 and based on RIFF. It interleaves video and audio and can hold many different codecs.",
+        "details": [
+          "RIFF-based container",
+          "Many codecs",
+          "Limited support for modern features",
+          "Legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to AVI",
+      "points": [
+        "The AVI holds MPEG-4 video tagged xvid, encoded at a fixed quality setting.",
+        "A GIF has no sound to encode; in a test the AVI had no audio stream.",
+        "The frame rate is capped at 30 fps and a picture over 1920 pixels on the longer side is scaled down.",
+        "No loop setting is passed, so loop the AVI in your player.",
+        "Several GIFs convert in turn, one AVI each."
+      ]
+    },
+    "guide": {
+      "title": "About GIF files",
+      "markdown": "### What is a GIF file?\n\nCompuServe produced the Graphics Interchange Format in 1987; people call it GIF. It packs data with lossless LZW coding and gives each frame a palette of up to 256 colors. It also offers simple animation and 1-bit transparency.\n\nA single GIF can hold several frames, which is how a simple animation is stored. Transparency here means one palette entry is declared fully clear, so there is no partial opacity. A disposal setting on each frame controls how the next image covers the one before it.\n\nPeople use GIFs as brief looping animations, small graphics and icons, reaction images and stickers. The AVI side is a RIFF-based video container that arrived with Windows in 1992, and you meet it in video archives and legacy desktop editing.\n\n### Programs that open GIF files\n\nAny web browser, Preview on macOS, Windows Photos and GIMP open GIF files. Sorted by platform, the format's fact sheet names these:\n\n**Windows, Mac and Linux**\n\n- GIMP: writes still pictures or multilayer animations.\n- ImageMagick: reads GIF; ask your install which formats it supports.\n\n**Web and Mobile**\n\n- Google Chrome: GIF display.\n\n**Web**\n\n- Mozilla Firefox: GIF display.\n\n**Mobile**\n\n- Safari: GIF display.\n\nFor the AVI you get, ffplay and mpv play it on Windows, Mac and Linux, Adobe Premiere opens AVI on Windows and Mac, and VLC plays it on Android and iOS.\n\n### GIF and AVI compared\n\n- **Extensions and media types**: .gif for GIF; .avi for AVI, commonly labeled video/x-msvideo.\n- **Kind**: GIF is a raster image format with simple animation. AVI is a video container that can hold many different codecs.\n- **Compression**: GIF uses lossless LZW with at most 256 colors per frame. The AVI from this page holds MPEG-4 video, which is lossy.\n- **Looping**: GIFs are typically used as short looping animations. This page passes no loop setting to the AVI.\n- **Transparency**: GIF has 1-bit transparency. The AVI is yuv420p video, and that pixel format carries no alpha.\n- **Typical use**: GIFs are reaction images and stickers. AVI turns up in older Windows video, capture output and archives.\n\nInside your browser, a WebAssembly build of FFmpeg does the encoding. It writes MPEG-4 video tagged xvid at a fixed -q:v 10 with B-frames off, and MP3 at 96 kbps is named in the command as well. No GIF side goes past 1920 pixels, and a side that is odd gets trimmed by a pixel. The AVI never exceeds 30 fps, so a quicker GIF sheds frames but plays for the same length of time. No stream mapping is passed. The upload never happens, the GIF stays untouched, and the result is saved as the same name ending in .avi. With a batch of GIFs, the page converts them one after another, each into its own AVI. There is no cap on file size from this page.\n\n### Other ways to convert GIF to AVI\n\n- **FFmpeg (Windows, Mac, Linux):** run `ffmpeg -i reaction-loop.gif -c:v mpeg4 -q:v 5 reaction-clip.avi` for MPEG-4 video at a -q:v value you choose. FFmpeg's manual describes the -q:v scale as codec-dependent.\n- **ImageMagick plus FFmpeg (command line):** run `magick diagram-motion.gif -coalesce diagram-frame-%04d.png`, then `ffmpeg -framerate 10 -i diagram-frame-%04d.png -c:v mpeg4 diagram-motion.avi` to control the frame rate yourself. The -coalesce option expands the frames into full images first.\n\n### Problems with GIF files\n\n- **Gradients look banded**: what GIMP writes as GIF is limited to 256 colors at most, so smooth gradients can shift.\n- **Soft edges turn jagged**: a GIF cannot hold partial opacity along a soft transparent edge.\n- **Frames overlap wrongly**: disposal choices determine what an earlier image leaves behind, so pick combine or replace to suit the animation.\n- **A GIF comment is missing**: GIMP leaves out a comment containing characters beyond seven-bit ASCII.\n- **Colors differ in the AVI**: lossy video at a fixed quality cannot match the GIF pixel for pixel.\n- **The AVI is bigger than the GIF**: in a test, a tiny GIF became a larger AVI. The page sets no size target.\n- **The AVI does not loop**: no loop setting is passed. Loop it in your player.\n- **There is no sound**: the GIF is silent, and the test AVI had no audio stream.\n- **An editor will not open the AVI**: an editor may recognize AVI but not include the decoder a given file needs. Play it in ffplay, mpv or VLC to check the file.\n- **The speed looks different**: the AVI never runs above 30 fps, so a faster GIF loses frames and cannot be matched exactly.\n"
+    }
+  }
+}

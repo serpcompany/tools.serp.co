@@ -1,0 +1,240 @@
+{
+  "tools": {
+    "3g2-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg: encode",
+          "steps": "ffmpeg -i handset.3g2 -c:v libx264 -c:a aac handset-share.mp4",
+          "limits": "Requires the input decoder and selected encoders; lossy re-encoding.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg: remux",
+          "steps": "ffmpeg -i archive-phone.3g2 -c copy archive-phone.mp4",
+          "limits": "Stream copy; MP4 must accept the existing codecs.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Add File(s), Output Format MP4, Encoder Options, Save to Folder, Convert.",
+          "limits": "Vendor marks 3G2 input Windows only; no damaged-file repair guarantee.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportingSources": [
+            "https://www.nchsoftware.com/prism/kb/1217.html"
+          ]
+        }
+      ]
+    },
+    "avi-to-mkv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i capture-master.avi -c copy capture-master.mkv",
+          "limits": "Automatic stream selection; supported codecs required. This is a remux.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "HandBrakeCLI",
+          "steps": "HandBrakeCLI --input avi-review.avi --output avi-review.mkv --format av_mkv --encoder x264 --aencoder av_aac --quality 22",
+          "limits": "Re-encodes video rather than stream-copying; review track selection and installed CLI options.",
+          "source": "https://handbrake.fr/docs/en/latest/cli/command-line-reference.html",
+          "supportingSources": [
+            "https://handbrake.fr/docs/en/latest/technical/containers.html",
+            "https://handbrake.fr/docs/en/latest/workflow/open-video-source.html"
+          ]
+        },
+        {
+          "app": "Prism",
+          "steps": "Add AVI, set Output Format MKV, review Encoder Options, set Save to Folder, Convert.",
+          "limits": "AVI codecs must be available; choices depend on installation.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportingSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ]
+        }
+      ]
+    },
+    "avi-to-webm": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i web-source.avi -c:v libvpx-vp9 -b:v 1024k -crf 32 -c:a libopus web-delivery.webm",
+          "limits": "Constrained-quality VP9 form; requires libvpx-vp9 and libopus encoders; lossy output.",
+          "source": "https://developers.google.com/media/vp9/settings/vod",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Open Source and choose the AVI; choose WebM as the container; pick one of the video encoders HandBrake lists for WebM.",
+          "limits": "Video transcoding; encoder choices depend on the container.",
+          "source": "https://handbrake.fr/docs/en/latest/technical/containers.html",
+          "supportingSources": [
+            "https://handbrake.fr/docs/en/latest/workflow/open-video-source.html"
+          ]
+        },
+        {
+          "app": "Prism",
+          "steps": "Add file, choose WebM output, configure encoder and folder, Convert.",
+          "limits": "Available options depend on the installed edition and decoders.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportingSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ]
+        }
+      ]
+    },
+    "bmp-to-jpeg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the BMP; choose File > Export As; in the JPEG export dialog set the quality from 0 to 100 (default 85).",
+          "limits": "Lossy JPEG; deliberate flattening needed for transparency.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick scan-bitmap.bmp -quality 90 scan-photo.jpeg",
+          "limits": "Example quality chosen explicitly; BMP variants depend on decoder support.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "caf-to-wav": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i field-recording.caf -c:a pcm_s16le field-edit.wav",
+          "limits": "Requires CAF codec support; 16-bit output can reduce source depth.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "Switch",
+          "steps": "Add the CAF; choose WAV as the Output Format; set Encoder Options and the Save to Folder; Convert.",
+          "limits": "Vendor lists CAF input and WAV output; available options depend on the installation.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportingSources": [
+            "https://www.nch.com.au/switch/kb/1405.html"
+          ]
+        }
+      ]
+    },
+    "cdr-to-jpg": {
+      "methods": [
+        {
+          "app": "CorelDRAW",
+          "steps": "File > Export; set Save as type to JPEG, enter the file name, optionally choose Export this page only or Selected only; click Export; an export dialog follows.",
+          "limits": "Requires CorelDRAW; JPEG is raster and flattens the page.",
+          "source": "https://product.corel.com/help/CorelDRAW/540223850/Main/EN/Documentation/CorelDRAW-Exporting-files.html"
+        },
+        {
+          "app": "LibreOffice Draw",
+          "steps": "Open the CDR in Draw; export it as JPEG (the book lists JPEG among Draw's graphics export formats); no menu path is given.",
+          "limits": "Imported through libcdr; Draw's guide lists Corel Draw (*.cdr) among the formats it opens.",
+          "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+        }
+      ]
+    },
+    "cr3-to-jpeg": {
+      "methods": [
+        {
+          "app": "Canon Digital Photo Professional",
+          "steps": "File > Convert and save; select an image, choose a destination, enter a file name and select an image type; save.",
+          "limits": "Requires a version that supports the camera model.",
+          "source": "https://cam.start.canon/en/S002/manual/html/UG-04_EditImage_0170.html"
+        },
+        {
+          "app": "RawTherapee",
+          "steps": "Develop supported CR3 in Editor; disk icon opens a Save As dialog (name, location, format, bit depth, compression level); save immediately or queue; the gears icon queues.",
+          "limits": "CR3 decoding arrived in 5.8; check metadata and camera support.",
+          "source": "https://rawpedia.pixls.us/saving_images/"
+        },
+        {
+          "app": "darktable",
+          "steps": "Open the export module; target file on disk; choose the JPEG format, set quality (default 95) and size; Export.",
+          "limits": "CR3 support depends on version and camera.",
+          "source": "https://docs.darktable.org/usermanual/4.6/en/module-reference/utility-modules/shared/export/"
+        }
+      ]
+    },
+    "dxf-to-jpg": {
+      "methods": [
+        {
+          "app": "LibreCAD",
+          "steps": "Open the DXF; File > Export; the export list includes JPEG.",
+          "limits": "LibreCAD does not implement every DXF feature; supported versions run through DXF 2007.",
+          "source": "https://docs.librecad.org/en/latest/ref/menu.html",
+          "supportingSources": [
+            "https://dokuwiki.librecad.org/doku.php/usage%3Afaq"
+          ]
+        },
+        {
+          "app": "QCAD Professional",
+          "steps": "dwg2bmp -o plan-review.jpg -x 2400 plan-review.dxf",
+          "limits": "Command-line tool of QCAD Professional; the page lists it as dwg2bmpPRO in Professional installs; not run locally.",
+          "source": "https://www.qcad.org/en/command-line-tools/"
+        },
+        {
+          "app": "LibreOffice Draw",
+          "steps": "Open the DXF in Draw (AutoCAD Interchange Format (*.dxf) is listed among the formats it opens); export it as JPEG (JPEG is listed among Draw's graphics export formats); no menu path is given.",
+          "limits": "The guide gives no menu path or export options.",
+          "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+        }
+      ]
+    },
+    "emf-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick on Windows",
+          "steps": "magick office-diagram.emf office-diagram.png",
+          "limits": "EMF is listed as readable on Windows only, with the size option supported.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Inkscape",
+          "steps": "Open the EMF; File > Export PNG Image (Shift+Ctrl+E); choose the export area (Page, Drawing, Selection or Custom), the image size and file name; Export.",
+          "limits": "Some imported formats lose unsupported features.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html"
+        },
+        {
+          "app": "LibreOffice Draw",
+          "steps": "Open the EMF in Draw (Enhanced Windows Metafile is listed among the formats it opens); export it as PNG (PNG is listed among Draw's graphics export formats); no menu path is given.",
+          "limits": "The guide gives no menu path or export options.",
+          "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+        }
+      ]
+    },
+    "gif-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i reaction-loop.gif -c:v mpeg4 -q:v 5 reaction-clip.avi",
+          "limits": "Lossy MPEG-4; no audio from a GIF; the -q:v scale is codec-dependent.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "ImageMagick plus FFmpeg",
+          "steps": "magick diagram-motion.gif -coalesce diagram-frame-%04d.png; then ffmpeg -framerate 10 -i diagram-frame-%04d.png -c:v mpeg4 diagram-motion.avi",
+          "limits": "Two tools; frame rate is set by you.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        }
+      ]
+    }
+  }
+}

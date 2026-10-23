@@ -1,0 +1,921 @@
+{
+  "aac-to-mp4": {
+    "seo": {
+      "title": "Convert AAC to MP4: Audio in an MP4 File",
+      "h1": "AAC to MP4 Converter",
+      "description": "Convert AAC to MP4 in your browser. The audio is encoded again as AAC at 96 kbps inside an MP4 with no video. Free, with no sign-up.",
+      "howToHeading": "How to convert AAC to MP4"
+    },
+    "tool": {
+      "subtitle": "Put an AAC recording into an MP4 file, with no picture, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AAC to MP4?",
+        "answer": "Pick the AAC above. The page encodes it into an MP4 with a sound track, and the MP4 downloads when it is done. Choose several recordings and each gets its own MP4."
+      },
+      {
+        "question": "Will the MP4 have a picture?",
+        "answer": "No. An AAC file holds only sound, so the MP4 holds a sound track and no video. If a site wants a movie with a still image behind the sound, you need a video editor for that step."
+      },
+      {
+        "question": "Is AAC the same as MP4?",
+        "answer": "No. AAC is a way of compressing sound. MP4 is a container that can hold that sound, video, subtitles and more. A .aac file is usually a bare stream of audio frames, and an MP4 wraps audio in a structure with track information."
+      },
+      {
+        "question": "Does this copy the AAC audio or encode it again?",
+        "answer": "It encodes it again. The page sends the audio through FFmpeg's AAC encoder at 96 kbps, so the sound goes through a second lossy pass. To repackage the existing frames instead, use the FFmpeg or Bento4 method under Other ways."
+      },
+      {
+        "question": "What bitrate will the MP4 audio have?",
+        "answer": "96 kbps, whatever the bitrate of your AAC file was. A second lossy pass cannot bring back detail the first one discarded, so a higher bitrate in the source is not kept."
+      },
+      {
+        "question": "Can I rename a .aac file to .mp4?",
+        "answer": "A rename edits the file name and nothing inside. The data stays a raw AAC stream with its ADTS framing, and only a conversion builds an actual MP4 container around it."
+      },
+      {
+        "question": "Why is my .aac file hard to play on some programs?",
+        "answer": "Some decoders were written for MPEG-2 AAC and cannot handle the MPEG-4 variants, and a bare stream gives them no wrapper to go by. VLC reads raw AAC, so try it first."
+      },
+      {
+        "question": "What can I use to play a .aac file?",
+        "answer": "On Windows, Mac and Linux both VLC and FFmpeg read it; Adobe Audition imports it on Windows and Mac too. The MP4 this page makes can be opened in whatever player you already use for MP4 files."
+      },
+      {
+        "question": "Can I make the MP4 without recompressing the audio?",
+        "answer": "Yes, outside this page. FFmpeg's stream copy and Bento4's mp4mux both put the existing AAC frames into an MP4 as they are. This page always encodes the audio again."
+      },
+      {
+        "question": "Is my AAC file uploaded?",
+        "answer": "No. The page runs FFmpeg as WebAssembly in your browser tab, which keeps the recording on your device. The page sets no size limit, so how long a recording takes depends only on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "AAC and MP4",
+      "fromFormat": {
+        "name": "AAC",
+        "fullName": "Advanced Audio Coding",
+        "description": "A lossy audio codec standardized by MPEG (ISO/IEC 13818-7 and 14496-3) as the successor to MP3. A standalone .aac file commonly carries ADTS framing.",
+        "details": [
+          "Lossy compression",
+          "Better efficiency than MP3",
+          "Raw .aac streams or MP4 containers",
+          "Widely supported"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. This converter writes one with an AAC audio track.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AAC to MP4",
+      "points": [
+        "The audio is encoded again as AAC at 96 kbps, whatever bitrate your file had.",
+        "The MP4 has a sound track and no picture; the page adds no video.",
+        "A bare .aac stream becomes a real MP4 container, with the index placed at the start of the file.",
+        "The second lossy pass cannot restore detail the first one discarded.",
+        "The download is named after your file with the .mp4 extension."
+      ]
+    },
+    "guide": {
+      "title": "About AAC files",
+      "markdown": "### What is an AAC file?\n\nAAC is a lossy audio codec developed by MPEG as MP3's successor; the name stands for Advanced Audio Coding. It is defined in MPEG-2 Part 7 and again in MPEG-4 Part 3. For a given bitrate it tends to sound better than MP3, so streaming, music downloads and phones lean on it.\n\nThe codec and the file are two things. AAC audio can sit inside an MP4 or QuickTime wrapper, which is what an .m4a file is. A standalone .aac file is different: it commonly carries ADTS framing, with no track information around it. The registered audio/aac media type covers that stream form, along with LATM/LOAS framing. Profiles such as LC, HE-AAC and HE-AAC v2 describe how the audio was coded, and a player has to support the profile as well as read the file.\n\nA raw .aac stream can also start or end with ID3v1, ID3v2 or APE tags, which FFmpeg's aac demuxer reads along with the ADTS frames. The ADTS frame header holds a version bit that marks the stream as MPEG-2 or MPEG-4 AAC; FFmpeg's adts muxer writes 0, meaning MPEG-4, unless told otherwise. That bit is one reason a decoder built for one flavor can stumble on the other.\n\nBecause the same codec can live in either wrapper, moving between them is mostly a question of packaging.\n\n### Programs that open AAC files\n\n- **Windows, Mac and Linux:** VLC media player takes raw AAC as input and decodes the MPEG-4 version of AAC.\n- **Windows, Mac and Linux:** FFmpeg includes an AAC decoder and its own AAC encoder.\n- **Windows and Mac:** Adobe Audition imports AAC, including HE-AAC.\n\n### AAC and MP4 compared\n\n- **Extensions and media types**: .aac and audio/aac for a raw stream; .mp4 and video/mp4 for the container. Audio-only MPEG-4 files often use .m4a and the audio/mp4 type.\n- **What each is**: AAC compresses sound. MP4, defined in ISO/IEC 14496-14 and first published in 2003, holds sound, video, subtitles and metadata in separate tracks.\n- **Wrapper**: a raw .aac stream has none. Under the hood the container is ISO base media, an offshoot of QuickTime, and its track and timing data sit in nested boxes.\n- **Video**: MP4 mostly holds H.264 video together with AAC audio, and other codecs, among them AV1, VP9, MP3 and Opus, can be stored in it as well. It does not need any video.\n\nThe wrapper changes, and so does the audio. On the page, FFmpeg decodes the AAC and encodes it again as AAC at 96 kbps inside an MP4. FFmpeg then makes a second pass that relocates the moov atom, its name for the index, to the front so players find the track information without reading the whole file. No picture is added, so you get an MP4 with sound only. The conversion runs entirely in your browser, so the recording is not uploaded anywhere, and each file in a batch becomes its own MP4.\n\n### Other ways to convert AAC to MP4\n\nBoth methods copy the frames instead of encoding them again.\n\n- **FFmpeg:** run `ffmpeg -i voice.aac -c:a copy voice-container.mp4`. Its documentation describes stream copy as no decoding or encoding, and its aac demuxer reads ADTS AAC, with any ID3v1/2 or APE tags in it. Nothing is re-encoded, so the audio keeps the bitrate it already had.\n- **Bento4:** run `mp4mux --track aac:voice.aac voice-muxed.mp4`. Its documentation lists AAC input as ADTS format, and says that when you give no type before the colon, the type is inferred from the file extension. The output is the last name on the command line.\n\n### Problems with AAC files\n\n- **A file plays in one program and not another**: some decoders are built for MPEG-2 AAC only and cannot read the MPEG-4 variants. VLC accepts raw AAC input, so open the file there.\n- **Renaming to .m4a did not help**: a new extension leaves the ADTS framing where it was and adds no MP4 wrapper. Only a real conversion changes the container.\n- **The file is much larger once decoded**: AAC stores compressed audio, so an editor that unpacks it to raw samples uses far more space.\n- **A ZIP does not shrink it**: AAC streams are already compressed, and zipping them usually saves little.\n"
+    }
+  },
+  "ai-to-jpeg": {
+    "seo": {
+      "title": "Convert AI to JPEG: Illustrator File to Image",
+      "h1": "AI to JPEG Converter",
+      "description": "Convert an Illustrator AI file to JPEG in your browser. Each page of its PDF content becomes a JPEG on a white background. Free, with no sign-up.",
+      "howToHeading": "How to convert AI to JPEG"
+    },
+    "tool": {
+      "subtitle": "Turn an Illustrator AI file into JPEG images on a white background, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn an AI file into a JPEG?",
+        "answer": "Add the AI file above and give the pages a moment to render, then save the JPEG. A file with several PDF pages produces one JPEG per page, with _page1, _page2 and so on in the names."
+      },
+      {
+        "question": "What does \"no PDF inside\" mean for my AI file?",
+        "answer": "The page draws the PDF that Illustrator embeds in an AI file, and yours has none, so there is nothing to draw. Open the artwork in Illustrator, save it again with the PDF-compatible option on, and run the new file through."
+      },
+      {
+        "question": "Will the JPEG have a transparent background?",
+        "answer": "No. JPEG cannot store transparency, so each page is painted on opaque white. A logo that must sit on other colors needs a format with an alpha channel, such as PNG."
+      },
+      {
+        "question": "Can I get a JPEG from an AI file without Illustrator?",
+        "answer": "Yes. This page renders the PDF inside the AI file in your browser, so nothing needs installing. Inkscape and ImageMagick can also read AI files if you want a desktop program."
+      },
+      {
+        "question": "How big is the JPEG?",
+        "answer": "Each page renders at up to twice its size. The limit applies to the whole page area, about 16.8 megapixels, so a big poster is scaled down and ends up smaller than twice its size. The JPEG is saved at quality 0.9."
+      },
+      {
+        "question": "Can I convert just one page of the file?",
+        "answer": "No. The page converts every page it finds and gives each its own JPEG. Keep the one you want and delete the rest."
+      },
+      {
+        "question": "Can I drop in a whole folder of AI files?",
+        "answer": "Choose them together and the page converts them one after another. Each result downloads as its own file, so expect one download for every picture, not a ZIP archive."
+      },
+      {
+        "question": "Is a JPEG a good copy of a logo?",
+        "answer": "It works for a proof, a slide or a web page. It is a fixed set of pixels, so enlarging it later softens the edges, and it keeps no paths or live text. Keep the AI file as the master."
+      },
+      {
+        "question": "Which programs open an AI file?",
+        "answer": "Adobe Illustrator opens it with every editable object. Inkscape can import AI artwork, and ImageMagick can read it, though neither gives Illustrator's editing. Without those, this page shows you the artwork as images."
+      },
+      {
+        "question": "Does the AI file change when I convert it?",
+        "answer": "No. New JPEG files are created and the AI file is read only, so the original is untouched."
+      }
+    ],
+    "aboutSection": {
+      "title": "AI and JPEG",
+      "fromFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "The native file format of Adobe Illustrator. It stores vector artwork such as paths, shapes, text and effects, and modern files embed a PDF-compatible stream.",
+        "details": [
+          "Vector artwork",
+          "Layers and artboards",
+          "PDF-compatible content",
+          "Proprietary Adobe format"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AI to JPEG",
+      "points": [
+        "The page draws the PDF stored inside the AI file. A file saved without one fails with a \"no PDF inside\" message.",
+        "Every page becomes its own JPEG, and nothing is zipped.",
+        "The background is opaque white, because JPEG has no transparency.",
+        "The AI file is only read; you download new JPEG files and the original stays as it was.",
+        "The JPEG is flat pixels. Paths, text and layers stay in the AI file."
+      ]
+    },
+    "guide": {
+      "title": "About AI files",
+      "markdown": "### What is an AI file?\n\nA file ending in .ai is Illustrator's native document. Inside are paths, shapes and text drawn as vectors, along with layers, artboards and live effects, and placed raster images can sit among those objects. Logos, illustrations and print layouts are the usual jobs, and brushes, effects and transparency stay editable inside the file.\n\nThe format has been through changes: Illustrator 9 reworked it in 2000, and older files used PostScript. Newer files can carry a PDF-compatible copy beside Illustrator's private data, added when you save with the PDF-compatible option. That copy is how other software can draw the artwork without knowing Illustrator's internals.\n\nIllustrator also lets an AI document mix vector objects with pixel images. Two AI files can look alike in a folder and differ inside: one carries the PDF-compatible rendition and the other does not. Third-party software can fail on a file saved without that rendition, because this converter draws the embedded PDF.\n\n### Programs that open AI files\n\n- **Windows, Mac and Linux:** ImageMagick lists the format as Illustrator CS2 and renders it to a picture instead of editing it.\n- **Windows and Mac:** Adobe Illustrator opens native artwork with every object still editable, and it preserves the effects, brushes, layers and transparency stored in the document.\n- **Linux:** Inkscape's manual says it imports AI artwork saved by Illustrator 9.0 or later, and some document features may not come across. The same manual notes that an import can open a dialog of options, and that some import formats depend on other programs installed on your computer.\n\n### AI and JPEG compared\n\n- **Extensions**: an Illustrator file ends in .ai; the picture ends in .jpg or .jpeg, two spellings of one format with the image/jpeg media type.\n- **Kind of image**: an AI file is mostly vector artwork that can be scaled without losing sharpness. A JPEG is a raster, a fixed grid of pixels, at 8 bits for each color channel.\n- **Compression**: JPEG is lossy. In its baseline mode a picture is cut into eight by eight pixel tiles. Each tile is run through a discrete cosine transform before entropy coding with Huffman tables. Progressive files differ by storing several passes, so a viewer can paint a low-detail picture early while downloading continues.\n- **Origin**: the format is named for the committee that wrote it. Its core specification is ITU-T T.81, dated 1992, with ISO/IEC 10918-1 as the matching ISO text.\n- **Quality**: programs usually expose a 0 to 100 slider, though one number can give different results from one program to the next.\n- **Reach**: browsers all show JPEG, and cameras and scanners commonly produce it.\n- **Transparency**: Illustrator keeps transparency. JPEG has none and cannot store layers.\n- **Editing**: the AI file keeps layers, artboards and live text. A JPEG keeps none of that.\n\nAn editable document becomes a flat picture. The page takes the PDF stored inside your AI file, has PDF.js draw each page onto an opaque white background, and writes each one out as a JPEG. The size limits are in the FAQs below. An AI file with no PDF inside cannot be drawn, and the page tells you so.\n\n### Other ways to convert AI to JPEG\n\n- **ImageMagick:** run `magick brand.ai brand-proof.jpeg`. ImageMagick's format list shows AI as readable and says its PDF support requires Ghostscript.\n\n### Problems with AI files\n\n- **An error about a missing PDF**: Illustrator saved the file without its PDF-compatible copy. Reopen it there, turn the PDF-compatible saving option on, and convert the new copy.\n- **An old file is refused**: a file from before Illustrator 9 was PostScript-based, so it has no embedded PDF to draw, and this page answers with the no-PDF message. Open it in Illustrator and save it again.\n- **Part of the artwork is missing in Inkscape**: Inkscape imports only a subset of the features of some formats, and its manual lists AI files from Illustrator 9.0 onward.\n- **Another program draws it wrong**: programs that read only the embedded PDF never see Illustrator's native objects. For editing, use Illustrator.\n- **An older Illustrator opens it badly**: Adobe recommends opening artwork in the version that saved it or a newer one.\n- **Linked images are missing**: they stay external unless Include Linked Files was selected while saving.\n"
+    }
+  },
+  "amr-to-wav": {
+    "seo": {
+      "title": "Convert AMR to WAV: Voice Memo to PCM Audio",
+      "h1": "AMR to WAV Converter",
+      "description": "Convert AMR to WAV in your browser. The speech is decoded to 16-bit PCM, so Audacity can import it. Free, with no sign-up.",
+      "howToHeading": "How to convert AMR to WAV"
+    },
+    "tool": {
+      "subtitle": "Decode an AMR voice recording to a 16-bit WAV file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I change an AMR to a WAV file?",
+        "answer": "Drop your .amr memo on the page above. FFmpeg decodes it inside your browser, and the WAV is ready to save. With several memos you get a WAV per memo."
+      },
+      {
+        "question": "Why does the WAV weigh so much more than the AMR?",
+        "answer": "AMR squeezes a voice into a very small stream. The WAV stores raw 16-bit samples with no compression, and the extra bulk adds no detail."
+      },
+      {
+        "question": "Will the WAV sound better than the AMR?",
+        "answer": "No. Decoding only unpacks the speech into plain samples, and nothing the AMR dropped returns. Narrowband AMR is sampled at just 8 kHz to begin with."
+      },
+      {
+        "question": "Is the WAV compressed?",
+        "answer": "No. The page writes signed 16-bit PCM, so the WAV holds raw samples with no further compression."
+      },
+      {
+        "question": "My computer won't play .amr. How can I open it?",
+        "answer": "FFmpeg decodes AMR from the command line. A WAV from this page opens in Audacity without any extra library."
+      },
+      {
+        "question": "Where do AMR files come from?",
+        "answer": "Mostly from phones: voice recordings and voice messages. ETSI designed the codec for GSM speech before 3GPP took it into third-generation cellular systems."
+      },
+      {
+        "question": "Is AMR-WB the same codec as AMR?",
+        "answer": "They are different codecs. Narrowband works at 8 kHz and AMR-WB at 16 kHz, and each file starts with its own signature, so renaming cannot turn one into the other."
+      },
+      {
+        "question": "Can I rename a .amr file to .wav?",
+        "answer": "No. The file would still hold AMR speech, because changing an extension cannot change the codec inside. Converting writes real WAV data."
+      },
+      {
+        "question": "Is there a size limit for the AMR file?",
+        "answer": "The page sets none, and it has no timeout of its own. FFmpeg runs in your browser, so a longer memo takes longer on a slower device."
+      },
+      {
+        "question": "What happens if my AMR file is damaged or cut short?",
+        "answer": "Most of the time the file still converts. Anything FFmpeg cannot decode is reported and skipped, so the WAV ends up shorter than the original. Fetch a fresh copy from the phone if the end of the recording is missing."
+      }
+    ],
+    "aboutSection": {
+      "title": "AMR and WAV",
+      "fromFormat": {
+        "name": "AMR",
+        "fullName": "Adaptive Multi-Rate audio",
+        "description": "A speech codec standardized by ETSI for GSM and adopted by 3GPP for third-generation cellular systems. Narrowband AMR samples at 8 kHz and codes speech in 20-millisecond frames.",
+        "details": [
+          "Narrowband speech codec",
+          "Eight modes from 4.75 to 12.2 kbps",
+          "8 kHz sampling",
+          "Defined for storage in RFC 4867"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "A RIFF-based wrapper for sound that Microsoft and IBM documented. This converter writes uncompressed 16-bit PCM into it.",
+        "details": [
+          "RIFF container",
+          "Linear PCM is the usual payload",
+          "Imported by Audacity and other editors",
+          "Large files compared with compressed audio"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AMR to WAV",
+      "points": [
+        "The WAV holds signed 16-bit PCM, so it is uncompressed and much larger than the AMR.",
+        "Decoding does not restore detail: a narrowband AMR was sampled at 8 kHz and the WAV cannot sound wider than that.",
+        "Several files run one after another, and each downloads as its own WAV.",
+        "The download is named after your file with the .wav extension.",
+        "FFmpeg runs in your browser, so the recording is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About AMR files",
+      "markdown": "### What is an AMR file?\n\nAdaptive Multi-Rate, abbreviated AMR, began as an ETSI speech codec for GSM and was later taken up by 3GPP for 3G networks. The codec is tuned for speech and produces tiny files, so phones favor it for voice recordings and voice messages.\n\nA .amr file normally holds the narrowband codec, sampled at 8 kHz and split into 20-millisecond frames with eight speech modes from 4.75 to 12.2 kbps. AMR-WB is its own codec at 16 kHz, with nine wideband modes running from 6.6 to 23.85 kbps. The file starts with a text signature: the characters #!AMR and a line break for narrowband, and #!AMR-WB for wideband. Each stored speech frame then begins with a one-octet header holding a frame type, a quality bit and padding, and the last octet of the speech bits is zero-padded for alignment. A quality bit set to 0 marks a severely damaged frame. A frame that was lost or never transmitted is stored as NO_DATA, and the wideband file can also use SPEECH_LOST. RFC 4867, from April 2007, covers AMR files and their RTP transport, and it registers audio/AMR for narrowband.\n\nYou usually meet an AMR file as a recording that came off an older phone, and then find that your computer cannot play it or your editor will not import it. Audacity imports WAV, so a WAV copy gets around that.\n\nArchivists at the Library of Congress list WAVE among recommended formats for audio collections, which suits a recording you mean to keep.\n\n### Programs that open AMR files\n\n- **Windows, Mac and Linux:** FFmpeg is a command-line tool with decoders for AMR narrowband and AMR wideband.\n\n### AMR and WAV compared\n\n- **Extensions and media types**: .amr and audio/AMR for narrowband AMR; .wav and audio/wav or audio/x-wav for WAV.\n- **Kind of format**: AMR names a speech codec, whereas WAV is a RIFF wrapper that can hold several encodings, usually linear PCM but sometimes compressed ones.\n- **Compression**: AMR is lossy and tuned for speech. PCM in WAV is uncompressed.\n- **Frames**: an AMR file is a run of 20-millisecond speech frames, each with its own small header. A WAV stores a continuous stream of samples, so the frame structure disappears in the conversion.\n- **Bandwidth**: AMR suits a voice and little else. WAV can hold much wider audio, but a WAV made from AMR still carries only what the AMR kept.\n- **Limits and metadata**: a WAV has a 4 GB size limit, and very large recordings may need RF64 rather than the original RIFF size fields. Broadcast WAVE adds production and preservation metadata, and since extension chunks and the standard INFO chunks hold different information, programs treat them differently.\n\nWhat changes in this conversion is the storage, not the sound. The page runs FFmpeg in a worker and writes 16-bit PCM. The result is a plain waveform. Audacity opens nearly every WAV, all PCM variants included, with no extra library, but a WAV with a recorder's proprietary compression is a case where Audacity recommends its FFmpeg library. It does not reverse the speech compression, and raising the sampling rate in another program afterward cannot put missing frequencies back.\n\n### Other ways to convert AMR to WAV\n\n- **FFmpeg:** run `ffmpeg -i memo.amr memo-edit.wav`. FFmpeg's codec documentation lists decoders for AMR narrowband and wideband, and says the AMR-NB one is built into FFmpeg itself.\n\n### Problems with AMR files\n\n- **The sound is thin or tinny**: that is the codec. A narrowband recording cannot supply the wider frequency range of an AMR-WB source, because the two use different sampling rates.\n- **You are not sure what it is**: check the first bytes. A narrowband file begins with #!AMR and a line break, and a wideband file with #!AMR-WB.\n- **Renaming did not work**: AMR and AMR-WB signatures differ, and changing an extension cannot change the encoded speech.\n- **The WAV is far larger than the AMR**: AMR packs speech into a few kilobits a second, while a WAV holds every sample as uncompressed PCM, so the file grows even though no detail is added.\n- **The recording is cut off**: a partial transfer from the phone gives a partial recording. This page usually still turns the part that arrived into a shorter WAV, but copy the file across again for the whole memo.\n"
+    }
+  },
+  "av1-to-mp4": {
+    "seo": {
+      "title": "Convert AV1 to MP4: Raw Stream to H.264",
+      "h1": "AV1 to MP4 Converter",
+      "description": "Convert AV1 to MP4 in your browser. A raw .av1 stream is decoded by your browser and re-encoded as H.264, with no sound. Free, with no sign-up.",
+      "howToHeading": "How to convert AV1 to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn a raw AV1 video stream into an H.264 MP4 that plays almost anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn an AV1 video into an MP4?",
+        "answer": "Add the .av1 file in the box above. Your browser decodes the AV1, the page encodes H.264 into an MP4, and you save the result. A batch is processed one file at a time."
+      },
+      {
+        "question": "Does the MP4 keep AV1 video?",
+        "answer": "No. The MP4 holds H.264 video, which more players, phones and editors decode than AV1. To keep AV1 inside an MP4 without re-encoding, use one of the desktop methods listed in the guide."
+      },
+      {
+        "question": "Why does the MP4 have no sound?",
+        "answer": "A .av1 file is a bare video stream, so no audio track exists to carry over, and the page labels it \"Video only\". If the sound lives in another file, combine the two in a video editor."
+      },
+      {
+        "question": "Why does it say my browser can't decode AV1?",
+        "answer": "Decoding is done by the AV1 decoder built into your browser, and some devices lack one. You then see \"Your browser can't decode AV1 on this device\" and a suggestion to try a current Chrome or Edge on another computer."
+      },
+      {
+        "question": "Does the MP4 keep the AV1's resolution and frame rate?",
+        "answer": "Up to a ceiling, yes. Bigger pictures shrink to fit under the ceiling, while smaller ones stay as they are. A clip with a higher frame rate than the ceiling has frames removed, and its running time stays the same. Rounding to even sizes can trim one pixel from an odd width or height."
+      },
+      {
+        "question": "Does the MP4 look as good as the AV1?",
+        "answer": "Not identically. The AV1 is decoded and the pictures go through a new H.264 encode, so the MP4 is a fresh encode in a different lossy codec, not a copy."
+      },
+      {
+        "question": "What is a .av1 file?",
+        "answer": "It is the AV1 codec's raw stream saved straight to disk. Online video usually wraps AV1 in MP4 or WebM instead, and the .av1 ending is optional, so a suffix tells you nothing about the framing."
+      },
+      {
+        "question": "Can I open an AV1 file without converting it?",
+        "answer": "FFmpeg supports AV1 through external libraries, such as libaom and libdav1d. Converting it to an MP4 here gives you an ordinary file for any player."
+      },
+      {
+        "question": "Is there a way to convert AV1 to MP4 without re-encoding?",
+        "answer": "Yes, on a desktop. MP4Box and an FFmpeg stream copy both put the AV1 into an MP4 as it is, and the result still needs a player with an AV1 decoder."
+      },
+      {
+        "question": "What is the download called?",
+        "answer": "The MP4 is saved under your file's name with an .mp4 ending: scene.av1 becomes scene.mp4."
+      }
+    ],
+    "aboutSection": {
+      "title": "AV1 and MP4",
+      "fromFormat": {
+        "name": "AV1",
+        "fullName": "AOMedia Video 1",
+        "description": "An open, royalty-free video codec developed by the Alliance for Open Media. A .av1 file is a raw bitstream of the codec with no container and no audio.",
+        "details": [
+          "Video codec, not a container",
+          "Open and royalty-free",
+          "Bitstream made of OBUs",
+          "Media type video/av1"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 that can hold video, audio and metadata. This converter writes H.264 video into it.",
+        "details": [
+          "Container for several codecs",
+          "Plays on nearly every device",
+          "Video only from this converter",
+          "Named after your file"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AV1 to MP4",
+      "points": [
+        "The MP4 holds H.264 video, not AV1, so the video is encoded a second time.",
+        "A .av1 file has no audio track, so the MP4 has no sound.",
+        "Large pictures shrink to a ceiling and fast clips drop frames to a ceiling, with sides rounded down to even numbers.",
+        "Your browser must be able to decode AV1; without it the page says it can't.",
+        "The download is named after your file with the .mp4 extension."
+      ]
+    },
+    "guide": {
+      "title": "About AV1 files",
+      "markdown": "### What is an AV1 file?\n\nAV1 stands for AOMedia Video 1. It is a video codec, not a complete movie format. The Alliance for Open Media developed its bitstream and decoding specification, and the Library of Congress describes it as an open, royalty-free video coding format. The public release of the specification was announced on March 28, 2018.\n\nAn AV1 bitstream is organized into units called OBUs. Its registered media type is video/av1, and it supports full-resolution chroma setups such as 4:4:4. A .av1 file on this page's input side is that bare stream: video only, with no audio track and nothing wrapped around it. Most of the AV1 you meet sits inside an MP4 or WebM file.\n\nAV1 has no required file extension, so the ending alone cannot tell you the framing. A raw stream of OBUs and an AV1 image container are different inputs, and FFmpeg documents them as separate formats. AV1 encoding can take longer than older codecs because its compression process is complex. You get a .av1 file from an encoder such as aomenc, or from a tool that writes out a video stream on its own.\n\n### Programs that open AV1 files\n\n- **Windows, Mac and Linux:** FFmpeg supports AV1 through external libraries, among them libaom, libdav1d, librav1e and libsvtav1.\n\n### AV1 and MP4 compared\n\n- **What each is**: AV1 is a codec. MP4, defined in ISO/IEC 14496-14, is a container that can hold H.264, H.265 or AV1 video along with audio.\n- **Sound**: a .av1 stream has none, so an MP4 made from it has none either.\n- **Reach**: H.264 is the video most phones, editors and upload forms handle. AV1 depends on a decoder, which some devices lack.\n- **Playback**: a container that FFmpeg or a player accepts does not guarantee a decoder for the video inside it.\n- **Extensions**: .av1 has no required extension; .mp4 is the container's.\n- **Safety of the file**: a standard MP4 holds its index data in one place, so an interrupted write can leave a file that no player opens.\n\nBoth the codec and the wrapper change. Your browser decodes the AV1 with its built-in decoder, and the page writes H.264 into the MP4. The picture is capped at 1920 pixels along its longer edge and 30 frames per second. Frames are removed from a faster clip, which keeps the running time, and since the encoder needs even sizes, a side with an odd pixel count gets one pixel trimmed. All of this runs in your browser, so the video never leaves your device, and each file in a batch gets its own MP4.\n\nThat also explains the wait: the page decodes, re-encodes and scales entirely on your device, and several files run one after another. The MP4 has no sound.\n\n### Other ways to convert AV1 to MP4\n\n- **GPAC MP4Box:** run `MP4Box -add scene.av1 scene-av1.mp4`. This keeps AV1 inside the MP4. The GPAC article says to add `:fps=1000` if the stream carries no timing, and `:fmt=obu` if the extension is not recognized. It accepts OBU, IVF and Annex B framing, and it does not accept WebM.\n- **FFmpeg, stream copy:** run `ffmpeg -i clip.av1 -c:v copy -an clip-copy.mp4`. Copying skips decoding and encoding, so the AV1 is untouched, and the MP4 still needs an AV1 decoder to play.\n- **FFmpeg, H.264:** run `ffmpeg -i scene.av1 -c:v libx264 -an scene-h264.mp4`. The `-an` option leaves out any audio, and libx264 writes the H.264.\n\n### Problems with AV1 files\n\n- **\"Your browser can't decode AV1\"**: your device has no AV1 decoder for the browser to use. Try a recent Chrome or Edge on a different computer, or use FFmpeg.\n- **The file will not play**: the suffix does not tell you the framing. A raw OBU stream and an IVF file differ, so name the framing yourself when you import it.\n- **The speed looks wrong in another tool**: a raw stream may carry little timing information, which a container-based player expects. When you import it yourself, pass the frame rate on purpose instead of guessing it from the duration.\n- **An audio editor shows nothing**: an MP4 without audio cannot provide an audio track to an editor, and a .av1 stream never had one.\n- **Encoding takes a while**: AV1's compression process is complex, so a longer clip takes longer.\n"
+    }
+  },
+  "cdr-to-png": {
+    "seo": {
+      "title": "Convert CDR to PNG: Export CorelDRAW Files",
+      "h1": "CDR to PNG Converter",
+      "description": "This page promises no CDR conversion and ends in an error. Export a PNG from CorelDRAW, or open the CDR in LibreOffice Draw and export.",
+      "howToHeading": "How to convert CDR to PNG"
+    },
+    "tool": {
+      "subtitle": "Export a CorelDRAW CDR drawing as PNG with CorelDRAW or LibreOffice Draw."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert a CDR file to PNG?",
+        "answer": "It makes no promise to. The page hands images to your browser's own decoder, and for a CDR the message you get is \"Image decode failed.\" and no PNG. Use CorelDRAW or LibreOffice Draw to produce the picture."
+      },
+      {
+        "question": "How can I export a CDR to PNG from CorelDRAW?",
+        "answer": "Open the drawing in CorelDRAW and use its Export command, not Save As, because only Export offers raster formats. The steps are in the guide below."
+      },
+      {
+        "question": "How do I open a CDR file without CorelDRAW?",
+        "answer": "Open it in LibreOffice Draw, which imports Corel files, and export the picture from there."
+      },
+      {
+        "question": "Can I just rename my .cdr file to .png?",
+        "answer": "Not that way. A rename touches the file name alone, the drawing data inside stays as it was, and a PNG reader will reject it."
+      },
+      {
+        "question": "Does a PNG from CDR keep a transparent background?",
+        "answer": "PNG can, because it has an optional alpha channel for per-pixel transparency. Whether yours does depends on the program and its export settings, so look at the transparency option in the export dialog before saving."
+      },
+      {
+        "question": "How do I export each object in a CDR as its own PNG?",
+        "answer": "CorelDRAW has a multi-file export for this, and it suits an icon set better than one picture of the whole drawing. Its menu path is in the guide."
+      },
+      {
+        "question": "My older CorelDRAW won't open this CDR. Why?",
+        "answer": "Corel says CorelDRAW files are not backwards compatible, so a newer file will not open in an older release. The sender can save an earlier-version copy."
+      },
+      {
+        "question": "Will the PNG stay sharp when I enlarge it?",
+        "answer": "Not once it is a PNG. The picture has a fixed grid of pixels, and scaling up later invents pixels without recovering detail. Pick the size in the export dialog, while the drawing is still vector."
+      },
+      {
+        "question": "Can a CDR from a Mac open on Windows?",
+        "answer": "Corel's documentation says it can open on the other platform: a file created on Windows opens on a Mac, and the reverse works too."
+      },
+      {
+        "question": "What PNG settings does LibreOffice Draw offer?",
+        "answer": "The export dialog covers compression and interlacing. It also sets the width, height and resolution."
+      }
+    ],
+    "aboutSection": {
+      "title": "CDR and PNG",
+      "fromFormat": {
+        "name": "CDR",
+        "fullName": "CorelDRAW drawing",
+        "description": "CorelDRAW's default drawing format. Corel describes it as primarily vector, and a drawing can also hold bitmaps and effects.",
+        "details": [
+          "Primarily vector",
+          "Bitmaps and effects allowed",
+          "Earlier versions available on Save As",
+          "Opened by CorelDRAW and LibreOffice Draw"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format created as a patent-free successor to GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Optional alpha transparency",
+          "Fixed pixel size",
+          "Shown by every major browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CDR to PNG",
+      "points": [
+        "This page promises no CDR conversion: it uses the browser's image decoder, and a CDR ends in an error.",
+        "CorelDRAW exports PNG from File > Export, and LibreOffice Draw imports CDR.",
+        "A PNG is a picture at one pixel size. Paths and editable objects stay in the CDR.",
+        "An older CorelDRAW does not open a CDR saved by a newer one."
+      ]
+    },
+    "guide": {
+      "title": "About CDR files",
+      "markdown": "### What is a CDR file?\n\nDrawings made in CorelDRAW are stored as CDR, the program's default format. Corel calls the format primarily vector, meaning shapes, curves and text that stay crisp at any size, though a drawing can also contain bitmaps and vector effects. Saving can compress the bitmaps and graphic objects. The file can carry reference properties such as a title and a subject, and embedded fonts, within their permissions.\n\nTo share a drawing with someone on an older release, the Save As dialog offers earlier CDR versions. Corel says CorelDRAW files do not work backwards; saving to an earlier version can change newer effects or limit editing.\n\nA CDR usually arrives from a designer, a sign shop, a print vendor or a client who works in CorelDRAW. It is the working file, so a PNG is what people want when they need to show or place the design instead of editing it.\n\n### Programs that open CDR files\n\n- **Windows and Mac:** CorelDRAW created the format and opens it natively. Double-click a file, or use File > Open.\n- **Windows, Mac and Linux:** LibreOffice Draw lists Corel Draw (*.cdr) among the formats it can import.\n\n### CDR and PNG compared\n\n- **Extensions**: .cdr for the drawing; .png and image/png for the picture.\n- **What each holds**: a CDR keeps editable shapes, text and effects, whereas a PNG keeps one flat picture made of pixels.\n- **Scaling**: drawings scale without loss, but a PNG turns soft when enlarged, so choose the final size at export.\n- **Compression**: PNG always compresses without loss, through the DEFLATE method, so the picture matches what the program drew.\n- **Structure**: a PNG opens with a fixed signature and continues as chunks: an IHDR chunk describes the image, IDAT chunks hold its compressed pixels, and an IEND chunk ends the file.\n- **Bit depth**: indexed, grayscale and truecolor PNGs can use between 1 and 16 bits per sample.\n- **Reach**: every major browser displays PNG, and it carries no known royalty-bearing patents.\n- **Animation**: the current specification includes animated PNG, with a default image shown by software that cannot play the animation.\n- **Transparency**: PNG supports an optional alpha channel, so a see-through background is possible if the export is set up for it.\n- **Editing**: all object structure is gone in a PNG. Keep the CDR as the master.\n\nWhat matters is the program that draws the file, since it decides how the drawing looks as a picture. Image decoding on this page belongs to the browser itself, and for a CDR you should expect \"Image decode failed.\" instead of a picture, so use one of the methods below.\n\n### Other ways to convert CDR to PNG\n\n- **CorelDRAW, single export:** choose File > Export (Ctrl+E on Windows, Cmd+E on Mac), select PNG in the Save as type list, click Export, then set the options in the Export to PNG dialog and click OK. Corel's Export command provides raster formats, while Save As offers only vector ones.\n- **CorelDRAW, asset export:** choose File > Export For > Multiple Files, add the objects or page in the Export docker, pick PNG for each and export.\n- **LibreOffice Draw:** open the CDR, then use File > Export, choose PNG and set the options. The PNG dialog covers compression and interlacing, plus width, height and resolution of the picture, and the help page for it lists them.\n\n### Problems with CDR files\n\n- **The page shows an error**: its decoder is the browser's own, and it reports \"Image decode failed.\" for this file. Export from CorelDRAW or LibreOffice Draw instead.\n- **An older CorelDRAW rejects the file**: ask whoever made it for an earlier-version copy. Newer effects may look different in that copy.\n- **A renamed file stays unreadable**: calling the file .png leaves the drawing data untouched, and image viewers reject it.\n- **The text looks wrong**: the drawing may use fonts that were not embedded, and a program without them swaps in others. Ask the sender to embed the fonts, which CorelDRAW allows subject to font permissions, and install them before you export.\n- **You want to keep editing**: a PNG is a flat picture with no objects left in it. Keep the CDR, and export a new PNG whenever the design changes.\n- **The PNG is blurry**: it holds a fixed number of pixels. Export again at a larger size from the program.\n"
+    }
+  },
+  "dds-to-jpg": {
+    "seo": {
+      "title": "Convert DDS to JPG: Texture to Picture",
+      "h1": "DDS to JPG Converter",
+      "description": "Convert DDS to JPG in your browser. One picture is read from the texture and saved as a JPG, which has no transparency. Free, with no sign-up.",
+      "howToHeading": "How to convert DDS to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a DDS game texture into a JPG you can open, share or upload, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a DDS file to JPG?",
+        "answer": "Choose the DDS texture in the picker. ImageMagick decodes it inside your browser tab, and a JPG built from one picture is ready to save. A batch of textures gives one JPG per DDS."
+      },
+      {
+        "question": "What is a DDS file?",
+        "answer": "DDS is Microsoft's DirectDraw Surface texture format. It can hold uncompressed pixels or compressed texture data, and a mipmap chain of smaller copies of the largest surface can sit beside it."
+      },
+      {
+        "question": "How do I open a DDS file?",
+        "answer": "GIMP, Paint.NET and XnView MP open DDS files, as does Photoshop with a plugin, and ImageMagick reads and writes them. Most photo viewers do not. Converting to JPG here gives you a file anything can open."
+      },
+      {
+        "question": "Why does a DDS give me only one picture?",
+        "answer": "A JPG is a single still image. A DDS can hold a mipmap chain, a cube map or a volume texture, and ImageMagick reads one image from it. The other surfaces stay in the DDS."
+      },
+      {
+        "question": "Will transparency in my texture survive in the JPG?",
+        "answer": "No, because a JPG lacks an alpha channel and so can't store see-through areas. Convert to PNG instead if the transparency matters."
+      },
+      {
+        "question": "Can I use the JPG in a game instead of the DDS?",
+        "answer": "Not as a drop-in replacement. A game loads the texture format its engine expects, which for DDS often means GPU-compressed data with mipmaps. The JPG is for preview, sharing or editing in an ordinary image program."
+      },
+      {
+        "question": "Does converting DDS to JPG lose quality?",
+        "answer": "JPG is a lossy format, so yes in principle. The page sets no quality value of its own. Keep the DDS if you may need the texture again."
+      },
+      {
+        "question": "What do the DDS error messages on this page mean?",
+        "answer": "If the page says the picture inside couldn't be read, that points to damage or an incomplete file. \"Too large to convert here\" means the picture is bigger than the page handles."
+      },
+      {
+        "question": "Can I convert DDS to JPG on my computer instead?",
+        "answer": "Yes. Microsoft's texconv tool and ImageMagick both do it, and GIMP can open the DDS and export a JPEG. The commands are in the guide."
+      },
+      {
+        "question": "What is the download called?",
+        "answer": "Your file's name is reused with a .jpg ending, so material.dds comes back as material.jpg."
+      }
+    ],
+    "aboutSection": {
+      "title": "DDS and JPG",
+      "fromFormat": {
+        "name": "DDS",
+        "fullName": "DirectDraw Surface",
+        "description": "Microsoft's DirectDraw Surface texture format. It can hold uncompressed pixels or compressed texture data, with mipmaps, cube maps and volume textures.",
+        "details": [
+          "Texture format used by games and 3D tools",
+          "Uncompressed or compressed data",
+          "Mipmap chains, cube maps and volume textures",
+          "DX10 header for Direct3D 10 and 11 formats"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "No layers",
+          "Shown by every major browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DDS to JPG",
+      "points": [
+        "You get one picture. Mipmaps, cube map faces and other surfaces in the DDS are not written out as separate files.",
+        "JPG has no transparency, so an alpha channel in the texture cannot be kept.",
+        "The JPG is for viewing and sharing. A game still needs the original DDS.",
+        "A very large picture fails with a \"too large to convert here\" message.",
+        "The download is named after your file with the .jpg extension."
+      ]
+    },
+    "guide": {
+      "title": "About DDS files",
+      "markdown": "### What is a DDS file?\n\nDDS stands for DirectDraw Surface. It is Microsoft's texture file format, and games and 3D tools use it to store textures. A DDS can hold plain pixels or compressed texture data, which commonly means the DXT and BC block formats that a graphics card reads directly.\n\nA single DDS often holds more than one image: a mipmap chain of ever smaller copies of the top surface, cube maps, or volume textures. The extra header introduced for Direct3D 10 and 11 brings texture arrays and names pixel formats that the first header's structure could not describe. The properties list also includes an alpha channel.\n\nThe older header describes pixel layouts such as plain RGB and the DXT1 to DXT5 block-compressed forms, which have the broadest tool support. You meet DDS files when you unpack a game, work with mods or materials, or receive assets from a 3D artist. Photo programs and browsers rarely open them, so a JPG is the quick way to see what a texture looks like.\n\n### Programs that open DDS files\n\n- **Windows, Mac and Linux:** GIMP gained built-in DDS support in version 2.10.10, and its release notes say it can load and export DDS out of the box.\n- **Windows, Mac and Linux:** ImageMagick documents DDS reading and writing, with options for DXT compression and mipmaps.\n\n### DDS and JPG compared\n\n- **Extensions and media types**: .dds for the texture; .jpg or .jpeg and image/jpeg for the picture.\n- **Content**: a DDS can hold several surfaces. A JPG holds one image and cannot store layers.\n- **Compression**: a DDS can store GPU-ready block data. JPEG is lossy and aimed at photographs. A baseline JPEG divides the image into 8x8 squares, transforms each square with a discrete cosine transform, then compresses the coefficients using Huffman tables. Block edges become visible at low quality settings.\n- **Transparency and depth**: a DDS can have an alpha channel. JPEG has none and stores 8 bits per color channel.\n- **Variants**: legacy headers cover plain RGB and DXT1 to DXT5. The DX10 extension adds more formats, and some readers reject it.\n- **Modes**: progressive JPEG paints a blurry first pass, then sharpens as the remaining data arrives.\n- **Origin**: the Joint Photographic Experts Group started in 1986, and its core standard appeared as ITU-T T.81 in 1992. Cameras and scanners ship with JPEG built in, in most cases.\n- **Quality**: JPEG offers an adjustable 0 to 100 scale, and its numbers are not comparable across programs.\n\nA texture turns into an ordinary flat picture. The browser runs ImageMagick as WebAssembly, pulls one image from the DDS and saves it as a JPG. The page sets no quality value, and it refuses a picture over about 537 megapixels. See-through pixels in the texture are lost, because a JPG cannot hold them.\n\nTreat the JPG as a preview. It does not keep the mipmap levels, cube map faces or array elements a renderer uses, and it cannot stand in for the original texture.\n\n### Other ways to convert DDS to JPG\n\n- **Microsoft DirectXTex:** run `texconv -ft jpg material.dds`. The `-ft` option sets the output file type and accepts jpg and jpeg. The `--ignore-mips` option leaves the mipmap levels out.\n- **GIMP:** open the DDS and export it as a JPEG. In GIMP's JPEG export dialog the quality starts at 85, and the saved file holds neither transparency nor layers.\n- **ImageMagick:** run `magick material.dds material-preview.jpg`. The formats page marks DDS as readable and writable.\n\n### Problems with DDS files\n\n- **A reader rejects the file**: a few readers cannot parse the DX10 extension, whereas an older RGB or DXT1-to-DXT5 header opens in more tools.\n- **The file is invalid**: a header shorter than 128 bytes, or 148 with the DX10 extension, is truncated. Copy the file again.\n- **Scan lines look corrupted**: a wrong pitch value makes a reader misjudge where each row starts. Microsoft advises computing the pitch from the stored format.\n- **Only one picture came out**: ImageMagick reads a single image from a multi-surface texture, so the other surfaces do not appear.\n- **Transparency disappeared**: JPG has no alpha. Convert to PNG if the see-through areas matter.\n- **You need every mip level or face**: use a texture-aware tool such as texconv, and keep the DDS as the source.\n"
+    }
+  },
+  "dng-to-pdf": {
+    "seo": {
+      "title": "Convert DNG to PDF: Raw Photo on One Page",
+      "h1": "DNG to PDF Converter",
+      "description": "Convert DNG to PDF in your browser. Each raw photo becomes a one-page PDF the size of the image, with the picture embedded as a PNG. Free, with no sign-up.",
+      "howToHeading": "How to convert DNG to PDF"
+    },
+    "tool": {
+      "subtitle": "Turn a DNG raw photo into a one-page PDF the size of the picture, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I make a PDF from a DNG photo?",
+        "answer": "Add the DNG above, wait for it to finish, and save the PDF. A batch produces one single-page PDF per DNG."
+      },
+      {
+        "question": "Can I put several DNG photos in one PDF?",
+        "answer": "Not here. Each file you choose becomes its own PDF, and the page never merges them. For an album or contact sheet, put the pictures in a layout program afterward."
+      },
+      {
+        "question": "How big is the page in the PDF?",
+        "answer": "It matches the picture, where every pixel is one point of page. There are no margins and no standard paper size. A big photo makes a big page, which viewers shrink to fit the screen."
+      },
+      {
+        "question": "Is the photo in the PDF compressed?",
+        "answer": "The picture is embedded as a PNG, which is lossless, and the page has no quality setting. The PDF is still a picture made from the raw file, not the raw file itself."
+      },
+      {
+        "question": "Can I still adjust exposure after converting a DNG to PDF?",
+        "answer": "No. The PDF contains only a finished picture; none of the raw sensor data comes along. Hold on to the DNG if you might develop the photo again."
+      },
+      {
+        "question": "Why does my DNG fail with \"compression can't be decoded\"?",
+        "answer": "The page's message says the RAW file's compression can't be decoded here, or the file is damaged. The examples it gives are Nikon's High Efficiency RAW files and DNGs that use JPEG XL, as GoPro's do; the camera maker's own software is the way out."
+      },
+      {
+        "question": "What is a DNG file?",
+        "answer": "A DNG file stores camera raw data in the Digital Negative layout that Adobe documents. It is a subtype of TIFF, with extra tags to interpret raw photographs, and some phones and cameras write it."
+      },
+      {
+        "question": "Which programs can open a DNG?",
+        "answer": "darktable includes DNG in its import list, and ImageMagick reads it when you give the dng: prefix. If you only need to see the photo, convert it here to a PDF."
+      },
+      {
+        "question": "Is there a limit on file size?",
+        "answer": "The page sets none on the file itself. A picture bigger than its ceiling is turned away as too large. A huge raw file also asks a lot of your device."
+      },
+      {
+        "question": "What is the download called?",
+        "answer": "The PDF keeps your file's base name: archive-photo.dng gives archive-photo.pdf."
+      }
+    ],
+    "aboutSection": {
+      "title": "DNG and PDF",
+      "fromFormat": {
+        "name": "DNG",
+        "fullName": "Digital Negative",
+        "description": "An open raw image format published by Adobe in 2004 as a single documented alternative to the many proprietary raw formats. It is based on TIFF/EP.",
+        "details": [
+          "Raw sensor data or demosaiced linear data",
+          "Based on the TIFF family",
+          "Optional lossless JPEG compression",
+          "Exif metadata can be included"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DNG to PDF",
+      "points": [
+        "The PDF has one page, as large as the picture: one pixel is one point, with no margin.",
+        "The photo is embedded as a PNG, so no lossy compression is added at that step.",
+        "The PDF is a picture made from the raw file, so raw sensor data is not stored in it.",
+        "Each DNG gives its own PDF, and several files are never merged.",
+        "A DNG whose compression the reader can't decode fails with an error."
+      ]
+    },
+    "guide": {
+      "title": "About DNG files",
+      "markdown": "### What is a DNG file?\n\nAdobe published DNG, short for Digital Negative, in 2004 as an open raw format meant to replace the many proprietary ones with one documented design. The Library of Congress lists it as a subtype of TIFF 6.0 and notes that a file can comply with both DNG and TIFF/EP. The recommended extension is .dng.\n\nTwo kinds of DNG exist. A raw DNG holds mosaiced sensor data, typically from a Bayer array. A linear DNG is a rarer variety that holds RGB image data, usually demosaiced, which means the demosaicing choices cannot be redone later. The raw samples can be packed with lossless JPEG compression, and a DNG may contain an Exif metadata block, and it also uses IPTC and XMP tags plus proprietary tags for camera converters.\n\nPeople use DNG for archiving raw photos, for raw files from some phones and cameras, and for passing raw files between editors. The Library of Congress accepts it for digital photographs and graphic images.\n\nYou meet DNG files in a photo library or when a photographer sends raw files. Most people cannot open one in a browser or a document viewer, and a PDF is a common way to show a raw photo to someone who does not have a raw editor.\n\n### Programs that open DNG files\n\n- **Windows, Mac and Linux:** darktable includes DNG in the extensions it considers for import, and it reads raw files through the RawSpeed library. Apart from Fujifilm X-Trans cameras, it does not decode images from cameras with non-Bayer sensors.\n- **Windows, Mac and Linux:** ImageMagick reads DNG when you give the dng: prefix.\n\n### DNG and PDF compared\n\n- **Extensions**: .dng for the raw file; .pdf for the document.\n- **What they hold**: a DNG holds data to develop a photo, possibly the raw sensor mosaic. A PDF holds a finished page.\n- **Compression**: a DNG can use lossless JPEG for its raw samples, whereas this page places the picture in the PDF as a PNG.\n- **Imaging model**: PDF draws with a model inherited from PostScript, independent of device and resolution. Lossless Flate compression and JPEG are both available for the images inside.\n- **Media types**: application/pdf for the document, and .dng for the raw file's recommended extension.\n- **Metadata**: Exif tags in a DNG can sit in a separate directory, which the specification prefers over the TIFF/EP one.\n- **Page**: a PDF has pages. A DNG has none.\n- **Editing**: a DNG supports re-developing the photo. A PDF cannot.\n\nA raw file turns into a picture placed on a page. In the browser ImageMagick reads one image from the DNG, and the page wraps it in a one-page PDF. The sheet matches the picture, counting each pixel as a point, and has no margins. Each DNG yields a separate PDF, and the work happens in your browser, so the photo is not uploaded anywhere. The page sets no quality value, and a picture beyond roughly 537 megapixels is refused.\n\nThe picture is embedded without lossy compression, but that does not preserve the DNG. Only the finished picture is kept, so develop the photo first if tone, crop and color matter.\n\n### Other ways to convert DNG to PDF\n\n- **ImageMagick:** run `magick dng:archive-photo.dng archive-proof.pdf`. The ImageMagick formats page marks DNG as read-only and says it requires an explicit specifier such as dng:image.dng. It also marks PDF as readable and writable and says writing it requires Ghostscript.\n\n### Problems with DNG files\n\n- **The file will not decode**: a linear DNG already holds demosaiced data, so it is not the same as an untouched sensor mosaic. A reader may not support every sensor pattern, and darktable documents its limits for non-Bayer sensors.\n- **\"Compression can't be decoded here\"**: the raw reader cannot decode that kind of DNG. Use the camera maker's software and export a TIFF or JPEG.\n- **The photo can look flat at first**: a raw file holds unprocessed sensor data, and the picture you see comes from how it is developed. If the look matters, develop it in your editor first.\n- **The PDF will not look like your editor's version**: the finished picture, not the raw data, goes into the PDF, so settle the look first.\n- **The page size is wrong**: this page follows the image size. For A4 or Letter with margins, place the photo in a layout program.\n"
+    }
+  },
+  "docx-to-jpeg": {
+    "seo": {
+      "title": "Convert DOCX to JPEG: Word Pages as Images",
+      "h1": "DOCX to JPEG Converter",
+      "description": "Convert DOCX to JPEG in your browser. Each page of the Word document becomes its own JPEG, drawn at twice its size in points. Free, with no sign-up.",
+      "howToHeading": "How to convert DOCX to JPEG"
+    },
+    "tool": {
+      "subtitle": "Turn each page of a Word DOCX file into its own JPEG, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a Word document to JPEG?",
+        "answer": "Choose the DOCX file above and wait for the pages to render. Then download the JPEGs. A document with several pages gives one JPEG per page, named with _page1, _page2 and so on."
+      },
+      {
+        "question": "Is a DOCX to JPG conversion the same thing?",
+        "answer": "Yes. JPG and JPEG name one format, so the pictures open under either name. The files you download end in .jpeg."
+      },
+      {
+        "question": "Does it need Microsoft Word?",
+        "answer": "No. The page lays out the DOCX itself in your browser with docx-preview, so Word is not needed. Nothing is fetched from outside the file while it does."
+      },
+      {
+        "question": "What size are the JPEG pages?",
+        "answer": "A page comes out at double its point size, as a PDF page does. The width and height are both capped at a ceiling that Safari's canvas can handle."
+      },
+      {
+        "question": "Why does my text use a different font?",
+        "answer": "The page can only draw fonts your browser has. A font it lacks falls back to the browser's default, which changes the look. Install the font, or export a PDF from Word instead."
+      },
+      {
+        "question": "What if my DOCX has no page size set?",
+        "answer": "Then the page is drawn as US Letter with one-inch margins. If the document was written for A4, set the paper size in Word first and save again."
+      },
+      {
+        "question": "Why are pictures missing in the JPEG?",
+        "answer": "A picture the DOCX only links to, instead of holding, loads nothing, because the page fetches nothing from outside the file. Embed the picture in Word and save a new copy. Content added as an HTML altChunk is also left out."
+      },
+      {
+        "question": "Do my numbered lists come out right?",
+        "answer": "List numbers are written out as plain text, so they show. Numbering in other scripts, such as Chinese, Japanese, Korean or Hebrew, comes out as decimal numbers instead."
+      },
+      {
+        "question": "Can the text still be edited after I convert to JPEG?",
+        "answer": "No. Pixels are all a JPEG holds, so the words cannot be edited, searched or selected. Make changes in the DOCX, and if readers need to search the text, save a PDF from Word."
+      },
+      {
+        "question": "Do table header rows repeat on the next page?",
+        "answer": "Yes, when the table is set to repeat its header row. A table that runs past a page continues on the next one with its header and columns. A cell merged down across the break continues empty."
+      }
+    ],
+    "aboutSection": {
+      "title": "DOCX and JPEG",
+      "fromFormat": {
+        "name": "DOCX",
+        "fullName": "Microsoft Word document",
+        "description": "The default word processing format of Microsoft Word since Word 2007. It is a ZIP package of XML files standardized as Office Open XML (ECMA-376, ISO/IEC 29500).",
+        "details": [
+          "ZIP package of XML",
+          "Styles, images and tables",
+          "Tracked changes and comments",
+          "Open standard"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Shown by every major browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DOCX to JPEG",
+      "points": [
+        "Every page becomes its own JPEG, drawn at twice its size in points.",
+        "The page draws the document itself, not Word.",
+        "A font your browser lacks falls back to its default.",
+        "Pictures that the file only links to are not loaded, and HTML altChunk content is left out.",
+        "The text becomes pixels: it can no longer be edited or searched."
+      ]
+    },
+    "guide": {
+      "title": "About DOCX files",
+      "markdown": "### What is a DOCX file?\n\nMicrosoft Word has saved new documents as DOCX by default since Word 2007. The file is a ZIP package built on the Open Packaging Conventions. WordprocessingML carries the text and its formatting, and styles, images, properties and relationships are kept as separate parts. The format is specified in ECMA-376 and ISO/IEC 29500.\n\nThat structure is why pulling out only the main XML part does not give you the full document. A resume, a letter or a report keeps its text, tables and images together in the one package.\n\nPeople send DOCX files for letters, reports, contracts and resumes, and tracked changes and comments live inside them. A JPEG is what you want when a form takes only pictures, when you are posting a page on a site that does not accept documents, or when you want a page to look the same everywhere without anyone needing a word processor.\n\n### Programs that open DOCX files\n\n- **Windows and Mac:** Microsoft Word introduced the format and has made it the default for new documents ever since Word 2007.\n- **Windows, Mac and Linux:** LibreOffice Writer imports Word .docx files, and its help notes that a DOCX opened there may lose some formatting attributes.\n\n### DOCX and JPEG compared\n\n- **Extensions**: .docx for the document; .jpg and .jpeg, which are the same format, for the image.\n- **What each holds**: a DOCX holds editable text, styles, tables and images. A JPEG holds one picture of a page.\n- **Pages**: a DOCX flows into as many pages as its text needs. A JPEG is one page, so a long document gives many files.\n- **Compression**: JPEG is lossy and made for photographs, with quality usually set on a 0 to 100 scale. It stores 8 bits per color channel and cannot hold transparency.\n- **Reach**: every major browser displays JPEG, and the registered media type is image/jpeg.\n\nWhat changes in this conversion is the page itself. docx-preview lays the document out inside a sandbox where every node is built, and each page is drawn at double its point size, which makes US Letter 1224 by 1584 pixels. No side of the image passes 4096 pixels. A page breaks where the document says to, and where text runs past the height of a page, between paragraphs or table rows, with the header and footer repeated.\n\nWord is not the program drawing the pages. Fonts your browser lacks fall back to its default.\n\n### Other ways to convert DOCX to JPEG\n\n- **Microsoft Word and ImageMagick:** in Word choose File > Save a Copy > Browse, pick PDF as the type and save. Then run `magick statement.pdf statement-page.jpg`. The PDF comes from Word's own layout, and ImageMagick needs Ghostscript to read PDF.\n- **LibreOffice Writer and ImageMagick:** open the DOCX in Writer, pick File > Export As > Export as PDF, and save the PDF beside it. After that run `magick report.pdf report-page.jpg`. The ImageMagick formats page marks PDF as readable and writable.\n\n### Problems with DOCX files\n\n- **The text looks different in another program**: another word processor can drop some formatting while importing.\n- **List numbers use the wrong digits**: the capture drops CSS counters, so the page writes list numbers out as text, and CJK or Hebrew numbering turns into decimal digits. Check those lists before you send the JPEG.\n- **Pictures do not show**: the sandbox builds every node itself, so a picture that the file links to but does not hold loads nothing. Embed it in Word and save a copy.\n- **The page size is not what you expected**: a file with no page size is drawn as US Letter, and that fallback has one-inch margins. Set A4 or another size in Word first.\n- **A table breaks across pages**: its header rows are marked in the file as w:tblHeader, and that mark is what makes them repeat.\n- **Embedded HTML is missing**: the page leaves out any altChunk, the HTML that a file can carry inside it. Open the document in Word to see it, or export a PDF from there.\n- **Small print looks soft**: a page is a fixed grid of pixels, so fine print blurs when you enlarge it. A PDF export from Word keeps text sharp at any size.\n- **Page breaks moved**: this page does not use Word's own layout. For the exact page breaks, export a PDF from Word and turn that into JPEGs.\n"
+    }
+  },
+  "flac-to-aac": {
+    "seo": {
+      "title": "Convert FLAC to AAC: Lossless to Lossy",
+      "h1": "FLAC to AAC Converter",
+      "description": "Convert FLAC to AAC in your browser. The lossless audio is encoded as AAC, which makes a much smaller file. Free, with no sign-up.",
+      "howToHeading": "How to convert FLAC to AAC"
+    },
+    "tool": {
+      "subtitle": "Turn lossless FLAC audio into a smaller AAC file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert FLAC to AAC?",
+        "answer": "Pick the FLAC above and wait while it is encoded as AAC. Save the .aac file when it appears. A batch gives one AAC per FLAC, one after another."
+      },
+      {
+        "question": "What bitrate does the AAC have?",
+        "answer": "Every file gets the same fixed bitrate, given in the guide, and the page has no setting to change it. For a different bitrate or a variable-quality mode, use FFmpeg or qaac on your computer."
+      },
+      {
+        "question": "Does converting FLAC to AAC lose quality?",
+        "answer": "Yes. FLAC compresses audio without discarding sample information, and AAC is lossy, so detail is discarded to make the file smaller. Keep the FLAC as your master and use the AAC for phones and players."
+      },
+      {
+        "question": "Can I turn the AAC back into FLAC without losing anything?",
+        "answer": "A new FLAC will not bring back what the AAC left out. Changing a lossy source to FLAC cannot recreate the audio samples that were removed earlier."
+      },
+      {
+        "question": "Is AAC better than MP3?",
+        "answer": "Our format reference says AAC generally gives better quality than MP3 at the same bitrate. MPEG standardized it as the successor to MP3."
+      },
+      {
+        "question": "Is the .aac file the same as an .m4a?",
+        "answer": "No. A standalone .aac file is a raw AAC stream, while AAC can also sit inside an MP4 container. Changing the extension to .m4a does not add that wrapper. This page writes an .aac file."
+      },
+      {
+        "question": "My phone or player refuses a FLAC. What now?",
+        "answer": "Some players lack a FLAC decoder. Android's documentation, for one, lists native support narrower than the format: mono or stereo, with 16-bit samples recommended. An AAC file is easier for devices to play."
+      },
+      {
+        "question": "What is a FLAC file?",
+        "answer": "FLAC stands for Free Lossless Audio Codec. The codec takes integer PCM audio, discards no sample information, and has an open specification."
+      },
+      {
+        "question": "Is my file uploaded?",
+        "answer": "No. FFmpeg compiled to WebAssembly runs in your browser, so the audio stays on your device."
+      },
+      {
+        "question": "What happens if my FLAC is damaged or cut short?",
+        "answer": "Often it still converts. FFmpeg flags the error and encodes just the portion it could decode, leaving the AAC shorter than the original. If the end is missing, fetch a fresh copy."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLAC and AAC",
+      "fromFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "An open lossless audio codec that compresses audio without discarding any sample information. Its format description is standardized as RFC 9639.",
+        "details": [
+          "Lossless compression",
+          "One to eight channels",
+          "Sample depths from 4 to 32 bits",
+          "Vorbis comments, seek points and pictures"
+        ]
+      },
+      "toFormat": {
+        "name": "AAC",
+        "fullName": "Advanced Audio Coding",
+        "description": "A lossy audio codec standardized by MPEG (ISO/IEC 13818-7 and 14496-3) as the successor to MP3. It generally gives better quality than MP3 at the same bitrate.",
+        "details": [
+          "Lossy compression",
+          "Better efficiency than MP3",
+          "Raw .aac streams or MP4 containers",
+          "Widely supported"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting FLAC to AAC",
+      "points": [
+        "The AAC is encoded at a fixed bitrate and the page has no setting to change it.",
+        "AAC is lossy, so detail is discarded for size; FLAC is lossless.",
+        "The result is an .aac file, not an .m4a, so it has no MP4 wrapper.",
+        "The command leaves out video streams.",
+        "Keep the FLAC. Turning an AAC back into FLAC does not restore the lost detail."
+      ]
+    },
+    "guide": {
+      "title": "About FLAC files",
+      "markdown": "### What is a FLAC file?\n\nThe name FLAC expands to Free Lossless Audio Codec. Integer PCM goes in, a smaller stream comes out, and decoding returns the identical samples. Anyone can read the specification, and the reference code is open source. A native FLAC stream is labeled audio/flac, and the format description was issued as RFC 9639 in December 2024.\n\nChannel counts run from one to eight and bit depths from 4 to 32. FLAC metadata can include seek points, pictures and Vorbis comments. Storage corruption can make a frame fail its checksum, since lossless encoding gives no protection against it.\n\nBecause it is lossless, FLAC is also a good source to convert from: the encoder starts with the full audio, not a file that has already been through a lossy pass. The format reference names music archiving, audiophile listening and CD backups as typical uses.\n\n### Programs that open FLAC files\n\n- **Windows, Mac and Linux:** Audacity imports FLAC with its built-in importer, which also covers Ogg Vorbis, MP2, WAV and AIFF, so no FFmpeg add-on is needed.\n- **Windows, Mac and Linux:** VLC media player counts FLAC among its input formats and audio codecs, and AAC appears on its features page too.\n\n### FLAC and AAC compared\n\n- **Extensions and media types**: FLAC files end in .flac and use audio/flac; a raw AAC stream ends in .aac.\n- **Compression**: FLAC is lossless. AAC is lossy, so it discards detail to make the file smaller.\n- **Channels and depth**: FLAC goes up to eight channels and 32-bit samples.\n- **Wrapper**: AAC can be a raw .aac stream or sit inside an MP4 container.\n- **Support**: some devices lack a FLAC decoder, while AAC is widely supported.\n- **Use**: AAC serves streaming audio and music downloads, audio in MP4 videos and mobile devices. FLAC serves music archiving and lossless backups of CDs.\n- **Players**: VLC media player, Apple Music, Windows Media Player and any web browser open AAC.\n\nThe big change is that lossless audio turns lossy. In a worker, FFmpeg built for WebAssembly encodes the audio to AAC at 192 kbps with its own encoder and skips video streams. The page passes no option for sample rate or channel layout, so FFmpeg decides them. Several files can be chosen at once. Files are handled in turn, and every one is downloaded separately as an .aac, with no ZIP. The page sets no size limit or timeout of its own, so a long track takes as long as your device needs. Your original file is not changed, because you download a new copy. Hold on to the FLAC if you will want full quality later.\n\n### Other ways to convert FLAC to AAC\n\n- **FFmpeg:** run `ffmpeg -i album.flac -c:a aac -b:a 192k album-listen.aac`. The FFmpeg codec documentation describes its native AAC encoder as the default one, and the adts muxer writes a single AAC stream.\n- **Audacity and qaac:** qaac takes WAV, so first export a WAV from Audacity: open the FLAC, choose File > Export Audio and pick WAV, whose default encoding is Signed 16-bit PCM. The dialog can export the whole project or only a selection, so you can bridge just the part you need. Then run `qaac --adts -V 90 bridge.wav -o alternate.aac`. The qaac wiki describes `--adts` as ADTS output for AAC only and `-V` as a True VBR quality scale from 0 to 127, with -V90 as the default for the LC profile. It is a Windows console tool and needs Apple Application Support.\n\n### Problems with FLAC files\n\n- **It will not play on a phone**: a player without a FLAC decoder cannot open the file at all. Android documents native FLAC playback that is narrower than the format itself, which makes an AAC copy the safer pick for phones.\n- **A file stops partway**: a bad disk or interrupted download can break a frame's checksum, and FLAC cannot repair that. Transfer the file again.\n- **The FLAC came from an MP3 or AAC**: such a FLAC is only a bigger file, and the earlier loss stays. Converting it to AAC adds a second lossy pass.\n- **The FLAC takes a lot of room**: the format reference says FLAC typically halves uncompressed audio, which is still bulky beside a lossy copy.\n- **You need full quality**: AAC is lossy, so pick FLAC again if you need the audio for editing or archiving.\n"
+    }
+  },
+  "flac-to-aiff": {
+    "seo": {
+      "title": "Convert FLAC to AIFF: Lossless to PCM",
+      "h1": "FLAC to AIFF Converter",
+      "description": "Convert FLAC to AIFF in your browser. The audio is decoded to uncompressed PCM for Apple and pro audio software. Free, with no sign-up.",
+      "howToHeading": "How to convert FLAC to AIFF"
+    },
+    "tool": {
+      "subtitle": "Decode FLAC audio to an uncompressed AIFF file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert FLAC to AIFF?",
+        "answer": "Pick the FLAC above. FFmpeg decodes it in your browser and the AIFF is ready to save. A batch gives one AIFF per FLAC, one after another."
+      },
+      {
+        "question": "Is converting FLAC to AIFF lossless?",
+        "answer": "Both formats can be lossless, but this page writes signed 16-bit samples. A FLAC at that depth comes through sample for sample, while a deeper FLAC is cut down to it."
+      },
+      {
+        "question": "The AIFF file is huge next to my FLAC. Is that normal?",
+        "answer": "Yes. The FLAC packs the samples tightly with no loss, and the AIFF spells each one out, so the same recording takes more room."
+      },
+      {
+        "question": "Why would I want AIFF instead of FLAC?",
+        "answer": "Plenty of editing and mastering work happens in AIFF, and Audacity imports it with no add-on. FLAC is not read by every program."
+      },
+      {
+        "question": "What bit depth will the AIFF have?",
+        "answer": "Signed 16-bit big-endian PCM. Nothing in the page's command sets a rate or channels, so FFmpeg decides those."
+      },
+      {
+        "question": "AIFF versus WAV: which should I pick?",
+        "answer": "AIFF is an Apple format with roots in the IFF family; WAV came from Microsoft and IBM. Each often holds uncompressed PCM. AIFF orders the bytes of a sample big-endian, hence the pcm_s16be setting here."
+      },
+      {
+        "question": "Does AIFF support compressed audio?",
+        "answer": "AIFF-C, an extension of the family, does. This page writes plain AIFF with uncompressed PCM. A program reading AIFF-C needs a decoder for the actual encoding."
+      },
+      {
+        "question": "Can I convert AIFF back to FLAC?",
+        "answer": "Yes. FLAC can compress the PCM again without discarding any sample information. It will not restore detail that was cut when a deeper FLAC became 16-bit."
+      },
+      {
+        "question": "Why does my FLAC fail to convert?",
+        "answer": "A bad disk or an interrupted download can damage the file, and lossless coding offers no repair. A damaged file normally still converts, though the AIFF comes out shorter; if the end is missing, get a clean copy."
+      },
+      {
+        "question": "What is the download called?",
+        "answer": "Expect the same base name as your FLAC with .aiff on the end: master.flac turns into master.aiff."
+      }
+    ],
+    "aboutSection": {
+      "title": "FLAC and AIFF",
+      "fromFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "An open lossless audio codec that compresses audio without discarding any sample information. Its format description is standardized as RFC 9639.",
+        "details": [
+          "Lossless compression",
+          "One to eight channels",
+          "Sample depths from 4 to 32 bits",
+          "Vorbis comments, seek points and pictures"
+        ]
+      },
+      "toFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "A sound wrapper developed by Apple from Electronic Arts' IFF family. It often carries uncompressed linear PCM, and AIFF-C extends it to compressed audio.",
+        "details": [
+          "Uncompressed linear PCM",
+          "Named chunks for author and annotations",
+          "Used for masters and intermediates",
+          "Big-endian sample order"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting FLAC to AIFF",
+      "points": [
+        "The AIFF holds signed 16-bit PCM, so a FLAC with more bits per sample is cut to that depth.",
+        "The AIFF is uncompressed and much bigger than the FLAC, with the same sound.",
+        "The command leaves out video streams.",
+        "The page sets no sample rate or channel count itself.",
+        "Several files run one after another, and each downloads as its own AIFF."
+      ]
+    },
+    "guide": {
+      "title": "About FLAC files",
+      "markdown": "### What is a FLAC file?\n\nFree Lossless Audio Codec, or FLAC, squeezes integer PCM audio and returns every sample on decoding, since nothing about the samples is discarded. Its specification is public and the reference code is open source; December 2024 saw the format description published as RFC 9639. A native FLAC stream carries the media type audio/flac.\n\nA FLAC can hold between one and eight channels at depths from four to 32 bits per sample. Seek points, embedded pictures and Vorbis comments live in its metadata blocks. Lossless coding cannot stop a damaged frame from failing its checksum when the storage corrupts it.\n\nA FLAC makes a good source for a conversion, since the converter begins with the complete audio and not with something a lossy pass has already trimmed. Bit depth matters for this pair, because the AIFF written here is 16-bit. The format reference lists music archiving, audiophile listening and CD rips kept lossless as typical uses, and says FLAC typically shrinks files to about half the size of uncompressed audio.\n\n### Programs that open FLAC files\n\n- **Windows, Mac and Linux:** Audacity imports FLAC with its built-in importer, so the optional FFmpeg library is not needed.\n- **Windows, Mac and Linux:** VLC media player lists FLAC as both an input format and an audio codec.\n\n### FLAC and AIFF compared\n\n- **Extensions and media types**: .flac with audio/flac on one side, .aiff with audio/aiff or audio/x-aiff on the other.\n- **Compression**: FLAC is lossless compression. AIFF often carries uncompressed linear PCM, and its AIFF-C extension can hold compressed audio.\n- **Size**: expect the AIFF to dwarf the FLAC, because uncompressed PCM takes more storage than a packed copy.\n- **Support**: Audacity reads FLAC directly and imports most AIFF files, all PCM variants among them, with no optional FFmpeg library.\n- **Metadata**: FLAC stores Vorbis comments and pictures, while AIFF can add named chunks holding author, copyright and annotation text.\n- **Use**: AIFF turns up in masters and intermediate recordings made by professional audio users, while FLAC turns up in music archives.\n- **Origin**: Apple built AIFF as an audio wrapper from Electronic Arts' IFF family. Its AIFF 1.3 specification carries the date January 4, 1989.\n\nTwo things change: how the audio is stored, and on this page the bit depth. FFmpeg built for WebAssembly decodes your FLAC, leaves out any video stream, and writes signed 16-bit big-endian PCM inside an AIFF wrapper. The page passes no sample-rate or channel option, which leaves both to FFmpeg. A FLAC at 16 bits comes through sample for sample, and a deeper one is cut to 16. You download a new copy and your original stays untouched; a long file takes whatever time your device needs.\n\n### Other ways to convert FLAC to AIFF\n\n- **FFmpeg:** run `ffmpeg -i master.flac master-work.aiff`, and FFmpeg picks the AIFF muxer from the extension. FFmpeg's general documentation lists AIFF muxing and demuxing, as well as FLAC.\n- **SoX:** run `sox master.flac master-working.aiff`. The SoX manual says the file type comes from the file extension, so the .aiff name in the command is what selects the output format. Its format page says FLAC support is optional and that its AIFF support does not include multiple audio chunks.\n\n### Problems with FLAC files\n\n- **It will not open in my program**: not every program reads FLAC. Convert to AIFF here, or open the file in VLC or Audacity.\n- **The file is cut off**: storage errors can break a frame's checksum, and lossless coding cannot undo damage to the file. Download or copy it again from wherever it came from, then convert the fresh copy.\n- **The FLAC was made from an MP3**: the detail that MP3 discarded is gone, and the AIFF stays just as limited.\n- **A player rejects an AIFF-C file**: its compression scheme may be one the player lacks, because the family name alone proves nothing about support. This page writes plain PCM.\n- **ID3 tags are absent in the AIFF**: FFmpeg's AIFF muxer writes ID3v2 tags only when its write_id3v2 option is enabled, and the command used here does not enable it. Raw PCM muxers in FFmpeg store no metadata at all.\n- **The AIFF is huge**: nothing in it is compressed. Store the FLAC and use the AIFF only while editing.\n"
+    }
+  }
+}

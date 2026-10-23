@@ -1,0 +1,167 @@
+{
+  "tools": {
+    "avi-to-wmv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "`ffmpeg -i capture.avi -c:v wmv2 -c:a wmav2 archive.wmv` explicitly chooses the Windows Media Video and Windows Media Audio encoders.",
+          "limits": "Build must include wmv2 and wmav2; both streams are re-encoded.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavcodec/wmv2enc.c",
+            "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavcodec/wmaenc.c"
+          ]
+        }
+      ]
+    },
+    "bmp-to-ico": {
+      "methods": [
+        {
+          "app": "Pillow",
+          "steps": "`Image.open(\"badge.bmp\").save(\"badge.ico\", sizes=[(16,16),(32,32),(48,48),(256,256)])` writes a multi-size icon. By default it uses 16, 24, 32, 48, 64, 128 and 256.",
+          "limits": "Needs Python with Pillow installed; sizes larger than the source are ignored.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ]
+    },
+    "csv-to-html": {
+      "methods": [
+        {
+          "app": "LibreOffice Calc",
+          "steps": "open the CSV and review the text-import settings. Choose File > Save As, select HTML Document (LibreOffice Calc), name the output, and save. Calc exports its sheets together.",
+          "limits": "Review CSV import delimiter and column formats; Calc exports all sheets to HTML.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/scalc/guide/html_doc.html",
+          "supportingSources": [
+            "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html"
+          ]
+        },
+        {
+          "app": "CSVtoTable",
+          "steps": "the documented command `csvtotable records.csv report.html` creates a standalone page. Its output offers interactive table features, so compare its presentation with a simpler document table.",
+          "limits": "Install utility separately; interactive standalone output differs from a simple static table. Exact input/output command documented.",
+          "source": "https://github.com/vividvilla/csvtotable",
+          "supportingSources": []
+        }
+      ]
+    },
+    "flv-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "`ffmpeg -i lecture.flv -c:v mpeg4 -q:v 4 -c:a libmp3lame lecture.avi` chooses the quality scale explicitly.",
+          "limits": "Requires the MPEG-4 encoder and libmp3lame; re-encodes rather than remuxes.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        }
+      ]
+    },
+    "gif-to-ico": {
+      "methods": [
+        {
+          "app": "Pillow",
+          "steps": "`Image.open(\"reaction.gif\").save(\"reaction.ico\", sizes=[(16,16),(32,32),(48,48)])` writes several sizes from one frame. The GIF loader supports seek() and tell(), so you can move to another frame before saving.",
+          "limits": "Needs Python with Pillow installed.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ]
+    },
+    "jpeg-to-ai": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "run `magick photo.jpg photo.ai`. ImageMagick's format list shows both JPEG and AI as readable and writable.",
+          "limits": "Build-dependent format support; the AI that results is not a traced vector drawing.",
+          "source": "https://imagemagick.org/formats/",
+          "supportingSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "m4a-to-aiff": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "`ffmpeg -i interview.m4a -vn -c:a pcm_s24be interview.aiff` requests 24-bit PCM, which keeps more bits per sample than the page's output.",
+          "limits": "Explicit 24-bit choice does not restore previously discarded audio detail.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        }
+      ]
+    },
+    "mp4-to-opus": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "`ffmpeg -i talk.mp4 -vn -c:a libopus -b:a 96k talk.opus` sets an explicit audio bitrate.",
+          "limits": "Build needs libopus; -vn omits the picture.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "Audacity",
+          "steps": "open the MP4, choose File > Export Audio (Ctrl+Shift+E) and pick Opus as the format. Importing MP4 needs Audacity's optional FFmpeg library.",
+          "limits": "Requires the optional FFmpeg library for MP4 import.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportingSources": [
+            "https://manual.audacityteam.org/man/importing_audio.html"
+          ]
+        },
+        {
+          "app": "opus-tools with FFmpeg",
+          "steps": "first run `ffmpeg -i session.mp4 -vn session.wav`; then run `opusenc --bitrate 64 session.wav session.opus`. The intermediate WAV is an input type that opusenc documents directly.",
+          "limits": "opusenc does not accept MP4 directly; decode WAV first. Separate conversion programs required.",
+          "source": "https://opus-codec.org/docs/opus-tools/opusenc.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        }
+      ]
+    },
+    "mpg-to-avi": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "`ffmpeg -i broadcast.mpg -c:a libmp3lame -c:v mpeg4 -q:v 3 broadcast.avi` chooses video and audio compression directly.",
+          "limits": "Re-encoding, not stream-copy; build needs libmp3lame.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        }
+      ]
+    },
+    "mxf-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "Run `ffmpeg -i camera.mxf -c copy rewrap.mov` to copy the streams without decoding or encoding.",
+          "limits": "No decoding or encoding; works only when the MOV container accepts the codecs inside the MXF.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "`ffmpeg -i camera.mxf -c:v prores_ks -profile:v 2 -c:a pcm_s16le edit.mov` encodes ProRes video and PCM audio.",
+          "limits": "Requires the prores_ks encoder; example uses one profile and PCM.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        }
+      ]
+    }
+  }
+}

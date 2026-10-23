@@ -1,0 +1,912 @@
+{
+  "mp4-to-m4r": {
+    "seo": {
+      "title": "Convert MP4 to M4R Online (Free)",
+      "h1": "MP4 to M4R Converter",
+      "description": "Turn the sound of an MP4 into an M4R file for an iPhone ringtone. Saved as AAC at 192 kbps, picture dropped. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save the soundtrack of an MP4 as an M4R file for an iPhone ringtone."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to M4R?",
+        "answer": "Choose the MP4 above and save the M4R when it finishes. Only the sound is kept, as AAC at 192 kbps. A batch gives one M4R per file."
+      },
+      {
+        "question": "Can I make an iPhone ringtone from an MP4?",
+        "answer": "Yes, if the MP4 has sound. This page makes the M4R file from the soundtrack. Getting it onto the phone is a separate step, which Apple documents for GarageBand."
+      },
+      {
+        "question": "Does the page cut my video down to a ringtone length?",
+        "answer": "No. It sets no start time or length, so the M4R lasts as long as the soundtrack. Cut it down first in an audio editor, or let GarageBand shorten a long sound."
+      },
+      {
+        "question": "How long can an iPhone ringtone be?",
+        "answer": "GarageBand allows 30 seconds for a ringtone export, and prompts you to shorten anything longer."
+      },
+      {
+        "question": "What happens to the picture in my MP4?",
+        "answer": "It is dropped. The M4R holds sound only, and your MP4 stays as it was, so you can still use it."
+      },
+      {
+        "question": "What if my MP4 is silent?",
+        "answer": "A file without an audio track gives the page nothing to write, so it shows an FFmpeg error. Press play on the MP4 beforehand to hear whether it has sound."
+      },
+      {
+        "question": "What quality is the M4R?",
+        "answer": "AAC at 192 kbps. Because AAC is lossy, it cannot bring back detail that the MP4's own audio already lost."
+      },
+      {
+        "question": "Is M4R just a renamed M4A?",
+        "answer": "Close. Both are MPEG-4 audio with AAC sound, and the ending is what differs. iTunes and the iPhone look for M4R on a ringtone."
+      },
+      {
+        "question": "Can I make ringtones from several MP4 files?",
+        "answer": "Yes. Add them together; the page converts them back to back and saves one M4R for each."
+      },
+      {
+        "question": "Why is a song dimmed in GarageBand's file list?",
+        "answer": "Apple says a dimmed file in GarageBand may be protected or not yet downloaded to the iPhone. That is about the list on the phone, not about the M4R this page writes."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and M4R",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 that holds video, audio, subtitles and metadata. H.264 video with AAC audio is the most common mix.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays in every major browser"
+        ]
+      },
+      "toFormat": {
+        "name": "M4R",
+        "fullName": "iPhone ringtone",
+        "description": "An MPEG-4 audio file with AAC sound, named so that iTunes and the iPhone treat it as a ringtone.",
+        "details": [
+          "MPEG-4 container",
+          "AAC audio",
+          "Sound only",
+          "Used on Apple devices"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to M4R",
+      "points": [
+        "Only the audio is kept, as AAC at 192 kbps. The picture is dropped.",
+        "The page doesn't trim: the M4R is as long as the MP4's sound.",
+        "Apple's GarageBand ringtone export is limited to 30 seconds.",
+        "An MP4 with no sound track fails to convert.",
+        "The page makes the file; installing it on an iPhone is a separate step."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP4 and M4R",
+      "markdown": "### What is an MP4 file?\n\nISO/IEC 14496-14 (MPEG-4 Part 14), published in 2003, defines the MP4 container. It holds separate tracks for video, audio, subtitles and metadata rather than being a codec itself. Most files pair H.264 pictures with AAC sound, and other codecs such as AV1, VP9, MP3 or Opus are allowed. The file is made of nested boxes, the idea QuickTime calls atoms. Registered media types: video/mp4 and audio/mp4. A container is a wrapper: it organizes the tracks, and codecs such as H.264 and AAC compress what each track holds.\n\nThe MP4 design is derived from the ISO Base Media File Format, which counts Apple's QuickTime among its ancestors. QuickTime came first, and the MPEG-4 file format took it as its basis. Files with pictures usually end in .mp4 or .m4v; audio-only MPEG-4 is commonly saved as .m4a.\n\nYou meet MP4 as phone and camera recordings, downloaded clips and almost every video on the web, since every major browser plays it. For a ringtone only one track matters: the audio. An MP4 with a picture but no sound has nothing to give an audio editor.\n\n### Programs that open MP4 files\n\n**Windows, Mac and Linux:**\n\n- ffplay, the player that ships with FFmpeg, includes the MP4 demuxer.\n- mpv is a desktop player where you choose the audio and subtitle stream.\n\n**Windows and Mac:**\n\n- Adobe Premiere imports MP4 files into a project.\n\n**Web:**\n\n- Firefox opens MP4 files directly in a tab.\n- Chrome opens MP4 files directly too.\n\n**Mobile:**\n\n- VLC, a free media player, has versions for Android and for iOS that open most movie formats.\n\n### MP4 and M4R compared\n\n- **Extensions**: .mp4 and .m4r. An M4R carries AAC sound in an MPEG-4 file, and the ending is what makes iTunes and the iPhone offer it as a ringtone.\n- **Content**: an MP4 holds picture and sound. An M4R holds sound only.\n- **Container**: both are MPEG-4 family containers.\n- **Pictures**: the conversion disables video output, so no picture track reaches the M4R.\n- **Compression**: both usually hold lossy codecs. The MP4's own audio is often already AAC, so this conversion encodes lossy sound a second time.\n\nThe conversion runs FFmpeg inside your browser tab and writes the audio as AAC at 192 kbps in an iPod-style MPEG-4 file, with the video dropped. It does not cut anything, so the M4R is as long as the soundtrack. Putting the ringtone on a phone is a separate step.\n\n### Other ways to convert MP4 to M4R\n\n- **FFmpeg:** run `ffmpeg -i clip.mp4 -b:a 192k -c:a aac -vn -f ipod tone.m4r`. The flags choose AAC at 192 kbps, drop the video and name the container, which FFmpeg's format documentation describes as MPEG-4 audio limited to audio streams.\n- **GarageBand for iPhone:** first extract a sound file, for example `ffmpeg -i clip.mp4 -vn sound.wav`. In GarageBand tap the Loops Browser button, then Files, then Browse items from the Files app, and drag the file all the way to the left in Tracks view. Tap Share, then Ringtone, name it and tap Export.\n- **WavePad (Windows):** extract a WAV the same way, open it in WavePad and save the result as M4R. NCH's format table lists WAV among the formats WavePad opens and M4R among those it saves on Windows, and not on Mac.\n\n### Problems with MP4 files\n\n- **No audio comes out**: the MP4 has no sound track. Play the original first. A silent screen recording has no sound to pull out, and the page then reports a failed conversion.\n- **The video won't play anywhere**: container support doesn't guarantee a decoder for the video inside. Try a different player.\n- **The file stops partway or won't open**: a recording that was cut off while being written may not play at all. Capture or download it again.\n- **The ringtone is too long**: Apple says ringtones can be up to 30 seconds, and GarageBand offers to shorten a longer one. This page does not trim, so cut the sound first or let GarageBand do it.\n- **The audio isn't AAC**: an MP4 can hold MP3 or Opus sound instead. That makes no difference here, because the converter encodes the sound as AAC whatever the MP4 held.\n- **A phone won't play the video**: Android supports HEVC video inside MP4 files starting with version 5.0.\n"
+    }
+  },
+  "mp4-to-m4v": {
+    "seo": {
+      "title": "Convert MP4 to M4V Online (Free)",
+      "h1": "MP4 to M4V Converter",
+      "description": "Change an MP4 into an M4V without re-encoding: the video and audio are copied as they are, so the picture and sound keep their quality. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Copy an MP4's video and audio into an M4V file, with no new compression."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to M4V?",
+        "answer": "Choose the MP4 above and save the M4V when it appears. The video and audio are copied across without being compressed again."
+      },
+      {
+        "question": "Does converting MP4 to M4V lose quality?",
+        "answer": "No. The streams are copied into the new file without being compressed again, so the picture and sound are identical to the MP4's."
+      },
+      {
+        "question": "Will the M4V be smaller than the MP4?",
+        "answer": "The size can stay close to the MP4's, because the same compressed video and audio go into the new file and only the container is rewritten."
+      },
+      {
+        "question": "What is the difference between MP4 and M4V?",
+        "answer": "Both are MPEG-4 containers. M4V is Apple's name for the format, used by iTunes and on Apple TV, and iTunes Store files can carry FairPlay protection. This page adds no protection."
+      },
+      {
+        "question": "Can I just rename the MP4 to M4V?",
+        "answer": "Often. According to HandBrake's docs, the only difference between the two is the file ending. Converting here writes a new file with the .m4v ending and leaves your original untouched."
+      },
+      {
+        "question": "Does the page change the video's size or frame rate?",
+        "answer": "No. Nothing is re-encoded, so the picture keeps the size and frame rate of the MP4."
+      },
+      {
+        "question": "Will the M4V play on my iPhone or Apple TV?",
+        "answer": "That depends on the codecs inside, not the ending. Apple's M4V is typically built from H.264 video and AAC sound, and this page copies whatever codecs the MP4 holds without changing them."
+      },
+      {
+        "question": "Why does the M4V play with no sound?",
+        "answer": "The audio codec may be one the player lacks. Because the audio was copied as it was, the same file would be silent as an MP4 in that player."
+      },
+      {
+        "question": "Can I turn a folder of MP4s into M4V?",
+        "answer": "Yes. Select as many as you like; they are copied one at a time and each saves as a separate M4V."
+      },
+      {
+        "question": "Why did HandBrake save my MP4 with an .m4v ending?",
+        "answer": "HandBrake's documentation says it uses the M4V ending for MP4 output when you enable AC3 audio pass-through, SRT subs or chapters, and you can turn that off in its preferences. The container is the same either way."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and M4V",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 that holds video, audio, subtitles and metadata. H.264 video with AAC audio is the most common mix.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays in every major browser"
+        ]
+      },
+      "toFormat": {
+        "name": "M4V",
+        "fullName": "MPEG-4 video file",
+        "description": "Apple's name for an MPEG-4 video file, very close to MP4. Files from the iTunes Store may be protected with FairPlay.",
+        "details": [
+          "MPEG-4 container",
+          "H.264 video with AAC audio",
+          "Optional FairPlay protection",
+          "Used in iTunes and the Apple TV app"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to M4V",
+      "points": [
+        "Video and audio are copied, not re-encoded, so quality is unchanged.",
+        "The picture keeps the MP4's size and frame rate.",
+        "Your original MP4 is not changed; you download a new copy.",
+        "The M4V plays only where the codecs inside are supported.",
+        "This page adds no FairPlay protection to the M4V."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP4 and M4V",
+      "markdown": "### What is an MP4 file?\n\nThe MP4 format, MPEG-4 Part 14 (ISO/IEC 14496-14), appeared in 2003 as a container. A container is a wrapper that holds tracks and says nothing about how they are compressed: an MP4 can carry H.264, H.265 or AV1 video next to AAC, MP3 or Opus sound, with subtitles and chapters beside them. Inside, the file is a tree of boxes, which QuickTime calls atoms. That standard descends via the ISO Base Media File Format from Apple's QuickTime.\n\nAlmost everything you record or download as video is an MP4: phone clips, camera footage, saved web video. Every major browser plays it, and its registered media types are video/mp4 and audio/mp4. Android has played HEVC video in MP4 files since version 5.0. Because it is a container, whether a given MP4 plays depends on the codecs inside as much as on the .mp4 ending.\n\n### Programs that open MP4 files\n\n**Windows, Mac and Linux:**\n\n- mpv plays MP4 on the desktop and lets you choose the audio and subtitle stream.\n- ffplay, the player included with FFmpeg, reads the MP4 format.\n\n**Windows and Mac:**\n\n- Adobe Premiere imports MP4 into editing projects.\n\n**Web:**\n\n- Chrome and Firefox play MP4 directly in the page.\n\n**Mobile:**\n\n- VLC plays MP4 on Android phones and tablets, and its iOS version handles most movie formats on iPhone and iPad.\n\n### MP4 and M4V compared\n\n- **Extensions**: .mp4 and .m4v. MDN lists both as extensions for video MPEG-4 files, and notes that audio-only MPEG-4 files often use .m4a.\n- **Maker**: MP4 is an ISO standard. M4V is Apple's name for a very close relative, found in iTunes and on Apple TV.\n- **Container**: HandBrake's documentation calls the two the exact same file apart from the extension.\n- **Copy protection**: iTunes Store M4V files can be protected with FairPlay. An MP4 made here carries no such protection.\n- **Codecs**: usually H.264 video with AAC audio in both.\n\nNothing is re-encoded here. FFmpeg lifts the existing video and audio streams out and sets them in a fresh MPEG-4 file with the .m4v ending, and the picture keeps the MP4's frame size and rate. The 1920 px and 30 fps limits that other video pages apply don't apply here, because the streams are copied instead of re-encoded. Since no compression is repeated, no quality is lost, and the job is mostly rewriting the container. The page puts no cap on size; a long file only takes your device longer, and you can choose several MP4 files at once. The M4V plays only where the player supports the codecs inside, just as the MP4 did.\n\n### Other ways to convert MP4 to M4V\n\n- **FFmpeg:** run `ffmpeg -i source.mp4 -c copy -f mp4 output.m4v`. The -c copy option is FFmpeg's stream copy, which passes the video and audio through without re-encoding, and -f mp4 sets the output container to MP4 under the .m4v name.\n- **Rename a copy:** The HandBrake page calls the two the same file with a different extension, so you can copy the file and change .mp4 to .m4v. It adds that QuickTime and QuickTime-based apps can't play an MP4 with AC3 pass-through, subtitles or chapters enabled unless the ending is .m4v, which is a reason to rename a copy for those players.\n\n### Problems with MP4 files\n\n- **The video shows nothing or the sound is missing**: the container opens, yet a decoder for something inside is missing. Container support alone doesn't guarantee a decoder for the video or sound in it, so try another player.\n- **The codecs inside suit one device and not another**: a new ending doesn't change what a player can decode. This page copies the codecs unchanged, so re-encode the video in another program if a device refuses them.\n- **The picture plays but the sound doesn't, or the reverse**: an MP4 holds separate tracks, and a player may have a decoder for only one of them. The M4V behaves the way the MP4 did, because both tracks are copied as they are.\n- **Renaming didn't fix it**: changing the ending can't repair a damaged file or an unsupported encoding.\n- **The file is cut short or won't open**: an MP4 normally keeps its index data together, so a recording stopped mid-write may stay unplayable. Capture or download it again.\n"
+    }
+  },
+  "mp4-to-vob": {
+    "seo": {
+      "title": "Convert MP4 to VOB Online (Free)",
+      "h1": "MP4 to VOB Converter",
+      "description": "Re-encode an MP4 as MPEG-2 video with MP2 sound in a DVD-style VOB. It is one stream, not a full disc. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Make a DVD-style VOB stream from an MP4, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to VOB?",
+        "answer": "Choose the MP4 above and save the VOB once it is done. Picture and sound are both encoded again, to MPEG-2 and MP2, and several files give one VOB each."
+      },
+      {
+        "question": "Will the VOB play in a DVD player?",
+        "answer": "Not by itself. A DVD also needs IFO and BUP files, normally in a VIDEO_TS folder. For a disc, use a DVD authoring program such as DVDStyler."
+      },
+      {
+        "question": "Does the page make DVD menus?",
+        "answer": "No. It writes one stream. A VOB on a disc can hold menus, but this converter creates none."
+      },
+      {
+        "question": "Why can't I just rename the MP4 to VOB?",
+        "answer": "A VOB holds MPEG-2 material, while an MP4 most often carries H.264 and AAC. This page re-encodes the video to MPEG-2 and the audio to MP2 at 96 kbps, so the contents match the new ending."
+      },
+      {
+        "question": "Is the VOB the standard DVD frame size?",
+        "answer": "No. The picture keeps the MP4's size, up to 1920 pixels on its longest edge. FFmpeg's DVD target is the way to get the frame size the DVD standard sets."
+      },
+      {
+        "question": "What happens to a fast-moving or interlaced video?",
+        "answer": "Frames flagged as interlaced pass through a deinterlacer first. Frames that aren't flagged go through as they are."
+      },
+      {
+        "question": "Is there a frame-rate limit?",
+        "answer": "Yes. Faster footage, above 30 fps, is limited to 30, and a slower video keeps its own rate."
+      },
+      {
+        "question": "What quality does the VOB video have?",
+        "answer": "The MPEG-2 video is written at a fixed quality setting rather than a target bitrate, and the sound is MP2 at 96 kbps. Neither can be changed on this page."
+      },
+      {
+        "question": "Is the VOB copy-protected?",
+        "answer": "No. This page writes a plain VOB. Commercial discs can be copy-protected, and HandBrake, for one, does not process protected DVD sources."
+      },
+      {
+        "question": "Which programs can play the VOB I get?",
+        "answer": "VLC opens DVD-Video media and MPEG program streams. HandBrake also reads VOB files, provided they are unprotected."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and VOB",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 that holds video, audio, subtitles and metadata. H.264 video with AAC audio is the most common mix.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Subtitles and chapters",
+          "Plays in every major browser"
+        ]
+      },
+      "toFormat": {
+        "name": "VOB",
+        "fullName": "DVD Video Object",
+        "description": "The container for video, audio, subtitles and menus on DVD-Video discs, based on the MPEG-2 program stream.",
+        "details": [
+          "MPEG-2 program stream",
+          "Several audio and subtitle streams",
+          "May be encrypted with CSS on discs",
+          "Needs IFO and BUP files for a full disc"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to VOB",
+      "points": [
+        "Both streams are re-encoded: MPEG-2 for the picture, MP2 at 96 kbps for the sound.",
+        "Size and frame rate follow the MP4, capped at 1920 px and 30 fps.",
+        "Interlaced frames are deinterlaced.",
+        "The VOB is one stream with no menus, not a finished DVD.",
+        "A playable disc also needs IFO and BUP files."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP4 and VOB",
+      "markdown": "### What is an MP4 file?\n\nBehind the .mp4 ending is MPEG-4 Part 14, written up as ISO/IEC 14496-14 and published in 2003. Video, audio, subtitles and metadata sit in separate tracks within nested boxes, a layout inherited from Apple's QuickTime and the ISO Base Media File Format. Contents vary: H.264 with AAC is the common pair, and VP9, AV1, MP3 or Opus are allowed as well.\n\nYou will have MP4s from phones, cameras, screen recorders and downloads, because every major browser plays them. It is registered as video/mp4 for video and audio/mp4 for audio, and video files use either .mp4 or .m4v. MP4 is used for streaming, for clips from phones and cameras, and for files you share. Container support on its own doesn't guarantee a player can decode what is inside.\n\n### Programs that open MP4 files\n\n**Windows, Mac and Linux:**\n\n- mpv switches between audio and subtitle streams while it plays an MP4.\n- ffplay, FFmpeg's own viewer, plays the format.\n\n**Windows and Mac:**\n\n- Adobe Premiere imports MP4 files.\n\n**Web:**\n\n- Chrome and Firefox open MP4 directly.\n\n**Mobile:**\n\n- VLC runs on Android phones and tablets and also on iOS, where it handles most movie formats.\n\n### MP4 and VOB compared\n\n- **Extensions**: .mp4 and .vob. VOB stands for DVD Video Object.\n- **Structure**: a VOB is closely related to an MPEG-2 program stream. On a disc, video, sound, subtitles and menu content all travel in VOB streams.\n- **Codecs**: the MP4 usually holds H.264 and AAC. The output here is MPEG-2 video with MP2 audio at 96 kbps, which is why the conversion means a full re-encode.\n- **Companion files**: a DVD also relies on IFO and BUP files, and the VOBs normally sit in a VIDEO_TS folder. One VOB from this page is therefore not a finished disc.\n- **Players**: VLC and MPC-HC open VOB files, and Windows Media Player does with codecs installed.\n- **File size**: VOB files are limited to 1 GB each.\n- **Encryption**: VOBs on commercial discs may be encrypted with CSS. The VOB made here is plain.\n- **Subtitles**: DVD subtitles can be bitmap images rather than text, which some players skip even when they decode MPEG-2.\n- **Frame rate**: a source faster than 30 fps has frames dropped to fit, keeps its running time; a slower one keeps its own rate.\n- **Interlacing**: frames flagged as interlaced are deinterlaced, one output frame for each; progressive frames pass through.\n\nThis is why a lone VOB suits a quick test or an editor that wants MPEG-2, and a disc needs more. FFmpeg, running in your browser, writes the stream in the DVD layout. Frame size and rate follow the MP4 within two ceilings: a 1920-pixel long edge and 30 fps. The page never enlarges a small frame, and sides are rounded down to even numbers. The page does not scale to a DVD standard size and makes no menus, so use FFmpeg's DVD target or a DVD authoring program when a player needs a real disc.\n\n### Other ways to convert MP4 to VOB\n\n- **FFmpeg DVD target (NTSC):** run `ffmpeg -i movie.mp4 -target ntsc-dvd dvd-video.vob`. FFmpeg's documentation says the target sets the format options, such as bitrate, codecs and buffer sizes, for you.\n- **FFmpeg DVD target (PAL):** run `ffmpeg -i movie.mp4 -target pal-dvd dvd-video.vob`. FFmpeg accepts the pal-, ntsc- and film- prefixes in front of the target type to pick the corresponding standard.\n\n### Problems with MP4 files\n\n- **No picture or no sound**: the container opened, but a decoder for the video or audio inside is missing. Container support alone doesn't promise a decoder, as Adobe's list of supported formats also shows.\n- **The file stops or won't open**: a regular MP4 keeps its packet index in one place, so a recording interrupted while being written can be unplayable. Record or download it again.\n- **A phone refuses the video**: Android's supported-formats list has HEVC in MP4 beginning with version 5.0. The codec inside decides, not the .mp4 ending.\n- **The MP4 is very long**: the converter imposes no size limit or timeout, so a long clip keeps your device busy until it finishes. The picture and the sound are both re-encoded in your browser, so close other heavy tabs if the device struggles.\n- **The picture is interlaced**: footage from camcorders and broadcast captures may be flagged as interlaced. The converter deinterlaces those frames, so no extra step is needed.\n"
+    }
+  },
+  "mpeg-to-mov": {
+    "seo": {
+      "title": "Convert MPEG to MOV Online (Free)",
+      "h1": "MPEG to MOV Converter",
+      "description": "Convert an MPEG to a MOV in your browser. The video is re-encoded to H.264 with AAC sound, deinterlaced if needed. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MPEG video as a QuickTime MOV with H.264 and AAC, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MPEG to MOV?",
+        "answer": "Pick the MPEG above and save the MOV afterward. Picture and sound are re-encoded as H.264 and AAC, and a batch yields one MOV per file."
+      },
+      {
+        "question": "Is the MOV a lossless copy of the MPEG?",
+        "answer": "No. Picture and sound are compressed once more, H.264 at CRF 32 on the ultrafast preset and AAC at 96 kbps, which makes the MOV a fresh lossy version."
+      },
+      {
+        "question": "Will the MOV keep the MPEG's frame size?",
+        "answer": "Yes, unless a side passes 1920 pixels, in which case the picture is reduced to fit. Smaller pictures aren't enlarged, and an odd side loses a pixel."
+      },
+      {
+        "question": "What happens to the frame rate of my MPEG?",
+        "answer": "A rate up to 30 frames a second is kept. A faster video has frames dropped to reach 30, and it keeps its full length."
+      },
+      {
+        "question": "Does the converter deinterlace my MPEG?",
+        "answer": "A deinterlacing filter processes frames flagged as interlaced before encoding, and frames not flagged pass through as they are."
+      },
+      {
+        "question": "Which programs open the MOV afterward?",
+        "answer": "Final Cut Pro, Adobe Premiere Pro, VLC and QuickTime Player all appear among the programs that open a MOV. The MOV holds H.264 pictures with AAC sound."
+      },
+      {
+        "question": "Is .mpeg different from .mpg?",
+        "answer": "No. Both are names for MPEG video, and this page treats them alike."
+      },
+      {
+        "question": "Can I convert a very large MPEG?",
+        "answer": "The page sets no size limit and has no timeout, so a long file simply takes your device longer."
+      },
+      {
+        "question": "Is the sound kept?",
+        "answer": "Yes. It is encoded as AAC at 96 kbps, whatever the MPEG used."
+      },
+      {
+        "question": "Can I queue up more than one MPEG?",
+        "answer": "Yes. Select several and they are converted back to back, each saved as its own MOV."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPEG and MOV",
+      "fromFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "Video and audio from the Moving Picture Experts Group, usually MPEG-1 or MPEG-2, multiplexed into one stream. MPEG-2 was adopted for DVDs.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "Lossy compression",
+          "Used for VCD and DVD video",
+          ".mpeg and .mpg endings"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "Apple's QuickTime container, which was also the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "Multi-track container",
+          "H.264, ProRes and other codecs",
+          "Timecode and metadata tracks",
+          "Apple format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MPEG to MOV",
+      "points": [
+        "H.264 (CRF 32, ultrafast) carries the picture and AAC at 96 kbps the sound.",
+        "Size and frame rate carry over, capped at 1920 px and 30 fps.",
+        "Frames flagged interlaced are deinterlaced.",
+        "The MOV is a new lossy copy, not a lossless rewrap.",
+        "Each MPEG you choose downloads as its own MOV."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MPEG and MOV",
+      "markdown": "### What is an MPEG file?\n\n\"MPEG\" names the Moving Picture Experts Group and the video standards it wrote. In a .mpeg file, picture and sound are coded separately and woven together, most often as MPEG-1 or MPEG-2. Television delivery was the first job of MPEG-2, and DVDs adopted it afterward. In an MPEG system, coded picture, sound and data travel as separate streams. Inside the file, each coded component is an elementary stream, and packetizing splits those streams into small pieces that alternate through the file.\n\nThe two endings .mpeg and .mpg name the same kind of video, filed under the media type video/mpeg. Video CDs, DVD discs, old downloads and recordings captured from broadcasts are where it shows up. Detail thrown away by lossy encoding never comes back.\n\n### Programs that open MPEG files\n\n- **Windows:** Windows Media Player supports the .mpeg and .mpg endings.\n- **Mac:** QuickTime Player is one of the programs named for opening MPEG on a Mac.\n- **Windows, Mac and Linux:** VLC reads MPEG elementary, program and transport streams, and FFplay, which ships with FFmpeg, also plays MPEG.\n- **Mobile:** the Android port of VLC has the desktop player's decoding, and the iOS port opens local files in its own player, so the clip needs no conversion for viewing.\n\n### MPEG and MOV compared\n\n- **Extensions and types**: .mpeg or .mpg with video/mpeg, and .mov or .qt with video/quicktime.\n- **Origins**: MPEG comes from a standards committee. MOV is Apple's QuickTime format, which debuted in 1991 and reached Windows in 1994.\n- **Structure**: an MPEG file is a sequence of packets. A MOV is built from atoms, and an unknown atom can simply be skipped by the program reading it.\n- **Codecs**: an MPEG file holds MPEG-1 or MPEG-2 video. Inside a MOV you can find H.264, ProRes or Motion JPEG pictures next to AAC or raw PCM sound.\n- **Tracks**: a MOV keeps video, audio, text and timecode tracks, plus metadata.\n- **Where they turn up**: MPEG appears on video CDs and DVDs. MOV serves video editing on macOS, iPhone recordings and professional video workflows, and a Mac saves its screen recordings as MOV.\n- **Renaming**: changing .mpeg to .mov transcodes nothing and installs no missing decoder, which is why this page re-encodes the picture and sound.\n- **Playback**: not every browser plays MOV, and Apple itself has largely moved to MP4.\n- **Editors**: some QuickTime files use codecs the receiving editor doesn't have, so one program may open the MOV while another cannot.\n- **Interrupted writes**: if writing stops midway, an ordinary MOV file may not be usable.\n\nInside your browser tab, FFmpeg re-encodes the MPEG into H.264 pictures with 96 kbps AAC sound, both wrapped in a MOV. Quality is fixed at CRF 32 with the ultrafast preset. Before encoding, a deinterlacing filter handles frames flagged as interlaced. Output dimensions stay at the source size unless they pass 1920 pixels on the long edge, and the frame rate stops at 30. Width and height are each reduced to the nearest even number. Smaller frames aren't enlarged and slower rates aren't sped up. What you download is a new lossy copy and not a lossless rewrap. The original MPEG isn't touched. With a multi-file selection, the clips run in turn and every one downloads as a separate MOV.\n\n### Other ways to convert MPEG to MOV\n\n- **FFmpeg:** run `ffmpeg -i footage.mpeg -c:a aac -c:v libx264 delivery.mov`. It re-encodes the video and the audio, so the result is a new lossy file as it is on this page.\n\n### Problems with MPEG files\n\n- **Only sound, or only picture**: decoding the picture is not enough; the player has to decode the soundtrack too, and multiplexing doesn't make the codecs interchangeable.\n- **The file isn't recognized**: MPEG files come either as system streams or as bare video, and that structure determines which demuxer is used, so a file that cannot be read may simply be built differently from what you expected.\n- **A very long file**: the page doesn't cap size or time, so a long MPEG simply keeps your device working longer.\n- **Soft or blocky picture**: lossy MPEG coding can't keep every detail of the original, and converting adds another round of compression. Start from your best copy, since each round of lossy compression costs more detail.\n"
+    }
+  },
+  "mpg-to-gif": {
+    "seo": {
+      "title": "Convert MPG to GIF Online (Free)",
+      "h1": "MPG to GIF Converter",
+      "description": "Turn an MPG video into an animated GIF at up to 480 px on the longer side and 15 frames a second. Sound is dropped. Free, in your browser, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Make an animated GIF from an MPG video, up to 480 px on its longer side."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MPG to GIF?",
+        "answer": "Choose the MPG above and save the GIF when it finishes. The clip is drawn as an animated GIF with no sound, and several files give one GIF each."
+      },
+      {
+        "question": "How big is the GIF?",
+        "answer": "The longer side is held to 480 pixels, and a smaller picture stays as it is. A side with an odd count loses one pixel."
+      },
+      {
+        "question": "What frame rate does the GIF use?",
+        "answer": "Fifteen per second, so a faster video loses frames to fit."
+      },
+      {
+        "question": "Can I choose which part of the MPG becomes the GIF?",
+        "answer": "No. The page has no start or end option and converts the whole clip. Cut the MPG first in a video editor if you only want a moment."
+      },
+      {
+        "question": "Why does the GIF have no sound?",
+        "answer": "A GIF is an image format and can't hold audio. The MPG's sound is dropped."
+      },
+      {
+        "question": "Why do the colors look banded in the GIF?",
+        "answer": "No GIF frame may exceed 256 colors. Your clip is examined to build the palette before frames are drawn, but the 256 limit stays."
+      },
+      {
+        "question": "Does the GIF loop?",
+        "answer": "It is written to repeat. Looping is set when the file is made, and the page has no option to change it."
+      },
+      {
+        "question": "What happens to interlaced MPG video?",
+        "answer": "Frames flagged as interlaced get a deinterlacing filter before the GIF is drawn. Frames that aren't flagged pass through unchanged."
+      },
+      {
+        "question": "Is .mpg different from .mpeg?",
+        "answer": "No, they are two spellings of the same video format, and the page reads either."
+      },
+      {
+        "question": "Can I do a batch of MPG clips?",
+        "answer": "Yes. Select several and the clips are processed one by one, each saved as a separate GIF."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPG and GIF",
+      "fromFormat": {
+        "name": "MPG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "Lossy compression",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987, with LZW compression, a palette of at most 256 colors per frame and simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "No sound"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MPG to GIF",
+      "points": [
+        "The GIF's longest edge is capped at 480 px, and it plays at 15 frames per second.",
+        "The whole clip is converted, with no trimming.",
+        "The sound is dropped, because a GIF can't hold audio.",
+        "A palette is built from your clip, but a GIF still has at most 256 colors.",
+        "Frames flagged interlaced are deinterlaced."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MPG and GIF",
+      "markdown": "### What is an MPG file?\n\nAn MPG file holds MPEG-1 or MPEG-2 video and audio together in an MPEG program stream. The .mpg ending is the short form of .mpeg, and both are used for MPEG video. MPEG-2 was designed for television delivery and then became the video format of the DVD, while MPEG-1 and MPEG-2 were the standard for VCD and DVD video. Its media type is video/mpeg.\n\nInside, the picture and sound are coded separately, each as an elementary stream, then cut into packets and interleaved, so one file carries both. Streams in an MPEG system carry coded picture, sound and data, and each elementary stream stands for one coded component. It turns up on video CDs and DVDs, in older downloads and in broadcast captures. MPEG is a lossy format, and the detail it discards cannot be recovered from the file.\n\n### Programs that open MPG files\n\n- **Windows, Mac and Linux:** VLC names MPEG program streams among its readable inputs; FFplay is another option.\n- **Windows:** Windows Media Player supports the .mpg and .mpeg endings.\n- **Mac:** QuickTime Player is on the list of openers for MPG.\n- **Mobile:** install VLC for Android or VLC for iOS and the clip plays as it is. On Android, VLC includes the desktop decoding; on iOS it plays local files in a player of its own, bypassing the system's.\n\n### MPG and GIF compared\n\n- **Extensions and types**: .mpg with video/mpeg, and .gif with image/gif.\n- **What they are**: MPG is a video format with sound. GIF is an image format introduced by CompuServe in 1987, and it animates by holding many images with a delay between them.\n- **Color**: a GIF image draws from a small palette. This page generates that palette from the clip itself.\n- **Sound**: MPG carries audio. A GIF has none, so the sound is dropped. Keep the MPG itself when you still need the sound.\n- **Compression**: both are compressed, MPG with lossy video coding and GIF losslessly with LZW.\n- **Transparency**: one palette entry can be set fully transparent, and no pixel can be half see-through.\n- **Timing**: a GIF holds many images, each followed by a delay in hundredths of a second, which is all that GIF animation consists of.\n- **History**: version GIF89a from July 1990 introduced transparency, frame timing, comment and application-data extensions. From 1994 Unisys wanted license fees for LZW. The American patent lapsed in 2003; the equivalent European and Japanese ones lapsed in 2004.\n- **Looping**: a GIF can repeat, and the command this page runs sets it to loop without end.\n- **Playback**: every major browser displays a GIF with no player, while an MPEG needs a program that has the right decoders.\n- **Editing afterward**: GIMP can export layers as an animation set to repeat endlessly, and ImageMagick lists GIF too, so the result can be adjusted afterwards.\n\nYour MPG goes through FFmpeg in your browser. Footage whose frames are marked interlaced is deinterlaced first. The result plays at 15 frames per second, and its longest edge is capped at 480 pixels, with both sides rounded down to an even number. A picture that is already smaller keeps its size. A palette is generated from the clip itself before the frames are drawn, and the GIF is written to loop. Nothing trims the video, so the whole clip is used. If you choose more than one MPG, the converter handles them in sequence, producing a separate GIF per file while the originals stay put.\n\n### Other ways to convert MPG to GIF\n\n- **FFmpeg:** run `ffmpeg -i source.mpg animation.gif`.\n\n### Problems with MPG files\n\n- **A player won't open it**: both the video and the audio need a decoder, because combining them into one file does not make their codecs the same.\n- **It looks soft or blocky**: lossy MPEG encoding cannot retain every detail from the uncompressed picture, so start from the best copy you have.\n- **A very long clip**: nothing on the page limits size or run time; a long MPG takes whatever time your device requires.\n- **The file isn't recognized**: some MPEG files are raw video and others are system streams, so the right reader depends on how the file is structured, and an unreadable one may simply differ from what you assumed.\n"
+    }
+  },
+  "mts-to-mov": {
+    "seo": {
+      "title": "Convert MTS to MOV Online (Free)",
+      "h1": "MTS to MOV Converter",
+      "description": "Convert an AVCHD camcorder MTS clip to a MOV in your browser. The video is re-encoded to H.264, deinterlaced if needed. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encode an AVCHD camcorder MTS clip as a QuickTime MOV, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MTS to MOV?",
+        "answer": "Select the MTS above, then save the MOV it produces. Picture and sound are encoded anew, the first as H.264 and the second as AAC, and several files give one MOV each."
+      },
+      {
+        "question": "Is the MOV a lossless copy of my camcorder clip?",
+        "answer": "No. Both streams are compressed again. The H.264 uses a fixed CRF of 32 with the ultrafast preset, the AAC runs at 96 kbps, so the MOV is a fresh lossy version. Keep the original MTS if you may edit it later."
+      },
+      {
+        "question": "What happens to interlaced footage?",
+        "answer": "Frames flagged as interlaced pass through a deinterlacing filter before encoding, and frames that aren't flagged are left as they are."
+      },
+      {
+        "question": "Will a 60 fps MTS stay at 60 fps?",
+        "answer": "No. The MOV is capped at 30 frames a second, so a 50 or 60 frame clip has frames dropped and keeps its length. A rate up to 30 is kept."
+      },
+      {
+        "question": "Does the MOV keep Full HD size?",
+        "answer": "Yes, as long as neither side passes 1920 pixels; a larger picture is reduced to fit. Smaller ones aren't scaled up."
+      },
+      {
+        "question": "Do I need the whole AVCHD folder to convert one clip?",
+        "answer": "No. The page reads the single MTS file you choose. Keep the whole card folder elsewhere if you want to import the clips into an editor as camera media."
+      },
+      {
+        "question": "Can I rewrap the MTS without re-encoding?",
+        "answer": "Not here, since this page always encodes. FFmpeg on your computer can rewrap with -c copy, and its output is a different file with no new compression."
+      },
+      {
+        "question": "Is the sound kept?",
+        "answer": "Yes, converted to AAC at 96 kbps."
+      },
+      {
+        "question": "What opens the finished MOV?",
+        "answer": "Openers for MOV listed include QuickTime Player, VLC, Final Cut Pro and Adobe Premiere Pro. A MOV can hold H.264 with AAC."
+      },
+      {
+        "question": "Can I process a whole card of clips?",
+        "answer": "Yes. Select the MTS files together; they run in sequence and every clip downloads separately as a MOV."
+      }
+    ],
+    "aboutSection": {
+      "title": "MTS and MOV",
+      "fromFormat": {
+        "name": "MTS",
+        "fullName": "AVCHD transport stream",
+        "description": "The file extension for video recorded by AVCHD camcorders. It is an MPEG transport stream containing H.264 video.",
+        "details": [
+          "MPEG transport stream",
+          "H.264 video",
+          "Dolby Digital or PCM audio",
+          "192-byte packets"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "Multi-track container",
+          "H.264, ProRes and other codecs",
+          "Timecode and metadata tracks",
+          "Apple format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MTS to MOV",
+      "points": [
+        "H.264 (CRF 32, ultrafast) carries the picture and AAC at 96 kbps the sound.",
+        "Sides are capped at 1920 px and the rate at 30 fps, so 50 or 60 fps footage is reduced.",
+        "Frames flagged interlaced are deinterlaced.",
+        "The MOV is a new lossy copy, not the AVCHD streams or the card folder.",
+        "Each MTS you choose downloads as its own MOV."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MTS and MOV",
+      "markdown": "### What is an MTS file?\n\nAn MTS file is video recorded by an AVCHD camcorder. Technically it is an MPEG transport stream with H.264 pictures, paired with either Dolby Digital or linear PCM audio. AVCHD was designed for digital high-definition camcorders, and Sony documents MTS clips as part of an AVCHD recording structure on the camera's card. Sony and Panasonic cameras are the usual source.\n\nWrapper and compression are different layers, so the .mts ending tells you how the pictures are packaged and nothing about how they are coded. The stream is divided into 192-byte packets. MTS clips usually sit in a folder tree on the card beside other files that cameras and editors use to find them, and when you archive camera material, keeping the original folder structure lets an editor import it as camera media.\n\n### Programs that open MTS files\n\nMTS is a camcorder format, so the programs below are the ones that read it without a conversion.\n\n- **Windows, Mac and Linux:** VLC reads transport streams and decodes both AVC video and AC-3 sound. FFmpeg can demux MPEG-TS input.\n- **Windows and Mac:** Adobe Premiere Pro and DaVinci Resolve are listed as able to open MTS.\n- **Mac:** Final Cut Pro imports camera archives as camera media, which Apple documents.\n\n### MTS and MOV compared\n\n- **Extensions and types**: .mts, written by Sony and Panasonic AVCHD camcorders, and .mov or .qt with video/quicktime.\n- **What each is**: MTS is a transport stream. MOV is QuickTime's file format; Apple released it in 1991, and a Windows version followed three years later.\n- **Structure**: an MTS is a flow of fixed-size packets. A QuickTime file consists of atoms, and any atom a program doesn't know can be passed over.\n- **Codecs**: AVCHD relies on H.264 with Dolby Digital or PCM sound. ProRes, Motion JPEG and H.264 can all serve as a MOV's picture codec, and AAC or plain PCM as its sound.\n- **Sound**: an MTS carries Dolby Digital or PCM audio. The MOV made here carries AAC, whichever the camcorder used.\n- **Where you meet them**: MTS comes off camcorders, and a Mac writes its screen recordings as MOV.\n- **Renaming**: a new .mov ending does not transcode anything or add a missing decoder, so use the converted file instead.\n- **Editors**: a QuickTime container can use codecs the destination editor lacks, so a MOV may open in one program and not another.\n- **Playback**: a MOV won't play in every browser, and Apple has mostly turned to MP4 itself.\n- **Interrupted writes**: a regular MOV file may be unusable after an interrupted write.\n\nFFmpeg runs in your browser and encodes the MTS afresh, as H.264 plus 96 kbps AAC in a MOV. The picture is fixed at CRF 32 on the ultrafast preset. Frames flagged as interlaced are deinterlaced before encoding. A clip keeps its dimensions unless a side passes 1920 pixels; the frame rate may not exceed 30, and sides are rounded down to even. Footage shot at 50 or 60 frames therefore comes out reduced, and the MOV is a new lossy copy rather than the AVCHD streams. With several clips selected, each is converted in turn and downloads as a separate MOV, and the originals stay as they were.\n\n### Other ways to convert MTS to MOV\n\n- **FFmpeg, re-encoding:** run `ffmpeg -i camera.mts -c:v libx264 -c:a aac clip.mov`. This is the closest to what this page does.\n- **FFmpeg, stream copy:** run `ffmpeg -i camera.mts -c copy clip.mov` to rewrap without recompressing. A stream the MOV can't hold may be dropped or carried as data without any error, and the interlacing is kept.\n\n### Problems with MTS files\n\n- **A player opens it without sound or picture**: a player needs the codecs for the contained video and audio, not only the filename ending.\n- **Interlaced footage on a progressive display**: interlaced source material may require deinterlacing to look right there.\n- **Import into an editor fails**: for archived camera material, keep the original folder structure so the editor can import it as camera media.\n- **It plays on the camera but not elsewhere**: reading the wrapper and decoding what is inside are separate jobs, so a player that opens transport streams may still lack the H.264 or AC-3 decoder. VLC decodes both.\n"
+    }
+  },
+  "raf-to-jpg": {
+    "seo": {
+      "title": "Convert RAF to JPG Online (Free)",
+      "h1": "RAF to JPG Converter",
+      "description": "Turn a Fujifilm RAF raw photo into a JPG in your browser. ImageMagick reads the RAW file and writes the JPG. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert a Fujifilm RAF raw photo to JPG in your browser, with no upload."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a Fujifilm RAF to JPG?",
+        "answer": "Pick the RAF above and save the JPG afterward. ImageMagick in your browser reads the RAW file and writes a JPG, and a batch gives one JPG per file."
+      },
+      {
+        "question": "Is a RAF just a big JPEG?",
+        "answer": "No. A RAF stores unprocessed sensor data with an embedded JPEG preview. The JPG you get here is a developed picture in 8-bit color, and JPEG is lossy."
+      },
+      {
+        "question": "Will the JPG look like my Fujifilm Film Simulation?",
+        "answer": "This page has no Film Simulation or other development controls. Film Simulation can be applied during development in Fujifilm's RAW FILE CONVERTER EX, so use that when the camera look matters."
+      },
+      {
+        "question": "Is there a quality setting for the JPG?",
+        "answer": "There isn't one. Nothing is passed for quality, and ImageMagick writes the JPG directly."
+      },
+      {
+        "question": "Does it work with my Fujifilm camera?",
+        "answer": "A very recent model may not be readable yet, because converters need updating for new cameras. A file that can't be decoded gives a message saying it may be damaged."
+      },
+      {
+        "question": "What is the difference between uncompressed and lossless RAF?",
+        "answer": "Both hold the same capture. Lossless compression uses a reversible algorithm, so the smaller file decodes to the same data, though the software has to understand that variant."
+      },
+      {
+        "question": "I shot RAW+JPEG. Do I still need to convert?",
+        "answer": "Probably not. RAW+JPEG saves a ready-to-use JPEG beside the RAF, so the camera's own JPG already exists."
+      },
+      {
+        "question": "Why does it say the RAW file ends early?",
+        "answer": "LibRaw says so when a file stops before its picture data does. Copy the RAF from the card again and convert the new copy."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "Nothing on this page caps the file size. A RAF whose developed image holds too many pixels is turned away, and the error you see calls the picture too large."
+      },
+      {
+        "question": "Is my RAF uploaded or changed?",
+        "answer": "No. Everything happens in your browser, your RAF is left alone, and the JPG is a fresh download."
+      }
+    ],
+    "aboutSection": {
+      "title": "RAF and JPG",
+      "fromFormat": {
+        "name": "RAF",
+        "fullName": "Fujifilm RAW",
+        "description": "The raw image format of Fujifilm digital cameras. It stores unprocessed sensor data together with an embedded JPEG preview.",
+        "details": [
+          "Unprocessed sensor data",
+          "Embedded JPEG preview",
+          "Proprietary Fujifilm format",
+          "Uncompressed or lossless"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "8 bits per channel",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting RAF to JPG",
+      "points": [
+        "ImageMagick reads the RAF with its RAW decoder and writes the JPG.",
+        "The page passes no quality setting and has no Film Simulation or other development controls.",
+        "Anything larger than about 537 megapixels is refused as too large.",
+        "JPEG is lossy with 8 bits per channel, so keep the RAF to develop again.",
+        "Each RAF you choose downloads as its own JPG."
+      ]
+    },
+    "guide": {
+      "title": "Understanding RAF and JPG",
+      "markdown": "### What is a RAF file?\n\nRAF is Fujifilm's original camera RAW format. Unprocessed sensor data and a small embedded JPEG preview make up the file, so it is raw material for developing a photo and not a finished picture. Cameras such as the X-T3 can record RAF either uncompressed or losslessly compressed.\n\nMany Fujifilm cameras also offer RAW+JPEG recording, which saves a ready-to-use JPEG next to the RAF. If you shot that way, the JPEG already exists. A RAF is the file to convert when you want to develop the capture yourself, or when you shot RAW only. Fujifilm supplies its own RAW converter for X-series RAF data, and Film Simulation can be applied while the file is developed. The format is proprietary to Fujifilm, and photographers use it for editing before they convert to JPEG.\n\n### Programs that open RAF files\n\n- **Windows and Mac:** RAW FILE CONVERTER EX powered by SILKYPIX is Fujifilm's own RAW development software, so check its camera compatibility list. It develops RAF data recorded by X-series cameras and can apply Film Simulation during development. FUJIFILM X RAW STUDIO uses a connected compatible camera's image processor for the conversion.\n- **Windows, Mac and Linux:** ImageMagick lists RAF as a readable camera RAW format.\n- **Linux:** darktable recognizes RAF for import, with camera support from its RawSpeed library.\n\n### RAF and JPG compared\n\n- **Extensions and types**: .raf, and .jpg or .jpeg with image/jpeg.\n- **What each is**: a RAF holds the sensor data and a preview. A JPG is a finished picture with the look chosen, in compressed pixels.\n- **Compression**: a RAF's lossless option is reversible. JPEG discards data as it compresses: 8x8 pixel blocks go through a discrete cosine transform, and entropy coding comes last.\n- **Color**: JPEG stores 8 bits per color channel.\n- **Quality numbers**: programs usually offer a 0 to 100 quality scale, yet one number does not mean the same quality everywhere, so a JPG from another tool at the same setting may look different.\n- **Loading**: progressive JPEGs exist too, where a coarse version of the image appears first and sharpens as more data loads.\n- **Transparency and layers**: JPEG has no alpha channel and cannot store layers, so a JPG carries no editing history.\n- **Support**: every major browser displays JPEG, and most digital cameras and scanners write it natively. Its US patents expired on 27 October 2006.\n\nYour RAF is read in your browser by ImageMagick compiled to WebAssembly, which loads the first time you convert. ImageMagick reads camera RAW with its LibRaw decoder and then writes the JPG. The page passes no quality setting and has no development controls such as white balance or Film Simulation. Anything larger than about 537 megapixels is refused as too large to convert here. Your RAF itself stays untouched; what you save is a separate JPG.\n\n### Other ways to convert RAF to JPG\n\n- **FUJIFILM X RAW STUDIO:** on the camera, choose USB RAW CONVERSION under SET UP and connect it to the computer. In the software, pick the source image folder, which must be on the computer's drive, select the RAW files in Thumbnail View, adjust Conversion Settings and click Convert. The output is a JPEG or TIFF, saved in the same folder. The connected camera must be the model that took the photos.\n- **darktable:** select the images, open export, choose file on disk as the target, pick JPEG for the format and run the export. Check the camera-support list first.\n- **ImageMagick:** run `magick photo.raf delivery.jpg`, which reads the RAF and writes the JPG.\n\n### Problems with RAF files\n\n- **The file won't open in an older program**: new camera models can require a converter update, and Fujifilm publishes the models it adds. A losslessly compressed RAF needs software that understands that variant.\n- **\"The RAW file is damaged\"**: the decoder found a broken structure or couldn't decode the picture data. Copy the file from the card again.\n- **The RAW data stops short**: the RAF is incomplete, as a copy interrupted part way would be.\n- **Size refused**: the file declares a picture above roughly 537 megapixels, or the decoder would need more memory than it may use.\n- **X RAW STUDIO won't start**: it requires a supported camera connection and doesn't convert with the computer's processor.\n"
+    }
+  },
+  "svg-to-html": {
+    "seo": {
+      "title": "Convert SVG to HTML Online (Free)",
+      "h1": "SVG to HTML Converter",
+      "description": "Wrap an SVG drawing in a standalone HTML page. The vector markup is inlined, centered, and shrinks to the window's width. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Put an SVG drawing inside a standalone HTML page, still vector, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an SVG to HTML?",
+        "answer": "Choose the SVG above and save the HTML page when it finishes. The drawing is placed inside a new web page, and several files give one page each."
+      },
+      {
+        "question": "Is the drawing still vector in the HTML page?",
+        "answer": "Yes. The `<svg>` markup is copied into the page as it is, so it scales without losing sharpness. Nothing is turned into an image."
+      },
+      {
+        "question": "Does it rebuild my design as a website?",
+        "answer": "No. You get one page with the drawing in it. Shapes aren't converted to paragraphs, buttons or a layout, so a drawing that looks like a web interface is still a drawing."
+      },
+      {
+        "question": "How is the drawing sized and placed?",
+        "answer": "The page has no margins, and the drawing is centered in the window. It shrinks to fit the window's width and is never enlarged by the page."
+      },
+      {
+        "question": "What is the page title?",
+        "answer": "The word image, whatever your SVG was called. The title is set in the page's head, so you can edit it afterward."
+      },
+      {
+        "question": "My file starts with an XML declaration. Is that a problem?",
+        "answer": "No. The XML declaration, doctype and comments before the `<svg>` tag are dropped, because HTML doesn't allow them there. Everything from the `<svg>` tag on is kept."
+      },
+      {
+        "question": "Why does it say the file has no SVG drawing in it?",
+        "answer": "The converter looks for an `<svg>` tag and found none. Open the file in a text editor to check that it is an SVG and not some other XML."
+      },
+      {
+        "question": "What does the HTML around the drawing contain?",
+        "answer": "A doctype, an html tag with lang set to en, a utf-8 charset tag, a viewport tag, a title and one short style block, followed by your svg element."
+      },
+      {
+        "question": "Do I need to keep the SVG file next to the HTML?",
+        "answer": "No. The drawing's markup is copied into the page, so the HTML never reads the SVG file again."
+      },
+      {
+        "question": "Can I do a whole folder of SVGs in one go?",
+        "answer": "Yes. Select several SVGs and each becomes its own HTML page, downloaded separately."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and HTML",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Animation and scripting",
+          "Styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "HTML",
+        "fullName": "HyperText Markup Language",
+        "description": "The standard markup language for web pages, maintained by the WHATWG as the HTML Living Standard. It describes the structure of a page with elements and attributes.",
+        "details": [
+          "Text-based markup",
+          "Elements and attributes",
+          "Styled with CSS",
+          "Rendered by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SVG to HTML",
+      "points": [
+        "The `<svg>` markup is copied into the page as it is, so it stays vector.",
+        "The XML declaration, doctype and comments before the `<svg>` tag are dropped.",
+        "The page centers the drawing and lets it shrink to the window's width.",
+        "The page title is the word image, whatever your file is called.",
+        "A file with no `<svg>` in it is refused."
+      ]
+    },
+    "guide": {
+      "title": "Understanding SVG and HTML",
+      "markdown": "### What is an SVG file?\n\nThe name SVG stands for Scalable Vector Graphics, a W3C standard built on XML. A file lists the shapes, text and embedded pictures that make up a flat drawing. The W3C published version 1.0 as a Recommendation in 2001, and version 1.1 followed in 2003. The shapes are stored as instructions, which lets a renderer draw the same SVG at any size and keep its edges crisp.\n\nBecause the file is just text, any text editor opens it, and it can be searched, indexed and compressed; a gzip-compressed one ends in .svgz. Stylesheets and scripts can act on the drawing, which allows styling, scripting and animation, and the format includes clipping paths, masks and filter effects. Its media type is image/svg+xml, and every major browser displays it. On the web SVG typically carries logos, icons, illustrations, diagrams, charts and maps. You can show an SVG on its own or place it inside an HTML page.\n\n### Programs that open SVG files\n\n- **Windows, Mac and Linux:** Native SVG editing is what Inkscape does; Mozilla Firefox displays the format, and the list of programs that open it also names Adobe Illustrator and Figma.\n- **Mobile:** Google Chrome and Safari display SVG, so a phone browser shows a drawing with no extra app.\n\n### SVG and HTML compared\n\n- **Extensions and types**: .svg with image/svg+xml, and .html with text/html.\n- **What each is**: an SVG describes a drawing. HTML is the markup language used to describe web documents and applications, and the WHATWG maintains it as a Living Standard. Its early revisions developed at CERN and then the IETF during 1990 to 1995.\n- **Roles**: HTML describes document meaning, CSS supplies presentation and JavaScript can add behavior.\n- **Size**: an HTML document may point to other files instead of holding every asset inside itself. Here the drawing sits inside the page, so nothing else is needed.\n- **Opening the result**: Firefox displays HTML files from your disk, and Visual Studio Code offers syntax highlighting, completion and formatting for editing them, with built-in analysis that covers only the open file.\n- **Encoding**: HTML defines encoding declarations, and an incorrect character encoding can make a document's text render incorrectly. The page made here declares utf-8.\n- **Uses**: HTML serves web pages, HTML email, and generated reports and tables.\n\nYour SVG is turned into a web page in your browser. The converter copies the `<svg>` element and everything after it into a new HTML file, and drops the XML declaration, doctype and comments in front of it, which HTML doesn't allow there. The page has a doctype, `lang=\"en\"`, a viewport tag and a title, which reads image. A short style block removes the page margins, centers the drawing in the window and lets it shrink to the window's width. The drawing stays vector. It is not converted to paragraphs, buttons or a rebuilt site layout. A file with no `<svg>` in it is refused with \"This file has no SVG drawing in it.\"\n\n### Other ways to convert SVG to HTML\n\n- **Inline SVG in a text editor:** paste the entire SVG file into the body of an HTML document, as Mozilla documents for SVG in HTML. Keep the viewBox so the drawing scales. Save it with an .html ending and open it in a browser.\n- **A CSS background:** give an element a size and set its background-image property to url(\"logo.svg\"). Mozilla lists CSS background-image among the places browsers support SVG images.\n\n### Problems with SVG files\n\n- **A picture is missing**: pictures an SVG references by file name may vanish when those files are unavailable. Preserve the files with the SVG, or embed the pictures in it so the drawing carries everything it shows.\n- **The text looks different**: the drawing's text relies on installed fonts, and a stand-in font can change how it looks.\n- **An embedded photo looks soft when enlarged**: an SVG may contain pixel images, which keep their own resolution when scaled up; only the vector parts remain crisp.\n- **Scripts and links don't work as an image**: an SVG drawn as an image has JavaScript disabled and can't load external resources, apart from data: URLs. A drawing placed inline in a page is not an image in that sense.\n"
+    }
+  },
+  "txt-to-png": {
+    "seo": {
+      "title": "Convert TXT to PNG Online (Free)",
+      "h1": "TXT to PNG Converter",
+      "description": "Draw a plain text file onto a PNG image in your browser: DejaVu Sans on white, wrapped at about 90 characters. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a plain text file into a PNG image of the text, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How can I turn a text file into a PNG?",
+        "answer": "Pick the TXT above and save the PNG afterward. Your browser draws the text onto an image, and a batch gives one PNG per file."
+      },
+      {
+        "question": "What font and size does the image use?",
+        "answer": "DejaVu Sans, 16 pixels tall with 24 pixels between lines, in very dark gray on white and surrounded by 32 pixels of margin. The image is drawn at twice that size so the text stays sharp, or less for very tall text."
+      },
+      {
+        "question": "Can I pick the font, size or colors?",
+        "answer": "No. The converter has no options for font, size or color."
+      },
+      {
+        "question": "Does it wrap long lines?",
+        "answer": "Yes. Lines wrap at 800 pixels, which is about 90 characters, between words where it can. A single word wider than a line is broken."
+      },
+      {
+        "question": "How many lines fit in one image?",
+        "answer": "At most 168. Longer text is truncated, and the final line of the image marks the spot, and the page shows a notice. Split a long file and convert it in parts."
+      },
+      {
+        "question": "Will accented and non-Latin letters show?",
+        "answer": "DejaVu Sans draws Latin, Greek, Cyrillic, Hebrew and Arabic text; a line starting with a Hebrew or Arabic letter is laid out right to left. CJK and emoji fall back to the sans-serif font of your browser."
+      },
+      {
+        "question": "What encoding does it expect?",
+        "answer": "UTF-8, or UTF-16 when the file starts with a byte order mark. A file that isn't valid UTF-8 is read as Windows-1252, as a browser would show it."
+      },
+      {
+        "question": "What happens to tabs?",
+        "answer": "A tab moves to the next stop that is a multiple of 4 characters, so columns line up in the image."
+      },
+      {
+        "question": "Why does it say my file is empty?",
+        "answer": "The file has no text in it, or only control characters. The converter refuses it rather than make a blank image."
+      },
+      {
+        "question": "Does it handle more than one TXT file at a time?",
+        "answer": "Yes. Add several TXT files and you get a separate PNG for each."
+      }
+    ],
+    "aboutSection": {
+      "title": "TXT and PNG",
+      "fromFormat": {
+        "name": "TXT",
+        "fullName": "Plain text file",
+        "description": "A file that holds unformatted text with no fonts, styles or images. It is readable by any text editor, on any operating system.",
+        "details": [
+          "No formatting",
+          "Character encoding such as UTF-8",
+          "Very small files",
+          "Readable everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TXT to PNG",
+      "points": [
+        "The text is drawn in DejaVu Sans, 16 px on 24 px lines, dark gray on white.",
+        "Lines wrap at 800 px, about 90 characters, and tabs stop every 4 characters.",
+        "An image holds at most 168 lines; longer text is truncated and the final line marks it.",
+        "The PNG is drawn at twice its layout size and the text is no longer searchable.",
+        "There are no options for font, size or color."
+      ]
+    },
+    "guide": {
+      "title": "Understanding TXT and PNG",
+      "markdown": "### What is a TXT file?\n\nNothing but plain text sits inside a TXT file: characters without fonts, styles or pictures, which is why every text editor on every operating system can read one. Its MIME label is text/plain. Plain text holds no typographic formatting commands and sets no page layout, font or placement of embedded images.\n\nTXT is commonly used for notes and logs, configuration and readme files, and for exchanging text between programs. The bytes in a TXT file stand for characters through a character encoding, such as UTF-8, and the charset parameter tells a receiver which one. TextEdit on a Mac can convert rich text to TXT, and doing so removes the styles and formatting. A TXT file also can't keep an image or a table the way a word processor would.\n\n### Programs that open TXT files\n\n- **Windows, Mac and Linux:** Visual Studio Code edits text files in its file-based editor, and Vim is another editor for plain text.\n- **Windows:** Notepad is listed as able to open TXT.\n- **Mac:** TextEdit opens, edits and saves plain text documents.\n- **Web:** any web browser can open a text file.\n\n### TXT and PNG compared\n\n- **Extensions and types**: .txt with text/plain, and .png with image/png.\n- **What each is**: a TXT file is characters. A PNG is a picture, so the words become pixels and can no longer be searched, selected or edited.\n- **Compression**: PNG compression never loses data and uses DEFLATE.\n- **Color**: a PNG can be indexed, grayscale or truecolor, with 1 to 16 bits per sample, plus an optional alpha channel for transparency.\n- **History**: The aim behind PNG was a replacement for GIF free of patents. October 1996 saw it become the first format issued as a W3C Recommendation; ISO/IEC 15948 followed.\n- **Structure**: a PNG file starts with a fixed signature and is then built from chunks, such as IHDR for the header, IDAT for image data and IEND to close the file.\n- **Standard**: W3C made the third edition of the PNG specification a Recommendation on 24 June 2025.\n- **Support**: every major browser displays PNG, and macOS saves screenshots as PNG files by default.\n\nYour text is drawn in your browser, on a canvas. Letters are very dark gray on a white ground, set in DejaVu Sans: 16 pixels tall text, 24 pixels from one baseline to the next, and a 32 pixel margin around the block. A line breaks between words at 800 pixels, roughly 90 characters, and a word too long for one line is broken inside. Tabs stop every 4 characters. Control characters, terminal color codes among them, are stripped. The image is as wide as its longest line, and it is drawn at double size, which keeps zoomed-in text crisp, or smaller when the text is taller than 2048 pixels. A page holds at most 168 lines. Anything longer gets truncated; the image's final line says at which line it stopped, and the page displays a notice too.\n\nDejaVu Sans covers Latin, Greek, Cyrillic, Hebrew and Arabic. Other scripts fall back to your browser's own sans-serif font. The file is read as UTF-8, or UTF-16 when a byte order mark says so, and anything else is read as Windows-1252. Only the lines shown are measured, so a very long file is still drawn quickly. Select several TXT files and each is drawn into a PNG of its own, with your originals unchanged.\n\n### Other ways to convert TXT to PNG\n\n- **ImageMagick:** run `magick text:notes.txt notes.png`. ImageMagick's text pages use a letter-size canvas of 612x792 pixels by default and don't wrap long lines, and too many lines give several pages and so several images.\n\n### Problems with TXT files\n\n- **Different systems, different looks**: plain text does not prescribe a page layout or a font, so the same TXT file can look different from one editor to the next.\n- **Wrong characters**: choosing the wrong character encoding makes characters appear as others. Save the file as UTF-8 before converting.\n- **Styling is gone**: saving a styled document as TXT discards its formatting, so the PNG has none either.\n- **A table or picture is missing**: a text file holds no images or tables as a word processor document would.\n- **Nothing to draw**: an empty file is refused with \"This text file is empty: there's no text to draw.\"\n"
+    }
+  },
+  "wav-to-aiff": {
+    "seo": {
+      "title": "Convert WAV to AIFF Online (Free)",
+      "h1": "WAV to AIFF Converter",
+      "description": "Turn a WAV recording into an AIFF file in your browser. The sound is written as 16-bit PCM, uncompressed. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Convert WAV to uncompressed 16-bit AIFF in your browser, with no upload."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WAV to AIFF?",
+        "answer": "Pick the WAV above, then save the AIFF. The conversion runs in your browser through FFmpeg, which writes 16-bit PCM, and every WAV in a batch gets its own AIFF."
+      },
+      {
+        "question": "Is anything lost converting WAV to AIFF?",
+        "answer": "Not for a 16-bit PCM WAV: both hold uncompressed samples, and the AIFF is written as 16-bit PCM too. A 24-bit or floating-point WAV is written at 16 bits, so it loses precision."
+      },
+      {
+        "question": "What bit depth does the AIFF use?",
+        "answer": "16 bits. The audio is written as signed 16-bit PCM in big-endian order, the arrangement AIFF uses."
+      },
+      {
+        "question": "Will the AIFF be the same size as the WAV?",
+        "answer": "It can be close to the same, for a 16-bit WAV. Both are uncompressed PCM, so the file stays large."
+      },
+      {
+        "question": "Is AIFF the same as AIFF-C?",
+        "answer": "No. AIFF-C is the variant that allows compressed audio. This page writes plain AIFF holding uncompressed PCM."
+      },
+      {
+        "question": "Will the AIFF play on both a Mac and Windows?",
+        "answer": "Apple developed AIFF, and Audacity's manual calls it a lossless format that can be played on both Mac and Windows computers."
+      },
+      {
+        "question": "What if my WAV is compressed?",
+        "answer": "Some recorders put proprietary compression inside the WAV. Audacity can import such files once its optional FFmpeg library is installed."
+      },
+      {
+        "question": "How big a WAV can I convert?",
+        "answer": "AIFF tops out at 4 GB, a ceiling a very large WAV can exceed. The page itself imposes no size limit."
+      },
+      {
+        "question": "Is AIFF better than WAV?",
+        "answer": "Neither is better in itself. Both usually carry uncompressed PCM, so the choice depends on the software and the people you hand the file to."
+      },
+      {
+        "question": "Can I queue a batch of WAV files?",
+        "answer": "Yes. Add several WAVs together and each comes out as a separate AIFF file."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and AIFF",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "Usually uncompressed PCM",
+          "Lossless",
+          "Large files",
+          "4 GB file size limit"
+        ]
+      },
+      "toFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "An audio file format developed by Apple in 1988 and based on the IFF container. It usually stores uncompressed PCM audio.",
+        "details": [
+          "Usually uncompressed PCM",
+          "Lossless",
+          "Metadata chunks",
+          "Large files"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WAV to AIFF",
+      "points": [
+        "The sound is written as 16-bit PCM, big-endian, in an AIFF file.",
+        "A 24-bit or floating-point WAV is reduced to 16 bits.",
+        "Both formats are uncompressed, so the AIFF stays large.",
+        "Only audio is written.",
+        "Each WAV you choose downloads as its own AIFF."
+      ]
+    },
+    "guide": {
+      "title": "Understanding WAV and AIFF",
+      "markdown": "### What is a WAV file?\n\nWAV (also written WAVE) stands for Waveform Audio File Format. Microsoft and IBM built it on the RIFF container and described it in a multimedia specification published in August 1991. The file wraps sound but does not fix one encoding, and linear PCM is the usual contents, which makes a WAV big and exact, though compressed audio can sit inside as well.\n\nA program therefore needs a decoder that matches whatever the WAV holds. Files end in .wav, and audio/wav and audio/x-wav are the media types you will see. A Broadcast WAVE variant carries production and archiving metadata, and the US Library of Congress names WAVE as its recommended format for digital sound collections. The size fields in the original design limit a file to 4 GB; longer recordings may use RF64.\n\n### Programs that open WAV files\n\n- **Windows, Mac and Linux:** Audacity imports most WAV recordings, including PCM variants, and ffplay, which ships with FFmpeg, plays a WAV through FFmpeg's WAV demuxer.\n- **Web:** Firefox plays supported media itself, and Mozilla's list of audio types for Firefox on Android includes WAV.\n- **Mobile:** The free VLC app on Android decodes according to what the file contains, while mpv on Android, a port linked by the mpv project, plays it too.\n\n### WAV and AIFF compared\n\n- **Extensions and types**: .wav with audio/wav, and .aiff or .aif with audio/aiff or audio/x-aiff.\n- **Origins**: WAV came from Microsoft and IBM in 1991. Apple developed AIFF in 1988.\n- **Container**: AIFF is derived from Electronic Arts' IFF family. WAV is derived from RIFF.\n- **Sound**: both usually carry uncompressed linear PCM. AIFF-C extends the family to compressed audio.\n- **Metadata**: AIFF can include named chunks for author, copyright and annotations.\n- **Use**: professional audio users use AIFF for masters and intermediate recordings.\n- **Opening the AIFF**: Audacity can import most AIFF files, and every PCM variant, without its optional FFmpeg library. Adobe Audition will open uncompressed AIFF too, along with the common compressed variants.\n- **Specification**: Apple dated version 1.3 of the AIFF specification January 4, 1989.\n- **Size**: WAV and AIFF files are limited to 4 GB, a general restriction and not an Audacity one. Many players are said to manage only files up to 2 GB.\n- **CDs**: Audacity's manual says AIFF is suitable for burning an exported file to an audio CD.\n\nYour WAV goes through FFmpeg in your browser, which writes the sound as 16-bit PCM in an AIFF file with the bytes in big-endian order. That is plain, uncompressed audio like the WAV's, so a 16-bit WAV keeps its samples. A WAV that holds 24-bit or floating-point audio is written at 16 bits. Only audio is written, since the command leaves out any video stream, and your original WAV is left as it was; the AIFF is a new file you download. Choose several WAVs and they convert one after another. If the conversion fails, the message names FFmpeg and gives its exit code.\n\n### Other ways to convert WAV to AIFF\n\n- **FFmpeg from a terminal:** run `ffmpeg -i session.wav -c:a pcm_s16be listening.aiff`.\n- **Audacity:** load the WAV, open the Export Audio dialog, select the AIFF 16-bit PCM format (it has no options) and save. AIFF files are capped at 4 GB, a limit of the format itself.\n\n### Problems with WAV files\n\n- **It won't open**: the WAV may carry a proprietary compression from the recorder. Audacity recommends its FFmpeg library for importing such files.\n- **A player opens one WAV and not another**: linear PCM or compressed audio can sit inside a WAV, so a program that plays one WAV can still refuse another.\n- **The file is huge**: raw PCM needs more room than a delivery copy of the recording in compressed form.\n- **A recording over 4 GB**: the original RIFF size fields can't describe it, and very large recordings may require RF64.\n- **Tags look different afterward**: the INFO chunks of a WAV and the Broadcast WAVE extensions store different information, so programs treat metadata in different ways.\n- **An author field looks misplaced**: Adobe Audition may show an AIFF author field as Dublin Core: Creator rather than as Author.\n- **An AIFF-C won't play**: it needs a decoder for its particular encoding; knowing the family name does not guarantee support.\n"
+    }
+  }
+}

@@ -1,0 +1,929 @@
+{
+  "mp4-to-mp2": {
+    "seo": {
+      "title": "Convert MP4 to MP2 Online (Free)",
+      "h1": "MP4 to MP2 Converter",
+      "description": "Convert MP4 to MP2 in your browser: the soundtrack is re-encoded as MPEG-1 Layer II at 192 kbps and the picture is dropped. Free, with no sign-up.",
+      "howToHeading": "How to convert MP4 to MP2"
+    },
+    "tool": {
+      "subtitle": "Save the sound of an MP4 video as a 192 kbps MP2 audio file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to MP2?",
+        "answer": "Choose the MP4 above, wait while the soundtrack is encoded and save the MP2 that appears. Choose more than one MP4 and they are processed in order, each producing a separate MP2."
+      },
+      {
+        "question": "What bitrate is the MP2 file?",
+        "answer": "192 kbps. The sound is re-encoded to MPEG-1 Layer II at that bitrate whatever the MP4's audio was, so a quiet voice memo and a music video get the same setting."
+      },
+      {
+        "question": "Is MP2 the same as MPEG-2?",
+        "answer": "No. MP2 is a sound format, MPEG-1 Audio Layer II. MPEG-2 is a video standard, so for MPEG-2 pictures use the converter at /mp4-to-mpeg2/ instead."
+      },
+      {
+        "question": "Does the MP2 keep the video?",
+        "answer": "No. An MP2 file holds audio only, so the picture is left out and you get just the soundtrack. Keep the MP4 if you still need the footage."
+      },
+      {
+        "question": "What if my MP4 is silent?",
+        "answer": "With no audio track there is nothing to encode, and the run ends in an FFmpeg exit-code failure. Play the MP4 first to check that it carries sound."
+      },
+      {
+        "question": "Will the MP2 sound better than the MP4?",
+        "answer": "No. Converting can't add detail the MP4's audio never had, and MP2 is lossy: its coding leaves out sound information that decoding can't recover."
+      },
+      {
+        "question": "What is MP2 used for?",
+        "answer": "MP2 is used in digital radio and television broadcasting and for DVD-Video soundtracks."
+      },
+      {
+        "question": "Should I pick MP2 or MP3?",
+        "answer": "Pick MP3 for music players and phones, since it plays on nearly every device. Pick MP2 when a broadcaster, a DVD authoring program or a radio system names it. For MP3, use the MP4 to MP3 converter at /mp4-to-mp3/."
+      },
+      {
+        "question": "Which programs play an MP2 file?",
+        "answer": "VLC media player, Audacity and foobar2000 are listed as opening MP2, and ffplay, which comes with FFmpeg, plays it too."
+      },
+      {
+        "question": "Does the video leave my computer?",
+        "answer": "No. The file is encoded on your own device by FFmpeg running as WebAssembly in the page, and nothing travels to a server."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and MP2",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Holds video, audio and subtitles",
+          "H.264, H.265 and AV1 video",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "MP2",
+        "fullName": "MPEG-1 Audio Layer II",
+        "description": "A lossy audio format standardized by MPEG as Layer II of MPEG-1 Audio, used in digital radio, DVD-Video and broadcast television.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "Predecessor of MP3 Layer III",
+          "Low decoding complexity"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to MP2",
+      "points": [
+        "Only the sound is kept: the picture is dropped.",
+        "The MP2 is encoded at 192 kbps.",
+        "MP2 is MPEG-1 Layer II audio, not MPEG-2 video.",
+        "An MP4 without an audio track can't be converted.",
+        "Choose several MP4 files and each gives its own MP2.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 and MP2 files",
+      "markdown": "### What is an MP4 file?\n\nAn MP4 keeps a video's picture and sound as separate tracks inside one wrapper. Standards bodies call the wrapper MPEG-4 Part 14, numbered 14496-14 by ISO and IEC, and it appeared in 2003. Apple's QuickTime is the ancestor, with the ISO Base Media File Format in between, and the file itself is a tree of nested boxes (QuickTime's term is atoms).\n\nMP4 is a container, so the extension says nothing about how the contents were compressed. The common contents are H.264 pictures and AAC sound, though AV1, VP9, MP3 or Opus can sit inside too. Video files take .mp4 or .m4v, audio-only MPEG-4 files frequently take .m4a, and the media types on record are video/mp4 and audio/mp4. You come across MP4 in online video, phone and camera recordings, and clips people share. For this pair, the converter takes the soundtrack and writes it again as MP2.\n\n### Programs that open MP4 files\n\n**Windows, plus Mac**\n\n- Premiere, from Adobe, will import an MP4 provided the decoder for its contents is present.\n\n**Windows, Mac and Linux**\n\n- ffplay plays MP4 through FFmpeg's MP4 demuxer.\n- mpv is a desktop player that offers a choice of audio and subtitle tracks while an MP4 plays.\n\n**Web**\n\n- Firefox plays MP4 in the page, but whether AAC and H.264 work can hinge on codecs the system supplies.\n- Chrome plays supported web audio and MP4 combinations, and the codec inside still matters.\n\n**Mobile**\n\n- VLC for Android is a free mobile player, and its decoding follows whatever codecs the MP4 holds; VLC for iOS opens most movie formats, whether stored on the phone or reached over a network.\n\n### MP4 and MP2 compared\n\n- **Names and types**: .mp4 goes with video/mp4 and audio/mp4, while .mp2 goes with audio/mpeg.\n- **What a file holds**: a single MP4 may combine video, audio, subtitles and chapters, while an MP2 file holds audio only.\n- **Compression**: MP2 is MPEG-1 Audio Layer II, specified in ISO/IEC 11172-3 and finalized in 1992. It is lossy and perceptual, it needs little decoding work, and it came before MP3, which is Layer III. ISO/IEC 13818-3 extends Layer II for MPEG-2.\n- **Where it is used**: digital radio and television broadcasting, Video CD production and DVD-Video soundtracks.\n- **The name trap**: the MP2 produced here is MPEG audio Layer II, and it is unrelated to MPEG-2 video files.\n\nHere the picture is left out and the sound is encoded again. FFmpeg writes MPEG-1 Layer II at 192 kbps, whatever codec the MP4's audio used. MP2's lossy coding omits sound information that decoding cannot recover, so the conversion cannot bring back detail the MP4's audio did not have.\n\n### Other ways to convert MP4 to MP2\n\n- **FFmpeg (Windows, Mac, Linux):** run `ffmpeg -i video.mp4 -vn -c:a mp2 -b:a 192k soundtrack.mp2`. The `-vn` option disables video, and FFmpeg's documentation lists MP2 among the audio codecs it can encode. This is the same single encode the page runs.\n- **Audacity (Windows, Mac, Linux):** Audacity imports MP4 audio only with its optional FFmpeg library installed. Import the file, choose File > Export Audio and select MP2 in the Format list. The bit rate runs from 16 to 384 kbps, with 160 kbps as the default.\n- **TwoLAME with FFmpeg (command line):** run `ffmpeg -i video.mp4 -c:a pcm_s16le -vn extracted.wav`, then `twolame -b 192 extracted.wav soundtrack.mp2`. It takes two steps because TwoLAME reads sound files through libsndfile, and `-b` sets the total bitrate in kbps.\n\nAudacity suits you when you want a bitrate other than 192 kbps. The TwoLAME route uses a dedicated Layer II encoder, at the cost of a large intermediate WAV file, since WAV usually holds uncompressed audio.\n\n### Problems with MP4 files\n\n- **No sound to extract**: an MP4 without audio cannot give an audio editor a track, and this page fails with an FFmpeg exit-code error. Play the video and listen for sound first.\n- **No decoder for what is inside**: a player that accepts the MP4 wrapper may still lack a decoder for the video or sound it carries. Identify the codecs before blaming the player.\n- **The file stops partway**: ordinary MP4 files store their packet metadata in one place, which means a recording or download cut short can leave something unplayable. Record or fetch it once more.\n- **The MP4 holds several audio tracks**: some players let you choose a track, and mpv shows the audio streams a file has. Check which track you want before converting."
+    }
+  },
+  "mp4-to-mpeg2": {
+    "seo": {
+      "title": "Convert MP4 to MPEG2 Online (Free)",
+      "h1": "MP4 to MPEG2 Converter",
+      "description": "Convert MP4 to MPEG2 in your browser: the video is re-encoded as MPEG-2 with MP2 sound, at up to 1920 px and 30 fps. Free, with no sign-up.",
+      "howToHeading": "How to convert MP4 to MPEG2"
+    },
+    "tool": {
+      "subtitle": "Turn an MP4 video into an MPEG-2 file with MP2 sound, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to MPEG2?",
+        "answer": "Choose the MP4 above and wait while it is re-encoded. You get back an MPEG-2 video file with MP2 sound. Pick several MP4 files and they are handled in turn, each giving a separate file."
+      },
+      {
+        "question": "What if my MP4 has no sound?",
+        "answer": "The conversion still runs and gives a video-only MPEG-2 file. A missing audio track doesn't stop it the way it stops an MP4 to audio conversion."
+      },
+      {
+        "question": "Is the result a DVD?",
+        "answer": "No. The page makes a single video file. It does not build menus, chapters or the folder structure a DVD player reads, so a disc still needs a DVD authoring program."
+      },
+      {
+        "question": "What size and frame rate does the MPEG-2 file have?",
+        "answer": "Both follow the MP4 until they reach a ceiling: a 1920-pixel longer side and 30 frames per second. A larger frame is scaled down to fit, and a faster video loses frames yet keeps its running time. A smaller frame or slower rate is not raised."
+      },
+      {
+        "question": "Why did my video lose a pixel in width or height?",
+        "answer": "Both sides must come out even; a side with an odd count loses a pixel. A 1279 by 719 video comes out 1278 by 718."
+      },
+      {
+        "question": "What audio does the MPEG-2 file carry?",
+        "answer": "MP2 (MPEG-1 Layer II) at 96 kbps. The sound is re-encoded even if the MP4 already held MP2 or AAC."
+      },
+      {
+        "question": "Will the MPEG-2 look worse than the MP4?",
+        "answer": "It can. The picture is re-encoded, so the result is a new lossy generation. Keep the MP4 as your master."
+      },
+      {
+        "question": "Why is my MPEG-2 file bigger than the MP4?",
+        "answer": "It can come out bigger. The page re-encodes at a fixed quality level rather than aiming for the MP4's size, so the MPEG-2 file can be larger than the MP4 you started with."
+      },
+      {
+        "question": "What happens to interlaced video?",
+        "answer": "A deinterlacing filter (yadif) is applied just to frames the file flags as interlaced, which prevents combing along moving edges. Footage without that flag passes through unchanged."
+      },
+      {
+        "question": "Is my MP4 uploaded anywhere?",
+        "answer": "No upload happens. The encoding is done by FFmpeg built for WebAssembly inside your browser, which keeps the MP4 on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and MPEG-2",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Holds video, audio and subtitles",
+          "H.264, H.265 and AV1 video",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "MPEG-2",
+        "fullName": "MPEG-2 video",
+        "description": "A video and audio coding standard from MPEG (ISO/IEC 13818, ITU-T H.262), used for DVD-Video, digital television and broadcast.",
+        "details": [
+          "Lossy compression",
+          "Supports interlaced video",
+          "Also known as H.262",
+          "Used on DVDs and in broadcasting"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to MPEG-2",
+      "points": [
+        "You get an MPEG-2 video file with MP2 audio at 96 kbps.",
+        "The video is re-encoded, so it is a new lossy generation.",
+        "The frame is scaled down to 1920 pixels on its longer side and the rate to 30 fps if the MP4 is larger or faster.",
+        "An odd width or height loses one pixel, because both sides are made even.",
+        "It is a video file, not an authored DVD with menus.",
+        "FFmpeg runs in your browser, so the video isn't uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 and MPEG-2 files",
+      "markdown": "### What is an MP4 file?\n\nThink of MP4 as a standardized box that holds compressed video, audio and other data without saying how any of it was compressed. The name on the standard is MPEG-4 Part 14, dating from 2003, and its roots lie in Apple's QuickTime, reached through the ISO Base Media File Format.\n\nTypical contents are H.264 pictures with AAC sound, and the wrapper is just as happy to carry AV1, VP9, MP3 or Opus. A video file is named .mp4 or .m4v, with video/mp4 and audio/mp4 as the recorded media types. Online video and streaming, phone and camera recordings, and shared clips all use MP4, and every major browser plays it. A converter that targets MPEG-2 has to decode whatever codec the box holds, then encode the pictures again.\n\n### Programs that open MP4 files\n\n**Windows and macOS**\n\n- Adobe's Premiere imports an MP4 once the decoder for its contents is available.\n\n**Windows, Mac and Linux**\n\n- mpv is a desktop player where an MP4's audio and subtitle tracks can be chosen during playback.\n- ffplay, from the FFmpeg project, reads MP4 with FFmpeg's demuxer.\n\n**Web**\n\n- Firefox plays MP4 in the page, with AAC and H.264 sometimes depending on system codecs.\n- Chrome handles supported MP4 combinations, but the codec inside still decides.\n\n**Mobile**\n\n- On phones, VLC for Android and VLC for iOS open video stored on the device, decoding whatever codecs the file contains.\n\n### MP4 and MPEG-2 compared\n\n- **Names and types**: MP4 uses video/mp4. MPEG-2 video is registered as video/mpeg.\n- **Role**: MP4 is a container for many codecs. MPEG-2 is a picture coding, defined in ISO/IEC 13818-2 and ITU-T H.262.\n- **Compression**: MPEG-2 combines block transforms with prediction between frames, so not every frame stands alone. It was developed for compressed television and later adopted for DVDs, and it supports interlaced video.\n- **Streams**: audio and pictures can be assembled into a program stream, and a transport stream can combine several programs.\n\nThe codec is what changes here, and nothing is copied across: the picture is decoded from whatever the MP4 holds and encoded again. FFmpeg re-encodes the video as MPEG-2 at a fixed quality level (6) and the sound as MP2 at 96 kbps. A frame wider or taller than 1920 pixels is scaled down to fit, a rate above 30 fps is reduced to 30 by dropping frames, and both sides are made even. The deinterlacing filter runs on frames the file marks as interlaced. MPEG-2 compression can reduce detail, so the encoder settings affect how the result looks.\n\n### Other ways to convert MP4 to MPEG-2\n\n- **FFmpeg (Windows, Mac, Linux):** run `ffmpeg -i source.mp4 -c:a mp2 -c:v mpeg2video converted.mpg` to name the video and audio encoders yourself. FFmpeg's documentation lists MP2 audio and MPEG-2 video among the codecs it supports. Add any bitrate, size or frame rate your destination requires.\n- **FFmpeg DVD target (Windows, Mac, Linux):** the command is `ffmpeg -i source.mp4 -target pal-dvd dvd-ready.mpg`. FFmpeg's documentation says a target type may be prefixed with pal-, ntsc- or film-, so choose the standard for your region. This sets DVD-style encoder and muxer options for the file; it does not author menus or burn a disc.\n\nUse the DVD target when the file is headed for a disc and the plain command when you want only a codec change.\n\n### Problems with MP4 files\n\n- **Playback fails**: container support does not mean a decoder exists for its contents. Find out which codecs the file holds, then use a player that has them.\n- **The MP4 ends abruptly**: a regular MP4 gathers its packet metadata in one spot, so a download or recording halted early may leave a file that refuses to play. Obtain it again.\n- **A 4K or 60 fps MP4**: this page caps the longer side at 1920 pixels and the rate at 30 fps, and it drops frames rather than slowing the video. Run FFmpeg yourself if the destination needs more.\n- **Moving edges show combing**: only frames the file marks as interlaced get the deinterlacing filter. Footage that is interlaced but not marked passes through, so deinterlace it in an editor first.\n- **The MP4 has no audio track**: the conversion still runs, and the MPEG-2 file has pictures only. Add sound in an editor if the destination needs it."
+    }
+  },
+  "mpeg-to-gif": {
+    "seo": {
+      "title": "Convert MPEG to GIF Online (Free)",
+      "h1": "MPEG to GIF Converter",
+      "description": "Convert MPEG video to a looping GIF in your browser: 15 frames a second, up to 480 px, with a palette built from your clip. Free, with no sign-up.",
+      "howToHeading": "How to convert MPEG to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn an MPEG video into a silent looping GIF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MPEG to a GIF?",
+        "answer": "Choose the MPEG above and let the page turn its pictures into frames. You get back one looping GIF, and extra MPEG files queue up in turn."
+      },
+      {
+        "question": "How big is the GIF?",
+        "answer": "Its longer side is capped at 480 pixels, with the shape of the video kept. A smaller video keeps its size, and both sides end up even."
+      },
+      {
+        "question": "What frame rate does the GIF use?",
+        "answer": "15 frames a second. Footage with more frames per second has frames dropped, and slower footage has frames repeated, because the frame rate filter works by duplicating or dropping frames as needed."
+      },
+      {
+        "question": "Does the GIF have sound?",
+        "answer": "No. A GIF holds pictures and the delays between them, never a soundtrack, so the audio in the MPEG is left behind."
+      },
+      {
+        "question": "Does the GIF loop?",
+        "answer": "Yes, forever. The page writes it to repeat without stopping, so it starts over as soon as the last frame has shown."
+      },
+      {
+        "question": "Can I choose which part of the video becomes the GIF?",
+        "answer": "No. The page converts the whole MPEG and has no trim control. Cut the clip down in a video editor first, because every extra second adds frames."
+      },
+      {
+        "question": "Why is my GIF so large?",
+        "answer": "Every GIF frame is its own image, compressed alone with LZW, and an MPEG predicts pictures from their neighbors instead. A long or busy clip can end up far heavier as a GIF than the MPEG it began as."
+      },
+      {
+        "question": "Why do the colors look banded or spotted?",
+        "answer": "No GIF image may use more than 256 colors. The page derives the palette from your clip, which helps, but smooth gradients can still break into steps."
+      },
+      {
+        "question": "What if my MPEG is damaged or cut short?",
+        "answer": "It can still convert, but the GIF will be shorter than the video you expected."
+      },
+      {
+        "question": "What happens to an interlaced MPEG?",
+        "answer": "A deinterlacing filter runs only on frames the file marks as interlaced, before the picture is scaled. Frames not marked as interlaced are not deinterlaced."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPEG and GIF",
+      "fromFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "Lossy compression",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MPEG to GIF",
+      "points": [
+        "The GIF has no sound; only the pictures are kept.",
+        "It plays at 15 frames a second and loops forever.",
+        "Its longer side is at most 480 pixels, and a smaller video is not enlarged.",
+        "The page converts the whole video and has no trim control, so a long clip can give a very large GIF.",
+        "Colors come from a palette built from your clip, limited to 256 per frame.",
+        "Choose several MPEG files and each gives its own GIF."
+      ]
+    },
+    "guide": {
+      "title": "About MPEG and GIF files",
+      "markdown": "### What is an MPEG file?\n\nMPEG video takes its name from the Moving Picture Experts Group. The two usual endings are .mpeg and .mpg; the Library of Congress gives video/mpeg as the type. Television delivery was the original aim of MPEG-2, the version most people know, and DVDs adopted it afterward.\n\nThe MPEG systems layer arranges coded picture, sound and data into streams. One elementary stream carries a single coded media component, and packetized elementary streams cut each component into packets. An MPEG may be a full system stream or just raw video, and that matters to any reader choosing a demuxer.\n\n### Programs that open MPEG files\n\n- **Windows, Mac and Linux:** VLC media player accepts elementary, program and transport MPEG streams as input. ffplay, which ships with FFmpeg, plays MPEG through FFmpeg's decoders.\n- **Mobile:** on a phone, VLC for Android offers the decoding features found in the desktop version, and VLC for iOS handles local files through VLC's own playback engine.\n\n### MPEG and GIF compared\n\n- **Names and types**: .mpeg and .mpg go with video/mpeg, and .gif goes with image/gif.\n- **Compression**: MPEG is lossy, while a GIF compresses its images losslessly with LZW coding.\n- **Color**: every GIF image is limited to a 256-color palette. Transparency marks a single palette entry as clear, so there is no half-transparent pixel.\n- **Display**: every major browser displays a GIF.\n- **Sound**: a GIF stores pictures plus the pause after each one, so there is no audio track.\n- **Timing**: the delay between GIF images is set in hundredths of a second.\n- **Origin**: GIF was released by CompuServe in 1987. Its GIF89a revision of July 1990 introduced extension blocks for transparency, frame timing, comments and application data; the frame timing is what permits animation.\n- **Licensing history**: Unisys began charging license fees for LZW in 1994. The US patent ran out in 2003, and the European and Japanese ones in 2004.\n\nNearly everything changes. FFmpeg decodes the MPEG, deinterlaces the frames the file marks as interlaced, samples 15 frames a second, fits the picture within 480 pixels with even sides, and makes two passes: the first builds a 256-color palette from your clip and the second paints the frames with it. The result loops forever. The sound is discarded, and the whole video is converted, however long it is. Choose several MPEG files and each one gives its own GIF.\n\n### Other ways to convert MPEG to GIF\n\n- **FFmpeg, one command (Windows, Mac, Linux):** run `ffmpeg -i clip.mpeg animation.gif`. FFmpeg's GIF muxer loops the result indefinitely by default, and it cannot make the delay between frames smaller than one centisecond.\n- **FFmpeg, the opening seconds (Windows, Mac, Linux):** run `ffmpeg -t 5 -i clip.mpeg short.gif`. With `-t` written ahead of `-i`, FFmpeg reads only the first five seconds of the input.\n- **FFmpeg with a palette (Windows, Mac, Linux):** the first command is `ffmpeg -i clip.mpeg -vf palettegen colors.png`, then `ffmpeg -i clip.mpeg -i colors.png -lavfi paletteuse animation.gif`. The first command generates one palette for the whole video, and the second uses it to downsample the stream. This is the two-pass route the page follows, without its scaling and frame rate settings.\n\nFFmpeg is the route when you want only a section of a longer video, since this page cannot trim.\n\n### Problems with MPEG files\n\n- **Nothing plays**: an MPEG file can be a full system stream or bare video, and working out which kind it is tells you which demuxer to use. VLC reads elementary, program and transport streams.\n- **You hear nothing in the source**: sound needs its own decoder in addition to the picture's, since sharing one file does not give them a shared codec. The GIF made here is silent regardless, because the page discards the sound.\n- **The file is cut short or damaged**: this page can still convert it. FFmpeg logs the error and writes what it could read, so the GIF is shorter.\n- **Moving edges comb in the GIF**: footage that is interlaced but unmarked gets no deinterlacing here, because only marked frames are filtered. An editor that deinterlaces should handle it beforehand.\n- **Soft or blocky pictures**: lossy MPEG encoding cannot keep every detail of the uncompressed picture, and a GIF cannot bring it back."
+    }
+  },
+  "mpg-to-mov": {
+    "seo": {
+      "title": "Convert MPG to MOV Online (Free)",
+      "h1": "MPG to MOV Converter",
+      "description": "Convert MPG to MOV in your browser. The video is re-encoded as H.264 with AAC sound in a QuickTime file. Free, with no sign-up.",
+      "howToHeading": "How to convert MPG to MOV"
+    },
+    "tool": {
+      "subtitle": "Turn an MPG video into a QuickTime MOV with H.264 and AAC, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MPG to a MOV?",
+        "answer": "Pick the MPG above and wait for the new encode to finish. You receive a MOV carrying H.264 video and AAC sound, and any further MPG files are processed in turn."
+      },
+      {
+        "question": "Can I just rename .mpg to .mov?",
+        "answer": "No. Changing the ending neither re-encodes the video nor installs a missing decoder, so the file is still MPEG inside and may fail in a program that reads the contents."
+      },
+      {
+        "question": "What codecs does the MOV use?",
+        "answer": "H.264 carries the picture, and AAC at 96 kbps carries the sound. It is not ProRes, and it is not a copy of the MPEG streams."
+      },
+      {
+        "question": "Does the video lose quality?",
+        "answer": "Some. The MPEG is decoded and encoded again with H.264, which is lossy, so each generation can cost a little detail. Keep the MPG if you may need the original."
+      },
+      {
+        "question": "How big is the MOV picture, and how many frames a second?",
+        "answer": "Anything wider or taller than 1920 pixels gets scaled down to fit, while anything running faster than 30 fps drops to 30. Anything smaller or slower keeps its own values."
+      },
+      {
+        "question": "Why is the MOV a pixel narrower than my MPG?",
+        "answer": "Both sides are forced to even numbers, so an odd-sized video loses one pixel on that side."
+      },
+      {
+        "question": "Will old interlaced footage look right?",
+        "answer": "Frames the stream marks as interlaced pass through a deinterlacer, which keeps moving edges from combing. Interlaced footage that carries no such mark is left as it is."
+      },
+      {
+        "question": "Is MOV the same as MP4?",
+        "answer": "No. MOV is the QuickTime format, and MP4's underlying ISO base format descends from it, yet the two remain distinct. Take the MPG to MP4 route if the recipient asks for MP4."
+      },
+      {
+        "question": "Which programs open the MOV?",
+        "answer": "Adobe Premiere Pro opens MOV files on Windows and Mac, and ffplay and mpv open them on Windows, Mac and Linux. VLC for Android and VLC for iOS serve phones."
+      },
+      {
+        "question": "Does the MPG leave my computer?",
+        "answer": "No. Encoding happens on your device, in FFmpeg's WebAssembly build running in this tab."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPG and MOV",
+      "fromFormat": {
+        "name": "MPG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "Lossy compression",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "Multi-track container",
+          "Many codecs, including ProRes",
+          "Timecode and metadata tracks",
+          "Apple format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MPG to MOV",
+      "points": [
+        "The video is re-encoded as H.264 with AAC sound at 96 kbps, so it is a new lossy generation.",
+        "The MOV is not ProRes and not a straight copy of the MPEG streams.",
+        "The picture stays at its own size and frame rate, up to 1920 pixels on the longer side and 30 fps.",
+        "An odd width or height loses one pixel, because both sides are made even.",
+        "Frames flagged as interlaced are deinterlaced.",
+        "Choose several MPG files and each gives its own MOV."
+      ]
+    },
+    "guide": {
+      "title": "About MPG and MOV files",
+      "markdown": "### What is an MPG file?\n\nThe .mpg ending marks MPEG-1 or MPEG-2 video with its audio in an MPEG program stream, and VCD and DVD video were built on it. MPEG video turns up under both .mpeg and .mpg, and the Library of Congress lists its type as video/mpeg.\n\nMPEG-2 was designed to deliver compressed television and then taken up for DVDs. Its standard, ISO/IEC 13818, serves DVD-Video, digital television and broadcast. Within a file, picture, sound and data are arranged as streams: an elementary stream holds one coded component, and packetized elementary streams split each into packets. Some files are system streams and some are bare video, so the reader chooses its demuxer to match.\n\n### Programs that open MPG files\n\n- **Windows, Mac and Linux:** VLC media player reads MPEG streams of the elementary, program and transport kinds, where an elementary stream holds one coded media component. FFplay, the player that ships with FFmpeg, uses FFmpeg's decoders to play MPEG files from the command line.\n- **Mobile:** on a phone, VLC for Android carries over what the desktop player can decode, and VLC for iOS plays local files in VLC's own player, bypassing the system's.\n\n### MPG and MOV compared\n\n- **Names and types**: .mpg pairs with video/mpeg, and .mov or .qt pairs with video/quicktime.\n- **Container**: MPG is an MPEG program stream. MOV is QuickTime's container, assembled from atoms that software may skip when it does not know them.\n- **Codecs**: MPG holds MPEG-1 or MPEG-2 video, while a MOV can carry Motion JPEG, ProRes or H.264 video, with AAC or PCM audio.\n- **History**: QuickTime dates from 1991 and reached Windows in 1994. MPEG-4's file format grew from it, yet MOV and MP4 remain separate formats.\n- **Reach**: Mac screen recordings come out as MOV files. Playback of MOV in browsers is limited, and Apple's own software now generally favors MP4, which is why people ask for this conversion.\n- **Editors**: an editor may lack a codec that a MOV holds, so the ending alone does not promise the file will open there. The H.264 and AAC choice is what this page settles on.\n\nBoth the wrapper and the codecs change. FFmpeg decodes the MPEG and encodes H.264 (CRF 32, ultrafast) with AAC at 96 kbps; the MOV's index is moved to the start of the file. The page has no settings to alter any of this. The picture keeps its own dimensions and rate, except that it is fitted within 1920 pixels and held to 30 fps, with even sides. Frames the stream marks interlaced get a deinterlacing pass. Several files are converted in sequence, and each MOV downloads separately with no ZIP.\n\n### Other ways to convert MPG to MOV\n\n- **FFmpeg, re-encode:** run `ffmpeg -i archive.mpg -c:a aac -c:v libx264 viewing.mov`. This is a fresh lossy encode, so add whatever parameters the receiving program requires.\n- **FFmpeg, stream copy:** run `ffmpeg -i archive.mpg -c copy repacked.mov`. It puts the original streams in a MOV without re-encoding, but only works when the MOV can carry them, and the receiving program must still decode MPEG.\n\nStream copy keeps every pixel but also keeps the old codec. Re-encoding is what changes what the editor has to decode.\n\n### Problems with MPG files\n\n- **The player shows nothing**: an MPG may hold a full system stream or only bare video, and which one it is decides the demuxer. VLC reads all three stream types.\n- **The video plays silently**: a player has to decode the soundtrack in addition to the pictures, because a shared file does not give the two a shared codec.\n- **Combing on moving edges**: the footage is interlaced without being marked, and only marked frames are deinterlaced here. Run it through a deinterlacer in an editor beforehand.\n- **Detail is already gone**: MPEG is lossy, and the H.264 encode afterward moves a little further from the original. Keep the MPG in case you need it.\n- **Frame size is smaller than expected**: anything with a longer side above 1920 pixels is scaled down. Hold on to the MPG if you need every pixel.\n- **A renamed file fails**: a new ending leaves the MPEG streams untouched, so a program that needs the contents may still fail. Convert the file instead."
+    }
+  },
+  "nef-to-jpeg": {
+    "seo": {
+      "title": "Convert NEF to JPEG Online (Free)",
+      "h1": "NEF to JPEG Converter",
+      "description": "Convert Nikon NEF raw photos to JPEG in your browser. ImageMagick's raw reader develops the file on your device, with no upload. Free, with no sign-up.",
+      "howToHeading": "How to convert NEF to JPEG"
+    },
+    "tool": {
+      "subtitle": "Develop a Nikon NEF raw photo into a shareable JPEG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How can I turn a NEF into a JPEG?",
+        "answer": "Drop the NEF onto the page and let it decode. A JPEG of the same picture comes back, and further NEF files follow in sequence, every JPEG downloading separately."
+      },
+      {
+        "question": "Is the JPEG a replacement for my NEF?",
+        "answer": "No. A NEF keeps the sensor data at 12 or 14 bits per sample, and a JPEG holds eight bits per color. Keep the file around if you expect to adjust exposure or white balance later."
+      },
+      {
+        "question": "Does this page let me adjust white balance, exposure or Picture Controls?",
+        "answer": "No. There are no editing controls, only the conversion. Nikon's NX Studio is the program for choosing how the raw file is developed."
+      },
+      {
+        "question": "What JPEG quality does the converter apply?",
+        "answer": "The page passes no quality value, and there is no quality slider for this conversion, so the JPEG is written with whatever the encoder does when it is given none."
+      },
+      {
+        "question": "Why does my new Nikon's NEF fail to convert?",
+        "answer": "A NEF recorded with Nikon's High Efficiency RAW can fail here. The page then says the file's compression can't be decoded here, or that the file is damaged, and no setting changes that. Export a standard NEF from the camera, or use Nikon's own software."
+      },
+      {
+        "question": "Is there a maximum picture size?",
+        "answer": "Yes: a file that decodes to more than about 537 million pixels is turned back. Ordinary camera files are far below that."
+      },
+      {
+        "question": "Why does a damaged NEF fail?",
+        "answer": "The raw reader gives up when a file stops before its picture is complete or its structure is broken, and the page then reports it as damaged or incomplete. Copy it over from the card another time."
+      },
+      {
+        "question": "Will the JPEG match what NX Studio or my camera shows?",
+        "answer": "Not necessarily. Developing a NEF applies white balance and other rendering choices, so the JPEG can differ from what you saw on the camera. Compare the result on a few pictures before converting a whole shoot."
+      },
+      {
+        "question": "Is the NEF uploaded to a server?",
+        "answer": "No. The raw file is read by ImageMagick compiled to WebAssembly, in your own tab, so it never leaves the device."
+      },
+      {
+        "question": "Can I turn a JPEG back into a NEF?",
+        "answer": "No. This page has no raw encoder, and a JPEG does not hold the sensor samples a NEF carries. The conversion goes one way."
+      }
+    ],
+    "aboutSection": {
+      "title": "NEF and JPEG",
+      "fromFormat": {
+        "name": "NEF",
+        "fullName": "Nikon Electronic Format",
+        "description": "Nikon's raw photo format. It keeps sensor data with camera and lens metadata, at 12 or 14 bits depending on the camera.",
+        "details": [
+          "Raw sensor data",
+          "12 or 14 bits per sample",
+          "Uncompressed or lossless compression",
+          "Nikon cameras"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "Joint Photographic Experts Group image",
+        "description": "A lossy raster image format for photographs, also written with the .jpg extension.",
+        "details": [
+          "Lossy compression",
+          "Eight bits per color",
+          "No transparency",
+          "Opens almost anywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting NEF to JPEG",
+      "points": [
+        "The JPEG is a developed picture; the 12 or 14 bit raw sensor data is not carried into it.",
+        "The page has no exposure, white balance or Picture Control settings.",
+        "It sets no JPEG quality value.",
+        "A NEF in Nikon's High Efficiency RAW can fail, with a message that its compression can't be decoded here.",
+        "A picture over about 537 megapixels is refused as too large.",
+        "Keep the NEF if you may want to develop it again."
+      ]
+    },
+    "guide": {
+      "title": "About NEF and JPEG files",
+      "markdown": "### What is a NEF file?\n\nThe letters NEF expand to Nikon Electronic Format, the name of the raw photo files that Nikon cameras write. Nikon describes it as keeping the information captured by the sensor together with camera and lens metadata, in uncompressed or losslessly compressed form. Depending on the camera, a NEF has 12-bit or 14-bit precision. Settings for white balance, hue, tone and sharpening can ride along as instructions instead of being baked in, so one file can be developed in several ways.\n\nThat is why photographers keep NEF files after exporting. Nikon's own software can write a JPEG or TIFF from a NEF and leave the raw file untouched. A JPEG made from it is a finished picture with those choices already applied, and an eight-bit JPEG does not carry the original 12-bit or 14-bit raw representation.\n\n### Programs that open NEF files\n\n- **Windows, Mac and Linux:** ImageMagick can read NEF.\n- **Windows and Mac:** NX Studio is published by Nikon and is meant for viewing and developing the company's raw photographs.\n- **Linux:** XnView MP includes NEF in its supported formats, at no charge for private and educational users.\n\n### NEF and JPEG compared\n\n- **Extensions**: .nef for the raw file; .jpg or .jpeg for the JPEG, which are two spellings of one format.\n- **Content**: a NEF is sensor data plus the instructions for rendering it. A JPEG is the rendered picture.\n- **Precision**: 12 or 14 bits per sample against eight bits in the JPEG.\n- **Compression**: NEF is stored uncompressed or with lossless compression. JPEG is lossy, so each save at a lower quality discards detail.\n- **Structure**: a NEF is a TIFF-based file that holds an embedded JPEG preview next to the unprocessed sensor data.\n- **Quality**: JPEG has an adjustable quality setting, but this page passes no quality value, so you cannot choose one here.\n- **Alpha**: JPEG cannot store an alpha channel.\n- **Reach**: a JPEG is supported everywhere, while a NEF needs a raw developer such as Nikon NX Studio or darktable.\n\nWhat this page does is read the NEF with ImageMagick's raw reader, which is built on LibRaw and runs as WebAssembly on your device, then write a JPEG. No quality value is passed and there are no development controls; one picture comes out of each file. A header declaring more than about 537 million pixels gets the file rejected. Each NEF gives one JPEG, so a burst of shots means a burst of downloads. If the file uses Nikon's High Efficiency RAW compression, the page says it can't be decoded here, and a cut-short or broken file is reported as damaged or incomplete.\n\n### Other ways to convert NEF to JPEG\n\n- **Nikon NX Studio (Windows, Mac):** select the pictures, click Export, choose JPEG, choose where to save, then press Export. Nikon's processing software writes a JPEG or TIFF and keeps the raw original.\n- **darktable (Windows, Mac, Linux):** select a supported raw image, open the export section, pick file on disk as storage, JPEG as format, a location, then press export. It will not open Nikon High Efficiency NEFs.\n- **ImageMagick (Windows, Mac, Linux):** run `magick source.nef sharing.jpeg`. The formats page lists NEF as readable and JPEG as readable and writable.\n\nNX Studio is the program built by Nikon for its own raw files, and the JPEG it writes is a rendered result like any other.\n\n### Problems with NEF files\n\n- **The JPEG looks different from the camera's preview**: a NEF can appear different once developed, since white balance and similar rendering choices are instructions that the processing software carries out.\n- **Shadows or highlights look flat**: the amount of tonal information differs by camera, and an eight-bit JPEG cannot keep the 12-bit or 14-bit precision of the raw file. Return to the NEF to adjust them.\n- **darktable will not open the file**: its camera-support page lists Nikon high efficiency NEFs as not supported.\n- **The file fails on this page**: if it is High Efficiency RAW, shoot standard NEF or use Nikon's software. Otherwise copy it from the card again, since a damaged or incomplete file stops the reader.\n- **The JPEG is not a replacement**: a JPEG export is a rendered result, so it cannot take the place of the NEF's adjustable sensor data. Keep the NEF."
+    }
+  },
+  "ogv-to-mp4": {
+    "seo": {
+      "title": "Convert OGV to MP4 Online (Free)",
+      "h1": "OGV to MP4 Converter",
+      "description": "Convert OGV to MP4 in your browser. Ogg video is re-encoded as H.264 with AAC sound, for players that skip Ogg. Free, no sign-up.",
+      "howToHeading": "How to convert OGV to MP4"
+    },
+    "tool": {
+      "subtitle": "Re-encode an Ogg video as an H.264 and AAC MP4 that more players accept, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an OGV to an MP4?",
+        "answer": "Choose the OGV above and wait while the video is encoded again. You get an MP4 with H.264 pictures and AAC audio back. Further OGV files queue up behind it, each saving its own MP4."
+      },
+      {
+        "question": "Why won't my OGV play where MP4 does?",
+        "answer": "Ogg video is a different container, and a player that opens Ogg can still be missing the decoder for a stream inside it. MP4 holding H.264 and AAC is playable in all major browsers, and that is why people convert."
+      },
+      {
+        "question": "Can I just rename .ogv to .mp4?",
+        "answer": "No. The bytes are still Ogg, so a program that opens the file by its contents will not treat it as MP4. The streams have to be encoded again, which is what this page does."
+      },
+      {
+        "question": "What codecs does the MP4 contain?",
+        "answer": "Pictures are H.264 and sound is AAC at 96 kbps; nothing from the original Theora or Vorbis streams is copied across."
+      },
+      {
+        "question": "Will the video lose quality?",
+        "answer": "Some. The OGV is decoded and encoded again as H.264, which is lossy, at CRF 32, a fixed setting picked for speed. Hold on to the OGV in case you need a cleaner encode."
+      },
+      {
+        "question": "How large is the MP4's picture?",
+        "answer": "The OGV's own size is kept unless the longer side passes 1920 pixels, when it is scaled to fit. Both sides must come out even, so an odd side loses a pixel."
+      },
+      {
+        "question": "Does the frame rate change?",
+        "answer": "It is kept as it is unless it exceeds 30 frames a second, in which case it is brought down to 30."
+      },
+      {
+        "question": "What does .ogv mean, and is .ogg the same?",
+        "answer": "OGV is the extension for video in an Ogg container, with the media type video/ogg. Older files sometimes use .ogg for video as well."
+      },
+      {
+        "question": "Can I convert just part of the video?",
+        "answer": "No. The page converts the whole OGV and has no trim or cut control. Shorten the clip in an editor first if you only need a section."
+      },
+      {
+        "question": "Is the OGV uploaded to a server?",
+        "answer": "No. The OGV is processed by FFmpeg compiled to WebAssembly in this tab, so it is never sent anywhere. How long it takes depends on your own computer."
+      }
+    ],
+    "aboutSection": {
+      "title": "OGV and MP4",
+      "fromFormat": {
+        "name": "OGV",
+        "fullName": "Ogg Video",
+        "description": "Video carried in the Ogg container maintained by the Xiph.Org Foundation. Theora video with Vorbis sound is one documented combination.",
+        "details": [
+          "Ogg container",
+          "Media type video/ogg",
+          "Often Theora and Vorbis",
+          "Open format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "ISO base media container",
+          "H.264 and AAC most common",
+          "Plays in every major browser",
+          "Registered as video/mp4"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting OGV to MP4",
+      "points": [
+        "The video is encoded again as H.264 with 96 kbps AAC sound; the Theora and Vorbis streams are not copied.",
+        "The picture keeps its size up to 1920 pixels on the longer side and its rate up to 30 fps.",
+        "An odd width or height loses one pixel.",
+        "The encode uses a fast, fixed-quality setting, so the file is not tuned for the smallest size.",
+        "Frames flagged as interlaced are deinterlaced.",
+        "Choose several OGV files and each gives its own MP4."
+      ]
+    },
+    "guide": {
+      "title": "About OGV and MP4 files",
+      "markdown": "### What is an OGV file?\n\nThe .ogv ending marks video stored in an Ogg container. The Ogg format is maintained by the Xiph.Org Foundation, and RFC 5334 gives video/ogg as the media type. An OGV file can hold audio, video, timed text and other visually presented content. Every Ogg stream begins with the identification bytes OggS. The format is royalty-free, and it is used for open-source video and for web video in Firefox. Theora video with Vorbis or Opus audio is the typical content.\n\nThe ending says only that the container is Ogg. One documented combination is Theora video with Vorbis sound, but an Ogg file does not necessarily contain Vorbis, so the codec has to be identified before you decide what to do with a file. Xiph recommends .ogv for video, though older files may end in .ogg.\n\n### Programs that open OGV files\n\n- **Windows, Mac and Linux:** VLC media player can play an Ogg container holding Theora and Vorbis. FFmpeg demuxes Ogg streams so you can inspect and convert them.\n\n### OGV and MP4 compared\n\n- **Extensions and media types**: .ogv with video/ogg; .mp4 or .m4v with video/mp4.\n- **Typical codecs**: Theora and Vorbis in OGV. H.264 and AAC in MP4, which can additionally hold AV1, VP9, MP3 or Opus.\n- **Standard**: the MP4 specification is MPEG-4 Part 14, published in 2003 as ISO/IEC 14496-14 and layered on the ISO Base Media File Format. Ogg comes from Xiph.Org and is open.\n- **Contents**: an MP4 is a container for several codecs, including H.264, H.265 and AV1 video, and it can also hold subtitles, chapters and metadata. An OGV carries Theora pictures along with Vorbis or Opus sound, and sometimes timed text.\n- **Structure**: an MP4 is made of nested boxes, the same idea QuickTime calls atoms.\n- **Support**: every major browser plays MP4, and from version 5.0 Android also plays HEVC video inside MP4.\n\nA player may understand Ogg while lacking a decoder for one of its streams, so an OGV that opens in one program can show nothing in another.\n\nThe page decodes the OGV with FFmpeg and asks for H.264 (ultrafast, CRF 32), AAC at 96 kbps and an index moved to the head of the MP4. Pictures stay at their own dimensions and rate unless they exceed 1920 pixels or 30 fps, and the sides are made even. The page has no quality, size or trim controls. A deinterlacing step handles any frames the file marks interlaced. You do not pick between several audio or video streams.\n\n### Other ways to convert OGV to MP4\n\n- **FFmpeg (Windows, Mac, Linux):** run `ffmpeg -i source.ogv -c:a aac -c:v libx264 ogv-delivery.mp4`. It re-encodes instead of copying the Ogg streams, and you can add options to match a receiver's requirements.\n- **VLC (Windows, Mac, Linux):** open Media > Convert / Save, add the OGV, set a destination file, choose a profile and press Start. VLC's documentation does not list profile names, so look at what your copy offers before you start.\n\nThis page converts the whole OGV. In FFmpeg, writing `-t` ahead of `-i` caps how much input is read, so `ffmpeg -t 10 -i source.ogv short.mp4` converts just the first ten seconds.\n\n### Problems with OGV files\n\n- **A player opens the container but shows nothing**: it may lack a decoder for the video inside. A player understanding Ogg does not guarantee Theora support, so identify the codec first.\n- **The ending is .ogg instead of .ogv**: the older .ogg ending is also seen on video, although Xiph recommends .ogv for that role. This page expects .ogv.\n- **The codec is not what you assumed**: a file with an Ogg ending can hold a codec other than Vorbis, so find out which codec it uses before you decide what to do.\n- **The file holds more than pictures**: besides video, an OGV can carry audio, timed text and other visual content, and this page gives you no choice among them.\n- **A renamed file fails**: renaming it to .mp4 changes nothing inside, and the contents are still Ogg.\n- **Frame size or rate is capped**: pictures wider or taller than 1920 pixels are reduced here, and anything faster than 30 frames a second is brought down to 30. Keep the OGV if you want the original."
+    }
+  },
+  "opus-to-wav": {
+    "seo": {
+      "title": "Convert Opus to WAV Online (Free)",
+      "h1": "Opus to WAV Converter",
+      "description": "Convert Opus to WAV in your browser: the audio is decoded to 16-bit PCM for editors and tools that cannot read Opus. Free, with no sign-up or upload.",
+      "howToHeading": "How to convert Opus to WAV"
+    },
+    "tool": {
+      "subtitle": "Decode an Opus recording to uncompressed 16-bit WAV, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an Opus file to WAV?",
+        "answer": "Add the .opus file and let the page decode it. You receive a WAV with 16-bit PCM sound, and each further Opus file yields its own WAV in sequence."
+      },
+      {
+        "question": "What is inside the WAV the page produces?",
+        "answer": "The samples are signed 16-bit little-endian PCM, uncompressed, so there is no second lossy encode and nothing more is thrown away after the Opus decode."
+      },
+      {
+        "question": "Will the WAV sound better than the Opus?",
+        "answer": "No. Opus is lossy and its coding trades signal detail for a compact file. Decoding gives you the samples that were left, not what the encoder removed."
+      },
+      {
+        "question": "Why can the WAV be so much bigger?",
+        "answer": "The WAV stores every sample as 16 bits, while Opus stores a compressed description of the sound. The large size is the cost of being uncompressed, and it does not mean something went wrong. A fixture run here turned a 12,510-byte Opus file into a 96,078-byte WAV."
+      },
+      {
+        "question": "Can I pick the sample rate or channel layout?",
+        "answer": "No. The command fixes neither value, and the page has no control for them. If an editor needs a particular rate or layout, set it in the editor after the conversion."
+      },
+      {
+        "question": "Is a .opus file the same as Ogg Opus?",
+        "answer": "Usually. Usually the .opus file is Ogg Opus, and the codec itself is defined in RFC 6716. This page reads those files."
+      },
+      {
+        "question": "What if my Opus file comes from a video?",
+        "answer": "Choose the audio file itself. The page's command decodes the sound and leaves any video out, so a file with no audio stream fails with an FFmpeg exit-code error."
+      },
+      {
+        "question": "Why does my editor want WAV instead of Opus?",
+        "answer": "A program may read Ogg without decoding Opus, so it needs ordinary samples instead. Audacity, for example, opens most WAV recordings, PCM variants included."
+      },
+      {
+        "question": "Are tags and cover art kept?",
+        "answer": "The page passes no option for tags, and what a WAV can hold depends on its INFO chunks and Broadcast WAVE fields, which store different information. Keep the original .opus if the tags matter."
+      },
+      {
+        "question": "Is my audio uploaded to a server?",
+        "answer": "No. The decoding runs in FFmpeg's WebAssembly build inside this tab, and the recording is never uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "Opus and WAV",
+      "fromFormat": {
+        "name": "Opus",
+        "fullName": "Opus audio",
+        "description": "An open lossy audio codec for speech and music, standardized by the IETF in RFC 6716. A .opus file commonly stores it in an Ogg stream.",
+        "details": [
+          "Lossy compression",
+          "SILK and CELT technology",
+          "Usually in Ogg (RFC 7845)",
+          "Built for speech and music"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "A RIFF-based wrapper for sound, introduced in the August 1991 Microsoft and IBM multimedia specification. Linear PCM is its common payload.",
+        "details": [
+          "RIFF wrapper",
+          "Usually uncompressed PCM",
+          "Large files",
+          "Broadcast WAVE extension"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting Opus to WAV",
+      "points": [
+        "The WAV holds signed 16-bit PCM, which is uncompressed.",
+        "Decoding does not restore detail the Opus encode discarded.",
+        "The WAV can be much larger than the Opus.",
+        "The page sets no sample rate or channel count and offers no such options.",
+        "The page passes no tag option, and WAV's INFO chunks and Broadcast WAVE fields store different information.",
+        "Choose several Opus files and each gives its own WAV."
+      ]
+    },
+    "guide": {
+      "title": "About Opus and WAV files",
+      "markdown": "### What is an Opus file?\n\nOpus is an open codec for speech and music that was built with interactive communication in mind. The IETF standardized its original definition in RFC 6716 in September 2012. It blends SILK, which came from Skype, with CELT, from Xiph.Org. A .opus file commonly stores the encoded sound in an Ogg stream as specified by RFC 7845, and Ogg Opus supports descriptive metadata. It registers as audio/ogg carrying a codecs parameter of opus, and a player can jump within a long recording.\n\nOpus is lossy, since its coding modes give up some signal detail to keep the representation compact. Ogg Opus also counts its playback time in units of 48 kHz, whatever sample rate the original recording had when it was captured.\n\n### Programs that open Opus files\n\n- **Windows, Mac and Linux:** opusdec is the decoder the Opus project distributes in opus-tools for decoding .opus files, which commonly hold the sound in an Ogg stream. FFmpeg has an Ogg muxer that accepts Opus.\n\n### Opus and WAV compared\n\n- **Names and types**: .opus goes with audio/ogg, and .wav is labeled audio/wav or audio/x-wav.\n- **What it is**: Opus is a codec. WAVE wraps sound in a RIFF structure without prescribing one encoding, so compressed encodings can appear in it alongside linear PCM.\n- **Size**: Opus compresses and discards detail. A PCM WAV keeps every sample.\n- **History**: Microsoft and IBM documented the WAVE format in their August 1991 multimedia specification.\n- **Metadata**: Ogg Opus supports descriptive metadata and seeking. In a WAV, INFO chunks and the Broadcast WAVE extension hold different kinds of information, so tag handling varies.\n- **Preservation**: WAVE is the format the Library of Congress recommends for digital audio collections.\n- **Size limits**: a very large recording may need RF64, because the original RIFF size fields run out.\n- **Editors**: Audacity imports most WAV recordings, including PCM variants. A recorder may use proprietary compression inside WAV, and for such files Audacity recommends its FFmpeg library.\n- **Phones**: Mozilla lists WAV among the supported audio file types on Android.\n- **Timing**: playback timing in Ogg Opus is expressed at 48 kHz, which says nothing about the original recording's rate.\n\nWhat this page does is run FFmpeg, as WebAssembly in your browser, with the PCM signed 16-bit little-endian codec and the video dropped. That produces uncompressed samples. The command never sets a sample rate or channel layout, so the page has no such options. It also passes -vn, which discards any video stream, so only sound is written. The WAV is uncompressed PCM, so it can be far larger than the Opus original. Decoding does not recover what the Opus encode removed. Files are converted one after another with no ZIP, so a batch gives you one download per file. Each download takes the original's name with a .wav ending, and the source file is left alone. The output is checked against the target format, so a result that is not a WAV fails with a message instead of being saved.\n\n### Other ways to convert Opus to WAV\n\n- **opusdec (Windows, Mac, Linux):** run `opusdec message.opus decoded.wav`. opusdec writes WAVE output when the output filename ends in .wav.\n- **FFmpeg (Windows, Mac, Linux):** run `ffmpeg -i message.opus -c:a pcm_s16le editable.wav`. It will not reconstruct information the source encode discarded.\n\nWith FFmpeg, `-vn` removes any video, so a file that carries pictures as well as sound yields only the sound.\n\n### Problems with Opus files\n\n- **A program reads Ogg but not Opus**: software that handles Vorbis in Ogg may not decode Opus, as the Ogg mapping for Opus has its own headers.\n- **Unwanted audio at the start**: dropping the pre-skip value can cause unwanted leading samples, and Ogg Opus defines how readers must apply it.\n- **The sample rate looks different from your microphone's**: Ogg Opus stores its playback timing on a 48 kHz basis, which should not be confused with the original recording's sample rate.\n- **Detail is already gone**: Opus is lossy, so the samples in the WAV are the ones that were left, and decoding cannot bring back the sound before the first encode.\n- **The file comes from a video**: choose the audio file itself. Without an audio stream, the run ends in an error."
+    }
+  },
+  "ppm-to-png": {
+    "seo": {
+      "title": "Convert PPM to PNG Online (Free)",
+      "h1": "PPM to PNG Converter",
+      "description": "Convert PPM images to PNG in your browser. The Netpbm pixmap is read by ImageMagick on your device, with no upload. Free, no sign-up.",
+      "howToHeading": "How to convert PPM to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn a Netpbm PPM image into a PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PPM to a PNG?",
+        "answer": "Choose the PPM above and wait for it to be read. A PNG of the same picture comes back. Several PPM files are converted in sequence, each saved on its own."
+      },
+      {
+        "question": "Does the PNG lose any quality?",
+        "answer": "PNG compression itself is lossless: it uses DEFLATE. The page sets no quality, compression or color option for this conversion, and there is none for you to choose."
+      },
+      {
+        "question": "Why is my PNG so much smaller than the PPM?",
+        "answer": "A PPM stores every pixel as plain red, green and blue samples with almost no metadata. PNG compresses those samples, so the file can be much smaller. A fixture run here turned a 27,661-byte PPM into a 1,570-byte PNG."
+      },
+      {
+        "question": "Is a P3 or P6 PPM accepted?",
+        "answer": "Both are PPM. P6 is the common binary form and P3 the less common plain-text form, and ImageMagick's PPM reader handles the format. If a file is not read, check that it starts with the P3 or P6 signature."
+      },
+      {
+        "question": "What if my PPM file holds several images?",
+        "answer": "A raw PPM may hold several images back to back, but this page writes one PNG per file. Split the file with Netpbm tools first if you need every image."
+      },
+      {
+        "question": "Does the PNG have transparency?",
+        "answer": "A PPM pixel carries only a red, a green and a blue sample, so the file holds no transparency for the PNG to inherit."
+      },
+      {
+        "question": "Do colors change in the conversion?",
+        "answer": "The values are not altered on purpose. Some files with a .ppm name hold sRGB or linear numbers where the format specifies another transfer function, and then colors can look off; Netpbm's pnmgamma reconciles them."
+      },
+      {
+        "question": "Is there a maximum picture size?",
+        "answer": "Pictures past about 537 million pixels are turned back with a message that they are too large to convert here."
+      },
+      {
+        "question": "What are PPM files used for?",
+        "answer": "A PPM keeps only red, green and blue samples with little other metadata, so files can be large relative to compressed distribution images. That size is the usual reason people convert them."
+      },
+      {
+        "question": "Is my PPM uploaded to a server?",
+        "answer": "No. The PPM is read by ImageMagick compiled to WebAssembly, inside this tab, and is never uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "PPM and PNG",
+      "fromFormat": {
+        "name": "PPM",
+        "fullName": "Portable Pixmap",
+        "description": "Netpbm's portable color pixel-map format. Each pixel carries red, green and blue samples, with little else stored.",
+        "details": [
+          "P6 binary or P3 plain text",
+          "Red, green and blue samples",
+          "Almost no metadata",
+          "Large uncompressed files"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format with an optional alpha channel, built as an open replacement for GIF.",
+        "details": [
+          "Lossless compression",
+          "Optional alpha channel",
+          "Opens in every browser",
+          "Good for screenshots and graphics"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PPM to PNG",
+      "points": [
+        "The PNG can be much smaller than the PPM, because PNG compresses losslessly.",
+        "A PPM carries only red, green and blue samples, so it has no transparency to pass on.",
+        "The page writes one PNG per file, even if a raw PPM holds several images.",
+        "Files that use sRGB or linear values instead of the specified transfer function can look off.",
+        "A picture over about 537 megapixels is refused as too large."
+      ]
+    },
+    "guide": {
+      "title": "About PPM and PNG files",
+      "markdown": "### What is a PPM file?\n\nPPM is Netpbm's portable pixmap, a format for color images. Each pixel has three samples, one each for red, green and blue, and the maximum sample value can be anything from 1 to 65535. The normal binary form starts with the signature P6, and the rarer plain-text form starts with P3. A raw PPM can also contain a sequence of images with no separators between them.\n\nThe appeal is simplicity: there is almost no metadata and no compression, so a program can write a PPM in a few lines. The price is size, since the files are large next to compressed pictures. IANA has not registered the conventional media type, image/x-portable-pixmap.\n\n### Programs that open PPM files\n\n- **Windows, Mac and Linux:** ImageMagick reads and writes PPM color images. Netpbm supplies the libnetpbm reader and tools for PPM processing.\n\n### PPM and PNG compared\n\n- **Compression**: PPM stores samples as they are. PNG compresses them losslessly with DEFLATE, which combines LZ77 with Huffman coding.\n- **Metadata**: PPM carries almost none. PNG is built from chunks, and its third edition allows Exif metadata in an eXIf chunk.\n- **Transparency**: a PPM stores no alpha channel, while PNG can add an optional one for per-pixel transparency.\n- **Support**: PNG shows up in all major browsers and has no known patents that bear royalties.\n- **Depth**: PPM sample values can run up to 65535, which is 16 bits. PNG supports 1 to 16 bits per sample.\n- **Origin**: PNG was introduced as a patent-free replacement for GIF in the W3C Recommendation of October 1996. It is also described by RFC 2083 and ISO/IEC 15948:2004.\n- **Structure**: PNG files open with a fixed signature, then chunks: IHDR (header), IDAT (pixels) and IEND (the end).\n- **Image types**: PNG supports indexed, grayscale and truecolor images, so a PPM's red, green and blue samples fit its truecolor kind.\n- **Edition**: the PNG specification's third edition was made a W3C Recommendation on 24 June 2025. Animated PNG is covered, and software unable to animate falls back to the default still image.\n- **Everyday use**: macOS saves screenshots as PNG files by default, so PNG is a format most people already handle.\n- **Newer features**: HDR support arrives in the third edition through the cICP chunk, and image/png is the registered media type, with image/apng for animated files.\n- **Media types**: image/png for PNG; PPM's image/x-portable-pixmap is conventional only.\n\nWhat this page does is read the PPM with ImageMagick, compiled to WebAssembly and running on your device, and write a PNG. It reads one picture per file and sets no compression or color options of its own. The page rejects a picture beyond roughly 537 megapixels. The sample depth of the output is not something you choose on this page. The download keeps the original's name with a .png ending, and the source file stays untouched.\n\n### Other ways to convert PPM to PNG\n\n- **Netpbm pnmtopng (Windows, Mac, Linux):** run `pnmtopng render.ppm > render.png`. It is the format's own toolset. Netpbm's documentation says it scales the maxval automatically to 255 or 65535, so check technical images.\n- **ImageMagick (Windows, Mac, Linux):** run `magick render.ppm delivered.png`. ImageMagick's formats page lists PPM as readable and writable, and PNG as well.\n- **GIMP (Windows, Mac, Linux):** open the PPM, then choose File > Export As (Shift+Ctrl+E) and export it as a PNG. GIMP's PNM plug-in loads pnm, ppm, pgm, pbm, pfm and pam files.\n\nThe page uses ImageMagick, so the second method is the closest to what it does.\n\n### Problems with PPM files\n\n- **The file is huge**: PPM uses a redundant representation with little image metadata, so files are bulky next to compressed distribution formats.\n- **A program reads only some PPM files**: some readers implement only one eight-bit image. Normalize complex input with pnmtopnm and reduce sample depth with pamdepth when necessary.\n- **Colors look wrong**: a file labeled PPM now and then holds sRGB or linear values rather than the transfer function the format specifies. pnmgamma can reconcile the variants.\n- **Only one picture comes out**: a raw PPM can contain a sequence of images without separators, but the page writes a single PNG per file. Split the sequence first if you need every picture.\n- **The sample values run high**: a PPM's maximum sample value may be anywhere from 1 to 65535, so it can hold more than eight bits per sample."
+    }
+  },
+  "qt-to-mp4": {
+    "seo": {
+      "title": "Convert QT to MP4 Online (Free)",
+      "h1": "QT to MP4 Converter",
+      "description": "Convert QuickTime .qt movies to MP4 in your browser. The video is re-encoded as H.264 with AAC sound. Free, with no sign-up.",
+      "howToHeading": "How to convert QT to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn a QuickTime .qt movie into an H.264 and AAC MP4, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a QT file to MP4?",
+        "answer": "Pick the .qt file and give the page a moment to encode it. The MP4 you get back has H.264 pictures and AAC sound, and further files wait their turn, each saving its own MP4."
+      },
+      {
+        "question": "What is a .qt file?",
+        "answer": "It is a QuickTime movie, the same format as .mov. Apple's format uses both the .mov and .qt extensions, so a .qt file is not a different kind of video."
+      },
+      {
+        "question": "Can I rename .qt to .mp4?",
+        "answer": "No. A new ending neither re-encodes the video nor supplies a missing decoder. MOV and MP4 are separate formats, even though QuickTime was the basis for the MPEG-4 file format."
+      },
+      {
+        "question": "Does converting lose quality?",
+        "answer": "Some. The page decodes the movie and encodes it again with H.264 at a fixed quality setting, which is lossy. Keep the .qt if you might need the original pictures."
+      },
+      {
+        "question": "What codecs does the MP4 use?",
+        "answer": "H.264 for pictures, AAC at 96 kbps for sound. Nothing is copied straight from the QuickTime streams, whatever they were."
+      },
+      {
+        "question": "How large is the MP4?",
+        "answer": "A longer side beyond 1920 pixels means a scaled-down picture, and rates faster than 30 fps are capped; smaller values stay as they are. An odd side length costs one pixel because both sides are made even."
+      },
+      {
+        "question": "Why would I want MP4 rather than QT?",
+        "answer": "Browsers handle MOV unevenly, and Apple's own software now generally favors MP4. An MP4 holding H.264 and AAC plays in all the major browsers."
+      },
+      {
+        "question": "Will the file open on my phone?",
+        "answer": "H.264 with AAC is the most common combination in an MP4, and it is what this page writes. Phones play it in their built-in video player."
+      },
+      {
+        "question": "What if I want to keep the original streams?",
+        "answer": "Use a remux instead. FFmpeg's `-c copy` can put the streams in an MP4 without re-encoding, but only if the MP4 can carry them. This page always re-encodes."
+      },
+      {
+        "question": "Does the QuickTime file leave my device?",
+        "answer": "No. The encoding is done by FFmpeg compiled to WebAssembly inside your browser tab, which means nothing is uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "QT and MP4",
+      "fromFormat": {
+        "name": "QT",
+        "fullName": "QuickTime Movie",
+        "description": "The .qt extension of Apple's QuickTime file format, which also uses .mov. It is built from objects called atoms.",
+        "details": [
+          "Same format as MOV",
+          "Built from atoms",
+          "Many codecs",
+          "Registered as video/quicktime"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "ISO base media container",
+          "H.264 and AAC most common",
+          "Plays in every major browser",
+          "Registered as video/mp4"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting QT to MP4",
+      "points": [
+        "A .qt file is a QuickTime movie, the same format as .mov.",
+        "The video is encoded again as H.264 with 96 kbps AAC sound, so it is a new lossy generation.",
+        "The picture keeps its size up to 1920 pixels on the longer side and its rate up to 30 fps.",
+        "An odd width or height loses one pixel.",
+        "Frames flagged as interlaced are deinterlaced.",
+        "Choose several files and each gives its own MP4."
+      ]
+    },
+    "guide": {
+      "title": "About QT and MP4 files",
+      "markdown": "### What is a QT file?\n\nA .qt file is a QuickTime movie. Apple introduced the format in 1991, and a Windows version followed in 1994; it is the same format as ordinary MOV files, which use the .mov ending. The registered media type is video/quicktime. Inside, QuickTime is organized as atoms, and software that meets an unknown atom can skip over it.\n\nMotion JPEG, ProRes and H.264 are all possible for the pictures, with AAC or uncompressed PCM for the sound. That variety is why the ending alone tells you little: a movie can use a codec the destination editor lacks. Screen recordings made on a Mac are written as MOV files. Browsers support MOV only to a limited degree, and Apple now generally uses MP4 itself, so that is the common reason to convert.\n\n### Programs that open QT files\n\n- **Windows, Mac and Linux:** ffplay, the player that ships with FFmpeg, plays QuickTime files through FFmpeg's MOV demuxer from the command line. mpv is a desktop player where you can also choose among the audio and subtitle streams during playback.\n- **Windows and Mac:** Adobe Premiere imports this container when the necessary decoder is available.\n- **Mobile:** on a phone, VLC for Android is a free player whose decoding follows from what the container holds, and VLC for iOS is an iPhone and iPad player covering most movie formats, from local or network sources.\n\n### QT and MP4 compared\n\n- **Extensions and media types**: .qt or .mov with video/quicktime; .mp4 or .m4v with video/mp4.\n- **Lineage**: MPEG-4's file format grew out of QuickTime, but MOV and MP4 are different formats and cannot stand in for each other. The MP4 file format is MPEG-4 Part 14, from 2003.\n- **Structure**: MP4 is made of nested boxes, which is QuickTime's idea of atoms under another name.\n- **Codecs**: H.264 with AAC is typical in an MP4, and AV1, VP9, MP3 and Opus can live there too.\n- **Reach**: every major browser plays MP4, whereas browser support for MOV is limited.\n\nWrapper and codecs both change. After decoding, FFmpeg encodes H.264 (ultrafast preset, CRF 32) and AAC at 96 kbps, and the MP4's index is placed up front. The picture is shrunk when its longer side tops 1920 pixels, 30 fps is the ceiling for frame rate, and both sides come out even. The deinterlacing filter is applied to frames the file marks as interlaced. Audio is always encoded again as AAC, even if the movie already used it. The page offers no quality or trim controls, and files are converted one after another; every MP4 is its own download and nothing is zipped.\n\n### Other ways to convert QT to MP4\n\n- **FFmpeg, full re-encode (Windows, Mac, Linux):** run `ffmpeg -i legacy.qt -c:a aac -c:v libx264 quicktime-delivery.mp4`. It decodes and encodes again, so the source codecs must first be decodable.\n- **FFmpeg, stream copy (Windows, Mac, Linux):** the command is `ffmpeg -i legacy.qt -c copy quicktime-remux.mp4`. It puts the streams into an MP4 untouched, which works only with streams the MP4 muxer can carry.\n- **FFmpeg, first seconds only (Windows, Mac, Linux):** run `ffmpeg -t 10 -i legacy.qt -c:v libx264 -c:a aac first-ten.mp4`. The `-t` option, given before `-i`, restricts how much input is read; this page has no trim control of its own.\n\nA stream copy does not re-encode, so it keeps the original codecs. Re-encoding is the choice when the receiving program needs H.264 and AAC.\n\n### Problems with QT files\n\n- **An editor rejects the file**: a QuickTime container can use codecs that the destination editor does not have. Check the codec, because the ending settles nothing.\n- **A renamed file fails**: altering the filename ending neither transcodes the video nor supplies the decoder it needs.\n- **The file is damaged after an interrupted write**: regular MOV files may be unusable after an interrupted write, and fragmented output has a different recovery behavior. Copy or record the file again.\n- **Combing on moving edges**: only frames flagged as interlaced are deinterlaced here, so footage that is interlaced but unflagged keeps its combing.\n- **Frame size is smaller than expected**: a source whose longer side exceeds 1920 pixels is shrunk to fit. Keep the QT if you need the full size."
+    }
+  },
+  "wmv-to-gif": {
+    "seo": {
+      "title": "Convert WMV to GIF Online (Free)",
+      "h1": "WMV to GIF Converter",
+      "description": "Convert a Windows Media WMV video to a looping GIF in your browser: 15 fps, up to 480 px, with a custom 256-color palette. Free, with no sign-up.",
+      "howToHeading": "How to convert WMV to GIF"
+    },
+    "tool": {
+      "subtitle": "Turn a WMV video into a silent looping GIF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Can I make a GIF from a WMV without installing anything?",
+        "answer": "Yes. Pick the WMV on this page, wait while FFmpeg turns its pictures into frames, and save the looping GIF it hands back. Extra WMV files are processed in turn, one GIF apiece."
+      },
+      {
+        "question": "What dimensions does the GIF have?",
+        "answer": "The GIF fits inside a 480-pixel box measured on the longer side, with the video's proportions intact. Small videos are not blown up, and both sides come out even."
+      },
+      {
+        "question": "What frame rate does the GIF have?",
+        "answer": "15 frames a second, whatever the WMV used. A video with more frames loses some to reach that rate."
+      },
+      {
+        "question": "Is there sound in the GIF?",
+        "answer": "No. A GIF holds images and the delays between them, so the WMV's soundtrack is dropped."
+      },
+      {
+        "question": "Can I pick a section of the video?",
+        "answer": "No. The whole WMV is converted, and the page has no trim control. Cut the clip first in an editor such as Clipchamp, whose GIF export is limited to short videos."
+      },
+      {
+        "question": "Does the GIF repeat?",
+        "answer": "Yes, forever. It is written to loop without stopping."
+      },
+      {
+        "question": "Why does my GIF look grainy in places?",
+        "answer": "No GIF image can exceed 256 colors. The page builds the palette from your own clip to make the best use of it, but smooth gradients and skin tones can still band."
+      },
+      {
+        "question": "Why is the GIF so much bigger than the WMV?",
+        "answer": "A GIF compresses each image losslessly with LZW on its own, so many frames, even small ones, add up to a heavy file. A long video can come out much larger as a GIF than it was as a WMV."
+      },
+      {
+        "question": "What kinds of WMV can it read?",
+        "answer": "Any file in that family may be tried, but success depends on FFmpeg's decoders, and some WMV9 files misbehave."
+      },
+      {
+        "question": "Does the WMV get sent anywhere?",
+        "answer": "No. The frames are produced by FFmpeg running as WebAssembly in your own browser tab, so the video never goes to a server."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMV and GIF",
+      "fromFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "Video in the ASF container with Windows Media coded content, using Windows Media Video 7, 8 or 9 compression.",
+        "details": [
+          "ASF container",
+          "Windows Media Video 7, 8 or 9",
+          "Audio and video streams",
+          "video/x-ms-wmv"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WMV to GIF",
+      "points": [
+        "The GIF has no sound.",
+        "It plays at 15 frames a second and repeats forever.",
+        "Its longer side is at most 480 pixels, and a smaller video is not enlarged.",
+        "The whole video is converted; there is no trim control, so long clips give very large files.",
+        "A GIF frame holds at most 256 colors, so gradients can band.",
+        "Choose several WMV files and each gives its own GIF."
+      ]
+    },
+    "guide": {
+      "title": "About WMV and GIF files",
+      "markdown": "### What is a WMV file?\n\nThe .wmv ending means Windows Media content inside an ASF container. Microsoft built ASF to store synchronized media and deliver it over networks, and it can hold audio and video streams, played from a disk or streamed from an HTTP server. Three generations of Windows Media Video compression, 7, 8 and 9, are found in WMV files. The media type in common use is video/x-ms-wmv, which the Library of Congress notes is not an IANA registration.\n\nHow faithful the picture is depends on the codec and its compression settings, so the .wmv ending alone says nothing about quality.\n\n### Programs that open WMV files\n\n- **Windows, Mac and Linux:** VLC media player counts ASF/WMV among its inputs and covers Windows Media Video 1, 2 and 9 in its decoding. FFplay plays WMV input with FFmpeg decoders.\n- **Mobile:** on a phone, VLC for Android carries the desktop player's media decoding features, and VLC for iOS runs local files in VLC's player, and the system player is not involved.\n\n### WMV and GIF compared\n\n- **Names and types**: .wmv is video/x-ms-wmv, and .gif is image/gif.\n- **Content**: WMV holds audio and video streams in ASF. GIF holds a series of images with a delay for each, counted in hundredths of a second.\n- **Colors**: no GIF image can exceed a 256-color palette, and its transparency sets a single palette color fully clear, with no in-between.\n- **Compression**: GIF compresses images losslessly with LZW coding.\n- **History**: GIF was created at CompuServe in 1987; a July 1990 revision, GIF89a, added extensions covering transparency, timing, comments and application-specific data.\n- **Display**: every major browser displays GIF.\n- **Licensing**: LZW fees from Unisys began in 1994; the US patent expired in 2003, and the European and Japanese patents in 2004.\n- **Looping**: GIMP can export layers as an animated GIF that repeats forever, as this page's output does.\n\nFFmpeg works in two passes inside your browser. Pass one deinterlaces marked frames, takes 15 frames a second, scales the picture into a 480-pixel box with even sides, and derives a palette from what it sees. Pass two repeats the filtering and paints the frames from that palette. The result is set to repeat forever, the sound is dropped, and the whole video is processed. At 15 frames a second a one-minute clip becomes 900 separate images, so long videos give very large GIFs, and each frame is limited to the palette, so gradients may show visible steps. Cutting the clip down in an editor first keeps the GIF small, because the page has no trim control.\n\n### Other ways to convert WMV to GIF\n\n- **Microsoft Clipchamp:** add the WMV to a project, click Export, and choose GIF from the options. Clipchamp offers GIF for videos of 15 seconds or less, and WMV is on its list of supported imports.\n- **FFmpeg, short excerpt (Windows, Mac, Linux):** run `ffmpeg -t 4 -i training.wmv excerpt.gif`. Because `-t` comes before `-i`, only the first four seconds of the input are read.\n- **FFmpeg, palette pipeline (Windows, Mac, Linux):** run `ffmpeg -i training.wmv -vf palettegen wmv-colors.png`, then `ffmpeg -i training.wmv -i wmv-colors.png -lavfi paletteuse wmv-animation.gif`. Keep any trim and scale settings the same in both passes.\n\nBoth FFmpeg commands let you limit the length, which this page cannot. The palette pipeline generates one palette for the whole video, then uses it to downsample the stream.\n\n### Problems with WMV files\n\n- **Sound or text but no picture**: reading an ASF container and decoding the video inside it are different jobs, so a reader that opens the file may still lack the codec for the video.\n- **Some WMV9 files misbehave**: FFmpeg's documentation says its Windows Media Video 9 support is not completely working. Try VLC to check that the file plays at all.\n- **Quality varies from file to file**: fidelity follows the codec and compression settings the file was made with, not its ending.\n- **The container and the codec differ**: a .wmv file uses ASF with Windows Media coded content, in Windows Media Video 7, 8 or 9 compression, so knowing the ending does not tell you which one a file holds.\n- **Interlaced footage combs in the GIF**: only frames marked as interlaced are deinterlaced here, so unmarked interlaced footage keeps its combing."
+    }
+  }
+}

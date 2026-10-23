@@ -1,0 +1,830 @@
+{
+  "avi-to-wav": {
+    "seo": {
+      "title": "Convert AVI to WAV Online (Free)",
+      "h1": "AVI to WAV Converter",
+      "description": "Pull the soundtrack out of an AVI as a 16-bit PCM WAV in your browser. The picture is dropped and the file never leaves your device. Free.",
+      "howToHeading": "How to convert AVI to WAV"
+    },
+    "tool": {
+      "subtitle": "Pull the sound out of an AVI video and save it as an uncompressed WAV."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVI to WAV?",
+        "answer": "Choose your AVI above and wait for FFmpeg to finish. The WAV downloads when it is done. Your AVI is not changed."
+      },
+      {
+        "question": "Does the WAV keep the video?",
+        "answer": "No. A WAV is sound only, so the video is left out. Keep the AVI if you may want the video again."
+      },
+      {
+        "question": "Which audio track do I get from an AVI with several?",
+        "answer": "There is no track picker, and the page sets no -map option, so FFmpeg's defaults decide. If you need one particular language, extract it with FFmpeg's -map option on your own computer."
+      },
+      {
+        "question": "Why does the AVI to WAV conversion stop with an error?",
+        "answer": "The usual cause is an AVI with no audio track, so there is nothing to write as sound. The page then shows an FFmpeg failure with an exit code. Open the AVI in VLC and check that sound plays."
+      },
+      {
+        "question": "Why is my WAV larger than the AVI?",
+        "answer": "The page writes 16-bit PCM, which is not compressed. An AVI that stored its sound with a compact codec can give a larger WAV, so check your free space for a long recording."
+      },
+      {
+        "question": "Will the WAV sound better than the AVI?",
+        "answer": "No. WAV does not lose quality by itself, but detail the AVI's audio codec already threw away does not come back."
+      },
+      {
+        "question": "Can I convert several AVI files at once?",
+        "answer": "Select more than one AVI and the page works through them in order, saving a separate WAV for each. Nothing is zipped or joined."
+      },
+      {
+        "question": "Is my AVI uploaded to a server?",
+        "answer": "No. The decoding and encoding happen in FFmpeg on your own device, so the AVI never reaches a server."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVI and WAV",
+      "fromFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container format introduced by Microsoft in 1992 based on RIFF. It interleaves video and audio data and can hold many different codecs.",
+        "details": [
+          "RIFF-based container",
+          "many codecs",
+          "limited support for modern features",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "large files",
+          "4 GB file size limit"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVI to WAV",
+      "points": [
+        "The WAV holds the sound only, as 16-bit PCM. The picture is dropped.",
+        "The page has no audio track picker. FFmpeg's defaults decide which stream is used.",
+        "An AVI with no audio track ends in an FFmpeg error with an exit code.",
+        "Uncompressed PCM can make the WAV larger than the sound inside the AVI."
+      ]
+    },
+    "guide": {
+      "title": "AVI to WAV: format guide",
+      "markdown": "### What is an AVI file?\n\nMicrosoft introduced AVI alongside Windows 3.1, and the first specification is from 1992. It is a RIFF file that carries timed pictures and sound. The header records properties such as dimensions and frame rate, and another chunk stores the media. Each stream's codec is named by a FOURCC code.\n\nAVI carries video that may be uncompressed, lossless or lossy; the file extension says little about its quality. You meet AVI in video production archives and older desktop video workflows. People convert AVI to WAV to get the soundtrack into an audio editor, away from the picture.\n\n### Programs that open AVI files\n\n- **Windows, Mac and Linux:** ffplay plays AVI, and mpv plays it too, with selectable audio streams.\n- **Windows and Mac:** Adobe Premiere imports AVI once a decoder for its contents is available.\n- **Mobile:** The mobile players VLC for Android and VLC for iOS handle AVI, though decoding depends on what the container holds.\n\n### AVI and WAV compared\n\nAn AVI interleaves video and audio. A WAV is an audio wrapper, usually holding uncompressed PCM, so it is lossless but large. A WAV file also tops out at 4 GB. This page asks FFmpeg for 16-bit PCM and drops the video, so a soundtrack stored at a higher bit depth is written at 16 bits. The WAV keeps what the AVI's audio codec decoded, and nothing more.\n\n### Other ways to convert AVI to WAV\n\n- **FFmpeg (command line):** enter `ffmpeg -i input.avi -vn output.wav`. `-vn` drops the video, and `-map` lets you pick one audio stream.\n\n### Problems with AVI files\n\n- **An editor opens the AVI but cannot decode it**: an editor can recognize AVI and still lack the decoder for its particular contents. Install the matching decoder or play it in VLC.\n- **A large capture will not open**: size limits differ between original AVI and the later OpenDML extension, so a large capture may need compatible software.\n- **The picture shape looks wrong**: programs read the aspect ratio and scan type stored in an AVI inconsistently.\n- **No sound here**: the AVI has no audio track, and the converter reports an FFmpeg error. A picture that plays does not prove there is sound.\n"
+    }
+  },
+  "exr-to-jpg": {
+    "seo": {
+      "title": "Convert EXR to JPG Online (Free)",
+      "h1": "EXR to JPG Converter",
+      "description": "Turn an OpenEXR render into a JPG you can share. Linear light is encoded to sRGB, highlights above white clip, and the file stays in your browser.",
+      "howToHeading": "How to convert EXR to JPG"
+    },
+    "tool": {
+      "subtitle": "Make a shareable JPG preview of an OpenEXR render or HDR image."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert EXR to JPG?",
+        "answer": "Pick your EXR file here, give the page a moment, then download the JPG. It is a flat 8-bit picture, so the EXR remains your only copy of the full range."
+      },
+      {
+        "question": "Will my EXR come out dark as a JPG?",
+        "answer": "No. An EXR stores linear light, which would look dark if it were written as it is. The page encodes the values to sRGB before it writes the JPG, so the picture looks like a normal image."
+      },
+      {
+        "question": "Does the converter tone map an HDR EXR?",
+        "answer": "No. This 8-bit build clips every value brighter than white to white, so the JPG keeps the exposure the EXR was saved with and the brightest highlights go white. To keep them, lower the exposure in Blender, GIMP or Krita first and export from there."
+      },
+      {
+        "question": "What happens to depth, layers and extra channels?",
+        "answer": "You get one flat picture. A JPG holds only color, so extra channels such as depth have nowhere to go in it."
+      },
+      {
+        "question": "Does the JPG keep the EXR's transparency?",
+        "answer": "No. JPG cannot store transparency, because it has no alpha channel. Check the result if your render has transparent areas."
+      },
+      {
+        "question": "Why does a big EXR render fail?",
+        "answer": "An image above roughly 537 megapixels is refused as too large for this page. Render a smaller version or convert it with ImageMagick on your own computer."
+      },
+      {
+        "question": "Can I convert several EXR files at once?",
+        "answer": "Select several EXR files and they are converted in turn, each saved as its own JPG. Nothing is zipped."
+      },
+      {
+        "question": "Is my render uploaded anywhere?",
+        "answer": "No. The EXR is decoded by ImageMagick inside your browser, so it stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "EXR and JPG",
+      "fromFormat": {
+        "name": "EXR",
+        "fullName": "OpenEXR image",
+        "description": "A high-dynamic-range raster format created by Industrial Light & Magic and released as open source in 2003. It stores 16-bit half-float or 32-bit float pixel values.",
+        "details": [
+          "high dynamic range",
+          "16-bit and 32-bit float",
+          "lossless and lossy compression",
+          "multiple channels and layers"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting EXR to JPG",
+      "points": [
+        "Linear light is encoded to sRGB, so the JPG does not come out dark.",
+        "Values above white are clipped. There is no tone mapping and no exposure control.",
+        "The JPG is one flat 8-bit picture. Depth, layers and other channels are not in it.",
+        "Pictures over about 537 megapixels fail."
+      ]
+    },
+    "guide": {
+      "title": "EXR to JPG: format guide",
+      "markdown": "### What is an EXR file?\n\nILM created OpenEXR and released it as open source in 2003, and the Academy Software Foundation now hosts the project. It is designed for scene-linear, high-dynamic-range pixels, stored as 16-bit half floats or 32-bit floats. An EXR can hold named channels beyond red, green, blue and alpha, such as depth, and it supports scanline and tiled layouts. The window that holds stored pixels can differ from the display window.\n\nRenderers and compositors write EXR for rendering, compositing and texture work. People convert to JPG when they need a preview to send around, because a JPG opens almost anywhere.\n\n### Programs that open EXR files\n\n- **Windows, Mac and Linux:** GIMP has imported and exported high-bit-depth EXR since version 2.10, and Krita loads and saves EXR for painting and interchange. EXR has no internal color management, so Krita assigns its default color space on loading, usually Rec 709 Linear, and the picture may change visually.\n\n### EXR and JPG compared\n\nEXR keeps scene values that can be brighter than white, so it can be regraded later. JPG is lossy, stores 8 bits per channel and carries no alpha channel, which suits a preview and nothing more. Treating raw linear values as a display-ready JPG changes the look, which is why this page encodes them to sRGB first. Keep the EXR as your master.\n\n### Other ways to convert EXR to JPG\n\n- **ImageMagick (command line):** run `magick render.exr render.jpg`. ImageMagick reads and writes EXR when it is built with the OpenEXR library.\n- **GIMP (Windows, Mac, Linux):** GIMP loads and exports basic OpenEXR files. GIMP exports a JPEG through File > Export As… once the EXR is open; a dialog then opens where you set the quality from 0 to 100.\n\n### Problems with EXR files\n\n- **Brightness differs from your renderer**: scene-linear values need display processing. This page encodes the linear values to sRGB and clips anything above 1.0, so check the JPG against the EXR.\n- **Highlights are flat white**: values above 1.0 clip here. Lower the exposure in an EXR editor first.\n- **The conversion fails**: the image may be over about 537 megapixels. Render a smaller version.\n- **Colors shift in another program**: a program that assigns its own working space reads the EXR differently. Krita documents OCIO and profile workflows for this.\n- **A reader shows the wrong area**: the display window and the data window can differ in an EXR.\n"
+    }
+  },
+  "jpeg-to-avif": {
+    "seo": {
+      "title": "Convert JPEG to AVIF Online (Free)",
+      "h1": "JPEG to AVIF Converter",
+      "description": "Re-encode a JPEG as AVIF in your browser. The picture is decoded to 8-bit pixels and metadata is dropped, so compare size and quality afterwards.",
+      "howToHeading": "How to convert JPEG to AVIF"
+    },
+    "tool": {
+      "subtitle": "Re-encode a JPEG photo as an AV1-based AVIF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPEG to AVIF?",
+        "answer": "Choose your JPEG above and wait for the conversion. Save the AVIF when it appears. Your JPEG is not changed."
+      },
+      {
+        "question": "Will the AVIF be smaller than my JPEG?",
+        "answer": "Not necessarily. The result depends on the picture, and a small or already heavily compressed JPEG may not shrink. Compare the two file sizes before you swap them on a site."
+      },
+      {
+        "question": "Can I choose the AVIF quality?",
+        "answer": "No, the page has no quality setting for you to change. For a set quality, use avifenc with its -q option on your own computer."
+      },
+      {
+        "question": "Is JPEG to AVIF lossless?",
+        "answer": "No. The JPEG is decoded to pixels and then encoded again, so detail the JPEG already lost does not come back."
+      },
+      {
+        "question": "Does the AVIF keep my EXIF, GPS and color profile?",
+        "answer": "No. Only the decoded pixels are re-encoded, so the EXIF data, ICC profile and XMP packet are not written. That removes camera and location details, but it also removes the color profile."
+      },
+      {
+        "question": "Will the AVIF have higher bit depth or HDR?",
+        "answer": "No. The image is held as 8-bit RGBA on the way, so the AVIF is 8 bits per channel. The format can store 10- and 12-bit pictures, but a JPEG gives it nothing more to store."
+      },
+      {
+        "question": "Which browsers can show an AVIF?",
+        "answer": "Current Chrome, Firefox and Safari show AVIF, while older browsers may not. Keep the JPEG as a fallback for readers on old software."
+      },
+      {
+        "question": "Is my photo uploaded to a server?",
+        "answer": "No. Your browser, or ImageMagick as a fallback, encodes the AVIF on your own device, so the photo never leaves it."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and AVIF",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container. It supports lossy and lossless compression, HDR and transparency.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "HDR and wide color gamut",
+          "10-bit and 12-bit depth"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPEG to AVIF",
+      "points": [
+        "The JPEG is decoded to pixels and encoded again, not repackaged.",
+        "There is no quality control on the page.",
+        "EXIF, ICC profiles and XMP are not carried over.",
+        "The AVIF is 8-bit, whatever AVIF itself allows."
+      ]
+    },
+    "guide": {
+      "title": "JPEG to AVIF: format guide",
+      "markdown": "### What is a JPEG file?\n\nJPEG, from the Joint Photographic Experts Group, is a lossy format defined in ISO/IEC 10918-1 and designed for photographs. It has adjustable quality and no alpha transparency, and it is supported everywhere. Files ending in .jpg or .jpeg are one and the same format. You find JPEGs as digital camera output, as photographs on the web, and in email attachments and photo sharing.\n\n### Programs that open JPEG files\n\n- **Windows, Mac and Linux:** GIMP opens JPEG files for editing, and ImageMagick can read them.\n- **Windows:** Windows Photos opens JPEG files.\n- **Mac:** Preview on macOS opens them.\n- **Web:** Google Chrome and Mozilla Firefox display JPG in the browser.\n- **Mobile:** Safari and Google Chrome for Android display it as well.\n\n### JPEG and AVIF compared\n\nAVIF comes from the Alliance for Open Media and packs AV1-compressed pictures into a HEIF container; people convert JPEGs to it chasing smaller files for the web. AVIF can be lossy or lossless, handles transparency, HDR and wide color gamut, and goes to 10 and 12 bits. A JPEG source brings none of that. This page decodes the JPEG to 8-bit RGBA pixels and encodes them again, so the AVIF is made from decoded pixels, not a repackaged JPEG. Older browsers may fail to show AVIF, so keep a JPEG fallback. Compare the two files at the size visitors will see before you replace one with the other.\n\n### Other ways to convert JPEG to AVIF\n\n- **avifenc (command line):** run `avifenc -q 80 photo.jpg photo.avif`. The `-q` option sets color quality from 0 to 100, where 100 is lossless.\n- **GIMP (Windows, Mac, Linux):** open the JPEG and use File > Export As… to write the AVIF. GIMP supports AVIF import and export from version 2.10.22.\n- **ImageMagick (command line):** run `magick photo.jpg photo.avif`. ImageMagick lists AVIF as a format it can read and write.\n\n### Problems with JPEG files\n\n- **Transparency is missing**: a JPEG cannot hold transparent pixels, so nothing transparent carries into the AVIF. Choose a format with alpha if you need it.\n- **An old photo frame rejects the JPEG**: some older photo frames will not open a progressive JPEG, so re-save it with progressive mode off.\n- **Quality numbers do not match between editors**: the same quality setting can compress differently from one editor to the next.\n- **Layers are gone**: a JPEG holds one flat picture, so keep your project file if you still need the layers.\n"
+    }
+  },
+  "jpeg-to-psd": {
+    "seo": {
+      "title": "Convert JPEG to PSD Online (Free)",
+      "h1": "JPEG to PSD Converter",
+      "description": "Save a JPEG as a PSD in your browser. The PSD is a flat picture built from the decoded pixels, with no layers, and no metadata carried over.",
+      "howToHeading": "How to convert JPEG to PSD"
+    },
+    "tool": {
+      "subtitle": "Save a JPEG photo as a PSD file built from its decoded pixels."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JPEG to a PSD?",
+        "answer": "Pick your JPEG here, let the page convert it, then download the PSD. Your JPEG is not changed."
+      },
+      {
+        "question": "Will the PSD have layers?",
+        "answer": "No. The PSD holds the JPEG as one flat picture. A JPEG is one flat picture, so add new layers in your editor."
+      },
+      {
+        "question": "Does converting JPEG to PSD improve quality?",
+        "answer": "No. The PSD is built from the pixels the JPEG decodes to, so blocky or soft detail stays as it is. Nothing is restored."
+      },
+      {
+        "question": "Will the PSD have a transparent background?",
+        "answer": "No. A JPEG stores no alpha, so the picture fills the whole canvas. To cut out a subject, make a mask in your editor."
+      },
+      {
+        "question": "Does the PSD keep the JPEG's EXIF and color profile?",
+        "answer": "No. The PSD receives only the pixels, with no EXIF block, ICC profile or XMP packet. Assign a profile in your editor if the colors matter."
+      },
+      {
+        "question": "Is the PSD 16-bit?",
+        "answer": "No. The page holds the picture as 8-bit pixels on the way, so there is no extra depth to store."
+      },
+      {
+        "question": "Can I convert a batch of JPEGs?",
+        "answer": "Yes. Select them together and each converts in turn and downloads as its own PSD. There is no ZIP."
+      },
+      {
+        "question": "Is my JPEG uploaded to a server?",
+        "answer": "No. ImageMagick writes the PSD inside your browser, so the JPEG stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and PSD",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
+        "details": [
+          "layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes",
+          "proprietary Adobe format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JPEG to PSD",
+      "points": [
+        "The PSD holds one flat picture. A JPEG has no layers to recover.",
+        "Detail the JPEG lost is not restored.",
+        "EXIF, ICC profiles and XMP are not carried over.",
+        "The pixels are held as 8-bit on the way."
+      ]
+    },
+    "guide": {
+      "title": "JPEG to PSD: format guide",
+      "markdown": "### What is a JPEG file?\n\nA JPEG is a compressed photograph. The Joint Photographic Experts Group defined the format in ISO/IEC 10918-1 for photos, and it trades some detail for small files at an adjustable quality. It has no alpha channel, and almost every program and device can open it. Both .jpg and .jpeg name the same format.\n\nCameras write JPEG, web pages serve it, and email attachments and shared photos use it. People convert JPEG to PSD to retouch a photo in Photoshop, or to meet a PSD upload requirement.\n\n### Programs that open JPEG files\n\n- **Windows, Mac and Linux:** ImageMagick reads JPEG, and GIMP brings it in for retouching.\n- **Windows:** Windows Photos shows a JPEG.\n- **Mac:** Preview on macOS shows one too.\n- **Web:** Google Chrome and Mozilla Firefox show JPG pictures inline.\n- **Mobile:** Safari and Google Chrome for Android do the same.\n\n### JPEG and PSD compared\n\nA JPEG is a lossy picture with no alpha channel and no layers. PSD is Adobe Photoshop's native, proprietary format. It stores layers, masks, adjustment layers, text and color information so a design can be edited later, in RGB or CMYK mode with 16-bit and 32-bit channels.\n\nA PSD made from a JPEG has only the one picture, so the layers are yours to add. This page decodes the JPEG to pixels and writes them with ImageMagick, so the PSD is no sharper than the JPEG. Keep the JPEG as your original.\n\n### Other ways to convert JPEG to PSD\n\n- **GIMP (Windows, Mac, Linux):** open the JPEG, choose File > Export As… and give the file the .psd extension. GIMP does not convert every Photoshop feature exactly; some blending modes have no exact equivalent.\n- **Photopea (browser):** load the JPEG through File - Open, then run File - Save as PSD. Photopea converts every file you open into a PSD document.\n\n### Problems with JPEG files\n\n- **No text or layers**: a JPEG keeps no editable layer stack, so retype or rebuild anything that was flattened into the photo, and retain the project file next time.\n- **Compression blocks remain**: wrapping the pixels in a PSD cannot undo lossy damage.\n- **Nothing is see-through**: JPEG stores no transparency, so a design that needs it should go to a format with alpha.\n- **Quality numbers differ**: equal numbers in different programs can give a different look and size.\n"
+    }
+  },
+  "jxl-to-png": {
+    "seo": {
+      "title": "Convert JXL to PNG Online (Free)",
+      "h1": "JXL to PNG Converter",
+      "description": "Turn a JPEG XL image into a PNG. ImageMagick decodes it in your browser as one 8-bit still picture, and nothing is uploaded. Free, no sign-up.",
+      "howToHeading": "How to convert JXL to PNG"
+    },
+    "tool": {
+      "subtitle": "Decode a JPEG XL image into a PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JXL to PNG?",
+        "answer": "Pick your JXL file here and ImageMagick decodes it on your device. Then download the PNG. Your JXL is not changed."
+      },
+      {
+        "question": "Why can't I open my JXL file?",
+        "answer": "The program may lack a JPEG XL decoder, or its decoder may not cover what the file needs. A PNG avoids both problems."
+      },
+      {
+        "question": "Is JXL to PNG lossless?",
+        "answer": "PNG stores its pixels without loss. If the JXL was made with lossy compression, the detail it lost does not come back, and the PNG shows the picture as the JXL decodes."
+      },
+      {
+        "question": "What happens to an animated JXL?",
+        "answer": "You get one still PNG, because the page reads a single image. To get every frame, run djxl on your own computer, which writes a numbered output file for each frame."
+      },
+      {
+        "question": "Which programs open a JXL without converting?",
+        "answer": "GIMP, ImageMagick built with its JPEG XL delegate, and Safari open JXL files. Other programs may not, which is when a PNG helps."
+      },
+      {
+        "question": "Is the PNG 16-bit or HDR?",
+        "answer": "No. This ImageMagick build works at 8 bits per channel, so a high-bit-depth or HDR JXL becomes an 8-bit PNG."
+      },
+      {
+        "question": "Why did my JXL fail to convert?",
+        "answer": "An image above about 537 megapixels does not fit in the converter and stops with a message saying so."
+      },
+      {
+        "question": "Is my JXL uploaded, and can I do several together?",
+        "answer": "The JXL is decoded in your browser, so nothing is uploaded. Select several files and they are converted one by one, each as a separate PNG."
+      }
+    ],
+    "aboutSection": {
+      "title": "JXL and PNG",
+      "fromFormat": {
+        "name": "JPEG XL",
+        "fullName": "JPEG XL image",
+        "description": "An image format standardized as ISO/IEC 18181 by the Joint Photographic Experts Group. It supports lossy and lossless compression and can losslessly recompress existing JPEG files.",
+        "details": [
+          "lossy and lossless compression",
+          "lossless JPEG recompression",
+          "alpha transparency",
+          "animation"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting JXL to PNG",
+      "points": [
+        "You get one still picture, even from an animated JXL.",
+        "The PNG is 8-bit, so high bit depth and HDR are reduced.",
+        "Detail a lossy JXL discarded does not come back.",
+        "A picture over about 537 megapixels fails to convert."
+      ]
+    },
+    "guide": {
+      "title": "JXL to PNG: format guide",
+      "markdown": "### What is a JXL file?\n\nJPEG XL is an image coding system from the JPEG committee, standardized as ISO/IEC 18181. It offers lossy and lossless coding, alpha channels, animation, progressive decoding, and support for HDR, wide gamuts and high bit depth. It can also losslessly recompress an existing JPEG file. A .jxl file may hold just a codestream, or wrap one in a box-based container that also carries Exif, XMP and JUMBF metadata. The registered media type is image/jxl.\n\nPeople convert JXL to PNG when a program cannot decode JPEG XL.\n\n### Programs that open JXL files\n\n- **Windows, Mac and Linux:** GIMP has had stable JXL import support since version 2.10.32, and ImageMagick reads JXL when it has a JPEG XL delegate.\n- **Web:** Safari 17 added JPEG XL, and on iOS 17 and iPadOS 17 it decodes JPEG XL web images, which does not establish a separate photo-library editor.\n\n### JXL and PNG compared\n\nPNG is lossless, supports alpha transparency and stores 8-bit or 16-bit channels. A JXL can also be animated. This page decodes the JXL to one picture at 8 bits per channel, so any extra bit depth is lost. ImageMagick compiled to WebAssembly does the decoding, and the result is a PNG named after your file.\n\n### Other ways to convert JXL to PNG\n\n- **djxl (command line):** run `djxl image.jxl image.png`. The extension of the output file picks the format, and an animation writes one numbered file per frame.\n- **GIMP (Windows, Mac, Linux):** open the JXL, then use File > Export As… in GIMP to save it as PNG.\n- **ImageMagick (command line):** type `magick image.jxl image.png`. JXL is listed as readable and writable, and it needs a JPEG XL delegate library.\n\n### Problems with JXL files\n\n- **A program rejects the JXL**: its decoder may lack support for the profile or level the file needs.\n- **Metadata is missing**: a bare codestream lacks the container boxes that carry extra metadata.\n- **Only one frame appears here**: this page reads a single image. Use djxl for each frame of an animation.\n- **A large image fails**: pictures over about 537 megapixels do not fit here.\n"
+    }
+  },
+  "mp2-to-mp3": {
+    "seo": {
+      "title": "Convert MP2 to MP3 Online (Free)",
+      "h1": "MP2 to MP3 Converter",
+      "description": "Re-encode MPEG Layer II audio as MP3 in your browser. FFmpeg's LAME encoder does the work and the file never leaves your device. Free, no sign-up.",
+      "howToHeading": "How to convert MP2 to MP3"
+    },
+    "tool": {
+      "subtitle": "Re-encode MP2 broadcast or radio audio as an MP3 in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP2 to MP3?",
+        "answer": "Select your MP2 file and FFmpeg re-encodes it as MP3 on your device. The MP3 downloads when it finishes, and the MP2 stays as it was."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "The page asks LAME for a fixed bitrate, and a source with a low sample rate gets a lower one, because MP3 cannot reach the requested figure there. There is no bitrate menu, so for a different rate use FFmpeg on your own computer."
+      },
+      {
+        "question": "Will the MP3 sound better than the MP2?",
+        "answer": "No. Both are lossy, and decoding cannot bring back sound the MP2 already omitted. The MP3 adds a second round of compression."
+      },
+      {
+        "question": "Is an MP2 file the same as MPEG-2 video?",
+        "answer": "No. MP2 here is MPEG Audio Layer II, which holds sound only, and this page converts audio files."
+      },
+      {
+        "question": "Why do I need MP3 instead of MP2?",
+        "answer": "MP2 mostly lives in broadcast and DVD-Video audio. MP3 is the format music libraries and portable players expect, and almost any device can play it."
+      },
+      {
+        "question": "Can I change the sample rate or channels?",
+        "answer": "No, neither can be set here. If a delivery spec demands a certain sample rate or channel layout, Audacity lets you set the sample rate and channels when you export."
+      },
+      {
+        "question": "Can I convert several MP2 files at once?",
+        "answer": "Select several MP2 files and each is converted in turn, then saved as its own MP3. They are not zipped or joined."
+      },
+      {
+        "question": "Does the MP2 get uploaded anywhere?",
+        "answer": "No. The MP2 is decoded and re-encoded by FFmpeg on your own machine, so it never goes to a server."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP2 and MP3",
+      "fromFormat": {
+        "name": "MP2",
+        "fullName": "MPEG-1 Audio Layer II",
+        "description": "A lossy audio format standardized by MPEG, defined as Layer II of MPEG-1 Audio. It is used in digital radio, DVD-Video and broadcast television.",
+        "details": [
+          "lossy compression",
+          "low decoding complexity",
+          "predecessor of MP3 Layer III"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP2 to MP3",
+      "points": [
+        "There is no bitrate, sample rate or channel setting on this page.",
+        "It is a second lossy generation. A higher bitrate cannot restore what the MP2 lost.",
+        "MP2 here is Layer II audio, not MPEG-2 video.",
+        "Several MP2 files can be chosen at once, and each MP3 downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "MP2 to MP3: format guide",
+      "markdown": "### What is an MP2 file?\n\nAn MP2 file holds MPEG Audio Layer II, a lossy format with perceptual coding, defined in ISO/IEC 11172-3 and completed in 1992. ISO/IEC 13818-3 extends Layer II for MPEG-2. Its decoding complexity is low, and it is the predecessor of MP3, which is Layer III. You meet Layer II in digital radio, on DVD-Video soundtracks, in broadcast television and in Video CD production. The Library of Congress lists audio/mpeg as the media type for MP2 files.\n\nAn .mp2 audio file is not MPEG-2 video. People convert MP2 to MP3 for players, music libraries and apps that expect MP3.\n\n### Programs that open MP2 files\n\n- **Windows, Mac and Linux:** FFmpeg decodes and encodes MP2, ffplay plays it as well, and Audacity imports MP2 files natively.\n\n### MP2 and MP3 compared\n\nBoth are lossy, so converting decodes Layer II and encodes Layer III, which adds a second round of loss. The MP3 here is made with LAME, which is asked for 192 kb/s. MP3, developed with major contributions from the Fraunhofer Society, grew into the most widely used format for music downloads. It supports constant or variable bitrate and ID3 tags, and it plays on nearly every device. The download is named after your MP2 with the .mp3 extension. A higher bitrate cannot recover sound the MP2 already left out. Editing the MP3 and exporting another MP3 adds a third lossy stage, so do your editing on the MP2 or a lossless copy.\n\n### Other ways to convert MP2 to MP3\n\n- **FFmpeg (command line):** enter `ffmpeg -i input.mp2 -c:a libmp3lame -b:a 192k output.mp3`.\n- **Audacity (Windows, Mac, Linux):** bring the MP2 in with File > Import > Audio, then open File > Export Audio and select MP3.\n\n### Problems with MP2 files\n\n- **Mistaken for video**: Layer II is an audio coding, so a file that carries a picture is the wrong source here.\n- **Lost detail**: lossy MP2 coding omits sound information, and decoding cannot recover what was discarded.\n- **Surround needs speakers**: multichannel playback needs a suitable multichannel speaker arrangement.\n- **A player offers no MP2 support**: convert the file to MP3.\n"
+    }
+  },
+  "mp4-to-mjpeg": {
+    "seo": {
+      "title": "Convert MP4 to MJPEG Online (Free)",
+      "h1": "MP4 to MJPEG Converter",
+      "description": "Turn an MP4 into Motion JPEG video where every frame is its own JPEG, easy to edit frame by frame. It runs in your browser, so the MP4 stays on your device.",
+      "howToHeading": "How to convert MP4 to MJPEG"
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 as Motion JPEG video, with each frame stored as a JPEG."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to MJPEG?",
+        "answer": "Load your MP4 and FFmpeg re-encodes the video as Motion JPEG on your device. The file downloads once it finishes, and your MP4 is untouched."
+      },
+      {
+        "question": "What is inside the MJPEG download?",
+        "answer": "The file is named after your MP4 with the .mjpeg ending. Inside, every video frame is its own JPEG and the sound is 16-bit PCM, packed in an AVI wrapper."
+      },
+      {
+        "question": "Why can the MJPEG file be bigger than my MP4?",
+        "answer": "MJPEG codes every frame as a separate JPEG with nothing shared between frames, so the file grows. The sound, now uncompressed PCM, adds to the size."
+      },
+      {
+        "question": "What happens to the sound?",
+        "answer": "The audio is converted to uncompressed 16-bit PCM and stored beside the video. There is no setting for it."
+      },
+      {
+        "question": "Does the video keep its size and frame rate?",
+        "answer": "A picture too large for the page's size limit is scaled down, while a smaller one stays at its size. Both sides come out even, so an odd width or height loses a pixel. When the source runs faster, frames are dropped and the length stays the same."
+      },
+      {
+        "question": "Can I set the JPEG quality?",
+        "answer": "No. The page uses one fixed quality setting for every frame. For a quality of your own, run FFmpeg with the -q:v option on your computer."
+      },
+      {
+        "question": "Is interlaced video deinterlaced?",
+        "answer": "Yes, but only when the file flags its frames as interlaced. Those frames are deinterlaced before encoding, and progressive video is left as it is."
+      },
+      {
+        "question": "Is my MP4 uploaded to a server?",
+        "answer": "No. The video is processed by FFmpeg inside your browser and is never sent anywhere."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and MJPEG",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "MJPEG",
+        "fullName": "Motion JPEG",
+        "description": "A video codec that compresses each frame as a separate JPEG image. It does not use compression between frames, so every frame can be edited alone.",
+        "details": [
+          "each frame is a JPEG",
+          "intraframe only",
+          "larger files than H.264",
+          "easy to edit frame by frame"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP4 to MJPEG",
+      "points": [
+        "The video is re-encoded as Motion JPEG and the sound becomes 16-bit PCM.",
+        "Each frame is a separate JPEG, so files usually come out larger than H.264.",
+        "The picture is fitted to a size and frame-rate ceiling, with even dimensions.",
+        "The JPEG quality is fixed, and interlaced frames are deinterlaced."
+      ]
+    },
+    "guide": {
+      "title": "MP4 to MJPEG: format guide",
+      "markdown": "### What is an MP4 file?\n\nMP4 is MPEG-4 Part 14 (ISO/IEC 14496-14), a container for video, audio and metadata. H.264 video with AAC audio is the pairing you will meet most. MP4 turns up as online video and streams, as phone and camera recordings, and as files passed between people.\n\nBecause MP4 is a container, the codec inside decides what a player needs.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** ffplay plays MP4, and mpv plays it on the desktop.\n- **Windows and Mac:** Adobe Premiere imports MP4 once the decoder it needs is present.\n- **Web:** Firefox plays supported media directly, and Chrome plays supported MP4 combinations.\n- **Mobile:** VLC on Android (VLC for Android) and on iPhone (VLC for iOS) both play MP4, and decoding depends on the media inside.\n\n### MP4 and MJPEG compared\n\nMotion JPEG codes a video as a succession of individually JPEG-coded images, with no compression between frames, so its files usually come out larger than H.264. It is a video encoding rather than a container: AVI files commonly mark it with the MJPG FourCC, and QuickTime is another wrapper. This page stores the Motion JPEG in an AVI wrapper, turns the sound into 16-bit PCM and limits the picture to 1920 px on the longer side and the frame rate to 30 fps. Frames flagged as interlaced are deinterlaced first. MJPEG turns up in webcams and IP cameras, video editing and digital cameras' video modes. The OpenDML extension to AVI defines a profile for storing MJPEG, and production workflows may edit MJPEG and then use another encoding for delivery.\n\n### Other ways to convert MP4 to MJPEG\n\n- **FFmpeg (command line):** enter `ffmpeg -i input.mp4 -c:v mjpeg -q:v 5 output.avi`. It applies none of this page's size or frame-rate limits.\n\n### Problems with MP4 files\n\n- **No decoder for what is inside**: a container can be supported while the decoder for its video or sound is missing.\n- **An unfinished file will not play**: an MP4 interrupted while being written can be unplayable, since its packet metadata is stored together.\n- **No audio track to extract**: audio editors need an audio track, and an MP4 without one has none to give.\n"
+    }
+  },
+  "mp4-to-wma": {
+    "seo": {
+      "title": "Convert MP4 to WMA Online (Free)",
+      "h1": "MP4 to WMA Converter",
+      "description": "Extract the sound of an MP4 video as a WMA file. FFmpeg encodes the audio in your browser, drops the picture, and uploads nothing. Free, no sign-up.",
+      "howToHeading": "How to convert MP4 to WMA"
+    },
+    "tool": {
+      "subtitle": "Save the soundtrack of an MP4 video as a Windows Media Audio file."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to WMA?",
+        "answer": "Pick your MP4 and FFmpeg pulls out the sound and encodes it as WMA on your device. Save the WMA when it appears; the MP4 is left alone."
+      },
+      {
+        "question": "Does the WMA keep the video?",
+        "answer": "No. WMA is an audio format, so the picture is dropped and the file holds only the sound."
+      },
+      {
+        "question": "Which WMA encoder and bitrate does the page use?",
+        "answer": "FFmpeg's wmav2 encoder at 192 kb/s. There is no setting to change either."
+      },
+      {
+        "question": "Why does MP4 to WMA stop with an error?",
+        "answer": "One thing that triggers it is an MP4 with no audio track, which gives the encoder nothing to write, so the page reports an FFmpeg failure with an exit code. Check that the video has sound by playing it in VLC."
+      },
+      {
+        "question": "Which track does the WMA come from if my MP4 has several?",
+        "answer": "The page passes no -map option and has no track picker, so FFmpeg's defaults decide. To choose one track yourself, use FFmpeg's -map option on your own computer."
+      },
+      {
+        "question": "Will the WMA sound as good as the MP4?",
+        "answer": "No. The conversion starts from the MP4's decoded sound, so the WMA cannot sound better than the source audio."
+      },
+      {
+        "question": "Which programs play WMA files?",
+        "answer": "VLC media player, Audacity and FFmpeg handle WMA on Windows, Mac and Linux. Audacity needs its optional FFmpeg library, and it skips protected files."
+      },
+      {
+        "question": "Is my MP4 uploaded, and can I batch several?",
+        "answer": "No upload happens: FFmpeg runs as WebAssembly in your browser. Select more than one MP4 and the page converts each in turn, saving every WMA separately."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and WMA",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "A family of audio codecs developed by Microsoft and stored in the ASF container. The standard version is lossy, and a WMA Lossless variant exists.",
+        "details": [
+          "lossy (and lossless) variants",
+          "ASF container",
+          "proprietary Microsoft format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MP4 to WMA",
+      "points": [
+        "The WMA holds the sound only. The picture is dropped.",
+        "A video with no sound ends in an FFmpeg error.",
+        "The page cannot choose between audio tracks.",
+        "The sound is encoded a second time."
+      ]
+    },
+    "guide": {
+      "title": "MP4 to WMA: format guide",
+      "markdown": "### What is an MP4 file?\n\nMP4 is formally MPEG-4 Part 14, standardized as ISO/IEC 14496-14: one file can hold video, audio, subtitles and chapters. The usual video and audio inside is H.264 with AAC, though H.265 and AV1 video turn up as well. Phones and cameras record MP4, and it is a common choice for online video, streaming and sharing.\n\nPeople pull WMA out of an MP4 to get a listening copy for a Windows media library or an older portable player.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** ffplay and mpv open an MP4 on the desktop.\n- **Windows and Mac:** Adobe Premiere imports the container when it has the decoder.\n- **Web:** Firefox plays MP4 directly, and Chrome plays supported combinations.\n- **Mobile:** VLC for Android and VLC for iOS both open MP4.\n\n### MP4 and WMA compared\n\nMP4 is a general container for video and audio. Windows Media Audio is a family of audio codecs from Microsoft, stored in the ASF container. The standard version is lossy, with Professional, Lossless and Voice variants, and the .wma ending marks audio-only ASF content without telling you which variant a file uses. The WMA made here is encoded by FFmpeg at 192 kb/s. WMA is used to deliver audio and sometimes for intermediate storage, and its common media type is audio/x-ms-wma.\n\nThe sound is decoded and encoded again, so the WMA cannot beat the MP4's audio. Converting to WMA also costs the picture.\n\n### Other ways to convert MP4 to WMA\n\n- **FFmpeg (command line):** enter `ffmpeg -i input.mp4 -vn output.wma`. The `-vn` option drops the video.\n- **Audacity (Windows, Mac, Linux):** install the FFmpeg library and import the MP4. In File > Export Audio, the format to pick is WMA (version2) Files (FFmpeg).\n\n### Problems with MP4 files\n\n- **Nothing to extract**: with no audio in the MP4 there is nothing for an audio editor or this page to take.\n- **Sound without a decoder**: a container a player reads successfully still needs a decoder for the sound inside.\n- **A cut-off recording**: because packet metadata sits together in a normal MP4, a write interrupted midway may leave a file that will not open.\n"
+    }
+  },
+  "mpeg2-to-mp4": {
+    "seo": {
+      "title": "Convert MPEG2 to MP4 Online (Free)",
+      "h1": "MPEG2 to MP4 Converter",
+      "description": "Re-encode MPEG-2 video as an H.264 MP4 with AAC sound in your browser. Frames flagged as interlaced are deinterlaced before the encode.",
+      "howToHeading": "How to convert MPEG2 to MP4"
+    },
+    "tool": {
+      "subtitle": "Re-encode MPEG-2 video as H.264 with AAC sound in an MP4."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MPEG2 to MP4?",
+        "answer": "Choose your .mpeg2 file and FFmpeg re-encodes it as H.264 on your device. The MP4 downloads when it is ready and the original is untouched."
+      },
+      {
+        "question": "Does the converter just put the MPEG-2 video in an MP4?",
+        "answer": "No. The video is not copied across. It is re-encoded as H.264 and the sound as AAC, which takes longer than a rewrap and is a new lossy encoding."
+      },
+      {
+        "question": "My video ends in .mpg, .mpeg, .vob or .m2v. Can I use this page?",
+        "answer": "This page's file picker shows files ending in .mpeg2. For the other endings, use the [MPG to MP4](/mpg-to-mp4/), [MPEG to MP4](/mpeg-to-mp4/), [VOB to MP4](/vob-to-mp4/) or [M2V to MP4](/m2v-to-mp4/) converter."
+      },
+      {
+        "question": "Will the MP4 look worse than my MPEG-2 file?",
+        "answer": "It can look softer. The page favors speed and a small file, and the encode adds its own loss to whatever the MPEG-2 file already lost."
+      },
+      {
+        "question": "Does it fix interlaced video?",
+        "answer": "When the source marks its frames as interlaced, they are deinterlaced before the H.264 encode, so moving edges do not comb. Progressive video is left as it is."
+      },
+      {
+        "question": "Will the MP4 have the same picture size as my video?",
+        "answer": "A smaller picture keeps its size, because nothing is scaled up. A larger one is scaled down with its shape kept, and both sides come out even."
+      },
+      {
+        "question": "Does a fast frame rate shorten the video?",
+        "answer": "No. When the source runs faster than the page allows, frames are dropped and the MP4 keeps the same length. A source that is slower keeps the rate it has."
+      },
+      {
+        "question": "Does my MPEG-2 video get uploaded?",
+        "answer": "No. Your browser runs FFmpeg locally and the video is not sent anywhere. Long files take longer on slower devices."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPEG2 and MP4",
+      "fromFormat": {
+        "name": "MPEG-2",
+        "fullName": "MPEG-2 video",
+        "description": "A video and audio coding standard from MPEG (ISO/IEC 13818, ITU-T H.262). It is used for DVD-Video, digital television and broadcast.",
+        "details": [
+          "lossy compression",
+          "interlaced video support",
+          "program and transport streams",
+          "H.262"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting MPEG2 to MP4",
+      "points": [
+        "The video is re-encoded as H.264 with AAC sound, not copied across.",
+        "The page favors speed and a small file, so the MP4 can look softer.",
+        "Large pictures are scaled down and fast frame rates are capped, with even dimensions.",
+        "The picker takes .mpeg2 files. Other endings have their own converters."
+      ]
+    },
+    "guide": {
+      "title": "MPEG2 to MP4: format guide",
+      "markdown": "### What is an MPEG2 file?\n\nMPEG2 video, written MPEG-2 in the standards, is the picture coding defined by ISO/IEC 13818-2 and ITU-T H.262. It combines block transforms with prediction between frames, and it supports interlaced video. An MPEG2 file is used for DVD-Video, digital television and broadcast.\n\nA video elementary stream holds pictures and decoding headers. A program stream can bundle audio and picture streams, while a transport stream can carry several programs. People convert MPEG2 recordings to MP4 for a copy that plays in more places.\n\n### Programs that open MPEG2 files\n\n- **Windows, Mac and Linux:** ffplay plays MPEG2 video, and FFmpeg reads MPEG-2 video along with MPEG program and transport streams.\n\n### MPEG2 and MP4 compared\n\nMPEG-2 is a video coding standard, and MP4 is a container able to carry H.264, H.265 or AV1 video along with subtitles and chapters. Converting here means a new H.264 encode, with AAC sound, in an MP4 whose index is written first. The size ceiling is 1920 px on the longer edge, the frame-rate ceiling is 30 fps, dimensions come out even, and nothing is scaled up.\n\nAn MP4 opens in mpv and in web browsers such as Firefox and Chrome. Whether it plays still depends on the decoders for the video and sound inside it.\n\n### Other ways to convert MPEG2 to MP4\n\n- **FFmpeg (command line):** FFmpeg supports MPEG-2 video as input. Run `ffmpeg -i input.mpeg2 -c:v libx264 -c:a aac output.mp4` to encode the video with libx264 and the sound with the AAC encoder.\n- **Avidemux (Windows, Mac, Linux):** open the file with the Open button, set the video encoder to Mpeg4 AVC (x264) instead of Copy, set the output format to MP4 Muxer and save.\n\n### Problems with MPEG2 files\n\n- **Unclear stream type**: the codec name MPEG-2 leaves open whether the file is an elementary, program or transport stream.\n- **Combing on moving edges**: MPEG-2 supports interlaced video, and this page deinterlaces only frames flagged as interlaced.\n- **Frames that lean on others**: predicted pictures depend on reference pictures, so not every encoded frame stands alone.\n- **Lost detail**: MPEG-2 compression can reduce detail, and the encoder settings affect the visible result.\n- **The file will not load**: this page takes .mpeg2 files. Use the MPG, MPEG, VOB or M2V page for the others.\n"
+    }
+  },
+  "opus-to-m4a": {
+    "seo": {
+      "title": "Convert OPUS to M4A Online (Free)",
+      "h1": "OPUS to M4A Converter",
+      "description": "Re-encode Opus audio as AAC in an M4A file in your browser, so Apple Music and other players without Opus support can open it. Nothing is uploaded.",
+      "howToHeading": "How to convert OPUS to M4A"
+    },
+    "tool": {
+      "subtitle": "Re-encode Opus audio as AAC in an M4A container."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert OPUS to M4A?",
+        "answer": "Add your Opus file and FFmpeg re-encodes it as AAC on your device. The M4A is ready to download when that ends, and the Opus file is untouched."
+      },
+      {
+        "question": "What audio is inside the M4A?",
+        "answer": "AAC, written by FFmpeg. The page does not make Apple Lossless (ALAC) files, and there is no setting to change the codec or bitrate."
+      },
+      {
+        "question": "Will the M4A sound better than the Opus?",
+        "answer": "No. Both are lossy, and the conversion decodes the Opus and compresses it again as AAC. Detail the Opus left out does not come back."
+      },
+      {
+        "question": "Why is my M4A bigger than the Opus file?",
+        "answer": "Opus can work at far lower bitrates than the page asks of the AAC encoder, and a voice recording is often small. A low-bitrate Opus can therefore give a larger M4A."
+      },
+      {
+        "question": "Why do I need M4A instead of Opus?",
+        "answer": "Opus is not supported in every music app or editor, while M4A is widely supported and plays in Apple Music, VLC and Windows Media Player. Convert when a program refuses your .opus file."
+      },
+      {
+        "question": "Can I choose the sample rate or channels?",
+        "answer": "No. The page passes no rate or channel option to FFmpeg and offers no control over either."
+      },
+      {
+        "question": "Can I convert several Opus files at once?",
+        "answer": "Yes, choose several Opus files together. They run one at a time and each M4A downloads separately, with nothing zipped or merged."
+      },
+      {
+        "question": "Is my Opus file sent to a server?",
+        "answer": "No. Your Opus file never leaves the browser tab: FFmpeg works on it locally."
+      }
+    ],
+    "aboutSection": {
+      "title": "Opus and M4A",
+      "fromFormat": {
+        "name": "Opus",
+        "fullName": "Opus audio",
+        "description": "An open lossy audio codec standardized by the IETF in RFC 6716. It works well for both speech and music and for low-delay use.",
+        "details": [
+          "lossy compression",
+          "low latency",
+          "bitrates from 6 to 510 kbit/s",
+          "royalty-free"
+        ]
+      },
+      "toFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art",
+          "widely supported"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting OPUS to M4A",
+      "points": [
+        "The M4A holds AAC. There is no bitrate, codec, sample rate or channel setting.",
+        "It is a second lossy generation, so detail Opus left out does not return.",
+        "A low-bitrate Opus can give a larger M4A.",
+        "Several files can be chosen at once, and each M4A downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "OPUS to M4A: format guide",
+      "markdown": "### What is an Opus file?\n\nOpus became an IETF standard in September 2012 as RFC 6716, an open, royalty-free audio codec. It builds on SILK from Skype and CELT from Xiph.Org, and works well for speech, music and low-delay use. Bitrates run from 6 to 510 kbit/s. A .opus file commonly stores the sound in an Ogg stream, as RFC 7845 specifies, with descriptive metadata and seeking.\n\nIts uses include voice chat and calls, streaming and low-bitrate speech recordings. People convert Opus to M4A when a music app, editor or device does not accept Opus.\n\n### Programs that open Opus files\n\n- **Windows, Mac and Linux:** FFmpeg's Ogg muxer accepts Opus, and opusdec, the decoder in the Opus project's opus-tools, decodes .opus files.\n\n### Opus and M4A compared\n\nOpus is a codec, while M4A is an audio-only MPEG-4 file that usually holds AAC, or lossless ALAC. M4A supports metadata tags and cover art, and it is used for iTunes and Apple Music tracks, podcasts and iPhone voice memos. The M4A made here holds AAC, never ALAC, and the page asks FFmpeg for 192 kb/s. Both formats are lossy, so converting adds a second round of compression. Pick M4A when the target app lists AAC but not Opus.\n\n### Other ways to convert Opus to M4A\n\n- **FFmpeg (command line):** enter `ffmpeg -i input.opus -c:a aac -b:a 192k output.m4a`. FFmpeg decodes the Opus audio and writes AAC.\n- **opusdec and Audacity:** decode with `opusdec input.opus output.wav`. In Audacity, bring in the WAV via File > Import > Audio, then choose M4A(AAC) Files FFmpeg in the Format dropdown of File > Export Audio. Audacity needs its optional FFmpeg library for AAC export.\n\n### Problems with Opus files\n\n- **A program rejects the Opus**: a program that reads Vorbis in Ogg may still fail on Opus, since Opus uses its own Ogg headers. Converting to M4A avoids the problem.\n- **Unwanted leading samples**: a reader that ignores the pre-skip value plays extra samples at the start, and Ogg Opus says how to apply it.\n- **A sample rate that looks wrong**: Ogg Opus counts its playback timing at 48 kHz, which is not necessarily the rate the recording started with.\n"
+    }
+  }
+}

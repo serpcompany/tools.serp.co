@@ -1,0 +1,702 @@
+{
+  "svg-to-svg": {
+    "seo": {
+      "title": "Convert SVG to SVG Online (Free)",
+      "h1": "SVG to SVG Converter",
+      "description": "Re-save an SVG as a new SVG holding your drawing as one embedded PNG. Nothing is traced, so it no longer scales like a vector. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an SVG into an SVG that wraps your drawing as a single PNG picture."
+    },
+    "faqs": [
+      {
+        "question": "Does SVG to SVG keep my paths and text?",
+        "answer": "No. Your browser draws the SVG, and the page saves that drawing as a PNG inside a new SVG. Shapes and text become pixels."
+      },
+      {
+        "question": "Will the new SVG scale without blurring?",
+        "answer": "No. The PNG inside is a fixed grid of pixels, so enlarging the SVG stretches those pixels and softens the picture."
+      },
+      {
+        "question": "Is this the same as optimizing or minifying an SVG?",
+        "answer": "No. The page does not clean up or shorten your markup. It replaces the drawing with a picture of it."
+      },
+      {
+        "question": "What happens to pictures and fonts my SVG links to?",
+        "answer": "Because the browser treats the SVG as a picture, nothing outside the file loads: a picture, a style sheet or a font it merely points to never appears, online or not. Pictures embedded as data, inline styles and any font already installed on your device still draw."
+      },
+      {
+        "question": "Do transparent areas stay transparent?",
+        "answer": "Yes. No backdrop is added, so see-through regions of the original stay see-through in the embedded PNG."
+      },
+      {
+        "question": "Why would I want a flattened SVG?",
+        "answer": "Text and shapes become pixels, so an app that shows the new SVG no longer needs your original fonts to draw them."
+      },
+      {
+        "question": "What size will the result be?",
+        "answer": "The PNG and the new SVG both take the pixel width and height your browser reports for the original, and the page adds no scale factor or size cap."
+      },
+      {
+        "question": "Can I send a stack of SVG files together?",
+        "answer": "Yes. Choose as many as you like; they are handled one by one, and each result downloads separately as an SVG, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and SVG",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML graphics document that can combine vector objects with embedded pictures.",
+        "details": [
+          "Vector objects and raster images",
+          "XML structure"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML graphics document that can combine vector objects with embedded pictures.",
+        "details": [
+          "Vector objects and raster images",
+          "XML structure"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting SVG to SVG",
+      "points": [
+        "The new SVG holds one embedded PNG, not your paths or text.",
+        "The picture keeps the original's pixel size, with nothing resized or traced.",
+        "Transparent areas stay transparent, and metadata is not carried over."
+      ]
+    },
+    "guide": {
+      "title": "Understanding SVG to SVG",
+      "markdown": "### What is an SVG file?\n\nShort for Scalable Vector Graphics, SVG is a W3C standard vector format written in XML. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness. It is used for logos and icons on the web, illustrations and diagrams, and charts and maps. An SVG can also embed pictures, and those parts keep their own pixel resolution when the drawing is enlarged.\n\nSVG to SVG sounds like a no-op, but the output is a different kind of file: a picture wrapped in SVG markup.\n\n### Programs that open SVG files\n\n- **Windows, Mac and Linux:** Inkscape works on SVG natively, while Mozilla Firefox renders it.\n- **Web and mobile:** Google Chrome displays SVG on both, and Safari does so on mobile.\n\n### SVG and SVG compared\n\n- **Structure**: your original holds shapes, paths and text. The result holds one `<image>` element with a PNG embedded as base64.\n- **Size**: the picture is drawn 1:1 at the dimensions the browser gives the original.\n- **Tracing**: none. The picture is not turned back into vector shapes.\n- **Transparency**: the canvas starts transparent, so see-through areas survive in the PNG.\n- **Metadata**: nothing but raw pixels passes through, so EXIF, ICC and XMP data is gone.\n- **Privacy**: the drawing never leaves your device, since the page works in the browser.\n\n### Other ways to convert SVG to SVG\n\nThese work on the SVG itself instead of replacing it with a picture.\n\n- **Inkscape:** when you save, choose the Plain SVG type. Its manual describes it as meant for sharing your drawing with people who might not use Inkscape. Work on a separate copy.\n- **Scour:** run `scour -i design.svg -o cleaned.svg`. Its options are typically lossless but can be tweaked for more aggressive cleaning.\n- **SVGO:** run `svgo one.svg -o one.min.svg`. It has a plugin architecture, and the plugins are set in a config file such as `svgo.config.mjs`.\n\n### Problems with SVG files\n\n- **Pictures in other files vanish**: an SVG drawn as an image never loads them, online or not. Embed such pictures as data.\n- **Fonts change the drawing**: the text is laid out with whichever fonts exist, so a stand-in font can alter its look.\n- **Embedded pictures look soft when enlarged**: they keep their own pixel resolution. Keep your original for further editing.\n"
+    }
+  },
+  "webm-to-avi": {
+    "seo": {
+      "title": "Convert WebM to AVI Online (Free)",
+      "h1": "WebM to AVI Converter",
+      "description": "Convert WebM to AVI with MPEG-4 video and MP3 audio in your browser. Frames stay within 1920 px and 30 fps. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a WebM into an AVI with MPEG-4 video and MP3 sound, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the AVI just a renamed WebM?",
+        "answer": "No. The video is encoded again as MPEG-4 Part 2 and the sound as MP3. The page does not move the WebM streams into a new wrapper."
+      },
+      {
+        "question": "Which codecs does the AVI use?",
+        "answer": "Video is tagged xvid and encoded as MPEG-4 Part 2; audio is MP3 at 96 kbps. A player or editor needs decoders for both."
+      },
+      {
+        "question": "Does a 4K WebM stay 4K?",
+        "answer": "No. Anything above 1920 px on its longer side shrinks to that, aspect ratio kept, while a smaller video is not scaled up."
+      },
+      {
+        "question": "What happens to a 60 fps WebM?",
+        "answer": "The page lowers the rate to 30 fps by dropping frames. The clip keeps its length, though fast motion can look less smooth."
+      },
+      {
+        "question": "Why is my AVI one pixel narrower?",
+        "answer": "Each side is made divisible by 2, which trims an odd size by one pixel."
+      },
+      {
+        "question": "How good is the sound?",
+        "answer": "The audio is newly encoded as lossy MP3. The WebM's own audio track is not copied."
+      },
+      {
+        "question": "How long does a big WebM take?",
+        "answer": "The page sets no size limit or timeout. Encoding runs in one browser thread, so the wait depends on your device."
+      },
+      {
+        "question": "Do I have to convert WebM files one by one?",
+        "answer": "No. Select a batch and the page converts them in sequence, returning one AVI per WebM."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebM and AVI",
+      "fromFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "A web-oriented media container with defined video and audio codec combinations.",
+        "details": [
+          "Video and audio streams",
+          "Matroska-derived structure"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A RIFF-based multimedia container whose playback depends on its stream codecs.",
+        "details": [
+          "Multiple codec possibilities",
+          "RIFF chunks"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting WebM to AVI",
+      "points": [
+        "The WebM is encoded again; its streams are not copied into the AVI.",
+        "Large frames are cut down to fit 1920 px and fast clips to 30 fps.",
+        "An odd width or height loses one pixel, because both sides must be even."
+      ]
+    },
+    "guide": {
+      "title": "Understanding WebM to AVI",
+      "markdown": "### What is a WebM file?\n\nThe WebM Project promotes WebM as an open media format for web delivery, built on the Matroska container. It carries VP8 or VP9 video next to Vorbis or Opus audio, and the project supplies its format technology royalty-free. Its media types are video/webm for video files and audio/webm for sound-only ones.\n\n### Programs that open WebM files\n\n- **Windows, Mac, Linux, Android and iOS:** VLC media player reads Matroska-family media. The Android app carries the desktop player's decoding, and the iOS app plays local media without conversion.\n- **Windows, Mac and Linux:** FFplay plays WebM through FFmpeg's decoders.\n- **Web:** Safari on macOS added WebM in version 14.1; it covers VP8 and VP9 video plus Vorbis audio.\n\n### WebM and AVI compared\n\n- **AVI**: Microsoft's RIFF-based container, dating from Windows 3.1 and a 1992 specification. Its video may be raw, lossless or lossy, so a .avi name reveals nothing about quality.\n- **Video**: written by the FFmpeg `mpeg4` encoder and tagged xvid.\n- **Audio**: MP3 at 96 kbps.\n- **Frame size**: 1920 px is the ceiling for the longer side, and each side is trimmed to an even pixel count.\n- **Frame rate**: 30 fps at most.\n- **Interlacing**: frames marked as interlaced are deinterlaced.\n- **Tags**: the command has no `-map` or `-map_metadata`, so FFmpeg's defaults choose the streams and copy global tags, for example title or artist, wherever the AVI has a field for them.\n- **Privacy**: FFmpeg is compiled to WebAssembly and works in your browser, so the WebM is not uploaded. Several files run one after another, each downloading as its own AVI.\n\n### Other ways to convert WebM to AVI\n\n- **FFmpeg:** run `ffmpeg -i clip.webm clip.avi`. FFmpeg guesses the output format from the file extension.\n\n### Problems with WebM files\n\n- **Seeking is slow**: a missing cue index leaves the player with less direct location information.\n- **It plays in one app only**: the streams inside, rather than the .webm name, determine playback, so a player such as VLC must support them.\n- **An old Safari will not play it**: WebM playback arrived on macOS only with Safari 14.1, and only for VP8 or VP9 video with Vorbis sound.\n"
+    }
+  },
+  "xlsx-to-jpg": {
+    "seo": {
+      "title": "Convert XLSX to JPG Online (Free)",
+      "h1": "XLSX to JPG Converter",
+      "description": "Turn each visible XLSX sheet into a JPG picture of its table, with numbers and dates as Excel shows them. Free, in your browser, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn every visible sheet of an XLSX workbook into a JPG picture of its table."
+    },
+    "faqs": [
+      {
+        "question": "Do I get one JPG or one per sheet?",
+        "answer": "One JPG for each visible sheet that has values, saved under the workbook name plus the sheet name, such as report_Sales. Up to 100 sheets are drawn."
+      },
+      {
+        "question": "Are hidden sheets, rows and columns included?",
+        "answer": "No. Hidden and very hidden sheets, rows and columns are left out, as Excel leaves them out of a printout. The page counts the hidden sheets."
+      },
+      {
+        "question": "Do formulas show their results?",
+        "answer": "Yes, the result saved in the workbook. The page shows that stored value as it is."
+      },
+      {
+        "question": "Are my number and date formats kept?",
+        "answer": "Cells show what Excel shows: decimals, thousands separators, percentages, currency, dates, times and fractions. Dates work in both the 1900 and 1904 systems."
+      },
+      {
+        "question": "Are charts, pictures and colors drawn?",
+        "answer": "No. Charts, pictures, comments and colors are not drawn. Use Excel's own picture export when you need them."
+      },
+      {
+        "question": "What if my sheet is very wide or tall?",
+        "answer": "The picture holds as many rows and columns as fit within 4096 px a side. When some do not fit, a note in the image says so."
+      },
+      {
+        "question": "Why was my XLS or protected workbook refused?",
+        "answer": "An XLS file or a password-protected workbook is not read. Save it again as an unprotected .xlsx in Excel and convert that."
+      },
+      {
+        "question": "How do merged cells look?",
+        "answer": "A merged cell shows its value in its first cell. The first row of each sheet is drawn as the header."
+      }
+    ],
+    "aboutSection": {
+      "title": "XLSX and JPG",
+      "fromFormat": {
+        "name": "XLSX",
+        "fullName": "Office Open XML workbook",
+        "description": "A packaged spreadsheet document with worksheets, cell values, and formulas.",
+        "details": [
+          "Workbook structure",
+          "Saved formula results"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A raster image commonly using lossy compression for photographs.",
+        "details": [
+          "Fixed pixel dimensions",
+          "No alpha channel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting XLSX to JPG",
+      "points": [
+        "Each visible sheet with values becomes its own JPG, named after the sheet.",
+        "Hidden sheets, rows and columns are left out, and formulas show their saved results.",
+        "Charts, pictures, comments and colors are not drawn."
+      ]
+    },
+    "guide": {
+      "title": "Understanding XLSX to JPG",
+      "markdown": "### What is an XLSX file?\n\nXLSX is Microsoft Excel's XML workbook format, used since Excel 2007. A workbook is a ZIP package of Open Packaging Conventions parts, and several of those parts are XML documents. XLSX cannot store VBA code or Excel 4.0 macro sheets. Its media type is application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.\n\n### Programs that open XLSX files\n\n- **Windows, Mac and Linux:** LibreOffice Calc opens Excel workbook formats and imports Open XML Excel workbooks.\n- **Windows and Mac:** Microsoft Excel opens the workbook through File > Open.\n- **Mac:** Apple Numbers imports .xls and .xlsx files for editing.\n- **Linux:** Gnumeric documents Office Open XML import.\n- **Web:** Google Sheets imports Excel files, and Excel for the web opens XLSX directly.\n- **Mobile:** Numbers for iPhone imports XLSX, and Microsoft Excel for Android and iOS can edit it.\n\n### XLSX and JPG compared\n\n- **Sheets**: each visible sheet with values becomes one image, in order.\n- **Values**: cells show what Excel shows, and formulas show their saved results.\n- **Left out**: hidden sheets, rows and columns, plus charts, pictures, comments and colors.\n- **Size**: images stop at 4096 px a side, and a note appears when rows or columns do not fit.\n- **Refused**: XLS files and password-protected workbooks.\n- **Original**: your workbook is not changed and, since the page runs in your browser, not uploaded. You download new JPG files.\n- **Formulas**: a JPG of a sheet is a picture of its table and keeps no formulas, so keep the XLSX for calculations.\n\n### Other ways to convert XLSX to JPG\n\n- **Excel and GIMP:** select a range and use Home > Copy > Copy as Picture. Paste into GIMP via Edit > Paste as > Paste as New Image, and finish with File > Export As, saving a JPEG.\n- **LibreOffice Calc and GIMP:** choose File > Export As > Export as PDF, open the PDF in GIMP, where a dialog asks which page to import, and export a JPEG.\n- **Numbers and Preview:** in Numbers, export through File > Export To > PDF. Then open the PDF in Preview and save it with File > Export, choosing JPEG as the format.\n\n### Problems with XLSX files\n\n- **Saved as a CSV, formatting disappears**: a CSV keeps only the active sheet's data.\n- **A macro workbook loses its code**: saving as XLSX cannot retain VBA, so use a macro-enabled format.\n- **Very large files**: the page reads sheets within set limits, and a sheet that goes over them is left out and named.\n"
+    }
+  },
+  "avi-to-mpg": {
+    "seo": {
+      "title": "Convert AVI to MPG Online (Free)",
+      "h1": "AVI to MPG Converter",
+      "description": "Convert AVI to MPG with MPEG-2 video and MP2 audio in your browser. Frames stay within 1920 px and 30 fps. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an AVI into an MPG with MPEG-2 video and MP2 sound, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does the MPG play on a DVD player?",
+        "answer": "The page writes one media file. It builds no menus or DVD folders and does not author a disc, so a playable disc needs authoring software."
+      },
+      {
+        "question": "Which codecs does the MPG use?",
+        "answer": "The video becomes MPEG-2 and the sound becomes MP2 at 96 kbps. Neither stream is copied from the AVI. Both are encoded fresh."
+      },
+      {
+        "question": "Is the picture the same size as my AVI?",
+        "answer": "Larger pictures are scaled to fit 1920 px on the longer side with the aspect ratio kept, while smaller ones are never scaled up. Each side ends up even, which can cost an odd-sized frame one pixel."
+      },
+      {
+        "question": "How are very fast AVI captures handled?",
+        "answer": "Output never exceeds 30 fps. Extra frames are discarded and the length stays the same."
+      },
+      {
+        "question": "Will a damaged AVI still convert?",
+        "answer": "Usually. FFmpeg writes what it could read from a damaged or cut-short file, so the MPG may come out shorter than the original."
+      },
+      {
+        "question": "Is MPG the same as MPEG?",
+        "answer": "Yes. The .mpg and .mpeg endings both name MPEG video, with the media type video/mpeg."
+      },
+      {
+        "question": "Does converting touch my AVI file?",
+        "answer": "No. You download a new MPG, and the AVI you picked is left as it was."
+      },
+      {
+        "question": "Can I queue more than one AVI?",
+        "answer": "Yes. Select several and the page encodes them in order, giving you a separate MPG for each."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVI and MPG",
+      "fromFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A RIFF-based multimedia container whose playback depends on its stream codecs.",
+        "details": [
+          "Multiple codec possibilities",
+          "RIFF chunks"
+        ]
+      },
+      "toFormat": {
+        "name": "MPG",
+        "fullName": "MPEG video",
+        "description": "A media container used with MPEG video and accompanying audio.",
+        "details": [
+          "Video and sound",
+          "Codec compatibility matters"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AVI to MPG",
+      "points": [
+        "The MPG holds MPEG-2 video and MP2 audio at 96 kbps, both encoded again.",
+        "The longer side is capped at 1920 px and the frame rate at 30 fps.",
+        "The result is a media file, not an authored DVD."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AVI to MPG",
+      "markdown": "### What is an AVI file?\n\nMicrosoft introduced AVI, a RIFF container, alongside Windows 3.1, and the first specification dates from 1992. FOURCC codes name each stream's codec, and the header stores properties such as dimensions and frame rate. The video inside may be raw, lossless or lossy, which means .avi alone says nothing about quality. Production archives and older desktop workflows still hold many of these files.\n\n### Programs that open AVI files\n\n- **Windows, Mac and Linux:** FFplay and mpv play AVI.\n- **Windows and Mac:** Adobe Premiere imports it when a matching decoder exists.\n- **Mobile:** AVI files open in VLC's Android and iOS apps.\n\n### AVI and MPG compared\n\n- **MPG**: a suffix for MPEG video. MPEG-2 began as a standard for compressing television and later became the video format on DVDs.\n- **Video**: MPEG-2, from the FFmpeg `mpeg2video` encoder, so the picture is encoded again.\n- **Audio**: MP2 at 96 kbps, also encoded again from the AVI's sound.\n- **Picture size**: the longer side stops at 1920 px, and both dimensions are made even.\n- **Motion**: no more than 30 fps, and interlaced frames pass through a deinterlacer.\n- **Disc**: the result is a media file with no menus or DVD folders.\n- **Streams and tags**: with no stream mapping given, FFmpeg's defaults decide which streams go in, and global tags are copied where the MPG can hold them.\n- **Length**: frames above 30 fps are dropped, but the clip keeps its length.\n- **Privacy**: the conversion happens on your device, so the AVI never leaves it.\n\n### Other ways to convert AVI to MPG\n\n- **FFmpeg:** run `ffmpeg -i tape-capture.avi -c:a mp2 -q:v 4 -c:v mpeg2video recording.mpg`. FFmpeg takes the encoders from `-c:v` and `-c:a`, a fixed quality scale from `-q`, and the output format from the .mpg extension.\n\n### Problems with AVI files\n\n- **A tool recognizes the AVI yet cannot decode it**: it understands the container but lacks the decoder for the contents.\n- **A large capture fails**: the original AVI layout limits file size and OpenDML extended it, so big captures need software that supports the extension.\n- **Aspect ratio or scan type is wrong**: AVI implementations handle those flags inconsistently. Check the MPG before deleting the AVI.\n"
+    }
+  },
+  "bin-to-jpg": {
+    "seo": {
+      "title": "Convert BIN to JPG Online (Free)",
+      "h1": "BIN to JPG Converter",
+      "description": "Turn a picture saved as .bin, such as an Outlook ATT00001.bin attachment, into a JPG. Firmware and disc images are refused. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Turn a .bin file that holds a picture into a JPG, such as an Outlook attachment."
+    },
+    "faqs": [
+      {
+        "question": "Can any BIN file become a JPG?",
+        "answer": "No. Only a BIN that holds a picture converts. Firmware, disc images and other binary data are refused with a message saying the file isn't an image."
+      },
+      {
+        "question": "How does the page know what is inside my BIN?",
+        "answer": "It reads the start of the file, looking at up to its first 4096 bytes for a picture signature. It does not go by the .bin name."
+      },
+      {
+        "question": "What is ATT00001.bin?",
+        "answer": "Outlook often saves an email attachment under a name like ATT00001.bin. When that attachment is a picture, this page recognizes it and writes a JPG."
+      },
+      {
+        "question": "Does it handle MacBinary files?",
+        "answer": "Yes. Mac files saved in MacBinary also use the .bin extension. The page reads the 128-byte header and converts the picture in the data fork."
+      },
+      {
+        "question": "Which picture types can sit inside the BIN?",
+        "answer": "JPEG, PNG, GIF, WebP, HEIC, BMP, TIFF and many other formats are recognized."
+      },
+      {
+        "question": "What error means the picture is damaged?",
+        "answer": "A message says the file starts like a certain image type but the picture couldn't be read. It may be damaged, incomplete or too large to convert."
+      },
+      {
+        "question": "Will transparent areas stay transparent?",
+        "answer": "No. JPG has no alpha channel, so see-through areas cannot stay. Use the BIN to PNG page when you need transparency."
+      },
+      {
+        "question": "Can I convert a batch of Outlook attachments saved as .bin?",
+        "answer": "Yes. Select them all. Each is checked and converted in turn, and every JPG is a separate download."
+      }
+    ],
+    "aboutSection": {
+      "title": "BIN and JPG",
+      "fromFormat": {
+        "name": "BIN",
+        "fullName": "Binary data file",
+        "description": "A generic binary filename that does not identify one underlying format.",
+        "details": [
+          "Contents must be identified",
+          "Not inherently a picture"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A raster image commonly using lossy compression for photographs.",
+        "details": [
+          "Fixed pixel dimensions",
+          "No alpha channel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting BIN to JPG",
+      "points": [
+        "Only a .bin that holds a picture converts. Other binary data is refused.",
+        "The page reads the file's first bytes to find the picture, so the name does not matter.",
+        "JPG has no alpha channel, so transparent areas cannot stay."
+      ]
+    },
+    "guide": {
+      "title": "Understanding BIN to JPG",
+      "markdown": "### What is a BIN file?\n\nThe .bin extension is a catch-all for files holding raw binary data. The contents can be an image, a disc image, firmware or an email attachment, so the real type depends on the file. It has no fixed structure.\n\nFor this page, the useful cases are pictures saved under a .bin name. Outlook writes attachments as ATT00001.bin, a browser download can be saved as .bin, and a Mac file in MacBinary uses the same extension.\n\n### Programs that open BIN files\n\n- **Windows, Mac and Linux:** UltraEdit provides a hex view for .bin files, though that does not decode every BIN, and GNU Emacs Hexl inspects and edits the bytes through hexl-find-file.\n- **Web:** HexEd.it offers browser-based byte inspection and editing, but it is not a universal BIN interpreter.\n\n### BIN and JPG compared\n\n- **Detection**: the page looks at the first bytes of the file, up to 4096, and picks the engine for the picture it finds. A MacBinary file is read past its 128-byte header.\n- **Refusal**: a file with no picture signature is refused from its first bytes alone, so a disc image of several gigabytes is never read whole.\n- **Transparency**: a JPG cannot store alpha, so see-through pixels cannot be kept.\n- **Damaged pictures**: a file that starts like a picture but cannot be decoded fails with a message saying so.\n- **Original**: your BIN is not changed. You download a new JPG.\n\n### Other ways to convert BIN to JPG\n\n- **Pillow:** in Python, `Image.open(\"photo.bin\")` opens and identifies the file, `.convert(\"RGB\")` changes the mode, and `.save(\"photo.jpg\")` picks the JPEG format from the file name.\n- **ImageMagick:** run `magick photo.bin recovered.jpg`. It works only on a file ImageMagick can read as a picture.\n\n### Problems with BIN files\n\n- **A disc image or firmware file is refused**: those hold no picture, so no converter can turn them into a JPG.\n- **Raw samples have no picture layout**: a BIN of raw numbers carries no width, height or pixel arrangement, so nothing can draw it as an image.\n- **A hex editor can change the file**: look inside a BIN on a copy, because saving edited bytes alters it.\n- **You do not know what the file is**: check the source of the attachment, since a .bin name says nothing about the content.\n"
+    }
+  },
+  "bmp-to-svg": {
+    "seo": {
+      "title": "Convert BMP to SVG Online (Free)",
+      "h1": "BMP to SVG Converter",
+      "description": "Wrap a BMP in an SVG as one embedded PNG. Transparency is kept and nothing is traced into paths, so it stays a pixel picture. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Put a BMP inside an SVG as one embedded PNG picture, with nothing traced."
+    },
+    "faqs": [
+      {
+        "question": "Does BMP to SVG trace my picture into paths?",
+        "answer": "No. The SVG contains a single image element that carries your picture as base64 PNG data. Edges are not turned into editable vector shapes."
+      },
+      {
+        "question": "Will the SVG scale like a logo?",
+        "answer": "No. The embedded PNG has the BMP's pixel width and height. Enlarging the SVG stretches those pixels, so it softens like any bitmap."
+      },
+      {
+        "question": "Are my BMP colors kept exactly?",
+        "answer": "Pixels pass through 8-bit RGBA, so each channel is held at 8 bits in the embedded PNG."
+      },
+      {
+        "question": "How do I turn a BMP into real vector shapes?",
+        "answer": "Use a tracing tool. Potrace reads a black-and-white bitmap such as a BMP and writes SVG outlines. This page does not trace."
+      },
+      {
+        "question": "Does the SVG keep transparency?",
+        "answer": "Yes. The BMP's alpha channel travels into the embedded PNG, so clear areas remain clear."
+      },
+      {
+        "question": "Is any metadata carried over?",
+        "answer": "No. The conversion works from decoded pixels only, so EXIF, ICC profile and XMP data from the BMP are not written to the SVG."
+      },
+      {
+        "question": "What if my BMP will not load?",
+        "answer": "When the browser cannot read the BMP, the page stops with the message \"Image decode failed.\" and writes no SVG."
+      },
+      {
+        "question": "Is there a batch mode?",
+        "answer": "Select multiple BMPs and the page wraps each into its own SVG in turn. The results are separate downloads rather than a ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "BMP and SVG",
+      "fromFormat": {
+        "name": "BMP",
+        "fullName": "Bitmap image",
+        "description": "A raster image family with Windows and OS/2 variants.",
+        "details": [
+          "Pixel grid",
+          "Variant-dependent encoding"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML graphics document that can combine vector objects with embedded pictures.",
+        "details": [
+          "Vector objects and raster images",
+          "XML structure"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting BMP to SVG",
+      "points": [
+        "The SVG holds one embedded PNG, drawn at the BMP's pixel width and height.",
+        "Nothing is traced, so edges do not become vector paths.",
+        "Transparency is kept, and metadata is dropped."
+      ]
+    },
+    "guide": {
+      "title": "Understanding BMP to SVG",
+      "markdown": "### What is a BMP file?\n\nThe BMP family of raster images belongs to Microsoft and began on Windows and OS/2. Pixels are usually stored uncompressed, though lossless compression exists. BMP version 5 shipped with Windows 98 in 1998; it can carry an ICC profile and alpha. The registered media type is image/bmp. A BMP is commonly seen in Windows screen captures and system graphics.\n\n### Programs that open BMP files\n\n- **Windows, Mac and Linux:** ImageMagick and XnView MP read BMP.\n- **Web:** Mozilla Firefox and Google Chrome show BMP pictures inline.\n\n### BMP and SVG compared\n\n- **SVG**: an XML graphics format that can hold vector shapes and embedded pictures. This page uses the second ability, so the result suits a layout system that asks for an SVG file but not artwork that must scale cleanly.\n- **Structure**: the SVG holds one `<image>` element with the picture embedded as a base64 PNG.\n- **Size**: the embedded PNG matches the BMP's pixel dimensions, with no resizing or reduction.\n- **Tracing**: none. Pixels do not become paths.\n- **Transparency**: kept in the embedded PNG.\n- **Metadata**: not written to the SVG.\n- **Upload**: none, because the BMP stays on your device.\n- **Original**: your BMP is not changed. You download a new SVG.\n- **Display**: the SVG can be shown at any size, but a small BMP stays small and softens when stretched.\n- **Several files**: choose many BMPs at once; each becomes its own SVG, with no ZIP.\n\n### Other ways to convert BMP to SVG\n\n- **Inkscape:** choose File > Import, pick the BMP and select Embed when the dialog asks whether to link or embed it. Its manual lists bmp among the formats it imports.\n- **Potrace:** run `potrace -s -o outline.svg drawing.bmp` to trace a black-and-white bitmap into vector outlines instead of embedding it.\n\n### Problems with BMP files\n\n- **An uncompressed BMP is bulky**: PNG or JPEG may be more practical for distribution.\n- **An old program rejects the header**: tools such as ImageMagick can write BMP3 or BMP2 output rather than the default BMP version.\n- **A BMP has no editable vector shapes**: it also keeps no live typography, and an SVG wrapper does not add either.\n"
+    }
+  },
+  "csv-to-png": {
+    "seo": {
+      "title": "Convert CSV to PNG Online (Free)",
+      "h1": "CSV to PNG Converter",
+      "description": "Turn CSV rows into a PNG picture of the table in your browser. Tables past 4096 px a side show only their first rows and columns. Free, no sign-up."
+    }
+  },
+  "f4v-to-mp4": {
+    "seo": {
+      "title": "Convert F4V to MP4 Online (Free)",
+      "h1": "F4V to MP4 Converter",
+      "description": "Convert old Flash F4V video to MP4 with new H.264 video and AAC audio in your browser. Frames stay within 1920 px and 30 fps. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a Flash-era F4V video into an MP4 that plays in current apps and browsers."
+    },
+    "faqs": [
+      {
+        "question": "Is F4V the same as FLV?",
+        "answer": "No. F4V comes from the MPEG-4 family of containers, while FLV is a Flash video container that carries at most a single video track and a single audio track."
+      },
+      {
+        "question": "Does the page just change the wrapper?",
+        "answer": "No. The video is encoded again as H.264 and the sound as AAC. A stream copy that keeps the original encoding needs a desktop tool such as FFmpeg."
+      },
+      {
+        "question": "What video and audio does the MP4 have?",
+        "answer": "The MP4 carries H.264 pictures and AAC sound at 96 kbps. Its index is moved to the front so playback can start early."
+      },
+      {
+        "question": "Will my video keep its resolution?",
+        "answer": "Anything beyond 1920 px on its longer side is reduced with the aspect ratio kept, and smaller frames are never scaled up. Odd dimensions lose a pixel so both sides are even."
+      },
+      {
+        "question": "Does a 60 fps F4V keep its frame rate?",
+        "answer": "Output is held to 30 fps. A clip recorded faster loses frames but keeps its length, so quick motion may look less smooth."
+      },
+      {
+        "question": "Why won't my F4V play anywhere?",
+        "answer": "Browsers stopped playing Flash content, so nothing in them opens an F4V any more. An MP4 gives current apps something they can open."
+      },
+      {
+        "question": "Is my F4V uploaded?",
+        "answer": "No. Nothing leaves your device: the browser does the encoding and you download the new MP4."
+      },
+      {
+        "question": "Is batch conversion supported?",
+        "answer": "Yes. Add several F4V clips and they are encoded in order, each producing its own MP4."
+      }
+    ],
+    "aboutSection": {
+      "title": "F4V and MP4",
+      "fromFormat": {
+        "name": "F4V",
+        "fullName": "Flash MP4-family video",
+        "description": "An Adobe media container associated with MP4-family Flash delivery.",
+        "details": [
+          "Container format",
+          "Codec-dependent playback"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A multimedia container that can hold encoded video, audio, and related tracks.",
+        "details": [
+          "Container rather than one codec",
+          "Multiple stream types"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting F4V to MP4",
+      "points": [
+        "The video is encoded again as H.264 and the sound as AAC at 96 kbps.",
+        "The longer side stops at 1920 px and the frame rate at 30 fps.",
+        "Both sides are rounded down to even numbers, so an odd size loses 1 px."
+      ]
+    },
+    "guide": {
+      "title": "Understanding F4V to MP4",
+      "markdown": "### What is an F4V file?\n\nAdobe documents F4V among files derived from the MPEG-4 container structure. It is a container rather than the H.264 video codec itself. Adobe's playback API accepts H.264 video and HE-AAC v2 audio in these files, and Adobe AIR and Flash Player 9.0.115.0 added that support. F4V playback can deliver metadata and cue-point events. Flash Player support ended in 2020, so a browser no longer plays these files. Moving an archived clip to MP4 gives current players, editors and web pages a file they can open, provided they support H.264 and AAC.\n\n### Programs that open F4V files\n\n- **Windows, Mac and Linux:** FFmpeg, whose MOV-family demuxer recognizes the .f4v extension, opens F4V. VLC media player reads MP4 and MOV containers and decodes H.264 and AAC, so test the particular file.\n\n### F4V and MP4 compared\n\n- **Video**: encoded again as H.264 with the x264 encoder.\n- **Audio**: AAC at 96 kbps.\n- **Dimensions**: the longer side tops out at 1920 px; rounding then takes both sides down to an even number.\n- **Frame rate**: held to 30 fps, with a deinterlacing pass for interlaced frames.\n- **Layout**: the MP4 index is moved to the start so playback can begin before the whole file loads.\n- **Tags and tracks**: no mapping or metadata flags are passed, so FFmpeg picks the streams on its own.\n- **Original**: your F4V is not changed. The download is a new file with the same name and an .mp4 ending.\n- **Speed**: encoding runs in a single browser thread and has no size cap or timeout, so duration depends on your hardware.\n\n### Other ways to convert F4V to MP4\n\n- **FFmpeg:** run `ffmpeg -i archive.f4v -c copy migrated.mp4` to copy the streams without encoding again.\n- **Shotcut:** open the F4V, choose File > Export Video and click Export File. The Default settings make an H.264 MP4.\n\n### Problems with F4V files\n\n- **An old Flash embed stops working**: Adobe blocked Flash Player content after its retirement.\n- **A codec is not supported**: the archived Adobe player API covers the documented codec combinations, not every stream a container might hold.\n- **Cue points are missing**: some AIR iOS playback APIs omit the metadata and cue-point events available elsewhere.\n"
+    }
+  },
+  "gif-to-avif": {
+    "seo": {
+      "title": "Convert GIF to AVIF Online (Free)",
+      "h1": "GIF to AVIF Converter",
+      "description": "Convert a GIF to a still AVIF in your browser. Only the first frame is used, so animation is dropped. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save the first frame of a GIF as a still AVIF image."
+    },
+    "faqs": [
+      {
+        "question": "Will my animated GIF stay animated?",
+        "answer": "No. The AVIF is a still picture made from the first frame. Timing, looping and the other frames are not carried over."
+      },
+      {
+        "question": "Do I keep the GIF after converting?",
+        "answer": "Yes. Your GIF is left untouched on your device; the AVIF comes as a separate download."
+      },
+      {
+        "question": "Does the AVIF get the GIF's palette colors back?",
+        "answer": "No. Encoding as AVIF cannot restore colors lost when the GIF was made, so banding in the GIF stays banded."
+      },
+      {
+        "question": "Which frame is used?",
+        "answer": "The first one. If it is blank or a partial update, the AVIF looks incomplete, so pick a better frame in an editor first."
+      },
+      {
+        "question": "Can I get an animated AVIF from a GIF here?",
+        "answer": "No. This page writes still AVIF files only. An animated AVIF needs a desktop encoder that reads every frame."
+      },
+      {
+        "question": "Is any metadata kept?",
+        "answer": "No. Only the first frame's pixels are encoded, so EXIF, ICC profile and XMP information does not reach the AVIF."
+      },
+      {
+        "question": "Where does AVIF display?",
+        "answer": "Current Chrome, Firefox and Safari show still AVIF images. Older browsers need a JPEG, PNG or WebP fallback."
+      },
+      {
+        "question": "Can I do many GIFs in one go?",
+        "answer": "Yes. Pick them together and each gets its own AVIF, made one after another."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and AVIF",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A palette-based raster format supporting single pictures and animation.",
+        "details": [
+          "Palette colors",
+          "Optional frame sequence"
+        ]
+      },
+      "toFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An AV1 image format using a HEIF-based structure.",
+        "details": [
+          "Still images or sequences",
+          "AV1 compression"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting GIF to AVIF",
+      "points": [
+        "Only the first frame becomes the AVIF, so animation is dropped.",
+        "The AVIF is encoded from 8-bit pixels.",
+        "Metadata is dropped, and the GIF's palette colors are not restored."
+      ]
+    },
+    "guide": {
+      "title": "Understanding GIF to AVIF",
+      "markdown": "### What is a GIF file?\n\nGIF is a raster image format introduced by CompuServe in 1987. It uses LZW compression and a palette capped at 256 colors per frame, and supports simple animation. It is used for short looping animations, simple graphics and icons, and reaction images.\n\nAVIF is an image format built on AV1 compression. This page reads one frame of a GIF and writes it as a still AVIF. A moving GIF therefore becomes a single picture, which suits a poster image or a thumbnail but not a reaction clip.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:** GIMP exports one frame of a GIF or a multilayer animation, and ImageMagick reads GIF files too.\n- **Web:** Chrome, Firefox and Safari display a GIF picture directly.\n\n### GIF and AVIF compared\n\n- **Frames**: only the first frame is used. Timing, looping and disposal are not carried over.\n- **Quality**: the AVIF is lossy.\n- **Color**: pixels pass through 8-bit RGBA, and the GIF's palette is not restored.\n- **Metadata**: left behind; EXIF, ICC and XMP data is not written.\n- **Support**: still AVIF arrived in Safari on iOS 16 and in Firefox 93, with Chrome earlier.\n- **Size**: the picture keeps its pixel width and height. Nothing is resized.\n- **Errors**: a GIF the browser cannot decode stops with the message \"Image decode failed.\"\n- **Privacy**: the GIF stays on your device.\n\n### Other ways to convert GIF to AVIF\n\n- **GIMP:** open the GIF, go to File > Export As, save under an .avif name and set the AVIF dialog's options, such as Quality, Lossless and Encoder speed.\n- **ImageMagick:** run `magick \"animation.gif[0]\" cover.avif` to pick the first frame.\n- **Pillow:** open the GIF, call `seek(0)` and save a file ending in .avif. Pillow reads and writes AVIF and picks the format from the extension.\n\n### Problems with GIF files\n\n- **Soft transparent edges**: GIF cannot keep partial opacity.\n- **GIMP reduces a GIF export to 256 colors**: gradients can change.\n- **Frame disposal changes the picture**: later frames cover earlier ones, so a first frame alone may look incomplete.\n- **Older browsers fail to show AVIF**: supply a JPEG, PNG or WebP fallback.\n"
+    }
+  },
+  "icns-to-ico": {
+    "seo": {
+      "title": "Convert ICNS to ICO Online (Free)",
+      "h1": "ICNS to ICO Converter",
+      "description": "Turn a Mac ICNS icon into a single-image Windows ICO using its largest PNG icon, fitted within 256 px. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Turn a Mac ICNS icon into a Windows ICO holding its largest PNG image."
+    },
+    "faqs": [
+      {
+        "question": "Which size does the ICO use?",
+        "answer": "The largest PNG-backed icon in the ICNS. If either side exceeds 256 px, the image is shrunk to fit a 256-pixel box with its proportions intact."
+      },
+      {
+        "question": "Does the ICO contain all my icon sizes?",
+        "answer": "No. The ICO holds one image, not a set of sizes. For a multi-size ICO, build the sizes in a desktop tool."
+      },
+      {
+        "question": "Why did my ICNS fail to convert?",
+        "answer": "An ICNS with no PNG icon images is refused, and the message says so."
+      },
+      {
+        "question": "Is a 1024 px Retina icon used?",
+        "answer": "Yes, when it is a PNG icon. Apple's 512-point high-resolution representation is a 1024-pixel image, which the page then fits within 256 px."
+      },
+      {
+        "question": "What format is the 256 px entry in the ICO?",
+        "answer": "A 256 px image is stored in the ICO as PNG data."
+      },
+      {
+        "question": "Will the ICO look sharp as a favicon?",
+        "answer": "The ICO holds one image, not one drawn for each display size, so check it at the size you will use. A small icon enlarged may look soft."
+      },
+      {
+        "question": "Can I convert more than one icon file?",
+        "answer": "Yes. Select several ICNS files and each becomes its own ICO in turn."
+      },
+      {
+        "question": "Is my ICNS changed?",
+        "answer": "No. The page reads your file and gives you a new ICO. The original stays as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "ICNS and ICO",
+      "fromFormat": {
+        "name": "ICNS",
+        "fullName": "Apple icon image",
+        "description": "An Apple icon container holding artwork at multiple dimensions.",
+        "details": [
+          "Size-specific representations",
+          "macOS icon resources"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "An icon container supporting images at different dimensions and color depths.",
+        "details": [
+          "Icon image entries",
+          "PNG or bitmap representations"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting ICNS to ICO",
+      "points": [
+        "The page uses the largest PNG-backed icon in the ICNS.",
+        "The ICO holds one image, fitted inside 256 by 256 px.",
+        "An ICNS with no PNG icon images is refused."
+      ]
+    },
+    "guide": {
+      "title": "Understanding ICNS to ICO",
+      "markdown": "### What is an ICNS file?\n\nICNS packages application icon artwork for macOS. An icon collection can supply standard and high-resolution representations. Apple's documentation pairs standard and Retina icons from 16 up to 512 points, and the 512-point Retina image is 1024 pixels wide. Apple's iconutil converts an iconset directory into an ICNS file.\n\nICO is Microsoft's image format for graphical interface icons. A file may contain more than one image, and Windows Vista icon guidance includes 256 by 256 images for high-DPI displays.\n\n### Programs that open ICNS files\n\n- **Windows, Mac and Linux:** GIMP opens ICNS icons via its Apple Icon Image plug-in, and XnView MP lists ICNS as supported.\n- **Mac:** iconutil unpacks an ICNS into an iconset of PNG images.\n\n### ICNS and ICO compared\n\n- **Source image**: the page picks the largest PNG icon in the ICNS.\n- **Output**: one ICO image, not a set of sizes.\n- **Size**: anything above 256 px on a side is shrunk into a 256 by 256 box, proportions kept. Smaller images keep their size.\n- **Storage**: at 256 px the ICO entry is PNG data.\n- **Refused**: an ICNS whose icons are all older JPEG 2000 or bitmap types.\n- **Several files**: choose many ICNS files at once; each becomes its own ICO, with no ZIP.\n- **Privacy**: the ICNS stays on your device, because the page runs in your browser.\n- **Metadata**: dropped, since the icon goes through raw pixels at 8 bits per channel.\n\n### Other ways to convert ICNS to ICO\n\n- **Pillow:** open the ICNS, optionally set the `size` property before loading, then save an ICO with a `sizes` list. Sizes above 256 are ignored.\n- **GIMP:** open the ICNS, then File > Export As, saving as .ico. Pick sizes and Compressed (PNG) in the icon dialog; GIMP warns that not all programs read compressed icons.\n\n### Problems with ICNS files\n\n- **A small icon looks soft when enlarged**: a single enlarged icon may look different from artwork drawn for the display size.\n- **Missing representations**: the system must choose among the sizes that exist.\n- **A multi-size ICO is needed**: build each size in a desktop tool, since this page writes one image.\n- **Pixel sizes must match iconset names**: iconutil needs matching dimensions before it builds the resource.\n"
+    }
+  }
+}

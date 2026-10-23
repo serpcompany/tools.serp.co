@@ -1,0 +1,911 @@
+{
+  "rmvb-to-mp4": {
+    "seo": {
+      "title": "Convert RMVB to MP4 Online (Free)",
+      "h1": "RMVB to MP4 Converter",
+      "description": "Convert RMVB videos to MP4 in your browser. H.264 with AAC sound, scaled down past 1920 px and limited to 30 frames a second. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn old RealMedia RMVB movies into MP4 files that play almost anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert RMVB to MP4?",
+        "answer": "Add the RMVB above, let FFmpeg re-encode it locally and download the MP4. A long movie takes time, since your own device does the work."
+      },
+      {
+        "question": "Can I play an RMVB without converting it?",
+        "answer": "Yes, in a player that reads RealMedia. RealPlayer HD lists RMVB playback, and ffplay plays supported RealMedia streams. An MP4 plays on nearly every device, which is the usual reason to convert."
+      },
+      {
+        "question": "Which codecs end up in the MP4?",
+        "answer": "Video is encoded as H.264 and sound as AAC. The settings are fixed: x264's ultrafast preset at CRF 32, and 96 kbps for the audio."
+      },
+      {
+        "question": "Will the MP4 look better than my RMVB?",
+        "answer": "No. The MP4 is encoded from the decoded RMVB, so converting adds no detail. It makes the movie playable in more places, not sharper."
+      },
+      {
+        "question": "Is my movie resized?",
+        "answer": "Only when it is big. A movie whose picture exceeds 1920 pixels on the longer side is scaled down to fit that bound, while smaller ones keep their dimensions. Footage above 30 fps loses frames to reach that rate, with no change to the clip's length. Odd widths or heights lose a single pixel, since the encoder wants even numbers."
+      },
+      {
+        "question": "Is my RMVB uploaded anywhere?",
+        "answer": "No. FFmpeg, built as WebAssembly, runs in your browser tab, so the file never leaves your device. The RMVB itself stays as it was; the MP4 is a new copy named after it."
+      },
+      {
+        "question": "What does an FFmpeg error mean for my RMVB?",
+        "answer": "The message \"FFmpeg failed with exit code\" means FFmpeg stopped on that file. See whether the file plays in ffplay or RealPlayer HD first. A .ram file points to a stream and holds no video, so there is nothing in it to convert."
+      },
+      {
+        "question": "Can I convert several RMVB files at once?",
+        "answer": "Yes, one after another. Every RMVB produces a separate MP4 and nothing is merged, so a movie that was split into CD1 and CD2 stays in two pieces until you join them in a video editor."
+      },
+      {
+        "question": "Can I just rename the .rmvb file to .mp4?",
+        "answer": "No. Renaming changes only the name, and the data inside stays RealMedia with RealVideo pictures. Converting writes an MP4 with H.264 video."
+      },
+      {
+        "question": "Is there a size limit for the RMVB?",
+        "answer": "The page sets no file-size or time limit. A long file takes as long as your device needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "RMVB and MP4",
+      "fromFormat": {
+        "name": "RMVB",
+        "fullName": "RealMedia Variable Bitrate",
+        "description": "A variant of the RealMedia container that uses variable bitrate encoding. It was popular for sharing movies in the early 2000s.",
+        "details": [
+          "Variable bitrate",
+          "RealVideo codec",
+          "Proprietary RealNetworks format",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Metadata alongside the streams",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting RMVB to MP4",
+      "points": [
+        "The MP4 holds H.264 video and AAC audio at 96 kbps.",
+        "The video is encoded again at CRF 32, so detail the RMVB lost does not come back.",
+        "Pictures over 1920 pixels on the longer side are scaled down, and the frame rate is capped at 30 fps.",
+        "A .ram link file holds no video, so there is nothing in it to convert.",
+        "Each RMVB gives its own MP4. Several files are never joined."
+      ]
+    },
+    "guide": {
+      "title": "About RMVB files",
+      "markdown": "### What is an RMVB file?\n\nRMVB stands for RealMedia Variable Bitrate. It belongs to the RealMedia family from RealNetworks, and the Library of Congress describes the .rmvb ending as variable-bitrate RealMedia video. RealVideo can be encoded toward an average bitrate or toward a constant visual quality, and the versions differ in efficiency: RealVideo 9 and 10 do not code the picture equally well. A RealMedia file can also carry descriptive information such as a title, an author and a copyright line. Its media type is application/vnd.rn-realmedia.\n\nThe format was popular for sharing movies in the early 2000s, so RMVB files turn up in old download collections and archived TV episodes. It is a proprietary RealNetworks format, and today it counts as a legacy one, with the older downloaded movies and media archives as its main remaining use. One thing that looks like an RMVB but is not one is the .ram file. It is a small reference file used in some RealMedia streaming setups, and it points to the video instead of holding it.\n\n### Programs that open RMVB files\n\n**Windows**\n\n- RealPlayer HD: the vendor lists playback of RMVB videos, along with its Windows requirements.\n\n**Windows, Mac and Linux**\n\n- FFmpeg: includes a RealMedia demuxer and codec-specific handling.\n- ffplay: plays supported RealMedia streams through the FFmpeg libraries.\n\n### RMVB and MP4 compared\n\n- **Names and media types**: .rmvb is application/vnd.rn-realmedia. .mp4 is defined in ISO/IEC 14496-14.\n- **Contents**: an RMVB carries RealVideo pictures. MP4 is a wrapper that can hold video made with several codecs, with H.264 and AAC the usual pairing. MP4 turns up in web video, streaming sites and files passed between people.\n- **Bitrate**: an RMVB varies its bitrate through the movie. An MP4 holds whatever its encoder produced, constant or variable.\n- **Extras**: MP4 can carry metadata alongside the streams.\n- **Playback**: nearly every phone, TV and browser plays MP4. Playing one takes a reader for RealMedia and a RealVideo decoder.\n\nThe conversion itself: your browser runs FFmpeg, which reads the RealMedia file. Pictures larger than 1920 pixels are scaled down until they fit, anything above 30 frames per second is thinned out, with the running time unchanged, and widths and heights are trimmed to even values. Nothing leaves your device while this runs, and the RMVB itself is never altered. Each finished movie downloads as a new file with your RMVB's name and an .mp4 ending. Then x264 encodes H.264 video with its ultrafast preset at CRF 32, and FFmpeg's AAC encoder writes the sound at 96 kbps. Because the picture is compressed a second time, detail the RMVB had already lost stays lost.\n\n### Other ways to convert RMVB to MP4\n\n- **FFmpeg:** on the command line, `ffmpeg -i archive.rmvb -c:v libx264 -c:a aac archive.mp4` does the job by demuxing the RealMedia file and decoding its RealVideo. Here -i is the input file, and the two -c options pick the encoders for picture and sound. FFmpeg also has a special codec value, copy, that skips re-encoding, but copy would carry the RealVideo pictures over unchanged instead of making H.264, so name encoders as above.\n- **VLC:** select Media > Convert/Save, click Add, choose the RMVB and click Open. VLC then shows a Convert window. Type a name for the destination file, pick a profile whose output is MP4 and click Start.\n\n### Problems with RMVB files\n\n- **It won't play on a phone or TV**: an RMVB needs a RealMedia reader and a RealVideo decoder, and many players lack them. Convert the file to MP4 here, or play it in RealPlayer HD.\n- **The file is a .ram**: it only points to a stream. Find the actual .rmvb it names.\n- **FFmpeg rejects the header**: FFmpeg turns down an invalid RealMedia header instead of guessing. If ffplay cannot open the file either, download it again.\n- **A renamed file still fails**: changing .rmvb to .mp4 leaves the RealMedia data inside. Convert the file instead.\n- **The download stopped early**: a cut-short or damaged RMVB usually still converts, and the MP4 is then shorter than the movie. Download the whole file again to get the full length.\n- **The two halves of a movie are separate files**: converting never joins files. Join the MP4 files in a video editor.\n"
+    }
+  },
+  "svg-to-tiff": {
+    "seo": {
+      "title": "Convert SVG to TIFF Online (Free)",
+      "h1": "SVG to TIFF Converter",
+      "description": "Convert SVG to TIFF in your browser. The drawing is rendered at its own pixel size and saved as an uncompressed 8-bit RGB TIFF with transparency. Free."
+    },
+    "tool": {
+      "subtitle": "Render an SVG drawing as an uncompressed TIFF with its transparent areas kept."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert SVG to TIFF?",
+        "answer": "Select the SVG above and download the TIFF that is produced. The drawing is rendered locally, so the file stays on your machine. Multiple SVGs are handled one at a time."
+      },
+      {
+        "question": "What pixel size will the TIFF have?",
+        "answer": "Whatever width and height the browser gives the SVG. There is no scale or size option on the page. A larger TIFF needs bigger width and height values in the SVG, or a render with ImageMagick at a higher density."
+      },
+      {
+        "question": "Can I set the DPI or print size?",
+        "answer": "No. There is no resolution control, so the TIFF is simply as many pixels as the SVG renders to. ImageMagick on the desktop has a -density option that sets the resolution an SVG is rendered at."
+      },
+      {
+        "question": "Does the TIFF keep my transparent background?",
+        "answer": "Yes. Nothing paints a background, so empty areas of the drawing stay transparent and are stored as an alpha channel in the TIFF."
+      },
+      {
+        "question": "Is the TIFF compressed?",
+        "answer": "No. ImageMagick writes it uncompressed, so a large drawing makes a large file. GIMP's TIFF export dialog offers compression such as LZW if you need a smaller one."
+      },
+      {
+        "question": "Is the TIFF RGB or CMYK?",
+        "answer": "RGB, with 8 bits per channel plus an alpha channel. Pixels are handled as 8-bit RGBA, and no color profile is written. Convert the color mode in an image editor if a printer asks for CMYK."
+      },
+      {
+        "question": "Why does the text in my TIFF use a different font?",
+        "answer": "Only fonts installed on your device appear, and a web font the SVG points to is not fetched. Convert the text to outlines in a vector editor such as Inkscape before converting."
+      },
+      {
+        "question": "Will pictures linked from my SVG show up?",
+        "answer": "No. An SVG is drawn as an image, so a picture it links to never loads, online or not. Embed it in the SVG as data first."
+      },
+      {
+        "question": "Can I turn several SVG files into one multipage TIFF?",
+        "answer": "No. Each SVG yields its own single-image TIFF and the outputs are never merged."
+      },
+      {
+        "question": "Can I get my paths back from the TIFF?",
+        "answer": "No. A TIFF stores pixels, so shapes, text and CSS become one raster. Keep the SVG for editing."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and TIFF",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Supports animation and scripting",
+          "Styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster format first published by Aldus in 1986 and now controlled by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Multiple pages in one file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SVG to TIFF",
+      "points": [
+        "The TIFF is as many pixels as your browser reports for the SVG, with no scaling option.",
+        "It is uncompressed 8-bit RGB with an alpha channel, so transparent areas stay transparent.",
+        "Paths, live text and CSS become pixels. Keep the SVG for editing.",
+        "Only fonts installed on your device appear, and pictures the SVG links to never load.",
+        "Each SVG gives its own TIFF. Several files are never combined."
+      ]
+    },
+    "guide": {
+      "title": "About SVG files",
+      "markdown": "### What is an SVG file?\n\nSVG is short for Scalable Vector Graphics. It is an XML-based vector image format and a W3C standard, with SVG 1.0 a Recommendation in 2001 and SVG 1.1 following in 2003. A logo, chart or icon is stored as shapes, paths and text instead of a grid of pixels, which is why an SVG can be enlarged to any size without going soft. Because the format is plain XML text, you can open the file in a text editor and read its shapes, and a text file can also be searched, indexed and compressed. The drawing can be styled with CSS, and the file can include animation and scripting. SVG also supports clipping paths, masks and filter effects. Browsers open an SVG directly, and a web page can embed one too. A gzip-compressed SVG uses the .svgz extension, and the registered media type is image/svg+xml.\n\nNot every SVG is purely vector. Photos can be placed inside one, and they stay at their own resolution however far you zoom. A drawing can also refer to resources outside the file. A font installed on the device shows up, but a linked image or web font never loads when the SVG is drawn as a picture.\n\n### Programs that open SVG files\n\n**Windows, Mac and Linux**\n\n- Inkscape: edits SVG natively.\n- Mozilla Firefox: opens SVG files in the browser.\n\n**Web and mobile**\n\n- Google Chrome displays SVG.\n- Safari displays SVG on mobile.\n\n### SVG and TIFF compared\n\n- **Content**: SVG holds shapes, text and styling you can edit. TIFF holds pixels in a tag-based structure, and one file can store several images.\n- **Size**: an SVG has no fixed pixel size and scales cleanly. A TIFF is fixed at the pixel dimensions it was saved with, so enlarging it later cannot bring the sharpness back.\n- **Compression and color**: TIFF allows several compression schemes, deep color and CMYK separations. SVG is XML text. The extensions .tif and .tiff both name TIFF, with the media type image/tiff, and it was developed by Aldus and Microsoft as a tag-based raster wrapper that can hold different color representations.\n- **History**: TIFF began in 1986 at Aldus, and its 6.0 revision dates from 1992. Adobe now controls the specification. Classic TIFF stores file offsets in 32 bits, so a file tops out near 4 GB. SVG is a W3C recommendation.\n- **Typical use**: TIFF turns up in scanning, archiving, photography and print work, and document imaging, while SVG is the logo, icon and diagram format of web pages.\n\nThe steps are short. Your browser renders the SVG and reports its width and height, and those numbers become the TIFF's pixel dimensions. The page adds no scaling, no size cap and no viewBox logic of its own, and it paints no background, so clear areas remain clear. ImageMagick, running as WebAssembly, then saves the pixels as an uncompressed TIFF whose channels are 8-bit red, green, blue and alpha. Because only raw pixels travel, EXIF data, color profiles and XMP packets stay behind. If you need more pixels, enlarge the width and height attributes in the SVG first. Your original SVG is not changed.\n\n### Other ways to convert SVG to TIFF\n\n- **ImageMagick:** run `magick -density 300 logo.svg logo-print.tiff`. The -density option sets the resolution ImageMagick renders an SVG at, and the default is 72 dots per inch. ImageMagick renders SVG through Inkscape, RSVG or its own internal renderer, so the result depends on the installation.\n- **GIMP:** GIMP opens an SVG as an image in the usual way. Choose File > Export As to store it in a format other than XCF, and pick TIFF. The TIFF dialog offers compression such as None, LZW, Pack Bits and Deflate. GIMP opens the SVG as a picture of pixels, so keep the original SVG.\n\n### Problems with SVG files\n\n- **Letters are in the wrong typeface**: text is drawn with the fonts your device has, so a stand-in typeface can alter how the drawing looks. Convert the text to outlines in Inkscape before you start.\n- **An image is absent**: a picture the SVG only links to is not fetched. Embed it in the file as data.\n- **An embedded photo looks blurry when enlarged**: the pixel parts of an SVG keep their original resolution.\n"
+    }
+  },
+  "swf-to-gif": {
+    "seo": {
+      "title": "Convert SWF to GIF Online (Free)",
+      "h1": "SWF to GIF Converter",
+      "description": "Convert the video inside a Flash SWF to an animated GIF in your browser, at 15 fps and up to 480 px, with a 256-color palette. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn the video stream of a Flash SWF into a looping GIF that needs no Flash Player."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert SWF to GIF?",
+        "answer": "Choose the SWF above, let FFmpeg work in your browser and save the GIF. Several SWFs are processed one by one, each into a separate GIF."
+      },
+      {
+        "question": "Can I still play SWF files without Flash Player?",
+        "answer": "Flash Player has been discontinued. Ruffle, a Flash emulator, runs many SWF files in a browser or as a desktop app. A GIF needs neither."
+      },
+      {
+        "question": "What frame rate and size does the GIF have?",
+        "answer": "It plays at 15 frames per second. Anything wider or taller than 480 pixels is scaled down to fit, with even-numbered sides, while smaller clips keep their size."
+      },
+      {
+        "question": "Does the GIF loop?",
+        "answer": "Yes. It is written to repeat forever."
+      },
+      {
+        "question": "Why does my SWF fail to convert?",
+        "answer": "The converter takes the video stream stored in the SWF. A SWF that holds only sound has no picture to turn into frames, so it stops with \"FFmpeg failed with exit code\"."
+      },
+      {
+        "question": "Will ActionScript, buttons and games work in the GIF?",
+        "answer": "No. A GIF is a fixed set of frames, and no code runs in it. An interactive SWF has to be recorded while it plays, for example with Ruffle and a screen recorder."
+      },
+      {
+        "question": "Is the sound kept?",
+        "answer": "No. GIF has no audio, so any sound in the SWF is left out."
+      },
+      {
+        "question": "Why do the GIF's colors differ from the SWF's?",
+        "answer": "Each GIF frame can use no more than 256 colors. The converter makes one palette from the whole clip first, then maps every frame onto it."
+      },
+      {
+        "question": "Why is my GIF so large?",
+        "answer": "Each frame of a GIF is its own LZW-compressed picture, so a long clip at 15 fps means a great many frames. Shorten the clip if size matters."
+      },
+      {
+        "question": "Can I convert a SWF banner made from vector shapes?",
+        "answer": "Not with this page. A banner drawn on the Flash timeline holds vector shapes rather than a video stream, and this page converts the video stream. Export its frames with JPEXS Free Flash Decompiler, or record it playing in Ruffle."
+      }
+    ],
+    "aboutSection": {
+      "title": "SWF and GIF",
+      "fromFormat": {
+        "name": "SWF",
+        "fullName": "Shockwave Flash",
+        "description": "A file format for Adobe Flash animations, games and interactive content, originally from Macromedia. Flash Player reached end of life on 31 December 2020.",
+        "details": [
+          "Vector animation",
+          "ActionScript interactivity",
+          "Can embed video and audio",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SWF to GIF",
+      "points": [
+        "The GIF is made from the video stream in the SWF. A SWF that holds only sound stops with an FFmpeg error.",
+        "It plays at 15 fps, is scaled to fit 480 pixels on its longer side, and loops forever.",
+        "The palette is built from the whole clip, with at most 256 colors per frame.",
+        "Sound and ActionScript interactions are not carried over.",
+        "Each SWF gives its own GIF."
+      ]
+    },
+    "guide": {
+      "title": "About SWF files",
+      "markdown": "### What is an SWF file?\n\nSWF is the file format of Flash, the web animation and games technology that began at Macromedia and passed to Adobe when it bought Macromedia in 2005. The letters are commonly read as Shockwave Flash, and a source also gives the name Small Web Format. One file can combine vector graphics, timeline animation, bitmap video, sound and ActionScript code. Its registered media types include application/vnd.adobe.flash.movie.\n\nAdobe ended support for Flash Player on 31 December 2020, so SWF files now live in archives of old games, cartoons and banner ads, and it is no longer simple to see them play. An SWF may also refer to outside media instead of containing everything, so an old file can be missing parts it once loaded.\n\n### Programs that open SWF files\n\n**Windows, Mac and Linux**\n\n- Ruffle: a Flash emulator, where compatibility depends on the ActionScript features a file uses.\n\n**Windows and Linux**\n\n- Lightspark: an incomplete Flash implementation.\n\n**Mac**\n\n- Adobe Audition: its SWF import pulls out the audio of video files, and it is not an interactive Flash runtime.\n\n**Web**\n\n- Web player from the Ruffle project: runs Flash in a page through WebAssembly, with some APIs still missing.\n\n### SWF and GIF compared\n\n- **Names and media types**: .swf is application/vnd.adobe.flash.movie. .gif is the Graphics Interchange Format that CompuServe introduced in 1987.\n- **Content**: an SWF holds vector graphics, animation, video, sound and code. A GIF holds raster frames and nothing else.\n- **Color**: a GIF frame draws from a palette of at most 256 colors. A SWF's vector fills and video are not limited that way.\n- **Transparency**: GIF has 1-bit transparency, where a pixel is either clear or solid.\n- **Sound and interactivity**: GIF has neither.\n- **Compression**: GIF compresses each frame with lossless LZW.\n\nWhat happens here: FFmpeg opens the SWF and builds a palette from its video frames, sampled at 15 fps and scaled to fit 480 pixels with even sides. A second pass then draws every frame with that palette and writes a GIF that repeats forever, so you do not need to choose a loop count. Only the video stream is used, so the sound is dropped and no ActionScript runs. A SWF that ran faster than 15 fps loses its in-between frames. The SWF you chose is never altered.\n\n### Other ways to convert SWF to GIF\n\n- **JPEXS Free Flash Decompiler:** run `ffdec -format frame:gif -export frame frames-out banner.swf`, using the executable for your platform. The wiki documents the -format option, where frame:gif is one of the frame formats. This writes each frame of the SWF as a separate GIF image in the output folder. For frame export the wiki lists PNG, APNG, GIF, AVI and SVG, with PNG as the default.\n- **FFmpeg:** for a SWF with embedded video, run `ffmpeg -i clip.swf flash-preview.gif`. FFmpeg's SWF reader handles bitmap, video and audio data, and it skips vector shape tags, so it is not a Flash renderer. The reader covers FLV1, screen video, JPEG and lossless bitmap pictures, with PCM, ADPCM, MP3 and Nellymoser sound.\n- **Ruffle plus OBS Studio and FFmpeg:** open the SWF in Ruffle. In OBS add a window or display capture source, click Start Recording and perform the sequence. Check the recording settings under Settings > Output first. Then encode the saved recording as a GIF with FFmpeg. This captures one playing session, including any errors.\n\n### Problems with SWF files\n\n- **Nothing will open it**: Flash Player was retired at the end of 2020. Use Ruffle or Lightspark instead. Lightspark is an incomplete Flash implementation, so it may not cover everything a file uses.\n- **A game or animation looks wrong in Ruffle**: Ruffle has not implemented every Flash API, so graphics or behavior can differ from the original. Its compatibility page says most ActionScript 1 and 2 content will work, with some graphical inaccuracies, and that most ActionScript 3 games run well enough to be played.\n- **Parts are missing**: a SWF can depend on external files that no longer exist online. Get the whole set of files.\n- **FFmpeg reports an error**: the SWF probably holds no video stream, only sound or vector drawing. Try JPEXS for frames or record it with Ruffle.\n- **The buttons don't work**: a GIF has no code, so ActionScript controls cannot carry over.\n"
+    }
+  },
+  "tiff-to-svg": {
+    "seo": {
+      "title": "Convert TIFF to SVG Online (Free)",
+      "h1": "TIFF to SVG Converter",
+      "description": "Convert TIFF to SVG in your browser. The picture is embedded as a PNG inside an SVG of the same pixel size. It is not traced into paths. Free."
+    },
+    "tool": {
+      "subtitle": "Wrap a TIFF in an SVG file at its own pixel size, without tracing it into paths."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a TIFF to SVG?",
+        "answer": "Select the TIFF above, wait for ImageMagick to read it in your browser and save the SVG it returns."
+      },
+      {
+        "question": "Does this turn my TIFF into vector paths?",
+        "answer": "No. The converter reads the TIFF, makes a PNG of it and wraps that PNG in an SVG as a single image element. The file opens in vector editors, but it holds pixels, not outlines."
+      },
+      {
+        "question": "How do I trace a TIFF into real vector paths?",
+        "answer": "Use a tracing tool. Inkscape's Path > Trace Bitmap builds vector paths from a raster picture. Expect an approximation, not the original drawing."
+      },
+      {
+        "question": "Why is my SVG blocky when I zoom in?",
+        "answer": "The picture inside is still a PNG of the TIFF's pixels. Zooming an SVG scales that image, and it gets no sharper than the scan was."
+      },
+      {
+        "question": "Will every page of a multipage TIFF be converted?",
+        "answer": "No. Only one picture is read from a multipage TIFF, and the SVG holds just that one. To get the other pages, save each as its own TIFF first."
+      },
+      {
+        "question": "How big is the SVG?",
+        "answer": "The width and height match the image's pixels, and the viewBox repeats those numbers. The picture is stored as base64 text inside the file."
+      },
+      {
+        "question": "Is there a size limit for the TIFF?",
+        "answer": "Beyond roughly 537 megapixels the page refuses the file and says it is too big."
+      },
+      {
+        "question": "Can Potrace read my TIFF directly?",
+        "answer": "No. Potrace's documentation lists PBM, PGM, PPM and BMP as input. Convert the TIFF to one of those first, for example to BMP with ImageMagick, then trace it."
+      },
+      {
+        "question": "Will scanned text become editable text in the SVG?",
+        "answer": "No. The scan stays a picture, so the letters are pixels. Use OCR if you need searchable or editable words."
+      },
+      {
+        "question": "Can I convert several TIFF files in one go?",
+        "answer": "Yes, in sequence. You receive one SVG per TIFF and they are never merged."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIFF and SVG",
+      "fromFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster format first published by Aldus in 1986 and now controlled by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Multiple pages in one file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, and an SVG can also embed pixel images.",
+        "details": [
+          "Resolution independent",
+          "XML text",
+          "Can embed raster pictures",
+          "Styleable with CSS"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIFF to SVG",
+      "points": [
+        "The SVG holds your TIFF as an embedded PNG. Nothing is traced into paths.",
+        "Only one picture is read from a multipage TIFF, and the SVG holds just that one.",
+        "The SVG has the TIFF's pixel width and height, and zooming does not add detail.",
+        "A TIFF over about 537 megapixels fails to convert.",
+        "Each TIFF gives its own SVG."
+      ]
+    },
+    "guide": {
+      "title": "About TIFF files",
+      "markdown": "### What is a TIFF file?\n\nThe name TIFF stands for Tagged Image File Format, a raster wrapper first built by Aldus with Microsoft. The 6.0 revision appeared in 1992, and today the specification is under Adobe's control. Because a TIFF can use several compression methods and color representations, it serves scanners, print shops and photo archives, as well as document imaging and high-bit-depth preservation masters.\n\nOne TIFF file may hold a run of images, such as the pages of a scanned document. ImageMagick's format list describes extensive strip, tile, byte-order and compression tag controls for it. The endings .tif and .tiff both refer to the format, labeled image/tiff.\n\n### Programs that open TIFF files\n\n**Windows, Mac and Linux**\n\n- GIMP: opens image files for editing, and each export format keeps a different part of a project's properties.\n- ImageMagick: reads TIFF and writes it, with compression, strip, tile and byte-order options.\n\n**Mac**\n\n- Preview: lists TIFF in the format menu under File > Export.\n\n### TIFF and SVG compared\n\n- **What they hold**: TIFF stores pixels. SVG describes shapes, paths and text, and can also embed a pixel image.\n- **Scaling**: a TIFF is fixed at its pixel size. An SVG made of paths scales cleanly, but an SVG that only wraps a picture does not.\n- **Pages**: one TIFF can carry many images. The SVG produced here carries one picture, held as pixels inside an image element.\n- **Color**: TIFF supports high bit depth and CMYK. SVG is XML text styled with CSS, so you can open it in a text editor, and every major browser displays it.\n- **Typical use**: TIFF belongs to scanning, print and archiving. SVG is the usual choice for site logos, icons, diagrams and maps.\n\nHere is what happens to your file. ImageMagick, compiled to WebAssembly, reads the TIFF in your browser. SVG is not a format it writes, so it produces a PNG of the picture, and the converter then places that PNG inside an SVG as one image element at the same pixel size, with a matching viewBox. The PNG data is stored in the file as base64 text. This is not tracing: no outlines are found and no text is recognized. A multipage TIFF contributes one image only, and the rest of its pages are left out. Pictures beyond roughly 537 megapixels do not convert, and the page tells you the file is too big. The result fits a tool or web page that accepts only SVG files, and your original TIFF is left unchanged. Several TIFFs chosen at once go through one after another, and each SVG is saved under the TIFF's name. For paths you can edit, trace the picture instead.\n\n### Other ways to convert TIFF to SVG\n\n- **GIMP plus Inkscape:** in GIMP, choose File > Export As (Shift+Ctrl+E) to store the TIFF in a format other than XCF, and use PNG. The GIMP manual points to its Files section for details on each format. In Inkscape, import the PNG with File > Import, select it with the Selector tool and open Path > Trace Bitmap. Adjust the options, update the preview and apply the trace. The vector result sits exactly above your picture, so the original stays underneath until you move or delete it.\n- **ImageMagick plus Potrace:** run `magick scan.tiff scan.bmp`, then `potrace -s scan.bmp -o scan-outline.svg`. Potrace reads PBM, PGM, PPM and BMP, converts other pixel values to black and white with a threshold, and -s selects the SVG output. Unless you give a resolution with -r, it assumes the input is 72 dpi, and -o names the file the output goes to. Multiple input files are only allowed for multi-page output backends, so trace one bitmap at a time. It does not list TIFF as input, and it traces black and white shapes, so this suits a clean symbol or line drawing better than a photograph.\n\n### Problems with TIFF files\n\n- **A viewer shows only the first page**: a TIFF may hold several images, so use software that shows the full sequence.\n- **A program rejects the file**: not every reader understands each private tag, color-profile extensions among them.\n- **The file is enormous**: the original TIFF layout counts offsets in 32 bits, so files top out near 4 GB, and BigTIFF widens those fields.\n"
+    }
+  },
+  "ttf-to-png": {
+    "seo": {
+      "title": "Convert TTF to PNG Online (Free)",
+      "h1": "TTF to PNG Converter",
+      "description": "Turn a TrueType font into a PNG specimen in your browser: the font's name, its letters and digits, and a pangram at five sizes. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "See what a TrueType font looks like: a PNG specimen with its name, letters, digits and a pangram."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert TTF to PNG?",
+        "answer": "Select the font above and download the PNG it creates. ImageMagick renders the specimen in your browser, so the font never leaves your device. With several fonts, each gets a PNG of its own."
+      },
+      {
+        "question": "What is in the PNG?",
+        "answer": "The font's name, then the capital letters, the small letters, the digits and a few punctuation marks. The image shows one pangram sentence five times over, growing from 16 to 64 pixels. It is drawn in black on white."
+      },
+      {
+        "question": "Can I type my own text or pick the size?",
+        "answer": "No. The sample text, the five sizes and the black-on-white colors are fixed. For your own words, use Pillow in a short script or the Text tool in GIMP."
+      },
+      {
+        "question": "How wide is the PNG?",
+        "answer": "The width follows the longest line plus a 40 pixel margin, and stays between 400 and 2400 pixels. The height follows the lines' sizes and spacing."
+      },
+      {
+        "question": "Where does the name at the top come from?",
+        "answer": "From the font's own name table: the full name if it has one, otherwise the family name, cut to 64 characters. A font with no name shows \"TTF font\" instead."
+      },
+      {
+        "question": "Is the PNG an installable font?",
+        "answer": "No. A PNG is a picture, so it has no glyph tables, metrics or outlines. Keep the TTF for installing the font."
+      },
+      {
+        "question": "Does it show every glyph in the font?",
+        "answer": "No. It draws only the sample lines described above. It is a quick look at the typeface, not a full character map."
+      },
+      {
+        "question": "Can I get a texture atlas or a sprite sheet of the glyphs?",
+        "answer": "Not from this page. It makes a single specimen image. A bitmap-font tool or a script that draws each glyph to its own cell is what an atlas needs."
+      },
+      {
+        "question": "Does it work with OTF fonts?",
+        "answer": "This page takes TTF files. OpenType fonts have a separate OTF to PNG converter on the site."
+      },
+      {
+        "question": "Why does it say the file isn't a font?",
+        "answer": "The message \"isn't a font the converter can read\" means FreeType could not load the file, which usually points to a damaged font or a file that is not a font at all. A font with no drawable letters gets its own message."
+      }
+    ],
+    "aboutSection": {
+      "title": "TTF and PNG",
+      "fromFormat": {
+        "name": "TTF",
+        "fullName": "TrueType font",
+        "description": "A scalable font format developed by Apple and licensed to Microsoft. Its tagged tables hold glyph outlines, character mappings, metrics and naming information.",
+        "details": [
+          "Scalable outlines",
+          "Tagged tables",
+          "Media type font/ttf",
+          "Introduced in 1991"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format with support for transparency. It stores pixels only, so a font saved as PNG keeps its look but not its outlines.",
+        "details": [
+          "Lossless compression",
+          "Raster pixels",
+          "Optional alpha",
+          "No installable font data"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TTF to PNG",
+      "points": [
+        "The PNG is a fixed specimen: the font's name, letters, digits and a pangram at five sizes.",
+        "It is black on white, between 400 and 2400 pixels wide, and you cannot change the text.",
+        "A PNG is a picture. It cannot be installed as a font.",
+        "A damaged file stops with a message that it is not a font the converter can read.",
+        "Each font gives its own PNG."
+      ]
+    },
+    "guide": {
+      "title": "About TTF files",
+      "markdown": "### What is a TTF file?\n\nA TTF file holds a TrueType font. Apple developed TrueType and licensed the technology to Microsoft, and System 7 shipped with it in May 1991. A TrueType font describes scalable character outlines, so letters stay smooth at any size. Its data is arranged in individually tagged tables, which can hold glyph mappings, outlines, metrics and naming information. The registered media type is font/ttf.\n\nThe naming table is how a program learns a font's name, and it is where a specimen takes its heading from. A font file with a broken table or a bad offset can fail to display at all.\n\n### Programs that open TTF files\n\n**Windows, Mac and Linux**\n\n- FontForge: opens TrueType outlines for editing, including the tables.\n\n**Windows**\n\n- Windows Font Previewer: double-click the font to inspect it before installing.\n\n**Mac**\n\n- Font Book: installs and validates font files.\n\n**Linux**\n\n- GNOME Fonts: previews installed typefaces and installs downloaded .ttf files.\n\n### TTF and PNG compared\n\n- **What they store**: a TTF stores outlines, character mappings and metrics. A PNG stores a grid of pixels, losslessly compressed, with optional transparency.\n- **Scaling**: a font scales to any size. A PNG stays at the pixel size it was drawn.\n- **Text**: a font can set any words you type. A PNG shows only what was drawn into it, and it cannot be installed.\n- **Use**: a TTF goes into an operating system or an app. A PNG goes into a web page, a slide, a document or a review thread, so people can see a typeface without installing it.\n\nHere is how the specimen is made. ImageMagick, compiled to WebAssembly, loads the font in your browser and draws with FreeType. The top line is the font's name, taken from its name table (the full name, or the family name if there is no full name), cut to 64 characters, and a font with no usable name is labeled \"TTF font\". Below it come the capital letters, the small letters, and the digits with a few punctuation marks. Five more lines repeat one familiar test sentence, each at its own size of 16, 24, 32, 48 and 64 pixels. Everything is black on white inside a 40 pixel margin. The image is only as wide as the longest line needs, between 400 and 2400 pixels. You cannot change the text. It is a specimen, not the font's outlines and not a character map. The download is named after your file with a .png ending, and the TTF itself is not changed.\n\n### Other ways to convert TTF to PNG\n\n- **ImageMagick:** run `magick display-face.ttf display-face-preview.png`. ImageMagick's TTF reader gives a preview image of the font.\n- **Pillow (Python):** load the font with `ImageFont.truetype`, which loads a TrueType or OpenType font file at the pixel size you give. If the file is not at the given path, Pillow may search the standard font directories for your operating system, and it raises an OSError when the file cannot be read. Create a canvas with `Image.new`, draw your sample with `ImageDraw.text` and that font, then call `save` with a .png name. This takes a short script, but you choose the phrase, colors and size.\n- **GIMP:** with the font available in the font selector, create an image, choose the Text tool, pick the font and size, type your sample and export with File > Export As, choosing PNG. The PNG holds pixels, not an editable text layer.\n\n### Problems with TTF files\n\n- **A font that never shows up**: a damaged font can fail to display. Font Book on a Mac can validate a font file.\n- **Two copies conflict**: installing two copies of a font can create conflicts, and Font Book can resolve duplicates.\n- **It is missing in an app**: a font missing from a third-party application may require that application's own troubleshooting.\n- **The converter says it isn't a font**: FreeType could not read the file. Check that it opens in a font previewer.\n- **The converter says it has no letters to draw**: the font has no glyphs for the sample lines, as can happen with an icon or symbol font. Draw your own sample with Pillow or GIMP.\n- **You need the glyph outlines**: a PNG cannot give them. Open the TTF in FontForge.\n"
+    }
+  },
+  "txt-to-jpg": {
+    "seo": {
+      "title": "Convert TXT to JPG Online (Free)",
+      "h1": "TXT to JPG Converter",
+      "description": "Turn a text file into a JPG in your browser. Dark DejaVu Sans on white, long lines wrapped at about 90 characters, cut at 4,096 px. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Draw a plain-text file as a JPG: dark text on white, long lines wrapped to the page."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert TXT to JPG?",
+        "answer": "Select the text file above and download the JPG it produces. Your browser paints the text locally. Several files are done one after another, each into its own JPG."
+      },
+      {
+        "question": "What does the JPG look like?",
+        "answer": "Dark text on a white page in DejaVu Sans, with a 32 pixel margin and 24 pixel lines. It is drawn at twice that size when the text fits, so a short note comes out sharp."
+      },
+      {
+        "question": "Can I choose the font, size or colors?",
+        "answer": "No. Typeface, size and colors are fixed here, so use GIMP, ImageMagick or Pillow if you want a custom look."
+      },
+      {
+        "question": "How long can my text be?",
+        "answer": "A picture holds about 168 wrapped lines and is at most 4,096 pixels on a side. Anything longer is cut off at that point, and the final line of the picture reports where, for example \"cut before line 400 of 900\". The page shows the same notice."
+      },
+      {
+        "question": "Do long lines wrap?",
+        "answer": "Yes. A line is folded at about 90 characters, which is 800 pixels at the base size, preferably between words. An overlong word gets split across lines."
+      },
+      {
+        "question": "Which languages and encodings work?",
+        "answer": "A file starting with a byte order mark is read as UTF-8 or UTF-16, one without it as UTF-8, and anything that is not valid UTF-8 as Windows-1252. The bundled DejaVu Sans handles Latin, Greek, Cyrillic, Hebrew and Arabic letters, and lines starting in Hebrew or Arabic are drawn from the right-hand side. Any other script falls back to the sans-serif font your browser supplies."
+      },
+      {
+        "question": "What happens to tabs and blank lines?",
+        "answer": "Each tab turns into spaces up to the next multiple of four characters, and blank lines are kept. ANSI color codes and further control characters are removed."
+      },
+      {
+        "question": "Why is the text a little fuzzy around the letters?",
+        "answer": "JPG is lossy and the converter saves it at quality 0.85, which can leave faint noise around sharp edges. For crisp text, use the TXT to PNG converter instead."
+      },
+      {
+        "question": "Can I select or copy the text in the JPG?",
+        "answer": "No. A JPG is a picture of the words. Keep the TXT, or run OCR on the JPG if you ever need the text back."
+      },
+      {
+        "question": "Why does it say my text file is empty?",
+        "answer": "You get \"This text file is empty\" when the file contains only spaces and control characters, so there is nothing to paint. Open it in an editor to confirm."
+      }
+    ],
+    "aboutSection": {
+      "title": "TXT and JPG",
+      "fromFormat": {
+        "name": "TXT",
+        "fullName": "Plain text file",
+        "description": "A file that holds unformatted text with no fonts, styles or images. Any text editor on any operating system can read it.",
+        "details": [
+          "No formatting",
+          "Character encoding such as UTF-8",
+          "Very small files",
+          "Media type text/plain"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TXT to JPG",
+      "points": [
+        "The page draws dark DejaVu Sans text on white. There is no font, size or color setting.",
+        "Lines wrap at about 90 characters. About 168 wrapped lines fit before the text is cut.",
+        "A cut text ends with a line in the image saying where it stops, and the page shows the same notice.",
+        "The JPG is saved at quality 0.85. It is a picture, so the text cannot be selected.",
+        "Each text file gives its own JPG."
+      ]
+    },
+    "guide": {
+      "title": "About TXT files",
+      "markdown": "### What is a TXT file?\n\nNothing but characters are held in a TXT file. There are no typographic commands in it, and it dictates no page layout, typeface or placement of pictures, so any editor on any operating system can read it. Its MIME label is text/plain, and the charset parameter tells a receiver how the bytes map to characters.\n\nA styled document turns into plain text when it is saved as TXT, since TextEdit strips the styles and formatting when it converts rich text. What the characters look like is decided by whoever opens the file, not by the file.\n\n### Programs that open TXT files\n\n**Windows, Mac and Linux**\n\n- Visual Studio Code: a code editor that opens text files and lets you edit them.\n- Vim: a text editor with Windows builds and documented Unix and macOS use.\n\n**Mac**\n\n- TextEdit: the Mac editor that works with plain text documents.\n\n### TXT and JPG compared\n\n- **What they store**: a TXT stores characters and line breaks. A JPG stores a grid of pixels, compressed with some loss, with an adjustable quality setting and no alpha transparency.\n- **Look**: a TXT has no typeface of its own. A JPG fixes one, because the letters are already drawn into the picture.\n- **Editing**: text in a TXT can be searched, copied and edited. Text in a JPG cannot be selected.\n- **Support**: a TXT opens in any text editor, and a JPG is supported everywhere, so the picture is the safer choice when a destination takes only images.\n- **Origin**: the Joint Photographic Experts Group defined JPG (ISO/IEC 10918-1) for photographs. The endings .jpg and .jpeg mean the same format.\n\nHere is what the page does with your file. It decodes the bytes, drops terminal color codes and control characters, and turns each tab into spaces at stops every four characters. The text is then drawn on a canvas in your browser as dark text on white in DejaVu Sans. Lines that run long are folded at word breaks, and a single word wider than the page is cut. The picture is drawn at twice its size whenever it stays within 4,096 pixels a side, and the finished canvas is saved as a JPG at 0.85 quality. A text longer than one picture holds is cut, the last line of the picture says where, and the page shows the same notice. Your original TXT is not changed.\n\n### Other ways to convert TXT to JPG\n\n- **GIMP:** create an image and choose the Text tool. Turn on the editor window (\"Use editor window\") and load the TXT file with the folder icon in the text editor. Pick the font and size, drag a frame so the text fits, then use File > Export As and choose JPEG. GIMP puts the text on a new layer, and the size control offers several units. Check that no text runs off the canvas.\n- **ImageMagick:** run `magick -background white -fill black -pointsize 24 -size 800x caption:@notes.txt notes-card.jpg`. The caption: operator word-wraps long lines to the width you give with -size, and -font picks a typeface. The -pointsize option really controls the spacing between lines, newlines in the file act as paragraph separators, and -size is required so the wrapping has a width. A security policy can block reading text from a file.\n- **Pillow (Python):** read the TXT with the right encoding, create a canvas with `Image.new` (its default color is black, so pass white), draw the lines with `ImageDraw.multiline_text` and a font, and call `save` with a .jpg name. Text containing newlines passed to `ImageDraw.text` is handed to `multiline_text`, and drawing changes the image in place. You decide the size, wrapping and page breaks.\n\n### Problems with TXT files\n\n- **Accented letters look odd**: a file read with the wrong encoding shows valid characters as the wrong ones. Re-save it as UTF-8.\n- **Formatting disappeared**: a styled document saved as TXT loses its styling.\n- **A table or image is missing**: plain text cannot preserve an image or table as a word processor would.\n- **The text is very long**: a picture ends at 4,096 pixels, so a long log or manuscript is cut. Split the text into smaller files.\n- **The converter reports an empty file**: a file with nothing but spaces and control characters leaves nothing to draw. Open it in an editor and check that the text is really there.\n"
+    }
+  },
+  "wav-to-aac": {
+    "seo": {
+      "title": "Convert WAV to AAC Online (Free)",
+      "h1": "WAV to AAC Converter",
+      "description": "Convert WAV to AAC in your browser. FFmpeg encodes AAC-LC at 192 kbps into a standalone .aac stream. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Encode a WAV recording as a 192 kbps AAC stream you can send and play."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WAV to AAC?",
+        "answer": "Add the WAV above and FFmpeg encodes it locally in the browser, ready to download as AAC. If you add more files, each one is encoded in turn."
+      },
+      {
+        "question": "What is the AAC's bitrate?",
+        "answer": "192 kbps, fixed by the converter. The page has no bitrate setting. For another rate, use the FFmpeg command listed further down."
+      },
+      {
+        "question": "Does the page trim the audio or change its volume?",
+        "answer": "No. The command has no trim, volume or fade option, so the AAC covers the whole WAV. Any video in the file is ignored."
+      },
+      {
+        "question": "Is the AAC the same as M4A?",
+        "answer": "No. This page writes a standalone .aac file, a raw AAC stream in ADTS frames. M4A wraps AAC in an MP4 container, and renaming .aac to .m4a does not change the framing. Use WAV to M4A if an app wants the MP4 wrapper."
+      },
+      {
+        "question": "Does the AAC lose quality?",
+        "answer": "Yes. AAC is lossy, so it discards detail the ear is least likely to miss. Keep the WAV in case you want to edit or encode again."
+      },
+      {
+        "question": "Can I pick the sample rate or channels?",
+        "answer": "Not on this page, because the command sets neither. The FFmpeg command listed further down takes a rate or channel option when you need one."
+      },
+      {
+        "question": "What kind of AAC is it?",
+        "answer": "AAC-LC, the low complexity profile, made by FFmpeg's built-in AAC encoder. It does not make HE-AAC."
+      },
+      {
+        "question": "Which players open an .aac file?",
+        "answer": "VLC can read a raw AAC stream, and FFmpeg decodes AAC as well. Renaming .aac to .m4a does not add an MP4 wrapper, so use WAV to M4A for an app that wants one."
+      },
+      {
+        "question": "What does the \"FFmpeg failed\" error mean?",
+        "answer": "FFmpeg could not encode that file. Try opening the WAV in Audacity or VLC first. Some recorders put proprietary compression inside WAV, and Audacity suggests its FFmpeg library for those files."
+      },
+      {
+        "question": "Does my WAV leave my device?",
+        "answer": "No. The encoding happens through FFmpeg compiled to WebAssembly, running in a worker of your own browser, so no server sees the audio. The WAV is not modified; the AAC is a separate download."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and AAC",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "A RIFF-based wrapper for sound that Microsoft and IBM documented in 1991. Linear PCM is the common payload, though compressed encodings can appear too.",
+        "details": [
+          "RIFF container",
+          "Usually linear PCM",
+          "Common recording master",
+          "Media type audio/wav"
+        ]
+      },
+      "toFormat": {
+        "name": "AAC",
+        "fullName": "Advanced Audio Coding",
+        "description": "A perceptual audio coding family standardized through MPEG: Part 7 of MPEG-2 and Part 3 of MPEG-4. A standalone .aac file commonly carries ADTS framing.",
+        "details": [
+          "Lossy compression",
+          "LC, HE-AAC and HE-AAC v2 profiles",
+          "Can sit in MP4 or QuickTime",
+          "Media type audio/aac"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WAV to AAC",
+      "points": [
+        "The AAC is 192 kbps AAC-LC in a standalone ADTS stream. You cannot change the bitrate on the page.",
+        "No sample rate, channel count, trim or volume change is set by the command.",
+        "The conversion is lossy. Keep the WAV as the master.",
+        "A bare .aac is not an M4A. Choose M4A if your app wants an MP4 wrapper.",
+        "Each WAV gives its own AAC."
+      ]
+    },
+    "guide": {
+      "title": "About WAV files",
+      "markdown": "### What is a WAV file?\n\nSound stored in a WAV file sits inside a RIFF wrapper, so WAV names a container, not a single way of encoding audio. The August 1991 multimedia specification from Microsoft and IBM described it. Most WAV files contain linear PCM, the plain sampled form, but other encodings can ride in the same wrapper, which means two .wav files can differ a great deal inside. You will see audio/wav and audio/x-wav used as media types.\n\nPCM is uncompressed, which makes WAV files big but exact. Broadcast WAVE is the variant that holds metadata used in production and in preservation, and the Library of Congress names WAVE among the formats it recommends for audio collections. Keeping a WAV master and making an AAC for listening is a common split. The usual filename ending is .wav.\n\n### Programs that open WAV files\n\n**Windows, Mac and Linux**\n\n- Audacity: opens most WAV recordings, including PCM variants.\n- ffplay: the player bundled with FFmpeg, which includes a WAV demuxer and plays WAV files from the command line.\n\n**Mobile**\n\n- Firefox for Android: plays WAV, which Mozilla lists among its supported Android audio types.\n- VLC for Android: a free media player for Android phones and tablets, whose decoding follows from the media inside the container.\n- mpv for Android: an Android port linked by the mpv project.\n\n### WAV and AAC compared\n\n- **Encoding**: WAV is a wrapper that usually holds uncompressed linear PCM. AAC is a perceptual, lossy codec, standardized as MPEG-2 Part 7 and MPEG-4 Part 3.\n- **Packaging**: AAC can be carried in MP4, QuickTime or other wrappers. A freestanding .aac file normally uses ADTS framing and is labeled audio/aac.\n- **Profiles**: AAC comes as LC, HE-AAC and HE-AAC v2.\n- **Quality**: linear PCM in a WAV is lossless. AAC discards detail in exchange for a compressed stream, and was standardized as the successor to MP3.\n- **Use**: WAV suits recording and editing masters. AAC is used for streaming audio and end-user delivery.\n\nOn this page, FFmpeg runs inside your browser as WebAssembly and nothing is uploaded. It ignores any video, encodes the audio with its own AAC encoder at 192 kbps and writes an ADTS stream. No sample rate, channel count, trim or volume change is set by the command. A batch of WAV files is processed one by one, and each result is a separate .aac named after its WAV. Your original WAV stays unchanged. The codec is lossy, so converting the AAC back to WAV later will not restore the audio: encode from the original WAV, and avoid editing and re-encoding the AAC again and again.\n\nThe AAC comes out as a freestanding ADTS stream. FFmpeg's ADTS muxer accepts a single AAC stream, which is why the audio is written alone, and an app that wants an MP4 wrapper should be given the M4A converter's output instead.\n\n### Other ways to convert WAV to AAC\n\n- **FFmpeg:** `ffmpeg -i session.wav -vn -c:a aac -b:a 192k session-listen.aac` on the command line. Here -vn drops video, -c:a aac selects FFmpeg's own AAC encoder and -b:a fixes the bitrate. Add a sample rate or channel option when a delivery spec calls for one.\n- **Audacity with FFmpeg:** load the WAV, open File > Export Audio and pick Custom FFmpeg Export. In the format options choose a format and an AAC codec, which depends on how FFmpeg was built. This needs Audacity's optional FFmpeg library.\n- **WavePad:** open the WAV and choose File > Save As, then pick AAC. NCH lists AAC writing for Windows and Mac. Because AAC is lossy, avoid repeated editing generations of the same file.\n\n### Problems with WAV files\n\n- **Import fails**: some recorders put proprietary compression into the WAV, a case where Audacity suggests installing its FFmpeg library.\n- **A very large recording**: the original RIFF size fields top out near 4 GB, so recordings past them may need RF64, and a program built for the old layout may not handle such a file.\n- **Tags are missing or odd**: tags kept in INFO chunks and in Broadcast WAVE extensions differ, so programs treat metadata differently.\n- **One WAV opens and another does not**: WAV can wrap PCM or compressed audio, so programs differ in what they accept.\n"
+    }
+  },
+  "wav-to-m4r": {
+    "seo": {
+      "title": "Convert WAV to M4R Online (Free)",
+      "h1": "WAV to M4R Converter",
+      "description": "Make an iPhone ringtone file from a WAV in your browser. FFmpeg writes 192 kbps AAC in an MPEG-4 .m4r file, with no trimming. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a WAV into an M4R ringtone file, 192 kbps AAC in an MPEG-4 container."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WAV to M4R?",
+        "answer": "Select the WAV above and FFmpeg encodes it right in the browser, then offer the M4R as a download. Extra files are encoded one after another."
+      },
+      {
+        "question": "How long can the ringtone be?",
+        "answer": "The converter does not cut the audio, so a three-minute WAV gives a three-minute M4R. Apple's GarageBand ringtone workflow caps the sound at 30 seconds and offers to cut a longer export down. Trim the WAV first in an audio editor."
+      },
+      {
+        "question": "How do I put the M4R on my iPhone?",
+        "answer": "The page produces only a file. It does not install or assign a ringtone. Apple documents a route in GarageBand on the iPhone, where you bring the audio in, trim it and share it as a ringtone."
+      },
+      {
+        "question": "What is inside the M4R?",
+        "answer": "192 kbps AAC audio wrapped as MPEG-4 by FFmpeg's iPod format and saved with the .m4r name."
+      },
+      {
+        "question": "Is M4R different from M4A?",
+        "answer": "MediaInfo files the .m4r extension in the MPEG-4 family, and NCH's WavePad manual names M4R as the ringtone type for iPhone. The file this page writes is MPEG-4 audio from FFmpeg's iPod format."
+      },
+      {
+        "question": "Can I change the bitrate?",
+        "answer": "No. The page sets 192 kbps and has no bitrate setting. The FFmpeg command listed further down takes another rate."
+      },
+      {
+        "question": "Does the M4R sound worse than the WAV?",
+        "answer": "It can. AAC is lossy, so detail is discarded. Keep the WAV if you may want the original sound again."
+      },
+      {
+        "question": "Can I rename a .wav to .m4r?",
+        "answer": "No. The extension is only a label, and the data inside a WAV is not MPEG-4 audio. The file has to be re-encoded, which is what this page does."
+      },
+      {
+        "question": "Why does the converter show an FFmpeg error?",
+        "answer": "FFmpeg could not encode the file. Check whether the WAV plays in Audacity or VLC. Audacity suggests its FFmpeg library for WAV files that use a recorder's proprietary compression."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "No limit of its own. A long WAV gives a long ringtone file, and conversion takes as long as your device needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "WAV and M4R",
+      "fromFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "A RIFF-based wrapper for sound that Microsoft and IBM documented in 1991. Linear PCM is the common payload, though compressed encodings can appear too.",
+        "details": [
+          "RIFF container",
+          "Usually linear PCM",
+          "Common recording master",
+          "Media type audio/wav"
+        ]
+      },
+      "toFormat": {
+        "name": "M4R",
+        "fullName": "iPhone ringtone",
+        "description": "The extension for MPEG-4 audio files meant as iPhone ringtones. NCH's WavePad manual names M4R as the ringtone type for iPhone.",
+        "details": [
+          "MPEG-4 container",
+          "AAC audio",
+          "iPhone ringtone",
+          "Installing it is a separate step"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WAV to M4R",
+      "points": [
+        "The M4R holds 192 kbps AAC in an MPEG-4 container, set by the converter.",
+        "The audio is not cut. Apple's GarageBand ringtone limit is 30 seconds, so trim the WAV first.",
+        "The page makes the file only. Installing it as a ringtone is a separate step.",
+        "The command sets no sample rate or channel count.",
+        "Each WAV gives its own M4R."
+      ]
+    },
+    "guide": {
+      "title": "About WAV files",
+      "markdown": "### What is a WAV file?\n\nWAVE audio files, written .wav, use the RIFF chunk structure. Microsoft and IBM published the layout in a 1991 multimedia specification, and it describes a wrapper rather than a fixed encoding. Linear PCM is what you will usually find inside. Compressed audio is allowed too, so the extension alone cannot tell you what a given file holds. Common media types are audio/wav and audio/x-wav.\n\nA variant called Broadcast WAVE carries extra metadata for production and preservation. The Library of Congress recommends the format for audio collections. As a source for a ringtone, a WAV is a good place to start because it usually holds uncompressed PCM, which makes files big but exact. The format record puts the original size limit at 4 GB.\n\n### Programs that open WAV files\n\n**Windows, Linux and Mac**\n\n- ffplay: the player that ships with FFmpeg has a WAV demuxer, so it can play the WAV from the command line before you convert it.\n- Audacity: reads the common WAV recordings, PCM variants included.\n\n**Mobile**\n\n- Android edition of VLC: plays media on phones and tablets, with decoding that depends on what the container holds.\n- Firefox for Android: Mozilla lists WAV among the audio it plays directly.\n- mpv for Android: a port the mpv project links to, which plays the WAV on a phone or tablet.\n\n### WAV and M4R compared\n\n- **Encoding**: WAV usually holds uncompressed linear PCM. M4R holds compressed audio, typically AAC.\n- **Container**: an MPEG-4 file keeps its wrapper structure apart from whatever encoding the tracks use. MediaInfo classifies .m4r within its MPEG-4 container family, and these files can carry track metadata besides the samples.\n- **Purpose**: WAV is a recording master, while NCH's WavePad manual calls M4R the iPhone's ringtone type.\n- **Length**: Apple's GarageBand ringtone workflow limits the selected sound to 30 seconds, so a longer WAV has to be shortened elsewhere, because this page does not trim.\n- **Support**: WavePad lists .m4r opening and saving on Windows, but not on Mac.\n\nThe conversion runs in your browser, where FFmpeg (WebAssembly) skips any video and converts the audio to AAC at 192 kbps. It writes the result with FFmpeg's iPod format, so the file is MPEG-4 audio that carries the .m4r name. The command leaves sample rate, channel count and length alone, so the ringtone runs as long as the WAV. The page does not install a ringtone either: you still have to add the M4R to the iPhone. Select a batch and every WAV is converted one at a time, each getting its own .m4r with the WAV's name. Your original WAV is not changed.\n\n### Other ways to convert WAV to M4R\n\n- **FFmpeg:** `ffmpeg -i cue.wav -t 30 -c:a aac -b:a 192k -vn -f ipod cue-tone.m4r` on the command line. In this command -vn drops video, -c:a and -b:a choose the AAC encoder and its bitrate, and -f ipod writes the MPEG-4 container. This example cuts the audio at 30 seconds with `-t 30`. It makes the file and does not assign a ringtone.\n- **WavePad on Windows:** open the WAV, then choose File > Save As and pick M4R. NCH lists M4R saving for Windows only.\n- **GarageBand on iPhone:** create a recording project, then use Tracks > Loops Browser > Files > Browse items from Files to bring the WAV into Tracks and trim it. Back in My Songs, pick the project, then Share, Ringtone and Export. This builds and installs the ringtone on the phone, within the 30-second limit, and GarageBand offers to shorten a longer export. A dimmed song cannot be picked until it has been downloaded to the iPhone.\n\n### Problems with WAV files\n\n- **It will not import**: some recorders put proprietary compression inside a WAV. Audacity points to its FFmpeg library for those imports.\n- **The file is too big for an old program**: recordings that outgrow the original RIFF size fields may be stored as RF64, which a program built for the older layout may not read.\n- **A player balks at one file**: the same wrapper holds PCM or compressed audio, so one program can accept a file that another refuses.\n- **Titles or tags are odd**: INFO chunks and Broadcast WAVE extensions carry different information, so metadata is handled unevenly.\n"
+    }
+  },
+  "wmv-to-avi": {
+    "seo": {
+      "title": "Convert WMV to AVI Online (Free)",
+      "h1": "WMV to AVI Converter",
+      "description": "Convert WMV videos to AVI in your browser. The movie is re-encoded as MPEG-4 video tagged Xvid with MP3 sound. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn Windows Media WMV videos into AVI files with Xvid-tagged video and MP3 sound."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WMV to AVI?",
+        "answer": "Select the WMV above, wait for the conversion to end and save the AVI that appears."
+      },
+      {
+        "question": "What is inside the AVI I get?",
+        "answer": "MPEG-4 Part 2 video with the Xvid tag at a fixed quality value of 10 with no B-frames, and MP3 audio at 96 kbps. AVI is only the wrapper, so these two codecs are what a player has to support."
+      },
+      {
+        "question": "What is the difference between WMV and AVI?",
+        "answer": "WMV is Windows Media video, usually stored in Microsoft's ASF container. AVI, a RIFF-based container from Microsoft, can carry many codecs. Changing the extension does not change what is inside, which is why the video is re-encoded."
+      },
+      {
+        "question": "Will the AVI look worse than the WMV?",
+        "answer": "It can. Both formats are lossy, and the AVI is encoded from the already-compressed WMV picture. Converting does not add detail."
+      },
+      {
+        "question": "Is my video resized?",
+        "answer": "Only if it is big. A frame bigger than 1920 pixels in either direction is scaled down, and a clip above 30 fps drops frames to reach it while keeping its running time. Width and height are adjusted to even numbers."
+      },
+      {
+        "question": "Does the converter deinterlace the video?",
+        "answer": "When a frame is flagged interlaced, yes. The yadif filter skips everything else, so progressive video is untouched."
+      },
+      {
+        "question": "What happens to the WMV's sound?",
+        "answer": "The audio is decoded, then encoded again as 96 kbps MP3 by LAME, which makes it a second lossy generation."
+      },
+      {
+        "question": "Can I rename a .wmv file to .avi?",
+        "answer": "No, because the name is only a label and the bytes inside stay Windows Media. Any program that inspects the contents will reject it. Converting is what produces genuine AVI data."
+      },
+      {
+        "question": "Can I convert a batch of WMV files?",
+        "answer": "Yes. Several WMVs give several AVIs, made one at a time and never joined into a single movie."
+      },
+      {
+        "question": "Is there a size limit for the WMV?",
+        "answer": "The page sets none. The original AVI design had size restrictions that a later extension, OpenDML, lifted, so a very long recording may need a player that supports large AVI files."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMV and AVI",
+      "fromFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "A family of video codecs developed by Microsoft, usually stored in the ASF container. It was widely used for Windows video and streaming.",
+        "details": [
+          "ASF container",
+          "Windows Media Video 7, 8 or 9",
+          "Lossy compression",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container format introduced by Microsoft in 1992 based on RIFF. It interleaves video and audio data and can hold many different codecs.",
+        "details": [
+          "RIFF-based container",
+          "Many codecs",
+          "Limited support for modern features",
+          "Legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WMV to AVI",
+      "points": [
+        "The AVI holds MPEG-4 Part 2 video tagged Xvid and MP3 audio at 96 kbps.",
+        "The video is encoded again, so the AVI cannot be sharper than the WMV.",
+        "Pictures over 1920 pixels on the longer side are scaled down, and the frame rate is capped at 30 fps.",
+        "Each WMV gives its own AVI. Several files are never joined."
+      ]
+    },
+    "guide": {
+      "title": "About WMV files",
+      "markdown": "### What is a WMV file?\n\nWindows Media content in the ASF container is what a WMV file holds. Microsoft designed ASF for synchronized media that can be stored on a disk or delivered over HTTP, and it carries audio and video streams. The video inside a WMV uses Windows Media Video compression, in version 7, 8 or 9, according to the Library of Congress. That entry also notes video/x-ms-wmv, a media type in common use that was never formally registered.\n\nThe ending names only the family, so two WMV files can use different compression versions. How good a WMV looks comes from the codec and settings used to make it, not from the extension.\n\nASF carries audio and video streams, and a file can be played from disk or fetched over HTTP. The video inside is Windows Media coded content, so the ASF wrapper and the compression are two separate things.\n\n### Programs that open WMV files\n\n**Windows, Linux and Mac**\n\n- FFplay: the player that comes with FFmpeg, which decodes WMV with FFmpeg's own decoders.\n- VLC media player: its feature list covers ASF and WMV input plus Windows Media Video decoders for versions 1, 2 and 9.\n\n**Mobile**\n\n- Android port of VLC: brings the desktop player's decoding to Android.\n- iOS port of VLC: plays files on the device with VLC's own engine, not the system player.\n\n### WMV and AVI compared\n\n- **Extensions**: .wmv and .avi. Neither ending says which codec is inside.\n- **Container**: WMV uses ASF, built for streaming and synchronized delivery. AVI, which Microsoft introduced in 1992, is built on RIFF. It interleaves timed pictures and sound, and its header records dimensions and frame rate.\n- **Codecs**: a WMV carries Windows Media Video. An AVI can carry uncompressed, lossless or lossy video, identified by FOURCC codes. The AVI made here holds Xvid-tagged MPEG-4 video (Part 2).\n- **Size limits**: the first AVI design restricted file size, and the later OpenDML extension relaxed that.\n- **Streaming**: ASF was built for network delivery as well as disk storage, while AVI is an interleaved file of timed pictures and sound.\n- **Metadata**: AVI implementations do not all handle aspect ratio and scan type the same way.\n\nWhat happens to your file here: FFmpeg, running in the browser, reads the ASF container and passes any frames marked as interlaced through a deinterlacer. Video larger than 1920 pixels is reduced to fit, faster motion is limited to 30 frames per second, and widths and heights are adjusted to even values. The video is encoded with FFmpeg's MPEG-4 encoder at quality value 10 with no B-frames, and the sound goes through the LAME MP3 encoder at 96 kbps. Both codecs are lossy, so the AVI is a second generation of the picture and cannot be sharper than the WMV. The download is named after the WMV with an .avi ending, and the original is not changed. Select a batch and each WMV becomes its own AVI, converted one after another and never merged; no ZIP is produced.\n\n### Other ways to convert WMV to AVI\n\n- **FFmpeg:** on the command line, `ffmpeg -i legacy.wmv -c:v mpeg4 -c:a libmp3lame legacy.avi`. It reads the WMV with FFmpeg's decoder for it and writes the AVI with the two encoders named in the command. The command re-encodes both streams instead of copying them, and the -c:v and -c:a options pick the encoders. FFmpeg guesses the output container from the file extension, so the .avi name is what asks for an AVI.\n\n### Problems with WMV files\n\n- **Sound plays but the picture is missing**: unpacking the ASF wrapper is one job and decoding the video inside is another, and a player may manage only the first. The FFmpeg codec list itself marks its Windows Media Video 9 decoder as incomplete, so files can behave differently from program to program. Try VLC, which lists ASF and WMV input, to see whether the file opens at all.\n- **Two WMV files look different**: the family covers versions 7, 8 and 9, so the picture depends on the compression and settings used to make each file. Compare the files themselves, not their extensions, when one looks worse than another.\n- **A player gets the wrapper but not the video**: reading ASF does not mean every codec inside is installed.\n"
+    }
+  },
+  "xcf-to-pdf": {
+    "seo": {
+      "title": "Convert XCF to PDF Online (Free)",
+      "h1": "XCF to PDF Converter",
+      "description": "Convert a GIMP XCF to a one-page PDF in your browser. The picture is embedded losslessly as a PNG at 1 pixel per point, with no margin. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a GIMP XCF into a one-page PDF you can send to anyone, without GIMP."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert XCF to PDF?",
+        "answer": "Select the XCF above and download the PDF produced. ImageMagick reads the file locally, so it is never sent anywhere, and several XCFs are processed one by one."
+      },
+      {
+        "question": "Do my layers become separate PDF pages?",
+        "answer": "No. An XCF is read as one picture, so the PDF has one page whatever the number of layers. GIMP's own PDF export has a Layers as pages option if you want one page per layer."
+      },
+      {
+        "question": "What size is the PDF page?",
+        "answer": "It matches the image, one pixel per point, so a 1200 x 800 pixel XCF yields a 1200 x 800 point page of about 16.7 x 11.1 inches. Margins and standard paper sizes do not come into it."
+      },
+      {
+        "question": "Does the PDF reduce the picture's quality?",
+        "answer": "No. Pixels are embedded losslessly as a PNG, so quality settings do not come into it."
+      },
+      {
+        "question": "Can I search for words in the PDF?",
+        "answer": "No. All the PDF contains is a picture, so its words cannot be searched or selected. Keep the XCF if the words still need editing."
+      },
+      {
+        "question": "Can I edit the PDF in GIMP later?",
+        "answer": "Not as layers. XCF is GIMP's working format and keeps layers and transparency; the PDF holds one flat picture. Keep the XCF for future editing."
+      },
+      {
+        "question": "Why convert at all instead of sending the XCF?",
+        "answer": "Most ordinary image viewers cannot read XCF. A PDF opens in any browser or PDF reader."
+      },
+      {
+        "question": "Can I combine several XCF files into one PDF?",
+        "answer": "No. Each XCF becomes a separate PDF. A PDF tool can join them afterwards."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "Roughly 537 megapixels is the ceiling, and the page then reports the file as too large."
+      },
+      {
+        "question": "Why did my XCF fail to convert?",
+        "answer": "ImageMagick could not read the file. Open it in GIMP to see whether it is intact, and export a PNG from GIMP to convert that instead."
+      }
+    ],
+    "aboutSection": {
+      "title": "XCF and PDF",
+      "fromFormat": {
+        "name": "XCF",
+        "fullName": "GIMP image",
+        "description": "GIMP's native working-image format. It retains layers and transparency, not only a flattened picture, but not the undo history.",
+        "details": [
+          "Layers and transparency",
+          "Written by GIMP's Save command",
+          "Not an interchange format",
+          "Undo history not saved"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A fixed-page document format that can hold pictures, text and vector artwork, and looks the same wherever it is opened.",
+        "details": [
+          "Fixed page size",
+          "Pictures, text and vectors",
+          "Opens in any browser",
+          "Easy to share"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting XCF to PDF",
+      "points": [
+        "The PDF has one page the size of the image, at 1 pixel per point and with no margin.",
+        "The picture is embedded losslessly as a PNG.",
+        "Layers are not kept as pages, and the PDF holds a picture and no text. Keep the XCF for editing.",
+        "A picture over about 537 megapixels fails to convert.",
+        "Each XCF gives its own PDF."
+      ]
+    },
+    "guide": {
+      "title": "About XCF files",
+      "markdown": "### What is an XCF file?\n\nXCF is GIMP's native working-image format. The file keeps layers and transparency, so work can be resumed later and not just viewed as one flat picture. It also keeps channels, paths and selections, and GIMP uses it to retain editing information between sessions. Undo history is left out. GIMP's Save command writes XCF, while other image formats go through Export.\n\nGIMP does not present XCF as a format for exchanging images. It is a project file meant for your own editing, so most ordinary image viewers cannot read it. That is the usual reason to turn it into something shareable.\n\n### Programs that open XCF files\n\n**Windows, Mac and Linux**\n\n- GIMP: the native editor, and saving as XCF keeps the whole working image.\n- ImageMagick: reads XCF, though an outside renderer may not reproduce every GIMP feature.\n\nXCF is used for layered image editing and for saving work in progress, and it is lossless, so reopening the file in GIMP loses nothing.\n\n### XCF and PDF compared\n\n- **Purpose**: XCF is a working file for editing in GIMP. PDF is a fixed-page document made to be shared and read.\n- **Layers**: XCF keeps layers and transparency. A PDF made here holds one picture on one page.\n- **Page**: an XCF is a canvas of pixels. A PDF has a page size, so a viewer knows how large the page is.\n- **Support**: few ordinary viewers read XCF, while PDF is readable in browsers and PDF readers.\n- **Editing**: GIMP can reopen an XCF with every layer. A PDF of the picture cannot give the layers back.\n\nHere is what the converter does. ImageMagick, compiled to WebAssembly, reads the XCF in your browser as a single picture, so layers are not turned into separate pages. The picture is then embedded in a PDF with pdf-lib. The document is one page sized to the picture, with each pixel counted as one point, so a canvas 1200 pixels wide makes a page 1200 points wide, about 16.7 inches. That leaves out margins and standard paper sizes. Inside ImageMagick the pixels are first turned into a PNG, and pdf-lib then places that PNG on the page. The picture goes in losslessly, which means the quality setting does not apply. Above about 537 megapixels the page declines the file with a note that it is too large. Several files are never combined into one PDF, and the XCF you chose is left unchanged. The download is named after the XCF with a .pdf ending.\n\n### Other ways to convert XCF to PDF\n\n- **GIMP:** open the XCF and choose File > Export As, or press Shift+Ctrl+E, which stores the image in a format other than XCF. Export it as PDF. The PDF options include Layers as pages, Reverse order, Root layers only, Apply layer masks, Omit hidden layers and Fill transparent areas with background color, which help for a page per layer or a solid backdrop. The dialog also offers Convert bitmaps to vector and Convert text layers to image, so check each option against what you want the PDF to hold.\n- **ImageMagick:** run `magick project.xcf project-review.pdf`. ImageMagick's formats page lists XCF as read-only and says PDF output needs Ghostscript installed. Compare the result with what you see in GIMP, since ImageMagick is a different renderer from GIMP.\n- **GIMP and Preview on a Mac:** export the picture you want from GIMP as a PNG and open it in Preview. Then choose File > Export, open the Format pop-up menu, choose PDF and save. Preview is working from the PNG here, not the XCF.\n\n### Problems with XCF files\n\n- **Other software can't read it**: common image viewers do not understand XCF, so export a copy from GIMP for viewing.\n- **The export is flat**: a flattened export does not keep every project property. Keep the XCF for future editing.\n- **GIMP asks to save on exit**: exporting leaves the XCF project unsaved, so the prompt still appears.\n- **A layered file gives one picture**: this page reads the XCF as a single image, so a layer cannot be chosen here, and layers do not become pages. GIMP's own export has Layers as pages for that.\n- **It appears different elsewhere**: outside programs do not replicate all of GIMP's features. Export from GIMP itself and check the output.\n"
+    }
+  }
+}

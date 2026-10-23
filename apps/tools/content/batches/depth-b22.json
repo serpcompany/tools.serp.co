@@ -1,0 +1,802 @@
+{
+  "mp4-to-f4v": {
+    "seo": {
+      "title": "Convert MP4 to F4V for Flash-Era Players",
+      "h1": "MP4 to F4V Converter",
+      "description": "Convert MP4 to F4V in your browser with FFmpeg. The video is re-encoded as H.264 with AAC audio for Flash-era players. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 as an F4V with H.264 video and AAC audio, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does the F4V I get play in a browser?",
+        "answer": "No. F4V is a Flash format, and browsers no longer play Flash content. Open the file in VLC or mpv, and keep the MP4 for web pages."
+      },
+      {
+        "question": "Which video and audio codecs does the F4V contain?",
+        "answer": "H.264 video and AAC audio. FFmpeg re-encodes both inside your browser, and the audio is written at 96 kbps."
+      },
+      {
+        "question": "Is an F4V just an FLV with another name?",
+        "answer": "No. They are separate Flash video formats, and F4V is built on the MP4 container structure. This page writes F4V only."
+      },
+      {
+        "question": "Does a 4K MP4 stay 4K as an F4V?",
+        "answer": "Not always. The converter has a size cap, and a bigger frame is reduced to fit it; very fast footage drops frames but keeps its duration. Nothing is enlarged."
+      },
+      {
+        "question": "Why did my F4V lose a pixel of width?",
+        "answer": "The encoder wants even dimensions here, so a picture with an odd width or height is cut down by one pixel."
+      },
+      {
+        "question": "Can I add a batch of MP4 files?",
+        "answer": "Yes. Add several and they are processed in sequence; every F4V arrives as a separate file, not a ZIP."
+      },
+      {
+        "question": "Why would I still need an F4V?",
+        "answer": "Mostly for archived Flash content or an older Flash project that asks for it. For anything new, the MP4 plays on nearly every device."
+      },
+      {
+        "question": "Does my MP4 leave my computer?",
+        "answer": "Not at all. FFmpeg does the work on your device inside the page, so nothing is transmitted, and the MP4 is not modified."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and F4V",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A media container that holds encoded tracks together with timing and descriptive information.",
+        "details": [
+          "Video and audio tracks",
+          "Codec support varies by player",
+          "Container rather than one codec"
+        ]
+      },
+      "toFormat": {
+        "name": "F4V",
+        "fullName": "Flash MP4 video",
+        "description": "An Adobe video container built on the ISO base media structure and associated with H.264 and AAC media.",
+        "details": [
+          "Container rather than codec",
+          "Related to MP4 box structure",
+          "Legacy Flash-era delivery"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to F4V",
+      "points": [
+        "The video is re-encoded as H.264 with AAC audio.",
+        "A large frame is scaled down and a high frame rate is thinned; a smaller video is left as it is.",
+        "Browsers no longer play F4V, but VLC and mpv do.",
+        "Conversion runs in your browser, and each file downloads on its own as an F4V."
+      ]
+    },
+    "guide": {
+      "title": "MP4 to F4V: format guide",
+      "markdown": "### What is an MP4 file?\n\nAn MP4 file follows MPEG-4 Part 14, written ISO/IEC 14496-14, which appeared in 2003. It builds on the ISO Base Media File Format, whose nested boxes come from QuickTime. Most files hold H.264 video and AAC audio, though AV1, VP9, MP3 and Opus can be inside as well. Video uses the endings .mp4 and .m4v, and every major browser plays it.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** ffplay plays MP4 files whose streams the installed FFmpeg build can decode, and mpv offers audio-track switching.\n- **Windows and Mac:** Adobe Premiere imports MP4 when a suitable decoder is present.\n- **Web:** Firefox and Chrome play supported MP4 files directly.\n- **Mobile:** VLC on Android and on iOS.\n\n### MP4 and F4V compared\n\nF4V, an Adobe format, borrows its layout from the MPEG-4 container. That makes it a wrapper rather than a codec, so the streams inside matter more than the ending. Flash Player support has ended and no current browser plays Flash, which leaves F4V for archives and older Flash projects.\n\nFFmpeg, compiled to WebAssembly, deinterlaces the video, encodes it as H.264 and writes AAC audio at 96 kbps. Footage whose long edge exceeds 1920 px is downscaled, and a rate above 30 fps is brought down by dropping frames; smaller values stay. Each side is then made even, which costs an odd side one pixel. Files are processed one at a time, and the MP4 you chose is not modified.\n\n### Other ways to convert MP4 to F4V\n\n- **FFmpeg, re-encoding:** run `ffmpeg -i lesson.mp4 -c:v libx264 -c:a aac -f f4v lesson.f4v` to write H.264 video and AAC audio into an F4V.\n- **FFmpeg, stream copy:** run `ffmpeg -i compatible.mp4 -c copy -f f4v compatible.f4v` to copy the streams without re-encoding. Use it when the MP4 already holds H.264 video and AAC audio.\n\n### Problems with MP4 files\n\n- **Sound or picture missing:** the file ending says nothing about which decoders a player has. Try another player, such as mpv.\n- **A recording that stopped early:** MP4 gathers the index of its packets in one place, so a write cut short may leave an unplayable file.\n"
+    }
+  },
+  "mp4-to-m2ts": {
+    "seo": {
+      "title": "Convert MP4 to M2TS Without Re-encoding",
+      "h1": "MP4 to M2TS Converter",
+      "description": "Convert MP4 to M2TS in your browser. FFmpeg copies the video and audio without re-encoding, so size and frame rate stay. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Copy the streams of an MP4 into an M2TS file without re-encoding."
+    },
+    "faqs": [
+      {
+        "question": "Is the video re-encoded when I convert MP4 to M2TS?",
+        "answer": "No. FFmpeg copies the video and audio streams into the M2TS file, so this step adds no new compression."
+      },
+      {
+        "question": "Does the M2TS keep my resolution and frame rate?",
+        "answer": "Yes. The picture keeps the dimensions and frame rate it already has. The size cap and frame-rate limit used for re-encoded video do not come into play when streams are copied."
+      },
+      {
+        "question": "Why does my M2TS not play on a Blu-ray player?",
+        "answer": "The page copies the streams and nothing else. A disc also needs clip-information files and a disc organization, and a single M2TS file has neither."
+      },
+      {
+        "question": "What is an M2TS file?",
+        "answer": "It is the extension used for video on Blu-ray discs and AVCHD camcorder recordings. The file is an MPEG-2 transport stream with a timestamp added to each packet."
+      },
+      {
+        "question": "Is a stream copy quicker than a normal conversion?",
+        "answer": "A copy skips encoding, so the work is reading and writing the file. How long it takes still depends on your device and the file."
+      },
+      {
+        "question": "What do I do if the M2TS will not open?",
+        "answer": "Try VLC or ffplay first. The M2TS ending gives no hint about the video codec inside, so a player lacking that decoder shows no picture."
+      },
+      {
+        "question": "Is anything sent to a server?",
+        "answer": "No. FFmpeg copies the streams locally in your browser tab, and the original MP4 is untouched."
+      },
+      {
+        "question": "Can I convert several MP4 files in one go?",
+        "answer": "Yes. Add them together and each is converted in turn, then downloaded as its own M2TS file. They are not merged or zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and M2TS",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A media container that holds encoded tracks together with timing and descriptive information.",
+        "details": [
+          "Video and audio tracks",
+          "Codec support varies by player",
+          "Container rather than one codec"
+        ]
+      },
+      "toFormat": {
+        "name": "M2TS",
+        "fullName": "Blu-ray MPEG-2 transport stream",
+        "description": "A transport-stream packaging used in Blu-ray BDAV and AVCHD recording workflows.",
+        "details": [
+          "Multiple media streams",
+          "Wrapper does not choose one codec",
+          "Disc structure requires additional files"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to M2TS",
+      "points": [
+        "The streams are copied with -c copy; nothing is re-encoded.",
+        "The picture keeps the size and frame rate of the MP4.",
+        "The result is a single M2TS file, not a Blu-ray disc structure.",
+        "Conversion runs in your browser and each file downloads separately."
+      ]
+    },
+    "guide": {
+      "title": "MP4 to M2TS: format guide",
+      "markdown": "### What is an MP4 file?\n\nPhone clips, camera footage and downloaded web video usually arrive as MP4, which is MPEG-4 Part 14. It is standardized as ISO/IEC 14496-14 and dates from 2003. The file is a tree of boxes, the idea QuickTime calls atoms. Video takes .mp4 or .m4v, audio-only files often take .m4a, and the media types video/mp4 and audio/mp4 cover it.\n\n### Programs that open MP4 files\n\nTo play the source MP4 before copying it:\n\n- **Windows, Mac and Linux:** ffplay uses FFmpeg's libraries and mpv switches between audio streams.\n- **Windows and Mac:** Adobe Premiere reads an MP4 when a decoder is available for its contents.\n- **Web:** Firefox plays MP4 and may lean on codecs supplied by the operating system for AAC and H.264, while Chrome handles the combinations it supports.\n- **Mobile:** VLC on iOS and Android.\n\n### MP4 and M2TS compared\n\nM2TS packages video, audio and further streams for Blu-ray BDAV and AVCHD. It adapts the MPEG-2 transport stream and does not prescribe one video codec. Every source packet wraps a 188-byte transport packet and adds four bytes. Blu-ray permits MPEG-2, AVC and VC-1 pictures in it. Sony and Panasonic announced AVCHD in 2006.\n\nFFmpeg runs in your browser and copies the streams from the MP4 without re-encoding. The picture therefore keeps its size and frame rate, and the 1920 px and 30 fps cap that other video pages apply is not in play. Each file downloads on its own, and the MP4 itself is not altered.\n\n### Other ways to convert MP4 to M2TS\n\n- **FFmpeg, stream copy:** run `ffmpeg -i concert.mp4 -c copy -mpegts_m2ts_mode 1 concert.m2ts`. The `-mpegts_m2ts_mode 1` option enables M2TS mode.\n- **FFmpeg, re-encoding:** run `ffmpeg -i delivery.mp4 -c:v libx264 -c:a ac3 -mpegts_m2ts_mode 1 delivery.m2ts` to write new H.264 video and AC-3 audio instead of copying.\n\n### Problems with MP4 files\n\n- **A missing decoder:** a player can accept the MP4 and still lack the decoder for what it holds, which gives a blank picture or silence. Try another player.\n- **An unfinished file:** MP4 keeps its packet index together, so a recording cut off while writing may produce a file no player can open.\n"
+    }
+  },
+  "mp4-to-rm": {
+    "seo": {
+      "title": "Convert MP4 to RM (RealMedia) Online",
+      "h1": "MP4 to RM Converter",
+      "description": "Convert MP4 to RM, the legacy RealMedia format, with FFmpeg. The page tries a server route first, then your browser. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Write an MP4 as a RealMedia file with FFmpeg, server first and browser second."
+    },
+    "faqs": [
+      {
+        "question": "Which players open the RM file?",
+        "answer": "RealPlayer and VLC media player both play RM, and ffplay does too."
+      },
+      {
+        "question": "Which codecs does the RM use?",
+        "answer": "The page runs FFmpeg with only the input and output names, so FFmpeg chooses the codecs. To pick a RealVideo codec yourself, use the FFmpeg commands listed above."
+      },
+      {
+        "question": "Does my MP4 leave my device?",
+        "answer": "The page first tries the SERP Tools server. That attempt fails, and FFmpeg in your browser then does the conversion."
+      },
+      {
+        "question": "What is an RM file?",
+        "answer": "RealMedia is a container from RealNetworks, designed for streaming audio and video over the internet. It is now a legacy format."
+      },
+      {
+        "question": "Can I choose the bitrate of the RM?",
+        "answer": "No. This page sets no bitrate or quality value. FFmpeg run on your own computer accepts one with -b:v, as the commands above show."
+      },
+      {
+        "question": "Why would I still need an RM?",
+        "answer": "Mostly for old RealMedia archives or a legacy player that expects it. For current use the MP4 plays nearly everywhere."
+      },
+      {
+        "question": "Does the conversion change my MP4?",
+        "answer": "No. You download a new RM copy, and your MP4 stays as it was."
+      },
+      {
+        "question": "Can I convert several MP4 files together?",
+        "answer": "Yes. The files are handled in sequence, and every RM is saved as a separate download, never zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and RM",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A media container that holds encoded tracks together with timing and descriptive information.",
+        "details": [
+          "Video and audio tracks",
+          "Codec support varies by player",
+          "Container rather than one codec"
+        ]
+      },
+      "toFormat": {
+        "name": "RM",
+        "fullName": "RealMedia",
+        "description": "A RealNetworks multimedia container with stream headers and packets for recorded or delivered media.",
+        "details": [
+          "Audio and video streams",
+          "Codec-specific decoding",
+          "Legacy delivery workflows"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to RM",
+      "points": [
+        "FFmpeg picks the RealMedia codecs; the page sets no quality or bitrate.",
+        "The page tries a server route first and then falls back to your browser.",
+        "RealMedia is a legacy streaming format from RealNetworks.",
+        "Each file downloads on its own; your original is not changed."
+      ]
+    },
+    "guide": {
+      "title": "MP4 to RM: format guide",
+      "markdown": "### What is an MP4 file?\n\nMost phones and cameras save video as MP4, defined by MPEG-4 Part 14, ISO/IEC 14496-14, published in 2003. Boxes nest inside boxes, a layout inherited from QuickTime through the ISO Base Media File Format. A typical MP4 holds H.264 pictures and AAC sound, although VP9 and Opus can also appear. Files end in .mp4 or .m4v, and audio-only MPEG-4 files frequently use .m4a.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** ffplay, which comes with FFmpeg, opens an MP4, and mpv can choose among audio tracks.\n- **Windows and Mac:** Adobe Premiere takes in an MP4 when it has the decoder for the contents.\n- **Web:** Chrome and Firefox play the MP4 combinations they support.\n- **Mobile:** the VLC apps for Android and iOS.\n\n### MP4 and RM compared\n\nRM is RealMedia. RealNetworks described it as a streaming container in an Internet-Draft dated March 1998, covering playback from local storage or over a network. A RealMedia file begins with a .RMF header and continues in tagged chunks with four-character identifiers. Separate headers describe the whole file and each stream. The draft is work in progress, so its version-specific structures are history, not a guarantee.\n\nThe command here is plain: FFmpeg reads the MP4 and writes an .rm file, with no codec options of its own. The page first tries a server route and then converts in your browser with FFmpeg. You still get a separate download for each file, and your original is untouched.\n\n### Other ways to convert MP4 to RM\n\n- **FFmpeg with RealVideo 1.0 and AC-3:** run `ffmpeg -i exhibit.mp4 -c:v rv10 -b:v 800k -c:a ac3 exhibit.rm`. The `-b:v` option sets the video bitrate.\n- **FFmpeg, silent:** run `ffmpeg -i display.mp4 -an -c:v rv20 -b:v 800k display.rm` to leave out all sound and use RealVideo 2.0.\n\n### Problems with MP4 files\n\n- **Silent or black playback:** a player needs a decoder for every stream in the file, and the ending does not promise one. Try another player, such as mpv.\n- **A cut-off recording:** MP4 stores its packet index in one place, so an interrupted write may leave a file nothing can play.\n- **Nothing for an audio editor:** an MP4 with no audio track gives an editor nothing to import.\n"
+    }
+  },
+  "mpeg-to-wmv": {
+    "seo": {
+      "title": "Convert MPEG to WMV Online (Free)",
+      "h1": "MPEG to WMV Converter",
+      "description": "Convert MPEG to WMV in your browser. FFmpeg re-encodes and deinterlaces the video, so the WMV is a second lossy copy. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MPEG video as WMV with FFmpeg, deinterlaced, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does the converter keep the sound when I convert MPEG to WMV?",
+        "answer": "The converter does not remove the audio. FFmpeg re-encodes it as WMA v2, the audio codec it picks by default for a WMV."
+      },
+      {
+        "question": "Will my MPEG lose quality as a WMV?",
+        "answer": "Yes, somewhat. MPEG and WMV are both lossy, so the WMV is a second lossy encode. Keep the MPEG if you need the best copy."
+      },
+      {
+        "question": "Why is my WMV a pixel smaller than the MPEG?",
+        "answer": "Width and height both end up even, so an odd dimension gives up a pixel."
+      },
+      {
+        "question": "Does a large MPEG keep its frame size and frame rate?",
+        "answer": "Neither is increased: small frames and slow rates stay as they are. Large frames are shrunk to the cap, and fast footage drops frames while its running time holds."
+      },
+      {
+        "question": "Does it handle interlaced DVD-style video?",
+        "answer": "Yes. The command includes a deinterlacing filter, so frames flagged as interlaced are deinterlaced during the re-encode."
+      },
+      {
+        "question": "Which WMV codecs do I get?",
+        "answer": "The page chooses no codec, so FFmpeg's defaults decide: MS-MPEG4 v3 is used for video, which is not true Windows Media Video, and WMA v2 for audio. For a WMV2 file, use the FFmpeg command listed above."
+      },
+      {
+        "question": "Does the conversion change my MPEG?",
+        "answer": "No. The converter only reads the MPEG, and the WMV is a separate file you download."
+      },
+      {
+        "question": "Can I convert many MPEG files at once?",
+        "answer": "Yes. They run one after another, and each WMV is its own download without a ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPEG and WMV",
+      "fromFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "An extension associated with MPEG-coded video, including recordings packaged as system streams.",
+        "details": [
+          "Elementary or multiplexed media",
+          "Often lossy video",
+          "MPG is a related filename ending"
+        ]
+      },
+      "toFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "An ASF-based media file carrying Windows Media coded video and potentially sound.",
+        "details": [
+          "ASF container structure",
+          "Several video codec generations",
+          "Decoder compatibility varies"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MPEG to WMV",
+      "points": [
+        "The video is re-encoded, so the WMV is a second lossy generation.",
+        "A larger frame is scaled down and a faster rate is thinned; sides are rounded to even numbers.",
+        "FFmpeg's defaults write MS-MPEG4 v3 video and WMA v2 audio.",
+        "Conversion runs in your browser and each file downloads separately."
+      ]
+    },
+    "guide": {
+      "title": "MPEG to WMV: format guide",
+      "markdown": "### What is an MPEG file?\n\nMPEG video follows one of the Moving Picture Experts Group standards. MPEG-2, the generation behind DVD video, was designed for compressed television. Systems layers organize picture, sound and data as streams: an elementary stream is one coded component, and packetized elementary streams cut it into packets. The endings .mpeg and .mpg are both common, and the Library of Congress lists video/mpeg as the media type.\n\n### Programs that open MPEG files\n\n- **Windows, Mac and Linux:** VLC media player opens MPEG elementary, program and transport streams, while ffplay decodes MPEG.\n- **Mobile:** on phones, the Android version of VLC brings desktop decoding, and the iOS version plays local files with its own player.\n\n### MPEG and WMV compared\n\nASF, the wrapper around a .wmv file, exists to keep synchronized media together for storage and for network delivery. The video can be coded as Windows Media Video 7, 8 or 9, but this page writes MS-MPEG4 v3 instead. The Library of Congress records video/x-ms-wmv as the usual media type.\n\nFFmpeg re-encodes the video in your browser and leaves the codecs to its WMV defaults: MS-MPEG4 v3 at 200 kbit/s and WMA v2 audio. Interlaced frames are deinterlaced. Longer sides above 1920 px and rates above 30 fps are reduced by the converter, and an odd width or height then gives up a pixel. Both formats are lossy, so this is a second lossy pass. Files are handled one by one.\n\n### Other ways to convert MPEG to WMV\n\n- **FFmpeg:** run `ffmpeg -i seminar.mpeg -c:a wmav2 -b:v 1200k -c:v wmv2 seminar.wmv`. It names WMV2 video and WMA v2 audio, and `-b:v` fixes the video bitrate, unlike the page's defaults.\n\n### Problems with MPEG files\n\n- **Unclear structure:** an MPEG file may be a system stream or bare video, and identifying which helps choose the correct demuxer.\n- **Picture but no sound:** the audio track needs its own decoder in the player, separate from the video one, and putting both in one file does not supply it.\n- **Softer detail:** MPEG compression discards some of the original picture, and each further lossy pass discards more.\n"
+    }
+  },
+  "nef-to-pdf": {
+    "seo": {
+      "title": "Convert NEF to PDF, One Page per Photo",
+      "h1": "NEF to PDF Converter",
+      "description": "Convert Nikon NEF to PDF in your browser. Each photo becomes its own PDF page sized to the image, embedded as lossless PNG. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a Nikon NEF photo into a single-page PDF the size of the picture."
+    },
+    "faqs": [
+      {
+        "question": "Does the PDF hold the raw sensor data of my NEF?",
+        "answer": "No. It holds a picture embedded as a PNG. The adjustable sensor data stays in the NEF, so keep the original."
+      },
+      {
+        "question": "How big is the PDF page?",
+        "answer": "One page matching the picture, at one point per pixel. It has no margin and does not use a paper size such as A4 or Letter."
+      },
+      {
+        "question": "Can I put several NEF photos into one PDF?",
+        "answer": "Not here. Every NEF gets its own single-page PDF, and files are never merged."
+      },
+      {
+        "question": "Is the photo compressed again inside the PDF?",
+        "answer": "A lossless PNG is embedded, so no JPEG compression is applied."
+      },
+      {
+        "question": "Why does my NEF fail with 'too large to convert here'?",
+        "answer": "A picture beyond the converter's size limit is refused with that message. Nothing is converted for that file, and your NEF is untouched."
+      },
+      {
+        "question": "Why does the PDF differ from what NX Studio shows?",
+        "answer": "White balance, tone and sharpening are stored as processing instructions, and each program applies them in its own way. Compare against an NX Studio export if the match matters."
+      },
+      {
+        "question": "Is there a way to get a normal A4 PDF?",
+        "answer": "Place the exported picture on an A4 page in a PDF editor or layout program. This page always sizes the page to the picture."
+      },
+      {
+        "question": "Is my NEF uploaded?",
+        "answer": "No. Everything happens locally, the photo is never sent anywhere, and the NEF is not changed."
+      }
+    ],
+    "aboutSection": {
+      "title": "NEF and PDF",
+      "fromFormat": {
+        "name": "NEF",
+        "fullName": "Nikon Electronic Format",
+        "description": "Nikon\u2019s raw photographic format retains captured sensor information and processing-related metadata.",
+        "details": [
+          "Camera raw data",
+          "Development choices affect appearance",
+          "Keep as a photographic master"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A page-based document format that can place images, text, and vector graphics on a fixed canvas.",
+        "details": [
+          "Defined page geometry",
+          "Raster pictures can be embedded",
+          "Designed for viewing and printing"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting NEF to PDF",
+      "points": [
+        "Each NEF becomes its own single-page PDF; files are never merged.",
+        "The page is the size of the image, one pixel per point, with no margin.",
+        "The picture is embedded losslessly as a PNG.",
+        "A picture beyond the size limit fails with a 'too large to convert here' message."
+      ]
+    },
+    "guide": {
+      "title": "NEF to PDF: format guide",
+      "markdown": "### What is a NEF file?\n\nNEF, short for Nikon Electronic Format, is the raw photo file written by Nikon cameras. It preserves the sensor's capture together with camera and lens metadata, either uncompressed or losslessly compressed, at 12 or 14 bits depending on the camera. White balance, hue, tone and sharpening may be recorded as separate instructions rather than applied to the pixels, and Nikon's software can output a JPEG or TIFF while the raw file stays as shot.\n\n### Programs that open NEF files\n\n- **Windows and Mac:** NX Studio is Nikon's program for viewing and developing NEF photos.\n- **Windows, Mac and Linux:** ImageMagick reads NEF, a read-only format in its formats list.\n- **Linux:** XnView MP supports NEF and costs nothing for private or educational use.\n\n### NEF and PDF compared\n\nA PDF is a document format. It came from Adobe's Camelot project under John Warnock, begun in 1991 and named PDF by 1992, aiming for pages that show or print the same everywhere. ISO 32000-1 standardized PDF 1.7 in 2008. A page can mix text, vector art and bitmaps, and bitmaps are compressed losslessly with Flate or with JPEG. The media type is application/pdf.\n\nIn your browser, ImageMagick reads one image from the NEF. The PDF gets a single page cut to the picture, one point per pixel and no margin, with the picture stored inside as a lossless PNG. Several files are never merged, and your NEF is left alone.\n\n### Other ways to convert NEF to PDF\n\n- **ImageMagick:** run `magick selection.nef selection.pdf`. Its formats page marks NEF as readable and PDF as readable and writable, and PDF output requires Ghostscript.\n\n### Problems with NEF files\n\n- **It looks different after development:** white balance and other rendering settings are instructions that processing software applies, so the picture can change between programs.\n- **The raw data is gone:** a JPEG export or a PDF is a rendered result and cannot stand in for the adjustable sensor data in the NEF. Keep the original.\n- **Less tonal range:** tonal depth varies by camera, and an eight-bit export cannot hold the 12-bit or 14-bit depth of the raw file.\n"
+    }
+  },
+  "orf-to-jpeg": {
+    "seo": {
+      "title": "Convert ORF to JPEG Online (Free)",
+      "h1": "ORF to JPEG Converter",
+      "description": "Convert Olympus and OM SYSTEM ORF raw photos to JPEG in your browser with ImageMagick. Keep the ORF to redevelop later. Free, and no upload needed."
+    },
+    "tool": {
+      "subtitle": "Make a JPEG copy of an Olympus or OM SYSTEM ORF photo in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does the JPEG keep the raw data of my ORF?",
+        "answer": "No. A JPEG is a rendered picture, not raw sensor data. The raw data stays in the ORF, so keep it if you might want to redevelop the photo."
+      },
+      {
+        "question": "Is there a quality slider for the JPEG?",
+        "answer": "No. This page leaves quality unset."
+      },
+      {
+        "question": "Why does my ORF not open in Camera Raw?",
+        "answer": "Each program supports raw files camera by camera. Adobe publishes a table showing, per camera, the first Camera Raw release that reads it."
+      },
+      {
+        "question": "Is ORF only for Olympus?",
+        "answer": "No. Olympus and OM SYSTEM cameras both use the ORF extension for their raw pictures."
+      },
+      {
+        "question": "Why did a huge ORF fail?",
+        "answer": "A photo beyond the converter's size limit is not processed and shows 'too large to convert here'."
+      },
+      {
+        "question": "Will the JPEG have transparency?",
+        "answer": "No. The JPEG format stores no alpha channel, so transparent areas cannot be kept."
+      },
+      {
+        "question": "Is .jpeg different from .jpg?",
+        "answer": "No. Both extensions name the same JPEG format, and this page's download ends in .jpeg."
+      },
+      {
+        "question": "Can I convert several ORF files at once?",
+        "answer": "Yes. They are converted one after another, and each JPEG downloads as its own file."
+      }
+    ],
+    "aboutSection": {
+      "title": "ORF and JPEG",
+      "fromFormat": {
+        "name": "ORF",
+        "fullName": "Olympus Raw Format",
+        "description": "A camera raw image family used by Olympus and OM SYSTEM cameras for later photographic development.",
+        "details": [
+          "Model-specific decoding",
+          "Raw development workflow",
+          "Rendered exports are separate images"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "Joint Photographic Experts Group image",
+        "description": "A photograph-oriented raster format whose common encodings discard some image detail to reduce storage.",
+        "details": [
+          "Same image family as JPG",
+          "No alpha channel",
+          "Common camera and web format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ORF to JPEG",
+      "points": [
+        "A JPEG is a rendered copy; the raw data stays in the ORF.",
+        "The page sets no quality and reads one image from the file.",
+        "A picture beyond the size limit fails with a 'too large to convert here' message.",
+        "Conversion runs in your browser and each file downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "ORF to JPEG: format guide",
+      "markdown": "### What is an ORF file?\n\nORF is the raw-picture extension of Olympus cameras, and of OM SYSTEM cameras since the brand changed. A file stores raw sensor readings in a TIFF-based layout with a JPEG preview embedded. Which cameras a program can read depends on its version; Adobe's table, for example, starts OM-1 ORF support at Camera Raw 14.2. Many photographers shoot ORF so they can edit before exporting JPEGs. OM Workspace, the maker's software, develops ORF files, adjusts white balance and exposure, and keeps a history of your processing so an edit can be undone back to the original settings.\n\n### Programs that open ORF files\n\n- **Windows and Mac:** OM Workspace comes from the camera maker and processes raw files. Adobe Camera Raw reads ORF too, with a minimum version that depends on the exact camera.\n- **Linux:** ImageMagick reads ORF as a camera raw format, as long as the needed delegates are installed on your system.\n\n### ORF and JPEG compared\n\nThe Joint Photographic Experts Group gave JPEG its name and began its work in 1986; ITU-T T.81 followed in 1992 and ISO/IEC 10918-1 in 1994. The method is lossy, works on 8x8 blocks and stores 8 bits per color channel. It has no layers and no alpha channel, though an optional progressive mode first draws a rough image and refines it as the file loads. Both .jpg and .jpeg name the format, its media type is image/jpeg, and every major browser displays it. Photos on web pages, in email attachments and on sharing sites are usually JPEG.\n\nImageMagick, working inside your browser, reads one image from the ORF and writes a JPEG. No quality setting is passed. With several files, each is converted in its turn and saved separately, and the ORF itself is untouched.\n\n### Other ways to convert ORF to JPEG\n\n- **ImageMagick:** run `magick portrait.orf portrait.jpeg`. In the formats list, ORF is read-only while JPEG can be read and written.\n\n### Problems with ORF files\n\n- **Camera not supported:** an older raw plug-in may lack your camera even though it opens other ORF files. Update the plug-in or the software.\n- **A missing option:** in OM Workspace, not every processing option works with every raw image.\n- **High Res Shot files:** OM Workspace needs 8 GB of memory or more to process them as raw.\n"
+    }
+  },
+  "orf-to-png": {
+    "seo": {
+      "title": "Convert ORF to PNG, Lossless, in Your Browser",
+      "h1": "ORF to PNG Converter",
+      "description": "Convert Olympus and OM SYSTEM ORF raw photos to lossless PNG with ImageMagick in your browser. The ORF stays untouched. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save an Olympus or OM SYSTEM ORF photo as a lossless PNG in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the PNG made from my ORF lossless?",
+        "answer": "The PNG itself is lossless, because PNG compression never discards pixels. It is still a rendered picture, so it does not hold the raw sensor data."
+      },
+      {
+        "question": "Why is the PNG bigger than a JPEG of the same photo?",
+        "answer": "PNG compresses without loss, so a photograph usually takes more space than a lossy JPEG of the same picture."
+      },
+      {
+        "question": "Can I choose the bit depth of the PNG?",
+        "answer": "No. The page has no bit-depth setting and passes no quality value."
+      },
+      {
+        "question": "Where can I open the PNG afterwards?",
+        "answer": "Every major browser displays PNG, and editors such as GIMP import it, so it is easy to pass on or edit further."
+      },
+      {
+        "question": "What if my ORF is rejected?",
+        "answer": "A picture beyond the converter's size limit shows 'too large to convert here'. Otherwise, raw readers are matched to camera models, so a brand-new camera may need a newer reader."
+      },
+      {
+        "question": "Why would I want PNG instead of JPEG here?",
+        "answer": "PNG never discards pixels, so repeated edits and saves do not degrade the picture the way re-saving a JPEG does."
+      },
+      {
+        "question": "Can I convert a whole card of ORF files?",
+        "answer": "Yes, select them all. They go through one at a time, and each PNG is a separate download without a ZIP."
+      },
+      {
+        "question": "Does the ORF leave my computer?",
+        "answer": "No. The conversion is done by ImageMagick compiled for the browser, on your own device, and the ORF is left unchanged."
+      }
+    ],
+    "aboutSection": {
+      "title": "ORF and PNG",
+      "fromFormat": {
+        "name": "ORF",
+        "fullName": "Olympus Raw Format",
+        "description": "A camera raw image family used by Olympus and OM SYSTEM cameras for later photographic development.",
+        "details": [
+          "Model-specific decoding",
+          "Raw development workflow",
+          "Rendered exports are separate images"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format with grayscale, indexed, and truecolor modes, plus optional per-pixel transparency.",
+        "details": [
+          "Lossless pixel compression",
+          "Alpha support",
+          "Widely used for screenshots"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ORF to PNG",
+      "points": [
+        "The PNG is lossless, but it is a rendered picture, not raw data.",
+        "No quality or bit-depth setting is passed.",
+        "A picture beyond the size limit fails with a 'too large to convert here' message.",
+        "Conversion runs in your browser; each file downloads separately."
+      ]
+    },
+    "guide": {
+      "title": "ORF to PNG: format guide",
+      "markdown": "### What is an ORF file?\n\nEach ORF is a raw photograph from an Olympus or OM SYSTEM camera. It is TIFF-based, holds unprocessed sensor data and carries an embedded JPEG preview. Readers are matched to camera models and program versions, so a brand-new body can need an update before its files open. ORF mainly serves photographers who edit first and export afterwards. OM Workspace, from the manufacturer, develops them and logs your processing choices, which lets an edit step back to its starting settings.\n\n### Programs that open ORF files\n\n- **Windows and Mac:** OM Workspace is the maker's own raw software, and Adobe Camera Raw opens ORF once you look up the minimum version for your camera.\n- **Linux:** ImageMagick treats ORF as a camera raw format; check that your install has the right delegates.\n\n### ORF and PNG compared\n\nPNG was created as a patent-free alternative to GIF and in October 1996 became the earliest format released as a W3C Recommendation; it was later published as RFC 2083 and ISO/IEC 15948:2004. DEFLATE compression discards nothing. A file starts with a signature and continues in chunks such as IHDR, IDAT and IEND. Samples run from 1 to 16 bits, and an optional alpha channel gives each pixel its own transparency. Browsers all display it, under the media type image/png. It suits screenshots, logos, pictures that need transparency and web graphics with crisp edges.\n\nImageMagick picks one image from the ORF and writes it out as PNG. The page passes no quality value, since lossless PNG has nothing to trade. Pick several ORFs if you like: each becomes its own PNG download, and the originals are never altered.\n\n### Other ways to convert ORF to PNG\n\n- **ImageMagick:** run `magick landscape.orf landscape.png`. Its formats page marks ORF as read-only and PNG as readable and writable; PNG output requires libpng.\n\n### Problems with ORF files\n\n- **Unsupported camera:** an older raw plug-in may skip your model yet read other ORF files. Update it.\n- **Disabled options:** some processing options in OM Workspace are unavailable for some raw images.\n- **Not enough memory:** processing High Res Shot raw files in OM Workspace takes 8 GB of memory at least.\n"
+    }
+  },
+  "pbm-to-png": {
+    "seo": {
+      "title": "Convert PBM to PNG Online (Free)",
+      "h1": "PBM to PNG Converter",
+      "description": "Convert PBM two-tone bitmaps to lossless PNG in your browser with ImageMagick. One picture is read per file. Free, with no sign-up or upload."
+    },
+    "tool": {
+      "subtitle": "Turn a two-tone Netpbm PBM bitmap into a lossless PNG in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Why is my PNG only black and white?",
+        "answer": "A PBM stores two tones: a one bit is black and a zero bit is white. The PNG shows the same two tones."
+      },
+      {
+        "question": "What happens to a PBM that holds several images?",
+        "answer": "A raw PBM can hold consecutive images, but this page reads one picture from a file. A plain PBM holds just one image."
+      },
+      {
+        "question": "What is the difference between P1 and P4 PBM?",
+        "answer": "P1 is the plain variant, with pixels written as readable zeros and ones. P4 is the raw variant, with pixels packed as bits."
+      },
+      {
+        "question": "Can I choose a PNG compression level?",
+        "answer": "No. The page passes no quality setting, and PNG compression is lossless anyway."
+      },
+      {
+        "question": "Is a PBM a bitmap in the Windows BMP sense?",
+        "answer": "No. PBM is Netpbm's Portable Bit Map, a separate two-tone format that starts with a P1 or P4 header."
+      },
+      {
+        "question": "Why does my PBM fail in another program?",
+        "answer": "Some readers implement only part of the specification, and a reader that expects one image may not cope with a raw file holding several."
+      },
+      {
+        "question": "What is a PBM file used for?",
+        "answer": "Simple one-bit images and interchange between image tools. Netpbm uses PBM as an intermediate form between image-processing programs."
+      },
+      {
+        "question": "Can I convert a batch of PBM files?",
+        "answer": "Yes. Select a batch and every PBM gives its own PNG download, one after the other, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "PBM and PNG",
+      "fromFormat": {
+        "name": "PBM",
+        "fullName": "Portable Bitmap",
+        "description": "Netpbm\u2019s two-tone raster format, stored as readable digits or packed binary samples.",
+        "details": [
+          "Black or white pixels",
+          "P1 and P4 variants",
+          "Intermediate image interchange"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format with grayscale, indexed, and truecolor modes, plus optional per-pixel transparency.",
+        "details": [
+          "Lossless pixel compression",
+          "Alpha support",
+          "Widely used for screenshots"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PBM to PNG",
+      "points": [
+        "A PBM is two-tone, so the PNG is black and white.",
+        "Only one picture is read, even from a raw PBM with several images.",
+        "PNG compression is lossless and no quality setting is passed.",
+        "Conversion runs in your browser; each file downloads separately."
+      ]
+    },
+    "guide": {
+      "title": "PBM to PNG: format guide",
+      "markdown": "### What is a PBM file?\n\nPBM, short for Portable Bit Map, describes two-tone raster images, and Netpbm uses it as the glue between image-processing programs. The raw variant opens with P4 and packs its pixels bit by bit. The plain variant opens with P1 and spells pixels out as zeros and ones, with a one meaning black and a zero meaning white. Raw PBM permits consecutive images, while plain PBM contains one. The customary MIME label is image/x-portable-bitmap, which Netpbm notes is not registered with IANA.\n\n### Programs that open PBM files\n\n- **Windows, Mac and Linux:** ImageMagick reads PBM images, and XnView MP lists PBM among its readable formats. XnView MP is free for private and educational use.\n\n### PBM and PNG compared\n\nPNG started as a patent-free alternative to GIF and is standardized as ISO/IEC 15948:2004. Its compression loses nothing, and pictures can be indexed, grayscale or truecolor, with samples from 1 to 16 bits and transparency available through an alpha channel. A PBM carries only black and white, so a PNG made from it is a two-tone picture in a file that more programs can open. Every major browser shows PNG, and the media type is image/png.\n\nYour browser runs ImageMagick here, and it takes one picture from the PBM. No quality setting is passed, since PNG has none to adjust. Add several PBMs and each is processed in turn and saved on its own; the originals stay as they were.\n\n### Other ways to convert PBM to PNG\n\n- **ImageMagick:** run `magick stencil.pbm stencil.png`. Its formats page marks both PBM and PNG as readable and writable.\n- **Pillow:** in Python, after `from PIL import Image`, run `Image.open(\"mask.pbm\").save(\"mask.png\")`. Pillow reads plain and raw PBM and takes PNG from the file ending.\n\n### Problems with PBM files\n\n- **No shades:** color and gray shading cannot be represented directly in a two-tone image.\n- **Large plain files:** a plain PBM spends a text digit on each pixel, so it takes more space than the raw form.\n- **Partial readers:** some programs implement only a restricted part of the specification.\n- **Several images in one file:** Netpbm recommends a minimal single-image layout for interoperability.\n"
+    }
+  },
+  "pcx-to-jpg": {
+    "seo": {
+      "title": "Convert PCX to JPG Online (Free)",
+      "h1": "PCX to JPG Converter",
+      "description": "Convert PC Paintbrush PCX images to JPG in your browser with ImageMagick. PCX is lossless and JPG is not. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Make a JPG copy of a PC Paintbrush PCX image in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will the JPG look worse than my PCX?",
+        "answer": "It can. PCX uses lossless run-length encoding and JPG is lossy, so compare the result with the original."
+      },
+      {
+        "question": "What happens to the palette of my PCX?",
+        "answer": "Many PCX files are palette-based. A JPG has no palette, so each pixel is stored as full color."
+      },
+      {
+        "question": "Is the JPG quality adjustable?",
+        "answer": "No. This page does not pass a quality setting."
+      },
+      {
+        "question": "What is a DCX file?",
+        "answer": "A DCX is a multi-picture cousin of PCX, typical in fax programs. This page reads one picture per file, and its picker takes .pcx files."
+      },
+      {
+        "question": "Can the JPG keep transparency?",
+        "answer": "No. JPG stores no alpha channel, so transparency is not an option in the result."
+      },
+      {
+        "question": "Who made PCX?",
+        "answer": "ZSoft, for its PC Paintbrush program, in the 1980s."
+      },
+      {
+        "question": "Why does my image viewer not open PCX?",
+        "answer": "Some viewers have stopped supporting PCX even though they open newer bitmaps."
+      },
+      {
+        "question": "Can I convert a folder of PCX files at once?",
+        "answer": "Select them together. They run in turn, and each one downloads as its own JPG with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "PCX and JPG",
+      "fromFormat": {
+        "name": "PCX",
+        "fullName": "PC Paintbrush image",
+        "description": "ZSoft\u2019s raster format for PC Paintbrush, commonly using run-length compression and several pixel organizations.",
+        "details": [
+          "Legacy desktop graphics",
+          "Palette or truecolor variants",
+          "DCX can group PCX pictures"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A common filename spelling for JPEG photographs and other lossy compressed still images.",
+        "details": [
+          "Photographic raster data",
+          "No editable layers",
+          "JPEG and JPG name the same format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PCX to JPG",
+      "points": [
+        "PCX is lossless run-length encoded; JPG adds lossy compression.",
+        "JPG has no transparency and no palette.",
+        "One picture is read per file.",
+        "No quality is set; conversion runs in your browser."
+      ]
+    },
+    "guide": {
+      "title": "PCX to JPG: format guide",
+      "markdown": "### What is a PCX file?\n\nZSoft created PCX as the native format of its PC Paintbrush program, which reached MS-DOS in 1984 and 1985. A picture is a raster with run-length encoding, palette-based or truecolor, and some variants add a second palette after the image data. PCX saw wide use on DOS and early Windows, and old clip art collections still turn up in it. A related DCX file bundles several PCX pictures, an arrangement common in fax software.\n\n### Programs that open PCX files\n\n- **Windows, Mac and Linux:** ImageMagick lists PCX for reading and writing, and Pillow, a Python imaging library, reads and writes PCX in the modes its documentation names.\n\n### PCX and JPG compared\n\nJPEG is named after the Joint Photographic Experts Group, active since 1986, and ITU-T T.81 followed in 1992. Baseline JPEG is lossy: it cuts the picture into 8x8 blocks, runs a discrete cosine transform, then Huffman-codes the result. Each channel gets 8 bits, there is no transparency, and the media type is image/jpeg. The endings .jpg and .jpeg are interchangeable, and web photos, email attachments and shared snapshots are mostly JPEG.\n\nRun-length encoding in a PCX loses nothing, so the step to JPG adds a loss that was not there before. The conversion happens in your browser with ImageMagick, which decodes a single picture from the PCX. The page passes no quality setting. Each file is saved separately and your PCX stays as it is.\n\n### Other ways to convert PCX to JPG\n\n- **ImageMagick:** run `magick archive.pcx archive.jpg`. Its formats page marks both PCX and JPEG as readable and writable.\n- **Pillow:** in Python, run `Image.open(\"clipart.pcx\").convert(\"RGB\").save(\"clipart.jpg\")` after `from PIL import Image`. The `convert(\"RGB\")` call turns a palette image into RGB before the JPEG is written.\n\n### Problems with PCX files\n\n- **A program rejects the file:** newer software sometimes drops PCX support while handling modern bitmaps. Convert it with one of the tools above.\n- **Saving back to PCX:** Pillow's PCX writer accepts monochrome, grayscale, palette and RGB data, not arbitrary channel arrangements.\n- **A DCX read as one PCX:** treating a DCX as a single PCX loses the document's multiple-image structure.\n"
+    }
+  },
+  "pes-to-jpg": {
+    "seo": {
+      "title": "PES to JPG: Render an Embroidery Design",
+      "h1": "PES to JPG Converter",
+      "description": "This page cannot convert PES files to JPG. See how Ink/Stitch and ImageMagick render an embroidery design, and keep the PES for stitching."
+    },
+    "tool": {
+      "subtitle": "This page cannot read PES files; use embroidery software to render a JPG."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert PES to JPG?",
+        "answer": "No. The page passes the file to the browser's built-in image decoder, and a PES ends with the message 'Image decode failed.'"
+      },
+      {
+        "question": "How do I get a picture of my embroidery design?",
+        "answer": "Open the PES in software that draws stitches. Ink/Stitch imports a PES in Inkscape and can export a PNG, and ImageMagick on your computer can read a PES and write a JPG."
+      },
+      {
+        "question": "Will the JPG keep my stitches?",
+        "answer": "No. A JPG is a flat picture with no stitch order, thread colors or machine instructions. Keep the PES for sewing."
+      },
+      {
+        "question": "Which programs open a PES file?",
+        "answer": "Ink/Stitch on Windows, Mac and Linux, Brother's PE-DESIGN on Windows, and Brother's Artspira app on iOS and Android."
+      },
+      {
+        "question": "Can I rename the PES to JPG?",
+        "answer": "No. Renaming changes only the ending, and the file would still contain embroidery data that no image viewer can read."
+      },
+      {
+        "question": "Does ImageMagick open PES files?",
+        "answer": "ImageMagick lists PES as a format it can read, but not write. Run it on your own computer, as in the method above; it is a different engine from this page."
+      },
+      {
+        "question": "What do I do if my machine will not take the PES?",
+        "answer": "The design may exceed the machine's USB-connected storage. Brother suggests a USB flash drive where supported."
+      },
+      {
+        "question": "Why would I want a JPG of an embroidery design?",
+        "answer": "A JPG works as a preview you can share or print. It cannot be stitched, because it holds pixels rather than stitch data."
+      }
+    ],
+    "aboutSection": {
+      "title": "PES and JPG",
+      "fromFormat": {
+        "name": "PES",
+        "fullName": "Brother embroidery",
+        "description": "A machine-embroidery format holding a design\u2019s stitch information and associated color data.",
+        "details": [
+          "Stitch coordinates",
+          "Thread-color information",
+          "Requires embroidery-aware rendering"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A common filename spelling for JPEG photographs and other lossy compressed still images.",
+        "details": [
+          "Photographic raster data",
+          "No editable layers",
+          "JPEG and JPG name the same format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PES to JPG",
+      "points": [
+        "This page cannot convert PES; it ends with 'Image decode failed.'",
+        "A PES holds stitches and thread colors, not a pixel grid.",
+        "A JPG preview cannot carry stitch order or machine instructions.",
+        "Ink/Stitch, PE-DESIGN and Artspira open PES files."
+      ]
+    },
+    "guide": {
+      "title": "PES to JPG: format guide",
+      "markdown": "### What is a PES file?\n\nA PES file holds embroidery data for Brother's PE-DESIGN workflow, and Brother and Babylock machines use it. It stores stitch coordinates, a thread color palette and a design preview. PE-DESIGN 11 can show PES designs as thumbnails in Explorer in its full edition, and files saved by that version may be larger because they contain more design information. Ink/Stitch can both import and export PES, and Brother's Artspira app accepts PES files on iOS and Android. A PES describes stitches, not a grid of pixels.\n\n### Programs that open PES files\n\n- **Windows, Mac and Linux:** Ink/Stitch is a free embroidery extension for Inkscape with PES import and export.\n- **Windows:** PE-DESIGN 11 is Brother's application; its trial has restricted features.\n- **Mobile:** Artspira accepts PES uploads on iOS and Android.\n\n### PES and JPG compared\n\nJPEG is a lossy picture format from the Joint Photographic Experts Group, standardized as ITU-T T.81 in 1992. It stores 8 bits per color channel, has no transparency and cannot hold layers. A JPG is a flat picture, so it cannot carry thread colors, stitch order or machine instructions, and it works only as a preview of the design. The media type is image/jpeg.\n\nOn this page the browser's own image decoder gets the file, and it stops on a PES with \"Image decode failed.\" To get a JPG of a design, use software that draws the stitches, such as the programs below, and keep your PES for the sewing machine.\n\n### Other ways to convert PES to JPG\n\n- **ImageMagick:** run `magick sampler.pes sampler.jpg`. Its formats page lists PES for reading only, and JPEG for reading and writing.\n- **Ink/Stitch:** open the PES with File > Open in Inkscape, then use File > Save a copy and pick PNG, one of the utility formats Ink/Stitch can write. Save a JPG from that PNG in any image editor.\n\n### Problems with PES files\n\n- **A color-change limit:** Ink/Stitch's troubleshooting page says a PES export cannot contain more than 255 color changes.\n- **No thumbnails:** the PE-DESIGN 11 trial lacks the PES thumbnail integration of the full program.\n"
+    }
+  }
+}

@@ -1,0 +1,835 @@
+{
+  "jpg-to-pbm": {
+    "seo": {
+      "title": "Convert JPG to PBM: Photo to Black and White",
+      "h1": "JPG to PBM Converter",
+      "description": "Convert JPG to PBM in your browser. Every pixel becomes black or white, which suits scans and line art but flattens a photo. Free, no sign-up.",
+      "howToHeading": "How to convert JPG to PBM"
+    },
+    "tool": {
+      "subtitle": "Turn a JPG into a black-and-white PBM bitmap, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPG to PBM?",
+        "answer": "Add the JPG above. The browser decodes the picture, ImageMagick writes the PBM, and you save it. With several JPGs you get one PBM for each."
+      },
+      {
+        "question": "Why is my PBM only black and white?",
+        "answer": "A PBM stores one bit per pixel, so each pixel is either black or white. Color and gray shading have no place to go."
+      },
+      {
+        "question": "Where is the cutoff between black and white?",
+        "answer": "The page has no threshold control. Pixels in the darker half of the brightness range become black and the lighter half white, with no dither pattern. If you need a specific cutoff, use the ImageMagick or Netpbm commands below."
+      },
+      {
+        "question": "Will a photo look right as a PBM?",
+        "answer": "Rarely. PBM suits simple one-bit images such as scanned text, and a photograph loses its shading and most of its detail. Check the result before relying on it."
+      },
+      {
+        "question": "Can I keep gray shades instead?",
+        "answer": "Not in a PBM. A PGM stores gray samples, so the JPG to PGM page is the choice when you want a grayscale copy."
+      },
+      {
+        "question": "Is the PBM plain text or binary?",
+        "answer": "The page writes the raw form, which starts with P4 and packs the pixels as bits. The plain-text form starts with P1 and takes more space, because each pixel is a text digit."
+      },
+      {
+        "question": "Does the PBM keep my camera data?",
+        "answer": "No. The image is handed over as bare pixels, which leaves EXIF, ICC and XMP records behind."
+      },
+      {
+        "question": "Why does my program reject the PBM?",
+        "answer": "Some readers implement only part of the Netpbm specification. Try ImageMagick or XnView MP, which both list PBM among the formats they read."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and PBM",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format defined by the Joint Photographic Experts Group, standardized as ISO/IEC 10918-1 in 1994. The .jpg and .jpeg extensions name the same format.",
+        "details": [
+          "Lossy compression",
+          "8 bits per color channel",
+          "No transparency",
+          "Image media type image/jpeg"
+        ]
+      },
+      "toFormat": {
+        "name": "PBM",
+        "fullName": "Portable Bit Map",
+        "description": "The two-tone member of the Netpbm family. Netpbm uses it as an intermediate between image-processing programs.",
+        "details": [
+          "One bit per pixel",
+          "Raw form starts with P4",
+          "Plain-text form starts with P1",
+          "A one bit means black"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to PBM",
+      "points": [
+        "Every pixel becomes black or white, so color and gray shading are gone.",
+        "The page has no threshold setting: darker pixels become black and lighter ones white.",
+        "The PBM is written in the packed binary form that starts with P4.",
+        "EXIF, ICC profiles and XMP are not carried over.",
+        "Several files run one after another, each giving its own PBM."
+      ]
+    },
+    "guide": {
+      "title": "About JPG files",
+      "markdown": "### What is a JPG file?\n\nMost photos you handle are JPGs. A committee of photography and imaging experts began work on the format in 1986, ITU-T published it as T.81 in 1992, and ISO followed with part 1 of 10918 in 1994. The compression is lossy and works on blocks of 8x8 pixels, which is why a JPG is far smaller than the raw pixels.\n\nEach color channel gets 8 bits, and there is neither transparency nor a layer stack. The .jpg and .jpeg endings are interchangeable, and most cameras and scanners produce the format. Its media type is image/jpeg.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** GIMP opens a JPEG for retouching, while ImageMagick handles it from the command line.\n- **Web and Mobile:** Chrome displays JPG.\n- **Web:** Firefox displays JPG.\n- **Mobile:** Safari displays JPG.\n\n### JPG and PBM compared\n\nPBM is the Portable Bit Map of the Netpbm family, a two-tone format that Netpbm uses as an intermediate between programs. A raw PBM begins with P4 and packs its pixels as bits, while the plain variant begins with P1 and spells them as zeros and ones. A one bit means black. The conventional media type is image/x-portable-bitmap, which IANA has not registered.\n\nOn this page the browser decodes the JPG and ImageMagick, compiled to WebAssembly, writes the PBM, so every pixel ends up black or white. Open the PBM beside the JPG before you use it, to see what the black-and-white conversion kept.\n\n### Other ways to convert JPG to PBM\n\n- **ImageMagick:** run `magick scan.jpg -colorspace Gray -threshold 50% scan.pbm` to choose the cutoff yourself, and raise or lower the percentage for your scan.\n- **GIMP:** with the JPG open, use File > Export As, call the file scan.pbm, and choose ASCII or RAW under Data formatting. The export is black and white, not continuous grayscale.\n- **Netpbm:** run `jpegtopnm scan.jpg | ppmtopgm | pamthreshold -simple -threshold=0.5 | pamtopnm > scan.pbm`. The pamthreshold step writes a PAM file, so pamtopnm turns it into the PBM.\n\n### Problems with JPG files\n\n- **No transparency**: a logo that needs a clear background must start from a different format, because a JPG has none.\n- **Quality numbers differ**: an 85 in one editor is not an 85 in another, so re-saving the JPG in a different program can change its look.\n- **Layers do not survive**: editable layers cannot live in a JPG, so save the project in its own format.\n"
+    }
+  },
+  "jpg-to-pcx": {
+    "seo": {
+      "title": "Convert JPG to PCX: For Old DOS Programs",
+      "h1": "JPG to PCX Converter",
+      "description": "Convert JPG to PCX in your browser, for retro graphics tools and old DOS or Windows programs that read PC Paintbrush files. Free, no sign-up.",
+      "howToHeading": "How to convert JPG to PCX"
+    },
+    "tool": {
+      "subtitle": "Save a JPG as a run-length PCX image for older graphics programs, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How can I save a JPG as a PCX file?",
+        "answer": "Add the JPG above and give the page a moment to build the PCX, then save it. In a batch, each JPG returns its own PCX."
+      },
+      {
+        "question": "Why would I need a PCX?",
+        "answer": "ZSoft created PCX for PC Paintbrush on MS-DOS, and it was widely used on DOS and early Windows. Convert to it when a legacy program or an old clip art collection asks for that format."
+      },
+      {
+        "question": "Will the PCX be smaller than the JPG?",
+        "answer": "Often not. PCX uses run-length encoding, which saves space only where neighboring pixels repeat, so a photograph can come out larger than the JPG."
+      },
+      {
+        "question": "Does converting remove the JPG artifacts?",
+        "answer": "No. The PCX stores the decoded pixels, so any blockiness already in the JPG stays. Nothing new is lost, but nothing is restored either."
+      },
+      {
+        "question": "Does the PCX keep EXIF and color profiles?",
+        "answer": "No. Only pixels are passed along, so none of the EXIF, ICC or XMP records are written to the PCX."
+      },
+      {
+        "question": "My old program will not open the PCX. Why?",
+        "answer": "Applications may omit support for this older format even when they open newer bitmap formats. Try GIMP, IrfanView or XnView MP, which list PCX among the formats they open."
+      },
+      {
+        "question": "Is a DCX the same as a PCX?",
+        "answer": "No. DCX is a multi-picture wrapper around PCX images, common in fax software. This page writes a single picture from one JPG."
+      },
+      {
+        "question": "Can I convert a file ending in .jpeg?",
+        "answer": "Yes. Both .jpeg and .jpg name one format, so the picker accepts either ending."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and PCX",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy photo format whose quality is usually set on a 0 to 100 scale. It offers a progressive mode, and .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Progressive mode",
+          "No layers",
+          "Image media type image/jpeg"
+        ]
+      },
+      "toFormat": {
+        "name": "PCX",
+        "fullName": "ZSoft PC Paintbrush image",
+        "description": "A raster format with run-length encoding, created by ZSoft for PC Paintbrush on MS-DOS in the mid-1980s.",
+        "details": [
+          "Run-length encoding",
+          "128-byte header",
+          "Some variants append a palette",
+          "DCX groups several PCX pictures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to PCX",
+      "points": [
+        "The PCX uses run-length encoding, so a photo can come out larger than the JPG.",
+        "PCX began with PC Paintbrush on MS-DOS, and some programs no longer read it.",
+        "JPG blockiness is kept, since the PCX stores the decoded pixels.",
+        "EXIF, ICC profiles and XMP are not carried over.",
+        "Each JPG in a batch gives its own PCX."
+      ]
+    },
+    "guide": {
+      "title": "About JPG files",
+      "markdown": "### What is a JPG file?\n\nThe JPG is a lossy picture file built for photographs, and nearly every camera, phone and scanner can make one. Each color channel takes 8 bits, layers are impossible, and US patent protection lapsed in October 2006. A progressive JPEG shows a coarse picture first and refines it as loading continues.\n\nWhen you convert a JPG to something older, the lossy damage stays in the pixels: soft blocks and ringing travel along into the new file.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** GIMP can import a JPEG and edit it; ImageMagick takes one as input for scripted batches.\n- **Web and Mobile:** Chrome shows the picture.\n- **Web:** Firefox shows the picture.\n- **Mobile:** Safari shows the picture.\n\n### JPG and PCX compared\n\nZSoft made PCX for its PC Paintbrush program on MS-DOS around 1984 and 1985. A PCX opens with a 128-byte header and compresses rows with run-length encoding, which pays off on flat colors and does little for photographs. Some variants add a palette at the end of the file.\n\nThis page decodes the JPG in your browser and lets ImageMagick, compiled to WebAssembly, write the PCX. A single image goes in and a single image comes out. Open the PCX in a viewer before sending it on, since older programs may not read every variant.\n\n### Other ways to convert JPG to PCX\n\n- **ImageMagick:** run `magick art.jpg art.pcx`. ImageMagick lists PCX as readable and writable.\n- **GIMP:** load the JPG, then choose File > Export As and type art.pcx as the name. The export has no settings dialog.\n- **Pillow:** in Python, run `Image.open(\"art.jpg\").save(\"art.pcx\")`. Pillow reads and writes PCX files holding 1, L, P or RGB data, and takes the format from the file ending.\n\n### Problems with JPG files\n\n- **An old frame will not show it**: older photo frames sometimes cannot display progressive JPEG, so export with progressive mode off.\n- **Quality scales vary**: quality runs from 0 to 100 and GIMP starts at 85, yet one program's value yields another look than the same value elsewhere.\n- **Transparency is lost**: transparent pixels cannot survive JPEG export, so choose another format when you need alpha.\n"
+    }
+  },
+  "jpg-to-pgm": {
+    "seo": {
+      "title": "Convert JPG to PGM: Color Photo to Grayscale",
+      "h1": "JPG to PGM Converter",
+      "description": "Convert JPG to PGM in your browser. The color photo becomes a grayscale Netpbm map for image-processing code. Free, no sign-up.",
+      "howToHeading": "How to convert JPG to PGM"
+    },
+    "tool": {
+      "subtitle": "Make a grayscale PGM from a color JPG for scripts and research tools, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What are the steps to turn a JPG into a PGM?",
+        "answer": "Choose the JPG above and the PGM appears once your browser has decoded the picture. Save it from there. Several JPGs give several PGMs."
+      },
+      {
+        "question": "Does the PGM have gray levels or only black and white?",
+        "answer": "It has gray levels, because a PGM stores gray samples. For pure black and white, use the JPG to PBM page."
+      },
+      {
+        "question": "How is color turned into gray?",
+        "answer": "Each color is weighted by how bright it looks, with green counting most and blue least. A pure red object ends up lighter than a pure blue one of the same saturation."
+      },
+      {
+        "question": "Why would I want a PGM?",
+        "answer": "PGM holds only gray samples, which suits programs that work on brightness alone. Netpbm provides programs and a library for processing graymaps, and ImageMagick reads and writes the format."
+      },
+      {
+        "question": "What is the difference between P2 and P5?",
+        "answer": "P2 is the plain form with samples written as decimal text, and P5 is the raw form with samples in binary. The page writes the raw P5 form."
+      },
+      {
+        "question": "Can a PGM hold more than 8 bits per pixel?",
+        "answer": "The format can, when the maximum value is above 255 and each raw sample takes two bytes. This page passes the picture through 8-bit pixels, so the gray has at most 8 bits per sample."
+      },
+      {
+        "question": "Are EXIF and color profiles kept?",
+        "answer": "No. The picture is passed on as raw pixels, which leaves out EXIF, ICC profiles and XMP."
+      },
+      {
+        "question": "Does the page take .jpeg files too?",
+        "answer": "Yes. The picker offers .jpeg as well as .jpg, since the two endings mean the same thing."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and PGM",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy photo format with 8 bits per color channel. The .jpg and .jpeg extensions name the same format, and it cannot hold layers.",
+        "details": [
+          "Lossy compression",
+          "Color photographs",
+          "No transparency",
+          "Image media type image/jpeg"
+        ]
+      },
+      "toFormat": {
+        "name": "PGM",
+        "fullName": "Portable Gray Map",
+        "description": "The grayscale member of the Netpbm family. Raw files start with P5 and plain-text files with P2.",
+        "details": [
+          "Gray samples only",
+          "Raw form starts with P5",
+          "Plain form starts with P2",
+          "Maximum value above 255 needs two bytes"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to PGM",
+      "points": [
+        "Color is gone; the PGM keeps only brightness.",
+        "The PGM is written in the raw P5 form.",
+        "Green counts most toward the gray and blue least.",
+        "EXIF, ICC profiles and XMP are not carried over.",
+        "Each JPG in a batch gives its own PGM."
+      ]
+    },
+    "guide": {
+      "title": "About JPG files",
+      "markdown": "### What is a JPG file?\n\nMost cameras and scanners save their pictures as JPG. Each color channel gets 8 bits, transparency is not available, and fine detail is discarded to keep files small. A file may end in .jpg or .jpeg, and its media type is image/jpeg.\n\nBecause the compression is lossy, a PGM made from a JPG cannot recover what the JPG already threw away. Pictures are compressed in blocks of 8x8 pixels, and whatever blockiness is present in the color file remains visible in gray.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** ImageMagick reads JPG, and GIMP brings one in for editing.\n- **Web and Mobile:** Chrome displays JPG.\n- **Web:** Firefox displays JPG.\n- **Mobile:** Safari displays JPG.\n\n### JPG and PGM compared\n\nPGM stands for Portable Gray Map, a Netpbm format that stores only gray samples. A raw file starts with P5 and keeps samples in binary, while a plain file starts with P2 and writes them as decimal text. With a maximum value above 255, each raw sample takes two bytes. The conventional media type is image/x-portable-graymap, and IANA has not registered it. Some Netpbm tools reuse the format for opacity masks, reading the samples as opacity, not brightness.\n\nOn this page your browser first decodes the picture, then ImageMagick in WebAssembly produces the PGM.\n\n### Other ways to convert JPG to PGM\n\n- **Pillow:** in Python, `Image.open(\"photo.jpg\").convert(\"L\").save(\"photo.pgm\")` applies the ITU-R 601-2 luma transform from the Pillow reference. Pillow reads and writes PGM.\n- **Netpbm:** run `jpegtopnm photo.jpg | ppmtopgm > photo.pgm`. The ppmtopgm step weights red, green and blue as .299, .587 and .114.\n- **GIMP:** load the JPG, then File > Export As with the name photo.pgm; ASCII or RAW is chosen under Data formatting.\n\n### Problems with JPG files\n\n- **Matching numbers, different results**: two editors set to the same quality may compress differently, so a re-saved copy may not look like the first.\n- **A photo frame rejects the source**: some older frames refuse progressive JPEG, so save a copy with progressive mode disabled.\n- **No editable layers**: layers are not stored in a JPG, so hold on to the project file you edited.\n"
+    }
+  },
+  "ktx2-to-png": {
+    "seo": {
+      "title": "Convert KTX2 to PNG: Uncompressed Textures",
+      "h1": "KTX2 to PNG Converter",
+      "description": "Convert KTX2 to PNG in your browser. It reads uncompressed 8-bit RGB and RGBA textures and saves the top mip level. Free, with no sign-up.",
+      "howToHeading": "How to convert KTX2 to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn an uncompressed KTX2 texture into a PNG picture, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert KTX2 to PNG?",
+        "answer": "Add the .ktx2 file above. The page reads the raw pixels of the texture and writes them as a PNG that you can save. A batch gives one PNG per texture."
+      },
+      {
+        "question": "Which KTX2 files can this page read?",
+        "answer": "Only textures that store plain 8-bit RGB or RGBA pixels, with no supercompression. A supercompressed texture such as Basis Universal is refused, and so is any other pixel format, including GPU block formats."
+      },
+      {
+        "question": "Why does it say compressed KTX2 textures aren't supported?",
+        "answer": "The file uses supercompression, and the page gives the message \"Compressed KTX2 textures (Basis, BCn, ETC, ASTC) aren't supported yet.\" A file in another pixel format gets a message that only 8-bit RGB and RGBA are supported. KTX Software's ktx extract has a --transcode option for BasisLZ and UASTC textures, which is listed below."
+      },
+      {
+        "question": "Which image from the texture do I get?",
+        "answer": "The first image of the largest mip level. Smaller mip levels are not saved, and neither are the other faces of a cube map or the other layers of an array."
+      },
+      {
+        "question": "Is transparency kept?",
+        "answer": "Yes for an RGBA texture: the alpha values go into the PNG. An RGB texture has none, so the PNG is fully opaque."
+      },
+      {
+        "question": "How do I get every face or layer?",
+        "answer": "Not on this page. KTX Software's ktx extract command with --all writes each image to a separate file, and PVRTexToolCLI writes cube faces and array layers as separately named files."
+      },
+      {
+        "question": "Can I open a KTX2 file in a browser or photo viewer?",
+        "answer": "Not natively. KTX2 is a texture container for graphics APIs. Developers load it with libraries such as the Three.js KTX2Loader, and desktop tools such as KTX Software, kram and PVRTexTool work with it."
+      },
+      {
+        "question": "Is KTX2 the same as KTX?",
+        "answer": "No. KTX2 is a different layout from the first KTX container and has its own media type, image/ktx2. A loader built only for KTX 1 cannot read a KTX2 file, and renaming does not help."
+      }
+    ],
+    "aboutSection": {
+      "title": "KTX2 and PNG",
+      "fromFormat": {
+        "name": "KTX2",
+        "fullName": "Khronos Texture 2.0",
+        "description": "Khronos's second-generation GPU texture container, which stores image data for graphics APIs such as Vulkan and OpenGL.",
+        "details": [
+          "Mipmap levels",
+          "Texture arrays and cube maps",
+          "Supercompressed or universal data",
+          "Media type image/ktx2"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format created as a patent-free successor to GIF and published as ISO/IEC 15948.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Displays in every major browser",
+          "One image per file"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting KTX2 to PNG",
+      "points": [
+        "Only uncompressed 8-bit RGB and RGBA textures can be read.",
+        "Supercompressed textures and other pixel formats are refused with an error.",
+        "A PNG holds one picture, so mip levels, faces and layers beyond the first image are not saved.",
+        "RGBA alpha is kept; an RGB texture gives an opaque PNG.",
+        "Several files run one after another, each giving its own PNG."
+      ]
+    },
+    "guide": {
+      "title": "About KTX2 files",
+      "markdown": "### What is a KTX2 file?\n\nKTX2 is the second-generation texture container from Khronos. It holds image data for graphics APIs such as Vulkan and OpenGL, and it supports mipmap levels, texture arrays and cube maps. The data inside can be supercompressed or universal, meaning it is transcoded into whatever format the destination GPU uses. Its media type is image/ktx2, and its layout is incompatible with the original KTX container.\n\n### Programs that open KTX2 files\n\n- **Windows, Mac and Linux:** KTX Software, whose ktx info and ktx extract command-line tools inspect KTX2 metadata and extract images, with libktx for developers; and kram, a command-line utility that decodes supported KTX2 textures.\n- **Windows and Linux:** PVRTexTool, with a GUI and a CLI, lists KTX2 among its inputs.\n- **Mac:** kramv views KTX2 textures on Apple Silicon Macs.\n- **Web:** developer code such as the Three.js KTX2Loader reads the format in a browser.\n\n### KTX2 and PNG compared\n\nA KTX2 can carry many images: mip levels, faces, layers and depth slices. A PNG holds exactly one, so exporting one picture does not keep the whole texture.\n\nThis page decodes in your browser and works only on uncompressed textures. It reads 8-bit RGB or RGBA pixels and writes the first image of the top mip level as a PNG. Compressed textures stop with an error, so a Basis Universal texture needs one of the tools below first. Nothing is uploaded, because the whole conversion runs on your device.\n\n### Other ways to convert KTX2 to PNG\n\n- **KTX Software:** run `ktx extract --level 0 --face 0 --layer 0 texture.ktx2 preview.png` to pick one image. PNG output applies to _UNORM formats, and other data types are written as EXR.\n- **ktx extract --all:** run `ktx extract --all texture.ktx2 extracted` to write every slice into the extracted folder, one file each, named by level, face and layer.\n- **PVRTexToolCLI:** run `PVRTexToolCLI -i texture.ktx2 -d preview.png -noout`. Cube maps and arrays give separate files named with Face and Array numbers.\n\n### Problems with KTX2 files\n\n- **A loader for the old format fails**: KTX 1 loaders cannot read KTX2, and renaming the file changes nothing.\n- **A compressed texture must be transcoded**: universal data has to become a format the GPU supports before it can be shown.\n- **One picture is not the texture**: mipmaps, array layers and cube faces are separate images, so a single export does not preserve the whole structure.\n"
+    }
+  },
+  "mkv-to-ts": {
+    "seo": {
+      "title": "Convert MKV to TS: H.264 and AAC Stream",
+      "h1": "MKV to TS Converter",
+      "description": "Convert MKV to TS in your browser. The video is re-encoded as H.264 with AAC sound in an MPEG transport stream. Free, with no sign-up.",
+      "howToHeading": "How to convert MKV to TS"
+    },
+    "tool": {
+      "subtitle": "Re-encode an MKV movie as an H.264 and AAC transport stream, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MKV to TS?",
+        "answer": "Drop the .mkv above, let it encode, then save the .ts. Multiple files are processed in turn, with a separate download for each."
+      },
+      {
+        "question": "Does this just rewrap the MKV, or re-encode it?",
+        "answer": "It re-encodes, giving H.264 video and AAC sound inside a transport stream. To copy the original streams untouched, use FFmpeg's -c copy on your own computer, as in the second method below."
+      },
+      {
+        "question": "How large can the video be?",
+        "answer": "Large frames are scaled down to fit, and a clip with a high frame rate has frames dropped, so it keeps its length. A clip under the limits keeps its size and rate, except that an odd width or height loses a single pixel."
+      },
+      {
+        "question": "Will the file look worse than my MKV?",
+        "answer": "It can. The picture goes through another lossy encode with CRF 30 and 96 kbps audio, with no quality control on the page. Hold on to the MKV if the original image matters."
+      },
+      {
+        "question": "Are interlaced videos handled?",
+        "answer": "The command includes a deinterlace filter, and the page has no setting to switch it off."
+      },
+      {
+        "question": "Which audio track ends up in the TS?",
+        "answer": "The page passes no stream mapping, so FFmpeg's defaults pick the tracks. To fix the streams yourself, use the stream-copy method below."
+      },
+      {
+        "question": "Why is the TS file bigger or smaller than the MKV?",
+        "answer": "The size is set by the new encode, not by the old file, so the TS may end up bigger or smaller than the MKV."
+      },
+      {
+        "question": "What can open the .ts file afterwards?",
+        "answer": "VLC and FFmpeg read transport streams, and VLC for Android lists TS input. Decoding still depends on the codecs inside, which here are H.264 and AAC."
+      }
+    ],
+    "aboutSection": {
+      "title": "MKV and TS",
+      "fromFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open container built on EBML that can carry several video, audio and subtitle streams, with chapters and tags.",
+        "details": [
+          "Several streams in one file",
+          "Chapters and tags",
+          "No fixed codec",
+          "Media type video/matroska"
+        ]
+      },
+      "toFormat": {
+        "name": "TS",
+        "fullName": "MPEG transport stream",
+        "description": "A system format from ISO/IEC 13818-1 that multiplexes separately coded video and sound, designed with broadcast and error-prone links in mind.",
+        "details": [
+          "Timestamps for decoder buffering",
+          "Several programs in one stream",
+          "Broadcast distribution",
+          "Media type video/mp2t"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MKV to TS",
+      "points": [
+        "The video is re-encoded as H.264 and the sound as AAC, inside a transport stream.",
+        "Large frames are scaled down and fast frame rates lose frames.",
+        "No stream mapping is passed, so FFmpeg's defaults pick the tracks.",
+        "Several files run one after another, each downloading as its own .ts."
+      ]
+    },
+    "guide": {
+      "title": "About MKV files",
+      "markdown": "### What is an MKV file?\n\nThe Matroska format (MKV) rests on EBML, a binary layout descended from XML, and developed out of the older MCF project. Inside one file you can find many video, audio and subtitle tracks, plus chapter marks and tags. Its media type, registered with IANA, is video/matroska.\n\nMatroska prescribes no compression method and no fixed quality level, so two .mkv files may hold unrelated codecs and behave differently on the same device.\n\n### Programs that open MKV files\n\n- **Windows, Mac and Linux:** ffplay plays it through FFmpeg's Matroska demuxer, and mpv offers audio and subtitle stream selection.\n- **Mobile:** VLC, in its Android and iOS versions, plays most movie formats.\n\n### MKV and TS compared\n\nA TS file holds an MPEG transport stream, defined as a system format in ISO/IEC 13818-1. It interleaves separately coded video and sound, with timestamps that coordinate decoder buffering, and can bundle several programs. Broadcast distribution is an important use. The usual extension is .ts and the media type is video/mp2t. An MKV can carry several streams plus chapters and tags.\n\nThe page decodes the MKV and encodes it afresh: H.264 with the ultrafast preset, zero-latency tuning and CRF 30, plus AAC sound at 96 kbps, wrapped as an MPEG transport stream. A deinterlace filter runs, frames above 1920 pixels on the longer side are shrunk, 30 fps is the most it keeps, and widths and heights round down to even values.\n\n### Other ways to convert MKV to TS\n\n- **FFmpeg, new encode:** run `ffmpeg -i movie.mkv -c:v libx264 -c:a aac -f mpegts movie.ts` to make an H.264 and AAC transport stream.\n- **FFmpeg, stream copy:** run `ffmpeg -i movie.mkv -map 0:v:0 -map 0:a:0 -c copy -f mpegts movie.ts` to keep the first video and the first audio untouched. Their codecs must fit TS.\n- **tsMuxer:** run `tsMuxeR movie.mkv` to list the tracks, write the ones you want into a .meta file with lines such as `V_MPEG4/ISO/AVC, movie.mkv, track=1`, then run `tsMuxeR project.meta movie.ts`.\n\n### Problems with MKV files\n\n- **Wrong language**: an MKV can hold several audio or subtitle streams, and a player such as mpv lets you choose the right one.\n- **Seeking is slow or jumpy**: cues sit apart from the media clusters in Matroska, so when they are missing or damaged, finding a position gets harder.\n- **A player opens it but shows nothing**: knowing the container says nothing about the codecs, and your player may lack the one inside.\n"
+    }
+  },
+  "mov-to-mjpeg": {
+    "seo": {
+      "title": "Convert MOV to MJPEG: Motion JPEG Video",
+      "h1": "MOV to MJPEG Converter",
+      "description": "Convert MOV to MJPEG in your browser. Every frame is stored as its own JPEG, with uncompressed PCM sound, in an AVI wrapper. Free, with no sign-up.",
+      "howToHeading": "How to convert MOV to MJPEG"
+    },
+    "tool": {
+      "subtitle": "Turn a MOV movie into Motion JPEG video with PCM sound, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MOV to MJPEG?",
+        "answer": "Choose the .mov above and let the encode finish. With several files, each is handled in turn and returns its own download with the .mjpeg ending."
+      },
+      {
+        "question": "Is the download a bare MJPEG stream?",
+        "answer": "No. Motion JPEG is a video encoding, not a container, so it needs a wrapper, and this page uses AVI, which is what OpenDML documents an MJPEG profile for. FFmpeg on your computer can write the raw stream instead; see the raw-stream method below."
+      },
+      {
+        "question": "What does the audio become?",
+        "answer": "Uncompressed 16-bit little-endian PCM, whatever sound the MOV held."
+      },
+      {
+        "question": "Why are MJPEG files large?",
+        "answer": "Each frame is a JPEG in its own right, and JPEG compression does not remove the redundancy between successive frames. Size follows the individual images, and the PCM audio adds to it."
+      },
+      {
+        "question": "Can I change the JPEG quality?",
+        "answer": "Not on this page. Every frame is encoded with FFmpeg's -q:v set to 8. Set your own value with -q:v in FFmpeg on your computer."
+      },
+      {
+        "question": "What resolution and frame rate do I get?",
+        "answer": "Your source's own values, unless they are large: bigger frames are shrunk and faster rates have frames dropped. If a width or height is odd, one pixel is lost."
+      },
+      {
+        "question": "Is it still Motion JPEG if my MOV already holds MJPEG?",
+        "answer": "The page always decodes and re-encodes. A MOV that already holds Motion JPEG is therefore encoded a second time, and each lossy pass costs some quality. Keep the original when it already suits you."
+      },
+      {
+        "question": "Which programs play the result?",
+        "answer": "VLC lists Motion JPEG decoding, and FFmpeg reads raw MJPEG."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and MJPEG",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime movie",
+        "description": "Apple's QuickTime file format, introduced in 1991 and brought to Windows in 1994. It is built from objects called atoms.",
+        "details": [
+          "Registered media type video/quicktime",
+          "Holds H.264, ProRes or Motion JPEG video",
+          "AAC or PCM audio",
+          "Extensions .mov and .qt"
+        ]
+      },
+      "toFormat": {
+        "name": "MJPEG",
+        "fullName": "Motion JPEG",
+        "description": "A video encoding that stores a clip as a succession of individually JPEG-coded images.",
+        "details": [
+          "Every frame stands alone",
+          "Common in AVI files, also used in QuickTime",
+          "Edited in production before delivery",
+          "No saving between successive frames"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to MJPEG",
+      "points": [
+        "The video is Motion JPEG and the sound is uncompressed PCM, in an AVI wrapper.",
+        "The page has no JPEG quality setting.",
+        "Large frames are scaled down, fast frame rates lose frames and a deinterlace filter runs.",
+        "Each frame is coded on its own, so size follows the pictures and nothing is saved between frames."
+      ]
+    },
+    "guide": {
+      "title": "About MOV files",
+      "markdown": "### What is a MOV file?\n\nQuickTime, Apple's movie format, dates to 1991, with a Windows release in 1994. Its files end in .mov or .qt and have the media type video/quicktime. Internally they consist of atoms, and software can skip the ones it does not recognize.\n\nA MOV may hold ProRes, H.264 or Motion JPEG pictures, and its sound can be AAC or uncompressed PCM, so MOV files are a common source of Motion JPEG footage.\n\n### Programs that open MOV files\n\n- **Windows, Mac and Linux:** ffplay and mpv, which offers selectable audio and subtitle streams.\n- **Windows and Mac:** Adobe Premiere imports MOV.\n- **Mobile:** VLC for Android and VLC for iOS.\n\n### MOV and MJPEG compared\n\nMotion JPEG treats a video as a series of separate JPEG pictures, one per frame. It is an encoding, not a container, so it travels in a wrapper such as AVI, where it is commonly identified by the MJPG FourCC, or in QuickTime. Because frames do not depend on each other, file size follows the pictures themselves, and production teams often edit in it before delivering in another encoding.\n\nFFmpeg in your browser re-encodes the clip with its Motion JPEG encoder set to -q:v 8, adds 16-bit PCM audio and writes an AVI wrapper. Larger frames shrink to 1920 pixels, 30 fps is the maximum rate, a deinterlace filter runs and both dimensions come out even numbers.\n\n### Other ways to convert MOV to MJPEG\n\n- **FFmpeg to AVI:** run `ffmpeg -i take.mov -c:a pcm_s16le -c:v mjpeg -q:v 8 take.avi`.\n- **FFmpeg raw stream:** run `ffmpeg -i take.mov -an -c:v mjpeg -q:v 5 -f mjpeg take.mjpeg` to write pictures only, with no audio.\n- **FFmpeg to MOV:** run `ffmpeg -i take.mov -c:v mjpeg -q:v 3 -c:a pcm_s16le take_mjpeg.mov` to keep the QuickTime wrapper around Motion JPEG pictures.\n\n### Problems with MOV files\n\n- **An editor rejects it**: a QuickTime container may use a codec your editor lacks, and changing the file ending does not add the decoder or transcode the video.\n- **The file will not play after a crash**: a MOV in its standard layout may be unusable after the write stops midway, while fragmented output behaves differently.\n"
+    }
+  },
+  "mov-to-mxf": {
+    "seo": {
+      "title": "Convert MOV to MXF: MPEG-2 with PCM Audio",
+      "h1": "MOV to MXF Converter",
+      "description": "Convert MOV to MXF in your browser. The video is re-encoded as MPEG-2 with PCM stereo sound in an MXF file. Free, with no sign-up.",
+      "howToHeading": "How to convert MOV to MXF"
+    },
+    "tool": {
+      "subtitle": "Re-encode a MOV movie as MPEG-2 video with PCM sound in an MXF file."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MOV to MXF?",
+        "answer": "Add the .mov above, wait out the encode and save the .mxf. If you add more files they go through in sequence, one MXF apiece."
+      },
+      {
+        "question": "What video and audio does the MXF contain?",
+        "answer": "MPEG-2 video at 2,000 kbps in 4:2:2 color, and 16-bit PCM stereo audio at 48 kHz. The page re-encodes everything, so your original ProRes or H.264 is not carried over."
+      },
+      {
+        "question": "Will this meet a broadcaster's delivery spec?",
+        "answer": "Not by itself. The command requests no MXF operational pattern or application profile, so check your delivery document and use FFmpeg directly if you need a named profile."
+      },
+      {
+        "question": "Why is my frame rate fixed?",
+        "answer": "The command sets the output frame rate itself, whatever rate the MOV had, so a clip at another rate is retimed. Another rate needs FFmpeg's -r on your computer."
+      },
+      {
+        "question": "What happens to 4K or UHD footage?",
+        "answer": "Frames above the size limit are shrunk to fit with the aspect ratio kept, and an uneven side is trimmed by one pixel."
+      },
+      {
+        "question": "Is my MOV uploaded, and is there a size limit?",
+        "answer": "FFmpeg runs inside your browser, so nothing is uploaded. Longer clips take more time, depending on your device."
+      },
+      {
+        "question": "Is MXF the same as MOV with a different name?",
+        "answer": "No. MXF is a SMPTE format that wraps media essence together with descriptive and structural metadata. Renaming a .mov does not change the wrapper or the codecs."
+      },
+      {
+        "question": "Which programs open the MXF?",
+        "answer": "VLC lists MXF among its inputs and FFmpeg reads the essence. Some MXF files need professional software, since their essence layout is not meant for ordinary playback."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and MXF",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime movie",
+        "description": "Apple's QuickTime file format, introduced in 1991, built from atoms that software can skip when it does not know them.",
+        "details": [
+          "Registered media type video/quicktime",
+          "H.264, ProRes or Motion JPEG video",
+          "AAC or PCM audio",
+          "Extensions .mov and .qt"
+        ]
+      },
+      "toFormat": {
+        "name": "MXF",
+        "fullName": "Material Exchange Format",
+        "description": "A format standardized through SMPTE documents that wraps media essence with descriptive and structural metadata for professional exchange.",
+        "details": [
+          "Used in acquisition, exchange and preservation",
+          "Operational patterns",
+          "Media type application/mxf",
+          "Can carry different video encodings"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to MXF",
+      "points": [
+        "The video is always re-encoded as MPEG-2, at a fixed bitrate and a fixed frame rate that you cannot change.",
+        "The audio becomes PCM stereo.",
+        "Frames above the size limit are scaled down with the aspect ratio kept.",
+        "No MXF operational pattern or profile is requested, so match your delivery spec elsewhere."
+      ]
+    },
+    "guide": {
+      "title": "About MOV files",
+      "markdown": "### What is a MOV file?\n\nApple's movie format, QuickTime, saves files as .mov or .qt. H.264, ProRes and Motion JPEG are among the video encodings a MOV can use, alongside AAC or PCM sound, which is why one MOV plays where another needs a decoder it lacks.\n\nScreen recordings from a Mac are saved as MOV. MP4 grew out of the QuickTime format, but the two are separate formats and not interchangeable. Few browsers support MOV well, and Apple now mostly uses MP4.\n\n### Programs that open MOV files\n\n- **Windows, Mac and Linux:** ffplay and mpv both play MOV, and mpv lets you pick the audio and subtitle streams.\n- **Windows and Mac:** Adobe Premiere imports the container.\n- **Mobile:** VLC for Android and VLC for iOS.\n\n### MOV and MXF compared\n\nMXF stands for Material Exchange Format, standardized through SMPTE documents. It wraps media essence with descriptive and structural metadata for professional acquisition, exchange and preservation, and operational patterns define how packages and essence are laid out. Files end in .mxf and use the media type application/mxf. The video inside can use various encodings, so the name alone fixes no image quality, and some layouts refer to essence kept outside the file.\n\nThe conversion decodes the MOV and writes fresh MPEG-2 video: 2,000 kbps, 4:2:2, forced to 25 fps, with frames shrunk when they pass 1920 pixels. The sound is 48 kHz stereo PCM. A deinterlace filter is in the command, and profile options are not.\n\n### Other ways to convert MOV to MXF\n\n- **FFmpeg:** run `ffmpeg -i edit.mov -codec:v mpeg2video -f mxf -ac 2 -b:v 2000k -codec:a pcm_s16le -pix_fmt yuv422p -r 25 -ar 48000 edit.mxf`.\n- **FFmpeg OP-Atom:** `ffmpeg -i take.mov -c:v mpeg2video -b:v 6M -an -f mxf_opatom take.mxf` uses the mxf_opatom muxer and leaves the sound out.\n\n### Problems with MOV files\n\n- **The codec is missing**: the destination editor may lack a codec that the QuickTime file uses, and changing the file ending installs nothing.\n- **The movie will not open after a crash**: a failed save may ruin a regular MOV, while fragmented output is affected differently.\n"
+    }
+  },
+  "mov-to-vob": {
+    "seo": {
+      "title": "Convert MOV to VOB: MPEG-2 with MP2 Audio",
+      "h1": "MOV to VOB Converter",
+      "description": "Convert MOV to VOB in your browser. The video is re-encoded as MPEG-2 with MP2 sound in a DVD-style file. It is not a full disc. Free.",
+      "howToHeading": "How to convert MOV to VOB"
+    },
+    "tool": {
+      "subtitle": "Re-encode a MOV movie as MPEG-2 video with MP2 sound in a single VOB file."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MOV to VOB?",
+        "answer": "Select the .mov above, wait for the encode and save the .vob. With a batch, files go through in order and each yields a VOB of its own."
+      },
+      {
+        "question": "Can I burn the VOB to a DVD that plays in any player?",
+        "answer": "Not directly. A disc needs the VIDEO_TS structure with IFO and BUP files, and this page writes only the VOB. It sets no DVD resolution or frame rate either. Use an authoring program to build a disc."
+      },
+      {
+        "question": "What video and audio are inside?",
+        "answer": "MPEG-2 video with a quality value of 6, and MP2 audio at 96 kbps. The file is written with FFmpeg's DVD muxer. The page does not choose an NTSC or PAL target."
+      },
+      {
+        "question": "What if I need an NTSC or PAL DVD file?",
+        "answer": "Use FFmpeg on your computer with -target ntsc-dvd or -target pal-dvd, as in the methods below. This page writes the same DVD muxer format (-f dvd) but sets no NTSC or PAL target, so frame size and rate follow your source within the page's limits."
+      },
+      {
+        "question": "Does it keep my resolution and frame rate?",
+        "answer": "Mostly. Frames larger than the limit are shrunk, a faster rate has frames dropped without changing the length, and an uneven side loses a pixel."
+      },
+      {
+        "question": "Can I choose the audio bitrate?",
+        "answer": "No. The page has no setting for it."
+      },
+      {
+        "question": "Will DVD menus come along?",
+        "answer": "No. The page writes the movie only and authors no menus. Build menus and the disc layout in a DVD authoring program."
+      },
+      {
+        "question": "Is my original MOV changed?",
+        "answer": "No. The page leaves your file as it is and gives you a new copy named after it, ending in .vob."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and VOB",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime movie",
+        "description": "Apple's QuickTime container, introduced in 1991. It holds video and audio tracks built from atoms.",
+        "details": [
+          "Media type video/quicktime",
+          "H.264, ProRes or Motion JPEG video",
+          "AAC or PCM audio",
+          "Extensions .mov and .qt"
+        ]
+      },
+      "toFormat": {
+        "name": "VOB",
+        "fullName": "DVD Video Object",
+        "description": "The file type DVD producers use to store video, sound, subtitles and menu content, closely related to MPEG-2 program-stream material.",
+        "details": [
+          "Lives in a VIDEO_TS folder",
+          "Needs IFO and BUP files on a disc",
+          "Bitmap subtitle images",
+          "Used for DVD backups"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to VOB",
+      "points": [
+        "The result is one VOB, not a DVD: there are no IFO or BUP files and no menus.",
+        "The video is MPEG-2 and the sound is MP2, both re-encoded.",
+        "Large frames are scaled down and fast frame rates lose frames; no DVD size or TV standard is set.",
+        "Several files run one after another, each producing its own VOB."
+      ]
+    },
+    "guide": {
+      "title": "About MOV files",
+      "markdown": "### What is a MOV file?\n\nFiles named .mov hold QuickTime movies, and .qt is an alternative ending for them. The format has the media type video/quicktime, and its content is arranged in atoms. A reader may pass over any atom it cannot interpret, so unknown extras seldom break playback.\n\nA QuickTime file may carry ProRes, H.264 or Motion JPEG pictures and PCM or AAC sound. MP4 is a separate format that grew out of QuickTime, so renaming a MOV to MP4 does not convert it.\n\n### Programs that open MOV files\n\n- **Windows, Mac and Linux:** ffplay and mpv open MOV, with track choice in mpv.\n- **Windows and Mac:** Adobe Premiere imports it.\n- **Mobile:** movies saved on a phone open in VLC for Android and VLC for iOS.\n\n### MOV and VOB compared\n\nA VOB is a DVD Video Object, the stream type that carries a disc's picture, sound, subtitles and menus. The data inside is based on the MPEG-2 program stream. On a disc they sit in a VIDEO_TS folder alongside IFO and BUP files, and their subtitles can be bitmaps, not text.\n\nFFmpeg decodes the MOV and then writes MPEG-2 video at quality 6 with MP2 audio at 96 kbps, using its DVD muxer. Frames longer than 1920 pixels shrink while smaller ones keep their size, faster rates lose frames down to 30 fps with the clip length unchanged, and a deinterlace filter runs. Neither the NTSC nor the PAL target is set, and a single VOB made this way is not a finished disc.\n\n### Other ways to convert MOV to VOB\n\n- **FFmpeg, NTSC:** run `ffmpeg -i recording.mov -target ntsc-dvd recording.vob` to apply the NTSC DVD preset.\n- **FFmpeg, PAL:** run `ffmpeg -i recording.mov -target pal-dvd recording.vob` for the PAL DVD preset.\n\nBoth presets produce media for a DVD only; a complete disc still needs authoring.\n\n### Problems with MOV files\n\n- **The player complains about a codec**: QuickTime containers can use codecs your destination editor lacks. Changing the ending does not transcode the video or install the missing decoder.\n- **The file is unplayable after an interrupted save**: after a failed write a standard MOV can be unusable, but fragmented output recovers in its own way.\n"
+    }
+  },
+  "mp3-to-au": {
+    "seo": {
+      "title": "Convert MP3 to AU Online (Free)",
+      "h1": "MP3 to AU Converter",
+      "description": "Convert MP3 to AU in your browser. The audio is decoded to an uncompressed Sun AU file you can save. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert MP3 to AU"
+    },
+    "tool": {
+      "subtitle": "Decode an MP3 to an uncompressed Sun AU file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP3 to AU?",
+        "answer": "Pick the .mp3 above, wait briefly and save the .au. Several files go through one by one, each giving its own AU."
+      },
+      {
+        "question": "What encoding does the AU file use?",
+        "answer": "Signed 16-bit linear PCM, big-endian, at 44,100 Hz in stereo. The AU header records that encoding, the sample rate and the channel count, so a program reading the file can tell."
+      },
+      {
+        "question": "Does it make the audio better than my MP3?",
+        "answer": "No. An MP3 is lossy, so some sound was discarded when it was made. Decoding it to PCM keeps what was left and cannot restore the rest, so the AU sounds the same as the MP3."
+      },
+      {
+        "question": "Why is the AU so much bigger?",
+        "answer": "PCM stores every sample in full, while MP3 compression shrinks the audio. Expect the AU to take far more space than the MP3 it came from."
+      },
+      {
+        "question": "What happens to a mono MP3 or one with another sample rate?",
+        "answer": "The page always asks for the same rate and channel count. A mono recording is written as stereo, and a file at another rate is resampled. Use FFmpeg or SoX on your computer for other values."
+      },
+      {
+        "question": "Are the ID3 tags and cover art kept?",
+        "answer": "Cover art is a video stream, which the conversion leaves out. FFmpeg copies the MP3's title, artist and album tags where the AU has fields for them."
+      },
+      {
+        "question": "Is a .au file the same as a mu-law telephone file?",
+        "answer": "Not necessarily. The container allows several encodings, while the IANA audio/basic entry covers mu-law only. This page writes linear PCM."
+      },
+      {
+        "question": "Which programs open the AU?",
+        "answer": "Audacity imports AU without the optional FFmpeg library, and Praat reads supported NeXT and Sun encodings. Check any other program for its AU encodings before relying on it."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and AU",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1 Audio Layer III",
+        "description": "A lossy audio format standardized as ISO/IEC 11172-3 in 1993 and developed at Fraunhofer IIS.",
+        "details": [
+          "Bitrates from 32 to 320 kbps",
+          "Sampling at 32, 44.1 or 48 kHz",
+          "ID3 tags",
+          "Media type audio/mpeg"
+        ]
+      },
+      "toFormat": {
+        "name": "AU",
+        "fullName": "Sun/NeXT audio",
+        "description": "A format with a fixed header, an annotation area and audio samples, defined in Sun's published specification.",
+        "details": [
+          "Starts with the signature .snd",
+          "Big-endian values",
+          "PCM, mu-law, A-law, float and ADPCM",
+          "FFmpeg labels it audio/basic"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to AU",
+      "points": [
+        "The AU is uncompressed PCM, so it is far larger than the MP3.",
+        "Mono or other-rate sources are changed to the page's fixed layout.",
+        "Nothing lost in the MP3 comes back after decoding.",
+        "Cover art is dropped; tags are copied where AU has fields for them."
+      ]
+    },
+    "guide": {
+      "title": "About MP3 files",
+      "markdown": "### What is an MP3 file?\n\nMP3 is short for MPEG-1/2 Audio Layer III. MPEG standardized this lossy audio format as ISO/IEC 11172-3, and the Fraunhofer Society contributed heavily. For downloadable music it is the most common choice.\n\nLossy compression means some sound is discarded to save space. The bitrate may be constant or variable, titles and artists sit in ID3 tags, and the file plays on nearly every device. Music libraries, podcasts and portable players all use it.\n\n### Programs that open MP3 files\n\n- **Windows, Mac and Linux:** Audacity turns an MP3 into an editable project. ffplay can play it if the FFmpeg build you installed includes the decoder.\n- **Web:** Firefox and Chrome play supported audio directly.\n- **Mobile:** VLC for Android plays it, and so does mpv for Android.\n\n### MP3 and AU compared\n\nAn AU file opens with the four bytes .snd, then a header recording the encoding, sample rate and channel count. Multibyte values are big-endian. The specification defines linear PCM, mu-law, A-law, floating point and ADPCM, so one .au file can differ from the next, and Sun's format is a legacy one used for Unix and Java system sounds.\n\nFFmpeg decodes the MP3, drops any video and writes signed 16-bit big-endian PCM at 44,100 Hz in two channels. Nothing is compressed afterward, so quality is exactly what the MP3 had and the file grows a great deal. Before you convert, confirm the receiving program accepts this AU encoding. Afterward, play the AU once to check the length and that both channels carry sound.\n\n### Other ways to convert MP3 to AU\n\n- **FFmpeg:** run `ffmpeg -i audio.mp3 -c:a pcm_s16be -ar 44100 -ac 2 -f au audio.au`.\n- **SoX:** run `sox audio.mp3 -r 44100 -c 2 -b 16 -e signed-integer -B audio.au`.\n- **Switch Sound File Converter on Windows:** use Add to load the MP3, set Output Format to AU and press Convert.\n\n### Problems with MP3 files\n\n- **An import fails**: Audacity may report an error on a damaged MP3 that a different player still plays.\n- **Tags change after combining files**: bringing several MP3s into one Audacity project can swap earlier metadata for the newest file's tags.\n- **A re-saved MP3 sounds worse**: exporting a new MP3 after editing one adds another lossy stage, so stay in PCM until the end.\n"
+    }
+  },
+  "mp4-to-amr": {
+    "seo": {
+      "title": "MP4 to AMR: This Page Cannot Convert It",
+      "h1": "MP4 to AMR Converter",
+      "description": "MP4 to AMR does not work on this page: the browser's FFmpeg has no AMR-NB encoder. Read what AMR is and which program can make one.",
+      "howToHeading": "How to convert MP4 to AMR"
+    },
+    "tool": {
+      "subtitle": "This page stops with an encoder error. Use the desktop program below to make an AMR."
+    },
+    "faqs": [
+      {
+        "question": "Why does MP4 to AMR fail on this page?",
+        "answer": "FFmpeg is asked for the libopencore_amrnb encoder, which the browser build does not include, so the run ends with \"FFmpeg failed with exit code 1\". Nothing is uploaded and your MP4 is untouched."
+      },
+      {
+        "question": "How do I convert MP4 to AMR, then?",
+        "answer": "Use a desktop program such as Switch Sound File Converter on Windows. The steps are under the other methods below."
+      },
+      {
+        "question": "What is an AMR file?",
+        "answer": "AMR is Adaptive Multi-Rate, a speech codec standardized by ETSI for GSM and adopted by 3GPP for third-generation cellular systems. Narrowband AMR works at 8 kHz in 20-millisecond frames."
+      },
+      {
+        "question": "Is AMR good for music?",
+        "answer": "No. It is a speech codec, so music loses its higher range. AMR-WB is a separate codec with a wider range, and it is a different file type."
+      },
+      {
+        "question": "My MP4 has no sound. Can I still get an AMR?",
+        "answer": "No. AMR holds audio only, and an MP4 without an audio track gives a converter nothing to work with."
+      },
+      {
+        "question": "Will the video be kept in the AMR?",
+        "answer": "No. AMR holds audio, and the page's command drops the picture. If you want the picture, keep the MP4."
+      },
+      {
+        "question": "Can I rename my MP4 to .amr?",
+        "answer": "No. Changing the ending does not change what is inside. AMR and AMR-WB files carry different signatures, and neither is an MP4."
+      },
+      {
+        "question": "What can play an AMR file?",
+        "answer": "FFmpeg decodes it, and Audacity opens it through an FFmpeg library with AMR enabled. The recommended Audacity installer leaves out narrowband AMR."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and AMR",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 and first published in 2003, built on the ISO Base Media File Format.",
+        "details": [
+          "Nested boxes",
+          "H.264 video with AAC audio is typical",
+          "Plays in every major browser",
+          "Media types video/mp4 and audio/mp4"
+        ]
+      },
+      "toFormat": {
+        "name": "AMR",
+        "fullName": "Adaptive Multi-Rate",
+        "description": "A speech codec standardized by ETSI for GSM and adopted by 3GPP, with storage files defined in RFC 4867.",
+        "details": [
+          "Eight modes from 4.75 to 12.2 kbps",
+          "8 kHz sampling in 20 ms frames",
+          "AMR-WB is a separate codec at 16 kHz",
+          "Media type audio/AMR"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to AMR",
+      "points": [
+        "This page cannot make an AMR: its FFmpeg has no AMR-NB encoder and the run fails.",
+        "A desktop program that lists AMR as an output is needed.",
+        "AMR keeps audio only, so the video is not carried over."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 files",
+      "markdown": "### What is an MP4 file?\n\nMP4 is MPEG-4 Part 14, a container format defined in ISO/IEC 14496-14. It can hold video, audio, subtitles, chapters and metadata, and combining H.264 video with AAC audio is typical.\n\nTypical uses are streaming, phone footage, camera recordings and sharing clips. It plays on nearly every device.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** ffplay opens it provided the FFmpeg build in use includes the decoders, and mpv adds selectable audio and subtitle streams.\n- **Windows and Mac:** Adobe Premiere imports it when the decoder is available.\n- **Web:** Firefox and Chrome play supported combinations directly.\n- **Mobile:** VLC on Android and on iOS plays it.\n\n### MP4 and AMR compared\n\nAMR is built for speech. Narrowband AMR offers eight modes between 4.75 and 12.2 kbps, samples at 8 kHz and works in 20-millisecond frames. RFC 4867 (April 2007) specifies storage files and RTP transport. AMR-WB samples at 16 kHz, so narrowband output cannot match its range.\n\nETSI standardized AMR for GSM, and 3GPP adopted it for third-generation cellular systems, and that background explains its use in phone voice recordings and messages. Files are very small because only speech is kept. Playback support depends on the program, so test the AMR in the program that will use it.\n\nThis page does not make AMR files. Its command names the libopencore_amrnb encoder, and the browser's FFmpeg build lacks it, so the run ends in an error and no AMR is produced. Before converting elsewhere, check that the MP4 has an audio track, because a video-only file has nothing to extract. Afterward, play the AMR to confirm the speech came through.\n\n### Other ways to convert MP4 to AMR\n\n- **Switch Sound File Converter on Windows:** press Add, pick the MP4, choose AMR as Output Format, then press Convert.\n\n### Problems with MP4 files\n\n- **No audio to extract**: an MP4 without an audio track cannot supply sound to an audio converter.\n- **The video plays but the sound is silent**: container support does not guarantee a decoder exists for the sound inside.\n- **A download stops partway**: normal MP4 files keep packet metadata together, so an interrupted write can leave an unfinished file unplayable.\n"
+    }
+  }
+}
