@@ -1,0 +1,896 @@
+{
+  "gif-to-gif": {
+    "seo": {
+      "title": "Convert GIF to GIF Online (Free)",
+      "h1": "GIF to GIF Converter",
+      "description": "Re-save a GIF as a new GIF in your browser. An animated GIF comes out as its first frame only, so this suits stills. Free, with no sign-up.",
+      "howToHeading": "How to convert GIF to GIF"
+    },
+    "tool": {
+      "subtitle": "Re-save a GIF as a fresh GIF. An animated file keeps only its first frame."
+    },
+    "faqs": [
+      {
+        "question": "How can I re-save a GIF as a GIF here?",
+        "answer": "Choose the GIF above and download the new one when it finishes. The page decodes your GIF and writes a new GIF file from the picture it read, one file per GIF you choose."
+      },
+      {
+        "question": "What is the point of converting a GIF to a GIF?",
+        "answer": "To get a clean still copy. The new file is built from the pixels of the first frame alone. For a GIF that must keep moving, this is the wrong tool."
+      },
+      {
+        "question": "Does the animation survive?",
+        "answer": "No. The page reads one frame, the first, and writes it back as a single-frame GIF. Timing, looping and every later frame are gone, so keep the original animation."
+      },
+      {
+        "question": "Can I pick a different frame?",
+        "answer": "Not here, because the first frame is always the one used. In gifsicle you can name a frame by its number, such as '#0' for the first, and the command line keeps only that frame."
+      },
+      {
+        "question": "Can I shrink an animated GIF here?",
+        "answer": "No, because an animation comes out as one frame. The [GIF compressor](/compress-gif/) works on the GIF as a file and keeps every frame."
+      },
+      {
+        "question": "Can I resize the GIF here?",
+        "answer": "No. The page does no scaling, so the new GIF keeps the original picture's width and height."
+      },
+      {
+        "question": "Why are the bytes different when the picture looks identical?",
+        "answer": "The file is written again by ImageMagick, so its internal blocks and compression aren't copied from the original. GIF compression is lossless, so the pixels of that first frame stay the same even though the bytes need not."
+      },
+      {
+        "question": "Is the GIF's metadata kept?",
+        "answer": "No. Pixels are all that pass through, so a comment or other embedded information in the original isn't carried into the new file."
+      },
+      {
+        "question": "Can I get more than 256 colors out of a GIF?",
+        "answer": "No. A GIF frame's palette tops out at 256 colors, and re-saving can't add shades the original didn't have. A photo needs JPG, PNG or WebP instead."
+      },
+      {
+        "question": "Can I turn the GIF into something other than a GIF?",
+        "answer": "Yes. The [GIF to PNG converter](/gif-to-png/) saves the first frame as a PNG."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and GIF",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format developed by CompuServe. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format developed by CompuServe. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to GIF",
+      "points": [
+        "Only the first frame is read, so an animation becomes a single still picture.",
+        "The output is a new GIF file written by ImageMagick, not a copy of your original.",
+        "Comments and other metadata in the original are not carried over.",
+        "The page does not resize the picture or choose a different frame.",
+        "Choose several GIFs at once and each downloads as its own file."
+      ]
+    },
+    "guide": {
+      "title": "About GIF files",
+      "markdown": "### What is a GIF file?\n\nGIF, short for Graphics Interchange Format, was created at CompuServe in 1987. It stores a picture as a grid of palette indexes, compressed with LZW, and every frame may use only 256 colors. The GIF89a version of the specification added blocks that let a file hold several frames with a delay between them, and mark one palette entry as transparent. That is how GIF became the web's looping cartoon format, and it is still common for reaction images, stickers and small diagrams.\n\nThe extension doesn't tell you whether a file is a still or an animation. Open it in a browser to see whether it moves.\n\nA multi-frame GIF carries more than pictures. Each frame can have its own local palette, a delay, and a disposal method that says how the frame is treated after it is shown. An interlaced GIF stores its rows out of order. All of that is detail a still copy doesn't need, which is why this page drops it.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:** GIMP exports a GIF as a still picture or as an animation made from several layers. ImageMagick reads GIF on the command line.\n- **Web and Mobile:** Chrome displays GIF, animation included, in web pages.\n- **Web:** Firefox displays GIF, animation included. Dragging a file into a browser window is the quickest way to see whether it moves.\n- **Mobile:** Safari displays GIF in web pages. A screenshot of an animated GIF is a still, so keep the file itself.\n\n### GIF and GIF compared\n\nInput and output are the same format here, so the extension (.gif) and the media type (image/gif) don't change. What changes is the file itself.\n\n- **Frames**: the page reads the first frame of the input. The new GIF has one frame, so there is no animation, delay or loop.\n- **Palette**: one frame can use 256 colors at most, and the new file follows the same rule.\n- **Transparency**: GIF transparency is on or off for each pixel, with no partial opacity, so a soft shadow can't be stored.\n- **Compression**: GIF's LZW is lossless. The file is written again, so its bytes need not match the original's.\n- **Metadata**: the picture passes through raw pixels, so comments and other embedded information are left behind.\n- **Size in pixels**: unchanged. The page doesn't scale the picture.\n\nBecause source and target match, the page offers no quality choice, and what is lost is the frames after the first. If you start with an animation, the new file shows only its first frame.\n\nIn short, this conversion turns any GIF into a still copy of its first frame, and nothing else.\n\n### Other ways to convert GIF to GIF\n\n- **GIMP (Windows, Mac, Linux):** choose File > Export As to open the GIF export dialog. For an animation, tick As animation; the option is disabled when the image has only one layer.\n- **gifsicle (command line):** run `gifsicle -O3 input.gif -o optimized.gif` to rewrite a GIF with several optimization methods tried. The manual notes that -O3 can occasionally make a file larger.\n- **ImageMagick (command line):** run `magick input.gif rewritten.gif`, the same input-then-output form its manual uses for converting between formats.\n\nIf your GIF moves and you want it to keep moving, use gifsicle or the [GIF compressor](/compress-gif/), not this page.\n\n### Problems with GIF files\n\n- **The result doesn't move**: this page keeps one frame. Go back to the original file.\n- **Trails behind moving objects**: frame disposal is wrong. GIMP offers \"Cumulative layers (combine)\" and \"One frame per layer (replace)\"; pick the one that matches how the animation was drawn.\n- **Banding in a gradient**: 256 colors can't hold a smooth blend. Use PNG, or JPG for a photo.\n- **Soft edges turn jagged**: a GIF pixel is either transparent or not, so partial opacity can't be kept. Use PNG instead.\n- **A comment goes missing in GIMP**: GIF comments support only 7-bit ASCII, so GIMP exports without a comment that has other characters.\n- **Colors shift after exporting from GIMP**: GIMP writes a GIF with at most 256 colors, so a gradient can band.\n- **\"Image decode failed.\"**: the browser was unable to read the file. It may be damaged, or it may not be a GIF at all. Fetch a fresh copy from the original source.\n"
+    }
+  },
+  "html-to-gif": {
+    "seo": {
+      "title": "Convert HTML to GIF Online (Free)",
+      "h1": "HTML to GIF Converter",
+      "description": "Turn an HTML file into a GIF picture of the page, laid out 1280 px wide. Scripts don't run and nothing is fetched. Free, with no sign-up.",
+      "howToHeading": "How to convert HTML to GIF"
+    },
+    "tool": {
+      "subtitle": "Draw a saved HTML page as a single GIF picture, 1280 px wide."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert HTML to GIF?",
+        "answer": "Choose your .html file above and download the GIF when it finishes. The page lays the document out 1280 px wide and saves a picture of it, one GIF for each HTML file."
+      },
+      {
+        "question": "Is the GIF animated?",
+        "answer": "No. You get one still picture of the page as it looks once laid out. CSS animations, scripts and video don't play, so nothing moves in the GIF."
+      },
+      {
+        "question": "Why are the images on my page missing?",
+        "answer": "The page loads nothing from the web. Only images stored inside the file as data: URLs are drawn, and a normal <img src=\"logo.png\"> link comes out blank. Embed the picture in the HTML, or take a browser screenshot instead."
+      },
+      {
+        "question": "Why doesn't my stylesheet apply?",
+        "answer": "A <link rel=\"stylesheet\"> is removed, because the page fetches no outside files. Styles written in a <style> block or a style attribute do apply, so paste the CSS into the HTML first."
+      },
+      {
+        "question": "Does JavaScript run before the picture is taken?",
+        "answer": "No. Scripts are stripped out, so content a script would add or change never appears. Write the final content into the HTML, or capture the page with a browser tool."
+      },
+      {
+        "question": "How wide is the GIF?",
+        "answer": "The page is laid out 1280 px wide, and the height follows the content. A layout that changes with the window width is drawn at 1280 px, whatever your own screen is."
+      },
+      {
+        "question": "Why is the bottom of my page cut off?",
+        "answer": "A picture can be at most 4096 px tall. A longer page is cut at that height and the page tells you so. Split a long report into several HTML files."
+      },
+      {
+        "question": "Do web fonts load?",
+        "answer": "Only fonts embedded in the file as data: URLs. A font linked from a web address isn't fetched, so the text is drawn without it."
+      },
+      {
+        "question": "Can I convert a web address instead of a file?",
+        "answer": "No, the page converts a file you choose. Save the page from your browser as an HTML file first, or use a screenshot method from the list further up."
+      },
+      {
+        "question": "What happens to a video on the page?",
+        "answer": "A video is dropped, and its embedded poster image, if it has one, is drawn in its place. Audio is dropped too."
+      }
+    ],
+    "aboutSection": {
+      "title": "HTML and GIF",
+      "fromFormat": {
+        "name": "HTML",
+        "fullName": "HyperText Markup Language",
+        "description": "The standard markup language for web pages, maintained by the WHATWG as the HTML Living Standard. It describes the structure of a page with elements and attributes.",
+        "details": [
+          "text-based markup",
+          "elements and attributes",
+          "styled with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format developed by CompuServe. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HTML to GIF",
+      "points": [
+        "The page is laid out 1280 px wide and the picture is as tall as the page, up to 4096 px.",
+        "Scripts, linked stylesheets, frames and outside images are not loaded or run.",
+        "Images and fonts stored in the file as data: URLs are drawn.",
+        "The GIF is one still picture, so nothing animates.",
+        "A GIF frame holds at most 256 colors, so photos and gradients lose some detail."
+      ]
+    },
+    "guide": {
+      "title": "About HTML files",
+      "markdown": "### What is an HTML file?\n\nHTML is the markup language that describes web pages. Its early revisions were developed at CERN and then the IETF between 1990 and 1995, and the WHATWG now maintains it as a Living Standard. An HTML file is plain text made of elements and attributes: headings, paragraphs, links, tables. CSS supplies the look, and JavaScript can add behavior. The media type is text/html.\n\nA saved page rarely stands alone. It usually points at images, fonts, stylesheets and scripts stored elsewhere, and that matters here. Turning HTML into a GIF means drawing the page once, so the picture can only show what the file itself contains.\n\nYou meet HTML files as saved web pages, exported reports, invoices, email designs and documentation. A GIF of one is useful when you need a picture of the layout, for a thumbnail, a bug report or a slide, and not the live page.\n\n### Programs that open HTML files\n\n- **Windows, Mac and Linux:** Firefox renders a local HTML file, and Mozilla documents Open File with Ctrl+O or Command+O.\n- **Mac, Windows and Linux:** Visual Studio Code edits HTML with syntax highlighting, completion and formatting. Its built-in language analysis looks only at the current file, so it won't show you what a linked stylesheet or script contains.\n- **Web:** any browser renders HTML.\n\nA saved page often links to pictures and styles stored elsewhere, so opened offline it can lose its pictures or styling.\n\n### HTML and GIF compared\n\n- **Extensions and media types**: .html and text/html; .gif and image/gif.\n- **What they hold**: HTML is text that describes a document. A GIF is a grid of palette indexes, so headings, links and form fields become plain pixels, and the text can no longer be selected or searched.\n- **Colors**: a GIF frame tops out at 256 colors. A flat page with solid fills suits that, while photos and soft shadows lose detail.\n- **Animation**: GIF can hold frames, but this page writes one.\n- **Links**: the picture shows how a link looks and nothing more.\n- **Linked files**: an HTML document can link to separate resources rather than hold every asset itself. Only those stored in the file reach the GIF.\n\nWhat this page does is specific. It parses your file without running anything, then removes what would run or load: scripts, the base element, link elements, meta http-equiv tags, frames, objects, event attributes, audio, video (except a poster image stored in the file) and SVG references that point outside the page. It lays the result out 1280 px wide, with an 800 px window for vh units, inside a sandbox that allows only inline styles and data: images and fonts. The picture is as tall as the page, up to 4096 px.\n\n### Other ways to convert HTML to GIF\n\nAll three methods below take a browser screenshot, which is a PNG, and then change it to GIF with ImageMagick.\n\n- **Firefox (Windows, Mac, Linux):** tick \"Take a screenshot of the entire page\" in the Developer Tools settings, or type `:screenshot --fullpage --filename page.png` in the Web Console. Then run `magick page.png page.gif`.\n- **Chrome (Windows, Mac, Linux):** with DevTools docked, open the Command Menu (Control+Shift+P, or Command+Shift+P on a Mac), type screenshot, choose Capture area screenshot and drag over the part you want. Convert the download with `magick screenshot.png page.gif`.\n- **Playwright (Node.js script):** call `await page.screenshot({ path: 'capture.png', fullPage: true });` after opening the page, then `magick capture.png capture.gif`.\n\n### Problems with HTML files\n\n- **Images are blank**: they are linked, not embedded, and an offline HTML document can lose linked pictures or styling this way. Use data: URLs in the HTML, or one of the screenshot methods above.\n- **The layout looks unstyled**: the CSS lives in a linked file. Move it into a <style> block.\n- **Text is in the wrong font**: web fonts are linked. Embed them as data: URLs or accept a fallback font.\n- **Garbled characters**: a wrong or missing character encoding. Declare the encoding in the file.\n- **The picture stops partway down**: the page is taller than 4096 px. Split the HTML into sections.\n- **Boxes that a script fills in are empty**: dates, totals and counters that JavaScript writes never appear, because no script runs. Write the values into the HTML itself, or take a browser screenshot.\n- **Nothing moves**: a GIF made here is one frame. Use a screen recorder for motion.\n"
+    }
+  },
+  "m4a-to-flac": {
+    "seo": {
+      "title": "Convert M4A to FLAC Online (Free)",
+      "h1": "M4A to FLAC Converter",
+      "description": "Convert M4A to FLAC in your browser. The FLAC is lossless but can't restore detail AAC already dropped, and cover art is left out. Free, no sign-up.",
+      "howToHeading": "How to convert M4A to FLAC"
+    },
+    "tool": {
+      "subtitle": "Save an M4A recording as a lossless FLAC file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4A to FLAC?",
+        "answer": "Pick the M4A above and the FLAC saves when FFmpeg is done. Everything runs in your browser tab, so a podcast or voice memo never leaves your device. Longer recordings simply take longer."
+      },
+      {
+        "question": "Will the FLAC sound better than my M4A?",
+        "answer": "No. If the M4A holds AAC, the FLAC stores the decoded AAC sound as it is, with nothing restored. You get a lossless copy of a lossy recording, not a restored master."
+      },
+      {
+        "question": "Is my M4A AAC or Apple Lossless?",
+        "answer": "The .m4a ending doesn't say. AAC and Apple Lossless (ALAC) both live in the same MPEG-4 audio container. AAC is lossy and ALAC is lossless, which decides what the FLAC is worth."
+      },
+      {
+        "question": "Why is the FLAC so much bigger than the M4A?",
+        "answer": "AAC throws away detail, and FLAC keeps every decoded sample. A FLAC made from an AAC file can be several times larger than the M4A, and converting doesn't change that."
+      },
+      {
+        "question": "Does the cover art come across?",
+        "answer": "No. The command turns video streams off, and FFmpeg reads cover art embedded in an M4A as a video stream, so the FLAC has no picture. Title and artist tags are copied. Add the art back in a tag editor."
+      },
+      {
+        "question": "What is the difference between FLAC and ALAC?",
+        "answer": "Both are lossless, but they are separate formats. ALAC normally sits in an MPEG-4 file such as .m4a, while FLAC has its own .flac file."
+      },
+      {
+        "question": "Can I convert a protected iTunes file?",
+        "answer": "Not if it is FairPlay-protected. A protected .m4p file is refused with a message that says so. You need an unprotected copy."
+      },
+      {
+        "question": "Why will Audacity not open my M4A?",
+        "answer": "Audacity can import M4A only after its optional FFmpeg library is installed. Convert the file here instead, then open the FLAC, which Audacity reads without FFmpeg."
+      },
+      {
+        "question": "Is FLAC a good way to archive M4A files?",
+        "answer": "An AAC file stays lossy inside a FLAC and the FLAC is larger, so keep the M4A unless a player or library insists on FLAC."
+      },
+      {
+        "question": "What does \"FFmpeg failed with exit code\" mean?",
+        "answer": "FFmpeg stopped before it could write the FLAC. The number after it varies, and a file with no audio stream is one cause. A damaged or cut-short M4A usually still converts, to a shorter FLAC, so play the result to check its length."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4A and FLAC",
+      "fromFormat": {
+        "name": "M4A",
+        "fullName": "MPEG-4 Audio",
+        "description": "An audio-only file in the MPEG-4 container (MP4). It usually holds AAC audio, or lossless Apple Lossless (ALAC) audio.",
+        "details": [
+          "MPEG-4 container",
+          "AAC or ALAC audio",
+          "metadata tags and cover art"
+        ]
+      },
+      "toFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "An open lossless audio format that compresses encoded samples without discarding them. It supports audio metadata and embedded pictures.",
+        "details": [
+          "lossless audio compression",
+          "open format",
+          "audio tags and pictures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4A to FLAC",
+      "points": [
+        "FLAC is lossless, but it can only store the sound the M4A already holds.",
+        "An AAC source stays as lossy as it was, and the FLAC can be much larger.",
+        "Cover art is left out, because the conversion turns off video streams. Title and artist tags are copied.",
+        "The page sets no sample rate or channel count of its own.",
+        "A FairPlay-protected file is refused."
+      ]
+    },
+    "guide": {
+      "title": "About M4A files",
+      "markdown": "### What is an M4A file?\n\nAn M4A is an audio-only file wrapped in the MPEG-4 container, the same one MP4 video uses. The ending names the container, not the codec. AAC is what most M4A files contain, and it is lossy. But the same container can hold Apple Lossless (ALAC). You will find M4A in music libraries, podcast downloads, voice recordings and audio exported from Apple apps.\n\nBesides the sound, an M4A can carry descriptive tags and cover art. FFmpeg reads embedded cover art as a video stream, which is why a conversion that switches video off also leaves the picture behind.\n\nThe codec decides what a conversion to FLAC is worth. AAC is lossy. It saves space by discarding detail, and once discarded it is gone. ALAC stores every sample, so an ALAC file already holds everything FLAC would. Knowing which one you have tells you whether FLAC buys anything beyond compatibility with a player or library that wants it.\n\n### Programs that open M4A files\n\n- **Windows, Mac, Linux:** Audacity imports M4A only with its optional FFmpeg library, and it can't import DRM-protected recordings. ffplay, FFmpeg's player, includes the M4A demuxer.\n- **Web:** Firefox plays the formats it supports on its own, while AAC can lean on your system's codecs. In Chrome the codec inside the file decides whether it opens, since only some audio and MP4 combinations play.\n- **Mobile:** On Android, VLC is a free player and opens whatever codecs the file holds that it supports. mpv for Android also plays it.\n\nThe FLAC you make opens in Audacity without any extra library.\n\n### M4A and FLAC compared\n\n- **Extensions and media types**: .m4a, usually audio/mp4; .flac and audio/flac.\n- **Compression**: AAC is lossy. ALAC and FLAC are lossless.\n- **Metadata**: FLAC can carry Vorbis comments, embedded pictures and seek points. M4A carries metadata tags and cover art.\n- **Open format**: FLAC's reference implementation is open source.\n- **Size**: a lossless file is larger than its lossy counterpart.\n\nThe command this page runs is `-acodec flac -vn`: decode the audio, write FLAC, ignore video. It names no sample rate, channel count, stream or tag mapping, so FFmpeg's defaults settle those. An AAC source gives a FLAC with the same sound and no more detail. Converting a lossy file to FLAC cannot recreate samples that were removed earlier. Either way, keep the M4A until you have played the FLAC and checked its length. FLAC can carry embedded pictures too, so cover art can go back in with a tag editor.\n\n### Other ways to convert M4A to FLAC\n\n- **FFmpeg (command line):** enter `ffmpeg -i recording.m4a -vn -c:a flac recording.flac`. `-vn` disables video, and a file with several audio streams needs a `-map` option such as `-map 0:a:1` to choose one.\n- **Audacity (Windows, Mac, Linux):** after installing its optional FFmpeg library, import the file with File > Import > Audio and export it with File > Export Audio, choosing FLAC as the format. In the FLAC dialog you can choose mono, stereo or custom channels, a sample rate, 16-bit or 24-bit output and a compression level between 0 and 8.\n- **fre:ac (Windows, Mac, Linux):** the project's site says it converts freely between M4A/AAC and FLAC. Add the file, choose the FLAC encoder and start the conversion.\n\n### Problems with M4A files\n\n- **Audacity can't import it**: install the FFmpeg library, or convert here.\n- **A purchased file won't convert**: it is protected. Audacity can't import protected files, and this page refuses a FairPlay-protected one. Use an unprotected copy.\n- **The cover art is missing from the FLAC**: it is read as a video stream and left out. Add it back in a tag editor.\n- **Several recordings in one Audacity window**: importing multiple files replaces the project tags with the last file's tags.\n- **The FLAC is much larger**: FLAC stores every decoded sample, and the AAC it came from did not.\n- **\"FFmpeg failed with exit code\"**: a file with no audio stream ends this way. A damaged or cut-short file usually converts to a shorter FLAC instead, so check the length.\n- **The FLAC won't play on an Android phone's built-in player**: Android's built-in player handles FLAC in a narrower range than the format allows: mono or stereo, with 16-bit samples recommended. VLC for Android is an alternative player.\n- **The recording sounds the same as before**: that is the expected result. FLAC repeats the sound without improving it.\n"
+    }
+  },
+  "mp4-to-flac": {
+    "seo": {
+      "title": "Convert MP4 to FLAC Online (Free)",
+      "h1": "MP4 to FLAC Converter",
+      "description": "Pull the soundtrack out of an MP4 as a lossless FLAC file in your browser. The video is dropped, and AAC detail already lost doesn't come back.",
+      "howToHeading": "How to convert MP4 to FLAC"
+    },
+    "tool": {
+      "subtitle": "Extract an MP4 soundtrack as a FLAC audio file, without the video."
+    },
+    "faqs": [
+      {
+        "question": "How do I extract audio from an MP4 as FLAC?",
+        "answer": "Add the MP4 above and its FLAC downloads once FFmpeg finishes. Conversion happens inside your browser, so the video stays put on your computer, and a long one just takes more time."
+      },
+      {
+        "question": "Will FLAC make the MP4 audio sound better?",
+        "answer": "No. The sound in most MP4 files is AAC, which is lossy. The FLAC holds that decoded sound as it is, including the detail the AAC encoder had already removed."
+      },
+      {
+        "question": "Why does my MP4 fail with \"FFmpeg failed with exit code\"?",
+        "answer": "Most often the MP4 has no audio at all, like a silent screen capture. With nothing to encode, FFmpeg stops and reports an exit code."
+      },
+      {
+        "question": "What happens to the video?",
+        "answer": "It is dropped. Video streams are switched off in the command, so the FLAC holds sound only, and the MP4 you started with stays as it was."
+      },
+      {
+        "question": "Which audio track is used when the MP4 has several languages?",
+        "answer": "The page does not choose a track, so FFmpeg's default selection decides. Listen to the FLAC to see which language you got, or run FFmpeg yourself with a -map option."
+      },
+      {
+        "question": "Do tags carry over from the MP4?",
+        "answer": "FFmpeg copies the MP4's title, artist and album tags to the FLAC where FLAC has fields for them. Look at them in a tag editor afterward and add whatever is missing."
+      },
+      {
+        "question": "Is the FLAC bigger than the MP4's AAC audio?",
+        "answer": "Yes. FLAC keeps every decoded sample while AAC does not, so the FLAC can be several times larger than the AAC stream it came from."
+      },
+      {
+        "question": "Can I convert a large MP4?",
+        "answer": "The page adds no size limit or timeout. A long file just takes the time your device needs."
+      },
+      {
+        "question": "Can FLAC play on my phone?",
+        "answer": "Both VLC apps, on Android and on iOS, play local files, so a FLAC from this page should open in either. Android itself documents native FLAC playback only for mono or stereo, with 16-bit samples recommended."
+      },
+      {
+        "question": "Can I turn the MP4 into MP3 instead?",
+        "answer": "Yes. The [MP4 to MP3 converter](/mp4-to-mp3/) extracts the same soundtrack as a lossy 192 kbps MP3, which suits listening more than archiving."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and FLAC",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A media container that organizes supported video, audio, subtitle, and metadata tracks. The codecs inside determine decoding requirements.",
+        "details": [
+          "multiple media tracks",
+          "codec-dependent playback",
+          "timing and metadata"
+        ]
+      },
+      "toFormat": {
+        "name": "FLAC",
+        "fullName": "Free Lossless Audio Codec",
+        "description": "An open lossless audio format that compresses encoded samples without discarding them. It supports audio metadata and embedded pictures.",
+        "details": [
+          "lossless audio compression",
+          "open format",
+          "audio tags and pictures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to FLAC",
+      "points": [
+        "The FLAC holds sound only. The video track is dropped.",
+        "FLAC can't restore detail an AAC soundtrack already lost, and it can be much larger than the AAC stream.",
+        "No audio track is chosen explicitly, so a multi-language MP4 needs a listen.",
+        "Title and artist tags are copied where FLAC has fields for them.",
+        "An MP4 with no audio fails with an FFmpeg exit code."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 files",
+      "markdown": "### What is an MP4 file?\n\nDefined in ISO/IEC 14496-14, MP4 packs video, audio, subtitles and metadata into a single file. H.264 video with AAC audio is common, yet the .mp4 ending doesn't guarantee any codec. People meet MP4 as streamed video, phone and camera clips, and files passed around.\n\nOnly the sound counts for this conversion. A lecture, a concert recording or an interview may need to enter an audio workflow without its pictures. The video's resolution says nothing about the quality of its audio. A clip can look sharp and carry a heavily compressed soundtrack, and a screen recording can carry none at all.\n\nThe audio codec decides what FLAC is worth here. AAC is lossy: it drops detail and can't take it back. Turning the track into FLAC stores the decoded result as it is, and from then on nothing more is lost. It does not bring back the original studio signal.\n\n### Programs that open MP4 files\n\n- **Windows, Mac, Linux:** ffplay, FFmpeg's player, has the MP4 demuxer. mpv plays desktop media with a choice of audio and subtitle tracks.\n- **Windows and Mac:** Adobe Premiere can import an MP4 once the matching decoder is present.\n- **Web:** Firefox opens the MP4 files it supports without help, though AAC and H.264 can lean on your system's codecs. Chrome opens only some MP4 combinations, so the codec inside decides.\n- **Mobile:** The free VLC for Android decodes the codecs your MP4 holds, within what it supports. On an iPhone or iPad, VLC for iOS opens local and network media.\n\nA container that opens doesn't guarantee a decoder for the sound inside it.\n\n### MP4 and FLAC compared\n\n- **Extensions and media types**: .mp4, usually video/mp4; .flac and audio/flac.\n- **Content**: MP4 holds video, audio, subtitles and metadata. FLAC holds audio only.\n- **Compression**: the AAC inside most MP4 files is lossy. FLAC is lossless.\n- **Channels**: FLAC handles one to eight of them.\n- **Metadata**: FLAC carries Vorbis comments, embedded pictures and seek points.\n- **Standard**: FLAC is described in RFC 9639, published in December 2024.\n\nThe page runs FFmpeg with `-acodec flac -vn`, which decodes the sound, writes FLAC and skips every video stream. Nothing in that command picks a track, and it leaves the sample rate and channel count unset, so FFmpeg's defaults apply. If the MP4 has several audio tracks, listen to the FLAC to confirm you got the one you wanted.\n\nFLAC is larger than the AAC it came from, because it keeps every decoded sample. In a test with a one-second sample MP4, the FLAC was several times the size of the MP4. A longer file or a different audio setting changes the numbers.\n\n### Other ways to convert MP4 to FLAC\n\n- **FFmpeg (command line):** type `ffmpeg -i concert.mp4 -vn -c:a flac concert.flac`. `-vn` disables video. If a movie has several languages, `-map 0:a:1` selects the second audio stream.\n- **Audacity (Windows, Mac, Linux):** after adding the optional FFmpeg library, bring the MP4 in using File > Import > Audio, then pick FLAC under File > Export Audio. The FLAC export dialog lets you choose the channel layout, the sample rate, a bit depth of 16 or 24 and a level from 0 to 8.\n- **VLC (command line):** On VideoLAN's wiki, `-I dummy` keeps VLC's window from opening, `--sout \"#transcode{acodec=flac}:std{mux=raw,dst=yourAudio.flac}\"` writes the FLAC, and `vlc://quit` closes it. The wiki's example input is an .mp4 file.\n\n### Problems with MP4 files\n\n- **No audio track**: a screen recording made without a microphone has nothing to extract. Play the MP4 first. With no sound to extract, the conversion shows an FFmpeg exit code.\n- **An unsupported codec**: a valid container can hold a codec your tools can't decode. Try another player or get another copy rather than renaming the file.\n- **The wrong language came out**: no track is selected by the page, so use FFmpeg with its own `-map` option.\n- **The title or artist is missing**: FFmpeg copies the MP4's global tags to the FLAC where it has fields for them, but it can't add a tag the MP4 never had. Check the tags in a tag editor and fill in what is missing.\n- **An interrupted recording won't open**: a recording that stopped before it was finished can leave the file unplayable. Record or download it again.\n- **The FLAC is much larger than the AAC**: FLAC is lossless and keeps every decoded sample, while AAC discards detail.\n"
+    }
+  },
+  "mpeg-to-wav": {
+    "seo": {
+      "title": "Convert MPEG to WAV Online (Free)",
+      "h1": "MPEG to WAV Converter",
+      "description": "Extract the sound from an MPEG video as a 16-bit PCM WAV file in your browser. The picture is dropped, and the WAV can be much larger than the MPEG audio.",
+      "howToHeading": "How to convert MPEG to WAV"
+    },
+    "tool": {
+      "subtitle": "Save the soundtrack of an MPEG video as an uncompressed WAV file."
+    },
+    "faqs": [
+      {
+        "question": "How do I extract audio from an MPEG as WAV?",
+        "answer": "Add an MPEG above and the WAV downloads when FFmpeg finishes. Everything is done in your browser, so the video is never uploaded and a long file needs more time."
+      },
+      {
+        "question": "What kind of WAV does the page write?",
+        "answer": "Signed 16-bit PCM, stored little-endian. The page sets neither sample rate nor channel count, so FFmpeg's defaults apply."
+      },
+      {
+        "question": "Why is the WAV bigger than the audio in my MPEG?",
+        "answer": "The audio in an MPEG is compressed, while PCM keeps every decoded sample. The WAV can be several times larger than the MPEG audio it came from, even with the picture gone."
+      },
+      {
+        "question": "Does the WAV include the video?",
+        "answer": "No. Video streams are switched off, so the WAV has sound only, and your MPEG stays untouched."
+      },
+      {
+        "question": "What does the \"FFmpeg failed with exit code\" error mean for an MPEG?",
+        "answer": "The MPEG has no audio, such as a video-only stream, so FFmpeg has nothing to write. Play it in a media player and listen for sound."
+      },
+      {
+        "question": "Can I do a batch of MPEG files in one go?",
+        "answer": "Yes. Select the files together and each gets its own WAV, downloaded separately rather than zipped."
+      },
+      {
+        "question": "What if my MPEG is damaged or truncated?",
+        "answer": "Usually it still converts. FFmpeg reports the problem and converts what it can read, so the WAV ends early when the source did. Play the result to check its length."
+      },
+      {
+        "question": "Is a WAV always uncompressed?",
+        "answer": "No. WAV is a wrapper that can hold several encodings. This page writes PCM, which is uncompressed."
+      },
+      {
+        "question": "Should I use WAV or MP3 for a spoken interview?",
+        "answer": "WAV suits editing and transcription tools that want plain samples. MP3 is a lossy, compressed format, so choose it for listening or sharing, through [this site's MP3 option](/mpeg-to-mp3/)."
+      },
+      {
+        "question": "Does it matter if my file ends in .mpg or .mpeg?",
+        "answer": "The file picker on this page shows only .mpeg files. Both endings name MPEG video, and .mpg files go through the [MPG to WAV converter](/mpg-to-wav/)."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPEG and WAV",
+      "fromFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "lossy compression"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "A RIFF-based audio container developed by Microsoft and IBM. It often contains uncompressed PCM, while other encodings are also possible.",
+        "details": [
+          "audio container",
+          "often uncompressed PCM",
+          "encoding-dependent precision"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MPEG to WAV",
+      "points": [
+        "The WAV is signed 16-bit PCM and holds sound only. The picture is dropped.",
+        "PCM is larger than the compressed MPEG audio it came from.",
+        "No sample rate, channel count or track is set, so FFmpeg's defaults decide.",
+        "An MPEG with no audio fails with an FFmpeg exit code. A damaged or cut-short one usually still converts, to a shorter WAV."
+      ]
+    },
+    "guide": {
+      "title": "About MPEG files",
+      "markdown": "### What is an MPEG file?\n\nInside an MPEG file sits MPEG-1 or MPEG-2 video with its audio, joined in a program stream. The usual endings are .mpeg and .mpg, and the media type is video/mpeg. MPEG-2 started out for compressed television broadcasts, and DVDs adopted it later. You will meet MPEG files as older video downloads and broadcast captures.\n\nIn an MPEG system, picture, sound and data are coded as separate streams. One elementary stream carries a single component, split into packets. So a player can show a picture and still need a second decoder for the sound.\n\nWhat you keep from this conversion is the sound. A recording you want to edit, transcribe or archive can leave its picture behind. The sharpness of the video says nothing about the sound, and a file that holds only a video elementary stream has no audio to extract.\n\n### Programs that open MPEG files\n\n- **Windows, Mac, Linux:** VLC media player can open MPEG elementary, program and transport streams.\n- **Mac, Windows and Linux:** FFplay uses FFmpeg's decoders to play MPEG input.\n- **Mobile:** On a phone, VLC for Android carries much of the desktop player's decoding. VLC for iOS is a separate player app for media stored on the device.\n\nPlaying a file means decoding its audio as well as its video, because joining the two streams doesn't make their codecs interchangeable.\n\n### MPEG and WAV compared\n\n- **Names and media types**: .mpeg or .mpg, video/mpeg; .wav, audio/wav or audio/x-wav.\n- **Content**: an MPEG holds picture and sound together. A WAV holds sound only.\n- **Format**: WAV is a RIFF-based wrapper, documented by Microsoft and IBM in their August 1991 multimedia specification.\n- **Encoding**: linear PCM is a common WAV payload, but other, compressed encodings exist, so a .wav name alone doesn't prove the sound is uncompressed.\n- **Size**: PCM can take several times the space of the compressed audio inside an MPEG.\n- **Large files**: very big recordings may need RF64 instead of the original RIFF size fields.\n\nHere FFmpeg runs `-acodec pcm_s16le -vn`, which decodes the audio into signed 16-bit little-endian PCM and ignores the video. Sample rate, channels and track are left unspecified, so FFmpeg's own defaults take over. Check the channels and rate in an audio editor if a transcription tool or editor publishes a requirement.\n\nDecoding to PCM can't recreate detail the MPEG audio encoder removed. The WAV is a convenient, editable copy of the sound, and nothing more. Keep the MPEG if you later need the sound reconnected to its picture.\n\nA WAV is a good choice when the next step is editing, cutting or feeding the sound to a tool that wants plain samples. If you only need a smaller audio file to listen to, a compressed format such as MP3 is the better target, and this site has an [MPEG to MP3 converter](/mpeg-to-mp3/) for that.\n\n### Other ways to convert MPEG to WAV\n\n- **FFmpeg (command line):** use `ffmpeg -i archive.mpeg -vn -c:a pcm_s16le archive.wav`. `-vn` disables video. Two audio streams? Add `-map 0:a:1` to take the second.\n- **Audacity (Windows, Mac, Linux):** install the optional FFmpeg library first, then choose File > Import > Audio to bring the file in and File > Export Audio to write a WAV. The manual says FFmpeg imports audio from most video files that are not DRM-protected, and the export dialog lets you review the WAV encoding, sample rate and channels.\n- **VLC (command line):** The same wiki lists a WAV command: `-I dummy` hides the interface, `--sout \"#transcode{acodec=s16l,channels=2}:std{access=file,mux=wav,dst=yourAudio.wav}\"` does the conversion, and `vlc://quit` ends it. VLC's feature list names MPEG streams as input.\n\n### Problems with MPEG files\n\n- **No audio comes out**: a video-only elementary stream has no soundtrack. Find the companion sound file or a version that has both.\n- **\"FFmpeg failed with exit code\"**: an MPEG with no audio track ends this way. A damaged or cut-short MPEG usually still converts, so if the WAV ends early, try another copy.\n- **The wrong language or commentary**: track choice is left to FFmpeg, so use its `-map` option yourself.\n- **Unsure what the file contains**: .mpeg can hold a program stream, a transport stream or a bare video stream. Open it in VLC and listen for sound.\n- **The WAV is huge**: that is normal for PCM. A WAV that is shorter than the original needs a duration check, since a damaged MPEG converts only as far as it can be read.\n"
+    }
+  },
+  "nef-to-png": {
+    "seo": {
+      "title": "Convert NEF to PNG Online (Free)",
+      "h1": "NEF to PNG Converter",
+      "description": "Turn a Nikon NEF raw photo into a lossless PNG in your browser. The raw sensor data becomes a finished picture, and camera adjustments are no longer editable.",
+      "howToHeading": "How to convert NEF to PNG"
+    },
+    "tool": {
+      "subtitle": "Develop a Nikon NEF raw photo into a lossless PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a Nikon NEF to PNG?",
+        "answer": "Choose your NEF files above and each PNG downloads when it finishes. ImageMagick runs inside your browser, so your photos aren't uploaded."
+      },
+      {
+        "question": "Is converting NEF to PNG lossless?",
+        "answer": "The PNG itself is lossless, so it keeps the pixels it was given exactly. But a raw file has to be developed into pixels first, and that step isn't reversible. Keep the NEF if you may want a different edit later."
+      },
+      {
+        "question": "Can I still change white balance and exposure on the PNG?",
+        "answer": "Not in the way you can on the NEF. Nikon notes that white balance, tone and sharpening can stay as instructions in a raw file. The PNG is a finished picture, and the raw sensor data is gone."
+      },
+      {
+        "question": "Why does it say the RAW compression can't be decoded?",
+        "answer": "The page can't read Nikon's High Efficiency RAW (HE and HE*) files, and the message says so. The same message appears for a damaged file. Shoot or export those images as standard NEF instead."
+      },
+      {
+        "question": "Why does the PNG not match the preview on my camera?",
+        "answer": "A raw file can be developed in different ways, and the camera's JPEG preview is only one rendering. Open the NEF in NX Studio to see Nikon's own, or compare exposure and white balance in a raw developer."
+      },
+      {
+        "question": "Is the PNG much bigger than the NEF?",
+        "answer": "It can be. PNG stores every pixel without lossy compression, so a photograph from a Nikon body makes a large file. If you want a lossy file instead, the [NEF to JPG converter](/nef-to-jpg/) on this site makes a JPG."
+      },
+      {
+        "question": "Does the PNG keep the camera and lens details?",
+        "answer": "This page strips nothing on purpose, but don't rely on a PNG to carry shutter speed, lens or date. Keep the NEF as the record of how the photo was taken."
+      },
+      {
+        "question": "Which Nikon cameras work?",
+        "answer": "Standard NEF files from Nikon cameras are read by the LibRaw decoder built into this ImageMagick engine. The High Efficiency (HE and HE*) files are not supported."
+      },
+      {
+        "question": "Can I convert a batch of NEF files?",
+        "answer": "Yes. Pick a whole shoot together and each NEF is converted one after another into its own PNG, with no ZIP."
+      },
+      {
+        "question": "Is there a size limit for a NEF?",
+        "answer": "No. The page checks the format, not the file size. Only a picture beyond about 537 megapixels is turned away as too large to convert here."
+      }
+    ],
+    "aboutSection": {
+      "title": "NEF and PNG",
+      "fromFormat": {
+        "name": "NEF",
+        "fullName": "Nikon Electronic Format",
+        "description": "The raw image format of Nikon digital cameras. It stores unprocessed sensor data in a TIFF-based file, with an embedded JPEG preview.",
+        "details": [
+          "unprocessed sensor data",
+          "TIFF-based structure",
+          "embedded JPEG preview"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format for rendered images, with support for alpha transparency and multiple channel precisions.",
+        "details": [
+          "lossless pixel compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting NEF to PNG",
+      "points": [
+        "The raw sensor data is developed into pixels. The PNG can't be re-developed.",
+        "Nikon's High Efficiency RAW (HE and HE*) files can't be decoded here.",
+        "Keep the NEF as the record of the camera settings.",
+        "PNG is lossless, so the file is large compared with a JPG."
+      ]
+    },
+    "guide": {
+      "title": "About NEF files",
+      "markdown": "### What is a NEF file?\n\nNikon cameras write raw photos as NEF, short for Nikon Electronic Format. The file keeps the captured sensor data with camera and lens details, in a TIFF-based structure that includes a JPEG preview. Precision is 12-bit or 14-bit depending on the body, and the data is stored uncompressed or with lossless compression.\n\nNikon explains that choices such as white balance, hue, tone and sharpening can be kept as processing instructions rather than applied to the sensor values. A raw developer reads those instructions and renders a visible photograph. So converting NEF to PNG means developing the photo, not only changing the container. PNG is a finished picture that opens anywhere, but exposure and color have to be decided before its pixels are written.\n\nA different developer can render the same NEF differently, so the PNG you get is one interpretation of the capture. Your NEF remains the original, and converting never changes it.\n\nTone matters most. A NEF holds 12-bit or 14-bit data, so a developer decides which part of the range becomes shadows, midtones and highlights. If a PNG looks flat or too dark, that is the development choice and not damage to the file.\n\n### Programs that open NEF files\n\n- **Windows and Mac:** Nikon NX Studio, the company's software for viewing and developing its raw photos.\n- **Mac, Windows and Linux:** ImageMagick reads NEF.\n- **Linux:** XnView MP opens NEF files and needs no payment for private or educational use.\n\nAdobe Lightroom, Adobe Photoshop and darktable also open NEF.\n\n### NEF and PNG compared\n\n- **Extensions and media types**: .nef; .png, image/png.\n- **Content**: unprocessed sensor data in a NEF, a finished pixel image in a PNG.\n- **Precision**: a NEF's bit depth depends on the camera. PNG supports 8-bit and 16-bit channels.\n- **Compression**: PNG is lossless for the pixels it is given. NEF is uncompressed or losslessly compressed.\n- **Transparency**: PNG supports alpha transparency, though a camera photo has none.\n- **Standard**: PNG is both ISO/IEC 15948 and a W3C Recommendation.\n\nThis page reads the NEF with ImageMagick compiled to WebAssembly, using its bundled LibRaw decoder, and writes the PNG directly. It reads one picture and sets no quality value. Nothing is stripped on purpose. A file the decoder can't handle, such as a High Efficiency RAW from Nikon or a damaged one, ends with a message about RAW compression.\n\nPNG's lossless compression applies to the pixels it receives. It can't undo choices made during demosaicing or color conversion. A lossless output and a reversible workflow are separate things, so keep the NEF.\n\nSize follows from that. A PNG of a full-resolution Nikon photo stores every pixel, so the file can be large. Pick PNG when you want a lossless copy of the developed picture for editing or for a document, and the lossy JPG when you want something to share.\n\n### Other ways to convert NEF to PNG\n\n- **darktable (Windows, Mac, Linux):** first develop the NEF, then open the export module. Under target storage pick \"file on disk\", set the format to PNG, then press start export. darktable lists export to PNG among its features and NEF among the raw formats it imports.\n- **ImageMagick (command line):** run `magick photograph.nef photograph.png`. ImageMagick lists NEF as a format it reads and PNG as one it reads and writes, and its docs show the same input-then-output form.\n- **NX Studio and GIMP:** in NX Studio, select the photo and use Export to save a TIFF. NX Studio's saving options include TIFF but not PNG. Then open that TIFF in GIMP, use File > Export As and save it as PNG; GIMP shows its PNG Export dialog.\n\n### Problems with NEF files\n\n- **An unreadable result**: the raw decoder may not support that camera or compression. Try an updated raw developer such as darktable.\n- **\"Compression can't be decoded\" message**: the message points to Nikon's High Efficiency RAW, or a damaged file. Open it in a Nikon-supported raw developer, or get another copy.\n- **The PNG does not match the preview**: the development differs. Compare exposure, white balance and color in a raw developer instead of re-encoding the PNG.\n- **The PNG is huge**: lossless compression doesn't promise a small file. Use the NEF to JPG converter if size matters.\n- **Camera details are missing**: the NEF holds the camera and lens details and a PNG may not. Keep the NEF as the record.\n"
+    }
+  },
+  "pptx-to-png": {
+    "seo": {
+      "title": "Convert PPTX to PNG Online (Free)",
+      "h1": "PPTX to PNG Converter",
+      "description": "Turn each visible slide of a PowerPoint PPTX into its own PNG in your browser. Up to 100 slides, hidden slides and speaker notes left out. No upload.",
+      "howToHeading": "How to convert PPTX to PNG"
+    },
+    "tool": {
+      "subtitle": "Save every visible PowerPoint slide as a separate PNG image."
+    },
+    "faqs": [
+      {
+        "question": "How do I save PowerPoint slides as PNG images?",
+        "answer": "Choose your PPTX file above and each visible slide becomes its own PNG. The slides are drawn inside your browser, so the deck isn't uploaded."
+      },
+      {
+        "question": "How are the slide images named?",
+        "answer": "Each file is named after the deck with the slide's own number, such as name_slide3. A hidden slide still counts in the numbering, so you may see a gap."
+      },
+      {
+        "question": "What size are the PNGs?",
+        "answer": "A slide is drawn at 2x its point size, so a larger slide gives a larger PNG. No side goes beyond 4096 pixels. Set the slide size in the deck to control it."
+      },
+      {
+        "question": "Are hidden slides, speaker notes and comments included?",
+        "answer": "No. Hidden slides, speaker notes and comments are not drawn, and the page tells you how many hidden slides it skipped."
+      },
+      {
+        "question": "Why did my fonts change?",
+        "answer": "Text is drawn in the slide's own fonts using the fonts on your device, with metric-compatible fallbacks when one is missing. A fallback can shift line breaks on a crowded slide."
+      },
+      {
+        "question": "What happens to videos and linked pictures?",
+        "answer": "Video is skipped, and so is any picture the slide links to rather than contains. The page tallies what it omitted. Embed the pictures in PowerPoint before converting."
+      },
+      {
+        "question": "Is there a limit on the number of slides?",
+        "answer": "The first 100 slides are converted, and the page says how many the deck had. A deck that takes longer than 90 seconds to lay out is stopped."
+      },
+      {
+        "question": "Can I convert an old .ppt file?",
+        "answer": "Not directly. A .ppt file, or a deck saved with a password, is told to save a copy as an unprotected .pptx first."
+      },
+      {
+        "question": "Will animations or transitions be kept?",
+        "answer": "No. A PNG is a still picture of each slide, so builds, transitions and timed reveals are gone."
+      },
+      {
+        "question": "Can I get JPG instead of PNG?",
+        "answer": "Yes. The [PPTX to JPG converter](/pptx-to-jpg/) on this site draws the same slides as JPG files. Pick PNG when you want the slide pictures lossless."
+      }
+    ],
+    "aboutSection": {
+      "title": "PPTX and PNG",
+      "fromFormat": {
+        "name": "PPTX",
+        "fullName": "PowerPoint presentation",
+        "description": "PPTX packages slide layouts, text, media, and presentation relationships in an Office Open XML document.",
+        "details": [
+          "ZIP package of XML",
+          "slides, notes and animations",
+          "embedded media and charts"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format for rendered images, with support for alpha transparency and multiple channel precisions.",
+        "details": [
+          "lossless pixel compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PPTX to PNG",
+      "points": [
+        "Each visible slide is a separate PNG, at twice its size in points.",
+        "Hidden slides, speaker notes, comments, video and linked pictures are not drawn.",
+        "At most 100 slides are converted, and a deck needing more than 90 seconds is stopped.",
+        "Fonts come from your device, with fallbacks, so line breaks can shift."
+      ]
+    },
+    "guide": {
+      "title": "About PPTX files",
+      "markdown": "### What is a PPTX file?\n\nA PPTX is the standard PowerPoint presentation file. It stores presentation content as PresentationML in an Office Open XML package, with individual slides and their relationships in separate package parts. Notes and slide masters have their own XML parts. Its media type is application/vnd.openxmlformats-officedocument.presentationml.presentation, and macro-enabled presentations use .pptm instead.\n\nA slide's appearance is assembled from layouts, themes, text, pictures and charts, so it isn't one picture. A deck can also carry notes, transitions, audio and video. Turning it into PNG images captures how each slide looks and leaves behind everything that behaves: the animations, the notes and the editable chart data.\n\nThat suits a picture for a document, a review thread or a web page. The recipient can't edit the text or replay a timed reveal from a PNG, so keep the deck for that.\n\nA PNG per slide also keeps the layout fixed. Every recipient sees the same slide whatever fonts or PowerPoint version they have, which is why decks are often shared this way for reviews, handouts and web posts.\n\n### Programs that open PPTX files\n\n- **Windows and Mac:** Microsoft PowerPoint opens and saves PPTX natively.\n- **Windows, Mac and Linux:** LibreOffice Impress reads PowerPoint 2007 to 365 files through an XML filter.\n- **Mac:** Keynote opens a presentation dragged onto the Keynote icon.\n- **Linux:** ONLYOFFICE Desktop Editors opens PPTX in a desktop editor.\n- **Web:** PowerPoint for the web supports PPTX presentations.\n- **Mobile:** Phones open PPTX in the Microsoft mobile app. Keynote for iPhone opens .pptx and .ppt documents.\n\nMissing fonts can change how a presentation displays, and PowerPoint can embed eligible fonts to prevent that.\n\n### PPTX and PNG compared\n\n- **Extensions and media types**: .pptx, the Office Open XML presentation type; .png, image/png.\n- **Content**: a PPTX holds slide objects and relationships. A PNG holds one flat picture of a slide.\n- **Compression**: PNG is lossless, so the slide picture is exact at its pixel size.\n- **Transparency**: PNG supports alpha transparency.\n- **Editing**: a slide title becomes pixels, not a text box, and a chart becomes a picture.\n\nThis page draws each visible slide as SVG inside your browser using the pptx-glimpse library, then saves it as a PNG at twice the slide's size in points. No side of the picture goes beyond 4096 pixels. The files are named like name_slide3, using the slide's own number. A hidden slide keeps its number, so the sequence can skip one.\n\nHidden slides, speaker notes and comments stay out of the images. So do video and pictures a slide only links to, and the page reports how many items it skipped. The cap is 100 slides, the whole job is cut off at 90 seconds, and a package whose parts declare more than 512 MB inflated isn't read. Text uses the slide's own fonts through your device, with metric-compatible fallbacks, and text with no font gets the theme's body font.\n\nThe pixel size follows the slide size, so a deck set to a larger slide size gives larger PNGs, up to the 4096-pixel ceiling. A PNG has fixed pixels, so you can't enlarge one afterward without losing sharpness; set the size in the deck before converting.\n\n### Other ways to convert PPTX to PNG\n\n- **PowerPoint for Mac:** choose File > Export, set File Format to PNG, pick Save Every Slide or Save Current Slide Only, set the image size and export.\n- **LibreOffice Impress:** open the deck, which Impress reads through its PowerPoint XML filter, then choose File > Export and select PNG as the file type. LibreOffice lets you set PNG compression and interlacing.\n- **Keynote for Mac:** open the deck in Keynote by dragging it onto the Keynote icon, then choose File > Export To > Images. Select the slides, pick an image format and click Export.\n\n### Problems with PPTX files\n\n- **\"Save it as an unprotected .pptx\"**: the file is an old .ppt or has a password. Save a copy in PowerPoint without the password.\n- **Missing logos**: a picture linked instead of embedded isn't drawn. Embed it in PowerPoint and convert again.\n- **Fewer images than slides**: hidden slides are skipped, and only 100 slides become images. The page reports the count.\n- **A font looks different**: install the font on this device or embed it in the deck.\n- **The conversion stops early**: a very long or image-heavy deck can pass the 90-second limit. Split the deck into two files and convert each.\n- **Notes or animations missing**: a PNG can't hold them. Export them from PowerPoint another way.\n"
+    }
+  },
+  "psd-to-svg": {
+    "seo": {
+      "title": "Convert PSD to SVG Online (Free)",
+      "h1": "PSD to SVG Converter",
+      "description": "Wrap a Photoshop PSD as an SVG file in your browser. The SVG holds the picture as a PNG, so it is not traced vector paths and text isn't editable.",
+      "howToHeading": "How to convert PSD to SVG"
+    },
+    "tool": {
+      "subtitle": "Save a Photoshop PSD as an SVG file that holds the picture as an embedded PNG."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PSD to SVG?",
+        "answer": "Choose your PSD files above and each SVG downloads when it finishes. Your design isn't uploaded, because the work happens in your browser."
+      },
+      {
+        "question": "Does PSD to SVG make vector shapes?",
+        "answer": "No. The SVG you get is the PSD's picture saved as a PNG and placed inside an SVG file. Nothing is traced, so the edges don't become paths and the picture still has fixed pixels."
+      },
+      {
+        "question": "Why does the SVG get blurry when I enlarge it?",
+        "answer": "The pixels inside it are fixed. The SVG is sized to match the picture's pixel dimensions, and scaling it up stretches those pixels."
+      },
+      {
+        "question": "What happens to my Photoshop layers?",
+        "answer": "You get a single image, not one object per layer."
+      },
+      {
+        "question": "Will Photoshop text stay editable?",
+        "answer": "No. Text becomes part of the picture, so you can't select or edit it in an SVG editor. Keep the PSD for any text you may change."
+      },
+      {
+        "question": "Can I use the SVG with a cutting machine?",
+        "answer": "Not as it comes. A cutter needs paths, and this SVG holds a picture, so it has no outlines to cut."
+      },
+      {
+        "question": "Can I open the SVG in Inkscape or Illustrator?",
+        "answer": "Yes. It is a standard SVG file with one embedded PNG image in it. The shapes inside that picture can't be edited, because there are none."
+      },
+      {
+        "question": "Why is the SVG bigger than the PNG inside it?",
+        "answer": "Base64 text takes more room than the PNG's own bytes. The SVG is drawn at the picture's pixel size, with the PNG filling it."
+      },
+      {
+        "question": "Does it take a whole folder of PSD files?",
+        "answer": "Yes. Select several PSD files at once; each one becomes its own SVG and downloads separately, with no ZIP."
+      },
+      {
+        "question": "What if I only need a PNG?",
+        "answer": "Use [PSD to PNG](/psd-to-png/) instead. It gives the picture as a PNG, without the SVG wrapper."
+      }
+    ],
+    "aboutSection": {
+      "title": "PSD and SVG",
+      "fromFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
+        "details": [
+          "layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML image format that can describe vector geometry, text, effects, and embedded raster pictures. Vector shapes can scale independently of pixels; embedded pictures retain their raster limits.",
+        "details": [
+          "scalable vector geometry",
+          "XML document structure",
+          "can include raster images"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PSD to SVG",
+      "points": [
+        "The SVG holds the PSD's picture as an embedded PNG. It is not vector.",
+        "One picture is read from the PSD, so layers, masks and text don't carry over.",
+        "The SVG is the same size in pixels as the picture.",
+        "For real vectors, the artwork has to be redrawn or traced in a vector editor."
+      ]
+    },
+    "guide": {
+      "title": "About PSD files",
+      "markdown": "### What is a PSD file?\n\nPSD is the document format Photoshop uses to save its work. Unlike a flattened export, a PSD can hold layers, masks, adjustment layers, text and color data. Adobe's specification describes separate sections for the header, image resources, layer and mask information, and the final image data. The header begins with the signature 8BPS.\n\nDepth per color channel in a PSD runs 1, 8, 16 or 32 bits, and one side can reach 30,000 pixels. PSB raises that limit. Pixels may be stored uncompressed or squeezed with RLE or ZIP.\n\nThis matters for PSD to SVG because a design that contains a logo isn't necessarily a vector logo. The outline in a PSD may be painted pixels, shape paths or both, and changing the file label doesn't recover paths that were never there. A PSD is mostly pixel data, and that is what the page turns into an SVG.\n\nPeople search for PSD to SVG for several reasons: to put a design on a web page, to hand a logo to someone who asked for an SVG, or to feed a cutting machine. Only the first of those works with an embedded picture. For the others you need paths, which means redrawing the artwork or tracing it in a vector editor.\n\n### Programs that open PSD files\n\n- **Windows, Mac and Linux:** ImageMagick reads PSD images; `magick identify -list format` prints every format your install reads.\n- **Mac, Windows and Linux:** XnView MP can open PSD, and company use requires a license.\n- **Web:** Photopea works in PSD natively and loads files via File > Open.\n\nAdobe Photoshop is the native editor. A preview in another program doesn't prove full editing compatibility.\n\n### PSD and SVG compared\n\n- **Extensions and media types**: .psd for the source, .svg for the output.\n- **Content**: a PSD holds layers, masks and pixels. An SVG describes shapes, text and effects in XML, and can embed pictures.\n- **Scaling**: vector shapes in an SVG scale cleanly. An embedded picture keeps its pixels.\n- **Layers**: PSD keeps them. This page reads one picture.\n- **Fonts**: SVG text depends on the fonts available, but this output contains no live text.\n\nOn this page ImageMagick reads the PSD inside your browser. SVG isn't a format it writes directly, so the page writes a PNG and places it in an SVG file. The SVG's width and height are the picture's size in pixels, and the PNG sits inside it as base64 data. Nothing is traced. The result opens anywhere an SVG does, yet it behaves like an image, not like artwork you can reshape.\n\nThe page reads one picture from the PSD. A layered file gives you one picture, not an object per layer. It sets no quality value, and a picture of more than about 537 megapixels is refused because it is too big for the converter.\n\nIf you wanted to scale the picture, edit paths or send it to a cutting machine, an SVG made this way won't do that. If you only need the picture in an SVG-shaped file, it will.\n\nThe file carries the picture as base64 text, so it is larger than the PNG inside it. If the destination accepts PNG, the [PSD to PNG converter](/psd-to-png/) on this site gives the picture without the SVG wrapper.\n\n### Other ways to convert PSD to SVG\n\n- **Photopea (in a browser):** open the PSD through the Open dialog, then choose File > Export As and pick SVG. Photopea lists SVG among the formats it exports, next to PNG, JPG and PDF. It is a separate program, so the SVG it writes isn't the same file this page makes.\n\n### Problems with PSD files\n\n- **The edges look jagged when enlarged**: the SVG holds pixels. Redraw or trace the artwork in a vector editor if you need clean curves.\n- **The layers are gone**: only one picture is read. Keep the PSD as the editable source.\n- **The text can't be edited**: it is part of the picture.\n- **The file is refused as too large**: that happens beyond about 537 megapixels. Shrink the picture in Photoshop first.\n- **The SVG is larger than expected**: the PNG is stored inside it as base64 text, which takes more room than the PNG alone. Use the PSD to PNG converter if size matters.\n"
+    }
+  },
+  "svg-to-ai": {
+    "seo": {
+      "title": "Convert SVG to AI Online (Free)",
+      "h1": "SVG to AI Converter",
+      "description": "Draw an SVG as vectors into a PDF-compatible file with an .ai name, in your browser. Not a native Illustrator document, and the page size follows the drawing.",
+      "howToHeading": "How to convert SVG to AI"
+    },
+    "tool": {
+      "subtitle": "Turn SVG artwork into a vector, PDF-compatible AI file."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn an SVG into an AI file?",
+        "answer": "Choose your SVG files above and each AI file downloads when it finishes. The drawing is converted inside your browser, so your artwork isn't uploaded."
+      },
+      {
+        "question": "Is the AI file a native Illustrator document?",
+        "answer": "No. This page writes a PDF-compatible file: your SVG drawn as vectors into a PDF page. A native Illustrator document needs Illustrator to make it."
+      },
+      {
+        "question": "Is the result still vector?",
+        "answer": "Yes. The drawing is written as vector content, not as a picture of it, so it scales without blurring. Pictures embedded in the SVG stay pixels."
+      },
+      {
+        "question": "What size will the artboard be?",
+        "answer": "Width and height in px, pt, pc, in, cm or mm are converted to points, and a unitless number counts as points. The page then matches the drawing's size."
+      },
+      {
+        "question": "What if my SVG has no width or height?",
+        "answer": "A missing side is worked out from the viewBox proportions. With neither side given, the viewBox size is used, and with no viewBox the page is 300 by 150 points."
+      },
+      {
+        "question": "What does \"This SVG file couldn't be read\" mean?",
+        "answer": "The file has an SVG element, but the XML doesn't parse. Load it in a browser or Inkscape to find the error, then save a clean copy."
+      },
+      {
+        "question": "What does \"This file has no SVG drawing in it\" mean?",
+        "answer": "The file has no <svg> element at all. It may be a different format with an .svg name, or an empty file. Open it in a text editor to see what it holds."
+      },
+      {
+        "question": "Is the downloaded file a PDF?",
+        "answer": "Inside, yes. The page writes a PDF with jsPDF and svg2pdf.js and names it with the .ai extension, as an AI file is PDF-compatible. It isn't a native Illustrator document."
+      },
+      {
+        "question": "Can I convert a whole folder of SVG icons?",
+        "answer": "Yes. Select all the SVG files together and each becomes its own AI file in turn. No ZIP is made."
+      },
+      {
+        "question": "What if I need a PDF instead?",
+        "answer": "Use the [SVG to PDF converter](/svg-to-pdf/) on this site. Its download is named .pdf instead of .ai."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and AI",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML image format that can describe vector geometry, text, effects, and embedded raster pictures. Vector shapes can scale independently of pixels; embedded pictures retain their raster limits.",
+        "details": [
+          "scalable vector geometry",
+          "XML document structure",
+          "can include raster images"
+        ]
+      },
+      "toFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "Adobe Illustrator’s artwork format can store editable paths, text, layers, and artboards. Documents can include PDF-compatible content when that save option is selected.",
+        "details": [
+          "Illustrator artwork",
+          "editable objects and artboards",
+          "optional PDF-compatible content"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SVG to AI",
+      "points": [
+        "The AI file is PDF-compatible and holds your SVG drawn as vectors.",
+        "It is not a native Illustrator document. Save one in Illustrator if you need that.",
+        "The page matches the drawing's size, with one SVG unit per point.",
+        "Embedded pictures stay pixels, and the AI file holds none of Illustrator's own editing data."
+      ]
+    },
+    "guide": {
+      "title": "About SVG files",
+      "markdown": "### What is an SVG file?\n\nAn SVG document describes artwork in XML. A curve stays a path, a label stays text, and a gradient keeps its stops. The file can also refer to a photograph or a font stored elsewhere, which is why a vector drawing and a self-contained illustration are different things, even when they look the same in a browser.\n\nSVG suits diagrams, icons and illustrations that need to scale. Its document structure also allows CSS and browser behavior that a printed page doesn't reproduce.\n\nBefore converting, decide what the recipient needs. They may want the visible artwork, individual editable objects, or a native Illustrator production file. This page covers the first and part of the second. For the third, you need Illustrator.\n\nA common case is a logo or icon that a designer, printer or sign maker asked for as an .ai file. If they only need to place the artwork in a layout, a PDF-compatible file is often enough. If they need to change colors, paths or layers, send the SVG as well.\n\n### Programs that open SVG files\n\n- **Windows, Mac and Linux:** Inkscape is a native SVG editor.\n- **Windows, Mac, Linux and Web:** Mozilla Firefox displays SVG.\n- **Web and Mobile:** Chrome draws SVG in the browser.\n- **Mobile:** Safari renders SVG too.\n\nCorelDRAW imports SVG files through File > Import. A browser preview shows how a drawing looks, not what a drawing application can edit.\n\n### SVG and AI compared\n\n- **Extensions and media types**: .svg, image/svg+xml; .ai, Adobe Illustrator artwork.\n- **Format**: SVG is an open XML description. AI is Adobe Illustrator's native artwork format.\n- **Content**: vector objects and pixel images can sit together in an AI document, along with Illustrator's editable effects, brushes, layers and transparency.\n- **PDF compatibility**: saving from Illustrator with the PDF-compatible option adds a PDF version next to the Illustrator data.\n- **History**: Illustrator 9 changed the AI format in 2000. Earlier files used PostScript.\n\nAn AI file is a PDF-compatible file, and this page makes that kind. It parses your SVG and draws it as vectors into a PDF page of the drawing's size, with jsPDF and svg2pdf.js. That page is sized from the SVG's width and height, with inches, centimeters and millimeters converted to points and one unit or pixel counting as one point. A side that is missing comes from the viewBox, and an SVG that gives no size at all gets a 300 by 150 page. Check the page dimensions before the file goes to print.\n\nThe file holds none of Illustrator's own editing data. A program that reads only the PDF part may not expose native Illustrator objects. An image embedded in the SVG stays a picture.\n\nAn SVG can link to pictures that live in other files, so embed what the artwork depends on. Text layout also depends on the fonts available, so a substituted font changes the drawing.\n\nKeep the SVG as the editable source. If the recipient asks for a native Illustrator file, open the SVG in Illustrator and save an AI copy there.\n\n### Other ways to convert SVG to AI\n\n- **CorelDRAW:** choose File > Import, select the SVG and click Import. In the Import SVG dialog pick a scaling option (Automatic keeps the scale of the source file) and click OK, then click the page to place it. Next choose File > Export, pick Adobe Illustrator (AI) from the Save as type list, enter a name and click Export. CorelDRAW lists both SVG and AI among its file formats.\n\n### Problems with SVG files\n\n- **\"This SVG file couldn't be read\"**: the XML doesn't parse. Load the file in a browser or Inkscape and save a clean copy.\n- **The page comes out the wrong size**: an SVG with no width, height or viewBox gets a 300 by 150 point page. Add a viewBox or explicit sizes before converting.\n- **Text looks different**: when a font is substituted, the text changes shape. Convert text to outlines in your editor if the shapes must stay fixed.\n- **A picture is soft when enlarged**: embedded pixel images in an SVG keep the resolution they started with.\n- **The page size is wrong**: an SVG whose width and height are percentages has no absolute size, so the viewBox sets the page instead. Add an absolute width and height to the SVG.\n"
+    }
+  },
+  "svg-to-gif": {
+    "seo": {
+      "title": "Convert SVG to GIF Online (Free)",
+      "h1": "SVG to GIF Converter",
+      "description": "Turn an SVG into a GIF in your browser. You get one still image at the size the browser reports, with colors reduced to a GIF palette and no animation.",
+      "howToHeading": "How to convert SVG to GIF"
+    },
+    "tool": {
+      "subtitle": "Draw an SVG as a still GIF image at its own size, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an SVG to GIF?",
+        "answer": "Add an SVG above and the GIF downloads once it is ready. Your browser draws the SVG and ImageMagick writes the GIF, all on your device."
+      },
+      {
+        "question": "What size will the GIF be?",
+        "answer": "Whatever size your browser reports for the SVG. The page applies no scale factor and no size cap, so a small icon gives a small GIF."
+      },
+      {
+        "question": "Will the GIF stay sharp when I enlarge it?",
+        "answer": "No. A GIF is a fixed grid of pixels, so scaling it up shows stair-steps on diagonals and small text. Keep the SVG for anything that must scale."
+      },
+      {
+        "question": "Does the GIF keep SVG animation?",
+        "answer": "No. The result is one still image, not an animated GIF."
+      },
+      {
+        "question": "Why do my gradients look striped?",
+        "answer": "GIF holds at most 256 colors. A smooth gradient is reduced to that palette, so you may see bands where the shades change."
+      },
+      {
+        "question": "Are linked pictures and web fonts in my SVG drawn?",
+        "answer": "No. The browser draws the SVG as an image, so anything it links to outside the file, such as pictures, stylesheets and web fonts, is never loaded, online or not. Only what is embedded in the SVG and the fonts installed on your device appear."
+      },
+      {
+        "question": "Why did my font change?",
+        "answer": "The browser draws lettering in fonts installed on your device, and a web font the SVG links to is never loaded, so that text appears in another font. Convert the lettering to paths in your editor to lock the look."
+      },
+      {
+        "question": "What happens to an embedded photo?",
+        "answer": "It stays pixels and is reduced to the GIF palette. A photo doesn't become vector art by sitting inside an SVG, and it will look rough as a GIF."
+      },
+      {
+        "question": "Should I use PNG instead of GIF?",
+        "answer": "Usually. PNG keeps full color, so it suits logos and icons better. The [SVG to PNG converter](/svg-to-png/) on this site draws the SVG the same way."
+      },
+      {
+        "question": "Can I convert several SVG files at once?",
+        "answer": "Yes. Pick several SVGs together and each one comes out as its own GIF, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and GIF",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML image format that can describe vector geometry, text, effects, and embedded raster pictures. Vector shapes can scale independently of pixels; embedded pictures retain their raster limits.",
+        "details": [
+          "scalable vector geometry",
+          "XML document structure",
+          "can include raster images"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format developed by CompuServe. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SVG to GIF",
+      "points": [
+        "The GIF is one still image, sized as your browser reports the SVG, with no scaling.",
+        "Colors are reduced to a GIF palette of at most 256, so gradients can band.",
+        "Animation in the SVG is not kept.",
+        "Embedded photos stay pixels."
+      ]
+    },
+    "guide": {
+      "title": "About SVG files",
+      "markdown": "### What is an SVG file?\n\nInstead of a color per pixel, an SVG describes its shapes in a structured XML document. Curves, text, clipping paths and gradients can be described independently of display size, which makes SVG a good fit for a logo that appears both in a small interface and on a large sign. Photographs embedded in an SVG remain raster images, even when the drawing around them is vector artwork.\n\nSVG can also refer to outside resources and use features meant for a browser. Your browser paints the SVG as a flat image, so outside pictures, stylesheets and web fonts it points to are never fetched; just embedded data and fonts installed locally get drawn. Keep the SVG. The GIF can't replace it as the source for later changes to paths or lettering.\n\n### Programs that open SVG files\n\n- **Windows, Linux and Mac:** Inkscape edits SVG natively, and Mozilla Firefox displays it.\n- **Web:** Chrome and Firefox open an SVG directly in their own window.\n- **Mobile:** Safari and Chrome show an SVG as an ordinary picture.\n\nFor automated work, ImageMagick's format list marks SVG as readable and writable, with rendering through Inkscape, RSVG or its internal MSVG renderer. Different renderers may handle fonts or filters differently, so opening a file successfully is only the start of checking how it looks.\n\n### SVG and GIF compared\n\n- **Extensions and media types**: .svg, image/svg+xml; .gif, image/gif.\n- **Content**: SVG describes shapes and text. GIF is a grid of indexed colors.\n- **Palette**: a GIF frame holds up to 256 colors, which suits flat artwork and strains gradients and photos.\n- **Transparency**: GIF transparency is on or off. SVG edges can be partly transparent.\n- **Scaling**: SVG scales without limit. A GIF has a fixed size.\n\nHere your browser decodes the SVG and paints it at whatever size it reports. The page adds no scaling, size cap or viewBox handling. ImageMagick then writes the GIF. The conversion produces one still image, so nothing in the SVG that moves or runs is recorded. Compare the GIF with the SVG in a browser at the same size to see what the palette lost.\n\nA larger GIF doesn't regain vector scalability, and enlarging one later shows pixel edges on diagonal strokes and small type. Decide the display size first, because the page adds no scaling of its own.\n\nIf the destination accepts SVG, keep the SVG. If it takes PNG, the SVG to PNG converter gives full color and soft edges.\n\nGIF still has its place. It stores palette indexes compressed with LZW, and a frame can carry its own local color table, so a flat logo with few colors converts cleanly. A simple icon with solid fills and hard edges loses very little. A drawing with soft shadows, glows or gradients is where the 256-color palette shows, so preview the GIF at its real display size before you use it.\n\n### Other ways to convert SVG to GIF\n\n- **ImageMagick (command line):** run `magick artwork.svg artwork.gif`, the input-then-output form ImageMagick's docs show. The SVG renderer your installation uses affects the result, and the GIF is limited to 256 palette entries.\n- **Inkscape and GIMP:** open the SVG in Inkscape and press Shift + Ctrl + E for the Export PNG Image dialog. Choose Page, Drawing, Selection or Custom as the area, enter the pixel size under Image Size, name the file and click Export. Then bring the PNG into GIMP and use File > Export As to write a GIF. In the GIF dialog the As animation option is disabled for a single layer, and GIMP's GIF export is limited to 256 colors.\n\n### Problems with SVG files\n\n- **A picture or font is missing**: a linked picture, an external stylesheet or a web font is never loaded. Embed the pictures in the SVG and install the fonts.\n- **Fine strokes look rough**: the GIF is drawn at the SVG's own size with no scaling, so a thin line gets few pixels. Export a larger PNG from Inkscape and convert that.\n- **The GIF doesn't move**: the page writes one still image, whatever the SVG does. Build the frames in an animation tool if you want a moving GIF.\n- **Unexpected colors**: a gradient reduced once can't be restored by converting again. Start from the SVG.\n- **A different font**: lettering falls back to another typeface when yours is missing. Convert text to paths.\n"
+    }
+  }
+}

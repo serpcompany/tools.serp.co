@@ -1,0 +1,908 @@
+{
+  "png-to-txt": {
+    "seo": {
+      "title": "Convert PNG to TXT With OCR (Free)",
+      "h1": "PNG to TXT Converter",
+      "description": "Read the text in a PNG with OCR and save it as a TXT file. The page reads English only and runs in your browser. Free, with no sign-up.",
+      "howToHeading": "How to convert PNG to TXT"
+    },
+    "tool": {
+      "subtitle": "Turn the English text in a PNG screenshot into a plain TXT file."
+    },
+    "faqs": [
+      {
+        "question": "Is there a quick way to get a text file from a PNG?",
+        "answer": "Choose the PNG above and wait while the page reads it. When it finishes, save the TXT. The page runs OCR in your browser, so the picture is turned into the words it shows rather than copied as data."
+      },
+      {
+        "question": "Can I copy the text out of a screenshot?",
+        "answer": "Yes. Convert the screenshot and open the TXT, then copy from there. A screenshot holds only pixels, so the page reads the lettering with an OCR model and writes what it recognizes into the file."
+      },
+      {
+        "question": "Which languages can it read?",
+        "answer": "English only. The page loads one English recognition model and has no other language data. A screenshot in another language or script will come out wrong or empty."
+      },
+      {
+        "question": "Why does the page say \"No text was found in this image\"?",
+        "answer": "The recognizer returned nothing it could use, so no TXT is made. The picture may contain no lettering, or the letters may be too small, faint or blurry. Try a larger, sharper capture."
+      },
+      {
+        "question": "Will the TXT keep my columns and table layout?",
+        "answer": "No. Plain text has no columns, fonts or tables, and the page keeps only the characters it recognizes. For a table or a two-column page, crop each part and convert it on its own."
+      },
+      {
+        "question": "Why are letters like O and 0 or l and 1 mixed up?",
+        "answer": "OCR matches shapes, and those characters look alike, especially in small type or a compressed screenshot. Check codes, serial numbers and amounts against the PNG before you rely on them."
+      },
+      {
+        "question": "Can I do a whole folder of screenshots in one go?",
+        "answer": "Yes. Pick them all together and the page reads them one after another, saving a separate TXT for each. You get no ZIP and no merged file."
+      },
+      {
+        "question": "What encoding is the TXT file?",
+        "answer": "UTF-8. Lines have their trailing spaces removed, long runs of blank lines are cut to a single blank line, and the file ends with one newline. If an editor shows odd characters, set it to open the file as UTF-8."
+      },
+      {
+        "question": "Is my PNG uploaded to a server?",
+        "answer": "No. The recognizer and its English model are served from this site and run in your browser, so the image stays on your device while it is read."
+      },
+      {
+        "question": "How do I get a better result from a poor screenshot?",
+        "answer": "Start from a bigger, sharper capture of the text: zoom in before you screenshot, or scan at a higher resolution. Crop out borders and busy backgrounds. Enlarging a blurry image does not bring back lost letters."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and TXT",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "TXT",
+        "fullName": "Plain text file",
+        "description": "A file that holds unformatted text with no fonts, styles or images. It is readable by any text editor, on any operating system.",
+        "details": [
+          "no formatting",
+          "character encoding such as UTF-8",
+          "very small files",
+          "readable everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to TXT",
+      "points": [
+        "The page reads the picture with OCR, in your browser, using an English model only.",
+        "The TXT is UTF-8 plain text: no columns, fonts, tables or pictures.",
+        "If no text is found, you get a message and no file.",
+        "Check numbers and codes against the PNG, since OCR can swap look-alike characters.",
+        "Choose several PNGs and each becomes its own TXT."
+      ]
+    },
+    "guide": {
+      "title": "About PNG files",
+      "markdown": "### What is a PNG file?\n\nMade to replace GIF without GIF's patent trouble, PNG stores a picture losslessly. First of its kind at the W3C, PNG became a Recommendation in October 1996, with RFC 2083 and ISO/IEC 15948 after it. Under the hood it is a fixed signature followed by chunks, with the pixel data compressed by DEFLATE. Its pixel layouts are indexed, grayscale and truecolor; each sample takes 1 to 16 bits, and an alpha channel is optional. All major browsers show PNG, and no royalty-bearing patents are known to cover it. image/png is its registered media type, and image/apng is the one for animated files. Software that cannot animate a PNG shows its default still image instead.\n\nMost people meet PNG as a screenshot, because macOS saves screenshots as PNG by default. That is why this pair exists. A screenshot of a web page, a chat or a spreadsheet looks like text, but the file holds only pixels. The letters are not characters a text editor can select. To get them out, the converter has to read the picture, which is called optical character recognition, or OCR.\n\n### Programs that open PNG files\n\n**Windows, Mac and Linux:**\n\n- GIMP imports PNG for editing, so you can crop a screenshot to the lettering before you convert it.\n- ImageMagick reads PNG.\n\n**Web and mobile:**\n\n- Google Chrome displays PNG.\n- Mozilla Firefox displays PNG.\n- Safari, on mobile, displays PNG.\n\n### PNG and TXT compared\n\n- **Extensions and media types**: a screenshot ends in .png and is labeled image/png. The text it becomes ends in .txt and is labeled text/plain.\n- **What is stored**: a PNG is a grid of pixels, in indexed, grayscale or truecolor, with an optional alpha channel. A TXT holds characters, and its charset says how the bytes map to them.\n- **Compression**: PNG is always lossless, using DEFLATE. A text file is not compressed.\n- **Layout**: plain text has no fonts, page layout or picture placement, so columns, tables and styling in the screenshot do not carry over.\n\nUnlike most pairs here, this one does not copy anything out of the PNG; it reads the picture. A text recognizer runs in your browser with an English model only, and the image is not uploaded. When it finds no lettering, you get a message and no file.\n\n### Other ways to convert PNG to TXT\n\n- **Tesseract (command line):** run `tesseract capture.png recognized -l eng`. The `-l` option picks the language, and English is the default when you leave it out. The default output format is text, and it wrote recognized.txt next to the image in a test run. Tesseract and the English language data must be installed.\n- **PowerToys Text Extractor (Windows):** show the PNG on screen, press Windows+Shift+T and drag over the text. The text goes to the clipboard; paste it into a text editor and save a .txt file. It reads the screen region, not the file. Microsoft says the text may not be perfect and needs a quick proofread.\n- **Preview and TextEdit (Mac):** open the PNG in Preview, drag to select the text, Control-click and choose Copy Text. Paste into TextEdit, choose Format > Make Plain Text and save. Live Text isn't available in all regions or languages.\n\n### Problems with PNG files\n\n- **The text comes out wrong or scrambled**: OCR reads shapes, and small, blurry or slanted letters get misread. Capture the screen at a larger size or scan at a higher resolution, then convert again. Enlarging a blurry image adds no detail.\n- **The page finds no text**: the picture has no readable lettering, or the lettering is too faint or small. Try a sharper copy, and crop away borders and busy backgrounds.\n- **Letters in another language come out as nonsense**: the model is English. A screenshot in another language needs an OCR program with that language's data.\n- **Columns run together**: plain text has no columns. Convert each column or region as its own cropped image and join them in an editor.\n- **The recognizer couldn't start**: the recognizer or its English model did not load. Reload the page and try again, or try another browser.\n- **A photo gives nothing**: OCR finds letters, not objects, so a picture with no writing in it ends with no text instead of a description of the scene.\n"
+    }
+  },
+  "ppt-to-png": {
+    "seo": {
+      "title": "Convert PPT to PNG: Export Slides as Images",
+      "h1": "PPT to PNG Converter",
+      "description": "This page can't read old PPT decks. Export slides as images from PowerPoint, Impress or Keynote, or save a PPTX copy and use PPTX to PNG.",
+      "howToHeading": "How to convert PPT to PNG"
+    },
+    "tool": {
+      "subtitle": "Export PPT slides as images with PowerPoint, Impress or Keynote."
+    },
+    "faqs": [
+      {
+        "question": "Can this page convert a PPT to PNG?",
+        "answer": "No, this page cannot read the old PowerPoint format. It decodes images with your browser's image decoder and has no presentation renderer, so you see an error and get no PNG. Export from PowerPoint, Impress or Keynote instead, or save a PPTX copy and use the PPTX to PNG converter."
+      },
+      {
+        "question": "How do I save every slide of a PowerPoint as PNG images?",
+        "answer": "In PowerPoint for Windows, choose File > Save As, set the type to PNG, click Save and answer All Slides to save every slide as a separate image. PowerPoint for Mac exports only the current slide, through File > Export with PNG as the file format and Save Current Slide Only."
+      },
+      {
+        "question": "Can I rename my .ppt to .pptx to convert it?",
+        "answer": "No. The extension is a label, and the two formats store the presentation differently. Open the PPT in PowerPoint, Impress or Keynote and save a new PPTX copy instead."
+      },
+      {
+        "question": "Do I need PowerPoint to turn a PPT into PNG?",
+        "answer": "No. LibreOffice Impress opens .ppt through File > Open and lists PNG among its export types. On a Mac, Keynote opens .ppt files and can export images."
+      },
+      {
+        "question": "Will animations and transitions survive in a PNG?",
+        "answer": "No. A presentation holds transitions, animations, notes and comments, and none of those fit in the single still picture each exported slide becomes."
+      },
+      {
+        "question": "What is the difference between PPT and PPTX?",
+        "answer": "PPT is the older binary format of PowerPoint, and PPTX is the later XML-based format. PPT cannot represent every feature introduced in the newer versions of PowerPoint."
+      },
+      {
+        "question": "How do I make the PNGs sharper?",
+        "answer": "On Mac, PowerPoint's Export dialog has Width and Height boxes where you can enter a size. PNG compression is lossless, so what the file looks like depends on the pixel size the program writes."
+      },
+      {
+        "question": "Can I export just one slide?",
+        "answer": "Yes. In PowerPoint on Windows pick Just This One after choosing PNG. In PowerPoint on Mac, select Save Current Slide Only."
+      },
+      {
+        "question": "Is my old PPT safe to delete after exporting?",
+        "answer": "Keep it if you may need to edit the text or reuse the notes. The PNGs are pictures only, and the text in them cannot be edited."
+      },
+      {
+        "question": "Why does PowerPoint say it cannot open my downloaded PPT?",
+        "answer": "Microsoft's support page says Microsoft 365 can block a file for security reasons. Right-click the file in File Explorer, open Properties and choose Unblock."
+      }
+    ],
+    "aboutSection": {
+      "title": "PPT and PNG",
+      "fromFormat": {
+        "name": "PPT",
+        "fullName": "Legacy PowerPoint presentation",
+        "description": "The binary presentation format of Microsoft PowerPoint for legacy presentations, distinct from the later PPTX format.",
+        "details": [
+          "binary format of PowerPoint 97 to 2003",
+          "slides, transitions and animations",
+          "notes, handouts and comments"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format created as a patent-free successor to GIF. It is standardized as ISO/IEC 15948 and as a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "1 to 16 bits per sample",
+          "every major browser shows it"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PPT to PNG",
+      "points": [
+        "This page cannot read the old PPT format; it ends in an error and no PNG.",
+        "PowerPoint and LibreOffice Impress can export PNG, and Keynote exports images.",
+        "A PNG keeps one slide as a picture: no animation, notes or editable text.",
+        "A PPTX copy can be converted with the PPTX to PNG converter."
+      ]
+    },
+    "guide": {
+      "title": "About PPT files",
+      "markdown": "### What is a PPT file?\n\nA PPT is a PowerPoint presentation in the binary format used from PowerPoint 97 through Office 2003. Newer versions of PowerPoint save .pptx instead, a different XML-based format, and PPT cannot hold every feature added since PowerPoint 2007. Inside, a deck is a stack of slides carrying text, graphics, transitions and animations, with notes, handouts and comments kept beside them. That is a lot more than a picture can hold, which is why exporting is a rendering job.\n\nIts media type is application/vnd.ms-powerpoint. Saving newer presentation features into PPT can lose functionality that the older format cannot store.\n\nThis page cannot convert it. The page has only your browser's picture decoder and no presentation renderer, so a PPT ends in an error and nothing to download. The programs below can export the slides. Saving a .pptx copy first lets you use the [PPTX to PNG converter](/pptx-to-png/).\n\n### Programs that open PPT files\n\n**Windows, Mac and Linux:**\n\n- LibreOffice Impress opens .ppt and .pps through its File > Open command.\n- Apache OpenOffice Impress imports legacy PPT presentations and can save in PowerPoint format.\n\n**Windows and Mac:**\n\n- Microsoft PowerPoint opens PowerPoint 97-2003 presentations; newer features may need PPTX.\n\n**Mac:**\n\n- Keynote opens PowerPoint presentations, .ppt included.\n\n**Web:**\n\n- PowerPoint for the web reads PPT, but you must save a copy as PPTX to edit it.\n- Google Slides imports PowerPoint presentations into its browser editor.\n\n### PPT and PNG compared\n\n- **Extensions and media types**: .ppt is application/vnd.ms-powerpoint. .png is image/png.\n- **What they hold**: a PPT is a document of slides, notes and effects. A PNG is one still picture, so each exported slide is its own file.\n- **Compression**: a PNG is always lossless, and DEFLATE, which is LZ77 plus Huffman coding, does the packing.\n- **What is lost**: transitions, animations, notes and comments have no place in a picture, and text can no longer be edited.\n\nThe step that matters is the program that renders the PPT, since this page has none for the old binary format.\n\n### Other ways to convert PPT to PNG\n\n- **Microsoft PowerPoint (Windows, Mac):** on Windows, select the slide, open File > Save As, or Save a Copy when the file lives on OneDrive or SharePoint, pick PNG Portable Network Graphics Format as the type (the list also offers JPEG, GIF and SVG) and save; Microsoft says a slide saved this way is a picture you can use in other applications. Choose Just This One for the selected slide or All Slides for a separate image of each. On Mac, switch to Normal view, open the slide, choose File > Export, set the file format to PNG, select Save Current Slide Only, optionally enter a Width and Height, and click Export. The Mac steps cover the current slide only, and the Mac Export dialog also offers JPEG, TIFF and BMP; a message box then tells you where the image was saved.\n- **LibreOffice Impress (Windows, Mac, Linux):** choose File > Open and select the PPT, then File > Export, pick PNG as the file type and click Save. PNG offers extra export options after you click Save.\n- **Keynote (Mac):** open the PPT, choose File > Export To > Images, choose which slides to export and then an image format. Apple's page notes that a higher-quality image makes a larger file. Keynote remembers the slide range you set and applies it the next time you export that presentation.\n\n### Problems with PPT files\n\n- **The page shows an error**: the page has no way to read a PPT. Use PowerPoint, Impress or Keynote to export the slides.\n- **Renaming to .pptx fails**: the extension does not change the contents. A real PPTX has to be saved by a program that opens the PPT.\n- **The file will not open on Windows**: a deck downloaded from the internet may be blocked by Office security and report that it cannot be opened. Unblock it under Properties in File Explorer.\n- **Newer features are missing**: saving into PPT lost anything the old format cannot store. Ask for the PPTX if one exists.\n- **PowerPoint for the web will not let you edit it**: it reads .ppt but needs a .pptx copy for editing.\n- **Only one slide needed**: pick Just This One in PowerPoint on Windows, or Save Current Slide Only on Mac.\n"
+    }
+  },
+  "tga-to-jpg": {
+    "seo": {
+      "title": "Convert TGA to JPG Online (Free)",
+      "h1": "TGA to JPG Converter",
+      "description": "Turn a Targa texture or render into a JPG that opens anywhere. A JPG has no alpha channel, so a 32-bit TGA loses its transparency. Free, no sign-up.",
+      "howToHeading": "How to convert TGA to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn Targa files into JPG pictures that any program can open."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a TGA to a JPG?",
+        "answer": "Pick the TGA above and download the JPG that appears. Your browser runs ImageMagick to read the Targa and write the JPEG, and your original file stays as it was."
+      },
+      {
+        "question": "Why can't my computer open a .tga file?",
+        "answer": "Targa is tied to Truevision video boards and is still used in video editing and game development, so everyday viewers often skip it. GIMP, Photoshop and ImageMagick open it, and a JPG made here opens in every major browser."
+      },
+      {
+        "question": "Does my TGA's transparency carry over to the JPG?",
+        "answer": "It does not. A 32-bit TGA has an alpha channel, but a JPG can't store one. To keep see-through areas, convert to PNG."
+      },
+      {
+        "question": "What does a 32-bit TGA actually mean?",
+        "answer": "Thirty-two bits for each pixel: 8 for red, 8 for green, 8 for blue and 8 for alpha. A 24-bit TGA has the same colors without the alpha channel."
+      },
+      {
+        "question": "Will the JPG be smaller than the TGA?",
+        "answer": "It can be. A Targa keeps every pixel, with run-length encoding only as an option, while JPEG is lossy and gives up detail to save space. Compare the two sizes after converting."
+      },
+      {
+        "question": "Can the JPG go back into my game as a texture?",
+        "answer": "Avoid it. A JPG is lossy and has no alpha channel, so keep the TGA for the engine and use the JPG for previews, documentation or posts."
+      },
+      {
+        "question": "Can I convert a whole folder of TGAs?",
+        "answer": "Yes, select them together. They go through one by one and each gives its own JPG, with no ZIP file."
+      },
+      {
+        "question": "Which quality setting does this converter apply?",
+        "answer": "None is passed from the page, so ImageMagick's own default applies. For a specific number, convert in GIMP or with ImageMagick on your computer."
+      },
+      {
+        "question": "Why is my huge TGA refused?",
+        "answer": "The converter turns away pictures larger than about 537 megapixels. Scale the image down in an editor, then try again."
+      },
+      {
+        "question": "Is my TGA sent to a server?",
+        "answer": "No. The reading and writing happen in your browser through ImageMagick's WebAssembly build, on your own device."
+      }
+    ],
+    "aboutSection": {
+      "title": "TGA and JPG",
+      "fromFormat": {
+        "name": "TGA",
+        "fullName": "Truevision TGA (Targa)",
+        "description": "A raster image format. It stores 8 to 32 bits per pixel with optional run-length encoding and an alpha channel.",
+        "details": [
+          "optional run-length compression",
+          "alpha channel",
+          "8 to 32 bits per pixel",
+          "simple header"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "no alpha transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TGA to JPG",
+      "points": [
+        "ImageMagick reads the TGA in your browser; nothing is uploaded.",
+        "JPG has no alpha channel, so a 32-bit TGA loses its transparency.",
+        "JPG is lossy, so keep the TGA if it is your production copy.",
+        "The page sets no quality; the JPG uses ImageMagick's default.",
+        "A picture over about 537 megapixels is too big for the page."
+      ]
+    },
+    "guide": {
+      "title": "About TGA files",
+      "markdown": "### What is a TGA file?\n\nTarga, written .tga, began as the picture format of Truevision's video boards, which is where the name comes from. It can hold RGB, indexed-color or grayscale images. In a 24-bit RGB file each of red, green and blue gets 8 bits; a 32-bit file adds an 8-bit alpha channel so pixels can be partly see-through. The data may be run-length encoded, an option that squeezes long stretches of identical pixels.\n\nThe boards are history, but the format stuck around. Video editing and game development still use Targa images, so most TGAs people find today are game textures, 3D renders or frames out of an editing project. Hardly any phone, browser or office program shows one, which is the usual reason for wanting a JPG: something to paste into a document, post on a forum or send by email.\n\n### Programs that open TGA files\n\n**Windows, Mac and Linux:**\n\n- GIMP has an official Targa plug-in that both loads and exports the format.\n- ImageMagick treats TGA, ICB, VDA and VST as one Truevision Targa family and can read and write it.\n\n**Windows and Mac:**\n\n- Adobe Photoshop can open a Targa and has its own Targa options on save; a 24-bit save leaves no room for an alpha channel.\n\n### TGA and JPG compared\n\n- **Extensions and media type**: .tga for Targa. For JPEG, .jpg and .jpeg are one format, registered as image/jpeg.\n- **Compression**: a Targa keeps every pixel, whether or not run-length encoding is used. Baseline JPEG throws detail away by cutting the picture into 8x8 pixel blocks, applying a discrete cosine transform and coding the result with Huffman codes.\n- **Transparency**: the alpha channel in a 32-bit TGA has no counterpart in JPEG, which stores no transparency at all.\n- **Layers**: JPEG cannot store them.\n\n- **Where each is used**: Targa belongs to production, with game textures, renders and video frames. Most digital cameras and scanners build JPEG in, and browsers all show it, so it travels where a Targa cannot.\n\nHow the page does it: ImageMagick, compiled to WebAssembly, reads the TGA on your device and writes the JPG. Only one image is read from the file.\n\n### Other ways to convert TGA to JPG\n\n- **ImageMagick (command line):** `magick texture.tga preview.jpg` does it in one line. ImageMagick's format list shows TGA and JPEG both as readable and writable, and the command ran on a TGA fixture here. Add `-quality 90` before the output name to pick a JPEG quality yourself; ImageMagick scales it from 1, the lowest quality and most compression, to 100, the best quality and least compression.\n- **GIMP (Windows, Mac, Linux):** open the TGA, choose File > Export As, give the file a .jpg name and click Export. A JPEG export dialog follows, with quality at 85 by default. The same number can mean a different quality in another program, and JPEG doesn't support transparency or multiple layers.\n- **Pillow (Python):** run `from PIL import Image` then `Image.open(\"texture.tga\").convert(\"RGB\").save(\"preview.jpg\")`. Pillow reads and writes TGA, and picks the output format from the file name. Saving an RGBA Targa straight to JPEG raised an error in a test, so the `convert(\"RGB\")` step stays.\n\n### Problems with TGA files\n\n- **Nothing on your computer opens it**: open the TGA in GIMP, Photoshop or ImageMagick, or make a JPG here.\n- **The see-through areas are gone**: JPEG has no alpha channel. When transparency matters, take the [TGA to PNG converter](/tga-to-png/) instead.\n- **A \"32-bit\" file looks like ordinary color**: the number counts bits per pixel, so it is four 8-bit channels, not 32 bits for each color.\n- **An export lost its alpha**: saving RGB artwork at 24 bits leaves no space for a Targa alpha channel. Write it as 32-bit if you need one.\n- **Partial transparency in an indexed Targa**: GIMP cannot export full partial-alpha information in an indexed Targa color map, and only one fully transparent color is allowed in its indexed mode.\n- **The JPG looks softer than the texture**: that is the cost of lossy compression. Keep the TGA as the working file.\n- **Version 2 extension fields vanish**: GIMP's Targa support does not keep every one of them, so a round trip through GIMP can drop extra data stored in the file.\n- **The page refuses a huge image**: shrink the picture in an editor first.\n"
+    }
+  },
+  "wma-to-wav": {
+    "seo": {
+      "title": "Convert WMA to WAV Online (Free)",
+      "h1": "WMA to WAV Converter",
+      "description": "Decode a WMA file into a 16-bit PCM WAV in your browser. Video streams are dropped, and copy protection is not removed. Free, with no sign-up.",
+      "howToHeading": "How to convert WMA to WAV"
+    },
+    "tool": {
+      "subtitle": "Turn a WMA recording into an uncompressed 16-bit WAV file."
+    },
+    "faqs": [
+      {
+        "question": "How do I turn a WMA into a WAV?",
+        "answer": "Select the WMA on this page and download the WAV. FFmpeg decodes it in your browser and writes 16-bit PCM, and the WMA you started with is not touched."
+      },
+      {
+        "question": "Will a WAV sound better than my WMA?",
+        "answer": "No. A lossy WMA has already lost detail, and the WAV just holds the decoded sound in a larger file. Nothing the original encoder discarded comes back."
+      },
+      {
+        "question": "Why is my WAV file so much bigger?",
+        "answer": "WAV here is uncompressed PCM, while WMA is normally compressed, so the WAV is much larger than the WMA. A long recording makes a very large file."
+      },
+      {
+        "question": "What audio format is inside the WAV?",
+        "answer": "Signed 16-bit little-endian PCM (pcm_s16le). Any video stream in the input is left out."
+      },
+      {
+        "question": "Can I convert a copy-protected WMA?",
+        "answer": "No. This page does not remove copy protection, and Audacity's manual sets the same limit on its own WMA import. Use the app that holds the license."
+      },
+      {
+        "question": "Does the WAV keep artist and title tags?",
+        "answer": "Usually. The command gives no tag options, so FFmpeg carries the file's global tags, such as title and artist, across to the WAV, whose INFO chunks can store them. In a test with a tagged WMA, title and artist came through."
+      },
+      {
+        "question": "My WMA plays in some apps but not others. Why?",
+        "answer": "WMA comes as standard, Professional, Lossless and Voice, and an app can handle one and lack another. The extension does not name the variant."
+      },
+      {
+        "question": "Can I process a batch of WMA files?",
+        "answer": "Yes. Pick several and each goes through the converter in turn, arriving as its own WAV with no archive."
+      },
+      {
+        "question": "Does the file leave my computer?",
+        "answer": "No. FFmpeg runs inside your browser, so your recording stays on your device. Nothing in the page limits how long a recording may be."
+      },
+      {
+        "question": "Is there a size limit for WMA files?",
+        "answer": "The converter applies no size limit or timeout of its own. A long recording only means a longer wait on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMA and WAV",
+      "fromFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "A family of audio codecs developed by Microsoft and stored in the ASF container. The standard version is lossy, and a WMA Lossless variant exists.",
+        "details": [
+          "lossy (and lossless) variants",
+          "ASF container",
+          "proprietary Microsoft format"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "large files",
+          "4 GB file size limit"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WMA to WAV",
+      "points": [
+        "The WAV is 16-bit PCM, written by FFmpeg running in your browser.",
+        "A lossy WMA stays as good as it was; the WAV is just bigger.",
+        "The page does not remove copy protection from a WMA.",
+        "Title and artist tags are copied to the WAV when the WMA has them.",
+        "Pick several files and each downloads as its own WAV."
+      ]
+    },
+    "guide": {
+      "title": "About WMA files",
+      "markdown": "### What is a WMA file?\n\nMicrosoft built WMA to carry sound on Windows, and its files sit inside the company's ASF container. The .wma ending marks audio-only material, as opposed to other ASF content. The four WMA codec families are Standard, Professional, Lossless and Voice; variable bit rate encoding arrived with WMA 9. The media type usually given for WMA is audio/x-ms-wma.\n\nTypical WMA files are legacy ones: CDs ripped in Windows Media Player years ago, recordings from a handheld dictation device, or audio saved from an old streaming site. According to the Library of Congress, WMA files turn up in delivery workflows and now and then as a holding format for intermediate audio. The ending gives no hint of which variant is inside, and two WMA files can behave differently in the same player for exactly that reason. The usual reasons to want a WAV are an audio editor, a podcast project or an archive, where plain PCM is the easy format to work with.\n\n### Programs that open WMA files\n\n**Windows, Mac and Linux:**\n\n- VLC lists ASF and WMA input and ships several Windows Media Audio decoders.\n- Audacity can import unprotected WMA after you add its optional FFmpeg library.\n- FFmpeg decodes every WMA flavor in its support list, from WMA 1 and 2 through Pro, Voice and Lossless.\n\n### WMA and WAV compared\n\n- **Wrapper**: WMA lives in ASF. WAV is a RIFF wrapper for sound that can hold different encodings. Linear PCM is a common payload, but compressed encodings can appear too.\n- **Names**: .wma and audio/x-ms-wma against .wav and audio/wav (or audio/x-wav).\n- **What the WAV holds**: Linear PCM is the usual payload of the format, and this page writes it at 16 bits per sample.\n- **Background**: Microsoft and IBM described WAVE in a multimedia specification dated August 1991, and the Library of Congress recommends it for collections of digital audio.\n- **Compression**: WMA is generally lossy, apart from its Lossless variant. The WAV written here holds uncompressed PCM, so it is much larger.\n- **Size limits**: a very long recording can outgrow the size fields of the original RIFF layout, and RF64 exists for that case.\n- **Tags**: simple tags live in a WAV's INFO chunks, and the Broadcast WAVE variant adds production and preservation metadata on top. The two store different information, so tag handling varies between programs.\n\nUnder the hood the page runs FFmpeg as WebAssembly in a worker and issues `ffmpeg -y -nostdin -i input.wma -acodec pcm_s16le -vn output.wav`. The result is 16-bit signed little-endian PCM, with any video stream dropped. The command does not choose a stream, so FFmpeg's defaults do.\n\n### Other ways to convert WMA to WAV\n\n- **FFmpeg (command line):** `ffmpeg -i archive.wma -vn -c:a pcm_s16le working.wav` produces a 16-bit PCM file. FFmpeg takes the input after `-i` and the output file last, with output options in between. `-vn` turns off video, and a run of this command on a WMA fixture wrote a WAV.\n- **MediaHuman Audio Converter:** add the WMA files, select the output format and click Start. The product page lists WMA and WAV among the formats it converts.\n- **Audacity (Windows, Mac, Linux):** after adding its FFmpeg library, open the unprotected WMA and choose File > Export Audio. Pick WAV in the \"Save as type\" list, then set the Encoding; its default is signed 16-bit PCM, described as CD quality. The same dialog sets the sample rate (44100 Hz by default), the channels, the export range and optional metadata.\n\n### Problems with WMA files\n\n- **Audacity refuses it**: either the optional FFmpeg library is not installed, or the file is protected, which that library does not import.\n- **One app plays it, another stays silent**: a program may handle one WMA codec but not another, and the .wma extension does not reveal which kind the file uses.\n- **\"FFmpeg failed with exit code N\"**: FFmpeg could not make audio from the input, for example because the file holds no audio track. Try another copy.\n- **Adobe Audition refuses it**: Audition has WMA import on Windows alone, and DLMS Format Support must be switched on for it.\n- **A long recording takes a while**: the page sets no length limit, so the time depends on your computer.\n- **A protected WMA does not import**: Audacity's FFmpeg library takes WMA only when the files aren't DRM-protected, so a protected recording has to be opened in the app that holds its license.\n"
+    }
+  },
+  "wmv-to-mov": {
+    "seo": {
+      "title": "Convert WMV to MOV Online (Free)",
+      "h1": "WMV to MOV Converter",
+      "description": "Re-encode a WMV into a MOV with H.264 video and AAC audio, right in your browser. Interlaced video is deinterlaced. Free, with no sign-up.",
+      "howToHeading": "How to convert WMV to MOV"
+    },
+    "tool": {
+      "subtitle": "Turn Windows Media video into a MOV with H.264 video and AAC audio."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a WMV to a MOV?",
+        "answer": "Pick the WMV on this page and download the MOV. The conversion happens on your device, and both the picture and the sound are encoded again."
+      },
+      {
+        "question": "Why won't my player open a WMV file?",
+        "answer": "WMV is Windows Media video inside an ASF container, and a program can read that container yet lack the codec. VLC can play WMV files. Converting to MOV re-encodes the video as H.264 and the sound as AAC."
+      },
+      {
+        "question": "What video and audio does the MOV hold?",
+        "answer": "H.264 pictures and 96 kbps AAC sound. The old Windows Media codecs are replaced, not copied."
+      },
+      {
+        "question": "Will the MOV look as good as my WMV?",
+        "answer": "Not exactly. The encoder runs the ultrafast preset with CRF 32, which trades picture quality for speed, so the result looks rougher than the source."
+      },
+      {
+        "question": "Does the MOV keep my video's resolution and frame rate?",
+        "answer": "Usually the frame size and rate stay as they are, with three limits. A picture whose longer side passes 1920 pixels is reduced to fit. Footage above 30 fps drops frames yet keeps its running time, and a side of odd length is trimmed by one pixel. Smaller frames and slower rates are never scaled up or raised."
+      },
+      {
+        "question": "Why does my interlaced video look different?",
+        "answer": "The conversion command includes FFmpeg's yadif filter, set to deinterlace only the frames marked as interlaced."
+      },
+      {
+        "question": "Can I just rename .wmv to .mov?",
+        "answer": "No. Renaming only changes the label: the video is not transcoded and no missing decoder appears, so the Windows Media codecs stay inside. Convert the file instead."
+      },
+      {
+        "question": "Does the page restrict how big my WMV can be?",
+        "answer": "No size cap is set by the page itself, and nothing is uploaded."
+      },
+      {
+        "question": "Why does the page show an FFmpeg exit code?",
+        "answer": "The page shows FFmpeg's exit code when FFmpeg stops with an error. A damaged or cut-short file usually still converts, to a shorter MOV, so an error means FFmpeg could not read the file at all. Try another copy."
+      },
+      {
+        "question": "Can I convert several WMV files together?",
+        "answer": "Yes. Add them together and the converter handles one after the other, saving a MOV for each without zipping them."
+      }
+    ],
+    "aboutSection": {
+      "title": "WMV and MOV",
+      "fromFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "A family of video codecs developed by Microsoft, usually stored in the ASF container. It was widely used for Windows video and streaming.",
+        "details": [
+          "ASF container",
+          "proprietary Microsoft codec",
+          "lossy compression",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "multi-track container",
+          "many codecs, including ProRes",
+          "timecode and metadata tracks",
+          "Apple format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WMV to MOV",
+      "points": [
+        "The MOV holds H.264 video with AAC audio at 96 kbps, made in your browser.",
+        "The fast settings (CRF 32) favor speed over quality.",
+        "Frames are capped at 1920 pixels and 30 fps; odd sizes lose a pixel.",
+        "Interlaced video is deinterlaced.",
+        "Select several WMV files and each becomes its own MOV."
+      ]
+    },
+    "guide": {
+      "title": "About WMV files",
+      "markdown": "### What is a WMV file?\n\nInside a .wmv you find Windows Media content in the ASF container, a Microsoft design for keeping audio and video streams in sync. ASF was designed to store synchronized media and to deliver it over a network, whether from a local disk or from an HTTP server. The container can accommodate both audio and video streams. The video inside is compressed as Windows Media Video 7, 8 or 9. The Library of Congress lists video/x-ms-wmv as the commonly used media type, though it is not an IANA registration.\n\nBeing able to read the container is a separate matter from decoding its video. A program can open the ASF wrapper without having the Windows Media Video decoder, and that mismatch is the usual reason a WMV opens in one program and not another. A .wmv name says nothing about picture quality either; that comes from the codec and its compression settings.\n\n### Programs that open WMV files\n\n**Windows, Mac and Linux:**\n\n- FFplay, the FFmpeg player, uses FFmpeg's decoders to play WMV files from the command line.\n- VLC media player accepts ASF and WMV input and ships three Windows Media Video decoders, numbered 1, 2 and 9.\n\n**Mobile:**\n\n- On Android, VLC for Android includes the desktop player's media decoding features.\n- On iPhone and iPad, VLC for iOS plays local media with VLC's own player instead of requiring conversion through the system player.\n\n### WMV and MOV compared\n\n- **Names**: .wmv and video/x-ms-wmv; .mov (or .qt) and video/quicktime.\n- **Origin**: MOV is Apple's QuickTime file format, introduced in 1991 and brought to Windows in 1994. A MOV is not interchangeable with an MP4, which is a separate format.\n- **Structure**: a QuickTime file is built from objects called atoms, and software can skip atoms it does not recognize.\n- **Contents**: a WMV carries Windows Media codecs. A MOV can hold video such as H.264, ProRes or Motion JPEG, and audio such as AAC or uncompressed PCM.\n- **Reach**: Mac screen recordings are saved as MOV files. Apple itself now generally uses MP4, and browsers handle MOV only to a limited degree.\n- **Compression**: the WMV is lossy and the H.264 inside the new MOV is lossy as well, so detail is thrown away a second time.\n- **Editors**: QuickTime containers may use codecs that a destination editor lacks, so a MOV can import into one editor and not another.\n\nWhat happens here: a WebAssembly build of FFmpeg, running in a worker on your device, writes the MOV with H.264 pictures and AAC audio at 96 kbps. The video is encoded with the `ultrafast` preset at CRF 32. Title, artist and similar global tags in the source are copied when the MOV can hold them. No stream mapping is set, so FFmpeg picks the tracks itself.\n\n### Other ways to convert WMV to MOV\n\n- **FFmpeg (command line):** `ffmpeg -i lesson.wmv -c:a aac -c:v libx264 review.mov`. The command shape, `-i` for the input and `-c:v` and `-c:a` for the codecs, is FFmpeg's documented syntax, and it ran on a WMV fixture here. These are FFmpeg's desktop defaults, not the settings this page uses. Running FFmpeg yourself also lets you set the preset, the quality and the audio bitrate rather than take this page's fixed values.\n\n### Problems with WMV files\n\n- **It opens in some programs but not others**: a reader for the ASF container may lack the video decoder, so support for the wrapper does not mean every codec plays.\n- **Stutter or artifacts in an FFmpeg-based player**: the FFmpeg documentation flags its WMV9 decoder as only partly working. Try VLC, which ships the three versions listed above. VLC has decoders for all three Windows Media Video versions. Try VLC, which lists decoders for Windows Media Video 1, 2 and 9.\n- **The picture looks poor**: converting does not add detail back, and the source's own encoding sets the ceiling. The codec and compression settings decide it, and converting does not add detail back.\n- **The MOV is cut off or will not open**: stopping before the write finishes can leave a regular MOV unusable, so wait until the download appears.\n- **\"FFmpeg failed with exit code N\"**: FFmpeg stopped with an error on this file. Try another copy.\n"
+    }
+  },
+  "arw-to-jpeg": {
+    "seo": {
+      "title": "Convert ARW to JPEG Online (Free)",
+      "h1": "ARW to JPEG Converter",
+      "description": "Turn a Sony ARW raw photo into a JPEG. ImageMagick reads it in your browser, with no settings. Free, with no sign-up.",
+      "howToHeading": "How to convert ARW to JPEG"
+    },
+    "tool": {
+      "subtitle": "Turn a Sony ARW raw photo into a JPEG."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an ARW to a JPEG?",
+        "answer": "Drop your ARW onto the page, wait a moment and save the JPEG that appears. The raw data is read and the picture written by ImageMagick inside your browser tab, and nothing happens to your ARW."
+      },
+      {
+        "question": "Why won't my computer open a Sony ARW file?",
+        "answer": "An ARW is meant for raw development, not for opening like a finished picture, so a program needs a raw decoder for it. Convert it here, or use Sony's Imaging Edge Desktop."
+      },
+      {
+        "question": "Does the JPEG look like the picture on my camera's screen?",
+        "answer": "Not necessarily. This page passes no development settings, so ImageMagick's defaults decide the look. For control over it, develop the ARW in Imaging Edge Desktop."
+      },
+      {
+        "question": "What do I lose by converting ARW to JPEG?",
+        "answer": "The raw flexibility. An ARW lets you adjust white balance, exposure and color after the shot. A JPEG is lossy and stores 8 bits per channel, so you cannot go back to the raw data."
+      },
+      {
+        "question": "Is it okay to delete the ARW after converting?",
+        "answer": "Keep it if you may want to re-develop the photo. A JPEG cannot return the sensor data. Delete only photos you are sure you will never edit again."
+      },
+      {
+        "question": "Why is my ARW so much bigger than the JPEG?",
+        "answer": "A raw file holds the sensor data, and its size depends on the recording setting and the sensor. Sony documents different sizes for uncompressed and compressed modes. A JPEG is lossy, so it can discard detail."
+      },
+      {
+        "question": "Are lossless and uncompressed ARW the same picture?",
+        "answer": "Yes in content. Lossless compression reduces storage without discarding image information, so both hold the same data, one in a smaller file."
+      },
+      {
+        "question": "What JPEG quality do I get?",
+        "answer": "The page passes no quality value, so ImageMagick applies its own default. For a chosen quality, export from Imaging Edge Desktop or ImageMagick on your computer."
+      },
+      {
+        "question": "Can I convert several ARW photos at once?",
+        "answer": "Yes. Pick as many as you like and every one is converted separately, each giving its own JPEG file. They are not bundled into an archive."
+      },
+      {
+        "question": "My ARW fails with a decode error. What now?",
+        "answer": "Part of the file may be missing or damaged, so copy it off the memory card once more. A picture over about 537 megapixels is also refused with a too-large message."
+      }
+    ],
+    "aboutSection": {
+      "title": "ARW and JPEG",
+      "fromFormat": {
+        "name": "ARW",
+        "fullName": "Sony Alpha RAW",
+        "description": "The raw image format of Sony Alpha cameras. It keeps unprocessed sensor data, so processing can be adjusted after capture.",
+        "details": [
+          "unprocessed sensor data",
+          "processing adjustable after capture"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "Joint Photographic Experts Group",
+        "description": "A lossy raster format for photographs. It stores 8 bits per color channel with no alpha channel, and every major browser displays it.",
+        "details": [
+          "lossy compression",
+          "8 bits per channel",
+          "no transparency",
+          "every major browser shows it"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ARW to JPEG",
+      "points": [
+        "ImageMagick reads the raw data in your browser and writes a JPEG; nothing is uploaded.",
+        "The page sets no development options or JPEG quality, so ImageMagick's defaults apply.",
+        "A JPEG is lossy and 8-bit, so keep the ARW if you may edit the photo again.",
+        "A damaged raw file stops with a decode error instead of a JPEG.",
+        "Several ARW files in one go each become a separate JPEG."
+      ]
+    },
+    "guide": {
+      "title": "About ARW files",
+      "markdown": "### What is an ARW file?\n\nSony cameras use the .arw extension for their raw photographs. The file is not a finished picture. It retains sensor-derived image information, and raw processing parameters, such as white balance and exposure, can be adjusted after capture. Sony offers uncompressed, losslessly compressed and compressed raw recording, and with lossless compression nothing in the image is thrown away.\n\nAn ARW is intended for raw development rather than direct distribution as a finished JPEG. A raw file can take up a lot of storage, and its size varies with the recording setting and the sensor size. Photographers develop the raw file and then export a JPEG when a picture has to be shared.\n\n### Programs that open ARW files\n\n**Windows and Mac:**\n\n- Imaging Edge Desktop is Sony's own software for viewing and developing its raw photographs.\n\n**Windows, Mac and Linux:**\n\n- ImageMagick reads this raw format. `magick identify -list format` prints what your install can read, so look for ARW there.\n\n**Linux:**\n\n- XnView MP lists ARW among the formats it opens, and it is free for private and educational use.\n\nNothing is listed for web or mobile. This page reads the file inside your browser with ImageMagick instead.\n\n### ARW and JPEG compared\n\n- **Purpose**: ARW is raw material for later development. JPEG is a finished, compressed picture meant for sharing.\n- **Names**: .arw against .jpeg, which names the same format as .jpg, with the media type image/jpeg.\n- **Compression**: baseline JPEG is lossy.\n- **Color depth**: each color channel in a JPEG gets 8 bits, and no alpha channel exists, which rules out transparency.\n- **Progressive mode**: a JPEG can also load as a coarse version of the picture that sharpens as more data arrives.\n- **Editing room**: processing choices in a raw file stay open. A JPEG has them applied already, so white balance and exposure are fixed in the picture.\n- **Standards**: the ITU-T T.81 recommendation of 1992 defines JPEG, and an ISO/IEC standard, 10918-1, followed in 1994. Every major browser displays it, and most digital cameras and scanners build it in.\n\nThe page uses ImageMagick compiled to WebAssembly on your device. It decodes the raw data with the LibRaw reader that comes with it and writes the JPEG. No settings are passed, so the page makes no development choices of its own and the look comes from ImageMagick's defaults. The file reads as one picture, and an image over about 537 megapixels stops with a too-large message. A damaged or cut-off raw file produces an error such as \"The RAW file's picture couldn't be decoded: it may be damaged.\"\n\n### Other ways to convert ARW to JPEG\n\n- **Sony Imaging Edge Desktop (Windows, Mac):** open the image in Edit, click the Output icon on the toolbar or choose Output from the File menu, then enter the file name, file type, compression, color space and size, and click Save. To develop several images at once, select them in Viewer, click the Output icon or choose Export from the File menu, set the file settings and click Continue. The camera must be supported.\n- **ImageMagick (command line):** run `magick capture.arw delivery.jpeg`. The ImageMagick formats page lists ARW as read-only and JPEG as readable and writable. Its format page gives `-define dng:use-camera-wb=true` for using the embedded profile.\n\n### Problems with ARW files\n\n- **A program will not open it**: it needs a raw decoder. Convert it here, or try Imaging Edge Desktop.\n- **The JPEG looks different from what you expected**: the look comes from ImageMagick's defaults. Raw files let you adjust white balance and exposure after capture, so make those choices in Imaging Edge Desktop before exporting.\n- **The file is huge**: it holds sensor-derived data, and an uncompressed recording is larger than a losslessly compressed one.\n- **A folder of ARW files fills the drive**: Sony documents different file sizes for its uncompressed and compressed recording modes, so the recording setting you chose decides how much space each file takes.\n- **A smaller ARW seems broken**: a losslessly compressed raw is smaller than an uncompressed one and keeps the same information, so size alone does not mean damage.\n- **The page reports a damaged file**: the file may be corrupt or truncated. Copy it from the memory card a second time.\n"
+    }
+  },
+  "bin-to-png": {
+    "seo": {
+      "title": "Convert BIN to PNG: Recover a Picture",
+      "h1": "BIN to PNG Converter",
+      "description": "Recover a picture saved as a .bin file, such as an Outlook ATT00001.bin attachment, as a PNG. A .bin that holds no picture is refused. Free.",
+      "howToHeading": "How to convert BIN to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn a picture stored under a .bin name into a PNG, such as an Outlook attachment."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert BIN to PNG?",
+        "answer": "Drop the .bin file on the converter. If its first bytes match a picture format, a PNG downloads when it is ready. If they do not, the page says the file is not an image and saves nothing."
+      },
+      {
+        "question": "Why is my picture a .bin file?",
+        "answer": "An email attachment can arrive as ATT00001.bin, as with Outlook, and some browser downloads end up with that name. A Mac file in MacBinary also ends in .bin. In these cases the file may hold a picture under the wrong name."
+      },
+      {
+        "question": "What if my .bin file is not a picture?",
+        "answer": "The page tells you so and produces no PNG. Firmware and disc images are examples of binary files that hold no picture for it to convert."
+      },
+      {
+        "question": "How does the converter know what is inside a .bin?",
+        "answer": "It reads the first 4096 bytes and matches them against the signatures of image formats. The .bin name plays no part."
+      },
+      {
+        "question": "Can it open a MacBinary .bin?",
+        "answer": "Yes, when the data fork holds a picture. The page looks past the 128-byte MacBinary header, and it recognizes a MacPaint picture by the file type stored there."
+      },
+      {
+        "question": "Does it have to load my whole disc image to refuse it?",
+        "answer": "No. It checks only the start of the file, so a multi-gigabyte image that is not a picture is turned away without being read in full."
+      },
+      {
+        "question": "Which picture formats can it recognize in a .bin?",
+        "answer": "Common picture formats such as JPEG, PNG, GIF and WebP, as well as camera raw formats from Sony, Nikon, Canon and others. The picture is then converted by the engine for that format."
+      },
+      {
+        "question": "Why does it say the picture could not be read?",
+        "answer": "The first bytes look like a picture format, but the picture in it could not be read. The error lists three possible causes: damaged, incomplete or too big for this page. Copy the file again from where you got it."
+      },
+      {
+        "question": "Can I rename the .bin to .png instead?",
+        "answer": "Only if it already is a PNG. A new extension changes the label, not the bytes. Run it through this page and it converts from whatever format the bytes show."
+      },
+      {
+        "question": "Is my .bin uploaded anywhere?",
+        "answer": "No. Reading and converting both happen in your browser tab, and the file never leaves your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "BIN and PNG",
+      "fromFormat": {
+        "name": "BIN",
+        "fullName": "Binary file",
+        "description": "A .bin name only says a file holds binary data. Outlook attachments can arrive as ATT00001.bin, and a browser may save a download as .bin. The page finds the picture's real format from the file's first bytes.",
+        "details": [
+          "Names no image encoding",
+          "Pictures it recovers include JPEG, PNG, GIF, WebP, HEIC and TIFF",
+          "Firmware and disc images are refused"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format created as a patent-free successor to GIF. It is standardized as ISO/IEC 15948 and as a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "1 to 16 bits per sample",
+          "every major browser shows it"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting BIN to PNG",
+      "points": [
+        "The first 4096 bytes decide whether a .bin holds a picture; the name does not.",
+        "A file that is not a picture is refused and nothing is saved.",
+        "A picture in a MacBinary wrapper is found past its 128-byte header.",
+        "The picture is converted by the engine for its real format, so that engine's limits apply."
+      ]
+    },
+    "guide": {
+      "title": "About BIN files",
+      "markdown": "### What is a BIN file?\n\nThe .bin ending says only that a file holds binary data. It is not one image format: BIN is an extension used for raw binary output, and it does not identify one universal image encoding. GNU objcopy, for example, can produce a binary memory image from an object file, and that export omits symbols and relocation records. Firmware and disc images use the name too.\n\nA picture can end up with the name as well. Attachments from Outlook can show up as ATT00001.bin, browsers may save a download as .bin, and MacBinary files on a Mac end in .bin too. A .bin extension carries no dimensions or pixel layout, so a converter has to find the real format from the bytes.\n\n### Programs that open BIN files\n\n**Windows, Mac and Linux:**\n\n- GNU Emacs, with its hexl mode, inspects and edits the bytes of a file.\n- UltraEdit has a hex view for .bin files. It shows the data without decoding every BIN format.\n\n**Web:**\n\n- HexEd.it inspects and edits bytes in the browser. It is not a universal BIN image decoder.\n\nHex editors expose file bytes as hexadecimal values alongside a text view. A binary editor can inspect bytes without interpreting them as a photograph, and none of these programs turns data that is not a picture into one. Edit a copy, because changing the wrong bytes damages a file instead of repairing it.\n\n### BIN and PNG compared\n\n- **What the name tells you**: nothing. BIN names no encoding, while .png always means the PNG structure and the image/png media type.\n- **Where it works**: every major browser displays PNG. A .bin name gives a program no format to go on.\n\nThe page reads the first 4096 bytes of the file and compares them with the signatures of the image formats it knows, among them JPEG, PNG, GIF, WebP, AVIF, HEIC, BMP, TIFF, ICO, PSD, JPEG 2000, EXR, DDS, TGA and the camera raw formats. The file is then converted as that format by the same engine that handles its own extension, so that engine's limits and results apply. If the signature is not at the start, the page also looks past a 128-byte MacBinary header, and a MacPaint picture there is recognized by its Mac file type.\n\nA file that matches nothing is refused from those first bytes, so a large disc image is not read in full. The refusal explains that only pictures saved as .bin convert. Your original is never changed; you download a new PNG.\n\n### Other ways to convert BIN to PNG\n\n- **ImageMagick (command line):** run `magick identify suspect.bin` to see whether it recognizes a picture. In a test here, a PNG saved under a .bin name was identified as a PNG, and random bytes under a .bin name failed with a \"no decode delegate\" error. If it is recognized, `magick suspect.bin recovered.png` writes the PNG.\n- **GIMP:** make a copy of the file with the real extension, once you know the format. Choose File > Open for the copy. Then choose File > Export As, edit the name in the Name field to recovered.png and click Export.\n- **Preview (Mac):** open a copy that has a real picture extension, choose File > Export, pick PNG from the Format pop-up menu, name it and click Save.\n\nAll three need the file to be a readable picture already.\n\n### Problems with BIN files\n\n- **The page refuses the file**: the first bytes match no picture format. Firmware and disc images hold no picture to convert. Open the file with the program it came from.\n- **\"The picture in it couldn't be read\"**: the start of the file looks like a known format, but the picture could not be read. Get a fresh copy.\n- **No dimensions or pixel layout**: a .bin extension does not supply them, so raw image samples cannot be decoded from the name alone.\n- **Unsure what the file is**: open a copy in a hex editor to read its first bytes, or try it here and see whether the page accepts it.\n- **Renaming to .png does not help**: the extension is only a label. It adds neither pixels nor a header.\n- **An Outlook ATT00001.bin**: the attachment's name is the generic one, so try the file here. The page can convert it if its bytes show a picture.\n"
+    }
+  },
+  "dxf-to-png": {
+    "seo": {
+      "title": "Convert DXF to PNG: Drawing to Image",
+      "h1": "DXF to PNG Converter",
+      "description": "Turn a DXF drawing into a 2048-pixel PNG on a white background, drawn in your browser with WebGL. Text uses DejaVu Sans. Free, no sign-up.",
+      "howToHeading": "How to convert DXF to PNG"
+    },
+    "tool": {
+      "subtitle": "Draw the whole DXF as a PNG, 2048 pixels on its longer side, on white."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert DXF to PNG?",
+        "answer": "Drop the DXF on the converter and download the PNG. Your browser draws the drawing with WebGL and saves the picture, so no CAD program is needed."
+      },
+      {
+        "question": "What size is the PNG?",
+        "answer": "The PNG is 2048 pixels long on its longer side. The drawing's shape sets the other side, which is at least 128 pixels, and the whole drawing is fitted in with a small margin."
+      },
+      {
+        "question": "Why is my drawing black on white?",
+        "answer": "The background is white. An entity drawn in white (color 7, black or white) would vanish there, so it is drawn black."
+      },
+      {
+        "question": "Why do the labels look different?",
+        "answer": "Labels set in TEXT and MTEXT use DejaVu Sans, a single font, in place of whatever the drawing names, so they can look different. Check important annotations against the CAD original."
+      },
+      {
+        "question": "Does the PNG keep layers and dimensions?",
+        "answer": "No. A PNG is a flat picture, so layers, entities and editable dimensions are gone. Keep the DXF for any further CAD work."
+      },
+      {
+        "question": "Can I measure distances on the PNG?",
+        "answer": "No. The picture has no drawing units, and the scale depends on the 2048-pixel size. Use the DXF for measurement or manufacturing."
+      },
+      {
+        "question": "Why does it say the browser can't draw DXF files?",
+        "answer": "The page needs WebGL, and it is off or unavailable in that browser. Use a recent Chrome, Edge, Firefox or Safari with hardware acceleration on."
+      },
+      {
+        "question": "What does \"nothing drawn in it\" mean?",
+        "answer": "The viewer found nothing to draw in the file. Check it in LibreCAD or your CAD program to confirm."
+      },
+      {
+        "question": "Can I convert several DXF files at once?",
+        "answer": "Yes. Pick them together and each is drawn in turn and downloads as its own PNG. They are not zipped."
+      },
+      {
+        "question": "Is my DXF uploaded?",
+        "answer": "No. The drawing is read and rendered in your browser, and the file stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "DXF and PNG",
+      "fromFormat": {
+        "name": "DXF",
+        "fullName": "Drawing Exchange Format",
+        "description": "An Autodesk CAD exchange format used for sharing drawing data with other programs. It can be stored as text or binary.",
+        "details": [
+          "published by Autodesk",
+          "text or binary encoding",
+          "group codes paired with values in text form"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format created as a patent-free successor to GIF. It is standardized as ISO/IEC 15948 and as a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "1 to 16 bits per sample",
+          "every major browser shows it"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DXF to PNG",
+      "points": [
+        "The whole drawing is fitted into one PNG, 2048 pixels on the longer side, on white.",
+        "TEXT and MTEXT use DejaVu Sans, so labels can differ from the CAD original.",
+        "White entities are drawn black; layers and editable dimensions are not kept.",
+        "A browser without WebGL cannot draw the file."
+      ]
+    },
+    "guide": {
+      "title": "About DXF files",
+      "markdown": "### What is a DXF file?\n\nDXF is Autodesk's drawing exchange format, published so that AutoCAD drawing data can move to other programs. The first documentation appeared in 1982. A DXF exists in a text form and a binary form, and a text DXF pairs numeric group codes with values to describe each part of the drawing. New drawing capabilities have added codes and format versions over the years. The registered media type is image/vnd.dxf.\n\nA DXF describes a drawing rather than holding a picture, so a program has to draw it before anyone can look at it. This page makes a PNG from the drawing: a grid of colored pixels.\n\n### Programs that open DXF files\n\n**Windows, Mac and Linux:**\n\n- LibreCAD reads DXF drawings in its 2D workspace.\n- QCAD Community Edition is a free 2D CAD program with DXF support. Advanced interchange features belong to QCAD Professional.\n\n**Windows and Mac:**\n\n- Adobe Illustrator imports DXF from AutoCAD 2.5 through 2007, with unit and scale settings.\n\n**Windows:**\n\n- AutoCAD opens it from Open Drawing with DXF chosen in the file-type list.\n\n**Web:**\n\n- Autodesk Viewer shows CAD interchange files, DXF included, in the browser.\n\nLibreCAD does not implement every DXF feature and lists support through DXF 2007. Illustrator refuses AutoCAD drawings saved later than the 2007 format, so an older export is needed.\n\n### DXF and PNG compared\n\n- **What it holds**: a DXF describes a drawing with group codes and values. A PNG holds a grid of colored pixels.\n- **Where it opens**: every major browser displays PNG. A DXF opens in CAD programs and viewers.\n- **Measuring**: a PNG has only the picture, with no drawing units, so distances cannot be read from it.\n\nThis page draws the DXF in your browser with the dxf-viewer library, which uses three.js and WebGL. The whole drawing is fitted into the picture with a 5 percent margin on a white background. The longer side is 2048 pixels, and the shorter side follows the drawing's proportions but is never under 128 pixels. Entities drawn in white are shown black so they stay visible on the white page. TEXT and MTEXT are drawn in DejaVu Sans instead of the fonts named in the drawing, so labels can differ from the CAD original.\n\nThe result is one PNG per file. A browser without WebGL cannot draw the file and says so. A drawing with nothing in it stops with the message \"This DXF file has nothing drawn in it.\"\n\n### Other ways to convert DXF to PNG\n\n- **LibreCAD:** open the drawing and choose File > Export, which exports the current drawing as a CAM, PDF or image file. The menu reference lists PNG among the supported bitmap formats.\n- **QCAD Professional:** run `dwg2bmp -o plan.png plan.dxf` from the command line. The dwg2bmp tool converts a DXF or DWG file into a bitmap file. The `-r` option sets the resolution in pixels per drawing unit and `-b` sets the background color. Every QCAD Professional installation includes some command line tools.\n\n### Problems with DXF files\n\n- **The image looks empty**: the drawing may hold nothing, or the page reports \"nothing drawn in it\". Open the file in LibreCAD to see whether it has any entities.\n- **Labels sit differently**: TEXT and MTEXT use DejaVu Sans here, so labels can differ from the original fonts.\n- **\"This DXF file couldn't be read\"**: the viewer could not parse the file. Try re-exporting it from your CAD program.\n- **The browser cannot draw it**: WebGL is off or unavailable there. Check that hardware acceleration is on, or try another current browser.\n- **A newer DXF fails in Illustrator or LibreCAD**: both list support only through the 2007 format, so save an older version.\n- **Missing linked files in Illustrator**: the import can ask for external references because the drawing points to separate files.\n- **Scale and units in Illustrator**: moving a CAD drawing into Illustrator needs attention to scale and unit mapping.\n- **A big plan comes out small**: the picture always has a 2048-pixel long side, so fine detail in a large drawing is easier to inspect by zooming in a CAD program.\n- **A line you drew in white**: white entities appear black, because the page behind them is white.\n- **You need exact distances**: send the DXF, because a PNG has no units.\n"
+    }
+  },
+  "gif-to-svg": {
+    "seo": {
+      "title": "Convert GIF to SVG: Embed the Picture",
+      "h1": "GIF to SVG Converter",
+      "description": "Wrap a GIF in an SVG file as an embedded PNG at its own size. It is not traced to vector shapes, and animation keeps only the first frame.",
+      "howToHeading": "How to convert GIF to SVG"
+    },
+    "tool": {
+      "subtitle": "Embed a GIF's first frame in an SVG, at its original size, without tracing."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert GIF to SVG?",
+        "answer": "Drop the GIF on the converter and download the SVG. The browser decodes the picture and the SVG holds it as one embedded PNG image."
+      },
+      {
+        "question": "Does the SVG have vector shapes?",
+        "answer": "No. The GIF is not traced. The SVG contains an image element with your picture embedded, so it is still made of pixels and does not scale like a drawing."
+      },
+      {
+        "question": "Why does the SVG look blocky when I zoom?",
+        "answer": "Because the picture inside is the GIF's own pixel grid at its original width and height. Turning it into shapes takes a tracing tool."
+      },
+      {
+        "question": "What happens to my animated GIF?",
+        "answer": "Only the first frame is used. The other frames and their timing are dropped, so the SVG is a still."
+      },
+      {
+        "question": "How do I get real vector paths from a GIF?",
+        "answer": "Use a tracing tool: Path > Trace Bitmap in Inkscape, after you select the imported picture, or Shape > Convert > To Polygon in LibreOffice Draw."
+      },
+      {
+        "question": "Is the transparent background kept?",
+        "answer": "Yes. Transparency is kept in the embedded PNG, so a transparent GIF stays transparent inside the SVG."
+      },
+      {
+        "question": "Are the colors reduced or the picture resized?",
+        "answer": "No. The full-color picture is embedded at its pixel size, with nothing resized or reduced."
+      },
+      {
+        "question": "Does the SVG work on a web page?",
+        "answer": "Yes, in all the major browsers, whether the file is opened by itself or embedded in an HTML page. The picture inside is still made of pixels."
+      },
+      {
+        "question": "Can I do a batch of GIFs?",
+        "answer": "Yes. Select as many as you want. Each one gets its own SVG file in order, and nothing is zipped."
+      },
+      {
+        "question": "Is my GIF uploaded?",
+        "answer": "No. Everything happens in your browser, so the GIF never leaves your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and SVG",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "lossless LZW compression",
+          "animation",
+          "one transparent palette color"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML graphics document that can hold paths and raster pictures. This output holds one embedded PNG, not traced shapes.",
+        "details": [
+          "XML structure",
+          "One embedded PNG here",
+          "Tracing needed for paths"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to SVG",
+      "points": [
+        "The SVG holds your picture as an embedded PNG; nothing is traced to vector shapes.",
+        "It keeps the GIF's pixel size, so it looks as blocky when zoomed.",
+        "An animated GIF gives its first frame only.",
+        "Transparency is kept in the embedded PNG."
+      ]
+    },
+    "guide": {
+      "title": "About GIF files",
+      "markdown": "### What is a GIF file?\n\nThe GIF format came out of CompuServe in 1987 for pictures stored with a color palette. A GIF holds either one still picture or several images separated by delays counted in hundredths of a second; that timing is what makes GIF animation. Colors in every GIF image come from a table of no more than 256 entries, and LZW coding compresses the data without loss. Transparency works by marking one palette color as fully transparent, so there is no partial transparency.\n\nVersion GIF89a, dated July 1990, brought extensions covering transparency, frame timing, comments and application data. LZW license fees from Unisys began in 1994, and the patent behind them expired in the US in 2003. A GIF is a pixel format with a small palette, so it turns blocky when enlarged. That is why people ask for an SVG, and it is worth knowing before you convert that an SVG made from a GIF does not fix it.\n\n### Programs that open GIF files\n\n**Linux, Mac and Windows:**\n\n- ImageMagick reads GIF. To see what your install supports, run `magick identify -list format`.\n- Inkscape imports GIF files, but not their animation.\n- GIMP exports still pictures or multilayer animations as GIF.\n\n**Web and mobile:**\n\n- Chrome, Firefox and Safari all show GIF, as does every other major browser.\n\nA browser is the simplest way to check what the first frame of a GIF looks like.\n\n### GIF and SVG compared\n\n- **Kind**: a GIF is a grid of pixels. SVG is XML text for two-dimensional graphics built from shapes, text and embedded images. Its registered media type is image/svg+xml.\n- **Scaling**: because SVG shapes are stored as instructions, they can be drawn at any size without losing sharpness. Pixels in a GIF do not scale that way.\n- **Animation**: a GIF loops its frames. This page keeps only the first frame.\n- **Transparency**: GIF has one transparent palette color. The SVG made here keeps transparency inside the embedded picture.\n\nThis page does not trace the GIF into shapes. Your browser decodes the GIF, and the SVG that comes out has one image element inside it. That element carries the picture as a base64 PNG sized exactly like the GIF, with no resizing and no color reduction. Because the picture is still made of pixels, it does not scale the way a drawing does, and it looks just as blocky when zoomed as the GIF did.\n\nFrom an animated GIF the page keeps the opening frame alone; later frames and their delays are dropped, so what you download is a still. EXIF, ICC profile and XMP data are not carried over. A file the browser cannot decode stops with \"Image decode failed.\", and no SVG is made.\n\n### Other ways to convert GIF to SVG\n\n- **Inkscape:** use File > Import to bring in the GIF, choose to embed it in the dialog that follows, then save the drawing as SVG. Embedding stores the image inside the SVG file. Inkscape's manual says its GIF support does not include animation. To get paths, select the picture and use Path > Trace Bitmap.\n- **LibreOffice Draw:** select the bitmap, go to Shape > Convert > To Polygon, adjust the settings in the dialog, and then use File > Export and choose a graphics file type.\n\nEmbedding keeps the picture as pixels inside the SVG, while tracing and converting to polygons make vector shapes.\n\n### Problems with GIF files\n\n- **The SVG no longer moves**: it holds a single frame, so keep the GIF itself for the animation.\n- **The first frame is not the one you want**: open the GIF in an editor, save the frame you need as a still, and convert that.\n- **Zooming shows squares**: the SVG holds a raster picture, so it stays pixelated. Use a tracing tool to get shapes.\n- **Soft edges turn jagged**: a GIF cannot keep partial opacity, so soft transparent edges lose it.\n- **Gradients change**: GIMP's GIF export caps the palette at 256 colors, which can alter smooth gradients.\n- **You need editable curves for a cutter or a logo**: this page cannot make them. Trace the image in Inkscape or LibreOffice Draw.\n- **The GIF will not open**: your browser has to be able to decode it. A file that cannot be read stops with \"Image decode failed\" instead of an SVG.\n"
+    }
+  },
+  "heic-to-webp": {
+    "seo": {
+      "title": "Convert HEIC to WebP: iPhone Photos for the Web",
+      "h1": "HEIC to WebP Converter",
+      "description": "Turn an iPhone HEIC photo into a WebP, decoded in your browser. It keeps the primary image only. Free, no sign-up.",
+      "howToHeading": "How to convert HEIC to WebP"
+    },
+    "tool": {
+      "subtitle": "Convert an iPhone HEIC photo to a WebP in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert HEIC to WebP?",
+        "answer": "Add the HEIC on the page and download the WebP. libheif decodes it in your browser and the page encodes the WebP."
+      },
+      {
+        "question": "Is HEIC the same as H.265?",
+        "answer": "No. HEIF is the container and HEVC (H.265) is the compression inside it. A HEIC photo uses HEVC, but the file is a still image, not a video."
+      },
+      {
+        "question": "Will a HEIC with several photos make an animated WebP?",
+        "answer": "No. The page reads a HEIC's primary image only, which gives a single still WebP."
+      },
+      {
+        "question": "Does converting change my HEIC file?",
+        "answer": "No. The HEIC you added is left untouched, and the WebP downloads as a separate new file, so you can run the conversion again from the same HEIC."
+      },
+      {
+        "question": "Does the WebP keep 10-bit color?",
+        "answer": "No. Everything goes through 8-bit RGB, so any extra depth in the HEIC is lost."
+      },
+      {
+        "question": "Where did my camera details go?",
+        "answer": "Neither the EXIF data nor the ICC profile reaches the WebP. Keep the HEIC if you need the camera record."
+      },
+      {
+        "question": "Why does my iPhone give me JPEG instead of HEIC?",
+        "answer": "A USB import can convert photos to JPEG automatically. Turning on Keep Originals makes it hand over the HEIC."
+      },
+      {
+        "question": "Can Windows open HEIC without converting?",
+        "answer": "Microsoft Photos opens it once both the HEIF and HEVC extensions are installed. Without them it can reject the file."
+      },
+      {
+        "question": "Can I convert several HEIC photos together?",
+        "answer": "Yes. Select them together and each downloads as its own WebP, one after another. There is no ZIP."
+      },
+      {
+        "question": "Is my photo uploaded?",
+        "answer": "No. libheif runs in your browser, so the photo stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIC and WebP",
+      "fromFormat": {
+        "name": "HEIC",
+        "fullName": "HEIF image with HEVC coding",
+        "description": "HEIC is the HEIF variant whose images are coded with HEVC (H.265). HEIF is the container, defined in ISO/IEC 23008-12.",
+        "details": [
+          "HEVC-coded images in a HEIF container",
+          "Apple says better compression than JPEG",
+          "alpha as an auxiliary image",
+          "high bit depths"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "A Google image format using VP8-derived coding for lossy still pictures. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "lossy and lossless compression",
+          "alpha transparency",
+          "animation",
+          "supported by current major browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting HEIC to WebP",
+      "points": [
+        "The primary image only is read, so you get one still WebP.",
+        "The pixels pass through 8-bit RGB; extra color depth is lost.",
+        "EXIF data and the ICC profile are not carried over.",
+        "Your original HEIC is not changed; you download a new WebP."
+      ]
+    },
+    "guide": {
+      "title": "About HEIC files",
+      "markdown": "### What is a HEIC file?\n\nHEIC is the file type for HEIF images coded with HEVC. Apple uses HEIF for photos from iOS 11 and macOS High Sierra 10.13, capturing it on iPhone 7 and later, and says it gives better compression than JPEG. HEIF is the container and HEVC is the compression inside it, so HEIC is not simply another name for H.265 video. Its formal name is ISO/IEC 23008-12, MPEG-H Part 12, first published in 2017.\n\nA HEIF file can hold several images, image sequences, an alpha channel as an auxiliary image, high bit depths, and Exif or XMP metadata. WebP is an image format developed by Google. Google announced it on 30 September 2010, and its lossy compression is based on the VP8 video codec. WebP can carry transparency and animation whether lossy or lossless, and it can also hold an embedded ICC profile and Exif or XMP metadata.\n\n### Programs that open HEIC files\n\n**Windows, Mac and Linux:**\n\n- GIMP imports HEIC, and version 2.10.22 improved high-bit-depth handling.\n- ImageMagick reads it when built with the libheif delegate.\n\n**Windows:**\n\n- Microsoft Photos needs both the HEIF and HEVC extensions to open HEIC.\n\n**Mac, iPhone and iPad:**\n\n- Photos on Apple devices opens HEIF and exports another format.\n\n**Mac:**\n\n- Preview opens HEIF and exports JPEG or PNG.\n\n**Web and mobile:**\n\n- Safari 17 added HEIC display, including on iOS 17 and iPadOS 17; earlier mobile browsers are not covered.\n- The signed-in OneDrive website previews uploaded HEIF. Decoding a local file is a separate capability.\n- Android has decoded HEIF since version 9.\n\n### HEIC and WebP compared\n\n- **Coding**: HEIC uses HEVC inside HEIF, while lossy WebP is built on the VP8 video codec's intra-frame coding.\n- **Container**: HEIF is a container, not a codec, so the HEVC inside it is what the page has to decode.\n- **Transparency**: WebP supports alpha, and a HEIF file can carry alpha too.\n- **Support**: lossy WebP displays from Chrome 17, Edge 18, Firefox 65 and Safari 14 onward. Safari displays HEIC from version 17.0.\n- **File size**: Apple says HEIF compresses better than JPEG, and on average, Google says, lossy WebP comes out about 30% smaller than JPEG. This page promises no size for its WebP.\n- **Limits**: WebP stops at 16383 pixels on each side.\n\nThe page decodes the HEIC with libheif running in your browser. A HEIC can hold several pictures, but only the primary one is read, so the output is a single still WebP and never an animation. The pixels pass through 8-bit RGB, which means extra depth in the source is lost, and EXIF data and the ICC profile are not carried over. Keep the HEIC if you may need that information later.\n\nA file that holds no image stops with \"No images in HEIF\". Your original HEIC is not changed; you download a new WebP.\n\n### Other ways to convert HEIC to WebP\n\n- **GIMP:** open the HEIC, choose File > Export As, pick WebP in the file-type list or end the name in .webp, then click Export. The WebP dialog has a Lossless checkbox, which disables the quality settings, plus image quality and alpha quality settings.\n- **ImageMagick:** run `magick phone.heic published.webp`. Its format page lists HEIC and WEBP as readable and writable, and says HEIC requires the libheif delegate library and WEBP requires a WEBP delegate library.\n- **libheif:** run `heif-dec phone.heic published.webp`. The libheif README says heif-dec decodes HEIF images to JPEG, PNG, TIFF, WebP or Y4M, and the tool picks the format from the output file's suffix. If you set no quality, its source default for WebP is 75.\n\n### Problems with HEIC files\n\n- **Windows Photos will not open it**: it can reject HEIC until both Microsoft media extensions, HEIF and HEVC, are installed. Converting here avoids installing them.\n- **iPhone import gives JPEG**: a USB import to a computer can convert to JPEG on its own. Choose Keep Originals to receive the HEIC itself.\n- **An older Apple system**: HEIF support depends on the system version, so an older Apple system may not open a HEIC.\n- **The page says there is no image**: the HEIF holds none to decode. Copy the original again.\n- **Camera details missing from the WebP**: the WebP lacks the EXIF data and ICC profile. Go back to the HEIC for the camera record or color profile.\n- **A very large photo**: a WebP can be at most 16383 pixels on either axis.\n"
+    }
+  }
+}

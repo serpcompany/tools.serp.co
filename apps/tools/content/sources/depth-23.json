@@ -1,0 +1,238 @@
+{
+  "tools": {
+    "jif-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open input; File > Export As; name output.jpg; choose JPEG export settings.",
+          "limits": "Saving is lossy; the JPEG export keeps neither transparency nor layers.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ]
+        },
+        {
+          "app": "Photopea",
+          "steps": "File > Open; File > Export As > JPG; save download.",
+          "limits": "Saving as JPG is lossy.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        }
+      ]
+    },
+    "jpeg-to-tiff": {
+      "methods": [
+        {
+          "app": "Preview",
+          "steps": "Open JPEG; File > Export; Format: TIFF; Save.",
+          "limits": "Mac only.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "GIMP",
+          "steps": "File > Export As; output.tiff; choose TIFF compression.",
+          "limits": "LZW and Deflate are lossless; JPEG compression is lossy.",
+          "source": "https://docs.gimp.org/3.0/en/file-tiff-export.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.jpeg -compress LZW output.tiff",
+          "limits": "Options go before the output file name.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-options/#compress"
+          ]
+        }
+      ]
+    },
+    "jpg-to-avif": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "File > Export As; choose output.avif; confirm AVIF export settings.",
+          "limits": "The output name ends in .avif.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick photo.jpg photo.avif",
+          "limits": "AVIF is listed as readable and writable.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        },
+        {
+          "app": "libavif avifenc",
+          "steps": "avifenc -q 75 photo.jpg photo.avif",
+          "limits": "Built with at least one AV1 codec enabled; none is on by default.",
+          "source": "https://github.com/AOMediaCodec/libavif"
+        }
+      ]
+    },
+    "jpg-to-docx": {
+      "methods": [
+        {
+          "app": "Microsoft Word",
+          "steps": "Insert > Pictures > This Device; select JPG; Insert; save the file.",
+          "limits": "DOCX is Word's default for new documents.",
+          "source": "https://support.microsoft.com/en-us/word/training/insert-pictures",
+          "supportSources": [
+            "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+          ]
+        },
+        {
+          "app": "LibreOffice Writer",
+          "steps": "Insert > Image; select JPG with linking disabled; File > Save As; choose a Microsoft Word format.",
+          "limits": "LibreOffice opens and saves Word DOCX files.",
+          "source": "https://help.libreoffice.org/latest/en-ZA/text/swriter/guide/insert_graphic_dialog.html",
+          "supportSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html"
+          ]
+        }
+      ]
+    },
+    "jpg-to-psd": {
+      "methods": [
+        {
+          "app": "Photopea",
+          "steps": "File > Open; load JPG; File > Save as PSD.",
+          "limits": "Photopea uses PSD as its main document format.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick picture.jpg picture.psd",
+          "limits": "PSD is listed as readable and writable.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "jpg-to-txt": {
+      "methods": [
+        {
+          "app": "Tesseract",
+          "steps": "tesseract page.jpg result -l eng",
+          "limits": "English is the default language if -l is omitted.",
+          "source": "https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html"
+        },
+        {
+          "app": "Google Drive and Docs",
+          "steps": "Upload JPEG; right-click; Open with > Google Docs; copy recognized text into a plain-text editor.",
+          "limits": "Uploads the image; 2 MB or less; right-side up.",
+          "source": "https://support.google.com/drive/answer/176692?hl=en"
+        },
+        {
+          "app": "OneNote for Mac",
+          "steps": "Insert picture; Control-click; Copy Text from Picture; paste into a text editor.",
+          "limits": "Uses Microsoft online services; handwriting may not be recognized well.",
+          "source": "https://support.microsoft.com/en-us/onenote/onenote-for-mac-help-and-learning/copy-text-from-inserted-pictures-in-onenote-for-mac"
+        }
+      ]
+    },
+    "m4v-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i input.m4v -vn -b:a 128k -c:a libmp3lame soundtrack.mp3",
+          "limits": "Decoding the input requires the relevant decoders.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        }
+      ]
+    },
+    "mp4-to-flv": {
+      "methods": [
+        {
+          "app": "FFmpeg transcode",
+          "steps": "ffmpeg -i input.mp4 -f flv -codec:v libx264 -codec:a aac output.flv",
+          "limits": "Needs H.264 and AAC encoders.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "FFmpeg remux",
+          "steps": "ffmpeg -i input.mp4 -c copy -f flv output.flv",
+          "limits": "An FLV holds at most one video and one audio stream.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "FFmpeg keyframe index",
+          "steps": "ffmpeg -i input.mp4 -codec:v libx264 -codec:a aac -flvflags add_keyframe_index output.flv",
+          "limits": "The index aids seeking.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        }
+      ]
+    },
+    "mp4-to-mpg": {
+      "methods": [
+        {
+          "app": "FFmpeg DVD target",
+          "steps": "ffmpeg -i input.mp4 -target ntsc-dvd output.mpg",
+          "limits": "Choose the correct standard; authoring remains separate.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "FFmpeg VCD target",
+          "steps": "ffmpeg -i input.mp4 -target pal-vcd output.mpg",
+          "limits": "Sets Video CD parameters; choose pal- or ntsc- to suit the gear.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        }
+      ]
+    },
+    "mpv-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg H.264 conversion",
+          "steps": "ffmpeg -i input.mpv -an -pix_fmt yuv420p -c:v libx264 output.mp4",
+          "limits": "Video only; the MP4 has no audio.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "FFmpeg video remux",
+          "steps": "ffmpeg -i input.mpv -c:v copy -an output.mp4",
+          "limits": "Video only; the MP4 keeps the MPEG video.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg.html",
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        },
+        {
+          "app": "FFmpeg fast start",
+          "steps": "ffmpeg -i input.mpv -an -movflags +faststart -c:v libx264 -pix_fmt yuv420p output.mp4",
+          "limits": "Second pass moves the index; not possible with fragmented output.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        }
+      ]
+    }
+  }
+}

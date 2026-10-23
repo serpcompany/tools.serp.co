@@ -1,0 +1,180 @@
+{
+  "tools": {
+    "ai-to-pdf": {
+      "methods": [
+        {
+          "app": "Affinity Designer",
+          "steps": "Open the AI, choose File > Export, select PDF, review the export area and settings, click Export, name the file, and save.",
+          "limits": "Check how the imported artwork looks before you send the PDF.",
+          "source": "https://affinity.help/designer2/en-US.lproj/pages/ShareSavePrint/export.html",
+          "supportSource": "https://affinity.help/designer2/en-US.lproj/pages/Appendix/fileformat.html"
+        },
+        {
+          "app": "Inkscape",
+          "steps": "Open an AI and choose File > Save a Copy; select Portable Document Format, then review the font, rasterization and page-area options.",
+          "limits": "Effects that PDF cannot represent may be rasterized.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-pdf.html",
+          "supportSource": "https://wiki.inkscape.org/wiki/Files:_Save"
+        }
+      ]
+    },
+    "ai-to-svg": {
+      "methods": [
+        {
+          "app": "Affinity Designer",
+          "steps": "Open the AI, select File > Export, choose SVG, adjust the area and export settings, click Export, name the result, and save.",
+          "limits": "An SVG can hold pixel images as well as vector objects, so check the result after the import.",
+          "source": "https://affinity.help/designer2/en-US.lproj/pages/ShareSavePrint/export.html",
+          "supportSource": "https://affinity.help/designer2/en-US.lproj/pages/Appendix/fileformat.html"
+        },
+        {
+          "app": "Inkscape",
+          "steps": "Open an AI and save the drawing with a .svg ending; choose Plain SVG for sharing or Inkscape SVG to keep editor-specific information.",
+          "limits": "Inspect fonts and effects after the import.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/saving.html",
+          "supportSource": "https://wiki.inkscape.org/wiki/Files:_Save"
+        }
+      ]
+    },
+    "apng-to-gif": {
+      "methods": [
+        {
+          "app": "apng2gif (command line)",
+          "steps": "Run apng2gif.exe anim.png anim.gif on Windows; use the installed program name elsewhere.",
+          "limits": "Keeps the source delays and loop count. The -t threshold and -b background options handle partial transparency.",
+          "source": "https://apng2gif.sourceforge.net/"
+        },
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "Run ffmpeg -i input.apng output.gif.",
+          "limits": "Reads the APNG sequence and writes an animated GIF. Inspect the colors, since a GIF palette has at most 256.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "ImageMagick (command line)",
+          "steps": "Run magick apng:input.apng output.gif.",
+          "limits": "The apng: prefix names the input format, and ImageMagick's format list says reading it needs FFmpeg installed. GIF still has palette and transparency limits.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "avi-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "Run ffmpeg -i input.avi -c:v libx264 -c:a aac output.mov.",
+          "limits": "Needs the decoder for the AVI's codec. This makes a new H.264/AAC encoding rather than copying the AVI streams.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "OpenShot",
+          "steps": "Import the AVI, choose File > Export Video, open the Advanced tab, set Video Format to mov, then click Export Video.",
+          "limits": "The Advanced tab also sets codecs and bitrates.",
+          "source": "https://www.openshot.org/static/files/user-guide/export.html"
+        }
+      ]
+    },
+    "dng-to-png": {
+      "methods": [
+        {
+          "app": "darktable-cli (command line)",
+          "steps": "Run darktable-cli input.dng output.png.",
+          "limits": "The output extension selects the format. A related XMP sidecar can supply the processing history.",
+          "source": "https://docs.darktable.org/usermanual/4.6/en/special-topics/program-invocation/darktable-cli/",
+          "supportSource": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+        },
+        {
+          "app": "ImageMagick (command line)",
+          "steps": "Run magick dng:input.dng output.png.",
+          "limits": "The DNG format entry requires an explicit input prefix; inspect the resulting default rendering.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "eps-to-pdf": {
+      "methods": [
+        {
+          "app": "Ghostscript (command line)",
+          "steps": "Run ps2pdf input.eps output.pdf.",
+          "limits": "The official usage guide explicitly allows EPS with its PostScript utility scripts. Inspect the page area and resolve missing fonts in the source.",
+          "source": "https://ghostscript.readthedocs.io/en/latest/Use.html"
+        },
+        {
+          "app": "Affinity Designer",
+          "steps": "Open EPS, choose File > Export, select PDF, adjust settings and export area, then export and save.",
+          "limits": "Compare imported artwork and final PDF; font and feature interpretation can affect the result.",
+          "source": "https://affinity.help/designer2/en-US.lproj/pages/ShareSavePrint/export.html",
+          "supportSource": "https://affinity.help/designer2/en-US.lproj/pages/Appendix/fileformat.html"
+        }
+      ]
+    },
+    "gif-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "Run ffmpeg -i input.gif -c:v libx264 -pix_fmt yuv420p output.mov.",
+          "limits": "The selected pixel format may require even dimensions. This encodes video without creating audio absent from the GIF.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ]
+    },
+    "mov-to-webm": {
+      "methods": [
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "Run ffmpeg -i quicktime.mov -c:a libopus -c:v libvpx-vp9 web-copy.webm.",
+          "limits": "Requires libvpx-vp9 and libopus support. Uses a different codec combination from the browser tool.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "OpenShot (Windows, Mac, Linux)",
+          "steps": "Add the MOV to the project, choose File > Export Video, open the Advanced tab, set Video Format to webm, then click Export Video.",
+          "limits": "The Advanced tab also sets codecs and bitrates.",
+          "source": "https://www.openshot.org/static/files/user-guide/export.html"
+        }
+      ]
+    },
+    "mp3-to-aac": {
+      "methods": [
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "Run ffmpeg -i song.mp3 -vn -b:a 192k -c:a aac converted.aac.",
+          "limits": "Another lossy encode; the target bitrate cannot restore source information. Name the output .m4a for an MP4-based file.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "Open the MP3, choose File > Export Audio, and select M4A (AAC) Files as the format.",
+          "limits": "Needs the optional FFmpeg library. The result is an M4A, not a raw AAC stream.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        }
+      ]
+    },
+    "mp3-to-flac": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "Open MP3, choose File > Export Audio, select FLAC from Format, review channels, sample rate, bit depth, and level, then export.",
+          "limits": "FLAC level changes packing efficiency rather than recovering lost MP3 information.",
+          "source": "https://manual.audacityteam.org/man/flac_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "app": "FFmpeg (command line)",
+          "steps": "Run ffmpeg -i song.mp3 -vn -c:a flac decoded.flac.",
+          "limits": "Decodes MP3 then stores its samples losslessly. The FLAC does not become a lossless original recording.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ]
+    }
+  }
+}

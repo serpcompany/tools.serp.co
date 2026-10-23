@@ -1,0 +1,911 @@
+{
+  "avif-to-pdf": {
+    "seo": {
+      "title": "Convert AVIF to PDF Online (Free)",
+      "h1": "AVIF to PDF Converter",
+      "description": "Convert AVIF to PDF in your browser: each image becomes a one-page PDF the size of the picture, with transparency kept. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an AVIF image into a one-page PDF, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVIF to PDF?",
+        "answer": "Pick your AVIF file above. The PDF downloads when the conversion ends, and a batch gives one PDF per image."
+      },
+      {
+        "question": "Can I put several AVIF images in one PDF?",
+        "answer": "Not on this page. Each AVIF becomes a separate single-page PDF, and the files are never merged. Join them afterward in a PDF editor if you need one document."
+      },
+      {
+        "question": "What page size does the PDF have?",
+        "answer": "One point per pixel in each direction, with no margin around the picture. A 4000 by 3000 pixel AVIF gives a 4000 by 3000 point page, much bigger than A4 or Letter. Pick fit-to-page when you print."
+      },
+      {
+        "question": "Does the PDF keep my AVIF's transparency?",
+        "answer": "Yes. No background is painted, and transparent pixels go into the PDF as a soft mask."
+      },
+      {
+        "question": "What happens to an animated AVIF?",
+        "answer": "The PDF shows the first frame alone. A page holds a still picture, so the remaining frames stay in the AVIF."
+      },
+      {
+        "question": "Is the picture compressed again inside the PDF?",
+        "answer": "No JPEG step is added. The decoded picture is embedded as lossless PNG data. Detail the AVIF had already thrown away does not come back."
+      },
+      {
+        "question": "Does the PDF keep the AVIF's EXIF data or color profile?",
+        "answer": "No. Decoding to plain pixels comes first, which discards camera EXIF, XMP and the ICC profile."
+      },
+      {
+        "question": "Is a 10-bit or HDR AVIF kept at full depth?",
+        "answer": "No. The pixels go through at 8 bits per channel, so any depth beyond that in the source is lost."
+      },
+      {
+        "question": "Can I search or copy text from an AVIF I turned into a PDF?",
+        "answer": "No. The words are still part of the picture, so the PDF has no text layer. Run the PDF through OCR software if you need selectable text."
+      },
+      {
+        "question": "Why does my browser say it can't open the AVIF?",
+        "answer": "The page uses your browser's own image decoder, so the browser has to support AVIF. A current Chrome, Edge, Firefox or Safari will do. If the decoder can't read the file, you see \"Image decode failed.\""
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and PDF",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed pictures in the HEIF container.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "HDR and wide color gamut",
+          "10-bit and 12-bit depth"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Vector and raster content",
+          "Embedded fonts",
+          "Opens in any browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVIF to PDF",
+      "points": [
+        "Each AVIF becomes its own one-page PDF; several files are never merged.",
+        "The page is the size of the picture, one point per pixel, with no margin.",
+        "Transparency is kept as a soft mask; nothing paints a background.",
+        "An animated AVIF gives its first frame only.",
+        "EXIF data, XMP, the ICC profile and any depth beyond 8 bits per channel are not carried over."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AVIF and PDF",
+      "markdown": "### What is an AVIF file?\n\nAVIF is an image format from the Alliance for Open Media, the group that published the AV1 video codec in 2018. It takes AV1 compression, built for video, and applies it to still pictures and image sequences, stored in the HEIF container. One format serves lossy and lossless files, transparency, HDR and wide color gamut, with depth reaching 12 bits per channel, and Exif, XMP and an ICC profile may ride inside the file. It is royalty-free.\n\nYou usually meet AVIF on the web, where sites choose it for small files, so an image saved from a web page may turn out to be an .avif. That is when a PDF is handy: it turns the picture into a document you can attach, print or send. Decoding AVIF is slower than for older formats, and making one can take several seconds.\n\nUnder the Baseline profile a single image item tops out at 8,192 by 4,352 pixels, so a bigger picture is assembled from a grid of tiles.\n\nA PDF made here is a picture on a page. It does not add text, rebuild a document layout or sharpen the image. If the AVIF was already squeezed hard when someone saved it, the PDF shows the same softness, because nothing in the conversion can restore detail the file no longer has.\n\n### Programs that open AVIF files\n\n- **Windows:** to show .avif files, the system wants the HEIF Image Extension together with Microsoft's AV1 Video Extension.\n- **Windows, Mac and Linux:** ImageMagick reads AVIF, and GIMP imports and exports it from release 2.10.22 onward.\n- **Web:** Google Chrome has decoded AVIF since version 85, Mozilla Firefox has shown AVIF images since version 93, and Microsoft Edge since version 121. A browser shows an AVIF all at once: the format does not render progressively.\n- **Mobile:** Safari on iOS shows still AVIF images from iOS 16, though that first release did not cover animation. Android decodes baseline 8-bit AVIF from version 12, with 10-bit decoding optional.\n\n### AVIF and PDF compared\n\n- **Extensions and media types**: AVIF files end in .avif (image/avif), and PDFs in .pdf (application/pdf).\n- **What each holds**: an AVIF is one picture or an image sequence. A PDF is a set of fixed-size pages that can hold text, fonts, vector drawings and images.\n- **Compression**: AVIF uses AV1, lossy or lossless. Here the picture goes into the PDF as lossless PNG data, so no second lossy pass happens.\n- **Transparency**: AVIF has an alpha channel, and the PDF carries it through as a soft mask.\n- **Color depth**: AVIF goes to 12 bits per channel. Here the pixels are reduced to 8 bits, so a 10-bit or HDR source is flattened to 8.\n- **Metadata**: an AVIF can include Exif, XMP and a color profile, but the PDF gets none of them, so capture date and camera model stay behind.\n\nWhat changes in this conversion is the container: a picture becomes a page. The page is measured in points, one for each pixel, with no margin and no paper-size preset.\n\n### Other ways to convert AVIF to PDF\n\n- **GIMP (Windows, Mac, Linux):** open the AVIF, choose File > Export As, expand Select File Type and pick Portable Document Format (or end the name in .pdf), then click Export. The PDF dialog has an option to fill transparent areas with the background color.\n- **ImageMagick (command line):** run `magick artwork.avif document.pdf`. ImageMagick's format list marks both AVIF and PDF as readable and writable, and notes that PDF needs Ghostscript.\n\n### Problems with AVIF files\n\n- **It won't open in an older program**: AVIF is newer than JPEG and PNG. Open it in a current browser, or in GIMP 2.10.22 or later.\n- **The picture won't display in an older browser**: the browser lacks AVIF decoding. Update it, or serve a JPEG, PNG or WebP copy as a fallback for visitors whose browsers can't show AVIF.\n- **The PDF page is huge**: the page is one point per pixel. Choose fit-to-page when printing.\n- **The PDF doesn't move**: an animated AVIF gives its first frame, which becomes the still picture on the PDF page. Keep the AVIF for the motion.\n- **The colors look flatter**: HDR or 10-bit detail is lost in the 8-bit pass. Hold on to the AVIF when you need the original range.\n"
+    }
+  },
+  "jpg-to-jpg": {
+    "seo": {
+      "title": "Convert JPG to JPG Online (Free)",
+      "h1": "JPG to JPG Converter",
+      "description": "Convert a JPG to JPG in your browser: the photo is saved again as a new JPG at quality 0.85, without its EXIF, XMP or ICC profile. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save a JPG again as a fresh JPG, with its metadata left behind."
+    },
+    "faqs": [
+      {
+        "question": "What does converting a JPG to a JPG do?",
+        "answer": "The page decodes your photo to pixels and writes a new JPG at quality 0.85. The result is a new encode rather than a byte-for-byte copy, so the picture goes through lossy compression once more."
+      },
+      {
+        "question": "Is this the same as renaming a .jpeg file to .jpg?",
+        "answer": "No. The two extensions mean the same format, so renaming never changes the data. This page rewrites the data and drops the metadata. Rename the file if the extension is all you want to change."
+      },
+      {
+        "question": "Can I use it to remove EXIF data or GPS location from a photo?",
+        "answer": "Yes. EXIF, XMP and the ICC profile are not copied to the new JPG, and GPS coordinates stored in EXIF go with them. Open the result in your photo app to confirm the location is gone before you share it."
+      },
+      {
+        "question": "Will the new JPG be smaller?",
+        "answer": "Not always. The size depends on the photo and on how hard the original was compressed, and a file saved at a lower quality than 0.85 can come out bigger."
+      },
+      {
+        "question": "Does converting JPG to JPG lose quality?",
+        "answer": "Slightly. Because JPG is lossy, the photo is compressed a second time and each pass adds a little loss. Convert once from your best copy instead of converting a copy of a copy."
+      },
+      {
+        "question": "Can this make a blurry or pixelated JPG sharper?",
+        "answer": "No. Detail that an earlier save threw away can't be rebuilt by saving again. If you still have the camera original, convert that."
+      },
+      {
+        "question": "What quality is the new JPG saved at?",
+        "answer": "0.85 on the encoder's 0 to 1 scale, and the page has no slider to change it. Other programs use their own quality scales, so an editor's 85 is a different setting."
+      },
+      {
+        "question": "Does a GIF or WebP with several frames keep its motion?",
+        "answer": "No. A JPG holds one still picture, and an animated input gives its first frame only."
+      },
+      {
+        "question": "Can I convert several JPG files at once?",
+        "answer": "Yes. Select as many as you like and each comes back as a separate JPG, one after another. They are not merged."
+      },
+      {
+        "question": "Will a transparent image survive?",
+        "answer": "No. A JPG has no alpha transparency, so see-through areas are lost. Keep the PNG or project file for editing."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and JPG",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "The same format again. The page writes a new JPG from the decoded pixels at quality 0.85.",
+        "details": [
+          "Lossy compression",
+          "Quality fixed at 0.85 here",
+          "No EXIF, XMP or ICC profile",
+          "Opens in any browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to JPG",
+      "points": [
+        "The output is a new JPG at quality 0.85, so the photo is compressed with loss a second time.",
+        "EXIF data, including GPS, XMP and the ICC profile are not copied to the new file.",
+        "The new file can be bigger or smaller; there is no size target.",
+        "Detail already lost in the source does not come back.",
+        "Choose several JPG files at once and each downloads as its own JPG."
+      ]
+    },
+    "guide": {
+      "title": "Understanding JPG and JPG",
+      "markdown": "### What is a JPG file?\n\nJPG, also written JPEG, is the photo format of the web and of nearly every camera. The Joint Photographic Experts Group published the standard as ISO/IEC 10918-1. JPG compresses with loss: the encoder discards fine detail, and the quality setting decides how much goes. The format has no alpha transparency. .jpg and .jpeg are the same format.\n\nYou meet JPGs everywhere: camera output, email attachments, photo sharing, product pictures. Because the format is lossy, every new save adds another generation of loss, which makes it a poor choice for a master that you edit again and again. Keep your original and treat the converted file as a delivery copy.\n\nWhy would anyone convert a JPG to a JPG? Because a re-save does something a copy does not. Here the browser decodes the photo and writes a fresh JPG at quality 0.85, and the EXIF data, XMP and ICC profile are left behind. People use it to strip location data before posting a photo, or to get a clean file after an upload form rejected the original. The work happens in your browser with its own image decoder, so the photo is not sent to a server, and your original file is left as it was. It will not fix a photo that was already damaged, and it cannot bring back detail that an earlier save discarded.\n\n### Programs that open JPG files\n\n- **Windows:** the Photos app opens JPG files for viewing.\n- **Mac:** Preview on macOS opens JPG files for viewing.\n- **Windows, Mac and Linux:** GIMP is an editor that opens JPEG files so you can change them, and ImageMagick can read them in a terminal.\n- **Web:** Chrome and Firefox both display JPG.\n- **Mobile:** Safari and Chrome show it too.\n\n### JPG and JPG compared\n\n- **Extensions and media types**: both sides use .jpg or .jpeg and image/jpeg.\n- **Compression**: both are lossy. The new file is encoded from decoded pixels, not copied from the old stream.\n- **Quality**: this page always writes quality 0.85. Quality numbers don't match across programs, so GIMP's 85 and ImageMagick's 85 can look different.\n- **Transparency**: neither has any.\n- **Color depth**: pixels pass through 8 bits per channel.\n- **Metadata**: the original may carry Exif, XMP and a color profile; the new file carries none of them.\n\nThe only things that change are the encoded data and the metadata, and a rename would change nothing at all. Choose a handful of photos at once and each photo is processed in sequence, handing back a separate JPG for each rather than a zip. A moving input contributes just its opening frame, since a JPG holds a single picture.\n\nTwo of those differences matter most in practice. First, generation loss: a JPG is lossy, so decoding it and encoding it again at 0.85 compresses the picture a second time. The result looks close to the original, but it is never better, and repeated passes add up. Second, the metadata. A camera writes the date, the lens, the orientation and often the GPS position into the file as Exif. The new JPG has none of that, which is the reason many people run the conversion.\n\n### Other ways to convert JPG to JPG\n\n- **GIMP:** on Windows, Mac or Linux, once the photo is open, choose File > Export As, type a new .jpg name and export. In the JPEG dialog you choose a quality between 0 and 100 and pick which Exif, XMP or IPTC metadata is kept.\n- **ImageMagick (command line):** run `magick camera.jpg -quality 85 fresh.jpg`. This re-encodes with ImageMagick's own quality scale, and unlike this page it lets you choose the number.\n\n### Problems with JPG files\n\n- **The new file is bigger**: an original saved at a lower setting can grow. Converting again won't shrink it; use the [JPG Compressor](/compress-jpg/) instead.\n- **Text and edges look blotchy**: compression artifacts from an earlier save are now baked in. Go back to the earliest copy you have.\n- **A photo frame or device rejects it**: some older photo frames reject progressive JPEG. Export with progressive mode disabled.\n- **Transparent pixels are gone**: JPEG can't hold them. Save as PNG when you need transparency.\n- **Layers are gone**: JPEG keeps no layer stack, so keep the project file.\n"
+    }
+  },
+  "mkv-to-avi": {
+    "seo": {
+      "title": "Convert MKV to AVI Online (Free)",
+      "h1": "MKV to AVI Converter",
+      "description": "Convert MKV to AVI in your browser: the video is re-encoded as Xvid-tagged MPEG-4 with 96 kbps MP3 sound, up to 30 fps. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an MKV video into an AVI with MPEG-4 video and MP3 sound, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MKV to AVI?",
+        "answer": "Pick your MKV in the converter above. Both streams are re-encoded locally, and the AVI is offered for download when that ends. Longer videos simply take more time."
+      },
+      {
+        "question": "Does the converter just change the container?",
+        "answer": "No. The video and the sound are both encoded again, so this is not a fast stream copy. Nothing is uploaded; FFmpeg runs inside your browser."
+      },
+      {
+        "question": "Which codecs end up inside the AVI?",
+        "answer": "The video is MPEG-4 Part 2 tagged Xvid, and the sound is MP3 at 96 kbps. The .avi extension doesn't say what a device can decode, so check the player's specs for those two."
+      },
+      {
+        "question": "Will a 4K MKV stay 4K?",
+        "answer": "No. The picture is shrunk until its long edge is 1920 pixels. A smaller video keeps the size it has."
+      },
+      {
+        "question": "Why did my video lose one pixel in width or height?",
+        "answer": "Both sides are rounded down to an even number, so 1 pixel is cut from an odd width or height. A video 1279 pixels wide comes out 1278 wide."
+      },
+      {
+        "question": "What frame rate does the AVI have?",
+        "answer": "The source rate up to a cap of 30 fps. A 60 fps recording drops frames to reach 30, keeping its length, and a 24 or 25 fps film keeps its rate."
+      },
+      {
+        "question": "Can I choose the audio track or language for the AVI?",
+        "answer": "Not on this page; it offers no stream choice, and FFmpeg's default selection decides. When a specific language matters, run FFmpeg yourself with an explicit -map option."
+      },
+      {
+        "question": "Why is the sound lower quality than in my MKV?",
+        "answer": "The audio is re-encoded as MP3 at 96 kbps, and MP3 is lossy. If the MKV carried lossless sound, the AVI cannot match it."
+      },
+      {
+        "question": "Can I convert more than one MKV in a single go?",
+        "answer": "Yes. Select them together; they run in turn and each comes back as a separate AVI named after its MKV. No ZIP is made."
+      },
+      {
+        "question": "What does an \"FFmpeg failed with exit code\" error mean?",
+        "answer": "The engine reported an error for that file. A truncated or damaged MKV frequently gives a shorter AVI rather than an error, so the message does not simply mean the file is too long. Check that the MKV plays in a player such as VLC or mpv, then try again."
+      }
+    ],
+    "aboutSection": {
+      "title": "MKV and AVI",
+      "fromFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open, free container format that can hold unlimited video, audio, picture and subtitle tracks in one file. WebM is a subset of Matroska.",
+        "details": [
+          "Open standard",
+          "Multiple audio and subtitle tracks",
+          "Chapters and metadata",
+          "Supports almost any codec"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A container introduced by Microsoft in 1992 and based on RIFF. It interleaves video and audio and can hold many codecs.",
+        "details": [
+          "RIFF-based container",
+          "Many codecs",
+          "Limited support for modern features",
+          "Legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MKV to AVI",
+      "points": [
+        "The video is re-encoded as MPEG-4 Part 2 tagged Xvid; nothing is copied through.",
+        "The sound is re-encoded as MP3 at 96 kbps.",
+        "The longer side is capped at 1920 pixels and the frame rate at 30 fps.",
+        "Odd widths and heights are rounded down to even numbers, losing 1 pixel.",
+        "The page has no audio track selector."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MKV and AVI",
+      "markdown": "### What is an MKV file?\n\nAn MKV file is a Matroska video. Matroska is an open container format whose structure is written in EBML, itself a binary relative of XML, and it grew out of the earlier MCF project. One MKV can hold several picture, sound and subtitle streams together with chapter marks and descriptive tags.\n\nMatroska fixes neither the codec nor the quality. What sits inside is the author's choice, so two MKV files can call for very different decoders and look very different on the same player.\n\nYou find MKV files in video collections, Blu-ray rips and downloads with several audio languages or subtitle tracks. WebM is a subset of Matroska, and IANA registers video/matroska for Matroska video.\n\n### Programs that open MKV files\n\n- **Windows, Mac and Linux:** mpv plays MKV with selectable audio and subtitle streams. ffplay, which ships with FFmpeg, reads the container through FFmpeg's Matroska demuxer and plays the video and audio inside.\n- **Windows:** Windows Media Player opens MKV only with codecs added.\n- **Mobile:** VLC for Android plays whatever its decoders support, which depends on the streams in the file, and VLC for iOS plays most movie formats stored on the device or on the network.\n\n### MKV and AVI compared\n\n- **Extensions and media types**: .mkv and video/matroska; .avi and video/x-msvideo, one commonly used label.\n- **Structure**: Matroska is built on EBML and holds many streams, chapters and tags. AVI is a RIFF file with a header for dimensions and frame rate and another chunk for the media.\n- **Codecs**: Matroska takes almost any codec. AVI names its streams with FOURCC codes, and its video can be stored raw or compressed, with or without loss, so the .avi ending says nothing about quality.\n- **Size limits**: the original AVI format has size restrictions that differ from those of the later OpenDML extension.\n- **Modern features**: AVI has limited support for them.\n\nThis conversion picks the codecs for you. The MKV is decoded and its video and sound are encoded again, which adds another lossy pass to both. Video becomes MPEG-4 Part 2 carrying an Xvid tag and no B-frames, and sound becomes 96 kbps MP3. Any frame larger than 1920 pixels in either direction is reduced, a frame rate above 30 fps is lowered to 30 by dropping frames, though the running time stays the same, and 1 pixel is cut from any odd width or height.\n\nYou cannot choose a stream here. If the MKV holds several audio tracks, the one FFmpeg selects by default is the one you get.\n\n### Other ways to convert MKV to AVI\n\n- **FFmpeg (command line):** run `ffmpeg -i feature.mkv -c:v mpeg4 -c:a libmp3lame feature.avi`. FFmpeg's format list shows Matroska and AVI as both readable and writable. Add explicit `-map` options when you need a particular audio language.\n- **Avidemux:** open the MKV with the Open button, set AVI in the Output Format section on the left, choose the video and audio encoders, then Save. Its output-format table lists AVI with MPEG-4 ASP video among many codecs, and calls MPEG-1 and MPEG-2 in AVI highly problematic.\n- **Prism for Windows:** choose Add File(s), select AVI in Output Format, check Encoder Options, choose Save to Folder and press Convert. Prism lists MKV as an input only when the Matroska DirectShow filter is installed.\n\n### Problems with MKV files\n\n- **Wrong language or subtitles in your player**: you picked the wrong stream. The same MKV can hold several, so switch tracks in a player such as mpv.\n- **Seeking is slow or jumps**: Matroska keeps its seek index (the cues) apart from the media, so a file with that index missing or damaged is harder to skip around in.\n- **The file opens but shows nothing or has no sound**: the container was recognized but a codec inside it was not. Try another player, such as VLC.\n- **The file is cut short or damaged**: the AVI is generally still produced, only shorter, and it stops at the point where FFmpeg could no longer read. Copy or download the MKV again if you need all of it.\n- **The file is very large**: the page sets no size limit; a long film mostly means a longer wait on your device.\n"
+    }
+  },
+  "mp4-to-mpeg": {
+    "seo": {
+      "title": "Convert MP4 to MPEG Online (Free)",
+      "h1": "MP4 to MPEG Converter",
+      "description": "Convert MP4 to MPEG in your browser: the video becomes MPEG-2 with 96 kbps MP2 sound, up to 1920 px and 30 fps. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an MP4 video into an MPEG file with MPEG-2 video and MP2 sound."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to MPEG?",
+        "answer": "Select your MP4 in the converter above and let it encode on your device. The .mpeg file is ready to download at the end, and a longer video means a longer wait."
+      },
+      {
+        "question": "Is MP4 not already MPEG?",
+        "answer": "MP4 is MPEG-4 Part 14, a container from the MPEG family. A .mpeg file is something else: this page writes MPEG-2 video and MP2 audio, which is an older pair of codecs."
+      },
+      {
+        "question": "Which MPEG version does the file use, MPEG-1 or MPEG-2?",
+        "answer": "The video is MPEG-2, with MPEG Audio Layer II (MP2) sound at 96 kbps."
+      },
+      {
+        "question": "Will the MPEG be bigger than the MP4?",
+        "answer": "It can be. The page holds quality constant instead of aiming at a size, so the result follows the picture."
+      },
+      {
+        "question": "Can I burn the MPEG to a DVD?",
+        "answer": "The file is not a DVD. It has no menus or disc structure, and a DVD authoring program may demand its own frame size, frame rate and audio settings. Use this as raw material for that program."
+      },
+      {
+        "question": "Will a 60 fps MP4 stay at 60 fps?",
+        "answer": "No. Output is capped at 30 fps, so a 60 fps clip comes out at 30 with frames dropped and its length unchanged. Clips that run slower keep their own rate."
+      },
+      {
+        "question": "Does a 4K MP4 stay 4K?",
+        "answer": "No. Pictures bigger than 1920 pixels in either direction are shrunk to fit within 1920. Sizes are rounded down to even numbers too, which removes 1 pixel from an odd width or height."
+      },
+      {
+        "question": "What is the difference between .mpeg and .mpg?",
+        "answer": "None. Both endings are used for MPEG video files. The page writes .mpeg; renaming to .mpg changes the label but not the data."
+      },
+      {
+        "question": "Why does the sound seem worse than in my MP4?",
+        "answer": "The audio is re-encoded to MP2 at 96 kbps, which is a lossy step on top of whatever the MP4 held. Convert from the MP4 you trust most, not from a copy of a copy."
+      },
+      {
+        "question": "Why does one MP4 convert and another one fail?",
+        "answer": "Two MP4 files can hold quite different codecs, and the converter has to decode whatever is inside. If you see an \"FFmpeg failed with exit code\" message, check that the file plays in VLC and try again. A truncated MP4 frequently produces a shorter MPEG rather than an error."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and MPEG",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Holds video, audio and subtitles",
+          "H.264, H.265 and AV1 video",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "A family of video files using MPEG-1 or MPEG-2 coding, historically used for TV delivery and DVDs. Both .mpeg and .mpg are used.",
+        "details": [
+          "MPEG-2 video here",
+          "MP2 audio here",
+          "Both .mpeg and .mpg endings",
+          "Legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to MPEG",
+      "points": [
+        "The video is re-encoded as MPEG-2 and the sound as MP2 at 96 kbps.",
+        "The frame rate is capped at 30 fps and the longer side at 1920 pixels.",
+        "The file is plain MPEG video, not a DVD with menus.",
+        "The MPEG can come out larger than the MP4.",
+        "The page has no audio track selector."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP4 and MPEG",
+      "markdown": "### What is an MP4 file?\n\nMP4 is the everyday name for MPEG-4 Part 14, ISO/IEC 14496-14, whose first edition dates from 2003. It packages timed video, audio and extra streams such as subtitles. Apple's QuickTime heritage underlies it, standardized as the ISO Base Media File Format, and the file stores everything in nested boxes, which QuickTime calls atoms. Among them is the index telling a player where each video, audio or subtitle sample sits, which is why one file can carry several streams side by side.\n\nThe container says nothing about the codec: a phone clip and a downloaded film can both be .mp4 yet hold different video and sound. The typical contents are H.264 video and AAC sound; AV1, VP9, MP3 or Opus may appear instead.\n\nYou meet MP4 files everywhere. Phones and cameras record them, streaming sites serve them and people share them as files, and every major browser plays them. The usual endings are .mp4 or .m4v for video and .m4a for audio-only MPEG-4, with video/mp4 and audio/mp4 as the registered media types.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** mpv plays MP4 and lets you pick among its audio and subtitle streams. FFmpeg's bundled player, ffplay, contains the MP4 demuxer but still needs decoders for what the file holds.\n- **Windows and Mac:** Adobe Premiere can import MP4 once the required decoder is present.\n- **Web:** Firefox plays MP4 directly, but AAC and H.264 playback can hinge on the system's codecs. Chrome handles the MP4 codec combinations it supports.\n- **Mobile:** VLC for Android is a free player; what plays depends on the codecs in the file. VLC for iOS handles most movie formats from the device or the network.\n\n### MP4 and MPEG compared\n\n- **Extensions and media types**: .mp4 and video/mp4; .mpeg or .mpg and video/mpeg. The Library of Congress records video/mpeg for MPEG video.\n- **Codecs**: the MPEG file this page writes holds MPEG-2 video with MP2 audio, an older pair than what most MP4 files use.\n- **History**: MPEG-2 began as a coding for compressed television and was later taken up for DVDs. MPEG systems treat every coded picture, sound or data component as an elementary stream, which packetized elementary streams then cut into packets.\n- **Frame rate and size**: the page limits output to 30 fps and a 1920 pixel long edge, and trims an odd width or height by 1 pixel.\n- **Quality**: the video targets a set quality level, not a file size, and the audio is set at 96 kbps.\n\nThe word MPEG confuses people, because MP4 already belongs to the MPEG family. A .mpeg file uses the older MPEG-1 or MPEG-2 coding that TV delivery and DVDs relied on. The MPEG file here is plain video, without DVD menus or chapters. Nothing on the page lets you choose a track. With several audio tracks in the MP4, whichever FFmpeg selects by default ends up in the MPEG. The original MP4 stays untouched, since you download a new copy.\n\n### Other ways to convert MP4 to MPEG\n\n- **FFmpeg (command line):** run `ffmpeg -i recording.mp4 -c:v mpeg2video -c:a mp2 legacy.mpeg`. FFmpeg's format and codec tables list MP4, MPEG-2 video and MP2. This page's own command also sets a quality level, a 96 kbps audio bitrate, scaling and a frame-rate cap, so the bare command gives a different file.\n- **Prism for Windows:** add the MP4 with Add File(s), choose MPEG or MPG under Output Format, then set the Save to Folder path and hit Convert, reviewing Encoder Options first if you wish. Prism lists MP4 as an input only when an mp4 filter is installed, and its output list includes .mpeg and .mpg.\n\n### Problems with MP4 files\n\n- **It plays on one device and not another**: a device may take the container but lack a decoder for what it carries. Check the codec, not the extension, and open the file in VLC to see what it holds.\n- **The file won't play at all**: if recording stopped abruptly, the MP4 may be unfinished and refuse to play, since its packet metadata is kept together. Record or download it again.\n- **Newer codecs fail on older software**: Android plays HEVC video in MP4 files only from version 5.0.\n- **The MP4 is cut short or damaged**: the MPEG usually still gets written, only shorter, stopping where FFmpeg could no longer read.\n"
+    }
+  },
+  "png-to-ai": {
+    "seo": {
+      "title": "Convert PNG to AI Online (Free)",
+      "h1": "PNG to AI Converter",
+      "description": "Convert PNG to AI in your browser: your PNG goes into a one-page, PDF-based .ai file at the image's size, with transparency kept. No tracing. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Put a PNG into an .ai file: a PDF page holding your picture, not vector paths."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert PNG to AI?",
+        "answer": "Choose the PNG above and the .ai file downloads when it is ready. Several PNGs give one .ai each."
+      },
+      {
+        "question": "Does this turn my PNG into vectors?",
+        "answer": "No. Nothing is traced. The .ai file holds your PNG as a picture on a PDF page, so it stays made of pixels. Getting paths from it takes a tracing tool or redrawing by hand."
+      },
+      {
+        "question": "What is inside the .ai file this page makes?",
+        "answer": "A one-page PDF with the PNG embedded losslessly. The page is as big as the image, one point per pixel, and the file starts like any PDF. It carries no Illustrator layers, brushes or paths."
+      },
+      {
+        "question": "Can I edit the lettering in my PNG logo afterward?",
+        "answer": "No. Letters in a PNG are pixels, and they stay pixels in the .ai. Retype the words in Illustrator, or ask whoever made the logo for the vector original."
+      },
+      {
+        "question": "Will a logo become sharper when I scale the AI up?",
+        "answer": "No. A picture is made of a fixed number of pixels, so enlarging it only makes them bigger. Real vector artwork scales cleanly; this does not."
+      },
+      {
+        "question": "Is the PNG's transparency kept?",
+        "answer": "Yes. No background is painted behind the picture, and clear areas pass through as a soft mask, so the page shows whatever is under it."
+      },
+      {
+        "question": "Does a 16-bit PNG keep its depth?",
+        "answer": "No. The image is reduced to 8 bits per channel on the way in, so anything beyond that is gone."
+      },
+      {
+        "question": "Are the PNG's color profile and metadata kept?",
+        "answer": "No. The PNG is decoded to plain pixels, so the ICC profile, EXIF and XMP are not copied."
+      },
+      {
+        "question": "Why is my .ai file just a flat picture?",
+        "answer": "Because that is what it holds: a bitmap on a page. Anything you want to edit as a shape has to be traced or redrawn."
+      },
+      {
+        "question": "Does an animated PNG become an animation in the .ai?",
+        "answer": "No. An animated input gives its first frame only, and the PDF page holds that one picture."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and AI",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format standardized by the W3C. It stores pixels, with optional alpha transparency.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Raster, not vector",
+          "Opens in any browser"
+        ]
+      },
+      "toFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "Adobe Illustrator's native artwork format. A document can mix vector paths, text and placed pixel images.",
+        "details": [
+          "Vector objects, text and images",
+          "Layers, brushes and effects",
+          "Made for logos and print layouts",
+          "A PDF-compatible version can be saved inside"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to AI",
+      "points": [
+        "The .ai file is a one-page PDF holding your PNG as a picture, not Illustrator paths.",
+        "Nothing is traced, so lettering and logos stay pixels.",
+        "The page is the size of the image, one point per pixel.",
+        "Transparency is kept as a soft mask; nothing paints a background.",
+        "EXIF data, the ICC profile and any depth beyond 8 bits per channel are dropped."
+      ]
+    },
+    "guide": {
+      "title": "Understanding PNG and AI",
+      "markdown": "### What is a PNG file?\n\nA PNG, short for Portable Network Graphics, stores a picture as a grid of pixels with lossless compression, so the saved samples come back exactly. It supports indexed, grayscale and truecolor images, plus an optional alpha channel for transparency. The first W3C Recommendation for it dates from October 1996.\n\nYou come across PNG as screenshots, interface graphics, icons and logos with clean edges. A designer who asks you for an AI file usually wants more than a PNG: paths they can edit, text they can retype and shapes that scale. A PNG cannot give them that on its own, because it holds colored dots and not outlines.\n\nAI is the file designers use for logos, illustrations and print layouts. People search for \"PNG to AI\" for three reasons: a printer or client asked for an .ai file, they want to open a picture in Illustrator, or they hope to turn a flat logo into editable shapes. This page writes an .ai file that holds your picture. It cannot do the third.\n\n### Programs that open PNG files\n\n- **Windows:** the Photos app opens PNG files for viewing.\n- **Mac:** Preview opens PNG files for viewing, and a Mac screenshot is a PNG unless you change the setting.\n- **Windows, Mac and Linux:** GIMP loads a PNG for editing, and ImageMagick decodes one in a terminal.\n- **Web:** every major browser shows a PNG inline.\n- **Mobile:** phone browsers display one too.\n\n### PNG and AI compared\n\n- **Extensions and media types**: .png and image/png; .ai, which this page writes as application/pdf.\n- **What each holds**: a PNG is pixels only. A native AI file combines vector objects and pixel images, and it keeps editable effects, brushes, layers and transparency.\n- **Origin**: AI is Adobe Illustrator's native artwork format. Illustrator 9 changed it in 2000, and earlier files used PostScript.\n- **Color depth**: a PNG can hold more than 8 bits per channel; the file made here keeps 8.\n- **PDF compatibility**: Illustrator can save an AI with a PDF rendition inside. An AI file saved without it may fail in third-party software.\n\nThe file this page writes is simpler than a native AI. It is a PDF page made by embedding your PNG losslessly, with the .ai extension, and it begins like any PDF. Each pixel of your PNG gets one point of page, with no margin around it. The PNG is first decoded to 8-bit pixels, which leaves metadata and any extra bit depth behind, and see-through areas are carried over as a soft mask.\n\nA program that reads the PDF does not necessarily see native Illustrator objects, because there are none. Nothing is traced and no text becomes editable. You may choose several PNGs together: they are processed in sequence, each producing a separate .ai without any archive.\n\nTwo cautions apply to AI files you make yourself in Illustrator. Linked images remain external unless Include Linked Files is selected while saving, whereas the picture here is embedded, so nothing is left to link. And artwork opened in an older Illustrator version can cause compatibility problems, so Adobe advises matching or newer versions.\n\n### Other ways to convert PNG to AI\n\n- **ImageMagick (command line):** run `magick logo.png logo.ai`. ImageMagick's format list marks both PNG and AI as readable and writable, and describes AI as Adobe Illustrator CS2. This keeps the picture as pixels; it does not trace paths, and its output is ImageMagick's own rather than the file this page builds.\n\n### Problems with PNG files\n\n- **The logo looks jagged when enlarged**: a PNG has a fixed pixel count, so enlarging only makes the pixels bigger. Find a larger original or a vector source.\n- **The file is bigger than expected**: PNG compression is lossless, so a smaller compression setting does not reduce pixel fidelity.\n- **Camera tags and profiles are missing**: GIMP writes them only when its export dialog asks for them, so switch on the metadata options when you need them.\n- **Layers sit in the wrong place**: GIMP and other programs can place layer offsets differently, so skip GIMP's PNG offset option.\n- **An animated PNG shows one frame**: a viewer with no animation support falls back to the still default image, and this page likewise keeps only the first frame.\n"
+    }
+  },
+  "aiff-to-wav": {
+    "seo": {
+      "title": "Convert AIFF to WAV Online (Free)",
+      "h1": "AIFF to WAV Converter",
+      "description": "Convert AIFF to WAV in your browser: the audio is written as 16-bit PCM, uncompressed, so a 24-bit AIFF is reduced to 16 bits. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an AIFF recording into an uncompressed 16-bit WAV in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AIFF to WAV?",
+        "answer": "Choose the AIFF above and the WAV downloads when it is done. Several files run one after another, each coming back as its own WAV."
+      },
+      {
+        "question": "Is AIFF to WAV lossless?",
+        "answer": "Almost. WAV and AIFF both hold uncompressed PCM, so nothing is compressed away. But the WAV is always 16-bit, so a 24-bit AIFF is reduced to 16 bits of precision."
+      },
+      {
+        "question": "Can I choose the bit depth or sample rate of the WAV?",
+        "answer": "No. The page has no settings. The WAV is always signed 16-bit PCM."
+      },
+      {
+        "question": "What is the difference between AIFF and WAV?",
+        "answer": "Both store uncompressed audio. AIFF came from Apple and descends from Electronic Arts' IFF family. WAV is Microsoft and IBM's RIFF-based wrapper. For most people the sound is the same, and the practical difference is which program or device accepts which."
+      },
+      {
+        "question": "Will the WAV be smaller than the AIFF?",
+        "answer": "Not by much. Both are uncompressed, so a 16-bit AIFF and the WAV made from it are nearly the same size. A 24-bit AIFF can give a smaller WAV because of the reduced depth. For real savings choose a compressed format."
+      },
+      {
+        "question": "Does it work with AIFF-C?",
+        "answer": "It depends on the encoding inside. AIFF-C can hold compressed audio, and the FFmpeg build in the page converts what it can decode."
+      },
+      {
+        "question": "Why is the converted file not much smaller?",
+        "answer": "Because the container changes and the audio data does not: uncompressed PCM takes about the same room in either wrapper."
+      },
+      {
+        "question": "Can I just rename .aiff to .wav?",
+        "answer": "No. The AIFF data would still be inside, and strict programs read the content. A real conversion writes WAV data."
+      },
+      {
+        "question": "Will it work on a very long recording?",
+        "answer": "The page puts no size limit on the file. Encoding happens on your device, so how long a long recording takes depends on its speed."
+      },
+      {
+        "question": "Why does my DAW or player reject my AIFF?",
+        "answer": "A compressed AIFF-C encoding may be beyond that program's decoder, or the header may be damaged."
+      }
+    ],
+    "aboutSection": {
+      "title": "AIFF and WAV",
+      "fromFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "An audio format developed by Apple, derived from Electronic Arts' IFF family. It usually carries uncompressed PCM.",
+        "details": [
+          "Uncompressed PCM audio",
+          "AIFF-C adds compressed encodings",
+          "Named chunks for author and copyright",
+          "Used for masters and intermediate recordings"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "A RIFF-based audio wrapper documented by Microsoft and IBM. Linear PCM is its common payload.",
+        "details": [
+          "Usually uncompressed PCM",
+          "Broadcast WAVE adds production metadata",
+          "RF64 for very large files",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AIFF to WAV",
+      "points": [
+        "The WAV is always 16-bit PCM, so a 24-bit AIFF loses precision.",
+        "The page has no bit depth, sample rate or channel options.",
+        "Both formats are uncompressed, so the file size barely changes.",
+        "AIFF-C works only when its encoding can be decoded.",
+        "Any video or picture stream in the file is dropped; only sound is written."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AIFF and WAV",
+      "markdown": "### What is an AIFF file?\n\nAIFF, Audio Interchange File Format, is an audio format developed by Apple. It is derived from the IFF family from Electronic Arts, and it stores sound in named chunks that can also hold an author, copyright and annotations. AIFF usually carries uncompressed linear PCM. Its sibling AIFF-C extends the format to compressed audio.\n\nProducers and sound designers keep masters and intermediate recordings in AIFF. The AIFF 1.3 specification from Apple carries the date January 4, 1989, and the format is still common on Macs and in audio software.\n\nAudio people care about three settings: sample rate, bit depth and channel count. This page offers none of them as a choice; the WAV it writes is always 16-bit.\n\nPeople convert to WAV because a program, device or collaborator asks for it. WAV is the other widely used uncompressed wrapper, and a request for one over the other is usually about compatibility, not sound. Archives and delivery specifications often name WAVE for that reason, and the Library of Congress lists it among its recommended audio formats.\n\n### Programs that open AIFF files\n\n- **Windows, Mac and Linux:** Audacity is a free editor that imports AIFF files, including all PCM variants, without any extra library; its manual lists AIFF among the uncompressed formats it opens directly, while an optional FFmpeg add-on covers a wider range. FFmpeg's format table lists AIFF for both decoding and encoding, and third-party builds exist for all three systems.\n\n### AIFF and WAV compared\n\n- **Extensions and media types**: AIFF files end in .aiff or .aif and use audio/aiff or audio/x-aiff; .wav with audio/wav and audio/x-wav.\n- **Structure**: AIFF descends from IFF. WAVE is RIFF-based, documented by Microsoft and IBM in August 1991.\n- **Contents**: both usually hold linear PCM. AIFF-C adds compressed encodings, and WAV can carry compressed ones too.\n- **Metadata**: AIFF has chunks for author and copyright. Broadcast WAVE extends WAV with production and preservation metadata.\n- **Bit depth**: both can hold 16-bit, 24-bit and higher PCM. The WAV written here is 16-bit whatever the AIFF held.\n- **Large files**: a very large recording may need the RF64 extension instead of the original RIFF size fields.\n\nOn this page the WAV is signed 16-bit PCM, written by FFmpeg inside your browser. Any picture or video stream in the source is left out, and the original AIFF stays untouched because you download a new copy. A 16-bit AIFF converts with its samples unchanged. A 24-bit AIFF has its precision reduced to 16 bits.\n\nUncompressed audio takes the same room per second whichever wrapper holds it, so the two files land near each other in size. In a test with a short mono sample, a 16-bit AIFF and its WAV differed by a few bytes, while the WAV from a 24-bit AIFF came out a third smaller.\n\n### Other ways to convert AIFF to WAV\n\n- **Audacity (Windows, Mac, Linux):** bring the AIFF in with File > Import > Audio, then run File > Export Audio, pick WAV and set the sample rate and channels. Tracks that are muted or soloed out are not exported, so check the project before you export. Audacity also shows the sample rate and channel choices in the same dialog, which this page does not offer.\n- **FFmpeg (command line):** run `ffmpeg -i studio.aiff -c:a pcm_s16le delivery.wav` for 16-bit PCM. FFmpeg's codec table lists signed 16-bit little-endian PCM as supported for encoding.\n\n### Problems with AIFF files\n\n- **A program rejects the AIFF**: the file may be AIFF-C with a compressed encoding. the program needs a decoder for the specific encoding inside; the AIFF-C name alone does not guarantee support.\n- **The AIFF is large**: raw PCM takes more disk than a compressed delivery copy of the same recording, so pick a compressed format if space matters.\n- **Tags look different in the WAV**: formats store descriptive fields differently, since standard INFO chunks and Broadcast WAVE extensions hold different information. Open the WAV in your editor and confirm the fields you rely on.\n- **A very large recording**: once a recording outgrows the classic RIFF size fields, WAV needs the RF64 extension. If a program won't accept the result, keep the AIFF.\n- **The sound has less depth**: a 24-bit original was reduced to 16 bits in the WAV. Keep the AIFF as your master.\n"
+    }
+  },
+  "arw-to-png": {
+    "seo": {
+      "title": "Convert ARW to PNG Online (Free)",
+      "h1": "ARW to PNG Converter",
+      "description": "Convert ARW to PNG in your browser: ImageMagick develops the Sony raw file into a lossless PNG picture. Free, with no sign-up, and no upload."
+    },
+    "tool": {
+      "subtitle": "Develop a Sony ARW raw photo into a lossless PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert ARW to PNG?",
+        "answer": "Choose the ARW above. ImageMagick runs in your browser, and the PNG downloads when it finishes. A big raw file can take a while."
+      },
+      {
+        "question": "Does the PNG keep the raw data?",
+        "answer": "No. What the PNG stores is the developed picture, not the sensor readings behind it. Tweaks to white balance or exposure are only possible from the ARW itself."
+      },
+      {
+        "question": "Is my ARW file changed?",
+        "answer": "No. Nothing is written back to the ARW; the PNG is a separate new file."
+      },
+      {
+        "question": "Why do the colors differ from the picture on my camera screen?",
+        "answer": "A raw file keeps sensor-derived data for later development, so the colors depend on how it is processed. Another program may render the same ARW differently from this page."
+      },
+      {
+        "question": "Will the PNG be much bigger than the ARW or a JPG?",
+        "answer": "It can be, because PNG compresses without loss and a detailed photo takes a lot of space. Use a JPG when you only need a small copy to share."
+      },
+      {
+        "question": "How large a photo can the page handle?",
+        "answer": "Roughly 537 megapixels is the ceiling. Bigger pictures are rejected as \"too large to convert here\", and under it the outcome depends on your device."
+      },
+      {
+        "question": "Is my photo uploaded?",
+        "answer": "No. The conversion is ImageMagick compiled to WebAssembly, running in your browser, and no server takes part."
+      },
+      {
+        "question": "Can I choose the PNG's size or quality?",
+        "answer": "No. The page has no settings: it passes no quality setting to the conversion."
+      },
+      {
+        "question": "Can I convert several ARW files at once?",
+        "answer": "Yes. Select several in one go and they are processed in turn, each giving its own PNG download. No ZIP is made."
+      },
+      {
+        "question": "Should I delete the ARW after converting?",
+        "answer": "No. The ARW is the only copy that can still be developed differently. Keep it and treat the PNG as a finished render."
+      }
+    ],
+    "aboutSection": {
+      "title": "ARW and PNG",
+      "fromFormat": {
+        "name": "ARW",
+        "fullName": "Sony Alpha raw image",
+        "description": "The file extension Sony cameras use for raw photographs. It keeps sensor-derived data for development later.",
+        "details": [
+          "Raw sensor-derived data",
+          "Uncompressed, compressed and lossless modes",
+          "Needs a raw processor",
+          "Adjustable after capture"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format standardized by the W3C. It stores pixels, with optional alpha transparency.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "Opens in any browser",
+          "Developed pixels, not raw data"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ARW to PNG",
+      "points": [
+        "The PNG holds a developed picture; the raw data and your raw editing choices stay in the ARW.",
+        "ImageMagick runs in your browser, so the file is not uploaded.",
+        "A picture over about 537 megapixels is refused as too large.",
+        "The page has no settings for size or quality.",
+        "Choose several ARW files at once and each PNG downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "Understanding ARW and PNG",
+      "markdown": "### What is an ARW file?\n\nARW is the extension Sony cameras use for raw photographs. A raw file keeps the sensor-derived data, not a finished picture, so exposure, white balance and color can be set later in a raw processor. Sony offers uncompressed, losslessly compressed and compressed recording options, and file size varies with the recording mode and sensor size. The format is camera-specific and proprietary, with a TIFF-based structure.\n\nYou get ARW files when you shoot raw on an Alpha camera. They take real storage, and they are not meant to be shared as they are: a JPG or PNG is what you send to a client, print shop or website. A raw file is like a negative, and someone has to develop it into a picture first. Professional and enthusiast photographers use ARW to edit photos before they become JPEGs, and lossless compression reduces its storage without discarding image information.\n\nThat is what this page does. It decodes the ARW, develops it into pixels and saves a PNG, which opens in any browser, editor or layout program. The PNG is one finished version of the photo. The ARW stays your master, because you can still make a different one from it later.\n\n### Programs that open ARW files\n\n- **Windows, Mac and Linux:** darktable processes raw photos, and its camera support page has a Sony section. ImageMagick lists ARW as a format it reads, described as the Sony Digital Camera Alpha Raw Image Format.\n\n### ARW and PNG compared\n\n- **Extensions and media types**: .arw, a camera-specific raw format; .png and image/png.\n- **What they hold**: an ARW holds sensor data waiting to be developed. A PNG holds finished pixels.\n- **Compression**: ARW comes uncompressed, lossless or compressed. PNG is lossless, so it keeps the developed pixels exactly, but not the raw data behind them.\n- **Bit depth**: an ARW stores 12 to 14 bits per channel, while PNG holds 8-bit or 16-bit channels.\n- **Transparency**: PNG supports alpha. A camera photo has none.\n- **Editability**: raw development parameters can be adjusted after capture in an ARW. A PNG fixes them.\n\nThis page reads the ARW with ImageMagick, then writes the PNG, all in your browser. It reads one image from the file, passes no quality setting and strips nothing on purpose. Any image above about 537 megapixels stops at a \"too large\" notice instead of becoming a PNG. Your ARW stays as it is: the download is a separate new file. You may choose several files together; they are handled in turn and each gives its own PNG, with no archive.\n\n### Other ways to convert ARW to PNG\n\n- **darktable (Windows, Mac, Linux):** select the processed image, open the export module, choose file on disk, set the file format, size and bit depth options, then press export, which starts a background job with a progress bar you can cancel. From the command line, run `darktable-cli capture.arw developed.png`; the format follows the filename extension. darktable's camera support page lists some ARW variants as unsupported.\n- **ImageMagick (command line):** run `magick camera.arw rendered.png`. ImageMagick's format list marks ARW as readable and PNG as readable and writable. Raw processing defaults can differ from this page's, so compare the colors. ImageMagick's format list also notes that the define dng:use-camera-wb=true makes it use the embedded profile.\n\n### Problems with ARW files\n\n- **The ARW is huge**: raw files can occupy substantial storage, and uncompressed ones take the most room. A losslessly compressed raw file is smaller but keeps the image information; a smaller size alone does not mean damage.\n- **It is not meant for sharing**: an ARW is made to be developed first, not sent on as a finished JPEG.\n- **The PNG looks different from another program's version**: two programs choose different tone and color when they develop the same ARW. Settle on one for a whole project.\n- **The PNG is huge**: PNG does not discard detail, and a detailed photograph is large. Use a JPG for sharing.\n- **A particular ARW variant is not read**: darktable's camera support page lists some downsized lossless and lossy ARW variants as unsupported, so try another raw processor.\n- **A \"too large\" message appears**: the image exceeds the megapixel ceiling described above. Develop it in darktable instead.\n"
+    }
+  },
+  "caf-to-mp3": {
+    "seo": {
+      "title": "Convert CAF to MP3 Online (Free)",
+      "h1": "CAF to MP3 Converter",
+      "description": "Convert CAF to MP3 in your browser: Apple's Core Audio file is re-encoded by LAME at 192 kbps (source 32 kHz or more). Free, no sign-up, no upload."
+    },
+    "tool": {
+      "subtitle": "Turn an Apple CAF recording into an MP3 you can play anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert CAF to MP3?",
+        "answer": "Drop your Core Audio file into the converter above. It is decoded and re-encoded on your device, then offered as an MP3 download. A batch produces one MP3 per CAF."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "LAME is asked for a constant 192 kbps, which a CAF sampled at 32 kHz or more gets; a lower sample rate caps it lower. There is no control for changing it."
+      },
+      {
+        "question": "Is a CAF file always uncompressed?",
+        "answer": "No. CAF is a container whose description chunk says what encoding it holds, so it may hold plain PCM or compressed audio. The extension alone doesn't tell you."
+      },
+      {
+        "question": "Why won't my CAF open in my player?",
+        "answer": "CAF is Apple's format, so a player without a CAF reader won't open it, and opening the container does not guarantee a decoder for the audio inside. FFmpeg reads CAF, and an MP3 from this page opens in almost any player."
+      },
+      {
+        "question": "How close will the MP3 sound to the CAF?",
+        "answer": "Close, but not identical. MP3 discards detail, so uncompressed CAF audio loses some in the conversion. A CAF that was already compressed ends up as a second generation of loss, which cannot help the sound."
+      },
+      {
+        "question": "Does the MP3 keep the CAF's channel layout and markers?",
+        "answer": "The command only asks for MP3 audio at the stated bitrate. The page sets no channel layout, and it does not carry markers across."
+      },
+      {
+        "question": "Can the page convert a very long CAF recording?",
+        "answer": "CAF itself copes with huge files thanks to its 64-bit offsets, and this page imposes no cap. How long a big recording takes depends on your device."
+      },
+      {
+        "question": "Where do CAF files come from?",
+        "answer": "Mostly Apple software. CAF is the format of Apple's Core Audio system, so you meet it in files made by apps on a Mac or iPhone."
+      },
+      {
+        "question": "Can I just rename a .caf file to .mp3?",
+        "answer": "No. The bytes are still CAF, and any player that looks at the content will refuse them. The sound must actually be decoded and written as MP3."
+      },
+      {
+        "question": "My CAF shows an \"FFmpeg failed\" message. Why?",
+        "answer": "The page reports that its engine hit an error. Remember that a CAF may hold many encodings, so look at what your file contains. A cut-short CAF usually still converts, giving a shorter MP3."
+      }
+    ],
+    "aboutSection": {
+      "title": "CAF and MP3",
+      "fromFormat": {
+        "name": "CAF",
+        "fullName": "Core Audio Format",
+        "description": "An Apple audio container designed to be flexible. It uses 64-bit offsets and can hold compressed or uncompressed audio.",
+        "details": [
+          "64-bit offsets for long recordings",
+          "Compressed or uncompressed audio",
+          "Channel layouts and annotations",
+          "Described by its audio-description chunk"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG that became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CAF to MP3",
+      "points": [
+        "LAME is asked for a constant 192 kbps, lower for a source under 32 kHz; there is no bitrate option.",
+        "CAF can hold compressed audio, so the MP3 may be a second lossy encode.",
+        "Only the audio is written; any picture stream is left out.",
+        "Files run one after another, each coming back as its own MP3.",
+        "There is no size check on the page; a long recording takes as long as your device needs."
+      ]
+    },
+    "guide": {
+      "title": "Understanding CAF and MP3",
+      "markdown": "### What is a CAF file?\n\nCAF is Core Audio Format, a container Apple designed to be flexible. Support dates to OS X 10.4, and OS X 10.3 could use it through QuickTime 7. A mandatory audio-description chunk says what encoding the file holds, and the audio itself sits in a separate data chunk. So a .caf can hold plain PCM or compressed audio, and the extension alone can't tell you which.\n\nCAF uses 64-bit offsets instead of the small size fields in older audio containers, so it has no 4 GB limit. That is why it suits long recordings and many channels. It supports multiple channels with optional channel-layout information, and information and edit-comment chunks that can carry descriptive text.\n\nYou find CAF files in Apple's audio ecosystem: audio on macOS and iOS, long recordings, and sound effects in Apple apps. Apple's own format notes also mention metadata and markers. Outside it they are awkward to open, because a player needs a CAF reader and a decoder for the encoding inside, which is why people convert them to MP3 for sharing. An uncompressed CAF can shrink a lot as an MP3, while a CAF that was already compressed shrinks by less.\n\n### Programs that open CAF files\n\n- **Windows, Mac and Linux:** FFmpeg reads and writes Core Audio Format containers, and its site links builds for all three systems.\n- **Windows, Mac and Android:** Switch lists CAF as an input it converts.\n\n### CAF and MP3 compared\n\n- **Extensions and media types**: .caf; .mp3 with audio/mpeg.\n- **Container versus codec**: CAF is a container for many encodings. MP3 is a lossy codec, which is both a file format and an encoding.\n- **Compression**: CAF may be uncompressed or compressed. MP3 is always lossy.\n- **Description**: a CAF names its encoding in a mandatory description chunk. An MP3 is its own encoding, so a player knows what to expect from the file type.\n- **Channels**: CAF supports multiple channels and channel layouts.\n- **Large files**: CAF's 64-bit offsets suit long recordings. A destination container can still have its own limits.\n\nLAME asks for a constant 192 kbps MP3 from the decoded CAF, which MP3 cannot reach below 32 kHz, and any picture stream is left out. The sample rate is not changed, so a low-rate source gets a lower bitrate: LAME writes at most 160 kbps for a 16 to 24 kHz source and 64 kbps for an 8 to 12 kHz one, so a telephone-grade recording comes out well below 192. Nothing here deals with markers, and the page does not choose a sample rate or channel count.\n\nBecause the CAF can already be lossy, converting can be a second lossy generation. Quality cannot improve on what the source held. Your CAF stays as it is, since the download is a separate new file.\n\nThe page decodes the CAF with FFmpeg's CAF reader, then hands the sound to LAME inside your browser, one file after another when you pick several.\n\n### Other ways to convert CAF to MP3\n\n- **FFmpeg (command line):** `ffmpeg -i session.caf -c:a libmp3lame -b:a 192k listening.mp3` does the job. FFmpeg's format table lists CAF as supported, and its MP3 output relies on the external LAME library.\n- **Switch for Windows:** add the CAF with Add, set Output Format to MP3, choose a Save to Folder location and click Convert. Switch converts every file in its list when none is selected, and Encoder Options is optional.\n\n### Problems with CAF files\n\n- **It won't open**: opening the container doesn't guarantee that a system can decode its audio codec. Variable-packet audio also needs a packet table, and missing required chunk data can prevent correct decoding.\n- **The recording is too large for the target**: large recordings can exceed the limits of a destination container even though CAF accommodates them. Split the audio.\n- **The MP3 sounds thinner than you hoped**: the page requests one fixed bitrate, and a source under 32 kHz is encoded at less. For different settings, run FFmpeg yourself.\n- **A player without a CAF reader**: send it the MP3 instead, which nearly every player opens, or let FFmpeg read the CAF directly.\n- **You need the sound unchanged**: MP3 is lossy and can't hold it. Keep the CAF as your master.\n"
+    }
+  },
+  "mp3-to-opus": {
+    "seo": {
+      "title": "Convert MP3 to OPUS Online (Free)",
+      "h1": "MP3 to OPUS Converter",
+      "description": "Convert MP3 to Opus in your browser: libopus writes a 128 kbps .opus file. Free, with no sign-up. It is a second lossy encode of your MP3."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP3 as a 128 kbps Opus file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP3 to Opus?",
+        "answer": "Choose the MP3 above and the .opus file downloads when it has been encoded. Several MP3 files run one after another."
+      },
+      {
+        "question": "What Opus settings does the page use?",
+        "answer": "libopus at 128 kbps with compression level 4. There are no controls to change them."
+      },
+      {
+        "question": "Will the Opus sound better than the MP3?",
+        "answer": "No. Opus can't restore detail the MP3 encoder threw away, and the file is a second lossy pass over what the MP3 kept. Convert from a lossless original if you have one."
+      },
+      {
+        "question": "Will the Opus file be smaller?",
+        "answer": "Not always. If your MP3 was below 128 kbps, the Opus file can be larger, while a higher-bitrate MP3 can shrink."
+      },
+      {
+        "question": "Is an .opus file the same as an .ogg file?",
+        "answer": "An .opus file commonly keeps its audio in an Ogg stream, so the two are related. The codec is Opus; Ogg is the wrapper."
+      },
+      {
+        "question": "Why is the Opus bitrate not the same as my MP3's?",
+        "answer": "Different codecs spend bits differently, so equal bitrates don't mean equal quality. Opus at a given bitrate is not the same as MP3 at that number."
+      },
+      {
+        "question": "Do ID3 tags and cover art come across?",
+        "answer": "Embedded cover art does not come across, because the command leaves out any picture stream. Check the tags you need in the .opus file."
+      },
+      {
+        "question": "Can I play Opus on my phone or other devices?",
+        "answer": "Support varies by device and app. Test a single file in the player or service you care about before converting a whole library, since MP3 is the safer format for playing almost anywhere."
+      },
+      {
+        "question": "Why is Opus used for voice recordings?",
+        "answer": "Opus was built with live calls in mind as well as music, so it suits voice recordings at modest bitrates."
+      },
+      {
+        "question": "What if a site accepts MP3 but not Opus?",
+        "answer": "That site's upload filter may list codecs. Successful MP3 playback doesn't mean it accepts Ogg Opus. Check the supported types."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and Opus",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG that became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "Opus",
+        "fullName": "Opus audio",
+        "description": "An open, lossy audio codec for speech and music, standardized by the IETF as RFC 6716. Files usually use the Ogg wrapper.",
+        "details": [
+          "Open codec, RFC 6716",
+          "Built for speech and music",
+          "Usually inside Ogg (RFC 7845)",
+          "Needs an Opus-capable player"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP3 to Opus",
+      "points": [
+        "Your MP3 is decoded and encoded again, so this is a second lossy pass.",
+        "The Opus is written at 128 kbps with libopus compression level 4; neither can be changed.",
+        "A low-bitrate MP3 can come out larger as Opus.",
+        "Embedded cover art is not copied; only the audio is written.",
+        "Not every player accepts .opus, so check where it must play."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP3 and Opus",
+      "markdown": "### What is an MP3 file?\n\nMP3 is MPEG Audio Layer III, a lossy audio format standardized by MPEG (ISO/IEC 11172-3) and developed with the Fraunhofer Society as a major contributor. It became the most common format for downloadable music. It stores a compact approximation of the sound, and once the encoder has discarded detail, decoding the MP3 cannot bring it back.\n\nYou will find MP3s across music collections, podcasts and portable-player audio. Opus is newer. It is an open codec developed for speech and music, including interactive communication, and the IETF standardized its original definition as RFC 6716 in September 2012.\n\nOpus combines SILK technology from Skype with CELT from Xiph.Org, and its coding modes trade signal detail for a compact representation. A .opus file commonly keeps the sound in an Ogg stream, specified by RFC 7845. Its media type is audio/ogg, with a codec parameter naming Opus.\n\nPeople convert MP3 to Opus when a service, chat app or player asks for Opus. A conversion from MP3 is still a second lossy generation, so the result can be no better than the MP3. Whether the file comes out smaller depends on the MP3's own bitrate: a low-bitrate MP3 can grow.\n\n### Programs that open MP3 files\n\n- **Windows, Mac and Linux:** Audacity opens MP3 files among its built-in formats, so the MP3 becomes a project for cutting, fades and effects.\n- **Windows, Mac, Linux, iOS and Android:** VLC plays most multimedia files, MP3 included, without codec packs.\n- **Windows:** Windows Media Player opens MP3 files.\n- **Mac:** Apple Music opens MP3 files.\n- **Web:** any web browser plays MP3.\n\n### MP3 and Opus compared\n\n- **Extensions and media types**: .mp3 and audio/mpeg; .opus and audio/ogg with the opus parameter.\n- **Wrapper**: MP3 is its own stream format. Opus usually lives in an Ogg file, which supports descriptive metadata and seeking.\n- **Compression**: both are lossy. Opus trades signal detail for a compact representation.\n- **Sample rate**: Ogg Opus times playback on a 48 kHz basis, a separate matter from the recording's own sample rate.\n\nThe page's settings are fixed: a libopus target of 128 kbps and compression level 4, run by FFmpeg inside your browser. The encoded file carries only the audio: any cover picture is left out. Because both formats are lossy, bit counts don't compare directly: a 128 kbps Opus file and a 128 kbps MP3 are not equivalent. In a test, a 44.1 kHz MP3 came out as an Opus file reported at 48 kHz.\n\nTwo Opus details matter if a player misbehaves. Reading Vorbis in Ogg does not guarantee reading Opus: Ogg gives Opus its own headers. And ignoring the pre-skip value can leave stray samples at the start; Ogg Opus defines how readers apply it. The MP3 you chose stays untouched, as the download is a new file; picking several makes the page work through them in sequence, each ending as a separate .opus.\n\n### Other ways to convert MP3 to Opus\n\n- **FFmpeg (command line):** run `ffmpeg -i podcast.mp3 -c:a libopus -b:a 128k podcast.opus`. The page's own command also sets compression level 4 and drops any picture stream.\n- **Audacity (Windows, Mac, Linux):** import the MP3, choose File > Export Audio and select Opus (OggOpus) Files (FFmpeg) in the Format list. The same dialog sets channels, sample rate, bit rate and quality, unlike this page.\n- **Switch for Windows:** add the MP3 files and choose Opus in Output Format. Check Encoder Options and the destination, then click Convert. The vendor's table lists Opus output for Windows and Mac but not Android.\n\n### Problems with MP3 files\n\n- **A malformed MP3 gives an import error**: Audacity may report one even when another player can play the file.\n- **Tags change when imports are combined**: Audacity can overwrite earlier metadata with the newest file's tags when several imports share one project.\n- **A second lossy pass**: each time an edited MP3 is saved as MP3 again, another lossy encoding stage is added, and this conversion adds one too. It sounds no better than the MP3, because low-bitrate artifacts stay. Go back to a lossless master.\n- **Artwork vanished**: embedded cover art isn't copied, so re-add it in an editor.\n- **A long file takes a while**: the encoder is single-threaded WebAssembly on your device, so how long it takes depends on the length of the audio and your device.\n"
+    }
+  },
+  "oga-to-mp3": {
+    "seo": {
+      "title": "Convert OGA to MP3 Online (Free)",
+      "h1": "OGA to MP3 Converter",
+      "description": "Convert OGA to MP3 in your browser: Ogg audio, whether Vorbis, FLAC or Speex, is decoded and re-encoded as an MP3. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn Ogg audio (.oga) into an MP3 that any player opens."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert OGA to MP3?",
+        "answer": "Select the .oga file in the converter above and wait for the encode to end. The MP3 then downloads, and several files are handled one after another."
+      },
+      {
+        "question": "What is an OGA file?",
+        "answer": "It is general Ogg audio. The Ogg wrapper holds one of several codecs, so the extension doesn't say which you have. A .ogg file is conventionally Vorbis only."
+      },
+      {
+        "question": "What quality is the MP3?",
+        "answer": "The page asks the LAME encoder for a steady 192 kbps, as long as the OGA is sampled at 32 kHz or higher. You cannot pick another rate here."
+      },
+      {
+        "question": "Is an OGA file lossless?",
+        "answer": "Only if it holds FLAC. An OGA with Vorbis is lossy, like an MP3. If yours is Ogg FLAC, the MP3 gives up the lossless sound, so keep the OGA."
+      },
+      {
+        "question": "How does the MP3 compare in sound with the OGA?",
+        "answer": "It will not be better. From a lossy OGA, the MP3 adds a second round of loss on top of the first. From a lossless one, the MP3 still discards detail."
+      },
+      {
+        "question": "Why does my player open .ogg but not .oga?",
+        "answer": "A player may assume .ogg means Vorbis, or lack the decoder for what the .oga holds. A player that reads the Ogg wrapper still needs the codec inside."
+      },
+      {
+        "question": "Can I just rename .oga to .mp3?",
+        "answer": "No. Ogg data stays Ogg data, and players that inspect the content will refuse it. A real conversion decodes the sound and writes it as MP3."
+      },
+      {
+        "question": "Can I convert an Ogg file that holds Opus or Speex?",
+        "answer": "Yes, if FFmpeg can decode the stream: its table lists Vorbis, FLAC, Speex and Opus decoding. LAME then writes the MP3."
+      },
+      {
+        "question": "Does Switch convert OGA on a Mac?",
+        "answer": "No. The Switch support matrix lists OGA as input on Windows only. On Mac use this page, FFmpeg or Audacity."
+      },
+      {
+        "question": "What should I do after an \"FFmpeg failed with exit code\" error?",
+        "answer": "It means FFmpeg, the engine in the page, hit an error with the Ogg stream. Ogg wraps several codecs, so check which one yours holds. A damaged or cut-short OGA usually still converts, to a shorter MP3."
+      }
+    ],
+    "aboutSection": {
+      "title": "OGA and MP3",
+      "fromFormat": {
+        "name": "OGA",
+        "fullName": "Ogg audio",
+        "description": "The general-purpose extension for audio in the Ogg container. It can hold Vorbis, FLAC, Speex or Opus.",
+        "details": [
+          "Codec varies",
+          "Registered in RFC 5334",
+          "Media type audio/ogg",
+          "Open Xiph.Org container"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG that became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting OGA to MP3",
+      "points": [
+        "An OGA is general Ogg audio; the page decodes whichever codec FFmpeg can read inside it.",
+        "LAME is asked for a constant 192 kbps, lower for a source under 32 kHz.",
+        "An Ogg FLAC file loses its lossless sound; a Vorbis file gets a second lossy pass.",
+        "Only the audio is written; a picture stream is left out.",
+        "The file you downloaded is not changed."
+      ]
+    },
+    "guide": {
+      "title": "Understanding OGA and MP3",
+      "markdown": "### What is an OGA file?\n\nOGA is the general file extension for audio in the Ogg container, made by the Xiph.Org Foundation. Ogg is a wrapper, not a codec, so an OGA can hold audio such as Vorbis, FLAC, Speex or Opus. RFC 5334 registered audio/ogg and the .oga extension in September 2008. That RFC keeps .ogg for Ogg that contains only a Vorbis bitstream.\n\nEvery Ogg file begins with the pattern OggS. Plenty of music apps and upload forms accept MP3 but not OGA, which is why people convert. The MP3 is a delivery copy, so keep the OGA if you might want the original sound again.\n\nSince the codec varies, an OGA may be lossy or lossless: Vorbis is lossy, Ogg FLAC is lossless. The Xiph.Org Foundation controls the audio/ogg registration, so the container is open rather than tied to one company. Because an Ogg audio stream can carry different codecs, a program that assumes one codec handles the others badly, which is why the broader .oga name sits beside .ogg.\n\n### Programs that open OGA files\n\n- **Windows, Mac, Linux, iOS and Android:** VLC plays most multimedia files without codec packs, though playback of an Ogg file also depends on the codec inside.\n- **Windows, Mac and Linux:** Audacity imports Ogg Vorbis and FLAC without extra software. FFmpeg's table lists Ogg for decoding and encoding and has decoders for Vorbis, FLAC, Speex and Opus.\n\n### OGA and MP3 compared\n\n- **Extensions and media types**: .oga with audio/ogg; .mp3 with audio/mpeg.\n- **What they are**: Ogg is a container, and the codec inside decides the compression. MP3 is one specific lossy codec.\n- **Compression**: an OGA can be lossy or lossless. An MP3 is always lossy.\n- **Lossless sources**: an Ogg FLAC file is lossless, so the MP3 trades that sound for a lossy copy.\n- **Metadata**: MP3 uses ID3 tags for metadata.\n- **Playback**: Nearly every device plays MP3, the main reason to convert to it.\n\nThe page decodes the sound with FFmpeg in your browser and encodes it with LAME, asking for a constant 192 kbps, which MP3 cannot reach below 32 kHz. Only audio is written. A Vorbis or other lossy source ends up as a second lossy pass that can't improve the source. The OGA itself is untouched, since you receive a new file, and a multi-file selection is processed in sequence with one MP3 per source.\n\n### Other ways to convert OGA to MP3\n\n- **FFmpeg (command line):** the documented form is ffmpeg -i input output, so run `ffmpeg -i archive.oga -c:a libmp3lame -b:a 192k portable.mp3`. FFmpeg's table lists Ogg as supported and MP3 encoding through the external LAME library. The -c:a libmp3lame option selects that LAME encoder, and -b:a 192k sets the bitrate.\n- **Audacity (Windows, Mac, Linux):** load the Ogg audio through File > Import > Audio, then pick File > Export Audio and select MP3 from the Format list; the matching extension is added automatically. The dialog also sets the sample rate and the channels (Mono, Stereo or a custom mapping), which this page does not. Ogg Vorbis and FLAC import without extra software; other codecs can need Audacity's optional FFmpeg library.\n- **Switch for Windows:** choose Add or File > Add and select the OGA, pick MP3 in Output Format, check Encoder Options, set the Save to Folder field and click Convert. Switch lists OGA input only for Windows.\n\n### Problems with OGA files\n\n- **The player is silent**: a player that recognizes the Ogg wrapper can still lack the decoder for the particular audio stream. Try VLC, which plays most multimedia files, or convert the file to MP3 here, where nearly every device can then play it.\n- **A program treats it as Vorbis**: treating every .oga as Vorbis misidentifies files encoded with other audio codecs, and a codec-specific .ogg assumption can prevent an application from handling general .oga streams correctly.\n- **You expected lossless**: an OGA is lossless only if it holds FLAC. Check what it holds in a tool such as FFmpeg.\n- **The MP3 sounds worse**: a low-bitrate original carries its artifacts into the MP3. Look for a cleaner copy of the recording, ideally the lossless original.\n- **A long file is slow**: the page imposes no size limit, so how long it takes rests on your device.\n"
+    }
+  }
+}
