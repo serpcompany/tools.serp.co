@@ -1,4 +1,5 @@
 import BatchHeroConverter from "@/components/BatchHeroConverter";
+import { StructuredData } from "@/components/StructuredData";
 import { AboutFormatsSection } from "@/components/sections/AboutFormatsSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { ToolsLinkHub } from "@/components/sections/ToolsLinkHub";
@@ -22,6 +23,8 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-background">
+      <StructuredData toolId={toolId} name={content.tool.title} description={content.tool.subtitle} />
+
       {/* Hero Section with Batch Tool */}
       <BatchHeroConverter
         toolId={content.tool.id}

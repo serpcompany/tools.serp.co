@@ -1,4 +1,5 @@
 import CsvCombiner from "@/components/CsvCombiner";
+import { StructuredData } from "@/components/StructuredData";
 import { AboutFormatsSection } from "@/components/sections/AboutFormatsSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { BlogSection } from "@/components/sections/BlogSection";
@@ -10,6 +11,9 @@ import { buildToolMetadata } from "@/lib/metadata";
 import { toolContent } from "@/lib/tool-content";
 
 const toolId = "csv-combiner";
+// The H1 and the line under it, which the structured data repeats.
+const heading = "CSV Combiner";
+const subtitle = "Merge multiple CSV files into one clean dataset without uploads.";
 
 export const generateMetadata = () => buildToolMetadata(toolId);
 
@@ -22,7 +26,9 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-background">
-      <CsvCombiner toolId={content.tool.id} />
+      <StructuredData toolId={toolId} name={heading} description={subtitle} />
+
+      <CsvCombiner toolId={content.tool.id} heading={heading} subtitle={subtitle} />
 
       {content.aboutSection && (
         <AboutFormatsSection

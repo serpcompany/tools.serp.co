@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import PdfTool from "@/components/PdfTool";
+import { StructuredData } from "@/components/StructuredData";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { ChangelogSection } from "@/components/sections/ChangelogSection";
 import { FAQSection } from "@/components/sections/FAQSection";
@@ -100,6 +101,8 @@ export default function PdfToolPage({ toolId }: PdfToolPageProps) {
 
   return (
     <main className="min-h-screen bg-background">
+      <StructuredData toolId={toolId} name={content.tool.title} description={content.tool.subtitle} />
+
       <PdfTool
         toolId={toolId}
         title={content.tool.title}
