@@ -1,0 +1,213 @@
+{
+  "tools": {
+    "mp4-to-m4a": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i recording.mp4 -c:a aac -vn -b:a 192k interview-audio.m4a. If the audio is already AAC, run ffmpeg -i recording.mp4 -vn -c:a copy interview-audio.m4a to copy the stream.",
+          "limits": "Needs an audio stream; stream copy can fail when the target container lacks information it needs.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "With the FFmpeg library installed, File > Import > Audio to open the MP4; File > Export Audio, then M4A (AAC) Files (FFmpeg) from the Format menu.",
+          "limits": "The AAC bitrate setting is not always honored; for stereo, settings of 196 kbps or less export at 196 to 198 kbps.",
+          "source": "https://manual.audacityteam.org/man/aac_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "app": "mpv",
+          "steps": "Run mpv recording.mp4 --vid=no --oac=aac --oacopts=b=192000 --o=interview-audio.m4a.",
+          "limits": "--o enables encoding mode; the output format follows the file name unless --of is set.",
+          "source": "https://mpv.io/manual/stable/"
+        }
+      ]
+    },
+    "png-to-tiff": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "File > Export As; pick TIFF, then choose a compression in the TIFF export dialog (None, LZW, Pack Bits, Deflate or JPEG).",
+          "limits": "The JPEG compression option is lossy.",
+          "source": "https://docs.gimp.org/3.0/en/file-tiff-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "Preview",
+          "steps": "Open the PNG; File > Export; choose TIFF from the Format menu; name the copy and click Save.",
+          "limits": "Mac only.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick graphic.png graphic.tiff.",
+          "limits": "The format list notes extensive strip, tile, endian and compression tag controls for TIFF.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSource": "https://imagemagick.org/command-line-processing/"
+        }
+      ]
+    },
+    "svg-to-jpeg": {
+      "methods": [
+        {
+          "app": "Inkscape",
+          "steps": "Open the SVG; File > Export; choose JPEG in the Export dialog's format list and set the export area and DPI; export.",
+          "limits": "Needs the Export dialog of Inkscape 1.2 or later.",
+          "source": "https://wiki.inkscape.org/wiki/Release_notes/1.2"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the SVG, which GIMP loads as an image; File > Export As, save in JPEG format and set Quality (0 to 100, default 85) in the dialog.",
+          "limits": "GIMP's JPEG export has no transparency or multiple layers; the SVG is rasterized.",
+          "source": "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+          "supportSource": [
+            "https://docs.gimp.org/3.0/en/gimp-using-paths-and-svg.html",
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick drawing.svg picture.jpg.",
+          "limits": "The format list says SVG is rendered through Inkscape, RSVG or the internal MSVG renderer.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "webm-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i capture.webm -c:v libx264 -c:a aac result.mov.",
+          "limits": "Add options to set the preset, size or frame rate; this example sets none.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "mpv",
+          "steps": "Run mpv capture.webm --ovc=libx264 --oac=aac --o=result.mov.",
+          "limits": "Uses mpv's encoding mode; the output format is picked from the file name unless --of is set.",
+          "source": "https://mpv.io/manual/stable/"
+        }
+      ]
+    },
+    "bmp-to-pdf": {
+      "methods": [
+        {
+          "app": "Preview",
+          "steps": "Open BMP; File > Export; choose PDF and save.",
+          "limits": "Mac only.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open BMP; File > Export As; give the file a .pdf name, then export.",
+          "limits": "Layers as pages is disabled for a single-layer image.",
+          "source": "https://docs.gimp.org/3.2/en/file-pdf-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick scan.bmp scan.pdf.",
+          "limits": "The format list says PDF requires Ghostscript.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "cr2-to-png": {
+      "methods": [
+        {
+          "app": "RawTherapee",
+          "steps": "Editor > the hard disk icon below the preview opens the Save window; choose PNG and a bit depth; save immediately or put in the queue.",
+          "limits": "Saving immediately keeps RawTherapee busy until the save finishes; the queue keeps the editor responsive.",
+          "source": "https://rawpedia.pixls.us/saving_images/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick cr2:photograph.cr2 photograph.png.",
+          "limits": "The format list marks CR2 read-only and requires the explicit cr2: specifier.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "flac-to-alac": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i album.flac -vn -c:a alac album.m4a.",
+          "limits": "Keep -vn when the FLAC has cover art, or FFmpeg may fail.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "gif-to-pdf": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open GIF; File > Export As; give the file a .pdf name; optionally choose Layers as pages.",
+          "limits": "Frames that depend on earlier frames can look incomplete as separate pages.",
+          "source": "https://docs.gimp.org/3.2/en/file-pdf-export.html",
+          "supportSource": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.0/en/file-gif-export.html"
+          ]
+        },
+        {
+          "app": "Preview",
+          "steps": "Open GIF; File > Export; choose PDF as the format.",
+          "limits": "Mac only.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick 'animation.gif[0]' still.pdf.",
+          "limits": "The format list says PDF requires Ghostscript.",
+          "source": "https://usage.imagemagick.org/files/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "jpg-to-tiff": {
+      "methods": [
+        {
+          "app": "Preview",
+          "steps": "Display JPEG; File > Export; set Format to TIFF; save a new file.",
+          "limits": "Mac only; no compression settings.",
+          "source": "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Import JPG; File > Export As; choose TIFF and pick a compression method in the TIFF dialog.",
+          "limits": "Avoid the JPEG compression option when the goal is to stop adding loss.",
+          "source": "https://docs.gimp.org/3.0/en/file-tiff-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick portrait.jpg portrait.tiff.",
+          "limits": "The format list notes controls for compression, strips, tiles and byte order.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSource": "https://imagemagick.org/command-line-processing/"
+        }
+      ]
+    },
+    "mkv-to-wav": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i movie.mkv -map 0:a:0 -vn -c:a pcm_s16le sound.wav; change the -map value to pick another audio stream.",
+          "limits": "Command line; list the streams first to choose the right one.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "mpv",
+          "steps": "Run mpv movie.mkv --vid=no --oac=pcm_s16le --o=sound.wav.",
+          "limits": "Uses mpv's encoding mode; the output format follows the file name.",
+          "source": "https://mpv.io/manual/stable/"
+        }
+      ]
+    }
+  }
+}
