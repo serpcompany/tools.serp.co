@@ -1,0 +1,224 @@
+{
+  "tools": {
+    "mp4-to-mp2": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i video.mp4 -vn -c:a mp2 -b:a 192k soundtrack.mp2.",
+          "limits": "-vn disables video; the MP2 encoder is in FFmpeg's audio codec list.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "With the optional FFmpeg library installed, import the MP4 audio; File > Export Audio; select MP2 in the Format list.",
+          "limits": "Import of MP4 needs the optional FFmpeg library; MP2 bit rate 16 to 384 kbps, default 160.",
+          "source": "https://manual.audacityteam.org/man/mp2_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "app": "TwoLAME plus FFmpeg",
+          "steps": "Run ffmpeg -i video.mp4 -vn -c:a pcm_s16le extracted.wav, then twolame -b 192 extracted.wav soundtrack.mp2.",
+          "limits": "Two-stage method; TwoLAME reads input through libsndfile and -b sets the total bitrate in kbps.",
+          "source": "https://raw.githubusercontent.com/njh/twolame/main/doc/twolame.1.txt",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mp4-to-mpeg2": {
+      "methods": [
+        {
+          "app": "FFmpeg general encode",
+          "steps": "Run ffmpeg -i source.mp4 -c:a mp2 -c:v mpeg2video converted.mpg.",
+          "limits": "Set destination-required parameters explicitly; the documentation lists MP2 audio and MPEG-2 video among supported codecs.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "FFmpeg DVD target",
+          "steps": "Run ffmpeg -i source.mp4 -target pal-dvd dvd-ready.mpg; the target type may be prefixed with pal-, ntsc- or film-.",
+          "limits": "Encoded media is not an authored DVD.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mpeg-to-gif": {
+      "methods": [
+        {
+          "app": "FFmpeg, one command",
+          "steps": "Run ffmpeg -i clip.mpeg animation.gif.",
+          "limits": "The GIF muxer loops indefinitely by default and cannot make the delay between frames smaller than one centisecond.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "FFmpeg, first seconds only",
+          "steps": "Run ffmpeg -t 5 -i clip.mpeg short.gif.",
+          "limits": "-t before -i limits the duration of data read from the input.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg with a palette",
+          "steps": "Run ffmpeg -i clip.mpeg -vf palettegen colors.png, then ffmpeg -i clip.mpeg -i colors.png -lavfi paletteuse animation.gif.",
+          "limits": "palettegen generates one palette for the whole video; paletteuse uses it to downsample the stream.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/filters.texi",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "mpg-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg transcoding",
+          "steps": "Run ffmpeg -i archive.mpg -c:a aac -c:v libx264 viewing.mov.",
+          "limits": "Fresh lossy encoding; select parameters required by the receiver.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "Run ffmpeg -i archive.mpg -c copy repacked.mov.",
+          "limits": "Only compatible streams can be muxed; the receiving application must decode them.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "nef-to-jpeg": {
+      "methods": [
+        {
+          "app": "Nikon NX Studio",
+          "steps": "Select pictures; click Export; choose JPEG, choose where to save, then Export.",
+          "limits": "Verify raw variant support and development choices.",
+          "source": "https://nikonimglib.com/nxstdo/onlinehelp/en/saving_pictures_in_other_formats_61.html",
+          "supportSource": "https://nikonimglib.com/nxstdo/onlinehelp/en/supported_formats_4.html"
+        },
+        {
+          "app": "darktable",
+          "steps": "Select a supported raw image; in export choose file on disk and JPEG, choose a location, then export.",
+          "limits": "Nikon high-efficiency NEFs are explicitly unsupported.",
+          "source": "https://docs.darktable.org/usermanual/development/en/overview/workflow/export/",
+          "supportSource": "https://www.darktable.org/resources/camera-support/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick source.nef sharing.jpeg.",
+          "limits": "The formats page lists NEF as readable and JPEG as readable and writable.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "ogv-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i source.ogv -c:a aac -c:v libx264 ogv-delivery.mp4.",
+          "limits": "Re-encodes rather than copying Ogg streams.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "VLC",
+          "steps": "Media > Convert/Save; add OGV, set a destination file and a Profile; Start.",
+          "limits": "The documented walkthrough does not list profile names; Ogg and Theora input are listed on the features page.",
+          "source": "https://docs.videolan.me/vlc-user/desktop/3.0/en/basic/tipsandtricks/index.html",
+          "supportSource": "https://www.videolan.org/vlc/features.html"
+        }
+      ]
+    },
+    "opus-to-wav": {
+      "methods": [
+        {
+          "app": "opusdec",
+          "steps": "Run opusdec message.opus decoded.wav.",
+          "limits": "opusdec writes WAVE output when the output filename ends in .wav.",
+          "source": "https://opus-codec.org/docs/opus-tools/opusdec.html",
+          "supportSource": "https://opus-codec.org/docs/opus-tools/opusdec.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i message.opus -c:a pcm_s16le editable.wav.",
+          "limits": "-vn removes video; the source encode's discarded detail is not restored.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "ppm-to-png": {
+      "methods": [
+        {
+          "app": "Netpbm pnmtopng",
+          "steps": "Run pnmtopng render.ppm > render.png.",
+          "limits": "Netpbm documents automatic maxval scaling to 255 or 65535.",
+          "source": "https://netpbm.sourceforge.net/doc/pnmtopng.html",
+          "supportSource": "https://netpbm.sourceforge.net/doc/ppm.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick render.ppm delivered.png.",
+          "limits": "The formats page lists PPM and PNG as readable and writable.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open PPM; File > Export As; export as PNG.",
+          "limits": "The export page gives the menu path; file-pnm.c shows PPM loading.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/common/file-pnm.c"
+        }
+      ]
+    },
+    "qt-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg encode",
+          "steps": "Run ffmpeg -i legacy.qt -c:a aac -c:v libx264 quicktime-delivery.mp4.",
+          "limits": "Re-encodes; source codecs must first be decodable.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "Run ffmpeg -i legacy.qt -c copy quicktime-remux.mp4.",
+          "limits": "Works only with streams the MP4 muxer can carry.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg, first seconds only",
+          "steps": "Run ffmpeg -t 10 -i legacy.qt -c:a aac -c:v libx264 first-ten.mp4.",
+          "limits": "-t before -i limits the duration of data read from the input.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "wmv-to-gif": {
+      "methods": [
+        {
+          "app": "Microsoft Clipchamp",
+          "steps": "Add WMV to a project; click Export; choose GIF.",
+          "limits": "GIF is offered for videos of 15 seconds or less.",
+          "source": "https://support.microsoft.com/en-us/clipchamp/exporting-and-saving-a-video-in-clipchamp",
+          "supportSource": "https://support.microsoft.com/en-us/clipchamp/video-file-formats-supported-by-clipchamp"
+        },
+        {
+          "app": "FFmpeg short excerpt",
+          "steps": "Run ffmpeg -t 4 -i training.wmv excerpt.gif.",
+          "limits": "-t before -i limits how much of the input is read.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg palette pipeline",
+          "steps": "Run ffmpeg -i training.wmv -vf palettegen wmv-colors.png, then ffmpeg -i training.wmv -i wmv-colors.png -lavfi paletteuse wmv-animation.gif.",
+          "limits": "Keep any trim and scale settings consistent across passes.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/filters.texi",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    }
+  }
+}

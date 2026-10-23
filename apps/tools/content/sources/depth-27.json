@@ -1,0 +1,218 @@
+{
+  "tools": {
+    "aac-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i voice.aac -c:a copy voice-container.mp4",
+          "limits": "Stream copy does no decoding or encoding; the aac demuxer reads ADTS AAC input.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "Bento4 mp4mux",
+          "steps": "mp4mux --track aac:voice.aac voice-muxed.mp4",
+          "limits": "The documented AAC input is ADTS.",
+          "source": "https://www.bento4.com/documentation/mp4mux/"
+        }
+      ]
+    },
+    "ai-to-jpeg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick brand.ai brand-proof.jpeg",
+          "limits": "The format list shows AI as readable; its PDF support requires Ghostscript.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "amr-to-wav": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i memo.amr memo-edit.wav",
+          "limits": "The codec documentation lists AMR-NB and AMR-WB decoders.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html"
+          ]
+        }
+      ]
+    },
+    "av1-to-mp4": {
+      "methods": [
+        {
+          "app": "GPAC MP4Box",
+          "steps": "MP4Box -add scene.av1 scene-av1.mp4",
+          "limits": "OBU, IVF or Annex B framing; :fps=1000 if timing is missing; :fmt=obu if the extension is not recognized; WebM is not supported.",
+          "source": "https://gpac.io/2018/10/27/official-av1-and-vp9-support-in-gpac/"
+        },
+        {
+          "app": "FFmpeg, stream copy",
+          "steps": "ffmpeg -i clip.av1 -c:v copy -an clip-copy.mp4",
+          "limits": "The MP4 still needs an AV1 decoder to play.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "FFmpeg, H.264",
+          "steps": "ffmpeg -i scene.av1 -c:v libx264 -an scene-h264.mp4",
+          "limits": "Decoding AV1 uses an external library.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        }
+      ]
+    },
+    "cdr-to-png": {
+      "methods": [
+        {
+          "app": "CorelDRAW: single export",
+          "steps": "File > Export; select PNG in the Save as type list; set the options; confirm.",
+          "limits": "Export provides raster formats such as PNG; Save As offers only vector formats.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111130/Main/EN/Documentation/CorelDRAW-Exporting-files.html",
+          "supportSources": [
+            "https://kb.corel.com/en/127992",
+            "https://www.coreldraw.com/en/learn/tutorials/how-to-open-cdr-file/"
+          ]
+        },
+        {
+          "app": "CorelDRAW: asset export",
+          "steps": "File > Export For > Multiple Files; add selected objects or page in Export docker; choose PNG; export.",
+          "limits": "Each asset gets its own PNG.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Export-assets.html"
+        },
+        {
+          "app": "LibreOffice Draw",
+          "steps": "Open the CDR; File > Export; choose PNG; set the PNG options.",
+          "limits": "The PNG options cover compression, interlacing, width, height and resolution.",
+          "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html",
+          "supportSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/00/00000200.html"
+          ]
+        }
+      ]
+    },
+    "dds-to-jpg": {
+      "methods": [
+        {
+          "app": "Microsoft DirectXTex",
+          "steps": "texconv -ft jpg material.dds",
+          "limits": "-ft accepts jpg and jpeg; --ignore-mips leaves the mipmap levels out.",
+          "source": "https://github.com/microsoft/DirectXTex/wiki/Texconv"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the DDS; export as JPEG; set the quality in the export dialog.",
+          "limits": "JPEG keeps no transparency and no layers; the quality default is 85.",
+          "source": "https://www.gimp.org/news/2019/04/07/gimp-2-10-10-released/",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick material.dds material-preview.jpg",
+          "limits": "The formats page marks DDS as readable and writable.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "dng-to-pdf": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick dng:archive-photo.dng archive-proof.pdf",
+          "limits": "The formats page marks DNG read-only with an explicit specifier; PDF writing requires Ghostscript.",
+          "source": "https://imagemagick.org/formats/",
+          "supportSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "docx-to-jpeg": {
+      "methods": [
+        {
+          "app": "Microsoft Word and ImageMagick",
+          "steps": "Word: File > Save a Copy > Browse; PDF; Save. Then magick statement.pdf statement-page.jpg.",
+          "limits": "PDF reading in ImageMagick needs Ghostscript.",
+          "source": "https://support.microsoft.com/en-us/office/collab-files/save-or-convert-to-pdf-or-xps-in-office-desktop-apps",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "LibreOffice Writer and ImageMagick",
+          "steps": "Open the DOCX in Writer; File > Export As > Export as PDF; magick report.pdf report-page.jpg.",
+          "limits": "The formats page marks PDF as readable and writable.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/01/ref_pdf_export.html",
+          "supportSources": [
+            "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html",
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "flac-to-aac": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i album.flac -c:a aac -b:a 192k album-listen.aac",
+          "limits": "The codec documentation describes the native AAC encoder as the default; the adts muxer accepts a single AAC stream.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "Audacity and qaac",
+          "steps": "Audacity: open the FLAC; File > Export Audio; WAV. Then qaac --adts -V 90 bridge.wav -o alternate.aac",
+          "limits": "qaac needs Apple Application Support and runs as a Windows console tool; -V is a quality scale, not a fixed bitrate.",
+          "source": "https://github.com/nu774/qaac/wiki/Command-Line-Options",
+          "supportSources": [
+            "https://github.com/nu774/qaac/wiki/Installation",
+            "https://manual.audacityteam.org/man/file_export_dialog.html",
+            "https://manual.audacityteam.org/man/importing_audio.html"
+          ]
+        }
+      ]
+    },
+    "flac-to-aiff": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i master.flac master-work.aiff",
+          "limits": "The general documentation lists AIFF muxing and demuxing and FLAC; the AIFF muxer's write_id3v2 option is off by default.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html",
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "SoX",
+          "steps": "sox master.flac master-working.aiff",
+          "limits": "FLAC support is optional; SoX's AIFF support does not include multiple audio chunks.",
+          "source": "https://raw.githubusercontent.com/chirlu/sox/master/sox.1",
+          "supportSources": [
+            "https://raw.githubusercontent.com/chirlu/sox/master/soxformat.7"
+          ]
+        }
+      ]
+    }
+  }
+}

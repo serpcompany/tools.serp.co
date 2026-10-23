@@ -1,0 +1,134 @@
+{
+  "tools": {
+    "html-to-svg": {
+      "methods": [
+        {
+          "app": "Inkscape",
+          "steps": "Take a full-page screenshot, choose File > Import in Inkscape and pick it; a dialog asks whether to link or embed the image, and embedding stores it inside the SVG file.",
+          "limits": "The SVG holds a picture, not editable text.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/import-pictures.html"
+        },
+        {
+          "app": "modern-screenshot",
+          "steps": "The library lists domToSvg among its functions; it runs inside a web page you control.",
+          "limits": "A developer route; the README gives no domToSvg example.",
+          "source": "https://github.com/qq15725/modern-screenshot"
+        },
+        {
+          "app": "XMLSerializer for existing inline artwork",
+          "steps": "new XMLSerializer().serializeToString(document.querySelector('svg')); save returned markup as .svg",
+          "limits": "Only extracts existing SVG, not the whole HTML page; fonts and styles must be resolved.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/API/XMLSerializer/serializeToString"
+        }
+      ]
+    },
+    "ico-to-svg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the ICO, choose File > Export As (Shift+Ctrl+E) and export it as SVG; in the Export Image as SVG dialog, Embed raster layers as PNG (always) includes raster layers as PNG images.",
+          "limits": "The SVG holds the picture. The Export As menu path and shortcut are on https://docs.gimp.org/3.0/en/gimp-file-export-as.html; GIMP opening ICO comes from the format reference.",
+          "source": "https://docs.gimp.org/3.2/en/file-svg-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick favicon.ico favicon.png, following the magick image.jpg image.png example; the formats table lists ICO as readable.",
+          "limits": "Saves a PNG, not an SVG.",
+          "source": "https://imagemagick.org/command-line-processing/"
+        },
+        {
+          "app": "Inkscape Trace Bitmap",
+          "steps": "File > Import a PNG, select it, Path > Trace Bitmap, Update for the preview, confirm with OK.",
+          "limits": "Not a 100% faithful vector copy; suits dark silhouettes on a bright background; color tracing makes one object per color.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/tracing-an-image.html"
+        }
+      ]
+    },
+    "jif-to-png": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the file (GIMP imports it as a new project in XCF), choose File > Export As (Shift+Ctrl+E), which stores the image in a format other than XCF, and export it as PNG.",
+          "limits": "JIF as input comes from the format reference (GIMP listed as opening JIF); the menu path and shortcut are on https://docs.gimp.org/3.0/en/gimp-file-export-as.html.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        }
+      ]
+    },
+    "jpg-to-tga": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPG, choose File > Export As (Shift+Ctrl+E) and export as TGA; the Export Image as TarGA dialog has a Use RLE compression checkbox and an Origin choice of Bottom left or Top left.",
+          "limits": "Origin only affects how the data is stored. The Export As menu path is on https://docs.gimp.org/3.0/en/gimp-file-export-as.html; opening a JPG as a new project is on https://docs.gimp.org/3.0/en/gimp-images-out.html.",
+          "source": "https://docs.gimp.org/3.2/en/file-tga-export.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick fabric-reference.jpg fabric-texture.tga (the magick input output pattern); the format table lists Truevision Targa as readable and writable.",
+          "limits": "Tested locally: a JPG converts to TGA with this command.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "m4r-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i personal-tone.m4r -vn -c:a libmp3lame -b:a 192k personal-alert.mp3; libmp3lame is the LAME wrapper and b sets the bitrate in bits/s for CBR or ABR.",
+          "limits": "The codecs page does not name M4R; the command was run locally on an M4R and exited 0.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame"
+        }
+      ]
+    },
+    "m4v-to-mov": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i family-film.m4v -c:v libx264 -crf 21 -c:a aac -b:a 160k family-review.mov",
+          "limits": "Needs an FFmpeg build with libx264; the settings differ from this page's.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mkv-to-webm": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i lecture-archive.mkv -c:v libvpx-vp9 -crf 31 -c:a libopus lecture-browser.webm",
+          "limits": "Page documents libvpx-vp9, crf and libopus; run locally, exit 0.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ]
+    },
+    "mov-to-m4a": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i interview-camera.mov -vn -c:a aac -b:a 192k interview-listening.m4a",
+          "limits": "Composed documented flags; requires valid audio stream and decoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mov-to-wmv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i presentation-source.mov -b:v 1800k presentation-legacy.wmv",
+          "limits": "ffmpeg.html documents -i, -b:v and guessing the output format from the extension; run locally with a .mov, exit 0; sets only the video bitrate.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mp3-to-webm": {
+      "methods": [
+        {
+          "app": "FFmpeg with Opus",
+          "steps": "ffmpeg -i spoken-note.mp3 -vn -c:a libopus -b:a 64k spoken-note-opus.webm",
+          "limits": "ffmpeg.html documents -vn, -c:a, -b:a and guessing the format from the extension; libopus is listed in ffmpeg-codecs.html; run locally on an MP3 with cover art, exit 0.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    }
+  }
+}
