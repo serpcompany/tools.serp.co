@@ -1,0 +1,140 @@
+{
+  "tools": {
+    "mp4-to-f4v": {
+      "methods": [
+        {
+          "app": "FFmpeg encoding",
+          "steps": "Run ffmpeg -i lesson.mp4 -c:v libx264 -c:a aac -f f4v lesson.f4v.",
+          "limits": "Composed documented encoding syntax; local F4V muxer and H.264/AAC encoders required.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "FFmpeg remuxing",
+          "steps": "For compatible H.264/AAC input, run ffmpeg -i compatible.mp4 -c copy -f f4v compatible.f4v.",
+          "limits": "Only suitable tracks can be copied; this is a different workflow from the site transcode.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/movenc.c"
+        }
+      ]
+    },
+    "mp4-to-m2ts": {
+      "methods": [
+        {
+          "app": "FFmpeg remux",
+          "steps": "Run ffmpeg -i concert.mp4 -c copy -mpegts_m2ts_mode 1 concert.m2ts.",
+          "limits": "Explicit M2TS mode; stream compatibility and automatic selection must be reviewed.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg transcode",
+          "steps": "Run ffmpeg -i delivery.mp4 -c:v libx264 -c:a ac3 -mpegts_m2ts_mode 1 delivery.m2ts.",
+          "limits": "Creates new lossy video/audio; not equivalent to site stream copying or guaranteed disc compliance.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mp4-to-rm": {
+      "methods": [
+        {
+          "app": "FFmpeg explicit RealVideo and audio",
+          "steps": "Run ffmpeg -i exhibit.mp4 -c:v rv10 -b:v 800k -c:a ac3 exhibit.rm.",
+          "limits": "Requires RV10/AC-3 encoder support and a player accepting this combination; composed documented syntax.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/rmenc.c"
+        },
+        {
+          "app": "FFmpeg silent RealVideo",
+          "steps": "Run ffmpeg -i display.mp4 -an -c:v rv20 -b:v 800k display.rm.",
+          "limits": "Intentionally discards all sound; local RV20 encoder and receiving-player support required.",
+          "source": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "mpeg-to-wmv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i seminar.mpeg -c:a wmav2 -b:v 1200k -c:v wmv2 seminar.wmv.",
+          "limits": "Names WMV2 video and WMA v2 audio; local encoders required.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "nef-to-pdf": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick selection.nef selection.pdf.",
+          "limits": "NEF is read-only and PDF readable and writable in the formats list; PDF output requires Ghostscript.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "orf-to-jpeg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick portrait.orf portrait.jpeg.",
+          "limits": "ORF is read-only and JPEG readable and writable in the formats list.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "orf-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick landscape.orf landscape.png.",
+          "limits": "ORF is read-only and PNG readable and writable in the formats list; PNG output requires libpng.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "pbm-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick stencil.pbm stencil.png.",
+          "limits": "PBM and PNG are both readable and writable in the formats list.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "In Python, run from PIL import Image, then Image.open(\"mask.pbm\").save(\"mask.png\").",
+          "limits": "Pillow reads plain and raw PBM and takes the output format from the file ending.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ]
+    },
+    "pcx-to-jpg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick archive.pcx archive.jpg.",
+          "limits": "PCX and JPEG are both readable and writable in the formats list.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "In Python, run from PIL import Image, then Image.open(\"clipart.pcx\").convert(\"RGB\").save(\"clipart.jpg\").",
+          "limits": "convert(\"RGB\") turns a palette image into RGB before the JPEG is written.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/tutorial.html"
+        }
+      ]
+    },
+    "pes-to-jpg": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick sampler.pes sampler.jpg.",
+          "limits": "PES is read-only and JPEG readable and writable in the formats list.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Ink/Stitch PNG",
+          "steps": "Open the PES with File > Open in Inkscape, then use File > Save a copy and pick PNG; save a JPG from that PNG in an image editor.",
+          "limits": "Ink/Stitch must be installed in Inkscape; PNG is one of its utility output formats.",
+          "source": "https://inkstitch.org/docs/file-formats/"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,812 @@
+{
+  "mp4-to-mts": {
+    "seo": {
+      "title": "Convert MP4 to MTS Online (Free)",
+      "h1": "MP4 to MTS Converter",
+      "description": "Repackage an MP4 as an MTS file in your browser. FFmpeg copies the video and audio without re-encoding, so the picture is unchanged and nothing is uploaded.",
+      "howToHeading": "How to convert MP4 to MTS"
+    },
+    "tool": {
+      "subtitle": "Repackage an MP4 as an MTS file without re-encoding the video or audio."
+    },
+    "faqs": [
+      {
+        "question": "Does MP4 to MTS re-encode the video?",
+        "answer": "No. FFmpeg runs with -c copy, so the existing video and audio streams are written into the new file as they are."
+      },
+      {
+        "question": "Is there a size or frame-rate limit?",
+        "answer": "Neither the 1920 px nor the 30 fps cap that the site's re-encoding video converters use applies here, because nothing is re-encoded. The page itself sets no file-size limit."
+      },
+      {
+        "question": "Will every MP4 convert with its sound?",
+        "answer": "If the transport stream can't hold one of the streams, FFmpeg doesn't stop. It may omit that stream or pass it along as data, with no error, so listen to the MTS before you delete the MP4."
+      },
+      {
+        "question": "Is the result a full AVCHD recording?",
+        "answer": "No. A camcorder normally keeps its MTS clips inside an AVCHD recording structure. This page writes a single clip and none of that structure."
+      },
+      {
+        "question": "Why would I need MTS instead of MP4?",
+        "answer": "An editor or player may expect camcorder-style .mts clips. Only the wrapper changes here, and whether a program accepts the file still depends on the codecs inside it."
+      },
+      {
+        "question": "Will the MTS be smaller than the MP4?",
+        "answer": "Not necessarily. Nothing is compressed again, and the transport stream adds its own packet overhead, so a short MP4 can come out larger as an MTS."
+      },
+      {
+        "question": "Can I send several MP4 clips together?",
+        "answer": "Add as many MP4 files as you like and they are processed in turn; every MTS is its own download, with no archive."
+      },
+      {
+        "question": "What is the converted file called?",
+        "answer": "It keeps the name of your MP4 and gets the .mts extension. The original MP4 isn't changed."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and MTS",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container defined in ISO/IEC 14496-14 that holds video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters"
+        ]
+      },
+      "toFormat": {
+        "name": "MTS",
+        "fullName": "AVCHD transport stream",
+        "description": "The file extension for video recorded by AVCHD camcorders. It is an MPEG transport stream containing H.264 video.",
+        "details": [
+          "AVCHD camera recordings",
+          "H.264 video",
+          "Dolby Digital or PCM audio"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to MTS",
+      "points": [
+        "Video and audio are copied with -c copy. Nothing is re-encoded.",
+        "The MTS keeps the MP4's frame size and frame rate; the 1920 px and 30 fps limits don't apply.",
+        "A stream the transport stream can't hold can be dropped or carried as data without an error, so play the result.",
+        "The MTS is one clip, not a camcorder's AVCHD folder."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 files",
+      "markdown": "### What is an MP4 file?\n\nFormally MPEG-4 Part 14 (ISO/IEC 14496-14), MP4 dates from 2003. Apple's QuickTime format was the ancestor of the ISO Base Media File Format that MP4 builds on, and the data sits in nested boxes.\n\nAs a container, MP4 doesn't fix one codec. H.264 video and AAC audio make the typical combination; the container can also carry streams such as Opus, MP3, VP9 or AV1.\n\n### Programs that open MP4 files\n\n- **Windows and Linux:** ffplay uses FFmpeg's MP4 demuxer and needs the matching decoders to play.\n- **Windows:** Premiere on Windows takes MP4 files when the right decoder is installed.\n- **Mac and Linux:** mpv plays MP4 and lets you select audio and subtitle streams during playback.\n\n### MP4 and MTS compared\n\n- **Extensions**: .mp4 and .mts.\n- **Container**: MP4 is a box-based file. MTS is an MPEG transport stream, the extension for video from AVCHD camcorders.\n- **Codecs**: H.264 video can sit in either wrapper, while AVCHD audio is Dolby Digital or linear PCM. The wrapper and the compressed video are independent layers, so streams can move across unchanged.\n- **Structure**: camcorder MTS clips normally sit in an AVCHD recording structure, which a single converted clip lacks.\n\nThe page runs FFmpeg with `-c copy`, so video and audio aren't re-encoded and the picture keeps its frame size and rate. The MTS can still end up larger than the original.\n\n### Other ways to convert MP4 to MTS\n\n- **FFmpeg, copying streams:** `ffmpeg -i event-delivery.mp4 -c copy event-transport.mts`. FFmpeg's documentation says stream copy doesn't re-encode, and that the output format is guessed from the file extension. Read the log for streams that were dropped.\n- **FFmpeg, encoding the video again:** `ffmpeg -i editor-source.mp4 -c:v libx264 -c:a copy editor-transport.mts` encodes the video with libx264 and copies the audio. Your FFmpeg needs that encoder.\n- **Prism (Windows):** add the MP4 with Add File(s), pick a Save to Folder, select MTS under Output Format, open Encoder Options to change settings, and press Convert. NCH's product page lists MP4 as an input and MTS as an output.\n\n### Problems with MP4 files\n\n- **The MP4 won't play**: a recognized container says nothing about the codecs inside it, which need their own decoders. Try mpv or ffplay.\n- **An unfinished recording**: because an MP4 gathers its packet metadata in one structure, a write that stopped early may leave a file that won't play. FFmpeg may still convert what it can read, giving a shorter MTS.\n- **Sound missing from the MTS**: FFmpeg can leave out a stream the transport stream can't hold, or carry it as a data stream, and reports no error. Play the MTS before deleting the MP4.\n"
+    }
+  },
+  "pcd-to-jpg": {
+    "seo": {
+      "title": "Convert PCD to JPG Online (Free)",
+      "h1": "PCD to JPG Converter",
+      "description": "Convert a Kodak Photo CD PCD file to a JPG in your browser. ImageMagick writes one image from the file, and your PCD never leaves your device. Free.",
+      "howToHeading": "How to convert PCD to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a Kodak Photo CD PCD file into a JPG that opens in any viewer."
+    },
+    "faqs": [
+      {
+        "question": "What is a PCD file?",
+        "answer": "Here it is a Kodak Photo CD image, the format of Kodak's Photo CD system. One file stores the same photo at multiple sizes."
+      },
+      {
+        "question": "How do I open a PCD file?",
+        "answer": "IrfanView and ImageMagick both read PCD. A JPG, which this page writes, opens in any web browser."
+      },
+      {
+        "question": "Can I choose the resolution of the JPG?",
+        "answer": "No. The page has no size or resolution setting and writes one JPG for each PCD."
+      },
+      {
+        "question": "Is the JPG quality adjustable?",
+        "answer": "No quality value is passed by the page. To choose one yourself, decode with hpcdtoppm and run pnmtojpeg, whose -quality option takes 0 to 100."
+      },
+      {
+        "question": "How do I get the largest Photo CD size?",
+        "answer": "With hpcdtoppm, whose -5 option extracts the 16Base image, 2048 by 3072 pixels."
+      },
+      {
+        "question": "Why is the JPG from overview.pcd so small?",
+        "answer": "The overview file supplies thumbnails for a contact sheet, at Base/16 size, 128 by 192 pixels. Convert the numbered image files in the photo_cd/images folder instead."
+      },
+      {
+        "question": "Can I convert several PCD files at once?",
+        "answer": "Yes, select more than one. They are processed in sequence and every JPG is a separate download, with no ZIP."
+      },
+      {
+        "question": "What is the JPG called, and is my PCD changed?",
+        "answer": "The JPG takes the name of your PCD with a .jpg extension, and the PCD itself is left as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "PCD and JPG",
+      "fromFormat": {
+        "name": "PCD",
+        "fullName": "Kodak Photo CD",
+        "description": "The image format of Kodak's Photo CD system, introduced in 1992. Each file holds one photo at several resolutions.",
+        "details": [
+          "thumbnail to high resolution",
+          "scanned photographs",
+          "opened by XnView MP and IrfanView"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format defined by ISO/IEC 10918-1, designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "opens everywhere",
+          "lossy compression",
+          "one image per file"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PCD to JPG",
+      "points": [
+        "The page writes one JPG for each PCD and has no resolution setting.",
+        "No JPEG quality value is passed.",
+        "overview.pcd holds only thumbnails; convert the numbered image files for a full picture.",
+        "Several PCD files run one after another, each downloaded as its own JPG."
+      ]
+    },
+    "guide": {
+      "title": "About PCD files",
+      "markdown": "### What is a PCD file?\n\nPCD is the image format of Kodak's Photo CD system, introduced in 1992. Each file holds one photo at several resolutions, from a thumbnail up to high resolution. Photo CD defines sizes from 128 by 192 to 2048 by 3072 pixels, and ProPhotoCD adds 4096 by 6144. The image stores luminance at full resolution and chromaticity at half resolution.\n\nA standard Photo CD places numbered .pcd images in photo_cd/images. The overview.pcd file supplies the thumbnails for a contact sheet.\n\n### Programs that open PCD files\n\n- **Windows:** IrfanView is free for noncommercial use and reads PCD. Its Photo-CD plug-in adds high-resolution decoding.\n- **Windows, Mac and Linux:** ImageMagick is a free command-line reader and writer for Photo CD, with a documented write limit of 768 by 512 pixels.\n- **Mac and Linux:** hpcdtoppm is the decoder Netpbm documents; it is distributed separately under restrictive licensing.\n\n### PCD and JPG compared\n\n- **Extensions**: .pcd and .jpg. A .jpeg file is the same format as .jpg.\n- **Content**: a PCD stores several resolutions of one photo. A JPG stores a single image.\n- **Compression**: JPG is lossy and its quality is usually chosen between 0 and 100. Each channel gets 8 bits, and transparency isn't possible.\n\nImageMagick reads the PCD here and one JPG comes out. No quality value is passed and there is no resolution setting. Above about 537 megapixels, a picture is turned away.\n\n### Other ways to convert PCD to JPG\n\n- **ImageMagick:** `magick family-scan.pcd family-view.jpg`. ImageMagick's format list shows PCD as readable and writable.\n- **IrfanView (Windows):** open the PCD, then use File > Save as, choose JPG as the output format, set the name and folder, and save. Install the Photo-CD plug-in for high-resolution decoding.\n- **hpcdtoppm and Netpbm:** `hpcdtoppm archive-image.pcd -ppm -5 archive-image.ppm` writes a PPM at the 16Base size, then `pnmtojpeg -quality=90 archive-image.ppm > archive-image.jpg` writes the JPG. Netpbm says hpcdtoppm may not be sold or used in profit-making activity.\n\n### Problems with PCD files\n\n- **A tiny picture**: overview.pcd is only Base/16 resolution. Use the numbered image file for a larger picture.\n- **The highest ProPhotoCD size is missing**: it needs its extension files and the original directory layout, so copying one PCD alone can lose it.\n- **A program can't open the file**: GraphicConverter's Mac App Store edition doesn't import PhotoCD. IrfanView and ImageMagick do.\n"
+    }
+  },
+  "psd-to-webp": {
+    "seo": {
+      "title": "Convert PSD to WebP Online (Free)",
+      "h1": "PSD to WebP Converter",
+      "description": "Turn a Photoshop PSD into a WebP picture in your browser. ImageMagick writes one image, so layers and masks don't carry over. Free, with no sign-up.",
+      "howToHeading": "How to convert PSD to WebP"
+    },
+    "tool": {
+      "subtitle": "Turn a Photoshop PSD into a WebP picture. Layers are not kept."
+    },
+    "faqs": [
+      {
+        "question": "Does the WebP keep my Photoshop layers?",
+        "answer": "No. The converter takes one image from the PSD and writes one WebP, so layers, masks and text objects stay behind in the PSD."
+      },
+      {
+        "question": "Do I get one WebP per layer?",
+        "answer": "No. A layered PSD gives one picture, not one file per layer."
+      },
+      {
+        "question": "Can I pick which layer or version goes into the WebP?",
+        "answer": "No. The page passes no layer or page option. Open the WebP to check that it shows the design you wanted."
+      },
+      {
+        "question": "Can I set the WebP quality or make it lossless?",
+        "answer": "The page passes none. For control, GIMP's WebP export offers a Lossless option plus separate image quality and alpha quality settings."
+      },
+      {
+        "question": "Can I turn the WebP back into layers?",
+        "answer": "No. A flat export doesn't retain the PSD's layer and mask information, so keep the PSD as your editing file."
+      },
+      {
+        "question": "Is a very large PSD a problem?",
+        "answer": "Yes, past about 537 megapixels. The page then declines and says the picture is too large for it."
+      },
+      {
+        "question": "Can I convert a batch of PSD files?",
+        "answer": "Yes. With several PSD files selected, you get one WebP per file, produced in sequence and without any archive."
+      },
+      {
+        "question": "Does my PSD change, and what is the WebP named?",
+        "answer": "The WebP takes the name of your PSD with a .webp extension. The PSD is left as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "PSD and WebP",
+      "fromFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
+        "details": [
+          "layers and masks",
+          "editable text",
+          "opens in Photoshop and GIMP"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "lossy and lossless",
+          "transparency",
+          "shown directly by browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PSD to WebP",
+      "points": [
+        "You get one WebP; layers, masks and text stay in the PSD.",
+        "The page reads one image and has no layer option.",
+        "No quality value is passed.",
+        "Keep the PSD as your editing master."
+      ]
+    },
+    "guide": {
+      "title": "About PSD files",
+      "markdown": "### What is a PSD file?\n\nAdobe Photoshop saves its documents as PSD. The file starts with the 8BPS signature, and separate sections store the image resources and the layer and mask information. Sample depth can be 1, 8, 16 or 32 bits, and pixel data may be raw, RLE-coded or ZIP-compressed. Each side can reach 30,000 pixels, and the PSB variant lifts that cap.\n\n### Programs that open PSD files\n\n- **Windows, Mac and Linux:** Open PSD in ImageMagick.\n- **Windows, Mac and Linux:** XnView MP lists PSD among its formats, and a company needs a license.\n- **Web:** Photopea, a web editor, treats PSD as its main document format and loads files via File > Open.\n\n### PSD and WebP compared\n\n- **Extensions**: .psd and .webp.\n- **Layers**: layers and masks live in the PSD only; a flattened export loses them, and the WebP made here is a single picture.\n- **Format**: WebP wraps VP8-based lossy data, or its own lossless method, in a RIFF container, and it can carry transparency, animation, color profiles and metadata.\n- **Size**: a WebP is at most 16383 by 16383 pixels.\n\nImageMagick reads a single image from the PSD here and the WebP is written from it. No quality value is passed and a layer can't be chosen. Pictures past about 537 megapixels get a 'too large to convert here' refusal.\n\n### Other ways to convert PSD to WebP\n\n- **ImageMagick:** `magick campaign.psd campaign.webp`. ImageMagick's format list shows both PSD and WebP as readable and writable.\n- **GIMP:** load the PSD, pick File > Export As and save it as WebP. Settings in its WebP dialog include Lossless, Image quality, Alpha quality and Save animation, plus metadata options; keep Save animation off for a still picture.\n\n### Problems with PSD files\n\n- **Layers and masks vanish**: a flat export doesn't retain them. Keep the PSD for editing.\n- **A canvas past the limit**: a document over 30,000 pixels a side needs PSB, not PSD.\n- **A program shows the PSD differently**: third-party readers must interpret Photoshop-specific data, so a preview in one doesn't prove full editing compatibility. Compare against Photoshop.\n- **An oversized document**: the page won't take a picture beyond about 537 megapixels.\n"
+    }
+  },
+  "raf-to-jpeg": {
+    "seo": {
+      "title": "Convert RAF to JPEG Online (Free)",
+      "h1": "RAF to JPEG Converter",
+      "description": "Convert a Fujifilm RAF raw photo to a JPEG in your browser. ImageMagick decodes the file on your device, and the RAF stays unchanged. Free, no sign-up.",
+      "howToHeading": "How to convert RAF to JPEG"
+    },
+    "tool": {
+      "subtitle": "Convert a Fujifilm RAF raw photo into a JPEG without uploading it."
+    },
+    "faqs": [
+      {
+        "question": "What kind of file is a RAF?",
+        "answer": "RAF is Fujifilm's own camera RAW format. It stores unprocessed sensor data together with an embedded JPEG preview, so it has to be developed or converted before most programs can show it."
+      },
+      {
+        "question": "How do I open a RAF file?",
+        "answer": "Fujifilm's RAW FILE CONVERTER EX develops RAF data, and darktable and ImageMagick read it. FUJIFILM X RAW STUDIO converts it with a connected compatible camera's processor."
+      },
+      {
+        "question": "Will the JPEG look like my camera's Film Simulation?",
+        "answer": "No Film Simulation option exists on this page. Fujifilm's RAW FILE CONVERTER EX can apply a Film Simulation while it develops RAF data."
+      },
+      {
+        "question": "Can I choose the JPEG quality?",
+        "answer": "No. This page sends no quality value to the converter. For a chosen quality, export from darktable, which has a quality setting in its export module."
+      },
+      {
+        "question": "Why does a program refuse my RAF?",
+        "answer": "Software has to understand the losslessly compressed RAW variant, and a newer camera model may need a converter update, so look at the program's camera list."
+      },
+      {
+        "question": "My camera saved a JPEG next to the RAF. Do I need this?",
+        "answer": "With RAW+JPEG recording the camera saves a ready-to-use JPEG alongside the RAW capture. Use this page when you only have the RAF or want a JPEG made from it."
+      },
+      {
+        "question": "Should I delete the RAF afterward?",
+        "answer": "No. The JPEG is lossy and the RAF still holds the unprocessed sensor data, so hold on to the RAF for any later processing."
+      },
+      {
+        "question": "Can I convert many RAF files, and what are they called?",
+        "answer": "Yes. The files are converted in turn, and each JPEG is a separate download that keeps its RAF's name with .jpeg on the end."
+      }
+    ],
+    "aboutSection": {
+      "title": "RAF and JPEG",
+      "fromFormat": {
+        "name": "RAF",
+        "fullName": "Fujifilm RAW",
+        "description": "The raw image format of Fujifilm digital cameras. It stores unprocessed sensor data together with an embedded JPEG preview.",
+        "details": [
+          "unprocessed sensor data",
+          "embedded JPEG preview",
+          "opens in RawTherapee and darktable"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format defined by ISO/IEC 10918-1, designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "opens everywhere",
+          "lossy compression",
+          "no transparency"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting RAF to JPEG",
+      "points": [
+        "The page has no Film Simulation setting.",
+        "No JPEG quality value is passed.",
+        "The page writes one JPEG for each RAF and leaves the RAF unchanged.",
+        "Keep the RAF for later processing."
+      ]
+    },
+    "guide": {
+      "title": "About RAF files",
+      "markdown": "### What is a RAF file?\n\nFujifilm describes RAF as its original camera RAW format. On a camera like the X-T3, RAF data can be recorded uncompressed or with lossless compression, which is reversible. A RAF also carries an embedded JPEG preview, and RAW+JPEG recording saves a ready-to-use JPEG next to the RAW capture.\n\nFujifilm's RAW converter develops RAF data from X-series cameras, and it can apply a Film Simulation during development.\n\n### Programs that open RAF files\n\n- **Windows and Mac:** Fujifilm's development software is RAW FILE CONVERTER EX powered by SILKYPIX, which has a camera compatibility list to check.\n- **Windows and Mac:** FUJIFILM X RAW STUDIO hands the RAW conversion to the image processor of a compatible camera that is connected.\n- **Windows, Mac and Linux:** ImageMagick lists RAF among the camera RAW formats it reads.\n- **Linux:** darktable recognizes RAF for import, and its camera support comes from the RawSpeed library.\n\n### RAF and JPEG compared\n\n- **Extensions**: .raf and .jpeg. The .jpg extension is the same format.\n- **Data**: a RAF holds unprocessed sensor data in a proprietary Fujifilm format. A JPEG is a developed picture with lossy compression, 8 bits per channel and no transparency.\n- **Quality**: a JPEG's quality is normally chosen on a scale from 0 to 100.\n\nImageMagick reads the RAF on this page and a JPEG is written. There is no quality value and no Film Simulation setting.\n\n### Other ways to convert RAF to JPEG\n\n- **RawTherapee:** in the Editor, click the hard disk icon at the bottom left of the preview, set the name, location and format in the dialog, then choose Save immediately or put the file in the processing queue.\n- **darktable:** in the export module, choose file on disk as the target and the file format, set the quality and size, then press Export.\n- **ImageMagick:** `magick mountain-capture.raf mountain-delivery.jpeg`. ImageMagick's format list shows RAF as readable.\n\n### Problems with RAF files\n\n- **A losslessly compressed RAF won't open**: the program needs to understand that RAW variant.\n- **A new camera model isn't recognized**: the converter may need an update, and Fujifilm publishes model support additions.\n- **X RAW STUDIO won't convert**: it needs a supported camera connected, and it doesn't use the computer's CPU for the conversion.\n"
+    }
+  },
+  "tif-to-tiff": {
+    "seo": {
+      "title": "Convert TIF to TIFF Online (Free)",
+      "h1": "TIF to TIFF Converter",
+      "description": "TIF and TIFF are the same format. To get a new .tiff file, ImageMagick reads one image from your TIF and writes it in your browser. Free, no sign-up.",
+      "howToHeading": "How to convert TIF to TIFF"
+    },
+    "tool": {
+      "subtitle": "Write a TIF as a new .tiff file. Both extensions mean the same format."
+    },
+    "faqs": [
+      {
+        "question": "Is TIF different from TIFF?",
+        "answer": "No. The extensions .tif and .tiff both refer to the Tagged Image File Format, with the media type image/tiff."
+      },
+      {
+        "question": "Do I need to convert a TIF to get a TIFF?",
+        "answer": "If a program only wants the .tiff spelling, renaming a copy gives the same format. Use this page when you want a new .tiff file written from the image."
+      },
+      {
+        "question": "What does this converter actually do?",
+        "answer": "It reads one image from your TIF and writes it as a new .tiff file, named after the original. The original TIF is not changed."
+      },
+      {
+        "question": "Does a multi-page TIF stay multi-page?",
+        "answer": "No. Just one image gets read, so the output is a single picture rather than a page each. To keep every page, rename a copy of the file instead."
+      },
+      {
+        "question": "Can I choose the compression?",
+        "answer": "No. The page sets no compression or quality option. GIMP's TIFF export dialog lets you pick None, LZW, Pack Bits, Deflate or JPEG compression."
+      },
+      {
+        "question": "Why won't my program open the TIFF?",
+        "answer": "Readers differ in the compression methods, color representations and private tags they understand, so the .tiff extension isn't the cause. Try saving with another compression."
+      },
+      {
+        "question": "Can I run a batch of TIF files?",
+        "answer": "Yes. Several TIF files go through one by one, and each leaves as its own TIFF download rather than inside a ZIP."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "There's no general file-size cap. The single exception is a picture above roughly 537 megapixels, which the page refuses."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIF and TIFF",
+      "fromFormat": {
+        "name": "TIF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. TIF is the short spelling of TIFF.",
+        "details": [
+          "one or more images",
+          "many compression options",
+          "scans and print masters"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "The same format with the longer extension. It stores one or more images with a tag-based structure.",
+        "details": [
+          "same format as TIF",
+          "opens in Preview and GIMP",
+          "no quality difference"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIF to TIFF",
+      "points": [
+        "TIF and TIFF are the same format, so renaming a copy often does the job.",
+        "The page reads one image and doesn't keep every page of a multi-page file.",
+        "You can't choose the compression.",
+        "Keep your original TIF master."
+      ]
+    },
+    "guide": {
+      "title": "About TIF files",
+      "markdown": "### What is a TIF file?\n\nTIFF, the Tagged Image File Format, is frequently abbreviated TIF. Aldus and Microsoft developed it as a tag-based raster wrapper, the 6.0 revision was issued in 1992, and Adobe holds the specification today. Scanning and archiving, professional photography and print, and fax and document imaging are typical uses.\n\nCompression methods and color representations vary from one file to the next, and one file may hold several images, a fit for scanned document sequences. High-bit-depth work and preservation masters are established uses. Either extension names the same format; its media type is image/tiff.\n\n### Programs that open TIF files\n\n- **Windows and Linux:** ImageMagick handles TIF files in both directions, and its switches cover compression, strips, tiles and byte order.\n- **Windows and Linux:** GIMP opens TIF as an image to edit.\n- **Mac:** Preview offers TIFF in the Format menu of File > Export.\n\n### TIF and TIFF compared\n\n- **Extensions**: .tif and .tiff.\n- **Format**: identical, so a program that reads one reads the other.\n- **Rename**: a copy renamed to the other spelling is the same file.\n\nHere, more than a rename happens: ImageMagick reads one image from the TIF and writes a fresh .tiff file. A multi-page TIF gives a single picture, and no compression option is passed.\n\n### Other ways to convert TIF to TIFF\n\n- **ImageMagick:** `magick contract-scan.tif contract-page.tiff` reads the TIF and writes a new .tiff file.\n- **GIMP:** open the TIF and use File > Export As. The TIFF export dialog has Compression (None, LZW, Pack Bits, Deflate, JPEG), Save layers, which stores each layer as a separate TIFF page, and metadata options.\n- **Preview (Mac):** with the file open, use File > Export, set the Format menu to TIFF and click Save.\n\n### Problems with TIF files\n\n- **Pages are missing**: a TIFF may hold several images, and this page converts one. Use software that exposes the full image sequence.\n- **A program refuses the file**: private tags, including some color-profile extensions, aren't understood by every reader.\n- **A file over 4 GB**: 32-bit offsets in classic TIFF limit it to about 4 GB; the BigTIFF variant extends those fields.\n- **A giant scan**: this page refuses anything past about 537 megapixels.\n"
+    }
+  },
+  "tif-to-webp": {
+    "seo": {
+      "title": "Convert TIF to WebP Online (Free)",
+      "h1": "TIF to WebP Converter",
+      "description": "Convert a TIF scan or photo to WebP in your browser. ImageMagick reads one image from the TIF, so a multi-page file gives one picture. Nothing is uploaded.",
+      "howToHeading": "How to convert TIF to WebP"
+    },
+    "tool": {
+      "subtitle": "Turn a TIF into a WebP picture. A multi-page TIF gives one image."
+    },
+    "faqs": [
+      {
+        "question": "What is a TIF file and what opens it?",
+        "answer": "TIF is the short form of TIFF, the Tagged Image File Format behind many scans, print jobs and document images. It opens in Preview on macOS, in Windows Photos, in GIMP and in Adobe Photoshop."
+      },
+      {
+        "question": "What happens to the other pages of a multi-page TIF?",
+        "answer": "The converter takes a single image, so one WebP comes out and the other pages are left behind."
+      },
+      {
+        "question": "Can I choose how compressed the WebP is?",
+        "answer": "No setting is exposed here. A tool that has one is GIMP, whose WebP export includes Lossless, Image quality and Alpha quality controls."
+      },
+      {
+        "question": "How do I save a TIF as WebP in GIMP?",
+        "answer": "Open the TIF in GIMP and export it as WebP from the File menu. Keep Save animation off when you want a still picture."
+      },
+      {
+        "question": "Why does a large scan stop at the WebP size limit?",
+        "answer": "WebP images can't exceed 16,383 pixels on either axis. A TIF scanned past that on one side doesn't fit the format."
+      },
+      {
+        "question": "Does this page accept .tiff files?",
+        "answer": "The file picker lists .tif only. TIF and TIFF are the same format, so you can rename a copy with the .tif extension first."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "No general file-size limit applies. The one refusal is for a picture above about 537 megapixels, which gets a too-large-to-convert message."
+      },
+      {
+        "question": "What name does the WebP get, and is the TIF touched?",
+        "answer": "Your TIF's name is reused with .webp on the end, and the TIF itself is left alone. When you pick several files they go through in turn, each producing its own download."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIF and WebP",
+      "fromFormat": {
+        "name": "TIF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "scans and archives",
+          "multiple pages in one file",
+          "high bit depth"
+        ]
+      },
+      "toFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "lossy and lossless",
+          "transparency",
+          "shown by browsers"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIF to WebP",
+      "points": [
+        "The page reads one image from the TIF and gives one WebP.",
+        "No quality setting is passed.",
+        "WebP is limited to 16,383 pixels on each axis.",
+        "Keep the TIF as your master copy."
+      ]
+    },
+    "guide": {
+      "title": "About TIF files",
+      "markdown": "### What is a TIF file?\n\nTIF is short for TIFF, the Tagged Image File Format. Aldus published it first in 1986, and Adobe has maintained it since. It wraps images in a tag-based structure and offers many compression options, so a single file can be lossless or lossy.\n\nA TIF can hold several images, which suits scanned document sequences. Scanning, archiving, professional photography, print work, and fax and document imaging are its usual jobs. The .tif and .tiff extensions are one format under two spellings.\n\n### Programs that open TIF files\n\n- **Windows, Mac and Linux:** GIMP can load TIF files for editing.\n- **Windows, Mac and Linux:** ImageMagick reads TIFF from the command line, which on the Mac means Terminal.\n- **Mac:** Preview lists TIFF among its export formats.\n\n### TIF and WebP compared\n\n- **Extensions**: .tif and .webp.\n- **Pages**: a TIF can hold several images. A WebP is one picture, and this page reads one image from the TIF.\n- **Compression**: lossy WebP is based on the VP8 codec from video, with a lossless mode, transparency and animation also on offer. An ICC profile plus Exif and XMP metadata fit inside.\n- **Size**: WebP stops at 16,383 pixels on each side.\n\nNo quality setting is passed. Beyond roughly 537 megapixels the converter refuses with a too-large message. RFC 9649 documents WebP and registers its image/webp media type.\n\n### Other ways to convert TIF to WebP\n\n- **GIMP:** after opening the TIF, choose File > Export As and write a WebP. Its dialog covers Lossless, Image quality, Alpha quality, animation and metadata settings.\n- **ImageMagick:** `magick brochure-master.tif brochure-cover.webp`. ImageMagick's format list shows both TIFF and WebP as readable and writable.\n\n### Problems with TIF files\n\n- **Only one page arrives**: the TIF may contain several images, but this converter handles a single one.\n- **The TIF won't open elsewhere**: readers differ in which compression methods and private tags they support.\n- **A scan is too big for WebP**: a side past 16,383 pixels doesn't fit.\n- **Over 4 GB**: offsets in classic TIFF are 32 bits wide, so a file tops out near 4 GB unless it is BigTIFF.\n- **A picture past the ceiling**: about 537 megapixels is as far as this page goes before refusing.\n"
+    }
+  },
+  "ts-to-mkv": {
+    "seo": {
+      "title": "Convert TS to MKV Online (Free)",
+      "h1": "TS to MKV Converter",
+      "description": "Convert a TS transport stream to MKV in your browser. FFmpeg re-encodes the video as H.264 and the audio as AAC. Nothing is uploaded.",
+      "howToHeading": "How to convert TS to MKV"
+    },
+    "tool": {
+      "subtitle": "Re-encode a TS recording as an H.264 and AAC Matroska file in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does TS to MKV re-encode the video?",
+        "answer": "Yes. The video goes through libx264 (H.264) with the ultrafast preset at CRF 32, and the audio becomes AAC at 96 kb/s. Nothing is copied across as it is."
+      },
+      {
+        "question": "What frame size and frame rate does the MKV have?",
+        "answer": "Both carry over from the source up to 1920 px on the longer edge and 30 fps, and no further. Smaller pictures are never enlarged, and a width or height that is odd gives up 1 px."
+      },
+      {
+        "question": "What happens to a TS above 30 fps?",
+        "answer": "Frames are dropped to stay at 30 fps, and the video keeps its length. It isn't slowed down."
+      },
+      {
+        "question": "How do I change containers without re-encoding?",
+        "answer": "Use a tool that copies the streams, such as FFmpeg with -c copy or MKVToolNix's mkvmerge. They are listed below. The page itself always re-encodes."
+      },
+      {
+        "question": "My TS recording has errors. Will it still convert?",
+        "answer": "In most cases, yes: FFmpeg records the error in its log and writes out whatever was readable, which can leave the MKV shorter than the recording."
+      },
+      {
+        "question": "Is there a size limit or a time limit?",
+        "answer": "No. Neither limit is set by the page; a lengthy recording simply keeps your device busy for as long as it needs."
+      },
+      {
+        "question": "Can I convert several TS files at once?",
+        "answer": "Yes. Your TS files are converted one at a time, and each MKV downloads on its own with no ZIP."
+      },
+      {
+        "question": "How is the MKV named, and what happens to the TS?",
+        "answer": "The MKV keeps your TS file's name with a .mkv extension, and the TS itself is not modified."
+      }
+    ],
+    "aboutSection": {
+      "title": "TS and MKV",
+      "fromFormat": {
+        "name": "TS",
+        "fullName": "MPEG transport stream",
+        "description": "A container standardized in MPEG-2 Systems (ISO/IEC 13818-1) for broadcasting. It splits video, audio and data into small fixed-size packets so streams survive transmission errors.",
+        "details": [
+          "digital TV recordings",
+          "188-byte packets",
+          "HLS segments"
+        ]
+      },
+      "toFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "An open, free container format that can hold unlimited video, audio, picture and subtitle tracks in one file. WebM is a subset of Matroska.",
+        "details": [
+          "many tracks",
+          "chapters and metadata",
+          "open standard"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TS to MKV",
+      "points": [
+        "The video is re-encoded as H.264 and the audio as AAC at 96 kb/s.",
+        "The picture stays within 1920 px and 30 fps; a faster source loses frames but keeps its length.",
+        "An odd width or height loses 1 px.",
+        "For a copy without re-encoding, use FFmpeg -c copy or mkvmerge."
+      ]
+    },
+    "guide": {
+      "title": "About TS files",
+      "markdown": "### What is a TS file?\n\nA TS file holds an MPEG-2 transport stream, a system format from the ISO/IEC 13818-1 standard. Instead of defining a picture codec, it interleaves video and sound that were coded separately, cut into 188-byte packets. Several programs with their own clocks can share one stream.\n\nBroadcast distribution and error-prone transmission are the important uses, and HLS streaming segments and Blu-ray and camcorder recordings rely on it too. Timestamps in the stream coordinate presentation and decoder buffering. The usual extension is .ts, with video/mp2t as the registered media type.\n\n### Programs that open TS files\n\n- **Windows, Mac and Linux:** FFmpeg reads transport streams, and on the Mac you use it from the command line.\n- **Windows, Mac and Linux:** VLC media player lists TS as one of its input formats.\n- **Mobile:** On a phone, VLC for Android lists TS input; decoding still depends on the media in the stream.\n\n### TS and MKV compared\n\n- **Extensions**: .ts and .mkv.\n- **Purpose**: TS suits broadcasting and survives transmission errors. Matroska is an open container for any number of video, audio, picture and subtitle tracks, and chapters and tags belong to its design.\n- **Codecs**: neither container prescribes a codec; Matroska doesn't fix a compression method or quality level.\n\nOn this page the video is rewritten as H.264 and the audio as AAC at 96 kb/s, with the picture held to 1920 px and 30 fps. IANA registers video/matroska as the media type for Matroska video.\n\n### Other ways to convert TS to MKV\n\n- **FFmpeg:** `ffmpeg -i broadcast-segment.ts -c copy broadcast-segment.mkv` copies the streams without re-encoding.\n- **HandBrakeCLI:** `HandBrakeCLI -i recorder-input.ts -o recorder-output.mkv -f av_mkv -e x264` encodes the video with x264 into Matroska. HandBrake lists TS among the sources it reads.\n- **MKVToolNix:** `mkvmerge -o channel-archive.mkv channel-capture.ts`. mkvmerge reads MPEG transport streams.\n\n### Problems with TS files\n\n- **Several programs in one stream**: selecting the intended program matters.\n- **The TS won't decode**: recognizing the wrapper doesn't settle which codec its audio or video needs.\n- **Damaged timing or missing packets**: renaming the file won't fix them. FFmpeg usually logs the error and converts what it can read.\n"
+    }
+  },
+  "vob-to-mpeg": {
+    "seo": {
+      "title": "Convert VOB to MPEG Online (Free)",
+      "h1": "VOB to MPEG Converter",
+      "description": "Convert a DVD VOB file to MPEG in your browser. FFmpeg writes MPEG-2 video and MP2 audio, and nothing is uploaded.",
+      "howToHeading": "How to convert VOB to MPEG"
+    },
+    "tool": {
+      "subtitle": "Convert a DVD VOB file to an MPEG file with MPEG-2 video and MP2 audio."
+    },
+    "faqs": [
+      {
+        "question": "What is a VOB file?",
+        "answer": "A VOB is a DVD Video Object, where producers keep a disc's video, sound, subtitles and menu content. On a backup these files commonly sit in a VIDEO_TS folder."
+      },
+      {
+        "question": "What is inside the MPEG I get?",
+        "answer": "FFmpeg encodes the video as MPEG-2 and the audio as MP2 at 96 kb/s. The file is an MPEG program stream."
+      },
+      {
+        "question": "What frame size and rate does the MPEG have?",
+        "answer": "The source's frame size and rate carry through unless they go past 1920 px on the longer edge or 30 fps. Nothing is enlarged, and a side with an odd pixel count loses one."
+      },
+      {
+        "question": "Is the picture quality the same as the VOB?",
+        "answer": "No. The video is encoded again, so some detail of the original picture is lost."
+      },
+      {
+        "question": "My VOB was cut short or is damaged. Does it still convert?",
+        "answer": "Most often it does. The error goes to FFmpeg's log and the readable part is written, so the MPEG can end up shorter than the VOB."
+      },
+      {
+        "question": "Can I join the VOB files from one DVD?",
+        "answer": "No. Each VOB you pick becomes its own MPEG, and they run one after another. Nothing is zipped or joined."
+      },
+      {
+        "question": "Is .mpeg different from .mpg?",
+        "answer": "Both suffixes are used for MPEG video files. This page names the download with .mpeg; the vob-to-mpg page names it .mpg."
+      },
+      {
+        "question": "What is the MPEG called, and is my VOB changed?",
+        "answer": "Your VOB's name is kept with .mpeg as the extension. The original isn't altered, and nothing limits the length except how long your device needs."
+      }
+    ],
+    "aboutSection": {
+      "title": "VOB and MPEG",
+      "fromFormat": {
+        "name": "VOB",
+        "fullName": "DVD Video Object",
+        "description": "The container DVD-Video discs use for video, audio, subtitles and menus. It is closely related to an MPEG-2 program stream.",
+        "details": [
+          "DVD video",
+          "menus and subtitles",
+          "VIDEO_TS folders"
+        ]
+      },
+      "toFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG program stream",
+          "lossy compression",
+          "older video downloads"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting VOB to MPEG",
+      "points": [
+        "The video is re-encoded as MPEG-2 and the audio as MP2 at 96 kb/s.",
+        "The picture stays within 1920 px and 30 fps; an odd side loses 1 px.",
+        "Each VOB gives its own MPEG; files aren't joined.",
+        "Keep the VOB or the DVD folder as your original."
+      ]
+    },
+    "guide": {
+      "title": "About VOB files",
+      "markdown": "### What is a VOB file?\n\nVOB is short for DVD Video Object, the stream type in which a DVD keeps its video, sound, subtitles and menus. Its data is a close relative of MPEG-2 program-stream material, and DVD authoring additionally calls for IFO and BUP files.\n\nBackups of a DVD usually keep their VOB files in a folder named VIDEO_TS. A DVD's subtitles can be bitmap pictures rather than text you can search.\n\n### Programs that open VOB files\n\n- **Windows, Mac and Linux:** HandBrake can load a single VOB or a whole VIDEO_TS folder, as long as its input is unprotected.\n- **Windows, Mac and Linux:** VLC media player opens DVD Video media, as well as program streams.\n\n### VOB and MPEG compared\n\n- **Extensions**: .vob and .mpeg. The .mpg suffix is also used for MPEG video.\n- **Structure**: a VOB is a piece of a DVD, alongside menus, subtitles and companion files, whereas the MPEG file packs MPEG-1 or MPEG-2 video with its audio into a program stream.\n- **Compression**: both are lossy, and lossy MPEG encoding can't retain every detail.\n\nThe converter writes MPEG-2 video and MP2 audio at 96 kb/s, limited to 1920 px and 30 fps; authoring a DVD is outside what it does.\n\n### Other ways to convert VOB to MPEG\n\n- **FFmpeg:** `ffmpeg -i feature-part.vob -c:v mpeg2video -b:a 128k -q:v 4 -c:a mp2 feature-review.mpeg` encodes MPEG-2 video and MP2 audio into an MPEG file.\n- **Prism (Windows):** load the VOB through Add File(s), select MPG as the Output Format, set a Save to Folder, tweak Encoder Options when needed, then press Convert. Per NCH's product page, VOB is an input format and MPG an output, so the result is an .mpg file.\n\n### Problems with VOB files\n\n- **A protected disc**: HandBrake doesn't process copy-protected DVD sources.\n- **One VOB is not a DVD**: authoring needs the full DVD structure, which a loose VOB can't replace.\n- **Subtitles don't show**: a player that decodes MPEG-2 video can still skip the DVD subtitle streams.\n- **A clip you didn't expect**: discs can hold several titles, and picking the wrong title gives the wrong clip.\n"
+    }
+  },
+  "vob-to-mpg": {
+    "seo": {
+      "title": "Convert VOB to MPG Online (Free)",
+      "h1": "VOB to MPG Converter",
+      "description": "Convert a DVD VOB file to MPG in your browser. FFmpeg writes MPEG-2 video and MP2 audio, and your file stays on your device.",
+      "howToHeading": "How to convert VOB to MPG"
+    },
+    "tool": {
+      "subtitle": "Convert a DVD VOB file to an MPG file with MPEG-2 video and MP2 audio."
+    },
+    "faqs": [
+      {
+        "question": "What is inside a VOB file?",
+        "answer": "It is a DVD Video Object: a DVD's video, sound, subtitles and menu content live in VOB streams, usually in a VIDEO_TS folder on a backup."
+      },
+      {
+        "question": "Which codecs does the MPG use?",
+        "answer": "MPEG-2 for the video and MP2 for the audio, at 96 kb/s. The result is an MPEG program stream with the .mpg extension."
+      },
+      {
+        "question": "Does the MPG keep the VOB's frame size and rate?",
+        "answer": "Yes, up to a point. Anything bigger than 1920 px on its longer side or faster than 30 fps is reduced to those limits; smaller ones stay small, dropped frames leave the running time alone, and an odd side loses 1 px."
+      },
+      {
+        "question": "Will the MPG look as good as the DVD?",
+        "answer": "Not exactly. The video is compressed again and no quality setting exists; lossy MPEG compression can't keep every detail of a picture."
+      },
+      {
+        "question": "What if my VOB file is damaged?",
+        "answer": "It tends to convert anyway: FFmpeg notes the error, writes the readable part, and leaves you an MPG that is shorter than the source."
+      },
+      {
+        "question": "Can I convert all VOB files of a disc in one go?",
+        "answer": "Choose several VOB files and the page handles them in turn. Each produces its own MPG, none are merged, and no ZIP is created."
+      },
+      {
+        "question": "Why MPG and not MPEG?",
+        "answer": "They are two suffixes for the same kind of file, MPEG video. This page names the download .mpg. The vob-to-mpeg page uses .mpeg."
+      },
+      {
+        "question": "What is the MPG called, and is the VOB changed?",
+        "answer": "Expect your VOB's file name with an .mpg extension. The VOB itself is not modified, and the page sets no size or time limit."
+      }
+    ],
+    "aboutSection": {
+      "title": "VOB and MPG",
+      "fromFormat": {
+        "name": "VOB",
+        "fullName": "DVD Video Object",
+        "description": "The container DVD-Video discs use for video, audio, subtitles and menus. It is closely related to an MPEG-2 program stream.",
+        "details": [
+          "DVD video",
+          "menus and subtitles",
+          "VIDEO_TS folders"
+        ]
+      },
+      "toFormat": {
+        "name": "MPG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG program stream",
+          "lossy compression",
+          "Video CDs and DVDs"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting VOB to MPG",
+      "points": [
+        "The video is re-encoded as MPEG-2 and the audio as MP2 at 96 kb/s.",
+        "Video stays within 1920 px and 30 fps.",
+        "Each VOB becomes its own MPG; nothing is joined.",
+        "The MPG is a video file, not a DVD."
+      ]
+    },
+    "guide": {
+      "title": "About VOB files",
+      "markdown": "### What is inside a VOB file?\n\nProducers put a DVD's video, audio, subtitles and menu content into VOB streams, short for DVD Video Object. The data closely resembles MPEG-2 program-stream material, and IFO and BUP companion files complete a disc for authoring.\n\nOn a DVD backup the VOB files usually sit inside a VIDEO_TS directory. Its subtitle streams can contain bitmap images instead of text.\n\n### Programs that open VOB files\n\n- **Windows, Mac and Linux:** HandBrake takes one VOB or an entire VIDEO_TS disc folder as input. It accepts only unprotected sources, and nothing else, so a copy-protected disc is not opened.\n- **Windows, Mac and Linux:** VLC media player is listed as a player for DVD Video media and for MPEG program streams.\n\n### VOB and MPG compared\n\n- **Extensions**: .vob and .mpg. The .mpeg suffix is also used for MPEG video.\n- **Role**: a VOB is one part of a DVD and relies on companion files. An MPG packs MPEG-1 or MPEG-2 video and audio into a program stream, the basis of VCD and DVD video.\n- **Compression**: both are lossy, and no lossy MPEG encoding retains every detail of the source.\n\nThe page encodes MPEG-2 video and MP2 audio (96 kb/s) and stays inside 1920 px and 30 fps. It is a plain video file, not a DVD.\n\n### Other ways to convert VOB to MPG\n\n- **FFmpeg:** `ffmpeg -i dvd-extract.vob -q:v 5 -c:a mp2 -c:v mpeg2video dvd-extract.mpg` writes MPEG-2 video and MP2 audio from the VOB into an .mpg file.\n- **Prism (Windows):** Prism takes VOB as input and writes MPG, according to NCH's product page. Use Add File(s), choose MPG for Output Format, choose a Save to Folder, review Encoder Options, and hit Convert.\n\n### Problems with VOB files\n\n- **Copy protection**: HandBrake doesn't process copy-protected DVD sources, so such a disc can't be read this way.\n- **Missing disc structure**: a stray VOB lacks the companion files and structure that DVD authoring needs.\n- **Subtitles lost in playback**: some players that cope with MPEG-2 video still disregard DVD subtitle streams.\n- **Wrong footage**: on a multi-title disc, choosing the wrong title produces the wrong clip.\n"
+    }
+  },
+  "webp-to-psd": {
+    "seo": {
+      "title": "Convert WebP to PSD Online (Free)",
+      "h1": "WebP to PSD Converter",
+      "description": "Convert a WebP to a Photoshop PSD in your browser. An animated WebP gives its first frame, and EXIF, ICC and XMP metadata are dropped. Nothing is uploaded.",
+      "howToHeading": "How to convert WebP to PSD"
+    },
+    "tool": {
+      "subtitle": "Turn a WebP picture into a PSD file you can open in Photoshop-compatible programs."
+    },
+    "faqs": [
+      {
+        "question": "Will the PSD have layers?",
+        "answer": "No. A WebP holds one picture, so the PSD can't contain the layers of the original design. A flat export doesn't retain layer and mask information."
+      },
+      {
+        "question": "Can the PSD hold an animated WebP?",
+        "answer": "Only the first frame is used, as one PSD picture."
+      },
+      {
+        "question": "Does the PSD keep EXIF, ICC or XMP data?",
+        "answer": "No. Decoding goes through raw pixels, which drops EXIF, ICC profiles and XMP."
+      },
+      {
+        "question": "Is the color depth 8 bits per channel?",
+        "answer": "The pixels pass through 8-bit RGBA, so any extra depth in the source is lost."
+      },
+      {
+        "question": "Which programs open the PSD?",
+        "answer": "Photopea opens PSD files through File > Open. ImageMagick and XnView MP also read PSD."
+      },
+      {
+        "question": "Why do I see \"This browser can't open WebP files\"?",
+        "answer": "The page decodes with your browser's own image decoder. When that decoder can't read WebP, you get this message, which suggests a current Chrome, Edge, Firefox or Safari."
+      },
+      {
+        "question": "What does \"Image decode failed.\" mean?",
+        "answer": "This message means your browser's own image decoder couldn't read the file."
+      },
+      {
+        "question": "What is the PSD named, and can I send several WebP files?",
+        "answer": "Your WebP's name is reused with .psd, and the WebP is untouched. A batch is processed file by file, each yielding its own PSD with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and PSD",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format developed by Google, first released in 2010 and built on the VP8 video codec for lossy images. It also supports lossless compression, transparency and animation.",
+        "details": [
+          "lossy and lossless",
+          "transparency",
+          "animation"
+        ]
+      },
+      "toFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
+        "details": [
+          "layers and masks",
+          "opens in Photoshop",
+          "up to 30,000 px a side"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebP to PSD",
+      "points": [
+        "The PSD holds the WebP's picture; layers can't be recovered from it.",
+        "An animated WebP gives its first frame.",
+        "EXIF, ICC profiles and XMP are dropped.",
+        "The pixels pass through 8-bit RGBA."
+      ]
+    },
+    "guide": {
+      "title": "About WebP files",
+      "markdown": "### What is a WebP file?\n\nGoogle developed WebP and announced it on 30 September 2010. Lossy files use the VP8 video codec, and a separate lossless method exists. Inside the RIFF container there is room for transparency, animation, an ICC color profile, and Exif and XMP metadata. RFC 9649 documents the format and registers the image/webp media type. Lossless coding relies on LZ77, prefix codes and a color cache, while lossy files reuse VP8's intra-frame coding.\n\nNeither side of a WebP may pass 16,383 pixels. Typical uses are smaller web images, pictures needing transparency, and short animations.\n\n### Programs that open WebP files\n\n- **Windows, Mac and Linux:** GIMP has handled WebP natively, for both import and export, since version 2.10.\n- **Windows, Mac and Linux:** ImageMagick reads WebP, and on the Mac you run it from Terminal.\n- **Windows:** File Explorer and Photos show WebP once Microsoft's WebP Image Extension has been added.\n- **Web and Mobile:** Google Chrome displays WebP.\n- **Web:** Mozilla Firefox displays WebP.\n- **Mobile:** Safari displays WebP on phones, as Chrome does.\n\n### WebP and PSD compared\n\n- **Extensions**: .webp and .psd.\n- **Purpose**: Photoshop's own document format, PSD, holds layers, masks and text so a design remains editable.\n- **Structure**: files start with 8BPS and allow one, eight, 16 or 32 bits for each sample, storing pixels raw, with RLE or with ZIP. Each side tops out at 30,000 pixels.\n\nThis page writes the PSD from the decoded picture. It can't rebuild layers from a flat image.\n\n### Other ways to convert WebP to PSD\n\n- **ImageMagick:** `magick site-banner.webp site-banner.psd`. ImageMagick's format list shows WebP and PSD as readable and writable.\n- **Photopea (web):** use File > Open to load the WebP, then File > Save as PSD. Photopea's front page lists WebP among the formats it opens.\n\n### Problems with WebP files\n\n- **An old browser**: older browser versions may lack animation support even when they display still WebP.\n- **A picture over the limit**: an image beyond 16,383 pixels on either axis exceeds WebP's size limit.\n- **ImageMagick can't read it**: a WebP decode may be unavailable in a particular ImageMagick installation, so check its format list.\n"
+    }
+  }
+}

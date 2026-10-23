@@ -1,0 +1,342 @@
+{
+  "tools": {
+    "pes-to-png": {
+      "methods": [
+        {
+          "app": "Ink/Stitch and Inkscape",
+          "steps": "Open the PES with File > Open. Press Shift+Ctrl+E to open Export PNG Image, choose the export area, set the size in pixels, enter a file name and click Export.",
+          "limits": "The PES opens in Manual Stitch Mode; the PNG is a picture of the stitches.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+          "supportSources": [
+            "https://inkstitch.org/docs/import-export/",
+            "https://inkstitch.org/docs/file-formats/"
+          ]
+        },
+        {
+          "app": "pyembroidery",
+          "steps": "Run pyembroidery.write_png(pyembroidery.read_pes('design.pes'), 'design.png').",
+          "limits": "PNG is write-only in the library.",
+          "source": "https://github.com/EmbroidePy/pyembroidery"
+        }
+      ]
+    },
+    "pes-to-svg": {
+      "methods": [
+        {
+          "app": "Ink/Stitch and Inkscape",
+          "steps": "Open the PES with File > Open (Manual Stitch Mode), then save the document, choosing Inkscape SVG or Plain SVG as the format.",
+          "limits": "The SVG is a drawing of the stitches.",
+          "source": "https://inkstitch.org/docs/import-export/",
+          "supportSources": [
+            "https://inkstitch.org/docs/file-formats/",
+            "https://inkscape-manuals.readthedocs.io/en/latest/saving.html"
+          ]
+        },
+        {
+          "app": "pyembroidery",
+          "steps": "Run pyembroidery.write_svg(pyembroidery.read_pes('design.pes'), 'design.svg').",
+          "limits": "SVG is write-only in the library.",
+          "source": "https://github.com/EmbroidePy/pyembroidery"
+        }
+      ]
+    },
+    "png-to-xbm": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the PNG, choose File > Export As, name the file with .xbm and set the XBM options.",
+          "limits": "Works only from an image with 8 bits per channel; black and white only.",
+          "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick picture.png picture.xbm.",
+          "limits": "XBM is read and written for black and white only.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "ImageMagick with flattening",
+          "steps": "Run magick picture.png -background white -alpha remove -alpha off -monochrome picture.xbm.",
+          "limits": "-alpha remove composites over the background color; -monochrome transforms the image to black and white.",
+          "source": "https://imagemagick.org/command-line-options/"
+        }
+      ]
+    },
+    "ra-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i archive.ra -vn -b:a 192k -c:a libmp3lame listening.mp3.",
+          "limits": "Requires a decoder for the actual RealAudio variant.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Switch Sound File Converter",
+          "steps": "Click Add and choose the RA file, set the Output Format field to mp3, then click Convert.",
+          "limits": "RA is a source format in Switch; mp3 is an output format.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/switch/win/switchformats.html"
+          ]
+        }
+      ]
+    },
+    "svg-to-tga": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick -density 144 artwork.svg artwork.tga.",
+          "limits": "-density sets the canvas resolution while SVG is rendered; SVG and TGA are both read and written.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "Inkscape and ImageMagick",
+          "steps": "Open the SVG in Inkscape, press Shift+Ctrl+E, choose the export area, enter the width in pixels, name the file and click Export, then run magick artwork.png artwork.tga.",
+          "limits": "Inkscape exports PNG; ImageMagick reads PNG and writes TGA.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "svg-to-tif": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick -density 180 illustration.svg illustration.tif.",
+          "limits": "-density sets the canvas resolution while SVG is read; SVG and TIFF are both read and written.",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "Inkscape and ImageMagick",
+          "steps": "Open the SVG in Inkscape, press Shift+Ctrl+E, choose the export area, enter the width in pixels, name the file and click Export, then run magick illustration.png illustration.tif.",
+          "limits": "Inkscape exports PNG; ImageMagick reads PNG and writes TIFF.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "wav-to-amr": {
+      "methods": [
+        {
+          "app": "Switch Sound File Converter",
+          "steps": "Use Add to pick the WAV, enter amr in the Output Format field and press Convert.",
+          "limits": "wav is a source format in Switch and amr is an output format.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/switch/win/switchformats.html"
+          ]
+        }
+      ]
+    },
+    "webp-to-webp": {
+      "methods": [
+        {
+          "app": "cwebp",
+          "steps": "Run cwebp -lossless -exact still.webp -o recoded.webp.",
+          "limits": "WebP input is accepted for static images only; -exact keeps RGB values in transparent areas.",
+          "source": "https://developers.google.com/speed/webp/docs/cwebp"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the WebP with File > Open, choose File > Export As, enter a new name ending in .webp and click Export, then set the WebP options.",
+          "limits": "The dialog has Lossless, Image quality, Alpha quality and Save animation settings.",
+          "source": "https://docs.gimp.org/3.0/en/file-webp-export.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+            "https://docs.gimp.org/3.0/en/gimp-file-open.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick still.webp -define webp:lossless=true rewritten.webp.",
+          "limits": "The webp:lossless define encodes without any quality loss; WEBP is read and written.",
+          "source": "https://imagemagick.org/webp/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "wma-to-aiff": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i take.wma -vn -c:a pcm_s16be take.aiff.",
+          "limits": "Needs a decoder for the WMA variant; writes 16-bit big-endian PCM.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Switch Sound File Converter",
+          "steps": "Click Add and choose the WMA; open the Output Format field and select AIFF; click Convert.",
+          "limits": "Output uses Switch encoder defaults.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/switch/win/switchformats.html"
+          ]
+        }
+      ]
+    },
+    "wmv-to-mkv": {
+      "methods": [
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "Run ffmpeg -i footage.wmv -map 0 -c copy wrapped.mkv.",
+          "limits": "Keeps the existing streams without re-encoding.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Click Add File(s) and pick the WMV; select MKV in the Output Format field; click Convert.",
+          "limits": "Re-encodes through Prism; the receiving player must decode the codecs.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ]
+        }
+      ]
+    }
+  },
+  "formatFacts": {
+    "pes": [
+      {
+        "fact": "PES is supported embroidery data; imported patterns use manual stitch mode rather than original digitizing objects.",
+        "source": "https://inkstitch.org/docs/import-export/",
+        "supportSource": "https://github.com/EmbroidePy/pyembroidery"
+      }
+    ],
+    "png": [
+      {
+        "fact": "PNG supports lossless raster storage with several color modes and alpha.",
+        "source": "https://www.w3.org/TR/png/"
+      }
+    ],
+    "svg": [
+      {
+        "fact": "SVG can describe vectors and embedded pictures, with coordinate transformations and font dependencies.",
+        "source": "https://www.w3.org/TR/SVG2/",
+        "supportSource": "https://www.w3.org/TR/SVG2/coords.html"
+      }
+    ],
+    "xbm": [
+      {
+        "fact": "XBM is monochrome C-style bitmap text; GIMP documents hotspots and separate masks.",
+        "source": "https://docs.gimp.org/3.2/en/file-xbm-export.html"
+      }
+    ],
+    "ra": [
+      {
+        "fact": "RealAudio includes several codecs; RAM streaming references are distinct from the recorded media.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000051.shtml"
+      }
+    ],
+    "mp3": [
+      {
+        "fact": "MP3 is lossy; re-encoding cannot restore earlier removed information.",
+        "source": "https://manual.audacityteam.org/man/mp3_export_options.html"
+      }
+    ],
+    "tga": [
+      {
+        "fact": "Targa is raster;24bitRGB and32bitwithalpha are separate choices.",
+        "source": "https://helpx.adobe.com/photoshop/desktop/save-and-export/save-files/save-in-bmp-cineon-targa-and-raw-formats.html"
+      }
+    ],
+    "tif": [
+      {
+        "fact": "TIF aliases TIFF; its compression can be lossless or lossy and depth varies.",
+        "source": "https://docs.gimp.org/3.0/en/file-tiff-export.html"
+      }
+    ],
+    "wav": [
+      {
+        "fact": "WAVE is RIFF-based and may contain PCM or other coding.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml"
+      }
+    ],
+    "amr": [
+      {
+        "fact": "Narrowband AMR samples speech at8kHz; AMR-WB is separate.",
+        "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+      }
+    ],
+    "webp": [
+      {
+        "fact": "WebP uses RIFF-based packaging, offers lossy/lossless and alpha, and can be animated.",
+        "source": "https://developers.google.com/speed/webp"
+      }
+    ],
+    "wma": [
+      {
+        "fact": "WMA is ASF-based; standard,Pro,Lossless andVoice variants differ.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000027.shtml",
+        "supportSource": "https://learn.microsoft.com/en-us/windows/win32/medfound/about-the-windows-media-codecs"
+      }
+    ],
+    "aiff": [
+      {
+        "fact": "AIFF commonly contains PCM; uncompressed sample-format choices determine precision.",
+        "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000005.shtml",
+        "supportSource": "https://manual.audacityteam.org/man/other_uncompressed_files_export_options.html"
+      }
+    ],
+    "wmv": [
+      {
+        "fact": "WMV content is normally ASF-packaged; Windows Media video has several variants.",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/wmformat/overview-of-the-asf-format",
+        "supportSource": "https://learn.microsoft.com/en-us/windows/win32/medfound/about-the-windows-media-codecs"
+      }
+    ],
+    "mkv": [
+      {
+        "fact": "Matroska can organize multiple media tracks; the container does not specify fidelity.",
+        "source": "https://www.matroska.org/technical/basics.html"
+      }
+    ]
+  },
+  "sharedSheets": {
+    "png": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json",
+    "webp": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json",
+    "svg": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json",
+    "mp3": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+    "wav": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+    "mkv": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+    "wmv": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json",
+    "pes": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F09.json",
+    "ra": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F15.json",
+    "wma": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F04.json",
+    "aiff": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F04.json",
+    "tga": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F04.json",
+    "tif": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F04.json",
+    "amr": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-06/apps/tools/content/sources/formats-F06.json",
+    "xbm": "/Users/devin/Documents/Codex/2026-10-22/can-x20/outputs/coordinated-rewrites/coordinator-06/apps/tools/content/sources/formats-F12.json",
+    "pilotBackground": "Read format-guides.json for existingPNG/SVG/WebP/MP3 background. TIF resolves to TIFF inF02."
+  },
+  "engineConcerns": {
+    "pes-to-png": "Recorded sweep error: Image decode failed. Browser raster decoder is not an embroidery interpreter.",
+    "pes-to-svg": "Recorded sweep error: Image decode failed. No functioning conversion or automatic vector reconstruction promised.",
+    "wav-to-amr": "Recorded sweep error: FFmpeg exit1 unknown encoder libopencore_amrnb; intended settings mono8kHz12.2kbps are not a working output guarantee.",
+    "webp-to-webp": "Re-encodes at0.85, first animated frame only, source metadata omitted.",
+    "svg-to-tga/svg-to-tif": "Browser-reported SVG size with no added scaling;8bitRGBA; metadata omitted; alpha/result and activeSVG behavior not guaranteed.",
+    "wma-to-aiff": "PCM signed16big-endian; no explicit sample rate or channel count.",
+    "wmv-to-mkv": "H264CRF32ultrafast/AAC96k encode with1920/30/even/yadif, notremux."
+  }
+}

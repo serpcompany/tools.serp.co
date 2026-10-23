@@ -1,0 +1,509 @@
+{
+  "tools": {
+    "wma-to-flac": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run `ffmpeg -i song.wma -vn -c:a flac song.flac`. It decodes the WMA and writes the audio as FLAC without the video.",
+          "limits": "The WMA must be readable by your FFmpeg build.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/general.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "Audacity",
+          "steps": "With the optional FFmpeg library installed, choose File > Import > Audio to open the WMA. Then choose File > Export Audio and select FLAC in the Format list.",
+          "limits": "Protected WMA can't be imported.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/flac_export_options.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "wma": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000027.shtml",
+          "https://learn.microsoft.com/en-us/windows/win32/medfound/about-the-windows-media-codecs",
+          "https://manual.audacityteam.org/man/importing_audio.html"
+        ],
+        "flac": [
+          "https://www.rfc-editor.org/rfc/rfc9639.html"
+        ]
+      },
+      "programSources": [
+        "https://www.videolan.org/vlc/features.html",
+        "https://ffmpeg.org/general.html"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json",
+        "outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F04.json"
+      ]
+    },
+    "wmv-to-mpeg": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run `ffmpeg -i training.wmv -c:v mpeg2video -c:a mp2 training.mpeg` to encode MPEG-2 video and MP2 audio.",
+          "limits": "Your FFmpeg build needs a Windows Media Video decoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/general.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "Prism",
+          "steps": "On Windows, run `prism.exe -convert \"C:\\Media\\training.wmv\" -format .mpg`, using the full path to the executable if it isn't on your path.",
+          "limits": "Windows only.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/prismcommandlinetool.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "wmv": [
+          "https://learn.microsoft.com/en-us/windows/win32/wmformat/overview-of-the-asf-format",
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000091.shtml"
+        ],
+        "mpeg": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000335.shtml",
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        ]
+      },
+      "programSources": [
+        "https://www.videolan.org/vlc/features.html",
+        "https://ffmpeg.org/general.html"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json"
+      ]
+    },
+    "xcf-to-jpeg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the XCF, then choose File > Export As. Pick JPEG in the Select File Type list, or type a .jpeg extension in the Name field, then click Export. The JPEG dialog that follows has a quality slider from 0 to 100, set to 85 by default.",
+          "limits": "Save the XCF separately; exporting does not update it.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+            "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run `magick design.xcf design.jpeg`. ImageMagick reads XCF and picks the output format from the extension.",
+          "limits": "ImageMagick may not reproduce every GIMP feature.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-options/"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "IrfanView",
+          "steps": "On Windows, install the IrfanView plugins, which provide XCF reading. Use File > Open for the XCF, then File > Save as and choose JPG.",
+          "limits": "XCF reading needs the plugin pack; IrfanView can read XCF but not write it.",
+          "source": "https://www.irfanview.com/main_formats.htm",
+          "supportSources": [
+            "https://www.irfanview.com/faq.htm"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "xcf": [
+          "https://docs.gimp.org/3.0/en/gimp-images-out.html",
+          "https://docs.gimp.org/3.0/en/gimp-image-flatten.html"
+        ],
+        "jpeg": [
+          "https://docs.gimp.org/3.0/en/file-jpeg-export.html",
+          "https://www.iana.org/assignments/media-types/image/jpeg"
+        ]
+      },
+      "programSources": [
+        "https://docs.gimp.org/3.0/en/gimp-images-out.html",
+        "https://www.irfanview.com/main_formats.htm",
+        "https://imagemagick.org/formats/"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+        "outputs/coordinated-rewrites/coordinator-06/apps/tools/content/sources/formats-F06.json"
+      ]
+    },
+    "ai-to-gif": {
+      "methods": [
+        {
+          "app": "Inkscape and GIMP",
+          "steps": "Open the AI file in Inkscape, choose File > Export PNG Image, set the export area, size and file name, and export. Open the PNG in GIMP, choose File > Export As, pick GIF in the Select File Type list and click Export.",
+          "limits": "GIF reduces the picture to 256 colors or fewer; Inkscape imports AI files made with Illustrator 9.0 and newer.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+          "supportSources": [
+            "https://inkscape-manuals.readthedocs.io/en/latest/import-other-formats.html",
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+            "https://docs.gimp.org/3.0/en/file-gif-export.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "Inkscape and ImageMagick",
+          "steps": "Open the AI file in Inkscape, choose File > Export PNG Image, set the export area, size and file name, and export. Then run `magick emblem.png emblem.gif`.",
+          "limits": "Inkscape imports AI files made with Illustrator 9.0 and newer.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+          "supportSources": [
+            "https://inkscape-manuals.readthedocs.io/en/latest/import-other-formats.html",
+            "https://imagemagick.org/command-line-processing/"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run `magick emblem.ai emblem.gif`. ImageMagick lists AI as a format it can read and write.",
+          "limits": "Check the result against Illustrator for effects and fonts.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-options/"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "ai": [
+          "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html",
+          "https://helpx.adobe.com/illustrator/using/saving-artwork.html"
+        ],
+        "gif": [
+          "https://www.w3.org/Graphics/GIF/spec-gif89a.txt",
+          "https://docs.gimp.org/3.0/en/file-gif-export.html"
+        ]
+      },
+      "programSources": [
+        "https://www.adobe.com/creativecloud/file-types/image/vector/ai-file.html",
+        "https://inkscape-manuals.readthedocs.io/en/latest/import-other-formats.html",
+        "https://imagemagick.org/formats/"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F04.json",
+        "outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json"
+      ]
+    },
+    "arw-to-pdf": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "Run `darktable-cli portrait.arw portrait.pdf`; the filename extension selects PDF output.",
+          "limits": "darktable-cli uses the last export settings from the darktable GUI, so set them there first.",
+          "source": "https://docs.darktable.org/usermanual/development/en/special-topics/program-invocation/darktable-cli/",
+          "supportSources": [
+            "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+            "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run `magick portrait.arw portrait.pdf`. ImageMagick lists ARW as a camera raw format it can read.",
+          "limits": "Needs an ImageMagick build with raw support.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-options/"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "arw": [
+          "https://imagingedge.sony.net/en-us/ie-desktop.html",
+          "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/",
+          "https://imagemagick.org/formats/"
+        ],
+        "pdf": [
+          "https://docs.darktable.org/usermanual/development/en/special-topics/program-invocation/darktable-cli/",
+          "https://imagemagick.org/formats/",
+          "https://www.iana.org/assignments/media-types/application/pdf"
+        ]
+      },
+      "programSources": [
+        "https://imagingedge.sony.net/en-us/ie-desktop.html",
+        "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/",
+        "https://imagemagick.org/formats/"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F01.json",
+        "outputs/coordinated-rewrites/coordinator-06/apps/tools/content/sources/formats-F06.json"
+      ]
+    },
+    "arw-to-tiff": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "In the export module, choose TIFF and set its bit depth and compression, then run `darktable-cli landscape.arw landscape.tiff`; the filename extension selects the format.",
+          "limits": "Export settings come from the darktable GUI.",
+          "source": "https://docs.darktable.org/usermanual/development/en/special-topics/program-invocation/darktable-cli/",
+          "supportSources": [
+            "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+            "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run `magick landscape.arw landscape.tiff`. ImageMagick lists ARW as a camera raw format it can read.",
+          "limits": "Needs an ImageMagick build with raw support.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSources": [
+            "https://imagemagick.org/formats/",
+            "https://imagemagick.org/command-line-options/"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "arw": [
+          "https://imagingedge.sony.net/en-us/ie-desktop.html",
+          "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/",
+          "https://imagemagick.org/formats/"
+        ],
+        "tiff": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000022.shtml",
+          "https://www.iana.org/assignments/media-types/image/tiff"
+        ]
+      },
+      "programSources": [
+        "https://imagingedge.sony.net/en-us/ie-desktop.html",
+        "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/",
+        "https://imagemagick.org/formats/"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+        "outputs/coordinated-rewrites/coordinator-06/apps/tools/content/sources/formats-F06.json"
+      ]
+    },
+    "avi-to-flv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run `ffmpeg -i demonstration.avi -c:v libx264 -c:a aac -f flv demonstration.flv` to request H.264 and AAC in FLV.",
+          "limits": "Your FFmpeg build needs libx264.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/general.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "Prism",
+          "steps": "On Windows, run `prism.exe -convert \"C:\\Media\\demonstration.avi\" -format .flv`, using the full path to the executable if needed.",
+          "limits": "Windows only.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/prismcommandlinetool.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "avi": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        ],
+        "flv": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000131.shtml",
+          "https://www.adobe.com/products/flashplayer/end-of-life.html"
+        ]
+      },
+      "programSources": [
+        "https://www.videolan.org/vlc/features.html",
+        "https://ffmpeg.org/general.html"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F03.json",
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json"
+      ]
+    },
+    "avi-to-mjpeg": {
+      "methods": [
+        {
+          "app": "FFmpeg, AVI output",
+          "steps": "Run `ffmpeg -i frames.avi -c:v mjpeg -c:a pcm_s16le frames-mjpeg.avi` to write MJPEG video and PCM sound in an AVI wrapper.",
+          "limits": "Your FFmpeg build needs the MJPEG encoder.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/general.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "FFmpeg, bare stream",
+          "steps": "Run `ffmpeg -i frames.avi -an -c:v mjpeg -f mjpeg frames.mjpeg` to write the video alone, without an AVI wrapper.",
+          "limits": "Use this only for a receiver that expects a raw MJPEG stream.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/general.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "avi": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        ],
+        "mjpeg": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml",
+          "https://ffmpeg.org/ffmpeg-formats.html"
+        ]
+      },
+      "programSources": [
+        "https://www.videolan.org/vlc/features.html",
+        "https://ffmpeg.org/general.html"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json",
+        "outputs/coordinated-rewrites/coordinator-01/apps/tools/content/sources/formats-F07.json"
+      ]
+    },
+    "avi-to-mpeg2": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run `ffmpeg -i transfer.avi -c:v mpeg2video -c:a mp2 transfer.mpg` to encode MPEG-2 video and MP2 sound.",
+          "limits": "Your FFmpeg build needs the MPEG-2 and MP2 encoders.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/general.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "Prism",
+          "steps": "With Prism available to the shell, run `prism.exe -convert \"C:\\Media\\transfer.avi\" -format .mpg -settings .mpg MPEG2 4000 9000 44100 128`. The numbers are Prism's documented example values.",
+          "limits": "Windows only; supply the full path to the executable if needed.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/prismcommandlinetool.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "avi": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        ],
+        "mpeg2": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml"
+        ]
+      },
+      "programSources": [
+        "https://www.videolan.org/vlc/features.html",
+        "https://ffmpeg.org/general.html"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-03/apps/tools/content/sources/formats-F09.json",
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json"
+      ]
+    },
+    "avi-to-vob": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run `ffmpeg -i screening.avi -target ntsc-dvd screening.vob`. The ntsc-dvd target sets DVD parameters, including 720x480 at 29.97 fps, MPEG-2 video and AC-3 sound.",
+          "limits": "This writes one media file, not menus or a disc structure.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/ffmpeg-codecs.html",
+            "https://ffmpeg.org/ffmpeg-formats.html",
+            "https://ffmpeg.org/general.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        },
+        {
+          "app": "Prism",
+          "steps": "Add the AVI with Add File(s), choose VOB as the output format, select a destination and click Convert.",
+          "limits": "Windows only; VOB output is listed in Prism's supported formats.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ],
+          "verification": "Steps checked against the cited documentation pages."
+        }
+      ],
+      "formatSources": {
+        "avi": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000059.shtml"
+        ],
+        "vob": [
+          "https://www.loc.gov/preservation/digital/formats/fdd/fdd000028.shtml",
+          "https://ffmpeg.org/ffmpeg.html"
+        ]
+      },
+      "programSources": [
+        "https://www.videolan.org/vlc/features.html",
+        "https://ffmpeg.org/general.html"
+      ],
+      "engineEvidence": {
+        "brief": "work/repo/tmp/content-briefs/c05-worker-a-depth-b17.md",
+        "basis": "Generated engine facts only for page behavior. No unlisted layer, precision, metadata or stream guarantees."
+      },
+      "factSheetFiles": [
+        "outputs/coordinated-rewrites/coordinator-04/apps/tools/content/sources/formats-F04.json",
+        "outputs/coordinated-rewrites/coordinator-02/apps/tools/content/sources/formats-F02.json"
+      ]
+    }
+  }
+}
