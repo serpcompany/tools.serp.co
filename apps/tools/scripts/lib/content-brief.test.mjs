@@ -68,8 +68,10 @@ test("a Tool with no CSV keyword uses the data file's head keyword and volume", 
   assert.doesNotMatch(text, /No keyword is assigned to this Tool/);
 });
 
-test("download name: image compressors add _compressed, other Tools take the target extension", () => {
+test("download name: every compressor adds _compressed, other Tools take the target extension", () => {
   assert.match(brief(["compress-jpg"], null), /"<name>_compressed\.jpg"/);
-  assert.match(brief(["compress-gif"], null), /"<name>\.gif"/);
+  assert.match(brief(["compress-gif"], null), /"<name>_compressed\.gif"/);
+  assert.match(brief(["compress-mp4"], null), /"<name>_compressed\.mp4"/);
+  assert.doesNotMatch(brief(["compress-mp4"], null), /"<name>\.mp4"/);
   assert.match(brief(["webp-to-png"], null), /"<name>\.png"/);
 });

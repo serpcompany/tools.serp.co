@@ -268,3 +268,18 @@ test("a browser-raster output has 8 bits per channel, as the RGBA type holds", (
   assert.match(heif, /export type RGBA = \{ data: Uint8ClampedArray;/);
   assert.match(text("browser-raster"), /a canvas output has 8 bits per channel/);
 });
+
+test("the MP3 192 kbit/s fact is the conversion's, never the MP3 compressor's", () => {
+  const [, kbps] = flags(buildConvertCommand("aac", "mp3").args).match(/-b:a (\d+)k/);
+  assert.match(factsOf("wav-to-mp3").text, new RegExp(`MP3 outputs ask for ${kbps} kbit/s`));
+  const compress = factsOf("compress-mp3");
+  assert.doesNotMatch(compress.text, new RegExp(`\\b${kbps}\\b`));
+  assert.doesNotMatch(compress.command, new RegExp(`\\b${kbps}k\\b`));
+});
+
+test("WMV, OGV and SWF outputs set no codec, so FFmpeg's defaults decide", () => {
+  for (const to of ["wmv", "ogv", "swf"]) {
+    const args = buildConvertCommand("mp4", to).args;
+    for (const option of ["-c:v", "-vcodec", "-c:a", "-acodec"]) assert.ok(!args.includes(option), `${to} sets ${option}`);
+  }
+});

@@ -136,7 +136,9 @@ sections, in this order, written for the pair:
 1. **What is a {FROM} file**: what it is, who made it, its history, and
    where people come across one.
 2. **Programs that open {FROM} files**: grouped under Windows, Mac, Linux,
-   web and mobile, one line on each program.
+   web and mobile, one line on each program. Each group starts with a bold
+   label at the start of a line or list item (`**Windows:**`), made only of
+   platform words, and at least 3 platforms have one.
 3. **{FROM} and {TO} compared**: extensions, media types, variants,
    compression, transparency, color depth and metadata, and how the two
    differ for this conversion.
@@ -198,6 +200,10 @@ Copy links only to live pages on this site, as a relative path
    given as a path (`content:apply <file>.json`) resolves against
    `apps/tools`, where `pnpm -C apps/tools` runs the script.
 
+`apps/tools/content/sources/formats-*.json` and `sources/<batch>.json` are the
+evidence the #372 copy was checked against, dated to that work. They are not
+current truth, and not a second source beside `format-guides.json`.
+
 The engine facts are in `apps/tools/scripts/lib/engine-facts.mjs`, each with
 the file it was read from. When an engine changes, update its entry in the
 same PR. A Tool whose sweep doesn't pass is flagged in its brief: write
@@ -231,7 +237,8 @@ compressor. It fails when:
 - for a Tool with a `guide` (written in depth): it has fewer than 8 FAQs; the
   guide's `###` headings aren't the five sections of "Writing in depth", in
   order (known by how they start or end: "What is", "Programs that",
-  "compared", "Other ways to", "Problems with"); the guide has a table; or
+  "compared", "Other ways to", "Problems with"); "Programs that open" has
+  bold platform labels for fewer than 3 platforms; the guide has a table; or
   any field of its copy uses a common British spelling (colour, grey,
   licence, modelled, centre, behaviour, -ise and -isation, and others in
   `apps/tools/scripts/lib/content.mjs`).

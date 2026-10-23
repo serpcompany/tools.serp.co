@@ -433,6 +433,16 @@ test("a guide groups the programs that open the format under platform labels", (
   assert.equal(programPlatforms("**Windows**\n\n- Photos.\n\n**macOS:** Preview.\n\n- **Android and iOS:** a viewer."), 3);
   assert.equal(programPlatforms("**Desktop**\n\n- GIMP on Windows, Mac and Linux.\n\n**Browsers and phones**"), 2);
   assert.equal(programPlatforms("- **Windows, Mac and Linux:** GIMP.\n- **Mobile:** a viewer."), 4);
+});
+
+test("a platform label is made only of platform words and fillers", () => {
+  assert.equal(programPlatforms("- **On Windows:** Photos."), 1);
+  assert.equal(programPlatforms("**Desktop (Windows, Mac, Linux):** GIMP."), 3);
+  assert.equal(programPlatforms("- **Windows Media Player:** plays it."), 0);
+  assert.equal(programPlatforms("**Web Video Player** plays it."), 0);
+});
+
+test("a guide without platform labels fails the depth check", () => {
 
   const tools = deepCatalog();
   tools[0].content.guide.markdown = tools[0].content.guide.markdown.replace(PLATFORMS, "GIMP opens it on Windows, Mac and Linux.");

@@ -8,7 +8,6 @@
 // that operation. FFmpeg command lines aren't restated: the brief runs the builders in
 // lib/convert/ffmpeg-args.ts for each Tool, so they can't drift.
 
-import { resolveCompressionTarget } from "../../lib/compression-utils.ts";
 import { buildCompressionCommand, buildConvertCommand } from "../../lib/convert/ffmpeg-args.ts";
 
 // HeroConverter (components/HeroConverter.tsx) and lib/convert/workerClient.ts
@@ -25,7 +24,9 @@ export function converterPageFacts(tool) {
     "There is no general file-size limit (checkInputFile in lib/convert/workerClient.ts checks the format, not the size). Some engines have their own, listed below.",
     'The output is checked against the target format: a wrong result fails with "The converter produced X instead of Y." (lib/convert/workerClient.ts).',
     "The visitor's original file isn't changed; they download a new copy.",
-    compress && resolveCompressionTarget(tool.from) === "image-worker"
+    // Every compression saves "_compressed" with the source extension, whichever
+    // engine runs it (the isCompression branch in HeroConverter).
+    compress
       ? `The download is named after the original with "_compressed" added: "<name>_compressed.${tool.from.toLowerCase()}" (components/HeroConverter.tsx).`
       : `The download is named after the original with this Tool's target extension: "<name>.${tool.to}" (components/HeroConverter.tsx). An FFmpeg command below writes an internal file whose name the visitor never sees; copy must not give that name or its extension as the download's.`,
   ];
@@ -195,7 +196,8 @@ export const ENGINE_FACTS = {
 
 
 // Facts for every Tool that writes one format (`to`), on the listed engines.
-// An entry may be a list, when parts of it hold on different engines.
+// An entry may be a list, when parts of it hold on different engines. An entry
+// marked `convertOnly` is skipped for a compressor, whose command differs.
 export const TARGET_FACTS = {
   pdf: [
     {
@@ -243,8 +245,10 @@ const defaultCodecs = (container, video, audio) => ({
 TARGET_FACTS.wmv = defaultCodecs("WMV", "MS-MPEG4 v3 (not Windows Media Video)", "WMA v2 (128 kbit/s)");
 TARGET_FACTS.ogv = defaultCodecs("OGV", "Theora", "Vorbis");
 TARGET_FACTS.swf = defaultCodecs("SWF", "Sorenson Spark (FLV1)", "MP3");
+// buildConvertCommand asks for 192k; compress-mp3 runs buildCompressionCommand (160k).
 TARGET_FACTS.mp3 = {
   engines: ["ffmpeg-wasm", "server-video, then ffmpeg-wasm"],
+  convertOnly: true,
   facts: [
     "MP3 outputs ask for 192 kbit/s, which MP3 can't reach below 32 kHz: LAME then writes at most 160 kbit/s (16 to 24 kHz) or 64 kbit/s (8 to 12 kHz). The sample rate isn't changed, so an 8 kHz source (GSM, telephone ULAW or A-law) gives an MP3 of about 64 kbit/s. Checked with @ffmpeg/core 0.12.6. Copy must not promise 192 kbit/s for every source.",
   ],
@@ -351,7 +355,7 @@ export function engineFactsFor(tool, engine) {
   const unsettled = entry ? [...(entry.unsettled ?? [])] : [];
   if (entry) {
     for (const scoped of [TARGET_FACTS[tool.to], SOURCE_FACTS[tool.from], TOOL_FACTS[tool.id]].flat()) {
-      if (!appliesTo(scoped, engine)) continue;
+      if (!appliesTo(scoped, engine) || (compress && scoped.convertOnly)) continue;
       facts.push(...(scoped.facts ?? []));
       if (scoped.pdf && tool.to === "pdf") facts.push(scoped.pdf);
       unsettled.push(...(scoped.unsettled ?? []));
