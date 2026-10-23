@@ -1,25 +1,33 @@
 // lib/convert/pdf.ts
-// PDF → PNG using the legacy pdfjs bundle for worker compatibility.
+// pdf.js, self-hosted, and the size a page is drawn at. pdf-images.ts draws
+// pages as images, and pdf-text.ts reads their text.
 
 const workerPublicUrl = "/vendor/pdfjs/pdf.worker.min.js";
-type PdfCanvasContext = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+export type PdfCanvasContext = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
-type PdfjsPage = {
-  getViewport: (options: { scale: number }) => { width: number; height: number };
-  render: (options: { canvasContext: PdfCanvasContext; viewport: { width: number; height: number } }) => {
-    promise: Promise<void>;
-  };
+export type PdfjsViewport = { width: number; height: number };
+
+export type PdfjsPage = {
+  getViewport: (options: { scale: number }) => PdfjsViewport;
+  render: (options: {
+    canvasContext: PdfCanvasContext;
+    viewport: PdfjsViewport;
+    background?: string;
+  }) => { promise: Promise<void> };
+  cleanup?: () => unknown;
 };
 
-type PdfjsDocument = {
+export type PdfjsDocument = {
   numPages: number;
   getPage: (page: number) => Promise<PdfjsPage>;
-  destroy: () => void | Promise<void>;
 };
 
-type PdfjsModule = {
+export type PdfjsModule = {
   GlobalWorkerOptions: { workerSrc: string };
-  getDocument: (options: { data: ArrayBuffer }) => { promise: Promise<PdfjsDocument> };
+  getDocument: (options: { data: Uint8Array; isEvalSupported?: boolean; verbosity?: number }) => {
+    promise: Promise<PdfjsDocument>;
+    destroy: () => Promise<void>;
+  };
 };
 
 let pdfjsPromise: Promise<unknown> | null = null;
@@ -52,46 +60,8 @@ export function pageRenderScale(width: number, height: number) {
   return scale;
 }
 
-export async function renderPdfPages(buf: ArrayBuffer, page?: number, format?: string) {
-  const pdfjsLib = await loadPdfjs();
-  const doc = await pdfjsLib.getDocument({ data: buf }).promise;
-  const out: Array<ArrayBuffer> = [];
-  const pages = page ? [page] : Array.from({ length: doc.numPages }, (_, i) => i + 1);
-  
-  // Determine output format
-  const mimeType = format === "jpg" || format === "jpeg" ? "image/jpeg" : "image/png";
-  const quality = mimeType === "image/jpeg" ? 0.9 : undefined;
-
-  for (const p of pages) {
-    const pg = await doc.getPage(p);
-    const size = pg.getViewport({ scale: 1 });
-    const viewport = pg.getViewport({ scale: pageRenderScale(size.width, size.height) });
-    const useOffscreen = typeof OffscreenCanvas !== "undefined";
-    const canvas: HTMLCanvasElement | OffscreenCanvas = useOffscreen
-      ? new OffscreenCanvas(viewport.width, viewport.height)
-      : Object.assign(document.createElement("canvas"), { width: viewport.width, height: viewport.height });
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      throw new Error("Failed to create 2D canvas context.");
-    }
-    const ctx2d = ctx as PdfCanvasContext;
-    
-    // Fill white background for JPEG (since it doesn't support transparency)
-    if (mimeType === "image/jpeg") {
-      ctx2d.fillStyle = "white";
-      ctx2d.fillRect(0, 0, viewport.width, viewport.height);
-    }
-
-    await pg.render({ canvasContext: ctx2d, viewport }).promise;
-
-    const blob: Blob = "convertToBlob" in canvas
-      ? await (canvas as OffscreenCanvas).convertToBlob({ type: mimeType, quality })
-      : await new Promise((resolve) => (canvas as HTMLCanvasElement).toBlob((b)=>resolve(b!), mimeType, quality));
-
-    out.push(await blob.arrayBuffer());
-  }
-
-  await doc.destroy();
-  return out;
+// The canvas a page of `viewport`'s size is drawn on, in whole pixels, as a
+// canvas takes them (a fraction is dropped), and never empty.
+export function pageCanvasSize(viewport: PdfjsViewport): { width: number; height: number } {
+  return { width: Math.max(1, Math.floor(viewport.width)), height: Math.max(1, Math.floor(viewport.height)) };
 }

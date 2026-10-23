@@ -1329,6 +1329,95 @@
     ]
   },
   {
+    "id": "ai-to-psd",
+    "name": "AI to PSD",
+    "description": "Convert Adobe Illustrator (AI) files to Photoshop PSD",
+    "operation": "convert",
+    "route": "/ai-to-psd",
+    "from": "ai",
+    "to": "psd",
+    "isActive": true,
+    "tags": [
+      "ai",
+      "psd",
+      "illustrator",
+      "photoshop",
+      "convert",
+      "image"
+    ],
+    "content": {
+      "tool": {
+        "title": "AI to PSD: Convert Illustrator Files to Photoshop",
+        "subtitle": "Convert AI to PSD in your browser, with no upload. Each Illustrator artboard becomes its own Photoshop file, drawn on white at twice its size in points.",
+        "from": "ai",
+        "to": "psd",
+        "accept": ".ai"
+      },
+      "howTo": {
+        "title": "How to convert an AI file to PSD",
+        "intro": "Each artboard of your Illustrator file becomes its own Photoshop file, named after your file and the artboard's number.",
+        "steps": [
+          "Upload your AI file, saved with Create PDF Compatible File turned on, Illustrator's default.",
+          "We draw each artboard in your browser at twice its size in points, on a white background: a 500 × 500 pt artboard becomes 1000 × 1000 pixels.",
+          "Download a PSD for each artboard: logo_page1.psd, logo_page2.psd and so on."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Which AI files can be converted?",
+          "answer": "Those saved with Create PDF Compatible File turned on, which is Illustrator's default: the PDF inside the file is what's drawn. A file saved without it, or an old PostScript AI file, is refused with a message saying how to save it again."
+        },
+        {
+          "question": "Will the layers and vectors be kept?",
+          "answer": "No. Each artboard is drawn as pixels into one layer on a white background: the PSD is a picture of the artwork, not its Illustrator layers or paths, so it can be retouched but not edited as vectors. To keep the vectors, convert the AI file to PDF."
+        },
+        {
+          "question": "Do I get one PSD for each artboard?",
+          "answer": "Yes, named after your file and the artboard's number: logo.ai becomes logo_page1.psd, logo_page2.psd and so on."
+        },
+        {
+          "question": "What size is the PSD?",
+          "answer": "Twice the artboard's size in points, 144 pixels to the inch: a 500 × 500 pt artboard becomes 1000 × 1000 pixels. A larger artboard is drawn smaller, keeping its shape, so no image is over about 16.7 million pixels (4096 × 4096)."
+        },
+        {
+          "question": "Is my file uploaded anywhere?",
+          "answer": "No. Your AI file is drawn and converted in your browser, and it never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "Illustrator and Photoshop files",
+        "fromFormat": {
+          "name": "AI",
+          "fullName": "Adobe Illustrator Artwork",
+          "description": "AI is Adobe Illustrator's format for vector artwork, such as logos, icons and illustrations made of paths that stay sharp at any size."
+        },
+        "toFormat": {
+          "name": "PSD",
+          "fullName": "Photoshop Document",
+          "description": "PSD is Adobe Photoshop's own format, which keeps layers, masks and adjustments for editing. Most image editors open it."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "AI to PNG",
+          "toolId": "ai-to-png"
+        },
+        {
+          "title": "AI to PDF",
+          "toolId": "ai-to-pdf"
+        },
+        {
+          "title": "PDF to PSD",
+          "toolId": "pdf-to-psd"
+        },
+        {
+          "title": "PNG to PSD",
+          "toolId": "png-to-psd"
+        }
+      ]
+    }
+  },
+  {
     "id": "ai-to-svg",
     "name": "AI to SVG",
     "description": "Convert AI files to SVG format",
@@ -92153,6 +92242,98 @@
     ]
   },
   {
+    "id": "pdf-to-bmp",
+    "name": "PDF to BMP",
+    "description": "Convert PDF pages to BMP bitmap images",
+    "operation": "convert",
+    "route": "/pdf-to-bmp",
+    "from": "pdf",
+    "to": "bmp",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "bmp",
+      "bitmap",
+      "convert",
+      "image"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to BMP: Convert PDF to Bitmap Images",
+        "subtitle": "Convert PDF to BMP in your browser, with no upload. Each page becomes its own Windows bitmap image, drawn on white at twice its size in points.",
+        "from": "pdf",
+        "to": "bmp",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to BMP",
+        "intro": "Each page of your PDF becomes its own BMP image, named after your PDF and the page number.",
+        "steps": [
+          "Upload your PDF.",
+          "We draw each page in your browser at twice its size in points, on a white background: a US Letter page becomes 1224 × 1584 pixels.",
+          "Download a BMP for each page: report_page1.bmp, report_page2.bmp and so on."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Do I get one BMP, or one for each page?",
+          "answer": "One for each page, named after your PDF and the page number: report.pdf becomes report_page1.bmp, report_page2.bmp and so on. A one-page PDF gives report_page1.bmp."
+        },
+        {
+          "question": "What size are the BMP images?",
+          "answer": "Each page is drawn at twice its size in points, 144 pixels to the inch: a US Letter page becomes 1224 × 1584 pixels and an A4 page 1190 × 1683. A page too large for that is drawn smaller, keeping its shape, so no image is over about 16.7 million pixels (4096 × 4096)."
+        },
+        {
+          "question": "What kind of BMP is it?",
+          "answer": "An uncompressed 32-bit Windows bitmap: 8 bits each of red, green, blue and alpha, the alpha fully opaque, since pages are drawn on white. A US Letter page comes to about 7.8 MB."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one, and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 1,000 pages, and up to about 128 US Letter pages at once: the BMP images are held in your browser until they're saved, up to about 1 GB of pixels. A larger PDF is refused with a message saying how many of its pages can be converted at once; split it into smaller PDFs and convert each."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. Your PDF is drawn and converted in your browser, and it never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and BMP",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, its text, fonts, pictures and layout, so it reads and prints the same on every device."
+        },
+        "toFormat": {
+          "name": "BMP",
+          "fullName": "Bitmap",
+          "description": "BMP is the Windows bitmap format: simple, uncompressed and opened by almost every program, so its files are large."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        },
+        {
+          "title": "PDF to JPG",
+          "toolId": "pdf-to-jpg"
+        },
+        {
+          "title": "BMP to PDF",
+          "toolId": "bmp-to-pdf"
+        },
+        {
+          "title": "AI to BMP",
+          "toolId": "ai-to-bmp"
+        }
+      ]
+    }
+  },
+  {
     "id": "pdf-to-epub",
     "name": "PDF to EPUB",
     "description": "Convert PDF to EPUB (an e-book)",
@@ -92259,6 +92440,97 @@
         {
           "title": "PDF to PNG",
           "toolId": "pdf-to-png"
+        }
+      ]
+    }
+  },
+  {
+    "id": "pdf-to-gif",
+    "name": "PDF to GIF",
+    "description": "Convert PDF pages to GIF images",
+    "operation": "convert",
+    "route": "/pdf-to-gif",
+    "from": "pdf",
+    "to": "gif",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "gif",
+      "convert",
+      "image"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to GIF: Convert PDF Pages to GIF Images",
+        "subtitle": "Convert PDF to GIF in your browser, with no upload. Each page becomes its own still GIF image of up to 256 colours, drawn on white at twice its size in points.",
+        "from": "pdf",
+        "to": "gif",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to GIF",
+        "intro": "Each page of your PDF becomes its own GIF image, named after your PDF and the page number.",
+        "steps": [
+          "Upload your PDF.",
+          "We draw each page in your browser at twice its size in points, on a white background: a US Letter page becomes 1224 × 1584 pixels.",
+          "Download a GIF for each page: report_page1.gif, report_page2.gif and so on."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Do I get an animated GIF of all the pages?",
+          "answer": "No. Each page is saved as its own still GIF, named after your PDF and the page number: report.pdf becomes report_page1.gif, report_page2.gif and so on."
+        },
+        {
+          "question": "How many colours does the GIF have?",
+          "answer": "Up to 256, as GIF allows. Text, line art and flat colours keep their look; photos and gradients in the PDF lose some colour. For every colour, convert the PDF to PNG."
+        },
+        {
+          "question": "What size are the GIF images?",
+          "answer": "Each page is drawn at twice its size in points, 144 pixels to the inch: a US Letter page becomes 1224 × 1584 pixels and an A4 page 1190 × 1683. A page too large for that is drawn smaller, keeping its shape, so no image is over about 16.7 million pixels (4096 × 4096)."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one, and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 1,000 pages, and up to about 128 US Letter pages at once: the GIF images are held in your browser until they're saved, up to about 1 GB of pixels. A larger PDF is refused with a message saying how many of its pages can be converted at once; split it into smaller PDFs and convert each."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. Your PDF is drawn and converted in your browser, and it never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and GIF",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, its text, fonts, pictures and layout, so it reads and prints the same on every device."
+        },
+        "toFormat": {
+          "name": "GIF",
+          "fullName": "Graphics Interchange Format",
+          "description": "GIF holds up to 256 colours a picture, compressed without loss, and is shown everywhere, from browsers to chat apps."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        },
+        {
+          "title": "PDF to JPG",
+          "toolId": "pdf-to-jpg"
+        },
+        {
+          "title": "GIF to PDF",
+          "toolId": "gif-to-pdf"
+        },
+        {
+          "title": "AI to GIF",
+          "toolId": "ai-to-gif"
         }
       ]
     }
@@ -92567,6 +92839,474 @@
     }
   },
   {
+    "id": "pdf-to-ppm",
+    "name": "PDF to PPM",
+    "description": "Convert PDF pages to PPM (Netpbm) images",
+    "operation": "convert",
+    "route": "/pdf-to-ppm",
+    "from": "pdf",
+    "to": "ppm",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "ppm",
+      "netpbm",
+      "convert",
+      "image"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to PPM: Convert PDF Pages to PPM Images",
+        "subtitle": "Convert PDF to PPM in your browser, with no upload. Each page becomes its own PPM image, Netpbm's RGB format, drawn on white at twice its size in points.",
+        "from": "pdf",
+        "to": "ppm",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to PPM",
+        "intro": "Each page of your PDF becomes its own PPM image, named after your PDF and the page number.",
+        "steps": [
+          "Upload your PDF.",
+          "We draw each page in your browser at twice its size in points, on a white background: a US Letter page becomes 1224 × 1584 pixels.",
+          "Download a PPM for each page: report_page1.ppm, report_page2.ppm and so on."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "What kind of PPM is it?",
+          "answer": "A binary PPM (P6), the Netpbm format: a short text header with the width and height, then 3 bytes of red, green and blue for each pixel, uncompressed. A US Letter page comes to about 5.8 MB."
+        },
+        {
+          "question": "Do I get one PPM, or one for each page?",
+          "answer": "One for each page, named after your PDF and the page number: report.pdf becomes report_page1.ppm, report_page2.ppm and so on. A one-page PDF gives report_page1.ppm."
+        },
+        {
+          "question": "What size are the PPM images?",
+          "answer": "Each page is drawn at twice its size in points, 144 pixels to the inch: a US Letter page becomes 1224 × 1584 pixels and an A4 page 1190 × 1683. A page too large for that is drawn smaller, keeping its shape, so no image is over about 16.7 million pixels (4096 × 4096)."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one, and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 1,000 pages, and up to about 128 US Letter pages at once: the PPM images are held in your browser until they're saved, up to about 1 GB of pixels. A larger PDF is refused with a message saying how many of its pages can be converted at once; split it into smaller PDFs and convert each."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. Your PDF is drawn and converted in your browser, and it never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and PPM",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, its text, fonts, pictures and layout, so it reads and prints the same on every device."
+        },
+        "toFormat": {
+          "name": "PPM",
+          "fullName": "Portable Pixmap",
+          "description": "PPM is the Netpbm colour image format: simple enough that image-processing scripts and programs read and write it directly, uncompressed."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        },
+        {
+          "title": "PDF to RGB",
+          "toolId": "pdf-to-rgb"
+        },
+        {
+          "title": "PNG to PPM",
+          "toolId": "png-to-ppm"
+        },
+        {
+          "title": "PPM to PNG",
+          "toolId": "ppm-to-png"
+        }
+      ]
+    }
+  },
+  {
+    "id": "pdf-to-psd",
+    "name": "PDF to PSD",
+    "description": "Convert PDF pages to Photoshop PSD files",
+    "operation": "convert",
+    "route": "/pdf-to-psd",
+    "from": "pdf",
+    "to": "psd",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "psd",
+      "photoshop",
+      "convert",
+      "image"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to PSD: Convert PDF to Photoshop Files",
+        "subtitle": "Convert PDF to PSD in your browser, with no upload. Each page becomes its own Photoshop file, one layer drawn on white at twice its size in points.",
+        "from": "pdf",
+        "to": "psd",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to PSD",
+        "intro": "Each page of your PDF becomes its own PSD image in a Photoshop file, named after your PDF and the page number.",
+        "steps": [
+          "Upload your PDF.",
+          "We draw each page in your browser at twice its size in points, on a white background: a US Letter page becomes 1224 × 1584 pixels.",
+          "Download a PSD for each page: report_page1.psd, report_page2.psd and so on."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Will the text and shapes be editable in Photoshop?",
+          "answer": "Not as text or vectors. Each page is drawn as pixels, so the PSD holds a picture of the page in one layer: you can retouch it and add layers over it, but its words can't be retyped. To get the words, convert the PDF to TXT."
+        },
+        {
+          "question": "Do I get one PSD, or one for each page?",
+          "answer": "One for each page, named after your PDF and the page number: report.pdf becomes report_page1.psd, report_page2.psd and so on. A one-page PDF gives report_page1.psd."
+        },
+        {
+          "question": "What size are the PSD images?",
+          "answer": "Each page is drawn at twice its size in points, 144 pixels to the inch: a US Letter page becomes 1224 × 1584 pixels and an A4 page 1190 × 1683. A page too large for that is drawn smaller, keeping its shape, so no image is over about 16.7 million pixels (4096 × 4096)."
+        },
+        {
+          "question": "Which programs open the PSD?",
+          "answer": "Adobe Photoshop, and other editors that read PSD, such as GIMP, Affinity Photo and Photopea. It's 8-bit RGB, with the page as one layer on a white background."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one, and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 1,000 pages, and up to about 128 US Letter pages at once: the PSD images are held in your browser until they're saved, up to about 1 GB of pixels. A larger PDF is refused with a message saying how many of its pages can be converted at once; split it into smaller PDFs and convert each."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. Your PDF is drawn and converted in your browser, and it never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and PSD",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, its text, fonts, pictures and layout, so it reads and prints the same on every device."
+        },
+        "toFormat": {
+          "name": "PSD",
+          "fullName": "Photoshop Document",
+          "description": "PSD is Adobe Photoshop's own format, which keeps layers, masks and adjustments for editing. Most image editors open it."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "AI to PSD",
+          "toolId": "ai-to-psd"
+        },
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        },
+        {
+          "title": "PNG to PSD",
+          "toolId": "png-to-psd"
+        },
+        {
+          "title": "PSD to PDF",
+          "toolId": "psd-to-pdf"
+        }
+      ]
+    }
+  },
+  {
+    "id": "pdf-to-rgb",
+    "name": "PDF to RGB",
+    "description": "Convert PDF pages to raw RGB pixel files",
+    "operation": "convert",
+    "route": "/pdf-to-rgb",
+    "from": "pdf",
+    "to": "rgb",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "rgb",
+      "raw",
+      "convert",
+      "image"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to RGB: Convert PDF Pages to Raw RGB Pixels",
+        "subtitle": "Convert PDF to raw RGB pixel files in your browser, with no upload. Each page's pixels are saved as red, green and blue bytes, with no header.",
+        "from": "pdf",
+        "to": "rgb",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to RGB",
+        "intro": "Each page of your PDF becomes its own RGB image of raw pixels, named after your PDF and the page number.",
+        "steps": [
+          "Upload your PDF.",
+          "We draw each page in your browser at twice its size in points, on a white background: a US Letter page becomes 1224 × 1584 pixels.",
+          "Download a RGB for each page: report_page1.rgb, report_page2.rgb and so on."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Is this a CMYK to RGB colour conversion of my PDF?",
+          "answer": "No. Each page is saved as a .rgb file: raw pixels, 3 bytes (red, green, blue) for each, row after row from the top, with no header. The PDF's colours are drawn in RGB as a PDF reader shows them on screen. To change a print PDF's colours from CMYK to RGB and keep it a PDF, use a PDF editor's colour conversion, such as Acrobat Pro's Convert Colors."
+        },
+        {
+          "question": "How do I open a .rgb file?",
+          "answer": "With a program that reads raw pixels, told the image's width and height, since the file doesn't store them: a page is twice its size in points, so a US Letter page is 1224 × 1584 pixels and 5,816,448 bytes. With ImageMagick: magick -size 1224x1584 -depth 8 rgb:report_page1.rgb report_page1.png."
+        },
+        {
+          "question": "Do I get one RGB, or one for each page?",
+          "answer": "One for each page, named after your PDF and the page number: report.pdf becomes report_page1.rgb, report_page2.rgb and so on. A one-page PDF gives report_page1.rgb."
+        },
+        {
+          "question": "What size are the RGB images?",
+          "answer": "Each page is drawn at twice its size in points, 144 pixels to the inch: a US Letter page becomes 1224 × 1584 pixels and an A4 page 1190 × 1683. A page too large for that is drawn smaller, keeping its shape, so no image is over about 16.7 million pixels (4096 × 4096)."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one, and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 1,000 pages, and up to about 128 US Letter pages at once: the RGB images are held in your browser until they're saved, up to about 1 GB of pixels. A larger PDF is refused with a message saying how many of its pages can be converted at once; split it into smaller PDFs and convert each."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. Your PDF is drawn and converted in your browser, and it never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and RGB",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, its text, fonts, pictures and layout, so it reads and prints the same on every device."
+        },
+        "toFormat": {
+          "name": "RGB",
+          "fullName": "Raw RGB pixels",
+          "description": "A .rgb file holds an image's pixels and nothing else: 3 bytes each, red, green and blue, with no size, colour profile or compression. Graphics programs and hardware read it when told its size."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to PPM",
+          "toolId": "pdf-to-ppm"
+        },
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        },
+        {
+          "title": "PNG to RGB",
+          "toolId": "png-to-rgb"
+        }
+      ]
+    }
+  },
+  {
+    "id": "pdf-to-tga",
+    "name": "PDF to TGA",
+    "description": "Convert PDF pages to TGA (Targa) images",
+    "operation": "convert",
+    "route": "/pdf-to-tga",
+    "from": "pdf",
+    "to": "tga",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "tga",
+      "targa",
+      "convert",
+      "image"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to TGA: Convert PDF Pages to Targa Images",
+        "subtitle": "Convert PDF to TGA in your browser, with no upload. Each page becomes its own Targa image, drawn on white at twice its size in points.",
+        "from": "pdf",
+        "to": "tga",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to TGA",
+        "intro": "Each page of your PDF becomes its own TGA image, named after your PDF and the page number.",
+        "steps": [
+          "Upload your PDF.",
+          "We draw each page in your browser at twice its size in points, on a white background: a US Letter page becomes 1224 × 1584 pixels.",
+          "Download a TGA for each page: report_page1.tga, report_page2.tga and so on."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Do I get one TGA, or one for each page?",
+          "answer": "One for each page, named after your PDF and the page number: report.pdf becomes report_page1.tga, report_page2.tga and so on. A one-page PDF gives report_page1.tga."
+        },
+        {
+          "question": "What size are the TGA images?",
+          "answer": "Each page is drawn at twice its size in points, 144 pixels to the inch: a US Letter page becomes 1224 × 1584 pixels and an A4 page 1190 × 1683. A page too large for that is drawn smaller, keeping its shape, so no image is over about 16.7 million pixels (4096 × 4096)."
+        },
+        {
+          "question": "What kind of TGA is it?",
+          "answer": "An uncompressed 32-bit Targa: 8 bits each of red, green, blue and alpha, the alpha fully opaque, since pages are drawn on white. A US Letter page comes to about 7.8 MB."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one, and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 1,000 pages, and up to about 128 US Letter pages at once: the TGA images are held in your browser until they're saved, up to about 1 GB of pixels. A larger PDF is refused with a message saying how many of its pages can be converted at once; split it into smaller PDFs and convert each."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. Your PDF is drawn and converted in your browser, and it never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and TGA",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, its text, fonts, pictures and layout, so it reads and prints the same on every device."
+        },
+        "toFormat": {
+          "name": "TGA",
+          "fullName": "Truevision TGA (Targa)",
+          "description": "TGA is a simple image format with an alpha channel, long used for textures in games and 3D software, and in video work."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        },
+        {
+          "title": "PNG to TGA",
+          "toolId": "png-to-tga"
+        },
+        {
+          "title": "TGA to PNG",
+          "toolId": "tga-to-png"
+        },
+        {
+          "title": "AI to TGA",
+          "toolId": "ai-to-tga"
+        }
+      ]
+    }
+  },
+  {
+    "id": "pdf-to-tiff",
+    "name": "PDF to TIFF",
+    "description": "Convert PDF pages to TIFF (TIF) images",
+    "operation": "convert",
+    "route": "/pdf-to-tiff",
+    "from": "pdf",
+    "to": "tiff",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "tiff",
+      "tif",
+      "convert",
+      "image"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to TIFF: Convert PDF to TIFF (TIF) Images",
+        "subtitle": "Convert PDF to TIFF (TIF) in your browser, with no upload. Each page becomes its own TIFF image, drawn on white at twice its size in points.",
+        "from": "pdf",
+        "to": "tiff",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to TIFF",
+        "intro": "Each page of your PDF becomes its own TIFF image, named after your PDF and the page number.",
+        "steps": [
+          "Upload your PDF.",
+          "We draw each page in your browser at twice its size in points, on a white background: a US Letter page becomes 1224 × 1584 pixels.",
+          "Download a TIFF for each page: report_page1.tiff, report_page2.tiff and so on."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Is TIF the same as TIFF?",
+          "answer": "Yes. TIF and TIFF are two spellings of the same format's file extension, and a program that opens one opens the other. The files are saved as .tiff; rename one to .tif if a program asks for that."
+        },
+        {
+          "question": "Do I get one TIFF, or one for each page?",
+          "answer": "One for each page, named after your PDF and the page number: report.pdf becomes report_page1.tiff, report_page2.tiff and so on. A single TIFF holding every page isn't made here."
+        },
+        {
+          "question": "What size are the TIFF images?",
+          "answer": "Each page is drawn at twice its size in points, 144 pixels to the inch: a US Letter page becomes 1224 × 1584 pixels and an A4 page 1190 × 1683. A page too large for that is drawn smaller, keeping its shape, so no image is over about 16.7 million pixels (4096 × 4096)."
+        },
+        {
+          "question": "What kind of TIFF is it?",
+          "answer": "An uncompressed TIFF in 8-bit RGB colour, with an alpha channel that is fully opaque: pages are drawn on white, as a PDF reader shows them, so nothing is transparent. A US Letter page comes to about 7.8 MB."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one, and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 1,000 pages, and up to about 128 US Letter pages at once: the TIFF images are held in your browser until they're saved, up to about 1 GB of pixels. A larger PDF is refused with a message saying how many of its pages can be converted at once; split it into smaller PDFs and convert each."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. Your PDF is drawn and converted in your browser, and it never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and TIFF",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, its text, fonts, pictures and layout, so it reads and prints the same on every device."
+        },
+        "toFormat": {
+          "name": "TIFF",
+          "fullName": "Tagged Image File Format",
+          "description": "TIFF is a lossless image format used for scanning, printing, faxing and archives. It keeps every pixel exactly, so its files are large."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        },
+        {
+          "title": "PDF to JPG",
+          "toolId": "pdf-to-jpg"
+        },
+        {
+          "title": "TIFF to PDF",
+          "toolId": "tiff-to-pdf"
+        },
+        {
+          "title": "AI to TIFF",
+          "toolId": "ai-to-tiff"
+        }
+      ]
+    }
+  },
+  {
     "id": "pdf-to-txt",
     "name": "PDF to TXT",
     "description": "Convert PDF to text (TXT)",
@@ -92671,6 +93411,98 @@
         {
           "title": "PNG to TXT (text from a picture)",
           "toolId": "png-to-txt"
+        }
+      ]
+    }
+  },
+  {
+    "id": "pdf-to-webp",
+    "name": "PDF to WebP",
+    "description": "Convert PDF pages to WebP images",
+    "operation": "convert",
+    "route": "/pdf-to-webp",
+    "from": "pdf",
+    "to": "webp",
+    "isActive": true,
+    "tags": [
+      "pdf",
+      "webp",
+      "convert",
+      "image",
+      "web"
+    ],
+    "content": {
+      "tool": {
+        "title": "PDF to WebP: Convert PDF Pages to WebP Images",
+        "subtitle": "Convert PDF to WebP in your browser, with no upload. Each page becomes its own WebP image, drawn on white at twice its size in points, small enough for the web.",
+        "from": "pdf",
+        "to": "webp",
+        "accept": ".pdf,application/pdf"
+      },
+      "howTo": {
+        "title": "How to convert a PDF to WebP",
+        "intro": "Each page of your PDF becomes its own WebP image, named after your PDF and the page number.",
+        "steps": [
+          "Upload your PDF.",
+          "We draw each page in your browser at twice its size in points, on a white background: a US Letter page becomes 1224 × 1584 pixels.",
+          "Download a WEBP for each page: report_page1.webp, report_page2.webp and so on."
+        ]
+      },
+      "faqs": [
+        {
+          "question": "Do I get one WEBP, or one for each page?",
+          "answer": "One for each page, named after your PDF and the page number: report.pdf becomes report_page1.webp, report_page2.webp and so on. A one-page PDF gives report_page1.webp."
+        },
+        {
+          "question": "What size are the WebP images?",
+          "answer": "Each page is drawn at twice its size in points, 144 pixels to the inch: a US Letter page becomes 1224 × 1584 pixels and an A4 page 1190 × 1683. A page too large for that is drawn smaller, keeping its shape, so no image is over about 16.7 million pixels (4096 × 4096)."
+        },
+        {
+          "question": "Is the WebP lossy?",
+          "answer": "Yes. It's a lossy WebP, much smaller than a PNG of the page: flat colour and text stay clean, though fine edges can soften a little, as in a JPEG. For an exact copy of each page, convert the PDF to PNG."
+        },
+        {
+          "question": "Can I convert a password-protected PDF?",
+          "answer": "Not while it has a password. Open it with its password, save or print a copy without one, and convert that copy. A PDF that only restricts printing or copying, and opens without a password, converts as usual."
+        },
+        {
+          "question": "How large a PDF can I convert?",
+          "answer": "Up to 1,000 pages, and up to about 128 US Letter pages at once: the WebP images are held in your browser until they're saved, up to about 1 GB of pixels. A larger PDF is refused with a message saying how many of its pages can be converted at once; split it into smaller PDFs and convert each."
+        },
+        {
+          "question": "Is my PDF uploaded anywhere?",
+          "answer": "No. Your PDF is drawn and converted in your browser, and it never leaves your device."
+        }
+      ],
+      "aboutSection": {
+        "title": "PDF and WebP",
+        "fromFormat": {
+          "name": "PDF",
+          "fullName": "Portable Document Format",
+          "description": "A PDF fixes each page's look, its text, fonts, pictures and layout, so it reads and prints the same on every device."
+        },
+        "toFormat": {
+          "name": "WebP",
+          "fullName": "WebP image",
+          "description": "WebP is Google's image format for the web: smaller than PNG and JPEG for the same look, and shown by every current browser."
+        }
+      },
+      "relatedTools": [
+        {
+          "title": "PDF to PNG",
+          "toolId": "pdf-to-png"
+        },
+        {
+          "title": "PDF to JPG",
+          "toolId": "pdf-to-jpg"
+        },
+        {
+          "title": "WebP to PDF",
+          "toolId": "webp-to-pdf"
+        },
+        {
+          "title": "AI to WebP",
+          "toolId": "ai-to-webp"
         }
       ]
     }

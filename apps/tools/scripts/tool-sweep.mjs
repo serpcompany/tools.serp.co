@@ -32,9 +32,11 @@ import {
   countStatuses,
   decodeOutputs,
   ffmpegError,
+  fixtureImageSizes,
   loadFixtures,
   measurePixels,
   mergeRows,
+  outputImageIndex,
   parseArgs,
   planTool,
   refusalProblem,
@@ -168,16 +170,18 @@ function loadMagick() {
 
 // Measures each output's pixels (bytes from a ZIP, or base64 from the page)
 // for classifyRun, then drops the bytes. An output whose bytes weren't read
-// is left without `pixels`, which classifyRun fails.
-async function measureOutputPixels(outputs, format) {
+// is left without `pixels`, which classifyRun fails. Headerless RGB is read
+// as the size of the fixture's image it was made from.
+async function measureOutputPixels(outputs, format, fixture) {
   const magick = await loadMagick();
-  for (const output of outputs) {
+  const sizes = format.toLowerCase() === "rgb" ? await fixtureImageSizes(magick, fixture) : [];
+  for (const [index, output] of outputs.entries()) {
     const bytes = output.bytes ?? Buffer.from(output.base64 ?? "", "base64");
     delete output.bytes;
     delete output.base64;
     if (!bytes.length) continue;
     try {
-      output.pixels = measurePixels(magick, bytes, format);
+      output.pixels = measurePixels(magick, bytes, format, sizes[outputImageIndex(output.name, index)]);
     } catch (error) {
       output.pixels = { error: String(error?.message ?? error).split("\n")[0] };
     }
@@ -710,7 +714,7 @@ async function measure(plan) {
     await decodeOutputs(observation.outputs ?? [], plan.to, { document: plan.document });
   }
   if (plan.pixelCheck && observation.outcome === "completed") {
-    await measureOutputPixels(observation.outputs ?? [], plan.to);
+    await measureOutputPixels(observation.outputs ?? [], plan.to, plan.fixtures[0]);
   }
   const verdict = withRefusals(classifyRun(observation, plan), refusals);
   const outputs = observation.outputs ?? [];
