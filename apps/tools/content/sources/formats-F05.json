@@ -1,0 +1,799 @@
+{
+  "formats": {
+    "ogg": {
+      "background": [
+        {
+          "fact": "Ogg is Xiph.Org\u2019s open container for compressed multimedia streams.",
+          "source": "https://xiph.org/ogg/"
+        },
+        {
+          "fact": "The container can interleave sound and video; the codec determines how each stream is compressed.",
+          "source": "https://xiph.org/ogg/"
+        },
+        {
+          "fact": "Ogg supports sequential reading and writing, which suits streaming pipelines.",
+          "source": "https://xiph.org/ogg/"
+        },
+        {
+          "fact": "Its framing includes timestamps and error detection.",
+          "source": "https://xiph.org/ogg/"
+        },
+        {
+          "fact": "The IETF published the Ogg media-type registration in September 2008.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        },
+        {
+          "fact": "An audio-only Ogg stream uses audio/ogg; video content uses video/ogg.",
+          "source": "https://xiph.org/ogg/"
+        },
+        {
+          "fact": "The .ogg extension is conventionally used for Vorbis audio, while .oga is the broader audio extension.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Audacity",
+            "note": "Imports Ogg Vorbis audio directly for editing.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Plays Ogg containers and decodes Vorbis audio.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Audacity",
+            "note": "Imports Ogg Vorbis audio directly for editing.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Plays Ogg containers and decodes Vorbis audio.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Audacity",
+            "note": "Imports Ogg Vorbis audio directly for editing.",
+            "source": "https://manual.audacityteam.org/man/importing_audio.html"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Plays Ogg containers and decodes Vorbis audio.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A player needs the enclosed codec as well as Ogg container support; Ogg itself does not identify one audio encoding.",
+          "source": "https://xiph.org/ogg/"
+        },
+        {
+          "fact": "The extension can be misleading: RFC 5334 distinguishes .ogg Vorbis files from general .oga audio and .ogv video.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334"
+        },
+        {
+          "fact": "The container detects damaged pages, but that does not reconstruct missing encoded audio.",
+          "source": "https://xiph.org/ogg/"
+        }
+      ]
+    },
+    "html": {
+      "background": [
+        {
+          "fact": "HTML is the markup language used to describe web documents and applications.",
+          "source": "https://html.spec.whatwg.org/multipage/introduction.html"
+        },
+        {
+          "fact": "Its early revisions developed at CERN and then the IETF during 1990\u20131995.",
+          "source": "https://html.spec.whatwg.org/multipage/introduction.html"
+        },
+        {
+          "fact": "WHATWG maintains HTML as a Living Standard.",
+          "source": "https://html.spec.whatwg.org/multipage/introduction.html"
+        },
+        {
+          "fact": "HTML describes document meaning; CSS supplies presentation and JavaScript can add behavior.",
+          "source": "https://html.spec.whatwg.org/multipage/introduction.html"
+        },
+        {
+          "fact": "The HTML serialization is identified by text/html.",
+          "source": "https://html.spec.whatwg.org/multipage/iana.html"
+        },
+        {
+          "fact": "An HTML document can link to separate resources rather than contain every asset itself.",
+          "source": "https://html.spec.whatwg.org/multipage/introduction.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Visual Studio Code",
+            "note": "Edits HTML with syntax highlighting, completion, and formatting.",
+            "source": "https://code.visualstudio.com/docs/languages/html"
+          },
+          {
+            "app": "Firefox",
+            "note": "Renders local HTML documents; Mozilla documents Open File with Ctrl+O or Command+O.",
+            "source": "https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Visual Studio Code",
+            "note": "Edits HTML with syntax highlighting, completion, and formatting.",
+            "source": "https://code.visualstudio.com/docs/languages/html"
+          },
+          {
+            "app": "Firefox",
+            "note": "Renders local HTML documents; Mozilla documents Open File with Ctrl+O or Command+O.",
+            "source": "https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Visual Studio Code",
+            "note": "Edits HTML with syntax highlighting, completion, and formatting.",
+            "source": "https://code.visualstudio.com/docs/languages/html"
+          },
+          {
+            "app": "Firefox",
+            "note": "Renders local HTML documents; Mozilla documents Open File with Ctrl+O or Command+O.",
+            "source": "https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Missing linked files can leave an offline HTML document without its pictures or styling.",
+          "source": "https://html.spec.whatwg.org/multipage/introduction.html"
+        },
+        {
+          "fact": "An incorrect character encoding can make the document\u2019s text render incorrectly; HTML defines encoding declarations.",
+          "source": "https://html.spec.whatwg.org/multipage/iana.html"
+        },
+        {
+          "fact": "An editor\u2019s HTML support need not inspect linked scripts and styles; VS Code limits its built-in language analysis to the current file.",
+          "source": "https://code.visualstudio.com/docs/languages/html"
+        }
+      ]
+    },
+    "m4v": {
+      "background": [
+        {
+          "fact": "M4V can label an MPEG-4 container file; HandBrake treats its .m4v and .mp4 outputs as the same container.",
+          "source": "https://handbrake.fr/docs/en/latest/technical/containers.html"
+        },
+        {
+          "fact": "HandBrake chooses the M4V extension for some combinations of chapters, AC3 passthrough, or subtitles.",
+          "source": "https://handbrake.fr/docs/en/latest/technical/containers.html"
+        },
+        {
+          "fact": "FFmpeg includes .m4v among the extensions handled by its MOV/MP4 demuxer.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+        },
+        {
+          "fact": "The MPEG-4 container family can store audio and video tracks, with playback dependent on their encodings.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "fact": "The MOV/MP4 family supports timed media tracks and metadata stored in boxes.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Its MOV/MP4 reader lists .m4v input explicitly; processing also requires the relevant decoders.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Supports MPEG-4 containers and common MPEG-4 video and AAC audio codecs.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Its MOV/MP4 reader lists .m4v input explicitly; processing also requires the relevant decoders.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Supports MPEG-4 containers and common MPEG-4 video and AAC audio codecs.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Its MOV/MP4 reader lists .m4v input explicitly; processing also requires the relevant decoders.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Supports MPEG-4 containers and common MPEG-4 video and AAC audio codecs.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "An unsupported codec can prevent playback even when the application recognizes the container.",
+          "source": "https://support.apple.com/en-us/102644"
+        },
+        {
+          "fact": "Changing the M4V suffix cannot resolve a damaged file or an unsupported encoding.",
+          "source": "https://support.apple.com/en-us/102644"
+        },
+        {
+          "fact": "A normal MOV/MP4-family recording may be unreadable if writing ends before required metadata is finished.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "dds": {
+      "background": [
+        {
+          "fact": "DDS is Microsoft\u2019s DirectDraw Surface texture-file format.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "fact": "It can contain uncompressed pixels or compressed texture data.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+        },
+        {
+          "fact": "A DDS asset may include a mipmap chain alongside its largest surface.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+        },
+        {
+          "fact": "DDS can hold cube maps and volume textures.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+        },
+        {
+          "fact": "Direct3D 10 and 11 extend DDS to texture arrays through an additional header.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+        },
+        {
+          "fact": "The DX10 header can describe formats not expressible in the original pixel-format structure.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Built-in DDS support arrived in GIMP 2.10.10.",
+            "source": "https://www.gimp.org/news/2019/04/07/gimp-2-10-10-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes DDS, including documented DXT compression and mipmap options.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Built-in DDS support arrived in GIMP 2.10.10.",
+            "source": "https://www.gimp.org/news/2019/04/07/gimp-2-10-10-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes DDS, including documented DXT compression and mipmap options.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Built-in DDS support arrived in GIMP 2.10.10.",
+            "source": "https://www.gimp.org/news/2019/04/07/gimp-2-10-10-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes DDS, including documented DXT compression and mipmap options.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Some DDS readers reject the DX10 extension; legacy RGB or DXT1\u20135 headers have broader tool compatibility.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+        },
+        {
+          "fact": "A truncated header is invalid: ordinary DDS needs at least 128 bytes, or 148 bytes with the DX10 extension.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+        },
+        {
+          "fact": "Incorrect pitch information can corrupt a texture reader\u2019s interpretation of scan lines; Microsoft recommends computing pitch for the stored format.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide"
+        }
+      ]
+    },
+    "m4r": {
+      "background": [
+        {
+          "fact": "NCH\u2019s WavePad manual identifies M4R as the ringtone type for iPhone.",
+          "source": "https://help.nchsoftware.com/help/en/wavepad/win/help.pdf"
+        },
+        {
+          "fact": "MediaInfo classifies the .m4r extension within its MPEG-4 container family.",
+          "source": "https://raw.githubusercontent.com/MediaArea/MediaInfoLib/master/Source/MediaInfo/MediaInfo_Config_Automatic.cpp"
+        },
+        {
+          "fact": "MPEG-4 separates the container structure from the encoding carried by its media tracks.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "fact": "MPEG-4-family files can carry track metadata in addition to the encoded samples.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "fact": "WavePad explicitly lists .m4r as readable and writable on Windows.",
+          "source": "https://www.nch.com.au/wavepad/kb/1414.html"
+        },
+        {
+          "fact": "Apple\u2019s GarageBand ringtone-export workflow limits the selected sound to 30 seconds.",
+          "source": "https://support.apple.com/en-us/120692"
+        },
+        {
+          "fact": "NCH links M4R output to its shared AAC/M4A encoder-options documentation.",
+          "source": "https://help.nchsoftware.com/help/en/switch/win/encoderoptions.html"
+        },
+        {
+          "fact": "Audacity's documented AAC export accepts .m4r as an MP4 ringtone filename.",
+          "source": "https://manual.audacityteam.org/man/faq_opening_and_saving_files.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "MediaInfo",
+            "note": "Inspects the container and stream properties; it is not an audio player. Its format registry includes .m4r.",
+            "source": "https://raw.githubusercontent.com/MediaArea/MediaInfoLib/master/Source/MediaInfo/MediaInfo_Config_Automatic.cpp"
+          },
+          {
+            "app": "WavePad",
+            "note": "NCH lists .m4r opening and saving on Windows, but not on Mac.",
+            "source": "https://www.nch.com.au/wavepad/kb/1414.html"
+          },
+          {
+            "app": "Switch",
+            "note": "Switch explicitly accepts M4R input on Windows; copy-protected files are excluded.",
+            "source": "https://www.nch.com.au/switch/kb/1405.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "MediaInfo",
+            "note": "Inspects MPEG-4-family media properties; its format registry includes .m4r.",
+            "source": "https://raw.githubusercontent.com/MediaArea/MediaInfoLib/master/Source/MediaInfo/MediaInfo_Config_Automatic.cpp"
+          },
+          {
+            "app": "Switch",
+            "note": "Switch lists M4R as supported conversion input on Mac.",
+            "source": "https://www.nch.com.au/switch/kb/1405.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "MediaInfo",
+            "note": "Inspects MPEG-4-family media properties; its format registry includes .m4r.",
+            "source": "https://raw.githubusercontent.com/MediaArea/MediaInfoLib/master/Source/MediaInfo/MediaInfo_Config_Automatic.cpp"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "GarageBand for iPhone",
+            "note": "Creates and installs custom ringtones from eligible audio; this source does not establish arbitrary .m4r import support.",
+            "source": "https://support.apple.com/en-us/120692"
+          },
+          {
+            "app": "Switch",
+            "note": "Switch lists Android M4R input support; this is a conversion app rather than a system ringtone installer.",
+            "source": "https://www.nch.com.au/switch/kb/1405.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "WavePad does not decode copy-protected input, so its .m4r support does not establish decryption support.",
+          "source": "https://www.nch.com.au/wavepad/kb/1414.html"
+        },
+        {
+          "fact": "A dimmed source song may be unavailable because it has not been downloaded to the iPhone.",
+          "source": "https://support.apple.com/en-us/120692"
+        },
+        {
+          "fact": "If an export exceeds 30 seconds, GarageBand offers to shorten it before completing the ringtone.",
+          "source": "https://support.apple.com/en-us/120692"
+        }
+      ]
+    },
+    "opus": {
+      "background": [
+        {
+          "fact": "Opus is an open audio codec developed for speech and music, including interactive communication.",
+          "source": "https://www.opus-codec.org/"
+        },
+        {
+          "fact": "The IETF standardized its original definition in RFC 6716 in September 2012.",
+          "source": "https://www.rfc-editor.org/rfc/rfc6716"
+        },
+        {
+          "fact": "Its design combines SILK technology from Skype with CELT technology from Xiph.Org.",
+          "source": "https://www.opus-codec.org/"
+        },
+        {
+          "fact": "A .opus file commonly stores the encoded sound in an Ogg stream as specified by RFC 7845.",
+          "source": "https://www.rfc-editor.org/rfc/rfc7845"
+        },
+        {
+          "fact": "Ogg Opus supports descriptive metadata and seeking.",
+          "source": "https://www.rfc-editor.org/rfc/rfc7845"
+        },
+        {
+          "fact": "The registered media type for an Ogg Opus audio file is audio/ogg with the opus codec parameter.",
+          "source": "https://www.rfc-editor.org/rfc/rfc7845"
+        },
+        {
+          "fact": "Opus is lossy: its coding modes trade signal detail for a compact representation.",
+          "source": "https://www.rfc-editor.org/rfc/rfc6716"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Its Ogg muxer accepts Opus.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "opusdec",
+            "note": "The Opus project distributes this decoder in opus-tools for decoding .opus files.",
+            "source": "https://www.opus-codec.org/downloads/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Its Ogg muxer accepts Opus.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "opusdec",
+            "note": "The Opus project distributes this decoder in opus-tools for decoding .opus files.",
+            "source": "https://www.opus-codec.org/downloads/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Its Ogg muxer accepts Opus.",
+            "source": "https://ffmpeg.org/ffmpeg-formats.html"
+          },
+          {
+            "app": "opusdec",
+            "note": "The Opus project distributes this decoder in opus-tools for decoding .opus files.",
+            "source": "https://www.opus-codec.org/downloads/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A program that reads Vorbis-in-Ogg does not necessarily decode Opus; the Ogg mapping uses distinct Opus headers.",
+          "source": "https://www.rfc-editor.org/rfc/rfc7845"
+        },
+        {
+          "fact": "Dropping the pre-skip value can cause unwanted leading samples; Ogg Opus defines how readers must apply it.",
+          "source": "https://www.rfc-editor.org/rfc/rfc7845"
+        },
+        {
+          "fact": "Ogg Opus stores its playback timing on a 48 kHz basis, which should not be confused with an original recording\u2019s sample rate.",
+          "source": "https://www.rfc-editor.org/rfc/rfc7845"
+        }
+      ]
+    },
+    "csv": {
+      "background": [
+        {
+          "fact": "CSV exchanges rows of text fields between databases and spreadsheets.",
+          "source": "https://www.rfc-editor.org/rfc/rfc4180"
+        },
+        {
+          "fact": "RFC 4180 documented a common CSV representation in October 2005 rather than inventing the preexisting format.",
+          "source": "https://www.rfc-editor.org/rfc/rfc4180"
+        },
+        {
+          "fact": "Its registered media type is text/csv.",
+          "source": "https://www.rfc-editor.org/rfc/rfc4180"
+        },
+        {
+          "fact": "RFC 4180 allows a header record before the data rows.",
+          "source": "https://www.rfc-editor.org/rfc/rfc4180"
+        },
+        {
+          "fact": "Double quotes protect fields containing commas or line breaks, and embedded double quotes are doubled.",
+          "source": "https://www.rfc-editor.org/rfc/rfc4180"
+        },
+        {
+          "fact": "CSV dialects differ in delimiter and quoting conventions.",
+          "source": "https://docs.python.org/3/library/csv.html"
+        },
+        {
+          "fact": "Spreadsheet export to CSV stores one sheet\u2019s data without workbook formatting.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreOffice Calc",
+            "note": "Opens Text CSV with delimiter and column-format choices.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html"
+          },
+          {
+            "app": "Microsoft Excel",
+            "note": "Imports and exports text and CSV data.",
+            "source": "https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreOffice Calc",
+            "note": "Imports CSV records through its Text Import dialog.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html"
+          },
+          {
+            "app": "Microsoft Excel",
+            "note": "Supports CSV import; select text handling carefully for identifiers.",
+            "source": "https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreOffice Calc",
+            "note": "Loads CSV data into spreadsheet columns.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html"
+          },
+          {
+            "app": "Python csv module",
+            "note": "Reads CSV records programmatically, with configurable dialects.",
+            "source": "https://docs.python.org/3/library/csv.html"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Sheets with Apps Script",
+            "note": "Google provides a documented script for importing CSV data into Sheets.",
+            "source": "https://developers.google.com/apps-script/samples/automations/import-csv-sheets"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A delimiter mismatch can put a whole row into one column; set the separator in the import dialog.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html"
+        },
+        {
+          "fact": "Spreadsheet formatting and other sheets disappear in a CSV export because CSV saves the current sheet\u2019s data alone.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/scalc/guide/csv_files.html"
+        },
+        {
+          "fact": "Excel may interpret dates or numeric identifiers during opening; import with chosen column formats when those transformations are unwanted.",
+          "source": "https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba"
+        },
+        {
+          "fact": "A parser must honor quoted line breaks rather than assume every physical line is a full record.",
+          "source": "https://www.rfc-editor.org/rfc/rfc4180"
+        }
+      ]
+    },
+    "cr2": {
+      "background": [
+        {
+          "fact": "The CR2 extension identifies a Canon camera-raw format.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000241.shtml"
+        },
+        {
+          "fact": "Raw files retain sensor measurements that require processing to produce a viewable photograph.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000241.shtml"
+        },
+        {
+          "fact": "Canon\u2019s DPP lists .CR2 among its supported raw-image extensions.",
+          "source": "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html"
+        },
+        {
+          "fact": "Raw processing permits choices such as white balance and tone adjustment after capture.",
+          "source": "https://www.canon-europe.com/get-inspired/tips-and-techniques/editing-raw-images-in-dpp/"
+        },
+        {
+          "fact": "CR2 differs from a finished JPEG because a raw workflow leaves image interpretation to processing software.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000241.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "darktable",
+            "note": "Lists CR2 as an import extension; actual decoding depends on camera support.",
+            "source": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          },
+          {
+            "app": "Canon Digital Photo Professional",
+            "note": "Reads supported Canon CR2 camera files.",
+            "source": "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html"
+          },
+          {
+            "app": "Adobe Camera Raw",
+            "note": "Canon support varies by camera and minimum plug-in version.",
+            "source": "https://helpx.adobe.com/camera-raw/kb/camera-raw-plug-supported-cameras.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "darktable",
+            "note": "Reads supported CR2 raw images through RawSpeed.",
+            "source": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          },
+          {
+            "app": "Canon Digital Photo Professional",
+            "note": "Supports CR2 files from listed Canon cameras.",
+            "source": "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html"
+          },
+          {
+            "app": "Adobe Camera Raw",
+            "note": "Use the supported-camera list to check the exact camera model.",
+            "source": "https://helpx.adobe.com/camera-raw/kb/camera-raw-plug-supported-cameras.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "darktable",
+            "note": "Supports CR2 imports from cameras handled by its raw decoder.",
+            "source": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          },
+          {
+            "app": "LibRaw dcraw_emu",
+            "note": "Command-line raw developer; LibRaw lists supported Canon cameras, and the included dcraw_emu sample processes supported raw inputs.",
+            "source": "https://www.libraw.org/docs/Samples-LibRaw.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A recognized CR2 suffix does not guarantee support for the camera that made it; check the decoder\u2019s model list.",
+          "source": "https://helpx.adobe.com/camera-raw/kb/camera-raw-plug-supported-cameras.html"
+        },
+        {
+          "fact": "A raw preview and a developed output can differ because raw data still requires color and tone processing.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000241.shtml"
+        },
+        {
+          "fact": "Long-term access depends on support for the proprietary camera format, which is a preservation concern.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000241.shtml"
+        }
+      ]
+    },
+    "dng": {
+      "background": [
+        {
+          "fact": "Adobe publishes Digital Negative as a documented format for camera-raw data.",
+          "source": "https://helpx.adobe.com/camera-raw/digital-negative.html"
+        },
+        {
+          "fact": "The first DNG specification dates to September 2004.",
+          "source": "https://helpx.adobe.com/camera-raw/digital-negative.html"
+        },
+        {
+          "fact": "DNG extends the TIFF family with tags needed to interpret raw photographs.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000188.shtml"
+        },
+        {
+          "fact": "DNG can store mosaic sensor data or a demosaiced linear representation.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000188.shtml"
+        },
+        {
+          "fact": "DNG may use lossless JPEG compression for raw samples.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000188.shtml"
+        },
+        {
+          "fact": "Exif metadata can accompany the image data in DNG.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000188.shtml"
+        },
+        {
+          "fact": "Adobe offers DNG Converter to translate supported proprietary raw files into DNG.",
+          "source": "https://helpx.adobe.com/camera-raw/digital-negative.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "darktable",
+            "note": "Includes DNG in its import list; decoding limitations still apply.",
+            "source": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          },
+          {
+            "app": "Adobe Camera Raw",
+            "note": "Adobe\u2019s raw processing workflow supports DNG.",
+            "source": "https://helpx.adobe.com/camera-raw/digital-negative.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads DNG with the documented dng: explicit format prefix.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "darktable",
+            "note": "Reads supported DNG variants.",
+            "source": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          },
+          {
+            "app": "Adobe Camera Raw",
+            "note": "Processes DNG in compatible Adobe applications.",
+            "source": "https://helpx.adobe.com/camera-raw/digital-negative.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Offers DNG reading through its raw-image support.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "darktable",
+            "note": "Recognizes the DNG extension for import.",
+            "source": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Uses dng:filename.dng when explicit format selection is required.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Converting to DNG does not ensure every reader supports the stored sensor pattern; darktable documents non-Bayer limits.",
+          "source": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+        },
+        {
+          "fact": "Proprietary raw formats have different support requirements; verify that DNG Converter lists the source camera.",
+          "source": "https://helpx.adobe.com/camera-raw/digital-negative.html"
+        },
+        {
+          "fact": "A linear DNG already contains demosaiced data, so it is not interchangeable with untouched sensor-mosaic samples.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000188.shtml"
+        }
+      ]
+    }
+  }
+}

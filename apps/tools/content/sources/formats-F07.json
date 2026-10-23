@@ -1,0 +1,851 @@
+{
+  "formats": {
+    "hevc": {
+      "background": [
+        {
+          "fact": "HEVC is the video coding standard also named H.265 and MPEG-H Part 2.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000530.shtml"
+        },
+        {
+          "fact": "ISO/IEC and ITU-T jointly standardized HEVC; its first publication was in 2013.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000530.shtml"
+        },
+        {
+          "fact": "The standard addresses video storage, television, streaming and video calls.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000530.shtml"
+        },
+        {
+          "fact": "HEVC profiles specify different combinations of coding features.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000530.shtml"
+        },
+        {
+          "fact": "The family includes support for higher bit depths and full-resolution chroma.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000530.shtml"
+        },
+        {
+          "fact": "A raw HEVC stream is a supported FFmpeg input, separate from a container such as MP4.",
+          "source": "https://ffmpeg.org/general.html"
+        },
+        {
+          "fact": "The video/H265 media-type registration describes HEVC carried over RTP.",
+          "source": "https://www.iana.org/assignments/media-types/video/H265"
+        },
+        {
+          "fact": "Apple introduced HEVC media support with iOS 11 and macOS High Sierra 10.13.",
+          "source": "https://support.apple.com/en-us/116944"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads raw HEVC streams.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Player using FFmpeg decoding libraries.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads raw HEVC streams.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Player using FFmpeg decoding libraries.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads raw HEVC streams.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "Player using FFmpeg decoding libraries.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "VideoLAN documents HEVC hardware decoding through Android MediaCodec. Device capabilities and the media wrapper still matter; standalone .hevc filename handling was not separately verified.",
+            "source": "https://images.videolan.org/vlc/releases/3.0.18.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A decoder must support the stream profile and level; supporting H.265 alone does not identify every decoding capability.",
+          "source": "https://www.iana.org/assignments/media-types/video/H265"
+        },
+        {
+          "fact": "Older Apple devices may be limited by the video resolution or frame rate.",
+          "source": "https://support.apple.com/en-us/116944"
+        },
+        {
+          "fact": "A raw video stream is not a general audio/video container; use a suitable wrapper when an application requires one.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "ts": {
+      "background": [
+        {
+          "fact": "TS identifies an MPEG-2 transport stream, one of the system formats specified by ISO/IEC 13818-1.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000635.shtml"
+        },
+        {
+          "fact": "Transport streams multiplex separately coded video and sound rather than defining a picture codec.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000635.shtml"
+        },
+        {
+          "fact": "A stream can carry several programs with independent clocks.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000635.shtml"
+        },
+        {
+          "fact": "Transport-stream syntax uses timestamps to coordinate presentation and decoder buffering.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000635.shtml"
+        },
+        {
+          "fact": "Broadcast distribution and transmissions vulnerable to errors are important uses of TS.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000635.shtml"
+        },
+        {
+          "fact": "The usual extension is .ts and its registered media type is video/mp2t.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000635.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Lists TS input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads transport streams.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Lists TS input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads transport streams.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Lists TS input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads transport streams.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "VLC for Android",
+            "note": "The Android app explicitly lists TS input; decoding still depends on the media carried in the stream.",
+            "source": "https://play.google.com/store/apps/details?hl=en_US&id=org.videolan.vlc"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Multiple programs can coexist in one stream, so selecting the intended program matters.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "fact": "Recognizing the TS wrapper does not settle the codec required to decode its audio or video.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000635.shtml"
+        },
+        {
+          "fact": "Transport-stream timing is part of the system format; damaged timing or missing packets cannot be fixed by changing the filename.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000635.shtml"
+        }
+      ]
+    },
+    "3gp": {
+      "background": [
+        {
+          "fact": "3GPP defines the 3GP container as a specialization of ISO base media file format.",
+          "source": "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+        },
+        {
+          "fact": "The format supports mobile messaging, download and packet-switched streaming services.",
+          "source": "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+        },
+        {
+          "fact": "A 3GP presentation can combine video, speech, other sound and timed text.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3839.html"
+        },
+        {
+          "fact": "The standard registers video coding options including H.263, MPEG-4 Visual, AVC and HEVC.",
+          "source": "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+        },
+        {
+          "fact": "Registered sound options include AMR variants and AAC.",
+          "source": "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+        },
+        {
+          "fact": "A conforming file includes a file-type box whose brands identify its profile.",
+          "source": "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+        },
+        {
+          "fact": "Use video/3gpp for visual content and audio/3gpp for purely audio content.",
+          "source": "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Lists 3GP input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads 3GP containers.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Lists 3GP input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads 3GP containers.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Lists 3GP input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads 3GP containers.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A file extension does not identify which of the permitted codecs a 3GP recording contains.",
+          "source": "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+        },
+        {
+          "fact": "A conforming parser may ignore boxes or codecs outside the specification.",
+          "source": "https://www.etsi.org/deliver/etsi_ts/126200_126299/126244/15.00.00_60/ts_126244v150000p.pdf"
+        },
+        {
+          "fact": "An audio-only 3GP file has no video track to recover; the format explicitly permits pure sound.",
+          "source": "https://www.rfc-editor.org/rfc/rfc3839.html"
+        }
+      ]
+    },
+    "mxf": {
+      "background": [
+        {
+          "fact": "MXF means Material Exchange Format, standardized through SMPTE documents.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000013.shtml"
+        },
+        {
+          "fact": "It wraps media essence and associated descriptive or structural metadata.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000013.shtml"
+        },
+        {
+          "fact": "MXF is used in professional acquisition, exchange and preservation workflows.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000013.shtml"
+        },
+        {
+          "fact": "Its operational patterns describe arrangements of packages and essence.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000013.shtml"
+        },
+        {
+          "fact": "The wrapper can carry different video encodings, so MXF alone does not define image quality.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000013.shtml"
+        },
+        {
+          "fact": "Some MXF arrangements reference essence stored outside the file.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000013.shtml"
+        },
+        {
+          "fact": "The extension is .mxf and the media type is application/mxf.",
+          "source": "https://www.iana.org/assignments/media-types/application/mxf"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Lists MXF input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads MXF essence.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Lists MXF input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads MXF essence.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Lists MXF input.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads MXF essence.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "An MXF file may require a professional application because some essence structures are not arranged for ordinary playback.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000013.shtml"
+        },
+        {
+          "fact": "Externally referenced essence can be missing when an MXF file is copied by itself.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000013.shtml"
+        },
+        {
+          "fact": "Changing the wrapper does not guarantee that specialized metadata or all ancillary streams will be retained.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "cdr": {
+      "background": [
+        {
+          "fact": "CDR is CorelDRAW’s default drawing format.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Save-drawings.html"
+        },
+        {
+          "fact": "Corel describes CDR as a primarily vector drawing format.",
+          "source": "https://product.corel.com/help/PHOTO-PAINT/540111147/Corel-PHOTO-PAINT-en/Corel-PHOTO-PAINT-CorelDRAW-CDR.html"
+        },
+        {
+          "fact": "A drawing can contain bitmap content as well as vector effects.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Save-drawings.html"
+        },
+        {
+          "fact": "CDR save options include bitmap and graphic-object compression.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Save-drawings.html"
+        },
+        {
+          "fact": "A drawing can store reference properties such as its title and subject.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Save-drawings.html"
+        },
+        {
+          "fact": "Font embedding is available, subject to font permissions and other restrictions.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Save-drawings.html"
+        },
+        {
+          "fact": "The Save As dialog offers earlier CDR versions for compatibility.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Save-drawings.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreOffice Draw",
+            "note": "Imports CDR through libcdr.",
+            "source": "https://raw.githubusercontent.com/LibreOffice/core/master/writerperfect/source/draw/CDRImportFilter.cxx"
+          },
+          {
+            "app": "Inkscape",
+            "note": "Uses libcdr for CDR input.",
+            "source": "https://lists.inkscape.org/hyperkitty/list/inkscape-devel%40lists.inkscape.org/thread/AQUOSGTBMSKBB5X7WIR2TZVSJSYR6LYL/"
+          },
+          {
+            "app": "CorelDRAW",
+            "note": "Opens its native drawings.",
+            "source": "https://www.coreldraw.com/en/learn/tutorials/how-to-open-cdr-file/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreOffice Draw",
+            "note": "Imports CDR through libcdr.",
+            "source": "https://raw.githubusercontent.com/LibreOffice/core/master/writerperfect/source/draw/CDRImportFilter.cxx"
+          },
+          {
+            "app": "Inkscape",
+            "note": "Uses libcdr for CDR input.",
+            "source": "https://lists.inkscape.org/hyperkitty/list/inkscape-devel%40lists.inkscape.org/thread/AQUOSGTBMSKBB5X7WIR2TZVSJSYR6LYL/"
+          },
+          {
+            "app": "CorelDRAW",
+            "note": "Opens its native drawings.",
+            "source": "https://www.coreldraw.com/en/learn/tutorials/how-to-open-cdr-file/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreOffice Draw",
+            "note": "Imports CDR through libcdr.",
+            "source": "https://raw.githubusercontent.com/LibreOffice/core/master/writerperfect/source/draw/CDRImportFilter.cxx"
+          },
+          {
+            "app": "Inkscape",
+            "note": "Uses libcdr for CDR input.",
+            "source": "https://lists.inkscape.org/hyperkitty/list/inkscape-devel%40lists.inkscape.org/thread/AQUOSGTBMSKBB5X7WIR2TZVSJSYR6LYL/"
+          }
+        ],
+        "web": [
+          {
+            "app": "CorelDRAW Web",
+            "note": "CDR support is documented for compatible browsers; access is a benefit for qualifying Graphics Suite subscribers and maintenance customers.",
+            "source": "https://www.coreldraw.com/en/learn/tutorials/new-in-march-2025/"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "An older CorelDRAW release may reject a drawing produced by a newer version; saving an earlier-version copy is the documented workaround.",
+          "source": "https://www.coreldraw.com/en/learn/tutorials/how-to-open-cdr-file/"
+        },
+        {
+          "fact": "Saving backward may alter newer effects or restrict editing.",
+          "source": "https://product.corel.com/help/CorelDRAW/540111147/CorelDRAW-en/CorelDRAW-Save-drawings.html"
+        },
+        {
+          "fact": "Corel PHOTO-PAINT rasterizes imported CDR drawings, so that import does not retain vector objects.",
+          "source": "https://product.corel.com/help/PHOTO-PAINT/540111147/Corel-PHOTO-PAINT-en/Corel-PHOTO-PAINT-CorelDRAW-CDR.html"
+        }
+      ]
+    },
+    "cr3": {
+      "background": [
+        {
+          "fact": "Canon uses the .CR3 extension for camera RAW images.",
+          "source": "https://cam.start.canon/en/C004/manual/html/UG-03_Shooting-1_0030.html"
+        },
+        {
+          "fact": "Canon identifies CR3 with EOS cameras released since 2018.",
+          "source": "https://www.canon-europe.com/pro/infobank/file-numbering-and-naming/"
+        },
+        {
+          "fact": "RAW records sensor data that needs image processing before ordinary delivery.",
+          "source": "https://cam.start.canon/en/C004/manual/html/UG-03_Shooting-1_0030.html"
+        },
+        {
+          "fact": "Compact RAW makes smaller files than the camera’s normal RAW option.",
+          "source": "https://cam.start.canon/en/C004/manual/html/UG-03_Shooting-1_0030.html"
+        },
+        {
+          "fact": "Canon says C-RAW achieves smaller files by using lossy compression.",
+          "source": "https://www.canon-europe.com/pro/infobank/image-file-types/"
+        },
+        {
+          "fact": "RAW+JPEG capture creates separate files carrying the same image number.",
+          "source": "https://cam.start.canon/en/C004/manual/html/UG-03_Shooting-1_0030.html"
+        },
+        {
+          "fact": "Processing a RAW file into JPEG can leave the original RAW unchanged.",
+          "source": "https://cam.start.canon/en/C004/manual/html/UG-03_Shooting-1_0030.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "RawTherapee",
+            "note": "CR3 decoding arrived in 5.8; that release lacked metadata support.",
+            "source": "https://rawtherapee.com/downloads/5.8/"
+          },
+          {
+            "app": "darktable",
+            "note": "Added CR3 support in 3.8, with camera and dependency requirements.",
+            "source": "https://www.darktable.org/2021/12/darktable-3-8/"
+          },
+          {
+            "app": "Canon Digital Photo Professional",
+            "note": "Processes supported Canon RAW images.",
+            "source": "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "RawTherapee",
+            "note": "CR3 decoding arrived in 5.8; that release lacked metadata support.",
+            "source": "https://rawtherapee.com/downloads/5.8/"
+          },
+          {
+            "app": "darktable",
+            "note": "Added CR3 support in 3.8, with camera and dependency requirements.",
+            "source": "https://www.darktable.org/2021/12/darktable-3-8/"
+          },
+          {
+            "app": "Canon Digital Photo Professional",
+            "note": "Processes supported Canon RAW images.",
+            "source": "https://cam.start.canon/en/S002/manual/html/UG-00_Before_0060.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "RawTherapee",
+            "note": "CR3 decoding arrived in 5.8; that release lacked metadata support.",
+            "source": "https://rawtherapee.com/downloads/5.8/"
+          },
+          {
+            "app": "darktable",
+            "note": "Added CR3 support in 3.8, with camera and dependency requirements.",
+            "source": "https://www.darktable.org/2021/12/darktable-3-8/"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "Adobe Lightroom for mobile",
+            "note": "On iOS and Android, camera RAW editing requires supported camera files and premium access. Check the Canon model; Android file-picker recognition may require share-to-Lightroom or camera PTP import.",
+            "source": "https://helpx.adobe.com/lightroom/mobile/get-started/supported-file-formats.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "An older Digital Photo Professional build may not understand RAW files from a newer camera.",
+          "source": "https://cam.start.canon/en/C004/manual/html/UG-03_Shooting-1_0030.html"
+        },
+        {
+          "fact": "Third-party RAW support must be checked for the particular camera model.",
+          "source": "https://cam.start.canon/en/C004/manual/html/UG-03_Shooting-1_0030.html"
+        },
+        {
+          "fact": "RawTherapee 5.8 decoded CR3 pixels without CR3 metadata; its release notes describe manual input-profile selection.",
+          "source": "https://rawtherapee.com/downloads/5.8/"
+        }
+      ]
+    },
+    "jxl": {
+      "background": [
+        {
+          "fact": "JPEG XL is an image coding system developed by the JPEG committee.",
+          "source": "https://jpeg.org/jpegxl/"
+        },
+        {
+          "fact": "It offers both lossy coding and lossless coding.",
+          "source": "https://jpeg.org/jpegxl/"
+        },
+        {
+          "fact": "Its features include alpha channels, animation and progressive decoding.",
+          "source": "https://jpeg.org/jpegxl/"
+        },
+        {
+          "fact": "JPEG XL supports high bit depth, wide color gamuts and HDR.",
+          "source": "https://jpeg.org/jpegxl/"
+        },
+        {
+          "fact": "A JXL file can be a bare codestream or a box-based container.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000538.shtml"
+        },
+        {
+          "fact": "The container can store Exif, XMP and JUMBF metadata.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000538.shtml"
+        },
+        {
+          "fact": "The extension .jxl corresponds to the registered media type image/jxl.",
+          "source": "https://www.iana.org/assignments/media-types/image/jxl"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Stable import support arrived in 2.10.32.",
+            "source": "https://www.gimp.org/news/2022/06/14/gimp-2-10-32-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads JXL with a JPEG XL delegate.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Stable import support arrived in 2.10.32.",
+            "source": "https://www.gimp.org/news/2022/06/14/gimp-2-10-32-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads JXL with a JPEG XL delegate.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Stable import support arrived in 2.10.32.",
+            "source": "https://www.gimp.org/news/2022/06/14/gimp-2-10-32-released/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads JXL with a JPEG XL delegate.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [
+          {
+            "app": "Safari",
+            "note": "Version 17 added JPEG XL.",
+            "source": "https://developer.apple.com/documentation/safari-release-notes/safari-17-release-notes"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Safari",
+            "note": "JPEG XL web-image decoding is supported in Safari 17 on iOS 17 and iPadOS 17; this does not establish a separate photo-library editor.",
+            "source": "https://webkit.org/blog/14445/webkit-features-in-safari-17-0/"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Bare codestream files lack the container boxes used for additional metadata.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000538.shtml"
+        },
+        {
+          "fact": "A decoder may not support the profile or level required by a particular image.",
+          "source": "https://www.iana.org/assignments/media-types/image/jxl"
+        },
+        {
+          "fact": "ImageMagick needs its JPEG XL delegate; support is not guaranteed in every build.",
+          "source": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "mjpeg": {
+      "background": [
+        {
+          "fact": "Motion JPEG codes a video as a succession of individually JPEG-coded images.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml"
+        },
+        {
+          "fact": "MJPEG is a video encoding, rather than a single audio/video container.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml"
+        },
+        {
+          "fact": "OpenDML documents an MJPEG profile for the AVI wrapper.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml"
+        },
+        {
+          "fact": "OpenDML’s AVI extensions were developed during 1996–1997.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml"
+        },
+        {
+          "fact": "AVI files containing this encoding commonly identify it with the MJPG FourCC.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml"
+        },
+        {
+          "fact": "QuickTime is another wrapper used for MJPEG.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml"
+        },
+        {
+          "fact": "Production workflows may edit MJPEG before using another encoding for delivery.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Lists MJPEG A/B decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads raw MJPEG.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Lists MJPEG A/B decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads raw MJPEG.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Lists MJPEG A/B decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Reads raw MJPEG.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "JPEG compression in every frame does not remove redundancy between successive frames; size depends on the encoded images.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml"
+        },
+        {
+          "fact": "An extracted MJPEG frame may omit a Huffman table that a standalone JPEG decoder needs.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000063.shtml"
+        },
+        {
+          "fact": "Raw MJPEG and multipart JPEG are distinct FFmpeg formats; an incorrect format assumption can prevent parsing.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "dst": {
+      "background": [
+        {
+          "fact": "In embroidery, a DST file represents machine stitches rather than a pixel image.",
+          "source": "https://wilcom.com/resources/blog/compare-emb-and-dst"
+        },
+        {
+          "fact": "Its stitch coordinates tell an embroidery machine how to move and sew.",
+          "source": "https://wilcom.com/resources/blog/compare-emb-and-dst"
+        },
+        {
+          "fact": "The design can include changes in thread and other machine actions.",
+          "source": "https://wilcom.com/resources/blog/compare-emb-and-dst"
+        },
+        {
+          "fact": "Ordinary DST files do not preserve a thread palette; pyembroidery also documents an extended-header variant with color information.",
+          "source": "https://github.com/EmbroidePy/pyembroidery"
+        },
+        {
+          "fact": "Enlarging a basic DST design spreads existing stitches without increasing their count.",
+          "source": "https://wilcom.com/resources/blog/compare-emb-and-dst"
+        },
+        {
+          "fact": "Ink/Stitch reads and writes DST as an embroidery format.",
+          "source": "https://inkstitch.org/docs/file-formats/"
+        },
+        {
+          "fact": "Keeping an SVG design alongside machine output preserves an editable Ink/Stitch source.",
+          "source": "https://inkstitch.org/docs/import-export/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Ink/Stitch for Inkscape",
+            "note": "Reads and writes DST stitch files.",
+            "source": "https://inkstitch.org/docs/file-formats/"
+          },
+          {
+            "app": "Embrilliance Essentials",
+            "note": "Displays and recolors DST designs.",
+            "source": "https://embrilliance.com/product/essentials"
+          },
+          {
+            "app": "Wilcom EmbroideryStudio",
+            "note": "Opens stitch files and can attempt object reconstruction.",
+            "source": "https://wilcom.com/resources/blog/compare-emb-and-dst"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Ink/Stitch for Inkscape",
+            "note": "Reads and writes DST stitch files.",
+            "source": "https://inkstitch.org/docs/file-formats/"
+          },
+          {
+            "app": "Embrilliance Essentials",
+            "note": "Displays and recolors DST designs.",
+            "source": "https://embrilliance.com/product/essentials"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Ink/Stitch for Inkscape",
+            "note": "Reads and writes DST stitch files.",
+            "source": "https://inkstitch.org/docs/file-formats/"
+          },
+          {
+            "app": "pyembroidery",
+            "note": "Python library rather than a GUI viewer. The project declares OS-independent operation; its documented read_dst API loads embroidery stitch data when a compatible Python environment is installed.",
+            "source": "https://github.com/EmbroidePy/pyembroidery"
+          }
+        ],
+        "web": [
+          {
+            "app": "Wilcom Library",
+            "note": "Accepts DST production stitch files and provides browser design previews; account/service access required.",
+            "source": "https://wilcom.com/resources/blog/embroidery-design-management-10-key-library-features"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Wilcom Library in a tablet browser",
+            "note": "Wilcom documents tablet access and DST upload to its cloud library; viewing requires service/account access.",
+            "source": "https://wilcom.com/resources/blog/embroidery-design-management-10-key-library-features"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Unexpected preview colors can reflect missing palette data; an external thread list is needed.",
+          "source": "https://inkstitch.org/docs/thread-color/"
+        },
+        {
+          "fact": "Shrinking the coordinates also tightens stitch spacing and stitch length.",
+          "source": "https://wilcom.com/resources/blog/compare-emb-and-dst"
+        },
+        {
+          "fact": "Reconstructing embroidery objects from stitches cannot restore every original editing property.",
+          "source": "https://wilcom.com/resources/blog/compare-emb-and-dst"
+        }
+      ]
+    }
+  }
+}

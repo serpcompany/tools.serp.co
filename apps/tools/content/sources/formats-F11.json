@@ -1,0 +1,816 @@
+{
+  "formats": {
+    "pgm": {
+      "background": [
+        {
+          "fact": "PGM means Portable Gray Map and stores grayscale pixels.",
+          "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+        },
+        {
+          "fact": "Raw PGM begins with P5 and stores samples in binary form.",
+          "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+        },
+        {
+          "fact": "Plain PGM begins with P2 and represents samples as decimal text.",
+          "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+        },
+        {
+          "fact": "A Maxval above 255 requires two bytes for each raw sample.",
+          "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+        },
+        {
+          "fact": "The conventional media type is image/x-portable-graymap; IANA has not registered it.",
+          "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+        },
+        {
+          "fact": "Netpbm also uses PGM for opacity masks, with a different interpretation of sample values.",
+          "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes the PGM member of the Netpbm family.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Netpbm",
+            "note": "Provides programs and libnetpbm for processing graymaps.",
+            "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes the PGM member of the Netpbm family.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Netpbm",
+            "note": "Provides programs and libnetpbm for processing graymaps.",
+            "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes the PGM member of the Netpbm family.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Netpbm",
+            "note": "Provides programs and libnetpbm for processing graymaps.",
+            "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Older readers may reject samples deeper than eight bits; pamdepth can reduce Maxval.",
+          "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+        },
+        {
+          "fact": "Some readers stop after the first image even though raw PGM permits a sequence.",
+          "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+        },
+        {
+          "fact": "Linear-light and sRGB variants can display differently from the specified BT.709 interpretation.",
+          "source": "https://netpbm.sourceforge.net/doc/pgm.html"
+        }
+      ]
+    },
+    "otf": {
+      "background": [
+        {
+          "fact": "Microsoft and Adobe developed OpenType by extending TrueType.",
+          "source": "https://learn.microsoft.com/en-us/typography/opentype/"
+        },
+        {
+          "fact": "OpenType 1.0 was published in 1997.",
+          "source": "https://learn.microsoft.com/en-us/typography/opentype/"
+        },
+        {
+          "fact": "OpenType files organize glyph and text-layout data into tables.",
+          "source": "https://learn.microsoft.com/en-us/typography/opentype/spec/otff"
+        },
+        {
+          "fact": "Glyph descriptions may use TrueType outlines, CFF outlines, bitmaps, or SVG.",
+          "source": "https://learn.microsoft.com/en-us/typography/opentype/spec/otff"
+        },
+        {
+          "fact": "The registered media type is font/otf.",
+          "source": "https://www.iana.org/assignments/media-types/font/otf"
+        },
+        {
+          "fact": "OpenType variation tables allow several related faces within one font resource.",
+          "source": "https://learn.microsoft.com/en-us/typography/opentype/spec/otvaroverview"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FontForge",
+            "note": "Opens .otf fonts for inspection and editing.",
+            "source": "https://fontforge.org/docs/ui/menus/filemenu.html"
+          },
+          {
+            "app": "fontTools TTX",
+            "note": "Reads binary OTF tables and writes an XML representation for inspection.",
+            "source": "https://fonttools.readthedocs.io/en/latest/ttx.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Font Book",
+            "note": "Installs and validates OpenType and OpenType-SVG fonts.",
+            "source": "https://support.apple.com/guide/font-book/install-and-validate-fonts-fntbk1000/mac"
+          },
+          {
+            "app": "FontForge",
+            "note": "Includes OTF in its Open dialog.",
+            "source": "https://fontforge.org/docs/ui/menus/filemenu.html"
+          },
+          {
+            "app": "fontTools TTX",
+            "note": "Reads binary OTF tables and writes an XML representation for inspection.",
+            "source": "https://fonttools.readthedocs.io/en/latest/ttx.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FontForge",
+            "note": "Opens OTF files through its File menu.",
+            "source": "https://fontforge.org/docs/ui/menus/filemenu.html"
+          },
+          {
+            "app": "fontTools TTX",
+            "note": "Reads binary OTF tables and writes an XML representation for inspection.",
+            "source": "https://fonttools.readthedocs.io/en/latest/ttx.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "An older rendering engine may lack support for a font's particular outline representation.",
+          "source": "https://www.iana.org/assignments/media-types/font/otf"
+        },
+        {
+          "fact": "A corrupt font can prevent correct display; Font Book provides file validation.",
+          "source": "https://support.apple.com/guide/font-book/install-and-validate-fonts-fntbk1000/mac"
+        },
+        {
+          "fact": "Duplicate installed copies can cause conflicts; Font Book can resolve duplicates.",
+          "source": "https://support.apple.com/guide/font-book/install-and-validate-fonts-fntbk1000/mac"
+        }
+      ]
+    },
+    "au": {
+      "background": [
+        {
+          "fact": "Sun's published AU specification describes a fixed header, an annotation area, and audio samples.",
+          "source": "https://pubs.opengroup.org/external/auformat.html"
+        },
+        {
+          "fact": "AU starts with the four-byte signature .snd.",
+          "source": "https://pubs.opengroup.org/external/auformat.html"
+        },
+        {
+          "fact": "The header records the encoding, sample rate, and channel count.",
+          "source": "https://pubs.opengroup.org/external/auformat.html"
+        },
+        {
+          "fact": "Multibyte header and sample values use big-endian ordering.",
+          "source": "https://pubs.opengroup.org/external/auformat.html"
+        },
+        {
+          "fact": "Defined encodings include linear PCM, mu-law, A-law, floating point, and ADPCM.",
+          "source": "https://pubs.opengroup.org/external/auformat.html"
+        },
+        {
+          "fact": "FFmpeg uses audio/basic as the media label for its Sun AU writer.",
+          "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/au.c"
+        },
+        {
+          "fact": "The IANA audio/basic definition describes mono eight-bit mu-law at 8 kHz; it is narrower than the full set of AU encodings.",
+          "source": "https://www.iana.org/assignments/media-types/audio/basic"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Audacity",
+            "note": "Imports AU audio without adding the optional FFmpeg library.",
+            "source": "https://manual.audacityteam.org/man/play.html"
+          },
+          {
+            "app": "Praat",
+            "note": "Reads supported NeXT/Sun encodings using Read from file.",
+            "source": "https://www.fon.hum.uva.nl/praat/manual/Sound_files_2_4__NeXT_Sun___au__files.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Audacity",
+            "note": "Imports AU audio without adding the optional FFmpeg library.",
+            "source": "https://manual.audacityteam.org/man/play.html"
+          },
+          {
+            "app": "Praat",
+            "note": "Reads supported NeXT/Sun encodings using Read from file.",
+            "source": "https://www.fon.hum.uva.nl/praat/manual/Sound_files_2_4__NeXT_Sun___au__files.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Audacity",
+            "note": "Imports AU audio without adding the optional FFmpeg library.",
+            "source": "https://manual.audacityteam.org/man/play.html"
+          },
+          {
+            "app": "Praat",
+            "note": "Reads supported NeXT/Sun encodings using Read from file.",
+            "source": "https://www.fon.hum.uva.nl/praat/manual/Sound_files_2_4__NeXT_Sun___au__files.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Old Audacity projects need their associated audio files in the expected locations.",
+          "source": "https://manual.audacityteam.org/man/audacity_2.html"
+        },
+        {
+          "fact": "An isolated Audacity block does not supply the arrangement stored by the AUP project.",
+          "source": "https://manual.audacityteam.org/man/audacity_2.html"
+        },
+        {
+          "fact": "Praat's Sun export quantizes samples to 16-bit mono; keep amplitudes below one to avoid clipping.",
+          "source": "https://www.fon.hum.uva.nl/praat/manual/Sound_files_2_4__NeXT_Sun___au__files.html"
+        },
+        {
+          "fact": "More than two interleaved channels are allowed by the specification, but some applications cannot handle them.",
+          "source": "https://pubs.opengroup.org/external/auformat.html"
+        }
+      ]
+    },
+    "raf": {
+      "background": [
+        {
+          "fact": "Fujifilm identifies RAF as its original camera RAW format.",
+          "source": "https://fujifilm-dsc.com/en/manual/x-t3/technical_notes/spec/index.html"
+        },
+        {
+          "fact": "The X-T3 can record either uncompressed or losslessly compressed RAF data.",
+          "source": "https://fujifilm-dsc.com/en/manual/x-t3/technical_notes/spec/index.html"
+        },
+        {
+          "fact": "Lossless RAW compression uses a reversible algorithm.",
+          "source": "https://fujifilm-dsc.com/en/manual/x100f/menu_shooting/raw_recording/index.html"
+        },
+        {
+          "fact": "RAW+JPEG recording saves a ready-to-use JPEG alongside the RAW capture.",
+          "source": "https://fujifilm-dsc.com/en/manual/x-t3/technical_notes/spec/index.html"
+        },
+        {
+          "fact": "Fujifilm's RAW converter develops RAF data recorded by X-series cameras.",
+          "source": "https://www.fujifilm-x.com/en-us/products/software/raw-file-converter-ex-powered-by-silkypix/"
+        },
+        {
+          "fact": "Film Simulation can be applied during RAW development in Fujifilm's converter.",
+          "source": "https://www.fujifilm-x.com/en-us/products/software/raw-file-converter-ex-powered-by-silkypix/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "RAW FILE CONVERTER EX powered by SILKYPIX",
+            "note": "Fujifilm offers RAW development software; check its camera compatibility list.",
+            "source": "https://www.fujifilm-x.com/en-us/support/download/software/raw-file-converter-ex-powered-by-silkypix/"
+          },
+          {
+            "app": "FUJIFILM X RAW STUDIO",
+            "note": "Uses a connected compatible camera's image processor for RAW conversion.",
+            "source": "https://www.fujifilm-x.com/en-us/support/download/software/x-raw-studio/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Lists RAF as a readable camera RAW format.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "RAW FILE CONVERTER EX powered by SILKYPIX",
+            "note": "Fujifilm offers RAW development software; check its camera compatibility list.",
+            "source": "https://www.fujifilm-x.com/en-us/support/download/software/raw-file-converter-ex-powered-by-silkypix/"
+          },
+          {
+            "app": "FUJIFILM X RAW STUDIO",
+            "note": "Uses a connected compatible camera's image processor for RAW conversion.",
+            "source": "https://www.fujifilm-x.com/en-us/support/download/software/x-raw-studio/"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Lists RAF as a readable camera RAW format.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Supports reading RAF.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "darktable",
+            "note": "Recognizes RAF for import; camera support comes from its RawSpeed library.",
+            "source": "https://docs.darktable.org/usermanual/development/en/overview/supported-file-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Losslessly compressed RAF needs software that understands that RAW variant.",
+          "source": "https://fujifilm-dsc.com/en/manual/x100f/menu_shooting/raw_recording/index.html"
+        },
+        {
+          "fact": "X RAW STUDIO requires a supported camera connection; it does not perform the conversion with the computer CPU.",
+          "source": "https://www.fujifilm-x.com/en-us/support/download/software/x-raw-studio/"
+        },
+        {
+          "fact": "New camera models can require a converter update; Fujifilm publishes model support additions.",
+          "source": "https://www.fujifilm-x.com/en-us/support/download/software/raw-file-converter-ex-powered-by-silkypix/"
+        }
+      ]
+    },
+    "xlsx": {
+      "background": [
+        {
+          "fact": "XLSX is Microsoft Excel's XML workbook format used from Excel 2007.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        },
+        {
+          "fact": "Its content is a ZIP package of Open Packaging Conventions parts.",
+          "source": "https://www.iana.org/assignments/media-types/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        {
+          "fact": "Several parts in that package are XML documents.",
+          "source": "https://www.iana.org/assignments/media-types/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        {
+          "fact": "XLSX cannot store VBA code or Excel 4.0 macro sheets.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        },
+        {
+          "fact": "Its registered media type is application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.",
+          "source": "https://www.iana.org/assignments/media-types/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreOffice Calc",
+            "note": "Opens Excel workbook formats; check imported features before resaving.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Microsoft Excel",
+            "note": "Opens the workbook through File > Open.",
+            "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreOffice Calc",
+            "note": "Reads Excel spreadsheets.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Apple Numbers",
+            "note": "Imports .xls and .xlsx spreadsheets for editing.",
+            "source": "https://support.apple.com/guide/numbers/open-or-close-spreadsheets-tan753033f43/mac"
+          },
+          {
+            "app": "Microsoft Excel",
+            "note": "Reads Excel workbook files.",
+            "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreOffice Calc",
+            "note": "Imports both legacy binary and Open XML Excel workbooks.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Gnumeric",
+            "note": "Its manual documents Excel and Office Open XML import support.",
+            "source": "https://gnome.pages.gitlab.gnome.org/gnumeric/manual/chapter-welcome.html"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Sheets",
+            "note": "Imports Excel files or edits Office files in Drive.",
+            "source": "https://support.google.com/docs/answer/9331167?hl=en"
+          },
+          {
+            "app": "Excel for the web",
+            "note": "Opens XLSX directly; opening legacy XLS converts a working copy to XLSX.",
+            "source": "https://support.microsoft.com/en-us/excel/differences-between-using-a-workbook-in-the-browser-and-in-excel"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Numbers for iPhone",
+            "note": "Imports .xls and .xlsx files.",
+            "source": "https://support.apple.com/guide/numbers-iphone/open-spreadsheets-tan753033f43/ios"
+          },
+          {
+            "app": "Microsoft Excel for Android and iOS",
+            "note": "XLSX can be edited; legacy XLS opens read-only.",
+            "source": "https://support.microsoft.com/en-us/excel/why-can-t-i-open-my-excel-file"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Saving a workbook with macros as XLSX cannot retain its VBA code; use a macro-enabled format.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        },
+        {
+          "fact": "Exporting a workbook to CSV saves only the active worksheet and discards formatting.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        },
+        {
+          "fact": "Google recommends retaining Excel for datasets above its stated Sheets cell limit or unusual chart types.",
+          "source": "https://support.google.com/docs/answer/9331167?hl=en"
+        }
+      ]
+    },
+    "xls": {
+      "background": [
+        {
+          "fact": "XLS identifies several generations of Microsoft Excel binary workbooks.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        },
+        {
+          "fact": "The Excel 97\u20132003 workbook uses BIFF8.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        },
+        {
+          "fact": "Excel 5.0/95 used the BIFF5 variant with the same .xls ending.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        },
+        {
+          "fact": "Modern Excel opens Excel 97\u20132003 workbooks in Compatibility Mode.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        },
+        {
+          "fact": "The registered Excel media type is application/vnd.ms-excel.",
+          "source": "https://www.iana.org/assignments/media-types/application/vnd.ms-excel"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreOffice Calc",
+            "note": "Opens Excel workbook formats; check imported features before resaving.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Microsoft Excel",
+            "note": "Opens the workbook through File > Open.",
+            "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreOffice Calc",
+            "note": "Reads Excel spreadsheets.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Apple Numbers",
+            "note": "Imports .xls and .xlsx spreadsheets for editing.",
+            "source": "https://support.apple.com/guide/numbers/open-or-close-spreadsheets-tan753033f43/mac"
+          },
+          {
+            "app": "Microsoft Excel",
+            "note": "Reads Excel workbook files.",
+            "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreOffice Calc",
+            "note": "Imports both legacy binary and Open XML Excel workbooks.",
+            "source": "https://books.libreoffice.org/en/GS75/GS7510-FileFormatsSecurityExporting.html"
+          },
+          {
+            "app": "Gnumeric",
+            "note": "Its manual documents Excel and Office Open XML import support.",
+            "source": "https://gnome.pages.gitlab.gnome.org/gnumeric/manual/chapter-welcome.html"
+          }
+        ],
+        "web": [
+          {
+            "app": "Google Sheets",
+            "note": "Imports Excel files or edits Office files in Drive.",
+            "source": "https://support.google.com/docs/answer/9331167?hl=en"
+          },
+          {
+            "app": "Excel for the web",
+            "note": "Opens XLSX directly; opening legacy XLS converts a working copy to XLSX.",
+            "source": "https://support.microsoft.com/en-us/excel/differences-between-using-a-workbook-in-the-browser-and-in-excel"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Numbers for iPhone",
+            "note": "Imports .xls and .xlsx files.",
+            "source": "https://support.apple.com/guide/numbers-iphone/open-spreadsheets-tan753033f43/ios"
+          },
+          {
+            "app": "Microsoft Excel for Android and iOS",
+            "note": "XLSX can be edited; legacy XLS opens read-only.",
+            "source": "https://support.microsoft.com/en-us/excel/why-can-t-i-open-my-excel-file"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Modern worksheet features can be lost when a workbook is saved as Excel 97\u20132003.",
+          "source": "https://support.microsoft.com/en-us/excel/worksheet-compatibility-issues"
+        },
+        {
+          "fact": "An XLS destination cannot hold cells outside its older row and column limits.",
+          "source": "https://support.microsoft.com/en-us/excel/worksheet-compatibility-issues"
+        },
+        {
+          "fact": "Text-format exports lose workbook formatting and keep only the active sheet.",
+          "source": "https://support.microsoft.com/en-us/excel/file-formats-that-are-supported-in-excel"
+        }
+      ]
+    },
+    "f4v": {
+      "background": [
+        {
+          "fact": "Adobe documents F4V among files derived from the MPEG-4 container structure.",
+          "source": "https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html"
+        },
+        {
+          "fact": "F4V is a container rather than the H.264 video codec itself.",
+          "source": "https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html"
+        },
+        {
+          "fact": "Adobe's playback API accepts H.264 video and HE-AAC v2 audio in these files.",
+          "source": "https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html"
+        },
+        {
+          "fact": "Adobe AIR and Flash Player 9.0.115.0 added the documented MPEG-4-family playback support.",
+          "source": "https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html"
+        },
+        {
+          "fact": "F4V playback can deliver metadata and cue-point events.",
+          "source": "https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html"
+        },
+        {
+          "fact": "Flash Player support ended in 2020; browser Flash is no longer a current playback method.",
+          "source": "https://www.adobe.com/products/flashplayer/end-of-life-alternative.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Its MOV-family demuxer explicitly recognizes the .f4v extension.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Reads MP4/MOV containers and decodes H.264 and AAC; test the particular F4V file.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Its MOV-family demuxer explicitly recognizes the .f4v extension.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Reads MP4/MOV containers and decodes H.264 and AAC; test the particular F4V file.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Its MOV-family demuxer explicitly recognizes the .f4v extension.",
+            "source": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavformat/mov.c"
+          },
+          {
+            "app": "VLC media player",
+            "note": "Reads MP4/MOV containers and decodes H.264 and AAC; test the particular F4V file.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "An old Flash embed can stop working because Adobe blocked Flash Player content after its retirement.",
+          "source": "https://www.adobe.com/products/flashplayer/end-of-life-alternative.html"
+        },
+        {
+          "fact": "The archived Adobe player API supports the documented codec combinations, not every stream a container might hold.",
+          "source": "https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html"
+        },
+        {
+          "fact": "Some AIR iOS playback APIs omit metadata and cue-point events available elsewhere.",
+          "source": "https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html"
+        }
+      ]
+    },
+    "divx": {
+      "background": [
+        {
+          "fact": "DivX video files belong to DivX's video playback and authoring ecosystem.",
+          "source": "https://www.divx.com/divx-11/"
+        },
+        {
+          "fact": "VideoLAN lists DivX versions one through six among its supported video compression formats.",
+          "source": "https://www.videolan.org/vlc/features.html"
+        },
+        {
+          "fact": "DivX authoring can add menus and chapter points to a movie.",
+          "source": "https://www.divx.com/press/divx-author-1-5-now-available-in-multiple-languages/"
+        },
+        {
+          "fact": "A DivX movie can contain subtitles and more than one audio track.",
+          "source": "https://www.divx.com/press/divx-author-1-5-now-available-in-multiple-languages/"
+        },
+        {
+          "fact": "DivX certification profiles distinguish device playback capabilities.",
+          "source": "https://www.divx.com/en/devices/all/"
+        },
+        {
+          "fact": "The .divx extension is one of the formats explicitly listed by DivX Player.",
+          "source": "https://www.divx.com/divx-11/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Decodes the documented DivX video formats.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "DivX Player",
+            "note": "Plays DIVX files and offers soundtrack selection.",
+            "source": "https://www.divx.com/divx-11/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Provides DivX decoding on the Mac.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "DivX Player",
+            "note": "The vendor offers its player on macOS.",
+            "source": "https://www.divx.com/divx-11/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Includes DivX video decoding.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFplay",
+            "note": "FFmpeg's test player handles DivX streams and subtitle samples; menus are not promised.",
+            "source": "https://www.ffmpeg.org/ffplay-all.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Advanced menus, chapters, and tracks depend on the receiving device's DivX profile.",
+          "source": "https://www.divx.com/en/devices/all/"
+        },
+        {
+          "fact": "DivX is primarily a delivery format; Adobe advises conversion before Premiere editing.",
+          "source": "https://www.adobe.com/creativecloud/file-types/video/container/divx.html"
+        },
+        {
+          "fact": "Having a DivX video decoder does not by itself establish support for every advanced authoring feature.",
+          "source": "https://www.divx.com/en/devices/all/"
+        }
+      ]
+    },
+    "xps": {
+      "background": [
+        {
+          "fact": "XPS means XML Paper Specification and is used for electronic documents and printing.",
+          "source": "https://learn.microsoft.com/en-us/dotnet/desktop/wpf/documents/printing-overview"
+        },
+        {
+          "fact": "The format uses XML and Open Packaging Conventions.",
+          "source": "https://learn.microsoft.com/en-us/dotnet/desktop/wpf/documents/printing-overview"
+        },
+        {
+          "fact": "XPS fixes page layout instead of reflowing the content.",
+          "source": "https://learn.microsoft.com/en-us/archive/msdn-magazine/2006/january/introducing-apis-for-creating-xml-paper-specification-documents"
+        },
+        {
+          "fact": "Its document structure includes ordered fixed documents and fixed pages.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee236513(v=vs.85)"
+        },
+        {
+          "fact": "Font resources can be embedded in an XPS document.",
+          "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee236513(v=vs.85)"
+        },
+        {
+          "fact": "Its registered media type is application/vnd.ms-xpsdocument.",
+          "source": "https://www.iana.org/assignments/media-types/application/vnd.ms-xpsdocument"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "SumatraPDF",
+            "note": "Free Windows reader with XPS support.",
+            "source": "https://www.sumatrapdfreader.org/free-pdf-reader"
+          },
+          {
+            "app": "Okular",
+            "note": "Lists XPS among its document handlers.",
+            "source": "https://okular.kde.org/formats/"
+          },
+          {
+            "app": "MuPDF viewer",
+            "note": "Its documented supported formats include XPS.",
+            "source": "https://mupdf.readthedocs.io/en/1.26.1/quick-start-guide.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "MuPDF viewer",
+            "note": "Its documented supported formats include XPS.",
+            "source": "https://mupdf.readthedocs.io/en/1.26.1/quick-start-guide.html"
+          },
+          {
+            "app": "mutool draw",
+            "note": "Reads XPS pages for rendering or text extraction.",
+            "source": "https://mupdf.readthedocs.io/en/1.26.1/mutool-draw.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "Okular",
+            "note": "Views XPS through its document handler.",
+            "source": "https://okular.kde.org/formats/"
+          },
+          {
+            "app": "MuPDF viewer",
+            "note": "Its documented supported formats include XPS.",
+            "source": "https://mupdf.readthedocs.io/en/1.26.1/quick-start-guide.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "XPS page descriptions are not the editable source document; retain the original authoring file.",
+          "source": "https://learn.microsoft.com/en-us/dotnet/desktop/wpf/documents/printing-overview"
+        },
+        {
+          "fact": "Viewer features differ by format; do not assume PDF annotations or forms also work in XPS.",
+          "source": "https://okular.kde.org/formats/"
+        },
+        {
+          "fact": "A changed signed document can be detected by XPS signature verification.",
+          "source": "https://learn.microsoft.com/en-us/windows/win32/printdocs/documents"
+        }
+      ]
+    }
+  }
+}

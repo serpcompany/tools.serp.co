@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import {
   applyBatch,
   britishSpellings,
+  programPlatforms,
   checkContent,
   joinRegistry,
   loadContext,
@@ -398,12 +399,14 @@ const SECTIONS = [
   "Other ways to convert WebP to PNG",
   "Problems with WebP files",
 ];
+const PLATFORMS = "- **Windows:** Photos.\n- **Mac:** Preview.\n- **Web:** any current browser.";
 const WORDS = ["amber", "basalt", "cobalt", "dune", "ember", "fjord", "garnet", "harbor", "indigo", "jasper"];
 function deepCatalog() {
   const tools = catalog();
   const { content } = tools[0];
   content.faqs = WORDS.slice(0, 8).map((word, index) => ({ question: `Question ${index}?`, answer: `The ${word} answer.` }));
   content.guide = { title: "About WebP files", markdown: SECTIONS.map((heading) => `### ${heading}\n\nText with a color cache.`).join("\n\n") };
+  content.guide.markdown = content.guide.markdown.replace("WebP files\n\nText", `WebP files\n\n${PLATFORMS}\n\nText`);
   return tools;
 }
 
@@ -424,6 +427,18 @@ test("a page with a guide has at least 8 FAQs and the guide's five sections in o
   const missing = deepCatalog();
   missing[0].content.guide.markdown = "No sections at all.";
   assert.match(checkContent(missing, noKeywords)[0].message, /it has none$/);
+});
+
+test("a guide groups the programs that open the format under platform labels", () => {
+  assert.equal(programPlatforms("**Windows**\n\n- Photos.\n\n**macOS:** Preview.\n\n- **Android and iOS:** a viewer."), 3);
+  assert.equal(programPlatforms("**Desktop**\n\n- GIMP on Windows, Mac and Linux.\n\n**Browsers and phones**"), 2);
+  assert.equal(programPlatforms("- **Windows, Mac and Linux:** GIMP.\n- **Mobile:** a viewer."), 4);
+
+  const tools = deepCatalog();
+  tools[0].content.guide.markdown = tools[0].content.guide.markdown.replace(PLATFORMS, "GIMP opens it on Windows, Mac and Linux.");
+  assert.deepEqual(checkContent(tools, noKeywords).map((failure) => failure.message), [
+    'content.guide\'s "Programs that open" section needs its programs under at least 3 bold platform labels (Windows, Mac, Linux, Web, Mobile)',
+  ]);
 });
 
 test("copy on a page with a guide is in US spelling", () => {
@@ -473,7 +488,7 @@ test("content:apply writes a batch's How-to and guide", () => {
   batch["mp4-to-mp3"].guide = {
     title: "About MP4 and MP3",
     markdown: ["What is an MP4 file?", "Programs that open MP4 files", "MP4 and MP3 compared", "Other ways to convert MP4 to MP3", "Problems with MP4 files"]
-      .map((heading) => `### ${heading}\n\nA container.`)
+      .map((heading) => `### ${heading}\n\n${heading.startsWith("Programs") ? PLATFORMS : "A container."}`)
       .join("\n\n"),
   };
   const { text, problems } = applyBatch(registryOf(catalog()), batch, noKeywords);

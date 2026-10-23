@@ -8,6 +8,7 @@
 // that operation. FFmpeg command lines aren't restated: the brief runs the builders in
 // lib/convert/ffmpeg-args.ts for each Tool, so they can't drift.
 
+import { resolveCompressionTarget } from "../../lib/compression-utils.ts";
 import { buildCompressionCommand, buildConvertCommand } from "../../lib/convert/ffmpeg-args.ts";
 
 // HeroConverter (components/HeroConverter.tsx) and lib/convert/workerClient.ts
@@ -24,6 +25,9 @@ export function converterPageFacts(tool) {
     "There is no general file-size limit (checkInputFile in lib/convert/workerClient.ts checks the format, not the size). Some engines have their own, listed below.",
     'The output is checked against the target format: a wrong result fails with "The converter produced X instead of Y." (lib/convert/workerClient.ts).',
     "The visitor's original file isn't changed; they download a new copy.",
+    compress && resolveCompressionTarget(tool.from) === "image-worker"
+      ? `The download is named after the original with "_compressed" added: "<name>_compressed.${tool.from.toLowerCase()}" (components/HeroConverter.tsx).`
+      : `The download is named after the original with this Tool's target extension: "<name>.${tool.to}" (components/HeroConverter.tsx). An FFmpeg command below writes an internal file whose name the visitor never sees; copy must not give that name or its extension as the download's.`,
   ];
 }
 
@@ -56,7 +60,8 @@ export const ENGINE_FACTS = {
       "Decodes with the browser's own image decoder (lib/convert/decode.ts) and encodes with a canvas or ImageMagick (lib/convert/encode.ts).",
       "Transparency is kept for PNG and WebP outputs.",
       "An animated input gives its first frame only (decodeWithImageDecoder in lib/convert/decode.ts).",
-      "JPEG, WebP and AVIF outputs are written at quality 0.85 (workers/convert.worker.js); PNG has no quality setting.",
+      "JPEG outputs are written by the canvas at quality 0.85 (workers/convert.worker.js); PNG has no quality setting.",
+      "WebP and AVIF outputs are written at quality 0.85 only where the browser's canvas can encode that format. Where it can't, the canvas returns a PNG and ImageMagick encodes the WebP or AVIF from it with no quality set (encodeFromRGBA in lib/convert/encode.ts). Copy must not state one quality for WebP or AVIF output.",
       "BMP, GIF, ICO and similar outputs are written by ImageMagick (lib/convert/encode.ts).",
       "Metadata isn't carried over: the image goes through raw pixels, so EXIF, ICC profiles and XMP are dropped (lib/convert/decode.ts, lib/convert/encode.ts).",
       "The pixels pass through 8-bit RGBA (the RGBA type in lib/convert/heif.ts holds a Uint8ClampedArray), so a canvas output has 8 bits per channel: extra depth in the source, such as a 16-bit PNG or a 10- or 12-bit AVIF, is lost.",
@@ -65,6 +70,7 @@ export const ENGINE_FACTS = {
     ],
     unsettled: [
       "What color fills transparent areas in a JPG output (the canvas JPEG encoder decides).",
+      "Which browsers' canvas can encode WebP or AVIF, and ImageMagick's default quality for each.",
       "Whether EXIF orientation is applied on decode.",
       "How an ICC profile affects the decoded colors.",
     ],
@@ -90,8 +96,9 @@ export const ENGINE_FACTS = {
   "ffmpeg-wasm": {
     where: "In the browser: FFmpeg compiled to WebAssembly, single-threaded, in its own worker. No server.",
     facts: [
-      "No `-map` or `-map_metadata` is passed, so FFmpeg's defaults pick the streams and tags.",
+      "No `-map` or `-map_metadata` is passed, so FFmpeg's defaults pick the streams and copy the input's global tags (title, artist, album and the like) to an output format that can hold them. Checked with @ffmpeg/core 0.12.6: an MP3's title came through an MP3 to MP3 conversion. Copy must not say tags are dropped.",
       "No size limit or timeout of its own; a long file takes as long as the visitor's device needs.",
+      "A damaged or cut-short input usually still converts: FFmpeg logs the error and writes what it could read, so the output is shorter. With `-c copy`, a stream the output container can't hold may be dropped or carried as a data stream without any error. Checked with @ffmpeg/core 0.12.6 on cut-short MPEG and CAF files and an MP4 with ALAC audio. Copy must not promise that a bad input or an unsupported stream makes the conversion fail.",
       'Errors a visitor can see: "FFmpeg failed with exit code N" (for example a video with no audio track converted to audio); a FairPlay-protected M4P is refused with its own message.',
     ],
     convert: [
@@ -103,7 +110,8 @@ export const ENGINE_FACTS = {
     ],
     unsettled: [
       "Which audio or video track is used when a file has several.",
-      "Whether subtitles, chapters and tags survive.",
+      "Whether subtitles and chapters survive.",
+      "Which tags a given pair of formats can carry across (the output format may have no field for them).",
       "The output sample rate and channel count, where the command doesn't set them.",
       "Memory ceilings: how large a file a phone can convert.",
     ],
@@ -139,7 +147,7 @@ export const ENGINE_FACTS = {
     facts: [
       "Only the primary image is decoded: a HEIC that holds several images gives one.",
       "Decoded to 8-bit RGB pixels; EXIF data and ICC profiles aren't carried over.",
-      "Lossy outputs are written at quality 0.85.",
+      "JPEG outputs are written at quality 0.85. WebP and AVIF are written at 0.85 only where the browser's canvas can encode them; otherwise ImageMagick encodes them with no quality set (encodeFromRGBA in lib/convert/encode.ts).",
       'A file with no image fails with "No images in HEIF".',
     ],
     unsettled: ["Whether transparency (an alpha plane) survives."],
@@ -224,6 +232,24 @@ export const TARGET_FACTS = {
   },
 };
 
+// WMV, OGV and SWF outputs set no codec (buildConvertCommand in
+// lib/convert/ffmpeg-args.ts), so FFmpeg's defaults for the container decide.
+// Read from @ffmpeg/core 0.12.6 converting benchmarks/fixtures/sample.mp4.
+const defaultCodecs = (container, video, audio) => ({
+  facts: [
+    `The command sets no codec for ${container}, so FFmpeg's defaults decide: ${video} video and ${audio} audio, at FFmpeg's default bitrates (200 kbit/s video). Checked with @ffmpeg/core 0.12.6.`,
+  ],
+});
+TARGET_FACTS.wmv = defaultCodecs("WMV", "MS-MPEG4 v3 (not Windows Media Video)", "WMA v2 (128 kbit/s)");
+TARGET_FACTS.ogv = defaultCodecs("OGV", "Theora", "Vorbis");
+TARGET_FACTS.swf = defaultCodecs("SWF", "Sorenson Spark (FLV1)", "MP3");
+TARGET_FACTS.mp3 = {
+  engines: ["ffmpeg-wasm", "server-video, then ffmpeg-wasm"],
+  facts: [
+    "MP3 outputs ask for 192 kbit/s, which MP3 can't reach below 32 kHz: LAME then writes at most 160 kbit/s (16 to 24 kHz) or 64 kbit/s (8 to 12 kHz). The sample rate isn't changed, so an 8 kHz source (GSM, telephone ULAW or A-law) gives an MP3 of about 64 kbit/s. Checked with @ffmpeg/core 0.12.6. Copy must not promise 192 kbit/s for every source.",
+  ],
+};
+
 // Facts for every Tool that reads one format (`from`), on the listed engines.
 export const SOURCE_FACTS = {
   svg: {
@@ -235,6 +261,11 @@ export const SOURCE_FACTS = {
     unsettled: ["How an animated or scripted SVG is drawn (the code doesn't handle it)."],
   },
 };
+// An SVG is drawn from a blob as an image (decodeInBrowser in lib/convert/decode.ts),
+// and a browser loads nothing outside an SVG drawn as an image.
+SOURCE_FACTS.svg.facts.push(
+  "The SVG is drawn as an image, so the browser loads nothing outside the file: a linked picture, an external stylesheet or a web font it points to is never drawn, whether or not it is online. Only what is embedded in the SVG (data: URIs, inline styles) and fonts installed on the visitor's device appear.",
+);
 
 const MAGICK_PDF_ROUTE = {
   engines: ["imagemagick-wasm"],
@@ -339,7 +370,7 @@ export function engineFactsFor(tool, engine) {
           );
         } else if (built.args.includes("-fpsmax")) {
           facts.push(
-            "The video is re-encoded and keeps the source's frame size and frame rate up to 1920 px on the longer side and 30 fps (MAX_VIDEO_SIZE, MAX_VIDEO_FPS in lib/convert/ffmpeg-args.ts). Both sides are rounded down to an even number (force_divisible_by=2 in fitWithin), so an odd width or height loses 1 px: copy must not say the size is kept exactly.",
+            "The video is re-encoded and keeps the source's frame size and frame rate up to 1920 px on the longer side and 30 fps (MAX_VIDEO_SIZE, MAX_VIDEO_FPS in lib/convert/ffmpeg-args.ts). A smaller frame is never scaled up and a slower rate is never raised; a faster source has frames dropped (-fpsmax) and keeps its length, so it is not slowed down. Both sides are rounded down to an even number (force_divisible_by=2 in fitWithin), so an odd width or height loses 1 px: copy must not say the size is kept exactly.",
           );
         }
       }

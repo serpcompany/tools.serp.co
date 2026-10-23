@@ -1,0 +1,843 @@
+{
+  "csv-to-pdf": {
+    "seo": {
+      "title": "Convert CSV to PDF Online (Free)",
+      "h1": "CSV to PDF Converter",
+      "description": "Convert CSV to PDF in your browser. A4 pages repeat the header row and turn landscape when columns need it. Free, with no sign-up."
+    }
+  },
+  "psd-to-jpg": {
+    "seo": {
+      "title": "Convert PSD to JPG Online (Free)",
+      "h1": "PSD to JPG Converter",
+      "description": "Convert PSD to JPG in your browser. Your Photoshop file is saved as one flat picture, with no layers or transparency. Free, with no sign-up.",
+      "howToHeading": "How to convert PSD to JPG"
+    },
+    "tool": {
+      "subtitle": "Save a Photoshop PSD as one flat JPG picture, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PSD to JPG?",
+        "answer": "Choose your PSD file above. ImageMagick runs in your browser and writes a JPG, which downloads once it is ready. Your PSD stays as it was."
+      },
+      {
+        "question": "How do I save a PSD as a JPG, and what is the file called?",
+        "answer": "Choose the PSD above and the page saves a new copy named after your file with a .jpg ending, so poster.psd downloads as poster.jpg. The original PSD is not changed."
+      },
+      {
+        "question": "Does the JPG keep my Photoshop layers?",
+        "answer": "No. A JPG is a single picture, so the layers, masks, adjustment layers and live text are not in it. A layered PSD gives one picture here, not one per layer. Keep the PSD if you may need to edit the design again."
+      },
+      {
+        "question": "What happens to transparent areas of a PSD?",
+        "answer": "JPG has no alpha channel, so a JPG cannot hold see-through areas. When transparency matters, make a PNG with the [PSD to PNG converter](/psd-to-png/)."
+      },
+      {
+        "question": "Can I choose the JPG quality?",
+        "answer": "No. The page passes no quality setting, so there is no control for it here. If you need to pick a quality number, export from GIMP, whose JPEG export dialog has a Quality level from 0 to 100."
+      },
+      {
+        "question": "Can I convert several PSD files at once?",
+        "answer": "Yes. Pick as many files as you want. The page works through them in turn and saves a separate JPG for each, with nothing zipped."
+      },
+      {
+        "question": "Why does my big PSD fail with a \"too large\" message?",
+        "answer": "Anything larger than roughly 537 megapixels is refused, because that much pixel data would take over half the memory its browser engine has. A PSD can reach 30,000 pixels on a side, which is 900 megapixels, so only huge documents run into this."
+      },
+      {
+        "question": "Will a 16-bit PSD convert?",
+        "answer": "The converter works at 8 bits for each color, so a 16-bit or 32-bit PSD ends up as an 8-bit picture here."
+      },
+      {
+        "question": "Can I just rename the .psd file to .jpg?",
+        "answer": "No. A new ending changes the label and nothing else: the data still begins with the Photoshop signature, 8BPS. Converting writes JPEG data, and the page checks that the result really is a JPG before it offers the download."
+      },
+      {
+        "question": "How can I open a PSD without Photoshop?",
+        "answer": "GIMP, XnView MP and ImageMagick open PSD files on a computer, and Photopea opens them in a browser tab. Or convert it here and open the JPG anywhere."
+      }
+    ],
+    "aboutSection": {
+      "title": "PSD and JPG",
+      "fromFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
+        "details": [
+          "layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes",
+          "proprietary Adobe format"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PSD to JPG",
+      "points": [
+        "You get one flat picture, not one file per layer.",
+        "JPG has no layers and no alpha transparency.",
+        "The page passes no JPEG quality setting, and JPG is lossy.",
+        "Channels deeper than 8 bits end up as 8 bits.",
+        "A picture over about 537 megapixels is refused.",
+        "Choose several PSD files and each JPG downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "About PSD files",
+      "markdown": "### What is a PSD file?\n\nAdobe Photoshop projects are stored as PSD files. Where a JPG stores a finished picture, a PSD stores the work behind it: layers, masks, adjustment layers, type and color data, so a design can be reopened and changed later. A designer can return to one headline or one retouching layer without rebuilding the image.\n\nThe data begins with the signature 8BPS, then a header, then separate sections for image resources, layers and masks, and pixels. Pixel data may be left uncompressed or packed with RLE or ZIP. A PSD tops out at 30,000 pixels on a side, and the related PSB format lifts that limit. Its registered media type is image/vnd.adobe.photoshop.\n\nYou meet PSD files when a designer, photographer or retoucher hands over a project. The PSD is the master; the JPG is the copy you place in a listing, send for approval or upload to a form that does not take PSD.\n\n### Programs that open PSD files\n\n- **Linux, Mac and Windows:** Command-line users can run ImageMagick, whose format list notes PSD support for alpha blending, adjustment layers and opacity masks. XnView MP lists PSD among the formats it opens, and company use needs a license. Adobe Photoshop and GIMP open PSD files too.\n- **Mac:** Preview opens PSD files for a quick look.\n- **Web:** Photopea works in the browser and uses PSD as its main document format; choose File > Open.\n\n### PSD and JPG compared\n\n- **Extensions and media types**: .psd and image/vnd.adobe.photoshop; .jpg or .jpeg and image/jpeg.\n- **Layers**: a PSD keeps layers and masks. A JPG cannot store layers.\n- **Compression**: PSD pixel data is raw, RLE or ZIP. JPEG compression is lossy.\n- **Transparency**: JPG carries no alpha channel, so see-through areas cannot be kept.\n- **Bit depth**: a PSD can hold 1, 8, 16 or 32 bits per channel, and a JPG stores 8.\n- **Quality**: programs usually offer a 0 to 100 slider for JPEG, but one program's 80 need not match another's.\n\nThe name JPEG is taken from the Joint Photographic Experts Group; ISO/IEC 10918-1 (1994) is its main standard. Most digital cameras and scanners write it directly, and all the major browsers can show it. A progressive mode exists too: a rough version shows up first, then refines while the rest downloads.\n\nThe result is one flat picture of the PSD, saved as a JPG. Individual layers are not written out, and the JPG cannot hand back editable text or masks. Use it as the copy you send for a listing, an email or an approval, and hold on to the PSD for changes. Your PSD itself is never altered, because the page gives you a separate new file named after it. Choose several PSDs together and they run one after another, each JPG is saved by itself.\n\n### Other ways to convert PSD to JPG\n\n- **GIMP:** load the PSD, then choose File > Export As. In GIMP's JPEG export dialog the Quality field runs from 0 to 100, and Advanced Options holds a progressive setting.\n- **Photopea (web):** Photopea turns whatever you open into a PSD-based document, so open the file with File > Open, then use File > Export As > JPG. The result is a flat image, so look over text and effects before you send it on.\n- **ImageMagick (Windows, Mac, Linux):** run `magick input.psd output.jpg`. In a test with a two-layer PSD, this wrote one numbered JPG per layer, output-0.jpg and output-1.jpg, so check what came out.\n\n### Problems with PSD files\n\n- **The JPG looks different from Photoshop**: other programs have to interpret Photoshop-specific data, and opening a preview does not prove every feature was read the same way. Use the original PSD in Photoshop when an effect must match exactly.\n- **The file is too large**: a document beyond the 30,000-pixel limit has to be saved as PSB. This page refuses anything past roughly 537 megapixels.\n- **See-through areas are not in the JPG**: a JPG has no alpha channel. Use PNG when you need to keep transparency.\n- **The JPG looks soft or blotchy**: the format throws detail away, and this page gives you no quality control. Export from GIMP when you need to choose the quality yourself.\n- **Layers are missing from the result**: a flat image export does not keep layer and mask information. Go back to the PSD for any layer-level work.\n"
+    }
+  },
+  "cr2-to-jpg": {
+    "seo": {
+      "title": "Convert CR2 to JPG Online (Free)",
+      "h1": "CR2 to JPG Converter",
+      "description": "Convert Canon CR2 raw photos to JPG in your browser, several at a time. Each CR2 is saved as a regular JPG. Free, with no sign-up.",
+      "howToHeading": "How to convert CR2 to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn Canon CR2 raw photos into JPG pictures that open anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a CR2 to JPG?",
+        "answer": "Pick your CR2 files above. Each one is decoded in your browser by ImageMagick, which uses LibRaw for raw files, and the JPG downloads once it is ready. The CR2 itself stays untouched."
+      },
+      {
+        "question": "How do I convert CR2 to JPG in bulk?",
+        "answer": "Pick every CR2 from the card in one go and the page works through them in order. Each JPG is saved under its CR2's name and nothing is zipped, so expect one download per photo."
+      },
+      {
+        "question": "Can I convert CR2 to JPG without losing quality?",
+        "answer": "Not entirely. JPEG is lossy, and the page gives no quality setting. Keep the CR2 as your master and treat the JPG as the copy you share."
+      },
+      {
+        "question": "Can I change the brightness or color before it converts?",
+        "answer": "No. This page has no development controls. To tune the result, open the file in darktable and export the JPG from there."
+      },
+      {
+        "question": "What does \"The RAW file is damaged\" mean?",
+        "answer": "The decoder reported the CR2 as damaged or cut short. Copy it off the card a second time and convert that fresh copy."
+      },
+      {
+        "question": "Why is the JPG not the same as the preview on my camera?",
+        "answer": "Software must convert the sensor data of a raw file into color and tone, and each program decides how. A developed JPG can therefore differ in brightness and color from what your camera showed. To steer the look, develop the file in darktable and export from there."
+      },
+      {
+        "question": "Which Canon cameras does it support?",
+        "answer": "A recognized .cr2 ending does not guarantee that a program supports the camera that made the file. The decoder this page uses is LibRaw, which lists the Canon cameras it supports. CR3 files from newer Canon bodies are a different format; the site has a separate [CR3 to JPG converter](/cr3-to-jpg/) for them."
+      },
+      {
+        "question": "Can I open a CR2 without converting it?",
+        "answer": "Yes, with Canon Digital Photo Professional, darktable or Adobe Camera Raw, provided your camera model is supported. Adobe lists a minimum plug-in version for each camera."
+      },
+      {
+        "question": "Is there a PNG option for my CR2?",
+        "answer": "Yes. The site has a [CR2 to PNG converter](/cr2-to-png/) if you want PNG instead of JPG."
+      },
+      {
+        "question": "Is my CR2 uploaded to a server?",
+        "answer": "No. The work is done by ImageMagick compiled to WebAssembly inside this page, so no server gets your CR2. The raw file is not modified, and a JPG is saved as a new file."
+      }
+    ],
+    "aboutSection": {
+      "title": "CR2 and JPG",
+      "fromFormat": {
+        "name": "CR2",
+        "fullName": "Canon RAW version 2",
+        "description": "The raw image format used by many Canon EOS cameras from the mid-2000s until CR3 replaced it. It stores unprocessed sensor data in a TIFF-based file.",
+        "details": [
+          "unprocessed sensor data",
+          "TIFF-based structure",
+          "embedded JPEG preview",
+          "proprietary Canon format"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting CR2 to JPG",
+      "points": [
+        "The page has no development controls, so you cannot adjust the raw settings.",
+        "The JPG is lossy, and the page has no quality setting.",
+        "Choose several CR2 files and each JPG downloads on its own.",
+        "A CR2 the decoder reports as damaged or cut short stops with a message about the file.",
+        "A picture over about 537 megapixels is refused.",
+        "Keep the CR2 as your master; the JPG cannot be developed again."
+      ]
+    },
+    "guide": {
+      "title": "About CR2 files",
+      "markdown": "### What is a CR2 file?\n\nCR2 is Canon's raw image format, the one many EOS cameras wrote from the mid-2000s until CR3 replaced it. Raw means the file holds the sensor's measurements instead of a finished picture. Software has to process them, choosing white balance, tone and color, before they look like a photograph.\n\nA CR2 is built on TIFF, and it carries an embedded JPEG preview next to the sensor data. Canon's own Digital Photo Professional lists .CR2 among the raw extensions it reads.\n\nYou usually meet a CR2 when you copy a shoot off the memory card of a Canon camera and find that your phone, an email program or an upload form will not show it. A JPG fixes that.\n\nRaw files exist so you can make those choices after the shot. The catch is that CR2 is a proprietary camera format. A program that recognizes the extension may still not support the camera that made the file.\n\n### Programs that open CR2 files\n\n- **Windows, Mac and Linux:** darktable lists CR2 as an import extension, and decoding depends on camera support.\n- **Windows and Mac:** Canon Digital Photo Professional is Canon's own program and reads CR2 files from the cameras it lists. Adobe Camera Raw supports Canon cameras by model and by minimum plug-in version, so check Adobe's supported-camera list.\n- **Linux:** LibRaw's dcraw_emu is a command-line raw developer; LibRaw lists the Canon cameras it supports.\n- **Web and mobile:** browsers do not display CR2. This page decodes it with ImageMagick inside the page.\n\n### CR2 and JPG compared\n\n- **Extensions and media types**: .cr2 is Canon-specific; .jpg or .jpeg is image/jpeg.\n- **What is stored**: a CR2 holds unprocessed sensor data and a small preview. A JPG holds a processed picture.\n- **Compression**: JPEG is lossy. The raw data in a CR2 is not a rendered picture at all.\n- **Editing room**: raw leaves white balance and tone adjustments open until you process it. A JPG has them baked in.\n- **Color depth**: JPEG stores 8 bits per channel, and this page works at 8 bits.\n- **Reach**: all major browsers show JPEG, and it comes straight out of most digital cameras and scanners. CR2 needs a decoder that knows your camera.\n\nIts name comes from a committee, the Joint Photographic Experts Group; the ISO/IEC 10918-1 standard dates from 1994. Most programs expose quality as a number from 0 to 100, yet equal numbers in two programs can look different.\n\nThe step from CR2 to JPG is a processing step as well as a format change. After it, you have one picture, not a file you can re-develop. For a result you control, develop the CR2 in a raw editor first, then export the JPG from there. If you only need a quick copy to share or to check focus, the converter on this page is enough.\n\n### Other ways to convert CR2 to JPG\n\n- **darktable (Windows, Mac, Linux):** import the CR2 and select it. In the export module, target storage is set to file on disk; then JPEG is chosen as the format, and you press export. The module has a quality setting for JPEG, which defaults to 95.\n- **ImageMagick (command line):** run `magick cr2:portrait.cr2 portrait.jpg`. ImageMagick's format list says CR2 needs the explicit `cr2:` specifier before the file name. In a test with a sample CR2 this wrote a JPG.\n\n### Problems with CR2 files\n\n- **The program says it cannot read the file**: the extension is recognized but your camera model is not. Update the program, or convert with a decoder that lists the camera.\n- **Brightness and color differ from your camera**: the camera, this page and your editor each turn the sensor data into a picture in their own way, so the results will not match.\n- **\"The RAW file is damaged.\" or \"ends before its picture does\"**: the decoder reports the file as cut off or corrupt. Copy it from the card again.\n- **Too large to convert**: roughly 537 megapixels is the ceiling; above it you see a message that the picture is too big for this page.\n- **You worry the CR2 will not open in future**: it is a proprietary camera format, so long-term access depends on programs keeping support for it. Hold on to the original file.\n- **The JPG looks flat**: this page has no tone or color controls. Use darktable to adjust the picture and export your own JPG.\n"
+    }
+  },
+  "svg-to-pdf": {
+    "seo": {
+      "title": "Convert SVG to PDF Online (Free)",
+      "h1": "SVG to PDF Converter",
+      "description": "Convert SVG to PDF in your browser. The drawing is placed on one PDF page as a picture, not as vector paths. Free, with no sign-up.",
+      "howToHeading": "How to convert SVG to PDF"
+    },
+    "tool": {
+      "subtitle": "Put an SVG drawing on a PDF page as a picture, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an SVG to PDF?",
+        "answer": "Choose your SVG above. Your browser draws it, the page embeds that picture in a PDF, and the PDF downloads. Each SVG becomes its own PDF."
+      },
+      {
+        "question": "Does the PDF keep the SVG as vector graphics?",
+        "answer": "No. The browser draws the SVG into pixels and the PDF holds that picture, embedded as a PNG, so shapes are no longer separate paths. Inkscape's File > Save a Copy with the PDF type is the route the Inkscape manual gives, and it calls PDF a vector format."
+      },
+      {
+        "question": "Is the text in the PDF still selectable?",
+        "answer": "No. The text is part of the picture, so you cannot select, search or copy it. The Inkscape manual says to embed fonts when you save as PDF if you need searchable text."
+      },
+      {
+        "question": "How large is each PDF?",
+        "answer": "You get one page cut to the picture's own size, without margins and without an A4 or Letter sheet. A pixel in the SVG becomes one point on the page."
+      },
+      {
+        "question": "Will the PDF look sharp when I zoom in?",
+        "answer": "Only as sharp as the pixel size of the picture. The SVG is drawn at the size your browser reports for it, 1:1, and the code adds no scale factor, so a small SVG gets soft when you zoom or print it large."
+      },
+      {
+        "question": "Is the SVG's transparent background kept?",
+        "answer": "Yes. The page paints no background, so transparent pixels stay transparent in the PDF."
+      },
+      {
+        "question": "Can I merge several SVG files into one PDF?",
+        "answer": "No. Each file becomes its own one-page PDF, and the PDFs download one after another."
+      },
+      {
+        "question": "Why are my fonts or linked pictures missing?",
+        "answer": "A browser loads nothing from outside an SVG it draws as a picture, whether or not you are online. That covers linked images, external CSS and web fonts. Data URIs inside the file and fonts already on your device still show. Embed images as data, and convert text to paths first if the exact lettering matters."
+      },
+      {
+        "question": "Can an SVG go to PNG instead?",
+        "answer": "Yes. The site has an [SVG to PNG converter](/svg-to-png/)."
+      },
+      {
+        "question": "Is my SVG uploaded?",
+        "answer": "No. A Web Worker in your browser draws the SVG and builds the PDF, and no server is involved. The SVG file itself is untouched; the PDF is a new download."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and PDF",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting",
+          "styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "fixed page layout",
+          "embedded fonts",
+          "vector and raster content",
+          "optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting SVG to PDF",
+      "points": [
+        "The PDF holds a picture of the SVG, not its vector paths or live text.",
+        "The page is the size of the picture, one pixel to one point, with no margin.",
+        "Transparent areas stay transparent.",
+        "Each SVG becomes its own PDF, and several files are never merged.",
+        "The conversion runs in your browser, so the SVG is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About SVG files",
+      "markdown": "### What is an SVG file?\n\nThe letters SVG expand to Scalable Vector Graphics. The format is XML-based and describes two-dimensional artwork made of shapes, text and embedded images. The W3C maintains it as an open standard: version 1.0 was recommended in 2001, and 1.1 followed in 2003. Shapes are stored as instructions, so a single file stays sharp however large it is drawn.\n\nPlain text means an SVG needs no special software to read: any editor will open it, and search, indexing or compression all work on it. The gzip-compressed form is saved with an .svgz extension. CSS and JavaScript apply to SVG, so a drawing can be styled, scripted and animated, and the format adds clipping paths, masks and filter effects. It works as a stand-alone file or as a piece of an HTML page. Its registered media type is image/svg+xml.\n\nDesigners meet SVG as logos and icons exported from a drawing program, as charts from a plotting tool, and as artwork on websites. A PDF is the usual way to hand such a drawing to someone who wants a document, a print shop, or a form that takes only PDF.\n\n### Programs that open SVG files\n\n- **Mac, Windows and Linux:** Inkscape edits SVG as its native format, and Firefox displays it.\n- **Web and mobile:** Google Chrome displays SVG on the web and on phones, and Safari displays it on phones.\n\n### SVG and PDF compared\n\n- **Extensions and media types**: .svg and image/svg+xml; .pdf and application/pdf.\n- **What they are**: SVG is XML text that describes a drawing. PDF is a page format created by Adobe and standardized as ISO 32000, built to look the same on any device.\n- **Content**: an SVG describes shapes, text and embedded images. One PDF page can combine text, vector graphics and raster images, and the file may also hold links, bookmarks, form fields and annotations.\n- **Imaging**: every major browser displays SVG, and a PDF's imaging model comes from PostScript and does not depend on the device or resolution.\n- **Fonts**: text layout in an SVG depends on the fonts available, while a PDF needs its fonts embedded to look the same everywhere.\n- **Images inside**: a PDF can store its pictures using Flate, which is lossless, or using JPEG.\n\nA PDF can hold vector paths, but this converter does not write them. It draws the SVG in your browser and puts that picture on a page, so you get the fixed layout of a PDF without the scalability of SVG. For vector output, use one of the programs below, and keep the SVG as the source either way.\n\n### Other ways to convert SVG to PDF\n\n- **Inkscape (Windows, Mac, Linux):** open the SVG, choose File > Save a Copy and pick Portable Document Format (*.pdf) as the type. The manual advises converting decorative text, such as a logo, to paths, and keeping an SVG master.\n- **CairoSVG (command line):** run `cairosvg drawing.svg -o drawing.pdf`. The format follows the output file's extension. CairoSVG's documentation says its text and font support is limited, fonts must be installed on the system, and animation and scripting are not implemented.\n- **ImageMagick (command line):** run `magick diagram.svg diagram.pdf`. ImageMagick's format list says SVG is rendered by Inkscape, RSVG or its internal renderer, and that PDF support requires Ghostscript.\n\n### Problems with SVG files\n\n- **Text looks wrong**: the drawing depends on which fonts are present, and a replacement font can alter it. Turn the text into paths before exporting, or install the font the SVG names.\n- **A picture is missing**: this page renders the SVG as an image, which means a linked picture is not drawn whether or not you are online. Embed pictures in the SVG as data URIs.\n- **The PDF is soft when printed**: the picture is embedded at the SVG's pixel size. Use Inkscape instead.\n- **Pictures inside the SVG stay pixelated**: pixel images embedded in an SVG keep their own resolution, so enlarging them shows the blocks.\n- **The page is much smaller than expected**: the PDF follows the size your browser reports for the SVG, one pixel to one point. If a larger page is needed, set the size in an editor beforehand.\n- **The file will not load**: when the browser cannot decode the file, you get \"Image decode failed.\" Check it in a browser or in Inkscape beforehand.\n"
+    }
+  },
+  "tif-to-jpg": {
+    "seo": {
+      "title": "Convert TIF to JPG Online (Free)",
+      "h1": "TIF to JPG Converter",
+      "description": "Convert TIF to JPG in your browser, several scans at a time. A multi-page TIF gives one JPG, not one per page. Free, with no sign-up.",
+      "howToHeading": "How to change TIF to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn TIF scans and photos into JPG pictures that any form or app accepts."
+    },
+    "faqs": [
+      {
+        "question": "How do I change a TIF to a JPG?",
+        "answer": "Drop your TIF on the converter above. ImageMagick opens it inside your browser, and a JPG copy downloads when it is done. The original TIF is left as it was."
+      },
+      {
+        "question": "Can I turn a stack of TIF scans into JPGs?",
+        "answer": "Select several TIFs in the picker and they convert in sequence. Every JPG is saved on its own under the TIF's name and no archive is made, so a big batch means many downloads."
+      },
+      {
+        "question": "What happens to a TIF with several pages?",
+        "answer": "Only one image is read from the file, so the result is a single JPG and not one per page. A TIFF can hold several images, which is why it suits scanned document sequences."
+      },
+      {
+        "question": "Are .tif and .tiff the same?",
+        "answer": "Yes. Both spellings name TIFF, short for Tagged Image File Format, whose media type is image/tiff. The file picker on this page lists .tif files."
+      },
+      {
+        "question": "Can I convert TIF to JPG without losing quality?",
+        "answer": "No. JPEG discards detail, and there is no quality setting here to turn up. Store the TIF as the master and send out the JPG."
+      },
+      {
+        "question": "Why did my TIF fail to convert?",
+        "answer": "A damaged file, or a TIFF variant that ImageMagick cannot read, ends with a message that the picture couldn't be read."
+      },
+      {
+        "question": "Is my TIF uploaded to a server?",
+        "answer": "No. The conversion runs inside your browser tab, so the scan never leaves your device. Only the finished JPG is saved."
+      },
+      {
+        "question": "Should I pick PNG instead of JPG for a TIF?",
+        "answer": "Pick PNG through the [TIF to PNG converter](/tif-to-png/) when every pixel must survive, since PNG is lossless. Choose JPG when a small file that opens anywhere matters more."
+      },
+      {
+        "question": "Will a very large TIF stop the conversion?",
+        "answer": "File size is not capped. Only a picture with an extreme pixel count is refused, with a message that it is too big for this page."
+      },
+      {
+        "question": "Does the JPG keep my TIF's file name?",
+        "answer": "Yes, apart from the ending. scan.tif downloads as scan.jpg."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIF and JPG",
+      "fromFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "lossless or lossy compression",
+          "multiple pages in one file",
+          "high bit depth",
+          "CMYK support"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIF to JPG",
+      "points": [
+        "A multi-page TIF gives one JPG, not one per page.",
+        "JPG is lossy and the page has no quality setting, so keep the TIF as your master.",
+        "Choose several TIF files and each JPG downloads on its own.",
+        "A picture over about 537 megapixels is refused.",
+        "The conversion runs in your browser, so the TIF is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About TIF files",
+      "markdown": "### What is a TIF file?\n\nTIF is the short spelling of TIFF, the Tagged Image File Format. It is a raster format first published by Aldus in 1986 and developed with Microsoft, and Adobe now holds its specification. Revision 6.0 came out in 1992. A TIFF is built from tags that say how the pixel data is stored, so two files with the same ending can differ a lot inside.\n\nThat flexibility is why scanners, print shops and document-imaging systems use it. A TIFF can use different compression methods and color representations, reach high bit depths, and hold several images in one file, which suits a scanned stack of pages. It is not always lossless, though. The compression is chosen when the file is written.\n\nPhotographers and archivists keep TIFFs as preservation masters because high bit depth and lossless storage are established uses of the format. The ending tells you the container, not what is in it: one page or fifty, 8 bits or 16, lossless or not.\n\n### Programs that open TIF files\n\n- **Linux, Mac and Windows:** TIFF opens in GIMP for editing. ImageMagick reads and writes TIFF from the command line, with controls for compression, strips, tiles and byte order.\n- **Windows:** Windows Photos opens TIFF.\n- **Mac:** Preview lists TIFF among the formats in File > Export, and Adobe Photoshop opens TIFF too.\n\n### TIF and JPG compared\n\n- **Extensions and media types**: .tif and .tiff with image/tiff; .jpg and .jpeg with image/jpeg.\n- **Compression**: a TIFF can be lossless or lossy, depending on the method used. JPG is always lossy, so detail is traded for a smaller file.\n- **Pages**: a TIFF can hold several images. A JPG is one picture, and this page writes one JPG for each file.\n- **Bit depth and color**: TIFF can carry high bit depths and CMYK. The converter works at 8 bits for the JPG.\n- **Specification**: Adobe controls the TIFF specification, while JPEG is defined by the ISO/IEC 10918-1 standard.\n- **Support**: JPG is supported almost everywhere, and every major browser displays it.\n\nISO/IEC 10918-1, published in 1994, is the core JPEG standard, written by the Joint Photographic Experts Group. Digital cameras and scanners generally produce it natively. A 0 to 100 range is typical, but identical figures can look different between programs. Progressive JPEGs paint a blurry preview first and sharpen it as the remaining data arrives.\n\nThe conversion sets no quality, so there is nothing to tune here. For a scan of fine print or line art, look at the JPG at full size before you throw anything away. The TIF on your disk stays as it was; what you download is a fresh JPG that carries its name. Picking several TIFs together runs them one after another with no ZIP. A lossless copy is also possible, because the site has a PNG option for TIF files.\n\n### Other ways to convert TIF to JPG\n\n- **GIMP:** open the TIFF and choose File > Export As. The Quality field in GIMP's JPEG export dialog accepts 0 to 100. GIMP's manual says every format other than XCF loses some image properties, such as layers and transparency, and that exporting does not change the open image.\n- **ImageMagick (command line):** run `magick scan.tif scan-copy.jpg`. ImageMagick's format list marks TIFF as readable and writable. In a test with a small TIF this wrote a JPG.\n\n### Problems with TIF files\n\n- **A website or form rejects the TIF**: convert the file. Renaming it to .jpg does not change what is inside.\n- **Only one picture came out**: a TIFF can hold several images, and this page gives one JPG per file. Use software that exposes the full image sequence if you need every page.\n- **A reader does not understand the file**: private tags vary, and a program may not recognize all of them, color-profile extensions included.\n- **The page says the picture couldn't be read**: either the file is damaged or it uses a TIFF variant that ImageMagick cannot decode. Try the scanning software that made it.\n- **Colors shift on a 16-bit or CMYK scan**: the JPG comes out with 8 bits for each color, so compare it with the original before you rely on it.\n- **A very large scan**: original TIFF offsets are 32 bits wide, capping a file near 4 GB, and BigTIFF widens them. Pictures beyond roughly 537 megapixels are declined by the page.\n"
+    }
+  },
+  "m4v-to-mp4": {
+    "seo": {
+      "title": "Convert M4V to MP4 Online (Free)",
+      "h1": "M4V to MP4 Converter",
+      "description": "Convert M4V to MP4 in your browser. The video is re-encoded as H.264 with AAC sound, and several files can run in one go. Free, with no sign-up.",
+      "howToHeading": "How to convert M4V to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn an M4V video into an MP4 that plays on almost any device."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4V to MP4?",
+        "answer": "Choose your M4V above. FFmpeg runs in your browser, re-encodes the video, and the MP4 downloads when it finishes. Your M4V is not changed."
+      },
+      {
+        "question": "Can I just rename .m4v to .mp4?",
+        "answer": "A rename changes only the label. According to Apple's support page, a different suffix cannot repair a damaged file or supply an encoding the player is missing. Converting writes new H.264 video and AAC audio, and it cannot remove protection from a protected file."
+      },
+      {
+        "question": "Is the M4V re-encoded or just copied into an MP4?",
+        "answer": "It is re-encoded. The page does not copy streams. The video becomes H.264 and the sound AAC at 96 kbps. For a repack without re-encoding on your own computer, FFmpeg's `-c copy` does that, as the Other ways section shows."
+      },
+      {
+        "question": "Will the MP4 look worse than the M4V?",
+        "answer": "It can. The video is encoded with a fast, small-file setting (CRF 32, the ultrafast preset), so some detail can be lost. Keep the M4V if image quality matters most."
+      },
+      {
+        "question": "What size and frame rate does the MP4 have?",
+        "answer": "Your video keeps its own frame size and rate, as long as the longer side stays within 1920 pixels and the rate within 30 fps. Footage with a higher rate loses frames but keeps its running time. Both width and height are rounded down to an even count, which costs an odd width or height one pixel."
+      },
+      {
+        "question": "Can I convert an iTunes movie in M4V format?",
+        "answer": "An iTunes Store movie may carry Apple's copy protection, and this page has no way to remove it: its FFmpeg cannot decrypt FairPlay. Convert only M4V files that are not protected."
+      },
+      {
+        "question": "Are the title and other tags kept?",
+        "answer": "The page does not clear them. Global tags like title, artist and album are copied by FFmpeg into the output where the container has fields for them."
+      },
+      {
+        "question": "Can I queue several M4V files?",
+        "answer": "Yes. Add them together and the page encodes them one by one, saving an MP4 per video under the same name."
+      },
+      {
+        "question": "Why does the MP4 take so long to make?",
+        "answer": "Encoding happens in your browser with single-threaded FFmpeg, and the page sets no limit or timeout of its own; a long or high-resolution file ties up your device for however long the encode runs. Keep the tab open until the download starts."
+      },
+      {
+        "question": "Is my M4V uploaded?",
+        "answer": "No. Everything runs in your browser tab, which means the video is never uploaded."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4V and MP4",
+      "fromFormat": {
+        "name": "M4V",
+        "fullName": "MPEG-4 video",
+        "description": "A video file format developed by Apple that is very close to MP4. Files from the iTunes Store may be protected with FairPlay DRM.",
+        "details": [
+          "MPEG-4 container",
+          "H.264 video with AAC audio",
+          "optional DRM",
+          "Apple format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4V to MP4",
+      "points": [
+        "The video is re-encoded as H.264 with AAC sound at 96 kbps, not copied across.",
+        "Size and frame rate are kept up to 1920 pixels and 30 fps, with odd sides rounded down.",
+        "The page cannot remove FairPlay protection from an iTunes purchase.",
+        "Global tags such as title and artist are copied across where the container allows.",
+        "Several files convert one after another, each downloading on its own.",
+        "Everything runs in your browser tab, which means the video is never uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About M4V files",
+      "markdown": "### What is an M4V file?\n\nApple developed M4V as a video format that sits very close to MP4. Both use the MPEG-4 container for video, audio and other tracks, and an everyday M4V holds H.264 video with AAC sound. FFmpeg's MP4 reader names .m4v among its endings, and HandBrake counts its M4V and MP4 outputs as one container.\n\nYou meet M4V in the iTunes and Apple TV world and in video made for phones and tablets. HandBrake picks the M4V ending for some combinations of chapters, AC3 passthrough or subtitles. The MOV and MP4 family supports timed media tracks and metadata stored in boxes, and how a file plays depends on the encodings of its tracks.\n\nFiles from the iTunes Store may be protected with FairPlay, Apple's copy protection. HandBrake's documentation lists MP4 and M4V as common file types for video from phones, tablets and cameras.\n\nMost people convert an M4V so that a player, a site or an editing program accepts it. MP4 with H.264 and AAC is the combination that plays on nearly every device, and MP4 is the container that nearly every player expects.\n\n### Programs that open M4V files\n\n- **Mac, Windows and Linux:** VLC media player supports MPEG-4 containers and common MPEG-4 video and AAC audio. FFmpeg's MOV/MP4 reader lists .m4v input explicitly, and processing also requires the relevant decoders.\n- **Mac:** QuickTime Player and the Apple TV app open M4V.\n\n### M4V and MP4 compared\n\n- **Extensions**: .m4v and .mp4, with video/mp4 as the media type of an MP4.\n- **Container**: both use the MPEG-4 file structure. MP4 is defined in ISO/IEC 14496-14 and can hold video, audio, subtitles and metadata. M4V is Apple's variant.\n- **Codecs**: the usual contents are H.264 video and AAC audio. MP4 may also hold H.265 or AV1 video. An unsupported codec can prevent playback even when the application recognizes the container.\n- **Protection**: an M4V can carry FairPlay DRM.\n- **Metadata**: the MOV and MP4 family keeps metadata in boxes, and FFmpeg's reader treats .m4v as part of that family.\n- **Support**: MP4 plays on nearly every device.\n\nThis page does not repack the streams. It decodes your video and encodes it again with H.264 video and AAC audio. The result is a new encode, not a bit-for-bit copy. If you want the original quality in a new container, copy the streams with FFmpeg on your computer.\n\n### Other ways to convert M4V to MP4\n\n- **FFmpeg (command line):** type `ffmpeg -i library.m4v -c copy library-remux.mp4`. FFmpeg's manual describes stream copy as copying packets without decoding or encoding them, and warns it may fail if the target container needs information the source lacks. Without `-map`, FFmpeg picks one video, one audio and one subtitle stream, so extra tracks are left out. In a test with a sample M4V, this command wrote an MP4.\n- **HandBrake (Windows, Mac, Linux):** pick Open Source, then either keep the default Fast 1080p30 preset or choose another, give the output a destination under To, and select Start. HandBrake's docs list M4V among common video file types it reads. It re-encodes the video, so check the size, frame rate and codec in the result. HandBrake itself chooses the .m4v ending for some outputs, since it treats M4V and MP4 as one container.\n- **VLC:** open Media > Convert/Save, use Add to select the M4V, fill in the Destination file, pick a profile like Video - H.264 + MP3 (MP4), then click Start. That profile's audio codec is MP3, not AAC.\n\n### Problems with M4V files\n\n- **The video will not play outside Apple apps**: the file may be a FairPlay-protected purchase, or the player may lack the codec inside it.\n- **An FFmpeg exit-code message appears**: the page prints \"FFmpeg failed with exit code\" when the file could not be processed. Play it in VLC to see whether it opens at all.\n- **The MP4 looks softer**: the video is re-encoded at CRF 32 with the ultrafast preset. Use HandBrake or the FFmpeg copy command when quality matters.\n- **The MP4 has a smaller picture or fewer frames than expected**: 1920 pixels is the cap on the longer side, and footage faster than 30 fps loses frames.\n- **A recording from a camera or phone will not open**: a normal MOV/MP4-family recording may be unreadable if writing ended before the required metadata was finished.\n"
+    }
+  },
+  "mov-to-wav": {
+    "seo": {
+      "title": "Convert MOV to WAV Online (Free)",
+      "h1": "MOV to WAV Converter",
+      "description": "Extract the sound of a MOV video as a WAV file in your browser. The audio is saved as 16-bit PCM and the picture is dropped. Free, no sign-up.",
+      "howToHeading": "How to convert MOV to WAV"
+    },
+    "tool": {
+      "subtitle": "Pull the audio out of a MOV video and save it as an uncompressed WAV."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MOV to WAV?",
+        "answer": "Add your MOV to the converter above. FFmpeg works in your browser tab, removes the picture and saves the sound as a WAV. The MOV itself stays as it is."
+      },
+      {
+        "question": "How do I extract audio from a MOV file?",
+        "answer": "This converter does exactly that. It leaves the video behind and writes the sound to a standalone WAV, which you can open in an audio editor or a transcription tool."
+      },
+      {
+        "question": "Is the WAV lossless?",
+        "answer": "The WAV is 16-bit PCM, which is uncompressed, but it holds the MOV's sound as FFmpeg decoded it. It cannot restore detail that was already thrown away. If the MOV's sound was compressed, say as AAC, the WAV holds that decoded result."
+      },
+      {
+        "question": "Why is the WAV so large?",
+        "answer": "WAV usually holds uncompressed PCM, so its size grows with the length of the recording, and WAV files have a 4 GB limit. The MOV's own sound is often compressed."
+      },
+      {
+        "question": "What if my MOV has more than one audio track?",
+        "answer": "The page does not let you pick a track. FFmpeg's default choice decides which one you get. If you need a particular microphone or language, extract it with an FFmpeg `-map` option on your computer."
+      },
+      {
+        "question": "Why did my MOV fail to convert?",
+        "answer": "A MOV that lacks audio makes FFmpeg stop, and the message reads \"FFmpeg failed with exit code\" and then a figure."
+      },
+      {
+        "question": "Can I extract the audio from a batch of MOV clips?",
+        "answer": "Yes. Select the clips together and each is processed in turn, saving a WAV named after its MOV. Nothing is zipped, so you get one file per clip."
+      },
+      {
+        "question": "Can I set the WAV's sample rate or channel count?",
+        "answer": "Not here. The page hands FFmpeg no sample rate and no channel count, so there is nothing for you to choose. If you need an exact format, the VLC method in the guide sets one."
+      },
+      {
+        "question": "Does my MOV get uploaded?",
+        "answer": "No. Everything happens inside your browser tab, so the video never leaves your device. The only thing saved is the finished WAV."
+      },
+      {
+        "question": "Can I get an MP3 instead of a WAV?",
+        "answer": "Yes. The site has a [MOV to MP3 converter](/mov-to-mp3/). Choose WAV when you plan to edit the sound."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and WAV",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "The container format of Apple's QuickTime, which also served as the basis for the MPEG-4 file format. It stores video, audio, text and timecode tracks.",
+        "details": [
+          "multi-track container",
+          "many codecs, including ProRes",
+          "timecode and metadata tracks",
+          "Apple format"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "large files",
+          "4 GB file size limit"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MOV to WAV",
+      "points": [
+        "Only the sound is kept. The picture is dropped.",
+        "The WAV is 16-bit PCM, which is uncompressed.",
+        "A MOV with no sound track fails with an FFmpeg error.",
+        "With several audio tracks, FFmpeg's default choice decides which one you get.",
+        "Several files convert one after another, each downloading on its own.",
+        "The conversion runs in your browser, so the MOV is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About MOV files",
+      "markdown": "### What is a MOV file?\n\nQuickTime's container is the MOV. It stores video, audio, text and timecode tracks side by side, and it served as the basis for the MPEG-4 file format. iPhones record in it, Mac editing programs export it, and production workflows use it for codecs such as ProRes. The ending tells you about the container, not the codec inside it.\n\nFor a WAV, only the sound track matters. A MOV is a multi-track container, so it can hold more than one audio track. It can also hold none, as in a silent animation or a screen recording made with the microphone off.\n\nA QuickTime container can use codecs missing from the editor you send it to. Renaming a file never transcodes it or installs a missing decoder. A regular MOV may also be unusable after an interrupted write.\n\n### Programs that open MOV files\n\n- **Linux, Mac and Windows:** ffplay ships with FFmpeg and plays MOV. VLC media player opens MOV too, while mpv adds desktop playback in which you choose the audio and subtitle streams.\n- **Windows and Mac:** Premiere, Adobe's editor, imports MOV, provided the decoder it needs is present.\n- **Mac:** QuickTime Player is Apple's own player, and Final Cut Pro is Apple's editor.\n- **Mobile:** Android and iOS users can play MOV in VLC, as far as the media inside the container allows.\n\n### MOV and WAV compared\n\n- **Extensions and media types**: .mov for the movie container; .wav for audio, labeled audio/wav or audio/x-wav.\n- **What they hold**: MOV is a multi-track movie container. WAV is a RIFF-based sound wrapper documented by Microsoft and IBM in 1991, and it normally holds uncompressed PCM. Compressed encodings can appear in a WAV too.\n- **Compression**: the audio inside a MOV may be compressed. The WAV made here is 16-bit PCM, so it is not.\n- **Size**: a WAV is large because it is uncompressed, and it is capped at 4 GB.\n- **Video**: a WAV has none, so the picture of the MOV is not carried over.\n- **Variants**: Broadcast WAVE adds metadata for production and preservation work, while RF64 replaces the original RIFF size fields for very large recordings.\n- **Metadata**: INFO chunks and Broadcast WAVE extensions each hold different details, so support varies.\n- **Archiving**: WAVE is the Library of Congress's recommendation for digital audio collections.\n\nHere the video is discarded and the audio is written as 16-bit PCM. Sample rate and channel count are not options on this page. Hold on to the MOV if the picture or its timing may matter later, since the WAV is a separate copy.\n\n### Other ways to convert MOV to WAV\n\n- **FFmpeg (command line):** run `ffmpeg -i interview.mov -vn -c:a pcm_s16le interview-audio.wav`. The -vn option stops any video stream from being selected. In a test with a sample MOV this wrote a WAV. For a MOV with more than one audio stream, a `-map` option picks the one you want.\n- **Audacity (Windows, Mac, Linux):** Audacity's manual says FFmpeg is needed to import audio from most video files, and that on Mac only it can import unprotected MOV files without it. Bring in the MOV, go to File > Export Audio, select WAV under Save as type, and either leave the Signed 16-bit PCM encoding as it is or choose a different one.\n- **VLC:** choose Media > Convert/Save, add the MOV, set the profile to Audio - CD, give the destination a .wav name and click Start. That profile writes 16-bit PCM, stereo, at 44,100 Hz.\n\n### Problems with MOV files\n\n- **An FFmpeg exit-code error appears**: a MOV without a sound track is one cause. Open it in a player first, to confirm that there is audio before you try again.\n- **The WAV has the wrong audio**: with several tracks in the MOV you receive just one. Extract the right one with FFmpeg `-map`.\n- **The WAV is large**: WAV is uncompressed, so its size follows the length of the sound and it stops at 4 GB.\n- **The MOV will not play in your editor**: the editor may lack the codec inside it. Renaming the file does not install the codec.\n- **A recording made on a phone will not open**: if the recording stopped before it was finished, a regular MOV may be unusable.\n"
+    }
+  },
+  "dng-to-jpg": {
+    "seo": {
+      "title": "Convert DNG to JPG Online (Free)",
+      "h1": "DNG to JPG Converter",
+      "description": "Convert DNG raw photos to JPG in your browser, many at a time. The page has no development controls. Free, with no sign-up.",
+      "howToHeading": "How to convert DNG to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn Adobe DNG raw photos into JPG pictures you can share anywhere."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a DNG to a JPG?",
+        "answer": "Add your DNG files above. Each one is read in your browser with ImageMagick and saved as a JPG named after it. The DNG on your disk is not touched."
+      },
+      {
+        "question": "How do I batch convert DNG to JPG?",
+        "answer": "Choose as many DNGs as you like in the file picker. The page converts them in turn, and a JPG with the same name as each DNG lands in your downloads. You get separate files, not an archive."
+      },
+      {
+        "question": "Can I convert DNG to JPG without losing quality?",
+        "answer": "Not fully. A JPG is lossy, and this page offers no quality setting. Treat the DNG as the master you keep."
+      },
+      {
+        "question": "Can I adjust exposure or white balance first?",
+        "answer": "No. The page has no controls for developing the raw data. For a hand-tuned result, develop the DNG in a raw editor such as darktable and export a JPG from there."
+      },
+      {
+        "question": "Why won't my DNG convert?",
+        "answer": "A message such as \"The RAW file ends before its picture does\" points to a damaged or incomplete file, so copy it again from where it came from. The converter also turns away pictures over roughly 537 megapixels."
+      },
+      {
+        "question": "Why does my DNG say its compression can't be decoded?",
+        "answer": "The page cannot decode every DNG. The error message lists the files it cannot decode: some Nikon raws, DNGs compressed with JPEG XL, and GoPro DNGs. A raw editor is the way around that."
+      },
+      {
+        "question": "Does the JPG look like the picture on my phone?",
+        "answer": "Maybe not. This page gives you no say in how the raw data is developed, so brightness and color can come out different. A raw editor lets you steer the look."
+      },
+      {
+        "question": "What is a DNG file?",
+        "answer": "DNG, Digital Negative, is Adobe's documented format for camera raw data. Many phones and some cameras write it, and Adobe's DNG Converter can turn supported raw files into it. It needs developing before it looks like a normal photo."
+      },
+      {
+        "question": "Can I open a DNG without converting it?",
+        "answer": "Yes, in a raw editor that imports DNG, darktable among them. Ordinary photo viewers may show only a small preview or nothing."
+      },
+      {
+        "question": "Should I pick PNG over JPG for a DNG?",
+        "answer": "Use the [DNG to PNG converter](/dng-to-png/) if you want to edit the picture again, since PNG is lossless. Choose JPG when you want a small file to share."
+      }
+    ],
+    "aboutSection": {
+      "title": "DNG and JPG",
+      "fromFormat": {
+        "name": "DNG",
+        "fullName": "Digital Negative",
+        "description": "An open raw image format published by Adobe in 2004 as a single documented alternative to the many proprietary raw formats. It is based on TIFF/EP.",
+        "details": [
+          "unprocessed sensor data",
+          "publicly documented specification",
+          "TIFF-based structure",
+          "optional lossless compression"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting DNG to JPG",
+      "points": [
+        "You cannot adjust how the raw data is developed.",
+        "The JPG is lossy, and the page has no quality setting.",
+        "Choose several DNG files and each JPG downloads on its own.",
+        "JPEG XL and GoPro DNGs are not decoded.",
+        "A picture over about 537 megapixels is refused.",
+        "Keep the DNG as your master copy."
+      ]
+    },
+    "guide": {
+      "title": "About DNG files",
+      "markdown": "### What is a DNG file?\n\nDNG, Digital Negative, is a format Adobe published for camera raw data, with the first specification dating to September 2004. It extends the TIFF family with the tags a program needs to interpret a raw photograph. Raw means the file holds what the sensor measured, not a finished picture, so software has to develop it before you see a photo.\n\nA DNG can come straight from a camera or phone that writes the format. It can also be made with Adobe's DNG Converter, which translates supported proprietary raw files into DNG. Inside, it may hold the mosaic of sensor data or an already demosaiced, linear version, and it can use lossless JPEG compression. Exif metadata can ride along.\n\nYou usually meet a DNG when you copy photos from a phone's pro camera mode or from an editing catalog, and find that an upload form, a chat app or a website will not show it. A JPG fixes that, and it opens almost anywhere. The DNG stays the better starting point if you may want a different color treatment later, so keep it after you convert.\n\n### Programs that open DNG files\n\n- **Windows, Mac and Linux:** darktable accepts the .dng extension on import, though its decoding limits still apply. ImageMagick reads DNG too, and the dng: prefix names the format when it has to be explicit.\n- **Windows and Mac:** DNG is handled by Adobe Camera Raw inside compatible Adobe applications, part of Adobe's raw workflow.\n\n### DNG and JPG compared\n\n- **Extensions and media types**: Digital Negative files end in .dng. JPEG files end in .jpg or .jpeg and use image/jpeg.\n- **Contents**: a DNG holds raw sensor data or a linear version, plus the tags to interpret it. A JPG holds a finished picture.\n- **Compression**: a DNG can use lossless JPEG compression. A JPG is always lossy.\n- **Editing room**: raw leaves white balance, exposure and tone open for later. A JPG has them baked in.\n- **Metadata**: a DNG can hold Exif metadata, but this page does not promise that tags carry over to the JPG.\n- **Support**: JPG opens everywhere. A DNG needs a raw-aware program.\n\nOn this page the raw data goes through ImageMagick with no controls offered, and the result is saved as a JPG named after your DNG. You get a normal photo, but you cannot change white balance, exposure or noise handling before it is written. If the look matters, develop in a raw editor and export from there, then use the JPG for sharing. The page takes several files at once and hands you each JPG separately.\n\n### Other ways to convert DNG to JPG\n\n- **darktable (Windows, Mac, Linux):** highlight the DNG in the filmstrip, find the export module, switch target storage to file on disk, pick JPEG for the format and press start export. The module offers a quality setting. Cameras with non-Bayer sensors are a known gap, with an exception for Fujifilm X-Trans.\n\n### Problems with DNG files\n\n- **A viewer shows nothing or a tiny picture**: ordinary viewers do not develop raw data. Open the DNG in a raw editor, or convert it here.\n- **The page says the compression can't be decoded**: the message points at Nikon's newer raw compression, JPEG XL inside a DNG, and GoPro files. Use a raw editor for these.\n- **The page says the RAW file is damaged or ends early**: the copy may be incomplete. Copy it from the source again, whether that is a card, a phone or a cloud folder.\n- **The JPG looks flatter than expected**: the page lets you tune nothing, so adjust tone and color in an editor afterward.\n- **A linear DNG behaves differently**: it is already demosaiced, so it is not interchangeable with untouched sensor-mosaic data. Check how it was made.\n- **A huge picture is refused**: anything over about 537 megapixels is too large for the converter here.\n- **Converting to DNG did not help a program read it**: DNG does not guarantee that every reader supports the sensor pattern inside. darktable documents limits for non-Bayer sensors, so check your camera in the program you use.\n- **Renaming does nothing**: giving a DNG a .jpg ending leaves raw data inside, and no viewer will treat it as a photo.\n- **A proprietary raw file will not open**: Adobe suggests verifying that DNG Converter lists the camera before you rely on it.\n"
+    }
+  },
+  "ico-to-png": {
+    "seo": {
+      "title": "Convert ICO to PNG Online (Free)",
+      "h1": "ICO to PNG Converter",
+      "description": "Convert an ICO icon or favicon to PNG in your browser. The PNG keeps transparency as 8-bit RGBA. Free, with no sign-up, nothing uploaded.",
+      "howToHeading": "How to convert ICO to PNG"
+    },
+    "tool": {
+      "subtitle": "Turn an ICO icon or favicon into a PNG with its transparency intact."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an ICO to a PNG?",
+        "answer": "Choose your ICO above. Your browser decodes the icon, the page writes it as a PNG, and the file downloads under the icon's name with a .png ending. Your ICO is not changed."
+      },
+      {
+        "question": "Will the icon stay transparent as a PNG?",
+        "answer": "Yes. See-through areas of the icon stay see-through, because PNG output keeps transparency. The picture is written as 8-bit RGBA."
+      },
+      {
+        "question": "Which size do I get from an ICO that holds several?",
+        "answer": "You get one PNG, and the page has no size picker. The ICO can hold more than one image, so look at the PNG to see whether it is the size you wanted."
+      },
+      {
+        "question": "How do I convert a favicon.ico to PNG?",
+        "answer": "Save the favicon.ico file to your computer first, then choose it above. A favicon is an ordinary ICO, so it goes through the same steps."
+      },
+      {
+        "question": "Why is my PNG so small?",
+        "answer": "The icon was drawn at that size. Changing the format does not add pixels, and a small icon enlarged for a bigger display can look soft. Use a larger image from the ICO, or get the original artwork."
+      },
+      {
+        "question": "How do I convert a folder of icons?",
+        "answer": "Pick all the ICO files in the file picker. Each is converted in turn and saved as its own PNG, named after the icon. There is no archive, so each icon is a separate download."
+      },
+      {
+        "question": "Can I convert a Windows cursor file instead?",
+        "answer": "Yes, with the [CUR to PNG converter](/cur-to-png/). A CUR is a cursor file and not an icon, so it has its own page."
+      },
+      {
+        "question": "Why did my ICO fail to convert?",
+        "answer": "A file your browser cannot decode fails with \"Image decode failed.\" It may be damaged, or not a real icon with an .ico ending."
+      },
+      {
+        "question": "Can I use the PNG as a Windows icon?",
+        "answer": "Not directly. Windows icons use the ICO container, which this PNG is not. Use the PNG for a slide, a mockup or a website, and keep the ICO for the icon itself."
+      },
+      {
+        "question": "Is my icon uploaded when I convert it?",
+        "answer": "No. All the work happens in your browser on your own device, so the icon stays with you."
+      }
+    ],
+    "aboutSection": {
+      "title": "ICO and PNG",
+      "fromFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and color depths in a single file. Browsers also use it for favicons.",
+        "details": [
+          "multiple sizes in one file",
+          "alpha transparency",
+          "PNG or bitmap entries"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ICO to PNG",
+      "points": [
+        "You get one PNG from the icon. The page has no way to pick a size.",
+        "Transparency is kept, as 8-bit RGBA.",
+        "A small icon stays small, and enlarging it looks soft.",
+        "Metadata is not copied to the PNG.",
+        "Several files convert one after another, each downloading on its own.",
+        "The conversion runs in your browser, so the icon is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About ICO files",
+      "markdown": "### What is an ICO file?\n\nMicrosoft made ICO for the icons in its graphical interface. A single file may carry more than one image, which is why the format is called a container: it can hold several bitmap images of different sizes and color depths. The entries can be bitmaps or PNG data. ICO files use little-endian byte order, and the registered media type is image/vnd.microsoft.icon.\n\nWebsites know the format best as favicon.ico, the tiny logo a browser shows in a tab. The .ico ending is widely associated with favicons. Windows Vista guidance added 256-by-256 images for high-DPI displays, so a recent icon may carry a large entry along with small ones.\n\nPeople convert an ICO to a PNG because a slide deck, a mockup, a chat app or a design tool wants an ordinary picture, not an icon container. A PNG is that picture, and it keeps transparency. Because an ICO is built for small screens, expect a small result unless the icon was made with a larger entry.\n\nCheck what you have before you convert. An ICO may contain several images, so do not assume the first preview you see is the only one. The page gives you a single PNG and no way to choose, so if the size matters, look at the result and compare it with what you expected.\n\n### Programs that open ICO files\n\n- **On Windows:** File Explorer is named among the programs that open ICO.\n- **Linux, Mac and Windows:** ImageMagick can read ICO from a terminal, and the image formats XnView MP supports include ICO. A license is required for company use of XnView MP.\n- **Web:** Firefox and Chrome display ICO pictures in the page, so a favicon or an icon file opens in a browser tab.\n\n### ICO and PNG compared\n\n- **Extensions and media types**: .ico with image/vnd.microsoft.icon; .png with image/png.\n- **What they hold**: an ICO is a container of one or more icon images. A PNG holds a single picture.\n- **Compression**: PNG is lossless and standardized as ISO/IEC 15948. ICO entries can be uncompressed bitmaps or PNG data.\n- **Transparency**: both can have an alpha channel. This page keeps it.\n- **Bit depth**: PNG can store 8 or 16 bits per channel. The one made here stores 8, because the pixels pass through 8-bit RGBA on the way.\n- **Metadata**: the page does not carry it over. Exif, color profiles and XMP are dropped, so the PNG holds pixels only.\n- **Sizes**: an ICO can hold several. The PNG holds one picture.\n- **Use**: an ICO serves as a Windows icon or favicon. A PNG goes into documents, slides, apps and the web.\n\nA PNG holds one picture, so keep the ICO when you also need the other sizes inside it. The ICO on your disk is never changed, because the page hands you a new copy. Pick as many icons as you like. Each is handled in turn and each PNG downloads separately, with no ZIP to unpack.\n\n### Other ways to convert ICO to PNG\n\n- **GIMP:** open the ICO with File > Open, choose File > Export As, pick PNG and set its options in the dialog that follows. GIMP loads Windows ICO files through its own file plug-in. The PNG dialog has a compression level, an interlacing option and metadata choices.\n- **ImageMagick (command line):** enter `magick application.ico icon-copy.png`. The ImageMagick formats list marks ICO as readable, and the command takes the input name first and the output name second.\n\n### Problems with ICO files\n\n- **The PNG looks soft when enlarged**: enlarging a small icon for a high-DPI display can blur it. Look for a bigger image inside the icon, or the original artwork.\n- **The size is not the one you wanted**: the page gives one picture and no choice. Open the ICO in a program that shows every image inside it.\n- **The page says \"Image decode failed.\"**: the header or the image offsets may be damaged, or the file is not an icon. Try another reader or get the icon again.\n- **Malformed icon**: an icon with bad image offsets can confuse a reader. An invalid header is a different problem from a missing file association in Windows.\n- **Windows will not take the PNG as an icon**: Windows icons use the ICO container, and a PNG is a different format.\n- **A cursor file is a different case**: Windows cursors end in .cur and use the separate CUR converter.\n"
+    }
+  },
+  "mp4-to-ogg": {
+    "seo": {
+      "title": "Convert MP4 to OGG Online (Free)",
+      "h1": "MP4 to OGG Converter",
+      "description": "Extract the sound of an MP4 as an OGG audio file in your browser. Encoded as Vorbis at quality 5, with the video left out. Free, with no sign-up.",
+      "howToHeading": "How to convert MP4 to OGG"
+    },
+    "tool": {
+      "subtitle": "Pull the audio out of an MP4 video and save it as an OGG Vorbis file."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to OGG?",
+        "answer": "Pick your MP4 above. In your browser FFmpeg discards the picture, encodes the sound using libvorbis, and hands you an OGG named after the MP4. The MP4 is left unchanged."
+      },
+      {
+        "question": "Does MP4 to OGG keep the video?",
+        "answer": "No. An OGG made here is audio only. The page removes the video and keeps just the sound. If you need the picture too, the [MP4 to WebM converter](/mp4-to-webm/) keeps the video."
+      },
+      {
+        "question": "What quality is the OGG?",
+        "answer": "The encoder is set to quality 5 and the page has no control to raise or lower it. Vorbis is lossy, so keep the MP4 if you may need a cleaner copy."
+      },
+      {
+        "question": "Will the OGG sound worse than the MP4?",
+        "answer": "Possibly. Vorbis is lossy, which makes the OGG a freshly compressed copy rather than the sound as it was. Keep the MP4, and make any further copies from it, not from the OGG."
+      },
+      {
+        "question": "Why did my MP4 fail to convert?",
+        "answer": "If the video has no audio track there is nothing to extract, and FFmpeg stops with \"FFmpeg failed with exit code\" and a number. VLC can tell you whether the file has sound."
+      },
+      {
+        "question": "What if my MP4 has several audio tracks?",
+        "answer": "You get one of them. The page does not let you choose, and FFmpeg's default decides. To pick a language or commentary track, use FFmpeg with a `-map` option on your computer."
+      },
+      {
+        "question": "Can I turn a batch of MP4 files into OGG?",
+        "answer": "Yes. Select every file in one go and they are converted in turn. Each video produces its own OGG with the matching name, and nothing is zipped."
+      },
+      {
+        "question": "What is an OGG file used for?",
+        "answer": "OGG is Xiph.Org's open container, and the .ogg ending is most commonly used for Vorbis audio. It is used for game audio, open-source and Linux music, and web audio. Firefox, Chrome, VLC and Audacity open it."
+      },
+      {
+        "question": "Is OGG better than MP3?",
+        "answer": "They differ. OGG Vorbis is an open, patent-free and lossy format, and the [MP4 to MP3 converter](/mp4-to-mp3/) makes MP3 from the same video. Pick the one that the app or device you are sending it to expects."
+      },
+      {
+        "question": "Is my MP4 uploaded to a server?",
+        "answer": "Not at all. FFmpeg extracts the audio inside your browser, and the video never leaves your computer. The finished OGG goes to your downloads."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and OGG",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "OGG",
+        "fullName": "Ogg container",
+        "description": "A free container format maintained by Xiph.Org. The .ogg extension is most commonly used for Vorbis audio, a lossy codec.",
+        "details": [
+          "open, patent-free format",
+          "usually Vorbis audio",
+          "lossy compression",
+          "streaming-friendly"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to OGG",
+      "points": [
+        "Only the sound is kept, encoded as Ogg Vorbis at quality 5. The video is dropped.",
+        "The conversion is lossy and has no quality setting.",
+        "An MP4 with no sound track fails with an FFmpeg error.",
+        "With several audio tracks, FFmpeg's default choice decides which one you get.",
+        "Several files convert one after another, each downloading on its own.",
+        "The conversion runs in your browser, so the MP4 is not uploaded."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 files",
+      "markdown": "### What is an MP4 file?\n\nMP4, or MPEG-4 Part 14, is a container defined in ISO/IEC 14496-14. One file can carry video, audio, subtitles and metadata. The usual pairing is H.264 video with AAC audio, yet H.265 and AV1 video fit too. Phones and cameras record in it, and it plays on nearly every device.\n\nBecause MP4 is only the wrapper, the codec inside decides what a player has to decode. Container support alone does not guarantee that a decoder exists for the video or sound inside it, so a file can carry the right ending and still fail on a device that lacks the codec.\n\nPeople take the sound out of an MP4 for many reasons. A lecture or a talk becomes an audio file for a commute. A video of a song becomes a track. OGG is a natural target when the audio is headed for a game or an open-source player, since game audio and open-source music are among its common uses.\n\nThe page keeps the sound and drops everything else. It does not ask you to pick a track or a bitrate, and the finished file is named after the MP4 with an .ogg ending.\n\n### Programs that open MP4 files\n\n- **Mac, Windows and Linux:** ffplay is bundled with FFmpeg and plays MP4. mpv is a desktop player where audio and subtitle streams can be selected, and VLC media player will open MP4 as well.\n- **Windows and Mac:** Adobe Premiere can import MP4 when a suitable decoder is installed. QuickTime Player and Windows Media Player are also listed for opening MP4.\n- **Web:** Firefox and Chrome play supported media in a tab, as long as the codec inside is one they handle.\n- **Mobile:** Phone users can try the Android or iOS versions of VLC, which open MP4 whenever they can decode the contents.\n\n### MP4 and OGG compared\n\n- **Extensions and media types**: MP4 files use .mp4 and video/mp4. Audio-only Ogg is labeled audio/ogg, while Ogg with video is labeled video/ogg. The .ogg ending is conventionally used for Vorbis audio, and .oga is the broader audio ending.\n- **What they hold**: MP4 is a multi-track container for video, audio, subtitles and metadata. The OGG made here carries one thing, Vorbis audio.\n- **Codecs**: Ogg is the container, and the codec determines how each stream is compressed. Vorbis is a lossy codec in an open, patent-free format.\n- **Openness**: Ogg is maintained by Xiph.Org as a free format. MP4 is defined in an ISO standard.\n- **Streaming**: Ogg can be read and written in sequence, a good fit for streaming. Timestamps and error detection are part of its framing.\n- **Video**: gone. The picture of the MP4 does not carry over.\n- **Support**: Firefox, Chrome, VLC and Audacity open OGG.\n\nThe OGG is a new compressed copy, so choose it because you need Ogg Vorbis, not because it improves the audio. The MP4 to MP3 converter on this site is the alternative for apps that expect MP3 audio.\n\n### Other ways to convert MP4 to OGG\n\n- **FFmpeg (command line):** run `ffmpeg -i lecture.mp4 -vn -c:a libvorbis -q:a 5 lecture-sound.ogg`. A `-map` option selects a particular stream when the MP4 has several.\n- **Audacity (Windows, Mac, Linux):** Audacity's manual says the optional FFmpeg library lets it import audio from most unprotected video files, and that on a Mac it can import MP4 without it. Import the MP4, choose File > Export Audio, pick Ogg Vorbis as the format and set its quality slider, which runs from 0 to 10 and defaults to 5.\n- **VLC:** choose Media > Convert/Save, add the MP4, set the profile to Audio - Vorbis (OGG), enter a destination with an .ogg name and click Start. That profile has video turned off and writes 128 kbps stereo at 44,100 Hz, so it differs from the quality setting on this page.\n\n### Problems with MP4 files\n\n- **The page reports \"FFmpeg failed with exit code\"**: an MP4 with no audio is the likely reason. Audacity's manual notes that such a file cannot supply an audio track.\n- **The OGG has the wrong language or track**: this page does not select tracks for you. Extract the needed track with FFmpeg `-map`.\n- **An OGG will not play**: the container does not say which audio encoding it holds, so the player must handle that codec and Ogg itself. Try VLC or a current browser.\n- **An MP4 will not play at all**: the codec inside may be one your player lacks. VLC carries many decoders of its own and is worth a try.\n- **A site or player wants .oga or .ogv**: RFC 5334 treats .ogg, .oga and .ogv as different endings, so a tool that expects one may refuse another.\n- **The file was cut off when the recording stopped**: normal MP4 files keep packet metadata in one place, which is why a write that stops early can leave a file that will not play.\n"
+    }
+  }
+}

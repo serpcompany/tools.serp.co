@@ -1,0 +1,696 @@
+{
+  "formats": {
+    "mts": {
+      "background": [
+        {
+          "fact": "MTS camera recordings commonly belong to an AVCHD recording structure.",
+          "source": "https://www.sony.com/electronics/support/articles/00051703"
+        },
+        {
+          "fact": "AVCHD was designed for digital high-definition camcorders.",
+          "source": "https://helpguide.sony.net/ilc/1450/v1/en/contents/TP0000226747.html"
+        },
+        {
+          "fact": "AVCHD uses MPEG-4 AVC/H.264 compression for its video.",
+          "source": "https://helpguide.sony.net/ilc/1450/v1/en/contents/TP0000226747.html"
+        },
+        {
+          "fact": "AVCHD audio can use Dolby Digital or linear PCM.",
+          "source": "https://helpguide.sony.net/ilc/1450/v1/en/contents/TP0000226747.html"
+        },
+        {
+          "fact": "The transport-stream container and the compressed video are separate layers.",
+          "source": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Reads MPEG transport streams and decodes AVC video and AC-3 audio.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Can demux MPEG-TS input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Reads MPEG transport streams and decodes AVC video and AC-3 audio.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Can demux MPEG-TS input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Reads MPEG transport streams and decodes AVC video and AC-3 audio.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Can demux MPEG-TS input.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A player needs support for the contained video and audio codecs, not just the filename ending.",
+          "source": "https://ffmpeg.org/general.html"
+        },
+        {
+          "fact": "Interlaced source material may require deinterlacing for progressive displays.",
+          "source": "https://ffmpeg.org/ffmpeg-filters.html#yadif"
+        },
+        {
+          "fact": "For archived camera material, preserve the original folder structure so the editor can import it as camera media.",
+          "source": "https://support.apple.com/guide/final-cut-pro/import-from-an-archive-or-disk-image-ver41816dc2/mac"
+        }
+      ]
+    },
+    "ttf": {
+      "background": [
+        {
+          "fact": "Apple developed TrueType and licensed the technology to Microsoft.",
+          "source": "https://learn.microsoft.com/en-us/typography/truetype/history"
+        },
+        {
+          "fact": "System 7 included TrueType in May 1991.",
+          "source": "https://learn.microsoft.com/en-us/typography/truetype/history"
+        },
+        {
+          "fact": "TrueType fonts describe scalable character outlines.",
+          "source": "https://learn.microsoft.com/en-us/typography/opentype/spec/ttch01"
+        },
+        {
+          "fact": "Font information is organized into individually tagged tables.",
+          "source": "https://learn.microsoft.com/en-us/typography/opentype/spec/otff"
+        },
+        {
+          "fact": "The font can contain glyph mappings, outlines, metrics, and naming information.",
+          "source": "https://learn.microsoft.com/en-us/typography/opentype/spec/otff"
+        },
+        {
+          "fact": "The registered media type for a TrueType font is font/ttf.",
+          "source": "https://www.rfc-editor.org/rfc/rfc8081.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FontForge",
+            "note": "Opens TrueType outlines for editing.",
+            "source": "https://fontforge.org/archive/filemenu.html"
+          },
+          {
+            "app": "Windows Font Previewer",
+            "note": "Double-click the font to inspect it before installing.",
+            "source": "https://support.microsoft.com/en-us/office/fonts/download-and-install-custom-fonts-to-use-with-office"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Font Book",
+            "note": "Installs and validates font files.",
+            "source": "https://support.apple.com/guide/font-book/install-and-validate-fonts-fntbk1000/mac"
+          },
+          {
+            "app": "FontForge",
+            "note": "Edits the font outlines and tables.",
+            "source": "https://fontforge.org/archive/filemenu.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FontForge",
+            "note": "Loads TrueType files in its font editor.",
+            "source": "https://fontforge.org/archive/filemenu.html"
+          },
+          {
+            "app": "GNOME Fonts",
+            "note": "Previews installed typefaces and installs downloaded .ttf files.",
+            "source": "https://apps.gnome.org/FontViewer/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A damaged font can fail to display; Font Book provides file validation.",
+          "source": "https://support.apple.com/guide/font-book/install-and-validate-fonts-fntbk1000/mac"
+        },
+        {
+          "fact": "Installing two copies can create conflicts; Font Book can resolve duplicate fonts.",
+          "source": "https://support.apple.com/guide/font-book/install-and-validate-fonts-fntbk1000/mac"
+        },
+        {
+          "fact": "Fonts missing from a third-party application may require that application's own troubleshooting.",
+          "source": "https://support.apple.com/guide/font-book/troubleshooting-fntb569a054a/mac"
+        }
+      ]
+    },
+    "caf": {
+      "background": [
+        {
+          "fact": "Apple designed Core Audio Format as a flexible audio container.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html"
+        },
+        {
+          "fact": "CAF uses 64-bit offsets rather than the small size fields of older containers.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html"
+        },
+        {
+          "fact": "The container can hold compressed audio or uncompressed samples.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html"
+        },
+        {
+          "fact": "Its mandatory audio-description chunk identifies the stored audio encoding.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_spec/CAF_spec.html"
+        },
+        {
+          "fact": "CAF supports multiple channels and optional channel-layout information.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_spec/CAF_spec.html"
+        },
+        {
+          "fact": "Information and edit-comment chunks can carry descriptive text.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_spec/CAF_spec.html"
+        },
+        {
+          "fact": "Core Audio support dates to OS X 10.4, with OS X 10.3 support through QuickTime 7.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads and writes Core Audio Format containers.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses FFmpeg demuxers and decoders to play supported CAF audio.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads and writes Core Audio Format containers.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses FFmpeg demuxers and decoders to play supported CAF audio.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Reads and writes Core Audio Format containers.",
+            "source": "https://ffmpeg.org/general.html"
+          },
+          {
+            "app": "ffplay",
+            "note": "Uses FFmpeg demuxers and decoders to play supported CAF audio.",
+            "source": "https://ffmpeg.org/ffplay.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Opening the container does not guarantee that a system can decode its audio codec.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Conceptual/CoreAudioOverview/SupportedAudioFormatsMacOSX/SupportedAudioFormatsMacOSX.html"
+        },
+        {
+          "fact": "Variable-packet audio needs a packet table; missing required chunk data can prevent correct decoding.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_spec/CAF_spec.html"
+        },
+        {
+          "fact": "Large recordings can exceed the limits of a destination container even though CAF accommodates them.",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html"
+        }
+      ]
+    },
+    "ogv": {
+      "background": [
+        {
+          "fact": "OGV names video content carried in an Ogg container.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334.html"
+        },
+        {
+          "fact": "The corresponding media type is video/ogg.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334.html"
+        },
+        {
+          "fact": "Ogg is maintained by the Xiph.Org Foundation.",
+          "source": "https://xiph.org/ogg/"
+        },
+        {
+          "fact": "Theora video with Vorbis sound is one documented Ogg video combination.",
+          "source": "https://wiki.xiph.org/MIME_Types_and_File_Extensions"
+        },
+        {
+          "fact": "An OGV file can include audio, video, timed text, and other visually presented content.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334.html"
+        },
+        {
+          "fact": "Ogg streams begin with the OggS identification bytes.",
+          "source": "https://www.rfc-editor.org/rfc/rfc5334.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "VLC media player",
+            "note": "Plays Ogg containers with Theora and Vorbis.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Demuxes Ogg streams for inspection and conversion.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "VLC media player",
+            "note": "Plays Ogg containers with Theora and Vorbis.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Demuxes Ogg streams for inspection and conversion.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "VLC media player",
+            "note": "Plays Ogg containers with Theora and Vorbis.",
+            "source": "https://www.videolan.org/vlc/features.html"
+          },
+          {
+            "app": "FFmpeg",
+            "note": "Demuxes Ogg streams for inspection and conversion.",
+            "source": "https://ffmpeg.org/general.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A player may understand Ogg while lacking a decoder for one of its streams.",
+          "source": "https://wiki.xiph.org/MIME_Types_and_File_Extensions"
+        },
+        {
+          "fact": "An Ogg file does not necessarily contain Vorbis; identifying the codec matters before conversion.",
+          "source": "https://wiki.xiph.org/MIME_Types_and_File_Extensions"
+        },
+        {
+          "fact": "The older .ogg ending is also encountered on video, although Xiph recommends .ogv for that role.",
+          "source": "https://wiki.xiph.org/MIME_Types_and_File_Extensions"
+        }
+      ]
+    },
+    "pptx": {
+      "background": [
+        {
+          "fact": "PPTX is PowerPoint's ordinary presentation document type.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+        },
+        {
+          "fact": "PresentationML stores presentation content in an Office Open XML package.",
+          "source": "https://learn.microsoft.com/en-us/office/open-xml/presentation/structure-of-a-presentationml-document"
+        },
+        {
+          "fact": "Individual slides and their relationships occupy separate package parts.",
+          "source": "https://learn.microsoft.com/en-us/office/open-xml/presentation/structure-of-a-presentationml-document"
+        },
+        {
+          "fact": "Notes and slide masters have their own XML parts.",
+          "source": "https://learn.microsoft.com/en-us/office/open-xml/presentation/structure-of-a-presentationml-document"
+        },
+        {
+          "fact": "Macro-enabled presentations use .pptm rather than .pptx.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+        },
+        {
+          "fact": "Its media type is application/vnd.openxmlformats-officedocument.presentationml.presentation.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreOffice Impress",
+            "note": "Includes a PowerPoint 2007\u2013365 XML filter.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html"
+          },
+          {
+            "app": "Microsoft PowerPoint",
+            "note": "Opens and saves its native PPTX presentation type.",
+            "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreOffice Impress",
+            "note": "Imports PowerPoint presentations using its XML filters.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html"
+          },
+          {
+            "app": "Keynote",
+            "note": "Open a PowerPoint presentation by dragging it to the Keynote icon.",
+            "source": "https://support.apple.com/guide/keynote/open-or-close-a-presentation-tan72232b56/mac"
+          },
+          {
+            "app": "Microsoft PowerPoint",
+            "note": "Reads PPTX on macOS.",
+            "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreOffice Impress",
+            "note": "Provides PowerPoint XML import and export.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html"
+          },
+          {
+            "app": "ONLYOFFICE Desktop Editors",
+            "note": "Opens PPTX presentations in a desktop editor available for Linux.",
+            "source": "https://helpcenter.onlyoffice.com/desktop/getting-started.aspx"
+          }
+        ],
+        "web": [
+          {
+            "app": "PowerPoint for the web",
+            "note": "Supports PPTX presentations.",
+            "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Microsoft PowerPoint",
+            "note": "PPTX presentations open in the mobile PowerPoint app.",
+            "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+          },
+          {
+            "app": "Keynote for iPhone",
+            "note": "Opens .pptx and .ppt documents.",
+            "source": "https://support.apple.com/guide/keynote-iphone/open-a-presentation-tan72232b56/ios"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "Saving a presentation as an image turns slide objects into a flattened picture.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+        },
+        {
+          "fact": "Saving as an older presentation format can affect features unavailable in that format.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/file-formats-that-are-supported-in-powerpoint"
+        },
+        {
+          "fact": "Missing fonts can change the way a presentation displays; PowerPoint supports embedding eligible fonts.",
+          "source": "https://support.microsoft.com/en-us/office/fonts/benefits-of-embedding-custom-fonts"
+        }
+      ]
+    },
+    "exr": {
+      "background": [
+        {
+          "fact": "OpenEXR is designed for scene-linear, high-dynamic-range imagery.",
+          "source": "https://openexr.com/en/latest/"
+        },
+        {
+          "fact": "The Academy Software Foundation hosts the OpenEXR project.",
+          "source": "https://openexr.com/en/latest/"
+        },
+        {
+          "fact": "An EXR image can contain named channels beyond red, green, blue, and alpha.",
+          "source": "https://openexr.com/en/latest/TechnicalIntroduction.html"
+        },
+        {
+          "fact": "Supported channel samples include half floats, full floats, and unsigned integers.",
+          "source": "https://openexr.com/en/latest/TechnicalIntroduction.html"
+        },
+        {
+          "fact": "The display window and the region containing stored pixels can differ.",
+          "source": "https://openexr.com/en/latest/TechnicalIntroduction.html"
+        },
+        {
+          "fact": "EXR supports scanline and tiled image layouts.",
+          "source": "https://openexr.com/en/latest/TechnicalIntroduction.html"
+        },
+        {
+          "fact": "Its uses include rendering, compositing, and texture workflows.",
+          "source": "https://openexr.com/en/latest/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "GIMP 2.10 introduced high-bit-depth EXR import and export.",
+            "source": "https://www.gimp.org/release-notes/gimp-2.10.html"
+          },
+          {
+            "app": "Krita",
+            "note": "Loads and saves EXR for painting and interchange.",
+            "source": "https://docs.krita.org/en/general_concepts/file_formats/file_exr.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "GIMP 2.10 introduced high-bit-depth EXR import and export.",
+            "source": "https://www.gimp.org/release-notes/gimp-2.10.html"
+          },
+          {
+            "app": "Krita",
+            "note": "Loads and saves EXR for painting and interchange.",
+            "source": "https://docs.krita.org/en/general_concepts/file_formats/file_exr.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "GIMP 2.10 introduced high-bit-depth EXR import and export.",
+            "source": "https://www.gimp.org/release-notes/gimp-2.10.html"
+          },
+          {
+            "app": "Krita",
+            "note": "Loads and saves EXR for painting and interchange.",
+            "source": "https://docs.krita.org/en/general_concepts/file_formats/file_exr.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Scene-linear values need appropriate display processing; treating them like a display-ready JPEG changes the appearance.",
+          "source": "https://openexr.com/en/latest/"
+        },
+        {
+          "fact": "A reader may show the display window differently from the stored data window.",
+          "source": "https://openexr.com/en/latest/TechnicalIntroduction.html"
+        },
+        {
+          "fact": "Color interpretation can change when an editor assigns a different working space; Krita documents OCIO and profile workflows.",
+          "source": "https://docs.krita.org/en/general_concepts/file_formats/file_exr.html"
+        }
+      ]
+    },
+    "jif": {
+      "sameAs": "jpg"
+    },
+    "bin": {
+      "background": [
+        {
+          "fact": "BIN is an extension used for raw binary output; it does not identify one universal image encoding.",
+          "source": "https://sourceware.org/binutils/docs/binutils/objcopy.html"
+        },
+        {
+          "fact": "GNU objcopy can produce a binary memory image from an object file.",
+          "source": "https://sourceware.org/binutils/docs/binutils/objcopy.html"
+        },
+        {
+          "fact": "That binary export omits symbols and relocation records.",
+          "source": "https://sourceware.org/binutils/docs/binutils/objcopy.html"
+        },
+        {
+          "fact": "Hex editors expose file bytes as hexadecimal values alongside a text view.",
+          "source": "https://hexed.it/"
+        },
+        {
+          "fact": "A binary editor can inspect bytes without interpreting them as a photograph.",
+          "source": "https://www.gnu.org/software/emacs/manual/html_node/emacs/Editing-Binary-Files.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "GNU Emacs Hexl",
+            "note": "Inspects and edits binary bytes using hexl-find-file.",
+            "source": "https://www.gnu.org/software/emacs/manual/html_node/emacs/Editing-Binary-Files.html"
+          },
+          {
+            "app": "UltraEdit",
+            "note": "Provides a hex view for .bin files; this does not decode every BIN format.",
+            "source": "https://www.ultraedit.com/language/hex-editor/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GNU Emacs Hexl",
+            "note": "Inspects and edits binary bytes using hexl-find-file.",
+            "source": "https://www.gnu.org/software/emacs/manual/html_node/emacs/Editing-Binary-Files.html"
+          },
+          {
+            "app": "UltraEdit",
+            "note": "Provides a hex view for .bin files; this does not decode every BIN format.",
+            "source": "https://www.ultraedit.com/language/hex-editor/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GNU Emacs Hexl",
+            "note": "Inspects and edits binary bytes using hexl-find-file.",
+            "source": "https://www.gnu.org/software/emacs/manual/html_node/emacs/Editing-Binary-Files.html"
+          },
+          {
+            "app": "UltraEdit",
+            "note": "Provides a hex view for .bin files; this does not decode every BIN format.",
+            "source": "https://www.ultraedit.com/language/hex-editor/"
+          }
+        ],
+        "web": [
+          {
+            "app": "HexEd.it",
+            "note": "Browser-based byte inspection and editing; it is not a universal BIN image decoder.",
+            "source": "https://hexed.it/"
+          }
+        ],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A BIN extension alone does not supply the dimensions or pixel layout required to decode raw image samples.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "fact": "Editing the wrong bytes can alter the data rather than repair a format; work on a copy when using a hex editor.",
+          "source": "https://www.gnu.org/software/emacs/manual/html_node/emacs/Editing-Binary-Files.html"
+        },
+        {
+          "fact": "An objcopy binary export cannot restore symbol information already discarded during export.",
+          "source": "https://sourceware.org/binutils/docs/binutils/objcopy.html"
+        }
+      ]
+    },
+    "icns": {
+      "background": [
+        {
+          "fact": "ICNS packages application icon artwork for macOS.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        },
+        {
+          "fact": "An icon collection can supply standard and high-resolution representations.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        },
+        {
+          "fact": "Apple documents paired icon sizes from 16 through 512 points.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        },
+        {
+          "fact": "The high-resolution 512-point representation uses a 1024-pixel image.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        },
+        {
+          "fact": "Apple's iconutil converts an iconset directory into an ICNS file.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        },
+        {
+          "fact": "The iconutil conversion also compresses the result.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Its Apple Icon Image plug-in loads ICNS artwork.",
+            "source": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-icns/file-icns.c"
+          },
+          {
+            "app": "XnView MP",
+            "note": "The vendor's supported-formats list includes Macintosh ICNS images.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Its Apple Icon Image plug-in loads ICNS artwork.",
+            "source": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-icns/file-icns.c"
+          },
+          {
+            "app": "iconutil",
+            "note": "Extracts an ICNS file to an iconset or creates ICNS from an iconset.",
+            "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+          },
+          {
+            "app": "XnView MP",
+            "note": "The vendor's supported-formats list includes Macintosh ICNS images.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Its Apple Icon Image plug-in loads ICNS artwork.",
+            "source": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-icns/file-icns.c"
+          },
+          {
+            "app": "XnView MP",
+            "note": "The vendor's supported-formats list includes Macintosh ICNS images.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Pixel dimensions must match the iconset filenames before iconutil builds the resource.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        },
+        {
+          "fact": "A single enlarged small icon may look different from artwork drawn for the intended display size.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        },
+        {
+          "fact": "Missing representations force the system to choose among the available icon sizes.",
+          "source": "https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html"
+        }
+      ]
+    }
+  }
+}

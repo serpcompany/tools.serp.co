@@ -67,6 +67,18 @@ export const GUIDE_SECTIONS = [
   { name: "Other ways to convert {FROM} to {TO}", pattern: /^Other ways to /i },
   { name: "Problems with {FROM} files", pattern: /^Problems with /i },
 ];
+// The "Programs that open" section groups its programs under the platforms,
+// each a bold label at the start of a line or list item ("**Windows:** …").
+// A label may name several ("**Windows, Mac and Linux:** GIMP"), so a
+// cross-platform program is listed once. A format with nothing on one platform leaves it out, so at least
+// PROGRAM_PLATFORMS_MIN of them are needed.
+const PROGRAM_PLATFORMS = [/windows/i, /mac(os)?/i, /linux/i, /web|online|browsers?/i, /mobile|phones?|android|ios|iphone/i];
+export const PROGRAM_PLATFORMS_MIN = 3;
+export function programPlatforms(section) {
+  const labels = [...section.matchAll(/^\s*(?:[-*]\s+)?\*\*([^*\n]+?)\*\*/gm)].map((match) => match[1]);
+  const platformLabels = labels.filter((label) => PROGRAM_PLATFORMS.some((platform) => new RegExp(`^(${platform.source})\\b`, "i").test(label.trim())));
+  return PROGRAM_PLATFORMS.filter((platform) => platformLabels.some((label) => new RegExp(`\\b(${platform.source})\\b`, "i").test(label))).length;
+}
 // British spellings writers fall into, with the US spelling the style guide
 // asks for ("plain US English"). A word is matched whole, in any case, with
 // these endings.
@@ -286,6 +298,10 @@ function checkDepth(content, fail) {
       "depth",
       `content.guide needs these ### sections, in order: ${GUIDE_SECTIONS.map((section) => `"${section.name}"`).join(", ")}; it has ${headings.length ? headings.map((heading) => `"${heading}"`).join(", ") : "none"}`,
     );
+  }
+  const programs = markdown.split(/^###\s+/m).find((section) => GUIDE_SECTIONS[1].pattern.test(section)) ?? "";
+  if (matches && programPlatforms(programs) < PROGRAM_PLATFORMS_MIN) {
+    fail("depth", `content.guide's "Programs that open" section needs its programs under at least ${PROGRAM_PLATFORMS_MIN} bold platform labels (Windows, Mac, Linux, Web, Mobile)`);
   }
   if (/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/m.test(markdown)) fail("depth", "content.guide has a table; write a list instead");
   for (const [where, text] of strings(content, "content")) {

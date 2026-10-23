@@ -1,0 +1,927 @@
+{
+  "mpeg-to-mp3": {
+    "seo": {
+      "title": "Convert MPEG to MP3 Online (Free)",
+      "h1": "MPEG to MP3 Converter",
+      "description": "Save the soundtrack of an MPEG movie as an MP3. FFmpeg drops the picture and encodes the sound with LAME in your browser. Free, no upload.",
+      "howToHeading": "How to convert MPEG to MP3"
+    },
+    "aboutSection": {
+      "title": "MPEG and MP3",
+      "fromFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "Lossy compression",
+          "Legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MPEG to MP3",
+      "points": [
+        "Only the sound is kept: the picture is dropped.",
+        "The MP3 is encoded at 192 kbps if the movie's sound is 32 kHz or higher.",
+        "An MPEG with no audio track fails with an FFmpeg error.",
+        "Choose several MPEG files and each gives its own MP3, with no ZIP.",
+        "FFmpeg runs inside your browser, so the movie is never uploaded."
+      ]
+    },
+    "tool": {
+      "subtitle": "Save the sound from an MPEG video as an MP3 in your browser."
+    },
+    "guide": {
+      "title": "About MPEG and MP3 files",
+      "markdown": "### What is an MPEG file?\n\nOpen an MPEG and you get video with its sound, built to one of the standards from the Moving Picture Experts Group. MPEG-1 was designed for digital storage media, which is why it ended up on Video CDs. MPEG-2 was developed for compressed television delivery and later adopted for DVDs. The endings .mpeg and .mpg both mark this kind of video file.\n\nInside, an MPEG file is a system stream. It organizes the coded picture, the coded sound and any other data as separate streams that play together, so the audio is already a track of its own. The registered media type is video/mpeg. Each coded part, the picture or the sound, is an elementary stream, and packetized elementary streams divide those parts into packets.\n\nYou mostly meet these files as older downloads, clips copied from Video CDs and DVDs, and captured broadcasts.\n\n### Programs that open MPEG files\n\n**Android, iOS, Windows, Mac and Linux**\n\n- VLC media player: reads MPEG elementary, program and transport streams, according to its format list. On Android, the same decoding features are included.\n\n**Windows, Mac and Linux**\n\n- FFplay: plays MPEG with FFmpeg's decoders.\n\n**Windows**\n\n- Windows Media Player: named in the format reference for these files.\n\n**Mac**\n\n- QuickTime Player: also in the format reference.\n\n### MPEG and MP3 compared\n\n- **File names and media types**: video/mpeg for .mpeg and .mpg, audio/mpeg for .mp3.\n- **Content**: an MPEG carries picture and sound streams. An MP3 carries sound only, so the picture has nowhere to go.\n- **Compression**: both are lossy. MP3 drops sound that its model of human hearing says listeners will probably miss.\n- **Family**: MP3, MPEG-1 Audio Layer III, is defined in ISO/IEC 11172-3, and Fraunhofer was where it took shape, together with the rest of the MPEG audio group.\n- **Metadata**: song titles and other tags in an MP3 sit in ID3 structures.\n- **Bitrate**: an MP3 runs from 32 to 320 kbps.\n- **Typical use**: MPEG suits Video CD and DVD video, broadcast capture and older downloads; MP3 suits music collections, podcasts and portable players.\n\nThis page runs FFmpeg in your browser with the picture turned off and LAME asked for 192 kbps. LAME reaches that only when the sound is sampled at 32 kHz or higher. In a run on a sample MPEG, the soundtrack was MP2, and FFmpeg encoded it into a new MP3 stream, so the MP3 holds newly encoded sound and none of the movie's own audio is copied across.\n\nThe download takes the MPEG's name with .mp3 in place of its ending. Pick several files and they are processed in sequence, and each result is a separate download. The page puts no limit on size or length.\n\n### Other ways to convert MPEG to MP3\n\n- **FFmpeg (Windows, Mac, Linux):** enter `ffmpeg -i input.mpeg -vn -c:a libmp3lame output.mp3` in a terminal. -vn turns the picture off. The b option sets the bitrate, for example -b:a 192k.\n- **Audacity with FFmpeg (Windows, Mac, Linux):** install Audacity's optional FFmpeg library, and through it Audacity can import the audio of most video files, DRM-protected ones excepted. Open the MPEG, then File > Export Audio opens the export dialog, where the Format menu has MP3.\n\n### Problems with MPEG files\n\n- **An error or no sound**: an MPEG without an audio track gives the message \"FFmpeg failed with exit code\". Open the file in VLC and listen for sound before converting. A cut-short MPEG usually still converts, to a shorter MP3.\n- **Less than 192 kbps**: a movie with sound sampled at 16 to 24 kHz gets no more than 160 kbps from LAME, and 8 to 12 kHz gets no more than 64 kbps.\n- **Wrong language or commentary**: the page passes no track choice to FFmpeg. Use a desktop program that lets you pick the track.\n- **It plays in one player but not another**: an MPEG may be a system stream or raw video, and finding its structure decides which demuxer reads it.\n- **Renaming did not help**: changing .mpeg to .mp3 leaves the video data inside. Convert the file instead.\n- **Players disagree about the file**: multiplexing the audio with the video does not make their codecs interchangeable, so a player needs the right decoder for both streams.\n- **The picture looks soft**: MPEG compression discards some picture detail, so a soft image is expected.\n"
+    },
+    "faqs": [
+      {
+        "question": "How can I turn an MPEG into an MP3?",
+        "answer": "Pick the file and FFmpeg decodes its sound and writes it as an MP3. Save the download when it is ready. The movie stays in your browser the whole time."
+      },
+      {
+        "question": "Can I just rename a .mpeg file to .mp3?",
+        "answer": "No. A rename alters just the name, so the file still holds MPEG data. Convert it to get the sound written as a real MP3."
+      },
+      {
+        "question": "What bitrate does the MP3 get?",
+        "answer": "192 kbps when the sound's sample rate reaches 32 kHz, set by the LAME encoder inside FFmpeg. The page has no bitrate selector, and the original audio bitrate makes no difference."
+      },
+      {
+        "question": "Why does the conversion fail with \"FFmpeg failed with exit code\"?",
+        "answer": "Usually the movie has no sound track at all, which leaves nothing to put in an MP3. A cut-short file normally still converts, to a shorter MP3. Check that the movie plays with sound in VLC first."
+      },
+      {
+        "question": "Can I pick which audio track or language is used?",
+        "answer": "Not on this page. It passes no stream selection to FFmpeg, so you cannot choose a track. For a movie with several soundtracks, pick the one you want in a desktop program."
+      },
+      {
+        "question": "Will the MP3 sound as good as the MPEG?",
+        "answer": "At best it matches. Both MPEG audio and MP3 are lossy, which means the sound is compressed a second time and some detail is lost again. Re-encoding cannot add detail the movie never had."
+      },
+      {
+        "question": "Does my MPEG file change when I convert it?",
+        "answer": "No. The converter writes a new file named after the original with .mp3 on the end, and your MPEG stays as it was. The picture is only in the MPEG, so keep it if you want to see the movie again."
+      },
+      {
+        "question": "Can I convert a batch of MPEG files at once?",
+        "answer": "Yes. Select as many MPEG files as you want and the page converts them in sequence. Every MP3 is a separate download, and nothing is zipped."
+      },
+      {
+        "question": "Is my MPEG uploaded to a server?",
+        "answer": "No. The conversion happens in a worker inside your browser tab, using FFmpeg built for WebAssembly, so nothing leaves the device."
+      },
+      {
+        "question": "Why is a long MPEG slow to convert?",
+        "answer": "Neither size nor running time is capped, so the speed is set by your device. FFmpeg in the browser runs on a single thread."
+      }
+    ]
+  },
+  "webm-to-mp3": {
+    "seo": {
+      "title": "Convert WebM to MP3 Online (Free)",
+      "h1": "WebM to MP3 Converter",
+      "description": "Save the audio of a WebM recording or clip as an MP3. FFmpeg decodes the sound and encodes it with LAME in your browser. Free, no upload.",
+      "howToHeading": "How to convert WebM to MP3"
+    },
+    "aboutSection": {
+      "title": "WebM and MP3",
+      "fromFormat": {
+        "name": "WebM",
+        "fullName": "WebM video",
+        "description": "An open media format designed for the web, based on a subset of Matroska. It carries VP8, VP9 or AV1 video with Vorbis or Opus audio.",
+        "details": [
+          "Royalty-free",
+          "VP8, VP9 or AV1 video",
+          "Vorbis or Opus audio",
+          "Supported by major browsers"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebM to MP3",
+      "points": [
+        "Only the sound is kept: the picture is dropped.",
+        "The MP3 reaches 192 kbps when the audio is 32 kHz or above.",
+        "The sound is decoded and compressed again as MP3.",
+        "A WebM with no audio track fails with an FFmpeg error.",
+        "Choose several WebM files and each gives its own MP3, with no ZIP."
+      ]
+    },
+    "tool": {
+      "subtitle": "Save the sound from a WebM video as an MP3 in your browser."
+    },
+    "guide": {
+      "title": "About WebM and MP3 files",
+      "markdown": "### What is a WebM file?\n\nMedia for the web is what WebM is built for, and the WebM Project promotes it as an open format. It is based on Matroska and combines VP8 or VP9 video with Vorbis or Opus audio, with AV1 video also in use. The project provides the format's technology royalty-free. A WebM with video uses video/webm as its media type, and one that holds only sound uses audio/webm.\n\nYou usually meet WebM as a saved web video, a screen recording from a browser or a short animated clip. The sound is a separate stream inside the file, so a converter can take it out without touching the picture.\n\nThe files are made for delivery over the web. A missing cue index leaves a player with less direct location information, which makes seeking less efficient.\n\n### Programs that open WebM files\n\n**Windows, Mac, Linux, Android and iOS**\n\n- VLC media player: reads Matroska-family media, provided its codecs match the streams in the file. The Android release carries over the desktop player's decoding features.\n\n**Windows, Mac and Linux**\n\n- FFplay: plays WebM with FFmpeg's decoders.\n\n**Mac**\n\n- Safari: supports WebM from 14.1 onward, covering VP8, VP9 and Vorbis.\n\n### WebM and MP3 compared\n\n- **Extensions and media types**: .webm with video/webm (audio/webm for sound only), against .mp3 with audio/mpeg.\n- **Container**: WebM is a Matroska subset that holds video, audio and more. MP3 is a single audio stream.\n- **Codecs**: WebM audio is Vorbis or Opus, while MP3 is MPEG-1 Audio Layer III from ISO/IEC 11172-3.\n- **Openness**: the WebM Project licenses its technology royalty-free. The MP3 patent licensing program ended in April 2017.\n- **Metadata**: ID3 data inside the MP3 is where titles and other tags live.\n- **Support**: MP3 plays on nearly every device. Vorbis and Opus in a WebM depend on the player's codecs.\n- **Typical use**: WebM fits web video, browser screen recordings and animated clips; MP3 fits music libraries, podcasts and portable players.\n\nThe page runs FFmpeg with its video output off and LAME set to 192 kbps, a rate LAME reaches only for audio sampled at 32 kHz or above. In a run on a sample WebM, FFmpeg decoded Vorbis audio and wrote it as a new MP3 stream. Both formats are lossy, so the audio goes through compression a second time, and detail the WebM already dropped does not return.\n\nThe output is named after the WebM, with .mp3 in place of .webm. A batch converts one file after another, and each MP3 is saved separately. Nothing caps size or running time, and FFmpeg works on one thread. The page gives you no bitrate, track or quality options.\n\n### Other ways to convert WebM to MP3\n\n- **FFmpeg (Windows, Mac, Linux):** execute `ffmpeg -i input.webm -vn -c:a libmp3lame output.mp3`. -vn turns the video off.\n- **Audacity with FFmpeg (Windows, Mac, Linux):** Audacity can import the sound of most video files other than DRM-protected ones provided the optional FFmpeg library is installed. Then open the WebM, go to File > Export Audio and choose MP3 in the Format menu.\n\nFFmpeg's b option sets a bitrate of your own, for example -b:a 192k, and Audacity's export dialog has MP3 options, so both desktop routes offer what this page does not.\n\n### Problems with WebM files\n\n- **An error or a silent result**: the WebM may have no audio track. Play it first to check.\n- **Plays in one program but not another**: playback depends on the real video and audio codecs, not on the .webm ending.\n- **The bitrate is lower than expected**: a WebM with 16 to 24 kHz audio gets at most 160 kbps from LAME, and one at 8 to 12 kHz gets 64 kbps.\n- **The recording is cut short**: a damaged or truncated WebM often converts anyway, giving a shorter MP3.\n- **Seeking is sluggish**: a WebM missing its cue index gives players less to seek with.\n- **Older Safari will not play it**: releases before 14.1 on macOS lack WebM support.\n- **A renamed file fails**: changing .webm to .mp3 leaves the Matroska data inside. Convert the file instead.\n- **Titles are missing in the MP3**: FFmpeg carries the WebM's global tags, for example title and artist, into the MP3 when it has them. Add the rest with a tag editor.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WebM to MP3?",
+        "answer": "Choose the WebM file and wait while FFmpeg writes the MP3, then save it. It all happens in your browser, so a screen recording stays private."
+      },
+      {
+        "question": "Why is my WebM sound Opus or Vorbis, and does that matter?",
+        "answer": "WebM pairs its video with Vorbis or Opus audio, and a music app or player may lack the matching decoder. Converting decodes the sound and writes MP3, which nearly every device plays."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps, set by the LAME encoder, as long as the WebM audio is 32 kHz or above. There is no bitrate choice on this page."
+      },
+      {
+        "question": "Can I convert a WebM that has only audio?",
+        "answer": "Yes. A WebM can hold sound alone, and its media type is then audio/webm. In a run on an audio-only WebM, FFmpeg wrote the MP3 as usual, and there was simply no video to drop."
+      },
+      {
+        "question": "Why does the conversion fail?",
+        "answer": "A WebM with no audio track fails with an FFmpeg error, because MP3 has nothing to hold. A file cut off mid-recording usually still converts, to a shorter MP3."
+      },
+      {
+        "question": "Will the MP3 sound worse than the WebM?",
+        "answer": "Some detail is lost. Opus and Vorbis are lossy and so is MP3, so the sound is compressed twice, and detail lost in the WebM never comes back."
+      },
+      {
+        "question": "Does the WebM stay on my device?",
+        "answer": "Yes. FFmpeg built for WebAssembly extracts the audio inside your browser tab, so the recording is never sent anywhere."
+      },
+      {
+        "question": "Can I do a batch of WebM files?",
+        "answer": "Yes. Pick as many as you like; they are processed in turn and each MP3 downloads on its own."
+      },
+      {
+        "question": "Is my WebM's title and artist kept in the MP3?",
+        "answer": "FFmpeg copies the file's global tags into the MP3 when the WebM has them. A test file carrying a title and artist kept both. A file without tags gives an MP3 without them."
+      },
+      {
+        "question": "Why is it slow on a long recording?",
+        "answer": "Nothing limits file size or time, so the speed is your device's. FFmpeg in the browser works on a single thread."
+      }
+    ]
+  },
+  "wma-to-mp3": {
+    "seo": {
+      "title": "Convert WMA to MP3 Online (Free)",
+      "h1": "WMA to MP3 Converter",
+      "description": "Turn Windows Media Audio files into MP3s that play on nearly any device. FFmpeg decodes the WMA and LAME writes the MP3, in your browser. Free.",
+      "howToHeading": "How to convert WMA to MP3"
+    },
+    "aboutSection": {
+      "title": "WMA and MP3",
+      "fromFormat": {
+        "name": "WMA",
+        "fullName": "Windows Media Audio",
+        "description": "A family of audio codecs developed by Microsoft and stored in the ASF container. The standard version is lossy, and a WMA Lossless variant exists.",
+        "details": [
+          "Lossy and lossless variants",
+          "ASF container",
+          "Proprietary Microsoft format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Audio only",
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WMA to MP3",
+      "points": [
+        "The MP3 gets 192 kbps from a WMA sampled at 32 kHz or more.",
+        "The sound is decoded and compressed again, so the MP3 cannot add detail the WMA lacks.",
+        "WMA Lossless becomes lossy MP3.",
+        "Choose several WMA files and each gives its own MP3, with no ZIP.",
+        "FFmpeg runs in your browser, so the file is not uploaded."
+      ]
+    },
+    "tool": {
+      "subtitle": "Turn a WMA audio file into an MP3 in your browser."
+    },
+    "guide": {
+      "title": "About WMA and MP3 files",
+      "markdown": "### What is a WMA file?\n\nWMA stands for Windows Media Audio, a family of audio codecs developed by Microsoft. The sound sits inside Microsoft's ASF container, and the .wma ending marks an ASF file that holds audio only. The family has four variants: standard WMA, WMA Professional, WMA Lossless and WMA Voice. WMA 9 supports variable bitrate encoding. The media type usually given is audio/x-ms-wma.\n\nWMA serves delivery workflows and is sometimes used to store audio between editing steps. You find WMA files in Windows media libraries and on older portable music players. The extension does not tell you which of the four variants a file uses, which is why an app can open one WMA and refuse another.\n\n### Programs that open WMA files\n\n**Linux, Mac and Windows**\n\n- VLC media player: its feature list names ASF/WMA input and several Windows Media Audio decoders.\n- Audacity: imports unprotected WMA once its optional FFmpeg library is installed.\n- FFmpeg: decodes WMA 1 and 2 plus the Pro, Voice and Lossless variants, per its support list.\n\n**Windows**\n\n- Windows Media Player: the format's own player, named in the format reference.\n\n### WMA and MP3 compared\n\n- **Extensions and media types**: .wma with audio/x-ms-wma, against .mp3 with audio/mpeg.\n- **Container**: WMA is held in an ASF container, while an MP3 is audio frames with ID3 tags attached.\n- **Compression**: the standard WMA codec is lossy, and WMA Lossless is not. MP3 is always lossy.\n- **Ownership**: WMA is a proprietary Microsoft format. MP3 is an ISO/IEC standard (11172-3) from MPEG, developed at Fraunhofer.\n- **Bitrate**: WMA 9 supports variable bitrate. MP3 can be constant or variable and runs from 32 to 320 kbps.\n- **Metadata**: the title and artist of a WMA sit in its ASF container. The MP3 written here carries them as ID3 tags when FFmpeg finds them.\n- **Reach**: MP3 plays in every major browser and on nearly every device.\n- **Typical use**: WMA belongs to Windows media libraries and older portable players; MP3 serves music libraries, podcasts and portable players.\n\nMP3 is lossy, and its encoder uses a model of what people can hear to decide which sounds to leave out. This page decodes the WMA with FFmpeg and asks LAME for 192 kbps, which only sources sampled at 32 kHz or higher can reach. A run on a sample WMA decoded the WMA and wrote a new MP3 stream. The sound is first decoded and then encoded again, so the MP3 is a new file and not a repackaged WMA. A lossless WMA therefore ends up lossy, so keep a WMA Lossless original and make the MP3 as a listening copy.\n\nThe download is named after the WMA, with .mp3 in place of .wma. A folder's worth of WMA files can go in together; they are processed one by one, which means an album gives one download per track. No size limit or timeout is set.\n\n### Other ways to convert WMA to MP3\n\n- **FFmpeg (Windows, Mac, Linux):** type `ffmpeg -i input.wma -c:a libmp3lame output.mp3` in a terminal.\n- **Audacity with FFmpeg (Windows, Mac, Linux):** get Audacity's optional FFmpeg library first, open the WMA, choose File > Export Audio and select MP3 in the Format menu. Protected WMA files do not import.\n\nAudacity's MP3 export lets you set the bit rate mode, and in FFmpeg you can pass -b:a with a rate of your choice. This page offers neither.\n\n### Problems with WMA files\n\n- **Audacity cannot import it**: the optional FFmpeg library may be missing, or the file is copy-protected. Install the library or use an unprotected copy.\n- **A player opens one WMA but not another**: an app may decode one WMA codec and not another, and the ending hides which variant a file is.\n- **A lower bitrate than 192 kbps**: sources at 16 to 24 kHz are held to 160 kbps by LAME, and sources at 8 to 12 kHz to 64 kbps.\n- **The file is cut short**: a damaged or truncated WMA usually still converts, to a shorter MP3.\n- **Titles or artists are missing**: FFmpeg copies the WMA's global tags, such as title and artist, when it has them. Fill in the rest with a tag editor.\n- **Audition will not import it**: Adobe Audition enables WMA import on Windows only, once DLMS Format Support is switched on.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert WMA to MP3?",
+        "answer": "Choose the WMA file and wait for FFmpeg to finish. Then save the MP3. Your original WMA is left as it was."
+      },
+      {
+        "question": "Why won't my WMA play on my phone or in my car?",
+        "answer": "Apps and devices differ in which WMA codecs they decode, and the extension does not say which variant a file uses. MP3 plays on nearly every device, so an MP3 copy is the quick fix."
+      },
+      {
+        "question": "What bitrate is the MP3?",
+        "answer": "192 kbps when the WMA's sample rate is 32 kHz or higher. The page has no bitrate setting, and it does not copy the WMA's own bitrate."
+      },
+      {
+        "question": "Does converting WMA to MP3 lose quality?",
+        "answer": "A little. WMA and MP3 are both lossy, which means the sound goes through lossy compression twice. A WMA Lossless file loses the most, since it becomes a lossy MP3."
+      },
+      {
+        "question": "What is the MP3 file called?",
+        "answer": "It takes the WMA's name with .mp3 in place of .wma, so song.wma downloads as song.mp3."
+      },
+      {
+        "question": "Do I need to install FFmpeg or any program?",
+        "answer": "No. FFmpeg is built for WebAssembly and runs in your browser tab, so you only open the page and pick the file."
+      },
+      {
+        "question": "Will the song's title and artist carry over?",
+        "answer": "FFmpeg copies the WMA's global tags into the MP3 when it has them. A tagged test WMA came out as an MP3 with both its title and artist. Check the MP3 in your player, and use a tag editor for anything missing."
+      },
+      {
+        "question": "Can I convert a whole folder of WMA files?",
+        "answer": "You can select many files together. They convert one after another and each MP3 downloads separately. There is no ZIP."
+      },
+      {
+        "question": "Is my WMA uploaded anywhere?",
+        "answer": "No. FFmpeg runs as WebAssembly in your browser tab, and the audio stays on your device."
+      },
+      {
+        "question": "Why is it taking long?",
+        "answer": "The page sets no limit on length. FFmpeg runs on one thread in your browser, so a long recording or a slow device takes more time."
+      }
+    ]
+  },
+  "txt-to-pdf": {
+    "seo": {
+      "title": "Convert TXT to PDF Online (Free)",
+      "h1": "TXT to PDF Converter",
+      "description": "Turn a plain TXT file into a PDF on A4 pages: Courier type, long lines wrapped, form feeds kept as page breaks. Free, no sign-up, no upload."
+    },
+    "aboutSection": {
+      "title": "TXT and PDF",
+      "fromFormat": {
+        "name": "TXT",
+        "fullName": "Plain text file",
+        "description": "A file that holds unformatted text with no fonts, styles or images. It is readable by any text editor, on any operating system.",
+        "details": [
+          "No formatting",
+          "Character encoding such as UTF-8",
+          "Very small files",
+          "Readable everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TXT to PDF",
+      "points": [
+        "Pages are A4 portrait with 3/4 inch margins, holding 61 lines of up to 81 Courier characters.",
+        "Long lines wrap, and a wrapped line is indented as far as the line it continues.",
+        "Blank lines and leading spaces are kept, and a form feed starts a new page.",
+        "No header, footer or page numbers are added.",
+        "A file over 20 MB or 2,000 pages is refused, and so is text with characters the font lacks.",
+        "Each file makes its own PDF, saved as the file's name with .pdf, and it is made in your browser."
+      ]
+    },
+    "tool": {
+      "subtitle": "Set a plain-text file on A4 pages as a PDF, right in your browser."
+    },
+    "guide": {
+      "title": "About TXT and PDF files",
+      "markdown": "### What is a TXT file?\n\nA TXT file is plain text: characters and line endings, with no fonts, styles, tables or pictures. Its media type is text/plain, and a charset parameter says how the bytes stand for characters. Plain text carries no commands for typography and sets no page layout, which is why any editor on any system can open it and why the files stay small.\n\nYou find .txt files as notes, logs, readme files, exported data and the text of old documents. Because there is no layout, there is no page size either. That is the gap a PDF fills: it turns the same lines into fixed pages that print and look the same on every device.\n\nLine endings differ by system, so a TXT may end its lines with CR LF, CR or LF. This page treats all three as a line break, along with NEL and the Unicode line and paragraph separators. It reads the encoding from a byte order mark when there is one: UTF-8 or UTF-16. Without one it tries UTF-8 and then Windows-1252.\n\n### Programs that open TXT files\n\n**Windows**\n\n- Notepad: the format reference's first choice for plain text.\n\n**Mac**\n\n- TextEdit: handles plain text documents, including opening, editing and saving them.\n\n**Windows, Mac and Linux**\n\n- Visual Studio Code: opens and edits text files in its editor.\n- Vim: a text editor that runs on all three.\n\n### TXT and PDF compared\n\n- **Extensions and media types**: .txt with text/plain, against .pdf with application/pdf.\n- **Layout**: a TXT has none. A PDF is a set of fixed pages that look the same everywhere.\n- **Fonts**: a TXT uses whatever font the viewer picks. A PDF embeds its fonts to keep its look.\n- **Content**: a TXT holds text only. Beyond text, a PDF can carry vector graphics and images, along with links, bookmarks and forms.\n- **Standards**: ISO adopted PDF 1.7 as ISO 32000-1 in 2008; PDF 2.0 followed as ISO 32000-2 in 2017.\n\nThis page sets your text on A4 portrait pages with 3/4 inch margins, in Courier at 10 pt with 12 pt between lines. That gives 61 lines to a page, each up to 81 characters, about what an 80-column printout holds. Nothing else is added.\n\nTabs stop at every fourth column, control characters and terminal escape sequences are dropped, and a line whose first letter is Hebrew or Arabic is set against the right margin, as an editor shows it. All-Windows-1252 text gets Courier; any other text gets DejaVu Sans, which has a wider range of letters but gives each its own width.\n\nThe PDF text is real text, not a picture of it, so a PDF reader can search and copy it.\n\n### Other ways to convert TXT to PDF\n\n- **TextEdit (Mac):** open the TXT, then choose File > Export as PDF. TextEdit lays the page out with its own settings, not a fixed grid of lines.\n- **Adobe Acrobat:** use File > Create > PDF from File, change the file-type filter in the Open dialog so TXT files show, pick the file, press Open and save the result. The layout follows Acrobat's settings.\n\nUse a word processor route when you want your own fonts, headers or page numbers.\n\n### Problems with TXT files\n\n- **Accents or symbols turn into odd characters**: the file was saved in a different encoding from the one it is read in. Re-save it as UTF-8.\n- **A line is cut off in the PDF**: it is not cut. Lines longer than 81 characters wrap onto the next line, indented to match.\n- **Text in Chinese, Japanese, Korean or emoji is refused**: the PDF font lacks those glyphs. Use TXT to PNG, which draws them.\n- **The file is rejected as empty**: a file with only whitespace and control characters has nothing to set.\n- **Tabs look narrow**: tabs stop every fourth column in the PDF, so a file written for eight-column tabs will look tighter than in your editor.\n- **Columns drift**: the file has characters beyond Windows-1252, so the whole text was set in DejaVu Sans, where spaces do not line up columns. Remove those characters to get Courier.\n- **A report keeps its page breaks only sometimes**: a form feed ends a page that has a line on it, but does nothing on a page with none.\n"
+    },
+    "faqs": [
+      {
+        "question": "How can I turn a TXT file into a PDF?",
+        "answer": "Pick the TXT file, and the PDF is built in your browser, then downloads with the same name and a .pdf ending. The text is set on A4 pages, so there are no settings to change."
+      },
+      {
+        "question": "What font and page size does the PDF use?",
+        "answer": "A4 portrait with 3/4 inch margins. A file of plain Windows-1252 text gets Courier, and any other file gets DejaVu Sans."
+      },
+      {
+        "question": "Will my columns and spacing line up?",
+        "answer": "In Courier they do, because every character has the same width. Leading spaces and blank lines are kept. In DejaVu Sans each letter has its own width, so spaced-out columns drift, though indentation still lines up."
+      },
+      {
+        "question": "What happens to lines that are longer than the page?",
+        "answer": "They wrap, first between words and, for a word too long for a line, inside the word. The continuation lines are indented as far as the line itself, up to 40 columns."
+      },
+      {
+        "question": "Can I choose where pages break?",
+        "answer": "Put a form feed character where you want a new page and the PDF starts a new page there, as a printer would. Files paginated that way, such as old RFCs and reports, keep their pages."
+      },
+      {
+        "question": "Why is my Chinese, Japanese or emoji text refused?",
+        "answer": "The font has no glyphs for those characters, so the page names the characters it can't set instead of printing blanks. The [TXT to PNG converter](/txt-to-png/) draws them, though it makes a picture rather than a PDF."
+      },
+      {
+        "question": "Why do accents or non-English letters look wrong?",
+        "answer": "The page reads UTF-8 or UTF-16 by the byte order mark, then tries UTF-8, then Windows-1252. A file saved in another legacy encoding, such as Shift_JIS or KOI8-R, is read as Windows-1252 and set that way."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "Yes: a file over 20 MB is refused before it is read, and so is one that would run past 2,000 pages. 2,000 full pages hold about 10 million characters."
+      },
+      {
+        "question": "Can I add page numbers or a header?",
+        "answer": "No. The page adds nothing but your text. For headers, footers or numbering, use a word processor and export a PDF from there."
+      },
+      {
+        "question": "Does the PDF have selectable text?",
+        "answer": "Yes. The text is set as real text in the PDF, so you can search it and copy from it. The PDF is titled with the file's name."
+      }
+    ]
+  },
+  "pdf-to-txt": {
+    "seo": {
+      "title": "Convert PDF to TXT File Online (Free)",
+      "h1": "PDF to TXT Converter",
+      "description": "Save the words of a PDF as a plain TXT file. Layout, images and tables are left out, and scans need OCR. Free, no sign-up, no upload."
+    },
+    "aboutSection": {
+      "title": "PDF and TXT",
+      "fromFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      },
+      "toFormat": {
+        "name": "TXT",
+        "fullName": "Plain text file",
+        "description": "A file that holds unformatted text with no fonts, styles or images. It is readable by any text editor, on any operating system.",
+        "details": [
+          "No formatting",
+          "Character encoding such as UTF-8",
+          "Very small files",
+          "Readable everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PDF to TXT",
+      "points": [
+        "Only the text is kept: no layout, fonts, tables, images, links or form fields.",
+        "A scanned PDF has no text to extract, and the page does no OCR.",
+        "A table's cells come out as lines of text.",
+        "A PDF that needs a password to open can't be converted.",
+        "The TXT is UTF-8, with a blank line after each paragraph and between pages.",
+        "Up to 2,000 pages and 20 million characters, read in your browser."
+      ]
+    },
+    "tool": {
+      "subtitle": "Save the words of a PDF as a plain TXT file in your browser, with no upload."
+    },
+    "guide": {
+      "title": "About PDF and TXT files",
+      "markdown": "### What is a PDF file?\n\nPDF is a document format made by Adobe. Its roots lie in Camelot, a project John Warnock began in 1991 that had become PDF by 1992. The goal was a file that captures a document from any application and shows or prints it the same way anywhere. The ISO 32000-1 standard of 2008 is PDF 1.7, and ISO 32000-2 of 2017 is PDF 2.0. Its media type is application/pdf.\n\nBesides text, a PDF can hold vector graphics and raster images, plus links, bookmarks, form fields and annotations. To look the same everywhere it needs its fonts embedded. The text is stored as drawing instructions positioned on a page, which is why pulling it out takes some work: a PDF page is not a paragraph in a word processor. Scans are different again, because a scan is an image of text, not text. Adobe's own help notes that scan imagery is distinct from extractable text, so a page can look full of words and still give a TXT nothing.\n\n### Programs that open PDF files\n\n**Windows and Mac**\n\n- Mozilla Firefox: built-in PDF viewing and annotations.\n\n**Windows**\n\n- GIMP: imports PDF pages, and asks for the password of a protected file.\n\n**Mac**\n\n- Apple Preview: shows PDF pages and thumbnails.\n\n**Linux**\n\n- Evince and Okular, which uses Poppler to render PDF.\n\n**Web and Mobile**\n\n- Adobe Acrobat: the online version lets you annotate an uploaded PDF in the browser, and Acrobat Reader views PDFs on Android and iOS.\n\n**Mobile**\n\n- Firefox for Android opens PDFs stored on the device.\n\n### PDF and TXT compared\n\n- **File names and media types**: .pdf is application/pdf and .txt is text/plain.\n- **Layout**: a PDF has fixed pages and embedded fonts. A TXT has no layout at all.\n- **Content**: a PDF holds text, graphics and images. A TXT holds text only.\n- **Encoding**: this page writes the TXT as UTF-8.\n- **What carries over**: the words, taken in storage order, which is usually reading order. A line ends where pdf.js marks one, and its spaces are collapsed.\n- **What is lost**: layout, fonts, tables, images, links, annotations and form fields.\n- **Line breaks**: a TXT can hold only lines and blank lines. A paragraph's lines stay on lines of their own, with a blank line after each paragraph and between pages.\n- **Hyphens**: a word broken at a line's end keeps its hyphen in the TXT.\n\nThe page reads each page's text with pdf.js. A paragraph ends at an empty line, where the next line is higher up the page, where the font size changes by more than a fifth (a heading), or where the gap to the next line is much larger than the page's usual spacing.\n\n### Other ways to convert PDF to TXT\n\n- **pdftotext (Poppler):** run `pdftotext input.pdf output.txt`. The command converts a PDF to plain text, and without a second name it writes a file named after the PDF with .txt.\n- **PyMuPDF (Python):** follow the \"Extract all Document Text\" recipe. It opens the PDF, joins the page.get_text() string of every page with a form feed and writes the encoded text to a file. The recipe warns that text may not come out in reading order.\n- **Preview and TextEdit (Mac):** in Preview choose Tools > Text Selection, select text and use Edit > Copy. Paste into TextEdit and choose Format > Make Plain Text before saving. This suits an excerpt, not a whole PDF.\n\n### Problems with PDF files\n\n- **No text comes out**: a scan or photo has no text layer. Run OCR first, then convert. The converter does none.\n- **A password is asked for**: the PDF needs one to open. Remove it in a reader, then convert the copy.\n- **Columns come out mixed**: the PDF stores columns a row at a time. Copy the columns by hand or use a layout-preserving tool.\n- **Chinese, Japanese or Korean text is missing**: text in a font with no Unicode map that relies on one of Adobe's predefined CMaps is dropped here, and a PDF with only such text is refused as having none.\n- **Words are out of order**: pdf.js follows the order inside the file, usually but not always reading order. Check a page or two.\n- **A file will not open at all**: the file could be damaged, truncated or not a PDF at all. The page calls it unreadable. Download it again.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PDF to a TXT file?",
+        "answer": "Choose the PDF and the text is read in your browser, then saved as a .txt file with the PDF's name. Several PDFs give one TXT each."
+      },
+      {
+        "question": "Why does my PDF come out with no text?",
+        "answer": "The PDF is probably a scan or a photo of pages, so the words are pixels rather than text. The page tells you it has no text to extract. It does no OCR, so run the scan through an OCR program first."
+      },
+      {
+        "question": "Does the TXT keep my tables and columns?",
+        "answer": "No. A table's cells come out as separate lines. Columns that the file keeps one block after another stay intact, while columns it stores row by row get interleaved."
+      },
+      {
+        "question": "What happens to images, links and formatting?",
+        "answer": "They are left out. Only the text is kept, so fonts, bold, links, annotations and form fields are not carried into the TXT."
+      },
+      {
+        "question": "Can I convert a password-protected PDF?",
+        "answer": "Not when a password is required to open it. In a PDF reader, save or print a copy without the password. A PDF with only an owner password, which restricts editing, opens and converts."
+      },
+      {
+        "question": "What encoding is the TXT file?",
+        "answer": "UTF-8 with no byte-order mark, so accents and non-Latin letters are kept. Any editor can open it."
+      },
+      {
+        "question": "How are paragraphs and pages separated?",
+        "answer": "A paragraph's lines stay on their own lines, followed by a blank line. Pages are separated by a blank line as well. A page with no text adds nothing."
+      },
+      {
+        "question": "Why are words split with a hyphen at line ends?",
+        "answer": "A word broken with a hyphen at the end of a line keeps the hyphen, because the PDF stores it that way. Search for the hyphenated halves or join them by hand."
+      },
+      {
+        "question": "Is there a limit on pages or size?",
+        "answer": "A PDF over 2,000 pages is refused, and so is one with more than 20 million characters of text. A read that takes more than 2 minutes is stopped."
+      },
+      {
+        "question": "Can I get the text of a PDF without converting it?",
+        "answer": "Yes, for a few lines. Select the text in Preview or a PDF reader and copy it into a text editor. This page covers the whole document, page after page."
+      }
+    ]
+  },
+  "gif-to-jpg": {
+    "seo": {
+      "title": "Convert GIF to JPG Online (Free)",
+      "h1": "GIF to JPG Converter",
+      "description": "Save a GIF as a JPG still. An animated GIF gives its first frame, and the JPG can't hold transparency. Runs in your browser: free, no sign-up.",
+      "howToHeading": "How to convert GIF to JPG"
+    },
+    "aboutSection": {
+      "title": "GIF and JPG",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A raster image format introduced by CompuServe in 1987. It uses LZW compression, a palette of at most 256 colors per frame, and supports simple animation.",
+        "details": [
+          "256-color palette per frame",
+          "Lossless LZW compression",
+          "Animation",
+          "1-bit transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting GIF to JPG",
+      "points": [
+        "An animated GIF gives its first frame only.",
+        "A JPG has no transparency, so see-through parts of a GIF can't stay see-through.",
+        "The JPG is written at quality 0.85, and the setting can't be changed.",
+        "Converting can't bring back detail that the GIF's 256-color palette lost.",
+        "Choose several GIFs and each one downloads as its own JPG."
+      ]
+    },
+    "tool": {
+      "subtitle": "Save a GIF, or the first frame of an animated one, as a JPG in your browser."
+    },
+    "guide": {
+      "title": "About GIF and JPG files",
+      "markdown": "### What is a GIF file?\n\nGIF, the Graphics Interchange Format, was introduced by CompuServe in 1987. The 89a revision of July 1990 introduced extensions for clear pixels, frame delays, comments and application data. A GIF compresses images losslessly with LZW coding, and every image draws from a palette of 256 colors at most. Its registered media type is image/gif. Those extensions are what make animated GIFs possible.\n\nA GIF is a stack of images, each held for its own delay in hundredths of a second, and that stack is the animation. Only one palette color can be flagged clear, which leaves every pixel either fully clear or fully opaque. That palette limit is why GIF suits flat-color graphics better than photographs. Browsers all show GIF. Colors come from color tables, and an image may use a table of its own instead of the one for the whole file, so the frames of one GIF can differ in color.\n\nYou meet GIFs as short looping animations, reaction images, stickers and simple graphics.\n\n### Programs that open GIF files\n\n**Mac, Linux and Windows**\n\n- GIMP: an image editor named in the format reference.\n- ImageMagick: a command-line tool whose supported formats include GIF.\n- Mozilla Firefox: shows GIF in the browser.\n\n**Mac**\n\n- Preview: listed in the format reference for GIFs.\n\n**Web and Mobile**\n\n- Google Chrome displays GIF.\n\n**Mobile**\n\n- Safari displays GIF.\n\n### GIF and JPG compared\n\n- **Names**: .gif is image/gif, while .jpg or .jpeg is image/jpeg.\n- **Compression**: GIF is lossless but limited to 256 colors per image. JPEG is lossy: it works on 8x8 pixel blocks, runs a discrete cosine transform on each and finishes with Huffman coding.\n- **Color**: GIF is indexed color. JPEG keeps 8 bits for each color channel.\n- **Transparency**: a GIF can mark one color as transparent. JPEG has no alpha channel.\n- **Animation**: a GIF holds timed frames, one after another. A JPG is a single still.\n- **Good for**: GIF for simple graphics and short loops. JPEG for photographs.\n- **Metadata**: only pixels are written, so blocks such as EXIF, ICC and XMP are left behind, along with the GIF's comments.\n- **Patents**: the LZW patents behind GIF expired in 2003 and 2004. JPEG's US patents expired in 2006.\n- **Quality numbers**: GIF has none, since it is lossless. JPEG quality usually runs from 0 to 100, though one number gives different results in different programs.\n\nOn this page your browser decodes the GIF, then the canvas writes its first frame as a JPG at quality 0.85. Pixels that were see-through can't stay see-through, and an animation is cut to its first frame. EXIF, ICC and XMP metadata is dropped.\n\nThe download takes the GIF's name with .jpg in place of .gif. Several GIFs are handled in sequence, and every JPG lands in its own download.\n\n### Other ways to convert GIF to JPG\n\n- **GIMP (Windows, Mac, Linux):** open the GIF and pick File > Export As. Select JPEG from the file-type list, press Export, and a JPEG settings dialog follows, with 85 as its default quality.\n- **ImageMagick (command line):** run `magick 'input.gif[0]' output.jpg`. The [0] picks the first frame by number, and the quotes keep the brackets from being read by the shell.\n\nBoth give you control that this page does not, such as the quality setting.\n\n### Problems with GIF files\n\n- **Only one frame came out**: that is how a JPG works. Keep the GIF if you need the motion.\n- **The see-through parts changed**: the GIF had transparency, which a JPG cannot hold. If you need it kept, convert to PNG instead with the [GIF to PNG converter](/gif-to-png/).\n- **The first frame looks blank**: a GIF's first frame can be mostly see-through, and a JPG cannot keep see-through pixels, so check that the first frame is the one you want.\n- **The timing is gone**: a GIF keeps a delay in hundredths of a second for each frame, and a JPG has nowhere to keep it.\n- **Gradients look banded**: a GIF palette has at most 256 colors, and the JPG cannot restore the in-between shades.\n- **A GIF will not open**: the file may be damaged, which the page reports as \"Image decode failed.\" Re-download it from its source.\n- **You need a different frame**: this page always takes the first. Use an editor that shows each frame separately.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a GIF to JPG?",
+        "answer": "Choose the GIF and your browser decodes it, then writes a JPG that you can save. Several GIFs give one JPG each."
+      },
+      {
+        "question": "Can I convert an animated GIF to JPG?",
+        "answer": "Yes, but you get one picture. A JPG holds a single still image, so the first frame of the animation is the one saved."
+      },
+      {
+        "question": "Why did my GIF's transparent background change?",
+        "answer": "A JPG cannot store transparency, so those pixels cannot stay see-through. Check the result before using it, and use PNG if the see-through area matters."
+      },
+      {
+        "question": "Will the JPG look worse than the GIF?",
+        "answer": "A little, in the way a JPG always does. The JPG is lossy and written at quality 0.85, so sharp edges, text and flat colors in a GIF can pick up faint blur or speckles around them."
+      },
+      {
+        "question": "What is the JPG file called?",
+        "answer": "cat.gif downloads as cat.jpg; the name stays and the ending changes."
+      },
+      {
+        "question": "Can the JPG have more colors than the GIF?",
+        "answer": "No gain in detail. The picture comes from the GIF's pixels, which already had 256 colors or fewer, and converting cannot bring back shades the palette threw away."
+      },
+      {
+        "question": "Can I pick a different frame?",
+        "answer": "Not on this page: the first frame is always used. If you need another frame, save it from an image program that lets you step through the frames."
+      },
+      {
+        "question": "Is the GIF's metadata kept?",
+        "answer": "No. Only decoded pixels are written, so metadata such as EXIF, ICC or XMP does not reach the JPG."
+      },
+      {
+        "question": "Can I convert more than one GIF?",
+        "answer": "Yes. Choose several GIFs and they are converted one after another; every JPG downloads separately, with no ZIP."
+      },
+      {
+        "question": "My GIF won't open. What is wrong?",
+        "answer": "A damaged GIF shows \"Image decode failed.\" A browser with no decoder for the file says it can't open that kind of file, and the fix is to update Chrome, Edge, Firefox or Safari to a current version."
+      }
+    ]
+  },
+  "jpg-to-jpeg": {
+    "seo": {
+      "title": "Convert JPG to JPEG Online (Free)",
+      "h1": "JPG to JPEG Converter",
+      "description": "JPG and JPEG are the same format. This page saves your photo again with a .jpeg ending, at quality 0.85. Free, no sign-up, no upload.",
+      "howToHeading": "How to convert JPG to JPEG"
+    },
+    "aboutSection": {
+      "title": "JPG and JPEG",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The same format as JPG: a lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          ".jpeg and .jpg are the same format",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to JPEG",
+      "points": [
+        "JPG and JPEG are the same format, so only the file ending changes.",
+        "The page decodes the image and encodes it again at quality 0.85. It does not just rename the file.",
+        "That second lossy pass can cost a little detail, and EXIF, ICC profile and XMP data are dropped.",
+        "Several JPG files give one JPEG each, downloaded one by one.",
+        "Your browser does the work, so the image isn't uploaded."
+      ]
+    },
+    "tool": {
+      "subtitle": "Save a JPG image as a JPEG file, right in your browser."
+    },
+    "guide": {
+      "title": "About JPG and JPEG files",
+      "markdown": "### What is a JPG file?\n\nA JPG file is a photograph or other picture saved in the JPEG format. The name honors the Joint Photographic Experts Group, which wrote the standard for JPG files. Work began in 1986. ITU-T T.81 published the core standard in 1992, and ISO/IEC 10918-1 followed in 1994. US patents on JPEG lapsed on 27 October 2006, and all major browsers show it. The registered media type is image/jpeg.\n\nBaseline JPEG is lossy. Pixels are grouped into 8x8 blocks, put through a discrete cosine transform and Huffman coded. Each color channel gets 8 bits in JPEG, and without an alpha channel transparency is impossible. A progressive mode shows a rough picture first, which sharpens while the rest of the data arrives. Most digital cameras and scanners write JPG files.\n\nBoth .jpg and .jpeg refer to one and the same format, and JPEG cannot store layers. So the question behind this page is rarely about the picture. It is about a name: an upload form, a script or a folder rule that wants one ending and gets the other.\n\n### Programs that open JPG files\n\n**Windows**\n\n- Windows Photos: named in the format reference.\n\n**Mac**\n\n- Preview: opens JPG files.\n\n**Windows, Mac and Linux**\n\n- GIMP: lets you edit JPEG.\n- ImageMagick: reads JPG; check the installed format support.\n\n**Web and Mobile**\n\n- Google Chrome shows JPG.\n\n**Web**\n\n- Mozilla Firefox shows JPG.\n\n**Mobile**\n\n- Safari displays JPG.\n\n### JPG and JPEG compared\n\n- **Extensions**: .jpg and .jpeg, with the same media type, image/jpeg.\n- **Format**: identical. Both are JPEG, so there is no difference in compression, color depth, transparency or metadata between a file called .jpg and one called .jpeg.\n- **Quality**: usually 0 to 100; GIMP defaults to 85, and identical numbers do not guarantee identical quality across programs.\n- **Color depth**: 8 bits per color channel in both.\n- **Modes**: baseline, which loads top to bottom, and progressive, which paints a coarse version first and refines it as data arrives. Both endings can hold either.\n- **Transparency**: neither has an alpha channel.\n- **Download name**: this page names the result after your file, with .jpeg in place of .jpg.\n\nA rename is therefore the exact answer to \"how do I make my JPG a JPEG\", and this page is a second route to the same name. This page does not rename your file. It decodes the JPG to pixels and writes a JPEG again at quality 0.85, which is a second lossy pass. EXIF, ICC and XMP metadata does not carry over to the new file.\n\n### Other ways to convert JPG to JPEG\n\n- **Rename the file:** because the two names are the same format, changing .jpg to .jpeg in your file manager does the whole job and leaves the picture untouched.\n- **GIMP (Windows, Mac, Linux):** with the JPG loaded, choose File > Export As, set the type to JPEG in the file-type list and press Export. A settings dialog follows, and GIMP accepts both .jpg and .jpeg as the extension.\n- **ImageMagick (command line):** run `magick input.jpg output.jpeg`. This writes the picture again, like this page does.\n\n### Problems with JPG files\n\n- **A form rejects .jpg**: a form may check the ending as text and accept only one spelling. A .jpeg ending satisfies a check for that spelling.\n- **Transparent pixels cannot survive JPEG export**: choose a format with alpha, such as PNG, if you need see-through areas.\n- **An older photo frame rejects the file**: some older frames do not read progressive files. Save it again with progressive mode off.\n- **The picture looks softer after repeated saves**: each lossy save compounds the loss. Make copies from the original, not from a copy of a copy.\n- **Quality numbers disagree between programs**: one editor's 85 is not another's, so the same number can give different file sizes and looks.\n- **Layers are gone**: a JPEG stores no layers, so keep your project file.\n- **Many files to fix**: choose a batch and the page works through it, saving each result as its own file.\n- **A folder has both endings**: a program or script that matches only *.jpg will skip the .jpeg files, and the reverse. Pick one ending and rename or convert the rest to match.\n- **You want to keep EXIF data**: this page drops it. Rename the file instead, or use a desktop program that copies metadata, because renaming leaves every byte of the picture in place.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPG to JPEG?",
+        "answer": "Choose the JPG and your browser writes a new file with a .jpeg ending, ready to save. Several JPGs give one JPEG each."
+      },
+      {
+        "question": "What is the difference between JPG and JPEG?",
+        "answer": "None in the data. Both endings name the Joint Photographic Experts Group format, and image/jpeg is the media type for each. Programs treat a .jpg file and a .jpeg file alike."
+      },
+      {
+        "question": "Can I just rename my .jpg to .jpeg?",
+        "answer": "Yes, and for one file that is the lossless way. Because the two endings name the same format, a rename changes only the name. Use this page when you want the file re-saved rather than renamed."
+      },
+      {
+        "question": "Does converting JPG to JPEG reduce quality?",
+        "answer": "A little. On this page the picture is decoded and then encoded afresh as a JPEG at quality 0.85, which makes a second lossy pass. If you only need the new ending, renaming costs nothing and this page costs a little detail."
+      },
+      {
+        "question": "Why does a website ask for a .jpeg file when mine is .jpg?",
+        "answer": "A site's upload check may look at the ending as text and take one spelling only. The format is the same, so a .jpeg ending meets the check without changing what is inside."
+      },
+      {
+        "question": "Does the JPEG keep my photo's EXIF data and location?",
+        "answer": "No. Only the pixels survive the round trip; EXIF, ICC profiles and XMP are not kept. That also removes a GPS location from the file."
+      },
+      {
+        "question": "What is the new file called?",
+        "answer": "It takes your file's name with .jpeg in place of .jpg, so holiday.jpg downloads as holiday.jpeg."
+      },
+      {
+        "question": "Can I convert a PNG or WebP to JPEG here?",
+        "answer": "Not on this page, which takes JPG and JPEG files. Use the [PNG to JPG converter](/png-to-jpg/) or the [WebP to JPG converter](/webp-to-jpg/) for those."
+      },
+      {
+        "question": "Can I convert many JPG files in one go?",
+        "answer": "Yes. Queue a batch and the page handles the files one at a time, each saved separately as a JPEG, never zipped."
+      },
+      {
+        "question": "Is my photo uploaded?",
+        "answer": "No. Your browser decodes and re-encodes the image locally, so the photo stays on your device."
+      }
+    ]
+  },
+  "tiff-to-pdf": {
+    "seo": {
+      "title": "Convert TIFF to PDF Online (Free)",
+      "h1": "TIFF to PDF Converter",
+      "description": "Put a TIFF image on a PDF page the size of the picture, with no margins. ImageMagick runs in your browser. Free, no sign-up, no upload.",
+      "howToHeading": "How to convert TIFF to PDF"
+    },
+    "aboutSection": {
+      "title": "TIFF and PDF",
+      "fromFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Multiple pages in one file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A document format created by Adobe in 1993 and standardized as ISO 32000. It keeps text, fonts, images and layout the same on any device.",
+        "details": [
+          "Fixed page layout",
+          "Embedded fonts",
+          "Vector and raster content",
+          "Optional encryption and signatures"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIFF to PDF",
+      "points": [
+        "Only one image is read from the TIFF, and it becomes one PDF page.",
+        "The PDF page is the size of the image, at 1 pixel to 1 point, with no margin and no A4 or Letter page.",
+        "The picture is embedded as a lossless PNG, so the PDF adds no JPEG loss.",
+        "Each TIFF makes its own PDF; files are not merged into one.",
+        "A picture over about 537 megapixels can't be converted.",
+        "ImageMagick runs in your browser, so the TIFF isn't uploaded."
+      ]
+    },
+    "tool": {
+      "subtitle": "Turn a TIFF image into a PDF file, right in your browser."
+    },
+    "guide": {
+      "title": "About TIFF and PDF files",
+      "markdown": "### What is a TIFF file?\n\nThe Tagged Image File Format, or TIFF, is a raster format from Aldus and Microsoft. Aldus released the first version in 1986, revision 6.0 arrived in 1992, and the specification is now Adobe's. The name comes from its structure: a TIFF is a wrapper of tags that describe the image data, its color and other characteristics. Both .tif and .tiff are used for it, and its media type is image/tiff.\n\nDifferent compression methods and color representations are possible in a TIFF, and one file may contain several images, which made it a staple for scanned document sequences. Deep bit depths and preservation masters are also long-standing uses. You mostly meet it from scanners, fax and document imaging software, and in professional photography and print. GIMP supports high-precision TIFF import and export, which suits the format's deeper bit depths.\n\nA PDF is a common next step when a scan has to be sent or filed. It turns the image into a document page that PDF readers handle.\n\n### Programs that open TIFF files\n\n**Mac**\n\n- Preview: its File > Export sheet lists TIFF among the formats.\n\n**Windows, Mac and Linux**\n\n- GIMP: loads image files for editing; what an export keeps depends on the format chosen.\n- ImageMagick: reads and writes TIFF and exposes compression, strip, tile and byte-order controls.\n\n**Windows**\n\n- Windows Photos: appears in the format reference.\n\n### TIFF and PDF compared\n\n- **Extensions**: .tif and .tiff are image/tiff, .pdf is application/pdf.\n- **Pages**: one TIFF file may contain several images, while a PDF holds fixed pages; this page writes a single page.\n- **Compression**: TIFF can be lossless or lossy, and offers many methods. This page embeds the picture in the PDF losslessly.\n- **Content**: a TIFF holds raster pixels alone. A PDF can combine text, vector graphics and images, though the PDF written here carries a single picture.\n- **Color depth**: TIFF can use high bit depth and CMYK. PDF images can use lossless Flate compression or JPEG.\n- **Size limit**: classic TIFF uses 32-bit offsets, which keeps it to about 4 GB. BigTIFF extends those fields.\n- **Who can open it**: the PDF opens in Firefox, Apple Preview, Evince, Okular and Adobe Acrobat Reader, so the person you send it to needs no viewer that understands TIFF tags.\n- **Standards**: PDF 1.7 was standardized as ISO 32000-1 in 2008, and PDF 2.0 as ISO 32000-2 in 2017.\n\nImageMagick reads one image, which the page saves as a PNG and sets on a PDF page matching the image's size. No quality setting is passed, and the pixels are not resampled to a paper size. The result looks like the scan, is not searchable and is not set to A4 or Letter.\n\nThe download takes the TIFF's name with .pdf in place of its ending. Several TIFFs convert one after another, and each PDF is saved separately. Nothing is added to the page around the picture: no header, footer or page number.\n\n### Other ways to convert TIFF to PDF\n\n- **Preview (Mac):** open the TIFF in Preview, then File > Export, Format: PDF, and save. The Format menu in the export sheet lists PDF.\n- **ImageMagick (command line):** run `magick input.tiff output.pdf`, which reads the TIFF and takes the output format from the .pdf ending. ImageMagick's formats page lists TIFF as readable and writable, and PDF as readable and writable but requiring Ghostscript.\n\n### Problems with TIFF files\n\n- **Only one image of a multi-page TIFF came out**: this page reads a single image. Split the TIFF into one file per page first if you need each one.\n- **The picture is too large**: a picture over roughly 537 megapixels is refused.\n- **A \"couldn't be read\" message appears**: the file's picture could be damaged or incomplete. Try a desktop program and save a fresh copy.\n- **A viewer refuses the file**: some viewers cannot interpret every private tag, color-profile extensions among them. Re-save it from GIMP or another editor.\n- **A TIFF over 4 GB**: classic TIFF stops near 4 GB, and BigTIFF extends that.\n- **The PDF page is far bigger than A4**: one pixel is one point, so a 300 dpi scan makes a page about four times the size of the paper. Scale it when you print.\n- **The text isn't searchable**: it is a picture of text. OCR is needed.\n"
+    },
+    "faqs": [
+      {
+        "question": "How can I turn a TIFF into a PDF?",
+        "answer": "Pick the TIFF, ImageMagick in your browser reads it, and the PDF is built and downloads. Several TIFFs give one PDF each."
+      },
+      {
+        "question": "Can I turn a multi-page TIFF into a multi-page PDF?",
+        "answer": "No. The page takes a single image out of the file, so a multi-page TIFF still yields one picture on one PDF page."
+      },
+      {
+        "question": "What size is the PDF page?",
+        "answer": "The size of the image, with each pixel set as one point. A 2,480 by 3,508 pixel scan gives a 2,480 by 3,508 point page, not an A4 or Letter sheet, and there is no margin."
+      },
+      {
+        "question": "Can I combine several TIFF files into one PDF?",
+        "answer": "Not here. Each file becomes its own PDF and they are never merged. Merge the PDFs afterward in a PDF tool."
+      },
+      {
+        "question": "Does the PDF lose quality compared with the TIFF?",
+        "answer": "No loss is added: the picture is stored as a lossless PNG, with no JPEG step."
+      },
+      {
+        "question": "What is the PDF file called?",
+        "answer": "The TIFF's name stays and the ending becomes .pdf, so scan.tiff downloads as scan.pdf."
+      },
+      {
+        "question": "Is the text in my scanned TIFF searchable in the PDF?",
+        "answer": "No. The PDF holds a picture of the page, not text. Run it through an OCR program to make the words searchable."
+      },
+      {
+        "question": "Will a very large TIFF work?",
+        "answer": "Anything past about 537 megapixels is rejected with a message that it is too large."
+      },
+      {
+        "question": "Does my TIFF get uploaded?",
+        "answer": "No. ImageMagick is compiled to WebAssembly and runs in your browser tab."
+      },
+      {
+        "question": "What does the 'picture couldn't be read' message mean?",
+        "answer": "The page could not read the picture in the file, which may be damaged or incomplete. Try saving a fresh copy from a desktop program."
+      }
+    ]
+  },
+  "tiff-to-jpg": {
+    "seo": {
+      "title": "Convert TIFF to JPG Online (Free)",
+      "h1": "TIFF to JPG Converter",
+      "description": "Turn a TIFF into a JPG that email, websites and phones open. ImageMagick runs in your browser, one file or a batch. Free, no sign-up.",
+      "howToHeading": "How to convert TIFF to JPG"
+    },
+    "aboutSection": {
+      "title": "TIFF and JPG",
+      "fromFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Multiple pages in one file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Adjustable quality",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIFF to JPG",
+      "points": [
+        "Only one image is read: a multi-page TIFF gives one JPG, not one per page.",
+        "JPG is lossy, even when the TIFF is lossless.",
+        "A JPG has no transparency or layers.",
+        "The page sets no JPG quality of its own, so you cannot choose one.",
+        "A picture over about 537 megapixels fails.",
+        "Several TIFFs give several JPGs, downloaded one by one."
+      ]
+    },
+    "tool": {
+      "subtitle": "Turn a TIFF file into a JPG in your browser, one file or a whole batch."
+    },
+    "guide": {
+      "title": "About TIFF and JPG files",
+      "markdown": "### What is a TIFF file?\n\nShort for Tagged Image File Format, TIFF is a tag-based raster wrapper created by Aldus and Microsoft. The first release dates from 1986 and revision 6.0 from 1992; Adobe now controls the specification. TIFF permits several compression methods and several color representations. Files end in .tif or .tiff, and the media type is image/tiff.\n\nMultiple images per file make TIFF useful for scanned document sequences, and high bit depth imaging and preservation masters are established uses. You meet TIFF from scanners, in print and professional photography workflows, and as the master copy a photographer keeps beside a smaller JPG. The format reference also lists fax and document imaging among its uses. GIMP supports high-precision TIFF import and export. Because a TIFF may hold several images, a converter that reads one has to take a single image from the file.\n\n### Programs that open TIFF files\n\n**Mac**\n\n- Preview: the format list under File > Export offers TIFF.\n\n**Windows, Mac and Linux**\n\n- GIMP: imports TIFF for editing, and what an export keeps depends on the format.\n- ImageMagick: reads and writes TIFF; compression, strips, tiles and byte order are all adjustable.\n\n**Windows**\n\n- Windows Photos: the format reference lists it.\n\n### TIFF and JPG compared\n\n- **Extensions**: .tif or .tiff is image/tiff, while .jpg or .jpeg is image/jpeg.\n- **Compression**: TIFF can be lossless or lossy. JPEG is lossy: the picture is divided into 8x8 blocks that go through a discrete cosine transform before Huffman coding.\n- **Pages**: a TIFF may contain several images, whereas a JPG is a single picture.\n- **Color depth**: TIFF supports high bit depth and CMYK. JPEG stores 8 bits per color channel.\n- **Transparency**: JPEG has no alpha channel. Layers do not survive either.\n- **Size limit**: classic TIFF is capped near 4 GB.\n- **Support**: JPG opens in every browser and phone. TIFF needs a viewer that understands its tags.\n- **Typical use**: TIFF for scanning, archiving and print. JPG for web photos, camera output and email attachments.\n- **Quality setting**: TIFF has none for lossless compression. JPEG quality runs from 0 to 100, but programs scale it differently, so equal numbers do not give equal results.\n\nImageMagick takes one image from the TIFF and saves a JPG. A multi-page TIFF gives one picture, not one per page. Keep the TIFF: a JPG cannot be turned back into it, and saving the JPG again later costs more detail.\n\nThe download takes the TIFF's name with .jpg in place of .tif or .tiff, and each TIFF in a batch is converted and saved on its own.\n\n### Other ways to convert TIFF to JPG\n\n- **GIMP (Windows, Mac, Linux):** load the TIFF, go to File > Export As, pick the JPEG entry in the file types and hit Export. The JPEG settings dialog appears next, where the default quality is 85.\n- **Preview (Mac):** open the TIFF, go to File > Export, choose JPEG as the Format and save.\n- **ImageMagick (command line):** run `magick 'input.tiff[0]' output.jpg`. The [0] picks the first image in the file, and the quotes keep the brackets away from the shell.\n\nOn a desktop you can set the JPEG quality and see the settings before saving, which this page does not offer.\n\n### Problems with TIFF files\n\n- **It will not open**: viewers can stumble on private tags, some color-profile extensions included. Re-save it from GIMP or a similar editor.\n- **Only one page converted**: the TIFF holds several images and this page reads one. Use software that exposes the whole image sequence.\n- **Over 4 GB**: classic TIFF uses 32-bit offsets and stops at about 4 GB, and BigTIFF extends those fields.\n- **The picture is too large**: pictures over roughly 537 megapixels are refused.\n- **A \"couldn't be read\" message**: the page could not read the picture, which may be damaged or incomplete; save a new TIFF from GIMP or Preview and convert that.\n- **Transparent areas change**: a JPG cannot keep transparency. Convert to PNG if you need it.\n- **A scanned page looks soft**: JPEG is lossy and works in 8x8 blocks, so thin lines and small text can blur. Keep the TIFF as the master.\n- **The colors look off**: a JPG holds 8 bits per channel, so a high bit depth TIFF is reduced. Check the result against the original.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a TIFF to JPG?",
+        "answer": "Choose the TIFF and ImageMagick reads it in your browser and writes a JPG. Save the result. A batch gives one JPG per TIFF."
+      },
+      {
+        "question": "Can you convert TIFF to JPG without losing quality?",
+        "answer": "No. JPG is a lossy format, so a TIFF saved without loss will lose some detail when it becomes a JPG. The loss is small for photographs and shows most on sharp edges and text."
+      },
+      {
+        "question": "Can I convert a multi-page TIFF to JPG?",
+        "answer": "You get a single JPG, not one per page, because the page reads one image from the file. For each page as its own JPG, split the TIFF first in a program such as GIMP."
+      },
+      {
+        "question": "Can I choose the JPG quality?",
+        "answer": "No: the page supplies no quality value, so the choice isn't offered. A desktop program such as GIMP lets you set it, with 85 as its default."
+      },
+      {
+        "question": "Can I batch convert TIFF to JPG?",
+        "answer": "Yes. Add many TIFFs at once; they are processed in sequence and each JPG downloads separately, with no ZIP."
+      },
+      {
+        "question": "What is the JPG file called?",
+        "answer": "Same name, new ending: a file called photo.tif is saved as photo.jpg."
+      },
+      {
+        "question": "Does the JPG keep the TIFF's transparency?",
+        "answer": "No. JPG cannot store an alpha channel, so see-through areas cannot stay see-through. Choose PNG if the transparency matters."
+      },
+      {
+        "question": "Will a 16-bit TIFF come out right?",
+        "answer": "A JPG holds 8 bits for each color channel, so extra depth is reduced. Compare the JPG with your original before relying on it."
+      },
+      {
+        "question": "What if my TIFF is very large?",
+        "answer": "Past about 537 megapixels the conversion fails with a message about the picture's size."
+      },
+      {
+        "question": "Does my TIFF get uploaded?",
+        "answer": "No. ImageMagick runs as WebAssembly in your browser, so the TIFF stays on your device."
+      }
+    ]
+  },
+  "png-to-dds": {
+    "seo": {
+      "title": "Convert PNG to DDS Online (Free)",
+      "h1": "PNG to DDS Converter",
+      "description": "Convert a PNG to a DDS texture file in your browser. ImageMagick writes the DDS; the page has no format or mipmap options. Free, no sign-up.",
+      "howToHeading": "How to convert PNG to DDS"
+    },
+    "aboutSection": {
+      "title": "PNG and DDS",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "Alpha transparency",
+          "8-bit and 16-bit channels",
+          "Supported by every browser"
+        ]
+      },
+      "toFormat": {
+        "name": "DDS",
+        "fullName": "DirectDraw Surface",
+        "description": "A Microsoft container format for textures and cubemaps, originally from DirectX. It commonly stores GPU-compressed data in the DXT/BC block formats, with optional mipmaps.",
+        "details": [
+          "GPU block compression (DXT/BC)",
+          "Mipmaps",
+          "Cubemaps",
+          "Alpha channel"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to DDS",
+      "points": [
+        "The page has no settings for the DDS compression format or for mipmaps.",
+        "The pixels pass through 8-bit color, so the extra depth of a 16-bit PNG is lost.",
+        "Only the first frame of an animated PNG is used.",
+        "EXIF, ICC and XMP metadata is not carried into the DDS.",
+        "Each PNG becomes its own DDS, downloaded one by one.",
+        "Your browser does the work, so the PNG isn't uploaded."
+      ]
+    },
+    "tool": {
+      "subtitle": "Turn a PNG image into a DDS texture file, right in your browser."
+    },
+    "guide": {
+      "title": "About PNG and DDS files",
+      "markdown": "### What is a PNG file?\n\nPortable Network Graphics, shortened to PNG, began as a patent-free answer to GIF. October 1996 brought its W3C Recommendation, the first for any format, and RFC 2083 and ISO/IEC 15948:2004 followed. Its compression, DEFLATE, is always lossless, so a PNG can be saved again with no loss of pixels. Every PNG opens with a fixed signature and then runs as a series of chunks: IHDR holds the header, IDAT the image data and IEND ends the file.\n\nIndexed, grayscale and truecolor images are all allowed, using 1 to 16 bits per sample and optionally an alpha channel that gives each pixel its own transparency. Animated PNG (APNG) is covered by the current specification too, and software with no animation support shows the default still image instead. image/png is the media type, and animated files use image/apng. Browsers all display PNG, and screenshots on macOS are saved as PNG unless you change it.\n\n### Programs that open PNG files\n\n**Linux, Mac and Windows**\n\n- GIMP: brings PNG in for editing.\n- ImageMagick: reads PNG, so check which formats your install supports.\n\n**Web**\n\n- Mozilla Firefox shows PNG pictures.\n\n**Web and Mobile**\n\n- Google Chrome shows PNG pictures.\n\n**Mobile**\n\n- Safari displays PNG on phones and tablets.\n\n### PNG and DDS compared\n\n- **Extensions**: .png against .dds.\n- **Purpose**: PNG is a picture for screens and the web. DDS is Microsoft's DirectDraw Surface texture-file format, made for GPU texture pipelines such as Direct3D.\n- **Compression**: PNG is always lossless. DDS stores either plain pixels or compressed texture data, typically the DXT/BC block formats.\n- **Mipmaps**: a DDS asset may include a mipmap chain alongside its largest surface. PNG holds one image.\n- **Other surfaces**: Cube maps and volume textures fit in a DDS; texture arrays arrive with the extra header of Direct3D 10 and 11.\n- **Transparency**: PNG has an alpha channel. A DDS can have one too.\n- **Headers**: the DX10 header can describe formats the original pixel-format structure cannot express, and some DDS readers reject it.\n- **Metadata**: PNG can carry Exif in an eXIf chunk. Metadata is not carried into the DDS written here.\n\nThis page decodes the PNG in your browser to 8-bit RGBA pixels and passes them to ImageMagick, which writes the DDS. The page does not ask for a compression format or mipmaps, and the file you get depends on ImageMagick's DDS writer.\n\nThe download takes the PNG's name with .dds in place of .png.\n\n### Other ways to convert PNG to DDS\n\n- **DirectXTex texconv (Windows):** run `texconv -ft dds -f BC3_UNORM input.png`. Add `-m 1` if you want only one mip level. By default it generates all levels, and the format has to match your renderer.\n- **GIMP (Windows, Mac, Linux):** open the PNG, choose File > Export As, select DDS among the file types, then click Export. The DDS settings dialog comes up next. The DDS plug-in has been built into GIMP since 2.10.10.\n- **ImageMagick (command line):** run `magick input.png output.dds`. Its formats page marks DDS as supported for reading and writing, and mentions dxt1, dxt5 and mipmap defines.\n\nChoose texconv or GIMP when the engine fixes the format, since both let you pick it.\n\n### Problems with PNG files\n\n- **The extra depth of a 16-bit PNG is lost**: the pixels pass through 8-bit color on the way to the DDS, so the DDS holds the 8-bit version.\n- **An animated PNG is cut to one frame**: the first. The DDS written here is a single still texture.\n- **EXIF, ICC and XMP data does not carry over**: raw pixels are all that is passed along, which leaves camera tags and profiles behind.\n- **PNG compression does not reduce fidelity**: a smaller compression setting in an export dialog changes file size, not pixels.\n- **Layer offsets differ between programs**: GIMP warns that its PNG offset option may be read differently by other applications, so avoid that option.\n- **The PNG is very large**: no limit is built into the page, so time and memory depend on your device.\n- **Several PNGs**: each becomes its own DDS, and they download one by one.\n- **The PNG will not open**: the page shows \"Image decode failed.\" for a damaged file, or reports that the browser has no decoder for that kind of file. A current release of Chrome, Edge, Firefox or Safari should open it.\n"
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to DDS?",
+        "answer": "Pick your PNG, give it a moment and download the DDS. Your browser decodes the PNG and ImageMagick, running in the page, writes the DDS."
+      },
+      {
+        "question": "Can I choose DXT1, DXT5 or BC7?",
+        "answer": "No. The page has no compression option. If your game or engine needs a specific format such as BC3 or BC7, convert with a tool that sets it, such as Microsoft's texconv."
+      },
+      {
+        "question": "Does the DDS have mipmaps?",
+        "answer": "The page lets you neither request nor skip them. If your engine needs a full mipmap chain, generate the DDS with texconv, which builds all levels by default, or with GIMP."
+      },
+      {
+        "question": "Is a DDS the same as a PNG?",
+        "answer": "No. A PNG is a lossless picture for screens and the web. A DDS is a texture container made for the graphics card, which commonly stores GPU block-compressed data and can hold mipmaps and cube maps."
+      },
+      {
+        "question": "Why can't I open the DDS in Windows Photos or a browser?",
+        "answer": "DDS is a game-texture format and many viewers do not read it. GIMP opens DDS files, so open it there and export to a format your viewer reads."
+      },
+      {
+        "question": "Does the DDS keep my PNG's transparency?",
+        "answer": "The page hands the PNG's pixels, alpha included, to ImageMagick's DDS writer. Open the DDS in GIMP or your engine to confirm the alpha channel before you ship it."
+      },
+      {
+        "question": "What happens to a 16-bit PNG?",
+        "answer": "The extra depth is lost: pixels are reduced to 8 bits per channel before the DDS is written."
+      },
+      {
+        "question": "Will an animated PNG work?",
+        "answer": "Only its first frame is used, and the DDS is a single still texture."
+      },
+      {
+        "question": "What is the DDS file called?",
+        "answer": "The PNG's name is kept and only the ending becomes .dds, so rock.png downloads as rock.dds."
+      },
+      {
+        "question": "Can I convert many PNGs in one go?",
+        "answer": "Yes. Queue up several PNGs and they are converted in order; each DDS is saved on its own, with no ZIP."
+      }
+    ]
+  }
+}

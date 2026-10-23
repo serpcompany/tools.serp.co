@@ -1,0 +1,211 @@
+{
+  "tools": {
+    "webm-to-gif": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i input.webm output.gif",
+          "limits": "FFmpeg takes the output format from the file ending; a plain command skips frame-rate, size and palette steps.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "Gifski with FFmpeg",
+          "steps": "ffmpeg -i input.webm frame%04d.png; then gifski -o anim.gif frame*.png",
+          "limits": "Gifski's documentation names --width and --height as the biggest levers for a smaller file and --quality for lowering quality; on Windows the frame pattern may need %%04d.",
+          "source": "https://github.com/ImageOptim/gifski",
+          "supportingSources": [
+            "https://gif.ski/"
+          ]
+        }
+      ]
+    },
+    "dds-to-png": {
+      "methods": [
+        {
+          "app": "Microsoft DirectXTex",
+          "steps": "texconv -ft png input.dds",
+          "limits": "Windows-oriented texture utility; check multi-image resource handling.",
+          "source": "https://github.com/microsoft/DirectXTex/wiki/Texconv"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Load the DDS; File > Export As; name texture.png; click Export to open the PNG options.",
+          "limits": "GIMP loads DDS from version 2.10.10 on.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+          "supportingSources": [
+            "https://www.gimp.org/news/2019/04/07/gimp-2-10-10-released/"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.dds output.png",
+          "limits": "The format list marks DDS readable and writable, with DXT and mipmap options, and notes PNG needs libpng.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "jpg-to-webp": {
+      "methods": [
+        {
+          "app": "cwebp",
+          "steps": "cwebp -q 80 input.jpg -o output.webp; alternatively cwebp -lossless input.jpg -o output.webp",
+          "limits": "-q runs from 0 to 100 and defaults to 75; lossless preserves what was decoded, not what the JPG discarded; the manual lists JPEG as an accepted input.",
+          "source": "https://developers.google.com/speed/webp/docs/cwebp"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the JPG; File > Export As; give a name ending .webp; tick Lossless or set the image quality and alpha quality sliders.",
+          "limits": "Higher quality usually means a larger file.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/file-webp-export.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.jpg -quality 80 output.webp",
+          "limits": "WebP needs the WEBP delegate library.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportingSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "mkv-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i recording.mkv -map 0:a:0 -b:a 192k -c:a libmp3lame -vn soundtrack.mp3",
+          "limits": "-map gives manual control of which stream is used, -vn turns video off, and the build needs LAME.",
+          "source": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "MKVToolNix",
+          "steps": "mkvextract recording.mkv tracks 1:audio.mp3",
+          "limits": "The track ID comes from mkvmerge --identify; the stream is written as stored, so the result is a playable MP3 only when the track is already MP3.",
+          "source": "https://mkvtoolnix.download/doc/mkvextract.html"
+        }
+      ]
+    },
+    "jfif-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.jfif output.png",
+          "limits": "The format list calls the JPEG entry the JFIF format and marks it readable and writable; PNG needs libpng.",
+          "source": "https://imagemagick.org/formats/",
+          "supportingSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "wmv-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i legacy.wmv -c:a aac -c:v libx264 shared.mp4",
+          "limits": "Size and quality settings are not repeated; -movflags +faststart moves the moov atom to the front in a second pass.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportingSources": [
+            "https://ffmpeg.org/ffmpeg-formats.html"
+          ]
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Open Source on the toolbar; pick the WMV; choose a preset such as Fast 1080p30; set Save As and the To folder; Start.",
+          "limits": "The source-formats page lists WMV; Fast 1080p30 writes MP4 with H.264 and AAC stereo.",
+          "source": "https://handbrake.fr/docs/en/latest/introduction/quick-start.html",
+          "supportingSources": [
+            "https://handbrake.fr/docs/en/latest/technical/source-formats.html",
+            "https://handbrake.fr/docs/en/latest/technical/official-presets.html"
+          ]
+        }
+      ]
+    },
+    "heif-to-jpg": {
+      "methods": [
+        {
+          "app": "Preview",
+          "steps": "Open HEIF; File > Export; choose JPEG in Format; save.",
+          "limits": "Compatible macOS and decodable HEIF required.",
+          "source": "https://support.apple.com/en-us/116944"
+        },
+        {
+          "app": "libheif",
+          "steps": "heif-dec input.heif output.jpg",
+          "limits": "The output format comes from the filename suffix; a quality option applies to JPEG; a file with several images gives numbered outputs ending -1, -2.",
+          "source": "https://raw.githubusercontent.com/strukturag/libheif/master/examples/heif_dec.cc"
+        }
+      ]
+    },
+    "svg-to-jpg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open SVG as an image; File > Export As; use drawing.jpg; confirm JPEG options.",
+          "limits": "SVG is rasterized at import; retain vector original.",
+          "source": "https://docs.gimp.org/3.0/en/glossary.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/gimp-export-dialog.html",
+            "https://docs.gimp.org/3.0/en/file-jpeg-export.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.svg output.jpg",
+          "limits": "The format list gives SVG read and write mode and says it renders with Inkscape, RSVG or its internal MSVG renderer.",
+          "source": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Inkscape plus Preview",
+          "steps": "In Inkscape, File > Export PNG Image; choose the area and image size in pixels; pick a file name; click Export. Open the PNG in Preview and choose File > Export > Format JPEG.",
+          "limits": "Two-stage macOS workflow with a PNG intermediate.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+          "supportingSources": [
+            "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+          ]
+        }
+      ]
+    },
+    "png-to-gif": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the PNG; File > Export As; name ending .gif; choose Interlace, comment and As animation options in the GIF dialog.",
+          "limits": "GIMP only exports a maximum of 256 colors; its docs advise indexed mode first.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportingSources": [
+            "https://docs.gimp.org/3.0/en/file-gif-export.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.png output.gif",
+          "limits": "The format list marks PNG and GIF read and write, with GIF as 8-bit PseudoColor up to 256 palette entries.",
+          "source": "https://imagemagick.org/formats/",
+          "supportingSources": [
+            "https://imagemagick.org/command-line-processing/"
+          ]
+        }
+      ]
+    },
+    "jpeg-to-svg": {
+      "methods": [
+        {
+          "app": "Text editor, by hand",
+          "steps": "Save a text file ending in .svg with an svg element carrying width, height and xmlns http://www.w3.org/2000/svg; inside it add an image element with href set to the JPEG's file name and width and height set to the picture's pixel size; open it in a browser.",
+          "limits": "JPEG, PNG and other SVG files are the formats SVG software must support; width and height are required; the SVG links the JPEG, so the two files stay together.",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/image"
+        }
+      ]
+    }
+  }
+}

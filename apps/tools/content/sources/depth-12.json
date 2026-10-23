@@ -1,0 +1,185 @@
+{
+  "tools": {
+    "heif-to-pdf": {
+      "methods": [
+        {
+          "app": "Apple Preview",
+          "steps": "Open the HEIF in Preview; choose File > Export; pick PDF in the Format menu and click Save.",
+          "limits": "Preview opens HEIF files on macOS High Sierra and later.",
+          "source": [
+            "https://support.apple.com/en-us/116944",
+            "https://support.apple.com/guide/preview/convert-image-file-types-prvw1012/mac"
+          ]
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the HEIF; choose File > Export As; end the name in .pdf and click Export; set the PDF options.",
+          "limits": "Needs GIMP 2.10.2 or later to load HEIF. Layers as pages and Fill transparent areas with background color are PDF export options.",
+          "source": [
+            "https://www.gimp.org/news/2018/04/08/gimp-2-10-2-released/",
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.2/en/file-pdf-export.html"
+          ]
+        }
+      ]
+    },
+    "jpeg-to-webp": {
+      "methods": [
+        {
+          "app": "cwebp",
+          "steps": "Run cwebp portrait.jpeg -q 85 -o portrait.webp; add -lossless for the lossless mode.",
+          "limits": "No metadata is kept by default.",
+          "source": "https://developers.google.com/speed/webp/docs/cwebp"
+        },
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG; choose File > Export As to start the export; the WebP dialog offers Lossless, Image quality and Exif, XMP and color profile options.",
+          "limits": "Exif, XMP and color profile are separate options.",
+          "source": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.0/en/file-webp-export.html",
+            "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick portrait.jpeg portrait.webp.",
+          "limits": "WebP writing needs ImageMagick's WebP delegate library.",
+          "source": [
+            "https://imagemagick.org/convert/",
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "opus-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i interview.opus -c:a libmp3lame -b:a 192k interview.mp3.",
+          "limits": "The libmp3lame encoder needs a build configured with it.",
+          "source": [
+            "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame",
+            "https://ffmpeg.org/ffmpeg.html",
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Audacity with FFmpeg",
+          "steps": "Install the optional FFmpeg library and open the .opus file; choose File > Export Audio, pick MP3 in the Format menu, then choose the Bit Rate Mode.",
+          "limits": "Audacity does not read Opus natively; it tries FFmpeg when that library is installed.",
+          "source": [
+            "https://manual.audacityteam.org/man/faq_opening_and_saving_files.html",
+            "https://manual.audacityteam.org/man/mp3_export_options.html"
+          ]
+        }
+      ]
+    },
+    "avi-to-gif": {
+      "methods": [
+        {
+          "app": "Ezgif Video to GIF",
+          "steps": "Choose the AVI or enter a direct video URL and upload it; enter start and end times, pick a size and a frame rate, then make the GIF.",
+          "limits": "The video is uploaded; files up to 200 MB, 60 seconds at 5 frames a second and 30 seconds at 10; uploaded files are deleted after an hour.",
+          "source": "https://ezgif.com/video-to-gif"
+        }
+      ]
+    },
+    "bmp-to-png": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick diagram.bmp diagram.png.",
+          "limits": "ImageMagick writes BMP version 4 by default; BMP3 and BMP2 select older headers.",
+          "source": [
+            "https://imagemagick.org/convert/",
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "flac-to-wav": {
+      "methods": [
+        {
+          "app": "FLAC command-line tool",
+          "steps": "Run flac -d album-track.flac; decoding creates a WAV file by default.",
+          "limits": "The flac tool reads FLAC natively.",
+          "source": "https://xiph.org/flac/documentation_tools_flac.html"
+        },
+        {
+          "app": "Audacity",
+          "steps": "Open the FLAC; choose File > Export Audio; select WAV and the PCM encoding you need.",
+          "limits": "The Encoding menu defaults to Signed 16-bit PCM.",
+          "source": "https://manual.audacityteam.org/man/file_export_dialog.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i album-track.flac -c:a pcm_s24le album-track.wav for 24-bit PCM output.",
+          "limits": "Pick the PCM encoding that matches your source.",
+          "source": [
+            "https://ffmpeg.org/ffmpeg.html",
+            "https://ffmpeg.org/general.html"
+          ]
+        }
+      ]
+    },
+    "jfif-to-pdf": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick receipt.jfif receipt.pdf.",
+          "limits": "Writing PDF needs Ghostscript installed.",
+          "source": [
+            "https://imagemagick.org/convert/",
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "jpg-to-gif": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPG; choose File > Export As, name it portrait.gif and click Export.",
+          "limits": "The image is reduced to 256 colors or fewer; the dialog advises indexed mode first, and partial transparency cannot be kept.",
+          "source": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.0/en/file-gif-export.html"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick portrait.jpg portrait.gif.",
+          "limits": "A GIF palette holds up to 256 colors, which can change photograph colors.",
+          "source": [
+            "https://imagemagick.org/convert/",
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "xml-to-pdf": {
+      "methods": [
+        {
+          "app": "Apache FOP",
+          "steps": "Run fop -xml report.xml -xsl layout.xsl -pdf report.pdf.",
+          "limits": "Needs a stylesheet that produces valid XSL-FO; plain XML does not define a page layout.",
+          "source": "https://xmlgraphics.apache.org/fop/2.11/running.html"
+        }
+      ]
+    },
+    "aac-to-mp3": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i lecture.aac -codec:a libmp3lame -b:a 192k lecture.mp3.",
+          "limits": "The libmp3lame encoder needs a build configured with it.",
+          "source": [
+            "https://ffmpeg.org/ffmpeg-codecs.html#libmp3lame",
+            "https://ffmpeg.org/ffmpeg.html"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,913 @@
+{
+  "mpeg-to-mp4": {
+    "seo": {
+      "title": "Convert MPEG to MP4 Online (Free)",
+      "h1": "MPEG to MP4 Converter",
+      "description": "Convert MPEG video to MP4 in your browser: H.264 video and AAC sound, interlaced frames cleaned up, 1920 px and 30 fps at most. Free, no sign-up.",
+      "howToHeading": "How to convert MPEG to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn an MPEG video into an H.264 MP4 that nearly every device plays."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MPEG to MP4?",
+        "answer": "Pick the MPEG file above. The page re-encodes it in your browser with FFmpeg and hands you the MP4 to save. The MPEG itself is never changed."
+      },
+      {
+        "question": "Can I convert a large MPEG file to MP4?",
+        "answer": "There is no size limit and no timeout here. Everything runs on your own computer, so a long recording simply takes longer."
+      },
+      {
+        "question": "Does the MP4 keep the MPEG's resolution and frame rate?",
+        "answer": "A smaller picture is never scaled up and a slower rate is never raised. Only a picture past 1920 px on its longer side is shrunk, and only a rate past 30 fps loses frames, with the clip keeping its length."
+      },
+      {
+        "question": "Why do moving edges look striped in my MPEG?",
+        "answer": "Interlaced video builds every frame from two fields, and the stripes are the gap between them. The converter deinterlaces the frames the file flags as interlaced, which cleans the picture of the MP4 up."
+      },
+      {
+        "question": "Will the MP4 look worse than the MPEG?",
+        "answer": "It can on detailed footage. The H.264 encoder runs with its ultrafast preset and a fairly high CRF of 32, which favors speed over sharpness, and re-encoding can't bring back detail the MPEG had already lost."
+      },
+      {
+        "question": "What happens to the sound?",
+        "answer": "The MPEG's audio is converted to AAC running at 96 kbps and goes into the MP4 next to the video."
+      },
+      {
+        "question": "Is .mpeg the same as .mpg?",
+        "answer": "Both endings label the same kind of MPEG video file. This page's file picker lists .mpeg files; the [MPG to MP4 converter](/mpg-to-mp4/) runs the same conversion for files named .mpg."
+      },
+      {
+        "question": "Can I just rename the .mpeg to .mp4?",
+        "answer": "No. An MPEG file and an MP4 are different containers. Renaming changes only the label, not what is inside."
+      },
+      {
+        "question": "Why won't my MPEG play on my phone or in my browser?",
+        "answer": "Not every device plays MPEG video. An MP4 with H.264 video is handled by nearly every device and browser, which is why this conversion produces one."
+      },
+      {
+        "question": "Can I convert several MPEG files at once?",
+        "answer": "Yes. Select several and they run one after another, and each one downloads as its own MP4, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPEG and MP4",
+      "fromFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "lossy compression",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing MPEG to MP4",
+      "points": [
+        "The MPEG is re-encoded, not just rewrapped: H.264 video and AAC audio at 96 kbps.",
+        "Video larger than 1920 px on its longer side is scaled down, and above 30 fps frames are dropped.",
+        "Frames flagged as interlaced are deinterlaced.",
+        "Several files give several MP4s, one after another, with no ZIP.",
+        "The MPEG you chose is not changed."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MPEG for MP4 output",
+      "markdown": "### What is an MPEG file?\n\nAn MPEG file holds video and sound compressed to the standards of the Moving Picture Experts Group. A .mpeg file usually carries MPEG-1 or MPEG-2 video and audio in a program stream, the layout that Video CDs and DVD video used. MPEG-2 itself was developed for television delivery and later adopted for DVDs, and the extension was the standard way to label VCD and DVD video.\n\nInside, MPEG systems organize coded picture, sound and data as streams. An elementary stream is one coded component, such as the video, and packetized elementary streams cut those components into packets so they can be interleaved in one file. The .mpeg and .mpg endings are both used for these files, and the Library of Congress catalogs both under video/mpeg.\n\nYou come across .mpeg files as Video CD and DVD material, older video downloads and broadcast captures. They still play on a computer with the right player, but MPEG is a legacy format, while MP4 plays on nearly every device.\n\n### Programs that open MPEG files\n\n**Windows, Mac and Linux**\n\n- VLC handles MPEG elementary, program and transport streams, so most variants of the format open in it.\n- FFplay: plays MPEG through FFmpeg's decoders.\n\n**Windows**\n\n- Windows Media Player opens MPEG video.\n\n**Mac**\n\n- QuickTime Player opens MPEG video.\n\n**Mobile**\n\n- Phones: VLC for Android carries over the desktop player's decoding, program-stream support among it, and VLC for iOS has a player of its own for local files, so an MPEG needs no conversion first.\n\n### MPEG and MP4 compared\n\n- **Extensions and media types**: MPEG files end in .mpeg or .mpg and have the media type video/mpeg. An MP4 file is defined in ISO/IEC 14496-14, part 14 of the MPEG-4 standard.\n- **What is inside**: MPEG here means MPEG-1 or MPEG-2 video in a program stream. An MP4 wraps video in H.264, H.265 or AV1 and can carry subtitles and chapters as well, so one container serves several codecs.\n- **Generation loss**: the MPEG is already lossy, and the new MP4 is encoded from it, so it is a copy of a copy.\n- **Reach**: nearly every device and browser handles an MP4, which is the reason to convert.\n\nConverting here rebuilds the video rather than rewrapping it. The picture is encoded as H.264 with an encoder tuned for speed over file size, and 96 kbps AAC carries the sound. A frame whose longer edge passes 1920 px is scaled to fit, and past 30 fps frames are discarded, yet the clip is not shortened. When a side has an odd pixel count it gives up one pixel, which keeps both sides even. Frames the file flags as interlaced are deinterlaced first. The download is named after your MPEG with the .mp4 ending, and the MPEG itself stays untouched, because you save a new copy.\n\n### Other ways to convert MPEG to MP4\n\n- **FFmpeg (Windows, Mac, Linux):** the command `ffmpeg -i archive.mpeg -c:v libx264 -c:a aac archive.mp4`. FFmpeg's format list includes MPEG-1 System and MPEG program streams. The -i flag marks the input file, -c:v chooses the encoder for video, here libx264, and -c:a the one for audio, here aac. Left to its defaults for everything else, FFmpeg makes its own choices of streams and settings, which is why the output is not the same as this page's.\n\n### Problems with MPEG files\n\n- **The player shows picture but no sound, or the reverse**: the audio stream is coded apart from the picture, so a player without its decoder shows one without the other.\n- **Stripes on moving edges**: interlaced video alternates two fields per frame, and motion between them shows as stripes. Converting here deinterlaces frames flagged that way.\n- **A phone or site refuses the file**: MPEG is a legacy format that not every device plays. Convert it to MP4, which nearly every device handles.\n- **The picture is blocky or soft**: MPEG encoding is lossy and can't keep every detail of the original picture, and a new MP4 can't restore it.\n- **A program says the file is not a movie**: the player may not recognize the stream layout, because MPEG files come as program, transport or elementary streams. Try VLC to see what the file holds.\n"
+    }
+  },
+  "amr-to-mp3": {
+    "seo": {
+      "title": "Convert AMR to MP3 Online (Free)",
+      "h1": "AMR to MP3 Converter",
+      "description": "Turn AMR voice recordings into MP3 in your browser, in a file that plays on nearly every device. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert AMR to MP3"
+    },
+    "tool": {
+      "subtitle": "Turn an AMR voice recording into an MP3 that plays on nearly every device."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an AMR file to MP3?",
+        "answer": "Choose the AMR above and your browser decodes it with FFmpeg and writes the MP3. When it finishes, save the new file. Your AMR is not changed."
+      },
+      {
+        "question": "Does the converter upload my voice memo?",
+        "answer": "No. FFmpeg runs inside your browser, so the memo stays on your device and nothing is sent to a server."
+      },
+      {
+        "question": "Why is the MP3 so much bigger than the AMR?",
+        "answer": "AMR is built to be tiny, and an MP3 spends many more bits on the same speech. A narrowband AMR (8 kHz) comes out near 64 kbit/s, because MP3 at that sample rate cannot go higher. The extra size adds no detail the phone never recorded."
+      },
+      {
+        "question": "Will the MP3 sound better than the AMR?",
+        "answer": "No. AMR was designed for speech over phone networks and samples at 8 kHz. The MP3 is easier to play, but it can't bring back sound that the recording left out."
+      },
+      {
+        "question": "How do I open an AMR file on my computer?",
+        "answer": "VLC media player and QuickTime Player can open AMR, and so can Audacity when it has an AMR-capable FFmpeg library. Converting to MP3 here gives you a file that plays on nearly every device."
+      },
+      {
+        "question": "Why won't Audacity open my AMR file?",
+        "answer": "Audacity needs an FFmpeg library that can decode AMR, and the recommended FFmpeg installer leaves out narrowband AMR. Convert the file here and open the MP3 instead."
+      },
+      {
+        "question": "What is the difference between AMR and AMR-WB?",
+        "answer": "AMR-WB is a separate codec that samples at 16 kHz, while narrowband AMR samples at 8 kHz. The two files carry different signatures, which is why a rename cannot convert one into the other."
+      },
+      {
+        "question": "Can I convert a batch of AMR voice messages?",
+        "answer": "Yes, add all the messages at once. They are processed one by one, and every message comes back as a separate MP3 file."
+      },
+      {
+        "question": "Can I just rename my .amr file to .mp3?",
+        "answer": "No. Renaming changes only the label. The file still holds AMR speech, not MP3 data."
+      },
+      {
+        "question": "Does the converter reduce background noise?",
+        "answer": "No. It decodes the speech as recorded and writes it to MP3, with no noise reduction or level change. Use an audio editor such as Audacity first if you want the recording cleaned up."
+      }
+    ],
+    "aboutSection": {
+      "title": "AMR and MP3",
+      "fromFormat": {
+        "name": "AMR",
+        "fullName": "Adaptive Multi-Rate audio",
+        "description": "A speech audio codec standardized by 3GPP and widely used in mobile phone networks. It is optimized for voice and compresses to very small files.",
+        "details": [
+          "lossy speech compression",
+          "8 kHz sampling",
+          "bitrates from 4.75 to 12.2 kbit/s",
+          "3GPP standard"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing AMR to MP3",
+      "points": [
+        "The MP3 is written with LAME. The page asks for 192 kbit/s, but an 8 kHz AMR tops out near 64 kbit/s.",
+        "Only the audio is converted, and no noise reduction or level change is applied.",
+        "Several recordings give several MP3s, one after another, with no ZIP.",
+        "Your AMR is not changed, and the conversion runs on your device."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AMR for MP3 output",
+      "markdown": "### What is an AMR file?\n\nThe name AMR is short for Adaptive Multi-Rate. ETSI standardized it for GSM speech, and 3GPP then adopted it for third-generation cellular systems. That history explains what an .amr file usually is: a voice recording or voice message from a phone, saved at a very small size. It is built for voice, not music, which is why it turns up in voice recordings on phones, voice messages and mobile telephony.\n\nNarrowband AMR uses eight speech modes that span 4.75 to 12.2 kbps. It samples at 8 kHz and encodes speech in 20-millisecond frames. AMR-WB is a separate codec with a 16 kHz sampling rate, so the two should not be treated as one format.\n\nRFC 4867, published in April 2007, defines storage files as well as RTP transport. The registered media type for narrowband AMR is audio/AMR. Because AMR was built for speech, a recording that sounds like a phone call is working as designed.\n\n### Programs that open AMR files\n\n**Linux, Mac and Windows**\n\n- VLC opens AMR recordings.\n- FFmpeg: a command-line decoder for AMR.\n- Audacity: needs a compatible FFmpeg library with AMR decoding enabled, and the recommended installer omits narrowband AMR.\n\n**Mac**\n\n- QuickTime Player opens AMR recordings.\n\n### AMR and MP3 compared\n\n- **Extensions and media types**: .amr with audio/AMR; .mp3 with audio/mpeg.\n- **Purpose**: AMR is a lossy speech codec. MP3 is a general audio format used for music libraries, podcasts and portable players, standardized as ISO/IEC 11172-3 in 1993, and every major browser plays it.\n- **Compression**: both are lossy. AMR compresses speech only, while an MP3 may be encoded at a constant or at a variable bitrate.\n- **Bitrate**: narrowband AMR tops out at 12.2 kbps. MP3 runs from 32 to 320 kbps. This page asks LAME for 192 kbit/s, which sources below 32 kHz cannot reach, so an 8 kHz AMR gives about 64 kbit/s.\n- **Size**: at 12.2 kbps AMR uses about 1.5 KB of data per second of speech, and at 64 kbit/s the MP3 uses 8 KB, roughly five times as much.\n- **Origin**: Fraunhofer IIS began the work on MP3 in the late 1980s alongside other MPEG audio group members, and the format drops sound that, by a hearing model, a listener would not notice.\n- **Metadata**: an MP3 keeps its song titles and further tags in ID3 structures apart from the audio.\n- **Support**: the patent license program for MP3 closed on 23 April 2017.\n\nThe MP3 comes from decoding the AMR and encoding it again with LAME, so it is a second lossy generation of the speech. Only the audio is kept, and the page applies no noise reduction, level change or trimming. The sample rate is not changed. Recordings chosen together are converted in turn, and each gets its own MP3 named after its AMR. The MP3 therefore sounds like the AMR, only in a format that more apps will open. Your original AMR stays as it was, and the MP3 arrives as a new download.\n\n### Other ways to convert AMR to MP3\n\n- **FFmpeg (Windows, Mac, Linux):** type this in a terminal, in the folder that holds the recording: `ffmpeg -i memo.amr -c:a libmp3lame memo.mp3`. FFmpeg's format list includes 3GPP AMR, and its audio codec list says MP3 encoding goes through the external LAME library, which is switched on with --enable-libmp3lame when FFmpeg is built. In it, -i is the input file and -c:a selects the audio encoder. If you set no bitrate, FFmpeg uses a default of its own, so the result is not the file this page makes.\n\n### Problems with AMR files\n\n- **The MP3 still sounds like a phone call**: the recording only holds the narrow speech range that AMR stores, and a higher bitrate can't restore frequencies the recorder never kept. Frequencies that an AMR-WB source would carry are missing from narrowband AMR, because the two codecs use different sampling rates.\n- **Audacity refuses the file**: Audacity may reject narrowband AMR even after an FFmpeg library is installed, because the recommended FFmpeg installer excludes that codec.\n- **AMR and AMR-WB share an extension**: AMR and AMR-WB storage signatures differ. Changing the extension doesn't change the speech codec.\n- **The file opens nowhere**: a player needs a decoder for the codec. Try VLC to see whether it plays.\n"
+    }
+  },
+  "mpg-to-mp4": {
+    "seo": {
+      "title": "Convert MPG to MP4 Online (Free)",
+      "h1": "MPG to MP4 Converter",
+      "description": "Convert MPG video to MP4 in your browser: H.264 video and AAC sound, up to 1920 px and 30 fps. Free, no sign-up, and no upload.",
+      "howToHeading": "How to convert MPG to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn an MPG video into an MP4 that plays on nearly every device."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MPG file to MP4?",
+        "answer": "Choose the .mpg above, let FFmpeg re-encode it right in the browser, and save the MP4. Pick several files and they run one after another."
+      },
+      {
+        "question": "Is an MPG the same as an MPEG file?",
+        "answer": "Yes. .mpg and .mpeg are two endings for MPEG-1 or MPEG-2 video files, and the MP4 you get is the same either way. This page's picker lists .mpg files; the [MPEG to MP4 converter](/mpeg-to-mp4/) takes the longer ending."
+      },
+      {
+        "question": "Why is my MPG video blocky when I convert it?",
+        "answer": "MPG video is compressed with a lossy codec, and the MP4 is encoded again with settings that favor speed. The MP4 can't be sharper than the MPG, and a low-bitrate source shows its blocks in the copy."
+      },
+      {
+        "question": "Can I choose the quality or bitrate of the MP4?",
+        "answer": "No. The page passes no quality setting. Every MPG is encoded with the same fixed H.264 settings (preset ultrafast, CRF 32) and 96 kbps AAC audio."
+      },
+      {
+        "question": "Does the MP4 keep my video's size?",
+        "answer": "The frame size stays unless the longer side passes 1920 px, in which case the picture is scaled down. Each side is also rounded down to an even number, so a height of 721 px becomes 720."
+      },
+      {
+        "question": "What happens to the sound in my MPG?",
+        "answer": "The sound is encoded again as AAC at 96 kbps and never copied across, so the MP4 holds AAC whatever the MPG used."
+      },
+      {
+        "question": "Can I convert a DVD or camcorder recording in MPG format?",
+        "answer": "Yes, if it is a plain .mpg file you can choose here. DVD movies stored as VOB files go through the [VOB to MP4 converter](/vob-to-mp4/) instead."
+      },
+      {
+        "question": "Why does the converted video have lines on moving edges?",
+        "answer": "Lines usually mean the source is interlaced. The conversion deinterlaces frames flagged as interlaced, so a correctly flagged file comes out clean."
+      },
+      {
+        "question": "Is there a limit on how long my MPG can be?",
+        "answer": "No. The page has no length or size limit of its own and no timeout. A long home video simply takes more time on a slower computer."
+      },
+      {
+        "question": "Why do I need MP4 instead of MPG for uploads?",
+        "answer": "MPG is a legacy MPEG-1 and MPEG-2 format, so MP4 is the safer file to hand to a site or app."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPG and MP4",
+      "fromFormat": {
+        "name": "MPG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "lossy compression",
+          "legacy format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing MPG to MP4",
+      "points": [
+        "The video is re-encoded as H.264 with 96 kbps AAC audio.",
+        "Pictures wider or taller than 1920 px are scaled down; above 30 fps frames are dropped and the clip keeps its length.",
+        "An odd width or height is rounded down by 1 px.",
+        "Interlaced frames are deinterlaced.",
+        "A choice of several files gives one MP4 for each, converted one after another."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MPG for MP4 output",
+      "markdown": "### What is an MPG file?\n\nShort for MPEG video, the MPG ending marks the format of Video CDs and DVDs. The file holds MPEG-1 or MPEG-2 video with sound in a program stream. MPEG-2 was developed for television delivery and then adopted for DVDs. Both .mpg and .mpeg name the same kind of file, and the Library of Congress gives them one shared media type, video/mpeg.\n\nInside, the picture, the sound and any data are coded apart from each other. A coded component is called an elementary stream, and its packetized form cuts it into packets that a single file can interleave.\n\nYou meet an MPG as Video CD or DVD material, as an older video download or as a broadcast capture. Such a file can be a system stream, with picture and sound woven together, or a raw video stream, and that structure decides which tools can read it.\n\nIf a video site, phone or editor rejects the file, the cause is usually the format rather than the footage. MPG is a legacy format. Converting gives you one file that plays almost anywhere, at the cost of one more lossy generation.\n\n### Programs that open MPG files\n\n**Linux, Mac and Windows**\n\n- VLC reads elementary, program and transport streams of MPEG.\n- FFplay: plays MPG through FFmpeg's decoders.\n\n**Windows**\n\n- Windows Media Player plays MPEG video.\n\n**Mac**\n\n- QuickTime Player can open MPEG video.\n\n**Mobile**\n\n- iPhone and Android: VLC for iOS plays local files in its own player, and VLC for Android is a port of the desktop player, so nothing needs converting just to watch.\n\n### MPG and MP4 compared\n\n- **Extensions and media types**: .mpg or .mpeg with video/mpeg for the MPG. The MP4 container is defined in ISO/IEC 14496-14.\n- **Contents**: an MPG is an MPEG program stream with MPEG-1 or MPEG-2 video. An MP4 is a container whose video may be H.264, H.265 or AV1, and it can carry subtitles and chapters.\n- **Support**: nearly every device and browser opens an MP4, while an MPG needs a player such as the ones above.\n- **Quality**: lossy to lossy, which makes the MP4 a second-generation picture.\n\nOn this page an MPG is decoded and re-encoded: H.264 for the picture, AAC at 96 kbps for the sound, and an encoder setting that favors speed over file size. Interlaced frames are cleaned up by deinterlacing. Frames over 1920 px on the longer side shrink to fit. Above 30 fps, frames are dropped and the clip keeps its length. If a side is odd it loses a pixel, so width and height end up even. Small pictures are never enlarged. No quality setting is passed, so every MPG gets the same encoder settings, and several files run one after another with one MP4 each. The MPG you picked stays as it was, and the download keeps its name with an .mp4 ending.\n\n### Other ways to convert MPG to MP4\n\n- **FFmpeg (Windows, Mac, Linux):** try `ffmpeg -i family.mpg -c:v libx264 -c:a aac family.mp4`. FFmpeg lists MPEG-1 System and MPEG program streams among the formats it reads, and this command writes H.264 video and AAC audio. Here -i gives the input file, -c:v the video encoder and -c:a the audio encoder. Without extra options FFmpeg picks the streams itself, so the result is not the same as this page makes.\n\n### Problems with MPG files\n\n- **No sound in a player**: the audio stream needs its own decoder and can use a different codec from the picture. Try VLC, or convert to MP4.\n- **A site rejects the upload**: the site does not accept this old format. Convert the MPG to MP4 here and upload that.\n- **Combing on moving edges**: this is interlacing, where one frame is made of two fields woven together. This page deinterlaces frames flagged that way.\n- **A blocky or smeared picture**: lossy MPEG encoding discards detail that no converter can bring back.\n- **A renamed file won't open**: changing .mpg to .mp4 leaves MPEG data inside, because only the label changes.\n- **A program says it is not a movie**: the file may hold only a raw video stream, not the system stream a player expects. Open it in VLC to see what it holds.\n"
+    }
+  },
+  "vob-to-mp4": {
+    "seo": {
+      "title": "Convert VOB to MP4 Online (Free)",
+      "h1": "VOB to MP4 Converter",
+      "description": "Convert a DVD VOB file to MP4 in your browser: H.264 video and AAC sound, interlaced frames deinterlaced. Each VOB gives its own MP4. Free, no sign-up.",
+      "howToHeading": "How to convert VOB to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn a DVD video file into an MP4 you can play without a disc drive."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a VOB file to MP4?",
+        "answer": "Open the VIDEO_TS folder on your drive, choose a .vob file above and let your browser re-encode it with FFmpeg. Then save the MP4. The VOB is not changed."
+      },
+      {
+        "question": "Can I join all the VOB files of a DVD into one MP4?",
+        "answer": "No. Each VOB you choose becomes its own MP4, one after another. A movie longer than a VOB's 1 GB is spread over several, so you get several MP4s to play in order."
+      },
+      {
+        "question": "Which VOB files should I convert from the VIDEO_TS folder?",
+        "answer": "A disc can hold several titles, and menu content is stored in VOB streams too. Play the files in VLC to see which hold the movie, then convert those. Choosing the wrong title gives the wrong clip."
+      },
+      {
+        "question": "Do I need the IFO and BUP files?",
+        "answer": "No. The page converts the VOB you choose and nothing beside it. The IFO and BUP files that sit with it in VIDEO_TS are used for DVD authoring, not for this conversion."
+      },
+      {
+        "question": "What happens to the DVD menus?",
+        "answer": "The MP4 is a single video file with no menus or disc navigation, because a VOB holds only a piece of the disc's streams, not its structure. To pick a title or scene, choose the VOB that holds it before you convert."
+      },
+      {
+        "question": "Why does my VOB look striped when it plays?",
+        "answer": "A DVD VOB is often interlaced, with every frame made of two fields. Frames flagged that way are deinterlaced during conversion, so motion in the MP4 should play without comb lines."
+      },
+      {
+        "question": "How large will the MP4 be?",
+        "answer": "The size depends on the clip. The video is re-encoded with H.264 at a high CRF of 32, a setting that favors speed over fine detail. Compare the two on your own file."
+      },
+      {
+        "question": "What video size does the MP4 have?",
+        "answer": "Frames larger than 1920 px on the longer side are scaled to fit, and a side with an odd number of pixels drops one to become even. Video above 30 fps loses frames but keeps its length."
+      },
+      {
+        "question": "Why won't my VOB play on its own?",
+        "answer": "On its own a VOB lacks the IFO and BUP files that go with it. A player such as VLC can still read the file, but there are no menus."
+      },
+      {
+        "question": "Is there a size limit for VOB files?",
+        "answer": "This page has no size cap and no time cap. A large VOB takes longer on a slower computer."
+      }
+    ],
+    "aboutSection": {
+      "title": "VOB and MP4",
+      "fromFormat": {
+        "name": "VOB",
+        "fullName": "DVD Video Object",
+        "description": "The container used for video, audio, subtitles and menus on DVD-Video discs. It is based on the MPEG-2 program stream.",
+        "details": [
+          "MPEG-2 program stream",
+          "multiple audio and subtitle streams",
+          "may be encrypted with CSS",
+          "files up to 1 GB"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio, subtitles and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "subtitles and chapters",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing VOB to MP4",
+      "points": [
+        "Each VOB becomes its own MP4. Files are not joined.",
+        "The video is re-encoded as H.264 with 96 kbps AAC audio.",
+        "Frames flagged as interlaced are deinterlaced.",
+        "The MP4 has no menus or disc navigation.",
+        "The page converts the VOB you choose, not the whole disc."
+      ]
+    },
+    "guide": {
+      "title": "Understanding VOB for MP4 output",
+      "markdown": "### What is a VOB file?\n\nVOB stands for DVD Video Object. DVD producers store the video, sound, subtitles and menu content of a disc in VOB streams, and the data is closely related to MPEG-2 program-stream material. A VOB can carry several audio and subtitle streams, and it may be encrypted with CSS.\n\nA DVD backup commonly puts the VOB files inside a folder named VIDEO_TS, next to IFO and BUP files that DVD authoring also needs. You meet VOB files on DVD-Video discs and when you rip a disc to files. A single VOB holds up to 1 GB, so a movie longer than that is spread over several, and a disc can hold several titles.\n\nBecause a VOB is MPEG-2 material built for a disc, it is awkward outside a player that understands DVDs. Converting the VOBs you want to keep to MP4 gives you ordinary video files that play on nearly every device.\n\n### Programs that open VOB files\n\n**Windows, Mac and Linux**\n\n- VLC reads DVD Video media and MPEG program streams.\n- HandBrake: opens VOB files and whole VIDEO_TS disc folders, as long as the source is unprotected. Its Title control picks which clip of a multi-clip source, such as a DVD, to use, and it does not defeat copy protection of any kind.\n\n**Windows**\n\n- MPC-HC opens VOB files.\n- Windows Media Player opens a VOB when the right codecs are installed.\n\n### VOB and MP4 compared\n\n- **Extensions**: a VOB ends in .vob and sits in a VIDEO_TS folder. An MP4 ends in .mp4 and follows ISO/IEC 14496-14.\n- **Format family**: a VOB is built on the MPEG-2 program stream, which FFmpeg's format list names as MPEG-PS, also known as VOB.\n- **Streams**: a VOB can hold multiple audio and subtitle streams, and the MP4 container is built for several codecs plus subtitles and chapters.\n- **Structure**: a VOB belongs to a set. The IFO and BUP files beside it support DVD authoring. An MP4 is one self-contained file.\n- **Subtitles**: DVD subtitle streams can contain bitmap images rather than searchable text.\n- **Support**: nearly every device and web browser accepts an MP4, whereas a VOB needs a DVD-aware or MPEG-capable player.\n- **Quality**: the MP4 is built from the decoded VOB, so the picture goes through lossy compression a second time.\n\nThe VOB is decoded and re-encoded here, with H.264 for the picture and 96 kbps AAC for the sound, and the encoder favors speed over fine detail. Frames flagged as interlaced are deinterlaced, so motion does not comb. A frame up to 1920 px on the longer side keeps its size, apart from rounding each side down to an even number, and a larger frame is scaled down. Video above 30 fps has frames dropped. Several VOBs chosen together are converted one after another, each into its own MP4 named after its VOB. The VOB you choose is left untouched.\n\n### Other ways to convert VOB to MP4\n\n- **FFmpeg (Windows, Mac, Linux):** use `ffmpeg -i clip.vob -c:v libx264 -c:a aac dvd-viewing.mp4`. FFmpeg's format list calls the MPEG program stream the format also known as VOB. The -i flag is the source file, and -c:v and -c:a pick the video and audio encoders, libx264 and aac. If you add nothing else, FFmpeg picks the streams on its own, so the output is not what this page makes.\n\n### Problems with VOB files\n\n- **Only part of the movie plays**: a VOB tops out at 1 GB, so a longer movie runs across several. Convert each one you want and play the MP4s in order.\n- **Wrong clip**: a disc source may contain several titles, and choosing the wrong one produces the wrong clip. Check which VOBs belong to the title you want.\n- **Copy-protected disc**: HandBrake does not process copy-protected DVD sources, and the format reference notes a VOB may be encrypted with CSS.\n- **Menus do not play**: a loose VOB does not replace the full DVD structure, and an MP4 has no disc menus at all.\n- **Subtitles missing in a player**: DVD subtitles can be bitmap images, and a player that handles MPEG-2 video may still ignore them.\n- **Combing on moving edges**: DVD video is commonly interlaced. Converting here deinterlaces frames flagged that way.\n"
+    }
+  },
+  "aiff-to-mp3": {
+    "seo": {
+      "title": "Convert AIFF to MP3 Online (Free)",
+      "h1": "AIFF to MP3 Converter",
+      "description": "Convert AIFF audio to MP3 in your browser: LAME encoding, asked for 192 kbit/s. Free, no sign-up, and your original AIFF stays untouched.",
+      "howToHeading": "How to convert AIFF to MP3"
+    },
+    "tool": {
+      "subtitle": "Turn an AIFF recording into an MP3 that plays on nearly every device."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an AIFF file to MP3?",
+        "answer": "Pick the AIFF file on this page and your browser encodes it with FFmpeg. Save the MP3 when it finishes; the AIFF stays as it was."
+      },
+      {
+        "question": "Does converting AIFF to MP3 lose quality?",
+        "answer": "Yes. An AIFF usually holds uncompressed PCM, while MP3 is lossy and discards sound listeners are unlikely to notice. You can't return to the original from the MP3."
+      },
+      {
+        "question": "What bitrate does the MP3 use?",
+        "answer": "The page asks LAME for 192 kbit/s and has no bitrate setting. That rate is reachable from 32 kHz upward, so a CD-rate AIFF gets it. A source below 32 kHz gets less: LAME writes at most 160 kbit/s for 16 to 24 kHz and 64 kbit/s for 8 to 12 kHz."
+      },
+      {
+        "question": "Why is my AIFF file so big?",
+        "answer": "AIFF usually stores uncompressed linear PCM, which needs far more space than a compressed copy."
+      },
+      {
+        "question": "What is the difference between .aif and .aiff?",
+        "answer": "Both endings are used for the same format, Apple's Audio Interchange File Format. This page's file picker lists .aiff files."
+      },
+      {
+        "question": "Can I convert AIFF to MP3 on a Mac or in Windows?",
+        "answer": "Yes. The conversion runs in your browser, so you need no audio software on either system."
+      },
+      {
+        "question": "Should I keep the AIFF after I make the MP3?",
+        "answer": "Yes, if you may edit or re-export the audio later. Editing an MP3 and saving it again adds a second lossy encoding stage, while the AIFF is lossless."
+      },
+      {
+        "question": "I have a folder of AIFF takes. Can I convert them all?",
+        "answer": "Select all the takes together and they are encoded one after another. Each finished MP3 downloads on its own, and no ZIP is made."
+      },
+      {
+        "question": "Which programs open an AIFF file?",
+        "answer": "Audacity opens most AIFF files, including every PCM variant. Adobe Audition, VLC media player and Apple Music also open AIFF, and so does Logic Pro."
+      },
+      {
+        "question": "Does my unreleased audio leave my computer?",
+        "answer": "No. The encoding happens in your browser through FFmpeg compiled to WebAssembly, so an unreleased mix is never sent to a server."
+      }
+    ],
+    "aboutSection": {
+      "title": "AIFF and MP3",
+      "fromFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "An audio file format developed by Apple in 1988 and based on the IFF container. It usually stores uncompressed PCM audio.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "metadata chunks",
+          "large files"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing AIFF to MP3",
+      "points": [
+        "The MP3 is written with LAME at 192 kbit/s for a source at 32 kHz or more.",
+        "Only the audio is converted, and there is no bitrate option.",
+        "Several files give several MP3s, one after another, with no ZIP.",
+        "Your AIFF is not changed, so it stays available as the master."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AIFF for MP3 output",
+      "markdown": "### What is an AIFF file?\n\nAIFF stands for Audio Interchange File Format. Apple developed it, and it is an audio wrapper derived from Electronic Arts' IFF family. Apple's AIFF 1.3 specification is dated January 4, 1989.\n\nAn AIFF often carries uncompressed linear PCM samples, which is why professional audio users have long used it for masters and intermediate recordings. The AIFF-C extension covers compressed audio, so not every AIFF-family file is plain PCM. The format can also hold named chunks for author, copyright and annotations. Common media-type labels are audio/aiff and audio/x-aiff. It is used for audio production on macOS and professional sound editing.\n\nYou meet AIFF files in recording sessions, sample libraries and projects exported from Mac audio software. They are lossless but large, so an MP3 is the lighter copy for sharing, uploading or playing on a device that doesn't read AIFF.\n\n### Programs that open AIFF files\n\n**Linux, Mac and Windows**\n\n- Audacity: imports most AIFF files, including all PCM variants, without its optional FFmpeg library.\n- VLC media player plays AIFF.\n- FFmpeg: lists AIFF encoding and decoding support.\n\n**Mac and Windows**\n\n- Adobe Audition: handles uncompressed AIFF as well as most common compressed variants.\n\n**Mac**\n\n- Logic Pro and Apple Music open AIFF.\n\n### AIFF and MP3 compared\n\n- **Extensions and media types**: .aiff or .aif with audio/aiff; .mp3 with audio/mpeg.\n- **Compression**: AIFF is usually uncompressed PCM and lossless. MP3 is lossy: its encoder models human hearing and drops sound that most listeners would not miss.\n- **Size**: uncompressed PCM needs more storage than a compressed copy of the same recording. A 128 kbps MP3 needs roughly an eleventh of the space the matching CD audio does, so 192 kbps lands near one seventh for a CD-rate source.\n- **Metadata**: an AIFF stores author, copyright and annotations in named chunks, while an MP3 puts song titles and other tags into ID3 structures kept apart from the audio.\n- **Editing**: each time you edit an MP3 and export it again, you add another lossy encoding stage. The AIFF has no such stage.\n- **Support**: every major browser plays MP3. MP3 became ISO/IEC 11172-3 in 1993, and the license program for its patents closed on 23 April 2017.\n\nThis page asks LAME for 192 kbps, which a source at 32 kHz or more gets, and keeps only the audio. You can't pick a bitrate here, so if a delivery spec asks for a different one, use a desktop tool from the next section. The AIFF you chose is never changed, and you download a new file named after it with the .mp3 ending. Files chosen together are encoded in sequence, and each produces its own MP3.\n\n### Other ways to convert AIFF to MP3\n\nEach of these re-encodes the audio as a new MP3, as this page does.\n\n- **Audacity (Windows, Mac, Linux):** begin with File > Import > Audio and pick the AIFF, then File > Export Audio, select MP3 in the format list, set the channels and sample rate, choose the entire project or the current selection, and press Export. The MP3 encoding settings sit on a separate MP3 Export Options page.\n- **SoX (command line):** run `sox session.aiff -C 192 session.mp3`. A positive integer after -C is taken as the bitrate in kbps. SoX can only write MP3 if it was built with the LAME library.\n- **FFmpeg (command line):** run `ffmpeg -i session.aiff -c:a libmp3lame session.mp3`. FFmpeg's format list includes AIFF, and its MP3 encoder comes from the external LAME library. FFmpeg falls back on a default bitrate of its own when none is given, so add `-b:a 192k` for the bitrate this page uses.\n\n### Problems with AIFF files\n\n- **An editor rejects the file**: it may be AIFF-C, which extends the family to compressed audio. The family name alone doesn't promise support, because a decoder for the actual compression is needed.\n- **The file is huge**: that is normal for uncompressed PCM, which takes plenty of room on a drive or a phone. Make an MP3 for sharing and keep the AIFF as the master.\n- **Credits look different in another program**: the author field can show in Audition under Dublin Core: Creator instead of a field called Author.\n- **Renaming did nothing**: changing .aif to .mp3 leaves the PCM data inside, because only the label changes. Converting is the only way to make a real MP3.\n"
+    }
+  },
+  "mp3-to-m4r": {
+    "seo": {
+      "title": "Convert MP3 to M4R Online (Free)",
+      "h1": "MP3 to M4R Converter",
+      "description": "Turn an MP3 into an M4R iPhone ringtone file in your browser, encoded as AAC at 192 kbps. Free, no sign-up, and the song is not uploaded.",
+      "howToHeading": "How to convert MP3 to M4R"
+    },
+    "tool": {
+      "subtitle": "Turn an MP3 into an M4R file, the iPhone ringtone format."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an MP3 to an M4R ringtone?",
+        "answer": "Choose the MP3 above and your browser encodes it with FFmpeg. When it finishes, save the M4R. The file holds AAC audio."
+      },
+      {
+        "question": "Does this page cut my song down to ringtone length?",
+        "answer": "No. The whole MP3 is converted and nothing is trimmed. Cut the part you want in an audio editor first; Audacity can export only the current selection."
+      },
+      {
+        "question": "Will the M4R work as an iPhone ringtone?",
+        "answer": "Yes, .m4r is the iPhone ringtone extension. This page only makes the file; it doesn't send it to a phone."
+      },
+      {
+        "question": "Can I just rename the MP3 to .m4r?",
+        "answer": "No. The MP3 data would still be inside, and an M4R holds AAC audio. This page decodes the MP3 and encodes AAC, so the .m4r holds real AAC audio."
+      },
+      {
+        "question": "What quality is the M4R?",
+        "answer": "It is AAC at 192 kbps. Your MP3 was already lossy, so the new file can't be better than the MP3."
+      },
+      {
+        "question": "Does the M4R keep my MP3's title and artist?",
+        "answer": "Yes, those tags are copied across. The page does not set them itself: no stream or metadata options are passed to FFmpeg, whose defaults carry a file's global tags into an output that can hold them."
+      },
+      {
+        "question": "How do I make a ringtone from just part of a song?",
+        "answer": "Trim the MP3 in Audacity, export the current selection, then convert the short file here. Nothing is trimmed for you, so the length you give it is the length you get."
+      },
+      {
+        "question": "What is an M4R file?",
+        "answer": "It is the iPhone ringtone extension: an MPEG-4 audio file with AAC audio, renamed so iTunes and the iPhone treat it as a ringtone."
+      },
+      {
+        "question": "Can I make ringtones from a whole playlist at once?",
+        "answer": "Select the MP3s together and each becomes its own M4R, one after another. Trim each song first, because the page converts every file in full."
+      },
+      {
+        "question": "Does the song get uploaded anywhere?",
+        "answer": "No. The encoding happens in your browser tab, so the song never leaves your device, and the MP3 itself is not modified."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP3 and M4R",
+      "fromFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "lossy compression",
+          "constant or variable bitrate",
+          "ID3 tags for metadata",
+          "plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "M4R",
+        "fullName": "iPhone ringtone",
+        "description": "The file extension for iPhone ringtones. It is an MPEG-4 audio file with AAC audio, renamed so iTunes and the iPhone treat it as a ringtone.",
+        "details": [
+          "MPEG-4 container",
+          "AAC audio",
+          "used by Apple devices"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing MP3 to M4R",
+      "points": [
+        "The M4R holds AAC audio at 192 kbps in an MPEG-4 container, not a renamed MP3.",
+        "The whole MP3 is converted. Nothing is trimmed, faded or selected for you.",
+        "The page only makes the file. It does not send it to a phone.",
+        "Several MP3s give several M4Rs, one after another, with no ZIP."
+      ]
+    },
+    "guide": {
+      "title": "Understanding MP3 for M4R output",
+      "markdown": "### What is an MP3 file?\n\nThe MP3 name comes from MPEG-1 Audio Layer III. ISO/IEC 11172-3 standardized it in 1993; the 1995 extension is ISO/IEC 13818-3. Fraunhofer IIS began the work in the late 1980s with other MPEG audio group members. Being lossy, it discards sound that a listener is unlikely to miss.\n\nAn MP3 runs from 32 up to 320 kbps, sampled at 32, 44.1 or 48 kHz. ID3 structures inside the file hold the title and other tags apart from the audio. Its media type is audio/mpeg, and all the major browsers play it. The program that licensed MP3 patents ended on 23 April 2017.\n\nMP3 files turn up in podcasts, downloaded music and on portable players. The MP3 you start from is usually a whole song, while a ringtone is a short passage of it, so most of the work in making a ringtone is choosing the part you want to hear when the phone rings.\n\n### Programs that open MP3 files\n\n**Linux, Mac and Windows**\n\n- Audacity: opens an MP3 as an editable project, which is where you can trim a song.\n- ffplay: plays MP3 through FFmpeg's decoders.\n- VLC plays MP3 files.\n\n**Windows**\n\n- Windows Media Player plays MP3 files.\n\n**Web**\n\n- Firefox plays supported media directly.\n- Chrome handles supported web audio.\n\n**Mobile**\n\n- Android: VLC for Android is a free player for phones, and mpv for Android is the mpv project's port.\n\n### MP3 and M4R compared\n\n- **Extensions and media types**: .mp3 with audio/mpeg; .m4r for iPhone ringtones.\n- **What is inside**: an M4R holds AAC-encoded sound in an MPEG-4 file. MPEG-4 separates the container structure from the encoding its tracks carry.\n- **Compression**: both are lossy, so the M4R is a second generation of the sound. MP3 leaves out the sound a hearing model predicts listeners would not notice.\n- **Bitrate**: an MP3 at 128 kbit/s takes about one eleventh of the room the same audio uses on a CD. The M4R from this page is AAC at 192 kbps, whatever bitrate the MP3 had.\n- **Purpose**: the .m4r ending is what iTunes and the iPhone treat as a ringtone, and the format is used for iPhone ringtones and alert tones.\n- **Metadata**: MPEG-4-family files can carry track metadata in addition to the samples. MP3 keeps its tags in ID3 structures.\n\nOn this page the MP3 is decoded and encoded again as AAC at 192 kbps and written into an MPEG-4 audio container, with the video, if any, left out. The whole song is converted, and no trimming is done. A full track therefore gives a full-length file. The title and artist tags of the MP3 are copied into the M4R. The download takes its name from your MP3 and ends in .m4r, and the original is left as it was.\n\n### Other ways to convert MP3 to M4R\n\n- **Audacity (Windows, Mac, Linux):** import the MP3 with File > Import > Audio, then choose File > Export Audio. Install the optional FFmpeg library, then pick the M4A (AAC) (FFmpeg) choice from the format list, type a file name that ends in .m4r, such as rhythms.m4r, and press Export. The export dialog also sets the channels and sample rate and lets you export the entire project or only the current selection, so you can cut the song down first.\n- **FFmpeg (command line):** run `ffmpeg -i cue.mp3 -c:a aac -f ipod cue.m4r`. FFmpeg's format list includes MP3, and its ipod muxer writes an MPEG-4 audio file like MOV or MP4 but limited to audio streams. The command does not trim the audio or put it on a phone, and when no bitrate is given FFmpeg falls back on its own default.\n\n### Problems with MP3 files\n\n- **Audacity reports an import error**: A damaged MP3 can stop Audacity from opening it, yet still play in another player. Try the file in VLC, or get a fresh copy.\n- **Tags change after several imports**: bringing several files into one Audacity project can overwrite the earlier metadata with that of the latest file.\n- **Quality drops after editing**: every MP3 you export after editing adds a second lossy encoding pass. Keep the original MP3 so you can pick another passage later.\n- **A renamed file won't work**: changing .mp3 to .m4r leaves MP3 data inside, because only the label changes.\n"
+    }
+  },
+  "nef-to-jpg": {
+    "seo": {
+      "title": "Convert NEF to JPG Online (Free)",
+      "h1": "NEF to JPG Converter",
+      "description": "Turn Nikon NEF raw photos into JPG in your browser with ImageMagick and LibRaw. Free, no sign-up, nothing is uploaded, and your NEF stays untouched.",
+      "howToHeading": "How to convert NEF to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a Nikon NEF raw photo into a JPG you can share."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a NEF file to JPG?",
+        "answer": "Choose the NEF above and your browser develops it into a JPG with ImageMagick. Save the result when it finishes. The NEF itself is not changed."
+      },
+      {
+        "question": "Can I open a NEF without Nikon software?",
+        "answer": "Yes. darktable, Adobe Lightroom and Adobe Photoshop open NEF, and so does Nikon's NX Studio. Converting here gives you a JPG, which is supported everywhere."
+      },
+      {
+        "question": "Does the JPG keep the NEF's raw editing flexibility?",
+        "answer": "No. A JPG holds a rendered picture, not the adjustable sensor data. Keep the NEF if you may want to develop the photo differently later."
+      },
+      {
+        "question": "Why does the JPG look different from what another program showed?",
+        "answer": "Settings such as white balance are processing instructions that the software applies. Another program may render the same NEF in its own way, so the JPG can differ from what another program displayed."
+      },
+      {
+        "question": "Does the JPG have as much tonal range as the NEF?",
+        "answer": "No. A NEF records 12-bit or 14-bit data depending on the camera, while a JPG stores 8 bits per color channel. That loss is part of making a JPG."
+      },
+      {
+        "question": "Why does my NEF say it can't be decoded here?",
+        "answer": "High Efficiency RAW from Nikon is one compression this converter can't decode, and a damaged file can give it too. Nikon's NX Studio is a Nikon program that exports NEF files."
+      },
+      {
+        "question": "Is there a size limit for NEF files?",
+        "answer": "Beyond about 537 megapixels the page stops with a too-large message. It sets no other size limit."
+      },
+      {
+        "question": "Can I batch-convert a whole Nikon shoot?",
+        "answer": "Select all the NEF files together and they convert one after another. Every JPG downloads separately, with no ZIP."
+      },
+      {
+        "question": "Is my photo uploaded when I convert it?",
+        "answer": "No. ImageMagick runs inside your browser, so the NEF stays on your device."
+      },
+      {
+        "question": "Can I turn the JPG back into a NEF?",
+        "answer": "No. A JPG holds no sensor data, so nothing can turn it back into a NEF. Keep the original NEF and make new JPGs from it."
+      }
+    ],
+    "aboutSection": {
+      "title": "NEF and JPG",
+      "fromFormat": {
+        "name": "NEF",
+        "fullName": "Nikon Electronic Format",
+        "description": "The raw image format of Nikon digital cameras. It stores unprocessed sensor data in a TIFF-based file, with an embedded JPEG preview.",
+        "details": [
+          "unprocessed sensor data",
+          "TIFF-based structure",
+          "embedded JPEG preview",
+          "proprietary Nikon format"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "lossy compression",
+          "adjustable quality",
+          "no alpha transparency",
+          "supported everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing NEF to JPG",
+      "points": [
+        "ImageMagick develops the NEF in your browser through LibRaw and writes one JPG per file.",
+        "Nikon's High Efficiency RAW can't be decoded here, and the page says so.",
+        "A JPG holds 8 bits per channel, while a NEF records 12 or 14 bits.",
+        "Pictures over about 537 megapixels fail. Your NEF is never changed."
+      ]
+    },
+    "guide": {
+      "title": "Understanding NEF for JPG output",
+      "markdown": "### What is a NEF file?\n\nNEF means Nikon Electronic Format. It stores raw photographs from Nikon cameras and retains the captured sensor information together with camera and lens metadata. A NEF is not simply a large JPG: white balance, hue, tone and sharpening choices can be kept as processing instructions that software applies later.\n\nNikon describes NEF storage in uncompressed and losslessly compressed forms. Depending on the camera, NEF data has 12-bit or 14-bit precision. The format is a TIFF-based file with an embedded JPEG preview, and it is proprietary to Nikon.\n\nNEF files come from professional and enthusiast photography, and they are the starting point for editing photos before conversion to JPEG. Nikon's own processing software can render a NEF as a JPEG or TIFF while retaining the raw original. That is the idea behind the conversion here: the NEF stays as your negative, and the JPG is the print you hand out.\n\n### Programs that open NEF files\n\n**Mac and Windows**\n\n- NX Studio: Nikon's own program for viewing raw photographs and developing them.\n- Adobe Lightroom and Adobe Photoshop both open NEF.\n\n**Linux, Mac and Windows**\n\n- ImageMagick: a command-line tool that reads this camera raw format.\n- darktable opens NEF.\n\n**Linux**\n\n- XnView MP: a viewer with NEF listed in its supported formats, free for private and educational use.\n\n### NEF and JPG compared\n\n- **Extensions and media types**: a NEF is a proprietary Nikon format. A JPG ends in .jpg or .jpeg, which name the same format, and its media type is image/jpeg.\n- **What is stored**: a NEF holds unprocessed sensor data. A JPG holds a rendered picture, so an export does not replace the adjustable sensor data in the original.\n- **Precision**: NEF data is 12-bit or 14-bit. JPEG stores 8 bits per color channel, so an export keeps less tonal information.\n- **Compression**: a baseline JPEG is lossy. It cuts the picture into 8x8 pixel blocks, puts each block through a discrete cosine transform, and Huffman coding follows. Quality is usually a number from 0 to 100, which this page leaves alone.\n- **Transparency and layers**: JPEG carries no alpha channel and holds no layers.\n- **Standard**: The name JPEG comes from the Joint Photographic Experts Group, which began work in 1986. Its core standard is ITU-T T.81, published in 1992, and ISO/IEC 10918-1, published in 1994.\n- **Progressive mode**: JPEG can also be written progressively, so a rough version shows first and then sharpens as the remaining data comes in.\n- **Support**: JPEG's US patents expired on 27 October 2006, and every major browser displays it. Cameras and scanners commonly build it in.\n\nThe page reads one image from each NEF through ImageMagick and LibRaw, and writes a JPG. A new file downloads, named after the NEF with the .jpg ending, and the NEF is never changed. Several NEF files convert one after another, with one JPG for each.\n\n### Other ways to convert NEF to JPG\n\n- **NX Studio (Windows, Mac):** select the photo, click Export in the toolbar, set Export as to JPEG, and drag the Quality slider or enter a value for the JPEG compression ratio. To resize, turn on Change image size under Resolution and enter a value for Long edge. Then pick a destination under Save in, and click Export. The JPEG copies are saved to the folder you chose.\n\n### Problems with NEF files\n\n- **\"Compression can't be decoded here\" on a new Nikon file**: the message names Nikon's High Efficiency RAW as one compression it can't read, and it also appears for a damaged file.\n- **A cut-short or damaged NEF**: if the page says the file may be damaged or incomplete, copy it from the card again.\n- **A very large picture fails**: past roughly 537 megapixels the page stops and says the file is too large to convert here.\n- **Colors look different from another program**: the rendering is applied by processing software, so another program may show other colors.\n- **The JPG has less shadow and highlight detail than expected**: an eight-bit JPEG export does not retain the original 12-bit or 14-bit raw representation. Develop the NEF in a raw developer if you need to recover tones.\n- **You want to edit later**: do it from the NEF. A JPG export can't recover the sensor data.\n"
+    }
+  },
+  "ogg-to-wav": {
+    "seo": {
+      "title": "Convert OGG to WAV Online (Free)",
+      "h1": "OGG to WAV Converter",
+      "description": "Decode OGG audio to an uncompressed 16-bit WAV in your browser, ready for editors and samplers. Free, no sign-up, and the audio stays on your device.",
+      "howToHeading": "How to convert OGG to WAV"
+    },
+    "tool": {
+      "subtitle": "Decode an OGG audio file to a 16-bit WAV for editing."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an OGG file to WAV?",
+        "answer": "Choose the OGG above and wait while your browser decodes it. When it finishes, save the WAV, which is named after your file. The OGG is not changed."
+      },
+      {
+        "question": "Will the WAV sound better than the OGG?",
+        "answer": "No. A WAV made from a lossy OGG holds exactly the sound the OGG decodes to. It can't bring back detail the Ogg encoder discarded, but it is safe to edit without losing more."
+      },
+      {
+        "question": "Why is the WAV so much bigger than the OGG?",
+        "answer": "A WAV stores the decoded samples directly, while Ogg audio is compressed. The size follows the length of the recording, not the OGG's bitrate."
+      },
+      {
+        "question": "What kind of WAV does this page make?",
+        "answer": "Signed 16-bit PCM, little-endian, which nearly every editor and sampler reads. Decoding a compressed recording into that does not make it a higher-precision master."
+      },
+      {
+        "question": "Is every .ogg file Vorbis audio?",
+        "answer": "No. Ogg is a container, and .ogg is conventionally used for Vorbis. The .oga ending is the broader audio extension."
+      },
+      {
+        "question": "Can I choose an .oga file?",
+        "answer": "The file picker offers only .ogg files, so an .oga file needs its ending changed or must be chosen by another route first."
+      },
+      {
+        "question": "Can I just rename my .ogg to .wav?",
+        "answer": "No. A rename keeps the compressed Ogg bytes inside a file called WAV. Converting writes genuine WAV samples."
+      },
+      {
+        "question": "Is there a size limit on the WAV?",
+        "answer": "This page puts no cap on size, and a long OGG simply takes longer on a slow device. A plain WAV file tops out at 4 GB."
+      },
+      {
+        "question": "Can I convert a folder of OGG sound effects together?",
+        "answer": "Select the files together and they are decoded one after another. Each ends up as its own WAV, with no ZIP."
+      },
+      {
+        "question": "Does my audio leave my computer?",
+        "answer": "No. FFmpeg compiled to WebAssembly decodes the file in your browser tab, so the recording is not sent to a server."
+      }
+    ],
+    "aboutSection": {
+      "title": "OGG and WAV",
+      "fromFormat": {
+        "name": "OGG",
+        "fullName": "Ogg container",
+        "description": "A free container format maintained by Xiph.Org. The .ogg extension is most commonly used for Vorbis audio, a lossy codec.",
+        "details": [
+          "open, patent-free format",
+          "usually Vorbis audio",
+          "lossy compression",
+          "streaming-friendly"
+        ]
+      },
+      "toFormat": {
+        "name": "WAV",
+        "fullName": "Waveform Audio File Format",
+        "description": "An audio container format developed by Microsoft and IBM that is based on RIFF. It usually holds uncompressed PCM audio, so files are large but exact.",
+        "details": [
+          "usually uncompressed PCM",
+          "lossless",
+          "large files",
+          "4 GB file size limit"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing OGG to WAV",
+      "points": [
+        "The WAV is 16-bit PCM, little-endian, decoded from the OGG audio.",
+        "A larger file is normal: decoding adds size but not detail.",
+        "Several files give several WAVs, one after another, with no ZIP.",
+        "Only .ogg files appear in the file picker."
+      ]
+    },
+    "guide": {
+      "title": "Understanding OGG for WAV output",
+      "markdown": "### What is an OGG file?\n\nOgg is an open container from Xiph.Org for streams of compressed multimedia. Sound and video can be interleaved in one file, and each stream is compressed the way its codec decides. Ogg supports sequential reading and writing, which suits streaming pipelines, and its framing includes timestamps and error detection.\n\nThe .ogg extension is conventionally used for Vorbis audio, while .oga is the broader audio extension. The IETF published the Ogg media-type registration in September 2008. An audio-only Ogg stream uses audio/ogg, and video content uses video/ogg.\n\nOGG files turn up in game soundtracks, Linux music libraries and web audio. The format is open and patent-free, and its usual audio codec, Vorbis, is lossy.\n\nBecause Ogg is only the wrapper, two files with the same .ogg ending can behave differently. One may hold Vorbis, which nearly every Ogg-aware program reads, and another may hold a codec that a given editor lacks. That is the most common reason an OGG opens in one program and fails in another.\n\n### Programs that open OGG files\n\n- **Windows, Mac and Linux:** Audacity imports Ogg Vorbis audio directly for editing, and VLC media player plays Ogg containers and decodes Vorbis audio.\n- **Web:** Firefox and Chrome open OGG files.\n\n### OGG and WAV compared\n\n- **Extensions and media types**: .ogg with audio/ogg; .wav with audio/wav or audio/x-wav.\n- **Structure**: Ogg is a container whose streams can use different codecs. WAVE is a RIFF-based wrapper for sound, and Microsoft and IBM documented it in their August 1991 multimedia specification.\n- **Compression**: .ogg audio is usually lossy Vorbis. A WAV commonly holds linear PCM, though compressed encodings can appear too.\n- **Size**: the WAV is much larger, because decoded samples take more room than a compressed stream. A plain WAV also tops out at 4 GB, and very large recordings may need RF64.\n- **Odd payloads**: a recorder may use proprietary compression inside a WAV, and for such imports Audacity's advice is to use its FFmpeg library.\n- **Metadata**: standard INFO chunks and Broadcast WAVE extensions store different information.\n- **Standing**: the Library of Congress recommends WAVE for digital audio collections, and Broadcast WAVE adds metadata for production and preservation.\n\nThe page decodes the audio with FFmpeg inside your browser and writes signed 16-bit little-endian PCM. A new WAV downloads under the OGG's name with the .wav ending, and the OGG is never changed. Choose several OGG files and they convert in turn, each with its own WAV and no ZIP.\n\n### Other ways to convert OGG to WAV\n\n- **Audacity (Windows, Mac, Linux):** open the OGG, choose File > Export Audio, name the file with the .wav ending, and set Encoding. Signed 16-bit PCM is the default. Then pick the export range: the entire project or the current selection. A Multiple Files option exports several files based on tracks or labels. Audacity's manual warns that WAV files are limited to a maximum size of 4 GB, which it ties to maximum durations.\n- **FFmpeg (command line):** run `ffmpeg -i interview.ogg -c:a pcm_s16le interview.wav`. Here -i names the input file and -c:a sets the audio codec, 16-bit little-endian PCM. FFmpeg's general documentation lists Ogg among the file formats it reads and writes, and lists signed 16-bit little-endian PCM among its audio codecs.\n- **SoX (command line):** run `sox interview.ogg interview.wav`. Unless you give -t, SoX works out the output type from the file extension, and -t exists for files whose type can't be told from the ending. The first example in the SoX manual turns an AU file into a WAV file in the same way.\n\n### Problems with OGG files\n\n- **An editor says the file is unsupported**: the file may hold a codec that the editor lacks. A player needs the enclosed codec as well as Ogg container support, because Ogg itself does not identify one audio encoding.\n- **The extension is misleading**: RFC 5334 distinguishes .ogg Vorbis files from general .oga audio and .ogv video, so the three endings are not interchangeable.\n- **Parts of the recording are missing**: the container detects damaged pages, but that does not reconstruct missing encoded audio. Get a fresh copy of the OGG.\n- **Audacity will not import it**: Audacity imports Ogg Vorbis directly, so a refusal points to a different codec inside the container.\n- **Two OGG files behave differently**: check which codec each holds rather than trusting the ending.\n"
+    }
+  },
+  "ai-to-png": {
+    "seo": {
+      "title": "Convert AI to PNG Online (Free)",
+      "h1": "AI to PNG Converter",
+      "description": "Render Illustrator AI files to PNG in your browser, one image per page on a white background. Free, no sign-up, and your artwork is not uploaded.",
+      "howToHeading": "How to convert AI to PNG"
+    },
+    "tool": {
+      "subtitle": "Render an Illustrator AI file as a PNG, one image per page."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an AI file to PNG?",
+        "answer": "Choose the AI above and wait while your browser renders it. Each page of the file downloads as its own PNG. Your AI is not changed."
+      },
+      {
+        "question": "Can I open an AI file without Illustrator?",
+        "answer": "Yes. Inkscape can import them, though some document features may be missing, and ImageMagick can read AI too. Converting here gives you a PNG that any viewer opens."
+      },
+      {
+        "question": "Will my logo be transparent in the PNG?",
+        "answer": "No. This page draws the artwork on an opaque white background, even though PNG itself can hold transparency."
+      },
+      {
+        "question": "Why does it say my AI file has no PDF inside?",
+        "answer": "The page reads the PDF stored inside the AI file. If the file was saved without it, you need to save it again in Illustrator with the PDF-compatible option on."
+      },
+      {
+        "question": "How big is the PNG?",
+        "answer": "Pages render at up to twice their size, scaled down if needed to stay within about 16.8 megapixels. For a different size, a program such as Inkscape lets you enter the pixel dimensions yourself."
+      },
+      {
+        "question": "Will the PNG stay sharp if I enlarge it?",
+        "answer": "No. A PNG is made of pixels, and the vector curves are gone. Go back to the AI file for a different size."
+      },
+      {
+        "question": "Does the PNG keep my layers?",
+        "answer": "No. The PNG is a flat picture of each page. Paths, text and layers are not separate objects in it."
+      },
+      {
+        "question": "What happens to a multi-page AI file?",
+        "answer": "Every page of the embedded PDF becomes its own PNG, numbered _page1, _page2 and so on after the file's name. There is no page limit and no ZIP."
+      },
+      {
+        "question": "Can I convert a folder of AI files in one go?",
+        "answer": "Select the files together and they are rendered one after another, each page of each file downloading as its own PNG."
+      },
+      {
+        "question": "Is my artwork uploaded when I convert it?",
+        "answer": "No. The PDF inside your AI file is rendered in your browser with PDF.js, so the file stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "AI and PNG",
+      "fromFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "The native file format of Adobe Illustrator. It stores vector artwork such as paths, shapes, text and effects, and modern files embed a PDF-compatible stream.",
+        "details": [
+          "vector artwork",
+          "layers and artboards",
+          "PDF-compatible content",
+          "proprietary Adobe format"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster image format developed in the mid-1990s as a patent-free replacement for GIF and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "lossless compression",
+          "alpha transparency",
+          "8-bit and 16-bit channels",
+          "supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing AI to PNG",
+      "points": [
+        "The PDF stored inside the AI is rendered, so an AI saved without it fails with its own message.",
+        "Each page becomes its own PNG on an opaque white background.",
+        "Pages render at up to twice their size, within about 16.8 megapixels.",
+        "The PNG is flat. Layers and vector paths are not kept."
+      ]
+    },
+    "guide": {
+      "title": "Understanding AI for PNG output",
+      "markdown": "### What is an AI file?\n\nAI is Adobe Illustrator's native artwork format. An AI document can hold vector objects next to pixel images, and Illustrator keeps editable effects, brushes, layers and transparency inside the file. AI source files are what designers work from for logos, illustrations and print layouts.\n\nIllustrator 9 changed the AI format in 2000; earlier files used PostScript. The PDF-compatible saving option includes a PDF rendition alongside the Illustrator data, and that rendition is what this page draws. Modern files embed that PDF-compatible stream, which is why other programs can often read an AI file without owning Illustrator.\n\nYou will usually receive an AI file from a designer or a brand kit. To put the artwork in a slide, a web page or a document, you need a picture instead. Keep the AI itself if the artwork may need editing.\n\n### Programs that open AI files\n\n- **Mac and Windows:** Adobe Illustrator opens native artwork and keeps its Illustrator objects editable.\n- **Linux, Mac and Windows:** ImageMagick can read the AI format that its format list calls Illustrator CS2, but it renders the artwork rather than editing it as Illustrator does.\n- **Linux:** Inkscape's import manual lists Illustrator files from version 9.0 onward, though not every document feature is available.\n\n### AI and PNG compared\n\n- **Extensions and media types**: .ai, a proprietary Adobe format; .png with image/png.\n- **What is stored**: an AI keeps vector artwork, layers and artboards. A PNG keeps pixels as indexed, grayscale or truecolor samples of 1 to 16 bits each.\n- **Compression**: PNG compression is always lossless, using the DEFLATE method, so a rendered logo stays crisp at the size it was drawn.\n- **Transparency**: PNG supports an optional alpha channel, but this page paints a white background.\n- **History**: PNG was designed as a patent-free alternative to GIF, and RFC 2083 and ISO/IEC 15948:2004 later defined it.\n- **Structure**: the first thing in a PNG is a fixed signature, and after it come chunks: the header sits in IHDR, the image data in IDAT, and IEND ends the file.\n- **Standards**: October 1996 saw PNG published as the first format to become a W3C Recommendation.\n- **Support**: PNG is displayed by every major browser, and no known patents on it require royalties.\n- **Editing**: the AI can be reopened and changed. The PNG is a final picture, and changing it means editing pixels.\n\nThe page renders each page of the embedded PDF with PDF.js. A page is drawn at up to twice its size, and scaled down if it would pass 16,777,216 pixels, about 16.8 megapixels. The cap is on area, not on each side. Pages are drawn onto opaque white and are not merged into one picture. Each page downloads as its own PNG, named after the file with _page1, _page2 and so on, and your AI is never changed. Because only the embedded PDF is drawn, the result shows the artwork as it was saved into that rendition, not as a live document.\n\n### Other ways to convert AI to PNG\n\n- **Inkscape (Windows, Mac, Linux):** bring the AI file into Inkscape and use File > Export PNG Image, or press Shift+Ctrl+E. Choose what to export from Page, Drawing, Selection or Custom, under Image Size set the pixel dimensions or the resolution, pick a file name and press Export.\n- **ImageMagick (command line):** run `magick artwork.ai artwork.png`. ImageMagick's format list marks AI as both readable and writable, under the name Adobe Illustrator CS2. The result is a rendering, not an editable file.\n\n### Problems with AI files\n\n- **\"This AI file has no PDF inside\"**: the file was saved without a PDF-compatible representation. In Illustrator, save it again with Create PDF Compatible File turned on. Older PostScript-based files don't have it.\n- **Third-party software can't read the AI**: a file saved without its PDF-compatible representation may fail in other programs as well.\n- **Linked pictures are missing**: Illustrator leaves linked images outside the file unless Include Linked Files is chosen when saving.\n- **Illustrator reports a compatibility problem**: opening artwork in an older Illustrator version can cause them, so Adobe advises matching or newer versions.\n- **You need to edit the design**: a program that reads the embedded PDF doesn't necessarily expose the native objects. Keep the AI.\n- **Several pages came out**: that is expected when the embedded PDF has more than one page. Each is its own PNG.\n"
+    }
+  },
+  "svg-to-ico": {
+    "seo": {
+      "title": "Convert SVG to ICO Online (Free)",
+      "h1": "SVG to ICO Converter",
+      "description": "Convert SVG to ICO in your browser. You get one icon image, fitted inside 256 x 256 if it is larger. Free, with no sign-up, and nothing is uploaded.",
+      "howToHeading": "How to convert SVG to ICO"
+    },
+    "tool": {
+      "subtitle": "Turn an SVG image into a Windows ICO icon, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert an SVG to ICO?",
+        "answer": "Choose the SVG above. Your browser draws it and the page saves that picture as an ICO named after your file. Your SVG is not changed."
+      },
+      {
+        "question": "Can I get 16, 32 and 48 px sizes in one ICO?",
+        "answer": "Not here. This page's ICO holds one image. For several sizes in one file, use ImageMagick with icon:auto-resize, described below."
+      },
+      {
+        "question": "What size will the icon be?",
+        "answer": "The size the browser draws your SVG at. Anything bigger than 256 px is scaled down to fit a square of that size without distortion, and a smaller picture stays as drawn."
+      },
+      {
+        "question": "Can I use the ICO as a favicon?",
+        "answer": "The .ico extension is widely associated with favicons, and Firefox and Chrome display ICO pictures. This page makes a single-image icon, so it suits one size rather than a full set."
+      },
+      {
+        "question": "Is the ICO still a vector?",
+        "answer": "No. The icon holds pixels, and the 256 px size is kept inside the ICO as a PNG. Keep the SVG for any other size."
+      },
+      {
+        "question": "Why does the text in my icon look different?",
+        "answer": "Fonts installed on the device decide how SVG text is drawn, so a stand-in font changes the lettering. Converting the text to paths in your editor avoids this."
+      },
+      {
+        "question": "Why is a picture linked from my SVG missing?",
+        "answer": "Your browser renders the SVG as a standalone image, which means no linked picture, external stylesheet or web font is fetched, with or without a connection. What the file embeds appears, along with fonts installed on your device."
+      },
+      {
+        "question": "Does the ICO keep my SVG's metadata?",
+        "answer": "No. Each pixel is 8-bit RGBA on the way through, and metadata is dropped."
+      },
+      {
+        "question": "Can I turn a set of SVG logos into icons together?",
+        "answer": "Select the SVGs together and each is drawn and saved in turn as its own ICO. There is no ZIP."
+      },
+      {
+        "question": "Is my SVG uploaded when I convert it?",
+        "answer": "No. Your browser draws the SVG and writes the ICO, so the file stays on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "SVG and ICO",
+      "fromFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An XML-based vector image format and W3C standard. Shapes, paths and text are described mathematically, so images scale to any size without losing sharpness.",
+        "details": [
+          "resolution independent",
+          "XML text",
+          "supports animation and scripting",
+          "styleable with CSS"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A container format for icons on Microsoft Windows that can hold several bitmap images of different sizes and color depths in a single file. Browsers also use it for favicons.",
+        "details": [
+          "multiple sizes in one file",
+          "alpha transparency",
+          "PNG or bitmap entries"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before changing SVG to ICO",
+      "points": [
+        "The ICO holds one image, not a set of sizes.",
+        "A side over 256 px is fitted inside 256 x 256 with its proportions kept. Smaller images keep their size.",
+        "The browser draws the SVG as an image, so linked pictures, stylesheets and web fonts never load.",
+        "Metadata is dropped, and the pixels pass through 8-bit RGBA."
+      ]
+    },
+    "guide": {
+      "title": "Understanding SVG for ICO output",
+      "markdown": "### What is an SVG file?\n\nAn SVG is a Scalable Vector Graphics file, an open W3C standard. Version 1.0 became a Recommendation in 2001 and 1.1 in 2003. Written in XML, it defines two-dimensional graphics through shapes, text and embedded images, which is why it can be scaled to any size and stay sharp.\n\nAn SVG is plain text, so any text editor opens it, and tools can search, index and compress the file. The .svgz extension marks an SVG compressed with gzip. Through CSS and JavaScript an SVG can be styled, scripted and animated, and clipping paths, masks and filter effects are supported. A browser can show it as a page of its own, or an HTML page can embed it. Every major browser displays SVG, and the registered media type is image/svg+xml.\n\nBecause shapes are stored as instructions rather than pixels, one SVG can serve a favicon, a poster and everything between. People use it for illustrations, diagrams, charts and maps, as well as logos and icons on the web.\n\nYou usually have an SVG because a logo or icon was drawn in a vector editor. The pixels only come into it when something, such as an icon file, needs a bitmap.\n\n### Programs that open SVG files\n\n- **Linux, Windows and Mac:** Mozilla Firefox displays SVG, and Inkscape does native SVG editing.\n- **Web and Mobile:** Google Chrome displays SVG, and so does Safari.\n\n### SVG and ICO compared\n\n- **Names**: SVG files end in .svg (image/svg+xml), and ICO files end in .ico (image/vnd.microsoft.icon).\n- **What is stored**: an SVG holds shapes, text and styling. An ICO holds bitmap images, and the entries can be PNG or bitmap. ICO files use little-endian byte ordering and may contain more than one image.\n- **Sizes**: Windows Vista's icon guidance lists 256-by-256 images for high-DPI screens. Enlarged for such a display, a small icon may look soft, so the icon should hold a suitable larger image.\n- **Uses**: The ICO format is Microsoft's, used for graphical interface icons, and it serves Windows application icons and website favicons.\n- **Support**: Windows File Explorer, GIMP, IrfanView and any web browser open ICO. Firefox displays ICO pictures in browser content, and Chrome supports ICO images.\n\nThis page's ICO holds one image. The browser draws your SVG at the size it reports, and the page adds no scale factor. When a side is longer than 256 px, the image is fitted inside a 256 x 256 box, proportions kept, and a smaller image keeps its size. The 256 px size goes into the ICO as a PNG. Metadata is not carried over, and the pixels pass through 8-bit RGBA. The download is named after your SVG with the .ico ending, and your SVG is never changed. Several SVG files are converted in turn, each into an ICO of its own.\n\n### Other ways to convert SVG to ICO\n\n- **Inkscape (Windows, Mac, Linux):** to get a PNG at the size you want, choose File > Export PNG Image or press Shift+Ctrl+E. Pick the export area from Page, Drawing, Selection or Custom, give the pixel dimensions or a resolution in Image Size, type a file name and click Export.\n- **ImageMagick (command line):** the ImageMagick usage guide builds a favicon from that PNG with `magick image.png -alpha off -resize 256x256 -define icon:auto-resize=\"16,32,48,256\" favicon.ico`. The input can be any image as long as it is square, so resize a non-square one first. The guide says 16 and 32 pixels are the most common ICO sizes and that few browsers use 128 or 256.\n\n### Problems with SVG files\n\n- **Text looks different**: lettering follows the fonts available where the file is drawn, and a substitute font changes it.\n- **A picture inside the SVG is missing**: the browser draws this file as a picture and fetches nothing it links to, whether or not you are online, so linked pictures, stylesheets and web fonts never appear. Embed the image as a data URI.\n- **An embedded photo looks soft**: photos placed inside an SVG are pixels, and they keep their own resolution however large the drawing is.\n- **An .svgz file is not offered**: the file picker shows only .svg files.\n- **The page says \"Image decode failed.\"**: the browser couldn't draw the file. Open it in Chrome, Edge, Firefox or Safari to see whether it is a valid SVG.\n"
+    }
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "tools": {
+    "m4a-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.m4a -c copy output.mp4.",
+          "limits": "Streams are copied, not re-encoded.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "Audacity with FFmpeg",
+          "steps": "Choose File > Export Audio; select M4A (AAC) Files (FFmpeg) and use the permitted .mp4 extension.",
+          "limits": "Needs the optional FFmpeg library; the audio is re-encoded.",
+          "source": "https://manual.audacityteam.org/man/aac_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/export_formats_supported_by_audacity.html"
+        }
+      ]
+    },
+    "mp3-to-m4a": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "Open the MP3, choose File > Export Audio and select M4A (AAC) Files (FFmpeg) from the Format menu.",
+          "limits": "Requires the optional FFmpeg library.",
+          "source": "https://manual.audacityteam.org/man/aac_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i source-track.mp3 -b:a 192k -c:a aac listening-copy.m4a.",
+          "limits": "Re-encodes the MP3 as AAC.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "pdf-to-html": {
+      "methods": [
+        {
+          "app": "Poppler pdftohtml",
+          "steps": "Run pdftohtml input.pdf output.html.",
+          "limits": "The -s, -c and -i options change the layout and images.",
+          "source": "https://github.com/tsdgeos/poppler_mirror/blob/master/utils/pdftohtml.1"
+        },
+        {
+          "app": "pdf2htmlEX",
+          "steps": "Run pdf2htmlEX input.pdf.",
+          "limits": "CJK characters need poppler-data.",
+          "source": "https://github.com/pdf2htmlEX/pdf2htmlEX/wiki/Quick-Start"
+        }
+      ]
+    },
+    "psd-to-png": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the PSD; choose File > Export As (Shift+Ctrl+E) and pick PNG; adjust the PNG Export dialog.",
+          "limits": "Review imported Photoshop features before export.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/file-png-export.html"
+        },
+        {
+          "app": "Photopea",
+          "steps": "Open the PSD with File > Open, then choose File > Export As > PNG.",
+          "limits": "Photopea converts opened files to PSD internally.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick 'input.psd[0]' output.png.",
+          "limits": "The bracketed index picks the first image in the file; quote it in the shell.",
+          "source": "https://legacy.imagemagick.org/script/command-line-processing.php",
+          "supportSource": "https://imagemagick.org/formats/"
+        }
+      ]
+    },
+    "jpg-to-ico": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPG; choose File > Export As (Shift+Ctrl+E) and export it as an ICO.",
+          "limits": "GIMP's ICO plug-in writes the file.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://raw.githubusercontent.com/GNOME/gimp/master/plug-ins/file-ico/ico.c"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.jpg -resize 256x256 output.ico.",
+          "limits": "-resize fits within the given dimensions, so a smaller picture is enlarged.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://raw.githubusercontent.com/ImageMagick/ImageMagick/main/coders/icon.c"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.jpg -s 256x256 -frames:v 1 -c:v png -pix_fmt rgba output.ico.",
+          "limits": "-s sets the size outright, so a rectangular source is stretched; the ICO writer needs RGBA PNG and no side over 256.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        }
+      ]
+    },
+    "wav-to-ogg": {
+      "methods": [
+        {
+          "app": "Audacity",
+          "steps": "File > Export Audio; select Ogg Vorbis in the Format dropdown; choose a quality from 0 to 10.",
+          "limits": "Vorbis compression is lossy; the default quality is 5.",
+          "source": "https://manual.audacityteam.org/man/ogg_vorbis_export_options.html",
+          "supportSource": "https://manual.audacityteam.org/man/importing_audio.html"
+        },
+        {
+          "app": "FFmpeg",
+          "steps": "Run ffmpeg -i input.wav -c:a libvorbis -q:a 5 output.ogg.",
+          "limits": "The installed build must include libvorbis.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "oggenc",
+          "steps": "Run oggenc -q 5 -o output.ogg input.wav.",
+          "limits": "Reads raw, Wave or AIFF audio; -o names the output when there is one input.",
+          "source": "https://manpages.debian.org/bookworm/vorbis-tools/oggenc.1.en.html"
+        }
+      ]
+    },
+    "avif-to-jpeg": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the AVIF; choose File > Export As (Shift+Ctrl+E) and save it as a JPEG; a JPEG dialog with a quality setting follows.",
+          "limits": "AVIF import needs GIMP 2.10.22 or later; the JPEG dialog's default quality is 85.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "supportSource": "https://www.gimp.org/news/2020/10/07/gimp-2-10-22-released/"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.avif output.jpeg.",
+          "limits": "The ImageMagick formats table lists AVIF as readable and writable.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "libavif avifdec",
+          "steps": "Run avifdec input.avif output.jpeg.",
+          "limits": "JPEG quality defaults to 90; only frame 0 is decoded unless --index names another.",
+          "source": "https://github.com/AOMediaCodec/libavif/blob/main/doc/avifdec.1.md"
+        }
+      ]
+    },
+    "flv-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "Run ffmpeg -i input.flv -c copy output.mp4.",
+          "limits": "Only works when MP4 can carry the source codecs.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg transcoding",
+          "steps": "Run ffmpeg -i input.flv -c:a aac -c:v libx264 output.mp4.",
+          "limits": "Re-encodes picture and sound; the build needs libx264.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "HandBrake",
+          "steps": "Open the FLV with Open Source; pick a preset; make sure the container is MP4; set the file name in Save As; press Start.",
+          "limits": "Re-encodes the video with the preset's settings.",
+          "source": "https://handbrake.fr/docs/en/latest/workflow/start-encoding.html",
+          "supportSource": "https://handbrake.fr/docs/en/latest/technical/source-formats.html"
+        }
+      ]
+    },
+    "hevc-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg stream copy",
+          "steps": "Run ffmpeg -i input.hevc -c:v copy output.mp4.",
+          "limits": "Keeps HEVC; the target player must decode it.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg H.264 encoding",
+          "steps": "Run ffmpeg -i input.hevc -c:v libx264 output.mp4.",
+          "limits": "Lossy transcode; needs an FFmpeg build with libx264.",
+          "source": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        },
+        {
+          "app": "GPAC MP4Box",
+          "steps": "Run MP4Box -add input.hevc -new output.mp4.",
+          "limits": "Imports HEVC without re-encoding; the -fps option forces the video frame rate.",
+          "source": "https://wiki.gpac.io/MP4Box/mp4box-import-opts/",
+          "supportSource": "https://wiki.gpac.io/Filters/rfnalu/"
+        }
+      ]
+    },
+    "webp-to-pdf": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the WebP; File > Export As; choose the .pdf extension or the PDF file type, then review the PDF options.",
+          "limits": "The dialog has a Fill transparent areas with background color option.",
+          "source": "https://docs.gimp.org/3.2/en/file-pdf-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+          "inputSupportSource": "https://www.gimp.org/release-notes/gimp-2.10.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "Run magick input.webp output.pdf.",
+          "limits": "A 96 by 96 pixel test image gave a 96 by 96 point page.",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "Run python3 -c \"from PIL import Image; Image.open('input.webp').convert('RGB').save('output.pdf')\".",
+          "limits": "RGB images are written with JPEG encoding, so the picture is compressed again and has no transparency.",
+          "source": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ]
+    }
+  }
+}

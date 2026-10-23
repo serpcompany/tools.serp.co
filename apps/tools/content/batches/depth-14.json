@@ -1,0 +1,890 @@
+{
+  "mp4-to-mkv": {
+    "seo": {
+      "title": "Convert MP4 to MKV Online (Free)",
+      "h1": "MP4 to MKV Converter",
+      "description": "Convert MP4 to MKV by copying the video and audio into a Matroska file, with no re-encoding and no resizing. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Rewrap an MP4 as an MKV in your browser; the video and audio are copied, not re-encoded."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to MKV?",
+        "answer": "Pick the MP4 in the box at the top and let the conversion run to the end. The MKV then downloads as its own file, named like your MP4 with a .mkv ending."
+      },
+      {
+        "question": "Is converting MP4 to MKV lossless?",
+        "answer": "Yes. The page runs FFmpeg with its copy option, so the video and audio are moved into the new container rather than decoded and compressed again. The picture and sound match the MP4."
+      },
+      {
+        "question": "Does converting replace my original MP4?",
+        "answer": "No. Your MP4 isn't changed. The page gives you a new copy as an MKV, so the original stays where it is."
+      },
+      {
+        "question": "Will the MKV be smaller than the MP4?",
+        "answer": "It can come out close to the original size. The compressed video and audio are carried over as they are, and only the container around them differs. If you need a smaller file, the video has to be re-encoded, which this page does not do."
+      },
+      {
+        "question": "Will my 4K or 60 fps MP4 keep its size and frame rate?",
+        "answer": "Yes. Pages that re-encode video cap the frame at 1920 px and 30 fps, but a copy has no such cap. The MKV has the same dimensions and frame rate as the MP4."
+      },
+      {
+        "question": "Why would I want an MKV instead of an MP4?",
+        "answer": "Matroska is an open container that can hold unlimited video, audio, picture and subtitle tracks in one file, with chapters and tags as part of its design. Players such as mpv and VLC read it, and so does Plex. If your player already handles the MP4, you gain nothing."
+      },
+      {
+        "question": "Can I just rename my .mp4 file to .mkv?",
+        "answer": "No. A rename swaps the file extension but leaves the MP4 data as it was; converting rewrites the streams into a genuine Matroska file. Renaming changes only the ending, and the data inside is still an MP4. Converting writes the streams into a real Matroska file."
+      },
+      {
+        "question": "Why won't my TV or phone play the MKV?",
+        "answer": "Copying keeps the original video and audio codecs. If a device can't decode them in the MP4, it can't in the MKV either. For a device like that you need a program that re-encodes, such as HandBrake."
+      },
+      {
+        "question": "Can I convert a batch of MP4 files?",
+        "answer": "Yes. Add more than one file and they are converted one after another, each saved as its own MKV. The files are not joined into one movie."
+      },
+      {
+        "question": "Is my video uploaded when I convert it?",
+        "answer": "No. The conversion happens on your device through FFmpeg compiled to WebAssembly: it reads the MP4 and writes the MKV there. Your original file isn't changed."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and MKV",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A multimedia container for encoded video, audio, subtitles, and related information.",
+        "details": [
+          "Video container",
+          "Different codecs possible",
+          "Common delivery format"
+        ]
+      },
+      "toFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "Matroska wraps audiovisual tracks with options for subtitles, chapters, and tags.",
+        "details": [
+          "Several track types",
+          "Open container design",
+          "Codec-dependent playback"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to MKV",
+      "points": [
+        "The video and audio are copied as they are, not re-encoded, so the picture and sound don't change.",
+        "The picture keeps the MP4's size and frame rate; the 1920 px and 30 fps cap used by re-encoding pages doesn't apply.",
+        "The compressed data is carried over as it is; only the container around it changes.",
+        "A codec your player can't decode in the MP4 still won't play in the MKV.",
+        "Several files give several MKVs, never one joined movie."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 and MKV",
+      "markdown": "### What is an MP4 file?\n\nAn MP4 file is a container, defined as MPEG-4 Part 14 in ISO/IEC 14496-14 and first published in 2003. It can carry video, audio, subtitles and metadata together, and H.264 video paired with AAC audio is the most common combination. MP4 can also hold codecs such as AV1, VP9, MP3 and Opus, so the .mp4 ending names the wrapper, not the compression inside it. Because it is only a wrapper, an MP4 can be healthy and still refuse to play on a device that lacks the decoder for the video inside.\n\nMP4 follows the ISO Base Media File Format, itself derived from QuickTime, and its content sits in nested boxes (QuickTime called them atoms). The .mp4 and .m4v extensions mark video, .m4a often marks audio-only MPEG-4, and the media types video/mp4 and audio/mp4 are registered for the format. Every major browser plays MP4, and Android plays HEVC video in MP4 files from version 5.0.\n\nYou meet MP4 in online video and streaming, in phone and camera recordings, and in files shared between people. That is also why people want to move one into Matroska. They want several audio or subtitle tracks, chapters, or a format their media server prefers.\n\n### Programs that open MP4 files\n\n- **Linux, Mac and Windows:** ffplay plays an MP4 once the matching decoders are in your FFmpeg build.\n- **Windows, Mac and Linux:** mpv plays MP4 files and lets you choose which audio and subtitle streams play.\n- **Windows, Mac and Linux:** VLC media player opens MP4 files.\n- **Windows and Mac:** Adobe Premiere brings in an MP4 only if it has a decoder for the codec the file holds.\n- **Mac:** QuickTime Player opens MP4 files.\n- **Web:** Firefox plays supported media directly, and AAC and H.264 availability can depend on the codecs in your system.\n- **Web:** Chrome plays the MP4 files whose codecs it supports.\n- **Mobile:** Android and iOS both get their own VLC app, which plays an MP4 whose codecs it supports.\n\n### MP4 and MKV compared\n\n- **Extensions and media types**: .mp4 for MP4; .mkv for Matroska video, registered as video/matroska.\n- **Design**: MP4 is an ISO standard container. Matroska is an open container format. It grew out of the MCF project and is built on EBML, a binary markup derived from XML. WebM is a subset of Matroska.\n- **Tracks**: MP4 can carry subtitles and chapters. Matroska files can include several video, audio and subtitle streams, with chapters and descriptive tags built into the design. In a player such as mpv, choosing the wrong audio or subtitle stream gives the wrong language, and the player lets you switch.\n- **Codecs**: neither container fixes a codec or a quality level. The codec decides how the picture looks, and a container swap leaves it as it was.\n- **Reach**: MP4 plays on nearly every device. MKV plays in VLC, mpv and Plex, so check that the player you plan to use accepts it before you convert a whole library.\n\nThis page copies the streams (`-c copy` in FFmpeg). They are not decoded and compressed a second time, so the picture keeps its size and frame rate. What you gain is the new container. What you do not get is a codec change.\n\n### Other ways to convert MP4 to MKV\n\n- **FFmpeg (command line):** copy the streams across with `ffmpeg -i input.mp4 -c copy output.mkv`. This is the same copy this page performs. By default FFmpeg picks one stream of each kind, so add explicit stream mapping when you need a particular track set.\n- **HandBrake (Windows, Mac, Linux):** choose Open Source and select the MP4, then pick a Matroska preset such as H.264 MKV 1080p30, set the Save As destination and select Start. The presets set their own encoders, so the video is encoded again, which suits a file whose codec has to change too.\n\n### Problems with MP4 files\n\n- **A codec your player lacks**: a container can open fine while the video inside can't be decoded. Converting to MKV does not change that, because the codec is copied.\n- **An unfinished MP4**: normal MP4 files keep their packet metadata together, so an interrupted recording or download can leave a file that never plays. Record or download it again before you convert.\n"
+    }
+  },
+  "mxf-to-mp4": {
+    "seo": {
+      "title": "Convert MXF to MP4 Online (Free)",
+      "h1": "MXF to MP4 Converter",
+      "description": "Convert MXF to MP4 as H.264 video with AAC audio, capped at 1920 px and 30 fps for easy sharing. Runs in your browser, free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a broadcast MXF into an H.264 MP4 you can play and share."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MXF to MP4?",
+        "answer": "Choose your MXF above and wait while the video is re-encoded. The MP4 downloads when it finishes, named like your MXF with an .mp4 ending. A long clip takes as long as your own device needs."
+      },
+      {
+        "question": "Does MXF to MP4 lose quality?",
+        "answer": "Yes. The video is re-encoded to H.264 with a strong compression setting (CRF 32, FFmpeg's ultrafast preset) and the audio to AAC at 96 kbps. Treat the MP4 as a viewing copy and keep the MXF if you will edit it again."
+      },
+      {
+        "question": "Will the MP4 be smaller than the MXF?",
+        "answer": "It can be much smaller. Expect a smaller file rather than maximum fidelity, because the encode favors size, and any frame longer than 1920 px on its long side is shrunk. A frame that is already smaller is not scaled up."
+      },
+      {
+        "question": "Will a 4K MXF stay 4K?",
+        "answer": "No. Any picture bigger than 1920 px is scaled so its longer side fits, the proportions stay the same, and odd dimensions lose a pixel. A frame already under 1920 px keeps its size apart from that rounding."
+      },
+      {
+        "question": "What happens to a 50 or 60 fps MXF?",
+        "answer": "The MP4 is limited to 30 frames per second. A slower source, such as 25 fps, keeps its own rate and is not padded with extra frames."
+      },
+      {
+        "question": "My MXF is interlaced. Will the MP4 look combed?",
+        "answer": "Frames that the file marks as interlaced are deinterlaced, so moving edges shouldn't show combing. Frames that are not marked interlaced pass through that filter unchanged."
+      },
+      {
+        "question": "Will the MP4 keep my MXF's timecode?",
+        "answer": "FFmpeg copies the input's global tags to the output, and a test with a sample MXF showed its timecode tag in the MP4's metadata. Other production metadata and ancillary streams may not carry over, so keep the MXF as your master."
+      },
+      {
+        "question": "What if my MXF won't convert?",
+        "answer": "When FFmpeg cannot process the file, the page shows an error such as \"FFmpeg failed with exit code\" followed by a number. Some MXF files point to media stored in other files, so a single .mxf copied out of its folder can be incomplete. A damaged or cut-short MXF usually still converts to a shorter MP4."
+      },
+      {
+        "question": "Can I rename .mxf to .mp4 instead?",
+        "answer": "No. MXF and MP4 are different containers, so a renamed file is still MXF inside. Converting writes a new MP4 file."
+      },
+      {
+        "question": "Is my MXF uploaded anywhere?",
+        "answer": "No. Because FFmpeg runs as WebAssembly in the browser, reading the MXF and writing the MP4 both happen on your device. You can pick several files; each becomes its own MP4."
+      }
+    ],
+    "aboutSection": {
+      "title": "MXF and MP4",
+      "fromFormat": {
+        "name": "MXF",
+        "fullName": "Material Exchange Format",
+        "description": "A professional media wrapper that organizes encoded picture, sound, and production metadata.",
+        "details": [
+          "Broadcast exchange",
+          "Media essence and metadata",
+          "Several operational patterns"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A multimedia container for encoded video, audio, subtitles, and related information.",
+        "details": [
+          "Video container",
+          "Different codecs possible",
+          "Common delivery format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MXF to MP4",
+      "points": [
+        "The MP4 holds H.264 video and AAC audio, written by encoding the footage again.",
+        "The picture is fitted inside 1920 px on its longer side, and frame rate is limited to 30 fps.",
+        "Frames flagged as interlaced are deinterlaced.",
+        "Keep the MXF when you need production metadata or the original quality.",
+        "Several MXF files give several MP4s."
+      ]
+    },
+    "guide": {
+      "title": "About MXF and MP4",
+      "markdown": "### What is an MXF file?\n\nMXF stands for Material Exchange Format, a container standardized through SMPTE documents (SMPTE 377M) and used by D-Cinema and the broadcast industry. It wraps media essence, the encoded picture and sound, together with descriptive or structural metadata. MXF is used in professional acquisition, exchange and preservation workflows, so most people meet it as a camera original or a file delivered by a television workflow.\n\nThe .mxf ending does not say how the picture is compressed. Because an MXF wrapper may hold several kinds of video encoding, the extension alone tells you nothing about picture quality. Its operational patterns describe how packages and essence are arranged, and some arrangements reference essence stored outside the file, so copying one .mxf out of a larger folder can leave it incomplete. The media type is application/mxf. FFmpeg's documentation lists MXF as a format it can both read and write.\n\nThe Library of Congress describes MXF as an object-based format that wraps video, audio and other bitstreams, called essences, for interchange or archiving, in a form that is essence-agnostic and metadata-aware. SMPTE developed it. The Pro-MPEG Forum began the work in 1999, and the standard was approved through SMPTE at NAB2004. The central specification is SMPTE ST 377-1. Operational pattern OP1a describes a single item in a single package, and OP-Atom a simplified single item. Metadata is written as KLV, key-length-value, data, and essences are generally stored inside the file. Mappings exist for JPEG 2000, MPEG streams, AES3 and Broadcast Wave audio, DV-DIF, uncompressed pictures, AVC, VC-1 and VC-3.\n\n### Programs that open MXF files\n\n- **Windows, Mac and Linux:** MXF is among the inputs that VLC media player takes.\n- **Windows, Mac and Linux:** FFmpeg reads MXF essence from the command line.\n\n### MXF and MP4 compared\n\n- **Extensions and media types**: .mxf is application/mxf. Video in MP4 takes the .mp4 or .m4v extension, and video/mp4 and audio/mp4 are its registered media types.\n- **Standards**: MXF comes from SMPTE documents. MP4's formal name is MPEG-4 Part 14, ISO/IEC 14496-14, and it first appeared as a standard in 2003.\n- **Design**: Apple's QuickTime format is the ancestor of MP4, which stores its data as nested boxes under the ISO Base Media File Format. MXF arranges packages and essence in operational patterns.\n- **Purpose**: MXF is built for professional acquisition, exchange and preservation, with timecode and metadata. MP4 is built for playback and delivery and plays on nearly every device.\n- **Codecs**: both are wrappers, so neither fixes image quality. Typical MP4 files pair H.264 video with AAC audio; AV1, VP9, MP3 and Opus are also possible inside.\n- **Playback**: every major browser plays MP4, and HEVC video in an MP4 works on Android from 5.0 on. MXF gets no such browser support.\n\nThis conversion is a re-encode, not a rewrap. FFmpeg on this page encodes H.264 video (CRF 32, ultrafast preset) with 96 kbps AAC audio and writes an MP4. Pictures larger than 1920 px are scaled down so the longer side fits, keeping the shape, with widths and heights trimmed to even numbers, and frames above 30 fps are dropped to reach 30, so the clip keeps its length. A slower source keeps its own rate. Frames marked interlaced are deinterlaced.\n\n### Other ways to convert MXF to MP4\n\n- **FFmpeg (command line):** `ffmpeg -i input.mxf -c:v libx264 -c:a aac output.mp4` does the whole job. FFmpeg lists MXF among the formats it reads.\n- **HandBrake (Windows, Mac, Linux):** HandBrake lists MXF among the professional production formats it can open, and it generally opens whatever FFmpeg will. Choose Open Source and select the file, pick a preset such as Fast 1080p30, set the destination under To and select Start.\n\n### Problems with MXF files\n\n- **A file that won't play on its own**: externally referenced essence can be missing when an MXF file is copied by itself. Move the whole folder from the camera or system, not just the .mxf.\n- **A viewer needs a professional application**: an MXF file may require one because some essence structures are not arranged for ordinary playback.\n- **Metadata or channels are missing after changing the wrapper**: changing the container does not guarantee that specialized metadata or every ancillary stream is kept. Keep the MXF as the master.\n"
+    }
+  },
+  "psd-to-pdf": {
+    "seo": {
+      "title": "Convert PSD to PDF Online (Free)",
+      "h1": "PSD to PDF Converter",
+      "description": "Convert PSD to PDF: the Photoshop image becomes a one-page PDF with the picture embedded losslessly. Free, in your browser, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a Photoshop PSD into a one-page PDF with the picture embedded as it is."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PSD to PDF?",
+        "answer": "Choose your PSD above and save the PDF that appears. You get one PDF for each PSD, and the file never leaves your device. Photoshop is not needed."
+      },
+      {
+        "question": "Does converting change my PSD?",
+        "answer": "No. Your PSD stays as it is. You download a new PDF named like the PSD with a .pdf ending, so the layered original is still there to edit."
+      },
+      {
+        "question": "Does each layer become its own PDF page?",
+        "answer": "No. A PSD gives one picture, and the PDF has one page. Layers are not split into separate pages."
+      },
+      {
+        "question": "Are the layers still editable in the PDF?",
+        "answer": "No. The PDF holds one picture, so layers, masks and effects are not separate in it. Hold on to the PSD in case the design needs editing later."
+      },
+      {
+        "question": "Will the text in my PSD be selectable in the PDF?",
+        "answer": "No. Once converted, text is part of the picture and can't be selected, searched or copied. Run text recognition on the PDF if you need it as text."
+      },
+      {
+        "question": "Why is the PDF page so large?",
+        "answer": "Each PDF page matches the image size exactly: one pixel becomes one point, and there is no margin. A large picture therefore makes a large page, not an A4 or Letter one. Scale it when printing or in a PDF editor."
+      },
+      {
+        "question": "Does the PDF lose image quality?",
+        "answer": "The PNG is embedded as is, without added JPEG compression, which can make the PDF bigger than one built from a JPG. It does not add new quality to a PSD that was low resolution."
+      },
+      {
+        "question": "Can I merge several PSD files into one PDF?",
+        "answer": "Not here. Each PSD you choose becomes its own PDF. Combine the PDFs afterward in a PDF tool if you need one document."
+      },
+      {
+        "question": "Why did my large PSD fail to convert?",
+        "answer": "A picture above roughly 537 megapixels is turned away with the message \"too large to convert here\". A PSB file, the larger Photoshop format, is not listed as an input on this page."
+      },
+      {
+        "question": "Is my PSD uploaded to a server?",
+        "answer": "No. ImageMagick runs as WebAssembly in the browser, which means the PSD is read and the PDF written on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "PSD and PDF",
+      "fromFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "A Photoshop working document that can retain layers, masks, and image resources.",
+        "details": [
+          "Editable layer structures",
+          "Raster project format",
+          "Several sample depths"
+        ]
+      },
+      "toFormat": {
+        "name": "PDF",
+        "fullName": "Portable Document Format",
+        "description": "A page-description document that can carry pictures, text, and vector graphics.",
+        "details": [
+          "Fixed page geometry",
+          "Raster images supported",
+          "Document viewing and printing"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PSD to PDF",
+      "points": [
+        "One PSD gives one PDF with one page, never one page for each layer.",
+        "The page is the size of the picture: one pixel is one point, with no margin.",
+        "The picture is embedded losslessly as a PNG, so the PDF can be large.",
+        "Layers, masks and text become part of the picture and are no longer editable.",
+        "Pictures over about 537 megapixels are refused."
+      ]
+    },
+    "guide": {
+      "title": "About PSD and PDF",
+      "markdown": "### What is a PSD file?\n\nA PSD is Adobe Photoshop's native document format. It stores an image together with what is needed to keep editing it: layers, masks, adjustment layers, text and color information. It is used for layered image editing, design mockups and photo retouching.\n\nA PSD has five sections: a file header, color mode data, image resources, layer and mask information, and image data. The 8BPS signature starts every PSD, followed by a header that stores the version (1 for PSD, 2 for PSB), a channel count from 1 to 56 that includes alpha channels, a bit depth of 1, 8, 16 or 32 and one of eight color modes: bitmap, grayscale, indexed, RGB, CMYK, multichannel, duotone or Lab. Pixels are saved either raw or compressed with RLE or ZIP, and every value in the file is big-endian. PSD dimensions are limited to 30,000 pixels per side, and PSB, the Large Document Format, raises that to 300,000. The registered media type is image/vnd.adobe.photoshop.\n\nImage resources hold non-pixel data such as pen tool paths, resolution information and an ICC profile, each in a block that starts with the signature 8BIM. The layer and mask section describes every layer's bounds, channels, blend mode, opacity and mask. The last section holds the merged, composite image, the flattened result of all layers.\n\n### Programs that open PSD files\n\n- **Windows and Mac:** Adobe Photoshop is the native editor.\n- **Windows and Mac:** Affinity Photo opens PSD files.\n- **Windows, Mac and Linux:** GIMP opens PSD files for editing.\n- **Windows, Mac and Linux:** From the command line, ImageMagick reads PSD images.\n- **Windows, Mac and Linux:** XnView MP counts PSD among the formats it supports, but a company must buy a license to use it.\n- **Mac:** Preview opens a PSD.\n- **Web:** Photopea treats PSD as its native document format, and File > Open loads a file.\n\n### PSD and PDF compared\n\n- **Extensions and media types**: .psd is image/vnd.adobe.photoshop. .pdf is application/pdf.\n- **Purpose**: a PSD is a working file with editable layers. PDF packages a document from any application so it looks and prints the same on every system; its imaging model is taken from PostScript and is independent of device and resolution.\n- **Origins**: PDF was created at Adobe. Camelot, John Warnock's 1991 project, turned into PDF by 1992.\n- **Fonts**: to look the same everywhere, a PDF needs its fonts embedded. The PDF made here holds one picture, so it has no live text.\n- **Contents**: a PDF can mix text, vector graphics and raster images, with links, bookmarks, form fields, annotations and media. A PDF may store its images with lossless compression like Flate, or with JPEG compression.\n- **Standards**: PDF 1.7 became the ISO 32000-1 standard in 2008, and PDF 2.0 became ISO 32000-2 in 2017. Specialized subsets exist, such as PDF/A for archiving, PDF/X for printing and PDF/UA for accessibility.\n\nThis conversion makes a picture-only PDF. ImageMagick reads the PSD as one image, writes a PNG, and the PNG is embedded in a one-page PDF with no margin. One pixel becomes one PDF point, so the page takes the size of the image rather than A4 or Letter. The PDF comes from the layered PSD as a single picture rather than one item per layer. The PNG is embedded losslessly, with no JPEG compression added. Several PSD files give several separate PDFs, never one merged document.\n\n### Other ways to convert PSD to PDF\n\n- **ImageMagick (Windows, Mac, Linux):** run `magick input.psd output.pdf`. ImageMagick lists both PSD, described as an Adobe Photoshop multispectral bitmap file, and PDF, the Portable Document Format, as formats it can read and write.\n- **Photopea (web):** load the PSD through File > Open, choose File > Export As, pick PDF and save the file.\n\n### Problems with PSD files\n\n- **A document larger than the PSD limit**: it needs PSB or another suitable format.\n- **Layers and masks are gone in a flat export**: a PSD includes layer and mask information that a simple flattened image export does not retain. Keep the PSD for editing.\n- **The PSD opens, but looks different**: third-party readers must interpret Photoshop-specific data structures, so opening a preview does not establish full editing compatibility. Compare the result with the picture in Photoshop before you send it on.\n"
+    }
+  },
+  "webp-to-ico": {
+    "seo": {
+      "title": "Convert WebP to ICO Online (Free)",
+      "h1": "WebP to ICO Converter",
+      "description": "Convert WebP to ICO for a favicon or Windows icon. Pictures over 256 px are fitted inside 256 x 256, proportions kept. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Make an ICO icon from a WebP image, fitted to 256 px at most."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a WebP to ICO?",
+        "answer": "Choose your WebP above and save the ICO that appears. Each WebP you pick gives its own ICO file. The conversion runs in your browser."
+      },
+      {
+        "question": "Can I use the ICO as a website favicon?",
+        "answer": "Yes. ICO is the favicon format browsers read, and a browser can open the ICO this page produces. Start from a square WebP so the icon isn't squeezed or left with empty sides."
+      },
+      {
+        "question": "How big is the ICO?",
+        "answer": "A bigger picture is reduced to sit inside a 256 x 256 square without changing its proportions. A smaller picture keeps its own size."
+      },
+      {
+        "question": "Does the ICO contain several icon sizes?",
+        "answer": "No. This page writes one image: your WebP, fitted to 256 px at most. For a file with a separate 16, 32 and 48 px image, build it with an icon editor or with Pillow's sizes option."
+      },
+      {
+        "question": "What if my WebP is smaller than 256 px?",
+        "answer": "It keeps its own size. The page fits a larger picture down to 256 px but never enlarges a smaller one, so a 96 px WebP gives a 96 px icon."
+      },
+      {
+        "question": "What happens to a non-square WebP?",
+        "answer": "Its proportions are kept, so it is not stretched into a square. An image 400 x 200 px becomes 256 x 128 px."
+      },
+      {
+        "question": "What happens to an animated WebP?",
+        "answer": "The icon is made from the first frame only. This ICO is a still image, so the motion is dropped."
+      },
+      {
+        "question": "Why does an older program reject my ICO?",
+        "answer": "An image of 256 px is written into the ICO as PNG data, the way Windows icons do it. GIMP's documentation notes that not all programs support reading icons saved this way. If one rejects the file, an icon editor such as GIMP lets you turn PNG compression off."
+      },
+      {
+        "question": "Are the WebP's color profile and metadata copied into the ICO?",
+        "answer": "No. No EXIF, ICC profile or XMP is carried over, because the image passes through raw pixels on its way."
+      },
+      {
+        "question": "Can I rename my .webp file to .ico?",
+        "answer": "No. An ICO has its own structure, and a renamed file still holds WebP data. Convert it instead."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and ICO",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format supporting lossy or lossless compression, alpha, and animation.",
+        "details": [
+          "Still or animated images",
+          "Optional metadata",
+          "Web image delivery"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "A Windows icon container that can hold images at different sizes and color depths.",
+        "details": [
+          "Interface icon assets",
+          "One or more image entries",
+          "Distinct from cursor files"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebP to ICO",
+      "points": [
+        "The ICO holds one image, not a set of sizes.",
+        "A side over 256 px is fitted inside 256 x 256 with its proportions kept; a smaller picture keeps its size.",
+        "A 256 px image is stored as PNG data inside the ICO, which some icon readers can't open.",
+        "An animated WebP gives its first frame only.",
+        "EXIF, ICC profiles and XMP are not copied."
+      ]
+    },
+    "guide": {
+      "title": "About WebP and ICO",
+      "markdown": "### What is a WebP file?\n\nWebP is an image format developed by Google and released as open source. Google announced it on 30 September 2010. Its lossy compression is based on VP8, the video codec Google released as open source in May 2010, and applies VP8's intra-frame coding to still images. The lossless variant takes another route, combining LZ77 matching, prefix codes and a color cache. A WebP file is a RIFF container.\n\nTransparency and animation work in both lossy and lossless WebP, and the file can also store an ICC profile along with Exif and XMP metadata. An image can be at most 16,383 x 16,383 pixels. On average, Google says lossless WebP comes out about 26% smaller than PNG, and lossy WebP about 30% smaller than JPEG. WebP was documented in RFC 9649 in November 2024, which also registers the image/webp media type.\n\n### Programs that open WebP files\n\n- **Windows, Mac and Linux:** GIMP handles WebP import and export natively as of version 2.10.\n- **Windows, Mac and Linux:** ImageMagick reads WebP; inspect `magick identify -list format` for your installed build.\n- **Windows, Mac and Linux:** XnView MP reads and writes WebP, and is free for private or educational use. A company needs a license.\n- **Windows and Mac:** Photoshop reads and writes WebP without a plug-in from version 23.2.\n- **Windows:** With Microsoft's WebP Image Extension installed, File Explorer and Photos can open WebP images.\n- **Web:** Firefox and Chrome display WebP, though older versions may not animate it. Lossy WebP displays in Chrome 17+, Edge 18+, Firefox 65+ and Safari 14+.\n- **Mobile:** Safari on iPhone and Chrome on Android display WebP. Android decodes WebP from version 4.0, and lossless or transparent WebP from 4.2.1.\n\n### WebP and ICO compared\n\n- **Extensions and media types**: .webp is image/webp. .ico is image/vnd.microsoft.icon.\n- **Purpose**: WebP is a web image format. Microsoft designed ICO for icons in graphical interfaces, and the .ico extension is best known today from website favicons.\n- **Several images**: an ICO file may contain more than one image. A WebP is one picture, or one animation.\n- **Animation**: WebP can animate. The ICO written here holds one still image.\n- **Transparency**: both formats support an alpha channel.\n- **Size**: a WebP can be up to 16,383 px a side. ICO stores each side in one byte, so an image tops out at 256 px.\n- **Byte order**: ICO files use little-endian byte ordering.\n\nWindows Vista icon guidance includes 256-by-256 images for high-DPI displays, which is where the 256 px limit sits. On this page, the browser's own decoder reads the WebP and ImageMagick writes the ICO. Only one image goes in. A larger picture is fitted down to the limit, and one that is already smaller keeps its size. At 256 px the image is embedded in the ICO as PNG data. Metadata isn't copied.\n\n### Other ways to convert WebP to ICO\n\n- **GIMP (Windows, Mac, Linux):** open the WebP and choose File > Export As. Change the Name field's extension to .ico, or pick ICO under Select File Type, then export. The ICO dialog sets the color depth and offers a Compressed (PNG) checkbox.\n- **Pillow (Python):** open the WebP with `Image.open` and call `save` with a .ico filename. Pass `sizes=[(16,16),(32,32),(48,48)]` to put several icon sizes in one file. The default is 16, 24, 32, 48, 64, 128 and 256 px, and any size bigger than the original or 256 is ignored. Pillow needs libwebp to read WebP.\n- **FFmpeg (command line):** run `ffmpeg -i input.webp output.ico`. FFmpeg's documentation lists WebP among the image formats it decodes and ICO among the formats it reads and writes.\n\n### Problems with WebP files\n\n- **Older browsers and animation**: an old browser may show a still WebP yet be unable to play an animated one.\n- **A WebP beyond 16,383 px**: WebP caps each side at 16,383 pixels, so a bigger image runs past the format's limit.\n- **A tool can't read the WebP**: a given ImageMagick install might lack WebP decoding or encoding, so look in its format list.\n- **The page says it can't open the file**: you see \"This browser can't open ... files\" when your browser has no WebP decoder, and \"Image decode failed.\" for a file the browser can't read. Updating to a current Chrome, Edge, Firefox or Safari cures the first.\n"
+    }
+  },
+  "aif-to-mp3": {
+    "seo": {
+      "title": "Convert AIF to MP3 Online (Free)",
+      "h1": "AIF to MP3 Converter",
+      "description": "Turn a large uncompressed AIFF recording into an MP3 that is easy to share, at up to 192 kbps. Free, in your browser, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an AIF recording into an MP3 that is easier to share."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AIF to MP3?",
+        "answer": "Choose your AIF above and wait for the MP3 to appear, then save it. Pick several AIF files and each becomes its own MP3. The audio is encoded in your browser, so nothing is uploaded."
+      },
+      {
+        "question": "Is an AIF file the same as an AIFF file?",
+        "answer": "Yes. .aif is the short form of .aiff, the Audio Interchange File Format that Apple developed. Both endings hold the same kind of file, usually uncompressed PCM audio."
+      },
+      {
+        "question": "What MP3 quality does this page use?",
+        "answer": "The page asks FFmpeg's LAME encoder for 192 kbps, which a source sampled at 32 kHz or more can reach. A lower sample rate gets a lower MP3 rate, because MP3 can't reach 192 kbps there. There is no quality slider. Audacity's MP3 export lets you pick a preset or a constant, average or variable bit rate if you need another."
+      },
+      {
+        "question": "Does AIF to MP3 lose quality?",
+        "answer": "Yes. MP3 is lossy and discards audio information that an uncompressed AIFF keeps. Keep the AIF if you will edit or master it later."
+      },
+      {
+        "question": "Why is the MP3 so much smaller than the AIF?",
+        "answer": "Uncompressed PCM needs far more storage than a compressed MP3 of the same recording. The MP3 gets there by discarding audio information, which is also why the conversion is lossy."
+      },
+      {
+        "question": "Are the tags in my AIF kept in the MP3?",
+        "answer": "Where MP3 has a matching field, yes. FFmpeg copies the file's global tags by default, and in a test an AIF's title came through as the MP3's title. Check the MP3 in a tag editor if you rely on other fields."
+      },
+      {
+        "question": "Is there a limit on how long an AIF can be?",
+        "answer": "The page sets no file-size limit or timeout of its own. Length only matters through how much work your own device has to do, since the encoding happens locally."
+      },
+      {
+        "question": "What if my AIF shows \"FFmpeg failed with exit code\"?",
+        "answer": "The page shows that message when FFmpeg stops with an error. AIFF-C, the extension of the format, can hold compressed audio, so the encoding inside a file matters more than the .aif ending. A damaged or cut-short AIF usually still converts to a shorter MP3."
+      },
+      {
+        "question": "Can several AIF files become one MP3?",
+        "answer": "No. Each AIF is converted separately and downloads as its own MP3. To join tracks into one recording, assemble them in an audio editor first."
+      },
+      {
+        "question": "Does the AIF leave my computer?",
+        "answer": "No. The conversion engine, FFmpeg compiled to WebAssembly, loads into this page, so there is nothing to install and no upload. You download a new MP3 and the AIF stays as it was."
+      }
+    ],
+    "aboutSection": {
+      "title": "AIF and MP3",
+      "fromFormat": {
+        "name": "AIF",
+        "fullName": "Audio Interchange File Format",
+        "description": "The short extension for Audio Interchange File Format, often carrying uncompressed PCM sound.",
+        "details": [
+          "Audio recording wrapper",
+          "Also written .aiff",
+          "Used for audio masters"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A compressed audio format that reduces data through lossy encoding.",
+        "details": [
+          "Audio delivery",
+          "Bitrate affects file size",
+          "Different from PCM masters"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AIF to MP3",
+      "points": [
+        "The LAME encoder is asked for 192 kbps, which a source below 32 kHz can't reach, with no quality setting.",
+        "MP3 is lossy and AIFF is usually uncompressed, so the MP3 is not identical to the source.",
+        "Keep the AIF if you still plan to edit or master the recording.",
+        "Several AIF files give several MP3s."
+      ]
+    },
+    "guide": {
+      "title": "About AIF and MP3",
+      "markdown": "### What is an AIF file?\n\nAn AIF file is an Audio Interchange File Format recording. The .aif extension is the short form of .aiff, and both name the same format. AIFF was Apple's creation, based on Electronic Arts' IFF family, and version 1.3 of its specification carries the date January 4, 1989. Uncompressed linear PCM samples are the usual contents, while AIFF-C widens the family to compressed audio. An AIFF can also include named chunks for the author, copyright and annotations.\n\nMasters and working recordings in professional audio are a typical use, and macOS audio production is where AIFF is best known. Because the samples are usually uncompressed and lossless, the files are large, and a recording is often turned into an MP3 before it is shared. Common media-type labels are audio/aiff and audio/x-aiff.\n\n### Programs that open AIF files\n\n- **Windows, Mac and Linux:** Audacity imports most AIFF files, every PCM variant included, without its optional FFmpeg library. It is the choice for trimming or cleaning a recording before you export it.\n- **Windows, Mac and Linux:** FFmpeg lists AIFF encoding and decoding support in its format table, and it runs from the command line.\n- **Windows, Mac and Linux:** AIFF is among the files VLC media player opens.\n- **Windows and Mac:** Adobe Audition opens uncompressed AIFF and most of the common compressed variants, which suits professional editing.\n- **Mac:** Apple Music plays AIFF, and Logic Pro, Apple's music production app, opens it for editing.\n\n### AIF and MP3 compared\n\n- **Extensions and media types**: .aif and .aiff are common audio/aiff, with audio/x-aiff also seen. MP3's registered media type is audio/mpeg.\n- **Compression**: AIFF is normally uncompressed PCM. MP3 is a lossy format, and it plays in every major browser; it shrinks audio by dropping sounds that a model of human hearing says listeners won't notice.\n- **Standards**: MP3 is MPEG-1 Audio Layer III, standardized as ISO/IEC 11172-3 in 1993 and extended by ISO/IEC 13818-3 in 1995. The late 1980s saw Fraunhofer IIS start the work on MP3, joined by other members of the MPEG audio group.\n- **Size**: compared with the same audio on a CD, an MP3 at 128 kbit/s takes roughly one eleventh of the space.\n- **Bitrate**: an MP3 can be written at 32 to 320 kbps, at a 32, 44.1 or 48 kHz sampling rate. This page asks for 192 kbps, so a source below 32 kHz gets a lower rate.\n- **Metadata**: AIFF has its own chunks for author, copyright and annotations. ID3 structures, separate from the audio, hold an MP3's song titles and other tags.\n- **Playback**: every major browser plays MP3, so the converted file works almost anywhere.\n- **Licensing**: the MP3 patent licensing program ended on 23 April 2017.\n\nThis page re-encodes the audio with FFmpeg's LAME encoder and discards any picture track. The result is a standard MP3 that is not identical to the AIF. Global tags from the AIF are carried over by FFmpeg wherever the MP3 has a matching field.\n\n### Other ways to convert AIF to MP3\n\n- **FFmpeg (command line):** encode with `ffmpeg -i input.aif -c:a libmp3lame -b:a 192k output.mp3`. FFmpeg's documentation lists AIFF among the formats it reads, describes the LAME encoder, and sets the bitrate with the b option. Replace input.aif with the name of your own file, and the result is written next to it as output.mp3 in the folder where you ran the command.\n- **Audacity (Windows, Mac, Linux):** use File > Import > Audio to load the AIF, then File > Export Audio with MP3 chosen as the format. The bit rate modes are Preset, Variable, Average and Constant, and the Standard preset is the default.\n\nEach route makes a lossy MP3, so keep the AIF as your master.\n\n### Problems with AIF files\n\n- **One AIF plays, another doesn't**: AIFF-C compression requires a decoder for the actual encoding, and the family name alone does not establish support.\n- **Author field missing**: Adobe Audition can file an AIFF's author under Dublin Core: Creator, not under a field called Author.\n- **The AIF is too big to email**: a long recording in uncompressed PCM gets very large, and a compressed copy of it takes less storage.\n- **The extension misleads**: .aif and .aiff are the same format, but a file ending in either may hold AIFF-C, so the ending does not tell you how the audio is encoded.\n"
+    }
+  },
+  "avif-to-gif": {
+    "seo": {
+      "title": "Convert AVIF to GIF Online (Free)",
+      "h1": "AVIF to GIF Converter",
+      "description": "Convert AVIF to GIF as a still picture of the first frame, reduced to GIF's 256-color palette. Free, in your browser, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn an AVIF image into a still GIF for programs that don't read AVIF."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert AVIF to GIF?",
+        "answer": "Choose your AVIF above and save the GIF that appears. Your browser decodes the AVIF on your own device, so nothing is uploaded. Each AVIF you choose gives its own GIF."
+      },
+      {
+        "question": "Will an animated AVIF become an animated GIF?",
+        "answer": "No. An animated AVIF contributes only its first frame, which leaves the GIF as one still picture. Keep the AVIF, or use a program that handles image sequences, when the motion matters."
+      },
+      {
+        "question": "Why do the colors look banded or flat in the GIF?",
+        "answer": "No more than 256 colors fit in one GIF frame. A photo with smooth skies or gradients has far more, so it is reduced and bands can show, while flat graphics and line art change much less."
+      },
+      {
+        "question": "Is there a size limit for the AVIF?",
+        "answer": "No file-size cap is built into the page. How long a large picture takes depends on your device, since your browser does both the decoding and the GIF writing."
+      },
+      {
+        "question": "What happens to transparency in the AVIF?",
+        "answer": "GIF can mark a pixel as fully transparent or fully opaque, with nothing in between, so soft shadows and feathered edges can't stay soft. This converter keeps transparency when the target is PNG or WebP."
+      },
+      {
+        "question": "Is my AVIF's HDR or 10-bit color kept?",
+        "answer": "No. Only 8 bits per channel get through, so a 10-bit or 12-bit AVIF loses its extra depth, and GIF then holds each frame to 256 colors."
+      },
+      {
+        "question": "Why am I told my browser can't open the AVIF?",
+        "answer": "The browser decodes the AVIF, and an older one may not read the format. You then see a message suggesting a current version of Chrome, Edge, Firefox or Safari. Update the browser or open the page in another one."
+      },
+      {
+        "question": "Are the AVIF's EXIF, color profile and XMP copied?",
+        "answer": "No. Raw pixels are all that pass through, so that information is dropped. The GIF holds only the picture."
+      },
+      {
+        "question": "Can I rename .avif to .gif instead?",
+        "answer": "No. The file would still be AV1 data inside a HEIF container, which GIF viewers can't read. Convert it so the picture is rewritten as a GIF."
+      },
+      {
+        "question": "Can I convert many AVIF files at once?",
+        "answer": "Yes. Select several and the page converts them in turn, downloading a separate GIF for each. Nothing is merged into a single animation."
+      }
+    ],
+    "aboutSection": {
+      "title": "AVIF and GIF",
+      "fromFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An AV1 image format with support for still pictures, sequences, alpha, and greater sample precision.",
+        "details": [
+          "AV1-coded images",
+          "Lossy or lossless coding",
+          "Optional image sequences"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A palette-based image format for still graphics and frame animation.",
+        "details": [
+          "Up to 256 colors per frame",
+          "Fully transparent or opaque pixels",
+          "No soundtrack"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting AVIF to GIF",
+      "points": [
+        "The GIF is one still picture: an animated AVIF gives its first frame.",
+        "A GIF frame holds at most 256 colors, so photos can show banding.",
+        "GIF transparency is on or off; soft edges can't stay soft.",
+        "The picture goes through 8 bits per channel, so extra bit depth is lost.",
+        "EXIF, ICC profiles and XMP are not copied."
+      ]
+    },
+    "guide": {
+      "title": "About AVIF and GIF",
+      "markdown": "### What is an AVIF file?\n\nThe Alliance for Open Media created AVIF, the AV1 Image File Format. The Alliance was founded in 2015 to build royalty-free media formats and published the AV1 video codec in 2018. Version 1.0.0 of the AVIF specification is dated 19 February 2019. A file stores AV1-coded images inside the HEIF container, and it can be lossy or lossless, transparent, a still or an image sequence, with up to 12 bits per channel for HDR and wide color gamut. Exif, XMP and an ICC color profile fit inside, and image/avif is the registered media type.\n\nWebsites use AVIF for web images with small files and for HDR and wide-gamut pictures. You meet it when a site serves a photo in it and your software, or an upload form, won't take the file. That is the usual reason to convert. A Baseline-profile image item is at most 8,192 by 4,352 pixels, and a larger picture is stored as a grid of such images.\n\n### Programs that open AVIF files\n\n- **Windows, Mac and Linux:** GIMP gained AVIF import and export in version 2.10.22, which came out in October 2020.\n- **Windows, Mac and Linux:** ImageMagick reads AVIF, so check your install's format list.\n- **Windows:** Microsoft's AV1 Video Extension and its HEIF Image Extension must both be installed before .avif files display.\n- **Web:** Edge 121, Safari 16.1, Firefox 93 and Chrome 85 all display AVIF, though without progressive rendering.\n- **Mobile:** Android has decoded AVIF since version 12; Safari on iOS 16 brought in still AVIF images, and that first support leaves out animation.\n\n### AVIF and GIF compared\n\n- **Extensions and media types**: .avif is image/avif and .gif is image/gif.\n- **Compression**: AVIF uses AV1 and can be lossy or lossless. GIF compresses losslessly with LZW coding, and each image uses a palette of at most 256 colors.\n- **Color**: AVIF supports up to 12 bits per channel, HDR and a wide color gamut. A GIF image is limited to its palette of 256 colors.\n- **Metadata**: GIF89a offers comments and application data, a different set from the fields an AVIF carries.\n- **Transparency**: AVIF supports it. In a GIF one palette entry can be designated fully transparent, and there are no partial transparency levels.\n- **Animation**: a GIF can hold many images, with the delay between them set in hundredths of a second. GIF came from CompuServe in 1987; its GIF89a revision, dated July 1990, brought in the extensions for transparency and frame timing.\n- **Support**: GIF displays in every major browser. GIF patents on LZW ran out in 2003 in the US and in 2004 in Europe and Japan.\n\nYour browser decodes the AVIF here, and ImageMagick then writes the GIF. An animated AVIF gives its first frame only. Everything goes through 8-bit RGBA, which drops EXIF, ICC and XMP data, and you get one still picture for software that wants a GIF. Keep the AVIF if you need the sequence, the extra bit depth or the metadata again.\n\n### Other ways to convert AVIF to GIF\n\n- **GIMP on Windows, Mac and Linux:** GIMP 2.10.22 or later can open the AVIF; then choose File > Export As. Type .gif as the Name field's extension, or choose GIF under Select File Type, and export. GIMP only supports exporting a GIF with a maximum of 256 colors.\n- **ImageMagick (command line):** run `magick input.avif output.gif`. ImageMagick's format list shows AVIF and GIF as formats it reads and writes.\n- **Pillow (Python):** Pillow reads and writes AVIF, 8-bit only. Call `Image.open` on the file, then `save` with a name that ends in .gif; Pillow infers the format from that ending when you name none.\n\nEach of these writes one still picture unless you set up an animation yourself. Check the result at its normal display size, because palette reduction shows most on photos and gradients.\n\n### Problems with AVIF files\n\n- **The AVIF won't open**: older browsers may fail to display it. Update the browser, or ask the site for a JPEG, PNG or WebP copy.\n- **An older GIMP can't import it**: releases before 2.10.22 lack the AVIF importer.\n- **A 10-bit file fails on a phone**: baseline 8-bit AVIF decodes on Android 12 and newer, but support for 10-bit is optional.\n- **Windows shows no preview**: the .avif viewer needs the AV1 Video Extension and the HEIF Image Extension.\n- **It decodes slowly**: decoding an AVIF is slow, and encoding one may take several seconds.\n"
+    }
+  },
+  "jpg-to-bmp": {
+    "seo": {
+      "title": "Convert JPG to BMP Online (Free)",
+      "h1": "JPG to BMP Converter",
+      "description": "Turn a JPG into a plain-pixel Windows BMP that adds no new compression loss. Free, in your browser, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a JPG into an uncompressed BMP bitmap."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JPG to BMP?",
+        "answer": "Choose your JPG above and save the BMP that appears. You can pick several JPG files, and each becomes its own BMP. The conversion happens in your browser, so the photos stay on your device."
+      },
+      {
+        "question": "Why does the BMP take so much more space than the JPG?",
+        "answer": "A JPG compresses a photo by discarding detail, while a BMP usually stores the pixels uncompressed, so its size follows the picture's width, height and bytes per pixel. In a test, a small JPG produced a BMP many times its size, and a large photo can give a very large file."
+      },
+      {
+        "question": "Does JPG to BMP lose quality?",
+        "answer": "Not further. The JPG is decoded to pixels and written to the BMP uncompressed, so no new compression loss is added. The BMP shows the JPG as it looked, blockiness included."
+      },
+      {
+        "question": "Will converting to BMP bring back detail the JPG lost?",
+        "answer": "No. JPEG compression throws that detail away when the JPG is saved. A BMP holds the decoded result in full, which is why it is bigger but no sharper."
+      },
+      {
+        "question": "Why would I want a BMP instead of a JPG?",
+        "answer": "BMP is simple: it usually stores pixels uncompressed, and Windows Paint and Windows Photos open it. It suits simple Windows graphics and uncompressed interchange. For sharing photos, JPG is the more practical choice."
+      },
+      {
+        "question": "Is .jpg the same as .jpeg for this page?",
+        "answer": "Yes, .jpg and .jpeg name the same format. This page's file picker is set to .jpg files."
+      },
+      {
+        "question": "What if the page says \"Image decode failed.\"?",
+        "answer": "Your browser couldn't decode the file as a JPG. The file may be damaged or may not really be a JPG. Open it in an image viewer to check, or save it again from the program that made it."
+      },
+      {
+        "question": "Are the JPG's EXIF data and color profile kept?",
+        "answer": "No. Because the picture is turned into raw pixels, camera and date tags, ICC profiles and XMP don't reach the BMP."
+      },
+      {
+        "question": "Can I rename .jpg to .bmp instead?",
+        "answer": "No. Renaming only changes the label. A program that reads the contents will find JPEG data, not a bitmap. Convert it to write real BMP pixels."
+      },
+      {
+        "question": "Is there a size limit?",
+        "answer": "No limit is set by this page. Your device does the decoding and writes the bitmap, so a large photo simply takes longer."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and BMP",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A common JPEG raster image, usually using lossy compression for photographs.",
+        "details": [
+          "Same format as .jpeg",
+          "No alpha channel",
+          "No editable layer stack"
+        ]
+      },
+      "toFormat": {
+        "name": "BMP",
+        "fullName": "Windows Bitmap",
+        "description": "A Microsoft bitmap format with several header and pixel-storage variants.",
+        "details": [
+          "Raster pixel data",
+          "Often uncompressed",
+          "Reader compatibility varies"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to BMP",
+      "points": [
+        "The BMP can be far larger than the JPG, because its pixels are usually stored uncompressed.",
+        "No new loss is added, and none of the JPG's lost detail returns.",
+        "EXIF, ICC profiles and XMP are not copied.",
+        "The picture passes through 8 bits per channel, the depth a JPG has.",
+        "Several JPG files give several BMPs."
+      ]
+    },
+    "guide": {
+      "title": "About JPG and BMP",
+      "markdown": "### What is a JPG file?\n\nJPEG takes its name from the committee that wrote it, the Joint Photographic Experts Group, whose work started in 1986. ITU-T T.81 (1992) and ISO/IEC 10918-1 (1994) are the two publications of the core standard. The .jpg and .jpeg extensions name the same format, and its registered media type is image/jpeg. No alpha channel exists in JPEG, and each color channel gets 8 bits, so layers and transparency can't be stored.\n\nBaseline JPEG is lossy. JPEG compression first cuts the picture into 8x8 pixel blocks; a discrete cosine transform follows, then Huffman coding. A progressive mode shows a coarse version of the image first, which sharpens as more data loads. Quality is commonly a number between 0 and 100, but one program's value does not match another's in output. Digital cameras and scanners mostly have JPEG built in, every major browser displays it, and 27 October 2006 was the expiry date of its US patents. The wrapper called JFIF, the JPEG File Interchange Format, is minimal and exists to exchange JPEG data between programs and platforms.\n\n### Programs that open JPG files\n\n- **Linux, Mac and Windows:** GIMP takes JPEG files in for editing.\n- **Windows, Mac and Linux:** JPG is among the formats ImageMagick reads, and your install's format list confirms it.\n- **Windows:** Windows Paint and Windows Photos open JPG.\n- **Mac:** Preview opens JPG.\n- **Web:** Google Chrome and Mozilla Firefox open a JPG directly.\n- **Mobile:** On phones and tablets, Safari and Chrome both display JPG.\n\n### JPG and BMP compared\n\n- **Extensions and media types**: image/jpeg uses .jpg or .jpeg. The registered BMP media type is image/bmp.\n- **Compression**: JPG is lossy. BMP usually holds uncompressed pixels; lossless compression is possible, including optional run-length compression.\n- **Size**: expect a big file from an uncompressed BMP; PNG or JPEG can suit distribution better.\n- **Color depth**: BMP stores 1 to 32 bits per pixel. A JPG decoded here becomes 8 bits per channel.\n- **Transparency**: JPG has none. Windows 98 brought BMP version 5 in 1998, with room for an alpha channel and an ICC profile.\n- **Where you meet them**: JPG comes from cameras and websites. BMP is commonly encountered in Windows screen captures and system graphics.\n- **Origin**: Microsoft controls the BMP family, used originally on Windows and OS/2.\n\nOn this page your browser decodes the JPG and ImageMagick writes the BMP. Conversion runs through 8-bit RGBA, so the JPG's EXIF, ICC and XMP data does not come along. The BMP is a copy of the decoded pixels, and none of the detail the JPG discarded comes back.\n\n### Other ways to convert JPG to BMP\n\n- **ImageMagick (command line):** run `magick input.jpg output.bmp`. ImageMagick's format list shows BMP as a format it reads and writes, with version 4 as the default, and names BMP3 and BMP2 for versions 3 and 2.\n- **GIMP (Windows, Mac, Linux):** open the JPG and choose File > Export As. Give the file name a .bmp extension in the Name field, or select BMP under Select File Type, and export. The BMP dialog has a Write color space information checkbox, which some programs can't read, and an RGB format list such as 24 bit (R8 G8 B8).\n- **Pillow (Python):** Pillow reads and writes BMP. Load the JPG using `Image.open`, then `save` to a name ending in .bmp; with no format given, Pillow reads it from the ending.\n\nWhichever route you choose, the BMP holds the decoded picture, so convert from the largest, least compressed JPG you have if quality matters.\n\n### Problems with JPG files\n\n- **Transparent areas vanish**: transparent pixels can't survive JPEG export, so choose a format with alpha when you need see-through pixels.\n- **An older photo frame refuses the file**: some older frames reject progressive JPEG. Export again with progressive mode off.\n- **The same quality number looks different**: matching quality numbers across editors don't guarantee matching compression or appearance.\n- **Layers are gone**: a JPEG can't store an editable layer stack, so save the project file separately.\n- **The picture looks blocky**: a low-quality JPG shows blocky patches around edges and in flat areas, and every program that decodes the file shows them.\n- **Colors can't go deeper**: JPEG holds 8 bits per channel, so a program that needs more depth has to start from a different source.\n"
+    }
+  },
+  "mkv-to-gif": {
+    "seo": {
+      "title": "Convert MKV to GIF Online (Free)",
+      "h1": "MKV to GIF Converter",
+      "description": "Turn an MKV video into a silent, looping GIF at 15 frames per second, up to 480 px on the longer side. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Turn an MKV video into a silent, looping GIF at 15 fps and up to 480 px."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MKV to GIF?",
+        "answer": "Choose your MKV above and wait for the GIF to finish, then save it. The page converts the whole video from start to end, so a short clip works best. Everything happens in your browser."
+      },
+      {
+        "question": "What size and frame rate will the GIF have?",
+        "answer": "The longer side is at most 480 px, with the shape of the picture kept, and the GIF runs at 15 frames per second. A video smaller than 480 px keeps its size. Odd widths and heights lose one pixel to become even."
+      },
+      {
+        "question": "Can I pick the part of the video to turn into a GIF?",
+        "answer": "No. This page converts the whole MKV from start to end. Trim the clip first in a video editor such as Kdenlive, or render only a selected zone there, then convert the short file."
+      },
+      {
+        "question": "Does the MKV have to be short?",
+        "answer": "No size limit or timeout is built into the page. A long video takes as long as your device needs, and the GIF holds every frame at 15 per second, so a short clip is the sensible choice."
+      },
+      {
+        "question": "Will the GIF have sound?",
+        "answer": "No. The output is a GIF, which has no soundtrack, so the audio does not carry over."
+      },
+      {
+        "question": "Why do the colors look off in the GIF?",
+        "answer": "One GIF image holds at most 256 colors. The page builds one palette for the whole video first and then maps every frame to it, which keeps the colors close but can still show banding in gradients."
+      },
+      {
+        "question": "Does the GIF loop?",
+        "answer": "Yes. The GIF is written to repeat forever."
+      },
+      {
+        "question": "My MKV is interlaced. Will the GIF look combed?",
+        "answer": "Frames that the video marks as interlaced are deinterlaced first, so moving edges don't comb. Frames not marked as interlaced pass through unchanged."
+      },
+      {
+        "question": "What if the page says \"FFmpeg failed with exit code\"?",
+        "answer": "FFmpeg stopped with an error on that file. The video may be damaged or hold a codec the page's FFmpeg can't decode. A damaged MKV often still converts to a shorter GIF, so try another copy if the message appears."
+      },
+      {
+        "question": "Is it one GIF for each MKV I choose?",
+        "answer": "Yes. Chosen files run one after another, each giving a separate GIF download, never a combined animation. Your MKV files themselves are left as they were."
+      }
+    ],
+    "aboutSection": {
+      "title": "MKV and GIF",
+      "fromFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "Matroska wraps audiovisual tracks with options for subtitles, chapters, and tags.",
+        "details": [
+          "Several track types",
+          "Open container design",
+          "Codec-dependent playback"
+        ]
+      },
+      "toFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A palette-based image format for still graphics and frame animation.",
+        "details": [
+          "Up to 256 colors per frame",
+          "Fully transparent or opaque pixels",
+          "No soundtrack"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MKV to GIF",
+      "points": [
+        "The GIF runs at 15 fps and is at most 480 px on its longer side.",
+        "The whole video is converted, with no way to choose a start or end.",
+        "GIF has no sound, so the audio is dropped.",
+        "The page builds a 256-color palette from the video before writing the GIF.",
+        "The GIF repeats forever."
+      ]
+    },
+    "guide": {
+      "title": "About MKV and GIF",
+      "markdown": "### What is an MKV file?\n\nThe .mkv extension marks a Matroska video file. Matroska uses EBML, a binary structure derived from XML, as its base, and it developed out of the older MCF project as a container for audio and video. An MKV may contain multiple video, audio and subtitle streams alongside chapters and descriptive tags, which the format includes by design. IANA registers video/matroska as the media type, and WebM is a subset of Matroska.\n\nThe container does not prescribe one compression method or a fixed level of quality, so two MKV files can differ completely inside. People use MKV for high-quality video collections, Blu-ray rips and videos with several audio and subtitle tracks. A clip from such a file makes a decent GIF only when it is short.\n\n### Programs that open MKV files\n\n- **Linux, Mac and Windows:** mpv offers desktop playback where you can select the audio and subtitle tracks.\n- **Windows, Mac and Linux:** ffplay relies on FFmpeg's Matroska demuxer.\n- **Windows, Mac and Linux:** VLC media player is among the programs that open MKV.\n- **Mobile:** Android and iOS both have a VLC app, and playback hinges on what is inside the container.\n\nPlex also reads MKV, and Windows Media Player needs extra codecs for it.\n\n### MKV and GIF compared\n\n- **Extensions and media types**: .mkv uses video/matroska, and .gif uses image/gif.\n- **Content**: an MKV holds video, audio and subtitle streams with any codec. A GIF holds only pictures, with a palette of at most 256 colors per image, compressed losslessly with LZW.\n- **Sound**: GIF has no soundtrack, so a GIF made here is silent.\n- **Transparency**: a GIF can designate one palette color fully transparent but offers no partial levels, and video frames have no need of them.\n- **Frame timing**: CompuServe introduced GIF in 1987. GIF89a, dated July 1990, added the extensions for frame timing, with each delay set in hundredths of a second. A GIF can hold many images, and those delays are how GIF animation works.\n- **Support**: every major browser displays GIF. License fees for LZW were first charged by Unisys in 1994; the patent expired in the US in 2003 and in Europe and Japan in 2004.\n\nThis page makes the conversion in two FFmpeg passes that share the same filter chain, so the palette matches the frames it is applied to. That chain deinterlaces frames flagged as interlaced, samples the video at 15 frames per second and fits the picture inside a 480 px box, keeping its shape and never enlarging a smaller video. Both dimensions are rounded down to even numbers. The first pass analyzes the whole video and writes a single palette. The second pass writes the GIF with that palette, set to loop forever. No audio is written.\n\n### Other ways to convert MKV to GIF\n\n- **FFmpeg (command line):** build a palette with `ffmpeg -i input.mkv -vf palettegen palette.png`, then write the GIF with `ffmpeg -i input.mkv -i palette.png -lavfi paletteuse output.gif`. The palettegen filter generates one palette for a whole video stream, and paletteuse then maps the frames to it, which is the approach this page takes. These commands keep the original size and frame rate, so the GIF differs from one made here.\n- **Kdenlive (Windows, Mac, Linux):** put the MKV on the timeline and open File > Render from the menu bar. Pick GIF High Quality from the Generic presets, choose Full Project or Selected Zone and select Render to File. Full Project is the default and renders from the start of the first clip to the end of the last. Selected Zone renders only the part of the project you marked, so it lets you choose the section you want.\n\nBoth routes write a GIF without sound. Check the result at its normal size, since palette reduction shows most in gradients.\n\n### Problems with MKV files\n\n- **Wrong audio or subtitle language**: choosing the wrong audio or subtitle stream can give the wrong language. mpv provides track selection controls.\n- **Seeking is slow or fails**: cues are defined apart from the media clusters in Matroska, and a file whose cues are missing or damaged can be harder to seek in.\n- **The container opens but the video doesn't**: a player that understands the container may still lack a decoder for the codec inside.\n"
+    }
+  },
+  "png-to-cur": {
+    "seo": {
+      "title": "Convert PNG to CUR Online (Free)",
+      "h1": "PNG to CUR Converter",
+      "description": "Turn a PNG into a Windows CUR cursor file, one image up to 256 px, with no hotspot setting. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Make a Windows CUR cursor file from a PNG image, up to 256 px."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a PNG to CUR?",
+        "answer": "Choose your PNG above and save the CUR file that appears. Each PNG gives its own CUR. Everything happens in your browser, so the image never leaves your device."
+      },
+      {
+        "question": "What is the hotspot, and can I set it here?",
+        "answer": "The hotspot is the active pixel of the cursor, the point that does the clicking, such as the tip of an arrow. A CUR stores its coordinates, and this page has no hotspot setting. A cursor editor, such as GIMP with its Windows cursor export, lets you set the position."
+      },
+      {
+        "question": "What size will my cursor be?",
+        "answer": "If a side exceeds 256 px, the page scales the picture down to fit inside 256 x 256, keeping its proportions. A smaller PNG keeps its size, so make the PNG about as large as you want the cursor to be."
+      },
+      {
+        "question": "Does the CUR hold several sizes?",
+        "answer": "No. The CUR holds the single image you supplied. A CUR can embed several sizes, each with its own hotspot, but this page writes only one. GIMP's Windows cursor export supports multiple sizes if you need them."
+      },
+      {
+        "question": "How is a CUR different from an ICO?",
+        "answer": "A CUR uses the same layout as an ICO, with an added hotspot position that marks the point the pointer clicks. This page writes a CUR, so the file is meant for pointers rather than for icons."
+      },
+      {
+        "question": "Can I make an animated cursor?",
+        "answer": "No. This page writes a still cursor, and ANI is the format animated cursors use. An animated PNG contributes its first frame alone."
+      },
+      {
+        "question": "Can I use a very large PNG?",
+        "answer": "Yes, the file itself has no cap here. Whatever its size, the cursor comes out at 256 px or less on each side, so a huge source only costs your browser the time to decode it."
+      },
+      {
+        "question": "Why does an older program reject my CUR?",
+        "answer": "A 256 px picture is held inside the file as PNG data, as it is in Windows icons. Some programs can't read PNG entries. GIMP's cursor export lets you leave the Compressed (PNG) option off."
+      },
+      {
+        "question": "Are the PNG's metadata and color profile kept?",
+        "answer": "No. Only decoded pixels reach the cursor, so text chunks, an ICC profile, EXIF and XMP are left behind."
+      },
+      {
+        "question": "Can I rename .png to .cur instead?",
+        "answer": "No. A CUR has its own structure with a hotspot position, so a renamed PNG is still PNG data. Convert it so the picture is written as a cursor."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and CUR",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A losslessly compressed raster format supporting indexed color, truecolor, and alpha.",
+        "details": [
+          "Sharp interface graphics",
+          "Optional transparent pixels",
+          "Eight- or sixteen-bit samples"
+        ]
+      },
+      "toFormat": {
+        "name": "CUR",
+        "fullName": "Windows cursor",
+        "description": "A Windows cursor image container that also stores the active click position.",
+        "details": [
+          "Hotspot coordinates",
+          "Static pointer assets",
+          "Size and depth variants"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to CUR",
+      "points": [
+        "The CUR holds one image, up to 256 px; larger pictures are fitted inside 256 x 256.",
+        "There is no hotspot setting on this page, so use a cursor editor if you need to place it.",
+        "The cursor is still, not animated; an animated PNG gives its first frame.",
+        "A 256 px image is stored as PNG data, which some programs can't read.",
+        "Metadata and ICC profiles are not copied."
+      ]
+    },
+    "guide": {
+      "title": "About PNG and CUR",
+      "markdown": "### What is a PNG file?\n\nReplacing GIF without its patent problem was the goal of PNG. PNG was the first format to receive W3C Recommendation status, in October 1996, and it was later issued as RFC 2083 and as ISO/IEC 15948:2004. A W3C Recommendation dated 24 June 2025 made the specification's third edition official. Lossless DEFLATE compression, a mix of LZ77 and Huffman coding, is the only kind PNG uses.\n\nFollowing a fixed signature, a PNG is made of chunks; the header chunk is IHDR, the pixel data lives in IDAT and IEND closes the file. Samples of 1 to 16 bits are supported in indexed, grayscale and truecolor images, with an optional alpha channel giving per-pixel transparency. Registered media types are image/png, with image/apng for animated files. With the third edition, HDR is handled by the cICP chunk and Exif metadata may sit in an eXIf chunk.\n\nNo royalty-bearing patents are known to cover PNG, and all major browsers display it. By default, macOS stores screenshots as PNG. Screenshots, interface graphics, logos and images with transparency are common PNG material, which is why a PNG often becomes the starting point for a cursor.\n\n### Programs that open PNG files\n\n- **Windows, Linux and Mac:** GIMP opens PNG files so you can edit them.\n- **Windows, Mac and Linux:** ImageMagick lists PNG as a readable format, so see your install's format support.\n- **Windows:** Windows Photos opens PNG.\n- **Mac:** Preview opens PNG.\n- **Web:** PNG displays in Google Chrome and Mozilla Firefox.\n- **Mobile:** Phones show PNG in Safari and Chrome.\n\nTo check a finished cursor, ImageMagick lists CUR as a readable format. On Windows, the Visual Studio Image Editor views and edits cursor resources, although 32-bit images can be viewed but not edited there. XnView MP, free for private and educational use, lists CUR among its supported formats on Mac and Linux.\n\n### PNG and CUR compared\n\n- **Extensions and media types**: PNG files use .png, and .cur is the Windows cursor container.\n- **Purpose**: PNG is a general image format. CUR is made for pointers, and a conventional image format is more suitable when hotspot information is unnecessary.\n- **Hotspot**: a CUR is related to ICO but includes coordinates for the active pointer location. PNG has no such coordinate.\n- **Sizes**: a CUR may embed several images at different dimensions, each with its own hotspot. A PNG is one image.\n- **Color and transparency**: PNG has an optional alpha channel for transparency, and the CUR sheet lists alpha transparency among the properties of a cursor file.\n- **Animation**: animated cursor assets use ANI rather than the ordinary CUR workflow.\n\nOn this page, the browser decodes the PNG and ImageMagick writes the CUR. One image goes in and one comes out. A larger picture is scaled down until it fits, because the format stores each side in one byte, and a picture at the full 256 px is held as PNG data. The page has no hotspot control. Metadata is not copied, and the picture is decoded to 8-bit pixels first.\n\n### Other ways to convert PNG to CUR\n\n- **GIMP (Windows, Mac, Linux):** open the PNG and choose File > Export As. Replace the extension in the Name field with .cur, or choose it under Select File Type, then export. The Windows cursor dialog lets you set the save type for each size, the Compressed (PNG) option, and Hot spot X and Hot spot Y.\n- **Axialis CursorWorkshop:** open the PNG, select the area you want, and choose Image > Create New Cursor from Selection. Pick the image formats in the New Cursor From Image dialog, then use Draw > Set Cursor Hot Spot and click at the hotspot position.\n- **SixLabors ImageSharp (.NET):** load the PNG, set HotspotX and HotspotY on `image.Frames.RootFrame.Metadata.GetCurMetadata()`, and save with `new CurEncoder()` to a .cur file. ImageSharp's page says to choose hotspots from the cursor design, not to copy them from another size.\n\n### Problems with PNG files\n\n- **A smaller compression setting changes nothing**: PNG compression is lossless, so a smaller setting does not reduce pixel fidelity.\n- **Layers sit at the wrong offset**: GIMP and other applications can disagree about layer offsets, so leave GIMP's PNG offset option off.\n- **Camera tags are missing**: GIMP exports camera tags and profiles only when asked, so turn on the matching metadata controls if you need them.\n- **The picture doesn't move**: software that cannot animate shows an animated PNG's default still image.\n"
+    }
+  },
+  "ai-to-jpg": {
+    "seo": {
+      "title": "Convert AI to JPG Online (Free)",
+      "h1": "AI to JPG Converter",
+      "description": "Turn an Illustrator AI file into JPG images, one per page, on a white background. Needs a PDF inside the AI. Free, in your browser."
+    },
+    "tool": {
+      "subtitle": "Render Illustrator AI artwork as JPG images, one per page."
+    },
+    "faqs": [
+      {
+        "question": "Why does my AI file say it has no PDF inside?",
+        "answer": "The page draws the PDF stored inside the AI, so a file saved without one is turned away. The message says the AI file has no PDF inside and tells you to re-save it, with Create PDF Compatible File switched on, from Illustrator. The re-saved copy then converts."
+      },
+      {
+        "question": "How can I turn an AI file into a JPG?",
+        "answer": "Choose your AI file above and save the JPG files that appear. The file is read in your browser and stays on your device. Each page of the artwork becomes its own JPG."
+      },
+      {
+        "question": "Will the JPG keep my editable paths and layers?",
+        "answer": "No. A JPG is a fixed grid of pixels, so paths, live text and layers become flat picture data. Keep the AI file for any later change."
+      },
+      {
+        "question": "What happens to a transparent background?",
+        "answer": "It turns white. Each page is drawn on a white background, and JPEG has no alpha channel anyway. For transparency, choose PNG or another alpha-capable format."
+      },
+      {
+        "question": "Does a multi-page AI give one JPG or several?",
+        "answer": "Several. Every page of the embedded PDF is rendered as its own image, and each is a separate download whose name ends in _page1, _page2 and onward. No ZIP is made, and there is no page limit."
+      },
+      {
+        "question": "What quality are the JPG files saved at?",
+        "answer": "Quality 0.9. You cannot change the setting on this page."
+      },
+      {
+        "question": "How large will the JPG be?",
+        "answer": "The scale is at most 2, so a page comes out at up to double its artboard size. The total is capped at 16,777,216 pixels, so a very large artboard is rendered at a lower scale than a small one."
+      },
+      {
+        "question": "How do I get a specific resolution?",
+        "answer": "This page picks the scale itself. For a set resolution, ImageMagick's -density option sets the canvas resolution when it renders vector formats, and Ghostscript's -r option takes the resolution you want."
+      },
+      {
+        "question": "Why are my linked images missing?",
+        "answer": "Unless Include Linked Files was ticked at save time, a linked image sits outside the AI file. Choose that option when you save from Illustrator, so the pictures travel inside the file."
+      },
+      {
+        "question": "Can I convert an AI file from a very old Illustrator?",
+        "answer": "Not directly. The oldest AI files were based on PostScript and have no PDF inside, so this page refuses them with the \"no PDF inside\" message. Opening one in a current Illustrator and saving it as a PDF-compatible AI gives you a file this page accepts."
+      }
+    ],
+    "aboutSection": {
+      "title": "AI and JPG",
+      "fromFormat": {
+        "name": "AI",
+        "fullName": "Adobe Illustrator artwork",
+        "description": "Illustrator source artwork containing editable design objects and, when enabled, a PDF representation.",
+        "details": [
+          "Vector drawing data",
+          "Layers and artboards",
+          "Optional PDF compatibility"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A common JPEG raster image, usually using lossy compression for photographs.",
+        "details": [
+          "Same format as .jpeg",
+          "No alpha channel",
+          "No editable layer stack"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before converting AI to JPG",
+      "points": [
+        "The AI must contain its PDF-compatible representation, or the page stops with the message \"This AI file has no PDF inside\".",
+        "Each page becomes a separate JPG at quality 0.9 on a white background.",
+        "A page is rendered at up to 2x and capped at 16,777,216 pixels.",
+        "The JPG is flat pixels; paths, text and layers stay in the AI."
+      ]
+    },
+    "guide": {
+      "title": "About AI and JPG",
+      "markdown": "### What is an AI file?\n\nAdobe Illustrator saves its artwork natively as AI. A single document may combine vector objects and pixel images, and Illustrator keeps effects, brushes, layers and transparency editable inside it. Typical AI documents are logos, illustrations and print layouts.\n\nAdobe changed the AI format with Illustrator 9 in 2000, and earlier files used PostScript. Saving with the PDF-compatible option puts a PDF rendition next to the Illustrator data, and that PDF part is all other apps can open. A program that reads the embedded PDF does not necessarily expose native Illustrator objects for editing. That rendition is also what this converter reads.\n\n### Programs that open AI files\n\n- **Windows and Mac:** Native artwork opens in Adobe Illustrator with its Illustrator objects still editable.\n- **Windows, Mac and Linux:** ImageMagick reads the AI format its list calls Adobe Illustrator CS2, so it renders the artwork but does not edit it as Illustrator does.\n- **Linux:** Inkscape's manual says it imports AI artwork from Illustrator 9.0 onward, with some document features possibly unavailable.\n\nAffinity Designer and CorelDRAW are also listed among the programs that open AI files.\n\n### AI and JPG compared\n\n- **Content**: AI holds vector paths, text, layers and artboards. JPG holds a grid of pixels.\n- **Editing**: a JPEG has no editable layer stack, so keep the AI if the artwork will change later.\n- **Transparency**: with no alpha channel in JPEG, transparent pixels can't make it through the export. This page draws each page on white.\n- **Compression**: JPEG is a lossy format with 8 bits for every color channel. A progressive JPEG displays a rough picture right away, and later data sharpens it.\n- **Standards**: image/jpeg is the registered media type, and the specification is ITU-T T.81 from 1992, also published as ISO/IEC 10918-1 in 1994.\n- **How JPEG compresses**: in the baseline form, 8x8 pixel blocks of the image each get a discrete cosine transform, followed by Huffman coding.\n- **Support**: most digital cameras and scanners have JPEG built in, all major browsers display it, and 27 October 2006 is when the US patents ran out.\n- **Print and screen**: AI is aimed at logos, illustrations and print layouts, while JPG is built for photographs and displays in every major browser.\n- **Size**: vector artwork can be drawn at any size, while a JPG is fixed at the pixel size it was rendered at.\n\nOn this page, PDF.js reads the PDF inside the AI file and renders every page. PDF.js draws each page at a scale of up to 2, reduced for a big page so its area stays within 16,777,216 pixels. Each page becomes its own JPG at quality 0.9 on a white background, and the pages arrive as separate images, not one combined file. The AI file itself is not changed.\n\nBecause the page reads only the embedded PDF, the JPG shows the page as that PDF draws it. Keep the AI for any later edit, because the JPG holds only pixels.\n\n### Other ways to convert AI to JPG\n\n- **ImageMagick (Windows, Mac, Linux):** run `magick -density 150 input.ai output.jpg`. ImageMagick's format list shows AI as a format it reads, and the -density option sets the canvas resolution while rendering vector formats such as PostScript and PDF.\n- **Ghostscript (Windows, Mac, Linux):** run `gs -dBATCH -dNOPAUSE -sDEVICE=jpeg -r150 -sOutputFile=page-%d.jpg input.ai`. The -r option takes the resolution, and %d in the output name is replaced with the page number, so each page gets its own file. It reads the PDF part of a PDF-compatible AI, not Illustrator's editable objects.\n\nBoth commands render at the resolution you set, unlike this page, which chooses its own scale.\n\n### Problems with AI files\n\n- **Other software can't open it**: third-party software may fail on an AI file that was saved with no PDF-compatible representation. Save it again from Illustrator with that option on.\n- **Opening in an older Illustrator**: an older Illustrator version may run into compatibility problems with the artwork, so Adobe recommends the same or a newer version.\n- **A linked image is missing**: the artwork may point at an external image instead of holding it, so a moved or absent file leaves a gap.\n- **A very old file has no PDF**: files from before Illustrator 9 were based on PostScript, so there is no PDF rendition for other software to read.\n"
+    }
+  }
+}

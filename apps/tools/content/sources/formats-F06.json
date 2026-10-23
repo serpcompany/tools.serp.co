@@ -1,0 +1,783 @@
+{
+  "formats": {
+    "amr": {
+      "background": [
+        {
+          "fact": "AMR expands to Adaptive Multi-Rate and was standardized by ETSI for GSM speech.",
+          "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+        },
+        {
+          "fact": "3GPP adopted AMR for third-generation cellular systems.",
+          "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+        },
+        {
+          "fact": "Narrowband AMR uses eight speech modes spanning 4.75 to 12.2 kbps.",
+          "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+        },
+        {
+          "fact": "The narrowband codec samples at 8 kHz and encodes speech in 20-millisecond frames.",
+          "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+        },
+        {
+          "fact": "AMR-WB is a separate codec with a 16 kHz sampling rate.",
+          "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+        },
+        {
+          "fact": "RFC 4867, published in April 2007, defines storage files as well as RTP transport.",
+          "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+        },
+        {
+          "fact": "The registered media type for narrowband AMR is audio/AMR.",
+          "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "FFmpeg",
+            "note": "Command-line decoder.",
+            "source": "https://ffmpeg.org/ffmpeg-codecs.html#libopencore-amrnb"
+          },
+          {
+            "app": "Audacity",
+            "note": "Requires a compatible FFmpeg library with AMR decoding enabled; the recommended installer omits AMR narrowband.",
+            "source": "https://www.audacityteam.org/manual/basics/installing-ffmpeg/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "FFmpeg",
+            "note": "Command-line decoder.",
+            "source": "https://ffmpeg.org/ffmpeg-codecs.html#libopencore-amrnb"
+          },
+          {
+            "app": "Audacity",
+            "note": "Requires a compatible FFmpeg library with AMR decoding enabled; the recommended installer omits AMR narrowband.",
+            "source": "https://www.audacityteam.org/manual/basics/installing-ffmpeg/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "FFmpeg",
+            "note": "Command-line decoder.",
+            "source": "https://ffmpeg.org/ffmpeg-codecs.html#libopencore-amrnb"
+          },
+          {
+            "app": "Audacity",
+            "note": "Requires a compatible FFmpeg library with AMR decoding enabled; the recommended installer omits AMR narrowband.",
+            "source": "https://www.audacityteam.org/manual/basics/installing-ffmpeg/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A narrowband AMR recording cannot supply the wider frequency range of an AMR-WB source; the codecs use different sampling rates.",
+          "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+        },
+        {
+          "fact": "Audacity may reject AMR narrowband even after FFmpeg installation because the recommended FFmpeg installer excludes that codec.",
+          "source": "https://www.audacityteam.org/manual/basics/installing-ffmpeg/"
+        },
+        {
+          "fact": "AMR and AMR-WB storage signatures differ, so changing an extension cannot change the encoded speech codec.",
+          "source": "https://datatracker.ietf.org/doc/html/rfc4867"
+        }
+      ]
+    },
+    "nef": {
+      "background": [
+        {
+          "fact": "NEF means Nikon Electronic Format and stores raw photographs from Nikon cameras.",
+          "source": "https://www.nikonusa.com/learn-and-explore/c/products-and-innovation/nikon-electronic-format-nef"
+        },
+        {
+          "fact": "A NEF retains captured sensor information together with camera and lens metadata.",
+          "source": "https://www.nikonusa.com/learn-and-explore/c/products-and-innovation/nikon-electronic-format-nef"
+        },
+        {
+          "fact": "Nikon describes NEF storage in uncompressed and losslessly compressed forms.",
+          "source": "https://www.nikonusa.com/learn-and-explore/c/products-and-innovation/nikon-electronic-format-nef"
+        },
+        {
+          "fact": "Depending on the camera, NEF data has 12-bit or 14-bit precision.",
+          "source": "https://www.nikonusa.com/learn-and-explore/c/products-and-innovation/nikon-electronic-format-nef"
+        },
+        {
+          "fact": "White balance, hue, tone, and sharpening choices can be retained as processing instructions.",
+          "source": "https://www.nikonusa.com/learn-and-explore/c/products-and-innovation/nikon-electronic-format-nef"
+        },
+        {
+          "fact": "Nikon processing software can render a NEF as a JPEG or TIFF while retaining the raw original.",
+          "source": "https://www.nikonusa.com/learn-and-explore/c/products-and-innovation/nikon-electronic-format-nef"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "NX Studio",
+            "note": "Manufacturer software for viewing and developing Nikon raw photographs.",
+            "source": "https://www.nikonusa.com/content/nx-studio"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads this camera raw format.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "NX Studio",
+            "note": "Manufacturer software for viewing and developing Nikon raw photographs.",
+            "source": "https://www.nikonusa.com/content/nx-studio"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads this camera raw format.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads this camera raw format.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Viewer with NEF listed in its supported formats; free for private and educational use.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A JPEG export is a rendered result; it does not replace the adjustable sensor data held by the original NEF.",
+          "source": "https://www.nikonusa.com/learn-and-explore/c/products-and-innovation/nikon-electronic-format-nef"
+        },
+        {
+          "fact": "A NEF may look different after development because white balance and other rendering settings are instructions applied by processing software.",
+          "source": "https://www.nikonusa.com/learn-and-explore/c/products-and-innovation/nikon-electronic-format-nef"
+        },
+        {
+          "fact": "The amount of tonal information differs by camera; an eight-bit JPEG export does not retain the original 12-bit or 14-bit raw representation.",
+          "source": "https://www.nikonusa.com/learn-and-explore/c/products-and-innovation/nikon-electronic-format-nef"
+        }
+      ]
+    },
+    "arw": {
+      "background": [
+        {
+          "fact": "Sony cameras use the ARW extension for raw photographs.",
+          "source": "https://www.sony.com/electronics/support/articles/00024655"
+        },
+        {
+          "fact": "An ARW retains sensor-derived image information for later processing.",
+          "source": "https://www.sony.com/electronics/support/articles/00024655"
+        },
+        {
+          "fact": "Raw processing parameters can be adjusted after capture.",
+          "source": "https://www.sony.com/electronics/support/articles/00024655"
+        },
+        {
+          "fact": "Sony documents uncompressed, losslessly compressed, and compressed raw recording options.",
+          "source": "https://www.sony.com/electronics/support/articles/00024655"
+        },
+        {
+          "fact": "Lossless compression reduces storage without discarding image information.",
+          "source": "https://www.sony.com/electronics/support/articles/00024655"
+        },
+        {
+          "fact": "Raw file size varies with recording settings and camera sensor size.",
+          "source": "https://www.sony.com/electronics/support/articles/00024655"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "Imaging Edge Desktop",
+            "note": "Manufacturer software for viewing and developing Sony raw photographs.",
+            "source": "https://imagingedge.sony.net/l/ie-desktop.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads this camera raw format.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "Imaging Edge Desktop",
+            "note": "Manufacturer software for viewing and developing Sony raw photographs.",
+            "source": "https://imagingedge.sony.net/l/ie-desktop.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads this camera raw format.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads this camera raw format.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Viewer with ARW listed in its supported formats; free for private and educational use.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Raw files can occupy substantial storage; Sony documents different sizes for uncompressed and compressed recording modes.",
+          "source": "https://www.sony.com/electronics/support/articles/00024655"
+        },
+        {
+          "fact": "An ARW is intended for raw development rather than direct distribution as a finished JPEG.",
+          "source": "https://www.sony.com/electronics/support/articles/00024655"
+        },
+        {
+          "fact": "A losslessly compressed raw file is smaller than an uncompressed one but still retains the image information; a smaller size alone does not establish damage.",
+          "source": "https://www.sony.com/electronics/support/articles/00024655"
+        }
+      ]
+    },
+    "cur": {
+      "background": [
+        {
+          "fact": "CUR is the Windows cursor container format.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        },
+        {
+          "fact": "CUR is related to ICO but includes coordinates for the active pointer location.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        },
+        {
+          "fact": "The active pointer pixel is called the hotspot.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        },
+        {
+          "fact": "A CUR may embed several images at different dimensions.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        },
+        {
+          "fact": "Each embedded cursor image has its own hotspot information.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        },
+        {
+          "fact": "Animated cursor assets use ANI rather than the ordinary CUR workflow.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists CUR as a readable format; use it to inspect or render cursor images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Visual Studio Image Editor",
+            "note": "Views and edits cursor resources; 32-bit images can be viewed but not edited.",
+            "source": "https://learn.microsoft.com/en-us/cpp/windows/image-editor-for-icons?view=msvc-170"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists CUR as a readable format; use it to inspect or render cursor images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Viewer with CUR listed in its supported formats; free for private and educational use.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Lists CUR as a readable format; use it to inspect or render cursor images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Viewer with CUR listed in its supported formats; free for private and educational use.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "A misplaced hotspot makes clicks land away from the visually expected point; check each frame's coordinates.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        },
+        {
+          "fact": "A multi-size cursor needs a valid hotspot in every embedded image; copying coordinates blindly between sizes can misalign the pointer.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        },
+        {
+          "fact": "CUR is specialized for pointer assets; a conventional image format is more suitable when hotspot information is unnecessary.",
+          "source": "https://docs.sixlabors.com/articles/imagesharp/cur.html"
+        }
+      ]
+    },
+    "xcf": {
+      "background": [
+        {
+          "fact": "XCF is GIMP's native working-image format.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "fact": "GIMP uses XCF to retain image editing information between sessions.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "fact": "XCF retains layers and transparency rather than only a flattened image.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "fact": "The undo history is excluded from the saved project.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "fact": "GIMP's Save command writes XCF; other image formats use Export.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "fact": "GIMP does not position XCF as an interchange format.",
+          "source": "https://www.gimp.org/news/2018/05/20/gimp-2-10-2-released/"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "Native project editor; preserves the working image when saved as XCF.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads XCF; do not assume third-party rendering reproduces every GIMP feature.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "Native project editor; preserves the working image when saved as XCF.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads XCF; do not assume third-party rendering reproduces every GIMP feature.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "Native project editor; preserves the working image when saved as XCF.",
+            "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+          },
+          {
+            "app": "ImageMagick",
+            "note": "Reads XCF; do not assume third-party rendering reproduces every GIMP feature.",
+            "source": "https://imagemagick.org/formats/"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Most ordinary image viewers cannot read XCF; export a display copy from GIMP.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "fact": "Saving a flattened export does not preserve every project property; retain the XCF for future editing.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "fact": "Closing after an export can still trigger a save warning because exporting does not save changes to the XCF project.",
+          "source": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        }
+      ]
+    },
+    "docx": {
+      "background": [
+        {
+          "fact": "DOCX is an Office Open XML word-processing document format.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+        },
+        {
+          "fact": "Microsoft Word has used DOCX by default for new documents since Word 2007.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+        },
+        {
+          "fact": "WordprocessingML describes the main document text and formatting.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+        },
+        {
+          "fact": "A DOCX package uses ZIP-based Open Packaging Conventions.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+        },
+        {
+          "fact": "Images, styles, properties, and relationships can occupy separate package parts.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+        },
+        {
+          "fact": "The format is specified through ECMA-376 and ISO/IEC 29500.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "LibreOffice Writer",
+            "note": "Opens and saves Word DOCX; some formatting attributes may differ.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html"
+          },
+          {
+            "app": "Microsoft Word",
+            "note": "DOCX has been the default for new Word documents since Word 2007.",
+            "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+          }
+        ],
+        "mac": [
+          {
+            "app": "LibreOffice Writer",
+            "note": "Opens and saves Word DOCX; some formatting attributes may differ.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html"
+          },
+          {
+            "app": "Apple Pages",
+            "note": "Opens DOCX; missing fonts and formatting differences may produce warnings.",
+            "source": "https://support.apple.com/en-us/105050"
+          }
+        ],
+        "linux": [
+          {
+            "app": "LibreOffice Writer",
+            "note": "Opens and saves Word DOCX; some formatting attributes may differ.",
+            "source": "https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html"
+          },
+          {
+            "app": "ONLYOFFICE Desktop Editors",
+            "note": "Free Linux desktop editor that opens and edits DOCX documents.",
+            "source": "https://www.onlyoffice.com/desktop"
+          }
+        ],
+        "web": [
+          {
+            "app": "Pages for iCloud",
+            "note": "Uploads and opens Word documents through the browser.",
+            "source": "https://support.apple.com/en-us/105050"
+          },
+          {
+            "app": "Word for the web",
+            "note": "Opens DOCX documents in the browser; some desktop features differ.",
+            "source": "https://support.microsoft.com/en-us/word/differences-between-using-a-document-in-the-browser-and-in-word"
+          }
+        ],
+        "mobile": [
+          {
+            "app": "Apple Pages for iPhone and iPad",
+            "note": "Opens Microsoft Word DOCX documents.",
+            "source": "https://support.apple.com/en-us/105050"
+          },
+          {
+            "app": "Word for Android",
+            "note": "Opens and edits DOCX documents; Microsoft lists format-specific restrictions for other Word file types.",
+            "source": "https://support.microsoft.com/en-us/word/why-can-t-i-open-my-office-for-android-file"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A DOCX is a package of related parts, so extracting only document.xml does not reproduce the full document.",
+          "source": "https://www.loc.gov/preservation/digital/formats/fdd/fdd000397.shtml"
+        },
+        {
+          "fact": "A DOCX opened in another word processor may lose formatting attributes during import.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/shared/00/00000020.html"
+        },
+        {
+          "fact": "Missing fonts can change the appearance when a Word document is opened in Pages.",
+          "source": "https://support.apple.com/en-us/105050"
+        }
+      ]
+    },
+    "ppm": {
+      "background": [
+        {
+          "fact": "PPM names Netpbm's portable color pixel-map format.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        },
+        {
+          "fact": "Normal binary PPM identifies an image with P6.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        },
+        {
+          "fact": "The less common plain-text representation uses P3.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        },
+        {
+          "fact": "Each pixel carries red, green, and blue samples.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        },
+        {
+          "fact": "The maximum sample value can range from 1 to 65535.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        },
+        {
+          "fact": "Raw PPM can contain a sequence of images without separators.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        },
+        {
+          "fact": "image/x-portable-pixmap is conventional but is not an IANA-registered media type.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes PPM color images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Netpbm",
+            "note": "Provides the libnetpbm reader and tools for PPM processing.",
+            "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes PPM color images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Netpbm",
+            "note": "Provides the libnetpbm reader and tools for PPM processing.",
+            "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes PPM color images.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Netpbm",
+            "note": "Provides the libnetpbm reader and tools for PPM processing.",
+            "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "PPM uses a redundant representation with little image metadata, so files can be large relative to compressed distribution images.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        },
+        {
+          "fact": "Some readers implement only one eight-bit image; normalize complex input with pnmtopnm and reduce sample depth with pamdepth when necessary.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        },
+        {
+          "fact": "Files labeled PPM sometimes use sRGB or linear values instead of the specified transfer function; pnmgamma can reconcile these variants.",
+          "source": "https://netpbm.sourceforge.net/doc/ppm.html"
+        }
+      ]
+    },
+    "hdr": {
+      "background": [
+        {
+          "fact": "Radiance RGBE was created by Greg Ward.",
+          "source": "https://www.graphics.cornell.edu/~bjw/rgbe.html"
+        },
+        {
+          "fact": "RGBE represents a pixel with red, green, and blue bytes plus a shared exponent.",
+          "source": "https://www.graphics.cornell.edu/~bjw/rgbe.html"
+        },
+        {
+          "fact": "The shared exponent permits a wider brightness range than ordinary 24-bit RGB.",
+          "source": "https://www.graphics.cornell.edu/~bjw/rgbe.html"
+        },
+        {
+          "fact": "The pixel representation uses four bytes rather than three single-precision floating-point channels.",
+          "source": "https://www.graphics.cornell.edu/~bjw/rgbe.html"
+        },
+        {
+          "fact": "Radiance lighting simulations use RGBE images to represent calculated brightness.",
+          "source": "https://www.graphics.cornell.edu/~bjw/rgbe.html"
+        },
+        {
+          "fact": "The registered media type is image/vnd.radiance.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.radiance"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes Radiance HDR through its HDR coder.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Adobe Photoshop",
+            "note": "Named as a user of the Radiance media type by the registered format description.",
+            "source": "https://www.iana.org/assignments/media-types/image/vnd.radiance"
+          }
+        ],
+        "mac": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes Radiance HDR through its HDR coder.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Adobe Photoshop",
+            "note": "Named as a user of the Radiance media type by the registered format description.",
+            "source": "https://www.iana.org/assignments/media-types/image/vnd.radiance"
+          }
+        ],
+        "linux": [
+          {
+            "app": "ImageMagick",
+            "note": "Reads and writes Radiance HDR through its HDR coder.",
+            "source": "https://imagemagick.org/formats/"
+          },
+          {
+            "app": "Radiance",
+            "note": "The original rendering system includes RGBE reading and writing code.",
+            "source": "https://www.graphics.cornell.edu/~bjw/rgbe.html"
+          }
+        ],
+        "web": [],
+        "mobile": []
+      },
+      "problems": [
+        {
+          "fact": "Clipping bright values to the ordinary eight-bit range can discard highlight information; choose an appropriate rendering rather than simply truncating samples.",
+          "source": "https://www.graphics.cornell.edu/~bjw/rgbe.html"
+        },
+        {
+          "fact": "An HDR image needs software that interprets the shared exponent; its bytes are not ordinary packed RGB pixels.",
+          "source": "https://www.graphics.cornell.edu/~bjw/rgbe.html"
+        },
+        {
+          "fact": "The extension alone does not identify the contents; the registered Radiance description advises checking the complete header.",
+          "source": "https://www.iana.org/assignments/media-types/image/vnd.radiance"
+        }
+      ]
+    },
+    "heif": {
+      "background": [
+        {
+          "fact": "HEIF means High Efficiency Image File Format and is specified by ISO/IEC 23008-12.",
+          "source": "https://nokiatech.github.io/heif/technical.html"
+        },
+        {
+          "fact": "HEIF organizes images in an ISO Base Media File Format container.",
+          "source": "https://nokiatech.github.io/heif/technical.html"
+        },
+        {
+          "fact": "A HEIF container can hold individual still images, collections, and timed sequences.",
+          "source": "https://nokiatech.github.io/heif/technical.html"
+        },
+        {
+          "fact": "The container can associate metadata and derived images with stored pictures.",
+          "source": "https://nokiatech.github.io/heif/technical.html"
+        },
+        {
+          "fact": "HEVC is one supported coding format; the container is not itself the H.265 codec.",
+          "source": "https://nokiatech.github.io/heif/technical.html"
+        },
+        {
+          "fact": "Generic HEIF still images use image/heif, while sequences use image/heif-sequence.",
+          "source": "https://nokiatech.github.io/heif/technical.html"
+        }
+      ],
+      "programs": {
+        "windows": [
+          {
+            "app": "GIMP",
+            "note": "HEIF import and export were added in GIMP 2.10.2.",
+            "source": "https://www.gimp.org/news/2018/05/20/gimp-2-10-2-released/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Viewer with HEIF listed in its supported formats; free for private and educational use.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "mac": [
+          {
+            "app": "GIMP",
+            "note": "HEIF import and export were added in GIMP 2.10.2.",
+            "source": "https://www.gimp.org/news/2018/05/20/gimp-2-10-2-released/"
+          },
+          {
+            "app": "Apple Preview",
+            "note": "Apple documents HEIF-to-JPEG export in Preview; macOS High Sierra introduced HEIF support.",
+            "source": "https://support.apple.com/en-us/116944"
+          }
+        ],
+        "linux": [
+          {
+            "app": "GIMP",
+            "note": "HEIF import and export were added in GIMP 2.10.2.",
+            "source": "https://www.gimp.org/news/2018/05/20/gimp-2-10-2-released/"
+          },
+          {
+            "app": "XnView MP",
+            "note": "Viewer with HEIF listed in its supported formats; free for private and educational use.",
+            "source": "https://www.xnview.com/en/image-formats/"
+          }
+        ],
+        "web": [],
+        "mobile": [
+          {
+            "app": "Apple Photos",
+            "note": "iOS 11 introduced support for HEIF photos from supported devices.",
+            "source": "https://support.apple.com/en-us/116944"
+          },
+          {
+            "app": "Adobe Lightroom for mobile",
+            "note": "Photo app for iOS and Android with documented HEIF/.heic image support. This does not establish decoding of every HEIF codec or sequence; HEVC video remains unsupported on Android. Check current app requirements before installation.",
+            "source": "https://helpx.adobe.com/lightroom/desktop/kb/heic-files-support.html"
+          }
+        ]
+      },
+      "problems": [
+        {
+          "fact": "A program needs support for both the container and the stored codec; the HEIF brand identifies decoding requirements.",
+          "source": "https://nokiatech.github.io/heif/technical.html"
+        },
+        {
+          "fact": "A file can include several related pictures or a sequence, so a single-image export need not represent the entire container.",
+          "source": "https://nokiatech.github.io/heif/technical.html"
+        },
+        {
+          "fact": "Older Apple systems lack the built-in support introduced with iOS 11 and macOS High Sierra; conversion to JPEG improves compatibility.",
+          "source": "https://support.apple.com/en-us/116944"
+        }
+      ]
+    }
+  }
+}

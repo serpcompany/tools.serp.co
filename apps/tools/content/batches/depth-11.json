@@ -1,0 +1,903 @@
+{
+  "tif-to-png": {
+    "seo": {
+      "title": "Convert TIF to PNG Online (Free)",
+      "h1": "TIF to PNG Converter",
+      "description": "Convert a TIF scan to PNG in your browser. A multi-page TIF gives one PNG, not one per page. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save a TIF scan or print master as a PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "What is the difference between TIF and TIFF?",
+        "answer": "Nothing inside the file. Both endings name the Tagged Image File Format, which has the media type image/tiff. Scanners and programs simply differ on whether they write the short or the long spelling."
+      },
+      {
+        "question": "Is my TIF uploaded when I convert it?",
+        "answer": "No, nothing leaves your device. The conversion happens in the browser through ImageMagick compiled to WebAssembly. You download a fresh PNG and the TIF stays as it was."
+      },
+      {
+        "question": "Can I convert a multi-page TIF to PNG?",
+        "answer": "You get a single PNG made from one picture in the file, not a PNG per page. For a particular page, use ImageMagick on your computer with the page number in brackets, as in scan.tif[1] for the second page."
+      },
+      {
+        "question": "Does converting TIF to PNG lose quality?",
+        "answer": "PNG compression is lossless, and the page passes no quality setting to the converter. A TIF saved with lossy compression keeps whatever loss it already had."
+      },
+      {
+        "question": "Can I convert several TIF files at once?",
+        "answer": "Yes. Select a group and they are processed in turn. Every TIF downloads as its own PNG, and nothing is zipped."
+      },
+      {
+        "question": "How large a TIF can I convert?",
+        "answer": "File size has no cap. The picture's dimensions do: roughly 537 megapixels is the ceiling, and above that figure the converter stops with a notice that the picture is oversized."
+      },
+      {
+        "question": "Why does the first TIF take longer than the next?",
+        "answer": "The page fetches the ImageMagick converter when you convert your first TIF. After it loads, later files begin straight away."
+      },
+      {
+        "question": "Can I just rename my .tif file to .png?",
+        "answer": "No. A new name changes the label only, and TIFF data stays inside. Any program that checks the contents still sees a TIFF, so convert the file to get real PNG data."
+      },
+      {
+        "question": "What will the PNG be called?",
+        "answer": "The download reuses your TIF's name and ends in .png, so scan.tif becomes scan.png."
+      },
+      {
+        "question": "What is a TIF file used for?",
+        "answer": "People use TIF for scans and long-term archives, for photography headed to print, and for fax and document imaging. Aldus first published the format, and Adobe maintains it now."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIF and PNG",
+      "fromFormat": {
+        "name": "TIF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Several images in one file",
+          "Lossless or lossy compression",
+          "High bit depth and CMYK",
+          "Same format as .tiff"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format developed in the mid-1990s as a patent-free replacement for GIF, and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "8-bit and 16-bit channels",
+          "Alpha transparency",
+          "Supported by every browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIF to PNG",
+      "points": [
+        "A multi-page TIF gives one PNG, not one per page.",
+        "PNG compression is lossless, and the page sets no quality.",
+        "A picture over about 537 megapixels fails with a too-large message.",
+        "Choose several TIF files and each downloads as its own PNG."
+      ]
+    },
+    "guide": {
+      "title": "About TIF files",
+      "markdown": "### What is a TIF file?\n\nA .tif file holds a TIFF, short for Tagged Image File Format. Aldus and Microsoft created it, and the specification now belongs to Adobe, which acquired Aldus's PageMaker program. Aldus first published TIFF in 1986. At that point it handled only bilevel images, and grayscale and color came later as scanners and storage improved. Revision 6.0 arrived in 1992, and files that follow earlier versions remain valid TIFF 6.0 files.\n\nYou meet a .tif when you scan a document, when a photographer or print shop sends a print master, or when a library or archive hands over a preservation copy. Among the Library of Congress's preferred formats for photographs and other graphic images is TIFF, which it uses as a master format in many digitization workflows. Subtypes such as TIFF/EP, GeoTIFF and Adobe DNG build on it. The long .tiff ending names the identical format, and image/tiff is the media type for both.\n\n### Programs that open TIF files\n\n**Windows, Mac and Linux**\n\n- GIMP: opens a scan for editing, and each export format keeps its own subset of the project's properties.\n\n**Mac**\n\n- Preview: has TIFF in its File > Export menu among the formats it can write.\n\n### TIF and PNG compared\n\n- **Extensions and media types**: .tif or .tiff with image/tiff, and .png with image/png.\n- **Compression**: a TIFF may be stored uncompressed or with LZW, Group 4 or JPEG, whereas PNG never loses data.\n- **Images per file**: one TIF can contain many pictures, which suits a stack of scanned pages. This page reads only a single picture from the file.\n- **Color**: color handling is defined by a tag. Plain 8-bit grayscale and 24-bit RGB dominate, yet some workflows go past 8 bits per channel. An embedded ICC profile is possible in a TIF, though not every reader recognizes it, so the format suits high-bit-depth imaging and preservation masters. PNG offers 8-bit and 16-bit channels plus alpha transparency.\n- **Age**: TIFF dates from 1986 and grew up with scanning and print. PNG was designed in the mid-1990s to replace GIF without its patent problems, and it is now both a W3C Recommendation and ISO/IEC 15948.\n- **Reach**: every browser draws a PNG, while a TIF needs a program that understands it.\n\nOn this page ImageMagick runs as WebAssembly inside your browser, so your scan is never sent to a server. It decodes one picture from the TIF and writes it as a PNG, without resizing it or setting a quality value. Only the first file waits for the converter to load. A multi-page TIF gives a single PNG rather than one per page. When you need every page, keep the TIF as your master and treat the PNG as a viewing copy.\n\n### Other ways to convert TIF to PNG\n\n- **Preview (Mac):** open the TIF, choose File > Export, set the Format menu to PNG and press Save. That menu offers PNG next to HEIC, JPEG, JPEG-2000, OpenEXR, PDF and TIFF. For many files, open them in one Preview window, select them in the sidebar and export.\n- **GIMP (Windows, Mac, Linux):** open the scan, choose File > Export As, type .png after the name in the Name field, then press Export.\n- **ImageMagick (command line):** run `magick 'scan.tif[0]' scan.png`. The number in brackets selects one image from a multi-image file, counting from zero, so `[1]` is the second. Keep the quotes, since Linux shells treat brackets specially.\n\n### Problems with TIF files\n\n- **A program shows just one image of a multi-page scan**: a TIFF may hold several images, and only software that exposes the whole sequence shows them all. Open the file in such a program, or choose a page with ImageMagick as above.\n- **The conversion stops with a size error**: anything over about 537 megapixels is turned back, and you can shrink the scan's resolution in an editor first. Classic TIFF itself tops out near 4 GB because of its 32-bit offsets, and BigTIFF uses 64-bit offsets to lift that.\n- **Colors or tags look wrong elsewhere**: some private tags, including certain color-profile extensions, are unknown to other readers. Export from the program that made the TIF.\n- **A renamed file still fails**: switching .tif to .png leaves TIFF data inside, so make a real conversion.\n"
+    }
+  },
+  "webp-to-svg": {
+    "seo": {
+      "title": "Convert WebP to SVG Online (Free)",
+      "h1": "WebP to SVG Converter",
+      "description": "Convert WebP to SVG in your browser. The SVG embeds your picture as a PNG at its own size; it is not traced to vector paths. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Wrap a WebP picture in an SVG file, in your browser, without tracing it."
+    },
+    "faqs": [
+      {
+        "question": "Does converting WebP to SVG make a vector image?",
+        "answer": "No. Inside the SVG is a single image element carrying your picture as an embedded PNG. It is a bitmap in an SVG wrapper, so it still blurs when you enlarge it. Tracing in a tool such as Inkscape is what creates paths."
+      },
+      {
+        "question": "Does the SVG link to my WebP or contain the picture?",
+        "answer": "It contains it. The picture is embedded inside the SVG as a PNG, so the file does not depend on your WebP staying where it is."
+      },
+      {
+        "question": "Will the SVG keep my WebP's transparency?",
+        "answer": "Yes. The embedded PNG keeps the transparent areas, so the picture can sit on any background."
+      },
+      {
+        "question": "Can I edit or recolor the SVG in a vector program?",
+        "answer": "You can place it and move it, but it is one picture, not shapes, so there are no paths or colors to change. For editable shapes, trace the picture with the Inkscape or Potrace routes."
+      },
+      {
+        "question": "What size is the SVG?",
+        "answer": "Its width and height equal the picture's pixel width and height. A 1200 by 800 WebP gives a 1200 by 800 SVG, and nothing is resized."
+      },
+      {
+        "question": "What happens to an animated WebP?",
+        "answer": "You get its first frame only, as a still."
+      },
+      {
+        "question": "Is the WebP's metadata copied into the SVG?",
+        "answer": "No. Only the pixels are carried across, so the EXIF, ICC profile and XMP data stay behind."
+      },
+      {
+        "question": "Can I use this SVG as a logo or icon?",
+        "answer": "It works anywhere an SVG image is accepted, but it won't stay crisp at large sizes. If the logo started as artwork, ask for the original vector file or trace the bitmap."
+      },
+      {
+        "question": "Can I convert several WebP files at once?",
+        "answer": "Yes. Select a batch and every WebP is turned into a separate SVG in turn, with no archive."
+      },
+      {
+        "question": "What name does the SVG download have?",
+        "answer": "The download reuses your WebP's name and ends in .svg, so logo.webp downloads as logo.svg. Your original WebP is not changed."
+      }
+    ],
+    "aboutSection": {
+      "title": "WebP and SVG",
+      "fromFormat": {
+        "name": "WebP",
+        "fullName": "WebP image",
+        "description": "An image format from Google that stores lossy or lossless pixels, with transparency and animation.",
+        "details": [
+          "Lossy and lossless modes",
+          "Alpha transparency",
+          "Animation",
+          "image/webp"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "An open W3C XML format that describes shapes, text and embedded images, drawn at any size.",
+        "details": [
+          "Plain-text XML",
+          "Shapes, text or embedded images",
+          "Styled with CSS",
+          "image/svg+xml"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting WebP to SVG",
+      "points": [
+        "The SVG embeds your picture as a PNG; nothing is traced into paths.",
+        "It keeps the picture's pixel width and height and scales like a bitmap.",
+        "Transparency is kept inside the embedded PNG.",
+        "An animated WebP gives its first frame only.",
+        "EXIF, ICC profiles and XMP are not copied."
+      ]
+    },
+    "guide": {
+      "title": "About WebP files",
+      "markdown": "### What is a WebP file?\n\nGoogle announced WebP in 2010 as a new image format. For lossy pictures it borrows the key-frame method of VP8, a video codec from On2 Technologies that Google open-sourced in May 2010; a lossless mode came later. Either mode may include transparency and animation. Inside, the file is a RIFF container, and RFC 9649 describes it and registers the image/webp media type. Each side is limited to 16,383 pixels, and the file can store an ICC color profile plus Exif and XMP metadata.\n\nWebsites use WebP because it is compact: Google reports lossless files about 26% smaller than PNG and lossy ones about 30% smaller than JPEG. That is why a picture you save from a browser often arrives as .webp. Messaging apps use it as well, since WhatsApp's animated stickers are WebP files.\n\n### Programs that open WebP pictures\n\n**Windows**\n\n- Photos and File Explorer: they display WebP after you install Microsoft's WebP Image Extension.\n\n**Windows and Mac**\n\n- Photoshop: opens and saves WebP from version 23.2.\n\n**Windows, Mac and Linux**\n\n- GIMP: has supported WebP since version 2.10.\n- ImageMagick: reads WebP, if your installation includes the format.\n- XnView MP: reads and writes WebP; free for private or educational use.\n\n**Web**\n\n- Lossy WebP shows in Chrome from version 17, Edge from 18, Firefox from 65 and Safari from 14.\n\n**Mobile**\n\n- On Android, WebP decodes from version 4.0, with lossless or transparent files from 4.2.1. iPhone Safari shows it from iOS 14.\n\n### WebP and SVG compared\n\n- **Extensions and media types**: .webp with image/webp; .svg with image/svg+xml.\n- **What they store**: WebP stores pixels. SVG is written in XML and describes shapes, text and embedded images, which means one SVG can hold drawn artwork or just a picture.\n- **Scaling**: a vector SVG stays sharp at any size. A pixel image does not, and neither does an SVG that merely wraps one.\n- **Animation**: WebP can hold timed frames. An SVG can animate through CSS or scripts, but that is a different mechanism.\n- **Text**: an SVG is plain text, so it can be edited in a text editor and searched, indexed and compressed. A WebP is a RIFF container.\n- **Linked pictures**: an SVG can point to a picture in another file and lose it when that file is unavailable. This page avoids that by embedding the picture inside the SVG itself.\n\nThis is what the conversion does. The page decodes the WebP and writes an SVG that contains a single image element: your picture, embedded as a base64 PNG, at the picture's own width and height. Nothing is traced into paths. The SVG opens wherever SVG opens, but it scales like the original bitmap, and its colors and shapes can't be edited as objects.\n\n### Other ways to convert WebP to SVG\n\nThese routes trace the picture into paths, which is a different job from the embedding this page does. dwebp does not read animated WebP files.\n\n- **Inkscape with dwebp:** run `dwebp input.webp -o input.png`, which writes a PNG. In Inkscape choose File > Import, select the image with the Selector tool, then choose Path > Trace Bitmap, set the options and click OK. Tracing is not a faithful copy, and color tracing makes one object per color, which can be hard to edit.\n- **Potrace with dwebp:** run `dwebp input.webp -bmp -o input.bmp`, which writes an uncompressed BMP, then `potrace -s input.bmp -o output.svg`. Potrace reads PBM, PGM, PPM and BMP, and -s selects the SVG backend.\n\n### Problems with WebP files\n\n- **Renaming the file doesn't work**: changing .webp to .svg leaves WebP data inside, and an SVG has to be XML text.\n- **It won't open in an older program**: install Microsoft's WebP Image Extension on Windows, or use a recent browser, GIMP or Photoshop.\n- **A design tool rejects it**: turn the WebP into a plain bitmap with the [WebP to PNG converter](/webp-to-png/), then bring that in.\n- **An old browser shows a still**: an older browser can show a still WebP yet lack animation support. On this page an animated WebP gives its first frame only.\n- **The picture is too big for WebP**: WebP limits each side to 16,383 pixels, so a file claiming more is damaged or not a WebP.\n- **A decode failure message appears**: the browser could not open the file. Try an up-to-date Chrome, Edge, Firefox or Safari, or fetch a fresh copy.\n- **ImageMagick can't read it**: a WebP decode or encode may be unavailable in a particular installation, so check its format list.\n"
+    }
+  },
+  "arw-to-jpg": {
+    "seo": {
+      "title": "Convert ARW to JPG Online (Free)",
+      "h1": "ARW to JPG Converter",
+      "description": "Convert Sony ARW raw photos to JPG in your browser. The page sets no quality or resize options, and your ARW is left unchanged. Free, no sign-up.",
+      "howToHeading": "How to convert ARW to JPG"
+    },
+    "tool": {
+      "subtitle": "Turn a Sony ARW raw photo into a JPG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert ARW to JPG?",
+        "answer": "Choose the ARW above and wait while ImageMagick reads it in your browser. The first file takes a little longer because the image engine loads first. Then save the JPG that appears."
+      },
+      {
+        "question": "Can I convert many ARW photos together?",
+        "answer": "Yes. Drop in a batch of ARW photos and the page converts them in turn, saving a separate JPG for each."
+      },
+      {
+        "question": "Can I convert ARW to JPG without losing quality?",
+        "answer": "Not entirely. A JPG is lossy, so it keeps less than the sensor data in the ARW, and the page passes no quality setting. Keep the ARW if you may want to edit the photo again."
+      },
+      {
+        "question": "Can I adjust exposure or white balance here?",
+        "answer": "No. The page offers no editing controls. For adjustments, develop the ARW in darktable or Imaging Edge Desktop and export a JPG from there."
+      },
+      {
+        "question": "Do I need Sony software to open an ARW?",
+        "answer": "No. This page reads the file in your browser. Sony's Imaging Edge Desktop is useful if you want to view and develop your raw photos yourself."
+      },
+      {
+        "question": "What happens if the page can't read my ARW?",
+        "answer": "The page reports that the picture in the file couldn't be read. Copy the file from the card again and retry, or open it in Imaging Edge Desktop to see whether it is intact."
+      },
+      {
+        "question": "Is there a size limit for ARW files?",
+        "answer": "There is no limit on file size. Only the picture's pixel count matters: above about 537 megapixels the page declines and reports it as too large."
+      },
+      {
+        "question": "Is the JPG the full size of the photo?",
+        "answer": "The page sets no resize option, so the picture is not scaled down. Open the JPG in an editor to check its pixel dimensions."
+      },
+      {
+        "question": "What file name does the JPG get?",
+        "answer": "The download reuses your ARW's name and ends in .jpg, so DSC00001.ARW downloads as DSC00001.jpg. The ARW itself is not changed."
+      },
+      {
+        "question": "Is my ARW photo uploaded?",
+        "answer": "No upload takes place. The decoding runs through ImageMagick compiled to WebAssembly in this tab, so your raw photo never reaches a server. Only the new JPG is written, and the ARW stays untouched."
+      }
+    ],
+    "aboutSection": {
+      "title": "ARW and JPG",
+      "fromFormat": {
+        "name": "ARW",
+        "fullName": "Sony Alpha RAW",
+        "description": "The raw photo format of Sony cameras. It keeps data from the sensor so software can develop it later.",
+        "details": [
+          "Sensor data to be developed",
+          "Uncompressed, lossless or compressed",
+          "Size varies with camera and mode",
+          "Needs software that supports the camera"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster format designed for photographs, stored at 8 bits per color channel.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "Same format as .jpeg",
+          "image/jpeg"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting ARW to JPG",
+      "points": [
+        "ImageMagick reads the ARW and writes a JPG; the page has no exposure or white balance controls.",
+        "The page passes no quality setting and no resize option.",
+        "The JPG can't be turned back into the raw ARW.",
+        "Choose several ARW files and each downloads as its own JPG."
+      ]
+    },
+    "guide": {
+      "title": "About ARW files",
+      "markdown": "### What is an ARW file?\n\nAn ARW file is a raw photograph from a Sony camera. Where a JPG is a finished picture, an ARW keeps information straight from the sensor, and software has to develop it into an image you can look at. That is why photographers shoot raw: settings such as white balance and exposure can still be adjusted after the shot, without baking them in.\n\nSony cameras let you record raw in different ways. The company documents uncompressed, losslessly compressed and compressed options. Lossless compression makes the file smaller and discards no image information, while an uncompressed file is the largest. File size also varies with the camera's sensor, so a high-resolution body produces much bigger ARW files than a small one. You meet ARW files on the memory card of an Alpha camera, and in the folders of anyone who edits their photos. Because the file is meant for processing rather than for sending, it is rarely what you attach to an email or upload to a website, and that is the usual reason people look for a converter.\n\n### Programs that read ARW photos\n\n**Windows and Mac**\n\n- Imaging Edge Desktop: Sony's own program for viewing and developing its raw photos.\n\n**Windows, Mac and Linux**\n\n- ImageMagick: reads this camera raw format.\n\n**Linux**\n\n- XnView MP: a viewer whose supported-format list includes ARW; private and educational use costs nothing.\n\n### ARW and JPG compared\n\n- **Purpose**: ARW is raw material for editing. JPG is a finished picture for sharing and display.\n- **Compression**: an ARW can be uncompressed or losslessly compressed. A JPG is lossy: it splits the picture into 8x8 blocks and throws away the detail the eye notices least.\n- **Color depth**: JPG stores 8 bits per color channel. A raw file holds the sensor's own readings, which are the source for the picture you develop.\n- **Adjustments**: raw settings can be changed after capture. In a JPG they are already applied.\n- **Extensions**: .arw is Sony's raw extension; .jpg and .jpeg are the same format.\n- **Reach**: any browser, phone or printer reads a JPG. An ARW needs software that supports the camera.\n- **Size**: JPEG typically shrinks a picture by a factor of 10 to 20 against its uncompressed form, which is why the JPG is the copy you send.\n\nOn this page, ImageMagick reads the ARW and writes a JPG. There is no slider for quality, exposure or white balance. The JPG is a standard copy, and the ARW stays your master. If you plan to crop, recolor or print the photo, do that work from the raw file in a raw developer, and use this page when you just need a copy that you can send, post or open on any device.\n\n### Other ways to convert ARW to JPG\n\n- **XnConvert:** drag the ARW into the Input tab; on the Output tab choose the destination folder, JPEG as the target format and its quality settings, then click Convert. XnView's format list names Sony RAW with the extension arw.\n- **darktable:** in the export module set target storage to file on disk, choose the file format, leave the quality field at its default of 95 or change it, then press Start export.\n- **ImageMagick:** run `magick input.arw output.jpg`. The output extension decides the format in ImageMagick, and its format list shows ARW as read-only and JPEG as read and write.\n\n### Problems with ARW files\n\n- **A raw converter skips it**: darktable's camera support leaves out Sony ARW 4.0 and 5.0 downsized lossless files in M and S sizes and ARW 6.0 lossy files. Check which recording mode the camera used, or open the file in Sony's Imaging Edge Desktop.\n- **The files fill the card**: raw files take a lot of space, and Sony lists one size for uncompressed recording and another for compressed.\n- **A lossless ARW is smaller than expected**: lossless compression keeps all the image information, so a smaller file alone doesn't mean damage. Compare it with an uncompressed file from the same camera.\n- **It is not ready to send**: raw development is what an ARW is for; a finished picture for sharing is a different job. Convert a copy to JPG and keep the ARW as your master.\n- **The page reports an unreadable picture**: re-copy it from the card, ideally using a card reader, then retry.\n- **A very large picture stops the conversion**: a picture over about 537 megapixels stops the conversion with a too-large message.\n"
+    }
+  },
+  "jfif-to-jpeg": {
+    "seo": {
+      "title": "Convert JFIF to JPEG Online (Free)",
+      "h1": "JFIF to JPEG Converter",
+      "description": "Turn a .jfif picture into a JPEG with a .jpeg ending. The page re-encodes it at quality 0.85 and drops EXIF. Free, in your browser.",
+      "howToHeading": "How to convert JFIF to JPEG"
+    },
+    "tool": {
+      "subtitle": "Turn a .jfif file into a .jpeg file, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JFIF to JPEG?",
+        "answer": "Choose your .jfif file above. The page decodes it and writes a JPEG, and you save the result. The original JFIF is left as it was."
+      },
+      {
+        "question": "How do I change JFIF to JPEG?",
+        "answer": "Convert it on this page. The download keeps your file's name with .jpeg as the ending, so photo.jfif becomes photo.jpeg."
+      },
+      {
+        "question": "Is JFIF a different image format from JPEG?",
+        "answer": "No. JFIF wraps JPEG data, and most files that people call JPEGs are JFIF files. A .jfif file has the same media type as a JPEG: image/jpeg."
+      },
+      {
+        "question": "Why does my download save as .jfif?",
+        "answer": "JFIF files may use .jpg, .jpeg, .jpe, .jfi, .jfif or .jif, and some tools pick .jfif. The data inside is JPEG, but a site or app that checks only the ending may not recognize it."
+      },
+      {
+        "question": "Can I just rename the file to .jpeg?",
+        "answer": "The data is already JPEG, so a program that looks only at the ending may accept a renamed file. Converting here writes a new JPEG instead of relabeling the old one."
+      },
+      {
+        "question": "What quality does the JPEG use?",
+        "answer": "The browser's JPEG encoder gets quality 0.85. That is a setting for the encoder, not a percentage of detail kept, and one number can give different quality in different programs."
+      },
+      {
+        "question": "Does the JPEG keep my EXIF data?",
+        "answer": "No. EXIF, ICC and XMP are dropped, because the picture passes through raw pixels. Your original JFIF is the only copy that has them."
+      },
+      {
+        "question": "Will converting make a blurry JFIF sharper?",
+        "answer": "No. JPEG discards detail when it is encoded, and a new encode can't restore it."
+      },
+      {
+        "question": "Can I convert a batch of JFIF files?",
+        "answer": "Yes. Select as many as you want. They are handled one by one, and every JFIF becomes a separate JPEG with no ZIP."
+      },
+      {
+        "question": "Is .jpg different from .jpeg?",
+        "answer": "No, the two endings are one format. Use whichever your upload site asks for."
+      }
+    ],
+    "aboutSection": {
+      "title": "JFIF and JPEG",
+      "fromFormat": {
+        "name": "JFIF",
+        "fullName": "JPEG File Interchange Format",
+        "description": "A convention for storing JPEG-compressed pictures with interchange information in an APP0 marker.",
+        "details": [
+          "JPEG image data",
+          "Density information",
+          "Common .jfif extension"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A photographic image encoding used with both .jpeg and .jpg filenames.",
+        "details": [
+          "Lossy photographic compression",
+          "No ordinary alpha channel",
+          "Common image decoder support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JFIF to JPEG",
+      "points": [
+        "The page decodes the picture and writes a new JPEG at quality 0.85; it doesn't just rename the file.",
+        "EXIF, ICC and XMP aren't carried over.",
+        "Each file you choose downloads as its own JPEG.",
+        "Your JFIF is left untouched."
+      ]
+    },
+    "guide": {
+      "title": "About JFIF files",
+      "markdown": "### What is a JFIF file?\n\nThe letters JFIF mean JPEG File Interchange Format. It is a thin envelope for carrying JPEG picture data from one program or platform to another, which makes a .jfif file a JPEG photo and not a competing format. Open one and you find the JPEG start-of-image marker, then right behind it an APP0 segment with the label JFIF. That segment can carry a small embedded thumbnail.\n\nEric Hamilton of C-Cube Microsystems wrote JFIF first, and version 1.02 dates from 1992. It later became a standard twice over: ITU-T T.871, approved in May 2011, and ISO/IEC 10918-5. Most files people call JPEGs are JFIF files.\n\nSo why does it cause trouble? Mostly because of the name, not the picture. The extensions for JFIF are .jpg, .jpeg, .jpe, .jfi, .jfif and .jif. When a tool saves a picture as .jfif, an upload form that looks at the ending alone can turn it away, even though the picture is fine.\n\n### Programs that open JFIF files\n\n**Windows, Linux and Mac**\n\n- Mozilla Firefox: displays JPEG and JFIF data.\n- ImageMagick: handles JFIF through its JPEG reader.\n\n**Web and mobile**\n\n- Google Chrome: displays JFIF.\n\n**Mobile**\n\n- Safari: displays JFIF.\n\n### JFIF and JPEG compared\n\n- **Format**: JFIF is a way of wrapping JPEG data, and most JPEG files are JFIF files. They are not two image qualities. Beneath the wrapper sits an ordinary JPEG stream. The JFIF part is only a small labeled segment placed right after the opening marker.\n- **Extensions**: .jpg and .jpeg are one format under two spellings. .jfif is a third ending for the same data.\n- **Media type**: image/jpeg for all of them.\\n- **Standards**: the JPEG committee began its work in 1986, and The committee's core standard went out as ITU-T T.81 in 1992 and then as ISO/IEC 10918-1 two years later. JFIF came later as ITU-T T.871 and ISO/IEC 10918-5.\n- **Compression**: lossy in both cases. The picture is split into 8x8 pixel blocks, and each block goes through a discrete cosine transform and Huffman coding.\n- **Color and transparency**: 8 bits per color channel, no alpha channel.\n- **Where it matters**: only the name. A tool that accepts .jpeg but refuses .jfif is judging the ending, not the picture.\n\nHere the page decodes your picture with the browser's decoder and writes a new JPEG at quality 0.85. It is a fresh encode, not a rename: pixels pass through 8-bit RGBA, and the EXIF, ICC and XMP blocks are not carried over. Quality numbers differ between programs, so 0.85 here is not the same thing as 85 in another editor. JPEG also has a progressive mode that shows a coarse picture first, but you don't choose it here.\n\n### Other ways to convert JFIF to JPEG\n\n- **Preview (Mac):** open the picture, choose File > Export, pick JPEG in the Format menu, set the quality if you want, then click Save. Preview's Format menu lists JPEG, and its quality slider appears for JPEG and JPEG-2000.\n- **GIMP:** open the file, use File > Export As, set the Name field to end in .jpeg and click Export.\n- **ImageMagick:** run `magick input.jfif output.jpeg`. ImageMagick takes the output format from the file extension, and its JPEG reader handles JFIF.\n\n### Problems with JFIF files\n\n- **An upload form refuses .jfif**: the form may look only at the ending and never at the picture. Converting gives you a .jpeg that it should accept.\n- **It is JPEG data, or it isn't**: the .jfif ending can hide ordinary JPEG data, so find out how the file is encoded before you re-encode it.\n- **A reader chokes on it**: a few JPEG extensions are beyond what one JFIF reader supports, and a baseline-compatible export is the fix.\n- **The metadata is gone**: this page leaves out EXIF, ICC and XMP. The camera data and color profile stay only in the JFIF.\n- **The picture looks softer than the original**: JPEG is lossy, and a second encode can't bring back detail the first one discarded. Typical JPEG settings already compress an image to somewhere near a tenth or a twentieth of the raw pixels. Convert once from the original and don't chain exports.\n- **A decode failure message shows up**: the browser could not open the file. Switch to the latest Chrome, Edge, Firefox or Safari, or download the file again from its source.\n- **A transparent logo turned flat**: a JFIF file's JPEG data has no way to store alpha transparency.\n"
+    }
+  },
+  "m4b-to-mp3": {
+    "seo": {
+      "title": "Convert M4B to MP3 Online (Free)",
+      "h1": "M4B to MP3 Converter",
+      "description": "Turn an M4B audiobook into an MP3 in your browser. FFmpeg asks the LAME encoder for 192 kbit/s and drops any video stream. Free, with no upload."
+    },
+    "tool": {
+      "subtitle": "Turn an M4B audiobook into an MP3, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4B to MP3?",
+        "answer": "Choose your M4B above. FFmpeg runs in your browser and asks the LAME encoder for 192 kbit/s. Save the MP3 when it appears; the M4B stays as it was."
+      },
+      {
+        "question": "Will the MP3 keep the title and author?",
+        "answer": "With no tag options set, FFmpeg's default is to bring the file's global tags (title, artist, album and the like) over to any output with fields for them. MP3 can hold them in ID3 tags."
+      },
+      {
+        "question": "Does this work on audiobooks bought from a store?",
+        "answer": "The page does not remove copy protection. Use it on DRM-free files that you can already play outside the store."
+      },
+      {
+        "question": "Can I just rename .m4b to .mp3?",
+        "answer": "No. The file would still be an MPEG-4 audiobook with AAC audio inside. The audio has to be encoded again as MP3."
+      },
+      {
+        "question": "What bitrate does the MP3 have?",
+        "answer": "The page asks for 192 kbit/s and has no setting to change it. MP3 can't reach that rate below a 32 kHz sample rate, so for 16 to 24 kHz audio LAME stops at 160 kbit/s, and for 8 to 12 kHz audio at 64 kbit/s. For a different bitrate, use FFmpeg on your computer."
+      },
+      {
+        "question": "Can I convert a very long audiobook?",
+        "answer": "There is no size limit or timeout built in, so a long book takes as long as your device needs. FFmpeg runs single-threaded in the browser."
+      },
+      {
+        "question": "Why does the MP3 sound different from the M4B?",
+        "answer": "The audio is decoded from AAC and encoded again as MP3, which is lossy too. The copy can't be better than the source, so keep the M4B if you want the original."
+      },
+      {
+        "question": "Can I convert several M4B files at once?",
+        "answer": "Yes. Pick several audiobooks and each is converted in turn into a separate MP3. They aren't merged."
+      },
+      {
+        "question": "What name does the MP3 download have?",
+        "answer": "The download reuses your M4B's name and ends in .mp3, so book.m4b downloads as book.mp3."
+      },
+      {
+        "question": "Which player should I use for the MP3?",
+        "answer": "MP3 plays on nearly every device. For the original M4B with chapters, BookPlayer on iPhone imports M4B files and lets you jump between chapters, for books without DRM."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4B and MP3",
+      "fromFormat": {
+        "name": "M4B",
+        "fullName": "MPEG-4 audiobook",
+        "description": "An audiobook file in the MPEG-4 container. It carries AAC audio and can hold chapter markers.",
+        "details": [
+          "MPEG-4 container",
+          "AAC audio",
+          "Chapter markers",
+          "Bookmarking in supporting players"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG and developed with major contributions from the Fraunhofer Society.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting M4B to MP3",
+      "points": [
+        "The audio is encoded again with LAME, asked for 192 kbit/s, and any video stream is dropped.",
+        "Global tags from the M4B come across wherever MP3 has a field for them, since the page sets no tag options.",
+        "The page does not remove copy protection from purchased books.",
+        "There is no size limit or timeout, so a long book takes as long as your device needs.",
+        "Each M4B you choose downloads as its own MP3."
+      ]
+    },
+    "guide": {
+      "title": "About M4B files",
+      "markdown": "### What is an M4B file?\n\nAn M4B is an audiobook file in the MPEG-4 family. Apple documents .m4b as an AAC audiobook extension and lists audio/x-m4b as its media type in its archived iOS media documentation. FFmpeg recognizes it through the same MOV and MPEG-4 container reader it uses for other MP4-style files.\n\nWhat sets an audiobook apart from a song is structure. The MOV and MPEG-4 family supports chapter metadata, which players handle separately from the audio samples, so an audiobook app can jump between chapters. M4B is used for audiobooks distributed without DRM, as well as in Apple-oriented listening workflows. You come across one when a DRM-free audiobook is sold or shared as a single long file, or when an app such as BookPlayer on an iPhone imports it. FFmpeg's documentation notes that Audible AAX files are encrypted M4B files, which tells you that an .m4b extension alone doesn't mean the audio is free of protection.\n\n### Programs that open M4B files\n\n**Windows, Mac and Linux**\n\n- FFmpeg: reads an unencrypted M4B through its MOV and MPEG-4 demuxer.\n- ffplay: plays media through the FFmpeg libraries.\n\n**Mobile**\n\n- BookPlayer: an iPhone audiobook player with M4B import and chapter navigation, intended for DRM-free audiobooks. It also plays M4A and MP3, changes playback speed, has a sleep timer and shows the progress of your books.\n\n### M4B and MP3 compared\n\n- **Container**: an M4B is an MPEG-4 file made for audiobooks. An MP3 is a stream of MPEG-1 Audio Layer III frames, first standardized in 1993 as ISO/IEC 11172-3, then extended in 1995 by ISO/IEC 13818-3.\n- **Sound**: M4B holds AAC. MP3 is a different lossy codec, so converting means decoding and encoding again. Its psychoacoustic model throws away sound that most listeners are unlikely to notice.\n- **Origin**: Fraunhofer IIS developed MP3 from the late 1980s; other members of the MPEG audio group took part too. Patent licensing for MP3 ended on 23 April 2017.\n- **Structure**: M4B can carry chapter metadata. An MP3 stores titles and other tags in separate ID3 structures inside the file.\n- **Compatibility**: every major browser plays MP3, and its registered media type is audio/mpeg.\n- **Size**: The MP3 format spans 320 kbps down to 32 kbps with 32, 44.1 and 48 kHz as the sample rates. At 128 kbit/s, an MP3 comes to about one eleventh of the same audio's size on a CD.\n\nFFmpeg, running in your browser, is given `-acodec libmp3lame -b:a 192k -vn`: LAME asked for 192 kbit/s, with any video stream dropped. It sets no sample rate or channel count and passes no stream or tag mapping, so FFmpeg's defaults apply. A long book takes the time your device needs, because no timeout or size cap is built in. The first run also loads the FFmpeg engine, so it starts a little slower than later files.\n\n### Other ways to convert M4B to MP3\n\n- **FFmpeg:** run `ffmpeg -i book.m4b -c:a libmp3lame -b:a 192k -vn book.mp3`. The libmp3lame encoder wraps LAME. The -vn option disables automatic selection of any video stream, and the page's own command uses the same options.\n\n### Problems with M4B files\n\n- **A purchased book won't play or convert**: BookPlayer is designed for DRM-free audiobooks, so protected purchases fall outside its stated scope, and this page does not remove protection either. Use files you can already play.\n- **Chapter buttons are gone in an FFmpeg-based app**: FFmpeg's MOV reader parses chapters only for seekable input, so a non-seekable stream may show none.\n- **Chapter markers clash with a tagging program**: Nero-style chapter markers can conflict with some tagging applications. FFmpeg normally writes both Nero chapters and a QuickTime chapter track, and documents an option that writes only the QuickTime track.\n- **An Audible AAX book won't convert**: FFmpeg's documentation describes AAX files as encrypted M4B files that can be decrypted with a 4-byte activation secret. This page has no such option and doesn't remove protection.\n- **The page says FFmpeg failed with an exit code**: this can happen, for example, when a file has no audio track.\n- **The file is damaged or cut short**: FFmpeg usually logs an error and writes what it could read, which leaves the MP3 shorter than the book. Get a fresh copy of the M4B if the end is missing.\n"
+    }
+  },
+  "mkv-to-mov": {
+    "seo": {
+      "title": "Convert MKV to MOV Online (Free)",
+      "h1": "MKV to MOV Converter",
+      "description": "Rewrap an MKV movie as MOV without re-encoding. FFmpeg copies the streams in your browser, so size and frame rate stay put. Free, no upload."
+    },
+    "tool": {
+      "subtitle": "Copy an MKV movie into a MOV file without re-encoding, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MKV to MOV?",
+        "answer": "Choose your MKV above. FFmpeg copies the video and audio into a MOV file in your browser, and you save the result. Nothing is uploaded."
+      },
+      {
+        "question": "Does converting MKV to MOV lose quality?",
+        "answer": "No. The page runs a stream copy with `-c copy`, so the video and audio aren't re-encoded. The picture keeps the source's size and frame rate."
+      },
+      {
+        "question": "What if the MOV can't hold my MKV's video?",
+        "answer": "A stream copy can't change a codec, and MOV can't hold every codec an MKV can. A local run with a VP9 and Opus source stopped with an error, while an H.264 and AAC source copied without trouble. Re-encode with FFmpeg on your computer, for example `-c:v libx264 -c:a aac`, to get a MOV your editor accepts."
+      },
+      {
+        "question": "Are the title and other tags kept?",
+        "answer": "FFmpeg's defaults apply, because the command has no `-map_metadata` option. Under them, global tags like the title go into an output with fields for them. The page also passes no `-map` option, so FFmpeg's defaults choose which streams go in."
+      },
+      {
+        "question": "Is MOV the same as MP4?",
+        "answer": "No. QuickTime was the foundation of the MPEG-4 file format, but the two are separate formats. Convert to MP4 instead if a site wants that."
+      },
+      {
+        "question": "Will my editor accept the MOV?",
+        "answer": "Only if it supports the codecs inside. QuickTime containers may use codecs that an editor lacks, and a MOV copied from an MKV still holds the MKV's original video and audio."
+      },
+      {
+        "question": "Can I convert a large MKV?",
+        "answer": "Nothing in the page caps the size or the time, so a big file simply runs until your device finishes."
+      },
+      {
+        "question": "Can I convert several MKV files at once?",
+        "answer": "Yes. Choose several movies and each is rewrapped in sequence as a separate MOV download."
+      },
+      {
+        "question": "Does MOV play in every browser?",
+        "answer": "No. Browsers support MOV only in part, and Apple itself mostly uses MP4 today. If the file is for a web page, MP4 is the better target."
+      },
+      {
+        "question": "What name does the MOV download have?",
+        "answer": "The download reuses your MKV's name and ends in .mov, so trip.mkv downloads as trip.mov. The MKV itself is not changed."
+      }
+    ],
+    "aboutSection": {
+      "title": "MKV and MOV",
+      "fromFormat": {
+        "name": "MKV",
+        "fullName": "Matroska Video",
+        "description": "An open multimedia container with support for audio, video, subtitles, chapters and attachments.",
+        "details": [
+          "Open standard",
+          "Multiple audio and subtitle tracks",
+          "Chapters and metadata",
+          "Supports almost any codec"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "Apple's QuickTime container. It stores video, audio, text and timecode tracks, and many codecs, including ProRes.",
+        "details": [
+          "Multi-track container",
+          "Many codecs, including ProRes",
+          "Timecode and metadata tracks",
+          "Apple format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MKV to MOV",
+      "points": [
+        "The streams are copied with `-c copy`; nothing is re-encoded.",
+        "The picture keeps the source's size and frame rate; the 1920 px and 30 fps cap doesn't apply.",
+        "MOV can't hold every codec: a VP9 source stopped the copy in a local run, and an H.264 and AAC source copied fine.",
+        "Streams are chosen by FFmpeg's defaults; the page maps none.",
+        "Each MKV downloads as its own MOV."
+      ]
+    },
+    "guide": {
+      "title": "About MKV files",
+      "markdown": "### What is an MKV file?\n\nMatroska is the container behind the .mkv extension. Its structure is EBML, a binary format derived from XML, and the format developed from the earlier MCF project. A single Matroska file may carry numerous picture, sound and subtitle streams, plus chapters and descriptive tags in its design. The container requires neither a particular codec nor a quality level, so two MKV files can hold quite different video inside. IANA registers video/matroska for it.\n\nYou come across MKV files as video collections, as videos with several audio and subtitle tracks, and as Blu-ray rips. WebM is a subset of Matroska. People ask for this conversion because the movie plays fine but an editor or an Apple workflow wants a .mov. Both formats are containers rather than codecs, so the copy this page makes keeps the same video and sound and changes only the wrapper.\n\n### Programs that open MKV files\n\n**Windows, Mac and Linux**\n\n- ffplay: FFmpeg's player, which reads Matroska.\n- mpv: a desktop player with controls for switching audio and subtitle tracks.\n\n**Mobile**\n\n- VLC for Android and VLC for iOS: free apps that play most movie formats from local storage or the network.\n\n### MKV and MOV compared\n\nMOV is Apple's QuickTime file format. QuickTime arrived in 1991 and reached Windows in 1994, and its files end in .mov or .qt. Inside are objects called atoms, which software may skip if it doesn't know them. The codecs a MOV holds include H.264, ProRes and Motion JPEG for video and AAC or uncompressed PCM for sound. Mac screen captures of video land in this format.\n\n- **Owner**: Matroska is an open container. MOV is Apple's QuickTime format.\n- **Streams**: MKV carries several video, audio and subtitle streams. MOV can hold H.264, ProRes or Motion JPEG video and AAC or PCM audio.\n- **Relatives**: QuickTime underlies the MPEG-4 file format, but a MOV file and an MP4 file are different things and can't stand in for each other.\n- **Browser use**: MOV is only partly supported there, and Apple mostly uses MP4 itself now.\n- **Media types**: video/matroska and video/quicktime.\n- **Extensions**: .mkv for Matroska; .mov or .qt for QuickTime.\n- **Metadata**: chapters and descriptive tags are part of Matroska's design, while a MOV keeps its data in atoms.\n\nThis page doesn't re-encode. It runs FFmpeg with `-c copy` in your browser, which copies the video and audio streams into a MOV wrapper. Size and frame rate stay as the source had them, so the cap of 1920 px and 30 fps that other video conversions use is not applied. Because the codecs are copied as they are, they must be ones MOV can hold. The page maps no streams itself, so FFmpeg's defaults decide which ones to copy.\n\n### Other ways to convert MKV to MOV\n\n- **FFmpeg, copy:** run `ffmpeg -i input.mkv -c copy output.mov`. This is the same stream copy as the page. The `-c` option takes the special value copy, which means the stream is not re-encoded.\n- **FFmpeg, re-encode:** run `ffmpeg -i input.mkv -c:v libx264 -c:a aac output.mov` when the copy stops or the editor wants H.264 and AAC. FFmpeg transcodes every stream unless you ask for `-c copy`, so this takes longer than a copy. In a local run it converted a VP9 and Opus source into a MOV holding H.264 and AAC.\n\n### Problems with MKV files\n\n- **Wrong language on playback**: an MKV can hold several audio and subtitle streams, and choosing the wrong one gives the wrong language. mpv has track selection controls, and FFmpeg's `-map` option chooses streams on your computer.\n- **Seeking is slow or broken**: missing or damaged cues can make seeking harder. Matroska defines cues separately from the media clusters.\n- **It plays in one app but not another**: recognizing the container doesn't mean every embedded codec can be decoded by the chosen player.\n- **The MOV copy stops with an error**: MOV may not accept a stream's codec, and a copy can't change it. Use the re-encode method above.\n- **The editor still refuses the MOV**: QuickTime containers may use codecs that the destination editor lacks. A new filename ending can't transcode the video or add a missing decoder, so re-encode to a codec the editor supports.\n"
+    }
+  },
+  "mp4-to-wmv": {
+    "seo": {
+      "title": "Convert MP4 to WMV Online (Free)",
+      "h1": "MP4 to WMV Converter",
+      "description": "Convert MP4 to WMV in your browser. FFmpeg re-encodes the video, so fine detail softens. Free, with no upload or sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 video as WMV for Windows Media players, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to WMV?",
+        "answer": "Drop your MP4 on the page. FFmpeg turns it into a WMV inside your browser, and then you download the new file. The video never leaves your device."
+      },
+      {
+        "question": "Does MP4 to WMV lose quality?",
+        "answer": "Yes, and a detailed picture shows it. The video is encoded again at only 200 kbit/s, with a deinterlace filter applied, which leaves fine detail soft. Keep the MP4 and make each new WMV from it."
+      },
+      {
+        "question": "Will my 4K MP4 stay 4K?",
+        "answer": "No. A frame over 1920 px on the longer side is scaled down, and a smaller one keeps its size. A source faster than 30 fps loses frames but not running time. An odd-sized side is trimmed by a pixel to make it even."
+      },
+      {
+        "question": "Why would I need WMV instead of MP4?",
+        "answer": "Usually for an older Windows program or device that wants Windows Media. Every major browser plays MP4, so for the web MP4 is the better file."
+      },
+      {
+        "question": "Which codecs does the WMV use?",
+        "answer": "The page passes no codec options, so FFmpeg's defaults for .wmv apply: MS-MPEG4 v3 video (not Windows Media Video) and WMA v2 audio at 128 kbit/s. The video bitrate is left at FFmpeg's default of 200 kbit/s. For a different codec, run FFmpeg yourself with `-c:v wmv2 -c:a wmav2`."
+      },
+      {
+        "question": "Why is the conversion slow?",
+        "answer": "FFmpeg runs on a single thread inside your browser, and every frame is decoded and encoded again. A long or large video takes the time your device needs."
+      },
+      {
+        "question": "Can I queue more than one MP4?",
+        "answer": "Yes, pick several videos together. Each is re-encoded in turn and saved as a separate WMV file."
+      },
+      {
+        "question": "Are the title and other tags kept?",
+        "answer": "FFmpeg copies global tags such as title and artist wherever the output has a field for them, and the WMV has fields for some. Stream choice is left to FFmpeg, since the page sets no mapping."
+      },
+      {
+        "question": "Is there a file size limit?",
+        "answer": "No. Nothing caps the size or the running time, so a big file only needs enough memory on your device."
+      },
+      {
+        "question": "The WMV won't play. What now?",
+        "answer": "Try VLC, which lists ASF/WMV input. If a player still fails, it may lack a decoder for the codec, because a player can open the container and still lack the codec for the video inside."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and WMV",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A multimedia container that organizes encoded streams and timing information for playback.",
+        "details": [
+          "Audio and video streams",
+          "Different codec combinations",
+          "Not a single video codec"
+        ]
+      },
+      "toFormat": {
+        "name": "WMV",
+        "fullName": "Windows Media Video",
+        "description": "Windows Media video is commonly delivered in an ASF container with a .wmv extension.",
+        "details": [
+          "Microsoft media family",
+          "ASF storage structure",
+          "Codec support matters"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting MP4 to WMV",
+      "points": [
+        "The video is re-encoded; nothing is copied.",
+        "Frames over 1920 px are scaled down, faster video loses frames, and sides round down to even numbers.",
+        "A deinterlace filter is applied.",
+        "No codec options are passed, so FFmpeg's defaults for .wmv apply, at 200 kbit/s video.",
+        "Each MP4 downloads as its own WMV."
+      ]
+    },
+    "guide": {
+      "title": "About WMV files",
+      "markdown": "### What is an MP4 file?\n\nThe name stands for the MPEG-4 Part 14 file format, ISO/IEC 14496-14, first published in 2003. Its foundation is the ISO Base Media File Format, which descends from Apple's QuickTime, and the data sits in nested boxes, the idea QuickTime calls atoms. Typically an MP4 carries H.264 video and AAC sound, though AV1, VP9, MP3 and Opus fit too, and all the major browsers play it. Video files end in .mp4 or .m4v, audio-only ones often in .m4a, with video/mp4 as the usual media type.\n\nPeople convert MP4 to WMV for a specific reason: an older Windows program, a presentation setup or a device that wants Windows Media. If nothing requires WMV, the MP4 is the more widely playable file, and a modern phone has no need for Windows Media at all.\n\n### Programs that open MP4 files\n\n**Windows, Linux and Mac**\n\n- ffplay: ships with FFmpeg, which has the MP4 demuxer.\n- mpv: a desktop player where you pick which audio and subtitle streams play.\n\n**Windows and Mac**\n\n- Adobe Premiere: an editor that imports MP4 files.\n\n**Web**\n\n- Firefox will play supported MP4 files directly; AAC and H.264 playback can come down to which codecs the system provides. Chrome plays supported MP4 combinations, but the codecs inside still matter.\n\n**Mobile**\n\n- On phones, VLC's Android and iOS apps both open MP4; whether a given file works depends on the codecs inside.\n\n### MP4 and WMV compared\n\nA .wmv file is an ASF container with Windows Media coded content. ASF was designed for synchronized media storage and network delivery: it carries audio and video streams, and the same file can play from a disk or arrive from an HTTP server. Inside a WMV, the video may be compressed with Windows Media Video 7, 8 or 9. For its media type the Library of Congress lists video/x-ms-wmv, though IANA has no registration for it. To check a WMV you have made, VLC media player lists ASF/WMV input and Windows Media Video 1, 2 and 9 decoding, and FFplay uses FFmpeg decoders for it.\n\n- **Container**: MP4 uses boxes from the ISO Base Media File Format. WMV is ASF.\n- **Codecs**: MP4 usually pairs H.264 with AAC but takes others too. WMV carries video from the Windows Media Video family.\n- **Playback**: MP4 plays in all major browsers. WMV depends on a player with Windows Media decoders.\n- **Media types**: video/mp4 and audio/mp4 for MP4; video/x-ms-wmv for WMV, which is not an IANA registration.\n- **Extensions**: .mp4 or .m4v for video MP4; .wmv for Windows Media.\n\nThis page re-encodes everything. It runs a deinterlace filter (`yadif`) and a scale step that caps the longer side at 1920 px. Faster footage loses frames to reach 30 fps without getting shorter, and odd sides lose 1 px. No codec options are passed, so FFmpeg's defaults for a .wmv file pick the codecs: video is MS-MPEG4 v3 rather than true Windows Media Video, and audio is WMA v2. A local run of the same defaults wrote 128 kbit/s audio. The picture gets only 200 kbit/s, so detail turns soft. A clip already within those limits keeps its size and frame rate.\n\n### Other ways to convert MP4 to WMV\n\n- **FFmpeg:** run `ffmpeg -i input.mp4 output.wmv`. FFmpeg picks its default codecs for the output, so the result matches this page's codecs.\n- **FFmpeg with explicit codecs:** run `ffmpeg -i input.mp4 -c:v wmv2 -c:a wmav2 output.wmv`. FFmpeg's supported-codecs table lists Windows Media Video 8 and Windows Media Audio 2 for both encoding and decoding. In a local run, this wrote wmv2 video and wmav2 audio.\n- **VLC:** choose Media > Convert/Save, add the file, select Video - WMV + WMA (ASF), set a .wmv destination and start. This profile uses WMV2 and WMA2.\n\n### Problems with MP4 files\n\n- **A big frame comes out smaller**: large frames are scaled down and frames above 30 fps are dropped. For other dimensions use FFmpeg on your computer.\n- **The MP4 plays nowhere you need it**: opening a container doesn't promise a decoder for the video within, so a player may open the file and still show no picture.\n- **Fine detail looks worse in the WMV**: a second lossy encode at 200 kbit/s softens texture, gradients and small text. Convert from the original MP4 each time, not from a WMV.\n- **The WMV is not true Windows Media Video**: the defaults write MS-MPEG4 v3. For Windows Media Video 8, run the FFmpeg command above with `-c:v wmv2`.\n- **An \"FFmpeg failed\" error**: the MP4 may be damaged or hold streams FFmpeg can't read. Copy it again and retry.\n- **A long clip stalls a phone**: no size limit applies, but the conversion takes the time your device needs. A desktop is the safer place for a long video.\n"
+    }
+  },
+  "png-to-bmp": {
+    "seo": {
+      "title": "Convert PNG to BMP Online (Free)",
+      "h1": "PNG to BMP Converter",
+      "description": "Turn a PNG into a BMP for older Windows programs. ImageMagick writes it in your browser from 8-bit pixels; transparency isn't kept. Free and private."
+    },
+    "tool": {
+      "subtitle": "Turn a PNG into a BMP for older Windows programs, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert PNG to BMP?",
+        "answer": "Choose your PNG above. The browser decodes it, ImageMagick writes the BMP, and you save the file. Nothing is uploaded."
+      },
+      {
+        "question": "Why is my BMP far larger than the PNG?",
+        "answer": "PNG is always compressed with DEFLATE, while a BMP commonly stores uncompressed pixels. Flat screenshots shrink a lot in PNG and not at all in BMP."
+      },
+      {
+        "question": "Does the BMP keep PNG transparency?",
+        "answer": "No. Transparency is kept only for PNG and WebP output on this page, so the BMP will not carry the PNG's alpha channel. Check the result over your intended background."
+      },
+      {
+        "question": "Is a 16-bit PNG still 16-bit as a BMP?",
+        "answer": "No. The pixels pass through 8-bit RGBA, so extra bit depth in the source is lost."
+      },
+      {
+        "question": "What BMP version does the page write?",
+        "answer": "ImageMagick's default BMP writer, with no version option. If an older program needs version 3 or 2, use ImageMagick yourself with `BMP3:` or `BMP2:`."
+      },
+      {
+        "question": "Will the color profile and EXIF carry over?",
+        "answer": "No. Only raw pixels are passed along, so the EXIF, ICC and XMP data don't survive."
+      },
+      {
+        "question": "What happens to an animated PNG?",
+        "answer": "You get the first frame only. Keep the PNG if you need the motion."
+      },
+      {
+        "question": "Can I convert a batch of PNG images?",
+        "answer": "Yes, select as many as you like. Every PNG is processed in sequence and becomes its own BMP download, with no archive."
+      },
+      {
+        "question": "How big a PNG can I use?",
+        "answer": "No limit is built in, though a BMP of a large picture can be huge because it is mostly uncompressed."
+      },
+      {
+        "question": "When should I use BMP instead of PNG?",
+        "answer": "Only when a program asks for it, such as older Windows software. PNG is lossless too, and every major browser displays it."
+      }
+    ],
+    "aboutSection": {
+      "title": "PNG and BMP",
+      "fromFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless pixel format supporting grayscale, indexed color, truecolor and optional transparency.",
+        "details": [
+          "Lossless compression",
+          "Alpha channel support",
+          "Common browser image format"
+        ]
+      },
+      "toFormat": {
+        "name": "BMP",
+        "fullName": "Windows bitmap",
+        "description": "A bitmap file with headers describing the pixel layout, dimensions and color interpretation.",
+        "details": [
+          "Multiple header versions",
+          "Indexed and truecolor variants",
+          "Legacy software may require a specific variant"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting PNG to BMP",
+      "points": [
+        "ImageMagick writes the BMP from the decoded pixels; there are no version or depth options.",
+        "PNG transparency isn't kept.",
+        "EXIF, ICC and XMP are dropped, and depth is 8 bits per channel.",
+        "An animated PNG gives its first frame.",
+        "Each PNG downloads as its own BMP."
+      ]
+    },
+    "guide": {
+      "title": "About BMP files",
+      "markdown": "### What is a PNG file?\n\nThe PNG format was designed to replace GIF without patent worries. In October 1996 it became the first image format the W3C published as a Recommendation, after which it was issued as RFC 2083 and again as ISO/IEC 15948:2004. A third edition of the specification reached Recommendation status on 24 June 2025. Its compression never discards anything; it uses DEFLATE, which combines LZ77 with Huffman coding.\n\nA PNG file starts with a set signature and continues as a series of chunks, among them IHDR (header), IDAT (pixel data) and IEND (the end). Pixel data can be indexed, grayscale or truecolor, at 1 to 16 bits a sample, with an optional alpha channel for per-pixel transparency. The current specification includes animated PNG (APNG); software without animation shows the default still frame instead. All major browsers display PNG, and macOS saves its screenshots as PNG.\n\nPeople ask for this conversion when a program, device or assignment wants a bitmap. The two formats hold the same kind of thing, a grid of pixels, so the picture stays the same; what changes is how it is stored. PNG's third edition also adds HDR support through the cICP chunk and allows Exif metadata in an eXIf chunk, but neither is carried into the BMP here.\n\n### Programs that open PNG files\n\n**Windows and Mac**\n\n- GIMP: opens PNG for editing.\n\n**Windows**\n\n- Windows Photos: opens PNG.\n\n**Mac**\n\n- Preview: the built-in viewer on macOS.\n\n**Linux**\n\n- ImageMagick: reads PNG.\n\n**Web**\n\n- Any web browser, such as Chrome or Firefox, displays PNG.\n\n**Mobile**\n\n- Safari and Chrome display PNG on a phone.\n\n### PNG and BMP compared\n\nThe BMP raster family belongs to Microsoft, was first used on Windows and OS/2, and reached version 5 with Windows 98 in 1998. Version 5 is able to store an ICC profile and an alpha channel. You will most often run into BMP in Windows screen captures and system graphics. The registered media type is image/bmp. To open the BMP you get, ImageMagick reads it, XnView MP supports BMP too (company use needs a license), and Firefox displays BMP in the browser.\n\n- **Compression**: PNG is always lossless and compressed. A BMP usually holds uncompressed pixels, though lossless compression exists, so it tends to be much larger.\n- **Transparency**: PNG has an optional alpha channel. BMP version 5 can record an alpha channel, but this page doesn't keep PNG transparency.\n- **Color profile**: BMP version 5 can store an ICC profile. The page drops ICC, EXIF and XMP data.\n- **Depth**: A PNG can use up to 16 bits per sample, while this page writes 8 bits per channel.\n- **Origin**: PNG is a W3C and ISO standard. BMP comes from Microsoft.\n- **Media type**: image/png and image/bmp.\n\nOn this page the browser decodes your PNG and ImageMagick writes the BMP from the pixels. There is no BMP version, depth or compression option. An animated PNG gives its first frame only, and the page sets no size limit. The original PNG is not changed, so you can always make another BMP from it later.\n\n### Other ways to convert PNG to BMP\n\n- **GIMP:** load the PNG, pick File > Export As, put .bmp at the end of the Name field, then click Export.\n- **ImageMagick:** run `magick input.png output.bmp`. ImageMagick's format list says the default is version 4, and that BMP3 and BMP2 write versions 3 and 2. For an older program that expects a version-three header, run `magick input.png BMP3:output.bmp`. In a local run, the default wrote a Windows 98/2000 and newer header and BMP3 wrote a Windows 3.x header.\n- **XnConvert:** load the PNG into the Input list, choose a folder and BMP under Output, and click Convert.\n\n### Problems with PNG files\n\n- **Transparent areas change**: the page does not keep PNG transparency in the BMP. Check the result over the background you plan to use.\n- **A 16-bit PNG loses depth**: the BMP gets 8 bits per channel, so the extra precision does not survive.\n- **Color looks different**: the PNG's ICC profile isn't carried over, and neither are EXIF and XMP.\n- **An animated PNG gives one still**: only the first frame is written. Keep the PNG for the motion.\n- **A small PNG becomes a large bitmap**: PNG packs repeated colors efficiently, such as flat areas in a screenshot, and a mostly uncompressed BMP doesn't. PNG or JPEG is usually more practical for distribution.\n- **An older program refuses the BMP**: it may expect an older bitmap header. This page writes ImageMagick's default version; BMP3 or BMP2 output covers older programs.\n- **\"Image decode failed.\" appears**: this browser couldn't read that file. Try the original PNG.\n"
+    }
+  },
+  "tiff-to-png": {
+    "seo": {
+      "title": "Convert TIFF to PNG Online (Free)",
+      "h1": "TIFF to PNG Converter",
+      "description": "Convert a TIFF master or scan to PNG in your browser. The PNG comes from one picture in the file. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a TIFF into a PNG, right in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a TIFF to PNG?",
+        "answer": "Choose the TIFF above and let the page read it with ImageMagick, then save the PNG it produces. A group of TIFF files converts one after another, each becoming a separate PNG."
+      },
+      {
+        "question": "Will my multi-page TIFF become several PNG files?",
+        "answer": "No. One picture is read from the TIFF and written as one PNG. Reach another page by running ImageMagick on your own computer with the page number in brackets, like master.tiff[1]."
+      },
+      {
+        "question": "Is converting TIFF to PNG lossless?",
+        "answer": "PNG compression is lossless and no quality setting is passed to the converter. If the TIFF was saved with lossy compression, the loss it had stays."
+      },
+      {
+        "question": "Is a PNG as good as a TIFF master for archiving?",
+        "answer": "Not if the TIFF holds more than one image: the page writes a single picture, while a TIFF can contain many. Keep the TIFF as the master and share the PNG."
+      },
+      {
+        "question": "What is the largest TIFF I can convert here?",
+        "answer": "Only the picture is limited, not the file size. If the picture goes beyond roughly 537 megapixels, the page declines and calls it too large for this converter."
+      },
+      {
+        "question": "Why does my TIFF look different in two programs?",
+        "answer": "Programs understand different sets of private tags, color-profile extensions among them. Open the TIFF in whatever made it, or export a copy from there."
+      },
+      {
+        "question": "What is the difference between TIFF and PNG?",
+        "answer": "TIFF suits scans and print work and can store many images, several compression methods and high bit depths. PNG is a lossless raster format for graphics, and every browser shows it."
+      },
+      {
+        "question": "Is my TIFF uploaded?",
+        "answer": "No. There is no server step, because ImageMagick runs as WebAssembly in your browser. The TIFF itself stays unchanged, and you download a new PNG."
+      },
+      {
+        "question": "What will the PNG be called?",
+        "answer": "The PNG gets your TIFF's name plus a .png ending, so master.tiff downloads as master.png."
+      },
+      {
+        "question": "Which programs open a TIFF without converting it?",
+        "answer": "Adobe Photoshop, GIMP, Windows Photos and Preview on macOS all show TIFF files. Turn it into a PNG when the picture has to show in any web browser."
+      }
+    ],
+    "aboutSection": {
+      "title": "TIFF and PNG",
+      "fromFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster format built from tags, published by Aldus in 1986 and now maintained by Adobe. It suits scanning, print and archives.",
+        "details": [
+          "Several images in one file",
+          "Lossless or lossy compression",
+          "High bit depth and CMYK",
+          "image/tiff"
+        ]
+      },
+      "toFormat": {
+        "name": "PNG",
+        "fullName": "Portable Network Graphics",
+        "description": "A lossless raster format developed in the mid-1990s as a patent-free replacement for GIF, and standardized as ISO/IEC 15948 and a W3C Recommendation.",
+        "details": [
+          "Lossless compression",
+          "8-bit and 16-bit channels",
+          "Alpha transparency",
+          "image/png"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TIFF to PNG",
+      "points": [
+        "One picture is read from the TIFF, so a multi-page file gives one PNG.",
+        "PNG compression is lossless, and the page sets no quality.",
+        "Choose several TIFFs and each downloads as its own PNG, with no ZIP.",
+        "A picture over about 537 megapixels is refused with a too-large message."
+      ]
+    },
+    "guide": {
+      "title": "About TIFF files",
+      "markdown": "### What is a TIFF file?\n\nTIFF is short for Tagged Image File Format, a design whose point is its tags. A file opens with a header, followed by one or more directories of tags, each directory with its own bitmap data; a directory and its bitmap form a subfile. That structure is how a TIFF holds a run of scanned pages. The tags define color, bit depth and compression, and Adobe keeps a registry of extensions. Some private tags, including color-profile extensions, mean nothing to certain readers.\n\nTwo endings, .tiff and .tif, point to this one format, which is registered as image/tiff. The Library of Congress describes the format as fully documented and free of external dependencies, and it is on the preferred list for photographs and other graphic images. TIFF/IT, TIFF/EP and GeoTIFF are subtypes that extend it, and camera Exif metadata shows up in TIFF/EP files. Aldus and Microsoft created TIFF; today Adobe controls the specification, having acquired Aldus's PageMaker program. It began in 1986 as a bilevel format. Version 6.0 was published in 1992, and TIFF 5.0 is still used for many uncompressed images.\n\n### Programs that open TIFF files\n\n**Windows, Linux and Mac**\n\n- ImageMagick: handles TIFF in both directions, with settings for strips, tiles, byte order and compression.\n\n**Mac**\n\n- Preview: TIFF is among the file types offered under File > Export.\n\n### TIFF and PNG compared\n\n- **Names and types**: .tiff or .tif carry image/tiff; .png carries image/png.\n- **Compression**: a TIFF can be stored raw, or use LZW, Group 4 (a CCITT scheme for black-and-white images) or JPEG. The LZW patent expired in 2003 in the U.S. and in 2004 in Europe and Japan. PNG compression is lossless.\n- **Pages**: a TIFF can hold several images, handy for scanned sequences, but this page reads one picture from the file.\n- **Color**: the Photometric Interpretation tag picks the color space. 8-bit grayscale and 24-bit RGB are widespread, though a few TIFF workflows exceed 8 bits per channel. PNG provides 8-bit and 16-bit channels.\n- **Transparency**: only PNG offers an alpha channel here.\n- **Size ceiling**: classic TIFF uses 32-bit offsets and stops near 4 GB, while BigTIFF uses 64-bit offsets.\n- **Background**: TIFF is the older format, built around scanners and print. PNG followed in the mid-1990s as a GIF replacement without patent worries, and it became ISO/IEC 15948 and a W3C Recommendation.\n\nThe page decodes one picture with ImageMagick, running as WebAssembly inside your browser, and writes it as a PNG. It does not resize the picture or set a quality value, and the TIFF itself is never altered. If your TIFF is a multi-page scan or a print master, treat the PNG as a copy to share rather than a replacement.\n\n### Other ways to convert TIFF to PNG\n\n- **ImageMagick (command line):** run `magick 'master.tiff[0]' copy.png`. Put a different frame number in the brackets, counting from zero, to reach a later page. The quotes matter because Linux shells interpret brackets.\n- **GIMP (Windows, Mac, Linux):** open the TIFF, pick File > Export As, make the Name field end in .png and click Export.\n- **Preview (Mac):** open the TIFF, pick File > Export, select PNG in the Format menu, then press Save. A batch works if you open the files in one Preview window and select them in the sidebar.\n\n### Problems with TIFF files\n\n- **Only the first page came out**: a TIFF can hold many images but this page reads only one. Use ImageMagick with a page number as shown, or software that exposes the whole sequence.\n- **The picture is rejected as too large**: beyond about 537 megapixels the page refuses it. Lower the scan's resolution in an editor and retry.\n- **A program reads it wrongly**: readers differ over private tags. Open the file in the software that created it and export a standard copy.\n- **The file is near 4 GB**: classic TIFF can't grow past that because of its 32-bit offsets, which is what BigTIFF was made to fix.\n- **The color profile is missing**: ICC profiles live in an extension tag that not every reader recognizes, so check the result in a second viewer before deleting the original.\n- **A renamed file still fails**: changing .tiff to .png leaves TIFF data inside, so run an actual conversion.\n"
+    }
+  },
+  "ts-to-mp4": {
+    "seo": {
+      "title": "Convert TS to MP4 Online (Free)",
+      "h1": "TS to MP4 Converter",
+      "description": "Convert a .ts transport stream to an MP4 that browsers play. FFmpeg re-encodes it in your browser. Free, nothing is uploaded.",
+      "howToHeading": "How to convert TS to MP4"
+    },
+    "tool": {
+      "subtitle": "Turn a .ts recording into an MP4 that browsers and phones play, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert TS to MP4?",
+        "answer": "Pick your .ts file on this page. FFmpeg re-encodes the stream into an MP4 inside your browser, and you save the result. The recording stays on your device."
+      },
+      {
+        "question": "How do I convert .ts to MP4 on my computer?",
+        "answer": "Rewrap it with FFmpeg's stream copy, `-c copy`, with no re-encoding, or open the file in HandBrake or VLC and choose MP4. This page does the re-encode in the browser instead."
+      },
+      {
+        "question": "Is converting TS to MP4 lossless?",
+        "answer": "On this page, no. The video is encoded again with x264 at CRF 32 and the audio as AAC at 96 kbps. The FFmpeg copy method on your computer doesn't re-encode, so it keeps the streams as they are when MP4 can hold them."
+      },
+      {
+        "question": "Will my 4K recording stay 4K?",
+        "answer": "No. The picture is kept within 1920 px on the longer side and 30 fps. Dimensions are forced to even values, so a picture with an odd height comes out one pixel shorter."
+      },
+      {
+        "question": "Why does the MP4 start playing before it finishes loading?",
+        "answer": "The page adds `+faststart`, which puts the index at the start of the file. Browsers can then begin playback early."
+      },
+      {
+        "question": "Which video and audio streams does the MP4 get?",
+        "answer": "FFmpeg's defaults choose them, because the page maps no streams. The command has no `-map_metadata` option, so the input's global tags, such as the title, go into an output that has fields for them."
+      },
+      {
+        "question": "Why is the converted video softer than the broadcast?",
+        "answer": "The encode is tuned for speed and size: ultrafast preset, CRF 32. That trades detail for a smaller file and a quicker run. Interlaced pictures also get a deinterlace filter."
+      },
+      {
+        "question": "Can I convert more than one TS recording?",
+        "answer": "Yes, select them together. Each recording is processed in turn and saved as a separate MP4; they are not joined."
+      },
+      {
+        "question": "Does it work for a very long recording?",
+        "answer": "Neither size nor running time is capped. A long recording keeps your device busy longer, and FFmpeg's single thread in the browser adds to the wait."
+      },
+      {
+        "question": "Why does the TS file not play in my browser?",
+        "answer": "A transport stream is a system format for broadcast, and browsers play MP4 instead. Converting gives you the file they know."
+      }
+    ],
+    "aboutSection": {
+      "title": "TS and MP4",
+      "fromFormat": {
+        "name": "TS",
+        "fullName": "MPEG transport stream",
+        "description": "A packetized container used to carry synchronized media, including television program streams.",
+        "details": [
+          "Transport packets",
+          "Several component streams possible",
+          "Not a guarantee of one codec"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A multimedia container that organizes encoded streams and timing information for playback.",
+        "details": [
+          "Audio and video streams",
+          "Different codec combinations",
+          "Not a single video codec"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting TS to MP4",
+      "points": [
+        "The video is re-encoded with x264 (CRF 32, ultrafast) and the audio is AAC at 96 kbps.",
+        "The picture is limited to 1920 px and 30 fps, with sides rounded to even numbers.",
+        "A deinterlace filter is applied and +faststart is set.",
+        "FFmpeg's defaults choose the streams; the page maps none.",
+        "Each TS downloads as its own MP4."
+      ]
+    },
+    "guide": {
+      "title": "About TS files",
+      "markdown": "### What is a TS file?\n\nTS identifies an MPEG-2 transport stream, one of the system formats specified by ISO/IEC 13818-1. A transport stream doesn't define a picture codec. It multiplexes separately coded video and sound, and one stream can carry several programs with independent clocks. Its syntax uses timestamps to coordinate presentation and decoder buffering. Broadcast distribution and transmissions vulnerable to errors are important uses of TS. Besides television, TS is used for HLS segments in streaming and for footage from Blu-ray discs and camcorders, and its fixed 188-byte packets help streams survive transmission errors.\n\nThe usual extension is .ts and the registered media type is video/mp2t. You tend to meet it as a recording from a TV tuner, a stream or a capture, where the file is long and not tidy.\n\nMP4 is the MPEG-4 Part 14 format, ISO/IEC 14496-14, first published in 2003. Typically it holds H.264 video and AAC audio, and all major browsers play it. That is the reason for the conversion: MP4 opens in places a .ts file doesn't. Because TS is a wrapper rather than a codec, the video inside may already be H.264. Even so, this page encodes it again, so the result is a new file with its own quality settings, not a copy of the original streams.\n\n### Programs that open TS files\n\n**Windows, Mac and Linux**\n\n- FFmpeg: reads transport streams.\n- VLC media player: its input list includes TS.\n\n**Mobile**\n\n- Android: the VLC app lists TS among its inputs, and decoding depends on the stream's media.\n\n### TS and MP4 compared\n\n- **What it is**: TS is a system format for multiplexed streams and broadcast. MP4 is a file container built on the ISO Base Media File Format.\n- **Codecs**: neither fixes the codec. An MP4 often has H.264 and AAC, and may use AV1, VP9, MP3 or Opus instead.\n- **Programs**: one TS can carry several programs. An MP4 normally holds one movie.\n- **Playback**: browsers play MP4; a .ts file needs a player that understands transport streams.\n- **Timing**: a TS leans on timestamps for presentation and decoder buffering, which suits a broadcast that may lose packets. An MP4 is built for files you store and play back.\n- **Extensions and types**: .ts and video/mp2t; .mp4 or .m4v and video/mp4.\n\nThis page encodes new video. In your browser, FFmpeg uses `libx264` (preset ultrafast, CRF 32, tune zerolatency) for video and AAC at 96 kbps for audio, adds `+faststart` so the MP4 can start before it has fully loaded, and applies a deinterlace filter (`yadif`). The longer side stays at or under 1920 px and the frame rate at or under 30 fps. Sides round down to even numbers, which costs an odd dimension one pixel. No `-map` is passed, so FFmpeg's defaults pick the streams.\n\n### Other ways to convert TS to MP4\n\n- **FFmpeg, copy:** run `ffmpeg -i input.ts -c copy output.mp4`. It doesn't re-encode, so the streams stay as they are, but MP4 must be able to hold them.\n- **HandBrake:** choose Open Source, pick a preset, set the file name in Save As and the folder in To, then press Start. HandBrake's container page says it may switch an MP4 to the .m4v ending when AC3 pass-through, SRT subtitles or chapter markers are on, and a preference turns that off.\n- **VLC:** under Media > Convert/Save, add the recording, select the Video - H.264 + MP3 (MP4) profile, name a destination and start. The profile's name says MP3 sound.\n\n### Problems with TS files\n\n- **It won't play in a browser**: browsers read MP4 rather than TS, so this is expected and not a fault in the file.\n- **The codec isn't supported**: recognizing the TS wrapper doesn't settle which codec decodes its audio or video.\n- **Glitches or jumps in the picture**: a TS is built to survive transmission errors, but lost packets can still leave flaws. The MP4 follows the stream as written, so it shows the same flaws. Try another copy of the recording.\n- **The MP4 is smaller than the TS**: the picture is capped in size and frame rate, and CRF 32 compresses hard.\n- **Fine detail looks worse**: the video is encoded again. Convert from the original TS each time.\n- **A long recording is slow**: the conversion is single-threaded in your browser, so a longer file means a longer wait.\n"
+    }
+  }
+}
