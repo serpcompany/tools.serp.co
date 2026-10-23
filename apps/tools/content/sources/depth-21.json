@@ -1,0 +1,263 @@
+{
+  "tools": {
+    "gif-to-gif": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "File > Export As opens the GIF export dialog; tick As animation to keep a multi-layer image moving.",
+          "limits": "As animation is disabled when the image has only one layer.",
+          "source": "https://docs.gimp.org/3.0/en/file-gif-export.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html"
+          ]
+        },
+        {
+          "app": "gifsicle",
+          "steps": "gifsicle -O3 input.gif -o optimized.gif",
+          "limits": "-O3 tries several optimization methods and can occasionally enlarge a file.",
+          "source": "https://www.lcdf.org/gifsicle/man.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick input.gif rewritten.gif",
+          "limits": "Its manual shows the magick input output form for converting between formats.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        }
+      ]
+    },
+    "html-to-gif": {
+      "methods": [
+        {
+          "app": "Firefox and ImageMagick",
+          "steps": "In Developer Tools settings tick \"Take a screenshot of the entire page\", or run :screenshot --fullpage --filename page.png in the Web Console. Then run magick page.png page.gif.",
+          "limits": "Firefox documents the .png extension for the file name.",
+          "source": "https://firefox-source-docs.mozilla.org/devtools-user/taking_screenshots/index.html",
+          "supportSources": [
+            "https://imagemagick.org/convert/"
+          ]
+        },
+        {
+          "app": "Chrome DevTools and ImageMagick",
+          "steps": "Open docked Chrome DevTools and its Command Menu. Type screenshot; choose Capture area screenshot and drag the desired region. Convert the downloaded screenshot with magick screenshot.png page.gif.",
+          "limits": "Selected-area screenshot rather than full-page capture; requires docked DevTools.",
+          "source": "https://developer.chrome.com/docs/devtools/command-menu",
+          "supportSources": [
+            "https://imagemagick.org/convert/"
+          ]
+        },
+        {
+          "app": "Playwright and ImageMagick",
+          "steps": "After navigation, await page.screenshot({ path: 'capture.png', fullPage: true }); then magick capture.png capture.gif",
+          "limits": "A scripted PNG capture followed by GIF encoding; no animation recording implied.",
+          "source": "https://playwright.dev/docs/screenshots",
+          "supportSources": [
+            "https://imagemagick.org/convert/"
+          ]
+        }
+      ]
+    },
+    "m4a-to-flac": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i recording.m4a -vn -c:a flac recording.flac",
+          "limits": "-vn disables video; -map selects streams.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Audacity",
+          "steps": "Install the optional FFmpeg library; File > Import > Audio; then File > Export Audio and choose FLAC as the format.",
+          "limits": "M4A import requires the optional FFmpeg library; the FLAC options set channels, sample rate, bit depth and level.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/file_export_dialog.html",
+            "https://manual.audacityteam.org/man/flac_export_options.html"
+          ]
+        },
+        {
+          "app": "fre:ac",
+          "steps": "Add the M4A file, choose the FLAC encoder and start the conversion.",
+          "limits": "The site says it converts freely between M4A/AAC and FLAC and runs on Windows, macOS and Linux; it does not list menu steps.",
+          "source": "https://www.freac.org/"
+        }
+      ]
+    },
+    "mp4-to-flac": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i concert.mp4 -vn -c:a flac concert.flac",
+          "limits": "Add -map 0:a:N to choose an audio stream when the file has several.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Audacity",
+          "steps": "File > Import > Audio; then File > Export Audio; select FLAC and review export settings.",
+          "limits": "MP4 import requires the optional FFmpeg library; the FLAC options set channels, sample rate, bit depth and level.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/file_export_dialog.html",
+            "https://manual.audacityteam.org/man/flac_export_options.html"
+          ]
+        },
+        {
+          "app": "VLC",
+          "steps": "Run VLC without its interface: -I dummy --sout \"#transcode{acodec=flac}:std{mux=raw,dst=yourAudio.flac}\" with the video file as input, ending with vlc://quit.",
+          "limits": "The wiki's example is a Windows command that reads an .mp4 file.",
+          "source": "https://wiki.videolan.org/VLC_HowTo/Extract_audio/",
+          "supportSources": [
+            "https://www.videolan.org/vlc/features.html"
+          ]
+        }
+      ]
+    },
+    "mpeg-to-wav": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i archive.mpeg -vn -c:a pcm_s16le archive.wav",
+          "limits": "-vn disables video; -map selects streams.",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSources": [
+            "https://ffmpeg.org/general.html"
+          ]
+        },
+        {
+          "app": "Audacity",
+          "steps": "With the optional FFmpeg library installed, File > Import > Audio; then File > Export Audio and choose WAV.",
+          "limits": "The manual says FFmpeg imports audio from most video files that are not DRM-protected; it does not name MPEG.",
+          "source": "https://manual.audacityteam.org/man/importing_audio.html",
+          "supportSources": [
+            "https://manual.audacityteam.org/man/file_export_dialog.html"
+          ]
+        },
+        {
+          "app": "VLC",
+          "steps": "Run VLC without its interface: -I dummy --sout \"#transcode{acodec=s16l,channels=2}:std{access=file,mux=wav,dst=yourAudio.wav}\" with the video file as input, ending with vlc://quit.",
+          "limits": "The wiki's example is a Windows command that reads an .mp4 file; VLC's feature list names MPEG streams as input.",
+          "source": "https://wiki.videolan.org/VLC_HowTo/Extract_audio/",
+          "supportSources": [
+            "https://www.videolan.org/vlc/features.html"
+          ]
+        }
+      ]
+    },
+    "nef-to-png": {
+      "methods": [
+        {
+          "app": "darktable",
+          "steps": "Develop the NEF; in the export module choose target storage: file on disk and file format: PNG; press start export.",
+          "limits": "darktable's features page lists PNG export and NEF import; it gives no camera list here.",
+          "source": "https://docs.darktable.org/usermanual/development/en/module-reference/utility-modules/shared/export/",
+          "supportSources": [
+            "https://www.darktable.org/about/features/"
+          ]
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick photograph.nef photograph.png",
+          "limits": "The formats page lists NEF as read-only and PNG as read and write.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "Nikon NX Studio + GIMP",
+          "steps": "Select the photograph; NX Studio toolbar Export > Export as TIFF (8 Bit) or TIFF (16 Bit); open the TIFF in GIMP; File > Export As, export as PNG.",
+          "limits": "Two-stage method; NX Studio's export formats are JPEG, TIFF and HEIF, not PNG.",
+          "source": "https://nikonimglib.com/nxstdo/onlinehelp/en/saving_pictures_in_other_formats_64.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.0/en/file-png-export.html"
+          ]
+        }
+      ]
+    },
+    "pptx-to-png": {
+      "methods": [
+        {
+          "app": "PowerPoint for Mac",
+          "steps": "File > Export; File Format: PNG; choose Save Every Slide or Save Current Slide Only; set image size; export.",
+          "limits": "The page gives PNG as an example format; image size is set in the Width and Height boxes.",
+          "source": "https://support.microsoft.com/en-us/powerpoint/export-your-powerpoint-for-mac-presentation-as-a-different-file-format"
+        },
+        {
+          "app": "LibreOffice Impress",
+          "steps": "Open the deck in Impress; File > Export; select PNG as the file type; set PNG compression and interlacing.",
+          "limits": "The export page covers graphics file types and does not describe slide selection.",
+          "source": "https://help.libreoffice.org/latest/en-US/text/simpress/01/01170000.html",
+          "supportSources": [
+            "https://help.libreoffice.org/latest/en-US/text/shared/00/00000200.html",
+            "https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html"
+          ]
+        },
+        {
+          "app": "Keynote for Mac",
+          "steps": "Drag the deck onto the Keynote icon to open it; File > Export To > Images; select slides; select an image format; Export.",
+          "limits": "Keynote's page doesn't list the image formats.",
+          "source": "https://support.apple.com/guide/keynote/export-to-powerpoint-or-another-file-format-tana0d19882a/mac",
+          "supportSources": [
+            "https://support.apple.com/guide/keynote/open-or-close-a-presentation-tan72232b56/mac"
+          ]
+        }
+      ]
+    },
+    "psd-to-svg": {
+      "methods": [
+        {
+          "app": "Photopea",
+          "steps": "Open the PSD through the Open dialog; File > Export As; pick SVG.",
+          "limits": "Photopea's own export, not this page's; the page doesn't say whether its SVG holds vector paths or a picture.",
+          "source": "https://www.photopea.com/learn/opening-saving"
+        }
+      ]
+    },
+    "svg-to-ai": {
+      "methods": [
+        {
+          "app": "CorelDRAW",
+          "steps": "File > Import; select the SVG; Import; pick a scaling option in the Import SVG dialog; OK; click the page. Then File > Export; select Adobe Illustrator (AI) from the Save as type list; enter a name; Export.",
+          "limits": "The export page gives AI as an example output format; the supported-formats page lists both SVG and AI without saying which direction each supports.",
+          "source": "https://product.corel.com/help/CorelDRAW/540240626/Main/EN/Doc/CorelDRAW-Exporting-files.html",
+          "supportSources": [
+            "https://product.corel.com/help/CorelDRAW/Documentation-Windows/CorelDRAW-en/CorelDRAW-Scalable-Vector-Graphics-SVG.html",
+            "https://product.corel.com/help/CorelDRAW/540111186/Documentation-Windows/CorelDRAW-en/CorelDRAW-Supported-file-formats.html"
+          ]
+        }
+      ]
+    },
+    "svg-to-gif": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick artwork.svg artwork.gif",
+          "limits": "The formats page notes that SVG renders through Inkscape, RSVG or the internal MSVG renderer, and that GIF holds up to 256 palette entries.",
+          "source": "https://imagemagick.org/convert/",
+          "supportSources": [
+            "https://imagemagick.org/formats/"
+          ]
+        },
+        {
+          "app": "Inkscape and GIMP",
+          "steps": "Open the SVG in Inkscape; Shift + Ctrl + E for the Export PNG Image dialog; choose the export area and the pixel size under Image Size; name the file and Export. Open the PNG in GIMP; File > Export As; export as GIF.",
+          "limits": "In the GIF dialog the As animation option is disabled for a single layer; GIMP's GIF export is limited to 256 colors.",
+          "source": "https://inkscape-manuals.readthedocs.io/en/latest/export-png.html",
+          "supportSources": [
+            "https://docs.gimp.org/3.0/en/gimp-file-export-as.html",
+            "https://docs.gimp.org/3.0/en/file-gif-export.html"
+          ]
+        }
+      ]
+    }
+  }
+}

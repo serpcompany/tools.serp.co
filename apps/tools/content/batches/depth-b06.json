@@ -1,0 +1,808 @@
+{
+  "gif-to-tga": {
+    "seo": {
+      "title": "Convert GIF to TGA Online (Free)",
+      "h1": "GIF to TGA Converter",
+      "description": "Save a GIF as a TGA still for game or video work. Only the first frame of an animated GIF is converted. Free, with no sign-up.",
+      "howToHeading": "How to convert GIF to TGA"
+    },
+    "tool": {
+      "subtitle": "Save the first frame of a GIF as a TGA still, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Will an animated GIF become an animated TGA?",
+        "answer": "No. A TGA is a still image, and the page takes the first frame of the GIF only. Keep the GIF if the motion matters."
+      },
+      {
+        "question": "How do I choose a different GIF frame?",
+        "answer": "Not on this page, which always uses the first frame. In ImageMagick, add a number in brackets, as in `magick 'animation.gif[3]' frame.tga`."
+      },
+      {
+        "question": "Can the TGA bring back colors the GIF lost?",
+        "answer": "No. A GIF stores only a palette of colors per frame, and the pixels the page passes on carry only those colors."
+      },
+      {
+        "question": "Why would I want a TGA from a GIF?",
+        "answer": "Game engines take TGA as a texture format, and renderers use it for finished frames. The GIF supplies the still picture."
+      },
+      {
+        "question": "Does the TGA keep the GIF's metadata?",
+        "answer": "No. The picture passes through raw pixels, so ICC and XMP data are left behind."
+      },
+      {
+        "question": "What is the TGA file called?",
+        "answer": "It takes the GIF's name with a .tga ending. The page leaves your GIF alone and gives you a fresh TGA to download."
+      },
+      {
+        "question": "Can I convert several GIFs together?",
+        "answer": "Yes. Add a group of GIFs and each is saved as a separate TGA, without a ZIP."
+      },
+      {
+        "question": "What does \"Image decode failed\" mean?",
+        "answer": "The decoder built into your browser was unable to open the file. Check that the GIF displays in the browser, then try again."
+      }
+    ],
+    "aboutSection": {
+      "title": "GIF and TGA",
+      "fromFormat": {
+        "name": "GIF",
+        "fullName": "Graphics Interchange Format",
+        "description": "A palette-based image or animation with a limited transparency model.",
+        "details": [
+          "Indexed colors",
+          "Timed frames possible",
+          "Binary pixel transparency"
+        ]
+      },
+      "toFormat": {
+        "name": "TGA",
+        "fullName": "Truevision TGA (Targa)",
+        "description": "A Targa still-image format used by graphics workflows.",
+        "details": [
+          "Raster image",
+          "RGB variants",
+          "Optional RLE"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting GIF to TGA",
+      "points": [
+        "Your browser decodes the GIF and ImageMagick writes the TGA.",
+        "An animated GIF gives a single still, its first frame.",
+        "The pixels pass through 8-bit RGBA.",
+        "Several GIFs convert one after another, each into its own TGA."
+      ]
+    },
+    "guide": {
+      "title": "GIF background and TGA conversion",
+      "markdown": "### What is a GIF file?\n\nCompuServe introduced GIF in 1987. Every image in a GIF is limited to a 256-color palette and compressed without loss using LZW. One GIF can store many images, each with a delay measured in hundredths of a second, which is how it animates. GIF89a, released in July 1990, let files carry transparency flags, frame delays, comments and application data. Transparency works by flagging a single palette entry, so a pixel is either clear or opaque. Every major browser displays GIF, and its media type is image/gif.\n\n### Programs that open GIF files\n\n- **Windows, Mac and Linux:** In GIMP you can export a single image or a layered animation to GIF and make the animation repeat endlessly. ImageMagick reads GIF.\n- **Web:** Google Chrome and Mozilla Firefox display it.\n- **Mobile:** Safari and Google Chrome display it too.\n\n### GIF and TGA compared\n\n- **Color**: a GIF is limited to a palette. A 24-bit TGA stores 8 bits per color component, and a 32-bit TGA adds an 8-bit alpha channel.\n- **Animation**: a GIF can animate. A TGA is a single still image.\n- **Compression**: GIF uses LZW. TGA can use optional run-length encoding.\n- **Use**: video editing and game development workflows still use Targa images.\n\nThe page decodes the GIF in your browser and ImageMagick writes the TGA. Only the first frame of an animated GIF is converted, so open the TGA in an image viewer afterwards to confirm it shows the frame you wanted.\n\n### Other ways to convert GIF to TGA\n\n- **ImageMagick:** run `magick 'animation.gif[0]' still.tga`. ImageMagick counts frames from zero, so `[0]` is the first image, and a different number picks a later one. ImageMagick reads and writes both GIF and Truevision Targa.\n\n### Problems with GIF files\n\n- **Soft edges turn hard**: partial opacity is impossible in a GIF, so transparent edges are clear or opaque before the page reads them.\n- **Gradients look banded**: GIMP reduces a GIF export to a palette, which can change gradients.\n- **Frames cover each other wrongly**: each frame carries a disposal setting that controls what happens to the previous image, so a wrong setting smears the animation.\n- **A comment is missing**: GIMP leaves out a GIF comment that has characters outside seven-bit ASCII.\n"
+    }
+  },
+  "heic-to-svg": {
+    "seo": {
+      "title": "Convert HEIC to SVG Online (Free)",
+      "h1": "HEIC to SVG Converter",
+      "description": "Wrap an iPhone HEIC photo in an SVG file. libheif decodes it in your browser and the SVG holds the picture as an image, not paths. Free.",
+      "howToHeading": "How to convert HEIC to SVG"
+    },
+    "tool": {
+      "subtitle": "Wrap a HEIC photo in an SVG file, in your browser; nothing is traced."
+    },
+    "faqs": [
+      {
+        "question": "Does the SVG contain vector paths?",
+        "answer": "No. It holds your photo as one embedded PNG picture, so it scales like a bitmap. For paths, trace the picture in Inkscape with Path > Trace Bitmap."
+      },
+      {
+        "question": "Why convert HEIC to SVG at all?",
+        "answer": "The SVG is a wrapper around the photo, so a tool or page that asks for an SVG file can take it. The picture inside stays a bitmap."
+      },
+      {
+        "question": "Which image in the HEIC is used?",
+        "answer": "The primary image. A HEIC that holds several images still gives one SVG with that single picture."
+      },
+      {
+        "question": "Does the SVG keep the photo's EXIF and color profile?",
+        "answer": "No. The page decodes to 8-bit RGB and drops EXIF and ICC data."
+      },
+      {
+        "question": "How big is the SVG?",
+        "answer": "The PNG is stored as base64 text inside the SVG, and base64 takes more room than the PNG's own bytes, so expect a bigger file than the PNG alone."
+      },
+      {
+        "question": "Why does the page say 'No images in HEIF'?",
+        "answer": "libheif found no image inside the file. Copy the HEIC again from your phone or cloud storage, then try again."
+      },
+      {
+        "question": "Do I need the Windows HEVC extensions?",
+        "answer": "Not for this page, which decodes the HEIC itself with libheif. Windows Photos needs them to open HEIC."
+      },
+      {
+        "question": "Can several HEIC photos go through together?",
+        "answer": "Yes. They are converted one after another into separate SVG files, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "HEIC and SVG",
+      "fromFormat": {
+        "name": "HEIC",
+        "fullName": "HEIF image with HEVC coding",
+        "description": "A HEIF photograph container using HEVC image compression.",
+        "details": [
+          "May contain several images",
+          "Primary image selection",
+          "Pixel-based photograph"
+        ]
+      },
+      "toFormat": {
+        "name": "SVG",
+        "fullName": "Scalable Vector Graphics",
+        "description": "A graphics document capable of paths and embedded raster content.",
+        "details": [
+          "XML graphics structure",
+          "Paths are possible",
+          "Raster content is possible"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting HEIC to SVG",
+      "points": [
+        "libheif decodes the primary image as 8-bit RGB.",
+        "The SVG embeds a base64 PNG at the picture's own pixel size.",
+        "Nothing is traced into vector paths.",
+        "EXIF and ICC data are dropped."
+      ]
+    },
+    "guide": {
+      "title": "HEIC background and SVG conversion",
+      "markdown": "### What is a HEIC file?\n\nThe High Efficiency Image File Format (HEIF) is MPEG-H Part 12 (ISO/IEC 23008-12), and its first edition appeared in 2017. It is a container rather than a codec, and HEIC is the variant whose images are coded with HEVC (H.265). One HEIF file may carry multiple pictures, sequences, depth beyond 8 bits, an alpha layer stored as a second image, and Exif or XMP metadata. Apple's photo apps started saving HEIF in iOS 11 and macOS High Sierra, and every iPhone since the iPhone 7 can shoot it. The Camera settings, under Formats, let you pick High Efficiency (HEIF) or Most Compatible (JPEG). The registered media types are image/heic and image/heif.\n\n### Programs that open HEIC files\n\n- **Windows, Mac and Linux:** GIMP can import HEIC files; ImageMagick can read them through libheif.\n- **Windows:** Windows Photos needs Microsoft's HEIF and HEVC extensions before it will open HEIC.\n- **Windows and Mac:** Photoshop handles HEIC on macOS from 10.13, and on Windows after both Microsoft codecs are added.\n- **Mac:** Preview on a Mac can open a HEIF file and export JPEG or PNG copies.\n- **Mac and Mobile:** Photos from Apple opens HEIF and exports another format.\n- **Web and Mobile:** Safari displays HEIC from version 17.0, and the OneDrive website previews uploaded HEIF photos.\n\n### HEIC and SVG compared\n\nHEIC stores a photograph with lossy HEVC compression. SVG is an XML format that describes shapes, text and embedded images, so it usually scales without losing sharpness. The SVG contains one `<image>` element that carries the picture as base64-encoded PNG data at the picture's own pixel width and height. Pixel images inside an SVG keep their original resolution when enlarged, so the result scales like a photo, not like a drawing. libheif decodes the HEIC's primary image to 8-bit RGB, and EXIF and ICC data are dropped.\n\n### Other ways to convert HEIC to SVG\n\n- **libheif and Inkscape:** run `heif-dec input.heic intermediate.png`. The heif-dec tool writes JPEG, PNG, TIFF, WebP or Y4M output from a HEIF input. Then, in Inkscape, choose File > Import for the decoded PNG and Path > Trace Bitmap. Tracing builds vector paths from the bitmap.\n\n### Problems with HEIC files\n\n- **Windows won't open it**: Windows needs Microsoft's HEIF Image Extension plus the HEVC Video Extensions. The HEIF extensions are free in the Microsoft Store, and the HEVC Video Extensions cost $0.99.\n- **iPhone photos arrive as JPEG**: a USB copy can convert them to JPEG unless Photos is set to Keep Originals.\n- **Error \"No images in HEIF\"**: the file holds no image, so fetch a fresh copy of it.\n"
+    }
+  },
+  "jfif-to-ico": {
+    "seo": {
+      "title": "Convert JFIF to ICO Online (Free)",
+      "h1": "JFIF to ICO Converter",
+      "description": "Turn a .jfif picture into a single-image ICO icon file. The whole picture is fitted, not cropped to a square. Free, nothing is uploaded.",
+      "howToHeading": "How to convert JFIF to ICO"
+    },
+    "tool": {
+      "subtitle": "Turn a .jfif picture into a single-image ICO icon, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JFIF to ICO?",
+        "answer": "Pick the .jfif file on this page. The browser decodes it, ImageMagick writes the ICO, and you download that. Your file never leaves your device."
+      },
+      {
+        "question": "Does the ICO contain several sizes?",
+        "answer": "No. It holds one image. If you need several sizes in one file, build the ICO in an icon editor."
+      },
+      {
+        "question": "What size is the icon?",
+        "answer": "A large picture is scaled down to fit a square box, with its proportions kept. A smaller picture keeps its size."
+      },
+      {
+        "question": "Will the picture be cropped to a square?",
+        "answer": "No. The page fits the whole picture and keeps its proportions, so crop first if you need a square favicon."
+      },
+      {
+        "question": "Is a JFIF the same as a JPG?",
+        "answer": "A JFIF is JPEG data in a thin wrapper, so it behaves like any JPEG and shares the image/jpeg media type."
+      },
+      {
+        "question": "Is the JFIF's EXIF data kept?",
+        "answer": "No. Only the pixels are carried over. EXIF, ICC and XMP data are dropped."
+      },
+      {
+        "question": "Will the ICO work for a site favicon?",
+        "answer": "Browsers such as Firefox and Chrome can show an ICO file as a site icon, and many people know the format mainly for favicons."
+      },
+      {
+        "question": "Is there a batch mode for JFIF files?",
+        "answer": "Yes. Every JFIF is saved as its own ICO, and nothing is zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "JFIF and ICO",
+      "fromFormat": {
+        "name": "JFIF",
+        "fullName": "JPEG File Interchange Format",
+        "description": "A JPEG interchange wrapper often encountered on downloaded photographs.",
+        "details": [
+          "JPEG-coded pixels",
+          "No alpha channel",
+          "Photographic input"
+        ]
+      },
+      "toFormat": {
+        "name": "ICO",
+        "fullName": "Windows icon",
+        "description": "An icon container that can package display representations.",
+        "details": [
+          "One image written here",
+          "256-pixel fitting ceiling",
+          "Distinct from JPEG"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting JFIF to ICO",
+      "points": [
+        "This ICO contains a single image rather than several sizes.",
+        "A larger picture is fitted inside a square box with its proportions kept.",
+        "Every JFIF converts into its own ICO, with no ZIP.",
+        "EXIF, ICC and XMP data are dropped."
+      ]
+    },
+    "guide": {
+      "title": "JFIF background and ICO conversion",
+      "markdown": "### What is a JFIF file?\n\nJFIF is the JPEG File Interchange Format, a thin wrapper that lets JPEG data move between programs. Eric Hamilton at C-Cube Microsystems wrote it first, and version 1.02 dates from 1992. ITU-T T.871 and ISO/IEC 10918-5 later standardized it. JFIF adds an APP0 segment labeled JFIF right after the JPEG start-of-image marker, and that segment may hold a small thumbnail. Most files called JPEGs are JFIF files. The pixels inside are lossy JPEG data at 8 bits per color channel, with no alpha channel. A .jfif file has the media type image/jpeg, and JFIF files may also use .jpg, .jpeg, .jpe, .jfi or .jif.\n\n### Programs that open JFIF files\n\n- **Windows, Mac and Linux:** ImageMagick's JPEG reader handles JFIF, and Mozilla Firefox displays JPEG/JFIF data.\n- **Web and Mobile:** Google Chrome displays JFIF, and so does Safari on mobile.\n\n### JFIF and ICO compared\n\nICO is Microsoft's image format for interface icons. A file can hold more than one image, it uses little-endian byte order, and its media type is image/vnd.microsoft.icon. Most people know ICO as the favicon format.\n\nHere the browser decodes the JFIF and ImageMagick writes the ICO. This ICO contains a single image rather than several sizes. Anything larger than 256 px on its long side is scaled down to fit a 256 by 256 box, proportions intact; smaller pictures are left at their size. The image sits inside the ICO as PNG. Open the finished ICO in an image viewer to confirm the whole picture is there and nothing was cropped. Pixels go through 8-bit RGBA, and EXIF, ICC and XMP metadata is not kept.\n\n### Other ways to convert JFIF to ICO\n\n- **ImageMagick:** run `magick portrait.jfif -resize '256x256>' portrait-icon.ico`. In the geometry, the `>` means a picture shrinks only when it is larger than the box.\n\n### Problems with JFIF files\n\n- **No see-through areas**: a JFIF stores no alpha channel, so the icon starts out fully opaque.\n- **A reader rejects the JFIF**: some JPEG extensions outgrow a particular JFIF reader, so try a baseline-compatible export.\n- **Unsure what the file holds**: the .jfif suffix can contain ordinary JPEG data, so identify its encoding before re-encoding.\n"
+    }
+  },
+  "jpeg-to-jpeg": {
+    "seo": {
+      "title": "Convert JPEG to JPEG Online (Free)",
+      "h1": "JPEG to JPEG Converter",
+      "description": "Re-encode a JPEG as a fresh JPEG with one fixed quality setting, in your browser. EXIF, ICC and XMP data are dropped. Free, nothing is uploaded.",
+      "howToHeading": "How to convert JPEG to JPEG"
+    },
+    "tool": {
+      "subtitle": "Re-encode a JPEG as a new JPEG, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Why convert a JPEG to a JPEG?",
+        "answer": "To get a fresh encode with the page's settings, or a copy without the original's EXIF, ICC and XMP data."
+      },
+      {
+        "question": "What quality does the new JPEG have?",
+        "answer": "The browser's encoder gets quality 0.85. It is not a percentage of detail kept, and other programs use their own scales."
+      },
+      {
+        "question": "Will the JPEG look different from the original?",
+        "answer": "A little can change. JPEG is lossy, so the second encode can add artifacts, and it can't repair the ones already there."
+      },
+      {
+        "question": "Is the EXIF data kept?",
+        "answer": "No. EXIF, ICC and XMP are dropped, so location and camera details don't carry over."
+      },
+      {
+        "question": "Will the file be smaller?",
+        "answer": "The page doesn't promise it. The size depends on how the original was saved and on the setting of the new encode."
+      },
+      {
+        "question": "Does .jpg to .jpeg need a conversion?",
+        "answer": "No. The two extensions name the same format, so a rename is enough if you only want another ending."
+      },
+      {
+        "question": "Can I get a lossless copy?",
+        "answer": "Not here. This page always encodes again. To keep the original bytes, copy the file."
+      },
+      {
+        "question": "Does it take multiple JPEGs together?",
+        "answer": "Yes. Each one comes back as its own JPEG, and nothing is zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and JPEG",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "The incoming photographic JPEG before another decoding and encoding pass.",
+        "details": [
+          "Lossy photographic coding",
+          "May carry metadata",
+          "Source for the rewrite"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A newly encoded JPEG copy of the decoded picture.",
+        "details": [
+          "Same image family",
+          "New encoded data",
+          "No guaranteed size reduction"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting JPEG to JPEG",
+      "points": [
+        "The picture is decoded and encoded again at one fixed quality.",
+        "EXIF, ICC and XMP data are dropped.",
+        "The pixels pass through 8-bit RGBA.",
+        "Your original is left unchanged."
+      ]
+    },
+    "guide": {
+      "title": "JPEG background and JPEG conversion",
+      "markdown": "### What is a JPEG file?\n\nThe format's committee, the Joint Photographic Experts Group, started in 1986. ITU-T T.81 from 1992 and ISO/IEC 10918-1 from 1994 specify the core. Baseline JPEG discards information: the picture is split into blocks eight pixels square, every block is run through a discrete cosine transform, and the result is Huffman-coded. Each color channel gets 8 bits, and with no alpha channel there is no transparency or layers. A progressive variant exists too, which shows a rough picture first and refines it while the rest downloads. Cameras and scanners have JPEG built in, and its media type is image/jpeg. Both .jpg and .jpeg are used for one and the same format.\n\n### Programs that open JPEG files\n\n- **Windows, Mac and Linux:** GIMP opens JPEG for editing, and ImageMagick can read it.\n- **Web:** Google Chrome and Mozilla Firefox display JPEG.\n- **Mobile:** Safari and Google Chrome display it too.\n\n### JPEG and JPEG compared\n\nBoth sides of this conversion are the same format, so the only change is a new encode. The page decodes your JPEG in the browser and writes another one at quality 0.85. That number is an encoder setting, and the same value can mean different quality in different programs; GIMP, for example, defaults to 85. EXIF, ICC and XMP data don't come along, and the pixels pass through 8-bit RGBA. Convert once from the original, because each lossy encode starts from what the last one left behind.\n\n### Other ways to convert JPEG to JPEG\n\n- **GIMP:** open the JPEG, choose File > Export As, enter a new name and pick JPEG under Select File Type. In the JPEG options, set the quality level from 0 to 100. GIMP also lets you choose which metadata to keep.\n- **ImageMagick:** run `magick original.jpeg -quality 90 rewritten.jpeg`. ImageMagick's JPEG writer scales quality by its own rules.\n- **Preview:** on a Mac, open the JPEG and choose File > Export. In the Format pop-up menu select JPEG, set the quality, give the copy a new name and click Save.\n\n### Problems with JPEG files\n\n- **Transparency is lost**: JPEG stores no alpha channel, so choose another format if you need clear areas.\n- **An old photo frame shows nothing**: it may not read progressive JPEG, so export with progressive turned off.\n- **Quality numbers don't match**: the same number in two editors does not guarantee the same compression or appearance.\n- **Layers are flattened**: only one merged image is stored, so keep your layered project file.\n"
+    }
+  },
+  "mov-to-mkv": {
+    "seo": {
+      "title": "Convert MOV to MKV Online (Free)",
+      "h1": "MOV to MKV Converter",
+      "description": "Convert a MOV video to MKV in your browser. FFmpeg re-encodes it with x264 and AAC, and large frames are shrunk. Free, nothing is uploaded.",
+      "howToHeading": "How to convert MOV to MKV"
+    },
+    "tool": {
+      "subtitle": "Re-encode a MOV video as MKV with x264 and AAC, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is MOV to MKV a lossless rewrap here?",
+        "answer": "No. The page re-encodes the video with x264 and the audio as AAC, so there is some loss. A lossless rewrap needs `ffmpeg -c copy` on your computer."
+      },
+      {
+        "question": "Why is the MKV picture smaller than my MOV?",
+        "answer": "The cap on size and frame rate applies to every MOV, so a big or fast recording comes out smaller. Odd dimensions lose a pixel."
+      },
+      {
+        "question": "Is my original MOV changed?",
+        "answer": "Your MOV is only read. The MKV you get is a separate new file."
+      },
+      {
+        "question": "What does the video look like?",
+        "answer": "It is encoded for speed rather than quality, so expect visible compression on detailed footage."
+      },
+      {
+        "question": "Does the page deinterlace the video?",
+        "answer": "Yes. A deinterlace filter is applied to interlaced video."
+      },
+      {
+        "question": "Why would I want MKV?",
+        "answer": "Choose it when you want several audio tracks or chapters in one file, since Matroska is not bound to a particular codec."
+      },
+      {
+        "question": "Is there a cap on how large the MOV can be?",
+        "answer": "Nothing in the page caps size or time, so a long movie simply keeps your device busy longer."
+      },
+      {
+        "question": "Can I queue more than one MOV?",
+        "answer": "Yes. Each MOV is saved as an individual MKV, not zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "MOV and MKV",
+      "fromFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "A QuickTime container holding timed media tracks.",
+        "details": [
+          "Codec-dependent content",
+          "Can include several tracks",
+          "Used by camera and editing workflows"
+        ]
+      },
+      "toFormat": {
+        "name": "MKV",
+        "fullName": "Matroska video",
+        "description": "A Matroska container for organizing media streams.",
+        "details": [
+          "Independent of one codec",
+          "Can hold multiple streams",
+          "Different from a quality setting"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting MOV to MKV",
+      "points": [
+        "The video is re-encoded with x264 and the audio as AAC.",
+        "The picture is shrunk to fit and fast frame rates are reduced.",
+        "A deinterlace filter is applied."
+      ]
+    },
+    "guide": {
+      "title": "MOV background and MKV conversion",
+      "markdown": "### What is a MOV file?\n\nQuickTime, Apple's media technology, launched in 1991 and came to Windows in 1994. MOV is its file format. Inside, a QuickTime file is a series of objects called atoms, and a program may skip any atom it doesn't know. Video in a MOV may be H.264, ProRes or Motion JPEG, with AAC or uncompressed PCM audio. macOS saves screen recordings as MOV. Its media type is video/quicktime. iPhone recordings are typical MOV files, and video editing on macOS and professional video workflows use the format too.\n\n### Programs that open MOV files\n\n- **Windows, Mac and Linux:** ffplay and mpv play MOV.\n- **Windows and Mac:** Adobe Premiere Pro imports MOV.\n- **Mac:** QuickTime Player and Final Cut Pro open MOV.\n- **Mobile:** VLC has Android and iOS apps for MOV.\n\n### MOV and MKV compared\n\nMatroska is a container built on EBML. It stores several video and audio streams in one file, along with chapters and tags, and it prescribes no single codec. Typical uses are Blu-ray rips, personal video libraries and files with more than one audio track. A MOV is a QuickTime container with its own atoms.\n\nThis page does not rewrap the streams, it re-encodes them. In your browser, FFmpeg encodes the video with x264 (preset ultrafast, CRF 32) and the audio as 96 kbps AAC. It also deinterlaces, caps the long side at 1920 px and the frame rate at 30 per second. Dimensions that are odd lose a pixel when rounded down.\n\n### Other ways to convert MOV to MKV\n\n- **FFmpeg, stream copy:** run `ffmpeg -i source.mov -c copy remuxed.mkv`. It rewraps without re-encoding, and works when Matroska accepts the streams.\n- **FFmpeg, re-encode:** run `ffmpeg -i source.mov -c:a aac -c:v libx264 encoded.mkv`.\n\n### Problems with MOV files\n\n- **A player shows no picture**: the QuickTime container may use codecs your player lacks, so look at the codec, not the extension.\n- **Renaming did not help**: a new ending cannot transcode the video or install its missing decoder.\n- **The picture is smaller than the MOV**: the page caps size and frame rate.\n- **You want the exact original quality**: the page cannot give it, so use the stream copy command above on your own computer.\n"
+    }
+  },
+  "mp4-to-aiff": {
+    "seo": {
+      "title": "Convert MP4 to AIFF Online (Free)",
+      "h1": "MP4 to AIFF Converter",
+      "description": "Extract the sound of an MP4 as an AIFF file. FFmpeg drops the video and writes uncompressed PCM in your browser. Free, nothing is uploaded.",
+      "howToHeading": "How to convert MP4 to AIFF"
+    },
+    "tool": {
+      "subtitle": "Extract an MP4's sound as an uncompressed AIFF, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the picture carried into the AIFF?",
+        "answer": "No. AIFF is audio only, so the picture is discarded."
+      },
+      {
+        "question": "What audio format is inside the AIFF?",
+        "answer": "Signed 16-bit big-endian PCM, uncompressed."
+      },
+      {
+        "question": "Why is the AIFF bigger than the MP4?",
+        "answer": "PCM is uncompressed, and the audio inside an MP4 is typically compressed, so the AIFF can take more room than the MP4 did."
+      },
+      {
+        "question": "Does converting restore quality lost in the MP4?",
+        "answer": "No. Decoding to PCM keeps what the MP4 held, and nothing more."
+      },
+      {
+        "question": "Why does my MP4 fail with an FFmpeg error?",
+        "answer": "A video with no audio track can't become audio, and the page reports an FFmpeg failure. Try a file that has sound."
+      },
+      {
+        "question": "Does a damaged MP4 still give an AIFF?",
+        "answer": "Often it does, with a shorter result. The page writes the sound FFmpeg managed to read before it hit the damage."
+      },
+      {
+        "question": "Can I convert a long MP4?",
+        "answer": "Yes. Nothing in the page caps length or time, so a long recording only keeps your device busy longer."
+      },
+      {
+        "question": "Is converting a group of MP4 videos supported?",
+        "answer": "Yes. Each video gives its own AIFF, and nothing is zipped."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and AIFF",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "An MPEG media package whose soundtrack is extracted for audio work.",
+        "details": [
+          "Can include video",
+          "Sound uses a separate codec",
+          "Timed media container"
+        ]
+      },
+      "toFormat": {
+        "name": "AIFF",
+        "fullName": "Audio Interchange File Format",
+        "description": "An audio wrapper carrying the decoded PCM soundtrack.",
+        "details": [
+          "Signed PCM output",
+          "No movie pictures",
+          "Larger working audio possible"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting MP4 to AIFF",
+      "points": [
+        "The video is dropped (`-vn`).",
+        "The sound is written as signed 16-bit big-endian PCM.",
+        "No sample rate or channel count is set.",
+        "An MP4 without audio fails."
+      ]
+    },
+    "guide": {
+      "title": "MP4 background and AIFF conversion",
+      "markdown": "### What is an MP4 file?\n\nMP4 is specified by Part 14 of MPEG-4, also numbered ISO/IEC 14496-14, and the first edition appeared in 2003. It is built on the ISO Base Media File Format, which grew out of Apple's QuickTime, and it is made of nested boxes. MP4 is a container: it commonly holds H.264 video with AAC audio, and it can also carry AV1, VP9, MP3 and Opus. Video usually carries .mp4 or .m4v, while MPEG-4 files with sound alone commonly end in .m4a. Registered media types for it are video/mp4 and audio/mp4, and the big browsers can play it.\n\nA screen recording, a phone clip or a downloaded video usually arrives as MP4. People convert it to AIFF to pull the sound out for an audio editor or a Mac workflow that wants uncompressed audio.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** ffplay can play MP4, and mpv plays it on desktop systems.\n- **Windows and Mac:** Adobe Premiere takes MP4 in as an import when a suitable decoder exists.\n- **Web:** Firefox plays MP4 media it supports, and Chrome handles supported MP4 audio and video pairings.\n- **Mobile:** VLC apps for Android and iOS play MP4 on a phone.\n\n### MP4 and AIFF compared\n\nMP4 is a container for timed media, not a single audio codec, so its sound may be AAC or something else. The Audio Interchange File Format is an Apple audio wrapper descended from Electronic Arts' IFF family. It often carries uncompressed linear PCM samples, and AIFF-C extends it to compressed audio. Named chunks can hold author, copyright and annotations. Professional audio users choose AIFF for masters, and Audacity and Adobe Audition open it. Apple published version 1.3 of the AIFF specification on 4 January 1989, and the usual media types are audio/aiff and audio/x-aiff.\n\nThe page runs FFmpeg in your browser with `-acodec pcm_s16be -vn`: the video is dropped and the sound is written as signed 16-bit big-endian PCM. Decoding the sound to PCM doesn't restore detail removed when the MP4 was made.\n\n### Other ways to convert MP4 to AIFF\n\n- **FFmpeg:** run `ffmpeg -i interview.mp4 -vn interview.aiff`. As an output option, `-vn` turns off video, so only the sound is written to the AIFF.\n\n### Problems with MP4 files\n\n- **No sound to extract**: if the MP4 holds only picture, there is nothing to write into the AIFF.\n- **A cut-off file will not play**: an interrupted MP4 recording can be unplayable because its packet index is kept as a single block.\n- **No decoder for the contents**: understanding the MP4 wrapper is not enough if the player has no decoder for the codec used inside.\n"
+    }
+  },
+  "mpeg-to-avi": {
+    "seo": {
+      "title": "Convert MPEG to AVI Online (Free)",
+      "h1": "MPEG to AVI Converter",
+      "description": "Turn an MPEG into an AVI with MPEG-4 video and MP3 sound, re-encoded by FFmpeg in your browser. Free, with no sign-up and no upload.",
+      "howToHeading": "How to convert MPEG to AVI"
+    },
+    "tool": {
+      "subtitle": "Re-encode an MPEG to MPEG-4 AVI with MP3 sound, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Which video codec does the AVI use?",
+        "answer": "MPEG-4 Part 2, from FFmpeg's mpeg4 encoder. It is tagged xvid, but the libxvid encoder is not used."
+      },
+      {
+        "question": "Is the MPEG soundtrack copied as is?",
+        "answer": "No. The sound is encoded to MP3, so it is another lossy generation."
+      },
+      {
+        "question": "Why won't my old AVI player open the result?",
+        "answer": "AVI doesn't include decoders. The player must support MPEG-4 Part 2 video and MP3 audio."
+      },
+      {
+        "question": "Can I avoid re-encoding?",
+        "answer": "Yes, on your computer: `ffmpeg -i in.mpeg -c copy out.avi` rewraps the streams when AVI and your player accept them."
+      },
+      {
+        "question": "Does the page deinterlace old TV captures?",
+        "answer": "Yes. A deinterlace filter (yadif) is applied to the video."
+      },
+      {
+        "question": "Does a high-frame-rate MPEG keep its frame rate?",
+        "answer": "Not above the page's cap. Frames over the cap are dropped, so a fast clip stays the same length rather than turning to slow motion."
+      },
+      {
+        "question": "Does a damaged MPEG still give an AVI?",
+        "answer": "Often it does, and the AVI is shorter. FFmpeg writes whatever it could read before reaching the damage."
+      },
+      {
+        "question": "Will it handle a pile of MPEG captures?",
+        "answer": "Yes. Every capture is saved as a separate AVI, with no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPEG and AVI",
+      "fromFormat": {
+        "name": "MPEG",
+        "fullName": "MPEG video",
+        "description": "An MPEG systems recording with codec-dependent video and sound.",
+        "details": [
+          "Standards-family name",
+          "Can contain several streams",
+          "Legacy television material possible"
+        ]
+      },
+      "toFormat": {
+        "name": "AVI",
+        "fullName": "Audio Video Interleave",
+        "description": "A RIFF media container with new encoded picture and sound streams.",
+        "details": [
+          "Codec identifiers matter",
+          "MPEG-4 Part 2 output",
+          "No inherent quality increase"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting MPEG into AVI",
+      "points": [
+        "Video is MPEG-4 Part 2 from FFmpeg's mpeg4 encoder, tagged xvid.",
+        "Sound is encoded to MP3.",
+        "The picture is limited in size and frame rate, and it is deinterlaced.",
+        "The AVI needs a player with MPEG-4 Part 2 and MP3 decoders."
+      ]
+    },
+    "guide": {
+      "title": "MPEG background and AVI conversion",
+      "markdown": "### What is an MPEG file?\n\nMPEG is the name of a standards family, not one fixed specification. A file ending in .mpeg usually packages compressed video and sound in an MPEG systems stream, which organizes coded picture, sound and data as streams: elementary streams that each hold one coded component, divided into packets. Both .mpeg and .mpg appear on MPEG video files, and the Library of Congress records the media type video/mpeg. MPEG-2 began as a scheme for compressed television broadcast, and DVDs adopted it later. The extension can't tell you which video generation or audio encoding is inside, so old television captures vary a lot.\n\n### Programs that open MPEG files\n\n- **Windows, Mac and Linux:** VLC opens MPEG files whether they are elementary, program or transport streams, and ffplay plays them with its built-in decoders.\n- **Mobile:** local MPEG files play in the VLC apps for Android and iOS.\n\n### MPEG and AVI compared\n\nAVI is a RIFF-based container that identifies each stream by a codec identifier. It suits older desktop workflows, but the player still needs decoders for whatever is written into it.\n\nThe page makes a new encode: in your browser, FFmpeg writes MPEG-4 Part 2 video with its built-in mpeg4 encoder, using `-q:v 10` and no B-frames, tagged xvid. The sound becomes MP3 at 96 kbps. Pictures bigger than 1920 px are scaled down, faster motion is reduced to 30 fps, and sizes are rounded to even numbers. A deinterlace filter is applied. A fresh encode can't bring back detail the capture never had.\n\n### Other ways to convert MPEG to AVI\n\n- **FFmpeg encode:** run `ffmpeg -i source.mpeg -c:a libmp3lame -c:v mpeg4 converted-scene.avi`. FFmpeg's native mpeg4 encoder writes MPEG-4 Part 2 video, and libmp3lame writes the MP3 audio.\n- **FFmpeg stream copy:** run `ffmpeg -i source.mpeg -c copy copied-scene.avi`. It only rewraps, and `copy` means the streams are not re-encoded. AVI and your player must accept the original streams.\n\n### Problems with MPEG files\n\n- **Unknown structure**: .mpeg can hold a systems stream or bare video, and knowing which helps pick the right demuxer.\n- **Sound is missing**: the player needs a decoder for the audio stream as well as for the video.\n- **Detail is missing**: whatever the original MPEG encode threw away stays gone, and converting again cannot restore it.\n"
+    }
+  },
+  "mpg-to-mp3": {
+    "seo": {
+      "title": "Convert MPG to MP3 Online (Free)",
+      "h1": "MPG to MP3 Converter",
+      "description": "Pull the soundtrack out of an MPG as an MP3. FFmpeg drops the video and encodes the sound with LAME in your browser. Free, no upload.",
+      "howToHeading": "How to convert MPG to MP3"
+    },
+    "tool": {
+      "subtitle": "Extract an MPG's sound as an MP3, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is any of the movie's picture left in the MP3?",
+        "answer": "No. Only the soundtrack is written."
+      },
+      {
+        "question": "Is the MP3 always at the same bitrate?",
+        "answer": "No. The bitrate follows the soundtrack's sample rate, so low-rate audio ends up at a lower bitrate."
+      },
+      {
+        "question": "Can the conversion repair a damaged soundtrack?",
+        "answer": "No. It decodes and encodes what is there and can't recreate missing sound."
+      },
+      {
+        "question": "What if my MPG has no sound?",
+        "answer": "The conversion stops with an \"FFmpeg failed\" error, because there is no audio to extract. Play the file first to confirm it has sound."
+      },
+      {
+        "question": "Does a damaged MPG still give an MP3?",
+        "answer": "Usually, and the MP3 is shorter. Everything FFmpeg could read before the damage ends up in the file."
+      },
+      {
+        "question": "What is the MP3 called?",
+        "answer": "It takes the MPG's name with an .mp3 ending. Your MPG is left unchanged."
+      },
+      {
+        "question": "Can I extract sound from a long MPG?",
+        "answer": "Yes. The page applies no length or size limit, so a long movie only takes longer on your device."
+      },
+      {
+        "question": "Can several MPG movies be extracted in one go?",
+        "answer": "Yes. Each movie yields its own MP3, and there is no ZIP."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPG and MP3",
+      "fromFormat": {
+        "name": "MPG",
+        "fullName": "MPEG video",
+        "description": "An MPEG movie whose sound will be separated from its pictures.",
+        "details": [
+          "Sound and picture share one file",
+          "Needs a suitable decoder",
+          "Picture context remains in the original"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "An audio-only lossy derivative of the source soundtrack.",
+        "details": [
+          "Bitrate follows the sample rate",
+          "No moving pictures",
+          "No restoration of lost sound"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting MPG into MP3",
+      "points": [
+        "The video is dropped (`-vn`).",
+        "LAME encodes the sound, and the bitrate depends on its sample rate.",
+        "No sample rate, channels or stream mapping are set."
+      ]
+    },
+    "guide": {
+      "title": "MPG background and MP3 conversion",
+      "markdown": "### What is an MPG file?\n\nMPG is a filename ending for MPEG video, and .mpeg is the other ending in use for it. MPEG is a standards family, so the ending doesn't say which audio encoding is inside. In MPEG systems, picture, sound and other data are coded and carried as separate streams, and video/mpeg is the media type the Library of Congress lists for it. DVDs adopted MPEG-2, a scheme first designed to deliver compressed television. The sound is stored apart from the images, and extracting it needs a decoder for the actual recording.\n\n### Programs that open MPG files\n\n- **Windows, Mac and Linux:** VLC handles MPEG elementary streams, program streams and transport streams; ffplay plays MPEG.\n- **Mobile:** on a phone, VLC for Android or for iOS opens local MPG files.\n\n### MPG and MP3 compared\n\nStandardized in 1993 as ISO/IEC 11172-3, MP3 is the common name for MPEG-1 Audio Layer III. The coding is lossy, using a psychoacoustic model to choose what to throw away. Titles and other tags are kept as ID3 data in the file, and bitrates range from 32 to 320 kbps.\n\nFFmpeg runs in your browser with `-vn`, so the video is dropped, and encodes the sound with LAME, asking for 192 kbps, a rate MP3 reaches only at a sample rate of 32 kHz or above. The new file can't restore what an earlier encode removed, and a higher bitrate than the source doesn't make it sound better. The page sets no sample rate, channel count or stream mapping. FFmpeg copies the movie's global tags, such as the title, into the MP3 where it has fields for them. Keep the MPG if the picture still matters, such as a demonstration whose spoken steps refer to the screen.\n\n### Other ways to convert MPG to MP3\n\n- **FFmpeg:** run `ffmpeg -i old-recording.mpg -b:a 192k -vn -c:a libmp3lame soundtrack-copy.mp3`. Here `-vn` omits the picture and `-b:a` chooses the bitrate for the sound.\n\n### Problems with MPG files\n\n- **Bare video**: a file may hold only raw MPEG video with no soundtrack, so check what you have before expecting sound.\n- **No decoder for the audio**: audio inside an MPEG file is coded separately from the picture, so it needs its own decoder.\n- **No audio track**: converting a video that has none to audio fails with an FFmpeg error.\n"
+    }
+  },
+  "pptx-to-jpeg": {
+    "seo": {
+      "title": "Convert PPTX to JPEG Online (Free)",
+      "h1": "PPTX to JPEG Converter",
+      "description": "Turn each visible slide of a PPTX into a JPEG in your browser. Hidden slides and speaker notes are skipped. Free, and nothing is uploaded.",
+      "howToHeading": "How to convert PPTX to JPEG"
+    },
+    "tool": {
+      "subtitle": "Save each visible slide of a PowerPoint deck as a JPEG, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Is the JPEG still an editable slide?",
+        "answer": "No. It is a flat picture, so text boxes, charts and shapes can't be edited."
+      },
+      {
+        "question": "Do the images keep the slide shape?",
+        "answer": "Yes. A widescreen slide gives a widescreen picture and a square slide gives a square one."
+      },
+      {
+        "question": "Are hidden slides included?",
+        "answer": "No. Hidden slides are left out, and the remaining files keep the numbers their slides had in the deck."
+      },
+      {
+        "question": "What happens if a font is missing?",
+        "answer": "Your device substitutes another font, which can change line breaks and alignment. Check text-heavy slides."
+      },
+      {
+        "question": "Do speaker notes appear in the JPEG?",
+        "answer": "No. Notes and comments are left out."
+      },
+      {
+        "question": "Why is something missing from my slide?",
+        "answer": "The converter leaves out elements it can't draw, and the page says how many. Videos are not played."
+      },
+      {
+        "question": "Can I convert just one slide?",
+        "answer": "The converter saves every visible slide. To get fewer files, delete or hide the slides you don't need in PowerPoint before you upload the deck."
+      },
+      {
+        "question": "Can I convert an old .ppt or protected deck?",
+        "answer": "Not directly. Open it in PowerPoint and save an unprotected .pptx first."
+      }
+    ],
+    "aboutSection": {
+      "title": "PPTX and JPEG",
+      "fromFormat": {
+        "name": "PPTX",
+        "fullName": "PowerPoint presentation",
+        "description": "A packaged presentation with editable slide objects and related parts.",
+        "details": [
+          "PresentationML structure",
+          "May reference external media",
+          "Can include notes and hidden slides"
+        ]
+      },
+      "toFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A static raster view of an individual slide.",
+        "details": [
+          "No editable slide objects",
+          "Suitable for image delivery",
+          "Layout depends on rendering"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting PPTX into JPEG",
+      "points": [
+        "One JPEG per visible slide.",
+        "Hidden slides, notes and comments are left out.",
+        "Elements it can't draw are left out and counted."
+      ]
+    },
+    "guide": {
+      "title": "PPTX background and JPEG conversion",
+      "markdown": "### What is a PPTX file?\n\nPPTX is a packaged PresentationML document. Its parts describe slides, relationships, themes and extras such as notes. A slide can combine editable text, diagrams, photographs and drawing objects instead of one finished picture.\n\nJPEG suits a slide that must become a still image for a web page, a review sheet or a message. The export captures how the slide looks and drops the editable objects.\n\n### Programs that open PPTX files\n\n- **Windows:** PowerPoint opens and saves PPTX and can save slides as images, and LibreOffice Impress includes a PowerPoint XML filter.\n- **Mac:** Apple Keynote, PowerPoint and LibreOffice Impress all open PPTX on a Mac.\n- **Linux:** LibreOffice Impress and ONLYOFFICE Desktop Editors open PPTX.\n- **Web:** the web version of PowerPoint supports PPTX presentations.\n- **Mobile:** Keynote for iPhone and the mobile PowerPoint app open PPTX.\n\n### PPTX and JPEG compared\n\nThe page draws each slide with pptx-glimpse in your browser, at twice the slide's size in points, so a widescreen slide comes out at 1920 by 1080 pixels. Slides are saved as separate JPEG files named slide1, slide2 and so on, numbered as PowerPoint numbers them, hidden slides counted. Hidden slides, speaker notes and comments are left out.\n\nText is drawn with your device's fonts, so a font you lack falls back to another and lines can wrap differently. Elements the converter can't draw are left out, and the page tells you how many. At most 100 slides are saved. A package that inflates past 512 MB is refused, and drawing stops after 90 seconds. An older .ppt file or a password-protected deck must be saved as an unprotected .pptx first.\n\n### Other ways to convert PPTX to JPEG\n\n- **PowerPoint:** on Windows, open the deck, go to File > Save As, set the type to JPEG File Interchange Format and answer All Slides or Just This One when asked.\n- **LibreOffice:** run `soffice --convert-to jpg deck.pptx`, and add `--outdir` with a folder name to choose where the JPEG goes.\n\n### Problems with PPTX files\n\n- **Text wraps differently**: install the deck's fonts, or export from PowerPoint.\n- **A slide is missing**: it was hidden, or the deck has more slides than the page saves.\n- **A video area is empty**: videos aren't played, so put a still frame on the slide before converting.\n- **The page refuses the file**: save an older .ppt or protected deck as an unprotected .pptx.\n"
+    }
+  },
+  "swf-to-mov": {
+    "seo": {
+      "title": "Convert SWF to MOV Online (Free)",
+      "h1": "SWF to MOV Converter",
+      "description": "Convert the video embedded in an SWF to a MOV with H.264 and AAC. It does not run Flash scripts or draw vector scenes. Free, in your browser.",
+      "howToHeading": "How to convert SWF to MOV"
+    },
+    "tool": {
+      "subtitle": "Extract an SWF's embedded video as an H.264 MOV, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "Does the converter play Flash animations?",
+        "answer": "No. It plays nothing and runs no ActionScript, because it only extracts the media stored inside the SWF."
+      },
+      {
+        "question": "Can a vector-only SWF become a movie here?",
+        "answer": "No. A SWF that draws its scene from vectors and scripts has no embedded media for the converter to read."
+      },
+      {
+        "question": "Which codecs does the MOV use?",
+        "answer": "H.264 video from x264 and AAC audio."
+      },
+      {
+        "question": "Will a button in the SWF still work in the MOV?",
+        "answer": "No. A MOV plays one sequence and keeps no interaction."
+      },
+      {
+        "question": "Does my SWF get sent anywhere?",
+        "answer": "No. Conversion happens in your browser, and the SWF never leaves your machine."
+      },
+      {
+        "question": "Does the page take a batch of SWF files?",
+        "answer": "Yes. Add them together and each SWF is turned into its own MOV, one after the other, with no archive."
+      },
+      {
+        "question": "Is the embedded video resized?",
+        "answer": "Large embedded video is fitted within a size cap, and a very fast frame rate is lowered. Odd dimensions are made even."
+      },
+      {
+        "question": "Is there a size limit on the SWF?",
+        "answer": "The page imposes no limit, and a long file just takes more time on your device."
+      }
+    ],
+    "aboutSection": {
+      "title": "SWF and MOV",
+      "fromFormat": {
+        "name": "SWF",
+        "fullName": "Shockwave Flash",
+        "description": "A Flash file that may combine media, vector drawing, and scripted behavior.",
+        "details": [
+          "Can be interactive",
+          "May contain embedded video",
+          "Requires compatible execution for full scenes"
+        ]
+      },
+      "toFormat": {
+        "name": "MOV",
+        "fullName": "QuickTime Movie",
+        "description": "A linear QuickTime movie representation of readable or recorded media.",
+        "details": [
+          "H.264 and AAC requested",
+          "No Flash interaction",
+          "Review actual rendered content"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Converting SWF into MOV",
+      "points": [
+        "Only embedded audio and video are read.",
+        "ActionScript and vector animation are not rendered.",
+        "Output is x264 video and AAC audio in a MOV."
+      ]
+    },
+    "guide": {
+      "title": "SWF background and MOV conversion",
+      "markdown": "### What is an SWF file?\n\nSWF belongs to the Flash ecosystem. Macromedia created the format for Flash animations, games and interactive web content, and Adobe stopped supporting Flash Player on 31 December 2020. A file can combine timeline animation, vector shapes, compressed media and ActionScript code. Some SWFs hold a movie stream, while others draw their scenes from vectors and scripts, and a few carry both. That difference decides whether a media converter finds anything to extract.\n\nMOV is a QuickTime movie container for timed media. It holds a linear recording of pictures and sound, so clickable Flash behavior and branching can't survive in it.\n\n### Programs that open SWF files\n\n- **Windows, Mac and Linux:** Ruffle, an emulator for Flash, plays SWF files, though some language and API features are still missing, and the JPEXS Free Flash Decompiler opens them too.\n- **Windows and Linux:** Lightspark is an incomplete Flash implementation.\n- **Web:** a web player from Ruffle emulates Flash in a browser through WebAssembly.\n\nFFmpeg has an SWF demuxer that reads the media embedded in the file.\n\n### SWF and MOV compared\n\nThis page does not render Flash. FFmpeg runs in your browser and reads only the audio and video embedded in the SWF. It doesn't run ActionScript or draw the vector animation, so a SWF without embedded video has nothing for it to read.\n\nWhen there is media to read, the page encodes H.264 video with x264 and AAC audio at 96 kbps into a MOV, with the moov atom moved to the front (`+faststart`). The long side is capped at 1920 px, the frame rate at 30 per second, and sizes become even.\n\n### Other ways to convert SWF to MOV\n\n- **FFmpeg:** run `ffmpeg -i archive.swf -c:a aac -c:v libx264 extracted-movie.mov`. Check the result by playing the MOV, since only embedded media can appear in it.\n\n### Problems with SWF files\n\n- **The MOV shows no scene**: the SWF draws its scene with Flash features and holds no video to read.\n- **Buttons no longer work**: a movie plays straight through and keeps no interaction.\n- **The animation does not look like the SWF**: only the embedded audio and video are read, never the vector drawing.\n"
+    }
+  }
+}

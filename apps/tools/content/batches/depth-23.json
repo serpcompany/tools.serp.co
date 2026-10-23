@@ -1,0 +1,907 @@
+{
+  "jif-to-jpg": {
+    "seo": {
+      "title": "Convert JIF to JPG Online (Free)",
+      "h1": "JIF to JPG Converter",
+      "description": "Turn a JIF file into a JPG that upload forms and apps accept. The picture is re-saved at quality 0.85, in your browser. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Re-save a JIF picture as a JPG that upload forms and apps accept."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JIF to JPG?",
+        "answer": "Add the JIF above and give it a moment; the JPG is ready to save when it appears. If you pick several files, each one gives its own JPG, one after another."
+      },
+      {
+        "question": "Are JIF and JPG two names for one thing?",
+        "answer": "Both hold a JPEG-compressed picture. JIF is the original file layout from the JPEG standard, which JFIF and Exif largely replaced."
+      },
+      {
+        "question": "Can I just rename a .jif file to .jpg?",
+        "answer": "Renaming changes the label and leaves every byte as it was. The page does something different: it decodes the picture and writes a new JPG, so the result is a freshly saved file with a .jpg name."
+      },
+      {
+        "question": "Does converting JIF to JPG lose quality?",
+        "answer": "Slightly. Both sides are lossy JPEG, and the new JPG is written at quality 0.85, so the picture is compressed a second time. The pixel size does not change."
+      },
+      {
+        "question": "Is JIF the same as GIF?",
+        "answer": "No. GIF is its own format, limited to a 256-color palette with optional animation. JIF holds a photograph-style JPEG picture, and the one-letter difference in the extension is easy to misread."
+      },
+      {
+        "question": "Which programs open a .jif file?",
+        "answer": "If your editor will not open it, this page can turn the file into a JPG that any viewer shows."
+      },
+      {
+        "question": "Does the JPG keep the JIF's camera details?",
+        "answer": "No. The page rebuilds the file from raw pixels, which leaves EXIF, color profiles and XMP behind."
+      },
+      {
+        "question": "Will the JPG have the same dimensions as my JIF?",
+        "answer": "Yes. The page draws the picture at its own width and height and saves that, with no resizing."
+      },
+      {
+        "question": "Why does the page say \"Image decode failed.\"?",
+        "answer": "Your browser's image decoder could not read the file. Fetch it again from where you found it, then try once more."
+      },
+      {
+        "question": "Why do upload forms reject my .jif file?",
+        "answer": "Many forms check the extension against a short list such as .jpg and .png, and a .jif ending may not be on that list."
+      }
+    ],
+    "aboutSection": {
+      "title": "JIF and JPG",
+      "fromFormat": {
+        "name": "JIF",
+        "fullName": "JPEG Interchange Format",
+        "description": "The original file layout described in the JPEG standard for storing JPEG-compressed images. It was largely superseded by JFIF and Exif, and .jif files are rarely seen.",
+        "details": [
+          "Lossy JPEG compression",
+          "No alpha transparency",
+          "Largely superseded by JFIF and Exif",
+          "Listed among the formats XnView opens"
+        ]
+      },
+      "toFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          ".jpg and .jpeg are the same format",
+          "Displays in every major browser"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JIF to JPG",
+      "points": [
+        "The JPG is written at quality 0.85, so the picture is compressed a second time.",
+        "Width and height stay the same.",
+        "EXIF data, ICC profiles and XMP are not copied.",
+        "Neither format has transparency, so nothing is lost there.",
+        "Choose several JIF files at once and each JPG downloads on its own."
+      ]
+    },
+    "guide": {
+      "title": "About JIF files",
+      "markdown": "### What is a JIF file?\n\nJIF is short for JPEG Interchange Format, the first file layout the JPEG standard defined for holding JPEG-compressed pictures. JFIF and Exif largely took its place, and .jif files are rarely seen now. Most files with a JPEG picture inside today use one of those two layouts.\n\nThe compression inside is JPEG, a method the Joint Photographic Experts Group started designing in 1986. The core text is ITU-T T.81 from 1992, which ISO and IEC took on as 10918-1 two years later. Baseline JPEG discards detail by design: 8x8 blocks of pixels pass through a discrete cosine transform, and the results are Huffman-coded. Most digital cameras and scanners write JPEG natively. The format itself is free to use now that its US patents have lapsed, and every major browser displays it, so JPEG is rarely the obstacle. That is the usual reason to convert: the picture is fine, the file name is the problem. JIF is also easy to mistake for GIF, a different format with a 256-color palette and optional animation.\n\nA JIF is used for legacy JPEG files and for interchange of JPEG photographs. A JPG is the form of the same compression that cameras, scanners, web pages and photo sharing sites handle every day, and the two endings, .jpg and .jpeg, mean the same thing. The registered media type is image/jpeg. Converting here changes the layout and the name, and the pixels are decoded and compressed again, so the JPG is a new file rather than a renamed copy.\n\n### Programs that open JIF files\n\n- **Windows, Mac and Linux:** XnView lists JIF among the formats it opens. The JPG made here opens in any web browser, in Preview on macOS, in Windows Photos and in GIMP.\n\n### JIF and JPG compared\n\n- **Extensions and media types**: the original layout uses .jif, while the file most programs expect uses .jpg or .jpeg, with image/jpeg as its media type.\n- **Compression**: identical. A discrete cosine transform works on 8x8 pixel blocks, and Huffman coding packs the result.\n- **Transparency**: neither has an alpha channel, so a JPEG cannot hold transparency.\n- **Color depth**: 8 bits for each color channel.\n- **Layers**: JPEG cannot store layers.\n- **Layout**: JIF is the layout from the standard itself. JFIF and Exif largely replaced it.\n- **Quality scale**: editors usually offer a 0 to 100 slider, and equal numbers do not mean equal quality across programs. GIMP's default is 85. This page asks the canvas encoder for 0.85 on its 0 to 1 scale.\n- **Progressive mode**: a progressive JPEG paints a rough version first and refines it as the rest of the file arrives.\n- **Acceptance**: a form that wants a JPG often checks the ending, so a .jif name can be turned away even when the data would display.\n\nHere the page asks your browser's image decoder to read the file, then saves a JPG at quality 0.85 and the original pixel dimensions. Since both formats are lossy, this is a second round of compression, and EXIF, ICC and XMP data stay behind.\n\n### Other ways to convert JIF to JPG\n\n- **GIMP (any desktop):** bring the picture in, go to File > Export As, name the output with a .jpg ending and press Export. A JPEG settings dialog follows, where you choose the quality. GIMP's JPEG export defaults to 85 and keeps neither transparency nor layers.\n- **Photopea (web):** choose File > Open for the picture, then File > Export As > JPG and save the download.\n\n### Problems with JIF files\n\n- **Your editor will not open it**: Use the converter above and open the JPG in any viewer.\n- **A form rejects the file**: convert it here and upload the .jpg instead.\n- **\"Image decode failed.\"**: the browser could not read the picture. Download the file again, since a transfer that stopped early leaves a file that ends in the middle.\n- **It turns out to be a GIF**: GIF and JIF differ by one letter, and a GIF is a different format. Check the full extension before converting.\n- **Quality settings differ**: a quality number in one program does not match the same number in another, so compare results by eye rather than by number.\n- **Camera details are gone**: the conversion passes through raw pixels and drops EXIF. Read those details from the JIF before converting.\n"
+    }
+  },
+  "jpeg-to-tiff": {
+    "seo": {
+      "title": "Convert JPEG to TIFF Online (Free)",
+      "h1": "JPEG to TIFF Converter",
+      "description": "Convert a JPEG to TIFF in your browser. The TIFF is written from the decoded pixels, with no re-compression by JPEG. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Turn a JPEG into a TIFF written from its decoded pixels."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPEG to TIFF?",
+        "answer": "Add the JPEG above, let it convert and save the TIFF. A batch gives one TIFF per JPEG, each downloaded separately."
+      },
+      {
+        "question": "Does converting JPEG to TIFF improve the quality?",
+        "answer": "No. A JPEG has already thrown away some detail, and a TIFF cannot bring it back. The TIFF stores the decoded pixels, so it matches what the JPEG shows and nothing more."
+      },
+      {
+        "question": "Can the TIFF be larger than the JPEG?",
+        "answer": "Yes, it can be much larger. JPEG discards detail to stay small, and the TIFF made here holds the decoded pixels."
+      },
+      {
+        "question": "Are .tif and .tiff different?",
+        "answer": "No. They name one format, with the media type image/tiff."
+      },
+      {
+        "question": "Does a TIFF from a JPEG keep EXIF data?",
+        "answer": "No. The page reads the JPEG into raw pixels and writes the TIFF from those, so EXIF data, color profiles and XMP stay behind."
+      },
+      {
+        "question": "Can a printer or publisher take my TIFF?",
+        "answer": "TIFF is an established format for high-bit-depth imaging and preservation master files. A TIFF made here is 8 bits per channel, since the picture goes through an 8-bit RGBA step, a job that needs 16-bit files will not get them from a JPEG source."
+      },
+      {
+        "question": "Is JPEG to TIFF lossless?",
+        "answer": "The step from JPEG to TIFF adds no new loss of its own, since no lossy encoder runs. The JPEG's earlier compression remains in the picture."
+      },
+      {
+        "question": "Can I put several JPEGs into one multi-page TIFF?",
+        "answer": "No. Every JPEG gets a TIFF of its own with one image. The format allows several images in a file, but this page never merges files."
+      },
+      {
+        "question": "Which programs open a TIFF?",
+        "answer": "Preview on macOS, GIMP and ImageMagick all handle TIFF."
+      },
+      {
+        "question": "Does the picture change size?",
+        "answer": "No. The TIFF is as wide and as tall, in pixels, as the JPEG."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPEG and TIFF",
+      "fromFormat": {
+        "name": "JPEG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "8 bits per color channel",
+          "Displays in every major browser"
+        ]
+      },
+      "toFormat": {
+        "name": "TIFF",
+        "fullName": "Tagged Image File Format",
+        "description": "A flexible raster image format first published by Aldus in 1986 and now maintained by Adobe. It stores one or more images with a tag-based structure and many compression options.",
+        "details": [
+          "Lossless or lossy compression",
+          "Several images in one file",
+          "High bit depth",
+          "CMYK support"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPEG to TIFF",
+      "points": [
+        "The TIFF stores the decoded pixels, so it does not recover detail the JPEG discarded.",
+        "The TIFF can be much bigger than the JPEG.",
+        "The pixels pass through 8-bit RGBA, so the TIFF is 8 bits per channel.",
+        "EXIF data, ICC profiles and XMP are not copied.",
+        "Each JPEG becomes its own single-image TIFF."
+      ]
+    },
+    "guide": {
+      "title": "About JPEG files",
+      "markdown": "### What is a JPEG file?\n\nBehind the name is the Joint Photographic Experts Group, which started on the format in 1986. The specification dates to 1992 as ITU-T T.81 and was adopted internationally in 1994 as ISO/IEC 10918-1. JPEG was designed for photographs. Baseline coding sends 8x8 pixel blocks through a discrete cosine transform, packs the output with Huffman codes and drops the detail the eye is least likely to notice.\n\nPeople use JPEG for web photographs, pictures straight off a camera, mail attachments and photo-sharing sites, and most cameras and scanners write it. The US patents lapsed in October 2006, and all major browsers show the format. A progressive mode lets a rough image appear first and clear up as the file loads. You will see both .jpg and .jpeg; they are one format, registered as image/jpeg.\n\n### Programs that open JPEG files\n\n- **Windows, Mac and Linux:** Preview on macOS and Windows Photos show JPEG, GIMP edits it, and ImageMagick converts it from a terminal.\n- **Web:** Chrome and Firefox display JPG in a tab.\n- **Mobile:** Safari displays JPG on iPhone and iPad.\n\n### JPEG and TIFF compared\n\n- **Extensions**: .jpg and .jpeg (image/jpeg) versus .tif and .tiff (image/tiff).\n- **Compression**: baseline JPEG is always lossy. TIFF is a tag-based wrapper: it can use different compression methods, lossless or lossy, and different color representations.\n- **Size**: a TIFF made on this page can be much larger than the JPEG it came from.\n- **Quality scale**: JPEG sliders run 0 to 100 and GIMP's default is 85. This page has no quality setting for TIFF output.\n- **Pages**: a JPEG is one picture. A TIFF can contain several images, which makes it useful for scanned document sequences.\n- **Bit depth**: a JPEG has 8 bits for each channel. TIFF is established for high-bit-depth imaging, though a TIFF written from this page is 8-bit.\n- **Transparency**: JPEG has no alpha channel.\n- **Standing**: Aldus and Microsoft created TIFF, revision 6.0 is from 1992, and Adobe now controls the specification. Preservation master files are an established use.\n- **Limits**: the 32-bit offsets in classic TIFF cap a file at roughly 4 GB, a ceiling BigTIFF lifts with wider ones.\n\nIn this conversion the browser decodes the JPEG, and ImageMagick running in the page encodes the pixels as a TIFF. The TIFF holds the decoded pixels as they are, so no second JPEG compression is applied. EXIF, ICC profiles and XMP stay behind. The download takes the JPEG's name with a .tiff ending, and the JPEG file itself is not changed.\n\nThe TIFF made here holds one image. A TIFF can hold several, so software that exposes the full image sequence is needed to see them all, and software may skip private tags, such as certain color-profile extensions.\n\n### Other ways to convert JPEG to TIFF\n\n- **Preview (Mac):** open the picture, go to File > Export, set Format to TIFF and save.\n- **GIMP (any desktop):** pick File > Export As with a .tiff extension, then select a compression in the TIFF dialog, which offers None, LZW, Pack Bits, Deflate, JPEG and CCITT. LZW and Deflate are lossless; JPEG compression inside a TIFF is lossy.\n- **ImageMagick (command line):** run `magick input.jpeg -compress LZW output.tiff`. LZW is one of ImageMagick's listed compression types, and options go before the output file name.\n\n### Problems with JPEG files\n\n- **Blocky squares or halos**: heavy compression leaves 8x8 block edges. A TIFF made from that file keeps them, so start from the least compressed version you have.\n- **Transparency**: a JPEG cannot hold see-through areas, and a TIFF made from one has none to show.\n- **Layers are gone**: a JPEG is one flat picture, so the layered project file is the thing to keep.\n- **An old photo frame will not show it**: some older devices reject progressive JPEG, and saving it again without progressive mode fixes that.\n- **Quality numbers do not match**: the same quality number in two editors can give different file sizes and looks, so judge the result by eye.\n- **A job asks for 16-bit**: a JPEG source has only 8 bits per channel and the TIFF here stays 8-bit, so no extra depth appears. Ask for the original capture if the job needs it.\n- **\"Image decode failed.\"**: your browser could not read the JPEG. Download the JPEG again and retry.\n"
+    }
+  },
+  "jpg-to-avif": {
+    "seo": {
+      "title": "Convert JPG to AVIF Online (Free)",
+      "h1": "JPG to AVIF Converter",
+      "description": "Convert JPG photos to AVIF in your browser. Pixel size stays the same; EXIF is not copied. Free, no sign-up, and nothing is uploaded."
+    },
+    "tool": {
+      "subtitle": "Turn a JPG photo into an AVIF image, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPG to AVIF?",
+        "answer": "Add the JPG above and save the AVIF once the conversion ends. Several files are handled one after the other, with a separate AVIF download for each."
+      },
+      {
+        "question": "Can the AVIF be smaller than the JPG?",
+        "answer": "It can be. AVIF compresses with AV1 and is built for small web images, but the size depends on the picture, so check the result."
+      },
+      {
+        "question": "Does converting JPG to AVIF lose quality?",
+        "answer": "A little. The JPG is decoded to pixels, then a lossy AVIF encoder compresses it a second time, so loss stacks on top of the JPG's own. Detail the JPG discarded does not come back."
+      },
+      {
+        "question": "Which browsers show AVIF?",
+        "answer": "AVIF displays in current versions of Chrome, Firefox, Safari and Edge, and in recent Android releases. An older browser may fail to display it."
+      },
+      {
+        "question": "Why won't Windows open my AVIF?",
+        "answer": "Showing .avif files in Windows takes Microsoft's AV1 Video Extension together with the HEIF Image Extension. A browser tab or GIMP opens them without either."
+      },
+      {
+        "question": "Can I open an AVIF in GIMP?",
+        "answer": "Yes. GIMP can import and export AVIF."
+      },
+      {
+        "question": "Does the AVIF keep my photo's EXIF data?",
+        "answer": "No. Only decoded pixels are passed on, so the AVIF gets no EXIF, color profile or XMP data, even though the format could carry them."
+      },
+      {
+        "question": "Why did the conversion take so long?",
+        "answer": "AVIF encoding is slow. Encoding one image can take several seconds, because your own device does all the work."
+      },
+      {
+        "question": "Does this AVIF have 10-bit color?",
+        "answer": "No. Each channel in the AVIF holds 8 bits, since the picture is converted through 8-bit RGBA first, although the format allows up to 12."
+      },
+      {
+        "question": "Can I use the AVIF where a JPG is required?",
+        "answer": "Only where AVIF is accepted. Older browsers may fail to display it, so keep the original JPG for places that ask for JPG."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and AVIF",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "8 bits per color channel",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "AVIF",
+        "fullName": "AV1 Image File Format",
+        "description": "An image format from the Alliance for Open Media that stores AV1-compressed images in the HEIF container. It supports lossy and lossless compression, HDR and transparency.",
+        "details": [
+          "Lossy and lossless compression",
+          "Alpha transparency",
+          "HDR and wide color gamut",
+          "Royalty-free"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to AVIF",
+      "points": [
+        "The AVIF is a second lossy pass over the JPG's pixels.",
+        "If the browser's canvas can write AVIF, it does; otherwise ImageMagick in the page writes it.",
+        "The AVIF has 8 bits per channel, however the format allows more.",
+        "EXIF data, ICC profiles and XMP are not copied.",
+        "AVIF encoding is slow: one image can take several seconds on your device."
+      ]
+    },
+    "guide": {
+      "title": "About JPG files",
+      "markdown": "### What is a JPG file?\n\nA JPG holds a picture squeezed by the method the Joint Photographic Experts Group began developing in 1986. The standard text exists as ITU-T Recommendation T.81 (1992) and as international standard ISO/IEC 10918-1 (1994). Baseline compression is lossy. Pixels are handled in 8x8 blocks, a discrete cosine transform turns each block into coefficients, and Huffman codes store them.\n\nJPG is everywhere because cameras and scanners write it natively and browsers draw it without help. US patent protection ended in October 2006. Both .jpg and .jpeg name this one format, served as image/jpeg.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** ImageMagick reads JPG on the command line, and GIMP imports the picture if you want to touch it up first.\n- **Web:** Chrome and Firefox draw JPG in a tab.\n- **Mobile:** Safari shows JPG on iPhone and iPad.\n\n### JPG and AVIF compared\n\n- **Extensions**: .jpg or .jpeg (image/jpeg) against .avif (image/avif).\n- **Compression**: JPEG applies a block-based discrete cosine transform followed by Huffman coding. AVIF packs AV1-compressed images into the HEIF container and offers lossy and lossless modes.\n- **Transparency**: JPEG has no alpha channel. AVIF does.\n- **Color depth**: 8 bits for each JPEG channel; AVIF goes up to 12 for HDR and wide gamut, though this page writes 8.\n- **Quality scale**: editors tend to offer 0 to 100, but a given number does not mean the same quality everywhere. This page has no quality control of its own.\n- **Layers**: JPEG cannot store layers.\n- **Metadata**: Exif, XMP and an ICC profile all fit in an AVIF file; this page writes none of them.\n- **Origins**: the Alliance for Open Media started in 2015 with a goal of royalty-free media formats, and AV1 appeared in 2018.\n- **Large pictures**: Baseline-profile AVIF items top out at 8,192 x 4,352 pixels; bigger pictures are tiled as a grid.\n- **Licensing**: AVIF is royalty-free.\n- **Speed**: AVIF images are slow to decode, and encoding one can take several seconds. JPEG is quick both ways.\n- **Progressive display**: a progressive JPG shows a rough picture early, while an AVIF does not render progressively.\n- **Support**: every browser shows JPEG. AVIF displays in current Chrome, Firefox, Safari and Edge, and Android decodes it from version 12. Older browsers may not show AVIF, so keep a JPEG, PNG or WebP copy for visitors whose browser cannot open AVIF. Windows needs two Microsoft add-ons to preview .avif files: the HEIF Image Extension plus the AV1 Video Extension.\n\nFor the conversion, your browser decodes the JPG into pixels. If the browser's canvas can encode AVIF, the page asks it for the AVIF. If it cannot, it returns a PNG, and an ImageMagick build running inside the page writes the AVIF from that. Either way the picture keeps its pixel size and loses its metadata, and the AVIF has 8 bits per channel. Nothing leaves your device, because both the decoding and the encoding happen in the browser tab and the original JPG is left as it was. The download uses the JPG's name with an .avif ending.\n\n### Other ways to convert JPG to AVIF\n\n- **GIMP (any desktop):** use File > Export As, enter a filename that ends in .avif, press Export and accept the AVIF settings.\n- **ImageMagick (command line):** run `magick photo.jpg photo.avif`. ImageMagick's format table marks AVIF as readable and writable.\n- **libavif's avifenc (command line):** run `avifenc -q 75 photo.jpg photo.avif`. The avifenc tool must be built with at least one AV1 codec enabled, because none is on by default.\n\n### Problems with JPG files\n\n- **Banding or blocks in smooth areas**: heavy JPG compression leaves 8x8 block edges, and an AVIF made from the file keeps them. Pick the least compressed copy as the source.\n- **No transparency**: a JPG cannot hold see-through pixels, so the AVIF will not have any either. Transparent pixels do not survive saving as JPEG in the first place.\n- **Layers are gone**: a JPG is one flat picture, so keep the layered project file.\n- **An older device rejects the file**: some older photo frames refuse progressive JPG, and saving it again without progressive mode gets around that.\n- **Quality numbers disagree**: equal numbers in different editors give unequal results, so compare by eye.\n- **\"Image decode failed.\"**: the JPG could not be opened by your browser's decoder. Download the JPG again and retry.\n"
+    }
+  },
+  "jpg-to-docx": {
+    "seo": {
+      "title": "Convert JPG to DOCX Online (Free)",
+      "h1": "JPG to DOCX Converter",
+      "description": "Put a JPG on a Word page: you get a DOCX holding your picture, shrunk only if it is large. It is not OCR, so no text is typed out. Free."
+    },
+    "tool": {
+      "subtitle": "Place a JPG inside a DOCX document. It is not OCR, so no text is read."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPG to DOCX?",
+        "answer": "Add the JPG above and save the DOCX once it finishes. The picture is in the first paragraph of the document."
+      },
+      {
+        "question": "Does JPG to DOCX turn the picture's text into editable words?",
+        "answer": "No. This page puts the picture itself into the document, as an image. Nothing is read from it. For the words in a photo or scan, use the JPG to TXT converter, which runs OCR."
+      },
+      {
+        "question": "Is the JPG compressed again inside the DOCX?",
+        "answer": "No. The JPG's bytes are placed in the document as they are, so the picture is the one you started with. The page only decides how large it appears."
+      },
+      {
+        "question": "How big will the picture be on the page?",
+        "answer": "A picture larger than 6.5 inches wide or 9 inches tall, at 96 pixels per inch, is scaled down, keeping its proportions, to fit. A smaller picture is not enlarged."
+      },
+      {
+        "question": "Can I put several JPGs into one DOCX?",
+        "answer": "Not on this page. Each JPG becomes its own DOCX with one picture. To combine them, insert them into one document with Insert > Pictures > This Device in Word."
+      },
+      {
+        "question": "Which programs open a DOCX?",
+        "answer": "DOCX is Word's default format for new documents. Other word processors open it too, but some formatting may differ between programs."
+      },
+      {
+        "question": "Why does the picture look larger or smaller in Word than on my screen?",
+        "answer": "The page sizes the picture from its pixel dimensions at 96 pixels per inch. A photo with many pixels is shrunk to fit; a small icon keeps its small size."
+      },
+      {
+        "question": "Does the DOCX keep the photo's EXIF data?",
+        "answer": "The page does not decode the JPG before embedding it, so the picture file inside the DOCX is the JPG you chose, EXIF included."
+      },
+      {
+        "question": "Does the DOCX contain layers?",
+        "answer": "No. The JPG is placed as one picture, so the DOCX holds a single flat image with no layers."
+      },
+      {
+        "question": "Will the DOCX look the same in every program?",
+        "answer": "Not necessarily. Another word processor may change some formatting."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and DOCX",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "No alpha transparency",
+          "Camera output",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "DOCX",
+        "fullName": "Microsoft Word document",
+        "description": "The default word processing format of Microsoft Word since Word 2007. It is a ZIP package of XML files standardized as Office Open XML (ECMA-376, ISO/IEC 29500).",
+        "details": [
+          "ZIP package of XML",
+          "Styles, images and tables",
+          "Tracked changes and comments",
+          "Open standard"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to DOCX",
+      "points": [
+        "The picture goes into the DOCX as an image. No text is recognized.",
+        "The JPG's bytes are embedded as they are, so it is not compressed again.",
+        "A picture over 6.5 inches wide or 9 inches tall is scaled down to fit; a smaller one is left at its own size.",
+        "Each JPG gives its own DOCX with a single picture.",
+        "Use the JPG to TXT converter when you want the words."
+      ]
+    },
+    "guide": {
+      "title": "About JPG files",
+      "markdown": "### What is a JPG file?\n\nJPG takes its name from the Joint Photographic Experts Group, and most photographs from cameras and scanners are saved in it. The group began in 1986, and the standard is ITU-T T.81 (1992). The format is lossy: pixels are grouped in 8x8 tiles, a discrete cosine transform converts each tile, and Huffman coding packs the output.\n\nAll the major browsers show a JPG, and .jpg and .jpeg are interchangeable names, served as image/jpeg. A JPG has no transparency and cannot store layers, which matters when you place it on a colored page. A progressive JPG first draws a coarse version and sharpens it while the file loads. JPG suits web photos, camera output, mailed attachments and photo-sharing sites, and US patent protection ended in October 2006.\n\nEditors often use a 0 to 100 scale, GIMP's default is 85, and equal numbers do not give equal quality in every program. This page has no quality setting, because the original JPG goes into the document untouched.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** GIMP imports a JPG for tidying a picture before it goes into a document, and ImageMagick reads JPG without a window, from the command line.\n- **Web:** Google Chrome and Mozilla Firefox show a JPG when you open it in a tab.\n- **Mobile:** Safari and Chrome display JPG on a phone.\n\n### JPG and DOCX compared\n\n- **What they are**: a JPG is one picture. A DOCX is a document, so it can hold styles, images and tables.\n- **Extensions**: .jpg or .jpeg (image/jpeg) for the picture; .docx for the Word file.\n- **Structure**: a DOCX is a ZIP package of XML files built on the Open Packaging Conventions. Its text and formatting are described in WordprocessingML, and images, styles and properties sit in separate parts of the package.\n- **Standards**: the format is standardized twice, as ECMA-376 and as ISO/IEC 29500, and Word made it the default for new files with the 2007 release. LibreOffice Writer, ONLYOFFICE Desktop Editors, Apple Pages, Word for the web and Word for Android are listed as opening it, and some formatting attributes may differ between programs.\n- **Package**: because a DOCX is a package of related parts, extracting only document.xml does not reproduce the full document.\n- **Compression**: the JPG stays lossy, as it was. Placing it in a DOCX does not recompress it, because the page never decodes it first.\n- **Editing**: a DOCX supports tracked changes and comments around the picture, which a bare JPG cannot hold.\n- **Transparency**: a JPG has none, so the picture shows as a rectangle on the page.\n\nThe page builds the document with the docx library in your browser: one paragraph that holds the picture. The JPG's bytes are put into the package unchanged. A picture wider than 6.5 inches or taller than 9 inches is scaled down, keeping its proportions, and a smaller one keeps its size, measured at 96 pixels per inch. No text is read from the picture.\n\n### Other ways to convert JPG to DOCX\n\n- **Microsoft Word (Windows, Mac):** use Insert > Pictures > This Device, select the JPG, click Insert and save the file.\n- **LibreOffice Writer (Windows, Mac, Linux):** choose Insert > Image, select the JPG with the Link box unmarked, then File > Save As and pick a Microsoft Word format in the File type box. LibreOffice opens and saves Word DOCX files.\n\n### Problems with JPG files\n\n- **A solid rectangle shows around the picture**: a JPG cannot be see-through, so it always shows as a solid rectangle. Use a format with alpha when the document needs transparency.\n- **The text in the picture cannot be selected**: it is part of the image. Run OCR with the JPG to TXT converter to get the words.\n- **Layers are gone**: a JPG never had any, so go back to the layered project file if you need them.\n- **Blocky squares around text**: heavy compression leaves 8x8 block edges, and the DOCX carries the JPG unchanged, so start from the least compressed copy.\n- **Quality numbers disagree**: a 0 to 100 setting is not a shared unit, so two editors can save the same picture at different sizes.\n- **Another app changes the layout**: a different word processor can alter some formatting when it opens the DOCX.\n"
+    }
+  },
+  "jpg-to-psd": {
+    "seo": {
+      "title": "Convert JPG to PSD Online (Free)",
+      "h1": "JPG to PSD Converter",
+      "description": "Save a JPG as a PSD file in your browser. It holds your picture's pixels, not layers recovered from it. Free, with no sign-up."
+    },
+    "tool": {
+      "subtitle": "Save a JPG as a Photoshop PSD file, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert JPG to PSD?",
+        "answer": "Add the JPG above and save the PSD when it is ready. Several JPGs give one PSD each."
+      },
+      {
+        "question": "Does the PSD split my photo into layers?",
+        "answer": "No. A JPG is one flat picture with nothing to separate, and the page does not cut it apart."
+      },
+      {
+        "question": "Does converting JPG to PSD make the picture sharper?",
+        "answer": "No. The PSD holds the pixels the JPG showed, including its compression marks. Editing from the PSD does not add detail that was discarded."
+      },
+      {
+        "question": "Can the PSD be bigger than the JPG?",
+        "answer": "Yes, it can be much bigger. A JPG shrinks a picture, while a PSD can store pixels raw or with RLE or ZIP compression."
+      },
+      {
+        "question": "Can I get the original layers back from a JPG?",
+        "answer": "No. JPEG cannot store layers. Only the project file the JPG was exported from can still have them."
+      },
+      {
+        "question": "Does the PSD keep the JPG's EXIF information?",
+        "answer": "No. The page reads the picture into raw pixels and writes the PSD from those, so EXIF, ICC profiles and XMP are not copied."
+      },
+      {
+        "question": "Is the PSD 8-bit or 16-bit?",
+        "answer": "8 bits per channel. The picture is converted through an 8-bit RGBA step, so the page cannot produce a 16-bit file, even though PSD allows 16 and 32."
+      },
+      {
+        "question": "What is the largest picture a PSD can hold?",
+        "answer": "The PSD format allows 30,000 pixels on a side at most. The larger PSB format raises that limit."
+      },
+      {
+        "question": "Can I open a PSD without Photoshop?",
+        "answer": "Yes. ImageMagick, XnView MP and Photopea in a browser are listed as opening PSD. This page needs no Adobe software."
+      },
+      {
+        "question": "Why choose a PSD instead of the JPG?",
+        "answer": "A PSD is Photoshop's native document format, and a JPG cannot hold layers."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and PSD",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "One flat picture",
+          "No layers",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "PSD",
+        "fullName": "Adobe Photoshop Document",
+        "description": "The native file format of Adobe Photoshop. It stores layers, masks, adjustment layers, text and color information so a design can be edited later.",
+        "details": [
+          "Layers and masks",
+          "16-bit and 32-bit channels",
+          "CMYK and RGB modes",
+          "Proprietary Adobe format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to PSD",
+      "points": [
+        "The PSD holds the JPG's pixels, with no layers made from them.",
+        "The PSD is 8 bits per channel and can be larger than the JPG.",
+        "Detail the JPG discarded does not come back.",
+        "EXIF data, ICC profiles and XMP are not copied.",
+        "Each JPG becomes its own PSD."
+      ]
+    },
+    "guide": {
+      "title": "About JPG files",
+      "markdown": "### What is a JPG file?\n\nIn JPEG, the J is for Joint, the first word of the Joint Photographic Experts Group. Its baseline mode is lossy by design: each 8x8 block of pixels gets a discrete cosine transform, and Huffman coding writes out the numbers. The group started in 1986, and its core text came out of ITU-T as T.81 in 1992; ISO and IEC took it up as 10918-1 two years after that. Cameras and scanners commonly write JPEG, and the US patents lapsed in October 2006. In progressive mode a rough picture appears first and gets sharper while more data arrives. Quality is normally a 0 to 100 slider, GIMP starts at 85, and the same figure can mean different quality in different programs.\n\nJPEG cannot store layers, which is the main thing a designer wants to add back. The extensions .jpg and .jpeg are one and the same format, with image/jpeg as the media type. Photographs on the web, camera output, mail attachments and photo sharing all lean on it, and every major browser displays it.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** GIMP imports a JPG, which is handy for checking the source before you convert, and ImageMagick opens it in a terminal.\n- **Web:** Chrome and Firefox display a JPG you open in a tab.\n- **Mobile:** Safari and Chrome show a JPG on a phone.\n\n### JPG and PSD compared\n\n- **Purpose**: PSD is Adobe Photoshop's native document format. JPG is lossy and made for photographs.\n- **Extensions**: .jpg or .jpeg (image/jpeg); .psd (image/vnd.adobe.photoshop).\n- **Layers**: JPG stores a single flat picture. A PSD keeps layers, masks, adjustment layers and text, in sections kept apart from the image resources.\n- **Compression**: JPG is lossy. PSD pixel data can be raw or encoded with RLE or ZIP compression. The PSD written here holds the decoded pixels without JPEG compression, and can be much larger than the JPG.\n- **Bit depth**: JPEG channels hold 8 bits. A PSD header supports one, eight, 16 or 32 bits, though the PSD written here uses 8.\n- **Size limit**: PSD tops out at 30,000 pixels for each side; PSB lifts that.\n- **Signature**: a PSD header begins with 8BPS.\n- **Other readers**: programs besides Photoshop must interpret Photoshop-specific data structures, so a thumbnail appearing does not prove a program can edit every part of a file.\n- **Transparency**: JPG has none.\n\nFirst the browser decodes the JPG. Then ImageMagick, which runs in the page, encodes those pixels as a PSD. No layers are made from the picture's contents, and EXIF, ICC profiles and XMP stay behind.\n\nA PSD is a container with several sections. Photoshop uses those sections to hold the pieces of a design, such as layers, masks, adjustments, text and color data, so it can be edited later. The format is proprietary to Adobe, and Adobe documents its header and sections publicly.\n\n### Other ways to convert JPG to PSD\n\n- **Photopea (web):** choose File > Open, load the JPG, then File > Save as PSD. Photopea treats PSD as its main document format.\n- **ImageMagick (command line):** run `magick picture.jpg picture.psd`. According to its format table, ImageMagick can both read and write PSD.\n\n### Problems with JPG files\n\n- **No layers to edit**: a JPG never stored any. The project file you exported from is the only place they can still be.\n- **A blocky or smudged photo**: compression artifacts in the JPG pass straight into the PSD. Look for a less compressed copy of the picture.\n- **A transparent logo shows a white box**: JPEG cannot keep see-through pixels, so the box was in the JPG before you converted it.\n- **An older photo frame shows nothing**: some reject progressive JPEG, and saving the picture again without it helps.\n- **Quality numbers disagree**: the same 0 to 100 value can mean different things in different editors.\n- **A very large picture**: a document larger than the PSD dimension limit needs PSB or another suitable format.\n- **Going back to a flat image later**: flattening a PSD into a plain image discards its structure, so keep the PSD for editing.\n- **A file named .psd that will not open**: a real PSD header begins with the signature 8BPS, so a file with another header is not a PSD whatever its name says.\n"
+    }
+  },
+  "jpg-to-txt": {
+    "seo": {
+      "title": "Convert JPG to TXT Online (Free)",
+      "h1": "JPG to TXT Converter",
+      "description": "Read the text in a JPG photo or scan and save it as a TXT file. OCR runs in your browser with an English model, so the image is never uploaded. Free."
+    },
+    "tool": {
+      "subtitle": "Pull the English text out of a JPG photo or scan into a plain TXT file."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert a JPG to text?",
+        "answer": "Add the JPG above and let the page read it. When it finishes you can save a TXT file with the words it found."
+      },
+      {
+        "question": "Is JPG to TXT the same as saving the picture as a text file?",
+        "answer": "No. A JPG is a picture of letters, not letters. The converter runs optical character recognition (OCR) to read the letters from the pixels and writes them as plain text."
+      },
+      {
+        "question": "Which languages does it read?",
+        "answer": "English only. The page loads Tesseract's English model."
+      },
+      {
+        "question": "What does \"No text was found in this image\" mean?",
+        "answer": "It means the recognizer returned no text from the picture. The page stops with that message instead of saving an empty file."
+      },
+      {
+        "question": "Which engine reads the picture?",
+        "answer": "tesseract.js, an OCR engine that runs in your browser. Its worker, engine and English language model are served from this site."
+      },
+      {
+        "question": "Does the TXT keep my columns, tables and layout?",
+        "answer": "No. Plain text has no layout, fonts or images. The page returns lines of text; it trims spaces at the ends of lines and squeezes runs of blank lines down to one."
+      },
+      {
+        "question": "Is my picture uploaded to read the text?",
+        "answer": "No. The OCR runs in your browser and everything it needs loads from this site, so your JPG is not sent anywhere."
+      },
+      {
+        "question": "What encoding is the TXT file in?",
+        "answer": "UTF-8, with a newline at the end. Plain text carries no typographic formatting."
+      },
+      {
+        "question": "Can I read several JPGs in one go?",
+        "answer": "Yes. The pictures run one after another and each gives its own TXT file, with no ZIP."
+      },
+      {
+        "question": "Can I get editable text with formatting instead?",
+        "answer": "Not from this page. Plain text carries no formatting. If you want the picture itself on a Word page, use the JPG to DOCX converter, which does not read the text."
+      }
+    ],
+    "aboutSection": {
+      "title": "JPG and TXT",
+      "fromFormat": {
+        "name": "JPG",
+        "fullName": "JPEG image",
+        "description": "A lossy raster image format defined by the Joint Photographic Experts Group (ISO/IEC 10918-1), designed for photographs. .jpg and .jpeg are the same format.",
+        "details": [
+          "Lossy compression",
+          "Pictures of text hold pixels, not letters",
+          "No alpha transparency",
+          "Supported everywhere"
+        ]
+      },
+      "toFormat": {
+        "name": "TXT",
+        "fullName": "Plain text file",
+        "description": "A file that holds unformatted text with no fonts, styles or images. It is readable by any text editor, on any operating system.",
+        "details": [
+          "No formatting",
+          "Character encoding such as UTF-8",
+          "Very small files",
+          "Readable everywhere"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "What to know before converting JPG to TXT",
+      "points": [
+        "This is OCR: the page reads letters from the picture, it does not extract hidden text.",
+        "The English model is the only one the page loads.",
+        "Several JPGs give one TXT each.",
+        "The TXT is UTF-8 with no layout, fonts or images.",
+        "A picture with no readable text gives an error, not an empty file."
+      ]
+    },
+    "guide": {
+      "title": "About JPG files",
+      "markdown": "### What is a JPG file?\n\nA JPG stores a picture, not words. Even a photographed page of print is, inside the file, a grid of colored pixels squeezed by lossy JPEG compression, which works on 8x8 blocks of pixels. The compression comes from the Joint Photographic Experts Group, a body that started the work in 1986. ITU-T published its core standard in 1992, and ISO and IEC took it on in 1994.\n\nPhotographs on websites, in cameras, in email and on photo-sharing sites are commonly JPG, and every major browser displays it. The two names, .jpg and .jpeg, describe a single format registered as image/jpeg. The text in a photo or scan is easy to see but cannot be selected or searched, because it is only pixels. That is the gap this converter fills. A progressive JPG first shows a rough picture, then refines it as the rest arrives.\n\nA JPG can also carry metadata such as Exif. None of that is text from the page, and none of it ends up in the TXT: only the letters the recognizer reads from the pixels do.\n\n### Programs that open JPG files\n\n- **Windows, Mac and Linux:** ImageMagick reads JPG from the command line, which helps when you want to resize or straighten a batch first, and GIMP imports JPEG for editing.\n- **Web:** Google Chrome and Mozilla Firefox show the picture so you can check it is legible.\n- **Mobile:** Chrome and Safari show JPG on a phone.\n\n### JPG and TXT compared\n\n- **What they hold**: a JPG holds pixels. A TXT holds characters and nothing else.\n- **Extensions**: .jpg or .jpeg (image/jpeg) against .txt (text/plain).\n- **Formatting**: plain text carries no commands for typographic formatting, and it does not prescribe a page layout, a font or how images are arranged.\n- **Tables and images**: a word processor can place an image or a table on a page, while plain text cannot.\n- **Encoding**: a TXT depends on a character set, shown by the charset parameter. The file written here is UTF-8.\n- **Editors**: Visual Studio Code and Vim open TXT on Windows, Mac and Linux, and TextEdit opens it on a Mac. Converting rich text to TXT in TextEdit removes styles and formatting.\n- **Reversibility**: converting a picture to text is a reading step, not a re-save, so nothing in the TXT tells you how the page looked.\n\nHere the recognition is done by tesseract.js, running in your browser. The worker, engine and English model are served by this site, so the picture is not sent to another site. The recognized text has line-end spaces removed and runs of three or more newlines reduced to one blank line, and it is saved as UTF-8 with a final newline. If no words are found, the page stops with an error rather than writing an empty file.\n\n### Other ways to convert JPG to TXT\n\n- **Tesseract (command line):** run `tesseract page.jpg result -l eng`. The command takes an input image name and an output base name, and English is the default language if -l is left out.\n- **Google Drive and Docs (web):** upload the JPG to Drive, right-click it, choose Open with > Google Docs, then copy the recognized text into a plain-text editor. The image is uploaded to Google, which accepts PDF and .jpeg, .png and .gif files, asks for files of 2 MB or less, and needs the document right-side up.\n- **OneNote for Mac:** insert the picture, Control-click it, choose Copy Text from Picture and paste into a text editor. Recognition uses Microsoft online services, and handwriting may not be recognized well.\n\n### Problems with JPG files\n\n- **Several pictures at once**: each JPG gives its own TXT, the pictures are processed in sequence, and no ZIP is made.\n- **Stray blank space**: spaces at line ends are cut and three or more line breaks in a row collapse to a single blank line, so extra spacing in the picture may not carry over.\n- **Other languages**: this page reads with an English model only. Use a tool with the right language data for another language.\n- **\"No text was found in this image.\"**: the page stops there instead of saving an empty file.\n- **Tables lose their grid**: plain text has no table structure, so copy the result into a spreadsheet and rebuild the columns by hand.\n- **Odd characters in the TXT**: an editor that reads the file with the wrong character encoding shows garbled letters. The file here is UTF-8.\n"
+    }
+  },
+  "m4v-to-mp3": {
+    "seo": {
+      "title": "Convert M4V to MP3 Online (Free)",
+      "h1": "M4V to MP3 Converter",
+      "description": "Pull the soundtrack out of an M4V video and save it as an MP3. The picture is dropped and the file is never uploaded. Free, no sign-up."
+    },
+    "tool": {
+      "subtitle": "Extract the audio from an M4V video as an MP3, picture dropped."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert M4V to MP3?",
+        "answer": "Add the M4V file and wait until the page is done. It pulls out the soundtrack and offers an MP3 to download. Everything happens in your browser, and no copy of the video goes to a server."
+      },
+      {
+        "question": "Is any of the video left in the MP3?",
+        "answer": "No. The result is audio only, so the picture is gone and only the soundtrack remains."
+      },
+      {
+        "question": "What bitrate does the MP3 use?",
+        "answer": "LAME is given one fixed constant-bitrate setting, and you cannot change it. A soundtrack sampled below 32 kHz comes out lower."
+      },
+      {
+        "question": "Why did the conversion fail on my M4V?",
+        "answer": "If the video has no audio track you will see an error like \"FFmpeg failed with exit code\"; there is no sound to encode."
+      },
+      {
+        "question": "Is every M4V protected by iTunes DRM?",
+        "answer": "No. The .m4v extension can label an ordinary MPEG-4 container file."
+      },
+      {
+        "question": "Will the MP3 sound better than the M4V?",
+        "answer": "No. The soundtrack is encoded again as a lossy MP3, which cannot add detail the original lacked. Keep the M4V so the original sound stays available."
+      },
+      {
+        "question": "Which audio track is used if my M4V has several?",
+        "answer": "The page does not offer a track choice, so you cannot pick a language from it."
+      },
+      {
+        "question": "Can I convert several M4V files at once?",
+        "answer": "Yes. Pick several files and they run in sequence, each ending up as a separate MP3. They are never joined into one recording."
+      },
+      {
+        "question": "Is there a size or length limit?",
+        "answer": "The page sets none. A long video simply takes as much time as your device needs."
+      },
+      {
+        "question": "Does the video get uploaded?",
+        "answer": "No. The work is done by FFmpeg compiled to WebAssembly in your browser tab. The M4V remains on your device, and you download a new MP3."
+      }
+    ],
+    "aboutSection": {
+      "title": "M4V and MP3",
+      "fromFormat": {
+        "name": "M4V",
+        "fullName": "MPEG-4 video",
+        "description": "A video file format developed by Apple that is very close to MP4. Files from the iTunes Store may be protected with FairPlay DRM.",
+        "details": [
+          "MPEG-4 container",
+          "H.264 video with AAC audio",
+          "Optional DRM",
+          "Apple format"
+        ]
+      },
+      "toFormat": {
+        "name": "MP3",
+        "fullName": "MPEG-1/2 Audio Layer III",
+        "description": "A lossy audio format standardized by MPEG (ISO/IEC 11172-3), developed with major contributions from the Fraunhofer Society. It became the most common format for downloadable music.",
+        "details": [
+          "Lossy compression",
+          "Constant or variable bitrate",
+          "ID3 tags for metadata",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before turning M4V into MP3",
+      "points": [
+        "The picture is removed; only the soundtrack is encoded.",
+        "LAME writes the MP3 at a bitrate the page sets, and you cannot change it.",
+        "A video with no audio track gives an error like \"FFmpeg failed with exit code\".",
+        "The page has no track picker."
+      ]
+    },
+    "guide": {
+      "title": "About M4V files",
+      "markdown": "### What is an M4V file?\n\nAn M4V is a video file in the MPEG-4 container family. It is associated with Apple's video workflows, but the extension does not prove who made the file. Both of HandBrake's output suffixes, .m4v and .mp4, hold the same container. MP4 itself, MPEG-4 Part 14, sits on the ISO Base Media File Format, an outgrowth of Apple's QuickTime, and video files in this family carry either .mp4 or .m4v.\n\nA container organizes timed tracks. The picture and the soundtrack are separate tracks, each with its own encoding that a player must understand, and playback depends on those encodings. The family stores timed media tracks and metadata in boxes. Turning an M4V into an MP3 makes sense when you only need the sound, because the MP3 holds no picture. The MP3 is a fresh lossy encode of the soundtrack, not a copy of the original audio.\n\nVideos bought from the iTunes Store can carry FairPlay DRM. Use a recording you have the right to process, and keep the original M4V in case you ever need the video again.\n\nThe MP3 format, formally MPEG-1 Audio Layer III, was developed at Fraunhofer IIS from the late 1980s and became ISO/IEC 11172-3 in 1993. Being lossy, it keeps what a model of human hearing says will be noticed and drops the rest. Every major browser plays MP3, and audio/mpeg is its registered media type. That is the usual reason for this conversion: not to improve the sound, but to get a file that plays almost everywhere.\n\n### Programs that open M4V files\n\n- **Windows, Mac and Linux:** FFmpeg reads .m4v through its MOV/MP4 demuxer, and the matching decoders must be present as well. VLC media player handles MPEG-4 containers along with common MPEG-4 video and AAC audio.\n\n### M4V and MP3 compared\n\n- **What they hold**: an M4V holds a picture track and a soundtrack. An MP3 holds compressed sound only.\n- **Compression**: MP3 is lossy; it trades some sound information for a smaller file. Re-encoding a soundtrack as MP3 is a lossy step, not a rename.\n- **Metadata**: tags such as song titles live in separate ID3 structures within an MP3.\n- **Bitrates**: an MP3 can be as slow as 32 kbps or as fast as 320 kbps, using a 32, 44.1 or 48 kHz sample rate.\n- **Reach**: MP3 plays on nearly every device, and its patent licensing program ended in April 2017.\n- **Media types**: video/mp4 and audio/mp4 for the MP4 family, audio/mpeg for MP3.\n\nHere the picture is dropped and the soundtrack is encoded with the LAME encoder at a constant-bitrate setting that the page fixes; you cannot change it. An MP3 cannot reach that rate for audio sampled below 32 kHz, so a soundtrack sampled lower than that gets a lower bitrate. No track is chosen by you: FFmpeg's defaults pick the streams. A video without any sound cannot supply material for the encoder, so the page reports an error instead of writing an empty file. The download takes the M4V's name with an .mp3 ending, and the original video file is not changed.\n\nThe new MP3 cannot improve the original recording. Saving an edited MP3 as a new MP3 adds one more lossy pass, so keep the M4V in case you need the original sound again.\n\n### Other ways to convert M4V to MP3\n\n- **FFmpeg (command line):** run `ffmpeg -i input.m4v -vn -b:a 128k -c:a libmp3lame soundtrack.mp3`. The `-vn` option leaves out the picture, and The name libmp3lame refers to the LAME encoder inside FFmpeg. Decoding the input also requires the relevant decoders.\n\n### Problems with M4V files\n\n- **The conversion fails at once**: check that the video has an audio stream. A video with no audio track gives an error that begins \"FFmpeg failed with exit code\".\n- **Unsupported codec**: a recognized container can still hold a codec the player lacks.\n- **A new extension does not help**: renaming cannot repair damage or add support for an encoding.\n- **Recording cut short**: a normal MPEG-4 family recording may be unreadable if writing ends before the required metadata is finished.\n- **Very long files**: processing time depends on your device, and the page sets no length limit. Keep the M4V until you have played the downloaded MP3 to the end.\n"
+    }
+  },
+  "mp4-to-flv": {
+    "seo": {
+      "title": "Convert MP4 to FLV Online (Free)",
+      "h1": "MP4 to FLV Converter",
+      "description": "Re-encode an MP4 as an FLV with H.264 video and AAC audio, in your browser, for an older player or pipeline that wants Flash Video."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 as Flash Video with H.264 video and AAC audio, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to FLV?",
+        "answer": "Drop in the MP4 and let the page work. FFmpeg re-encodes both tracks inside your browser, and the finished FLV is ready to download. Nothing is sent to a server."
+      },
+      {
+        "question": "What codecs does the FLV contain?",
+        "answer": "Video goes in as H.264 and audio as AAC (96 kbps). A player needs the decoder for the codecs inside an FLV, so check what your player supports."
+      },
+      {
+        "question": "Do I need Flash Player to play the FLV?",
+        "answer": "No. Adobe ended Flash Player support, so putting it back is not how you play an FLV. A player that reads FLV, such as VLC media player or FFplay, opens the file."
+      },
+      {
+        "question": "Is the MP4 copied without quality loss?",
+        "answer": "No. The page encodes the picture and sound again, so the FLV is a new copy made with a lossy encode."
+      },
+      {
+        "question": "Will a large MP4 keep its frame size?",
+        "answer": "Frames larger than 1920 px along their longest edge are shrunk to fit. Width and height are both made even, so an odd-sized frame can lose a pixel."
+      },
+      {
+        "question": "Does the FLV keep 60 fps footage?",
+        "answer": "No, motion tops out at 30 frames per second. Footage below that keeps the rate it came with."
+      },
+      {
+        "question": "Will interlaced video look right?",
+        "answer": "If the footage is flagged interlaced, a deinterlacing filter runs before encoding. Progressive video skips it."
+      },
+      {
+        "question": "Can an FLV hold several audio tracks?",
+        "answer": "No. The FLV model allows a single audio stream, so alternate language tracks cannot stay in it. Keep the MP4 if you need them."
+      },
+      {
+        "question": "Will renaming an MP4 to .flv work?",
+        "answer": "Renaming alters the file name alone; the contents remain an MP4. Converting writes a genuine FLV."
+      },
+      {
+        "question": "Which phone apps play an FLV?",
+        "answer": "VLC reads FLV without Flash Player, and its Android and iOS apps play local media."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and FLV",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Several tracks in one file",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "FLV",
+        "fullName": "Flash Video",
+        "description": "A container format created by Macromedia and later Adobe for delivering video through Flash Player. Flash Player is discontinued, so FLV is now a legacy format.",
+        "details": [
+          "Usually H.263 or H.264 video",
+          "MP3 or AAC audio",
+          "Designed for streaming",
+          "Legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before turning MP4 into FLV",
+      "points": [
+        "The FLV gets newly encoded video (H.264) and audio (AAC, 96 kbps).",
+        "Video is capped at 1920 px on the longer side and 30 fps.",
+        "An FLV holds at most one video and one audio stream.",
+        "A player needs the decoder for the codecs inside the FLV."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 files",
+      "markdown": "### What is an MP4 file?\n\nThink of an MP4 as a box with compartments for picture, sound and descriptive data. Nothing in the .mp4 name reveals which codec fills each compartment, which is why a decoder must handle the compression and not merely the wrapper. H.264 video with AAC sound is the usual content, though other codecs are possible.\n\nEvery major browser can play MP4, and phones and cameras commonly produce it. Its data sits in nested boxes, and a normal file keeps its index together, which is why a recording that was interrupted before it finished can be hard to open.\n\nBefore converting, work out what the next system needs. A request that only says \"Flash video\" can mean H.264 and AAC, or the older Sorenson and VP6 pairings, and they are not interchangeable. If you are not sure the destination really needs FLV, ask for its list of accepted codecs first, and keep the MP4 in case the legacy copy cannot use something in it.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** ffplay plays MP4 through FFmpeg's demuxer, and mpv does desktop playback with selectable audio streams.\n- **Web:** Firefox and Chrome play MP4 files whose codecs they support.\n- **Mobile:** on phones, VLC for Android and for iOS opens videos saved on the device.\n\n### MP4 and FLV compared\n\n- **Origin**: FLV is Flash Video, a binary container tied to Macromedia's Flash video delivery. Adobe ended Flash Player support on December 31, 2020, so treat FLV as legacy media.\n- **Streams**: an FLV tops out at a single video plus a single audio track, whereas an MP4 can carry many.\n- **Codecs**: FLV can carry Sorenson or On2 VP6 video, and audio such as MP3, PCM or ADPCM. This page writes H.264 and AAC instead, and a player needs the decoder for whatever codecs an FLV holds.\n- **Extension**: the .flv extension does not identify a unique video codec.\n- **Playback**: media software such as VLC can still read FLV without Flash Player.\n\nPicture and sound are both encoded again. The video uses H.264 (ultrafast preset, CRF 32) and the audio uses AAC at 96 kbps. Footage whose long side exceeds 1920 px is shrunk, and a frame rate above 30 per second is trimmed by discarding frames, so the running time is untouched. Sizes are rounded to even numbers too. Footage flagged interlaced is deinterlaced beforehand. This is a fresh encode, not a stream copy, so quality and file size can change.\n\nNo stream mapping is given, so FFmpeg picks the streams by its own defaults.\n\nThe download carries the MP4's name with an .flv ending, and the original file is left as it was. You can pick several MP4s; each runs in turn and becomes its own FLV, and no ZIP is made. All of it happens inside your browser, where FFmpeg runs as WebAssembly in a worker, so the video is not uploaded.\n\n### Other ways to convert MP4 to FLV\n\n- **FFmpeg (re-encode):** `ffmpeg -i input.mp4 -f flv -codec:v libx264 -codec:a aac output.flv` selects H.264 and AAC and names the FLV muxer with -f.\n- **FFmpeg (stream copy):** `ffmpeg -i input.mp4 -c copy -f flv output.flv` skips encoding and copies the streams. An FLV has room for one video stream and one audio stream, nothing more.\n- **FFmpeg (keyframe index):** `ffmpeg -i input.mp4 -codec:v libx264 -codec:a aac -flvflags add_keyframe_index output.flv` adds a keyframe index that helps seeking, particularly for HTTP pseudo streaming.\n\n### Problems with MP4 files\n\n- **An old player opens the container but shows no picture**: the container may be understood while the codec inside is not. Compare the player's accepted codecs with H.264 and AAC.\n- **Alternate audio is missing**: an FLV keeps one audio stream, so a workflow that needs several alternative audio tracks cannot keep them in the FLV. Return to the original MP4.\n- **An unfinished MP4**: an MP4 normally keeps its packet index together, so a write that was interrupted may leave a file that will not play. Cut-short input often still converts, giving a shorter result, so compare the running time.\n- **Not a Flash Player file**: you do not need Flash Player for an FLV. Use any player with FLV support.\n- **Keep the MP4**: making an FLV for one old workflow should not make it the only surviving copy.\n"
+    }
+  },
+  "mp4-to-mpg": {
+    "seo": {
+      "title": "Convert MP4 to MPG Online (Free)",
+      "h1": "MP4 to MPG Converter",
+      "description": "Turn an MP4 into an MPG with MPEG-2 video and MP2 audio, in your browser. A movie file for older gear, not a finished DVD. Free."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MP4 as an MPG with MPEG-2 video and MP2 audio, in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MP4 to MPG?",
+        "answer": "Pick the MP4 above and wait. Your browser re-encodes the picture and the sound, then offers the MPG for download. The video never leaves your device."
+      },
+      {
+        "question": "Which MPEG version does the MPG use?",
+        "answer": "The video is MPEG-2 and the audio is MP2, meaning MPEG Audio Layer II, at 96 kbps."
+      },
+      {
+        "question": "Is the MPG a DVD I can play in a disc player?",
+        "answer": "No. It is a movie file, not a DVD-Video disc. A DVD adds navigation and supporting files through an authoring step, and this page does not apply a DVD profile."
+      },
+      {
+        "question": "Will renaming an MP4 to .mpg work?",
+        "answer": "No. A renamed file is still an MP4 holding its original video, and gear that reads the data sees that. The conversion writes real MPEG-2 video."
+      },
+      {
+        "question": "Will the MPG keep my video's resolution?",
+        "answer": "Frames over 1920 px on their longest edge are scaled down. Smaller ones stay as they are, and each side is cut to an even pixel count."
+      },
+      {
+        "question": "Does the MPG keep 60 fps footage?",
+        "answer": "No, 30 fps is the ceiling. A slower source keeps its own speed."
+      },
+      {
+        "question": "Is interlaced footage handled?",
+        "answer": "Anything flagged as interlaced is deinterlaced first. Progressive footage is left alone."
+      },
+      {
+        "question": "Why does the MPG look less sharp than the MP4?",
+        "answer": "The video is encoded again with a lossy MPEG-2 pass, and a large frame may be resized. Re-encoding cannot restore detail the MP4 already lost."
+      },
+      {
+        "question": "Does MPG always mean DVD-compatible MPEG-2?",
+        "answer": "No. The extension covers MPEG-1 and MPEG-2 program streams. DVD compatibility depends on specific stream settings and a disc layout, not on the suffix."
+      },
+      {
+        "question": "Can I queue more than one MP4?",
+        "answer": "Yes. Pick several and the page takes them in turn, saving a separate MPG for each."
+      }
+    ],
+    "aboutSection": {
+      "title": "MP4 and MPG",
+      "fromFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Several tracks in one file",
+          "Plays on nearly every device"
+        ]
+      },
+      "toFormat": {
+        "name": "MPG",
+        "fullName": "MPEG video",
+        "description": "A file extension for MPEG-1 or MPEG-2 video and audio in an MPEG program stream. It was the standard for VCD and DVD video.",
+        "details": [
+          "MPEG-1 or MPEG-2 video",
+          "MPEG program stream",
+          "Lossy compression",
+          "Legacy format"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before turning MP4 into MPG",
+      "points": [
+        "The MPG gets MPEG-2 video and MP2 audio at 96 kbps, both encoded fresh.",
+        "Video is capped at 1920 px on the longer side and 30 fps.",
+        "The result is a movie file, not an authored DVD-Video disc.",
+        "The conversion starts from the MP4 only; the page maps no extra tracks across."
+      ]
+    },
+    "guide": {
+      "title": "About MP4 files",
+      "markdown": "### What is an MP4 file?\n\nIn an MP4, the picture, the sound and the descriptive data each get their own track inside one container. Codecs are chosen separately from the container. The familiar pairing is H.264 picture with AAC sound, but other encodings can sit inside, so whether a file plays on older equipment depends on the streams within it as well as the wrapper.\n\nEvery major browser plays MP4, and it is a common format for phone and camera recordings and online video. Its structure is a set of nested boxes, and normal files keep their packet index together, so a recording interrupted before it is finished can be hard to play.\n\nA request for MPG often signals a legacy playback or authoring requirement. Get the receiving system's actual specifications first: the MPEG version, picture dimensions, frame rate and supported sound. A file named .mpg does not certify that all of those have been met.\n\nThis matters most when a device manual mentions DVD. A movie file accepted by an editing program is not a finished disc, because disc authoring adds navigation and a directory structure around compliant streams. Keep the MP4 while you decide whether you need a playable file, an intermediate for authoring or a real disc.\n\n### Programs that open MP4 files\n\n- **Windows, Mac and Linux:** ffplay plays an MP4 locally, and mpv is a desktop player for the same files.\n- **Web:** Chrome and Firefox can play an MP4 in a tab when they support its codecs.\n- **Mobile:** you can open local files in VLC on Android or iOS.\n\n### MP4 and MPG compared\n\n- **Container family**: MPG is the usual extension for an MPEG program stream carrying MPEG-1 or MPEG-2 picture and sound. MP4 belongs to the MPEG-4 family. Both wrap encoded media, but they support different combinations.\n- **History**: MPG was the standard extension for VCD and DVD video.\n- **Suffixes**: both .mpeg and .mpg label MPEG video, and neither tells you whether the video inside is MPEG-1 or MPEG-2.\n- **Streams**: some MPEG files are system streams and others are raw video, so a tool has to identify the structure before choosing a demuxer.\n\nHere the picture is encoded as MPEG-2 and the soundtrack as MP2 at 96 kbps. Nothing from the MP4 is copied across: the video gets a new lossy pass. A long edge beyond 1920 px is scaled down, a rate above 30 frames per second is cut by dropping frames so the clip keeps its length, and widths and heights end up even. Anything flagged as interlaced gets a deinterlacing pass before encoding.\n\nThese are general conversion settings. They do not match a PAL or NTSC DVD profile, so do not treat the result as universally disc-compliant. No -map option is used; FFmpeg decides which streams go in. Your MP4 stays untouched; what you save is a new file ending in .mpg.\n\n### Other ways to convert MP4 to MPG\n\n- **FFmpeg (DVD target):** `ffmpeg -i input.mp4 -target ntsc-dvd output.mpg` sets the codecs, bitrates and buffer sizes for NTSC DVD. Use pal-dvd for PAL. The file still needs disc authoring if you want a navigable DVD.\n- **FFmpeg (VCD target):** `ffmpeg -i input.mp4 -target pal-vcd output.mpg` applies the Video CD settings instead, for gear that expects them.\n\n### Problems with MP4 files\n\n- **A player rejects the MPG**: compare its streams with the device manual. The extension does not settle bitrate, dimensions, scan type or accepted audio. A standard-definition MPEG device may refuse a larger MPEG-2 file that a desktop player handles.\n- **It won't act as a DVD**: burning one MPG as data is not the same as building a DVD-Video layout with navigation and supporting files.\n- **Lost detail**: a lossy MPEG encode cannot keep every detail of the picture, and a large frame may also be resized.\n- **Decoder missing**: playback needs a decoder for the sound as well as the picture, and sharing a container does not make their codecs interchangeable.\n- **Unfinished MP4**: a recording stopped mid-write may be unplayable. The output from a cut-short input can end early, so check its length.\n\nFor an equipment handoff, ask for a short sample known to play on that device and compare its specifications with your export. That beats matching a suffix.\n"
+    }
+  },
+  "mpv-to-mp4": {
+    "seo": {
+      "title": "Convert MPV to MP4 Online (Free)",
+      "h1": "MPV to MP4 Converter",
+      "description": "Wrap a raw MPEG video (.mpv) stream in an MP4, re-encoded as H.264 in your browser. An MPV has no soundtrack to carry over. Free."
+    },
+    "tool": {
+      "subtitle": "Re-encode an MPEG video (.mpv) elementary stream as an H.264 MP4 in your browser."
+    },
+    "faqs": [
+      {
+        "question": "How do I convert MPV to MP4?",
+        "answer": "Add the .mpv file above and give the page a moment. It turns the picture into H.264 inside your browser and hands back an MP4 to download. Nothing is uploaded."
+      },
+      {
+        "question": "Why is my MP4 silent?",
+        "answer": "A true MPV is a video elementary stream, so it has no soundtrack inside it. The conversion cannot create sound; the audio, if there is any, sits in a separate file."
+      },
+      {
+        "question": "Is .mpv the same as the mpv media player?",
+        "answer": "No. One is a filename extension for MPEG video; the other is a media-player application that opens many formats. Playing a movie in mpv does not make it an MPV file."
+      },
+      {
+        "question": "Does the page copy the MPEG video into the MP4 unchanged?",
+        "answer": "No. It re-encodes the picture as H.264, so the MP4 is a new lossy copy."
+      },
+      {
+        "question": "Can I add the matching audio file here?",
+        "answer": "No. The page converts the one file you pick. To join a separate audio file with the picture, use a desktop tool such as FFmpeg that accepts two inputs."
+      },
+      {
+        "question": "How large can the MP4 picture be?",
+        "answer": "The longest edge tops out at 1920 px, with bigger frames scaled down. Both sides also end up even, which can take a pixel off an odd-sized frame."
+      },
+      {
+        "question": "Is the source frame rate kept?",
+        "answer": "Rates above 30 fps are held at 30. Anything slower stays as it was."
+      },
+      {
+        "question": "Does the page deinterlace?",
+        "answer": "Yes, for frames flagged as interlaced; they are deinterlaced before encoding. Progressive material is not changed by that step."
+      },
+      {
+        "question": "Can I rename my .mpv file to .mp4?",
+        "answer": "No. Renaming does not build the MP4 track and timing structure, and Adobe warns that a changed extension does not guarantee import. A real conversion writes the container."
+      },
+      {
+        "question": "Should I keep the original MPV and its audio?",
+        "answer": "Yes. Keep the MPV and any matching audio file until you have watched the finished MP4 to the end."
+      }
+    ],
+    "aboutSection": {
+      "title": "MPV and MP4",
+      "fromFormat": {
+        "name": "MPV",
+        "fullName": "MPEG video",
+        "description": "A file extension for an MPEG video elementary stream, typically MPEG-1 or MPEG-2 video without audio.",
+        "details": [
+          "MPEG video only",
+          "No audio track",
+          "Elementary stream"
+        ]
+      },
+      "toFormat": {
+        "name": "MP4",
+        "fullName": "MPEG-4 Part 14",
+        "description": "A container format defined in ISO/IEC 14496-14 that can hold video, audio and metadata. H.264 video with AAC audio is the most common combination.",
+        "details": [
+          "Container for several codecs",
+          "H.264, H.265 and AV1 video",
+          "Several tracks in one file",
+          "Plays on nearly every device"
+        ]
+      }
+    },
+    "pairNotes": {
+      "title": "Before turning MPV into MP4",
+      "points": [
+        "An MPV is video only; the MP4 will not gain sound.",
+        "The picture is re-encoded as H.264 with fast-start metadata.",
+        "Video is capped at 1920 px on the longer side and 30 fps.",
+        "Keep the MPV and its audio file until the MP4 is checked."
+      ]
+    },
+    "guide": {
+      "title": "About MPV files",
+      "markdown": "### What is an MPV file?\n\nAn MPV is usually an MPEG video elementary stream. It holds the encoded picture sequence itself, not a program container that interleaves picture and sound. FFmpeg's raw MPEG demuxer recognizes such video sequences from their contents, and it tells them apart from MPEG packets that contain audio. Adobe groups the .mpv suffix with MPEG-1 imports.\n\nA companion audio file may sit beside the MPV, but the video bytes do not contain that sound. In short, the extension stands for an MPEG video elementary stream, typically MPEG-1 or MPEG-2 video without audio. That is why a player that opens whole movies can find nothing familiar in it, and why the sound has to be handled as a separate job.\n\nThe name is easy to confuse with mpv, the media-player application. The two are unrelated: watching a movie in the player does not make it an MPV elementary stream. Inspect the actual file before deciding how to convert it, because the extension alone should not decide whether MPEG-1 or MPEG-2 decoding is needed.\n\n### Programs that open MPV files\n\n- **Windows, Mac and Linux:** FFmpeg, whose raw MPEG demuxer recognizes video sequences from their contents, and ffplay, which plays them through the FFmpeg libraries when MPEG decoding is included.\n- **Windows and Mac:** Adobe After Effects lists .mpv among its MPEG-1 import extensions.\n\n### MPV and MP4 compared\n\n- **Streams**: a genuine MPV supplies picture only. An MP4 stores timed tracks, so it can hold video and audio together.\n- **Wrapper**: a raw MPEG video stream has no program-stream wrapper. The MP4 adds the track and timing structure.\n- **Compatibility**: Premiere Elements lists MPV among its unsupported extensions, while Adobe Media Encoder lists it among recognized MPEG input extensions.\n- **Codecs**: the .mp4 name does not name a codec, and every major browser plays MP4.\n\nHere the picture is encoded again as H.264 with FFmpeg's ultrafast preset at CRF 32, and the MP4 is written with its index at the start of the file so it can begin playing before the download finishes. Audio is set to AAC at 96 kbps, but an MPV that carries none leaves the MP4 silent. Output cannot exceed 1920 px along its longest edge or 30 frames per second, each side is made even, and frames flagged as interlaced are deinterlaced. Smaller or slower footage stays below those limits.\n\nFiles you add are processed in turn, and each produces a separate MP4; there is no ZIP. The encoder is FFmpeg built for WebAssembly and it runs in the page, so nothing is uploaded. The download takes the MPV's name with an .mp4 ending, leaving your MPV unaltered.\n\nAn MP4 is built from nested boxes that describe each track and its timing. H.264 with AAC is the pairing most files use, though the container also carries other codecs, so the .mp4 name alone does not tell a player what is inside.\n\nFor an MPV, the practical gain is the container itself. The picture gets a track, a timeline and a place to put sound later, which a bare elementary stream does not offer. Adobe Media Encoder and After Effects both recognize the suffix, so the MPV can still be imported there if that is the real goal.\n\n### Other ways to convert MPV to MP4\n\n- **FFmpeg (H.264 re-encode):** `ffmpeg -i input.mpv -an -pix_fmt yuv420p -c:v libx264 output.mp4` makes a video-only H.264 copy.\n- **FFmpeg (stream copy):** `ffmpeg -i input.mpv -c:v copy -an output.mp4` puts the MPEG video into an MP4 without re-encoding, so the MP4 still holds MPEG video.\n- **FFmpeg (fast start):** `ffmpeg -i input.mpv -an -movflags +faststart -c:v libx264 -pix_fmt yuv420p output.mp4` moves the index to the start of the file in a second pass, which suits web playback.\n\n### Problems with MPV files\n\n- **The MP4 is silent**: an elementary video stream has no soundtrack inside its video data. Find the matching audio file and join the two with a desktop tool; converting the picture again will not add sound.\n- **A movie player won't open it**: the stream has no container around it, so a player that expects one may not open it.\n- **Adobe won't import it**: Premiere Elements lists MPV as unsupported, and renaming the extension does not help. Convert first.\n- **Unclear MPEG version**: inspect the stream to see which kind of MPEG video it holds.\n"
+    }
+  }
+}

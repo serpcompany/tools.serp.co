@@ -1,0 +1,207 @@
+{
+  "tools": {
+    "jpeg-to-tga": {
+      "methods": [
+        {
+          "app": "GIMP",
+          "steps": "Open the JPEG; File > Export As; export as TGA; Use RLE compression, Origin.",
+          "limits": "",
+          "source": "https://docs.gimp.org/3.2/en/file-tga-export.html",
+          "supportSource": "https://docs.gimp.org/3.0/en/gimp-images-out.html"
+        },
+        {
+          "app": "ImageMagick",
+          "steps": "magick photograph.jpeg texture_copy.tga",
+          "limits": "",
+          "source": "https://imagemagick.org/command-line-processing/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Tacent View",
+          "steps": "tacentview -c photograph.jpeg --out tga",
+          "limits": "",
+          "source": "https://bluescan.github.io/tacentview/cli.html"
+        }
+      ]
+    },
+    "jpg-to-rgb": {
+      "methods": [
+        {
+          "app": "ImageMagick",
+          "steps": "magick photo.jpg -depth 8 RGB:samples.rgb",
+          "limits": "",
+          "source": "https://imagemagick.org/command-line-options/",
+          "supportSource": "https://imagemagick.org/formats/"
+        },
+        {
+          "app": "Pillow",
+          "steps": "from PIL import Image; pixels=Image.open('photo.jpg').convert('RGB'); open('samples.rgb','wb').write(pixels.tobytes())",
+          "limits": "",
+          "source": "https://pillow.readthedocs.io/en/stable/reference/Image.html",
+          "supportSource": "https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html"
+        }
+      ]
+    },
+    "ktx-to-png": {
+      "methods": [
+        {
+          "app": "PVRTexToolCLI",
+          "steps": "PVRTexToolCLI -i texture.ktx -d extracted.png -noout",
+          "limits": "",
+          "source": "https://docs.imgtec.com/tools-manuals/pvrtextool-manual/html/topics/cli/command-line-options.html"
+        },
+        {
+          "app": "Tacent View",
+          "steps": "tacentview -c texture.ktx --out png",
+          "limits": "",
+          "source": "https://bluescan.github.io/tacentview/cli.html",
+          "supportSource": "https://github.com/bluescan/tacentview"
+        }
+      ]
+    },
+    "m2v-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg video only",
+          "steps": "ffmpeg -i pictures.m2v -c:v libx264 -an viewing.mp4",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        },
+        {
+          "app": "FFmpeg separate audio",
+          "steps": "ffmpeg -i pictures.m2v -i soundtrack.wav -c:v libx264 -c:a aac -shortest complete.mp4",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-codecs.html"
+        }
+      ]
+    },
+    "mac-to-png": {
+      "methods": [
+        {
+          "app": "Netpbm",
+          "steps": "macptopbm old_drawing.mac > drawing.pbm; pnmtopng drawing.pbm > drawing.png",
+          "limits": "",
+          "source": "https://netpbm.sourceforge.net/doc/macptopbm.html",
+          "supportSource": "https://netpbm.sourceforge.net/doc/pnmtopng.html"
+        },
+        {
+          "app": "Deark",
+          "steps": "deark -m macpaint old_drawing.mac",
+          "limits": "",
+          "source": "https://entropymine.com/deark/formats.txt",
+          "supportSource": "https://entropymine.com/deark/readme.md"
+        }
+      ]
+    },
+    "mjpeg-to-mp4": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i camera.mjpeg -c:v libx264 -an camera_view.mp4",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "FFmpeg with a chosen pixel format",
+          "steps": "ffmpeg -i clip.mjpeg -pix_fmt yuv420p -c:v libx264 clip_player.mp4",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        }
+      ]
+    },
+    "mkv-to-wmv": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i film.mkv film.wmv",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "FFmpeg with chosen streams",
+          "steps": "ffmpeg -i multilingual.mkv -map 0:0 -map 0:1 delivery.wmv",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/general.html"
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Add MKV; Output Format: WMV; Convert.",
+          "limits": "Input needs a Matroska DirectShow filter installed.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ]
+        }
+      ]
+    },
+    "mp3-to-caf": {
+      "methods": [
+        {
+          "app": "FFmpeg PCM",
+          "steps": "ffmpeg -i listening.mp3 -c:a pcm_s16le -ar 44100 -ac 2 -f caf editing.caf",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "Apple afconvert",
+          "steps": "afconvert -f caff -d LEI16@44100 -c 2 listening.mp3 editing.caf",
+          "limits": "",
+          "source": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html",
+          "evidence": "Local macOS afconvert -h and -hf output name caff and MPG3 (.mp3); a local run of this command wrote a CAF with 2-channel 44100 Hz Int16 data."
+        }
+      ]
+    },
+    "mp3-to-cdda": {
+      "methods": [
+        {
+          "app": "FFmpeg raw PCM",
+          "steps": "ffmpeg -i track.mp3 -ar 44100 -ac 2 -c:a pcm_s16le -f s16le samples.cdda",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg WAV and Python wave extraction",
+          "steps": "ffmpeg -i track.mp3 -ac 2 -ar 44100 -c:a pcm_s16le prepared.wav; then Python: import wave; w=wave.open('prepared.wav','rb'); assert (w.getnchannels(),w.getsampwidth(),w.getframerate())==(2,2,44100); open('samples.cdda','wb').write(w.readframes(w.getnframes())); w.close()",
+          "limits": "",
+          "source": "https://docs.python.org/3/library/wave.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg.html"
+        }
+      ]
+    },
+    "mp4-to-asf": {
+      "methods": [
+        {
+          "app": "FFmpeg",
+          "steps": "ffmpeg -i presentation.mp4 -f asf presentation.asf",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "FFmpeg with a video bitrate",
+          "steps": "ffmpeg -i presentation.mp4 -b:v 1400k -f asf presentation.asf",
+          "limits": "",
+          "source": "https://ffmpeg.org/ffmpeg.html",
+          "supportSource": "https://ffmpeg.org/ffmpeg-formats.html"
+        },
+        {
+          "app": "Prism for Windows",
+          "steps": "Add MP4; Output Format: ASF; Convert.",
+          "limits": "Input needs an MP4 filter installed.",
+          "source": "https://help.nchsoftware.com/help/en/prism/win/generalusage.html",
+          "supportSources": [
+            "https://help.nchsoftware.com/help/en/prism/win/prismformats.html"
+          ]
+        }
+      ]
+    }
+  }
+}
